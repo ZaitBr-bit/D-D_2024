@@ -1,0 +1,485 @@
+{
+  "nome": "Guerreiro",
+  "tracos_basicos": {
+    "Atributo Primário": "Equipamento Inicial",
+    "Força ou Destreza": "Escolha A, B ou C: (A) Cota de Malha, Espada Grande, Mangual, 8 Azagaias, Kit de Explorador de Masmorras e 4 PO; (B) Armadura de Couro Batido, Cimitarra, Espada Curta, Arco Longo, 20 Flechas, Aljava, Kit de Explorador de Masmorras e 11 PO; ou (C) 155 PO"
+  },
+  "tabela_caracteristicas": [
+    {
+      "Nível": "1",
+      "Bônus de Proficiência": "+2",
+      "Características": "Estilo de Luta, Maestria em Arma, Recuperar Fôlego",
+      "Recuperar Fôlego": "2",
+      "Maestria em Arma": "3"
+    },
+    {
+      "Nível": "2",
+      "Bônus de Proficiência": "+2",
+      "Características": "Mente Tática, Surto de Ação",
+      "Recuperar Fôlego": "2",
+      "Maestria em Arma": "3"
+    },
+    {
+      "Nível": "3",
+      "Bônus de Proficiência": "+2",
+      "Características": "Subclasse de Guerreiro",
+      "Recuperar Fôlego": "2",
+      "Maestria em Arma": "3"
+    },
+    {
+      "Nível": "4",
+      "Bônus de Proficiência": "+2",
+      "Características": "Aumento no Valor de Atributo",
+      "Recuperar Fôlego": "3",
+      "Maestria em Arma": "4"
+    },
+    {
+      "Nível": "5",
+      "Bônus de Proficiência": "+3",
+      "Características": "Ajuste Tático, Ataque Extra",
+      "Recuperar Fôlego": "3",
+      "Maestria em Arma": "4"
+    },
+    {
+      "Nível": "6",
+      "Bônus de Proficiência": "+3",
+      "Características": "Aumento no Valor de Atributo",
+      "Recuperar Fôlego": "3",
+      "Maestria em Arma": "4"
+    },
+    {
+      "Nível": "7",
+      "Bônus de Proficiência": "+3",
+      "Características": "Característica de Subclasse",
+      "Recuperar Fôlego": "3",
+      "Maestria em Arma": "4"
+    },
+    {
+      "Nível": "8",
+      "Bônus de Proficiência": "+3",
+      "Características": "Aumento no Valor de Atributo",
+      "Recuperar Fôlego": "3",
+      "Maestria em Arma": "4"
+    },
+    {
+      "Nível": "9",
+      "Bônus de Proficiência": "+4",
+      "Características": "Indomável, Mestre Tático",
+      "Recuperar Fôlego": "3",
+      "Maestria em Arma": "4"
+    },
+    {
+      "Nível": "10",
+      "Bônus de Proficiência": "+4",
+      "Características": "Característica de Subclasse",
+      "Recuperar Fôlego": "4",
+      "Maestria em Arma": "5"
+    },
+    {
+      "Nível": "11",
+      "Bônus de Proficiência": "+4",
+      "Características": "Dois Ataques Extras",
+      "Recuperar Fôlego": "4",
+      "Maestria em Arma": "5"
+    },
+    {
+      "Nível": "12",
+      "Bônus de Proficiência": "+4",
+      "Características": "Aumento no Valor de Atributo",
+      "Recuperar Fôlego": "4",
+      "Maestria em Arma": "5"
+    },
+    {
+      "Nível": "13",
+      "Bônus de Proficiência": "+5",
+      "Características": "Ataques Estudados, Indomável",
+      "Recuperar Fôlego": "4",
+      "Maestria em Arma": "5"
+    },
+    {
+      "Nível": "14",
+      "Bônus de Proficiência": "+5",
+      "Características": "Aumento no Valor de Atributo",
+      "Recuperar Fôlego": "4",
+      "Maestria em Arma": "5"
+    },
+    {
+      "Nível": "15",
+      "Bônus de Proficiência": "+5",
+      "Características": "Característica de Subclasse",
+      "Recuperar Fôlego": "4",
+      "Maestria em Arma": "5"
+    },
+    {
+      "Nível": "16",
+      "Bônus de Proficiência": "+5",
+      "Características": "Aumento no Valor de Atributo",
+      "Recuperar Fôlego": "4",
+      "Maestria em Arma": "6"
+    },
+    {
+      "Nível": "17",
+      "Bônus de Proficiência": "+6",
+      "Características": "Indomável, Surto de Ação",
+      "Recuperar Fôlego": "4",
+      "Maestria em Arma": "6"
+    },
+    {
+      "Nível": "18",
+      "Bônus de Proficiência": "+6",
+      "Características": "Característica de Subclasse",
+      "Recuperar Fôlego": "4",
+      "Maestria em Arma": "6"
+    },
+    {
+      "Nível": "19",
+      "Bônus de Proficiência": "+6",
+      "Características": "Dádiva Épica",
+      "Recuperar Fôlego": "4",
+      "Maestria em Arma": "6"
+    },
+    {
+      "Nível": "20",
+      "Bônus de Proficiência": "+6",
+      "Características": "Três Ataques Extras",
+      "Recuperar Fôlego": "4",
+      "Maestria em Arma": "6"
+    }
+  ],
+  "caracteristicas": [
+    {
+      "nivel": 15,
+      "nome": "Esquiva Sombria",
+      "descricao": "Quando uma criatura realiza uma jogada de ataque contra você, você pode executar uma Reação para impor Desvantagem nessa jogada. Se o ataque acertar ou errar, você pode se teleportar até 9 metros para um espaço desocupado à sua vista.\n# Guerreiro\n**Um Mestre de Todas as Armas e Armaduras**\n**Traços Básicos de Guerreiro**\n| **Atributo Primário**            | Força ou Destreza                                                                                                                                                                                                                                               |\n|----------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|\n| **Dado de Ponto de Vida**        | D10 por nível de Guerreiro                                                                                                                                                                                                                                      |\n| **Proficiência em Salvaguardas** | Força e Constituição                                                                                                                                                                                                                                            |\n| **Proficiências em Perícias**    | *Escolha 2:* Acrobacia, Atletismo, História, Intimidação, Intuição, Lidar com Animais, Percepção, Persuasão ou Sobrevivência.                                                                                                                                   |\n| **Proficiências com Armas**      | Armas Simples e Marciais                                                                                                                                                                                                                                        |\n| **Treinamento com Armadura**     | Armaduras Leves, Médias e Pesadas e Escudos                                                                                                                                                                                                                     |\n| **Equipamento Inicial**          | *Escolha A, B ou C:* (A) Cota de Malha, Espada Grande, Mangual, 8 Azagaias, Kit de Explorador de Masmorras e 4 PO; (B) Armadura de Couro Batido, Cimitarra, Espada Curta, Arco Longo, 20 Flechas, Aljava, Kit de Explorador de Masmorras e 11 PO; ou (C) 155 PO |\nGuerreiros dominam inúmeros campos de batalha. Cavaleiros em busca de glória, campeões reais, soldados de elite e mercenários experientes — como Guerreiros, todos compartilham uma competência incomparável com armas e armaduras. Eles conhecem bem a morte, tanto ao infligi-la quanto ao desafiá-la.\nGuerreiros dominam várias técnicas de combate com armas, e um Guerreiro bem equipado sempre tem a ferramenta certa para qualquer situação de combate. Da mesma forma, um Guerreiro é perito com todos os tipos de armadura. Além dessa familiaridade básica, cada Guerreiro se distingue em certos estilos de combate. Alguns se concentram na arquearia, outros no combate com duas armas e outros em aumentar suas habilidades marciais com magia. Essa combinação de habilidades amplas e especializações extensas torna os Guerreiros combatentes superiores."
+    },
+    {
+      "nivel": 1,
+      "nome": "Estilo de Luta",
+      "descricao": "Você aprimorou suas proezas marciais e tem um talento de Estilo de Luta à sua escolha (veja também o capítulo 5). Defensivo é o recomendado.\nSempre que atinge um nível de Guerreiro, você pode substituir o talento que escolheu por um talento diferente de Estilo de Luta."
+    },
+    {
+      "nivel": 1,
+      "nome": "Maestria em Arma",
+      "descricao": "Seu treinamento com armas permite que você utilize as propriedades de maestria com três tipos de armas Simples ou Marciais à sua escolha. Sempre que completar um Descanso Longo, você pode praticar movimentos com armas e alterar uma dessas escolhas de armas.\nAo alcançar certos níveis de Guerreiro, você adquire a habilidade de usar as propriedades de maestria de mais tipos de armas, conforme mostrado na coluna Maestria em Armas da tabela Características de Guerreiro."
+    },
+    {
+      "nivel": 1,
+      "nome": "Recuperar Fôlego",
+      "descricao": "Você tem uma reserva limitada de resistência física e mental que pode usar. Como uma Ação Bônus, você pode usá-la para recuperar Pontos de Vida iguais a 1d10 mais seu nível de Guerreiro.\nVocê pode usar essa característica duas vezes. Você recupera um uso gasto quando completa um Descanso Curto e restaura todos os usos gastos quando completa um Descanso Longo.\nAo atingir certos níveis de Guerreiro, você adquire mais usos dessa característica, conforme mostrado na coluna Recuperar Fôlego da tabela Características de Guerreiro."
+    },
+    {
+      "nivel": 2,
+      "nome": "Mente Tática",
+      "descricao": "Você tem uma mente para táticas dentro e fora do campo de batalha. Ao falhar em um teste de atributo, você pode gastar um uso de seu Recuperar Fôlego para tentar alcançar a vitória. Em vez de recuperar Pontos de Vida, você joga 1d10 e adiciona o resultado ao teste de atributo, potencialmente transformando-o em sucesso. Se o teste ainda assim falhar, esse uso do Recuperar Fôlego não é gasto."
+    },
+    {
+      "nivel": 2,
+      "nome": "Surto de Ação",
+      "descricao": "Você pode se esforçar além de seus limites normais por um momento. No seu turno, você pode executar uma ação adicional, exceto a ação Usar Magia.\nApós usar esta característica, você não pode usá-la novamente até completar um Descanso Curto ou Longo. A partir do nível 17, você pode usá-lo duas vezes antes de um descanso, mas apenas uma vez em um turno."
+    },
+    {
+      "nivel": 3,
+      "nome": "Subclasse de Guerreiro",
+      "descricao": "Você adquire uma subclasse de Guerreiro à sua escolha. As subclasses Campeão, Cavaleiro Místico, Combatente Psíquico e Mestre da Batalha estão detalhadas após a descrição desta classe. Uma subclasse é uma especialidade que concede a você características em determinados níveis de Guerreiro. Pelo resto de sua jornada, você adquire cada uma das características de sua subclasse de seu nível de Guerreiro ou menor."
+    },
+    {
+      "nivel": 4,
+      "nome": "Aumento no Valor de Atributo",
+      "descricao": "Você adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 6, 8, 12, 14 e 16 de Guerreiro."
+    },
+    {
+      "nivel": 5,
+      "nome": "Ajuste Tático",
+      "descricao": "Sempre que executar uma Ação Bônus para seu Recuperar Fôlego, você pode mover-se até metade do seu Deslocamento sem provocar Ataques de Oportunidade."
+    },
+    {
+      "nivel": 5,
+      "nome": "Ataque Extra",
+      "descricao": "Você pode atacar duas vezes, em vez de uma, sempre que executar a ação Atacar no seu turno."
+    },
+    {
+      "nivel": 9,
+      "nome": "Indomável",
+      "descricao": "Ao falhar em uma salvaguarda, você pode jogá-la novamente adicionando um bônus igual ao seu nível de Guerreiro. Você deve usar o novo resultado e não pode usar essa característica novamente até completar um Descanso Longo.\nA partir do nível 13, você pode usar essa característica duas vezes antes de um Descanso Longo e três vezes antes de um Descanso Longo ao atingir o nível 17."
+    },
+    {
+      "nivel": 9,
+      "nome": "Mestre Tático",
+      "descricao": "Ao atacar com uma arma cuja propriedade de maestria você pode usar, você pode substituir essa propriedade pela propriedade Empurrar, Drenar ou Lentidão para esse ataque."
+    },
+    {
+      "nivel": 11,
+      "nome": "Dois Ataques Extras",
+      "descricao": "Você pode atacar três vezes, em vez de uma, sempre que executar a ação Atacar no seu turno."
+    },
+    {
+      "nivel": 13,
+      "nome": "Ataques Estudados",
+      "descricao": "Você estuda seus oponentes e aprende com cada ataque que realiza. Se você realizar uma jogada de ataque contra uma criatura e errar, você tem Vantagem em sua próxima jogada de ataque contra essa criatura antes do final do seu próximo turno."
+    },
+    {
+      "nivel": 19,
+      "nome": "Dádiva Épica",
+      "descricao": "Você adquire o talento Dádiva Épica (veja o capítulo 5) ou outro talento à sua escolha para o qual se qualifica. Dádiva da Proeza em Combate é recomendada."
+    },
+    {
+      "nivel": 20,
+      "nome": "Três Ataques Extras",
+      "descricao": "Você pode atacar quatro vezes, em vez de uma, sempre que executar a ação Atacar no seu turno.\n**Um Guerreiro fica entre um aliado e o ataque de um dragão negro.**\n# Subclasses de Guerreiro\nUma subclasse de Guerreiro é uma especialização que concede características em certos níveis, conforme detalhado na subclasse. Esta seção apresenta as subclasses Campeão, Cavaleiro Místico, Combatente Psíquico e Mestre da Batalha."
+    },
+    {
+      "nivel": 3,
+      "nome": "Atleta Extraordinário",
+      "descricao": "Graças ao seu atletismo, você tem Vantagem em jogadas de Iniciativa e testes de Força (Atletismo).\nAlém disso, imediatamente após obter um Acerto Crítico, você pode se mover até metade do seu Deslocamento sem provocar Ataques de Oportunidade."
+    },
+    {
+      "nivel": 3,
+      "nome": "Crítico Aprimorado",
+      "descricao": "Suas jogadas de ataque com armas e Ataques Desarmados obtém Acerto Crítico em jogadas com resultados 19 ou 20 no d20."
+    },
+    {
+      "nivel": 7,
+      "nome": "Estilo de Luta Adicional",
+      "descricao": "Você adquire outro talento de Estilo de Luta à sua escolha."
+    },
+    {
+      "nivel": 10,
+      "nome": "Combatente Heroico",
+      "descricao": "A emoção da batalha leva você à vitória. Durante o combate, você pode se conceder Inspiração Heroica sempre que começar seu turno sem ela."
+    },
+    {
+      "nivel": 15,
+      "nome": "Crítico Superior",
+      "descricao": "Suas jogadas de ataque com armas e Ataques Desarmados agora obtém Acerto Crítico em jogadas com resultados 18 a 20 no d20."
+    },
+    {
+      "nivel": 18,
+      "nome": "Sobrevivente",
+      "descricao": "Você atinge o auge da resiliência em batalha, concedendo-lhe os seguintes benefícios.\n**Desafie a Morte.** Você tem Vantagem em Salvaguardas Contra Morte. Além disso, ao obter um 18–20 em uma Salvaguarda Contra Morte, você obtém um 20 como resultado.\n**Regeneração Heroica.** No início de cada um dos seus turnos, você recupera Pontos de Vida iguais a 5 mais seu modificador de Constituição se estiver Sangrando e ter ao menos 1 Ponto de Vida."
+    },
+    {
+      "nivel": 3,
+      "nome": "Conjuração",
+      "descricao": "Você aprendeu a conjurar magias. Veja o capítulo 7 para as regras sobre conjuração de magias. As informações abaixo detalham como você usa essas regras como um Cavaleiro Místico.\n**Truques.** Você conhece dois truques à sua escolha da lista de magias de Mago (veja a seção desta classe para a lista de magias). *Raio de Gelo* e *Toque Chocante* são recomendados. Sempre que você atinge um nível de Guerreiro, pode substituir um desses truques por outro truque à sua escolha da lista de magias de Mago.\nAo atingir o nível 10 de Guerreiro, você aprende mais um truque de Mago à sua escolha.\n**Espaços de Magia.** A tabela Conjuração de Cavaleiro Místico apresenta quantos espaços de magia você tem para conjurar suas magias de 1º círculo ou superior. Você restaura todos os espaços gastos ao completar um Descanso Longo.\n**Conjuração de Cavaleiro Místico**\n|                        |                       | **Espaços de Magia por Círculo de Magia** |       |       |       |\n|------------------------|-----------------------|-------------------------------------------|-------|-------|-------|\n| **Nível de Guerreiro** | **Magias Preparadas** | **1**                                     | **2** | **3** | **4** |\n| 3                      | 3                     | 2                                         | —     | —     | —     |\n| 4                      | 4                     | 3                                         | —     | —     | —     |\n| 5                      | 4                     | 3                                         | —     | —     | —     |\n| 6                      | 4                     | 3                                         | —     | —     | —     |\n| 7                      | 5                     | 4                                         | 2     | —     | —     |\n| 8                      | 6                     | 4                                         | 2     | —     | —     |\n| 9                      | 6                     | 4                                         | 2     | —     | —     |\n| 10                     | 7                     | 4                                         | 3     | —     | —     |\n| 11                     | 8                     | 4                                         | 3     | —     | —     |\n| 12                     | 8                     | 4                                         | 3     | —     | —     |\n| 13                     | 9                     | 4                                         | 3     | 2     | —     |\n| 14                     | 10                    | 4                                         | 3     | 2     | —     |\n| 15                     | 10                    | 4                                         | 3     | 2     | —     |\n| 16                     | 11                    | 4                                         | 3     | 3     | —     |\n| 17                     | 11                    | 4                                         | 3     | 3     | —     |\n| 18                     | 11                    | 4                                         | 3     | 3     | —     |\n| 19                     | 12                    | 4                                         | 3     | 3     | 1     |\n| 20                     | 13                    | 4                                         | 3     | 3     | 1     |\n**Magias Preparadas de 1º Círculo ou Superior.** Você prepara a lista de magias de 1º círculo ou superior que estão disponíveis para você ao conjurar com essa característica. Para começar, escolha três magias de 1º círculo da lista de magias de Mago. *Escudo Arcano*, *Mãos Flamejantes* e *Salto* são recomendadas.\nO número de magias em sua lista aumenta à medida que você atinge níveis de Guerreiro, conforme mostrado na coluna Magias Preparadas da tabela Conjuração de Cavaleiro Místico. Sempre que esse número aumentar, escolha magias adicionais da lista de magias de Mago até que o número de magias em sua lista corresponda ao número da tabela. As magias escolhidas devem ser de um círculo para o qual você possui espaços de magia. Por exemplo, se você é um Guerreiro de nível 7, sua lista de magias preparadas pode incluir cinco magias de Mago de 1º ou 2º círculo em qualquer combinação.\n**Mudando Suas Magias Preparadas.** Sempre que você atinge um nível de Guerreiro, pode substituir uma magia em sua lista por outra magia de Mago para a qual você tem espaços de magia.\n**Atributo de Conjuração.** Inteligência é seu atributo de conjuração para suas magias de Mago.\n**Foco de Conjuração.** Você pode usar um Foco Arcano como um Foco de Conjuração para suas magias de Mago."
+    },
+    {
+      "nivel": 3,
+      "nome": "Vínculo com Arma",
+      "descricao": "Você aprende um ritual que cria um vínculo mágico entre você e uma arma. Você realiza o ritual ao longo de 1 hora, o que pode ser concluído durante um Descanso Curto. A arma deve estar ao seu alcance durante todo o ritual e, ao concluí-lo, você toca a arma e estabelece o vínculo. O vínculo falha se outro Guerreiro estiver ligado à arma ou se a arma for um item mágico com o qual outra pessoa está sintonizada.\nApós ter vinculado uma arma a si, ela não pode ser desarmada de você, a menos que você tenha a condição Incapacitado. Se ela estiver no mesmo plano de existência, você pode invocar essa arma como uma Ação Bônus, teleportando-a instantaneamente para sua mão.\nVocê pode ter até dois vínculos com armas, mas pode invocar apenas uma de cada vez com uma Ação Bônus. Se você tentar se vincular com uma terceira arma, você deve quebrar o vínculo com uma das outras duas."
+    },
+    {
+      "nivel": 7,
+      "nome": "Magia de Guerra",
+      "descricao": "Ao executar a ação Atacar no seu turno, você pode substituir um dos ataques por uma conjuração de um de seus truques de Mago que tenha um tempo de conjuração de uma ação."
+    },
+    {
+      "nivel": 10,
+      "nome": "Golpe Místico",
+      "descricao": "Você aprende a usar seus ataques com armas para reduzir a resistência de uma criatura às suas magias. Ao atingir uma criatura com um ataque usando uma arma, essa criatura sofre Desvantagem na próxima salvaguarda que realizar contra uma magia que você conjurar antes do final do seu próximo turno."
+    },
+    {
+      "nivel": 15,
+      "nome": "Investida Mística",
+      "descricao": "Ao usar seu Surto de Ação, você pode se teleportar até 9 metros para um espaço desocupado à sua vista. Você pode se teleportar antes ou depois da ação adicional."
+    },
+    {
+      "nivel": 18,
+      "nome": "Magia de Guerra Aprimorada",
+      "descricao": "Ao executar a ação Atacar no seu turno, você pode substituir dois ataques pela conjuração de uma das suas magias de Mago de 1º ou 2º círculo que tenha um tempo de conjuração de uma ação."
+    },
+    {
+      "nivel": 3,
+      "nome": "Poder Psiônico",
+      "descricao": "Você possui uma fonte de energia psiônica, representada pelos seus Dados de Energia Psiônica, que alimenta os poderes desta subclasse. A tabela Dados de Energia do Combatente Psíquico indica o tipo e a quantidade desses dados conforme você atinge certos níveis de Guerreiro.\n**Dados de Energia do Combatente Psíquico**\n| **Nível de Guerreiro** | **Tipo de Dado** | **Quantidade** |\n|------------------------|------------------|----------------|\n| 3                      | D6               | 4              |\n| 5                      | D8               | 6              |\n| 9                      | D8               | 8              |\n| 11                     | D10              | 8              |\n| 13                     | D10              | 10             |\n| 17                     | D12              | 12             |\nQualquer característica desta subclasse que utilize um Dado de Energia Psiônica emprega apenas os dados dessa subclasse. Alguns poderes consomem esse Dado, conforme detalhado na respectiva descrição, e você não pode usar um poder se ele exigir um dado e todos os seus Dados de Energia Psiônica estiverem esgotados.\nVocê recupera um de seus Dados de Energia Psiônica gastos ao completar um Descanso Curto, e restaura todos ao completar um Descanso Longo.\n**Golpe Psiônico.** Você pode impulsionar suas armas com força psiônica. Uma vez em cada um dos seus turnos, imediatamente após atingir um alvo a até 9 metros de você com um ataque e causar dano a ele com uma arma, você pode gastar um Dado de Energia Psiônica, jogá-lo e causar dano Energético ao alvo igual ao resultado obtido mais seu modificador de Inteligência.\n**Movimento Telecinético.** Você pode mover um objeto ou uma criatura com sua mente. Como uma ação Usar Magia, escolha um alvo à sua vista a até 9 metros de você; o alvo deve ser um objeto solto que seja Grande ou menor, ou uma criatura voluntária que não seja você. Você transporta o alvo até 9 metros para um espaço desocupado à sua vista. Como alternativa, se o alvo for um objeto Minúsculo, você pode transportá-lo de ou para sua mão.\nApós executar essa ação, você não pode fazer isso novamente até completar um Descanso Curto ou Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar o uso.\n**Vínculo Protetivo.** Quando você ou outra criatura à sua vista a até 9 metros de você sofrer dano, você pode executar uma Reação para gastar um Dado de Energia Psiônica, jogar o dado e reduzir o dano sofrido pelo resultado mais seu modificador de Inteligência (redução mínima de 1), enquanto cria um escudo momentâneo de força telecinética."
+    },
+    {
+      "nivel": 7,
+      "nome": "Adepto Telecinético",
+      "descricao": "Você dominou novas maneiras de usar suas habilidades telecinéticas, detalhadas abaixo.\n**Estocada Telecinética.** Ao causar dano a um alvo com seu Golpe Psiônico, você pode forçá-lo a realizar uma salvaguarda de Força (CD 8 mais seu modificador de Inteligência e seu Bônus de Proficiência). Se falhar, você pode impor ao alvo a condição Caído ou transportá-lo horizontalmente até 3 metros.\n**Salto com Impulsão Psíquica.** Como uma Ação Bônus, você adquire um Deslocamento de Voo igual ao dobro do seu Deslocamento até o final do turno atual. Após executar essa Ação Bônus, você não pode fazer isso novamente até completar um Descanso Curto ou Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar o uso."
+    },
+    {
+      "nivel": 10,
+      "nome": "Resguardo Mental",
+      "descricao": "Você tem Resistência a Dano Psíquico. Além disso, ao iniciar seu turno com a condição Amedrontado ou Enfeitiçado, você pode gastar um Dado de Energia Psiônica (nenhuma ação é necessária) e encerrar todos os efeitos em você que lhe impõe essas condições."
+    },
+    {
+      "nivel": 15,
+      "nome": "Baluarte de Energia",
+      "descricao": "Você pode proteger a si e aos outros com força telecinética. Como uma Ação Bônus, você pode escolher criaturas, incluindo você mesmo, a até 9 metros, até um número de criaturas igual ao seu modificador de Inteligência (mínimo de uma criatura). Cada uma das criaturas escolhidas tem Cobertura Parcial por 1 minuto ou até você ter a condição Incapacitado.\nApós usar essa característica, você não pode fazer isso novamente até completar um Descanso Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar seu uso."
+    },
+    {
+      "nivel": 18,
+      "nome": "Mestre Telecinético",
+      "descricao": "Você sempre tem a magia *Telecinese* preparada. Com esta característica, você pode conjurá-la sem um espaço de magia ou componentes, e seu atributo de conjuração para ela é a Inteligência. Em cada um dos seus turnos enquanto você mantém a Concentração nela, incluindo o turno quando a conjura, você pode realizar um ataque com arma como uma Ação Bônus.\nApós conjurar a magia por meio dessa característica, você não pode fazer isso deste modo até completar um Descanso Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar o uso."
+    },
+    {
+      "nivel": 3,
+      "nome": "Estudioso da Guerra",
+      "descricao": "Você adquire proficiência com um tipo de Ferramentas de Artesão à sua escolha e adquire proficiência em uma perícia à sua escolha das perícias disponíveis para Guerreiros no nível 1."
+    },
+    {
+      "nivel": 3,
+      "nome": "Superioridade em Combate",
+      "descricao": "Sua experiência em combate aprimorou suas técnicas de luta, permitindo que você aprenda manobras com base em dados especiais chamados Dados de Superioridade.\n**Manobras.** Você aprende três manobras à sua escolha na seção “Opções de Manobras” mais adiante na descrição desta subclasse. Muitas manobras aprimoram, de alguma forma, um ataque. Você pode usar apenas uma manobra por ataque.\nVocê aprende duas manobras adicionais à sua escolha quando atinge os níveis 7, 10 e 15 de Guerreiro. Cada vez que aprende novas manobras, você também pode substituir uma manobra que você conhece por uma diferente.\n**Dados de Superioridade.** Você tem quatro Dados de Superioridade, os quais são d8s. Um Dado de Superioridade é gasto ao usá-lo. Você restaura todos os Dados de Superioridade gastos quando completa um Descanso Curto ou Longo.\nVocê adquire um Dado de Superioridade adicional ao atingir os níveis 7 (cinco dados no total) e 15 (seis dados no total) de Guerreiro.\n**Salvaguardas.** Se uma manobra exigir uma salvaguarda, a CD é igual a 8 mais seu modificador de Força ou Destreza (à sua escolha) e seu Bônus de Proficiência."
+    },
+    {
+      "nivel": 7,
+      "nome": "Conheça Seu Inimigo",
+      "descricao": "Como uma Ação Bônus, você pode examinar certos pontos fortes e fracos de uma criatura à sua vista a até 9 metros de você; você sabe se essa criatura tem Imunidades, Resistências ou Vulnerabilidades, e se a criatura tiver alguma, você sabe quais são.\nApós usar essa característica, você não pode fazer isso novamente até completar um Descanso Longo. Você também pode recuperar um uso da característica gastando um Dado de Superioridade (nenhuma ação é necessária)."
+    },
+    {
+      "nivel": 10,
+      "nome": "Superioridade em Combate Aprimorada",
+      "descricao": "Seu Dado de Superioridade se torna um d10."
+    },
+    {
+      "nivel": 15,
+      "nome": "Implacável",
+      "descricao": "Uma vez por turno, ao usar uma manobra, você pode jogar 1d8 e usar o resultado em vez de gastar um Dado de Superioridade."
+    },
+    {
+      "nivel": 18,
+      "nome": "Superioridade em Combate Suprema",
+      "descricao": "Seu Dado de Superioridade se torna um d12."
+    }
+  ],
+  "subclasses": [
+    {
+      "nome": "Campeão",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Atleta Extraordinário",
+          "descricao": "Graças ao seu atletismo, você tem Vantagem em jogadas de Iniciativa e testes de Força (Atletismo).\nAlém disso, imediatamente após obter um Acerto Crítico, você pode se mover até metade do seu Deslocamento sem provocar Ataques de Oportunidade."
+        },
+        {
+          "nivel": 3,
+          "nome": "Crítico Aprimorado",
+          "descricao": "Suas jogadas de ataque com armas e Ataques Desarmados obtém Acerto Crítico em jogadas com resultados 19 ou 20 no d20."
+        },
+        {
+          "nivel": 7,
+          "nome": "Estilo de Luta Adicional",
+          "descricao": "Você adquire outro talento de Estilo de Luta à sua escolha."
+        },
+        {
+          "nivel": 10,
+          "nome": "Combatente Heroico",
+          "descricao": "A emoção da batalha leva você à vitória. Durante o combate, você pode se conceder Inspiração Heroica sempre que começar seu turno sem ela."
+        },
+        {
+          "nivel": 15,
+          "nome": "Crítico Superior",
+          "descricao": "Suas jogadas de ataque com armas e Ataques Desarmados agora obtém Acerto Crítico em jogadas com resultados 18 a 20 no d20."
+        },
+        {
+          "nivel": 18,
+          "nome": "Sobrevivente",
+          "descricao": "Você atinge o auge da resiliência em batalha, concedendo-lhe os seguintes benefícios.\n**Desafie a Morte.** Você tem Vantagem em Salvaguardas Contra Morte. Além disso, ao obter um 18–20 em uma Salvaguarda Contra Morte, você obtém um 20 como resultado.\n**Regeneração Heroica.** No início de cada um dos seus turnos, você recupera Pontos de Vida iguais a 5 mais seu modificador de Constituição se estiver Sangrando e ter ao menos 1 Ponto de Vida."
+        }
+      ]
+    },
+    {
+      "nome": "Cavaleiro Místico",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Conjuração",
+          "descricao": "Você aprendeu a conjurar magias. Veja o capítulo 7 para as regras sobre conjuração de magias. As informações abaixo detalham como você usa essas regras como um Cavaleiro Místico.\n**Truques.** Você conhece dois truques à sua escolha da lista de magias de Mago (veja a seção desta classe para a lista de magias). *Raio de Gelo* e *Toque Chocante* são recomendados. Sempre que você atinge um nível de Guerreiro, pode substituir um desses truques por outro truque à sua escolha da lista de magias de Mago.\nAo atingir o nível 10 de Guerreiro, você aprende mais um truque de Mago à sua escolha.\n**Espaços de Magia.** A tabela Conjuração de Cavaleiro Místico apresenta quantos espaços de magia você tem para conjurar suas magias de 1º círculo ou superior. Você restaura todos os espaços gastos ao completar um Descanso Longo.\n**Conjuração de Cavaleiro Místico**\n|                        |                       | **Espaços de Magia por Círculo de Magia** |       |       |       |\n|------------------------|-----------------------|-------------------------------------------|-------|-------|-------|\n| **Nível de Guerreiro** | **Magias Preparadas** | **1**                                     | **2** | **3** | **4** |\n| 3                      | 3                     | 2                                         | —     | —     | —     |\n| 4                      | 4                     | 3                                         | —     | —     | —     |\n| 5                      | 4                     | 3                                         | —     | —     | —     |\n| 6                      | 4                     | 3                                         | —     | —     | —     |\n| 7                      | 5                     | 4                                         | 2     | —     | —     |\n| 8                      | 6                     | 4                                         | 2     | —     | —     |\n| 9                      | 6                     | 4                                         | 2     | —     | —     |\n| 10                     | 7                     | 4                                         | 3     | —     | —     |\n| 11                     | 8                     | 4                                         | 3     | —     | —     |\n| 12                     | 8                     | 4                                         | 3     | —     | —     |\n| 13                     | 9                     | 4                                         | 3     | 2     | —     |\n| 14                     | 10                    | 4                                         | 3     | 2     | —     |\n| 15                     | 10                    | 4                                         | 3     | 2     | —     |\n| 16                     | 11                    | 4                                         | 3     | 3     | —     |\n| 17                     | 11                    | 4                                         | 3     | 3     | —     |\n| 18                     | 11                    | 4                                         | 3     | 3     | —     |\n| 19                     | 12                    | 4                                         | 3     | 3     | 1     |\n| 20                     | 13                    | 4                                         | 3     | 3     | 1     |\n**Magias Preparadas de 1º Círculo ou Superior.** Você prepara a lista de magias de 1º círculo ou superior que estão disponíveis para você ao conjurar com essa característica. Para começar, escolha três magias de 1º círculo da lista de magias de Mago. *Escudo Arcano*, *Mãos Flamejantes* e *Salto* são recomendadas.\nO número de magias em sua lista aumenta à medida que você atinge níveis de Guerreiro, conforme mostrado na coluna Magias Preparadas da tabela Conjuração de Cavaleiro Místico. Sempre que esse número aumentar, escolha magias adicionais da lista de magias de Mago até que o número de magias em sua lista corresponda ao número da tabela. As magias escolhidas devem ser de um círculo para o qual você possui espaços de magia. Por exemplo, se você é um Guerreiro de nível 7, sua lista de magias preparadas pode incluir cinco magias de Mago de 1º ou 2º círculo em qualquer combinação.\n**Mudando Suas Magias Preparadas.** Sempre que você atinge um nível de Guerreiro, pode substituir uma magia em sua lista por outra magia de Mago para a qual você tem espaços de magia.\n**Atributo de Conjuração.** Inteligência é seu atributo de conjuração para suas magias de Mago.\n**Foco de Conjuração.** Você pode usar um Foco Arcano como um Foco de Conjuração para suas magias de Mago."
+        },
+        {
+          "nivel": 3,
+          "nome": "Vínculo com Arma",
+          "descricao": "Você aprende um ritual que cria um vínculo mágico entre você e uma arma. Você realiza o ritual ao longo de 1 hora, o que pode ser concluído durante um Descanso Curto. A arma deve estar ao seu alcance durante todo o ritual e, ao concluí-lo, você toca a arma e estabelece o vínculo. O vínculo falha se outro Guerreiro estiver ligado à arma ou se a arma for um item mágico com o qual outra pessoa está sintonizada.\nApós ter vinculado uma arma a si, ela não pode ser desarmada de você, a menos que você tenha a condição Incapacitado. Se ela estiver no mesmo plano de existência, você pode invocar essa arma como uma Ação Bônus, teleportando-a instantaneamente para sua mão.\nVocê pode ter até dois vínculos com armas, mas pode invocar apenas uma de cada vez com uma Ação Bônus. Se você tentar se vincular com uma terceira arma, você deve quebrar o vínculo com uma das outras duas."
+        },
+        {
+          "nivel": 7,
+          "nome": "Magia de Guerra",
+          "descricao": "Ao executar a ação Atacar no seu turno, você pode substituir um dos ataques por uma conjuração de um de seus truques de Mago que tenha um tempo de conjuração de uma ação."
+        },
+        {
+          "nivel": 10,
+          "nome": "Golpe Místico",
+          "descricao": "Você aprende a usar seus ataques com armas para reduzir a resistência de uma criatura às suas magias. Ao atingir uma criatura com um ataque usando uma arma, essa criatura sofre Desvantagem na próxima salvaguarda que realizar contra uma magia que você conjurar antes do final do seu próximo turno."
+        },
+        {
+          "nivel": 15,
+          "nome": "Investida Mística",
+          "descricao": "Ao usar seu Surto de Ação, você pode se teleportar até 9 metros para um espaço desocupado à sua vista. Você pode se teleportar antes ou depois da ação adicional."
+        },
+        {
+          "nivel": 18,
+          "nome": "Magia de Guerra Aprimorada",
+          "descricao": "Ao executar a ação Atacar no seu turno, você pode substituir dois ataques pela conjuração de uma das suas magias de Mago de 1º ou 2º círculo que tenha um tempo de conjuração de uma ação."
+        }
+      ]
+    },
+    {
+      "nome": "Combatente Psíquico",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Poder Psiônico",
+          "descricao": "Você possui uma fonte de energia psiônica, representada pelos seus Dados de Energia Psiônica, que alimenta os poderes desta subclasse. A tabela Dados de Energia do Combatente Psíquico indica o tipo e a quantidade desses dados conforme você atinge certos níveis de Guerreiro.\n**Dados de Energia do Combatente Psíquico**\n| **Nível de Guerreiro** | **Tipo de Dado** | **Quantidade** |\n|------------------------|------------------|----------------|\n| 3                      | D6               | 4              |\n| 5                      | D8               | 6              |\n| 9                      | D8               | 8              |\n| 11                     | D10              | 8              |\n| 13                     | D10              | 10             |\n| 17                     | D12              | 12             |\nQualquer característica desta subclasse que utilize um Dado de Energia Psiônica emprega apenas os dados dessa subclasse. Alguns poderes consomem esse Dado, conforme detalhado na respectiva descrição, e você não pode usar um poder se ele exigir um dado e todos os seus Dados de Energia Psiônica estiverem esgotados.\nVocê recupera um de seus Dados de Energia Psiônica gastos ao completar um Descanso Curto, e restaura todos ao completar um Descanso Longo.\n**Golpe Psiônico.** Você pode impulsionar suas armas com força psiônica. Uma vez em cada um dos seus turnos, imediatamente após atingir um alvo a até 9 metros de você com um ataque e causar dano a ele com uma arma, você pode gastar um Dado de Energia Psiônica, jogá-lo e causar dano Energético ao alvo igual ao resultado obtido mais seu modificador de Inteligência.\n**Movimento Telecinético.** Você pode mover um objeto ou uma criatura com sua mente. Como uma ação Usar Magia, escolha um alvo à sua vista a até 9 metros de você; o alvo deve ser um objeto solto que seja Grande ou menor, ou uma criatura voluntária que não seja você. Você transporta o alvo até 9 metros para um espaço desocupado à sua vista. Como alternativa, se o alvo for um objeto Minúsculo, você pode transportá-lo de ou para sua mão.\nApós executar essa ação, você não pode fazer isso novamente até completar um Descanso Curto ou Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar o uso.\n**Vínculo Protetivo.** Quando você ou outra criatura à sua vista a até 9 metros de você sofrer dano, você pode executar uma Reação para gastar um Dado de Energia Psiônica, jogar o dado e reduzir o dano sofrido pelo resultado mais seu modificador de Inteligência (redução mínima de 1), enquanto cria um escudo momentâneo de força telecinética."
+        },
+        {
+          "nivel": 7,
+          "nome": "Adepto Telecinético",
+          "descricao": "Você dominou novas maneiras de usar suas habilidades telecinéticas, detalhadas abaixo.\n**Estocada Telecinética.** Ao causar dano a um alvo com seu Golpe Psiônico, você pode forçá-lo a realizar uma salvaguarda de Força (CD 8 mais seu modificador de Inteligência e seu Bônus de Proficiência). Se falhar, você pode impor ao alvo a condição Caído ou transportá-lo horizontalmente até 3 metros.\n**Salto com Impulsão Psíquica.** Como uma Ação Bônus, você adquire um Deslocamento de Voo igual ao dobro do seu Deslocamento até o final do turno atual. Após executar essa Ação Bônus, você não pode fazer isso novamente até completar um Descanso Curto ou Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar o uso."
+        },
+        {
+          "nivel": 10,
+          "nome": "Resguardo Mental",
+          "descricao": "Você tem Resistência a Dano Psíquico. Além disso, ao iniciar seu turno com a condição Amedrontado ou Enfeitiçado, você pode gastar um Dado de Energia Psiônica (nenhuma ação é necessária) e encerrar todos os efeitos em você que lhe impõe essas condições."
+        },
+        {
+          "nivel": 15,
+          "nome": "Baluarte de Energia",
+          "descricao": "Você pode proteger a si e aos outros com força telecinética. Como uma Ação Bônus, você pode escolher criaturas, incluindo você mesmo, a até 9 metros, até um número de criaturas igual ao seu modificador de Inteligência (mínimo de uma criatura). Cada uma das criaturas escolhidas tem Cobertura Parcial por 1 minuto ou até você ter a condição Incapacitado.\nApós usar essa característica, você não pode fazer isso novamente até completar um Descanso Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar seu uso."
+        },
+        {
+          "nivel": 18,
+          "nome": "Mestre Telecinético",
+          "descricao": "Você sempre tem a magia *Telecinese* preparada. Com esta característica, você pode conjurá-la sem um espaço de magia ou componentes, e seu atributo de conjuração para ela é a Inteligência. Em cada um dos seus turnos enquanto você mantém a Concentração nela, incluindo o turno quando a conjura, você pode realizar um ataque com arma como uma Ação Bônus.\nApós conjurar a magia por meio dessa característica, você não pode fazer isso deste modo até completar um Descanso Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar o uso."
+        }
+      ]
+    },
+    {
+      "nome": "Mestre da Batalha",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Estudioso da Guerra",
+          "descricao": "Você adquire proficiência com um tipo de Ferramentas de Artesão à sua escolha e adquire proficiência em uma perícia à sua escolha das perícias disponíveis para Guerreiros no nível 1."
+        },
+        {
+          "nivel": 3,
+          "nome": "Superioridade em Combate",
+          "descricao": "Sua experiência em combate aprimorou suas técnicas de luta, permitindo que você aprenda manobras com base em dados especiais chamados Dados de Superioridade.\n**Manobras.** Você aprende três manobras à sua escolha na seção “Opções de Manobras” mais adiante na descrição desta subclasse. Muitas manobras aprimoram, de alguma forma, um ataque. Você pode usar apenas uma manobra por ataque.\nVocê aprende duas manobras adicionais à sua escolha quando atinge os níveis 7, 10 e 15 de Guerreiro. Cada vez que aprende novas manobras, você também pode substituir uma manobra que você conhece por uma diferente.\n**Dados de Superioridade.** Você tem quatro Dados de Superioridade, os quais são d8s. Um Dado de Superioridade é gasto ao usá-lo. Você restaura todos os Dados de Superioridade gastos quando completa um Descanso Curto ou Longo.\nVocê adquire um Dado de Superioridade adicional ao atingir os níveis 7 (cinco dados no total) e 15 (seis dados no total) de Guerreiro.\n**Salvaguardas.** Se uma manobra exigir uma salvaguarda, a CD é igual a 8 mais seu modificador de Força ou Destreza (à sua escolha) e seu Bônus de Proficiência."
+        },
+        {
+          "nivel": 7,
+          "nome": "Conheça Seu Inimigo",
+          "descricao": "Como uma Ação Bônus, você pode examinar certos pontos fortes e fracos de uma criatura à sua vista a até 9 metros de você; você sabe se essa criatura tem Imunidades, Resistências ou Vulnerabilidades, e se a criatura tiver alguma, você sabe quais são.\nApós usar essa característica, você não pode fazer isso novamente até completar um Descanso Longo. Você também pode recuperar um uso da característica gastando um Dado de Superioridade (nenhuma ação é necessária)."
+        },
+        {
+          "nivel": 10,
+          "nome": "Superioridade em Combate Aprimorada",
+          "descricao": "Seu Dado de Superioridade se torna um d10."
+        },
+        {
+          "nivel": 15,
+          "nome": "Implacável",
+          "descricao": "Uma vez por turno, ao usar uma manobra, você pode jogar 1d8 e usar o resultado em vez de gastar um Dado de Superioridade."
+        },
+        {
+          "nivel": 18,
+          "nome": "Superioridade em Combate Suprema",
+          "descricao": "Seu Dado de Superioridade se torna um d12."
+        }
+      ]
+    }
+  ],
+  "lista_magias": {},
+  "texto_completo": "**Medo em Massa.** O alvo e cada criatura a até 3 metros dele deve realizar uma salvaguarda de Sabedoria contra a CD para evitar sua magia. Ao falhar, uma criatura tem a condição Amedrontado até o início do seu próximo turno.\n\n### Nível 15: Esquiva Sombria\n\nQuando uma criatura realiza uma jogada de ataque contra você, você pode executar uma Reação para impor Desvantagem nessa jogada. Se o ataque acertar ou errar, você pode se teleportar até 9 metros para um espaço desocupado à sua vista.\n\n# Guerreiro\n\n**Um Mestre de Todas as Armas e Armaduras**\n\n**Traços Básicos de Guerreiro**\n\n| **Atributo Primário**            | Força ou Destreza                                                                                                                                                                                                                                               |\n|----------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|\n| **Dado de Ponto de Vida**        | D10 por nível de Guerreiro                                                                                                                                                                                                                                      |\n| **Proficiência em Salvaguardas** | Força e Constituição                                                                                                                                                                                                                                            |\n| **Proficiências em Perícias**    | *Escolha 2:* Acrobacia, Atletismo, História, Intimidação, Intuição, Lidar com Animais, Percepção, Persuasão ou Sobrevivência.                                                                                                                                   |\n| **Proficiências com Armas**      | Armas Simples e Marciais                                                                                                                                                                                                                                        |\n| **Treinamento com Armadura**     | Armaduras Leves, Médias e Pesadas e Escudos                                                                                                                                                                                                                     |\n| **Equipamento Inicial**          | *Escolha A, B ou C:* (A) Cota de Malha, Espada Grande, Mangual, 8 Azagaias, Kit de Explorador de Masmorras e 4 PO; (B) Armadura de Couro Batido, Cimitarra, Espada Curta, Arco Longo, 20 Flechas, Aljava, Kit de Explorador de Masmorras e 11 PO; ou (C) 155 PO |\n\nGuerreiros dominam inúmeros campos de batalha. Cavaleiros em busca de glória, campeões reais, soldados de elite e mercenários experientes — como Guerreiros, todos compartilham uma competência incomparável com armas e armaduras. Eles conhecem bem a morte, tanto ao infligi-la quanto ao desafiá-la.\n\nGuerreiros dominam várias técnicas de combate com armas, e um Guerreiro bem equipado sempre tem a ferramenta certa para qualquer situação de combate. Da mesma forma, um Guerreiro é perito com todos os tipos de armadura. Além dessa familiaridade básica, cada Guerreiro se distingue em certos estilos de combate. Alguns se concentram na arquearia, outros no combate com duas armas e outros em aumentar suas habilidades marciais com magia. Essa combinação de habilidades amplas e especializações extensas torna os Guerreiros combatentes superiores.\n\n## Tornando-se um Guerreiro…\n\nComo um Personagem de Nível 1\n\n-   Você adquire todos os traços da tabela Traços Básicos de Guerreiro.\n-   Adquira as características de nível 1 do Guerreiro, apresentadas na tabela Características de Guerreiro.\n\n## Como um Personagem Multiclasse\n\n-   Você adquire as seguintes características da tabela Traços Básicos de Guerreiro: Dado de Ponto de Vida, proficiência com armas Marciais e treinamento com armaduras Leves e Médias e Escudos.\n-   Adquira as características de nível 1 do Guerreiro, apresentadas na tabela Características de Guerreiro.\n\n    **Características de Guerreiro**\n\n| **Nível** | **Bônus de Proficiência** | **Características**                                | **Recuperar Fôlego** | **Maestria em Arma** |\n|-----------|---------------------------|----------------------------------------------------|----------------------|----------------------|\n| 1         | +2                        | Estilo de Luta, Maestria em Arma, Recuperar Fôlego | 2                    | 3                    |\n| 2         | +2                        | Mente Tática, Surto de Ação                        | 2                    | 3                    |\n| 3         | +2                        | Subclasse de Guerreiro                             | 2                    | 3                    |\n| 4         | +2                        | Aumento no Valor de Atributo                       | 3                    | 4                    |\n| 5         | +3                        | Ajuste Tático, Ataque Extra                        | 3                    | 4                    |\n| 6         | +3                        | Aumento no Valor de Atributo                       | 3                    | 4                    |\n| 7         | +3                        | Característica de Subclasse                        | 3                    | 4                    |\n| 8         | +3                        | Aumento no Valor de Atributo                       | 3                    | 4                    |\n| 9         | +4                        | Indomável, Mestre Tático                           | 3                    | 4                    |\n| 10        | +4                        | Característica de Subclasse                        | 4                    | 5                    |\n| 11        | +4                        | Dois Ataques Extras                                | 4                    | 5                    |\n| 12        | +4                        | Aumento no Valor de Atributo                       | 4                    | 5                    |\n| 13        | +5                        | Ataques Estudados, Indomável                       | 4                    | 5                    |\n| 14        | +5                        | Aumento no Valor de Atributo                       | 4                    | 5                    |\n| 15        | +5                        | Característica de Subclasse                        | 4                    | 5                    |\n| 16        | +5                        | Aumento no Valor de Atributo                       | 4                    | 6                    |\n| 17        | +6                        | Indomável, Surto de Ação                           | 4                    | 6                    |\n| 18        | +6                        | Característica de Subclasse                        | 4                    | 6                    |\n| 19        | +6                        | Dádiva Épica                                       | 4                    | 6                    |\n| 20        | +6                        | Três Ataques Extras                                | 4                    | 6                    |\n\n## Características de Classe de Guerreiro\n\nComo Guerreiro, você adquire as seguintes características de classe ao alcançar os níveis especificados de Guerreiro. Essas características estão apresentadas na tabela Características de Guerreiro.\n\n### Nível 1: Estilo de Luta\n\nVocê aprimorou suas proezas marciais e tem um talento de Estilo de Luta à sua escolha (veja também o capítulo 5). Defensivo é o recomendado.\n\nSempre que atinge um nível de Guerreiro, você pode substituir o talento que escolheu por um talento diferente de Estilo de Luta.\n\n### Nível 1: Maestria em Arma\n\nSeu treinamento com armas permite que você utilize as propriedades de maestria com três tipos de armas Simples ou Marciais à sua escolha. Sempre que completar um Descanso Longo, você pode praticar movimentos com armas e alterar uma dessas escolhas de armas.\n\nAo alcançar certos níveis de Guerreiro, você adquire a habilidade de usar as propriedades de maestria de mais tipos de armas, conforme mostrado na coluna Maestria em Armas da tabela Características de Guerreiro.\n\n### Nível 1: Recuperar Fôlego\n\nVocê tem uma reserva limitada de resistência física e mental que pode usar. Como uma Ação Bônus, você pode usá-la para recuperar Pontos de Vida iguais a 1d10 mais seu nível de Guerreiro.\n\nVocê pode usar essa característica duas vezes. Você recupera um uso gasto quando completa um Descanso Curto e restaura todos os usos gastos quando completa um Descanso Longo.\n\nAo atingir certos níveis de Guerreiro, você adquire mais usos dessa característica, conforme mostrado na coluna Recuperar Fôlego da tabela Características de Guerreiro.\n\n### Nível 2: Mente Tática\n\nVocê tem uma mente para táticas dentro e fora do campo de batalha. Ao falhar em um teste de atributo, você pode gastar um uso de seu Recuperar Fôlego para tentar alcançar a vitória. Em vez de recuperar Pontos de Vida, você joga 1d10 e adiciona o resultado ao teste de atributo, potencialmente transformando-o em sucesso. Se o teste ainda assim falhar, esse uso do Recuperar Fôlego não é gasto.\n\n### Nível 2: Surto de Ação\n\nVocê pode se esforçar além de seus limites normais por um momento. No seu turno, você pode executar uma ação adicional, exceto a ação Usar Magia.\n\nApós usar esta característica, você não pode usá-la novamente até completar um Descanso Curto ou Longo. A partir do nível 17, você pode usá-lo duas vezes antes de um descanso, mas apenas uma vez em um turno.\n\n### Nível 3: Subclasse de Guerreiro\n\nVocê adquire uma subclasse de Guerreiro à sua escolha. As subclasses Campeão, Cavaleiro Místico, Combatente Psíquico e Mestre da Batalha estão detalhadas após a descrição desta classe. Uma subclasse é uma especialidade que concede a você características em determinados níveis de Guerreiro. Pelo resto de sua jornada, você adquire cada uma das características de sua subclasse de seu nível de Guerreiro ou menor.\n\n### Nível 4: Aumento no Valor de Atributo\n\nVocê adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 6, 8, 12, 14 e 16 de Guerreiro.\n\n### Nível 5: Ajuste Tático\n\nSempre que executar uma Ação Bônus para seu Recuperar Fôlego, você pode mover-se até metade do seu Deslocamento sem provocar Ataques de Oportunidade.\n\n### Nível 5: Ataque Extra\n\nVocê pode atacar duas vezes, em vez de uma, sempre que executar a ação Atacar no seu turno.\n\n### Nível 9: Indomável\n\nAo falhar em uma salvaguarda, você pode jogá-la novamente adicionando um bônus igual ao seu nível de Guerreiro. Você deve usar o novo resultado e não pode usar essa característica novamente até completar um Descanso Longo.\n\nA partir do nível 13, você pode usar essa característica duas vezes antes de um Descanso Longo e três vezes antes de um Descanso Longo ao atingir o nível 17.\n\n### Nível 9: Mestre Tático\n\nAo atacar com uma arma cuja propriedade de maestria você pode usar, você pode substituir essa propriedade pela propriedade Empurrar, Drenar ou Lentidão para esse ataque.\n\n### Nível 11: Dois Ataques Extras\n\nVocê pode atacar três vezes, em vez de uma, sempre que executar a ação Atacar no seu turno.\n\n### Nível 13: Ataques Estudados\n\nVocê estuda seus oponentes e aprende com cada ataque que realiza. Se você realizar uma jogada de ataque contra uma criatura e errar, você tem Vantagem em sua próxima jogada de ataque contra essa criatura antes do final do seu próximo turno.\n\n### Nível 19: Dádiva Épica\n\nVocê adquire o talento Dádiva Épica (veja o capítulo 5) ou outro talento à sua escolha para o qual se qualifica. Dádiva da Proeza em Combate é recomendada.\n\n### Nível 20: Três Ataques Extras\n\nVocê pode atacar quatro vezes, em vez de uma, sempre que executar a ação Atacar no seu turno.\n\n**Um Guerreiro fica entre um aliado e o ataque de um dragão negro.**\n\n# Subclasses de Guerreiro\n\nUma subclasse de Guerreiro é uma especialização que concede características em certos níveis, conforme detalhado na subclasse. Esta seção apresenta as subclasses Campeão, Cavaleiro Místico, Combatente Psíquico e Mestre da Batalha.\n\n## Campeão\n\n*Busque a Excelência Física em Combate*\n\nUm Campeão foca no desenvolvimento de habilidades marciais em sua busca incessante pela vitória. Ele combina treino rigoroso com excelência física para suportar golpes devastadores, enfrentar perigos e conquistar a glória. Seja em competições esportivas ou batalhas sangrentas, os Campeões lutam pela coroa do vencedor.\n\n### Nível 3: Atleta Extraordinário\n\nGraças ao seu atletismo, você tem Vantagem em jogadas de Iniciativa e testes de Força (Atletismo).\n\nAlém disso, imediatamente após obter um Acerto Crítico, você pode se mover até metade do seu Deslocamento sem provocar Ataques de Oportunidade.\n\n### Nível 3: Crítico Aprimorado\n\nSuas jogadas de ataque com armas e Ataques Desarmados obtém Acerto Crítico em jogadas com resultados 19 ou 20 no d20.\n\n### Nível 7: Estilo de Luta Adicional\n\nVocê adquire outro talento de Estilo de Luta à sua escolha.\n\n### Nível 10: Combatente Heroico\n\nA emoção da batalha leva você à vitória. Durante o combate, você pode se conceder Inspiração Heroica sempre que começar seu turno sem ela.\n\n### Nível 15: Crítico Superior\n\nSuas jogadas de ataque com armas e Ataques Desarmados agora obtém Acerto Crítico em jogadas com resultados 18 a 20 no d20.\n\n### Nível 18: Sobrevivente\n\nVocê atinge o auge da resiliência em batalha, concedendo-lhe os seguintes benefícios.\n\n**Desafie a Morte.** Você tem Vantagem em Salvaguardas Contra Morte. Além disso, ao obter um 18–20 em uma Salvaguarda Contra Morte, você obtém um 20 como resultado.\n\n**Regeneração Heroica.** No início de cada um dos seus turnos, você recupera Pontos de Vida iguais a 5 mais seu modificador de Constituição se estiver Sangrando e ter ao menos 1 Ponto de Vida.\n\n## Cavaleiro Místico\n\n*Fortaleça suas Habilidades de Combate com Magia Arcana*\n\nCavaleiros Místicos unem habilidades marciais de Guerreiros a um estudo aprofundado da magia, que não só complementa suas técnicas de combate como também oferece proteção adicional à armadura e permite enfrentar múltiplos inimigos simultaneamente com magia explosiva.\n\n### Nível 3: Conjuração\n\nVocê aprendeu a conjurar magias. Veja o capítulo 7 para as regras sobre conjuração de magias. As informações abaixo detalham como você usa essas regras como um Cavaleiro Místico.\n\n**Truques.** Você conhece dois truques à sua escolha da lista de magias de Mago (veja a seção desta classe para a lista de magias). *Raio de Gelo* e *Toque Chocante* são recomendados. Sempre que você atinge um nível de Guerreiro, pode substituir um desses truques por outro truque à sua escolha da lista de magias de Mago.\n\nAo atingir o nível 10 de Guerreiro, você aprende mais um truque de Mago à sua escolha.\n\n**Espaços de Magia.** A tabela Conjuração de Cavaleiro Místico apresenta quantos espaços de magia você tem para conjurar suas magias de 1º círculo ou superior. Você restaura todos os espaços gastos ao completar um Descanso Longo.\n\n**Conjuração de Cavaleiro Místico**\n\n|                        |                       | **Espaços de Magia por Círculo de Magia** |       |       |       |\n|------------------------|-----------------------|-------------------------------------------|-------|-------|-------|\n| **Nível de Guerreiro** | **Magias Preparadas** | **1**                                     | **2** | **3** | **4** |\n| 3                      | 3                     | 2                                         | —     | —     | —     |\n| 4                      | 4                     | 3                                         | —     | —     | —     |\n| 5                      | 4                     | 3                                         | —     | —     | —     |\n| 6                      | 4                     | 3                                         | —     | —     | —     |\n| 7                      | 5                     | 4                                         | 2     | —     | —     |\n| 8                      | 6                     | 4                                         | 2     | —     | —     |\n| 9                      | 6                     | 4                                         | 2     | —     | —     |\n| 10                     | 7                     | 4                                         | 3     | —     | —     |\n| 11                     | 8                     | 4                                         | 3     | —     | —     |\n| 12                     | 8                     | 4                                         | 3     | —     | —     |\n| 13                     | 9                     | 4                                         | 3     | 2     | —     |\n| 14                     | 10                    | 4                                         | 3     | 2     | —     |\n| 15                     | 10                    | 4                                         | 3     | 2     | —     |\n| 16                     | 11                    | 4                                         | 3     | 3     | —     |\n| 17                     | 11                    | 4                                         | 3     | 3     | —     |\n| 18                     | 11                    | 4                                         | 3     | 3     | —     |\n| 19                     | 12                    | 4                                         | 3     | 3     | 1     |\n| 20                     | 13                    | 4                                         | 3     | 3     | 1     |\n\n**Magias Preparadas de 1º Círculo ou Superior.** Você prepara a lista de magias de 1º círculo ou superior que estão disponíveis para você ao conjurar com essa característica. Para começar, escolha três magias de 1º círculo da lista de magias de Mago. *Escudo Arcano*, *Mãos Flamejantes* e *Salto* são recomendadas.\n\nO número de magias em sua lista aumenta à medida que você atinge níveis de Guerreiro, conforme mostrado na coluna Magias Preparadas da tabela Conjuração de Cavaleiro Místico. Sempre que esse número aumentar, escolha magias adicionais da lista de magias de Mago até que o número de magias em sua lista corresponda ao número da tabela. As magias escolhidas devem ser de um círculo para o qual você possui espaços de magia. Por exemplo, se você é um Guerreiro de nível 7, sua lista de magias preparadas pode incluir cinco magias de Mago de 1º ou 2º círculo em qualquer combinação.\n\n**Mudando Suas Magias Preparadas.** Sempre que você atinge um nível de Guerreiro, pode substituir uma magia em sua lista por outra magia de Mago para a qual você tem espaços de magia.\n\n**Atributo de Conjuração.** Inteligência é seu atributo de conjuração para suas magias de Mago.\n\n**Foco de Conjuração.** Você pode usar um Foco Arcano como um Foco de Conjuração para suas magias de Mago.\n\n### Nível 3: Vínculo com Arma\n\nVocê aprende um ritual que cria um vínculo mágico entre você e uma arma. Você realiza o ritual ao longo de 1 hora, o que pode ser concluído durante um Descanso Curto. A arma deve estar ao seu alcance durante todo o ritual e, ao concluí-lo, você toca a arma e estabelece o vínculo. O vínculo falha se outro Guerreiro estiver ligado à arma ou se a arma for um item mágico com o qual outra pessoa está sintonizada.\n\nApós ter vinculado uma arma a si, ela não pode ser desarmada de você, a menos que você tenha a condição Incapacitado. Se ela estiver no mesmo plano de existência, você pode invocar essa arma como uma Ação Bônus, teleportando-a instantaneamente para sua mão.\n\nVocê pode ter até dois vínculos com armas, mas pode invocar apenas uma de cada vez com uma Ação Bônus. Se você tentar se vincular com uma terceira arma, você deve quebrar o vínculo com uma das outras duas.\n\n### Nível 7: Magia de Guerra\n\nAo executar a ação Atacar no seu turno, você pode substituir um dos ataques por uma conjuração de um de seus truques de Mago que tenha um tempo de conjuração de uma ação.\n\n### Nível 10: Golpe Místico\n\nVocê aprende a usar seus ataques com armas para reduzir a resistência de uma criatura às suas magias. Ao atingir uma criatura com um ataque usando uma arma, essa criatura sofre Desvantagem na próxima salvaguarda que realizar contra uma magia que você conjurar antes do final do seu próximo turno.\n\n### Nível 15: Investida Mística\n\nAo usar seu Surto de Ação, você pode se teleportar até 9 metros para um espaço desocupado à sua vista. Você pode se teleportar antes ou depois da ação adicional.\n\n### Nível 18: Magia de Guerra Aprimorada\n\nAo executar a ação Atacar no seu turno, você pode substituir dois ataques pela conjuração de uma das suas magias de Mago de 1º ou 2º círculo que tenha um tempo de conjuração de uma ação.\n\n## Combatente Psíquico\n\n*Aprimore o Poder Físico com Poder Psiônico*\n\nCombatentes Psíquicos despertam o poder de suas mentes para aprimorar suas habilidades físicas, infundindo ataques com energia psiônica, usando telecinesia e criando barreiras de força mental.\n\n### Nível 3: Poder Psiônico\n\nVocê possui uma fonte de energia psiônica, representada pelos seus Dados de Energia Psiônica, que alimenta os poderes desta subclasse. A tabela Dados de Energia do Combatente Psíquico indica o tipo e a quantidade desses dados conforme você atinge certos níveis de Guerreiro.\n\n**Dados de Energia do Combatente Psíquico**\n\n| **Nível de Guerreiro** | **Tipo de Dado** | **Quantidade** |\n|------------------------|------------------|----------------|\n| 3                      | D6               | 4              |\n| 5                      | D8               | 6              |\n| 9                      | D8               | 8              |\n| 11                     | D10              | 8              |\n| 13                     | D10              | 10             |\n| 17                     | D12              | 12             |\n\nQualquer característica desta subclasse que utilize um Dado de Energia Psiônica emprega apenas os dados dessa subclasse. Alguns poderes consomem esse Dado, conforme detalhado na respectiva descrição, e você não pode usar um poder se ele exigir um dado e todos os seus Dados de Energia Psiônica estiverem esgotados.\n\nVocê recupera um de seus Dados de Energia Psiônica gastos ao completar um Descanso Curto, e restaura todos ao completar um Descanso Longo.\n\n**Golpe Psiônico.** Você pode impulsionar suas armas com força psiônica. Uma vez em cada um dos seus turnos, imediatamente após atingir um alvo a até 9 metros de você com um ataque e causar dano a ele com uma arma, você pode gastar um Dado de Energia Psiônica, jogá-lo e causar dano Energético ao alvo igual ao resultado obtido mais seu modificador de Inteligência.\n\n**Movimento Telecinético.** Você pode mover um objeto ou uma criatura com sua mente. Como uma ação Usar Magia, escolha um alvo à sua vista a até 9 metros de você; o alvo deve ser um objeto solto que seja Grande ou menor, ou uma criatura voluntária que não seja você. Você transporta o alvo até 9 metros para um espaço desocupado à sua vista. Como alternativa, se o alvo for um objeto Minúsculo, você pode transportá-lo de ou para sua mão.\n\nApós executar essa ação, você não pode fazer isso novamente até completar um Descanso Curto ou Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar o uso.\n\n**Vínculo Protetivo.** Quando você ou outra criatura à sua vista a até 9 metros de você sofrer dano, você pode executar uma Reação para gastar um Dado de Energia Psiônica, jogar o dado e reduzir o dano sofrido pelo resultado mais seu modificador de Inteligência (redução mínima de 1), enquanto cria um escudo momentâneo de força telecinética.\n\n### Nível 7: Adepto Telecinético\n\nVocê dominou novas maneiras de usar suas habilidades telecinéticas, detalhadas abaixo.\n\n**Estocada Telecinética.** Ao causar dano a um alvo com seu Golpe Psiônico, você pode forçá-lo a realizar uma salvaguarda de Força (CD 8 mais seu modificador de Inteligência e seu Bônus de Proficiência). Se falhar, você pode impor ao alvo a condição Caído ou transportá-lo horizontalmente até 3 metros.\n\n**Salto com Impulsão Psíquica.** Como uma Ação Bônus, você adquire um Deslocamento de Voo igual ao dobro do seu Deslocamento até o final do turno atual. Após executar essa Ação Bônus, você não pode fazer isso novamente até completar um Descanso Curto ou Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar o uso.\n\n### Nível 10: Resguardo Mental\n\nVocê tem Resistência a Dano Psíquico. Além disso, ao iniciar seu turno com a condição Amedrontado ou Enfeitiçado, você pode gastar um Dado de Energia Psiônica (nenhuma ação é necessária) e encerrar todos os efeitos em você que lhe impõe essas condições.\n\n### Nível 15: Baluarte de Energia\n\nVocê pode proteger a si e aos outros com força telecinética. Como uma Ação Bônus, você pode escolher criaturas, incluindo você mesmo, a até 9 metros, até um número de criaturas igual ao seu modificador de Inteligência (mínimo de uma criatura). Cada uma das criaturas escolhidas tem Cobertura Parcial por 1 minuto ou até você ter a condição Incapacitado.\n\nApós usar essa característica, você não pode fazer isso novamente até completar um Descanso Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar seu uso.\n\n### Nível 18: Mestre Telecinético\n\nVocê sempre tem a magia *Telecinese* preparada. Com esta característica, você pode conjurá-la sem um espaço de magia ou componentes, e seu atributo de conjuração para ela é a Inteligência. Em cada um dos seus turnos enquanto você mantém a Concentração nela, incluindo o turno quando a conjura, você pode realizar um ataque com arma como uma Ação Bônus.\n\nApós conjurar a magia por meio dessa característica, você não pode fazer isso deste modo até completar um Descanso Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar o uso.\n\n## Mestre da Batalha\n\n*Domine Manobras de Batalha Sofisticadas*\n\nOs Mestres da Batalha são estudantes da arte do combate, aprendendo técnicas marciais transmitidas por gerações. Os mais bem-sucedidos equilibram suas habilidades marciais cuidadosamente aprimoradas com estudos acadêmicos em história, teoria e artes.\n\n### Nível 3: Estudioso da Guerra\n\nVocê adquire proficiência com um tipo de Ferramentas de Artesão à sua escolha e adquire proficiência em uma perícia à sua escolha das perícias disponíveis para Guerreiros no nível 1.\n\n### Nível 3: Superioridade em Combate\n\nSua experiência em combate aprimorou suas técnicas de luta, permitindo que você aprenda manobras com base em dados especiais chamados Dados de Superioridade.\n\n**Manobras.** Você aprende três manobras à sua escolha na seção “Opções de Manobras” mais adiante na descrição desta subclasse. Muitas manobras aprimoram, de alguma forma, um ataque. Você pode usar apenas uma manobra por ataque.\n\nVocê aprende duas manobras adicionais à sua escolha quando atinge os níveis 7, 10 e 15 de Guerreiro. Cada vez que aprende novas manobras, você também pode substituir uma manobra que você conhece por uma diferente.\n\n**Dados de Superioridade.** Você tem quatro Dados de Superioridade, os quais são d8s. Um Dado de Superioridade é gasto ao usá-lo. Você restaura todos os Dados de Superioridade gastos quando completa um Descanso Curto ou Longo.\n\nVocê adquire um Dado de Superioridade adicional ao atingir os níveis 7 (cinco dados no total) e 15 (seis dados no total) de Guerreiro.\n\n**Salvaguardas.** Se uma manobra exigir uma salvaguarda, a CD é igual a 8 mais seu modificador de Força ou Destreza (à sua escolha) e seu Bônus de Proficiência.\n\n### Nível 7: Conheça Seu Inimigo\n\nComo uma Ação Bônus, você pode examinar certos pontos fortes e fracos de uma criatura à sua vista a até 9 metros de você; você sabe se essa criatura tem Imunidades, Resistências ou Vulnerabilidades, e se a criatura tiver alguma, você sabe quais são.\n\nApós usar essa característica, você não pode fazer isso novamente até completar um Descanso Longo. Você também pode recuperar um uso da característica gastando um Dado de Superioridade (nenhuma ação é necessária).\n\n### Nível 10: Superioridade em Combate Aprimorada\n\nSeu Dado de Superioridade se torna um d10.\n\n### Nível 15: Implacável\n\nUma vez por turno, ao usar uma manobra, você pode jogar 1d8 e usar o resultado em vez de gastar um Dado de Superioridade.\n\n### Nível 18: Superioridade em Combate Suprema\n\nSeu Dado de Superioridade se torna um d12.\n\n### Opções de Manobra\n\nAs manobras são apresentadas em ordem alfabética.\n\n**Aparar.** Ao receber dano de outra criatura em uma jogada de ataque corpo a corpo, você pode executar uma Reação e gastar um Dado de Superioridade para reduzir o dano pelo número obtido no Dado de Superioridade mais seu modificador de Força ou Destreza (à sua escolha).\n\n**Ataque Ameaçador.** Ao atingir uma criatura com uma jogada de ataque, você pode gastar um Dado de Superioridade para tentar amedrontar o alvo. Adicione o resultado do Dado de Superioridade à jogada de dano do ataque. O alvo deve ser bem-sucedido em uma salvaguarda de Sabedoria ou tem a condição Amedrontado até o final do seu próximo turno.\n\n**Ataque de Varredura.** Ao atingir uma criatura com uma jogada de ataque corpo a corpo usando uma arma ou um Ataque Desarmado, você pode gastar um Dado de Superioridade para tentar causar dano a outra criatura. Escolha outra criatura a até 1,5 metro do alvo original e ao seu alcance. Se a jogada de ataque original atingir a segunda criatura, ela sofre dano igual ao resultado do Dado de Superioridade. O dano é do mesmo tipo causado pelo ataque original.\n\n**Ataque Estendido.** Como uma Ação Bônus, você pode gastar um Dado de Superioridade e executar a ação Correr. Se você se mover pelo menos 1,5 metro em linha reta imediatamente antes de realizar um ataque corpo a corpo como parte da ação Atacar neste turno, pode adicionar o resultado do Dado de Superioridade à jogada de dano do ataque.\n\n**Ataque para Distrair.** Ao atingir uma criatura com uma jogada de ataque, você pode gastar um Dado de Superioridade para distrair o alvo. Adicione o resultado do Dado de Superioridade à jogada de dano do ataque. A próxima jogada de ataque contra o alvo por um atacante diferente de você tem Vantagem se o ataque for realizado antes do início do seu próximo turno.\n\n**Ataque Preciso.** Ao errar uma jogada de ataque, você pode gastar um Dado de Superioridade e adicionar resultado à jogada de ataque, fazendo potencialmente o ataque acertar.\n\n**Ataque Provocante.** Ao atingir uma criatura com uma jogada de ataque, você pode gastar um Dado de Superioridade para provocar o alvo a atacá-lo. Adicione o resultado do Dado de Superioridade à jogada de dano do ataque. O alvo deve ser bem-sucedido em uma salvaguarda de Sabedoria ou tem Desvantagem em jogadas de ataque contra alvos diferentes de você até o final do seu próximo turno.\n\n**Avaliação Tática.** Ao realizar um teste de Inteligência (História ou Investigação) ou um teste de Sabedoria (Intuição), você pode gastar um Dado de Superioridade e adicionar o resultado ao teste de atributo.\n\n**Contra-ataque.** Quando uma criatura erra uma jogada de ataque corpo a corpo contra você, você pode executar uma Reação e gastar um Dado de Superioridade para realizar uma jogada de ataque corpo a corpo com uma arma ou um Ataque Desarmado contra a criatura. Se você acertar, adicione o resultado do Dado de Superioridade ao dano do ataque.\n\n**Desarme.** Ao atingir uma criatura com uma jogada de ataque, você pode gastar um Dado de Superioridade para tentar desarmar o alvo. Adicione o resultado do Dado de Superioridade à jogada de dano do ataque. O alvo deve ser bem-sucedido em uma salvaguarda de Força ou soltar um objeto à sua escolha que esteja segurando, com o objeto caindo no espaço dele.\n\n**Emboscada.** Ao realizar um teste de Destreza (Furtividade) ou jogar Iniciativa, você pode gastar um Dado de Superioridade e adicionar o resultado ao teste, a menos que tenha a condição Incapacitado.\n\n**Encontrão.** Ao atingir uma criatura com uma jogada de ataque usando uma arma ou um Ataque Desarmado, você pode gastar um Dado de Superioridade para tentar fazer o alvo recuar. Adicione o resultado do Dado de Superioridade à jogada de dano do ataque. Se o alvo for Grande ou menor, ele deve ser bem-sucedido em uma salvaguarda de Força ou é empurrado até 4,5 metros para longe de você.\n\n**Finta.** Como uma Ação Bônus, você pode gastar um Dado de Superioridade para fintar, escolhendo uma criatura a até 1,5 metro de você como seu alvo. Você tem Vantagem em sua próxima jogada de ataque contra esse alvo neste turno. Se o ataque acertar, adicione o resultado do Dado de Superioridade à jogada de dano do ataque.\n\n**Gato Por Lebre.** Ao estar a até 1,5 metro de uma criatura no seu turno, você pode gastar um Dado de Superioridade e trocar de lugar com essa criatura, desde que você gaste pelo menos 1,5 metro de movimento e a criatura seja voluntária e não tenha a condição Incapacitado. Este movimento não provoca Ataques de Oportunidade.\n\nJogue o Dado de Superioridade. Até o início do seu próximo turno, você ou a outra criatura (à sua escolha) adquire um bônus de CA igual ao número do resultado.\n\n**Golpe do Comandante.** Ao executar a ação Atacar no seu turno, você pode substituir um de seus ataques para instruir um de seus companheiros a atacar. Ao fazer isso, escolha uma criatura voluntária que possa vê-lo ou ouvi-lo e gaste um Dado de Superioridade. Essa criatura pode usar imediatamente a Reação dela para realizar um ataque com uma arma ou um Ataque Desarmado, adicionando o resultado do Dado de Superioridade à jogada de dano do ataque em caso de acerto.\n\n**Manobrar.** Ao atingir uma criatura com uma jogada de ataque, você pode gastar um Dado de Superioridade para manobrar um de seus companheiros para outra posição. Adicione o resultado do Dado de Superioridade à jogada de dano do ataque e escolha uma criatura voluntária que possa vê-lo ou ouvi-lo. Essa criatura pode usar a Reação dela para se mover até metade do Deslocamento sem provocar Ataques de Oportunidade do alvo de seu ataque.\n\n**Movimentação Evasiva.** Como uma Ação Bônus, você pode gastar um Dado de Superioridade e executar a ação Desengajar. Você também joga o dado e adiciona o número obtido à sua CA até o início do seu próximo turno.\n\n**Presença de Autoridade.** Ao realizar um teste de Carisma (Atuação, Intimidação ou Persuasão), você pode gastar um Dado de Superioridade e adicionar o resultado ao teste.\n\n**Prostrar.** Ao atingir uma criatura com uma jogada de ataque usando uma arma ou um Ataque Desarmado, você pode gastar um Dado de Superioridade e adicionar o resultado à jogada de dano do ataque. Se o alvo for Grande ou menor, ele deve ser bem-sucedido em uma salvaguarda de Força ou tem a condição Caído.\n\n**Recuperar Energia.** Como uma Ação Bônus, você pode gastar um Dado de Superioridade para encorajar a determinação de um companheiro. Escolha um aliado seu a até 9 metros de você que possa vê-lo ou ouvi-lo. Essa criatura adquire Pontos de Vida Temporários igual ao resultado do Dado de Superioridade mais metade do seu nível de Guerreiro (arredondado para baixo)."
+}

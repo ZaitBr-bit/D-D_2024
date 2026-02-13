@@ -1,0 +1,832 @@
+{
+  "circulo": 3,
+  "nome_circulo": "3º Círculo",
+  "total_magias": 52,
+  "magias": [
+    {
+      "nome": "Animar Mortos",
+      "circulo": 3,
+      "escola": "Necromancia",
+      "classes": [
+        "Clérigo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "3 metros",
+      "componentes": "V, S, M (uma gota de sangue, um pedaço de carne e uma pitada de pó de osso)",
+      "duracao": "Instantânea",
+      "descricao": "Escolha uma pilha de ossos ou um cadáver de um Humanoide Médio ou Pequeno no alcance da magia. O alvo se torna um Morto-vivo: um Esqueleto se tiver escolhido ossos ou um Zumbi se tiver escolhido um cadáver (veja o apêndice B para os blocos de estatística).\nEm cada um dos seus turnos, você pode executar uma Ação Bônus para comandar mentalmente qualquer criatura que tenha animado com essa magia se a criatura estiver a até 18 metros de você (se você controlar várias criaturas, pode comandar qualquer uma delas ao mesmo tempo, emitindo o mesmo comando para cada uma). Você decide qual ação a criatura realiza e para onde ela se move no próximo turno dela, ou pode emitir um comando geral, como proteger uma câmara ou um corredor. Se você não der nenhum comando, a criatura executa a ação Esquivar e move-se apenas para evitar dano. Uma vez dada uma ordem, a criatura continua a segui-la até que a tarefa seja concluída.\nA criatura fica sob seu controle por 24 horas, após as quais ela deixa de obedecer a qualquer comando que você tenha dado a ela. Para manter o controle da criatura por mais 24 horas, é necessário conjurar essa magia na criatura novamente antes que o período atual de 24 horas termine. Esse uso da magia reafirma seu controle sobre até quatro criaturas que você animou com essa magia em vez de animar uma nova criatura.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. Você anima ou reafirma o controle sobre duas criaturas Mortas-vivas adicionais para cada círculo de espaço de magia acima de 3. Cada uma das criaturas deve vir de um cadáver ou pilha de ossos diferente."
+    },
+    {
+      "nome": "Arma Elemental",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida",
+        "Guardião",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 hora",
+      "descricao": "Uma arma não-mágica que você toca se torna uma arma mágica. Escolha um dos seguintes tipos de dano: Ácido, Elétrico, Gélido, Ígneo ou Trovejante. Pela duração da magia, a arma tem um bônus de +1 para jogadas de ataque e causa 1d4 pontos de dano adicional do tipo escolhido quando atinge.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. Se você usar um espaço de magia de 5º ou 6º círculo, o bônus nas jogadas de ataque aumenta para +2, e o dano adicional aumenta para 2d4. Se você usar um espaço de magia de 7º círculo ou superior, o bônus aumenta para +3 e o dano adicional aumenta para 3d4."
+    },
+    {
+      "nome": "Aura de Vitalidade",
+      "circulo": 3,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Uma aura irradia de você em uma Emanação de 9 metros pela duração da magia. Quando você cria a aura e no início de cada um dos seus turnos enquanto ela persiste, você pode restaurar 2d6 Pontos de Vida em uma criatura dentro dela.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Bola de Fogo",
+      "circulo": 3,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "45 metros",
+      "componentes": "V, S, M (uma bola de guano de morcego e enxofre)",
+      "duracao": "Instantânea",
+      "descricao": "Um elfo Mago demonstra o potencial de resolução de problema da magia Bola de Fogo.\nUma faixa brilhante emerge de você até um ponto à sua escolha no alcance da magia e, em seguida, desabrocha com um estrondo baixo em uma explosão de fogo. Cada criatura em uma Esfera de 6 metros de raio centrada nesse ponto realiza uma salvaguarda de Destreza, sofrendo 8d6 pontos de dano Ígneo se falhar, ou metade desse dano em caso de sucesso.\nObjetos inflamáveis na área que não estão sendo usados ou carregados entram em combustão.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano aumenta em 1d6 para cada círculo de espaço de magia acima de 3."
+    },
+    {
+      "nome": "Caminhar Sobre as Águas",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Feiticeiro",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (um pedaço de cortiça)",
+      "duracao": "1 hora",
+      "descricao": "Esta magia concede a capacidade de se mover através de qualquer superfície líquida — como ácido, água, areia movediça, lama, lava ou neve — como se fosse um solo sólido inofensivo (criaturas que cruzam a lava derretida ainda podem sofrer dano devido ao calor). Até dez criaturas voluntárias à sua escolha no alcance da magia recebem essa habilidade pela duração da magia.\nUm alvo afetado deve executar uma Ação Bônus para passar da superfície do líquido para dentro dele e vice-versa, mas, se o alvo cair no líquido, ele atravessa a superfície e entra no líquido abaixo.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Celeridade",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (uma lasca de raiz de alcaçuz)",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Escolha uma criatura voluntária à sua vista e no alcance da magia. Até que a magia termine, o deslocamento do alvo é dobrado, e ele recebe um bônus de +2 na Classe de Armadura, tem Vantagem em salvaguardas de Destreza e recebe uma ação adicional em cada um de seus turnos. Essa ação pode ser utilizada apenas para executar a ação Atacar (apenas um ataque), Correr, Desengajar, Esconder ou Usar Objeto.\nQuando a magia termina, o alvo fica Incapacitado e tem Deslocamento 0 até o final do próximo turno dele, quando uma onda de letargia passa por ele.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Clarividência",
+      "circulo": 3,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "10 minutos",
+      "alcance": "1,5 km",
+      "componentes": "V, S, M (um foco no valor de 100 ou mais PO, seja um chifre adornado com joias e usado para escutar, ou um olho de vidro usado para enxergar)",
+      "duracao": "Concentração, até 10 minutos",
+      "descricao": "Você cria um sensor Invisível no alcance da magia em um local que lhe seja familiar (um lugar que você já viu ou visitou antes) ou em um local óbvio que não lhe seja familiar (como atrás de uma porta, em uma esquina ou em um bosque). O sensor não pode ser atacado e permanece no lugar pela duração da magia.\nAo conjurar a magia, escolha ver ou ouvir. Você pode usar o sentido escolhido através do sensor como se estivesse em seu espaço. Como uma Ação Bônus, você pode alternar entre ver e ouvir.\nUma criatura que veja o sensor (como uma criatura que se beneficia de Ver o Invisível ou Visão Verdadeira) enxerga uma esfera luminosa do tamanho do seu punho.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Contramagia",
+      "circulo": 3,
+      "escola": "Abjuração",
+      "classes": [
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Reação, que você executa quando vê uma criatura a até 18 metros de você conjurando uma magia com componentes Verbais, Somáticos ou Materiais",
+      "alcance": "18 metros",
+      "componentes": "S",
+      "duracao": "Instantânea",
+      "descricao": "Você tenta interromper uma criatura no processo de conjurar uma magia. A criatura realiza uma salvaguarda de Constituição. Se falhar, a magia se dissipa sem efeito, e a ação, Ação Bônus ou Reação usada para conjurá-la é desperdiçada. Se a magia do alvo foi conjurada com um espaço de magia, o espaço de magia da criatura não é gasto.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Convocar Feérico",
+      "circulo": 3,
+      "escola": "Invocação",
+      "classes": [
+        "Bruxo",
+        "Druida",
+        "Guardião",
+        "Mago"
+      ],
+      "tempo_conjuracao": "ama Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S, M (uma flor dourada no valor de 300 ou mais PO)",
+      "duracao": "Concentração, até 1 hora",
+      "descricao": "Um Guardião conjura Invocar Feérico, conjurando um Espírito Feérico enfurecido para enfrentar um Merrow saqueador.\nVocê invoca um Espírito Feérico. Ele se manifesta em um espaço desocupado à sua vista e no alcance da magia e usa o bloco de estatísticas do Espírito Feérico. Ao conjurar a magia, escolha um humor: Alegre, Enfurecido ou Malandro. A criatura se assemelha a uma criatura Feérica à sua escolha definida pelo humor escolhido, o que determina certos detalhes no bloco de estatísticas da criatura. A criatura desaparece se reduzida a 0 Pontos de Vida ou quando a magia termina.\nA criatura é uma aliada sua e de seus aliados. Em combate, ela compartilha sua contagem de Iniciativa, mas o turno dela é imediatamente após o seu. Ela obedece aos seus comandos verbais (nenhuma ação é necessária). Se você não emitir nenhum, ela executa a ação Esquivar e usa o movimento dela para evitar o perigo.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. Use o círculo do espaço de magia para o círculo da magia no bloco de estatísticas.\n\nEspírito Feérico\n\nFeérico Pequeno, Neutro\n\nCA 12 + o círculo da magia\n\nPV 30 + 10 para cada círculo de magia acima de 3\n\nDeslocamento 9 m, Voo 9 m\n\n|         |    | Mod | SG |         |    | Mod | SG |         |    | Mod | SG |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| For | 13 | +1      | +1     | Des | 16 | +3      | +3     | Con | 14 | +2      | +2     |\n| Int | 14 | +2      | +2     | Sab | 11 | +0      | +0     | Car | 16 | +3      | +3     |\n\nImunidades Enfeitiçado\n\nSentidos Visão no Escuro 18 m, Percepção Passiva 10\n\nIdiomas Silvestre, compreende os idiomas que você fala\n\nND Nenhum (XP 0; BP é igual ao seu Bônus de Proficiência)\n\nAções\n\nAtaques Múltiplos. O espírito realiza um número de ataques com Lâmina Feérica igual à metade do círculo da magia (arredondado para baixo).\n\nLâmina Feérica. Jogada de Ataque Corpo a Corpo: Bônus é igual ao seu modificador de ataque mágico, alcance 1,5 m. Dano: 3d6 + 3 + o círculo da magia pontos de dano Energético.\n\nAções Bônus\n\nPasso Feérico. O espírito se teleporta magicamente até 9 metros para um espaço desocupado à vista dele. Em seguida, ocorre um dos seguintes efeitos, com base no humor escolhido para o espírito:\n\nAlegre. Salvaguarda de Sabedoria: CD é igual a CD para evitar sua magia, uma criatura à vista do espírito e a até 3 metros dele. Falha: O alvo fica Enfeitiçado por você e pelo espírito por 1 minuto ou até que o alvo sofra qualquer dano.\n\nEnfurecido. O espírito tem Vantagem na próxima jogada de ataque que realizar antes do final deste turno.\n\nMalandro. O espírito preenche um Cubo de 3 metros de lado a até 1,5 metro dele com Escuridão mágica, que dura até o final do próximo turno dele."
+    },
+    {
+      "nome": "Convocar Relâmpagos",
+      "circulo": 3,
+      "escola": "Invocação",
+      "classes": [
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos",
+      "descricao": "Uma nuvem de tempestade aparece em um ponto no alcance da magia à sua vista acima de você. A nuvem tem a forma de um Cilindro com 3 metros de altura e um raio de 18 metros.\nAo conjurar a magia, escolha um ponto à sua vista sob a nuvem. Um relâmpago é disparado da nuvem até aquele ponto. Cada criatura a até 1,5 metro desse ponto realiza uma salvaguarda de Destreza, sofrendo 3d10 pontos de dano Elétrico se falhar ou metade desse dano em caso de sucesso.\nAté que a magia termine, você pode executar uma ação Usar Magia para invocar relâmpagos desse modo novamente, escolhendo o mesmo ponto ou um diferente.\nSe o conjurador estiver ao ar livre durante uma tempestade ao conjurar esta magia, ele passa a controlar a tempestade existente em vez de criar uma nova. Nessas condições, o dano da magia é aumentado em 1d10.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano é aumentado em 1d10 pontos para cada círculo de espaço de magia acima de 3."
+    },
+    {
+      "nome": "Crescimento de Plantas",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação (Crescimento Excessivo) ou 8 horas (Fertilização)",
+      "alcance": "45 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea",
+      "descricao": "Esta magia canaliza vitalidade para as plantas. O tempo de conjuração que você usa determina se a magia tem o efeito Crescimento Excessivo ou Fertilização, apresentados a seguir.\nCrescimento Excessivo. Escolha um ponto no alcance da magia. Todas as plantas normais em uma Esfera de 30 metros de raio centrada nesse ponto tornam-se espessas e crescem. Uma criatura que se move por essa área deve gastar 4 metros de deslocamento para cada 1 metro que se move. Você pode anular o efeito em uma ou mais áreas de qualquer tamanho dentro da área da magia.\nFertilização. Todas as plantas em um raio de 800 metros centradas em um ponto no alcance da magia ficam fertilizadas por 365 dias. As plantas produzem o dobro da quantidade normal de alimento quando colhidas. Elas podem se beneficiar de apenas um Crescimento de Plantas por ano.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Criar Comida e Água",
+      "circulo": 3,
+      "escola": "Invocação",
+      "classes": [
+        "Clérigo",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea",
+      "descricao": "Você cria 20 quilos de comida e 120 litros de água potável no chão ou em recipientes no alcance da magia — ambos úteis para afastar os perigos da desnutrição e desidratação. A comida não é temperada, mas nutritiva e se parece com um alimento à sua escolha, e a água é limpa. A comida estraga após 24 horas se não for consumida.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Círculo Mágico",
+      "circulo": 3,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo",
+        "Bruxo",
+        "Mago",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "3 metros",
+      "componentes": "V, S, M (sal e prata em pó no valor de 100 ou mais PO, que a magia consome)",
+      "duracao": "1 hora",
+      "descricao": "Você cria um Cilindro de energia mágica com 3 metros de raio e 6 metros de altura, centrado em um ponto visível e ao alcance no chão. Runas brilhantes surgem onde o Cilindro toca o chão ou outra superfície.\nEscolha um ou mais dos seguintes tipos de criaturas: Celestiais, Elementais, Feéricos, Ínferos ou Mortos-Vivos. O círculo afeta uma criatura do tipo escolhido das seguintes maneiras:\n-   A criatura não pode entrar voluntariamente no Cilindro por meios não mágicos. Se a criatura tentar usar teleporte ou viagem interplanar para fazer isso, ela deve primeiro ser bem-sucedida em uma salvaguarda de Carisma.\n-   A criatura tem Desvantagem nas jogadas de ataque contra alvos dentro do Cilindro.\n-   Alvos dentro do Cilindro não podem ser possuídos ou ter a condição Amedrontado ou Enfeitiçado pela criatura.\nAo conjurar essa magia, você pode fazer com que ela funcione na direção inversa, impedindo que uma criatura do tipo especificado saia do Cilindro e protegendo alvos fora dele.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. A duração aumenta em 1 hora para cada círculo de espaço de magia acima de 3."
+    },
+    {
+      "nome": "Destruição Cegante",
+      "circulo": 3,
+      "escola": "Evocação",
+      "classes": [
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após atingir uma criatura com uma arma Corpo a Corpo ou um Ataque Desarmado",
+      "alcance": "Pessoal",
+      "componentes": "",
+      "duracao": "1 minuto",
+      "descricao": "Componente: V\nO alvo atingido pelo ataque sofre 3d8 pontos de dano Radiante adicionais e tem a condição Cego até que a magia termine. No final de cada um dos turnos dele, o alvo Cego realiza uma salvaguarda de Constituição, encerrando a magia em caso de sucesso.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano adicional aumenta em 1d8 para cada círculo de espaço de magia acima de 3."
+    },
+    {
+      "nome": "Dissipar Magia",
+      "circulo": 3,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Clérigo",
+        "Druida",
+        "Feiticeiro",
+        "Guardião",
+        "Mago",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea",
+      "descricao": "Escolha uma criatura, objeto ou efeito mágico no alcance da magia. Qualquer magia ativa de 3º círculo ou inferior no alvo é encerrada. Para cada magia ativa de 4º círculo ou superior no alvo, realize um teste de atributo usando seu atributo de conjuração (CD 10 mais o círculo da magia alvo). Em caso de sucesso, a magia se encerra.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. Você encerra automaticamente uma magia no alvo se o círculo da magia for igual ou inferior ao círculo do espaço de magia que você usa."
+    },
+    {
+      "nome": "Falar com Mortos",
+      "circulo": 3,
+      "escola": "Necromancia",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "3 metros",
+      "componentes": "V, S, M (um incenso aceso)",
+      "duracao": "10 minutos",
+      "descricao": "Você confere uma aparência de vida a um cadáver à sua escolha que esteja no alcance da magia, permitindo que ele responda às perguntas que você fizer. O cadáver precisa ter boca, e a magia falha se a criatura morta era um Morto-Vivo quando pereceu ou se foi o alvo desta magia nos últimos 10 dias.\nAté que a magia termine, você pode fazer até cinco perguntas ao cadáver. O cadáver sabe apenas o que sabia em vida, incluindo os idiomas que conhecia. As respostas geralmente são breves, enigmáticas ou repetitivas, e o cadáver não tem obrigação de oferecer uma resposta verdadeira se você for hostil a ele ou se ele o reconhecer como um inimigo. Esta magia não devolve a alma da criatura ao corpo dela, apenas o espírito animado. Assim, o cadáver não pode aprender novas informações, não compreende nada do que aconteceu desde que morreu e não pode discorrer sobre eventos futuros.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Falar com Plantas",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "10 minutos",
+      "descricao": "Você imbuí plantas em uma Emanação imóvel de 9 metros com razão e intelecto limitado, permitindo que elas se comuniquem com você e sigam seus comandos simples. Você pode questionar as plantas sobre eventos na área da magia nas últimas 24 horas, obtendo informações sobre criaturas que passaram, clima e outras circunstâncias.\nAlém disso, você pode transformar Terreno Difícil causado pelo crescimento vegetal (como moitas e vegetação densa) em terreno comum pela duração da magia. Como alternativa, você pode transformar terreno comum onde há plantas em Terreno Difícil, também pela duração da magia.\nA magia não permite que as plantas se desloquem, mas elas podem mover seus galhos, cipós e caules para você.\nCaso haja uma criatura do tipo Planta na área, você pode se comunicar com ela como se compartilhassem um idioma em comum.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Flecha Relâmpago",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após atingir ou errar um alvo com um ataque à distância usando uma arma",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Instantânea",
+      "descricao": "Quando seu ataque atinge ou erra o alvo, a arma ou munição que você está usando se transforma em um relâmpago. Em vez de sofrer qualquer dano ou outros efeitos do ataque, o alvo sofre 4d8 pontos de dano Elétrico em um acerto ou metade desse dano em um erro. Cada criatura em um raio de 3 metros do alvo deve então realizar uma salvaguarda de Destreza, sofrendo 2d8 pontos de dano Elétrico se falhar ou metade desse dano em caso de sucesso.\nA arma ou munição retorna então à sua forma normal.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano para ambos os efeitos da magia aumenta em 1d8 para cada círculo de espaço de magia acima de 3."
+    },
+    {
+      "nome": "Fome de Hadar",
+      "circulo": 3,
+      "escola": "Invocação",
+      "classes": [
+        "Bruxo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "45 metros",
+      "componentes": "V, S, M (um tentáculo em conserva)",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Um Aasimar Bruxo expõe inimigos à Fome de Hadar, que tudo consome.\nVocê abre uma porta de entrada para o Reino Distante, uma região infestada de horrores indizíveis. Uma Esfera de Escuridão de 6 metros de raio aparece, centrada em um ponto no alcance e pela duração da magia. A Esfera é considerada Terreno Difícil, e está cheia de sussurros estranhos e sons de sucção que podem ser ouvidos a até 9 metros de distância. Nenhuma luz, seja mágica ou não, pode iluminar a área, e criaturas totalmente dentro da área têm a condição Cego.\nQualquer criatura que comece seu turno na área sofre 2d6 pontos de dano Gélido. Qualquer criatura que termine seu turno na área deve ser bem-sucedida em uma salvaguarda de Destreza ou sofre 2d6 pontos de dano Ácido enquanto tentáculos esbranquiçados de outro mundo se esfregam nela.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano Ácido ou Gélido (à sua escolha) aumenta em 1d6 para cada círculo de espaço de magia acima de 3."
+    },
+    {
+      "nome": "Forma Gasosa",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (um pouco de gaze)",
+      "duracao": "Concentração, até 1 hora",
+      "descricao": "Uma criatura voluntária que você toca multimorfa-se, junto com tudo o que está vestindo e carregando, em uma nuvem de neblina durante a duração da magia. A magia se encerra no alvo se ele for reduzido a 0 Pontos de Vida ou se executar uma ação Usar Magia para encerrá-la.\nEnquanto estiver nesta forma, o único método de movimento do alvo é um Deslocamento de Voo de 3 metros, e ele pode pairar. O alvo pode entrar e ocupar o espaço de outra criatura. O alvo tem Resistência a dano Contundente, Cortante e Perfurante; tem Imunidade à condição Caído; e tem Vantagem em salvaguardas de Força, Destreza e Constituição. O alvo pode passar por aberturas estreitas, mas considera líquidos como se fossem superfícies sólidas.\nO alvo não pode falar ou manipular objetos, e qualquer objeto que ele estava carregando ou segurando não pode ser derrubado, usado ou interagido de outra forma. Por fim, o alvo não pode atacar ou conjurar magias.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. Você pode escolher uma criatura adicional para cada círculo de espaço de magia acima de 3."
+    },
+    {
+      "nome": "Glifo de Proteção",
+      "circulo": 3,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 hora",
+      "alcance": "Toque",
+      "componentes": "V, S, M (um diamante em pó no valor de 200 ou mais PO, que a magia consome)",
+      "duracao": "Até ser dissipada ou acionada",
+      "descricao": "Você inscreve um glifo que mais tarde aciona um efeito mágico. Você o inscreve em uma superfície (como uma mesa ou uma seção de piso no chão) ou dentro de um objeto que pode ser fechado (como um livro ou baú) para ocultar o glifo. O glifo pode cobrir uma área não superior a 3 metros de diâmetro. Se a superfície ou objeto for movido a mais de 3 metros de onde você conjurou esta magia, o glifo é quebrado e a magia encerra sem ser acionada.\nO glifo é quase imperceptível e requer um teste bem-sucedido de Sabedoria (Percepção) contra a CD para evitar sua magia para ser notado.\nQuando inscreve o glifo, você define o gatilho dele e escolhe se ele é uma runa explosiva ou um glifo de magia, conforme explicado abaixo.\nDefina o Gatilho. Você decide o que aciona o glifo quando conjura a magia. Para glifos inscritos em uma superfície, os gatilhos comuns incluem tocar ou pisar no glifo, remover outro objeto que o cubra ou se aproximar a uma certa distância dele. Para glifos inscritos em um objeto, os gatilhos comuns incluem abrir esse objeto ou ver o glifo. Uma vez que um glifo é acionado, esta magia se encerra.\nVocê pode ajustar o gatilho para que apenas criaturas de certos tipos o ativem (por exemplo, o glifo pode ser definido para afetar Aberrações). Você também pode definir condições para criaturas que não acionam o glifo, como aquelas que dizem uma determinada senha.\nRuna Explosiva. Quando acionado, o glifo irrompe com energia mágica em uma Esfera de 6 metros de raio centrada no glifo. Cada criatura na área realiza uma salvaguarda de Destreza. Se falhar, uma criatura sofre 5d8 pontos de dano Ácido, Elétrico, Gélido, Ígneo ou Trovejante (à sua escolha ao criar o glifo), ou metade desse dano em caso de sucesso.\nGlifo de Magia. Você pode armazenar uma magia preparada de 3º círculo ou inferior no glifo, conjurando-a como parte da criação do glifo. A magia deve ter como alvo uma única criatura ou uma área. A magia que está sendo armazenada não tem efeito imediato quando conjurada desse modo.\nQuando o glifo é acionado, a magia armazenada entra em efeito. Se a magia tiver um alvo, ela tem como alvo a criatura que acionou o glifo. Se a magia afetar uma área, a área está centrada nessa criatura. Se a magia invocar criaturas hostis ou criar objetos ou armadilhas prejudiciais, elas aparecem o mais próximo possível do intruso e o atacam. Se a magia exigir Concentração, ela dura até o final da duração total da magia.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano de uma runa explosiva aumenta em 1d8 para cada círculo de espaço de magia acima de 3. Se você criar um glifo de magia, você pode armazenar qualquer magia de até o mesmo círculo que o espaço de magia que você usa para o Glifo de Proteção."
+    },
+    {
+      "nome": "Guardiões Espirituais",
+      "circulo": 3,
+      "escola": "Invocação",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (um pergaminho de oração)",
+      "duracao": "Concentração, até 10 minutos",
+      "descricao": "Espíritos protetores voam ao seu redor em uma Emanação de 4,5 metros pela duração da magia. Se você for bom ou neutro, a forma espectral deles parece angelical ou feérica (à sua escolha). Se você é mau, eles parecem ínferos.\nAo conjurar esta magia, você pode escolher criaturas que não serão afetadas. O Deslocamento de quaisquer outras criaturas é reduzido pela metade na Emanação. Sempre que a Emanação entrar no espaço de uma criatura ou uma criatura entrar na Emanação, ou terminar seu turno nela, ela deve realizar uma salvaguarda de Sabedoria. Se falhar, a criatura sofre 3d8 pontos de dano Radiante (se você for bom ou neutro) ou 3d8 pontos de dano Necrótico (se for mau). Em caso de sucesso, a criatura sofre metade do dano. Cada criatura realiza essa salvaguarda apenas uma vez por turno.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano aumenta em 1d8 para cada círculo de espaço de magia acima de 3.\n\nH\n\n*"
+    },
+    {
+      "nome": "Imagem Maior",
+      "circulo": 3,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S, M (um pouco de lã)",
+      "duracao": "Concentração, até 10 minutos",
+      "descricao": "Você cria a imagem de um objeto, uma criatura ou algum outro fenômeno visível que não seja maior do que um Cubo de 6 metros. A imagem aparece em um local à sua vista e no alcance da magia e permanece pela duração. A imagem parece real, incluindo sons, cheiros e temperatura apropriados para a coisa representada, mas não pode causar danos ou condições.\nSe você estiver dentro do alcance da imagem, pode usar a ação Usar Magia para movê-la para outro ponto no alcance da magia. Durante essa movimentação, você pode alterar sua aparência para que os movimentos pareçam naturais. Por exemplo, ao mover a imagem de uma criatura, pode fazê-la parecer que está andando. Além disso, você pode fazer com que a imagem emita sons diferentes em momentos distintos, como continuar uma conversa.\nA interação física com a imagem revela que ela é uma ilusão, pois as coisas podem passar por ela. Uma criatura que executa uma ação Analisar para examinar a imagem pode determinar que ela é uma ilusão com um teste bem-sucedido de Inteligência (Investigação) contra a CD para evitar sua magia. Se uma criatura perceber a ilusão pelo que ela é, ela pode ver através da imagem, e suas outras qualidades sensoriais tornam-se fracas para a criatura.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. A magia dura até ser dissipada, sem exigir Concentração, se conjurada com um espaço de magia de 4º círculo ou superior."
+    },
+    {
+      "nome": "Indetectável",
+      "circulo": 3,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Guardião",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (uma pitada de poeira de diamante no valor de 25 ou mais PO, que a magia consome)",
+      "duracao": "8 horas",
+      "descricao": "Pela duração da magia, você protege um alvo que tocar contra magias de Adivinhação. O alvo pode ser uma criatura voluntária, um local ou um objeto que não exceda 3 metros em qualquer dimensão. O alvo não pode ser afetado por nenhuma magia de Adivinhação nem percebido através de sensores mágicos de vidência.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Invocar Animais",
+      "circulo": 3,
+      "escola": "Invocação",
+      "classes": [
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos",
+      "descricao": "Você conjura espíritos da natureza que aparecem como um grande bando de animais espectrais e intangíveis em um espaço desocupado à sua vista e no alcance da magia. O bando permanece pela duração da magia e você escolhe a forma animal dos espíritos, como lobos, serpentes ou pássaros.\nVocê tem Vantagem em salvaguardas de Força enquanto estiver a até 1,5 metro do bando e, quando se mover no seu turno, também pode mover o bando até 9 metros para um espaço desocupado à sua vista.\nSempre que o bando se mover até 3 metros de uma criatura à sua vista ou quando uma criatura à sua vista entrar ou terminar seu turno a até 3 metros do bando, você pode forçá-la a realizar uma salvaguarda de Destreza. Se falhar, a criatura sofre 3d10 pontos de dano Cortante. Cada criatura só realiza essa salvaguarda uma vez por turno.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano aumenta em 1d10 para cada círculo de espaço de magia acima de 3."
+    },
+    {
+      "nome": "Invocar Barragem",
+      "circulo": 3,
+      "escola": "Invocação",
+      "classes": [
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma arma Corpo a Corpo ou à Distância que vale pelo menos 1 PP)",
+      "duracao": "Instantânea",
+      "descricao": "Você brande a arma usada para conjurar a magia e invoca armas espectrais semelhantes (ou munição apropriada para a arma) que são lançadas adiante e depois desaparecem. Cada criatura à sua escolha à sua vista em um Cone de 18 metros realiza uma salvaguarda de Destreza, sofrendo 5d8 pontos de dano Energético se falhar, ou metade desse dano em caso de sucesso.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano aumenta em 1d8 para cada círculo de espaço de magia acima de 3."
+    },
+    {
+      "nome": "Invocar Morto-Vivo",
+      "circulo": 3,
+      "escola": "Necromancia",
+      "classes": [
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S, M (um crânio dourado no valor de 300 ou mais PO)",
+      "duracao": "Concentração, até 1 hora",
+      "descricao": "Você invoca um Espírito Morto-Vivo. Ele se manifesta em um espaço desocupado à sua vista e no alcance da magia e usa o bloco de estatísticas do Espírito Morto-vivo. Ao conjurar a magia, escolha a forma da criatura: Esquelético, Fantasmagórico ou Pútrido. O espírito se assemelha a uma criatura Morta-viva com a forma escolhida, o que determina certos detalhes no bloco de estatísticas da criatura. A criatura desaparece ao ser reduzida a 0 Pontos de Vida ou quando a magia termina.\nA criatura é uma aliada sua e de seus aliados. Em combate, ela compartilha sua contagem de Iniciativa, mas o turno dela é imediatamente após o seu. Ele obedece aos seus comandos verbais (nenhuma ação é necessária). Se você não emitir nenhum, ela executa a ação Esquivar e usa o movimento dela para evitar o perigo.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. Use o círculo do espaço de magia para o círculo da magia no bloco de estatísticas.\n\n### Espírito Morto-Vivo\n\nMorto-vivo Médio, Neutro\n\nCA 11 + o círculo da magia\n\nPV 30 (apenas Fantasmagórico e Pútrido) ou 20 (apenas Esquelético) + 10 para cada círculo de magia acima de 3\n\nDeslocamento 9 m; Voo 12 m (pairar; apenas Fantasmagórico)\n\n|         |    | Mod | SG |         |    | Mod | SG |         |    | Mod | SG |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| For | 12 | +1      | +1     | Des | 16 | +3      | +3     | Con | 15 | +2      | +2     |\n| Int | 4  | -3      | -3     | Sab | 10 | +0      | +0     | Car | 9  | -1      | -1     |\n\nImunidades Necrótico, Venenoso; Amedrontado, Envenenado, Exaustão, Paralisado\n\nSentidos Visão no Escuro 18 m, Percepção Passiva 10\n\nIdiomas Compreende os idiomas que você fala\n\nND Nenhum (XP 0; BP é igual ao seu Bônus de Proficiência)\n\nTraços\n\nAura Purulenta (Apenas Pútrido). Salvaguarda de Constituição: CD é igual a CD para evitar sua magia, qualquer criatura (exceto você) que inicie o turno dentro de uma Emanação de 1,5 metro originada a partir do espírito. Falha: A criatura tem a condição Envenenado até o início de seu próximo turno.\n\nPassagem Incorpórea (Apenas Fantasmagórico). O espírito pode se mover através de outras criaturas e objetos como se fossem Terreno Difícil. Se ele terminar o turno dentro de um objeto, ele é desviado para o espaço desocupado mais próximo e sofre 1d10 pontos de dano Energético por cada 1,5 metro percorrido.\n\nAções\n\nAtaques Múltiplos. O espírito realiza um número de ataques igual à metade do círculo da magia (arredondado para baixo).\n\nGarra Podre (Apenas Pútrido). Jogada de Ataque Corpo a Corpo: Bônus é igual ao seu modificador de ataque mágico, alcance 1,5 m. Dano: 1d6 + 3 + o círculo da magia em pontos de dano Cortante. Se o alvo tem a condição Envenenado, ele tem a condição Paralisado até o final do próximo turno dele.\n\nRaio da Cova (Somente Esquelético). Jogada de Ataque à Distância: Bônus é igual ao seu modificador de ataque mágico, alcance 45 m. Dano: 2d4 + 3 + o círculo da magia em pontos de dano Necrótico.\n\nToque Mortal (Apenas Fantasmagórico). Jogada de Ataque Corpo a Corpo: Bônus é igual ao seu modificador de ataque mágico, alcance 1,5 m. Dano: 1d8 + 3 + o círculo da magia em pontos de dano Necrótico, e o alvo tem a condição Amedrontado até o final do próximo turno dele."
+    },
+    {
+      "nome": "Lentidão",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S, M (uma gota de melaço)",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Você altera a passagem do tempo em torno de até seis criaturas à sua escolha em um Cubo de 12 metros de lado no alcance da magia. Cada alvo deve ser bem-sucedido em uma salvaguarda de Sabedoria ou é afetado por esta magia pela sua duração.\nO Deslocamento de um alvo afetado é reduzido pela metade, sofre uma penalidade de -2 em salvaguardas de Destreza e na CA e não pode executar Reações. Nos turnos do alvo, ele pode executar uma ação ou uma Ação Bônus, não ambas, e pode realizar apenas um ataque se executar a ação Atacar. Se conjurar uma magia com um componente Somático, há uma chance de 25% da magia falhar como resultado do alvo fazer os gestos da magia muito lentamente.\nUm alvo afetado repete a salvaguarda no final de cada um dos turnos dele, encerrando a magia em caso de sucesso.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Luz do Dia",
+      "circulo": 3,
+      "escola": "Evocação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Feiticeiro",
+        "Guardião",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "1 hora",
+      "descricao": "Um elfo Clérigo usa a magia Luz do Dia para trazer a luz do amanhecer para uma corte de vampiros.\nPela duração da magia, a luz do sol se espalha de um ponto no alcance da magia e preenche uma Esfera de 18 metros de raio. A área da luz do sol é Luz Plena e emite Meia-luz por mais 18 metros.\nComo alternativa, você conjura a magia em um objeto que não esteja sendo usado ou carregado, fazendo com que a luz do sol preencha uma Emanação de 18 metros originada desse objeto. Cobrir esse objeto com algo opaco, como uma tigela ou elmo, bloqueia a luz do sol.\nSe qualquer área desta magia se sobrepuser a uma área de Escuridão criada por uma magia de 3º círculo ou inferior, essa outra magia é dissipada.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Línguas",
+      "circulo": 3,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Clérigo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, M (um zigurate em miniatura)",
+      "duracao": "1 hora",
+      "descricao": "Esta magia concede à criatura que você toca a capacidade de entender qualquer idioma falado ou com língua de sinais que ela ouça ou veja. Além disso, quando o alvo se comunica falando ou usando sinais, qualquer criatura que conheça pelo menos um idioma pode entendê-lo se essa criatura puder ouvir as palavras ou ver os sinais.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Manto do Cruzado",
+      "circulo": 3,
+      "escola": "Evocação",
+      "classes": [
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Você irradia uma aura mágica em uma Emanação de 9 metros. Enquanto estiver na aura, você e seus aliados causam 1d4 pontos de dano Radiante adicionais ao atingir com uma arma ou um Ataque Desarmado.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Medo",
+      "circulo": 3,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma pena branca)",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Cada criatura em um Cone de 9 metros deve ser bem-sucedida em uma salvaguarda de Sabedoria ou larga o que estiver segurando e tem a condição Amedrontado pela duração da magia.\nUma criatura Amedrontada executa a ação Correr e se afasta de você pela rota mais segura em cada um dos turnos dela, a menos que não haja para onde se mover. Se a criatura encerrar o turno dela em um espaço onde não tenha linha de visão para você, a criatura realiza uma salvaguarda de Sabedoria. Em caso de sucesso, a magia encerra naquela criatura.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Mesclar-se às Rochas",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "8 horas",
+      "descricao": "Você adentra em um objeto ou superfície rochosa grande o suficiente para caber completamente seu corpo, fundindo a si e seu equipamento com a pedra pela duração. Você deve tocar a pedra para fazer isso. Nada da sua presença permanece visível ou detectável por sentidos não mágicos.\nEnquanto estiver fundido com a rocha, você não pode ver o que ocorre fora dela, e quaisquer testes de Sabedoria (Percepção) que você realize para ouvir sons fora dela são realizados com Desvantagem. Você permanece ciente da passagem do tempo e pode conjurar magias em si mesmo enquanto está fundido à pedra. Você pode usar 1,5 metro de movimento para sair da rocha onde entrou, o que encerra a magia. Caso contrário, você não pode se mover.\nDanos físicos menores à rocha não o afetam, mas a destruição parcial ou mudança na forma dela (a ponto de você não caber mais nela) o expulsa e causa 6d6 pontos de dano Energético a você. A destruição completa da rocha (ou a transmutação dela em outra substância) o expulsa e causa 50 pontos de dano Energético.\nSe expulso, você é movido para o espaço desocupado mais próximo de onde entrou e tem a condição Caído.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Montaria Fantasmagórica",
+      "circulo": 3,
+      "escola": "Ilusão",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto ou Ritual",
+      "alcance": "9 metros",
+      "componentes": "V, S",
+      "duracao": "1 hora",
+      "descricao": "Uma criatura Grande, quase real e semelhante a um cavalo aparece no chão em um espaço desocupado à sua escolha no alcance da magia. Você decide a aparência da criatura e ela é equipada com uma sela, rédea e freio. Qualquer equipamento criado pela magia desaparece em uma nuvem de fumaça se for carregado a mais de 3 metros de distância da montaria.\nPela duração da magia, você ou uma criatura à sua escolha pode usar a montaria. A montaria usa o bloco de estatísticas do Cavalo de Montaria (veja também o apêndice B), exceto que ele tem um Deslocamento de 30 metros e pode viajar 20 quilômetros em uma hora. Quando a magia termina, a montaria desaparece gradualmente, dando ao cavaleiro 1 minuto para desmontar. A magia se encerra se a montaria sofrer algum dano.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Muralha de Vento",
+      "circulo": 3,
+      "escola": "Evocação",
+      "classes": [
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S, M (um leque e uma pena)",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Uma muralha de vento forte sobe do chão em um ponto à sua escolha no alcance da magia. Você pode realizar uma parede de até 15 metros de comprimento, 4,5 metros de altura e 30 centímetros de espessura. Você pode moldar a parede da maneira que quiser, desde que ela faça um caminho contínuo ao longo do chão. A muralha permanece pela duração da magia.\nQuando a muralha surge, cada criatura na área dela realiza uma salvaguarda de Força, sofrendo 4d8 pontos de dano Contundente se falhar, ou metade desse dano em caso de sucesso.\nO vento forte mantém névoa, fumaça e outros gases afastados. Criaturas ou objetos Pequenos ou menores não podem atravessar a muralha. Materiais soltos e leves que entrem na muralha são lançados para cima. Flechas, virotes e outros projéteis comuns disparados contra alvos atrás da muralha são desviados para cima e erram automaticamente. Pedras arremessadas por Gigantes ou máquinas de cerco, assim como projéteis semelhantes, não são afetados. Criaturas em forma gasosa não conseguem atravessar a muralha.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Nevasca",
+      "circulo": 3,
+      "escola": "Invocação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "45 metros",
+      "componentes": "V, S, M (um guarda-chuva em miniatura)",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Até que a magia termine, granizo cai em um Cilindro de 12 metros de altura e 6 metros de raio centrado em um ponto à sua escolha no alcance da magia. A área está Totalmente Obscurecida e as chamas expostas na área são apagadas.\nO Solo no Cilindro é Terreno Difícil. Quando uma criatura entra no Cilindro pela primeira vez em um turno ou começa o turno dela nele, deve ser bem-sucedida em uma salvaguarda de Destreza ou está Caída e perde a Concentração.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Nuvem Fétida",
+      "circulo": 3,
+      "escola": "Invocação",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S, M (um ovo podre)",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Você cria uma Esfera de 6 metros de raio de gás amarelo nauseante centrada em um ponto no alcance da magia. A nuvem é Totalmente Obscurecida. A nuvem permanece no ar pela duração da magia ou até que um vento forte (como o criado por Lufada de Vento) a disperse.\nCada criatura que começa seu turno na Esfera deve ser bem-sucedida em uma salvaguarda de Constituição ou tem a condição Envenenado até o final do turno atual. Enquanto Envenenada desse modo, a criatura não pode executar uma ação ou uma Ação Bônus.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Padrão Hipnótico",
+      "circulo": 3,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "S, M (uma pitada de confete)",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Você cria um padrão distorcido de cores em um cubo de 9 metros de lado no alcance da magia. O padrão aparece por um momento e desaparece. Cada criatura na área, que pode ver o padrão, deve ser bem-sucedida em uma salvaguarda de Sabedoria ou tem a condição Enfeitiçado pela duração. Enquanto Enfeitiçado, a criatura tem a condição Incapacitado e Deslocamento 0.\nA magia se encerra para uma criatura afetada se ela sofrer algum dano ou se outra pessoa executar uma ação para sacudi-la, removendo-a de seu estupor.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Palavra Curativa em Massa",
+      "circulo": 3,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "18 metros",
+      "componentes": "V",
+      "duracao": "Instantânea",
+      "descricao": "Até seis criaturas à sua escolha, à sua vista e no alcance da magia, recuperam Pontos de Vida iguais a 2d4 mais o seu modificador de atributo de conjuração.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. A cura aumenta em 1d4 para cada círculo de espaço de magia acima de 3."
+    },
+    {
+      "nome": "Pequeno Refúgio de Leomund",
+      "circulo": 3,
+      "escola": "Evocação",
+      "classes": [
+        "Bardo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto ou Ritual",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma conta de cristal)",
+      "duracao": "8 horas",
+      "descricao": "Uma Emanação de 3 metros surge ao seu redor e permanece estacionária pela duração. A magia falha quando você a conjura se a Emanação não for grande o suficiente para envolver totalmente todas as criaturas em sua área.\nCriaturas e objetos dentro da Emanação quando você conjura a magia podem se mover livremente através dela. Todas as outras criaturas e objetos são impedidos de atravessá-la. Magias de 3º círculo ou inferior não podem ser conjuradas através dela, e os efeitos dessas magias não podem se estender para dentro dela.\nA atmosfera no interior da Emanação é confortável e seca, independentemente do clima externo. Até que a magia termine, você pode determinar se no interior há Meia-luz ou Escuridão (nenhuma ação é necessária). A Emanação é opaca por fora e de qualquer cor que você escolher, mas é transparente por dentro.\nA magia encerra se você sair da Emanação ou se a conjurar novamente.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Piscar",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "1 minuto",
+      "descricao": "Jogue 1d6 no final de cada um dos seus turnos pela duração da magia. Em um resultado de 4-6, você desaparece do seu plano de existência atual e aparece no Plano Etéreo (a magia termina instantaneamente se você já estiver nesse plano). Enquanto estiver no Plano Etéreo, você pode ver o plano que você deixou, que aparece em tons de cinza, mas você não pode ver nada nele a mais de 18 metros de distância. Você só pode afetar e ser afetado por criaturas que estejam no Plano Etéreo, e criaturas no outro plano não podem percebê-lo, a menos que tenham uma habilidade específica que lhes permita perceber coisas no Plano Etéreo.\nVocê retorna ao outro plano no início do seu próximo turno e quando a magia termina se você estiver no Plano Etéreo. Você retorna a um espaço desocupado à sua escolha à sua vista e a até 3 metros do espaço que deixou. Se nenhum espaço desocupado estiver disponível dentro desse intervalo, você aparece no espaço desocupado mais próximo.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Proteção Contra Energia",
+      "circulo": 3,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Feiticeiro",
+        "Guardião",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 hora",
+      "descricao": "Pela duração da magia, a criatura voluntária que você tocar tem Resistência a um tipo de dano à sua escolha: Ácido, Elétrico, Gélido, Ígneo ou Trovejante.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Relâmpago",
+      "circulo": 3,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (um pouco de pelo e um cajado de cristal)",
+      "duracao": "Instantânea",
+      "descricao": "Um relâmpago formando uma Linha de 30 metros de comprimento e 1,5 metro de largura dispara a partir de você em uma direção à sua escolha. Cada criatura na Linha realiza uma salvaguarda de Destreza, sofrendo 8d6 pontos de dano Elétrico se falhar ou metade desse dano em caso de sucesso.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano aumenta em 1d6 para cada círculo de espaço de magia acima de 3."
+    },
+    {
+      "nome": "Remeter",
+      "circulo": 3,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Ilimitado",
+      "componentes": "V, S, M (um fio de cobre)",
+      "duracao": "Instantânea",
+      "descricao": "Você envia uma mensagem curta de 25 palavras ou menos para uma criatura que você já encontrou ou que foi descrita a você por alguém que a tenha conhecido. O alvo ouve a mensagem na mente, reconhece você como remetente se o conhecer e pode responder da mesma forma imediatamente. A magia permite que o alvo compreenda o significado da sua mensagem.\nVocê pode enviar a mensagem através de qualquer distância e até para outros planos de existência, mas se o alvo estiver em um plano diferente do seu, há uma chance de 5% de que a mensagem não chegue. Você sabe se a entrega falha.\nAo receber sua mensagem, a criatura pode bloquear sua capacidade de contactá-la novamente com essa magia por 8 horas. Se você tentar enviar outra mensagem durante esse período, descobre que está bloqueado e a magia falha.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Remover Maldição",
+      "circulo": 3,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo",
+        "Bruxo",
+        "Mago",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "Instantânea",
+      "descricao": "Ao seu toque, todas as maldições que afetam uma criatura ou objeto se encerram. Se o objeto for um item mágico amaldiçoado, a maldição permanece, mas a magia quebra a Sintonização do dono com o objeto, permitindo que ele seja removido ou descartado.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Respirar na Água",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Guardião",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (um pedaço de junco)",
+      "duracao": "24 horas",
+      "descricao": "Magias como Caminhar Sobre as Águas e Respirar na Água auxiliam viagens a reinos aquáticos.\nEsta magia concede a até dez criaturas voluntárias à sua escolha no alcance da magia a capacidade de respirar debaixo d'água até que a magia termine. As criaturas afetadas também mantêm seu modo normal de respiração.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Revivificar",
+      "circulo": 3,
+      "escola": "Necromancia",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Guardião",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (um diamante no valor de 300 ou mais PO, que a magia consome)",
+      "duracao": "Instantânea",
+      "descricao": "Você toca uma criatura que morreu no último minuto. Essa criatura revive com 1 Ponto de Vida. Esta magia não pode reviver uma criatura que morreu de velhice, nem restaura partes do corpo ausentes.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Rogar Maldição",
+      "circulo": 3,
+      "escola": "Necromancia",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Você toca uma criatura, que deve ser bem-sucedida em uma salvaguarda de Sabedoria ou fica amaldiçoada pela duração da magia. Até que a maldição termine, o alvo sofre um dos seguintes efeitos à sua escolha:\n-   Escolha um atributo. O alvo tem Desvantagem em testes de atributo e salvaguardas realizadas com esse atributo.\n-   O alvo tem Desvantagem em jogadas de ataque contra você.\n-   Em combate, o alvo deve ser bem-sucedido em uma salvaguarda de Sabedoria no início de cada um dos turnos dele ou ele é forçado a executar a ação Esquivar neste turno.\n-   Se você causar dano ao alvo com uma jogada de ataque ou uma magia, o alvo sofre 1d8 pontos de dano Necrótico adicionais.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. Se você conjurar esta magia usando um espaço de magia de 4º círculo, você pode manter a Concentração nela por até 10 minutos. Se você usar um espaço de magia de 5º círculo ou superior, a magia não requer Concentração, e a duração se torna 8 horas (espaço de 5º e 6º círculo) ou 24 horas (espaço de 7º ou 8º círculo). Se você usar um espaço de magia de 9º círculo, a magia permanece até ser dissipada.\n\nS\n\n*"
+    },
+    {
+      "nome": "Simular Morte",
+      "circulo": 3,
+      "escola": "Necromancia",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "Toque",
+      "componentes": "V, S, M (uma pitada de terra de cemitério)",
+      "duracao": "1 hora",
+      "descricao": "Você toca uma criatura voluntária e a coloca em um estado cataléptico que é indistinguível da morte.\nPela duração da magia, o alvo parece morto em uma inspeção externa e para magias usadas para determinar a situação do alvo. O alvo está com as condições Cego e Incapacitado, e o Deslocamento dele é 0.\nO alvo também tem Resistência a todos os tipos de dano, exceto dano Psíquico, e tem Imunidade à condição Envenenado.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Sinal de Esperança",
+      "circulo": 3,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Escolha qualquer número de criaturas no alcance da magia. Pela duração da magia, cada alvo tem Vantagem em salvaguardas de Sabedoria e Salvaguarda contra Morte e recupera o número de Pontos de Vida máximos possíveis de qualquer cura.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Toque Vampírico",
+      "circulo": 3,
+      "escola": "Necromancia",
+      "classes": [
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "O toque da sua mão envolta em sombras pode sugar a força vital dos outros para curar suas feridas. Realize um ataque mágico corpo a corpo contra uma criatura no alcance da magia. Em caso de acerto, o alvo sofre 3d6 pontos de dano Necrótico e você recupera Pontos de Vida iguais à metade da quantidade do dano Necrótico causado.\nAté que a magia termine, você pode realizar o ataque novamente em cada um dos seus turnos como uma ação Usar Magia, atingindo a mesma criatura ou uma diferente.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano aumenta em 1d6 para cada círculo de espaço de magia acima de 3."
+    },
+    {
+      "nome": "Voo",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (uma pena)",
+      "duracao": "Concentração, até 10 minutos",
+      "descricao": "Você toca uma criatura voluntária. Pela duração da magia, o alvo ganha um Deslocamento de Voo de 18 metros e pode pairar. Quando a magia termina, o alvo entra em queda se ainda estiver no alto, a menos que possa impedir a queda.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. Você pode escolher uma criatura adicional para cada círculo de espaço de magia acima de 3.\n\nZ\n\n*"
+    }
+  ]
+}

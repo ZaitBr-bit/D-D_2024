@@ -1,0 +1,311 @@
+{
+  "classe": "Guardião",
+  "total_magias": 61,
+  "magias": [
+    {
+      "nome": "Alarme",
+      "circulo": 1,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Amizade Animal",
+      "circulo": 1,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Bom Fruto",
+      "circulo": 1,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Curar Ferimentos",
+      "circulo": 1,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Detectar Magia",
+      "circulo": 1,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Detectar Veneno e Doença",
+      "circulo": 1,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Emaranhar",
+      "circulo": 1,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Falar com Animais",
+      "circulo": 1,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Golpe Constritor",
+      "circulo": 1,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Marca do Predador",
+      "circulo": 1,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Névoa Obscurecente",
+      "circulo": 1,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Passos Largos",
+      "circulo": 1,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Salto",
+      "circulo": 1,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Saraivada de Espinhos",
+      "circulo": 1,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Aprimorar Atributo",
+      "circulo": 2,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Arma Mágica",
+      "circulo": 2,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Auxílio",
+      "circulo": 2,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Cordão de Flechas",
+      "circulo": 2,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Crescer Espinhos",
+      "circulo": 2,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Encontrar Armadilhas",
+      "circulo": 2,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Invocar Fera",
+      "circulo": 2,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Localizar Animais ou Plantas",
+      "circulo": 2,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Localizar Objeto",
+      "circulo": 2,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Lufada de Vento",
+      "circulo": 2,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Mensageiro Animal",
+      "circulo": 2,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Passo Sem Rastro",
+      "circulo": 2,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Pele-Casca",
+      "circulo": 2,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Proteção Contra Veneno",
+      "circulo": 2,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Restauração Menor",
+      "circulo": 2,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Sentido Feral",
+      "circulo": 2,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Silêncio",
+      "circulo": 2,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Visão no Escuro",
+      "circulo": 2,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Arma Elemental",
+      "circulo": 3,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Caminhar Sobre as Águas",
+      "circulo": 3,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Convocar Feérico",
+      "circulo": 3,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Crescimento de Plantas",
+      "circulo": 3,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Dissipar Magia",
+      "circulo": 3,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Falar com Plantas",
+      "circulo": 3,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Flecha Relâmpago",
+      "circulo": 3,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Indetectável",
+      "circulo": 3,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Invocar Animais",
+      "circulo": 3,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Invocar Barragem",
+      "circulo": 3,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Luz do Dia",
+      "circulo": 3,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Mesclar-se às Rochas",
+      "circulo": 3,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Muralha de Vento",
+      "circulo": 3,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Proteção Contra Energia",
+      "circulo": 3,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Respirar na Água",
+      "circulo": 3,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Revivificar",
+      "circulo": 3,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Convocar Elemental",
+      "circulo": 4,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Dominar Fera",
+      "circulo": 4,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Invocar Seres da Floresta",
+      "circulo": 4,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Localizar Criatura",
+      "circulo": 4,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Movimentação Livre",
+      "circulo": 4,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Pele-Rocha",
+      "circulo": 4,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Vinha Agarradora",
+      "circulo": 4,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Aljava Veloz",
+      "circulo": 5,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Comunhão com a Natureza",
+      "circulo": 5,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Golpe de Arço",
+      "circulo": 5,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Invocar Saraivada",
+      "circulo": 5,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Passo Arbóreo",
+      "circulo": 5,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Restauração Maior",
+      "circulo": 5,
+      "escola": "Abjuração"
+    }
+  ]
+}

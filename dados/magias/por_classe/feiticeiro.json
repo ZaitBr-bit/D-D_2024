@@ -1,0 +1,756 @@
+{
+  "classe": "Feiticeiro",
+  "total_magias": 150,
+  "magias": [
+    {
+      "nome": "Amigos",
+      "circulo": 0,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Bolha Ácida",
+      "circulo": 0,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Elementalismo",
+      "circulo": 0,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Explosão Elemental",
+      "circulo": 0,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Golpe Certeiro",
+      "circulo": 0,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Ilusão Menor",
+      "circulo": 0,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Luz",
+      "circulo": 0,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Luzes Dançantes",
+      "circulo": 0,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Mensagem",
+      "circulo": 0,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Mãos Mágicas",
+      "circulo": 0,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Prestidigitação Arcana",
+      "circulo": 0,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Proteção Contra Lâminas",
+      "circulo": 0,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Raio de Fogo",
+      "circulo": 0,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Raio de Gelo",
+      "circulo": 0,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Rajada de Veneno",
+      "circulo": 0,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Reparar",
+      "circulo": 0,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Talho Mental",
+      "circulo": 0,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Toque Chocante",
+      "circulo": 0,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Toque Necrótico",
+      "circulo": 0,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Trovão",
+      "circulo": 0,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Armadura Arcana",
+      "circulo": 1,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Compreender Idiomas",
+      "circulo": 1,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Detectar Magia",
+      "circulo": 1,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Disfarçar-se",
+      "circulo": 1,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Enfeitiçar Pessoa",
+      "circulo": 1,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Escudo Arcano",
+      "circulo": 1,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Faca de Gelo",
+      "circulo": 1,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Graxa",
+      "circulo": 1,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Imagem Silenciosa",
+      "circulo": 1,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Leque Cromático",
+      "circulo": 1,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Mãos Flamejantes",
+      "circulo": 1,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Mísseis Mágicos",
+      "circulo": 1,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Névoa Obscurecente",
+      "circulo": 1,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Onda Trovejante",
+      "circulo": 1,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Orbe Cromático",
+      "circulo": 1,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Queda Suave",
+      "circulo": 1,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Raio Nauseante",
+      "circulo": 1,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Raio de Bruxa",
+      "circulo": 1,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Retirada Acelerada",
+      "circulo": 1,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Salto",
+      "circulo": 1,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Sono",
+      "circulo": 1,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Vitalidade Vazia",
+      "circulo": 1,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Alterar-se",
+      "circulo": 2,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Aprimorar Atributo",
+      "circulo": 2,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Arma Mágica",
+      "circulo": 2,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Arrombar",
+      "circulo": 2,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Aumentar/Reduzir",
+      "circulo": 2,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Cegueira/Surdez",
+      "circulo": 2,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Coroa da Loucura",
+      "circulo": 2,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Despedaçar",
+      "circulo": 2,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Detectar Pensamentos",
+      "circulo": 2,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Escalada de Aranha",
+      "circulo": 2,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Escuridão",
+      "circulo": 2,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Esfera Flamejante",
+      "circulo": 2,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Espinho Mental",
+      "circulo": 2,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Força Espectral",
+      "circulo": 2,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Invisibilidade",
+      "circulo": 2,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Levitação",
+      "circulo": 2,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Lufada de Vento",
+      "circulo": 2,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Lâmina Flamejante",
+      "circulo": 2,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Nuvem de Adagas",
+      "circulo": 2,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Paralisar Pessoa",
+      "circulo": 2,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Passo Nebuloso",
+      "circulo": 2,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Raio Ardente",
+      "circulo": 2,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Reflexos",
+      "circulo": 2,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Sopro de Dragão",
+      "circulo": 2,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Sugestão",
+      "circulo": 2,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Teia",
+      "circulo": 2,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Turvar",
+      "circulo": 2,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Ver o Invisível",
+      "circulo": 2,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Vigor Arcano",
+      "circulo": 2,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Visão no Escuro",
+      "circulo": 2,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Bola de Fogo",
+      "circulo": 3,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Caminhar Sobre as Águas",
+      "circulo": 3,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Celeridade",
+      "circulo": 3,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Clarividência",
+      "circulo": 3,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Contramagia",
+      "circulo": 3,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Dissipar Magia",
+      "circulo": 3,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Forma Gasosa",
+      "circulo": 3,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Imagem Maior",
+      "circulo": 3,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Lentidão",
+      "circulo": 3,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Luz do Dia",
+      "circulo": 3,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Línguas",
+      "circulo": 3,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Medo",
+      "circulo": 3,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Nevasca",
+      "circulo": 3,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Nuvem Fétida",
+      "circulo": 3,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Padrão Hipnótico",
+      "circulo": 3,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Piscar",
+      "circulo": 3,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Proteção Contra Energia",
+      "circulo": 3,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Relâmpago",
+      "circulo": 3,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Respirar na Água",
+      "circulo": 3,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Toque Vampírico",
+      "circulo": 3,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Voo",
+      "circulo": 3,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Banimento",
+      "circulo": 4,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Confusão",
+      "circulo": 4,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Dominar Fera",
+      "circulo": 4,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Enfeitiçar Monstro",
+      "circulo": 4,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Escudo Ardente",
+      "circulo": 4,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Esfera Vitriólica",
+      "circulo": 4,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Invisibilidade Maior",
+      "circulo": 4,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Malogro",
+      "circulo": 4,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Muralha de Fogo",
+      "circulo": 4,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Pele-Rocha",
+      "circulo": 4,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Polimorfia",
+      "circulo": 4,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Porta Dimensional",
+      "circulo": 4,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Tempestade Glacial",
+      "circulo": 4,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Animar Objetos",
+      "circulo": 5,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Cone de Frio",
+      "circulo": 5,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Criação",
+      "circulo": 5,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Círculo de Teleporte",
+      "circulo": 5,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Dominar Pessoa",
+      "circulo": 5,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Estática Sináptica",
+      "circulo": 5,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Muralha de Pedra",
+      "circulo": 5,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Mão de Bigby",
+      "circulo": 5,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Névoa Mortal",
+      "circulo": 5,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Paralisar Monstro",
+      "circulo": 5,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Praga de Insetos",
+      "circulo": 5,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Similaridade",
+      "circulo": 5,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Telecinese",
+      "circulo": 5,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Corrente de Relâmpagos",
+      "circulo": 6,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Círculo da Morte",
+      "circulo": 6,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "De Carne para Pedra",
+      "circulo": 6,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Desintegrar",
+      "circulo": 6,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Esfera Congelante de Otiluke",
+      "circulo": 6,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Globo de Invulnerabilidade",
+      "circulo": 6,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Mau Olhado",
+      "circulo": 6,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Mover Terra",
+      "circulo": 6,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Portais Arcanos",
+      "circulo": 6,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Raio Solar",
+      "circulo": 6,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Sugestão em Massa",
+      "circulo": 6,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Visão da Verdade",
+      "circulo": 6,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Bola de Fogo Adiável",
+      "circulo": 7,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Dedo da Morte",
+      "circulo": 7,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Forma Etérea",
+      "circulo": 7,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Inverter a Gravidade",
+      "circulo": 7,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Rajada Prismática",
+      "circulo": 7,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Teleporte",
+      "circulo": 7,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Tempestade de Fogo",
+      "circulo": 7,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Transição Planar",
+      "circulo": 7,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Dominar Monstro",
+      "circulo": 8,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Explosão Solar",
+      "circulo": 8,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Nuvem Incendiária",
+      "circulo": 8,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Palavra de Poder: Atordoar",
+      "circulo": 8,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Semiplano",
+      "circulo": 8,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Terremoto",
+      "circulo": 8,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Chuva de Meteoros",
+      "circulo": 9,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Desejo",
+      "circulo": 9,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Palavra de Poder: Matar",
+      "circulo": 9,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Parar o Tempo",
+      "circulo": 9,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Portal",
+      "circulo": 9,
+      "escola": "Invocação"
+    }
+  ]
+}

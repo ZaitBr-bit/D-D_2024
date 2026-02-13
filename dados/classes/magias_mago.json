@@ -1,0 +1,1235 @@
+{
+  "classe": "Mago",
+  "lista_magias": {
+    "Truques": [
+      {
+        "nome": "Amigos",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Badalar Fúnebre",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Bolha Ácida",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Elementalismo",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Golpe Certeiro",
+        "escola": "Adivinhação",
+        "especial": "M"
+      },
+      {
+        "nome": "Ilusão Menor",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Luz",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Luzes Dançantes",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Mãos Mágicas",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Mensagem",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Prestidigitação Arcana",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Proteção Contra Lâminas",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Raio de Fogo",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Raio de Gelo",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Rajada de Veneno",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Reparar",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Talho Mental",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Toque Chocante",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Toque Necrótico",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Trovão",
+        "escola": "Evocação",
+        "especial": "—"
+      }
+    ],
+    "1º Círculo": [
+      {
+        "nome": "Alarme",
+        "escola": "Abjuração",
+        "especial": "R"
+      },
+      {
+        "nome": "Armadura Arcana",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Compreender Idiomas",
+        "escola": "Adivinhação",
+        "especial": "R"
+      },
+      {
+        "nome": "Convocar Familiar",
+        "escola": "Invocação",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Detectar Magia",
+        "escola": "Adivinhação",
+        "especial": "C, R"
+      },
+      {
+        "nome": "Disco Flutuante de Tenser",
+        "escola": "Invocação",
+        "especial": "R"
+      },
+      {
+        "nome": "Disfarçar-se",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Enfeitiçar Pessoa",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Escrita Ilusória",
+        "escola": "Ilusão",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Escudo Arcano",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Faca de Gelo",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Gargalhada Nefasta de Tasha",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Graxa",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Identificar",
+        "escola": "Adivinhação",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Imagem Silenciosa",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Leque Cromático",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Mãos Flamejantes",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Mísseis Mágicos",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Névoa Obscurecente",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Onda Trovejante",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Orbe Cromático",
+        "escola": "Evocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Passos Largos",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Proteção Contra o Bem e o Mal",
+        "escola": "Abjuração",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Queda Suave",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Raio de Bruxa",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Raio Nauseante",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Retirada Acelerada",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Salto",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Servo Invisível",
+        "escola": "Invocação",
+        "especial": "R"
+      },
+      {
+        "nome": "Sono",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Vitalidade Vazia",
+        "escola": "Necromancia",
+        "especial": "—"
+      }
+    ],
+    "2º Círculo": [
+      {
+        "nome": "Alterar-se",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Aprimorar Atributo",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Arma Mágica",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Arrombar",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Augúrio",
+        "escola": "Adivinhação",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Aumentar/Reduzir",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Aura Mágica de Nystul",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Boca Encantada",
+        "escola": "Ilusão",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Cegueira/Surdez",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Chama Contínua",
+        "escola": "Evocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Corda Extradimensional",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Coroa da Loucura",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Despedaçar",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Detectar Pensamentos",
+        "escola": "Adivinhação",
+        "especial": "C"
+      },
+      {
+        "nome": "Escalada de Aranha",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Escuridão",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Esfera Flamejante",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Espinho Mental",
+        "escola": "Adivinhação",
+        "especial": "C"
+      },
+      {
+        "nome": "Flecha Ácida de Melf",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Força Espectral",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Invisibilidade",
+        "escola": "Ilusão",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Levitação",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Localizar Objeto",
+        "escola": "Adivinhação",
+        "especial": "C"
+      },
+      {
+        "nome": "Lufada de Vento",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Nuvem de Adagas",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Paralisar Pessoa",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Passo Nebuloso",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Raio Ardente",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Raio do Enfraquecimento",
+        "escola": "Necromancia",
+        "especial": "C"
+      },
+      {
+        "nome": "Reflexos",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Repouso Tranquilo",
+        "escola": "Necromancia",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Sopro de Dragão",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Sugestão",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Teia",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Tranca Arcana",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Turvar",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Ver o Invisível",
+        "escola": "Adivinhação",
+        "especial": "—"
+      },
+      {
+        "nome": "Vigor Arcano",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Visão no Escuro",
+        "escola": "Transmutação",
+        "especial": "—"
+      }
+    ],
+    "3º Círculo": [
+      {
+        "nome": "Animar Mortos",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Bola de Fogo",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Celeridade",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Círculo Mágico",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Clarividência",
+        "escola": "Adivinhação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Contramagia",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Convocar Feérico",
+        "escola": "Invocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Dissipar Magia",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Falar com Mortos",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Forma Gasosa",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Glifo de Proteção",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Imagem Maior",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Indetectável",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Invocar Morto-Vivo",
+        "escola": "Necromancia",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Lentidão",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Línguas",
+        "escola": "Adivinhação",
+        "especial": "—"
+      },
+      {
+        "nome": "Medo",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Montaria Fantasmagórica",
+        "escola": "Ilusão",
+        "especial": "R"
+      },
+      {
+        "nome": "Nevasca",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Nuvem Fétida",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Padrão Hipnótico",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Pequeno Refúgio de Leomund",
+        "escola": "Evocação",
+        "especial": "R"
+      },
+      {
+        "nome": "Piscar",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Proteção Contra Energia",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Relâmpago",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Remeter",
+        "escola": "Adivinhação",
+        "especial": "—"
+      },
+      {
+        "nome": "Remover Maldição",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Respirar na Água",
+        "escola": "Transmutação",
+        "especial": "R"
+      },
+      {
+        "nome": "Rogar Maldição",
+        "escola": "Necromancia",
+        "especial": "C"
+      },
+      {
+        "nome": "Simular Morte",
+        "escola": "Necromancia",
+        "especial": "R"
+      },
+      {
+        "nome": "Toque Vampírico",
+        "escola": "Necromancia",
+        "especial": "C"
+      },
+      {
+        "nome": "Voo",
+        "escola": "Transmutação",
+        "especial": "C"
+      }
+    ],
+    "4º Círculo": [
+      {
+        "nome": "Arca Secreta de Leomund",
+        "escola": "Invocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Assassino Fantasmagórico",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Banimento",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Cão Fiel de Mordenkainen",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Confusão",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Controlar Água",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Convocar Elemental",
+        "escola": "Invocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Enfeitiçar Monstro",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Escudo Ardente",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Esfera Resiliente de Otiluke",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Esfera Vitriólica",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Fabricar",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Invisibilidade Maior",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Invocar Aberração",
+        "escola": "Invocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Invocar Constructo",
+        "escola": "Invocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Invocar Elementais Menores",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Localizar Criatura",
+        "escola": "Adivinhação",
+        "especial": "C"
+      },
+      {
+        "nome": "Malogro",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Moldar Rochas",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Muralha de Fogo",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Olho Arcano",
+        "escola": "Adivinhação",
+        "especial": "C"
+      },
+      {
+        "nome": "Pele-Rocha",
+        "escola": "Transmutação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Polimorfia",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Porta Dimensional",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Presságio",
+        "escola": "Adivinhação",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Santuário Particular de Mordenkainen",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Tempestade Glacial",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Tentáculos Negros de Evard",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Terreno Alucinatório",
+        "escola": "Ilusão",
+        "especial": "—"
+      }
+    ],
+    "5º Círculo": [
+      {
+        "nome": "Âncora Planar",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Animar Objetos",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Círculo de Poder",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Círculo de Teleporte",
+        "escola": "Invocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Cone de Frio",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Contato Extraplanar",
+        "escola": "Adivinhação",
+        "especial": "R"
+      },
+      {
+        "nome": "Criação",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Criar Passagem",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Despistar",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Dominar Pessoa",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Estática Sináptica",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Golpe de Arço",
+        "escola": "Invocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Invocar Dragão",
+        "escola": "Invocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Invocar Elemental",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Lendas e Histórias",
+        "escola": "Adivinhação",
+        "especial": "M"
+      },
+      {
+        "nome": "Ligação Telepática de Rary",
+        "escola": "Adivinhação",
+        "especial": "R"
+      },
+      {
+        "nome": "Mão de Bigby",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Missão",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Modificar Memória",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Muralha de Energia",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Muralha de Pedra",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Névoa Mortal",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Paralisar Monstro",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Presença Régia de Yolande",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Similaridade",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Sonho",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Telecinese",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Tempestade Radiante de Jallarzi",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Vidência",
+        "escola": "Adivinhação",
+        "especial": "C, M"
+      }
+    ],
+    "6º Círculo": [
+      {
+        "nome": "Caldeirão Borbulhante de Tasha",
+        "escola": "Invocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Círculo da Morte",
+        "escola": "Necromancia",
+        "especial": "M"
+      },
+      {
+        "nome": "Contingência",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Corrente de Relâmpagos",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Criar Mortos-Vivos",
+        "escola": "Necromancia",
+        "especial": "M"
+      },
+      {
+        "nome": "Dança Irresistível de Otto",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "De Carne para Pedra",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Desintegrar",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Esfera Congelante de Otiluke",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Globo de Invulnerabilidade",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Ilusão Programada",
+        "escola": "Ilusão",
+        "especial": "M"
+      },
+      {
+        "nome": "Invocação Instantânea de Drawmij",
+        "escola": "Invocação",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Invocar Ínfero",
+        "escola": "Invocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Mau Olhado",
+        "escola": "Necromancia",
+        "especial": "C"
+      },
+      {
+        "nome": "Mover Terra",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Muralha de Gelo",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Portais Arcanos",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Proteger Fortaleza",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Raio Solar",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Receptáculo Arcano",
+        "escola": "Necromancia",
+        "especial": "M"
+      },
+      {
+        "nome": "Sugestão em Massa",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Visão da Verdade",
+        "escola": "Adivinhação",
+        "especial": "M"
+      }
+    ],
+    "7º Círculo": [
+      {
+        "nome": "Bola de Fogo Adiável",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Cárcere de Energia",
+        "escola": "Evocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Dedo da Morte",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Espada de Mordenkainen",
+        "escola": "Evocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Forma Etérea",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Inverter a Gravidade",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Mansão Magnífica de Mordenkainen",
+        "escola": "Invocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Miragem Arcana",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Projetar Imagem",
+        "escola": "Ilusão",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Rajada Prismática",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Refugiar",
+        "escola": "Transmutação",
+        "especial": "M"
+      },
+      {
+        "nome": "Símbolo",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Simulacro",
+        "escola": "Ilusão",
+        "especial": "M"
+      },
+      {
+        "nome": "Teleporte",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Transição Planar",
+        "escola": "Invocação",
+        "especial": "M"
+      }
+    ],
+    "8º Círculo": [
+      {
+        "nome": "Antipatia/Simpatia",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Campo Antimagia",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Clone",
+        "escola": "Necromancia",
+        "especial": "M"
+      },
+      {
+        "nome": "Controlar o Clima",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Dominar Monstro",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Explosão Solar",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Labirinto",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Limpar a Mente",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Nuvem Incendiária",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Palavra de Poder: Atordoar",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Semiplano",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Suplício",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Telepatia",
+        "escola": "Adivinhação",
+        "especial": "—"
+      }
+    ],
+    "9º Círculo": [
+      {
+        "nome": "Aprisionamento",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Chuva de Meteoros",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Desejo",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Encarnação Fantasmagórica",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Metamorfose",
+        "escola": "Transmutação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Muralha Prismática",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Palavra de Poder: Matar",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Parar o Tempo",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Polimorfia Total",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Portal",
+        "escola": "Invocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Projeção Astral",
+        "escola": "Necromancia",
+        "especial": "M"
+      },
+      {
+        "nome": "Sexto Sentido",
+        "escola": "Adivinhação",
+        "especial": "—"
+      }
+    ]
+  }
+}

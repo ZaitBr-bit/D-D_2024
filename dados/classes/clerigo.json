@@ -1,0 +1,750 @@
+{
+  "nome": "Clérigo",
+  "tracos_basicos": {
+    "Atributo Primario": "Equipamento Inicial",
+    "Sabedoria": "Escolha A ou B: (A) Cota de Malha Parcial, Escudo, Maça, Símbolo Sagrado, Kit de Sacerdote e 7 PO; ou (B) 110 PO"
+  },
+  "tabela_caracteristicas": [
+    {
+      "Nível": "1",
+      "Bônus de Proficiência": "+2",
+      "Características": "Conjuracao, Ordem Divina",
+      "Canalizar Divindade": "—",
+      "Truques": "3",
+      "Magias Preparadas": "4",
+      "1": "2",
+      "2": "—",
+      "3": "—",
+      "4": "—",
+      "5": "—",
+      "6": "—",
+      "7": "—",
+      "8": "—",
+      "9": "—"
+    },
+    {
+      "Nível": "2",
+      "Bônus de Proficiência": "+2",
+      "Características": "Canalizar Divindade",
+      "Canalizar Divindade": "2",
+      "Truques": "3",
+      "Magias Preparadas": "5",
+      "1": "3",
+      "2": "—",
+      "3": "—",
+      "4": "—",
+      "5": "—",
+      "6": "—",
+      "7": "—",
+      "8": "—",
+      "9": "—"
+    },
+    {
+      "Nível": "3",
+      "Bônus de Proficiência": "+2",
+      "Características": "Subclasse Clerigo",
+      "Canalizar Divindade": "2",
+      "Truques": "3",
+      "Magias Preparadas": "6",
+      "1": "4",
+      "2": "2",
+      "3": "—",
+      "4": "—",
+      "5": "—",
+      "6": "—",
+      "7": "—",
+      "8": "—",
+      "9": "—"
+    },
+    {
+      "Nível": "4",
+      "Bônus de Proficiência": "+2",
+      "Características": "Aumento no Valor de Atributo",
+      "Canalizar Divindade": "2",
+      "Truques": "4",
+      "Magias Preparadas": "7",
+      "1": "4",
+      "2": "3",
+      "3": "—",
+      "4": "—",
+      "5": "—",
+      "6": "—",
+      "7": "—",
+      "8": "—",
+      "9": "—"
+    },
+    {
+      "Nível": "5",
+      "Bônus de Proficiência": "+3",
+      "Características": "Fulminar Mortos-Vivos",
+      "Canalizar Divindade": "2",
+      "Truques": "4",
+      "Magias Preparadas": "9",
+      "1": "4",
+      "2": "3",
+      "3": "2",
+      "4": "—",
+      "5": "—",
+      "6": "—",
+      "7": "—",
+      "8": "—",
+      "9": "—"
+    },
+    {
+      "Nível": "6",
+      "Bônus de Proficiência": "+3",
+      "Características": "Caracteristica de Subclasse",
+      "Canalizar Divindade": "3",
+      "Truques": "4",
+      "Magias Preparadas": "10",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "—",
+      "5": "—",
+      "6": "—",
+      "7": "—",
+      "8": "—",
+      "9": "—"
+    },
+    {
+      "Nível": "7",
+      "Bônus de Proficiência": "+3",
+      "Características": "Golpes Abencoados",
+      "Canalizar Divindade": "3",
+      "Truques": "4",
+      "Magias Preparadas": "11",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "1",
+      "5": "—",
+      "6": "—",
+      "7": "—",
+      "8": "—",
+      "9": "—"
+    },
+    {
+      "Nível": "8",
+      "Bônus de Proficiência": "+3",
+      "Características": "Aumento no Valor de Atributo",
+      "Canalizar Divindade": "3",
+      "Truques": "4",
+      "Magias Preparadas": "12",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "2",
+      "5": "—",
+      "6": "—",
+      "7": "—",
+      "8": "—",
+      "9": "—"
+    },
+    {
+      "Nível": "9",
+      "Bônus de Proficiência": "+4",
+      "Características": "—",
+      "Canalizar Divindade": "3",
+      "Truques": "4",
+      "Magias Preparadas": "14",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "3",
+      "5": "1",
+      "6": "—",
+      "7": "—",
+      "8": "—",
+      "9": "—"
+    },
+    {
+      "Nível": "10",
+      "Bônus de Proficiência": "+4",
+      "Características": "Intervencao Divina",
+      "Canalizar Divindade": "3",
+      "Truques": "5",
+      "Magias Preparadas": "15",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "3",
+      "5": "2",
+      "6": "—",
+      "7": "—",
+      "8": "—",
+      "9": "—"
+    },
+    {
+      "Nível": "11",
+      "Bônus de Proficiência": "+4",
+      "Características": "—",
+      "Canalizar Divindade": "3",
+      "Truques": "5",
+      "Magias Preparadas": "16",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "3",
+      "5": "2",
+      "6": "1",
+      "7": "—",
+      "8": "—",
+      "9": "—"
+    },
+    {
+      "Nível": "12",
+      "Bônus de Proficiência": "+4",
+      "Características": "Aumento no Valor de Atributo",
+      "Canalizar Divindade": "3",
+      "Truques": "5",
+      "Magias Preparadas": "16",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "3",
+      "5": "2",
+      "6": "1",
+      "7": "—",
+      "8": "—",
+      "9": "—"
+    },
+    {
+      "Nível": "13",
+      "Bônus de Proficiência": "+5",
+      "Características": "—",
+      "Canalizar Divindade": "3",
+      "Truques": "5",
+      "Magias Preparadas": "17",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "3",
+      "5": "2",
+      "6": "1",
+      "7": "1",
+      "8": "—",
+      "9": "—"
+    },
+    {
+      "Nível": "14",
+      "Bônus de Proficiência": "+5",
+      "Características": "Golpes Abencoados Aprimorado",
+      "Canalizar Divindade": "3",
+      "Truques": "5",
+      "Magias Preparadas": "17",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "3",
+      "5": "2",
+      "6": "1",
+      "7": "1",
+      "8": "—",
+      "9": "—"
+    },
+    {
+      "Nível": "15",
+      "Bônus de Proficiência": "+5",
+      "Características": "—",
+      "Canalizar Divindade": "3",
+      "Truques": "5",
+      "Magias Preparadas": "18",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "3",
+      "5": "2",
+      "6": "1",
+      "7": "1",
+      "8": "1",
+      "9": "—"
+    },
+    {
+      "Nível": "16",
+      "Bônus de Proficiência": "+5",
+      "Características": "Aumento no Valor de Atributo",
+      "Canalizar Divindade": "3",
+      "Truques": "5",
+      "Magias Preparadas": "18",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "3",
+      "5": "2",
+      "6": "1",
+      "7": "1",
+      "8": "1",
+      "9": "—"
+    },
+    {
+      "Nível": "17",
+      "Bônus de Proficiência": "+6",
+      "Características": "Caracteristica de Subclasse",
+      "Canalizar Divindade": "3",
+      "Truques": "5",
+      "Magias Preparadas": "19",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "3",
+      "5": "2",
+      "6": "1",
+      "7": "1",
+      "8": "1",
+      "9": "1"
+    },
+    {
+      "Nível": "18",
+      "Bônus de Proficiência": "+6",
+      "Características": "—",
+      "Canalizar Divindade": "4",
+      "Truques": "5",
+      "Magias Preparadas": "20",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "3",
+      "5": "3",
+      "6": "1",
+      "7": "1",
+      "8": "1",
+      "9": "1"
+    },
+    {
+      "Nível": "19",
+      "Bônus de Proficiência": "+6",
+      "Características": "Dadiva Epica",
+      "Canalizar Divindade": "4",
+      "Truques": "5",
+      "Magias Preparadas": "21",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "3",
+      "5": "3",
+      "6": "2",
+      "7": "1",
+      "8": "1",
+      "9": "1"
+    },
+    {
+      "Nível": "20",
+      "Bônus de Proficiência": "+6",
+      "Características": "Intervencao Divina Maior",
+      "Canalizar Divindade": "4",
+      "Truques": "5",
+      "Magias Preparadas": "22",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "3",
+      "5": "3",
+      "6": "2",
+      "7": "2",
+      "8": "1",
+      "9": "1"
+    }
+  ],
+  "caracteristicas": [
+    {
+      "nivel": 1,
+      "nome": "Conjuração",
+      "descricao": "Você aprendeu a conjurar magias por meio de oração e meditação. Veja o capítulo 7 para as regras sobre conjuração de magias. As informações abaixo detalham como você usa essas regras com as magias de Clérigo, explicadas na lista de magias de Clérigo mais adiante na descrição da classe.\n**Truques.** Você conhece três truques à sua escolha da lista de magias de Clérigo. *Chama Sagrada*, *Orientação* e *Taumaturgia* são recomendados.\nSempre que você alcança um nível de Clérigo, pode substituir um dos seus truques por outro truque à sua escolha da lista de magias de Clérigo.\nQuando alcançar os níveis 4 e 10 de Clérigo, você aprende mais um truque à sua escolha da lista de magias de Clérigo, conforme mostrado na coluna Truques da tabela Características de Clérigo.\n**Espaços de Magia.** A tabela Características de Clérigo mostra quantos espaços de magia você tem para conjurar suas magias de 1º círculo ou superior. Você recupera todos os espaços gastos quando completa um Descanso Longo.\n**Magias Preparadas de 1º Círculo ou Superior.** Você prepara a lista de magias de nível 1º circulo ou superior que estão disponíveis para você conjurar com essa característica. Para começar, escolha quatro magias de 1º círculo da lista de magias de Clérigo. *Bênção*, *Curar Ferimentos*, *Escudo da Fé* e *Raio Guia* são recomendadas.\nO número de magias em sua lista aumenta à medida que você alcança níveis de Clérigo, conforme mostrado na coluna Magias Preparadas da tabela Características de Clérigo. Sempre que esse número aumentar, escolha magias adicionais da lista de magias de Clérigo até que o número de magias em sua lista seja o mesmo do número da tabela. As magias escolhidas devem ser de um círculo para o qual você possui espaços de magia. Por exemplo, se você é um Clérigo de nível 3, sua lista de magias preparadas pode incluir seis magias de 1º ou 2º círculo em qualquer combinação.\nSe outra característica de Clérigo lhe der magias que você sempre tem preparadas, essas magias não contam para o número de magias que você pode preparar com esta característica, mas que contam como magias de Clérigo para você.\n**Mudando Suas Magias Preparadas.** Sempre que completar um Descanso Longo, você pode definir sua lista de magias preparadas, substituindo qualquer uma das magias por outras magias de Clérigo para as quais você tem espaços de magia.\n**Atributo de Conjuração.** Sabedoria é seu atributo de conjuração para suas magias de Clérigo.\n**Foco de Conjuração.** Você pode usar um Símbolo Sagrado como um Foco de Conjuração para suas magias de Clérigo."
+    },
+    {
+      "nivel": 1,
+      "nome": "Ordem Divina",
+      "descricao": "Você se dedicou a um dos seguintes papéis sagrados à sua escolha.\n**Protetor.** Treinado para a batalha, você adquire proficiência com armas Marciais e treinamento com Armadura Pesada.\n**Taumaturgo.** Você conhece um truque adicional da lista de magias de Clérigo. Além disso, sua conexão mística com o divino lhe dá um bônus em seus testes de Inteligência (Arcanismo ou Religião). O bônus é igual ao seu modificador de Sabedoria (mínimo de +1)."
+    },
+    {
+      "nivel": 2,
+      "nome": "Canalizar Divindade",
+      "descricao": "Você pode canalizar energia divina diretamente dos Planos Externos para alimentar efeitos mágicos. Você começa com dois desses efeitos: Centelha Divina e Expulsar Mortos-Vivos, cada um descrito a seguir. Cada vez que você usar o Canalizar Divindade desta classe, escolha qual efeito de Canalizar Divindade deseja realizar. Você obtém opções adicionais de efeitos em níveis mais altos de Clérigo.\nVocê pode usar o Canalizar Divindade desta classe duas vezes. Você recupera um uso gasto ao completar um Descanso Curto e todos os usos gastos ao completar um Descanso Longo. Você adquire usos adicionais ao atingir certos níveis de Clérigo, conforme mostrado na coluna Canalizar Divindade da tabela Características de Clérigo.\nSe um efeito de Canalizar Divindade exigir uma salvaguarda, a CD é igual a CD para evitar magia da característica Conjuração desta classe.\n**Centelha Divina.** Como uma ação Usar Magia, você expõe seu Símbolo Sagrado para outra criatura à sua vista a até 9 metros e canaliza energia divina nela. Jogue 1d8 e adicione seu modificador de Sabedoria. Você pode restaurar Pontos de Vida da criatura igual ao resultado total ou forçar a criatura a realizar uma salvaguarda de Constituição. Se falhar, a criatura sofre dano Necrótico ou Radiante (à sua escolha) igual ao total. Em caso de sucesso, a criatura recebe metade do dano (arredondado para baixo).\nVocê joga um d8 adicional quando atinge os níveis de 7 (2d8), 13 (3d8) e 18 (4d8) de Clérigo.\n**Expulsar Mortos-Vivos**. Como uma ação Usar Magia, você mostra seu Símbolo Sagrado e repreende criaturas Mortas-Vivas. Cada Morto-Vivo à sua escolha a até 9 metros de você deve realizar uma salvaguarda de Sabedoria. Se a criatura falhar, ela está com as condições Amedrontado e Incapacitado por 1 minuto. Pela duração da canalização, ela tenta se mover o mais longe possível de você nos turnos dela. Este efeito se encerra na criatura se ela sofrer algum dano, se você está com a condição Incapacitado ou se você morrer."
+    },
+    {
+      "nivel": 3,
+      "nome": "Subclasse de Clérigo",
+      "descricao": "Você adquire uma subclasse de Clérigo à sua escolha. Uma subclasse é uma especialização que lhe concede características em determinados níveis de Clérigo. As subclasses Domínio da Guerra, Domínio da Luz, Domínio da Trapaça e Domínio da Vida estão detalhadas após a descrição desta classe. Para o resto de sua jornada, você recebe cada uma das características de sua subclasse que são de seu nível de Clérigo ou menor."
+    },
+    {
+      "nivel": 4,
+      "nome": "Aumento no Valor de Atributo",
+      "descricao": "Você adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 8, 12 e 16 de Clérigo."
+    },
+    {
+      "nivel": 5,
+      "nome": "Fulminar Mortos-Vivos",
+      "descricao": "Ao usar Expulsar Mortos-Vivos, você pode jogar uma quantidade de d8s igual ao seu modificador de Sabedoria (mínimo de 1d8) e somar os resultados jogados. Cada Morto-Vivo que falhar na salvaguarda sofre dano Radiante igual ao resultado da soma dos dados jogados. Esse dano não encerra o efeito de Expulsar Mortos-Vivos."
+    },
+    {
+      "nivel": 7,
+      "nome": "Golpes Abençoados",
+      "descricao": "Você se infunde de poder divino em combate. Você adquire uma das seguintes opções à sua escolha (se você já tiver qualquer uma dessas opções de uma subclasse de Clérigo em um livro antigo de D&D, use apenas a opção escolhida para esta característica).\n**Conjuração Poderosa.** Adicione seu modificador de Sabedoria ao dano causado com qualquer truque de Clérigo.\n**Golpe Divino.** Uma vez em cada um dos seus turnos, quando você atinge uma criatura com uma jogada de ataque usando uma arma, você pode causar ao alvo 1d8 pontos de dano Necrótico ou Radiante (à sua escolha) adicionais."
+    },
+    {
+      "nivel": 10,
+      "nome": "Intervenção Divina",
+      "descricao": "Você pode convocar sua divindade ou panteão para intervir em seu nome. Como uma ação Usar Magia, escolha qualquer magia de Clérigo de 5º círculo ou inferior que não exija uma Reação para ser conjurada. Como parte da mesma ação, você conjura essa magia sem gastar espaço de magia ou precisar de componentes Materiais. Você não pode usar essa característica novamente até completar um Descanso Longo."
+    },
+    {
+      "nivel": 14,
+      "nome": "Golpes Abençoados Aprimorados",
+      "descricao": "A opção que você escolheu para Golpes Abençoados fica mais poderosa.\n**Conjuração Poderosa.** Quando conjurar um truque de Clérigo e causar dano a uma criatura com ele, você pode conferir vitalidade a si ou a outra criatura a até 18 metros de você, concedendo um número de Pontos de Vida Temporários igual ao dobro do seu modificador de Sabedoria.\n**Golpe Divino.** O dano adicional de seu Golpe Divino aumenta para 2d8."
+    },
+    {
+      "nivel": 19,
+      "nome": "Dádiva Épica",
+      "descricao": "Você adquire o talento Dádiva Épica (veja o capítulo 5) ou outro talento à sua escolha para o qual se qualifica. Dádiva do Destino é recomendada."
+    },
+    {
+      "nivel": 20,
+      "nome": "Intervenção Divina Maior",
+      "descricao": "Você pode convocar uma intervenção divina ainda mais poderosa. Quando usar sua característica Intervenção Divina, você pode escolher *Desejo* como opção de magia. Se fizer isso, não pode usar Intervenção Divina novamente até completar 2d4 Descansos Longos."
+    },
+    {
+      "nivel": 3,
+      "nome": "Magias de Domínio da Guerra",
+      "descricao": "Sua conexão com este domínio divino garante que você sempre tenha certas magias preparadas. Ao atingir um nível de Clérigo especificado na tabela Magias de Domínio da Guerra, você sempre tem as magias listadas preparadas.\n**Magias de Domínio da Guerra**\n| **Nível de Clérigo** | **Magias Preparadas**                                   |\n|----------------------|---------------------------------------------------------|\n| 3                    | *Arma Espiritual, Arma Mágica, Escudo da Fé, Raio Guia* |\n| 5                    | *Guardiões Espirituais, Manto do Cruzado*               |\n| 7                    | *Escudo Ardente, Movimentação Livre*                    |\n| 9                    | *Golpe de Arço, Paralisar Monstro*                      |"
+    },
+    {
+      "nivel": 3,
+      "nome": "Ataque Direcionado",
+      "descricao": "Quando você ou uma criatura a até 9 metros de você erra uma jogada de ataque, você pode gastar um uso de seu Canalizar Divindade e dar a essa jogada um bônus de +10, potencialmente fazendo-o acertar. Você usa sua Reação para conceder esse bônus a uma jogada de ataque a outra criatura."
+    },
+    {
+      "nivel": 3,
+      "nome": "Sacerdote da Guerra",
+      "descricao": "Como uma Ação Bônus, você pode realizar um ataque com uma arma ou um Ataque Desarmado. Você pode usar essa Ação Bônus um número de vezes igual ao seu modificador de Sabedoria (mínimo de uma vez). Você restaura todos os usos gastos ao completar um Descanso Curto ou Longo."
+    },
+    {
+      "nivel": 6,
+      "nome": "Bênção do Deus da Guerra",
+      "descricao": "Você pode gastar um uso de seu Canalizar Divindade para conjurar *Arma Espiritual* ou *Escudo da Fé* em vez de gastar um espaço de magia. Uma magia conjurada dessa maneira não requer Concentração. Em vez disso, a magia permanece por 1 minuto, mas encerra se você conjurá-la novamente, ter a condição Incapacitado ou morrer."
+    },
+    {
+      "nivel": 17,
+      "nome": "Avatar da Guerra",
+      "descricao": "Você adquire Resistência a dano Contundente, Cortante e Perfurante."
+    },
+    {
+      "nivel": 3,
+      "nome": "Brilho do Amanhecer",
+      "descricao": "Como uma ação Usar Magia, você ergue seu Símbolo Sagrado e gasta o uso de seu Canalizar Divindade para emitir um feixe de luz em uma Emanação de 9 metros originada em você. Qualquer Escuridão mágica, como a criada pela magia *Escuridão*, nessa área é dissipada. Além disso, cada criatura à sua escolha nessa área deve realizar uma salvaguarda de Constituição, sofrendo dano Radiante igual a 2d10 mais seu nível de Clérigo se falhar ou metade desse dano em caso de sucesso."
+    },
+    {
+      "nivel": 3,
+      "nome": "Labareda Protetora",
+      "descricao": "Quando uma criatura à sua vista a até 9 metros de você realiza uma jogada de ataque, você pode executar uma Reação para impor Desvantagem na jogada de ataque, fazendo com que a luz brilhe antes de acertar ou errar.\nVocê pode usar essa característica um número de vezes igual ao seu modificador de Sabedoria (mínimo de uma vez) e restaura todos os usos gastos ao completar um Descanso Longo."
+    },
+    {
+      "nivel": 3,
+      "nome": "Magias de Domínio da Luz",
+      "descricao": "Sua conexão com este domínio divino garante que você sempre tenha certas magias preparadas. Ao atingir um nível de Clérigo especificado na tabela Magias de Domínio da Luz, você sempre tem as magias listadas preparadas.\n**Magias de Domínio da Luz**\n| **Nível de Clérigo** | **Magias Preparadas**                                          |\n|----------------------|----------------------------------------------------------------|\n| 3                    | *Fogo das Fadas, Mãos Ardentes, Raio Ardente, Ver o Invisível* |\n| 5                    | *Bola de Fogo, Luz do Dia*                                     |\n| 7                    | *Muralha de Fogo, Olho Arcano*                                 |\n| 9                    | *Coluna de Chamas, Vidência*                                   |"
+    },
+    {
+      "nivel": 6,
+      "nome": "Labareda Protetora Aprimorada",
+      "descricao": "Você restaura todos os usos gastos da sua Labareda Protetora ao completar um Descanso Curto ou Longo.\nAlém disso, sempre que usar Labareda Protetora, você pode conceder ao alvo do ataque desencadeado um número de Pontos de Vida Temporários igual a 2d6 mais seu modificador de Sabedoria."
+    },
+    {
+      "nivel": 17,
+      "nome": "Coroa de Luz",
+      "descricao": "Como uma ação Usar Magia, você emite uma aura de luz solar que dura 1 minuto ou até que você a encerre (nenhuma ação é necessária). Você emite Luz Plena em um raio de 18 metros e Meia-luz por mais 9 metros. Seus inimigos na Luz Plena têm Desvantagem em salvaguardas contra seu Brilho do Amanhecer e qualquer magia que cause dano Ígneo ou Radiante.\nVocê pode usar esta característica um número de vezes igual ao seu modificador de Sabedoria (mínimo de uma vez) e restaura todos os usos gastos ao completar um Descanso Longo."
+    },
+    {
+      "nivel": 3,
+      "nome": "Magias de Domínio da Trapaça",
+      "descricao": "Sua conexão com este domínio divino garante que você sempre tenha certas magias preparadas. Ao atingir um nível de Clérigo especificado na tabela Magias de Domínio da Trapaça, você sempre tem as magias listadas preparadas.\n**Magias de Domínio da Trapaça**\n| **Nível de Clérigo** | **Magias Preparadas**                                               |\n|----------------------|---------------------------------------------------------------------|\n| 3                    | *Disfarçar-se, Enfeitiçar Pessoa, Invisibilidade, Passo Sem Rastro* |\n| 5                    | *Indetectável, Padrão Hipnótico*                                    |\n| 7                    | *Confusão, Porta Dimensional*                                       |\n| 9                    | *Dominar Pessoa, Modificar Memória*                                 |"
+    },
+    {
+      "nivel": 3,
+      "nome": "Bênção do Trapaceiro",
+      "descricao": "Com uma ação Usar Magia, você pode escolher a si ou a uma criatura voluntária a até 9 metros de você para ter Vantagem em testes de Destreza (Furtividade). Essa bênção permanece até você completar um Descanso Longo ou usar esta característica novamente."
+    },
+    {
+      "nivel": 3,
+      "nome": "Invocar Duplicidade",
+      "descricao": "Como uma Ação Bônus, você pode gastar um uso de seu Canalizar Divindade para criar uma ilusão visual perfeita de si em um espaço desocupado à sua vista a até 9 metros de si. A ilusão é intangível e não ocupa seu espaço. Ela permanece por 1 minuto e acaba se você tiver a condição Incapacitado ou a encerrar (nenhuma ação é necessária). A ilusão é animada e imita suas expressões e gestos. Enquanto ela persistir, você adquire os seguintes benefícios.\n**Conjurar Magias.** Você pode conjurar magias como se estivesse no espaço da ilusão, mas deve usar seus próprios sentidos.\n**Distração.** Quando você e sua ilusão estão a até 1,5 metro de uma criatura que pode ver a ilusão, você tem Vantagem em jogadas de ataque contra essa criatura, considerando quão perturbadora a ilusão é para o alvo.\n**Mover.** Como uma Ação Bônus, você pode mover a ilusão até 9 metros para um espaço desocupado que esteja a até 36 metros de você."
+    },
+    {
+      "nivel": 6,
+      "nome": "Transposição do Trapaceiro",
+      "descricao": "Ao executar a Ação Bônus para criar ou mover a ilusão de seu Invocar Duplicidade, você pode se teleportar, trocando de lugar com a ilusão."
+    },
+    {
+      "nivel": 17,
+      "nome": "Duplicidade Aprimorada",
+      "descricao": "A ilusão de seu Invocar Duplicidade ficou mais poderosa das seguintes maneiras.\n**Distração Compartilhada.** Quando você e seus aliados realizam jogadas de ataque contra uma criatura a até 1,5 metro da ilusão, as jogadas de ataque têm Vantagem.\n**Ilusão de Cura.** Quando a ilusão termina, você ou uma criatura à sua escolha a até 1,5 metro dela recupera um número de Pontos de Vida igual ao seu nível de Clérigo."
+    },
+    {
+      "nivel": 3,
+      "nome": "Magias de Domínio da Vida",
+      "descricao": "Sua conexão com este domínio divino garante que você sempre tenha certas magias preparadas. Ao atingir um nível de Clérigo especificado na tabela Magias de Domínio da Vida, você sempre tem as magias listadas preparadas.\n**Magias de Domínio da Vida**\n| **Nível de Clérigo** | **Magias Preparadas**                                  |\n|----------------------|--------------------------------------------------------|\n| 3                    | *Auxílio, Bênção, Curar Ferimentos, Restauração Menor* |\n| 5                    | *Palavra Curativa em Massa, Revivificar*               |\n| 7                    | *Aura de Vida, Proteção Contra a Morte*                |\n| 9                    | *Curar Ferimentos em Massa, Restauração Maior*         |"
+    },
+    {
+      "nivel": 3,
+      "nome": "Discípulo da Vida",
+      "descricao": "Ao conjurar uma magia com um espaço de magia que restaura Pontos de Vida em uma criatura, essa criatura recupera Pontos de Vida adicionais no turno da conjuração. Os Pontos de Vida adicionais são iguais a 2 mais o nível do espaço de magia."
+    },
+    {
+      "nivel": 3,
+      "nome": "Preservar a Vida",
+      "descricao": "Com uma ação Usar Magia, você exibe seu Símbolo Sagrado e usa seu Canalizar Divindade para evocar uma energia de cura que pode restaurar um número de Pontos de Vida igual a cinco vezes seu nível de Clérigo. Escolha criaturas Sangrando a até 9 metros de você (que pode incluir você) e divida esses Pontos de Vida entre elas. Esta característica pode restaurar uma criatura a não mais que a metade dos Pontos de Vida máximo dela."
+    },
+    {
+      "nivel": 6,
+      "nome": "Curandeiro Abençoado",
+      "descricao": "Magias de cura que você conjurar nos outros também o curam. Imediatamente após conjurar uma magia com um espaço de magia que restaure Pontos de Vida em uma criatura que não seja você, você recupera Pontos de Vida iguais a 2 mais o círculo do espaço de magia."
+    },
+    {
+      "nivel": 17,
+      "nome": "Cura Suprema",
+      "descricao": "Ao usar uma magia ou Canalizar Divindade para restaurar Pontos de Vida em uma criatura, não jogue os dados normalmente; em vez disso, utilize o maior resultado de cada dado. Por exemplo, ao restaurar 2d6 Pontos de Vida, você restaura 12."
+    }
+  ],
+  "subclasses": [
+    {
+      "nome": "Domínio da Guerra",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Magias de Domínio da Guerra",
+          "descricao": "Sua conexão com este domínio divino garante que você sempre tenha certas magias preparadas. Ao atingir um nível de Clérigo especificado na tabela Magias de Domínio da Guerra, você sempre tem as magias listadas preparadas.\n**Magias de Domínio da Guerra**\n| **Nível de Clérigo** | **Magias Preparadas**                                   |\n|----------------------|---------------------------------------------------------|\n| 3                    | *Arma Espiritual, Arma Mágica, Escudo da Fé, Raio Guia* |\n| 5                    | *Guardiões Espirituais, Manto do Cruzado*               |\n| 7                    | *Escudo Ardente, Movimentação Livre*                    |\n| 9                    | *Golpe de Arço, Paralisar Monstro*                      |"
+        },
+        {
+          "nivel": 3,
+          "nome": "Ataque Direcionado",
+          "descricao": "Quando você ou uma criatura a até 9 metros de você erra uma jogada de ataque, você pode gastar um uso de seu Canalizar Divindade e dar a essa jogada um bônus de +10, potencialmente fazendo-o acertar. Você usa sua Reação para conceder esse bônus a uma jogada de ataque a outra criatura."
+        },
+        {
+          "nivel": 3,
+          "nome": "Sacerdote da Guerra",
+          "descricao": "Como uma Ação Bônus, você pode realizar um ataque com uma arma ou um Ataque Desarmado. Você pode usar essa Ação Bônus um número de vezes igual ao seu modificador de Sabedoria (mínimo de uma vez). Você restaura todos os usos gastos ao completar um Descanso Curto ou Longo."
+        },
+        {
+          "nivel": 6,
+          "nome": "Bênção do Deus da Guerra",
+          "descricao": "Você pode gastar um uso de seu Canalizar Divindade para conjurar *Arma Espiritual* ou *Escudo da Fé* em vez de gastar um espaço de magia. Uma magia conjurada dessa maneira não requer Concentração. Em vez disso, a magia permanece por 1 minuto, mas encerra se você conjurá-la novamente, ter a condição Incapacitado ou morrer."
+        },
+        {
+          "nivel": 17,
+          "nome": "Avatar da Guerra",
+          "descricao": "Você adquire Resistência a dano Contundente, Cortante e Perfurante."
+        }
+      ]
+    },
+    {
+      "nome": "Domínio da Luz",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Brilho do Amanhecer",
+          "descricao": "Como uma ação Usar Magia, você ergue seu Símbolo Sagrado e gasta o uso de seu Canalizar Divindade para emitir um feixe de luz em uma Emanação de 9 metros originada em você. Qualquer Escuridão mágica, como a criada pela magia *Escuridão*, nessa área é dissipada. Além disso, cada criatura à sua escolha nessa área deve realizar uma salvaguarda de Constituição, sofrendo dano Radiante igual a 2d10 mais seu nível de Clérigo se falhar ou metade desse dano em caso de sucesso."
+        },
+        {
+          "nivel": 3,
+          "nome": "Labareda Protetora",
+          "descricao": "Quando uma criatura à sua vista a até 9 metros de você realiza uma jogada de ataque, você pode executar uma Reação para impor Desvantagem na jogada de ataque, fazendo com que a luz brilhe antes de acertar ou errar.\nVocê pode usar essa característica um número de vezes igual ao seu modificador de Sabedoria (mínimo de uma vez) e restaura todos os usos gastos ao completar um Descanso Longo."
+        },
+        {
+          "nivel": 3,
+          "nome": "Magias de Domínio da Luz",
+          "descricao": "Sua conexão com este domínio divino garante que você sempre tenha certas magias preparadas. Ao atingir um nível de Clérigo especificado na tabela Magias de Domínio da Luz, você sempre tem as magias listadas preparadas.\n**Magias de Domínio da Luz**\n| **Nível de Clérigo** | **Magias Preparadas**                                          |\n|----------------------|----------------------------------------------------------------|\n| 3                    | *Fogo das Fadas, Mãos Ardentes, Raio Ardente, Ver o Invisível* |\n| 5                    | *Bola de Fogo, Luz do Dia*                                     |\n| 7                    | *Muralha de Fogo, Olho Arcano*                                 |\n| 9                    | *Coluna de Chamas, Vidência*                                   |"
+        },
+        {
+          "nivel": 6,
+          "nome": "Labareda Protetora Aprimorada",
+          "descricao": "Você restaura todos os usos gastos da sua Labareda Protetora ao completar um Descanso Curto ou Longo.\nAlém disso, sempre que usar Labareda Protetora, você pode conceder ao alvo do ataque desencadeado um número de Pontos de Vida Temporários igual a 2d6 mais seu modificador de Sabedoria."
+        },
+        {
+          "nivel": 17,
+          "nome": "Coroa de Luz",
+          "descricao": "Como uma ação Usar Magia, você emite uma aura de luz solar que dura 1 minuto ou até que você a encerre (nenhuma ação é necessária). Você emite Luz Plena em um raio de 18 metros e Meia-luz por mais 9 metros. Seus inimigos na Luz Plena têm Desvantagem em salvaguardas contra seu Brilho do Amanhecer e qualquer magia que cause dano Ígneo ou Radiante.\nVocê pode usar esta característica um número de vezes igual ao seu modificador de Sabedoria (mínimo de uma vez) e restaura todos os usos gastos ao completar um Descanso Longo."
+        }
+      ]
+    },
+    {
+      "nome": "Domínio da Trapaça",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Magias de Domínio da Trapaça",
+          "descricao": "Sua conexão com este domínio divino garante que você sempre tenha certas magias preparadas. Ao atingir um nível de Clérigo especificado na tabela Magias de Domínio da Trapaça, você sempre tem as magias listadas preparadas.\n**Magias de Domínio da Trapaça**\n| **Nível de Clérigo** | **Magias Preparadas**                                               |\n|----------------------|---------------------------------------------------------------------|\n| 3                    | *Disfarçar-se, Enfeitiçar Pessoa, Invisibilidade, Passo Sem Rastro* |\n| 5                    | *Indetectável, Padrão Hipnótico*                                    |\n| 7                    | *Confusão, Porta Dimensional*                                       |\n| 9                    | *Dominar Pessoa, Modificar Memória*                                 |"
+        },
+        {
+          "nivel": 3,
+          "nome": "Bênção do Trapaceiro",
+          "descricao": "Com uma ação Usar Magia, você pode escolher a si ou a uma criatura voluntária a até 9 metros de você para ter Vantagem em testes de Destreza (Furtividade). Essa bênção permanece até você completar um Descanso Longo ou usar esta característica novamente."
+        },
+        {
+          "nivel": 3,
+          "nome": "Invocar Duplicidade",
+          "descricao": "Como uma Ação Bônus, você pode gastar um uso de seu Canalizar Divindade para criar uma ilusão visual perfeita de si em um espaço desocupado à sua vista a até 9 metros de si. A ilusão é intangível e não ocupa seu espaço. Ela permanece por 1 minuto e acaba se você tiver a condição Incapacitado ou a encerrar (nenhuma ação é necessária). A ilusão é animada e imita suas expressões e gestos. Enquanto ela persistir, você adquire os seguintes benefícios.\n**Conjurar Magias.** Você pode conjurar magias como se estivesse no espaço da ilusão, mas deve usar seus próprios sentidos.\n**Distração.** Quando você e sua ilusão estão a até 1,5 metro de uma criatura que pode ver a ilusão, você tem Vantagem em jogadas de ataque contra essa criatura, considerando quão perturbadora a ilusão é para o alvo.\n**Mover.** Como uma Ação Bônus, você pode mover a ilusão até 9 metros para um espaço desocupado que esteja a até 36 metros de você."
+        },
+        {
+          "nivel": 6,
+          "nome": "Transposição do Trapaceiro",
+          "descricao": "Ao executar a Ação Bônus para criar ou mover a ilusão de seu Invocar Duplicidade, você pode se teleportar, trocando de lugar com a ilusão."
+        },
+        {
+          "nivel": 17,
+          "nome": "Duplicidade Aprimorada",
+          "descricao": "A ilusão de seu Invocar Duplicidade ficou mais poderosa das seguintes maneiras.\n**Distração Compartilhada.** Quando você e seus aliados realizam jogadas de ataque contra uma criatura a até 1,5 metro da ilusão, as jogadas de ataque têm Vantagem.\n**Ilusão de Cura.** Quando a ilusão termina, você ou uma criatura à sua escolha a até 1,5 metro dela recupera um número de Pontos de Vida igual ao seu nível de Clérigo."
+        }
+      ]
+    },
+    {
+      "nome": "Domínio da Vida",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Magias de Domínio da Vida",
+          "descricao": "Sua conexão com este domínio divino garante que você sempre tenha certas magias preparadas. Ao atingir um nível de Clérigo especificado na tabela Magias de Domínio da Vida, você sempre tem as magias listadas preparadas.\n**Magias de Domínio da Vida**\n| **Nível de Clérigo** | **Magias Preparadas**                                  |\n|----------------------|--------------------------------------------------------|\n| 3                    | *Auxílio, Bênção, Curar Ferimentos, Restauração Menor* |\n| 5                    | *Palavra Curativa em Massa, Revivificar*               |\n| 7                    | *Aura de Vida, Proteção Contra a Morte*                |\n| 9                    | *Curar Ferimentos em Massa, Restauração Maior*         |"
+        },
+        {
+          "nivel": 3,
+          "nome": "Discípulo da Vida",
+          "descricao": "Ao conjurar uma magia com um espaço de magia que restaura Pontos de Vida em uma criatura, essa criatura recupera Pontos de Vida adicionais no turno da conjuração. Os Pontos de Vida adicionais são iguais a 2 mais o nível do espaço de magia."
+        },
+        {
+          "nivel": 3,
+          "nome": "Preservar a Vida",
+          "descricao": "Com uma ação Usar Magia, você exibe seu Símbolo Sagrado e usa seu Canalizar Divindade para evocar uma energia de cura que pode restaurar um número de Pontos de Vida igual a cinco vezes seu nível de Clérigo. Escolha criaturas Sangrando a até 9 metros de você (que pode incluir você) e divida esses Pontos de Vida entre elas. Esta característica pode restaurar uma criatura a não mais que a metade dos Pontos de Vida máximo dela."
+        },
+        {
+          "nivel": 6,
+          "nome": "Curandeiro Abençoado",
+          "descricao": "Magias de cura que você conjurar nos outros também o curam. Imediatamente após conjurar uma magia com um espaço de magia que restaure Pontos de Vida em uma criatura que não seja você, você recupera Pontos de Vida iguais a 2 mais o círculo do espaço de magia."
+        },
+        {
+          "nivel": 17,
+          "nome": "Cura Suprema",
+          "descricao": "Ao usar uma magia ou Canalizar Divindade para restaurar Pontos de Vida em uma criatura, não jogue os dados normalmente; em vez disso, utilize o maior resultado de cada dado. Por exemplo, ao restaurar 2d6 Pontos de Vida, você restaura 12."
+        }
+      ]
+    }
+  ],
+  "lista_magias": {
+    "9º Círculo": [
+      "Acudir os Moribundos",
+      "Badalar Fúnebre",
+      "Chama Sagrada",
+      "Luz",
+      "Orientação",
+      "Palavra de Radiância",
+      "Reparar",
+      "Resistência",
+      "Taumaturgia",
+      "Benção",
+      "Comando",
+      "Criar ou Destruir Água",
+      "Curar Ferimentos",
+      "Detectar Magia",
+      "Detectar o Bem e o Mal",
+      "Detectar Veneno e Doença",
+      "Escudo da Fé",
+      "Infligir Ferimentos",
+      "Palavra Curativa",
+      "Perdição",
+      "Proteção Contra o Bem e o Mal",
+      "Purificar Alimentos e Bebidas",
+      "Raio Guia",
+      "Santuário",
+      "Acalmar Emoções",
+      "Aprimorar Atributo",
+      "Arma Espiritual",
+      "Augúrio",
+      "Auxílio",
+      "Cegueira/Surdez",
+      "Chama Contínua",
+      "Encontrar Armadilhas",
+      "Localizar Objeto",
+      "Oração de Cura",
+      "Paralisar Pessoa",
+      "Proteção Contra Veneno",
+      "Repouso Tranquilo",
+      "Restauração Menor",
+      "Silêncio",
+      "Vínculo de Proteção",
+      "Zona da Verdade",
+      "Animar Mortos",
+      "Aura de Vitalidade",
+      "Caminhar Sobre as Águas",
+      "Círculo Mágico",
+      "Clarividência",
+      "Criar Comida e Água",
+      "Dissipar Magia",
+      "Falar com Mortos",
+      "Glifo de Proteção",
+      "Guardiões Espirituais",
+      "Línguas",
+      "Luz do Dia",
+      "Mesclar-se às Rochas",
+      "Palavra Curativa em Massa",
+      "Proteção contra Energia",
+      "Remeter",
+      "Remover Maldição",
+      "Revivificar",
+      "Rogar Maldição",
+      "Simular Morte",
+      "Sinal de Esperança",
+      "Aura de Pureza",
+      "Aura de Vida",
+      "Banimento",
+      "Controlar Água",
+      "Defensor da Fé",
+      "Localizar Criatura",
+      "Moldar Rochas",
+      "Movimentação Livre",
+      "Presságio",
+      "Proteção Contra a Morte",
+      "Âncora Planar",
+      "Círculo de Poder",
+      "Coluna de Chamas",
+      "Comunhão",
+      "Consagrar",
+      "Contágio",
+      "Convocar Celestial",
+      "Curar Ferimentos em Massa",
+      "Dissipar o Bem e o Mal",
+      "Lendas e Histórias",
+      "Missão",
+      "Praga de Insetos",
+      "Restauração Maior",
+      "Reviver os Mortos",
+      "Vidência",
+      "Aliado Extraplanar",
+      "Banquete de Heróis",
+      "Barreira de Lâminas",
+      "Criar Mortos-Vivos",
+      "Cura Completa",
+      "Encontrar o Caminho",
+      "Moléstia",
+      "Palavra de Regresso",
+      "Proibição",
+      "Raio Solar",
+      "Visão da Verdade",
+      "Forma Etérea",
+      "Invocar Celestial",
+      "Palavra de Poder: Fortificar",
+      "Palavra Sagrada",
+      "Regeneração",
+      "Ressurreição",
+      "Símbolo",
+      "Tempestade de Fogo",
+      "Transição Planar",
+      "Aura Sagrada",
+      "Campo Antimagia",
+      "Controlar o Clima",
+      "Explosão Solar",
+      "Terremoto",
+      "Cura Completa em Massa",
+      "Palavra de Poder: Salvar",
+      "Portal",
+      "Projeção Astral",
+      "Ressurreição Verdadeira"
+    ]
+  },
+  "texto_completo": "Clérigos canalizam o poder dos reinos dos deuses para realizar milagres. Abençoados por uma divindade, panteão ou outra entidade imortal, os Clérigos acessam a magia divina dos Planos Externos — onde habitam os deuses — e a utilizam para fortalecer os necessitados e enfrentar inimigos.\n\nComo seu poder é um presente divino, os Clérigos geralmente se associam a templos dedicados à divindade ou à força imortal que desbloqueou sua magia. Canalizar magia divina não depende de um treinamento específico, mas os Clérigos podem aprender orações e ritos que os auxiliam a acessar o poder dos Planos Externos.\n\nNem todos os membros de um templo ou santuário são Clérigos. Alguns sacerdotes levam uma vida simples de serviço no templo, dedicando-se à devoção por meio de orações e rituais, sem magia. Muitos mortais alegam falar pelos deuses, mas poucos podem invocar o poder dessas divindades da maneira que um Clérigo faz.\n\n## Tornando-se um Clérigo...\n\n### Como um Personagem de Nível 1\n\n-   Adquira todos os traços da tabela Traços Básicos de Clérigo.\n-   Adquira as características de nível 1 do Clérigo, apresentadas na tabela Características de Clérigo.\n\n### Como um Personagem Multiclasse\n\n-   Adquira as seguintes características da tabela Traços Básicos de Clérigo: Dado de Ponto de Vida e treinamento com armadura Leve, Média e Escudos.\n-   Adquira as características de nível 1 de Clérigo, apresentadas na tabela Características de Clérigo. Veja também regras de multiclasse no capítulo 2 para determinar seus espaços de magia disponíveis.\n\n|           |                           |                              |                         |              |                       | **Magias Preparadas por Círculo de Magia** |       |       |       |       |       |       |       |       |\n|-----------|---------------------------|------------------------------|-------------------------|--------------|-----------------------|--------------------------------------------|-------|-------|-------|-------|-------|-------|-------|-------|\n| **Nível** | **Bônus de Proficiência** | **Características**          | **Canalizar Divindade** |  **Truques** | **Magias Preparadas** | **1**                                      | **2** | **3** | **4** | **5** | **6** | **7** | **8** | **9** |\n| 1         | +2                        | Conjuração, Ordem Divina     | —                       | 3            | 4                     | 2                                          | — — — | —     | —     | —     | — —   | —     | —     | —     |\n| 2         | +2                        | Canalizar Divindade          | 2                       | 3            | 5                     | 3                                          | —     | —     | —     | —     | —     | —     | —     | —     |\n| 3         | +2                        | Subclasse Clérigo            | 2                       | 3            | 6                     | 4                                          | 2     | —     | —     | —     | —     | —     | —     | —     |\n| 4         | +2                        | Aumento no Valor de Atributo | 2                       | 4            | 7                     | 4                                          | 3     | —     | —     | —     | —     | —     | —     | —     |\n| 5         | +3                        | Fulminar Mortos-Vivos        | 2                       | 4            | 9                     | 4                                          | 3     | 2     | —     | —     | —     | —     | —     | —     |\n| 6         | +3                        | Característica de Subclasse  | 3                       | 4            | 10                    | 4                                          | 3     | 3     | —     | —     | —     | —     | —     | —     |\n| 7         | +3                        | Golpes Abençoados            | 3                       | 4            | 11                    | 4                                          | 3     | 3     | 1     | —     | —     | —     | —     | —     |\n| 8         | +3                        | Aumento no Valor de Atributo | 3                       | 4            | 12                    | 4                                          | 3     | 3     | 2     | —     | —     | —     | —     | —     |\n| 9         | +4                        | —                            | 3                       | 4            | 14                    | 4                                          | 3     | 3     | 3     | 1     | —     | —     | —     | —     |\n| 10        | +4                        | Intervenção Divina           | 3                       | 5            | 15                    | 4                                          | 3     | 3     | 3     | 2     | —     | —     | —     | —     |\n| 11        | +4                        | —                            | 3                       | 5            | 16                    | 4                                          | 3     | 3     | 3     | 2     | 1     | —     | —     | —     |\n| 12        | +4                        | Aumento no Valor de Atributo | 3                       | 5            | 16                    | 4                                          | 3     | 3     | 3     | 2     | 1     | —     | —     | —     |\n| 13        | +5                        | —                            | 3                       | 5            | 17                    | 4                                          | 3     | 3     | 3     | 2     | 1     | 1     | —     | —     |\n| 14        | +5                        | Golpes Abençoados Aprimorado | 3                       | 5            | 17                    | 4                                          | 3     | 3     | 3     | 2     | 1     | 1     | —     | —     |\n| 15        | +5                        | —                            | 3                       | 5            | 18                    | 4                                          | 3     | 3     | 3     | 2     | 1     | 1     | 1     | —     |\n| 16        | +5                        | Aumento no Valor de Atributo | 3                       | 5            | 18                    | 4                                          | 3     | 3     | 3     | 2     | 1     | 1     | 1     | —     |\n| 17        | +6                        | Característica de Subclasse  | 3                       | 5            | 19                    | 4                                          | 3     | 3     | 3     | 2     | 1     | 1     | 1     | 1     |\n| 18        | +6                        | —                            | 4                       | 5            | 20                    | 4                                          | 3     | 3     | 3     | 3     | 1     | 1     | 1     | 1     |\n| 19        | +6                        | Dádiva Épica                 | 4                       | 5            | 21                    | 4                                          | 3     | 3     | 3     | 3     | 2     | 1     | 1     | 1     |\n| 20        | +6                        | Intervenção Divina Maior     | 4                       | 5            | 22                    | 4                                          | 3     | 3     | 3     | 3     | 2     | 2     | 1     | 1     |\n\n## Características de Classe de Clérigo\n\nComo um Clérigo, você recebe as seguintes características de classe quando atinge os níveis especificados de Clérigo. Essas características estão apresentadas na tabela Características de Clérigo.\n\n### Nível 1: Conjuração\n\nVocê aprendeu a conjurar magias por meio de oração e meditação. Veja o capítulo 7 para as regras sobre conjuração de magias. As informações abaixo detalham como você usa essas regras com as magias de Clérigo, explicadas na lista de magias de Clérigo mais adiante na descrição da classe.\n\n**Truques.** Você conhece três truques à sua escolha da lista de magias de Clérigo. *Chama Sagrada*, *Orientação* e *Taumaturgia* são recomendados.\n\nSempre que você alcança um nível de Clérigo, pode substituir um dos seus truques por outro truque à sua escolha da lista de magias de Clérigo.\n\nQuando alcançar os níveis 4 e 10 de Clérigo, você aprende mais um truque à sua escolha da lista de magias de Clérigo, conforme mostrado na coluna Truques da tabela Características de Clérigo.\n\n**Espaços de Magia.** A tabela Características de Clérigo mostra quantos espaços de magia você tem para conjurar suas magias de 1º círculo ou superior. Você recupera todos os espaços gastos quando completa um Descanso Longo.\n\n**Magias Preparadas de 1º Círculo ou Superior.** Você prepara a lista de magias de nível 1º circulo ou superior que estão disponíveis para você conjurar com essa característica. Para começar, escolha quatro magias de 1º círculo da lista de magias de Clérigo. *Bênção*, *Curar Ferimentos*, *Escudo da Fé* e *Raio Guia* são recomendadas.\n\nO número de magias em sua lista aumenta à medida que você alcança níveis de Clérigo, conforme mostrado na coluna Magias Preparadas da tabela Características de Clérigo. Sempre que esse número aumentar, escolha magias adicionais da lista de magias de Clérigo até que o número de magias em sua lista seja o mesmo do número da tabela. As magias escolhidas devem ser de um círculo para o qual você possui espaços de magia. Por exemplo, se você é um Clérigo de nível 3, sua lista de magias preparadas pode incluir seis magias de 1º ou 2º círculo em qualquer combinação.\n\nSe outra característica de Clérigo lhe der magias que você sempre tem preparadas, essas magias não contam para o número de magias que você pode preparar com esta característica, mas que contam como magias de Clérigo para você.\n\n**Mudando Suas Magias Preparadas.** Sempre que completar um Descanso Longo, você pode definir sua lista de magias preparadas, substituindo qualquer uma das magias por outras magias de Clérigo para as quais você tem espaços de magia.\n\n**Atributo de Conjuração.** Sabedoria é seu atributo de conjuração para suas magias de Clérigo.\n\n**Foco de Conjuração.** Você pode usar um Símbolo Sagrado como um Foco de Conjuração para suas magias de Clérigo.\n\n### Nível 1: Ordem Divina\n\nVocê se dedicou a um dos seguintes papéis sagrados à sua escolha.\n\n**Protetor.** Treinado para a batalha, você adquire proficiência com armas Marciais e treinamento com Armadura Pesada.\n\n**Taumaturgo.** Você conhece um truque adicional da lista de magias de Clérigo. Além disso, sua conexão mística com o divino lhe dá um bônus em seus testes de Inteligência (Arcanismo ou Religião). O bônus é igual ao seu modificador de Sabedoria (mínimo de +1).\n\n### Nível 2: Canalizar Divindade\n\nVocê pode canalizar energia divina diretamente dos Planos Externos para alimentar efeitos mágicos. Você começa com dois desses efeitos: Centelha Divina e Expulsar Mortos-Vivos, cada um descrito a seguir. Cada vez que você usar o Canalizar Divindade desta classe, escolha qual efeito de Canalizar Divindade deseja realizar. Você obtém opções adicionais de efeitos em níveis mais altos de Clérigo.\n\nVocê pode usar o Canalizar Divindade desta classe duas vezes. Você recupera um uso gasto ao completar um Descanso Curto e todos os usos gastos ao completar um Descanso Longo. Você adquire usos adicionais ao atingir certos níveis de Clérigo, conforme mostrado na coluna Canalizar Divindade da tabela Características de Clérigo.\n\nSe um efeito de Canalizar Divindade exigir uma salvaguarda, a CD é igual a CD para evitar magia da característica Conjuração desta classe.\n\n**Centelha Divina.** Como uma ação Usar Magia, você expõe seu Símbolo Sagrado para outra criatura à sua vista a até 9 metros e canaliza energia divina nela. Jogue 1d8 e adicione seu modificador de Sabedoria. Você pode restaurar Pontos de Vida da criatura igual ao resultado total ou forçar a criatura a realizar uma salvaguarda de Constituição. Se falhar, a criatura sofre dano Necrótico ou Radiante (à sua escolha) igual ao total. Em caso de sucesso, a criatura recebe metade do dano (arredondado para baixo).\n\nVocê joga um d8 adicional quando atinge os níveis de 7 (2d8), 13 (3d8) e 18 (4d8) de Clérigo.\n\n**Expulsar Mortos-Vivos**. Como uma ação Usar Magia, você mostra seu Símbolo Sagrado e repreende criaturas Mortas-Vivas. Cada Morto-Vivo à sua escolha a até 9 metros de você deve realizar uma salvaguarda de Sabedoria. Se a criatura falhar, ela está com as condições Amedrontado e Incapacitado por 1 minuto. Pela duração da canalização, ela tenta se mover o mais longe possível de você nos turnos dela. Este efeito se encerra na criatura se ela sofrer algum dano, se você está com a condição Incapacitado ou se você morrer.\n\n### Nível 3: Subclasse de Clérigo\n\nVocê adquire uma subclasse de Clérigo à sua escolha. Uma subclasse é uma especialização que lhe concede características em determinados níveis de Clérigo. As subclasses Domínio da Guerra, Domínio da Luz, Domínio da Trapaça e Domínio da Vida estão detalhadas após a descrição desta classe. Para o resto de sua jornada, você recebe cada uma das características de sua subclasse que são de seu nível de Clérigo ou menor.\n\n### Nível 4: Aumento no Valor de Atributo\n\nVocê adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 8, 12 e 16 de Clérigo.\n\n### Nível 5: Fulminar Mortos-Vivos\n\nAo usar Expulsar Mortos-Vivos, você pode jogar uma quantidade de d8s igual ao seu modificador de Sabedoria (mínimo de 1d8) e somar os resultados jogados. Cada Morto-Vivo que falhar na salvaguarda sofre dano Radiante igual ao resultado da soma dos dados jogados. Esse dano não encerra o efeito de Expulsar Mortos-Vivos.\n\n### Nível 7: Golpes Abençoados\n\nVocê se infunde de poder divino em combate. Você adquire uma das seguintes opções à sua escolha (se você já tiver qualquer uma dessas opções de uma subclasse de Clérigo em um livro antigo de D&D, use apenas a opção escolhida para esta característica).\n\n**Conjuração Poderosa.** Adicione seu modificador de Sabedoria ao dano causado com qualquer truque de Clérigo.\n\n**Golpe Divino.** Uma vez em cada um dos seus turnos, quando você atinge uma criatura com uma jogada de ataque usando uma arma, você pode causar ao alvo 1d8 pontos de dano Necrótico ou Radiante (à sua escolha) adicionais.\n\n### Nível 10: Intervenção Divina\n\nVocê pode convocar sua divindade ou panteão para intervir em seu nome. Como uma ação Usar Magia, escolha qualquer magia de Clérigo de 5º círculo ou inferior que não exija uma Reação para ser conjurada. Como parte da mesma ação, você conjura essa magia sem gastar espaço de magia ou precisar de componentes Materiais. Você não pode usar essa característica novamente até completar um Descanso Longo.\n\n### Nível 14: Golpes Abençoados Aprimorados\n\nA opção que você escolheu para Golpes Abençoados fica mais poderosa.\n\n**Conjuração Poderosa.** Quando conjurar um truque de Clérigo e causar dano a uma criatura com ele, você pode conferir vitalidade a si ou a outra criatura a até 18 metros de você, concedendo um número de Pontos de Vida Temporários igual ao dobro do seu modificador de Sabedoria.\n\n**Golpe Divino.** O dano adicional de seu Golpe Divino aumenta para 2d8.\n\n### Nível 19: Dádiva Épica\n\nVocê adquire o talento Dádiva Épica (veja o capítulo 5) ou outro talento à sua escolha para o qual se qualifica. Dádiva do Destino é recomendada.\n\n### Nível 20: Intervenção Divina Maior\n\nVocê pode convocar uma intervenção divina ainda mais poderosa. Quando usar sua característica Intervenção Divina, você pode escolher *Desejo* como opção de magia. Se fizer isso, não pode usar Intervenção Divina novamente até completar 2d4 Descansos Longos.\n\n## Lista de Magias de Clérigo\n\nEsta seção apresenta a lista de magias de Clérigo. As magias estão organizadas por círculo de magia, ordem alfabética e suas respectivas escolas de magia. Na coluna Especial, *C* indica que a magia requer Concentração, *R* que é um Ritual e *M* que necessita de um componente Material específico.\n\n**Truques (Magias de Clérigo de 0 Círculo)**\n\n| **Magia**              | **Escola**   | **Especial** |\n|------------------------|--------------|--------------|\n| *Acudir os Moribundos* | Necromancia  | —            |\n| *Badalar Fúnebre*      | Necromancia  | —            |\n| *Chama Sagrada*        | Evocação     | —            |\n| *Luz*                  | Evocação     | —            |\n| *Orientação*           | Adivinhação  | C            |\n| *Palavra de Radiância* | Evocação     | —            |\n| *Reparar*              | Transmutação | —            |\n| *Resistência*          | Abjuração    | C            |\n| *Taumaturgia*          | Transmutação | —            |\n\n**Magias de Clérigo de 1º Círculo**\n\n| **Magia**                       | **Escola**   | **Especial** |\n|---------------------------------|--------------|--------------|\n| *Benção*                        | Encantamento | C, M         |\n| *Comando*                       | Encantamento | —            |\n| *Criar ou Destruir Água*        | Transmutação | —            |\n| *Curar Ferimentos*              | Abjuração    | —            |\n| *Detectar Magia*                | Adivinhação  | C, R         |\n| *Detectar o Bem e o Mal*        | Adivinhação  | C            |\n| *Detectar Veneno e Doença*      | Adivinhação  | C, R         |\n| *Escudo da Fé*                  | Abjuração    | C            |\n| *Infligir Ferimentos*           | Necromancia  | —            |\n| *Palavra Curativa*              | Abjuração    | —            |\n| *Perdição*                      | Encantamento | C            |\n| *Proteção Contra o Bem e o Mal* | Abjuração    | C, M         |\n| *Purificar Alimentos e Bebidas* | Transmutação | R            |\n| *Raio Guia*                     | Evocação     | —            |\n| *Santuário*                     | Abjuração    | —            |\n\n**Magias de Clérigo de 2º Círculo**\n\n| **Magia**                | **Escola**   | **Especial** |\n|--------------------------|--------------|--------------|\n| *Acalmar Emoções*        | Encantamento | C            |\n| *Aprimorar Atributo*     | Transmutação | C            |\n| *Arma Espiritual*        | Evocação     | C            |\n| *Augúrio*                | Adivinhação  |  R, M        |\n| *Auxílio*                | Abjuração    | —            |\n| *Cegueira/Surdez*        | Transmutação | —            |\n| *Chama Contínua*         | Evocação     | M            |\n| *Encontrar Armadilhas*   | Adivinhação  | —            |\n| *Localizar Objeto*       | Adivinhação  | C            |\n| *Oração de Cura*         | Abjuração    | —            |\n| *Paralisar Pessoa*       | Encantamento | C            |\n| *Proteção Contra Veneno* | Abjuração    | —            |\n| *Repouso Tranquilo*      | Necromancia  | R, M         |\n| *Restauração Menor*      | Abjuração    | —            |\n| *Silêncio*               | Ilusão       | C, R         |\n| *Vínculo de Proteção*    | Abjuração    | M            |\n| *Zona da Verdade*        | Encantamento | —            |\n\n**Magias de Clérigo de 3º Círculo**\n\n| **Magia**                   | **Escola**   | **Especial** |\n|-----------------------------|--------------|--------------|\n| *Animar Mortos*             | Necromancia  | —            |\n| *Aura de Vitalidade*        | Abjuração    | C            |\n| *Caminhar Sobre as Águas*   | Transmutação | R            |\n| *Círculo Mágico*            | Abjuração    | M            |\n| *Clarividência*             | Adivinhação  | C, M         |\n| *Criar Comida e Água*       | Invocação    | —            |\n| *Dissipar Magia*            | Abjuração    | —            |\n| *Falar com Mortos*          | Necromancia  | —            |\n| *Glifo de Proteção*         | Abjuração    | M            |\n| *Guardiões Espirituais*     | Invocação    | C            |\n| *Línguas*                   | Adivinhação  | —            |\n| *Luz do Dia*                | Evocação     | —            |\n| *Mesclar-se às Rochas*      | Transmutação | R            |\n| *Palavra Curativa em Massa* | Abjuração    | —            |\n| *Proteção contra Energia*   | Abjuração    | C            |\n| *Remeter*                   | Evocação     | —            |\n| *Remover Maldição*          | Abjuração    | —            |\n| *Revivificar*               | Necromancia  | M            |\n| *Rogar Maldição*            | Necromancia  | C            |\n| *Simular Morte*             | Necromancia  | R            |\n| *Sinal de Esperança*        | Abjuração    | C            |\n\n**Magias de Clérigo de 4º Círculo**\n\n| **Magia**                 | **Escola**   | **Especial** |\n|---------------------------|--------------|--------------|\n| *Aura de Pureza*          | Abjuração    | C            |\n| *Aura de Vida*            | Abjuração    | C            |\n| *Banimento*               | Abjuração    | C            |\n| *Controlar Água*          | Transmutação | C            |\n| *Defensor da Fé*          | Invocação    | —            |\n| *Localizar Criatura*      | Adivinhação  | C            |\n| *Moldar Rochas*           | Transmutação | —            |\n| *Movimentação Livre*      | Abjuração    | —            |\n| *Presságio*               | Adivinhação  | R, M         |\n| *Proteção Contra a Morte* | Abjuração    | —            |\n\n**Magias de Clérigo de 5º Círculo**\n\n| **Magia**                   | **Escola**   | **Especial** |\n|-----------------------------|--------------|--------------|\n| *Âncora Planar*             | Abjuração    | M            |\n| *Círculo de Poder*          | Abjuração    | C            |\n| *Coluna de Chamas*          | Evocação     | —            |\n| *Comunhão*                  | Adivinhação  | R            |\n| *Consagrar*                 | Evocação     | M            |\n| *Contágio*                  | Necromancia  | —            |\n| *Convocar Celestial*        | Invocação    | C, M         |\n| *Curar Ferimentos em Massa* | Abjuração    | —            |\n| *Dissipar o Bem e o Mal*    | Abjuração    | C            |\n| *Lendas e Histórias*        | Adivinhação  | M            |\n| *Missão*                    | Encantamento | —            |\n| *Praga de Insetos*          | Invocação    | C            |\n| *Restauração Maior*         | Abjuração    | M            |\n| *Reviver os Mortos*         | Necromancia  | M            |\n| *Vidência*                  | Adivinhação  | C, M         |\n\n**Magias de Clérigo de 6º Círculo**\n\n| **Magia**             | **Escola**  | **Especial** |\n|-----------------------|-------------|--------------|\n| *Aliado Extraplanar*  | Invocação   | —            |\n| *Banquete de Heróis*  | Invocação   | M            |\n| *Barreira de Lâminas* | Evocação    | C            |\n| *Criar Mortos-Vivos*  | Necromancia | M            |\n| *Cura Completa*       | Abjuração   | —            |\n| *Encontrar o Caminho* | Adivinhação | C, M         |\n| *Moléstia*            | Necromancia | —            |\n| *Palavra de Regresso* | Invocação   | —            |\n| *Proibição*           | Abjuração   | R, M         |\n| *Raio Solar*          | Evocação    | C            |\n| *Visão da Verdade*    | Adivinhação | M            |\n\n**Magias de Clérigo de 7º Círculo**\n\n| **Magia**                      | **Escola**   | **Especial** |\n|--------------------------------|--------------|--------------|\n| *Forma Etérea*                 | Invocação    | —            |\n| *Invocar Celestial*            | Invocação    | C            |\n| *Palavra de Poder: Fortificar* | Encantamento | —            |\n| *Palavra Sagrada*              | Evocação     | —            |\n| *Regeneração*                  | Transmutação | —            |\n| *Ressurreição*                 | Necromancia  | M            |\n| *Símbolo*                      | Abjuração    | M            |\n| *Tempestade de Fogo*           | Evocação     | —            |\n| *Transição Planar*             | Invocação    | M            |\n\n**Magias de Clérigo de 8º Círculo**\n\n| **Magia**           | **Escola**   | **Especial** |\n|---------------------|--------------|--------------|\n| *Aura Sagrada*      | Abjuração    | C, M         |\n| *Campo Antimagia*   | Abjuração    | C            |\n| *Controlar o Clima* | Transmutação | C            |\n| *Explosão Solar*    | Evocação     | —            |\n| *Terremoto*         | Transmutação | C            |\n\n**Magias de Clérigo de 9º Círculo**\n\n| **Magia**                  | **Escola**   | **Especial** |\n|----------------------------|--------------|--------------|\n| *Cura Completa em Massa*   | Abjuração    | —            |\n| *Palavra de Poder: Salvar* | Encantamento | —            |\n| *Portal*                   | Invocação    | C, M         |\n| *Projeção Astral*          | Necromancia  | C            |\n| *Ressurreição Verdadeira*  | Necromancia  | M            |\n\n# Subclasses de Clérigo\n\nUma subclasse de Clérigo é uma especialização que concede características em certos níveis de Clérigo, conforme detalhado na subclasse. Cada subclasse de Clérigo recebe o nome de um domínio de existência favorecido por um deus, panteão ou ordem religiosa. Esta seção apresenta as subclasses Domínio da Guerra, Domínio da Luz, Domínio da Trapaça e Domínio da Vida.\n\n## Domínio da Guerra\n\n*Inspire Bravura e Derrote Inimigos*\n\nA guerra se manifesta de diversas formas, capaz de transformar pessoas comuns em heróis. Pode ser aterrorizante, com crueldades e covardias ofuscando atos de bravura e coragem. Os Clérigos do Domínio da Guerra se destacam em batalhas, inspirando outros a lutar pelo bem ou convertendo atos de violência em orações.\n\nOs Deuses do Domínio da Guerra observam e recompensam os guerreiros por suas conquistas. Eles incluem deuses de honra e cavalheirismo, assim como de destruição e pilhagem. Outros deuses da guerra adotam uma postura neutra, apoiando a belicosidade em todas as suas formas e incentivando os combatentes em todas as situações.\n\n### Nível 3: Magias de Domínio da Guerra\n\nSua conexão com este domínio divino garante que você sempre tenha certas magias preparadas. Ao atingir um nível de Clérigo especificado na tabela Magias de Domínio da Guerra, você sempre tem as magias listadas preparadas.\n\n**Magias de Domínio da Guerra**\n\n| **Nível de Clérigo** | **Magias Preparadas**                                   |\n|----------------------|---------------------------------------------------------|\n| 3                    | *Arma Espiritual, Arma Mágica, Escudo da Fé, Raio Guia* |\n| 5                    | *Guardiões Espirituais, Manto do Cruzado*               |\n| 7                    | *Escudo Ardente, Movimentação Livre*                    |\n| 9                    | *Golpe de Arço, Paralisar Monstro*                      |\n\n### Nível 3: Ataque Direcionado\n\nQuando você ou uma criatura a até 9 metros de você erra uma jogada de ataque, você pode gastar um uso de seu Canalizar Divindade e dar a essa jogada um bônus de +10, potencialmente fazendo-o acertar. Você usa sua Reação para conceder esse bônus a uma jogada de ataque a outra criatura.\n\n### Nível 3: Sacerdote da Guerra\n\nComo uma Ação Bônus, você pode realizar um ataque com uma arma ou um Ataque Desarmado. Você pode usar essa Ação Bônus um número de vezes igual ao seu modificador de Sabedoria (mínimo de uma vez). Você restaura todos os usos gastos ao completar um Descanso Curto ou Longo.\n\n### Nível 6: Bênção do Deus da Guerra\n\nVocê pode gastar um uso de seu Canalizar Divindade para conjurar *Arma Espiritual* ou *Escudo da Fé* em vez de gastar um espaço de magia. Uma magia conjurada dessa maneira não requer Concentração. Em vez disso, a magia permanece por 1 minuto, mas encerra se você conjurá-la novamente, ter a condição Incapacitado ou morrer.\n\n### Nível 17: Avatar da Guerra\n\nVocê adquire Resistência a dano Contundente, Cortante e Perfurante.\n\n## Domínio da Luz\n\n*Traga a Luz para Banir a Escuridão*\n\nO Domínio da Luz destaca o poder divino de gerar fogo e revelação. Seus Clérigos, almas iluminadas, possuem a visão clara de suas divindades, encarregados de afastar mentiras e dissipar as trevas.\n\nEste domínio está ligado a deuses da verdade, vigilância, beleza, percepção e renovação. Alguns desses deuses são identificados com o sol ou como condutores de carruagens que guiam o sol pelo céu. Outros atuam como sentinelas contra o engano, enquanto algumas divindades da beleza e da arte ensinam que a arte é um caminho para o aprimoramento da alma.\n\n### Nível 3: Brilho do Amanhecer\n\nComo uma ação Usar Magia, você ergue seu Símbolo Sagrado e gasta o uso de seu Canalizar Divindade para emitir um feixe de luz em uma Emanação de 9 metros originada em você. Qualquer Escuridão mágica, como a criada pela magia *Escuridão*, nessa área é dissipada. Além disso, cada criatura à sua escolha nessa área deve realizar uma salvaguarda de Constituição, sofrendo dano Radiante igual a 2d10 mais seu nível de Clérigo se falhar ou metade desse dano em caso de sucesso.\n\n### Nível 3: Labareda Protetora\n\nQuando uma criatura à sua vista a até 9 metros de você realiza uma jogada de ataque, você pode executar uma Reação para impor Desvantagem na jogada de ataque, fazendo com que a luz brilhe antes de acertar ou errar.\n\nVocê pode usar essa característica um número de vezes igual ao seu modificador de Sabedoria (mínimo de uma vez) e restaura todos os usos gastos ao completar um Descanso Longo.\n\n### Nível 3: Magias de Domínio da Luz\n\nSua conexão com este domínio divino garante que você sempre tenha certas magias preparadas. Ao atingir um nível de Clérigo especificado na tabela Magias de Domínio da Luz, você sempre tem as magias listadas preparadas.\n\n**Magias de Domínio da Luz**\n\n| **Nível de Clérigo** | **Magias Preparadas**                                          |\n|----------------------|----------------------------------------------------------------|\n| 3                    | *Fogo das Fadas, Mãos Ardentes, Raio Ardente, Ver o Invisível* |\n| 5                    | *Bola de Fogo, Luz do Dia*                                     |\n| 7                    | *Muralha de Fogo, Olho Arcano*                                 |\n| 9                    | *Coluna de Chamas, Vidência*                                   |\n\n### Nível 6: Labareda Protetora Aprimorada\n\nVocê restaura todos os usos gastos da sua Labareda Protetora ao completar um Descanso Curto ou Longo.\n\nAlém disso, sempre que usar Labareda Protetora, você pode conceder ao alvo do ataque desencadeado um número de Pontos de Vida Temporários igual a 2d6 mais seu modificador de Sabedoria.\n\n### Nível 17: Coroa de Luz\n\nComo uma ação Usar Magia, você emite uma aura de luz solar que dura 1 minuto ou até que você a encerre (nenhuma ação é necessária). Você emite Luz Plena em um raio de 18 metros e Meia-luz por mais 9 metros. Seus inimigos na Luz Plena têm Desvantagem em salvaguardas contra seu Brilho do Amanhecer e qualquer magia que cause dano Ígneo ou Radiante.\n\nVocê pode usar esta característica um número de vezes igual ao seu modificador de Sabedoria (mínimo de uma vez) e restaura todos os usos gastos ao completar um Descanso Longo.\n\n## Domínio da Trapaça\n\n*Pregue Peças e Desafie as Autoridades*\n\nO Domínio da Trapaça fornece magias de enganação, ilusão e furtividade. Os Clérigos que usam essa magia são uma força disruptiva no mundo, perfurando o orgulho, zombando de tiranos, libertando cativos e desprezando tradições vazias. Eles preferem estratagemas e brincadeiras ao confronto direto.\n\nOs deuses da trapaça são instigadores e trapaceiros que desafiam a ordem entre deuses e mortais. Eles personificam a mudança e a agitação social, sendo patronos de ladrões, vigaristas, apostadores, rebeldes e libertadores. Ordens religiosas secretas, especialmente as que buscam minar governos ou hierarquias opressivas, também se apoiam no poder do Domínio da Trapaça.\n\n### Nível 3: Magias de Domínio da Trapaça\n\nSua conexão com este domínio divino garante que você sempre tenha certas magias preparadas. Ao atingir um nível de Clérigo especificado na tabela Magias de Domínio da Trapaça, você sempre tem as magias listadas preparadas.\n\n**Magias de Domínio da Trapaça**\n\n| **Nível de Clérigo** | **Magias Preparadas**                                               |\n|----------------------|---------------------------------------------------------------------|\n| 3                    | *Disfarçar-se, Enfeitiçar Pessoa, Invisibilidade, Passo Sem Rastro* |\n| 5                    | *Indetectável, Padrão Hipnótico*                                    |\n| 7                    | *Confusão, Porta Dimensional*                                       |\n| 9                    | *Dominar Pessoa, Modificar Memória*                                 |\n\n### Nível 3: Bênção do Trapaceiro\n\nCom uma ação Usar Magia, você pode escolher a si ou a uma criatura voluntária a até 9 metros de você para ter Vantagem em testes de Destreza (Furtividade). Essa bênção permanece até você completar um Descanso Longo ou usar esta característica novamente.\n\n### Nível 3: Invocar Duplicidade\n\nComo uma Ação Bônus, você pode gastar um uso de seu Canalizar Divindade para criar uma ilusão visual perfeita de si em um espaço desocupado à sua vista a até 9 metros de si. A ilusão é intangível e não ocupa seu espaço. Ela permanece por 1 minuto e acaba se você tiver a condição Incapacitado ou a encerrar (nenhuma ação é necessária). A ilusão é animada e imita suas expressões e gestos. Enquanto ela persistir, você adquire os seguintes benefícios.\n\n**Conjurar Magias.** Você pode conjurar magias como se estivesse no espaço da ilusão, mas deve usar seus próprios sentidos.\n\n**Distração.** Quando você e sua ilusão estão a até 1,5 metro de uma criatura que pode ver a ilusão, você tem Vantagem em jogadas de ataque contra essa criatura, considerando quão perturbadora a ilusão é para o alvo.\n\n**Mover.** Como uma Ação Bônus, você pode mover a ilusão até 9 metros para um espaço desocupado que esteja a até 36 metros de você.\n\n### Nível 6: Transposição do Trapaceiro\n\nAo executar a Ação Bônus para criar ou mover a ilusão de seu Invocar Duplicidade, você pode se teleportar, trocando de lugar com a ilusão.\n\n### Nível 17: Duplicidade Aprimorada\n\nA ilusão de seu Invocar Duplicidade ficou mais poderosa das seguintes maneiras.\n\n**Distração Compartilhada.** Quando você e seus aliados realizam jogadas de ataque contra uma criatura a até 1,5 metro da ilusão, as jogadas de ataque têm Vantagem.\n\n**Ilusão de Cura.** Quando a ilusão termina, você ou uma criatura à sua escolha a até 1,5 metro dela recupera um número de Pontos de Vida igual ao seu nível de Clérigo.\n\n## Domínio da Vida\n\n*Alivie as Feridas do Mundo*\n\nO Domínio da Vida se concentra na energia positiva que ajuda a sustentar toda a vida no multiverso. Os clérigos que acessam este domínio são mestres da cura, usando essa força vital para curar muitas feridas.\n\nA existência deste domínio repousa na energia positiva que o envolve, atraindo Clérigos de várias tradições religiosas. Está especialmente conectado a divindades agrícolas, deuses da cura e resistência, além de entidades do lar e da comunidade. Ordens religiosas voltadas para a cura também buscam a magia deste domínio.\n\n### Nível 3: Magias de Domínio da Vida\n\nSua conexão com este domínio divino garante que você sempre tenha certas magias preparadas. Ao atingir um nível de Clérigo especificado na tabela Magias de Domínio da Vida, você sempre tem as magias listadas preparadas.\n\n**Magias de Domínio da Vida**\n\n| **Nível de Clérigo** | **Magias Preparadas**                                  |\n|----------------------|--------------------------------------------------------|\n| 3                    | *Auxílio, Bênção, Curar Ferimentos, Restauração Menor* |\n| 5                    | *Palavra Curativa em Massa, Revivificar*               |\n| 7                    | *Aura de Vida, Proteção Contra a Morte*                |\n| 9                    | *Curar Ferimentos em Massa, Restauração Maior*         |\n\n### Nível 3: Discípulo da Vida\n\nAo conjurar uma magia com um espaço de magia que restaura Pontos de Vida em uma criatura, essa criatura recupera Pontos de Vida adicionais no turno da conjuração. Os Pontos de Vida adicionais são iguais a 2 mais o nível do espaço de magia.\n\n### Nível 3: Preservar a Vida\n\nCom uma ação Usar Magia, você exibe seu Símbolo Sagrado e usa seu Canalizar Divindade para evocar uma energia de cura que pode restaurar um número de Pontos de Vida igual a cinco vezes seu nível de Clérigo. Escolha criaturas Sangrando a até 9 metros de você (que pode incluir você) e divida esses Pontos de Vida entre elas. Esta característica pode restaurar uma criatura a não mais que a metade dos Pontos de Vida máximo dela.\n\n### Nível 6: Curandeiro Abençoado\n\nMagias de cura que você conjurar nos outros também o curam. Imediatamente após conjurar uma magia com um espaço de magia que restaure Pontos de Vida em uma criatura que não seja você, você recupera Pontos de Vida iguais a 2 mais o círculo do espaço de magia.\n\n### Nível 17: Cura Suprema\n\nAo usar uma magia ou Canalizar Divindade para restaurar Pontos de Vida em uma criatura, não jogue os dados normalmente; em vez disso, utilize o maior resultado de cada dado. Por exemplo, ao restaurar 2d6 Pontos de Vida, você restaura 12."
+}

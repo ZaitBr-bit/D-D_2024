@@ -1,0 +1,628 @@
+{
+  "nome": "Paladino",
+  "tracos_basicos": {
+    "Atributo Primário": "Equipamento Inicial",
+    "Força e Carisma": "Escolha A ou B: (A) Cota de Malha, Escudo, Espada Longa, 6 Azagaias, Símbolo Sagrado, Kit de Sacerdote e 9 PO; ou (B) 150 PO"
+  },
+  "tabela_caracteristicas": [
+    {
+      "Nível": "1",
+      "Bônus de Proficiência": "+2",
+      "Características": "Conjuracao, Maestria em Arma, Maos Consagradas",
+      "Canalizar Divindade": "—",
+      "Magias Preparadas": "2",
+      "1": "2",
+      "2": "—",
+      "3": "—",
+      "4": "—",
+      "5": "—"
+    },
+    {
+      "Nível": "2",
+      "Bônus de Proficiência": "+2",
+      "Características": "Destruicao do Paladino, Estilo de Luta",
+      "Canalizar Divindade": "—",
+      "Magias Preparadas": "3",
+      "1": "2",
+      "2": "—",
+      "3": "—",
+      "4": "—",
+      "5": "—"
+    },
+    {
+      "Nível": "3",
+      "Bônus de Proficiência": "+2",
+      "Características": "Canalizar Divindade, Subclasse de Paladino",
+      "Canalizar Divindade": "2",
+      "Magias Preparadas": "4",
+      "1": "3",
+      "2": "—",
+      "3": "—",
+      "4": "—",
+      "5": "—"
+    },
+    {
+      "Nível": "4",
+      "Bônus de Proficiência": "+2",
+      "Características": "Aumento no Valor de Atributo",
+      "Canalizar Divindade": "2",
+      "Magias Preparadas": "5",
+      "1": "3",
+      "2": "—",
+      "3": "—",
+      "4": "—",
+      "5": "—"
+    },
+    {
+      "Nível": "5",
+      "Bônus de Proficiência": "+3",
+      "Características": "Ataque Extra, Montaria Fiel",
+      "Canalizar Divindade": "2",
+      "Magias Preparadas": "6",
+      "1": "4",
+      "2": "2",
+      "3": "—",
+      "4": "—",
+      "5": "—"
+    },
+    {
+      "Nível": "6",
+      "Bônus de Proficiência": "+3",
+      "Características": "Aura de Protecao",
+      "Canalizar Divindade": "2",
+      "Magias Preparadas": "6",
+      "1": "4",
+      "2": "2",
+      "3": "—",
+      "4": "—",
+      "5": "—"
+    },
+    {
+      "Nível": "7",
+      "Bônus de Proficiência": "+3",
+      "Características": "Caracteristica de Subclasse",
+      "Canalizar Divindade": "2",
+      "Magias Preparadas": "7",
+      "1": "4",
+      "2": "3",
+      "3": "—",
+      "4": "—",
+      "5": "—"
+    },
+    {
+      "Nível": "8",
+      "Bônus de Proficiência": "+3",
+      "Características": "Aumento no Valor de Atributo",
+      "Canalizar Divindade": "2",
+      "Magias Preparadas": "7",
+      "1": "4",
+      "2": "3",
+      "3": "—",
+      "4": "—",
+      "5": "—"
+    },
+    {
+      "Nível": "9",
+      "Bônus de Proficiência": "+4",
+      "Características": "Repudiar Inimigos",
+      "Canalizar Divindade": "2",
+      "Magias Preparadas": "9",
+      "1": "4",
+      "2": "3",
+      "3": "2",
+      "4": "—",
+      "5": "—"
+    },
+    {
+      "Nível": "10",
+      "Bônus de Proficiência": "+4",
+      "Características": "Aura de Coragem",
+      "Canalizar Divindade": "2",
+      "Magias Preparadas": "9",
+      "1": "4",
+      "2": "3",
+      "3": "2",
+      "4": "—",
+      "5": "—"
+    },
+    {
+      "Nível": "11",
+      "Bônus de Proficiência": "+4",
+      "Características": "Golpes Radiantes",
+      "Canalizar Divindade": "3",
+      "Magias Preparadas": "10",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "—",
+      "5": "—"
+    },
+    {
+      "Nível": "12",
+      "Bônus de Proficiência": "+4",
+      "Características": "Aumento no Valor de Atributo",
+      "Canalizar Divindade": "3",
+      "Magias Preparadas": "10",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "—",
+      "5": "—"
+    },
+    {
+      "Nível": "13",
+      "Bônus de Proficiência": "+5",
+      "Características": "—",
+      "Canalizar Divindade": "3",
+      "Magias Preparadas": "11",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "1",
+      "5": "—"
+    },
+    {
+      "Nível": "14",
+      "Bônus de Proficiência": "+5",
+      "Características": "Toque Restaurador",
+      "Canalizar Divindade": "3",
+      "Magias Preparadas": "11",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "1",
+      "5": "—"
+    },
+    {
+      "Nível": "15",
+      "Bônus de Proficiência": "+5",
+      "Características": "Caracteristica de Subclasse",
+      "Canalizar Divindade": "3",
+      "Magias Preparadas": "12",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "2",
+      "5": "—"
+    },
+    {
+      "Nível": "16",
+      "Bônus de Proficiência": "+5",
+      "Características": "Aumento no Valor de Atributo",
+      "Canalizar Divindade": "3",
+      "Magias Preparadas": "12",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "2",
+      "5": "—"
+    },
+    {
+      "Nível": "17",
+      "Bônus de Proficiência": "+6",
+      "Características": "—",
+      "Canalizar Divindade": "3",
+      "Magias Preparadas": "14",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "3",
+      "5": "1"
+    },
+    {
+      "Nível": "18",
+      "Bônus de Proficiência": "+6",
+      "Características": "Aura Expandida",
+      "Canalizar Divindade": "3",
+      "Magias Preparadas": "14",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "3",
+      "5": "1"
+    },
+    {
+      "Nível": "19",
+      "Bônus de Proficiência": "+6",
+      "Características": "Dadiva Epica",
+      "Canalizar Divindade": "3",
+      "Magias Preparadas": "15",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "3",
+      "5": "2"
+    },
+    {
+      "Nível": "20",
+      "Bônus de Proficiência": "+6",
+      "Características": "Caracteristica de Subclasse",
+      "Canalizar Divindade": "3",
+      "Magias Preparadas": "15",
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "3",
+      "5": "2"
+    }
+  ],
+  "caracteristicas": [
+    {
+      "nivel": 1,
+      "nome": "Conjuração",
+      "descricao": "Você aprendeu a conjurar magias por meio de oração e meditação. Veja o capítulo 7 para as regras sobre conjuração de magias. As informações abaixo detalham como você usa essas regras com as magias de Paladino, explicadas na lista de magias de Paladino mais adiante na descrição da classe.\n**Espaços de Magia.** A tabela Características de Paladino mostra quantos espaços de magia você tem para conjurar suas magias de 1º círculo ou superior. Você restaura todos os espaços gastos ao completar um Descanso Longo.\n**Magias Preparadas de 1º Círculo ou Superior.** Você prepara a lista de magias de 1º círculo ou superior que estão disponíveis para você conjurar com essa característica. Para começar, escolha duas magias de Paladino de 1º círculo. *Destruição Cauterizante* e *Heroísmo* são recomendadas.\nO número de magias em sua lista aumenta à medida que você atinge níveis de Paladino, conforme mostrado na coluna Magias Preparadas da tabela Características de Paladino. Sempre que esse número aumentar, escolha magias adicionais da lista de magias de Paladino até que o número de magias em sua lista corresponda ao número da tabela. As magias escolhidas devem ser de um círculo para o qual você possui espaços de magia. Por exemplo, se você é um Paladino de nível 5, sua lista de magias preparadas pode incluir seis magias de Paladino de 1º ou 2º círculo em qualquer combinação.\nSe outra característica de Paladino lhe der magias que você sempre tem preparadas, essas magias não contam para o número de magias que você pode preparar com esta característica, mas essas magias, de outra forma, contam como magias de Paladino para você.\n**Mudando Suas Magias Preparadas.** Sempre que completar um Descanso Longo, você pode substituir uma magia em sua lista por outra magia de Paladino para a qual você tem espaços de magia.\n**Atributo de Conjuração.** Carisma é seu atributo de conjuração para suas magias de Paladino.\n**Foco de Conjuração.** Você pode usar um Símbolo Sagrado como um Foco de Conjuração para suas magias de Paladino."
+    },
+    {
+      "nivel": 1,
+      "nome": "Maestria em Arma",
+      "descricao": "Seu treinamento com armas permite que você use as propriedades de maestria de dois tipos de armas à sua escolha com as quais você tem proficiência, como Azagaia e Espadas Longas.\nSempre que completar um Descanso Longo, você pode alterar os tipos de armas que escolheu. Por exemplo, você pode mudar para usar as propriedades de maestria de Alabardas e Manguais."
+    },
+    {
+      "nivel": 1,
+      "nome": "Mãos Consagradas",
+      "descricao": "Seu toque abençoado pode aliviar feridas. Você tem uma reserva de poder de cura que reabastece ao completar um Descanso Longo. Com essa reserva, você pode recuperar um número total de Pontos de Vida igual a cinco vezes seu nível de Paladino.\nComo uma Ação Bônus, você toca uma criatura (que pode ser você mesmo) e extrair poder dessa reserva de cura para restaurar um número de Pontos de Vida para essa criatura, até o valor máximo restante na reserva.\nVocê também pode gastar 5 Pontos de Vida dessa reserva de poder de cura para remover a condição Envenenado da criatura; esses pontos não restauram Pontos de Vida da criatura."
+    },
+    {
+      "nivel": 2,
+      "nome": "Destruição do Paladino",
+      "descricao": "Você sempre tem a magia *Destruição Divina* preparada. Além disso, você pode conjurá-la sem gastar um espaço de magia, não podendo conjurá-la dessa forma novamente antes de completar um Descanso Longo"
+    },
+    {
+      "nivel": 2,
+      "nome": "Estilo de Luta",
+      "descricao": "Você adquire um talento Estilo de Luta à sua escolha (veja também o capítulo 5). Em vez de escolher um desses talentos, você pode escolher a opção abaixo.\n**Combatente Abençoado.** Você aprende dois truques de Clérigo à sua escolha. *Chama Sagrada* e *Orientação* são recomendados. Os truques escolhidos contam como magias de Paladino para você, e Carisma é o atributo de conjuração para elas. Sempre que você atinge um nível de Paladino, pode substituir um desses truques por outro truque de Clérigo."
+    },
+    {
+      "nivel": 3,
+      "nome": "Canalizar Divindade",
+      "descricao": "Você pode canalizar energia divina diretamente dos Planos Externos, usando-a para causar efeitos mágicos. Você começa com um desses efeitos: Sentido Divino, descrito abaixo. Outras características de Paladino dão opções adicionais de efeito de Canalizar Divindade. Cada vez que você usa Canalizar Divindade desta classe, você escolhe qual efeito desta classe usar.\nVocê pode usar Canalizar Divindade desta classe duas vezes e três vezes a partir do nível 11 de Paladino. Você recupera um uso gasto ao completar um Descanso Curto, e restaura todos os usos gastos ao completar um Descanso Longo.\nSe um efeito de Canalizar Divindade exigir uma salvaguarda, a CD é igual a CD para evitar magias da característica Conjuração desta classe.\n**Sentido Divino.** Como uma Ação Bônus, você pode abrir sua consciência para detectar Celestiais, Ínferos e Mortos-Vivos. Pelos próximos 10 minutos ou até você ter a condição Incapacitado, você sabe a localização de qualquer criatura desse tipo a até 18 metros de você e conhece o tipo de criatura. Dentro do mesmo raio, você também detecta a presença de qualquer lugar ou objeto que tenha sido consagrado ou profanado, como na magia *Consagrar.*"
+    },
+    {
+      "nivel": 3,
+      "nome": "Subclasse de Paladino",
+      "descricao": "Você adquire uma subclasse de Paladino à sua escolha.As subclasses Juramento da Devoção, Juramento da Glória, Juramento de Vingança e Juramento dos Anciões estão detalhadas após a descrição desta classe. Uma subclasse é uma especialidade que lhe concede características em determinados níveis de Paladino. Durante toda sua jornada, você recebe cada uma das características de sua subclasse de seu nível de Paladino ou menor.\n**Quebrando Seu Juramento**\nUm Paladino busca manter os mais altos padrões de conduta, mas até os mais dedicados podem falhar. Às vezes, um Paladino transgride seu juramento.\nAo quebrar um voto, um Paladino geralmente busca absolvição, passando a noite em vigília como sinal de penitência ou realizando um jejum. Após um rito de perdão, o Paladino retoma seu caminho.\nSe o seu Paladino violar o juramento sem arrependimento, converse com seu Mestre. Nesse caso, o seu Paladino pode precisar escolher uma subclasse mais adequada ou até abandonar a classe em favor de outra."
+    },
+    {
+      "nivel": 4,
+      "nome": "Aumento no Valor de Atributo",
+      "descricao": "Você adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 8, 12 e 16 de Paladino."
+    },
+    {
+      "nivel": 5,
+      "nome": "Ataque Extra",
+      "descricao": "Você pode atacar duas vezes, em vez de uma, sempre que executar a ação Atacar no seu turno."
+    },
+    {
+      "nivel": 5,
+      "nome": "Montaria Fiel",
+      "descricao": "Você pode pedir auxílio de uma montaria sobrenatural. Você sempre tem a magia *Convocar Montaria* preparada.\nVocê também pode conjurar a magia uma vez sem gastar um espaço de magia, e restaura a capacidade de fazê-lo ao completar um Descanso Longo."
+    },
+    {
+      "nivel": 6,
+      "nome": "Aura de Proteção",
+      "descricao": "Você irradia uma aura protetora e invisível em uma Emanação de 3 metros que se origina em você. A aura fica inativa em você, caso tenha a condição Incapacitado.\nVocê e seus aliados na aura adquirem um bônus em salvaguardas igual ao seu modificador de Carisma (bônus mínimo de +1).\nSe outro Paladino estiver presente, uma criatura pode se beneficiar de apenas uma Aura de Proteção de cada vez; a criatura escolhe qual aura recebe enquanto estiver nela."
+    },
+    {
+      "nivel": 9,
+      "nome": "Repudiar Inimigos",
+      "descricao": "Como uma ação Usar Magia, você pode fazer um uso de Canalizar Divindade para subjugar inimigos com temor. Ao apresentar seu Símbolo Sagrado ou arma, você pode escolher um número de criaturas igual ao seu modificador de Carisma (no mínimo uma criatura) à sua vista e a até 18 metros de você. Cada alvo deve ser bem-sucedido em uma salvaguarda de Sabedoria ou tem a condição Amedrontado por 1 minuto ou até sofrer qualquer dano. Enquanto Amedrontado deste modo, um alvo pode realizar apenas uma das opções seguintes nos turnos dele: mover-se, executar uma ação ou executar uma Ação Bônus."
+    },
+    {
+      "nivel": 10,
+      "nome": "Aura de Coragem",
+      "descricao": "Você e seus aliados têm Imunidade à condição Amedrontado enquanto estiverem em sua Aura de Proteção. Se um aliado Amedrontado entrar na aura, essa condição não tem efeito sobre esse aliado enquanto ele estiver na aura."
+    },
+    {
+      "nivel": 11,
+      "nome": "Golpes Radiantes",
+      "descricao": "Seus golpes agora imbuem poder sobrenatural. Ao atingir alvo com uma jogada de ataque usando uma arma Corpo a Corpo ou um Ataque Desarmado, o alvo sofre 1d8 pontos de dano Radiante adicionais."
+    },
+    {
+      "nivel": 14,
+      "nome": "Toque Restaurador",
+      "descricao": "Ao usar Mãos Consagradas em uma criatura, você também pode remover uma ou mais das seguintes condições da criatura: Amedrontado, Atordoado, Cego, Enfeitiçado, Paralisado ou Surdo. Você deve gastar 5 Pontos de Vida da reserva de cura de Mãos Consagradas para cada uma dessas condições que deseja remover; esses pontos não restauram Pontos de Vida para a criatura."
+    },
+    {
+      "nivel": 18,
+      "nome": "Aura Expandida",
+      "descricao": "Sua Aura de Proteção agora é uma Emanação de 9 metros."
+    },
+    {
+      "nivel": 19,
+      "nome": "Dádiva Épica",
+      "descricao": "Você adquire o talento Dádiva Épica (veja o capítulo 5) ou outro talento à sua escolha para o qual se qualifica. Dádiva da Visão Verdadeira é recomendada."
+    },
+    {
+      "nivel": 3,
+      "nome": "Magias do Juramento da Devoção",
+      "descricao": "A magia do seu juramento garante que você sempre tenha certas magias prontas; ao atingir um nível de Paladino detalhado na tabela Magias do Juramento da Devoção, você sempre tem as magias apresentadas preparadas.\n**Magias do Juramento da Devoção**\n| **Nível de Paladino** | **Magias**                                    |\n|-----------------------|-----------------------------------------------|\n| 3                     | *Escudo da Fé, Proteção Contra o Bem e o Mal* |\n| 5                     | *Auxílio, Zona da Verdade*                    |\n| 9                     | *Dissipar Magia, Sinal de Esperança*          |\n| 13                    | *Defensor da Fé, Movimentação Livre*          |\n| 17                    | *Coluna de Chamas, Comunhão*                  |"
+    },
+    {
+      "nivel": 3,
+      "nome": "Arma Sagrada",
+      "descricao": "Ao executar a ação Atacar, você pode gastar um uso de seu Canalizar Divindade para imbuir uma arma Corpo a Corpo que você está empunhando com energia positiva. Por 10 minutos ou até usar essa característica novamente, você adiciona seu modificador de Carisma às jogadas de ataque que realizar com essa arma (bônus mínimo de +1) e, cada vez que atingir com ela, você causa o tipo de dano normal da arma ou dano Radiante.\nAlém disso, a arma também emite Luz Plena em um raio de 6 metros e Meia-luz por mais 6 metros.\nVocê pode encerrar este efeito mais cedo (nenhuma ação é necessária). Este efeito também encerra se você não estiver carregando a arma."
+    },
+    {
+      "nivel": 7,
+      "nome": "Aura de Devoção",
+      "descricao": "Você e seus aliados têm Imunidade à condição Enfeitiçado enquanto estiverem em sua Aura de Proteção. Se um aliado Enfeitiçado entrar na aura, essa condição não tem efeito sobre esse aliado enquanto ele estiver na aura."
+    },
+    {
+      "nivel": 15,
+      "nome": "Destruição Protetora",
+      "descricao": "Sua destruição mágica agora irradia energia protetora. Ao conjurar *Destruição Divina*, você e seus aliados têm Cobertura Parcial enquanto estiverem em sua Aura de Proteção. A aura mantém este benefício até o início do seu próximo turno."
+    },
+    {
+      "nivel": 20,
+      "nome": "Resplendor Sagrado",
+      "descricao": "Como uma Ação Bônus, você pode imbuir sua Aura de Proteção com poder sagrado, concedendo os benefícios abaixo por 10 minutos ou até a encerrar (nenhuma ação é necessária). Após usar esta característica, você não pode utilizá-la novamente até completar um Descanso Longo. Você também pode recuperar seu uso gastando um espaço de magia de 5º círculo (nenhuma ação é necessária).\n**Dano Radiante.** Sempre que um inimigo inicia o turno na sua aura, essa criatura sofre dano Radiante igual ao seu modificador de Carisma mais seu Bônus de Proficiência.\n**Luz Solar.** A aura é preenchida com Luz Plena que é luz solar.\n**Vigília Consagrada.** Você tem Vantagem em qualquer salvaguarda que seja forçado a realizar por um Ínfero ou um Morto-Vivo."
+    },
+    {
+      "nivel": 3,
+      "nome": "Atleta Inigualável",
+      "descricao": "Como uma Ação Bônus, você pode gastar um uso do seu Canalizar Divindade para aprimorar seu atletismo. Por 1 hora, você tem Vantagem em testes de Força (Atletismo) e Destreza (Acrobacia), e a distância de seus Saltos Longos e Salto em Altura aumenta em 3 metros (essa distância adicional custa movimento padrão)."
+    },
+    {
+      "nivel": 3,
+      "nome": "Destruição Inspiradora",
+      "descricao": "Imediatamente após conjurar *Destruição Divina*, você pode gastar um uso do seu Canalizar Divindade e distribuir Pontos de Vida Temporários para criaturas à sua escolha a até 9 metros de si, incluindo você. O número total de Pontos de Vida Temporários é igual a 2d8 mais o seu nível de Paladino, dividido entre as criaturas escolhidas, como preferir."
+    },
+    {
+      "nivel": 3,
+      "nome": "Magias do Juramento da Glória",
+      "descricao": "A magia do seu juramento garante que você sempre tenha certas magias prontas; ao atingir um nível de Paladino detalhado na tabela Magias do Juramento da Glória, você sempre tem as magias apresentadas preparadas.\n**Magias de Juramento da Glória**\n| **Nível de Paladino** | **Magias**                                      |\n|-----------------------|-------------------------------------------------|\n| 3                     | *Heroísmo, Raio Guia*                           |\n| 5                     | *Aprimorar Atributo, Arma Mágica*               |\n| 9                     | *Celeridade, Proteção contra Energia*           |\n| 13                    | *Compulsão, Movimentação Livre*                 |\n| 17                    | *Lendas e Histórias, Presença Régia de Yolande* |"
+    },
+    {
+      "nivel": 7,
+      "nome": "Aura de Vivacidade",
+      "descricao": "Seu Deslocamento aumenta em 3 metros.\nAlém disso, sempre que um aliado entra em sua Aura de Proteção pela primeira vez em um turno ou inicia o turno dele na aura, o Deslocamento do aliado aumenta em 3 metros até o final do próximo turno dele."
+    },
+    {
+      "nivel": 15,
+      "nome": "Defesa Gloriosa",
+      "descricao": "Você pode transformar a defesa em um ataque repentino. Quando você ou outra criatura à sua vista a até 3 metros de você é atingida por uma jogada de ataque, você pode executar uma Reação para conceder um bônus à CA do alvo contra esse ataque, fazendo potencialmente com que o ataque erre. O bônus é igual ao seu modificador de Carisma (mínimo de +1). Se o ataque falhar, você pode realizar um ataque com uma arma contra o atacante como parte desta Reação se o atacante estiver no alcance da sua arma.\nVocê pode usar essa característica um número de vezes igual ao seu modificador de Carisma (mínimo de uma vez) e restaura todos os usos gastos ao completar um Descanso Longo."
+    },
+    {
+      "nivel": 20,
+      "nome": "Lenda Viva",
+      "descricao": "Você pode se fortalecer com as lendas — verdadeiras ou exageradas — de seus grandes feitos. Como uma Ação Bônus, você recebe os benefícios abaixo por 10 minutos. Após usar essa característica, você não pode utilizá-la novamente até completar um Descanso Longo. Você também pode recuperar seu uso gastando um espaço de magia de 5º círculo (nenhuma ação é necessária).\n**Carismático.** Você é abençoado com uma presença sobrenatural e tem Vantagem em todos os testes de Carisma.\n**Golpe Infalível.** Uma vez em cada um dos seus turnos, ao realizar uma jogada de ataque com uma arma e errar, você pode fazer com que esse ataque atinja.\n**Jogar Novamente a Salvaguarda.** Se você falhar em uma salvaguarda, pode usar sua Reação para jogá-la novamente. Você deve usar o novo resultado."
+    },
+    {
+      "nivel": 3,
+      "nome": "Magias do Juramento da Vingança",
+      "descricao": "A magia do seu juramento garante que você sempre tenha certas magias prontas; quando você atinge um nível de Paladino detalhado na tabela Magias do Juramento da Vingança, você sempre tem as magias apresentadas preparadas.\n**Magias do Juramento da Vingança**\n| **Nível de Paladino** | **Magias**                            |\n|-----------------------|---------------------------------------|\n| *3*                   | *Marca do Caçador, Perdição*          |\n| *5*                   | *Paralisar Pessoa, Passo Nebuloso*    |\n| *9*                   | *Celeridade, Proteção contra Energia* |\n| *13*                  | *Banimento, Porta Dimensional*        |\n| *17*                  | *Paralisar Monstro, Vidência*         |"
+    },
+    {
+      "nivel": 3,
+      "nome": "Voto de Inimizade",
+      "descricao": "Ao executar a ação Atacar, você pode gastar um uso de seu Canalizar Divindade para proferir um voto de inimizade contra uma criatura à sua vista a até 9 metros de si. Você tem Vantagem em jogadas de ataque contra a criatura por 1 minuto ou até usar essa característica novamente.\nCaso a criatura caia a 0 Pontos de Vida antes do voto terminar, você pode transferir o voto para uma criatura diferente a até 9 metros de você (nenhuma ação é necessária)."
+    },
+    {
+      "nivel": 7,
+      "nome": "Vingador Implacável",
+      "descricao": "Seu foco sobrenatural permite que você evite a retirada de um inimigo. Ao atingir uma criatura com um Ataque de Oportunidade, você pode reduzir o Deslocamento da criatura para 0 até o final do turno atual. Você pode então se mover até metade de seu Deslocamento como parte da mesma Reação. Esse movimento não provoca Ataques de Oportunidade."
+    },
+    {
+      "nivel": 15,
+      "nome": "Alma Vingativa",
+      "descricao": "Imediatamente após uma criatura sob o efeito do seu Voto de Inimizade acertar ou errar com uma jogada de ataque, você pode executar uma Reação para realizar um ataque corpo a corpo contra essa criatura se ela estiver ao seu alcance."
+    },
+    {
+      "nivel": 20,
+      "nome": "Anjo Vingador",
+      "descricao": "Como uma Ação Bônus, você adquire os benefícios abaixo por 10 minutos ou até a encerrar (nenhuma ação é necessária). Após usar esta característica, você não pode utilizá-la novamente até completar um Descanso Longo. Você também pode recuperar seu uso gastando um espaço de magia de 5º círculo (nenhuma ação é necessária).\n**Aura Amedrontadora.** Sempre que um inimigo inicia o turno dele em sua Aura de Proteção, ele deve ser bem-sucedido em uma salvaguarda de Sabedoria ou tem a condição Amedrontado por 1 minuto, ou até sofrer qualquer dano. Jogadas de ataque contra a criatura Amedrontada têm Vantagem.\n**Voo.** Você cria asas espectrais nas costas e tem um Deslocamento de Voo de 18 metros, além de poder pairar."
+    },
+    {
+      "nivel": 3,
+      "nome": "A Ira da Natureza",
+      "descricao": "Como uma ação Usar Magia, você pode gastar um uso do seu Canalizar Divindade para conjurar videiras espectrais em torno de criaturas próximas. Cada criatura à sua escolha que você possa ver a até 4,5 metros de você deve ser bem-sucedida em uma salvaguarda de Força ou tem a condição Contido por 1 minuto. Uma criatura Contida repete a salvaguarda no final de cada um dos turnos dela, encerrando o efeito em caso de sucesso."
+    },
+    {
+      "nivel": 3,
+      "nome": "Magias do Juramento dos Anciões",
+      "descricao": "A magia do seu juramento garante que você sempre tenha certas magias prontas; quando você atinge um nível de Paladino detalhado na tabela Magias do Juramento dos Anciões, você sempre tem as magias apresentadas preparadas.\n**Magias do Juramento dos Anciões**\n| **Nível de Paladino** | **Magias**                                        |\n|-----------------------|---------------------------------------------------|\n| 3                     | *Falar com Animais, Golpe Constritor*             |\n| 5                     | *Passo Nebuloso, Raio Lunar*                      |\n| 9                     | *Crescimento de Plantas, Proteção contra Energia* |\n| 13                    | *Pele-Rocha, Tempestade Glacial*                  |\n| 17                    | *Comunhão com a Natureza, Passo Arbóreo*          |"
+    },
+    {
+      "nivel": 7,
+      "nome": "Aura de Resistência",
+      "descricao": "Magia antiga repousa tão fortemente em você que forma uma proteção mística, bloqueando a energia que vem de fora do Plano Material; você e seus aliados têm Resistência a dano Necrótico, Psíquico e Radiantes enquanto estiverem em sua Aura de Proteção."
+    },
+    {
+      "nivel": 15,
+      "nome": "Sentinela Imortal",
+      "descricao": "Ao ser reduzido a 0 Pontos de Vida e não morto imediatamente, você fica com 1 Ponto de Vida e recupera um número de Pontos de Vida igual a três vezes o seu nível de Paladino. Após usar essa característica, você não pode utilizá-la novamente até completar um Descanso Longo.\nAlém disso, você não pode envelhecer magicamente e sua aparência não envelhece."
+    },
+    {
+      "nivel": 20,
+      "nome": "Campeão Ancestral",
+      "descricao": "Como uma Ação Bônus, você pode imbuir sua Aura de Proteção com poder sagrado, concedendo os benefícios abaixo por 1 minuto ou até a encerrar (nenhuma ação é necessária). Após usar esta característica, você não pode utilizá-la novamente até completar um Descanso Longo. Você também pode restaurar seu uso gastando um espaço de magia de 5º círculo (nenhuma ação é necessária).\n**Aliviar Desafio.** Inimigos na sua aura têm Desvantagem em salvaguardas contra suas magias e opções de Canalizar Divindade.\n**Magias Ágeis.** Sempre que conjurar uma magia que tenha um tempo de conjuração de uma ação, você pode conjurá-la usando uma Ação Bônus.\n**Regeneração.** No início de cada um dos seus turnos, você recupera 10 Pontos de Vida."
+    }
+  ],
+  "subclasses": [
+    {
+      "nome": "Subclasses de Paladino",
+      "caracteristicas": []
+    },
+    {
+      "nome": "Juramento da Devoção",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Magias do Juramento da Devoção",
+          "descricao": "A magia do seu juramento garante que você sempre tenha certas magias prontas; ao atingir um nível de Paladino detalhado na tabela Magias do Juramento da Devoção, você sempre tem as magias apresentadas preparadas.\n**Magias do Juramento da Devoção**\n| **Nível de Paladino** | **Magias**                                    |\n|-----------------------|-----------------------------------------------|\n| 3                     | *Escudo da Fé, Proteção Contra o Bem e o Mal* |\n| 5                     | *Auxílio, Zona da Verdade*                    |\n| 9                     | *Dissipar Magia, Sinal de Esperança*          |\n| 13                    | *Defensor da Fé, Movimentação Livre*          |\n| 17                    | *Coluna de Chamas, Comunhão*                  |"
+        },
+        {
+          "nivel": 3,
+          "nome": "Arma Sagrada",
+          "descricao": "Ao executar a ação Atacar, você pode gastar um uso de seu Canalizar Divindade para imbuir uma arma Corpo a Corpo que você está empunhando com energia positiva. Por 10 minutos ou até usar essa característica novamente, você adiciona seu modificador de Carisma às jogadas de ataque que realizar com essa arma (bônus mínimo de +1) e, cada vez que atingir com ela, você causa o tipo de dano normal da arma ou dano Radiante.\nAlém disso, a arma também emite Luz Plena em um raio de 6 metros e Meia-luz por mais 6 metros.\nVocê pode encerrar este efeito mais cedo (nenhuma ação é necessária). Este efeito também encerra se você não estiver carregando a arma."
+        },
+        {
+          "nivel": 7,
+          "nome": "Aura de Devoção",
+          "descricao": "Você e seus aliados têm Imunidade à condição Enfeitiçado enquanto estiverem em sua Aura de Proteção. Se um aliado Enfeitiçado entrar na aura, essa condição não tem efeito sobre esse aliado enquanto ele estiver na aura."
+        },
+        {
+          "nivel": 15,
+          "nome": "Destruição Protetora",
+          "descricao": "Sua destruição mágica agora irradia energia protetora. Ao conjurar *Destruição Divina*, você e seus aliados têm Cobertura Parcial enquanto estiverem em sua Aura de Proteção. A aura mantém este benefício até o início do seu próximo turno."
+        },
+        {
+          "nivel": 20,
+          "nome": "Resplendor Sagrado",
+          "descricao": "Como uma Ação Bônus, você pode imbuir sua Aura de Proteção com poder sagrado, concedendo os benefícios abaixo por 10 minutos ou até a encerrar (nenhuma ação é necessária). Após usar esta característica, você não pode utilizá-la novamente até completar um Descanso Longo. Você também pode recuperar seu uso gastando um espaço de magia de 5º círculo (nenhuma ação é necessária).\n**Dano Radiante.** Sempre que um inimigo inicia o turno na sua aura, essa criatura sofre dano Radiante igual ao seu modificador de Carisma mais seu Bônus de Proficiência.\n**Luz Solar.** A aura é preenchida com Luz Plena que é luz solar.\n**Vigília Consagrada.** Você tem Vantagem em qualquer salvaguarda que seja forçado a realizar por um Ínfero ou um Morto-Vivo."
+        }
+      ]
+    },
+    {
+      "nome": "Juramento da Glória",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Atleta Inigualável",
+          "descricao": "Como uma Ação Bônus, você pode gastar um uso do seu Canalizar Divindade para aprimorar seu atletismo. Por 1 hora, você tem Vantagem em testes de Força (Atletismo) e Destreza (Acrobacia), e a distância de seus Saltos Longos e Salto em Altura aumenta em 3 metros (essa distância adicional custa movimento padrão)."
+        },
+        {
+          "nivel": 3,
+          "nome": "Destruição Inspiradora",
+          "descricao": "Imediatamente após conjurar *Destruição Divina*, você pode gastar um uso do seu Canalizar Divindade e distribuir Pontos de Vida Temporários para criaturas à sua escolha a até 9 metros de si, incluindo você. O número total de Pontos de Vida Temporários é igual a 2d8 mais o seu nível de Paladino, dividido entre as criaturas escolhidas, como preferir."
+        },
+        {
+          "nivel": 3,
+          "nome": "Magias do Juramento da Glória",
+          "descricao": "A magia do seu juramento garante que você sempre tenha certas magias prontas; ao atingir um nível de Paladino detalhado na tabela Magias do Juramento da Glória, você sempre tem as magias apresentadas preparadas.\n**Magias de Juramento da Glória**\n| **Nível de Paladino** | **Magias**                                      |\n|-----------------------|-------------------------------------------------|\n| 3                     | *Heroísmo, Raio Guia*                           |\n| 5                     | *Aprimorar Atributo, Arma Mágica*               |\n| 9                     | *Celeridade, Proteção contra Energia*           |\n| 13                    | *Compulsão, Movimentação Livre*                 |\n| 17                    | *Lendas e Histórias, Presença Régia de Yolande* |"
+        },
+        {
+          "nivel": 7,
+          "nome": "Aura de Vivacidade",
+          "descricao": "Seu Deslocamento aumenta em 3 metros.\nAlém disso, sempre que um aliado entra em sua Aura de Proteção pela primeira vez em um turno ou inicia o turno dele na aura, o Deslocamento do aliado aumenta em 3 metros até o final do próximo turno dele."
+        },
+        {
+          "nivel": 15,
+          "nome": "Defesa Gloriosa",
+          "descricao": "Você pode transformar a defesa em um ataque repentino. Quando você ou outra criatura à sua vista a até 3 metros de você é atingida por uma jogada de ataque, você pode executar uma Reação para conceder um bônus à CA do alvo contra esse ataque, fazendo potencialmente com que o ataque erre. O bônus é igual ao seu modificador de Carisma (mínimo de +1). Se o ataque falhar, você pode realizar um ataque com uma arma contra o atacante como parte desta Reação se o atacante estiver no alcance da sua arma.\nVocê pode usar essa característica um número de vezes igual ao seu modificador de Carisma (mínimo de uma vez) e restaura todos os usos gastos ao completar um Descanso Longo."
+        },
+        {
+          "nivel": 20,
+          "nome": "Lenda Viva",
+          "descricao": "Você pode se fortalecer com as lendas — verdadeiras ou exageradas — de seus grandes feitos. Como uma Ação Bônus, você recebe os benefícios abaixo por 10 minutos. Após usar essa característica, você não pode utilizá-la novamente até completar um Descanso Longo. Você também pode recuperar seu uso gastando um espaço de magia de 5º círculo (nenhuma ação é necessária).\n**Carismático.** Você é abençoado com uma presença sobrenatural e tem Vantagem em todos os testes de Carisma.\n**Golpe Infalível.** Uma vez em cada um dos seus turnos, ao realizar uma jogada de ataque com uma arma e errar, você pode fazer com que esse ataque atinja.\n**Jogar Novamente a Salvaguarda.** Se você falhar em uma salvaguarda, pode usar sua Reação para jogá-la novamente. Você deve usar o novo resultado."
+        }
+      ]
+    },
+    {
+      "nome": "Juramento da Vingança",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Magias do Juramento da Vingança",
+          "descricao": "A magia do seu juramento garante que você sempre tenha certas magias prontas; quando você atinge um nível de Paladino detalhado na tabela Magias do Juramento da Vingança, você sempre tem as magias apresentadas preparadas.\n**Magias do Juramento da Vingança**\n| **Nível de Paladino** | **Magias**                            |\n|-----------------------|---------------------------------------|\n| *3*                   | *Marca do Caçador, Perdição*          |\n| *5*                   | *Paralisar Pessoa, Passo Nebuloso*    |\n| *9*                   | *Celeridade, Proteção contra Energia* |\n| *13*                  | *Banimento, Porta Dimensional*        |\n| *17*                  | *Paralisar Monstro, Vidência*         |"
+        },
+        {
+          "nivel": 3,
+          "nome": "Voto de Inimizade",
+          "descricao": "Ao executar a ação Atacar, você pode gastar um uso de seu Canalizar Divindade para proferir um voto de inimizade contra uma criatura à sua vista a até 9 metros de si. Você tem Vantagem em jogadas de ataque contra a criatura por 1 minuto ou até usar essa característica novamente.\nCaso a criatura caia a 0 Pontos de Vida antes do voto terminar, você pode transferir o voto para uma criatura diferente a até 9 metros de você (nenhuma ação é necessária)."
+        },
+        {
+          "nivel": 7,
+          "nome": "Vingador Implacável",
+          "descricao": "Seu foco sobrenatural permite que você evite a retirada de um inimigo. Ao atingir uma criatura com um Ataque de Oportunidade, você pode reduzir o Deslocamento da criatura para 0 até o final do turno atual. Você pode então se mover até metade de seu Deslocamento como parte da mesma Reação. Esse movimento não provoca Ataques de Oportunidade."
+        },
+        {
+          "nivel": 15,
+          "nome": "Alma Vingativa",
+          "descricao": "Imediatamente após uma criatura sob o efeito do seu Voto de Inimizade acertar ou errar com uma jogada de ataque, você pode executar uma Reação para realizar um ataque corpo a corpo contra essa criatura se ela estiver ao seu alcance."
+        },
+        {
+          "nivel": 20,
+          "nome": "Anjo Vingador",
+          "descricao": "Como uma Ação Bônus, você adquire os benefícios abaixo por 10 minutos ou até a encerrar (nenhuma ação é necessária). Após usar esta característica, você não pode utilizá-la novamente até completar um Descanso Longo. Você também pode recuperar seu uso gastando um espaço de magia de 5º círculo (nenhuma ação é necessária).\n**Aura Amedrontadora.** Sempre que um inimigo inicia o turno dele em sua Aura de Proteção, ele deve ser bem-sucedido em uma salvaguarda de Sabedoria ou tem a condição Amedrontado por 1 minuto, ou até sofrer qualquer dano. Jogadas de ataque contra a criatura Amedrontada têm Vantagem.\n**Voo.** Você cria asas espectrais nas costas e tem um Deslocamento de Voo de 18 metros, além de poder pairar."
+        }
+      ]
+    },
+    {
+      "nome": "Juramento dos Anciões",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "A Ira da Natureza",
+          "descricao": "Como uma ação Usar Magia, você pode gastar um uso do seu Canalizar Divindade para conjurar videiras espectrais em torno de criaturas próximas. Cada criatura à sua escolha que você possa ver a até 4,5 metros de você deve ser bem-sucedida em uma salvaguarda de Força ou tem a condição Contido por 1 minuto. Uma criatura Contida repete a salvaguarda no final de cada um dos turnos dela, encerrando o efeito em caso de sucesso."
+        },
+        {
+          "nivel": 3,
+          "nome": "Magias do Juramento dos Anciões",
+          "descricao": "A magia do seu juramento garante que você sempre tenha certas magias prontas; quando você atinge um nível de Paladino detalhado na tabela Magias do Juramento dos Anciões, você sempre tem as magias apresentadas preparadas.\n**Magias do Juramento dos Anciões**\n| **Nível de Paladino** | **Magias**                                        |\n|-----------------------|---------------------------------------------------|\n| 3                     | *Falar com Animais, Golpe Constritor*             |\n| 5                     | *Passo Nebuloso, Raio Lunar*                      |\n| 9                     | *Crescimento de Plantas, Proteção contra Energia* |\n| 13                    | *Pele-Rocha, Tempestade Glacial*                  |\n| 17                    | *Comunhão com a Natureza, Passo Arbóreo*          |"
+        },
+        {
+          "nivel": 7,
+          "nome": "Aura de Resistência",
+          "descricao": "Magia antiga repousa tão fortemente em você que forma uma proteção mística, bloqueando a energia que vem de fora do Plano Material; você e seus aliados têm Resistência a dano Necrótico, Psíquico e Radiantes enquanto estiverem em sua Aura de Proteção."
+        },
+        {
+          "nivel": 15,
+          "nome": "Sentinela Imortal",
+          "descricao": "Ao ser reduzido a 0 Pontos de Vida e não morto imediatamente, você fica com 1 Ponto de Vida e recupera um número de Pontos de Vida igual a três vezes o seu nível de Paladino. Após usar essa característica, você não pode utilizá-la novamente até completar um Descanso Longo.\nAlém disso, você não pode envelhecer magicamente e sua aparência não envelhece."
+        },
+        {
+          "nivel": 20,
+          "nome": "Campeão Ancestral",
+          "descricao": "Como uma Ação Bônus, você pode imbuir sua Aura de Proteção com poder sagrado, concedendo os benefícios abaixo por 1 minuto ou até a encerrar (nenhuma ação é necessária). Após usar esta característica, você não pode utilizá-la novamente até completar um Descanso Longo. Você também pode restaurar seu uso gastando um espaço de magia de 5º círculo (nenhuma ação é necessária).\n**Aliviar Desafio.** Inimigos na sua aura têm Desvantagem em salvaguardas contra suas magias e opções de Canalizar Divindade.\n**Magias Ágeis.** Sempre que conjurar uma magia que tenha um tempo de conjuração de uma ação, você pode conjurá-la usando uma Ação Bônus.\n**Regeneração.** No início de cada um dos seus turnos, você recupera 10 Pontos de Vida."
+        }
+      ]
+    }
+  ],
+  "lista_magias": {
+    "5º Círculo": [
+      "Benção",
+      "Comando",
+      "Curar Ferimentos",
+      "Destruição Cauterizante",
+      "Destruição Colérica",
+      "Destruição Divina",
+      "Destruição Estrondosa",
+      "Detectar Magia",
+      "Detectar o Bem e o Mal",
+      "Detectar Veneno e Doença",
+      "Duelo Compelido",
+      "Escudo da Fé",
+      "Favor Divino",
+      "Heroísmo",
+      "Proteção Contra o Bem e o Mal",
+      "Purificar Alimentos e Bebidas",
+      "Auxílio",
+      "Convocar Montaria",
+      "Repouso Tranquilo",
+      "Restauração Menor",
+      "Localizar Objeto",
+      "Arma Mágica",
+      "Oração de Cura",
+      "Proteção Contra Veneno",
+      "Destruição Radiante",
+      "Vínculo de Proteção",
+      "Zona da Verdade",
+      "Arma Elemental",
+      "Aura de Vitalidade",
+      "Círculo Mágico",
+      "Criar Comida e Água",
+      "Destruição Cegante",
+      "Dissipar Magia",
+      "Luz do Dia",
+      "Manto do Cruzado",
+      "Remover Maldição",
+      "Revivificar",
+      "Aura de Pureza",
+      "Aura de Vida",
+      "Banimento",
+      "Destruição Atordoante",
+      "Localizar Criatura",
+      "Proteção Contra a Morte",
+      "Círculo de Poder",
+      "Convocar Celestial",
+      "Destruição Banidora",
+      "Dissipar o Bem e o Mal",
+      "Missão",
+      "Onda Destrutiva",
+      "Restauração Maior",
+      "Reviver os Mortos"
+    ]
+  },
+  "texto_completo": "**Golpes Potencializados.** Uma vez em cada um dos seus turnos, você pode causar dano adicional a um alvo igual a uma jogada de seu dado de Artes Marciais ao atingi-lo com um Ataque Desarmado. O dano adicional é do mesmo tipo causado por esse ataque.\n\n**Passo Destrutivo.** Ao usar seu Passo do Vento, seu Deslocamento aumenta em 6 metros até o final do turno. Pela duração, qualquer criatura à sua escolha sofre dano igual a uma jogada de seu dado de Artes Marciais quando você entra em um espaço a até 1,5 metro dela. O tipo de dano fica à sua escolha, entre Ácido, Elétrico, Gélido, Ígneo ou Trovejante. Uma criatura pode sofrer esse dano apenas uma vez por turno.\n\n**Resistência a Dano.** Você adquire Resistência a um dos seguintes tipos de dano à sua escolha: Ácido, Elétrico, Gélido, Ígneo ou Trovejante. No início de cada um dos seus turnos, você pode alterar essa escolha.\n\nPaladino\n\nUm Combatente Devotado com Juramentos Sagrados\n\n**Traços Básicos de Paladino**\n\n| **Atributo Primário**           | **Força e Carisma**                                                                                                            |\n|---------------------------------|--------------------------------------------------------------------------------------------------------------------------------|\n| **Dado de Ponto de Vida**       | D10 por nível de Paladino                                                                                                      |\n| **Proficiência em Salvaguarda** | Sabedoria e Carisma                                                                                                            |\n| **Proficiência em Perícias**    | *Escolha 2:* Atletismo, Intimidação, Intuição, Medicina, Persuasão ou Religião.                                                |\n| **Proficiências com Armas**     | Armas Simples e Marciais                                                                                                       |\n| **Treinamento com Armadura**    | Armaduras Leves, Médias, Pesadas e Escudos                                                                                     |\n| **Equipamento Inicial**         | *Escolha A ou B:* (A) Cota de Malha, Escudo, Espada Longa, 6 Azagaias, Símbolo Sagrado, Kit de Sacerdote e 9 PO; ou (B) 150 PO |\n\nOs Paladinos são unidos por seus juramentos de combater as forças da aniquilação e da corrupção. Seja diante do altar de um deus, em uma clareira sagrada diante de espíritos da natureza ou em momentos de desespero e tristeza com os mortos como as únicas testemunhas, o juramento de um Paladino é um vínculo poderoso. Ele transforma um combatente devoto em um campeão abençoado.\n\nPaladinos treinam para dominar armas e armaduras, mas suas habilidades marciais são superadas pelo poder mágico que possuem: curar feridos, punir inimigos e proteger os indefesos e aqueles que lutam ao seu lado.\n\nA vida de um Paladino é, quase por definição, uma vida de aventura, pois eles estão na linha de frente da luta cósmica contra a aniquilação. Guerreiros são raros nos exércitos de um mundo, e ainda menos indivíduos podem reivindicar a vocação de um Paladino. Ao receber esse chamado, essas pessoas abençoadas abandonam suas ocupações anteriores para empunhar armas e magia.\n\n## Tornando-se um Paladino…\n\nComo um Personagem de Nível 1\n\nAdquira todos os traços da tabela Traços Básicos de Paladino.\n\nAdquira as características de nível 1 de Paladino, apresentadas na tabela Características de Paladino.\n\n## Como um Personagem Multiclasse\n\nVocê adquire as seguintes características da tabela Traços Básicos de Paladino: Dado de Ponto de Vida, proficiência com armas Marciais e treinamento com armaduras Leves, Médias e Escudos.\n\nAdquira as características de nível 1 de Paladino, apresentadas na tabela Características de Paladino. Veja também regras de multiclasse no capítulo 2 para determinar seus espaços de magia disponíveis.\n\n## Características de Paladino\n\n|           |                           |                                                |                         |                       | **Espaços de Magia por Círculo de Magia** |       |       |       |       |\n|-----------|---------------------------|------------------------------------------------|-------------------------|-----------------------|-------------------------------------------|-------|-------|-------|-------|\n| **Nível** | **Bônus de Proficiência** | **Características**                            | **Canalizar Divindade** | **Magias Preparadas** | **1**                                     | **2** | **3** | **4** | **5** |\n| 1         | +2                        | Conjuração, Maestria em Arma. Mãos Consagradas | —                       | 2                     | 2                                         | —     | —     | —     | —     |\n| 2         | +2                        | Destruição do Paladino, Estilo de Luta         | —                       | 3                     | 2                                         | —     | —     | —     | —     |\n| 3         | +2                        | Canalizar Divindade, Subclasse de Paladino     | 2                       | 4                     | 3                                         | —     | —     | —     | —     |\n| 4         | +2                        | Aumento no Valor de Atributo                   | 2                       | 5                     | 3                                         | —     | —     | —     | —     |\n| 5         | +3                        | Ataque Extra, Montaria Fiel                    | 2                       | 6                     | 4                                         | 2     | —     | —     | —     |\n| 6         | +3                        | Aura de Proteção                               | 2                       | 6                     | 4                                         | 2     | —     | —     | —     |\n| 7         | +3                        | Característica de Subclasse                    | 2                       | 7                     | 4                                         | 3     | —     | —     | —     |\n| 8         | +3                        | Aumento no Valor de Atributo                   | 2                       | 7                     | 4                                         | 3     | —     | —     | —     |\n| 9         | +4                        | Repudiar Inimigos                              | 2                       | 9                     | 4                                         | 3     | 2     | —     | —     |\n| 10        | +4                        | Aura de Coragem                                | 2                       | 9                     | 4                                         | 3     | 2     | —     | —     |\n| 11        | +4                        | Golpes Radiantes                               | 3                       | 10                    | 4                                         | 3     | 3     | —     | —     |\n| 12        | +4                        | Aumento no Valor de Atributo                   | 3                       | 10                    | 4                                         | 3     | 3     | —     | —     |\n| 13        | +5                        | —                                              | 3                       | 11                    | 4                                         | 3     | 3     | 1     | —     |\n| 14        | +5                        | Toque Restaurador                              | 3                       | 11                    | 4                                         | 3     | 3     | 1     | —     |\n| 15        | +5                        | Característica de Subclasse                    | 3                       | 12                    | 4                                         | 3     | 3     | 2     | —     |\n| 16        | +5                        | Aumento no Valor de Atributo                   | 3                       | 12                    | 4                                         | 3     | 3     | 2     | —     |\n| 17        | +6                        | —                                              | 3                       | 14                    | 4                                         | 3     | 3     | 3     | 1     |\n| 18        | +6                        | Aura Expandida                                 | 3                       | 14                    | 4                                         | 3     | 3     | 3     | 1     |\n| 19        | +6                        | Dádiva Épica                                   | 3                       | 15                    | 4                                         | 3     | 3     | 3     | 2     |\n| 20        | +6                        | Característica de Subclasse                    | 3                       | 15                    | 4                                         | 3     | 3     | 3     | 2     |\n\n## Características de Classe de Paladino\n\nComo Paladino, você recebe as seguintes características de classe ao atingir os níveis especificados de Paladino. Essas características estão apresentadas na tabela Características de Paladino.\n\n### Nível 1: Conjuração\n\nVocê aprendeu a conjurar magias por meio de oração e meditação. Veja o capítulo 7 para as regras sobre conjuração de magias. As informações abaixo detalham como você usa essas regras com as magias de Paladino, explicadas na lista de magias de Paladino mais adiante na descrição da classe.\n\n**Espaços de Magia.** A tabela Características de Paladino mostra quantos espaços de magia você tem para conjurar suas magias de 1º círculo ou superior. Você restaura todos os espaços gastos ao completar um Descanso Longo.\n\n**Magias Preparadas de 1º Círculo ou Superior.** Você prepara a lista de magias de 1º círculo ou superior que estão disponíveis para você conjurar com essa característica. Para começar, escolha duas magias de Paladino de 1º círculo. *Destruição Cauterizante* e *Heroísmo* são recomendadas.\n\nO número de magias em sua lista aumenta à medida que você atinge níveis de Paladino, conforme mostrado na coluna Magias Preparadas da tabela Características de Paladino. Sempre que esse número aumentar, escolha magias adicionais da lista de magias de Paladino até que o número de magias em sua lista corresponda ao número da tabela. As magias escolhidas devem ser de um círculo para o qual você possui espaços de magia. Por exemplo, se você é um Paladino de nível 5, sua lista de magias preparadas pode incluir seis magias de Paladino de 1º ou 2º círculo em qualquer combinação.\n\nSe outra característica de Paladino lhe der magias que você sempre tem preparadas, essas magias não contam para o número de magias que você pode preparar com esta característica, mas essas magias, de outra forma, contam como magias de Paladino para você.\n\n**Mudando Suas Magias Preparadas.** Sempre que completar um Descanso Longo, você pode substituir uma magia em sua lista por outra magia de Paladino para a qual você tem espaços de magia.\n\n**Atributo de Conjuração.** Carisma é seu atributo de conjuração para suas magias de Paladino.\n\n**Foco de Conjuração.** Você pode usar um Símbolo Sagrado como um Foco de Conjuração para suas magias de Paladino.\n\n### Nível 1: Maestria em Arma\n\nSeu treinamento com armas permite que você use as propriedades de maestria de dois tipos de armas à sua escolha com as quais você tem proficiência, como Azagaia e Espadas Longas.\n\nSempre que completar um Descanso Longo, você pode alterar os tipos de armas que escolheu. Por exemplo, você pode mudar para usar as propriedades de maestria de Alabardas e Manguais.\n\n### Nível 1: Mãos Consagradas\n\nSeu toque abençoado pode aliviar feridas. Você tem uma reserva de poder de cura que reabastece ao completar um Descanso Longo. Com essa reserva, você pode recuperar um número total de Pontos de Vida igual a cinco vezes seu nível de Paladino.\n\nComo uma Ação Bônus, você toca uma criatura (que pode ser você mesmo) e extrair poder dessa reserva de cura para restaurar um número de Pontos de Vida para essa criatura, até o valor máximo restante na reserva.\n\nVocê também pode gastar 5 Pontos de Vida dessa reserva de poder de cura para remover a condição Envenenado da criatura; esses pontos não restauram Pontos de Vida da criatura.\n\n### Nível 2: Destruição do Paladino\n\nVocê sempre tem a magia *Destruição Divina* preparada. Além disso, você pode conjurá-la sem gastar um espaço de magia, não podendo conjurá-la dessa forma novamente antes de completar um Descanso Longo\n\n### Nível 2: Estilo de Luta\n\nVocê adquire um talento Estilo de Luta à sua escolha (veja também o capítulo 5). Em vez de escolher um desses talentos, você pode escolher a opção abaixo.\n\n**Combatente Abençoado.** Você aprende dois truques de Clérigo à sua escolha. *Chama Sagrada* e *Orientação* são recomendados. Os truques escolhidos contam como magias de Paladino para você, e Carisma é o atributo de conjuração para elas. Sempre que você atinge um nível de Paladino, pode substituir um desses truques por outro truque de Clérigo.\n\n### Nível 3: Canalizar Divindade\n\nVocê pode canalizar energia divina diretamente dos Planos Externos, usando-a para causar efeitos mágicos. Você começa com um desses efeitos: Sentido Divino, descrito abaixo. Outras características de Paladino dão opções adicionais de efeito de Canalizar Divindade. Cada vez que você usa Canalizar Divindade desta classe, você escolhe qual efeito desta classe usar.\n\nVocê pode usar Canalizar Divindade desta classe duas vezes e três vezes a partir do nível 11 de Paladino. Você recupera um uso gasto ao completar um Descanso Curto, e restaura todos os usos gastos ao completar um Descanso Longo.\n\nSe um efeito de Canalizar Divindade exigir uma salvaguarda, a CD é igual a CD para evitar magias da característica Conjuração desta classe.\n\n**Sentido Divino.** Como uma Ação Bônus, você pode abrir sua consciência para detectar Celestiais, Ínferos e Mortos-Vivos. Pelos próximos 10 minutos ou até você ter a condição Incapacitado, você sabe a localização de qualquer criatura desse tipo a até 18 metros de você e conhece o tipo de criatura. Dentro do mesmo raio, você também detecta a presença de qualquer lugar ou objeto que tenha sido consagrado ou profanado, como na magia *Consagrar.*\n\n### Nível 3: Subclasse de Paladino\n\nVocê adquire uma subclasse de Paladino à sua escolha.As subclasses Juramento da Devoção, Juramento da Glória, Juramento de Vingança e Juramento dos Anciões estão detalhadas após a descrição desta classe. Uma subclasse é uma especialidade que lhe concede características em determinados níveis de Paladino. Durante toda sua jornada, você recebe cada uma das características de sua subclasse de seu nível de Paladino ou menor.\n\n**Quebrando Seu Juramento**\n\nUm Paladino busca manter os mais altos padrões de conduta, mas até os mais dedicados podem falhar. Às vezes, um Paladino transgride seu juramento.\n\nAo quebrar um voto, um Paladino geralmente busca absolvição, passando a noite em vigília como sinal de penitência ou realizando um jejum. Após um rito de perdão, o Paladino retoma seu caminho.\n\nSe o seu Paladino violar o juramento sem arrependimento, converse com seu Mestre. Nesse caso, o seu Paladino pode precisar escolher uma subclasse mais adequada ou até abandonar a classe em favor de outra.\n\n### Nível 4: Aumento no Valor de Atributo\n\nVocê adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 8, 12 e 16 de Paladino.\n\n### Nível 5: Ataque Extra\n\nVocê pode atacar duas vezes, em vez de uma, sempre que executar a ação Atacar no seu turno.\n\n### Nível 5: Montaria Fiel\n\nVocê pode pedir auxílio de uma montaria sobrenatural. Você sempre tem a magia *Convocar Montaria* preparada.\n\nVocê também pode conjurar a magia uma vez sem gastar um espaço de magia, e restaura a capacidade de fazê-lo ao completar um Descanso Longo.\n\n### Nível 6: Aura de Proteção\n\nVocê irradia uma aura protetora e invisível em uma Emanação de 3 metros que se origina em você. A aura fica inativa em você, caso tenha a condição Incapacitado.\n\nVocê e seus aliados na aura adquirem um bônus em salvaguardas igual ao seu modificador de Carisma (bônus mínimo de +1).\n\nSe outro Paladino estiver presente, uma criatura pode se beneficiar de apenas uma Aura de Proteção de cada vez; a criatura escolhe qual aura recebe enquanto estiver nela.\n\n### Nível 9: Repudiar Inimigos\n\nComo uma ação Usar Magia, você pode fazer um uso de Canalizar Divindade para subjugar inimigos com temor. Ao apresentar seu Símbolo Sagrado ou arma, você pode escolher um número de criaturas igual ao seu modificador de Carisma (no mínimo uma criatura) à sua vista e a até 18 metros de você. Cada alvo deve ser bem-sucedido em uma salvaguarda de Sabedoria ou tem a condição Amedrontado por 1 minuto ou até sofrer qualquer dano. Enquanto Amedrontado deste modo, um alvo pode realizar apenas uma das opções seguintes nos turnos dele: mover-se, executar uma ação ou executar uma Ação Bônus.\n\n### Nível 10: Aura de Coragem\n\nVocê e seus aliados têm Imunidade à condição Amedrontado enquanto estiverem em sua Aura de Proteção. Se um aliado Amedrontado entrar na aura, essa condição não tem efeito sobre esse aliado enquanto ele estiver na aura.\n\n### Nível 11: Golpes Radiantes\n\nSeus golpes agora imbuem poder sobrenatural. Ao atingir alvo com uma jogada de ataque usando uma arma Corpo a Corpo ou um Ataque Desarmado, o alvo sofre 1d8 pontos de dano Radiante adicionais.\n\n### Nível 14: Toque Restaurador\n\nAo usar Mãos Consagradas em uma criatura, você também pode remover uma ou mais das seguintes condições da criatura: Amedrontado, Atordoado, Cego, Enfeitiçado, Paralisado ou Surdo. Você deve gastar 5 Pontos de Vida da reserva de cura de Mãos Consagradas para cada uma dessas condições que deseja remover; esses pontos não restauram Pontos de Vida para a criatura.\n\n### Nível 18: Aura Expandida\n\nSua Aura de Proteção agora é uma Emanação de 9 metros.\n\n### Nível 19: Dádiva Épica\n\nVocê adquire o talento Dádiva Épica (veja o capítulo 5) ou outro talento à sua escolha para o qual se qualifica. Dádiva da Visão Verdadeira é recomendada.\n\n## Lista de Magias de Paladino\n\nEsta seção apresenta a lista de magias de Paladino, organizadas por círculo de magia e em ordem alfabética, com suas respectivas escolas de magias. Na coluna Especial, *C* indica que a magia requer Concentração, *R* que é um Ritual e *M* que necessita de um componente Material específico.\n\n**Magias de Paladino de 1º Círculo**\n\n| **Magia**                       | **Escola**   | **Especial** |\n|---------------------------------|--------------|--------------|\n| *Benção*                        | Encantamento | C, M         |\n| *Comando*                       | Encantamento | —            |\n| *Curar Ferimentos*              | Abjuração    | —            |\n| *Destruição Cauterizante*       | Evocação     | —            |\n| *Destruição Colérica*           | Necromancia  | —            |\n| *Destruição Divina*             | Evocação     | —            |\n| *Destruição Estrondosa*         | Evocação     | —            |\n| *Detectar Magia*                | Adivinhação  | C, R         |\n| *Detectar o Bem e o Mal*        | Adivinhação  | C            |\n| *Detectar Veneno e Doença*      | Adivinhação  | C, R         |\n| *Duelo Compelido*               | Encantamento | C            |\n| *Escudo da Fé*                  | Abjuração    | C            |\n| *Favor Divino*                  | Evocação     | —            |\n| *Heroísmo*                      | Encantamento | C            |\n| *Proteção Contra o Bem e o Mal* | Abjuração    | C, M         |\n| *Purificar Alimentos e Bebidas* | Transmutação | R            |\n\n**Magias de Paladino de 2º Círculo**\n\n| **Magia**                | **Escola**   | **Especial** |\n|--------------------------|--------------|--------------|\n| *Auxílio*                | Abjuração    | —            |\n| *Convocar Montaria*      | Invocação    | —            |\n| *Repouso Tranquilo*      | Necromancia  | R, M         |\n| *Restauração Menor*      | Abjuração    | —            |\n| *Localizar Objeto*       | Adivinhação  | C            |\n| *Arma Mágica*            | Transmutação | —            |\n| *Oração de Cura*         | Abjuração    | —            |\n| *Proteção Contra Veneno* | Abjuração    | —            |\n| *Destruição Radiante*    | Transmutação | C            |\n| *Vínculo de Proteção*    | Abjuração    | M            |\n| *Zona da Verdade*        | Encantamento | —            |\n\n**Magias de Paladino de 3º Círculo**\n\n| **Magia**             | **Escola**   | **Especial** |\n|-----------------------|--------------|--------------|\n| *Arma Elemental*      | Transmutação | C            |\n| *Aura de Vitalidade*  | Abjuração    | C            |\n| *Círculo Mágico*      | Abjuração    | M            |\n| *Criar Comida e Água* | Invocação    | —            |\n| *Destruição Cegante*  | Evocação     | —            |\n| *Dissipar Magia*      | Abjuração    | —            |\n| *Luz do Dia*          | Evocação     | —            |\n| *Manto do Cruzado*    | Transmutação | C            |\n| *Remover Maldição*    | Abjuração    | —            |\n| *Revivificar*         | Necromancia  | M            |\n\n**Magias de Paladino de 4º Círculo**\n\n| **Magia**                 | **Escola**   | **Especial** |\n|---------------------------|--------------|--------------|\n| *Aura de Pureza*          | Abjuração    | C            |\n| *Aura de Vida*            | Abjuração    | C            |\n| *Banimento*               | Abjuração    | C            |\n| *Destruição Atordoante*   | Encantamento | —            |\n| *Localizar Criatura*      | Adivinhação  | C            |\n| *Proteção Contra a Morte* | Abjuração    | —            |\n\n**Magias de Paladino de 5º Círculo**\n\n| **Magia**                | **Escola**   | **Especial** |\n|--------------------------|--------------|--------------|\n| *Círculo de Poder*       | Abjuração    | C            |\n| *Convocar Celestial*     | Invocação    | C, M         |\n| *Destruição Banidora*    | Invocação    | C            |\n| *Dissipar o Bem e o Mal* | Abjuração    | C            |\n| *Missão*                 | Encantamento | —            |\n| *Onda Destrutiva*        | Evocação     | —            |\n| *Restauração Maior*      | Abjuração    | M            |\n| *Reviver os Mortos*      | Necromancia  | M            |\n\n## Subclasses de Paladino\n\nUma subclasse de Paladino é uma especialização que concede características em certos níveis de Paladino, conforme detalhado na subclasse. Esta seção apresenta as subclasses Juramento da Devoção, Juramento da Glória, Juramento de Vingança e Juramento dos Anciões.\n\nCada subclasse representa um conjunto de juramentos que um Paladino assume ao adquirir a classe. O juramento final, realizado no nível 3, é o ápice do seu treinamento. Alguns personagens não se consideram verdadeiros Paladinos até fazerem esse juramento, enquanto para outros ele é apenas uma formalidade, confirmando o que já sentem no coração.\n\n## Juramento da Devoção\n\n*Defenda os Ideais da Justiça e da Ordem*\n\nO Juramento da Devoção conecta os Paladinos aos ideais de justiça e ordem, representando o arquétipo do cavaleiro de armadura brilhante. Eles seguem elevados padrões de conduta e, para melhor ou pior, tentam impor esses padrões ao restante do mundo.\n\nMuitos que fazem esse juramento são devotos dos deuses da ordem e do bem, usando seus princípios como medida de devoção pessoal. Outros têm anjos como ideais, incorporando imagens de asas em seus capacetes ou brasões.\n\nEsses Paladinos compartilham os seguintes princípios:\n\n-   Deixe sua palavra ser sua garantia.\n-   Proteja os fracos e nunca tenha medo de agir.\n-   Deixe seus atos de honra serem um exemplo.\n\n### Nível 3: Magias do Juramento da Devoção\n\nA magia do seu juramento garante que você sempre tenha certas magias prontas; ao atingir um nível de Paladino detalhado na tabela Magias do Juramento da Devoção, você sempre tem as magias apresentadas preparadas.\n\n**Magias do Juramento da Devoção**\n\n| **Nível de Paladino** | **Magias**                                    |\n|-----------------------|-----------------------------------------------|\n| 3                     | *Escudo da Fé, Proteção Contra o Bem e o Mal* |\n| 5                     | *Auxílio, Zona da Verdade*                    |\n| 9                     | *Dissipar Magia, Sinal de Esperança*          |\n| 13                    | *Defensor da Fé, Movimentação Livre*          |\n| 17                    | *Coluna de Chamas, Comunhão*                  |\n\n### Nível 3: Arma Sagrada\n\nAo executar a ação Atacar, você pode gastar um uso de seu Canalizar Divindade para imbuir uma arma Corpo a Corpo que você está empunhando com energia positiva. Por 10 minutos ou até usar essa característica novamente, você adiciona seu modificador de Carisma às jogadas de ataque que realizar com essa arma (bônus mínimo de +1) e, cada vez que atingir com ela, você causa o tipo de dano normal da arma ou dano Radiante.\n\nAlém disso, a arma também emite Luz Plena em um raio de 6 metros e Meia-luz por mais 6 metros.\n\nVocê pode encerrar este efeito mais cedo (nenhuma ação é necessária). Este efeito também encerra se você não estiver carregando a arma.\n\n### Nível 7: Aura de Devoção\n\nVocê e seus aliados têm Imunidade à condição Enfeitiçado enquanto estiverem em sua Aura de Proteção. Se um aliado Enfeitiçado entrar na aura, essa condição não tem efeito sobre esse aliado enquanto ele estiver na aura.\n\n### Nível 15: Destruição Protetora\n\nSua destruição mágica agora irradia energia protetora. Ao conjurar *Destruição Divina*, você e seus aliados têm Cobertura Parcial enquanto estiverem em sua Aura de Proteção. A aura mantém este benefício até o início do seu próximo turno.\n\n### Nível 20: Resplendor Sagrado\n\nComo uma Ação Bônus, você pode imbuir sua Aura de Proteção com poder sagrado, concedendo os benefícios abaixo por 10 minutos ou até a encerrar (nenhuma ação é necessária). Após usar esta característica, você não pode utilizá-la novamente até completar um Descanso Longo. Você também pode recuperar seu uso gastando um espaço de magia de 5º círculo (nenhuma ação é necessária).\n\n**Dano Radiante.** Sempre que um inimigo inicia o turno na sua aura, essa criatura sofre dano Radiante igual ao seu modificador de Carisma mais seu Bônus de Proficiência.\n\n**Luz Solar.** A aura é preenchida com Luz Plena que é luz solar.\n\n**Vigília Consagrada.** Você tem Vantagem em qualquer salvaguarda que seja forçado a realizar por um Ínfero ou um Morto-Vivo.\n\n## Juramento da Glória\n\n*Aspire às Alturas do Heroísmo*\n\nOs paladinos que fazem o Juramento de Glória acreditam que eles e seus companheiros estão destinados à glória por meio de atos heroicos. Treinam com afinco e encorajam seus companheiros, sempre prontos para atender ao chamado do destino.\n\nEsses Paladinos compartilham os seguintes princípios:\n\n-   Esforce-se para ser conhecido por seus atos.\n-   Enfrente as dificuldades com coragem.\n-   Inspire os outros a buscar a glória.\n\n### Nível 3: Atleta Inigualável\n\nComo uma Ação Bônus, você pode gastar um uso do seu Canalizar Divindade para aprimorar seu atletismo. Por 1 hora, você tem Vantagem em testes de Força (Atletismo) e Destreza (Acrobacia), e a distância de seus Saltos Longos e Salto em Altura aumenta em 3 metros (essa distância adicional custa movimento padrão).\n\n### Nível 3: Destruição Inspiradora\n\nImediatamente após conjurar *Destruição Divina*, você pode gastar um uso do seu Canalizar Divindade e distribuir Pontos de Vida Temporários para criaturas à sua escolha a até 9 metros de si, incluindo você. O número total de Pontos de Vida Temporários é igual a 2d8 mais o seu nível de Paladino, dividido entre as criaturas escolhidas, como preferir.\n\n### Nível 3: Magias do Juramento da Glória\n\nA magia do seu juramento garante que você sempre tenha certas magias prontas; ao atingir um nível de Paladino detalhado na tabela Magias do Juramento da Glória, você sempre tem as magias apresentadas preparadas.\n\n**Magias de Juramento da Glória**\n\n| **Nível de Paladino** | **Magias**                                      |\n|-----------------------|-------------------------------------------------|\n| 3                     | *Heroísmo, Raio Guia*                           |\n| 5                     | *Aprimorar Atributo, Arma Mágica*               |\n| 9                     | *Celeridade, Proteção contra Energia*           |\n| 13                    | *Compulsão, Movimentação Livre*                 |\n| 17                    | *Lendas e Histórias, Presença Régia de Yolande* |\n\n### Nível 7: Aura de Vivacidade\n\nSeu Deslocamento aumenta em 3 metros.\n\nAlém disso, sempre que um aliado entra em sua Aura de Proteção pela primeira vez em um turno ou inicia o turno dele na aura, o Deslocamento do aliado aumenta em 3 metros até o final do próximo turno dele.\n\n### Nível 15: Defesa Gloriosa\n\nVocê pode transformar a defesa em um ataque repentino. Quando você ou outra criatura à sua vista a até 3 metros de você é atingida por uma jogada de ataque, você pode executar uma Reação para conceder um bônus à CA do alvo contra esse ataque, fazendo potencialmente com que o ataque erre. O bônus é igual ao seu modificador de Carisma (mínimo de +1). Se o ataque falhar, você pode realizar um ataque com uma arma contra o atacante como parte desta Reação se o atacante estiver no alcance da sua arma.\n\nVocê pode usar essa característica um número de vezes igual ao seu modificador de Carisma (mínimo de uma vez) e restaura todos os usos gastos ao completar um Descanso Longo.\n\n### Nível 20: Lenda Viva\n\nVocê pode se fortalecer com as lendas — verdadeiras ou exageradas — de seus grandes feitos. Como uma Ação Bônus, você recebe os benefícios abaixo por 10 minutos. Após usar essa característica, você não pode utilizá-la novamente até completar um Descanso Longo. Você também pode recuperar seu uso gastando um espaço de magia de 5º círculo (nenhuma ação é necessária).\n\n**Carismático.** Você é abençoado com uma presença sobrenatural e tem Vantagem em todos os testes de Carisma.\n\n**Golpe Infalível.** Uma vez em cada um dos seus turnos, ao realizar uma jogada de ataque com uma arma e errar, você pode fazer com que esse ataque atinja.\n\n**Jogar Novamente a Salvaguarda.** Se você falhar em uma salvaguarda, pode usar sua Reação para jogá-la novamente. Você deve usar o novo resultado.\n\n## Juramento da Vingança\n\n*Puna os Malfeitores a Qualquer Custo*\n\nO Juramento de Vingança é um compromisso solene de punir quem comete graves atos imorais. Paladinos levantam-se para corrigir as injustiças em momentos de massacres de aldeões indefesos por exércitos malignos, tiranos que desafiam a vontade dos deuses, guildas de ladrões que se tornam violentas demais ou a invasão de dragões no campo.\n\nEsses Paladinos compartilham os seguintes princípios:\n\n-   Não mostre misericórdia aos ímpios.\n-   Combata a injustiça e suas causas.\n-   Ajude os vitimados pela injustiça.\n\n### Nível 3: Magias do Juramento da Vingança\n\nA magia do seu juramento garante que você sempre tenha certas magias prontas; quando você atinge um nível de Paladino detalhado na tabela Magias do Juramento da Vingança, você sempre tem as magias apresentadas preparadas.\n\n**Magias do Juramento da Vingança**\n\n| **Nível de Paladino** | **Magias**                            |\n|-----------------------|---------------------------------------|\n| *3*                   | *Marca do Caçador, Perdição*          |\n| *5*                   | *Paralisar Pessoa, Passo Nebuloso*    |\n| *9*                   | *Celeridade, Proteção contra Energia* |\n| *13*                  | *Banimento, Porta Dimensional*        |\n| *17*                  | *Paralisar Monstro, Vidência*         |\n\n### Nível 3: Voto de Inimizade\n\nAo executar a ação Atacar, você pode gastar um uso de seu Canalizar Divindade para proferir um voto de inimizade contra uma criatura à sua vista a até 9 metros de si. Você tem Vantagem em jogadas de ataque contra a criatura por 1 minuto ou até usar essa característica novamente.\n\nCaso a criatura caia a 0 Pontos de Vida antes do voto terminar, você pode transferir o voto para uma criatura diferente a até 9 metros de você (nenhuma ação é necessária).\n\n### Nível 7: Vingador Implacável\n\nSeu foco sobrenatural permite que você evite a retirada de um inimigo. Ao atingir uma criatura com um Ataque de Oportunidade, você pode reduzir o Deslocamento da criatura para 0 até o final do turno atual. Você pode então se mover até metade de seu Deslocamento como parte da mesma Reação. Esse movimento não provoca Ataques de Oportunidade.\n\n### Nível 15: Alma Vingativa\n\nImediatamente após uma criatura sob o efeito do seu Voto de Inimizade acertar ou errar com uma jogada de ataque, você pode executar uma Reação para realizar um ataque corpo a corpo contra essa criatura se ela estiver ao seu alcance.\n\n### Nível 20: Anjo Vingador\n\nComo uma Ação Bônus, você adquire os benefícios abaixo por 10 minutos ou até a encerrar (nenhuma ação é necessária). Após usar esta característica, você não pode utilizá-la novamente até completar um Descanso Longo. Você também pode recuperar seu uso gastando um espaço de magia de 5º círculo (nenhuma ação é necessária).\n\n**Aura Amedrontadora.** Sempre que um inimigo inicia o turno dele em sua Aura de Proteção, ele deve ser bem-sucedido em uma salvaguarda de Sabedoria ou tem a condição Amedrontado por 1 minuto, ou até sofrer qualquer dano. Jogadas de ataque contra a criatura Amedrontada têm Vantagem.\n\n**Voo.** Você cria asas espectrais nas costas e tem um Deslocamento de Voo de 18 metros, além de poder pairar.\n\n## Juramento dos Anciões\n\n*Preserve a Vida e a Luz no Mundo*\n\nO Juramento dos Anciões remonta aos primeiros elfos. Os Paladinos que o assumem, valorizam a luz e as belezas vivificantes do mundo mais do que princípios de honra, coragem e justiça. Para refletir seu compromisso com a preservação da vida e da luz, costumam adornar suas armaduras e roupas com imagens de elementos em crescimento, como folhas, chifres ou flores.\n\nEsses Paladinos compartilham os seguintes princípios:\n\n-   Acenda a luz da esperança.\n-   Proteja a vida.\n-   Encante-se com a arte e a alegria.\n\n### Nível 3: A Ira da Natureza\n\nComo uma ação Usar Magia, você pode gastar um uso do seu Canalizar Divindade para conjurar videiras espectrais em torno de criaturas próximas. Cada criatura à sua escolha que você possa ver a até 4,5 metros de você deve ser bem-sucedida em uma salvaguarda de Força ou tem a condição Contido por 1 minuto. Uma criatura Contida repete a salvaguarda no final de cada um dos turnos dela, encerrando o efeito em caso de sucesso.\n\n### Nível 3: Magias do Juramento dos Anciões\n\nA magia do seu juramento garante que você sempre tenha certas magias prontas; quando você atinge um nível de Paladino detalhado na tabela Magias do Juramento dos Anciões, você sempre tem as magias apresentadas preparadas.\n\n**Magias do Juramento dos Anciões**\n\n| **Nível de Paladino** | **Magias**                                        |\n|-----------------------|---------------------------------------------------|\n| 3                     | *Falar com Animais, Golpe Constritor*             |\n| 5                     | *Passo Nebuloso, Raio Lunar*                      |\n| 9                     | *Crescimento de Plantas, Proteção contra Energia* |\n| 13                    | *Pele-Rocha, Tempestade Glacial*                  |\n| 17                    | *Comunhão com a Natureza, Passo Arbóreo*          |\n\n### Nível 7: Aura de Resistência\n\nMagia antiga repousa tão fortemente em você que forma uma proteção mística, bloqueando a energia que vem de fora do Plano Material; você e seus aliados têm Resistência a dano Necrótico, Psíquico e Radiantes enquanto estiverem em sua Aura de Proteção.\n\n### Nível 15: Sentinela Imortal\n\nAo ser reduzido a 0 Pontos de Vida e não morto imediatamente, você fica com 1 Ponto de Vida e recupera um número de Pontos de Vida igual a três vezes o seu nível de Paladino. Após usar essa característica, você não pode utilizá-la novamente até completar um Descanso Longo.\n\nAlém disso, você não pode envelhecer magicamente e sua aparência não envelhece.\n\n### Nível 20: Campeão Ancestral\n\nComo uma Ação Bônus, você pode imbuir sua Aura de Proteção com poder sagrado, concedendo os benefícios abaixo por 1 minuto ou até a encerrar (nenhuma ação é necessária). Após usar esta característica, você não pode utilizá-la novamente até completar um Descanso Longo. Você também pode restaurar seu uso gastando um espaço de magia de 5º círculo (nenhuma ação é necessária).\n\n**Aliviar Desafio.** Inimigos na sua aura têm Desvantagem em salvaguardas contra suas magias e opções de Canalizar Divindade.\n\n**Magias Ágeis.** Sempre que conjurar uma magia que tenha um tempo de conjuração de uma ação, você pode conjurá-la usando uma Ação Bônus.\n\n**Regeneração.** No início de cada um dos seus turnos, você recupera 10 Pontos de Vida."
+}

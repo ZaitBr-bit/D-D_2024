@@ -1,0 +1,81 @@
+{
+  "titulo": "D&D 5.5 - Livro do Jogador (2024)",
+  "versao": "4ª Edição, 18 de Abril de 2025",
+  "total_linhas": 21811,
+  "capitulos": [
+    {
+      "numero": 1,
+      "titulo": "Jogando o Jogo",
+      "arquivo": "capitulo1_regras.json"
+    },
+    {
+      "numero": 2,
+      "titulo": "Criação de Personagens",
+      "arquivo": "capitulo2_criacao.json"
+    },
+    {
+      "numero": 3,
+      "titulo": "Classes de Personagem",
+      "arquivo": "classes/"
+    },
+    {
+      "numero": 4,
+      "titulo": "Origens dos Personagens",
+      "arquivo": "origens/"
+    },
+    {
+      "numero": 5,
+      "titulo": "Talentos",
+      "arquivo": "talentos/talentos.json"
+    },
+    {
+      "numero": 6,
+      "titulo": "Equipamento",
+      "arquivo": "equipamento/"
+    },
+    {
+      "numero": 7,
+      "titulo": "Magias",
+      "arquivo": "magias/"
+    }
+  ],
+  "apendices": [
+    {
+      "id": "A",
+      "titulo": "O Multiverso",
+      "arquivo": "apendices/multiverso.json"
+    },
+    {
+      "id": "B",
+      "titulo": "Blocos de Estatísticas de Criaturas",
+      "arquivo": "apendices/criaturas.json"
+    },
+    {
+      "id": "C",
+      "titulo": "Glossário de Regras",
+      "arquivo": "apendices/glossario.json"
+    }
+  ],
+  "estrutura_arquivos": {
+    "capitulo1_regras.json": "Regras básicas do jogo",
+    "capitulo2_criacao.json": "Passo a passo para criar personagens",
+    "classes/": "Uma JSON por classe com traços, características, subclasses e lista de magias",
+    "classes/magias_*.json": "Lista de magias disponíveis por classe conjuradora",
+    "origens/antecedentes.json": "Os 16 antecedentes com atributos, talentos e proficiências",
+    "origens/especies.json": "As 10 espécies com traços raciais",
+    "talentos/talentos.json": "Todos os talentos organizados por categoria",
+    "equipamento/armas.json": "Todas as armas com dano, propriedades e maestrias",
+    "equipamento/armaduras.json": "Armaduras com CA e requisitos",
+    "equipamento/ferramentas.json": "Ferramentas de artesão e outros kits",
+    "equipamento/equipamento_aventura.json": "Itens de aventura com custo e peso",
+    "equipamento/montarias_veiculos.json": "Montarias e veículos",
+    "equipamento/servicos.json": "Serviços disponíveis",
+    "magias/truques.json": "Magias de 0 Círculo (truques)",
+    "magias/circulo_1.json a circulo_9.json": "Magias organizadas por círculo",
+    "magias/_indice.json": "Índice completo de todas as magias",
+    "magias/por_classe/": "Magias filtradas por classe conjuradora",
+    "apendices/criaturas.json": "Blocos de estatísticas de criaturas",
+    "apendices/multiverso.json": "Informações sobre o multiverso de D&D",
+    "apendices/glossario.json": "Glossário completo de termos de regras"
+  }
+}

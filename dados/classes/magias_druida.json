@@ -1,0 +1,700 @@
+{
+  "classe": "Druida",
+  "lista_magias": {
+    "Truques": [
+      {
+        "nome": "Acudir os Moribundos",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Arte Druídica",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Bordão Místico",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Chicote de Espinhos",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Criar Chamas",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Elementalismo",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Fagulha Estelar",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Mensagem",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Orientação",
+        "escola": "Adivinhação",
+        "especial": "C"
+      },
+      {
+        "nome": "Rajada de Veneno",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Reparar",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Resistência",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Trovão",
+        "escola": "Evocação",
+        "especial": "—"
+      }
+    ],
+    "1º Círculo": [
+      {
+        "nome": "Amizade Animal",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Bom Fruto",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Criar ou Destruir Água",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Curar Ferimentos",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Detectar Magia",
+        "escola": "Adivinhação",
+        "especial": "C, R"
+      },
+      {
+        "nome": "Detectar Veneno e Doença",
+        "escola": "Adivinhação",
+        "especial": "C, R"
+      },
+      {
+        "nome": "Emaranhar",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Enfeitiçar Pessoa",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Faca de Gelo",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Falar com Animais",
+        "escola": "Adivinhação",
+        "especial": "R"
+      },
+      {
+        "nome": "Fogo das Fadas",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Névoa Obscurecente",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Onda Trovejante",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Palavra Curativa",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Passos Largos",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Proteção Contra o Bem e o Mal",
+        "escola": "Abjuração",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Purificar Alimentos e Bebidas",
+        "escola": "Transmutação",
+        "especial": "R"
+      },
+      {
+        "nome": "Salto",
+        "escola": "Transmutação",
+        "especial": "—"
+      }
+    ],
+    "2º Círculo": [
+      {
+        "nome": "Aprimorar Atributo",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Augúrio",
+        "escola": "Adivinhação",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Aumentar/Reduzir",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Auxílio",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Chama Contínua",
+        "escola": "Evocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Crescer Espinhos",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Encontrar Armadilhas",
+        "escola": "Adivinhação",
+        "especial": "—"
+      },
+      {
+        "nome": "Esfera Flamejante",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Esquentar Metal",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Invocar Fera",
+        "escola": "Invocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Lâmina Flamejante",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Localizar Animais ou Plantas",
+        "escola": "Adivinhação",
+        "especial": "R"
+      },
+      {
+        "nome": "Localizar Objeto",
+        "escola": "Adivinhação",
+        "especial": "C"
+      },
+      {
+        "nome": "Lufada de Vento",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Mensageiro Animal",
+        "escola": "Encantamento",
+        "especial": "R"
+      },
+      {
+        "nome": "Paralisar Pessoa",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Passo Sem Rastro",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Pele-Casca",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Proteção Contra Veneno",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Raio Lunar",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Restauração Menor",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Sentido Feral",
+        "escola": "Adivinhação",
+        "especial": "C, R"
+      },
+      {
+        "nome": "Visão no Escuro",
+        "escola": "Transmutação",
+        "especial": "—"
+      }
+    ],
+    "3º Círculo": [
+      {
+        "nome": "Arma Elemental",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Aura de Vitalidade",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Caminhar Sobre as Águas",
+        "escola": "Transmutação",
+        "especial": "R"
+      },
+      {
+        "nome": "Convocar Feérico",
+        "escola": "Invocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Convocar Relâmpagos",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Crescimento de Plantas",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Dissipar Magia",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Falar com Plantas",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Invocar Animais",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Luz do Dia",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Mesclar-se às Rochas",
+        "escola": "Transmutação",
+        "especial": "R"
+      },
+      {
+        "nome": "Muralha de Vento",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Nevasca",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Proteção Contra Energia",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Respirar na Água",
+        "escola": "Transmutação",
+        "especial": "R"
+      },
+      {
+        "nome": "Revivificar",
+        "escola": "Necromancia",
+        "especial": "M"
+      },
+      {
+        "nome": "Simular Morte",
+        "escola": "Necromancia",
+        "especial": "R"
+      }
+    ],
+    "4º Círculo": [
+      {
+        "nome": "Confusão",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Controlar Água",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Convocar Elemental",
+        "escola": "Invocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Dominar Fera",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Enfeitiçar Monstro",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Escudo Ardente",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Fonte do Luar",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Inseto Gigante",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Invocar Elementais Menores",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Invocar Seres da Floresta",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Localizar Criatura",
+        "escola": "Adivinhação",
+        "especial": "C"
+      },
+      {
+        "nome": "Malogro",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Moldar Rochas",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Movimentação Livre",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Muralha de Fogo",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Pele-Rocha",
+        "escola": "Transmutação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Polimorfia",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Presságio",
+        "escola": "Adivinhação",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Tempestade Glacial",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Terreno Alucinatório",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Vinha Agarradora",
+        "escola": "Invocação",
+        "especial": "C"
+      }
+    ],
+    "5º Círculo": [
+      {
+        "nome": "Âncora Planar",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Comunhão com a Natureza",
+        "escola": "Adivinhação",
+        "especial": "R"
+      },
+      {
+        "nome": "De Carne para Pedra",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Cone de Frio",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Contágio",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Cúpula Antivida",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Curar Ferimentos em Massa",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Despertar",
+        "escola": "Transmutação",
+        "especial": "M"
+      },
+      {
+        "nome": "Invocar Elemental",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Missão",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Muralha de Pedra",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Passo Arbóreo",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Praga de Insetos",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Reencarnar",
+        "escola": "Necromancia",
+        "especial": "M"
+      },
+      {
+        "nome": "Restauração Maior",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Vidência",
+        "escola": "Adivinhação",
+        "especial": "C, M"
+      }
+    ],
+    "6º Círculo": [
+      {
+        "nome": "Banquete de Heróis",
+        "escola": "Invocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Caminhar no Vento",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Cura Completa",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Encontrar o Caminho",
+        "escola": "Adivinhação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Invocar Feérico",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Mover Terra",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Muralha de Espinhos",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Raio Solar",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Transporte via Plantas",
+        "escola": "Invocação",
+        "especial": "—"
+      }
+    ],
+    "7º Círculo": [
+      {
+        "nome": "Inverter a Gravidade",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Miragem Arcana",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Regeneração",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Símbolo",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Tempestade de Fogo",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Transição Planar",
+        "escola": "Invocação",
+        "especial": "M"
+      }
+    ],
+    "8º Círculo": [
+      {
+        "nome": "Antipatia/Simpatia",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Controlar o Clima",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Explosão Solar",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Formas Animais",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Nuvem Incendiária",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Suplício",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Terremoto",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Tsunami",
+        "escola": "Invocação",
+        "especial": "C"
+      }
+    ],
+    "9º Círculo": [
+      {
+        "nome": "Metamorfose",
+        "escola": "Transmutação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Ressurreição Verdadeira",
+        "escola": "Necromancia",
+        "especial": "M"
+      },
+      {
+        "nome": "Sexto Sentido",
+        "escola": "Adivinhação",
+        "especial": "—"
+      },
+      {
+        "nome": "Tempestade da Vingança",
+        "escola": "Invocação",
+        "especial": "C"
+      }
+    ]
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "total": 13,
+  "armaduras": [
+    {
+      "nome": "Acolchoada",
+      "categoria": "Leve",
+      "ca": "11 + modificador de Des",
+      "requisito_forca": "—",
+      "furtividade": "Desvantagem",
+      "peso": "4 kg",
+      "custo": "5 PO"
+    },
+    {
+      "nome": "Couro",
+      "categoria": "Leve",
+      "ca": "11 + modificador de Des",
+      "requisito_forca": "—",
+      "furtividade": "—",
+      "peso": "5 kg",
+      "custo": "10 PO"
+    },
+    {
+      "nome": "Couro Batido",
+      "categoria": "Leve",
+      "ca": "12 + modificador de Des",
+      "requisito_forca": "—",
+      "furtividade": "—",
+      "peso": "6,5 kg",
+      "custo": "45 PO"
+    },
+    {
+      "nome": "Gibão de Peles",
+      "categoria": "Média",
+      "ca": "12 + modificador de Des (máx. 2)",
+      "requisito_forca": "—",
+      "furtividade": "—",
+      "peso": "6 kg",
+      "custo": "10 PO"
+    },
+    {
+      "nome": "Cota de Malha Parcial",
+      "categoria": "Média",
+      "ca": "13 + modificador de Des (máx. 2)",
+      "requisito_forca": "—",
+      "furtividade": "—",
+      "peso": "10 kg",
+      "custo": "50 PO"
+    },
+    {
+      "nome": "Loriga de Escamas",
+      "categoria": "Média",
+      "ca": "14 + Modificador de Des (máx. 2)",
+      "requisito_forca": "—",
+      "furtividade": "Desvantagem",
+      "peso": "22 kg",
+      "custo": "50 PO"
+    },
+    {
+      "nome": "Couraça Peitoral",
+      "categoria": "Média",
+      "ca": "14 + Modificador de Des (máx. 2)",
+      "requisito_forca": "—",
+      "furtividade": "—",
+      "peso": "10 kg",
+      "custo": "400 PO"
+    },
+    {
+      "nome": "Placas Parcial",
+      "categoria": "Média",
+      "ca": "15 + Modificador de Des (máx. 2)",
+      "requisito_forca": "—",
+      "furtividade": "Desvantagem",
+      "peso": "20 kg",
+      "custo": "750 PO"
+    },
+    {
+      "nome": "Cota de Anéis",
+      "categoria": "Pesada",
+      "ca": "14",
+      "requisito_forca": "—",
+      "furtividade": "Desvantagem",
+      "peso": "20 kg",
+      "custo": "30 PO"
+    },
+    {
+      "nome": "Cota de Malha",
+      "categoria": "Pesada",
+      "ca": "16",
+      "requisito_forca": "For 13",
+      "furtividade": "Desvantagem",
+      "peso": "27 kg",
+      "custo": "75 PO"
+    },
+    {
+      "nome": "Armadura de Talas",
+      "categoria": "Pesada",
+      "ca": "17",
+      "requisito_forca": "For 15",
+      "furtividade": "Desvantagem",
+      "peso": "30 kg",
+      "custo": "200 PO"
+    },
+    {
+      "nome": "Placas",
+      "categoria": "Pesada",
+      "ca": "18",
+      "requisito_forca": "For 15",
+      "furtividade": "Desvantagem",
+      "peso": "32 kg",
+      "custo": "1.500 PO"
+    },
+    {
+      "nome": "Escudo",
+      "categoria": "Escudo",
+      "ca": "+2",
+      "requisito_forca": "—",
+      "furtividade": "—",
+      "peso": "3 kg",
+      "custo": "10 PO"
+    }
+  ]
+}

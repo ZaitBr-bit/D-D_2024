@@ -1,0 +1,253 @@
+{
+  "circulo": 9,
+  "nome_circulo": "9º Círculo",
+  "total_magias": 16,
+  "magias": [
+    {
+      "nome": "Aprisionamento",
+      "circulo": 9,
+      "escola": "Abjuração",
+      "classes": [
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (uma estatueta do alvo no valor de 5.000 ou mais PO)",
+      "duracao": "Até ser dissipada",
+      "descricao": "Você cria uma restrição mágica para conter uma criatura à sua vista e no alcance da magia. O alvo deve realizar uma salvaguarda de Sabedoria. Em caso de sucesso, o alvo não é afetado e fica imune a esta magia pelas próximas 24 horas. Se falhar, o alvo é aprisionado. Enquanto estiver aprisionado, o alvo não precisa respirar, comer ou beber e não envelhece. Magias de Adivinhação não podem localizar ou perceber o alvo, e ele não pode se teleportar.\nAté que a magia termine, o alvo também é afetado por um dos seguintes efeitos à sua escolha:\nAcorrentar. Correntes firmemente enraizadas ao chão prendem o alvo no lugar. O alvo tem a condição Contido e não pode ser movido de forma alguma.\nContenção Reduzida. O alvo encolhe para 2,5 cm de altura e fica preso dentro de uma pedra preciosa indestrutível ou um objeto semelhante. A luz pode passar pela pedra preciosa (permitindo que o alvo veja o que há fora e outras criaturas de fora possam vê-lo), mas nada mais pode passar por qualquer meio.\nEnterrar. O alvo é enterrado sob a terra em um globo oco de força mágica que é grande o suficiente para contê-lo. Nada pode passar para dentro ou para fora do globo.\nPrisão Cercada. O alvo está preso em um semiplano e está protegido contra teleporte e viagens planares. O semiplano pode ser um labirinto, uma gaiola, uma torre ou algo semelhante à sua escolha.\nTorpor. O alvo está Inconsciente e não pode ser despertado.\nEncerrando a Magia. Ao conjurar a magia, você define uma situação que a encerrará. Essa situação pode ser tão simples ou elaborada quanto você desejar, mas o Mestre deve concordar que existe uma grande probabilidade de isso ocorrer na próxima década. A situação deve ser uma ação observável, como alguém fazendo uma oferenda específica no templo do seu deus, salvando seu verdadeiro amor ou derrotando um monstro específico.\nDissipar Magia só pode encerrar a magia se for conjurada com um espaço de magia de 9º círculo, tendo como alvo a prisão ou o componente usado para criá-la.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Chuva de Meteoros",
+      "circulo": 9,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "1,5 km",
+      "componentes": "V, S",
+      "duracao": "Instantânea",
+      "descricao": "Orbes flamejantes caem do céu em quatro pontos distintos à sua vista e no alcance da magia. Cada criatura em uma Esfera de 12 metros de raio centrada em cada um desses pontos realiza uma salvaguarda de Destreza. Uma criatura sofre 20d6 pontos de dano Ígneo e 20d6 pontos de dano Contundente se falhar, ou metade desse dano em caso de sucesso. Uma criatura na área de mais de uma esfera de fogo é afetada apenas uma vez.\nUm objeto não mágico que não esteja sendo usado ou carregado também sofre o dano se estiver na área da magia, e começa a queimar se for inflamável.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Cura Completa em Massa",
+      "circulo": 9,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea",
+      "descricao": "Uma onda de energia curativa flui de você para as criaturas ao seu redor. Você restaura até 700 Pontos de Vida, divididos à sua escolha entre qualquer número de criaturas à sua vista e no alcance da magia. Criaturas curadas por esta magia também têm as condições Cego, Envenenado e Surdo removidas.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Desejo",
+      "circulo": 9,
+      "escola": "Invocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V",
+      "duracao": "Instantânea",
+      "descricao": "Desejo é a magia mais poderosa que um mortal pode conjurar. Ao simplesmente falar em voz alta, você pode alterar a própria realidade.\nO uso básico dessa magia é duplicar qualquer outra magia de 8º círculo ou inferior. Ao usá-la dessa forma, você não precisa atender a nenhum requisito para conjurar essa magia, incluindo Componentes caros. A magia simplesmente surte efeito.\nComo alternativa, você pode criar um dos seguintes efeitos à sua escolha:\nAprendizado Repentino. Você substitui um dos seus talentos por outro talento para o qual seja elegível. Você perde todos os benefícios do talento antigo e obtém os benefícios do novo. Não é possível substituir um talento que seja pré-requisito para qualquer um dos seus outros talentos ou características.\nCriação de Objeto. Você cria um objeto no valor de até 25.000 PO que não seja um item mágico. O objeto pode ter no máximo 90 metros em qualquer dimensão e aparece em um espaço desocupado à sua vista, no chão.\nImunidade à Magia. Você concede a até dez criaturas à sua vista imunidade a uma única magia ou outro efeito mágico por 8 horas.\nRefazer Jogada. Você desfaz um único evento recente, forçando uma nova jogada de qualquer jogada de dado realizada no último turno (incluindo o seu último turno). A realidade se remodela para acomodar o novo resultado. Por exemplo, uma magia Desejo pode desfazer uma falha na salvaguarda de um aliado ou um Acerto Crítico de um inimigo. Você pode forçar refazer a jogada com Vantagem ou Desvantagem, e escolher se usa o novo resultado ou a jogada original.\nReformar a Realidade. Você pode expressar um desejo que não se encaixe nos outros efeitos. Para isso, declare seu desejo ao Mestre da maneira mais clara possível. O Mestre possui total liberdade para decidir o que acontece; quanto maior o desejo, maior a chance de algo dar errado. A magia pode falhar, o efeito desejado pode ser apenas parcialmente alcançado ou você pode enfrentar consequências inesperadas devido à forma como formulou seu desejo. Por exemplo, desejar que um vilão esteja morto pode levá-lo a um futuro em que o vilão já não está vivo, removendo o seu personagem do jogo. Desejar um item mágico Lendário ou um Artefato pode transportá-lo imediatamente ao local do atual proprietário. Se o desejo concedido afetar uma comunidade, região ou o mundo, é provável que você atraia inimigos poderosos. Se o desejo impactar uma divindade, os servos dela podem intervir rapidamente para impedir ou encorajar você a formular o desejo de uma determinada maneira. Se o desejo ameaçar o multiverso, a Cidade de Sigil ou a Senhora da Dor, você terá uma visão dela por um instante; ela balança a cabeça e o desejo falha.\nResistência. Você concede a até dez criaturas à sua vista Resistência a um tipo de dano à sua escolha. Essa Resistência é permanente.\nSaúde Instantânea. Você permite a si mesmo e a até vinte criaturas à sua vista recuperar todos os Pontos de Vida, além de encerrar todos os efeitos sobre elas listados na magia Restauração Maior.\nO estresse de conjurar Desejo para produzir qualquer efeito além de duplicar outra magia enfraquece você. Após suportar esse estresse, sempre que conjurar uma magia até completar um Descanso Longo, você sofre 1d10 pontos de dano Necrótico por círculo da magia. Esse dano não pode ser reduzido ou evitado de nenhuma maneira. Além disso, seu valor de Força se torna 3 por 2d4 dias. Para cada um desses dias em que você descanse e realize apenas atividades leves, o tempo de recuperação diminui em 2 dias. Por fim, há 33% de chance de que você nunca mais consiga conjurar Desejo se sofrer esse estresse.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Encarnação Fantasmagórica",
+      "circulo": 9,
+      "escola": "Ilusão",
+      "classes": [
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Você tenta criar terrores ilusórios na mente dos outros. Cada criatura à sua escolha em uma Esfera de 9 metros de raio centrada em um ponto no alcance da magia realiza uma salvaguarda de Sabedoria. Se falhar, um alvo sofre 10d10 pontos de dano Psíquico e tem a condição Amedrontado pela duração da magia. Em caso de sucesso, um alvo recebe apenas metade do dano.\nUm alvo Amedrontado realiza uma salvaguarda de Sabedoria no final de cada um dos turnos dele. Se falhar, sofre 5d10 pontos de dano Psíquico. Em caso de sucesso, a magia se encerra naquele alvo.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Metamorfose",
+      "circulo": 9,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma argola de jade no valor de 1.500 ou mais PO)",
+      "duracao": "Concentração, até 1 hora",
+      "descricao": "Magos rivais usam Metamorfose para se transformarem em um Observador e um Beír durante um duelo mágico.\nVocê se multimorfa em outra criatura pela duração da magia ou até executar uma ação Usar Magia para se multimorfa em uma criatura diferente. A nova forma deve ser de uma criatura com um Nível de Desafio igual ou inferior ao seu nível ou ao seu Nível de Desafio. Você deve ter visto esse tipo de criatura antes, e ela não pode ser um Constructo ou um Morto-vivo.\nAo se multimorfar, você recebe um número de Pontos de Vida Temporários igual aos Pontos de Vida da nova forma. A magia encerra se você perder todos os Pontos de Vida Temporários recebidos pela magia.\nAs suas estatísticas de jogo são substituídas pelo bloco de estatísticas da nova forma, mas você mantém seu tipo de criatura, alinhamento, personalidade, valores de Inteligência, Sabedoria e Carisma, Pontos de Vida, Dados de Pontos de Vida, proficiências e capacidade de comunicação. Se você possuir a característica Conjuração, também a mantém.\nAo se multimorfar, você decide se seu equipamento cai no chão ou se altera em tamanho e forma para se ajustar à nova forma enquanto você a mantém.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Muralha Prismática",
+      "circulo": 9,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "10 minutos",
+      "descricao": "Uma superfície cintilante e multicolorida forma uma parede vertical opaca de até 27 metros de comprimento, 9 metros de altura e 2,5 centímetros de espessura centrada em um ponto no alcance da magia. Como alternativa, você molda a parede em um globo de até 9 metros de diâmetro centrado em um ponto no alcance da magia. A parede permanece pela duração. Se você posicionar a parede em um espaço ocupado por uma criatura, a magia encerra instantaneamente sem efeito.\nA parede emite Luz Plena por 30 metros e Meia-luz por mais 30 metros. Você e as criaturas que você escolher ao conjurar a magia podem passar e ficar perto da muralha sem sofrer dano. Se outra criatura que possa ver a parede se mover a até 6 metros dela ou começar o turno nela, a criatura deve ser bem-sucedida em uma salvaguarda de Constituição ou tem a condição Cego por 1 minuto.\nA parede possui sete camadas, cada uma de uma cor diferente. Uma criatura que atravessa ou entra na parede passa uma camada por vez e deve realizar uma salvaguarda de Destreza ou é afetada pelas propriedades da camada, conforme descrito na tabela Camadas Prismáticas.\nA parede tem CA 10 e pode ser destruída uma camada por vez, em ordem do vermelho ao violeta, por meios específicos para cada camada. Se uma camada for destruída, ela desaparece pela duração da magia. Campo Antimagia não tem efeito na parede, e Dissipar Magia pode afetar apenas a camada violeta.\nCamadas Prismáticas\n| Ordem | Efeitos                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |\n|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|\n| 1         | Vermelho. Se falhar: 12d6 pontos de dano Ígneo. Em caso de sucesso: metade do dano. Efeitos Adicionais: Ataques à distância não mágicos não podem atravessar esta camada, que é destruída se sofrer ao menos 25 pontos de dano Gélido.                                                                                                                                                                                                                                                                                                                          |\n| 2         | Laranja. Se falhar: 12d6 pontos de dano Ácido. Em caso de sucesso: metade do dano. Efeitos Adicionais: Ataques mágicos à distância não podem passar por esta camada, que é destruída por um vento forte (como o criado por Lufada de Vento).                                                                                                                                                                                                                                                                                                                  |\n| 3         | Amarelo. Se falhar: 12d6 pontos de dano Elétrico. Em caso de sucesso: metade do dano. Efeitos Adicionais: A camada é destruída se sofrer ao menos 60 pontos de dano Energético.                                                                                                                                                                                                                                                                                                                                                                                 |\n| 4         | Verde. Se falhar: 12d6 pontos de dano Venenoso. Em caso de sucesso: metade do dano. Efeitos Adicionais: Uma magia Criar Passagem ou outra magia de círculo igual ou superior, que possa abrir um portal em uma superfície sólida, destrói esta camada.                                                                                                                                                                                                                                                                                                        |\n| 5         | Azul. Se falhar: 12d6 pontos de dano Gélido. Em caso de sucesso: metade do dano. Efeitos Adicionais: A camada é destruída se sofrer ao menos 25 pontos de dano Ígneo.                                                                                                                                                                                                                                                                                                                                                                                           |\n| 6         | Anil. Se falhar: O alvo tem a condição Contido e realiza uma salvaguarda de Constituição no final de cada um dos turnos dele. Se bem-sucedido três vezes, a condição se encerra. Se falhar três vezes, ele tem a condição Petrificado até ser liberado por um efeito como a magia Restauração Maior. Os sucessos e fracassos não precisam ser consecutivos; acompanhe ambos até que o alvo alcance três de um tipo. Efeitos Adicionais: Magias não podem ser conjuradas através desta camada, que é destruída pela Luz Plena conjurada pela magia Luz do Dia. |\n| 7         | Violeta. Se falhar: O alvo tem a condição Cego e realiza uma salvaguarda de Sabedoria no início do seu próximo turno. Em caso de sucesso a condição se encerra. Se falhar, a condição se encerra e a criatura se teleporta para outro plano de existência (à escolha do Mestre). Efeitos Adicionais: Esta camada é destruída por Dissipar Magia.                                                                                                                                                                                                                |",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Palavra de Poder: Matar",
+      "circulo": 9,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "",
+      "duracao": "Instantânea",
+      "descricao": "Componente: V\nVocê obriga uma criatura à sua vista e no alcance da magia a morrer. Se o alvo tiver 100 Pontos de Vida ou menos, ele morre. Caso contrário, sofre 12d12 pontos de dano Psíquico.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Palavra de Poder: Salvar",
+      "circulo": 9,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "",
+      "duracao": "Instantânea",
+      "descricao": "Componente: V\nUma onda de energia curativa percorre uma criatura à sua vista e no alcance da magia. O alvo recupera todos os Pontos de Vida. Se a criatura tem a condição Amedrontado, Atordoado, Enfeitiçado, Envenenado ou Paralisado, a condição encerra. Se a criatura tem a condição Caído, ela pode usar sua Reação para se levantar.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Parar o Tempo",
+      "circulo": 9,
+      "escola": "Transmutação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V",
+      "duracao": "Instantânea",
+      "descricao": "Você interrompe brevemente o fluxo do tempo para todos, menos para si. O tempo não passa para outras criaturas, enquanto você faz 1d4 +1 turnos consecutivos, durante os quais você pode usar ações e se mover normalmente.\nEsta magia encerra se uma das ações que você usar durante este período, ou quaisquer efeitos que você criar durante ela, afetar uma criatura que não seja você ou um objeto que esteja sendo usado ou carregado por alguém que não seja você. Além disso, a magia encerra se você se mover para um lugar a mais de 300 metros do local onde a conjurou.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Polimorfia Total",
+      "circulo": 9,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (uma gota de mercúrio, uma porção de goma arábica e um fiapo de fumaça)",
+      "duracao": "Concentração, até 1 hora",
+      "descricao": "Escolha uma criatura ou objeto não mágico à sua vista e no alcance da magia. A criatura se multimorfa para uma criatura diferente, um objeto não mágico, ou o objeto se multimorfa para uma criatura (o objeto não pode estar sendo usado nem carregado). A transformação permanece pela duração da magia ou até que o alvo morra ou seja destruído, mas se você mantiver a Concentração nesta magia pela duração completa, a magia permanece até ser dissipada.\nUma criatura involuntária pode realizar uma salvaguarda de Sabedoria e, se for bem-sucedida, não é afetada por esta magia.\nCriatura em Criatura. Se você transformar uma criatura em outro tipo de criatura, a nova forma pode ser qualquer tipo que você escolher que tenha um Nível de Desafio igual ou menor do que o Nível de Desafio ou nível do alvo. As estatísticas de jogo do alvo são substituídas pelo bloco de estatísticas da nova forma, mas ele mantém seus Pontos de Vida, Dados de Pontos de Vida e alinhamento.\nO alvo adquire um número de Pontos de Vida Temporários igual aos Pontos de Vida da nova forma. A magia se encerra no alvo se ele não tiver Pontos de Vida Temporários restantes.\nO alvo é limitado às ações que pode realizar pela anatomia de sua nova forma, e não pode falar ou conjurar magias.\nO equipamento do alvo se funde com a nova forma. A criatura não pode usar ou se beneficiar de nenhum desses equipamentos.\nObjeto em Criatura. Você pode transformar um objeto em qualquer tipo de criatura, desde que o tamanho da criatura não seja maior que o tamanho do objeto e a criatura tenha um Nível de Desafio de 9 ou menor. A criatura é Amigável a você e seus aliados. Em combate, ela age imediatamente após o seu turno e obedece aos seus comandos.\nSe a magia durar mais de uma hora, você não controla mais a criatura. Ela pode permanecer Amigável a você, dependendo de como você a tratou.\nCriatura em Objeto. Se você transformar uma criatura em um objeto, ela se transforma junto com o que quer que esteja vestindo e carregando nessa forma, desde que o tamanho do objeto não seja maior do que o tamanho da criatura. As estatísticas da criatura se tornam as do objeto, ela não tem memórias do período que passou em forma de objeto e volta ao normal após a magia terminar.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Portal",
+      "circulo": 9,
+      "escola": "Invocação",
+      "classes": [
+        "Bruxo",
+        "Clérigo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (um diamante no valor de 5.000 ou mais PO)",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Otto, o Bardo, conjura Portal para abrir um portal para as Terras Além.\nVocê conjura um portal que liga um espaço desocupado à sua vista e no alcance da magia a um local preciso em um plano de existência diferente. O portal é uma abertura circular, que você pode criar com 1,5 a 6 metros de diâmetro. Você pode orientar o portal em qualquer direção que escolher. O portal permanece pela duração da magia e o destino para o qual ele leva é visível através dele.\nO portal tem uma frente e um verso em cada plano onde aparece. Se deslocar pelo portal só é possível movendo-se pela frente. Qualquer coisa que o faça é instantaneamente transportada para o outro plano, aparecendo no espaço desocupado mais próximo do portal.\nDivindades e outros governantes dos planos podem impedir que portais criados por esta magia se abram em sua presença ou em qualquer lugar dentro de seus domínios.\nAo conjurar esta magia, você pode proferir o nome de uma criatura específica (não funciona com um pseudônimo, título ou apelido). Se essa criatura estiver em um plano diferente daquele em que você está, o portal se abre ao lado da criatura nomeada e a transporta para o espaço desocupado mais próximo do seu lado do portal. Você não recebe nenhum poder especial sobre a criatura, e ela é livre para agir conforme o Mestre julgar apropriado. Ela pode ir embora, atacar você ou ajudá-lo.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Projeção Astral",
+      "circulo": 9,
+      "escola": "Necromancia",
+      "classes": [
+        "Clérigo",
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 hora",
+      "alcance": "3 metros",
+      "componentes": "V, S, M (para cada um dos alvos da magia, um zircão no valor de 1.000 ou mais PO e uma barra de prata no valor de 100 ou mais PO, que a magia consome)",
+      "duracao": "Até ser dissipada",
+      "descricao": "Você e até oito criaturas voluntárias no alcance da magia projetam seus corpos astrais no Plano Astral (a magia se encerra instantaneamente se você já estiver nesse plano). O corpo de cada alvo é deixado para trás em um estado de animação suspensa; ele tem a condição Inconsciente, não precisa comer ou respirar e não envelhece.\nA forma astral de um alvo se assemelha ao seu corpo em quase todos os aspectos, replicando suas estatísticas de jogo e pertences. A principal diferença é a adição de um cordão prateado que se arrasta entre as omoplatas da forma astral. O cordão desaparece de vista após 30 centímetros. Se o cordão for cortado — algo que só pode acontecer quando um efeito especificamente declarar isto — tanto o corpo quanto a forma astral do alvo morrem.\nA forma astral de um alvo pode viajar pelo Plano Astral. No momento em que uma forma astral deixa aquele plano, o corpo e os pertences do alvo viajam ao longo do cordão prateado, fazendo com que o alvo reentre em seu corpo no novo plano.\nQualquer dano ou efeito aplicável a uma forma astral não afeta o corpo do alvo e vice-versa. Se o corpo ou a forma astral de um alvo for reduzido a 0 Pontos de Vida, a magia se encerra para esse alvo. A magia se encerra para todos os alvos se você executar uma ação Usar Magia para descartá-la.\nQuando a magia termina para um alvo que não está morto, o alvo reaparece em seu corpo e sai do estado de animação suspensa.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Ressurreição Verdadeira",
+      "circulo": 9,
+      "escola": "Necromancia",
+      "classes": [
+        "Clérigo",
+        "Druida"
+      ],
+      "tempo_conjuracao": "1 hora",
+      "alcance": "Toque",
+      "componentes": "V, S, M (diamantes no valor de 25.000 ou mais PO, que a magia consome)",
+      "duracao": "Instantânea",
+      "descricao": "Você toca uma criatura morta há no máximo 200 anos e que morreu por qualquer motivo, exceto velhice. A criatura retorna à vida com todos os seus Pontos de Vida.\nEsta magia fecha todas as feridas, neutraliza qualquer veneno, cura todos os contágios mágicos e elimina quaisquer maldições afetando a criatura quando ela morreu. A magia substitui órgãos e membros danificados ou ausentes. Se a criatura era Morto-Vivo, ela é restaurada à sua forma não Morta-Viva.\nA magia pode criar um novo corpo se o original não existir mais; nesse caso, você deve pronunciar o nome da criatura. A criatura então aparece em um espaço desocupado à sua escolha, a até 3 metros de você.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Sexto Sentido",
+      "circulo": 9,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "Toque",
+      "componentes": "V, S, M (uma pena de beija-flor)",
+      "duracao": "8 horas",
+      "descricao": "Você toca uma criatura voluntária e concede a ela a capacidade de ver o futuro imediato. Pela duração da magia, o alvo tem Vantagem em Testes de D20, enquanto outras criaturas têm Desvantagem em jogadas de ataque contra ele. A magia se encerra se você a conjurar novamente.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Tempestade da Vingança",
+      "circulo": 9,
+      "escola": "Invocação",
+      "classes": [
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "1,5 km",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Uma nuvem de tempestade agitada se forma, centrada pela duração em um ponto no alcance da magia, se espalhando para um raio de 90 metros. Cada criatura sob a nuvem quando ela aparecer deve ser bem-sucedida em uma salvaguarda de Constituição ou sofre 2d6 pontos de dano Trovejante e tem a condição Surdo pela duração da magia.\nNo início de cada um dos seus turnos posteriores, a tempestade produz efeitos diferentes, conforme detalhado abaixo:\nTurno 2: Chuva ácida cai. Cada criatura e objeto sob a nuvem sofre 4d6 pontos de dano Ácido.\nTurno 3: Você convoca seis relâmpagos da nuvem para atingir seis criaturas ou objetos diferentes abaixo dela. Cada alvo realiza uma salvaguarda de Destreza, sofrendo 10d6 pontos de dano Elétrico se falhar ou metade desse dano em caso de sucesso.\nTurno 4: Chuva de pedras de granizo. Cada criatura sob a nuvem sofre 2d6 pontos de dano Contundente.\nTurnos 5-10: Rajadas de vento e chuva gelada surgem sob a nuvem. Cada criatura na área sofre 1d6 pontos de dano Gélido. Até que a magia termine, a área é Terreno Difícil e está Totalmente Obscurecida, ataques à distância com armas são impossíveis nela e ventos fortes sopram por toda a área.",
+      "circulo_superior": ""
+    }
+  ]
+}

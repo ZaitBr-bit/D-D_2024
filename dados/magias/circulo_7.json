@@ -1,0 +1,334 @@
+{
+  "circulo": 7,
+  "nome_circulo": "7º Círculo",
+  "total_magias": 21,
+  "magias": [
+    {
+      "nome": "Bola de Fogo Adiável",
+      "circulo": 7,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "45 metros",
+      "componentes": "V, S, M (uma bola de guano de morcego e enxofre)",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Um feixe de luz amarela dispara de você, depois se condensa em um ponto escolhido no alcance da magia como um grânulo brilhante pela duração da magia. Quando a magia termina, o grânulo explode, e cada criatura em uma Esfera de 6 metros de raio centrada nesse ponto realiza uma salvaguarda de Destreza. Se falhar, uma criatura sofre dano Ígneo igual ao dano total acumulado, ou metade desse dano em caso de sucesso.\nO dano base da magia é 12d6, e o dano aumenta em 1d6 sempre que seu turno termina e a magia não se encerra.\nSe uma criatura tocar o grânulo brilhante antes da magia terminar, ela realiza uma salvaguarda de Destreza. Se falhar, a magia se encerra, fazendo com que o grânulo exploda. Em caso de sucesso, a criatura pode arremessar o grânulo até 12 metros. Se o arremesso atingir o espaço de uma criatura ou colidir com um objeto sólido, a magia se encerra e o grânulo explode.\nQuando o grânulo explode, objetos inflamáveis na explosão que não estão sendo usados ou carregados entram em combustão.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano base aumenta em 1d6 pontos para cada círculo de espaço de magia acima de 7."
+    },
+    {
+      "nome": "Cárcere de Energia",
+      "circulo": 7,
+      "escola": "Evocação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "30 metros",
+      "componentes": "V, S, M (rubi em pó no valor de 1.500 ou mais PO, que a magia consome)",
+      "duracao": "Concentração, até 1 hora",
+      "descricao": "Uma prisão imóvel, invisível e em forma de Cubo composta de força energética surge em torno de uma área à sua escolha no alcance da magia. A prisão pode ser uma jaula ou uma caixa sólida, à sua escolha.\nUma prisão na forma de uma jaula pode ter até 6 metros de lado e é formada com barras de 1,5 centímetro de diâmetro com espaços de 1,5 centímetro entre elas. Uma prisão na forma de caixa pode ter até 3 metros de lado, criando uma barreira sólida que impede que qualquer matéria passe por ela e bloqueia quaisquer magias conjuradas para dentro ou para fora da área.\nAo conjurar a magia, qualquer criatura que esteja completamente na área da jaula fica presa. Criaturas apenas parcialmente dentro da área, ou aquelas grandes demais para caber dentro dela, são empurradas para longe do centro da área até que estejam completamente fora dela.\nUma criatura na jaula não pode deixá-la por meios não mágicos. Se a criatura tentar usar teleporte ou viagem interplanar para sair, ela deve primeiro realizar uma salvaguarda de Carisma. Em caso de sucesso, a criatura pode usar essa magia para sair da jaula. Se falhar, a criatura não sai da jaula e desperdiça a magia ou o efeito. A jaula também se estende para o Plano Etéreo, bloqueando viagens etéreas.\nEsta magia não pode ser dissipada por Dissipar Magia.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Dedo da Morte",
+      "circulo": 7,
+      "escola": "Necromancia",
+      "classes": [
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea",
+      "descricao": "Você libera energia negativa através de uma criatura à sua vista e no alcance da magia. O alvo realiza uma salvaguarda de Constituição, sofrendo 7d8 + 30 pontos de dano Necrótico se falhar ou metade desse dano em caso de sucesso.\nUm Humanoide morto por esta magia levanta-se no início do seu próximo turno como um Zumbi (veja o apêndice B) que segue suas ordens verbais.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Espada de Mordenkainen",
+      "circulo": 7,
+      "escola": "Evocação",
+      "classes": [
+        "Bardo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S, M (uma espada em miniatura no valor de 250 ou mais PO)",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Você cria uma espada espectral que fica suspensa no alcance da magia. Ela permanece pela duração da magia.\nQuando a espada aparece, você realiza um ataque mágico corpo a corpo contra um alvo a até 1,5 metro da espada. Em um acerto, o alvo sofre um dano Energético igual a 4d12 mais o seu modificador de atributo de conjuração.\nNos turnos seguintes, você pode executar uma Ação Bônus para mover a espada até 9 metros para um ponto à sua vista e repetir o ataque contra o mesmo alvo ou um diferente.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Forma Etérea",
+      "circulo": 7,
+      "escola": "Invocação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Clérigo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Até 8 horas",
+      "descricao": "Você entra nas regiões de fronteira do Plano Etéreo, onde ele se sobrepõe ao seu plano atual.\nVocê permanece na Fronteira Etérea pela duração da magia. Durante esse período, você pode se mover em qualquer direção. Se você se mover para cima ou para baixo, cada metro de movimento custa um metro adicional. Você pode ver o plano que você deixou, que parece cinza, e você não pode ver nada lá a mais de 18 metros de distância.\nEnquanto estiver no Plano Etéreo, você pode afetar e ser afetado apenas por criaturas, objetos e efeitos nesse plano. Criaturas que não estão no Plano Etéreo não podem perceber ou interagir com você, a menos que uma característica lhes dê a capacidade de fazê-lo.\nQuando a magia termina, você retorna ao plano que deixou no local que corresponde ao seu espaço na Fronteira Etérea. Se você aparecer em um espaço ocupado, você é direcionado para o espaço desocupado mais próximo e sofre dano Energético igual a 10 pontos para cada 1,5 metro que é movido.\nEsta magia se encerra instantaneamente se você a conjurar enquanto estiver no Plano Etéreo ou em um plano que não faz fronteira com ele, como um dos Planos Externos.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. Você pode escolher até três criaturas voluntárias (incluindo você) para cada círculo de espaço de magia acima de 7. As criaturas devem estar a até 3 metros de você quando você conjurar a magia."
+    },
+    {
+      "nome": "Inverter a Gravidade",
+      "circulo": 7,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "30 metros",
+      "componentes": "V, S, M (uma pedra-ímã e raspas de ferro)",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Esta magia inverte a gravidade em um Cilindro de 15 metros de raio e 30 metros de altura, centrado em um ponto ao alcance da magia. Todas as criaturas e objetos na área que não estão fixos ao chão são levados para cima até o topo do Cilindro. Uma criatura pode realizar uma salvaguarda de Destreza para agarrar um objeto fixo que possa alcançar, evitando assim a queda ascendente.\nSe um teto ou objeto ancorado for encontrado nessa subida, criaturas e objetos colidem com ele como em uma queda normal. Se chegarem ao topo do Cilindro sem colidir com nada, pairam lá pela duração da magia. Quando a magia termina, criaturas e objetos afetados caem.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Invocar Celestial",
+      "circulo": 7,
+      "escola": "Invocação",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos",
+      "descricao": "Você conjura um espírito dos Planos Superiores, que se manifesta como um pilar de luz em um Cilindro de 3 metros de raio e 12 metros de altura centrado em um ponto no alcance da magia. Para cada criatura à sua vista no Cilindro, escolha qual dessas luzes brilha sobre ela:\nLuz Curativa. O alvo recupera Pontos de Vida iguais a 4d12 mais seu modificador de atributo de conjuração.\nLuz Ardente. O alvo realiza uma salvaguarda de Destreza, sofrendo 6d12 pontos de dano Radiante se falhar, ou metade desse dano em caso de sucesso.\nAté que a magia termine, Luz Plena preenche o Cilindro e, quando você se mover no seu turno, também pode mover o Cilindro até 9 metros.\nSempre que o Cilindro se mover para o espaço de uma criatura à sua vista e sempre que uma criatura à sua vista entrar no Cilindro ou terminar seu turno lá, você pode envolvê-lo com uma das luzes. Uma criatura pode ser afetada por esta magia apenas uma vez por turno.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. A cura e o dano aumentam em 1d12 para cada círculo de espaço de magia acima de 7."
+    },
+    {
+      "nome": "Mansão Magnífica de Mordenkainen",
+      "circulo": 7,
+      "escola": "Invocação",
+      "classes": [
+        "Bardo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "90 metros",
+      "componentes": "V, S, M (uma porta em miniatura no valor de 15 ou mais PO)",
+      "duracao": "24 horas",
+      "descricao": "O Mago Mordenkainen recebe os hóspedes em sua residência mágica, a Mansão Magnífica de Mordenkainen.\nVocê conjura uma porta cintilante no alcance da magia que permanece por toda a duração da magia. A porta leva a uma moradia extradimensional e tem 1,5 metro de largura e 3 metros de altura. Você e qualquer criatura que você designe ao conjurar a magia podem entrar na residência extradimensional enquanto a porta permanecer aberta. Você pode abri-la ou fechá-la (nenhuma ação é necessária) se estiver a até 9 metros de distância dela. Quando fechada, a porta é imperceptível.\nAlém da porta, há um magnífico saguão com várias câmaras ao fundo. A atmosfera da moradia é limpa, fresca e aquecida.\nVocê pode criar qualquer projeto que desejar para a moradia, mas ela não pode exceder 50 Cubos contíguos de 3 metros de lado. O local é mobiliado e decorado à sua escolha. Contém comida suficiente para servir um banquete de nove pratos para até 100 pessoas. Mobílias e outros objetos criados por essa magia se dissipam em fumaça se removidos dela.\nUma equipe de 100 servos quase transparentes atende a todos que entrarem. Você determina a aparência desses servos e as vestes deles. Eles são invulneráveis e obedecem aos seus comandos. Cada servo pode realizar tarefas que um humano poderia realizar, mas eles não podem atacar ou realizar qualquer ação que cause dano direto a outra criatura. Assim, os servos podem buscar coisas, limpar, remendar, dobrar roupas, acender fogos, servir comida, servir vinho, entre outras atividades. Os servos não podem deixar a moradia.\nQuando a magia termina, qualquer criatura ou objeto deixado no espaço extradimensional é expulso para os espaços desocupados mais próximos à entrada.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Miragem Arcana",
+      "circulo": 7,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "10 minutos",
+      "alcance": "À sua vista",
+      "componentes": "V, S",
+      "duracao": "10 dias",
+      "descricao": "Você faz com que o terreno em uma área de até 2,5 quilômetros quadrados pareça, soe, cheire e até mesmo seja sentido como algum outro tipo de terreno. Campos abertos ou uma estrada podem ser transformados em um pântano, colina, fenda ou qualquer outro tipo de terreno irregular ou intransitável. Um lago pode ser formado para parecer um prado gramado, um precipício como uma suave encosta ou uma ravina cheia de pedras como uma estrada larga e lisa.\nDa mesma forma, você pode alterar a aparência de estruturas ou adicioná-las onde não há nenhuma presente. A magia não disfarça, oculta ou adiciona criaturas.\nA ilusão inclui elementos audíveis, visuais, táteis e olfativos, podendo transformar terreno desimpedido em Terreno Difícil (ou vice-versa) ou, de outra forma, dificultar o movimento pela área. Qualquer parte do terreno ilusório (como uma pedra ou um galho) que for removida da área da magia desaparece imediatamente.\nCriaturas com Visão Verdadeira podem ver através da ilusão e discernir a verdadeira forma do terreno; no entanto, todos os outros elementos da ilusão permanecem, de modo que, embora a criatura esteja ciente da ilusão, ainda pode interagir fisicamente com ela.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Palavra Sagrada",
+      "circulo": 7,
+      "escola": "Evocação",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "9 metros",
+      "componentes": "V",
+      "duracao": "Instantânea",
+      "descricao": "Você pronuncia uma palavra imbuída de poder dos Planos Superiores. Cada criatura à sua escolha no alcance da magia realiza uma salvaguarda de Carisma. Se falhar, um alvo com 50 Pontos de Vida ou menos sofre um efeito com base nos Pontos de Vida atuais dele, conforme mostrado na tabela Efeitos de Palavra Sagrada. Independentemente dos Pontos de Vida, um alvo Celestial, Elemental, Feérico ou Ínfero que falhar na salvaguarda é forçado a voltar ao seu plano de origem (se ainda não estiver lá) e não pode retornar ao plano atual por 24 horas por qualquer meio que não seja uma magia Desejo.\nEfeitos de Palavra Sagrada\n| Pontos de Vida | Efeito                                                       |\n|--------------------|------------------------------------------------------------------|\n| 0–20               | O alvo morre.                                                    |\n| 21–30              | O alvo está com as condições Atordoado, Cego e Surdo por 1 hora. |\n| 31–40              | O alvo está com as condições Cego e Surdo por 10 minutos.        |\n| 41–50              | O alvo tem a condição Surdo por 1 minuto.                        |",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Palavra de Poder: Fortificar",
+      "circulo": 7,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "",
+      "duracao": "Instantânea",
+      "descricao": "Componente: V\nVocê fortalece até seis criaturas à sua vista e no alcance da magia. A magia concede 120 Pontos de Vida Temporários, que você divide entre os alvos da magia.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Projetar Imagem",
+      "circulo": 7,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "800 quilômetros",
+      "componentes": "V, S, M (uma estatueta de si mesmo no valor de 5 ou mais PO)",
+      "duracao": "Concentração, até 1 dia",
+      "descricao": "Você cria uma cópia ilusória de si mesmo que dura enquanto a magia estiver ativa. A cópia pode surgir em qualquer lugar que você já tenha visto e que esteja no alcance da magia, ignorando obstáculos. A ilusão se parece e soa como você, mas é intangível. Se a ilusão sofrer qualquer dano, ela desaparece e a magia se encerra.\nVocê pode ver através dos olhos da ilusão e ouvir através dos ouvidos dela, como se você estivesse no espaço dela. Com uma ação Usar Magia, você pode movê-la até 18 metros e fazer com que ela gesticule, fale e se comporte da maneira que desejar. Ela imita seus maneirismos perfeitamente.\nInteração física com a imagem revela sua natureza ilusória, já que objetos podem atravessá-la. Uma criatura que executa a ação Analisar para examinar a imagem pode determinar que se trata de uma ilusão com um teste bem-sucedido de Inteligência (Investigação) contra a CD para evitar sua magia. Se uma criatura perceber a ilusão, ela pode ver através da imagem, e qualquer som que a ilusão emita parece vago para essa criatura.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Rajada Prismática",
+      "circulo": 7,
+      "escola": "Evocação",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Instantânea",
+      "descricao": "Um anão teve um encontro infeliz com o raio anil da Rajada Prismática.\nOito raios luminosos partem de você em um Cone de 18 metros. Cada criatura no Cone realiza uma salvaguarda de Destreza. Para cada alvo, jogue 1d8 para determinar qual raio colorido o afeta, consultando a tabela Raios Prismáticos.\nRaios Prismáticos\n| 1d8 | Raio                                                                                                                                                                                                                                                                                                                                                                                                                    |\n|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|\n| 1       | Vermelho. Se falhar: 12d6 pontos de dano Ígneo. Em caso de sucesso: metade do dano.                                                                                                                                                                                                                                                                                                                                 |\n| 2       | Laranja. Se falhar: 12d6 pontos de dano Ácido. Em caso de sucesso: metade do dano.                                                                                                                                                                                                                                                                                                                                  |\n| 3       | Amarelo. Se falhar: 12d6 pontos de dano Elétrico. Em caso de sucesso: metade do dano.                                                                                                                                                                                                                                                                                                                               |\n| 4       | Verde. Se falhar: 12d6 pontos de dano Venenoso. Em caso de sucesso: metade do dano.                                                                                                                                                                                                                                                                                                                                 |\n| 5       | Azul. Se falhar: 12d6 pontos de dano Gélido. Em caso de sucesso: metade do dano.                                                                                                                                                                                                                                                                                                                                    |\n| 6       | Anil. Se falhar: O alvo tem a condição Contido e realiza uma salvaguarda de Constituição no final de cada um dos turnos dele. Se bem-sucedido três vezes, a condição se encerra. Se falhar três vezes, ele tem a condição Petrificado até ser liberado por um efeito como a magia Restauração Maior. Os sucessos e fracassos não precisam ser consecutivos; acompanhe ambos até que o alvo alcance três de um tipo. |\n| 7       | Violeta. Se falhar: O alvo tem a condição Cego e realiza uma salvaguarda de Sabedoria no início do seu próximo turno. Em uma salvaguarda bem-sucedida, a condição se encerra. Se falhar, a condição se encerra e a criatura se teleporta para outro plano de existência (à escolha do Mestre).                                                                                                                        |\n| 8       | Especial. O alvo é atingido por dois raios. Jogue duas vezes, jogando novamente quaisquer 8.                                                                                                                                                                                                                                                                                                                            |",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Refugiar",
+      "circulo": 7,
+      "escola": "Transmutação",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (poeira de uma pedra preciosa no valor de 5.000 ou mais PO, que a magia consome)",
+      "duracao": "Até ser dissipada",
+      "descricao": "Com um toque, você magicamente oculta um objeto ou uma criatura voluntária. Pela duração da magia, o alvo tem a condição Invisível, não pode ser alvo de magias de Adivinhação, detectado por magia ou observado remotamente por meios mágicos.\nSe o alvo for uma criatura, ela entra em um estado de animação suspensa, tem a condição Inconsciente, não envelhece e não necessita de alimento, água ou ar.\nVocê pode definir uma condição para que a magia encerre previamente. A condição pode ser qualquer coisa à sua escolha, mas deve ocorrer ou ser visível em um raio de 1,5 quilômetro do alvo. Exemplos incluem “após 1.000 anos” ou “quando o tarrasque despertar”. A magia também encerra se o alvo sofrer qualquer dano.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Regeneração",
+      "circulo": 7,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Druida"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "Toque",
+      "componentes": "V, S, M (uma conta de oração)",
+      "duracao": "1 hora",
+      "descricao": "Uma criatura que você toca recupera 4d8 + 15 Pontos de Vida. Pela duração da magia, o alvo recupera 1 Ponto de Vida no início de cada um dos turnos dele, e quaisquer partes do corpo cortadas voltam a crescer após 2 minutos.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Ressurreição",
+      "circulo": 7,
+      "escola": "Necromancia",
+      "classes": [
+        "Bardo",
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "1 hora",
+      "alcance": "Toque",
+      "componentes": "V, S, M (um diamante no valor de 1.000 ou mais PO, que a magia consome)",
+      "duracao": "Instantânea",
+      "descricao": "Com um toque, você revive uma criatura morta há no máximo um século, que não faleceu de velhice nem era um Morto-Vivo.\nA criatura retorna à vida com todos os seus Pontos de Vida, e a magia neutraliza quaisquer venenos que a afetavam na hora da morte, fecha feridas letais e restaura partes do corpo ausentes.\nVoltar à vida é um processo difícil. O alvo sofre uma penalidade de -4 em Testes de D20. Sempre que o alvo completar um Descanso Longo, a penalidade é reduzida em 1 até se tornar 0.\nConjurar essa magia para reviver uma criatura morta há 365 dias ou mais sobrecarrega você. Até completar um Descanso Longo, você não pode conjurar magias novamente e tem Desvantagem nos Testes de D20.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Simulacro",
+      "circulo": 7,
+      "escola": "Ilusão",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "12 horas",
+      "alcance": "Toque",
+      "componentes": "V, S, M (rubi em pó no valor de 1.500 ou mais PO, que a magia consome)",
+      "duracao": "Até ser dissipada",
+      "descricao": "Você cria uma duplicata ilusória de uma Fera ou Humanoide que esteja a até 3 metros de você durante toda a conjuração da magia. Você encerra a conjuração tocando tanto a criatura quanto uma pilha de gelo ou neve do mesmo tamanho da criatura, e a pilha se transforma na duplicata, que é uma criatura. A duplicata utiliza as estatísticas da criatura original no momento da conjuração, exceto que ela é um Constructo, seus Pontos de Vida máximos são reduzidos pela metade e ela não pode conjurar esta magia.\nA duplicata é Amigável a você e às criaturas que você escolher. Ele obedece aos seus comandos e age no seu turno durante o combate e não pode adquirir níveis, nem realizar Descansos Curtos ou Longos.\nSe a duplicata sofrer dano, a única forma de restaurar seus Pontos de Vida é repará-la durante um Descanso Longo, no qual você deve gastar componentes no valor de 100 PO por Ponto de Vida restaurado e deve permanecer a até 1,5 metro de você para ser reparada.\nA duplicata dura até ser reduzida a 0 Pontos de Vida, momento em que ela retorna a ser neve e derrete. Se você conjurar esta magia novamente, qualquer duplicata criada anteriormente por esta magia é destruída instantaneamente.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Símbolo",
+      "circulo": 7,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "Toque",
+      "componentes": "V, S, M (um diamante em pó no valor de 1.000 ou mais PO, que a magia consome)",
+      "duracao": "Até ser dissipada ou acionada",
+      "descricao": "Você inscreve um glifo prejudicial em uma superfície (como uma seção do chão ou parede) ou dentro de um objeto que pode ser fechado (como um livro ou baú). O glifo pode cobrir uma área não superior a 3 metros de diâmetro. Se você escolher um objeto, ele deve permanecer no lugar; se for movido a mais de 3 metros de onde você conjurou esta magia, o glifo é quebrado e a magia se encerra sem ser acionada.\nO glifo é quase imperceptível e requer um teste bem-sucedido de Sabedoria (Percepção) contra a CD para evitar sua magia para ser notado.\nQuando inscreve o glifo, você define seu gatilho e escolhe qual efeito o símbolo possui: Atordoamento, Discórdia, Dor, Medo, Morte ou Sono. Cada um é explicado abaixo.\nDefina o Gatilho. Você decide o que aciona o glifo quando conjura a magia. Para glifos inscritos em uma superfície, os gatilhos comuns incluem tocar ou ficar em pé sobre o glifo, remover outro objeto que o cubra, aproximar-se a uma certa distância ou manipular o objeto que o contém. Para glifos inscritos em um objeto, os gatilhos comuns incluem abrir esse objeto ou ver o glifo. Você pode ajustar o gatilho para que apenas criaturas de certos tipos o ativem (por exemplo, o glifo pode ser definido para afetar Aberrações). Você também pode definir condições para criaturas que não acionam o glifo, como aquelas que dizem uma determinada senha.\nUma vez acionado, o glifo brilha, preenchendo uma Esfera de 18 metros de raio com Meia-Luz por 10 minutos, após os quais a magia termina. Cada criatura na Esfera quando o glifo é ativado é alvo de seu efeito, assim como uma criatura que entra na Esfera pela primeira vez em um turno ou termina o turno nela. Uma criatura é atingida apenas uma vez por turno.\nAtordoamento. Cada alvo deve ser bem-sucedido em uma salvaguarda de Sabedoria ou tem a condição Atordoado por 1 minuto.\nDiscórdia. Cada alvo realiza uma salvaguarda de Sabedoria. Se falhar, um alvo discute com outras criaturas por 1 minuto. Durante esse tempo, é incapaz de se comunicar efetivamente e tem Desvantagem em jogadas de ataque e testes de atributo.\nDor. Cada alvo deve ser bem-sucedido em uma salvaguarda de Constituição ou tem a condição Incapacitado por 1 minuto.\nMedo. Cada alvo deve ser bem-sucedido em uma salvaguarda de Sabedoria ou tem a condição Amedrontado por 1 minuto. Enquanto Amedrontado, o alvo deve se mover pelo menos 9 metros para longe do glifo em cada um dos turnos dele, se possível.\nMorte. Cada alvo realiza uma salvaguarda de Constituição, sofrendo 10d10 pontos de dano Necrótico se falhar, ou metade desse dano em caso de sucesso.\nSono. Cada alvo deve ser bem-sucedido em uma salvaguarda de Sabedoria ou tem a condição Inconsciente por 10 minutos. Uma criatura desperta se sofrer dano ou se alguém executar uma ação para sacudi-la.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Teleporte",
+      "circulo": 7,
+      "escola": "Invocação",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "3 metros",
+      "componentes": "V",
+      "duracao": "Instantânea",
+      "descricao": "Esta magia transporta instantaneamente você e até oito criaturas voluntárias ou um único objeto à sua vista e no alcance da magia, para um destino à sua escolha. Se você escolher um objeto, ele deve ser Grande ou menor e não pode estar sendo segurado ou carregado por uma criatura involuntária.\nO destino que você escolheu deve ser de seu conhecimento e deve estar no mesmo plano de existência que você. Sua familiaridade com o destino determina se você chega lá com sucesso. O Mestre joga 1d100 e consulta a tabela Resultado do Teleporte e as explicações posteriores.\nResultado do Teleporte\n| Familiaridade  | Azar | Área Similar | Fora do Alvo | No Alvo |\n|--------------------|----------|------------------|------------------|-------------|\n| Círculo permanente | —        | —                | —                | 01–100      |\n| Objeto associado   | —        | —                | —                | 01–100      |\n| Muito familiar     | 01–05    | 06–13            | 14–24            | 25–100      |\n| Visto casualmente  | 01–33    | 34–43            | 44–53            | 54–100      |\n| Visto uma vez      | 01–43    | 44–53            | 54–73            | 74–100      |\n| Descrição          | 01–43    | 44–53            | 54–74            | 75–100      |\n| Destino falso      | 01–50    | 51–100           | —                | —           |\nFamiliaridade. Aqui estão os significados dos termos na coluna Familiaridade da tabela:\n-   “Círculo permanente” significa um círculo de teleporte permanente cuja sequência de símbolos você conhece.\n-   “Objeto associado” significa que você possui um objeto retirado do destino desejado nos últimos seis meses, como um livro da biblioteca de um mago.\n-   “Muito familiar” é um lugar que você visitou com frequência, um lugar que você estudou cuidadosamente ou um lugar à sua vista ao conjurar a magia.\n-   “Visto casualmente” é um lugar que você já viu mais de uma vez, mas com o qual não está muito familiarizado.\n-   “Visto uma vez ou descrito” é um lugar que você já viu uma vez, possivelmente usando magia, ou um lugar que você conhece através da descrição de outra pessoa, talvez através de um mapa.\n-   “Destino falso” é um lugar que não existe. Talvez você tenha tentado visualizar o santuário de um inimigo, mas em vez disso viu uma ilusão, ou está tentando se teleportar para um local que não existe mais.\nAzar. A natureza imprevisível da magia resulta em uma jornada difícil. Cada criatura se teleportando (ou o objeto alvo) sofre 3d10 pontos de dano Energético, e o Mestre joga novamente a tabela para ver onde você parou (mais de um azar pode acontecer, causando dano a cada vez).\nÁrea Similar. Você e seu grupo (ou o objeto de destino) aparecem em uma área diferente que é visual ou tematicamente semelhante à área de destino. Você aparece no lugar semelhante mais próximo. Se você estiver indo para seu laboratório, por exemplo, pode aparecer no laboratório de outra pessoa na mesma cidade.\nFora do Alvo. Você e seu grupo (ou o objeto alvo) aparecem a 2d12 x 1,5 quilômetros da distância do destino em uma direção aleatória. Jogue 1d8 para a direção: 1, leste; 2, sudeste; 3, sul; 4, sudoeste; 5, oeste; 6, noroeste; 7, norte; ou 8, nordeste.\nNo Alvo. Você e seu grupo (ou o objeto alvo) aparecem onde você pretendia.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Tempestade de Fogo",
+      "circulo": 7,
+      "escola": "Evocação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Feiticeiro"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "45 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea",
+      "descricao": "Uma tempestade de fogo aparece no alcance da magia. A área da tempestade consiste em até dez cubos de 3 metros, que você organiza como preferir. Cada Cubo deve ser contíguo a pelo menos um outro Cubo. Cada criatura na área realiza uma salvaguarda de Destreza, sofrendo 7d10 pontos de dano Ígneo se falhar, ou metade desse dano em caso de sucesso.\nObjetos inflamáveis na área que não estão sendo usados ou carregados entram em combustão.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Transição Planar",
+      "circulo": 7,
+      "escola": "Invocação",
+      "classes": [
+        "Bruxo",
+        "Clérigo",
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (uma haste de metal bifurcada no valor de 250 ou mais PO e sintonizada a um plano de existência)",
+      "duracao": "Instantânea",
+      "descricao": "Você e até oito criaturas voluntárias que dão as mãos em um círculo são transportadas para um plano de existência diferente. Você pode especificar um destino-alvo em termos gerais, como a Cidade de Latão no Plano Elemental do Fogo ou o palácio de Dispater no segundo nível dos Nove Infernos, e você aparece dentro ou perto desse destino, conforme determinado pelo Mestre.\nComo alternativa, se você souber a sequência de símbolos de um círculo de teleporte em outro plano de existência, esta magia pode levá-lo a esse círculo. Se o círculo de teleporte for pequeno demais para caber todas as criaturas que você transportou, elas aparecem nos espaços desocupados mais próximos ao círculo.",
+      "circulo_superior": ""
+    }
+  ]
+}

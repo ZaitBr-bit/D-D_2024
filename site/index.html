@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="D&D Ficha">
+  <meta name="theme-color" content="#7b2d26">
+  <title>D&D 5.5 - Ficha de Personagem</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="img/icon-192.png">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+  <!-- Barra de navegação superior -->
+  <header id="app-header">
+    <button id="btn-voltar" class="header-btn" onclick="window.history.back()" style="display:none">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <h1 id="header-titulo">D&D 5.5 Ficha</h1>
+    <div id="header-acoes"></div>
+  </header>
+
+  <!-- Conteúdo principal (gerenciado pelo router) -->
+  <main id="app-content"></main>
+
+  <!-- Modal reutilizável -->
+  <div id="modal-overlay" class="modal-overlay" style="display:none">
+    <div id="modal-container" class="modal-container">
+      <div id="modal-header" class="modal-header">
+        <h2 id="modal-titulo"></h2>
+        <button class="modal-fechar" onclick="fecharModal()">&times;</button>
+      </div>
+      <div id="modal-corpo" class="modal-corpo"></div>
+      <div id="modal-acoes" class="modal-acoes"></div>
+    </div>
+  </div>
+
+  <!-- Toast de notificação -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts como módulos ES -->
+  <script type="module" src="js/app.js"></script>
+
+</body>
+</html>

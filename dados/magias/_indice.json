@@ -1,0 +1,5293 @@
+{
+  "total_magias": 391,
+  "magias": [
+    {
+      "nome": "Acalmar Emoções",
+      "circulo": 2,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Acudir os Moribundos",
+      "circulo": 0,
+      "escola": "Necromancia",
+      "classes": [
+        "Clérigo",
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "4,5 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Alarme",
+      "circulo": 1,
+      "escola": "Abjuração",
+      "classes": [
+        "Guardião",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto ou Ritual",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (um sino e um fio de prata)",
+      "duracao": "8 horas"
+    },
+    {
+      "nome": "Aliado Extraplanar",
+      "circulo": 6,
+      "escola": "Invocação",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "10 minutos",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Aljava Veloz",
+      "circulo": 5,
+      "escola": "Transmutação",
+      "classes": [
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma Aljava no valor de 1 ou mais PO)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Alterar-se",
+      "circulo": 2,
+      "escola": "Transmutação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Amigos",
+      "circulo": 0,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "3 metros",
+      "componentes": "S, M (um pouco de maquiagem)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Amizade Animal",
+      "circulo": 1,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (um bocado de comida)",
+      "duracao": "24 horas"
+    },
+    {
+      "nome": "Animar Mortos",
+      "circulo": 3,
+      "escola": "Necromancia",
+      "classes": [
+        "Clérigo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "3 metros",
+      "componentes": "V, S, M (uma gota de sangue, um pedaço de carne e uma pitada de pó de osso)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Animar Objetos",
+      "circulo": 5,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Antipatia/Simpatia",
+      "circulo": 8,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 hora",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (uma mistura de vinagre e mel)",
+      "duracao": "10 dias"
+    },
+    {
+      "nome": "Aprimorar Atributo",
+      "circulo": 2,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Druida",
+        "Feiticeiro",
+        "Guardião",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (pelo ou uma pena)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Aprisionamento",
+      "circulo": 9,
+      "escola": "Abjuração",
+      "classes": [
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (uma estatueta do alvo no valor de 5.000 ou mais PO)",
+      "duracao": "Até ser dissipada"
+    },
+    {
+      "nome": "Arca Secreta de Leomund",
+      "circulo": 4,
+      "escola": "Invocação",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (um baú de 1 m por 60 cm por 60 cm, construído com materiais raros no valor de 5.000 ou mais PO, e uma réplica minúscula do baú fabricada com os mesmos materiais no valor de 50 ou mais PO)",
+      "duracao": "Até ser dissipada"
+    },
+    {
+      "nome": "Arma Elemental",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida",
+        "Guardião",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Arma Espiritual",
+      "circulo": 2,
+      "escola": "Evocação",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Arma Mágica",
+      "circulo": 2,
+      "escola": "Transmutação",
+      "classes": [
+        "Feiticeiro",
+        "Guardião",
+        "Mago",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Armadura Arcana",
+      "circulo": 1,
+      "escola": "Abjuração",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (um pedaço de couro curtido)",
+      "duracao": "8 horas"
+    },
+    {
+      "nome": "Armadura de Agathys",
+      "circulo": 1,
+      "escola": "Abjuração",
+      "classes": [
+        "Bruxo"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (um caco de vidro azul)",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Arrombar",
+      "circulo": 2,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Arte Druídica",
+      "circulo": 0,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Assassino Fantasmagórico",
+      "circulo": 4,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Augúrio",
+      "circulo": 2,
+      "escola": "Adivinhação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto ou Ritual",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (varetas, ossos, cartas ou símbolos semelhantes especialmente marcados no valor de 25 ou mais PO)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Aumentar/Reduzir",
+      "circulo": 2,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (uma pitada de ferro em pó)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Aura Mágica de Nystul",
+      "circulo": 2,
+      "escola": "Ilusão",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (um pequeno quadrado de seda)",
+      "duracao": "24 horas"
+    },
+    {
+      "nome": "Aura Sagrada",
+      "circulo": 8,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (um relicário no valor de 1.000 ou mais PO)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Aura de Pureza",
+      "circulo": 4,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Aura de Vida",
+      "circulo": 4,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Aura de Vitalidade",
+      "circulo": 3,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Auxílio",
+      "circulo": 2,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Druida",
+        "Guardião",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (uma tira de pano branco)",
+      "duracao": "8 horas"
+    },
+    {
+      "nome": "Badalar Fúnebre",
+      "circulo": 0,
+      "escola": "Necromancia",
+      "classes": [
+        "Clérigo",
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Banimento",
+      "circulo": 4,
+      "escola": "Abjuração",
+      "classes": [
+        "Bruxo",
+        "Clérigo",
+        "Feiticeiro",
+        "Mago",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (um pentagrama)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Banquete de Heróis",
+      "circulo": 6,
+      "escola": "Invocação",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Druida"
+      ],
+      "tempo_conjuracao": "10 minutos",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma tigela incrustada de pedras preciosas no valor de 1.000 ou mais PO, que a magia consome)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Barreira de Lâminas",
+      "circulo": 6,
+      "escola": "Evocação",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Boca Encantada",
+      "circulo": 2,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto ou Ritual",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (poeira de jade no valor de 10 ou mais PO, que a magia consome)",
+      "duracao": "Até ser dissipada"
+    },
+    {
+      "nome": "Bola de Fogo",
+      "circulo": 3,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "45 metros",
+      "componentes": "V, S, M (uma bola de guano de morcego e enxofre)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Bola de Fogo Adiável",
+      "circulo": 7,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "45 metros",
+      "componentes": "V, S, M (uma bola de guano de morcego e enxofre)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Bolha Ácida",
+      "circulo": 0,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Bom Fruto",
+      "circulo": 1,
+      "escola": "Invocação",
+      "classes": [
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (um ramo de visco)",
+      "duracao": "24 horas"
+    },
+    {
+      "nome": "Bordão Místico",
+      "circulo": 0,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (um ramo de visco)",
+      "duracao": "1 minuto"
+    },
+    {
+      "nome": "Braços de Hadar",
+      "circulo": 1,
+      "escola": "Invocação",
+      "classes": [
+        "Bruxo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Bênção",
+      "circulo": 1,
+      "escola": "Encantamento",
+      "classes": [
+        "Clérigo",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (um Símbolo Sagrado no valor de 5 ou mais PO)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Caldeirão Borbulhante de Tasha",
+      "circulo": 6,
+      "escola": "Invocação",
+      "classes": [
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "1,5 metro",
+      "componentes": "V, S, M (uma colher de mexer caldeirão dourada no valor de 500 ou mais PO)",
+      "duracao": "10 minutos"
+    },
+    {
+      "nome": "Caminhar Sobre as Águas",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Feiticeiro",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (um pedaço de cortiça)",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Caminhar no Vento",
+      "circulo": 6,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (uma vela)",
+      "duracao": "8 horas"
+    },
+    {
+      "nome": "Campo Antimagia",
+      "circulo": 8,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (raspas de ferro)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Cativar",
+      "circulo": 2,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Bruxo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Cegueira/Surdez",
+      "circulo": 2,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V",
+      "duracao": "1 minuto"
+    },
+    {
+      "nome": "Celeridade",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (uma lasca de raiz de alcaçuz)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Chama Contínua",
+      "circulo": 2,
+      "escola": "Evocação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (rubi em pó no valor de 50 ou mais PO, que a magia consome)",
+      "duracao": "Até ser dissipada"
+    },
+    {
+      "nome": "Chama Sagrada",
+      "circulo": 0,
+      "escola": "Evocação",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Chicote de Espinhos",
+      "circulo": 0,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (o caule de uma planta espinhosa)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Chuva de Meteoros",
+      "circulo": 9,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "1,5 km",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Clarividência",
+      "circulo": 3,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "10 minutos",
+      "alcance": "1,5 km",
+      "componentes": "V, S, M (um foco no valor de 100 ou mais PO, seja um chifre adornado com joias e usado para escutar, ou um olho de vidro usado para enxergar)",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Clone",
+      "circulo": 8,
+      "escola": "Necromancia",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 hora",
+      "alcance": "Toque",
+      "componentes": "V, S, M (um diamante no valor de 1.000 ou mais PO, que a magia consome, e um recipiente vedável no valor de 2.000 ou mais PO que seja grande o suficiente para conter a criatura sendo clonada)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Coluna de Chamas",
+      "circulo": 5,
+      "escola": "Evocação",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (uma pitada de enxofre)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Comando",
+      "circulo": 1,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Compreender Idiomas",
+      "circulo": 1,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma pitada de fuligem e sal)",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Compulsão",
+      "circulo": 4,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Comunhão",
+      "circulo": 5,
+      "escola": "Adivinhação",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "1 minuto ou Ritual",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (incenso)",
+      "duracao": "1 minuto"
+    },
+    {
+      "nome": "Comunhão com a Natureza",
+      "circulo": 5,
+      "escola": "Adivinhação",
+      "classes": [
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "1 minuto ou Ritual",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Cone de Frio",
+      "circulo": 5,
+      "escola": "Evocação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (um pequeno cone de cristal ou vidro)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Confusão",
+      "circulo": 4,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S, M (três cascas de nozes)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Consagrar",
+      "circulo": 5,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "24 horas",
+      "alcance": "Toque",
+      "componentes": "V, S, M (incenso no valor de 1.000 ou mais PO, que a magia consome)",
+      "duracao": "Até ser dissipada"
+    },
+    {
+      "nome": "Contato Extraplanar",
+      "circulo": 5,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto ou Ritual",
+      "alcance": "Pessoal",
+      "componentes": "V",
+      "duracao": "1 minuto"
+    },
+    {
+      "nome": "Contingência",
+      "circulo": 6,
+      "escola": "Abjuração",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "10 minutos",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma estatueta de si mesmo incrustada de pedras preciosas no valor de 1.500 ou mais PO)",
+      "duracao": "10 dias"
+    },
+    {
+      "nome": "Contramagia",
+      "circulo": 3,
+      "escola": "Abjuração",
+      "classes": [
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Reação, que você executa quando vê uma criatura a até 18 metros de você conjurando uma magia com componentes Verbais, Somáticos ou Materiais",
+      "alcance": "18 metros",
+      "componentes": "S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Controlar o Clima",
+      "circulo": 8,
+      "escola": "Transmutação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "10 minutos",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (um incenso aceso)",
+      "duracao": "Concentração, até 8 horas"
+    },
+    {
+      "nome": "Controlar Água",
+      "circulo": 4,
+      "escola": "Transmutação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "90 metros",
+      "componentes": "V, S, M (uma mistura de água e poeira)",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Contágio",
+      "circulo": 5,
+      "escola": "Necromancia",
+      "classes": [
+        "Clérigo",
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "",
+      "duracao": "7 dias"
+    },
+    {
+      "nome": "Convocar Celestial",
+      "circulo": 5,
+      "escola": "Invocação",
+      "classes": [
+        "Clérigo",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S, M (um relicário no valor de 500 ou mais PO)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Convocar Elemental",
+      "circulo": 4,
+      "escola": "Invocação",
+      "classes": [
+        "Druida",
+        "Guardião",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S, M (ar, uma pedra, cinzas e água dentro de um frasco incrustado de ouro no valor de 400 ou mais PO)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Convocar Familiar",
+      "circulo": 1,
+      "escola": "Invocação",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 hora ou Ritual",
+      "alcance": "3 metros",
+      "componentes": "V, S, M (incenso queimando no valor de 10 ou mais PO, que a magia consome)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Convocar Feérico",
+      "circulo": 3,
+      "escola": "Invocação",
+      "classes": [
+        "Bruxo",
+        "Druida",
+        "Guardião",
+        "Mago"
+      ],
+      "tempo_conjuracao": "ama Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S, M (uma flor dourada no valor de 300 ou mais PO)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Convocar Montaria",
+      "circulo": 2,
+      "escola": "Invocação",
+      "classes": [
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Convocar Relâmpagos",
+      "circulo": 3,
+      "escola": "Invocação",
+      "classes": [
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Corda Extradimensional",
+      "circulo": 2,
+      "escola": "Transmutação",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (um pedaço de corda)",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Cordão de Flechas",
+      "circulo": 2,
+      "escola": "Transmutação",
+      "classes": [
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (uma trança ornamental)",
+      "duracao": "8 horas"
+    },
+    {
+      "nome": "Coroa da Loucura",
+      "circulo": 2,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Corrente de Relâmpagos",
+      "circulo": 6,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "45 metros",
+      "componentes": "V, S, M (três alfinetes de prata)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Crescer Espinhos",
+      "circulo": 2,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "45 metros",
+      "componentes": "V, S, M (sete espinhos)",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Crescimento de Plantas",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação (Crescimento Excessivo) ou 8 horas (Fertilização)",
+      "alcance": "45 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Criar Chamas",
+      "circulo": 0,
+      "escola": "Invocação",
+      "classes": [
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "10 minutos"
+    },
+    {
+      "nome": "Criar Comida e Água",
+      "circulo": 3,
+      "escola": "Invocação",
+      "classes": [
+        "Clérigo",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Criar Mortos-Vivos",
+      "circulo": 6,
+      "escola": "Necromancia",
+      "classes": [
+        "Bruxo",
+        "Clérigo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "3 metros",
+      "componentes": "V, S, M (uma pedra de ônix preto de 150 ou mais PO para cada cadáver)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Criar Passagem",
+      "circulo": 5,
+      "escola": "Transmutação",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (uma pitada de sementes de gergelim)",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Criar ou Destruir Água",
+      "circulo": 1,
+      "escola": "Transmutação",
+      "classes": [
+        "Clérigo",
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (uma mistura de água e areia)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Criação",
+      "circulo": 5,
+      "escola": "Ilusão",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (um pincel)",
+      "duracao": "Especial"
+    },
+    {
+      "nome": "Cura Completa",
+      "circulo": 6,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo",
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Cura Completa em Massa",
+      "circulo": 9,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Curar Ferimentos",
+      "circulo": 1,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Druida",
+        "Guardião",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Curar Ferimentos em Massa",
+      "circulo": 5,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Cárcere de Energia",
+      "circulo": 7,
+      "escola": "Evocação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "30 metros",
+      "componentes": "V, S, M (rubi em pó no valor de 1.500 ou mais PO, que a magia consome)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Cão Fiel de Mordenkainen",
+      "circulo": 4,
+      "escola": "Invocação",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (um apito de prata)",
+      "duracao": "8 horas"
+    },
+    {
+      "nome": "Círculo Mágico",
+      "circulo": 3,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo",
+        "Bruxo",
+        "Mago",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "3 metros",
+      "componentes": "V, S, M (sal e prata em pó no valor de 100 ou mais PO, que a magia consome)",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Círculo da Morte",
+      "circulo": 6,
+      "escola": "Necromancia",
+      "classes": [
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "45 metros",
+      "componentes": "V, S, M (o pó de uma pérola negra esmagada no valor de 500 ou mais PO)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Círculo de Poder",
+      "circulo": 5,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo",
+        "Mago",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Círculo de Teleporte",
+      "circulo": 5,
+      "escola": "Invocação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "3 metros",
+      "componentes": "V, M (tintas raras no valor de 50 ou mais PO, que a magia consome)",
+      "duracao": "1 rodada"
+    },
+    {
+      "nome": "Cúpula Antivida",
+      "circulo": 5,
+      "escola": "Abjuração",
+      "classes": [
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Danação",
+      "circulo": 1,
+      "escola": "Encantamento",
+      "classes": [
+        "Bruxo"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "27 metros",
+      "componentes": "V, S, M (o olho petrificado de uma salamandra)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Dança Irresistível de Otto",
+      "circulo": 6,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "De Carne para Pedra",
+      "circulo": 6,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (uma pena de cocatriz)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Dedo da Morte",
+      "circulo": 7,
+      "escola": "Necromancia",
+      "classes": [
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Defensor da Fé",
+      "circulo": 4,
+      "escola": "Invocação",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V",
+      "duracao": "8 horas"
+    },
+    {
+      "nome": "Desejo",
+      "circulo": 9,
+      "escola": "Invocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Desintegrar",
+      "circulo": 6,
+      "escola": "Transmutação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (uma pedra-ímã e poeira)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Despedaçar",
+      "circulo": 2,
+      "escola": "Evocação",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (uma lasca de mica)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Despertar",
+      "circulo": 5,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Druida"
+      ],
+      "tempo_conjuracao": "8 horas",
+      "alcance": "Toque",
+      "componentes": "V, S, M (uma ágata no valor de 1.000 ou mais PO, que a magia consome)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Despistar",
+      "circulo": 5,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "S",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Destruição Atordoante",
+      "circulo": 4,
+      "escola": "Encantamento",
+      "classes": [
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após atingir uma criatura com uma arma Corpo a Corpo ou um Ataque Desarmado",
+      "alcance": "Pessoal",
+      "componentes": "",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Destruição Banidora",
+      "circulo": 5,
+      "escola": "Invocação",
+      "classes": [
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após atingir uma criatura com uma arma Corpo a Corpo ou um Ataque Desarmado",
+      "alcance": "Pessoal",
+      "componentes": "",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Destruição Cauterizante",
+      "circulo": 1,
+      "escola": "Evocação",
+      "classes": [
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após acertar um alvo com uma arma Corpo a Corpo ou um Ataque Desarmado",
+      "alcance": "Pessoal",
+      "componentes": "",
+      "duracao": "1 minuto"
+    },
+    {
+      "nome": "Destruição Cegante",
+      "circulo": 3,
+      "escola": "Evocação",
+      "classes": [
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após atingir uma criatura com uma arma Corpo a Corpo ou um Ataque Desarmado",
+      "alcance": "Pessoal",
+      "componentes": "",
+      "duracao": "1 minuto"
+    },
+    {
+      "nome": "Destruição Colérica",
+      "circulo": 1,
+      "escola": "Necromancia",
+      "classes": [
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após atingir uma criatura com uma arma Corpo a Corpo ou um Ataque Desarmado",
+      "alcance": "Pessoal",
+      "componentes": "V",
+      "duracao": "1 minuto"
+    },
+    {
+      "nome": "Destruição Divina",
+      "circulo": 1,
+      "escola": "Evocação",
+      "classes": [
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após acertar um alvo com uma arma Corpo a Corpo ou um Ataque Desarmado",
+      "alcance": "Pessoal",
+      "componentes": "V",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Destruição Estrondosa",
+      "circulo": 1,
+      "escola": "Evocação",
+      "classes": [
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após acertar um alvo com uma arma Corpo a Corpo ou um Ataque Desarmado",
+      "alcance": "Pessoal",
+      "componentes": "",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Destruição Radiante",
+      "circulo": 2,
+      "escola": "Transmutação",
+      "classes": [
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após atingir uma criatura com uma arma Corpo a Corpo ou um Ataque Desarmado",
+      "alcance": "Pessoal",
+      "componentes": "",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Detectar Magia",
+      "circulo": 1,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Clérigo",
+        "Druida",
+        "Feiticeiro",
+        "Guardião",
+        "Mago",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Detectar Pensamentos",
+      "circulo": 2,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (1 Peça de Cobre)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Detectar Veneno e Doença",
+      "circulo": 1,
+      "escola": "Adivinhação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Guardião",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma folha de teixo)",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Detectar o Bem e o Mal",
+      "circulo": 1,
+      "escola": "Adivinhação",
+      "classes": [
+        "Clérigo",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Disco Flutuante de Tenser",
+      "circulo": 1,
+      "escola": "Invocação",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (uma gota de mercúrio)",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Disfarçar-se",
+      "circulo": 1,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Dissipar Magia",
+      "circulo": 3,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Clérigo",
+        "Druida",
+        "Feiticeiro",
+        "Guardião",
+        "Mago",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Dissipar o Bem e o Mal",
+      "circulo": 5,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (prata e ferro em pó)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Dominar Fera",
+      "circulo": 4,
+      "escola": "Encantamento",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Dominar Monstro",
+      "circulo": 8,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Dominar Pessoa",
+      "circulo": 5,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Duelo Compelido",
+      "circulo": 1,
+      "escola": "Encantamento",
+      "classes": [
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "9 metros",
+      "componentes": "V",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Elementalismo",
+      "circulo": 0,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Emaranhar",
+      "circulo": 1,
+      "escola": "Invocação",
+      "classes": [
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Encarnação Fantasmagórica",
+      "circulo": 9,
+      "escola": "Ilusão",
+      "classes": [
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Encontrar Armadilhas",
+      "circulo": 2,
+      "escola": "Adivinhação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Encontrar o Caminho",
+      "circulo": 6,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Druida"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (um conjunto de ferramentas de adivinhação — como cartas ou runas — no valor de 100 ou mais PO)",
+      "duracao": "Concentração, até 1 dia"
+    },
+    {
+      "nome": "Enfeitiçar Monstro",
+      "circulo": 4,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Enfeitiçar Pessoa",
+      "circulo": 1,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Escalada de Aranha",
+      "circulo": 2,
+      "escola": "Transmutação",
+      "classes": [
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (uma gota de betume e uma aranha)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Escrita Ilusória",
+      "circulo": 1,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto ou Ritual",
+      "alcance": "Toque",
+      "componentes": "S, M (tinta no valor de 10 ou mais PO, que a magia consome)",
+      "duracao": "10 dias"
+    },
+    {
+      "nome": "Escudo Arcano",
+      "circulo": 1,
+      "escola": "Abjuração",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Reação, que você executa quando é atingido por uma jogada de ataque ou é alvo da magia Mísseis Mágicos",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "1 rodada"
+    },
+    {
+      "nome": "Escudo Ardente",
+      "circulo": 4,
+      "escola": "Evocação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (um pouco de fósforo ou um vaga-lume)",
+      "duracao": "10 minutos"
+    },
+    {
+      "nome": "Escudo da Fé",
+      "circulo": 1,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (um pergaminho de oração)",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Escuridão",
+      "circulo": 2,
+      "escola": "Evocação",
+      "classes": [
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, M (pelo de morcego e um pedaço de carvão)",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Esfera Congelante de Otiluke",
+      "circulo": 6,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "90 metros",
+      "componentes": "V, S, M (uma esfera de cristal em miniatura)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Esfera Flamejante",
+      "circulo": 2,
+      "escola": "Invocação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (uma bola de cera)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Esfera Resiliente de Otiluke",
+      "circulo": 4,
+      "escola": "Abjuração",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (uma esfera de vidro)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Esfera Vitriólica",
+      "circulo": 4,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "45 metros",
+      "componentes": "V, S, M (uma gota de bile)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Espada de Mordenkainen",
+      "circulo": 7,
+      "escola": "Evocação",
+      "classes": [
+        "Bardo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S, M (uma espada em miniatura no valor de 250 ou mais PO)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Espinho Mental",
+      "circulo": 2,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "S",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Esquentar Metal",
+      "circulo": 2,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (um pedaço de ferro e uma chama)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Estática Sináptica",
+      "circulo": 5,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Explosão Elemental",
+      "circulo": 0,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Explosão Solar",
+      "circulo": 8,
+      "escola": "Evocação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "45 metros",
+      "componentes": "V, S, M (um pedaço de pedra solar)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Fabricar",
+      "circulo": 4,
+      "escola": "Transmutação",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "10 minutos",
+      "alcance": "36 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Faca de Gelo",
+      "circulo": 1,
+      "escola": "Invocação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "S, M (uma gota de água ou um pedaço de gelo)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Fagulha Estelar",
+      "circulo": 0,
+      "escola": "Evocação",
+      "classes": [
+        "Bardo",
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Falar com Animais",
+      "circulo": 1,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "10 minutos"
+    },
+    {
+      "nome": "Falar com Mortos",
+      "circulo": 3,
+      "escola": "Necromancia",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "3 metros",
+      "componentes": "V, S, M (um incenso aceso)",
+      "duracao": "10 minutos"
+    },
+    {
+      "nome": "Falar com Plantas",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "10 minutos"
+    },
+    {
+      "nome": "Favor Divino",
+      "circulo": 1,
+      "escola": "Transmutação",
+      "classes": [
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "1 minuto"
+    },
+    {
+      "nome": "Flecha Relâmpago",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após atingir ou errar um alvo com um ataque à distância usando uma arma",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Flecha Ácida de Melf",
+      "circulo": 2,
+      "escola": "Evocação",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S, M (folha de ruibarbo em pó)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Fogo das Fadas",
+      "circulo": 1,
+      "escola": "Evocação",
+      "classes": [
+        "Bardo",
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Fome de Hadar",
+      "circulo": 3,
+      "escola": "Invocação",
+      "classes": [
+        "Bruxo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "45 metros",
+      "componentes": "V, S, M (um tentáculo em conserva)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Fonte do Luar",
+      "circulo": 4,
+      "escola": "Evocação",
+      "classes": [
+        "Bardo",
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Forma Etérea",
+      "circulo": 7,
+      "escola": "Invocação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Clérigo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Até 8 horas"
+    },
+    {
+      "nome": "Forma Gasosa",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (um pouco de gaze)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Formas Animais",
+      "circulo": 8,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S",
+      "duracao": "24 horas"
+    },
+    {
+      "nome": "Força Espectral",
+      "circulo": 2,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (um pouco de lã)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Gargalhada Nefasta de Tasha",
+      "circulo": 1,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (uma torta e uma pena)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Glifo de Proteção",
+      "circulo": 3,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 hora",
+      "alcance": "Toque",
+      "componentes": "V, S, M (um diamante em pó no valor de 200 ou mais PO, que a magia consome)",
+      "duracao": "Até ser dissipada ou acionada"
+    },
+    {
+      "nome": "Globo de Invulnerabilidade",
+      "circulo": 6,
+      "escola": "Abjuração",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma conta de vidro)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Golpe Certeiro",
+      "circulo": 0,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "S, M (uma arma com a qual você tem proficiência e que vale 1 ou mais PP)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Golpe Constritor",
+      "circulo": 1,
+      "escola": "Invocação",
+      "classes": [
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após atingir uma criatura com uma arma",
+      "alcance": "Pessoal",
+      "componentes": "V",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Golpe de Arço",
+      "circulo": 5,
+      "escola": "Invocação",
+      "classes": [
+        "Guardião",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "S, M (uma arma Corpo a Corpo que vale 1 ou mais PP)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Graxa",
+      "circulo": 1,
+      "escola": "Invocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (um pouco de banha de porco ou manteiga)",
+      "duracao": "1 minuto"
+    },
+    {
+      "nome": "Guardiões Espirituais",
+      "circulo": 3,
+      "escola": "Invocação",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (um pergaminho de oração)",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Heroísmo",
+      "circulo": 1,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Identificar",
+      "circulo": 1,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto ou Ritual",
+      "alcance": "Toque",
+      "componentes": "V, S, M (uma pérola no valor de 100 ou mais PO)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Ilusão Menor",
+      "circulo": 0,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "S, M (um pouco de lã)",
+      "duracao": "1 minuto"
+    },
+    {
+      "nome": "Ilusão Programada",
+      "circulo": 6,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S, M (pó de jade no valor de 25 ou mais PO)",
+      "duracao": "Até ser dissipada"
+    },
+    {
+      "nome": "Imagem Maior",
+      "circulo": 3,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S, M (um pouco de lã)",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Imagem Silenciosa",
+      "circulo": 1,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (um pouco de lã)",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Indetectável",
+      "circulo": 3,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Guardião",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (uma pitada de poeira de diamante no valor de 25 ou mais PO, que a magia consome)",
+      "duracao": "8 horas"
+    },
+    {
+      "nome": "Infligir Ferimentos",
+      "circulo": 1,
+      "escola": "Necromancia",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Inseto Gigante",
+      "circulo": 4,
+      "escola": "Invocação",
+      "classes": [
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Inverter a Gravidade",
+      "circulo": 7,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "30 metros",
+      "componentes": "V, S, M (uma pedra-ímã e raspas de ferro)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Invisibilidade",
+      "circulo": 2,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (um cílio envolto em goma arábica)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Invisibilidade Maior",
+      "circulo": 4,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Invocar Aberração",
+      "circulo": 4,
+      "escola": "Invocação",
+      "classes": [
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S, M (um tentáculo em conserva e um globo ocular em um frasco incrustado de platina no valor de 400 ou mais PO)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Invocar Animais",
+      "circulo": 3,
+      "escola": "Invocação",
+      "classes": [
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Invocar Barragem",
+      "circulo": 3,
+      "escola": "Invocação",
+      "classes": [
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma arma Corpo a Corpo ou à Distância que vale pelo menos 1 PP)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Invocar Celestial",
+      "circulo": 7,
+      "escola": "Invocação",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Invocar Constructo",
+      "circulo": 4,
+      "escola": "Invocação",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S, M (um cofre no valor de 400 ou mais PO)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Invocar Dragão",
+      "circulo": 5,
+      "escola": "Invocação",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (um objeto com a imagem de um dragão gravado nele no valor de 500 ou mais PO)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Invocar Elementais Menores",
+      "circulo": 4,
+      "escola": "Invocação",
+      "classes": [
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Invocar Elemental",
+      "circulo": 5,
+      "escola": "Invocação",
+      "classes": [
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Invocar Fera",
+      "circulo": 2,
+      "escola": "Invocação",
+      "classes": [
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S, M (uma pluma, tufo de pele e rabo de peixe dentro de uma bolota dourada no valor de 200 ou mais PO)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Invocar Feérico",
+      "circulo": 6,
+      "escola": "Invocação",
+      "classes": [
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Invocar Morto-Vivo",
+      "circulo": 3,
+      "escola": "Necromancia",
+      "classes": [
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S, M (um crânio dourado no valor de 300 ou mais PO)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Invocar Saraivada",
+      "circulo": 5,
+      "escola": "Invocação",
+      "classes": [
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "45 metros",
+      "componentes": "V, S, M (uma arma Corpo a Corpo ou à Distância no valor de 1 ou mais PP)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Invocar Seres da Floresta",
+      "circulo": 4,
+      "escola": "Invocação",
+      "classes": [
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Invocar Ínfero",
+      "circulo": 6,
+      "escola": "Invocação",
+      "classes": [
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S, M (um frasco com sangue no valor de 600 ou mais PO)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Invocação Instantânea de Drawmij",
+      "circulo": 6,
+      "escola": "Invocação",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto ou Ritual",
+      "alcance": "Toque",
+      "componentes": "V, S, M (uma safira no valor de 1.000 ou mais PO)",
+      "duracao": "Até ser dissipada"
+    },
+    {
+      "nome": "Labirinto",
+      "circulo": 8,
+      "escola": "Invocação",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Lendas e Histórias",
+      "circulo": 5,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "10 minutos",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (incenso no valor de 250 ou mais PO, que a magia consome, e quatro tiras de marfim no valor de 50 ou mais PO cada)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Lentidão",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S, M (uma gota de melaço)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Leque Cromático",
+      "circulo": 1,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma pitada de areia colorida)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Levitação",
+      "circulo": 2,
+      "escola": "Transmutação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (uma mola de metal)",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Ligação Telepática de Rary",
+      "circulo": 5,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (dois ovos)",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Limpar a Mente",
+      "circulo": 8,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "24 horas"
+    },
+    {
+      "nome": "Localizar Animais ou Plantas",
+      "circulo": 2,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (pelo de um cão de caça)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Localizar Criatura",
+      "circulo": 4,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Druida",
+        "Guardião",
+        "Mago",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (pelo de um cão de caça)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Localizar Objeto",
+      "circulo": 2,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Druida",
+        "Guardião",
+        "Mago",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (um galho bifurcado)",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Loquacidade",
+      "circulo": 8,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Bruxo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Lufada de Vento",
+      "circulo": 2,
+      "escola": "Evocação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Guardião",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (a semente de um legume)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Luz",
+      "circulo": 0,
+      "escola": "Evocação",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, M (um vaga-lume ou musgo fosforescente)",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Luz do Dia",
+      "circulo": 3,
+      "escola": "Evocação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Feiticeiro",
+        "Guardião",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Luzes Dançantes",
+      "circulo": 0,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S, M (um pouco de fósforo)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Lâmina Flamejante",
+      "circulo": 2,
+      "escola": "Evocação",
+      "classes": [
+        "Druida",
+        "Feiticeiro"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma folha de sumagre)",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Línguas",
+      "circulo": 3,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Clérigo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, M (um zigurate em miniatura)",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Malogro",
+      "circulo": 4,
+      "escola": "Necromancia",
+      "classes": [
+        "Bruxo",
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Mansão Magnífica de Mordenkainen",
+      "circulo": 7,
+      "escola": "Invocação",
+      "classes": [
+        "Bardo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "90 metros",
+      "componentes": "V, S, M (uma porta em miniatura no valor de 15 ou mais PO)",
+      "duracao": "24 horas"
+    },
+    {
+      "nome": "Manto do Cruzado",
+      "circulo": 3,
+      "escola": "Evocação",
+      "classes": [
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Marca do Predador",
+      "circulo": 1,
+      "escola": "Adivinhação",
+      "classes": [
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "27 metros",
+      "componentes": "V",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Mau Olhado",
+      "circulo": 6,
+      "escola": "Necromancia",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Medo",
+      "circulo": 3,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma pena branca)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Mensageiro Animal",
+      "circulo": 2,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (um bocado de comida)",
+      "duracao": "24 horas"
+    },
+    {
+      "nome": "Mensagem",
+      "circulo": 0,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "S, M (um fio de cobre)",
+      "duracao": "1 rodada"
+    },
+    {
+      "nome": "Mesclar-se às Rochas",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "8 horas"
+    },
+    {
+      "nome": "Metamorfose",
+      "circulo": 9,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma argola de jade no valor de 1.500 ou mais PO)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Miragem Arcana",
+      "circulo": 7,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "10 minutos",
+      "alcance": "À sua vista",
+      "componentes": "V, S",
+      "duracao": "10 dias"
+    },
+    {
+      "nome": "Missão",
+      "circulo": 5,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Druida",
+        "Paladino",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "18 metros",
+      "componentes": "V",
+      "duracao": "30 dias"
+    },
+    {
+      "nome": "Modificar Memória",
+      "circulo": 5,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Moldar Rochas",
+      "circulo": 4,
+      "escola": "Transmutação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (argila mole)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Moléstia",
+      "circulo": 6,
+      "escola": "Necromancia",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Montaria Fantasmagórica",
+      "circulo": 3,
+      "escola": "Ilusão",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto ou Ritual",
+      "alcance": "9 metros",
+      "componentes": "V, S",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Mover Terra",
+      "circulo": 6,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S, M (uma pá em miniatura)",
+      "duracao": "Concentração, até 2 horas"
+    },
+    {
+      "nome": "Movimentação Livre",
+      "circulo": 4,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (uma alça de couro)",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Muralha Prismática",
+      "circulo": 9,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "10 minutos"
+    },
+    {
+      "nome": "Muralha de Energia",
+      "circulo": 5,
+      "escola": "Evocação",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S, M (um caco de vidro)",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Muralha de Espinhos",
+      "circulo": 6,
+      "escola": "Invocação",
+      "classes": [
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S, M (um punhado de espinhos)",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Muralha de Fogo",
+      "circulo": 4,
+      "escola": "Evocação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S, M (um pedaço de carvão)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Muralha de Gelo",
+      "circulo": 6,
+      "escola": "Evocação",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S, M (um pedaço de quartzo)",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Muralha de Pedra",
+      "circulo": 5,
+      "escola": "Evocação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S, M (um cubo de granito)",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Muralha de Vento",
+      "circulo": 3,
+      "escola": "Evocação",
+      "classes": [
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S, M (um leque e uma pena)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Mão de Bigby",
+      "circulo": 5,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S, M (uma casca de ovo e uma luva)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Mãos Flamejantes",
+      "circulo": 1,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Mãos Mágicas",
+      "circulo": 0,
+      "escola": "Invocação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S",
+      "duracao": "1 minuto"
+    },
+    {
+      "nome": "Mísseis Mágicos",
+      "circulo": 1,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Nevasca",
+      "circulo": 3,
+      "escola": "Invocação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "45 metros",
+      "componentes": "V, S, M (um guarda-chuva em miniatura)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Nuvem Fétida",
+      "circulo": 3,
+      "escola": "Invocação",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S, M (um ovo podre)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Nuvem Incendiária",
+      "circulo": 8,
+      "escola": "Invocação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "45 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Nuvem de Adagas",
+      "circulo": 2,
+      "escola": "Invocação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (um caco de vidro)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Névoa Mortal",
+      "circulo": 5,
+      "escola": "Invocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Névoa Obscurecente",
+      "circulo": 1,
+      "escola": "Invocação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Guardião",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Olho Arcano",
+      "circulo": 4,
+      "escola": "Adivinhação",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (um pouco de pele de morcego)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Onda Destrutiva",
+      "circulo": 5,
+      "escola": "Evocação",
+      "classes": [
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Onda Trovejante",
+      "circulo": 1,
+      "escola": "Evocação",
+      "classes": [
+        "Bardo",
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Oração de Cura",
+      "circulo": 2,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "10 minutos",
+      "alcance": "9 metros",
+      "componentes": "V",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Orbe Cromático",
+      "circulo": 1,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S, M (um diamante no valor de 50 ou mais PO)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Orientação",
+      "circulo": 0,
+      "escola": "Adivinhação",
+      "classes": [
+        "Clérigo",
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Padrão Hipnótico",
+      "circulo": 3,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "S, M (uma pitada de confete)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Palavra Curativa",
+      "circulo": 1,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "18 metros",
+      "componentes": "V",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Palavra Curativa em Massa",
+      "circulo": 3,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "18 metros",
+      "componentes": "V",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Palavra Sagrada",
+      "circulo": 7,
+      "escola": "Evocação",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "9 metros",
+      "componentes": "V",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Palavra de Poder: Atordoar",
+      "circulo": 8,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Palavra de Poder: Fortificar",
+      "circulo": 7,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Palavra de Poder: Matar",
+      "circulo": 9,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Palavra de Poder: Salvar",
+      "circulo": 9,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Palavra de Radiância",
+      "circulo": 0,
+      "escola": "Evocação",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, M (um símbolo com um raio de sol)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Palavra de Regresso",
+      "circulo": 6,
+      "escola": "Invocação",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "1,5 metro",
+      "componentes": "V",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Paralisar Monstro",
+      "circulo": 5,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S, M (um pedaço reto de ferro)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Paralisar Pessoa",
+      "circulo": 2,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Clérigo",
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (um pedaço reto de ferro)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Parar o Tempo",
+      "circulo": 9,
+      "escola": "Transmutação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Passo Arbóreo",
+      "circulo": 5,
+      "escola": "Invocação",
+      "classes": [
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Passo Nebuloso",
+      "circulo": 2,
+      "escola": "Invocação",
+      "classes": [
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "Pessoal",
+      "componentes": "V",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Passo Sem Rastro",
+      "circulo": 2,
+      "escola": "Abjuração",
+      "classes": [
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (cinzas de ramo de visco queimado)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Passos Largos",
+      "circulo": 1,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Druida",
+        "Guardião",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (uma pitada de poeira)",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Pele-Casca",
+      "circulo": 2,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "Toque",
+      "componentes": "",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Pele-Rocha",
+      "circulo": 4,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Guardião",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (poeira de diamante no valor de 100 ou mais PO, que a magia consome)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Pequeno Refúgio de Leomund",
+      "circulo": 3,
+      "escola": "Evocação",
+      "classes": [
+        "Bardo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto ou Ritual",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma conta de cristal)",
+      "duracao": "8 horas"
+    },
+    {
+      "nome": "Perdição",
+      "circulo": 1,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (uma gota de sangue)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Piscar",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "1 minuto"
+    },
+    {
+      "nome": "Polimorfia",
+      "circulo": 4,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (um casulo de lagarta)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Polimorfia Total",
+      "circulo": 9,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (uma gota de mercúrio, uma porção de goma arábica e um fiapo de fumaça)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Porta Dimensional",
+      "circulo": 4,
+      "escola": "Invocação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "150 metros",
+      "componentes": "V",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Portais Arcanos",
+      "circulo": 6,
+      "escola": "Invocação",
+      "classes": [
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "150 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Portal",
+      "circulo": 9,
+      "escola": "Invocação",
+      "classes": [
+        "Bruxo",
+        "Clérigo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (um diamante no valor de 5.000 ou mais PO)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Praga de Insetos",
+      "circulo": 5,
+      "escola": "Invocação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Feiticeiro"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "90 metros",
+      "componentes": "V, S, M (um gafanhoto)",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Presença Régia de Yolande",
+      "circulo": 5,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma tiara em miniatura)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Presságio",
+      "circulo": 4,
+      "escola": "Adivinhação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (incenso no valor de 25 ou mais PO, que a magia consome)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Prestidigitação Arcana",
+      "circulo": 0,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "3 metros",
+      "componentes": "V, S",
+      "duracao": "Até 1 hora"
+    },
+    {
+      "nome": "Proibição",
+      "circulo": 6,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "10 minutos ou Ritual",
+      "alcance": "Toque",
+      "componentes": "V, S, M (rubi em pó no valor de 1.000 ou mais PO)",
+      "duracao": "1 dia"
+    },
+    {
+      "nome": "Projetar Imagem",
+      "circulo": 7,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "800 quilômetros",
+      "componentes": "V, S, M (uma estatueta de si mesmo no valor de 5 ou mais PO)",
+      "duracao": "Concentração, até 1 dia"
+    },
+    {
+      "nome": "Projeção Astral",
+      "circulo": 9,
+      "escola": "Necromancia",
+      "classes": [
+        "Clérigo",
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 hora",
+      "alcance": "3 metros",
+      "componentes": "V, S, M (para cada um dos alvos da magia, um zircão no valor de 1.000 ou mais PO e uma barra de prata no valor de 100 ou mais PO, que a magia consome)",
+      "duracao": "Até ser dissipada"
+    },
+    {
+      "nome": "Proteger Fortaleza",
+      "circulo": 6,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 hora",
+      "alcance": "Toque",
+      "componentes": "V, S, M (um cetro de prata no valor de 10 ou mais PO)",
+      "duracao": "24 horas"
+    },
+    {
+      "nome": "Proteção Contra Energia",
+      "circulo": 3,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Feiticeiro",
+        "Guardião",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Proteção Contra Lâminas",
+      "circulo": 0,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Proteção Contra Veneno",
+      "circulo": 2,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Guardião",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Proteção Contra a Morte",
+      "circulo": 4,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "8 horas"
+    },
+    {
+      "nome": "Proteção Contra o Bem e o Mal",
+      "circulo": 1,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo",
+        "Bruxo",
+        "Druida",
+        "Mago",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (um pote de Água Benta no valor de 25 ou mais PO, que a magia consome)",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Purificar Alimentos e Bebidas",
+      "circulo": 1,
+      "escola": "Transmutação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "3 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Queda Suave",
+      "circulo": 1,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Reação, que você executa quando você ou uma criatura à sua vista a até 18 metros de você entra em queda",
+      "alcance": "18 metros",
+      "componentes": "V, M (uma pequena pena ou pedaço de penugem)",
+      "duracao": "1 minuto"
+    },
+    {
+      "nome": "Raio Ardente",
+      "circulo": 2,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Raio Guia",
+      "circulo": 1,
+      "escola": "Evocação",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S",
+      "duracao": "1 rodada"
+    },
+    {
+      "nome": "Raio Lunar",
+      "circulo": 2,
+      "escola": "Evocação",
+      "classes": [
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S, M (uma folha de dama-da-noite)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Raio Místico",
+      "circulo": 0,
+      "escola": "Evocação",
+      "classes": [
+        "Bruxo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Raio Nauseante",
+      "circulo": 1,
+      "escola": "Necromancia",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Raio Solar",
+      "circulo": 6,
+      "escola": "Evocação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma lupa)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Raio de Bruxa",
+      "circulo": 1,
+      "escola": "Evocação",
+      "classes": [
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (um galho atingido por um raio)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Raio de Fogo",
+      "circulo": 0,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Raio de Gelo",
+      "circulo": 0,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Raio do Enfraquecimento",
+      "circulo": 2,
+      "escola": "Necromancia",
+      "classes": [
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Rajada Prismática",
+      "circulo": 7,
+      "escola": "Evocação",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Rajada de Veneno",
+      "circulo": 0,
+      "escola": "Necromancia",
+      "classes": [
+        "Bruxo",
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Receptáculo Arcano",
+      "circulo": 6,
+      "escola": "Necromancia",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma gema, cristal ou relicário no valor de 500 ou mais PO)",
+      "duracao": "Até ser dissipada"
+    },
+    {
+      "nome": "Reencarnar",
+      "circulo": 5,
+      "escola": "Necromancia",
+      "classes": [
+        "Druida"
+      ],
+      "tempo_conjuracao": "1 hora",
+      "alcance": "Toque",
+      "componentes": "V, S, M (óleos raros no valor de 1.000 ou mais PO, que a magia consome)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Reflexos",
+      "circulo": 2,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "1 minuto"
+    },
+    {
+      "nome": "Refugiar",
+      "circulo": 7,
+      "escola": "Transmutação",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (poeira de uma pedra preciosa no valor de 5.000 ou mais PO, que a magia consome)",
+      "duracao": "Até ser dissipada"
+    },
+    {
+      "nome": "Regeneração",
+      "circulo": 7,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Druida"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "Toque",
+      "componentes": "V, S, M (uma conta de oração)",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Relâmpago",
+      "circulo": 3,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (um pouco de pelo e um cajado de cristal)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Remeter",
+      "circulo": 3,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Ilimitado",
+      "componentes": "V, S, M (um fio de cobre)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Remover Maldição",
+      "circulo": 3,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo",
+        "Bruxo",
+        "Mago",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Reparar",
+      "circulo": 0,
+      "escola": "Transmutação",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "Toque",
+      "componentes": "V, S, M (duas pedras-ímã)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Repouso Tranquilo",
+      "circulo": 2,
+      "escola": "Necromancia",
+      "classes": [
+        "Clérigo",
+        "Mago",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "Toque",
+      "componentes": "V, S, M (2 Peças de Cobre, que a magia consome)",
+      "duracao": "10 dias"
+    },
+    {
+      "nome": "Repreensão Diabólica",
+      "circulo": 1,
+      "escola": "Evocação",
+      "classes": [
+        "Bruxo"
+      ],
+      "tempo_conjuracao": "Reação, que você realiza ao receber dano de uma criatura à sua vista e a até 18 metros de você",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Resistência",
+      "circulo": 0,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo",
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Respirar na Água",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Guardião",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (um pedaço de junco)",
+      "duracao": "24 horas"
+    },
+    {
+      "nome": "Ressurreição",
+      "circulo": 7,
+      "escola": "Necromancia",
+      "classes": [
+        "Bardo",
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "1 hora",
+      "alcance": "Toque",
+      "componentes": "V, S, M (um diamante no valor de 1.000 ou mais PO, que a magia consome)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Ressurreição Verdadeira",
+      "circulo": 9,
+      "escola": "Necromancia",
+      "classes": [
+        "Clérigo",
+        "Druida"
+      ],
+      "tempo_conjuracao": "1 hora",
+      "alcance": "Toque",
+      "componentes": "V, S, M (diamantes no valor de 25.000 ou mais PO, que a magia consome)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Restauração Maior",
+      "circulo": 5,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Druida",
+        "Guardião",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (poeira de diamante no valor de 100 ou mais PO, que a magia consome)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Restauração Menor",
+      "circulo": 2,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Druida",
+        "Guardião",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Retirada Acelerada",
+      "circulo": 1,
+      "escola": "Transmutação",
+      "classes": [
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Reviver os Mortos",
+      "circulo": 5,
+      "escola": "Necromancia",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "1 hora",
+      "alcance": "Toque",
+      "componentes": "V, S, M (um diamante no valor de 500 ou mais PO, que a magia consome)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Revivificar",
+      "circulo": 3,
+      "escola": "Necromancia",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Guardião",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (um diamante no valor de 300 ou mais PO, que a magia consome)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Rogar Maldição",
+      "circulo": 3,
+      "escola": "Necromancia",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Salto",
+      "circulo": 1,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Guardião",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "Toque",
+      "componentes": "",
+      "duracao": "1 minuto"
+    },
+    {
+      "nome": "Santuário",
+      "circulo": 1,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "9 metros",
+      "componentes": "V, S, M (o caco de um espelho)",
+      "duracao": "1 minuto"
+    },
+    {
+      "nome": "Santuário Particular de Mordenkainen",
+      "circulo": 4,
+      "escola": "Abjuração",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "10 minutos",
+      "alcance": "36 metros",
+      "componentes": "V, S, M (uma folha fina de chumbo)",
+      "duracao": "24 horas"
+    },
+    {
+      "nome": "Saraivada de Espinhos",
+      "circulo": 1,
+      "escola": "Invocação",
+      "classes": [
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após atingir uma criatura com um ataque com arma à Distância",
+      "alcance": "Pessoal",
+      "componentes": "V",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Semiplano",
+      "circulo": 8,
+      "escola": "Invocação",
+      "classes": [
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "S",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Sentido Feral",
+      "circulo": 2,
+      "escola": "Adivinhação",
+      "classes": [
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "Toque",
+      "componentes": "S",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Servo Invisível",
+      "circulo": 1,
+      "escola": "Invocação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (um pedaço de barbante e de madeira)",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Sexto Sentido",
+      "circulo": 9,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "Toque",
+      "componentes": "V, S, M (uma pena de beija-flor)",
+      "duracao": "8 horas"
+    },
+    {
+      "nome": "Silêncio",
+      "circulo": 2,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "36 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Similaridade",
+      "circulo": 5,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S",
+      "duracao": "8 horas"
+    },
+    {
+      "nome": "Simulacro",
+      "circulo": 7,
+      "escola": "Ilusão",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "12 horas",
+      "alcance": "Toque",
+      "componentes": "V, S, M (rubi em pó no valor de 1.500 ou mais PO, que a magia consome)",
+      "duracao": "Até ser dissipada"
+    },
+    {
+      "nome": "Simular Morte",
+      "circulo": 3,
+      "escola": "Necromancia",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "Toque",
+      "componentes": "V, S, M (uma pitada de terra de cemitério)",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Sinal de Esperança",
+      "circulo": 3,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Sonho",
+      "circulo": 5,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "Especial",
+      "componentes": "V, S, M (um punhado de areia)",
+      "duracao": "8 horas"
+    },
+    {
+      "nome": "Sono",
+      "circulo": 1,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (uma pitada de areia ou pétalas de rosa)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Sopro de Dragão",
+      "circulo": 2,
+      "escola": "Transmutação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "Toque",
+      "componentes": "V, S, M (uma pimenta)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Sugestão",
+      "circulo": 2,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, M (uma gota de mel)",
+      "duracao": "Concentração, até 8 horas"
+    },
+    {
+      "nome": "Sugestão em Massa",
+      "circulo": 6,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, M (a língua de uma cobra)",
+      "duracao": "24 horas"
+    },
+    {
+      "nome": "Suplício",
+      "circulo": 8,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "45 metros",
+      "componentes": "V, S, M (um chaveiro sem chaves)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Sussurros Dissonantes",
+      "circulo": 1,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Símbolo",
+      "circulo": 7,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "Toque",
+      "componentes": "V, S, M (um diamante em pó no valor de 1.000 ou mais PO, que a magia consome)",
+      "duracao": "Até ser dissipada ou acionada"
+    },
+    {
+      "nome": "Talho Mental",
+      "circulo": 0,
+      "escola": "Encantamento",
+      "classes": [
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V",
+      "duracao": "1 rodada"
+    },
+    {
+      "nome": "Taumaturgia",
+      "circulo": 0,
+      "escola": "Transmutação",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V",
+      "duracao": "Até 1 minuto"
+    },
+    {
+      "nome": "Teia",
+      "circulo": 2,
+      "escola": "Invocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (um pouco de teia de aranha)",
+      "duracao": "Concentração, até 1 hora"
+    },
+    {
+      "nome": "Telecinese",
+      "circulo": 5,
+      "escola": "Transmutação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Telepatia",
+      "circulo": 8,
+      "escola": "Adivinhação",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Ilimitado",
+      "componentes": "V, S, M (um par de anéis de prata interligados)",
+      "duracao": "24 horas"
+    },
+    {
+      "nome": "Teleporte",
+      "circulo": 7,
+      "escola": "Invocação",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "3 metros",
+      "componentes": "V",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Tempestade Glacial",
+      "circulo": 4,
+      "escola": "Evocação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "90 metros",
+      "componentes": "V, S, M (uma luva)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Tempestade Radiante de Jallarzi",
+      "circulo": 5,
+      "escola": "Evocação",
+      "classes": [
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Tempestade da Vingança",
+      "circulo": 9,
+      "escola": "Invocação",
+      "classes": [
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "1,5 km",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Tempestade de Fogo",
+      "circulo": 7,
+      "escola": "Evocação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Feiticeiro"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "45 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Tentáculos Negros de Evard",
+      "circulo": 4,
+      "escola": "Invocação",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "27 metros",
+      "componentes": "V, S, M (um tentáculo)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Terremoto",
+      "circulo": 8,
+      "escola": "Transmutação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Feiticeiro"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "150 metros",
+      "componentes": "V, S, M (uma rocha rachada)",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Terreno Alucinatório",
+      "circulo": 4,
+      "escola": "Ilusão",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "10 minutos",
+      "alcance": "90 metros",
+      "componentes": "V, S, M (um cogumelo)",
+      "duracao": "24 horas"
+    },
+    {
+      "nome": "Toque Chocante",
+      "circulo": 0,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Toque Necrótico",
+      "circulo": 0,
+      "escola": "Necromancia",
+      "classes": [
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Toque Vampírico",
+      "circulo": 3,
+      "escola": "Necromancia",
+      "classes": [
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Tranca Arcana",
+      "circulo": 2,
+      "escola": "Abjuração",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (pó de ouro no valor de 25 ou mais PO, que a magia consome)",
+      "duracao": "Até ser dissipada"
+    },
+    {
+      "nome": "Transição Planar",
+      "circulo": 7,
+      "escola": "Invocação",
+      "classes": [
+        "Bruxo",
+        "Clérigo",
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (uma haste de metal bifurcada no valor de 250 ou mais PO e sintonizada a um plano de existência)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Transporte via Plantas",
+      "circulo": 6,
+      "escola": "Invocação",
+      "classes": [
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "3 metros",
+      "componentes": "V, S",
+      "duracao": "1 minuto"
+    },
+    {
+      "nome": "Trovão",
+      "circulo": 0,
+      "escola": "Evocação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "S",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Tsunami",
+      "circulo": 8,
+      "escola": "Invocação",
+      "classes": [
+        "Druida"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "1,5 km",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 6 rodadas"
+    },
+    {
+      "nome": "Turvar",
+      "circulo": 2,
+      "escola": "Ilusão",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Ver o Invisível",
+      "circulo": 2,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma pitada de talco)",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Vidência",
+      "circulo": 5,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Clérigo",
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "10 minutos",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (um foco no valor de 1.000 ou mais PO, como uma bola de cristal, espelho ou fonte cheia de água)",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Vigor Arcano",
+      "circulo": 2,
+      "escola": "Abjuração",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "Pessoal",
+      "componentes": "",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Vinha Agarradora",
+      "circulo": 4,
+      "escola": "Invocação",
+      "classes": [
+        "Druida",
+        "Guardião"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto"
+    },
+    {
+      "nome": "Visão da Verdade",
+      "circulo": 6,
+      "escola": "Adivinhação",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Clérigo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (cogumelo em pó no valor de 25 ou mais PO, que a magia consome)",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Visão no Escuro",
+      "circulo": 2,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Guardião",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (uma cenoura seca)",
+      "duracao": "8 horas"
+    },
+    {
+      "nome": "Vitalidade Vazia",
+      "circulo": 1,
+      "escola": "Necromancia",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma gota de álcool)",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Voo",
+      "circulo": 3,
+      "escola": "Transmutação",
+      "classes": [
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (uma pena)",
+      "duracao": "Concentração, até 10 minutos"
+    },
+    {
+      "nome": "Vínculo de Proteção",
+      "circulo": 2,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (um par de anéis de platina no valor de 50 ou mais PO cada, que você e o alvo devem usar pela duração da magia)",
+      "duracao": "1 hora"
+    },
+    {
+      "nome": "Zombaria Perversa",
+      "circulo": 0,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V",
+      "duracao": "Instantânea"
+    },
+    {
+      "nome": "Zona da Verdade",
+      "circulo": 2,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Paladino"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "10 minutos"
+    },
+    {
+      "nome": "Âncora Planar",
+      "circulo": 5,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Clérigo",
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 hora",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (uma joia no valor de 1.000 ou mais PO, que a magia consome)",
+      "duracao": "24 horas"
+    }
+  ]
+}

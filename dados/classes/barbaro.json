@@ -1,0 +1,475 @@
+{
+  "nome": "Bárbaro",
+  "tracos_basicos": {
+    "Atributo Primário": "Equipamento Inicial",
+    "Força": "Escolha A ou B: (A) 4 Machadinhas, Machado Grande, Kit de Aventureiro e 15 PO; ou (B) 75 PO"
+  },
+  "tabela_caracteristicas": [
+    {
+      "Nível": "1",
+      "Bônus de Proficiência": "+2",
+      "Características de Classe": "Defesa sem Armadura, Fúria, Maestria em Arma",
+      "Fúrias": "2",
+      "Dano da Fúria": "+2",
+      "Maestria em Arma": "2"
+    },
+    {
+      "Nível": "2",
+      "Bônus de Proficiência": "+2",
+      "Características de Classe": "Ataque Imprudente, Sentido de Perigo",
+      "Fúrias": "2",
+      "Dano da Fúria": "+2",
+      "Maestria em Arma": "2"
+    },
+    {
+      "Nível": "3",
+      "Bônus de Proficiência": "+2",
+      "Características de Classe": "Conhecimento Primordial, Subclasse Bárbaro",
+      "Fúrias": "3",
+      "Dano da Fúria": "+2",
+      "Maestria em Arma": "2"
+    },
+    {
+      "Nível": "4",
+      "Bônus de Proficiência": "+2",
+      "Características de Classe": "Aumento no Valor de Atributo",
+      "Fúrias": "3",
+      "Dano da Fúria": "+2",
+      "Maestria em Arma": "3"
+    },
+    {
+      "Nível": "5",
+      "Bônus de Proficiência": "+3",
+      "Características de Classe": "Ataque Extra, Movimento Rápido",
+      "Fúrias": "3",
+      "Dano da Fúria": "+2",
+      "Maestria em Arma": "3"
+    },
+    {
+      "Nível": "6",
+      "Bônus de Proficiência": "+3",
+      "Características de Classe": "Característica de Subclasse",
+      "Fúrias": "4",
+      "Dano da Fúria": "+2",
+      "Maestria em Arma": "3"
+    },
+    {
+      "Nível": "7",
+      "Bônus de Proficiência": "+3",
+      "Características de Classe": "Bote Instintivo, Instintos Primitivos",
+      "Fúrias": "4",
+      "Dano da Fúria": "+2",
+      "Maestria em Arma": "3"
+    },
+    {
+      "Nível": "8",
+      "Bônus de Proficiência": "+3",
+      "Características de Classe": "Aumento no Valor de Atributo",
+      "Fúrias": "4",
+      "Dano da Fúria": "+2",
+      "Maestria em Arma": "3"
+    },
+    {
+      "Nível": "9",
+      "Bônus de Proficiência": "+4",
+      "Características de Classe": "Golpe Brutal",
+      "Fúrias": "4",
+      "Dano da Fúria": "+3",
+      "Maestria em Arma": "3"
+    },
+    {
+      "Nível": "10",
+      "Bônus de Proficiência": "+4",
+      "Características de Classe": "Característica de Subclasse",
+      "Fúrias": "4",
+      "Dano da Fúria": "+3",
+      "Maestria em Arma": "4"
+    },
+    {
+      "Nível": "11",
+      "Bônus de Proficiência": "+4",
+      "Características de Classe": "Fúria Implacável",
+      "Fúrias": "4",
+      "Dano da Fúria": "+3",
+      "Maestria em Arma": "4"
+    },
+    {
+      "Nível": "12",
+      "Bônus de Proficiência": "+4",
+      "Características de Classe": "Aumento no Valor de Atributo",
+      "Fúrias": "5",
+      "Dano da Fúria": "+3",
+      "Maestria em Arma": "4"
+    },
+    {
+      "Nível": "13",
+      "Bônus de Proficiência": "+5",
+      "Características de Classe": "Golpe Brutal Aprimorado",
+      "Fúrias": "5",
+      "Dano da Fúria": "+3",
+      "Maestria em Arma": "4"
+    },
+    {
+      "Nível": "14",
+      "Bônus de Proficiência": "+5",
+      "Características de Classe": "Característica de Subclasse",
+      "Fúrias": "5",
+      "Dano da Fúria": "+3",
+      "Maestria em Arma": "4"
+    },
+    {
+      "Nível": "15",
+      "Bônus de Proficiência": "+5",
+      "Características de Classe": "Fúria Persistente",
+      "Fúrias": "5",
+      "Dano da Fúria": "+3",
+      "Maestria em Arma": "4"
+    },
+    {
+      "Nível": "16",
+      "Bônus de Proficiência": "+5",
+      "Características de Classe": "Aumento no Valor de Atributo",
+      "Fúrias": "5",
+      "Dano da Fúria": "+4",
+      "Maestria em Arma": "4"
+    },
+    {
+      "Nível": "17",
+      "Bônus de Proficiência": "+6",
+      "Características de Classe": "Golpe Brutal Aprimorado",
+      "Fúrias": "6",
+      "Dano da Fúria": "+4",
+      "Maestria em Arma": "4"
+    },
+    {
+      "Nível": "18",
+      "Bônus de Proficiência": "+6",
+      "Características de Classe": "Força Indomável",
+      "Fúrias": "6",
+      "Dano da Fúria": "+4",
+      "Maestria em Arma": "4"
+    },
+    {
+      "Nível": "19",
+      "Bônus de Proficiência": "+6",
+      "Características de Classe": "Dádiva Épica",
+      "Fúrias": "6",
+      "Dano da Fúria": "+4",
+      "Maestria em Arma": "4"
+    },
+    {
+      "Nível": "20",
+      "Bônus de Proficiência": "+6",
+      "Características de Classe": "Campeão Primitivo",
+      "Fúrias": "6",
+      "Dano da Fúria": "+4",
+      "Maestria em Arma": "4"
+    }
+  ],
+  "caracteristicas": [
+    {
+      "nivel": 1,
+      "nome": "Fúria",
+      "descricao": "Você pode se imbuir com um poder primitivo chamado Fúria, uma força que lhe concede força e resiliência extraordinárias. Você pode entrar em Fúria como uma Ação Bônus, desde que não esteja vestindo armadura Pesada.\nVocê pode entrar em Fúria o número de vezes indicado na coluna Fúrias da tabela Características de Bárbaro para seu nível de Bárbaro. Você recupera um uso gasto ao completar um Descanso Curto, e restaura todos os usos gastos ao completar um Descanso Longo.\nEnquanto ativa, sua Fúria segue as regras abaixo.\n**Resistência a Dano.** Você tem Resistência a dano Contundente, Cortante e Perfurante.\n**Dano da Fúria.** Ao realizar um ataque com Força — seja com uma arma ou um Ataque Desarmado — e causar dano ao alvo, você recebe um bônus no dano, que aumenta conforme você adquire níveis como Bárbaro, conforme mostrado na coluna Dano da Fúria da tabela Características de Bárbaro.\n**Vantagem com Força.** Você tem Vantagem em testes de Força e salvaguardas de Força.\n**Sem Concentração ou Magias.** Você não pode manter a Concentração e não pode conjurar magias.\n**Duração.** A Fúria dura até o final do seu próximo turno, e encerra se você vestir armadura Pesada ou ter a condição Incapacitado. Se sua Fúria ainda estiver ativa no próximo turno, você pode estendê-la por mais um turno ao realizar uma das seguintes ações:\n-   Realizar uma jogada de ataque contra um inimigo.\n-   Forçar um inimigo a realizar uma salvaguarda.\n-   Executar uma Ação Bônus para estender sua Fúria.\nCada vez que a Fúria é estendida, ela permanece até o final do seu próximo turno. Você pode manter uma Fúria por até 10 minutos."
+    },
+    {
+      "nivel": 1,
+      "nome": "Defesa sem Armadura",
+      "descricao": "Enquanto você não estiver vestindo nenhuma armadura, sua Classe de Armadura base é igual a 10 mais seus modificadores de Destreza e Constituição. Você pode usar um Escudo e ainda receber este benefício."
+    },
+    {
+      "nivel": 1,
+      "nome": "Maestria em Arma",
+      "descricao": "Seu treinamento com armas permite que você utilize as propriedades de maestria com dois tipos de armas Corpo a Corpo Simples ou Marciais à sua escolha, como Machados Grandes e Machadinhas. Sempre que completar um Descanso Longo, você pode praticar movimentos com armas e alterar uma dessas escolhas de armas.\nAo alcançar certos níveis de Bárbaro, você adquire a habilidade de usar as propriedades de maestria de mais tipos de armas, conforme mostrado na coluna Maestria em Armas da tabela Características de Bárbaro."
+    },
+    {
+      "nivel": 2,
+      "nome": "Ataque Imprudente",
+      "descricao": "Você pode descartar toda preocupação com a defesa para atacar com ferocidade intensificada. Ao realizar sua primeira jogada de ataque no seu turno, você pode decidir atacar de forma imprudente. Fazer isso lhe concede Vantagem em jogadas de ataque usando Força até o início do seu próximo turno, mas jogadas de ataque contra você também têm Vantagem durante esse tempo."
+    },
+    {
+      "nivel": 2,
+      "nome": "Sentido de Perigo",
+      "descricao": "Você adquire uma sensibilidade extraordinária de quando as coisas não estão como deveriam, o que lhe dá um benefício ao desviar de perigos. Você tem Vantagem em salvaguardas de Destreza, a menos que tenha a condição Incapacitado."
+    },
+    {
+      "nivel": 3,
+      "nome": "Conhecimento Primordial",
+      "descricao": "Você adquire proficiência em outra perícia à sua escolha da lista de perícias disponíveis para Bárbaros no nível 1.\nAlém disso, enquanto sua Fúria estiver ativa, você pode canalizar poder primitivo ao tentar realizar certas tarefas. Sempre que realizar um teste de atributo usando uma das seguintes perícias, pode realizá-lo como um teste de Força, mesmo que normalmente utilize outro atributo: Acrobacia, Furtividade, Intimidação, Percepção ou Sobrevivência. Ao usar essa habilidade, sua Força representa o poder primitivo fluindo em você, refinando sua agilidade, postura e sentidos."
+    },
+    {
+      "nivel": 3,
+      "nome": "Subclasse de Bárbaro",
+      "descricao": "Você adquire uma subclasse de Bárbaro à sua escolha. As subclasses Trilha da Árvore do Mundo, Trilha do Berserker, Trilha do Coração Selvagem e Trilha do Fanático estão detalhadas após a descrição desta classe. Uma subclasse é uma especialização que lhe concede características em determinados níveis de Bárbaro. Durante toda sua jornada, você adquire cada característica da sua subclasse que corresponda ao seu nível de Bárbaro ou inferior."
+    },
+    {
+      "nivel": 4,
+      "nome": "Aumento no Valor de Atributo",
+      "descricao": "Você adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 8, 12 e 16 de Bárbaro."
+    },
+    {
+      "nivel": 5,
+      "nome": "Ataque Extra",
+      "descricao": "Você pode atacar duas vezes, em vez de uma, sempre que executar a ação Atacar no seu turno."
+    },
+    {
+      "nivel": 5,
+      "nome": "Movimento Rápido",
+      "descricao": "Seu Deslocamento aumenta em 3 metros enquanto você não estiver usando Armadura Pesada."
+    },
+    {
+      "nivel": 7,
+      "nome": "Bote Instintivo",
+      "descricao": "Como parte da Ação Bônus que você realiza para entrar em Fúria, você pode se mover até metade do seu Deslocamento."
+    },
+    {
+      "nivel": 7,
+      "nome": "Instintos Primitivos",
+      "descricao": "Seus instintos estão tão apurados que você tem Vantagem nas jogadas de Iniciativa."
+    },
+    {
+      "nivel": 9,
+      "nome": "Golpe Brutal",
+      "descricao": "Se você usar Ataque Imprudente, pode renunciar à Vantagem em uma jogada de ataque com Força à sua escolha no seu turno. A jogada de ataque escolhida não deve ter Desvantagem. Se a jogada de ataque atingir o alvo, este sofre 1d10 pontos de dano adicional do mesmo tipo causado pela arma ou Ataque Desarmado, e você pode causar um efeito de Golpe Brutal à sua escolha.\nVocê tem as seguintes opções de efeito.\n**Golpe Debilitador.** O Deslocamento do alvo é reduzido em 4,5 metros até o início do seu próximo turno. Um alvo pode ser afetado por apenas um Golpe Debilitador de cada vez — o mais recente.\n**Golpe Poderoso.** O alvo é empurrado 4,5 metros diretamente para longe de você. Em seguida, você pode se mover até metade do seu Deslocamento diretamente em direção ao alvo sem provocar Ataques de Oportunidade."
+    },
+    {
+      "nivel": 11,
+      "nome": "Fúria Implacável",
+      "descricao": "Sua Fúria pode mantê-lo lutando, apesar de ferimentos graves. Se você é reduzido a 0 Pontos de Vida enquanto sua Fúria estiver ativa e não morrer imediatamente, você pode realizar uma salvaguarda de Constituição CD 10. Em caso de sucesso, seus Pontos de Vida mudam para um número igual a duas vezes seu nível de Bárbaro.\nA cada vez que usar essa característica após a primeira, a CD aumenta em 5. Ao completar um Descanso Curto ou Longo, a CD volta para 10."
+    },
+    {
+      "nivel": 13,
+      "nome": "Golpe Brutal Fortalecido",
+      "descricao": "Você aperfeiçoou novas formas de atacar com ferocidade. Os seguintes efeitos agora estão entre suas opções de Golpe Brutal.\n**Golpe Atordoante.** O alvo tem Desvantagem na próxima salvaguarda que realizar e não pode realizar Ataques de Oportunidade até o início do seu próximo turno.\n**Golpe Destruidor.** Antes do início do seu próximo turno, a próxima jogada de ataque realizada por outra criatura contra o alvo recebe um bônus de +5. Uma jogada de ataque só pode receber um bônus de Golpe Destruidor por vez."
+    },
+    {
+      "nivel": 15,
+      "nome": "Fúria Persistente",
+      "descricao": "Ao jogar Iniciativa, você pode recuperar todos os usos gastos de Fúria. Após recuperar a Fúria deste modo, você não pode fazê-lo novamente até completar um Descanso Longo.\nAlém disso, sua Fúria é tão feroz que agora dura 10 minutos sem a necessidade de estender a duração de rodada em rodada. Sua Fúria encerra se você estiver com a condição Inconsciente (não apenas Incapacitado) ou vestir armadura Pesada."
+    },
+    {
+      "nivel": 17,
+      "nome": "Golpe Brutal Fortalecido",
+      "descricao": "O dano adicional de seu Golpe Brutal aumenta para 2d10 pontos. Além disso, você pode usar dois efeitos diferentes de Golpe Brutal sempre que utilizar esta característica."
+    },
+    {
+      "nivel": 18,
+      "nome": "Força Indomável",
+      "descricao": "Se o total de seu teste de Força ou de sua salvaguarda de Força for menor que seu valor de Força, você pode usar esse valor no lugar do resultado total."
+    },
+    {
+      "nivel": 19,
+      "nome": "Dádiva Épica",
+      "descricao": "Você adquire um talento Dádiva Épica (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. A Dádiva do Ataque Irresistível é recomendada."
+    },
+    {
+      "nivel": 20,
+      "nome": "Campeão Primitivo",
+      "descricao": "Você incorpora o poder primitivo. Seus valores de Força e Constituição aumentam em 4, até um máximo de 25.\n# Subclasses de Bárbaro\nUma subclasse de Bárbaro é uma especialização que concede características em certos níveis, conforme apresentado na subclasse. Esta seção apresenta as subclasses Trilha do Berserker, Trilha do Coração Selvagem, Trilha da Árvore do Mundo e Trilha do Fanático."
+    },
+    {
+      "nivel": 3,
+      "nome": "Vitalidade da Árvore",
+      "descricao": "Sua Fúria se conecta à força vital da Árvore do Mundo. Você adquire os seguintes benefícios.\n**Força Revigorante.** No início de cada um dos seus turnos enquanto sua Fúria estiver ativa, você pode escolher outra criatura a até 3 metros de você para receber Pontos de Vida Temporários. Para determinar a quantidade de Pontos de Vida Temporários, jogue um número de d6s igual ao seu bônus de Dano da Fúria e some os valores. Se qualquer um desses Pontos de Vida Temporários ainda estiverem ativos quando sua Fúria terminar, eles desaparecem.\n**Surto de Vitalidade.** Ao ativar sua Fúria, você recebe um número de Pontos de Vida Temporários igual ao seu nível de Bárbaro."
+    },
+    {
+      "nivel": 6,
+      "nome": "Ramos da Árvore",
+      "descricao": "Sempre que uma criatura que você pode ver começar o turno a até 9 metros de você enquanto sua Fúria estiver ativa, você pode executar uma Reação para convocar ramos espectrais da Árvore do Mundo ao redor dela. O alvo deve ser bem-sucedido em uma salvaguarda de Força (CD 8 mais seu modificador de Força e seu Bônus de Proficiência) ou é teleportado para um espaço desocupado à sua vista a até 1,5 metro de você ou no espaço desocupado mais próximo à sua vista. Depois que o alvo se teleportar, você pode reduzir o Deslocamento dele a 0 até o final do turno atual."
+    },
+    {
+      "nivel": 10,
+      "nome": "Raízes Devastadoras",
+      "descricao": "Durante o seu turno, seu alcance é 3 metros maior com qualquer arma corpo a corpo que tenha a propriedade Pesada ou Versátil, à medida que as raízes da Árvore do Mundo se estendem a partir de você. Ao atingir com tal arma no seu turno, pode ativar a propriedade de maestria Derrubar ou Empurrar, além de outra propriedade de maestria que você estiver utilizando com a arma."
+    },
+    {
+      "nivel": 14,
+      "nome": "Percorrer a Árvore",
+      "descricao": "Ao ativar sua Fúria e, como uma Ação Bônus enquanto ela estiver ativa, você pode se teleportar a até 18 metros para um espaço desocupado à sua vista.\nAlém disso, uma vez por Fúria, você pode aumentar o alcance desse teleporte para 45 metros. Ao fazer isso, você também pode levar até seis criaturas voluntárias que estejam a até 3 metros de você. Cada criatura se teleporta para um espaço desocupado à sua escolha a até 3 metros do seu destino.\nSubclasse Trilha da Árvore do Mundo"
+    },
+    {
+      "nivel": 3,
+      "nome": "Frenesi",
+      "descricao": "Se você usar Ataque Imprudente enquanto sua Fúria estiver ativa, você causa dano adicional ao primeiro alvo atingido no seu turno com um ataque baseado em Força. Para determinar o dano adicional, jogue um número de d6s igual ao seu bônus de Dano da Fúria e some os resultados. O dano tem o mesmo tipo da arma ou do Ataque Desarmado utilizado para o ataque."
+    },
+    {
+      "nivel": 6,
+      "nome": "Fúria Irracional",
+      "descricao": "Você tem Imunidade às condições Amedrontado e Enfeitiçado enquanto sua Fúria estiver ativa. Se você estiver sob efeito de uma dessas condições ao entrar em Fúria, a condição encerra."
+    },
+    {
+      "nivel": 10,
+      "nome": "Retaliação",
+      "descricao": "Quando você sofrer dano de uma criatura que esteja a até 1,5 metro de você, pode executar uma Reação para realizar um ataque corpo a corpo contra essa criatura, usando uma arma ou um Ataque Desarmado."
+    },
+    {
+      "nivel": 14,
+      "nome": "Presença Intimidante",
+      "descricao": "Como uma Ação Bônus, você pode causar terror em outros com sua presença ameaçadora e poder primitivo. Quando fizer isso, cada criatura à sua escolha em uma Emanação de 9 metros originada de você deve realizar uma salvaguarda de Sabedoria (CD 8 + seu modificador de Força + seu Bônus de Proficiência). Se falhar, a criatura tem a condição Amedrontado por 1 minuto. No final de cada turno da criatura Amedrontada, ela repete a salvaguarda e encerra o efeito em caso de sucesso.\nUma vez que você usa essa característica, não pode usá-la novamente até completar um Descanso Longo, a menos que gaste um uso de sua Fúria (nenhuma ação é necessária) para restaurar o uso.\n**Subclasse Trilha do Berserker**"
+    },
+    {
+      "nivel": 3,
+      "nome": "Arauto da Fauna",
+      "descricao": "Você pode conjurar as magias *Falar com Animais* e *Sentido Feral*, mas apenas como Rituais. Sabedoria é seu atributo de conjuração para elas."
+    },
+    {
+      "nivel": 3,
+      "nome": "Fúria dos Selvagens",
+      "descricao": "Sua Fúria se conecta ao poder primitivo dos animais. Sempre que você ativar sua Fúria, adquire uma das seguintes opções à sua escolha.\n**Águia**. Ao ativar sua Fúria, você pode executar as ações Correr e Desengajar como parte dessa Ação Bônus. Enquanto sua Fúria estiver ativa, você pode executar uma Ação Bônus para realizar ambas as ações.\n**Lobo.** Enquanto sua Fúria estiver ativa, seus aliados têm Vantagem em jogadas de ataque contra qualquer inimigo seu a até 1,5 metro de você.\n**Urso.** Enquanto em Fúria, você tem Resistência a todos os tipos de dano, exceto Energético, Necrótico, Psíquico e Radiante."
+    },
+    {
+      "nivel": 6,
+      "nome": "Aspecto dos Selvagens",
+      "descricao": "Você recebe uma das seguintes opções à sua escolha. Sempre que completar um Descanso Longo, você pode alterar sua escolha.\n**Coruja.** Você tem Visão no Escuro com um alcance de 18 metros. Se você já tem Visão no Escuro, seu alcance aumenta em 18 metros.\n**Pantera.** Você tem um Deslocamento de Escalada igual ao seu Deslocamento.\n**Salmão.** Você tem um Deslocamento de Natação igual ao seu Deslocamento."
+    },
+    {
+      "nivel": 10,
+      "nome": "Arauto da Natureza",
+      "descricao": "Você pode conjurar a magia *Comunhão com a Natureza*, mas apenas como um Ritual. Sabedoria é seu atributo de conjuração para isso."
+    },
+    {
+      "nivel": 14,
+      "nome": "Poder dos Selvagens",
+      "descricao": "Sempre que você ativar sua Fúria, recebe uma das seguintes opções à sua escolha.\n**Carneiro.** Enquanto sua Fúria estiver ativa, você pode impor a condição Caído em uma criatura Grande ou menor quando você a atinge com um ataque corpo a corpo.\n**Falcão.** Enquanto sua Fúria estiver ativa, você tem um Deslocamento de Voo igual ao seu Deslocamento se não estiver usando nenhuma armadura.\n**Leão.** Enquanto sua Fúria estiver ativa, qualquer um de seus inimigos a até 1,5 metro de você tem Desvantagem em jogadas de ataque contra alvos que não sejam você ou outro Bárbaro que tenha essa opção ativa.\n**Subclasse Trilha do Coração Selvagem**"
+    },
+    {
+      "nivel": 3,
+      "nome": "Campeão dos Deuses",
+      "descricao": "Uma entidade divina assegura que você possa continuar lutando. Você tem uma reserva de quatro d12s que pode gastar para se curar. Como uma Ação Bônus, você pode gastar dados da reserva, jogá-los e recuperar uma quantidade de Pontos de Vida igual ao total do resultado.\nSua reserva restaura todos os dados gastos ao completar um Descanso Longo.\nO número máximo de dados na reserva aumenta em um quando você atinge os níveis de Bárbaro 6 (5 dados), 12 (6 dados) e 17 (7 dados)."
+    },
+    {
+      "nivel": 3,
+      "nome": "Fúria Divina",
+      "descricao": "Você pode canalizar poder divino em seus golpes. Em cada um dos seus turnos, enquanto sua Fúria estiver ativa, a primeira criatura que você atingir com uma arma ou com um Ataque Desarmado sofre dano adicional igual a 1d6 pontos mais metade do seu nível de Bárbaro (arredondado para baixo). O dano adicional é do tipo Necrótico ou Radiante, à sua escolha, cada vez que causar dano."
+    },
+    {
+      "nivel": 6,
+      "nome": "Concentração Fanática",
+      "descricao": "Uma vez por Fúria ativa, se você falhar em uma salvaguarda, pode jogá-la novamente com um bônus igual ao seu bônus de Dano da Fúria, e deve usar o novo resultado."
+    },
+    {
+      "nivel": 10,
+      "nome": "Presença Zelosa",
+      "descricao": "Como uma Ação Bônus, você libera um grito de batalha infundido com energia divina. Até dez outras criaturas à sua escolha a até 18 metros de você obtêm Vantagem em jogadas de ataque e salvaguardas até o início do seu próximo turno.\nUma vez que você usa essa característica, não pode usá-la novamente até completar um Descanso Longo, a menos que gaste um uso de sua Fúria (nenhuma ação é necessária) para restaurar o uso."
+    },
+    {
+      "nivel": 14,
+      "nome": "Fúria dos Deuses",
+      "descricao": "Ao ativar sua Fúria, pode assumir a forma de um combatente divino. Essa forma dura 1 minuto ou até você atingir 0 Pontos de Vida. Uma vez que você use essa característica, não pode fazê-lo novamente até completar um Descanso Longo.\nEnquanto estiver nesta forma, você adquire os benefícios a seguir.\n**Resistência.** Você tem Resistência a dano Necrótico, Psíquico e Radiante.\n**Revivificação.** Quando uma criatura a até 9 metros de você é reduzida a 0 Pontos de Vida, você pode executar uma Reação para gastar um uso da sua Fúria e, em vez disso, mudar os Pontos de Vida do alvo para um número igual ao seu nível de Bárbaro.\n**Voo.** Você tem um Deslocamento de Voo igual ao seu Deslocamento e pode pairar.\n**Subclasse Trilha do Fanático**"
+    }
+  ],
+  "subclasses": [
+    {
+      "nome": "Trilha da Árvore do Mundo",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Vitalidade da Árvore",
+          "descricao": "Sua Fúria se conecta à força vital da Árvore do Mundo. Você adquire os seguintes benefícios.\n**Força Revigorante.** No início de cada um dos seus turnos enquanto sua Fúria estiver ativa, você pode escolher outra criatura a até 3 metros de você para receber Pontos de Vida Temporários. Para determinar a quantidade de Pontos de Vida Temporários, jogue um número de d6s igual ao seu bônus de Dano da Fúria e some os valores. Se qualquer um desses Pontos de Vida Temporários ainda estiverem ativos quando sua Fúria terminar, eles desaparecem.\n**Surto de Vitalidade.** Ao ativar sua Fúria, você recebe um número de Pontos de Vida Temporários igual ao seu nível de Bárbaro."
+        },
+        {
+          "nivel": 6,
+          "nome": "Ramos da Árvore",
+          "descricao": "Sempre que uma criatura que você pode ver começar o turno a até 9 metros de você enquanto sua Fúria estiver ativa, você pode executar uma Reação para convocar ramos espectrais da Árvore do Mundo ao redor dela. O alvo deve ser bem-sucedido em uma salvaguarda de Força (CD 8 mais seu modificador de Força e seu Bônus de Proficiência) ou é teleportado para um espaço desocupado à sua vista a até 1,5 metro de você ou no espaço desocupado mais próximo à sua vista. Depois que o alvo se teleportar, você pode reduzir o Deslocamento dele a 0 até o final do turno atual."
+        },
+        {
+          "nivel": 10,
+          "nome": "Raízes Devastadoras",
+          "descricao": "Durante o seu turno, seu alcance é 3 metros maior com qualquer arma corpo a corpo que tenha a propriedade Pesada ou Versátil, à medida que as raízes da Árvore do Mundo se estendem a partir de você. Ao atingir com tal arma no seu turno, pode ativar a propriedade de maestria Derrubar ou Empurrar, além de outra propriedade de maestria que você estiver utilizando com a arma."
+        },
+        {
+          "nivel": 14,
+          "nome": "Percorrer a Árvore",
+          "descricao": "Ao ativar sua Fúria e, como uma Ação Bônus enquanto ela estiver ativa, você pode se teleportar a até 18 metros para um espaço desocupado à sua vista.\nAlém disso, uma vez por Fúria, você pode aumentar o alcance desse teleporte para 45 metros. Ao fazer isso, você também pode levar até seis criaturas voluntárias que estejam a até 3 metros de você. Cada criatura se teleporta para um espaço desocupado à sua escolha a até 3 metros do seu destino.\nSubclasse Trilha da Árvore do Mundo"
+        }
+      ]
+    },
+    {
+      "nome": "Trilha do Berserker",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Frenesi",
+          "descricao": "Se você usar Ataque Imprudente enquanto sua Fúria estiver ativa, você causa dano adicional ao primeiro alvo atingido no seu turno com um ataque baseado em Força. Para determinar o dano adicional, jogue um número de d6s igual ao seu bônus de Dano da Fúria e some os resultados. O dano tem o mesmo tipo da arma ou do Ataque Desarmado utilizado para o ataque."
+        },
+        {
+          "nivel": 6,
+          "nome": "Fúria Irracional",
+          "descricao": "Você tem Imunidade às condições Amedrontado e Enfeitiçado enquanto sua Fúria estiver ativa. Se você estiver sob efeito de uma dessas condições ao entrar em Fúria, a condição encerra."
+        },
+        {
+          "nivel": 10,
+          "nome": "Retaliação",
+          "descricao": "Quando você sofrer dano de uma criatura que esteja a até 1,5 metro de você, pode executar uma Reação para realizar um ataque corpo a corpo contra essa criatura, usando uma arma ou um Ataque Desarmado."
+        },
+        {
+          "nivel": 14,
+          "nome": "Presença Intimidante",
+          "descricao": "Como uma Ação Bônus, você pode causar terror em outros com sua presença ameaçadora e poder primitivo. Quando fizer isso, cada criatura à sua escolha em uma Emanação de 9 metros originada de você deve realizar uma salvaguarda de Sabedoria (CD 8 + seu modificador de Força + seu Bônus de Proficiência). Se falhar, a criatura tem a condição Amedrontado por 1 minuto. No final de cada turno da criatura Amedrontada, ela repete a salvaguarda e encerra o efeito em caso de sucesso.\nUma vez que você usa essa característica, não pode usá-la novamente até completar um Descanso Longo, a menos que gaste um uso de sua Fúria (nenhuma ação é necessária) para restaurar o uso.\n**Subclasse Trilha do Berserker**"
+        }
+      ]
+    },
+    {
+      "nome": "Trilha do Coração Selvagem",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Arauto da Fauna",
+          "descricao": "Você pode conjurar as magias *Falar com Animais* e *Sentido Feral*, mas apenas como Rituais. Sabedoria é seu atributo de conjuração para elas."
+        },
+        {
+          "nivel": 3,
+          "nome": "Fúria dos Selvagens",
+          "descricao": "Sua Fúria se conecta ao poder primitivo dos animais. Sempre que você ativar sua Fúria, adquire uma das seguintes opções à sua escolha.\n**Águia**. Ao ativar sua Fúria, você pode executar as ações Correr e Desengajar como parte dessa Ação Bônus. Enquanto sua Fúria estiver ativa, você pode executar uma Ação Bônus para realizar ambas as ações.\n**Lobo.** Enquanto sua Fúria estiver ativa, seus aliados têm Vantagem em jogadas de ataque contra qualquer inimigo seu a até 1,5 metro de você.\n**Urso.** Enquanto em Fúria, você tem Resistência a todos os tipos de dano, exceto Energético, Necrótico, Psíquico e Radiante."
+        },
+        {
+          "nivel": 6,
+          "nome": "Aspecto dos Selvagens",
+          "descricao": "Você recebe uma das seguintes opções à sua escolha. Sempre que completar um Descanso Longo, você pode alterar sua escolha.\n**Coruja.** Você tem Visão no Escuro com um alcance de 18 metros. Se você já tem Visão no Escuro, seu alcance aumenta em 18 metros.\n**Pantera.** Você tem um Deslocamento de Escalada igual ao seu Deslocamento.\n**Salmão.** Você tem um Deslocamento de Natação igual ao seu Deslocamento."
+        },
+        {
+          "nivel": 10,
+          "nome": "Arauto da Natureza",
+          "descricao": "Você pode conjurar a magia *Comunhão com a Natureza*, mas apenas como um Ritual. Sabedoria é seu atributo de conjuração para isso."
+        },
+        {
+          "nivel": 14,
+          "nome": "Poder dos Selvagens",
+          "descricao": "Sempre que você ativar sua Fúria, recebe uma das seguintes opções à sua escolha.\n**Carneiro.** Enquanto sua Fúria estiver ativa, você pode impor a condição Caído em uma criatura Grande ou menor quando você a atinge com um ataque corpo a corpo.\n**Falcão.** Enquanto sua Fúria estiver ativa, você tem um Deslocamento de Voo igual ao seu Deslocamento se não estiver usando nenhuma armadura.\n**Leão.** Enquanto sua Fúria estiver ativa, qualquer um de seus inimigos a até 1,5 metro de você tem Desvantagem em jogadas de ataque contra alvos que não sejam você ou outro Bárbaro que tenha essa opção ativa.\n**Subclasse Trilha do Coração Selvagem**"
+        }
+      ]
+    },
+    {
+      "nome": "Trilha do Fanático",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Campeão dos Deuses",
+          "descricao": "Uma entidade divina assegura que você possa continuar lutando. Você tem uma reserva de quatro d12s que pode gastar para se curar. Como uma Ação Bônus, você pode gastar dados da reserva, jogá-los e recuperar uma quantidade de Pontos de Vida igual ao total do resultado.\nSua reserva restaura todos os dados gastos ao completar um Descanso Longo.\nO número máximo de dados na reserva aumenta em um quando você atinge os níveis de Bárbaro 6 (5 dados), 12 (6 dados) e 17 (7 dados)."
+        },
+        {
+          "nivel": 3,
+          "nome": "Fúria Divina",
+          "descricao": "Você pode canalizar poder divino em seus golpes. Em cada um dos seus turnos, enquanto sua Fúria estiver ativa, a primeira criatura que você atingir com uma arma ou com um Ataque Desarmado sofre dano adicional igual a 1d6 pontos mais metade do seu nível de Bárbaro (arredondado para baixo). O dano adicional é do tipo Necrótico ou Radiante, à sua escolha, cada vez que causar dano."
+        },
+        {
+          "nivel": 6,
+          "nome": "Concentração Fanática",
+          "descricao": "Uma vez por Fúria ativa, se você falhar em uma salvaguarda, pode jogá-la novamente com um bônus igual ao seu bônus de Dano da Fúria, e deve usar o novo resultado."
+        },
+        {
+          "nivel": 10,
+          "nome": "Presença Zelosa",
+          "descricao": "Como uma Ação Bônus, você libera um grito de batalha infundido com energia divina. Até dez outras criaturas à sua escolha a até 18 metros de você obtêm Vantagem em jogadas de ataque e salvaguardas até o início do seu próximo turno.\nUma vez que você usa essa característica, não pode usá-la novamente até completar um Descanso Longo, a menos que gaste um uso de sua Fúria (nenhuma ação é necessária) para restaurar o uso."
+        },
+        {
+          "nivel": 14,
+          "nome": "Fúria dos Deuses",
+          "descricao": "Ao ativar sua Fúria, pode assumir a forma de um combatente divino. Essa forma dura 1 minuto ou até você atingir 0 Pontos de Vida. Uma vez que você use essa característica, não pode fazê-lo novamente até completar um Descanso Longo.\nEnquanto estiver nesta forma, você adquire os benefícios a seguir.\n**Resistência.** Você tem Resistência a dano Necrótico, Psíquico e Radiante.\n**Revivificação.** Quando uma criatura a até 9 metros de você é reduzida a 0 Pontos de Vida, você pode executar uma Reação para gastar um uso da sua Fúria e, em vez disso, mudar os Pontos de Vida do alvo para um número igual ao seu nível de Bárbaro.\n**Voo.** Você tem um Deslocamento de Voo igual ao seu Deslocamento e pode pairar.\n**Subclasse Trilha do Fanático**"
+        }
+      ]
+    }
+  ],
+  "lista_magias": {},
+  "texto_completo": "*Glória* para alcançar os picos do heroísmo.\n\n*Vingança* para perseguir os malfeitores.\n\nBárbaro\n\n***\n\nUm Combatente Feroz da Fúria Primitiva\n\n**Traços Básicos de Bárbaro**\n\n| **Atributo Primário**            | **Força**                                                                                     |\n|----------------------------------|-----------------------------------------------------------------------------------------------|\n| **Dado de Ponto de Vida**        | D12 por nível de Bárbaro                                                                      |\n| **Proficiência em Salvaguardas** | Força e Constituição                                                                          |\n| **Proficiência em Perícias**     | *Escolha 2:* Atletismo, Intimidação, Lidar com Animais, Natureza, Percepção ou Sobrevivência  |\n| **Proficiências com Armas**      | Armas Simples e Marciais                                                                      |\n| **Treinamento com Armadura**     | Armaduras Leve e Média e Escudos                                                              |\n| **Equipamento Inicial**          | *Escolha A ou B:* (A) 4 Machadinhas, Machado Grande, Kit de Aventureiro e 15 PO; ou (B) 75 PO |\n\nBárbaros são combatentes poderosos, impulsionados por forças primitivas do multiverso que se manifestam com sua Fúria. Mais do que uma simples emoção — e não limitada à raiva — essa Fúria é a encarnação da ferocidade de um predador, da fúria de uma tempestade e da turbulência do mar.\n\nAlguns Bárbaros personificam sua Fúria como um espírito feroz ou um antepassado reverenciado. Outros a veem como uma conexão com a dor e o sofrimento do mundo, um emaranhado impessoal de magia selvagem ou uma expressão de seu eu mais profundo. Para cada Bárbaro, a Fúria é uma força que alimenta não apenas sua habilidade de combate, mas também seus reflexos aprimorados e sentidos ampliados.\n\nBárbaros frequentemente servem como protetores e líderes em suas comunidades. Eles se entregam de cabeça no perigo para que aqueles sob sua proteção não precisem. Sua coragem diante do perigo torna os Bárbaros perfeitamente adequados para aventuras.\n\n## Tornando-se um Bárbaro...\n\n### Como um Personagem de Nível 1\n\n-   Adquira todos os traços na tabela Traços Básicos de Bárbaro.\n-   Adquira as características de nível 1 de Bárbaro, apresentadas na tabela Características de Bárbaro.\n\n### Como um Personagem Multiclasse\n\n-   Adquira as seguintes características da tabela Traços Básicos de Bárbaro: Dado de Ponto de Vida, proficiência com armas Marciais e treinamento com Escudos.\n-   Adquira as características de nível 1 de Bárbaro, apresentadas na tabela Características de Bárbaro.\n\n## Características de Classe de Bárbaro\n\nComo Bárbaro, você recebe as seguintes características de classe ao alcançar os níveis especificados de Bárbaro. Essas características são apresentadas na tabela Características de Bárbaro.\n\n**Características de Bárbaro**\n\n| **Nível** | **Bônus de Proficiência** | **Características de Classe**                | **Fúrias** | **Dano da Fúria** | **Maestria em Arma** |\n|-----------|---------------------------|----------------------------------------------|------------|-------------------|----------------------|\n| 1         | +2                        | Defesa sem Armadura, Fúria, Maestria em Arma | 2          | +2                | 2                    |\n| 2         | +2                        | Ataque Imprudente, Sentido de Perigo         | 2          | +2                | 2                    |\n| 3         | +2                        | Conhecimento Primordial, Subclasse Bárbaro   | 3          | +2                | 2                    |\n| 4         | +2                        | Aumento no Valor de Atributo                 | 3          | +2                | 3                    |\n| 5         | +3                        | Ataque Extra, Movimento Rápido               | 3          | +2                | 3                    |\n| 6         | +3                        | Característica de Subclasse                  | 4          | +2                | 3                    |\n| 7         | +3                        | Bote Instintivo, Instintos Primitivos        | 4          | +2                | 3                    |\n| 8         | +3                        | Aumento no Valor de Atributo                 | 4          | +2                | 3                    |\n| 9         | +4                        | Golpe Brutal                                 | 4          | +3                | 3                    |\n| 10        | +4                        | Característica de Subclasse                  | 4          | +3                | 4                    |\n| 11        | +4                        | Fúria Implacável                             | 4          | +3                | 4                    |\n| 12        | +4                        | Aumento no Valor de Atributo                 | 5          | +3                | 4                    |\n| 13        | +5                        | Golpe Brutal Aprimorado                      | 5          | +3                | 4                    |\n| 14        | +5                        | Característica de Subclasse                  | 5          | +3                | 4                    |\n| 15        | +5                        | Fúria Persistente                            | 5          | +3                | 4                    |\n| 16        | +5                        | Aumento no Valor de Atributo                 | 5          | +4                | 4                    |\n| 17        | +6                        | Golpe Brutal Aprimorado                      | 6          | +4                | 4                    |\n| 18        | +6                        | Força Indomável                              | 6          | +4                | 4                    |\n| 19        | +6                        | Dádiva Épica                                 | 6          | +4                | 4                    |\n| 20        | +6                        | Campeão Primitivo                            | 6          | +4                | 4                    |\n\n### Nível 1: Fúria\n\nVocê pode se imbuir com um poder primitivo chamado Fúria, uma força que lhe concede força e resiliência extraordinárias. Você pode entrar em Fúria como uma Ação Bônus, desde que não esteja vestindo armadura Pesada.\n\nVocê pode entrar em Fúria o número de vezes indicado na coluna Fúrias da tabela Características de Bárbaro para seu nível de Bárbaro. Você recupera um uso gasto ao completar um Descanso Curto, e restaura todos os usos gastos ao completar um Descanso Longo.\n\nEnquanto ativa, sua Fúria segue as regras abaixo.\n\n**Resistência a Dano.** Você tem Resistência a dano Contundente, Cortante e Perfurante.\n\n**Dano da Fúria.** Ao realizar um ataque com Força — seja com uma arma ou um Ataque Desarmado — e causar dano ao alvo, você recebe um bônus no dano, que aumenta conforme você adquire níveis como Bárbaro, conforme mostrado na coluna Dano da Fúria da tabela Características de Bárbaro.\n\n**Vantagem com Força.** Você tem Vantagem em testes de Força e salvaguardas de Força.\n\n**Sem Concentração ou Magias.** Você não pode manter a Concentração e não pode conjurar magias.\n\n**Duração.** A Fúria dura até o final do seu próximo turno, e encerra se você vestir armadura Pesada ou ter a condição Incapacitado. Se sua Fúria ainda estiver ativa no próximo turno, você pode estendê-la por mais um turno ao realizar uma das seguintes ações:\n\n-   Realizar uma jogada de ataque contra um inimigo.\n-   Forçar um inimigo a realizar uma salvaguarda.\n-   Executar uma Ação Bônus para estender sua Fúria.\n\n    Cada vez que a Fúria é estendida, ela permanece até o final do seu próximo turno. Você pode manter uma Fúria por até 10 minutos.\n\n### Nível 1: Defesa sem Armadura\n\nEnquanto você não estiver vestindo nenhuma armadura, sua Classe de Armadura base é igual a 10 mais seus modificadores de Destreza e Constituição. Você pode usar um Escudo e ainda receber este benefício.\n\n### Nível 1: Maestria em Arma\n\nSeu treinamento com armas permite que você utilize as propriedades de maestria com dois tipos de armas Corpo a Corpo Simples ou Marciais à sua escolha, como Machados Grandes e Machadinhas. Sempre que completar um Descanso Longo, você pode praticar movimentos com armas e alterar uma dessas escolhas de armas.\n\nAo alcançar certos níveis de Bárbaro, você adquire a habilidade de usar as propriedades de maestria de mais tipos de armas, conforme mostrado na coluna Maestria em Armas da tabela Características de Bárbaro.\n\n### Nível 2: Ataque Imprudente\n\nVocê pode descartar toda preocupação com a defesa para atacar com ferocidade intensificada. Ao realizar sua primeira jogada de ataque no seu turno, você pode decidir atacar de forma imprudente. Fazer isso lhe concede Vantagem em jogadas de ataque usando Força até o início do seu próximo turno, mas jogadas de ataque contra você também têm Vantagem durante esse tempo.\n\n### Nível 2: Sentido de Perigo\n\nVocê adquire uma sensibilidade extraordinária de quando as coisas não estão como deveriam, o que lhe dá um benefício ao desviar de perigos. Você tem Vantagem em salvaguardas de Destreza, a menos que tenha a condição Incapacitado.\n\n### Nível 3: Conhecimento Primordial\n\nVocê adquire proficiência em outra perícia à sua escolha da lista de perícias disponíveis para Bárbaros no nível 1.\n\nAlém disso, enquanto sua Fúria estiver ativa, você pode canalizar poder primitivo ao tentar realizar certas tarefas. Sempre que realizar um teste de atributo usando uma das seguintes perícias, pode realizá-lo como um teste de Força, mesmo que normalmente utilize outro atributo: Acrobacia, Furtividade, Intimidação, Percepção ou Sobrevivência. Ao usar essa habilidade, sua Força representa o poder primitivo fluindo em você, refinando sua agilidade, postura e sentidos.\n\n### Nível 3: Subclasse de Bárbaro\n\nVocê adquire uma subclasse de Bárbaro à sua escolha. As subclasses Trilha da Árvore do Mundo, Trilha do Berserker, Trilha do Coração Selvagem e Trilha do Fanático estão detalhadas após a descrição desta classe. Uma subclasse é uma especialização que lhe concede características em determinados níveis de Bárbaro. Durante toda sua jornada, você adquire cada característica da sua subclasse que corresponda ao seu nível de Bárbaro ou inferior.\n\n### Nível 4: Aumento no Valor de Atributo\n\nVocê adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 8, 12 e 16 de Bárbaro.\n\n### Nível 5: Ataque Extra\n\nVocê pode atacar duas vezes, em vez de uma, sempre que executar a ação Atacar no seu turno.\n\n### Nível 5: Movimento Rápido\n\nSeu Deslocamento aumenta em 3 metros enquanto você não estiver usando Armadura Pesada.\n\n### Nível 7: Bote Instintivo\n\nComo parte da Ação Bônus que você realiza para entrar em Fúria, você pode se mover até metade do seu Deslocamento.\n\n### Nível 7: Instintos Primitivos\n\nSeus instintos estão tão apurados que você tem Vantagem nas jogadas de Iniciativa.\n\n### Nível 9: Golpe Brutal\n\nSe você usar Ataque Imprudente, pode renunciar à Vantagem em uma jogada de ataque com Força à sua escolha no seu turno. A jogada de ataque escolhida não deve ter Desvantagem. Se a jogada de ataque atingir o alvo, este sofre 1d10 pontos de dano adicional do mesmo tipo causado pela arma ou Ataque Desarmado, e você pode causar um efeito de Golpe Brutal à sua escolha.\n\nVocê tem as seguintes opções de efeito.\n\n**Golpe Debilitador.** O Deslocamento do alvo é reduzido em 4,5 metros até o início do seu próximo turno. Um alvo pode ser afetado por apenas um Golpe Debilitador de cada vez — o mais recente.\n\n**Golpe Poderoso.** O alvo é empurrado 4,5 metros diretamente para longe de você. Em seguida, você pode se mover até metade do seu Deslocamento diretamente em direção ao alvo sem provocar Ataques de Oportunidade.\n\n### Nível 11: Fúria Implacável\n\nSua Fúria pode mantê-lo lutando, apesar de ferimentos graves. Se você é reduzido a 0 Pontos de Vida enquanto sua Fúria estiver ativa e não morrer imediatamente, você pode realizar uma salvaguarda de Constituição CD 10. Em caso de sucesso, seus Pontos de Vida mudam para um número igual a duas vezes seu nível de Bárbaro.\n\nA cada vez que usar essa característica após a primeira, a CD aumenta em 5. Ao completar um Descanso Curto ou Longo, a CD volta para 10.\n\n### Nível 13: Golpe Brutal Fortalecido\n\nVocê aperfeiçoou novas formas de atacar com ferocidade. Os seguintes efeitos agora estão entre suas opções de Golpe Brutal.\n\n**Golpe Atordoante.** O alvo tem Desvantagem na próxima salvaguarda que realizar e não pode realizar Ataques de Oportunidade até o início do seu próximo turno.\n\n**Golpe Destruidor.** Antes do início do seu próximo turno, a próxima jogada de ataque realizada por outra criatura contra o alvo recebe um bônus de +5. Uma jogada de ataque só pode receber um bônus de Golpe Destruidor por vez.\n\n### Nível 15: Fúria Persistente\n\nAo jogar Iniciativa, você pode recuperar todos os usos gastos de Fúria. Após recuperar a Fúria deste modo, você não pode fazê-lo novamente até completar um Descanso Longo.\n\nAlém disso, sua Fúria é tão feroz que agora dura 10 minutos sem a necessidade de estender a duração de rodada em rodada. Sua Fúria encerra se você estiver com a condição Inconsciente (não apenas Incapacitado) ou vestir armadura Pesada.\n\n### Nível 17: Golpe Brutal Fortalecido\n\nO dano adicional de seu Golpe Brutal aumenta para 2d10 pontos. Além disso, você pode usar dois efeitos diferentes de Golpe Brutal sempre que utilizar esta característica.\n\n### Nível 18: Força Indomável\n\nSe o total de seu teste de Força ou de sua salvaguarda de Força for menor que seu valor de Força, você pode usar esse valor no lugar do resultado total.\n\n### Nível 19: Dádiva Épica\n\nVocê adquire um talento Dádiva Épica (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. A Dádiva do Ataque Irresistível é recomendada.\n\n### Nível 20: Campeão Primitivo\n\nVocê incorpora o poder primitivo. Seus valores de Força e Constituição aumentam em 4, até um máximo de 25.\n\n# Subclasses de Bárbaro\n\nUma subclasse de Bárbaro é uma especialização que concede características em certos níveis, conforme apresentado na subclasse. Esta seção apresenta as subclasses Trilha do Berserker, Trilha do Coração Selvagem, Trilha da Árvore do Mundo e Trilha do Fanático.\n\n## Trilha da Árvore do Mundo\n\n*Entrelace as Raízes e Ramos do Multiverso*\n\nBárbaros que seguem a Trilha da Árvore do Mundo conectam-se à árvore cósmica Yggdrasil por meio de sua Fúria. Essa árvore cresce entre os Planos Externos, ligando-os entre si e ao Plano Material. Esses Bárbaros extraem a magia da árvore para obter vitalidade e viajar entre dimensões.\n\n### Nível 3: Vitalidade da Árvore\n\nSua Fúria se conecta à força vital da Árvore do Mundo. Você adquire os seguintes benefícios.\n\n**Força Revigorante.** No início de cada um dos seus turnos enquanto sua Fúria estiver ativa, você pode escolher outra criatura a até 3 metros de você para receber Pontos de Vida Temporários. Para determinar a quantidade de Pontos de Vida Temporários, jogue um número de d6s igual ao seu bônus de Dano da Fúria e some os valores. Se qualquer um desses Pontos de Vida Temporários ainda estiverem ativos quando sua Fúria terminar, eles desaparecem.\n\n**Surto de Vitalidade.** Ao ativar sua Fúria, você recebe um número de Pontos de Vida Temporários igual ao seu nível de Bárbaro.\n\n### Nível 6: Ramos da Árvore\n\nSempre que uma criatura que você pode ver começar o turno a até 9 metros de você enquanto sua Fúria estiver ativa, você pode executar uma Reação para convocar ramos espectrais da Árvore do Mundo ao redor dela. O alvo deve ser bem-sucedido em uma salvaguarda de Força (CD 8 mais seu modificador de Força e seu Bônus de Proficiência) ou é teleportado para um espaço desocupado à sua vista a até 1,5 metro de você ou no espaço desocupado mais próximo à sua vista. Depois que o alvo se teleportar, você pode reduzir o Deslocamento dele a 0 até o final do turno atual.\n\n### Nível 10: Raízes Devastadoras\n\nDurante o seu turno, seu alcance é 3 metros maior com qualquer arma corpo a corpo que tenha a propriedade Pesada ou Versátil, à medida que as raízes da Árvore do Mundo se estendem a partir de você. Ao atingir com tal arma no seu turno, pode ativar a propriedade de maestria Derrubar ou Empurrar, além de outra propriedade de maestria que você estiver utilizando com a arma.\n\n### Nível 14: Percorrer a Árvore\n\nAo ativar sua Fúria e, como uma Ação Bônus enquanto ela estiver ativa, você pode se teleportar a até 18 metros para um espaço desocupado à sua vista.\n\nAlém disso, uma vez por Fúria, você pode aumentar o alcance desse teleporte para 45 metros. Ao fazer isso, você também pode levar até seis criaturas voluntárias que estejam a até 3 metros de você. Cada criatura se teleporta para um espaço desocupado à sua escolha a até 3 metros do seu destino.\n\nSubclasse Trilha da Árvore do Mundo\n\n## Trilha do Berserker\n\n*Canalize sua Fúria em um Frenesi Violento*\n\nBárbaros que seguem a Trilha do Berserker direcionam sua Fúria principalmente para a violência. Essa trilha é de um frenesi desenfreado, e eles se deleitam no caos da batalha ao permitir que sua Fúria os domine e fortaleça.\n\n### Nível 3: Frenesi\n\nSe você usar Ataque Imprudente enquanto sua Fúria estiver ativa, você causa dano adicional ao primeiro alvo atingido no seu turno com um ataque baseado em Força. Para determinar o dano adicional, jogue um número de d6s igual ao seu bônus de Dano da Fúria e some os resultados. O dano tem o mesmo tipo da arma ou do Ataque Desarmado utilizado para o ataque.\n\n### Nível 6: Fúria Irracional\n\nVocê tem Imunidade às condições Amedrontado e Enfeitiçado enquanto sua Fúria estiver ativa. Se você estiver sob efeito de uma dessas condições ao entrar em Fúria, a condição encerra.\n\n### Nível 10: Retaliação\n\nQuando você sofrer dano de uma criatura que esteja a até 1,5 metro de você, pode executar uma Reação para realizar um ataque corpo a corpo contra essa criatura, usando uma arma ou um Ataque Desarmado.\n\n### Nível 14: Presença Intimidante\n\nComo uma Ação Bônus, você pode causar terror em outros com sua presença ameaçadora e poder primitivo. Quando fizer isso, cada criatura à sua escolha em uma Emanação de 9 metros originada de você deve realizar uma salvaguarda de Sabedoria (CD 8 + seu modificador de Força + seu Bônus de Proficiência). Se falhar, a criatura tem a condição Amedrontado por 1 minuto. No final de cada turno da criatura Amedrontada, ela repete a salvaguarda e encerra o efeito em caso de sucesso.\n\nUma vez que você usa essa característica, não pode usá-la novamente até completar um Descanso Longo, a menos que gaste um uso de sua Fúria (nenhuma ação é necessária) para restaurar o uso.\n\n**Subclasse Trilha do Berserker**\n\n## Trilha do Coração Selvagem\n\n*Ande em Comunhão com o Mundo Animal*\n\nBárbaros que seguem a Trilha do Coração Selvagem se consideram parentes dos animais. Esses Bárbaros aprendem meios mágicos de se comunicar com os animais, e sua Fúria intensifica essa conexão com eles, preenchendo-os com poder sobrenatural.\n\n### Nível 3: Arauto da Fauna\n\nVocê pode conjurar as magias *Falar com Animais* e *Sentido Feral*, mas apenas como Rituais. Sabedoria é seu atributo de conjuração para elas.\n\n### Nível 3: Fúria dos Selvagens\n\nSua Fúria se conecta ao poder primitivo dos animais. Sempre que você ativar sua Fúria, adquire uma das seguintes opções à sua escolha.\n\n**Águia**. Ao ativar sua Fúria, você pode executar as ações Correr e Desengajar como parte dessa Ação Bônus. Enquanto sua Fúria estiver ativa, você pode executar uma Ação Bônus para realizar ambas as ações.\n\n**Lobo.** Enquanto sua Fúria estiver ativa, seus aliados têm Vantagem em jogadas de ataque contra qualquer inimigo seu a até 1,5 metro de você.\n\n**Urso.** Enquanto em Fúria, você tem Resistência a todos os tipos de dano, exceto Energético, Necrótico, Psíquico e Radiante.\n\n### Nível 6: Aspecto dos Selvagens\n\nVocê recebe uma das seguintes opções à sua escolha. Sempre que completar um Descanso Longo, você pode alterar sua escolha.\n\n**Coruja.** Você tem Visão no Escuro com um alcance de 18 metros. Se você já tem Visão no Escuro, seu alcance aumenta em 18 metros.\n\n**Pantera.** Você tem um Deslocamento de Escalada igual ao seu Deslocamento.\n\n**Salmão.** Você tem um Deslocamento de Natação igual ao seu Deslocamento.\n\n### Nível 10: Arauto da Natureza\n\nVocê pode conjurar a magia *Comunhão com a Natureza*, mas apenas como um Ritual. Sabedoria é seu atributo de conjuração para isso.\n\n### Nível 14: Poder dos Selvagens\n\nSempre que você ativar sua Fúria, recebe uma das seguintes opções à sua escolha.\n\n**Carneiro.** Enquanto sua Fúria estiver ativa, você pode impor a condição Caído em uma criatura Grande ou menor quando você a atinge com um ataque corpo a corpo.\n\n**Falcão.** Enquanto sua Fúria estiver ativa, você tem um Deslocamento de Voo igual ao seu Deslocamento se não estiver usando nenhuma armadura.\n\n**Leão.** Enquanto sua Fúria estiver ativa, qualquer um de seus inimigos a até 1,5 metro de você tem Desvantagem em jogadas de ataque contra alvos que não sejam você ou outro Bárbaro que tenha essa opção ativa.\n\n**Subclasse Trilha do Coração Selvagem**\n\n## Trilha do Fanático\n\n*Fúria em Êxtase com um Deus*\n\nBárbaros que seguem a Trilha do Fanático recebem bênçãos de um deus ou panteão. Esses Bárbaros experimentam sua Fúria como um episódio extático de união divina que os infunde com poder. Frequentemente, são aliados de sacerdotes e outros seguidores de sua divindade ou panteão.\n\n### Nível 3: Campeão dos Deuses\n\nUma entidade divina assegura que você possa continuar lutando. Você tem uma reserva de quatro d12s que pode gastar para se curar. Como uma Ação Bônus, você pode gastar dados da reserva, jogá-los e recuperar uma quantidade de Pontos de Vida igual ao total do resultado.\n\nSua reserva restaura todos os dados gastos ao completar um Descanso Longo.\n\nO número máximo de dados na reserva aumenta em um quando você atinge os níveis de Bárbaro 6 (5 dados), 12 (6 dados) e 17 (7 dados).\n\n### Nível 3: Fúria Divina\n\nVocê pode canalizar poder divino em seus golpes. Em cada um dos seus turnos, enquanto sua Fúria estiver ativa, a primeira criatura que você atingir com uma arma ou com um Ataque Desarmado sofre dano adicional igual a 1d6 pontos mais metade do seu nível de Bárbaro (arredondado para baixo). O dano adicional é do tipo Necrótico ou Radiante, à sua escolha, cada vez que causar dano.\n\n### Nível 6: Concentração Fanática\n\nUma vez por Fúria ativa, se você falhar em uma salvaguarda, pode jogá-la novamente com um bônus igual ao seu bônus de Dano da Fúria, e deve usar o novo resultado.\n\n### Nível 10: Presença Zelosa\n\nComo uma Ação Bônus, você libera um grito de batalha infundido com energia divina. Até dez outras criaturas à sua escolha a até 18 metros de você obtêm Vantagem em jogadas de ataque e salvaguardas até o início do seu próximo turno.\n\nUma vez que você usa essa característica, não pode usá-la novamente até completar um Descanso Longo, a menos que gaste um uso de sua Fúria (nenhuma ação é necessária) para restaurar o uso.\n\n### Nível 14: Fúria dos Deuses\n\nAo ativar sua Fúria, pode assumir a forma de um combatente divino. Essa forma dura 1 minuto ou até você atingir 0 Pontos de Vida. Uma vez que você use essa característica, não pode fazê-lo novamente até completar um Descanso Longo.\n\nEnquanto estiver nesta forma, você adquire os benefícios a seguir.\n\n**Resistência.** Você tem Resistência a dano Necrótico, Psíquico e Radiante.\n\n**Revivificação.** Quando uma criatura a até 9 metros de você é reduzida a 0 Pontos de Vida, você pode executar uma Reação para gastar um uso da sua Fúria e, em vez disso, mudar os Pontos de Vida do alvo para um número igual ao seu nível de Bárbaro.\n\n**Voo.** Você tem um Deslocamento de Voo igual ao seu Deslocamento e pode pairar.\n\n**Subclasse Trilha do Fanático**"
+}

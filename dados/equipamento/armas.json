@@ -1,0 +1,429 @@
+{
+  "total": 38,
+  "armas": [
+    {
+      "nome": "Adaga",
+      "categoria": "Armas Simples Corpo a Corpo",
+      "dano": "1d4 Perfurante",
+      "propriedades": "Acuidade, Arremesso (Alcance 6/18), Leve",
+      "maestria": "Ágil",
+      "peso": "0,5 kg",
+      "custo": "2 PO"
+    },
+    {
+      "nome": "Azagaia",
+      "categoria": "Armas Simples Corpo a Corpo",
+      "dano": "1d6 Perfurante",
+      "propriedades": "Arremesso (Alcance 9/36)",
+      "maestria": "Lentidão",
+      "peso": "1 kg",
+      "custo": "5 PP"
+    },
+    {
+      "nome": "Cajado",
+      "categoria": "Armas Simples Corpo a Corpo",
+      "dano": "1d6 Contundente",
+      "propriedades": "Versátil (1d8)",
+      "maestria": "Derrubar",
+      "peso": "2 kg",
+      "custo": "2 PP"
+    },
+    {
+      "nome": "Clava",
+      "categoria": "Armas Simples Corpo a Corpo",
+      "dano": "1d4 Contundente",
+      "propriedades": "Leve",
+      "maestria": "Lentidão",
+      "peso": "1 kg",
+      "custo": "1 PP"
+    },
+    {
+      "nome": "Clava Grande",
+      "categoria": "Armas Simples Corpo a Corpo",
+      "dano": "1d8 Contundente",
+      "propriedades": "Duas Mãos",
+      "maestria": "Empurrar",
+      "peso": "5 kg",
+      "custo": "2 PP"
+    },
+    {
+      "nome": "Foice",
+      "categoria": "Armas Simples Corpo a Corpo",
+      "dano": "1d4 Cortante",
+      "propriedades": "Leve",
+      "maestria": "Ágil",
+      "peso": "1 kg",
+      "custo": "1 PO"
+    },
+    {
+      "nome": "Lança",
+      "categoria": "Armas Simples Corpo a Corpo",
+      "dano": "1d6 Perfurante",
+      "propriedades": "Arremesso (Alcance 6/18), Versátil (1d8)",
+      "maestria": "Drenar",
+      "peso": "1,5 kg",
+      "custo": "1 PO"
+    },
+    {
+      "nome": "Maça",
+      "categoria": "Armas Simples Corpo a Corpo",
+      "dano": "1d6 Contundente",
+      "propriedades": "—",
+      "maestria": "Drenar",
+      "peso": "2 kg",
+      "custo": "5 PO"
+    },
+    {
+      "nome": "Machadinha",
+      "categoria": "Armas Simples Corpo a Corpo",
+      "dano": "1d6 Cortante",
+      "propriedades": "Arremesso (Alcance 6/18), Leve",
+      "maestria": "Afligir",
+      "peso": "1 kg",
+      "custo": "5 PO"
+    },
+    {
+      "nome": "Martelo Leve",
+      "categoria": "Armas Simples Corpo a Corpo",
+      "dano": "1d4 Contundente",
+      "propriedades": "Arremesso (Alcance 6/18), Leve",
+      "maestria": "Ágil",
+      "peso": "1 kg",
+      "custo": "2 PO"
+    },
+    {
+      "nome": "Arco Curto",
+      "categoria": "Armas Simples à Distância",
+      "dano": "1d6 Perfurante",
+      "propriedades": "Duas Mãos, Munição (Alcance 24/96; Flecha)",
+      "maestria": "Afligir",
+      "peso": "1 kg",
+      "custo": "25 PO"
+    },
+    {
+      "nome": "Besta Leve",
+      "categoria": "Armas Simples à Distância",
+      "dano": "1d8 Perfurante",
+      "propriedades": "Duas Mãos, Munição (Alcance 24/96; Virote), Recarga",
+      "maestria": "Lentidão",
+      "peso": "2,5 kg",
+      "custo": "25 PO"
+    },
+    {
+      "nome": "Dardo",
+      "categoria": "Armas Simples à Distância",
+      "dano": "1d4 Perfurante",
+      "propriedades": "Acuidade, Arremesso (Alcance 6/18),",
+      "maestria": "Afligir",
+      "peso": "150 g",
+      "custo": "5 PC"
+    },
+    {
+      "nome": "Funda",
+      "categoria": "Armas Simples à Distância",
+      "dano": "1d4 Contundente",
+      "propriedades": "Munição (Alcance 9/36; Bala)",
+      "maestria": "Lentidão",
+      "peso": "—",
+      "custo": "1 PP"
+    },
+    {
+      "nome": "Alabarda",
+      "categoria": "Armas Marciais Corpo a Corpo",
+      "dano": "1d10 Cortante",
+      "propriedades": "Duas Mãos, Extensão, Pesada",
+      "maestria": "Trespassar",
+      "peso": "3 kg",
+      "custo": "20 PO"
+    },
+    {
+      "nome": "Chicote",
+      "categoria": "Armas Marciais Corpo a Corpo",
+      "dano": "1d4 Cortante",
+      "propriedades": "Acuidade, Extensão",
+      "maestria": "Lentidão",
+      "peso": "1,5 kg",
+      "custo": "2 PO"
+    },
+    {
+      "nome": "Cimitarra",
+      "categoria": "Armas Marciais Corpo a Corpo",
+      "dano": "1d6 Cortante",
+      "propriedades": "Acuidade, Leve",
+      "maestria": "Ágil",
+      "peso": "1,5 kg",
+      "custo": "25 PO"
+    },
+    {
+      "nome": "Espada Curta",
+      "categoria": "Armas Marciais Corpo a Corpo",
+      "dano": "1d6 Perfurante,",
+      "propriedades": "Acuidade, Leve",
+      "maestria": "Afligir",
+      "peso": "1 kg",
+      "custo": "10 PO"
+    },
+    {
+      "nome": "Espada Grande",
+      "categoria": "Armas Marciais Corpo a Corpo",
+      "dano": "2d6 Cortante",
+      "propriedades": "Duas Mãos, Pesada",
+      "maestria": "Garantido",
+      "peso": "3 kg",
+      "custo": "50 PO"
+    },
+    {
+      "nome": "Espada Longa",
+      "categoria": "Armas Marciais Corpo a Corpo",
+      "dano": "1d8 Cortante",
+      "propriedades": "Versátil (1d10)",
+      "maestria": "Drenar",
+      "peso": "1,5 kg",
+      "custo": "15 PO"
+    },
+    {
+      "nome": "Glaive",
+      "categoria": "Armas Marciais Corpo a Corpo",
+      "dano": "1d10 Cortante",
+      "propriedades": "Duas Mãos, Extensão, Pesada",
+      "maestria": "Garantido",
+      "peso": "3 kg",
+      "custo": "20 PO"
+    },
+    {
+      "nome": "Lança de Montaria",
+      "categoria": "Armas Marciais Corpo a Corpo",
+      "dano": "1d10 Perfurante",
+      "propriedades": "Duas Mãos (a menos que montado), Extensão, Pesada",
+      "maestria": "Derrubar",
+      "peso": "3 kg",
+      "custo": "10 PO"
+    },
+    {
+      "nome": "Lança Longa",
+      "categoria": "Armas Marciais Corpo a Corpo",
+      "dano": "1d10 Perfurante",
+      "propriedades": "Duas Mãos, Extensão, Pesada",
+      "maestria": "Empurrar",
+      "peso": "9 kg",
+      "custo": "5 PO"
+    },
+    {
+      "nome": "Maça Estrela",
+      "categoria": "Armas Marciais Corpo a Corpo",
+      "dano": "1d8 Perfurante",
+      "propriedades": "—",
+      "maestria": "Drenar",
+      "peso": "2 kg",
+      "custo": "15 PO"
+    },
+    {
+      "nome": "Machado de Batalha",
+      "categoria": "Armas Marciais Corpo a Corpo",
+      "dano": "1d8 Cortante",
+      "propriedades": "Versátil (1d10)",
+      "maestria": "Derrubar",
+      "peso": "2 kg",
+      "custo": "10 PO"
+    },
+    {
+      "nome": "Machado Grande",
+      "categoria": "Armas Marciais Corpo a Corpo",
+      "dano": "1d12 Cortante",
+      "propriedades": "Duas Mãos, Pesada",
+      "maestria": "Trespassar",
+      "peso": "3,5 kg",
+      "custo": "30 PO"
+    },
+    {
+      "nome": "Malho",
+      "categoria": "Armas Marciais Corpo a Corpo",
+      "dano": "2d6 Contundente",
+      "propriedades": "Duas Mãos, Pesada",
+      "maestria": "Derrubar",
+      "peso": "5 kg",
+      "custo": "10 PO"
+    },
+    {
+      "nome": "Mangual",
+      "categoria": "Armas Marciais Corpo a Corpo",
+      "dano": "1d8 Contundente",
+      "propriedades": "—",
+      "maestria": "Drenar",
+      "peso": "1 kg",
+      "custo": "10 PO"
+    },
+    {
+      "nome": "Martelo de Guerra",
+      "categoria": "Armas Marciais Corpo a Corpo",
+      "dano": "1d8 Contundente",
+      "propriedades": "Versátil (1d10)",
+      "maestria": "Empurrar",
+      "peso": "2,5 kg",
+      "custo": "15 PO"
+    },
+    {
+      "nome": "Picareta de Guerra",
+      "categoria": "Armas Marciais Corpo a Corpo",
+      "dano": "1d8 Perfurante",
+      "propriedades": "Versátil (1d10)",
+      "maestria": "Drenar",
+      "peso": "1 kg",
+      "custo": "5 PO"
+    },
+    {
+      "nome": "Rapieira",
+      "categoria": "Armas Marciais Corpo a Corpo",
+      "dano": "1d8 Perfurante",
+      "propriedades": "Acuidade",
+      "maestria": "Afligir",
+      "peso": "1 kg",
+      "custo": "25 PO"
+    },
+    {
+      "nome": "Tridente",
+      "categoria": "Armas Marciais Corpo a Corpo",
+      "dano": "1d8 Perfurante",
+      "propriedades": "Arremesso (Alcance 6/18), Versátil (1d10)",
+      "maestria": "Derrubar",
+      "peso": "2 kg",
+      "custo": "5 PO"
+    },
+    {
+      "nome": "Arco Longo",
+      "categoria": "Armas Marciais à Distância",
+      "dano": "1d8 Perfurante",
+      "propriedades": "Duas Mãos, Munição (Alcance 45/180; Flecha), Pesada",
+      "maestria": "Lentidão",
+      "peso": "1 kg",
+      "custo": "50 PO"
+    },
+    {
+      "nome": "Besta de Mão",
+      "categoria": "Armas Marciais à Distância",
+      "dano": "1d6 Perfurante",
+      "propriedades": "Leve, Munição (Alcance 9/36; Virote), Recarga",
+      "maestria": "Empurrar",
+      "peso": "1,5 kg",
+      "custo": "75 PO"
+    },
+    {
+      "nome": "Besta Pesada",
+      "categoria": "Armas Marciais à Distância",
+      "dano": "1d10 Perfurante",
+      "propriedades": "Duas Mãos, Munição (Alcance 30/120; Virote), Pesada, Recarga",
+      "maestria": "Lentidão",
+      "peso": "9 kg",
+      "custo": "50 PO"
+    },
+    {
+      "nome": "Mosquete",
+      "categoria": "Armas Marciais à Distância",
+      "dano": "1d12 Perfurante",
+      "propriedades": "Duas Mãos, Munição (Alcance 12/36; Bala), Recarga",
+      "maestria": "Lentidão",
+      "peso": "5 kg",
+      "custo": "500 PO"
+    },
+    {
+      "nome": "Pistola",
+      "categoria": "Armas Marciais à Distância",
+      "dano": "1d10 Perfurante",
+      "propriedades": "Munição (Alcance 9/27; Bala), Recarga",
+      "maestria": "Afligir",
+      "peso": "1,5 kg",
+      "custo": "250 PO"
+    },
+    {
+      "nome": "Zarabatana",
+      "categoria": "Armas Marciais à Distância",
+      "dano": "1 Perfurante",
+      "propriedades": "Munição (Alcance 7,5/30; Agulha), Recarga",
+      "maestria": "Afligir",
+      "peso": "0,5 kg",
+      "custo": "10 PO"
+    }
+  ],
+  "propriedades": [
+    {
+      "nome": "Acuidade",
+      "descricao": "Ao realizar um ataque com uma arma que possui Acuidade, utilize seu modificador de Força ou Destreza, à sua escolha, para as jogadas de ataque e dano. Você deve aplicar o mesmo modificador em ambas as jogadas."
+    },
+    {
+      "nome": "Alcance",
+      "descricao": "Uma arma com Alcance possui um alcance indicado entre parênteses após a propriedade Munição ou Arremesso. O alcance apresenta dois números: o primeiro representa o alcance normal da arma em metros, enquanto o segundo indica o alcance máximo. Ao atacar um alvo que esteja além do alcance normal, você tem Desvantagem na jogada de ataque. Não é possível atacar um alvo que esteja além do alcance máximo."
+    },
+    {
+      "nome": "Arremesso",
+      "descricao": "Se uma arma possui a propriedade Arremesso, você pode arremessá-la para realizar um ataque à distância, e pode sacar essa arma como parte do ataque. Se a arma for corpo a corpo, utilize o mesmo modificador de atributo para as jogadas de ataque e dano que você emprega ao realizar um ataque corpo a corpo com essa arma."
+    },
+    {
+      "nome": "Duas Mãos",
+      "descricao": "Uma arma de Duas Mãos exige o uso de duas mãos ao atacar com ela."
+    },
+    {
+      "nome": "Extensão",
+      "descricao": "Uma arma de Extensão adiciona 1,5 metro ao seu alcance ao atacar com ela, bem como ao determinar seu alcance para realizar Ataques de Oportunidade com ela."
+    },
+    {
+      "nome": "Leve",
+      "descricao": "Ao executar a ação Atacar em seu turno e usar uma arma Leve, você pode realizar um ataque adicional como uma Ação Bônus mais tarde no mesmo turno. Esse ataque adicional deve ser realizado com uma arma Leve diferente, e você não adiciona seu modificador de atributo ao dano do ataque adicional, a menos que esse modificador seja negativo. Por exemplo, você pode atacar com uma Espada Curta em uma mão e uma Adaga na outra executando a ação Atacar e uma Ação Bônus, mas não adiciona seu modificador de Força ou Destreza à jogada de dano da Ação Bônus, a menos que esse modificador seja negativo."
+    },
+    {
+      "nome": "Munição",
+      "descricao": "Você só pode usar uma arma com a propriedade Munição para realizar um ataque à distância se tiver munição disponível. O tipo de munição necessária é especificado junto ao alcance da arma. Cada ataque gasta uma peça de munição. Sacar a munição é parte do ataque (você precisa de uma mão livre para carregar uma arma com uma mão). Após uma luta, você pode gastar 1 minuto para recuperar metade da munição (arredondado para baixo) que utilizou na luta; o restante é perdido."
+    },
+    {
+      "nome": "Pesada",
+      "descricao": "Você tem Desvantagem em jogadas de ataque com uma arma Pesada se for uma arma Corpo a Corpo e seu valor de Força for inferior a 13, ou se for uma arma à Distância e seu valor de Destreza for inferior a 13."
+    },
+    {
+      "nome": "Recarga",
+      "descricao": "Você pode disparar apenas uma única peça de munição de uma arma com Recarga ao executar uma ação, uma Ação Bônus ou uma Reação para dispará-la, independentemente do número de ataques que você normalmente pode realizar."
+    },
+    {
+      "nome": "Versátil",
+      "descricao": "Uma arma Versátil pode ser usada com uma ou duas mãos. Um valor de dano entre parênteses aparece com a propriedade. A arma causa esse dano quando usada com as duas mãos ao realizar um ataque corpo a corpo.\n## Propriedades de Maestria\nCada arma possui uma propriedade de maestria, que só pode ser utilizada por um personagem que tenha uma característica, como Maestria em Armas, que desbloqueie a propriedade para o personagem. As propriedades estão definidas abaixo."
+    },
+    {
+      "nome": "Afligir",
+      "descricao": "Se você atingir uma criatura com esta arma e causar dano a ela, você tem Vantagem em sua próxima jogada de ataque contra essa criatura antes do final do seu próximo turno."
+    },
+    {
+      "nome": "Ágil",
+      "descricao": "Ao realizar o ataque adicional da propriedade Leve, você pode fazê-lo como parte da ação Atacar, em vez de uma Ação Bônus. Esse ataque adicional só pode ser realizado uma vez por turno."
+    },
+    {
+      "nome": "Derrubar",
+      "descricao": "Se você atingir uma criatura com esta arma, você pode forçar a criatura a realizar uma salvaguarda de Constituição (CD 8 mais o modificador de atributo usado para realizar a jogada de ataque e seu Bônus de Proficiência). Se falhar, a criatura tem a condição Caído."
+    },
+    {
+      "nome": "Drenar",
+      "descricao": "Se você atingir uma criatura com esta arma, essa criatura tem Desvantagem na próxima jogada de ataque dela antes do início do seu próximo turno."
+    },
+    {
+      "nome": "Empurrar",
+      "descricao": "Se atingir uma criatura com esta arma, você pode empurrá-la até 3 metros para longe de você se a criatura for Grande ou menor."
+    },
+    {
+      "nome": "Garantido",
+      "descricao": "Se sua jogada de ataque com esta arma errar uma criatura, você pode causar dano a essa criatura igual ao modificador de atributo que utilizou para realizar a jogada de ataque. Este dano é do mesmo tipo causado pela arma, e só pode ser aumentado se o modificador de atributo for incrementado."
+    },
+    {
+      "nome": "Lentidão",
+      "descricao": "Se você atingir uma criatura com esta arma e causar dano a ela, você pode reduzir o Deslocamento da criatura atingida em 3 metros até o início do seu próximo turno. Se a criatura for atingida mais de uma vez por armas que tenham essa propriedade, a redução de Deslocamento não excede 3 metros."
+    },
+    {
+      "nome": "Trespassar",
+      "descricao": "Se atingir uma criatura com uma jogada de ataque corpo a corpo usando esta arma, você pode realizar uma jogada de ataque corpo a corpo com a mesma arma contra uma segunda criatura a até 1,5 metro da primeira que também esteja ao seu alcance. Se acertar, a segunda criatura sofre o dano da arma, mas você não adiciona seu modificador de atributo a esse dano, a menos que esse modificador seja negativo. Você pode realizar esse ataque adicional apenas uma vez por turno.\n# Armaduras\n**Armaduras**\n| **Armadura**                                                       | **Classe de Armadura (CA)**      | **Força** | **Furtividade** | **Peso** | **Custo** |\n|--------------------------------------------------------------------|----------------------------------|-----------|-----------------|----------|-----------|\n| *Armadura Leve (1 Minuto para Vestir ou Despir)*                   |                                  |           |                 |          |           |\n| Acolchoada                                                         | 11 + modificador de Des          | —         | Desvantagem     | 4 kg     | 5 PO      |\n| Couro                                                              | 11 + modificador de Des          | —         | —               | 5 kg     | 10 PO     |\n| Couro Batido                                                       | 12 + modificador de Des          | —         | —               | 6,5 kg   | 45 PO     |\n| *Armadura Média (5 Minutos para Vestir e 1 Minuto para Despir)*    |                                  |           |                 |          |           |\n| Gibão de Peles                                                     | 12 + modificador de Des (máx. 2) | —         | —               | 6 kg     | 10 PO     |\n| Cota de Malha Parcial                                              | 13 + modificador de Des (máx. 2) | —         | —               | 10 kg    | 50 PO     |\n| Loriga de Escamas                                                  | 14 + Modificador de Des (máx. 2) | —         | Desvantagem     | 22 kg    | 50 PO     |\n| Couraça Peitoral                                                   | 14 + Modificador de Des (máx. 2) | —         | —               | 10 kg    | 400 PO    |\n| Placas Parcial                                                     | 15 + Modificador de Des (máx. 2) | —         | Desvantagem     | 20 kg    | 750 PO    |\n| *Armadura Pesada (10 Minutos para Vestir e 5 Minutos para Despir)* |                                  |           |                 |          |           |\n| Cota de Anéis                                                      | 14                               | —         | Desvantagem     | 20 kg    | 30 PO     |\n| Cota de Malha                                                      | 16                               | For 13    | Desvantagem     | 27 kg    | 75 PO     |\n| Armadura de Talas                                                   | 17                               | For 15    | Desvantagem     | 30 kg    | 200 PO    |\n| Placas                                                             | 18                               | For 15    | Desvantagem     | 32 kg    | 1.500 PO  |\n| *Escudo (Ação Usar Objeto para Equipar ou Desequipar)*             |                                  |           |                 |          |           |\n| Escudo                                                             | +2                                | —         | —               | 3 kg     | 10 PO     |\nA tabela Armaduras detalha as principais armaduras do jogo. A tabela inclui o custo e o peso da armadura, bem como os seguintes detalhes:\n**Categoria.** Cada tipo de armadura se enquadra em uma categoria: Leve, Média ou Pesada. A categoria determina quanto tempo leva para vestir ou despir a armadura (conforme mostrado na tabela).\n**Classe de Armadura (CA).** A coluna CA da tabela informa qual é a sua CA base quando você usa um tipo de armadura. Por exemplo, se você usar Armadura de Couro, sua CA base é 11 mais seu modificador de Destreza, enquanto sua CA é 16 se for uma Cota de Malha.\n**Força.** Se a tabela mostrar um valor de Força na coluna Força para um tipo de armadura, essa armadura reduz o deslocamento do usuário em 3 metros, a menos que o usuário tenha um valor de Força igual ou superior ao valor indicado.\n**Furtividade.** Se a tabela mostra “Desvantagem” na coluna Furtividade para um tipo de armadura, o usuário tem Desvantagem em testes de Destreza (Furtividade).\n## Treinamento com Armadura\nQualquer um pode vestir uma armadura ou segurar um Escudo, mas apenas aqueles com treinamento podem usá-los de forma eficaz, conforme explicado abaixo. A classe de um personagem e outras características determinam o treinamento com armadura do personagem. Um monstro tem treinamento com qualquer armadura em seu bloco de estatísticas."
+    },
+    {
+      "nome": "Armadura Leve, Média ou Pesada",
+      "descricao": "Se você usar armadura Leve, Média ou Pesada e não tiver treinamento com ela, você tem Desvantagem em qualquer Teste de D20 que envolva Força ou Destreza, e não pode conjurar magias."
+    },
+    {
+      "nome": "Escudo",
+      "descricao": "Você adquire o benefício de Classe de Armadura de um Escudo somente se tiver treinamento com ele.\n## Um de Cada Vez\nUma criatura pode usar apenas uma armadura e empunhar apenas um Escudo de cada vez.\n**Variante: Tamanhos de Equipamento**\nNa maioria das campanhas, você pode usar ou vestir qualquer equipamento que encontrar em suas aventuras, dentro dos limites do senso comum. Por exemplo, um aventureiro orc não caberá na Armadura de Couro de um pequenino, e a túnica de um gigante das nuvens seria grande demais para um gnomo.\nO Mestre pode aplicar mais realismo. Por exemplo, uma Armadura de Placas fabricada para um humano pode não caber em outro sem alterações significativas, e o uniforme de um guarda pode ser visivelmente inadequado quando um aventureiro tenta usá-lo como um disfarce.\nUsando esta variante, quando os aventureiros encontram armaduras, roupas e itens semelhantes que são fabricados para serem usados, eles podem precisar visitar um alfaiate, um curtidor, um ferreiro ou um especialista semelhante para tornar o item usável. O custo do ajuste é de 1d4 x 10 por cento do preço de mercado do item.\n# Ferramentas\nUma ferramenta ajuda você a realizar testes de atributo de forma especializada, fabricar certos itens ou ambos. A descrição de uma ferramenta inclui o custo e o peso da ferramenta, bem como as seguintes descrições:\n**Atributo.** Esta descrição indica o atributo a ser usado ao realizar um teste de atributo com a ferramenta.\n**Usar Objeto.** Esta descrição indica as coisas que você pode realizar com a ferramenta ao executar a ação Usar Objeto. Você pode realizar uma dessas coisas toda vez que agir. Esta descrição também fornece a CD para a ação.\n**Fabricação.** Esta descrição indica se e o que você pode fabricar com a ferramenta. Para regras de fabricação, veja \"Fabricação de Equipamentos\" mais adiante neste capítulo.\n**Variantes.** Esta descrição aparece se a ferramenta tiver variantes indicadas. Cada uma requer uma proficiência separada.\n## Proficiência com Ferramentas\nSe você tem proficiência com uma ferramenta, adicione seu Bônus de Proficiência a qualquer teste de atributo que use a ferramenta. Se você tem proficiência em uma perícia usada com esse teste, também tem Vantagem no teste.\nSuas características podem lhe dar proficiência com uma ferramenta. Um monstro tem proficiência com qualquer ferramenta em seu próprio bloco de estatísticas.\n## Ferramentas de Artesão\nFerramentas de Artesão são focadas na fabricação de itens e em mercadorias. Cada uma dessas ferramentas requer uma proficiência separada.\n#### Ferramentas de Carpinteiro (8 PO)\n**Atributo:** Força\n**Peso:** 3 kg\n**Usar Objeto:** Selar ou abrir uma porta ou recipiente (CD 20)\n**Fabricação:** Aríete Portável, Baliza, Barril, Baú, Cajado, Clava, Clava Grande, Escada, Tocha\n#### Ferramentas de Cartógrafo (15 PO)\n**Atributo:** Sabedoria\n**Peso:** 3 kg\n**Usar Objeto:** Elaborar o mapa de uma pequena área (CD 15)\n**Fabricação:** Mapa\n#### Ferramentas de Coureiro (5 PO)\n**Atributo:** Destreza\n**Peso:** 2,5 kg\n**Usar Objeto:** Moldar a estética de um item de couro (CD 10)\n**Fabricação:** Algibeira, Aljava, Armadura de Couro, Armadura de Couro Batido, Cantil, Chicote, Estojo de Mapa ou Pergaminho, Estojo de Virotes de Besta, Funda, Gibão de Peles, Mochila, Pergaminho\n#### Ferramentas de Entalhador (1 PO)\n**Atributo:** Destreza\n**Peso:** 2,5 kg\n**Usar Objeto:** Entalhar um padrão em madeira (CD 10)\n**Fabricação:** Armas à Distância (exceto Funda, Mosquete e Pistola), Cajado, Caneta Tinteiro, Clava, Clava Grande, Dardos, Flechas, Foco Arcano, Foco Druídico, Virotes"
+    }
+  ]
+}
