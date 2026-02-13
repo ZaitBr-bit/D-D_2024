@@ -1,0 +1,2599 @@
+{
+  "total": 75,
+  "por_categoria": {
+    "de Origem": [
+      {
+        "nome": "Alerta",
+        "categoria": "de Origem",
+        "prerequisito": "",
+        "beneficios": [
+          {
+            "nome": "Proficiência em Iniciativa",
+            "descricao": "Quando você joga Iniciativa, pode adicionar seu Bônus de Proficiência à jogada."
+          },
+          {
+            "nome": "Troca de Iniciativa",
+            "descricao": "Imediatamente após jogar Iniciativa, você pode trocar sua Iniciativa com a Iniciativa de um aliado voluntário no mesmo combate. Não é possível fazer a troca se você ou o aliado tem a condição Incapacitado."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Artifista",
+        "categoria": "de Origem",
+        "prerequisito": "",
+        "beneficios": [
+          {
+            "nome": "Proficiência com Ferramentas",
+            "descricao": "Você adquire proficiência com três Ferramentas de Artesão diferentes à sua escolha na tabela Fabricação Rápida."
+          },
+          {
+            "nome": "Desconto",
+            "descricao": "Sempre que você compra um item não mágico, recebe um desconto de 20% nele."
+          },
+          {
+            "nome": "Fabricação Rápida",
+            "descricao": "ao completar um Descanso Longo, você pode fabricar uma peça de equipamento da tabela Fabricação Rápida, se tiver as Ferramentas de Artesão associadas a esse item e tenha proficiência com essas ferramentas. O item permanece até que você complete outro Descanso Longo, momento em que o item se desfaz."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios.\n**Fabricação Rápida**\n| **Ferramentas de Artesão** | **Itens de Fabricação**                                   |\n|----------------------------|-----------------------------------------------------------|\n| Ferramentas de Carpinteiro | Escada, Tocha                                             |\n| Ferramentas de Coureiro    | Algibeira, Estojo                                         |\n| Ferramentas de Entalhador  | Cajado, Clava, Clava Grande                               |\n| Ferramentas de Ferreiro    | Arpéu, Balde, Esferas de Metal, Estrepes, Panela de Ferro |\n| Ferramentas de Funileiro   | Pederneira, Pá, Sino                                      |\n| Ferramentas de Oleiro      | Jarro, Lâmpada                                            |\n| Ferramentas de Pedreiro    | Roldana e Polias                                          |\n| Ferramentas de Tecelão,    | Cesta, Corda, Rede, Tenda                                 |"
+      },
+      {
+        "nome": "Atacante Selvagem",
+        "categoria": "de Origem",
+        "prerequisito": "",
+        "beneficios": [],
+        "descricao": "Você treinou para causar ataques particularmente nocivos. Uma vez por turno, ao atingir um alvo com uma arma, pode jogar os dados de dano da arma duas vezes e usar qualquer uma das jogadas contra o alvo."
+      },
+      {
+        "nome": "Curandeiro",
+        "categoria": "de Origem",
+        "prerequisito": "",
+        "beneficios": [
+          {
+            "nome": "Médico de Combate",
+            "descricao": "Caso tenha um Kit de Curandeiro, você pode gastar um uso e cuidar de uma criatura a até 1,5 metro de você como uma ação Usar Objeto. Essa criatura pode gastar um dos Dados de Pontos de Vida dela e você joga esse dado. A criatura recupera um número de Pontos de Vida igual à jogada mais o seu Bônus de Proficiência."
+          },
+          {
+            "nome": "Cura Garantida",
+            "descricao": "Sempre que jogar um dado para determinar o número de Pontos de Vida que você recupera com uma magia ou com o benefício do talento Médico de Combate, você pode jogar novamente o dado se o resultado for 1, e você deve usar o novo resultado."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Habilidoso",
+        "categoria": "de Origem",
+        "prerequisito": "",
+        "beneficios": [
+          {
+            "nome": "Repetível",
+            "descricao": "Você pode adquirir este talento mais de uma vez."
+          }
+        ],
+        "descricao": "Você adquire proficiência em qualquer combinação de três perícias ou ferramentas à sua escolha."
+      },
+      {
+        "nome": "Iniciado em Magia",
+        "categoria": "de Origem",
+        "prerequisito": "",
+        "beneficios": [
+          {
+            "nome": "Dois Truques",
+            "descricao": "Você aprende dois truques à sua escolha na lista de magias de Clérigo, Druida ou Mago. Inteligência, Sabedoria ou Carisma é seu atributo de conjuração para as magias deste talento (escolha quando selecionar este talento)."
+          },
+          {
+            "nome": "Magia de 1º Círculo",
+            "descricao": "Escolha uma magia de 1º círculo da mesma lista que você selecionou para os truques deste talento. Você tem essa magia sempre preparada. Você pode conjurá-la uma vez sem um espaço de magia, e você restaura a capacidade de conjurá-la dessa maneira ao completar um Descanso Longo. Você também pode conjurar a magia usando qualquer espaço de magia que tiver."
+          },
+          {
+            "nome": "Substituição de Magia",
+            "descricao": "Sempre que você alcança um novo nível, pode substituir uma das magias que escolheu para este talento por uma magia diferente do mesmo círculo da lista de magias escolhida."
+          },
+          {
+            "nome": "Repetível",
+            "descricao": "Você pode adquirir este talento mais de uma vez, mas deve escolher uma lista de magias diferente a cada vez."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Músico",
+        "categoria": "de Origem",
+        "prerequisito": "",
+        "beneficios": [
+          {
+            "nome": "Treinamento em Instrumentos",
+            "descricao": "Você adquire proficiência com três Instrumentos Musicais à sua escolha."
+          },
+          {
+            "nome": "Canção Encorajadora",
+            "descricao": "Ao completar um Descanso Curto ou Longo, você pode tocar uma música em um Instrumento Musical com o qual tem proficiência e conceder Inspiração Heroica a aliados que ouvem a música. O número de aliados que você pode afetar desse modo é igual ao seu Bônus de Proficiência."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Sortudo",
+        "categoria": "de Origem",
+        "prerequisito": "",
+        "beneficios": [
+          {
+            "nome": "Pontos de Sorte",
+            "descricao": "Você tem um número de Pontos de Sorte igual ao seu Bônus de Proficiência e pode gastar os pontos nos benefícios abaixo. Você restaura seus Pontos de Sorte gastos ao completar um Descanso Longo."
+          },
+          {
+            "nome": "Vantagem",
+            "descricao": "Ao jogar um d20 para um Teste de D20, você pode gastar 1 Ponto de Sorte para ter Vantagem na jogada."
+          },
+          {
+            "nome": "Desvantagem",
+            "descricao": "Quando uma criatura jogar um d20 para uma jogada de ataque contra você, você pode gastar 1 Ponto de Sorte para impor Desvantagem nessa jogada."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Valentão de Taverna",
+        "categoria": "de Origem",
+        "prerequisito": "",
+        "beneficios": [
+          {
+            "nome": "Ataque Desarmado Aprimorado",
+            "descricao": "Ao atingir com seu Ataque Desarmado e causar dano, você pode causar dano Contundente igual a 1d4 pontos mais seu modificador de Força em vez do dano normal de um Ataque Desarmado."
+          },
+          {
+            "nome": "Dano Garantido",
+            "descricao": "Sempre que você joga um dado de dano para seu Ataque Desarmado, pode jogar novamente o dado se o resultado for 1, e deve usar o novo resultado."
+          },
+          {
+            "nome": "Armamento Improvisado",
+            "descricao": "Você tem proficiência com armas improvisadas."
+          },
+          {
+            "nome": "Empurrar",
+            "descricao": "Ao atingir uma criatura com um Ataque Desarmado como parte da ação Atacar no seu turno, você pode causar dano ao alvo e também empurrá-lo 1,5 metro para longe de você. Você pode usar esse benefício apenas uma vez por turno."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Vigoroso",
+        "categoria": "de Origem",
+        "prerequisito": "",
+        "beneficios": [],
+        "descricao": "Seus Pontos de Vida máximos aumentam em um valor igual ao dobro do seu nível de personagem ao obter este talento. Sempre que você alcança um nível de personagem depois disso, seus Pontos de Vida máximos aumentam em 2 Pontos de Vida adicionais.\n## Talentos Gerais\nEsses talentos estão na categoria Geral."
+      }
+    ],
+    "Geral": [
+      {
+        "nome": "Adepto Elemental",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Característica Conjuração ou Magia de Pacto",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Inteligência, Sabedoria ou Carisma em 1, até no máximo 20."
+          },
+          {
+            "nome": "Domínio Elemental",
+            "descricao": "Escolha um dos seguintes tipos de dano: Ácido, Elétrico, Gélido, Ígneo ou Trovejante. Magias que você conjura ignoram a Resistência a dano do tipo escolhido. Além disso, ao jogar dano para uma magia que causa dano deste tipo, você pode tratar qualquer 1 em um dado de dano como um 2."
+          },
+          {
+            "nome": "Repetível",
+            "descricao": "Você pode adquirir este talento mais de uma vez, mas deve escolher um tipo de dano diferente a cada vez para Domínio Elemental."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Agressor",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Força ou Destreza 13 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+          },
+          {
+            "nome": "Corrida Aprimorada",
+            "descricao": "Ao executar a ação Correr, seu Deslocamento aumenta em 3 metros para esta ação."
+          },
+          {
+            "nome": "Ataque em Investida",
+            "descricao": "Se você se mover pelo menos 3 metros em linha reta em direção a um alvo imediatamente antes de atingi-lo com uma jogada de ataque corpo a corpo como parte da ação Atacar, escolha um dos seguintes efeitos: obter um bônus de +1d8 na jogada de dano do ataque ou empurrar o alvo até 3 metros se ele não for um tamanho maior que você. Você pode usar esse benefício apenas uma vez em cada um dos seus turnos."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Analítico",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Inteligência ou Sabedoria 13 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Inteligência ou Sabedoria em 1, até no máximo 20."
+          },
+          {
+            "nome": "Observador Atento",
+            "descricao": "Escolha uma das seguintes perícias: Intuição, Investigação ou Percepção. Se não tiver proficiência na perícia escolhida, você a adquire; se já for proficiente, adquire Especialização."
+          },
+          {
+            "nome": "Pesquisa Rápida",
+            "descricao": "Você pode executar a ação Procurar como uma Ação Bônus."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Atirador Arcano",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Característica Conjuração ou Magia de Pacto",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Inteligência, Sabedoria ou Carisma em 1, até no máximo 20."
+          },
+          {
+            "nome": "Ignorar Cobertura",
+            "descricao": "Jogadas de ataque com magias ignoram Cobertura Parcial e Cobertura de Três Quartos."
+          },
+          {
+            "nome": "Conjuração à Queima-Roupa",
+            "descricao": "Estar a 1,5 metro de um inimigo não impõe Desvantagem em suas jogadas de ataque com magias."
+          },
+          {
+            "nome": "Alcance Aumentado",
+            "descricao": "Ao conjurar uma magia que tem um alcance de pelo menos 3 metros e exija realizar uma jogada de ataque, você pode aumentar o alcance da magia em 18 metros."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Atleta",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Força ou Destreza 13 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+          },
+          {
+            "nome": "Deslocamento de Escalada",
+            "descricao": "Você adquire Deslocamento de Escalada igual ao seu Deslocamento."
+          },
+          {
+            "nome": "Levantar",
+            "descricao": "Ao ter a condição Caído, você pode se reerguer com apenas 1,5 metro de movimento."
+          },
+          {
+            "nome": "Saltar",
+            "descricao": "Você pode realizar um Salto em Distância ou Salto em Altura correndo após mover-se apenas 1,5 metro."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Ator",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Carisma 13 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Carisma em 1, até no máximo 20."
+          },
+          {
+            "nome": "Personificação",
+            "descricao": "Enquanto está disfarçado como uma pessoa real ou fictícia, você tem Vantagem em testes de Carisma (Atuação ou Enganação) para convencer os outros de que você é essa pessoa."
+          },
+          {
+            "nome": "Mimetismo",
+            "descricao": "Você pode imitar os sons de outras criaturas, incluindo a fala. Uma criatura que ouve a imitação deve ser bem-sucedida em um teste de Sabedoria (Intuição) para determinar que o efeito é falso (CD 8 mais seu modificador de Carisma e seu Bônus de Proficiência)."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Aumento no Valor de Atributo",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior",
+        "beneficios": [
+          {
+            "nome": "Repetível",
+            "descricao": "Você pode adquirir este talento mais de uma vez."
+          }
+        ],
+        "descricao": "Aumente um valor de atributo à sua escolha em 2, ou aumente dois valores de atributo à sua escolha em 1. Este talento não pode aumentar um valor de atributo acima de 20."
+      },
+      {
+        "nome": "Chef",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Constituição ou Sabedoria em 1, até no máximo 20."
+          },
+          {
+            "nome": "Utensílios de Cozinheiro",
+            "descricao": "Você adquire proficiência com Utensílios de Cozinheiro se ainda não o tiver."
+          },
+          {
+            "nome": "Refeição Satisfatória",
+            "descricao": "Como parte de um Descanso Curto, você pode cozinhar alimentos especiais se tiver ingredientes e Utensílios de Cozinheiro à mão. Você pode preparar comida suficiente para um número de criaturas igual a 4 mais seu Bônus de Proficiência. No final do Descanso Curto, qualquer criatura que comer a comida e gastar um ou mais Dados de Vida para recuperar Pontos de Vida recupera 1d8 Pontos de Vida adicionais."
+          },
+          {
+            "nome": "Guloseimas Revigorantes",
+            "descricao": "Com 1 hora de trabalho ou quando completar um Descanso Longo, você pode cozinhar um número de guloseimas igual ao seu Bônus de Proficiência se tiver ingredientes e Utensílios de Cozinheiro à mão. Essas guloseimas especiais permanecem por 8 horas após serem feitas. Uma criatura pode executar uma Ação Bônus para comer uma dessas guloseimas e obter um número de Pontos de Vida Temporários igual ao seu Bônus de Proficiência."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Combatente Montado",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Força, Destreza ou Sabedoria em 1, até no máximo 20."
+          },
+          {
+            "nome": "Golpe Montado",
+            "descricao": "Enquanto estiver montado, você tem Vantagem em jogadas de ataque contra qualquer criatura desmontada a até 1,5 metro de sua montaria que seja pelo menos um tamanho menor que a montaria."
+          },
+          {
+            "nome": "Pulo Lateral",
+            "descricao": "Se sua montaria for submetida a um efeito que lhe permita realizar uma salvaguarda de Destreza para sofrer apenas metade do dano, ela não sofre dano em caso de sucesso, e apenas metade do dano se falhar. Para que sua montaria obtenha esse benefício, você deve estar montando-a, e nenhum de vocês pode ter a condição Incapacitado."
+          },
+          {
+            "nome": "Redirecionar Ataque",
+            "descricao": "Enquanto estiver montado, você pode forçar um ataque que atinge sua montaria a atingi-lo se você não tem a condição Incapacitado."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Conjurador Bélico",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Característica Conjuração ou Magia de Pacto",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Inteligência, Sabedoria ou Carisma em 1, até no máximo 20."
+          },
+          {
+            "nome": "Concentração",
+            "descricao": "Você tem Vantagem em salvaguardas de Constituição que realiza para manter a Concentração."
+          },
+          {
+            "nome": "Magia Reativa",
+            "descricao": "Quando uma criatura provocar um Ataque de Oportunidade a você ao sair do seu alcance, você pode executar uma Reação para conjurar uma magia contra a criatura, em vez de realizar o Ataque de Oportunidade. A magia deve ter um tempo de conjuração de uma ação e deve ter como alvo apenas aquela criatura."
+          },
+          {
+            "nome": "Componentes Somáticos",
+            "descricao": "Você pode realizar os componentes somáticos de magias mesmo quando estiver com armas ou um Escudo em uma ou ambas as mãos."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Conjurador Ritualista",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Inteligência, Sabedoria ou Carisma 13 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Inteligência, Sabedoria ou Carisma em 1, até no máximo 20."
+          },
+          {
+            "nome": "Magias Rituais",
+            "descricao": "Escolha um número de magias de 1º círculo igual ao seu Bônus de Proficiência que tem o marcador Ritual. Você tem essas magias sempre preparadas e pode conjurá-las com qualquer espaço de magia que tiver. O atributo de conjuração das magias é o atributo aumentado por este talento. Sempre que seu Bônus de Proficiência aumentar depois disso, você pode adicionar uma magia de 1º círculo com o marcador Ritual às magias sempre preparadas com esta característica."
+          },
+          {
+            "nome": "Ritual Rápido",
+            "descricao": "Com este benefício, você pode conjurar uma magia Ritual que tem preparada usando seu tempo de conjuração normal, em vez do tempo prolongado para um Ritual. Realizar isso não requer um espaço de magia. Após conjurar a magia desse modo, você não pode usar esse benefício novamente até completar um Descanso Longo."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Duelista Defensivo",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Destreza 13 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Destreza em 1, até no máximo 20."
+          },
+          {
+            "nome": "Aparar",
+            "descricao": "Se estiver segurando uma arma de Acuidade e outra criatura acertar você com um ataque corpo a corpo, você pode executar uma Reação para adicionar seu Bônus de Proficiência à sua Classe de Armadura, potencialmente fazendo com que o ataque erre. Você obtém este bônus na sua CA contra ataques corpo a corpo até o início do seu próximo turno."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Envenenador",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Destreza ou Inteligência em 1, até no máximo 20."
+          },
+          {
+            "nome": "Veneno Potente",
+            "descricao": "Ao realizar uma jogada de dano que causa dano Venenoso, você ignora Resistência a dano Venenoso."
+          },
+          {
+            "nome": "Preparar Veneno",
+            "descricao": "Você adquire proficiência com o Kit de Veneno. Com 1 hora de trabalho usando esse kit e gastando 50 PO em materiais, você pode fabricar um número de doses de veneno igual ao seu Bônus de Proficiência. Como uma Ação Bônus, você pode aplicar uma dose de veneno a uma arma ou peça de munição. Uma vez aplicado, o veneno retém sua potência por 1 minuto ou até você causar dano com o item envenenado, o que for mais curto. Ao sofrer dano do item envenenado, uma criatura deve ser bem-sucedida em uma salvaguarda de Constituição (CD 8 mais o modificador do atributo aumentado por este talento e seu Bônus de Proficiência) ou sofre 2d8 pontos de dano Venenoso e está com a condição Envenenado até o final do seu próximo turno."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Esmagador",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Força ou Constituição em 1, até no máximo 20."
+          },
+          {
+            "nome": "Empurrar",
+            "descricao": "Uma vez por turno, ao atingir uma criatura com um ataque que causa dano Contundente, você pode movê-la 1,5 metro para um espaço desocupado se o alvo não for um tamanho maior que você."
+          },
+          {
+            "nome": "Crítico Melhorado",
+            "descricao": "Ao obter um Acerto Crítico que causa dano Contundente a uma criatura, jogadas de ataque contra essa criatura tem Vantagem até o início do seu próximo turno."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Especialista Ambidestro",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Força ou Destreza 13 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+          },
+          {
+            "nome": "Combate com Duas Armas Aprimorado",
+            "descricao": "Ao executar a ação Atacar no seu turno com uma arma que tenha a propriedade Leve, você pode realizar um ataque adicional como uma Ação Bônus no mesmo turno com uma arma diferente, que deve ser uma arma Corpo a Corpo que não possua a propriedade Duas Mãos. Você não pode adicionar o seu modificador de atributo ao dano do ataque adicional, a menos que o modificador seja negativo."
+          },
+          {
+            "nome": "Saque Rápido",
+            "descricao": "Você pode desembainhar ou embainhar duas armas que não possuam a propriedade Duas Mãos quando normalmente poderia desembainhar ou embainhar apenas uma."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Especialista em Armaduras Leves",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+          },
+          {
+            "nome": "Treinamento com Armadura",
+            "descricao": "Você obtém treinamento com Armadura Leve e Escudos."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Especialista em Armaduras Médias",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Treinamento com Armadura Leve",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+          },
+          {
+            "nome": "Treinamento com Armadura",
+            "descricao": "Você obtém treinamento com Armadura Média."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Especialista em Armaduras Pesadas",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Treinamento com Armadura Média",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Constituição ou Força em 1, até no máximo 20."
+          },
+          {
+            "nome": "Treinamento com Armadura",
+            "descricao": "Você adquire treinamento com Armadura Pesada."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Especialista em Besta",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Destreza 13 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Destreza em 1, até no máximo 20."
+          },
+          {
+            "nome": "Ignorar Recarga",
+            "descricao": "Você ignora a propriedade Recarga da Besta de Mão, Besta Leve e Besta Pesada (todas chamadas de bestas em outras partes deste talento). Se estiver segurando uma dessas bestas, você pode carregar uma peça de munição nela mesmo sem ter uma mão livre."
+          },
+          {
+            "nome": "Disparo à Queima-Roupa",
+            "descricao": "Estar a 1,5 metro de um inimigo não impõe Desvantagem em suas jogadas de ataque com bestas."
+          },
+          {
+            "nome": "Combate com Duas Armas",
+            "descricao": "Ao realizar o ataque adicional da propriedade Leve, você pode adicionar seu modificador de atributo ao dano do ataque adicional se esse ataque for com uma besta que tenha a propriedade Leve e você ainda não estiver adicionando esse modificador ao dano."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Especialista em Perícia",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente um valor de atributo à sua escolha em 1, até no máximo 20."
+          },
+          {
+            "nome": "Proficiência em Perícia",
+            "descricao": "Você adquire proficiência em uma perícia à sua escolha."
+          },
+          {
+            "nome": "Especialização",
+            "descricao": "Escolha uma perícia na qual você tenha proficiência, mas não seja Especialização. Você obtém Especialização nessa perícia."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Exterminador de Conjuradores",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+          },
+          {
+            "nome": "Quebrador de Concentração",
+            "descricao": "Ao causar dano a uma criatura que está se concentrando em uma magia, ela tem Desvantagem na salvaguarda que realiza para manter a Concentração."
+          },
+          {
+            "nome": "Resguardo Mental",
+            "descricao": "Se falhar em uma salvaguarda de Inteligência, Sabedoria ou Carisma, em vez disso você escolhe ser bem-sucedido. Após usar esse benefício, você não pode usá-lo novamente até completar um Descanso Curto ou Longo."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Imobilizador",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Força ou Destreza 13 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+          },
+          {
+            "nome": "Socar e Imobilizar",
+            "descricao": "Imediatamente após executar a ação Atacar e atingir uma criatura com um Ataque Desarmado, você pode executar uma Ação Bônus para tentar Imobilizar o alvo."
+          },
+          {
+            "nome": "Vantagem no Ataque",
+            "descricao": "Você tem Vantagem em jogadas de ataque contra uma criatura Imobilizada por você."
+          },
+          {
+            "nome": "Imobilizador Veloz",
+            "descricao": "Você não precisa gastar movimento adicional ao mover uma criatura Imobilizada por você se a criatura for do seu tamanho ou menor."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Líder Inspirador",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Sabedoria ou Carisma 13 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Sabedoria ou Carisma em 1, até no máximo 20."
+          },
+          {
+            "nome": "Atuação Encorajadora",
+            "descricao": "Ao completar um Descanso Curto ou Longo, você pode fazer uma atuação encorajadora: um discurso, música ou dança. Ao realizar isso, escolha até seis aliados (você pode se incluir) a até 9 metros de você que presenciaram a atuação. Criaturas escolhidas recebem Pontos de Vida Temporários iguais ao seu *nível de personagem* mais o modificador do atributo que você aumentou com este talento."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Mente Aguçada",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Inteligência 13 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Inteligência em 1, até no máximo 20."
+          },
+          {
+            "nome": "Conhecimento Vasto",
+            "descricao": "Escolha uma das seguintes perícias: Arcanismo, História, Investigação, Natureza ou Religião. Se não tiver proficiência na perícia escolhida, você a adquire; se já for proficiente, adquire Especialização."
+          },
+          {
+            "nome": "Análise Rápida",
+            "descricao": "Você pode executar a ação Analisar como uma Ação Bônus."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Mestre das Armas",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+          },
+          {
+            "nome": "Propriedade de Maestria",
+            "descricao": "Seu treinamento com armas permite que você use a propriedade de maestria de um tipo de arma Simples ou Marcial à sua escolha, desde que você tenha proficiência com ela. Sempre que completar um Descanso Longo, você pode trocar o tipo de arma por outro elegível."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Mestre em Armaduras Médias",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Treinamento com Armadura Média",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+          },
+          {
+            "nome": "Portador Ágil",
+            "descricao": "Enquanto estiver usando armadura Média, você pode adicionar 3, em vez de 2, à sua CA se tiver um valor de Destreza 16 ou superior."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Mestre em Armaduras Pesadas",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Treinamento com Armadura Pesada",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Força ou Constituição em 1, até no máximo 20."
+          },
+          {
+            "nome": "Redução de Dano",
+            "descricao": "Ao ser atingido por um ataque enquanto está vestido com uma armadura Pesada, qualquer dano Contundente, Cortante e Perfurante causado a você por esse ataque é reduzido em uma quantidade de pontos igual ao seu Bônus de Proficiência."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Mestre em Armas de Haste",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Força ou Destreza 13 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+          },
+          {
+            "nome": "Golpe de Haste",
+            "descricao": "Imediatamente após executar a ação Atacar e atacar com um Cajado, Lança ou uma arma que tenha as propriedades Alcance e Pesado, você pode executar uma Ação Bônus para realizar um ataque corpo a corpo com a extremidade oposta da arma. A arma causa dano Contundente, e o dado de dano da arma para este ataque é um d4."
+          },
+          {
+            "nome": "Golpe Reativo",
+            "descricao": "Enquanto você estiver segurando um Cajado, Lança ou uma arma que tenha as propriedades Alcance e Pesado, pode executar uma Reação para realizar um ataque corpo a corpo com essa arma contra uma criatura que entra no alcance."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Mestre em Armas Grandes",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Força 13 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Força em 1, até no máximo 20."
+          },
+          {
+            "nome": "Maestria em Armas Pesadas",
+            "descricao": "Ao atingir uma criatura com uma arma que tem a propriedade Pesada como parte da ação Atacar no seu turno, você pode causar dano adicional ao alvo com a arma. O dano adicional é igual ao seu Bônus de Proficiência."
+          },
+          {
+            "nome": "Cortar",
+            "descricao": "Imediatamente após obter um Acerto Crítico ou reduzir uma criatura a 0 Pontos de Vida com uma arma Corpo a Corpo, você pode realizar um ataque com a mesma arma como uma Ação Bônus."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Mestre em Escudos",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Treinamento com Escudo",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Força em 1, até no máximo 20."
+          },
+          {
+            "nome": "Golpe de Escudo",
+            "descricao": "Ao atacar uma criatura a até 1,5 metro de você como parte da ação Atacar e atingir com uma arma Corpo a Corpo, você pode atacar imediatamente o alvo com seu Escudo se ele estiver equipado, forçando o alvo a realizar uma salvaguarda de Força (CD 8 mais seu modificador de Força e seu Bônus de Proficiência). Se falhar, você empurra o alvo a 1,5 metro de você ou impõe a ele a condição Caído (à sua escolha). Você pode usar esse benefício apenas uma vez em cada um dos seus turnos."
+          },
+          {
+            "nome": "Interpor Escudo",
+            "descricao": "Se você for submetido a um efeito que lhe permita realizar uma salvaguarda de Destreza para sofrer apenas metade do dano, pode usar uma Reação para não sofrer dano se você for bem-sucedido na salvaguarda e estiver segurando um Escudo."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Mestre-Atirador",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Destreza 13 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Destreza em 1, até no máximo 20."
+          },
+          {
+            "nome": "Ignorar Cobertura",
+            "descricao": "Seus ataques à distância com armas ignoram Cobertura Parcial e Cobertura de Três Quartos."
+          },
+          {
+            "nome": "Disparo à Queima-Roupa",
+            "descricao": "Estar a 1,5 metro de um inimigo não impõe Desvantagem em suas jogadas de ataque com armas à Distância."
+          },
+          {
+            "nome": "Tiro Longo",
+            "descricao": "Atacar com alcance máximo não impõe Desvantagem em suas jogadas de ataque com armas à Distância."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Perfurador",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+          },
+          {
+            "nome": "Punção",
+            "descricao": "Uma vez por turno, ao atingir uma criatura com um ataque que causa dano Perfurante, você pode jogar novamente um dos dados de dano do ataque, e você deve usar a nova jogada."
+          },
+          {
+            "nome": "Crítico Melhorado",
+            "descricao": "Ao obter um Acerto Crítico que causa dano Perfurante a uma criatura, você pode jogar um dado de dano adicional ao determinar o dano Perfurante adicional que o alvo sofre."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Resiliente",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Escolha um atributo no qual você não tenha proficiência em salvaguarda. Aumente o valor de atributo escolhido em 1, até no máximo 20."
+          },
+          {
+            "nome": "Proficiência em Salvaguarda",
+            "descricao": "Você adquire proficiência em salvaguardas com o atributo escolhido."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Resistente",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Constituição em 1, até no máximo 20."
+          },
+          {
+            "nome": "Desafie a Morte",
+            "descricao": "Você tem Vantagem em Salvaguardas Contra Morte."
+          },
+          {
+            "nome": "Recuperação Rápida",
+            "descricao": "Como uma Ação Bônus, você pode gastar um de seus Dados de Pontos de Vida, jogar o dado e recuperar um número de Pontos de Vida igual ao resultado."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Sentinela",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Força ou Destreza 13 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+          },
+          {
+            "nome": "Diligente",
+            "descricao": "Imediatamente após uma criatura em até 1,5 metro de você executar a ação Desengajar ou atingir um alvo diferente de você com um ataque, você pode realizar um Ataque de Oportunidade contra essa criatura."
+          },
+          {
+            "nome": "Deter",
+            "descricao": "Ao atingir uma criatura com um Ataque de Oportunidade, o Deslocamento da criatura se torna 0 pelo resto do turno atual."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Sorrateiro",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Destreza 13 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Destreza em 1, até no máximo 20."
+          },
+          {
+            "nome": "Visão às Cegas",
+            "descricao": "Você tem Visão às Cegas com um alcance de 3 metros."
+          },
+          {
+            "nome": "Névoa de Guerra",
+            "descricao": "Você explora as distrações da batalha e tem Vantagem em qualquer teste de Destreza (Furtividade) que realiza como parte da ação Esconder durante o combate."
+          },
+          {
+            "nome": "Atirador",
+            "descricao": "Se você realizar uma jogada de ataque enquanto estiver escondido e errar a jogada, realizar a jogada de ataque não revela sua localização."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Talhador",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+          },
+          {
+            "nome": "Debilitar",
+            "descricao": "Uma vez por turno, ao atingir uma criatura com um ataque que causa dano Cortante, você pode reduzir o Deslocamento dessa criatura em 3 metros até o início do seu próximo turno."
+          },
+          {
+            "nome": "Crítico Melhorado",
+            "descricao": "Ao obter um Acerto Crítico que causa dano Cortante a uma criatura, ela tem Desvantagem nas jogadas de ataque até o início do seu próximo turno."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Telecinético",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Inteligência, Sabedoria ou Carisma em 1, até no máximo 20."
+          },
+          {
+            "nome": "Telecinese Menor",
+            "descricao": "Você aprende a magia *Mãos Mágicas*. Você pode conjurá-la sem componentes Verbais ou Somáticos, pode usar a mão espectral Invisível e o alcance dela aumenta em 9 metros quando você a conjura. O atributo de conjuração da magia é o atributo aumentado por este talento."
+          },
+          {
+            "nome": "Empurrão Telecinético",
+            "descricao": "Como uma Ação Bônus, você pode empurrar telecinéticamente uma criatura à sua vista a até 9 metros de você. Ao realizar isso, o alvo deve ser bem-sucedido em uma salvaguarda de Força (CD 8 mais o modificador de atributo do aumento por este talento e seu Bônus de Proficiência) ou é movido 1,5 metro em qualquer direção horizontal."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Telepático",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Inteligência, Sabedoria ou Carisma em 1, até no máximo 20."
+          },
+          {
+            "nome": "Enunciado Telepático",
+            "descricao": "Você pode falar telepaticamente com qualquer criatura à sua vista a até 18 metros de você. Seus enunciados telepáticos estão em um idioma que você conhece, e a criatura só o entende se souber esse idioma. Sua comunicação não dá à criatura a capacidade de responder a você telepaticamente."
+          },
+          {
+            "nome": "Detectar Pensamentos",
+            "descricao": "Você tem a magia *Detectar Pensamentos* sempre preparada. Você pode conjurá-la sem um espaço de magia ou componentes de magia, não podendo conjurá-la dessa forma novamente antes de completar um Descanso Longo. Além disso, pode conjurá-la gastando o espaço de magia que você tem do círculo apropriado. Seu atributo de conjuração para a magia é o atributo aumentado por este talento."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Tocado Pelas Sombras",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Inteligência, Sabedoria ou Carisma em 1, até no máximo 20."
+          },
+          {
+            "nome": "Magia Sombria",
+            "descricao": "Escolha uma magia de 1º círculo da escola de magia Ilusão ou Necromancia. Você tem essa magia e *Invisibilidade* sempre preparadas, podendo conjurá-las sem gastar espaço de magia. Após usar uma delas desse modo, você não pode conjurá-la assim novamente até completar um Descanso Longo. Também é possível conjurar estas magias utilizando espaços de magia de círculos apropriados. O atributo de conjuração das magias é o aprimorado por este talento."
+          }
+        ],
+        "descricao": "Sua exposição à magia do Sombral lhe concede os seguintes benefícios."
+      },
+      {
+        "nome": "Tocado Por Fadas",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Inteligência, Sabedoria ou Carisma em 1, até no máximo 20."
+          },
+          {
+            "nome": "Magia Feérica",
+            "descricao": "Escolha uma magia de 1º círculo da escola de magia Adivinhação ou Encantamento. Você tem sempre essa magia e *Passo Nebuloso* preparadas, podendo conjurá-las sem gastar espaço de magia. Após usar uma delas desse modo, você não pode conjurá-la assim novamente até completar um Descanso Longo. Também é possível conjurar essas magias utilizando espaços de magia de círculos apropriados. O atributo de conjuração das magias é o aprimorado por este talento."
+          }
+        ],
+        "descricao": "Sua exposição à magia Feérica lhe concede os seguintes benefícios."
+      },
+      {
+        "nome": "Treinamento com Armas Marciais",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+          },
+          {
+            "nome": "Proficiência com Armas",
+            "descricao": "Você adquire proficiência com armas Marciais."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Velocista",
+        "categoria": "Geral",
+        "prerequisito": "Nível 4 ou superior, Destreza ou Constituição 13 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Destreza ou Constituição em 1, até no máximo 20."
+          },
+          {
+            "nome": "Aumento de Deslocamento",
+            "descricao": "Seu Deslocamento aumenta em 3 metros."
+          },
+          {
+            "nome": "Correr em Terreno Difícil",
+            "descricao": "Ao executar a ação Correr no seu turno, Terreno Difícil não custa movimento adicional pelo resto deste turno."
+          },
+          {
+            "nome": "Movimentação Ágil",
+            "descricao": "Ataques de Oportunidade têm Desvantagem contra você."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios.\n## Talentos de Estilo de Luta\n*Esses talentos estão na categoria Estilo de Luta.*"
+      }
+    ],
+    "de Estilo de Luta": [
+      {
+        "nome": "Arquearia",
+        "categoria": "de Estilo de Luta",
+        "prerequisito": "Característica de Estilo de Luta",
+        "beneficios": [],
+        "descricao": "Você recebe um bônus de +2 nas jogadas de ataque com armas à Distância."
+      },
+      {
+        "nome": "Combate com Armas de Arremesso",
+        "categoria": "de Estilo de Luta",
+        "prerequisito": "Característica de Estilo de Luta",
+        "beneficios": [],
+        "descricao": "Ao atingir com uma jogada de ataque à distância usando uma arma com a propriedade Arremesso, você obtém um bônus de +2 na jogada de dano."
+      },
+      {
+        "nome": "Combate com Armas Grandes",
+        "categoria": "de Estilo de Luta",
+        "prerequisito": "Característica de Estilo de Luta",
+        "beneficios": [],
+        "descricao": "Ao jogar dano para um ataque que realiza com uma arma Corpo a Corpo que está empunhando com as duas mãos, você pode tratar qualquer 1 ou 2 em um dado de dano como um 3. A arma deve ter a propriedade Duas Mãos ou Versátil para obter este benefício."
+      },
+      {
+        "nome": "Combate com Duas Armas",
+        "categoria": "de Estilo de Luta",
+        "prerequisito": "Característica de Estilo de Luta",
+        "beneficios": [],
+        "descricao": "Ao realizar um ataque adicional como resultado de usar uma arma com a propriedade Leve, você pode adicionar seu modificador de atributo ao dano desse ataque, se já não estiver adicionando-o ao dano."
+      },
+      {
+        "nome": "Combate Desarmado",
+        "categoria": "de Estilo de Luta",
+        "prerequisito": "Característica de Estilo de Luta",
+        "beneficios": [],
+        "descricao": "Ao atingir com seu Ataque Desarmado e causar dano, você pode causar dano Contundente igual a 1d6 mais seu modificador de Força em vez do dano normal de um Ataque Desarmado. Se você não estiver segurando nenhuma arma ou Escudo quando realizar a jogada de ataque, o d6 se torna um d8.\nNo início de cada um dos seus turnos, você pode causar 1d4 pontos de dano Contundente a uma criatura Imobilizada por você."
+      },
+      {
+        "nome": "Defensivo",
+        "categoria": "de Estilo de Luta",
+        "prerequisito": "Característica de Estilo de Luta",
+        "beneficios": [],
+        "descricao": "Enquanto estiver usando armadura Leve, Média ou Pesada, você recebe um bônus de +1 na Classe de Armadura."
+      },
+      {
+        "nome": "Duelismo",
+        "categoria": "de Estilo de Luta",
+        "prerequisito": "Característica de Estilo de Luta",
+        "beneficios": [],
+        "descricao": "Ao segurar uma arma Corpo a Corpo em uma mão e nenhuma outra arma, você recebe um bônus de +2 nas jogadas de dano desta arma."
+      },
+      {
+        "nome": "Interceptação",
+        "categoria": "de Estilo de Luta",
+        "prerequisito": "Característica de Estilo de Luta",
+        "beneficios": [],
+        "descricao": "Quando uma criatura à sua vista atinge outra criatura a até 1,5 metro de você com uma jogada de ataque, você pode executar uma Reação para reduzir o dano causado ao alvo em 1d10 mais seu Bônus de Proficiência. Você deve estar segurando um Escudo ou uma arma Simples ou Marcial para executar esta Reação."
+      },
+      {
+        "nome": "Luta às Cegas",
+        "categoria": "de Estilo de Luta",
+        "prerequisito": "Característica de Estilo de Luta",
+        "beneficios": [],
+        "descricao": "Você tem Visão às Cegas com um alcance de 3 metros."
+      },
+      {
+        "nome": "Protetivo",
+        "categoria": "de Estilo de Luta",
+        "prerequisito": "Característica de Estilo de Luta",
+        "beneficios": [],
+        "descricao": "Quando uma criatura à sua vista ataca um alvo que não é você e que está a até 1,5 metro de distância, você pode executar uma Reação para interpor seu Escudo, se o estiver segurando. Isso impõe Desvantagem na jogada de ataque que acionou a reação e em todas as jogadas contra o alvo até o início do seu próximo turno, enquanto você estiver a até 1,5 metro do alvo.\n## Talentos de Dádiva Épica\n*Esses talentos estão na categoria Dádiva Épica.*"
+      }
+    ],
+    "de Dádiva Épica": [
+      {
+        "nome": "Dádiva da Fortitude",
+        "categoria": "de Dádiva Épica",
+        "prerequisito": "Nível 19 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente um valor de atributo à sua escolha em 1, até no máximo 30."
+          },
+          {
+            "nome": "Saúde Fortalecida",
+            "descricao": "Seus Pontos de Vida máximos aumentam em 40. Além disso, sempre que você recuperar Pontos de Vida, pode recuperar Pontos de Vida adicionais iguais ao seu modificador de Constituição. Após recuperar esses Pontos de Vida adicionais, você não pode fazer isso novamente até o início do seu próximo turno."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Dádiva da Proeza em Combate",
+        "categoria": "de Dádiva Épica",
+        "prerequisito": "Nível 19 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente um valor de atributo à sua escolha em 1, até no máximo 30."
+          },
+          {
+            "nome": "Pontaria Inigualável",
+            "descricao": "Ao errar uma jogada de ataque, em vez disso, você acerta. Após usar este benefício, você não pode utilizá-lo novamente até o início do seu próximo turno."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Dádiva da Proficiência em Perícia",
+        "categoria": "de Dádiva Épica",
+        "prerequisito": "Nível 19 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente um valor de atributo à sua escolha em 1, até no máximo 30."
+          },
+          {
+            "nome": "Assecla Completo",
+            "descricao": "Você adquire proficiência em todas as perícias."
+          },
+          {
+            "nome": "Especialização",
+            "descricao": "Escolha uma perícia na qual você tenha proficiência, mas não tenha Especialização. Você obtém Especialização nessa perícia."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Dádiva da Recordação de Magia",
+        "categoria": "de Dádiva Épica",
+        "prerequisito": "Nível 19 ou superior, Característica de Conjuração",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Inteligência, Sabedoria ou Carisma em 1, até no máximo 30."
+          },
+          {
+            "nome": "Conjuração Livre",
+            "descricao": "Sempre que você conjurar uma magia com um espaço de magia de 1º a 4º círculo, jogue 1d4. Se o resultado que você tirar for o mesmo que o círculo do espaço, o espaço não é gasto."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Dádiva da Recuperação",
+        "categoria": "de Dádiva Épica",
+        "prerequisito": "Nível 19 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente um valor de atributo à sua escolha em 1, até no máximo 30."
+          },
+          {
+            "nome": "Até a Morte",
+            "descricao": "Ao ser reduzido a 0 Pontos de Vida, você pode escolher ficar com 1 Ponto de Vida e recuperar um número de Pontos de Vida igual à metade dos seus Pontos de Vida máximos. Após usar esse benefício, você não pode usá-lo novamente até completar um Descanso Longo."
+          },
+          {
+            "nome": "Recuperar Vitalidade",
+            "descricao": "Você tem uma reserva de dez d10s. Como uma Ação Bônus, você pode gastar dados da reserva, jogá-los e recuperar um número de Pontos de Vida igual ao total do resultado. Você restaura todos os dados gastos quando você completa um Descanso Longo."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Dádiva da Resistência à Energia",
+        "categoria": "de Dádiva Épica",
+        "prerequisito": "Nível 19 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente um valor de atributo à sua escolha em 1, até no máximo 30."
+          },
+          {
+            "nome": "Resistências à Energia",
+            "descricao": "Você obtém Resistência a dois dos seguintes tipos de dano à sua escolha: Ácido, Elétrico, Gélido, Ígneo, Necrótico, Psíquico, Radiante, Trovejante ou Venenoso. Sempre que completar um Descanso Longo, você pode mudar suas escolhas."
+          },
+          {
+            "nome": "Redirecionamento de Energia",
+            "descricao": "Ao sofrer dano de um dos tipos escolhidos para o benefício Resistências à Energia, você pode executar uma Reação para direcionar o dano do mesmo tipo para outra criatura à sua vista a até 18 metros de você que não esteja sob Cobertura Total. Se você fizer isso, essa criatura deve ser bem-sucedida em uma salvaguarda de Destreza (CD 8 mais seu modificador de Constituição e seu Bônus de Proficiência) ou sofre dano igual a 2d12 mais seu modificador de Constituição."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Dádiva da Velocidade",
+        "categoria": "de Dádiva Épica",
+        "prerequisito": "Nível 19 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente um valor de atributo à sua escolha em 1, até no máximo 30."
+          },
+          {
+            "nome": "Artista de Fuga",
+            "descricao": "Como uma Ação Bônus, você pode executar a ação Desengajar, que também encerra a condição Imobilizado em você."
+          },
+          {
+            "nome": "Agilidade",
+            "descricao": "Seu Deslocamento aumenta em 9 metros."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Dádiva da Viagem Dimensional",
+        "categoria": "de Dádiva Épica",
+        "prerequisito": "Nível 19 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente um valor de atributo à sua escolha em 1, até no máximo 30."
+          },
+          {
+            "nome": "Passos Fugazes",
+            "descricao": "Imediatamente após executar a ação Atacar ou Usar Magia, você pode se teleportar até 9 metros para um espaço desocupado à sua vista."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Dádiva da Visão Verdadeira",
+        "categoria": "de Dádiva Épica",
+        "prerequisito": "Nível 19 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente um valor de atributo à sua escolha em 1, até no máximo 30."
+          },
+          {
+            "nome": "Visão Verdadeira",
+            "descricao": "Você tem Visão Verdadeira com um alcance de 18 metros."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Dádiva do Ataque Irresistível",
+        "categoria": "de Dádiva Épica",
+        "prerequisito": "Nível 19 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 30."
+          },
+          {
+            "nome": "Superar Defesas",
+            "descricao": "O dano Contundente, Cortante e Perfurante que você causa sempre ignora Resistência."
+          },
+          {
+            "nome": "Golpe Devastador",
+            "descricao": "Ao tirar 20 no d20 para uma jogada de ataque, você pode causar dano adicional ao alvo igual ao valor do atributo aumentado por este talento. O tipo de dano adicional é o mesmo do ataque."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Dádiva do Destino",
+        "categoria": "de Dádiva Épica",
+        "prerequisito": "Nível 19 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente um valor de atributo à sua escolha em 1, até no máximo 30."
+          },
+          {
+            "nome": "Aprimorar Destino",
+            "descricao": "Quando você ou outra criatura a até 18 metros de você for bem-sucedida ou falhar em um Teste D20, você pode jogar 2d4 e aplicar os resultados como bônus ou penalidade na jogada de d20. Após usar este benefício, você não pode utilizá-lo novamente até jogar Iniciativa ou completar um Descanso Curto ou Longo."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      },
+      {
+        "nome": "Dádiva do Espírito da Noite",
+        "categoria": "de Dádiva Épica",
+        "prerequisito": "Nível 19 ou superior",
+        "beneficios": [
+          {
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Aumente um valor de atributo à sua escolha em 1, até no máximo 30."
+          },
+          {
+            "nome": "Fundir-se com Sombras",
+            "descricao": "Enquanto estiver em Meia-luz ou Escuridão, você pode se conceder a condição Invisível como uma Ação Bônus. A condição encerra imediatamente após você executar uma ação, uma Ação Bônus ou uma Reação."
+          },
+          {
+            "nome": "Forma Sombria",
+            "descricao": "Enquanto estiver em Meia-luz ou Escuridão, você tem Resistência a todos os danos, exceto Psíquico e Radiante."
+          }
+        ],
+        "descricao": "Você adquire os seguintes benefícios."
+      }
+    ]
+  },
+  "todos": [
+    {
+      "nome": "Adepto Elemental",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Característica Conjuração ou Magia de Pacto",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Inteligência, Sabedoria ou Carisma em 1, até no máximo 20."
+        },
+        {
+          "nome": "Domínio Elemental",
+          "descricao": "Escolha um dos seguintes tipos de dano: Ácido, Elétrico, Gélido, Ígneo ou Trovejante. Magias que você conjura ignoram a Resistência a dano do tipo escolhido. Além disso, ao jogar dano para uma magia que causa dano deste tipo, você pode tratar qualquer 1 em um dado de dano como um 2."
+        },
+        {
+          "nome": "Repetível",
+          "descricao": "Você pode adquirir este talento mais de uma vez, mas deve escolher um tipo de dano diferente a cada vez para Domínio Elemental."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Agressor",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Força ou Destreza 13 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+        },
+        {
+          "nome": "Corrida Aprimorada",
+          "descricao": "Ao executar a ação Correr, seu Deslocamento aumenta em 3 metros para esta ação."
+        },
+        {
+          "nome": "Ataque em Investida",
+          "descricao": "Se você se mover pelo menos 3 metros em linha reta em direção a um alvo imediatamente antes de atingi-lo com uma jogada de ataque corpo a corpo como parte da ação Atacar, escolha um dos seguintes efeitos: obter um bônus de +1d8 na jogada de dano do ataque ou empurrar o alvo até 3 metros se ele não for um tamanho maior que você. Você pode usar esse benefício apenas uma vez em cada um dos seus turnos."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Alerta",
+      "categoria": "de Origem",
+      "prerequisito": "",
+      "beneficios": [
+        {
+          "nome": "Proficiência em Iniciativa",
+          "descricao": "Quando você joga Iniciativa, pode adicionar seu Bônus de Proficiência à jogada."
+        },
+        {
+          "nome": "Troca de Iniciativa",
+          "descricao": "Imediatamente após jogar Iniciativa, você pode trocar sua Iniciativa com a Iniciativa de um aliado voluntário no mesmo combate. Não é possível fazer a troca se você ou o aliado tem a condição Incapacitado."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Analítico",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Inteligência ou Sabedoria 13 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Inteligência ou Sabedoria em 1, até no máximo 20."
+        },
+        {
+          "nome": "Observador Atento",
+          "descricao": "Escolha uma das seguintes perícias: Intuição, Investigação ou Percepção. Se não tiver proficiência na perícia escolhida, você a adquire; se já for proficiente, adquire Especialização."
+        },
+        {
+          "nome": "Pesquisa Rápida",
+          "descricao": "Você pode executar a ação Procurar como uma Ação Bônus."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Arquearia",
+      "categoria": "de Estilo de Luta",
+      "prerequisito": "Característica de Estilo de Luta",
+      "beneficios": [],
+      "descricao": "Você recebe um bônus de +2 nas jogadas de ataque com armas à Distância."
+    },
+    {
+      "nome": "Artifista",
+      "categoria": "de Origem",
+      "prerequisito": "",
+      "beneficios": [
+        {
+          "nome": "Proficiência com Ferramentas",
+          "descricao": "Você adquire proficiência com três Ferramentas de Artesão diferentes à sua escolha na tabela Fabricação Rápida."
+        },
+        {
+          "nome": "Desconto",
+          "descricao": "Sempre que você compra um item não mágico, recebe um desconto de 20% nele."
+        },
+        {
+          "nome": "Fabricação Rápida",
+          "descricao": "ao completar um Descanso Longo, você pode fabricar uma peça de equipamento da tabela Fabricação Rápida, se tiver as Ferramentas de Artesão associadas a esse item e tenha proficiência com essas ferramentas. O item permanece até que você complete outro Descanso Longo, momento em que o item se desfaz."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios.\n**Fabricação Rápida**\n| **Ferramentas de Artesão** | **Itens de Fabricação**                                   |\n|----------------------------|-----------------------------------------------------------|\n| Ferramentas de Carpinteiro | Escada, Tocha                                             |\n| Ferramentas de Coureiro    | Algibeira, Estojo                                         |\n| Ferramentas de Entalhador  | Cajado, Clava, Clava Grande                               |\n| Ferramentas de Ferreiro    | Arpéu, Balde, Esferas de Metal, Estrepes, Panela de Ferro |\n| Ferramentas de Funileiro   | Pederneira, Pá, Sino                                      |\n| Ferramentas de Oleiro      | Jarro, Lâmpada                                            |\n| Ferramentas de Pedreiro    | Roldana e Polias                                          |\n| Ferramentas de Tecelão,    | Cesta, Corda, Rede, Tenda                                 |"
+    },
+    {
+      "nome": "Atacante Selvagem",
+      "categoria": "de Origem",
+      "prerequisito": "",
+      "beneficios": [],
+      "descricao": "Você treinou para causar ataques particularmente nocivos. Uma vez por turno, ao atingir um alvo com uma arma, pode jogar os dados de dano da arma duas vezes e usar qualquer uma das jogadas contra o alvo."
+    },
+    {
+      "nome": "Atirador Arcano",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Característica Conjuração ou Magia de Pacto",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Inteligência, Sabedoria ou Carisma em 1, até no máximo 20."
+        },
+        {
+          "nome": "Ignorar Cobertura",
+          "descricao": "Jogadas de ataque com magias ignoram Cobertura Parcial e Cobertura de Três Quartos."
+        },
+        {
+          "nome": "Conjuração à Queima-Roupa",
+          "descricao": "Estar a 1,5 metro de um inimigo não impõe Desvantagem em suas jogadas de ataque com magias."
+        },
+        {
+          "nome": "Alcance Aumentado",
+          "descricao": "Ao conjurar uma magia que tem um alcance de pelo menos 3 metros e exija realizar uma jogada de ataque, você pode aumentar o alcance da magia em 18 metros."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Atleta",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Força ou Destreza 13 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+        },
+        {
+          "nome": "Deslocamento de Escalada",
+          "descricao": "Você adquire Deslocamento de Escalada igual ao seu Deslocamento."
+        },
+        {
+          "nome": "Levantar",
+          "descricao": "Ao ter a condição Caído, você pode se reerguer com apenas 1,5 metro de movimento."
+        },
+        {
+          "nome": "Saltar",
+          "descricao": "Você pode realizar um Salto em Distância ou Salto em Altura correndo após mover-se apenas 1,5 metro."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Ator",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Carisma 13 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Carisma em 1, até no máximo 20."
+        },
+        {
+          "nome": "Personificação",
+          "descricao": "Enquanto está disfarçado como uma pessoa real ou fictícia, você tem Vantagem em testes de Carisma (Atuação ou Enganação) para convencer os outros de que você é essa pessoa."
+        },
+        {
+          "nome": "Mimetismo",
+          "descricao": "Você pode imitar os sons de outras criaturas, incluindo a fala. Uma criatura que ouve a imitação deve ser bem-sucedida em um teste de Sabedoria (Intuição) para determinar que o efeito é falso (CD 8 mais seu modificador de Carisma e seu Bônus de Proficiência)."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Aumento no Valor de Atributo",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior",
+      "beneficios": [
+        {
+          "nome": "Repetível",
+          "descricao": "Você pode adquirir este talento mais de uma vez."
+        }
+      ],
+      "descricao": "Aumente um valor de atributo à sua escolha em 2, ou aumente dois valores de atributo à sua escolha em 1. Este talento não pode aumentar um valor de atributo acima de 20."
+    },
+    {
+      "nome": "Chef",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Constituição ou Sabedoria em 1, até no máximo 20."
+        },
+        {
+          "nome": "Utensílios de Cozinheiro",
+          "descricao": "Você adquire proficiência com Utensílios de Cozinheiro se ainda não o tiver."
+        },
+        {
+          "nome": "Refeição Satisfatória",
+          "descricao": "Como parte de um Descanso Curto, você pode cozinhar alimentos especiais se tiver ingredientes e Utensílios de Cozinheiro à mão. Você pode preparar comida suficiente para um número de criaturas igual a 4 mais seu Bônus de Proficiência. No final do Descanso Curto, qualquer criatura que comer a comida e gastar um ou mais Dados de Vida para recuperar Pontos de Vida recupera 1d8 Pontos de Vida adicionais."
+        },
+        {
+          "nome": "Guloseimas Revigorantes",
+          "descricao": "Com 1 hora de trabalho ou quando completar um Descanso Longo, você pode cozinhar um número de guloseimas igual ao seu Bônus de Proficiência se tiver ingredientes e Utensílios de Cozinheiro à mão. Essas guloseimas especiais permanecem por 8 horas após serem feitas. Uma criatura pode executar uma Ação Bônus para comer uma dessas guloseimas e obter um número de Pontos de Vida Temporários igual ao seu Bônus de Proficiência."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Combate Desarmado",
+      "categoria": "de Estilo de Luta",
+      "prerequisito": "Característica de Estilo de Luta",
+      "beneficios": [],
+      "descricao": "Ao atingir com seu Ataque Desarmado e causar dano, você pode causar dano Contundente igual a 1d6 mais seu modificador de Força em vez do dano normal de um Ataque Desarmado. Se você não estiver segurando nenhuma arma ou Escudo quando realizar a jogada de ataque, o d6 se torna um d8.\nNo início de cada um dos seus turnos, você pode causar 1d4 pontos de dano Contundente a uma criatura Imobilizada por você."
+    },
+    {
+      "nome": "Combate com Armas Grandes",
+      "categoria": "de Estilo de Luta",
+      "prerequisito": "Característica de Estilo de Luta",
+      "beneficios": [],
+      "descricao": "Ao jogar dano para um ataque que realiza com uma arma Corpo a Corpo que está empunhando com as duas mãos, você pode tratar qualquer 1 ou 2 em um dado de dano como um 3. A arma deve ter a propriedade Duas Mãos ou Versátil para obter este benefício."
+    },
+    {
+      "nome": "Combate com Armas de Arremesso",
+      "categoria": "de Estilo de Luta",
+      "prerequisito": "Característica de Estilo de Luta",
+      "beneficios": [],
+      "descricao": "Ao atingir com uma jogada de ataque à distância usando uma arma com a propriedade Arremesso, você obtém um bônus de +2 na jogada de dano."
+    },
+    {
+      "nome": "Combate com Duas Armas",
+      "categoria": "de Estilo de Luta",
+      "prerequisito": "Característica de Estilo de Luta",
+      "beneficios": [],
+      "descricao": "Ao realizar um ataque adicional como resultado de usar uma arma com a propriedade Leve, você pode adicionar seu modificador de atributo ao dano desse ataque, se já não estiver adicionando-o ao dano."
+    },
+    {
+      "nome": "Combatente Montado",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Força, Destreza ou Sabedoria em 1, até no máximo 20."
+        },
+        {
+          "nome": "Golpe Montado",
+          "descricao": "Enquanto estiver montado, você tem Vantagem em jogadas de ataque contra qualquer criatura desmontada a até 1,5 metro de sua montaria que seja pelo menos um tamanho menor que a montaria."
+        },
+        {
+          "nome": "Pulo Lateral",
+          "descricao": "Se sua montaria for submetida a um efeito que lhe permita realizar uma salvaguarda de Destreza para sofrer apenas metade do dano, ela não sofre dano em caso de sucesso, e apenas metade do dano se falhar. Para que sua montaria obtenha esse benefício, você deve estar montando-a, e nenhum de vocês pode ter a condição Incapacitado."
+        },
+        {
+          "nome": "Redirecionar Ataque",
+          "descricao": "Enquanto estiver montado, você pode forçar um ataque que atinge sua montaria a atingi-lo se você não tem a condição Incapacitado."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Conjurador Bélico",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Característica Conjuração ou Magia de Pacto",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Inteligência, Sabedoria ou Carisma em 1, até no máximo 20."
+        },
+        {
+          "nome": "Concentração",
+          "descricao": "Você tem Vantagem em salvaguardas de Constituição que realiza para manter a Concentração."
+        },
+        {
+          "nome": "Magia Reativa",
+          "descricao": "Quando uma criatura provocar um Ataque de Oportunidade a você ao sair do seu alcance, você pode executar uma Reação para conjurar uma magia contra a criatura, em vez de realizar o Ataque de Oportunidade. A magia deve ter um tempo de conjuração de uma ação e deve ter como alvo apenas aquela criatura."
+        },
+        {
+          "nome": "Componentes Somáticos",
+          "descricao": "Você pode realizar os componentes somáticos de magias mesmo quando estiver com armas ou um Escudo em uma ou ambas as mãos."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Conjurador Ritualista",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Inteligência, Sabedoria ou Carisma 13 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Inteligência, Sabedoria ou Carisma em 1, até no máximo 20."
+        },
+        {
+          "nome": "Magias Rituais",
+          "descricao": "Escolha um número de magias de 1º círculo igual ao seu Bônus de Proficiência que tem o marcador Ritual. Você tem essas magias sempre preparadas e pode conjurá-las com qualquer espaço de magia que tiver. O atributo de conjuração das magias é o atributo aumentado por este talento. Sempre que seu Bônus de Proficiência aumentar depois disso, você pode adicionar uma magia de 1º círculo com o marcador Ritual às magias sempre preparadas com esta característica."
+        },
+        {
+          "nome": "Ritual Rápido",
+          "descricao": "Com este benefício, você pode conjurar uma magia Ritual que tem preparada usando seu tempo de conjuração normal, em vez do tempo prolongado para um Ritual. Realizar isso não requer um espaço de magia. Após conjurar a magia desse modo, você não pode usar esse benefício novamente até completar um Descanso Longo."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Curandeiro",
+      "categoria": "de Origem",
+      "prerequisito": "",
+      "beneficios": [
+        {
+          "nome": "Médico de Combate",
+          "descricao": "Caso tenha um Kit de Curandeiro, você pode gastar um uso e cuidar de uma criatura a até 1,5 metro de você como uma ação Usar Objeto. Essa criatura pode gastar um dos Dados de Pontos de Vida dela e você joga esse dado. A criatura recupera um número de Pontos de Vida igual à jogada mais o seu Bônus de Proficiência."
+        },
+        {
+          "nome": "Cura Garantida",
+          "descricao": "Sempre que jogar um dado para determinar o número de Pontos de Vida que você recupera com uma magia ou com o benefício do talento Médico de Combate, você pode jogar novamente o dado se o resultado for 1, e você deve usar o novo resultado."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Defensivo",
+      "categoria": "de Estilo de Luta",
+      "prerequisito": "Característica de Estilo de Luta",
+      "beneficios": [],
+      "descricao": "Enquanto estiver usando armadura Leve, Média ou Pesada, você recebe um bônus de +1 na Classe de Armadura."
+    },
+    {
+      "nome": "Duelismo",
+      "categoria": "de Estilo de Luta",
+      "prerequisito": "Característica de Estilo de Luta",
+      "beneficios": [],
+      "descricao": "Ao segurar uma arma Corpo a Corpo em uma mão e nenhuma outra arma, você recebe um bônus de +2 nas jogadas de dano desta arma."
+    },
+    {
+      "nome": "Duelista Defensivo",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Destreza 13 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Destreza em 1, até no máximo 20."
+        },
+        {
+          "nome": "Aparar",
+          "descricao": "Se estiver segurando uma arma de Acuidade e outra criatura acertar você com um ataque corpo a corpo, você pode executar uma Reação para adicionar seu Bônus de Proficiência à sua Classe de Armadura, potencialmente fazendo com que o ataque erre. Você obtém este bônus na sua CA contra ataques corpo a corpo até o início do seu próximo turno."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Dádiva da Fortitude",
+      "categoria": "de Dádiva Épica",
+      "prerequisito": "Nível 19 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente um valor de atributo à sua escolha em 1, até no máximo 30."
+        },
+        {
+          "nome": "Saúde Fortalecida",
+          "descricao": "Seus Pontos de Vida máximos aumentam em 40. Além disso, sempre que você recuperar Pontos de Vida, pode recuperar Pontos de Vida adicionais iguais ao seu modificador de Constituição. Após recuperar esses Pontos de Vida adicionais, você não pode fazer isso novamente até o início do seu próximo turno."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Dádiva da Proeza em Combate",
+      "categoria": "de Dádiva Épica",
+      "prerequisito": "Nível 19 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente um valor de atributo à sua escolha em 1, até no máximo 30."
+        },
+        {
+          "nome": "Pontaria Inigualável",
+          "descricao": "Ao errar uma jogada de ataque, em vez disso, você acerta. Após usar este benefício, você não pode utilizá-lo novamente até o início do seu próximo turno."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Dádiva da Proficiência em Perícia",
+      "categoria": "de Dádiva Épica",
+      "prerequisito": "Nível 19 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente um valor de atributo à sua escolha em 1, até no máximo 30."
+        },
+        {
+          "nome": "Assecla Completo",
+          "descricao": "Você adquire proficiência em todas as perícias."
+        },
+        {
+          "nome": "Especialização",
+          "descricao": "Escolha uma perícia na qual você tenha proficiência, mas não tenha Especialização. Você obtém Especialização nessa perícia."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Dádiva da Recordação de Magia",
+      "categoria": "de Dádiva Épica",
+      "prerequisito": "Nível 19 ou superior, Característica de Conjuração",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Inteligência, Sabedoria ou Carisma em 1, até no máximo 30."
+        },
+        {
+          "nome": "Conjuração Livre",
+          "descricao": "Sempre que você conjurar uma magia com um espaço de magia de 1º a 4º círculo, jogue 1d4. Se o resultado que você tirar for o mesmo que o círculo do espaço, o espaço não é gasto."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Dádiva da Recuperação",
+      "categoria": "de Dádiva Épica",
+      "prerequisito": "Nível 19 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente um valor de atributo à sua escolha em 1, até no máximo 30."
+        },
+        {
+          "nome": "Até a Morte",
+          "descricao": "Ao ser reduzido a 0 Pontos de Vida, você pode escolher ficar com 1 Ponto de Vida e recuperar um número de Pontos de Vida igual à metade dos seus Pontos de Vida máximos. Após usar esse benefício, você não pode usá-lo novamente até completar um Descanso Longo."
+        },
+        {
+          "nome": "Recuperar Vitalidade",
+          "descricao": "Você tem uma reserva de dez d10s. Como uma Ação Bônus, você pode gastar dados da reserva, jogá-los e recuperar um número de Pontos de Vida igual ao total do resultado. Você restaura todos os dados gastos quando você completa um Descanso Longo."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Dádiva da Resistência à Energia",
+      "categoria": "de Dádiva Épica",
+      "prerequisito": "Nível 19 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente um valor de atributo à sua escolha em 1, até no máximo 30."
+        },
+        {
+          "nome": "Resistências à Energia",
+          "descricao": "Você obtém Resistência a dois dos seguintes tipos de dano à sua escolha: Ácido, Elétrico, Gélido, Ígneo, Necrótico, Psíquico, Radiante, Trovejante ou Venenoso. Sempre que completar um Descanso Longo, você pode mudar suas escolhas."
+        },
+        {
+          "nome": "Redirecionamento de Energia",
+          "descricao": "Ao sofrer dano de um dos tipos escolhidos para o benefício Resistências à Energia, você pode executar uma Reação para direcionar o dano do mesmo tipo para outra criatura à sua vista a até 18 metros de você que não esteja sob Cobertura Total. Se você fizer isso, essa criatura deve ser bem-sucedida em uma salvaguarda de Destreza (CD 8 mais seu modificador de Constituição e seu Bônus de Proficiência) ou sofre dano igual a 2d12 mais seu modificador de Constituição."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Dádiva da Velocidade",
+      "categoria": "de Dádiva Épica",
+      "prerequisito": "Nível 19 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente um valor de atributo à sua escolha em 1, até no máximo 30."
+        },
+        {
+          "nome": "Artista de Fuga",
+          "descricao": "Como uma Ação Bônus, você pode executar a ação Desengajar, que também encerra a condição Imobilizado em você."
+        },
+        {
+          "nome": "Agilidade",
+          "descricao": "Seu Deslocamento aumenta em 9 metros."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Dádiva da Viagem Dimensional",
+      "categoria": "de Dádiva Épica",
+      "prerequisito": "Nível 19 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente um valor de atributo à sua escolha em 1, até no máximo 30."
+        },
+        {
+          "nome": "Passos Fugazes",
+          "descricao": "Imediatamente após executar a ação Atacar ou Usar Magia, você pode se teleportar até 9 metros para um espaço desocupado à sua vista."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Dádiva da Visão Verdadeira",
+      "categoria": "de Dádiva Épica",
+      "prerequisito": "Nível 19 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente um valor de atributo à sua escolha em 1, até no máximo 30."
+        },
+        {
+          "nome": "Visão Verdadeira",
+          "descricao": "Você tem Visão Verdadeira com um alcance de 18 metros."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Dádiva do Ataque Irresistível",
+      "categoria": "de Dádiva Épica",
+      "prerequisito": "Nível 19 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 30."
+        },
+        {
+          "nome": "Superar Defesas",
+          "descricao": "O dano Contundente, Cortante e Perfurante que você causa sempre ignora Resistência."
+        },
+        {
+          "nome": "Golpe Devastador",
+          "descricao": "Ao tirar 20 no d20 para uma jogada de ataque, você pode causar dano adicional ao alvo igual ao valor do atributo aumentado por este talento. O tipo de dano adicional é o mesmo do ataque."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Dádiva do Destino",
+      "categoria": "de Dádiva Épica",
+      "prerequisito": "Nível 19 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente um valor de atributo à sua escolha em 1, até no máximo 30."
+        },
+        {
+          "nome": "Aprimorar Destino",
+          "descricao": "Quando você ou outra criatura a até 18 metros de você for bem-sucedida ou falhar em um Teste D20, você pode jogar 2d4 e aplicar os resultados como bônus ou penalidade na jogada de d20. Após usar este benefício, você não pode utilizá-lo novamente até jogar Iniciativa ou completar um Descanso Curto ou Longo."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Dádiva do Espírito da Noite",
+      "categoria": "de Dádiva Épica",
+      "prerequisito": "Nível 19 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente um valor de atributo à sua escolha em 1, até no máximo 30."
+        },
+        {
+          "nome": "Fundir-se com Sombras",
+          "descricao": "Enquanto estiver em Meia-luz ou Escuridão, você pode se conceder a condição Invisível como uma Ação Bônus. A condição encerra imediatamente após você executar uma ação, uma Ação Bônus ou uma Reação."
+        },
+        {
+          "nome": "Forma Sombria",
+          "descricao": "Enquanto estiver em Meia-luz ou Escuridão, você tem Resistência a todos os danos, exceto Psíquico e Radiante."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Envenenador",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Destreza ou Inteligência em 1, até no máximo 20."
+        },
+        {
+          "nome": "Veneno Potente",
+          "descricao": "Ao realizar uma jogada de dano que causa dano Venenoso, você ignora Resistência a dano Venenoso."
+        },
+        {
+          "nome": "Preparar Veneno",
+          "descricao": "Você adquire proficiência com o Kit de Veneno. Com 1 hora de trabalho usando esse kit e gastando 50 PO em materiais, você pode fabricar um número de doses de veneno igual ao seu Bônus de Proficiência. Como uma Ação Bônus, você pode aplicar uma dose de veneno a uma arma ou peça de munição. Uma vez aplicado, o veneno retém sua potência por 1 minuto ou até você causar dano com o item envenenado, o que for mais curto. Ao sofrer dano do item envenenado, uma criatura deve ser bem-sucedida em uma salvaguarda de Constituição (CD 8 mais o modificador do atributo aumentado por este talento e seu Bônus de Proficiência) ou sofre 2d8 pontos de dano Venenoso e está com a condição Envenenado até o final do seu próximo turno."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Esmagador",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Força ou Constituição em 1, até no máximo 20."
+        },
+        {
+          "nome": "Empurrar",
+          "descricao": "Uma vez por turno, ao atingir uma criatura com um ataque que causa dano Contundente, você pode movê-la 1,5 metro para um espaço desocupado se o alvo não for um tamanho maior que você."
+        },
+        {
+          "nome": "Crítico Melhorado",
+          "descricao": "Ao obter um Acerto Crítico que causa dano Contundente a uma criatura, jogadas de ataque contra essa criatura tem Vantagem até o início do seu próximo turno."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Especialista Ambidestro",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Força ou Destreza 13 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+        },
+        {
+          "nome": "Combate com Duas Armas Aprimorado",
+          "descricao": "Ao executar a ação Atacar no seu turno com uma arma que tenha a propriedade Leve, você pode realizar um ataque adicional como uma Ação Bônus no mesmo turno com uma arma diferente, que deve ser uma arma Corpo a Corpo que não possua a propriedade Duas Mãos. Você não pode adicionar o seu modificador de atributo ao dano do ataque adicional, a menos que o modificador seja negativo."
+        },
+        {
+          "nome": "Saque Rápido",
+          "descricao": "Você pode desembainhar ou embainhar duas armas que não possuam a propriedade Duas Mãos quando normalmente poderia desembainhar ou embainhar apenas uma."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Especialista em Armaduras Leves",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+        },
+        {
+          "nome": "Treinamento com Armadura",
+          "descricao": "Você obtém treinamento com Armadura Leve e Escudos."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Especialista em Armaduras Médias",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Treinamento com Armadura Leve",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+        },
+        {
+          "nome": "Treinamento com Armadura",
+          "descricao": "Você obtém treinamento com Armadura Média."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Especialista em Armaduras Pesadas",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Treinamento com Armadura Média",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Constituição ou Força em 1, até no máximo 20."
+        },
+        {
+          "nome": "Treinamento com Armadura",
+          "descricao": "Você adquire treinamento com Armadura Pesada."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Especialista em Besta",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Destreza 13 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Destreza em 1, até no máximo 20."
+        },
+        {
+          "nome": "Ignorar Recarga",
+          "descricao": "Você ignora a propriedade Recarga da Besta de Mão, Besta Leve e Besta Pesada (todas chamadas de bestas em outras partes deste talento). Se estiver segurando uma dessas bestas, você pode carregar uma peça de munição nela mesmo sem ter uma mão livre."
+        },
+        {
+          "nome": "Disparo à Queima-Roupa",
+          "descricao": "Estar a 1,5 metro de um inimigo não impõe Desvantagem em suas jogadas de ataque com bestas."
+        },
+        {
+          "nome": "Combate com Duas Armas",
+          "descricao": "Ao realizar o ataque adicional da propriedade Leve, você pode adicionar seu modificador de atributo ao dano do ataque adicional se esse ataque for com uma besta que tenha a propriedade Leve e você ainda não estiver adicionando esse modificador ao dano."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Especialista em Perícia",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente um valor de atributo à sua escolha em 1, até no máximo 20."
+        },
+        {
+          "nome": "Proficiência em Perícia",
+          "descricao": "Você adquire proficiência em uma perícia à sua escolha."
+        },
+        {
+          "nome": "Especialização",
+          "descricao": "Escolha uma perícia na qual você tenha proficiência, mas não seja Especialização. Você obtém Especialização nessa perícia."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Exterminador de Conjuradores",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+        },
+        {
+          "nome": "Quebrador de Concentração",
+          "descricao": "Ao causar dano a uma criatura que está se concentrando em uma magia, ela tem Desvantagem na salvaguarda que realiza para manter a Concentração."
+        },
+        {
+          "nome": "Resguardo Mental",
+          "descricao": "Se falhar em uma salvaguarda de Inteligência, Sabedoria ou Carisma, em vez disso você escolhe ser bem-sucedido. Após usar esse benefício, você não pode usá-lo novamente até completar um Descanso Curto ou Longo."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Habilidoso",
+      "categoria": "de Origem",
+      "prerequisito": "",
+      "beneficios": [
+        {
+          "nome": "Repetível",
+          "descricao": "Você pode adquirir este talento mais de uma vez."
+        }
+      ],
+      "descricao": "Você adquire proficiência em qualquer combinação de três perícias ou ferramentas à sua escolha."
+    },
+    {
+      "nome": "Imobilizador",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Força ou Destreza 13 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+        },
+        {
+          "nome": "Socar e Imobilizar",
+          "descricao": "Imediatamente após executar a ação Atacar e atingir uma criatura com um Ataque Desarmado, você pode executar uma Ação Bônus para tentar Imobilizar o alvo."
+        },
+        {
+          "nome": "Vantagem no Ataque",
+          "descricao": "Você tem Vantagem em jogadas de ataque contra uma criatura Imobilizada por você."
+        },
+        {
+          "nome": "Imobilizador Veloz",
+          "descricao": "Você não precisa gastar movimento adicional ao mover uma criatura Imobilizada por você se a criatura for do seu tamanho ou menor."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Iniciado em Magia",
+      "categoria": "de Origem",
+      "prerequisito": "",
+      "beneficios": [
+        {
+          "nome": "Dois Truques",
+          "descricao": "Você aprende dois truques à sua escolha na lista de magias de Clérigo, Druida ou Mago. Inteligência, Sabedoria ou Carisma é seu atributo de conjuração para as magias deste talento (escolha quando selecionar este talento)."
+        },
+        {
+          "nome": "Magia de 1º Círculo",
+          "descricao": "Escolha uma magia de 1º círculo da mesma lista que você selecionou para os truques deste talento. Você tem essa magia sempre preparada. Você pode conjurá-la uma vez sem um espaço de magia, e você restaura a capacidade de conjurá-la dessa maneira ao completar um Descanso Longo. Você também pode conjurar a magia usando qualquer espaço de magia que tiver."
+        },
+        {
+          "nome": "Substituição de Magia",
+          "descricao": "Sempre que você alcança um novo nível, pode substituir uma das magias que escolheu para este talento por uma magia diferente do mesmo círculo da lista de magias escolhida."
+        },
+        {
+          "nome": "Repetível",
+          "descricao": "Você pode adquirir este talento mais de uma vez, mas deve escolher uma lista de magias diferente a cada vez."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Interceptação",
+      "categoria": "de Estilo de Luta",
+      "prerequisito": "Característica de Estilo de Luta",
+      "beneficios": [],
+      "descricao": "Quando uma criatura à sua vista atinge outra criatura a até 1,5 metro de você com uma jogada de ataque, você pode executar uma Reação para reduzir o dano causado ao alvo em 1d10 mais seu Bônus de Proficiência. Você deve estar segurando um Escudo ou uma arma Simples ou Marcial para executar esta Reação."
+    },
+    {
+      "nome": "Luta às Cegas",
+      "categoria": "de Estilo de Luta",
+      "prerequisito": "Característica de Estilo de Luta",
+      "beneficios": [],
+      "descricao": "Você tem Visão às Cegas com um alcance de 3 metros."
+    },
+    {
+      "nome": "Líder Inspirador",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Sabedoria ou Carisma 13 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Sabedoria ou Carisma em 1, até no máximo 20."
+        },
+        {
+          "nome": "Atuação Encorajadora",
+          "descricao": "Ao completar um Descanso Curto ou Longo, você pode fazer uma atuação encorajadora: um discurso, música ou dança. Ao realizar isso, escolha até seis aliados (você pode se incluir) a até 9 metros de você que presenciaram a atuação. Criaturas escolhidas recebem Pontos de Vida Temporários iguais ao seu *nível de personagem* mais o modificador do atributo que você aumentou com este talento."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Mente Aguçada",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Inteligência 13 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Inteligência em 1, até no máximo 20."
+        },
+        {
+          "nome": "Conhecimento Vasto",
+          "descricao": "Escolha uma das seguintes perícias: Arcanismo, História, Investigação, Natureza ou Religião. Se não tiver proficiência na perícia escolhida, você a adquire; se já for proficiente, adquire Especialização."
+        },
+        {
+          "nome": "Análise Rápida",
+          "descricao": "Você pode executar a ação Analisar como uma Ação Bônus."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Mestre das Armas",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+        },
+        {
+          "nome": "Propriedade de Maestria",
+          "descricao": "Seu treinamento com armas permite que você use a propriedade de maestria de um tipo de arma Simples ou Marcial à sua escolha, desde que você tenha proficiência com ela. Sempre que completar um Descanso Longo, você pode trocar o tipo de arma por outro elegível."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Mestre em Armaduras Médias",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Treinamento com Armadura Média",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+        },
+        {
+          "nome": "Portador Ágil",
+          "descricao": "Enquanto estiver usando armadura Média, você pode adicionar 3, em vez de 2, à sua CA se tiver um valor de Destreza 16 ou superior."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Mestre em Armaduras Pesadas",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Treinamento com Armadura Pesada",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Força ou Constituição em 1, até no máximo 20."
+        },
+        {
+          "nome": "Redução de Dano",
+          "descricao": "Ao ser atingido por um ataque enquanto está vestido com uma armadura Pesada, qualquer dano Contundente, Cortante e Perfurante causado a você por esse ataque é reduzido em uma quantidade de pontos igual ao seu Bônus de Proficiência."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Mestre em Armas Grandes",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Força 13 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Força em 1, até no máximo 20."
+        },
+        {
+          "nome": "Maestria em Armas Pesadas",
+          "descricao": "Ao atingir uma criatura com uma arma que tem a propriedade Pesada como parte da ação Atacar no seu turno, você pode causar dano adicional ao alvo com a arma. O dano adicional é igual ao seu Bônus de Proficiência."
+        },
+        {
+          "nome": "Cortar",
+          "descricao": "Imediatamente após obter um Acerto Crítico ou reduzir uma criatura a 0 Pontos de Vida com uma arma Corpo a Corpo, você pode realizar um ataque com a mesma arma como uma Ação Bônus."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Mestre em Armas de Haste",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Força ou Destreza 13 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+        },
+        {
+          "nome": "Golpe de Haste",
+          "descricao": "Imediatamente após executar a ação Atacar e atacar com um Cajado, Lança ou uma arma que tenha as propriedades Alcance e Pesado, você pode executar uma Ação Bônus para realizar um ataque corpo a corpo com a extremidade oposta da arma. A arma causa dano Contundente, e o dado de dano da arma para este ataque é um d4."
+        },
+        {
+          "nome": "Golpe Reativo",
+          "descricao": "Enquanto você estiver segurando um Cajado, Lança ou uma arma que tenha as propriedades Alcance e Pesado, pode executar uma Reação para realizar um ataque corpo a corpo com essa arma contra uma criatura que entra no alcance."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Mestre em Escudos",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Treinamento com Escudo",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Força em 1, até no máximo 20."
+        },
+        {
+          "nome": "Golpe de Escudo",
+          "descricao": "Ao atacar uma criatura a até 1,5 metro de você como parte da ação Atacar e atingir com uma arma Corpo a Corpo, você pode atacar imediatamente o alvo com seu Escudo se ele estiver equipado, forçando o alvo a realizar uma salvaguarda de Força (CD 8 mais seu modificador de Força e seu Bônus de Proficiência). Se falhar, você empurra o alvo a 1,5 metro de você ou impõe a ele a condição Caído (à sua escolha). Você pode usar esse benefício apenas uma vez em cada um dos seus turnos."
+        },
+        {
+          "nome": "Interpor Escudo",
+          "descricao": "Se você for submetido a um efeito que lhe permita realizar uma salvaguarda de Destreza para sofrer apenas metade do dano, pode usar uma Reação para não sofrer dano se você for bem-sucedido na salvaguarda e estiver segurando um Escudo."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Mestre-Atirador",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Destreza 13 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Destreza em 1, até no máximo 20."
+        },
+        {
+          "nome": "Ignorar Cobertura",
+          "descricao": "Seus ataques à distância com armas ignoram Cobertura Parcial e Cobertura de Três Quartos."
+        },
+        {
+          "nome": "Disparo à Queima-Roupa",
+          "descricao": "Estar a 1,5 metro de um inimigo não impõe Desvantagem em suas jogadas de ataque com armas à Distância."
+        },
+        {
+          "nome": "Tiro Longo",
+          "descricao": "Atacar com alcance máximo não impõe Desvantagem em suas jogadas de ataque com armas à Distância."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Músico",
+      "categoria": "de Origem",
+      "prerequisito": "",
+      "beneficios": [
+        {
+          "nome": "Treinamento em Instrumentos",
+          "descricao": "Você adquire proficiência com três Instrumentos Musicais à sua escolha."
+        },
+        {
+          "nome": "Canção Encorajadora",
+          "descricao": "Ao completar um Descanso Curto ou Longo, você pode tocar uma música em um Instrumento Musical com o qual tem proficiência e conceder Inspiração Heroica a aliados que ouvem a música. O número de aliados que você pode afetar desse modo é igual ao seu Bônus de Proficiência."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Perfurador",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+        },
+        {
+          "nome": "Punção",
+          "descricao": "Uma vez por turno, ao atingir uma criatura com um ataque que causa dano Perfurante, você pode jogar novamente um dos dados de dano do ataque, e você deve usar a nova jogada."
+        },
+        {
+          "nome": "Crítico Melhorado",
+          "descricao": "Ao obter um Acerto Crítico que causa dano Perfurante a uma criatura, você pode jogar um dado de dano adicional ao determinar o dano Perfurante adicional que o alvo sofre."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Protetivo",
+      "categoria": "de Estilo de Luta",
+      "prerequisito": "Característica de Estilo de Luta",
+      "beneficios": [],
+      "descricao": "Quando uma criatura à sua vista ataca um alvo que não é você e que está a até 1,5 metro de distância, você pode executar uma Reação para interpor seu Escudo, se o estiver segurando. Isso impõe Desvantagem na jogada de ataque que acionou a reação e em todas as jogadas contra o alvo até o início do seu próximo turno, enquanto você estiver a até 1,5 metro do alvo.\n## Talentos de Dádiva Épica\n*Esses talentos estão na categoria Dádiva Épica.*"
+    },
+    {
+      "nome": "Resiliente",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Escolha um atributo no qual você não tenha proficiência em salvaguarda. Aumente o valor de atributo escolhido em 1, até no máximo 20."
+        },
+        {
+          "nome": "Proficiência em Salvaguarda",
+          "descricao": "Você adquire proficiência em salvaguardas com o atributo escolhido."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Resistente",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Constituição em 1, até no máximo 20."
+        },
+        {
+          "nome": "Desafie a Morte",
+          "descricao": "Você tem Vantagem em Salvaguardas Contra Morte."
+        },
+        {
+          "nome": "Recuperação Rápida",
+          "descricao": "Como uma Ação Bônus, você pode gastar um de seus Dados de Pontos de Vida, jogar o dado e recuperar um número de Pontos de Vida igual ao resultado."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Sentinela",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Força ou Destreza 13 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+        },
+        {
+          "nome": "Diligente",
+          "descricao": "Imediatamente após uma criatura em até 1,5 metro de você executar a ação Desengajar ou atingir um alvo diferente de você com um ataque, você pode realizar um Ataque de Oportunidade contra essa criatura."
+        },
+        {
+          "nome": "Deter",
+          "descricao": "Ao atingir uma criatura com um Ataque de Oportunidade, o Deslocamento da criatura se torna 0 pelo resto do turno atual."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Sorrateiro",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Destreza 13 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Destreza em 1, até no máximo 20."
+        },
+        {
+          "nome": "Visão às Cegas",
+          "descricao": "Você tem Visão às Cegas com um alcance de 3 metros."
+        },
+        {
+          "nome": "Névoa de Guerra",
+          "descricao": "Você explora as distrações da batalha e tem Vantagem em qualquer teste de Destreza (Furtividade) que realiza como parte da ação Esconder durante o combate."
+        },
+        {
+          "nome": "Atirador",
+          "descricao": "Se você realizar uma jogada de ataque enquanto estiver escondido e errar a jogada, realizar a jogada de ataque não revela sua localização."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Sortudo",
+      "categoria": "de Origem",
+      "prerequisito": "",
+      "beneficios": [
+        {
+          "nome": "Pontos de Sorte",
+          "descricao": "Você tem um número de Pontos de Sorte igual ao seu Bônus de Proficiência e pode gastar os pontos nos benefícios abaixo. Você restaura seus Pontos de Sorte gastos ao completar um Descanso Longo."
+        },
+        {
+          "nome": "Vantagem",
+          "descricao": "Ao jogar um d20 para um Teste de D20, você pode gastar 1 Ponto de Sorte para ter Vantagem na jogada."
+        },
+        {
+          "nome": "Desvantagem",
+          "descricao": "Quando uma criatura jogar um d20 para uma jogada de ataque contra você, você pode gastar 1 Ponto de Sorte para impor Desvantagem nessa jogada."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Talhador",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+        },
+        {
+          "nome": "Debilitar",
+          "descricao": "Uma vez por turno, ao atingir uma criatura com um ataque que causa dano Cortante, você pode reduzir o Deslocamento dessa criatura em 3 metros até o início do seu próximo turno."
+        },
+        {
+          "nome": "Crítico Melhorado",
+          "descricao": "Ao obter um Acerto Crítico que causa dano Cortante a uma criatura, ela tem Desvantagem nas jogadas de ataque até o início do seu próximo turno."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Telecinético",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Inteligência, Sabedoria ou Carisma em 1, até no máximo 20."
+        },
+        {
+          "nome": "Telecinese Menor",
+          "descricao": "Você aprende a magia *Mãos Mágicas*. Você pode conjurá-la sem componentes Verbais ou Somáticos, pode usar a mão espectral Invisível e o alcance dela aumenta em 9 metros quando você a conjura. O atributo de conjuração da magia é o atributo aumentado por este talento."
+        },
+        {
+          "nome": "Empurrão Telecinético",
+          "descricao": "Como uma Ação Bônus, você pode empurrar telecinéticamente uma criatura à sua vista a até 9 metros de você. Ao realizar isso, o alvo deve ser bem-sucedido em uma salvaguarda de Força (CD 8 mais o modificador de atributo do aumento por este talento e seu Bônus de Proficiência) ou é movido 1,5 metro em qualquer direção horizontal."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Telepático",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Inteligência, Sabedoria ou Carisma em 1, até no máximo 20."
+        },
+        {
+          "nome": "Enunciado Telepático",
+          "descricao": "Você pode falar telepaticamente com qualquer criatura à sua vista a até 18 metros de você. Seus enunciados telepáticos estão em um idioma que você conhece, e a criatura só o entende se souber esse idioma. Sua comunicação não dá à criatura a capacidade de responder a você telepaticamente."
+        },
+        {
+          "nome": "Detectar Pensamentos",
+          "descricao": "Você tem a magia *Detectar Pensamentos* sempre preparada. Você pode conjurá-la sem um espaço de magia ou componentes de magia, não podendo conjurá-la dessa forma novamente antes de completar um Descanso Longo. Além disso, pode conjurá-la gastando o espaço de magia que você tem do círculo apropriado. Seu atributo de conjuração para a magia é o atributo aumentado por este talento."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Tocado Pelas Sombras",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Inteligência, Sabedoria ou Carisma em 1, até no máximo 20."
+        },
+        {
+          "nome": "Magia Sombria",
+          "descricao": "Escolha uma magia de 1º círculo da escola de magia Ilusão ou Necromancia. Você tem essa magia e *Invisibilidade* sempre preparadas, podendo conjurá-las sem gastar espaço de magia. Após usar uma delas desse modo, você não pode conjurá-la assim novamente até completar um Descanso Longo. Também é possível conjurar estas magias utilizando espaços de magia de círculos apropriados. O atributo de conjuração das magias é o aprimorado por este talento."
+        }
+      ],
+      "descricao": "Sua exposição à magia do Sombral lhe concede os seguintes benefícios."
+    },
+    {
+      "nome": "Tocado Por Fadas",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Inteligência, Sabedoria ou Carisma em 1, até no máximo 20."
+        },
+        {
+          "nome": "Magia Feérica",
+          "descricao": "Escolha uma magia de 1º círculo da escola de magia Adivinhação ou Encantamento. Você tem sempre essa magia e *Passo Nebuloso* preparadas, podendo conjurá-las sem gastar espaço de magia. Após usar uma delas desse modo, você não pode conjurá-la assim novamente até completar um Descanso Longo. Também é possível conjurar essas magias utilizando espaços de magia de círculos apropriados. O atributo de conjuração das magias é o aprimorado por este talento."
+        }
+      ],
+      "descricao": "Sua exposição à magia Feérica lhe concede os seguintes benefícios."
+    },
+    {
+      "nome": "Treinamento com Armas Marciais",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Força ou Destreza em 1, até no máximo 20."
+        },
+        {
+          "nome": "Proficiência com Armas",
+          "descricao": "Você adquire proficiência com armas Marciais."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Valentão de Taverna",
+      "categoria": "de Origem",
+      "prerequisito": "",
+      "beneficios": [
+        {
+          "nome": "Ataque Desarmado Aprimorado",
+          "descricao": "Ao atingir com seu Ataque Desarmado e causar dano, você pode causar dano Contundente igual a 1d4 pontos mais seu modificador de Força em vez do dano normal de um Ataque Desarmado."
+        },
+        {
+          "nome": "Dano Garantido",
+          "descricao": "Sempre que você joga um dado de dano para seu Ataque Desarmado, pode jogar novamente o dado se o resultado for 1, e deve usar o novo resultado."
+        },
+        {
+          "nome": "Armamento Improvisado",
+          "descricao": "Você tem proficiência com armas improvisadas."
+        },
+        {
+          "nome": "Empurrar",
+          "descricao": "Ao atingir uma criatura com um Ataque Desarmado como parte da ação Atacar no seu turno, você pode causar dano ao alvo e também empurrá-lo 1,5 metro para longe de você. Você pode usar esse benefício apenas uma vez por turno."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios."
+    },
+    {
+      "nome": "Velocista",
+      "categoria": "Geral",
+      "prerequisito": "Nível 4 ou superior, Destreza ou Constituição 13 ou superior",
+      "beneficios": [
+        {
+          "nome": "Aumento no Valor de Atributo",
+          "descricao": "Aumente seu valor de Destreza ou Constituição em 1, até no máximo 20."
+        },
+        {
+          "nome": "Aumento de Deslocamento",
+          "descricao": "Seu Deslocamento aumenta em 3 metros."
+        },
+        {
+          "nome": "Correr em Terreno Difícil",
+          "descricao": "Ao executar a ação Correr no seu turno, Terreno Difícil não custa movimento adicional pelo resto deste turno."
+        },
+        {
+          "nome": "Movimentação Ágil",
+          "descricao": "Ataques de Oportunidade têm Desvantagem contra você."
+        }
+      ],
+      "descricao": "Você adquire os seguintes benefícios.\n## Talentos de Estilo de Luta\n*Esses talentos estão na categoria Estilo de Luta.*"
+    },
+    {
+      "nome": "Vigoroso",
+      "categoria": "de Origem",
+      "prerequisito": "",
+      "beneficios": [],
+      "descricao": "Seus Pontos de Vida máximos aumentam em um valor igual ao dobro do seu nível de personagem ao obter este talento. Sempre que você alcança um nível de personagem depois disso, seus Pontos de Vida máximos aumentam em 2 Pontos de Vida adicionais.\n## Talentos Gerais\nEsses talentos estão na categoria Geral."
+    }
+  ]
+}

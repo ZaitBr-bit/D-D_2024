@@ -1,0 +1,458 @@
+{
+  "total_itens": 82,
+  "itens": [
+    {
+      "nome": "Ácido",
+      "peso": "0,5 kg",
+      "custo": "25 PO"
+    },
+    {
+      "nome": "Água Benta",
+      "peso": "0,5 kg",
+      "custo": "25 PO"
+    },
+    {
+      "nome": "Algibeira",
+      "peso": "0,5 kg",
+      "custo": "5 PP"
+    },
+    {
+      "nome": "Aljava",
+      "peso": "0,5 kg",
+      "custo": "1 PO"
+    },
+    {
+      "nome": "Antitoxina",
+      "peso": "—",
+      "custo": "50 PO"
+    },
+    {
+      "nome": "Apito Sinalizador",
+      "peso": "—",
+      "custo": "5 PC"
+    },
+    {
+      "nome": "Aríete Portável",
+      "peso": "16,5 kg",
+      "custo": "4 PO"
+    },
+    {
+      "nome": "Armadilha de Caça",
+      "peso": "12,5 kg",
+      "custo": "5 PO"
+    },
+    {
+      "nome": "Arpéu",
+      "peso": "2 kg",
+      "custo": "2 PO"
+    },
+    {
+      "nome": "Balde",
+      "peso": "1 kg",
+      "custo": "5 PC"
+    },
+    {
+      "nome": "Baliza",
+      "peso": "3,5 kg",
+      "custo": "5 PC"
+    },
+    {
+      "nome": "Barril",
+      "peso": "35 kg",
+      "custo": "2 PO"
+    },
+    {
+      "nome": "Baú",
+      "peso": "12,5 kg",
+      "custo": "5 PO"
+    },
+    {
+      "nome": "Bolsa de Componentes",
+      "peso": "1 kg",
+      "custo": "25 PO"
+    },
+    {
+      "nome": "Cadeado",
+      "peso": "0,5 kg",
+      "custo": "10 PO"
+    },
+    {
+      "nome": "Caixa para Fogo",
+      "peso": "0,5 kg",
+      "custo": "5 PP"
+    },
+    {
+      "nome": "Caneta Tinteiro",
+      "peso": "—",
+      "custo": "2 PC"
+    },
+    {
+      "nome": "Cantil (cheio)",
+      "peso": "2,5 kg",
+      "custo": "2 PP"
+    },
+    {
+      "nome": "Cesta",
+      "peso": "1 kg",
+      "custo": "4 PP"
+    },
+    {
+      "nome": "Cobertor",
+      "peso": "1,5 kg",
+      "custo": "5 PP"
+    },
+    {
+      "nome": "Corda",
+      "peso": "2,5 kg",
+      "custo": "1 PO"
+    },
+    {
+      "nome": "Cordão",
+      "peso": "—",
+      "custo": "1 PP"
+    },
+    {
+      "nome": "Corrente",
+      "peso": "5 kg",
+      "custo": "5 PO"
+    },
+    {
+      "nome": "Escada",
+      "peso": "12,5 kg",
+      "custo": "1 PP"
+    },
+    {
+      "nome": "Esferas de Metal",
+      "peso": "1 kg (saco)",
+      "custo": "1 PO"
+    },
+    {
+      "nome": "Espelho",
+      "peso": "250 g",
+      "custo": "5 PO"
+    },
+    {
+      "nome": "Estacas de Ferro",
+      "peso": "2,5 kg",
+      "custo": "1 PO"
+    },
+    {
+      "nome": "Estojo, Mapa ou Pergaminho",
+      "peso": "0,5 kg",
+      "custo": "1 PO"
+    },
+    {
+      "nome": "Estojo, Virote de Besta",
+      "peso": "0,5 kg",
+      "custo": "1 PO"
+    },
+    {
+      "nome": "Estrepes",
+      "peso": "1 kg (saco)",
+      "custo": "1 PO"
+    },
+    {
+      "nome": "Foco Arcano",
+      "peso": "Varia",
+      "custo": "Varia"
+    },
+    {
+      "nome": "Foco Druídico",
+      "peso": "Varia",
+      "custo": "Varia"
+    },
+    {
+      "nome": "Fogo Alquímico",
+      "peso": "0,5 kg",
+      "custo": "50 PO"
+    },
+    {
+      "nome": "Frasco",
+      "peso": "—",
+      "custo": "1 PO"
+    },
+    {
+      "nome": "Garrafa de Vidro (1 litro)",
+      "peso": "1 kg",
+      "custo": "2 PO"
+    },
+    {
+      "nome": "Grilhões",
+      "peso": "3 kg",
+      "custo": "2 PO"
+    },
+    {
+      "nome": "Jarro (4 litros)",
+      "peso": "2 kg",
+      "custo": "2 PC"
+    },
+    {
+      "nome": "Kit de Artista",
+      "peso": "29 kg",
+      "custo": "40 PO"
+    },
+    {
+      "nome": "Kit de Assaltante",
+      "peso": "21 kg",
+      "custo": "16 PO"
+    },
+    {
+      "nome": "Kit de Aventureiro",
+      "peso": "27,5 kg",
+      "custo": "10 PO"
+    },
+    {
+      "nome": "Kit de Curandeiro",
+      "peso": "1,5 kg",
+      "custo": "5 PO"
+    },
+    {
+      "nome": "Kit de Diplomata",
+      "peso": "19,5 kg",
+      "custo": "39 PO"
+    },
+    {
+      "nome": "Kit de Erudito",
+      "peso": "11 kg",
+      "custo": "40 PO"
+    },
+    {
+      "nome": "Kit de Escalada",
+      "peso": "6 kg",
+      "custo": "25 PO"
+    },
+    {
+      "nome": "Kit de Explorador de Masmorras",
+      "peso": "27,5 kg",
+      "custo": "12 PO"
+    },
+    {
+      "nome": "Kit de Sacerdote",
+      "peso": "14,5 kg",
+      "custo": "33 PO"
+    },
+    {
+      "nome": "Lâmpada",
+      "peso": "0,5 kg",
+      "custo": "5 PP"
+    },
+    {
+      "nome": "Lanterna Coberta",
+      "peso": "1 kg",
+      "custo": "5 PO"
+    },
+    {
+      "nome": "Lanterna Foca-facho",
+      "peso": "1 kg",
+      "custo": "10 PO"
+    },
+    {
+      "nome": "Livro",
+      "peso": "2,5 kg",
+      "custo": "25 PO"
+    },
+    {
+      "nome": "Luneta",
+      "peso": "0,5 kg",
+      "custo": "1.000 PO"
+    },
+    {
+      "nome": "Lupa",
+      "peso": "—",
+      "custo": "100 PO"
+    },
+    {
+      "nome": "Mapa",
+      "peso": "—",
+      "custo": "1 PO"
+    },
+    {
+      "nome": "Mochila",
+      "peso": "2,5 kg",
+      "custo": "2 PO"
+    },
+    {
+      "nome": "Munição",
+      "peso": "Varia",
+      "custo": "Varia"
+    },
+    {
+      "nome": "Óleo",
+      "peso": "0,5 kg",
+      "custo": "1 PP"
+    },
+    {
+      "nome": "Pá",
+      "peso": "2,5 kg",
+      "custo": "2 PO"
+    },
+    {
+      "nome": "Papel",
+      "peso": "—",
+      "custo": "2 PP"
+    },
+    {
+      "nome": "Pé de Cabra",
+      "peso": "2,5 kg",
+      "custo": "2 PO"
+    },
+    {
+      "nome": "Perfume",
+      "peso": "—",
+      "custo": "5 PO"
+    },
+    {
+      "nome": "Pergaminho",
+      "peso": "—",
+      "custo": "1 PP"
+    },
+    {
+      "nome": "Pergaminho Mágico (1º Círculo)",
+      "peso": "—",
+      "custo": "50 PO"
+    },
+    {
+      "nome": "Pergaminho Mágico (Truque)",
+      "peso": "—",
+      "custo": "30 PO"
+    },
+    {
+      "nome": "Poção de Cura",
+      "peso": "250 g",
+      "custo": "50 PO"
+    },
+    {
+      "nome": "Pote",
+      "peso": "0,5 kg",
+      "custo": "2 PC"
+    },
+    {
+      "nome": "Pote, Ferro",
+      "peso": "5 kg",
+      "custo": "2 PO"
+    },
+    {
+      "nome": "Rações",
+      "peso": "1 kg",
+      "custo": "5 PP"
+    },
+    {
+      "nome": "Rede",
+      "peso": "1,5 kg",
+      "custo": "1 PO"
+    },
+    {
+      "nome": "Roldana e Polias",
+      "peso": "2,5 kg",
+      "custo": "1 PO"
+    },
+    {
+      "nome": "Roupas, Fantasia",
+      "peso": "2 kg",
+      "custo": "5 PO"
+    },
+    {
+      "nome": "Roupas, Finas",
+      "peso": "3 kg",
+      "custo": "15 PO"
+    },
+    {
+      "nome": "Roupas, Viagem",
+      "peso": "2 kg",
+      "custo": "2 PO"
+    },
+    {
+      "nome": "Saca",
+      "peso": "250 g",
+      "custo": "1 PC"
+    },
+    {
+      "nome": "Saco de Dormir",
+      "peso": "3,5 kg",
+      "custo": "1 PO"
+    },
+    {
+      "nome": "Símbolo Sagrado",
+      "peso": "Varia",
+      "custo": "Varia"
+    },
+    {
+      "nome": "Sino",
+      "peso": "—",
+      "custo": "1 PO"
+    },
+    {
+      "nome": "Tenda",
+      "peso": "10 kg",
+      "custo": "2 PO"
+    },
+    {
+      "nome": "Tinta",
+      "peso": "—",
+      "custo": "10 PO"
+    },
+    {
+      "nome": "Tocha",
+      "peso": "0,5 kg",
+      "custo": "1 PC"
+    },
+    {
+      "nome": "Túnica",
+      "peso": "2 kg",
+      "custo": "1 PO"
+    },
+    {
+      "nome": "Vela",
+      "peso": "—",
+      "custo": "1 PC"
+    },
+    {
+      "nome": "Veneno Básico",
+      "peso": "—",
+      "custo": "100 PO"
+    }
+  ],
+  "municao": [
+    {
+      "tipo": "Agulhas",
+      "quantidade": "50",
+      "armazenamento": "Algibeira",
+      "peso": "0,5 kg",
+      "custo": "1 PO"
+    },
+    {
+      "tipo": "Balas, Arma de Fogo",
+      "quantidade": "10",
+      "armazenamento": "Algibeira",
+      "peso": "750 g",
+      "custo": "3 PO"
+    },
+    {
+      "tipo": "Balas, Funda",
+      "quantidade": "20",
+      "armazenamento": "Algibeira",
+      "peso": "250 g",
+      "custo": "4 PC"
+    },
+    {
+      "tipo": "Flechas",
+      "quantidade": "20",
+      "armazenamento": "Aljava",
+      "peso": "0,5 kg",
+      "custo": "1 PO"
+    },
+    {
+      "tipo": "Virotes",
+      "quantidade": "20",
+      "armazenamento": "Estojo",
+      "peso": "750 g",
+      "custo": "1 P"
+    }
+  ],
+  "descricoes": {
+    "Um Bruxo canaliza magia através de um Foco Arcano": "",
+    "Cobrindo uma Criatura ou um Objeto": "Ao executar a ação Atacar, você pode substituir um de seus ataques por arremessar um frasco de Óleo. Escolha uma criatura ou objeto a até 6 metros de distância. O alvo deve ser bem-sucedido em uma salvaguarda de Destreza (CD 8 mais seu modificador de Destreza e seu Bônus de Proficiência) ou fica coberto de óleo. Se o alvo sofrer dano Ígneo antes que o óleo seque (após 1 minuto), ele sofre 5 pontos de dano Ígneo adicionais devido ao óleo em combustão.",
+    "Cobrindo um Espaço": "Você pode executar a ação Usar Objeto para despejar um pote de Óleo em um terreno plano para cobrir uma área quadrada de 1,5 metro de lado a até 1,5 metro de você. Ao ser aceso, o óleo queima até o fim do turno 2 rodadas depois (ou 12 segundos) e causa 5 pontos de dano Ígneo a qualquer criatura que entre ou termine o turno na área. Uma criatura sofre esse dano apenas uma vez por turno.",
+    "Combustível": "O Óleo serve como combustível para Lâmpadas e Lanternas. Uma vez aceso, um pote de Óleo queima por 6 horas em uma Lâmpada ou Lanterna. Esse tempo de queima não precisa ser consecutivo; você pode extinguir o Óleo em combustão (como uma ação Usar Objeto) e acendê-lo até que ele tenha queimado por um total de 6 horas."
+  }
+}

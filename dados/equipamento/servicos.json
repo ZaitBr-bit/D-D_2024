@@ -1,0 +1,181 @@
+{
+  "tabelas": [
+    {
+      "cabecalhos": [
+        "Item",
+        "Custo"
+      ],
+      "dados": [
+        {
+          "Item": "Alojamento por Dia",
+          "Custo": ""
+        },
+        {
+          "Item": "Desvalido",
+          "Custo": "7 PC"
+        },
+        {
+          "Item": "Pobre",
+          "Custo": "1 PP"
+        },
+        {
+          "Item": "Modesto",
+          "Custo": "5 PP"
+        },
+        {
+          "Item": "Confortável",
+          "Custo": "8 PP"
+        },
+        {
+          "Item": "Abastado",
+          "Custo": "2 PO"
+        },
+        {
+          "Item": "Aristocrático",
+          "Custo": "4 PO"
+        },
+        {
+          "Item": "Cerveja (caneca)",
+          "Custo": "4 PC"
+        },
+        {
+          "Item": "Pão (fatia)",
+          "Custo": "2 PC"
+        },
+        {
+          "Item": "Queijo (fatia)",
+          "Custo": "1 PP"
+        },
+        {
+          "Item": "Refeições",
+          "Custo": ""
+        },
+        {
+          "Item": "Desvalido",
+          "Custo": "1 PC"
+        },
+        {
+          "Item": "Pobre",
+          "Custo": "2 PC"
+        },
+        {
+          "Item": "Modesto",
+          "Custo": "1 PP"
+        },
+        {
+          "Item": "Confortável",
+          "Custo": "2 PP"
+        },
+        {
+          "Item": "Abastado",
+          "Custo": "3 PP"
+        },
+        {
+          "Item": "Aristocrático",
+          "Custo": "6 PP"
+        },
+        {
+          "Item": "Vinho (garrafa)",
+          "Custo": ""
+        },
+        {
+          "Item": "Comum",
+          "Custo": "2 PP"
+        },
+        {
+          "Item": "Bom",
+          "Custo": "10 PO"
+        }
+      ]
+    },
+    {
+      "cabecalhos": [
+        "Serviço",
+        "Custo"
+      ],
+      "dados": [
+        {
+          "Serviço": "Condução de carroça dentro de uma cidade",
+          "Custo": "1 PC por quilômetro"
+        },
+        {
+          "Serviço": "Condução de carroça entre aldeias/cidades",
+          "Custo": "2 PC por quilômetro"
+        },
+        {
+          "Serviço": "Passagem de navio",
+          "Custo": "6 PC por quilômetro"
+        },
+        {
+          "Serviço": "Pedágio (de estrada ou portão)",
+          "Custo": "1 PC"
+        }
+      ]
+    },
+    {
+      "cabecalhos": [
+        "Serviço",
+        "Custo"
+      ],
+      "dados": [
+        {
+          "Serviço": "Mensageiro",
+          "Custo": "2 PC por 1,5 quilômetro"
+        },
+        {
+          "Serviço": "Trabalhador não-qualificado",
+          "Custo": "2 PP por dia"
+        },
+        {
+          "Serviço": "Trabalhador qualificado",
+          "Custo": "2 PO por dia"
+        }
+      ]
+    },
+    {
+      "cabecalhos": [
+        "Círculo da Magia",
+        "Disponibilidade",
+        "Custo"
+      ],
+      "dados": [
+        {
+          "Círculo da Magia": "Truque",
+          "Disponibilidade": "Vila, aldeia ou cidade",
+          "Custo": "30 PO"
+        },
+        {
+          "Círculo da Magia": "1",
+          "Disponibilidade": "Vila, aldeia ou cidade",
+          "Custo": "50 PO"
+        },
+        {
+          "Círculo da Magia": "2",
+          "Disponibilidade": "Vila, aldeia ou cidade",
+          "Custo": "200 PO"
+        },
+        {
+          "Círculo da Magia": "3",
+          "Disponibilidade": "Apenas aldeia ou cidade",
+          "Custo": "300 PO"
+        },
+        {
+          "Círculo da Magia": "4–5",
+          "Disponibilidade": "Apenas aldeia ou cidade",
+          "Custo": "2.000 PO"
+        },
+        {
+          "Círculo da Magia": "6–8",
+          "Disponibilidade": "Apenas cidade",
+          "Custo": "20.000 PO"
+        },
+        {
+          "Círculo da Magia": "9",
+          "Disponibilidade": "Apenas cidade",
+          "Custo": "100.000 PO"
+        }
+      ]
+    }
+  ],
+  "texto_completo": "# Serviços\n\nEsta seção descreve os serviços e outras despesas em que os aventureiros podem gastar dinheiro.\n\n## Despesas de Estilo de Vida\n\nAs despesas de estilo de vida resumem o custo de vida em um mundo de fantasia. Elas cobrem hospedagem, alimentação, manutenção de equipamentos e outras necessidades.\n\nNo início de cada semana ou mês (à escolha do Mestre), escolha um estilo de vida abaixo — Miserável, Desvalido, Pobre, Modesto, Confortável, Abastado ou Aristocrático — e pague o preço para sustentar esse estilo de vida.\n\nOs estilos de vida não têm consequências inerentes, mas o Mestre pode levá-las em consideração ao determinar os riscos ou como os outros percebem seu personagem.\n\n### Miserável (Grátis)\n\nVocê sobrevive por acaso e caridade. Você está frequentemente exposto a perigos naturais como resultado de dormir ao ar livre.\n\n**Um Mago e seu familiar passam uma tarde fazendo compras.**\n\n### Desvalido (1 PP por Dia)\n\nVocê gasta o mínimo necessário para suas necessidades. Você pode estar exposto a condições insalubres e criminosos oportunistas.\n\n### Pobre (2 PP por Dia)\n\nVocê gasta cautelosamente por suas necessidades.\n\n### Modesto (1 PO por Dia)\n\nVocê se sustenta em um nível médio.\n\n### Confortável (2 PO por Dia)\n\nVocê gasta modestamente por suas necessidades e desfruta de alguns luxos.\n\n### Abastado (4 PO por Dia)\n\nVocê está acostumado com as coisas boas da vida e pode ter servos.\n\n### Aristocrático (10 PO por Dia)\n\nVocê paga pelo melhor e pode ter uma equipe que apoie seu estilo de vida. Outros percebem sua riqueza e podem incentivá-lo a compartilhá-la, legalmente ou de outra forma.\n\n## Comida, Bebida e Hospedagem\n\nA tabela Comida, Bebida e Hospedagem oferece preços para comida e uma única noite de hospedagem. Os preços de hospedagem diária e refeições estão incluídos nas despesas do seu estilo de vida.\n\n| **Item**             | **Custo** |\n|----------------------|-----------|\n| *Alojamento por Dia* |           |\n| Desvalido            | 7 PC      |\n| Pobre                | 1 PP      |\n| Modesto              | 5 PP      |\n| Confortável          | 8 PP      |\n| Abastado             | 2 PO      |\n| Aristocrático        | 4 PO      |\n| Cerveja (caneca)     | 4 PC      |\n| Pão (fatia)          | 2 PC      |\n| Queijo (fatia)       | 1 PP      |\n| *Refeições*          |           |\n| Desvalido            | 1 PC      |\n| Pobre                | 2 PC      |\n| Modesto              | 1 PP      |\n| Confortável          | 2 PP      |\n| Abastado             | 3 PP      |\n| Aristocrático        | 6 PP      |\n| *Vinho (garrafa)*    |           |\n| Comum                | 2 PP      |\n| Bom                  | 10 PO     |\n\n## Viagem\n\nOs condutores ou tripulantes contratados para conduzir os passageiros até seus destinos cobram as tarifas da tabela Viagem, acrescidas de eventuais pedágios ou despesas adicionais.\n\n**Viagem**\n\n| **Serviço**                               | **Custo**           |\n|-------------------------------------------|---------------------|\n| Condução de carroça dentro de uma cidade  | 1 PC por quilômetro |\n| Condução de carroça entre aldeias/cidades | 2 PC por quilômetro |\n| Passagem de navio                         | 6 PC por quilômetro |\n| Pedágio (de estrada ou portão)            | 1 PC                |\n\n## Trabalhadores\n\nTrabalhadores qualificados incluem qualquer pessoa contratada para realizar um serviço que envolva uma proficiência (incluindo uma arma, ferramenta ou perícia): um mercenário, um artesão, um escriba ou algo semelhante. O pagamento mostrado na tabela Trabalhadores é o mínimo; alguns trabalhadores especialistas exigem um pagamento maior. Trabalhadores não-qualificados são contratados para trabalhos que não exigem proficiências específicas; eles incluem carregadores e operários.\n\n**Trabalhadores**\n\n| **Serviço**                 | **Custo**           |\n|-----------------------------|---------------------|\n| Mensageiro                  | 2 PC por 1,5 quilômetro |\n| Trabalhador não-qualificado | 2 PP por dia        |\n| Trabalhador qualificado     | 2 PO por dia        |\n\n## Conjuração\n\nA maioria dos povoados contém indivíduos que estão dispostos a conjurar magias em troca de pagamento. Se uma magia tiver componentes caros, adicione o custo desses componentes ao custo apresentado na tabela Serviços de Conjuração. Quanto maior o círculo de uma magia desejada, mais difícil é encontrar alguém para conjurá-la.\n\n**Serviços de Conjuração**\n\n| **Círculo da Magia** | **Disponibilidade**     | **Custo**  |\n|----------------------|-------------------------|------------|\n| Truque               | Vila, aldeia ou cidade  | 30 PO      |\n| 1                    | Vila, aldeia ou cidade  | 50 PO      |\n| 2                    | Vila, aldeia ou cidade  | 200 PO     |\n| 3                    | Apenas aldeia ou cidade | 300 PO     |\n| 4–5                  | Apenas aldeia ou cidade | 2.000 PO   |\n| 6–8                  | Apenas cidade           | 20.000 PO  |\n| 9                    | Apenas cidade           | 100.000 PO |"
+}

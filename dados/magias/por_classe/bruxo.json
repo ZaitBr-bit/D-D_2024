@@ -1,0 +1,461 @@
+{
+  "classe": "Bruxo",
+  "total_magias": 91,
+  "magias": [
+    {
+      "nome": "Amigos",
+      "circulo": 0,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Badalar Fúnebre",
+      "circulo": 0,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Golpe Certeiro",
+      "circulo": 0,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Ilusão Menor",
+      "circulo": 0,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Mãos Mágicas",
+      "circulo": 0,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Prestidigitação Arcana",
+      "circulo": 0,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Proteção Contra Lâminas",
+      "circulo": 0,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Raio Místico",
+      "circulo": 0,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Rajada de Veneno",
+      "circulo": 0,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Talho Mental",
+      "circulo": 0,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Toque Necrótico",
+      "circulo": 0,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Trovão",
+      "circulo": 0,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Armadura de Agathys",
+      "circulo": 1,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Braços de Hadar",
+      "circulo": 1,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Compreender Idiomas",
+      "circulo": 1,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Danação",
+      "circulo": 1,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Detectar Magia",
+      "circulo": 1,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Enfeitiçar Pessoa",
+      "circulo": 1,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Escrita Ilusória",
+      "circulo": 1,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Falar com Animais",
+      "circulo": 1,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Gargalhada Nefasta de Tasha",
+      "circulo": 1,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Perdição",
+      "circulo": 1,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Proteção Contra o Bem e o Mal",
+      "circulo": 1,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Raio de Bruxa",
+      "circulo": 1,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Repreensão Diabólica",
+      "circulo": 1,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Retirada Acelerada",
+      "circulo": 1,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Servo Invisível",
+      "circulo": 1,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Cativar",
+      "circulo": 2,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Coroa da Loucura",
+      "circulo": 2,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Escalada de Aranha",
+      "circulo": 2,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Escuridão",
+      "circulo": 2,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Espinho Mental",
+      "circulo": 2,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Invisibilidade",
+      "circulo": 2,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Nuvem de Adagas",
+      "circulo": 2,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Paralisar Pessoa",
+      "circulo": 2,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Passo Nebuloso",
+      "circulo": 2,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Raio do Enfraquecimento",
+      "circulo": 2,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Reflexos",
+      "circulo": 2,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Sugestão",
+      "circulo": 2,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Contramagia",
+      "circulo": 3,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Convocar Feérico",
+      "circulo": 3,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Círculo Mágico",
+      "circulo": 3,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Dissipar Magia",
+      "circulo": 3,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Fome de Hadar",
+      "circulo": 3,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Forma Gasosa",
+      "circulo": 3,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Imagem Maior",
+      "circulo": 3,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Invocar Morto-Vivo",
+      "circulo": 3,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Línguas",
+      "circulo": 3,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Medo",
+      "circulo": 3,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Padrão Hipnótico",
+      "circulo": 3,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Remover Maldição",
+      "circulo": 3,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Toque Vampírico",
+      "circulo": 3,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Voo",
+      "circulo": 3,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Banimento",
+      "circulo": 4,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Enfeitiçar Monstro",
+      "circulo": 4,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Invocar Aberração",
+      "circulo": 4,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Malogro",
+      "circulo": 4,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Porta Dimensional",
+      "circulo": 4,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Terreno Alucinatório",
+      "circulo": 4,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Contato Extraplanar",
+      "circulo": 5,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Círculo de Teleporte",
+      "circulo": 5,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Despistar",
+      "circulo": 5,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Estática Sináptica",
+      "circulo": 5,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Paralisar Monstro",
+      "circulo": 5,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Sonho",
+      "circulo": 5,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Tempestade Radiante de Jallarzi",
+      "circulo": 5,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Vidência",
+      "circulo": 5,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Âncora Planar",
+      "circulo": 5,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Caldeirão Borbulhante de Tasha",
+      "circulo": 6,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Criar Mortos-Vivos",
+      "circulo": 6,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Círculo da Morte",
+      "circulo": 6,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Invocar Ínfero",
+      "circulo": 6,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Mau Olhado",
+      "circulo": 6,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Portais Arcanos",
+      "circulo": 6,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Visão da Verdade",
+      "circulo": 6,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Cárcere de Energia",
+      "circulo": 7,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Dedo da Morte",
+      "circulo": 7,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Forma Etérea",
+      "circulo": 7,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Transição Planar",
+      "circulo": 7,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Dominar Monstro",
+      "circulo": 8,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Loquacidade",
+      "circulo": 8,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Palavra de Poder: Atordoar",
+      "circulo": 8,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Semiplano",
+      "circulo": 8,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Suplício",
+      "circulo": 8,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Aprisionamento",
+      "circulo": 9,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Encarnação Fantasmagórica",
+      "circulo": 9,
+      "escola": "Ilusão"
+    },
+    {
+      "nome": "Palavra de Poder: Matar",
+      "circulo": 9,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Polimorfia Total",
+      "circulo": 9,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Portal",
+      "circulo": 9,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Projeção Astral",
+      "circulo": 9,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Sexto Sentido",
+      "circulo": 9,
+      "escola": "Adivinhação"
+    }
+  ]
+}

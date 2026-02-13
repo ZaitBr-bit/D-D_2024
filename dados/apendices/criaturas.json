@@ -1,0 +1,2127 @@
+{
+  "total": 51,
+  "criaturas": [
+    {
+      "nome": "Alce",
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "10",
+      "iniciativa": "+0 (10)",
+      "pv": "11 (2d10)",
+      "deslocamento": "15 m",
+      "atributos": {
+        "For": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Des": {
+          "valor": "10",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Con": {
+          "valor": "11",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        }
+      },
+      "pericias": "Percepção +2",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 12",
+      "idiomas": "—",
+      "nd": "1/4 (XP 50; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Cabeçada Aríete",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 6 (1d6 + 3) Contundente. Se o alce tiver se movido pelo menos 6 metros em linha reta em direção ao alvo imediatamente antes do ataque, o alvo sofre 3 (1d6) pontos de dano Contundente adicionais e, se for de tamanho Enorme ou menor, tem a condição Caído."
+        }
+      ],
+      "texto_completo": "## Alce\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 10\n\n**Iniciativa** +0 (10)\n\n**PV** 11 (2d10)\n\n**Deslocamento** 15 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 16 | +3      | +3     | **Des** | 10 | +0      | +0     | **Con** | 11 | +0      | +0     |\n| **Int** | 2  | -4      | -4     | **Sab** | 10 | +0      | +0     | **Car** | 6  | -2      | -2     |\n\n**Perícias** Percepção +2\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 12\n\n**Idiomas** —\n\n**ND** 1/4 (XP 50; BP +2)\n\n### Ações\n\n**Cabeçada Aríete.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 6 (1d6 + 3) Contundente. Se o alce tiver se movido pelo menos 6 metros em linha reta em direção ao alvo imediatamente antes do ataque, o alvo sofre 3 (1d6) pontos de dano Contundente adicionais e, se for de tamanho Enorme ou menor, tem a condição Caído."
+    },
+    {
+      "nome": "Aranha",
+      "tipo_tamanho": "Fera Minúscula, Sem Alinhamento",
+      "ca": "12",
+      "iniciativa": "+2 (12)",
+      "pv": "1 (1d4 - 1)",
+      "deslocamento": "6 m, Escalada 6 m",
+      "atributos": {
+        "For": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Des": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Con": {
+          "valor": "8",
+          "modificador": "-1",
+          "salvaguarda": "-1"
+        }
+      },
+      "pericias": "Furtividade +4",
+      "sentidos": "Visão no Escuro 9 m, Percepção Passiva 10",
+      "idiomas": "—",
+      "nd": "0 (XP 10; BP +2)",
+      "tracos": [
+        {
+          "nome": "Andar na Teia",
+          "descricao": "A aranha ignora restrições de movimento causadas por teias e sabe a localização de qualquer outra criatura em contato com a mesma teia."
+        },
+        {
+          "nome": "Escalada de Aranha",
+          "descricao": "A aranha pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 1 Perfurante mais 2 (1d4) Venenoso."
+        }
+      ],
+      "texto_completo": "## Aranha\n\n*Fera Minúscula, Sem Alinhamento*\n\n**CA** 12\n\n**Iniciativa** +2 (12)\n\n**PV** 1 (1d4 - 1)\n\n**Deslocamento** 6 m, Escalada 6 m\n\n|         |   | **Mod** | **SG** |         |    | **Mod** | **SG** |         |   | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|---|---------|--------|\n| **For** | 2 | -4      | -4     | **Des** | 14 | +2      | +2     | **Con** | 8 | -1      | -1     |\n| **Int** | 1 | -5      | -5     | **Sab** | 10 | +0      | +0     | **Car** | 2 | -4      | -4     |\n\n**Perícias** Furtividade +4\n\n**Sentidos** Visão no Escuro 9 m, Percepção Passiva 10\n\n**Idiomas** —\n\n**ND** 0 (XP 10; BP +2)\n\n### Traços\n\n**Andar na Teia.** A aranha ignora restrições de movimento causadas por teias e sabe a localização de qualquer outra criatura em contato com a mesma teia.\n\n**Escalada de Aranha.** A aranha pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo.\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 1 Perfurante mais 2 (1d4) Venenoso."
+    },
+    {
+      "nome": "Aranha Gigante",
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "14",
+      "iniciativa": "+3 (13)",
+      "pv": "26 (4d10 + 4)",
+      "deslocamento": "9 m, Escalada 9 m",
+      "atributos": {
+        "For": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Des": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Con": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        }
+      },
+      "pericias": "Furtividade +7, Percepção +4",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 14",
+      "idiomas": "—",
+      "nd": "1 (XP 200; BP +2)",
+      "tracos": [
+        {
+          "nome": "Andar na Teia",
+          "descricao": "A aranha ignora restrições de movimento causadas por teias e sabe a localização de qualquer outra criatura em contato com a mesma teia."
+        },
+        {
+          "nome": "Escalada de Aranha",
+          "descricao": "A aranha pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 7 (1d8 + 3) Perfurante mais 7 (2d6) Venenoso."
+        },
+        {
+          "nome": "Teia (Recarga 5–6)",
+          "descricao": "*Salvaguarda de Destreza:* CD 13, uma criatura à vista da aranha a até 18 metros. *Falha:* O alvo tem a condição Contido até que a teia seja destruída (CA 10; PV 5; Vulnerabilidade a dano Ígneo; Imunidade a dano Contundente, Psíquico e Venenoso; e Imunidade à condição Envenenado)."
+        }
+      ],
+      "texto_completo": "## Aranha Gigante\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 14\n\n**Iniciativa** +3 (13)\n\n**PV** 26 (4d10 + 4)\n\n**Deslocamento** 9 m, Escalada 9 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 14 | +2      | +2     | **Des** | 16 | +3      | +3     | **Con** | 12 | +1      | +1     |\n| **Int** | 2  | -4      | -4     | **Sab** | 11 | +0      | +0     | **Car** | 4  | -3      | -3     |\n\n**Perícias** Furtividade +7, Percepção +4\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 14\n\n**Idiomas** —\n\n**ND** 1 (XP 200; BP +2)\n\n### Traços\n\n**Andar na Teia.** A aranha ignora restrições de movimento causadas por teias e sabe a localização de qualquer outra criatura em contato com a mesma teia.\n\n**Escalada de Aranha.** A aranha pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo.\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 7 (1d8 + 3) Perfurante mais 7 (2d6) Venenoso.\n\n**Teia (Recarga 5–6).** *Salvaguarda de Destreza:* CD 13, uma criatura à vista da aranha a até 18 metros. *Falha:* O alvo tem a condição Contido até que a teia seja destruída (CA 10; PV 5; Vulnerabilidade a dano Ígneo; Imunidade a dano Contundente, Psíquico e Venenoso; e Imunidade à condição Envenenado)."
+    },
+    {
+      "nome": "Cabra",
+      "tipo_tamanho": "Fera Média, Sem Alinhamento",
+      "ca": "10",
+      "iniciativa": "+0 (10)",
+      "pv": "4 (1d8)",
+      "deslocamento": "12 m, Escalada 9 m",
+      "atributos": {
+        "For": {
+          "valor": "11",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Des": {
+          "valor": "10",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Con": {
+          "valor": "11",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        }
+      },
+      "pericias": "Percepção +2",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 12",
+      "idiomas": "—",
+      "nd": "0 (XP 10; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Cabeçada Aríete",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +2 para acertar, alcance 1,5 m. *Dano:* 1 Contundente, ou a cabra causa 2 (1d4) Contundente se ela tiver se movido pelo menos 6 metros em linha reta na direção do alvo imediatamente antes do ataque."
+        }
+      ],
+      "texto_completo": "## Cabra\n\n*Fera Média, Sem Alinhamento*\n\n**CA** 10\n\n**Iniciativa** +0 (10)\n\n**PV** 4 (1d8)\n\n**Deslocamento** 12 m, Escalada 9 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 11 | +0      | +0     | **Des** | 10 | +0      | +0     | **Con** | 11 | +0      | +0     |\n| **Int** | 2  | -4      | -4     | **Sab** | 10 | +0      | +0     | **Car** | 5  | -3      | -3     |\n\n**Perícias** Percepção +2\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 12\n\n**Idiomas** —\n\n**ND** 0 (XP 10; BP +2)\n\n### Ações\n\n**Cabeçada Aríete.** *Jogada de Ataque Corpo a Corpo:* +2 para acertar, alcance 1,5 m. *Dano:* 1 Contundente, ou a cabra causa 2 (1d4) Contundente se ela tiver se movido pelo menos 6 metros em linha reta na direção do alvo imediatamente antes do ataque."
+    },
+    {
+      "nome": "Cabra Gigante",
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "11",
+      "iniciativa": "+1 (11)",
+      "pv": "19 (3d10 + 3)",
+      "deslocamento": "12 m, Escalada 9 m",
+      "atributos": {
+        "For": {
+          "valor": "17",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Des": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Con": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        }
+      },
+      "pericias": "Percepção +3",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 13",
+      "idiomas": "—",
+      "nd": "1/2 (XP 100; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Cabeçada Aríete",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 6 (1d6 + 3) Contundente. Se a cabra tiver se movido pelo menos 6 metros em linha reta em direção ao alvo imediatamente antes do ataque, o alvo sofre 5 (2d4) pontos de dano Contundente adicionais e, se for de tamanho Enorme ou menor, tem a condição Caído."
+        }
+      ],
+      "texto_completo": "## Cabra Gigante\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 11\n\n**Iniciativa** +1 (11)\n\n**PV** 19 (3d10 + 3)\n\n**Deslocamento** 12 m, Escalada 9 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 17 | +3      | +3     | **Des** | 13 | +1      | +1     | **Con** | 12 | +1      | +1     |\n| **Int** | 3  | -4      | -4     | **Sab** | 12 | +1      | +1     | **Car** | 6  | -2      | -2     |\n\n**Perícias** Percepção +3\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 13\n\n**Idiomas** —\n\n**ND** 1/2 (XP 100; BP +2)\n\n### Ações\n\n**Cabeçada Aríete.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 6 (1d6 + 3) Contundente. Se a cabra tiver se movido pelo menos 6 metros em linha reta em direção ao alvo imediatamente antes do ataque, o alvo sofre 5 (2d4) pontos de dano Contundente adicionais e, se for de tamanho Enorme ou menor, tem a condição Caído."
+    },
+    {
+      "nome": "Camelo",
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "10",
+      "iniciativa": "-1 (9)",
+      "pv": "17 (2d10 + 6)",
+      "deslocamento": "15 m",
+      "atributos": {
+        "For": {
+          "valor": "15",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Des": {
+          "valor": "8",
+          "modificador": "-1",
+          "salvaguarda": "-1"
+        },
+        "Con": {
+          "valor": "17",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        }
+      },
+      "pericias": "",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 10",
+      "idiomas": "—",
+      "nd": "1/8 (XP 25; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 4 (1d4 + 2) Contundente."
+        }
+      ],
+      "texto_completo": "## Camelo\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 10\n\n**Iniciativa** -1 (9)\n\n**PV** 17 (2d10 + 6)\n\n**Deslocamento** 15 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 15 | +2      | +2     | **Des** | 8  | -1      | -1     | **Con** | 17 | +3      | +3     |\n| **Int** | 2  | -4      | -4     | **Sab** | 11 | +0      | +0     | **Car** | 5  | -3      | -3     |\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 10\n\n**Idiomas** —\n\n**ND** 1/8 (XP 25; BP +2)\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 4 (1d4 + 2) Contundente."
+    },
+    {
+      "nome": "Caranguejo",
+      "tipo_tamanho": "Fera Minúscula, Sem Alinhamento",
+      "ca": "11",
+      "iniciativa": "+0 (10)",
+      "pv": "3 (1d4 + 1)",
+      "deslocamento": "6 m, Natação 6 m",
+      "atributos": {
+        "For": {
+          "valor": "6",
+          "modificador": "-2",
+          "salvaguarda": "-2"
+        },
+        "Des": {
+          "valor": "11",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Con": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        }
+      },
+      "pericias": "Furtividade +2",
+      "sentidos": "Visão às Cegas 9 m, Percepção Passiva 9",
+      "idiomas": "—",
+      "nd": "0 (XP 10; BP +2)",
+      "tracos": [
+        {
+          "nome": "Anfíbio",
+          "descricao": "O caranguejo pode respirar ar e água."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Garra",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +2 para acertar, alcance 1,5 m. *Dano:* 1 Contundente."
+        }
+      ],
+      "texto_completo": "## Caranguejo\n\n*Fera Minúscula, Sem Alinhamento*\n\n**CA** 11\n\n**Iniciativa** +0 (10)\n\n**PV** 3 (1d4 + 1)\n\n**Deslocamento** 6 m, Natação 6 m\n\n|         |   | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 6 | -2      | -2     | **Des** | 11 | +0      | +0     | **Con** | 12 | +1      | +1     |\n| **Int** | 1 | -5      | -5     | **Sab** | 8  | -1      | -1     | **Car** | 2  | -4      | -4     |\n\n**Perícias** Furtividade +2\n\n**Sentidos** Visão às Cegas 9 m, Percepção Passiva 9\n\n**Idiomas** —\n\n**ND** 0 (XP 10; BP +2)\n\n### Traços\n\n**Anfíbio.** O caranguejo pode respirar ar e água.\n\n### Ações\n\n**Garra.** *Jogada de Ataque Corpo a Corpo:* +2 para acertar, alcance 1,5 m. *Dano:* 1 Contundente."
+    },
+    {
+      "nome": "Caranguejo Gigante",
+      "tipo_tamanho": "Fera Média, Sem Alinhamento",
+      "ca": "15",
+      "iniciativa": "+1 (11)",
+      "pv": "13 (3d8)",
+      "deslocamento": "9 m, Natação 9 m",
+      "atributos": {
+        "For": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Des": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Con": {
+          "valor": "11",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        }
+      },
+      "pericias": "Furtividade +3",
+      "sentidos": "Visão às Cegas 9 m, Percepção Passiva 9",
+      "idiomas": "—",
+      "nd": "1/8 (XP 25; BP +2)",
+      "tracos": [
+        {
+          "nome": "Anfíbio",
+          "descricao": "O caranguejo pode respirar ar e água."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Garra",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +3 para acertar, alcance 1,5 m. *Dano:* 4 (1d6 + 1) Contundente. Se o alvo for Médio ou menor, ele tem a condição Imobilizado (CD 11 para escapar). O caranguejo tem duas garras, cada uma das quais pode agarrar um alvo."
+        }
+      ],
+      "texto_completo": "## Caranguejo Gigante\n\n*Fera Média, Sem Alinhamento*\n\n**CA** 15\n\n**Iniciativa** +1 (11)\n\n**PV** 13 (3d8)\n\n**Deslocamento** 9 m, Natação 9 m\n\n|     |    | **Mod** | **SG** |     |    | **Mod** | **SG** |     |    | **Mod** | **SG** |\n|-----|----|---------|--------|-----|----|---------|--------|-----|----|---------|--------|\n| For | 13 | +1      | +1     | Des | 13 | +1      | +1     | Con | 11 | +0      | +0     |\n| Int | 1  | -5      | -5     | Sab | 9  | -1      | -1     | Car | 3  | -4      | -4     |\n\n**Perícias** Furtividade +3\n\n**Sentidos** Visão às Cegas 9 m, Percepção Passiva 9\n\n**Idiomas** —\n\n**ND** 1/8 (XP 25; BP +2)\n\n### Traços\n\n**Anfíbio.** O caranguejo pode respirar ar e água.\n\n### Ações\n\n**Garra.** *Jogada de Ataque Corpo a Corpo:* +3 para acertar, alcance 1,5 m. *Dano:* 4 (1d6 + 1) Contundente. Se o alvo for Médio ou menor, ele tem a condição Imobilizado (CD 11 para escapar). O caranguejo tem duas garras, cada uma das quais pode agarrar um alvo."
+    },
+    {
+      "nome": "Cavalo de Carga",
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "10",
+      "iniciativa": "+0 (10)",
+      "pv": "15 (2d10 + 4)",
+      "deslocamento": "12 m",
+      "atributos": {
+        "For": {
+          "valor": "18",
+          "modificador": "+4",
+          "salvaguarda": "+4"
+        },
+        "Des": {
+          "valor": "10",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Con": {
+          "valor": "15",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        }
+      },
+      "pericias": "",
+      "sentidos": "Percepção Passiva 10",
+      "idiomas": "—",
+      "nd": "1/4 (XP 50; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Cascos",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +6 para acertar, alcance 1,5 m. *Dano:* 6 (1d4 + 4) Contundente."
+        }
+      ],
+      "texto_completo": "## Cavalo de Carga\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 10\n\n**Iniciativa** +0 (10)\n\n**PV** 15 (2d10 + 4)\n\n**Deslocamento** 12 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 18 | +4      | +4     | **Des** | 10 | +0      | +0     | **Con** | 15 | +2      | +2     |\n| **Int** | 2  | -4      | -4     | **Sab** | 11 | +0      | +0     | **Car** | 7  | -2      | -2     |\n\n**Sentidos** Percepção Passiva 10\n\n**Idiomas** —\n\n**ND** 1/4 (XP 50; BP +2)\n\n### Ações\n\n**Cascos.** *Jogada de Ataque Corpo a Corpo:* +6 para acertar, alcance 1,5 m. *Dano:* 6 (1d4 + 4) Contundente."
+    },
+    {
+      "nome": "Cavalo de Guerra",
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "11",
+      "iniciativa": "+1 (11)",
+      "pv": "19 (3d10 + 3)",
+      "deslocamento": "18 m",
+      "atributos": {
+        "For": {
+          "valor": "18",
+          "modificador": "+4",
+          "salvaguarda": "+4"
+        },
+        "Des": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Con": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        }
+      },
+      "pericias": "",
+      "sentidos": "Percepção Passiva 11",
+      "idiomas": "—",
+      "nd": "1/2 (XP 100; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Cascos",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +6 para acertar, alcance 1,5 m. *Dano:* 9 (2d4 + 4) Contundente. Se o cavalo tiver se movido pelo menos 6 metros em linha reta em direção ao alvo imediatamente antes do ataque, o alvo sofre 5 (2d4) pontos de dano Contundente adicionais e, se for de tamanho Enorme ou menor, tem a condição Caído."
+        }
+      ],
+      "texto_completo": "## Cavalo de Guerra\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 11\n\n**Iniciativa** +1 (11)\n\n**PV** 19 (3d10 + 3)\n\n**Deslocamento** 18 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 18 | +4      | +4     | **Des** | 12 | +1      | +1     | **Con** | 13 | +1      | +1     |\n| **Int** | 2  | -4      | -4     | **Sab** | 12 | +1      | +1     | **Car** | 7  | -2      | -2     |\n\n**Sentidos** Percepção Passiva 11\n\n**Idiomas** —\n\n**ND** 1/2 (XP 100; BP +2)\n\n### Ações\n\n**Cascos.** *Jogada de Ataque Corpo a Corpo:* +6 para acertar, alcance 1,5 m. *Dano:* 9 (2d4 + 4) Contundente. Se o cavalo tiver se movido pelo menos 6 metros em linha reta em direção ao alvo imediatamente antes do ataque, o alvo sofre 5 (2d4) pontos de dano Contundente adicionais e, se for de tamanho Enorme ou menor, tem a condição Caído."
+    },
+    {
+      "nome": "Cavalo de Montaria",
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "11",
+      "iniciativa": "+1 (11)",
+      "pv": "13 (2d10 + 2)",
+      "deslocamento": "18 m",
+      "atributos": {
+        "For": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Des": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Con": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        }
+      },
+      "pericias": "",
+      "sentidos": "Percepção Passiva 10",
+      "idiomas": "—",
+      "nd": "1/4 (XP 50; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Cascos",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 7 (1d8 + 3) Contundente. Se o cavalo tiver se movido pelo menos 6 metros em linha reta em direção ao alvo imediatamente antes do ataque, o alvo sofre 5 (2d4) pontos de dano Contundente adicionais, e se for de tamanho Enorme ou menor, tem a condição Caído."
+        }
+      ],
+      "texto_completo": "## Cavalo de Montaria\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 11\n\n**Iniciativa** +1 (11)\n\n**PV** 13 (2d10 + 2)\n\n**Deslocamento** 18 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 16 | +3      | +3     | **Des** | 13 | +1      | +1     | **Con** | 12 | +1      | +1     |\n| **Int** | 2  | -4      | -4     | **Sab** | 11 | +0      | +0     | **Car** | 7  | -2      | -2     |\n\n**Sentidos** Percepção Passiva 10\n\n**Idiomas** —\n\n**ND** 1/4 (XP 50; BP +2)\n\n### Ações\n\n**Cascos.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 7 (1d8 + 3) Contundente. Se o cavalo tiver se movido pelo menos 6 metros em linha reta em direção ao alvo imediatamente antes do ataque, o alvo sofre 5 (2d4) pontos de dano Contundente adicionais, e se for de tamanho Enorme ou menor, tem a condição Caído."
+    },
+    {
+      "nome": "Cavalo Marinho Gigante",
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "14",
+      "iniciativa": "+1 (11)",
+      "pv": "16 (3d10)",
+      "deslocamento": "1,5 m, Natação 12 m",
+      "atributos": {
+        "For": {
+          "valor": "15",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Des": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Con": {
+          "valor": "11",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        }
+      },
+      "pericias": "",
+      "sentidos": "Percepção Passiva 11",
+      "idiomas": "—",
+      "nd": "1/2 (XP 100; BP +2)",
+      "tracos": [
+        {
+          "nome": "Respirar na Água",
+          "descricao": "O cavalo-marinho só pode respirar debaixo d'água."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Cabeçada Aríete",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 9 (2d6 + 2) Contundente ou o cavalo-marinho causa 11 (2d8 + 2) pontos de dano Contundente se ele tiver se movido pelo menos 6 metros em linha reta na direção do alvo imediatamente antes do ataque."
+        },
+        {
+          "nome": "Propulsão",
+          "descricao": "Enquanto estiver debaixo d'água, o cavalo-marinho se move até metade do seu Deslocamento de Natação sem provocar Ataques de Oportunidade."
+        }
+      ],
+      "texto_completo": "## Cavalo Marinho Gigante\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 14\n\n**Iniciativa** +1 (11)\n\n**PV** 16 (3d10)\n\n**Deslocamento** 1,5 m, Natação 12 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 15 | +2      | +2     | **Des** | 12 | +1      | +1     | **Con** | 11 | +0      | +0     |\n| **Int** | 2  | -4      | -4     | **Sab** | 12 | +1      | +1     | **Car** | 5  | -3      | -3     |\n\n**Sentidos** Percepção Passiva 11\n\n**Idiomas** —\n\n**ND** 1/2 (XP 100; BP +2)\n\n### Traços\n\n**Respirar na Água.** O cavalo-marinho só pode respirar debaixo d'água.\n\n### Ações\n\n**Cabeçada Aríete.** *Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 9 (2d6 + 2) Contundente ou o cavalo-marinho causa 11 (2d8 + 2) pontos de dano Contundente se ele tiver se movido pelo menos 6 metros em linha reta na direção do alvo imediatamente antes do ataque.\n\n### Ações Bônus\n\n**Propulsão.** Enquanto estiver debaixo d'água, o cavalo-marinho se move até metade do seu Deslocamento de Natação sem provocar Ataques de Oportunidade."
+    },
+    {
+      "nome": "Cobra Constritora",
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "13",
+      "iniciativa": "+2 (12)",
+      "pv": "13 (2d10 + 2)",
+      "deslocamento": "9 m, Natação 9 m",
+      "atributos": {
+        "For": {
+          "valor": "15",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Des": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Con": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        }
+      },
+      "pericias": "Furtividade +4, Percepção +2",
+      "sentidos": "",
+      "idiomas": "—",
+      "nd": "1/4 (XP 50; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Constrição",
+          "descricao": "*Salvaguarda de Força:* CD 12, uma criatura Média ou menor à vista da cobra a até 1,5 metro. *Falha:* 7 (3d4) pontos de dano Contundente, e o alvo tem a condição Imobilizado (CD 12 para escapar)."
+        },
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 6 (1d8 + 2) Perfurante."
+        }
+      ],
+      "texto_completo": "## Cobra Constritora\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 13\n\n**Iniciativa** +2 (12)\n\n**PV** 13 (2d10 + 2)\n\n**Deslocamento** 9 m, Natação 9 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 15 | +2      | +2     | **Des** | 14 | +2      | +2     | **Con** | 12 | +1      | +1     |\n| **Int** | 1  | -5      | -5     | **Sab** | 10 | +0      | +0     | **Car** | 3  | -4      | -4     |\n\n**Perícias** Furtividade +4, Percepção +2\n\n**Sentidos:** Visão às Cegas 3 m, Percepção Passiva 12\n\n**Idiomas** —\n\n**ND** 1/4 (XP 50; BP +2)\n\n### Ações\n\n**Constrição.** *Salvaguarda de Força:* CD 12, uma criatura Média ou menor à vista da cobra a até 1,5 metro. *Falha:* 7 (3d4) pontos de dano Contundente, e o alvo tem a condição Imobilizado (CD 12 para escapar).\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 6 (1d8 + 2) Perfurante."
+    },
+    {
+      "nome": "Cobra Peçonhenta",
+      "tipo_tamanho": "Fera Minúscula, Sem Alinhamento",
+      "ca": "12",
+      "iniciativa": "+2 (12)",
+      "pv": "5 (2d4)",
+      "deslocamento": "9 m, Natação 9 m",
+      "atributos": {
+        "For": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Des": {
+          "valor": "15",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Con": {
+          "valor": "11",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        }
+      },
+      "pericias": "",
+      "sentidos": "Visão às Cegas 3 m, Percepção Passiva 10",
+      "idiomas": "—",
+      "nd": "1/8 (XP 25; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 4 (1d4 + 2) Perfurante mais 3 (1d6) Venenoso."
+        }
+      ],
+      "texto_completo": "## Cobra Peçonhenta\n\n*Fera Minúscula, Sem Alinhamento*\n\n**CA** 12\n\n**Iniciativa** +2 (12)\n\n**PV** 5 (2d4)\n\n**Deslocamento** 9 m, Natação 9 m\n\n|         |   | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 2 | -4      | -4     | **Des** | 15 | +2      | +2     | **Con** | 11 | +0      | +0     |\n| **Int** | 1 | -5      | -5     | **Sab** | 10 | +0      | +0     | **Car** | 3  | -4      | -4     |\n\n**Sentidos** Visão às Cegas 3 m, Percepção Passiva 10\n\n**Idiomas** —\n\n**ND** 1/8 (XP 25; BP +2)\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 4 (1d4 + 2) Perfurante mais 3 (1d6) Venenoso."
+    },
+    {
+      "nome": "Coruja",
+      "tipo_tamanho": "Fera Minúscula, Sem Alinhamento",
+      "ca": "11",
+      "iniciativa": "+1 (11)",
+      "pv": "1 (1d4 - 1)",
+      "deslocamento": "1,5 m, Voo 18 m",
+      "atributos": {
+        "For": {
+          "valor": "3",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Des": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Con": {
+          "valor": "8",
+          "modificador": "-1",
+          "salvaguarda": "-1"
+        }
+      },
+      "pericias": "Furtividade +5, Percepção +5",
+      "sentidos": "Visão no Escuro 36 m, Percepção Passiva 15",
+      "idiomas": "—",
+      "nd": "0 (XP 10; BP +2)",
+      "tracos": [
+        {
+          "nome": "Sobrevoo",
+          "descricao": "A coruja não provoca Ataques de Oportunidade ao voar para fora do alcance de um inimigo."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Garras",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +3 para acertar, alcance 1,5 m. *Dano:* 1 Cortante."
+        }
+      ],
+      "texto_completo": "## Coruja\n\n*Fera Minúscula, Sem Alinhamento*\n\n**CA** 11\n\n**Iniciativa** +1 (11)\n\n**PV** 1 (1d4 - 1)\n\n**Deslocamento** 1,5 m, Voo 18 m\n\n|         |   | **Mod** | **SG** |         |    | **Mod** | **SG** |         |   | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|---|---------|--------|\n| **For** | 3 | -4      | -4     | **Des** | 13 | +1      | +1     | **Con** | 8 | -1      | -1     |\n| **Int** | 2 | -4      | -4     | **Sab** | 12 | +1      | +1     | **Car** | 7 | -2      | -2     |\n\n**Perícias** Furtividade +5, Percepção +5\n\n**Sentidos** Visão no Escuro 36 m, Percepção Passiva 15\n\n**Idiomas** —\n\n**ND** 0 (XP 10; BP +2)\n\n### Traços\n\n**Sobrevoo.** A coruja não provoca Ataques de Oportunidade ao voar para fora do alcance de um inimigo.\n\n### Ações\n\n**Garras.** *Jogada de Ataque Corpo a Corpo:* +3 para acertar, alcance 1,5 m. *Dano:* 1 Cortante."
+    },
+    {
+      "nome": "Corvo",
+      "tipo_tamanho": "Fera Minúscula, Sem Alinhamento",
+      "ca": "12",
+      "iniciativa": "+2 (12)",
+      "pv": "2 (1d4)",
+      "deslocamento": "3 m, Voo 15 m",
+      "atributos": {
+        "For": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Des": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Con": {
+          "valor": "10",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        }
+      },
+      "pericias": "Percepção +3",
+      "sentidos": "Percepção Passiva 13",
+      "idiomas": "—",
+      "nd": "0 (XP 10; BP +2)",
+      "tracos": [
+        {
+          "nome": "Mímica",
+          "descricao": "O corvo pode imitar sons simples que ouviu, como um sussurro ou piado. Um ouvinte pode discernir que os sons são imitações com um teste bem-sucedido de Sabedoria (Intuição) CD 10."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Bico",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 1 Perfurante."
+        }
+      ],
+      "texto_completo": "## Corvo\n\n*Fera Minúscula, Sem Alinhamento*\n\n**CA** 12\n\n**Iniciativa** +2 (12)\n\n**PV** 2 (1d4)\n\n**Deslocamento** 3 m, Voo 15 m\n\n|         |   | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 2 | -4      | -4     | **Des** | 14 | +2      | +2     | **Con** | 10 | +0      | +0     |\n| **Int** | 5 | -3      | -3     | **Sab** | 13 | +1      | +1     | **Car** | 6  | -2      | -2     |\n\n**Perícias** Percepção +3\n\n**Sentidos** Percepção Passiva 13\n\n**Idiomas** —\n\n**ND** 0 (XP 10; BP +2)\n\n### Traços\n\n**Mímica.** O corvo pode imitar sons simples que ouviu, como um sussurro ou piado. Um ouvinte pode discernir que os sons são imitações com um teste bem-sucedido de Sabedoria (Intuição) CD 10.\n\n### Ações\n\n**Bico.** *Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 1 Perfurante."
+    },
+    {
+      "nome": "Crocodilo",
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "12",
+      "iniciativa": "+0 (10)",
+      "pv": "13 (2d10 + 2)",
+      "deslocamento": "6 m, Natação 9 m",
+      "atributos": {
+        "For": {
+          "valor": "15",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Des": {
+          "valor": "10",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Con": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        }
+      },
+      "pericias": "Furtividade +2",
+      "sentidos": "Percepção Passiva 10",
+      "idiomas": "—",
+      "nd": "1/2 (XP 100; BP +2)",
+      "tracos": [
+        {
+          "nome": "Prender a Respiração",
+          "descricao": "O crocodilo pode prender a respiração por 1 hora."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 6 (1d8 + 2) Perfurante. Se o alvo for Médio ou menor, ele tem a condição Imobilizado (CD 12 para escapar). Enquanto estiver Imobilizado, o alvo tem a condição Contido."
+        }
+      ],
+      "texto_completo": "## Crocodilo\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 12\n\n**Iniciativa** +0 (10)\n\n**PV** 13 (2d10 + 2)\n\n**Deslocamento** 6 m, Natação 9 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 15 | +2      | +2     | **Des** | 10 | +0      | +0     | **Con** | 13 | +1      | +1     |\n| **Int** | 2  | -4      | -4     | **Sab** | 10 | +0      | +0     | **Car** | 5  | -3      | -3     |\n\n**Perícias** Furtividade +2\n\n**Sentidos** Percepção Passiva 10\n\n**Idiomas** —\n\n**ND** 1/2 (XP 100; BP +2)\n\n### Traços\n\n**Prender a Respiração.** O crocodilo pode prender a respiração por 1 hora.\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 6 (1d8 + 2) Perfurante. Se o alvo for Médio ou menor, ele tem a condição Imobilizado (CD 12 para escapar). Enquanto estiver Imobilizado, o alvo tem a condição Contido."
+    },
+    {
+      "nome": "Diabrete",
+      "tipo_tamanho": "Ínfero Minúsculo (Diabo), Ordeiro e Mau",
+      "ca": "13",
+      "iniciativa": "+3 (13)",
+      "pv": "21 (6d4 + 6)",
+      "deslocamento": "6 m, Voo 12 m",
+      "atributos": {
+        "For": {
+          "valor": "6",
+          "modificador": "-2",
+          "salvaguarda": "-2"
+        },
+        "Des": {
+          "valor": "17",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Con": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        }
+      },
+      "pericias": "Enganação +4, Furtividade +5, Intuição +3",
+      "sentidos": "Visão no Escuro 36 m, Percepção Passiva 11",
+      "idiomas": "Comum, Infernal",
+      "nd": "1 (XP 200; BP +2)",
+      "tracos": [
+        {
+          "nome": "Resistência à Magia",
+          "descricao": "O diabrete tem Vantagem em salvaguardas contra magias e outros efeitos mágicos."
+        },
+        {
+          "nome": "Visão Diabólica",
+          "descricao": "Escuridão Mágica não impede a Visão no Escuro do diabrete."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Alterar Forma",
+          "descricao": "O diabrete se multimorfa em uma forma que se assemelha a uma aranha (Deslocamento 6 m, Escalada 6 m), um corvo (6 m, Voo 18 m) ou um rato (6 m), ou ele retorna à sua verdadeira forma. Suas estatísticas são as mesmas em cada forma, exceto por seu Deslocamento. Qualquer equipamento que esteja usando ou carregando não é transformado. O diabrete reverte para sua verdadeira forma se morrer."
+        },
+        {
+          "nome": "Ferroada",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 6 (1d6 + 3) Perfurante mais 7 (2d6) Venenoso."
+        },
+        {
+          "nome": "Invisibilidade",
+          "descricao": "O diabrete conjura Invisibilidade em si, não exigindo componentes de magia e usando Carisma como atributo de conjuração."
+        }
+      ],
+      "texto_completo": "## Diabrete\n\n*Ínfero Minúsculo (Diabo), Ordeiro e Mau*\n\n**CA** 13\n\n**Iniciativa** +3 (13)\n\n**PV** 21 (6d4 + 6)\n\n**Deslocamento** 6 m, Voo 12 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 6  | -2      | -2     | **Des** | 17 | +3      | +3     | **Con** | 13 | +1      | +1     |\n| **Int** | 11 | +0      | +0     | **Sab** | 12 | +1      | +1     | **Car** | 14 | +2      | +2     |\n\n**Perícias** Enganação +4, Furtividade +5, Intuição +3\n\n**Resistências** Gélido\n\n**Imunidades** Ígneo, Venenoso; Envenenado\n\n**Sentidos** Visão no Escuro 36 m, Percepção Passiva 11\n\n**Idiomas** Comum, Infernal\n\n**ND** 1 (XP 200; BP +2)\n\n### Traços\n\n**Resistência à Magia.** O diabrete tem Vantagem em salvaguardas contra magias e outros efeitos mágicos.\n\n**Visão Diabólica.** Escuridão Mágica não impede a Visão no Escuro do diabrete.\n\n### Ações\n\n**Alterar Forma.** O diabrete se multimorfa em uma forma que se assemelha a uma aranha (Deslocamento 6 m, Escalada 6 m), um corvo (6 m, Voo 18 m) ou um rato (6 m), ou ele retorna à sua verdadeira forma. Suas estatísticas são as mesmas em cada forma, exceto por seu Deslocamento. Qualquer equipamento que esteja usando ou carregando não é transformado. O diabrete reverte para sua verdadeira forma se morrer.\n\n**Ferroada.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 6 (1d6 + 3) Perfurante mais 7 (2d6) Venenoso.\n\n**Invisibilidade.** O diabrete conjura Invisibilidade em si, não exigindo componentes de magia e usando Carisma como atributo de conjuração."
+    },
+    {
+      "nome": "Doninha",
+      "tipo_tamanho": "Fera Minúscula, Sem Alinhamento",
+      "ca": "13",
+      "iniciativa": "+3 (13)",
+      "pv": "1 (1d4 - 1)",
+      "deslocamento": "9 m, Escalada 9 m",
+      "atributos": {
+        "For": {
+          "valor": "3",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Des": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Con": {
+          "valor": "8",
+          "modificador": "-1",
+          "salvaguarda": "-1"
+        }
+      },
+      "pericias": "Acrobacia +5, Furtividade +5, Percepção +3",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 13",
+      "idiomas": "—",
+      "nd": "0 (XP 10; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 1 Perfurante."
+        }
+      ],
+      "texto_completo": "## Doninha\n\n*Fera Minúscula, Sem Alinhamento*\n\n**CA** 13\n\n**Iniciativa** +3 (13)\n\n**PV** 1 (1d4 - 1)\n\n**Deslocamento** 9 m, Escalada 9 m\n\n|         |   | **Mod** | **SG** |         |    | **Mod** | **SG** |         |   | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|---|---------|--------|\n| **For** | 3 | -4      | -4     | **Des** | 16 | +3      | +3     | **Con** | 8 | -1      | -1     |\n| **Int** | 2 | -4      | -4     | **Sab** | 12 | +1      | +1     | **Car** | 3 | -4      | -4     |\n\n**Perícias** Acrobacia +5, Furtividade +5, Percepção +3\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 13\n\n**Idiomas** —\n\n**ND** 0 (XP 10; BP +2)\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 1 Perfurante."
+    },
+    {
+      "nome": "Doninha Gigante",
+      "tipo_tamanho": "Fera Média, Sem Alinhamento",
+      "ca": "13",
+      "iniciativa": "+3 (13)",
+      "pv": "9 (2d8)",
+      "deslocamento": "12 m, Escalada 9 m",
+      "atributos": {
+        "For": {
+          "valor": "11",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Des": {
+          "valor": "17",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Con": {
+          "valor": "10",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        }
+      },
+      "pericias": "Acrobacia +5, Furtividade +5, Percepção +3",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 13",
+      "idiomas": "—",
+      "nd": "1/8 (XP 25; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 5 (1d4 + 3) Perfurante."
+        }
+      ],
+      "texto_completo": "## Doninha Gigante\n\n*Fera Média, Sem Alinhamento*\n\n**CA** 13\n\n**Iniciativa** +3 (13)\n\n**PV** 9 (2d8)\n\n**Deslocamento** 12 m, Escalada 9 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 11 | +0      | +0     | **Des** | 17 | +3      | +3     | **Con** | 10 | +0      | +0     |\n| **Int** | 4  | -3      | -3     | **Sab** | 12 | +1      | +1     | **Car** | 5  | -3      | -3     |\n\n**Perícias** Acrobacia +5, Furtividade +5, Percepção +3\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 13\n\n**Idiomas** —\n\n**ND** 1/8 (XP 25; BP +2)\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 5 (1d4 + 3) Perfurante."
+    },
+    {
+      "nome": "Elefante",
+      "tipo_tamanho": "Fera Enorme, Sem Alinhamento",
+      "ca": "12",
+      "iniciativa": "-1 (9)",
+      "pv": "76 (8d12 + 24)",
+      "deslocamento": "12 m",
+      "atributos": {
+        "For": {
+          "valor": "22",
+          "modificador": "+6",
+          "salvaguarda": "+6"
+        },
+        "Des": {
+          "valor": "9",
+          "modificador": "-1",
+          "salvaguarda": "-1"
+        },
+        "Con": {
+          "valor": "17",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        }
+      },
+      "pericias": "",
+      "sentidos": "Percepção Passiva 10",
+      "idiomas": "—",
+      "nd": "4 (XP 1.100; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Ataques Múltiplos",
+          "descricao": "O elefante realiza dois ataques usando Investida."
+        },
+        {
+          "nome": "Investida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +8 para acertar, alcance 1,5 m. Dano: 15 (2d8 + 6) Perfurante. Se o elefante tiver se movido pelo menos 6 metros em linha reta em direção ao alvo imediatamente antes do ataque, o alvo também tem a condição Caído."
+        },
+        {
+          "nome": "Pisão",
+          "descricao": "*Salvaguarda de Destreza:* CD 16, uma criatura a até 1,5 metro que tem a condição Caído. *Falha:* 17 (2d10 +6) pontos de dano Contundente. *Sucesso:* Metade do dano."
+        }
+      ],
+      "texto_completo": "## Elefante\n\n*Fera Enorme, Sem Alinhamento*\n\n**CA** 12\n\n**Iniciativa** -1 (9)\n\n**PV** 76 (8d12 + 24)\n\n**Deslocamento** 12 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 22 | +6      | +6     | **Des** | 9  | -1      | -1     | **Con** | 17 | +3      | +3     |\n| **Int** | 3  | -4      | -4     | **Sab** | 11 | +0      | +0     | **Car** | 6  | -2      | -2     |\n\n**Sentidos** Percepção Passiva 10\n\n**Idiomas** —\n\n**ND** 4 (XP 1.100; BP +2)\n\n### Ações\n\n**Ataques Múltiplos.** O elefante realiza dois ataques usando Investida.\n\n**Investida.** *Jogada de Ataque Corpo a Corpo:* +8 para acertar, alcance 1,5 m. Dano: 15 (2d8 + 6) Perfurante. Se o elefante tiver se movido pelo menos 6 metros em linha reta em direção ao alvo imediatamente antes do ataque, o alvo também tem a condição Caído.\n\n### Ações Bônus\n\n**Pisão.** *Salvaguarda de Destreza:* CD 16, uma criatura a até 1,5 metro que tem a condição Caído. *Falha:* 17 (2d10 +6) pontos de dano Contundente. *Sucesso:* Metade do dano."
+    },
+    {
+      "nome": "Escorpião",
+      "tipo_tamanho": "Fera Minúscula, Sem Alinhamento",
+      "ca": "11",
+      "iniciativa": "+0 (10)",
+      "pv": "1 (1d4 - 1)",
+      "deslocamento": "3 m",
+      "atributos": {
+        "For": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Des": {
+          "valor": "11",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Con": {
+          "valor": "8",
+          "modificador": "-1",
+          "salvaguarda": "-1"
+        }
+      },
+      "pericias": "",
+      "sentidos": "Visão às Cegas 3 m, Percepção Passiva 9",
+      "idiomas": "—",
+      "nd": "0 (XP 10; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Ferroada",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +2 para acertar, alcance 1,5 m. *Dano:* 1 Perfurante mais 3 (1d6) Venenoso."
+        }
+      ],
+      "texto_completo": "## Escorpião\n\n*Fera Minúscula, Sem Alinhamento*\n\n**CA** 11\n\n**Iniciativa** +0 (10)\n\n**PV** 1 (1d4 - 1)\n\n**Deslocamento** 3 m\n\n|         |   | **Mod** | **SG** |         |    | **Mod** | **SG** |         |   | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|---|---------|--------|\n| **For** | 2 | -4      | -4     | **Des** | 11 | +0      | +0     | **Con** | 8 | -1      | -1     |\n| **Int** | 1 | -5      | -5     | **Sab** | 8  | -1      | -1     | **Car** | 2 | -4      | -4     |\n\n**Sentidos** Visão às Cegas 3 m, Percepção Passiva 9\n\n**Idiomas** —\n\n**ND** 0 (XP 10; BP +2)\n\n### Ações\n\n**Ferroada.** *Jogada de Ataque Corpo a Corpo:* +2 para acertar, alcance 1,5 m. *Dano:* 1 Perfurante mais 3 (1d6) Venenoso."
+    },
+    {
+      "nome": "Esfinge Maravilhosa",
+      "tipo_tamanho": "Celestial Minúsculo, Ordeiro e Bom",
+      "ca": "13",
+      "iniciativa": "+3 (13)",
+      "pv": "24 (7d4 + 7)",
+      "deslocamento": "6 m, Voo 12 m",
+      "atributos": {
+        "For": {
+          "valor": "6",
+          "modificador": "-2",
+          "salvaguarda": "-2"
+        },
+        "Des": {
+          "valor": "17",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Con": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        }
+      },
+      "pericias": "Arcanismo +4, Furtividade +5, Religião +4",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 11",
+      "idiomas": "Celestial, Comum",
+      "nd": "1 (XP 200; BP +2)",
+      "tracos": [
+        {
+          "nome": "Resistência à Magia",
+          "descricao": "A esfinge tem Vantagem em salvaguardas contra magias e outros efeitos mágicos."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Dilacerar",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 5 (1d4 + 3) Cortante mais 7 (2d6) Radiante."
+        }
+      ],
+      "texto_completo": "## Esfinge Maravilhosa\n\n*Celestial Minúsculo, Ordeiro e Bom*\n\n**CA** 13\n\n**Iniciativa** +3 (13)\n\n**PV** 24 (7d4 + 7)\n\n**Deslocamento** 6 m, Voo 12 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 6  | -2      | -2     | **Des** | 17 | +3      | +3     | **Con** | 13 | +1      | +1     |\n| **Int** | 15 | +2      | +2     | **Sab** | 12 | +1      | +1     | **Car** | 11 | +0      | +0     |\n\n**Perícias** Arcanismo +4, Furtividade +5, Religião +4\n\n**Resistências** Necrótico, Psíquico, Radiante\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 11\n\n**Idiomas** Celestial, Comum\n\n**ND** 1 (XP 200; BP +2)\n\n### Traços\n\n**Resistência à Magia.** A esfinge tem Vantagem em salvaguardas contra magias e outros efeitos mágicos.\n\n### Ações\n\n**Dilacerar.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 5 (1d4 + 3) Cortante mais 7 (2d6) Radiante.\n\n### Reações\n\n**Ampliar Engenhosidade (2/Dia).** *Gatilho:* A esfinge ou outra criatura a até 9 metros realiza um teste de atributo ou uma salvaguarda. *Resposta:* A esfinge adiciona 2 ao resultado."
+    },
+    {
+      "nome": "Esqueleto",
+      "tipo_tamanho": "Morto-Vivo Médio, Ordeiro e Mau",
+      "ca": "13",
+      "iniciativa": "+3 (13)",
+      "pv": "13 (2d8 + 4)",
+      "deslocamento": "9 m",
+      "atributos": {
+        "For": {
+          "valor": "10",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Des": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Con": {
+          "valor": "15",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        }
+      },
+      "pericias": "",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 9",
+      "idiomas": "Compreende os idiomas que conhecia em vida, mas não consegue falar",
+      "nd": "1/4 (XP 50; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Arco Curto",
+          "descricao": "*Jogada de Ataque à Distância:* +5 para acertar, alcance 24/96 m. *Dano:* 6 (1d6 + 3) Perfurante."
+        },
+        {
+          "nome": "Espada Curta",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 6 (1d6 + 3) Perfurante."
+        }
+      ],
+      "texto_completo": "## Esqueleto\n\n*Morto-Vivo Médio, Ordeiro e Mau*\n\n**CA** 13\n\n**Iniciativa** +3 (13)\n\n**PV** 13 (2d8 + 4)\n\n**Deslocamento** 9 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 10 | +0      | +0     | **Des** | 16 | +3      | +3     | **Con** | 15 | +2      | +2     |\n| **Int** | 6  | -2      | -2     | **Sab** | 8  | -1      | -1     | **Car** | 5  | -3      | -3     |\n\n**Vulnerabilidades** Contundente\n\n**Imunidades** Venenoso; Envenenado, Exaustão\n\n**Equipamento** Arco Curto, Espada Curta\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 9\n\n**Idiomas** Compreende os idiomas que conhecia em vida, mas não consegue falar\n\n**ND** 1/4 (XP 50; BP +2)\n\n### Ações\n\n**Arco Curto.** *Jogada de Ataque à Distância:* +5 para acertar, alcance 24/96 m. *Dano:* 6 (1d6 + 3) Perfurante.\n\n**Espada Curta.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 6 (1d6 + 3) Perfurante."
+    },
+    {
+      "nome": "Gato",
+      "tipo_tamanho": "Fera Minúscula, Sem Alinhamento",
+      "ca": "12",
+      "iniciativa": "+2 (12)",
+      "pv": "2 (1d4)",
+      "deslocamento": "12 m, Escalada 12 m",
+      "atributos": {
+        "For": {
+          "valor": "3",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Des": {
+          "valor": "15",
+          "modificador": "+2",
+          "salvaguarda": "+4"
+        },
+        "Con": {
+          "valor": "10",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        }
+      },
+      "pericias": "Furtividade +4, Percepção +3",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 13",
+      "idiomas": "—",
+      "nd": "0 (XP 10; BP +2)",
+      "tracos": [
+        {
+          "nome": "Saltador",
+          "descricao": "A distância de salto do gato é determinada usando a Destreza em vez da Força."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Arranhar",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 1 Cortante."
+        }
+      ],
+      "texto_completo": "## Gato\n\n*Fera Minúscula, Sem Alinhamento*\n\n**CA** 12\n\n**Iniciativa** +2 (12)\n\n**PV** 2 (1d4)\n\n**Deslocamento** 12 m, Escalada 12 m\n\n|         |   | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 3 | -4      | -4     | **Des** | 15 | +2      | +4     | **Con** | 10 | +0      | +0     |\n| **Int** | 3 | -4      | -4     | **Sab** | 12 | +1      | +1     | **Car** | 7  | -2      | -2     |\n\n**Perícias** Furtividade +4, Percepção +3\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 13\n\n**Idiomas** —\n\n**ND** 0 (XP 10; BP +2)\n\n### Traços\n\n**Saltador.** A distância de salto do gato é determinada usando a Destreza em vez da Força.\n\n### Ações\n\n**Arranhar.** *Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 1 Cortante."
+    },
+    {
+      "nome": "Gavião",
+      "tipo_tamanho": "Fera Minúscula, Sem Alinhamento",
+      "ca": "13",
+      "iniciativa": "+3 (13)",
+      "pv": "1 (1d4 - 1)",
+      "deslocamento": "3 m, Voo 18 m",
+      "atributos": {},
+      "pericias": "Percepção +6",
+      "sentidos": "Percepção Passiva 16",
+      "idiomas": "—",
+      "nd": "0 (XP 10; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Garras",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 1 Cortante."
+        }
+      ],
+      "texto_completo": "## Gavião\n\n*Fera Minúscula, Sem Alinhamento*\n\n**CA** 13\n\n**Iniciativa** +3 (13)\n\n**PV** 1 (1d4 - 1)\n\n**Deslocamento** 3 m, Voo 18 m\n\n|          |   | **Mod** | **SG** |         |    | **Mod** | **SG** |         |   | **Mod** | **SG** |\n|----------|---|---------|--------|---------|----|---------|--------|---------|---|---------|--------|\n| **Para** | 5 | -3      | -3     | **Des** | 16 | +3      | +3     | **Con** | 8 | -1      | -1     |\n| **Int**  | 2 | -4      | -4     | **Sab** | 14 | +2      | +2     | **Car** | 6 | -2      | -2     |\n\n**Perícias** Percepção +6\n\n**Sentidos** Percepção Passiva 16\n\n**Idiomas** —\n\n**ND** 0 (XP 10; BP +2)\n\n### Ações\n\n**Garras.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 1 Cortante."
+    },
+    {
+      "nome": "Gorila",
+      "tipo_tamanho": "Fera Média, Sem Alinhamento",
+      "ca": "12",
+      "iniciativa": "+2 (12)",
+      "pv": "19 (3d8 + 6)",
+      "deslocamento": "9 m, Escalada 9 m",
+      "atributos": {
+        "For": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Des": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Con": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        }
+      },
+      "pericias": "Atletismo +5, Percepção +3",
+      "sentidos": "Percepção Passiva 13",
+      "idiomas": "—",
+      "nd": "1/2 (XP 100; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Ataques Múltiplos",
+          "descricao": "O gorila realiza dois ataques usando Punho."
+        },
+        {
+          "nome": "Punho",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 5 (1d4 + 3) Contundente."
+        },
+        {
+          "nome": "Rocha (Recarga 6)",
+          "descricao": "*Jogada de Ataque à Distância:* +5 para acertar, alcance 7,5/15 m. *Dano:* 10 (2d6 + 3) Contundente."
+        }
+      ],
+      "texto_completo": "## Gorila\n\n*Fera Média, Sem Alinhamento*\n\n**CA** 12\n\n**Iniciativa** +2 (12)\n\n**PV** 19 (3d8 + 6)\n\n**Deslocamento** 9 m, Escalada 9 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 16 | +3      | +3     | **Des** | 14 | +2      | +2     | **Con** | 14 | +2      | +2     |\n| **Int** | 6  | -2      | -2     | **Sab** | 12 | +1      | +1     | **Car** | 7  | -2      | -2     |\n\n**Perícias** Atletismo +5, Percepção +3\n\n**Sentidos** Percepção Passiva 13\n\n**Idiomas** —\n\n**ND** 1/2 (XP 100; BP +2)\n\n### Ações\n\n**Ataques Múltiplos.** O gorila realiza dois ataques usando Punho.\n\n**Punho.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 5 (1d4 + 3) Contundente.\n\n**Rocha (Recarga 6).** *Jogada de Ataque à Distância:* +5 para acertar, alcance 7,5/15 m. *Dano:* 10 (2d6 + 3) Contundente."
+    },
+    {
+      "nome": "Javali",
+      "tipo_tamanho": "Fera Média, Sem Alinhamento",
+      "ca": "11",
+      "iniciativa": "+0 (10)",
+      "pv": "13 (2d8 + 4)",
+      "deslocamento": "12 m",
+      "atributos": {
+        "For": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Des": {
+          "valor": "11",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Con": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        }
+      },
+      "pericias": "",
+      "sentidos": "Percepção Passiva 9",
+      "idiomas": "—",
+      "nd": "1/4 (XP 50; BP +2)",
+      "tracos": [
+        {
+          "nome": "Fúria Sangrenta",
+          "descricao": "Enquanto estiver Sangrando, o javali tem Vantagem em jogadas de ataque."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Investida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +3 para acertar, alcance 1,5 m. *Dano:* 4 (1d6 + 1) Perfurante. Se o javali tiver se movido pelo menos 6 metros em linha reta em direção ao alvo imediatamente antes do ataque, o alvo sofre 3 (1d6) pontos de dano Perfurante adicionais e, se for Grande ou menor, tem a condição Caído."
+        }
+      ],
+      "texto_completo": "## Javali\n\n*Fera Média, Sem Alinhamento*\n\n**CA** 11\n\n**Iniciativa** +0 (10)\n\n**PV** 13 (2d8 + 4)\n\n**Deslocamento** 12 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 13 | +1      | +1     | **Des** | 11 | +0      | +0     | **Con** | 14 | +2      | +2     |\n| **Int** | 2  | -4      | -4     | **Sab** | 9  | -1      | -1     | **Car** | 5  | -3      | -3     |\n\n**Sentidos** Percepção Passiva 9\n\n**Idiomas** —\n\n**ND** 1/4 (XP 50; BP +2)\n\n### Traços\n\n**Fúria Sangrenta.** Enquanto estiver Sangrando, o javali tem Vantagem em jogadas de ataque.\n\n### Ações\n\n**Investida.** *Jogada de Ataque Corpo a Corpo:* +3 para acertar, alcance 1,5 m. *Dano:* 4 (1d6 + 1) Perfurante. Se o javali tiver se movido pelo menos 6 metros em linha reta em direção ao alvo imediatamente antes do ataque, o alvo sofre 3 (1d6) pontos de dano Perfurante adicionais e, se for Grande ou menor, tem a condição Caído."
+    },
+    {
+      "nome": "Lagarto",
+      "tipo_tamanho": "Fera Minúscula, Sem Alinhamento",
+      "ca": "10",
+      "iniciativa": "+0 (10)",
+      "pv": "2 (1d4)",
+      "deslocamento": "6 m, Escalada 6 m",
+      "atributos": {
+        "For": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Des": {
+          "valor": "11",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Con": {
+          "valor": "10",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        }
+      },
+      "pericias": "",
+      "sentidos": "Visão no Escuro 9 m, Percepção Passiva 9",
+      "idiomas": "—",
+      "nd": "0 (XP 10; BP +2)",
+      "tracos": [
+        {
+          "nome": "Escalada de Aranha",
+          "descricao": "O lagarto pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +2 para acertar, alcance 1,5 m. *Dano:* 1 Perfurante."
+        }
+      ],
+      "texto_completo": "## Lagarto\n\n*Fera Minúscula, Sem Alinhamento*\n\n**CA** 10\n\n**Iniciativa** +0 (10)\n\n**PV** 2 (1d4)\n\n**Deslocamento** 6 m, Escalada 6 m\n\n|         |   | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 2 | -4      | -4     | **Des** | 11 | +0      | +0     | **Con** | 10 | +0      | +0     |\n| **Int** | 1 | -5      | -5     | **Sab** | 8  | -1      | -1     | **Car** | 3  | -4      | -4     |\n\n**Sentidos** Visão no Escuro 9 m, Percepção Passiva 9\n\n**Idiomas** —\n\n**ND** 0 (XP 10; BP +2)\n\n### Traços\n\n**Escalada de Aranha.** O lagarto pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo.\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +2 para acertar, alcance 1,5 m. *Dano:* 1 Perfurante."
+    },
+    {
+      "nome": "Leão",
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "12",
+      "iniciativa": "+2 (12)",
+      "pv": "22 (4d10)",
+      "deslocamento": "15 m",
+      "atributos": {
+        "For": {
+          "valor": "17",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Des": {
+          "valor": "15",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Con": {
+          "valor": "11",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        }
+      },
+      "pericias": "Furtividade +4, Percepção +3",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 13",
+      "idiomas": "—",
+      "nd": "1 (XP 200; BP +2)",
+      "tracos": [
+        {
+          "nome": "Salto com Impulso",
+          "descricao": "Ao se deslocar pelo menos 3 metros, o leão pode realizar um Salto em Distância de até 7,5 metros."
+        },
+        {
+          "nome": "Táticas de Grupo",
+          "descricao": "O leão tem Vantagem em uma jogada de ataque contra uma criatura se pelo menos um dos aliados do leão está a até 1,5 metro da criatura e o aliado não tem a condição Incapacitado."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Múltiplos Ataques",
+          "descricao": "O leão realiza dois ataques usando Dilacerar. Ele pode substituir um desses ataques pelo uso de Rugido."
+        },
+        {
+          "nome": "Dilacerar",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 7 (1d8 + 3) Cortante. Se pelo menos um dos aliados do leão está a até 1,5 metro do alvo, o ataque causa 4 (1d8) pontos de dano Cortante adicionais."
+        },
+        {
+          "nome": "Rugido",
+          "descricao": "*Salvaguarda de Sabedoria:* CD 11, uma criatura a até 4,5 metros. *Falha:* O alvo tem a condição Amedrontado até o início do próximo turno do leão."
+        }
+      ],
+      "texto_completo": "## Leão\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 12\n\n**Iniciativa** +2 (12)\n\n**PV** 22 (4d10)\n\n**Deslocamento** 15 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 17 | +3      | +3     | **Des** | 15 | +2      | +2     | **Con** | 11 | +0      | +0     |\n| **Int** | 3  | -4      | -4     | **Sab** | 12 | +1      | +1     | **Car** | 8  | -1      | -1     |\n\n**Perícias** Furtividade +4, Percepção +3\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 13\n\n**Idiomas** —\n\n**ND** 1 (XP 200; BP +2)\n\n### Traços\n\n**Salto com Impulso.** Ao se deslocar pelo menos 3 metros, o leão pode realizar um Salto em Distância de até 7,5 metros.\n\n**Táticas de Grupo.** O leão tem Vantagem em uma jogada de ataque contra uma criatura se pelo menos um dos aliados do leão está a até 1,5 metro da criatura e o aliado não tem a condição Incapacitado.\n\n### Ações\n\n**Múltiplos Ataques.** O leão realiza dois ataques usando Dilacerar. Ele pode substituir um desses ataques pelo uso de Rugido.\n\n**Dilacerar.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 7 (1d8 + 3) Cortante. Se pelo menos um dos aliados do leão está a até 1,5 metro do alvo, o ataque causa 4 (1d8) pontos de dano Cortante adicionais.\n\n**Rugido.** *Salvaguarda de Sabedoria:* CD 11, uma criatura a até 4,5 metros. *Falha:* O alvo tem a condição Amedrontado até o início do próximo turno do leão."
+    },
+    {
+      "nome": "Lobo",
+      "tipo_tamanho": "Fera Média, Sem Alinhamento",
+      "ca": "12",
+      "iniciativa": "+2 (12)",
+      "pv": "11 (2d8 + 2)",
+      "deslocamento": "12 m",
+      "atributos": {
+        "For": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Des": {
+          "valor": "15",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Con": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        }
+      },
+      "pericias": "Furtividade +4, Percepção +5",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 15",
+      "idiomas": "—",
+      "nd": "1/4 (XP 50; BP +2)",
+      "tracos": [
+        {
+          "nome": "Táticas de Grupo",
+          "descricao": "O lobo tem Vantagem em jogadas de ataque contra uma criatura se pelo menos um dos aliados do lobo está a até 1,5 metro da criatura e o aliado não tem a condição Incapacitado."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 5 (1d6 + 2) Perfurante e o alvo tem a condição Caído se for Médio ou menor."
+        }
+      ],
+      "texto_completo": "## Lobo\n\n*Fera Média, Sem Alinhamento*\n\n**CA** 12\n\n**Iniciativa** +2 (12)\n\n**PV** 11 (2d8 + 2)\n\n**Deslocamento** 12 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 14 | +2      | +2     | **Des** | 15 | +2      | +2     | **Con** | 12 | +1      | +1     |\n| **Int** | 3  | -4      | -4     | **Sab** | 12 | +1      | +1     | **Car** | 6  | -2      | -2     |\n\n**Perícias** Furtividade +4, Percepção +5\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 15\n\n**Idiomas** —\n\n**ND** 1/4 (XP 50; BP +2)\n\n### Traços\n\n**Táticas de Grupo.** O lobo tem Vantagem em jogadas de ataque contra uma criatura se pelo menos um dos aliados do lobo está a até 1,5 metro da criatura e o aliado não tem a condição Incapacitado.\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 5 (1d6 + 2) Perfurante e o alvo tem a condição Caído se for Médio ou menor."
+    },
+    {
+      "nome": "Lobo Atroz",
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "14",
+      "iniciativa": "+2 (12)",
+      "pv": "22 (3d10 + 6)",
+      "deslocamento": "15 m",
+      "atributos": {
+        "For": {
+          "valor": "17",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Des": {
+          "valor": "15",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Con": {
+          "valor": "15",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        }
+      },
+      "pericias": "Furtividade +4, Percepção +5",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 15",
+      "idiomas": "—",
+      "nd": "1 (XP 200; BP +2)",
+      "tracos": [
+        {
+          "nome": "Táticas de Grupo",
+          "descricao": "O lobo tem Vantagem em uma jogada de ataque contra uma criatura se pelo menos um dos aliados do lobo está a até 1,5 metro da criatura e o aliado não tem a condição Incapacitado."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 8 (1d10 + 3) Perfurante, e o alvo tem a condição Caído se for de tamanho Enorme ou menor."
+        }
+      ],
+      "texto_completo": "## Lobo Atroz\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 14\n\n**Iniciativa** +2 (12)\n\n**PV** 22 (3d10 + 6)\n\n**Deslocamento** 15 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 17 | +3      | +3     | **Des** | 15 | +2      | +2     | **Con** | 15 | +2      | +2     |\n| **Int** | 3  | -4      | -4     | **Sab** | 12 | +1      | +1     | **Car** | 7  | -2      | -2     |\n\n**Perícias** Furtividade +4, Percepção +5\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 15\n\n**Idiomas** —\n\n**ND** 1 (XP 200; BP +2)\n\n### Traços\n\n**Táticas de Grupo.** O lobo tem Vantagem em uma jogada de ataque contra uma criatura se pelo menos um dos aliados do lobo está a até 1,5 metro da criatura e o aliado não tem a condição Incapacitado.\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 8 (1d10 + 3) Perfurante, e o alvo tem a condição Caído se for de tamanho Enorme ou menor."
+    },
+    {
+      "nome": "Mastim",
+      "tipo_tamanho": "Fera Média, Sem Alinhamento",
+      "ca": "12",
+      "iniciativa": "+2 (12)",
+      "pv": "5 (1d8 + 1)",
+      "deslocamento": "12 m",
+      "atributos": {
+        "For": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Des": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Con": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        }
+      },
+      "pericias": "Percepção +5",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 15",
+      "idiomas": "—",
+      "nd": "1/8 (XP 25; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +3 para acertar, alcance 1,5 m. *Dano:* 4 (1d6 + 1) Perfurante, e o alvo tem a condição Caído se for Grande ou menor."
+        }
+      ],
+      "texto_completo": "## Mastim\n\n*Fera Média, Sem Alinhamento*\n\n**CA** 12\n\n**Iniciativa** +2 (12)\n\n**PV** 5 (1d8 + 1)\n\n**Deslocamento** 12 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 13 | +1      | +1     | **Des** | 14 | +2      | +2     | **Con** | 12 | +1      | +1     |\n| **Int** | 3  | -4      | -4     | **Sab** | 12 | +1      | +1     | **Car** | 7  | -2      | -2     |\n\n**Perícias** Percepção +5\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 15\n\n**Idiomas** —\n\n**ND** 1/8 (XP 25; BP +2)\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +3 para acertar, alcance 1,5 m. *Dano:* 4 (1d6 + 1) Perfurante, e o alvo tem a condição Caído se for Grande ou menor."
+    },
+    {
+      "nome": "Morcego",
+      "tipo_tamanho": "Fera Minúscula, Sem Alinhamento",
+      "ca": "12",
+      "iniciativa": "+2 (12)",
+      "pv": "1 (1d4 - 1)",
+      "deslocamento": "1,5 m, Voo 9 m",
+      "atributos": {
+        "For": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        }
+      },
+      "pericias": "",
+      "sentidos": "Visão às Cegas 18 m, Percepção Passiva 11",
+      "idiomas": "—",
+      "nd": "0 (XP 10; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 1 Perfurante."
+        }
+      ],
+      "texto_completo": "## Morcego\n\n*Fera Minúscula, Sem Alinhamento*\n\n**CA** 12\n\n**Iniciativa** +2 (12)\n\n**PV** 1 (1d4 - 1)\n\n**Deslocamento** 1,5 m, Voo 9 m\n\n|         |   | **Mod** | **SG** |           |    | **Mod**    | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|-----------|----|------------|--------|---------|----|---------|--------|\n| **For** | 2 | -4      | -4     | **Des**15 | +2 | +2 **Con** | 8      | -1      | -1 |         |        |\n| **Int** | 2 | -4      | -4     | **Sab**   | 12 | +1         | +1     | **Car** | 4  | -3      | -3     |\n\n**Sentidos** Visão às Cegas 18 m, Percepção Passiva 11\n\n**Idiomas** —\n\n**ND** 0 (XP 10; BP +2)\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 1 Perfurante."
+    },
+    {
+      "nome": "Mula",
+      "tipo_tamanho": "Fera Média, Sem Alinhamento",
+      "ca": "10",
+      "iniciativa": "+0 (10)",
+      "pv": "11 (2d8 + 2)",
+      "deslocamento": "12 m",
+      "atributos": {
+        "For": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Des": {
+          "valor": "10",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Con": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        }
+      },
+      "pericias": "",
+      "sentidos": "Percepção Passiva 10",
+      "idiomas": "—",
+      "nd": "1/8 (XP 25; BP +2)",
+      "tracos": [
+        {
+          "nome": "Animal de Carga",
+          "descricao": "A mula conta como um tamanho maior para determinar sua capacidade de carga."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Cascos",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 4 (1d4 + 2) Contundente."
+        }
+      ],
+      "texto_completo": "## Mula\n\n*Fera Média, Sem Alinhamento*\n\n**CA** 10\n\n**Iniciativa** +0 (10)\n\n**PV** 11 (2d8 + 2)\n\n**Deslocamento** 12 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 14 | +2      | +2     | **Des** | 10 | +0      | +0     | **Con** | 13 | +1      | +1     |\n| **Int** | 2  | -4      | -4     | **Sab** | 10 | +0      | +0     | **Car** | 5  | -3      | -3     |\n\n**Sentidos** Percepção Passiva 10\n\n**Idiomas** —\n\n**ND** 1/8 (XP 25; BP +2)\n\n### Traços\n\n**Animal de Carga.** A mula conta como um tamanho maior para determinar sua capacidade de carga.\n\n### Ações\n\n**Cascos.** *Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 4 (1d4 + 2) Contundente."
+    },
+    {
+      "nome": "Pantera",
+      "tipo_tamanho": "Fera Média, Sem Alinhamento",
+      "ca": "12",
+      "iniciativa": "+2 (12)",
+      "pv": "13 (3d8)",
+      "deslocamento": "15 m, Escalada 12 m",
+      "atributos": {
+        "For": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Des": {
+          "valor": "15",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Con": {
+          "valor": "10",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        }
+      },
+      "pericias": "Furtividade +6, Percepção +4",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 14",
+      "idiomas": "—",
+      "nd": "1/4 (XP 50; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Ataques Múltiplos",
+          "descricao": "A pantera realiza um ataque usando Bote e usa Rondar."
+        },
+        {
+          "nome": "Bote",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 4 (1d4 + 2) Cortante, ou a pantera causa 7 (2d4 + 2) pontos de dano Cortante se teve Vantagem na jogada de ataque."
+        },
+        {
+          "nome": "Rondar",
+          "descricao": "A pantera se move até metade do seu Deslocamento sem provocar Ataques de Oportunidade. No final deste movimento, a pantera pode executar a ação Esconder."
+        }
+      ],
+      "texto_completo": "## Pantera\n\n*Fera Média, Sem Alinhamento*\n\n**CA** 12\n\n**Iniciativa** +2 (12)\n\n**PV** 13 (3d8)\n\n**Deslocamento** 15 m, Escalada 12 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 14 | +2      | +2     | **Des** | 15 | +2      | +2     | **Con** | 10 | +0      | +0     |\n| **Int** | 3  | -4      | -4     | **Sab** | 14 | +2      | +2     | **Car** | 7  | -2      | -2     |\n\n**Perícias** Furtividade +6, Percepção +4\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 14\n\n**Idiomas** —\n\n**ND** 1/4 (XP 50; BP +2)\n\n### Ações\n\n**Ataques Múltiplos.** A pantera realiza um ataque usando Bote e usa Rondar.\n\n**Bote.** *Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 4 (1d4 + 2) Cortante, ou a pantera causa 7 (2d4 + 2) pontos de dano Cortante se teve Vantagem na jogada de ataque.\n\n**Rondar.** A pantera se move até metade do seu Deslocamento sem provocar Ataques de Oportunidade. No final deste movimento, a pantera pode executar a ação Esconder."
+    },
+    {
+      "nome": "Polvo",
+      "tipo_tamanho": "Fera Pequena, Sem Alinhamento",
+      "ca": "12",
+      "iniciativa": "+2 (12)",
+      "pv": "3 (1d6)",
+      "deslocamento": "1,5 m, Natação 9 m",
+      "atributos": {
+        "For": {
+          "valor": "4",
+          "modificador": "-3",
+          "salvaguarda": "-3"
+        },
+        "Des": {
+          "valor": "15",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Con": {
+          "valor": "11",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        }
+      },
+      "pericias": "Furtividade +6, Percepção +2",
+      "sentidos": "Visão no Escuro 9 m, Percepção Passiva 12",
+      "idiomas": "—",
+      "nd": "0 (XP 10; BP +2)",
+      "tracos": [
+        {
+          "nome": "Compressão",
+          "descricao": "O polvo pode se mover por um espaço tão estreito quanto 2,5 cm sem gastar movimento adicional para fazê-lo."
+        },
+        {
+          "nome": "Respirar na Água",
+          "descricao": "O polvo só pode respirar debaixo d'água."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Tentáculos",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 1 Contundente. Se o alvo for Pequeno ou menor, ele tem a condição Imobilizado (CD 10 para escapar)."
+        }
+      ],
+      "texto_completo": "## Polvo\n\n*Fera Pequena, Sem Alinhamento*\n\n**CA** 12\n\n**Iniciativa** +2 (12)\n\n**PV** 3 (1d6)\n\n**Deslocamento** 1,5 m, Natação 9 m\n\n|         |   | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 4 | -3      | -3     | **Des** | 15 | +2      | +2     | **Con** | 11 | +0      | +0     |\n| **Int** | 3 | -4      | -4     | **Sab** | 10 | +0      | +0     | **Car** | 4  | -3      | -3     |\n\n**Perícias** Furtividade +6, Percepção +2\n\n**Sentidos** Visão no Escuro 9 m, Percepção Passiva 12\n\n**Idiomas** —\n\n**ND** 0 (XP 10; BP +2)\n\n### Traços\n\n**Compressão.** O polvo pode se mover por um espaço tão estreito quanto 2,5 cm sem gastar movimento adicional para fazê-lo.\n\n**Respirar na Água.** O polvo só pode respirar debaixo d'água.\n\n### Ações\n\n**Tentáculos.** *Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 1 Contundente. Se o alvo for Pequeno ou menor, ele tem a condição Imobilizado (CD 10 para escapar).\n\n### Reações\n\n**Nuvem de Tinta (1/Dia).** *Gatilho:* Uma criatura termina o turno a até 1,5 metro do polvo enquanto estiver debaixo d 'água. *Resposta:* O polvo libera tinta, que preenche um Cubo de 1,5 metro de lado centrado em si, e o polvo se desloca o máximo de seu Deslocamento de Natação. O Cubo fica Totalmente Obscurecido por 1 minuto ou até que uma corrente forte ou efeito semelhante disperse a tinta."
+    },
+    {
+      "nome": "Pônei",
+      "tipo_tamanho": "Fera Média, Sem Alinhamento",
+      "ca": "10",
+      "iniciativa": "+0 (10)",
+      "pv": "11 (2d8 + 2)",
+      "deslocamento": "12 m",
+      "atributos": {
+        "For": {
+          "valor": "15",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Des": {
+          "valor": "10",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Con": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        }
+      },
+      "pericias": "",
+      "sentidos": "Percepção Passiva 10",
+      "idiomas": "—",
+      "nd": "1/8 (XP 25; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Cascos",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 4 (1d4 + 2) Contundente."
+        }
+      ],
+      "texto_completo": "## Pônei\n\n*Fera Média, Sem Alinhamento*\n\n**CA** 10\n\n**Iniciativa** +0 (10)\n\n**PV** 11 (2d8 + 2)\n\n**Deslocamento** 12 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 15 | +2      | +2     | **Des** | 10 | +0      | +0     | **Con** | 13 | +1      | +1     |\n| **Int** | 2  | -4      | -4     | **Sab** | 11 | +0      | +0     | **Car** | 7  | -2      | -2     |\n\n**Sentidos** Percepção Passiva 10\n\n**Idiomas** —\n\n**ND** 1/8 (XP 25; BP +2)\n\n### Ações\n\n**Cascos.** *Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 4 (1d4 + 2) Contundente."
+    },
+    {
+      "nome": "Pseudodragão",
+      "tipo_tamanho": "Dragão Minúsculo, Neutro e Bom",
+      "ca": "14",
+      "iniciativa": "+2 (12)",
+      "pv": "10 (3d4 + 3)",
+      "deslocamento": "4,5 m, Voo 18 m",
+      "atributos": {
+        "For": {
+          "valor": "6",
+          "modificador": "-2",
+          "salvaguarda": "-2"
+        },
+        "Des": {
+          "valor": "15",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Con": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        }
+      },
+      "pericias": "Furtividade +4, Percepção +5",
+      "sentidos": "Visão às Cegas 3 m, Visão no Escuro 18 m, Percepção Passiva 15",
+      "idiomas": "Compreende Comum e Dracônico, mas não consegue falar",
+      "nd": "1/4 (XP 50; BP +2)",
+      "tracos": [
+        {
+          "nome": "Resistência à Magia",
+          "descricao": "O pseudodragão tem Vantagem em salvaguardas contra magias e outros efeitos mágicos."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Ataques Múltiplos",
+          "descricao": "O pseudodragão realiza dois ataques usando Mordida."
+        },
+        {
+          "nome": "Ferroada",
+          "descricao": "*Salvaguarda de Constituição:* CD 12, uma criatura à vista do pseudodragão a até 1,5 metro. *Falha:* 5 (2d4) Venenoso, e o alvo tem a condição Envenenado por 1 hora. Falha por 5 ou Mais: O alvo Envenenado também tem a condição Inconsciente até sofrer dano ou outra criatura executar uma ação para sacudi-la."
+        },
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 4 (1d4 + 2) Perfurante."
+        }
+      ],
+      "texto_completo": "## Pseudodragão\n\n*Dragão Minúsculo, Neutro e Bom*\n\n**CA** 14\n\n**Iniciativa** +2 (12)\n\n**PV** 10 (3d4 + 3)\n\n**Deslocamento** 4,5 m, Voo 18 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 6  | -2      | -2     | **Des** | 15 | +2      | +2     | **Con** | 13 | +1      | +1     |\n| **Int** | 10 | +0      | +0     | **Sab** | 12 | +1      | +1     | **Car** | 10 | +0      | +0     |\n\n**Perícias** Furtividade +4, Percepção +5\n\n**Sentidos** Visão às Cegas 3 m, Visão no Escuro 18 m, Percepção Passiva 15\n\n**Idiomas** Compreende Comum e Dracônico, mas não consegue falar\n\n**ND** 1/4 (XP 50; BP +2)\n\n### Traços\n\n**Resistência à Magia.** O pseudodragão tem Vantagem em salvaguardas contra magias e outros efeitos mágicos.\n\n### Ações\n\n**Ataques Múltiplos.** O pseudodragão realiza dois ataques usando Mordida.\n\n**Ferroada.** *Salvaguarda de Constituição:* CD 12, uma criatura à vista do pseudodragão a até 1,5 metro. *Falha:* 5 (2d4) Venenoso, e o alvo tem a condição Envenenado por 1 hora. Falha por 5 ou Mais: O alvo Envenenado também tem a condição Inconsciente até sofrer dano ou outra criatura executar uma ação para sacudi-la.\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 4 (1d4 + 2) Perfurante."
+    },
+    {
+      "nome": "Quasit",
+      "tipo_tamanho": "Ínfero Minúsculo (Demônio), Caótico e Mau",
+      "ca": "13",
+      "iniciativa": "+3 (13)",
+      "pv": "25 (10d4)",
+      "deslocamento": "12 m",
+      "atributos": {
+        "For": {
+          "valor": "5",
+          "modificador": "-3",
+          "salvaguarda": "-3"
+        },
+        "Des": {
+          "valor": "17",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Con": {
+          "valor": "10",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        }
+      },
+      "pericias": "Furtividade +5",
+      "sentidos": "Visão no Escuro 36 m, Percepção Passiva 10",
+      "idiomas": "Abissal, Comum",
+      "nd": "1 (XP 200; BP +2)",
+      "tracos": [
+        {
+          "nome": "Resistência à Magia",
+          "descricao": "O quasit tem Vantagem em salvaguardas contra magias e outros efeitos mágicos."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Alterar Forma",
+          "descricao": "O quasit se multimorfa em uma forma que se assemelha a uma centopeia (12 m., Escalada 12 m.), um morcego (Deslocamento 3 m., Voo 12 m.) ou um sapo (12 m., Natação 12 m.), ou retorna à sua verdadeira forma. Suas estatísticas são as mesmas em cada forma, exceto por seu Deslocamento. Qualquer equipamento que esteja usando ou carregando não é transformado. O quasit reverte para sua verdadeira forma se morrer."
+        },
+        {
+          "nome": "Assustar (1/Dia)",
+          "descricao": "*Salvaguarda de Sabedoria:* CD 10, uma criatura a até 6 metros. *Falha:* O alvo tem a condição Amedrontado. No final de cada um dos próprios turnos, o alvo repete a salvaguarda, encerrando o efeito em si em caso de sucesso. Após 1 minuto, ele é automaticamente bem-sucedido."
+        },
+        {
+          "nome": "Dilacerar",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 5 (1d4 + 3) Cortante, e o alvo tem a condição Envenenado até o início do próximo turno do quasit."
+        },
+        {
+          "nome": "Invisibilidade",
+          "descricao": "O quasit conjura Invisibilidade em si, não exigindo componentes de magia e usando Carisma como atributo de conjuração."
+        }
+      ],
+      "texto_completo": "## Quasit\n\n*Ínfero Minúsculo (Demônio), Caótico e Mau*\n\n**CA** 13\n\n**Iniciativa** +3 (13)\n\n**PV** 25 (10d4)\n\n**Deslocamento** 12 m\n\n|         |   | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 5 | -3      | -3     | **Des** | 17 | +3      | +3     | **Con** | 10 | +0      | +0     |\n| **Int** | 7 | -2      | -2     | **Sab** | 10 | +0      | +0     | **Car** | 10 | +0      | +0     |\n\n**Perícias** Furtividade +5\n\n**Resistências** Elétrico, Gélido, Ígneo\n\n**Imunidades** Venenoso; Envenenado\n\n**Sentidos** Visão no Escuro 36 m, Percepção Passiva 10\n\n**Idiomas** Abissal, Comum\n\n**ND** 1 (XP 200; BP +2)\n\n### Traços\n\n**Resistência à Magia.** O quasit tem Vantagem em salvaguardas contra magias e outros efeitos mágicos.\n\n### Ações\n\n**Alterar Forma.** O quasit se multimorfa em uma forma que se assemelha a uma centopeia (12 m., Escalada 12 m.), um morcego (Deslocamento 3 m., Voo 12 m.) ou um sapo (12 m., Natação 12 m.), ou retorna à sua verdadeira forma. Suas estatísticas são as mesmas em cada forma, exceto por seu Deslocamento. Qualquer equipamento que esteja usando ou carregando não é transformado. O quasit reverte para sua verdadeira forma se morrer.\n\n**Assustar (1/Dia).** *Salvaguarda de Sabedoria:* CD 10, uma criatura a até 6 metros. *Falha:* O alvo tem a condição Amedrontado. No final de cada um dos próprios turnos, o alvo repete a salvaguarda, encerrando o efeito em si em caso de sucesso. Após 1 minuto, ele é automaticamente bem-sucedido.\n\n**Dilacerar.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 5 (1d4 + 3) Cortante, e o alvo tem a condição Envenenado até o início do próximo turno do quasit.\n\n**Invisibilidade.** O quasit conjura Invisibilidade em si, não exigindo componentes de magia e usando Carisma como atributo de conjuração."
+    },
+    {
+      "nome": "Rã",
+      "tipo_tamanho": "Fera Minúscula, Sem Alinhamento",
+      "ca": "11",
+      "iniciativa": "+1 (11)",
+      "pv": "1 (1d4 - 1)",
+      "deslocamento": "6 m, Natação 6 m",
+      "atributos": {
+        "For": {
+          "valor": "1",
+          "modificador": "-5",
+          "salvaguarda": "-5"
+        },
+        "Des": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Con": {
+          "valor": "8",
+          "modificador": "-1",
+          "salvaguarda": "-1"
+        }
+      },
+      "pericias": "Furtividade +3, Percepção +1",
+      "sentidos": "Visão no Escuro 9 m, Percepção Passiva 11",
+      "idiomas": "—",
+      "nd": "0 (XP 10; BP +2)",
+      "tracos": [
+        {
+          "nome": "Anfíbio",
+          "descricao": "A rã pode respirar ar e água."
+        },
+        {
+          "nome": "Salto Parado",
+          "descricao": "O Salto em Distância da rã é de até 3 metros e o Salto em Altura é de até 1,5 metro com ou sem uma corrida inicial."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +3 para acertar, alcance 1,5 m. *Dano:* 1 Perfurante."
+        }
+      ],
+      "texto_completo": "## Rã\n\n*Fera Minúscula, Sem Alinhamento*\n\n**CA** 11\n\n**Iniciativa** +1 (11)\n\n**PV** 1 (1d4 - 1)\n\n**Deslocamento** 6 m, Natação 6 m\n\n|         |   | **Mod** | **SG** |         |    | **Mod** | **SG** |         |   | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|---|---------|--------|\n| **For** | 1 | -5      | -5     | **Des** | 13 | +1      | +1     | **Con** | 8 | -1      | -1     |\n| **Int** | 1 | -5      | -5     | **Sab** | 8  | -1      | -1     | **Car** | 3 | -4      | -4     |\n\n**Perícias** Furtividade +3, Percepção +1\n\n**Sentidos** Visão no Escuro 9 m, Percepção Passiva 11\n\n**Idiomas** —\n\n**ND** 0 (XP 10; BP +2)\n\n### Traços\n\n**Anfíbio.** A rã pode respirar ar e água.\n\n**Salto Parado.** O Salto em Distância da rã é de até 3 metros e o Salto em Altura é de até 1,5 metro com ou sem uma corrida inicial.\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +3 para acertar, alcance 1,5 m. *Dano:* 1 Perfurante."
+    },
+    {
+      "nome": "Rato",
+      "tipo_tamanho": "Fera Minúscula, Sem Alinhamento",
+      "ca": "10",
+      "iniciativa": "+0 (10)",
+      "pv": "1 (1d4 - 1)",
+      "deslocamento": "6 m, Escalada 6 m",
+      "atributos": {
+        "For": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Des": {
+          "valor": "11",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Con": {
+          "valor": "9",
+          "modificador": "-1",
+          "salvaguarda": "-1"
+        }
+      },
+      "pericias": "Percepção +2",
+      "sentidos": "Visão no Escuro 9 m, Percepção Passiva 12",
+      "idiomas": "—",
+      "nd": "0 (XP 10; BP +2)",
+      "tracos": [
+        {
+          "nome": "Ágil",
+          "descricao": "O rato não provoca Ataques de Oportunidade ao se mover fora do alcance de um inimigo."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +2 para acertar, alcance 1,5 m. *Dano:* 1 Perfurante."
+        }
+      ],
+      "texto_completo": "## Rato\n\n*Fera Minúscula, Sem Alinhamento*\n\n**CA** 10\n\n**Iniciativa** +0 (10)\n\n**PV** 1 (1d4 - 1)\n\n**Deslocamento** 6 m, Escalada 6 m\n\n|         |   | **Mod** | **SG** |         |    | **Mod** | **SG** |         |   | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|---|---------|--------|\n| **For** | 2 | -4      | -4     | **Des** | 11 | +0      | +0     | **Con** | 9 | -1      | -1     |\n| **Int** | 2 | -4      | -4     | **Sab** | 10 | +0      | +0     | **Car** | 4 | -3      | -3     |\n\n**Perícias** Percepção +2\n\n**Sentidos** Visão no Escuro 9 m, Percepção Passiva 12\n\n**Idiomas** —\n\n**ND** 0 (XP 10; BP +2)\n\n### Traços\n\n**Ágil.** O rato não provoca Ataques de Oportunidade ao se mover fora do alcance de um inimigo.\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +2 para acertar, alcance 1,5 m. *Dano:* 1 Perfurante."
+    },
+    {
+      "nome": "Slaad Girino",
+      "tipo_tamanho": "Aberração Minúscula, Caótico e Neutro",
+      "ca": "12",
+      "iniciativa": "+2 (12)",
+      "pv": "7 (3d4)",
+      "deslocamento": "9 m, Escavação 3 m",
+      "atributos": {
+        "For": {
+          "valor": "7",
+          "modificador": "-2",
+          "salvaguarda": "-2"
+        },
+        "Des": {
+          "valor": "15",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Con": {
+          "valor": "10",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        }
+      },
+      "pericias": "Furtividade +4",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 7",
+      "idiomas": "Compreende Slaad, mas não consegue falar",
+      "nd": "1/8 (XP 25; BP +2)",
+      "tracos": [
+        {
+          "nome": "Resistência à Magia",
+          "descricao": "O slaad tem Vantagem em salvaguardas contra magias e outros efeitos mágicos."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 5 (1d6 + 2) Perfurante."
+        }
+      ],
+      "texto_completo": "## Slaad Girino\n\n*Aberração Minúscula, Caótico e Neutro*\n\n**CA** 12\n\n**Iniciativa** +2 (12)\n\n**PV** 7 (3d4)\n\n**Deslocamento** 9 m, Escavação 3 m\n\n|         |   | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 7 | -2      | -2     | **Des** | 15 | +2      | +2     | **Con** | 10 | +0      | +0     |\n| **Int** | 3 | -4      | -4     | **Sab** | 5  | -3      | -3     | **Car** | 3  | -4      | -4     |\n\n**Perícias** Furtividade +4\n\n**Resistências** Ácido, Elétrico, Gélido, Ígneo, Trovejante\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 7\n\n**Idiomas** Compreende Slaad, mas não consegue falar\n\n**ND** 1/8 (XP 25; BP +2)\n\n### Traços\n\n**Resistência à Magia.** O slaad tem Vantagem em salvaguardas contra magias e outros efeitos mágicos.\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 5 (1d6 + 2) Perfurante."
+    },
+    {
+      "nome": "Sprite",
+      "tipo_tamanho": "Feérico Minúsculo, Neutro e Bom",
+      "ca": "15",
+      "iniciativa": "+4 (14)",
+      "pv": "10 (4d4)",
+      "deslocamento": "3 m, Voo 12 m",
+      "atributos": {
+        "For": {
+          "valor": "3",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Des": {
+          "valor": "18",
+          "modificador": "+4",
+          "salvaguarda": "+4"
+        },
+        "Con": {
+          "valor": "10",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        }
+      },
+      "pericias": "Furtividade +8, Percepção +3",
+      "sentidos": "Percepção Passiva 13",
+      "idiomas": "Comum, Élfico, Silvestre",
+      "nd": "1/4 (XP 50; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Agulha-Espada",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +6 para acertar, alcance 1,5 m. *Dano:* 6 (1d4 + 4) Perfurante."
+        },
+        {
+          "nome": "Arco Encantado",
+          "descricao": "*Jogada de Ataque à Distância:* +6 para acertar, alcance 12/48 m. *Dano:* 1 Perfurante e o alvo tem a condição Enfeitiçado até o início do próximo turno do sprite."
+        },
+        {
+          "nome": "Invisibilidade",
+          "descricao": "O sprite conjura *Invisibilidade* em si, não exigindo componentes de magia e usando Carisma como atributo de conjuração."
+        },
+        {
+          "nome": "Ver o Coração",
+          "descricao": "*Salvaguarda de Carisma:* CD 10, uma criatura a até 1,5 metro à vista do sprite. Celestiais, Ínferos e Mortos-Vivos falham automaticamente na salvaguarda. *Falha:* O sprite conhece as emoções e o alinhamento do alvo."
+        }
+      ],
+      "texto_completo": "## Sprite\n\n*Feérico Minúsculo, Neutro e Bom*\n\n**CA** 15\n\n**Iniciativa** +4 (14)\n\n**PV** 10 (4d4)\n\n**Deslocamento** 3 m, Voo 12 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 3  | -4      | -4     | **Des** | 18 | +4      | +4     | **Con** | 10 | +0      | +0     |\n| **Int** | 14 | +2      | +2     | **Sab** | 13 | +1      | +1     | **Car** | 11 | +0      | +0     |\n\n**Perícias** Furtividade +8, Percepção +3\n\n**Sentidos** Percepção Passiva 13\n\n**Idiomas** Comum, Élfico, Silvestre\n\n**ND** 1/4 (XP 50; BP +2)\n\n### Ações\n\n**Agulha-Espada.** *Jogada de Ataque Corpo a Corpo:* +6 para acertar, alcance 1,5 m. *Dano:* 6 (1d4 + 4) Perfurante.\n\n**Arco Encantado.** *Jogada de Ataque à Distância:* +6 para acertar, alcance 12/48 m. *Dano:* 1 Perfurante e o alvo tem a condição Enfeitiçado até o início do próximo turno do sprite.\n\n**Invisibilidade.** O sprite conjura *Invisibilidade* em si, não exigindo componentes de magia e usando Carisma como atributo de conjuração.\n\n**Ver o Coração.** *Salvaguarda de Carisma:* CD 10, uma criatura a até 1,5 metro à vista do sprite. Celestiais, Ínferos e Mortos-Vivos falham automaticamente na salvaguarda. *Falha:* O sprite conhece as emoções e o alinhamento do alvo."
+    },
+    {
+      "nome": "Texugo",
+      "tipo_tamanho": "Fera Minúscula, Sem Alinhamento",
+      "ca": "11",
+      "iniciativa": "+0 (10)",
+      "pv": "5 (1d4 + 3)",
+      "deslocamento": "6 m, Escavação 1,5 m",
+      "atributos": {
+        "For": {
+          "valor": "10",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Des": {
+          "valor": "11",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Con": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        }
+      },
+      "pericias": "Percepção +3",
+      "sentidos": "",
+      "idiomas": "—",
+      "nd": "0 (XP 10; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +2 para acertar, alcance 1,5 m. *Dano:* 1 Perfurante."
+        }
+      ],
+      "texto_completo": "## Texugo\n\n*Fera Minúscula, Sem Alinhamento*\n\n**CA** 11\n\n**Iniciativa** +0 (10)\n\n**PV** 5 (1d4 + 3)\n\n**Deslocamento** 6 m, Escavação 1,5 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 10 | +0      | +0     | **Des** | 11 | +0      | +0     | **Con** | 16 | +3      | +3     |\n| **Int** | 2  | -4      | -4     | **Sab** | 12 | +1      | +1     | **Car** | 5  | -3      | -3     |\n\n**Perícias** Percepção +3\n\n**Resistências** Venenoso\n\n**Sentidos:** Visão no Escuro 9 m, Percepção Passiva 13\n\n**Idiomas** —\n\n**ND** 0 (XP 10; BP +2)\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +2 para acertar, alcance 1,5 m. *Dano:* 1 Perfurante."
+    },
+    {
+      "nome": "Texugo Gigante",
+      "tipo_tamanho": "Fera Média, Sem Alinhamento",
+      "ca": "13",
+      "iniciativa": "+0 (10)",
+      "pv": "15 (2d8 + 6)",
+      "deslocamento": "9 m, Escavação 3 m",
+      "atributos": {
+        "For": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Des": {
+          "valor": "10",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Con": {
+          "valor": "17",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        }
+      },
+      "pericias": "Percepção +3",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 13",
+      "idiomas": "—",
+      "nd": "1/4 (XP 50; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +3 para acertar, alcance 1,5 m. *Dano:* 6 (2d4 + 1) Perfurante."
+        }
+      ],
+      "texto_completo": "## Texugo Gigante\n\n*Fera Média, Sem Alinhamento*\n\n**CA** 13\n\n**Iniciativa** +0 (10)\n\n**PV** 15 (2d8 + 6)\n\n**Deslocamento** 9 m, Escavação 3 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 13 | +1      | +1     | **Des** | 10 | +0      | +0     | **Con** | 17 | +3      | +3     |\n| **Int** | 2  | -4      | -4     | **Sab** | 12 | +1      | +1     | **Car** | 5  | -3      | -3     |\n\n**Perícias** Percepção +3\n\n**Resistências** Venenoso\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 13\n\n**Idiomas** —\n\n**ND** 1/4 (XP 50; BP +2)\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +3 para acertar, alcance 1,5 m. *Dano:* 6 (2d4 + 1) Perfurante."
+    },
+    {
+      "nome": "Tigre",
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "13",
+      "iniciativa": "+3 (13)",
+      "pv": "22 (3d10 + 6)",
+      "deslocamento": "12 m",
+      "atributos": {
+        "For": {
+          "valor": "17",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Des": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Con": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        }
+      },
+      "pericias": "Furtividade +7, Percepção +3",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 13",
+      "idiomas": "—",
+      "nd": "1 (XP 200; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Ataques Múltiplos",
+          "descricao": "O tigre realiza um ataque usando Bote e usa Rondar."
+        },
+        {
+          "nome": "Bote",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 6 (1d6 + 3) Cortante. Se o tigre teve Vantagem na jogada de ataque, o alvo sofre 3 (1d6) pontos de dano Cortante adicionais e, se for Enorme ou menor, tem a condição Caído."
+        },
+        {
+          "nome": "Rondar",
+          "descricao": "O tigre se move até metade do próprio Deslocamento sem provocar Ataques de Oportunidade. No final deste movimento, o tigre pode executar a ação Esconder."
+        }
+      ],
+      "texto_completo": "## Tigre\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 13\n\n**Iniciativa** +3 (13)\n\n**PV** 22 (3d10 + 6)\n\n**Deslocamento** 12 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 17 | +3      | +3     | **Des** | 16 | +3      | +3     | **Con** | 14 | +2      | +2     |\n| **Int** | 3  | -4      | -4     | **Sab** | 12 | +1      | +1     | **Car** | 8  | -1      | -1     |\n\n**Perícias** Furtividade +7, Percepção +3\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 13\n\n**Idiomas** —\n\n**ND** 1 (XP 200; BP +2)\n\n### Ações\n\n**Ataques Múltiplos.** O tigre realiza um ataque usando Bote e usa Rondar.\n\n**Bote.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 6 (1d6 + 3) Cortante. Se o tigre teve Vantagem na jogada de ataque, o alvo sofre 3 (1d6) pontos de dano Cortante adicionais e, se for Enorme ou menor, tem a condição Caído.\n\n**Rondar.** O tigre se move até metade do próprio Deslocamento sem provocar Ataques de Oportunidade. No final deste movimento, o tigre pode executar a ação Esconder."
+    },
+    {
+      "nome": "Tubarão do Recife",
+      "tipo_tamanho": "Fera Média, Sem Alinhamento",
+      "ca": "12",
+      "iniciativa": "+2 (12)",
+      "pv": "22 (4d8 + 4)",
+      "deslocamento": "1,5 m, Natação 9 m",
+      "atributos": {
+        "For": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Des": {
+          "valor": "15",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Con": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        }
+      },
+      "pericias": "Percepção +2",
+      "sentidos": "Visão às Cegas 9 m, Percepção Passiva 12",
+      "idiomas": "—",
+      "nd": "1/2 (XP 100; BP +2)",
+      "tracos": [
+        {
+          "nome": "Respirar na Água",
+          "descricao": "O tubarão só pode respirar debaixo d'água."
+        },
+        {
+          "nome": "Táticas de Grupo",
+          "descricao": "O tubarão tem Vantagem em uma jogada de ataque contra uma criatura se pelo menos um dos aliados do tubarão está a até 1,5 metro da criatura e o aliado não tem a condição Incapacitado."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 7 (2d4 + 2) Perfurante. Se o tubarão tiver se movido pelo menos 6 metros em linha reta em direção ao alvo imediatamente antes do ataque, o ataque causa 4 (1d8) pontos de dano Perfurante adicionais."
+        }
+      ],
+      "texto_completo": "## Tubarão do Recife\n\n*Fera Média, Sem Alinhamento*\n\n**CA** 12\n\n**Iniciativa** +2 (12)\n\n**PV** 22 (4d8 + 4)\n\n**Deslocamento** 1,5 m, Natação 9 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 14 | +2      | +2     | **Des** | 15 | +2      | +2     | **Con** | 13 | +1      | +1     |\n| **Int** | 1  | -5      | -5     | **Sab** | 10 | +0      | +0     | **Car** | 4  | -3      | -3     |\n\n**Perícias** Percepção +2\n\n**Sentidos** Visão às Cegas 9 m, Percepção Passiva 12\n\n**Idiomas** —\n\n**ND** 1/2 (XP 100; BP +2)\n\n### Traços\n\n**Respirar na Água.** O tubarão só pode respirar debaixo d'água.\n\n**Táticas de Grupo.** O tubarão tem Vantagem em uma jogada de ataque contra uma criatura se pelo menos um dos aliados do tubarão está a até 1,5 metro da criatura e o aliado não tem a condição Incapacitado.\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 7 (2d4 + 2) Perfurante. Se o tubarão tiver se movido pelo menos 6 metros em linha reta em direção ao alvo imediatamente antes do ataque, o ataque causa 4 (1d8) pontos de dano Perfurante adicionais."
+    },
+    {
+      "nome": "Urso Negro",
+      "tipo_tamanho": "Fera Média, Sem Alinhamento",
+      "ca": "11",
+      "iniciativa": "+1 (11)",
+      "pv": "19 (3d8 + 6)",
+      "deslocamento": "9 m, Escalada 9 m, Natação 9 m",
+      "atributos": {
+        "For": {
+          "valor": "15",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Des": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Con": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        }
+      },
+      "pericias": "Percepção +5",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 15",
+      "idiomas": "—",
+      "nd": "1/2 (XP 100; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Ataques Múltiplos",
+          "descricao": "O urso realiza dois ataques usando Dilacerar."
+        },
+        {
+          "nome": "Dilacerar",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m *Dano:* 5 (1d6 + 2) Cortante."
+        }
+      ],
+      "texto_completo": "## Urso Negro\n\n*Fera Média, Sem Alinhamento*\n\n**CA** 11\n\n**Iniciativa** +1 (11)\n\n**PV** 19 (3d8 + 6)\n\n**Deslocamento** 9 m, Escalada 9 m, Natação 9 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 15 | +2      | +2     | **Des** | 12 | +1      | +1     | **Con** | 14 | +2      | +2     |\n| **Int** | 2  | -4      | -4     | **Sab** | 12 | +1      | +1     | **Car** | 7  | -2      | -2     |\n\n**Perícias** Percepção +5\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 15\n\n**Idiomas** —\n\n**ND** 1/2 (XP 100; BP +2)\n\n### Ações\n\n**Ataques Múltiplos.** O urso realiza dois ataques usando Dilacerar.\n\n**Dilacerar.** *Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m *Dano:* 5 (1d6 + 2) Cortante."
+    },
+    {
+      "nome": "Urso Pardo",
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "11",
+      "iniciativa": "+1 (11)",
+      "pv": "22 (3d10 + 6)",
+      "deslocamento": "12 m, Escalada 9 m",
+      "atributos": {
+        "For": {
+          "valor": "17",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Des": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Con": {
+          "valor": "15",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        }
+      },
+      "pericias": "Percepção +3",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 13",
+      "idiomas": "—",
+      "nd": "1 (XP 200; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Ataques Múltiplos",
+          "descricao": "O urso realiza um ataque usando Mordida e um ataque usando Garras."
+        },
+        {
+          "nome": "Garras",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 5 (1d4 + 3) Cortante, e o alvo tem a condição Caído se for Enorme ou menor."
+        },
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 7 (1d8 + 3) Perfurante."
+        }
+      ],
+      "texto_completo": "## Urso Pardo\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 11\n\n**Iniciativa** +1 (11)\n\n**PV** 22 (3d10 + 6)\n\n**Deslocamento** 12 m, Escalada 9 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 17 | +3      | +3     | **Des** | 12 | +1      | +1     | **Con** | 15 | +2      | +2     |\n| **Int** | 2  | -4      | -4     | **Sab** | 13 | +1      | +1     | **Car** | 7  | -2      | -2     |\n\n**Perícias** Percepção +3\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 13\n\n**Idiomas** —\n\n**ND** 1 (XP 200; BP +2)\n\n### Ações\n\n**Ataques Múltiplos.** O urso realiza um ataque usando Mordida e um ataque usando Garras.\n\n**Garras.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 5 (1d4 + 3) Cortante, e o alvo tem a condição Caído se for Enorme ou menor.\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 7 (1d8 + 3) Perfurante."
+    },
+    {
+      "nome": "Zumbi",
+      "tipo_tamanho": "Morto-vivo Médio, Neutro e Mau",
+      "ca": "8",
+      "iniciativa": "-2 (8)",
+      "pv": "15 (2d8 + 6)",
+      "deslocamento": "6 m",
+      "atributos": {
+        "For": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Des": {
+          "valor": "6",
+          "modificador": "-2",
+          "salvaguarda": "-2"
+        },
+        "Con": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        }
+      },
+      "pericias": "",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 8",
+      "idiomas": "Compreende os idiomas que conhecia em vida, mas não consegue falar",
+      "nd": "1/4 (XP 50; BP +2)",
+      "tracos": [
+        {
+          "nome": "Fortitude de Morto-Vivo",
+          "descricao": "Se o dano reduzir o zumbi a 0 Pontos de Vida, ele deve realizar uma salvaguarda de Constituição CD 5 mais o dano sofrido, a menos que o dano seja Radiante ou de um Acerto Crítico. Em caso de sucesso, o zumbi tem 1 Ponto de Vida."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Pancada",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +3 para acertar, alcance 1,5 m. *Dano:* 4 (1d6 + 1) Contundente."
+        }
+      ],
+      "texto_completo": "## Zumbi\n\n*Morto-vivo Médio, Neutro e Mau*\n\n**CA** 8\n\n**Iniciativa** -2 (8)\n\n**PV** 15 (2d8 + 6)\n\n**Deslocamento** 6 m\n\n|         |    | **Mod** | **SG** |         |   | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|---|---------|--------|---------|----|---------|--------|\n| **For** | 13 | +1      | +1     | **Des** | 6 | -2      | -2     | **Con** | 16 | +3      | +3     |\n| **Int** | 3  | -4      | -4     | **Sab** | 6 | -2      | +0     | **Car** | 5  | -3      | -3     |\n\n**Imunidades** Venenoso; Envenenado, Exaustão\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 8\n\n**Idiomas** Compreende os idiomas que conhecia em vida, mas não consegue falar\n\n**ND** 1/4 (XP 50; BP +2)\n\n### Traços\n\n**Fortitude de Morto-Vivo.** Se o dano reduzir o zumbi a 0 Pontos de Vida, ele deve realizar uma salvaguarda de Constituição CD 5 mais o dano sofrido, a menos que o dano seja Radiante ou de um Acerto Crítico. Em caso de sucesso, o zumbi tem 1 Ponto de Vida.\n\n### Ações\n\n**Pancada.** *Jogada de Ataque Corpo a Corpo:* +3 para acertar, alcance 1,5 m. *Dano:* 4 (1d6 + 1) Contundente."
+    }
+  ]
+}

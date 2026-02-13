@@ -1,0 +1,210 @@
+{
+  "tabelas": [
+    {
+      "cabecalhos": [
+        "Item",
+        "Capacidade de Carga",
+        "Custo"
+      ],
+      "dados": [
+        {
+          "Item": "Camelo",
+          "Capacidade de Carga": "225 kg",
+          "Custo": "50 PO"
+        },
+        {
+          "Item": "Cavalo de Carga",
+          "Capacidade de Carga": "270 kg",
+          "Custo": "50 PO"
+        },
+        {
+          "Item": "Cavalo de Guerra",
+          "Capacidade de Carga": "270 kg",
+          "Custo": "400 PO"
+        },
+        {
+          "Item": "Cavalo de Montaria",
+          "Capacidade de Carga": "240 kg",
+          "Custo": "75 PO"
+        },
+        {
+          "Item": "Elefante",
+          "Capacidade de Carga": "660 kg",
+          "Custo": "200 PO"
+        },
+        {
+          "Item": "Mastim",
+          "Capacidade de Carga": "93 kg",
+          "Custo": "25 PO"
+        },
+        {
+          "Item": "Mula",
+          "Capacidade de Carga": "210 kg",
+          "Custo": "8 PO"
+        },
+        {
+          "Item": "Pônei",
+          "Capacidade de Carga": "112 kg",
+          "Custo": "30 PO"
+        }
+      ]
+    },
+    {
+      "cabecalhos": [
+        "Item",
+        "Peso",
+        "Custo"
+      ],
+      "dados": [
+        {
+          "Item": "Alimentação por dia",
+          "Peso": "5 kg",
+          "Custo": "5 PC"
+        },
+        {
+          "Item": "Biga",
+          "Peso": "50 kg",
+          "Custo": "250 PO"
+        },
+        {
+          "Item": "Carroça",
+          "Peso": "100 kg",
+          "Custo": "15 PO"
+        },
+        {
+          "Item": "Carruagem",
+          "Peso": "300 kg",
+          "Custo": "100 PO"
+        },
+        {
+          "Item": "Estábulo por dia",
+          "Peso": "-",
+          "Custo": "5 PP"
+        },
+        {
+          "Item": "Sela",
+          "Peso": "",
+          "Custo": ""
+        },
+        {
+          "Item": "Exótica",
+          "Peso": "20 kg",
+          "Custo": "60 PO"
+        },
+        {
+          "Item": "Militar",
+          "Peso": "15 kg",
+          "Custo": "20 PO"
+        },
+        {
+          "Item": "Viagem",
+          "Peso": "12,5 kg",
+          "Custo": "10 PO"
+        },
+        {
+          "Item": "Trenó",
+          "Peso": "150 kg",
+          "Custo": "20 PO"
+        },
+        {
+          "Item": "Vagão",
+          "Peso": "200 kg",
+          "Custo": "35 PO"
+        }
+      ]
+    },
+    {
+      "cabecalhos": [
+        "Embarcação",
+        "Deslocamento",
+        "Tripulação",
+        "Passageiros",
+        "Carga (Toneladas)",
+        "CA",
+        "PV",
+        "Limiar de Dano",
+        "Custo"
+      ],
+      "dados": [
+        {
+          "Embarcação": "Aeronau",
+          "Deslocamento": "13 km/h",
+          "Tripulação": "10",
+          "Passageiros": "20",
+          "Carga (Toneladas)": "1",
+          "CA": "13",
+          "PV": "300",
+          "Limiar de Dano": "—",
+          "Custo": "40.000 PO"
+        },
+        {
+          "Embarcação": "Barco a Remo",
+          "Deslocamento": "2,4 km/h",
+          "Tripulação": "1",
+          "Passageiros": "3",
+          "Carga (Toneladas)": "—",
+          "CA": "11",
+          "PV": "50",
+          "Limiar de Dano": "—",
+          "Custo": "50 PO"
+        },
+        {
+          "Embarcação": "Barco de Quilha",
+          "Deslocamento": "1,6 km/h",
+          "Tripulação": "1",
+          "Passageiros": "6",
+          "Carga (Toneladas)": "0,5",
+          "CA": "15",
+          "PV": "100",
+          "Limiar de Dano": "10",
+          "Custo": "3.000 PO"
+        },
+        {
+          "Embarcação": "Dracar",
+          "Deslocamento": "4,8 km/h",
+          "Tripulação": "40",
+          "Passageiros": "150",
+          "Carga (Toneladas)": "10",
+          "CA": "15",
+          "PV": "300",
+          "Limiar de Dano": "15",
+          "Custo": "10.000 PO"
+        },
+        {
+          "Embarcação": "Galera",
+          "Deslocamento": "6,5 km/h",
+          "Tripulação": "80",
+          "Passageiros": "—",
+          "Carga (Toneladas)": "150",
+          "CA": "15",
+          "PV": "500",
+          "Limiar de Dano": "20",
+          "Custo": "30.000 PO"
+        },
+        {
+          "Embarcação": "Navio de Guerra",
+          "Deslocamento": "4 km/h",
+          "Tripulação": "60",
+          "Passageiros": "60",
+          "Carga (Toneladas)": "200",
+          "CA": "15",
+          "PV": "500",
+          "Limiar de Dano": "20",
+          "Custo": "25.000 PO"
+        },
+        {
+          "Embarcação": "Veleiro",
+          "Deslocamento": "3,2 km/h",
+          "Tripulação": "20",
+          "Passageiros": "20",
+          "Carga (Toneladas)": "100",
+          "CA": "15",
+          "PV": "300",
+          "Limiar de Dano": "15",
+          "Custo": "10.000 PO"
+        }
+      ]
+    }
+  ],
+  "texto_completo": "# Montarias e Veículos\n\nUma montaria pode ajudá-lo a se mover mais rapidamente pelos ermos, mas seu objetivo principal é carregar equipamentos que, de outra forma, o atrasariam. A tabela Montarias e Outros Animais mostra a capacidade de carga de cada animal. Veja o apêndice B para os blocos de estatísticas dos animais.\n\n## Montarias e Carga\n\nUm animal que puxa uma carruagem, biga, carroça, trenó ou vagão pode mover até cinco vezes sua capacidade de carga básica, incluindo o peso do veículo. Se vários animais puxarem o mesmo veículo, some suas capacidades de carga.\n\n## Armadura de Montaria\n\nArmadura de montaria é uma armadura projetada para uma montaria. Qualquer tipo de armadura na tabela Armaduras deste capítulo pode ser comprada como uma armadura de montaria. O custo é quatro vezes o custo normal e pesa duas vezes mais.\n\n## Selas\n\nUma sela vem com um bridão, freio, rédea e qualquer outro equipamento necessário para usar a sela. Uma Sela Militar concede Vantagem em qualquer teste de atributo que você realizar para permanecer montado. Uma Sela Exótica é necessária para montar uma criatura aquática ou voadora.\n\n**Montarias e Outros Animais**\n\n| **Item**           | **Capacidade de Carga** | **Custo** |\n|--------------------|-------------------------|-----------|\n| Camelo             | 225 kg                  | 50 PO     |\n| Cavalo de Carga    | 270 kg                  | 50 PO     |\n| Cavalo de Guerra   | 270 kg                  | 400 PO    |\n| Cavalo de Montaria | 240 kg                  | 75 PO     |\n| Elefante           | 660 kg                  | 200 PO    |\n| Mastim             | 93 kg                   | 25 PO     |\n| Mula               | 210 kg                  | 8 PO      |\n| Pônei              | 112 kg                  | 30 PO     |\n\n**Arreios, Apetrechos e Veículos de Tração**\n\n| **Item**            | **Peso** | **Custo** |\n|---------------------|----------|-----------|\n| Alimentação por dia | 5 kg     | 5 PC      |\n| Biga                | 50 kg    | 250 PO    |\n| Carroça             | 100 kg   | 15 PO     |\n| Carruagem           | 300 kg   | 100 PO    |\n| Estábulo por dia    | -        | 5 PP      |\n| *Sela*              |          |           |\n| Exótica             | 20 kg    | 60 PO     |\n| Militar             | 15 kg    | 20 PO     |\n| Viagem              | 12,5 kg  | 10 PO     |\n| Trenó               | 150 kg   | 20 PO     |\n| Vagão               | 200 kg   | 35 PO     |\n\n**Veículos Aéreos e Aquáticos**\n\n| **Embarcação**  | **Deslocamento** | **Tripulação** | **Passageiros** | **Carga (Toneladas)** | **CA** | **PV** | **Limiar de Dano** | **Custo** |\n|-----------------|------------------|----------------|-----------------|-----------------------|--------|--------|--------------------|-----------|\n| Aeronau         | 13 km/h          | 10             | 20              | 1                     | 13     | 300    | —                  | 40.000 PO |\n| Barco a Remo    | 2,4 km/h         | 1              | 3               | —                     | 11     | 50     | —                  | 50 PO     |\n| Barco de Quilha | 1,6 km/h         | 1              | 6               | 0,5                   | 15     | 100    | 10                 | 3.000 PO  |\n| Dracar          | 4,8 km/h         | 40             | 150             | 10                    | 15     | 300    | 15                 | 10.000 PO |\n| Galera          | 6,5 km/h         | 80             | —               | 150                   | 15     | 500    | 20                 | 30.000 PO |\n| Navio de Guerra | 4 km/h           | 60             | 60              | 200                   | 15     | 500    | 20                 | 25.000 PO |\n| Veleiro         | 3,2 km/h         | 20             | 20              | 100                   | 15     | 300    | 15                 | 10.000 PO |\n\n## Veículos Grandes\n\nA tabela Veículos Aéreos e Aquáticos fornece estatísticas para vários tipos de veículos grandes. As seguintes notas se aplicam.\n\n### Deslocamento\n\nUma embarcação navegando contra um vento forte se move com a metade do deslocamento. Em uma calmaria (sem vento), as embarcações aquáticas não podem se mover com vela e devem ser remadas. Barcos de quilha e barcos a remo são usados em lagos e rios. Se for rio abaixo, adicione o deslocamento da correnteza (normalmente 4,5 quilômetros por hora) ao deslocamento do veículo. Esses veículos não podem ser remados contra nenhuma correnteza significativa, mas podem ser puxados rio acima por animais de tração pelas margens. Um Barco a Remo pode ser carregado e pesa 45 quilos.\n\n### Tripulação\n\nUma embarcação maior que um Barco a Remo ou Barco de Quilha precisa de uma tripulação de trabalhadores qualificados (veja “Serviços” mais adiante neste capítulo) para funcionar. O número mínimo de trabalhadores qualificados necessários para tripular um navio depende do tipo de navio, conforme mostrado na tabela.\n\n### Passageiros\n\nA tabela mostra o número de passageiros Pequenos e Médios que o navio pode acomodar usando redes de dormir. Um navio equipado com acomodações privadas pode transportar um quinto do número de passageiros. Um passageiro geralmente paga 5 PP por dia por uma rede de dormir, mas os preços podem variar de navio para navio. Uma pequena cabine privada geralmente custa 2 PO por dia.\n\n### Limiar de Dano\n\nSe um veículo tem um limiar de dano (veja o glossário de regras), ele é mostrado na tabela.\n\n### Reparo de Embarcação\n\nOs reparos em uma embarcação danificada podem ser realizados enquanto a embarcação estiver atracada. Reparar 1 Ponto de Vida de dano requer 1 dia e custa 20 PO de materiais e mão de obra. Se os reparos forem feitos em um local onde os suprimentos e a mão de obra qualificada são abundantes, como o estaleiro de uma cidade, o tempo e o custo do reparo são reduzidos pela metade."
+}

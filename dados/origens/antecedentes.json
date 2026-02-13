@@ -1,0 +1,149 @@
+{
+  "total": 16,
+  "antecedentes": [
+    {
+      "nome": "Acólito",
+      "valores_atributo": "Inteligência, Sabedoria, Carisma",
+      "talento": "Iniciado em Magia (Clérigo) (veja o capítulo 5)",
+      "pericias": "Intuição, Religião",
+      "ferramentas": "Suprimentos de Calígrafo",
+      "equipamento": "*Escolha A ou B:* (A) Suprimentos de Calígrafo, Livro (orações), Símbolo Sagrado, Pergaminho (10 folhas), Túnica, 8 PO; ou (B) 50 PO",
+      "descricao": "Você se dedicou ao serviço em um templo, localizado em uma aldeia ou em um bosque sagrado, onde realizava ritos em homenagem a um deus ou panteão. Sob a orientação de um sacerdote, você estudou religião e, graças à sua devoção, aprendeu a canalizar um pouco do poder divino para o seu local de culto e para as pessoas que ali oravam."
+    },
+    {
+      "nome": "Andarilho",
+      "valores_atributo": "Destreza, Sabedoria, Carisma",
+      "talento": "Sortudo (veja o capítulo 5)",
+      "pericias": "Furtividade, Intuição",
+      "ferramentas": "Ferramentas de Ladrão",
+      "equipamento": "*Escolha A ou B:* (A) 2 Adagas, Ferramentas de Ladrão, Kit de Jogos (qualquer um), 2 Algibeiras, Roupas de Viagem, Saco de Dormir, 16 PO; ou (B) 50 PO",
+      "descricao": "Você cresceu nas ruas cercado por rejeitados igualmente malfadados, alguns deles amigos e outros rivais. Você dormia onde podia e fazia bicos por comida. Às vezes, quando a fome se tornava insuportável, você recorria ao furto. Ainda assim, você nunca perdeu seu orgulho e nunca abandonou a esperança. O destino ainda não terminou com você."
+    },
+    {
+      "nome": "Artesão",
+      "valores_atributo": "Força, Destreza, Inteligência",
+      "talento": "Artifista (veja o capítulo 5)",
+      "pericias": "Investigação, Persuasão",
+      "ferramentas": "*Escolha um tipo de Ferramentas de Artesão* (veja o capítulo 6)",
+      "equipamento": "*Escolha A ou B:* (A) Ferramentas de Artesão (a mesma que acima), 2 Algibeiras, Roupas de Viagem, 32 PO; ou (B) 50 PO",
+      "descricao": "Você começou a limpar o chão e esfregar balcões na oficina de um artesão por alguns trocados por dia assim que ficou forte o suficiente para carregar um balde. Ao se tornar aprendiz, aprendeu a fabricar artesanatos básicos e a lidar com clientes exigentes, desenvolvendo também um olhar aguçado para detalhes."
+    },
+    {
+      "nome": "Artista",
+      "valores_atributo": "Força, Destreza, Carisma",
+      "talento": "Músico (veja o capítulo 5)",
+      "pericias": "Acrobacia, Atuação",
+      "ferramentas": "Escolha um tipo de *Instrumento Musical* (veja o capítulo 6)",
+      "equipamento": "*Escolha A ou B:* (A) Instrumento Musical (o mesmo que acima), Espelho, 2 Fantasias, Perfume, Roupas de Viagem, 11 PO; ou (B) 50 PO",
+      "descricao": "Você passou a juventude em feiras e festivais itinerantes, fazendo bicos para músicos e acrobatas em troca de aulas. Aprendeu a andar na corda bamba, tocar alaúde de um jeito distinto e recitar poesia com dicção impecável. Até hoje, prospera com aplausos e anseia pelo palco."
+    },
+    {
+      "nome": "Charlatão",
+      "valores_atributo": "Destreza, Constituição, Carisma",
+      "talento": "Habilidoso (veja o capítulo 5)",
+      "pericias": "Enganação, Prestidigitação",
+      "ferramentas": "Kit de Falsificação",
+      "equipamento": "*Escolha A ou B:* (A) Kit de Falsificação, Fantasia, Roupas Finas, 15 PO; ou (B) 50 PO",
+      "descricao": "Assim que você atingiu a idade para pedir uma cerveja, escolheu seu banquinho favorito em cada taverna a quinze quilômetros de onde nasceu. Ao percorrer o circuito de bares e botequins, aprendeu a lidar com os infelizes em busca de mentiras reconfortantes — talvez uma poção falsa ou registros de ancestralidade forjados."
+    },
+    {
+      "nome": "Criminoso",
+      "valores_atributo": "Destreza, Constituição, Inteligência",
+      "talento": "Alerta (veja o capítulo 5)",
+      "pericias": "Furtividade, Prestidigitação",
+      "ferramentas": "Ferramentas de Ladrão",
+      "equipamento": "*Escolha A ou B:* (A) 2 Adagas, Ferramentas de Ladrão, 2 Algibeiras, Pé de Cabra, Roupas de Viagem, 16 PO; ou (B) 50 PO",
+      "descricao": "Você sobrevivia em becos escuros, furtando pessoas ou assaltando lojas. Talvez fizesse parte de uma pequena gangue de criminosos que se protegiam mutuamente, ou fosse um lobo solitário, enfrentando a guilda dos ladrões locais e os criminosos mais temíveis."
+    },
+    {
+      "nome": "Eremita",
+      "valores_atributo": "Constituição, Sabedoria, Carisma",
+      "talento": "Curandeiro (veja o capítulo 5)",
+      "pericias": "Medicina, Religião",
+      "ferramentas": "Kit de Herbalismo",
+      "equipamento": "*Escolha A ou B:* (A) Cajado, Kit de Herbalismo, Lâmpada, Livro (filosofia), Óleo (3 frascos), Roupas de Viagem, Saco de Dormir, 16 PO; ou (B) 50 PO",
+      "descricao": "Você passou seus primeiros anos isolado em uma cabana ou mosteiro localizado bem além dos arredores do povoado mais próximo. Naqueles dias, seus únicos companheiros eram as criaturas da floresta e aqueles que ocasionalmente faziam uma visita para trazer suprimentos e notícias do mundo externo. A solidão permitia que você passasse muitas horas ponderando os mistérios da criação."
+    },
+    {
+      "nome": "Escriba",
+      "valores_atributo": "Destreza, Inteligência, Sabedoria",
+      "talento": "Habilidoso (veja o capítulo 5)",
+      "pericias": "Investigação, Percepção",
+      "ferramentas": "Suprimentos de Calígrafo",
+      "equipamento": "*Escolha A ou B:* (A) Suprimentos de Calígrafo, Lâmpada, Óleo (3 frascos), Pergaminho (12 folhas), Roupas Finas, 23 PO; ou (B) 50 PO",
+      "descricao": "Você passou anos de formação em um scriptorium, um mosteiro dedicado à preservação do conhecimento ou uma agência governamental, onde aprendeu a escrever com uma mão firme e produzir textos finamente escritos. Talvez você tenha escrito documentos governamentais ou copiado tomos de literatura. Você pode ter alguma habilidade como escritor de poesia, narrativa ou pesquisa acadêmica. Acima de tudo, você tem uma atenção cuidadosa aos detalhes, o que lhe ajuda a evitar a introdução de erros aos documentos que você copia e cria."
+    },
+    {
+      "nome": "Fazendeiro",
+      "valores_atributo": "Força, Constituição, Sabedoria",
+      "talento": "Vigoroso (veja o capítulo 5)",
+      "pericias": "Lidar com Animais, Natureza",
+      "ferramentas": "Ferramentas de Carpinteiro",
+      "equipamento": "*Escolha A ou B:* (A) Foice, Ferramentas de Carpinteiro, Kit de Curandeiro, Balde de Ferro, Pá, 30 PO; ou (B) 50 PO",
+      "descricao": "Você cresceu perto da terra. Os anos cuidando de animais e cultivando a terra o recompensaram com paciência e boa saúde. Você tem um grande apreço pela generosidade da natureza, juntamente com um respeito saudável pela ira dela."
+    },
+    {
+      "nome": "Guarda",
+      "valores_atributo": "Força, Inteligência, Sabedoria",
+      "talento": "Alerta (veja o capítulo 5)",
+      "pericias": "Atletismo, Percepção",
+      "ferramentas": "*Escolha um tipo de Kit de Jogos* (veja o capítulo 6)",
+      "equipamento": "*Escolha A ou B:* (A) Lança, Besta Leve, 20 Virotes, Kit de Jogo (o mesmo que acima), Aljava, Grilhões, Lanterna Coberta, Roupas de Viagem, 12 PO; ou (B) 50 PO",
+      "descricao": "Seus pés doem quando você se lembra das incontáveis horas que passou em seu posto na torre. Você foi treinado para manter um olho atento para o que ocorria do lado fora da muralha, observando saqueadores vasculhando a floresta próxima, e seu outro olho voltado para dentro da muralha, procurando por assaltantes e encrenqueiros."
+    },
+    {
+      "nome": "Guia",
+      "valores_atributo": "Destreza, Constituição, Sabedoria",
+      "talento": "Iniciado em Magia (Druida) (veja o capítulo 5)",
+      "pericias": "Furtividade, Sobrevivência",
+      "ferramentas": "Ferramentas de Cartógrafo",
+      "equipamento": "*Escolha A ou B:* (A) Arco Curto, 20 Flechas, Ferramentas de Cartógrafo, Aljava, Roupas de Viagem, Saco de Dormir, Tenda, 3 PO; ou (B) 50 PO",
+      "descricao": "Você cresceu ao ar livre, longe de terras povoadas. Sua casa ficava em qualquer lugar que você escolhesse para estender seu saco de dormir. Há maravilhas na natureza — monstros estranhos, florestas e riachos intocados, ruínas imensas de grandes salões outrora pisados por gigantes — e você aprendeu a se defender enquanto as explorava. De tempos em tempos, você guiava sacerdotes da natureza amigáveis que o instruíam nos fundamentos de canalizar a magia da natureza."
+    },
+    {
+      "nome": "Marinheiro",
+      "valores_atributo": "Força, Destreza, Sabedoria",
+      "talento": "Valentão de Taverna (veja o capítulo 5)",
+      "pericias": "Acrobacia, Percepção",
+      "ferramentas": "Ferramentas de Navegador",
+      "equipamento": "*Escolha A ou B:* (A) Adaga, Ferramentas de Navegador, Corda, Roupas de Viagem, 20 PO; ou (B) 50 PO",
+      "descricao": "Você viveu como um marinheiro, com o vento nas costas e os conveses balançando sob seus pés. Você já se sentou em bancos de bar em mais portos de escala do que consegue se lembrar, enfrentou grandes tempestades e trocou histórias com pessoas que vivem sob as ondas."
+    },
+    {
+      "nome": "Mercador",
+      "valores_atributo": "Constituição, Inteligência, Carisma",
+      "talento": "Sortudo (veja o capítulo 5)",
+      "pericias": "Lidar com Animais, Persuasão",
+      "ferramentas": "Ferramentas de Navegador",
+      "equipamento": "*Escolha A ou B:* (A) Ferramentas de Navegador, 2 Algibeiras, Roupas de Viagem, 22 PO; ou (B) 50 PO",
+      "descricao": "**Proficiência em Perícia:** Lidar com Animais, Persuasão\nVocê foi aprendiz de um comerciante, mestre de caravanas ou lojista, aprendendo os fundamentos do comércio. Com ele, viajou bastante e ganhou a vida comprando e vendendo as matérias-primas que os artesãos precisam para praticar seu ofício, ou trabalhos acabados de tais artesãos. Você pode ter transportado mercadorias de um lugar para outro (por navio, carroça ou caravana) ou comprado de comerciantes viajantes e vendido em sua própria loja."
+    },
+    {
+      "nome": "Nobre",
+      "valores_atributo": "Força, Inteligência, Carisma",
+      "talento": "Habilidoso (veja o capítulo 5)",
+      "pericias": "História, Persuasão",
+      "ferramentas": "*Escolha um tipo de Kit de Jogos* (veja o capítulo 6)",
+      "equipamento": "*Escolha A ou B:* (A) Kit de Jogos (o mesmo que acima), Perfume, Roupas Finas, 29 PO; ou (B) 50 PO",
+      "descricao": "Você foi criado em um castelo, cercado por riqueza, poder e privilégio. Sua família de aristocratas menores garantiu que você recebesse uma educação de primeira categoria, com conteúdos que você apreciava e outros dos quais se ressentia. Seu tempo no castelo, especialmente as muitas horas que passou observando sua família na corte, também lhe ensinou muito sobre liderança."
+    },
+    {
+      "nome": "Sábio",
+      "valores_atributo": "Constituição, Inteligência, Sabedoria",
+      "talento": "Iniciado em Magia (Mago) (veja o capítulo 5)",
+      "pericias": "Arcanismo, História",
+      "ferramentas": "Suprimentos de Calígrafo",
+      "equipamento": "*Escolha A ou B:* (A) Cajado, Suprimentos de Calígrafo, Livro (história), Pergaminho (8 folhas), Túnica, 8 PO; ou (B) 50 PO",
+      "descricao": "Você passou seus anos de formação viajando entre mansões e mosteiros, realizando vários bicos e serviços em troca de acesso às bibliotecas desses locais. Suas noites se resumiram a estudar livros e pergaminhos, aprendendo a sabedoria do multiverso — até mesmo os rudimentos da magia — e, agora, sua mente anseia por mais."
+    },
+    {
+      "nome": "Soldado",
+      "valores_atributo": "Força, Destreza, Constituição",
+      "talento": "Atacante Selvagem (veja o capítulo 5)",
+      "pericias": "Atletismo, Intimidação",
+      "ferramentas": "*Escolha um tipo de Kit de Jogos* (veja o capítulo 6)",
+      "equipamento": "*Escolha A ou B:* (A) Lança, Arco Curto, 20 Flechas, Kit de Curandeiro, Kit de Jogo (o mesmo que acima), Aljava, Roupas de Viagem, 14 PO; ou (B) 50 PO",
+      "descricao": "Você começou a treinar para a guerra assim que atingiu a idade adulta e tem poucas lembranças preciosas da vida antes de pegar em armas. A batalha está em seu sangue. Às vezes, você se pega realizando reflexivamente os exercícios básicos de luta que aprendeu primeiro. Por fim, você coloca esse treinamento em prática no campo de batalha, protegendo o reino por meio da guerra."
+    }
+  ]
+}

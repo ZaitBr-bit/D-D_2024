@@ -1,0 +1,62 @@
+# .gitignore para o projeto D&D
+# Arquivos e pastas gerados localmente que não devem ser comitados
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.env
+.env.local
+.env.*
+.pytest_cache/
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Node (caso usado localmente)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# IDEs JetBrains
+.idea/
+
+# Logs e caches
+*.log
+.coverage
+coverage/
+.cache/
+
+# Bancos de dados e arquivos de sessão
+*.sqlite3
+*.db
+
+# Arquivos de chave/credenciais
+credentials.json
+*.key
+*.pem
+
+# Arquivos temporários
+tmp/
+temp/
+
+# Arquivos estáticos/gerados da pasta site que não queira versionar (ajuste conforme necessário)
+site/.DS_Store
+site/.cache/
+
+# Notas:
+# - Ajuste este arquivo conforme seus fluxos (por exemplo, remova `site/.cache/` se você realmente deseja versionar cache).
+# - Para aplicar o .gitignore a arquivos já comitados: execute os comandos sugeridos abaixo.

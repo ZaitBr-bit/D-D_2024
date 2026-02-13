@@ -1,0 +1,284 @@
+{
+  "circulo": 8,
+  "nome_circulo": "8º Círculo",
+  "total_magias": 18,
+  "magias": [
+    {
+      "nome": "Antipatia/Simpatia",
+      "circulo": 8,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 hora",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (uma mistura de vinagre e mel)",
+      "duracao": "10 dias",
+      "descricao": "Ao conjurar a magia, decida se ela cria antipatia ou simpatia, e escolha como alvo uma criatura ou objeto que seja Enorme ou menor. Em seguida, especifique um tipo de criatura, como dragões vermelhos, goblins ou vampiros. Uma criatura do tipo escolhido realiza uma salvaguarda de Sabedoria quando estiver a até 36 metros do alvo. Sua escolha entre antipatia ou simpatia determina o que acontece com uma criatura ao falhar nessa salvaguarda:\nAntipatia: A criatura tem a condição Amedrontado. A criatura Amedrontada deve usar o movimento nos turnos dela para se afastar o máximo possível do alvo, movendo-se pela rota mais segura.\nSimpatia: A criatura tem a condição Enfeitiçado. A criatura Enfeitiçada deve usar o movimento nos turnos dela para chegar o mais próximo possível do alvo, movendo-se pela rota mais segura. Se a criatura estiver a até 1,5 metro do alvo, a criatura não pode se afastar voluntariamente. Se o alvo causar dano à criatura Enfeitiçada, essa criatura deve realizar uma salvaguarda de Sabedoria para encerrar o efeito, conforme descrito abaixo.\nEncerrando o Efeito. Se a criatura Amedrontada ou Enfeitiçada terminar o turno a mais de 36 metros de distância do alvo, a criatura realiza uma salvaguarda de Sabedoria. Em caso de sucesso, a criatura não é mais afetada pelo alvo e fica imune a ele por 1 minuto, após o qual pode ser afetada novamente.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Aura Sagrada",
+      "circulo": 8,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (um relicário no valor de 1.000 ou mais PO)",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Pela duração, você emite uma aura em uma Emanação de 9 metros. Enquanto estão dentro da aura, criaturas à sua escolha têm Vantagem em todas as salvaguardas, enquanto as outras têm Desvantagem nas jogadas de ataque contra elas. Além disso, se um Ínfero ou um Morto-Vivo atinge uma criatura afetada em uma jogada de ataque corpo a corpo, o atacante deve ser bem-sucedido em uma salvaguarda de Constituição ou fica Cego até o final do próximo turno dele.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Campo Antimagia",
+      "circulo": 8,
+      "escola": "Abjuração",
+      "classes": [
+        "Clérigo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (raspas de ferro)",
+      "duracao": "Concentração, até 1 hora",
+      "descricao": "Uma aura de antimagia envolve você em uma Emanação de 3 metros. Ninguém pode conjurar magias, executar a ação Usar Magia ou criar outros efeitos mágicos dentro da aura, e esses efeitos não podem ter como alvo ou afetar qualquer coisa dentro dela. As propriedades mágicas dos itens mágicos não funcionam dentro da aura ou em qualquer coisa dentro dela.\nÁreas de efeito criadas por magias ou outros efeitos mágicos não podem se estender para dentro da aura, e ninguém pode se teleportar para dentro ou para fora dela ou usar viagens planares para lá. Os portais se fecham temporariamente enquanto estão na aura.\nMagias em andamento, exceto aquelas conjuradas por um Artefato ou por uma divindade, são suprimidas na área. Enquanto um efeito é suprimido, ele não funciona, mas o tempo que ele gasta suprimido conta para sua duração.\nDissipar Magia não tem efeito sobre a aura, e as auras criadas por diferentes magias de Campo Antimagia não se anulam.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Clone",
+      "circulo": 8,
+      "escola": "Necromancia",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "1 hora",
+      "alcance": "Toque",
+      "componentes": "V, S, M (um diamante no valor de 1.000 ou mais PO, que a magia consome, e um recipiente vedável no valor de 2.000 ou mais PO que seja grande o suficiente para conter a criatura sendo clonada)",
+      "duracao": "Instantânea",
+      "descricao": "Você toca uma criatura ou pelo menos 2,5 centímetros cúbicos da carne dela. Uma duplicata inerte dessa criatura se forma dentro do recipiente usado na conjuração da magia e termina de crescer após 120 dias; você escolhe se o clone finalizado tem a mesma idade da criatura ou é mais nova. O clone permanece inerte e dura indefinidamente enquanto o recipiente o contém permanecer intacto.\nSe a criatura original morrer após o clone terminar de se formar, a alma da criatura é transferida para o clone se a alma estiver livre e disposta a retornar. O clone é fisicamente idêntico ao original e tem a mesma personalidade, memórias e habilidades, mas nenhum dos equipamentos do original. Os restos originais da criatura, se houver, tornam-se inertes e não podem ser revividos, uma vez que a alma da criatura está em outro lugar.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Controlar o Clima",
+      "circulo": 8,
+      "escola": "Transmutação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "10 minutos",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (um incenso aceso)",
+      "duracao": "Concentração, até 8 horas",
+      "descricao": "Um Dragão de Latão conjura Controlar o Clima para salvar uma comunidade de uma tempestade destrutiva.\nVocê assume o controle do clima a até 8 quilômetros de você pela duração da magia. Você deve estar ao ar livre para conjurar esta magia, e ela encerra se você for para áreas internas.\nAo conjurar a magia, você altera a condição climática atual, determinada pelo Mestre. Você pode alterar a precipitação, a temperatura e o vento. Leva 1d4 x 10 minutos para as novas condições do clima entrarem em vigor. Depois que elas se estabelecerem, você pode alterar as condições novamente. Quando a magia termina, o clima volta gradualmente ao normal.\nAo alterar as condições meteorológicas, encontre uma condição atual nas tabelas a seguir e altere o estágio em um, para cima ou para baixo. Ao mudar o vento, você pode alterar a direção dele.\nPrecipitação\n| Estágio | Condição                                       |\n|-------------|----------------------------------------------------|\n| 1           | Limpo                                              |\n| 2           | Nuvens leves                                       |\n| 3           | Nublado ou com neblina                             |\n| 4           | Chuva, granizo ou neve                             |\n| 5           | Chuva torrencial, tempestade de granizo ou nevasca |\nTemperatura\n| Estágio | Condição       |\n|-------------|--------------------|\n| 1           | Calor insuportável |\n| 2           | Quente             |\n| 3           | Ameno              |\n| 4           | Fresco             |\n| 5           | Frio               |\n| 6           | Frio extremo       |\nVento\n| Estágio | Condição   |\n|-------------|----------------|\n| 1           | Calmo          |\n| 2           | Vento moderado |\n| 3           | Vento forte    |\n| 4           | Vendaval       |\n| 5           | Tempestade     |",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Dominar Monstro",
+      "circulo": 8,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 hora",
+      "descricao": "Uma criatura à sua vista e no alcance da magia deve ser bem-sucedida em uma salvaguarda de Sabedoria ou tem a condição Enfeitiçado pela duração da magia. O alvo tem Vantagem na salvaguarda se você ou seus aliados estiverem lutando contra ele. Sempre que o alvo sofre dano, ele repete a salvaguarda, encerrando a magia em caso de sucesso.\nVocê tem um vínculo telepático com o alvo Enfeitiçado enquanto vocês dois estão no mesmo plano de existência. No seu turno, você pode usar este vínculo para emitir comandos para o alvo (nenhuma ação é necessária), como “Ataque essa criatura”, “Mova-se para lá” ou “Busque aquele objeto”. O alvo faz o possível para obedecer no turno dele. Se ele concluir um pedido e não receber mais instruções de você, ele age e se move como quiser, concentrando-se em se proteger.\nVocê pode ordenar o alvo a executar uma Reação, mas deve executar sua própria Reação para tanto.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. Sua Concentração pode durar mais com um espaço de magia de 9º círculo (em até 8 horas)."
+    },
+    {
+      "nome": "Explosão Solar",
+      "circulo": 8,
+      "escola": "Evocação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "45 metros",
+      "componentes": "V, S, M (um pedaço de pedra solar)",
+      "duracao": "Instantânea",
+      "descricao": "Luz solar brilhante lampeja em uma Esfera de 18 metros de raio centrada em um ponto à sua escolha no alcance da magia. Cada criatura na Esfera realiza uma salvaguarda de Constituição. Se falhar, uma criatura sofre 12d6 pontos de dano Radiante e tem a condição Cego por 1 minuto. Em caso de sucesso, ela sofre apenas metade do dano.\nUma criatura Cega por esta magia realiza outra salvaguarda de Constituição no final de cada um dos turnos dela, encerrando o efeito em caso de sucesso.\nEsta magia dissipa Escuridão criada por qualquer magia em sua área.\nF\n*",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Formas Animais",
+      "circulo": 8,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "9 metros",
+      "componentes": "V, S",
+      "duracao": "24 horas",
+      "descricao": "Escolha qualquer número de criaturas voluntárias à vista e no alcance da magia. Cada alvo se multimorfa em uma Fera Grande ou menor à sua escolha e que tenha um Nível de Desafio igual ou inferior a 4. Você pode escolher uma forma diferente para cada alvo. Em turnos posteriores, você pode executar uma ação Usar Magia para transformar os alvos novamente.\nAs estatísticas de jogo de um alvo são substituídas pelas estatísticas da Fera escolhida, mas o alvo mantém seu tipo de criatura, Pontos de Vida, Dados de Pontos de Vida, alinhamento, capacidade de comunicação, e valores de atributo de Inteligência, Sabedoria e Carisma. As ações do alvo são limitadas pela anatomia da forma da Fera e ele não pode conjurar magias. O equipamento do alvo se funde com a nova forma e o alvo não pode usar nenhum desses equipamentos enquanto estiver nesta forma.\nO alvo adquire um número de Pontos de Vida Temporários igual aos Pontos de Vida da forma da Fera. A transformação permanece pela duração da magia para cada alvo, até que o alvo não tenha mais Pontos de Vida Temporários ou até que o alvo use uma Ação Bônus para sair da forma.\nG\n*",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Labirinto",
+      "circulo": 8,
+      "escola": "Invocação",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos",
+      "descricao": "Você bane uma criatura à sua vista e no alcance da magia para um semiplano labiríntico. O alvo permanece lá pela duração ou até escapar do labirinto.\nO alvo pode executar uma ação Analisar para tentar escapar. Quando isso acontece, ele realiza um teste de Inteligência (Investigação) CD 20. Em caso de sucesso, ele escapa e a magia se encerra.\nQuando a magia termina, o alvo reaparece no espaço que deixou ou, se esse espaço estiver ocupado, no espaço desocupado mais próximo.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Limpar a Mente",
+      "circulo": 8,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "24 horas",
+      "descricao": "Até que a magia termine, uma criatura voluntária que você toca adquire Imunidade a dano Psíquico e à condição Enfeitiçado. O alvo também fica imune a qualquer coisa que possa detectar suas emoções ou alinhamento, ler seus pensamentos, detectar magicamente sua localização, e nenhuma magia — nem mesmo Desejo — pode obter informações sobre o alvo, observá-lo remotamente ou controlar sua mente.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Loquacidade",
+      "circulo": 8,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Bruxo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V",
+      "duracao": "1 hora",
+      "descricao": "Até que a magia termine, ao realizar um teste de Carisma, você pode substituir o número que você tirou por um 15. Além disso, não importa o que você diga, a magia que determinaria se você está dizendo a verdade indica que você está sendo verdadeiro.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Nuvem Incendiária",
+      "circulo": 8,
+      "escola": "Invocação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "45 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Uma nuvem rodopiante de brasas e fumaça preenche uma Esfera de 6 metros de raio centrada em um ponto no alcance da magia. A área da nuvem é Totalmente Obscurecida. Ela permanece pela duração ou até que um vento forte (como o criado pela Lufada de Vento) a disperse.\nQuando a nuvem aparece, cada criatura dentro dela realiza uma salvaguarda de Destreza e, se falhar, sofre 10d8 pontos de dano Ígneo, ou metade desse dano em caso de sucesso. Uma criatura também deve realizar essa salvaguarda quando a Esfera se mover para seu espaço e quando terminar seu turno nela. Uma criatura realiza essa salvaguarda apenas uma vez por turno.\nA nuvem se afasta 3 metros de você na direção que você escolher no início de cada um dos seus turnos.\nO\n*",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Palavra de Poder: Atordoar",
+      "circulo": 8,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "",
+      "duracao": "Instantânea",
+      "descricao": "Componente: V\nVocê domina a mente de uma criatura à sua vista e no alcance da magia. Se o alvo tiver 150 Pontos de Vida ou menos, ele tem a condição Atordoado. Caso contrário, o Deslocamento dele é 0 até o início do seu próximo turno.\nO alvo Atordoado realiza uma salvaguarda de Constituição no final de cada um dos turnos dele, encerrando a condição em caso de sucesso.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Semiplano",
+      "circulo": 8,
+      "escola": "Invocação",
+      "classes": [
+        "Bruxo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "S",
+      "duracao": "1 hora",
+      "descricao": "Você cria uma porta Média de sombras em uma superfície sólida e plana à sua vista e no alcance da magia. Essa porta pode ser aberta e fechada, levando a uma sala vazia de 9 metros em cada dimensão, feita de madeira ou pedra à sua escolha, em semiplano.\nQuando a magia termina, a porta desaparece e os objetos dentro do semiplano permanecem nele. Qualquer criatura dentro dele também permanece nele, a menos que escolha passar pela porta enquanto ela desaparece, saindo com a condição Caído e nos espaços desocupados mais próximos do espaço que a porta ocupava anteriormente.\nAo conjurar esta magia, você pode criar um novo semiplano ou conectar a porta de sombras a um semiplano que você criou em uma conjuração anterior desta magia. Além disso, se souber a natureza e o conteúdo de um semiplano criado por outra criatura com esta magia, você pode conectar a porta de sombras a esse semiplano.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Suplício",
+      "circulo": 8,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Bruxo",
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "45 metros",
+      "componentes": "V, S, M (um chaveiro sem chaves)",
+      "duracao": "Instantânea",
+      "descricao": "Você sobrecarrega a mente de uma criatura à sua vista e no alcance da magia. O alvo realiza uma salvaguarda de Inteligência.\nSe falhar, o alvo sofre 10d12 pontos de dano Psíquico e não pode conjurar magias ou executar a ação Usar Magia. Ao final de cada 30 dias, o alvo repete a salvaguarda, encerrando o efeito em caso de sucesso. O efeito também pode ser encerrado pela magia Cura Completa, Desejo ou Restauração Maior.\nEm uma salvaguarda bem-sucedida, o alvo recebe apenas metade do dano.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Telepatia",
+      "circulo": 8,
+      "escola": "Adivinhação",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Ilimitado",
+      "componentes": "V, S, M (um par de anéis de prata interligados)",
+      "duracao": "24 horas",
+      "descricao": "Você cria um elo telepático entre você e uma criatura voluntária com a qual está familiarizado. A criatura pode estar em qualquer lugar no mesmo plano de existência que você. A magia encerra se você ou o alvo não estiverem mais no mesmo plano.\nAté que a magia termine, você e o alvo podem compartilhar instantaneamente palavras, imagens, sons e outras mensagens sensoriais entre si através do elo, e o alvo o reconhece como a criatura com a qual está se comunicando. A magia permite que uma criatura compreenda o significado de suas palavras e quaisquer mensagens sensoriais que você enviar a ela.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Terremoto",
+      "circulo": 8,
+      "escola": "Transmutação",
+      "classes": [
+        "Clérigo",
+        "Druida",
+        "Feiticeiro"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "150 metros",
+      "componentes": "V, S, M (uma rocha rachada)",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Escolha um ponto no chão à sua vista e no alcance da magia. Pela duração da magia, um tremor intenso rasga o chão em um círculo de 30 metros de raio centrado neste ponto. O terreno é Terreno Difícil.\nAo conjurar esta magia e no final de cada um dos seus turnos pela duração da magia, cada criatura no chão na área realiza uma salvaguarda de Destreza. Se falhar, uma criatura tem a condição Caído e a Concentração dela é quebrada.\nVocê também pode causar os efeitos abaixo.\nEstruturas. O tremor causa 50 pontos de dano Contundente em qualquer estrutura em contato com o chão na área quando você conjura a magia e no final de cada um dos seus turnos até que a magia termine. Se uma estrutura é reduzida a 0 Pontos de Vida, ela desaba.\nUma criatura a uma distância de uma estrutura desabando igual à metade da altura da estrutura realiza uma salvaguarda de Destreza. Se falhar, a criatura sofre 12d6 pontos de dano Contundente, tem a condição Caído e é soterrada pelos escombros, exigindo um teste de Força (Atletismo) CD 20 como uma ação para escapar. Em caso de sucesso, a criatura recebe apenas metade do dano.\nFissuras. Um total de 1d6 fissuras se abrem na área da magia ao final do turno que você a conjura. Você escolhe os locais das fissuras, que não podem estar sob estruturas. Cada fissura tem 1d10 × 3 metros de profundidade e 3 metros de largura, e se estende de uma borda da área da magia para outra borda. Uma criatura no mesmo espaço que uma fissura deve ser bem-sucedida em uma salvaguarda de Destreza ou cai na fissura. Uma criatura bem-sucedida se move com a borda da fissura à medida que ela se abre.",
+      "circulo_superior": ""
+    },
+    {
+      "nome": "Tsunami",
+      "circulo": 8,
+      "escola": "Invocação",
+      "classes": [
+        "Druida"
+      ],
+      "tempo_conjuracao": "1 minuto",
+      "alcance": "1,5 km",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 6 rodadas",
+      "descricao": "Uma muralha de água surge em um ponto à sua escolha no alcance da magia. Você pode fazer a muralha com até 90 metros de comprimento, 90 metros de altura e 15 metros de espessura. A muralha permanece pela duração da magia.\nQuando a muralha aparece, cada criatura na área realiza uma salvaguarda de Força, sofrendo 6d10 pontos de dano Contundente se falhar, ou metade desse dano em caso de sucesso.\nNo início de cada um dos seus turnos após o aparecimento da muralha, ela se move 15 metros para longe de você, juntamente com quaisquer criaturas que estejam dentro dela. Qualquer criatura de tamanho Enorme ou menor dentro da muralha, ou cujo espaço a muralha adentre ao se mover, deve ser bem-sucedida em uma salvaguarda de Força ou sofre 5d10 pontos de dano Contundente. Uma criatura pode sofrer esse dano apenas uma vez por rodada. No final de cada turno, a altura da muralha é reduzida em 15 metros, e o dano que a muralha causa nas rodadas subsequentes é reduzido em 1d10. Quando a muralha atinge 0 metros de altura, a magia termina.\nUma criatura apanhada pela muralha pode se mover nadando. No entanto, devido à força da onda, a criatura deve ser bem-sucedida em um teste de Força (Atletismo) contra a CD para evitar sua magia para se mover. Se falhar no teste, ela não pode se mover. Uma criatura que sair da muralha cai no chão.",
+      "circulo_superior": ""
+    }
+  ]
+}

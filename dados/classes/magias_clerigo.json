@@ -1,0 +1,610 @@
+{
+  "classe": "Clérigo",
+  "lista_magias": {
+    "Truques": [
+      {
+        "nome": "Acudir os Moribundos",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Badalar Fúnebre",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Chama Sagrada",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Luz",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Orientação",
+        "escola": "Adivinhação",
+        "especial": "C"
+      },
+      {
+        "nome": "Palavra de Radiância",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Reparar",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Resistência",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Taumaturgia",
+        "escola": "Transmutação",
+        "especial": "—"
+      }
+    ],
+    "1º Círculo": [
+      {
+        "nome": "Bênção",
+        "escola": "Encantamento",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Comando",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Criar ou Destruir Água",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Curar Ferimentos",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Detectar Magia",
+        "escola": "Adivinhação",
+        "especial": "C, R"
+      },
+      {
+        "nome": "Detectar o Bem e o Mal",
+        "escola": "Adivinhação",
+        "especial": "C"
+      },
+      {
+        "nome": "Detectar Veneno e Doença",
+        "escola": "Adivinhação",
+        "especial": "C, R"
+      },
+      {
+        "nome": "Escudo da Fé",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Infligir Ferimentos",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Palavra Curativa",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Perdição",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Proteção Contra o Bem e o Mal",
+        "escola": "Abjuração",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Purificar Alimentos e Bebidas",
+        "escola": "Transmutação",
+        "especial": "R"
+      },
+      {
+        "nome": "Raio Guia",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Santuário",
+        "escola": "Abjuração",
+        "especial": "—"
+      }
+    ],
+    "2º Círculo": [
+      {
+        "nome": "Acalmar Emoções",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Aprimorar Atributo",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Arma Espiritual",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Augúrio",
+        "escola": "Adivinhação",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Auxílio",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Cegueira/Surdez",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Chama Contínua",
+        "escola": "Evocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Encontrar Armadilhas",
+        "escola": "Adivinhação",
+        "especial": "—"
+      },
+      {
+        "nome": "Localizar Objeto",
+        "escola": "Adivinhação",
+        "especial": "C"
+      },
+      {
+        "nome": "Oração de Cura",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Paralisar Pessoa",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Proteção Contra Veneno",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Repouso Tranquilo",
+        "escola": "Necromancia",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Restauração Menor",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Silêncio",
+        "escola": "Ilusão",
+        "especial": "C, R"
+      },
+      {
+        "nome": "Vínculo de Proteção",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Zona da Verdade",
+        "escola": "Encantamento",
+        "especial": "—"
+      }
+    ],
+    "3º Círculo": [
+      {
+        "nome": "Animar Mortos",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Aura de Vitalidade",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Caminhar Sobre as Águas",
+        "escola": "Transmutação",
+        "especial": "R"
+      },
+      {
+        "nome": "Círculo Mágico",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Clarividência",
+        "escola": "Adivinhação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Criar Comida e Água",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Dissipar Magia",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Falar com Mortos",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Glifo de Proteção",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Guardiões Espirituais",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Línguas",
+        "escola": "Adivinhação",
+        "especial": "—"
+      },
+      {
+        "nome": "Luz do Dia",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Mesclar-se às Rochas",
+        "escola": "Transmutação",
+        "especial": "R"
+      },
+      {
+        "nome": "Palavra Curativa em Massa",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Proteção Contra Energia",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Remeter",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Remover Maldição",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Revivificar",
+        "escola": "Necromancia",
+        "especial": "M"
+      },
+      {
+        "nome": "Rogar Maldição",
+        "escola": "Necromancia",
+        "especial": "C"
+      },
+      {
+        "nome": "Simular Morte",
+        "escola": "Necromancia",
+        "especial": "R"
+      },
+      {
+        "nome": "Sinal de Esperança",
+        "escola": "Abjuração",
+        "especial": "C"
+      }
+    ],
+    "4º Círculo": [
+      {
+        "nome": "Aura de Pureza",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Aura de Vida",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Banimento",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Controlar Água",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Defensor da Fé",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Localizar Criatura",
+        "escola": "Adivinhação",
+        "especial": "C"
+      },
+      {
+        "nome": "Moldar Rochas",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Movimentação Livre",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Presságio",
+        "escola": "Adivinhação",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Proteção Contra a Morte",
+        "escola": "Abjuração",
+        "especial": "—"
+      }
+    ],
+    "5º Círculo": [
+      {
+        "nome": "Âncora Planar",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Círculo de Poder",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Coluna de Chamas",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Comunhão",
+        "escola": "Adivinhação",
+        "especial": "R"
+      },
+      {
+        "nome": "Consagrar",
+        "escola": "Evocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Contágio",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Convocar Celestial",
+        "escola": "Invocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Curar Ferimentos em Massa",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Dissipar o Bem e o Mal",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Lendas e Histórias",
+        "escola": "Adivinhação",
+        "especial": "M"
+      },
+      {
+        "nome": "Missão",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Praga de Insetos",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Restauração Maior",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Reviver os Mortos",
+        "escola": "Necromancia",
+        "especial": "M"
+      },
+      {
+        "nome": "Vidência",
+        "escola": "Adivinhação",
+        "especial": "C, M"
+      }
+    ],
+    "6º Círculo": [
+      {
+        "nome": "Aliado Extraplanar",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Banquete de Heróis",
+        "escola": "Invocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Barreira de Lâminas",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Criar Mortos-Vivos",
+        "escola": "Necromancia",
+        "especial": "M"
+      },
+      {
+        "nome": "Cura Completa",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Encontrar o Caminho",
+        "escola": "Adivinhação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Moléstia",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Palavra de Regresso",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Proibição",
+        "escola": "Abjuração",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Raio Solar",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Visão da Verdade",
+        "escola": "Adivinhação",
+        "especial": "M"
+      }
+    ],
+    "7º Círculo": [
+      {
+        "nome": "Forma Etérea",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Invocar Celestial",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Palavra de Poder: Fortificar",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Palavra Sagrada",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Regeneração",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Ressurreição",
+        "escola": "Necromancia",
+        "especial": "M"
+      },
+      {
+        "nome": "Símbolo",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Tempestade de Fogo",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Transição Planar",
+        "escola": "Invocação",
+        "especial": "M"
+      }
+    ],
+    "8º Círculo": [
+      {
+        "nome": "Aura Sagrada",
+        "escola": "Abjuração",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Campo Antimagia",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Controlar o Clima",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Explosão Solar",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Terremoto",
+        "escola": "Transmutação",
+        "especial": "C"
+      }
+    ],
+    "9º Círculo": [
+      {
+        "nome": "Cura Completa em Massa",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Palavra de Poder: Salvar",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Portal",
+        "escola": "Invocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Projeção Astral",
+        "escola": "Necromancia",
+        "especial": "C"
+      },
+      {
+        "nome": "Ressurreição Verdadeira",
+        "escola": "Necromancia",
+        "especial": "M"
+      }
+    ]
+  }
+}

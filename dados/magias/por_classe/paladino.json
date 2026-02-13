@@ -1,0 +1,261 @@
+{
+  "classe": "Paladino",
+  "total_magias": 51,
+  "magias": [
+    {
+      "nome": "Bênção",
+      "circulo": 1,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Comando",
+      "circulo": 1,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Curar Ferimentos",
+      "circulo": 1,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Destruição Cauterizante",
+      "circulo": 1,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Destruição Colérica",
+      "circulo": 1,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Destruição Divina",
+      "circulo": 1,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Destruição Estrondosa",
+      "circulo": 1,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Detectar Magia",
+      "circulo": 1,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Detectar Veneno e Doença",
+      "circulo": 1,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Detectar o Bem e o Mal",
+      "circulo": 1,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Duelo Compelido",
+      "circulo": 1,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Escudo da Fé",
+      "circulo": 1,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Favor Divino",
+      "circulo": 1,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Heroísmo",
+      "circulo": 1,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Proteção Contra o Bem e o Mal",
+      "circulo": 1,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Purificar Alimentos e Bebidas",
+      "circulo": 1,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Arma Mágica",
+      "circulo": 2,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Auxílio",
+      "circulo": 2,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Convocar Montaria",
+      "circulo": 2,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Destruição Radiante",
+      "circulo": 2,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Localizar Objeto",
+      "circulo": 2,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Oração de Cura",
+      "circulo": 2,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Proteção Contra Veneno",
+      "circulo": 2,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Repouso Tranquilo",
+      "circulo": 2,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Restauração Menor",
+      "circulo": 2,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Vínculo de Proteção",
+      "circulo": 2,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Zona da Verdade",
+      "circulo": 2,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Arma Elemental",
+      "circulo": 3,
+      "escola": "Transmutação"
+    },
+    {
+      "nome": "Aura de Vitalidade",
+      "circulo": 3,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Criar Comida e Água",
+      "circulo": 3,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Círculo Mágico",
+      "circulo": 3,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Destruição Cegante",
+      "circulo": 3,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Dissipar Magia",
+      "circulo": 3,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Luz do Dia",
+      "circulo": 3,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Manto do Cruzado",
+      "circulo": 3,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Remover Maldição",
+      "circulo": 3,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Revivificar",
+      "circulo": 3,
+      "escola": "Necromancia"
+    },
+    {
+      "nome": "Aura de Pureza",
+      "circulo": 4,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Aura de Vida",
+      "circulo": 4,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Banimento",
+      "circulo": 4,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Destruição Atordoante",
+      "circulo": 4,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Localizar Criatura",
+      "circulo": 4,
+      "escola": "Adivinhação"
+    },
+    {
+      "nome": "Proteção Contra a Morte",
+      "circulo": 4,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Convocar Celestial",
+      "circulo": 5,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Círculo de Poder",
+      "circulo": 5,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Destruição Banidora",
+      "circulo": 5,
+      "escola": "Invocação"
+    },
+    {
+      "nome": "Dissipar o Bem e o Mal",
+      "circulo": 5,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Missão",
+      "circulo": 5,
+      "escola": "Encantamento"
+    },
+    {
+      "nome": "Onda Destrutiva",
+      "circulo": 5,
+      "escola": "Evocação"
+    },
+    {
+      "nome": "Restauração Maior",
+      "circulo": 5,
+      "escola": "Abjuração"
+    },
+    {
+      "nome": "Reviver os Mortos",
+      "circulo": 5,
+      "escola": "Necromancia"
+    }
+  ]
+}
