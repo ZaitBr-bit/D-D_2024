@@ -1678,6 +1678,13 @@ function renderSheetInvItem(item, idx) {
     profBadge = sheetBadgeProf(sheetTemProfArmadura({ categoria: item.dados.categoria, nome: item.nome }));
   }
 
+  // Badge de tipo de uso (consumível, equipamento, etc.)
+  let tipoBadge = '';
+  const tipoUso = item.dados?.tipo_uso || '';
+  if (tipoUso === 'consumivel') {
+    tipoBadge = '<span class="badge" style="font-size:0.6rem;background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7">Consumível</span>';
+  }
+
   // Calcular bônus de ataque para armas
   let ataqueInfo = '';
   if (item.tipo === 'arma' && item.dados) {
@@ -1702,12 +1709,18 @@ function renderSheetInvItem(item, idx) {
     ataqueInfo = `<span class="badge badge-secondary" style="font-size:0.65rem">Atq ${fmtMod(bonusAtq)}</span>`;
   }
 
+  // Descrição curta do item
+  const descCurta = item.dados?.descricao || item.descricao || '';
+  const descPreview = descCurta && item.tipo === 'equipamento'
+    ? `<div class="inv-item-detalhe" style="font-size:0.7rem;color:var(--text-muted);margin-top:1px">${descCurta.length > 80 ? descCurta.substring(0, 80) + '…' : descCurta}</div>`
+    : '';
+
   return `
     <div class="inv-item ${item.equipado ? 'inv-item-equipado' : ''}" data-idx="${idx}" draggable="true">
       <div class="inv-drag-handle no-print" title="Arrastar para reordenar">&#9776;</div>
       <div style="flex:1;cursor:pointer" data-info-inv-sheet="${idx}" title="Ver detalhes">
         <div class="inv-item-nome">
-          ${item.nome} ${profBadge} ${ataqueInfo}
+          ${item.nome} ${profBadge} ${ataqueInfo} ${tipoBadge}
           ${item.quantidade > 1 ? `<span style="color:var(--text-muted)">(x${item.quantidade})</span>` : ''}
         </div>
         <div class="inv-item-detalhe">
@@ -1718,6 +1731,7 @@ function renderSheetInvItem(item, idx) {
           ${item.tipo === 'customizado' ? `${item.descricao || ''}` : ''}
           ${item.tipo === 'generico' ? `${item.descricao || ''}` : ''}
         </div>
+        ${descPreview}
       </div>
       <div class="inv-item-acoes no-print">
         <button class="btn btn-sm btn-icon inv-btn-mover" data-sheet-move="${idx}" data-dir="up" title="Mover para cima">&uarr;</button>
@@ -1987,8 +2001,15 @@ async function mostrarDetalheItemSheet(item) {
     corpo += `</div>`;
   } else {
     const d = item.dados || {};
+    if (d.tipo_uso) {
+      const tipoLabel = d.tipo_uso === 'consumivel' ? '🧪 Consumível' : '🎒 Equipamento';
+      corpo += `<div style="font-size:0.85rem;margin-bottom:6px"><span class="badge" style="font-size:0.7rem;background:${d.tipo_uso === 'consumivel' ? '#e8f5e9;color:#2e7d32' : '#e3f2fd;color:#1565c0'}">${tipoLabel}</span></div>`;
+    }
     if (d.custo || d.peso) {
       corpo += `<div style="font-size:0.85rem"><strong>Custo:</strong> ${d.custo || '—'} | <strong>Peso:</strong> ${d.peso || '—'}</div>`;
+    }
+    if (d.descricao) {
+      corpo += `<div class="md-content" style="margin-top:6px;font-size:0.85rem">${mdParaHtml(d.descricao)}</div>`;
     }
     if (item.descricao) {
       corpo += `<div class="md-content" style="margin-top:6px;font-size:0.85rem">${mdParaHtml(item.descricao)}</div>`;
@@ -2085,7 +2106,9 @@ async function mostrarSeletorCategoria() {
         itens = consumiveis.map(i => ({
           nome: i.nome,
           detalhe: `${i.custo} | ${i.peso || '\u2014'}`,
-          badge: '', badgeCat: '',
+          detalhe2: i.descricao ? (i.descricao.length > 80 ? i.descricao.substring(0, 80) + '…' : i.descricao) : '',
+          badge: '<span class="badge" style="font-size:0.6rem;background:#e8f5e9;color:#2e7d32">Consumível</span>',
+          badgeCat: '',
           dados: i,
           tipo: 'equipamento'
         }));
