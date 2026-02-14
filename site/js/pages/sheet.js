@@ -497,8 +497,7 @@ async function abrirModalLevelUp() {
   let subclassesDisponiveis = [];
   if (precisaSubclasse && classeData && classeData.subclasses) {
     subclassesDisponiveis = classeData.subclasses
-      .map(sc => sc.nome)
-      .filter(nome => !nome.toLowerCase().startsWith('subclasses de'));
+      .filter(sc => !sc.nome.toLowerCase().startsWith('subclasses de'));
   }
   
   let conteudoModal = `
@@ -524,12 +523,25 @@ async function abrirModalLevelUp() {
     conteudoModal += `
       <div class="form-group">
         <label class="form-label" style="color:var(--warning);font-weight:700">⚠ Escolha de Subclasse Obrigatória</label>
-        <select class="form-input" id="levelup-subclasse">
-          <option value="">-- Selecione uma subclasse --</option>
-          ${subclassesDisponiveis.map(nome => `<option value="${nome}">${nome}</option>`).join('')}
-        </select>
-        <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">
-          No nível 3, você deve escolher uma subclasse de ${char.classe}.
+        <input type="hidden" id="levelup-subclasse" value="">
+        <div id="levelup-subclasses-lista" style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+          ${subclassesDisponiveis.map((sc, idx) => {
+            const featsNivel3 = (sc.caracteristicas || []).filter(c => c.nivel === 3);
+            return `
+              <div class="levelup-subclasse-card" data-subclasse="${sc.nome}" data-idx="${idx}"
+                   style="border:2px solid var(--border-light);border-radius:8px;padding:12px;cursor:pointer;transition:border-color 0.2s,background 0.2s">
+                <div style="font-weight:700;font-size:1rem;margin-bottom:4px">${sc.nome}</div>
+                <div style="font-size:0.82rem;color:var(--text-muted)">
+                  ${featsNivel3.map(f => `<div style="margin-top:4px"><strong>${f.nome}:</strong> ${f.descricao.length > 120 ? f.descricao.substring(0, 120) + '…' : f.descricao}</div>`).join('')}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+        <div id="levelup-subclasse-detalhe" style="margin-top:12px;display:none;background:var(--surface-variant);border-radius:8px;padding:12px;font-size:0.85rem">
+        </div>
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px">
+          Clique em uma subclasse para selecioná-la e ver todos os detalhes.
         </div>
       </div>
     `;
@@ -569,6 +581,40 @@ async function abrirModalLevelUp() {
   
   abrirModal(`⬆ Level Up para Nivel ${nivelNovo}`, conteudoModal, 
     '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-accent" id="btn-confirmar-levelup">Confirmar Level Up</button>');
+  
+  // Eventos de seleção de subclasse
+  if (precisaSubclasse) {
+    document.querySelectorAll('.levelup-subclasse-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const nome = card.dataset.subclasse;
+        const idx = parseInt(card.dataset.idx);
+        document.getElementById('levelup-subclasse').value = nome;
+        // Destacar card selecionado
+        document.querySelectorAll('.levelup-subclasse-card').forEach(c => {
+          c.style.borderColor = 'var(--border-light)';
+          c.style.background = 'transparent';
+        });
+        card.style.borderColor = 'var(--accent)';
+        card.style.background = 'var(--surface-variant)';
+        // Mostrar detalhes completos da subclasse selecionada
+        const sc = subclassesDisponiveis[idx];
+        const detalheEl = document.getElementById('levelup-subclasse-detalhe');
+        if (sc && detalheEl) {
+          const feats = sc.caracteristicas || [];
+          detalheEl.innerHTML = `
+            <div style="font-weight:700;font-size:1rem;margin-bottom:8px;color:var(--accent)">${sc.nome}</div>
+            ${feats.map(f => `
+              <div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border-light)">
+                <div style="font-weight:600;font-size:0.9rem">${f.nome} <span style="color:var(--text-muted);font-weight:400">(Nível ${f.nivel})</span></div>
+                <div style="margin-top:2px">${f.descricao}</div>
+              </div>
+            `).join('')}
+          `;
+          detalheEl.style.display = 'block';
+        }
+      });
+    });
+  }
   
   // Validação de pontos de atributo
   if (ganhaAumentoAtributo) {
