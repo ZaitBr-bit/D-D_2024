@@ -76,7 +76,7 @@ function renderFichaCompleta() {
           <div style="display:flex;gap:4px">
             <button class="btn btn-sm btn-secondary" id="btn-edit-header">Editar</button>
           </div>
-          ${podeSubirDeNivel(char) && char.nivel < 20 ? `
+          ${char.nivel < 20 ? `
             <button class="btn btn-sm btn-accent" id="btn-levelup" style="font-weight:700">
               ⬆ Level Up! (Nivel ${char.nivel + 1})
             </button>
@@ -382,7 +382,13 @@ function setupEventosEdicao() {
         </div>
         <div class="col">
           <label class="form-label">Subclasse</label>
-          <input type="text" class="form-input" id="edit-sub" value="${char.subclasse || ''}">
+          <select class="form-input" id="edit-sub">
+            <option value="">-- Nenhuma --</option>
+            ${(classeData?.subclasses || [])
+              .map(sc => sc.nome)
+              .filter(nome => !nome.toLowerCase().startsWith('subclasses de'))
+              .map(nome => `<option value="${nome}" ${char.subclasse === nome ? 'selected' : ''}>${nome}</option>`).join('')}
+          </select>
         </div>
       </div>
       <div class="section-divider mt-2"><span>Atributos</span></div>
@@ -480,12 +486,27 @@ async function abrirModalLevelUp() {
   const hpGanho = Math.floor(info.dado_vida / 2) + 1 + modCon;
   
   // Importar funções do levelup
-  const { obterCaracteristicasNivel, obterCaracteristicasEspecieNivel, concedeAumentoAtributo, exigeSubclasse } = await import('../levelup.js');
+  const { obterCaracteristicasNivel, obterCaracteristicasEspecieNivel, obterCaracteristicasSubclasseNivel, obterMagiasDominioNivel, concedeAumentoAtributo, exigeSubclasse } = await import('../levelup.js');
   
   const caracteristicas = await obterCaracteristicasNivel(char.classe, nivelNovo);
   const caracteristicasEspecie = await obterCaracteristicasEspecieNivel(char.especie, nivelNovo);
   const ganhaAumentoAtributo = concedeAumentoAtributo(char.classe, nivelNovo);
   const precisaSubclasse = exigeSubclasse(char.classe, nivelNovo) && !char.subclasse;
+  
+  // Obter características da subclasse para este nível (se já tem subclasse)
+  const caracteristicasSubclasse = char.subclasse 
+    ? await obterCaracteristicasSubclasseNivel(char.classe, char.subclasse, nivelNovo)
+    : [];
+  const magiasDominioNivel = char.subclasse
+    ? await obterMagiasDominioNivel(char.classe, char.subclasse, nivelNovo)
+    : [];
+  
+  // Carregar lista de subclasses da classe se necessário
+  let subclassesDisponiveis = [];
+  if (precisaSubclasse && classeData && classeData.subclasses) {
+    subclassesDisponiveis = classeData.subclasses
+      .filter(sc => !sc.nome.toLowerCase().startsWith('subclasses de'));
+  }
   
   let conteudoModal = `
     <div style="text-align:center;margin-bottom:16px">
@@ -505,14 +526,60 @@ async function abrirModalLevelUp() {
     </div>
   `;
   
+  // Mostrar características da subclasse para este nível (se já tem subclasse)
+  if (caracteristicasSubclasse.length > 0) {
+    conteudoModal += `
+      <div class="card" style="background:var(--surface-variant);margin-bottom:12px">
+        <div style="font-weight:700;margin-bottom:8px;color:var(--accent)">Características de Subclasse — ${char.subclasse}</div>
+        ${caracteristicasSubclasse.map(f => `
+          <div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border-light)">
+            <div style="font-weight:600;font-size:0.9rem">${f.nome}</div>
+            <div style="font-size:0.85rem;margin-top:2px">${f.descricao}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+  
+  // Mostrar magias de domínio que serão adicionadas automaticamente
+  if (magiasDominioNivel.length > 0) {
+    conteudoModal += `
+      <div class="card" style="background:var(--surface-variant);margin-bottom:12px">
+        <div style="font-weight:700;margin-bottom:8px;color:var(--accent)">🔮 Magias de Domínio — Adicionadas Automaticamente</div>
+        <ul style="margin:0;padding-left:20px;font-size:0.9rem">
+          ${magiasDominioNivel.map(m => `<li><strong>${m.nome}</strong> (${m.circulo}º círculo)</li>`).join('')}
+        </ul>
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px">
+          Essas magias são sempre preparadas e não contam no limite de magias preparadas.
+        </div>
+      </div>
+    `;
+  }
+  
   // Se precisa escolher subclasse
   if (precisaSubclasse) {
     conteudoModal += `
       <div class="form-group">
         <label class="form-label" style="color:var(--warning);font-weight:700">⚠ Escolha de Subclasse Obrigatória</label>
-        <input type="text" class="form-input" id="levelup-subclasse" placeholder="Digite o nome da subclasse escolhida">
-        <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">
-          No nível 3, você deve escolher uma subclasse. Consulte o livro do jogador para opções.
+        <input type="hidden" id="levelup-subclasse" value="">
+        <div id="levelup-subclasses-lista" style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+          ${subclassesDisponiveis.map((sc, idx) => {
+            const featsNivel3 = (sc.caracteristicas || []).filter(c => c.nivel === 3);
+            return `
+              <div class="levelup-subclasse-card" data-subclasse="${sc.nome}" data-idx="${idx}"
+                   style="border:2px solid var(--border-light);border-radius:8px;padding:12px;cursor:pointer;transition:border-color 0.2s,background 0.2s">
+                <div style="font-weight:700;font-size:1rem;margin-bottom:4px">${sc.nome}</div>
+                <div style="font-size:0.82rem;color:var(--text-muted)">
+                  ${featsNivel3.map(f => `<div style="margin-top:4px"><strong>${f.nome}:</strong> ${f.descricao.length > 120 ? f.descricao.substring(0, 120) + '…' : f.descricao}</div>`).join('')}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+        <div id="levelup-subclasse-detalhe" style="margin-top:12px;display:none;background:var(--surface-variant);border-radius:8px;padding:12px;font-size:0.85rem">
+        </div>
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px">
+          Clique em uma subclasse para selecioná-la e ver todos os detalhes.
         </div>
       </div>
     `;
@@ -553,6 +620,40 @@ async function abrirModalLevelUp() {
   abrirModal(`⬆ Level Up para Nivel ${nivelNovo}`, conteudoModal, 
     '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-accent" id="btn-confirmar-levelup">Confirmar Level Up</button>');
   
+  // Eventos de seleção de subclasse
+  if (precisaSubclasse) {
+    document.querySelectorAll('.levelup-subclasse-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const nome = card.dataset.subclasse;
+        const idx = parseInt(card.dataset.idx);
+        document.getElementById('levelup-subclasse').value = nome;
+        // Destacar card selecionado
+        document.querySelectorAll('.levelup-subclasse-card').forEach(c => {
+          c.style.borderColor = 'var(--border-light)';
+          c.style.background = 'transparent';
+        });
+        card.style.borderColor = 'var(--accent)';
+        card.style.background = 'var(--surface-variant)';
+        // Mostrar detalhes completos da subclasse selecionada
+        const sc = subclassesDisponiveis[idx];
+        const detalheEl = document.getElementById('levelup-subclasse-detalhe');
+        if (sc && detalheEl) {
+          const feats = sc.caracteristicas || [];
+          detalheEl.innerHTML = `
+            <div style="font-weight:700;font-size:1rem;margin-bottom:8px;color:var(--accent)">${sc.nome}</div>
+            ${feats.map(f => `
+              <div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border-light)">
+                <div style="font-weight:600;font-size:0.9rem">${f.nome} <span style="color:var(--text-muted);font-weight:400">(Nível ${f.nivel})</span></div>
+                <div style="margin-top:2px">${f.descricao}</div>
+              </div>
+            `).join('')}
+          `;
+          detalheEl.style.display = 'block';
+        }
+      });
+    });
+  }
+  
   // Validação de pontos de atributo
   if (ganhaAumentoAtributo) {
     const selects = ATRIBUTOS_KEYS.map(key => document.getElementById(`levelup-attr-${key}`));
@@ -567,7 +668,7 @@ async function abrirModalLevelUp() {
   
   // Confirmar level up
   document.getElementById('btn-confirmar-levelup')?.addEventListener('click', async () => {
-    const opcoes = {};
+    const opcoes = { ignorar_xp: true };
     
     // Validar subclasse se necessário
     if (precisaSubclasse) {
@@ -615,6 +716,8 @@ async function abrirModalLevelUp() {
             <li>+${resultado.hp_ganho} HP (Total: ${char.pv_max})</li>
             ${resultado.subclasse_escolhida ? `<li>Subclasse: ${resultado.subclasse_escolhida}</li>` : ''}
             ${resultado.aumentos_aplicados ? `<li>Atributos aumentados</li>` : ''}
+            ${(resultado.caracteristicas_subclasse || []).length > 0 ? resultado.caracteristicas_subclasse.map(f => `<li><strong>[${char.subclasse}]</strong> ${f.nome}</li>`).join('') : ''}
+            ${(resultado.magias_dominio_adicionadas || []).length > 0 ? `<li>🔮 Magias de domínio adicionadas: ${resultado.magias_dominio_adicionadas.map(m => m.nome).join(', ')}</li>` : ''}
           </ul>
         </div>
       `;
