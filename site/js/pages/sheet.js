@@ -838,8 +838,24 @@ function renderFeatureItem(f, source) {
 
 function renderSecaoCaracteristicas() {
   if (!classeData?.caracteristicas?.length) return '';
-  const feats = classeData.caracteristicas.filter(c => c.nivel <= char.nivel);
+  let feats = classeData.caracteristicas.filter(c => c.nivel <= char.nivel);
   if (!feats.length) return '';
+
+  // Filtrar features de subclasses não selecionadas (evitar duplicatas)
+  if (classeData.subclasses?.length) {
+    const outrasSubclasses = classeData.subclasses.filter(s => s.nome !== char.subclasse);
+    const featsOutras = new Set();
+    outrasSubclasses.forEach(sc => {
+      (sc.caracteristicas || []).forEach(f => featsOutras.add(f.nome));
+    });
+    // Manter somente features que não pertencem exclusivamente a outra subclasse
+    const featsSelecionada = new Set();
+    if (char.subclasse) {
+      const scAtual = classeData.subclasses.find(s => s.nome === char.subclasse);
+      (scAtual?.caracteristicas || []).forEach(f => featsSelecionada.add(f.nome));
+    }
+    feats = feats.filter(f => !featsOutras.has(f.nome) || featsSelecionada.has(f.nome));
+  }
 
   const passivas = feats.filter(f => !ehHabilidadeAtiva(f.descricao));
   const ativas = feats.filter(f => ehHabilidadeAtiva(f.descricao));
