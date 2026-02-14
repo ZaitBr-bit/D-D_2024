@@ -182,12 +182,20 @@ export function getTamanho(especieTexto) {
 
 // --- Renderizador simples de Markdown ---
 
+/** Formata notação de dados (ex: 3d6, 2D8) como 🎲3d6🎲 */
+export function formatarDados(texto) {
+  if (!texto) return texto;
+  return texto.replace(/(\d+)[dD](\d+)/g, '🎲$1d$2🎲');
+}
+
 /** Converte markdown básico para HTML */
 export function mdParaHtml(texto) {
   if (!texto) return '';
   let html = texto
     // Escapar HTML
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    // Formatar dados (🎲XdY🎲) antes de outras transformações
+    .replace(/(\d+)[dD](\d+)/g, '🎲$1d$2🎲')
     // Headers
     .replace(/^#### (.+)$/gm, '<h4>$1</h4>')
     .replace(/^### (.+)$/gm, '<h3>$1</h3>')

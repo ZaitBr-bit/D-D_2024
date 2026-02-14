@@ -3,14 +3,15 @@
 // ============================================================
 import { CLASSES_INFO, PERICIAS, ATRIBUTOS_NOMES, ATRIBUTOS_KEYS, ATRIBUTO_NOME_PARA_KEY } from '../dados-classes.js';
 import { getPersonagem, salvarPersonagem, removerPersonagem } from '../store.js';
-import { getClasse, getMagiasClasse, getMagiasPorCirculo, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura } from '../db.js';
-import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagia, calcPercepcaoPassiva, calcBonusPericia, calcPVTotal, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, gerarId, detectarRecarga, ehHabilidadeAtiva } from '../utils.js';
+import { getClasse, getMagiasClasse, getMagiasPorCirculo, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura, getTalentos } from '../db.js';
+import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagia, calcPercepcaoPassiva, calcBonusPericia, calcPVTotal, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, gerarId, detectarRecarga, ehHabilidadeAtiva, formatarDados } from '../utils.js';
 import { podeSubirDeNivel, subirDeNivel, XP_POR_NIVEL, adicionarXP } from '../levelup.js';
 
 let char = null;
 let containerRef = null;
 let classeData = null;
 let indiceMagiasCache = null;
+let talentosCache = null;
 
 export async function renderSheet(container, charId) {
   containerRef = container;
@@ -32,6 +33,7 @@ export async function renderSheet(container, charId) {
   classeData = await getClasse(char.classe);
   const indiceData = await getIndiceMagias();
   indiceMagiasCache = indiceData?.magias || [];
+  talentosCache = await getTalentos();
 
   renderFichaCompleta();
 
@@ -120,30 +122,34 @@ function renderFichaCompleta() {
       <div style="display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap">
         <div style="text-align:center">
           <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--text-muted)">Pontos de Vida</div>
-          <div class="counter no-print">
-            <button class="counter-btn" id="hp-minus">-</button>
-            <span class="counter-value" style="color:${char.pv_atual <= char.pv_max * 0.25 ? 'var(--danger)' : char.pv_atual <= char.pv_max * 0.5 ? 'var(--warning)' : 'var(--success)'}">
-              ${char.pv_atual}
-            </span>
-            <button class="counter-btn" id="hp-plus">+</button>
+          <div style="font-size:1.3rem;font-weight:800;color:${char.pv_atual <= (char.pv_max_override || char.pv_max) * 0.25 ? 'var(--danger)' : char.pv_atual <= (char.pv_max_override || char.pv_max) * 0.5 ? 'var(--warning)' : 'var(--success)'}">
+            ${char.pv_atual} / ${char.pv_max_override || char.pv_max}
           </div>
-          <div style="font-size:0.75rem;color:var(--text-muted)">/ ${char.pv_max}</div>
-          <!-- Para impressão -->
-          <div class="hidden" style="font-size:1.3rem;font-weight:800">${char.pv_atual} / ${char.pv_max}</div>
+          ${char.pv_max_override && char.pv_max_override !== char.pv_max ? `<div style="font-size:0.7rem;color:var(--info)">(Base: ${char.pv_max} | Bônus: +${char.pv_max_override - char.pv_max})</div>` : ''}
+          <div class="no-print" style="display:flex;gap:6px;justify-content:center;margin-top:6px">
+            <button class="btn btn-sm btn-danger" id="hp-minus">Dano</button>
+            <button class="btn btn-sm btn-success" id="hp-plus">Cura</button>
+            <button class="btn btn-sm btn-secondary" id="hp-temp">PV Temp</button>
+            <button class="btn btn-sm btn-secondary" id="hp-max-override" title="Sobrescrever PV Máximo">⚙ PV Max</button>
+          </div>
         </div>
         <div style="text-align:center">
-          <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--text-muted)">PV Temporario</div>
-          <div class="counter no-print">
-            <button class="counter-btn" id="temp-minus">-</button>
-            <span class="counter-value">${char.pv_temporario || 0}</span>
-            <button class="counter-btn" id="temp-plus">+</button>
-          </div>
+          <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--text-muted)">PV Temporário</div>
+          <div style="font-size:1rem;font-weight:700;color:var(--info)">${char.pv_temporario || 0}</div>
         </div>
         <div style="text-align:center">
           <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--text-muted)">Dados de Vida</div>
-          <div style="font-size:1rem;font-weight:700">${char.nivel - (char.dados_vida_usados || 0)}d${info.dado_vida || '?'} / ${char.nivel}</div>
+          <div style="font-size:1rem;font-weight:700">${char.nivel - (char.dados_vida_usados || 0)} / ${char.nivel} 🎲d${info.dado_vida || '?'}🎲</div>
           <button class="btn btn-sm btn-secondary no-print" id="btn-usar-dv" style="margin-top:4px">Usar DV</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Descansos -->
+    <div class="card no-print">
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-accent" id="btn-descanso-curto">☀ Descanso Curto</button>
+        <button class="btn btn-accent" id="btn-descanso-longo">🌙 Descanso Longo</button>
       </div>
     </div>
 
@@ -226,8 +232,6 @@ function renderFichaCompleta() {
     <!-- Ações da ficha -->
     <div class="card no-print mt-3">
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-        <button class="btn btn-accent" id="btn-descanso-curto">Descanso Curto</button>
-        <button class="btn btn-accent" id="btn-descanso-longo">Descanso Longo</button>
         <button class="btn btn-danger btn-sm" id="btn-excluir-char">Excluir Personagem</button>
       </div>
     </div>
@@ -244,13 +248,16 @@ function renderFichaCompleta() {
 
 // --- HP e Dados de Vida ---
 function setupEventosHP() {
+  const pvMax = char.pv_max_override || char.pv_max;
+
   document.getElementById('hp-minus')?.addEventListener('click', () => {
     abrirModal('Dano Recebido',
-      '<div class="form-group"><label class="form-label">Valor do dano</label><input type="number" class="form-input" id="input-dano" value="1" min="1" autofocus></div>',
+      `<div class="form-group"><label class="form-label">Valor do dano</label><input type="number" class="form-input" id="input-dano" placeholder="Informe o dano" min="1" autofocus></div>`,
       '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-danger" id="btn-aplicar-dano">Aplicar Dano</button>'
     );
     document.getElementById('btn-aplicar-dano')?.addEventListener('click', () => {
       let dano = parseInt(document.getElementById('input-dano')?.value) || 0;
+      if (dano <= 0) return;
       // Absorver pelo PV temporário primeiro
       if (char.pv_temporario > 0) {
         const absorvido = Math.min(dano, char.pv_temporario);
@@ -266,28 +273,68 @@ function setupEventosHP() {
 
   document.getElementById('hp-plus')?.addEventListener('click', () => {
     abrirModal('Cura',
-      '<div class="form-group"><label class="form-label">Valor da cura</label><input type="number" class="form-input" id="input-cura" value="1" min="1" autofocus></div>',
+      `<div class="form-group"><label class="form-label">Valor da cura</label><input type="number" class="form-input" id="input-cura" placeholder="Informe a cura" min="1" autofocus></div>`,
       '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-success" id="btn-aplicar-cura">Curar</button>'
     );
     document.getElementById('btn-aplicar-cura')?.addEventListener('click', () => {
       const cura = parseInt(document.getElementById('input-cura')?.value) || 0;
-      char.pv_atual = Math.min(char.pv_max, char.pv_atual + cura);
+      if (cura <= 0) return;
+      char.pv_atual = Math.min(pvMax, char.pv_atual + cura);
       salvar();
       window.fecharModal();
       renderFichaCompleta();
     });
   });
 
-  document.getElementById('temp-minus')?.addEventListener('click', () => {
-    char.pv_temporario = Math.max(0, (char.pv_temporario || 0) - 1);
-    salvar();
-    renderFichaCompleta();
+  document.getElementById('hp-temp')?.addEventListener('click', () => {
+    abrirModal('PV Temporário',
+      `<div class="form-group"><label class="form-label">Definir PV Temporário</label><input type="number" class="form-input" id="input-temp" value="${char.pv_temporario || 0}" min="0" autofocus></div>
+       <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">PV temporário não se acumula. Use o maior valor.</div>`,
+      '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-aplicar-temp">Aplicar</button>'
+    );
+    document.getElementById('btn-aplicar-temp')?.addEventListener('click', () => {
+      char.pv_temporario = Math.max(0, parseInt(document.getElementById('input-temp')?.value) || 0);
+      salvar();
+      window.fecharModal();
+      renderFichaCompleta();
+    });
   });
 
-  document.getElementById('temp-plus')?.addEventListener('click', () => {
-    char.pv_temporario = (char.pv_temporario || 0) + 1;
-    salvar();
-    renderFichaCompleta();
+  document.getElementById('hp-max-override')?.addEventListener('click', () => {
+    abrirModal('Sobrescrever PV Máximo',
+      `<div class="form-group">
+        <label class="form-label">PV Máximo Base (fixo)</label>
+        <div style="font-size:1rem;font-weight:700;margin-bottom:8px">${char.pv_max}</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">PV Máximo Atual (com bônus temporário)</label>
+        <input type="number" class="form-input" id="input-pv-max-override" value="${char.pv_max_override || char.pv_max}" min="1" autofocus>
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">
+          Use para magias que aumentam PV máximo temporariamente (ex: Ajuda, Heróis do Banquete).
+        </div>
+      </div>`,
+      `<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
+       <button class="btn btn-warning" id="btn-resetar-pv-max">Resetar</button>
+       <button class="btn btn-primary" id="btn-aplicar-pv-max">Aplicar</button>`
+    );
+    document.getElementById('btn-resetar-pv-max')?.addEventListener('click', () => {
+      delete char.pv_max_override;
+      char.pv_atual = Math.min(char.pv_atual, char.pv_max);
+      salvar();
+      window.fecharModal();
+      renderFichaCompleta();
+    });
+    document.getElementById('btn-aplicar-pv-max')?.addEventListener('click', () => {
+      const novoMax = parseInt(document.getElementById('input-pv-max-override')?.value) || char.pv_max;
+      if (novoMax !== char.pv_max) {
+        char.pv_max_override = novoMax;
+      } else {
+        delete char.pv_max_override;
+      }
+      salvar();
+      window.fecharModal();
+      renderFichaCompleta();
+    });
   });
 
   document.getElementById('btn-usar-dv')?.addEventListener('click', () => {
@@ -296,13 +343,29 @@ function setupEventosHP() {
     const dvRestantes = char.nivel - (char.dados_vida_usados || 0);
     if (dvRestantes <= 0) { toast('Sem dados de vida restantes', 'error'); return; }
     const modCon = calcMod(char.atributos.constituicao);
-    const media = Math.floor(info.dado_vida / 2) + 1;
-    const cura = Math.max(1, media + modCon);
-    char.pv_atual = Math.min(char.pv_max, char.pv_atual + cura);
-    char.dados_vida_usados = (char.dados_vida_usados || 0) + 1;
-    salvar();
-    toast(`Curou ${cura} PV (d${info.dado_vida}+${modCon})`, 'success');
-    renderFichaCompleta();
+
+    abrirModal('Usar Dados de Vida',
+      `<div class="form-group">
+        <label class="form-label">Quantos dados de vida usar?</label>
+        <input type="number" class="form-input" id="input-qtd-dv" value="1" min="1" max="${dvRestantes}" autofocus>
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">
+          Restantes: ${dvRestantes} / ${char.nivel} (🎲d${info.dado_vida}🎲 + ${modCon} CON por dado)
+        </div>
+      </div>`,
+      '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-aplicar-dv">Usar</button>'
+    );
+    document.getElementById('btn-aplicar-dv')?.addEventListener('click', () => {
+      const qtd = Math.min(dvRestantes, Math.max(1, parseInt(document.getElementById('input-qtd-dv')?.value) || 1));
+      const media = Math.floor(info.dado_vida / 2) + 1;
+      const curaPorDado = Math.max(1, media + modCon);
+      const curaTotal = curaPorDado * qtd;
+      char.pv_atual = Math.min(pvMax, char.pv_atual + curaTotal);
+      char.dados_vida_usados = (char.dados_vida_usados || 0) + qtd;
+      salvar();
+      window.fecharModal();
+      toast(`Curou ${curaTotal} PV (${qtd}x 🎲d${info.dado_vida}🎲+${modCon})`, 'success');
+      renderFichaCompleta();
+    });
   });
 }
 
@@ -329,9 +392,15 @@ function restaurarHabilidades(tipoDescanso) {
     const recarga = detectarRecarga(descricao);
     if (!recarga) return;
     if (tipoDescanso === 'longo') {
-      char.usos_habilidades[key] = false;
+      // Reset: handle both boolean and numeric usage tracking
+      char.usos_habilidades[key] = typeof char.usos_habilidades[key] === 'number' ? 0 : false;
     } else if (tipoDescanso === 'curto' && (recarga === 'curto' || recarga === 'curto_ou_longo')) {
-      char.usos_habilidades[key] = false;
+      // For short rest, restore 1 use if numeric, or reset if boolean
+      if (typeof char.usos_habilidades[key] === 'number') {
+        char.usos_habilidades[key] = Math.max(0, char.usos_habilidades[key] - 1);
+      } else {
+        char.usos_habilidades[key] = false;
+      }
     }
   });
 }
@@ -345,7 +414,8 @@ function setupEventosDescanso() {
   });
 
   document.getElementById('btn-descanso-longo')?.addEventListener('click', () => {
-    char.pv_atual = char.pv_max;
+    const pvMax = char.pv_max_override || char.pv_max;
+    char.pv_atual = pvMax;
     char.pv_temporario = 0;
     char.dados_vida_usados = Math.max(0, (char.dados_vida_usados || 0) - Math.floor(char.nivel / 2));
     // Restaurar espaços de magia
@@ -376,6 +446,7 @@ function setupEventosDescanso() {
 
 // --- Habilidades (Ativas) ---
 function setupEventosHabilidades() {
+  // Toggle simples (1 uso)
   document.querySelectorAll('[data-toggle-uso]').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -383,6 +454,25 @@ function setupEventosHabilidades() {
       const key = btn.dataset.toggleUso;
       if (!char.usos_habilidades) char.usos_habilidades = {};
       char.usos_habilidades[key] = !char.usos_habilidades[key];
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
+  // Usar habilidade com múltiplos usos
+  document.querySelectorAll('[data-usar-habilidade]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const key = btn.dataset.usarHabilidade;
+      const usosMax = parseInt(btn.dataset.usosMax) || 1;
+      if (!char.usos_habilidades) char.usos_habilidades = {};
+      const atual = typeof char.usos_habilidades[key] === 'number' ? char.usos_habilidades[key] : 0;
+      if (atual >= usosMax) {
+        toast('Usos esgotados! Descanse para recuperar.', 'error');
+        return;
+      }
+      char.usos_habilidades[key] = atual + 1;
       salvar();
       renderFichaCompleta();
     });
@@ -445,11 +535,14 @@ function setupEventosEdicao() {
         </div>
       </div>
       <div class="section-divider mt-2"><span>Atributos</span></div>
+      <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">
+        Atributos são definidos na criação e alterados via Level Up (Aumento de Atributo). Não podem ser editados livremente.
+      </div>
       <div class="atributos-grid">
         ${ATRIBUTOS_KEYS.map(key => `
           <div class="form-group" style="text-align:center">
             <label class="form-label">${ATRIBUTOS_NOMES[key]}</label>
-            <input type="number" class="form-input" style="text-align:center;font-weight:700" id="edit-attr-${key}" value="${char.atributos[key]}" min="1" max="30">
+            <div style="font-size:1.1rem;font-weight:700;padding:6px;background:var(--surface-variant);border-radius:4px">${char.atributos[key]}</div>
           </div>
         `).join('')}
       </div>
@@ -475,11 +568,6 @@ function setupEventosEdicao() {
           char.espacos_magia = getEspacosMagia(classeData.tabela_caracteristicas, novoNivel);
         }
       }
-
-      ATRIBUTOS_KEYS.forEach(key => {
-        const val = parseInt(document.getElementById(`edit-attr-${key}`)?.value);
-        if (val) char.atributos[key] = val;
-      });
 
       salvar();
       window.fecharModal();
@@ -791,25 +879,106 @@ async function abrirModalLevelUp() {
 // --- Talentos ---
 function renderSecaoTalentos() {
   if (!char.talentos?.length) return '';
+  
+  // Buscar descrições dos talentos no cache
+  const todosOsTalentos = [];
+  if (talentosCache?.por_categoria) {
+    Object.values(talentosCache.por_categoria).forEach(lista => {
+      lista.forEach(t => todosOsTalentos.push(t));
+    });
+  }
+  
   return `
     <div class="card">
       <div class="card-header"><h2>Talentos</h2></div>
-      ${char.talentos.map(t => `
-        <div style="padding:6px 0;border-bottom:1px solid var(--border-light)">
-          <strong style="font-size:0.9rem">${t}</strong>
-        </div>
-      `).join('')}
+      ${char.talentos.map(t => {
+        const nome = typeof t === 'string' ? t : t.nome;
+        const talentoData = todosOsTalentos.find(td => td.nome === nome);
+        const descricao = talentoData?.descricao || '';
+        const beneficios = talentoData?.beneficios || [];
+        
+        return `
+          <details style="margin-bottom:6px">
+            <summary style="font-weight:600;cursor:pointer;font-size:0.9rem;padding:6px 0;border-bottom:1px solid var(--border-light)">
+              ${nome}
+              ${talentoData?.categoria ? `<span class="badge badge-secondary" style="font-size:0.65rem;margin-left:4px">${talentoData.categoria}</span>` : ''}
+            </summary>
+            <div style="padding:6px 0 6px 16px;font-size:0.85rem">
+              ${descricao ? `<div class="md-content">${mdParaHtml(descricao)}</div>` : ''}
+              ${beneficios.length > 0 ? `
+                <div style="margin-top:6px">
+                  ${beneficios.map(b => `
+                    <div style="margin-bottom:4px">
+                      <strong>${b.nome}:</strong> ${mdParaHtml(b.descricao)}
+                    </div>
+                  `).join('')}
+                </div>
+              ` : ''}
+            </div>
+          </details>
+        `;
+      }).join('')}
     </div>
   `;
 }
 
 // --- Características de Classe ---
+
+/**
+ * Detecta usos máximos de uma habilidade pela descrição.
+ * Ex: "duas vezes" => 2, "três vezes" => 3
+ */
+function detectarUsosMaximos(descricao) {
+  if (!descricao) return null;
+  const d = descricao.toLowerCase();
+  const numerosTexto = { 'uma': 1, 'duas': 2, 'dois': 2, 'três': 3, 'tres': 3, 'quatro': 4, 'cinco': 5, 'seis': 6 };
+  for (const [texto, num] of Object.entries(numerosTexto)) {
+    if (d.includes(`${texto} vezes`) || d.includes(`${texto} vez`)) return num;
+  }
+  const match = d.match(/(\d+)\s*vezes/);
+  if (match) return parseInt(match[1]);
+  return null;
+}
+
+/**
+ * Detecta sub-habilidades (ex: **Centelha Divina.**, **Expulsar Mortos-Vivos.**)
+ */
+function detectarSubHabilidades(descricao) {
+  if (!descricao) return [];
+  const matches = descricao.matchAll(/\*\*([^*]+)\.\*\*/g);
+  const subs = [];
+  for (const match of matches) {
+    const nome = match[1].trim();
+    // Filtrar nomes genéricos ou de tabela
+    if (nome.length > 2 && nome.length < 60 && !nome.includes('|') && !nome.includes('Nível')) {
+      subs.push(nome);
+    }
+  }
+  return subs;
+}
+
 function renderFeatureItem(f, source) {
   const recarga = detectarRecarga(f.descricao);
   const ativa = ehHabilidadeAtiva(f.descricao);
   const key = `${source}_${f.nome}`;
   if (!char.usos_habilidades) char.usos_habilidades = {};
-  const usado = char.usos_habilidades[key] || false;
+
+  // Detectar usos máximos e sub-habilidades
+  const usosMax = detectarUsosMaximos(f.descricao);
+  const subHabilidades = detectarSubHabilidades(f.descricao);
+  const temMultiplosUsos = usosMax && usosMax > 1 && recarga;
+
+  // Para habilidades com múltiplos usos, usar contador
+  let usosAtual = 0;
+  if (temMultiplosUsos) {
+    if (typeof char.usos_habilidades[key] === 'number') {
+      usosAtual = char.usos_habilidades[key];
+    } else if (char.usos_habilidades[key] === true) {
+      usosAtual = usosMax; // Migrar de boolean para número
+      char.usos_habilidades[key] = usosMax;
+    }
+  }
+  const usado = temMultiplosUsos ? usosAtual >= usosMax : (char.usos_habilidades[key] || false);
 
   const recargaBadge = recarga
     ? `<span class="badge" style="font-size:0.65rem;margin-left:4px;background:${recarga === 'longo' ? 'var(--info)' : recarga === 'curto' ? 'var(--success)' : 'var(--warning)'};color:#fff">${recarga === 'longo' ? '🌙 Desc. Longo' : recarga === 'curto' ? '☀ Desc. Curto' : '☀🌙 Curto/Longo'}</span>`
@@ -818,6 +987,25 @@ function renderFeatureItem(f, source) {
     ? '<span class="badge" style="font-size:0.65rem;margin-left:4px;background:var(--accent);color:#fff">Ativa</span>'
     : '<span class="badge" style="font-size:0.65rem;margin-left:4px;background:var(--text-muted);color:#fff">Passiva</span>';
 
+  // Renderizar controle de usos
+  let usosHtml = '';
+  if (temMultiplosUsos) {
+    usosHtml = `
+      <div class="no-print" style="display:flex;align-items:center;gap:4px;margin-left:auto">
+        <span style="font-size:0.7rem;font-weight:600">${usosMax - usosAtual}/${usosMax}</span>
+        <button class="btn btn-sm" style="padding:2px 8px;font-size:0.7rem" data-usar-habilidade="${key}" data-usos-max="${usosMax}" onclick="event.stopPropagation()">
+          ${usosAtual >= usosMax ? '✗ Esgotado' : 'Usar'}
+        </button>
+      </div>
+    `;
+  } else if (ativa && recarga) {
+    usosHtml = `
+      <button class="btn btn-sm no-print" style="margin-left:auto;padding:2px 8px;font-size:0.7rem;${usado ? 'opacity:0.5' : ''}" data-toggle-uso="${key}" onclick="event.stopPropagation()">
+        ${usado ? '✗ Usado' : '✓ Disponível'}
+      </button>
+    `;
+  }
+
   return `
     <details style="margin-bottom:6px">
       <summary style="font-weight:600;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;flex-wrap:wrap;gap:2px">
@@ -825,13 +1013,14 @@ function renderFeatureItem(f, source) {
         ${f.nome}
         ${tipoBadge}
         ${recargaBadge}
-        ${ativa && recarga ? `
-          <button class="btn btn-sm no-print" style="margin-left:auto;padding:2px 8px;font-size:0.7rem;${usado ? 'opacity:0.5' : ''}" data-toggle-uso="${key}" onclick="event.stopPropagation()">
-            ${usado ? '✗ Usado' : '✓ Disponível'}
-          </button>
-        ` : ''}
+        ${usosHtml}
       </summary>
       <div class="md-content" style="padding:6px 0 6px 16px;font-size:0.85rem">${mdParaHtml(f.descricao)}</div>
+      ${subHabilidades.length > 0 ? `
+        <div style="padding:4px 0 4px 16px;font-size:0.8rem;color:var(--text-muted)">
+          <strong>Sub-habilidades:</strong> ${subHabilidades.join(', ')}
+        </div>
+      ` : ''}
     </details>
   `;
 }
@@ -960,6 +1149,14 @@ function renderSecaoMagias() {
   const preparadas = char.magias_preparadas || [];
   const espacos = char.espacos_magia || {};
 
+  // Agrupar magias preparadas por círculo
+  const preparadasPorCirculo = {};
+  preparadas.forEach(m => {
+    const circ = m.circulo || 1;
+    if (!preparadasPorCirculo[circ]) preparadasPorCirculo[circ] = [];
+    preparadasPorCirculo[circ].push(m);
+  });
+
   return `
     <div class="card print-break-before">
       <div class="card-header">
@@ -989,61 +1186,81 @@ function renderSecaoMagias() {
 
       <!-- Truques -->
       ${truques.length > 0 ? `
-        <div class="section-divider"><span>Truques</span></div>
-        ${truques.map(m => `
-          <div class="magia-item" data-magia-nome="${m.nome}" data-magia-circ="0">
-            <div class="magia-nome">${m.nome}</div>
-            ${badgesMagiaRapidos(m.nome)}
-            <div class="magia-desc"></div>
-          </div>
-        `).join('')}
-      ` : ''}
-
-      <!-- Magias Preparadas -->
-      ${preparadas.length > 0 ? `
-        <div class="section-divider"><span>Magias Preparadas</span></div>
-        ${preparadas.map(m => {
-          const circulos = Object.keys(espacos).filter(c => parseInt(c) >= m.circulo).sort((a, b) => parseInt(a) - parseInt(b));
-          const temUpcast = circulos.length > 1;
-          return `
-          <div class="magia-item preparada" data-magia-nome="${m.nome}" data-magia-circ="${m.circulo}">
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <div>
+        <details open style="margin-bottom:8px">
+          <summary style="font-weight:700;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--border-light)">
+            Truques (${truques.length})
+          </summary>
+          <div style="padding-top:4px">
+            ${truques.map(m => `
+              <div class="magia-item" data-magia-nome="${m.nome}" data-magia-circ="0">
                 <div class="magia-nome">${m.nome}</div>
                 ${badgesMagiaRapidos(m.nome)}
+                <div class="magia-desc"></div>
               </div>
-              <div class="no-print" style="display:flex;align-items:center;gap:4px">
-                ${temUpcast ? `
-                  <select class="form-input" data-conj-select="${m.nome}" style="width:auto;padding:2px 4px;font-size:0.75rem">
-                    ${circulos.map(c => `<option value="${c}"${c == m.circulo ? ' selected' : ''}>${c}º</option>`).join('')}
-                  </select>
-                ` : ''}
-                <button class="btn btn-sm btn-primary" data-conjurar="${m.nome}" data-conj-circ="${m.circulo}">Conjurar</button>
-              </div>
-            </div>
-            <div class="magia-desc"></div>
-          </div>`;
-        }).join('')}
+            `).join('')}
+          </div>
+        </details>
       ` : ''}
+
+      <!-- Magias Preparadas por Círculo -->
+      ${Object.keys(preparadasPorCirculo).sort((a, b) => parseInt(a) - parseInt(b)).map(circ => {
+        const magias = preparadasPorCirculo[circ];
+        return `
+        <details style="margin-bottom:8px">
+          <summary style="font-weight:700;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--border-light)">
+            ${circ}º Círculo (${magias.length})
+          </summary>
+          <div style="padding-top:4px">
+            ${magias.map(m => {
+              const circulos = Object.keys(espacos).filter(c => parseInt(c) >= m.circulo).sort((a, b) => parseInt(a) - parseInt(b));
+              const temUpcast = circulos.length > 1;
+              return `
+              <div class="magia-item preparada" data-magia-nome="${m.nome}" data-magia-circ="${m.circulo}">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div class="magia-nome">${m.nome}</div>
+                    ${badgesMagiaRapidos(m.nome)}
+                  </div>
+                  <div class="no-print" style="display:flex;align-items:center;gap:4px">
+                    ${temUpcast ? `
+                      <select class="form-input" data-conj-select="${m.nome}" style="width:auto;padding:2px 4px;font-size:0.75rem">
+                        ${circulos.map(c => `<option value="${c}"${c == m.circulo ? ' selected' : ''}>${c}º</option>`).join('')}
+                      </select>
+                    ` : ''}
+                    <button class="btn btn-sm btn-primary" data-conjurar="${m.nome}" data-conj-circ="${m.circulo}">Conjurar</button>
+                  </div>
+                </div>
+                <div class="magia-desc"></div>
+              </div>`;
+            }).join('')}
+          </div>
+        </details>`;
+      }).join('')}
 
       <!-- Magias customizadas -->
       ${(char.magias_customizadas || []).length > 0 ? `
-        <div class="section-divider"><span>Magias Customizadas</span></div>
-        ${char.magias_customizadas.map((m, i) => `
-          <div class="magia-item">
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <div>
-                <div class="magia-nome">${m.nome}</div>
-                <div class="magia-meta">
-                  <span>${m.circulo === 0 ? 'Truque' : m.circulo + 'o Circulo'}</span>
-                  <span>${m.escola || ''}</span>
+        <details style="margin-bottom:8px">
+          <summary style="font-weight:700;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--border-light)">
+            Magias Customizadas (${char.magias_customizadas.length})
+          </summary>
+          <div style="padding-top:4px">
+            ${char.magias_customizadas.map((m, i) => `
+              <div class="magia-item">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div class="magia-nome">${m.nome}</div>
+                    <div class="magia-meta">
+                      <span>${m.circulo === 0 ? 'Truque' : m.circulo + 'o Circulo'}</span>
+                      <span>${m.escola || ''}</span>
+                    </div>
+                  </div>
+                  <button class="btn btn-sm btn-danger btn-icon no-print" data-remover-magia-custom="${i}">&times;</button>
                 </div>
+                <div class="magia-desc" style="display:block">${mdParaHtml(m.descricao || '')}</div>
               </div>
-              <button class="btn btn-sm btn-danger btn-icon no-print" data-remover-magia-custom="${i}">&times;</button>
-            </div>
-            <div class="magia-desc" style="display:block">${mdParaHtml(m.descricao || '')}</div>
+            `).join('')}
           </div>
-        `).join('')}
+        </details>
       ` : ''}
     </div>
   `;
