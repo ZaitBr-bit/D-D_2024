@@ -1,0 +1,29 @@
+{
+  "descricao": "Controle de combinações de classe + espécie testadas no sistema de level-up",
+  "ultima_atualizacao": "2026-02-14",
+  "combinacoes": [
+    {
+      "classe": "Clérigo",
+      "especie": "Golias",
+      "testado": true,
+      "data_teste": "2026-02-14",
+      "niveis_testados": [1, 2, 3, 4, 5],
+      "observacoes": [
+        "Forma Grande do Golias desbloqueia corretamente no nível 5",
+        "Ganho de HP calculado corretamente (d8 + CON por nível)",
+        "Progressão de magias e truques funcionando",
+        "Canalizar Divindade implementado no nível 2",
+        "Seleção de subclasse no nível 3",
+        "Aumento de atributo no nível 4"
+      ],
+      "status": "✓ Totalmente funcional"
+    }
+  ],
+  "proximas_combinacoes": [
+    "Clérigo + Aasimar",
+    "Clérigo + Anão",
+    "Clérigo + Humano",
+    "Bárbaro + Golias",
+    "Guerreiro + Golias"
+  ]
+}

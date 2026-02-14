@@ -1,0 +1,100 @@
+{
+  "descricao": "Controle de classes revisadas para o sistema de level-up",
+  "ultima_atualizacao": "2026-02-14",
+  "classes": [
+    {
+      "nome": "Clérigo",
+      "revisado": true,
+      "data_revisao": "2026-02-14",
+      "nivel_subclasse": 3,
+      "niveis_aumento_atributo": [4, 8, 12, 16],
+      "caracteristicas_por_nivel": {
+        "1": ["Conjuração", "Ordem Divina"],
+        "2": ["Canalizar Divindade (2 usos)"],
+        "3": ["Subclasse"],
+        "4": ["Aumento no Valor de Atributo"],
+        "5": ["Fulminar Mortos-Vivos"],
+        "6": ["Característica de Subclasse"],
+        "7": ["Golpes Abençoados"],
+        "8": ["Aumento no Valor de Atributo"],
+        "10": ["Intervenção Divina"],
+        "14": ["Golpes Abençoados Aprimorado"],
+        "17": ["Característica de Subclasse"],
+        "19": ["Dom Épico"],
+        "20": ["Intervenção Divina Maior"]
+      },
+      "progressao_conjuracao": {
+        "dado_vida": "d8",
+        "hp_fixo_por_nivel": 5,
+        "atributo_conjuracao": "Sabedoria"
+      },
+      "notas": "Primeira classe implementada no sistema de level-up. Escolha de Ordem Divina no nível 1 afeta proficiências."
+    },
+    {
+      "nome": "Bárbaro",
+      "revisado": false,
+      "nivel_subclasse": 3,
+      "niveis_aumento_atributo": [4, 8, 12, 16, 19]
+    },
+    {
+      "nome": "Bardo",
+      "revisado": false,
+      "nivel_subclasse": 3,
+      "niveis_aumento_atributo": [4, 8, 12, 16, 19]
+    },
+    {
+      "nome": "Bruxo",
+      "revisado": false,
+      "nivel_subclasse": 3,
+      "niveis_aumento_atributo": [4, 8, 12, 16, 19]
+    },
+    {
+      "nome": "Druida",
+      "revisado": false,
+      "nivel_subclasse": 3,
+      "niveis_aumento_atributo": [4, 8, 12, 16, 19]
+    },
+    {
+      "nome": "Feiticeiro",
+      "revisado": false,
+      "nivel_subclasse": 3,
+      "niveis_aumento_atributo": [4, 8, 12, 16, 19]
+    },
+    {
+      "nome": "Guardião",
+      "revisado": false,
+      "nivel_subclasse": 3,
+      "niveis_aumento_atributo": [4, 8, 12, 16, 19]
+    },
+    {
+      "nome": "Guerreiro",
+      "revisado": false,
+      "nivel_subclasse": 3,
+      "niveis_aumento_atributo": [4, 6, 8, 12, 14, 16, 19]
+    },
+    {
+      "nome": "Ladino",
+      "revisado": false,
+      "nivel_subclasse": 3,
+      "niveis_aumento_atributo": [4, 8, 10, 12, 16, 19]
+    },
+    {
+      "nome": "Mago",
+      "revisado": false,
+      "nivel_subclasse": 3,
+      "niveis_aumento_atributo": [4, 8, 12, 16, 19]
+    },
+    {
+      "nome": "Monge",
+      "revisado": false,
+      "nivel_subclasse": 3,
+      "niveis_aumento_atributo": [4, 8, 12, 16, 19]
+    },
+    {
+      "nome": "Paladino",
+      "revisado": false,
+      "nivel_subclasse": 3,
+      "niveis_aumento_atributo": [4, 8, 12, 16, 19]
+    }
+  ]
+}

@@ -90,6 +90,7 @@ export function criarPersonagemVazio() {
     id: gerarId(),
     nome: '',
     nivel: 1,
+    xp: 0,
     classe: '',
     subclasse: '',
     especie: '',
