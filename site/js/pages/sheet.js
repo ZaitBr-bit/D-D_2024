@@ -653,7 +653,7 @@ function renderSecaoCaracteristicas() {
     <div class="card print-break-before">
       <div class="card-header"><h2>Caracteristicas de Classe</h2></div>
       ${feats.map(f => `
-        <details style="margin-bottom:6px" ${f.nivel === 1 ? 'open' : ''}>
+        <details style="margin-bottom:6px">
           <summary style="font-weight:600;cursor:pointer;font-size:0.9rem">
             <span class="badge badge-secondary" style="margin-right:4px">Nv.${f.nivel}</span>
             ${f.nome}
