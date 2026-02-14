@@ -340,7 +340,7 @@ function setupEventosDescanso() {
   document.getElementById('btn-descanso-curto')?.addEventListener('click', () => {
     restaurarHabilidades('curto');
     salvar();
-    toast('Descanso curto realizado! Habilidades de descanso curto restauradas', 'success');
+    toast('Descanso curto realizado!', 'success');
     renderFichaCompleta();
   });
 
