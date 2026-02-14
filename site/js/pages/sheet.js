@@ -3,15 +3,26 @@
 // ============================================================
 import { CLASSES_INFO, PERICIAS, ATRIBUTOS_NOMES, ATRIBUTOS_KEYS, ATRIBUTO_NOME_PARA_KEY } from '../dados-classes.js';
 import { getPersonagem, salvarPersonagem, removerPersonagem } from '../store.js';
-import { getClasse, getMagiasClasse, getMagiasPorCirculo, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura, getTalentos } from '../db.js';
+import { getClasse, getMagiasClasse, getMagiasPorCirculo, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura, getTalentos, getEspecies } from '../db.js';
 import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagia, calcPercepcaoPassiva, calcBonusPericia, calcPVTotal, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, gerarId, detectarRecarga, ehHabilidadeAtiva } from '../utils.js';
 import { podeSubirDeNivel, subirDeNivel, XP_POR_NIVEL, adicionarXP } from '../levelup.js';
+
+// Estilos visuais (cor e emoji) para cada atributo
+const ATRIBUTO_ESTILO = {
+  forca:        { emoji: '💪', cor: '#b71c1c' },
+  destreza:     { emoji: '🏹', cor: '#1b5e20' },
+  constituicao: { emoji: '🛡️', cor: '#e65100' },
+  inteligencia: { emoji: '📖', cor: '#0d47a1' },
+  sabedoria:    { emoji: '🔮', cor: '#4a148c' },
+  carisma:      { emoji: '✨', cor: '#c62828' }
+};
 
 let char = null;
 let containerRef = null;
 let classeData = null;
 let indiceMagiasCache = null;
 let talentosCache = null;
+let especiesCache = null;
 
 export async function renderSheet(container, charId) {
   containerRef = container;
@@ -34,6 +45,7 @@ export async function renderSheet(container, charId) {
   const indiceData = await getIndiceMagias();
   indiceMagiasCache = indiceData?.magias || [];
   talentosCache = await getTalentos();
+  especiesCache = await getEspecies();
 
   renderFichaCompleta();
 
@@ -162,10 +174,11 @@ function renderFichaCompleta() {
           const val = char.atributos[key];
           const mod = calcMod(val);
           const isPrimario = info.atributo_primario?.includes(nome);
+          const attrStyle = ATRIBUTO_ESTILO[key] || {};
           return `
-            <div class="atributo-box ${isPrimario ? 'destaque' : ''}">
-              <div class="atributo-nome">${nome}</div>
-              <div class="atributo-mod">${fmtMod(mod)}</div>
+            <div class="atributo-box ${isPrimario ? 'destaque' : ''}" style="border-color:${attrStyle.cor || 'var(--border)'}">
+              <div class="atributo-nome" style="color:${attrStyle.cor || 'var(--text-muted)'}">${attrStyle.emoji || ''} ${nome}</div>
+              <div class="atributo-mod" style="color:${attrStyle.cor || 'var(--primary)'}">${fmtMod(mod)}</div>
               <div class="atributo-valor">${val}</div>
             </div>`;
         }).join('')}
@@ -219,6 +232,9 @@ function renderFichaCompleta() {
 
     <!-- Características de Subclasse -->
     ${renderSecaoSubclasse()}
+
+    <!-- Traços da Espécie/Raça -->
+    ${renderSecaoTracosEspecie()}
 
     <!-- Espaços de Magia e Magias -->
     ${info.conjurador ? renderSecaoMagias() : ''}
@@ -388,6 +404,15 @@ function restaurarHabilidades(tipoDescanso) {
       });
     }
   }
+  // Coletar traços da espécie
+  if (char.especie && especiesCache?.especies) {
+    const esp = especiesCache.especies.find(e => e.nome === char.especie);
+    if (esp?.tracos) {
+      esp.tracos.forEach(t => {
+        allFeats.push({ key: `especie_${t.nome}`, descricao: t.descricao });
+      });
+    }
+  }
   allFeats.forEach(({ key, descricao }) => {
     const recarga = detectarRecarga(descricao);
     if (!recarga) return;
@@ -521,17 +546,13 @@ function setupEventosEdicao() {
       <div class="row gap-1">
         <div class="col">
           <label class="form-label">Nivel</label>
-          <input type="number" class="form-input" id="edit-nivel" value="${char.nivel}" min="1" max="20">
+          <div style="font-size:1rem;font-weight:700;padding:6px;background:var(--surface-variant);border-radius:4px">${char.nivel}</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px">Use Level Up para alterar</div>
         </div>
         <div class="col">
           <label class="form-label">Subclasse</label>
-          <select class="form-input" id="edit-sub">
-            <option value="">-- Nenhuma --</option>
-            ${(classeData?.subclasses || [])
-              .map(sc => sc.nome)
-              .filter(nome => !nome.toLowerCase().startsWith('subclasses de'))
-              .map(nome => `<option value="${nome}" ${char.subclasse === nome ? 'selected' : ''}>${nome}</option>`).join('')}
-          </select>
+          <div style="font-size:1rem;font-weight:700;padding:6px;background:var(--surface-variant);border-radius:4px">${char.subclasse || '—'}</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px">Definida no Level Up</div>
         </div>
       </div>
       <div class="section-divider mt-2"><span>Atributos</span></div>
@@ -550,24 +571,6 @@ function setupEventosEdicao() {
 
     document.getElementById('btn-salvar-edit')?.addEventListener('click', () => {
       char.nome = document.getElementById('edit-nome')?.value?.trim() || char.nome;
-      const novoNivel = parseInt(document.getElementById('edit-nivel')?.value) || char.nivel;
-      char.subclasse = document.getElementById('edit-sub')?.value?.trim() || '';
-
-      // Se mudou de nível, recalcular
-      if (novoNivel !== char.nivel) {
-        char.nivel = novoNivel;
-        char.dados_vida_total = novoNivel;
-        const info = CLASSES_INFO[char.classe];
-        if (info) {
-          const modCon = calcMod(char.atributos.constituicao);
-          char.pv_max = calcPVTotal(info.dado_vida, novoNivel, modCon);
-          char.pv_atual = Math.min(char.pv_atual, char.pv_max);
-        }
-        // Recalcular espaços de magia
-        if (info?.conjurador && classeData?.tabela_caracteristicas) {
-          char.espacos_magia = getEspacosMagia(classeData.tabela_caracteristicas, novoNivel);
-        }
-      }
 
       salvar();
       window.fecharModal();
@@ -1091,6 +1094,110 @@ function renderSecaoSubclasse() {
   `;
 }
 
+// --- Traços da Espécie/Raça ---
+
+function renderSecaoTracosEspecie() {
+  if (!char.especie || !especiesCache?.especies) return '';
+  const esp = especiesCache.especies.find(e => e.nome === char.especie);
+  if (!esp?.tracos?.length) return '';
+
+  // Filtrar traços escolhidos (se a espécie tem opções selecionáveis)
+  const tracosEscolhidos = char.tracos_escolhidos || [];
+  let tracosMostrar = esp.tracos;
+
+  // Espécies com escolhas: mostrar traços fixos + apenas o traço escolhido
+  const TRACOS_PAI = ['Ancestralidade Gigante', 'Linhagem Gnômica', 'Herança Dracônica', 'Linhagem Élfica', 'Legado Ínfero'];
+  const TRACOS_ESCOLHA_GOLIAS = ['Arrepio do Gelo (Gigante do Gelo)', 'Queimadura de Fogo (Gigante de Fogo)', 'Resistência da Pedra (Gigante da Pedra)', 'Salto da Nuvem (Gigante das Nuvens)', 'Tombo da Colina (Gigante da Colina)', 'Trovão da Tempestade (Gigante da Tempestade)'];
+  const TRACOS_ESCOLHA_GNOMO = ['Gnomo das Rochas', 'Gnomo do Bosque'];
+
+  if (tracosEscolhidos.length > 0) {
+    tracosMostrar = esp.tracos.filter(t => {
+      if (TRACOS_PAI.includes(t.nome)) return false;
+      if (TRACOS_ESCOLHA_GOLIAS.includes(t.nome) || TRACOS_ESCOLHA_GNOMO.includes(t.nome)) {
+        return tracosEscolhidos.includes(t.nome);
+      }
+      return true;
+    });
+  }
+
+  if (!tracosMostrar.length) return '';
+
+  const passivos = tracosMostrar.filter(t => !ehHabilidadeAtiva(t.descricao));
+  const ativos = tracosMostrar.filter(t => ehHabilidadeAtiva(t.descricao));
+
+  return `
+    <div class="card print-break-before">
+      <div class="card-header"><h2>Traços de Espécie — ${char.especie}</h2></div>
+      ${ativos.length > 0 ? `
+        <div class="section-divider"><span>Habilidades Ativas</span></div>
+        ${ativos.map(t => renderTracoEspecie(t)).join('')}
+      ` : ''}
+      ${passivos.length > 0 ? `
+        <div class="section-divider"><span>Habilidades Passivas</span></div>
+        ${passivos.map(t => renderTracoEspecie(t)).join('')}
+      ` : ''}
+    </div>
+  `;
+}
+
+function renderTracoEspecie(traco) {
+  const recarga = detectarRecarga(traco.descricao);
+  const ativa = ehHabilidadeAtiva(traco.descricao);
+  const key = `especie_${traco.nome}`;
+  if (!char.usos_habilidades) char.usos_habilidades = {};
+
+  const usosMax = detectarUsosMaximos(traco.descricao) || (recarga ? bonusProficiencia(char.nivel) : null);
+  const temMultiplosUsos = usosMax && usosMax > 1 && recarga;
+
+  let usosAtual = 0;
+  if (temMultiplosUsos) {
+    if (typeof char.usos_habilidades[key] === 'number') {
+      usosAtual = char.usos_habilidades[key];
+    } else if (char.usos_habilidades[key] === true) {
+      usosAtual = usosMax;
+      char.usos_habilidades[key] = usosMax;
+    }
+  }
+  const usado = temMultiplosUsos ? usosAtual >= usosMax : (char.usos_habilidades[key] || false);
+
+  const recargaBadge = recarga
+    ? `<span class="badge" style="font-size:0.65rem;margin-left:4px;background:${recarga === 'longo' ? 'var(--info)' : recarga === 'curto' ? 'var(--success)' : 'var(--warning)'};color:#fff">${recarga === 'longo' ? '🌙 Desc. Longo' : recarga === 'curto' ? '☀ Desc. Curto' : '☀🌙 Curto/Longo'}</span>`
+    : '';
+  const tipoBadge = ativa
+    ? '<span class="badge" style="font-size:0.65rem;margin-left:4px;background:var(--accent);color:#fff">Ativa</span>'
+    : '<span class="badge" style="font-size:0.65rem;margin-left:4px;background:var(--text-muted);color:#fff">Passiva</span>';
+
+  let usosHtml = '';
+  if (temMultiplosUsos) {
+    usosHtml = `
+      <div class="no-print" style="display:flex;align-items:center;gap:4px;margin-left:auto">
+        <span style="font-size:0.7rem;font-weight:600">${usosMax - usosAtual}/${usosMax}</span>
+        <button class="btn btn-sm" style="padding:2px 8px;font-size:0.7rem" data-usar-habilidade="${key}" data-usos-max="${usosMax}" onclick="event.stopPropagation()">
+          ${usosAtual >= usosMax ? '✗ Esgotado' : 'Usar'}
+        </button>
+      </div>
+    `;
+  } else if (ativa && recarga) {
+    usosHtml = `
+      <button class="btn btn-sm no-print" style="margin-left:auto;padding:2px 8px;font-size:0.7rem;${usado ? 'opacity:0.5' : ''}" data-toggle-uso="${key}" onclick="event.stopPropagation()">
+        ${usado ? '✗ Usado' : '✓ Disponível'}
+      </button>
+    `;
+  }
+
+  return `
+    <details style="margin-bottom:6px">
+      <summary style="font-weight:600;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;flex-wrap:wrap;gap:2px">
+        ${traco.nome}
+        ${tipoBadge}
+        ${recargaBadge}
+        ${usosHtml}
+      </summary>
+      <div class="md-content" style="padding:6px 0 6px 16px;font-size:0.85rem">${mdParaHtml(traco.descricao)}</div>
+    </details>
+  `;
+}
+
 // --- Magias ---
 
 // Retorna badges HTML compactos com metadados da magia (tipo, tempo, alcance, duração)
@@ -1184,24 +1291,6 @@ function renderSecaoMagias() {
         </div>
       ` : ''}
 
-      <!-- Truques -->
-      ${truques.length > 0 ? `
-        <details open style="margin-bottom:8px">
-          <summary style="font-weight:700;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--border-light)">
-            Truques (${truques.length})
-          </summary>
-          <div style="padding-top:4px">
-            ${truques.map(m => `
-              <div class="magia-item" data-magia-nome="${m.nome}" data-magia-circ="0">
-                <div class="magia-nome">${m.nome}</div>
-                ${badgesMagiaRapidos(m.nome)}
-                <div class="magia-desc"></div>
-              </div>
-            `).join('')}
-          </div>
-        </details>
-      ` : ''}
-
       <!-- Magias Preparadas por Círculo -->
       ${Object.keys(preparadasPorCirculo).sort((a, b) => parseInt(a) - parseInt(b)).map(circ => {
         const magias = preparadasPorCirculo[circ];
@@ -1214,6 +1303,7 @@ function renderSecaoMagias() {
             ${magias.map(m => {
               const circulos = Object.keys(espacos).filter(c => parseInt(c) >= m.circulo).sort((a, b) => parseInt(a) - parseInt(b));
               const temUpcast = circulos.length > 1;
+              const todosEsgotados = circulos.every(c => (espacos[c]?.usados || 0) >= (espacos[c]?.total || 0));
               return `
               <div class="magia-item preparada" data-magia-nome="${m.nome}" data-magia-circ="${m.circulo}">
                 <div style="display:flex;justify-content:space-between;align-items:center">
@@ -1227,7 +1317,7 @@ function renderSecaoMagias() {
                         ${circulos.map(c => `<option value="${c}"${c == m.circulo ? ' selected' : ''}>${c}º</option>`).join('')}
                       </select>
                     ` : ''}
-                    <button class="btn btn-sm btn-primary" data-conjurar="${m.nome}" data-conj-circ="${m.circulo}">Conjurar</button>
+                    <button class="btn btn-sm ${todosEsgotados ? 'btn-secondary' : 'btn-primary'}" data-conjurar="${m.nome}" data-conj-circ="${m.circulo}" ${todosEsgotados ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Conjurar</button>
                   </div>
                 </div>
                 <div class="magia-desc"></div>
@@ -1257,6 +1347,24 @@ function renderSecaoMagias() {
                   <button class="btn btn-sm btn-danger btn-icon no-print" data-remover-magia-custom="${i}">&times;</button>
                 </div>
                 <div class="magia-desc" style="display:block">${mdParaHtml(m.descricao || '')}</div>
+              </div>
+            `).join('')}
+          </div>
+        </details>
+      ` : ''}
+
+      <!-- Truques (por último para ficarem separados dos espaços de magia) -->
+      ${truques.length > 0 ? `
+        <details open style="margin-bottom:8px">
+          <summary style="font-weight:700;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--border-light)">
+            Truques (${truques.length})
+          </summary>
+          <div style="padding-top:4px">
+            ${truques.map(m => `
+              <div class="magia-item" data-magia-nome="${m.nome}" data-magia-circ="0">
+                <div class="magia-nome">${m.nome}</div>
+                ${badgesMagiaRapidos(m.nome)}
+                <div class="magia-desc"></div>
               </div>
             `).join('')}
           </div>
@@ -1309,7 +1417,7 @@ function setupEventosEspacosMagia() {
   // Expandir detalhes da magia ao clicar
   document.querySelectorAll('.magia-item[data-magia-nome]').forEach(item => {
     item.addEventListener('click', async (e) => {
-      if (e.target.closest('button')) return;
+      if (e.target.closest('button') || e.target.closest('select')) return;
       const nome = item.dataset.magiaNome;
       const circ = parseInt(item.dataset.magiaCirc);
       const descEl = item.querySelector('.magia-desc');
