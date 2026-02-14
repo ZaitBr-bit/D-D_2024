@@ -223,6 +223,36 @@ export function mdParaHtml(texto) {
 
 // --- Helpers gerais ---
 
+/**
+ * Detecta tipo de recarga de uma habilidade pela descrição.
+ * Retorna 'curto', 'longo', 'curto_ou_longo' ou null (passiva).
+ */
+export function detectarRecarga(descricao) {
+  if (!descricao) return null;
+  const d = descricao.toLowerCase();
+  if (d.includes('descanso curto ou longo') || d.includes('descanso longo ou curto'))
+    return 'curto_ou_longo';
+  // Check for short rest recharge
+  const temCurto = d.includes('descanso curto');
+  const temLongo = d.includes('descanso longo');
+  if (temCurto && temLongo) return 'curto_ou_longo';
+  if (temCurto) return 'curto';
+  if (temLongo) return 'longo';
+  return null;
+}
+
+/**
+ * Detecta se uma habilidade é ativa (tem ação, reação, etc.) vs passiva.
+ */
+export function ehHabilidadeAtiva(descricao) {
+  if (!descricao) return false;
+  const d = descricao.toLowerCase();
+  const recarga = detectarRecarga(descricao);
+  if (recarga) return true;
+  const acoes = ['como uma ação', 'como ação bônus', 'como uma reação', 'você pode usar', 'você pode gastar', 'no seu turno'];
+  return acoes.some(a => d.includes(a));
+}
+
 /** Gera UUID v4 simples */
 export function gerarId() {
   return 'xxxx-xxxx-xxxx'.replace(/x/g, () =>
