@@ -2,7 +2,7 @@
 // Sistema de Level-Up D&D 2024
 // ============================================================
 import { CLASSES_INFO } from './dados-classes.js';
-import { getClasse, getEspecies } from './db.js';
+import { getClasse, getEspecies, getIndiceMagias } from './db.js';
 import { calcMod, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas } from './utils.js';
 
 /**
@@ -170,6 +170,77 @@ export async function obterCaracteristicasEspecieNivel(especie, nivel) {
 }
 
 /**
+ * Obtém características da subclasse que o personagem ganha em um nível específico
+ * @param {string} classe - Nome da classe
+ * @param {string} subclasse - Nome da subclasse escolhida
+ * @param {number} nivel - Nível do personagem
+ * @returns {Array} Lista de features da subclasse para esse nível
+ */
+export async function obterCaracteristicasSubclasseNivel(classe, subclasse, nivel) {
+  if (!subclasse) return [];
+  
+  const classeData = await getClasse(classe);
+  if (!classeData || !classeData.subclasses) return [];
+  
+  const sc = classeData.subclasses.find(s => s.nome === subclasse);
+  if (!sc || !sc.caracteristicas) return [];
+  
+  return sc.caracteristicas.filter(c => c.nivel === nivel);
+}
+
+/**
+ * Extrai magias de domínio da descrição da feature de magias da subclasse
+ * Parseia a tabela markdown para retornar as magias do nível atual
+ * @param {string} classe - Nome da classe
+ * @param {string} subclasse - Nome da subclasse
+ * @param {number} nivel - Nível do personagem
+ * @returns {Array} Lista de { nome, circulo } das magias de domínio para esse nível
+ */
+export async function obterMagiasDominioNivel(classe, subclasse, nivel) {
+  if (!subclasse) return [];
+  
+  const classeData = await getClasse(classe);
+  if (!classeData || !classeData.subclasses) return [];
+  
+  const sc = classeData.subclasses.find(s => s.nome === subclasse);
+  if (!sc || !sc.caracteristicas) return [];
+  
+  // Encontrar a feature de magias de domínio (nível 3)
+  const magiasFeat = sc.caracteristicas.find(c => 
+    c.nivel === 3 && c.nome.toLowerCase().startsWith('magias de')
+  );
+  if (!magiasFeat) return [];
+  
+  // Parsear tabela markdown para extrair magias por nível
+  // Formato: | 3 | *Magia1, Magia2, Magia3* |
+  const linhas = magiasFeat.descricao.split('\n');
+  const nomesMagias = [];
+  
+  for (const linha of linhas) {
+    // Procurar linhas da tabela com nível e magias
+    const match = linha.match(/\|\s*(\d+)\s*\|\s*\*([^*]+)\*\s*\|/);
+    if (match) {
+      const nivelMagia = parseInt(match[1]);
+      if (nivelMagia === nivel) {
+        const nomes = match[2].split(',').map(n => n.trim()).filter(n => n);
+        nomesMagias.push(...nomes);
+      }
+    }
+  }
+  
+  if (nomesMagias.length === 0) return [];
+  
+  // Buscar círculo real de cada magia no índice
+  const indice = await getIndiceMagias();
+  const indiceMagias = indice?.magias || [];
+  
+  return nomesMagias.map(nome => {
+    const magiaIdx = indiceMagias.find(m => m.nome === nome);
+    return { nome, circulo: magiaIdx?.circulo || 1 };
+  });
+}
+
+/**
  * Atualiza os espaços de magia do personagem baseado no novo nível
  */
 export async function atualizarEspacosMagia(personagem, classeData) {
@@ -284,6 +355,21 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     personagem.subclasse = opcoes.subclasse;
   }
   
+  // Obter características de subclasse para este nível
+  const subclasseAtual = personagem.subclasse;
+  const caracteristicasSubclasse = await obterCaracteristicasSubclasseNivel(personagem.classe, subclasseAtual, novoNivel);
+  
+  // Adicionar automaticamente magias de domínio/subclasse
+  const magiasDominio = await obterMagiasDominioNivel(personagem.classe, subclasseAtual, novoNivel);
+  if (magiasDominio.length > 0) {
+    if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
+    for (const magia of magiasDominio) {
+      if (!personagem.magias_preparadas.find(m => m.nome === magia.nome)) {
+        personagem.magias_preparadas.push(magia);
+      }
+    }
+  }
+  
   // Aplicar aumentos de atributo
   if (ganhaAumentoAtributo && opcoes.aumentos_atributo) {
     for (const [atributo, valor] of Object.entries(opcoes.aumentos_atributo)) {
@@ -313,6 +399,8 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     bonus_mudou: bonusMudou,
     caracteristicas: caracteristicas,
     caracteristicas_especie: caracteristicasEspecie,
+    caracteristicas_subclasse: caracteristicasSubclasse,
+    magias_dominio_adicionadas: magiasDominio,
     subclasse_escolhida: precisaSubclasse ? opcoes.subclasse : null,
     aumento_atributo: ganhaAumentoAtributo,
     aumentos_aplicados: opcoes.aumentos_atributo || null,
