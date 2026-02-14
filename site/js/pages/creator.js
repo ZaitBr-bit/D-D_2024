@@ -1155,6 +1155,22 @@ function renderStepAtributos(el) {
   renderPericiasSeletor();
 }
 
+// Distribuições sugeridas de atributos padrão por classe (índices do STANDARD_ARRAY [15,14,13,12,10,8])
+const DISTRIBUICOES_SUGERIDAS = {
+  'Bárbaro':    { forca: 0, destreza: 3, constituicao: 1, inteligencia: 5, sabedoria: 4, carisma: 2 },
+  'Bardo':      { forca: 5, destreza: 2, constituicao: 3, inteligencia: 4, sabedoria: 1, carisma: 0 },
+  'Bruxo':      { forca: 5, destreza: 3, constituicao: 2, inteligencia: 4, sabedoria: 1, carisma: 0 },
+  'Clérigo':    { forca: 4, destreza: 5, constituicao: 2, inteligencia: 3, sabedoria: 0, carisma: 1 },
+  'Druida':     { forca: 5, destreza: 3, constituicao: 2, inteligencia: 4, sabedoria: 0, carisma: 1 },
+  'Feiticeiro': { forca: 5, destreza: 2, constituicao: 1, inteligencia: 4, sabedoria: 3, carisma: 0 },
+  'Guardião':   { forca: 3, destreza: 1, constituicao: 2, inteligencia: 5, sabedoria: 0, carisma: 4 },
+  'Guerreiro':  { forca: 0, destreza: 2, constituicao: 1, inteligencia: 5, sabedoria: 4, carisma: 3 },
+  'Ladino':     { forca: 5, destreza: 0, constituicao: 2, inteligencia: 3, sabedoria: 1, carisma: 4 },
+  'Mago':       { forca: 5, destreza: 2, constituicao: 1, inteligencia: 0, sabedoria: 3, carisma: 4 },
+  'Monge':      { forca: 4, destreza: 0, constituicao: 2, inteligencia: 5, sabedoria: 1, carisma: 3 },
+  'Paladino':   { forca: 0, destreza: 4, constituicao: 2, inteligencia: 5, sabedoria: 3, carisma: 1 }
+};
+
 function renderStandardArray(el) {
   const info = CLASSES_INFO[personagem.classe];
   if (!dadosCache.stdAssign) {
@@ -1163,9 +1179,15 @@ function renderStandardArray(el) {
 
   const usados = Object.values(dadosCache.stdAssign);
   const disponiveis = STANDARD_ARRAY.filter((v, i) => !usados.includes(i));
+  const temSugestao = DISTRIBUICOES_SUGERIDAS[personagem.classe];
 
   el.innerHTML = `
     <div class="info-box warning">Distribua os valores [${STANDARD_ARRAY.join(', ')}] entre seus atributos.</div>
+    ${temSugestao ? `
+      <button class="btn btn-sm btn-accent" id="btn-dist-sugerida" style="margin-bottom:8px">
+        ⚡ Usar distribuição sugerida para ${personagem.classe}
+      </button>
+    ` : ''}
     <div class="atributos-grid">
       ${ATRIBUTOS_KEYS.map(key => {
         const nome = ATRIBUTOS_NOMES[key];
@@ -1195,6 +1217,21 @@ function renderStandardArray(el) {
       }).join('')}
     </div>
   `;
+
+  // Botão de distribuição sugerida
+  document.getElementById('btn-dist-sugerida')?.addEventListener('click', () => {
+    const dist = DISTRIBUICOES_SUGERIDAS[personagem.classe];
+    if (!dist) return;
+    dadosCache.stdAssign = { ...dist };
+    ATRIBUTOS_KEYS.forEach(k => {
+      const idx = dadosCache.stdAssign[k];
+      const base = idx !== undefined ? STANDARD_ARRAY[idx] : 10;
+      const bonus = personagem.bonus_antecedente[k] || 0;
+      personagem.atributos_base[k] = base;
+      personagem.atributos[k] = base + bonus;
+    });
+    renderStandardArray(el);
+  });
 
   el.querySelectorAll('[data-attr-key]').forEach(sel => {
     sel.addEventListener('change', () => {
