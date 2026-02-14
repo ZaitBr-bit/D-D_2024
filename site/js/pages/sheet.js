@@ -5,6 +5,7 @@ import { CLASSES_INFO, PERICIAS, ATRIBUTOS_NOMES, ATRIBUTOS_KEYS, ATRIBUTO_NOME_
 import { getPersonagem, salvarPersonagem, removerPersonagem } from '../store.js';
 import { getClasse, getMagiasClasse, getMagiasPorCirculo, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura } from '../db.js';
 import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagia, calcPercepcaoPassiva, calcBonusPericia, calcPVTotal, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, gerarId } from '../utils.js';
+import { podeSubirDeNivel, subirDeNivel, XP_POR_NIVEL, adicionarXP } from '../levelup.js';
 
 let char = null;
 let containerRef = null;
@@ -66,9 +67,20 @@ function renderFichaCompleta() {
             ${char.especie || ''} ${char.classe || ''} ${char.subclasse ? `(${char.subclasse})` : ''} &middot; Nivel ${char.nivel}
           </div>
           <div style="font-size:0.8rem;color:var(--text-muted)">Antecedente: ${char.antecedente || '–'}</div>
+          <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">
+            XP: <span style="font-weight:600;color:var(--accent);cursor:pointer" id="xp-display" title="Clique para editar XP">${char.xp || 0}</span>
+            ${char.nivel < 20 ? ` / ${XP_POR_NIVEL[char.nivel + 1]}` : ' (Nível Máximo)'}
+          </div>
         </div>
-        <div class="no-print" style="display:flex;gap:4px">
-          <button class="btn btn-sm btn-secondary" id="btn-edit-header">Editar</button>
+        <div class="no-print" style="display:flex;gap:4px;flex-direction:column">
+          <div style="display:flex;gap:4px">
+            <button class="btn btn-sm btn-secondary" id="btn-edit-header">Editar</button>
+          </div>
+          ${podeSubirDeNivel(char) && char.nivel < 20 ? `
+            <button class="btn btn-sm btn-accent" id="btn-levelup" style="font-weight:700">
+              ⬆ Level Up! (Nivel ${char.nivel + 1})
+            </button>
+          ` : ''}
         </div>
       </div>
     </div>
@@ -415,6 +427,204 @@ function setupEventosEdicao() {
       document.getElementById('header-titulo').textContent = char.nome;
       renderFichaCompleta();
     });
+  });
+
+  // Editar XP
+  document.getElementById('xp-display')?.addEventListener('click', () => {
+    abrirModal('Gerenciar Pontos de Experiência', `
+      <div class="form-group">
+        <label class="form-label">XP Atual</label>
+        <input type="number" class="form-input" id="edit-xp-atual" value="${char.xp || 0}" min="0">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">
+          Nivel Atual: ${char.nivel}${char.nivel < 20 ? ` | Próximo Nivel (${char.nivel + 1}): ${XP_POR_NIVEL[char.nivel + 1]} XP` : ' (Máximo)'}
+        </div>
+      </div>
+      <div class="section-divider mt-2"><span>Adicionar XP</span></div>
+      <div class="form-group">
+        <label class="form-label">Ganhar XP</label>
+        <input type="number" class="form-input" id="add-xp" placeholder="Quantidade de XP para adicionar" min="0">
+      </div>
+    `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-xp">Salvar</button>');
+
+    document.getElementById('btn-salvar-xp')?.addEventListener('click', () => {
+      const novoXP = parseInt(document.getElementById('edit-xp-atual')?.value) || 0;
+      const addXP = parseInt(document.getElementById('add-xp')?.value) || 0;
+      
+      char.xp = novoXP + addXP;
+      
+      salvar();
+      window.fecharModal();
+      
+      // Verificar se pode subir de nível
+      if (podeSubirDeNivel(char)) {
+        toast(`XP atualizado! Você pode subir para o nível ${char.nivel + 1}!`, 'success');
+      } else {
+        toast('XP atualizado com sucesso!', 'success');
+      }
+      
+      renderFichaCompleta();
+    });
+  });
+
+  // Level Up
+  document.getElementById('btn-levelup')?.addEventListener('click', async () => {
+    await abrirModalLevelUp();
+  });
+}
+
+// Modal de Level Up
+async function abrirModalLevelUp() {
+  const nivelNovo = char.nivel + 1;
+  const modCon = calcMod(char.atributos.constituicao);
+  const info = CLASSES_INFO[char.classe];
+  const hpGanho = Math.floor(info.dado_vida / 2) + 1 + modCon;
+  
+  // Importar funções do levelup
+  const { obterCaracteristicasNivel, obterCaracteristicasEspecieNivel, concedeAumentoAtributo, exigeSubclasse } = await import('../levelup.js');
+  
+  const caracteristicas = await obterCaracteristicasNivel(char.classe, nivelNovo);
+  const caracteristicasEspecie = await obterCaracteristicasEspecieNivel(char.especie, nivelNovo);
+  const ganhaAumentoAtributo = concedeAumentoAtributo(char.classe, nivelNovo);
+  const precisaSubclasse = exigeSubclasse(char.classe, nivelNovo) && !char.subclasse;
+  
+  let conteudoModal = `
+    <div style="text-align:center;margin-bottom:16px">
+      <h3 style="color:var(--accent);margin:0">Nivel ${char.nivel} → Nivel ${nivelNovo}</h3>
+      <div style="font-size:0.9rem;color:var(--text-muted);margin-top:4px">
+        ${char.especie} ${char.classe}
+      </div>
+    </div>
+    
+    <div class="card" style="background:var(--surface-variant);margin-bottom:12px">
+      <div style="font-weight:700;margin-bottom:8px;color:var(--accent)">Ganhos Automáticos</div>
+      <ul style="margin:0;padding-left:20px;font-size:0.9rem">
+        <li><strong>+${hpGanho} Pontos de Vida</strong> (d${info.dado_vida} médio + CON)</li>
+        ${caracteristicas.length > 0 ? caracteristicas.map(c => `<li>${c}</li>`).join('') : '<li>Nenhuma característica nova neste nível</li>'}
+        ${caracteristicasEspecie.length > 0 ? caracteristicasEspecie.map(c => `<li><strong>[Espécie]</strong> ${c.nome}</li>`).join('') : ''}
+      </ul>
+    </div>
+  `;
+  
+  // Se precisa escolher subclasse
+  if (precisaSubclasse) {
+    conteudoModal += `
+      <div class="form-group">
+        <label class="form-label" style="color:var(--warning);font-weight:700">⚠ Escolha de Subclasse Obrigatória</label>
+        <input type="text" class="form-input" id="levelup-subclasse" placeholder="Digite o nome da subclasse escolhida">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">
+          No nível 3, você deve escolher uma subclasse. Consulte o livro do jogador para opções.
+        </div>
+      </div>
+    `;
+  }
+  
+  // Se ganha aumento de atributo
+  if (ganhaAumentoAtributo) {
+    conteudoModal += `
+      <div class="section-divider mt-2"><span>Aumento de Atributo</span></div>
+      <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
+        Você pode aumentar um atributo em +2, ou dois atributos em +1 cada (máximo 20).
+      </div>
+      <div class="atributos-grid">
+        ${ATRIBUTOS_KEYS.map(key => `
+          <div class="form-group" style="text-align:center">
+            <label class="form-label">${ATRIBUTOS_NOMES[key]}</label>
+            <div style="font-size:0.8rem;margin-bottom:2px">${char.atributos[key]}</div>
+            <select class="form-input" style="text-align:center" id="levelup-attr-${key}">
+              <option value="0">+0</option>
+              <option value="1">+1</option>
+              <option value="2">+2</option>
+            </select>
+          </div>
+        `).join('')}
+      </div>
+      <div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px;text-align:center">
+        Total de pontos: <span id="levelup-pontos-total" style="font-weight:700">0</span> / 2
+      </div>
+    `;
+  }
+  
+  conteudoModal += `
+    <div style="margin-top:16px;padding:12px;background:var(--warning);color:#000;border-radius:4px;font-size:0.85rem">
+      <strong>⚠ Importante:</strong> Esta ação não pode ser desfeita. Certifique-se de ter feito as escolhas corretas.
+    </div>
+  `;
+  
+  abrirModal(`⬆ Level Up para Nivel ${nivelNovo}`, conteudoModal, 
+    '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-accent" id="btn-confirmar-levelup">Confirmar Level Up</button>');
+  
+  // Validação de pontos de atributo
+  if (ganhaAumentoAtributo) {
+    const selects = ATRIBUTOS_KEYS.map(key => document.getElementById(`levelup-attr-${key}`));
+    selects.forEach(sel => {
+      sel?.addEventListener('change', () => {
+        const total = selects.reduce((sum, s) => sum + (parseInt(s?.value) || 0), 0);
+        document.getElementById('levelup-pontos-total').textContent = total;
+        document.getElementById('levelup-pontos-total').style.color = total === 2 ? 'var(--success)' : (total > 2 ? 'var(--danger)' : 'inherit');
+      });
+    });
+  }
+  
+  // Confirmar level up
+  document.getElementById('btn-confirmar-levelup')?.addEventListener('click', async () => {
+    const opcoes = {};
+    
+    // Validar subclasse se necessário
+    if (precisaSubclasse) {
+      const subclasse = document.getElementById('levelup-subclasse')?.value?.trim();
+      if (!subclasse) {
+        toast('Você deve escolher uma subclasse para continuar', 'error');
+        return;
+      }
+      opcoes.subclasse = subclasse;
+    }
+    
+    // Validar aumento de atributo se necessário
+    if (ganhaAumentoAtributo) {
+      const aumentos = {};
+      let total = 0;
+      ATRIBUTOS_KEYS.forEach(key => {
+        const valor = parseInt(document.getElementById(`levelup-attr-${key}`)?.value) || 0;
+        if (valor > 0) {
+          aumentos[key] = valor;
+          total += valor;
+        }
+      });
+      
+      if (total !== 2) {
+        toast('Você deve distribuir exatamente 2 pontos de atributo', 'error');
+        return;
+      }
+      
+      opcoes.aumentos_atributo = aumentos;
+    }
+    
+    // Executar level up
+    const resultado = await subirDeNivel(char, opcoes);
+    
+    if (resultado.sucesso) {
+      salvar();
+      window.fecharModal();
+      
+      // Mostrar resumo
+      const resumo = `
+        <div style="text-align:center">
+          <h3 style="color:var(--success);margin:0">✓ Level Up Concluído!</h3>
+          <div style="font-size:1.1rem;margin:12px 0">Nivel ${resultado.nivel_anterior} → <strong>Nivel ${resultado.nivel_novo}</strong></div>
+          <ul style="text-align:left;margin:12px 0">
+            <li>+${resultado.hp_ganho} HP (Total: ${char.pv_max})</li>
+            ${resultado.subclasse_escolhida ? `<li>Subclasse: ${resultado.subclasse_escolhida}</li>` : ''}
+            ${resultado.aumentos_aplicados ? `<li>Atributos aumentados</li>` : ''}
+          </ul>
+        </div>
+      `;
+      
+      abrirModal('Level Up Concluído!', resumo, '<button class="btn btn-primary" onclick="fecharModal()">OK</button>');
+      
+      renderFichaCompleta();
+    } else {
+      toast(resultado.erro || 'Erro ao fazer level up', 'error');
+    }
   });
 }
 
