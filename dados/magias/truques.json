@@ -294,7 +294,7 @@
       "alcance": "Toque",
       "componentes": "V, S",
       "duracao": "Concentração, até 1 minuto",
-      "descricao": "Você toca uma criatura voluntária e escolhe uma perícia. Até que a magia termine, a criatura adiciona 1d4 a qualquer teste de atributo usando a perícia escolhida.\nP\n*",
+      "descricao": "Você toca uma criatura voluntária e escolhe uma perícia. Até que a magia termine, a criatura adiciona 1d4 a qualquer teste de atributo usando a perícia escolhida.",
       "circulo_superior": ""
     },
     {
