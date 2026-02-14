@@ -214,7 +214,7 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     return { sucesso: false, erro: 'Nível máximo já alcançado (20)' };
   }
   
-  if (!podeSubirDeNivel(personagem)) {
+  if (!opcoes.ignorar_xp && !podeSubirDeNivel(personagem)) {
     const xpNecessario = XP_POR_NIVEL[novoNivel];
     const xpAtual = personagem.xp || 0;
     return {

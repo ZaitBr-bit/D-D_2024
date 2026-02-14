@@ -76,7 +76,7 @@ function renderFichaCompleta() {
           <div style="display:flex;gap:4px">
             <button class="btn btn-sm btn-secondary" id="btn-edit-header">Editar</button>
           </div>
-          ${podeSubirDeNivel(char) && char.nivel < 20 ? `
+          ${char.nivel < 20 ? `
             <button class="btn btn-sm btn-accent" id="btn-levelup" style="font-weight:700">
               ⬆ Level Up! (Nivel ${char.nivel + 1})
             </button>
@@ -382,7 +382,13 @@ function setupEventosEdicao() {
         </div>
         <div class="col">
           <label class="form-label">Subclasse</label>
-          <input type="text" class="form-input" id="edit-sub" value="${char.subclasse || ''}">
+          <select class="form-input" id="edit-sub">
+            <option value="">-- Nenhuma --</option>
+            ${(classeData?.subclasses || [])
+              .map(sc => sc.nome)
+              .filter(nome => !nome.toLowerCase().startsWith('subclasses de'))
+              .map(nome => `<option value="${nome}" ${char.subclasse === nome ? 'selected' : ''}>${nome}</option>`).join('')}
+          </select>
         </div>
       </div>
       <div class="section-divider mt-2"><span>Atributos</span></div>
@@ -487,6 +493,14 @@ async function abrirModalLevelUp() {
   const ganhaAumentoAtributo = concedeAumentoAtributo(char.classe, nivelNovo);
   const precisaSubclasse = exigeSubclasse(char.classe, nivelNovo) && !char.subclasse;
   
+  // Carregar lista de subclasses da classe se necessário
+  let subclassesDisponiveis = [];
+  if (precisaSubclasse && classeData && classeData.subclasses) {
+    subclassesDisponiveis = classeData.subclasses
+      .map(sc => sc.nome)
+      .filter(nome => !nome.toLowerCase().startsWith('subclasses de'));
+  }
+  
   let conteudoModal = `
     <div style="text-align:center;margin-bottom:16px">
       <h3 style="color:var(--accent);margin:0">Nivel ${char.nivel} → Nivel ${nivelNovo}</h3>
@@ -510,9 +524,12 @@ async function abrirModalLevelUp() {
     conteudoModal += `
       <div class="form-group">
         <label class="form-label" style="color:var(--warning);font-weight:700">⚠ Escolha de Subclasse Obrigatória</label>
-        <input type="text" class="form-input" id="levelup-subclasse" placeholder="Digite o nome da subclasse escolhida">
+        <select class="form-input" id="levelup-subclasse">
+          <option value="">-- Selecione uma subclasse --</option>
+          ${subclassesDisponiveis.map(nome => `<option value="${nome}">${nome}</option>`).join('')}
+        </select>
         <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">
-          No nível 3, você deve escolher uma subclasse. Consulte o livro do jogador para opções.
+          No nível 3, você deve escolher uma subclasse de ${char.classe}.
         </div>
       </div>
     `;
@@ -567,7 +584,7 @@ async function abrirModalLevelUp() {
   
   // Confirmar level up
   document.getElementById('btn-confirmar-levelup')?.addEventListener('click', async () => {
-    const opcoes = {};
+    const opcoes = { ignorar_xp: true };
     
     // Validar subclasse se necessário
     if (precisaSubclasse) {
