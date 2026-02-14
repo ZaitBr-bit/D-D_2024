@@ -4,7 +4,7 @@
 import { CLASSES_INFO, PERICIAS, ATRIBUTOS_NOMES, ATRIBUTOS_KEYS, ATRIBUTO_NOME_PARA_KEY } from '../dados-classes.js';
 import { getPersonagem, salvarPersonagem, removerPersonagem } from '../store.js';
 import { getClasse, getMagiasClasse, getMagiasPorCirculo, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura } from '../db.js';
-import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagia, calcPercepcaoPassiva, calcBonusPericia, calcPVTotal, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, gerarId } from '../utils.js';
+import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagia, calcPercepcaoPassiva, calcBonusPericia, calcPVTotal, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, gerarId, detectarRecarga, ehHabilidadeAtiva } from '../utils.js';
 import { podeSubirDeNivel, subirDeNivel, XP_POR_NIVEL, adicionarXP } from '../levelup.js';
 
 let char = null;
@@ -211,6 +211,9 @@ function renderFichaCompleta() {
     <!-- Características de Classe -->
     ${renderSecaoCaracteristicas()}
 
+    <!-- Características de Subclasse -->
+    ${renderSecaoSubclasse()}
+
     <!-- Espaços de Magia e Magias -->
     ${info.conjurador ? renderSecaoMagias() : ''}
 
@@ -236,6 +239,7 @@ function renderFichaCompleta() {
   setupEventosEdicao();
   setupEventosInventarioSheet();
   setupEventosEspacosMagia();
+  setupEventosHabilidades();
 }
 
 // --- HP e Dados de Vida ---
@@ -303,9 +307,41 @@ function setupEventosHP() {
 }
 
 // --- Descansos ---
+function restaurarHabilidades(tipoDescanso) {
+  if (!char.usos_habilidades) return;
+  const allFeats = [];
+  // Coletar características da classe
+  if (classeData?.caracteristicas) {
+    classeData.caracteristicas.filter(c => c.nivel <= char.nivel).forEach(f => {
+      allFeats.push({ key: `classe_${f.nome}`, descricao: f.descricao });
+    });
+  }
+  // Coletar características da subclasse
+  if (char.subclasse && classeData?.subclasses) {
+    const sc = classeData.subclasses.find(s => s.nome === char.subclasse);
+    if (sc?.caracteristicas) {
+      sc.caracteristicas.filter(c => c.nivel <= char.nivel).forEach(f => {
+        allFeats.push({ key: `subclasse_${f.nome}`, descricao: f.descricao });
+      });
+    }
+  }
+  allFeats.forEach(({ key, descricao }) => {
+    const recarga = detectarRecarga(descricao);
+    if (!recarga) return;
+    if (tipoDescanso === 'longo') {
+      char.usos_habilidades[key] = false;
+    } else if (tipoDescanso === 'curto' && (recarga === 'curto' || recarga === 'curto_ou_longo')) {
+      char.usos_habilidades[key] = false;
+    }
+  });
+}
+
 function setupEventosDescanso() {
   document.getElementById('btn-descanso-curto')?.addEventListener('click', () => {
-    toast('Descanso curto realizado', 'success');
+    restaurarHabilidades('curto');
+    salvar();
+    toast('Descanso curto realizado! Habilidades de descanso curto restauradas', 'success');
+    renderFichaCompleta();
   });
 
   document.getElementById('btn-descanso-longo')?.addEventListener('click', () => {
@@ -318,8 +354,10 @@ function setupEventosDescanso() {
         char.espacos_magia[k].usados = 0;
       });
     }
+    // Restaurar todas as habilidades
+    restaurarHabilidades('longo');
     salvar();
-    toast('Descanso longo realizado! PV e espacos restaurados', 'success');
+    toast('Descanso longo realizado! PV, espaços e habilidades restaurados', 'success');
     renderFichaCompleta();
   });
 
@@ -332,6 +370,21 @@ function setupEventosDescanso() {
       removerPersonagem(char.id);
       window.fecharModal();
       window.navegar('home');
+    });
+  });
+}
+
+// --- Habilidades (Ativas) ---
+function setupEventosHabilidades() {
+  document.querySelectorAll('[data-toggle-uso]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const key = btn.dataset.toggleUso;
+      if (!char.usos_habilidades) char.usos_habilidades = {};
+      char.usos_habilidades[key] = !char.usos_habilidades[key];
+      salvar();
+      renderFichaCompleta();
     });
   });
 }
@@ -534,7 +587,7 @@ async function abrirModalLevelUp() {
         ${caracteristicasSubclasse.map(f => `
           <div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border-light)">
             <div style="font-weight:600;font-size:0.9rem">${f.nome}</div>
-            <div style="font-size:0.85rem;margin-top:2px">${f.descricao}</div>
+            <div class="md-content" style="font-size:0.85rem;margin-top:2px">${mdParaHtml(f.descricao)}</div>
           </div>
         `).join('')}
       </div>
@@ -570,7 +623,11 @@ async function abrirModalLevelUp() {
                    style="border:2px solid var(--border-light);border-radius:8px;padding:12px;cursor:pointer;transition:border-color 0.2s,background 0.2s">
                 <div style="font-weight:700;font-size:1rem;margin-bottom:4px">${sc.nome}</div>
                 <div style="font-size:0.82rem;color:var(--text-muted)">
-                  ${featsNivel3.map(f => `<div style="margin-top:4px"><strong>${f.nome}:</strong> ${f.descricao.length > 120 ? f.descricao.substring(0, 120) + '…' : f.descricao}</div>`).join('')}
+                  ${featsNivel3.map(f => {
+                    const descPlain = f.descricao.replace(/\|[^|]*\|/g, '').replace(/\*\*/g, '').trim();
+                    const preview = descPlain.length > 120 ? descPlain.substring(0, 120) + '…' : descPlain;
+                    return `<div style="margin-top:4px"><strong>${f.nome}:</strong> ${preview}</div>`;
+                  }).join('')}
                 </div>
               </div>
             `;
@@ -644,7 +701,7 @@ async function abrirModalLevelUp() {
             ${feats.map(f => `
               <div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border-light)">
                 <div style="font-weight:600;font-size:0.9rem">${f.nome} <span style="color:var(--text-muted);font-weight:400">(Nível ${f.nivel})</span></div>
-                <div style="margin-top:2px">${f.descricao}</div>
+                <div class="md-content" style="margin-top:2px">${mdParaHtml(f.descricao)}</div>
               </div>
             `).join('')}
           `;
@@ -747,23 +804,84 @@ function renderSecaoTalentos() {
 }
 
 // --- Características de Classe ---
+function renderFeatureItem(f, source) {
+  const recarga = detectarRecarga(f.descricao);
+  const ativa = ehHabilidadeAtiva(f.descricao);
+  const key = `${source}_${f.nome}`;
+  if (!char.usos_habilidades) char.usos_habilidades = {};
+  const usado = char.usos_habilidades[key] || false;
+
+  const recargaBadge = recarga
+    ? `<span class="badge" style="font-size:0.65rem;margin-left:4px;background:${recarga === 'longo' ? 'var(--info)' : recarga === 'curto' ? 'var(--success)' : 'var(--warning)'};color:#fff">${recarga === 'longo' ? '🌙 Desc. Longo' : recarga === 'curto' ? '☀ Desc. Curto' : '☀🌙 Curto/Longo'}</span>`
+    : '';
+  const tipoBadge = ativa
+    ? '<span class="badge" style="font-size:0.65rem;margin-left:4px;background:var(--accent);color:#fff">Ativa</span>'
+    : '<span class="badge" style="font-size:0.65rem;margin-left:4px;background:var(--text-muted);color:#fff">Passiva</span>';
+
+  return `
+    <details style="margin-bottom:6px">
+      <summary style="font-weight:600;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;flex-wrap:wrap;gap:2px">
+        <span class="badge badge-secondary" style="margin-right:4px">Nv.${f.nivel}</span>
+        ${f.nome}
+        ${tipoBadge}
+        ${recargaBadge}
+        ${ativa && recarga ? `
+          <button class="btn btn-sm no-print" style="margin-left:auto;padding:2px 8px;font-size:0.7rem;${usado ? 'opacity:0.5' : ''}" data-toggle-uso="${key}" onclick="event.stopPropagation()">
+            ${usado ? '✗ Usado' : '✓ Disponível'}
+          </button>
+        ` : ''}
+      </summary>
+      <div class="md-content" style="padding:6px 0 6px 16px;font-size:0.85rem">${mdParaHtml(f.descricao)}</div>
+    </details>
+  `;
+}
+
 function renderSecaoCaracteristicas() {
   if (!classeData?.caracteristicas?.length) return '';
   const feats = classeData.caracteristicas.filter(c => c.nivel <= char.nivel);
   if (!feats.length) return '';
 
+  const passivas = feats.filter(f => !ehHabilidadeAtiva(f.descricao));
+  const ativas = feats.filter(f => ehHabilidadeAtiva(f.descricao));
+
   return `
     <div class="card print-break-before">
-      <div class="card-header"><h2>Caracteristicas de Classe</h2></div>
-      ${feats.map(f => `
-        <details style="margin-bottom:6px">
-          <summary style="font-weight:600;cursor:pointer;font-size:0.9rem">
-            <span class="badge badge-secondary" style="margin-right:4px">Nv.${f.nivel}</span>
-            ${f.nome}
-          </summary>
-          <div class="md-content" style="padding:6px 0 6px 16px;font-size:0.85rem">${mdParaHtml(f.descricao)}</div>
-        </details>
-      `).join('')}
+      <div class="card-header"><h2>Características de Classe</h2></div>
+      ${ativas.length > 0 ? `
+        <div class="section-divider"><span>Habilidades Ativas</span></div>
+        ${ativas.map(f => renderFeatureItem(f, 'classe')).join('')}
+      ` : ''}
+      ${passivas.length > 0 ? `
+        <div class="section-divider"><span>Habilidades Passivas</span></div>
+        ${passivas.map(f => renderFeatureItem(f, 'classe')).join('')}
+      ` : ''}
+    </div>
+  `;
+}
+
+// --- Subclasse ---
+
+function renderSecaoSubclasse() {
+  if (!char.subclasse || !classeData?.subclasses?.length) return '';
+  const sc = classeData.subclasses.find(s => s.nome === char.subclasse);
+  if (!sc?.caracteristicas?.length) return '';
+  const feats = sc.caracteristicas.filter(c => c.nivel <= char.nivel);
+  if (!feats.length) return '';
+
+  const passivas = feats.filter(f => !ehHabilidadeAtiva(f.descricao));
+  const ativas = feats.filter(f => ehHabilidadeAtiva(f.descricao));
+
+  return `
+    <div class="card print-break-before">
+      <div class="card-header"><h2>Subclasse — ${char.subclasse}</h2></div>
+      ${ativas.length > 0 ? `
+        <div class="section-divider"><span>Habilidades Ativas</span></div>
+        ${ativas.map(f => renderFeatureItem(f, 'subclasse')).join('')}
+      ` : ''}
+      ${passivas.length > 0 ? `
+        <div class="section-divider"><span>Habilidades Passivas</span></div>
+        ${passivas.map(f => renderFeatureItem(f, 'subclasse')).join('')}
+      ` : ''}
     </div>
   `;
 }
@@ -868,18 +986,28 @@ function renderSecaoMagias() {
       <!-- Magias Preparadas -->
       ${preparadas.length > 0 ? `
         <div class="section-divider"><span>Magias Preparadas</span></div>
-        ${preparadas.map(m => `
+        ${preparadas.map(m => {
+          const circulos = Object.keys(espacos).filter(c => parseInt(c) >= m.circulo).sort((a, b) => parseInt(a) - parseInt(b));
+          const temUpcast = circulos.length > 1;
+          return `
           <div class="magia-item preparada" data-magia-nome="${m.nome}" data-magia-circ="${m.circulo}">
             <div style="display:flex;justify-content:space-between;align-items:center">
               <div>
                 <div class="magia-nome">${m.nome}</div>
                 ${badgesMagiaRapidos(m.nome)}
               </div>
-              <button class="btn btn-sm btn-primary no-print" data-conjurar="${m.nome}" data-conj-circ="${m.circulo}">Conjurar</button>
+              <div class="no-print" style="display:flex;align-items:center;gap:4px">
+                ${temUpcast ? `
+                  <select class="form-input" data-conj-select="${m.nome}" style="width:auto;padding:2px 4px;font-size:0.75rem">
+                    ${circulos.map(c => `<option value="${c}"${c == m.circulo ? ' selected' : ''}>${c}º</option>`).join('')}
+                  </select>
+                ` : ''}
+                <button class="btn btn-sm btn-primary" data-conjurar="${m.nome}" data-conj-circ="${m.circulo}">Conjurar</button>
+              </div>
             </div>
             <div class="magia-desc"></div>
-          </div>
-        `).join('')}
+          </div>`;
+        }).join('')}
       ` : ''}
 
       <!-- Magias customizadas -->
@@ -928,15 +1056,19 @@ function setupEventosEspacosMagia() {
   document.querySelectorAll('[data-conjurar]').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const circ = btn.dataset.conjCirc;
+      const nome = btn.dataset.conjurar;
+      const selectEl = btn.parentElement?.querySelector(`[data-conj-select="${nome}"]`);
+      const circ = selectEl ? selectEl.value : btn.dataset.conjCirc;
       if (!char.espacos_magia[circ]) return;
       if (char.espacos_magia[circ].usados >= char.espacos_magia[circ].total) {
-        toast(`Sem espacos de ${circ}o circulo!`, 'error');
+        toast(`Sem espaços de ${circ}º círculo!`, 'error');
         return;
       }
       char.espacos_magia[circ].usados++;
       salvar();
-      toast(`${btn.dataset.conjurar} conjurada!`, 'success');
+      const baseCirc = btn.dataset.conjCirc;
+      const upcast = parseInt(circ) > parseInt(baseCirc);
+      toast(`${nome} conjurada${upcast ? ` no ${circ}º círculo` : ''}!`, 'success');
       renderFichaCompleta();
     });
   });
