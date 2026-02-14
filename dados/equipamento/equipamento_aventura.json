@@ -4,17 +4,23 @@
     {
       "nome": "Ácido",
       "peso": "0,5 kg",
-      "custo": "25 PO"
+      "custo": "25 PO",
+      "descricao": "Como uma ação, você pode jogar este frasco em uma criatura a até 1,5 metro de você ou arremessá-lo a até 6 metros, quebrando-o no impacto. Faça um ataque à distância contra a criatura, tratando o ácido como uma arma improvisada. Se acertar, o alvo sofre 2d6 de dano ácido.",
+      "tipo_uso": "consumivel"
     },
     {
       "nome": "Água Benta",
       "peso": "0,5 kg",
-      "custo": "25 PO"
+      "custo": "25 PO",
+      "descricao": "Como uma ação, você pode jogar este frasco a até 6 metros, quebrando-o no impacto. Faça um ataque à distância, tratando como arma improvisada. Se o alvo for um corruptor ou morto-vivo, ele sofre 2d6 de dano radiante.",
+      "tipo_uso": "consumivel"
     },
     {
       "nome": "Algibeira",
       "peso": "0,5 kg",
-      "custo": "5 PP"
+      "custo": "5 PP",
+      "descricao": "Pode conter até 20 projéteis de funda ou itens pequenos.",
+      "tipo_uso": "equipamento"
     },
     {
       "nome": "Aljava",
@@ -24,7 +30,9 @@
     {
       "nome": "Antitoxina",
       "peso": "—",
-      "custo": "50 PO"
+      "custo": "50 PO",
+      "descricao": "Uma criatura que beber este frasco ganha vantagem em testes de resistência contra veneno por 1 hora. Não confere benefício a mortos-vivos ou constructos.",
+      "tipo_uso": "consumivel"
     },
     {
       "nome": "Apito Sinalizador",
@@ -164,7 +172,9 @@
     {
       "nome": "Fogo Alquímico",
       "peso": "0,5 kg",
-      "custo": "50 PO"
+      "custo": "50 PO",
+      "descricao": "Como uma ação, você pode jogar este frasco a até 6 metros, quebrando-o no impacto. Faça um ataque à distância, tratando como arma improvisada. Se acertar, o alvo sofre 1d4 de dano ígneo no início de cada turno. Uma criatura pode usar sua ação para apagar as chamas.",
+      "tipo_uso": "consumivel"
     },
     {
       "nome": "Frasco",
@@ -254,7 +264,9 @@
     {
       "nome": "Luneta",
       "peso": "0,5 kg",
-      "custo": "1.000 PO"
+      "custo": "1.000 PO",
+      "descricao": "Objetos vistos através de uma luneta são ampliados ao dobro do seu tamanho.",
+      "tipo_uso": "equipamento"
     },
     {
       "nome": "Lupa",
@@ -269,7 +281,9 @@
     {
       "nome": "Mochila",
       "peso": "2,5 kg",
-      "custo": "2 PO"
+      "custo": "2 PO",
+      "descricao": "Pode conter até 15 kg de equipamento.",
+      "tipo_uso": "equipamento"
     },
     {
       "nome": "Munição",
@@ -279,7 +293,9 @@
     {
       "nome": "Óleo",
       "peso": "0,5 kg",
-      "custo": "1 PP"
+      "custo": "1 PP",
+      "descricao": "Geralmente vem em um frasco de argila que contém 0,5 litro. Como uma ação, você pode jogar o óleo em uma criatura a até 1,5 metro ou arremessar o frasco a até 6 metros. Se o alvo coberto de óleo sofrer dano ígneo, ele sofre 5 de dano ígneo adicional. O óleo também pode ser derramado no chão, cobrindo uma área de 1,5 metro quadrado.",
+      "tipo_uso": "consumivel"
     },
     {
       "nome": "Pá",
@@ -319,12 +335,16 @@
     {
       "nome": "Poção de Cura",
       "peso": "250 g",
-      "custo": "50 PO"
+      "custo": "50 PO",
+      "descricao": "Um personagem que beber esta poção recupera 2d4+2 pontos de vida. Beber ou administrar esta poção requer uma ação.",
+      "tipo_uso": "consumivel"
     },
     {
       "nome": "Pote",
       "peso": "0,5 kg",
-      "custo": "2 PC"
+      "custo": "2 PC",
+      "descricao": "Recipiente simples de argila. Pode conter líquidos ou itens pequenos.",
+      "tipo_uso": "equipamento"
     },
     {
       "nome": "Pote, Ferro",
@@ -394,7 +414,9 @@
     {
       "nome": "Tocha",
       "peso": "0,5 kg",
-      "custo": "1 PC"
+      "custo": "1 PC",
+      "descricao": "Uma tocha queima por 1 hora, fornecendo luz plena em um raio de 6 metros e penumbra por mais 6 metros.",
+      "tipo_uso": "consumivel"
     },
     {
       "nome": "Túnica",
@@ -409,7 +431,9 @@
     {
       "nome": "Veneno Básico",
       "peso": "—",
-      "custo": "100 PO"
+      "custo": "100 PO",
+      "descricao": "Você pode usar este veneno para revestir uma arma cortante ou perfurante, ou até três munições. Aplicar o veneno requer uma ação. Uma criatura atingida deve fazer um teste de resistência de Constituição CD 10 ou sofrer 1d4 de dano venenoso. Uma vez aplicado, o veneno mantém sua potência por 1 minuto antes de secar.",
+      "tipo_uso": "consumivel"
     }
   ],
   "municao": [
