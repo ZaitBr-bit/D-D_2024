@@ -4,7 +4,7 @@
 import { CLASSES_INFO, PERICIAS, ATRIBUTOS_NOMES, ATRIBUTOS_KEYS, ATRIBUTO_NOME_PARA_KEY } from '../dados-classes.js';
 import { getPersonagem, salvarPersonagem, removerPersonagem } from '../store.js';
 import { getClasse, getMagiasClasse, getMagiasPorCirculo, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura, getTalentos } from '../db.js';
-import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagia, calcPercepcaoPassiva, calcBonusPericia, calcPVTotal, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, gerarId, detectarRecarga, ehHabilidadeAtiva, formatarDados } from '../utils.js';
+import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagia, calcPercepcaoPassiva, calcBonusPericia, calcPVTotal, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, gerarId, detectarRecarga, ehHabilidadeAtiva } from '../utils.js';
 import { podeSubirDeNivel, subirDeNivel, XP_POR_NIVEL, adicionarXP } from '../levelup.js';
 
 let char = null;
@@ -392,10 +392,10 @@ function restaurarHabilidades(tipoDescanso) {
     const recarga = detectarRecarga(descricao);
     if (!recarga) return;
     if (tipoDescanso === 'longo') {
-      // Reset: handle both boolean and numeric usage tracking
+      // Long rest: reset all uses (handle both boolean and numeric tracking)
       char.usos_habilidades[key] = typeof char.usos_habilidades[key] === 'number' ? 0 : false;
     } else if (tipoDescanso === 'curto' && (recarga === 'curto' || recarga === 'curto_ou_longo')) {
-      // For short rest, restore 1 use if numeric, or reset if boolean
+      // Short rest: restore 1 use if numeric (reduce "used" count by 1), or reset if boolean
       if (typeof char.usos_habilidades[key] === 'number') {
         char.usos_habilidades[key] = Math.max(0, char.usos_habilidades[key] - 1);
       } else {
@@ -1172,7 +1172,7 @@ function renderSecaoMagias() {
         <div style="margin-bottom:12px">
           ${Object.entries(espacos).map(([circ, data]) => `
             <div class="slots-grupo">
-              <label>${circ}&ordm; Circulo</label>
+              <label>${circ}&ordm; Círculo</label>
               <div style="display:flex;gap:4px">
                 ${Array.from({ length: data.total }, (_, i) => `
                   <div class="slot-bolha ${i < data.usados ? 'usado' : ''}" data-slot-circ="${circ}" data-slot-idx="${i}"></div>
@@ -1250,7 +1250,7 @@ function renderSecaoMagias() {
                   <div>
                     <div class="magia-nome">${m.nome}</div>
                     <div class="magia-meta">
-                      <span>${m.circulo === 0 ? 'Truque' : m.circulo + 'o Circulo'}</span>
+                      <span>${m.circulo === 0 ? 'Truque' : m.circulo + 'º Círculo'}</span>
                       <span>${m.escola || ''}</span>
                     </div>
                   </div>
@@ -1378,7 +1378,7 @@ async function mostrarBuscaMagia() {
       <div class="magia-item" style="cursor:pointer" data-add-nome="${m.nome}" data-add-circ="${m.circulo}">
         <div class="magia-nome">${m.nome}</div>
         <div class="magia-meta">
-          <span>${m.circulo === 0 ? 'Truque' : m.circulo + 'o Circulo'}</span>
+          <span>${m.circulo === 0 ? 'Truque' : m.circulo + 'º Círculo'}</span>
           <span>${m.escola}</span>
           <span>${(m.classes || []).join(', ')}</span>
         </div>
