@@ -1,0 +1,55 @@
+{
+  "descricao": "Controle de espécies revisadas para o sistema de level-up",
+  "ultima_atualizacao": "2026-02-14",
+  "especies": [
+    {
+      "nome": "Golias",
+      "revisado": true,
+      "data_revisao": "2026-02-14",
+      "caracteristicas_especiais": [
+        "Ancestralidade Gigante (escolha no nível 1)",
+        "Forma Grande (disponível a partir do nível 5)"
+      ],
+      "notas": "Primeira espécie implementada no sistema de level-up. Forma Grande desbloqueia automaticamente no nível 5."
+    },
+    {
+      "nome": "Aasimar",
+      "revisado": false,
+      "caracteristicas_especiais": [
+        "Revelação Celestial (disponível a partir do nível 3)"
+      ]
+    },
+    {
+      "nome": "Anão",
+      "revisado": false
+    },
+    {
+      "nome": "Draconato",
+      "revisado": false
+    },
+    {
+      "nome": "Elfo",
+      "revisado": false
+    },
+    {
+      "nome": "Gnomo",
+      "revisado": false
+    },
+    {
+      "nome": "Halfling",
+      "revisado": false
+    },
+    {
+      "nome": "Humano",
+      "revisado": false
+    },
+    {
+      "nome": "Orc",
+      "revisado": false
+    },
+    {
+      "nome": "Tiferino",
+      "revisado": false
+    }
+  ]
+}
