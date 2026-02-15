@@ -522,7 +522,7 @@ function setupEventosHP() {
         <div style="font-size:1rem;font-weight:700;margin-bottom:8px">${char.pv_max}</div>
       </div>
       <div class="form-group">
-        <label class="form-label">PV Máximo Atual (com bônus temporário)</label>
+        <label class="form-label" for="input-pv-max-override">PV Máximo Atual (com bônus temporário)</label>
         <input type="number" class="form-input" id="input-pv-max-override" value="${char.pv_max_override || char.pv_max}" min="1" autofocus>
         <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">
           Use para magias que aumentam PV máximo temporariamente (ex: Ajuda, Heróis do Banquete).
@@ -803,7 +803,7 @@ function setupEventosEdicao() {
     abrirModal('Editar Detalhes', `
       ${campos.map(c => `
         <div class="form-group">
-          <label class="form-label">${c.label}</label>
+          <label class="form-label" for="edit-${c.key}">${c.label}</label>
           <textarea class="form-textarea" id="edit-${c.key}" rows="2">${char[c.key] || ''}</textarea>
         </div>
       `).join('')}
@@ -823,7 +823,7 @@ function setupEventosEdicao() {
   document.getElementById('btn-edit-header')?.addEventListener('click', () => {
     abrirModal('Editar Personagem', `
       <div class="form-group">
-        <label class="form-label">Nome</label>
+        <label class="form-label" for="edit-nome">Nome</label>
         <input type="text" class="form-input" id="edit-nome" value="${char.nome}">
       </div>
       <div class="row gap-1">
@@ -866,7 +866,7 @@ function setupEventosEdicao() {
   document.getElementById('xp-display')?.addEventListener('click', () => {
     abrirModal('Gerenciar Pontos de Experiência', `
       <div class="form-group">
-        <label class="form-label">XP Atual</label>
+        <label class="form-label" for="edit-xp-atual">XP Atual</label>
         <input type="number" class="form-input" id="edit-xp-atual" value="${char.xp || 0}" min="0">
         <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">
           Nivel Atual: ${char.nivel}${char.nivel < 20 ? ` | Próximo Nivel (${char.nivel + 1}): ${XP_POR_NIVEL[char.nivel + 1]} XP` : ' (Máximo)'}
@@ -874,7 +874,7 @@ function setupEventosEdicao() {
       </div>
       <div class="section-divider mt-2"><span>Adicionar XP</span></div>
       <div class="form-group">
-        <label class="form-label">Ganhar XP</label>
+        <label class="form-label" for="add-xp">Ganhar XP</label>
         <input type="number" class="form-input" id="add-xp" placeholder="Quantidade de XP para adicionar" min="0">
       </div>
     `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-xp">Salvar</button>');
@@ -1026,7 +1026,7 @@ async function abrirModalLevelUp() {
       <div class="atributos-grid">
         ${ATRIBUTOS_KEYS.map(key => `
           <div class="form-group" style="text-align:center">
-            <label class="form-label">${ATRIBUTOS_NOMES[key]}</label>
+            <label class="form-label" for="levelup-attr-${key}">${ATRIBUTOS_NOMES[key]}</label>
             <div style="font-size:0.8rem;margin-bottom:2px">${char.atributos[key]}</div>
             <select class="form-input" style="text-align:center" id="levelup-attr-${key}">
               <option value="0">+0</option>
@@ -1617,7 +1617,7 @@ async function abrirModalLevelUp() {
     
     if (resultado.sucesso) {
       salvar();
-      window.fecharModal();
+      window.fecharModalTodos();
       
       // Mostrar resumo
       const resumo = `
@@ -1760,22 +1760,25 @@ function renderFeatureItem(f, source) {
     ? '<span class="badge" style="font-size:0.65rem;margin-left:4px;background:var(--accent);color:#fff">Ativa</span>'
     : '<span class="badge" style="font-size:0.65rem;margin-left:4px;background:var(--text-muted);color:#fff">Passiva</span>';
 
-  // Renderizar controle de usos
-  let usosHtml = '';
+  // Renderizar controle de usos (fora do summary para acessibilidade)
+  let usosHtmlSummary = '';
+  let usosHtmlBody = '';
   if (temMultiplosUsos) {
-    usosHtml = `
-      <div class="no-print" style="display:flex;align-items:center;gap:4px;margin-left:auto">
-        <span style="font-size:0.7rem;font-weight:600">${usosMax - usosAtual}/${usosMax}</span>
-        <button class="btn btn-sm" style="padding:2px 8px;font-size:0.7rem" data-usar-habilidade="${key}" data-usos-max="${usosMax}" onclick="event.stopPropagation()">
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${usosMax - usosAtual}/${usosMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:4px;padding:4px 0 4px 16px">
+        <button class="btn btn-sm" style="padding:2px 8px;font-size:0.7rem" data-usar-habilidade="${key}" data-usos-max="${usosMax}">
           ${usosAtual >= usosMax ? '✗ Esgotado' : 'Usar'}
         </button>
       </div>
     `;
   } else if (ativa && recarga) {
-    usosHtml = `
-      <button class="btn btn-sm no-print" style="margin-left:auto;padding:2px 8px;font-size:0.7rem;${usado ? 'opacity:0.5' : ''}" data-toggle-uso="${key}" onclick="event.stopPropagation()">
-        ${usado ? '✗ Usado' : '✓ Disponível'}
-      </button>
+    usosHtmlBody = `
+      <div class="no-print" style="padding:4px 0 4px 16px">
+        <button class="btn btn-sm" style="padding:2px 8px;font-size:0.7rem;${usado ? 'opacity:0.5' : ''}" data-toggle-uso="${key}">
+          ${usado ? '✗ Usado' : '✓ Disponível'}
+        </button>
+      </div>
     `;
   }
 
@@ -1786,8 +1789,9 @@ function renderFeatureItem(f, source) {
         ${f.nome}
         ${tipoBadge}
         ${recargaBadge}
-        ${usosHtml}
+        ${usosHtmlSummary}
       </summary>
+      ${usosHtmlBody}
       <div class="md-content" style="padding:6px 0 6px 16px;font-size:0.85rem">${mdParaHtml(f.descricao)}</div>
       ${subHabilidades.length > 0 ? `
         <div style="padding:4px 0 4px 16px;font-size:0.8rem;color:var(--text-muted)">
@@ -1960,21 +1964,24 @@ function renderTracoEspecie(traco, herdaAncestralidade = false) {
     ? '<span class="badge" style="font-size:0.65rem;margin-left:4px;background:var(--accent);color:#fff">Ativa</span>'
     : '<span class="badge" style="font-size:0.65rem;margin-left:4px;background:var(--text-muted);color:#fff">Passiva</span>';
 
-  let usosHtml = '';
+  let usosHtmlSummary = '';
+  let usosHtmlBody = '';
   if (temMultiplosUsos) {
-    usosHtml = `
-      <div class="no-print" style="display:flex;align-items:center;gap:4px;margin-left:auto">
-        <span style="font-size:0.7rem;font-weight:600">${usosMax - usosAtual}/${usosMax}</span>
-        <button class="btn btn-sm" style="padding:2px 8px;font-size:0.7rem" data-usar-habilidade="${key}" data-usos-max="${usosMax}" onclick="event.stopPropagation()">
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${usosMax - usosAtual}/${usosMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:4px;padding:4px 0 4px 16px">
+        <button class="btn btn-sm" style="padding:2px 8px;font-size:0.7rem" data-usar-habilidade="${key}" data-usos-max="${usosMax}">
           ${usosAtual >= usosMax ? '✗ Esgotado' : 'Usar'}
         </button>
       </div>
     `;
   } else if (ativa && recarga) {
-    usosHtml = `
-      <button class="btn btn-sm no-print" style="margin-left:auto;padding:2px 8px;font-size:0.7rem;${usado ? 'opacity:0.5' : ''}" data-toggle-uso="${key}" onclick="event.stopPropagation()">
-        ${usado ? '✗ Usado' : '✓ Disponível'}
-      </button>
+    usosHtmlBody = `
+      <div class="no-print" style="padding:4px 0 4px 16px">
+        <button class="btn btn-sm" style="padding:2px 8px;font-size:0.7rem;${usado ? 'opacity:0.5' : ''}" data-toggle-uso="${key}">
+          ${usado ? '✗ Usado' : '✓ Disponível'}
+        </button>
+      </div>
     `;
   }
 
@@ -1984,8 +1991,9 @@ function renderTracoEspecie(traco, herdaAncestralidade = false) {
         ${traco.nome}
         ${tipoBadge}
         ${recargaBadge}
-        ${usosHtml}
+        ${usosHtmlSummary}
       </summary>
+      ${usosHtmlBody}
       <div class="md-content" style="padding:6px 0 6px 16px;font-size:0.85rem">${mdParaHtml(traco.descricao)}</div>
     </details>
   `;
@@ -2491,7 +2499,7 @@ async function mostrarBuscaMagia() {
     </div>
     <div class="search-box"><input type="text" id="busca-magia-add" placeholder="Buscar magia..." class="form-input"></div>
     <div id="resultado-magias" style="max-height:50vh;overflow-y:auto"></div>
-  `);
+  `, '', () => renderFichaCompleta());
 
   const resultadoEl = document.getElementById('resultado-magias');
   let tabAtiva = 'preparadas';
@@ -2507,44 +2515,40 @@ async function mostrarBuscaMagia() {
       const filtradas = termo.length >= 2 ? normais.filter(m => semAcento(m.nome).includes(termo)) : normais;
       const filtradasDom = termo.length >= 2 ? dominio.filter(m => semAcento(m.nome).includes(termo)) : dominio;
 
-      html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">${labelMg}s: ${normais.length}/${maxPrep} | Clique em uma magia para removê-la</div>`;
+      html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">${labelMg}s: ${normais.length}/${maxPrep} | Clique para remover</div>`;
 
       if (filtradasDom.length > 0) {
         html += `<div style="font-size:0.75rem;font-weight:700;color:var(--secondary);margin:8px 0 4px">Domínio (sempre preparadas)</div>`;
-        html += filtradasDom.map(m => `
-          <div class="magia-item magia-dominio" style="opacity:0.7;cursor:default">
-            <div class="magia-nome"><span class="badge-dominio">&#9733;</span> ${m.nome}</div>
-            ${badgesMagiaRapidos(m.nome)}
-            <div style="font-size:0.65rem;color:var(--secondary)">Sempre preparada (Domínio)</div>
+        html += `<div class="magias-grid">${filtradasDom.map(m => `
+          <div class="magia-card selecionada magia-dominio" style="opacity:0.7;cursor:default">
+            <span class="magia-card-check"></span>
+            <div class="magia-card-nome"><span class="badge-dominio">&#9733;</span> ${m.nome}</div>
+            <div class="magia-card-meta"><span>Domínio</span></div>
+            <span class="magia-card-info" data-detalhe-magia="${m.nome}" data-detalhe-circ="${m.circulo}" title="Ver detalhes">&#9432;</span>
           </div>
-        `).join('');
+        `).join('')}</div>`;
       }
 
       if (filtradas.length > 0) {
-        html += filtradas.map(m => `
-          <div class="magia-item preparada" style="cursor:pointer" data-remover-prep="${m.nome}">
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <div>
-                <div class="magia-nome">${m.nome}</div>
-                ${badgesMagiaRapidos(m.nome)}
-              </div>
-              <div style="display:flex;gap:4px;align-items:center">
-                <span class="magia-card-info" data-detalhe-magia="${m.nome}" data-detalhe-circ="${m.circulo}" title="Ver detalhes" style="cursor:pointer;font-size:1.2rem;color:var(--accent)">&#9432;</span>
-                <button class="btn btn-sm btn-danger btn-icon btn-magia-remover">&times;</button>
-              </div>
+        html += `<div class="magias-grid">${filtradas.map(m => `
+          <div class="magia-card selecionada" style="cursor:pointer" data-remover-prep="${m.nome}">
+            <span class="magia-card-check"></span>
+            <div class="magia-card-nome">${m.nome}</div>
+            <div class="magia-card-meta">
+              <span>${m.circulo || 0}º Círculo</span>
             </div>
+            <span class="magia-card-info" data-detalhe-magia="${m.nome}" data-detalhe-circ="${m.circulo}" title="Ver detalhes">&#9432;</span>
           </div>
-        `).join('');
+        `).join('')}</div>`;
       } else if (normais.length === 0) {
         html += `<div style="text-align:center;color:var(--text-muted);padding:16px">Nenhuma magia ${labelMg.toLowerCase()} ainda.</div>`;
       }
     } else if (tabAtiva === 'truques') {
-      // Truques: lista da classe com check
+      // Truques: grid da classe com toggle
       const truquesAtuais = (char.magias_conhecidas || []).filter(m => m.circulo === 0);
       const numTruq = truquesAtuais.length;
       html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">Truques: ${numTruq}/${maxTruq}</div>`;
 
-      // Primeiro mostrar selecionados
       const selecionadosSet = new Set(truquesAtuais.map(m => m.nome));
       let lista = [...truquesClasse];
       lista.sort((a, b) => {
@@ -2553,22 +2557,25 @@ async function mostrarBuscaMagia() {
         return aSel - bSel || a.nome.localeCompare(b.nome);
       });
       if (termo.length >= 2) lista = lista.filter(m => semAcento(m.nome).includes(termo));
+      const cheioTruq = numTruq >= maxTruq;
 
-      html += lista.map(m => {
+      html += `<div class="magias-grid">${lista.map(m => {
         const sel = selecionadosSet.has(m.nome);
+        const bloqueado = cheioTruq && !sel;
         return `
-          <div class="magia-item ${sel ? 'preparada' : ''}" style="cursor:pointer" data-toggle-truque="${m.nome}">
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <div>
-                <div class="magia-nome">${sel ? '&#10003; ' : ''}${m.nome}</div>
-                ${badgesMagiaRapidos(m.nome)}
-              </div>
-              <span class="magia-card-info" data-detalhe-magia="${m.nome}" data-detalhe-circ="0" title="Ver detalhes" style="cursor:pointer;font-size:1.2rem;color:var(--accent)">&#9432;</span>
+          <div class="magia-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}"
+               data-toggle-truque="${m.nome}" style="${bloqueado ? 'opacity:0.35;' : ''}">
+            <span class="magia-card-check"></span>
+            <div class="magia-card-nome">${m.nome}</div>
+            <div class="magia-card-meta">
+              <span>${m.escola || ''}</span>
+              ${m.especial === 'C' ? '<span title="Concentração">C</span>' : ''}
             </div>
+            <span class="magia-card-info" data-detalhe-magia="${m.nome}" data-detalhe-circ="0" title="Ver detalhes">&#9432;</span>
           </div>`;
-      }).join('');
+      }).join('')}</div>`;
     } else {
-      // Magias de um círculo específico
+      // Magias de um círculo específico — grid
       const circ = parseInt(tabAtiva);
       const magiasDoCirc = magiasCirculo[circ] || [];
       const selecionadasSet = new Set((char.magias_preparadas || []).filter(m => m.circulo === circ).map(m => m.nome));
@@ -2585,21 +2592,24 @@ async function mostrarBuscaMagia() {
       });
       if (termo.length >= 2) lista = lista.filter(m => semAcento(m.nome).includes(termo));
 
-      html += lista.map(m => {
+      html += `<div class="magias-grid">${lista.map(m => {
         const sel = selecionadasSet.has(m.nome);
         const isDominio = (char.magias_preparadas || []).find(p => p.nome === m.nome && p.origem === 'dominio');
+        const bloqueado = cheio && !sel && !isDominio;
         return `
-          <div class="magia-item ${sel ? 'preparada' : ''} ${isDominio ? 'magia-dominio' : ''}" style="cursor:${isDominio ? 'default' : 'pointer'}" ${isDominio ? '' : `data-toggle-magia="${m.nome}" data-toggle-circ="${circ}"`}>
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <div>
-                <div class="magia-nome">${sel ? '&#10003; ' : ''}${isDominio ? '<span class="badge-dominio">&#9733;</span> ' : ''}${m.nome}</div>
-                ${badgesMagiaRapidos(m.nome)}
-                ${isDominio ? '<div style="font-size:0.65rem;color:var(--secondary)">Domínio</div>' : ''}
-              </div>
-              <span class="magia-card-info" data-detalhe-magia="${m.nome}" data-detalhe-circ="${circ}" title="Ver detalhes" style="cursor:pointer;font-size:1.2rem;color:var(--accent)">&#9432;</span>
+          <div class="magia-card ${sel ? 'selecionada' : ''} ${isDominio ? 'magia-dominio' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}"
+               ${isDominio ? '' : `data-toggle-magia="${m.nome}" data-toggle-circ="${circ}"`}
+               style="${bloqueado ? 'opacity:0.35;' : ''}${isDominio ? 'opacity:0.7;' : ''}">
+            <span class="magia-card-check"></span>
+            <div class="magia-card-nome">${isDominio ? '<span class="badge-dominio">&#9733;</span> ' : ''}${m.nome}</div>
+            <div class="magia-card-meta">
+              <span>${m.escola || ''}</span>
+              ${m.especial === 'C' ? '<span title="Concentração">C</span>' : ''}
+              ${isDominio ? '<span>Domínio</span>' : ''}
             </div>
+            <span class="magia-card-info" data-detalhe-magia="${m.nome}" data-detalhe-circ="${circ}" title="Ver detalhes">&#9432;</span>
           </div>`;
-      }).join('');
+      }).join('')}</div>`;
     }
 
     resultadoEl.innerHTML = html;
@@ -2734,36 +2744,36 @@ async function mostrarBuscaMagia() {
 function mostrarFormMagiaCustom() {
   abrirModal('Magia Customizada', `
     <div class="form-group">
-      <label class="form-label">Nome</label>
+      <label class="form-label" for="mc-nome">Nome</label>
       <input type="text" class="form-input" id="mc-nome" placeholder="Nome da magia">
     </div>
     <div class="row gap-1">
       <div class="col">
-        <label class="form-label">Circulo</label>
+        <label class="form-label" for="mc-circulo">Circulo</label>
         <select class="form-select" id="mc-circulo">
           <option value="0">Truque</option>
           ${[1,2,3,4,5,6,7,8,9].map(i => `<option value="${i}">${i}o Circulo</option>`).join('')}
         </select>
       </div>
       <div class="col">
-        <label class="form-label">Escola</label>
+        <label class="form-label" for="mc-escola">Escola</label>
         <input type="text" class="form-input" id="mc-escola" placeholder="Ex: Evocacao">
       </div>
     </div>
     <div class="row gap-1">
-      <div class="col"><label class="form-label">Tempo de Conjuracao</label><input type="text" class="form-input" id="mc-tempo" value="Acao"></div>
-      <div class="col"><label class="form-label">Alcance</label><input type="text" class="form-input" id="mc-alcance" value="9 metros"></div>
+      <div class="col"><label class="form-label" for="mc-tempo">Tempo de Conjuracao</label><input type="text" class="form-input" id="mc-tempo" value="Acao"></div>
+      <div class="col"><label class="form-label" for="mc-alcance">Alcance</label><input type="text" class="form-input" id="mc-alcance" value="9 metros"></div>
     </div>
     <div class="row gap-1">
-      <div class="col"><label class="form-label">Componentes</label><input type="text" class="form-input" id="mc-comp" value="V, S"></div>
-      <div class="col"><label class="form-label">Duracao</label><input type="text" class="form-input" id="mc-duracao" value="Instantanea"></div>
+      <div class="col"><label class="form-label" for="mc-comp">Componentes</label><input type="text" class="form-input" id="mc-comp" value="V, S"></div>
+      <div class="col"><label class="form-label" for="mc-duracao">Duracao</label><input type="text" class="form-input" id="mc-duracao" value="Instantanea"></div>
     </div>
     <div class="form-group">
-      <label class="form-label">Descricao</label>
+      <label class="form-label" for="mc-desc">Descricao</label>
       <textarea class="form-textarea" id="mc-desc" rows="4" placeholder="Descricao da magia..."></textarea>
     </div>
     <div class="form-group">
-      <label class="form-label">Dano / Efeito</label>
+      <label class="form-label" for="mc-dano">Dano / Efeito</label>
       <input type="text" class="form-input" id="mc-dano" placeholder="Ex: 3d6 fogo">
     </div>
   `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-mc">Adicionar</button>');
@@ -2851,130 +2861,222 @@ async function mostrarBuscaGrimorio() {
 /** Modal de troca de magias preparadas (usado no descanso longo para classes preparadas) */
 async function mostrarTrocaMagias() {
   const info = CLASSES_INFO[char.classe] || {};
-  const tipoConj = info.tipo_conjuracao;
   const maxPreparadas = classeData?.tabela_caracteristicas
     ? getMagiaPreparadas(classeData.tabela_caracteristicas, char.nivel) : 0;
   const ehMago = char.classe === 'Mago';
 
+  // Espaços de magia para determinar círculos disponíveis
+  const espacosNivel = classeData?.tabela_caracteristicas
+    ? getEspacosMagia(classeData.tabela_caracteristicas, char.nivel) : {};
+  const maxCirculo = Math.max(...Object.keys(espacosNivel).map(Number), 0);
+
   // Buscar lista de magias disponíveis (classe ou grimório)
   let magiasDisponiveis = [];
   if (ehMago) {
-    // Mago prepara a partir do grimório
-    magiasDisponiveis = (char.grimorio || []).map(m => ({ ...m, classes: ['Mago'] }));
+    magiasDisponiveis = (char.grimorio || []).map(m => ({ ...m }));
   } else {
-    // Demais classes preparam da lista completa
-    const indice = await getIndiceMagias();
-    magiasDisponiveis = (indice?.magias || []).filter(m =>
-      m.circulo > 0 && (m.classes || []).includes(char.classe)
-    );
+    const magiasClasseData = await getMagiasClasse(char.classe);
+    magiasDisponiveis = achatarMagiasClasse(magiasClasseData).filter(m => m.circulo > 0);
   }
 
   // Identificar magias de domínio (não removíveis)
   const nomesDominio = new Set((char.magias_preparadas || []).filter(m => m.origem === 'dominio').map(m => m.nome));
 
-  // Cópia temporária das magias preparadas (excluindo domínio para edição)
-  let prepTemp = (char.magias_preparadas || []).filter(m => m.origem !== 'dominio').map(m => ({ ...m }));
+  // Set temporário com magias selecionadas (excluindo domínio)
+  const selecionadasSet = new Set((char.magias_preparadas || []).filter(m => m.origem !== 'dominio').map(m => m.nome));
+  // Mapa nome->circulo para reconstruir ao confirmar
+  const circuloMap = {};
+  magiasDisponiveis.forEach(m => { circuloMap[m.nome] = m.circulo; });
+  (char.magias_preparadas || []).forEach(m => { circuloMap[m.nome] = m.circulo; });
 
-  function renderListaTroca() {
-    const numAtual = prepTemp.length;
-    const corContador = numAtual > maxPreparadas ? 'var(--danger)' : numAtual === maxPreparadas ? 'var(--success)' : 'inherit';
-
-    return `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div style="font-weight:700;color:${corContador}">${numAtual} / ${maxPreparadas} Magias Preparadas</div>
-      </div>
-
-      ${nomesDominio.size > 0 ? `
-        <div style="font-size:0.8rem;color:var(--secondary);margin-bottom:8px">
-          <strong>Magias de Domínio (sempre preparadas):</strong>
-          ${[...nomesDominio].join(', ')}
-        </div>
-      ` : ''}
-
-      <div style="margin-bottom:12px">
-        <div style="font-size:0.8rem;font-weight:700;margin-bottom:4px">Magias Atualmente Preparadas:</div>
-        ${prepTemp.length === 0
-          ? '<div style="color:var(--text-muted);font-size:0.85rem;padding:8px">Nenhuma magia preparada</div>'
-          : prepTemp.map((m, i) => `
-          <div class="magia-item" style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;margin-bottom:2px">
-            <span style="font-size:0.85rem;font-weight:600">${m.nome} <span style="color:var(--text-muted);font-size:0.75rem">(${m.circulo}º)</span></span>
-            <button class="btn btn-sm btn-danger btn-icon" data-troca-remover="${i}" style="width:24px;height:24px;font-size:0.7rem">&times;</button>
-          </div>
-        `).join('')}
-      </div>
-
-      <div class="section-divider"><span>Adicionar</span></div>
-      <div class="search-box"><input type="text" id="busca-troca-magia" placeholder="Buscar magia ${ehMago ? 'no grimório' : 'da classe'}..." class="form-input"></div>
-      <div id="resultado-troca" style="max-height:30vh;overflow-y:auto"></div>
-    `;
+  // Separar por círculo
+  const magiasCirculo = {};
+  for (let c = 1; c <= maxCirculo; c++) {
+    const doCirculo = magiasDisponiveis.filter(m => m.circulo === c);
+    if (doCirculo.length > 0) magiasCirculo[c] = doCirculo;
   }
 
-  abrirModal(
-    `Trocar Magias Preparadas`,
-    renderListaTroca(),
-    '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-confirmar-troca">Confirmar</button>'
-  );
+  // Tabs
+  const tabs = ['selecionadas'];
+  Object.keys(magiasCirculo).forEach(c => tabs.push(c));
+  let tabAtiva = 'selecionadas';
 
-  function setupEventosTroca() {
-    // Remover magia da lista temporária
-    document.querySelectorAll('[data-troca-remover]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const idx = parseInt(btn.dataset.trocaRemover);
-        prepTemp.splice(idx, 1);
-        document.getElementById('modal-corpo').innerHTML = renderListaTroca();
-        setupEventosTroca();
+  abrirModal('Trocar Magias Preparadas', `
+    <div style="margin-bottom:8px">
+      <span class="magia-contador ${selecionadasSet.size >= maxPreparadas ? 'contador-cheio' : selecionadasSet.size > maxPreparadas ? 'contador-excedido' : ''}">
+        Preparadas: <strong id="troca-contador">${selecionadasSet.size}</strong>/${maxPreparadas}
+      </span>
+      ${nomesDominio.size > 0 ? `<span style="font-size:0.75rem;color:var(--secondary);margin-left:8px">+ ${nomesDominio.size} de Domínio</span>` : ''}
+    </div>
+    <div class="tabs" id="tabs-troca-magias" style="margin-bottom:8px;overflow-x:auto;white-space:nowrap">
+      <div class="tab active" data-tab-troca="selecionadas">Selecionadas</div>
+      ${Object.keys(magiasCirculo).map(c => `<div class="tab" data-tab-troca="${c}">${c}º Círculo</div>`).join('')}
+    </div>
+    <div class="search-box"><input type="text" id="busca-troca-magia" placeholder="Buscar magia..." class="form-input"></div>
+    <div id="resultado-troca" style="max-height:50vh;overflow-y:auto"></div>
+  `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-confirmar-troca">Confirmar</button>');
+
+  const resultadoEl = document.getElementById('resultado-troca');
+
+  function atualizarContadorTroca() {
+    const el = document.getElementById('troca-contador');
+    if (el) {
+      el.textContent = selecionadasSet.size;
+      el.style.color = selecionadasSet.size === maxPreparadas ? 'var(--success)' : (selecionadasSet.size > maxPreparadas ? 'var(--danger)' : 'inherit');
+    }
+  }
+
+  function renderTabTroca() {
+    const termo = semAcento(document.getElementById('busca-troca-magia')?.value || '');
+    let html = '';
+
+    if (tabAtiva === 'selecionadas') {
+      // Magias atualmente selecionadas para preparar
+      html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">Clique para remover</div>`;
+
+      if (nomesDominio.size > 0) {
+        const domMagias = magiasDisponiveis.filter(m => nomesDominio.has(m.nome));
+        const filtDom = termo.length >= 2 ? domMagias.filter(m => semAcento(m.nome).includes(termo)) : domMagias;
+        if (filtDom.length > 0 || (termo.length < 2 && nomesDominio.size > 0)) {
+          html += `<div style="font-size:0.75rem;font-weight:700;color:var(--secondary);margin:4px 0">Domínio (sempre preparadas)</div>`;
+          // Garantir que domínio apareca mesmo se nao esta em magiasDisponiveis
+          const domNomes = [...nomesDominio];
+          const filtDomNomes = termo.length >= 2 ? domNomes.filter(n => semAcento(n).includes(termo)) : domNomes;
+          html += `<div class="magias-grid">${filtDomNomes.map(nome => `
+            <div class="magia-card selecionada magia-dominio" style="opacity:0.7;cursor:default">
+              <span class="magia-card-check"></span>
+              <div class="magia-card-nome"><span class="badge-dominio">&#9733;</span> ${nome}</div>
+              <div class="magia-card-meta"><span>Domínio</span></div>
+              <span class="magia-card-info" data-troca-info="${nome}" data-troca-info-circ="${circuloMap[nome] || 1}" title="Ver detalhes">&#9432;</span>
+            </div>
+          `).join('')}</div>`;
+        }
+      }
+
+      const selNomes = [...selecionadasSet];
+      const filtSel = termo.length >= 2 ? selNomes.filter(n => semAcento(n).includes(termo)) : selNomes;
+      if (filtSel.length > 0) {
+        html += `<div class="magias-grid">${filtSel.map(nome => `
+          <div class="magia-card selecionada" style="cursor:pointer" data-troca-toggle="${nome}">
+            <span class="magia-card-check"></span>
+            <div class="magia-card-nome">${nome}</div>
+            <div class="magia-card-meta"><span>${circuloMap[nome] || '?'}º Círculo</span></div>
+            <span class="magia-card-info" data-troca-info="${nome}" data-troca-info-circ="${circuloMap[nome] || 1}" title="Ver detalhes">&#9432;</span>
+          </div>
+        `).join('')}</div>`;
+      } else if (selecionadasSet.size === 0) {
+        html += `<div style="text-align:center;color:var(--text-muted);padding:16px">Nenhuma magia selecionada. Use as tabs de círculo para adicionar.</div>`;
+      }
+    } else {
+      // Magias de um círculo específico
+      const circ = parseInt(tabAtiva);
+      const magiasDoCirc = magiasCirculo[circ] || [];
+      const cheio = selecionadasSet.size >= maxPreparadas;
+
+      html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">Preparadas: ${selecionadasSet.size}/${maxPreparadas}${cheio ? ' <span style="color:var(--danger)">(Limite)</span>' : ''}</div>`;
+
+      let lista = [...magiasDoCirc];
+      lista.sort((a, b) => {
+        const aS = selecionadasSet.has(a.nome) ? 0 : 1;
+        const bS = selecionadasSet.has(b.nome) ? 0 : 1;
+        return aS - bS || a.nome.localeCompare(b.nome);
       });
-    });
+      if (termo.length >= 2) lista = lista.filter(m => semAcento(m.nome).includes(termo));
 
-    // Buscar e adicionar magia
-    document.getElementById('busca-troca-magia')?.addEventListener('input', (e) => {
-      const termo = semAcento(e.target.value);
-      const resultadoEl = document.getElementById('resultado-troca');
-      if (!resultadoEl || termo.length < 2) { if (resultadoEl) resultadoEl.innerHTML = ''; return; }
+      html += `<div class="magias-grid">${lista.map(m => {
+        const sel = selecionadasSet.has(m.nome);
+        const isDominio = nomesDominio.has(m.nome);
+        const bloqueado = cheio && !sel && !isDominio;
+        return `
+          <div class="magia-card ${sel || isDominio ? 'selecionada' : ''} ${isDominio ? 'magia-dominio' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}"
+               ${isDominio ? '' : `data-troca-toggle="${m.nome}"`}
+               style="${bloqueado ? 'opacity:0.35;' : ''}${isDominio ? 'opacity:0.7;cursor:default;' : ''}">
+            <span class="magia-card-check"></span>
+            <div class="magia-card-nome">${isDominio ? '<span class="badge-dominio">&#9733;</span> ' : ''}${m.nome}</div>
+            <div class="magia-card-meta">
+              <span>${m.escola || ''}</span>
+              ${m.especial === 'C' ? '<span title="Concentração">C</span>' : ''}
+              ${isDominio ? '<span>Domínio</span>' : ''}
+            </div>
+            <span class="magia-card-info" data-troca-info="${m.nome}" data-troca-info-circ="${circ}" title="Ver detalhes">&#9432;</span>
+          </div>`;
+      }).join('')}</div>`;
+    }
 
-      const jaPrep = new Set(prepTemp.map(m => m.nome));
-      const jaDominio = nomesDominio;
-      const maxCirculo = Math.max(...Object.keys(char.espacos_magia || {}).map(Number), 0);
+    resultadoEl.innerHTML = html;
+    bindEventosTroca();
+  }
 
-      let matches = magiasDisponiveis
-        .filter(m => semAcento(m.nome).includes(termo) && !jaPrep.has(m.nome) && !jaDominio.has(m.nome) && m.circulo <= maxCirculo)
-        .slice(0, 15);
-
-      resultadoEl.innerHTML = matches.map(m => `
-        <div class="magia-item" style="cursor:pointer;padding:6px 8px" data-troca-add-nome="${m.nome}" data-troca-add-circ="${m.circulo}">
-          <span style="font-weight:600;font-size:0.85rem">${m.nome}</span>
-          <span style="color:var(--text-muted);font-size:0.75rem">${m.circulo}º Círculo</span>
-        </div>
-      `).join('');
-
-      resultadoEl.querySelectorAll('[data-troca-add-nome]').forEach(el => {
-        el.addEventListener('click', () => {
-          if (prepTemp.length >= maxPreparadas) {
-            toast('Limite de magias preparadas atingido! Remova uma antes de adicionar.', 'error');
+  function bindEventosTroca() {
+    // Toggle seleção
+    resultadoEl.querySelectorAll('[data-troca-toggle]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        if (e.target.closest('[data-troca-info]')) return;
+        const nome = el.dataset.trocaToggle;
+        if (selecionadasSet.has(nome)) {
+          selecionadasSet.delete(nome);
+        } else {
+          if (selecionadasSet.size >= maxPreparadas) {
+            toast(`Limite de ${maxPreparadas} magias! Remova uma antes.`, 'error');
             return;
           }
-          prepTemp.push({ nome: el.dataset.trocaAddNome, circulo: parseInt(el.dataset.trocaAddCirc) });
-          document.getElementById('modal-corpo').innerHTML = renderListaTroca();
-          setupEventosTroca();
-        });
+          selecionadasSet.add(nome);
+        }
+        atualizarContadorTroca();
+        renderTabTroca();
       });
     });
 
-    // Confirmar troca
-    document.getElementById('btn-confirmar-troca')?.addEventListener('click', () => {
-      // Manter magias de domínio + definir novas preparadas
-      char.magias_preparadas = [
-        ...(char.magias_preparadas || []).filter(m => m.origem === 'dominio'),
-        ...prepTemp
-      ];
-      salvar();
-      window.fecharModal();
-      renderFichaCompleta();
-      toast('Magias preparadas atualizadas!', 'success');
+    // Info detalhes
+    resultadoEl.querySelectorAll('[data-troca-info]').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const nome = btn.dataset.trocaInfo;
+        const circ = parseInt(btn.dataset.trocaInfoCirc);
+        const dados = await getMagiasPorCirculo(circ);
+        const magia = dados?.magias?.find(m => m.nome === nome);
+        if (!magia) { toast('Detalhes não encontrados', 'error'); return; }
+        abrirModal(magia.nome, `
+          <div class="magia-meta" style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:8px;font-size:0.85rem">
+            <span class="badge badge-primary">${circ === 0 ? 'Truque' : circ + 'º Círculo'}</span>
+            <span class="badge badge-secondary">${magia.escola}</span>
+            <span>${magia.tempo_conjuracao}</span> <span>${magia.alcance}</span>
+            <span>${magia.componentes}</span> <span>${magia.duracao}</span>
+          </div>
+          <div class="md-content">${mdParaHtml(magia.descricao)}</div>
+          ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em círculos superiores:</strong> ${magia.circulo_superior}</div>` : ''}
+        `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
+      });
     });
   }
 
-  setupEventosTroca();
+  // Tabs
+  document.querySelectorAll('#tabs-troca-magias .tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('#tabs-troca-magias .tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      tabAtiva = tab.dataset.tabTroca;
+      document.getElementById('busca-troca-magia').value = '';
+      renderTabTroca();
+    });
+  });
+
+  // Busca
+  document.getElementById('busca-troca-magia')?.addEventListener('input', renderTabTroca);
+
+  // Confirmar troca
+  document.getElementById('btn-confirmar-troca')?.addEventListener('click', () => {
+    char.magias_preparadas = [
+      ...(char.magias_preparadas || []).filter(m => m.origem === 'dominio'),
+      ...[...selecionadasSet].map(nome => ({ nome, circulo: circuloMap[nome] || 1 }))
+    ];
+    salvar();
+    window.fecharModal();
+    renderFichaCompleta();
+    toast('Magias preparadas atualizadas!', 'success');
+  });
+
+  renderTabTroca();
 }
 
 // --- Proficiência de armas/armaduras na ficha ---
@@ -3248,21 +3350,21 @@ function setupEventosInventarioSheet() {
   // Item customizado
   document.getElementById('btn-add-inv-custom')?.addEventListener('click', () => {
     abrirModal('Item Customizado', `
-      <div class="form-group"><label class="form-label">Nome</label><input type="text" class="form-input" id="ic-nome"></div>
-      <div class="form-group"><label class="form-label">Descricao</label><textarea class="form-textarea" id="ic-desc" rows="2"></textarea></div>
+      <div class="form-group"><label class="form-label" for="ic-nome">Nome</label><input type="text" class="form-input" id="ic-nome"></div>
+      <div class="form-group"><label class="form-label" for="ic-desc">Descricao</label><textarea class="form-textarea" id="ic-desc" rows="2"></textarea></div>
       <div class="row gap-1">
         <div class="col">
-          <label class="form-label">Bonus CA</label>
+          <label class="form-label" for="ic-ca">Bonus CA</label>
           <input type="number" class="form-input" id="ic-ca" value="0" min="-5" max="5">
           <div style="font-size:0.65rem;color:var(--text-muted)">-5 a +5</div>
         </div>
         <div class="col">
-          <label class="form-label">Dano</label>
+          <label class="form-label" for="ic-dano">Dano</label>
           <input type="text" class="form-input" id="ic-dano" placeholder="1d8 Cortante">
           <div style="font-size:0.65rem;color:var(--text-muted)">Ex: 2d6 Cortante</div>
         </div>
         <div class="col">
-          <label class="form-label">Bonus Atq</label>
+          <label class="form-label" for="ic-atq">Bonus Atq</label>
           <input type="number" class="form-input" id="ic-atq" value="0" min="-5" max="10">
           <div style="font-size:0.65rem;color:var(--text-muted)">-5 a +10</div>
         </div>
@@ -3326,7 +3428,7 @@ function setupEventosInventarioSheet() {
   // Editar PO
   document.getElementById('btn-edit-po')?.addEventListener('click', () => {
     abrirModal('Pecas de Ouro', `
-      <div class="form-group"><label class="form-label">PO</label><input type="number" class="form-input" id="edit-po" value="${char.po || 0}" min="0"></div>
+      <div class="form-group"><label class="form-label" for="edit-po">PO</label><input type="number" class="form-input" id="edit-po" value="${char.po || 0}" min="0"></div>
     `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-po">Salvar</button>');
     document.getElementById('btn-salvar-po')?.addEventListener('click', () => {
       char.po = parseInt(document.getElementById('edit-po')?.value) || 0;
