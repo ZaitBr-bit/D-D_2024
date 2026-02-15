@@ -23,7 +23,8 @@ export const CLASSES_INFO = {
     pericias_opcoes: null, // Qualquer perícia
     num_pericias: 3,
     conjurador: true,
-    atributo_conjuracao: "Carisma"
+    atributo_conjuracao: "Carisma",
+    tipo_conjuracao: "conhecidas"
   },
   "Bruxo": {
     dado_vida: 8,
@@ -34,7 +35,8 @@ export const CLASSES_INFO = {
     pericias_opcoes: ["Arcanismo", "Enganação", "História", "Intimidação", "Investigação", "Natureza", "Religião"],
     num_pericias: 2,
     conjurador: true,
-    atributo_conjuracao: "Carisma"
+    atributo_conjuracao: "Carisma",
+    tipo_conjuracao: "conhecidas"
   },
   "Clérigo": {
     dado_vida: 8,
@@ -45,7 +47,8 @@ export const CLASSES_INFO = {
     pericias_opcoes: ["História", "Intuição", "Medicina", "Persuasão", "Religião"],
     num_pericias: 2,
     conjurador: true,
-    atributo_conjuracao: "Sabedoria"
+    atributo_conjuracao: "Sabedoria",
+    tipo_conjuracao: "preparadas"
   },
   "Druida": {
     dado_vida: 8,
@@ -56,7 +59,8 @@ export const CLASSES_INFO = {
     pericias_opcoes: ["Arcanismo", "Adestrar Animais", "Intuição", "Medicina", "Natureza", "Percepção", "Religião", "Sobrevivência"],
     num_pericias: 2,
     conjurador: true,
-    atributo_conjuracao: "Sabedoria"
+    atributo_conjuracao: "Sabedoria",
+    tipo_conjuracao: "preparadas"
   },
   "Feiticeiro": {
     dado_vida: 6,
@@ -67,7 +71,8 @@ export const CLASSES_INFO = {
     pericias_opcoes: ["Arcanismo", "Enganação", "Intuição", "Intimidação", "Persuasão", "Religião"],
     num_pericias: 2,
     conjurador: true,
-    atributo_conjuracao: "Carisma"
+    atributo_conjuracao: "Carisma",
+    tipo_conjuracao: "conhecidas"
   },
   "Guardião": {
     dado_vida: 10,
@@ -78,7 +83,8 @@ export const CLASSES_INFO = {
     pericias_opcoes: ["Adestrar Animais", "Atletismo", "Furtividade", "Intuição", "Investigação", "Natureza", "Percepção", "Sobrevivência"],
     num_pericias: 3,
     conjurador: true,
-    atributo_conjuracao: "Sabedoria"
+    atributo_conjuracao: "Sabedoria",
+    tipo_conjuracao: "preparadas"
   },
   "Guerreiro": {
     dado_vida: 10,
@@ -111,7 +117,8 @@ export const CLASSES_INFO = {
     pericias_opcoes: ["Arcanismo", "História", "Intuição", "Investigação", "Medicina", "Religião"],
     num_pericias: 2,
     conjurador: true,
-    atributo_conjuracao: "Inteligência"
+    atributo_conjuracao: "Inteligência",
+    tipo_conjuracao: "preparadas"
   },
   "Monge": {
     dado_vida: 8,
@@ -133,7 +140,8 @@ export const CLASSES_INFO = {
     pericias_opcoes: ["Atletismo", "Intimidação", "Intuição", "Medicina", "Persuasão", "Religião"],
     num_pericias: 2,
     conjurador: true,
-    atributo_conjuracao: "Carisma"
+    atributo_conjuracao: "Carisma",
+    tipo_conjuracao: "preparadas"
   }
 };
 

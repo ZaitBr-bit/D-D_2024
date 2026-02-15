@@ -132,6 +132,7 @@ export function criarPersonagemVazio() {
     po: 0,
     magias_conhecidas: [],
     magias_preparadas: [],
+    grimorio: [],
     espacos_magia: {},
     talentos: [],
     itens_customizados: [],

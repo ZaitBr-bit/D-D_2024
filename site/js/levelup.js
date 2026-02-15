@@ -241,6 +241,25 @@ export async function obterMagiasDominioNivel(classe, subclasse, nivel) {
 }
 
 /**
+ * Obtém TODAS as magias de domínio/subclasse para todos os níveis até o nível atual
+ * @param {string} classe
+ * @param {string} subclasse
+ * @param {number} nivelAtual
+ * @returns {Array} Lista de { nome, circulo } de todas as magias de domínio
+ */
+export async function obterTodasMagiasDominio(classe, subclasse, nivelAtual) {
+  if (!subclasse) return [];
+  const todas = [];
+  // Magias de domínio são concedidas nos níveis 3, 5, 7, 9
+  for (const nivel of [3, 5, 7, 9]) {
+    if (nivel > nivelAtual) break;
+    const magias = await obterMagiasDominioNivel(classe, subclasse, nivel);
+    todas.push(...magias);
+  }
+  return todas;
+}
+
+/**
  * Atualiza os espaços de magia do personagem baseado no novo nível
  */
 export async function atualizarEspacosMagia(personagem, classeData) {
@@ -365,7 +384,7 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
     for (const magia of magiasDominio) {
       if (!personagem.magias_preparadas.find(m => m.nome === magia.nome)) {
-        personagem.magias_preparadas.push(magia);
+        personagem.magias_preparadas.push({ ...magia, origem: 'dominio' });
       }
     }
   }

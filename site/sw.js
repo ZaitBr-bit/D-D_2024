@@ -1,6 +1,6 @@
 // Service Worker para PWA D&D 5.5 Ficha de Personagem
 // Incrementar esta versão a cada deploy para forçar atualização dos caches
-const CACHE_VERSION = 3;
+const CACHE_VERSION = 7;
 const CACHE_STATIC = `dnd-ficha-static-v${CACHE_VERSION}`;
 const CACHE_DATA = `dnd-ficha-data-v${CACHE_VERSION}`;
 
