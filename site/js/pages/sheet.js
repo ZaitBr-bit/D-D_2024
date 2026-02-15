@@ -56,7 +56,27 @@ function salvar() {
   salvarPersonagem(char);
 }
 
+/** Salva o estado open/closed de todos os <details> no container */
+function salvarEstadoDetails() {
+  const estado = {};
+  containerRef?.querySelectorAll('details').forEach((det, i) => {
+    const id = det.querySelector('summary')?.textContent?.trim() || `det_${i}`;
+    estado[id] = det.open;
+  });
+  return estado;
+}
+
+/** Restaura o estado open/closed dos <details> salvos */
+function restaurarEstadoDetails(estado) {
+  if (!estado || Object.keys(estado).length === 0) return;
+  containerRef?.querySelectorAll('details').forEach((det, i) => {
+    const id = det.querySelector('summary')?.textContent?.trim() || `det_${i}`;
+    if (id in estado) det.open = estado[id];
+  });
+}
+
 function renderFichaCompleta() {
+  const estadoDetails = salvarEstadoDetails();
   const info = CLASSES_INFO[char.classe] || {};
   const prof = bonusProficiencia(char.nivel);
   const ca = calcCA(char);
@@ -155,13 +175,35 @@ function renderFichaCompleta() {
           <button class="btn btn-sm btn-secondary no-print" id="btn-usar-dv" style="margin-top:4px">Usar DV</button>
         </div>
       </div>
+
+      ${char.pv_atual <= 0 ? `
+      <!-- Salvaguarda Contra Morte -->
+      <div style="margin-top:12px;padding:12px;border:2px solid var(--danger);border-radius:var(--radius);background:rgba(192,57,43,0.05)">
+        <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;color:var(--danger);text-align:center;margin-bottom:8px">☠ Salvaguarda Contra Morte</div>
+        <div style="display:flex;justify-content:center;gap:24px">
+          <div style="text-align:center">
+            <div style="font-size:0.7rem;font-weight:600;color:var(--success);margin-bottom:4px">Sucessos</div>
+            <div style="display:flex;gap:6px;justify-content:center">
+              ${[0,1,2].map(i => `<label class="morte-check" style="cursor:pointer"><input type="checkbox" data-morte-sucesso="${i}" ${(char.morte_sucessos || 0) > i ? 'checked' : ''} style="display:none"><span class="morte-bolha ${(char.morte_sucessos || 0) > i ? 'morte-sucesso' : ''}"></span></label>`).join('')}
+            </div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:0.7rem;font-weight:600;color:var(--danger);margin-bottom:4px">Falhas</div>
+            <div style="display:flex;gap:6px;justify-content:center">
+              ${[0,1,2].map(i => `<label class="morte-check" style="cursor:pointer"><input type="checkbox" data-morte-falha="${i}" ${(char.morte_falhas || 0) > i ? 'checked' : ''} style="display:none"><span class="morte-bolha ${(char.morte_falhas || 0) > i ? 'morte-falha' : ''}"></span></label>`).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+      ` : ''}
     </div>
 
-    <!-- Descansos -->
-    <div class="card no-print">
-      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-        <button class="btn btn-accent" id="btn-descanso-curto">☀ Descanso Curto</button>
-        <button class="btn btn-accent" id="btn-descanso-longo">🌙 Descanso Longo</button>
+    <!-- FAB Descanso (flutuante) -->
+    <div id="fab-descanso" class="fab-descanso no-print">
+      <button class="fab-btn" id="fab-toggle-descanso" title="Descanso">🏕️</button>
+      <div class="fab-menu" id="fab-menu-descanso" style="display:none">
+        <button class="btn btn-accent btn-sm" id="btn-descanso-curto">☀ Descanso Curto</button>
+        <button class="btn btn-accent btn-sm" id="btn-descanso-longo">🌙 Descanso Longo</button>
       </div>
     </div>
 
@@ -174,12 +216,14 @@ function renderFichaCompleta() {
           const val = char.atributos[key];
           const mod = calcMod(val);
           const isPrimario = info.atributo_primario?.includes(nome);
+          const isConjuracao = info.conjurador && info.atributo_conjuracao === nome;
           const attrStyle = ATRIBUTO_ESTILO[key] || {};
           return `
             <div class="atributo-box ${isPrimario ? 'destaque' : ''}" style="border-color:${attrStyle.cor || 'var(--border)'}">
               <div class="atributo-nome" style="color:${attrStyle.cor || 'var(--text-muted)'}">${attrStyle.emoji || ''} ${nome}</div>
               <div class="atributo-mod" style="color:${attrStyle.cor || 'var(--primary)'}">${fmtMod(mod)}</div>
               <div class="atributo-valor">${val}</div>
+              ${isConjuracao ? '<div style="font-size:0.6rem;font-weight:700;color:var(--accent);margin-top:2px">🔮 Conjuração</div>' : ''}
             </div>`;
         }).join('')}
       </div>
@@ -260,19 +304,58 @@ function renderFichaCompleta() {
   setupEventosInventarioSheet();
   setupEventosEspacosMagia();
   setupEventosHabilidades();
+
+  // Restaurar estado dos details
+  restaurarEstadoDetails(estadoDetails);
 }
 
 // --- HP e Dados de Vida ---
+
+/** Gera HTML para um seletor numérico com botões +/- */
+function numberPickerHtml(id, valor, min, max, label) {
+  return `
+    <div class="form-group" style="text-align:center">
+      <label class="form-label">${label}</label>
+      <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:8px">
+        <button type="button" class="btn btn-sm btn-secondary" style="width:40px;height:40px;font-size:1.2rem;border-radius:50%" data-picker-minus="${id}">−</button>
+        <span id="${id}" style="font-size:2rem;font-weight:800;min-width:60px;text-align:center;color:var(--primary)">${valor}</span>
+        <button type="button" class="btn btn-sm btn-secondary" style="width:40px;height:40px;font-size:1.2rem;border-radius:50%" data-picker-plus="${id}">+</button>
+      </div>
+      <input type="hidden" id="${id}-val" value="${valor}" data-min="${min}" data-max="${max}">
+    </div>
+  `;
+}
+
+/** Configura eventos do number picker */
+function setupNumberPicker(id) {
+  const display = document.getElementById(id);
+  const input = document.getElementById(`${id}-val`);
+  if (!display || !input) return;
+  const min = parseInt(input.dataset.min) || 0;
+  const max = parseInt(input.dataset.max) || 999;
+
+  const update = (delta) => {
+    let val = parseInt(input.value) || 0;
+    val = Math.min(max, Math.max(min, val + delta));
+    input.value = val;
+    display.textContent = val;
+  };
+
+  document.querySelector(`[data-picker-minus="${id}"]`)?.addEventListener('click', () => update(-1));
+  document.querySelector(`[data-picker-plus="${id}"]`)?.addEventListener('click', () => update(1));
+}
+
 function setupEventosHP() {
   const pvMax = char.pv_max_override || char.pv_max;
 
   document.getElementById('hp-minus')?.addEventListener('click', () => {
     abrirModal('Dano Recebido',
-      `<div class="form-group"><label class="form-label">Valor do dano</label><input type="number" class="form-input" id="input-dano" placeholder="Informe o dano" min="1" autofocus></div>`,
+      numberPickerHtml('input-dano', 1, 1, 999, 'Valor do dano'),
       '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-danger" id="btn-aplicar-dano">Aplicar Dano</button>'
     );
+    setupNumberPicker('input-dano');
     document.getElementById('btn-aplicar-dano')?.addEventListener('click', () => {
-      let dano = parseInt(document.getElementById('input-dano')?.value) || 0;
+      let dano = parseInt(document.getElementById('input-dano-val')?.value) || 0;
       if (dano <= 0) return;
       // Absorver pelo PV temporário primeiro
       if (char.pv_temporario > 0) {
@@ -289,13 +372,19 @@ function setupEventosHP() {
 
   document.getElementById('hp-plus')?.addEventListener('click', () => {
     abrirModal('Cura',
-      `<div class="form-group"><label class="form-label">Valor da cura</label><input type="number" class="form-input" id="input-cura" placeholder="Informe a cura" min="1" autofocus></div>`,
+      numberPickerHtml('input-cura', 1, 1, pvMax, 'Valor da cura'),
       '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-success" id="btn-aplicar-cura">Curar</button>'
     );
+    setupNumberPicker('input-cura');
     document.getElementById('btn-aplicar-cura')?.addEventListener('click', () => {
-      const cura = parseInt(document.getElementById('input-cura')?.value) || 0;
+      const cura = parseInt(document.getElementById('input-cura-val')?.value) || 0;
       if (cura <= 0) return;
       char.pv_atual = Math.min(pvMax, char.pv_atual + cura);
+      // Reset death saves when healed from 0
+      if (char.pv_atual > 0) {
+        char.morte_sucessos = 0;
+        char.morte_falhas = 0;
+      }
       salvar();
       window.fecharModal();
       renderFichaCompleta();
@@ -304,12 +393,13 @@ function setupEventosHP() {
 
   document.getElementById('hp-temp')?.addEventListener('click', () => {
     abrirModal('PV Temporário',
-      `<div class="form-group"><label class="form-label">Definir PV Temporário</label><input type="number" class="form-input" id="input-temp" value="${char.pv_temporario || 0}" min="0" autofocus></div>
-       <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">PV temporário não se acumula. Use o maior valor.</div>`,
+      numberPickerHtml('input-temp', char.pv_temporario || 0, 0, 999, 'Definir PV Temporário') +
+      `<div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;text-align:center">PV temporário não se acumula. Use o maior valor.</div>`,
       '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-aplicar-temp">Aplicar</button>'
     );
+    setupNumberPicker('input-temp');
     document.getElementById('btn-aplicar-temp')?.addEventListener('click', () => {
-      char.pv_temporario = Math.max(0, parseInt(document.getElementById('input-temp')?.value) || 0);
+      char.pv_temporario = Math.max(0, parseInt(document.getElementById('input-temp-val')?.value) || 0);
       salvar();
       window.fecharModal();
       renderFichaCompleta();
@@ -361,25 +451,40 @@ function setupEventosHP() {
     const modCon = calcMod(char.atributos.constituicao);
 
     abrirModal('Usar Dados de Vida',
-      `<div class="form-group">
-        <label class="form-label">Quantos dados de vida usar?</label>
-        <input type="number" class="form-input" id="input-qtd-dv" value="1" min="1" max="${dvRestantes}" autofocus>
-        <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">
-          Restantes: ${dvRestantes} / ${char.nivel} (🎲d${info.dado_vida}🎲 + ${modCon} CON por dado)
-        </div>
-      </div>`,
+      numberPickerHtml('input-qtd-dv', 1, 1, dvRestantes, 'Quantos dados de vida usar?') +
+      `<div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;text-align:center">
+          Restantes: ${dvRestantes} / ${char.nivel} (🎲d${info.dado_vida}🎲 + ${modCon} CON por dado)<br>
+          <em>Apenas desconta os dados — use seus dados reais para cura.</em>
+        </div>`,
       '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-aplicar-dv">Usar</button>'
     );
+    setupNumberPicker('input-qtd-dv');
     document.getElementById('btn-aplicar-dv')?.addEventListener('click', () => {
-      const qtd = Math.min(dvRestantes, Math.max(1, parseInt(document.getElementById('input-qtd-dv')?.value) || 1));
-      const media = Math.floor(info.dado_vida / 2) + 1;
-      const curaPorDado = Math.max(1, media + modCon);
-      const curaTotal = curaPorDado * qtd;
-      char.pv_atual = Math.min(pvMax, char.pv_atual + curaTotal);
+      const qtd = Math.min(dvRestantes, Math.max(1, parseInt(document.getElementById('input-qtd-dv-val')?.value) || 1));
       char.dados_vida_usados = (char.dados_vida_usados || 0) + qtd;
       salvar();
       window.fecharModal();
-      toast(`Curou ${curaTotal} PV (${qtd}x 🎲d${info.dado_vida}🎲+${modCon})`, 'success');
+      toast(`${qtd}x 🎲d${info.dado_vida}🎲 usado(s). Role os dados e aplique a cura manualmente.`, 'success');
+      renderFichaCompleta();
+    });
+  });
+
+  // Salvaguarda contra morte checkboxes
+  document.querySelectorAll('[data-morte-sucesso]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const idx = parseInt(cb.dataset.morteSucesso);
+      if (!char.morte_sucessos) char.morte_sucessos = 0;
+      char.morte_sucessos = cb.checked ? idx + 1 : idx;
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+  document.querySelectorAll('[data-morte-falha]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const idx = parseInt(cb.dataset.morteFalha);
+      if (!char.morte_falhas) char.morte_falhas = 0;
+      char.morte_falhas = cb.checked ? idx + 1 : idx;
+      salvar();
       renderFichaCompleta();
     });
   });
@@ -431,6 +536,12 @@ function restaurarHabilidades(tipoDescanso) {
 }
 
 function setupEventosDescanso() {
+  // FAB toggle
+  document.getElementById('fab-toggle-descanso')?.addEventListener('click', () => {
+    const menu = document.getElementById('fab-menu-descanso');
+    if (menu) menu.style.display = menu.style.display === 'none' ? 'flex' : 'none';
+  });
+
   document.getElementById('btn-descanso-curto')?.addEventListener('click', () => {
     restaurarHabilidades('curto');
     salvar();
@@ -443,6 +554,9 @@ function setupEventosDescanso() {
     char.pv_atual = pvMax;
     char.pv_temporario = 0;
     char.dados_vida_usados = Math.max(0, (char.dados_vida_usados || 0) - Math.floor(char.nivel / 2));
+    // Reset death saves
+    char.morte_sucessos = 0;
+    char.morte_falhas = 0;
     // Restaurar espaços de magia
     if (char.espacos_magia) {
       Object.keys(char.espacos_magia).forEach(k => {
@@ -962,7 +1076,9 @@ function detectarSubHabilidades(descricao) {
 
 function renderFeatureItem(f, source) {
   const recarga = detectarRecarga(f.descricao);
-  const ativa = ehHabilidadeAtiva(f.descricao);
+  // Features that are purely descriptive should always be passive
+  const nomeNorm = semAcento(f.nome);
+  const ativa = nomeNorm.includes('conjuracao') ? false : ehHabilidadeAtiva(f.descricao);
   const key = `${source}_${f.nome}`;
   if (!char.usos_habilidades) char.usos_habilidades = {};
 
@@ -1120,33 +1236,56 @@ function renderSecaoTracosEspecie() {
     });
   }
 
+  // Filter traits by level requirement (e.g., "A partir do nível 5")
+  tracosMostrar = tracosMostrar.filter(t => {
+    const match = t.descricao?.match(/a partir do n[ií]vel (\d+)/i);
+    if (match) return char.nivel >= parseInt(match[1]);
+    return true;
+  });
+
   if (!tracosMostrar.length) return '';
 
-  const passivos = tracosMostrar.filter(t => !ehHabilidadeAtiva(t.descricao));
-  const ativos = tracosMostrar.filter(t => ehHabilidadeAtiva(t.descricao));
+  // Traits that inherit recharge from parent "Ancestralidade Gigante" (prof bonus, long rest)
+  const TRACOS_HERDAM_ANCESTRALIDADE = ['Arrepio do Gelo (Gigante do Gelo)', 'Queimadura de Fogo (Gigante de Fogo)', 'Resistência da Pedra (Gigante da Pedra)', 'Salto da Nuvem (Gigante das Nuvens)', 'Tombo da Colina (Gigante da Colina)', 'Trovão da Tempestade (Gigante da Tempestade)'];
+
+  // Determine active/passive considering inherited traits
+  const ehAtivo = (t) => {
+    if (TRACOS_HERDAM_ANCESTRALIDADE.includes(t.nome)) return true;
+    return ehHabilidadeAtiva(t.descricao);
+  };
+
+  const passivos = tracosMostrar.filter(t => !ehAtivo(t));
+  const ativos = tracosMostrar.filter(t => ehAtivo(t));
 
   return `
     <div class="card print-break-before">
       <div class="card-header"><h2>Traços de Espécie — ${char.especie}</h2></div>
       ${ativos.length > 0 ? `
         <div class="section-divider"><span>Habilidades Ativas</span></div>
-        ${ativos.map(t => renderTracoEspecie(t)).join('')}
+        ${ativos.map(t => renderTracoEspecie(t, TRACOS_HERDAM_ANCESTRALIDADE.includes(t.nome))).join('')}
       ` : ''}
       ${passivos.length > 0 ? `
         <div class="section-divider"><span>Habilidades Passivas</span></div>
-        ${passivos.map(t => renderTracoEspecie(t)).join('')}
+        ${passivos.map(t => renderTracoEspecie(t, false)).join('')}
       ` : ''}
     </div>
   `;
 }
 
-function renderTracoEspecie(traco) {
-  const recarga = detectarRecarga(traco.descricao);
-  const ativa = ehHabilidadeAtiva(traco.descricao);
+function renderTracoEspecie(traco, herdaAncestralidade = false) {
+  let recarga = detectarRecarga(traco.descricao);
+  let ativa = ehHabilidadeAtiva(traco.descricao);
+
+  // Traits inheriting from "Ancestralidade Gigante": prof bonus uses, long rest
+  if (herdaAncestralidade && !recarga) {
+    recarga = 'longo';
+    ativa = true;
+  }
+
   const key = `especie_${traco.nome}`;
   if (!char.usos_habilidades) char.usos_habilidades = {};
 
-  const usosMax = detectarUsosMaximos(traco.descricao) || (recarga ? bonusProficiencia(char.nivel) : null);
+  let usosMax = detectarUsosMaximos(traco.descricao) || (recarga ? bonusProficiencia(char.nivel) : null);
   const temMultiplosUsos = usosMax && usosMax > 1 && recarga;
 
   let usosAtual = 0;
@@ -1622,11 +1761,13 @@ function sheetBadgeProf(proficiente) {
 function renderSecaoInventario() {
   const inv = char.inventario || [];
 
-  // Separar equipados e não equipados
+  // Separar equipados, não equipados, e zerados
   const equipados = [];
   const naoEquipados = [];
+  const zerados = [];
   inv.forEach((item, idx) => {
-    if (item.equipado) equipados.push(idx);
+    if ((item.quantidade || 1) <= 0) zerados.push(idx);
+    else if (item.equipado) equipados.push(idx);
     else naoEquipados.push(idx);
   });
 
@@ -1643,7 +1784,7 @@ function renderSecaoInventario() {
       <div id="sheet-inventario">
         ${inv.length === 0
           ? '<div style="color:var(--text-muted);text-align:center;padding:12px;font-size:0.85rem">Inventario vazio</div>'
-          : renderSheetInvLista(equipados, naoEquipados)
+          : renderSheetInvLista(equipados, naoEquipados, zerados)
         }
       </div>
     </div>
@@ -1651,7 +1792,7 @@ function renderSecaoInventario() {
 }
 
 /** Renderiza a lista do inventário separada por seções */
-function renderSheetInvLista(equipados, naoEquipados) {
+function renderSheetInvLista(equipados, naoEquipados, zerados) {
   let html = '';
 
   if (equipados.length > 0) {
@@ -1662,6 +1803,11 @@ function renderSheetInvLista(equipados, naoEquipados) {
   if (naoEquipados.length > 0) {
     html += '<div class="inv-secao-titulo"><span>Mochila</span></div>';
     html += naoEquipados.map(idx => renderSheetInvItem(char.inventario[idx], idx)).join('');
+  }
+
+  if (zerados && zerados.length > 0) {
+    html += '<div class="inv-secao-titulo"><span>Esgotados</span></div>';
+    html += zerados.map(idx => renderSheetInvItem(char.inventario[idx], idx)).join('');
   }
 
   return html;
@@ -1715,13 +1861,14 @@ function renderSheetInvItem(item, idx) {
     ? `<div class="inv-item-detalhe" style="font-size:0.7rem;color:var(--text-muted);margin-top:1px">${descCurta.length > 80 ? descCurta.substring(0, 80) + '…' : descCurta}</div>`
     : '';
 
+  const isZeroQtd = (item.quantidade || 1) <= 0;
+
   return `
-    <div class="inv-item ${item.equipado ? 'inv-item-equipado' : ''}" data-idx="${idx}" draggable="true">
+    <div class="inv-item ${item.equipado ? 'inv-item-equipado' : ''} ${isZeroQtd ? 'inv-item-zerado' : ''}" data-idx="${idx}" draggable="true">
       <div class="inv-drag-handle no-print" title="Arrastar para reordenar">&#9776;</div>
       <div style="flex:1;cursor:pointer" data-info-inv-sheet="${idx}" title="Ver detalhes">
         <div class="inv-item-nome">
           ${item.nome} ${profBadge} ${ataqueInfo} ${tipoBadge}
-          ${item.quantidade > 1 ? `<span style="color:var(--text-muted)">(x${item.quantidade})</span>` : ''}
         </div>
         <div class="inv-item-detalhe">
           ${item.tipo === 'arma' ? `${item.dados?.dano || ''} | ${item.dados?.propriedades || ''}` : ''}
@@ -1733,9 +1880,12 @@ function renderSheetInvItem(item, idx) {
         </div>
         ${descPreview}
       </div>
-      <div class="inv-item-acoes no-print">
-        <button class="btn btn-sm btn-icon inv-btn-mover" data-sheet-move="${idx}" data-dir="up" title="Mover para cima">&uarr;</button>
-        <button class="btn btn-sm btn-icon inv-btn-mover" data-sheet-move="${idx}" data-dir="down" title="Mover para baixo">&darr;</button>
+      <div class="inv-item-acoes no-print" style="align-items:center">
+        <div class="inv-qty-control" style="display:flex;align-items:center;gap:2px">
+          <button class="btn btn-sm btn-icon" data-qty-minus="${idx}" style="font-size:0.7rem;padding:1px 5px">−</button>
+          <span style="min-width:20px;text-align:center;font-size:0.8rem;font-weight:700" data-qty-display="${idx}">${item.quantidade || 1}</span>
+          <button class="btn btn-sm btn-icon" data-qty-plus="${idx}" style="font-size:0.7rem;padding:1px 5px">+</button>
+        </div>
         <label class="form-check inv-equip-label" title="Equipar/Desequipar">
           <input type="checkbox" data-sheet-equip="${idx}" ${item.equipado ? 'checked' : ''}> Eq.
         </label>
@@ -1781,20 +1931,28 @@ function setupEventosInventarioSheet() {
     });
   });
 
-  // Mover item para cima/baixo
-  document.querySelectorAll('[data-sheet-move]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const idx = parseInt(btn.dataset.sheetMove);
-      const dir = btn.dataset.dir;
-      const inv = char.inventario;
-
-      if (dir === 'up' && idx > 0) {
-        [inv[idx], inv[idx - 1]] = [inv[idx - 1], inv[idx]];
-      } else if (dir === 'down' && idx < inv.length - 1) {
-        [inv[idx], inv[idx + 1]] = [inv[idx + 1], inv[idx]];
+  // Quantidade +/-
+  document.querySelectorAll('[data-qty-plus]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.qtyPlus);
+      if (char.inventario[idx]) {
+        char.inventario[idx].quantidade = (char.inventario[idx].quantidade || 1) + 1;
+        salvar();
+        reRenderSheetInv();
       }
-      salvar();
-      reRenderSheetInv();
+    });
+  });
+  document.querySelectorAll('[data-qty-minus]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.qtyMinus);
+      if (char.inventario[idx]) {
+        const novaQtd = Math.max(0, (char.inventario[idx].quantidade || 1) - 1);
+        char.inventario[idx].quantidade = novaQtd;
+        salvar();
+        reRenderSheetInv();
+      }
     });
   });
 
@@ -1870,14 +2028,16 @@ function reRenderSheetInv() {
   const inv = char.inventario || [];
   const equipados = [];
   const naoEquipados = [];
+  const zerados = [];
   inv.forEach((item, idx) => {
-    if (item.equipado) equipados.push(idx);
+    if ((item.quantidade || 1) <= 0) zerados.push(idx);
+    else if (item.equipado) equipados.push(idx);
     else naoEquipados.push(idx);
   });
 
   invEl.innerHTML = inv.length === 0
     ? '<div style="color:var(--text-muted);text-align:center;padding:12px;font-size:0.85rem">Inventario vazio</div>'
-    : renderSheetInvLista(equipados, naoEquipados);
+    : renderSheetInvLista(equipados, naoEquipados, zerados);
 
   // Re-bind eventos
   setupEventosInventarioSheet();
@@ -1940,7 +2100,13 @@ async function carregarDadosEquipSheet() {
     armas: armasData?.armas || [],
     propriedadesArmas: armasData?.propriedades || [],
     armaduras: armadurasData?.armaduras || [],
-    equipAvent: equipData?.itens || []
+    equipAvent: equipData?.itens || [],
+    municao: (equipData?.municao || []).map(m => ({
+      nome: m.tipo,
+      custo: m.custo || '',
+      peso: m.peso || '',
+      descricao: `Quantidade: ${m.quantidade || '—'} | Armazenamento: ${m.armazenamento || '—'}`
+    }))
   };
   return _cacheEquipSheet;
 }
@@ -2027,13 +2193,11 @@ async function mostrarSeletorCategoria() {
 
   // Categorias de itens consumíveis / poções do equipamento de aventura
   const ITENS_CONSUMIVEIS = ['Ácido', 'Água Benta', 'Antitoxina', 'Fogo Alquímico', 'Óleo', 'Veneno Básico'];
-  const ITENS_MUNICAO = ['Flechas', 'Virotes', 'Balas de Funda', 'Balas de Arma de Fogo', 'Dardos'];
 
   const consumiveis = dados.equipAvent.filter(i => ITENS_CONSUMIVEIS.some(c => i.nome.includes(c)));
-  const municao = dados.equipAvent.filter(i => ITENS_MUNICAO.some(c => i.nome.includes(c)));
+  const municao = dados.municao || [];
   const outrosEquip = dados.equipAvent.filter(i =>
-    !ITENS_CONSUMIVEIS.some(c => i.nome.includes(c)) &&
-    !ITENS_MUNICAO.some(c => i.nome.includes(c))
+    !ITENS_CONSUMIVEIS.some(c => i.nome.includes(c))
   );
 
   const categorias = [
@@ -2151,33 +2315,64 @@ async function mostrarSeletorCategoria() {
         </div>
       `).join('');
 
-    // Eventos de seleção
+    // Eventos de seleção - mostrar descrição antes de adicionar
     listaEl.querySelectorAll('[data-add-cat]').forEach(el => {
       el.addEventListener('click', () => {
         const item = itens[parseInt(el.dataset.addCat)];
         if (!item) return;
 
-        const novoItem = {
-          nome: item.nome,
-          tipo: item.tipo,
-          quantidade: 1,
-          equipado: false,
-          descricao: item.tipo === 'arma' ? `${item.dados.dano}` : item.tipo === 'armadura' ? `CA: ${item.dados.ca}` : '',
-          dados: { ...item.dados }
-        };
-
-        // Verificar se já existe no inventário (agrupar)
-        const existente = char.inventario.find(inv => inv.nome === item.nome && inv.tipo === item.tipo);
-        if (existente && ['equipamento', 'generico'].includes(item.tipo)) {
-          existente.quantidade = (existente.quantidade || 1) + 1;
+        // Construir descrição completa do item
+        let descCorpo = '';
+        const d = item.dados || {};
+        if (item.tipo === 'arma') {
+          descCorpo += `<div style="font-size:0.85rem;margin-bottom:6px">`;
+          if (d.categoria) descCorpo += `<strong>Categoria:</strong> ${d.categoria}<br>`;
+          if (d.dano) descCorpo += `<strong>Dano:</strong> ${d.dano}<br>`;
+          if (d.maestria) descCorpo += `<strong>Maestria:</strong> ${d.maestria}<br>`;
+          if (d.propriedades) descCorpo += `<strong>Propriedades:</strong> ${d.propriedades}<br>`;
+          if (d.custo || d.peso) descCorpo += `<strong>Custo:</strong> ${d.custo || '—'} | <strong>Peso:</strong> ${d.peso || '—'}`;
+          descCorpo += `</div>`;
+        } else if (item.tipo === 'armadura' || item.tipo === 'escudo') {
+          descCorpo += `<div style="font-size:0.85rem;margin-bottom:6px">`;
+          if (d.categoria) descCorpo += `<strong>Categoria:</strong> ${d.categoria}<br>`;
+          if (d.ca) descCorpo += `<strong>CA:</strong> ${d.ca}<br>`;
+          if (d.custo || d.peso) descCorpo += `<strong>Custo:</strong> ${d.custo || '—'} | <strong>Peso:</strong> ${d.peso || '—'}`;
+          descCorpo += `</div>`;
         } else {
-          char.inventario.push(novoItem);
+          if (d.custo || d.peso) descCorpo += `<div style="font-size:0.85rem;margin-bottom:6px"><strong>Custo:</strong> ${d.custo || '—'} | <strong>Peso:</strong> ${d.peso || '—'}</div>`;
+          if (d.descricao) descCorpo += `<div class="md-content" style="font-size:0.85rem">${mdParaHtml(d.descricao)}</div>`;
         }
+        if (!descCorpo.trim()) descCorpo = '<div style="color:var(--text-muted)">Sem descrição disponível.</div>';
 
-        salvar();
-        window.fecharModal();
-        renderFichaCompleta();
-        toast(`${item.nome} adicionado!`, 'success');
+        abrirModal(item.nome,
+          descCorpo,
+          `<button class="btn btn-secondary" onclick="fecharModal()">Voltar</button>
+           <button class="btn btn-primary" id="btn-confirmar-add-item">Adicionar ao Inventário</button>`
+        );
+
+        document.getElementById('btn-confirmar-add-item')?.addEventListener('click', () => {
+          const novoItem = {
+            nome: item.nome,
+            tipo: item.tipo,
+            quantidade: 1,
+            equipado: false,
+            descricao: item.tipo === 'arma' ? `${item.dados.dano}` : item.tipo === 'armadura' ? `CA: ${item.dados.ca}` : '',
+            dados: { ...item.dados }
+          };
+
+          // Verificar se já existe no inventário (agrupar)
+          const existente = char.inventario.find(inv => inv.nome === item.nome && inv.tipo === item.tipo);
+          if (existente && ['equipamento', 'generico'].includes(item.tipo)) {
+            existente.quantidade = (existente.quantidade || 1) + 1;
+          } else {
+            char.inventario.push(novoItem);
+          }
+
+          salvar();
+          window.fecharModal();
+          renderFichaCompleta();
+          toast(`${item.nome} adicionado!`, 'success');
+        });
       });
     });
   }
