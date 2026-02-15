@@ -134,10 +134,10 @@ function init() {
     });
   }
 
-  // Fechar modal ao clicar fora
+  // Fechar modal ao clicar fora (usa fecharModal para suporte a pilha)
   document.getElementById('modal-overlay').addEventListener('click', (e) => {
     if (e.target.id === 'modal-overlay') {
-      document.getElementById('modal-overlay').style.display = 'none';
+      window.fecharModal();
     }
   });
 

@@ -299,20 +299,84 @@ export function semAcento(str) {
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 }
 
-/** Abre modal global */
-export function abrirModal(titulo, corpoHtml, acoesHtml = '') {
-  document.getElementById('modal-titulo').textContent = titulo;
-  document.getElementById('modal-corpo').innerHTML = corpoHtml;
-  document.getElementById('modal-acoes').innerHTML = acoesHtml;
-  document.getElementById('modal-overlay').style.display = 'flex';
+/** Contador de sub-modais ativos */
+let _subModalCount = 0;
+/** Callback opcional ao fechar o modal principal */
+let _onModalClose = null;
+
+/** Abre modal global. onClose é chamado quando o modal principal é fechado. */
+export function abrirModal(titulo, corpoHtml, acoesHtml = '', onClose = null) {
+  const overlay = document.getElementById('modal-overlay');
+  const tituloEl = document.getElementById('modal-titulo');
+  const corpoEl = document.getElementById('modal-corpo');
+  const acoesEl = document.getElementById('modal-acoes');
+
+  // Se ja existe modal aberto, abrir como sub-modal (overlay empilhado)
+  if (overlay.style.display === 'flex') {
+    _subModalCount++;
+    const sub = document.createElement('div');
+    sub.className = 'modal-overlay sub-modal-overlay';
+    sub.id = `sub-modal-overlay-${_subModalCount}`;
+    sub.style.display = 'flex';
+    sub.style.zIndex = 200 + _subModalCount;
+    sub.innerHTML = `
+      <div class="modal-container" style="animation:slideUp 0.2s">
+        <div class="modal-header" style="position:sticky;top:0;background:var(--bg-card);z-index:1">
+          <h2 style="font-size:1rem;font-weight:700">${titulo}</h2>
+          <button class="modal-fechar" data-fechar-sub="true">&times;</button>
+        </div>
+        <div class="modal-corpo" style="padding:16px">${corpoHtml}</div>
+        <div class="modal-acoes" style="padding:12px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--border-light)">${acoesHtml}</div>
+      </div>
+    `;
+    document.body.appendChild(sub);
+    // Fechar sub-modal ao clicar fora ou no X
+    sub.addEventListener('click', (e) => {
+      if (e.target === sub || e.target.closest('[data-fechar-sub]')) {
+        sub.remove();
+        _subModalCount--;
+      }
+    });
+    // Substituir onclick="fecharModal()" nos botões do sub-modal
+    sub.querySelectorAll('[onclick*="fecharModal"]').forEach(btn => {
+      btn.removeAttribute('onclick');
+      btn.addEventListener('click', () => { sub.remove(); _subModalCount--; });
+    });
+    return;
+  }
+
+  tituloEl.textContent = titulo;
+  corpoEl.innerHTML = corpoHtml;
+  acoesEl.innerHTML = acoesHtml;
+  overlay.style.display = 'flex';
+  _onModalClose = onClose;
+  document.getElementById('modal-container').scrollTop = 0;
 }
 
 /** Fecha modal global */
 export function fecharModal() {
+  // Se existem sub-modais, fechar o mais recente
+  if (_subModalCount > 0) {
+    const sub = document.getElementById(`sub-modal-overlay-${_subModalCount}`);
+    if (sub) sub.remove();
+    _subModalCount--;
+    return;
+  }
   document.getElementById('modal-overlay').style.display = 'none';
+  if (_onModalClose) { const cb = _onModalClose; _onModalClose = null; cb(); }
+}
+
+/** Fecha todos os modais (principal + sub-modais) */
+export function fecharModalTodos() {
+  // Remover todos sub-modais
+  document.querySelectorAll('.sub-modal-overlay').forEach(el => el.remove());
+  _subModalCount = 0;
+  document.getElementById('modal-overlay').style.display = 'none';
+  if (_onModalClose) { const cb = _onModalClose; _onModalClose = null; cb(); }
 }
 // Expor para onclick inline
 window.fecharModal = fecharModal;
+window.fecharModalTodos = fecharModalTodos;
 
 /** Extrai número base de uma string de CA (ex: "14 + Modificador de Des (máx. 2)" -> 14) */
 export function parsearCA(caStr) {
