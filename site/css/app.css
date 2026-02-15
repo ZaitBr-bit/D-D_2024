@@ -464,6 +464,8 @@ tr:hover td { background: #faf8f4; }
   font-size: 0.7rem; color: var(--text-muted); opacity: 0.6;
 }
 .magia-card .magia-card-info:hover { opacity: 1; color: var(--primary); }
+.magia-card-bloqueada { pointer-events: none; }
+.magia-card-bloqueada .magia-card-info { pointer-events: auto; }
 
 /* Tags de identificação rápida de magia na ficha */
 .magia-tags {
@@ -495,6 +497,34 @@ tr:hover td { background: #faf8f4; }
 .magia-meta { font-size: 0.75rem; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; }
 .magia-desc { font-size: 0.85rem; margin-top: 6px; line-height: 1.5; display: none; }
 .magia-item.expandida .magia-desc { display: block; }
+
+/* Contadores de magias preparadas/conhecidas */
+.magia-contadores {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;
+}
+.magia-contador {
+  font-size: 0.78rem; font-weight: 600; padding: 3px 8px;
+  border-radius: 12px; background: var(--surface-variant);
+  border: 1px solid var(--border-light);
+}
+.magia-contador.contador-cheio { background: #e8f5e9; border-color: var(--success); color: var(--success); }
+.magia-contador.contador-excedido { background: #ffebee; border-color: var(--danger); color: var(--danger); }
+.magia-contador.contador-dominio { background: #fff8e1; border-color: var(--secondary); color: #8d6e00; }
+
+/* Magias de domínio (sempre preparadas) */
+.magia-dominio { border-left: 3px solid var(--secondary); }
+.badge-dominio { color: var(--secondary); font-size: 0.8rem; margin-right: 4px; }
+
+/* Botão de remover/despreparar magia */
+.btn-magia-remover {
+  font-size: 0.7rem; padding: 2px 6px; border-radius: 4px;
+  background: transparent; color: var(--danger); border: 1px solid var(--danger);
+  cursor: pointer; transition: background 0.2s, color 0.2s;
+}
+.btn-magia-remover:hover { background: var(--danger); color: #fff; }
+
+/* Magia já adicionada (opacidade reduzida na busca) */
+.magia-ja-adicionada { opacity: 0.5; cursor: default !important; }
 
 /* Espaços de magia */
 .slots-grupo {
@@ -968,4 +998,111 @@ tr:hover td { background: #faf8f4; }
   border-radius: var(--radius-sm);
   font-weight: bold;
   cursor: pointer;
+}
+
+/* --- Perícias agrupadas por atributo --- */
+.pericias-por-atributo {
+  columns: 2;
+  column-gap: 16px;
+}
+.pericias-grupo {
+  break-inside: avoid;
+  margin-bottom: 10px;
+}
+.pericias-grupo:last-child { margin-bottom: 0; }
+.pericias-grupo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3px 8px;
+  margin-bottom: 2px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  background: rgba(0,0,0,0.025);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.pericias-grupo-mod {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* --- Scroll Picker (estilo alarme iPhone) --- */
+.scroll-picker-wrapper {
+  position: relative;
+  height: 200px;
+  width: 100px;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+}
+.scroll-picker-highlight {
+  position: absolute;
+  top: 50%;
+  left: 4px;
+  right: 4px;
+  height: 40px;
+  transform: translateY(-50%);
+  border-top: 2px solid var(--primary);
+  border-bottom: 2px solid var(--primary);
+  background: rgba(123, 45, 38, 0.06);
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+  z-index: 2;
+}
+.scroll-picker-fade-top,
+.scroll-picker-fade-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 70px;
+  pointer-events: none;
+  z-index: 1;
+}
+.scroll-picker-fade-top {
+  top: 0;
+  background: linear-gradient(to bottom, var(--bg-input) 20%, transparent 100%);
+}
+.scroll-picker-fade-bottom {
+  bottom: 0;
+  background: linear-gradient(to top, var(--bg-input) 20%, transparent 100%);
+}
+.scroll-picker-list {
+  height: 100%;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll-picker-list::-webkit-scrollbar { display: none; }
+.scroll-picker-spacer { height: 80px; }
+.scroll-picker-item {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  scroll-snap-align: center;
+  user-select: none;
+  opacity: 0.35;
+  transition: opacity 0.1s, color 0.1s;
+}
+.scroll-picker-item.selected {
+  color: var(--primary);
+  font-size: 1.5rem;
+  font-weight: 800;
+  opacity: 1;
+}
+
+@media (max-width: 480px) {
+  .pericias-por-atributo { columns: 1; }
+}
+
+@media print {
+  .pericias-por-atributo { columns: 3; font-size: 8pt; }
 }
