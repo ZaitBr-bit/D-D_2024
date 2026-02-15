@@ -50,12 +50,70 @@ function processarRota() {
   }
 }
 
+// --- PWA Update ---
+/**
+ * Verifica se existe uma nova versão do Service Worker e exibe um banner
+ * convidando o usuário a atualizar. Quando o usuário clica em "Atualizar",
+ * envia a mensagem SKIP_WAITING ao SW instalado para que ele assuma o controle;
+ * o listener de 'controllerchange' em init() recarrega a página automaticamente.
+ * @param {ServiceWorkerRegistration} registration - Registro do SW ativo
+ */
+function verificarAtualizacaoSW(registration) {
+  // Quando uma nova versão do SW é encontrada e está esperando ativação
+  const novoSW = registration.waiting || registration.installing;
+
+  function mostrarPromptAtualizar(sw) {
+    const banner = document.createElement('div');
+    banner.id = 'update-banner';
+    banner.className = 'update-banner';
+    banner.innerHTML = `
+      <span>Nova versão disponível!</span>
+      <button class="update-banner-btn" id="btn-atualizar">Atualizar</button>
+    `;
+    document.body.appendChild(banner);
+    document.getElementById('btn-atualizar').addEventListener('click', () => {
+      sw.postMessage({ type: 'SKIP_WAITING' });
+      banner.remove();
+    });
+  }
+
+  if (novoSW) {
+    if (novoSW.state === 'installed') {
+      mostrarPromptAtualizar(novoSW);
+    } else {
+      novoSW.addEventListener('statechange', () => {
+        if (novoSW.state === 'installed') {
+          mostrarPromptAtualizar(novoSW);
+        }
+      });
+    }
+  }
+
+  registration.addEventListener('updatefound', () => {
+    const instalando = registration.installing;
+    if (instalando) {
+      instalando.addEventListener('statechange', () => {
+        if (instalando.state === 'installed' && navigator.serviceWorker.controller) {
+          mostrarPromptAtualizar(instalando);
+        }
+      });
+    }
+  });
+}
+
 // --- Inicialização ---
 function init() {
-  // Registrar Service Worker
+  // Registrar Service Worker e verificar atualizações
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(err => {
+    navigator.serviceWorker.register('./sw.js').then(registration => {
+      verificarAtualizacaoSW(registration);
+    }).catch(err => {
       console.warn('SW registro falhou:', err);
+    });
+
+    // Recarregar página quando o novo SW assumir controle
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      window.location.reload();
     });
   }
 

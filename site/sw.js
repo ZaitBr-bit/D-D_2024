@@ -1,11 +1,12 @@
 // Service Worker para PWA D&D 5.5 Ficha de Personagem
-const CACHE_NAME = 'dnd-ficha-v1';
+const CACHE_NAME = 'dnd-ficha-v2';
 
 // Arquivos estáticos do site
 const STATIC_ASSETS = [
   './',
   './index.html',
   './manifest.json',
+  './favicon.ico',
   './css/app.css',
   './js/app.js',
   './js/db.js',
@@ -26,7 +27,6 @@ self.addEventListener('install', (event) => {
       return cache.addAll(STATIC_ASSETS);
     })
   );
-  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
@@ -38,6 +38,13 @@ self.addEventListener('activate', (event) => {
     })
   );
   self.clients.claim();
+});
+
+// Escuta mensagens do cliente para controlar a atualização
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('fetch', (event) => {
