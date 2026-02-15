@@ -54,26 +54,35 @@ function processarRota() {
 /**
  * Verifica se existe uma nova versão do Service Worker e exibe um banner
  * convidando o usuário a atualizar. Quando o usuário clica em "Atualizar",
- * envia a mensagem SKIP_WAITING ao SW instalado para que ele assuma o controle;
- * o listener de 'controllerchange' em init() recarrega a página automaticamente.
+ * limpa todos os caches, envia SKIP_WAITING ao SW novo e recarrega a página.
  * @param {ServiceWorkerRegistration} registration - Registro do SW ativo
  */
 function verificarAtualizacaoSW(registration) {
-  // Quando uma nova versão do SW é encontrada e está esperando ativação
   const novoSW = registration.waiting || registration.installing;
 
   function mostrarPromptAtualizar(sw) {
+    // Evitar duplicar banner
+    if (document.getElementById('update-banner')) return;
+
     const banner = document.createElement('div');
     banner.id = 'update-banner';
     banner.className = 'update-banner';
     banner.innerHTML = `
-      <span>Nova versão disponível!</span>
-      <button class="update-banner-btn" id="btn-atualizar">Atualizar</button>
+      <span>Nova versao disponivel!</span>
+      <button class="update-banner-btn" id="btn-atualizar">Atualizar agora</button>
     `;
     document.body.appendChild(banner);
     document.getElementById('btn-atualizar').addEventListener('click', () => {
-      sw.postMessage({ type: 'SKIP_WAITING' });
-      banner.remove();
+      banner.querySelector('#btn-atualizar').textContent = 'Atualizando...';
+      banner.querySelector('#btn-atualizar').disabled = true;
+      // Limpar todos os caches e forçar o novo SW
+      if ('caches' in window) {
+        caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).then(() => {
+          sw.postMessage({ type: 'SKIP_WAITING' });
+        });
+      } else {
+        sw.postMessage({ type: 'SKIP_WAITING' });
+      }
     });
   }
 
@@ -107,12 +116,20 @@ function init() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').then(registration => {
       verificarAtualizacaoSW(registration);
+
+      // Verificar atualizações periodicamente (a cada 30 min)
+      setInterval(() => {
+        registration.update();
+      }, 30 * 60 * 1000);
     }).catch(err => {
       console.warn('SW registro falhou:', err);
     });
 
-    // Recarregar página quando o novo SW assumir controle
+    // Recarregar página quando o novo SW assumir controle (pós-atualização)
+    let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshing) return;
+      refreshing = true;
       window.location.reload();
     });
   }
