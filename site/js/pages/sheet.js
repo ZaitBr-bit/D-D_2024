@@ -543,17 +543,51 @@ function setupEventosDescanso() {
   });
 
   document.getElementById('btn-descanso-curto')?.addEventListener('click', () => {
+    const info = CLASSES_INFO[char.classe];
+    const dvRestantes = char.nivel - (char.dados_vida_usados || 0);
+    const pvMax = char.pv_max_override || char.pv_max;
+    const modCon = calcMod(char.atributos.constituicao);
+    const jaCheio = char.pv_atual >= pvMax;
+
+    // Restaurar habilidades de descanso curto
     restaurarHabilidades('curto');
     salvar();
-    toast('Descanso curto realizado!', 'success');
-    renderFichaCompleta();
+
+    // Se tem dados de vida restantes e nao esta com PV cheio, oferecer modal
+    if (dvRestantes > 0 && !jaCheio && info?.dado_vida) {
+      abrirModal('Descanso Curto',
+        `<div class="info-box success" style="margin-bottom:12px">Habilidades de descanso curto restauradas!</div>` +
+        numberPickerHtml('input-qtd-dv-curto', 0, 0, dvRestantes, 'Quantos dados de vida usar para cura?') +
+        `<div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;text-align:center">
+            Restantes: ${dvRestantes} / ${char.nivel} (d${info.dado_vida} + ${modCon} CON por dado)<br>
+            <em>Apenas desconta os dados - use seus dados reais para cura.</em>
+        </div>`,
+        '<button class="btn btn-secondary" onclick="fecharModal()">Pular Cura</button><button class="btn btn-primary" id="btn-aplicar-dv-curto">Usar Dados de Vida</button>'
+      );
+      setupNumberPicker('input-qtd-dv-curto');
+      document.getElementById('btn-aplicar-dv-curto')?.addEventListener('click', () => {
+        const qtd = Math.min(dvRestantes, Math.max(0, parseInt(document.getElementById('input-qtd-dv-curto-val')?.value) || 0));
+        if (qtd > 0) {
+          char.dados_vida_usados = (char.dados_vida_usados || 0) + qtd;
+          salvar();
+          toast(`Descanso curto realizado! ${qtd}x d${info.dado_vida} usado(s). Role os dados e aplique a cura.`, 'success');
+        } else {
+          toast('Descanso curto realizado!', 'success');
+        }
+        window.fecharModal();
+        renderFichaCompleta();
+      });
+    } else {
+      toast('Descanso curto realizado!', 'success');
+      renderFichaCompleta();
+    }
   });
 
   document.getElementById('btn-descanso-longo')?.addEventListener('click', () => {
     const pvMax = char.pv_max_override || char.pv_max;
     char.pv_atual = pvMax;
     char.pv_temporario = 0;
-    char.dados_vida_usados = Math.max(0, (char.dados_vida_usados || 0) - Math.floor(char.nivel / 2));
+    char.dados_vida_usados = Math.max(0, (char.dados_vida_usados || 0) - Math.max(1, Math.floor(char.nivel / 2)));
     // Reset death saves
     char.morte_sucessos = 0;
     char.morte_falhas = 0;
@@ -1898,14 +1932,15 @@ function renderSheetInvItem(item, idx) {
 function setupEventosInventarioSheet() {
   const invContainer = document.getElementById('sheet-inventario');
 
-  // Equipar/desequipar (re-renderiza para reorganizar seções)
+  // Equipar/desequipar — re-renderiza a ficha completa para atualizar CA e stats
   document.querySelectorAll('[data-sheet-equip]').forEach(cb => {
     cb.addEventListener('change', () => {
       const idx = parseInt(cb.dataset.sheetEquip);
       if (char.inventario[idx]) {
         char.inventario[idx].equipado = cb.checked;
         salvar();
-        reRenderSheetInv();
+        // Re-renderizar ficha inteira para recalcular CA e outros stats
+        renderFichaCompleta();
       }
     });
   });
