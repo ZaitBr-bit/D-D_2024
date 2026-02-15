@@ -1077,8 +1077,8 @@ function detectarSubHabilidades(descricao) {
 function renderFeatureItem(f, source) {
   const recarga = detectarRecarga(f.descricao);
   // Features that are purely descriptive should always be passive
-  const DESCRITIVAS = ['Conjuração', 'Conjuracao'];
-  const ativa = DESCRITIVAS.some(d => f.nome.includes(d)) ? false : ehHabilidadeAtiva(f.descricao);
+  const nomeNorm = semAcento(f.nome);
+  const ativa = nomeNorm.includes('conjuracao') ? false : ehHabilidadeAtiva(f.descricao);
   const key = `${source}_${f.nome}`;
   if (!char.usos_habilidades) char.usos_habilidades = {};
 
