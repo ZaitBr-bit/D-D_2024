@@ -342,6 +342,11 @@ tr:hover td { background: #faf8f4; }
   border-left: 3px solid var(--success, #2d6a4f);
 }
 
+/* Inventário: item com quantidade zero */
+.inv-item-zerado {
+  opacity: 0.4;
+}
+
 /* Inventário: seção título */
 .inv-secao-titulo {
   font-size: 0.7rem;
@@ -714,6 +719,42 @@ tr:hover td { background: #faf8f4; }
 }
 .morte-bolha.morte-falha {
   background: var(--danger); border-color: var(--danger);
+}
+
+/* --- FAB Descanso (Floating Action Button) --- */
+.fab-descanso {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  gap: 8px;
+  padding-bottom: var(--safe-bottom);
+}
+.fab-btn {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-size: 1.4rem;
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.2s, background 0.2s;
+}
+.fab-btn:active { transform: scale(0.92); }
+.fab-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--bg-card);
+  padding: 8px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  animation: fadeIn 0.2s;
 }
 
 /* ============================================================
