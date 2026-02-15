@@ -1236,33 +1236,56 @@ function renderSecaoTracosEspecie() {
     });
   }
 
+  // Filter traits by level requirement (e.g., "A partir do nível 5")
+  tracosMostrar = tracosMostrar.filter(t => {
+    const match = t.descricao?.match(/a partir do n[ií]vel (\d+)/i);
+    if (match) return char.nivel >= parseInt(match[1]);
+    return true;
+  });
+
   if (!tracosMostrar.length) return '';
 
-  const passivos = tracosMostrar.filter(t => !ehHabilidadeAtiva(t.descricao));
-  const ativos = tracosMostrar.filter(t => ehHabilidadeAtiva(t.descricao));
+  // Traits that inherit recharge from parent "Ancestralidade Gigante" (prof bonus, long rest)
+  const TRACOS_HERDAM_ANCESTRALIDADE = ['Arrepio do Gelo (Gigante do Gelo)', 'Queimadura de Fogo (Gigante de Fogo)', 'Resistência da Pedra (Gigante da Pedra)', 'Salto da Nuvem (Gigante das Nuvens)', 'Tombo da Colina (Gigante da Colina)', 'Trovão da Tempestade (Gigante da Tempestade)'];
+
+  // Determine active/passive considering inherited traits
+  const ehAtivo = (t) => {
+    if (TRACOS_HERDAM_ANCESTRALIDADE.includes(t.nome)) return true;
+    return ehHabilidadeAtiva(t.descricao);
+  };
+
+  const passivos = tracosMostrar.filter(t => !ehAtivo(t));
+  const ativos = tracosMostrar.filter(t => ehAtivo(t));
 
   return `
     <div class="card print-break-before">
       <div class="card-header"><h2>Traços de Espécie — ${char.especie}</h2></div>
       ${ativos.length > 0 ? `
         <div class="section-divider"><span>Habilidades Ativas</span></div>
-        ${ativos.map(t => renderTracoEspecie(t)).join('')}
+        ${ativos.map(t => renderTracoEspecie(t, TRACOS_HERDAM_ANCESTRALIDADE.includes(t.nome))).join('')}
       ` : ''}
       ${passivos.length > 0 ? `
         <div class="section-divider"><span>Habilidades Passivas</span></div>
-        ${passivos.map(t => renderTracoEspecie(t)).join('')}
+        ${passivos.map(t => renderTracoEspecie(t, false)).join('')}
       ` : ''}
     </div>
   `;
 }
 
-function renderTracoEspecie(traco) {
-  const recarga = detectarRecarga(traco.descricao);
-  const ativa = ehHabilidadeAtiva(traco.descricao);
+function renderTracoEspecie(traco, herdaAncestralidade = false) {
+  let recarga = detectarRecarga(traco.descricao);
+  let ativa = ehHabilidadeAtiva(traco.descricao);
+
+  // Traits inheriting from "Ancestralidade Gigante": prof bonus uses, long rest
+  if (herdaAncestralidade && !recarga) {
+    recarga = 'longo';
+    ativa = true;
+  }
+
   const key = `especie_${traco.nome}`;
   if (!char.usos_habilidades) char.usos_habilidades = {};
 
-  const usosMax = detectarUsosMaximos(traco.descricao) || (recarga ? bonusProficiencia(char.nivel) : null);
+  let usosMax = detectarUsosMaximos(traco.descricao) || (recarga ? bonusProficiencia(char.nivel) : null);
   const temMultiplosUsos = usosMax && usosMax > 1 && recarga;
 
   let usosAtual = 0;
@@ -2077,7 +2100,13 @@ async function carregarDadosEquipSheet() {
     armas: armasData?.armas || [],
     propriedadesArmas: armasData?.propriedades || [],
     armaduras: armadurasData?.armaduras || [],
-    equipAvent: equipData?.itens || []
+    equipAvent: equipData?.itens || [],
+    municao: (equipData?.municao || []).map(m => ({
+      nome: m.tipo,
+      custo: m.custo || '',
+      peso: m.peso || '',
+      descricao: `Quantidade: ${m.quantidade || '—'} | Armazenamento: ${m.armazenamento || '—'}`
+    }))
   };
   return _cacheEquipSheet;
 }
@@ -2164,13 +2193,11 @@ async function mostrarSeletorCategoria() {
 
   // Categorias de itens consumíveis / poções do equipamento de aventura
   const ITENS_CONSUMIVEIS = ['Ácido', 'Água Benta', 'Antitoxina', 'Fogo Alquímico', 'Óleo', 'Veneno Básico'];
-  const ITENS_MUNICAO = ['Flechas', 'Virotes', 'Balas de Funda', 'Balas de Arma de Fogo', 'Dardos'];
 
   const consumiveis = dados.equipAvent.filter(i => ITENS_CONSUMIVEIS.some(c => i.nome.includes(c)));
-  const municao = dados.equipAvent.filter(i => ITENS_MUNICAO.some(c => i.nome.includes(c)));
+  const municao = dados.municao || [];
   const outrosEquip = dados.equipAvent.filter(i =>
-    !ITENS_CONSUMIVEIS.some(c => i.nome.includes(c)) &&
-    !ITENS_MUNICAO.some(c => i.nome.includes(c))
+    !ITENS_CONSUMIVEIS.some(c => i.nome.includes(c))
   );
 
   const categorias = [
