@@ -100,6 +100,12 @@ export function calcCA(personagem) {
     ca += 2;
   }
 
+  // Estilo de Luta: Defensivo (+1 CA enquanto usa armadura)
+  const estiloLuta = personagem.escolhas_classe?.estilo_luta?.[0] || '';
+  if (estiloLuta === 'Defensivo' && armadura) {
+    ca += 1;
+  }
+
   // Bônus de CA de itens customizados
   inv.filter(i => i.equipado && i.dados?.bonus_ca).forEach(i => {
     ca += parseInt(i.dados.bonus_ca) || 0;

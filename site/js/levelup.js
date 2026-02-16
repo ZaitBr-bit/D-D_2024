@@ -201,6 +201,27 @@ export function exigeEspecializacaoGuardiao(classe, nivel) {
 }
 
 /**
+ * Verifica se o nível exige escolha de Estilo de Luta (Guardião nv2, Paladino nv2)
+ */
+export function exigeEstiloLuta(classe, nivel) {
+  return (classe === 'Guardião' || classe === 'Paladino') && nivel === 2;
+}
+
+/**
+ * Verifica se o nível exige escolha de Explorador Hábil (Guardião nv2: 1 expertise + 2 idiomas)
+ */
+export function exigeExploradorHabil(classe, nivel) {
+  return classe === 'Guardião' && nivel === 2;
+}
+
+/**
+ * Verifica se o nível exige escolha de Acadêmico (Mago nv2: 2 expertise em perícias de conhecimento)
+ */
+export function exigeAcademico(classe, nivel) {
+  return classe === 'Mago' && nivel === 2;
+}
+
+/**
  * Extrai magias sempre preparadas de tabelas markdown no nível alvo.
  * Ex.: | 5 | *Passo Nebuloso* |
  */
@@ -522,6 +543,9 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   const ganhaAumentoAtributo = concedeAumentoAtributo(personagem.classe, novoNivel);
   const exigeEspecializacao = exigeEspecializacaoBardo(personagem.classe, novoNivel);
   const exigeEspecializacaoGuardiaoNivel = exigeEspecializacaoGuardiao(personagem.classe, novoNivel);
+  const exigeEstiloLutaNivel = exigeEstiloLuta(personagem.classe, novoNivel);
+  const exigeExploradorHabilNivel = exigeExploradorHabil(personagem.classe, novoNivel);
+  const exigeAcademicoNivel = exigeAcademico(personagem.classe, novoNivel);
   
   // Se precisa de escolhas do jogador e não foram fornecidas, retornar pendências
   if (precisaSubclasse && !opcoes.subclasse) {
@@ -562,6 +586,43 @@ export async function subirDeNivel(personagem, opcoes = {}) {
         pendente: true,
         tipo_pendencia: 'guardiao_expertise',
         mensagem: 'É necessário escolher 2 perícias para Especialista do Guardião'
+      };
+    }
+  }
+
+  // Validar Estilo de Luta (Guardião/Paladino nível 2)
+  if (exigeEstiloLutaNivel) {
+    if (!opcoes.estilo_luta) {
+      return {
+        sucesso: false,
+        pendente: true,
+        tipo_pendencia: 'estilo_luta',
+        mensagem: 'É necessário escolher um Estilo de Luta'
+      };
+    }
+  }
+
+  // Validar Explorador Hábil (Guardião nível 2: 1 expertise + 2 idiomas)
+  if (exigeExploradorHabilNivel) {
+    if (!opcoes.explorador_expertise) {
+      return {
+        sucesso: false,
+        pendente: true,
+        tipo_pendencia: 'explorador_habil',
+        mensagem: 'É necessário escolher 1 perícia para Especialização (Explorador Hábil)'
+      };
+    }
+  }
+
+  // Validar Acadêmico (Mago nível 2: 2 expertise)
+  if (exigeAcademicoNivel) {
+    const selecionadas = Array.isArray(opcoes.academico_expertise) ? opcoes.academico_expertise : [];
+    if (selecionadas.length !== 2) {
+      return {
+        sucesso: false,
+        pendente: true,
+        tipo_pendencia: 'academico',
+        mensagem: 'É necessário escolher 2 perícias para Acadêmico do Mago'
       };
     }
   }
@@ -689,6 +750,46 @@ export async function subirDeNivel(personagem, opcoes = {}) {
       }
     }
   }
+
+  // Aplicar Estilo de Luta (Guardião/Paladino nível 2)
+  let estiloLutaAplicado = null;
+  if (exigeEstiloLutaNivel && opcoes.estilo_luta) {
+    if (!personagem.escolhas_classe) personagem.escolhas_classe = {};
+    personagem.escolhas_classe.estilo_luta = [opcoes.estilo_luta];
+    estiloLutaAplicado = opcoes.estilo_luta;
+  }
+
+  // Aplicar Explorador Hábil (Guardião nível 2: 1 expertise + 2 idiomas)
+  let exploradorHabilAplicado = { expertise: null, idiomas: [] };
+  if (exigeExploradorHabilNivel) {
+    if (!personagem.pericias_expertise) personagem.pericias_expertise = [];
+    if (opcoes.explorador_expertise && !personagem.pericias_expertise.includes(opcoes.explorador_expertise)) {
+      personagem.pericias_expertise.push(opcoes.explorador_expertise);
+      exploradorHabilAplicado.expertise = opcoes.explorador_expertise;
+    }
+    if (Array.isArray(opcoes.explorador_idiomas) && opcoes.explorador_idiomas.length > 0) {
+      if (!personagem.idiomas) personagem.idiomas = [];
+      opcoes.explorador_idiomas.forEach(idioma => {
+        if (!personagem.idiomas.includes(idioma)) {
+          personagem.idiomas.push(idioma);
+          exploradorHabilAplicado.idiomas.push(idioma);
+        }
+      });
+    }
+  }
+
+  // Aplicar Acadêmico do Mago (nível 2: 2 expertise acadêmicas)
+  let academicoAplicado = [];
+  if (exigeAcademicoNivel) {
+    if (!personagem.pericias_expertise) personagem.pericias_expertise = [];
+    const selecionadas = (opcoes.academico_expertise || []).filter(Boolean);
+    for (const pericia of selecionadas) {
+      if (!personagem.pericias_expertise.includes(pericia)) {
+        personagem.pericias_expertise.push(pericia);
+        academicoAplicado.push(pericia);
+      }
+    }
+  }
   
   // Retornar resumo do level-up
   return {
@@ -711,7 +812,10 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     aumentos_aplicados: opcoes.aumentos_atributo || null,
     talento_aplicado: opcoes.talento || null,
     expertise_bardo_aplicada: expertiseBardoAplicada,
-    expertise_guardiao_aplicada: expertiseGuardiaoAplicada
+    expertise_guardiao_aplicada: expertiseGuardiaoAplicada,
+    estilo_luta_aplicado: estiloLutaAplicado,
+    explorador_habil_aplicado: exploradorHabilAplicado,
+    academico_aplicado: academicoAplicado
   };
 }
 

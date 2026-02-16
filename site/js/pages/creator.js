@@ -158,6 +158,37 @@ const CLASSES_ESCOLHAS = {
       maxEscolhas: 2,
       tipo: 'pericias' // indica que deve usar lista de perícias do personagem
     }
+  },
+  'Paladino': {
+    estilo_luta: {
+      titulo: 'Estilo de Luta (Nível 2)',
+      descricao: 'Escolha um talento de Estilo de Luta (ou Combatente Abençoado).',
+      nivelMinimo: 2,
+      maxEscolhas: 1,
+      opcoes: [
+        { nome: 'Arquearia', descricao: '+2 em ataques à distância com armas' },
+        { nome: 'Arremesso', descricao: '+2 de dano com armas de Arremesso' },
+        { nome: 'Armas Grandes', descricao: 'Trata 1-2 como 3 nos dados de dano (duas mãos)' },
+        { nome: 'Duas Armas', descricao: 'Adiciona mod. ao dano da mão secundária' },
+        { nome: 'Desarmado', descricao: 'Dano desarmado d6/d8+For' },
+        { nome: 'Defensivo', descricao: '+1 CA usando armadura' },
+        { nome: 'Duelismo', descricao: '+2 dano com uma arma em uma mão' },
+        { nome: 'Interceptação', descricao: 'Reduz dano a aliado em 1d10+Prof' },
+        { nome: 'Luta às Cegas', descricao: 'Visão Cega 3m, 9m se cego' },
+        { nome: 'Protetivo', descricao: 'Impõe desvantagem em ataques contra aliados' },
+        { nome: 'Combatente Abençoado', descricao: 'Aprende 2 truques de Clérigo; pode trocá-los ao subir de nível' }
+      ]
+    }
+  },
+  'Mago': {
+    academico: {
+      titulo: 'Acadêmico (Nível 2)',
+      descricao: 'Escolha 2 perícias para Especialização: Arcanismo, História, Investigação, Medicina, Natureza ou Religião.',
+      nivelMinimo: 2,
+      maxEscolhas: 2,
+      tipo: 'pericias_fixas',
+      opcoes_fixas: ['Arcanismo', 'História', 'Investigação', 'Medicina', 'Natureza', 'Religião']
+    }
   }
 };
 
@@ -414,6 +445,36 @@ async function finalizar() {
     personagem.proficiencias_extra.push('Armas Marciais', 'Armadura Média');
   }
 
+  // Aplicar expertise de classes que escolhem na criação
+  if (!personagem.pericias_expertise) personagem.pericias_expertise = [];
+
+  // Ladino: 2 perícias para Especialização (nível 1)
+  if (personagem.classe === 'Ladino' && personagem.escolhas_classe?.especialista?.length) {
+    personagem.escolhas_classe.especialista.forEach(p => {
+      if (!personagem.pericias_expertise.includes(p)) {
+        personagem.pericias_expertise.push(p);
+      }
+    });
+  }
+
+  // Guardião: Explorador Hábil - 1 perícia para Especialização (nível 2)
+  if (personagem.classe === 'Guardião' && personagem.escolhas_classe?.especialista?.length) {
+    personagem.escolhas_classe.especialista.forEach(p => {
+      if (!personagem.pericias_expertise.includes(p)) {
+        personagem.pericias_expertise.push(p);
+      }
+    });
+  }
+
+  // Mago: Acadêmico - 2 perícias de conhecimento para Especialização (nível 2)
+  if (personagem.classe === 'Mago' && personagem.escolhas_classe?.academico?.length) {
+    personagem.escolhas_classe.academico.forEach(p => {
+      if (!personagem.pericias_expertise.includes(p)) {
+        personagem.pericias_expertise.push(p);
+      }
+    });
+  }
+
   if (!personagem.nome) personagem.nome = 'Sem Nome';
 
   salvarPersonagem(personagem);
@@ -528,6 +589,22 @@ async function abrirPopupClasse(nome) {
             `).join('')}
           </div>
         `;
+      } else if (config.tipo === 'pericias_fixas') {
+        // Tipo pericias_fixas: exibe lista fixa de pericias independente da classe
+        const opcoes = config.opcoes_fixas || [];
+        escolhasHtml += `
+          <div class="section-divider mt-2"><span>${config.titulo}</span></div>
+          <div class="info-box info" style="font-size:0.85rem">${config.descricao}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0" id="escolha-${chave}">
+            ${opcoes.map(p => `
+              <div class="selection-card ${selecionados.includes(p) ? 'selected' : ''}"
+                   data-escolha-classe="${chave}" data-opcao="${p}"
+                   style="flex:1;min-width:120px;max-width:180px;cursor:pointer">
+                <div class="card-nome" style="font-size:0.85rem">${p}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
       } else {
         escolhasHtml += `
           <div class="section-divider mt-2"><span>${config.titulo}</span></div>
@@ -548,7 +625,7 @@ async function abrirPopupClasse(nome) {
   }
 
   // Características de nível 1
-  const caracteristicasExcluir = ['Ordem Divina', 'Estilo de Luta', 'Especialista'];
+  const caracteristicasExcluir = ['Ordem Divina', 'Estilo de Luta', 'Especialista', 'Explorador Hábil', 'Acadêmico'];
   let caracteristicas1 = '';
   if (classeData?.caracteristicas) {
     const feats = classeData.caracteristicas.filter(c => c.nivel === 1 && !caracteristicasExcluir.includes(c.nome));
