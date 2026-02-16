@@ -89,7 +89,7 @@
       "alcance": "Pessoal",
       "componentes": "V, S, M (uma argola de jade no valor de 1.500 ou mais PO)",
       "duracao": "Concentração, até 1 hora",
-      "descricao": "Magos rivais usam Metamorfose para se transformarem em um Observador e um Beír durante um duelo mágico.\nVocê se multimorfa em outra criatura pela duração da magia ou até executar uma ação Usar Magia para se multimorfa em uma criatura diferente. A nova forma deve ser de uma criatura com um Nível de Desafio igual ou inferior ao seu nível ou ao seu Nível de Desafio. Você deve ter visto esse tipo de criatura antes, e ela não pode ser um Constructo ou um Morto-vivo.\nAo se multimorfar, você recebe um número de Pontos de Vida Temporários igual aos Pontos de Vida da nova forma. A magia encerra se você perder todos os Pontos de Vida Temporários recebidos pela magia.\nAs suas estatísticas de jogo são substituídas pelo bloco de estatísticas da nova forma, mas você mantém seu tipo de criatura, alinhamento, personalidade, valores de Inteligência, Sabedoria e Carisma, Pontos de Vida, Dados de Pontos de Vida, proficiências e capacidade de comunicação. Se você possuir a característica Conjuração, também a mantém.\nAo se multimorfar, você decide se seu equipamento cai no chão ou se altera em tamanho e forma para se ajustar à nova forma enquanto você a mantém.",
+      "descricao": "Você se multimorfa em outra criatura pela duração da magia ou até executar uma ação Usar Magia para se multimorfa em uma criatura diferente. A nova forma deve ser de uma criatura com um Nível de Desafio igual ou inferior ao seu nível ou ao seu Nível de Desafio. Você deve ter visto esse tipo de criatura antes, e ela não pode ser um Constructo ou um Morto-vivo.\nAo se multimorfar, você recebe um número de Pontos de Vida Temporários igual aos Pontos de Vida da nova forma. A magia encerra se você perder todos os Pontos de Vida Temporários recebidos pela magia.\nAs suas estatísticas de jogo são substituídas pelo bloco de estatísticas da nova forma, mas você mantém seu tipo de criatura, alinhamento, personalidade, valores de Inteligência, Sabedoria e Carisma, Pontos de Vida, Dados de Pontos de Vida, proficiências e capacidade de comunicação. Se você possuir a característica Conjuração, também a mantém.\nAo se multimorfar, você decide se seu equipamento cai no chão ou se altera em tamanho e forma para se ajustar à nova forma enquanto você a mantém.",
       "circulo_superior": ""
     },
     {
@@ -119,9 +119,9 @@
       ],
       "tempo_conjuracao": "Ação",
       "alcance": "18 metros",
-      "componentes": "",
+      "componentes": "V",
       "duracao": "Instantânea",
-      "descricao": "Componente: V\nVocê obriga uma criatura à sua vista e no alcance da magia a morrer. Se o alvo tiver 100 Pontos de Vida ou menos, ele morre. Caso contrário, sofre 12d12 pontos de dano Psíquico.",
+      "descricao": "Você obriga uma criatura à sua vista e no alcance da magia a morrer. Se o alvo tiver 100 Pontos de Vida ou menos, ele morre. Caso contrário, sofre 12d12 pontos de dano Psíquico.",
       "circulo_superior": ""
     },
     {
@@ -134,9 +134,9 @@
       ],
       "tempo_conjuracao": "Ação",
       "alcance": "18 metros",
-      "componentes": "",
+      "componentes": "V",
       "duracao": "Instantânea",
-      "descricao": "Componente: V\nUma onda de energia curativa percorre uma criatura à sua vista e no alcance da magia. O alvo recupera todos os Pontos de Vida. Se a criatura tem a condição Amedrontado, Atordoado, Enfeitiçado, Envenenado ou Paralisado, a condição encerra. Se a criatura tem a condição Caído, ela pode usar sua Reação para se levantar.",
+      "descricao": "Uma onda de energia curativa percorre uma criatura à sua vista e no alcance da magia. O alvo recupera todos os Pontos de Vida. Se a criatura tem a condição Amedrontado, Atordoado, Enfeitiçado, Envenenado ou Paralisado, a condição encerra. Se a criatura tem a condição Caído, ela pode usar sua Reação para se levantar.",
       "circulo_superior": ""
     },
     {
@@ -184,7 +184,7 @@
       "alcance": "18 metros",
       "componentes": "V, S, M (um diamante no valor de 5.000 ou mais PO)",
       "duracao": "Concentração, até 1 minuto",
-      "descricao": "Otto, o Bardo, conjura Portal para abrir um portal para as Terras Além.\nVocê conjura um portal que liga um espaço desocupado à sua vista e no alcance da magia a um local preciso em um plano de existência diferente. O portal é uma abertura circular, que você pode criar com 1,5 a 6 metros de diâmetro. Você pode orientar o portal em qualquer direção que escolher. O portal permanece pela duração da magia e o destino para o qual ele leva é visível através dele.\nO portal tem uma frente e um verso em cada plano onde aparece. Se deslocar pelo portal só é possível movendo-se pela frente. Qualquer coisa que o faça é instantaneamente transportada para o outro plano, aparecendo no espaço desocupado mais próximo do portal.\nDivindades e outros governantes dos planos podem impedir que portais criados por esta magia se abram em sua presença ou em qualquer lugar dentro de seus domínios.\nAo conjurar esta magia, você pode proferir o nome de uma criatura específica (não funciona com um pseudônimo, título ou apelido). Se essa criatura estiver em um plano diferente daquele em que você está, o portal se abre ao lado da criatura nomeada e a transporta para o espaço desocupado mais próximo do seu lado do portal. Você não recebe nenhum poder especial sobre a criatura, e ela é livre para agir conforme o Mestre julgar apropriado. Ela pode ir embora, atacar você ou ajudá-lo.",
+      "descricao": "Você conjura um portal que liga um espaço desocupado à sua vista e no alcance da magia a um local preciso em um plano de existência diferente. O portal é uma abertura circular, que você pode criar com 1,5 a 6 metros de diâmetro. Você pode orientar o portal em qualquer direção que escolher. O portal permanece pela duração da magia e o destino para o qual ele leva é visível através dele.\nO portal tem uma frente e um verso em cada plano onde aparece. Se deslocar pelo portal só é possível movendo-se pela frente. Qualquer coisa que o faça é instantaneamente transportada para o outro plano, aparecendo no espaço desocupado mais próximo do portal.\nDivindades e outros governantes dos planos podem impedir que portais criados por esta magia se abram em sua presença ou em qualquer lugar dentro de seus domínios.\nAo conjurar esta magia, você pode proferir o nome de uma criatura específica (não funciona com um pseudônimo, título ou apelido). Se essa criatura estiver em um plano diferente daquele em que você está, o portal se abre ao lado da criatura nomeada e a transporta para o espaço desocupado mais próximo do seu lado do portal. Você não recebe nenhum poder especial sobre a criatura, e ela é livre para agir conforme o Mestre julgar apropriado. Ela pode ir embora, atacar você ou ajudá-lo.",
       "circulo_superior": ""
     },
     {

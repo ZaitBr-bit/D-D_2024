@@ -9,7 +9,7 @@ export const CLASSES_INFO = {
     salvaguardas: ["Força", "Constituição"],
     armaduras: ["Leve", "Média", "Escudo"],
     armas: ["Simples", "Marcial"],
-    pericias_opcoes: ["Adestrar Animais", "Atletismo", "Intimidação", "Natureza", "Percepção", "Sobrevivência"],
+    pericias_opcoes: ["Lidar com Animais", "Atletismo", "Intimidação", "Natureza", "Percepção", "Sobrevivência"],
     num_pericias: 2,
     conjurador: false,
     atributo_conjuracao: null
@@ -56,7 +56,7 @@ export const CLASSES_INFO = {
     salvaguardas: ["Inteligência", "Sabedoria"],
     armaduras: ["Leve", "Escudo"],
     armas: ["Simples"],
-    pericias_opcoes: ["Arcanismo", "Adestrar Animais", "Intuição", "Medicina", "Natureza", "Percepção", "Religião", "Sobrevivência"],
+    pericias_opcoes: ["Arcanismo", "Lidar com Animais", "Intuição", "Medicina", "Natureza", "Percepção", "Religião", "Sobrevivência"],
     num_pericias: 2,
     conjurador: true,
     atributo_conjuracao: "Sabedoria",
@@ -80,7 +80,7 @@ export const CLASSES_INFO = {
     salvaguardas: ["Força", "Destreza"],
     armaduras: ["Leve", "Média", "Escudo"],
     armas: ["Simples", "Marcial"],
-    pericias_opcoes: ["Adestrar Animais", "Atletismo", "Furtividade", "Intuição", "Investigação", "Natureza", "Percepção", "Sobrevivência"],
+    pericias_opcoes: ["Lidar com Animais", "Atletismo", "Furtividade", "Intuição", "Investigação", "Natureza", "Percepção", "Sobrevivência"],
     num_pericias: 3,
     conjurador: true,
     atributo_conjuracao: "Sabedoria",
@@ -92,7 +92,7 @@ export const CLASSES_INFO = {
     salvaguardas: ["Força", "Constituição"],
     armaduras: ["Leve", "Média", "Pesada", "Escudo"],
     armas: ["Simples", "Marcial"],
-    pericias_opcoes: ["Acrobacia", "Adestrar Animais", "Atletismo", "História", "Intimidação", "Intuição", "Percepção", "Persuasão", "Sobrevivência"],
+    pericias_opcoes: ["Acrobacia", "Lidar com Animais", "Atletismo", "História", "Intimidação", "Intuição", "Percepção", "Persuasão", "Sobrevivência"],
     num_pericias: 2,
     conjurador: false,
     atributo_conjuracao: null
@@ -148,7 +148,7 @@ export const CLASSES_INFO = {
 // Lista completa de todas as perícias com seus atributos associados
 export const PERICIAS = [
   { nome: "Acrobacia", atributo: "Destreza" },
-  { nome: "Adestrar Animais", atributo: "Sabedoria" },
+  { nome: "Lidar com Animais", atributo: "Sabedoria" },
   { nome: "Arcanismo", atributo: "Inteligência" },
   { nome: "Atletismo", atributo: "Força" },
   { nome: "Atuação", atributo: "Carisma" },

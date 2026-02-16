@@ -5,21 +5,21 @@
       "nome": "Ácido",
       "peso": "0,5 kg",
       "custo": "25 PO",
-      "descricao": "Como uma ação, você pode jogar este frasco em uma criatura a até 1,5 metro de você ou arremessá-lo a até 6 metros, quebrando-o no impacto. Faça um ataque à distância contra a criatura, tratando o ácido como uma arma improvisada. Se acertar, o alvo sofre 2d6 de dano ácido.",
+      "descricao": "Ao executar a ação Atacar, você pode substituir um de seus ataques arremessando um frasco de Ácido. Ataque uma criatura ou objeto à sua vista a até 6 metros de você. O alvo deve ser bem-sucedido em uma salvaguarda de Destreza (CD 8 mais seu modificador de Destreza e Bônus de Proficiência) ou sofre 2d6 pontos de dano Ácido.",
       "tipo_uso": "consumivel"
     },
     {
       "nome": "Água Benta",
       "peso": "0,5 kg",
       "custo": "25 PO",
-      "descricao": "Como uma ação, você pode jogar este frasco a até 6 metros, quebrando-o no impacto. Faça um ataque à distância, tratando como arma improvisada. Se o alvo for um corruptor ou morto-vivo, ele sofre 2d6 de dano radiante.",
+      "descricao": "Ao executar a ação Atacar, você pode substituir um de seus ataques arremessando um pote de Água Benta. Escolha como alvo uma criatura à sua vista a até 6 metros de você. O alvo deve ser bem-sucedido em uma salvaguarda de Destreza (CD 8 mais seu modificador de Destreza e Bônus de Proficiência) ou sofre 2d8 pontos de dano Radiante se for um Ínfero ou um Morto-vivo.",
       "tipo_uso": "consumivel"
     },
     {
       "nome": "Algibeira",
       "peso": "0,5 kg",
       "custo": "5 PP",
-      "descricao": "Pode conter até 20 projéteis de funda ou itens pequenos.",
+      "descricao": "Uma Algibeira comporta até 3 kg em um volume de 6 litros.",
       "tipo_uso": "equipamento"
     },
     {
@@ -31,7 +31,7 @@
       "nome": "Antitoxina",
       "peso": "—",
       "custo": "50 PO",
-      "descricao": "Uma criatura que beber este frasco ganha vantagem em testes de resistência contra veneno por 1 hora. Não confere benefício a mortos-vivos ou constructos.",
+      "descricao": "Como uma Ação Bônus, você pode beber um frasco de Antitoxina para obter Vantagem nas salvaguardas para evitar ou encerrar a condição Envenenado por 1 hora.",
       "tipo_uso": "consumivel"
     },
     {
@@ -173,7 +173,7 @@
       "nome": "Fogo Alquímico",
       "peso": "0,5 kg",
       "custo": "50 PO",
-      "descricao": "Como uma ação, você pode jogar este frasco a até 6 metros, quebrando-o no impacto. Faça um ataque à distância, tratando como arma improvisada. Se acertar, o alvo sofre 1d4 de dano ígneo no início de cada turno. Uma criatura pode usar sua ação para apagar as chamas.",
+      "descricao": "Ao executar a ação Atacar, você pode substituir um de seus ataques arremessando um frasco de Fogo Alquímico. Escolha como alvo uma criatura ou objeto à sua vista a até 6 metros de você. O alvo deve ser bem-sucedido em uma salvaguarda de Destreza (CD 8 mais seu modificador de Destreza e Bônus de Proficiência) ou sofre 1d4 pontos de dano Ígneo e entra em combustão (veja o glossário de regras).",
       "tipo_uso": "consumivel"
     },
     {
@@ -282,7 +282,7 @@
       "nome": "Mochila",
       "peso": "2,5 kg",
       "custo": "2 PO",
-      "descricao": "Pode conter até 15 kg de equipamento.",
+      "descricao": "Uma Mochila armazena até 15 quilos dentro de 30 centímetros cúbicos. Também pode servir como um alforje.",
       "tipo_uso": "equipamento"
     },
     {
@@ -294,7 +294,7 @@
       "nome": "Óleo",
       "peso": "0,5 kg",
       "custo": "1 PP",
-      "descricao": "Geralmente vem em um frasco de argila que contém 0,5 litro. Como uma ação, você pode jogar o óleo em uma criatura a até 1,5 metro ou arremessar o frasco a até 6 metros. Se o alvo coberto de óleo sofrer dano ígneo, ele sofre 5 de dano ígneo adicional. O óleo também pode ser derramado no chão, cobrindo uma área de 1,5 metro quadrado.",
+      "descricao": "Você pode cobrir uma criatura, objeto ou área com Óleo ou utilizá-lo como combustível. **Cobrindo uma Criatura ou um Objeto:** Ao executar a ação Atacar, você pode substituir um de seus ataques por arremessar um frasco de Óleo. Escolha uma criatura ou objeto a até 6 metros. O alvo deve ser bem-sucedido em uma salvaguarda de Destreza (CD 8 mais seu modificador de Destreza e Bônus de Proficiência) ou fica coberto de óleo. Se o alvo sofrer dano Ígneo antes que o óleo seque (após 1 minuto), ele sofre 5 pontos de dano Ígneo adicionais. **Combustível:** O Óleo serve como combustível para Lâmpadas e Lanternas, queimando por 6 horas.",
       "tipo_uso": "consumivel"
     },
     {
@@ -336,14 +336,14 @@
       "nome": "Poção de Cura",
       "peso": "250 g",
       "custo": "50 PO",
-      "descricao": "Um personagem que beber esta poção recupera 2d4+2 pontos de vida. Beber ou administrar esta poção requer uma ação.",
+      "descricao": "Esta poção é um item mágico. Como uma Ação Bônus, você pode bebê-la ou administrá-la a outra criatura a até 1,5 metro de você. A criatura que beber o líquido vermelho mágico deste frasco restaura 2d4 + 2 Pontos de Vida.",
       "tipo_uso": "consumivel"
     },
     {
       "nome": "Pote",
       "peso": "0,5 kg",
       "custo": "2 PC",
-      "descricao": "Recipiente simples de argila. Pode conter líquidos ou itens pequenos.",
+      "descricao": "Um Pote armazena até meio litro.",
       "tipo_uso": "equipamento"
     },
     {
@@ -415,7 +415,7 @@
       "nome": "Tocha",
       "peso": "0,5 kg",
       "custo": "1 PC",
-      "descricao": "Uma tocha queima por 1 hora, fornecendo luz plena em um raio de 6 metros e penumbra por mais 6 metros.",
+      "descricao": "Uma Tocha entra em combustão por 1 hora, emitindo Luz Plena em um raio de 6 metros e Meia-luz por mais 6 metros. Ao executar a ação Atacar, você pode atacar com a Tocha, usando-a como uma arma Simples Corpo a Corpo. Em caso de acerto, o alvo sofre 1 ponto de dano Ígneo.",
       "tipo_uso": "consumivel"
     },
     {
@@ -432,7 +432,7 @@
       "nome": "Veneno Básico",
       "peso": "—",
       "custo": "100 PO",
-      "descricao": "Você pode usar este veneno para revestir uma arma cortante ou perfurante, ou até três munições. Aplicar o veneno requer uma ação. Uma criatura atingida deve fazer um teste de resistência de Constituição CD 10 ou sofrer 1d4 de dano venenoso. Uma vez aplicado, o veneno mantém sua potência por 1 minuto antes de secar.",
+      "descricao": "Como uma Ação Bônus, você pode usar um frasco de Veneno Básico para revestir uma arma ou até três peças de munição. Uma criatura que sofre dano Perfurante ou Cortante da arma ou munição envenenada sofre 1d4 pontos de dano Venenoso adicional. Uma vez aplicado, o veneno retém a potência por 1 minuto ou até que o dano dele seja causado, o que ocorrer primeiro.",
       "tipo_uso": "consumivel"
     }
   ],
@@ -470,7 +470,7 @@
       "quantidade": "20",
       "armazenamento": "Estojo",
       "peso": "750 g",
-      "custo": "1 P"
+      "custo": "1 PO"
     }
   ],
   "descricoes": {

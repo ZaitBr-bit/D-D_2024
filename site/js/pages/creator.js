@@ -71,6 +71,31 @@ const ESPECIES_TRACOS_ESCOLHA = {
   }
 };
 
+// Truques concedidos automaticamente por espécie/traço
+function obterTruquesEspecie(especie, tracosEscolhidos) {
+  const truques = [];
+  const escolha = (tracosEscolhidos || [])[0] || '';
+
+  if (especie === 'Aasimar') {
+    truques.push('Luz');
+  } else if (especie === 'Gnomo') {
+    if (escolha === 'Gnomo das Rochas') {
+      truques.push('Prestidigitação Arcana', 'Reparar');
+    } else if (escolha === 'Gnomo do Bosque') {
+      truques.push('Ilusão Menor');
+    }
+  } else if (especie === 'Tiferino') {
+    truques.push('Taumaturgia'); // Presença Sobrenatural
+    const legadoTruque = { 'Abissal': 'Rajada de Veneno', 'Ctônico': 'Toque Necrótico', 'Infernal': 'Raio de Fogo' };
+    if (legadoTruque[escolha]) truques.push(legadoTruque[escolha]);
+  } else if (especie === 'Elfo') {
+    const linhagemTruque = { 'Alto Elfo': 'Prestidigitação Arcana', 'Drow': 'Luzes Dançantes', 'Elfo Silvestre': 'Arte Druídica' };
+    if (linhagemTruque[escolha]) truques.push(linhagemTruque[escolha]);
+  }
+
+  return truques;
+}
+
 // Nível obrigatório de subclasse por classe
 const NIVEL_SUBCLASSE = {
   'Bárbaro': 3, 'Bardo': 3, 'Bruxo': 3, 'Clérigo': 3, 'Druida': 3,
@@ -258,6 +283,82 @@ export async function renderCreator(container) {
   renderWizard();
 }
 
+// Limpa os dados associados a um passo especifico do wizard
+// Chamado ao voltar para um passo anterior, limpando os passos posteriores
+function limparDadosDoPasso(stepIndex) {
+  const stepId = STEPS[stepIndex]?.id;
+  if (!stepId) return;
+
+  switch (stepId) {
+    case 'especie':
+      personagem.especie = '';
+      personagem.tracos_escolhidos = [];
+      break;
+
+    case 'antecedente':
+      personagem.antecedente = '';
+      personagem.talentos = [];
+      personagem.escolhas_antecedente = {};
+      personagem.bonus_antecedente = {};
+      delete dadosCache.pericias_antecedente;
+      delete dadosCache.atributos_antecedente;
+      delete dadosCache.bonus2;
+      delete dadosCache.bonus1;
+      delete dadosCache.bonus111;
+      break;
+
+    case 'atributos':
+      personagem.atributos = { forca: 10, destreza: 10, constituicao: 10, inteligencia: 10, sabedoria: 10, carisma: 10 };
+      personagem.atributos_base = { forca: 10, destreza: 10, constituicao: 10, inteligencia: 10, sabedoria: 10, carisma: 10 };
+      personagem.pericias_proficientes = [];
+      delete dadosCache.attrMode;
+      delete dadosCache.stdAssign;
+      delete dadosCache.pbValues;
+      delete dadosCache.rolagemValores;
+      delete dadosCache.rolagemDados;
+      delete dadosCache.rolagemAssign;
+      delete dadosCache.pericias_classe_sel;
+      break;
+
+    case 'equipamento':
+      personagem.inventario = [];
+      personagem.escolha_equip_classe = null;
+      personagem.escolha_equip_antecedente = null;
+      personagem.po = 0;
+      break;
+
+    case 'magias':
+      personagem.magias_conhecidas = [];
+      personagem.magias_preparadas = [];
+      personagem.grimorio = [];
+      personagem.espacos_magia = {};
+      delete dadosCache.magiasClasse;
+      delete dadosCache.indiceMagias;
+      break;
+
+    case 'detalhes':
+      personagem.alinhamento = '';
+      personagem.aparencia = '';
+      personagem.personalidade = '';
+      personagem.ideais = '';
+      personagem.lacos = '';
+      personagem.defeitos = '';
+      personagem.historia_personagem = '';
+      personagem.notas = '';
+      personagem.tamanho = '';
+      personagem.idiomas = ['Comum'];
+      break;
+  }
+}
+
+// Limpa todos os passos de (stepAlvo + 1) ate stepAtual (inclusive)
+// Exemplo: de step 4 voltando para step 1 -> limpa steps 2, 3, 4
+function limparPassosPosteriores(stepAlvo) {
+  for (let i = stepAlvo + 1; i <= stepAtual; i++) {
+    limparDadosDoPasso(i);
+  }
+}
+
 function renderWizard() {
   const container = containerRef;
   container.innerHTML = `
@@ -288,7 +389,12 @@ function renderWizard() {
   `;
 
   // Eventos dos botões de navegação
-  document.getElementById('btn-prev')?.addEventListener('click', () => { stepAtual--; renderWizard(); });
+  document.getElementById('btn-prev')?.addEventListener('click', () => {
+    // Limpar dados do passo atual antes de voltar
+    limparDadosDoPasso(stepAtual);
+    stepAtual--;
+    renderWizard();
+  });
   document.getElementById('btn-next')?.addEventListener('click', () => avancar());
   document.getElementById('btn-finalizar')?.addEventListener('click', () => finalizar());
 
@@ -296,7 +402,12 @@ function renderWizard() {
   container.querySelectorAll('.wizard-step').forEach(el => {
     el.addEventListener('click', () => {
       const target = parseInt(el.dataset.step);
-      if (target < stepAtual) { stepAtual = target; renderWizard(); }
+      if (target < stepAtual) {
+        // Limpar dados de todos os passos posteriores ao destino
+        limparPassosPosteriores(target);
+        stepAtual = target;
+        renderWizard();
+      }
     });
   });
 
@@ -371,11 +482,76 @@ function validarStep() {
         toast(`Selecione ${antEscolha.titulo}`, 'error');
         return false;
       }
+      // Validar distribuicao de bonus de atributos do antecedente
+      {
+        const bonusKeys = Object.keys(personagem.bonus_antecedente || {});
+        const bonusTotal = Object.values(personagem.bonus_antecedente || {}).reduce((s, v) => s + v, 0);
+        if (bonusTotal < 3) {
+          toast('Distribua os bônus de atributos do antecedente (+2/+1 ou +1/+1/+1)', 'error');
+          return false;
+        }
+      }
       return true;
-    case 'atributos':
+    case 'atributos': {
+      const modo = dadosCache.attrMode || 'standard';
+
+      // Validacao especifica por modo de distribuicao
+      if (modo === 'standard') {
+        // Conjunto Padrao: todos os 6 atributos devem estar atribuidos via stdAssign
+        const assignKeys = Object.keys(dadosCache.stdAssign || {});
+        if (assignKeys.length < 6) {
+          toast(`Distribua todos os valores do Conjunto Padrão (${assignKeys.length}/6 atribuídos)`, 'error');
+          return false;
+        }
+      } else if (modo === 'pointbuy') {
+        // Compra de Pontos: todos os pontos devem ter sido gastos (restante = 0)
+        const custoTotal = ATRIBUTOS_KEYS.reduce((sum, k) => sum + (POINT_BUY_CUSTOS[dadosCache.pbValues?.[k] ?? 8] || 0), 0);
+        const restante = POINT_BUY_TOTAL - custoTotal;
+        if (restante > 0) {
+          toast(`Gaste todos os pontos de Compra de Pontos (${restante} restantes)`, 'error');
+          return false;
+        }
+        if (restante < 0) {
+          toast('Você excedeu o limite de pontos na Compra de Pontos', 'error');
+          return false;
+        }
+      } else if (modo === 'rolagem') {
+        // Rolagem 4d6: todos os 6 atributos devem ter sido rolados
+        const rolados = Object.keys(dadosCache.rolagemValores || {});
+        if (rolados.length < 6) {
+          toast(`Role os dados para todos os atributos (${rolados.length}/6 rolados)`, 'error');
+          return false;
+        }
+      }
+
+      // Verificar pericias da classe
+      const infoAttr = CLASSES_INFO[personagem.classe];
+      const periciasSel = dadosCache.pericias_classe_sel || [];
+      if (infoAttr && periciasSel.length < infoAttr.num_pericias) {
+        toast(`Selecione ${infoAttr.num_pericias} perícias da classe (${periciasSel.length} selecionadas)`, 'error');
+        return false;
+      }
       return true;
-    case 'equipamento':
+    }
+    case 'equipamento': {
+      // Verificar se o equipamento inicial da classe foi selecionado (quando ha opcoes)
+      const classeDataEq = dadosCache.classeData;
+      const equipTexto = classeDataEq?.tracos_basicos?.['Equipamento Inicial'] || '';
+      const temOpcoesClasse = equipTexto.match(/Escolha\s+[A-Z]/i);
+      if (temOpcoesClasse && !personagem.escolha_equip_classe) {
+        toast('Selecione o equipamento inicial da classe', 'error');
+        return false;
+      }
+      // Verificar equip do antecedente
+      const antEq = dadosCache.antecedentes?.find(a => a.nome === personagem.antecedente);
+      const equipAntTexto = antEq?.equipamento?.replace(/\*/g, '') || '';
+      const temOpcoesAnt = equipAntTexto.match(/Escolha\s+[A-Z]/i);
+      if (temOpcoesAnt && !personagem.escolha_equip_antecedente) {
+        toast('Selecione o equipamento do antecedente', 'error');
+        return false;
+      }
       return true;
+    }
     case 'magias':
       // Validar seleção de truques e magias para conjuradores
       const infoMagia = CLASSES_INFO[personagem.classe];
@@ -414,8 +590,26 @@ function validarStep() {
   return true;
 }
 
-async function finalizar() {
+// Validacao final antes de criar o personagem
+function validarFinal() {
   coletarDetalhes();
+  if (!personagem.nome || personagem.nome === 'Sem Nome') {
+    toast('Informe o nome do personagem', 'error');
+    return false;
+  }
+  // Verificar idiomas (deve ter pelo menos Comum + os adicionais obrigatorios)
+  const regraVal = obterRegraIdiomasAtual();
+  const idiomasSel = (personagem.idiomas || []).filter(i => i !== 'Comum');
+  if (regraVal.maxAdicionais > 0 && idiomasSel.length < regraVal.maxAdicionais) {
+    toast(`Selecione ${regraVal.maxAdicionais} idiomas adicionais (${idiomasSel.length} selecionados)`, 'error');
+    return false;
+  }
+  return true;
+}
+
+async function finalizar() {
+  // Validar dados finais antes de criar
+  if (!validarFinal()) return;
 
   // Calcular PV
   const info = CLASSES_INFO[personagem.classe];
@@ -476,6 +670,61 @@ async function finalizar() {
   }
 
   if (!personagem.nome) personagem.nome = 'Sem Nome';
+
+  // Aplicar resistencias/vulnerabilidades/imunidades da especie
+  // Mapeamento baseado no Livro do Jogador 2024
+  const resistenciasEspecie = [];
+  const especie = personagem.especie;
+  const tracosEscolhidos = personagem.tracos_escolhidos || [];
+
+  if (especie === 'Aasimar') {
+    // Resistência Celestial: Necrótico e Radiante
+    resistenciasEspecie.push('Necrótico', 'Radiante');
+  } else if (especie === 'Anão') {
+    // Resistência a Toxinas: Venenoso
+    resistenciasEspecie.push('Venenoso');
+  } else if (especie === 'Draconato') {
+    // Resistência ao tipo de dano da Herança Dracônica
+    const herancaMap = {
+      'Azul': 'Elétrico', 'Branco': 'Gélido', 'Bronze': 'Elétrico',
+      'Cobre': 'Ácido', 'Latão': 'Ígneo', 'Negro': 'Ácido',
+      'Ouro': 'Ígneo', 'Prata': 'Gélido', 'Verde': 'Venenoso', 'Vermelho': 'Ígneo'
+    };
+    const dragao = tracosEscolhidos[0];
+    if (dragao && herancaMap[dragao]) {
+      resistenciasEspecie.push(herancaMap[dragao]);
+    }
+  } else if (especie === 'Tiferino') {
+    // Resistência pelo Legado Ínfero
+    const legadoMap = {
+      'Abissal': 'Venenoso', 'Ctônico': 'Necrótico', 'Infernal': 'Ígneo'
+    };
+    const legado = tracosEscolhidos[0];
+    if (legado && legadoMap[legado]) {
+      resistenciasEspecie.push(legadoMap[legado]);
+    }
+  }
+
+  // Aplicar resistencias da especie (sem duplicar existentes)
+  if (resistenciasEspecie.length > 0) {
+    if (!personagem.resistencias) personagem.resistencias = [];
+    for (const r of resistenciasEspecie) {
+      if (!personagem.resistencias.includes(r)) {
+        personagem.resistencias.push(r);
+      }
+    }
+  }
+
+  // Adicionar truques concedidos pela espécie/traço (sem duplicar)
+  const truquesEspecie = obterTruquesEspecie(especie, tracosEscolhidos);
+  if (truquesEspecie.length > 0) {
+    if (!personagem.magias_conhecidas) personagem.magias_conhecidas = [];
+    for (const nome of truquesEspecie) {
+      if (!personagem.magias_conhecidas.find(m => m.nome === nome)) {
+        personagem.magias_conhecidas.push({ nome, circulo: 0, origem: 'especie' });
+      }
+    }
+  }
 
   salvarPersonagem(personagem);
   toast('Personagem criado com sucesso!', 'success');
@@ -730,6 +979,16 @@ async function abrirPopupClasse(nome) {
           return;
         }
       }
+    }
+    // Se mudou de classe, limpar dados especificos da classe anterior
+    if (personagem.classe && personagem.classe !== nome) {
+      personagem.subclasse = '';
+      personagem.ordem_divina = '';
+      personagem.ordem_primal = '';
+      personagem.escolhas_classe = {};
+      personagem.extras_classe = {};
+      personagem.proficiencias_extra = [];
+      delete dadosCache.classeData;
     }
     personagem.classe = nome;
     // Compatibilidade: migrar ordem_divina
@@ -1086,6 +1345,15 @@ function abrirPopupAntecedente(nome) {
       toast(`Selecione ${antEscolha.titulo}`, 'error');
       return;
     }
+    // Se mudou de antecedente, limpar dados especificos do anterior
+    if (personagem.antecedente && personagem.antecedente !== nome) {
+      personagem.bonus_antecedente = {};
+      personagem.escolhas_antecedente = {};
+      personagem.talentos = [];
+      delete dadosCache.bonus2;
+      delete dadosCache.bonus1;
+      delete dadosCache.bonus111;
+    }
     personagem.antecedente = nome;
 
     // Aplicar pericias do antecedente
@@ -1249,6 +1517,15 @@ function renderDistribuicaoAtributos(atributos) {
         });
       });
     });
+
+    // Restaurar bonus se ja tinha selecao anterior
+    if (dadosCache.bonus111?.length) {
+      personagem.bonus_antecedente = {};
+      dadosCache.bonus111.forEach(attr => {
+        const key = ATRIBUTO_NOME_PARA_KEY[attr];
+        if (key) personagem.bonus_antecedente[key] = 1;
+      });
+    }
   }
 }
 
@@ -1275,8 +1552,8 @@ function renderStepAtributos(el) {
       <label class="form-check">
         <input type="radio" name="attr-mode" value="rolagem" ${dadosCache.attrMode === 'rolagem' ? 'checked' : ''}> Rolagem 4d6
       </label>
-      <label class="form-check">
-        <input type="radio" name="attr-mode" value="manual" ${dadosCache.attrMode === 'manual' ? 'checked' : ''}> Manual
+      <label class="form-check" style="opacity:0.5;cursor:not-allowed" title="Opção desabilitada">
+        <input type="radio" name="attr-mode" value="manual" disabled> Manual
       </label>
     </div>
 
@@ -1289,6 +1566,9 @@ function renderStepAtributos(el) {
     </div>
     <div id="pericias-content"></div>
   `;
+
+  // Se o modo salvo era 'manual' (agora desabilitado), resetar para 'standard'
+  if (dadosCache.attrMode === 'manual') dadosCache.attrMode = 'standard';
 
   const renderAttr = () => {
     const modo = document.querySelector('[name="attr-mode"]:checked')?.value || 'standard';
@@ -1415,20 +1695,24 @@ function renderRolagem4d6(el) {
   });
 }
 
-// Distribuições sugeridas de atributos padrão por classe (índices do STANDARD_ARRAY [15,14,13,12,10,8])
+// Distribuicoes sugeridas de atributos padrao por classe.
+// IMPORTANTE: os valores abaixo sao INDICES do STANDARD_ARRAY, nao os atributos finais.
+// Mapeamento de indice -> valor: 0->15, 1->14, 2->13, 3->12, 4->10, 5->8.
+// Exemplo: { forca: 0, destreza: 2 } significa Forca 15 e Destreza 13.
+// Conforme tabela "Conjunto Padrao por Classe" do Livro do Jogador 2024 (cap.2)
 const DISTRIBUICOES_SUGERIDAS = {
-  'Bárbaro':    { forca: 0, destreza: 3, constituicao: 1, inteligencia: 5, sabedoria: 4, carisma: 2 },
-  'Bardo':      { forca: 5, destreza: 2, constituicao: 3, inteligencia: 4, sabedoria: 1, carisma: 0 },
-  'Bruxo':      { forca: 5, destreza: 3, constituicao: 2, inteligencia: 4, sabedoria: 1, carisma: 0 },
-  'Clérigo':    { forca: 4, destreza: 5, constituicao: 2, inteligencia: 3, sabedoria: 0, carisma: 1 },
-  'Druida':     { forca: 5, destreza: 3, constituicao: 2, inteligencia: 4, sabedoria: 0, carisma: 1 },
-  'Feiticeiro': { forca: 5, destreza: 2, constituicao: 1, inteligencia: 4, sabedoria: 3, carisma: 0 },
-  'Guardião':   { forca: 3, destreza: 1, constituicao: 2, inteligencia: 5, sabedoria: 0, carisma: 4 },
-  'Guerreiro':  { forca: 0, destreza: 2, constituicao: 1, inteligencia: 5, sabedoria: 4, carisma: 3 },
-  'Ladino':     { forca: 5, destreza: 0, constituicao: 2, inteligencia: 3, sabedoria: 1, carisma: 4 },
-  'Mago':       { forca: 5, destreza: 2, constituicao: 1, inteligencia: 0, sabedoria: 3, carisma: 4 },
-  'Monge':      { forca: 4, destreza: 0, constituicao: 2, inteligencia: 5, sabedoria: 1, carisma: 3 },
-  'Paladino':   { forca: 0, destreza: 4, constituicao: 2, inteligencia: 5, sabedoria: 3, carisma: 1 }
+  'Bárbaro':    { forca: 0, destreza: 2, constituicao: 1, inteligencia: 4, sabedoria: 3, carisma: 5 },  // For15 Des13 Con14 Int10 Sab12 Car8
+  'Bardo':      { forca: 5, destreza: 1, constituicao: 3, inteligencia: 2, sabedoria: 4, carisma: 0 },  // For8  Des14 Con12 Int13 Sab10 Car15
+  'Bruxo':      { forca: 5, destreza: 1, constituicao: 2, inteligencia: 3, sabedoria: 4, carisma: 0 },  // For8  Des14 Con13 Int12 Sab10 Car15
+  'Clérigo':    { forca: 1, destreza: 5, constituicao: 2, inteligencia: 4, sabedoria: 0, carisma: 3 },  // For14 Des8  Con13 Int10 Sab15 Car12
+  'Druida':     { forca: 5, destreza: 3, constituicao: 1, inteligencia: 2, sabedoria: 0, carisma: 4 },  // For8  Des12 Con14 Int13 Sab15 Car10
+  'Feiticeiro': { forca: 4, destreza: 2, constituicao: 1, inteligencia: 5, sabedoria: 3, carisma: 0 },  // For10 Des13 Con14 Int8  Sab12 Car15
+  'Guardião':   { forca: 3, destreza: 0, constituicao: 2, inteligencia: 5, sabedoria: 1, carisma: 4 },  // For12 Des15 Con13 Int8  Sab14 Car10
+  'Guerreiro':  { forca: 0, destreza: 1, constituicao: 2, inteligencia: 5, sabedoria: 4, carisma: 3 },  // For15 Des14 Con13 Int8  Sab10 Car12
+  'Ladino':     { forca: 3, destreza: 0, constituicao: 2, inteligencia: 1, sabedoria: 4, carisma: 5 },  // For12 Des15 Con13 Int14 Sab10 Car8
+  'Mago':       { forca: 5, destreza: 3, constituicao: 2, inteligencia: 0, sabedoria: 1, carisma: 4 },  // For8  Des12 Con13 Int15 Sab14 Car10
+  'Monge':      { forca: 3, destreza: 0, constituicao: 2, inteligencia: 4, sabedoria: 1, carisma: 5 },  // For12 Des15 Con13 Int10 Sab14 Car8
+  'Paladino':   { forca: 0, destreza: 4, constituicao: 2, inteligencia: 5, sabedoria: 3, carisma: 1 }   // For15 Des10 Con13 Int8  Sab12 Car14
 };
 
 function renderStandardArray(el) {
@@ -1797,8 +2081,10 @@ function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
   for (const itemStr of opcao.itens) {
     // Verificar se tem quantidade (ex: "2 Adagas", "20 Flechas")
     const qtyMatch = itemStr.match(/^(\d+)\s+(.+)$/);
-    const quantidade = qtyMatch ? parseInt(qtyMatch[1]) : 1;
-    const nomeItem = qtyMatch ? qtyMatch[2] : itemStr;
+    // Verificar formato "Nome (X unidades)" (ex: "Óleo (3 frascos)", "Pergaminho (10 folhas)")
+    const qtyParenMatch = !qtyMatch ? itemStr.match(/^(.+?)\s*\((\d+)\s+\w+\)$/) : null;
+    const quantidade = qtyMatch ? parseInt(qtyMatch[1]) : (qtyParenMatch ? parseInt(qtyParenMatch[2]) : 1);
+    const nomeItem = qtyMatch ? qtyMatch[2] : (qtyParenMatch ? qtyParenMatch[1].trim() : itemStr);
 
     // Singularizar nome para busca (ex: "Adagas" -> "Adaga", "Flechas" -> "Flecha")
     const nomeSingular = nomeItem
@@ -1853,7 +2139,7 @@ function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
         tipo: 'equipamento',
         quantidade,
         equipado: false,
-        dados: { custo: equip.custo, peso: equip.peso },
+        dados: { custo: equip.custo, peso: equip.peso, tipo_uso: equip.tipo_uso || '', descricao: equip.descricao || '' },
         origemTipo: tipoOrigem,
         origemNome: nomeOrigem
       });
@@ -1882,20 +2168,8 @@ async function renderStepEquipamento(el) {
   const info = CLASSES_INFO[personagem.classe];
   const classeData = dadosCache.classeData || await getClasse(personagem.classe);
 
-  // Equipamento inicial da classe (do tracos_basicos)
-  let equipClasse = '';
-  if (classeData?.tracos_basicos) {
-    const keys = Object.keys(classeData.tracos_basicos);
-    for (const k of keys) {
-      if (k !== 'Atributo Primário' && k !== 'Atributo Primario') {
-        equipClasse = classeData.tracos_basicos[k] || '';
-        break;
-      }
-    }
-    if (!equipClasse && keys.length >= 2) {
-      equipClasse = classeData.tracos_basicos[keys[keys.length - 1]] || '';
-    }
-  }
+  // Equipamento inicial da classe (chave "Equipamento Inicial" em tracos_basicos)
+  let equipClasse = classeData?.tracos_basicos?.['Equipamento Inicial'] || '';
 
   // Equipamento do antecedente
   const antecedente = dadosCache.antecedentes?.find(a => a.nome === personagem.antecedente);
@@ -2080,21 +2354,40 @@ function renderItemInventario(item, idx) {
     profBadge = prof ? '<span class="badge badge-prof-sm">Prof</span>' : '<span class="badge badge-no-prof-sm">Sem Prof</span>';
   }
 
+  // Badge de tipo de uso (consumivel, equipamento)
+  let tipoBadge = '';
+  const tipoUso = item.dados?.tipo_uso || '';
+  if (tipoUso === 'consumivel') {
+    tipoBadge = '<span class="badge" style="font-size:0.6rem;background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7">Consumível</span>';
+  }
+
+  // Descricao curta para equipamentos
+  const descCurta = item.dados?.descricao || item.descricao || '';
+  const descPreview = descCurta && item.tipo === 'equipamento'
+    ? `<div class="inv-item-detalhe" style="font-size:0.7rem;color:var(--text-muted);margin-top:1px">${descCurta.length > 80 ? descCurta.substring(0, 80) + '...' : descCurta}</div>`
+    : '';
+
   return `
     <div class="inv-item ${item.equipado ? 'inv-item-equipado' : ''}" data-idx="${idx}" draggable="true">
       <div class="inv-drag-handle" title="Arrastar para reordenar">&#9776;</div>
       <div style="flex:1;cursor:pointer" data-info-inv="${idx}" title="Ver detalhes">
-        <div class="inv-item-nome">${item.nome} ${profBadge}</div>
+        <div class="inv-item-nome">${item.nome} ${profBadge} ${tipoBadge}</div>
         <div class="inv-item-detalhe">
           ${item.tipo === 'arma' ? `${item.dados?.dano || ''} | ${item.dados?.propriedades || ''}` : ''}
           ${item.tipo === 'armadura' ? `CA: ${item.dados?.ca || ''} | ${item.dados?.categoria || ''}` : ''}
           ${item.tipo === 'escudo' ? `CA: ${item.dados?.ca || ''} | Escudo` : ''}
-          ${item.tipo === 'equipamento' ? `${item.dados?.peso || ''} | ${item.dados?.custo || ''}` : ''}
+          ${item.tipo === 'equipamento' ? `${item.dados?.custo || ''} ${item.dados?.peso ? '| ' + item.dados.peso : ''}` : ''}
           ${item.tipo === 'customizado' ? `${item.descricao || ''}` : ''}
-          ${item.quantidade > 1 ? ` (x${item.quantidade})` : ''}
+          ${item.tipo === 'generico' ? `${item.descricao || ''}` : ''}
         </div>
+        ${descPreview}
       </div>
-      <div class="inv-item-acoes">
+      <div class="inv-item-acoes" style="align-items:center">
+        <div class="inv-qty-control" style="display:flex;align-items:center;gap:2px">
+          <button class="btn btn-sm btn-icon" data-qty-minus-inv="${idx}" style="font-size:0.7rem;padding:1px 5px">−</button>
+          <span style="min-width:20px;text-align:center;font-size:0.8rem;font-weight:700">${item.quantidade ?? 1}</span>
+          <button class="btn btn-sm btn-icon" data-qty-plus-inv="${idx}" style="font-size:0.7rem;padding:1px 5px">+</button>
+        </div>
         <label class="form-check inv-equip-label" title="Equipar/Desequipar">
           <input type="checkbox" data-equip-idx="${idx}" ${item.equipado ? 'checked' : ''}> Eq.
         </label>
@@ -2137,6 +2430,35 @@ function setupEventosInventario(containerEl) {
           listaEl.innerHTML = renderListaInventario();
           setupEventosInventario(containerEl);
         }
+      }
+    });
+  });
+
+  // Quantidade +/-
+  containerEl.querySelectorAll('[data-qty-plus-inv]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.qtyPlusInv);
+      if (personagem.inventario[idx]) {
+        personagem.inventario[idx].quantidade = (personagem.inventario[idx].quantidade ?? 1) + 1;
+        const listaEl = document.getElementById('lista-inventario');
+        if (listaEl) { listaEl.innerHTML = renderListaInventario(); setupEventosInventario(containerEl); }
+      }
+    });
+  });
+  containerEl.querySelectorAll('[data-qty-minus-inv]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.qtyMinusInv);
+      if (personagem.inventario[idx]) {
+        const novaQtd = Math.max(0, (personagem.inventario[idx].quantidade ?? 1) - 1);
+        if (novaQtd <= 0) {
+          personagem.inventario.splice(idx, 1);
+        } else {
+          personagem.inventario[idx].quantidade = novaQtd;
+        }
+        const listaEl = document.getElementById('lista-inventario');
+        if (listaEl) { listaEl.innerHTML = renderListaInventario(); setupEventosInventario(containerEl); }
       }
     });
   });
@@ -2824,10 +3146,74 @@ function renderStepDetalhes(el) {
   // Tamanho: usar o salvo, ou detectar do texto da espécie
   if (!personagem.tamanho && espData) {
     if (permiteTamanhoEscolha) {
-      personagem.tamanho = 'Médio'; // padrão quando há escolha
+      personagem.tamanho = 'Médio'; // padrao quando ha escolha
     } else {
       personagem.tamanho = getTamanho(textoEsp) || 'Médio';
     }
+  }
+
+  // Construir HTML de escolha de tamanho (fora do template literal para evitar conflito de backticks)
+  let tamanhoCardHtml = '';
+  if (permiteTamanhoEscolha) {
+    const matchMedio = textoEsp.match(/Médio\s*\(([^)]+)\)/);
+    const matchPequeno = textoEsp.match(/Pequeno\s*\(([^)]+)\)/);
+    const alturaMedio = matchMedio ? matchMedio[1] : 'cerca de 1,20-2,10 metros';
+    const alturaPequeno = matchPequeno ? matchPequeno[1] : 'cerca de 0,60-1,20 metro';
+    const borderMedio = personagem.tamanho === 'Médio' ? 'var(--primary)' : 'var(--border-light)';
+    const borderPequeno = personagem.tamanho === 'Pequeno' ? 'var(--primary)' : 'var(--border-light)';
+    tamanhoCardHtml = `
+    <div class="card mb-2">
+      <div class="card-header"><h3>Tamanho da Criatura</h3></div>
+      <div class="info-box info" style="font-size:0.85rem">
+        A espécie <strong>${personagem.especie}</strong> permite escolher entre Médio ou Pequeno.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        <div style="border:2px solid ${borderMedio};border-radius:8px;padding:10px;cursor:pointer;transition:border-color 0.2s" data-tamanho-card="Médio">
+          <label class="form-check" style="font-weight:700;font-size:0.95rem;margin-bottom:4px">
+            <input type="radio" name="det-tamanho" value="Médio" ${personagem.tamanho === 'Médio' ? 'checked' : ''}> Médio
+          </label>
+          <div style="font-size:0.8rem;color:var(--text-muted)">
+            <div>Altura: ${alturaMedio}</div>
+            <div>Espaco em combate: 1,5 x 1,5 m</div>
+            <div>Capacidade de carga: For x 7 kg</div>
+          </div>
+        </div>
+        <div style="border:2px solid ${borderPequeno};border-radius:8px;padding:10px;cursor:pointer;transition:border-color 0.2s" data-tamanho-card="Pequeno">
+          <label class="form-check" style="font-weight:700;font-size:0.95rem;margin-bottom:4px">
+            <input type="radio" name="det-tamanho" value="Pequeno" ${personagem.tamanho === 'Pequeno' ? 'checked' : ''}> Pequeno
+          </label>
+          <div style="font-size:0.8rem;color:var(--text-muted)">
+            <div>Altura: ${alturaPequeno}</div>
+            <div>Espaco em combate: 1,5 x 1,5 m</div>
+            <div>Capacidade de carga: For x 7 kg</div>
+          </div>
+        </div>
+      </div>
+      <div class="info-box" style="font-size:0.78rem;margin-top:8px;background:var(--bg-hover)">
+        <strong>Diferenças de tamanho:</strong> Ambos ocupam o mesmo espaco em combate e possuem a mesma capacidade de carga.
+        Algumas habilidades e magias referenciam o tamanho relativo da criatura (ex: mover-se pelo espaco de criaturas maiores, Imobilizar, Empurrar).
+      </div>
+    </div>
+    `;
+  } else {
+    // Especie com tamanho fixo - exibir informacao somente leitura
+    const matchAltura = textoEsp.match(/(?:Médio|Pequeno|Grande)\s*\(([^)]+)\)/);
+    const alturaFixa = matchAltura ? matchAltura[1] : '';
+    const tamanhoFixo = personagem.tamanho || 'Médio';
+    const espacoCombate = tamanhoFixo === 'Pequeno' ? '1,5 x 1,5 m' : (tamanhoFixo === 'Grande' ? '3 x 3 m' : '1,5 x 1,5 m');
+    tamanhoCardHtml = `
+    <div class="card mb-2">
+      <div class="card-header"><h3>Tamanho da Criatura</h3></div>
+      <div style="border:2px solid var(--primary);border-radius:8px;padding:10px;margin-top:4px">
+        <div style="font-weight:700;font-size:0.95rem;margin-bottom:4px">${tamanhoFixo}</div>
+        <div style="font-size:0.8rem;color:var(--text-muted)">
+          ${alturaFixa ? '<div>Altura: ' + alturaFixa + '</div>' : ''}
+          <div>Espaco em combate: ${espacoCombate}</div>
+          <div>Capacidade de carga: For x 7 kg</div>
+        </div>
+      </div>
+    </div>
+    `;
   }
 
   el.innerHTML = `
@@ -2841,12 +3227,6 @@ function renderStepDetalhes(el) {
             <input type="text" class="form-input" id="det-nome" value="${personagem.nome}" placeholder="Nome do seu personagem">
           </div>
         </div>
-        <div class="col">
-          <div class="form-group">
-            <label class="form-label">Nível</label>
-            <input type="number" class="form-input" id="det-nivel" value="${personagem.nivel}" min="1" max="20">
-          </div>
-        </div>
       </div>
 
       <div class="info-box success">
@@ -2858,23 +3238,8 @@ function renderStepDetalhes(el) {
       </div>
     </div>
 
-    <!-- Tamanho (se a espécie permite escolha) -->
-    ${permiteTamanhoEscolha ? `
-    <div class="card mb-2">
-      <div class="card-header"><h3>Tamanho da Criatura</h3></div>
-      <div class="info-box info" style="font-size:0.85rem">
-        A espécie <strong>${personagem.especie}</strong> permite escolher entre Médio ou Pequeno.
-      </div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <label class="form-check">
-          <input type="radio" name="det-tamanho" value="Médio" ${personagem.tamanho === 'Médio' ? 'checked' : ''}> Médio
-        </label>
-        <label class="form-check">
-          <input type="radio" name="det-tamanho" value="Pequeno" ${personagem.tamanho === 'Pequeno' ? 'checked' : ''}> Pequeno
-        </label>
-      </div>
-    </div>
-    ` : ''}
+    <!-- Tamanho da Criatura -->
+    ${tamanhoCardHtml}
 
     <!-- Idiomas -->
     <div class="card mb-2">
@@ -2893,6 +3258,32 @@ function renderStepDetalhes(el) {
               <input type="checkbox" data-idioma="${idioma}" ${selecionado ? 'checked' : ''} ${ehObrigatorio ? 'disabled' : ''} ${(!ehObrigatorio && !selecionado && atingiuLimite) ? 'disabled' : ''}> ${idioma}
             </label>`;
         }).join('')}
+      </div>
+    </div>
+
+    <!-- Alinhamento -->
+    <div class="card mb-2">
+      <div class="card-header"><h3>Alinhamento</h3></div>
+      <div class="info-box info" style="font-size:0.85rem">
+        O alinhamento descreve as atitudes eticas e morais do personagem.
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px" id="det-alinhamento-grid">
+        ${[
+          { valor: 'OB', label: 'Ordeiro e Bom' },
+          { valor: 'NB', label: 'Neutro e Bom' },
+          { valor: 'CB', label: 'Caotico e Bom' },
+          { valor: 'ON', label: 'Ordeiro e Neutro' },
+          { valor: 'N',  label: 'Neutro' },
+          { valor: 'CN', label: 'Caotico e Neutro' },
+          { valor: 'OM', label: 'Ordeiro e Mau' },
+          { valor: 'NM', label: 'Neutro e Mau' },
+          { valor: 'CM', label: 'Caotico e Mau' }
+        ].map(a => `
+          <div class="selection-card ${personagem.alinhamento === a.valor ? 'selected' : ''}" data-alinhamento="${a.valor}" style="cursor:pointer;text-align:center;padding:8px 4px">
+            <div class="card-nome" style="font-size:0.8rem">${a.label}</div>
+            <div class="card-detalhe" style="font-size:0.7rem;color:var(--text-muted)">${a.valor}</div>
+          </div>
+        `).join('')}
       </div>
     </div>
 
@@ -2975,11 +3366,35 @@ function renderStepDetalhes(el) {
   });
 
   atualizarEstadoIdiomas();
+
+  // Eventos de selecao de tamanho (click no card seleciona o radio e atualiza visual)
+  document.querySelectorAll('[data-tamanho-card]').forEach(card => {
+    card.addEventListener('click', () => {
+      const valor = card.dataset.tamanhoCard;
+      const radio = card.querySelector('input[type="radio"]');
+      if (radio) radio.checked = true;
+      personagem.tamanho = valor;
+      // Atualizar bordas visuais
+      document.querySelectorAll('[data-tamanho-card]').forEach(c => {
+        c.style.borderColor = c.dataset.tamanhoCard === valor ? 'var(--primary)' : 'var(--border-light)';
+      });
+    });
+  });
+
+  // Eventos de selecao de alinhamento
+  document.querySelectorAll('[data-alinhamento]').forEach(card => {
+    card.addEventListener('click', () => {
+      const valor = card.dataset.alinhamento;
+      personagem.alinhamento = valor;
+      document.querySelectorAll('[data-alinhamento]').forEach(c => {
+        c.classList.toggle('selected', c.dataset.alinhamento === valor);
+      });
+    });
+  });
 }
 
 function coletarDetalhes() {
   personagem.nome = document.getElementById('det-nome')?.value?.trim() || personagem.nome;
-  personagem.nivel = parseInt(document.getElementById('det-nivel')?.value) || 1;
   personagem.aparencia = document.getElementById('det-aparencia')?.value || '';
   personagem.personalidade = document.getElementById('det-personalidade')?.value || '';
   personagem.ideais = document.getElementById('det-ideais')?.value || '';
@@ -2987,6 +3402,8 @@ function coletarDetalhes() {
   personagem.defeitos = document.getElementById('det-defeitos')?.value || '';
   personagem.historia_personagem = document.getElementById('det-historia')?.value || '';
   personagem.notas = document.getElementById('det-notas')?.value || '';
+
+  // Alinhamento ja eh salvo interativamente via evento de clique
 
   // Coletar idiomas selecionados
   const idiomasSelecionados = [];

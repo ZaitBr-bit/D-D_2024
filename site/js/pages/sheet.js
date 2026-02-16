@@ -317,6 +317,27 @@ function getEstadoRecursosBruxo() {
   }
 
   if (!Array.isArray(char.recursos.bruxo.invocacoes)) char.recursos.bruxo.invocacoes = [];
+
+  // Migracao: converter strings antigas para objetos {nome, truque?}
+  char.recursos.bruxo.invocacoes = char.recursos.bruxo.invocacoes.map(inv => {
+    if (typeof inv === 'string') return { nome: inv };
+    if (inv && typeof inv === 'object' && inv.nome) return inv;
+    return null;
+  }).filter(Boolean);
+
+  // Migracao: se pacto estava definido separadamente mas nao esta nas invocacoes, incluir
+  const PACTOS_VALIDOS = ['Pacto da Corrente', 'Pacto da Lâmina', 'Pacto do Tomo'];
+  const pactoAtual = char.recursos.bruxo.pacto || '';
+  const nomesInvocacoes = char.recursos.bruxo.invocacoes.map(i => i.nome);
+  if (pactoAtual && PACTOS_VALIDOS.includes(pactoAtual) && !nomesInvocacoes.includes(pactoAtual)) {
+    char.recursos.bruxo.invocacoes.unshift({ nome: pactoAtual });
+  }
+  // Derivar pacto do array de invocacoes
+  const pactoDerivado = PACTOS_VALIDOS.find(p => char.recursos.bruxo.invocacoes.some(i => i.nome === p)) || '';
+  if (pactoDerivado !== char.recursos.bruxo.pacto) {
+    char.recursos.bruxo.pacto = pactoDerivado;
+  }
+
   if (!char.recursos.bruxo.arcanum) {
     char.recursos.bruxo.arcanum = {
       6: { magia: '', usado: false },
@@ -341,6 +362,13 @@ function getEstadoRecursosBruxo() {
   const progressao = getProgressaoBruxo() || { invocacoesMax: 0 };
   const circulosArcanum = getCirculosArcanumDesbloqueados();
 
+  // Inicializar dados do Pacto do Tomo (truques e rituais escolhidos)
+  if (!char.recursos.bruxo.pacto_tomo) {
+    char.recursos.bruxo.pacto_tomo = { truques: [], rituais: [] };
+  }
+  if (!Array.isArray(char.recursos.bruxo.pacto_tomo.truques)) char.recursos.bruxo.pacto_tomo.truques = [];
+  if (!Array.isArray(char.recursos.bruxo.pacto_tomo.rituais)) char.recursos.bruxo.pacto_tomo.rituais = [];
+
   return {
     astuciaUsada: !!char.recursos.bruxo.astucia_usada,
     pacto: char.recursos.bruxo.pacto || '',
@@ -348,7 +376,8 @@ function getEstadoRecursosBruxo() {
     invocacoesMax: progressao.invocacoesMax,
     arcanum: char.recursos.bruxo.arcanum,
     circulosArcanum,
-    mestreMisticoAtivo: (char.nivel || 1) >= 20
+    mestreMisticoAtivo: (char.nivel || 1) >= 20,
+    pactoTomo: char.recursos.bruxo.pacto_tomo
   };
 }
 
@@ -816,119 +845,370 @@ function extrairOpcoesInvocacoesBruxo() {
     const prereqMatch = corpo.match(/\*Pré-requisitos?:\s*([^*]+)\*/i);
     const prerequisito = prereqMatch ? prereqMatch[1].trim() : '';
     const repetivel = /\*\*Repetível\.\*\*/i.test(corpo) || /Repetível\./i.test(corpo);
-    if (nome) opcoes.push({ nome, prerequisito, repetivel });
+    // Extrair descricao limpa (sem linha de pre-requisito e sem marcador de repetivel)
+    let descricao = corpo
+      .replace(/\*Pré-requisitos?:\s*[^*]+\*/gi, '')
+      .replace(/\*\*Repetível\.\*\*/gi, '')
+      .replace(/Repetível\./gi, '')
+      .replace(/^\s*\n/gm, '')
+      .trim();
+    if (nome) opcoes.push({ nome, prerequisito, repetivel, descricao });
   }
 
   return opcoes;
 }
 
-function avaliarPrerequisitoInvocacaoBruxo(prerequisito) {
-  if (!prerequisito) return { ok: true, motivo: '' };
-  let ok = true;
-  const motivos = [];
-  const texto = prerequisito;
+// Função legada removida - usar avaliarPrerequisitoInvocacaoBruxoComSel()
 
-  const nivelMatch = texto.match(/Bruxo\s*N[ií]vel\s*(\d+)/i);
-  if (nivelMatch) {
-    const nivelMin = parseInt(nivelMatch[1]);
-    if ((char?.nivel || 1) < nivelMin) {
-      ok = false;
-      motivos.push(`requer nível ${nivelMin}`);
-    }
-  }
-
-  const estado = getEstadoRecursosBruxo();
-  const pacto = estado?.pacto || '';
-  if (/Pacto da Lâmina/i.test(texto) && pacto !== 'Pacto da Lâmina') {
-    ok = false;
-    motivos.push('requer Pacto da Lâmina');
-  }
-  if (/Pacto da Corrente/i.test(texto) && pacto !== 'Pacto da Corrente') {
-    ok = false;
-    motivos.push('requer Pacto da Corrente');
-  }
-  if (/Pacto do Tomo/i.test(texto) && pacto !== 'Pacto do Tomo') {
-    ok = false;
-    motivos.push('requer Pacto do Tomo');
-  }
-
-  return { ok, motivo: motivos.join(', ') };
+// Obtém magias disponíveis do Bruxo por círculo para Arcana Mística
+async function obterMagiasArcanumPorCirculo(circulo) {
+  const magiasClasseData = await getMagiasClasse('Bruxo');
+  const todas = achatarMagiasClasse(magiasClasseData);
+  return todas.filter(m => m.circulo === circulo).sort((a, b) => a.nome.localeCompare(b.nome));
 }
 
-function abrirModalRecursosBruxo() {
+async function abrirModalRecursosBruxo() {
   if (char?.classe !== 'Bruxo') return;
   const estado = getEstadoRecursosBruxo();
   const opcoes = extrairOpcoesInvocacoesBruxo();
-  const mapaOpcoes = new Map(opcoes.map(o => [semAcento(o.nome), o]));
+  const nivel = char.nivel || 1;
 
-  abrirModal('Recursos do Bruxo', `
-    <div class="form-group">
-      <label class="form-label">Pacto</label>
-      <select class="form-select" id="bruxo-pacto">
-        <option value="">Não selecionado</option>
-        <option value="Pacto da Lâmina" ${estado.pacto === 'Pacto da Lâmina' ? 'selected' : ''}>Pacto da Lâmina</option>
-        <option value="Pacto da Corrente" ${estado.pacto === 'Pacto da Corrente' ? 'selected' : ''}>Pacto da Corrente</option>
-        <option value="Pacto do Tomo" ${estado.pacto === 'Pacto do Tomo' ? 'selected' : ''}>Pacto do Tomo</option>
-      </select>
-    </div>
+  // Separar pactos das demais invocações
+  const PACTOS = ['Pacto da Corrente', 'Pacto da Lâmina', 'Pacto do Tomo'];
+  const invPactos = opcoes.filter(o => PACTOS.includes(o.nome));
+  const invNormais = opcoes.filter(o => !PACTOS.includes(o.nome));
 
-    <div class="form-group">
-      <label class="form-label">Invocações Místicas (${estado.invocacoes.length}/${estado.invocacoesMax})</label>
-      <textarea class="form-textarea" id="bruxo-invocacoes" rows="6" placeholder="Uma invocação por linha">${estado.invocacoes.join('\n')}</textarea>
-      <div style="font-size:0.75rem;color:var(--text-muted)">Pré-requisitos conhecidos são validados automaticamente (nível e pacto). Duplicatas só são aceitas quando a invocação é Repetível.</div>
-    </div>
+  // Estado atual: invocações selecionadas (incluindo pacto) — array para suportar repetíveis
+  const invSelecionadas = [...estado.invocacoes];
 
-    <div class="section-divider"><span>Arcana Mística</span></div>
-    ${[6, 7, 8, 9].map(c => {
+  // Carregar magias para Arcana Mística (assíncrono)
+  const magiasArcanum = {};
+  for (const c of [6, 7, 8, 9]) {
+    if (estado.circulosArcanum.includes(c)) {
+      magiasArcanum[c] = await obterMagiasArcanumPorCirculo(c);
+    }
+  }
+
+  // Funcao auxiliar para extrair nivel de pre-requisito
+  function nivelPrereqInv(o) {
+    const m = o.prerequisito.match(/N[ií]vel\s*(\d+)/i);
+    return m ? parseInt(m[1]) : 0;
+  }
+
+  // Agrupar invocacoes por categoria de nivel
+  const grupos = [
+    { label: 'Pacto (Invocacao de Nivel 1)', items: invPactos },
+    { label: 'Sem pre-requisito de nivel', items: invNormais.filter(o => nivelPrereqInv(o) === 0) },
+    { label: 'Nivel 2+', items: invNormais.filter(o => { const n = nivelPrereqInv(o); return n >= 2 && n < 5; }) },
+    { label: 'Nivel 5+', items: invNormais.filter(o => { const n = nivelPrereqInv(o); return n >= 5 && n < 7; }) },
+    { label: 'Nivel 7+', items: invNormais.filter(o => { const n = nivelPrereqInv(o); return n >= 7 && n < 9; }) },
+    { label: 'Nivel 9+', items: invNormais.filter(o => { const n = nivelPrereqInv(o); return n >= 9 && n < 12; }) },
+    { label: 'Nivel 12+', items: invNormais.filter(o => { const n = nivelPrereqInv(o); return n >= 12 && n < 15; }) },
+    { label: 'Nivel 15+', items: invNormais.filter(o => nivelPrereqInv(o) >= 15) }
+  ].filter(g => g.items.length > 0);
+
+  // Contar ocorrencias de cada invocacao no array de objetos {nome, truque?}
+  function contarInv(arr, nome) { return arr.filter(o => o.nome === nome).length; }
+  // Extrair apenas nomes para validacao de pre-requisitos
+  function nomesDoArr(arr) { return arr.map(o => o.nome); }
+
+  // Invocacoes que requerem selecao de parametro extra (truque ou talento)
+  // tipo: 'truque' ou 'talento' -> determina qual campo salvar no objeto e qual lista exibir
+  const INV_PARAMETRO = {
+    'Explosão Agonizante': { tipo: 'truque', campo: 'truque', desc: 'Truque de dano: +modificador de Carisma ao dano', placeholder: '-- Escolha um truque --' },
+    'Explosão Repulsiva': { tipo: 'truque', campo: 'truque', desc: 'Truque com rolagem de ataque: empurra alvo 3m', placeholder: '-- Escolha um truque --' },
+    'Lança Mística': { tipo: 'truque', campo: 'truque', desc: 'Truque de dano (alcance 3m+): aumenta alcance', placeholder: '-- Escolha um truque --' },
+    'Lições dos Grandes Antigos': { tipo: 'talento', campo: 'talento', desc: 'Escolha um Talento de Origem', placeholder: '-- Escolha um talento --' }
+  };
+
+  // Talentos de Origem carregados do JSON (cache local)
+  let talentosOrigemCache = null;
+  async function obterTalentosOrigem() {
+    if (talentosOrigemCache) return talentosOrigemCache;
+    try {
+      const data = await getTalentos();
+      talentosOrigemCache = (data?.por_categoria?.['de Origem'] || []).map(t => t.nome).sort();
+    } catch (e) {
+      talentosOrigemCache = [];
+    }
+    return talentosOrigemCache;
+  }
+
+  // Obter truques conhecidos do personagem
+  function obterTruquesParaSelecao() {
+    const truques = (char.magias_conhecidas || []).filter(m => m.circulo === 0);
+    return truques.map(m => m.nome).sort();
+  }
+
+  // Obter opcoes para o parametro de uma invocacao
+  // Para talentos, filtra os ja escolhidos em outras instancias
+  function obterOpcoesParametro(nomeInv, invArr, idxAtual) {
+    const config = INV_PARAMETRO[nomeInv];
+    if (!config) return [];
+    if (config.tipo === 'truque') return obterTruquesParaSelecao();
+    if (config.tipo === 'talento') {
+      const lista = talentosOrigemCache || [];
+      // Filtrar talentos ja escolhidos em OUTRAS instancias desta invocacao
+      const jaEscolhidos = new Set();
+      let count = 0;
+      for (const inv of invArr) {
+        if (inv.nome === nomeInv) {
+          if (count !== idxAtual && inv.talento) jaEscolhidos.add(inv.talento);
+          count++;
+        }
+      }
+      return lista.filter(t => !jaEscolhidos.has(t));
+    }
+    return [];
+  }
+
+  function renderCard(o, invArr) {
+    const qtd = contarInv(invArr, o.nome);
+    const sel = qtd > 0;
+    const validacao = avaliarPrerequisitoInvocacaoBruxoComSel(o.prerequisito, new Set(nomesDoArr(invArr)));
+    const bloqueado = !validacao.ok && !sel;
+    const ehPacto = PACTOS.includes(o.nome);
+    const configParam = INV_PARAMETRO[o.nome] || null;
+    // Pre-requisito resumido
+    let preResumo = '';
+    if (o.prerequisito && !ehPacto) {
+      preResumo = o.prerequisito.replace(/Bruxo\s*/gi, '').replace(/ou superior/gi, '+');
+    }
+    // Seletor de parametro para invocacoes que requerem escolha (truque ou talento)
+    let paramHtml = '';
+    if (configParam && sel) {
+      const instancias = invArr.filter(i => i.nome === o.nome);
+      paramHtml = instancias.map((inst, idx) => {
+        const selVal = inst[configParam.campo] || '';
+        const opcoesDisp = obterOpcoesParametro(o.nome, invArr, idx);
+        return `
+          <div style="margin-top:4px;padding-top:4px;border-top:1px dashed var(--border-light)" data-inv-param-wrapper="${o.nome}" data-inv-param-idx="${idx}">
+            <label style="font-size:0.6rem;color:var(--text-muted);display:block">${configParam.desc}${qtd > 1 ? ` (#${idx+1})` : ''}</label>
+            <select class="form-select" style="font-size:0.7rem;padding:2px 4px;margin-top:2px" data-inv-param-sel="${o.nome}" data-inv-param-selidx="${idx}" data-inv-param-campo="${configParam.campo}">
+              <option value="">${configParam.placeholder}</option>
+              ${opcoesDisp.map(t => `<option value="${t}" ${selVal === t ? 'selected' : ''}>${t}</option>`).join('')}
+            </select>
+          </div>`;
+      }).join('');
+    }
+    return `
+      <div class="magia-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''} ${ehPacto ? 'magia-dominio' : ''}"
+           data-inv-toggle="${o.nome}" style="${bloqueado ? 'opacity:0.35;cursor:not-allowed;' : 'cursor:pointer;'};position:relative">
+        <span class="magia-card-check"></span>
+        <div class="magia-card-nome">${ehPacto ? '<span class="badge-dominio">&#9733;</span> ' : ''}${o.nome}${qtd > 1 ? ` <span class="badge" style="font-size:0.6rem;background:var(--accent);color:#fff">x${qtd}</span>` : ''}
+          <span class="btn-info-inv" data-inv-info="${o.nome}" title="Ver descricao" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--secondary);color:#fff;font-size:0.6rem;font-weight:700;cursor:pointer;margin-left:4px;vertical-align:middle;flex-shrink:0">i</span>
+        </div>
+        <div class="magia-card-meta">
+          ${preResumo ? `<span style="font-size:0.65rem">${preResumo}</span>` : ''}
+          ${o.repetivel ? '<span style="font-size:0.65rem;color:var(--accent)">Repetivel</span>' : ''}
+        </div>
+        ${paramHtml}
+      </div>`;
+  }
+
+  function buildInvocacoesHtml(invArr) {
+    let html = '';
+    html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">
+      Selecionadas: <strong>${invArr.length}</strong> / ${estado.invocacoesMax}
+      ${invArr.length > estado.invocacoesMax ? '<span style="color:var(--danger)"> (excedido!)</span>' : ''}
+    </div>`;
+    for (const grupo of grupos) {
+      html += `<div style="font-size:0.75rem;font-weight:700;color:var(--secondary);margin:10px 0 4px">${grupo.label}</div>`;
+      html += `<div class="magias-grid">${grupo.items.map(o => renderCard(o, invArr)).join('')}</div>`;
+    }
+    return html;
+  }
+
+  // Arcana Mística HTML
+  let arcanumHtml = '';
+  if (estado.circulosArcanum.length > 0 || nivel >= 11) {
+    arcanumHtml += '<div class="section-divider"><span>Arcana Mística</span></div>';
+    for (const c of [6, 7, 8, 9]) {
       const desbloqueado = estado.circulosArcanum.includes(c);
       const dado = estado.arcanum[c] || { magia: '', usado: false };
-      return `
+      const magias = magiasArcanum[c] || [];
+      arcanumHtml += `
         <div class="form-group" style="opacity:${desbloqueado ? 1 : 0.5}">
-          <label class="form-label">${c}º círculo ${desbloqueado ? '' : '(bloqueado)'}</label>
-          <input class="form-input" id="bruxo-arcanum-${c}" ${desbloqueado ? '' : 'disabled'} value="${dado.magia || ''}" placeholder="Nome da magia de arcanum">
-        </div>
-      `;
-    }).join('')}
+          <label class="form-label">${c}º Círculo ${desbloqueado ? '' : '(Bloqueado)'}</label>
+          ${desbloqueado ? `
+            <select class="form-select" id="bruxo-arcanum-${c}">
+              <option value="">-- Selecione uma magia --</option>
+              ${magias.map(m => `<option value="${m.nome}" ${dado.magia === m.nome ? 'selected' : ''}>${m.nome}</option>`).join('')}
+            </select>
+          ` : `
+            <select class="form-select" disabled>
+              <option value="">Desbloqueado no nível ${c === 6 ? 11 : c === 7 ? 13 : c === 8 ? 15 : 17}</option>
+            </select>
+          `}
+        </div>`;
+    }
+  }
+
+  abrirModal('Recursos do Bruxo', `
+    <div class="section-divider"><span>Invocaçoes Misticas</span></div>
+    <div class="search-box" style="margin-bottom:8px"><input type="text" id="busca-inv-bruxo" placeholder="Buscar invocacao..." class="form-input"></div>
+    <div id="bruxo-inv-grid" style="max-height:45vh;overflow-y:auto"></div>
+    <div id="bruxo-inv-desc" style="font-size:0.78rem;color:var(--text-muted);margin-top:8px;padding:8px 10px;border-radius:6px;background:var(--bg-card);border:1px solid var(--border-light);min-height:20px;display:none"></div>
+    ${arcanumHtml}
   `,
   '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-bruxo-recursos">Salvar</button>');
 
+  // Estado mutável das selecionadas (array para repetíveis)
+  const gridEl = document.getElementById('bruxo-inv-grid');
+
+  function renderGrid() {
+    const termo = semAcento(document.getElementById('busca-inv-bruxo')?.value || '');
+    if (termo.length >= 2) {
+      const gruposFiltrados = grupos.map(g => ({
+        ...g,
+        items: g.items.filter(o => semAcento(o.nome).includes(termo))
+      })).filter(g => g.items.length > 0);
+      let html = `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">
+        Selecionadas: <strong>${invSelecionadas.length}</strong> / ${estado.invocacoesMax}
+      </div>`;
+      for (const grupo of gruposFiltrados) {
+        html += `<div style="font-size:0.75rem;font-weight:700;color:var(--secondary);margin:10px 0 4px">${grupo.label}</div>`;
+        html += `<div class="magias-grid">${grupo.items.map(o => renderCard(o, invSelecionadas)).join('')}</div>`;
+      }
+      gridEl.innerHTML = html;
+    } else {
+      gridEl.innerHTML = buildInvocacoesHtml(invSelecionadas);
+    }
+    attachInvToggleListeners();
+  }
+
+  function attachInvToggleListeners() {
+    gridEl.querySelectorAll('[data-inv-toggle]').forEach(el => {
+      el.addEventListener('click', () => {
+        const nome = el.dataset.invToggle;
+        const opcao = opcoes.find(o => o.nome === nome);
+        if (!opcao) return;
+
+        const qtdAtual = contarInv(invSelecionadas, nome);
+        if (qtdAtual > 0) {
+          // Desselecionar (remover uma ocorrencia)
+          const idx = invSelecionadas.findIndex(o => o.nome === nome);
+          if (idx >= 0) invSelecionadas.splice(idx, 1);
+        } else {
+          // Validar pre-requisito
+          const validacao = avaliarPrerequisitoInvocacaoBruxoComSel(opcao.prerequisito, new Set(nomesDoArr(invSelecionadas)));
+          if (!validacao.ok) {
+            toast(`Pre-requisito nao atendido: ${validacao.motivo}`, 'error');
+            return;
+          }
+          if (invSelecionadas.length >= estado.invocacoesMax) {
+            toast(`Limite de ${estado.invocacoesMax} invocacoes atingido.`, 'error');
+            return;
+          }
+          // Se e pacto, remover outro pacto selecionado
+          if (PACTOS.includes(nome)) {
+            PACTOS.forEach(p => {
+              const idx = invSelecionadas.findIndex(o => o.nome === p);
+              if (idx >= 0) invSelecionadas.splice(idx, 1);
+            });
+          }
+          invSelecionadas.push({ nome });
+        }
+        renderGrid();
+      });
+    });
+
+    // Para repetíveis: botão + para adicionar outra ocorrência
+    gridEl.querySelectorAll('[data-inv-toggle]').forEach(el => {
+      const nome = el.dataset.invToggle;
+      const opcao = opcoes.find(o => o.nome === nome);
+      if (!opcao?.repetivel) return;
+      const qtd = contarInv(invSelecionadas, nome);
+      if (qtd >= 1) {
+        // Adicionar botão de + ao card
+        const metaDiv = el.querySelector('.magia-card-meta');
+        if (metaDiv) {
+          const addBtn = document.createElement('span');
+          addBtn.style.cssText = 'font-size:0.7rem;cursor:pointer;padding:1px 6px;border:1px solid var(--accent);border-radius:4px;color:var(--accent);margin-left:4px';
+          addBtn.textContent = '+1';
+          addBtn.title = 'Adicionar outra ocorrência (Repetível)';
+          addBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (invSelecionadas.length >= estado.invocacoesMax) {
+              toast(`Limite de ${estado.invocacoesMax} invocacoes atingido.`, 'error');
+              return;
+            }
+            invSelecionadas.push({ nome });
+            renderGrid();
+          });
+          metaDiv.appendChild(addBtn);
+        }
+      }
+    });
+
+    // Botoes de informacao (i) para mostrar descricao da invocacao
+    gridEl.querySelectorAll('[data-inv-info]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const nome = btn.dataset.invInfo;
+        const opcao = opcoes.find(o => o.nome === nome);
+        const descEl = document.getElementById('bruxo-inv-desc');
+        if (!opcao || !descEl) return;
+        if (descEl.style.display !== 'none' && descEl.dataset.invAtual === nome) {
+          descEl.style.display = 'none';
+          descEl.dataset.invAtual = '';
+          return;
+        }
+        const descHtml = mdParaHtml(opcao.descricao || 'Sem descricao disponivel.');
+        descEl.innerHTML = `<strong>${opcao.nome}</strong>${opcao.prerequisito ? ` <span style="font-size:0.7rem;color:var(--secondary)">(${opcao.prerequisito})</span>` : ''}<br>${descHtml}`;
+        descEl.style.display = 'block';
+        descEl.dataset.invAtual = nome;
+        descEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    });
+
+    // Listeners dos selects de parametro (truque ou talento)
+    gridEl.querySelectorAll('[data-inv-param-sel]').forEach(sel => {
+      sel.addEventListener('click', (e) => e.stopPropagation()); // Evitar toggle ao clicar no select
+      sel.addEventListener('change', (e) => {
+        e.stopPropagation();
+        const nome = sel.dataset.invParamSel;
+        const idx = parseInt(sel.dataset.invParamSelidx);
+        const campo = sel.dataset.invParamCampo; // 'truque' ou 'talento'
+        // Encontrar a n-esima instancia dessa invocacao no array
+        let count = 0;
+        for (let i = 0; i < invSelecionadas.length; i++) {
+          if (invSelecionadas[i].nome === nome) {
+            if (count === idx) {
+              const novoObj = { ...invSelecionadas[i] };
+              if (sel.value) { novoObj[campo] = sel.value; }
+              else { delete novoObj[campo]; }
+              invSelecionadas[i] = novoObj;
+              // Para talentos, re-renderizar para atualizar opcoes filtradas
+              if (campo === 'talento') renderGrid();
+              break;
+            }
+            count++;
+          }
+        }
+      });
+    });
+  }
+
+  // Pre-carregar talentos de origem (para Licoes dos Grandes Antigos)
+  await obterTalentosOrigem();
+
+  renderGrid();
+
+  // Busca
+  document.getElementById('busca-inv-bruxo')?.addEventListener('input', () => renderGrid());
+
+  // Salvar
   document.getElementById('btn-salvar-bruxo-recursos')?.addEventListener('click', () => {
-    const novoPacto = document.getElementById('bruxo-pacto')?.value || '';
-    const invTexto = document.getElementById('bruxo-invocacoes')?.value || '';
-    const invLinhas = invTexto.split('\n').map(v => v.trim()).filter(Boolean);
+    const invFinais = invSelecionadas.map(o => ({...o}));
 
-    if (invLinhas.length > estado.invocacoesMax) {
-      toast(`Você pode ter no máximo ${estado.invocacoesMax} invocações neste nível.`, 'error');
-      return;
-    }
+    // Determinar pacto a partir das invocacoes selecionadas
+    const pactoSelecionado = PACTOS.find(p => invSelecionadas.some(o => o.nome === p)) || '';
 
-    const usadas = new Map();
-    for (const nome of invLinhas) {
-      const chave = semAcento(nome);
-      const opcao = mapaOpcoes.get(chave);
-      if (!opcao) {
-        toast(`Invocação não reconhecida: ${nome}`, 'error');
-        return;
-      }
+    char.recursos.bruxo.pacto = pactoSelecionado;
+    char.recursos.bruxo.invocacoes = invFinais;
 
-      const ja = usadas.get(chave) || 0;
-      if (ja >= 1 && !opcao.repetivel) {
-        toast(`A invocação ${opcao.nome} não é repetível.`, 'error');
-        return;
-      }
-
-      const validacao = avaliarPrerequisitoInvocacaoBruxo(opcao.prerequisito);
-      if (!validacao.ok) {
-        toast(`Pré-requisito não atendido para ${opcao.nome}: ${validacao.motivo}`, 'error');
-        return;
-      }
-
-      usadas.set(chave, ja + 1);
-    }
-
-    char.recursos.bruxo.pacto = novoPacto;
-    char.recursos.bruxo.invocacoes = invLinhas;
-
+    // Salvar Arcana Mística
     [6, 7, 8, 9].forEach(c => {
       const desbloqueado = estado.circulosArcanum.includes(c);
       if (!desbloqueado) {
@@ -944,6 +1224,199 @@ function abrirModalRecursosBruxo() {
     window.fecharModal();
     renderFichaCompleta();
   });
+}
+
+// Modal para gerenciar truques e rituais do Pacto do Tomo
+function abrirModalPactoDoTomo() {
+  if (char?.classe !== 'Bruxo') return;
+  const estado = getEstadoRecursosBruxo();
+  if (!estado || estado.pacto !== 'Pacto do Tomo') return;
+
+  const tomoData = estado.pactoTomo || { truques: [], rituais: [] };
+  const truquesSel = [...tomoData.truques]; // [{nome, classe}]
+  const rituaisSel = [...tomoData.rituais]; // [{nome, classe}]
+
+  // Filtrar truques de TODAS as classes que o personagem ainda nao tem preparados
+  const truquesJaPreparados = new Set((char.magias_conhecidas || []).filter(m => m.circulo === 0).map(m => m.nome));
+  const todosTruquesIndice = indiceMagiasCache.filter(m => m.circulo === 0);
+  // Filtrar rituais de 1o circulo de TODAS as classes (magias com "Ritual" no tempo_conjuracao e que o personagem nao tem)
+  const jaPreparados = new Set((char.magias_preparadas || []).map(m => m.nome));
+  const todosRituais1 = indiceMagiasCache.filter(m =>
+    m.circulo === 1 &&
+    m.tempo_conjuracao && /ritual/i.test(m.tempo_conjuracao)
+  );
+
+  // Listar todas as classes disponveis nos truques/rituais
+  const classesComTruques = [...new Set(todosTruquesIndice.flatMap(m => m.classes || []))].sort();
+  const classesComRituais = [...new Set(todosRituais1.flatMap(m => m.classes || []))].sort();
+
+  function renderTruquesGrid(filtroClasse) {
+    let itens = todosTruquesIndice;
+    if (filtroClasse) itens = itens.filter(m => (m.classes || []).includes(filtroClasse));
+    return itens.sort((a, b) => a.nome.localeCompare(b.nome)).map(m => {
+      const sel = truquesSel.find(t => t.nome === m.nome);
+      const jaTem = truquesJaPreparados.has(m.nome) && !sel;
+      const cheio = truquesSel.length >= 3 && !sel;
+      return `
+        <div class="magia-card ${sel ? 'selecionada' : ''} ${cheio || jaTem ? 'magia-card-bloqueada' : ''}"
+             data-tomo-truque="${m.nome}" data-tomo-truque-classes="${(m.classes || []).join(',')}"
+             style="${cheio || jaTem ? 'opacity:0.35;cursor:not-allowed;' : 'cursor:pointer;'}">
+          <span class="magia-card-check"></span>
+          <div class="magia-card-nome" style="font-size:0.75rem">${m.nome}</div>
+          <div class="magia-card-meta"><span style="font-size:0.6rem">${(m.classes || []).join(', ')}</span></div>
+        </div>`;
+    }).join('');
+  }
+
+  function renderRituaisGrid(filtroClasse) {
+    let itens = todosRituais1;
+    if (filtroClasse) itens = itens.filter(m => (m.classes || []).includes(filtroClasse));
+    return itens.sort((a, b) => a.nome.localeCompare(b.nome)).map(m => {
+      const sel = rituaisSel.find(r => r.nome === m.nome);
+      const jaTem = jaPreparados.has(m.nome) && !sel;
+      const cheio = rituaisSel.length >= 2 && !sel;
+      return `
+        <div class="magia-card ${sel ? 'selecionada' : ''} ${cheio || jaTem ? 'magia-card-bloqueada' : ''}"
+             data-tomo-ritual="${m.nome}" data-tomo-ritual-classes="${(m.classes || []).join(',')}"
+             style="${cheio || jaTem ? 'opacity:0.35;cursor:not-allowed;' : 'cursor:pointer;'}">
+          <span class="magia-card-check"></span>
+          <div class="magia-card-nome" style="font-size:0.75rem">${m.nome}</div>
+          <div class="magia-card-meta"><span style="font-size:0.6rem">${(m.classes || []).join(', ')} | Ritual</span></div>
+        </div>`;
+    }).join('');
+  }
+
+  function renderConteudo() {
+    const filtroTruque = document.getElementById('tomo-filtro-classe-truque')?.value || '';
+    const filtroRitual = document.getElementById('tomo-filtro-classe-ritual')?.value || '';
+    return `
+      <div class="section-divider"><span>Truques do Livro das Sombras (${truquesSel.length}/3)</span></div>
+      <div style="margin-bottom:6px">
+        <select class="form-select" id="tomo-filtro-classe-truque" style="font-size:0.75rem;padding:3px 6px">
+          <option value="">Todas as classes</option>
+          ${classesComTruques.map(c => `<option value="${c}" ${filtroTruque === c ? 'selected' : ''}>${c}</option>`).join('')}
+        </select>
+      </div>
+      <div class="magias-grid" id="tomo-truques-grid" style="max-height:25vh;overflow-y:auto">${renderTruquesGrid(filtroTruque)}</div>
+
+      <div class="section-divider"><span>Rituais de 1o Circulo (${rituaisSel.length}/2)</span></div>
+      <div style="margin-bottom:6px">
+        <select class="form-select" id="tomo-filtro-classe-ritual" style="font-size:0.75rem;padding:3px 6px">
+          <option value="">Todas as classes</option>
+          ${classesComRituais.map(c => `<option value="${c}" ${filtroRitual === c ? 'selected' : ''}>${c}</option>`).join('')}
+        </select>
+      </div>
+      <div class="magias-grid" id="tomo-rituais-grid" style="max-height:25vh;overflow-y:auto">${renderRituaisGrid(filtroRitual)}</div>
+    `;
+  }
+
+  abrirModal('Livro das Sombras - Pacto do Tomo', `<div id="tomo-conteudo">${renderConteudo()}</div>`,
+    '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-tomo">Salvar</button>');
+
+  function attachTomoListeners() {
+    // Filtros
+    document.getElementById('tomo-filtro-classe-truque')?.addEventListener('change', () => {
+      document.getElementById('tomo-conteudo').innerHTML = renderConteudo();
+      attachTomoListeners();
+    });
+    document.getElementById('tomo-filtro-classe-ritual')?.addEventListener('change', () => {
+      document.getElementById('tomo-conteudo').innerHTML = renderConteudo();
+      attachTomoListeners();
+    });
+
+    // Toggle truques
+    document.querySelectorAll('[data-tomo-truque]').forEach(el => {
+      el.addEventListener('click', () => {
+        const nome = el.dataset.tomoTruque;
+        const classes = el.dataset.tomoTruqueClasses || '';
+        const idx = truquesSel.findIndex(t => t.nome === nome);
+        if (idx >= 0) {
+          truquesSel.splice(idx, 1);
+        } else {
+          if (truquesSel.length >= 3) {
+            toast('Limite de 3 truques do Livro das Sombras atingido.', 'error');
+            return;
+          }
+          truquesSel.push({ nome, classe: classes.split(',')[0] || '' });
+        }
+        document.getElementById('tomo-conteudo').innerHTML = renderConteudo();
+        attachTomoListeners();
+      });
+    });
+
+    // Toggle rituais
+    document.querySelectorAll('[data-tomo-ritual]').forEach(el => {
+      el.addEventListener('click', () => {
+        const nome = el.dataset.tomoRitual;
+        const classes = el.dataset.tomoRitualClasses || '';
+        const idx = rituaisSel.findIndex(r => r.nome === nome);
+        if (idx >= 0) {
+          rituaisSel.splice(idx, 1);
+        } else {
+          if (rituaisSel.length >= 2) {
+            toast('Limite de 2 rituais do Livro das Sombras atingido.', 'error');
+            return;
+          }
+          rituaisSel.push({ nome, classe: classes.split(',')[0] || '' });
+        }
+        document.getElementById('tomo-conteudo').innerHTML = renderConteudo();
+        attachTomoListeners();
+      });
+    });
+  }
+
+  attachTomoListeners();
+
+  document.getElementById('btn-salvar-tomo')?.addEventListener('click', () => {
+    char.recursos.bruxo.pacto_tomo = {
+      truques: [...truquesSel],
+      rituais: [...rituaisSel]
+    };
+    salvar();
+    window.fecharModal();
+    renderFichaCompleta();
+  });
+}
+
+// Avalia pré-requisito considerando pacto derivado do selSet (não do char salvo)
+function avaliarPrerequisitoInvocacaoBruxoComSel(prerequisito, selSet) {
+  if (!prerequisito) return { ok: true, motivo: '' };
+  let ok = true;
+  const motivos = [];
+  const texto = prerequisito;
+
+  const nivelMatch = texto.match(/Bruxo\s*N[ií]vel\s*(\d+)/i);
+  if (nivelMatch) {
+    const nivelMin = parseInt(nivelMatch[1]);
+    if ((char?.nivel || 1) < nivelMin) {
+      ok = false;
+      motivos.push(`requer nível ${nivelMin}`);
+    }
+  }
+
+  // Inferir pacto a partir das invocações selecionadas
+  const PACTOS = ['Pacto da Corrente', 'Pacto da Lâmina', 'Pacto do Tomo'];
+  const pacto = PACTOS.find(p => selSet.has(p)) || '';
+  if (/Pacto da Lâmina/i.test(texto) && pacto !== 'Pacto da Lâmina') {
+    ok = false;
+    motivos.push('requer Pacto da Lâmina');
+  }
+  if (/Pacto da Corrente/i.test(texto) && pacto !== 'Pacto da Corrente') {
+    ok = false;
+    motivos.push('requer Pacto da Corrente');
+  }
+  if (/Pacto do Tomo/i.test(texto) && pacto !== 'Pacto do Tomo') {
+    ok = false;
+    motivos.push('requer Pacto do Tomo');
+  }
+
+  // Invocações que requerem outra invocação (ex: Lâmina Devoradora requer Lâmina Sedenta)
+  if (/Lâmina Sedenta/i.test(texto) && !selSet.has('Lâmina Sedenta')) {
+    ok = false;
+    motivos.push('requer Lâmina Sedenta');
+  }
+
+  return { ok, motivo: motivos.join(', ') };
 }
 
 // ============================================================
@@ -1371,7 +1844,9 @@ export async function renderSheet(container, charId) {
   magiasSempreCache = await obterTodasMagiasSemprePreparadas(char.classe, char.subclasse, char.nivel);
   migrarMagiasDominio();
   migrarMagiasSemprePreparadas();
+  migrarTruquesEspecie();
   migrarEscolhasClasseLegadas();
+  migrarNomePericiaLidarAnimais();
 
   // Inicializar grimório do mago se necessário
   if (char.classe === 'Mago' && !char.grimorio) {
@@ -1380,6 +1855,31 @@ export async function renderSheet(container, charId) {
     (char.magias_preparadas || []).forEach(m => {
       if (magiaContaNoLimite(m) && !char.grimorio.find(g => g.nome === m.nome)) {
         char.grimorio.push({ nome: m.nome, circulo: m.circulo });
+      }
+    });
+    salvar();
+  }
+
+  // Sincronizar espaços de magia de conjuradores regulares
+  const _infoClasse = CLASSES_INFO[char.classe];
+  if (_infoClasse?.conjurador && classeData?.tabela_caracteristicas) {
+    const _espacosCorretos = getEspacosMagia(classeData.tabela_caracteristicas, char.nivel);
+    if (!char.espacos_magia) char.espacos_magia = {};
+    // Atualizar totais conforme tabela da classe
+    Object.keys(_espacosCorretos).forEach(circ => {
+      if (!char.espacos_magia[circ]) {
+        char.espacos_magia[circ] = { total: _espacosCorretos[circ].total, usados: 0 };
+      } else {
+        char.espacos_magia[circ].total = _espacosCorretos[circ].total;
+        if (char.espacos_magia[circ].usados > char.espacos_magia[circ].total) {
+          char.espacos_magia[circ].usados = char.espacos_magia[circ].total;
+        }
+      }
+    });
+    // Remover circulos que nao existem mais neste nivel
+    Object.keys(char.espacos_magia).forEach(circ => {
+      if (!_espacosCorretos[circ]) {
+        delete char.espacos_magia[circ];
       }
     });
     salvar();
@@ -1437,16 +1937,14 @@ function migrarMagiasSemprePreparadas() {
   let alterado = false;
   const nomesSempre = new Set((magiasSempreCache || []).map(m => m.nome));
 
-  // Higienização de legado: remove entradas inválidas de "sempre" no Guardião
-  // que tenham sido salvas por parsing antigo de markdown.
-  if (char.classe === 'Guardião') {
-    char.magias_preparadas = char.magias_preparadas.filter(m => {
-      if (m?.origem !== 'sempre') return true;
-      if (nomesSempre.has(m.nome)) return true;
-      alterado = true;
-      return false;
-    });
-  }
+  // Higienização: remove magias marcadas como "sempre" que não estão mais
+  // na lista real de magias sempre preparadas (corrige parsing antigo/errado)
+  char.magias_preparadas = char.magias_preparadas.filter(m => {
+    if (m?.origem !== 'sempre') return true;
+    if (nomesSempre.has(m.nome)) return true;
+    alterado = true;
+    return false;
+  });
 
   char.magias_preparadas.forEach(m => {
     if (nomesSempre.has(m.nome) && m.origem !== 'dominio' && m.origem !== 'sempre') {
@@ -1455,6 +1953,48 @@ function migrarMagiasSemprePreparadas() {
     }
   });
   if (alterado) salvar();
+}
+
+/** Adiciona truques concedidos pela espécie que estejam faltando */
+function migrarTruquesEspecie() {
+  if (!char.especie) return;
+  const truques = obterTruquesEspecieFicha(char.especie, char.tracos_escolhidos || []);
+  if (truques.length === 0) return;
+
+  if (!char.magias_conhecidas) char.magias_conhecidas = [];
+  let alterado = false;
+  for (const nome of truques) {
+    if (!char.magias_conhecidas.find(m => m.nome === nome)) {
+      char.magias_conhecidas.push({ nome, circulo: 0, origem: 'especie' });
+      alterado = true;
+    }
+  }
+  if (alterado) salvar();
+}
+
+/** Retorna truques concedidos pela espécie/traço escolhido */
+function obterTruquesEspecieFicha(especie, tracosEscolhidos) {
+  const truques = [];
+  const escolha = (tracosEscolhidos || [])[0] || '';
+
+  if (especie === 'Aasimar') {
+    truques.push('Luz');
+  } else if (especie === 'Gnomo') {
+    if (escolha === 'Gnomo das Rochas') {
+      truques.push('Prestidigitação Arcana', 'Reparar');
+    } else if (escolha === 'Gnomo do Bosque') {
+      truques.push('Ilusão Menor');
+    }
+  } else if (especie === 'Tiferino') {
+    truques.push('Taumaturgia');
+    const legadoTruque = { 'Abissal': 'Rajada de Veneno', 'Ctônico': 'Toque Necrótico', 'Infernal': 'Raio de Fogo' };
+    if (legadoTruque[escolha]) truques.push(legadoTruque[escolha]);
+  } else if (especie === 'Elfo') {
+    const linhagemTruque = { 'Alto Elfo': 'Prestidigitação Arcana', 'Drow': 'Luzes Dançantes', 'Elfo Silvestre': 'Arte Druídica' };
+    if (linhagemTruque[escolha]) truques.push(linhagemTruque[escolha]);
+  }
+
+  return truques;
 }
 
 /** Migra escolhas_classe legadas aplicando expertise e idiomas mecanicamente */
@@ -1481,6 +2021,19 @@ function migrarEscolhasClasseLegadas() {
     }
   });
 
+  if (alterado) salvar();
+}
+
+/** Migra nome legado da pericia 'Adestrar Animais' para 'Lidar com Animais' (Livro do Jogador 2024) */
+function migrarNomePericiaLidarAnimais() {
+  let alterado = false;
+  const substituir = (arr) => {
+    if (!arr) return;
+    const idx = arr.indexOf('Adestrar Animais');
+    if (idx !== -1) { arr[idx] = 'Lidar com Animais'; alterado = true; }
+  };
+  substituir(char.pericias_proficientes);
+  substituir(char.pericias_expertise);
   if (alterado) salvar();
 }
 
@@ -1548,7 +2101,7 @@ function renderFichaCompleta() {
           <div style="font-size:0.9rem;color:var(--text-muted)">
             ${char.especie || ''} ${char.classe || ''} ${char.subclasse ? `(${char.subclasse})` : ''} &middot; Nível ${char.nivel}
           </div>
-          <div style="font-size:0.8rem;color:var(--text-muted)">Antecedente: ${char.antecedente || '–'}</div>
+          <div style="font-size:0.8rem;color:var(--text-muted)">Antecedente: ${char.antecedente || '–'}${char.alinhamento ? ' | Alinhamento: ' + char.alinhamento : ''}</div>
           <div style="font-size:0.8rem;color:var(--text-muted)">Tamanho: ${_tamanho}${(char.idiomas && char.idiomas.length) ? ' | Idiomas: ' + char.idiomas.join(', ') : ''}</div>
           ${(estadoGuardiao && estadoGuardiao.sentidosSelvagensAtivo) ? '<div style="font-size:0.8rem;color:var(--text-muted)">Sentidos: Visão às Cegas 9 m</div>' : ''}
           ${(estadoGuardiao && estadoGuardiao.exaustao > 0) ? `<div style="font-size:0.8rem;color:var(--danger)">Exaustão: ${estadoGuardiao.exaustao}</div>` : ''}
@@ -1622,6 +2175,15 @@ function renderFichaCompleta() {
             Astúcia Mágica: ${estadoBruxo.astuciaUsada ? 'Usada' : 'Disponível'}
             &nbsp;|&nbsp; Invocações: ${estadoBruxo.invocacoes.length}/${estadoBruxo.invocacoesMax}
             &nbsp;|&nbsp; Pacto: ${estadoBruxo.pacto || 'Não definido'}
+            ${estadoBruxo.invocacoes.length > 0 ? `
+              <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px">
+                ${estadoBruxo.invocacoes.map(inv => {
+                  const nome = typeof inv === 'string' ? inv : inv.nome;
+                  const extra = inv?.truque ? ` (${inv.truque})` : inv?.talento ? ` (${inv.talento})` : '';
+                  return `<span class="badge" style="font-size:0.65rem;margin:1px 2px;background:var(--bg-card);border:1px solid var(--border-light)">${nome}${extra}</span>`;
+                }).join('')}
+              </div>
+            ` : ''}
           </div>
           <div class="no-print" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
             <button class="btn btn-sm btn-accent" data-bruxo-astucia-acao="usar" ${estadoBruxo.astuciaUsada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Astúcia Mágica</button>
@@ -2592,10 +3154,19 @@ function setupEventosDescanso() {
     const pvMax = char.pv_max_override || char.pv_max;
     char.pv_atual = pvMax;
     char.pv_temporario = 0;
-    char.dados_vida_usados = Math.max(0, (char.dados_vida_usados || 0) - Math.max(1, Math.floor(char.nivel / 2)));
+    // Regra 2024: Descanso Longo recupera TODOS os Dados de Vida
+    char.dados_vida_usados = 0;
     // Reset death saves
     char.morte_sucessos = 0;
     char.morte_falhas = 0;
+    // Regra 2024: Exaustao reduzida em 1 nivel no Descanso Longo (todas as classes)
+    if (typeof char.exaustao !== 'number') char.exaustao = 0;
+    if (char.exaustao > 0) {
+      char.exaustao = Math.max(0, char.exaustao - 1);
+      if (char.exaustao === 0) {
+        char.condicoes = (char.condicoes || []).filter(c => c !== 'Exaustão');
+      }
+    }
     // Restaurar espaços de magia
     if (char.espacos_magia) {
       Object.keys(char.espacos_magia).forEach(k => {
@@ -2700,8 +3271,6 @@ function setupEventosDescanso() {
         char.recursos.guardiao.veu_natureza_usos_gastos = 0;
         char.recursos.guardiao.marca_predador_ativa = false;
       }
-      if (typeof char.exaustao !== 'number') char.exaustao = 0;
-      char.exaustao = Math.max(0, char.exaustao - 1);
     }
 
     // Feiticeiro: descanso longo restaura pontos e usos por descanso longo
@@ -3189,16 +3758,91 @@ function setupEventosHabilidades() {
       }
 
       if (acao === 'metamagia-config') {
-        abrirModal('Opções de Metamagia', `
-          <div class="form-group">
-            <label class="form-label" for="metamagias-texto">Uma opção por linha</label>
-            <textarea class="form-textarea" id="metamagias-texto" rows="8" placeholder="Ex: Magia Acelerada">${(estado.metamagias || []).join('\n')}</textarea>
-          </div>
+        // Opções de Metamagia com seletor visual
+        const OPCOES_METAMAGIA = [
+          { nome: 'Magia Acelerada', custo: 2, desc: 'Ao conjurar uma magia com tempo de 1 ação, gaste 2 PF para mudar para Ação Bônus.' },
+          { nome: 'Magia Agravada', custo: 2, desc: 'Ao conjurar com teste de resistência, gaste 2 PF para dar Desvantagem na salvaguarda.' },
+          { nome: 'Magia Buscadora', custo: 1, desc: 'Jogada de ataque com magia que erra: gaste 1 PF para re-jogar (deve usar o novo resultado).' },
+          { nome: 'Magia Cautelosa', custo: 1, desc: 'Ao conjurar com salvaguarda, gaste 1 PF e escolha criaturas = mod. Car. que passam automaticamente.' },
+          { nome: 'Magia Distante', custo: 1, desc: 'Magia com alcance 1,5m+: gaste 1 PF para dobrar. Alcance Toque vira 9m.' },
+          { nome: 'Magia Duplicada', custo: 1, desc: 'Magia que mira apenas uma criatura e não tem auto-alcance: gaste 1 PF para mirar uma segunda.' },
+          { nome: 'Magia Persistente', custo: 1, desc: 'Ao conjurar com Concentração e duração 1 min+: gaste 1 PF, não requer Concentração por 1 min.' },
+          { nome: 'Magia Potencializada', custo: 1, desc: 'Ao rolar dano de magia: gaste 1 PF para re-jogar até mod. Car. dados de dano (deve usar novos).' },
+          { nome: 'Magia Sutil', custo: 1, desc: 'Ao conjurar: gaste 1 PF para conjurar sem componentes Verbais ou Somáticos.' },
+          { nome: 'Magia Transmutada', custo: 1, desc: 'Ao conjurar com dano: gaste 1 PF para trocar tipo de dano por Ácido/Elétrico/Gélido/Ígneo/Trovejante/Venenoso.' }
+        ];
+        const nivel = char.nivel || 1;
+        const maxMeta = (nivel >= 17 ? 6 : nivel >= 10 ? 4 : 2);
+        const metasSelecionadas = new Set(estado.metamagias || []);
+
+        function renderMetaGrid(selSet) {
+          let html = `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">
+            Selecionadas: <strong>${selSet.size}</strong> / ${maxMeta}
+            ${selSet.size > maxMeta ? '<span style="color:var(--danger)"> (excedido!)</span>' : ''}
+          </div>`;
+          html += `<div class="magias-grid">${OPCOES_METAMAGIA.map(o => {
+            const sel = selSet.has(o.nome);
+            const cheio = selSet.size >= maxMeta && !sel;
+            return `
+              <div class="magia-card ${sel ? 'selecionada' : ''} ${cheio ? 'magia-card-bloqueada' : ''}"
+                   data-meta-toggle="${o.nome}" style="${cheio ? 'opacity:0.35;' : 'cursor:pointer;'}">
+                <span class="magia-card-check"></span>
+                <div class="magia-card-nome">${o.nome}
+                  <span class="btn-info-meta" data-meta-info="${o.nome}" title="Ver descricao" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--secondary);color:#fff;font-size:0.6rem;font-weight:700;cursor:pointer;margin-left:4px;vertical-align:middle;flex-shrink:0">i</span>
+                </div>
+                <div class="magia-card-meta">
+                  <span style="font-size:0.65rem">${o.custo} PF</span>
+                </div>
+              </div>`;
+          }).join('')}</div>`;
+          return html;
+        }
+
+        abrirModal('Opcoes de Metamagia', `
+          <div id="metamagia-grid">${renderMetaGrid(metasSelecionadas)}</div>
+          <div id="metamagia-desc" style="font-size:0.78rem;color:var(--text-muted);margin-top:8px;padding:8px 10px;border-radius:6px;background:var(--bg-card);border:1px solid var(--border-light);min-height:20px;display:none"></div>
         `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-metamagia">Salvar</button>');
 
+        function attachMetaListeners() {
+          document.querySelectorAll('[data-meta-toggle]').forEach(el => {
+            el.addEventListener('click', () => {
+              const nome = el.dataset.metaToggle;
+              if (metasSelecionadas.has(nome)) {
+                metasSelecionadas.delete(nome);
+              } else {
+                if (metasSelecionadas.size >= maxMeta) {
+                  toast(`Limite de ${maxMeta} opções de Metamagia atingido.`, 'error');
+                  return;
+                }
+                metasSelecionadas.add(nome);
+              }
+              document.getElementById('metamagia-grid').innerHTML = renderMetaGrid(metasSelecionadas);
+              attachMetaListeners();
+            });
+          });
+          // Botoes de informacao (i) para metamagia
+          document.querySelectorAll('[data-meta-info]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const nome = btn.dataset.metaInfo;
+              const opcao = OPCOES_METAMAGIA.find(o => o.nome === nome);
+              const descEl = document.getElementById('metamagia-desc');
+              if (!opcao || !descEl) return;
+              if (descEl.style.display !== 'none' && descEl.dataset.metaAtual === nome) {
+                descEl.style.display = 'none';
+                descEl.dataset.metaAtual = '';
+                return;
+              }
+              descEl.innerHTML = `<strong>${opcao.nome}</strong> <span style="font-size:0.7rem;color:var(--secondary)">(${opcao.custo} PF)</span><br>${opcao.desc}`;
+              descEl.style.display = 'block';
+              descEl.dataset.metaAtual = nome;
+            });
+          });
+        }
+        attachMetaListeners();
+
         document.getElementById('btn-salvar-metamagia')?.addEventListener('click', () => {
-          const linhas = (document.getElementById('metamagias-texto')?.value || '').split('\n').map(v => v.trim()).filter(Boolean);
-          char.recursos.feiticeiro.metamagias = linhas;
+          char.recursos.feiticeiro.metamagias = [...metasSelecionadas];
           salvar();
           window.fecharModal();
           renderFichaCompleta();
@@ -3482,6 +4126,25 @@ function setupEventosHabilidades() {
       e.stopPropagation();
       e.preventDefault();
       abrirModalRecursosBruxo();
+    });
+  });
+
+  // Gerenciar selecoes do Pacto do Tomo
+  document.querySelectorAll('[data-pacto-tomo-gerenciar]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      abrirModalPactoDoTomo();
+    });
+  });
+
+  // Conjurar magias de Pacto (sem gastar espaco)
+  document.querySelectorAll('[data-conjurar-pacto]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const nomeMagia = btn.dataset.conjurarPacto;
+      toast(`${nomeMagia} conjurada (via Pacto, sem gastar espaco).`, 'success');
     });
   });
 
@@ -4491,6 +5154,21 @@ function setupEventosEdicao() {
         <label class="form-label" for="edit-nome">Nome</label>
         <input type="text" class="form-input" id="edit-nome" value="${char.nome}">
       </div>
+      <div class="form-group">
+        <label class="form-label" for="edit-alinhamento">Alinhamento</label>
+        <select class="form-input" id="edit-alinhamento">
+          <option value="">— Nenhum —</option>
+          <option value="Ordeiro e Bom"${char.alinhamento === 'Ordeiro e Bom' ? ' selected' : ''}>Ordeiro e Bom</option>
+          <option value="Neutro e Bom"${char.alinhamento === 'Neutro e Bom' ? ' selected' : ''}>Neutro e Bom</option>
+          <option value="Caótico e Bom"${char.alinhamento === 'Caótico e Bom' ? ' selected' : ''}>Caótico e Bom</option>
+          <option value="Ordeiro e Neutro"${char.alinhamento === 'Ordeiro e Neutro' ? ' selected' : ''}>Ordeiro e Neutro</option>
+          <option value="Neutro"${char.alinhamento === 'Neutro' ? ' selected' : ''}>Neutro</option>
+          <option value="Caótico e Neutro"${char.alinhamento === 'Caótico e Neutro' ? ' selected' : ''}>Caótico e Neutro</option>
+          <option value="Ordeiro e Mau"${char.alinhamento === 'Ordeiro e Mau' ? ' selected' : ''}>Ordeiro e Mau</option>
+          <option value="Neutro e Mau"${char.alinhamento === 'Neutro e Mau' ? ' selected' : ''}>Neutro e Mau</option>
+          <option value="Caótico e Mau"${char.alinhamento === 'Caótico e Mau' ? ' selected' : ''}>Caótico e Mau</option>
+        </select>
+      </div>
       <div class="row gap-1">
         <div class="col">
           <label class="form-label">Nivel</label>
@@ -4519,6 +5197,7 @@ function setupEventosEdicao() {
 
     document.getElementById('btn-salvar-edit')?.addEventListener('click', () => {
       char.nome = document.getElementById('edit-nome')?.value?.trim() || char.nome;
+      char.alinhamento = document.getElementById('edit-alinhamento')?.value || '';
 
       salvar();
       window.fecharModal();
@@ -5376,7 +6055,7 @@ async function abrirModalLevelUp() {
                 <span>${magia.componentes}</span> <span>${magia.duracao}</span>
               </div>
               <div class="md-content">${mdParaHtml(magia.descricao)}</div>
-              ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em círculos superiores:</strong> ${magia.circulo_superior}</div>` : ''}
+              ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em círculos superiores:</strong><div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
             `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
           });
         });
@@ -5467,7 +6146,7 @@ async function abrirModalLevelUp() {
                     <span>${magia.componentes}</span> <span>${magia.duracao}</span>
                   </div>
                   <div class="md-content">${mdParaHtml(magia.descricao)}</div>
-                  ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em círculos superiores:</strong> ${magia.circulo_superior}</div>` : ''}
+                  ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em círculos superiores:</strong><div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
                 `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
               });
             });
@@ -6701,6 +7380,90 @@ function renderSecaoSubclasse() {
   `;
 }
 
+// Descrições mecânicas dos sub-traços de espécies com opcoes
+const SUBTRACOS_ESPECIE = {
+  'Tiferino': {
+    'Abissal': {
+      descBase: 'Você tem Resistência a dano Venenoso. Você também conhece o truque *Rajada de Veneno*.',
+      magias: { 3: 'Raio Nauseante', 5: 'Paralisar Pessoa' }
+    },
+    'Ctônico': {
+      descBase: 'Você tem Resistência a dano Necrótico. Você também conhece o truque *Toque Necrótico*.',
+      magias: { 3: 'Vitalidade Vazia', 5: 'Raio do Enfraquecimento' }
+    },
+    'Infernal': {
+      descBase: 'Você tem Resistência a dano Ígneo. Você também conhece o truque *Raio de Fogo*.',
+      magias: { 3: 'Repreensão Diabólica', 5: 'Escuridão' }
+    }
+  },
+  'Elfo': {
+    'Alto Elfo': {
+      descBase: 'Você conhece o truque *Prestidigitação Arcana*. Sempre que completar um Descanso Longo, você pode substituir este truque por um truque diferente da lista de magias de Mago.',
+      magias: { 3: 'Detectar Magia', 5: 'Passo Nebuloso' }
+    },
+    'Drow': {
+      descBase: 'O alcance da sua Visão no Escuro aumenta para 36 metros. Você também conhece o truque *Luzes Dançantes*.',
+      magias: { 3: 'Fogo das Fadas', 5: 'Escuridão' }
+    },
+    'Elfo Silvestre': {
+      descBase: 'Seu Deslocamento aumenta para 10,5 metros. Você também conhece o truque *Arte Druídica*.',
+      magias: { 3: 'Passos Largos', 5: 'Passos Sem Rastro' }
+    }
+  },
+  'Draconato': {
+    'Azul': { descBase: 'Ancestral: Dragão Azul. Tipo de dano: Elétrico.' },
+    'Branco': { descBase: 'Ancestral: Dragão Branco. Tipo de dano: Gélido.' },
+    'Bronze': { descBase: 'Ancestral: Dragão Bronze. Tipo de dano: Elétrico.' },
+    'Cobre': { descBase: 'Ancestral: Dragão Cobre. Tipo de dano: Ácido.' },
+    'Latão': { descBase: 'Ancestral: Dragão Latão. Tipo de dano: Ígneo.' },
+    'Negro': { descBase: 'Ancestral: Dragão Negro. Tipo de dano: Ácido.' },
+    'Ouro': { descBase: 'Ancestral: Dragão Ouro. Tipo de dano: Ígneo.' },
+    'Prata': { descBase: 'Ancestral: Dragão Prata. Tipo de dano: Gélido.' },
+    'Verde': { descBase: 'Ancestral: Dragão Verde. Tipo de dano: Venenoso.' },
+    'Vermelho': { descBase: 'Ancestral: Dragão Vermelho. Tipo de dano: Ígneo.' }
+  }
+};
+
+// Títulos dos traços-pai para exibição do sub-traço
+const TITULO_TRACO_PAI = {
+  'Tiferino': 'Legado Ínfero',
+  'Elfo': 'Linhagem Élfica',
+  'Draconato': 'Herança Dracônica'
+};
+
+/**
+ * Gera um traço sintético para espécies com opcoes (sem sub-traço no JSON).
+ * Monta a descrição com base no nível do personagem.
+ */
+function gerarTracoSinteticoEspecie(especie, tracosEscolhidos, nivel) {
+  const mapa = SUBTRACOS_ESPECIE[especie];
+  if (!mapa) return null;
+  const escolha = tracosEscolhidos[0];
+  if (!escolha || !mapa[escolha]) return null;
+
+  const info = mapa[escolha];
+  const tituloPai = TITULO_TRACO_PAI[especie] || '';
+  let desc = info.descBase;
+
+  // Adicionar magias desbloqueadas por nível
+  if (info.magias) {
+    const magiasDesbloqueadas = [];
+    for (const [nv, nomeMagia] of Object.entries(info.magias)) {
+      if (nivel >= parseInt(nv)) {
+        magiasDesbloqueadas.push(`*${nomeMagia}* (nível ${nv})`);
+      }
+    }
+    if (magiasDesbloqueadas.length > 0) {
+      desc += `\n\nMagias sempre preparadas: ${magiasDesbloqueadas.join(', ')}. Essas magias podem ser conjuradas uma vez sem gastar um espaço de magia, restaurando ao completar um Descanso Longo.`;
+    }
+  }
+
+  return {
+    nome: `${tituloPai} — ${escolha}`,
+    descricao: desc
+  };
+}
+
 // --- Traços da Espécie/Raça ---
 
 function renderSecaoTracosEspecie() {
@@ -6725,23 +7488,35 @@ function renderSecaoTracosEspecie() {
       }
       return true;
     });
+
+    // Adicionar traço sintético para espécies com opcoes (sem sub-traço no JSON)
+    const tracoSintetico = gerarTracoSinteticoEspecie(char.especie, tracosEscolhidos, char.nivel);
+    if (tracoSintetico) {
+      tracosMostrar.push(tracoSintetico);
+    }
   }
 
-  // Filter traits by level requirement (e.g., "A partir do nível 5")
+  // Filtrar traços por requisito de nível (ex: "A partir do nível 5", "No nível 3")
   tracosMostrar = tracosMostrar.filter(t => {
-    const match = t.descricao?.match(/a partir do n[ií]vel (\d+)/i);
+    // Campo explícito de nível mínimo (sub-traços que dependem de um traço pai)
+    if (typeof t.nivel_minimo === 'number' && char.nivel < t.nivel_minimo) return false;
+    const match = t.descricao?.match(/(?:a partir do |no )n[ií]vel (\d+)/i);
     if (match) return char.nivel >= parseInt(match[1]);
     return true;
   });
 
   if (!tracosMostrar.length) return '';
 
-  // Traits that inherit recharge from parent "Ancestralidade Gigante" (prof bonus, long rest)
+  // Traços que herdam recarga do pai "Ancestralidade Gigante" (bônus prof, descanso longo)
   const TRACOS_HERDAM_ANCESTRALIDADE = ['Arrepio do Gelo (Gigante do Gelo)', 'Queimadura de Fogo (Gigante de Fogo)', 'Resistência da Pedra (Gigante da Pedra)', 'Salto da Nuvem (Gigante das Nuvens)', 'Tombo da Colina (Gigante da Colina)', 'Trovão da Tempestade (Gigante da Tempestade)'];
 
-  // Determine active/passive considering inherited traits
+  // Sub-traços da Revelação Celestial (Aasimar) — ativas, mas uso controlado pelo pai
+  const TRACOS_REVELACAO_CELESTIAL = ['Asas Celestiais', 'Manto Necrótico', 'Transfiguração Radiante'];
+
+  // Determinar ativa/passiva considerando traços herdados
   const ehAtivo = (t) => {
     if (TRACOS_HERDAM_ANCESTRALIDADE.includes(t.nome)) return true;
+    if (TRACOS_REVELACAO_CELESTIAL.includes(t.nome)) return true;
     return ehHabilidadeAtiva(t.descricao);
   };
 
@@ -6753,7 +7528,7 @@ function renderSecaoTracosEspecie() {
       <div class="card-header"><h2>Traços de Espécie — ${char.especie}</h2></div>
       ${ativos.length > 0 ? `
         <div class="section-divider"><span>Habilidades Ativas</span></div>
-        ${ativos.map(t => renderTracoEspecie(t, TRACOS_HERDAM_ANCESTRALIDADE.includes(t.nome))).join('')}
+        ${ativos.map(t => renderTracoEspecie(t, TRACOS_HERDAM_ANCESTRALIDADE.includes(t.nome), TRACOS_REVELACAO_CELESTIAL.includes(t.nome))).join('')}
       ` : ''}
       ${passivos.length > 0 ? `
         <div class="section-divider"><span>Habilidades Passivas</span></div>
@@ -6763,13 +7538,18 @@ function renderSecaoTracosEspecie() {
   `;
 }
 
-function renderTracoEspecie(traco, herdaAncestralidade = false) {
+function renderTracoEspecie(traco, herdaAncestralidade = false, ehSubRevelacao = false) {
   let recarga = detectarRecarga(traco.descricao);
   let ativa = ehHabilidadeAtiva(traco.descricao);
 
   // Traits inheriting from "Ancestralidade Gigante": prof bonus uses, long rest
   if (herdaAncestralidade && !recarga) {
     recarga = 'longo';
+    ativa = true;
+  }
+
+  // Sub-traços da Revelação Celestial: ativos mas sem controle de uso próprio
+  if (ehSubRevelacao) {
     ativa = true;
   }
 
@@ -6960,11 +7740,221 @@ function badgesMagiaRapidos(nomeMagia) {
   return `<div class="magia-tags">${badges.join('')}</div>`;
 }
 
+// Renderiza a secao de Dadivas do Pacto dentro da area de magias (somente Bruxo)
+function renderSecaoPactoBruxo() {
+  if (char?.classe !== 'Bruxo') return '';
+  const estado = getEstadoRecursosBruxo();
+  if (!estado) return '';
+  const pacto = estado.pacto;
+  if (!pacto) return '';
+
+  let html = '<details open style="margin-bottom:8px;border-left:3px solid var(--secondary);padding-left:8px">';
+  html += '<summary style="font-weight:700;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--border-light);color:var(--secondary)">';
+  html += `Dadivas do Pacto - ${pacto}`;
+  html += '</summary><div style="padding-top:6px">';
+
+  if (pacto === 'Pacto da Corrente') {
+    html += `
+      <div class="magia-item magia-dominio" style="border-left:3px solid var(--secondary)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="magia-nome"><span class="badge-dominio">&#9733;</span> Convocar Familiar</div>
+            <div style="font-size:0.7rem;color:var(--text-muted)">Conjuracao | Acao | 1 hora | 9 metros</div>
+            <div style="font-size:0.65rem;color:var(--secondary);font-weight:600;margin-top:1px">Pacto da Corrente (sem gastar espaco de magia)</div>
+          </div>
+          <button class="btn btn-sm btn-primary" data-conjurar-pacto="Convocar Familiar">Conjurar</button>
+        </div>
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px">
+          Formas especiais: Cobra Peconhenta, Diabrete, Esfinge Maravilhosa, Esqueleto, Pseudodragao, Quasit, Slaad Girino, Sprite.
+          <br>Ao executar acao Atacar, voce pode renunciar um ataque para que o familiar ataque como Reacao.
+        </div>
+      </div>`;
+  }
+
+  if (pacto === 'Pacto da Lâmina') {
+    html += `
+      <div class="magia-item magia-dominio" style="border-left:3px solid var(--secondary)">
+        <div>
+          <div class="magia-nome"><span class="badge-dominio">&#9733;</span> Arma de Pacto</div>
+          <div style="font-size:0.65rem;color:var(--secondary);font-weight:600;margin-top:1px">Pacto da Lamina</div>
+        </div>
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px">
+          <strong>Acao Bonus:</strong> Conjurar arma Corpo a Corpo (Simples ou Marcial) ou vincular-se a uma arma magica.
+          <br>Usa modificador de Carisma para ataque e dano (em vez de Forca/Destreza).
+          <br>Pode causar dano Necrotico, Psiquico ou Radiante (ou o tipo normal).
+          <br>Pode usar a arma como Foco de Conjuracao.
+        </div>
+      </div>`;
+  }
+
+  if (pacto === 'Pacto do Tomo') {
+    const tomoData = estado.pactoTomo || { truques: [], rituais: [] };
+    // Detectar conflitos: magias do Tomo que o personagem ja possui por outros meios
+    const truquesConhecidos = new Set((char.magias_conhecidas || []).filter(m => m.circulo === 0).map(m => m.nome));
+    const magiasPreparadas = new Set((char.magias_preparadas || []).map(m => m.nome));
+    const truquesConflito = tomoData.truques.filter(t => truquesConhecidos.has(t.nome));
+    const rituaisConflito = tomoData.rituais.filter(r => magiasPreparadas.has(r.nome));
+    const temConflito = truquesConflito.length > 0 || rituaisConflito.length > 0;
+
+    html += `
+      <div class="magia-item magia-dominio" style="border-left:3px solid var(--secondary)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="magia-nome"><span class="badge-dominio">&#9733;</span> Livro das Sombras</div>
+            <div style="font-size:0.65rem;color:var(--secondary);font-weight:600;margin-top:1px">Pacto do Tomo</div>
+          </div>
+          <button class="btn btn-sm btn-secondary no-print" data-pacto-tomo-gerenciar="1">Gerenciar</button>
+        </div>
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px">
+          3 truques de qualquer classe + 2 magias de 1o circulo com marcador Ritual (de qualquer classe).
+          <br>Funciona como Foco de Conjuracao. Reaparece ao final de Descanso Curto ou Longo.
+        </div>
+        ${temConflito ? `
+          <div class="info-box warning" style="font-size:0.65rem;margin-top:6px;padding:4px 8px">
+            Conflito: as magias do Livro devem ser magias que voce ainda nao tem preparadas.
+            Abra "Gerenciar" para substituir: ${[...truquesConflito.map(t => t.nome), ...rituaisConflito.map(r => r.nome)].join(', ')}.
+          </div>
+        ` : ''}
+        ${tomoData.truques.length > 0 ? `
+          <div style="margin-top:6px">
+            <div style="font-size:0.7rem;font-weight:700;color:var(--secondary)">Truques do Livro das Sombras:</div>
+            ${tomoData.truques.map(t => {
+              const conflito = truquesConhecidos.has(t.nome);
+              return `
+              <div class="magia-item ${conflito ? '' : ''}" style="margin:2px 0;padding:4px 8px;border-left:2px solid ${conflito ? 'var(--danger)' : 'var(--accent)'}">
+                <div class="magia-nome" style="font-size:0.8rem">${t.nome} <span style="font-size:0.6rem;color:var(--text-muted)">(${t.classe || '?'})</span>${conflito ? ' <span style="font-size:0.6rem;color:var(--danger);font-weight:700">Duplicado</span>' : ''}</div>
+                ${t.nome ? badgesMagiaRapidos(t.nome) : ''}
+              </div>`;
+            }).join('')}
+          </div>
+        ` : ''}
+        ${tomoData.rituais.length > 0 ? `
+          <div style="margin-top:6px">
+            <div style="font-size:0.7rem;font-weight:700;color:var(--secondary)">Rituais do Livro das Sombras:</div>
+            ${tomoData.rituais.map(r => {
+              const conflito = magiasPreparadas.has(r.nome);
+              return `
+              <div class="magia-item" style="margin:2px 0;padding:4px 8px;border-left:2px solid ${conflito ? 'var(--danger)' : 'var(--accent)'}">
+                <div class="magia-nome" style="font-size:0.8rem">${r.nome} <span style="font-size:0.6rem;color:var(--text-muted)">(${r.classe || '?'}) - Ritual</span>${conflito ? ' <span style="font-size:0.6rem;color:var(--danger);font-weight:700">Duplicado</span>' : ''}</div>
+                ${r.nome ? badgesMagiaRapidos(r.nome) : ''}
+              </div>`;
+            }).join('')}
+          </div>
+        ` : ''}
+      </div>`;
+  }
+
+  // Mostrar truques modificados por invocacoes (Explosao Agonizante, Repulsiva, Lanca Mistica)
+  const INV_TRUQUE_DISPLAY = {
+    'Explosão Agonizante': { efeito: '+modificador de Carisma ao dano', cor: 'var(--danger)' },
+    'Explosão Repulsiva': { efeito: 'Empurra o alvo 3 metros para longe', cor: 'var(--accent)' },
+    'Lança Mística': { efeito: 'Alcance do truque aumentado', cor: 'var(--secondary)' }
+  };
+  const truquesModificados = [];
+  for (const inv of estado.invocacoes) {
+    const nomeInv = typeof inv === 'string' ? inv : inv.nome;
+    const truque = inv?.truque;
+    const info = INV_TRUQUE_DISPLAY[nomeInv];
+    if (info && truque) {
+      truquesModificados.push({ invocacao: nomeInv, truque, ...info });
+    }
+  }
+  if (truquesModificados.length > 0) {
+    html += '<div style="margin-top:8px">';
+    html += '<div style="font-size:0.7rem;font-weight:700;color:var(--secondary);margin-bottom:4px">Truques Modificados por Invocacoes:</div>';
+    for (const tm of truquesModificados) {
+      html += `
+        <div class="magia-item" style="margin:2px 0;padding:4px 8px;border-left:3px solid ${tm.cor}">
+          <div class="magia-nome" style="font-size:0.8rem">${tm.truque} <span style="font-size:0.6rem;font-weight:700;color:${tm.cor}">[${tm.invocacao}]</span></div>
+          <div style="font-size:0.65rem;color:var(--text-muted)">${tm.efeito}</div>
+        </div>`;
+    }
+    html += '</div>';
+  }
+
+  // Mostrar talentos obtidos via invocacoes (Licoes dos Grandes Antigos)
+  const talentosViaInvocacao = [];
+  for (const inv of estado.invocacoes) {
+    const nomeInv = typeof inv === 'string' ? inv : inv.nome;
+    const talento = inv?.talento;
+    if (semAcento(nomeInv) === semAcento('Lições dos Grandes Antigos') && talento) {
+      talentosViaInvocacao.push({ invocacao: nomeInv, talento });
+    }
+  }
+  if (talentosViaInvocacao.length > 0) {
+    html += '<div style="margin-top:8px">';
+    html += '<div style="font-size:0.7rem;font-weight:700;color:var(--secondary);margin-bottom:4px">Talentos via Invocacoes:</div>';
+    for (const ti of talentosViaInvocacao) {
+      html += `
+        <div class="magia-item" style="margin:2px 0;padding:4px 8px;border-left:3px solid var(--accent)">
+          <div class="magia-nome" style="font-size:0.8rem">${ti.talento} <span style="font-size:0.6rem;color:var(--text-muted)">(Talento de Origem)</span></div>
+          <div style="font-size:0.65rem;color:var(--text-muted)">${ti.invocacao}</div>
+        </div>`;
+    }
+    html += '</div>';
+  }
+
+  // Mostrar invocacoes que concedem magias (exceto pactos)
+  const invocacoesComMagia = extrairInvocacoesMagicasBruxo(estado.invocacoes);
+  if (invocacoesComMagia.length > 0) {
+    html += '<div style="margin-top:8px">';
+    html += '<div style="font-size:0.7rem;font-weight:700;color:var(--secondary);margin-bottom:4px">Magias via Invocacoes:</div>';
+    for (const inv of invocacoesComMagia) {
+      html += `
+        <div class="magia-item" style="margin:2px 0;padding:4px 8px;border-left:2px solid var(--secondary)">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div class="magia-nome" style="font-size:0.8rem">${inv.magia}</div>
+              <div style="font-size:0.6rem;color:var(--text-muted)">${inv.invocacao} (sem gastar espaco)</div>
+            </div>
+            <button class="btn btn-sm btn-primary" data-conjurar-pacto="${inv.magia}" style="font-size:0.7rem">Conjurar</button>
+          </div>
+        </div>`;
+    }
+    html += '</div>';
+  }
+
+  html += '</div></details>';
+  return html;
+}
+
+// Extrai invocacoes que concedem magias sem gastar espaco de magia
+function extrairInvocacoesMagicasBruxo(invocacoesSelecionadas) {
+  // Mapa de invocacoes que concedem magias conhecidas (nome_invocacao -> magia_concedida)
+  const MAPA_INVOCACOES_MAGIA = {
+    'Armadura de Sombras': 'Armadura Arcana',
+    'Mascara das Muitas Faces': 'Disfarcar-se',
+    'Visoes Nebulosas': 'Imagem Silenciosa',
+    'Salto Sobrenatural': 'Salto',
+    'Passo Ascendente': 'Levitacao',
+    'Mestre das Infindaveis Formas': 'Alterar-se',
+    'Uno com as Sombras': 'Invisibilidade',
+    'Presente das Profundezas': 'Respirar na Agua',
+    'Visoes de Reinos Distantes': 'Olho Arcano',
+    'Lamento das Sepulturas': 'Falar com Mortos',
+    'Vigor Infero': 'Vitalidade Vazia'
+  };
+  const resultado = [];
+  for (const inv of invocacoesSelecionadas) {
+    // Suporta tanto string quanto objeto {nome, truque?}
+    const nomeInv = typeof inv === 'string' ? inv : inv.nome;
+    const invNorm = semAcento(nomeInv);
+    for (const [nomeMap, magia] of Object.entries(MAPA_INVOCACOES_MAGIA)) {
+      if (semAcento(nomeMap) === invNorm) {
+        resultado.push({ invocacao: nomeInv, magia });
+      }
+    }
+  }
+  return resultado;
+}
+
 function renderSecaoMagias() {
   const info = CLASSES_INFO[char.classe];
   const subConj = getSubclasseConjuradoraConjuracao();
   const tipoConj = info.tipo_conjuracao || (subConj ? 'preparadas' : 'preparadas');
-  const truques = (char.magias_conhecidas || []).filter(m => m.circulo === 0);
+  const todosTruques = (char.magias_conhecidas || []).filter(m => m.circulo === 0);
+  const truquesEspecie = todosTruques.filter(m => m.origem === 'especie');
+  const truquesClasse = todosTruques.filter(m => m.origem !== 'especie');
   const preparadas = char.magias_preparadas || [];
   const espacos = char.espacos_magia || {};
 
@@ -7005,6 +7995,24 @@ function renderSecaoMagias() {
   const ehMago = char.classe === 'Mago';
   const grimorio = char.grimorio || [];
 
+  // Mapa de truques modificados por invocacoes do Bruxo (para indicacao visual)
+  const truquesModificadosMapa = {};
+  if (char?.classe === 'Bruxo' && char.recursos?.bruxo?.invocacoes) {
+    const INV_TRUQUE_LABELS = {
+      'Explosão Agonizante': '+Carisma ao dano',
+      'Explosão Repulsiva': 'Empurra 3m',
+      'Lança Mística': 'Alcance aumentado'
+    };
+    for (const inv of char.recursos.bruxo.invocacoes) {
+      const nomeInv = typeof inv === 'string' ? inv : inv.nome;
+      const truque = inv?.truque;
+      if (truque && INV_TRUQUE_LABELS[nomeInv]) {
+        if (!truquesModificadosMapa[truque]) truquesModificadosMapa[truque] = [];
+        truquesModificadosMapa[truque].push({ invocacao: nomeInv, efeito: INV_TRUQUE_LABELS[nomeInv] });
+      }
+    }
+  }
+
   return `
     <div class="card print-break-before">
       <div class="card-header">
@@ -7018,9 +8026,15 @@ function renderSecaoMagias() {
       <!-- Contador de magias preparadas/conhecidas e truques -->
       <div class="magia-contadores" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
         ${maxTruques > 0 ? `
-          <div class="magia-contador ${truques.length > maxTruques ? 'contador-excedido' : truques.length === maxTruques ? 'contador-cheio' : ''}">
+          <div class="magia-contador ${truquesClasse.length > maxTruques ? 'contador-excedido' : truquesClasse.length === maxTruques ? 'contador-cheio' : ''}">
             <span class="contador-label">Truques</span>
-            <span class="contador-valor">${truques.length} / ${maxTruques}</span>
+            <span class="contador-valor">${truquesClasse.length} / ${maxTruques}</span>
+          </div>
+        ` : ''}
+        ${truquesEspecie.length > 0 ? `
+          <div class="magia-contador contador-dominio">
+            <span class="contador-label">Truques (Espécie)</span>
+            <span class="contador-valor">${truquesEspecie.length}</span>
           </div>
         ` : ''}
         ${maxPreparadas > 0 ? `
@@ -7060,6 +8074,9 @@ function renderSecaoMagias() {
         </div>
       ` : ''}
 
+      <!-- Dádivas do Pacto (Bruxo) -->
+      ${renderSecaoPactoBruxo()}
+
       <!-- Magias Preparadas por Círculo -->
       ${Object.keys(preparadasPorCirculo).sort((a, b) => parseInt(a) - parseInt(b)).map(circ => {
         const magias = preparadasPorCirculo[circ];
@@ -7091,7 +8108,7 @@ function renderSecaoMagias() {
                         ${circulos.map(c => `<option value="${c}"${c == m.circulo ? ' selected' : ''}>${c}º</option>`).join('')}
                       </select>
                     ` : ''}
-                    <button class="btn btn-sm ${todosEsgotados ? 'btn-secondary' : 'btn-primary'}" data-conjurar="${m.nome}" data-conj-circ="${m.circulo}" ${todosEsgotados ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Conjurar</button>
+                    <button class="btn btn-sm ${todosEsgotados ? 'btn-secondary' : 'btn-primary'}" data-conjurar="${m.nome}" data-conj-circ="${circulos[0] || m.circulo}" ${todosEsgotados ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Conjurar</button>
                   </div>
                 </div>
                 <div class="magia-desc"></div>
@@ -7128,24 +8145,43 @@ function renderSecaoMagias() {
       ` : ''}
 
       <!-- Truques -->
-      ${truques.length > 0 ? `
+      ${todosTruques.length > 0 ? `
         <details open style="margin-bottom:8px">
           <summary style="font-weight:700;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--border-light)">
-            Truques (${truques.length}${maxTruques ? ' / ' + maxTruques : ''})
+            Truques (${truquesClasse.length}${maxTruques ? ' / ' + maxTruques : ''}${truquesEspecie.length > 0 ? ` + ${truquesEspecie.length} espécie` : ''})
           </summary>
           <div style="padding-top:4px">
-            ${truques.map(m => `
-              <div class="magia-item" data-magia-nome="${m.nome}" data-magia-circ="0">
+            ${truquesEspecie.map(m => `
+              <div class="magia-item magia-dominio" data-magia-nome="${m.nome}" data-magia-circ="0">
                 <div style="display:flex;justify-content:space-between;align-items:center">
                   <div>
-                    <div class="magia-nome">${m.nome}</div>
+                    <div class="magia-nome"><span class="badge-dominio" title="Truque de Espécie">&#9733;</span> ${m.nome}</div>
                     ${badgesMagiaRapidos(m.nome)}
+                    <div style="font-size:0.65rem;color:var(--secondary);font-weight:600;margin-top:1px">Espécie</div>
                   </div>
                   <button class="btn btn-sm btn-primary" data-conjurar="${m.nome}" data-conj-circ="0">Conjurar</button>
                 </div>
                 <div class="magia-desc"></div>
               </div>
             `).join('')}
+            ${truquesClasse.map(m => {
+              const mods = truquesModificadosMapa[m.nome] || [];
+              const modHtml = mods.length > 0
+                ? `<div style="font-size:0.6rem;color:var(--accent);font-weight:600;margin-top:1px">${mods.map(mod => `${mod.invocacao}: ${mod.efeito}`).join(' | ')}</div>`
+                : '';
+              return `
+              <div class="magia-item ${mods.length > 0 ? 'magia-dominio' : ''}" data-magia-nome="${m.nome}" data-magia-circ="0">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div class="magia-nome">${mods.length > 0 ? '<span class="badge-dominio" title="Modificado por Invocacao">&#9889;</span> ' : ''}${m.nome}</div>
+                    ${badgesMagiaRapidos(m.nome)}
+                    ${modHtml}
+                  </div>
+                  <button class="btn btn-sm btn-primary" data-conjurar="${m.nome}" data-conj-circ="0">Conjurar</button>
+                </div>
+                <div class="magia-desc"></div>
+              </div>`;
+            }).join('')}
           </div>
         </details>
       ` : ''}
@@ -7278,7 +8314,7 @@ function setupEventosEspacosMagia() {
               <span>${magia.duracao}</span>
             </div>
             <div class="md-content">${mdParaHtml(magia.descricao)}</div>
-            ${magia.circulo_superior ? `<div class="info-box info" style="margin-top:4px"><strong>Circulos superiores:</strong> ${magia.circulo_superior}</div>` : ''}
+            ${magia.circulo_superior ? `<div class="info-box info" style="margin-top:4px"><strong>Circulos superiores:</strong><div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
           `;
         }
       }
@@ -7385,8 +8421,8 @@ async function mostrarBuscaMagia() {
 
   abrirModal('Gerenciar Magias', `
     <div style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:6px;font-size:0.78rem">
-      <span class="magia-contador ${(char.magias_conhecidas || []).filter(m => m.circulo === 0).length >= maxTruq ? 'contador-cheio' : ''}" id="gm-contador-truques">
-        Truques: ${(char.magias_conhecidas || []).filter(m => m.circulo === 0).length}/${maxTruq}
+      <span class="magia-contador ${(char.magias_conhecidas || []).filter(m => m.circulo === 0 && m.origem !== 'especie').length >= maxTruq ? 'contador-cheio' : ''}" id="gm-contador-truques">
+        Truques: ${(char.magias_conhecidas || []).filter(m => m.circulo === 0 && m.origem !== 'especie').length}/${maxTruq}
       </span>
       <span class="magia-contador ${preparadasNormais.length >= maxPrep ? 'contador-cheio' : preparadasNormais.length > maxPrep ? 'contador-excedido' : ''}" id="gm-contador-preparadas">
         ${labelMg}s: ${preparadasNormais.length}/${maxPrep}
@@ -7446,16 +8482,36 @@ async function mostrarBuscaMagia() {
     } else if (tabAtiva === 'truques') {
       // Truques: grid da classe com toggle
       const truquesAtuais = (char.magias_conhecidas || []).filter(m => m.circulo === 0);
-      const numTruq = truquesAtuais.length;
-      html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">Truques: ${numTruq}/${maxTruq}</div>`;
+      const truquesEsp = truquesAtuais.filter(m => m.origem === 'especie');
+      const numTruq = truquesAtuais.length - truquesEsp.length;
+      html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">Truques: ${numTruq}/${maxTruq}${truquesEsp.length > 0 ? ` (+${truquesEsp.length} espécie)` : ''}</div>`;
 
       const selecionadosSet = new Set(truquesAtuais.map(m => m.nome));
+      const truquesEspSet = new Set(truquesEsp.map(m => m.nome));
+
+      // Exibir truques de espécie (não removíveis) primeiro
+      if (truquesEsp.length > 0) {
+        let listaEsp = truquesEsp;
+        if (termo.length >= 2) listaEsp = listaEsp.filter(m => semAcento(m.nome).includes(termo));
+        html += `<div style="font-size:0.75rem;font-weight:700;color:var(--secondary);margin:8px 0 4px">Truques de Espécie</div>`;
+        html += `<div class="magias-grid">${listaEsp.map(m => `
+          <div class="magia-card selecionada magia-dominio" style="opacity:0.7;cursor:default">
+            <span class="magia-card-check"></span>
+            <div class="magia-card-nome"><span class="badge-dominio">&#9733;</span> ${m.nome}</div>
+            <div class="magia-card-meta"><span>Espécie</span></div>
+            <span class="magia-card-info" data-detalhe-magia="${m.nome}" data-detalhe-circ="0" title="Ver detalhes">&#9432;</span>
+          </div>
+        `).join('')}</div>`;
+      }
+
       let lista = [...truquesClasse];
       lista.sort((a, b) => {
         const aSel = selecionadosSet.has(a.nome) ? 0 : 1;
         const bSel = selecionadosSet.has(b.nome) ? 0 : 1;
         return aSel - bSel || a.nome.localeCompare(b.nome);
       });
+      // Filtrar truques de espécie da lista de classe (evitar duplicatas)
+      lista = lista.filter(m => !truquesEspSet.has(m.nome));
       if (termo.length >= 2) lista = lista.filter(m => semAcento(m.nome).includes(termo));
       const cheioTruq = numTruq >= maxTruq;
 
@@ -7538,13 +8594,16 @@ async function mostrarBuscaMagia() {
       el.addEventListener('click', (e) => {
         if (e.target.closest('[data-detalhe-magia]')) return;
         const nome = el.dataset.toggleTruque;
+        // Não permitir remover truques de espécie
+        const entradaExistente = (char.magias_conhecidas || []).find(m => m.nome === nome);
+        if (entradaExistente && entradaExistente.origem === 'especie') return;
         const idx = (char.magias_conhecidas || []).findIndex(m => m.nome === nome);
         if (idx >= 0) {
           char.magias_conhecidas.splice(idx, 1);
           salvar();
           toast(`${nome} removido`, 'success');
         } else {
-          const numAtual = (char.magias_conhecidas || []).filter(m => m.circulo === 0).length;
+          const numAtual = (char.magias_conhecidas || []).filter(m => m.circulo === 0 && m.origem !== 'especie').length;
           if (numAtual >= maxTruq) { toast(`Limite de ${maxTruq} truques atingido`, 'error'); return; }
           char.magias_conhecidas.push({ nome, circulo: 0 });
           salvar();
@@ -7607,7 +8666,7 @@ async function mostrarBuscaMagia() {
             <span>${magia.duracao}</span>
           </div>
           <div class="md-content">${mdParaHtml(magia.descricao)}</div>
-          ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em círculos superiores:</strong> ${magia.circulo_superior}</div>` : ''}
+          ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em círculos superiores:</strong><div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
           ${(magia.classes || []).length > 0 ? `<div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px">Classes: ${magia.classes.join(', ')}</div>` : ''}
         `;
         abrirModal(magia.nome, detalhesHtml, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
@@ -7621,7 +8680,8 @@ async function mostrarBuscaMagia() {
     (char.magias_preparadas || []).filter(m => magiaContaNoLimite(m)).forEach(m => preparadasNormais.push(m));
 
     // Atualizar contador de truques no topo do modal
-    const numTruques = (char.magias_conhecidas || []).filter(m => m.circulo === 0).length;
+    // Excluir truques de espécie do contador de classe
+    const numTruques = (char.magias_conhecidas || []).filter(m => m.circulo === 0 && m.origem !== 'especie').length;
     const contTruques = document.getElementById('gm-contador-truques');
     if (contTruques) {
       contTruques.textContent = `Truques: ${numTruques}/${maxTruq}`;
@@ -7964,7 +9024,7 @@ async function mostrarTrocaMagias(callbackPosTroca = null) {
             <span>${magia.componentes}</span> <span>${magia.duracao}</span>
           </div>
           <div class="md-content">${mdParaHtml(magia.descricao)}</div>
-          ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em círculos superiores:</strong> ${magia.circulo_superior}</div>` : ''}
+          ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em círculos superiores:</strong><div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
         `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
       });
     });
@@ -8069,7 +9129,7 @@ const CONDICOES_DESCRICAO = {
   'Caído': 'Unicas opcoes de movimento: rastejar ou gastar metade do Deslocamento para se levantar. Desvantagem em jogadas de ataque. Ataques contra voce tem Vantagem a 1,5m; caso contrario, tem Desvantagem.',
   'Cego': 'Nao pode ver. Falha automatica em testes que dependam de visao. Ataques contra voce tem Vantagem, seus ataques tem Desvantagem.',
   'Contido': 'Deslocamento 0 e nao pode aumentar. Ataques contra voce tem Vantagem, seus ataques tem Desvantagem. Desvantagem em salvaguardas de Destreza.',
-  'Enfeitiçado': 'Nao pode atacar quem o enfeiticou nem o ter como alvo de efeitos nocivos. Quem o enfeiticou tem Vantagem em testes de interacao social contra voce.',
+  'Enfeitiçado': 'Nao pode atacar quem o enfeiticou nem o ter como alvo de ataques ou efeitos magicos. Quem o enfeiticou tem Vantagem em qualquer teste de atributo para interacoes sociais com voce.',
   'Envenenado': 'Desvantagem em jogadas de ataque e testes de atributo.',
   'Exaustão': 'Cumulativa (niveis 1-6). Testes de D20 reduzidos em 2x nivel. Deslocamento reduzido em 1,5m x nivel. Nivel 6 = morte. Descanso Longo remove 1 nivel.',
   'Imobilizado': 'Deslocamento 0 e nao pode aumentar. Desvantagem em jogadas de ataque contra qualquer alvo que nao seja o imobilizador. O imobilizador pode arrastar/carregar voce (custo +1m por metro).',
@@ -8650,11 +9710,13 @@ function setupEventosInventarioSheet() {
   // Drag and drop
   setupSheetDragDrop();
 
-  // Adicionar item (por categorias)
-  document.getElementById('btn-add-inv')?.addEventListener('click', () => mostrarSeletorCategoria());
+  // Adicionar item (por categorias) - usar onclick direto para evitar empilhar handlers em re-renders
+  const btnAddInv = document.getElementById('btn-add-inv');
+  if (btnAddInv) btnAddInv.onclick = () => mostrarSeletorCategoria();
 
   // Item customizado
-  document.getElementById('btn-add-inv-custom')?.addEventListener('click', () => {
+  const btnAddCustom = document.getElementById('btn-add-inv-custom');
+  if (btnAddCustom) btnAddCustom.onclick = () => {
     abrirModal('Item Customizado', `
       <div class="form-group"><label class="form-label" for="ic-nome">Nome</label><input type="text" class="form-input" id="ic-nome"></div>
       <div class="form-group"><label class="form-label" for="ic-desc">Descricao</label><textarea class="form-textarea" id="ic-desc" rows="2"></textarea></div>
@@ -8729,7 +9791,7 @@ function setupEventosInventarioSheet() {
       renderFichaCompleta();
       toast(`${nome} adicionado!`, 'success');
     });
-  });
+  };
 
   // Editar PO
   document.getElementById('btn-edit-po')?.addEventListener('click', () => {

@@ -245,7 +245,8 @@ function extrairMagiasSemprePreparadasTabela(descricao, nivelAlvo) {
       .map(x => (x[1] || '').trim())
       .filter(Boolean);
 
-    const nomesLinha = (nomesItalico.length ? nomesItalico : colunaMagias.split(','))
+    // Separar por virgula caso italico envolva multiplas magias (ex: *Magia1, Magia2*)
+    const nomesLinha = (nomesItalico.length ? nomesItalico.flatMap(n => n.split(',')) : colunaMagias.split(','))
       .map(n => n.replace(/[*_`]/g, '').trim())
       .filter(Boolean);
 
@@ -264,15 +265,29 @@ function extrairMagiasSemprePreparadasTexto(descricao) {
   const texto = descricao.toLowerCase();
   if (!texto.includes('sempre') || !texto.includes('preparad')) return [];
 
+  // Se a descricao contem uma tabela markdown, pular - a funcao de tabela cuida disso
+  if (/\|\s*\d+\s*\|/.test(descricao) || /\|\s*\*\d+\*\s*\|/.test(descricao)) return [];
+
+  // Extrair apenas de frases que contenham "sempre" + "preparad" + itálico juntos
+  // Ex.: "Você sempre tem a magia *Destruição Divina* preparada."
   const nomes = [];
-  const regex = /\*([^*]+)\*/g;
-  let match;
-  while ((match = regex.exec(descricao)) !== null) {
-    const nome = (match[1] || '').trim();
-    if (!nome) continue;
-    if (nome.includes('|')) continue;
-    if (nome.length < 2) continue;
-    nomes.push(nome);
+  // Dividir em frases/parágrafos (por ponto final, quebra de linha dupla, ou **negrito**)
+  const frases = descricao.split(/(?:\.\s|\n\n|\*\*)/);
+  for (const frase of frases) {
+    const fl = frase.toLowerCase();
+    if (!fl.includes('sempre') || !fl.includes('preparad')) continue;
+    // Extrair nomes em itálico dentro desta frase
+    const regex = /\*([^*]+)\*/g;
+    let match;
+    while ((match = regex.exec(frase)) !== null) {
+      const nome = (match[1] || '').trim();
+      if (!nome) continue;
+      if (nome.includes('|')) continue;
+      if (nome.length < 2) continue;
+      // Descartar headers/textos longos que não são nomes de magias
+      if (nome.includes('º') || nome.includes('Círculo') || nome.includes('Nível')) continue;
+      nomes.push(nome);
+    }
   }
   return nomes;
 }
@@ -286,7 +301,25 @@ export async function obterMagiasSemprePreparadasNivel(classe, subclasse, nivel)
 
   const nomes = new Set();
 
-  const featsClasse = classeData.caracteristicas || [];
+  // Montar mapa: nome de feature -> conjunto de subclasses que a possuem
+  // Usado para excluir features de classe que pertencem a OUTRAS subclasses
+  const featParaSubclasses = new Map();
+  if (classeData.subclasses) {
+    for (const s of classeData.subclasses) {
+      for (const c of (s.caracteristicas || [])) {
+        if (!featParaSubclasses.has(c.nome)) featParaSubclasses.set(c.nome, new Set());
+        featParaSubclasses.get(c.nome).add(s.nome);
+      }
+    }
+  }
+
+  const featsClasse = (classeData.caracteristicas || []).filter(f => {
+    const subs = featParaSubclasses.get(f.nome);
+    // Se a feature não existe em nenhuma subclasse, manter (é feature de classe)
+    if (!subs) return true;
+    // Se existe em subclasses, manter apenas se pertence à subclasse escolhida
+    return subs.has(subclasse);
+  });
 
   // Características da classe no nível atual (texto corrido + tabela)
   featsClasse
@@ -475,6 +508,9 @@ export async function atualizarEspacosMagia(personagem, classeData) {
   if (!classeData || !classeData.tabela_caracteristicas) return;
   
   const espacos = getEspacosMagia(classeData.tabela_caracteristicas, personagem.nivel);
+  
+  // Garantir que espacos_magia exista
+  if (!personagem.espacos_magia) personagem.espacos_magia = {};
   
   // Preservar espaços usados se já existirem, caso contrário resetar
   Object.keys(espacos).forEach(circulo => {

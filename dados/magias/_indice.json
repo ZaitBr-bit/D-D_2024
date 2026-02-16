@@ -929,7 +929,7 @@
       ],
       "tempo_conjuracao": "Ação",
       "alcance": "Toque",
-      "componentes": "",
+      "componentes": "V, S",
       "duracao": "7 dias"
     },
     {
@@ -1458,7 +1458,7 @@
       ],
       "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após atingir uma criatura com uma arma Corpo a Corpo ou um Ataque Desarmado",
       "alcance": "Pessoal",
-      "componentes": "",
+      "componentes": "V",
       "duracao": "Instantânea"
     },
     {
@@ -1470,7 +1470,7 @@
       ],
       "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após atingir uma criatura com uma arma Corpo a Corpo ou um Ataque Desarmado",
       "alcance": "Pessoal",
-      "componentes": "",
+      "componentes": "V",
       "duracao": "Concentração, até 1 minuto"
     },
     {
@@ -1482,7 +1482,7 @@
       ],
       "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após acertar um alvo com uma arma Corpo a Corpo ou um Ataque Desarmado",
       "alcance": "Pessoal",
-      "componentes": "",
+      "componentes": "V",
       "duracao": "1 minuto"
     },
     {
@@ -1494,7 +1494,7 @@
       ],
       "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após atingir uma criatura com uma arma Corpo a Corpo ou um Ataque Desarmado",
       "alcance": "Pessoal",
-      "componentes": "",
+      "componentes": "V",
       "duracao": "1 minuto"
     },
     {
@@ -1530,7 +1530,7 @@
       ],
       "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após acertar um alvo com uma arma Corpo a Corpo ou um Ataque Desarmado",
       "alcance": "Pessoal",
-      "componentes": "",
+      "componentes": "V",
       "duracao": "Instantânea"
     },
     {
@@ -1542,7 +1542,7 @@
       ],
       "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após atingir uma criatura com uma arma Corpo a Corpo ou um Ataque Desarmado",
       "alcance": "Pessoal",
-      "componentes": "",
+      "componentes": "V",
       "duracao": "Concentração, até 1 minuto"
     },
     {
@@ -2017,7 +2017,7 @@
       ],
       "tempo_conjuracao": "Ação",
       "alcance": "36 metros",
-      "componentes": "",
+      "componentes": "V, S",
       "duracao": "Instantânea"
     },
     {
@@ -3569,7 +3569,7 @@
       ],
       "tempo_conjuracao": "Ação",
       "alcance": "18 metros",
-      "componentes": "",
+      "componentes": "V",
       "duracao": "Instantânea"
     },
     {
@@ -3582,7 +3582,7 @@
       ],
       "tempo_conjuracao": "Ação",
       "alcance": "18 metros",
-      "componentes": "",
+      "componentes": "V",
       "duracao": "Instantânea"
     },
     {
@@ -3597,7 +3597,7 @@
       ],
       "tempo_conjuracao": "Ação",
       "alcance": "18 metros",
-      "componentes": "",
+      "componentes": "V",
       "duracao": "Instantânea"
     },
     {
@@ -3610,7 +3610,7 @@
       ],
       "tempo_conjuracao": "Ação",
       "alcance": "18 metros",
-      "componentes": "",
+      "componentes": "V",
       "duracao": "Instantânea"
     },
     {
@@ -3747,7 +3747,7 @@
       ],
       "tempo_conjuracao": "Ação Bônus",
       "alcance": "Toque",
-      "componentes": "",
+      "componentes": "V, S, M (um punhado de casca de árvore)",
       "duracao": "1 hora"
     },
     {
@@ -4407,7 +4407,7 @@
       ],
       "tempo_conjuracao": "Ação",
       "alcance": "Toque",
-      "componentes": "",
+      "componentes": "V, S",
       "duracao": "Concentração, até 1 minuto"
     },
     {
@@ -4552,7 +4552,7 @@
       ],
       "tempo_conjuracao": "Ação Bônus",
       "alcance": "Toque",
-      "componentes": "",
+      "componentes": "V, S, M (perna traseira de um gafanhoto)",
       "duracao": "1 minuto"
     },
     {
@@ -4928,7 +4928,7 @@
       ],
       "tempo_conjuracao": "Ação",
       "alcance": "36 metros",
-      "componentes": "",
+      "componentes": "V, S, M (uma pitada de fósforo)",
       "duracao": "Concentração, até 1 minuto"
     },
     {
@@ -5160,7 +5160,7 @@
       ],
       "tempo_conjuracao": "Ação Bônus",
       "alcance": "Pessoal",
-      "componentes": "",
+      "componentes": "V, S",
       "duracao": "Instantânea"
     },
     {

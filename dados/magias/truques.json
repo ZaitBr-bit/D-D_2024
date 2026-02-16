@@ -46,7 +46,7 @@
       "alcance": "9 metros",
       "componentes": "V, S",
       "duracao": "Instantânea",
-      "descricao": "Um sprite conjura Arte Druídica para fazer as flores florescerem.\nSussurrando para os espíritos da natureza, você cria um dos seguintes efeitos no alcance da magia.\nBrincar com Fogo. Você acende ou apaga uma vela, uma tocha ou uma fogueira.\nEfeito Sensorial. Você cria um efeito sensorial inofensivo, como folhas caindo, fadas dançantes espectrais, uma brisa suave, o som de um animal ou o leve odor de gambá. O efeito deve caber em um Cubo de 1,5 metro de lado.\nFlorescimento. Você instantaneamente faz uma flor desabrochar, uma vagem se abrir ou um botão de folha se abrir.\nSensor Climático. Você cria um efeito sensorial minúsculo e inofensivo que prevê qual será o clima no local onde você está pelas próximas 24 horas. O efeito pode se manifestar como uma esfera dourada para céu claro, uma nuvem para chuva, flocos de neve caindo para neve e assim por diante. Esse efeito persiste por 1 rodada.",
+      "descricao": "Sussurrando para os espíritos da natureza, você cria um dos seguintes efeitos no alcance da magia.\nBrincar com Fogo. Você acende ou apaga uma vela, uma tocha ou uma fogueira.\nEfeito Sensorial. Você cria um efeito sensorial inofensivo, como folhas caindo, fadas dançantes espectrais, uma brisa suave, o som de um animal ou o leve odor de gambá. O efeito deve caber em um Cubo de 1,5 metro de lado.\nFlorescimento. Você instantaneamente faz uma flor desabrochar, uma vagem se abrir ou um botão de folha se abrir.\nSensor Climático. Você cria um efeito sensorial minúsculo e inofensivo que prevê qual será o clima no local onde você está pelas próximas 24 horas. O efeito pode se manifestar como uma esfera dourada para céu claro, uma nuvem para chuva, flocos de neve caindo para neve e assim por diante. Esse efeito persiste por 1 rodada.",
       "circulo_superior": ""
     },
     {
@@ -161,9 +161,9 @@
       ],
       "tempo_conjuracao": "Ação",
       "alcance": "36 metros",
-      "componentes": "",
+      "componentes": "V, S",
       "duracao": "Instantânea",
-      "descricao": "Componente: V, S\nVocê dispara energia arcana contra uma criatura ou objeto no alcance da magia. Realize uma jogada de ataque à distância contra o alvo. Em caso de acerto, o alvo sofre 1d8 pontos de dano de um tipo à sua escolha: Ácido, Elétrico, Gélido, Ígneo, Psíquico, Trovejante ou Venenoso.\nSe você tirar um 8 no d8 para esta magia, pode jogar outro d8 e adicionar ao dano. Ao conjurar essa magia, o número máximo de d8 adicionais que você pode somar ao dano da magia é igual ao seu modificador de atributo de conjuração.",
+      "descricao": "Você dispara energia arcana contra uma criatura ou objeto no alcance da magia. Realize uma jogada de ataque à distância contra o alvo. Em caso de acerto, o alvo sofre 1d8 pontos de dano de um tipo à sua escolha: Ácido, Elétrico, Gélido, Ígneo, Psíquico, Trovejante ou Venenoso.\nSe você tirar um 8 no d8 para esta magia, pode jogar outro d8 e adicionar ao dano. Ao conjurar essa magia, o número máximo de d8 adicionais que você pode somar ao dano da magia é igual ao seu modificador de atributo de conjuração.",
       "circulo_superior": "Aprimoramento de Truque. O dano aumenta em 1d8 quando você atinge os níveis 5 (2d8), 11 (3d8) e 17 (4d8)."
     },
     {
@@ -434,9 +434,9 @@
       ],
       "tempo_conjuracao": "Ação",
       "alcance": "Toque",
-      "componentes": "",
+      "componentes": "V, S",
       "duracao": "Concentração, até 1 minuto",
-      "descricao": "Componente: V, S\nVocê toca uma criatura voluntária e escolhe um tipo de dano: Ácido, Contundente, Cortante, Elétrico, Gélido, Ígneo, Necrótico, Perfurante, Radiante, Trovejante ou Venenoso. Quando a criatura sofre dano do tipo escolhido antes que a magia termine, a criatura reduz o dano total sofrido em 1d4 pontos. Uma criatura pode se beneficiar desta magia apenas uma vez por turno.",
+      "descricao": "Você toca uma criatura voluntária e escolhe um tipo de dano: Ácido, Contundente, Cortante, Elétrico, Gélido, Ígneo, Necrótico, Perfurante, Radiante, Trovejante ou Venenoso. Quando a criatura sofre dano do tipo escolhido antes que a magia termine, a criatura reduz o dano total sofrido em 1d4 pontos. Uma criatura pode se beneficiar desta magia apenas uma vez por turno.",
       "circulo_superior": ""
     },
     {
@@ -529,7 +529,7 @@
       "alcance": "18 metros",
       "componentes": "V",
       "duracao": "Instantânea",
-      "descricao": "Um gnomo Bardo conjura Zombaria Perversa para aborrecer um kobold com insultos mágicos.\nVocê libera uma série de insultos carregados com encantamentos sutis em uma criatura que pode ouvir você e que esteja à sua vista e no alcance da magia. O alvo deve ser bem-sucedido em uma salvaguarda de Sabedoria ou sofre 1d6 pontos de dano Psíquico e tem Desvantagem na próxima jogada de ataque que realizar antes do final do próximo turno dele.",
+      "descricao": "Você libera uma série de insultos carregados com encantamentos sutis em uma criatura que pode ouvir você e que esteja à sua vista e no alcance da magia. O alvo deve ser bem-sucedido em uma salvaguarda de Sabedoria ou sofre 1d6 pontos de dano Psíquico e tem Desvantagem na próxima jogada de ataque que realizar antes do final do próximo turno dele.",
       "circulo_superior": "Aprimoramento de Truque. O dano aumenta em 1d6 quando você atinge os níveis 5 (2d6), 11 (3d6) e 17 (4d6)."
     }
   ]
