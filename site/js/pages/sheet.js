@@ -3063,54 +3063,48 @@ function renderFichaCompleta() {
     <!-- Sentidos Passivos -->
     ${renderSecaoSentidos()}
 
-    <!-- Perícias agrupadas por atributo -->
+    <!-- Pericias em ordem customizada -->
     <div class="card">
       <div class="card-header"><h2>Pericias</h2></div>
-      <div class="pericias-por-atributo">
+      <div class="pericias-lista-custom">
         ${(() => {
-          const grupos = {};
-          PERICIAS.forEach(p => {
-            if (!grupos[p.atributo]) grupos[p.atributo] = [];
-            grupos[p.atributo].push(p);
-          });
-          const ordemAtributos = ['Força', 'Destreza', 'Constituição', 'Inteligência', 'Sabedoria', 'Carisma'];
-          return ordemAtributos.filter(attr => grupos[attr]).map(attr => {
-            const key = ATRIBUTO_NOME_PARA_KEY[attr];
-            const modVal = calcMod(char.atributos[key]);
+          // Ordem customizada de exibicao das pericias
+          const ordemPericias = [
+            'Percepção', 'Intuição', 'Investigação', 'Religião', 'História',
+            'Prestidigitação', 'Furtividade', 'Persuasão', 'Atletismo', 'Medicina',
+            'Acrobacia', 'Enganação', 'Arcanismo', 'Sobrevivência', 'Natureza',
+            'Atuação', 'Intimidação', 'Lidar com Animais'
+          ];
+          return ordemPericias.map(nome => {
+            const p = PERICIAS.find(x => x.nome === nome);
+            if (!p) return '';
+            const key = ATRIBUTO_NOME_PARA_KEY[p.atributo];
             const estilo = ATRIBUTO_ESTILO[key] || {};
+            const proficiente = (char.pericias_proficientes || []).includes(p.nome);
+            const expertise = (char.pericias_expertise || []).includes(p.nome);
+            const bonus = calcBonusPericia(char, p.nome, {
+              emFuria: !!getEstadoFuria()?.ativa,
+              forcaPrimordialAtiva: forcaPrimordialAtiva()
+            });
+            const vd = calcVantagemDesvantagemPericia(p.nome);
+            const temVant = vd.vantagens.length > 0;
+            const temDesv = vd.desvantagens.length > 0;
+            let indicador = '';
+            if (temVant && temDesv) {
+              indicador = `<span class="pericia-vd-badge neutro" data-vd-info="Vantagem (${vd.vantagens.join(', ')}) e Desvantagem (${vd.desvantagens.join(', ')}) se anulam">—</span>`;
+            } else if (temVant) {
+              indicador = `<span class="pericia-vd-badge vantagem" data-vd-info="Vantagem: ${vd.vantagens.join(', ')}">V</span>`;
+            } else if (temDesv) {
+              indicador = `<span class="pericia-vd-badge desvantagem" data-vd-info="Desvantagem: ${vd.desvantagens.join(', ')}">D</span>`;
+            }
             return `
-              <div class="pericias-grupo">
-                <div class="pericias-grupo-header" style="border-left:3px solid ${estilo.cor || 'var(--border)'}">
-                  <span style="color:${estilo.cor || 'var(--text-muted)'}">${estilo.emoji || ''} ${attr}</span>
-                  <span class="pericias-grupo-mod">${fmtMod(modVal)}</span>
-                </div>
-                ${grupos[attr].map(p => {
-                  const proficiente = (char.pericias_proficientes || []).includes(p.nome);
-                  const expertise = (char.pericias_expertise || []).includes(p.nome);
-                  const bonus = calcBonusPericia(char, p.nome, {
-                    emFuria: !!getEstadoFuria()?.ativa,
-                    forcaPrimordialAtiva: forcaPrimordialAtiva()
-                  });
-                  const vd = calcVantagemDesvantagemPericia(p.nome);
-                  const temVant = vd.vantagens.length > 0;
-                  const temDesv = vd.desvantagens.length > 0;
-                  let indicador = '';
-                  if (temVant && temDesv) {
-                    indicador = `<span class="pericia-vd-badge neutro" data-vd-info="Vantagem (${vd.vantagens.join(', ')}) e Desvantagem (${vd.desvantagens.join(', ')}) se anulam">—</span>`;
-                  } else if (temVant) {
-                    indicador = `<span class="pericia-vd-badge vantagem" data-vd-info="Vantagem: ${vd.vantagens.join(', ')}">V</span>`;
-                  } else if (temDesv) {
-                    indicador = `<span class="pericia-vd-badge desvantagem" data-vd-info="Desvantagem: ${vd.desvantagens.join(', ')}">D</span>`;
-                  }
-                  return `
-                  <div class="pericia-item">
-                    <div class="pericia-prof ${proficiente ? (expertise ? 'expertise' : 'ativo') : ''}"></div>
-                    <span class="pericia-bonus">${fmtMod(bonus)}</span>
-                    <span class="pericia-nome">${p.nome}</span>
-                    ${indicador}
-                  </div>`;
-                }).join('')}
-              </div>`;
+            <div class="pericia-item" style="border-left:3px solid ${estilo.cor || 'var(--border)'}">
+              <div class="pericia-prof ${proficiente ? (expertise ? 'expertise' : 'ativo') : ''}"></div>
+              <span class="pericia-bonus">${fmtMod(bonus)}</span>
+              <span class="pericia-nome">${p.nome}</span>
+              <span class="pericia-atributo-tag" style="color:${estilo.cor || 'var(--text-muted)'}">${p.atributo.substring(0,3).toUpperCase()}</span>
+              ${indicador}
+            </div>`;
           }).join('');
         })()}
       </div>
@@ -14838,7 +14832,9 @@ async function gerarHtmlImpressao() {
     <div class="print-section">
       <div class="print-section-title">Pericias</div>
       <div class="print-skills-grid">
-        ${PERICIAS.map(p => {
+        ${['Percepção','Intuição','Investigação','Religião','História','Prestidigitação','Furtividade','Persuasão','Atletismo','Medicina','Acrobacia','Enganação','Arcanismo','Sobrevivência','Natureza','Atuação','Intimidação','Lidar com Animais'].map(nome => {
+          const p = PERICIAS.find(x => x.nome === nome);
+          if (!p) return '';
           const proficiente = (char.pericias_proficientes || []).includes(p.nome);
           const expertise = (char.pericias_expertise || []).includes(p.nome);
           const bonus = calcBonusPericia(char, p.nome, {

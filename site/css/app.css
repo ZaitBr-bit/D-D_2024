@@ -1634,10 +1634,27 @@ tr:hover td { background: #faf8f4; }
   cursor: pointer;
 }
 
-/* --- Perícias agrupadas por atributo --- */
+/* --- Pericias agrupadas por atributo (legado) --- */
 .pericias-por-atributo {
   columns: 2;
   column-gap: 16px;
+}
+
+/* --- Pericias em lista customizada (ordem de relevancia) --- */
+.pericias-lista-custom {
+  columns: 2;
+  column-gap: 16px;
+}
+.pericias-lista-custom .pericia-item {
+  padding-left: 6px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.pericia-atributo-tag {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  opacity: 0.7;
+  flex-shrink: 0;
 }
 .pericias-grupo {
   break-inside: avoid;
@@ -1735,6 +1752,7 @@ tr:hover td { background: #faf8f4; }
 
 @media (max-width: 480px) {
   .pericias-por-atributo { columns: 1; }
+  .pericias-lista-custom { columns: 1; }
 }
 
 
