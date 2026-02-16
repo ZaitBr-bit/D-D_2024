@@ -297,6 +297,82 @@ tr:hover td { background: #faf8f4; }
 .stat-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
 .stat-value { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
 
+/* --- Proficiencias de Equipamento --- */
+.prof-equip-row {
+  display: flex; flex-wrap: wrap; gap: 6px 16px;
+  justify-content: center; align-items: center;
+  margin-bottom: 12px; padding: 6px 12px;
+  background: var(--bg-card); border-radius: var(--radius);
+  border: 1px solid var(--border-light);
+}
+.prof-equip-group {
+  display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
+}
+.prof-equip-label {
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+  color: var(--text-muted); margin-right: 2px;
+}
+.prof-equip-badge {
+  font-size: 0.7rem; font-weight: 600; padding: 2px 8px;
+  border-radius: 10px; white-space: nowrap;
+}
+.prof-equip-armadura { background: rgba(52,152,219,0.12); color: #2980b9; border: 1px solid rgba(52,152,219,0.25); }
+.prof-equip-arma { background: rgba(192,57,43,0.1); color: #c0392b; border: 1px solid rgba(192,57,43,0.2); }
+.prof-equip-nenhuma { background: var(--border-light); color: var(--text-muted); border: 1px solid var(--border); font-style: italic; }
+.prof-equip-extra { font-style: italic; border-style: dashed !important; }
+
+/* --- Secao de HP reorganizada --- */
+.hp-section {
+  display: flex; align-items: center; justify-content: center;
+  gap: 16px; flex-wrap: wrap; margin-bottom: 4px;
+}
+.hp-main {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  flex: 1; min-width: 180px;
+}
+.hp-pv-display { text-align: center; }
+.hp-pv-label {
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted);
+}
+.hp-pv-value { font-size: 1.4rem; font-weight: 800; }
+.hp-buttons { display: flex; gap: 6px; justify-content: center; }
+.hp-secondary {
+  display: flex; gap: 12px; align-items: stretch;
+}
+.hp-sub-box {
+  text-align: center; padding: 8px 14px;
+  border: 1px solid var(--border-light); border-radius: var(--radius);
+  background: var(--bg-card); min-width: 90px;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+}
+.hp-sub-label {
+  font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 2px;
+}
+.hp-sub-value { font-size: 1.05rem; font-weight: 700; }
+
+/* Inspiracao Heroica - botao integrado */
+.hp-inspiracao {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; cursor: pointer; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  padding: 8px 14px; border-radius: var(--radius);
+  border: 2px solid var(--border); background: var(--bg-card);
+  transition: all 0.25s ease; min-width: 80px;
+}
+.hp-inspiracao:hover { border-color: var(--primary); background: rgba(52,73,94,0.06); }
+.hp-inspiracao-ativa {
+  border-color: #f1c40f !important; background: linear-gradient(135deg, #f39c12, #f1c40f) !important;
+  box-shadow: 0 2px 8px rgba(241,196,15,0.35);
+}
+.hp-inspiracao-ativa:hover { background: linear-gradient(135deg, #e67e22, #f39c12) !important; }
+.hp-inspiracao-ativa svg { fill: #fff; }
+.hp-inspiracao-texto {
+  font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
+  color: var(--text-muted); line-height: 1;
+}
+.hp-inspiracao-ativa .hp-inspiracao-texto { color: #fff; }
+
 /* --- Perícias --- */
 .pericias-lista { columns: 2; column-gap: 12px; }
 .pericia-item {
@@ -1334,6 +1410,23 @@ tr:hover td { background: #faf8f4; }
   /* Slots de magia: compactar */
   .slots-grupo label { font-size: 0.78rem; min-width: 65px; }
   .slot-bolha { width: 20px; height: 20px; }
+
+  /* Proficiencias equipamento mobile */
+  .prof-equip-row { gap: 4px 10px; padding: 4px 8px; }
+  .prof-equip-label { font-size: 0.62rem; }
+  .prof-equip-badge { font-size: 0.62rem; padding: 1px 6px; }
+
+  /* HP section mobile */
+  .hp-section { gap: 10px; }
+  .hp-main { min-width: 140px; }
+  .hp-pv-value { font-size: 1.2rem; }
+  .hp-secondary { gap: 8px; }
+  .hp-sub-box { padding: 6px 8px; min-width: 75px; }
+  .hp-sub-label { font-size: 0.58rem; }
+  .hp-sub-value { font-size: 0.9rem; }
+  .hp-inspiracao { padding: 6px 10px; min-width: 60px; }
+  .hp-inspiracao svg { width: 18px; height: 18px; }
+  .hp-inspiracao-texto { font-size: 0.52rem; }
 }
 
 @media (min-width: 481px) and (max-width: 768px) {

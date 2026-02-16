@@ -2853,38 +2853,76 @@ function renderFichaCompleta() {
         ` : ''}
       </div>
 
-      <!-- HP -->
-      <div style="display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap">
-        <!-- Inspiracao Heroica (inline) -->
-        <div id="inspiracao-toggle" class="no-print" style="text-align:center;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent" title="Inspiração Heroica">
-          <div style="width:44px;height:44px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;background:${char.inspiracao_heroica ? 'var(--primary)' : 'var(--border-light)'};border:2px solid ${char.inspiracao_heroica ? 'var(--primary)' : 'var(--border)'};transition:background 0.2s,border-color 0.2s">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="${char.inspiracao_heroica ? '#fff' : 'var(--text-muted)'}" stroke="none">
-              <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 3c.6 0 1.1.1 1.6.3L12 8.5l-1.6-3.2c.5-.2 1-.3 1.6-.3zm-4.2 2.5L10 10.3l-3.5.5c.3-.8.7-1.5 1.3-2.1v-.2zM5.5 13.5l3.5-.5-2.2 2.8c-.6-.7-1-1.4-1.3-2.3zm4.7 5.2L12 15.5l1.8 3.2c-.5.2-1.1.3-1.8.3s-1.3-.1-1.8-.3zm6-2.9L14 13l3.5-.5c-.3.9-.7 1.6-1.3 2.3zm1.3-5.3l-3.5.5 2.2-2.8c.6.6 1 1.3 1.3 2.1v.2z"/>
-            </svg>
-          </div>
-          <div style="font-size:0.55rem;font-weight:700;text-transform:uppercase;color:${char.inspiracao_heroica ? 'var(--primary)' : 'var(--text-muted)'};margin-top:2px;line-height:1">Heroica</div>
+      <!-- Proficiencias de Armas e Armaduras -->
+      ${(() => {
+        // Mesclar proficiencias base da classe com extras (subclasse, talentos, etc.)
+        const extras = (char.proficiencias_extra || []).map(p => p.toLowerCase());
+        const armadurasProf = [...info.armaduras];
+        const armasProf = [...info.armas];
+        const armadurasExtras = [];
+        const armasExtras = [];
+        // Mapear proficiencias extras para categorias
+        for (const extra of extras) {
+          if (extra === 'armadura pesada' && !armadurasProf.includes('Pesada')) { armadurasProf.push('Pesada'); armadurasExtras.push('Pesada'); }
+          else if ((extra === 'armadura média' || extra === 'armadura media') && !armadurasProf.includes('Média')) { armadurasProf.push('Média'); armadurasExtras.push('Média'); }
+          else if (extra === 'armadura leve' && !armadurasProf.includes('Leve')) { armadurasProf.push('Leve'); armadurasExtras.push('Leve'); }
+          else if (extra === 'escudo' && !armadurasProf.includes('Escudo')) { armadurasProf.push('Escudo'); armadurasExtras.push('Escudo'); }
+          else if (extra === 'armas marciais' && !armasProf.includes('Marcial')) { armasProf.push('Marcial'); armasExtras.push('Marcial'); }
+          else if (extra === 'armas simples' && !armasProf.includes('Simples')) { armasProf.push('Simples'); armasExtras.push('Simples'); }
+        }
+        return `
+      <div class="prof-equip-row">
+        <div class="prof-equip-group">
+          <span class="prof-equip-label">Armaduras:</span>
+          ${armadurasProf.length > 0
+            ? armadurasProf.map(a => `<span class="prof-equip-badge prof-equip-armadura${armadurasExtras.includes(a) ? ' prof-equip-extra' : ''}">${a}${armadurasExtras.includes(a) ? '*' : ''}</span>`).join('')
+            : '<span class="prof-equip-badge prof-equip-nenhuma">Nenhuma</span>'
+          }
         </div>
-        <div style="text-align:center">
-          <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--text-muted)">Pontos de Vida</div>
-          <div style="font-size:1.3rem;font-weight:800;color:${char.pv_atual <= (char.pv_max_override || char.pv_max) * 0.25 ? 'var(--danger)' : char.pv_atual <= (char.pv_max_override || char.pv_max) * 0.5 ? 'var(--warning)' : 'var(--success)'}">
-            ${char.pv_atual} / ${char.pv_max_override || char.pv_max}
+        <div class="prof-equip-group">
+          <span class="prof-equip-label">Armas:</span>
+          ${armasProf.map(a => `<span class="prof-equip-badge prof-equip-arma${armasExtras.includes(a) ? ' prof-equip-extra' : ''}">${a}${armasExtras.includes(a) ? '*' : ''}</span>`).join('')}
+        </div>
+        ${armadurasExtras.length > 0 || armasExtras.length > 0 ? '<div style="width:100%;font-size:0.6rem;color:var(--text-muted);text-align:center;margin-top:2px">* Concedida por subclasse/talento</div>' : ''}
+      </div>`;
+      })()}
+
+      <!-- HP / Inspiracao Heroica -->
+      <div class="hp-section">
+        <!-- Coluna principal: PV -->
+        <div class="hp-main">
+          <div class="hp-pv-display">
+            <div class="hp-pv-label">Pontos de Vida</div>
+            <div class="hp-pv-value" style="color:${char.pv_atual <= (char.pv_max_override || char.pv_max) * 0.25 ? 'var(--danger)' : char.pv_atual <= (char.pv_max_override || char.pv_max) * 0.5 ? 'var(--warning)' : 'var(--success)'}">
+              ${char.pv_atual} / ${char.pv_max_override || char.pv_max}
+            </div>
+            ${char.pv_max_override && char.pv_max_override !== char.pv_max ? `<div style="font-size:0.7rem;color:var(--info)">(Base: ${char.pv_max} | Bonus: +${char.pv_max_override - char.pv_max})</div>` : ''}
           </div>
-          ${char.pv_max_override && char.pv_max_override !== char.pv_max ? `<div style="font-size:0.7rem;color:var(--info)">(Base: ${char.pv_max} | Bônus: +${char.pv_max_override - char.pv_max})</div>` : ''}
-          <div class="no-print" style="display:flex;gap:6px;justify-content:center;margin-top:6px">
+          <div class="no-print hp-buttons">
             <button class="btn btn-sm btn-danger" id="hp-minus">Dano</button>
             <button class="btn btn-sm btn-success" id="hp-plus">Cura</button>
             <button class="btn btn-sm btn-secondary" id="hp-temp">PV Temp</button>
-            <button class="btn btn-sm btn-secondary" id="hp-max-override" title="Sobrescrever PV Máximo">⚙ PV Max</button>
+            <button class="btn btn-sm btn-secondary" id="hp-max-override" title="Sobrescrever PV Máximo">&#9881; PV Max</button>
           </div>
         </div>
-        <div style="text-align:center">
-          <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--text-muted)">PV Temporário</div>
-          <div style="font-size:1rem;font-weight:700;color:var(--info)">${char.pv_temporario || 0}</div>
+        <!-- Coluna secundaria: PV Temp + Dados de Vida -->
+        <div class="hp-secondary">
+          <div class="hp-sub-box hp-temp-box">
+            <div class="hp-sub-label">PV Temporario</div>
+            <div class="hp-sub-value" style="color:var(--info)">${char.pv_temporario || 0}</div>
+          </div>
+          <div class="hp-sub-box hp-dv-box">
+            <div class="hp-sub-label">Dados de Vida</div>
+            <div class="hp-sub-value">${char.nivel - (char.dados_vida_usados || 0)} / ${char.nivel} <span style="font-size:0.8em;color:var(--text-muted)">d${info.dado_vida || '?'}</span></div>
+            <button class="btn btn-sm btn-secondary no-print" id="btn-usar-dv" style="margin-top:4px;font-size:0.72rem;padding:3px 8px">Usar DV</button>
+          </div>
         </div>
-        <div style="text-align:center">
-          <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--text-muted)">Dados de Vida</div>
-          <div style="font-size:1rem;font-weight:700">${char.nivel - (char.dados_vida_usados || 0)} / ${char.nivel} 🎲d${info.dado_vida || '?'}🎲</div>
-          <button class="btn btn-sm btn-secondary no-print" id="btn-usar-dv" style="margin-top:4px">Usar DV</button>
+        <!-- Inspiracao Heroica -->
+        <div id="inspiracao-toggle" class="no-print hp-inspiracao ${char.inspiracao_heroica ? 'hp-inspiracao-ativa' : ''}" title="Inspiração Heroica">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="${char.inspiracao_heroica ? '#fff' : 'var(--text-muted)'}" stroke="none">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          <span class="hp-inspiracao-texto">${char.inspiracao_heroica ? 'Inspirada!' : 'Inspiracao'}</span>
         </div>
       </div>
 
