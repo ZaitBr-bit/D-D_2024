@@ -2125,16 +2125,11 @@ function renderFichaCompleta() {
 
     <!-- Stats combate -->
     <div class="card">
-      <!-- Inspiração Heroica -->
-      <div class="info-box ${char.inspiracao_heroica ? 'success' : 'info'}" style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
-        <div style="font-size:0.85rem">
-          <strong>Inspiração Heroica:</strong> ${char.inspiracao_heroica ? 'Disponível' : 'Indisponível'}
-        </div>
-        <div class="no-print" style="display:flex;gap:6px;align-items:center">
-          ${char.inspiracao_heroica
-            ? '<button class="btn btn-sm btn-accent" id="btn-usar-inspiracao-heroica">Usar (d20 extra)</button>'
-            : '<button class="btn btn-sm btn-secondary" id="btn-ganhar-inspiracao-heroica">Conceder</button>'}
-        </div>
+      <!-- Inspiração Heroica (toggle compacto) -->
+      <div class="no-print" id="inspiracao-toggle" title="${char.inspiracao_heroica ? 'Inspiração Heroica: Disponível (clique para usar)' : 'Inspiração Heroica: Indisponível (clique para conceder)'}" style="position:fixed;bottom:calc(16px + var(--safe-bottom));right:16px;z-index:90;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-lg);transition:background 0.2s,transform 0.15s;background:${char.inspiracao_heroica ? 'var(--secondary)' : 'var(--border)'};border:2px solid ${char.inspiracao_heroica ? 'var(--secondary-light)' : 'var(--border-light)'}">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="${char.inspiracao_heroica ? '#fff' : 'var(--text-muted)'}" stroke="none">
+          <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+        </svg>
       </div>
 
       ${estadoFuria ? `
@@ -2946,18 +2941,12 @@ function restaurarHabilidades(tipoDescanso) {
 }
 
 function setupEventosDescanso() {
-  // Inspiração Heroica
-  document.getElementById('btn-usar-inspiracao-heroica')?.addEventListener('click', () => {
-    char.inspiracao_heroica = false;
+  // Inspiração Heroica (toggle estrela)
+  document.getElementById('inspiracao-toggle')?.addEventListener('click', () => {
+    char.inspiracao_heroica = !char.inspiracao_heroica;
     salvar();
     renderFichaCompleta();
-    toast('Inspiração Heroica usada! Role um d20 adicional.', 'success');
-  });
-  document.getElementById('btn-ganhar-inspiracao-heroica')?.addEventListener('click', () => {
-    char.inspiracao_heroica = true;
-    salvar();
-    renderFichaCompleta();
-    toast('Inspiração Heroica concedida!', 'success');
+    toast(char.inspiracao_heroica ? 'Inspiração Heroica concedida!' : 'Inspiração Heroica usada! Role um d20 adicional.', 'success');
   });
 
   // FAB toggle

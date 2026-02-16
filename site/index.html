@@ -9,13 +9,17 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="apple-touch-icon" href="img/icon-192.png">
   <link rel="stylesheet" href="css/app.css">
+  <!-- Firebase SDK (preload para cache offline) -->
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js">
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js">
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js">
 </head>
 <body>
 
   <!-- Barra de navegação superior -->
   <header id="app-header">
-    <button id="btn-voltar" class="header-btn" onclick="window.history.back()" style="display:none">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    <button id="btn-voltar" class="header-btn" style="display:none">
+      <svg id="icone-voltar" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
     <h1 id="header-titulo">D&D 5.5 Ficha</h1>
     <div id="header-acoes"></div>

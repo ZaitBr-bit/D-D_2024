@@ -1,6 +1,6 @@
 // Service Worker para PWA D&D 5.5 Ficha de Personagem
 // Incrementar esta versão a cada deploy para forçar atualização dos caches
-const CACHE_VERSION = 37;
+const CACHE_VERSION = 41;
 const CACHE_STATIC = `dnd-ficha-static-v${CACHE_VERSION}`;
 const CACHE_DATA = `dnd-ficha-data-v${CACHE_VERSION}`;
 
@@ -18,7 +18,8 @@ const STATIC_ASSETS = [
   './js/levelup.js',
   './js/pages/home.js',
   './js/pages/creator.js',
-  './js/pages/sheet.js'
+  './js/pages/sheet.js',
+  './js/auth.js'
 ];
 
 self.addEventListener('install', (event) => {
@@ -63,6 +64,11 @@ self.addEventListener('message', (event) => {
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   const url = new URL(request.url);
+
+  // Firebase e APIs Google: sempre rede, nunca cachear
+  if (url.hostname.includes('googleapis.com') || url.hostname.includes('gstatic.com') || url.hostname.includes('firebaseapp.com') || url.hostname.includes('firebaseio.com')) {
+    return;
+  }
 
   // Navegação: Network-first com fallback pro cache
   if (request.mode === 'navigate') {

@@ -1,15 +1,57 @@
 // ============================================================
-// Página inicial - Lista de personagens
+// Pagina inicial - Lista de personagens
 // ============================================================
-import { listarPersonagens, removerPersonagem, duplicarPersonagem, exportarTodos, importarPersonagens } from '../store.js';
+import { listarPersonagens, removerPersonagem, duplicarPersonagem, exportarTodos, importarPersonagens, atualizarListaLocal, backupPersonagensLocais, restaurarPersonagensLocais } from '../store.js';
 import { toast, abrirModal, fmtData } from '../utils.js';
 import { CLASSES_INFO } from '../dados-classes.js';
+import { iniciarAuth, getUsuario, loginComGoogle, logout, onAuthChange, buscarPersonagensCloud } from '../auth.js';
+
+let _containerRef = null;
+let _sincronizando = false;
 
 export function renderHome(container) {
+  _containerRef = container;
   const personagens = listarPersonagens();
+  const usuario = getUsuario();
+
+  // Iniciar Firebase em background (nao bloqueia a renderizacao)
+  iniciarAuth().then(() => {
+    // Registrar callback de auth apenas uma vez
+    if (!renderHome._authRegistrado) {
+      renderHome._authRegistrado = true;
+      onAuthChange(() => {
+        // Re-renderizar ao mudar estado de auth
+        if (_containerRef) renderHome(_containerRef);
+      });
+    }
+  });
+
+  _renderConteudo(container, personagens, usuario);
+}
+
+function _renderConteudo(container, personagens, usuario) {
+  // Barra de conta Google (opcional)
+  const contaHtml = usuario
+    ? `<div class="card" style="display:flex;align-items:center;gap:10px;padding:10px 14px;margin-bottom:12px;background:var(--bg-input)">
+        <img src="${usuario.photoURL || ''}" alt="" style="width:32px;height:32px;border-radius:50%;${usuario.photoURL ? '' : 'display:none'}" referrerpolicy="no-referrer">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:0.85rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${usuario.displayName || usuario.email}</div>
+          <div style="font-size:0.7rem;color:var(--text-muted)">Personagens sincronizados com a nuvem</div>
+        </div>
+        <button class="btn btn-sm btn-secondary" id="btn-sync-cloud" title="Sincronizar agora">&#x21bb;</button>
+        <button class="btn btn-sm btn-secondary" id="btn-logout" title="Sair da conta">Sair</button>
+      </div>`
+    : `<div class="card" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:10px 14px;margin-bottom:12px;background:var(--bg-input)">
+        <button class="btn btn-sm" id="btn-login-google" style="display:flex;align-items:center;gap:8px;background:#fff;color:#444;border:1px solid var(--border);padding:6px 14px;font-weight:600;font-size:0.85rem;border-radius:var(--radius)">
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#34A853" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#FBBC05" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          Entrar com Google
+        </button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Opcional - salva na nuvem</span>
+      </div>`;
 
   if (personagens.length === 0) {
     container.innerHTML = `
+      ${contaHtml}
       <div class="empty-state">
         <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#7b2d26" stroke-width="1.5">
           <path d="M12 2L2 7l10 5 10-5-10-5z"/>
@@ -26,11 +68,13 @@ export function renderHome(container) {
         <button class="btn btn-secondary btn-sm" id="btn-importar">Importar Personagens</button>
       </div>
     `;
+    _setupAuthEvents(container);
     setupImportar(container);
     return;
   }
 
   container.innerHTML = `
+    ${contaHtml}
     <div class="flex justify-between items-center mb-2">
       <h2 style="font-size:1.1rem;color:var(--text)">Meus Personagens</h2>
       <div class="flex gap-1">
@@ -104,6 +148,79 @@ export function renderHome(container) {
   }
 
   setupImportar(container);
+  _setupAuthEvents(container);
+
+  // Sincronizar automaticamente ao renderizar a home se logado
+  _sincronizarSeLogado(container);
+}
+
+/** Configura eventos de login/logout/sync */
+function _setupAuthEvents(container) {
+  // Login com Google
+  document.getElementById('btn-login-google')?.addEventListener('click', async () => {
+    try {
+      toast('Abrindo login com Google...', 'info');
+      await loginComGoogle();
+      toast('Login realizado com sucesso!', 'success');
+      // A re-renderizacao sera feita pelo onAuthChange callback
+    } catch (err) {
+      if (err.code === 'auth/popup-closed-by-user') {
+        toast('Login cancelado', 'info');
+      } else {
+        console.error('Erro no login:', err);
+        toast('Erro ao fazer login: ' + (err.message || 'desconhecido'), 'error');
+      }
+    }
+  });
+
+  // Logout
+  document.getElementById('btn-logout')?.addEventListener('click', async () => {
+    try {
+      // Restaurar personagens locais ANTES do logout,
+      // pois onAuthChange re-renderiza durante o signOut
+      restaurarPersonagensLocais();
+      await logout();
+      toast('Desconectado da conta Google', 'info');
+    } catch (err) {
+      toast('Erro ao desconectar', 'error');
+    }
+  });
+
+  // Sincronizar manualmente
+  document.getElementById('btn-sync-cloud')?.addEventListener('click', () => {
+    _sincronizarSeLogado(container, true);
+  });
+}
+
+/** Sincroniza personagens com a nuvem (se logado) */
+async function _sincronizarSeLogado(container, manual = false) {
+  const usuario = getUsuario();
+  if (!usuario || _sincronizando) return;
+
+  _sincronizando = true;
+  try {
+    if (manual) toast('Sincronizando...', 'info');
+    // Fazer backup dos personagens locais antes de substituir com os da nuvem
+    backupPersonagensLocais();
+    const listaCloud = await buscarPersonagensCloud();
+    const listaAnterior = listarPersonagens();
+    atualizarListaLocal(listaCloud);
+    if (manual) {
+      toast('Sincronizado com sucesso!', 'success');
+      renderHome(container);
+    } else {
+      // Re-renderizar se houve mudanca
+      if (listaCloud.length !== listaAnterior.length ||
+          JSON.stringify(listaCloud.map(p => p.id).sort()) !== JSON.stringify(listaAnterior.map(p => p.id).sort())) {
+        renderHome(container);
+      }
+    }
+  } catch (err) {
+    console.warn('Erro na sincronizacao:', err);
+    if (manual) toast('Erro ao sincronizar: ' + (err.message || ''), 'error');
+  } finally {
+    _sincronizando = false;
+  }
 }
 
 function setupImportar(container) {

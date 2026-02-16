@@ -35,6 +35,16 @@ function processarRota() {
   acoes.innerHTML = '';
   btnVoltar.style.display = pagina === 'home' ? 'none' : 'block';
 
+  // Na ficha: botao voltar vira casinha para home; nas demais: seta para history.back()
+  const iconeVoltar = document.getElementById('icone-voltar');
+  if (pagina === 'ficha') {
+    iconeVoltar.innerHTML = '<path d="M3 12l9-9 9 9"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>';
+    btnVoltar.onclick = () => navegar('home');
+  } else {
+    iconeVoltar.innerHTML = '<path d="M15 18l-6-6 6-6"/>';
+    btnVoltar.onclick = () => window.history.back();
+  }
+
   // Definir título padrão
   const titulos = {
     'home': 'D&D 5.5 Ficha',
