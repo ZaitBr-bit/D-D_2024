@@ -438,6 +438,7 @@ function limparDadosDoPasso(stepIndex) {
       personagem.inventario = [];
       personagem.escolha_equip_classe = null;
       personagem.escolha_equip_antecedente = null;
+      personagem.instrumento_classe_escolhido = null;
       personagem.po = 0;
       break;
 
@@ -654,6 +655,11 @@ function validarStep() {
       const temOpcoesClasse = equipTexto.match(/Escolha\s+[A-Z]/i);
       if (temOpcoesClasse && !personagem.escolha_equip_classe) {
         toast('Selecione o equipamento inicial da classe', 'error');
+        return false;
+      }
+      // Verificar se requer escolha de instrumento musical
+      if (/instrumento musical à sua escolha/i.test(equipTexto) && !personagem.instrumento_classe_escolhido) {
+        toast('Escolha um Instrumento Musical para o equipamento da classe', 'error');
         return false;
       }
       // Verificar equip do antecedente
@@ -2406,7 +2412,8 @@ function parseEquipamentoOpcoes(texto) {
       const poMatch = conteudo.match(/(\d+)\s*PO$/i);
       const po = poMatch ? parseInt(poMatch[1]) : 0;
       // Extrair itens (tudo antes do PO ou todo conteúdo se for só PO)
-      let itensStr = poMatch ? conteudo.replace(/,?\s*\d+\s*PO$/i, '').trim() : conteudo;
+      // Remove também a conjuncao " e" residual antes do valor de PO (ex: "Kit de Artista e 19 PO" -> "Kit de Artista")
+      let itensStr = poMatch ? conteudo.replace(/,?\s*e?\s*\d+\s*PO$/i, '').trim() : conteudo;
       // Se for só PO (sem itens), marcar como opção de dinheiro
       const apenasOuro = !itensStr || itensStr.length < 3;
       opcoes.push({
@@ -2436,7 +2443,24 @@ function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
   }
 
   // Processar cada item da opção
-  for (const itemStr of opcao.itens) {
+  for (let itemStr of opcao.itens) {
+    // Resolver itens com "à sua escolha" - substituir por escolha do jogador se disponivel
+    if (/à sua escolha/i.test(itemStr)) {
+      // Para instrumentos musicais, usar o instrumento escolhido (do antecedente Artista ou escolha da classe)
+      if (/instrumento musical/i.test(itemStr)) {
+        const instrEscolhido = personagem.instrumento_classe_escolhido || personagem.instrumento_escolhido;
+        if (instrEscolhido) {
+          itemStr = instrEscolhido;
+        } else {
+          // Fallback: adicionar como "Instrumento Musical" generico
+          itemStr = 'Instrumento Musical';
+        }
+      } else {
+        // Outros itens "à sua escolha" - remover sufixo
+        itemStr = itemStr.replace(/\s*à sua escolha/i, '').trim();
+      }
+    }
+
     // Verificar se tem quantidade (ex: "2 Adagas", "20 Flechas")
     const qtyMatch = itemStr.match(/^(\d+)\s+(.+)$/);
     // Verificar formato "Nome (X unidades)" (ex: "Óleo (3 frascos)", "Pergaminho (10 folhas)")
@@ -2468,10 +2492,15 @@ function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
       continue;
     }
 
-    // Tentar encontrar nas armaduras (tenta plural e singular)
+    // Tentar encontrar nas armaduras (tenta plural, singular e sem prefixo "Armadura de")
+    const nomeItemSemPrefixo = nomeItem.replace(/^Armadura de /i, '');
+    const nomeSingularSemPrefixo = nomeSingular.replace(/^Armadura de /i, '');
     const armadura = dadosCache.armaduras?.find(a => {
       const nomeArm = semAcento(a.nome).toLowerCase();
-      return nomeArm === semAcento(nomeItem).toLowerCase() || nomeArm === semAcento(nomeSingular).toLowerCase();
+      return nomeArm === semAcento(nomeItem).toLowerCase()
+        || nomeArm === semAcento(nomeSingular).toLowerCase()
+        || nomeArm === semAcento(nomeItemSemPrefixo).toLowerCase()
+        || nomeArm === semAcento(nomeSingularSemPrefixo).toLowerCase();
     });
     if (armadura) {
       personagem.inventario.push({
@@ -2581,6 +2610,10 @@ async function renderStepEquipamento(el) {
       </div>`;
   };
 
+  // Verificar se o equipamento da classe requer escolha de instrumento musical
+  const classeTemInstrumento = /instrumento musical à sua escolha/i.test(equipClasse);
+  const instrumentosDisponiveis = ['Alaude', 'Corne', 'Flauta', 'Flauta de Pa', 'Gaita de Foles', 'Harpa', 'Lira', 'Oboe', 'Tambor', 'Violino'];
+
   el.innerHTML = `
     <h3 style="margin-bottom:12px">Equipamento</h3>
 
@@ -2592,6 +2625,17 @@ async function renderStepEquipamento(el) {
       personagem.classe,
       personagem.escolha_equip_classe
     ) : ''}
+
+    ${classeTemInstrumento ? `
+    <div class="card mb-2" style="border-left:3px solid var(--primary)">
+      <div class="card-header"><h3>Instrumento Musical (Classe)</h3></div>
+      <div style="padding:4px 0">
+        <select class="form-input" id="select-instrumento-classe" style="max-width:280px">
+          <option value="">-- Escolha um instrumento --</option>
+          ${instrumentosDisponiveis.map(i => `<option value="${i}" ${personagem.instrumento_classe_escolhido === i ? 'selected' : ''}>${i}</option>`).join('')}
+        </select>
+      </div>
+    </div>` : ''}
 
     ${equipAntecedente ? renderCardEquip(
       `Equipamento do Antecedente (${personagem.antecedente})`,
@@ -2660,6 +2704,21 @@ async function renderStepEquipamento(el) {
   // Eventos
   document.getElementById('input-po')?.addEventListener('input', (e) => {
     personagem.po = parseInt(e.target.value) || 0;
+  });
+
+  // Evento de escolha de instrumento musical da classe
+  document.getElementById('select-instrumento-classe')?.addEventListener('change', (e) => {
+    personagem.instrumento_classe_escolhido = e.target.value || null;
+    // Re-adicionar itens da opcao de classe selecionada para atualizar o instrumento
+    if (personagem.escolha_equip_classe && opcoesClasse) {
+      const opcao = opcoesClasse.find(o => o.letra === personagem.escolha_equip_classe);
+      if (opcao) {
+        adicionarItensEquipamentoInicial(opcao, 'classe', personagem.classe);
+        const listaEl = document.getElementById('lista-inventario');
+        if (listaEl) listaEl.innerHTML = renderListaInventario();
+        setupEventosInventario(el);
+      }
+    }
   });
 
   document.getElementById('btn-add-arma')?.addEventListener('click', () => mostrarSeletorArma());
