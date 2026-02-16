@@ -2184,11 +2184,7 @@ export async function renderSheet(container, charId) {
 
   // Atualizar header
   document.getElementById('header-titulo').textContent = char.nome || 'Ficha';
-  document.getElementById('header-acoes').innerHTML = `
-    <button class="btn header-btn no-print" id="btn-print" title="Imprimir">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-    </button>
-  `;
+  document.getElementById('header-acoes').innerHTML = '';
 
   // Carregar dados complementares
   classeData = await getClasse(char.classe);
@@ -2273,7 +2269,7 @@ export async function renderSheet(container, charId) {
 
   renderFichaCompleta();
 
-  document.getElementById('btn-print')?.addEventListener('click', () => window.print());
+  document.getElementById('btn-print')?.addEventListener('click', () => imprimirFicha());
 }
 
 function salvar() {
@@ -2523,6 +2519,10 @@ function renderFichaCompleta() {
         <div class="no-print" style="display:flex;gap:4px;flex-direction:column">
           <div style="display:flex;gap:4px">
             <button class="btn btn-sm btn-secondary" id="btn-edit-header">Editar</button>
+            <button class="btn btn-sm btn-primary" id="btn-print" title="Imprimir ou Salvar como PDF" style="gap:4px">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              Imprimir
+            </button>
           </div>
           ${char.nivel < 20 ? `
             <button class="btn btn-sm btn-accent" id="btn-levelup" style="font-weight:700">
@@ -3985,14 +3985,18 @@ function setupEventosDescanso() {
 
     salvar();
 
-    // Verificar se a classe tem Maestria em Arma e/ou troca de magias preparadas
+    // Verificar se a classe tem Maestria em Arma e/ou troca de magias
     const infoClasse = CLASSES_INFO[char.classe] || {};
     const classesMaestria = ['Bárbaro', 'Guerreiro', 'Guardião', 'Paladino', 'Ladino'];
     const temMaestria = classesMaestria.includes(char.classe);
-    const temTrocaMagia = (infoClasse.conjurador && infoClasse.tipo_conjuracao === 'preparadas') || ehSubclasseConjuradora();
+    const ehSubConj = ehSubclasseConjuradora();
+    // Diferenciar troca completa (preparadas) vs troca unica (conhecidas/subclasse)
+    const temTrocaPreparadas = infoClasse.conjurador && infoClasse.tipo_conjuracao === 'preparadas' && !ehSubConj;
+    const temTrocaConhecida = (infoClasse.conjurador && infoClasse.tipo_conjuracao === 'conhecidas') || ehSubConj;
+    const temTrocaMagia = temTrocaPreparadas || temTrocaConhecida;
 
     if (temMaestria || temTrocaMagia) {
-      // Montar conteúdo do modal conforme opções disponíveis
+      // Montar conteudo do modal conforme opcoes disponiveis
       let conteudoModal = `
         <div class="info-box success" style="margin-bottom:12px">
           PV, espaços de magia e habilidades restaurados!
@@ -4008,12 +4012,21 @@ function setupEventosDescanso() {
         `;
       }
       if (temTrocaMagia) {
-        conteudoModal += `
-          <p style="font-size:0.9rem">Deseja trocar suas magias preparadas?</p>
-          <p style="font-size:0.8rem;color:var(--text-muted)">
-            Como ${char.classe}, você pode alterar sua lista de magias preparadas após um Descanso Longo.
-          </p>
-        `;
+        if (temTrocaConhecida) {
+          conteudoModal += `
+            <p style="font-size:0.9rem">Deseja trocar uma magia conhecida?</p>
+            <p style="font-size:0.8rem;color:var(--text-muted)">
+              Como ${char.classe}${ehSubConj ? ' (' + char.subclasse + ')' : ''}, você pode trocar <strong>1 magia conhecida</strong> por outra da lista de classe após um Descanso Longo.
+            </p>
+          `;
+        } else {
+          conteudoModal += `
+            <p style="font-size:0.9rem">Deseja trocar suas magias preparadas?</p>
+            <p style="font-size:0.8rem;color:var(--text-muted)">
+              Como ${char.classe}, você pode alterar sua lista de magias preparadas após um Descanso Longo.
+            </p>
+          `;
+        }
       }
 
       let botoesModal = '<button class="btn btn-secondary" id="btn-pular-troca-dl">Manter Tudo</button>';
@@ -4026,19 +4039,28 @@ function setupEventosDescanso() {
 
       abrirModal('Descanso Longo Concluído', conteudoModal, botoesModal);
 
+      // Funcao auxiliar para abrir o modal de troca correto
+      const abrirTrocaMagias = (callbackPos) => {
+        if (temTrocaConhecida) {
+          mostrarTrocaMagiaConhecida(callbackPos);
+        } else {
+          mostrarTrocaMagias(callbackPos);
+        }
+      };
+
       document.getElementById('btn-pular-troca-dl')?.addEventListener('click', () => {
         window.fecharModal();
         renderFichaCompleta();
       });
       document.getElementById('btn-trocar-maestrias-dl')?.addEventListener('click', async () => {
         window.fecharModal();
-        // Após trocar maestrias, oferecer troca de magias se disponível
-        await abrirModalTrocaMaestriaDescanso(temTrocaMagia ? () => mostrarTrocaMagias() : null);
+        // Apos trocar maestrias, oferecer troca de magias se disponivel
+        await abrirModalTrocaMaestriaDescanso(temTrocaMagia ? () => abrirTrocaMagias() : null);
       });
       document.getElementById('btn-trocar-magias-dl')?.addEventListener('click', () => {
         window.fecharModal();
-        // Após trocar magias, oferecer troca de maestrias se disponível
-        mostrarTrocaMagias(temMaestria ? () => abrirModalTrocaMaestriaDescanso() : null);
+        // Apos trocar magias, oferecer troca de maestrias se disponivel
+        abrirTrocaMagias(temMaestria ? () => abrirModalTrocaMaestriaDescanso() : null);
       });
     } else {
       toast('Descanso longo realizado! PV, espaços e habilidades restaurados', 'success');
@@ -7259,7 +7281,8 @@ async function abrirModalLevelUp() {
   // --- Seção de seleção de magias no level up ---
   const ehSubConj = ehSubclasseConjuradora();
   if (info.conjurador || ehSubConj) {
-    const tipoConj = info.tipo_conjuracao || 'preparadas';
+    // Subclasses conjuradoras (Cavaleiro Mistico, Trapaceiro Arcano) sao tipo "conhecidas"
+    const tipoConj = info.tipo_conjuracao || (ehSubConj ? 'conhecidas' : 'preparadas');
     const tabela = classeData?.tabela_caracteristicas;
     let truquesAtual = tabela ? getTruquesConhecidos(tabela, char.nivel) : 0;
     let truquesNovo = tabela ? getTruquesConhecidos(tabela, nivelNovo) : 0;
@@ -8033,7 +8056,8 @@ async function abrirModalLevelUp() {
 
   // --- Eventos de seleção de magias no level up ---
   if (info.conjurador || ehSubConj) {
-    const tipoConj = info.tipo_conjuracao || 'preparadas';
+    // Subclasses conjuradoras (Cavaleiro Mistico, Trapaceiro Arcano) sao tipo "conhecidas"
+    const tipoConj = info.tipo_conjuracao || (ehSubConj ? 'conhecidas' : 'preparadas');
     const tabela = classeData?.tabela_caracteristicas;
     let truquesAtual = tabela ? getTruquesConhecidos(tabela, char.nivel) : 0;
     let truquesNovo = tabela ? getTruquesConhecidos(tabela, nivelNovo) : 0;
@@ -11845,7 +11869,7 @@ function extrairInvocacoesMagicasBruxo(invocacoesSelecionadas) {
 function renderSecaoMagias() {
   const info = CLASSES_INFO[char.classe];
   const subConj = getSubclasseConjuradoraConjuracao();
-  const tipoConj = info.tipo_conjuracao || (subConj ? 'preparadas' : 'preparadas');
+  const tipoConj = info.tipo_conjuracao || (subConj ? 'conhecidas' : 'preparadas');
   const todosTruques = (char.magias_conhecidas || []).filter(m => m.circulo === 0);
   const truquesEspecie = todosTruques.filter(m => m.origem === 'especie');
   const _origensTalento = ['iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
@@ -12108,20 +12132,37 @@ function renderSecaoMagias() {
             Grimório (${grimorio.length} magias)
           </summary>
           <div style="padding-top:4px;font-size:0.8rem;color:var(--text-muted);margin-bottom:6px">
-            Magias copiadas no grimório. Prepare a partir daqui durante um Descanso Longo.
+            Livro de Magias. Prepare magias a partir daqui (limite: ${maxPreparadas}). Magias com marcador Ritual podem ser conjuradas sem preparar.
           </div>
           <div style="padding-top:4px">
             ${grimorio.map(m => {
               const jaPreparada = preparadas.some(p => p.nome === m.nome);
+              const infoMagia = indiceMagiasCache?.find(im => im.nome === m.nome);
+              const ehRitual = infoMagia?.tempo_conjuracao && /ritual/i.test(infoMagia.tempo_conjuracao);
+              const circulos = Object.keys(espacos).filter(c => parseInt(c) >= m.circulo).sort((a, b) => parseInt(a) - parseInt(b));
+              const temUpcast = circulos.length > 1;
+              const todosEsgotados = circulos.every(c => (espacos[c]?.usados || 0) >= (espacos[c]?.total || 0));
               return `
-              <div class="magia-item ${jaPreparada ? 'preparada' : ''}" data-magia-nome="${m.nome}" data-magia-circ="${m.circulo}" style="opacity:${jaPreparada ? '1' : '0.7'}">
+              <div class="magia-item ${jaPreparada ? 'preparada' : ''} ${ehRitual && !jaPreparada ? 'magia-dominio' : ''}" data-magia-nome="${m.nome}" data-magia-circ="${m.circulo}" style="opacity:${jaPreparada || ehRitual ? '1' : '0.7'}">
                 <div style="display:flex;justify-content:space-between;align-items:center">
                   <div>
-                    <div class="magia-nome">${m.nome} ${jaPreparada ? '<span class="badge badge-success" style="font-size:0.6rem">Preparada</span>' : ''}</div>
+                    <div class="magia-nome">${m.nome} ${jaPreparada ? '<span class="badge badge-success" style="font-size:0.6rem">Preparada</span>' : ''}${ehRitual ? ' <span class="badge" style="font-size:0.6rem;background:var(--secondary);color:#fff">Ritual</span>' : ''}</div>
                     <div class="magia-meta"><span>${m.circulo}º Círculo</span></div>
+                    ${!jaPreparada && !ehRitual ? '<div style="font-size:0.65rem;color:var(--text-muted);font-style:italic">Não preparada</div>' : ''}
                   </div>
-                  <div class="no-print" style="display:flex;gap:4px">
-                    ${!jaPreparada ? `<button class="btn btn-sm btn-accent" data-preparar-grimorio="${m.nome}" data-prep-circ="${m.circulo}">Preparar</button>` : ''}
+                  <div class="no-print" style="display:flex;gap:4px;align-items:center">
+                    ${jaPreparada ? `
+                      ${temUpcast ? `
+                        <select class="form-input" data-conj-select="${m.nome}" style="width:auto;padding:2px 4px;font-size:0.75rem">
+                          ${circulos.map(c => `<option value="${c}"${c == m.circulo ? ' selected' : ''}>${c}º</option>`).join('')}
+                        </select>
+                      ` : ''}
+                      <button class="btn btn-sm ${todosEsgotados ? 'btn-secondary' : 'btn-primary'}" data-conjurar="${m.nome}" data-conj-circ="${circulos[0] || m.circulo}" ${todosEsgotados ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Conjurar</button>
+                      <button class="btn btn-sm btn-secondary" data-despreparar-grimorio="${m.nome}" title="Despreparar">✕</button>
+                    ` : `
+                      <button class="btn btn-sm btn-accent" data-preparar-grimorio="${m.nome}" data-prep-circ="${m.circulo}">Preparar</button>
+                      ${ehRitual ? `<button class="btn btn-sm btn-secondary" data-conjurar-pacto="${m.nome}" title="Conjurar como Ritual (sem gastar espaço)">Ritual</button>` : ''}
+                    `}
                     <button class="btn btn-sm btn-danger btn-icon" data-remover-grimorio="${m.nome}" title="Remover do grimório">&times;</button>
                   </div>
                 </div>
@@ -12253,18 +12294,39 @@ function setupEventosEspacosMagia() {
     });
   });
 
-  // Grimório: preparar magia do grimório
+  // Grimório: preparar magia do grimório (com validação de limite)
   document.querySelectorAll('[data-preparar-grimorio]').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const nome = btn.dataset.prepararGrimorio;
       const circ = parseInt(btn.dataset.prepCirc);
-      if (!char.magias_preparadas.find(m => m.nome === nome)) {
-        char.magias_preparadas.push({ nome, circulo: circ });
-        salvar();
-        renderFichaCompleta();
-        toast(`${nome} preparada a partir do grimório`, 'success');
+      if (char.magias_preparadas.find(m => m.nome === nome)) return;
+
+      // Validar limite de magias preparadas
+      const tabela = classeData?.tabela_caracteristicas;
+      const maxPrep = tabela ? getMagiaPreparadas(tabela, char.nivel) : 99;
+      const preparadasNormais = (char.magias_preparadas || []).filter(m => magiaContaNoLimite(m));
+      if (preparadasNormais.length >= maxPrep) {
+        toast(`Limite de magias preparadas atingido (${maxPrep}). Desprepare uma magia primeiro.`, 'error');
+        return;
       }
+
+      char.magias_preparadas.push({ nome, circulo: circ });
+      salvar();
+      renderFichaCompleta();
+      toast(`${nome} preparada a partir do grimório (${preparadasNormais.length + 1}/${maxPrep})`, 'success');
+    });
+  });
+
+  // Grimório: despreparar magia (mantém no grimório)
+  document.querySelectorAll('[data-despreparar-grimorio]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const nome = btn.dataset.desprepararGrimorio;
+      char.magias_preparadas = (char.magias_preparadas || []).filter(m => m.nome !== nome);
+      salvar();
+      renderFichaCompleta();
+      toast(`${nome} despreparada (permanece no grimório)`, 'info');
     });
   });
 
@@ -12289,8 +12351,10 @@ function setupEventosEspacosMagia() {
 async function mostrarBuscaMagia() {
   const info = CLASSES_INFO[char.classe] || {};
   const subConj = getSubclasseConjuradoraConjuracao();
-  const tipoConj = info.tipo_conjuracao || 'preparadas';
+  const tipoConj = info.tipo_conjuracao || (subConj ? 'conhecidas' : 'preparadas');
   const labelMg = tipoConj === 'conhecidas' ? 'Conhecida' : 'Preparada';
+  // Classes "conhecidas" (Bardo, Bruxo, Feiticeiro) e subclasses conjuradoras: somente consulta
+  const somenteConsulta = tipoConj === 'conhecidas';
   const tabela = classeData?.tabela_caracteristicas;
   let maxPrep = tabela ? getMagiaPreparadas(tabela, char.nivel) : 99;
   let maxTruq = tabela ? getTruquesConhecidos(tabela, char.nivel) : 99;
@@ -12334,7 +12398,8 @@ async function mostrarBuscaMagia() {
   const tabs = ['preparadas', 'truques'];
   Object.keys(magiasCirculo).forEach(c => tabs.push(c));
 
-  abrirModal('Gerenciar Magias', `
+  abrirModal(somenteConsulta ? 'Consultar Magias' : 'Gerenciar Magias', `
+    ${somenteConsulta ? '<div class="info-box info" style="margin-bottom:8px;font-size:0.85rem">Magias conhecidas sao definidas na <strong>subida de nivel</strong>. Use o <strong>Descanso Longo</strong> para trocar 1 magia.</div>' : ''}
     <div style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:6px;font-size:0.78rem">
       <span class="magia-contador ${(char.magias_conhecidas || []).filter(m => m.circulo === 0 && m.origem !== 'especie').length >= maxTruq ? 'contador-cheio' : ''}" id="gm-contador-truques">
         Truques: ${(char.magias_conhecidas || []).filter(m => m.circulo === 0 && m.origem !== 'especie').length}/${maxTruq}
@@ -12366,7 +12431,7 @@ async function mostrarBuscaMagia() {
       const filtradas = termo.length >= 2 ? normais.filter(m => semAcento(m.nome).includes(termo)) : normais;
       const filtradasDom = termo.length >= 2 ? especiais.filter(m => semAcento(m.nome).includes(termo)) : especiais;
 
-      html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">${labelMg}s: ${normais.length}/${maxPrep} | Use o <strong>check</strong> para (des)marcar</div>`;
+      html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">${labelMg}s: ${normais.length}/${maxPrep}${somenteConsulta ? '' : ' | Use o <strong>check</strong> para (des)marcar'}</div>`;
 
       if (filtradasDom.length > 0) {
         html += `<div style="font-size:0.75rem;font-weight:700;color:var(--secondary);margin:8px 0 4px">Magias Especiais</div>`;
@@ -12382,7 +12447,7 @@ async function mostrarBuscaMagia() {
       if (filtradas.length > 0) {
         html += `<div class="magias-grid">${filtradas.map(m => `
           <div class="magia-card selecionada">
-            <span class="magia-card-check" data-remover-check="${m.nome}" style="cursor:pointer"></span>
+            <span class="magia-card-check" ${somenteConsulta ? '' : `data-remover-check="${m.nome}" style="cursor:pointer"`}></span>
             <div class="magia-card-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="${m.circulo}" style="cursor:pointer">${m.nome}</div>
             <div class="magia-card-meta">
               <span>${m.circulo || 0}º Circulo</span>
@@ -12432,8 +12497,8 @@ async function mostrarBuscaMagia() {
         const bloqueado = cheioTruq && !sel;
         return `
           <div class="magia-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}"
-               data-toggle-truque="${m.nome}" style="${bloqueado ? 'opacity:0.35;' : ''}">
-            <span class="magia-card-check" data-truque-check="${m.nome}" style="cursor:pointer"></span>
+               ${somenteConsulta ? '' : `data-toggle-truque="${m.nome}"`} style="${bloqueado ? 'opacity:0.35;' : ''}">
+            <span class="magia-card-check" ${somenteConsulta ? '' : `data-truque-check="${m.nome}" style="cursor:pointer"`}></span>
             <div class="magia-card-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="0" style="cursor:pointer">${m.nome}</div>
             <div class="magia-card-meta">
               <span>${m.escola || ''}</span>
@@ -12466,7 +12531,7 @@ async function mostrarBuscaMagia() {
         return `
           <div class="magia-card ${sel ? 'selecionada' : ''} ${isDominio ? 'magia-dominio' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}"
                style="${bloqueado ? 'opacity:0.35;' : ''}${isDominio ? 'opacity:0.7;' : ''}">
-            <span class="magia-card-check" ${isDominio ? '' : `data-circ-check="${m.nome}" data-circ-check-val="${circ}" style="cursor:pointer"`}></span>
+            <span class="magia-card-check" ${isDominio || somenteConsulta ? '' : `data-circ-check="${m.nome}" data-circ-check-val="${circ}" style="cursor:pointer"`}></span>
             <div class="magia-card-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="${circ}" style="cursor:pointer">${isDominio ? '<span class="badge-dominio">&#9733;</span> ' : ''}${m.nome}</div>
             <div class="magia-card-meta">
               <span>${m.escola || ''}</span>
@@ -12965,6 +13030,164 @@ async function mostrarTrocaMagias(callbackPosTroca = null) {
   });
 
   renderTabTroca();
+}
+
+/** Modal de troca de 1 magia conhecida (Descanso Longo - Bardo, Feiticeiro, Bruxo, subclasses conjuradoras) */
+async function mostrarTrocaMagiaConhecida(callbackPosTroca = null) {
+  const subConj = getSubclasseConjuradoraConjuracao();
+
+  // Espacos de magia para determinar circulos disponiveis
+  let espacosNivel = classeData?.tabela_caracteristicas
+    ? getEspacosMagia(classeData.tabela_caracteristicas, char.nivel) : {};
+  if (subConj && Object.keys(espacosNivel).length === 0) {
+    espacosNivel = subConj.espacos || {};
+  }
+  const maxCirculo = Math.max(...Object.keys(espacosNivel).map(Number), 0);
+
+  // Magias conhecidas atuais (apenas as que contam no limite e tem circulo > 0)
+  const magiasAtuais = (char.magias_preparadas || []).filter(m => m.circulo > 0 && magiaContaNoLimite(m));
+
+  if (magiasAtuais.length === 0) {
+    toast('Nenhuma magia conhecida para trocar', 'error');
+    if (callbackPosTroca) callbackPosTroca();
+    else renderFichaCompleta();
+    return;
+  }
+
+  // Carregar magias disponiveis da classe
+  const magiasClasse = await obterMagiasDisponiveisClasseAtual();
+  const jaTemSet = new Set((char.magias_preparadas || []).map(m => m.nome));
+
+  let magiaRemover = null;
+  let magiaAdicionar = null;
+  let circuloAdicionar = null;
+
+  const nomeClasse = char.subclasse && ehSubclasseConjuradora() ? `${char.classe} (${char.subclasse})` : char.classe;
+
+  abrirModal('Trocar Magia Conhecida', `
+    <div class="info-box info" style="margin-bottom:12px;font-size:0.85rem">
+      Apos um Descanso Longo, voce pode trocar <strong>1 magia conhecida</strong> por outra da lista de ${nomeClasse}.
+    </div>
+
+    <div style="margin-bottom:12px">
+      <label class="form-label" style="font-weight:700;color:var(--accent)">Magia a remover:</label>
+      <select class="form-input" id="troca-conhecida-remover" style="margin-bottom:4px">
+        <option value="">Selecione uma magia...</option>
+        ${magiasAtuais.map(m => `<option value="${m.nome}" data-circ="${m.circulo}">${m.nome} (${m.circulo}\u00ba Circulo)</option>`).join('')}
+      </select>
+    </div>
+
+    <div id="troca-conhecida-adicionar-container" style="display:none">
+      <label class="form-label" style="font-weight:700;color:var(--accent)">Nova magia:</label>
+      <div class="search-box" style="margin-bottom:8px"><input type="text" id="busca-troca-conhecida" placeholder="Buscar magia..." class="form-input"></div>
+      <div id="resultado-troca-conhecida" style="max-height:35vh;overflow-y:auto;margin-bottom:8px"></div>
+      <div style="font-size:0.85rem;color:var(--text-muted)">
+        Selecionada: <strong id="troca-conhecida-nome" style="color:var(--accent)">\u2014</strong>
+      </div>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
+     <button class="btn btn-secondary" id="btn-pular-troca-conhecida">Nao Trocar</button>
+     <button class="btn btn-primary" id="btn-confirmar-troca-conhecida" disabled>Confirmar Troca</button>`);
+
+  const containerAdicionar = document.getElementById('troca-conhecida-adicionar-container');
+  const resultadoEl = document.getElementById('resultado-troca-conhecida');
+  const confirmarBtn = document.getElementById('btn-confirmar-troca-conhecida');
+
+  function renderListaSubstituta() {
+    const termo = semAcento(document.getElementById('busca-troca-conhecida')?.value || '');
+    // Filtrar magias da classe que podem ser escolhidas
+    let disponiveis = magiasClasse.filter(m =>
+      m.circulo > 0 && m.circulo <= maxCirculo &&
+      !jaTemSet.has(m.nome) && m.nome !== magiaRemover
+    );
+    if (termo.length >= 2) disponiveis = disponiveis.filter(m => semAcento(m.nome).includes(termo));
+    disponiveis = disponiveis.slice(0, 30);
+
+    resultadoEl.innerHTML = `<div class="magias-grid">${disponiveis.map(m => `
+      <div class="magia-card ${m.nome === magiaAdicionar ? 'selecionada' : ''}" data-selecionar-troca="${m.nome}" data-selecionar-circ="${m.circulo}" style="cursor:pointer">
+        <span class="magia-card-check"></span>
+        <div class="magia-card-nome" data-troca-detalhe="${m.nome}" data-troca-detalhe-circ="${m.circulo}" style="cursor:pointer">${m.nome}</div>
+        <div class="magia-card-meta">
+          <span>${m.circulo}\u00ba Circulo</span><span>${m.escola || ''}</span>
+          ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
+        </div>
+      </div>
+    `).join('')}</div>`;
+
+    // Selecionar magia substituta
+    resultadoEl.querySelectorAll('[data-selecionar-troca]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        if (e.target.closest('[data-troca-detalhe]')) return;
+        magiaAdicionar = el.dataset.selecionarTroca;
+        circuloAdicionar = parseInt(el.dataset.selecionarCirc);
+        document.getElementById('troca-conhecida-nome').textContent = magiaAdicionar;
+        confirmarBtn.disabled = false;
+        renderListaSubstituta();
+      });
+    });
+
+    // Detalhes da magia
+    resultadoEl.querySelectorAll('[data-troca-detalhe]').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const nome = btn.dataset.trocaDetalhe;
+        const circ = parseInt(btn.dataset.trocaDetalheCirc);
+        const dados = await getMagiasPorCirculo(circ);
+        const magia = dados?.magias?.find(m => m.nome === nome);
+        if (!magia) return;
+        abrirModal(magia.nome, `
+          <div class="magia-meta" style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:8px;font-size:0.85rem">
+            <span class="badge badge-primary">${circ}\u00ba Circulo</span>
+            <span class="badge badge-secondary">${magia.escola}</span>
+            <span>${magia.tempo_conjuracao}</span> <span>${magia.alcance}</span>
+            <span>${magia.componentes}</span> <span>${magia.duracao}</span>
+          </div>
+          <div class="md-content">${mdParaHtml(magia.descricao)}</div>
+          ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em circulos superiores:</strong><div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
+        `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
+      });
+    });
+  }
+
+  // Quando selecionar magia a remover
+  document.getElementById('troca-conhecida-remover')?.addEventListener('change', (e) => {
+    magiaRemover = e.target.value || null;
+    magiaAdicionar = null;
+    circuloAdicionar = null;
+    document.getElementById('troca-conhecida-nome').textContent = '\u2014';
+    confirmarBtn.disabled = true;
+    if (magiaRemover) {
+      containerAdicionar.style.display = 'block';
+      renderListaSubstituta();
+    } else {
+      containerAdicionar.style.display = 'none';
+    }
+  });
+
+  // Busca
+  document.getElementById('busca-troca-conhecida')?.addEventListener('input', renderListaSubstituta);
+
+  // Nao trocar
+  document.getElementById('btn-pular-troca-conhecida')?.addEventListener('click', () => {
+    window.fecharModal();
+    if (callbackPosTroca) callbackPosTroca();
+    else renderFichaCompleta();
+  });
+
+  // Confirmar troca
+  confirmarBtn?.addEventListener('click', () => {
+    if (!magiaRemover || !magiaAdicionar) return;
+    const idx = char.magias_preparadas.findIndex(m => m.nome === magiaRemover);
+    if (idx >= 0) {
+      char.magias_preparadas.splice(idx, 1);
+      char.magias_preparadas.push({ nome: magiaAdicionar, circulo: circuloAdicionar });
+      salvar();
+      toast(`Trocou ${magiaRemover} por ${magiaAdicionar}`, 'success');
+    }
+    window.fecharModal();
+    if (callbackPosTroca) callbackPosTroca();
+    else renderFichaCompleta();
+  });
 }
 
 // --- Proficiência de armas/armaduras na ficha ---
@@ -14250,4 +14473,709 @@ function renderSecaoDetalhes() {
       `).join('')}
     </div>
   `;
+}
+
+// ============================================================
+// IMPRESSAO DE FICHA - Versao formatada para impressao
+// ============================================================
+
+/**
+ * Pre-carrega descricoes de todas as magias do personagem
+ * para uso no HTML de impressao.
+ */
+async function carregarDescricoesMagias() {
+  const cache = {};
+  const todasMagias = [];
+
+  // Truques conhecidos
+  (char.magias_conhecidas || []).forEach(m => {
+    if (!cache[m.nome]) todasMagias.push({ nome: m.nome, circulo: m.circulo || 0 });
+  });
+  // Magias preparadas
+  (char.magias_preparadas || []).forEach(m => {
+    if (!cache[m.nome]) todasMagias.push({ nome: m.nome, circulo: m.circulo || 1 });
+  });
+  // Magias customizadas (ja tem descricao inline)
+  // Grimorio
+  (char.grimorio || []).forEach(m => {
+    if (!cache[m.nome] && !todasMagias.find(t => t.nome === m.nome)) {
+      todasMagias.push({ nome: m.nome, circulo: m.circulo || 1 });
+    }
+  });
+  // Magias do pacto do bruxo
+  if (char.classe === 'Bruxo') {
+    const estado = getEstadoRecursosBruxo();
+    if (estado?.pacto === 'Pacto do Tomo') {
+      (char.recursos?.bruxo?.livro_sombras?.truques || []).forEach(nome => {
+        if (!todasMagias.find(t => t.nome === nome)) todasMagias.push({ nome, circulo: 0 });
+      });
+      (char.recursos?.bruxo?.livro_sombras?.rituais || []).forEach(r => {
+        const nome = typeof r === 'string' ? r : r.nome;
+        const circ = typeof r === 'string' ? 1 : (r.circulo || 1);
+        if (!todasMagias.find(t => t.nome === nome)) todasMagias.push({ nome, circulo: circ });
+      });
+    }
+    // Magias de invocacoes
+    if (estado?.invocacoes) {
+      for (const inv of estado.invocacoes) {
+        const nomeInv = typeof inv === 'string' ? inv : inv.nome;
+        const magiasInv = inv?.magias || [];
+        magiasInv.forEach(m => {
+          const nome = typeof m === 'string' ? m : m.nome;
+          const circ = typeof m === 'string' ? 1 : (m.circulo || 1);
+          if (!todasMagias.find(t => t.nome === nome)) todasMagias.push({ nome, circulo: circ });
+        });
+      }
+    }
+  }
+
+  // Carregar por circulo (agrupar pedidos)
+  const circulosPedidos = new Set(todasMagias.map(m => m.circulo));
+  const dadosPorCirculo = {};
+  for (const circ of circulosPedidos) {
+    const dados = await getMagiasPorCirculo(circ);
+    if (dados?.magias) dadosPorCirculo[circ] = dados.magias;
+  }
+
+  // Montar cache
+  todasMagias.forEach(m => {
+    if (cache[m.nome]) return;
+    const lista = dadosPorCirculo[m.circulo] || [];
+    const magia = lista.find(x => x.nome === m.nome);
+    if (magia) cache[m.nome] = magia;
+  });
+
+  return cache;
+}
+
+/**
+ * Gera o HTML de uma magia expandida para impressao.
+ */
+function htmlMagiaImpressao(nome, circulo, cacheMagias, origemExtra) {
+  const magia = cacheMagias[nome];
+  const infoIdx = indiceMagiasCache?.find(m => m.nome === nome);
+
+  let meta = '';
+  let desc = '';
+  let upcast = '';
+
+  if (magia) {
+    meta = [magia.escola, magia.tempo_conjuracao, magia.alcance, magia.componentes, magia.duracao]
+      .filter(Boolean).join(' | ');
+    desc = mdParaHtml(magia.descricao || '');
+    if (magia.circulo_superior) {
+      upcast = `<div class="print-spell-upcast"><strong>Circulos superiores:</strong> ${mdParaHtml(magia.circulo_superior)}</div>`;
+    }
+  } else if (infoIdx) {
+    meta = [infoIdx.escola, infoIdx.tempo_conjuracao, infoIdx.alcance, infoIdx.duracao]
+      .filter(Boolean).join(' | ');
+  }
+
+  const circLabel = circulo === 0 ? 'Truque' : `${circulo}º Círculo`;
+  const origemBadge = origemExtra ? ` <span class="print-feature-badge">${origemExtra}</span>` : '';
+
+  return `
+    <div class="print-spell">
+      <div class="print-spell-name">${nome} <span style="font-weight:400;font-size:7pt;color:#666">(${circLabel})</span>${origemBadge}</div>
+      ${meta ? `<div class="print-spell-meta">${meta}</div>` : ''}
+      ${desc ? `<div class="print-spell-desc"><div class="md-content">${desc}</div></div>` : ''}
+      ${upcast}
+    </div>
+  `;
+}
+
+/**
+ * Gera o HTML completo de impressao da ficha.
+ */
+async function gerarHtmlImpressao() {
+  const info = CLASSES_INFO[char.classe] || {};
+  const prof = bonusProficiencia(char.nivel);
+  const ca = calcCA(char);
+  const modCon = calcMod(char.atributos.constituicao);
+  const iniciativa = getModIniciativa();
+  const ataquesPorAcao = getAtaquesPorAcao();
+
+  // Dados da especie
+  const _espData = especiesCache?.especies?.find(e => e.nome === char.especie);
+  const _deslocamentoBase = _espData ? getDeslocamento(_espData.texto_completo) : '9 metros';
+  const _deslocamento = getDeslocamentoFinal(_deslocamentoBase);
+  const _tamanho = char.tamanho || (_espData ? getTamanho(_espData.texto_completo) : 'Medio');
+
+  // Pre-carregar descricoes de magias
+  const cacheMagias = await carregarDescricoesMagias();
+
+  // ===================== PAGINA 1 =====================
+  let pag1 = '';
+
+  // --- Cabecalho ---
+  pag1 += `
+    <div class="print-char-header">
+      <div class="print-char-name">${char.nome || 'Sem Nome'}</div>
+      <div class="print-char-sub">
+        ${char.especie || ''} ${char.classe || ''} ${char.subclasse ? `(${char.subclasse})` : ''} &mdash; Nivel ${char.nivel}
+        ${char.antecedente ? ` | Antecedente: ${char.antecedente}` : ''}
+        ${char.alinhamento ? ` | ${char.alinhamento}` : ''}
+      </div>
+      <div class="print-char-sub">
+        Tamanho: ${_tamanho}${(char.idiomas?.length) ? ' | Idiomas: ' + char.idiomas.join(', ') : ''}
+      </div>
+    </div>
+  `;
+
+  // --- HP ---
+  pag1 += `
+    <div class="print-hp-row">
+      <div class="print-hp-item">
+        <div class="print-hp-label">PV Atual</div>
+        <div class="print-hp-value">${char.pv_atual ?? 0}</div>
+      </div>
+      <div class="print-hp-item">
+        <div class="print-hp-label">PV Max</div>
+        <div class="print-hp-value">${char.pv_max ?? 0}</div>
+      </div>
+      <div class="print-hp-item">
+        <div class="print-hp-label">PV Temporario</div>
+        <div class="print-hp-value">${char.pv_temp ?? 0}</div>
+      </div>
+      <div class="print-hp-item">
+        <div class="print-hp-label">Dado de Vida</div>
+        <div class="print-hp-value">${char.dados_vida_disponiveis ?? char.nivel}/${char.nivel} d${info.dado_vida || '?'}</div>
+      </div>
+    </div>
+  `;
+
+  // --- Stats de combate ---
+  let statsHtml = `
+    <div class="print-stat-box"><div class="print-stat-label">CA</div><div class="print-stat-value">${ca}</div></div>
+    <div class="print-stat-box"><div class="print-stat-label">Iniciativa</div><div class="print-stat-value">${fmtMod(iniciativa.valor)}</div></div>
+    <div class="print-stat-box"><div class="print-stat-label">Deslocamento</div><div class="print-stat-value">${_deslocamento}</div></div>
+    <div class="print-stat-box"><div class="print-stat-label">Ataques</div><div class="print-stat-value">${ataquesPorAcao}</div></div>
+    <div class="print-stat-box"><div class="print-stat-label">Proficiencia</div><div class="print-stat-value">+${prof}</div></div>
+  `;
+  if (info.conjurador) {
+    statsHtml += `
+      <div class="print-stat-box"><div class="print-stat-label">CD Magia</div><div class="print-stat-value">${calcCDMagia(char)}</div></div>
+      <div class="print-stat-box"><div class="print-stat-label">Atq Magia</div><div class="print-stat-value">${fmtMod(calcAtaqueMagia(char))}</div></div>
+    `;
+  }
+  pag1 += `<div class="print-stats-row">${statsHtml}</div>`;
+
+  // --- Atributos ---
+  pag1 += `
+    <div class="print-section">
+      <div class="print-section-title">Atributos</div>
+      <div class="print-attr-grid">
+        ${ATRIBUTOS_KEYS.map(key => {
+          const nome = ATRIBUTOS_NOMES[key];
+          const val = char.atributos[key];
+          const mod = calcMod(val);
+          return `
+            <div class="print-attr-box">
+              <div class="print-attr-name">${nome}</div>
+              <div class="print-attr-mod">${fmtMod(mod)}</div>
+              <div class="print-attr-val">${val}</div>
+            </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+
+  // --- Salvaguardas ---
+  pag1 += `
+    <div class="print-section">
+      <div class="print-section-title">Salvaguardas</div>
+      <div class="print-saves-grid">
+        ${ATRIBUTOS_KEYS.map(key => {
+          const nome = ATRIBUTOS_NOMES[key];
+          const mod = calcMod(char.atributos[key]);
+          const proficiente = (char.salvaguardas_proficientes || []).includes(nome);
+          const bonus = mod + (proficiente ? prof : 0);
+          return `
+            <div class="print-save-item">
+              <div class="print-save-prof ${proficiente ? 'ativo' : ''}"></div>
+              <span class="print-save-bonus">${fmtMod(bonus)}</span>
+              <span>${nome}</span>
+            </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+
+  // --- Sentidos passivos ---
+  const percepcao = calcPercepcaoPassiva(char);
+  const intuicao = calcIntuicaoPassiva(char);
+  const investigacao = calcInvestigacaoPassiva(char);
+  let visaoEscuro = '';
+  if (especiesCache?.especies) {
+    const esp = especiesCache.especies.find(e => e.nome === char.especie);
+    if (esp?.tracos) {
+      const tracoVE = esp.tracos.find(t => t.nome === 'Visao no Escuro' || t.nome === 'Visão no Escuro');
+      if (tracoVE) {
+        const matchAlc = tracoVE.descricao?.match(/alcance de (\d+)/i);
+        visaoEscuro = matchAlc ? `${matchAlc[1]} m` : '18 m';
+      }
+      if ((char.tracos_escolhidos || []).includes('Drow')) visaoEscuro = '36 m';
+    }
+  }
+  pag1 += `
+    <div class="print-section">
+      <div class="print-section-title">Sentidos Passivos</div>
+      <div class="print-senses-grid">
+        <div class="print-sense-item"><div class="print-sense-value">${percepcao}</div><div class="print-sense-label">Percepcao</div></div>
+        <div class="print-sense-item"><div class="print-sense-value">${intuicao}</div><div class="print-sense-label">Intuicao</div></div>
+        <div class="print-sense-item"><div class="print-sense-value">${investigacao}</div><div class="print-sense-label">Investigacao</div></div>
+        ${visaoEscuro ? `<div class="print-sense-item"><div class="print-sense-value">${visaoEscuro}</div><div class="print-sense-label">Visao no Escuro</div></div>` : ''}
+      </div>
+    </div>
+  `;
+
+  // --- Defesas ---
+  const resistencias = [...(char.resistencias || [])];
+  const vulnerabilidades = char.vulnerabilidades || [];
+  const imunidades = char.imunidades || [];
+  if (resistencias.length > 0 || vulnerabilidades.length > 0 || imunidades.length > 0) {
+    pag1 += `<div class="print-section"><div class="print-section-title">Defesas</div><div class="print-defenses">`;
+    if (resistencias.length > 0) pag1 += `<div><strong>Resistencias:</strong> ${resistencias.join(', ')}</div>`;
+    if (vulnerabilidades.length > 0) pag1 += `<div><strong>Vulnerabilidades:</strong> ${vulnerabilidades.join(', ')}</div>`;
+    if (imunidades.length > 0) pag1 += `<div><strong>Imunidades:</strong> ${imunidades.join(', ')}</div>`;
+    pag1 += `</div></div>`;
+  }
+
+  // --- Pericias ---
+  const ordemAtributos = ['Forca', 'Destreza', 'Constituicao', 'Inteligencia', 'Sabedoria', 'Carisma'];
+  pag1 += `
+    <div class="print-section">
+      <div class="print-section-title">Pericias</div>
+      <div class="print-skills-grid">
+        ${PERICIAS.map(p => {
+          const proficiente = (char.pericias_proficientes || []).includes(p.nome);
+          const expertise = (char.pericias_expertise || []).includes(p.nome);
+          const bonus = calcBonusPericia(char, p.nome, {
+            emFuria: false,
+            forcaPrimordialAtiva: false
+          });
+          let profClass = '';
+          if (expertise) profClass = 'expertise';
+          else if (proficiente) profClass = 'ativo';
+          return `
+            <div class="print-skill-item">
+              <div class="print-skill-prof ${profClass}"></div>
+              <span class="print-skill-bonus">${fmtMod(bonus)}</span>
+              <span class="print-skill-name">${p.nome}</span>
+            </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+
+  // --- Itens equipados ---
+  const inv = char.inventario || [];
+  const equipados = inv.filter(i => i.equipado && (i.quantidade ?? 1) > 0);
+  if (equipados.length > 0) {
+    pag1 += `<div class="print-section"><div class="print-section-title">Equipamento</div><div class="print-equip-list">`;
+    equipados.forEach(item => {
+      let detalhe = '';
+      if (item.tipo === 'arma') {
+        const props = item.dados?.propriedades || '';
+        const dano = item.dados?.dano || '';
+        detalhe = [dano, props].filter(Boolean).join(' | ');
+      } else if (item.tipo === 'armadura') {
+        detalhe = `CA: ${item.dados?.ca || '?'} | ${item.dados?.categoria || ''}`;
+      } else if (item.tipo === 'escudo') {
+        detalhe = `CA: ${item.dados?.ca || '?'}`;
+      } else if (item.tipo === 'customizado') {
+        const bca = parseInt(item.dados?.bonus_ca) || 0;
+        const batq = parseInt(item.dados?.bonus_ataque) || 0;
+        const parts = [];
+        if (bca !== 0) parts.push(`CA ${bca > 0 ? '+' : ''}${bca}`);
+        if (batq !== 0) parts.push(`Atq ${batq > 0 ? '+' : ''}${batq}`);
+        if (item.dados?.dano) parts.push(item.dados.dano);
+        detalhe = parts.join(' | ') || (item.descricao || '');
+      }
+      const qtd = (item.quantidade ?? 1) > 1 ? ` x${item.quantidade}` : '';
+      pag1 += `
+        <div class="print-equip-item">
+          <span class="print-equip-name">${item.nome}${qtd}</span>
+          <span class="print-equip-detail">${detalhe}</span>
+        </div>`;
+    });
+    pag1 += `</div></div>`;
+  }
+
+  // ===================== PAGINA 2+ (Talentos, Caracteristicas, Tracos) =====================
+  let pag2 = '';
+
+  // --- Talentos ---
+  if (char.talentos?.length) {
+    const todosOsTalentos = [];
+    if (talentosCache?.por_categoria) {
+      Object.values(talentosCache.por_categoria).forEach(lista => lista.forEach(t => todosOsTalentos.push(t)));
+    }
+
+    pag2 += `<div class="print-section"><div class="print-section-title">Talentos</div>`;
+    char.talentos.forEach(t => {
+      const nome = typeof t === 'string' ? t : t.nome;
+      let talentoData = todosOsTalentos.find(td => td.nome === nome);
+      if (!talentoData) {
+        const nomeBase = nome.replace(/\s*\(.*\)$/, '').trim();
+        talentoData = todosOsTalentos.find(td => td.nome === nomeBase);
+      }
+      const descricao = talentoData?.descricao || '';
+      const beneficios = talentoData?.beneficios || [];
+      const catBadge = talentoData?.categoria ? `<span class="print-feature-badge">${talentoData.categoria}</span>` : '';
+
+      let infoEscolhas = '';
+      if (nome === 'Iniciado em Magia') {
+        const instancias = char.iniciado_em_magia_instancias || [];
+        if (instancias.length > 0) {
+          infoEscolhas = instancias.map((im, idx) =>
+            `<div style="margin-top:1mm;font-size:7.5pt;border:0.5px solid #ccc;padding:1mm 2mm;border-radius:2px">
+              ${instancias.length > 1 ? `<strong>Instancia ${idx + 1}:</strong> ` : ''}
+              <strong>Lista:</strong> ${im.lista} | <strong>Atributo:</strong> ${im.atributo || '—'}
+              | <strong>Truques:</strong> ${(im.truques || []).join(', ') || '—'}
+              | <strong>Magia:</strong> ${im.magia || '—'}
+            </div>`
+          ).join('');
+        }
+      }
+      if (nome === 'Adepto Elemental') {
+        const tipos = char.adepto_elemental_tipos || [];
+        if (tipos.length > 0) {
+          infoEscolhas = `<div style="margin-top:1mm;font-size:7.5pt"><strong>Dominio Elemental:</strong> ${tipos.join(', ')}</div>`;
+        }
+      }
+
+      pag2 += `
+        <div class="print-feature">
+          <div class="print-feature-name">${nome} ${catBadge}</div>
+          ${descricao ? `<div class="print-feature-desc"><div class="md-content">${mdParaHtml(descricao)}</div></div>` : ''}
+          ${beneficios.length > 0 ? beneficios.map(b =>
+            `<div class="print-feature-desc"><strong>${b.nome}:</strong> ${mdParaHtml(b.descricao)}</div>`
+          ).join('') : ''}
+          ${infoEscolhas}
+        </div>`;
+    });
+    pag2 += `</div>`;
+  }
+
+  // --- Caracteristicas de Classe ---
+  if (classeData?.caracteristicas?.length) {
+    let feats = classeData.caracteristicas.filter(c => c.nivel <= char.nivel);
+
+    // Filtrar features de subclasses nao selecionadas
+    if (classeData.subclasses?.length) {
+      const outrasSubclasses = classeData.subclasses.filter(s => s.nome !== char.subclasse);
+      const featsOutras = new Set();
+      outrasSubclasses.forEach(sc => (sc.caracteristicas || []).forEach(f => featsOutras.add(f.nome)));
+      const featsSelecionada = new Set();
+      if (char.subclasse) {
+        const scAtual = classeData.subclasses.find(s => s.nome === char.subclasse);
+        (scAtual?.caracteristicas || []).forEach(f => featsSelecionada.add(f.nome));
+      }
+      feats = feats.filter(f => !featsOutras.has(f.nome) || featsSelecionada.has(f.nome));
+      if (char.subclasse) {
+        const scAtual = classeData.subclasses.find(s => s.nome === char.subclasse);
+        const featsSC = new Set((scAtual?.caracteristicas || []).filter(c => c.nivel <= char.nivel).map(c => `${c.nivel}|${c.nome}`));
+        feats = feats.filter(f => !featsSC.has(`${f.nivel}|${f.nome}`));
+      }
+    }
+
+    if (feats.length > 0) {
+      pag2 += `<div class="print-section"><div class="print-section-title">Caracteristicas de Classe</div>`;
+      feats.forEach(f => {
+        pag2 += `
+          <div class="print-feature">
+            <div class="print-feature-name">${f.nome} <span style="font-weight:400;font-size:7pt;color:#666">(Nivel ${f.nivel})</span></div>
+            ${f.descricao ? `<div class="print-feature-desc"><div class="md-content">${mdParaHtml(f.descricao)}</div></div>` : ''}
+          </div>`;
+      });
+      pag2 += `</div>`;
+    }
+  }
+
+  // --- Caracteristicas de Subclasse ---
+  if (char.subclasse && classeData?.subclasses?.length) {
+    const sc = classeData.subclasses.find(s => s.nome === char.subclasse);
+    const feats = sc?.caracteristicas?.filter(c => c.nivel <= char.nivel) || [];
+    if (feats.length > 0) {
+      pag2 += `<div class="print-section"><div class="print-section-title">Subclasse &mdash; ${char.subclasse}</div>`;
+      feats.forEach(f => {
+        pag2 += `
+          <div class="print-feature">
+            <div class="print-feature-name">${f.nome} <span style="font-weight:400;font-size:7pt;color:#666">(Nivel ${f.nivel})</span></div>
+            ${f.descricao ? `<div class="print-feature-desc"><div class="md-content">${mdParaHtml(f.descricao)}</div></div>` : ''}
+          </div>`;
+      });
+      pag2 += `</div>`;
+    }
+  }
+
+  // --- Tracos de Especie (usa multi-colunas para aproveitar espaco) ---
+  if (_espData?.tracos?.length) {
+    const tracosEscolhidos = char.tracos_escolhidos || [];
+    let tracosMostrar = [..._espData.tracos];
+
+    // Filtrar sub-tracos nao escolhidos
+    if (SUBTRACOS_ESPECIE[char.especie]) {
+      const opcoes = SUBTRACOS_ESPECIE[char.especie];
+      const escolhido = tracosEscolhidos.find(e => opcoes[e]);
+      if (escolhido) {
+        const naoEscolhidos = Object.keys(opcoes).filter(k => k !== escolhido);
+        tracosMostrar = tracosMostrar.filter(t => !naoEscolhidos.some(ne => t.nome.includes(ne)));
+      }
+    }
+
+    // Filtrar por nivel
+    tracosMostrar = tracosMostrar.filter(t => {
+      if (typeof t.nivel_minimo === 'number' && char.nivel < t.nivel_minimo) return false;
+      const match = t.descricao?.match(/(?:a partir do |no )n[ií]vel (\d+)/i);
+      if (match) return char.nivel >= parseInt(match[1]);
+      return true;
+    });
+
+    if (tracosMostrar.length > 0) {
+      pag2 += `<div class="print-section"><div class="print-section-title">Tracos de Especie &mdash; ${char.especie}</div><div class="print-multi-col">`;
+      tracosMostrar.forEach(t => {
+        pag2 += `
+          <div class="print-feature">
+            <div class="print-feature-name">${t.nome}</div>
+            ${t.descricao ? `<div class="print-feature-desc"><div class="md-content">${mdParaHtml(t.descricao)}</div></div>` : ''}
+          </div>`;
+      });
+      pag2 += `</div></div>`;
+    }
+  }
+
+  // ===================== PAGINAS DE MAGIAS =====================
+  let pagMagias = '';
+  const temMagias = info.conjurador || ehSubclasseConjuradora() || (char.magias_conhecidas?.length > 0) || (char.magias_preparadas?.length > 0);
+
+  if (temMagias) {
+    // Espacos de magia
+    const espacos = char.espacos_magia || {};
+    if (Object.keys(espacos).length > 0) {
+      pagMagias += `<div class="print-section"><div class="print-section-title">Espacos de Magia</div>`;
+      pagMagias += `<div style="display:flex;gap:4mm;flex-wrap:wrap;margin-bottom:2mm">`;
+      Object.entries(espacos).forEach(([circ, data]) => {
+        const restantes = data.total - (data.usados || 0);
+        pagMagias += `<div style="text-align:center"><div style="font-weight:700;font-size:10pt">${restantes}/${data.total}</div><div style="font-size:6.5pt;color:#666">${circ}º Círculo</div></div>`;
+      });
+      pagMagias += `</div></div>`;
+    }
+
+    // Bruxo: slots de pacto
+    if (char.classe === 'Bruxo') {
+      const estadoBruxo = getEstadoRecursosBruxo();
+      if (estadoBruxo) {
+        const slotsBruxo = estadoBruxo.slotsTotal || 0;
+        const usadosBruxo = char.bruxo_slots_usados || 0;
+        const restBruxo = slotsBruxo - usadosBruxo;
+        const circBruxo = estadoBruxo.slotsCirculo || 1;
+        pagMagias += `<div style="font-size:8pt;margin-bottom:2mm"><strong>Espaços de Pacto:</strong> ${restBruxo}/${slotsBruxo} (${circBruxo}º Círculo)</div>`;
+      }
+    }
+
+    // Truques - usar layout em colunas para melhor aproveitamento
+    const todosTruques = (char.magias_conhecidas || []).filter(m => m.circulo === 0);
+    if (todosTruques.length > 0) {
+      pagMagias += `<div class="print-section"><div class="print-section-title">Truques</div><div class="print-multi-col">`;
+      todosTruques.forEach(m => {
+        const origem = rotuloOrigemMagia(m);
+        pagMagias += htmlMagiaImpressao(m.nome, 0, cacheMagias, origem);
+      });
+      pagMagias += `</div></div>`;
+    }
+
+    // Magias do Pacto do Tomo (Bruxo)
+    if (char.classe === 'Bruxo') {
+      const estado = getEstadoRecursosBruxo();
+      if (estado?.pacto === 'Pacto do Tomo') {
+        const truquesPacto = char.recursos?.bruxo?.livro_sombras?.truques || [];
+        const rituaisPacto = char.recursos?.bruxo?.livro_sombras?.rituais || [];
+
+        if (truquesPacto.length > 0) {
+          pagMagias += `<div class="print-section"><div class="print-section-title">Livro das Sombras - Truques</div><div class="print-multi-col">`;
+          truquesPacto.forEach(nome => {
+            pagMagias += htmlMagiaImpressao(nome, 0, cacheMagias, 'Livro das Sombras');
+          });
+          pagMagias += `</div></div>`;
+        }
+
+        if (rituaisPacto.length > 0) {
+          pagMagias += `<div class="print-section"><div class="print-section-title">Livro das Sombras - Rituais</div><div class="print-multi-col">`;
+          rituaisPacto.forEach(r => {
+            const nome = typeof r === 'string' ? r : r.nome;
+            const circ = typeof r === 'string' ? 1 : (r.circulo || 1);
+            pagMagias += htmlMagiaImpressao(nome, circ, cacheMagias, 'Ritual');
+          });
+          pagMagias += `</div></div>`;
+        }
+      }
+    }
+
+    // Magias preparadas por circulo
+    const preparadas = char.magias_preparadas || [];
+    const preparadasPorCirculo = {};
+    preparadas.forEach(m => {
+      const circ = m.circulo || 1;
+      if (!preparadasPorCirculo[circ]) preparadasPorCirculo[circ] = [];
+      preparadasPorCirculo[circ].push(m);
+    });
+
+    Object.keys(preparadasPorCirculo).sort((a, b) => parseInt(a) - parseInt(b)).forEach(circ => {
+      const magias = preparadasPorCirculo[circ];
+      pagMagias += `<div class="print-section"><div class="print-section-title">${circ}º Círculo (${magias.length} magias)</div><div class="print-multi-col">`;
+      magias.forEach(m => {
+        const origem = rotuloOrigemMagia(m);
+        pagMagias += htmlMagiaImpressao(m.nome, parseInt(circ), cacheMagias, origem);
+      });
+      pagMagias += `</div></div>`;
+    });
+
+    // Magias customizadas
+    const customizadas = char.magias_customizadas || [];
+    if (customizadas.length > 0) {
+      pagMagias += `<div class="print-section"><div class="print-section-title">Magias Customizadas</div><div class="print-multi-col">`;
+      customizadas.forEach(m => {
+        const circLabel = m.circulo === 0 ? 'Truque' : `${m.circulo}º Círculo`;
+        pagMagias += `
+          <div class="print-spell">
+            <div class="print-spell-name">${m.nome} <span style="font-weight:400;font-size:7pt;color:#666">(${circLabel})</span></div>
+            ${m.escola ? `<div class="print-spell-meta">${m.escola}${m.tempo_conjuracao ? ' | ' + m.tempo_conjuracao : ''}${m.alcance ? ' | ' + m.alcance : ''}${m.duracao ? ' | ' + m.duracao : ''}</div>` : ''}
+            <div class="print-spell-desc"><div class="md-content">${mdParaHtml(m.descricao || '')}</div></div>
+          </div>`;
+      });
+      pagMagias += `</div></div>`;
+    }
+  }
+
+  // ===================== ULTIMAS PAGINAS (Inventario + Detalhes) =====================
+  let pagFinal = '';
+
+  // --- Inventario (itens NAO equipados) ---
+  const naoEquipados = inv.filter(i => !i.equipado && (i.quantidade ?? 1) > 0);
+  if (naoEquipados.length > 0 || (char.po ?? 0) > 0) {
+    pagFinal += `<div class="print-section"><div class="print-section-title">Inventario (Mochila)</div>`;
+    if ((char.po ?? 0) > 0) {
+      pagFinal += `<div style="font-size:8.5pt;font-weight:700;margin-bottom:1mm">Ouro: ${char.po} PO</div>`;
+    }
+    naoEquipados.forEach(item => {
+      let detalhe = '';
+      if (item.tipo === 'arma') detalhe = [item.dados?.dano, item.dados?.propriedades].filter(Boolean).join(' | ');
+      else if (item.tipo === 'armadura') detalhe = `CA: ${item.dados?.ca || '?'} | ${item.dados?.categoria || ''}`;
+      else if (item.tipo === 'escudo') detalhe = `CA: ${item.dados?.ca || '?'}`;
+      else if (item.tipo === 'equipamento') detalhe = [item.dados?.custo, item.dados?.peso].filter(Boolean).join(' | ');
+      else if (item.tipo === 'customizado') detalhe = item.descricao || '';
+      else detalhe = item.descricao || '';
+      const qtd = (item.quantidade ?? 1) > 1 ? ` (x${item.quantidade})` : '';
+      pagFinal += `
+        <div class="print-inv-item">
+          <span class="print-inv-name">${item.nome}${qtd}</span>
+          <span class="print-inv-detail">${detalhe}</span>
+        </div>`;
+    });
+    pagFinal += `</div>`;
+  }
+
+  // --- Detalhes pessoais ---
+  const camposDetalhe = [
+    { key: 'aparencia', label: 'Aparencia' },
+    { key: 'personalidade', label: 'Personalidade' },
+    { key: 'ideais', label: 'Ideais' },
+    { key: 'lacos', label: 'Lacos' },
+    { key: 'defeitos', label: 'Defeitos' },
+    { key: 'historia_personagem', label: 'Historia' },
+    { key: 'notas', label: 'Notas' }
+  ];
+  const camposPreenchidos = camposDetalhe.filter(c => char[c.key]);
+  if (camposPreenchidos.length > 0) {
+    pagFinal += `<div class="print-section"><div class="print-section-title">Detalhes</div>`;
+    camposPreenchidos.forEach(c => {
+      pagFinal += `
+        <div class="print-detail-field">
+          <div class="print-detail-label">${c.label}</div>
+          <div class="print-detail-value">${char[c.key]}</div>
+        </div>`;
+    });
+    pagFinal += `</div>`;
+  }
+
+  // ===================== MONTAR PAGINAS =====================
+  // Pagina 1 sempre sozinha
+  let html = `<div class="print-page">${pag1}</div>`;
+
+  // Magias vem antes de talentos/caracteristicas para referencia rapida
+  if (pagMagias) {
+    html += `<div class="print-page">${pagMagias}</div>`;
+  }
+
+  // Talentos, caracteristicas, tracos de especie
+  if (pag2) {
+    html += `<div class="print-page">${pag2}</div>`;
+  }
+
+  // Paginas finais: inventario + detalhes
+  if (pagFinal) {
+    html += `<div class="print-page">${pagFinal}</div>`;
+  }
+
+  return html;
+}
+
+/**
+ * Prepara e executa a impressao da ficha de personagem.
+ * Gera um overlay dedicado com layout otimizado para impressao.
+ */
+let _printOverlayAtivo = false;
+async function imprimirFicha() {
+  // Evitar dupla invocacao
+  if (_printOverlayAtivo) {
+    // Se o overlay anterior ficou preso, limpar e continuar
+    const velho = document.getElementById('print-overlay');
+    if (velho) velho.remove();
+    _printOverlayAtivo = false;
+  }
+
+  toast('Preparando impressao...', 'info');
+
+  try {
+    const html = await gerarHtmlImpressao();
+
+    // Criar overlay de impressao
+    const overlay = document.createElement('div');
+    overlay.id = 'print-overlay';
+    overlay.innerHTML = html;
+    document.body.appendChild(overlay);
+    _printOverlayAtivo = true;
+
+    // Funcao de limpeza reutilizavel
+    const limparOverlay = () => {
+      const el = document.getElementById('print-overlay');
+      if (el) el.remove();
+      _printOverlayAtivo = false;
+      // Remover listeners para evitar acumulo
+      window.removeEventListener('afterprint', limparOverlay);
+    };
+
+    // Registrar cleanup ANTES de chamar window.print()
+    window.addEventListener('afterprint', limparOverlay);
+
+    // Aguardar renderizacao do DOM
+    await new Promise(r => setTimeout(r, 200));
+
+    // Imprimir
+    window.print();
+
+    // Fallback: se afterprint nao disparar em 5s, limpar manualmente
+    setTimeout(() => {
+      if (_printOverlayAtivo) limparOverlay();
+    }, 5000);
+  } catch (err) {
+    console.error('Erro ao preparar impressao:', err);
+    toast('Erro ao preparar impressao', 'danger');
+    // Limpar overlay em caso de erro
+    const el = document.getElementById('print-overlay');
+    if (el) el.remove();
+    _printOverlayAtivo = false;
+  }
 }
