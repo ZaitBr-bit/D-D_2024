@@ -5,7 +5,7 @@ import { CLASSES_INFO, PERICIAS, ATRIBUTOS_NOMES, ATRIBUTOS_KEYS, ATRIBUTO_NOME_
 import { getPersonagem, salvarPersonagem, removerPersonagem } from '../store.js';
 import { getClasse, getMagiasClasse, getMagiasPorCirculo, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura, getTalentos, getEspecies } from '../db.js';
 import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagia, calcPercepcaoPassiva, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcBonusPericia, calcPVTotal, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, gerarId, detectarRecarga, ehHabilidadeAtiva, getDeslocamento, getTamanho } from '../utils.js';
-import { podeSubirDeNivel, subirDeNivel, XP_POR_NIVEL, adicionarXP, obterTodasMagiasDominio, obterTodasMagiasSemprePreparadas, exigeEspecializacaoBardo, exigeEspecializacaoGuardiao } from '../levelup.js';
+import { podeSubirDeNivel, subirDeNivel, XP_POR_NIVEL, adicionarXP, obterTodasMagiasDominio, obterTodasMagiasSemprePreparadas, exigeEspecializacaoBardo, exigeEspecializacaoGuardiao, exigeEstiloLuta, exigeExploradorHabil, exigeAcademico } from '../levelup.js';
 
 // Estilos visuais (cor e emoji) para cada atributo
 const ATRIBUTO_ESTILO = {
@@ -106,6 +106,16 @@ function getEstadoInspiracaoBardo() {
     dado: prog.dado,
     recuperaCurto
   };
+}
+
+/**
+ * Retorna quantidade de truques extras concedidos pelo Estilo de Luta
+ * (Combatente Druídico = +2 truques de Druida, Combatente Abençoado = +2 truques de Clérigo)
+ */
+function getTruquesExtraEstiloLuta() {
+  const estilo = char?.escolhas_classe?.estilo_luta?.[0] || '';
+  if (estilo === 'Combatente Druídico' || estilo === 'Combatente Abençoado') return 2;
+  return 0;
 }
 
 function getProgressaoGuardiao() {
@@ -1361,6 +1371,7 @@ export async function renderSheet(container, charId) {
   magiasSempreCache = await obterTodasMagiasSemprePreparadas(char.classe, char.subclasse, char.nivel);
   migrarMagiasDominio();
   migrarMagiasSemprePreparadas();
+  migrarEscolhasClasseLegadas();
 
   // Inicializar grimório do mago se necessário
   if (char.classe === 'Mago' && !char.grimorio) {
@@ -1443,6 +1454,33 @@ function migrarMagiasSemprePreparadas() {
       alterado = true;
     }
   });
+  if (alterado) salvar();
+}
+
+/** Migra escolhas_classe legadas aplicando expertise e idiomas mecanicamente */
+function migrarEscolhasClasseLegadas() {
+  if (!char.escolhas_classe) return;
+  let alterado = false;
+  if (!char.pericias_expertise) char.pericias_expertise = [];
+
+  // Aplicar especialista (Ladino / Guardião) -> pericias_expertise
+  const especialista = char.escolhas_classe.especialista || [];
+  especialista.forEach(p => {
+    if (!char.pericias_expertise.includes(p)) {
+      char.pericias_expertise.push(p);
+      alterado = true;
+    }
+  });
+
+  // Aplicar acadêmico (Mago) -> pericias_expertise
+  const academico = char.escolhas_classe.academico || [];
+  academico.forEach(p => {
+    if (!char.pericias_expertise.includes(p)) {
+      char.pericias_expertise.push(p);
+      alterado = true;
+    }
+  });
+
   if (alterado) salvar();
 }
 
@@ -2013,7 +2051,7 @@ function renderFichaCompleta() {
     ${renderSecaoTracosEspecie()}
 
     <!-- Espaços de Magia e Magias -->
-    ${(info.conjurador || ehSubclasseConjuradora()) ? renderSecaoMagias() : ''}
+    ${(info.conjurador || ehSubclasseConjuradora() || getTruquesExtraEstiloLuta() > 0) ? renderSecaoMagias() : ''}
 
     <!-- Inventário -->
     ${renderSecaoInventario()}
@@ -4548,11 +4586,17 @@ async function abrirModalLevelUp() {
   const precisaSubclasse = exigeSubclasse(char.classe, nivelNovo) && !char.subclasse;
   const precisaExpertiseBardo = exigeEspecializacaoBardo(char.classe, nivelNovo);
   const precisaExpertiseGuardiao = exigeEspecializacaoGuardiao(char.classe, nivelNovo);
+  const precisaEstiloLuta = exigeEstiloLuta(char.classe, nivelNovo);
+  const precisaExploradorHabil = exigeExploradorHabil(char.classe, nivelNovo);
+  const precisaAcademico = exigeAcademico(char.classe, nivelNovo);
   const pendencias = [];
   if (precisaSubclasse) pendencias.push('Escolher subclasse');
   if (ganhaAumentoAtributo) pendencias.push('Distribuir 2 pontos de atributo');
   if (precisaExpertiseBardo) pendencias.push('Escolher 2 perícias para Especialização do Bardo');
   if (precisaExpertiseGuardiao) pendencias.push('Escolher 2 perícias para Especialista do Guardião');
+  if (precisaEstiloLuta) pendencias.push('Escolher Estilo de Luta');
+  if (precisaExploradorHabil) pendencias.push('Escolher perícia e idiomas (Explorador Hábil)');
+  if (precisaAcademico) pendencias.push('Escolher 2 perícias para Acadêmico do Mago');
   if (info.conjurador) pendencias.push('Revisar opções de magias deste nível');
   
   // Obter características da subclasse para este nível (se já tem subclasse)
@@ -4745,6 +4789,111 @@ async function abrirModalLevelUp() {
       </div>
       <div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px;text-align:center">
         Selecionadas: <span id="levelup-guardiao-expertise-count" style="font-weight:700">0</span>/2
+      </div>
+    `;
+  }
+
+  // --- Estilo de Luta (Guardião nv2, Paladino nv2) ---
+  if (precisaEstiloLuta) {
+    const opcoesBase = [
+      { nome: 'Arquearia', descricao: '+2 em ataques à distância com armas' },
+      { nome: 'Arremesso', descricao: '+2 de dano com armas de Arremesso' },
+      { nome: 'Armas Grandes', descricao: 'Trata 1-2 como 3 nos dados de dano (duas mãos)' },
+      { nome: 'Duas Armas', descricao: 'Adiciona mod. ao dano da mão secundária' },
+      { nome: 'Desarmado', descricao: 'Dano desarmado d6/d8+For' },
+      { nome: 'Defensivo', descricao: '+1 CA usando armadura' },
+      { nome: 'Duelismo', descricao: '+2 dano com uma arma em uma mão' },
+      { nome: 'Interceptação', descricao: 'Reduz dano a aliado em 1d10+Prof' },
+      { nome: 'Luta às Cegas', descricao: 'Visão Cega 3m, 9m se cego' },
+      { nome: 'Protetivo', descricao: 'Impõe desvantagem em ataques contra aliados' }
+    ];
+    // Variante especial por classe
+    if (char.classe === 'Guardião') {
+      opcoesBase.push({ nome: 'Combatente Druídico', descricao: 'Aprende 2 truques de Druida (Sabedoria)' });
+    }
+    if (char.classe === 'Paladino') {
+      opcoesBase.push({ nome: 'Combatente Abençoado', descricao: 'Aprende 2 truques de Clérigo (Carisma)' });
+    }
+
+    conteudoModal += `
+      <div class="section-divider mt-2"><span>Estilo de Luta</span></div>
+      <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
+        Escolha um Estilo de Luta. A escolha é permanente.
+      </div>
+      <div id="levelup-estilo-luta" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px">
+        ${opcoesBase.map(opt => `
+          <label class="form-check" style="display:flex;align-items:center;gap:6px;padding:6px 8px;border:1px solid var(--border-light);border-radius:6px;cursor:pointer">
+            <input type="radio" name="estilo_luta" value="${opt.nome}" data-estilo-luta="${opt.nome}">
+            <div>
+              <div style="font-weight:600;font-size:0.85rem">${opt.nome}</div>
+              <div style="font-size:0.75rem;color:var(--text-muted)">${opt.descricao}</div>
+            </div>
+          </label>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  // --- Explorador Hábil (Guardião nv2: 1 expertise + 2 idiomas) ---
+  if (precisaExploradorHabil) {
+    const proficientes = (char.pericias_proficientes || []);
+    const expertiseAtual = new Set(char.pericias_expertise || []);
+    const elegiveisExp = proficientes.filter(p => !expertiseAtual.has(p));
+
+    const idiomasDisponiveis = [
+      'Língua de Sinais Comum', 'Dracônico', 'Anão', 'Élfico',
+      'Gigante', 'Gnômico', 'Goblin', 'Pequenino', 'Orc'
+    ];
+    const idiomasJaPossuidos = new Set(char.idiomas || []);
+    const idiomasElegiveis = idiomasDisponiveis.filter(i => !idiomasJaPossuidos.has(i));
+
+    conteudoModal += `
+      <div class="section-divider mt-2"><span>Explorador Hábil</span></div>
+      <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
+        Escolha 1 perícia para Especialização e 2 idiomas.
+      </div>
+      <div style="font-weight:600;font-size:0.85rem;margin-bottom:4px">Especialização (1 perícia):</div>
+      <div id="levelup-explorador-expertise" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px;margin-bottom:12px">
+        ${elegiveisExp.map(p => `
+          <label class="form-check" style="display:flex;align-items:center;gap:6px;padding:6px 8px;border:1px solid var(--border-light);border-radius:6px;cursor:pointer">
+            <input type="radio" name="explorador_expertise" value="${p}" data-explorador-expertise="${p}"> ${p}
+          </label>
+        `).join('')}
+      </div>
+      <div style="font-weight:600;font-size:0.85rem;margin-bottom:4px">Idiomas (2):</div>
+      <div id="levelup-explorador-idiomas" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:6px">
+        ${idiomasElegiveis.map(i => `
+          <label class="form-check" style="display:flex;align-items:center;gap:6px;padding:6px 8px;border:1px solid var(--border-light);border-radius:6px;cursor:pointer">
+            <input type="checkbox" data-explorador-idioma="${i}"> ${i}
+          </label>
+        `).join('')}
+      </div>
+      <div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px;text-align:center">
+        Idiomas selecionados: <span id="levelup-explorador-idiomas-count" style="font-weight:700">0</span>/2
+      </div>
+    `;
+  }
+
+  // --- Acadêmico (Mago nv2: 2 expertise em perícias de conhecimento) ---
+  if (precisaAcademico) {
+    const periciasAcademicas = ['Arcanismo', 'História', 'Investigação', 'Medicina', 'Natureza', 'Religião'];
+    const expertiseAtual = new Set(char.pericias_expertise || []);
+    const elegiveisAc = periciasAcademicas.filter(p => !expertiseAtual.has(p));
+
+    conteudoModal += `
+      <div class="section-divider mt-2"><span>Acadêmico</span></div>
+      <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
+        Selecione 2 perícias de conhecimento para Especialização.
+      </div>
+      <div id="levelup-academico" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px">
+        ${elegiveisAc.map(p => `
+          <label class="form-check" style="display:flex;align-items:center;gap:6px;padding:6px 8px;border:1px solid var(--border-light);border-radius:6px">
+            <input type="checkbox" data-academico-expertise="${p}"> ${p}
+          </label>
+        `).join('')}
+      </div>
+      <div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px;text-align:center">
+        Selecionadas: <span id="levelup-academico-count" style="font-weight:700">0</span>/2
       </div>
     `;
   }
@@ -5005,7 +5154,47 @@ async function abrirModalLevelUp() {
     checks.forEach(c => c.addEventListener('change', atualizarCount));
     atualizarCount();
   }
-  
+
+  // Handler: Explorador Hábil - idiomas (max 2)
+  if (precisaExploradorHabil) {
+    const checksIdiomas = [...document.querySelectorAll('[data-explorador-idioma]')];
+    const countIdiomasEl = document.getElementById('levelup-explorador-idiomas-count');
+
+    const atualizarCountIdiomas = () => {
+      const marcadas = checksIdiomas.filter(c => c.checked).length;
+      if (countIdiomasEl) {
+        countIdiomasEl.textContent = String(marcadas);
+        countIdiomasEl.style.color = marcadas === 2 ? 'var(--success)' : (marcadas > 2 ? 'var(--danger)' : 'inherit');
+      }
+      checksIdiomas.forEach(c => {
+        if (!c.checked) c.disabled = marcadas >= 2;
+      });
+    };
+
+    checksIdiomas.forEach(c => c.addEventListener('change', atualizarCountIdiomas));
+    atualizarCountIdiomas();
+  }
+
+  // Handler: Acadêmico - expertise (max 2)
+  if (precisaAcademico) {
+    const checksAcademico = [...document.querySelectorAll('[data-academico-expertise]')];
+    const countAcademicoEl = document.getElementById('levelup-academico-count');
+
+    const atualizarCountAcademico = () => {
+      const marcadas = checksAcademico.filter(c => c.checked).length;
+      if (countAcademicoEl) {
+        countAcademicoEl.textContent = String(marcadas);
+        countAcademicoEl.style.color = marcadas === 2 ? 'var(--success)' : (marcadas > 2 ? 'var(--danger)' : 'inherit');
+      }
+      checksAcademico.forEach(c => {
+        if (!c.checked) c.disabled = marcadas >= 2;
+      });
+    };
+
+    checksAcademico.forEach(c => c.addEventListener('change', atualizarCountAcademico));
+    atualizarCountAcademico();
+  }
+
   // --- Eventos de seleção de magias no level up ---
   if (info.conjurador || ehSubConj) {
     const tipoConj = info.tipo_conjuracao || 'preparadas';
@@ -5370,6 +5559,45 @@ async function abrirModalLevelUp() {
       }
       opcoes.guardiao_expertise = escolhidas;
     }
+
+    // Validar Estilo de Luta
+    if (precisaEstiloLuta) {
+      const estiloRadio = document.querySelector('input[name="estilo_luta"]:checked');
+      if (!estiloRadio) {
+        toast('Selecione um Estilo de Luta', 'error');
+        return;
+      }
+      opcoes.estilo_luta = estiloRadio.value;
+    }
+
+    // Validar Explorador Hábil
+    if (precisaExploradorHabil) {
+      const expertiseRadio = document.querySelector('input[name="explorador_expertise"]:checked');
+      if (!expertiseRadio) {
+        toast('Selecione 1 perícia para Especialização (Explorador Hábil)', 'error');
+        return;
+      }
+      opcoes.explorador_expertise = expertiseRadio.value;
+
+      const idiomasEscolhidos = [...document.querySelectorAll('[data-explorador-idioma]:checked')]
+        .map(el => el.getAttribute('data-explorador-idioma'));
+      if (idiomasEscolhidos.length !== 2) {
+        toast('Selecione exatamente 2 idiomas (Explorador Hábil)', 'error');
+        return;
+      }
+      opcoes.explorador_idiomas = idiomasEscolhidos;
+    }
+
+    // Validar Acadêmico do Mago
+    if (precisaAcademico) {
+      const escolhidas = [...document.querySelectorAll('[data-academico-expertise]:checked')]
+        .map(el => el.getAttribute('data-academico-expertise'));
+      if (escolhidas.length !== 2) {
+        toast('Selecione exatamente 2 perícias para Acadêmico do Mago', 'error');
+        return;
+      }
+      opcoes.academico_expertise = escolhidas;
+    }
     
     // Validar e processar seleção de magias no level up
     const lm = window._levelupMagias;
@@ -5471,6 +5699,11 @@ async function abrirModalLevelUp() {
             ${(resultado.magias_sempre_adicionadas || []).length > 0 ? `<li>Magias sempre preparadas adicionadas: ${resultado.magias_sempre_adicionadas.map(m => m.nome).join(', ')}</li>` : ''}
             ${(resultado.expertise_bardo_aplicada || []).length > 0 ? `<li>Especialização: ${resultado.expertise_bardo_aplicada.join(', ')}</li>` : ''}
             ${(resultado.expertise_guardiao_aplicada || []).length > 0 ? `<li>Especialista do Guardião: ${resultado.expertise_guardiao_aplicada.join(', ')}</li>` : ''}
+            ${resultado.estilo_luta_aplicado ? `<li>Estilo de Luta: ${resultado.estilo_luta_aplicado}</li>` : ''}
+            ${(resultado.estilo_luta_aplicado === 'Combatente Druídico' || resultado.estilo_luta_aplicado === 'Combatente Abençoado') ? `<li style="color:var(--accent)">Use <strong>Gerenciar Magias</strong> para selecionar seus 2 truques bônus de ${resultado.estilo_luta_aplicado === 'Combatente Druídico' ? 'Druida' : 'Clérigo'}</li>` : ''}
+            ${resultado.explorador_habil_aplicado?.expertise ? `<li>Explorador Hábil - Especialização: ${resultado.explorador_habil_aplicado.expertise}</li>` : ''}
+            ${(resultado.explorador_habil_aplicado?.idiomas || []).length > 0 ? `<li>Explorador Hábil - Idiomas: ${resultado.explorador_habil_aplicado.idiomas.join(', ')}</li>` : ''}
+            ${(resultado.academico_aplicado || []).length > 0 ? `<li>Acadêmico: ${resultado.academico_aplicado.join(', ')}</li>` : ''}
             ${truquesAdicionados.length > 0 ? `<li>Truques: +${truquesAdicionados.join(', ')}</li>` : ''}
             ${magiasAdicionadas.length > 0 ? `<li>Magias: +${magiasAdicionadas.join(', ')}</li>` : ''}
             ${grimorioAdicionado.length > 0 ? `<li>Grimório: +${grimorioAdicionado.join(', ')}</li>` : ''}
@@ -6329,6 +6562,31 @@ function renderFeatureItem(f, source) {
       </div>
     `;
     recarga = 'curto_ou_longo';
+  } else if (f.nome === 'Estilo de Luta') {
+    // Exibir o estilo de luta escolhido com seu efeito
+    const estiloEscolhido = char.escolhas_classe?.estilo_luta?.[0] || '';
+    if (estiloEscolhido) {
+      const efeitosEstilo = {
+        'Arquearia': '+2 nas jogadas de ataque com armas à distância',
+        'Defesa Cega': 'Sentido cego de 3m (exige proficiência)',
+        'Defensivo': '+1 de CA ao usar armadura',
+        'Duelismo': '+2 de dano com arma de uma mão (sem outra arma)',
+        'Armas Grandes': 're-rolar 1 ou 2 no dano de armas de duas mãos',
+        'Intercessão': '-1d10+prof do dano em aliado adjacente (reação)',
+        'Arremesso': 'saca e arremessa com +2 de dano',
+        'Combate sem Arma': '1d6+FOR de dano desarmado',
+        'Combate com Duas Armas': '+mod de atributo no dano da arma secundária',
+        'Combatente Druídico': '2 truques de Druida (Sabedoria)',
+        'Combatente Abençoado': '2 truques de Clérigo (Carisma)'
+      };
+      const efeito = efeitosEstilo[estiloEscolhido] || '';
+      usosHtmlBody = `
+        <div style="display:flex;align-items:center;gap:8px;padding:4px 0 4px 16px;flex-wrap:wrap">
+          <span class="badge badge-accent" style="font-size:0.8rem">${estiloEscolhido}</span>
+          ${efeito ? `<span style="font-size:0.75rem;color:var(--text-muted)">${efeito}</span>` : ''}
+        </div>
+      `;
+    }
   }
 
   if (!usosHtmlBody && temMultiplosUsos) {
@@ -6610,6 +6868,30 @@ async function obterMagiasDisponiveisClasseAtual() {
   const magiasClasseData = await getMagiasClasse(classeParaMagias);
   const base = achatarMagiasClasse(magiasClasseData);
 
+  // Combatente Druídico: incluir truques de Druida
+  const estiloLuta = char.escolhas_classe?.estilo_luta?.[0] || '';
+  if (estiloLuta === 'Combatente Druídico') {
+    const druidaData = await getMagiasClasse('Druida');
+    const druidaTruques = achatarMagiasClasse(druidaData).filter(m => m.circulo === 0);
+    const mapa = new Map();
+    base.forEach(m => mapa.set(`${m.nome}|${m.circulo || 0}`, m));
+    druidaTruques.forEach(m => { if (!mapa.has(`${m.nome}|0`)) mapa.set(`${m.nome}|0`, m); });
+    // Retornar base + truques de druida, mantendo magias de circulo da base
+    const resultado = [...mapa.values()];
+    if (!ehBardoComSegredosMagicos()) return resultado;
+  }
+
+  // Combatente Abençoado: incluir truques de Clérigo
+  if (estiloLuta === 'Combatente Abençoado') {
+    const clerigoData = await getMagiasClasse('Clérigo');
+    const clerigoTruques = achatarMagiasClasse(clerigoData).filter(m => m.circulo === 0);
+    const mapa = new Map();
+    base.forEach(m => mapa.set(`${m.nome}|${m.circulo || 0}`, m));
+    clerigoTruques.forEach(m => { if (!mapa.has(`${m.nome}|0`)) mapa.set(`${m.nome}|0`, m); });
+    const resultado = [...mapa.values()];
+    if (!ehBardoComSegredosMagicos()) return resultado;
+  }
+
   if (!ehBardoComSegredosMagicos()) return base;
 
   const extrasClasses = ['Clérigo', 'Druida', 'Mago'];
@@ -6700,6 +6982,8 @@ function renderSecaoMagias() {
   if (subConj && maxTruques === 0) {
     maxTruques = subConj.truques || 0;
   }
+  // Truques extras de Combatente Druídico / Abençoado
+  maxTruques += getTruquesExtraEstiloLuta();
 
   // Contar magias preparadas excluindo as especiais (não contam no limite)
   const preparadasNormais = preparadas.filter(m => magiaContaNoLimite(m));
@@ -7067,6 +7351,8 @@ async function mostrarBuscaMagia() {
   if (subConj && maxTruq === 99) {
     maxTruq = subConj.truques || 99;
   }
+  // Truques extras de Combatente Druídico / Abençoado
+  maxTruq += getTruquesExtraEstiloLuta();
 
   // Espaços de magia para determinar círculos disponíveis
   let espacosNivel = tabela ? getEspacosMagia(tabela, char.nivel) : {};
