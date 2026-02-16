@@ -76,7 +76,7 @@ export const CLASSES_INFO = {
   },
   "Guardião": {
     dado_vida: 10,
-    atributo_primario: "Sabedoria",
+    atributo_primario: "Destreza e Sabedoria",
     salvaguardas: ["Força", "Destreza"],
     armaduras: ["Leve", "Média", "Escudo"],
     armas: ["Simples", "Marcial"],
@@ -92,7 +92,7 @@ export const CLASSES_INFO = {
     salvaguardas: ["Força", "Constituição"],
     armaduras: ["Leve", "Média", "Pesada", "Escudo"],
     armas: ["Simples", "Marcial"],
-    pericias_opcoes: ["Acrobacia", "Adestrar Animais", "Atletismo", "História", "Intimidação", "Intuição", "Percepção", "Sobrevivência"],
+    pericias_opcoes: ["Acrobacia", "Adestrar Animais", "Atletismo", "História", "Intimidação", "Intuição", "Percepção", "Persuasão", "Sobrevivência"],
     num_pericias: 2,
     conjurador: false,
     atributo_conjuracao: null

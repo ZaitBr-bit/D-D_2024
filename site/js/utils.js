@@ -38,6 +38,7 @@ export function calcCA(personagem) {
   const modDes = calcMod(personagem.atributos.destreza);
   const modCon = calcMod(personagem.atributos.constituicao);
   const modSab = calcMod(personagem.atributos.sabedoria);
+  const modCar = calcMod(personagem.atributos.carisma);
   const inv = personagem.inventario || [];
 
   // Verificar armadura equipada
@@ -53,6 +54,19 @@ export function calcCA(personagem) {
   // Monge: Defesa sem Armadura = 10 + Des + Sab
   if (personagem.classe === 'Monge' && !armadura) {
     ca = 10 + modDes + modSab;
+  }
+  // Bardo (Colégio da Dança): Defesa sem Armadura = 10 + Des + Car
+  if (personagem.classe === 'Bardo' && personagem.subclasse === 'Colégio da Dança' && (personagem.nivel || 1) >= 3 && !armadura && !escudo) {
+    ca = 10 + modDes + modCar;
+  }
+  // Feiticeiro (Feitiçaria Dracônica): Resiliência Dracônica = 10 + Des + Car (sem armadura)
+  if (
+    personagem.classe === 'Feiticeiro' &&
+    personagem.subclasse === 'Feitiçaria Dracônica' &&
+    (personagem.nivel || 1) >= 3 &&
+    !armadura
+  ) {
+    ca = 10 + modDes + modCar;
   }
 
   if (armadura) {
@@ -100,7 +114,14 @@ export function calcCDMagia(personagem) {
   if (!info || !info.atributo_conjuracao) return 0;
   const key = ATRIBUTO_NOME_PARA_KEY[info.atributo_conjuracao];
   const modAttr = calcMod(personagem.atributos[key]);
-  return 8 + bonusProficiencia(personagem.nivel) + modAttr;
+  let cd = 8 + bonusProficiencia(personagem.nivel) + modAttr;
+
+  // Feiticeiro: Feitiçaria Inata ativa aumenta CD em +1
+  if (personagem.classe === 'Feiticeiro' && personagem?.recursos?.feiticeiro?.feiticaria_inata_ativa) {
+    cd += 1;
+  }
+
+  return cd;
 }
 
 /** Calcula bônus de ataque de magia */
@@ -120,20 +141,63 @@ export function calcPercepcaoPassiva(personagem) {
   let bonus = modSab;
   if (prof) bonus += bonusProficiencia(personagem.nivel);
   if (exp) bonus += bonusProficiencia(personagem.nivel);
+  if (personagem.classe === 'Bardo' && (personagem.nivel || 1) >= 2 && !prof && !exp) {
+    bonus += Math.floor(bonusProficiencia(personagem.nivel) / 2);
+  }
   return 10 + bonus;
 }
 
+/** Calcula Intuicao Passiva (10 + bonus pericia Intuicao) */
+export function calcIntuicaoPassiva(personagem) {
+  return 10 + calcBonusPericia(personagem, 'Intuição');
+}
+
+/** Calcula Investigacao Passiva (10 + bonus pericia Investigacao) */
+export function calcInvestigacaoPassiva(personagem) {
+  return 10 + calcBonusPericia(personagem, 'Investigação');
+}
+
 /** Calcula bônus de uma perícia */
-export function calcBonusPericia(personagem, nomePericia) {
+export function calcBonusPericia(personagem, nomePericia, opcoes = {}) {
   const pericia = PERICIAS.find(p => p.nome === nomePericia);
   if (!pericia) return 0;
-  const key = ATRIBUTO_NOME_PARA_KEY[pericia.atributo];
+
+  const emFuria = !!opcoes.emFuria;
+  const forcaPrimordialAtiva = !!opcoes.forcaPrimordialAtiva;
+  const periciasConhecimentoPrimordial = ['Acrobacia', 'Furtividade', 'Intimidação', 'Percepção', 'Sobrevivência'];
+
+  const usarForcaPrimordial = emFuria && forcaPrimordialAtiva && periciasConhecimentoPrimordial.includes(nomePericia);
+  const key = usarForcaPrimordial ? 'forca' : ATRIBUTO_NOME_PARA_KEY[pericia.atributo];
   const mod = calcMod(personagem.atributos[key]);
   const prof = (personagem.pericias_proficientes || []).includes(nomePericia);
   const exp = (personagem.pericias_expertise || []).includes(nomePericia);
   let bonus = mod;
   if (prof) bonus += bonusProficiencia(personagem.nivel);
   if (exp) bonus += bonusProficiencia(personagem.nivel);
+  // Bardo: Pau pra Toda Obra (metade da proficiência em perícias sem proficiência)
+  if (personagem.classe === 'Bardo' && (personagem.nivel || 1) >= 2 && !prof && !exp) {
+    bonus += Math.floor(bonusProficiencia(personagem.nivel) / 2);
+  }
+
+  // Clérigo (Ordem Divina: Taumaturgo) - bônus em Arcanismo e Religião
+  if (
+    personagem.classe === 'Clérigo' &&
+    personagem.ordem_divina === 'Taumaturgo' &&
+    (nomePericia === 'Arcanismo' || nomePericia === 'Religião')
+  ) {
+    bonus += Math.max(1, calcMod(personagem.atributos.sabedoria));
+  }
+
+  // Druida (Ordem Primal: Xamã) - bônus em Arcanismo e Natureza
+  const ordemPrimal = personagem.ordem_primal || personagem.escolhas_classe?.ordem_primal?.[0] || '';
+  if (
+    personagem.classe === 'Druida' &&
+    ordemPrimal === 'Xamã' &&
+    (nomePericia === 'Arcanismo' || nomePericia === 'Natureza')
+  ) {
+    bonus += Math.max(1, calcMod(personagem.atributos.sabedoria));
+  }
+
   return bonus;
 }
 
@@ -169,15 +233,25 @@ export function getMagiaPreparadas(tabelaCaracteristicas, nivel) {
 /** Deslocamento padrão da espécie (extraído do texto_completo) */
 export function getDeslocamento(especieTexto) {
   if (!especieTexto) return '9 metros';
-  const match = especieTexto.match(/Deslocamento:\s*(\d+\s*metros?)/i);
-  return match ? match[1] : '9 metros';
+  const textoLimpo = especieTexto.replace(/\*\*/g, '');
+  const match = textoLimpo.match(/Deslocamento:\s*(\d+(?:[\.,]\d+)?\s*metros?)/i);
+  return match ? match[1].trim() : '9 metros';
 }
 
 /** Tamanho da espécie */
 export function getTamanho(especieTexto) {
   if (!especieTexto) return 'Médio';
-  const match = especieTexto.match(/Tamanho:\s*([^\n]+)/i);
-  return match ? match[1].trim() : 'Médio';
+  const textoLimpo = especieTexto.replace(/\*\*/g, '');
+  const match = textoLimpo.match(/Tamanho:\s*([^\n]+)/i);
+  if (!match) return 'Médio';
+  const linha = match[1].trim();
+
+  if (/Médio\s*\(.+?\)\s*ou\s*Pequeno|Pequeno\s*\(.+?\)\s*ou\s*Médio/i.test(linha)) {
+    return 'Médio ou Pequeno';
+  }
+
+  const tamanhoBase = linha.match(/\b(Pequeno|Médio|Grande)\b/i);
+  return tamanhoBase ? tamanhoBase[1] : 'Médio';
 }
 
 // --- Renderizador simples de Markdown ---
