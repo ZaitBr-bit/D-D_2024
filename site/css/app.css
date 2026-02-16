@@ -822,58 +822,422 @@ tr:hover td { background: #faf8f4; }
 /* ============================================================
    ESTILOS DE IMPRESSÃO / PDF
    ============================================================ */
+
+/* Container de impressao (oculto na tela) */
+#print-overlay {
+  display: none;
+}
+
 @media print {
+  @page {
+    size: A4;
+    margin: 8mm 6mm;
+  }
+
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
 
   body {
-    padding: 0; background: #fff;
-    font-size: 10pt; line-height: 1.4;
+    padding: 0 !important; margin: 0 !important; background: #fff;
+    font-size: 9.5pt; line-height: 1.35;
+    -webkit-font-smoothing: antialiased;
   }
 
+  /* Ocultar tudo exceto o overlay de impressao */
   #app-header, .wizard-steps, .wizard-nav-fixed,
-  .btn, .toast-container, .modal-overlay,
+  .toast-container, .modal-overlay,
   .no-print { display: none !important; }
 
-  #app-content {
-    max-width: 100%; padding: 8mm;
+  #app-content { display: none !important; }
+
+  #print-overlay {
+    display: block !important;
+    padding: 0;
     margin: 0;
   }
 
-  .card {
-    box-shadow: none; border: 1px solid #ccc;
-    page-break-inside: avoid; margin-bottom: 4mm;
-    padding: 3mm;
+  /* --- Pagina de impressao --- */
+  .print-page {
+    page-break-after: always;
+    padding: 0;
+    position: relative;
+  }
+  .print-page:last-child { page-break-after: auto; }
+
+  /* --- Cabecalho do personagem na impressao --- */
+  .print-char-header {
+    border-bottom: 2px solid #333;
+    padding-bottom: 3mm;
+    margin-bottom: 3mm;
+  }
+  .print-char-name {
+    font-size: 16pt;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1.2;
+  }
+  .print-char-sub {
+    font-size: 9pt;
+    color: #444;
+    margin-top: 1mm;
   }
 
-  .atributos-grid { grid-template-columns: repeat(6, 1fr); gap: 2mm; }
+  /* --- Stats de combate na impressao --- */
+  .print-stats-row {
+    display: flex;
+    gap: 3mm;
+    flex-wrap: wrap;
+    margin-bottom: 3mm;
+    padding: 2mm 0;
+    border-bottom: 1px solid #ccc;
+  }
+  .print-stat-box {
+    text-align: center;
+    border: 1.5px solid #333;
+    border-radius: 4px;
+    padding: 1.5mm 3mm;
+    min-width: 14mm;
+  }
+  .print-stat-label {
+    font-size: 5.5pt;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #666;
+    letter-spacing: 0.3px;
+  }
+  .print-stat-value {
+    font-size: 12pt;
+    font-weight: 800;
+    line-height: 1.2;
+  }
 
-  .atributo-box { padding: 2mm; border-width: 1px; }
-  .atributo-mod { font-size: 14pt; }
-  .atributo-nome { font-size: 6pt; }
-  .atributo-valor { font-size: 7pt; }
+  /* --- HP na impressao --- */
+  .print-hp-row {
+    display: flex;
+    gap: 4mm;
+    align-items: center;
+    margin-bottom: 3mm;
+    padding: 2mm;
+    border: 1.5px solid #333;
+    border-radius: 4px;
+  }
+  .print-hp-item {
+    text-align: center;
+    flex: 1;
+  }
+  .print-hp-label {
+    font-size: 6pt;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #666;
+  }
+  .print-hp-value {
+    font-size: 14pt;
+    font-weight: 800;
+  }
 
-  .pericias-lista { columns: 3; font-size: 8pt; }
-  .pericia-item { padding: 1px 0; }
+  /* --- Secao generica de impressao --- */
+  .print-section {
+    margin-bottom: 3mm;
+  }
+  .print-section-title {
+    font-size: 10pt;
+    font-weight: 800;
+    text-transform: uppercase;
+    border-bottom: 2px solid #333;
+    padding-bottom: 1mm;
+    margin-bottom: 2mm;
+    color: #222;
+    letter-spacing: 0.5px;
+  }
 
-  /* Magias: mostrar todas as descrições */
-  .magia-desc { display: block !important; }
-  .magia-item { border: 1px solid #ddd; padding: 2mm; margin-bottom: 2mm; }
-  .magia-item.preparada { border-left: 2px solid #333; }
-  .magia-tags { gap: 2px; margin-top: 1px; }
-  .magia-tag { font-size: 6pt; padding: 0 3px; border: 0.5px solid #999; }
+  /* --- Grid de atributos na impressao --- */
+  .print-attr-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 2mm;
+    margin-bottom: 3mm;
+  }
+  .print-attr-box {
+    text-align: center;
+    border: 1.5px solid #333;
+    border-radius: 4px;
+    padding: 1.5mm 1mm;
+  }
+  .print-attr-name {
+    font-size: 6pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #555;
+  }
+  .print-attr-mod {
+    font-size: 14pt;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+  .print-attr-val {
+    font-size: 7pt;
+    color: #666;
+  }
 
-  /* Quebras de página */
+  /* --- Salvaguardas e sentidos na impressao --- */
+  .print-saves-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1mm 3mm;
+    margin-bottom: 2mm;
+    font-size: 8.5pt;
+  }
+  .print-save-item {
+    display: flex;
+    align-items: center;
+    gap: 1.5mm;
+    padding: 0.5mm 0;
+  }
+  .print-save-prof {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    border: 1px solid #333;
+    flex-shrink: 0;
+  }
+  .print-save-prof.ativo {
+    background: #333;
+  }
+  .print-save-bonus {
+    font-weight: 700;
+    min-width: 16px;
+    text-align: right;
+  }
+  .print-senses-grid {
+    display: flex;
+    gap: 4mm;
+    flex-wrap: wrap;
+  }
+  .print-sense-item {
+    text-align: center;
+    font-size: 8.5pt;
+  }
+  .print-sense-value {
+    font-weight: 700;
+    font-size: 11pt;
+  }
+  .print-sense-label {
+    font-size: 6.5pt;
+    color: #555;
+  }
+
+  /* --- Defesas na impressao --- */
+  .print-defenses {
+    font-size: 8.5pt;
+    margin-bottom: 2mm;
+  }
+  .print-defenses strong {
+    font-size: 7pt;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  /* --- Pericias na impressao --- */
+  .print-skills-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5mm 4mm;
+    font-size: 8pt;
+    margin-bottom: 2mm;
+  }
+  .print-skill-item {
+    display: flex;
+    align-items: center;
+    gap: 1.5mm;
+    padding: 0.5mm 0;
+    border-bottom: 0.5px dotted #ccc;
+  }
+  .print-skill-prof {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    border: 1px solid #444;
+    flex-shrink: 0;
+  }
+  .print-skill-prof.ativo { background: #444; }
+  .print-skill-prof.expertise { background: #444; box-shadow: 0 0 0 1.5px #fff, 0 0 0 2.5px #444; }
+  .print-skill-bonus {
+    font-weight: 700;
+    min-width: 14px;
+    text-align: right;
+    font-size: 8.5pt;
+  }
+  .print-skill-name {
+    flex: 1;
+    font-size: 7.5pt;
+  }
+
+  /* --- Itens equipados na impressao --- */
+  .print-equip-list {
+    font-size: 8pt;
+  }
+  .print-equip-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 1mm 0;
+    border-bottom: 0.5px dotted #ccc;
+  }
+  .print-equip-name {
+    font-weight: 600;
+  }
+  .print-equip-detail {
+    color: #555;
+    font-size: 7.5pt;
+  }
+
+  /* --- Layout multi-colunas para magias, tracos e features curtas --- */
+  .print-multi-col {
+    columns: 2;
+    column-gap: 4mm;
+    column-fill: balance;
+  }
+  .print-multi-col > * {
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+  }
+
+  /* --- Talentos / Caracteristicas expandidas --- */
+  .print-feature {
+    margin-bottom: 2mm;
+    padding-bottom: 2mm;
+    border-bottom: 0.5px solid #ddd;
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+  }
+  .print-feature:last-child { border-bottom: none; }
+  .print-feature-name {
+    font-weight: 700;
+    font-size: 9.5pt;
+    margin-bottom: 0.5mm;
+  }
+  .print-feature-badges {
+    display: inline;
+    margin-left: 2mm;
+  }
+  .print-feature-badge {
+    font-size: 6pt;
+    padding: 0.5mm 2mm;
+    border: 0.5px solid #999;
+    border-radius: 2px;
+    margin-right: 1mm;
+  }
+  .print-feature-desc {
+    font-size: 8.5pt;
+    line-height: 1.4;
+    color: #333;
+  }
+  .print-feature-desc p { margin: 1mm 0; }
+  .print-feature-desc ul, .print-feature-desc ol { margin: 1mm 0; padding-left: 5mm; }
+  .print-feature-desc li { margin-bottom: 0.5mm; }
+  .print-feature-desc strong { font-weight: 700; }
+
+  /* --- Magias na impressao --- */
+  .print-spell {
+    margin-bottom: 2mm;
+    padding: 1.5mm 2mm;
+    border: 0.5px solid #ccc;
+    border-radius: 2px;
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+  }
+  .print-spell-name {
+    font-weight: 700;
+    font-size: 9pt;
+  }
+  .print-spell-meta {
+    font-size: 7pt;
+    color: #555;
+    display: flex;
+    gap: 2mm;
+    flex-wrap: wrap;
+    margin-top: 0.5mm;
+    margin-bottom: 1mm;
+    padding-bottom: 1mm;
+    border-bottom: 0.5px dotted #ddd;
+  }
+  .print-spell-desc {
+    font-size: 8pt;
+    line-height: 1.35;
+    color: #333;
+  }
+  .print-spell-desc p { margin: 0.5mm 0; }
+  .print-spell-upcast {
+    font-size: 7.5pt;
+    color: #555;
+    margin-top: 1mm;
+    padding-top: 1mm;
+    border-top: 0.5px dotted #ddd;
+  }
+
+  /* --- Inventario na impressao --- */
+  .print-inv-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 1mm 0;
+    border-bottom: 0.5px dotted #ccc;
+    font-size: 8pt;
+    page-break-inside: avoid;
+  }
+  .print-inv-name { font-weight: 600; }
+  .print-inv-detail { color: #555; font-size: 7.5pt; }
+  .print-inv-qty {
+    font-weight: 700;
+    min-width: 20px;
+    text-align: right;
+  }
+
+  /* --- Detalhes pessoais na impressao --- */
+  .print-detail-field {
+    margin-bottom: 2mm;
+  }
+  .print-detail-label {
+    font-size: 7pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #666;
+  }
+  .print-detail-value {
+    font-size: 8.5pt;
+    line-height: 1.4;
+  }
+
+  /* --- Rodape de pagina --- */
+  .print-page-footer {
+    position: fixed;
+    bottom: 3mm;
+    left: 8mm;
+    right: 8mm;
+    text-align: center;
+    font-size: 6pt;
+    color: #999;
+    border-top: 0.5px solid #ddd;
+    padding-top: 1mm;
+  }
+
+  /* Utilitarios de impressao */
+  .print-col-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3mm;
+  }
+  .print-col-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2mm;
+  }
   .print-break-before { page-break-before: always; }
   .print-break-after { page-break-after: always; }
-
+  .print-avoid-break { page-break-inside: avoid; }
   h2, h3 { page-break-after: avoid; }
 
-  .stat-box { border-width: 1px; padding: 1mm 3mm; }
-  .stat-value { font-size: 11pt; }
-  .stat-label { font-size: 6pt; }
-
-  /* Inventário compacto */
-  .inv-item { padding: 1mm 0; }
+  /* Markdown dentro de impressao */
+  .print-feature-desc .md-content p { margin: 1mm 0; }
+  .print-spell-desc .md-content p { margin: 0.5mm 0; }
 }
 
 /* --- Responsivo --- */
@@ -1135,6 +1499,4 @@ tr:hover td { background: #faf8f4; }
   .pericias-por-atributo { columns: 1; }
 }
 
-@media print {
-  .pericias-por-atributo { columns: 3; font-size: 8pt; }
-}
+
