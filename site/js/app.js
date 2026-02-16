@@ -117,10 +117,17 @@ function init() {
     navigator.serviceWorker.register('./sw.js').then(registration => {
       verificarAtualizacaoSW(registration);
 
-      // Verificar atualizações periodicamente (a cada 30 min)
+      // Verificar atualizações periodicamente (a cada 5 min)
       setInterval(() => {
         registration.update();
-      }, 30 * 60 * 1000);
+      }, 5 * 60 * 1000);
+
+      // Verificar ao voltar para a aba (útil em mobile)
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          registration.update();
+        }
+      });
     }).catch(err => {
       console.warn('SW registro falhou:', err);
     });

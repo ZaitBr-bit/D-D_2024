@@ -1,8 +1,14 @@
 {
   "nome": "Bardo",
   "tracos_basicos": {
-    "Atributo Primário": "Equipamento Inicial",
-    "Carisma": "Escolha A ou B: (A) Armadura de Couro, 2 Adagas, Instrumento Musical à sua escolha, Kit de Artista e 19 PO; ou (B) 90 PO"
+    "Atributo Primário": "Carisma",
+    "Dado de Ponto de Vida": "D8 por nível de Bardo",
+    "Proficiência em Salvaguardas": "Destreza e Carisma",
+    "Proficiência em Perícias": "Escolha quaisquer 3 perícias",
+    "Proficiências com Armas": "Armas Simples",
+    "Proficiências com Ferramentas": "Escolha 3 Instrumentos Musicais",
+    "Treinamento com Armadura": "Armadura Leve",
+    "Equipamento Inicial": "Escolha A ou B: (A) Armadura de Couro, 2 Adagas, Instrumento Musical à sua escolha, Kit de Artista e 19 PO; ou (B) 90 PO"
   },
   "tabela_caracteristicas": [
     {
@@ -591,148 +597,726 @@
     }
   ],
   "lista_magias": {
+    "Truques": [
+      {
+        "nome": "Amigos",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Fagulha Estelar",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Golpe Certeiro",
+        "escola": "Adivinhação",
+        "especial": "—"
+      },
+      {
+        "nome": "Ilusão Menor",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Luz",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Luzes Dançantes",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Mãos Mágicas",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Mensagem",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Prestidigitação Arcana",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Proteção Contra Lâminas",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Reparar",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Trovão",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Zombaria Perversa",
+        "escola": "Encantamento",
+        "especial": "—"
+      }
+    ],
+    "1º Círculo": [
+      {
+        "nome": "Amizade Animal",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Comando",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Compreender Idiomas",
+        "escola": "Adivinhação",
+        "especial": "R"
+      },
+      {
+        "nome": "Curar Ferimentos",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Detectar Magia",
+        "escola": "Adivinhação",
+        "especial": "C, R"
+      },
+      {
+        "nome": "Disfarçar-se",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Enfeitiçar Pessoa",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Escrita Ilusória",
+        "escola": "Ilusão",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Falar com Animais",
+        "escola": "Adivinhação",
+        "especial": "R"
+      },
+      {
+        "nome": "Fogo das Fadas",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Gargalhada Nefasta de Tasha",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Heroísmo",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Identificar",
+        "escola": "Adivinhação",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Imagem Silenciosa",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Leque Cromático",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Onda Trovejante",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Palavra Curativa",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Passos Largos",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Perdição",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Queda Suave",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Servo Invisível",
+        "escola": "Invocação",
+        "especial": "R"
+      },
+      {
+        "nome": "Sono",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Sussurros Dissonantes",
+        "escola": "Encantamento",
+        "especial": "—"
+      }
+    ],
+    "2º Círculo": [
+      {
+        "nome": "Acalmar Emoções",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Aprimorar Atributo",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Arrombar",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Aumentar/Reduzir",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Auxílio",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Boca Encantada",
+        "escola": "Ilusão",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Cativar",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Cegueira/Surdez",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Coroa da Loucura",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Despedaçar",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Detectar Pensamentos",
+        "escola": "Adivinhação",
+        "especial": "C"
+      },
+      {
+        "nome": "Esquentar Metal",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Força Espectral",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Invisibilidade",
+        "escola": "Ilusão",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Localizar Animais ou Plantas",
+        "escola": "Adivinhação",
+        "especial": "R"
+      },
+      {
+        "nome": "Localizar Objeto",
+        "escola": "Adivinhação",
+        "especial": "C"
+      },
+      {
+        "nome": "Mensageiro Animal",
+        "escola": "Encantamento",
+        "especial": "R"
+      },
+      {
+        "nome": "Nuvem de Adagas",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Paralisar Pessoa",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Reflexos",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Restauração Menor",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Silêncio",
+        "escola": "Ilusão",
+        "especial": "C, R"
+      },
+      {
+        "nome": "Sugestão",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Ver o Invisível",
+        "escola": "Adivinhação",
+        "especial": "—"
+      },
+      {
+        "nome": "Zona da Verdade",
+        "escola": "Encantamento",
+        "especial": "—"
+      }
+    ],
+    "3º Círculo": [
+      {
+        "nome": "Clarividência",
+        "escola": "Adivinhação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Crescimento de Plantas",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Dissipar Magia",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Falar com Mortos",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Falar com Plantas",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Glifo de Proteção",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Imagem Maior",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Indetectável",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Lentidão",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Línguas",
+        "escola": "Adivinhação",
+        "especial": "—"
+      },
+      {
+        "nome": "Medo",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Nuvem Fétida",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Padrão Hipnótico",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Palavra Curativa em Massa",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Pequeno Refúgio de Leomund",
+        "escola": "Evocação",
+        "especial": "R"
+      },
+      {
+        "nome": "Remeter",
+        "escola": "Adivinhação",
+        "especial": "—"
+      },
+      {
+        "nome": "Rogar Maldição",
+        "escola": "Necromancia",
+        "especial": "C"
+      },
+      {
+        "nome": "Simular Morte",
+        "escola": "Necromancia",
+        "especial": "R"
+      }
+    ],
+    "4º Círculo": [
+      {
+        "nome": "Assassino Fantasmagórico",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Compulsão",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Confusão",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Enfeitiçar Monstro",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Fonte do Luar",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Invisibilidade Maior",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Localizar Criatura",
+        "escola": "Adivinhação",
+        "especial": "C"
+      },
+      {
+        "nome": "Movimentação Livre",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Polimorfia",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Porta Dimensional",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Terreno Alucinatório",
+        "escola": "Ilusão",
+        "especial": "—"
+      }
+    ],
+    "5º Círculo": [
+      {
+        "nome": "Âncora Planar",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Animar Objetos",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Círculo de Teleporte",
+        "escola": "Invocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Curar Ferimentos em Massa",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Despertar",
+        "escola": "Transmutação",
+        "especial": "M"
+      },
+      {
+        "nome": "Despistar",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Dominar Pessoa",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Estática Sináptica",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Lendas e Histórias",
+        "escola": "Adivinhação",
+        "especial": "M"
+      },
+      {
+        "nome": "Ligação Telepática de Rary",
+        "escola": "Adivinhação",
+        "especial": "R"
+      },
+      {
+        "nome": "Missão",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Modificar Memória",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Paralisar Monstro",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Presença Régia de Yolande",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Restauração Maior",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Reviver os Mortos",
+        "escola": "Necromancia",
+        "especial": "M"
+      },
+      {
+        "nome": "Similaridade",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Sonho",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Vidência",
+        "escola": "Adivinhação",
+        "especial": "C, M"
+      }
+    ],
+    "6º Círculo": [
+      {
+        "nome": "Banquete de Heróis",
+        "escola": "Invocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Dança Irresistível de Otto",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Encontrar o Caminho",
+        "escola": "Adivinhação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Ilusão Programada",
+        "escola": "Ilusão",
+        "especial": "M"
+      },
+      {
+        "nome": "Mau Olhado",
+        "escola": "Necromancia",
+        "especial": "C"
+      },
+      {
+        "nome": "Proteger Fortaleza",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Sugestão em Massa",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Visão da Verdade",
+        "escola": "Adivinhação",
+        "especial": "M"
+      }
+    ],
+    "7º Círculo": [
+      {
+        "nome": "Cárcere de Energia",
+        "escola": "Evocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Espada de Mordenkainen",
+        "escola": "Evocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Forma Etérea",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Mansão Magnífica de Mordenkainen",
+        "escola": "Invocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Miragem Arcana",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Palavra de Poder: Fortificar",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Projetar Imagem",
+        "escola": "Ilusão",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Rajada Prismática",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Regeneração",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Ressurreição",
+        "escola": "Necromancia",
+        "especial": "M"
+      },
+      {
+        "nome": "Símbolo",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Teleporte",
+        "escola": "Invocação",
+        "especial": "—"
+      }
+    ],
+    "8º Círculo": [
+      {
+        "nome": "Antipatia/Simpatia",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Dominar Monstro",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Limpar a Mente",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Loquacidade",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Palavra de Poder: Atordoar",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Suplício",
+        "escola": "Encantamento",
+        "especial": "—"
+      }
+    ],
     "9º Círculo": [
-      "Amigos",
-      "Fagulha Estelar",
-      "Golpe Certeiro",
-      "Ilusão Menor",
-      "Luz",
-      "Luzes Dançantes",
-      "Mãos Mágicas",
-      "Mensagem",
-      "Prestidigitação Arcana",
-      "Proteção Contra Lâminas",
-      "Reparar",
-      "Trovão",
-      "Zombaria Perversa",
-      "Amizade Animal",
-      "Comando",
-      "Compreender Idiomas",
-      "Curar Ferimentos",
-      "Detectar Magia",
-      "Disfarçar-se",
-      "Enfeitiçar Pessoa",
-      "Escrita Ilusória",
-      "Falar com Animais",
-      "Fogo das Fadas",
-      "Gargalhada Nefasta de Tasha",
-      "Heroísmo",
-      "Identificar",
-      "Imagem Silenciosa",
-      "Leque Cromático",
-      "Onda Trovejante",
-      "Palavra Curativa",
-      "Passos Largos",
-      "Perdição",
-      "Queda Suave",
-      "Servo Invisível",
-      "Sono",
-      "Sussurros Dissonantes",
-      "Acalmar Emoções",
-      "Aprimorar Atributo",
-      "Arrombar",
-      "Aumentar/Reduzir",
-      "Auxílio",
-      "Boca Encantada",
-      "Cativar",
-      "Cegueira/Surdez",
-      "Coroa da Loucura",
-      "Despedaçar",
-      "Detectar Pensamentos",
-      "Esquentar Metal",
-      "Força Espectral",
-      "Invisibilidade",
-      "Localizar Animais ou Plantas",
-      "Localizar Objeto",
-      "Mensageiro Animal",
-      "Nuvem de Adagas",
-      "Paralisar Pessoa",
-      "Reflexos",
-      "Restauração Menor",
-      "Silêncio",
-      "Sugestão",
-      "Ver o Invisível",
-      "Zona da Verdade",
-      "Clarividência",
-      "Crescimento de Plantas",
-      "Dissipar Magia",
-      "Falar com Mortos",
-      "Falar com Plantas",
-      "Glifo de Proteção",
-      "Imagem Maior",
-      "Indetectável",
-      "Lentidão",
-      "Línguas",
-      "Medo",
-      "Nuvem Fétida",
-      "Padrão Hipnótico",
-      "Palavra Curativa em Massa",
-      "Pequeno Refúgio de Leomund",
-      "Remeter",
-      "Rogar Maldição",
-      "Simular Morte",
-      "Assassino Fantasmagórico",
-      "Compulsão",
-      "Confusão",
-      "Enfeitiçar Monstro",
-      "Fonte do Luar",
-      "Invisibilidade Maior",
-      "Localizar Criatura",
-      "Movimentação Livre",
-      "Polimorfia",
-      "Porta Dimensional",
-      "Terreno Alucinatório",
-      "Âncora Planar",
-      "Animar Objetos",
-      "Círculo de Teleporte",
-      "Curar Ferimentos em Massa",
-      "Despertar",
-      "Despistar",
-      "Dominar Pessoa",
-      "Estática Sináptica",
-      "Lendas e Histórias",
-      "Ligação Telepática de Rary",
-      "Missão",
-      "Modificar Memória",
-      "Paralisar Monstro",
-      "Presença Régia de Yolande",
-      "Restauração Maior",
-      "Reviver os Mortos",
-      "Similaridade",
-      "Sonho",
-      "Vidência",
-      "Banquete de Heróis",
-      "Dança Irresistível de Otto",
-      "Encontrar o Caminho",
-      "Ilusão Programada",
-      "Mau Olhado",
-      "Proteger Fortaleza",
-      "Sugestão em Massa",
-      "Visão da Verdade",
-      "Cárcere de Energia",
-      "Espada de Mordenkainen",
-      "Forma Etérea",
-      "Mansão Magnífica de Mordenkainen",
-      "Miragem Arcana",
-      "Palavra de Poder: Fortificar",
-      "Projetar Imagem",
-      "Rajada Prismática",
-      "Regeneração",
-      "Ressurreição",
-      "Símbolo",
-      "Teleporte",
-      "Antipatia/Simpatia",
-      "Dominar Monstro",
-      "Limpar a Mente",
-      "Loquacidade",
-      "Palavra de Poder: Atordoar",
-      "Suplício",
-      "Muralha Prismática",
-      "Palavra de Poder: Matar",
-      "Palavra de Poder: Salvar",
-      "Polimorfia Total",
-      "Sexto Sentido"
+      {
+        "nome": "Muralha Prismática",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Palavra de Poder: Matar",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Palavra de Poder: Salvar",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Polimorfia Total",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Sexto Sentido",
+        "escola": "Adivinhação",
+        "especial": "—"
+      }
     ]
   },
-  "texto_completo": "**Voo.** Você tem um Deslocamento de Voo igual ao seu Deslocamento e pode pairar.\n\n**Subclasse Trilha do Fanático**\n\nBardo\n\n***\n\nUm Inspirador Performista de Música, Dança e Magia\n\n**Traços Básicos de Bardo**\n\n| **Atributo Primário**             | **Carisma**                                                                                                                |\n|-----------------------------------|----------------------------------------------------------------------------------------------------------------------------|\n| **Dado de Ponto de Vida**         | D8 por nível de Bardo                                                                                                      |\n| **Proficiência em Salvaguardas**  | Destreza e Carisma                                                                                                         |\n| **Proficiência em Perícias**      | *Escolha quaisquer 3 perícias* (veja o capítulo 1)                                                                         |\n| **Proficiências com Armas**       | Armas Simples                                                                                                              |\n| **Proficiências com Ferramentas** | *Escolha 3 Instrumentos Musicais* (veja o capítulo 6)                                                                      |\n| **Treinamento com Armadura**      | Armadura Leve                                                                                                              |\n| **Equipamento Inicial**           | *Escolha A ou B:* (A) Armadura de Couro, 2 Adagas, Instrumento Musical à sua escolha, Kit de Artista e 19 PO; ou (B) 90 PO |\n\nInvocando magia através de música, dança e versos, os Bardos são peritos em inspirar os outros, aliviar ferimentos, desanimar inimigos e criar ilusões. Eles acreditam que o multiverso foi trazido à existência por meio de palavras pronunciadas e que resquícios das Palavras de Criação ainda ressoam e brilham em todos os planos de existência. A magia dos Bardos tenta canalizar essas palavras, que transcendem qualquer idioma.\n\nQualquer coisa pode inspirar uma nova canção ou história, o que faz com que os Bardos sejam fascinados por quase tudo. Eles se tornam mestres em muitas coisas, incluindo tocar música, realizar magia e fazer brincadeiras.\n\nA vida de um Bardo é passada viajando, coletando conhecimento, contando histórias e vivendo da gratidão dos ouvintes, como qualquer outro artista. No entanto, a profundidade de conhecimento e o domínio da magia distinguem os Bardos dos demais.\n\n## Tornando-se um Bardo...\n\n### Como um Personagem de Nível 1\n\n-   Adquira todos os traços da tabela Traços Básicos de Bardo.\n-   Adquira as características de nível 1 de Bardo, apresentadas na tabela Características de Bardo.\n\n### Como um Personagem Multiclasse\n\n-   Adquira as seguintes características da tabela Traços Básicos de Bardo: Dado de Ponto de Vida, proficiência em uma perícia à sua escolha, proficiência com um Instrumento Musical à sua escolha e treinamento com armadura Leve.\n-   Adquira as características de nível 1 de Bardo, apresentadas na tabela Características de Bardo. Veja também regras de multiclasse no capítulo 2 para determinar seus espaços de magia disponíveis.\n\n### Características de Classe de Bardo\n\nComo Bardo, você recebe as seguintes características de classe ao atingir os níveis especificados de Bardo. Essas características estão apresentadas na tabela Características de Bardo.\n\n**Características de Bardo**\n\n| **Nível** | **Bônus de Proficiência** | **Características de Classe**   | **Dados de Inspiração** | **Truques** | **Magias Preparadas** | **1** | **2** | **3** | **4** | **5** | **6** | **7** | **8** | **9** |\n|-----------|---------------------------|---------------------------------|-------------------------|-------------|-----------------------|-------|-------|-------|-------|-------|-------|-------|-------|-------|\n| 1         | +2                        | Inspiração de Bardo, Conjuração | D6                      | 2           | 4                     | 2     | —     | —     | —     | —     | —     | —     | —     | —     |\n| 2         | +2                        | Especialista, Pau pra Toda Obra | D6                      | 2           | 5                     | 3     | —     | —     | —     | —     | —     | —     | —     | —     |\n| 3         | +2                        | Subclasse de Bardo              | D6                      | 2           | 6                     | 4     | 2     | —     | —     | —     | —     | —     | —     | —     |\n| 4         | +2                        | Aumento no Valor de Atributo    | D6                      | 3           | 7                     | 4     | 3     | —     | —     | —     | —     | —     | —     | —     |\n| 5         | +3                        | Fonte de Inspiração             | D8                      | 3           | 9                     | 4     | 3     | 2     | —     | —     | —     | —     | —     | —     |\n| 6         | +3                        | Característica de Subclasse     | D8                      | 3           | 10                    | 4     | 3     | 3     | —     | —     | —     | —     | —     | —     |\n| 7         | +3                        | Contra-Encantamento             | D8                      | 3           | 11                    | 4     | 3     | 3     | 1     | —     | —     | —     | —     | —     |\n| 8         | +3                        | Aumento no Valor de Atributo    | D8                      | 3           | 12                    | 4     | 3     | 3     | 2     | —     | —     | —     | —     | —     |\n| 9         | +4                        | Especialização                  | D8                      | 3           | 14                    | 4     | 3     | 3     | 3     | 1     | —     | —     | —     | —     |\n| 10        | +4                        | Segredos Mágicos                | D10                     | 4           | 15                    | 4     | 3     | 3     | 3     | 2     | —     | —     | —     | —     |\n| 11        | +4                        | —                               | D10                     | 4           | 16                    | 4     | 3     | 3     | 3     | 2     | 1     | —     | —     | —     |\n| 12        | +4                        | Aumento no Valor de Atributo    | D10                     | 4           | 16                    | 4     | 3     | 3     | 3     | 2     | 1     | —     | —     | —     |\n| 13        | +5                        | —                               | D10                     | 4           | 17                    | 4     | 3     | 3     | 3     | 2     | 1     | 1     | —     | —     |\n| 14        | +5                        | Característica de Subclasse     | D10                     | 4           | 17                    | 4     | 3     | 3     | 3     | 2     | 1     | 1     | —     | —     |\n| 15        | +5                        | —                               | D12                     | 4           | 18                    | 4     | 3     | 3     | 3     | 2     | 1     | 1     | 1     | —     |\n| 16        | +5                        | Aumento no Valor de Atributo    | D12                     | 4           | 18                    | 4     | 3     | 3     | 3     | 2     | 1     | 1     | 1     | —     |\n| 17        | +6                        | —                               | D12                     | 4           | 19                    | 4     | 3     | 3     | 3     | 2     | 1     | 1     | 1     | 1     |\n| 18        | +6                        | Inspiração Superior             | D12                     | 4           | 20                    | 4     | 3     | 3     | 3     | 3     | 1     | 1     | 1     | 1     |\n| 19        | +6                        | Dádiva Épica                    | D12                     | 4           | 21                    | 4     | 3     | 3     | 3     | 3     | 2     | 1     | 1     | 1     |\n| 20        | +6                        | Palavras de Criação             | D12                     | 4           | 22                    | 4     | 3     | 3     | 3     | 3     | 2     | 2     | 1     | 1     |\n\n### \n\n### Nível 1: Inspiração de Bardo\n\nVocê pode inspirar outros sobrenaturalmente por meio de palavras, música ou dança. Essa inspiração é representada pelo seu dado de Inspiração de Bardo, que é um d6.\n\n**Usando Inspiração de Bardo.** Como uma Ação Bônus, você pode inspirar outra criatura a até 18 metros de você que possa vê-lo ou ouvi-lo. Essa criatura recebe um de seus dados de Inspiração de Bardo. Uma criatura pode ter apenas um dado de Inspiração de Bardo de cada vez.\n\nUma vez, dentro da próxima uma hora, após a criatura falhar em um Teste de D20, ela pode jogar o dado de Inspiração de Bardo e adicionar o resultado ao D20, transformando potencialmente a falha em sucesso. O dado de Inspiração de Bardo é gasto quando for jogado.\n\n**Quantidade de Usos.** Você pode conceder um dado de Inspiração de Bardo um número de vezes igual ao seu modificador de Carisma (mínimo de uma vez), e você restaura todos os usos gastos ao completar um Descanso Longo.\n\n**Em Níveis Superiores.** Seu dado de Inspiração de Bardo muda ao atingir certos níveis de Bardo, conforme mostrado na coluna Dados de Inspiração da tabela Características de Bardo. O dado se torna um d8 no nível 5, um d10 no nível 10 e um d12 no nível 15.\n\n### Nível 1: Conjuração\n\nVocê aprendeu a conjurar magias através de suas artes bárdicas. Veja o capítulo 7 para as regras sobre conjuração de magias. As informações abaixo detalham como você utiliza essas regras com as magias de Bardo, explicadas na lista de magias de Bardo mais adiante na descrição da classe.\n\n**Truques.** Você conhece dois truques à sua escolha da lista de magias de Bardo. *Luzes Dançantes* e *Zombaria Perversa* são recomendadas.\n\nSempre que você atinge um nível de Bardo, pode substituir um dos seus truques por outro truque à sua escolha da lista de magias de Bardo.\n\nAo atingir os níveis 4 e 10, você aprende mais um truque à sua escolha da lista de magias de Bardo, conforme mostrado na coluna Truques da tabela Características de Bardo.\n\n**Espaços de Magia.** A tabela Características de Bardo mostra quantos espaços de magia você tem para conjurar suas magias de 1º círculo ou superior. Você restaura todos os espaços gastos ao completar um Descanso Longo.\n\n**Magias Preparadas de 1º Círculo ou Superior.** Você prepara a lista de magias de 1º círculo ou superior que estão disponíveis para você conjurar com esta característica. Para começar, escolha quatro magias de 1º círculo da lista de magias de Bardo. *Enfeitiçar Pessoa*, *Leque Cromático*, *Palavra Curativa* e *Sussurros Dissonantes* são recomendadas.\n\nO número de magias em sua lista aumenta à medida que você alcança níveis de Bardo, conforme mostrado na coluna Magias Preparadas da tabela Características de Bardo. Sempre que esse número aumentar, escolha magias adicionais da lista de magias de Bardo até que o número de magias em sua lista corresponda ao número da tabela. As magias escolhidas devem ser de um círculo para o qual você possui espaços de magia. Por exemplo, se você é um Bardo de nível 3, sua lista de magias preparadas pode incluir seis magias de 1º ou 2º círculo em qualquer combinação.\n\nSe outra característica de Bardo lhe der magias que você sempre tem preparadas, essas magias não contam para o número de magias que você pode preparar com esta característica, mas essas magias, de outra forma, contam como magias de Bardo para você.\n\n**Mudando Suas Magias Preparadas.** Sempre que você atinge um nível de Bardo, pode substituir uma magia em sua lista por outra magia de Bardo para a qual você tem espaços de magia.\n\n**Atributo de Conjuração.** Carisma é seu atributo de conjuração para suas magias de Bardo.\n\n**Foco de Conjuração.** Você pode usar um Instrumento Musical como Foco de Conjuração para suas magias de Bardo.\n\n### Nível 2: Especialista\n\nVocê adquire Especialização (veja o glossário de regras) em duas de suas perícias, à sua escolha, nas quais já seja proficiente. Atuação e Persuasão são recomendadas se você tiver proficiência nelas.\n\nNo nível 9 de Bardo, você adquire Especialização em mais duas perícias nas quais já seja proficiente à sua escolha.\n\n### Nível 2: Pau pra Toda Obra\n\nVocê pode adicionar metade do seu Bônus de Proficiência (arredondado para baixo) a qualquer teste de atributo que realizar que use uma perícia à qual não possua proficiência e que não use seu Bônus de Proficiência.\n\nPor exemplo, se você realizar um teste de Força (Atletismo) e não tiver proficiência em Atletismo, pode adicionar metade do seu Bônus de Proficiência ao teste.\n\n### Nível 3: Subclasse de Bardo\n\nVocê adquire uma subclasse de Bardo à sua escolha. As subclasses Colégio da Bravura, Colégio da Dança, Colégio do Conhecimento e Colégio do Glamour são detalhadas após a descrição desta classe. Uma subclasse é uma especialização que lhe concede características em determinados níveis de Bardo. Durante toda sua jornada, você adquire cada característica de sua subclasse que corresponda ao seu nível de Bardo ou inferior.\n\n**O Repertório do Bardo**\n\nSeu Bardo bate um tambor enquanto entoa os feitos de heróis antigos? Dedilha um alaúde enquanto canta canções românticas? Realiza árias de poder comovente? Recita monólogos dramáticos de tragédias clássicas? Usa o ritmo de uma dança folclórica para coordenar o movimento dos aliados em batalha? Compõe poemas curtos e ousados?\n\nAo interpretar um Bardo, considere o estilo de apresentação artística que você prefere, os humores que pode evocar e os temas que inspiram suas próprias criações. Seus poemas são inspirados por momentos de beleza natural ou são reflexões sombrias sobre o luto? Você prefere hinos elevados ou canções animadas de taberna? É atraído por lamentos pelos que pereceram ou por celebrações de alegria? Dança baladas alegres ou realiza coreografias interpretativas elaboradas? Foca em um estilo de apresentação ou busca dominar todos?\n\n### Nível 4: Aumento no Valor de Atributo\n\nVocê adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 8, 12 e 16 de Bardo.\n\n### Nível 5: Fonte de Inspiração\n\nVocê agora restaura todos os seus usos gastos de Inspiração de Bardo ao completar um Descanso Curto ou Longo.\n\nAlém disso, você pode gastar um espaço de magia (nenhuma ação necessária) para recuperar um uso gasto de Inspiração de Bardo.\n\n### Nível 7: Contra-Encantamento\n\nVocê pode usar notas musicais ou palavras de poder para interromper efeitos que influenciam a mente. Se você ou uma criatura a até 9 metros de você falhar em uma salvaguarda contra um efeito que aplica as condições Amedrontado ou Enfeitiçado, você pode executar uma Reação para jogar novamente a salvaguarda, e a nova jogada tem Vantagem.\n\n### Nível 10: Segredos Mágicos\n\nVocê aprendeu segredos de várias tradições mágicas. Sempre que você alcançar um nível de Bardo (incluindo este nível) e o número de Magias Preparadas na tabela Características de Bardo aumentar, você pode escolher qualquer uma das novas magias preparadas da lista de magias de Bardo, Clérigo, Druida e Mago, e as magias escolhidas contam como magias de Bardo para você (veja a seção de cada classe para a respectiva lista de magias). Além disso, sempre que você substituir uma magia preparada para esta classe, pode trocá-la por uma magia dessas listas.\n\n### Nível 18: Inspiração Superior\n\nAo jogar Iniciativa, recupera usos gastos de Inspiração de Bardo até ter dois, se tiver menos do que isso.\n\n### Nível 19: Dádiva Épica\n\nVocê adquire um talento Dádiva Épica (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. A Dádiva da Recordação de Magia é recomendada.\n\n### Nível 20: Palavras de Criação\n\nVocê dominou duas das Palavras de Criação: as palavras de vida e morte. Portanto, você sempre tem as magias *Palavra de Poder: Matar* e *Palavra de Poder: Salvar* preparadas. Ao conjurar qualquer uma dessas magias, pode escolher uma segunda criatura que está a até 3 metros do primeiro alvo.\n\n*Um Bardo Molda Inspiração e Imaginação em Magia.*\n\n## Lista de Magias de Bardo\n\nEsta seção apresenta a lista de magias de Bardo, organizadas por círculo de magia e em ordem alfabética, com suas respectivas escolas. Na coluna Especial, *C* indica que a magia requer Concentração, *R* que é um Ritual e *M* que necessita de um componente Material específico.\n\n**Truques (Magias de Bardo de 0 Círculo)**\n\n| **Magia**                 | **Escola**   | **Especial** |\n|---------------------------|--------------|--------------|\n| *Amigos*                  | Encantamento | C            |\n| *Fagulha Estelar*         | Evocação     | —            |\n| *Golpe Certeiro*          | Adivinhação  | —            |\n| *Ilusão Menor*            | Ilusão       | —            |\n| *Luz*                     | Evocação     | —            |\n| *Luzes Dançantes*         | Ilusão       | C            |\n| *Mãos Mágicas*            | Invocação    | —            |\n| *Mensagem*                | Transmutação | —            |\n| *Prestidigitação Arcana*  | Transmutação | —            |\n| *Proteção Contra Lâminas* | Abjuração    | C            |\n| *Reparar*                 | Transmutação | —            |\n| *Trovão*                  | Evocação     | —            |\n| *Zombaria Perversa*       | Encantamento | —            |\n\n**Magias de Bardo de 1º Círculo**\n\n| **Magia**                     | **Escola**   | **Especial** |\n|-------------------------------|--------------|--------------|\n| *Amizade Animal*              | Encantamento | —            |\n| *Comando*                     | Encantamento | —            |\n| *Compreender Idiomas*         | Adivinhação  | R            |\n| *Curar Ferimentos*            | Abjuração    | —            |\n| *Detectar Magia*              | Adivinhação  | C, R         |\n| *Disfarçar-se*                | Ilusão       | —            |\n| *Enfeitiçar Pessoa*           | Encantamento | —            |\n| *Escrita Ilusória*            | Ilusão       | R, M         |\n| *Falar com Animais*           | Adivinhação  | R            |\n| *Fogo das Fadas*              | Evocação     | C            |\n| *Gargalhada Nefasta de Tasha* | Encantamento | C            |\n| *Heroísmo*                    | Encantamento | C            |\n| *Identificar*                 | Adivinhação  | R, M         |\n| *Imagem Silenciosa*           | Ilusão       | C            |\n| *Leque Cromático*             | Ilusão       | —            |\n| *Onda Trovejante*             | Evocação     | —            |\n| *Palavra Curativa*            | Abjuração    | —            |\n| *Passos Largos*               | Transmutação | —            |\n| *Perdição*                    | Encantamento | C            |\n| *Queda Suave*                 | Transmutação | —            |\n| *Servo Invisível*             | Invocação    | R            |\n| *Sono*                        | Encantamento | C            |\n| *Sussurros Dissonantes*       | Encantamento | —            |\n\n**Magias de Bardo de 2º Círculo**\n\n| **Magia**                      | **Escola**   | **Especial** |\n|--------------------------------|--------------|--------------|\n| *Acalmar Emoções*              | Encantamento | C            |\n| *Aprimorar Atributo*           | Transmutação | C            |\n| *Arrombar*                     | Transmutação | —            |\n| *Aumentar/Reduzir*             | Transmutação | C            |\n| *Auxílio*                      | Abjuração    | —            |\n| *Boca Encantada*               | Ilusão       | R, M         |\n| *Cativar*                      | Encantamento | C            |\n| *Cegueira/Surdez*              | Transmutação | —            |\n| *Coroa da Loucura*             | Encantamento | C            |\n| *Despedaçar*                   | Evocação     | —            |\n| *Detectar Pensamentos*         | Adivinhação  | C            |\n| *Esquentar Metal*              | Transmutação | C            |\n| *Força Espectral*              | Ilusão       | C            |\n| *Invisibilidade*               | Ilusão       | C, M         |\n| *Localizar Animais ou Plantas* | Adivinhação  | R            |\n| *Localizar Objeto*             | Adivinhação  | C            |\n| *Mensageiro Animal*            | Encantamento | R            |\n| *Nuvem de Adagas*              | Invocação    | C            |\n| *Paralisar Pessoa*             | Encantamento | C            |\n| *Reflexos*                     | Ilusão       | —            |\n| *Restauração Menor*            | Abjuração    | —            |\n| *Silêncio*                     | Ilusão       | C, R         |\n| *Sugestão*                     | Encantamento | C            |\n| *Ver o Invisível*              | Adivinhação  | —            |\n| *Zona da Verdade*              | Encantamento | —            |\n\n**Magias de Bardo de 3º Círculo**\n\n| **Magia**                    | **Escola**   | **Especial** |\n|------------------------------|--------------|--------------|\n| *Clarividência*              | Adivinhação  | C, M         |\n| *Crescimento de Plantas*     | Transmutação | —            |\n| *Dissipar Magia*             | Abjuração    | —            |\n| *Falar com Mortos*           | Necromancia  | —            |\n| *Falar com Plantas*          | Transmutação | —            |\n| *Glifo de Proteção*          | Abjuração    | M            |\n| *Imagem Maior*               | Ilusão       | C            |\n| *Indetectável*               | Abjuração    | M            |\n| *Lentidão*                   | Transmutação | C            |\n| *Línguas*                    | Adivinhação  | —            |\n| *Medo*                       | Ilusão       | C            |\n| *Nuvem Fétida*               | Invocação    | C            |\n| *Padrão Hipnótico*           | Ilusão       | C            |\n| *Palavra Curativa em Massa*  | Abjuração    | —            |\n| *Pequeno Refúgio de Leomund* | Evocação     | R            |\n| *Remeter*                    | Adivinhação  |  —           |\n| *Rogar Maldição*             | Necromancia  | C            |\n| *Simular Morte*              | Necromancia  | R            |\n\n**Magias de Bardo de 4º Círculo**\n\n| **Magia**                  | **Escola**   | **Especial** |\n|----------------------------|--------------|--------------|\n| *Assassino Fantasmagórico* | Ilusão       | C            |\n| *Compulsão*                | Encantamento | C            |\n| *Confusão*                 | Encantamento | C            |\n| *Enfeitiçar Monstro*       | Encantamento | —            |\n| *Fonte do Luar*            | Evocação     | C            |\n| *Invisibilidade Maior*     | Ilusão       | C            |\n| *Localizar Criatura*       | Adivinhação  | C            |\n| *Movimentação Livre*       | Abjuração    | —            |\n| *Polimorfia*               | Transmutação | C            |\n| *Porta Dimensional*        | Invocação    | —            |\n| *Terreno Alucinatório*     | Ilusão       | —            |\n\n**Magias de Bardo de 5º Círculo**\n\n| **Magia**                    | **Escola**   | **Especial** |\n|------------------------------|--------------|--------------|\n| *Âncora Planar*              | Abjuração    | M            |\n| *Animar Objetos*             | Transmutação | C            |\n| *Círculo de Teleporte*       | Invocação    | M            |\n| *Curar Ferimentos em Massa*  | Abjuração    | —            |\n| *Despertar*                  | Transmutação | M            |\n| *Despistar*                  | Ilusão       | C            |\n| *Dominar Pessoa*             | Encantamento | C            |\n| *Estática Sináptica*         | Encantamento | —            |\n| *Lendas e Histórias*         | Adivinhação  | M            |\n| *Ligação Telepática de Rary* | Adivinhação  | R            |\n| *Missão*                     | Encantamento | —            |\n| *Modificar Memória*          | Encantamento | C            |\n| *Paralisar Monstro*          | Encantamento | C            |\n| *Presença Régia de Yolande*  | Encantamento | C            |\n| *Restauração Maior*          | Abjuração    | M            |\n| *Reviver os Mortos*          | Necromancia  | M            |\n| *Similaridade*               | Ilusão       | —            |\n| *Sonho*                      | Ilusão       | —            |\n| *Vidência*                   | Adivinhação  | C, M         |\n\n**Magias de Bardo de 6º Círculo**\n\n| **Magia**                    | **Escola**   | **Especial** |\n|------------------------------|--------------|--------------|\n| *Banquete de Heróis*         | Invocação    | M            |\n| *Dança Irresistível de Otto* | Encantamento | C            |\n| *Encontrar o Caminho*        | Adivinhação  | C, M         |\n| *Ilusão Programada*          | Ilusão       | M            |\n| *Mau Olhado*                 | Necromancia  | C            |\n| *Proteger Fortaleza*         | Abjuração    | M            |\n| *Sugestão em Massa*          | Encantamento | —            |\n| *Visão da Verdade*           | Adivinhação  | M            |\n\n**Magias de Bardo de 7º Círculo**\n\n| **Magia**                          | **Escola**   | **Especial** |\n|------------------------------------|--------------|--------------|\n| *Cárcere de Energia*               | Evocação     | C, M         |\n| *Espada de Mordenkainen*           | Evocação     | C, M         |\n| *Forma Etérea*                     | Invocação    | —            |\n| *Mansão Magnífica de Mordenkainen* | Invocação    | M            |\n| *Miragem Arcana*                   | Ilusão       | —            |\n| *Palavra de Poder: Fortificar*     | Encantamento | —            |\n| *Projetar Imagem*                  | Ilusão       | C, M         |\n| *Rajada Prismática*                | Evocação     | —            |\n| *Regeneração*                      | Transmutação | —            |\n| *Ressurreição*                     | Necromancia  | M            |\n| *Símbolo*                          | Abjuração    | M            |\n| *Teleporte*                        | Invocação    | —            |\n\n**Magias de Bardo de 8º Círculo**\n\n| **Magia**                    | **Escola**   | **Especial** |\n|------------------------------|--------------|--------------|\n| *Antipatia/Simpatia*         | Encantamento | —            |\n| *Dominar Monstro*            | Encantamento | C            |\n| *Limpar a Mente*             | Abjuração    | —            |\n| *Loquacidade*                | Encantamento | —            |\n| *Palavra de Poder: Atordoar* | Encantamento | —            |\n| *Suplício*                   | Encantamento | —            |\n\n**Magias de Bardo de 9º Círculo**\n\n| **Magia**                  | **Escola**   | **Especial** |\n|----------------------------|--------------|--------------|\n| *Muralha Prismática*       | Abjuração    | —            |\n| *Palavra de Poder: Matar*  | Encantamento | —            |\n| *Palavra de Poder: Salvar* | Encantamento | —            |\n| *Polimorfia Total*         | Transmutação | C            |\n| *Sexto Sentido*            | Adivinhação  | —            |\n\n# Subclasses de Bardo\n\nUma subclasse de Bardo é uma especialização que concede características em certos níveis, conforme apresentado na subclasse. Bardos formam associações flexíveis, que chamam de colégios, para preservar suas tradições. Esta seção apresenta as subclasses Colégio da Bravura, Colégio da Dança, Colégio do Conhecimento e Colégio do Glamour.\n\n## Colégio da Bravura\n\n*Cante os Feitos dos Heróis Antigos*\n\nOs Bardos do Colégio da Bravura são narradores ousados cujas histórias preservam a memória dos grandes heróis do passado. Eles cantam os feitos dos poderosos em salões suntuosos ou para multidões reunidas em torno de grandes fogueiras. Esses Bardos viajam para testemunhar grandes eventos em primeira mão e garantir que a lembrança desses acontecimentos não desapareça. Com suas canções, eles inspiram novas gerações a alcançar os mesmos feitos grandiosos dos heróis de outrora.\n\n### Nível 3: Inspiração em Combate\n\nVocê pode usar sua astúcia para virar o rumo da batalha. Uma criatura que possui um dado de Inspiração de Bardo seu pode utilizá-lo para um dos seguintes efeitos.\n\n**Defensivo.** Quando a criatura é atingida por uma jogada de ataque, pode executar a própria Reação para jogar o dado da Inspiração de Bardo e adicionar o resultado jogado à própria CA contra aquele ataque, potencialmente fazendo com que o ataque erre.\n\n**Ofensivo.** Imediatamente após a criatura atingir um alvo com uma jogada de ataque, ela pode jogar o dado da Inspiração de Bardo e adicionar o resultado jogado ao dano do ataque contra o alvo.\n\n### Nível 3: Treinamento Marcial\n\nVocê adquire proficiência com armas Marciais, armaduras Médias e treinamento com Escudos.\n\nAlém disso, você pode usar uma arma Simples ou Marcial como Foco de Conjuração para conjurar magias da sua lista de magias de Bardo.\n\n### Nível 6: Ataque Extra\n\nVocê pode atacar duas vezes, em vez de uma, sempre que executar a ação Atacar no seu turno.\n\nAlém disso, você pode conjurar um de seus truques que tenha um tempo de conjuração de uma ação no lugar de um desses ataques.\n\n### Nível 14: Magia de Batalha\n\nApós conjurar uma magia que tenha um tempo de conjuração de uma ação, você pode realizar um ataque com uma arma como uma Ação Bônus\n\n## Colégio da Dança\n\n*Mova-se em Harmonia com o Cosmos*\n\nBardos do Colégio da Dança entendem que as Palavras de Criação transcendem a fala e a canção; elas se manifestam nos movimentos dos corpos celestes e nos gestos das menores criaturas. Esses Bardos buscam uma harmonia com o turbilhão do cosmos, enfatizando agilidade, velocidade e graça.\n\n### Nível 3: Ginga Fascinante\n\nEnquanto você não estiver vestindo armadura ou empunhando um Escudo, adquire os seguintes benefícios.\n\n**Dança Virtuosa.** Você tem Vantagem em qualquer teste de Carisma (Atuação) que envolva você dançando.\n\n**Dano de Bardo.** Você pode usar Destreza em vez de Força para as jogadas de ataque de seus Ataques Desarmados. Quando você causar dano com um Ataque Desarmado, pode causar dano Contundente igual ao resultado do dado da sua Inspiração de Bardo mais seu modificador de Destreza, em vez do dano normal do ataque. Esse uso não gasta o dado.\n\n**Defesa sem Armadura.** Sua Classe de Armadura base é igual a 10 mais seus modificadores de Destreza e Carisma.\n\n**Golpes Ágeis.** Ao gastar um uso da sua Inspiração de Bardo como parte de uma ação, Ação Bônus ou Reação, você pode realizar um Ataque Desarmado como parte dessa ação, Ação Bônus ou Reação.\n\n### Nível 6: Gingado Coordenado\n\nAo jogar Iniciativa, você pode gastar um uso da sua Inspiração de Bardo se não estiver com a condição Incapacitado. Ao realizar isso, jogue o dado da sua Inspiração de Bardo; você e cada aliado a até 9 metros de você que puder ver ou ouvir você adquire um bônus na Iniciativa igual ao número jogado.\n\n*Subclasse Colégio da Dança*\n\n### Nível 6: Movimento Inspirador\n\nQuando um inimigo à sua vista encerra o turno dele a até 1,5 metro de você, você pode executar uma Reação e gastar um uso da sua Inspiração de Bardo para se mover até metade do seu Deslocamento. Em seguida, um aliado à sua escolha a até 9 metros de você também pode se mover até metade do Deslocamento dele usando a própria Reação.\n\nNenhum movimento dessa característica provoca Ataques de Oportunidade.\n\n### Nível 14: Evasão Liderada\n\nSe você for alvo de um efeito que permita uma salvaguarda de Destreza para receber apenas metade do dano, você não recebe dano algum se for bem-sucedido e apenas metade se falhar. Se criaturas até 1,5 metro de você também realizarem a salvaguarda, você pode compartilhar esse benefício com elas.\n\nVocê não pode usar esta característica se estiver com a condição Incapacitado.\n\n## Colégio do Conhecimento\n\n*Explore as Profundezas do Conhecimento Mágico*\n\nBardos do Colégio do Conhecimento colecionam magias e segredos de fontes diversas, como tomos acadêmicos, ritos místicos e contos populares. Os membros do colégio reúnem-se em bibliotecas e universidades para compartilhar seu conhecimento uns com os outros. Eles também participam de festivais ou eventos de estado, onde podem expor corrupção, desvendar mentiras e satirizar figuras de autoridade que se acham importantes.\n\n### Nível 3: Palavras de Interrupção\n\nVocê aprende a usar sua sagacidade para distrair, confundir e diminuir sobrenaturalmente a confiança e a competência dos outros. Quando uma criatura à sua vista a até 18 metros de você realizar uma jogada de dano, ou for bem-sucedida em um teste de atributo ou jogada de ataque, você pode executar uma Reação para gastar um uso da sua Inspiração de Bardo. Jogue o dado de Inspiração de Bardo e subtraia o número jogado do resultado da criatura, reduzindo o dano ou transformando potencialmente o sucesso em fracasso.\n\n### Nível 3: Proficiências Bônus\n\nVocê adquire proficiência em três perícias à sua escolha.\n\n### Nível 6: Descobertas Mágicas\n\nVocê aprende duas magias à sua escolha. Essas magias podem vir da lista de magias de Clérigo, Druida ou Mago, ou uma combinação dessas listas (veja a seção da classe para a respectiva lista de magias). A magia escolhida deve ser um truque ou uma magia para a qual você tenha espaços de magia disponíveis, conforme mostrado na tabela Características de Bardo.\n\nVocê sempre tem as magias escolhidas preparadas e, sempre que adquirir um novo nível de Bardo, pode substituir uma das magias por outra que atenda a esses requisitos.\n\n### Nível 14: Perícia Inigualável\n\nAo realizar um teste de atributo ou uma jogada de ataque e falhar, pode gastar um uso da Inspiração de Bardo; jogue o dado da Inspiração de Bardo e adicione o resultado jogado ao d20, transformando potencialmente a falha em sucesso. Se falhar, o uso da Inspiração de Bardo não é gasto.\n\n## Colégio do Glamour\n\n*Teça Magia Feérica Fascinante*\n\nO Colégio do Glamour remonta à magia encantadora de Faéria. Bardos que estudam essa magia entrelaçam fios de beleza e terror em suas canções e histórias, e os mais poderosos entre eles podem se envolver em uma majestade sobrenatural. Suas apresentações despertam um anseio nostálgico por uma inocência esquecida, evocam memórias inconscientes de medos antigos e tocam as emoções até dos ouvintes mais insensíveis.\n\n### Nível 3: Magia Fascinante\n\nVocê sempre está com as magias *Enfeitiçar Pessoa* e *Reflexos* preparadas.\n\nAlém disso, imediatamente após você conjurar uma magia de Encantamento ou Ilusão usando um espaço de magia, pode fazer com que uma criatura à sua vista a até 18 metros de você realize uma salvaguarda de Sabedoria contra a CD para evitar sua magia. Se falhar, o alvo tem a condição Amedrontado ou Enfeitiçado (à sua escolha) por 1 minuto. O alvo repete a salvaguarda no final de cada um dos próprios turnos, e encerra o efeito em caso de sucesso.\n\nDepois de usar este benefício, você não pode utilizá-lo novamente até completar um Descanso Longo. Você também pode restaurar um uso gastando uma Inspiração de Bardo (nenhuma ação é necessária).\n\n### Nível 3: Manto de Inspiração\n\nVocê pode canalizar magia feérica em uma canção ou dança, revigorando os outros. Como uma Ação Bônus, você pode usar uma das suas Inspirações de Bardo, jogando um dado de Inspiração de Bardo. Escolha um número de criaturas a até 18 metros de você igual ao seu modificador de Carisma (no mínimo uma criatura). Cada uma dessas criaturas recebe um número de Pontos de Vida Temporários igual a duas vezes o número jogado no dado de Inspiração de Bardo e, então, cada uma pode executar uma Reação para se mover até o máximo do Deslocamento sem provocar Ataques de Oportunidade.\n\n### Nível 6: Manto de Majestade\n\nVocê tem sempre a magia *Comando* preparada.\n\nComo uma Ação Bônus, você pode conjurar *Comando* sem gastar um espaço de magia e assumir uma aparência sobrenatural por 1 minuto ou até que sua Concentração se quebre. Durante esse tempo, você pode conjurar *Comando* como uma Ação Bônus sem gastar um espaço de magia.\n\nQualquer criatura que está com a condição Enfeitiçado por você falha automaticamente em uma salvaguarda contra o *Comando* que você conjurar com esta característica.\n\nApós usar esta característica, você não pode utilizá-la novamente até completar um Descanso Longo. Você também pode restaurar seu uso gastando um espaço de magia de 3º círculo ou superior (nenhuma ação é necessária).\n\n*Subclasse Colégio do Glamour*\n\n### Nível 14: Majestade Inquebrável\n\nComo uma Ação Bônus, você pode assumir uma presença majestosamente mágica por 1 minuto ou até que tenha a condição Incapacitado. Por essa duração, sempre que qualquer criatura o atinge com uma jogada de ataque pela primeira vez em um turno, o atacante deve ser bem-sucedido em uma salvaguarda de Carisma contra a CD para evitar sua magia, ou o ataque falha, pois a criatura se retrai diante de sua majestade.\n\nUma vez que você assume essa presença majestosa, não pode fazê-lo novamente até completar um Descanso Curto ou Longo."
+  "texto_completo": "Bardo\n\n***\n\nUm Inspirador Performista de Música, Dança e Magia\n\n**Traços Básicos de Bardo**\n\n| **Atributo Primário**             | **Carisma**                                                                                                                |\n|-----------------------------------|----------------------------------------------------------------------------------------------------------------------------|\n| **Dado de Ponto de Vida**         | D8 por nível de Bardo                                                                                                      |\n| **Proficiência em Salvaguardas**  | Destreza e Carisma                                                                                                         |\n| **Proficiência em Perícias**      | *Escolha quaisquer 3 perícias* (veja o capítulo 1)                                                                         |\n| **Proficiências com Armas**       | Armas Simples                                                                                                              |\n| **Proficiências com Ferramentas** | *Escolha 3 Instrumentos Musicais* (veja o capítulo 6)                                                                      |\n| **Treinamento com Armadura**      | Armadura Leve                                                                                                              |\n| **Equipamento Inicial**           | *Escolha A ou B:* (A) Armadura de Couro, 2 Adagas, Instrumento Musical à sua escolha, Kit de Artista e 19 PO; ou (B) 90 PO |\n\nInvocando magia através de música, dança e versos, os Bardos são peritos em inspirar os outros, aliviar ferimentos, desanimar inimigos e criar ilusões. Eles acreditam que o multiverso foi trazido à existência por meio de palavras pronunciadas e que resquícios das Palavras de Criação ainda ressoam e brilham em todos os planos de existência. A magia dos Bardos tenta canalizar essas palavras, que transcendem qualquer idioma.\n\nQualquer coisa pode inspirar uma nova canção ou história, o que faz com que os Bardos sejam fascinados por quase tudo. Eles se tornam mestres em muitas coisas, incluindo tocar música, realizar magia e fazer brincadeiras.\n\nA vida de um Bardo é passada viajando, coletando conhecimento, contando histórias e vivendo da gratidão dos ouvintes, como qualquer outro artista. No entanto, a profundidade de conhecimento e o domínio da magia distinguem os Bardos dos demais.\n\n## Tornando-se um Bardo...\n\n### Como um Personagem de Nível 1\n\n-   Adquira todos os traços da tabela Traços Básicos de Bardo.\n-   Adquira as características de nível 1 de Bardo, apresentadas na tabela Características de Bardo.\n\n### Como um Personagem Multiclasse\n\n-   Adquira as seguintes características da tabela Traços Básicos de Bardo: Dado de Ponto de Vida, proficiência em uma perícia à sua escolha, proficiência com um Instrumento Musical à sua escolha e treinamento com armadura Leve.\n-   Adquira as características de nível 1 de Bardo, apresentadas na tabela Características de Bardo. Veja também regras de multiclasse no capítulo 2 para determinar seus espaços de magia disponíveis.\n\n### Características de Classe de Bardo\n\nComo Bardo, você recebe as seguintes características de classe ao atingir os níveis especificados de Bardo. Essas características estão apresentadas na tabela Características de Bardo.\n\n**Características de Bardo**\n\n| **Nível** | **Bônus de Proficiência** | **Características de Classe**   | **Dados de Inspiração** | **Truques** | **Magias Preparadas** | **1** | **2** | **3** | **4** | **5** | **6** | **7** | **8** | **9** |\n|-----------|---------------------------|---------------------------------|-------------------------|-------------|-----------------------|-------|-------|-------|-------|-------|-------|-------|-------|-------|\n| 1         | +2                        | Inspiração de Bardo, Conjuração | D6                      | 2           | 4                     | 2     | —     | —     | —     | —     | —     | —     | —     | —     |\n| 2         | +2                        | Especialista, Pau pra Toda Obra | D6                      | 2           | 5                     | 3     | —     | —     | —     | —     | —     | —     | —     | —     |\n| 3         | +2                        | Subclasse de Bardo              | D6                      | 2           | 6                     | 4     | 2     | —     | —     | —     | —     | —     | —     | —     |\n| 4         | +2                        | Aumento no Valor de Atributo    | D6                      | 3           | 7                     | 4     | 3     | —     | —     | —     | —     | —     | —     | —     |\n| 5         | +3                        | Fonte de Inspiração             | D8                      | 3           | 9                     | 4     | 3     | 2     | —     | —     | —     | —     | —     | —     |\n| 6         | +3                        | Característica de Subclasse     | D8                      | 3           | 10                    | 4     | 3     | 3     | —     | —     | —     | —     | —     | —     |\n| 7         | +3                        | Contra-Encantamento             | D8                      | 3           | 11                    | 4     | 3     | 3     | 1     | —     | —     | —     | —     | —     |\n| 8         | +3                        | Aumento no Valor de Atributo    | D8                      | 3           | 12                    | 4     | 3     | 3     | 2     | —     | —     | —     | —     | —     |\n| 9         | +4                        | Especialização                  | D8                      | 3           | 14                    | 4     | 3     | 3     | 3     | 1     | —     | —     | —     | —     |\n| 10        | +4                        | Segredos Mágicos                | D10                     | 4           | 15                    | 4     | 3     | 3     | 3     | 2     | —     | —     | —     | —     |\n| 11        | +4                        | —                               | D10                     | 4           | 16                    | 4     | 3     | 3     | 3     | 2     | 1     | —     | —     | —     |\n| 12        | +4                        | Aumento no Valor de Atributo    | D10                     | 4           | 16                    | 4     | 3     | 3     | 3     | 2     | 1     | —     | —     | —     |\n| 13        | +5                        | —                               | D10                     | 4           | 17                    | 4     | 3     | 3     | 3     | 2     | 1     | 1     | —     | —     |\n| 14        | +5                        | Característica de Subclasse     | D10                     | 4           | 17                    | 4     | 3     | 3     | 3     | 2     | 1     | 1     | —     | —     |\n| 15        | +5                        | —                               | D12                     | 4           | 18                    | 4     | 3     | 3     | 3     | 2     | 1     | 1     | 1     | —     |\n| 16        | +5                        | Aumento no Valor de Atributo    | D12                     | 4           | 18                    | 4     | 3     | 3     | 3     | 2     | 1     | 1     | 1     | —     |\n| 17        | +6                        | —                               | D12                     | 4           | 19                    | 4     | 3     | 3     | 3     | 2     | 1     | 1     | 1     | 1     |\n| 18        | +6                        | Inspiração Superior             | D12                     | 4           | 20                    | 4     | 3     | 3     | 3     | 3     | 1     | 1     | 1     | 1     |\n| 19        | +6                        | Dádiva Épica                    | D12                     | 4           | 21                    | 4     | 3     | 3     | 3     | 3     | 2     | 1     | 1     | 1     |\n| 20        | +6                        | Palavras de Criação             | D12                     | 4           | 22                    | 4     | 3     | 3     | 3     | 3     | 2     | 2     | 1     | 1     |\n\n### \n\n### Nível 1: Inspiração de Bardo\n\nVocê pode inspirar outros sobrenaturalmente por meio de palavras, música ou dança. Essa inspiração é representada pelo seu dado de Inspiração de Bardo, que é um d6.\n\n**Usando Inspiração de Bardo.** Como uma Ação Bônus, você pode inspirar outra criatura a até 18 metros de você que possa vê-lo ou ouvi-lo. Essa criatura recebe um de seus dados de Inspiração de Bardo. Uma criatura pode ter apenas um dado de Inspiração de Bardo de cada vez.\n\nUma vez, dentro da próxima uma hora, após a criatura falhar em um Teste de D20, ela pode jogar o dado de Inspiração de Bardo e adicionar o resultado ao D20, transformando potencialmente a falha em sucesso. O dado de Inspiração de Bardo é gasto quando for jogado.\n\n**Quantidade de Usos.** Você pode conceder um dado de Inspiração de Bardo um número de vezes igual ao seu modificador de Carisma (mínimo de uma vez), e você restaura todos os usos gastos ao completar um Descanso Longo.\n\n**Em Níveis Superiores.** Seu dado de Inspiração de Bardo muda ao atingir certos níveis de Bardo, conforme mostrado na coluna Dados de Inspiração da tabela Características de Bardo. O dado se torna um d8 no nível 5, um d10 no nível 10 e um d12 no nível 15.\n\n### Nível 1: Conjuração\n\nVocê aprendeu a conjurar magias através de suas artes bárdicas. Veja o capítulo 7 para as regras sobre conjuração de magias. As informações abaixo detalham como você utiliza essas regras com as magias de Bardo, explicadas na lista de magias de Bardo mais adiante na descrição da classe.\n\n**Truques.** Você conhece dois truques à sua escolha da lista de magias de Bardo. *Luzes Dançantes* e *Zombaria Perversa* são recomendadas.\n\nSempre que você atinge um nível de Bardo, pode substituir um dos seus truques por outro truque à sua escolha da lista de magias de Bardo.\n\nAo atingir os níveis 4 e 10, você aprende mais um truque à sua escolha da lista de magias de Bardo, conforme mostrado na coluna Truques da tabela Características de Bardo.\n\n**Espaços de Magia.** A tabela Características de Bardo mostra quantos espaços de magia você tem para conjurar suas magias de 1º círculo ou superior. Você restaura todos os espaços gastos ao completar um Descanso Longo.\n\n**Magias Preparadas de 1º Círculo ou Superior.** Você prepara a lista de magias de 1º círculo ou superior que estão disponíveis para você conjurar com esta característica. Para começar, escolha quatro magias de 1º círculo da lista de magias de Bardo. *Enfeitiçar Pessoa*, *Leque Cromático*, *Palavra Curativa* e *Sussurros Dissonantes* são recomendadas.\n\nO número de magias em sua lista aumenta à medida que você alcança níveis de Bardo, conforme mostrado na coluna Magias Preparadas da tabela Características de Bardo. Sempre que esse número aumentar, escolha magias adicionais da lista de magias de Bardo até que o número de magias em sua lista corresponda ao número da tabela. As magias escolhidas devem ser de um círculo para o qual você possui espaços de magia. Por exemplo, se você é um Bardo de nível 3, sua lista de magias preparadas pode incluir seis magias de 1º ou 2º círculo em qualquer combinação.\n\nSe outra característica de Bardo lhe der magias que você sempre tem preparadas, essas magias não contam para o número de magias que você pode preparar com esta característica, mas essas magias, de outra forma, contam como magias de Bardo para você.\n\n**Mudando Suas Magias Preparadas.** Sempre que você atinge um nível de Bardo, pode substituir uma magia em sua lista por outra magia de Bardo para a qual você tem espaços de magia.\n\n**Atributo de Conjuração.** Carisma é seu atributo de conjuração para suas magias de Bardo.\n\n**Foco de Conjuração.** Você pode usar um Instrumento Musical como Foco de Conjuração para suas magias de Bardo.\n\n### Nível 2: Especialista\n\nVocê adquire Especialização (veja o glossário de regras) em duas de suas perícias, à sua escolha, nas quais já seja proficiente. Atuação e Persuasão são recomendadas se você tiver proficiência nelas.\n\nNo nível 9 de Bardo, você adquire Especialização em mais duas perícias nas quais já seja proficiente à sua escolha.\n\n### Nível 2: Pau pra Toda Obra\n\nVocê pode adicionar metade do seu Bônus de Proficiência (arredondado para baixo) a qualquer teste de atributo que realizar que use uma perícia à qual não possua proficiência e que não use seu Bônus de Proficiência.\n\nPor exemplo, se você realizar um teste de Força (Atletismo) e não tiver proficiência em Atletismo, pode adicionar metade do seu Bônus de Proficiência ao teste.\n\n### Nível 3: Subclasse de Bardo\n\nVocê adquire uma subclasse de Bardo à sua escolha. As subclasses Colégio da Bravura, Colégio da Dança, Colégio do Conhecimento e Colégio do Glamour são detalhadas após a descrição desta classe. Uma subclasse é uma especialização que lhe concede características em determinados níveis de Bardo. Durante toda sua jornada, você adquire cada característica de sua subclasse que corresponda ao seu nível de Bardo ou inferior.\n\n**O Repertório do Bardo**\n\nSeu Bardo bate um tambor enquanto entoa os feitos de heróis antigos? Dedilha um alaúde enquanto canta canções românticas? Realiza árias de poder comovente? Recita monólogos dramáticos de tragédias clássicas? Usa o ritmo de uma dança folclórica para coordenar o movimento dos aliados em batalha? Compõe poemas curtos e ousados?\n\nAo interpretar um Bardo, considere o estilo de apresentação artística que você prefere, os humores que pode evocar e os temas que inspiram suas próprias criações. Seus poemas são inspirados por momentos de beleza natural ou são reflexões sombrias sobre o luto? Você prefere hinos elevados ou canções animadas de taberna? É atraído por lamentos pelos que pereceram ou por celebrações de alegria? Dança baladas alegres ou realiza coreografias interpretativas elaboradas? Foca em um estilo de apresentação ou busca dominar todos?\n\n### Nível 4: Aumento no Valor de Atributo\n\nVocê adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 8, 12 e 16 de Bardo.\n\n### Nível 5: Fonte de Inspiração\n\nVocê agora restaura todos os seus usos gastos de Inspiração de Bardo ao completar um Descanso Curto ou Longo.\n\nAlém disso, você pode gastar um espaço de magia (nenhuma ação necessária) para recuperar um uso gasto de Inspiração de Bardo.\n\n### Nível 7: Contra-Encantamento\n\nVocê pode usar notas musicais ou palavras de poder para interromper efeitos que influenciam a mente. Se você ou uma criatura a até 9 metros de você falhar em uma salvaguarda contra um efeito que aplica as condições Amedrontado ou Enfeitiçado, você pode executar uma Reação para jogar novamente a salvaguarda, e a nova jogada tem Vantagem.\n\n### Nível 10: Segredos Mágicos\n\nVocê aprendeu segredos de várias tradições mágicas. Sempre que você alcançar um nível de Bardo (incluindo este nível) e o número de Magias Preparadas na tabela Características de Bardo aumentar, você pode escolher qualquer uma das novas magias preparadas da lista de magias de Bardo, Clérigo, Druida e Mago, e as magias escolhidas contam como magias de Bardo para você (veja a seção de cada classe para a respectiva lista de magias). Além disso, sempre que você substituir uma magia preparada para esta classe, pode trocá-la por uma magia dessas listas.\n\n### Nível 18: Inspiração Superior\n\nAo jogar Iniciativa, recupera usos gastos de Inspiração de Bardo até ter dois, se tiver menos do que isso.\n\n### Nível 19: Dádiva Épica\n\nVocê adquire um talento Dádiva Épica (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. A Dádiva da Recordação de Magia é recomendada.\n\n### Nível 20: Palavras de Criação\n\nVocê dominou duas das Palavras de Criação: as palavras de vida e morte. Portanto, você sempre tem as magias *Palavra de Poder: Matar* e *Palavra de Poder: Salvar* preparadas. Ao conjurar qualquer uma dessas magias, pode escolher uma segunda criatura que está a até 3 metros do primeiro alvo.\n\n*Um Bardo Molda Inspiração e Imaginação em Magia.*\n\n## Lista de Magias de Bardo\n\nEsta seção apresenta a lista de magias de Bardo, organizadas por círculo de magia e em ordem alfabética, com suas respectivas escolas. Na coluna Especial, *C* indica que a magia requer Concentração, *R* que é um Ritual e *M* que necessita de um componente Material específico.\n\n**Truques (Magias de Bardo de 0 Círculo)**\n\n| **Magia**                 | **Escola**   | **Especial** |\n|---------------------------|--------------|--------------|\n| *Amigos*                  | Encantamento | C            |\n| *Fagulha Estelar*         | Evocação     | —            |\n| *Golpe Certeiro*          | Adivinhação  | —            |\n| *Ilusão Menor*            | Ilusão       | —            |\n| *Luz*                     | Evocação     | —            |\n| *Luzes Dançantes*         | Ilusão       | C            |\n| *Mãos Mágicas*            | Invocação    | —            |\n| *Mensagem*                | Transmutação | —            |\n| *Prestidigitação Arcana*  | Transmutação | —            |\n| *Proteção Contra Lâminas* | Abjuração    | C            |\n| *Reparar*                 | Transmutação | —            |\n| *Trovão*                  | Evocação     | —            |\n| *Zombaria Perversa*       | Encantamento | —            |\n\n**Magias de Bardo de 1º Círculo**\n\n| **Magia**                     | **Escola**   | **Especial** |\n|-------------------------------|--------------|--------------|\n| *Amizade Animal*              | Encantamento | —            |\n| *Comando*                     | Encantamento | —            |\n| *Compreender Idiomas*         | Adivinhação  | R            |\n| *Curar Ferimentos*            | Abjuração    | —            |\n| *Detectar Magia*              | Adivinhação  | C, R         |\n| *Disfarçar-se*                | Ilusão       | —            |\n| *Enfeitiçar Pessoa*           | Encantamento | —            |\n| *Escrita Ilusória*            | Ilusão       | R, M         |\n| *Falar com Animais*           | Adivinhação  | R            |\n| *Fogo das Fadas*              | Evocação     | C            |\n| *Gargalhada Nefasta de Tasha* | Encantamento | C            |\n| *Heroísmo*                    | Encantamento | C            |\n| *Identificar*                 | Adivinhação  | R, M         |\n| *Imagem Silenciosa*           | Ilusão       | C            |\n| *Leque Cromático*             | Ilusão       | —            |\n| *Onda Trovejante*             | Evocação     | —            |\n| *Palavra Curativa*            | Abjuração    | —            |\n| *Passos Largos*               | Transmutação | —            |\n| *Perdição*                    | Encantamento | C            |\n| *Queda Suave*                 | Transmutação | —            |\n| *Servo Invisível*             | Invocação    | R            |\n| *Sono*                        | Encantamento | C            |\n| *Sussurros Dissonantes*       | Encantamento | —            |\n\n**Magias de Bardo de 2º Círculo**\n\n| **Magia**                      | **Escola**   | **Especial** |\n|--------------------------------|--------------|--------------|\n| *Acalmar Emoções*              | Encantamento | C            |\n| *Aprimorar Atributo*           | Transmutação | C            |\n| *Arrombar*                     | Transmutação | —            |\n| *Aumentar/Reduzir*             | Transmutação | C            |\n| *Auxílio*                      | Abjuração    | —            |\n| *Boca Encantada*               | Ilusão       | R, M         |\n| *Cativar*                      | Encantamento | C            |\n| *Cegueira/Surdez*              | Transmutação | —            |\n| *Coroa da Loucura*             | Encantamento | C            |\n| *Despedaçar*                   | Evocação     | —            |\n| *Detectar Pensamentos*         | Adivinhação  | C            |\n| *Esquentar Metal*              | Transmutação | C            |\n| *Força Espectral*              | Ilusão       | C            |\n| *Invisibilidade*               | Ilusão       | C, M         |\n| *Localizar Animais ou Plantas* | Adivinhação  | R            |\n| *Localizar Objeto*             | Adivinhação  | C            |\n| *Mensageiro Animal*            | Encantamento | R            |\n| *Nuvem de Adagas*              | Invocação    | C            |\n| *Paralisar Pessoa*             | Encantamento | C            |\n| *Reflexos*                     | Ilusão       | —            |\n| *Restauração Menor*            | Abjuração    | —            |\n| *Silêncio*                     | Ilusão       | C, R         |\n| *Sugestão*                     | Encantamento | C            |\n| *Ver o Invisível*              | Adivinhação  | —            |\n| *Zona da Verdade*              | Encantamento | —            |\n\n**Magias de Bardo de 3º Círculo**\n\n| **Magia**                    | **Escola**   | **Especial** |\n|------------------------------|--------------|--------------|\n| *Clarividência*              | Adivinhação  | C, M         |\n| *Crescimento de Plantas*     | Transmutação | —            |\n| *Dissipar Magia*             | Abjuração    | —            |\n| *Falar com Mortos*           | Necromancia  | —            |\n| *Falar com Plantas*          | Transmutação | —            |\n| *Glifo de Proteção*          | Abjuração    | M            |\n| *Imagem Maior*               | Ilusão       | C            |\n| *Indetectável*               | Abjuração    | M            |\n| *Lentidão*                   | Transmutação | C            |\n| *Línguas*                    | Adivinhação  | —            |\n| *Medo*                       | Ilusão       | C            |\n| *Nuvem Fétida*               | Invocação    | C            |\n| *Padrão Hipnótico*           | Ilusão       | C            |\n| *Palavra Curativa em Massa*  | Abjuração    | —            |\n| *Pequeno Refúgio de Leomund* | Evocação     | R            |\n| *Remeter*                    | Adivinhação  |  —           |\n| *Rogar Maldição*             | Necromancia  | C            |\n| *Simular Morte*              | Necromancia  | R            |\n\n**Magias de Bardo de 4º Círculo**\n\n| **Magia**                  | **Escola**   | **Especial** |\n|----------------------------|--------------|--------------|\n| *Assassino Fantasmagórico* | Ilusão       | C            |\n| *Compulsão*                | Encantamento | C            |\n| *Confusão*                 | Encantamento | C            |\n| *Enfeitiçar Monstro*       | Encantamento | —            |\n| *Fonte do Luar*            | Evocação     | C            |\n| *Invisibilidade Maior*     | Ilusão       | C            |\n| *Localizar Criatura*       | Adivinhação  | C            |\n| *Movimentação Livre*       | Abjuração    | —            |\n| *Polimorfia*               | Transmutação | C            |\n| *Porta Dimensional*        | Invocação    | —            |\n| *Terreno Alucinatório*     | Ilusão       | —            |\n\n**Magias de Bardo de 5º Círculo**\n\n| **Magia**                    | **Escola**   | **Especial** |\n|------------------------------|--------------|--------------|\n| *Âncora Planar*              | Abjuração    | M            |\n| *Animar Objetos*             | Transmutação | C            |\n| *Círculo de Teleporte*       | Invocação    | M            |\n| *Curar Ferimentos em Massa*  | Abjuração    | —            |\n| *Despertar*                  | Transmutação | M            |\n| *Despistar*                  | Ilusão       | C            |\n| *Dominar Pessoa*             | Encantamento | C            |\n| *Estática Sináptica*         | Encantamento | —            |\n| *Lendas e Histórias*         | Adivinhação  | M            |\n| *Ligação Telepática de Rary* | Adivinhação  | R            |\n| *Missão*                     | Encantamento | —            |\n| *Modificar Memória*          | Encantamento | C            |\n| *Paralisar Monstro*          | Encantamento | C            |\n| *Presença Régia de Yolande*  | Encantamento | C            |\n| *Restauração Maior*          | Abjuração    | M            |\n| *Reviver os Mortos*          | Necromancia  | M            |\n| *Similaridade*               | Ilusão       | —            |\n| *Sonho*                      | Ilusão       | —            |\n| *Vidência*                   | Adivinhação  | C, M         |\n\n**Magias de Bardo de 6º Círculo**\n\n| **Magia**                    | **Escola**   | **Especial** |\n|------------------------------|--------------|--------------|\n| *Banquete de Heróis*         | Invocação    | M            |\n| *Dança Irresistível de Otto* | Encantamento | C            |\n| *Encontrar o Caminho*        | Adivinhação  | C, M         |\n| *Ilusão Programada*          | Ilusão       | M            |\n| *Mau Olhado*                 | Necromancia  | C            |\n| *Proteger Fortaleza*         | Abjuração    | M            |\n| *Sugestão em Massa*          | Encantamento | —            |\n| *Visão da Verdade*           | Adivinhação  | M            |\n\n**Magias de Bardo de 7º Círculo**\n\n| **Magia**                          | **Escola**   | **Especial** |\n|------------------------------------|--------------|--------------|\n| *Cárcere de Energia*               | Evocação     | C, M         |\n| *Espada de Mordenkainen*           | Evocação     | C, M         |\n| *Forma Etérea*                     | Invocação    | —            |\n| *Mansão Magnífica de Mordenkainen* | Invocação    | M            |\n| *Miragem Arcana*                   | Ilusão       | —            |\n| *Palavra de Poder: Fortificar*     | Encantamento | —            |\n| *Projetar Imagem*                  | Ilusão       | C, M         |\n| *Rajada Prismática*                | Evocação     | —            |\n| *Regeneração*                      | Transmutação | —            |\n| *Ressurreição*                     | Necromancia  | M            |\n| *Símbolo*                          | Abjuração    | M            |\n| *Teleporte*                        | Invocação    | —            |\n\n**Magias de Bardo de 8º Círculo**\n\n| **Magia**                    | **Escola**   | **Especial** |\n|------------------------------|--------------|--------------|\n| *Antipatia/Simpatia*         | Encantamento | —            |\n| *Dominar Monstro*            | Encantamento | C            |\n| *Limpar a Mente*             | Abjuração    | —            |\n| *Loquacidade*                | Encantamento | —            |\n| *Palavra de Poder: Atordoar* | Encantamento | —            |\n| *Suplício*                   | Encantamento | —            |\n\n**Magias de Bardo de 9º Círculo**\n\n| **Magia**                  | **Escola**   | **Especial** |\n|----------------------------|--------------|--------------|\n| *Muralha Prismática*       | Abjuração    | —            |\n| *Palavra de Poder: Matar*  | Encantamento | —            |\n| *Palavra de Poder: Salvar* | Encantamento | —            |\n| *Polimorfia Total*         | Transmutação | C            |\n| *Sexto Sentido*            | Adivinhação  | —            |\n\n# Subclasses de Bardo\n\nUma subclasse de Bardo é uma especialização que concede características em certos níveis, conforme apresentado na subclasse. Bardos formam associações flexíveis, que chamam de colégios, para preservar suas tradições. Esta seção apresenta as subclasses Colégio da Bravura, Colégio da Dança, Colégio do Conhecimento e Colégio do Glamour.\n\n## Colégio da Bravura\n\n*Cante os Feitos dos Heróis Antigos*\n\nOs Bardos do Colégio da Bravura são narradores ousados cujas histórias preservam a memória dos grandes heróis do passado. Eles cantam os feitos dos poderosos em salões suntuosos ou para multidões reunidas em torno de grandes fogueiras. Esses Bardos viajam para testemunhar grandes eventos em primeira mão e garantir que a lembrança desses acontecimentos não desapareça. Com suas canções, eles inspiram novas gerações a alcançar os mesmos feitos grandiosos dos heróis de outrora.\n\n### Nível 3: Inspiração em Combate\n\nVocê pode usar sua astúcia para virar o rumo da batalha. Uma criatura que possui um dado de Inspiração de Bardo seu pode utilizá-lo para um dos seguintes efeitos.\n\n**Defensivo.** Quando a criatura é atingida por uma jogada de ataque, pode executar a própria Reação para jogar o dado da Inspiração de Bardo e adicionar o resultado jogado à própria CA contra aquele ataque, potencialmente fazendo com que o ataque erre.\n\n**Ofensivo.** Imediatamente após a criatura atingir um alvo com uma jogada de ataque, ela pode jogar o dado da Inspiração de Bardo e adicionar o resultado jogado ao dano do ataque contra o alvo.\n\n### Nível 3: Treinamento Marcial\n\nVocê adquire proficiência com armas Marciais, armaduras Médias e treinamento com Escudos.\n\nAlém disso, você pode usar uma arma Simples ou Marcial como Foco de Conjuração para conjurar magias da sua lista de magias de Bardo.\n\n### Nível 6: Ataque Extra\n\nVocê pode atacar duas vezes, em vez de uma, sempre que executar a ação Atacar no seu turno.\n\nAlém disso, você pode conjurar um de seus truques que tenha um tempo de conjuração de uma ação no lugar de um desses ataques.\n\n### Nível 14: Magia de Batalha\n\nApós conjurar uma magia que tenha um tempo de conjuração de uma ação, você pode realizar um ataque com uma arma como uma Ação Bônus\n\n## Colégio da Dança\n\n*Mova-se em Harmonia com o Cosmos*\n\nBardos do Colégio da Dança entendem que as Palavras de Criação transcendem a fala e a canção; elas se manifestam nos movimentos dos corpos celestes e nos gestos das menores criaturas. Esses Bardos buscam uma harmonia com o turbilhão do cosmos, enfatizando agilidade, velocidade e graça.\n\n### Nível 3: Ginga Fascinante\n\nEnquanto você não estiver vestindo armadura ou empunhando um Escudo, adquire os seguintes benefícios.\n\n**Dança Virtuosa.** Você tem Vantagem em qualquer teste de Carisma (Atuação) que envolva você dançando.\n\n**Dano de Bardo.** Você pode usar Destreza em vez de Força para as jogadas de ataque de seus Ataques Desarmados. Quando você causar dano com um Ataque Desarmado, pode causar dano Contundente igual ao resultado do dado da sua Inspiração de Bardo mais seu modificador de Destreza, em vez do dano normal do ataque. Esse uso não gasta o dado.\n\n**Defesa sem Armadura.** Sua Classe de Armadura base é igual a 10 mais seus modificadores de Destreza e Carisma.\n\n**Golpes Ágeis.** Ao gastar um uso da sua Inspiração de Bardo como parte de uma ação, Ação Bônus ou Reação, você pode realizar um Ataque Desarmado como parte dessa ação, Ação Bônus ou Reação.\n\n### Nível 6: Gingado Coordenado\n\nAo jogar Iniciativa, você pode gastar um uso da sua Inspiração de Bardo se não estiver com a condição Incapacitado. Ao realizar isso, jogue o dado da sua Inspiração de Bardo; você e cada aliado a até 9 metros de você que puder ver ou ouvir você adquire um bônus na Iniciativa igual ao número jogado.\n\n*Subclasse Colégio da Dança*\n\n### Nível 6: Movimento Inspirador\n\nQuando um inimigo à sua vista encerra o turno dele a até 1,5 metro de você, você pode executar uma Reação e gastar um uso da sua Inspiração de Bardo para se mover até metade do seu Deslocamento. Em seguida, um aliado à sua escolha a até 9 metros de você também pode se mover até metade do Deslocamento dele usando a própria Reação.\n\nNenhum movimento dessa característica provoca Ataques de Oportunidade.\n\n### Nível 14: Evasão Liderada\n\nSe você for alvo de um efeito que permita uma salvaguarda de Destreza para receber apenas metade do dano, você não recebe dano algum se for bem-sucedido e apenas metade se falhar. Se criaturas até 1,5 metro de você também realizarem a salvaguarda, você pode compartilhar esse benefício com elas.\n\nVocê não pode usar esta característica se estiver com a condição Incapacitado.\n\n## Colégio do Conhecimento\n\n*Explore as Profundezas do Conhecimento Mágico*\n\nBardos do Colégio do Conhecimento colecionam magias e segredos de fontes diversas, como tomos acadêmicos, ritos místicos e contos populares. Os membros do colégio reúnem-se em bibliotecas e universidades para compartilhar seu conhecimento uns com os outros. Eles também participam de festivais ou eventos de estado, onde podem expor corrupção, desvendar mentiras e satirizar figuras de autoridade que se acham importantes.\n\n### Nível 3: Palavras de Interrupção\n\nVocê aprende a usar sua sagacidade para distrair, confundir e diminuir sobrenaturalmente a confiança e a competência dos outros. Quando uma criatura à sua vista a até 18 metros de você realizar uma jogada de dano, ou for bem-sucedida em um teste de atributo ou jogada de ataque, você pode executar uma Reação para gastar um uso da sua Inspiração de Bardo. Jogue o dado de Inspiração de Bardo e subtraia o número jogado do resultado da criatura, reduzindo o dano ou transformando potencialmente o sucesso em fracasso.\n\n### Nível 3: Proficiências Bônus\n\nVocê adquire proficiência em três perícias à sua escolha.\n\n### Nível 6: Descobertas Mágicas\n\nVocê aprende duas magias à sua escolha. Essas magias podem vir da lista de magias de Clérigo, Druida ou Mago, ou uma combinação dessas listas (veja a seção da classe para a respectiva lista de magias). A magia escolhida deve ser um truque ou uma magia para a qual você tenha espaços de magia disponíveis, conforme mostrado na tabela Características de Bardo.\n\nVocê sempre tem as magias escolhidas preparadas e, sempre que adquirir um novo nível de Bardo, pode substituir uma das magias por outra que atenda a esses requisitos.\n\n### Nível 14: Perícia Inigualável\n\nAo realizar um teste de atributo ou uma jogada de ataque e falhar, pode gastar um uso da Inspiração de Bardo; jogue o dado da Inspiração de Bardo e adicione o resultado jogado ao d20, transformando potencialmente a falha em sucesso. Se falhar, o uso da Inspiração de Bardo não é gasto.\n\n## Colégio do Glamour\n\n*Teça Magia Feérica Fascinante*\n\nO Colégio do Glamour remonta à magia encantadora de Faéria. Bardos que estudam essa magia entrelaçam fios de beleza e terror em suas canções e histórias, e os mais poderosos entre eles podem se envolver em uma majestade sobrenatural. Suas apresentações despertam um anseio nostálgico por uma inocência esquecida, evocam memórias inconscientes de medos antigos e tocam as emoções até dos ouvintes mais insensíveis.\n\n### Nível 3: Magia Fascinante\n\nVocê sempre está com as magias *Enfeitiçar Pessoa* e *Reflexos* preparadas.\n\nAlém disso, imediatamente após você conjurar uma magia de Encantamento ou Ilusão usando um espaço de magia, pode fazer com que uma criatura à sua vista a até 18 metros de você realize uma salvaguarda de Sabedoria contra a CD para evitar sua magia. Se falhar, o alvo tem a condição Amedrontado ou Enfeitiçado (à sua escolha) por 1 minuto. O alvo repete a salvaguarda no final de cada um dos próprios turnos, e encerra o efeito em caso de sucesso.\n\nDepois de usar este benefício, você não pode utilizá-lo novamente até completar um Descanso Longo. Você também pode restaurar um uso gastando uma Inspiração de Bardo (nenhuma ação é necessária).\n\n### Nível 3: Manto de Inspiração\n\nVocê pode canalizar magia feérica em uma canção ou dança, revigorando os outros. Como uma Ação Bônus, você pode usar uma das suas Inspirações de Bardo, jogando um dado de Inspiração de Bardo. Escolha um número de criaturas a até 18 metros de você igual ao seu modificador de Carisma (no mínimo uma criatura). Cada uma dessas criaturas recebe um número de Pontos de Vida Temporários igual a duas vezes o número jogado no dado de Inspiração de Bardo e, então, cada uma pode executar uma Reação para se mover até o máximo do Deslocamento sem provocar Ataques de Oportunidade.\n\n### Nível 6: Manto de Majestade\n\nVocê tem sempre a magia *Comando* preparada.\n\nComo uma Ação Bônus, você pode conjurar *Comando* sem gastar um espaço de magia e assumir uma aparência sobrenatural por 1 minuto ou até que sua Concentração se quebre. Durante esse tempo, você pode conjurar *Comando* como uma Ação Bônus sem gastar um espaço de magia.\n\nQualquer criatura que está com a condição Enfeitiçado por você falha automaticamente em uma salvaguarda contra o *Comando* que você conjurar com esta característica.\n\nApós usar esta característica, você não pode utilizá-la novamente até completar um Descanso Longo. Você também pode restaurar seu uso gastando um espaço de magia de 3º círculo ou superior (nenhuma ação é necessária).\n\n*Subclasse Colégio do Glamour*\n\n### Nível 14: Majestade Inquebrável\n\nComo uma Ação Bônus, você pode assumir uma presença majestosamente mágica por 1 minuto ou até que tenha a condição Incapacitado. Por essa duração, sempre que qualquer criatura o atinge com uma jogada de ataque pela primeira vez em um turno, o atacante deve ser bem-sucedido em uma salvaguarda de Carisma contra a CD para evitar sua magia, ou o ataque falha, pois a criatura se retrai diante de sua majestade.\n\nUma vez que você assume essa presença majestosa, não pode fazê-lo novamente até completar um Descanso Curto ou Longo."
 }

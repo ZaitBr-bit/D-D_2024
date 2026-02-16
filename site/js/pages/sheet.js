@@ -4,8 +4,8 @@
 import { CLASSES_INFO, PERICIAS, ATRIBUTOS_NOMES, ATRIBUTOS_KEYS, ATRIBUTO_NOME_PARA_KEY } from '../dados-classes.js';
 import { getPersonagem, salvarPersonagem, removerPersonagem } from '../store.js';
 import { getClasse, getMagiasClasse, getMagiasPorCirculo, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura, getTalentos, getEspecies } from '../db.js';
-import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagia, calcPercepcaoPassiva, calcBonusPericia, calcPVTotal, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, gerarId, detectarRecarga, ehHabilidadeAtiva } from '../utils.js';
-import { podeSubirDeNivel, subirDeNivel, XP_POR_NIVEL, adicionarXP, obterTodasMagiasDominio } from '../levelup.js';
+import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagia, calcPercepcaoPassiva, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcBonusPericia, calcPVTotal, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, gerarId, detectarRecarga, ehHabilidadeAtiva, getDeslocamento, getTamanho } from '../utils.js';
+import { podeSubirDeNivel, subirDeNivel, XP_POR_NIVEL, adicionarXP, obterTodasMagiasDominio, obterTodasMagiasSemprePreparadas, exigeEspecializacaoBardo, exigeEspecializacaoGuardiao } from '../levelup.js';
 
 // Estilos visuais (cor e emoji) para cada atributo
 const ATRIBUTO_ESTILO = {
@@ -24,6 +24,1314 @@ let indiceMagiasCache = null;
 let talentosCache = null;
 let especiesCache = null;
 let magiasDominioCache = null;
+let magiasSempreCache = null;
+
+function magiaContaNoLimite(magia) {
+  return magia?.origem !== 'dominio' && magia?.origem !== 'sempre';
+}
+
+function magiaEhEspecial(magia) {
+  return !magiaContaNoLimite(magia);
+}
+
+function rotuloOrigemMagia(magia) {
+  if (magia?.origem === 'dominio') return 'Domínio';
+  if (magia?.origem === 'sempre') return 'Sempre Preparada';
+  return '';
+}
+
+function ehBardoComSegredosMagicos() {
+  return char?.classe === 'Bardo' && (char?.nivel || 1) >= 10;
+}
+
+function temArmaduraPesadaEquipada() {
+  const inv = char?.inventario || [];
+  return inv.some(i => i.equipado && i.tipo === 'armadura' && (i.dados?.categoria || '').toLowerCase() === 'pesada');
+}
+
+function getProgressaoBarbaro() {
+  if (char?.classe !== 'Bárbaro' || !classeData?.tabela_caracteristicas) return null;
+  const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
+  if (!row) return null;
+  return {
+    furiasMax: parseInt(row['Fúrias']) || 0,
+    danoFuria: parseInt(String(row['Dano da Fúria'] || '0').replace('+', '')) || 0,
+    maestriasMax: parseInt(row['Maestria em Arma']) || 0
+  };
+}
+
+function getEstadoFuria() {
+  if (char?.classe !== 'Bárbaro') return null;
+  if (!char.recursos) char.recursos = {};
+  if (typeof char.recursos.furia_ativa !== 'boolean') char.recursos.furia_ativa = false;
+  if (typeof char.recursos.furia_usos_gastos !== 'number') char.recursos.furia_usos_gastos = 0;
+
+  const prog = getProgressaoBarbaro() || { furiasMax: 0, danoFuria: 0, maestriasMax: 0 };
+  const usosDisponiveis = Math.max(0, prog.furiasMax - char.recursos.furia_usos_gastos);
+
+  return {
+    ativa: !!char.recursos.furia_ativa,
+    usosGastos: char.recursos.furia_usos_gastos,
+    usosMax: prog.furiasMax,
+    usosDisponiveis,
+    dano: prog.danoFuria,
+    maestriasMax: prog.maestriasMax
+  };
+}
+
+function getProgressaoBardo() {
+  if (char?.classe !== 'Bardo' || !classeData?.tabela_caracteristicas) return null;
+  const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
+  if (!row) return null;
+  const dadoStr = String(row['Dados de Inspiração'] || 'D6');
+  const dado = parseInt(dadoStr.replace(/[^\d]/g, '')) || 6;
+  return { dado };
+}
+
+function getEstadoInspiracaoBardo() {
+  if (char?.classe !== 'Bardo') return null;
+  if (!char.recursos) char.recursos = {};
+  if (typeof char.recursos.inspiracao_bardo_usos_gastos !== 'number') char.recursos.inspiracao_bardo_usos_gastos = 0;
+
+  const modCar = calcMod(char.atributos.carisma);
+  const usosMax = Math.max(1, modCar);
+  const usosDisponiveis = Math.max(0, usosMax - char.recursos.inspiracao_bardo_usos_gastos);
+  const recuperaCurto = (char.nivel || 1) >= 5;
+  const prog = getProgressaoBardo() || { dado: 6 };
+
+  return {
+    usosMax,
+    usosGastos: char.recursos.inspiracao_bardo_usos_gastos,
+    usosDisponiveis,
+    dado: prog.dado,
+    recuperaCurto
+  };
+}
+
+function getProgressaoGuardiao() {
+  if (char?.classe !== 'Guardião' || !classeData?.tabela_caracteristicas) return null;
+  const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
+  if (!row) return null;
+  return {
+    inimigoFavoritoMax: parseInt(row['Inimigo Favorito']) || 0
+  };
+}
+
+function getEstadoRecursosGuardiao() {
+  if (char?.classe !== 'Guardião') return null;
+  if (!char.recursos) char.recursos = {};
+  if (!char.recursos.guardiao) {
+    char.recursos.guardiao = {
+      inimigo_favorito_usos_gastos: 0,
+      marca_predador_ativa: false,
+      incansavel_usos_gastos: 0,
+      veu_natureza_usos_gastos: 0
+    };
+  }
+
+  const r = char.recursos.guardiao;
+  if (typeof r.inimigo_favorito_usos_gastos !== 'number') r.inimigo_favorito_usos_gastos = 0;
+  if (typeof r.marca_predador_ativa !== 'boolean') r.marca_predador_ativa = false;
+  if (typeof r.incansavel_usos_gastos !== 'number') r.incansavel_usos_gastos = 0;
+  if (typeof r.veu_natureza_usos_gastos !== 'number') r.veu_natureza_usos_gastos = 0;
+  if (typeof char.exaustao !== 'number') char.exaustao = 0;
+
+  const prog = getProgressaoGuardiao() || { inimigoFavoritoMax: 0 };
+  const modSab = Math.max(1, calcMod(char.atributos.sabedoria));
+  const nivel = char.nivel || 1;
+
+  const inimigoFavoritoDisponiveis = Math.max(0, prog.inimigoFavoritoMax - r.inimigo_favorito_usos_gastos);
+  const incansavelDisponiveis = Math.max(0, modSab - r.incansavel_usos_gastos);
+  const veuDisponiveis = Math.max(0, modSab - r.veu_natureza_usos_gastos);
+
+  return {
+    nivel,
+    modSab,
+    inimigoFavoritoMax: prog.inimigoFavoritoMax,
+    inimigoFavoritoDisponiveis,
+    marcaPredadorAtiva: !!r.marca_predador_ativa,
+    marcaPredadorDado: nivel >= 20 ? 'd10' : 'd6',
+    incansavelAtivo: nivel >= 10,
+    incansavelMax: modSab,
+    incansavelDisponiveis,
+    predadorImplacavelAtivo: nivel >= 13,
+    veuNaturezaAtivo: nivel >= 14,
+    veuNaturezaMax: modSab,
+    veuNaturezaDisponiveis: veuDisponiveis,
+    cacadorPrecisoAtivo: nivel >= 17,
+    sentidosSelvagensAtivo: nivel >= 18,
+    exaustao: Math.max(0, char.exaustao || 0)
+  };
+}
+
+function getProgressaoClerigo() {
+  if (char?.classe !== 'Clérigo' || !classeData?.tabela_caracteristicas) return null;
+  const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
+  if (!row) return null;
+  return {
+    canalizarDivindadeMax: parseInt(row['Canalizar Divindade']) || 0
+  };
+}
+
+function getEstadoRecursosClerigo() {
+  if (char?.classe !== 'Clérigo') return null;
+  if (!char.recursos) char.recursos = {};
+  if (!char.recursos.clerigo) char.recursos.clerigo = {};
+
+  const prog = getProgressaoClerigo() || { canalizarDivindadeMax: 0 };
+  if (typeof char.recursos.clerigo.canalizar_divindade_usos_gastos !== 'number') {
+    char.recursos.clerigo.canalizar_divindade_usos_gastos = 0;
+  }
+  if (typeof char.recursos.clerigo.intervencao_divina_bloqueada !== 'boolean') {
+    char.recursos.clerigo.intervencao_divina_bloqueada = false;
+  }
+  if (typeof char.recursos.clerigo.intervencao_divina_descansos_restantes !== 'number') {
+    char.recursos.clerigo.intervencao_divina_descansos_restantes = 0;
+  }
+  if (!char.recursos.clerigo.subclasses) {
+    char.recursos.clerigo.subclasses = {
+      guerra: {
+        sacerdote_guerra_usos_gastos: 0
+      },
+      luz: {
+        labareda_protetora_usos_gastos: 0,
+        coroa_luz_usos_gastos: 0
+      },
+      trapaca: {
+        bencao_trapaceiro_ativa: false,
+        invocar_duplicidade_ativa: false
+      },
+      vida: {}
+    };
+  }
+
+  if (typeof char.recursos.clerigo.subclasses?.guerra?.sacerdote_guerra_usos_gastos !== 'number') {
+    char.recursos.clerigo.subclasses.guerra.sacerdote_guerra_usos_gastos = 0;
+  }
+  if (typeof char.recursos.clerigo.subclasses?.luz?.labareda_protetora_usos_gastos !== 'number') {
+    char.recursos.clerigo.subclasses.luz.labareda_protetora_usos_gastos = 0;
+  }
+  if (typeof char.recursos.clerigo.subclasses?.luz?.coroa_luz_usos_gastos !== 'number') {
+    char.recursos.clerigo.subclasses.luz.coroa_luz_usos_gastos = 0;
+  }
+  if (typeof char.recursos.clerigo.subclasses?.trapaca?.bencao_trapaceiro_ativa !== 'boolean') {
+    char.recursos.clerigo.subclasses.trapaca.bencao_trapaceiro_ativa = false;
+  }
+  if (typeof char.recursos.clerigo.subclasses?.trapaca?.invocar_duplicidade_ativa !== 'boolean') {
+    char.recursos.clerigo.subclasses.trapaca.invocar_duplicidade_ativa = false;
+  }
+
+  const usosDisponiveis = Math.max(0, prog.canalizarDivindadeMax - char.recursos.clerigo.canalizar_divindade_usos_gastos);
+
+  return {
+    canalizarDivindadeMax: prog.canalizarDivindadeMax,
+    canalizarDivindadeUsosGastos: char.recursos.clerigo.canalizar_divindade_usos_gastos,
+    canalizarDivindadeUsosDisponiveis: usosDisponiveis,
+    intervencaoDivinaBloqueada: !!char.recursos.clerigo.intervencao_divina_bloqueada,
+    intervencaoDivinaDescansosRestantes: char.recursos.clerigo.intervencao_divina_descansos_restantes
+  };
+}
+
+function getEstadoSubclassesClerigo() {
+  if (char?.classe !== 'Clérigo') return null;
+  const estado = getEstadoRecursosClerigo();
+  if (!estado) return null;
+
+  const modSab = Math.max(1, calcMod(char.atributos.sabedoria));
+  const sub = char.recursos.clerigo.subclasses;
+
+  const sacerdoteMax = modSab;
+  const sacerdoteGastos = sub.guerra.sacerdote_guerra_usos_gastos;
+
+  const labaredaMax = modSab;
+  const labaredaGastos = sub.luz.labareda_protetora_usos_gastos;
+
+  const coroaMax = modSab;
+  const coroaGastos = sub.luz.coroa_luz_usos_gastos;
+
+  return {
+    guerra: {
+      sacerdoteUsosMax: sacerdoteMax,
+      sacerdoteUsosGastos: sacerdoteGastos,
+      sacerdoteUsosDisponiveis: Math.max(0, sacerdoteMax - sacerdoteGastos)
+    },
+    luz: {
+      labaredaUsosMax: labaredaMax,
+      labaredaUsosGastos: labaredaGastos,
+      labaredaUsosDisponiveis: Math.max(0, labaredaMax - labaredaGastos),
+      coroaUsosMax: coroaMax,
+      coroaUsosGastos: coroaGastos,
+      coroaUsosDisponiveis: Math.max(0, coroaMax - coroaGastos)
+    },
+    trapaca: {
+      bencaoTrapaceiroAtiva: !!sub.trapaca.bencao_trapaceiro_ativa,
+      invocarDuplicidadeAtiva: !!sub.trapaca.invocar_duplicidade_ativa
+    }
+  };
+}
+
+function getProgressaoBruxo() {
+  if (char?.classe !== 'Bruxo' || !classeData?.tabela_caracteristicas) return null;
+  const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
+  if (!row) return null;
+  return {
+    invocacoesMax: parseInt(row['Invocações']) || 0
+  };
+}
+
+function getCirculosArcanumDesbloqueados() {
+  const nivel = char?.nivel || 1;
+  const circulos = [];
+  if (nivel >= 11) circulos.push(6);
+  if (nivel >= 13) circulos.push(7);
+  if (nivel >= 15) circulos.push(8);
+  if (nivel >= 17) circulos.push(9);
+  return circulos;
+}
+
+function getEstadoRecursosBruxo() {
+  if (char?.classe !== 'Bruxo') return null;
+  if (!char.recursos) char.recursos = {};
+  if (!char.recursos.bruxo) {
+    char.recursos.bruxo = {
+      astucia_usada: false,
+      pacto: '',
+      invocacoes: [],
+      arcanum: {
+        6: { magia: '', usado: false },
+        7: { magia: '', usado: false },
+        8: { magia: '', usado: false },
+        9: { magia: '', usado: false }
+      }
+    };
+  }
+
+  if (!Array.isArray(char.recursos.bruxo.invocacoes)) char.recursos.bruxo.invocacoes = [];
+  if (!char.recursos.bruxo.arcanum) {
+    char.recursos.bruxo.arcanum = {
+      6: { magia: '', usado: false },
+      7: { magia: '', usado: false },
+      8: { magia: '', usado: false },
+      9: { magia: '', usado: false }
+    };
+  }
+
+  [6, 7, 8, 9].forEach(c => {
+    if (!char.recursos.bruxo.arcanum[c]) {
+      char.recursos.bruxo.arcanum[c] = { magia: '', usado: false };
+    }
+    if (typeof char.recursos.bruxo.arcanum[c].usado !== 'boolean') {
+      char.recursos.bruxo.arcanum[c].usado = false;
+    }
+    if (typeof char.recursos.bruxo.arcanum[c].magia !== 'string') {
+      char.recursos.bruxo.arcanum[c].magia = '';
+    }
+  });
+
+  const progressao = getProgressaoBruxo() || { invocacoesMax: 0 };
+  const circulosArcanum = getCirculosArcanumDesbloqueados();
+
+  return {
+    astuciaUsada: !!char.recursos.bruxo.astucia_usada,
+    pacto: char.recursos.bruxo.pacto || '',
+    invocacoes: char.recursos.bruxo.invocacoes,
+    invocacoesMax: progressao.invocacoesMax,
+    arcanum: char.recursos.bruxo.arcanum,
+    circulosArcanum,
+    mestreMisticoAtivo: (char.nivel || 1) >= 20
+  };
+}
+
+function getProgressaoDruida() {
+  if (char?.classe !== 'Druida' || !classeData?.tabela_caracteristicas) return null;
+  const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
+  if (!row) return null;
+  return {
+    formaSelvagemMax: parseInt(row['Forma Selvagem']) || 0
+  };
+}
+
+function getEstadoRecursosDruida() {
+  if (char?.classe !== 'Druida') return null;
+  if (!char.recursos) char.recursos = {};
+  if (!char.recursos.druida) {
+    char.recursos.druida = {
+      forma_selvagem_usos_gastos: 0,
+      forma_selvagem_ativa: false,
+      companheiro_selvagem_ativo: false,
+      ressurgimento_slot_recuperado_hoje: false
+    };
+  }
+
+  if (typeof char.recursos.druida.forma_selvagem_usos_gastos !== 'number') char.recursos.druida.forma_selvagem_usos_gastos = 0;
+  if (typeof char.recursos.druida.forma_selvagem_ativa !== 'boolean') char.recursos.druida.forma_selvagem_ativa = false;
+  if (typeof char.recursos.druida.companheiro_selvagem_ativo !== 'boolean') char.recursos.druida.companheiro_selvagem_ativo = false;
+  if (typeof char.recursos.druida.ressurgimento_slot_recuperado_hoje !== 'boolean') char.recursos.druida.ressurgimento_slot_recuperado_hoje = false;
+
+  const prog = getProgressaoDruida() || { formaSelvagemMax: 0 };
+  const usosDisponiveis = Math.max(0, prog.formaSelvagemMax - char.recursos.druida.forma_selvagem_usos_gastos);
+
+  return {
+    formaSelvagemAtiva: !!char.recursos.druida.forma_selvagem_ativa,
+    companheiroSelvagemAtivo: !!char.recursos.druida.companheiro_selvagem_ativo,
+    usosGastos: char.recursos.druida.forma_selvagem_usos_gastos,
+    usosMax: prog.formaSelvagemMax,
+    usosDisponiveis,
+    ressurgimentoSlotRecuperadoHoje: !!char.recursos.druida.ressurgimento_slot_recuperado_hoje,
+    arquidruidaAtivo: (char.nivel || 1) >= 20,
+    ressurgimentoAtivo: (char.nivel || 1) >= 5
+  };
+}
+
+function consumirUsoFormaSelvagem(qtd = 1) {
+  const estado = getEstadoRecursosDruida();
+  if (!estado || qtd <= 0 || estado.usosDisponiveis < qtd) return false;
+  char.recursos.druida.forma_selvagem_usos_gastos += qtd;
+  return true;
+}
+
+function recuperarUmUsoFormaSelvagem() {
+  const estado = getEstadoRecursosDruida();
+  if (!estado || estado.usosDisponiveis >= estado.usosMax) return false;
+  char.recursos.druida.forma_selvagem_usos_gastos = Math.max(0, char.recursos.druida.forma_selvagem_usos_gastos - 1);
+  return true;
+}
+
+function getProgressaoFeiticeiro() {
+  if (char?.classe !== 'Feiticeiro' || !classeData?.tabela_caracteristicas) return null;
+  const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
+  if (!row) return null;
+  const pontosStr = String(row['Pontos de Feitiçaria'] || '0').trim();
+  const pontosMax = pontosStr === '—' ? 0 : (parseInt(pontosStr) || 0);
+  return { pontosMax };
+}
+
+function getEstadoRecursosFeiticeiro() {
+  if (char?.classe !== 'Feiticeiro') return null;
+  if (!char.recursos) char.recursos = {};
+  if (!char.recursos.feiticeiro) {
+    char.recursos.feiticeiro = {
+      pontos_feiticaria_gastos: 0,
+      feiticaria_inata_usos_gastos: 0,
+      feiticaria_inata_ativa: false,
+      restauracao_feiticeira_usada: false,
+      metamagias: [],
+      subclasses: {
+        aberrante: {
+          telepatia_ativa: false,
+          telepatia_duracao_min: 0,
+          revelacao_carne_ativa: false
+        },
+        draconica: {
+          afinidade_elemental: '',
+          asas_ativas: false,
+          asas_usada_desde_descanso: false,
+          companheiro_draconico_usado: false,
+          bonus_pv_aplicado: 0
+        },
+        mecanica: {
+          restaurar_equilibrio_usos_gastos: 0,
+          transe_ordem_ativo: false,
+          transe_ordem_usado_desde_descanso: false,
+          bastiao_dados: 0
+        },
+        selvagem: {
+          mares_caos_disponivel: true,
+          surto_pendente_automatico: false,
+          surto_controlado_usado: false
+        }
+      }
+    };
+  }
+
+  const r = char.recursos.feiticeiro;
+  if (typeof r.pontos_feiticaria_gastos !== 'number') r.pontos_feiticaria_gastos = 0;
+  if (typeof r.feiticaria_inata_usos_gastos !== 'number') r.feiticaria_inata_usos_gastos = 0;
+  if (typeof r.feiticaria_inata_ativa !== 'boolean') r.feiticaria_inata_ativa = false;
+  if (typeof r.restauracao_feiticeira_usada !== 'boolean') r.restauracao_feiticeira_usada = false;
+  if (!Array.isArray(r.metamagias)) r.metamagias = [];
+  if (!r.subclasses) r.subclasses = {};
+  if (!r.subclasses.aberrante) r.subclasses.aberrante = { telepatia_ativa: false, telepatia_duracao_min: 0, revelacao_carne_ativa: false };
+  if (!r.subclasses.draconica) r.subclasses.draconica = { afinidade_elemental: '', asas_ativas: false, asas_usada_desde_descanso: false, companheiro_draconico_usado: false, bonus_pv_aplicado: 0 };
+  if (!r.subclasses.mecanica) r.subclasses.mecanica = { restaurar_equilibrio_usos_gastos: 0, transe_ordem_ativo: false, transe_ordem_usado_desde_descanso: false, bastiao_dados: 0 };
+  if (!r.subclasses.selvagem) r.subclasses.selvagem = { mares_caos_disponivel: true, surto_pendente_automatico: false, surto_controlado_usado: false };
+
+  const prog = getProgressaoFeiticeiro() || { pontosMax: 0 };
+  const pontosAtuais = Math.max(0, prog.pontosMax - r.pontos_feiticaria_gastos);
+  const usosInataMax = 2;
+  const usosInataDisponiveis = Math.max(0, usosInataMax - r.feiticaria_inata_usos_gastos);
+  const modCar = Math.max(1, calcMod(char.atributos.carisma));
+
+  return {
+    pontosMax: prog.pontosMax,
+    pontosAtuais,
+    pontosGastos: r.pontos_feiticaria_gastos,
+    feiticariaInataAtiva: !!r.feiticaria_inata_ativa,
+    feiticariaInataUsosMax: usosInataMax,
+    feiticariaInataUsosDisponiveis: usosInataDisponiveis,
+    restauracaoFeiticeiraUsada: !!r.restauracao_feiticeira_usada,
+    metamagias: r.metamagias,
+    modCar,
+    subclasses: r.subclasses
+  };
+}
+
+function gastarPontosFeiticaria(qtd) {
+  const estado = getEstadoRecursosFeiticeiro();
+  if (!estado || qtd <= 0 || estado.pontosAtuais < qtd) return false;
+  char.recursos.feiticeiro.pontos_feiticaria_gastos += qtd;
+  return true;
+}
+
+function recuperarPontosFeiticaria(qtd) {
+  const estado = getEstadoRecursosFeiticeiro();
+  if (!estado || qtd <= 0) return false;
+  char.recursos.feiticeiro.pontos_feiticaria_gastos = Math.max(0, char.recursos.feiticeiro.pontos_feiticaria_gastos - qtd);
+  return true;
+}
+
+function sincronizarBonusPvDraconico() {
+  if (char?.classe !== 'Feiticeiro') return;
+  const estado = getEstadoRecursosFeiticeiro();
+  if (!estado) return;
+
+  const ehDraconica = semAcento(char.subclasse || '') === semAcento('Feitiçaria Dracônica');
+  const esperado = ehDraconica && (char.nivel || 1) >= 3 ? ((char.nivel || 1) + 2) : 0;
+  const aplicado = char.recursos.feiticeiro.subclasses.draconica.bonus_pv_aplicado || 0;
+
+  if (esperado === aplicado) return;
+
+  const diff = esperado - aplicado;
+  char.pv_max = Math.max(1, (char.pv_max || 1) + diff);
+  char.pv_atual = Math.max(0, Math.min((char.pv_max_override || char.pv_max), (char.pv_atual || 0) + diff));
+  char.recursos.feiticeiro.subclasses.draconica.bonus_pv_aplicado = esperado;
+  salvar();
+}
+
+// Progressão e recursos do Guerreiro
+function getProgressaoGuerreiro() {
+  if (char?.classe !== 'Guerreiro' || !classeData?.tabela_caracteristicas) return null;
+  const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
+  if (!row) return null;
+  return {
+    recuperarFolegoMax: parseInt(row['Recuperar Fôlego']) || 2,
+    maestriasMax: parseInt(row['Maestria em Arma']) || 3
+  };
+}
+
+function getEstadoRecursosGuerreiro() {
+  if (char?.classe !== 'Guerreiro') return null;
+  if (!char.recursos) char.recursos = {};
+  if (!char.recursos.guerreiro) {
+    char.recursos.guerreiro = {
+      recuperar_folego_usos_gastos: 0,
+      surto_acao_usos_gastos: 0,
+      indomavel_usos_gastos: 0
+    };
+  }
+
+  // Inicializar recursos de subclasses do Guerreiro
+  if (!char.recursos.guerreiro.subclasses) {
+    char.recursos.guerreiro.subclasses = {
+      mestre_batalha: {
+        dados_superioridade_gastos: 0,
+        conheca_inimigo_usado: false
+      },
+      combatente_psiquico: {
+        dados_psionicos_gastos: 0,
+        movimento_telecinetico_usado: false,
+        salto_impulsao_usado: false,
+        baluarte_usado: false,
+        mestre_telecinetico_usado: false
+      }
+    };
+  }
+  const sub = char.recursos.guerreiro.subclasses;
+  if (!sub.mestre_batalha) sub.mestre_batalha = { dados_superioridade_gastos: 0, conheca_inimigo_usado: false };
+  if (!sub.combatente_psiquico) sub.combatente_psiquico = { dados_psionicos_gastos: 0, movimento_telecinetico_usado: false, salto_impulsao_usado: false, baluarte_usado: false, mestre_telecinetico_usado: false };
+
+  const mb = sub.mestre_batalha;
+  const cp = sub.combatente_psiquico;
+  if (typeof mb.dados_superioridade_gastos !== 'number') mb.dados_superioridade_gastos = 0;
+  if (typeof mb.conheca_inimigo_usado !== 'boolean') mb.conheca_inimigo_usado = false;
+  if (typeof cp.dados_psionicos_gastos !== 'number') cp.dados_psionicos_gastos = 0;
+  if (typeof cp.movimento_telecinetico_usado !== 'boolean') cp.movimento_telecinetico_usado = false;
+  if (typeof cp.salto_impulsao_usado !== 'boolean') cp.salto_impulsao_usado = false;
+  if (typeof cp.baluarte_usado !== 'boolean') cp.baluarte_usado = false;
+  if (typeof cp.mestre_telecinetico_usado !== 'boolean') cp.mestre_telecinetico_usado = false;
+
+  const r = char.recursos.guerreiro;
+  if (typeof r.recuperar_folego_usos_gastos !== 'number') r.recuperar_folego_usos_gastos = 0;
+  if (typeof r.surto_acao_usos_gastos !== 'number') r.surto_acao_usos_gastos = 0;
+  if (typeof r.indomavel_usos_gastos !== 'number') r.indomavel_usos_gastos = 0;
+
+  const prog = getProgressaoGuerreiro() || { recuperarFolegoMax: 2, maestriasMax: 3 };
+  const nivel = char.nivel || 1;
+
+  // Surto de Ação: 1 uso até nível 16, 2 usos a partir do nível 17
+  const surtoMax = nivel >= 17 ? 2 : 1;
+  // Indomável: 1 uso a partir do nível 9, 2 a partir do 13, 3 a partir do 17
+  let indomavelMax = 0;
+  if (nivel >= 17) indomavelMax = 3;
+  else if (nivel >= 13) indomavelMax = 2;
+  else if (nivel >= 9) indomavelMax = 1;
+
+  // --- Mestre da Batalha ---
+  const ehMestreBatalha = char.subclasse === 'Mestre da Batalha';
+  let dadosSuperioridadeMax = 0, tipoDadoSuperioridade = 'd8';
+  if (ehMestreBatalha && nivel >= 3) {
+    // Quantidade: 4 (lv3), 5 (lv7), 6 (lv15)
+    if (nivel >= 15) dadosSuperioridadeMax = 6;
+    else if (nivel >= 7) dadosSuperioridadeMax = 5;
+    else dadosSuperioridadeMax = 4;
+    // Tipo: d8 (lv3), d10 (lv10), d12 (lv18)
+    if (nivel >= 18) tipoDadoSuperioridade = 'd12';
+    else if (nivel >= 10) tipoDadoSuperioridade = 'd10';
+  }
+  const cdSuperioridade = ehMestreBatalha
+    ? 8 + Math.max(calcMod(char.atributos?.forca || 10), calcMod(char.atributos?.destreza || 10)) + bonusProficiencia(nivel)
+    : 0;
+  let manobrasConhecidas = 0;
+  if (ehMestreBatalha && nivel >= 3) {
+    manobrasConhecidas = 3;
+    if (nivel >= 15) manobrasConhecidas = 9;
+    else if (nivel >= 10) manobrasConhecidas = 7;
+    else if (nivel >= 7) manobrasConhecidas = 5;
+  }
+  const conhecaInimigoAtivo = ehMestreBatalha && nivel >= 7;
+  const implacavelAtivo = ehMestreBatalha && nivel >= 15;
+
+  // --- Combatente Psíquico ---
+  const ehCombatentePsiquico = char.subclasse === 'Combatente Psíquico';
+  let dadosPsionicosMaxG = 0, tipoDadoPsionicoG = 'd6';
+  if (ehCombatentePsiquico && nivel >= 3) {
+    if (nivel >= 17) { dadosPsionicosMaxG = 12; tipoDadoPsionicoG = 'd12'; }
+    else if (nivel >= 13) { dadosPsionicosMaxG = 10; tipoDadoPsionicoG = 'd10'; }
+    else if (nivel >= 11) { dadosPsionicosMaxG = 8; tipoDadoPsionicoG = 'd10'; }
+    else if (nivel >= 9) { dadosPsionicosMaxG = 8; tipoDadoPsionicoG = 'd8'; }
+    else if (nivel >= 5) { dadosPsionicosMaxG = 6; tipoDadoPsionicoG = 'd8'; }
+    else { dadosPsionicosMaxG = 4; tipoDadoPsionicoG = 'd6'; }
+  }
+  const adeptoTelecineticoAtivo = ehCombatentePsiquico && nivel >= 7;
+  const resguardoMentalAtivo = ehCombatentePsiquico && nivel >= 10;
+  const baluarteEnergiaAtivo = ehCombatentePsiquico && nivel >= 15;
+  const mestreTelecineticoAtivo = ehCombatentePsiquico && nivel >= 18;
+
+  return {
+    nivel,
+    recuperarFolegoMax: prog.recuperarFolegoMax,
+    recuperarFolegoDisponiveis: Math.max(0, prog.recuperarFolegoMax - r.recuperar_folego_usos_gastos),
+    recuperarFolegoGastos: r.recuperar_folego_usos_gastos,
+    surtoMax,
+    surtoDisponiveis: Math.max(0, surtoMax - r.surto_acao_usos_gastos),
+    surtoGastos: r.surto_acao_usos_gastos,
+    indomavelMax,
+    indomavelDisponiveis: Math.max(0, indomavelMax - r.indomavel_usos_gastos),
+    indomavelGastos: r.indomavel_usos_gastos,
+    maestriasMax: prog.maestriasMax,
+    // Mestre da Batalha
+    ehMestreBatalha,
+    dadosSuperioridadeMax,
+    dadosSuperioridadeDisponiveis: Math.max(0, dadosSuperioridadeMax - mb.dados_superioridade_gastos),
+    dadosSuperioridadeGastos: mb.dados_superioridade_gastos,
+    tipoDadoSuperioridade,
+    cdSuperioridade,
+    manobrasConhecidas,
+    conhecaInimigoAtivo,
+    conhecaInimigoUsado: mb.conheca_inimigo_usado,
+    implacavelAtivo,
+    // Combatente Psíquico
+    ehCombatentePsiquico,
+    dadosPsionicosMaxG,
+    dadosPsionicosDisponiveisG: Math.max(0, dadosPsionicosMaxG - cp.dados_psionicos_gastos),
+    dadosPsionicosGastosG: cp.dados_psionicos_gastos,
+    tipoDadoPsionicoG,
+    movimentoTelecineticoUsado: cp.movimento_telecinetico_usado,
+    adeptoTelecineticoAtivo,
+    saltoImpulsaoUsado: cp.salto_impulsao_usado,
+    resguardoMentalAtivo,
+    baluarteEnergiaAtivo,
+    baluarteUsado: cp.baluarte_usado,
+    mestreTelecineticoAtivo,
+    mestreTelecineticoUsado: cp.mestre_telecinetico_usado,
+    subclasses: sub
+  };
+}
+
+// Tabela de conjuração do Cavaleiro Místico (subclasse do Guerreiro)
+function getCavaleiroMisticoConjuracao() {
+  if (char?.classe !== 'Guerreiro' || char?.subclasse !== 'Cavaleiro Místico') return null;
+  const nivel = char.nivel || 1;
+  if (nivel < 3) return null;
+
+  // Tabela: truques, preparadas (magias conhecidas), espaços por círculo
+  const tabela = {
+    3:  { truques: 2, preparadas: 3,  espacos: {1: 2} },
+    4:  { truques: 2, preparadas: 4,  espacos: {1: 3} },
+    5:  { truques: 2, preparadas: 4,  espacos: {1: 3} },
+    7:  { truques: 2, preparadas: 5,  espacos: {1: 4, 2: 2} },
+    8:  { truques: 2, preparadas: 6,  espacos: {1: 4, 2: 2} },
+    10: { truques: 3, preparadas: 7,  espacos: {1: 4, 2: 3} },
+    11: { truques: 3, preparadas: 8,  espacos: {1: 4, 2: 3} },
+    13: { truques: 3, preparadas: 9,  espacos: {1: 4, 2: 3, 3: 2} },
+    14: { truques: 3, preparadas: 10, espacos: {1: 4, 2: 3, 3: 2} },
+    16: { truques: 3, preparadas: 11, espacos: {1: 4, 2: 3, 3: 3} },
+    19: { truques: 3, preparadas: 12, espacos: {1: 4, 2: 3, 3: 3, 4: 1} },
+    20: { truques: 3, preparadas: 13, espacos: {1: 4, 2: 3, 3: 3, 4: 1} }
+  };
+
+  // Encontrar a entrada mais próxima (menor ou igual ao nível atual)
+  const niveis = Object.keys(tabela).map(Number).sort((a, b) => a - b);
+  let entrada = null;
+  for (const n of niveis) {
+    if (n <= nivel) entrada = tabela[n];
+  }
+  return entrada;
+}
+
+// Tabela de conjuração do Trapaceiro Arcano (subclasse do Ladino)
+// Mesma progressão de espaços que o Cavaleiro Místico (1/3 conjurador), mas truques diferentes
+function getTrapaceiroArcanoConjuracao() {
+  if (char?.classe !== 'Ladino' || char?.subclasse !== 'Trapaceiro Arcano') return null;
+  const nivel = char.nivel || 1;
+  if (nivel < 3) return null;
+
+  // Truques: 3 até nível 9 (Mãos Mágicas + 2), 4 a partir do nível 10 (Mãos Mágicas + 3)
+  const tabela = {
+    3:  { truques: 3, preparadas: 3,  espacos: {1: 2} },
+    4:  { truques: 3, preparadas: 4,  espacos: {1: 3} },
+    5:  { truques: 3, preparadas: 4,  espacos: {1: 3} },
+    7:  { truques: 3, preparadas: 5,  espacos: {1: 4, 2: 2} },
+    8:  { truques: 3, preparadas: 6,  espacos: {1: 4, 2: 2} },
+    10: { truques: 4, preparadas: 7,  espacos: {1: 4, 2: 3} },
+    11: { truques: 4, preparadas: 8,  espacos: {1: 4, 2: 3} },
+    13: { truques: 4, preparadas: 9,  espacos: {1: 4, 2: 3, 3: 2} },
+    14: { truques: 4, preparadas: 10, espacos: {1: 4, 2: 3, 3: 2} },
+    16: { truques: 4, preparadas: 11, espacos: {1: 4, 2: 3, 3: 3} },
+    19: { truques: 4, preparadas: 12, espacos: {1: 4, 2: 3, 3: 3, 4: 1} },
+    20: { truques: 4, preparadas: 13, espacos: {1: 4, 2: 3, 3: 3, 4: 1} }
+  };
+
+  const niveis = Object.keys(tabela).map(Number).sort((a, b) => a - b);
+  let entrada = null;
+  for (const n of niveis) {
+    if (n <= nivel) entrada = tabela[n];
+  }
+  return entrada;
+}
+
+// Retorna a tabela de conjuração da subclasse ativa (Cavaleiro Místico ou Trapaceiro Arcano)
+function getSubclasseConjuradoraConjuracao() {
+  return getCavaleiroMisticoConjuracao() || getTrapaceiroArcanoConjuracao();
+}
+
+// Verifica se a subclasse atual concede conjuração
+function ehSubclasseConjuradora() {
+  const nivel = char?.nivel || 1;
+  if (nivel < 3) return false;
+  return (char?.classe === 'Guerreiro' && char?.subclasse === 'Cavaleiro Místico')
+      || (char?.classe === 'Ladino' && char?.subclasse === 'Trapaceiro Arcano');
+}
+
+function consumirEspacoMagiaDisponivel(circuloMinimo = 1) {
+  if (!char?.espacos_magia) return 0;
+  const circulos = Object.keys(char.espacos_magia).map(Number).filter(c => c >= circuloMinimo).sort((a, b) => a - b);
+  for (const c of circulos) {
+    const slot = char.espacos_magia[c];
+    if (!slot) continue;
+    const disponiveis = Math.max(0, (slot.total || 0) - (slot.usados || 0));
+    if (disponiveis > 0) {
+      slot.usados = (slot.usados || 0) + 1;
+      return c;
+    }
+  }
+  return 0;
+}
+
+function recuperarEspacoMagia(circulo = 1) {
+  const slot = char?.espacos_magia?.[circulo];
+  if (!slot || (slot.usados || 0) <= 0) return false;
+  slot.usados -= 1;
+  return true;
+}
+
+function recuperarEspacosMagiaBruxo(parcial = false) {
+  if (char?.classe !== 'Bruxo' || !char.espacos_magia) return 0;
+  const chaves = Object.keys(char.espacos_magia);
+  if (chaves.length === 0) return 0;
+
+  const usadosAntes = chaves.reduce((acc, c) => acc + (char.espacos_magia[c]?.usados || 0), 0);
+  if (usadosAntes <= 0) return 0;
+
+  if (!parcial) {
+    chaves.forEach(c => { char.espacos_magia[c].usados = 0; });
+    return usadosAntes;
+  }
+
+  const totalMax = chaves.reduce((acc, c) => acc + (char.espacos_magia[c]?.total || 0), 0);
+  let recuperar = Math.ceil(totalMax / 2);
+  if ((char.nivel || 1) >= 20) recuperar = totalMax;
+  recuperar = Math.min(recuperar, usadosAntes);
+
+  let restante = recuperar;
+  for (const c of chaves.sort((a, b) => Number(b) - Number(a))) {
+    if (restante <= 0) break;
+    const usados = char.espacos_magia[c]?.usados || 0;
+    if (usados <= 0) continue;
+    const reduz = Math.min(usados, restante);
+    char.espacos_magia[c].usados -= reduz;
+    restante -= reduz;
+  }
+
+  return recuperar - restante;
+}
+
+function extrairOpcoesInvocacoesBruxo() {
+  if (char?.classe !== 'Bruxo') return [];
+  const texto = classeData?.texto_completo || '';
+  const marcadorInicio = '## Opções de Invocações Místicas';
+  const inicio = texto.indexOf(marcadorInicio);
+  if (inicio < 0) return [];
+
+  let secao = texto.slice(inicio + marcadorInicio.length);
+  const fim = secao.indexOf('## Lista de Magias de Bruxo');
+  if (fim >= 0) secao = secao.slice(0, fim);
+
+  const opcoes = [];
+  const regex = /###\s+([^\n]+)\n([\s\S]*?)(?=\n###\s+|$)/g;
+  let match;
+  while ((match = regex.exec(secao)) !== null) {
+    const nome = (match[1] || '').trim();
+    const corpo = match[2] || '';
+    const prereqMatch = corpo.match(/\*Pré-requisitos?:\s*([^*]+)\*/i);
+    const prerequisito = prereqMatch ? prereqMatch[1].trim() : '';
+    const repetivel = /\*\*Repetível\.\*\*/i.test(corpo) || /Repetível\./i.test(corpo);
+    if (nome) opcoes.push({ nome, prerequisito, repetivel });
+  }
+
+  return opcoes;
+}
+
+function avaliarPrerequisitoInvocacaoBruxo(prerequisito) {
+  if (!prerequisito) return { ok: true, motivo: '' };
+  let ok = true;
+  const motivos = [];
+  const texto = prerequisito;
+
+  const nivelMatch = texto.match(/Bruxo\s*N[ií]vel\s*(\d+)/i);
+  if (nivelMatch) {
+    const nivelMin = parseInt(nivelMatch[1]);
+    if ((char?.nivel || 1) < nivelMin) {
+      ok = false;
+      motivos.push(`requer nível ${nivelMin}`);
+    }
+  }
+
+  const estado = getEstadoRecursosBruxo();
+  const pacto = estado?.pacto || '';
+  if (/Pacto da Lâmina/i.test(texto) && pacto !== 'Pacto da Lâmina') {
+    ok = false;
+    motivos.push('requer Pacto da Lâmina');
+  }
+  if (/Pacto da Corrente/i.test(texto) && pacto !== 'Pacto da Corrente') {
+    ok = false;
+    motivos.push('requer Pacto da Corrente');
+  }
+  if (/Pacto do Tomo/i.test(texto) && pacto !== 'Pacto do Tomo') {
+    ok = false;
+    motivos.push('requer Pacto do Tomo');
+  }
+
+  return { ok, motivo: motivos.join(', ') };
+}
+
+function abrirModalRecursosBruxo() {
+  if (char?.classe !== 'Bruxo') return;
+  const estado = getEstadoRecursosBruxo();
+  const opcoes = extrairOpcoesInvocacoesBruxo();
+  const mapaOpcoes = new Map(opcoes.map(o => [semAcento(o.nome), o]));
+
+  abrirModal('Recursos do Bruxo', `
+    <div class="form-group">
+      <label class="form-label">Pacto</label>
+      <select class="form-select" id="bruxo-pacto">
+        <option value="">Não selecionado</option>
+        <option value="Pacto da Lâmina" ${estado.pacto === 'Pacto da Lâmina' ? 'selected' : ''}>Pacto da Lâmina</option>
+        <option value="Pacto da Corrente" ${estado.pacto === 'Pacto da Corrente' ? 'selected' : ''}>Pacto da Corrente</option>
+        <option value="Pacto do Tomo" ${estado.pacto === 'Pacto do Tomo' ? 'selected' : ''}>Pacto do Tomo</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Invocações Místicas (${estado.invocacoes.length}/${estado.invocacoesMax})</label>
+      <textarea class="form-textarea" id="bruxo-invocacoes" rows="6" placeholder="Uma invocação por linha">${estado.invocacoes.join('\n')}</textarea>
+      <div style="font-size:0.75rem;color:var(--text-muted)">Pré-requisitos conhecidos são validados automaticamente (nível e pacto). Duplicatas só são aceitas quando a invocação é Repetível.</div>
+    </div>
+
+    <div class="section-divider"><span>Arcana Mística</span></div>
+    ${[6, 7, 8, 9].map(c => {
+      const desbloqueado = estado.circulosArcanum.includes(c);
+      const dado = estado.arcanum[c] || { magia: '', usado: false };
+      return `
+        <div class="form-group" style="opacity:${desbloqueado ? 1 : 0.5}">
+          <label class="form-label">${c}º círculo ${desbloqueado ? '' : '(bloqueado)'}</label>
+          <input class="form-input" id="bruxo-arcanum-${c}" ${desbloqueado ? '' : 'disabled'} value="${dado.magia || ''}" placeholder="Nome da magia de arcanum">
+        </div>
+      `;
+    }).join('')}
+  `,
+  '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-bruxo-recursos">Salvar</button>');
+
+  document.getElementById('btn-salvar-bruxo-recursos')?.addEventListener('click', () => {
+    const novoPacto = document.getElementById('bruxo-pacto')?.value || '';
+    const invTexto = document.getElementById('bruxo-invocacoes')?.value || '';
+    const invLinhas = invTexto.split('\n').map(v => v.trim()).filter(Boolean);
+
+    if (invLinhas.length > estado.invocacoesMax) {
+      toast(`Você pode ter no máximo ${estado.invocacoesMax} invocações neste nível.`, 'error');
+      return;
+    }
+
+    const usadas = new Map();
+    for (const nome of invLinhas) {
+      const chave = semAcento(nome);
+      const opcao = mapaOpcoes.get(chave);
+      if (!opcao) {
+        toast(`Invocação não reconhecida: ${nome}`, 'error');
+        return;
+      }
+
+      const ja = usadas.get(chave) || 0;
+      if (ja >= 1 && !opcao.repetivel) {
+        toast(`A invocação ${opcao.nome} não é repetível.`, 'error');
+        return;
+      }
+
+      const validacao = avaliarPrerequisitoInvocacaoBruxo(opcao.prerequisito);
+      if (!validacao.ok) {
+        toast(`Pré-requisito não atendido para ${opcao.nome}: ${validacao.motivo}`, 'error');
+        return;
+      }
+
+      usadas.set(chave, ja + 1);
+    }
+
+    char.recursos.bruxo.pacto = novoPacto;
+    char.recursos.bruxo.invocacoes = invLinhas;
+
+    [6, 7, 8, 9].forEach(c => {
+      const desbloqueado = estado.circulosArcanum.includes(c);
+      if (!desbloqueado) {
+        char.recursos.bruxo.arcanum[c] = { magia: '', usado: false };
+      } else {
+        const magia = (document.getElementById(`bruxo-arcanum-${c}`)?.value || '').trim();
+        const usadoAntes = !!char.recursos.bruxo.arcanum[c]?.usado;
+        char.recursos.bruxo.arcanum[c] = { magia, usado: usadoAntes };
+      }
+    });
+
+    salvar();
+    window.fecharModal();
+    renderFichaCompleta();
+  });
+}
+
+// ============================================================
+// Progressão e recursos do Paladino
+// ============================================================
+function getProgressaoPaladino() {
+  if (char?.classe !== 'Paladino' || !classeData?.tabela_caracteristicas) return null;
+  const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
+  if (!row) return null;
+  const cdStr = String(row['Canalizar Divindade'] || '—');
+  const canalizarMax = parseInt(cdStr) || 0;
+  return { canalizarMax };
+}
+
+function getEstadoRecursosPaladino() {
+  if (char?.classe !== 'Paladino') return null;
+  if (!char.recursos) char.recursos = {};
+  if (!char.recursos.paladino) {
+    char.recursos.paladino = {
+      maos_consagradas_gastos: 0,
+      canalizar_divindade_usos_gastos: 0,
+      destruicao_gratuita_usada: false
+    };
+  }
+
+  const r = char.recursos.paladino;
+  if (typeof r.maos_consagradas_gastos !== 'number') r.maos_consagradas_gastos = 0;
+  if (typeof r.canalizar_divindade_usos_gastos !== 'number') r.canalizar_divindade_usos_gastos = 0;
+  if (typeof r.destruicao_gratuita_usada !== 'boolean') r.destruicao_gratuita_usada = false;
+
+  const nivel = char.nivel || 1;
+  const prog = getProgressaoPaladino() || { canalizarMax: 0 };
+
+  // Mãos Consagradas: reserva = 5 × nível
+  const maosMax = 5 * nivel;
+  const maosAtuais = Math.max(0, maosMax - r.maos_consagradas_gastos);
+
+  // Canalizar Divindade (nível 3+)
+  const canalizarMax = prog.canalizarMax;
+  const canalizarDisponiveis = Math.max(0, canalizarMax - r.canalizar_divindade_usos_gastos);
+
+  // Destruição gratuita (nível 2+, 1x/descanso longo)
+  const destruicaoGratuitaAtiva = nivel >= 2;
+
+  // Aura de Proteção (nível 6+)
+  const modCar = Math.max(1, calcMod(char.atributos.carisma));
+  const auraProtecaoAtiva = nivel >= 6;
+  const auraRaio = nivel >= 18 ? 9 : 3;
+
+  // Aura de Coragem (nível 10+)
+  const auraCoragemAtiva = nivel >= 10;
+
+  // Golpes Radiantes (nível 11+)
+  const golpesRadiantesAtivo = nivel >= 11;
+
+  // Toque Restaurador (nível 14+)
+  const toqueRestauradorAtivo = nivel >= 14;
+
+  return {
+    nivel,
+    maosMax,
+    maosAtuais,
+    maosGastos: r.maos_consagradas_gastos,
+    canalizarMax,
+    canalizarDisponiveis,
+    canalizarGastos: r.canalizar_divindade_usos_gastos,
+    destruicaoGratuitaAtiva,
+    destruicaoGratuitaUsada: r.destruicao_gratuita_usada,
+    auraProtecaoAtiva,
+    auraRaio,
+    bonusAura: modCar,
+    auraCoragemAtiva,
+    golpesRadiantesAtivo,
+    toqueRestauradorAtivo
+  };
+}
+
+// ============================================================
+// Progressão e recursos do Monge
+// ============================================================
+function getProgressaoMonge() {
+  if (char?.classe !== 'Monge' || !classeData?.tabela_caracteristicas) return null;
+  const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
+  if (!row) return null;
+  const dadoStr = String(row['Artes Marciais'] || '1d6');
+  const dado = parseInt(dadoStr.replace(/[^\d]/g, '')) || 6;
+  const pontos = parseInt(row['Pontos de Foco']) || 0;
+  const movTexto = String(row['Movimento sem Armadura'] || '—');
+  const movMatch = movTexto.match(/[\+]?\s*(\d+(?:[\.,]\d+)?)/);
+  const bonusMovimento = movMatch ? parseFloat(movMatch[1].replace(',', '.')) : 0;
+  return { dado, pontosMax: pontos, bonusMovimento };
+}
+
+function getEstadoRecursosMonge() {
+  if (char?.classe !== 'Monge') return null;
+  if (!char.recursos) char.recursos = {};
+  if (!char.recursos.monge) {
+    char.recursos.monge = {
+      pontos_foco_gastos: 0,
+      metabolismo_usado: false
+    };
+  }
+
+  const r = char.recursos.monge;
+  if (typeof r.pontos_foco_gastos !== 'number') r.pontos_foco_gastos = 0;
+  if (typeof r.metabolismo_usado !== 'boolean') r.metabolismo_usado = false;
+
+  const nivel = char.nivel || 1;
+  const prog = getProgressaoMonge() || { dado: 6, pontosMax: 0, bonusMovimento: 0 };
+
+  const pontosMax = prog.pontosMax;
+  const pontosAtuais = Math.max(0, pontosMax - r.pontos_foco_gastos);
+
+  // CD de Foco: 8 + prof + mod Sabedoria
+  const cdFoco = 8 + bonusProficiencia(nivel) + calcMod(char.atributos.sabedoria);
+
+  // Desviar Ataques (nível 3+): 1d10 + mod Des + nível
+  const desviarAtivo = nivel >= 3;
+  const desviarReducao = `1d10 + ${calcMod(char.atributos.destreza)} + ${nivel}`;
+
+  // Queda Lenta (nível 4+): reduz 5 × nível
+  const quedaLentaAtiva = nivel >= 4;
+  const quedaReducao = 5 * nivel;
+
+  // Golpe Atordoante (nível 5+)
+  const golpeAtordoanteAtivo = nivel >= 5;
+
+  // Evasão (nível 7+)
+  const evasaoAtiva = nivel >= 7;
+
+  // Sobrevivente Disciplinado (nível 14+)
+  const sobreviventeAtivo = nivel >= 14;
+
+  // Defesa Superior (nível 18+)
+  const defesaSuperiorAtiva = nivel >= 18;
+
+  return {
+    nivel,
+    dadoArtesMarciais: prog.dado,
+    pontosMax,
+    pontosAtuais,
+    pontosGastos: r.pontos_foco_gastos,
+    cdFoco,
+    bonusMovimento: prog.bonusMovimento,
+    desviarAtivo,
+    desviarReducao,
+    quedaLentaAtiva,
+    quedaReducao,
+    golpeAtordoanteAtivo,
+    evasaoAtiva,
+    sobreviventeAtivo,
+    defesaSuperiorAtiva,
+    metabolismoUsado: r.metabolismo_usado
+  };
+}
+
+// ============================================================
+// Progressão e recursos do Ladino
+// ============================================================
+function getProgressaoLadino() {
+  if (char?.classe !== 'Ladino' || !classeData?.tabela_caracteristicas) return null;
+  const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
+  if (!row) return null;
+  const furtStr = String(row['Ataque Furtivo'] || '1d6');
+  const furtMatch = furtStr.match(/(\d+)d(\d+)/);
+  const furtivoDados = furtMatch ? parseInt(furtMatch[1]) : Math.ceil((char.nivel || 1) / 2);
+  return { furtivoDados };
+}
+
+function getEstadoRecursosLadino() {
+  if (char?.classe !== 'Ladino') return null;
+  if (!char.recursos) char.recursos = {};
+  if (!char.recursos.ladino) {
+    char.recursos.ladino = {
+      golpe_sorte_usado: false
+    };
+  }
+
+  // Inicializar recursos de subclasses do Ladino
+  if (!char.recursos.ladino.subclasses) {
+    char.recursos.ladino.subclasses = {
+      adaga_espiritual: {
+        dados_psionicos_gastos: 0,
+        sussurros_gratis_usado: false,
+        veu_psiquico_usado: false,
+        rasgar_mente_usado: false
+      }
+    };
+  }
+  const subL = char.recursos.ladino.subclasses;
+  if (!subL.adaga_espiritual) subL.adaga_espiritual = { dados_psionicos_gastos: 0, sussurros_gratis_usado: false, veu_psiquico_usado: false, rasgar_mente_usado: false };
+
+  const ae = subL.adaga_espiritual;
+  if (typeof ae.dados_psionicos_gastos !== 'number') ae.dados_psionicos_gastos = 0;
+  if (typeof ae.sussurros_gratis_usado !== 'boolean') ae.sussurros_gratis_usado = false;
+  if (typeof ae.veu_psiquico_usado !== 'boolean') ae.veu_psiquico_usado = false;
+  if (typeof ae.rasgar_mente_usado !== 'boolean') ae.rasgar_mente_usado = false;
+
+  const r = char.recursos.ladino;
+  if (typeof r.golpe_sorte_usado !== 'boolean') r.golpe_sorte_usado = false;
+
+  const nivel = char.nivel || 1;
+  const prog = getProgressaoLadino() || { furtivoDados: Math.ceil(nivel / 2) };
+
+  // CD Golpe Astuto: 8 + mod Des + prof
+  const cdGolpeAstuto = 8 + calcMod(char.atributos.destreza) + bonusProficiencia(nivel);
+
+  // Ação Ardilosa (nível 2+)
+  const acaoArdilosaAtiva = nivel >= 2;
+
+  // Mira Firme (nível 3+)
+  const miraFirmeAtiva = nivel >= 3;
+
+  // Golpe Astuto (nível 5+)
+  const golpeAstutoAtivo = nivel >= 5;
+
+  // Esquiva Sobrenatural (nível 5+)
+  const esquivaSobrenaturalAtiva = nivel >= 5;
+
+  // Evasão (nível 7+)
+  const evasaoAtiva = nivel >= 7;
+
+  // Talento Confiável (nível 7+)
+  const talentoConfiavelAtivo = nivel >= 7;
+
+  // Golpe Astuto Aprimorado (nível 11+)
+  const golpeAprimoradoAtivo = nivel >= 11;
+
+  // Golpes Sujos (nível 14+)
+  const golpesSujosAtivo = nivel >= 14;
+
+  // Mente Escorregadia (nível 15+)
+  const menteEscorregadiaAtiva = nivel >= 15;
+
+  // Elusivo (nível 18+)
+  const elusivoAtivo = nivel >= 18;
+
+  // Golpe de Sorte (nível 20)
+  const golpeSorteAtivo = nivel >= 20;
+
+  // --- Adaga Espiritual ---
+  const ehAdagaEspiritual = char.subclasse === 'Adaga Espiritual';
+  let dadosPsionicosMaxL = 0, tipoDadoPsionicoL = 'd6';
+  if (ehAdagaEspiritual && nivel >= 3) {
+    if (nivel >= 17) { dadosPsionicosMaxL = 12; tipoDadoPsionicoL = 'd12'; }
+    else if (nivel >= 13) { dadosPsionicosMaxL = 10; tipoDadoPsionicoL = 'd10'; }
+    else if (nivel >= 11) { dadosPsionicosMaxL = 8; tipoDadoPsionicoL = 'd10'; }
+    else if (nivel >= 9) { dadosPsionicosMaxL = 8; tipoDadoPsionicoL = 'd8'; }
+    else if (nivel >= 5) { dadosPsionicosMaxL = 6; tipoDadoPsionicoL = 'd8'; }
+    else { dadosPsionicosMaxL = 4; tipoDadoPsionicoL = 'd6'; }
+  }
+  // CD psiônica do Adaga Espiritual: 8 + mod Des + prof
+  const cdPsionicaAdaga = ehAdagaEspiritual ? 8 + calcMod(char.atributos?.destreza || 10) + bonusProficiencia(nivel) : 0;
+  const laminasAlmaAtivas = ehAdagaEspiritual && nivel >= 9;
+  const veuPsiquicoAtivo = ehAdagaEspiritual && nivel >= 13;
+  const rasgarMenteAtivo = ehAdagaEspiritual && nivel >= 17;
+
+  return {
+    nivel,
+    furtivoDados: prog.furtivoDados,
+    furtivoTexto: `${prog.furtivoDados}d6`,
+    cdGolpeAstuto,
+    acaoArdilosaAtiva,
+    miraFirmeAtiva,
+    golpeAstutoAtivo,
+    esquivaSobrenaturalAtiva,
+    evasaoAtiva,
+    talentoConfiavelAtivo,
+    golpeAprimoradoAtivo,
+    golpesSujosAtivo,
+    menteEscorregadiaAtiva,
+    elusivoAtivo,
+    golpeSorteAtivo,
+    golpeSorteUsado: r.golpe_sorte_usado,
+    // Adaga Espiritual
+    ehAdagaEspiritual,
+    dadosPsionicosMaxL,
+    dadosPsionicosDisponiveisL: Math.max(0, dadosPsionicosMaxL - ae.dados_psionicos_gastos),
+    dadosPsionicosGastosL: ae.dados_psionicos_gastos,
+    tipoDadoPsionicoL,
+    cdPsionicaAdaga,
+    sussurrosGratisUsado: ae.sussurros_gratis_usado,
+    laminasAlmaAtivas,
+    veuPsiquicoAtivo,
+    veuPsiquicoUsado: ae.veu_psiquico_usado,
+    rasgarMenteAtivo,
+    rasgarMenteUsado: ae.rasgar_mente_usado,
+    subclasses: subL
+  };
+}
+
+// ============================================================
+// Progressão e recursos do Mago
+// ============================================================
+function getEstadoRecursosMago() {
+  if (char?.classe !== 'Mago') return null;
+  if (!char.recursos) char.recursos = {};
+  if (!char.recursos.mago) {
+    char.recursos.mago = {
+      recuperacao_arcana_usada: false,
+      assinatura_magia_1_usada: false,
+      assinatura_magia_2_usada: false
+    };
+  }
+
+  const r = char.recursos.mago;
+  if (typeof r.recuperacao_arcana_usada !== 'boolean') r.recuperacao_arcana_usada = false;
+  if (typeof r.assinatura_magia_1_usada !== 'boolean') r.assinatura_magia_1_usada = false;
+  if (typeof r.assinatura_magia_2_usada !== 'boolean') r.assinatura_magia_2_usada = false;
+
+  const nivel = char.nivel || 1;
+
+  // Recuperação Arcana: recupera círculos combinados <= metade do nível (arredondado para cima), máx 5º círculo
+  const recuperacaoArcanaMax = Math.ceil(nivel / 2);
+
+  // Memorizar Magia (nível 5+)
+  const memorizarMagiaAtivo = nivel >= 5;
+
+  // Maestria de Magias (nível 18+)
+  const maestriaMagiasAtiva = nivel >= 18;
+
+  // Assinatura Mágica (nível 20): 2 magias de 3º círculo, 1x cada por descanso curto/longo
+  const assinaturaMagicaAtiva = nivel >= 20;
+
+  return {
+    nivel,
+    recuperacaoArcanaMax,
+    recuperacaoArcanaUsada: r.recuperacao_arcana_usada,
+    memorizarMagiaAtivo,
+    maestriaMagiasAtiva,
+    assinaturaMagicaAtiva,
+    assinatura1Usada: r.assinatura_magia_1_usada,
+    assinatura2Usada: r.assinatura_magia_2_usada
+  };
+}
+
+function getDeslocamentoFinal(baseDeslocamento) {
+  const texto = String(baseDeslocamento || '9 metros');
+  const match = texto.match(/(\d+(?:[\.,]\d+)?)/);
+  const base = match ? parseFloat(match[1].replace(',', '.')) : 9;
+
+  let final = base;
+  if (char?.classe === 'Bárbaro' && (char?.nivel || 1) >= 5 && !temArmaduraPesadaEquipada()) {
+    final += 3;
+  }
+  if (char?.classe === 'Guardião' && (char?.nivel || 1) >= 6 && !temArmaduraPesadaEquipada()) {
+    final += 3;
+  }
+  // Monge: Movimento sem Armadura (nível 2+, sem armadura e sem escudo)
+  if (char?.classe === 'Monge' && (char?.nivel || 1) >= 2) {
+    const inv = char?.inventario || [];
+    const temArmadura = inv.some(i => i.equipado && i.tipo === 'armadura' && i.nome !== 'Escudo');
+    const temEscudo = inv.some(i => i.equipado && (i.nome === 'Escudo' || i.tipo === 'escudo'));
+    if (!temArmadura && !temEscudo) {
+      const progMonge = getProgressaoMonge();
+      if (progMonge) final += progMonge.bonusMovimento;
+    }
+  }
+
+  // Exaustao: Deslocamento reduzido em 1,5m x nivel de exaustao
+  if (char?.exaustao > 0) {
+    final -= 1.5 * char.exaustao;
+    if (final < 0) final = 0;
+  }
+
+  return `${String(final).replace('.', ',')} metros`;
+}
+
+function getAtaquesPorAcao() {
+  const nivel = char?.nivel || 1;
+  if (char?.classe === 'Guerreiro') {
+    if (nivel >= 20) return 4;
+    if (nivel >= 11) return 3;
+    if (nivel >= 5) return 2;
+  }
+  if (char?.classe === 'Bárbaro' && nivel >= 5) return 2;
+  if (char?.classe === 'Guardião' && nivel >= 5) return 2;
+  if (char?.classe === 'Paladino' && nivel >= 5) return 2;
+  if (char?.classe === 'Monge' && nivel >= 5) return 2;
+  if (char?.classe === 'Bardo' && char?.subclasse === 'Colégio da Bravura' && nivel >= 6) return 2;
+  return 1;
+}
+
+function getModIniciativa() {
+  const base = calcMod(char.atributos.destreza);
+  // Bárbaro nível 7+ (Instinto Selvagem) ou Guerreiro/Campeão nível 3+ (Atleta Extraordinário)
+  const vantagem = (char?.classe === 'Bárbaro' && (char?.nivel || 1) >= 7)
+    || (char?.classe === 'Guerreiro' && char?.subclasse === 'Campeão' && (char?.nivel || 1) >= 3);
+  return { valor: base, vantagem };
+}
+
+function forcaPrimordialAtiva() {
+  return char?.classe === 'Bárbaro' && (char?.nivel || 1) >= 3;
+}
+
+function ataqueImprudenteAtivo() {
+  return !!char?.recursos?.ataque_imprudente_ativo;
+}
 
 export async function renderSheet(container, charId) {
   containerRef = container;
@@ -50,18 +1358,43 @@ export async function renderSheet(container, charId) {
 
   // Pré-carregar magias de domínio e migrar dados legados
   magiasDominioCache = await obterTodasMagiasDominio(char.classe, char.subclasse, char.nivel);
+  magiasSempreCache = await obterTodasMagiasSemprePreparadas(char.classe, char.subclasse, char.nivel);
   migrarMagiasDominio();
+  migrarMagiasSemprePreparadas();
 
   // Inicializar grimório do mago se necessário
   if (char.classe === 'Mago' && !char.grimorio) {
     char.grimorio = [];
     // Migrar magias já preparadas para o grimório
     (char.magias_preparadas || []).forEach(m => {
-      if (m.origem !== 'dominio' && !char.grimorio.find(g => g.nome === m.nome)) {
+      if (magiaContaNoLimite(m) && !char.grimorio.find(g => g.nome === m.nome)) {
         char.grimorio.push({ nome: m.nome, circulo: m.circulo });
       }
     });
     salvar();
+  }
+
+  // Sincronizar espaços de magia de subclasses conjuradoras (Cavaleiro Místico / Trapaceiro Arcano)
+  if (ehSubclasseConjuradora()) {
+    const conjSub = getSubclasseConjuradoraConjuracao();
+    if (conjSub) {
+      if (!char.espacos_magia) char.espacos_magia = {};
+      // Atualizar totais com base na tabela de progressão
+      Object.entries(conjSub.espacos).forEach(([circ, total]) => {
+        if (!char.espacos_magia[circ]) {
+          char.espacos_magia[circ] = { total, usados: 0 };
+        } else {
+          char.espacos_magia[circ].total = total;
+        }
+      });
+      // Remover círculos que não estão na progressão
+      Object.keys(char.espacos_magia).forEach(circ => {
+        if (!conjSub.espacos[circ]) {
+          delete char.espacos_magia[circ];
+        }
+      });
+      salvar();
+    }
   }
 
   renderFichaCompleta();
@@ -79,8 +1412,34 @@ function migrarMagiasDominio() {
   let alterado = false;
   const nomesDominio = new Set(magiasDominioCache.map(m => m.nome));
   char.magias_preparadas.forEach(m => {
-    if (nomesDominio.has(m.nome) && m.origem !== 'dominio') {
+    if (nomesDominio.has(m.nome) && m.origem !== 'dominio' && m.origem !== 'sempre') {
       m.origem = 'dominio';
+      alterado = true;
+    }
+  });
+  if (alterado) salvar();
+}
+
+/** Migra magias sempre preparadas legadas adicionando origem: 'sempre' */
+function migrarMagiasSemprePreparadas() {
+  if (!char.magias_preparadas?.length) return;
+  let alterado = false;
+  const nomesSempre = new Set((magiasSempreCache || []).map(m => m.nome));
+
+  // Higienização de legado: remove entradas inválidas de "sempre" no Guardião
+  // que tenham sido salvas por parsing antigo de markdown.
+  if (char.classe === 'Guardião') {
+    char.magias_preparadas = char.magias_preparadas.filter(m => {
+      if (m?.origem !== 'sempre') return true;
+      if (nomesSempre.has(m.nome)) return true;
+      alterado = true;
+      return false;
+    });
+  }
+
+  char.magias_preparadas.forEach(m => {
+    if (nomesSempre.has(m.nome) && m.origem !== 'dominio' && m.origem !== 'sempre') {
+      m.origem = 'sempre';
       alterado = true;
     }
   });
@@ -111,8 +1470,22 @@ function renderFichaCompleta() {
   const info = CLASSES_INFO[char.classe] || {};
   const prof = bonusProficiencia(char.nivel);
   const ca = calcCA(char);
-  const modDes = calcMod(char.atributos.destreza);
   const modCon = calcMod(char.atributos.constituicao);
+  const iniciativa = getModIniciativa();
+  const ataquesPorAcao = getAtaquesPorAcao();
+  const estadoFuria = getEstadoFuria();
+  const estadoInspiracao = getEstadoInspiracaoBardo();
+  const estadoBruxo = getEstadoRecursosBruxo();
+  const estadoDruida = getEstadoRecursosDruida();
+  const estadoGuardiao = getEstadoRecursosGuardiao();
+  const estadoFeiticeiro = getEstadoRecursosFeiticeiro();
+  const estadoGuerreiro = getEstadoRecursosGuerreiro();
+  const estadoPaladino = getEstadoRecursosPaladino();
+  const estadoMonge = getEstadoRecursosMonge();
+  const estadoLadino = getEstadoRecursosLadino();
+  const estadoMago = getEstadoRecursosMago();
+
+  sincronizarBonusPvDraconico();
 
   // Recalcular PV max se necessário
   if (char.pv_max <= 0 && info.dado_vida) {
@@ -120,6 +1493,12 @@ function renderFichaCompleta() {
     char.pv_atual = char.pv_max;
     salvar();
   }
+
+  // Calcular deslocamento e tamanho a partir dos dados da espécie
+  const _espData = especiesCache?.especies?.find(e => e.nome === char.especie);
+  const _deslocamentoBase = _espData ? getDeslocamento(_espData.texto_completo) : '9 metros';
+  const _deslocamento = getDeslocamentoFinal(_deslocamentoBase);
+  const _tamanho = char.tamanho || (_espData ? getTamanho(_espData.texto_completo) : 'Médio');
 
   const container = containerRef;
   container.innerHTML = `
@@ -129,9 +1508,12 @@ function renderFichaCompleta() {
         <div>
           <h2 style="font-size:1.3rem;margin-bottom:2px" id="char-nome-display">${char.nome || 'Sem Nome'}</h2>
           <div style="font-size:0.9rem;color:var(--text-muted)">
-            ${char.especie || ''} ${char.classe || ''} ${char.subclasse ? `(${char.subclasse})` : ''} &middot; Nivel ${char.nivel}
+            ${char.especie || ''} ${char.classe || ''} ${char.subclasse ? `(${char.subclasse})` : ''} &middot; Nível ${char.nivel}
           </div>
           <div style="font-size:0.8rem;color:var(--text-muted)">Antecedente: ${char.antecedente || '–'}</div>
+          <div style="font-size:0.8rem;color:var(--text-muted)">Tamanho: ${_tamanho}${(char.idiomas && char.idiomas.length) ? ' | Idiomas: ' + char.idiomas.join(', ') : ''}</div>
+          ${(estadoGuardiao && estadoGuardiao.sentidosSelvagensAtivo) ? '<div style="font-size:0.8rem;color:var(--text-muted)">Sentidos: Visão às Cegas 9 m</div>' : ''}
+          ${(estadoGuardiao && estadoGuardiao.exaustao > 0) ? `<div style="font-size:0.8rem;color:var(--danger)">Exaustão: ${estadoGuardiao.exaustao}</div>` : ''}
           <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">
             XP: <span style="font-weight:600;color:var(--accent);cursor:pointer" id="xp-display" title="Clique para editar XP">${char.xp || 0}</span>
             ${char.nivel < 20 ? ` / ${XP_POR_NIVEL[char.nivel + 1]}` : ' (Nível Máximo)'}
@@ -143,7 +1525,7 @@ function renderFichaCompleta() {
           </div>
           ${char.nivel < 20 ? `
             <button class="btn btn-sm btn-accent" id="btn-levelup" style="font-weight:700">
-              ⬆ Level Up! (Nivel ${char.nivel + 1})
+              ⬆ Subir de Nível (Nível ${char.nivel + 1})
             </button>
           ` : ''}
         </div>
@@ -152,6 +1534,285 @@ function renderFichaCompleta() {
 
     <!-- Stats combate -->
     <div class="card">
+      <!-- Inspiração Heroica -->
+      <div class="info-box ${char.inspiracao_heroica ? 'success' : 'info'}" style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+        <div style="font-size:0.85rem">
+          <strong>Inspiração Heroica:</strong> ${char.inspiracao_heroica ? 'Disponível' : 'Indisponível'}
+        </div>
+        <div class="no-print" style="display:flex;gap:6px;align-items:center">
+          ${char.inspiracao_heroica
+            ? '<button class="btn btn-sm btn-accent" id="btn-usar-inspiracao-heroica">Usar (d20 extra)</button>'
+            : '<button class="btn btn-sm btn-secondary" id="btn-ganhar-inspiracao-heroica">Conceder</button>'}
+        </div>
+      </div>
+
+      ${estadoFuria ? `
+        <div class="info-box ${estadoFuria.ativa ? 'danger' : 'info'}" style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="font-size:0.85rem">
+            <strong>Fúria:</strong> ${estadoFuria.ativa ? 'Ativa' : 'Inativa'}
+            &nbsp;|&nbsp; Usos: ${estadoFuria.usosDisponiveis}/${estadoFuria.usosMax}
+            &nbsp;|&nbsp; Dano: +${estadoFuria.dano}
+            ${temArmaduraPesadaEquipada() ? '&nbsp;|&nbsp;<span style="color:var(--danger)">Armadura pesada equipada</span>' : ''}
+          </div>
+          <div class="no-print" style="display:flex;gap:6px;align-items:center">
+            <button class="btn btn-sm ${estadoFuria.ativa ? 'btn-secondary' : 'btn-danger'}" data-furia-toggle="${estadoFuria.ativa ? 'desativar' : 'ativar'}">
+              ${estadoFuria.ativa ? 'Encerrar Fúria' : 'Entrar em Fúria'}
+            </button>
+            ${char.nivel >= 15 ? `<button class="btn btn-sm btn-secondary" data-furia-iniciativa="1">Rolar Iniciativa (recuperar Fúrias)</button>` : ''}
+          </div>
+        </div>
+      ` : ''}
+
+      ${estadoInspiracao ? `
+        <div class="info-box info" style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="font-size:0.85rem">
+            <strong>Inspiração de Bardo:</strong> d${estadoInspiracao.dado}
+            &nbsp;|&nbsp; Usos: ${estadoInspiracao.usosDisponiveis}/${estadoInspiracao.usosMax}
+            &nbsp;|&nbsp; Recarga: ${estadoInspiracao.recuperaCurto ? 'Descanso Curto/Longo' : 'Descanso Longo'}
+          </div>
+          <div class="no-print" style="display:flex;gap:6px;align-items:center">
+            <button class="btn btn-sm btn-accent" data-inspiracao-acao="usar" ${estadoInspiracao.usosDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Inspiração</button>
+            ${(char.nivel || 1) >= 18 ? '<button class="btn btn-sm btn-secondary" data-inspiracao-acao="iniciativa">Rolar Iniciativa (recuperar até 2)</button>' : ''}
+          </div>
+        </div>
+      ` : ''}
+
+      ${estadoBruxo ? `
+        <div class="info-box info" style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="font-size:0.85rem">
+            <strong>Recursos do Bruxo:</strong>
+            Astúcia Mágica: ${estadoBruxo.astuciaUsada ? 'Usada' : 'Disponível'}
+            &nbsp;|&nbsp; Invocações: ${estadoBruxo.invocacoes.length}/${estadoBruxo.invocacoesMax}
+            &nbsp;|&nbsp; Pacto: ${estadoBruxo.pacto || 'Não definido'}
+          </div>
+          <div class="no-print" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-sm btn-accent" data-bruxo-astucia-acao="usar" ${estadoBruxo.astuciaUsada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Astúcia Mágica</button>
+            <button class="btn btn-sm btn-secondary" data-bruxo-recursos="abrir">Gerenciar Pacto/Invocações/Arcanum</button>
+          </div>
+          ${estadoBruxo.circulosArcanum.length > 0 ? `
+            <div style="width:100%;font-size:0.78rem;color:var(--text-muted)">
+              Arcana Mística:
+              ${estadoBruxo.circulosArcanum.map(c => {
+                const dado = estadoBruxo.arcanum[c] || { magia: '', usado: false };
+                return `<span style="margin-right:10px">${c}º: ${dado.magia || 'não definida'} (${dado.usado ? 'usada' : 'disponível'}) <button class="btn btn-sm btn-secondary no-print" style="padding:0 6px;line-height:1.4" data-bruxo-arcanum-toggle="${c}">${dado.usado ? 'Restaurar' : 'Marcar uso'}</button></span>`;
+              }).join('')}
+            </div>
+          ` : ''}
+        </div>
+      ` : ''}
+
+      ${estadoDruida ? `
+        <div class="info-box info" style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="font-size:0.85rem">
+            <strong>Recursos do Druida:</strong>
+            Forma Selvagem: ${estadoDruida.usosDisponiveis}/${estadoDruida.usosMax}
+            &nbsp;|&nbsp; Estado: ${estadoDruida.formaSelvagemAtiva ? 'Ativa' : 'Inativa'}
+            &nbsp;|&nbsp; Companheiro Selvagem: ${estadoDruida.companheiroSelvagemAtivo ? 'Ativo' : 'Inativo'}
+            ${(char.nivel || 1) >= 5 ? `&nbsp;|&nbsp; Ressurgimento (slot 1º): ${estadoDruida.ressurgimentoSlotRecuperadoHoje ? 'Já usado' : 'Disponível'}` : ''}
+          </div>
+          <div class="no-print" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-sm ${estadoDruida.formaSelvagemAtiva ? 'btn-secondary' : 'btn-accent'}" data-druida-forma-acao="${estadoDruida.formaSelvagemAtiva ? 'encerrar' : 'ativar'}" ${(estadoDruida.usosDisponiveis <= 0 && !estadoDruida.formaSelvagemAtiva) ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>
+              ${estadoDruida.formaSelvagemAtiva ? 'Encerrar Forma Selvagem' : 'Ativar Forma Selvagem'}
+            </button>
+            <button class="btn btn-sm btn-secondary" data-druida-companheiro-acao="toggle" ${(estadoDruida.usosDisponiveis <= 0 && !estadoDruida.companheiroSelvagemAtivo && !Object.keys(char.espacos_magia || {}).length) ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>
+              ${estadoDruida.companheiroSelvagemAtivo ? 'Dispensar Companheiro Selvagem' : 'Invocar Companheiro Selvagem'}
+            </button>
+            ${estadoDruida.ressurgimentoAtivo ? `<button class="btn btn-sm btn-primary" data-druida-ressurgimento-acao="recuperar-forma" ${estadoDruida.usosDisponiveis > 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Ressurgimento: recuperar Forma</button>` : ''}
+            ${estadoDruida.ressurgimentoAtivo ? `<button class="btn btn-sm btn-primary" data-druida-ressurgimento-acao="recuperar-slot" ${(estadoDruida.ressurgimentoSlotRecuperadoHoje || estadoDruida.usosDisponiveis <= 0) ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Ressurgimento: recuperar slot 1º</button>` : ''}
+            ${estadoDruida.arquidruidaAtivo ? `<button class="btn btn-sm btn-secondary" data-druida-iniciativa="1">Iniciativa (Arquidruida)</button>` : ''}
+          </div>
+        </div>
+      ` : ''}
+
+      ${estadoGuardiao ? `
+        <div class="info-box info" style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="font-size:0.85rem">
+            <strong>Recursos do Guardião:</strong>
+            Marca do Predador: ${estadoGuardiao.marcaPredadorAtiva ? 'Ativa' : 'Inativa'}
+            &nbsp;|&nbsp; Inimigo Favorito: ${estadoGuardiao.inimigoFavoritoDisponiveis}/${estadoGuardiao.inimigoFavoritoMax}
+            &nbsp;|&nbsp; Dano da Marca: ${estadoGuardiao.marcaPredadorDado}
+            ${estadoGuardiao.incansavelAtivo ? `&nbsp;|&nbsp; Incansável: ${estadoGuardiao.incansavelDisponiveis}/${estadoGuardiao.incansavelMax}` : ''}
+            ${estadoGuardiao.veuNaturezaAtivo ? `&nbsp;|&nbsp; Véu da Natureza: ${estadoGuardiao.veuNaturezaDisponiveis}/${estadoGuardiao.veuNaturezaMax}` : ''}
+          </div>
+          <div class="no-print" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-sm btn-accent" data-guardiao-acao="${estadoGuardiao.marcaPredadorAtiva ? 'encerrar-marca' : 'usar-marca'}" ${(!estadoGuardiao.marcaPredadorAtiva && estadoGuardiao.inimigoFavoritoDisponiveis <= 0) ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>
+              ${estadoGuardiao.marcaPredadorAtiva ? 'Encerrar Marca' : 'Marca sem Espaço'}
+            </button>
+            ${estadoGuardiao.incansavelAtivo ? `<button class="btn btn-sm btn-secondary" data-guardiao-acao="incansavel" ${estadoGuardiao.incansavelDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Incansável</button>` : ''}
+            ${estadoGuardiao.veuNaturezaAtivo ? `<button class="btn btn-sm btn-secondary" data-guardiao-acao="veu" ${estadoGuardiao.veuNaturezaDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Véu da Natureza</button>` : ''}
+          </div>
+          <div style="width:100%;font-size:0.78rem;color:var(--text-muted)">
+            ${estadoGuardiao.predadorImplacavelAtivo ? 'Predador Implacável: sofrer dano não quebra sua Concentração de Marca do Predador. ' : ''}
+            ${estadoGuardiao.cacadorPrecisoAtivo ? 'Caçador Preciso: ataques contra alvo marcado têm vantagem. ' : ''}
+            ${estadoGuardiao.sentidosSelvagensAtivo ? 'Sentidos Selvagens: Visão às Cegas 9 m.' : ''}
+          </div>
+        </div>
+      ` : ''}
+
+      ${estadoFeiticeiro ? `
+        <div class="info-box info" style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="font-size:0.85rem">
+            <strong>Recursos do Feiticeiro:</strong>
+            Pontos de Feitiçaria: ${estadoFeiticeiro.pontosAtuais}/${estadoFeiticeiro.pontosMax}
+            &nbsp;|&nbsp; Feitiçaria Inata: ${estadoFeiticeiro.feiticariaInataUsosDisponiveis}/${estadoFeiticeiro.feiticariaInataUsosMax}
+            &nbsp;|&nbsp; Estado: ${estadoFeiticeiro.feiticariaInataAtiva ? 'Ativa' : 'Inativa'}
+            ${semAcento(char.subclasse || '') === semAcento('Feitiçaria Selvagem') ? `&nbsp;|&nbsp; Marés do Caos: ${estadoFeiticeiro.subclasses.selvagem.mares_caos_disponivel ? 'Disponível' : 'Indisponível'}` : ''}
+            ${semAcento(char.subclasse || '') === semAcento('Feitiçaria Dracônica') ? `&nbsp;|&nbsp; Afinidade: ${estadoFeiticeiro.subclasses.draconica.afinidade_elemental || 'Não definida'}` : ''}
+          </div>
+          <div class="no-print" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-sm ${estadoFeiticeiro.feiticariaInataAtiva ? 'btn-secondary' : 'btn-accent'}" data-feiticeiro-acao="${estadoFeiticeiro.feiticariaInataAtiva ? 'encerrar-feiticaria-inata' : 'ativar-feiticaria-inata'}">
+              ${estadoFeiticeiro.feiticariaInataAtiva ? 'Encerrar Feitiçaria Inata' : 'Ativar Feitiçaria Inata'}
+            </button>
+            ${char.nivel >= 5 ? `<button class="btn btn-sm btn-primary" data-feiticeiro-acao="restauracao-feiticeira" ${estadoFeiticeiro.restauracaoFeiticeiraUsada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Restauração Feiticeira</button>` : ''}
+            <button class="btn btn-sm btn-secondary" data-feiticeiro-acao="metamagia-config">Metamagia</button>
+          </div>
+          ${semAcento(char.subclasse || '') === semAcento('Feitiçaria Selvagem') && estadoFeiticeiro.subclasses.selvagem.surto_pendente_automatico ? `
+            <div style="width:100%;font-size:0.78rem;color:var(--warning)">
+              Surto de Magia Selvagem automático pendente na próxima conjuração com espaço.
+              <button class="btn btn-sm btn-secondary no-print" style="margin-left:6px" data-feiticeiro-acao="surto-resolvido">Marcar resolvido</button>
+            </div>
+          ` : ''}
+        </div>
+      ` : ''}
+
+      ${estadoGuerreiro && (estadoGuerreiro.ehMestreBatalha || estadoGuerreiro.ehCombatentePsiquico) ? `
+        <div class="info-box info" style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="font-size:0.85rem">
+            <strong>Recursos do Guerreiro (${char.subclasse}):</strong>
+            ${estadoGuerreiro.ehMestreBatalha ? `
+              Dados de Superioridade: ${estadoGuerreiro.dadosSuperioridadeDisponiveis}/${estadoGuerreiro.dadosSuperioridadeMax} (${estadoGuerreiro.tipoDadoSuperioridade})
+              &nbsp;|&nbsp; CD: ${estadoGuerreiro.cdSuperioridade}
+              &nbsp;|&nbsp; Manobras: ${estadoGuerreiro.manobrasConhecidas}
+              ${estadoGuerreiro.conhecaInimigoAtivo ? `&nbsp;|&nbsp; Conheça Inimigo: ${estadoGuerreiro.conhecaInimigoUsado ? 'Usado' : 'Disponível'}` : ''}
+            ` : ''}
+            ${estadoGuerreiro.ehCombatentePsiquico ? `
+              Dados Psiônicos: ${estadoGuerreiro.dadosPsionicosDisponiveisG}/${estadoGuerreiro.dadosPsionicosMaxG} (${estadoGuerreiro.tipoDadoPsionicoG})
+              &nbsp;|&nbsp; Mov. Telecinético: ${estadoGuerreiro.movimentoTelecineticoUsado ? 'Usado' : 'Disponível'}
+              ${estadoGuerreiro.adeptoTelecineticoAtivo ? `&nbsp;|&nbsp; Salto: ${estadoGuerreiro.saltoImpulsaoUsado ? 'Usado' : 'Disponível'}` : ''}
+              ${estadoGuerreiro.baluarteEnergiaAtivo ? `&nbsp;|&nbsp; Baluarte: ${estadoGuerreiro.baluarteUsado ? 'Usado' : 'Disponível'}` : ''}
+              ${estadoGuerreiro.mestreTelecineticoAtivo ? `&nbsp;|&nbsp; Telecinese: ${estadoGuerreiro.mestreTelecineticoUsado ? 'Usada' : 'Disponível'}` : ''}
+            ` : ''}
+          </div>
+          <div class="no-print" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+            ${estadoGuerreiro.ehMestreBatalha ? `
+              <button class="btn btn-sm btn-primary" data-guerreiro-acao="usar-superioridade" ${estadoGuerreiro.dadosSuperioridadeDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Dado Superioridade</button>
+            ` : ''}
+            ${estadoGuerreiro.ehCombatentePsiquico ? `
+              <button class="btn btn-sm btn-primary" data-guerreiro-acao="golpe-psionico" ${estadoGuerreiro.dadosPsionicosDisponiveisG <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Golpe Psiônico</button>
+              <button class="btn btn-sm btn-accent" data-guerreiro-acao="vinculo-protetivo" ${estadoGuerreiro.dadosPsionicosDisponiveisG <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Vínculo Protetivo</button>
+            ` : ''}
+          </div>
+          <div style="width:100%;font-size:0.78rem;color:var(--text-muted)">
+            ${estadoGuerreiro.ehMestreBatalha && estadoGuerreiro.implacavelAtivo ? 'Implacável: 1x/turno, 1d8 grátis em vez de gastar dado. ' : ''}
+            ${estadoGuerreiro.ehCombatentePsiquico && estadoGuerreiro.resguardoMentalAtivo ? 'Resguardo Mental: Resistência a dano Psíquico. Gaste dado para encerrar Amedrontado/Enfeitiçado. ' : ''}
+          </div>
+        </div>
+      ` : ''}
+
+      ${estadoPaladino ? `
+        <div class="info-box info" style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="font-size:0.85rem">
+            <strong>Recursos do Paladino:</strong>
+            Mãos Consagradas: ${estadoPaladino.maosAtuais}/${estadoPaladino.maosMax} PV
+            ${estadoPaladino.canalizarMax > 0 ? `&nbsp;|&nbsp; Canalizar Divindade: ${estadoPaladino.canalizarDisponiveis}/${estadoPaladino.canalizarMax}` : ''}
+            ${estadoPaladino.destruicaoGratuitaAtiva ? `&nbsp;|&nbsp; Destruição Gratuita: ${estadoPaladino.destruicaoGratuitaUsada ? 'Usada' : 'Disponível'}` : ''}
+            ${estadoPaladino.auraProtecaoAtiva ? `&nbsp;|&nbsp; Aura: +${estadoPaladino.bonusAura} Salvaguardas (${estadoPaladino.auraRaio}m)` : ''}
+          </div>
+          <div class="no-print" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-sm btn-accent" data-paladino-acao="maos-consagradas" ${estadoPaladino.maosAtuais <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Mãos Consagradas</button>
+            ${estadoPaladino.canalizarMax > 0 ? `<button class="btn btn-sm btn-secondary" data-paladino-acao="canalizar" ${estadoPaladino.canalizarDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Canalizar Divindade</button>` : ''}
+            ${estadoPaladino.destruicaoGratuitaAtiva ? `<button class="btn btn-sm btn-primary" data-paladino-acao="destruicao-gratuita" ${estadoPaladino.destruicaoGratuitaUsada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Destruição Gratuita</button>` : ''}
+          </div>
+          <div style="width:100%;font-size:0.78rem;color:var(--text-muted)">
+            ${estadoPaladino.golpesRadiantesAtivo ? 'Golpes Radiantes: +1d8 Radiante em ataques corpo a corpo. ' : ''}
+            ${estadoPaladino.auraCoragemAtiva ? 'Aura de Coragem: Imunidade a Amedrontado na aura. ' : ''}
+            ${estadoPaladino.toqueRestauradorAtivo ? 'Toque Restaurador: remover condições com 5 PV da reserva. ' : ''}
+          </div>
+        </div>
+      ` : ''}
+
+      ${estadoMonge ? `
+        <div class="info-box info" style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="font-size:0.85rem">
+            <strong>Recursos do Monge:</strong>
+            Artes Marciais: d${estadoMonge.dadoArtesMarciais}
+            ${estadoMonge.pontosMax > 0 ? `&nbsp;|&nbsp; Pontos de Foco: ${estadoMonge.pontosAtuais}/${estadoMonge.pontosMax}` : ''}
+            &nbsp;|&nbsp; CD Foco: ${estadoMonge.cdFoco}
+            ${estadoMonge.bonusMovimento > 0 ? `&nbsp;|&nbsp; Mov. Bônus: +${String(estadoMonge.bonusMovimento).replace('.', ',')}m` : ''}
+          </div>
+          <div class="no-print" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+            ${estadoMonge.pontosMax > 0 ? `<button class="btn btn-sm btn-accent" data-monge-acao="gastar-ponto" ${estadoMonge.pontosAtuais <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Gastar Ponto de Foco</button>` : ''}
+            ${estadoMonge.golpeAtordoanteAtivo ? `<button class="btn btn-sm btn-primary" data-monge-acao="golpe-atordoante" ${estadoMonge.pontosAtuais <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Golpe Atordoante</button>` : ''}
+            ${!estadoMonge.metabolismoUsado ? `<button class="btn btn-sm btn-secondary" data-monge-acao="metabolismo">Metabolismo Incomum</button>` : ''}
+          </div>
+          <div style="width:100%;font-size:0.78rem;color:var(--text-muted)">
+            ${estadoMonge.desviarAtivo ? `Desviar Ataques: reduz ${estadoMonge.desviarReducao} de dano. ` : ''}
+            ${estadoMonge.quedaLentaAtiva ? `Queda Lenta: reduz ${estadoMonge.quedaReducao} dano de queda. ` : ''}
+            ${estadoMonge.evasaoAtiva ? 'Evasão: salvaguarda Des sucesso = 0 dano. ' : ''}
+            ${estadoMonge.sobreviventeAtivo ? 'Proficiência em todas as salvaguardas. ' : ''}
+            ${estadoMonge.defesaSuperiorAtiva ? 'Defesa Superior: 3 PF = resist. a todos exceto Energético. ' : ''}
+          </div>
+        </div>
+      ` : ''}
+
+      ${estadoLadino ? `
+        <div class="info-box info" style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="font-size:0.85rem">
+            <strong>Recursos do Ladino${estadoLadino.ehAdagaEspiritual ? ' (Adaga Espiritual)' : ''}:</strong>
+            Ataque Furtivo: ${estadoLadino.furtivoTexto}
+            ${estadoLadino.golpeAstutoAtivo ? `&nbsp;|&nbsp; CD Golpe Astuto: ${estadoLadino.cdGolpeAstuto}` : ''}
+            ${estadoLadino.golpeSorteAtivo ? `&nbsp;|&nbsp; Golpe de Sorte: ${estadoLadino.golpeSorteUsado ? 'Usado' : 'Disponível'}` : ''}
+            ${estadoLadino.ehAdagaEspiritual ? `
+              &nbsp;|&nbsp; Dados Psionicos: ${estadoLadino.dadosPsionicosDisponiveisL}/${estadoLadino.dadosPsionicosMaxL} (${estadoLadino.tipoDadoPsionicoL})
+              &nbsp;|&nbsp; CD Psionico: ${estadoLadino.cdPsionicaAdaga}
+              &nbsp;|&nbsp; Sussurros: ${estadoLadino.sussurrosGratisUsado ? 'Gratis Usado' : 'Gratis Disponivel'}
+              ${estadoLadino.veuPsiquicoAtivo ? `&nbsp;|&nbsp; Veu: ${estadoLadino.veuPsiquicoUsado ? 'Usado' : 'Disponivel'}` : ''}
+              ${estadoLadino.rasgarMenteAtivo ? `&nbsp;|&nbsp; Rasgar Mente: ${estadoLadino.rasgarMenteUsado ? 'Usado' : 'Disponivel'}` : ''}
+            ` : ''}
+          </div>
+          <div class="no-print" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+            ${estadoLadino.golpeSorteAtivo ? `<button class="btn btn-sm btn-accent" data-ladino-acao="golpe-sorte" ${estadoLadino.golpeSorteUsado ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Golpe de Sorte</button>` : ''}
+            ${estadoLadino.ehAdagaEspiritual ? `
+              <button class="btn btn-sm btn-primary" data-ladino-acao="gastar-dado-psionico" ${estadoLadino.dadosPsionicosDisponiveisL <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Gastar Dado Psionico</button>
+              ${estadoLadino.veuPsiquicoAtivo ? `<button class="btn btn-sm btn-secondary" data-ladino-acao="veu-psiquico" ${estadoLadino.veuPsiquicoUsado && estadoLadino.dadosPsionicosDisponiveisL <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${estadoLadino.veuPsiquicoUsado ? 'Veu (dado)' : 'Veu Psiquico'}</button>` : ''}
+            ` : ''}
+          </div>
+          <div style="width:100%;font-size:0.78rem;color:var(--text-muted)">
+            ${estadoLadino.acaoArdilosaAtiva ? 'Ação Ardilosa: Correr/Desengajar/Esconder como Ação Bônus. ' : ''}
+            ${estadoLadino.miraFirmeAtiva ? 'Mira Firme: Vantagem no ataque (sem mover). ' : ''}
+            ${estadoLadino.esquivaSobrenaturalAtiva ? 'Esquiva Sobrenatural: Reação = metade do dano. ' : ''}
+            ${estadoLadino.evasaoAtiva ? 'Evasão: Des sucesso = 0 dano. ' : ''}
+            ${estadoLadino.talentoConfiavelAtivo ? 'Talento Confiável: d20 <= 9 conta como 10 em proficiências. ' : ''}
+            ${estadoLadino.menteEscorregadiaAtiva ? 'Mente Escorregadia: Prof. salvaguardas Sab/Car. ' : ''}
+            ${estadoLadino.elusivoAtivo ? 'Elusivo: ninguém tem Vantagem contra você. ' : ''}
+            ${estadoLadino.ehAdagaEspiritual ? 'Laminas Psiquicas: 1d6 Psiquico (Acuidade, Arremesso 18/36m). Acao Bonus: 2o ataque 1d4. ' : ''}
+            ${estadoLadino.ehAdagaEspiritual && estadoLadino.laminasAlmaAtivas ? 'Golpes Teleguiados: dado ao errar ataque. Teleporte Psiquico: gasta dado. ' : ''}
+          </div>
+        </div>
+      ` : ''}
+
+      ${estadoMago ? `
+        <div class="info-box info" style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="font-size:0.85rem">
+            <strong>Recursos do Mago:</strong>
+            Recuperação Arcana: ${estadoMago.recuperacaoArcanaUsada ? 'Usada' : `Disponível (até ${estadoMago.recuperacaoArcanaMax}º combinado)`}
+            ${estadoMago.assinaturaMagicaAtiva ? `&nbsp;|&nbsp; Assinatura 1: ${estadoMago.assinatura1Usada ? 'Usada' : 'Disponível'} | Assinatura 2: ${estadoMago.assinatura2Usada ? 'Usada' : 'Disponível'}` : ''}
+          </div>
+          <div class="no-print" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-sm btn-accent" data-mago-acao="recuperacao-arcana" ${estadoMago.recuperacaoArcanaUsada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Recuperação Arcana</button>
+            ${estadoMago.assinaturaMagicaAtiva ? `
+              <button class="btn btn-sm btn-primary" data-mago-acao="assinatura-1" ${estadoMago.assinatura1Usada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Assinatura 1</button>
+              <button class="btn btn-sm btn-primary" data-mago-acao="assinatura-2" ${estadoMago.assinatura2Usada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Assinatura 2</button>
+            ` : ''}
+          </div>
+          <div style="width:100%;font-size:0.78rem;color:var(--text-muted)">
+            Grimório: preparar magias no Descanso Longo.
+            ${estadoMago.memorizarMagiaAtivo ? ' Memorizar Magia: trocar 1 magia preparada no Descanso Curto.' : ''}
+            ${estadoMago.maestriaMagiasAtiva ? ' Maestria: 1ª e 2ª sem espaço no círculo base.' : ''}
+          </div>
+        </div>
+      ` : ''}
+
       <div class="stats-row">
         <div class="stat-box">
           <div class="stat-label">CA</div>
@@ -159,11 +1820,17 @@ function renderFichaCompleta() {
         </div>
         <div class="stat-box">
           <div class="stat-label">Iniciativa</div>
-          <div class="stat-value">${fmtMod(modDes)}</div>
+          <div class="stat-value">${fmtMod(iniciativa.valor)}</div>
+          ${iniciativa.vantagem ? '<div style="font-size:0.65rem;color:var(--success);font-weight:700">Vantagem</div>' : ''}
         </div>
         <div class="stat-box">
           <div class="stat-label">Deslocamento</div>
-          <div class="stat-value">9m</div>
+          <div class="stat-value">${_deslocamento}</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Ataques</div>
+          <div class="stat-value">${ataquesPorAcao}</div>
+          <div style="font-size:0.65rem;color:var(--text-muted)">por Ação Atacar</div>
         </div>
         <div class="stat-box">
           <div class="stat-label">Prof.</div>
@@ -269,21 +1936,32 @@ function renderFichaCompleta() {
           const mod = calcMod(char.atributos[key]);
           const proficiente = (char.salvaguardas_proficientes || []).includes(nome);
           const bonus = mod + (proficiente ? prof : 0);
+          const incapacitado = (char.condicoes || []).includes('Incapacitado');
+          const vantagemFuria = nome === 'Força' && !!getEstadoFuria()?.ativa;
+          const vantagemSentidoPerigo = nome === 'Destreza' && char.classe === 'Bárbaro' && char.nivel >= 2 && !incapacitado;
+          const temVantagem = vantagemFuria || vantagemSentidoPerigo;
           return `
             <div class="salva-item ${proficiente ? 'proficiente' : ''}">
               <div class="pericia-prof ${proficiente ? 'ativo' : ''}"></div>
               <span class="pericia-bonus">${fmtMod(bonus)}</span>
-              <span class="pericia-nome">${nome}</span>
+              <span class="pericia-nome">${nome}${temVantagem ? ' <span style="font-size:0.65rem;color:var(--success);font-weight:700">(Vant.)</span>' : ''}</span>
             </div>`;
         }).join('')}
       </div>
     </div>
 
+    <!-- Condicoes ativas do personagem -->
+    ${renderSecaoCondicoes()}
+
+    <!-- Defesas: Resistencias, Vulnerabilidades, Imunidades -->
+    ${renderSecaoDefesas()}
+
+    <!-- Sentidos Passivos -->
+    ${renderSecaoSentidos()}
+
     <!-- Perícias agrupadas por atributo -->
     <div class="card">
-      <div class="card-header"><h2>Pericias</h2>
-        <span style="font-size:0.75rem;color:var(--text-muted)">Percep. Passiva: ${calcPercepcaoPassiva(char)}</span>
-      </div>
+      <div class="card-header"><h2>Pericias</h2></div>
       <div class="pericias-por-atributo">
         ${(() => {
           const grupos = {};
@@ -305,7 +1983,10 @@ function renderFichaCompleta() {
                 ${grupos[attr].map(p => {
                   const proficiente = (char.pericias_proficientes || []).includes(p.nome);
                   const expertise = (char.pericias_expertise || []).includes(p.nome);
-                  const bonus = calcBonusPericia(char, p.nome);
+                  const bonus = calcBonusPericia(char, p.nome, {
+                    emFuria: !!getEstadoFuria()?.ativa,
+                    forcaPrimordialAtiva: forcaPrimordialAtiva()
+                  });
                   return `
                   <div class="pericia-item">
                     <div class="pericia-prof ${proficiente ? (expertise ? 'expertise' : 'ativo') : ''}"></div>
@@ -332,7 +2013,7 @@ function renderFichaCompleta() {
     ${renderSecaoTracosEspecie()}
 
     <!-- Espaços de Magia e Magias -->
-    ${info.conjurador ? renderSecaoMagias() : ''}
+    ${(info.conjurador || ehSubclasseConjuradora()) ? renderSecaoMagias() : ''}
 
     <!-- Inventário -->
     ${renderSecaoInventario()}
@@ -355,6 +2036,8 @@ function renderFichaCompleta() {
   setupEventosInventarioSheet();
   setupEventosEspacosMagia();
   setupEventosHabilidades();
+  setupEventosCondicoes();
+  setupEventosDefesas();
 
   // Restaurar estado dos details
   restaurarEstadoDetails(estadoDetails);
@@ -458,14 +2141,28 @@ function setupEventosHP() {
   const pvMax = char.pv_max_override || char.pv_max;
 
   document.getElementById('hp-minus')?.addEventListener('click', () => {
+    const furia = getEstadoFuria();
+    const podeResistirFuria = !!(furia?.ativa && char.classe === 'Bárbaro');
+
     abrirModal('Dano Recebido',
-      numberPickerHtml('input-dano', 1, 1, 999, 'Valor do dano'),
+      numberPickerHtml('input-dano', 1, 1, 999, 'Valor do dano') +
+      (podeResistirFuria
+        ? `<label class="form-check" style="justify-content:center;margin-top:8px">
+             <input type="checkbox" id="input-resistencia-furia"> Aplicar Resistência da Fúria (contundente/cortante/perfurante)
+           </label>`
+        : ''),
       '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-danger" id="btn-aplicar-dano">Aplicar Dano</button>'
     );
     setupNumberPicker('input-dano');
     document.getElementById('btn-aplicar-dano')?.addEventListener('click', () => {
       let dano = parseInt(document.getElementById('input-dano-val')?.value) || 0;
       if (dano <= 0) return;
+
+      const aplicarResistenciaFuria = !!document.getElementById('input-resistencia-furia')?.checked;
+      if (aplicarResistenciaFuria) {
+        dano = Math.floor(dano / 2);
+      }
+
       // Absorver pelo PV temporário primeiro
       if (char.pv_temporario > 0) {
         const absorvido = Math.min(dano, char.pv_temporario);
@@ -473,6 +2170,10 @@ function setupEventosHP() {
         dano -= absorvido;
       }
       char.pv_atual = Math.max(0, char.pv_atual - dano);
+      const estadoGuardiao = getEstadoRecursosGuardiao();
+      if (estadoGuardiao?.predadorImplacavelAtivo && estadoGuardiao?.marcaPredadorAtiva && dano > 0) {
+        toast('Predador Implacável: sua concentração de Marca do Predador não é quebrada por dano.', 'info');
+      }
       salvar();
       window.fecharModal();
       renderFichaCompleta();
@@ -645,6 +2346,20 @@ function restaurarHabilidades(tipoDescanso) {
 }
 
 function setupEventosDescanso() {
+  // Inspiração Heroica
+  document.getElementById('btn-usar-inspiracao-heroica')?.addEventListener('click', () => {
+    char.inspiracao_heroica = false;
+    salvar();
+    renderFichaCompleta();
+    toast('Inspiração Heroica usada! Role um d20 adicional.', 'success');
+  });
+  document.getElementById('btn-ganhar-inspiracao-heroica')?.addEventListener('click', () => {
+    char.inspiracao_heroica = true;
+    salvar();
+    renderFichaCompleta();
+    toast('Inspiração Heroica concedida!', 'success');
+  });
+
   // FAB toggle
   document.getElementById('fab-toggle-descanso')?.addEventListener('click', () => {
     const menu = document.getElementById('fab-menu-descanso');
@@ -660,6 +2375,149 @@ function setupEventosDescanso() {
 
     // Restaurar habilidades de descanso curto
     restaurarHabilidades('curto');
+
+    // Bárbaro: recupera 1 uso de Fúria no descanso curto
+    if (char.classe === 'Bárbaro') {
+      if (!char.recursos) char.recursos = {};
+      char.recursos.furia_usos_gastos = Math.max(0, (char.recursos.furia_usos_gastos || 0) - 1);
+    }
+
+    // Bardo: a partir do nível 5, descanso curto restaura todos os usos
+    if (char.classe === 'Bardo' && (char.nivel || 1) >= 5) {
+      if (!char.recursos) char.recursos = {};
+      char.recursos.inspiracao_bardo_usos_gastos = 0;
+    }
+
+    // Clérigo: descanso curto recupera 1 uso de Canalizar Divindade
+    if (char.classe === 'Clérigo') {
+      const estadoClerigo = getEstadoRecursosClerigo();
+      if (estadoClerigo) {
+        char.recursos.clerigo.canalizar_divindade_usos_gastos = Math.max(
+          0,
+          (char.recursos.clerigo.canalizar_divindade_usos_gastos || 0) - 1
+        );
+
+        // Domínio da Guerra: Sacerdote da Guerra recarrega em descanso curto ou longo
+        if (char.subclasse === 'Domínio da Guerra') {
+          char.recursos.clerigo.subclasses.guerra.sacerdote_guerra_usos_gastos = 0;
+        }
+
+        // Domínio da Luz (nível 6+): Labareda Protetora recarrega em descanso curto ou longo
+        if (char.subclasse === 'Domínio da Luz' && (char.nivel || 1) >= 6) {
+          char.recursos.clerigo.subclasses.luz.labareda_protetora_usos_gastos = 0;
+        }
+      }
+    }
+
+    // Bruxo: descanso curto recupera todos os espaços de Magia de Pacto
+    if (char.classe === 'Bruxo') {
+      recuperarEspacosMagiaBruxo(false);
+    }
+
+    // Druida: descanso curto recupera 1 uso de Forma Selvagem
+    if (char.classe === 'Druida') {
+      recuperarUmUsoFormaSelvagem();
+    }
+
+    // Guerreiro: descanso curto recupera 1 uso de Recuperar Fôlego e restaura Surto de Ação
+    if (char.classe === 'Guerreiro') {
+      const estadoGuerreiro = getEstadoRecursosGuerreiro();
+      if (estadoGuerreiro) {
+        // Recuperar Fôlego: recupera 1 uso em descanso curto
+        char.recursos.guerreiro.recuperar_folego_usos_gastos = Math.max(
+          0,
+          (char.recursos.guerreiro.recuperar_folego_usos_gastos || 0) - 1
+        );
+        // Surto de Ação: restaura todos os usos em descanso curto
+        char.recursos.guerreiro.surto_acao_usos_gastos = 0;
+
+        // Mestre da Batalha: restaura TODOS os dados de superioridade no descanso curto
+        if (char.subclasse === 'Mestre da Batalha') {
+          char.recursos.guerreiro.subclasses.mestre_batalha.dados_superioridade_gastos = 0;
+        }
+
+        // Combatente Psíquico: recupera 1 dado psiônico no descanso curto
+        if (char.subclasse === 'Combatente Psíquico') {
+          char.recursos.guerreiro.subclasses.combatente_psiquico.dados_psionicos_gastos = Math.max(
+            0,
+            (char.recursos.guerreiro.subclasses.combatente_psiquico.dados_psionicos_gastos || 0) - 1
+          );
+          // Restaura habilidades 1/descanso curto
+          char.recursos.guerreiro.subclasses.combatente_psiquico.movimento_telecinetico_usado = false;
+          char.recursos.guerreiro.subclasses.combatente_psiquico.salto_impulsao_usado = false;
+        }
+      }
+    }
+
+    // Feiticeiro: descanso curto não restaura automaticamente PF,
+    // mas encerra efeitos temporários de 1 minuto para evitar estado preso.
+    if (char.classe === 'Feiticeiro') {
+      const estadoFeiticeiro = getEstadoRecursosFeiticeiro();
+      if (estadoFeiticeiro) {
+        char.recursos.feiticeiro.feiticaria_inata_ativa = false;
+        char.recursos.feiticeiro.subclasses.aberrante.telepatia_ativa = false;
+        char.recursos.feiticeiro.subclasses.aberrante.telepatia_duracao_min = 0;
+        char.recursos.feiticeiro.subclasses.aberrante.revelacao_carne_ativa = false;
+        char.recursos.feiticeiro.subclasses.draconica.asas_ativas = false;
+        char.recursos.feiticeiro.subclasses.mecanica.transe_ordem_ativo = false;
+      }
+    }
+
+    // Paladino: descanso curto recupera 1 uso de Canalizar Divindade
+    if (char.classe === 'Paladino') {
+      const estado = getEstadoRecursosPaladino();
+      if (estado && estado.canalizarMax > 0) {
+        char.recursos.paladino.canalizar_divindade_usos_gastos = Math.max(
+          0,
+          (char.recursos.paladino.canalizar_divindade_usos_gastos || 0) - 1
+        );
+      }
+    }
+
+    // Monge: descanso curto restaura todos os pontos de foco
+    if (char.classe === 'Monge') {
+      const estado = getEstadoRecursosMonge();
+      if (estado) {
+        char.recursos.monge.pontos_foco_gastos = 0;
+      }
+    }
+
+    // Ladino: descanso curto restaura Golpe de Sorte (nível 20)
+    if (char.classe === 'Ladino') {
+      const estado = getEstadoRecursosLadino();
+      if (estado) {
+        char.recursos.ladino.golpe_sorte_usado = false;
+
+        // Adaga Espiritual: recupera 1 dado psiônico no descanso curto
+        if (char.subclasse === 'Adaga Espiritual') {
+          char.recursos.ladino.subclasses.adaga_espiritual.dados_psionicos_gastos = Math.max(
+            0,
+            (char.recursos.ladino.subclasses.adaga_espiritual.dados_psionicos_gastos || 0) - 1
+          );
+        }
+      }
+    }
+
+    // Mago: descanso curto permite Memorizar Magia (nível 5+) e restaura assinaturas (nível 20)
+    if (char.classe === 'Mago') {
+      const estado = getEstadoRecursosMago();
+      if (estado) {
+        // Assinatura Mágica recupera em descanso curto ou longo
+        if (estado.assinaturaMagicaAtiva) {
+          char.recursos.mago.assinatura_magia_1_usada = false;
+          char.recursos.mago.assinatura_magia_2_usada = false;
+        }
+      }
+    }
+
+    // Guardião: Incansável (nível 10+) reduz exaustão em 1 no descanso curto
+    if (char.classe === 'Guardião' && (char.nivel || 1) >= 10) {
+      if (typeof char.exaustao !== 'number') char.exaustao = 0;
+      if (char.exaustao > 0) {
+        char.exaustao = Math.max(0, char.exaustao - 1);
+      }
+    }
+
     salvar();
 
     // Se tem dados de vida restantes e nao esta com PV cheio, oferecer modal
@@ -708,30 +2566,240 @@ function setupEventosDescanso() {
     }
     // Restaurar todas as habilidades
     restaurarHabilidades('longo');
+
+    // Bárbaro: descanso longo restaura todos os usos e encerra Fúria
+    if (char.classe === 'Bárbaro') {
+      if (!char.recursos) char.recursos = {};
+      char.recursos.furia_usos_gastos = 0;
+      char.recursos.furia_ativa = false;
+      char.recursos.furia_persistente_usada = false;
+    }
+
+    // Bardo: descanso longo restaura todos os usos de Inspiração
+    if (char.classe === 'Bardo') {
+      if (!char.recursos) char.recursos = {};
+      char.recursos.inspiracao_bardo_usos_gastos = 0;
+    }
+
+    // Guerreiro: descanso longo restaura todos os recursos
+    if (char.classe === 'Guerreiro') {
+      const estadoGuerreiro = getEstadoRecursosGuerreiro();
+      if (estadoGuerreiro) {
+        char.recursos.guerreiro.recuperar_folego_usos_gastos = 0;
+        char.recursos.guerreiro.surto_acao_usos_gastos = 0;
+        char.recursos.guerreiro.indomavel_usos_gastos = 0;
+
+        // Mestre da Batalha: restaura todos os dados de superioridade e Conheça Seu Inimigo
+        if (char.subclasse === 'Mestre da Batalha') {
+          char.recursos.guerreiro.subclasses.mestre_batalha.dados_superioridade_gastos = 0;
+          char.recursos.guerreiro.subclasses.mestre_batalha.conheca_inimigo_usado = false;
+        }
+
+        // Combatente Psíquico: restaura todos os dados psiônicos e habilidades
+        if (char.subclasse === 'Combatente Psíquico') {
+          char.recursos.guerreiro.subclasses.combatente_psiquico.dados_psionicos_gastos = 0;
+          char.recursos.guerreiro.subclasses.combatente_psiquico.movimento_telecinetico_usado = false;
+          char.recursos.guerreiro.subclasses.combatente_psiquico.salto_impulsao_usado = false;
+          char.recursos.guerreiro.subclasses.combatente_psiquico.baluarte_usado = false;
+          char.recursos.guerreiro.subclasses.combatente_psiquico.mestre_telecinetico_usado = false;
+        }
+      }
+    }
+
+    // Clérigo: Intervenção Divina
+    if (char.classe === 'Clérigo') {
+      const estadoClerigo = getEstadoRecursosClerigo();
+      if (estadoClerigo) {
+        // Recupera totalmente Canalizar Divindade no descanso longo
+        char.recursos.clerigo.canalizar_divindade_usos_gastos = 0;
+
+        const restantes = char.recursos.clerigo.intervencao_divina_descansos_restantes || 0;
+        if (restantes > 0) {
+          char.recursos.clerigo.intervencao_divina_descansos_restantes = Math.max(0, restantes - 1);
+          char.recursos.clerigo.intervencao_divina_bloqueada = char.recursos.clerigo.intervencao_divina_descansos_restantes > 0;
+        } else {
+          char.recursos.clerigo.intervencao_divina_bloqueada = false;
+        }
+
+        // Reset de recursos de subclasses
+        char.recursos.clerigo.subclasses.guerra.sacerdote_guerra_usos_gastos = 0;
+        char.recursos.clerigo.subclasses.luz.labareda_protetora_usos_gastos = 0;
+        char.recursos.clerigo.subclasses.luz.coroa_luz_usos_gastos = 0;
+        char.recursos.clerigo.subclasses.trapaca.bencao_trapaceiro_ativa = false;
+        char.recursos.clerigo.subclasses.trapaca.invocar_duplicidade_ativa = false;
+      }
+    }
+
+    // Bruxo: descanso longo restaura Astúcia Mágica e usos de Arcana Mística
+    if (char.classe === 'Bruxo') {
+      const estado = getEstadoRecursosBruxo();
+      if (estado) {
+        char.recursos.bruxo.astucia_usada = false;
+        estado.circulosArcanum.forEach(c => {
+          if (!char.recursos.bruxo.arcanum[c]) char.recursos.bruxo.arcanum[c] = { magia: '', usado: false };
+          char.recursos.bruxo.arcanum[c].usado = false;
+        });
+      }
+    }
+
+    // Druida: descanso longo restaura Forma Selvagem e limpa travas de recursos
+    if (char.classe === 'Druida') {
+      const estado = getEstadoRecursosDruida();
+      if (estado) {
+        char.recursos.druida.forma_selvagem_usos_gastos = 0;
+        char.recursos.druida.forma_selvagem_ativa = false;
+        char.recursos.druida.companheiro_selvagem_ativo = false;
+        char.recursos.druida.ressurgimento_slot_recuperado_hoje = false;
+      }
+    }
+
+    // Guardião: descanso longo restaura usos da classe e encerra efeitos temporários
+    if (char.classe === 'Guardião') {
+      const estado = getEstadoRecursosGuardiao();
+      if (estado) {
+        char.recursos.guardiao.inimigo_favorito_usos_gastos = 0;
+        char.recursos.guardiao.incansavel_usos_gastos = 0;
+        char.recursos.guardiao.veu_natureza_usos_gastos = 0;
+        char.recursos.guardiao.marca_predador_ativa = false;
+      }
+      if (typeof char.exaustao !== 'number') char.exaustao = 0;
+      char.exaustao = Math.max(0, char.exaustao - 1);
+    }
+
+    // Feiticeiro: descanso longo restaura pontos e usos por descanso longo
+    if (char.classe === 'Feiticeiro') {
+      const estadoFeiticeiro = getEstadoRecursosFeiticeiro();
+      if (estadoFeiticeiro) {
+        char.recursos.feiticeiro.pontos_feiticaria_gastos = 0;
+        char.recursos.feiticeiro.feiticaria_inata_usos_gastos = 0;
+        char.recursos.feiticeiro.feiticaria_inata_ativa = false;
+        char.recursos.feiticeiro.restauracao_feiticeira_usada = false;
+
+        char.recursos.feiticeiro.subclasses.aberrante.telepatia_ativa = false;
+        char.recursos.feiticeiro.subclasses.aberrante.telepatia_duracao_min = 0;
+        char.recursos.feiticeiro.subclasses.aberrante.revelacao_carne_ativa = false;
+
+        char.recursos.feiticeiro.subclasses.draconica.asas_ativas = false;
+        char.recursos.feiticeiro.subclasses.draconica.asas_usada_desde_descanso = false;
+        char.recursos.feiticeiro.subclasses.draconica.companheiro_draconico_usado = false;
+
+        char.recursos.feiticeiro.subclasses.mecanica.restaurar_equilibrio_usos_gastos = 0;
+        char.recursos.feiticeiro.subclasses.mecanica.transe_ordem_ativo = false;
+        char.recursos.feiticeiro.subclasses.mecanica.transe_ordem_usado_desde_descanso = false;
+        char.recursos.feiticeiro.subclasses.mecanica.bastiao_dados = 0;
+
+        char.recursos.feiticeiro.subclasses.selvagem.mares_caos_disponivel = true;
+        char.recursos.feiticeiro.subclasses.selvagem.surto_pendente_automatico = false;
+        char.recursos.feiticeiro.subclasses.selvagem.surto_controlado_usado = false;
+      }
+    }
+
+    // Paladino: descanso longo restaura todos os recursos
+    if (char.classe === 'Paladino') {
+      const estado = getEstadoRecursosPaladino();
+      if (estado) {
+        char.recursos.paladino.maos_consagradas_gastos = 0;
+        char.recursos.paladino.canalizar_divindade_usos_gastos = 0;
+        char.recursos.paladino.destruicao_gratuita_usada = false;
+      }
+    }
+
+    // Monge: descanso longo restaura pontos de foco e metabolismo
+    if (char.classe === 'Monge') {
+      const estado = getEstadoRecursosMonge();
+      if (estado) {
+        char.recursos.monge.pontos_foco_gastos = 0;
+        char.recursos.monge.metabolismo_usado = false;
+      }
+    }
+
+    // Ladino: descanso longo restaura golpe de sorte
+    if (char.classe === 'Ladino') {
+      const estado = getEstadoRecursosLadino();
+      if (estado) {
+        char.recursos.ladino.golpe_sorte_usado = false;
+
+        // Adaga Espiritual: restaura todos os dados psiônicos e habilidades
+        if (char.subclasse === 'Adaga Espiritual') {
+          char.recursos.ladino.subclasses.adaga_espiritual.dados_psionicos_gastos = 0;
+          char.recursos.ladino.subclasses.adaga_espiritual.sussurros_gratis_usado = false;
+          char.recursos.ladino.subclasses.adaga_espiritual.veu_psiquico_usado = false;
+          char.recursos.ladino.subclasses.adaga_espiritual.rasgar_mente_usado = false;
+        }
+      }
+    }
+
+    // Mago: descanso longo restaura recuperação arcana e assinaturas
+    if (char.classe === 'Mago') {
+      const estado = getEstadoRecursosMago();
+      if (estado) {
+        char.recursos.mago.recuperacao_arcana_usada = false;
+        char.recursos.mago.assinatura_magia_1_usada = false;
+        char.recursos.mago.assinatura_magia_2_usada = false;
+      }
+    }
+
+    // Inspiração Heroica: Humanos (traço "Eficiente") ganham no descanso longo
+    if (char.especie === 'Humano') {
+      char.inspiracao_heroica = true;
+    }
+
     salvar();
 
-    // Para classes com conjuração preparada, oferecer troca de magias
+    // Verificar se a classe tem Maestria em Arma e/ou troca de magias preparadas
     const infoClasse = CLASSES_INFO[char.classe] || {};
-    if (infoClasse.conjurador && infoClasse.tipo_conjuracao === 'preparadas') {
-      abrirModal('Descanso Longo Concluído', `
+    const classesMaestria = ['Bárbaro', 'Guerreiro', 'Guardião', 'Paladino', 'Ladino'];
+    const temMaestria = classesMaestria.includes(char.classe);
+    const temTrocaMagia = (infoClasse.conjurador && infoClasse.tipo_conjuracao === 'preparadas') || ehSubclasseConjuradora();
+
+    if (temMaestria || temTrocaMagia) {
+      // Montar conteúdo do modal conforme opções disponíveis
+      let conteudoModal = `
         <div class="info-box success" style="margin-bottom:12px">
           PV, espaços de magia e habilidades restaurados!
         </div>
-        <p style="font-size:0.9rem">Deseja trocar suas magias preparadas?</p>
-        <p style="font-size:0.8rem;color:var(--text-muted)">
-          Como ${char.classe}, você pode alterar sua lista de magias preparadas após um Descanso Longo.
-        </p>
-      `, `
-        <button class="btn btn-secondary" id="btn-pular-troca">Manter Magias Atuais</button>
-        <button class="btn btn-accent" id="btn-iniciar-troca">Trocar Magias</button>
-      `);
-      document.getElementById('btn-pular-troca')?.addEventListener('click', () => {
+      `;
+      if (temMaestria) {
+        const trocaUma = ['Bárbaro', 'Guerreiro'].includes(char.classe);
+        conteudoModal += `
+          <p style="font-size:0.9rem">Deseja trocar suas maestrias de arma?</p>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">
+            Como ${char.classe}, você pode ${trocaUma ? 'alterar <strong>uma</strong> escolha de' : 'alterar suas escolhas de'} maestria após um Descanso Longo.
+          </p>
+        `;
+      }
+      if (temTrocaMagia) {
+        conteudoModal += `
+          <p style="font-size:0.9rem">Deseja trocar suas magias preparadas?</p>
+          <p style="font-size:0.8rem;color:var(--text-muted)">
+            Como ${char.classe}, você pode alterar sua lista de magias preparadas após um Descanso Longo.
+          </p>
+        `;
+      }
+
+      let botoesModal = '<button class="btn btn-secondary" id="btn-pular-troca-dl">Manter Tudo</button>';
+      if (temMaestria) {
+        botoesModal += '<button class="btn btn-accent" id="btn-trocar-maestrias-dl">Trocar Maestrias</button>';
+      }
+      if (temTrocaMagia) {
+        botoesModal += '<button class="btn btn-primary" id="btn-trocar-magias-dl">Trocar Magias</button>';
+      }
+
+      abrirModal('Descanso Longo Concluído', conteudoModal, botoesModal);
+
+      document.getElementById('btn-pular-troca-dl')?.addEventListener('click', () => {
         window.fecharModal();
         renderFichaCompleta();
       });
-      document.getElementById('btn-iniciar-troca')?.addEventListener('click', () => {
+      document.getElementById('btn-trocar-maestrias-dl')?.addEventListener('click', async () => {
         window.fecharModal();
-        mostrarTrocaMagias();
+        // Após trocar maestrias, oferecer troca de magias se disponível
+        await abrirModalTrocaMaestriaDescanso(temTrocaMagia ? () => mostrarTrocaMagias() : null);
+      });
+      document.getElementById('btn-trocar-magias-dl')?.addEventListener('click', () => {
+        window.fecharModal();
+        // Após trocar magias, oferecer troca de maestrias se disponível
+        mostrarTrocaMagias(temMaestria ? () => abrirModalTrocaMaestriaDescanso() : null);
       });
     } else {
       toast('Descanso longo realizado! PV, espaços e habilidades restaurados', 'success');
@@ -785,6 +2853,1565 @@ function setupEventosHabilidades() {
       renderFichaCompleta();
     });
   });
+
+  // Recursos específicos do Clérigo
+  document.querySelectorAll('[data-clerigo-cd-acao]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (char.classe !== 'Clérigo') return;
+
+      const estado = getEstadoRecursosClerigo();
+      if (!estado || estado.canalizarDivindadeUsosDisponiveis <= 0) {
+        toast('Sem usos de Canalizar Divindade disponíveis.', 'error');
+        return;
+      }
+
+      const acao = btn.dataset.clerigoCdAcao;
+      const modSab = calcMod(char.atributos.sabedoria);
+      const dadosCentelha = (char.nivel >= 18) ? '4d8' : (char.nivel >= 13) ? '3d8' : (char.nivel >= 7) ? '2d8' : '1d8';
+
+      // Consome 1 uso
+      char.recursos.clerigo.canalizar_divindade_usos_gastos += 1;
+
+      if (acao === 'centelha') {
+        toast(`Centelha Divina usada (${dadosCentelha} + ${fmtMod(modSab)}).`, 'success');
+      } else if (acao === 'expulsar') {
+        toast('Expulsar Mortos-Vivos usado.', 'success');
+      } else if (acao === 'fulminar') {
+        toast(`Fulminar Mortos-Vivos usado (${Math.max(1, modSab)}d8).`, 'success');
+      }
+
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
+  document.querySelectorAll('[data-clerigo-golpes-opcao]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (char.classe !== 'Clérigo') return;
+      if (!char.recursos) char.recursos = {};
+      if (!char.recursos.clerigo) char.recursos.clerigo = {};
+
+      char.recursos.clerigo.golpes_abencoados_opcao = btn.dataset.clerigoGolpesOpcao;
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
+  document.querySelectorAll('[data-clerigo-intervencao]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (char.classe !== 'Clérigo') return;
+      if (!char.recursos) char.recursos = {};
+      if (!char.recursos.clerigo) char.recursos.clerigo = {};
+
+      const acao = btn.dataset.clerigoIntervencao;
+      const bloqueada = !!char.recursos.clerigo.intervencao_divina_bloqueada;
+      const restantes = char.recursos.clerigo.intervencao_divina_descansos_restantes || 0;
+
+      if (bloqueada) {
+        if (restantes > 0) {
+          toast(`Intervenção Divina bloqueada por ${restantes} descanso(s) longo(s).`, 'error');
+        } else {
+          toast('Intervenção Divina já foi usada e recarrega em descanso longo.', 'error');
+        }
+        return;
+      }
+
+      if (acao === 'desejo') {
+        const cooldown = Math.floor(Math.random() * 3) + Math.floor(Math.random() * 3) + 2; // 2d4
+        char.recursos.clerigo.intervencao_divina_descansos_restantes = cooldown;
+        char.recursos.clerigo.intervencao_divina_bloqueada = true;
+        toast(`Intervenção Divina Maior usada com Desejo. Recarrega em ${cooldown} descanso(s) longo(s).`, 'success');
+      } else {
+        char.recursos.clerigo.intervencao_divina_descansos_restantes = 0;
+        char.recursos.clerigo.intervencao_divina_bloqueada = true;
+        toast('Intervenção Divina usada. Recarrega no próximo descanso longo.', 'success');
+      }
+
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
+  document.querySelectorAll('[data-clerigo-subclasse-acao]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (char.classe !== 'Clérigo') return;
+
+      const acao = btn.dataset.clerigoSubclasseAcao;
+      const estadoClerigo = getEstadoRecursosClerigo();
+      const estadoSub = getEstadoSubclassesClerigo();
+      if (!estadoClerigo || !estadoSub) return;
+
+      // Ações que consomem Canalizar Divindade
+      const usaCanalizar = [
+        'guerra_ataque_direcionado',
+        'guerra_bencao_deus',
+        'luz_brilho_amanhecer',
+        'trapaca_invocar_duplicidade',
+        'vida_preservar_vida'
+      ].includes(acao);
+
+      if (usaCanalizar && estadoClerigo.canalizarDivindadeUsosDisponiveis <= 0) {
+        toast('Sem usos de Canalizar Divindade disponíveis.', 'error');
+        return;
+      }
+
+      switch (acao) {
+        case 'guerra_ataque_direcionado':
+          char.recursos.clerigo.canalizar_divindade_usos_gastos += 1;
+          toast('Ataque Direcionado usado.', 'success');
+          break;
+
+        case 'guerra_bencao_deus':
+          char.recursos.clerigo.canalizar_divindade_usos_gastos += 1;
+          toast('Bênção do Deus da Guerra usada.', 'success');
+          break;
+
+        case 'guerra_sacerdote_guerra':
+          if (estadoSub.guerra.sacerdoteUsosDisponiveis <= 0) {
+            toast('Sem usos de Sacerdote da Guerra disponíveis.', 'error');
+            return;
+          }
+          char.recursos.clerigo.subclasses.guerra.sacerdote_guerra_usos_gastos += 1;
+          toast('Sacerdote da Guerra usado.', 'success');
+          break;
+
+        case 'luz_brilho_amanhecer':
+          char.recursos.clerigo.canalizar_divindade_usos_gastos += 1;
+          toast('Brilho do Amanhecer usado.', 'success');
+          break;
+
+        case 'luz_labareda_protetora':
+          if (estadoSub.luz.labaredaUsosDisponiveis <= 0) {
+            toast('Sem usos de Labareda Protetora disponíveis.', 'error');
+            return;
+          }
+          char.recursos.clerigo.subclasses.luz.labareda_protetora_usos_gastos += 1;
+          toast('Labareda Protetora usada.', 'success');
+          break;
+
+        case 'luz_coroa_luz':
+          if (estadoSub.luz.coroaUsosDisponiveis <= 0) {
+            toast('Sem usos de Coroa de Luz disponíveis.', 'error');
+            return;
+          }
+          char.recursos.clerigo.subclasses.luz.coroa_luz_usos_gastos += 1;
+          toast('Coroa de Luz usada.', 'success');
+          break;
+
+        case 'trapaca_bencao_toggle':
+          char.recursos.clerigo.subclasses.trapaca.bencao_trapaceiro_ativa = !char.recursos.clerigo.subclasses.trapaca.bencao_trapaceiro_ativa;
+          toast(
+            char.recursos.clerigo.subclasses.trapaca.bencao_trapaceiro_ativa
+              ? 'Bênção do Trapaceiro ativada.'
+              : 'Bênção do Trapaceiro encerrada.',
+            'success'
+          );
+          break;
+
+        case 'trapaca_invocar_duplicidade':
+          if (!char.recursos.clerigo.subclasses.trapaca.invocar_duplicidade_ativa) {
+            char.recursos.clerigo.canalizar_divindade_usos_gastos += 1;
+            char.recursos.clerigo.subclasses.trapaca.invocar_duplicidade_ativa = true;
+            toast('Invocar Duplicidade ativada.', 'success');
+          } else {
+            char.recursos.clerigo.subclasses.trapaca.invocar_duplicidade_ativa = false;
+            toast('Invocar Duplicidade encerrada.', 'success');
+          }
+          break;
+
+        case 'vida_preservar_vida':
+          char.recursos.clerigo.canalizar_divindade_usos_gastos += 1;
+          toast(`Preservar a Vida usado (pool de ${5 * (char.nivel || 1)} PV).`, 'success');
+          break;
+
+        default:
+          return;
+      }
+
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
+  document.querySelectorAll('[data-feiticeiro-acao]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (char.classe !== 'Feiticeiro') return;
+
+      const estado = getEstadoRecursosFeiticeiro();
+      if (!estado) return;
+      const acao = btn.dataset.feiticeiroAcao;
+
+      if (acao === 'ativar-feiticaria-inata') {
+        if (estado.feiticariaInataUsosDisponiveis > 0) {
+          char.recursos.feiticeiro.feiticaria_inata_usos_gastos += 1;
+          char.recursos.feiticeiro.feiticaria_inata_ativa = true;
+          toast('Feitiçaria Inata ativada por 1 minuto.', 'success');
+        } else if ((char.nivel || 1) >= 7 && gastarPontosFeiticaria(2)) {
+          char.recursos.feiticeiro.feiticaria_inata_ativa = true;
+          toast('Feitiçaria Inata ativada com Feitiçaria Encarnada (-2 PF).', 'success');
+        } else {
+          toast('Sem usos de Feitiçaria Inata disponíveis.', 'error');
+          return;
+        }
+      }
+
+      if (acao === 'encerrar-feiticaria-inata') {
+        char.recursos.feiticeiro.feiticaria_inata_ativa = false;
+        toast('Feitiçaria Inata encerrada.', 'info');
+      }
+
+      if (acao === 'restauracao-feiticeira') {
+        if ((char.nivel || 1) < 5) {
+          toast('Restauração Feiticeira exige nível 5.', 'error');
+          return;
+        }
+        if (char.recursos.feiticeiro.restauracao_feiticeira_usada) {
+          toast('Restauração Feiticeira já foi usada neste descanso longo.', 'error');
+          return;
+        }
+        const rec = Math.floor((char.nivel || 1) / 2);
+        const recuperavel = Math.min(rec, estado.pontosMax - estado.pontosAtuais);
+        if (recuperavel <= 0) {
+          toast('Seus Pontos de Feitiçaria já estão no máximo.', 'info');
+          return;
+        }
+        recuperarPontosFeiticaria(recuperavel);
+        char.recursos.feiticeiro.restauracao_feiticeira_usada = true;
+        toast(`Restauração Feiticeira recuperou ${recuperavel} PF.`, 'success');
+      }
+
+      if (acao === 'converter-slot-ponto') {
+        abrirModal('Converter Slot em Pontos de Feitiçaria', `
+          <div class="form-group">
+            <label class="form-label" for="slot-para-pf">Círculo do espaço de magia</label>
+            <select class="form-input" id="slot-para-pf">
+              ${Object.keys(char.espacos_magia || {}).map(c => `<option value="${c}">${c}º círculo</option>`).join('')}
+            </select>
+          </div>
+        `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-slot-para-pf">Converter</button>');
+
+        document.getElementById('btn-slot-para-pf')?.addEventListener('click', () => {
+          const c = parseInt(document.getElementById('slot-para-pf')?.value) || 1;
+          const slot = char.espacos_magia?.[c];
+          const estAtual = getEstadoRecursosFeiticeiro();
+          if (!slot || (slot.usados || 0) >= (slot.total || 0)) {
+            toast(`Sem espaço de ${c}º círculo disponível.`, 'error');
+            return;
+          }
+          if (!estAtual || estAtual.pontosAtuais + c > estAtual.pontosMax) {
+            toast('Conversão excede o máximo de Pontos de Feitiçaria.', 'error');
+            return;
+          }
+          slot.usados += 1;
+          recuperarPontosFeiticaria(c);
+          salvar();
+          window.fecharModal();
+          toast(`Espaço de ${c}º círculo convertido em ${c} PF.`, 'success');
+          renderFichaCompleta();
+        });
+        return;
+      }
+
+      if (acao === 'converter-ponto-slot') {
+        const custos = { 1: 2, 2: 3, 3: 5, 4: 6, 5: 7 };
+        abrirModal('Criar Espaço de Magia', `
+          <div class="form-group">
+            <label class="form-label" for="pf-para-slot">Círculo do espaço (máx. 5º)</label>
+            <select class="form-input" id="pf-para-slot">
+              ${[1, 2, 3, 4, 5].filter(c => (char.nivel || 1) >= (c === 1 ? 2 : c === 2 ? 3 : c === 3 ? 5 : c === 4 ? 7 : 9)).map(c => `<option value="${c}">${c}º círculo (custo ${custos[c]} PF)</option>`).join('')}
+            </select>
+          </div>
+        `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-pf-para-slot">Criar</button>');
+
+        document.getElementById('btn-pf-para-slot')?.addEventListener('click', () => {
+          const c = parseInt(document.getElementById('pf-para-slot')?.value) || 1;
+          const custo = custos[c] || 2;
+          if (!gastarPontosFeiticaria(custo)) {
+            toast('Pontos de Feitiçaria insuficientes.', 'error');
+            return;
+          }
+          if (!char.espacos_magia[c]) char.espacos_magia[c] = { total: 0, usados: 0 };
+          char.espacos_magia[c].total += 1;
+          salvar();
+          window.fecharModal();
+          toast(`Espaço de ${c}º círculo criado por ${custo} PF.`, 'success');
+          renderFichaCompleta();
+        });
+        return;
+      }
+
+      if (acao === 'metamagia-config') {
+        abrirModal('Opções de Metamagia', `
+          <div class="form-group">
+            <label class="form-label" for="metamagias-texto">Uma opção por linha</label>
+            <textarea class="form-textarea" id="metamagias-texto" rows="8" placeholder="Ex: Magia Acelerada">${(estado.metamagias || []).join('\n')}</textarea>
+          </div>
+        `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-metamagia">Salvar</button>');
+
+        document.getElementById('btn-salvar-metamagia')?.addEventListener('click', () => {
+          const linhas = (document.getElementById('metamagias-texto')?.value || '').split('\n').map(v => v.trim()).filter(Boolean);
+          char.recursos.feiticeiro.metamagias = linhas;
+          salvar();
+          window.fecharModal();
+          renderFichaCompleta();
+        });
+        return;
+      }
+
+      if (acao === 'metamagia-gastar') {
+        abrirModal('Gastar Pontos de Feitiçaria', `
+          <div class="form-group">
+            <label class="form-label" for="metamagia-custo">Custo em PF</label>
+            <input type="number" class="form-input" id="metamagia-custo" value="1" min="1" max="20">
+          </div>
+        `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-gastar-metamagia">Gastar</button>');
+
+        document.getElementById('btn-gastar-metamagia')?.addEventListener('click', () => {
+          const custo = Math.max(1, parseInt(document.getElementById('metamagia-custo')?.value) || 1);
+          if (!gastarPontosFeiticaria(custo)) {
+            toast('Pontos de Feitiçaria insuficientes.', 'error');
+            return;
+          }
+          salvar();
+          window.fecharModal();
+          toast(`Metamagia usada (${custo} PF).`, 'success');
+          renderFichaCompleta();
+        });
+        return;
+      }
+
+      if (acao === 'fala-telepatica') {
+        char.recursos.feiticeiro.subclasses.aberrante.telepatia_ativa = true;
+        char.recursos.feiticeiro.subclasses.aberrante.telepatia_duracao_min = char.nivel || 1;
+        toast(`Fala Telepática ativada por ${char.nivel || 1} minuto(s).`, 'success');
+      }
+
+      if (acao === 'revelacao-carne') {
+        abrirModal('Revelação em Carne', `
+          <div class="form-group">
+            <label class="form-label" for="revelacao-custo">Pontos de Feitiçaria gastos</label>
+            <input type="number" class="form-input" id="revelacao-custo" value="1" min="1" max="10">
+          </div>
+        `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-revelacao-carne">Ativar</button>');
+        document.getElementById('btn-revelacao-carne')?.addEventListener('click', () => {
+          const custo = Math.max(1, parseInt(document.getElementById('revelacao-custo')?.value) || 1);
+          if (!gastarPontosFeiticaria(custo)) {
+            toast('Pontos de Feitiçaria insuficientes.', 'error');
+            return;
+          }
+          char.recursos.feiticeiro.subclasses.aberrante.revelacao_carne_ativa = true;
+          salvar();
+          window.fecharModal();
+          toast(`Revelação em Carne ativada (${custo} benefício(s)).`, 'success');
+          renderFichaCompleta();
+        });
+        return;
+      }
+
+      if (acao === 'afinidade-elemental') {
+        abrirModal('Afinidade Elemental', `
+          <div class="form-group">
+            <label class="form-label" for="draconica-afinidade">Tipo de dano</label>
+            <select class="form-input" id="draconica-afinidade">
+              ${['Ácido', 'Elétrico', 'Gélido', 'Ígneo', 'Venenoso'].map(t => `<option value="${t}" ${(estado.subclasses.draconica.afinidade_elemental || '') === t ? 'selected' : ''}>${t}</option>`).join('')}
+            </select>
+          </div>
+        `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-afinidade">Salvar</button>');
+        document.getElementById('btn-salvar-afinidade')?.addEventListener('click', () => {
+          char.recursos.feiticeiro.subclasses.draconica.afinidade_elemental = document.getElementById('draconica-afinidade')?.value || '';
+          salvar();
+          window.fecharModal();
+          renderFichaCompleta();
+        });
+        return;
+      }
+
+      if (acao === 'ativar-asas-dragao') {
+        const dr = char.recursos.feiticeiro.subclasses.draconica;
+        if (!dr.asas_usada_desde_descanso) {
+          dr.asas_usada_desde_descanso = true;
+          dr.asas_ativas = true;
+          toast('Asas de Dragão ativadas.', 'success');
+        } else if (gastarPontosFeiticaria(3)) {
+          dr.asas_ativas = true;
+          toast('Asas de Dragão restauradas com 3 PF.', 'success');
+        } else {
+          toast('Sem uso disponível e PF insuficientes (3 PF).', 'error');
+          return;
+        }
+      }
+
+      if (acao === 'desativar-asas-dragao') {
+        char.recursos.feiticeiro.subclasses.draconica.asas_ativas = false;
+        toast('Asas de Dragão recolhidas.', 'info');
+      }
+
+      if (acao === 'companheiro-draconico') {
+        const dr = char.recursos.feiticeiro.subclasses.draconica;
+        if (dr.companheiro_draconico_usado) {
+          toast('Companheiro Dracônico já foi usado neste descanso longo.', 'error');
+          return;
+        }
+        dr.companheiro_draconico_usado = true;
+        toast('Companheiro Dracônico usado: Invocar Dragão sem gasto de espaço.', 'success');
+      }
+
+      if (acao === 'restaurar-equilibrio') {
+        const mec = char.recursos.feiticeiro.subclasses.mecanica;
+        const max = Math.max(1, calcMod(char.atributos.carisma));
+        if ((mec.restaurar_equilibrio_usos_gastos || 0) >= max) {
+          toast('Sem usos de Restaurar Equilíbrio.', 'error');
+          return;
+        }
+        mec.restaurar_equilibrio_usos_gastos += 1;
+        toast('Restaurar Equilíbrio usado.', 'success');
+      }
+
+      if (acao === 'bastiao-lei') {
+        abrirModal('Bastião da Lei', `
+          <div class="form-group">
+            <label class="form-label" for="bastiao-custo">PF gastos (1 a 5)</label>
+            <input type="number" class="form-input" id="bastiao-custo" value="1" min="1" max="5">
+          </div>
+        `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-bastiao-lei">Criar</button>');
+        document.getElementById('btn-bastiao-lei')?.addEventListener('click', () => {
+          const custo = Math.max(1, Math.min(5, parseInt(document.getElementById('bastiao-custo')?.value) || 1));
+          if (!gastarPontosFeiticaria(custo)) {
+            toast('Pontos de Feitiçaria insuficientes.', 'error');
+            return;
+          }
+          char.recursos.feiticeiro.subclasses.mecanica.bastiao_dados = custo;
+          salvar();
+          window.fecharModal();
+          toast(`Bastião da Lei criado com ${custo}d8.`, 'success');
+          renderFichaCompleta();
+        });
+        return;
+      }
+
+      if (acao === 'ativar-transe-ordem') {
+        const mec = char.recursos.feiticeiro.subclasses.mecanica;
+        if (!mec.transe_ordem_usado_desde_descanso) {
+          mec.transe_ordem_usado_desde_descanso = true;
+          mec.transe_ordem_ativo = true;
+          toast('Transe da Ordem ativado.', 'success');
+        } else if (gastarPontosFeiticaria(5)) {
+          mec.transe_ordem_ativo = true;
+          toast('Transe da Ordem reativado com 5 PF.', 'success');
+        } else {
+          toast('Sem uso disponível e PF insuficientes (5 PF).', 'error');
+          return;
+        }
+      }
+
+      if (acao === 'desativar-transe-ordem') {
+        char.recursos.feiticeiro.subclasses.mecanica.transe_ordem_ativo = false;
+        toast('Transe da Ordem encerrado.', 'info');
+      }
+
+      if (acao === 'mares-caos') {
+        const sel = char.recursos.feiticeiro.subclasses.selvagem;
+        if (!sel.mares_caos_disponivel) {
+          toast('Marés do Caos indisponível até conjurar magia com espaço ou descanso longo.', 'error');
+          return;
+        }
+        sel.mares_caos_disponivel = false;
+        toast('Marés do Caos usado. A próxima magia com espaço ativa surto automático e recarrega Marés do Caos.', 'success');
+      }
+
+      if (acao === 'distorcer-sorte') {
+        if (!gastarPontosFeiticaria(1)) {
+          toast('Pontos de Feitiçaria insuficientes.', 'error');
+          return;
+        }
+        toast('Distorcer a Sorte usado (-1 PF).', 'success');
+      }
+
+      if (acao === 'surto-controlado') {
+        const sel = char.recursos.feiticeiro.subclasses.selvagem;
+        if (sel.surto_controlado_usado) {
+          toast('Surto Controlado já usado neste descanso longo.', 'error');
+          return;
+        }
+        sel.surto_controlado_usado = true;
+        toast('Surto Controlado marcado como usado.', 'success');
+      }
+
+      if (acao === 'surto-resolvido') {
+        char.recursos.feiticeiro.subclasses.selvagem.surto_pendente_automatico = false;
+        toast('Surto de Magia Selvagem marcado como resolvido.', 'success');
+      }
+
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
+  // Inspiração de Bardo (recurso de classe)
+  document.querySelectorAll('[data-inspiracao-acao]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (char.classe !== 'Bardo') return;
+      if (!char.recursos) char.recursos = {};
+      if (typeof char.recursos.inspiracao_bardo_usos_gastos !== 'number') {
+        char.recursos.inspiracao_bardo_usos_gastos = 0;
+      }
+
+      const acao = btn.dataset.inspiracaoAcao;
+      const modCar = calcMod(char.atributos.carisma);
+      const usosMax = Math.max(1, modCar);
+
+      if (acao === 'usar') {
+        if (char.recursos.inspiracao_bardo_usos_gastos >= usosMax) {
+          toast('Sem usos de Inspiração de Bardo disponíveis.', 'error');
+          return;
+        }
+        char.recursos.inspiracao_bardo_usos_gastos += 1;
+        toast('Inspiração de Bardo consumida.', 'success');
+      }
+
+      if (acao === 'iniciativa' && (char.nivel || 1) >= 18) {
+        const usosAtuais = Math.max(0, usosMax - char.recursos.inspiracao_bardo_usos_gastos);
+        const alvo = Math.min(2, usosMax);
+        if (usosAtuais < alvo) {
+          char.recursos.inspiracao_bardo_usos_gastos = usosMax - alvo;
+          toast('Inspiração Superior aplicada ao rolar iniciativa.', 'success');
+        } else {
+          toast('Você já possui 2 ou mais usos disponíveis.', 'info');
+        }
+      }
+
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
+  document.querySelectorAll('[data-bruxo-astucia-acao]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+
+      if (char.classe !== 'Bruxo') return;
+      const estado = getEstadoRecursosBruxo();
+      if (!estado) return;
+      if (estado.astuciaUsada) {
+        toast('Astúcia Mágica já foi usada até o próximo descanso longo.', 'error');
+        return;
+      }
+
+      const recuperados = recuperarEspacosMagiaBruxo(true);
+      if (recuperados <= 0) {
+        toast('Nenhum espaço de Magia de Pacto gasto para recuperar.', 'error');
+        return;
+      }
+
+      char.recursos.bruxo.astucia_usada = true;
+      salvar();
+      toast(`Astúcia Mágica recuperou ${recuperados} espaço(s) de Magia de Pacto.`, 'success');
+      renderFichaCompleta();
+    });
+  });
+
+  document.querySelectorAll('[data-bruxo-arcanum-toggle]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (char.classe !== 'Bruxo') return;
+      const circ = parseInt(btn.dataset.bruxoArcanumToggle);
+      if (!circ || ![6, 7, 8, 9].includes(circ)) return;
+      const estado = getEstadoRecursosBruxo();
+      if (!estado?.circulosArcanum.includes(circ)) return;
+      if (!char.recursos.bruxo.arcanum[circ]) char.recursos.bruxo.arcanum[circ] = { magia: '', usado: false };
+      char.recursos.bruxo.arcanum[circ].usado = !char.recursos.bruxo.arcanum[circ].usado;
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
+  document.querySelectorAll('[data-bruxo-recursos]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      abrirModalRecursosBruxo();
+    });
+  });
+
+  document.querySelectorAll('[data-druida-forma-acao]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (char.classe !== 'Druida') return;
+
+      const acao = btn.dataset.druidaFormaAcao;
+      const estado = getEstadoRecursosDruida();
+      if (!estado) return;
+
+      if (acao === 'ativar') {
+        if (!consumirUsoFormaSelvagem(1)) {
+          toast('Sem usos de Forma Selvagem disponíveis.', 'error');
+          return;
+        }
+        char.recursos.druida.forma_selvagem_ativa = true;
+        toast('Forma Selvagem ativada.', 'success');
+      } else {
+        char.recursos.druida.forma_selvagem_ativa = false;
+        toast('Forma Selvagem encerrada.', 'success');
+      }
+
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
+  document.querySelectorAll('[data-druida-companheiro-acao]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (char.classe !== 'Druida') return;
+
+      const estado = getEstadoRecursosDruida();
+      if (!estado) return;
+
+      if (estado.companheiroSelvagemAtivo) {
+        char.recursos.druida.companheiro_selvagem_ativo = false;
+        toast('Companheiro Selvagem dispensado.', 'success');
+        salvar();
+        renderFichaCompleta();
+        return;
+      }
+
+      if (consumirUsoFormaSelvagem(1)) {
+        char.recursos.druida.companheiro_selvagem_ativo = true;
+        toast('Companheiro Selvagem invocado (consumiu 1 uso de Forma Selvagem).', 'success');
+      } else {
+        const circulo = consumirEspacoMagiaDisponivel(1);
+        if (!circulo) {
+          toast('Sem uso de Forma Selvagem ou espaço de magia disponível para invocar o companheiro.', 'error');
+          return;
+        }
+        char.recursos.druida.companheiro_selvagem_ativo = true;
+        toast(`Companheiro Selvagem invocado (consumiu 1 espaço de ${circulo}º círculo).`, 'success');
+      }
+
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
+  document.querySelectorAll('[data-druida-ressurgimento-acao]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (char.classe !== 'Druida' || (char.nivel || 1) < 5) return;
+
+      const estado = getEstadoRecursosDruida();
+      if (!estado) return;
+      const acao = btn.dataset.druidaRessurgimentoAcao;
+
+      if (acao === 'recuperar-forma') {
+        if (estado.usosDisponiveis > 0) {
+          toast('Você ainda tem usos de Forma Selvagem disponíveis.', 'error');
+          return;
+        }
+        const circuloConsumido = consumirEspacoMagiaDisponivel(1);
+        if (!circuloConsumido) {
+          toast('Nenhum espaço de magia disponível para recuperar Forma Selvagem.', 'error');
+          return;
+        }
+        char.recursos.druida.forma_selvagem_usos_gastos = Math.max(0, char.recursos.druida.forma_selvagem_usos_gastos - 1);
+        toast(`Ressurgimento Selvagem: recuperou 1 uso de Forma Selvagem (gasto de espaço ${circuloConsumido}º).`, 'success');
+      }
+
+      if (acao === 'recuperar-slot') {
+        if (estado.ressurgimentoSlotRecuperadoHoje) {
+          toast('Você já recuperou um espaço de 1º círculo com Ressurgimento neste descanso longo.', 'error');
+          return;
+        }
+        if (!consumirUsoFormaSelvagem(1)) {
+          toast('Sem usos de Forma Selvagem disponíveis para converter.', 'error');
+          return;
+        }
+        if (!recuperarEspacoMagia(1)) {
+          char.recursos.druida.forma_selvagem_usos_gastos = Math.max(0, char.recursos.druida.forma_selvagem_usos_gastos - 1);
+          toast('Nenhum espaço de 1º círculo gasto para recuperar.', 'error');
+          return;
+        }
+        char.recursos.druida.ressurgimento_slot_recuperado_hoje = true;
+        toast('Ressurgimento Selvagem: espaço de 1º círculo recuperado.', 'success');
+      }
+
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
+  document.querySelectorAll('[data-druida-iniciativa]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (char.classe !== 'Druida' || (char.nivel || 1) < 20) return;
+      const estado = getEstadoRecursosDruida();
+      if (!estado) return;
+      if (estado.usosDisponiveis > 0) {
+        toast('Arquidruida só recupera uso ao rolar iniciativa se você não tiver usos restantes.', 'info');
+        return;
+      }
+      char.recursos.druida.forma_selvagem_usos_gastos = Math.max(0, char.recursos.druida.forma_selvagem_usos_gastos - 1);
+      salvar();
+      toast('Arquidruida: 1 uso de Forma Selvagem recuperado ao rolar iniciativa.', 'success');
+      renderFichaCompleta();
+    });
+  });
+
+  document.querySelectorAll('[data-guardiao-acao]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (char.classe !== 'Guardião') return;
+
+      const estado = getEstadoRecursosGuardiao();
+      if (!estado) return;
+      const acao = btn.dataset.guardiaoAcao;
+
+      if (acao === 'usar-marca') {
+        if (estado.inimigoFavoritoDisponiveis <= 0) {
+          toast('Sem usos de Inimigo Favorito disponíveis.', 'error');
+          return;
+        }
+        char.recursos.guardiao.inimigo_favorito_usos_gastos += 1;
+        char.recursos.guardiao.marca_predador_ativa = true;
+        toast('Marca do Predador ativada sem gastar espaço de magia.', 'success');
+      }
+
+      if (acao === 'encerrar-marca') {
+        char.recursos.guardiao.marca_predador_ativa = false;
+        toast('Marca do Predador encerrada.', 'info');
+      }
+
+      if (acao === 'incansavel') {
+        if (!estado.incansavelAtivo) return;
+        if (estado.incansavelDisponiveis <= 0) {
+          toast('Sem usos de Incansável disponíveis.', 'error');
+          return;
+        }
+        abrirModal('Incansável',
+          numberPickerHtml('input-guardiao-incansavel', 1, 1, 8, 'Resultado do d8') +
+          `<div style="font-size:0.8rem;color:var(--text-muted);margin-top:6px;text-align:center">PV temporário = d8 + Sabedoria (${fmtMod(calcMod(char.atributos.sabedoria))})</div>`,
+          '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-aplicar-incansavel">Aplicar</button>'
+        );
+        setupNumberPicker('input-guardiao-incansavel');
+        document.getElementById('btn-aplicar-incansavel')?.addEventListener('click', () => {
+          const d8 = parseInt(document.getElementById('input-guardiao-incansavel-val')?.value) || 1;
+          const temp = Math.max(1, d8 + calcMod(char.atributos.sabedoria));
+          char.pv_temporario = Math.max(char.pv_temporario || 0, temp);
+          char.recursos.guardiao.incansavel_usos_gastos += 1;
+          salvar();
+          window.fecharModal();
+          toast(`Incansável aplicado: ${temp} PV temporários.`, 'success');
+          renderFichaCompleta();
+        });
+        return;
+      }
+
+      if (acao === 'veu') {
+        if (!estado.veuNaturezaAtivo) return;
+        if (estado.veuNaturezaDisponiveis <= 0) {
+          toast('Sem usos de Véu da Natureza disponíveis.', 'error');
+          return;
+        }
+        char.recursos.guardiao.veu_natureza_usos_gastos += 1;
+        toast('Véu da Natureza usado (Invisível até o final do próximo turno).', 'success');
+      }
+
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
+  // Recursos do Guerreiro: Recuperar Fôlego, Surto de Ação, Indomável
+  // Handler: Paladino
+  document.querySelectorAll('[data-paladino-acao]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (char.classe !== 'Paladino') return;
+      const estado = getEstadoRecursosPaladino();
+      if (!estado) return;
+      const acao = btn.dataset.paladinoAcao;
+
+      if (acao === 'maos-consagradas') {
+        if (estado.maosAtuais <= 0) {
+          toast('Reserva de Mãos Consagradas esgotada.', 'error');
+          return;
+        }
+        // Abrir modal para definir quantidade de PV a usar
+        abrirModal('Mãos Consagradas', `
+          <div class="info-box info" style="margin-bottom:12px">
+            Reserva disponível: <strong>${estado.maosAtuais} PV</strong> de ${estado.maosMax}
+          </div>
+          <div style="margin-bottom:12px">
+            <label style="font-size:0.85rem;font-weight:600">Quantidade de PV a restaurar:</label>
+            <input type="number" id="maos-consagradas-qtd" min="1" max="${estado.maosAtuais}" value="1" style="width:100%;padding:8px;border-radius:var(--radius);border:1px solid var(--border);margin-top:4px">
+          </div>
+          <div style="font-size:0.8rem;color:var(--text-muted)">
+            Remover Envenenado: gasta 5 PV da reserva sem restaurar PV.
+            ${estado.toqueRestauradorAtivo ? '<br>Toque Restaurador: remover condição por 5 PV adicionais.' : ''}
+          </div>
+        `, `
+          <button class="btn btn-secondary" onclick="window.fecharModal()">Cancelar</button>
+          <button class="btn btn-accent" id="btn-maos-confirmar">Curar</button>
+          <button class="btn btn-primary" id="btn-maos-envenenado" ${estado.maosAtuais < 5 ? 'disabled style="opacity:0.5"' : ''}>Remover Envenenado (5 PV)</button>
+        `);
+        document.getElementById('btn-maos-confirmar')?.addEventListener('click', () => {
+          const qtd = Math.min(parseInt(document.getElementById('maos-consagradas-qtd')?.value) || 1, estado.maosAtuais);
+          char.recursos.paladino.maos_consagradas_gastos += qtd;
+          toast(`Mãos Consagradas: ${qtd} PV de cura aplicados.`, 'success');
+          salvar();
+          window.fecharModal();
+          renderFichaCompleta();
+        });
+        document.getElementById('btn-maos-envenenado')?.addEventListener('click', () => {
+          if (estado.maosAtuais < 5) return;
+          char.recursos.paladino.maos_consagradas_gastos += 5;
+          toast('Condição Envenenado removida (5 PV gastos da reserva).', 'success');
+          salvar();
+          window.fecharModal();
+          renderFichaCompleta();
+        });
+        return;
+      }
+
+      if (acao === 'canalizar') {
+        if (estado.canalizarDisponiveis <= 0) {
+          toast('Sem usos de Canalizar Divindade disponíveis.', 'error');
+          return;
+        }
+        char.recursos.paladino.canalizar_divindade_usos_gastos += 1;
+        toast('Canalizar Divindade usado! Sentido Divino ou opção de subclasse ativado.', 'success');
+      }
+
+      if (acao === 'destruicao-gratuita') {
+        if (estado.destruicaoGratuitaUsada) {
+          toast('Destruição gratuita já usada neste descanso.', 'error');
+          return;
+        }
+        char.recursos.paladino.destruicao_gratuita_usada = true;
+        toast('Destruição Divina conjurada sem gastar espaço de magia!', 'success');
+      }
+
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
+  // Handler: Monge
+  document.querySelectorAll('[data-monge-acao]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (char.classe !== 'Monge') return;
+      const estado = getEstadoRecursosMonge();
+      if (!estado) return;
+      const acao = btn.dataset.mongeAcao;
+
+      if (acao === 'gastar-ponto') {
+        if (estado.pontosAtuais <= 0) {
+          toast('Sem Pontos de Foco disponíveis.', 'error');
+          return;
+        }
+        char.recursos.monge.pontos_foco_gastos += 1;
+        toast(`Ponto de Foco gasto. Restantes: ${estado.pontosAtuais - 1}/${estado.pontosMax}`, 'success');
+      }
+
+      if (acao === 'golpe-atordoante') {
+        if (estado.pontosAtuais <= 0) {
+          toast('Sem Pontos de Foco para Golpe Atordoante.', 'error');
+          return;
+        }
+        char.recursos.monge.pontos_foco_gastos += 1;
+        toast(`Golpe Atordoante! Alvo faz salvaguarda de Constituição CD ${estado.cdFoco}. Restantes: ${estado.pontosAtuais - 1}/${estado.pontosMax}`, 'success');
+      }
+
+      if (acao === 'metabolismo') {
+        if (estado.metabolismoUsado) {
+          toast('Metabolismo Incomum já usado neste descanso.', 'error');
+          return;
+        }
+        // Restaurar todos os pontos de foco
+        char.recursos.monge.pontos_foco_gastos = 0;
+        char.recursos.monge.metabolismo_usado = true;
+        const cura = `${char.nivel || 1} + 1d${estado.dadoArtesMarciais}`;
+        toast(`Metabolismo Incomum ativado! Pontos de Foco restaurados. Cura: ${cura} PV.`, 'success');
+      }
+
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
+  // Handler: Ladino
+  document.querySelectorAll('[data-ladino-acao]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (char.classe !== 'Ladino') return;
+      const estado = getEstadoRecursosLadino();
+      if (!estado) return;
+      const acao = btn.dataset.ladinoAcao;
+
+      if (acao === 'golpe-sorte') {
+        if (estado.golpeSorteUsado) {
+          toast('Golpe de Sorte já usado neste descanso.', 'error');
+          return;
+        }
+        char.recursos.ladino.golpe_sorte_usado = true;
+        toast('Golpe de Sorte usado! O resultado do Teste de D20 se torna 20.', 'success');
+      }
+
+      // --- Adaga Espiritual ---
+      if (acao === 'gastar-dado-psionico') {
+        if (estado.dadosPsionicosDisponiveisL <= 0) {
+          toast('Sem Dados de Energia Psiônica disponíveis.', 'error');
+          return;
+        }
+        char.recursos.ladino.subclasses.adaga_espiritual.dados_psionicos_gastos += 1;
+        toast(`Dado de Energia Psiônica gasto! (${estado.tipoDadoPsionicoL})`, 'success');
+      }
+
+      if (acao === 'sussurros') {
+        if (estado.sussurrosGratisUsado) {
+          if (estado.dadosPsionicosDisponiveisL <= 0) {
+            toast('Sem Dados de Energia Psiônica para Sussurros Psíquicos.', 'error');
+            return;
+          }
+          char.recursos.ladino.subclasses.adaga_espiritual.dados_psionicos_gastos += 1;
+          toast(`Sussurros Psíquicos ativados! Role 1${estado.tipoDadoPsionicoL} = horas de telepatia (dado gasto).`, 'success');
+        } else {
+          char.recursos.ladino.subclasses.adaga_espiritual.sussurros_gratis_usado = true;
+          toast(`Sussurros Psíquicos ativados gratuitamente! Role 1${estado.tipoDadoPsionicoL} = horas de telepatia.`, 'success');
+        }
+      }
+
+      if (acao === 'teleporte-psiquico') {
+        if (estado.dadosPsionicosDisponiveisL <= 0) {
+          toast('Sem Dados de Energia Psiônica para Teleporte Psíquico.', 'error');
+          return;
+        }
+        char.recursos.ladino.subclasses.adaga_espiritual.dados_psionicos_gastos += 1;
+        toast(`Teleporte Psíquico! Role 1${estado.tipoDadoPsionicoL} x 3 = metros de teleporte.`, 'success');
+      }
+
+      if (acao === 'veu-psiquico') {
+        if (estado.veuPsiquicoUsado) {
+          if (estado.dadosPsionicosDisponiveisL <= 0) {
+            toast('Sem Dados de Energia Psiônica para recuperar Véu Psíquico.', 'error');
+            return;
+          }
+          char.recursos.ladino.subclasses.adaga_espiritual.dados_psionicos_gastos += 1;
+          char.recursos.ladino.subclasses.adaga_espiritual.veu_psiquico_usado = false;
+          toast('Véu Psíquico recuperado gastando 1 dado!', 'success');
+        } else {
+          char.recursos.ladino.subclasses.adaga_espiritual.veu_psiquico_usado = true;
+          toast('Véu Psíquico ativado! Invisível por 1 hora (encerra ao causar dano ou forçar salvaguarda).', 'success');
+        }
+      }
+
+      if (acao === 'rasgar-mente') {
+        if (estado.rasgarMenteUsado) {
+          if (estado.dadosPsionicosDisponiveisL < 3) {
+            toast('Precisa de 3 Dados de Energia Psiônica para recuperar Rasgar Mente.', 'error');
+            return;
+          }
+          char.recursos.ladino.subclasses.adaga_espiritual.dados_psionicos_gastos += 3;
+          char.recursos.ladino.subclasses.adaga_espiritual.rasgar_mente_usado = false;
+          toast('Rasgar Mente recuperado gastando 3 dados!', 'success');
+        } else {
+          char.recursos.ladino.subclasses.adaga_espiritual.rasgar_mente_usado = true;
+          toast(`Rasgar Mente usado! Alvo faz salvaguarda Sab CD ${estado.cdPsionicaAdaga} ou fica Atordoado por 1 min.`, 'success');
+        }
+      }
+
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
+  // Handler: Mago
+  document.querySelectorAll('[data-mago-acao]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (char.classe !== 'Mago') return;
+      const estado = getEstadoRecursosMago();
+      if (!estado) return;
+      const acao = btn.dataset.magoAcao;
+
+      if (acao === 'recuperacao-arcana') {
+        if (estado.recuperacaoArcanaUsada) {
+          toast('Recuperação Arcana já usada hoje.', 'error');
+          return;
+        }
+        // Abrir modal para escolher quais espaços recuperar
+        const maxCirculo = Math.min(5, estado.recuperacaoArcanaMax);
+        let opcoesHtml = '';
+        for (let c = 1; c <= maxCirculo; c++) {
+          const slot = char.espacos_magia?.[c];
+          if (!slot) continue;
+          const usados = slot.usados || 0;
+          if (usados <= 0) continue;
+          opcoesHtml += `
+            <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:0.85rem">
+              <input type="number" class="recuperar-slot" data-circulo="${c}" min="0" max="${usados}" value="0" style="width:60px;padding:4px;border-radius:var(--radius);border:1px solid var(--border)">
+              ${c}º Círculo (${usados} gastos)
+            </label>`;
+        }
+        if (!opcoesHtml) {
+          toast('Nenhum espaço de magia gasto para recuperar.', 'info');
+          return;
+        }
+        abrirModal('Recuperação Arcana', `
+          <div class="info-box info" style="margin-bottom:12px">
+            Recupere espaços gastos. Círculos combinados devem ser ≤ <strong>${estado.recuperacaoArcanaMax}</strong>. Máximo 5º círculo.
+          </div>
+          ${opcoesHtml}
+          <div id="recuperar-total" style="font-size:0.8rem;margin-top:8px;color:var(--text-muted)">Total: 0 / ${estado.recuperacaoArcanaMax}</div>
+        `, `
+          <button class="btn btn-secondary" onclick="window.fecharModal()">Cancelar</button>
+          <button class="btn btn-accent" id="btn-recuperar-confirmar">Recuperar</button>
+        `);
+        // Atualizar total em tempo real
+        const atualizarTotal = () => {
+          let total = 0;
+          document.querySelectorAll('.recuperar-slot').forEach(inp => {
+            total += (parseInt(inp.value) || 0) * parseInt(inp.dataset.circulo);
+          });
+          const el = document.getElementById('recuperar-total');
+          if (el) el.textContent = `Total: ${total} / ${estado.recuperacaoArcanaMax}`;
+        };
+        document.querySelectorAll('.recuperar-slot').forEach(inp => inp.addEventListener('input', atualizarTotal));
+        document.getElementById('btn-recuperar-confirmar')?.addEventListener('click', () => {
+          let total = 0;
+          const slots = [];
+          document.querySelectorAll('.recuperar-slot').forEach(inp => {
+            const qtd = parseInt(inp.value) || 0;
+            const circ = parseInt(inp.dataset.circulo);
+            if (qtd > 0) {
+              total += qtd * circ;
+              slots.push({ circulo: circ, qtd });
+            }
+          });
+          if (total <= 0) {
+            toast('Selecione ao menos 1 espaço para recuperar.', 'error');
+            return;
+          }
+          if (total > estado.recuperacaoArcanaMax) {
+            toast(`Total (${total}) excede o máximo (${estado.recuperacaoArcanaMax}).`, 'error');
+            return;
+          }
+          // Aplicar recuperação
+          slots.forEach(s => {
+            const slot = char.espacos_magia?.[s.circulo];
+            if (slot) slot.usados = Math.max(0, (slot.usados || 0) - s.qtd);
+          });
+          char.recursos.mago.recuperacao_arcana_usada = true;
+          const detalhes = slots.map(s => `${s.qtd}x ${s.circulo}º`).join(', ');
+          toast(`Recuperação Arcana: ${detalhes} restaurados!`, 'success');
+          salvar();
+          window.fecharModal();
+          renderFichaCompleta();
+        });
+        return;
+      }
+
+      if (acao === 'assinatura-1') {
+        if (estado.assinatura1Usada) {
+          toast('Assinatura Mágica 1 já usada neste descanso.', 'error');
+          return;
+        }
+        char.recursos.mago.assinatura_magia_1_usada = true;
+        toast('Assinatura Mágica 1 conjurada no 3º círculo sem gastar espaço!', 'success');
+      }
+
+      if (acao === 'assinatura-2') {
+        if (estado.assinatura2Usada) {
+          toast('Assinatura Mágica 2 já usada neste descanso.', 'error');
+          return;
+        }
+        char.recursos.mago.assinatura_magia_2_usada = true;
+        toast('Assinatura Mágica 2 conjurada no 3º círculo sem gastar espaço!', 'success');
+      }
+
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
+  document.querySelectorAll('[data-guerreiro-acao]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (char.classe !== 'Guerreiro') return;
+
+      const estado = getEstadoRecursosGuerreiro();
+      if (!estado) return;
+      const acao = btn.dataset.guerreiroAcao;
+
+      if (acao === 'usar-folego') {
+        if (estado.recuperarFolegoDisponiveis <= 0) {
+          toast('Sem usos de Recuperar Folego disponíveis.', 'error');
+          return;
+        }
+        char.recursos.guerreiro.recuperar_folego_usos_gastos += 1;
+        const cura = `1d10 + ${char.nivel || 1}`;
+        toast(`Recuperar Folego usado! Role ${cura} e aplique a cura.`, 'success');
+      }
+
+      if (acao === 'usar-surto') {
+        if (estado.surtoDisponiveis <= 0) {
+          toast('Sem usos de Surto de Ação disponíveis.', 'error');
+          return;
+        }
+        char.recursos.guerreiro.surto_acao_usos_gastos += 1;
+        toast('Surto de Ação usado! Você tem 1 ação adicional (exceto Usar Magia).', 'success');
+      }
+
+      if (acao === 'usar-indomavel') {
+        if (estado.indomavelDisponiveis <= 0) {
+          toast('Sem usos de Indomável disponíveis.', 'error');
+          return;
+        }
+        char.recursos.guerreiro.indomavel_usos_gastos += 1;
+        toast(`Indomável usado! Rejogue a salvaguarda com bônus de +${char.nivel || 1}.`, 'success');
+      }
+
+      // --- Mestre da Batalha ---
+      if (acao === 'usar-superioridade') {
+        if (estado.dadosSuperioridadeDisponiveis <= 0) {
+          toast('Sem Dados de Superioridade disponíveis.', 'error');
+          return;
+        }
+        char.recursos.guerreiro.subclasses.mestre_batalha.dados_superioridade_gastos += 1;
+        toast(`Dado de Superioridade gasto! Role 1${estado.tipoDadoSuperioridade} para a manobra. CD: ${estado.cdSuperioridade}.`, 'success');
+      }
+
+      if (acao === 'conheca-inimigo') {
+        if (estado.conhecaInimigoUsado) {
+          toast('Conheça Seu Inimigo já usado neste descanso.', 'error');
+          return;
+        }
+        char.recursos.guerreiro.subclasses.mestre_batalha.conheca_inimigo_usado = true;
+        toast('Conheça Seu Inimigo usado! Examine imunidades, resistências e vulnerabilidades do alvo.', 'success');
+      }
+
+      if (acao === 'conheca-inimigo-dado') {
+        if (estado.dadosSuperioridadeDisponiveis <= 0) {
+          toast('Sem Dados de Superioridade para recuperar Conheça Seu Inimigo.', 'error');
+          return;
+        }
+        char.recursos.guerreiro.subclasses.mestre_batalha.dados_superioridade_gastos += 1;
+        char.recursos.guerreiro.subclasses.mestre_batalha.conheca_inimigo_usado = false;
+        toast('Conheça Seu Inimigo recuperado gastando 1 Dado de Superioridade!', 'success');
+      }
+
+      // --- Combatente Psíquico ---
+      if (acao === 'golpe-psionico') {
+        if (estado.dadosPsionicosDisponiveisG <= 0) {
+          toast('Sem Dados de Energia Psiônica disponíveis.', 'error');
+          return;
+        }
+        char.recursos.guerreiro.subclasses.combatente_psiquico.dados_psionicos_gastos += 1;
+        const modInt = calcMod(char.atributos?.inteligencia || 10);
+        toast(`Golpe Psiônico! Role 1${estado.tipoDadoPsionicoG}+${modInt} dano Energético extra.`, 'success');
+      }
+
+      if (acao === 'vinculo-protetivo') {
+        if (estado.dadosPsionicosDisponiveisG <= 0) {
+          toast('Sem Dados de Energia Psiônica disponíveis.', 'error');
+          return;
+        }
+        char.recursos.guerreiro.subclasses.combatente_psiquico.dados_psionicos_gastos += 1;
+        const modInt = calcMod(char.atributos?.inteligencia || 10);
+        toast(`Vínculo Protetivo! Role 1${estado.tipoDadoPsionicoG}+${modInt} para reduzir o dano (Reação).`, 'success');
+      }
+
+      if (acao === 'movimento-telecinetico') {
+        if (estado.movimentoTelecineticoUsado) {
+          if (estado.dadosPsionicosDisponiveisG <= 0) {
+            toast('Sem Dados de Energia Psiônica para recuperar Movimento Telecinético.', 'error');
+            return;
+          }
+          char.recursos.guerreiro.subclasses.combatente_psiquico.dados_psionicos_gastos += 1;
+          char.recursos.guerreiro.subclasses.combatente_psiquico.movimento_telecinetico_usado = false;
+          toast('Movimento Telecinético recuperado gastando 1 dado!', 'success');
+        } else {
+          char.recursos.guerreiro.subclasses.combatente_psiquico.movimento_telecinetico_usado = true;
+          toast('Movimento Telecinético usado! Transporte um objeto ou criatura até 9m.', 'success');
+        }
+      }
+
+      if (acao === 'salto-impulsao') {
+        if (estado.saltoImpulsaoUsado) {
+          if (estado.dadosPsionicosDisponiveisG <= 0) {
+            toast('Sem Dados de Energia Psiônica para recuperar Salto com Impulsão.', 'error');
+            return;
+          }
+          char.recursos.guerreiro.subclasses.combatente_psiquico.dados_psionicos_gastos += 1;
+          char.recursos.guerreiro.subclasses.combatente_psiquico.salto_impulsao_usado = false;
+          toast('Salto com Impulsão Psíquica recuperado gastando 1 dado!', 'success');
+        } else {
+          char.recursos.guerreiro.subclasses.combatente_psiquico.salto_impulsao_usado = true;
+          toast('Salto com Impulsão usado! Voo = 2x Deslocamento até o final do turno.', 'success');
+        }
+      }
+
+      if (acao === 'baluarte') {
+        if (estado.baluarteUsado) {
+          if (estado.dadosPsionicosDisponiveisG <= 0) {
+            toast('Sem Dados de Energia Psiônica para recuperar Baluarte de Energia.', 'error');
+            return;
+          }
+          char.recursos.guerreiro.subclasses.combatente_psiquico.dados_psionicos_gastos += 1;
+          char.recursos.guerreiro.subclasses.combatente_psiquico.baluarte_usado = false;
+          toast('Baluarte de Energia recuperado gastando 1 dado!', 'success');
+        } else {
+          char.recursos.guerreiro.subclasses.combatente_psiquico.baluarte_usado = true;
+          const modInt = calcMod(char.atributos?.inteligencia || 10);
+          toast(`Baluarte de Energia ativado! Até ${Math.max(1, modInt)} criaturas ganham Cobertura Parcial por 1 min.`, 'success');
+        }
+      }
+
+      if (acao === 'mestre-telecinetico') {
+        if (estado.mestreTelecineticoUsado) {
+          if (estado.dadosPsionicosDisponiveisG <= 0) {
+            toast('Sem Dados de Energia Psiônica para recuperar Mestre Telecinético.', 'error');
+            return;
+          }
+          char.recursos.guerreiro.subclasses.combatente_psiquico.dados_psionicos_gastos += 1;
+          char.recursos.guerreiro.subclasses.combatente_psiquico.mestre_telecinetico_usado = false;
+          toast('Mestre Telecinético recuperado gastando 1 dado!', 'success');
+        } else {
+          char.recursos.guerreiro.subclasses.combatente_psiquico.mestre_telecinetico_usado = true;
+          toast('Telecinese conjurada sem espaço! INT como atributo de conjuração. Ataque com arma como Ação Bônus.', 'success');
+        }
+      }
+
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
+  document.querySelectorAll('[data-furia-toggle]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+
+      const acao = btn.dataset.furiaToggle;
+      const estado = getEstadoFuria();
+      if (!estado) return;
+
+      if (!char.recursos) char.recursos = {};
+
+      if (acao === 'ativar') {
+        if (temArmaduraPesadaEquipada()) {
+          toast('Não é possível entrar em Fúria com armadura pesada equipada.', 'error');
+          return;
+        }
+        if (estado.usosDisponiveis <= 0) {
+          toast('Sem usos de Fúria disponíveis.', 'error');
+          return;
+        }
+        if (char.recursos.furia_ativa) {
+          toast('A Fúria já está ativa.', 'error');
+          return;
+        }
+        char.recursos.furia_ativa = true;
+        char.recursos.furia_usos_gastos = (char.recursos.furia_usos_gastos || 0) + 1;
+      } else {
+        char.recursos.furia_ativa = false;
+      }
+
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
+  document.querySelectorAll('[data-config-maestrias]').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      await abrirModalMaestrias();
+    });
+  });
+
+  document.querySelectorAll('[data-imprudente-toggle]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (!char.recursos) char.recursos = {};
+      char.recursos.ataque_imprudente_ativo = btn.dataset.imprudenteToggle === 'ativar';
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
+  document.querySelectorAll('[data-furia-iniciativa]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (char.classe !== 'Bárbaro' || char.nivel < 15) return;
+      if (!char.recursos) char.recursos = {};
+      if (char.recursos.furia_persistente_usada) {
+        toast('Fúria Persistente já foi usada desde o último descanso longo.', 'error');
+        return;
+      }
+      char.recursos.furia_usos_gastos = 0;
+      char.recursos.furia_persistente_usada = true;
+      salvar();
+      toast('Fúrias recuperadas pela Fúria Persistente.', 'success');
+      renderFichaCompleta();
+    });
+  });
+}
+
+async function abrirModalMaestrias() {
+  // Classes que possuem Maestria em Arma
+  const classesMaestria = ['Bárbaro', 'Guerreiro', 'Guardião', 'Paladino', 'Ladino'];
+  if (!classesMaestria.includes(char.classe)) return;
+
+  // Obter quantidade máxima de maestrias conforme a classe
+  let maestriasMax = 2; // Valor fixo para Guardião, Paladino e Ladino
+  if (char.classe === 'Bárbaro') {
+    const prog = getProgressaoBarbaro();
+    maestriasMax = prog?.maestriasMax || 2;
+  } else if (char.classe === 'Guerreiro') {
+    const prog = getProgressaoGuerreiro();
+    maestriasMax = prog?.maestriasMax || 3;
+  }
+
+  const dados = await carregarDadosEquipSheet();
+  // Filtrar armas conforme regras de proficiência por classe
+  const todasArmas = dados?.armas || [];
+  const armas = todasArmas
+    .filter(a => {
+      const cat = (a.categoria || '').toLowerCase();
+      const ehSimples = cat.includes('simples');
+      const ehMarcial = cat.includes('marcial');
+      if (!ehSimples && !ehMarcial) return false;
+
+      // Bárbaro: apenas Corpo a Corpo (Simples ou Marcial)
+      if (char.classe === 'Bárbaro') {
+        return cat.includes('corpo a corpo');
+      }
+      // Ladino: Simples + Marciais com propriedade Acuidade
+      if (char.classe === 'Ladino') {
+        if (ehSimples) return true;
+        const props = (a.propriedades || []).map(p => p.toLowerCase());
+        return props.some(p => p.includes('acuidade'));
+      }
+      // Guerreiro, Guardião, Paladino: todas Simples e Marciais
+      return true;
+    })
+    .map(a => a.nome)
+    .sort((a, b) => a.localeCompare(b));
+
+  const selecionadas = new Set(char.maestrias_arma || []);
+
+  const renderLista = (filtro = '') => {
+    const termo = semAcento(filtro || '');
+    const visiveis = termo.length >= 2
+      ? armas.filter(n => semAcento(n).includes(termo))
+      : armas;
+
+    return `
+      <div style="font-size:0.85rem;margin-bottom:8px">
+        Selecionadas: <strong id="maestria-count">${selecionadas.size}</strong> / ${maestriasMax}
+      </div>
+      <div style="max-height:45vh;overflow:auto;border:1px solid var(--border-light);border-radius:8px;padding:8px" id="maestria-lista">
+        ${visiveis.map(nome => {
+          const marcada = selecionadas.has(nome);
+          return `
+            <label class="form-check" style="justify-content:flex-start;margin:0 0 6px 0;opacity:${!marcada && selecionadas.size >= maestriasMax ? 0.5 : 1}">
+              <input type="checkbox" data-maestria-nome="${nome}" ${marcada ? 'checked' : ''}>
+              ${nome}
+            </label>
+          `;
+        }).join('')}
+      </div>
+    `;
+  };
+
+  abrirModal(`Maestrias em Arma (${char.classe})`, `
+    <div class="search-box"><input type="text" id="maestria-busca" class="form-input" placeholder="Buscar arma..."></div>
+    <div id="maestria-conteudo">${renderLista('')}</div>
+    <div style="font-size:0.75rem;color:var(--text-muted);margin-top:8px">
+      Regra: você conhece ${maestriasMax} maestria(s) neste nível.
+    </div>
+  `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-maestrias">Salvar</button>');
+
+  const bindLista = () => {
+    document.querySelectorAll('[data-maestria-nome]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const nome = cb.dataset.maestriaNome;
+        if (cb.checked) {
+          if (selecionadas.size >= maestriasMax) {
+            cb.checked = false;
+            toast(`Você só pode selecionar ${maestriasMax} maestria(s).`, 'error');
+            return;
+          }
+          selecionadas.add(nome);
+        } else {
+          selecionadas.delete(nome);
+        }
+        const count = document.getElementById('maestria-count');
+        if (count) count.textContent = String(selecionadas.size);
+      });
+    });
+  };
+
+  bindLista();
+
+  document.getElementById('maestria-busca')?.addEventListener('input', (e) => {
+    const termo = e.target.value || '';
+    const conteudo = document.getElementById('maestria-conteudo');
+    if (!conteudo) return;
+    conteudo.innerHTML = renderLista(termo);
+    bindLista();
+  });
+
+  document.getElementById('btn-salvar-maestrias')?.addEventListener('click', () => {
+    char.maestrias_arma = [...selecionadas].sort((a, b) => a.localeCompare(b));
+    salvar();
+    window.fecharModal();
+    renderFichaCompleta();
+  });
+}
+
+// Modal de troca de maestria no descanso longo
+// Bárbaro/Guerreiro: troca apenas UMA arma por descanso longo
+// Guardião/Paladino/Ladino: pode trocar TODAS as armas
+async function abrirModalTrocaMaestriaDescanso(callbackPosTroca = null) {
+  const classesMaestria = ['Bárbaro', 'Guerreiro', 'Guardião', 'Paladino', 'Ladino'];
+  if (!classesMaestria.includes(char.classe)) return;
+
+  // Guardião, Paladino e Ladino podem trocar todas as escolhas
+  if (['Guardião', 'Paladino', 'Ladino'].includes(char.classe)) {
+    await abrirModalMaestrias();
+    if (callbackPosTroca) callbackPosTroca();
+    return;
+  }
+
+  // Bárbaro e Guerreiro: trocar apenas UMA arma
+  let maestriasMax = 2;
+  if (char.classe === 'Bárbaro') {
+    const prog = getProgressaoBarbaro();
+    maestriasMax = prog?.maestriasMax || 2;
+  } else if (char.classe === 'Guerreiro') {
+    const prog = getProgressaoGuerreiro();
+    maestriasMax = prog?.maestriasMax || 3;
+  }
+
+  const atuais = char.maestrias_arma || [];
+  if (atuais.length === 0) {
+    // Sem maestrias definidas, abrir modal completo
+    await abrirModalMaestrias();
+    return;
+  }
+
+  const dados = await carregarDadosEquipSheet();
+  const todasArmas = dados?.armas || [];
+  // Filtrar armas disponiveis conforme classe
+  const armasDisponiveis = todasArmas
+    .filter(a => {
+      const cat = (a.categoria || '').toLowerCase();
+      const ehSimples = cat.includes('simples');
+      const ehMarcial = cat.includes('marcial');
+      if (!ehSimples && !ehMarcial) return false;
+      if (char.classe === 'Bárbaro') return cat.includes('corpo a corpo');
+      return true;
+    })
+    .map(a => a.nome)
+    .filter(n => !atuais.includes(n))
+    .sort((a, b) => a.localeCompare(b));
+
+  let armaTrocar = '';
+  let armaSubstituta = '';
+
+  const renderConteudo = () => {
+    return `
+      <p style="font-size:0.85rem;margin-bottom:12px">
+        Como ${char.classe}, você pode trocar <strong>uma</strong> escolha de maestria por Descanso Longo.
+      </p>
+      <div style="margin-bottom:12px">
+        <label class="form-label" style="font-size:0.85rem">Qual arma deseja remover?</label>
+        <select id="maestria-remover" class="form-input" style="font-size:0.85rem">
+          <option value="">-- Selecionar --</option>
+          ${atuais.map(n => `<option value="${n}" ${armaTrocar === n ? 'selected' : ''}>${n}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label class="form-label" style="font-size:0.85rem">Qual arma adicionar no lugar?</label>
+        <input type="text" id="maestria-filtro-nova" class="form-input" placeholder="Buscar arma..." style="font-size:0.85rem;margin-bottom:6px">
+        <div style="max-height:30vh;overflow:auto;border:1px solid var(--border-light);border-radius:8px;padding:8px" id="maestria-nova-lista">
+          ${armasDisponiveis.map(n => `
+            <label class="form-check" style="justify-content:flex-start;margin:0 0 4px 0">
+              <input type="radio" name="maestria-nova" value="${n}" ${armaSubstituta === n ? 'checked' : ''}>
+              ${n}
+            </label>
+          `).join('')}
+        </div>
+      </div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:8px">
+        Maestrias atuais: ${atuais.join(', ')}
+      </div>
+    `;
+  };
+
+  abrirModal(`Trocar Maestria (${char.classe})`, renderConteudo(),
+    '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-confirmar-troca-maestria">Trocar</button>'
+  );
+
+  // Filtrar lista ao digitar
+  document.getElementById('maestria-filtro-nova')?.addEventListener('input', (e) => {
+    const termo = semAcento(e.target.value || '');
+    const lista = document.getElementById('maestria-nova-lista');
+    if (!lista) return;
+    const filtradas = termo.length >= 2
+      ? armasDisponiveis.filter(n => semAcento(n).includes(termo))
+      : armasDisponiveis;
+    lista.innerHTML = filtradas.map(n => `
+      <label class="form-check" style="justify-content:flex-start;margin:0 0 4px 0">
+        <input type="radio" name="maestria-nova" value="${n}" ${armaSubstituta === n ? 'checked' : ''}>
+        ${n}
+      </label>
+    `).join('');
+  });
+
+  document.getElementById('btn-confirmar-troca-maestria')?.addEventListener('click', () => {
+    const remover = document.getElementById('maestria-remover')?.value;
+    const nova = document.querySelector('input[name="maestria-nova"]:checked')?.value;
+
+    if (!remover || !nova) {
+      toast('Selecione a arma a remover e a arma substituta.', 'error');
+      return;
+    }
+
+    const novaLista = atuais.filter(n => n !== remover);
+    novaLista.push(nova);
+    char.maestrias_arma = novaLista.sort((a, b) => a.localeCompare(b));
+    salvar();
+    window.fecharModal();
+    toast(`Maestria trocada: ${remover} → ${nova}`, 'success');
+    renderFichaCompleta();
+    // Encadear próxima ação (ex.: troca de magias após maestria)
+    if (callbackPosTroca) callbackPosTroca();
+  });
 }
 
 // --- Edição do cabeçalho e detalhes ---
@@ -830,17 +4457,17 @@ function setupEventosEdicao() {
         <div class="col">
           <label class="form-label">Nivel</label>
           <div style="font-size:1rem;font-weight:700;padding:6px;background:var(--surface-variant);border-radius:4px">${char.nivel}</div>
-          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px">Use Level Up para alterar</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px">Use Subir de Nível para alterar</div>
         </div>
         <div class="col">
           <label class="form-label">Subclasse</label>
           <div style="font-size:1rem;font-weight:700;padding:6px;background:var(--surface-variant);border-radius:4px">${char.subclasse || '—'}</div>
-          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px">Definida no Level Up</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px">Definida ao subir de nível</div>
         </div>
       </div>
       <div class="section-divider mt-2"><span>Atributos</span></div>
       <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">
-        Atributos são definidos na criação e alterados via Level Up (Aumento de Atributo). Não podem ser editados livremente.
+        Atributos são definidos na criação e alterados ao subir de nível (Aumento de Atributo). Não podem ser editados livremente.
       </div>
       <div class="atributos-grid">
         ${ATRIBUTOS_KEYS.map(key => `
@@ -869,7 +4496,7 @@ function setupEventosEdicao() {
         <label class="form-label" for="edit-xp-atual">XP Atual</label>
         <input type="number" class="form-input" id="edit-xp-atual" value="${char.xp || 0}" min="0">
         <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">
-          Nivel Atual: ${char.nivel}${char.nivel < 20 ? ` | Próximo Nivel (${char.nivel + 1}): ${XP_POR_NIVEL[char.nivel + 1]} XP` : ' (Máximo)'}
+          Nível Atual: ${char.nivel}${char.nivel < 20 ? ` | Próximo Nível (${char.nivel + 1}): ${XP_POR_NIVEL[char.nivel + 1]} XP` : ' (Máximo)'}
         </div>
       </div>
       <div class="section-divider mt-2"><span>Adicionar XP</span></div>
@@ -905,12 +4532,12 @@ function setupEventosEdicao() {
   });
 }
 
-// Modal de Level Up
+// Modal de subir de nível
 async function abrirModalLevelUp() {
   const nivelNovo = char.nivel + 1;
   const modCon = calcMod(char.atributos.constituicao);
   const info = CLASSES_INFO[char.classe];
-  const hpGanho = Math.floor(info.dado_vida / 2) + 1 + modCon;
+  const hpGanhoFixo = Math.max(1, Math.floor(info.dado_vida / 2) + 1 + modCon);
   
   // Importar funções do levelup
   const { obterCaracteristicasNivel, obterCaracteristicasEspecieNivel, obterCaracteristicasSubclasseNivel, obterMagiasDominioNivel, concedeAumentoAtributo, exigeSubclasse } = await import('../levelup.js');
@@ -919,6 +4546,14 @@ async function abrirModalLevelUp() {
   const caracteristicasEspecie = await obterCaracteristicasEspecieNivel(char.especie, nivelNovo);
   const ganhaAumentoAtributo = concedeAumentoAtributo(char.classe, nivelNovo);
   const precisaSubclasse = exigeSubclasse(char.classe, nivelNovo) && !char.subclasse;
+  const precisaExpertiseBardo = exigeEspecializacaoBardo(char.classe, nivelNovo);
+  const precisaExpertiseGuardiao = exigeEspecializacaoGuardiao(char.classe, nivelNovo);
+  const pendencias = [];
+  if (precisaSubclasse) pendencias.push('Escolher subclasse');
+  if (ganhaAumentoAtributo) pendencias.push('Distribuir 2 pontos de atributo');
+  if (precisaExpertiseBardo) pendencias.push('Escolher 2 perícias para Especialização do Bardo');
+  if (precisaExpertiseGuardiao) pendencias.push('Escolher 2 perícias para Especialista do Guardião');
+  if (info.conjurador) pendencias.push('Revisar opções de magias deste nível');
   
   // Obter características da subclasse para este nível (se já tem subclasse)
   const caracteristicasSubclasse = char.subclasse 
@@ -937,19 +4572,45 @@ async function abrirModalLevelUp() {
   
   let conteudoModal = `
     <div style="text-align:center;margin-bottom:16px">
-      <h3 style="color:var(--accent);margin:0">Nivel ${char.nivel} → Nivel ${nivelNovo}</h3>
+      <h3 style="color:var(--accent);margin:0">Nível ${char.nivel} → Nível ${nivelNovo}</h3>
       <div style="font-size:0.9rem;color:var(--text-muted);margin-top:4px">
         ${char.especie} ${char.classe}
       </div>
     </div>
+
+    <div class="card" style="background:var(--surface-variant);margin-bottom:12px">
+      <div style="font-weight:700;margin-bottom:8px;color:var(--accent)">Resumo desta subida</div>
+      ${pendencias.length > 0 ? `
+        <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:6px">Antes de confirmar, você precisa:</div>
+        <ul style="margin:0;padding-left:20px;font-size:0.9rem">
+          ${pendencias.map(p => `<li>${p}</li>`).join('')}
+        </ul>
+      ` : `<div style="font-size:0.9rem;color:var(--success)">Nenhuma escolha obrigatória pendente.</div>`}
+    </div>
     
     <div class="card" style="background:var(--surface-variant);margin-bottom:12px">
-      <div style="font-weight:700;margin-bottom:8px;color:var(--accent)">Ganhos Automáticos</div>
+      <div style="font-weight:700;margin-bottom:8px;color:var(--accent)">Ganhos automáticos ao confirmar</div>
       <ul style="margin:0;padding-left:20px;font-size:0.9rem">
-        <li><strong>+${hpGanho} Pontos de Vida</strong> (d${info.dado_vida} médio + CON)</li>
+        <li><strong>Bônus de Proficiência:</strong> atualizado automaticamente quando aplicável</li>
         ${caracteristicas.length > 0 ? caracteristicas.map(c => `<li>${c}</li>`).join('') : '<li>Nenhuma característica nova neste nível</li>'}
         ${caracteristicasEspecie.length > 0 ? caracteristicasEspecie.map(c => `<li><strong>[Espécie]</strong> ${c.nome}</li>`).join('') : ''}
       </ul>
+    </div>
+
+    <div class="card" style="background:var(--surface-variant);margin-bottom:12px">
+      <div style="font-weight:700;margin-bottom:8px;color:var(--accent)">Pontos de Vida ao subir de nível</div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:0.9rem">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="radio" name="levelup-hp-modo" value="fixo" checked>
+          <span>Valor fixo recomendado: <strong id="levelup-hp-previa-fixo">+${hpGanhoFixo} PV</strong> (média do d${info.dado_vida} + CON)</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex-wrap:wrap">
+          <input type="radio" name="levelup-hp-modo" value="rolado">
+          <span>Usar rolagem: d${info.dado_vida} + CON</span>
+          <input type="number" class="form-input" id="levelup-hp-rolado" min="1" max="${info.dado_vida}" step="1" value="1" style="width:88px" disabled>
+          <span id="levelup-hp-previa-rolado" style="font-size:0.85rem;color:var(--text-muted)">Resultado aplicado: +${Math.max(1, 1 + modCon)} PV</span>
+        </label>
+      </div>
     </div>
   `;
   
@@ -1041,17 +4702,78 @@ async function abrirModalLevelUp() {
       </div>
     `;
   }
+
+  if (precisaExpertiseBardo) {
+    const proficientes = (char.pericias_proficientes || []);
+    const expertiseAtual = new Set(char.pericias_expertise || []);
+    const elegiveis = proficientes.filter(p => !expertiseAtual.has(p));
+
+    conteudoModal += `
+      <div class="section-divider mt-2"><span>Especialização do Bardo</span></div>
+      <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
+        Selecione exatamente 2 perícias já proficientes para receber Especialização.
+      </div>
+      <div id="levelup-bardo-expertise" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px">
+        ${elegiveis.map(p => `
+          <label class="form-check" style="display:flex;align-items:center;gap:6px;padding:6px 8px;border:1px solid var(--border-light);border-radius:6px">
+            <input type="checkbox" data-bardo-expertise="${p}"> ${p}
+          </label>
+        `).join('')}
+      </div>
+      <div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px;text-align:center">
+        Selecionadas: <span id="levelup-bardo-expertise-count" style="font-weight:700">0</span>/2
+      </div>
+    `;
+  }
+
+  if (precisaExpertiseGuardiao) {
+    const proficientes = (char.pericias_proficientes || []);
+    const expertiseAtual = new Set(char.pericias_expertise || []);
+    const elegiveis = proficientes.filter(p => !expertiseAtual.has(p));
+
+    conteudoModal += `
+      <div class="section-divider mt-2"><span>Especialista do Guardião</span></div>
+      <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
+        Selecione exatamente 2 perícias já proficientes para receber Especialização.
+      </div>
+      <div id="levelup-guardiao-expertise" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px">
+        ${elegiveis.map(p => `
+          <label class="form-check" style="display:flex;align-items:center;gap:6px;padding:6px 8px;border:1px solid var(--border-light);border-radius:6px">
+            <input type="checkbox" data-guardiao-expertise="${p}"> ${p}
+          </label>
+        `).join('')}
+      </div>
+      <div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px;text-align:center">
+        Selecionadas: <span id="levelup-guardiao-expertise-count" style="font-weight:700">0</span>/2
+      </div>
+    `;
+  }
   
   // --- Seção de seleção de magias no level up ---
-  if (info.conjurador) {
+  const ehSubConj = ehSubclasseConjuradora();
+  if (info.conjurador || ehSubConj) {
     const tipoConj = info.tipo_conjuracao || 'preparadas';
     const tabela = classeData?.tabela_caracteristicas;
-    const truquesAtual = tabela ? getTruquesConhecidos(tabela, char.nivel) : 0;
-    const truquesNovo = tabela ? getTruquesConhecidos(tabela, nivelNovo) : 0;
-    const truquesGanhos = truquesNovo - truquesAtual;
+    let truquesAtual = tabela ? getTruquesConhecidos(tabela, char.nivel) : 0;
+    let truquesNovo = tabela ? getTruquesConhecidos(tabela, nivelNovo) : 0;
+    let magiasAtual = tabela ? getMagiaPreparadas(tabela, char.nivel) : 0;
+    let magiasNovo = tabela ? getMagiaPreparadas(tabela, nivelNovo) : 0;
 
-    const magiasAtual = tabela ? getMagiaPreparadas(tabela, char.nivel) : 0;
-    const magiasNovo = tabela ? getMagiaPreparadas(tabela, nivelNovo) : 0;
+    // Para subclasses conjuradoras, calcular limites a partir da tabela da subclasse
+    if (ehSubConj) {
+      const subAtual = getSubclasseConjuradoraConjuracao();
+      // Calcular para o nível novo temporariamente
+      const nivelOriginal = char.nivel;
+      char.nivel = nivelNovo;
+      const subNovo = getSubclasseConjuradoraConjuracao();
+      char.nivel = nivelOriginal;
+
+      truquesAtual = subAtual?.truques || 0;
+      truquesNovo = subNovo?.truques || 0;
+      magiasAtual = subAtual?.preparadas || 0;
+      magiasNovo = subNovo?.preparadas || 0;
+    }
+    const truquesGanhos = truquesNovo - truquesAtual;
 
     conteudoModal += `<div class="section-divider mt-2"><span>Magias</span></div>`;
 
@@ -1089,7 +4811,7 @@ async function abrirModalLevelUp() {
         `;
       }
       // Troca opcional de 1 magia conhecida
-      const magiasAtuais = (char.magias_preparadas || []).filter(m => m.circulo > 0 && m.origem !== 'dominio');
+      const magiasAtuais = (char.magias_preparadas || []).filter(m => m.circulo > 0 && magiaContaNoLimite(m));
       if (magiasAtuais.length > 0) {
         conteudoModal += `
           <div class="card" style="background:var(--surface-variant);margin-bottom:12px">
@@ -1146,12 +4868,35 @@ async function abrirModalLevelUp() {
   
   conteudoModal += `
     <div style="margin-top:16px;padding:12px;background:var(--warning);color:#000;border-radius:4px;font-size:0.85rem">
-      <strong>⚠ Importante:</strong> Esta ação não pode ser desfeita. Certifique-se de ter feito as escolhas corretas.
+      <strong>Importante:</strong> Revise suas escolhas antes de confirmar. Após confirmar, a ficha será atualizada para o novo nível.
     </div>
   `;
   
-  abrirModal(`⬆ Level Up para Nivel ${nivelNovo}`, conteudoModal, 
-    '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-accent" id="btn-confirmar-levelup">Confirmar Level Up</button>');
+  abrirModal(`⬆ Subir para Nível ${nivelNovo}`, conteudoModal, 
+    '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-accent" id="btn-confirmar-levelup">Confirmar subida para Nível ' + nivelNovo + '</button>');
+
+  // Eventos do modo de ganho de PV
+  const hpModoRadios = document.querySelectorAll('input[name="levelup-hp-modo"]');
+  const hpRoladoInput = document.getElementById('levelup-hp-rolado');
+  const hpPreviaRolado = document.getElementById('levelup-hp-previa-rolado');
+
+  function atualizarEstadoHpRolado() {
+    const modo = document.querySelector('input[name="levelup-hp-modo"]:checked')?.value || 'fixo';
+    if (hpRoladoInput) hpRoladoInput.disabled = modo !== 'rolado';
+  }
+
+  function atualizarPreviaHpRolado() {
+    if (!hpRoladoInput || !hpPreviaRolado) return;
+    const rolado = parseInt(hpRoladoInput.value) || 1;
+    const clamp = Math.max(1, Math.min(info.dado_vida, rolado));
+    hpRoladoInput.value = String(clamp);
+    hpPreviaRolado.textContent = `Resultado aplicado: +${Math.max(1, clamp + modCon)} PV`;
+  }
+
+  hpModoRadios.forEach(r => r.addEventListener('change', atualizarEstadoHpRolado));
+  hpRoladoInput?.addEventListener('input', atualizarPreviaHpRolado);
+  atualizarEstadoHpRolado();
+  atualizarPreviaHpRolado();
   
   // Eventos de seleção de subclasse
   if (precisaSubclasse) {
@@ -1222,24 +4967,83 @@ async function abrirModalLevelUp() {
     // Aplicar bloqueio inicial
     atualizarOpcoesAtributos();
   }
+
+  if (precisaExpertiseBardo) {
+    const checks = [...document.querySelectorAll('[data-bardo-expertise]')];
+    const countEl = document.getElementById('levelup-bardo-expertise-count');
+
+    const atualizarCount = () => {
+      const marcadas = checks.filter(c => c.checked).length;
+      if (countEl) {
+        countEl.textContent = String(marcadas);
+        countEl.style.color = marcadas === 2 ? 'var(--success)' : (marcadas > 2 ? 'var(--danger)' : 'inherit');
+      }
+      checks.forEach(c => {
+        if (!c.checked) c.disabled = marcadas >= 2;
+      });
+    };
+
+    checks.forEach(c => c.addEventListener('change', atualizarCount));
+    atualizarCount();
+  }
+
+  if (precisaExpertiseGuardiao) {
+    const checks = [...document.querySelectorAll('[data-guardiao-expertise]')];
+    const countEl = document.getElementById('levelup-guardiao-expertise-count');
+
+    const atualizarCount = () => {
+      const marcadas = checks.filter(c => c.checked).length;
+      if (countEl) {
+        countEl.textContent = String(marcadas);
+        countEl.style.color = marcadas === 2 ? 'var(--success)' : (marcadas > 2 ? 'var(--danger)' : 'inherit');
+      }
+      checks.forEach(c => {
+        if (!c.checked) c.disabled = marcadas >= 2;
+      });
+    };
+
+    checks.forEach(c => c.addEventListener('change', atualizarCount));
+    atualizarCount();
+  }
   
   // --- Eventos de seleção de magias no level up ---
-  if (info.conjurador) {
+  if (info.conjurador || ehSubConj) {
     const tipoConj = info.tipo_conjuracao || 'preparadas';
     const tabela = classeData?.tabela_caracteristicas;
-    const truquesAtual = tabela ? getTruquesConhecidos(tabela, char.nivel) : 0;
-    const truquesNovo = tabela ? getTruquesConhecidos(tabela, nivelNovo) : 0;
+    let truquesAtual = tabela ? getTruquesConhecidos(tabela, char.nivel) : 0;
+    let truquesNovo = tabela ? getTruquesConhecidos(tabela, nivelNovo) : 0;
+    let magiasAtual = tabela ? getMagiaPreparadas(tabela, char.nivel) : 0;
+    let magiasNovo = tabela ? getMagiaPreparadas(tabela, nivelNovo) : 0;
+
+    // Para subclasses conjuradoras, calcular limites a partir da tabela da subclasse
+    if (ehSubConj) {
+      const subAtual = getSubclasseConjuradoraConjuracao();
+      const nivelOriginal = char.nivel;
+      char.nivel = nivelNovo;
+      const subNovo = getSubclasseConjuradoraConjuracao();
+      char.nivel = nivelOriginal;
+
+      truquesAtual = subAtual?.truques || 0;
+      truquesNovo = subNovo?.truques || 0;
+      magiasAtual = subAtual?.preparadas || 0;
+      magiasNovo = subNovo?.preparadas || 0;
+    }
     const truquesGanhos = truquesNovo - truquesAtual;
-    const magiasAtual = tabela ? getMagiaPreparadas(tabela, char.nivel) : 0;
-    const magiasNovo = tabela ? getMagiaPreparadas(tabela, nivelNovo) : 0;
     const magiasGanhas = magiasNovo - magiasAtual;
 
     // Carregar magias da classe para buscas
-    const magiasClasseData = await getMagiasClasse(char.classe);
-    const listaMagiasClasse = achatarMagiasClasse(magiasClasseData);
+    const listaMagiasClasse = await obterMagiasDisponiveisClasseAtual();
 
     // Espaços disponíveis no novo nível
-    const espacosNovo = tabela ? getEspacosMagia(tabela, nivelNovo) : {};
+    let espacosNovo = tabela ? getEspacosMagia(tabela, nivelNovo) : {};
+    // Fallback para subclasses conjuradoras
+    if (ehSubConj && Object.keys(espacosNovo).length === 0) {
+      const nivelOriginal = char.nivel;
+      char.nivel = nivelNovo;
+      const subNovo = getSubclasseConjuradoraConjuracao();
+      char.nivel = nivelOriginal;
+      espacosNovo = subNovo?.espacos || {};
+    }
     const maxCirculoNovo = Math.max(...Object.keys(espacosNovo).map(Number), 0);
 
     // Sets para controlar seleções no level up
@@ -1504,6 +5308,18 @@ async function abrirModalLevelUp() {
   // Confirmar level up
   document.getElementById('btn-confirmar-levelup')?.addEventListener('click', async () => {
     const opcoes = { ignorar_xp: true };
+
+    // Definir modo de ganho de PV
+    const hpModo = document.querySelector('input[name="levelup-hp-modo"]:checked')?.value || 'fixo';
+    opcoes.hp_modo = hpModo;
+    if (hpModo === 'rolado') {
+      const hpRolado = parseInt(document.getElementById('levelup-hp-rolado')?.value);
+      if (Number.isNaN(hpRolado) || hpRolado < 1 || hpRolado > info.dado_vida) {
+        toast(`Informe uma rolagem válida entre 1 e ${info.dado_vida}`, 'error');
+        return;
+      }
+      opcoes.hp_rolado = hpRolado;
+    }
     
     // Validar subclasse se necessário
     if (precisaSubclasse) {
@@ -1533,6 +5349,26 @@ async function abrirModalLevelUp() {
       }
       
       opcoes.aumentos_atributo = aumentos;
+    }
+
+    if (precisaExpertiseBardo) {
+      const escolhidas = [...document.querySelectorAll('[data-bardo-expertise]:checked')]
+        .map(el => el.getAttribute('data-bardo-expertise'));
+      if (escolhidas.length !== 2) {
+        toast('Selecione exatamente 2 perícias para Especialização do Bardo', 'error');
+        return;
+      }
+      opcoes.bardo_expertise = escolhidas;
+    }
+
+    if (precisaExpertiseGuardiao) {
+      const escolhidas = [...document.querySelectorAll('[data-guardiao-expertise]:checked')]
+        .map(el => el.getAttribute('data-guardiao-expertise'));
+      if (escolhidas.length !== 2) {
+        toast('Selecione exatamente 2 perícias para Especialista do Guardião', 'error');
+        return;
+      }
+      opcoes.guardiao_expertise = escolhidas;
     }
     
     // Validar e processar seleção de magias no level up
@@ -1622,14 +5458,19 @@ async function abrirModalLevelUp() {
       // Mostrar resumo
       const resumo = `
         <div style="text-align:center">
-          <h3 style="color:var(--success);margin:0">✓ Level Up Concluído!</h3>
-          <div style="font-size:1.1rem;margin:12px 0">Nivel ${resultado.nivel_anterior} → <strong>Nivel ${resultado.nivel_novo}</strong></div>
+          <h3 style="color:var(--success);margin:0">✓ Subida de Nível Concluída!</h3>
+          <div style="font-size:1.1rem;margin:12px 0">Nível ${resultado.nivel_anterior} → <strong>Nível ${resultado.nivel_novo}</strong></div>
           <ul style="text-align:left;margin:12px 0">
-            <li>+${resultado.hp_ganho} HP (Total: ${char.pv_max})</li>
+            <li>+${resultado.hp_ganho} HP (${resultado.hp_modo === 'rolado' ? `rolagem ${resultado.hp_rolado}` : 'valor fixo'})</li>
+            ${resultado.bonus_con_retroativo > 0 ? `<li>+${resultado.bonus_con_retroativo} HP (ajuste retroativo de Constituição)</li>` : ''}
+            <li>Total de PV: ${char.pv_max}</li>
             ${resultado.subclasse_escolhida ? `<li>Subclasse: ${resultado.subclasse_escolhida}</li>` : ''}
             ${resultado.aumentos_aplicados ? `<li>Atributos aumentados</li>` : ''}
             ${(resultado.caracteristicas_subclasse || []).length > 0 ? resultado.caracteristicas_subclasse.map(f => `<li><strong>[${char.subclasse}]</strong> ${f.nome}</li>`).join('') : ''}
             ${(resultado.magias_dominio_adicionadas || []).length > 0 ? `<li>Magias de domínio adicionadas: ${resultado.magias_dominio_adicionadas.map(m => m.nome).join(', ')}</li>` : ''}
+            ${(resultado.magias_sempre_adicionadas || []).length > 0 ? `<li>Magias sempre preparadas adicionadas: ${resultado.magias_sempre_adicionadas.map(m => m.nome).join(', ')}</li>` : ''}
+            ${(resultado.expertise_bardo_aplicada || []).length > 0 ? `<li>Especialização: ${resultado.expertise_bardo_aplicada.join(', ')}</li>` : ''}
+            ${(resultado.expertise_guardiao_aplicada || []).length > 0 ? `<li>Especialista do Guardião: ${resultado.expertise_guardiao_aplicada.join(', ')}</li>` : ''}
             ${truquesAdicionados.length > 0 ? `<li>Truques: +${truquesAdicionados.join(', ')}</li>` : ''}
             ${magiasAdicionadas.length > 0 ? `<li>Magias: +${magiasAdicionadas.join(', ')}</li>` : ''}
             ${grimorioAdicionado.length > 0 ? `<li>Grimório: +${grimorioAdicionado.join(', ')}</li>` : ''}
@@ -1638,11 +5479,11 @@ async function abrirModalLevelUp() {
         </div>
       `;
       
-      abrirModal('Level Up Concluído!', resumo, '<button class="btn btn-primary" onclick="fecharModal()">OK</button>');
+      abrirModal('Subida de Nível Concluída!', resumo, '<button class="btn btn-primary" onclick="fecharModal()">OK</button>');
       
       renderFichaCompleta();
     } else {
-      toast(resultado.erro || 'Erro ao fazer level up', 'error');
+      toast(resultado.erro || 'Erro ao subir de nível', 'error');
     }
   });
 }
@@ -1664,7 +5505,12 @@ function renderSecaoTalentos() {
       <div class="card-header"><h2>Talentos</h2></div>
       ${char.talentos.map(t => {
         const nome = typeof t === 'string' ? t : t.nome;
-        const talentoData = todosOsTalentos.find(td => td.nome === nome);
+        // Busca exata primeiro; se não encontrar, tenta pelo nome base (sem parênteses)
+        let talentoData = todosOsTalentos.find(td => td.nome === nome);
+        if (!talentoData) {
+          const nomeBase = nome.replace(/\s*\(.*\)$/, '').trim();
+          talentoData = todosOsTalentos.find(td => td.nome === nomeBase);
+        }
         const descricao = talentoData?.descricao || '';
         const beneficios = talentoData?.beneficios || [];
         
@@ -1729,7 +5575,7 @@ function detectarSubHabilidades(descricao) {
 }
 
 function renderFeatureItem(f, source) {
-  const recarga = detectarRecarga(f.descricao);
+  let recarga = detectarRecarga(f.descricao);
   // Features that are purely descriptive should always be passive
   const nomeNorm = semAcento(f.nome);
   const ativa = nomeNorm.includes('conjuracao') ? false : ehHabilidadeAtiva(f.descricao);
@@ -1737,9 +5583,126 @@ function renderFeatureItem(f, source) {
   if (!char.usos_habilidades) char.usos_habilidades = {};
 
   // Detectar usos máximos e sub-habilidades
-  const usosMax = detectarUsosMaximos(f.descricao);
+  let usosMax = detectarUsosMaximos(f.descricao);
   const subHabilidades = detectarSubHabilidades(f.descricao);
+  const ehCanalizarDivindadeClerigo = char.classe === 'Clérigo' && f.nome === 'Canalizar Divindade';
+  const ehGolpesAbencoadosClerigo = char.classe === 'Clérigo' && f.nome === 'Golpes Abençoados';
+  const ehIntervencaoDivinaClerigo = char.classe === 'Clérigo' && f.nome === 'Intervenção Divina';
+  const ehIntervencaoDivinaMaiorClerigo = char.classe === 'Clérigo' && f.nome === 'Intervenção Divina Maior';
+
+  const ehSubclasseClerigo = char.classe === 'Clérigo' && source === 'subclasse';
+  const ehGuerraAtaqueDirecionado = ehSubclasseClerigo && char.subclasse === 'Domínio da Guerra' && f.nome === 'Ataque Direcionado';
+  const ehGuerraSacerdote = ehSubclasseClerigo && char.subclasse === 'Domínio da Guerra' && f.nome === 'Sacerdote da Guerra';
+  const ehGuerraBencaoDeus = ehSubclasseClerigo && char.subclasse === 'Domínio da Guerra' && f.nome === 'Bênção do Deus da Guerra';
+  const ehLuzBrilho = ehSubclasseClerigo && char.subclasse === 'Domínio da Luz' && f.nome === 'Brilho do Amanhecer';
+  const ehLuzLabareda = ehSubclasseClerigo && char.subclasse === 'Domínio da Luz' && f.nome === 'Labareda Protetora';
+  const ehLuzCoroa = ehSubclasseClerigo && char.subclasse === 'Domínio da Luz' && f.nome === 'Coroa de Luz';
+  const ehTrapacaBencao = ehSubclasseClerigo && char.subclasse === 'Domínio da Trapaça' && f.nome === 'Bênção do Trapaceiro';
+  const ehTrapacaInvocar = ehSubclasseClerigo && char.subclasse === 'Domínio da Trapaça' && f.nome === 'Invocar Duplicidade';
+  const ehVidaPreservar = ehSubclasseClerigo && char.subclasse === 'Domínio da Vida' && f.nome === 'Preservar a Vida';
+
+  const ehInimigoFavoritoGuardiao = char.classe === 'Guardião' && f.nome === 'Inimigo Favorito';
+  const ehIncansavelGuardiao = char.classe === 'Guardião' && f.nome === 'Incansável';
+  const ehVeuNaturezaGuardiao = char.classe === 'Guardião' && f.nome === 'Véu da Natureza';
+  const ehMaestriaGuardiao = char.classe === 'Guardião' && f.nome === 'Maestria em Arma';
+  const estadoGuardiao = (ehInimigoFavoritoGuardiao || ehIncansavelGuardiao || ehVeuNaturezaGuardiao || ehMaestriaGuardiao) ? getEstadoRecursosGuardiao() : null;
+
+  // Druida: deteccao de Forma Selvagem para handler dedicado
+  const ehFormaSelvagem = char.classe === 'Druida' && f.nome === 'Forma Selvagem';
+  const estadoDruida = ehFormaSelvagem ? getEstadoRecursosDruida() : null;
+
+  // Bardo: deteccao de Inspiracao de Bardo para handler dedicado
+  const ehInspiracaoBardo = char.classe === 'Bardo' && f.nome === 'Inspiração de Bardo';
+  const estadoInspiracaoBardo = ehInspiracaoBardo ? getEstadoInspiracaoBardo() : null;
+
+  // Bruxo: deteccao de Astucia Magica para handler dedicado
+  const ehAstuciaBruxo = char.classe === 'Bruxo' && f.nome === 'Astúcia Mágica';
+  const estadoBruxoFeature = ehAstuciaBruxo ? getEstadoRecursosBruxo() : null;
+
+  const ehFeiticeiro = char.classe === 'Feiticeiro';
+  const subclasseFeiticeiro = semAcento(char.subclasse || '');
+  const ehFeiticariaInata = ehFeiticeiro && f.nome === 'Feitiçaria Inata';
+  const ehFonteMagia = ehFeiticeiro && f.nome === 'Fonte de Magia';
+  const ehMetamagia = ehFeiticeiro && f.nome === 'Metamagia';
+  const ehRestauracaoFeiticeira = ehFeiticeiro && f.nome === 'Restauração Feiticeira';
+  const ehFalaTelepatica = ehFeiticeiro && subclasseFeiticeiro === semAcento('Feitiçaria Aberrante') && f.nome === 'Fala Telepática';
+  const ehRevelacaoCarne = ehFeiticeiro && subclasseFeiticeiro === semAcento('Feitiçaria Aberrante') && f.nome === 'Revelação em Carne';
+  const ehAfinidadeElemental = ehFeiticeiro && subclasseFeiticeiro === semAcento('Feitiçaria Dracônica') && f.nome === 'Afinidade Elemental';
+  const ehAsasDragao = ehFeiticeiro && subclasseFeiticeiro === semAcento('Feitiçaria Dracônica') && f.nome === 'Asas de Dragão';
+  const ehCompanheiroDraconico = ehFeiticeiro && subclasseFeiticeiro === semAcento('Feitiçaria Dracônica') && f.nome === 'Companheiro Dracônico';
+  const ehRestaurarEquilibrio = ehFeiticeiro && subclasseFeiticeiro === semAcento('Feitiçaria Mecânica') && f.nome === 'Restaurar Equilíbrio';
+  const ehBastiaoLei = ehFeiticeiro && subclasseFeiticeiro === semAcento('Feitiçaria Mecânica') && f.nome === 'Bastião da Lei';
+  const ehTranseOrdem = ehFeiticeiro && subclasseFeiticeiro === semAcento('Feitiçaria Mecânica') && f.nome === 'Transe da Ordem';
+  const ehMaresCaos = ehFeiticeiro && subclasseFeiticeiro === semAcento('Feitiçaria Selvagem') && f.nome === 'Marés do Caos';
+  const ehDistorcerSorte = ehFeiticeiro && subclasseFeiticeiro === semAcento('Feitiçaria Selvagem') && f.nome === 'Distorcer a Sorte';
+  const ehSurtoControlado = ehFeiticeiro && subclasseFeiticeiro === semAcento('Feitiçaria Selvagem') && f.nome === 'Surto Controlado';
+
+  const estadoFeiticeiro = ehFeiticeiro ? getEstadoRecursosFeiticeiro() : null;
+
+  // Guerreiro: detecção de habilidades dedicadas
+  const ehGuerreiro = char.classe === 'Guerreiro';
+  const ehRecuperarFolegoGuerreiro = ehGuerreiro && f.nome === 'Recuperar Fôlego';
+  const ehSurtoAcaoGuerreiro = ehGuerreiro && f.nome === 'Surto de Ação';
+  const ehIndomavelGuerreiro = ehGuerreiro && f.nome === 'Indomável';
+  const ehMaestriaGuerreiro = ehGuerreiro && f.nome === 'Maestria em Arma';
+  // Mestre da Batalha
+  const ehSuperioridadeCombate = ehGuerreiro && char.subclasse === 'Mestre da Batalha' && f.nome === 'Superioridade em Combate';
+  const ehConhecaInimigo = ehGuerreiro && char.subclasse === 'Mestre da Batalha' && f.nome === 'Conheça Seu Inimigo';
+  // Combatente Psíquico
+  const ehPoderPsionicoGuerreiro = ehGuerreiro && char.subclasse === 'Combatente Psíquico' && f.nome === 'Poder Psiônico';
+  const ehAdeptoTelecinetico = ehGuerreiro && char.subclasse === 'Combatente Psíquico' && f.nome === 'Adepto Telecinético';
+  const ehBaluarteEnergia = ehGuerreiro && char.subclasse === 'Combatente Psíquico' && f.nome === 'Baluarte de Energia';
+  const ehMestreTelecinetico = ehGuerreiro && char.subclasse === 'Combatente Psíquico' && f.nome === 'Mestre Telecinético';
+  const estadoGuerreiro = ehGuerreiro ? getEstadoRecursosGuerreiro() : null;
+
+  // Paladino: detecção de habilidades dedicadas
+  const ehPaladino = char.classe === 'Paladino';
+  const ehMaosConsagradasPaladino = ehPaladino && f.nome === 'Mãos Consagradas';
+  const ehCanalizarPaladino = ehPaladino && f.nome === 'Canalizar Divindade';
+  const ehDestruicaoPaladino = ehPaladino && f.nome === 'Destruição do Paladino';
+  const ehAuraProtecaoPaladino = ehPaladino && f.nome === 'Aura de Proteção';
+  const ehGolpesRadiantesPaladino = ehPaladino && f.nome === 'Golpes Radiantes';
+  const ehMaestriaPaladino = ehPaladino && f.nome === 'Maestria em Arma';
+  const estadoPaladino = ehPaladino ? getEstadoRecursosPaladino() : null;
+
+  // Monge: detecção de habilidades dedicadas
+  const ehMonge = char.classe === 'Monge';
+  const ehArtesMarciais = ehMonge && f.nome === 'Artes Marciais';
+  const ehPontosFoco = ehMonge && f.nome === 'Foco do Monge';
+  const ehDesviarAtaques = ehMonge && (f.nome === 'Defletir Ataques' || f.nome === 'Defletir Energia');
+  const ehGolpeAtordoante = ehMonge && f.nome === 'Golpe Atordoante';
+  const estadoMonge = ehMonge ? getEstadoRecursosMonge() : null;
+
+  // Ladino: detecção de habilidades dedicadas
+  const ehLadino = char.classe === 'Ladino';
+  const ehAtaqueFurtivo = ehLadino && f.nome === 'Ataque Furtivo';
+  const ehGolpeSorte = ehLadino && f.nome === 'Golpe de Sorte';
+  const ehMaestriaLadino = ehLadino && f.nome === 'Maestria em Arma';
+  // Adaga Espiritual
+  const ehPoderPsionicoLadino = ehLadino && char.subclasse === 'Adaga Espiritual' && f.nome === 'Poder Psiônico';
+  const ehLaminasAlma = ehLadino && char.subclasse === 'Adaga Espiritual' && f.nome === 'Lâminas da Alma';
+  const ehVeuPsiquico = ehLadino && char.subclasse === 'Adaga Espiritual' && f.nome === 'Véu Psíquico';
+  const ehRasgarMente = ehLadino && char.subclasse === 'Adaga Espiritual' && f.nome === 'Rasgar Mente';
+  const estadoLadino = ehLadino ? getEstadoRecursosLadino() : null;
+
+  // Mago: detecção de habilidades dedicadas
+  const ehMago = char.classe === 'Mago';
+  const ehRecuperacaoArcana = ehMago && f.nome === 'Recuperação Arcana';
+  const ehAssinaturaMagica = ehMago && f.nome === 'Assinatura Mágica';
+  const estadoMago = ehMago ? getEstadoRecursosMago() : null;
+
+  if (ehLuzLabareda && (char.nivel || 1) >= 6) recarga = 'curto_ou_longo';
+
+  if (ehCanalizarDivindadeClerigo) {
+    const prog = getProgressaoClerigo();
+    if (prog?.canalizarDivindadeMax) usosMax = prog.canalizarDivindadeMax;
+  }
+
   const temMultiplosUsos = usosMax && usosMax > 1 && recarga;
+  const ehFuriaBarbaro = char.classe === 'Bárbaro' && f.nome === 'Fúria';
+  const ehMaestriaBarbaro = char.classe === 'Bárbaro' && f.nome === 'Maestria em Arma';
+  const ehAtaqueImprudente = char.classe === 'Bárbaro' && f.nome === 'Ataque Imprudente';
+  const estadoFuria = ehFuriaBarbaro ? getEstadoFuria() : null;
 
   // Para habilidades com múltiplos usos, usar contador
   let usosAtual = 0;
@@ -1752,6 +5715,14 @@ function renderFeatureItem(f, source) {
     }
   }
   const usado = temMultiplosUsos ? usosAtual >= usosMax : (char.usos_habilidades[key] || false);
+  const estadoClerigo = (ehCanalizarDivindadeClerigo || ehIntervencaoDivinaClerigo || ehIntervencaoDivinaMaiorClerigo || ehGolpesAbencoadosClerigo)
+    ? getEstadoRecursosClerigo()
+    : null;
+  const estadoSubclassesClerigo = (
+    ehGuerraAtaqueDirecionado || ehGuerraSacerdote || ehGuerraBencaoDeus ||
+    ehLuzBrilho || ehLuzLabareda || ehLuzCoroa ||
+    ehTrapacaBencao || ehTrapacaInvocar || ehVidaPreservar
+  ) ? getEstadoSubclassesClerigo() : null;
 
   const recargaBadge = recarga
     ? `<span class="badge" style="font-size:0.65rem;margin-left:4px;background:${recarga === 'longo' ? 'var(--info)' : recarga === 'curto' ? 'var(--success)' : 'var(--warning)'};color:#fff">${recarga === 'longo' ? '🌙 Desc. Longo' : recarga === 'curto' ? '☀ Desc. Curto' : '☀🌙 Curto/Longo'}</span>`
@@ -1763,7 +5734,604 @@ function renderFeatureItem(f, source) {
   // Renderizar controle de usos (fora do summary para acessibilidade)
   let usosHtmlSummary = '';
   let usosHtmlBody = '';
-  if (temMultiplosUsos) {
+
+  if (ehFuriaBarbaro && estadoFuria) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoFuria.usosDisponiveis}/${estadoFuria.usosMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm ${estadoFuria.ativa ? 'btn-secondary' : 'btn-danger'}" data-furia-toggle="${estadoFuria.ativa ? 'desativar' : 'ativar'}">
+          ${estadoFuria.ativa ? 'Encerrar Fúria' : 'Entrar em Fúria'}
+        </button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Dano da Fúria: +${estadoFuria.dano}</span>
+      </div>
+    `;
+  } else if (ehMaestriaBarbaro) {
+    const prog = getProgressaoBarbaro() || { maestriasMax: 0 };
+    const total = (char.maestrias_arma || []).length;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${total}/${prog.maestriasMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-config-maestrias="1">Definir Maestrias</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">${(char.maestrias_arma || []).join(', ') || 'Nenhuma selecionada'}</span>
+      </div>
+    `;
+  } else if (ehAtaqueImprudente) {
+    const ativo = ataqueImprudenteAtivo();
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm ${ativo ? 'btn-warning' : 'btn-secondary'}" data-imprudente-toggle="${ativo ? 'desativar' : 'ativar'}">
+          ${ativo ? 'Desativar Ataque Imprudente' : 'Ativar Ataque Imprudente'}
+        </button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Ajuste manual por turno</span>
+      </div>
+    `;
+  } else if (ehInimigoFavoritoGuardiao && estadoGuardiao) {
+    // Inimigo Favorito: usa o mesmo data-guardiao-acao do info-box
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoGuardiao.inimigoFavoritoDisponiveis}/${estadoGuardiao.inimigoFavoritoMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm ${estadoGuardiao.marcaPredadorAtiva ? 'btn-secondary' : 'btn-accent'}" data-guardiao-acao="${estadoGuardiao.marcaPredadorAtiva ? 'encerrar-marca' : 'usar-marca'}" ${(!estadoGuardiao.marcaPredadorAtiva && estadoGuardiao.inimigoFavoritoDisponiveis <= 0) ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>
+          ${estadoGuardiao.marcaPredadorAtiva ? 'Encerrar Marca' : 'Ativar Marca (sem espaço)'}
+        </button>
+        ${estadoGuardiao.marcaPredadorAtiva ? `<span style="font-size:0.75rem;color:var(--success)">Marca ativa (${estadoGuardiao.marcaPredadorDado})</span>` : ''}
+      </div>
+    `;
+  } else if (ehIncansavelGuardiao && estadoGuardiao && estadoGuardiao.incansavelAtivo) {
+    // Incansavel: usa o mesmo data-guardiao-acao do info-box
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoGuardiao.incansavelDisponiveis}/${estadoGuardiao.incansavelMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-secondary" data-guardiao-acao="incansavel" ${estadoGuardiao.incansavelDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Incansavel</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">d8 + mod Sabedoria PV temporarios</span>
+      </div>
+    `;
+  } else if (ehVeuNaturezaGuardiao && estadoGuardiao && estadoGuardiao.veuNaturezaAtivo) {
+    // Veu da Natureza: usa o mesmo data-guardiao-acao do info-box
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoGuardiao.veuNaturezaDisponiveis}/${estadoGuardiao.veuNaturezaMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-secondary" data-guardiao-acao="veu" ${estadoGuardiao.veuNaturezaDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Veu da Natureza</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Invisivel ate o final do proximo turno</span>
+      </div>
+    `;
+  } else if (ehFormaSelvagem && estadoDruida) {
+    // Forma Selvagem: usa o mesmo data-druida-forma-acao do info-box
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoDruida.usosDisponiveis}/${estadoDruida.usosMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm ${estadoDruida.formaSelvagemAtiva ? 'btn-secondary' : 'btn-accent'}" data-druida-forma-acao="${estadoDruida.formaSelvagemAtiva ? 'desativar' : 'ativar'}" ${(!estadoDruida.formaSelvagemAtiva && estadoDruida.usosDisponiveis <= 0) ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>
+          ${estadoDruida.formaSelvagemAtiva ? 'Encerrar Forma Selvagem' : 'Ativar Forma Selvagem'}
+        </button>
+      </div>
+    `;
+  } else if (ehInspiracaoBardo && estadoInspiracaoBardo) {
+    // Inspiracao de Bardo: usa o mesmo data-inspiracao-acao do info-box
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoInspiracaoBardo.usosDisponiveis}/${estadoInspiracaoBardo.usosMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-inspiracao-acao="usar" ${estadoInspiracaoBardo.usosDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Inspiracao (d${estadoInspiracaoBardo.dado})</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Recupera ${estadoInspiracaoBardo.recuperaCurto ? 'Descanso Curto' : 'Descanso Longo'}</span>
+      </div>
+    `;
+  } else if (ehAstuciaBruxo && estadoBruxoFeature) {
+    // Astucia Magica: usa o mesmo data-bruxo-astucia-acao do info-box
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoBruxoFeature.astuciaUsada ? 'Usada' : 'Disponivel'}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-bruxo-astucia-acao="usar" ${estadoBruxoFeature.astuciaUsada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Astucia Magica</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Recupera no Descanso Longo</span>
+      </div>
+    `;
+  } else if (ehCanalizarDivindadeClerigo && estadoClerigo) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoClerigo.canalizarDivindadeUsosDisponiveis}/${estadoClerigo.canalizarDivindadeMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-clerigo-cd-acao="centelha" ${estadoClerigo.canalizarDivindadeUsosDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Centelha Divina</button>
+        <button class="btn btn-sm btn-secondary" data-clerigo-cd-acao="expulsar" ${estadoClerigo.canalizarDivindadeUsosDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Expulsar Mortos-Vivos</button>
+        ${char.nivel >= 5 ? `<button class="btn btn-sm btn-accent" data-clerigo-cd-acao="fulminar" ${estadoClerigo.canalizarDivindadeUsosDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Fulminar Mortos-Vivos</button>` : ''}
+      </div>
+    `;
+  } else if (ehGolpesAbencoadosClerigo && estadoClerigo) {
+    const opcaoAtual = char.recursos?.clerigo?.golpes_abencoados_opcao || '';
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm ${opcaoAtual === 'Conjuração Poderosa' ? 'btn-accent' : 'btn-secondary'}" data-clerigo-golpes-opcao="Conjuração Poderosa">Conjuração Poderosa</button>
+        <button class="btn btn-sm ${opcaoAtual === 'Golpe Divino' ? 'btn-accent' : 'btn-secondary'}" data-clerigo-golpes-opcao="Golpe Divino">Golpe Divino</button>
+      </div>
+    `;
+  } else if (ehIntervencaoDivinaClerigo && estadoClerigo) {
+    const bloqueada = estadoClerigo.intervencaoDivinaBloqueada;
+    const restantes = estadoClerigo.intervencaoDivinaDescansosRestantes;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${bloqueada ? 'Em recarga' : 'Disponível'}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm ${bloqueada ? 'btn-secondary' : 'btn-primary'}" data-clerigo-intervencao="normal" ${bloqueada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Intervenção Divina</button>
+        ${bloqueada && restantes > 0 ? `<span style="font-size:0.75rem;color:var(--warning)">Recarrega em ${restantes} descanso(s) longo(s)</span>` : ''}
+      </div>
+    `;
+  } else if (ehIntervencaoDivinaMaiorClerigo && estadoClerigo) {
+    const bloqueada = estadoClerigo.intervencaoDivinaBloqueada;
+    const restantes = estadoClerigo.intervencaoDivinaDescansosRestantes;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${bloqueada ? 'Em recarga' : 'Disponível'}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm ${bloqueada ? 'btn-secondary' : 'btn-primary'}" data-clerigo-intervencao="normal" ${bloqueada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Intervenção (normal)</button>
+        <button class="btn btn-sm ${bloqueada ? 'btn-secondary' : 'btn-danger'}" data-clerigo-intervencao="desejo" ${bloqueada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Intervenção Maior (Desejo)</button>
+        ${bloqueada && restantes > 0 ? `<span style="font-size:0.75rem;color:var(--warning)">Recarrega em ${restantes} descanso(s) longo(s)</span>` : ''}
+      </div>
+    `;
+  } else if (ehGuerraAtaqueDirecionado && estadoClerigo && estadoSubclassesClerigo) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">CD ${estadoClerigo.canalizarDivindadeUsosDisponiveis}/${estadoClerigo.canalizarDivindadeMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-clerigo-subclasse-acao="guerra_ataque_direcionado" ${estadoClerigo.canalizarDivindadeUsosDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Ataque Direcionado</button>
+      </div>
+    `;
+  } else if (ehGuerraSacerdote && estadoSubclassesClerigo) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoSubclassesClerigo.guerra.sacerdoteUsosDisponiveis}/${estadoSubclassesClerigo.guerra.sacerdoteUsosMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-clerigo-subclasse-acao="guerra_sacerdote_guerra" ${estadoSubclassesClerigo.guerra.sacerdoteUsosDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Sacerdote da Guerra</button>
+      </div>
+    `;
+  } else if (ehGuerraBencaoDeus && estadoClerigo) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">CD ${estadoClerigo.canalizarDivindadeUsosDisponiveis}/${estadoClerigo.canalizarDivindadeMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-clerigo-subclasse-acao="guerra_bencao_deus" ${estadoClerigo.canalizarDivindadeUsosDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Bênção do Deus da Guerra</button>
+      </div>
+    `;
+  } else if (ehLuzBrilho && estadoClerigo) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">CD ${estadoClerigo.canalizarDivindadeUsosDisponiveis}/${estadoClerigo.canalizarDivindadeMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-clerigo-subclasse-acao="luz_brilho_amanhecer" ${estadoClerigo.canalizarDivindadeUsosDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Brilho do Amanhecer</button>
+      </div>
+    `;
+  } else if (ehLuzLabareda && estadoSubclassesClerigo) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoSubclassesClerigo.luz.labaredaUsosDisponiveis}/${estadoSubclassesClerigo.luz.labaredaUsosMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-clerigo-subclasse-acao="luz_labareda_protetora" ${estadoSubclassesClerigo.luz.labaredaUsosDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Labareda Protetora</button>
+      </div>
+    `;
+  } else if (ehLuzCoroa && estadoSubclassesClerigo) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoSubclassesClerigo.luz.coroaUsosDisponiveis}/${estadoSubclassesClerigo.luz.coroaUsosMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-clerigo-subclasse-acao="luz_coroa_luz" ${estadoSubclassesClerigo.luz.coroaUsosDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Coroa de Luz</button>
+      </div>
+    `;
+  } else if (ehTrapacaBencao && estadoSubclassesClerigo) {
+    const ativaBencao = estadoSubclassesClerigo.trapaca.bencaoTrapaceiroAtiva;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${ativaBencao ? 'Ativa' : 'Inativa'}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm ${ativaBencao ? 'btn-secondary' : 'btn-primary'}" data-clerigo-subclasse-acao="trapaca_bencao_toggle">${ativaBencao ? 'Encerrar Bênção' : 'Ativar Bênção'}</button>
+      </div>
+    `;
+  } else if (ehTrapacaInvocar && estadoClerigo && estadoSubclassesClerigo) {
+    const ativaDup = estadoSubclassesClerigo.trapaca.invocarDuplicidadeAtiva;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${ativaDup ? 'Ativa' : 'Inativa'}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm ${ativaDup ? 'btn-secondary' : 'btn-primary'}" data-clerigo-subclasse-acao="trapaca_invocar_duplicidade" ${(estadoClerigo.canalizarDivindadeUsosDisponiveis <= 0 && !ativaDup) ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${ativaDup ? 'Encerrar Duplicidade' : 'Invocar Duplicidade'}</button>
+        ${!ativaDup ? `<span style="font-size:0.75rem;color:var(--text-muted)">Consome 1 Canalizar Divindade</span>` : ''}
+      </div>
+    `;
+  } else if (ehVidaPreservar && estadoClerigo) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">CD ${estadoClerigo.canalizarDivindadeUsosDisponiveis}/${estadoClerigo.canalizarDivindadeMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-clerigo-subclasse-acao="vida_preservar_vida" ${estadoClerigo.canalizarDivindadeUsosDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Preservar a Vida</button>
+      </div>
+    `;
+  } else if (ehFeiticariaInata && estadoFeiticeiro) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoFeiticeiro.feiticariaInataUsosDisponiveis}/${estadoFeiticeiro.feiticariaInataUsosMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm ${estadoFeiticeiro.feiticariaInataAtiva ? 'btn-secondary' : 'btn-primary'}" data-feiticeiro-acao="${estadoFeiticeiro.feiticariaInataAtiva ? 'encerrar-feiticaria-inata' : 'ativar-feiticaria-inata'}" ${(estadoFeiticeiro.feiticariaInataUsosDisponiveis <= 0 && !estadoFeiticeiro.feiticariaInataAtiva && (char.nivel || 1) < 7) ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${estadoFeiticeiro.feiticariaInataAtiva ? 'Encerrar' : 'Ativar'}</button>
+      </div>
+    `;
+  } else if (ehFonteMagia && estadoFeiticeiro) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">PF ${estadoFeiticeiro.pontosAtuais}/${estadoFeiticeiro.pontosMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-secondary" data-feiticeiro-acao="converter-slot-ponto">Slot → PF</button>
+        <button class="btn btn-sm btn-secondary" data-feiticeiro-acao="converter-ponto-slot">PF → Slot</button>
+      </div>
+    `;
+  } else if (ehMetamagia && estadoFeiticeiro) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoFeiticeiro.metamagias.length} opção(ões)</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-secondary" data-feiticeiro-acao="metamagia-config">Gerenciar Metamagia</button>
+        <button class="btn btn-sm btn-primary" data-feiticeiro-acao="metamagia-gastar">Gastar PF</button>
+      </div>
+    `;
+  } else if (ehRestauracaoFeiticeira && estadoFeiticeiro) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoFeiticeiro.restauracaoFeiticeiraUsada ? 'Usada' : 'Disponível'}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-feiticeiro-acao="restauracao-feiticeira" ${estadoFeiticeiro.restauracaoFeiticeiraUsada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Recuperar PF</button>
+      </div>
+    `;
+  } else if (ehFalaTelepatica) {
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-feiticeiro-acao="fala-telepatica">Iniciar Telepatia</button>
+      </div>
+    `;
+  } else if (ehRevelacaoCarne) {
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-feiticeiro-acao="revelacao-carne">Ativar Revelação em Carne</button>
+      </div>
+    `;
+  } else if (ehAfinidadeElemental && estadoFeiticeiro) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoFeiticeiro.subclasses.draconica.afinidade_elemental || 'Não definida'}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-feiticeiro-acao="afinidade-elemental">Definir Afinidade</button>
+      </div>
+    `;
+  } else if (ehAsasDragao && estadoFeiticeiro) {
+    const ativa = !!estadoFeiticeiro.subclasses.draconica.asas_ativas;
+    const usada = !!estadoFeiticeiro.subclasses.draconica.asas_usada_desde_descanso;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${ativa ? 'Ativas' : (usada ? 'Gasta' : 'Disponível')}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm ${ativa ? 'btn-secondary' : 'btn-primary'}" data-feiticeiro-acao="${ativa ? 'desativar-asas-dragao' : 'ativar-asas-dragao'}">${ativa ? 'Recolher Asas' : 'Abrir Asas'}</button>
+      </div>
+    `;
+  } else if (ehCompanheiroDraconico && estadoFeiticeiro) {
+    const usada = !!estadoFeiticeiro.subclasses.draconica.companheiro_draconico_usado;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${usada ? 'Gasto' : 'Disponível'}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-feiticeiro-acao="companheiro-draconico" ${usada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Conjurar Invocar Dragão (grátis)</button>
+      </div>
+    `;
+  } else if (ehRestaurarEquilibrio && estadoFeiticeiro) {
+    const max = estadoFeiticeiro.modCar;
+    const gastos = estadoFeiticeiro.subclasses.mecanica.restaurar_equilibrio_usos_gastos || 0;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${Math.max(0, max - gastos)}/${max}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-feiticeiro-acao="restaurar-equilibrio" ${gastos >= max ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Restaurar Equilíbrio</button>
+      </div>
+    `;
+  } else if (ehBastiaoLei && estadoFeiticeiro) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">Escudo: ${estadoFeiticeiro.subclasses.mecanica.bastiao_dados || 0}d8</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-feiticeiro-acao="bastiao-lei">Criar Bastião da Lei</button>
+      </div>
+    `;
+  } else if (ehTranseOrdem && estadoFeiticeiro) {
+    const ativo = !!estadoFeiticeiro.subclasses.mecanica.transe_ordem_ativo;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${ativo ? 'Ativo' : 'Inativo'}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm ${ativo ? 'btn-secondary' : 'btn-primary'}" data-feiticeiro-acao="${ativo ? 'desativar-transe-ordem' : 'ativar-transe-ordem'}">${ativo ? 'Encerrar Transe' : 'Ativar Transe'}</button>
+      </div>
+    `;
+  } else if (ehMaresCaos && estadoFeiticeiro) {
+    const disponivel = !!estadoFeiticeiro.subclasses.selvagem.mares_caos_disponivel;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${disponivel ? 'Disponível' : 'Indisponível'}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-feiticeiro-acao="mares-caos" ${!disponivel ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Marés do Caos</button>
+      </div>
+    `;
+  } else if (ehDistorcerSorte && estadoFeiticeiro) {
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-feiticeiro-acao="distorcer-sorte" ${estadoFeiticeiro.pontosAtuais < 1 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Distorcer a Sorte (-1 PF)</button>
+      </div>
+    `;
+  } else if (ehSurtoControlado && estadoFeiticeiro) {
+    const usado = !!estadoFeiticeiro.subclasses.selvagem.surto_controlado_usado;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${usado ? 'Gasto' : 'Disponível'}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-feiticeiro-acao="surto-controlado" ${usado ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Surto Controlado</button>
+      </div>
+    `;
+  } else if (ehRecuperarFolegoGuerreiro && estadoGuerreiro) {
+    // Recuperar Fôlego: botão dedicado com contador de usos
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoGuerreiro.recuperarFolegoDisponiveis}/${estadoGuerreiro.recuperarFolegoMax}</span>`;
+    const curaFormula = `1d10 + ${char.nivel || 1}`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-guerreiro-acao="usar-folego" ${estadoGuerreiro.recuperarFolegoDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Recuperar Folego</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Cura: ${curaFormula} PV (Acao Bonus)</span>
+      </div>
+    `;
+    recarga = 'curto_ou_longo';
+  } else if (ehSurtoAcaoGuerreiro && estadoGuerreiro) {
+    // Surto de Ação: botão de usar com controle
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoGuerreiro.surtoDisponiveis}/${estadoGuerreiro.surtoMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-guerreiro-acao="usar-surto" ${estadoGuerreiro.surtoDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Surto de Acao</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">1 acao adicional (exceto Usar Magia)</span>
+      </div>
+    `;
+    recarga = 'curto_ou_longo';
+  } else if (ehIndomavelGuerreiro && estadoGuerreiro && estadoGuerreiro.indomavelMax > 0) {
+    // Indomável: botão de usar com contador
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoGuerreiro.indomavelDisponiveis}/${estadoGuerreiro.indomavelMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-danger" data-guerreiro-acao="usar-indomavel" ${estadoGuerreiro.indomavelDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Indomavel</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Bonus: +${char.nivel || 1} na salvaguarda</span>
+      </div>
+    `;
+    recarga = 'longo';
+  } else if (ehSuperioridadeCombate && estadoGuerreiro && estadoGuerreiro.dadosSuperioridadeMax > 0) {
+    // Mestre da Batalha: Dados de Superioridade
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoGuerreiro.dadosSuperioridadeDisponiveis}/${estadoGuerreiro.dadosSuperioridadeMax} ${estadoGuerreiro.tipoDadoSuperioridade}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-guerreiro-acao="usar-superioridade" ${estadoGuerreiro.dadosSuperioridadeDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Dado de Superioridade</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">CD: ${estadoGuerreiro.cdSuperioridade} | Manobras: ${estadoGuerreiro.manobrasConhecidas}</span>
+      </div>
+      ${estadoGuerreiro.implacavelAtivo ? '<div style="font-size:0.72rem;color:var(--text-muted);padding:2px 0 0 16px">Implacável: 1x/turno role 1d8 grátis em vez de gastar dado.</div>' : ''}
+    `;
+    recarga = 'curto_ou_longo';
+  } else if (ehConhecaInimigo && estadoGuerreiro) {
+    // Mestre da Batalha: Conheça Seu Inimigo (nível 7+)
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoGuerreiro.conhecaInimigoUsado ? 'Usado' : 'Disponível'}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-guerreiro-acao="conheca-inimigo" ${estadoGuerreiro.conhecaInimigoUsado ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Conheça Seu Inimigo</button>
+        <button class="btn btn-sm btn-secondary" data-guerreiro-acao="conheca-inimigo-dado" ${estadoGuerreiro.dadosSuperioridadeDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Recuperar (gasta 1 Dado)</button>
+      </div>
+    `;
+    recarga = 'longo';
+  } else if (ehPoderPsionicoGuerreiro && estadoGuerreiro && estadoGuerreiro.dadosPsionicosMaxG > 0) {
+    // Combatente Psíquico: Dados de Energia Psiônica
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoGuerreiro.dadosPsionicosDisponiveisG}/${estadoGuerreiro.dadosPsionicosMaxG} ${estadoGuerreiro.tipoDadoPsionicoG}</span>`;
+    const semDados = estadoGuerreiro.dadosPsionicosDisponiveisG <= 0;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-guerreiro-acao="golpe-psionico" ${semDados ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Golpe Psiônico</button>
+        <button class="btn btn-sm btn-accent" data-guerreiro-acao="vinculo-protetivo" ${semDados ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Vínculo Protetivo</button>
+        <button class="btn btn-sm btn-secondary" data-guerreiro-acao="movimento-telecinetico" ${estadoGuerreiro.movimentoTelecineticoUsado && semDados ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${estadoGuerreiro.movimentoTelecineticoUsado ? 'Mov. Telecinético (gasta dado)' : 'Mov. Telecinético (grátis)'}</button>
+      </div>
+      <div style="font-size:0.72rem;color:var(--text-muted);padding:2px 0 0 16px">
+        Golpe: +${estadoGuerreiro.tipoDadoPsionicoG}+mod INT dano Energético | Vínculo: Reação, reduz dano em ${estadoGuerreiro.tipoDadoPsionicoG}+mod INT
+      </div>
+    `;
+    recarga = 'curto_ou_longo';
+  } else if (ehAdeptoTelecinetico && estadoGuerreiro) {
+    // Combatente Psíquico: Adepto Telecinético (nível 7)
+    const semDados = estadoGuerreiro.dadosPsionicosDisponiveisG <= 0;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoGuerreiro.saltoImpulsaoUsado ? 'Salto Usado' : 'Salto Disponível'}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-guerreiro-acao="salto-impulsao" ${estadoGuerreiro.saltoImpulsaoUsado && semDados ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${estadoGuerreiro.saltoImpulsaoUsado ? 'Salto Psíquico (gasta dado)' : 'Salto Psíquico (grátis)'}</button>
+      </div>
+      <div style="font-size:0.72rem;color:var(--text-muted);padding:2px 0 0 16px">
+        Estocada: alvo faz salv. FOR ou cai Caído/empurrado 3m. Salto: Ação Bônus, Voo = 2x Deslocamento no turno.
+      </div>
+    `;
+    recarga = 'curto_ou_longo';
+  } else if (ehBaluarteEnergia && estadoGuerreiro) {
+    // Combatente Psíquico: Baluarte de Energia (nível 15)
+    const semDados = estadoGuerreiro.dadosPsionicosDisponiveisG <= 0;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoGuerreiro.baluarteUsado ? 'Usado' : 'Disponível'}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-guerreiro-acao="baluarte" ${estadoGuerreiro.baluarteUsado && semDados ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${estadoGuerreiro.baluarteUsado ? 'Usar Baluarte (gasta dado)' : 'Usar Baluarte (grátis)'}</button>
+      </div>
+    `;
+    recarga = 'longo';
+  } else if (ehMestreTelecinetico && estadoGuerreiro) {
+    // Combatente Psíquico: Mestre Telecinético (nível 18)
+    const semDados = estadoGuerreiro.dadosPsionicosDisponiveisG <= 0;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoGuerreiro.mestreTelecineticoUsado ? 'Usado' : 'Disponível'}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-guerreiro-acao="mestre-telecinetico" ${estadoGuerreiro.mestreTelecineticoUsado && semDados ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${estadoGuerreiro.mestreTelecineticoUsado ? 'Telecinese (gasta dado)' : 'Conjurar Telecinese (grátis)'}</button>
+      </div>
+    `;
+    recarga = 'longo';
+  } else if (ehMaestriaGuerreiro && estadoGuerreiro) {
+    // Maestria em Arma: mostra contador de maestrias
+    const total = (char.maestrias_arma || []).length;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${total}/${estadoGuerreiro.maestriasMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-config-maestrias="1">Definir Maestrias</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">${(char.maestrias_arma || []).join(', ') || 'Nenhuma selecionada'}</span>
+      </div>
+    `;
+  } else if (ehMaestriaGuardiao) {
+    // Guardião: Maestria em Arma fixa em 2
+    const total = (char.maestrias_arma || []).length;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${total}/2</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-config-maestrias="1">Definir Maestrias</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">${(char.maestrias_arma || []).join(', ') || 'Nenhuma selecionada'}</span>
+      </div>
+    `;
+  } else if (ehMaestriaPaladino) {
+    // Paladino: Maestria em Arma fixa em 2
+    const total = (char.maestrias_arma || []).length;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${total}/2</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-config-maestrias="1">Definir Maestrias</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">${(char.maestrias_arma || []).join(', ') || 'Nenhuma selecionada'}</span>
+      </div>
+    `;
+  } else if (ehMaestriaLadino) {
+    // Ladino: Maestria em Arma fixa em 2
+    const total = (char.maestrias_arma || []).length;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${total}/2</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-config-maestrias="1">Definir Maestrias</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">${(char.maestrias_arma || []).join(', ') || 'Nenhuma selecionada'}</span>
+      </div>
+    `;
+  } else if (ehPoderPsionicoLadino && estadoLadino && estadoLadino.dadosPsionicosMaxL > 0) {
+    // Adaga Espiritual: Dados de Energia Psiônica
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoLadino.dadosPsionicosDisponiveisL}/${estadoLadino.dadosPsionicosMaxL} ${estadoLadino.tipoDadoPsionicoL}</span>`;
+    const semDadosL = estadoLadino.dadosPsionicosDisponiveisL <= 0;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-ladino-acao="gastar-dado-psionico">Gastar Dado Psiônico</button>
+        <button class="btn btn-sm btn-secondary" data-ladino-acao="sussurros" ${estadoLadino.sussurrosGratisUsado && semDadosL ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${estadoLadino.sussurrosGratisUsado ? 'Sussurros (gasta dado)' : 'Sussurros Psíquicos (grátis)'}</button>
+      </div>
+      <div style="font-size:0.72rem;color:var(--text-muted);padding:2px 0 0 16px">
+        Aptidão Reforçada: ao falhar perícia, role dado (gasto só se acertar). Sussurros: telepatia por ${estadoLadino.tipoDadoPsionicoL} horas.
+      </div>
+    `;
+    recarga = 'curto_ou_longo';
+  } else if (ehLaminasAlma && estadoLadino) {
+    // Adaga Espiritual: Lâminas da Alma (nível 9)
+    const semDadosL = estadoLadino.dadosPsionicosDisponiveisL <= 0;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">Dados: ${estadoLadino.dadosPsionicosDisponiveisL}/${estadoLadino.dadosPsionicosMaxL}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-ladino-acao="teleporte-psiquico" ${semDadosL ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Teleporte Psíquico</button>
+      </div>
+      <div style="font-size:0.72rem;color:var(--text-muted);padding:2px 0 0 16px">
+        Golpes Teleguiados: ao errar ataque com Lâmina, role dado (gasto só se acertar). Teleporte: gasta dado, teleporta 3x resultado metros.
+      </div>
+    `;
+  } else if (ehVeuPsiquico && estadoLadino) {
+    // Adaga Espiritual: Véu Psíquico (nível 13)
+    const semDadosL = estadoLadino.dadosPsionicosDisponiveisL <= 0;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoLadino.veuPsiquicoUsado ? 'Usado' : 'Disponível'}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-ladino-acao="veu-psiquico" ${estadoLadino.veuPsiquicoUsado && semDadosL ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${estadoLadino.veuPsiquicoUsado ? 'Véu Psíquico (gasta dado)' : 'Véu Psíquico (grátis)'}</button>
+      </div>
+    `;
+    recarga = 'longo';
+  } else if (ehRasgarMente && estadoLadino) {
+    // Adaga Espiritual: Rasgar Mente (nível 17)
+    const semDadosL = estadoLadino.dadosPsionicosDisponiveisL < 3;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoLadino.rasgarMenteUsado ? 'Usado' : 'Disponível'}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-danger" data-ladino-acao="rasgar-mente" ${estadoLadino.rasgarMenteUsado && semDadosL ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${estadoLadino.rasgarMenteUsado ? 'Rasgar Mente (gasta 3 dados)' : 'Rasgar Mente (grátis)'}</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">CD: ${estadoLadino.cdPsionicaAdaga} (Sab) | Atordoado 1 min</span>
+      </div>
+    `;
+    recarga = 'longo';
+  } else if (ehMaosConsagradasPaladino && estadoPaladino) {
+    // Mãos Consagradas: mostra reserva de PV
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoPaladino.maosAtuais}/${estadoPaladino.maosMax} PV</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-paladino-acao="maos-consagradas" ${estadoPaladino.maosAtuais <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Mãos Consagradas</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Ação Bônus | Reserva: ${estadoPaladino.maosAtuais} PV</span>
+      </div>
+    `;
+    recarga = 'longo';
+  } else if (ehCanalizarPaladino && estadoPaladino && estadoPaladino.canalizarMax > 0) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoPaladino.canalizarDisponiveis}/${estadoPaladino.canalizarMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-paladino-acao="canalizar" ${estadoPaladino.canalizarDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Canalizar Divindade</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Recupera 1 uso por Descanso Curto</span>
+      </div>
+    `;
+    recarga = 'curto_ou_longo';
+  } else if (ehDestruicaoPaladino && estadoPaladino) {
+    usosHtmlSummary = estadoPaladino.destruicaoGratuitaAtiva ? `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoPaladino.destruicaoGratuitaUsada ? 'Usada' : 'Disponível'}</span>` : '';
+    usosHtmlBody = estadoPaladino.destruicaoGratuitaAtiva ? `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-paladino-acao="destruicao-gratuita" ${estadoPaladino.destruicaoGratuitaUsada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Destruição Gratuita (sem espaço)</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">1x por Descanso Longo</span>
+      </div>
+    ` : '';
+    recarga = 'longo';
+  } else if (ehAuraProtecaoPaladino && estadoPaladino && estadoPaladino.auraProtecaoAtiva) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">+${estadoPaladino.bonusAura} (${estadoPaladino.auraRaio}m)</span>`;
+    usosHtmlBody = `
+      <div style="padding:4px 0 4px 16px;font-size:0.8rem;color:var(--text-muted)">
+        Bônus nas salvaguardas = mod Carisma (+${estadoPaladino.bonusAura}) para você e aliados em ${estadoPaladino.auraRaio}m.
+        ${estadoPaladino.auraCoragemAtiva ? ' Inclui imunidade a Amedrontado.' : ''}
+      </div>
+    `;
+  } else if (ehGolpesRadiantesPaladino && estadoPaladino && estadoPaladino.golpesRadiantesAtivo) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">+1d8 Radiante</span>`;
+  } else if (ehArtesMarciais && estadoMonge) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">d${estadoMonge.dadoArtesMarciais}</span>`;
+    usosHtmlBody = `
+      <div style="padding:4px 0 4px 16px;font-size:0.8rem;color:var(--text-muted)">
+        Dado de dano: d${estadoMonge.dadoArtesMarciais} | Ataque Desarmado como Ação Bônus | Usar Destreza para ataque/dano
+      </div>
+    `;
+  } else if (ehPontosFoco && estadoMonge && estadoMonge.pontosMax > 0) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoMonge.pontosAtuais}/${estadoMonge.pontosMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-monge-acao="gastar-ponto" ${estadoMonge.pontosAtuais <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Gastar Ponto</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">CD ${estadoMonge.cdFoco} | Recupera todos no Descanso Curto</span>
+      </div>
+    `;
+    recarga = 'curto_ou_longo';
+  } else if (ehDesviarAtaques && estadoMonge && estadoMonge.desviarAtivo) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">Reduz ${estadoMonge.desviarReducao}</span>`;
+  } else if (ehGolpeAtordoante && estadoMonge && estadoMonge.golpeAtordoanteAtivo) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">CD ${estadoMonge.cdFoco}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-monge-acao="golpe-atordoante" ${estadoMonge.pontosAtuais <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Golpe Atordoante (1 PF)</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Salvaguarda Constituição CD ${estadoMonge.cdFoco}</span>
+      </div>
+    `;
+  } else if (ehAtaqueFurtivo && estadoLadino) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoLadino.furtivoTexto}</span>`;
+    usosHtmlBody = `
+      <div style="padding:4px 0 4px 16px;font-size:0.8rem;color:var(--text-muted)">
+        Dano extra: ${estadoLadino.furtivoTexto} | 1x/turno com Vantagem ou aliado adjacente ao alvo
+        ${estadoLadino.golpeAstutoAtivo ? `<br>Golpe Astuto (CD ${estadoLadino.cdGolpeAstuto}): Envenenar/Retirada/Tropeço (removem dados do Furtivo)` : ''}
+        ${estadoLadino.golpeAprimoradoAtivo ? '<br>Golpe Astuto Aprimorado: 2 efeitos simultâneos' : ''}
+        ${estadoLadino.golpesSujosAtivo ? '<br>Golpes Sujos: Aturdir (2d6) / Nocaute (6d6) / Obscurecer (3d6)' : ''}
+      </div>
+    `;
+  } else if (ehGolpeSorte && estadoLadino && estadoLadino.golpeSorteAtivo) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoLadino.golpeSorteUsado ? 'Usado' : 'Disponível'}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-ladino-acao="golpe-sorte" ${estadoLadino.golpeSorteUsado ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Golpe de Sorte</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Falha vira 20 | 1x por Descanso Curto/Longo</span>
+      </div>
+    `;
+    recarga = 'curto_ou_longo';
+  } else if (ehRecuperacaoArcana && estadoMago) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoMago.recuperacaoArcanaUsada ? 'Usada' : 'Disponível'}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-mago-acao="recuperacao-arcana" ${estadoMago.recuperacaoArcanaUsada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Recuperação Arcana</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Até ${estadoMago.recuperacaoArcanaMax}º combinado | Máx 5º círculo | Descanso Curto</span>
+      </div>
+    `;
+    recarga = 'longo';
+  } else if (ehAssinaturaMagica && estadoMago && estadoMago.assinaturaMagicaAtiva) {
+    const disp1 = estadoMago.assinatura1Usada ? 'Usada' : 'Pronta';
+    const disp2 = estadoMago.assinatura2Usada ? 'Usada' : 'Pronta';
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${disp1} / ${disp2}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-mago-acao="assinatura-1" ${estadoMago.assinatura1Usada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Assinatura 1</button>
+        <button class="btn btn-sm btn-primary" data-mago-acao="assinatura-2" ${estadoMago.assinatura2Usada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Assinatura 2</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">3º círculo sem espaço | Curto/Longo</span>
+      </div>
+    `;
+    recarga = 'curto_ou_longo';
+  }
+
+  if (!usosHtmlBody && temMultiplosUsos) {
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${usosMax - usosAtual}/${usosMax}</span>`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:4px;padding:4px 0 4px 16px">
@@ -1772,7 +6340,7 @@ function renderFeatureItem(f, source) {
         </button>
       </div>
     `;
-  } else if (ativa && recarga) {
+  } else if (!usosHtmlBody && ativa && recarga) {
     usosHtmlBody = `
       <div class="no-print" style="padding:4px 0 4px 16px">
         <button class="btn btn-sm" style="padding:2px 8px;font-size:0.7rem;${usado ? 'opacity:0.5' : ''}" data-toggle-uso="${key}">
@@ -1821,6 +6389,13 @@ function renderSecaoCaracteristicas() {
       (scAtual?.caracteristicas || []).forEach(f => featsSelecionada.add(f.nome));
     }
     feats = feats.filter(f => !featsOutras.has(f.nome) || featsSelecionada.has(f.nome));
+
+    // Evita duplicidade com seção de subclasse ativa
+    if (char.subclasse) {
+      const scAtual = classeData.subclasses.find(s => s.nome === char.subclasse);
+      const featsSC = new Set((scAtual?.caracteristicas || []).filter(c => c.nivel <= char.nivel).map(c => `${c.nivel}|${c.nome}`));
+      feats = feats.filter(f => !featsSC.has(`${f.nivel}|${f.nome}`));
+    }
   }
 
   const passivas = feats.filter(f => !ehHabilidadeAtiva(f.descricao));
@@ -2026,6 +6601,33 @@ function achatarMagiasClasse(magiasClasseData) {
   return resultado;
 }
 
+async function obterMagiasDisponiveisClasseAtual() {
+  // Subclasses conjuradoras (Cavaleiro Místico e Trapaceiro Arcano) usam a lista de magias do Mago
+  let classeParaMagias = char.classe;
+  if (ehSubclasseConjuradora()) {
+    classeParaMagias = 'Mago';
+  }
+  const magiasClasseData = await getMagiasClasse(classeParaMagias);
+  const base = achatarMagiasClasse(magiasClasseData);
+
+  if (!ehBardoComSegredosMagicos()) return base;
+
+  const extrasClasses = ['Clérigo', 'Druida', 'Mago'];
+  const extras = [];
+  for (const classe of extrasClasses) {
+    const data = await getMagiasClasse(classe);
+    extras.push(...achatarMagiasClasse(data));
+  }
+
+  const mapa = new Map();
+  [...base, ...extras].forEach(m => {
+    const chave = `${m.nome}|${m.circulo || 0}`;
+    if (!mapa.has(chave)) mapa.set(chave, m);
+  });
+
+  return [...mapa.values()];
+}
+
 // Retorna badges HTML compactos com metadados da magia (tipo, tempo, alcance, duração)
 function badgesMagiaRapidos(nomeMagia) {
   if (!indiceMagiasCache?.length) return '';
@@ -2078,20 +6680,30 @@ function badgesMagiaRapidos(nomeMagia) {
 
 function renderSecaoMagias() {
   const info = CLASSES_INFO[char.classe];
-  const tipoConj = info.tipo_conjuracao || 'preparadas';
+  const subConj = getSubclasseConjuradoraConjuracao();
+  const tipoConj = info.tipo_conjuracao || (subConj ? 'preparadas' : 'preparadas');
   const truques = (char.magias_conhecidas || []).filter(m => m.circulo === 0);
   const preparadas = char.magias_preparadas || [];
   const espacos = char.espacos_magia || {};
 
   // Calcular limites de magias preparadas/conhecidas e truques
-  const maxPreparadas = classeData?.tabela_caracteristicas
+  // Para subclasses conjuradoras (Cavaleiro Místico / Trapaceiro Arcano), usar tabela da subclasse
+  let maxPreparadas = classeData?.tabela_caracteristicas
     ? getMagiaPreparadas(classeData.tabela_caracteristicas, char.nivel) : 0;
-  const maxTruques = classeData?.tabela_caracteristicas
+  let maxTruques = classeData?.tabela_caracteristicas
     ? getTruquesConhecidos(classeData.tabela_caracteristicas, char.nivel) : 0;
 
-  // Contar magias preparadas excluindo as de domínio (que não contam no limite)
-  const preparadasNormais = preparadas.filter(m => m.origem !== 'dominio');
-  const preparadasDominio = preparadas.filter(m => m.origem === 'dominio');
+  // Fallback para subclasses conjuradoras se a tabela principal não tem colunas de magias
+  if (subConj && maxPreparadas === 0) {
+    maxPreparadas = subConj.preparadas || 0;
+  }
+  if (subConj && maxTruques === 0) {
+    maxTruques = subConj.truques || 0;
+  }
+
+  // Contar magias preparadas excluindo as especiais (não contam no limite)
+  const preparadasNormais = preparadas.filter(m => magiaContaNoLimite(m));
+  const preparadasEspeciais = preparadas.filter(m => magiaEhEspecial(m));
   const numPreparadas = preparadasNormais.length;
 
   // Label dinâmico baseado no tipo de conjuração
@@ -2133,10 +6745,10 @@ function renderSecaoMagias() {
             <span class="contador-valor">${numPreparadas} / ${maxPreparadas}</span>
           </div>
         ` : ''}
-        ${preparadasDominio.length > 0 ? `
+        ${preparadasEspeciais.length > 0 ? `
           <div class="magia-contador contador-dominio">
-            <span class="contador-label">Domínio</span>
-            <span class="contador-valor">${preparadasDominio.length}</span>
+            <span class="contador-label">Especiais</span>
+            <span class="contador-valor">${preparadasEspeciais.length}</span>
           </div>
         ` : ''}
         ${ehMago ? `
@@ -2174,19 +6786,20 @@ function renderSecaoMagias() {
           </summary>
           <div style="padding-top:4px">
             ${magias.map(m => {
-              const ehDominio = m.origem === 'dominio';
+              const ehEspecial = magiaEhEspecial(m);
+              const origemLabel = rotuloOrigemMagia(m);
               const circulos = Object.keys(espacos).filter(c => parseInt(c) >= m.circulo).sort((a, b) => parseInt(a) - parseInt(b));
               const temUpcast = circulos.length > 1;
               const todosEsgotados = circulos.every(c => (espacos[c]?.usados || 0) >= (espacos[c]?.total || 0));
               return `
-              <div class="magia-item preparada ${ehDominio ? 'magia-dominio' : ''}" data-magia-nome="${m.nome}" data-magia-circ="${m.circulo}">
+              <div class="magia-item preparada ${ehEspecial ? 'magia-dominio' : ''}" data-magia-nome="${m.nome}" data-magia-circ="${m.circulo}">
                 <div style="display:flex;justify-content:space-between;align-items:center">
                   <div>
                     <div class="magia-nome">
-                      ${ehDominio ? '<span class="badge-dominio" title="Magia de Domínio - Sempre Preparada">&#9733;</span> ' : ''}${m.nome}
+                      ${ehEspecial ? `<span class="badge-dominio" title="${origemLabel}">&#9733;</span> ` : ''}${m.nome}
                     </div>
                     ${badgesMagiaRapidos(m.nome)}
-                    ${ehDominio ? '<div style="font-size:0.65rem;color:var(--secondary);font-weight:600;margin-top:1px">Sempre Preparada (Domínio)</div>' : ''}
+                    ${ehEspecial ? `<div style="font-size:0.65rem;color:var(--secondary);font-weight:600;margin-top:1px">${origemLabel}</div>` : ''}
                   </div>
                   <div class="no-print" style="display:flex;align-items:center;gap:4px">
                     ${temUpcast ? `
@@ -2195,7 +6808,6 @@ function renderSecaoMagias() {
                       </select>
                     ` : ''}
                     <button class="btn btn-sm ${todosEsgotados ? 'btn-secondary' : 'btn-primary'}" data-conjurar="${m.nome}" data-conj-circ="${m.circulo}" ${todosEsgotados ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Conjurar</button>
-                    ${!ehDominio ? `<button class="btn btn-sm btn-danger btn-icon btn-magia-remover no-print" data-remover-magia="${m.nome}" title="Remover magia">&times;</button>` : ''}
                   </div>
                 </div>
                 <div class="magia-desc"></div>
@@ -2245,7 +6857,7 @@ function renderSecaoMagias() {
                     <div class="magia-nome">${m.nome}</div>
                     ${badgesMagiaRapidos(m.nome)}
                   </div>
-                  <button class="btn btn-sm btn-danger btn-icon btn-magia-remover no-print" data-remover-truque="${m.nome}" title="Remover truque">&times;</button>
+                  <button class="btn btn-sm btn-primary" data-conjurar="${m.nome}" data-conj-circ="0">Conjurar</button>
                 </div>
                 <div class="magia-desc"></div>
               </div>
@@ -2320,6 +6932,13 @@ function setupEventosEspacosMagia() {
   document.querySelectorAll('[data-conjurar]').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
+
+      const estadoFuria = getEstadoFuria();
+      if (estadoFuria?.ativa) {
+        toast('Não é possível conjurar magias enquanto a Fúria estiver ativa.', 'error');
+        return;
+      }
+
       const nome = btn.dataset.conjurar;
       const selectEl = btn.parentElement?.querySelector(`[data-conj-select="${nome}"]`);
       const circ = selectEl ? selectEl.value : btn.dataset.conjCirc;
@@ -2329,10 +6948,23 @@ function setupEventosEspacosMagia() {
         return;
       }
       char.espacos_magia[circ].usados++;
+
+      if (char.classe === 'Feiticeiro' && semAcento(char.subclasse || '') === semAcento('Feitiçaria Selvagem')) {
+        const estadoFeiticeiro = getEstadoRecursosFeiticeiro();
+        if (estadoFeiticeiro && !estadoFeiticeiro.subclasses.selvagem.mares_caos_disponivel) {
+          char.recursos.feiticeiro.subclasses.selvagem.mares_caos_disponivel = true;
+          char.recursos.feiticeiro.subclasses.selvagem.surto_pendente_automatico = true;
+        }
+      }
+
       salvar();
       const baseCirc = btn.dataset.conjCirc;
       const upcast = parseInt(circ) > parseInt(baseCirc);
-      toast(`${nome} conjurada${upcast ? ` no ${circ}º círculo` : ''}!`, 'success');
+      if (char.classe === 'Feiticeiro' && semAcento(char.subclasse || '') === semAcento('Feitiçaria Selvagem') && char.recursos?.feiticeiro?.subclasses?.selvagem?.surto_pendente_automatico) {
+        toast(`${nome} conjurada${upcast ? ` no ${circ}º círculo` : ''}! Surto de Magia Selvagem automático pendente.`, 'success');
+      } else {
+        toast(`${nome} conjurada${upcast ? ` no ${circ}º círculo` : ''}!`, 'success');
+      }
       renderFichaCompleta();
     });
   });
@@ -2386,36 +7018,6 @@ function setupEventosEspacosMagia() {
     });
   });
 
-  // Remover/despreparar magia
-  document.querySelectorAll('[data-remover-magia]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const nome = btn.dataset.removerMagia;
-      const idx = char.magias_preparadas.findIndex(m => m.nome === nome);
-      if (idx >= 0) {
-        char.magias_preparadas.splice(idx, 1);
-        salvar();
-        renderFichaCompleta();
-        toast(`${nome} removida das preparadas`, 'success');
-      }
-    });
-  });
-
-  // Remover truque
-  document.querySelectorAll('[data-remover-truque]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const nome = btn.dataset.removerTruque;
-      const idx = char.magias_conhecidas.findIndex(m => m.nome === nome);
-      if (idx >= 0) {
-        char.magias_conhecidas.splice(idx, 1);
-        salvar();
-        renderFichaCompleta();
-        toast(`${nome} removido`, 'success');
-      }
-    });
-  });
-
   // Grimório: preparar magia do grimório
   document.querySelectorAll('[data-preparar-grimorio]').forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -2451,25 +7053,37 @@ function setupEventosEspacosMagia() {
 
 async function mostrarBuscaMagia() {
   const info = CLASSES_INFO[char.classe] || {};
+  const subConj = getSubclasseConjuradoraConjuracao();
   const tipoConj = info.tipo_conjuracao || 'preparadas';
   const labelMg = tipoConj === 'conhecidas' ? 'Conhecida' : 'Preparada';
   const tabela = classeData?.tabela_caracteristicas;
-  const maxPrep = tabela ? getMagiaPreparadas(tabela, char.nivel) : 99;
-  const maxTruq = tabela ? getTruquesConhecidos(tabela, char.nivel) : 99;
+  let maxPrep = tabela ? getMagiaPreparadas(tabela, char.nivel) : 99;
+  let maxTruq = tabela ? getTruquesConhecidos(tabela, char.nivel) : 99;
+
+  // Fallback para subclasses conjuradoras
+  if (subConj && maxPrep === 99) {
+    maxPrep = subConj.preparadas || 99;
+  }
+  if (subConj && maxTruq === 99) {
+    maxTruq = subConj.truques || 99;
+  }
 
   // Espaços de magia para determinar círculos disponíveis
-  const espacosNivel = tabela ? getEspacosMagia(tabela, char.nivel) : {};
+  let espacosNivel = tabela ? getEspacosMagia(tabela, char.nivel) : {};
+  // Fallback para subclasses conjuradoras
+  if (subConj && Object.keys(espacosNivel).length === 0) {
+    espacosNivel = subConj.espacos || {};
+  }
   const circulosDisponiveis = Object.keys(espacosNivel).map(Number).sort((a, b) => a - b);
   const maxCirculo = circulosDisponiveis.length > 0 ? Math.max(...circulosDisponiveis) : 9;
 
   // Carregar magias da classe (pré-carrega tudo)
-  const magiasClasseData = await getMagiasClasse(char.classe);
-  const magiasClasse = achatarMagiasClasse(magiasClasseData);
+  const magiasClasse = await obterMagiasDisponiveisClasseAtual();
 
   // Magias já possuídas
   const jaPreparadas = new Set((char.magias_preparadas || []).map(m => m.nome));
   const jaConhecidas = new Set((char.magias_conhecidas || []).map(m => m.nome));
-  const preparadasNormais = (char.magias_preparadas || []).filter(m => m.origem !== 'dominio');
+  const preparadasNormais = (char.magias_preparadas || []).filter(m => magiaContaNoLimite(m));
 
   // Separar por círculo
   const truquesClasse = magiasClasse.filter(m => m.circulo === 0);
@@ -2485,10 +7099,10 @@ async function mostrarBuscaMagia() {
 
   abrirModal('Gerenciar Magias', `
     <div style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:6px;font-size:0.78rem">
-      <span class="magia-contador ${(char.magias_conhecidas || []).filter(m => m.circulo === 0).length >= maxTruq ? 'contador-cheio' : ''}">
+      <span class="magia-contador ${(char.magias_conhecidas || []).filter(m => m.circulo === 0).length >= maxTruq ? 'contador-cheio' : ''}" id="gm-contador-truques">
         Truques: ${(char.magias_conhecidas || []).filter(m => m.circulo === 0).length}/${maxTruq}
       </span>
-      <span class="magia-contador ${preparadasNormais.length >= maxPrep ? 'contador-cheio' : preparadasNormais.length > maxPrep ? 'contador-excedido' : ''}">
+      <span class="magia-contador ${preparadasNormais.length >= maxPrep ? 'contador-cheio' : preparadasNormais.length > maxPrep ? 'contador-excedido' : ''}" id="gm-contador-preparadas">
         ${labelMg}s: ${preparadasNormais.length}/${maxPrep}
       </span>
     </div>
@@ -2510,20 +7124,20 @@ async function mostrarBuscaMagia() {
 
     if (tabAtiva === 'preparadas') {
       // Mostrar magias preparadas/conhecidas atuais (para remover)
-      const dominio = (char.magias_preparadas || []).filter(m => m.origem === 'dominio');
-      const normais = (char.magias_preparadas || []).filter(m => m.origem !== 'dominio');
+      const especiais = (char.magias_preparadas || []).filter(m => magiaEhEspecial(m));
+      const normais = (char.magias_preparadas || []).filter(m => magiaContaNoLimite(m));
       const filtradas = termo.length >= 2 ? normais.filter(m => semAcento(m.nome).includes(termo)) : normais;
-      const filtradasDom = termo.length >= 2 ? dominio.filter(m => semAcento(m.nome).includes(termo)) : dominio;
+      const filtradasDom = termo.length >= 2 ? especiais.filter(m => semAcento(m.nome).includes(termo)) : especiais;
 
       html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">${labelMg}s: ${normais.length}/${maxPrep} | Clique para remover</div>`;
 
       if (filtradasDom.length > 0) {
-        html += `<div style="font-size:0.75rem;font-weight:700;color:var(--secondary);margin:8px 0 4px">Domínio (sempre preparadas)</div>`;
+        html += `<div style="font-size:0.75rem;font-weight:700;color:var(--secondary);margin:8px 0 4px">Magias Especiais</div>`;
         html += `<div class="magias-grid">${filtradasDom.map(m => `
           <div class="magia-card selecionada magia-dominio" style="opacity:0.7;cursor:default">
             <span class="magia-card-check"></span>
             <div class="magia-card-nome"><span class="badge-dominio">&#9733;</span> ${m.nome}</div>
-            <div class="magia-card-meta"><span>Domínio</span></div>
+            <div class="magia-card-meta"><span>${rotuloOrigemMagia(m)}</span></div>
             <span class="magia-card-info" data-detalhe-magia="${m.nome}" data-detalhe-circ="${m.circulo}" title="Ver detalhes">&#9432;</span>
           </div>
         `).join('')}</div>`;
@@ -2594,7 +7208,7 @@ async function mostrarBuscaMagia() {
 
       html += `<div class="magias-grid">${lista.map(m => {
         const sel = selecionadasSet.has(m.nome);
-        const isDominio = (char.magias_preparadas || []).find(p => p.nome === m.nome && p.origem === 'dominio');
+        const isDominio = (char.magias_preparadas || []).find(p => p.nome === m.nome && magiaEhEspecial(p));
         const bloqueado = cheio && !sel && !isDominio;
         return `
           <div class="magia-card ${sel ? 'selecionada' : ''} ${isDominio ? 'magia-dominio' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}"
@@ -2605,7 +7219,7 @@ async function mostrarBuscaMagia() {
             <div class="magia-card-meta">
               <span>${m.escola || ''}</span>
               ${m.especial === 'C' ? '<span title="Concentração">C</span>' : ''}
-              ${isDominio ? '<span>Domínio</span>' : ''}
+              ${isDominio ? '<span>Especial</span>' : ''}
             </div>
             <span class="magia-card-info" data-detalhe-magia="${m.nome}" data-detalhe-circ="${circ}" title="Ver detalhes">&#9432;</span>
           </div>`;
@@ -2669,7 +7283,7 @@ async function mostrarBuscaMagia() {
           toast(`${nome} removida`, 'success');
         } else {
           // Adicionar — verificar limite
-          const numAtual = (char.magias_preparadas || []).filter(m => m.origem !== 'dominio').length;
+          const numAtual = (char.magias_preparadas || []).filter(m => magiaContaNoLimite(m)).length;
           if (numAtual >= maxPrep) { toast(`Limite de ${maxPrep} magias atingido. Remova uma antes de adicionar.`, 'error'); return; }
           char.magias_preparadas.push({ nome, circulo: circ });
           // Mago: também adicionar ao grimório
@@ -2716,11 +7330,24 @@ async function mostrarBuscaMagia() {
   }
 
   function atualizarContadores() {
-    // Atualizar contadores no modal
-    const contadorEl = resultadoEl.closest('.modal-body')?.querySelector('.magia-contadores') || resultadoEl.parentElement?.querySelector('.magia-contadores');
-    // Recalcular a partir do char
+    // Recalcular preparadas normais a partir do char
     preparadasNormais.length = 0;
-    (char.magias_preparadas || []).filter(m => m.origem !== 'dominio').forEach(m => preparadasNormais.push(m));
+    (char.magias_preparadas || []).filter(m => magiaContaNoLimite(m)).forEach(m => preparadasNormais.push(m));
+
+    // Atualizar contador de truques no topo do modal
+    const numTruques = (char.magias_conhecidas || []).filter(m => m.circulo === 0).length;
+    const contTruques = document.getElementById('gm-contador-truques');
+    if (contTruques) {
+      contTruques.textContent = `Truques: ${numTruques}/${maxTruq}`;
+      contTruques.className = `magia-contador ${numTruques >= maxTruq ? 'contador-cheio' : ''}`;
+    }
+
+    // Atualizar contador de preparadas no topo do modal
+    const contPrep = document.getElementById('gm-contador-preparadas');
+    if (contPrep) {
+      contPrep.textContent = `${labelMg}s: ${preparadasNormais.length}/${maxPrep}`;
+      contPrep.className = `magia-contador ${preparadasNormais.length >= maxPrep ? 'contador-cheio' : preparadasNormais.length > maxPrep ? 'contador-excedido' : ''}`;
+    }
   }
 
   // Tabs
@@ -2859,15 +7486,23 @@ async function mostrarBuscaGrimorio() {
 }
 
 /** Modal de troca de magias preparadas (usado no descanso longo para classes preparadas) */
-async function mostrarTrocaMagias() {
+async function mostrarTrocaMagias(callbackPosTroca = null) {
   const info = CLASSES_INFO[char.classe] || {};
-  const maxPreparadas = classeData?.tabela_caracteristicas
+  const subConj = getSubclasseConjuradoraConjuracao();
+  let maxPreparadas = classeData?.tabela_caracteristicas
     ? getMagiaPreparadas(classeData.tabela_caracteristicas, char.nivel) : 0;
+  // Fallback para subclasses conjuradoras
+  if (subConj && maxPreparadas === 0) {
+    maxPreparadas = subConj.preparadas || 0;
+  }
   const ehMago = char.classe === 'Mago';
 
   // Espaços de magia para determinar círculos disponíveis
-  const espacosNivel = classeData?.tabela_caracteristicas
+  let espacosNivel = classeData?.tabela_caracteristicas
     ? getEspacosMagia(classeData.tabela_caracteristicas, char.nivel) : {};
+  if (subConj && Object.keys(espacosNivel).length === 0) {
+    espacosNivel = subConj.espacos || {};
+  }
   const maxCirculo = Math.max(...Object.keys(espacosNivel).map(Number), 0);
 
   // Buscar lista de magias disponíveis (classe ou grimório)
@@ -2875,15 +7510,14 @@ async function mostrarTrocaMagias() {
   if (ehMago) {
     magiasDisponiveis = (char.grimorio || []).map(m => ({ ...m }));
   } else {
-    const magiasClasseData = await getMagiasClasse(char.classe);
-    magiasDisponiveis = achatarMagiasClasse(magiasClasseData).filter(m => m.circulo > 0);
+    magiasDisponiveis = (await obterMagiasDisponiveisClasseAtual()).filter(m => m.circulo > 0);
   }
 
   // Identificar magias de domínio (não removíveis)
-  const nomesDominio = new Set((char.magias_preparadas || []).filter(m => m.origem === 'dominio').map(m => m.nome));
+  const nomesDominio = new Set((char.magias_preparadas || []).filter(m => magiaEhEspecial(m)).map(m => m.nome));
 
   // Set temporário com magias selecionadas (excluindo domínio)
-  const selecionadasSet = new Set((char.magias_preparadas || []).filter(m => m.origem !== 'dominio').map(m => m.nome));
+  const selecionadasSet = new Set((char.magias_preparadas || []).filter(m => magiaContaNoLimite(m)).map(m => m.nome));
   // Mapa nome->circulo para reconstruir ao confirmar
   const circuloMap = {};
   magiasDisponiveis.forEach(m => { circuloMap[m.nome] = m.circulo; });
@@ -2938,7 +7572,7 @@ async function mostrarTrocaMagias() {
         const domMagias = magiasDisponiveis.filter(m => nomesDominio.has(m.nome));
         const filtDom = termo.length >= 2 ? domMagias.filter(m => semAcento(m.nome).includes(termo)) : domMagias;
         if (filtDom.length > 0 || (termo.length < 2 && nomesDominio.size > 0)) {
-          html += `<div style="font-size:0.75rem;font-weight:700;color:var(--secondary);margin:4px 0">Domínio (sempre preparadas)</div>`;
+          html += `<div style="font-size:0.75rem;font-weight:700;color:var(--secondary);margin:4px 0">Magias Especiais</div>`;
           // Garantir que domínio apareca mesmo se nao esta em magiasDisponiveis
           const domNomes = [...nomesDominio];
           const filtDomNomes = termo.length >= 2 ? domNomes.filter(n => semAcento(n).includes(termo)) : domNomes;
@@ -2946,7 +7580,7 @@ async function mostrarTrocaMagias() {
             <div class="magia-card selecionada magia-dominio" style="opacity:0.7;cursor:default">
               <span class="magia-card-check"></span>
               <div class="magia-card-nome"><span class="badge-dominio">&#9733;</span> ${nome}</div>
-              <div class="magia-card-meta"><span>Domínio</span></div>
+              <div class="magia-card-meta"><span>Especial</span></div>
               <span class="magia-card-info" data-troca-info="${nome}" data-troca-info-circ="${circuloMap[nome] || 1}" title="Ver detalhes">&#9432;</span>
             </div>
           `).join('')}</div>`;
@@ -2996,7 +7630,7 @@ async function mostrarTrocaMagias() {
             <div class="magia-card-meta">
               <span>${m.escola || ''}</span>
               ${m.especial === 'C' ? '<span title="Concentração">C</span>' : ''}
-              ${isDominio ? '<span>Domínio</span>' : ''}
+              ${isDominio ? '<span>Especial</span>' : ''}
             </div>
             <span class="magia-card-info" data-troca-info="${m.nome}" data-troca-info-circ="${circ}" title="Ver detalhes">&#9432;</span>
           </div>`;
@@ -3067,13 +7701,15 @@ async function mostrarTrocaMagias() {
   // Confirmar troca
   document.getElementById('btn-confirmar-troca')?.addEventListener('click', () => {
     char.magias_preparadas = [
-      ...(char.magias_preparadas || []).filter(m => m.origem === 'dominio'),
+      ...(char.magias_preparadas || []).filter(m => magiaEhEspecial(m)),
       ...[...selecionadasSet].map(nome => ({ nome, circulo: circuloMap[nome] || 1 }))
     ];
     salvar();
     window.fecharModal();
     renderFichaCompleta();
     toast('Magias preparadas atualizadas!', 'success');
+    // Encadear próxima ação (ex.: troca de maestrias após magias)
+    if (callbackPosTroca) callbackPosTroca();
   });
 
   renderTabTroca();
@@ -3119,6 +7755,336 @@ function sheetBadgeProf(proficiente) {
   return proficiente
     ? '<span class="badge badge-prof-sm">Prof</span>'
     : '<span class="badge badge-no-prof-sm">Sem Prof</span>';
+}
+
+// --- Constantes de condicoes do D&D 5.5 ---
+const CONDICOES_DD = [
+  { nome: 'Amedrontado', icone: '😨', cor: '#8e44ad' },
+  { nome: 'Atordoado', icone: '💫', cor: '#e67e22' },
+  { nome: 'Caído', icone: '🧎', cor: '#95a5a6' },
+  { nome: 'Cego', icone: '🕶️', cor: '#2c3e50' },
+  { nome: 'Contido', icone: '🔗', cor: '#7f8c8d' },
+  { nome: 'Enfeitiçado', icone: '💜', cor: '#9b59b6' },
+  { nome: 'Envenenado', icone: '🧪', cor: '#27ae60' },
+  { nome: 'Exaustão', icone: '😴', cor: '#e74c3c' },
+  { nome: 'Imobilizado', icone: '⛓️', cor: '#34495e' },
+  { nome: 'Incapacitado', icone: '🚫', cor: '#c0392b' },
+  { nome: 'Inconsciente', icone: '💤', cor: '#1a1a2e' },
+  { nome: 'Invisível', icone: '👻', cor: '#3498db' },
+  { nome: 'Paralisado', icone: '⚡', cor: '#f39c12' },
+  { nome: 'Petrificado', icone: '🗿', cor: '#6c757d' },
+  { nome: 'Surdo', icone: '🔇', cor: '#566573' }
+];
+
+// Descricoes oficiais baseadas no glossario do Livro do Jogador 2024
+const CONDICOES_DESCRICAO = {
+  'Amedrontado': 'Desvantagem em testes de atributo e jogadas de ataque enquanto a fonte do medo estiver na linha de visao. Nao pode se aproximar voluntariamente da fonte do medo.',
+  'Atordoado': 'Incapacitado (sem acoes, bonus ou reacoes; sem Concentracao; sem fala). Falha automatica em salvaguardas de Forca e Destreza. Jogadas de ataque contra voce tem Vantagem.',
+  'Caído': 'Unicas opcoes de movimento: rastejar ou gastar metade do Deslocamento para se levantar. Desvantagem em jogadas de ataque. Ataques contra voce tem Vantagem a 1,5m; caso contrario, tem Desvantagem.',
+  'Cego': 'Nao pode ver. Falha automatica em testes que dependam de visao. Ataques contra voce tem Vantagem, seus ataques tem Desvantagem.',
+  'Contido': 'Deslocamento 0 e nao pode aumentar. Ataques contra voce tem Vantagem, seus ataques tem Desvantagem. Desvantagem em salvaguardas de Destreza.',
+  'Enfeitiçado': 'Nao pode atacar quem o enfeiticou nem o ter como alvo de efeitos nocivos. Quem o enfeiticou tem Vantagem em testes de interacao social contra voce.',
+  'Envenenado': 'Desvantagem em jogadas de ataque e testes de atributo.',
+  'Exaustão': 'Cumulativa (niveis 1-6). Testes de D20 reduzidos em 2x nivel. Deslocamento reduzido em 1,5m x nivel. Nivel 6 = morte. Descanso Longo remove 1 nivel.',
+  'Imobilizado': 'Deslocamento 0 e nao pode aumentar. Desvantagem em jogadas de ataque contra qualquer alvo que nao seja o imobilizador. O imobilizador pode arrastar/carregar voce (custo +1m por metro).',
+  'Incapacitado': 'Nao pode executar acoes, Acoes Bonus ou Reacoes. Concentracao interrompida. Nao pode falar. Desvantagem na Iniciativa se surpreso.',
+  'Inconsciente': 'Caido e Incapacitado, solta tudo que segura. Deslocamento 0. Falha automatica em SG de For e Des. Ataques tem Vantagem; corpo a corpo a 1,5m e Acerto Critico. Alheio ao redor.',
+  'Invisível': 'Nao e afetado por efeitos que exijam visao. Ataques contra voce tem Desvantagem, seus ataques tem Vantagem (exceto se o atacante puder ve-lo). Vantagem na Iniciativa.',
+  'Paralisado': 'Incapacitado. Deslocamento 0. Falha automatica em SG de For e Des. Ataques contra voce tem Vantagem; corpo a corpo a 1,5m e Acerto Critico.',
+  'Petrificado': 'Transformado em substancia solida. Incapacitado. Deslocamento 0. Peso x10, nao envelhece. Falha em SG de For e Des. Ataques contra voce tem Vantagem. Resistencia a todo dano. Imune a Envenenado.',
+  'Surdo': 'Nao pode ouvir. Falha automatica em testes que dependam de audicao.'
+};
+
+// --- Tipos de dano do D&D ---
+const TIPOS_DANO = [
+  'Ácido', 'Contundente', 'Cortante', 'Elétrico', 'Energético',
+  'Gélido', 'Ígneo', 'Necrótico', 'Perfurante', 'Psíquico',
+  'Radiante', 'Trovejante', 'Venenoso'
+];
+
+/** Renderiza secao de condicoes ativas */
+function renderSecaoCondicoes() {
+  const condicoes = char.condicoes || [];
+  const temCondicao = condicoes.length > 0;
+
+  return `
+    <div class="card" style="${temCondicao ? 'border-color:var(--warning)' : ''}">
+      <div class="card-header">
+        <h2>Condicoes${temCondicao ? ` (${condicoes.length})` : ''}</h2>
+        <button class="btn btn-sm btn-secondary no-print" id="btn-gerenciar-condicoes">Gerenciar</button>
+      </div>
+      ${temCondicao ? `
+        <div style="display:flex;flex-wrap:wrap;gap:6px;padding:4px 0">
+          ${condicoes.map(c => {
+            const info = CONDICOES_DD.find(cd => cd.nome === c) || { icone: '?', cor: '#666' };
+            const desc = CONDICOES_DESCRICAO[c] || '';
+            return `<span class="badge" style="font-size:0.75rem;padding:4px 8px;background:${info.cor};color:#fff;cursor:help" title="${desc}">${info.icone} ${c}</span>`;
+          }).join('')}
+        </div>
+        ${condicoes.includes('Exaustão') ? `
+          <div style="display:flex;align-items:center;gap:8px;margin-top:4px;font-size:0.8rem">
+            <span style="color:var(--danger);font-weight:600">Nivel de Exaustao:</span>
+            <button class="btn btn-sm btn-icon no-print" data-exaustao-ajuste="-1" style="padding:1px 6px;font-size:0.8rem">-</button>
+            <span style="font-weight:700;min-width:20px;text-align:center">${char.exaustao || 0}</span>
+            <button class="btn btn-sm btn-icon no-print" data-exaustao-ajuste="1" style="padding:1px 6px;font-size:0.8rem">+</button>
+            <span style="font-size:0.7rem;color:var(--text-muted)">(-${(char.exaustao || 0) * 2} em d20 e CD)</span>
+          </div>
+        ` : ''}
+      ` : '<div style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:8px">Nenhuma condicao ativa</div>'}
+    </div>
+  `;
+}
+
+/** Renderiza secao de defesas (resistencias, vulnerabilidades, imunidades) */
+function renderSecaoDefesas() {
+  const resistencias = char.resistencias || [];
+  const vulnerabilidades = char.vulnerabilidades || [];
+  const imunidades = char.imunidades || [];
+  const temDefesa = resistencias.length > 0 || vulnerabilidades.length > 0 || imunidades.length > 0;
+
+  if (!temDefesa) {
+    return `
+      <div class="card">
+        <div class="card-header">
+          <h2>Defesas</h2>
+          <button class="btn btn-sm btn-secondary no-print" id="btn-gerenciar-defesas">Gerenciar</button>
+        </div>
+        <div style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:8px">Nenhuma defesa configurada</div>
+      </div>
+    `;
+  }
+
+  let html = `
+    <div class="card">
+      <div class="card-header">
+        <h2>Defesas</h2>
+        <button class="btn btn-sm btn-secondary no-print" id="btn-gerenciar-defesas">Gerenciar</button>
+      </div>
+  `;
+
+  if (resistencias.length > 0) {
+    html += `<div style="margin-bottom:4px"><span style="font-size:0.75rem;font-weight:700;color:var(--info)">Resistencias:</span> <span style="font-size:0.8rem">${resistencias.join(', ')}</span></div>`;
+  }
+  if (vulnerabilidades.length > 0) {
+    html += `<div style="margin-bottom:4px"><span style="font-size:0.75rem;font-weight:700;color:var(--danger)">Vulnerabilidades:</span> <span style="font-size:0.8rem">${vulnerabilidades.join(', ')}</span></div>`;
+  }
+  if (imunidades.length > 0) {
+    html += `<div style="margin-bottom:4px"><span style="font-size:0.75rem;font-weight:700;color:var(--success)">Imunidades:</span> <span style="font-size:0.8rem">${imunidades.join(', ')}</span></div>`;
+  }
+
+  html += '</div>';
+  return html;
+}
+
+/** Renderiza secao de sentidos passivos */
+function renderSecaoSentidos() {
+  const percepcao = calcPercepcaoPassiva(char);
+  const intuicao = calcIntuicaoPassiva(char);
+  const investigacao = calcInvestigacaoPassiva(char);
+
+  // Verificar visao no escuro pela especie
+  let visaoEscuro = '';
+  if (especiesCache?.especies) {
+    const esp = especiesCache.especies.find(e => e.nome === char.especie);
+    if (esp?.tracos) {
+      const tracoVE = esp.tracos.find(t => t.nome === 'Visão no Escuro');
+      if (tracoVE) {
+        const matchAlcance = tracoVE.descricao?.match(/alcance de (\d+)/i);
+        visaoEscuro = matchAlcance ? `${matchAlcance[1]} m` : '18 m';
+      }
+      // Drow tem visao no escuro superior (36m) via linhagem
+      const tracosEscolhidos = char.tracos_escolhidos || [];
+      if (tracosEscolhidos.includes('Drow')) {
+        visaoEscuro = '36 m';
+      }
+    }
+  }
+
+  // Guardiao nivel 18+: Sentidos Selvagens (Visao as Cegas 9m)
+  let sentidoExtra = '';
+  const estadoG = char.classe === 'Guardião' ? getEstadoRecursosGuardiao() : null;
+  if (estadoG?.sentidosSelvagensAtivo) {
+    sentidoExtra = 'Visao as Cegas 9 m';
+  }
+
+  return `
+    <div class="card">
+      <div class="card-header"><h2>Sentidos Passivos</h2></div>
+      <div class="salvaguardas-grid" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr))">
+        <div class="salva-item" style="justify-content:center;gap:8px">
+          <span class="pericia-bonus">${percepcao}</span>
+          <span class="pericia-nome">Percepcao</span>
+        </div>
+        <div class="salva-item" style="justify-content:center;gap:8px">
+          <span class="pericia-bonus">${intuicao}</span>
+          <span class="pericia-nome">Intuicao</span>
+        </div>
+        <div class="salva-item" style="justify-content:center;gap:8px">
+          <span class="pericia-bonus">${investigacao}</span>
+          <span class="pericia-nome">Investigacao</span>
+        </div>
+        ${visaoEscuro ? `
+        <div class="salva-item" style="justify-content:center;gap:8px">
+          <span class="pericia-bonus">${visaoEscuro}</span>
+          <span class="pericia-nome">Visao no Escuro</span>
+        </div>
+        ` : ''}
+        ${sentidoExtra ? `
+        <div class="salva-item" style="justify-content:center;gap:8px">
+          <span class="pericia-bonus">${sentidoExtra.replace(/\D+$/, '').trim()}</span>
+          <span class="pericia-nome">${sentidoExtra.includes('Cegas') ? 'Visao as Cegas' : sentidoExtra}</span>
+        </div>
+        ` : ''}
+      </div>
+    </div>
+  `;
+}
+
+/** Setup de eventos para gerenciar condicoes */
+function setupEventosCondicoes() {
+  document.getElementById('btn-gerenciar-condicoes')?.addEventListener('click', () => {
+    const condicoesAtuais = new Set(char.condicoes || []);
+
+    const html = `
+      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+        ${CONDICOES_DD.map(c => {
+          const ativa = condicoesAtuais.has(c.nome);
+          const desc = CONDICOES_DESCRICAO[c.nome] || '';
+          return `
+            <div class="selection-card ${ativa ? 'selected' : ''}" data-condicao-toggle="${c.nome}" 
+                 style="min-width:130px;max-width:170px;cursor:pointer;text-align:center;border:2px solid ${ativa ? c.cor : 'var(--border-light)'};${ativa ? `background:${c.cor}15` : ''}" 
+                 title="${desc}">
+              <div style="font-size:1.2rem">${c.icone}</div>
+              <div style="font-size:0.8rem;font-weight:600">${c.nome}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:8px;text-align:center">Clique para ativar/desativar. Multiplas condicoes podem estar ativas ao mesmo tempo.</div>
+    `;
+
+    abrirModal('Gerenciar Condicoes', html,
+      '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-condicoes">Salvar</button>'
+    );
+
+    // Eventos de toggle
+    document.querySelectorAll('[data-condicao-toggle]').forEach(el => {
+      el.addEventListener('click', () => {
+        const nome = el.dataset.condicaoToggle;
+        if (el.classList.contains('selected')) {
+          el.classList.remove('selected');
+          el.style.borderColor = 'var(--border-light)';
+          el.style.background = '';
+        } else {
+          el.classList.add('selected');
+          const info = CONDICOES_DD.find(c => c.nome === nome);
+          el.style.borderColor = info?.cor || 'var(--accent)';
+          el.style.background = `${info?.cor || 'var(--accent)'}15`;
+        }
+      });
+    });
+
+    document.getElementById('btn-salvar-condicoes')?.addEventListener('click', () => {
+      const novas = [];
+      document.querySelectorAll('[data-condicao-toggle].selected').forEach(el => {
+        novas.push(el.dataset.condicaoToggle);
+      });
+      char.condicoes = novas;
+      // Se Exaustao foi removida, zerar nivel
+      if (!novas.includes('Exaustão') && char.exaustao > 0) {
+        char.exaustao = 0;
+      }
+      // Se Exaustao foi adicionada e nivel era 0, colocar 1
+      if (novas.includes('Exaustão') && (!char.exaustao || char.exaustao <= 0)) {
+        char.exaustao = 1;
+      }
+      salvar();
+      window.fecharModal();
+      renderFichaCompleta();
+    });
+  });
+
+  // Ajuste de nivel de exaustao
+  document.querySelectorAll('[data-exaustao-ajuste]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const delta = parseInt(btn.dataset.exaustaoAjuste);
+      if (!char.exaustao) char.exaustao = 0;
+      char.exaustao = Math.max(0, Math.min(6, char.exaustao + delta));
+      // Se zerou, remover condicao
+      if (char.exaustao <= 0) {
+        char.condicoes = (char.condicoes || []).filter(c => c !== 'Exaustão');
+        char.exaustao = 0;
+      }
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+}
+
+/** Setup de eventos para gerenciar defesas */
+function setupEventosDefesas() {
+  document.getElementById('btn-gerenciar-defesas')?.addEventListener('click', () => {
+    const resistencias = new Set(char.resistencias || []);
+    const vulnerabilidades = new Set(char.vulnerabilidades || []);
+    const imunidades = new Set(char.imunidades || []);
+
+    const renderCategoria = (titulo, cor, dataPrefix, selecionados) => {
+      return `
+        <div style="margin-bottom:12px">
+          <div style="font-size:0.85rem;font-weight:700;color:${cor};margin-bottom:6px">${titulo}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px">
+            ${TIPOS_DANO.map(tipo => {
+              const ativo = selecionados.has(tipo);
+              return `<span class="badge ${ativo ? '' : 'badge-secondary'}" style="cursor:pointer;padding:4px 8px;font-size:0.75rem;${ativo ? `background:${cor};color:#fff` : ''}" data-defesa-toggle="${dataPrefix}" data-tipo="${tipo}">${tipo}</span>`;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    };
+
+    const html = renderCategoria('Resistencias (metade do dano)', 'var(--info)', 'resistencia', resistencias)
+      + renderCategoria('Vulnerabilidades (dobro do dano)', 'var(--danger)', 'vulnerabilidade', vulnerabilidades)
+      + renderCategoria('Imunidades (ignora dano)', 'var(--success)', 'imunidade', imunidades);
+
+    abrirModal('Gerenciar Defesas', html,
+      '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-defesas">Salvar</button>'
+    );
+
+    document.querySelectorAll('[data-defesa-toggle]').forEach(el => {
+      el.addEventListener('click', () => {
+        const cat = el.dataset.defesaToggle;
+        const tipo = el.dataset.tipo;
+        if (el.classList.contains('badge-secondary')) {
+          el.classList.remove('badge-secondary');
+          const cores = { resistencia: 'var(--info)', vulnerabilidade: 'var(--danger)', imunidade: 'var(--success)' };
+          el.style.background = cores[cat] || 'var(--accent)';
+          el.style.color = '#fff';
+        } else {
+          el.classList.add('badge-secondary');
+          el.style.background = '';
+          el.style.color = '';
+        }
+      });
+    });
+
+    document.getElementById('btn-salvar-defesas')?.addEventListener('click', () => {
+      const novasR = [], novasV = [], novasI = [];
+      document.querySelectorAll('[data-defesa-toggle]').forEach(el => {
+        if (el.classList.contains('badge-secondary')) return;
+        const cat = el.dataset.defesaToggle;
+        const tipo = el.dataset.tipo;
+        if (cat === 'resistencia') novasR.push(tipo);
+        else if (cat === 'vulnerabilidade') novasV.push(tipo);
+        else if (cat === 'imunidade') novasI.push(tipo);
+      });
+      char.resistencias = novasR;
+      char.vulnerabilidades = novasV;
+      char.imunidades = novasI;
+      salvar();
+      window.fecharModal();
+      renderFichaCompleta();
+    });
+  });
 }
 
 // --- Inventário na ficha ---
@@ -3197,6 +8163,9 @@ function renderSheetInvItem(item, idx) {
 
   // Calcular bônus de ataque para armas
   let ataqueInfo = '';
+  let danoAutoInfo = '';
+  let vantagemInfo = '';
+  let danoExibicao = item.dados?.dano || '';
   if (item.tipo === 'arma' && item.dados) {
     const info = CLASSES_INFO[char.classe];
     const prof = bonusProficiencia(char.nivel);
@@ -3206,17 +8175,53 @@ function renderSheetInvItem(item, idx) {
     const isDistancia = cat.includes('dist');
 
     let modAtq;
+    let usaForcaNoAtaque = false;
     if (isAcuidade) {
-      modAtq = Math.max(calcMod(char.atributos.forca), calcMod(char.atributos.destreza));
+      const modFor = calcMod(char.atributos.forca);
+      const modDes = calcMod(char.atributos.destreza);
+      usaForcaNoAtaque = modFor >= modDes;
+      modAtq = Math.max(modFor, modDes);
     } else if (isDistancia) {
       modAtq = calcMod(char.atributos.destreza);
     } else {
       modAtq = calcMod(char.atributos.forca);
+      usaForcaNoAtaque = true;
     }
 
     const temProf = sheetTemProfArma({ categoria: item.dados.categoria, propriedades: item.dados.propriedades || '' });
     const bonusAtq = modAtq + (temProf ? prof : 0);
     ataqueInfo = `<span class="badge badge-secondary" style="font-size:0.65rem">Atq ${fmtMod(bonusAtq)}</span>`;
+    if (ataqueImprudenteAtivo() && usaForcaNoAtaque) {
+      vantagemInfo = '<span class="badge" style="font-size:0.6rem;background:#fff3cd;color:#8a6d3b;border:1px solid #ffeeba">Vantagem (Imprudente)</span>';
+    }
+    const estadoGuardiao = getEstadoRecursosGuardiao();
+    if (estadoGuardiao?.cacadorPrecisoAtivo && estadoGuardiao?.marcaPredadorAtiva) {
+      vantagemInfo = '<span class="badge" style="font-size:0.6rem;background:#e3f2fd;color:#0d47a1;border:1px solid #90caf9">Vantagem (Caçador Preciso)</span>';
+    }
+
+    const danoBase = item.dados?.dano || '';
+    const matchDano = danoBase.match(/^(\d+d\d+)(\s*[+\-]\s*\d+)?(.*)$/i);
+    if (matchDano) {
+      const dado = matchDano[1];
+      const modExistente = matchDano[2];
+      const sufixo = matchDano[3] || '';
+      const estadoFuria = getEstadoFuria();
+      const bonusFuria = estadoFuria?.ativa && usaForcaNoAtaque ? (estadoFuria.dano || 0) : 0;
+      const bonusTotalDano = modAtq + bonusFuria;
+
+      if (modExistente) {
+        const modBase = parseInt(String(modExistente).replace(/\s+/g, '')) || 0;
+        const modFinal = modBase + bonusFuria;
+        const sinal = modFinal >= 0 ? `+${modFinal}` : `${modFinal}`;
+        danoExibicao = `${dado}${sinal}${sufixo}`.replace(/\s+/g, ' ').trim();
+      } else if (bonusTotalDano !== 0) {
+        const sinal = bonusTotalDano >= 0 ? `+${bonusTotalDano}` : `${bonusTotalDano}`;
+        danoExibicao = `${dado}${sinal}${sufixo}`.replace(/\s+/g, ' ').trim();
+      } else {
+        danoExibicao = danoBase;
+      }
+      danoAutoInfo = `<span class="badge" style="font-size:0.6rem;background:#fce4ec;color:#c62828;border:1px solid #ef9a9a">Dano ${danoExibicao}</span>`;
+    }
   }
 
   // Descrição curta do item
@@ -3235,6 +8240,15 @@ function renderSheetInvItem(item, idx) {
     if (item.dados?.dano) customBadges += `<span class="badge" style="font-size:0.6rem;background:#fce4ec;color:#c62828;border:1px solid #ef9a9a">${item.dados.dano}</span> `;
   }
 
+  // Badge de maestria com a arma
+  let maestriaBadge = '';
+  if (item.tipo === 'arma' && item.dados?.maestria) {
+    const temMaestria = (char.maestrias_arma || []).some(m => m === item.nome);
+    if (temMaestria) {
+      maestriaBadge = `<span class="badge" style="font-size:0.6rem;background:#fff8e1;color:#e65100;border:1px solid #ffcc80;font-weight:700">Maestria: ${item.dados.maestria}</span>`;
+    }
+  }
+
   const isZeroQtd = (item.quantidade ?? 1) <= 0;
 
   return `
@@ -3242,10 +8256,10 @@ function renderSheetInvItem(item, idx) {
       <div class="inv-drag-handle no-print" title="Arrastar para reordenar">&#9776;</div>
       <div style="flex:1;cursor:pointer" data-info-inv-sheet="${idx}" title="Ver detalhes">
         <div class="inv-item-nome">
-          ${item.nome} ${profBadge} ${ataqueInfo} ${tipoBadge} ${customBadges}
+          ${item.nome} ${profBadge} ${maestriaBadge} ${ataqueInfo} ${vantagemInfo} ${danoAutoInfo} ${tipoBadge} ${customBadges}
         </div>
         <div class="inv-item-detalhe">
-          ${item.tipo === 'arma' ? `${item.dados?.dano || ''} | ${item.dados?.propriedades || ''}` : ''}
+          ${item.tipo === 'arma' ? `${danoExibicao} | ${item.dados?.propriedades || ''}` : ''}
           ${item.tipo === 'armadura' ? `CA: ${item.dados?.ca || ''} | ${item.dados?.categoria || ''}` : ''}
           ${item.tipo === 'escudo' ? `CA: ${item.dados?.ca || ''} | Escudo` : ''}
           ${item.tipo === 'equipamento' ? `${item.dados?.custo || ''} ${item.dados?.peso ? '| ' + item.dados.peso : ''}` : ''}
@@ -3278,6 +8292,12 @@ function setupEventosInventarioSheet() {
       const idx = parseInt(cb.dataset.sheetEquip);
       if (char.inventario[idx]) {
         char.inventario[idx].equipado = cb.checked;
+
+        if (char.classe === 'Bárbaro' && temArmaduraPesadaEquipada()) {
+          if (!char.recursos) char.recursos = {};
+          char.recursos.furia_ativa = false;
+        }
+
         salvar();
         // Re-renderizar ficha inteira para recalcular CA e outros stats
         renderFichaCompleta();
@@ -3671,11 +8691,16 @@ async function mostrarSeletorCategoria() {
       case 'armas':
         itens = dados.armas.map(a => {
           const prof = sheetTemProfArma(a);
+          // Verificar se o personagem tem maestria com esta arma
+          const temMaestriaArma = (char.maestrias_arma || []).includes(a.nome);
+          const maestriaBadgeAdd = temMaestriaArma && a.maestria
+            ? `<span class="badge" style="font-size:0.6rem;background:#fff8e1;color:#e65100;border:1px solid #ffcc80;font-weight:700">Maestria: ${a.maestria}</span>`
+            : '';
           return {
             nome: a.nome,
             detalhe: `${a.dano} | ${a.propriedades || '\u2014'}`,
             detalhe2: `Maestria: ${a.maestria || '\u2014'} | ${a.custo} | ${a.peso || '\u2014'}`,
-            badge: sheetBadgeProf(prof),
+            badge: sheetBadgeProf(prof) + (maestriaBadgeAdd ? ' ' + maestriaBadgeAdd : ''),
             badgeCat: `<span class="badge badge-secondary">${a.categoria?.includes('Dist') ? 'Dist\u00e2ncia' : 'Corpo'}</span>`,
             prof,
             dados: a,

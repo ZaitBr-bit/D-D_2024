@@ -28,7 +28,10 @@ export async function getClasse(nome) {
   const nomeArq = nome.toLowerCase()
     .replace(/á/g, 'a').replace(/ã/g, 'a').replace(/é/g, 'e')
     .replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u');
-  return fetchJSON(`classes/${nomeArq}.json`);
+  const dados = await fetchJSON(`classes/${nomeArq}.json`);
+  if (!dados) return null;
+
+  return dados;
 }
 
 /** Carrega lista de magias de uma classe conjuradora */

@@ -4,7 +4,7 @@
 import { CLASSES_INFO, PERICIAS, ATRIBUTOS_NOMES, ATRIBUTOS_KEYS, ATRIBUTO_NOME_PARA_KEY, STANDARD_ARRAY, POINT_BUY_CUSTOS, POINT_BUY_TOTAL } from '../dados-classes.js';
 import { getClasse, getAntecedentes, getEspecies, getTalentos, getMagiasClasse, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura } from '../db.js';
 import { criarPersonagemVazio, salvarPersonagem } from '../store.js';
-import { calcMod, fmtMod, calcPVNivel1, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, getDeslocamento } from '../utils.js';
+import { calcMod, fmtMod, calcPVNivel1, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, getDeslocamento, getTamanho } from '../utils.js';
 
 const STEPS = [
   { id: 'classe', label: 'Classe' },
@@ -66,7 +66,7 @@ const ESPECIES_TRACOS_ESCOLHA = {
     opcoes: [
       { nome: 'Abissal', descricao: 'Resistência Venenoso + Rajada de Veneno + Raio Nauseante (nv.3) + Paralisar Pessoa (nv.5)' },
       { nome: 'Ctônico', descricao: 'Resistência Necrótico + Toque Necrótico + Vitalidade Vazia (nv.3) + Raio do Enfraquecimento (nv.5)' },
-      { nome: 'Infernal', descricao: 'Resistência Ígneo + Toque Flamejante + Esfera Flamejante (nv.3) + Escuridão (nv.5)' }
+      { nome: 'Infernal', descricao: 'Resistência Ígneo + Raio de Fogo + Repreensão Diabólica (nv.3) + Escuridão (nv.5)' }
     ]
   }
 };
@@ -91,10 +91,22 @@ const CLASSES_ESCOLHAS = {
       ]
     }
   },
+  'Druida': {
+    ordem_primal: {
+      titulo: 'Ordem Primal',
+      descricao: 'Escolha sua ordem primal. Isso afeta proficiências e conjuração.',
+      maxEscolhas: 1,
+      opcoes: [
+        { nome: 'Protetor', descricao: 'Proficiência com armas Marciais e Armadura Média', efeito: { armaduras: ['Média'], armas: ['Marcial'] } },
+        { nome: 'Xamã', descricao: '+1 truque de Druida e bônus em Arcanismo/Natureza', efeito: { truques_extra: 1 } }
+      ]
+    }
+  },
   'Guerreiro': {
     estilo_luta: {
       titulo: 'Estilo de Luta',
       descricao: 'Escolha um talento de Estilo de Luta.',
+      nivelMinimo: 1,
       maxEscolhas: 1,
       opcoes: [
         { nome: 'Arquearia', descricao: '+2 em ataques à distância com armas' },
@@ -110,10 +122,39 @@ const CLASSES_ESCOLHAS = {
       ]
     }
   },
+  'Guardião': {
+    estilo_luta: {
+      titulo: 'Estilo de Luta (Nível 2)',
+      descricao: 'Escolha um talento de Estilo de Luta (ou Combatente Druídico).',
+      nivelMinimo: 2,
+      maxEscolhas: 1,
+      opcoes: [
+        { nome: 'Arquearia', descricao: '+2 em ataques à distância com armas' },
+        { nome: 'Arremesso', descricao: '+2 de dano com armas de Arremesso' },
+        { nome: 'Armas Grandes', descricao: 'Trata 1-2 como 3 nos dados de dano (duas mãos)' },
+        { nome: 'Duas Armas', descricao: 'Adiciona mod. ao dano da mão secundária' },
+        { nome: 'Desarmado', descricao: 'Dano desarmado d6/d8+For' },
+        { nome: 'Defensivo', descricao: '+1 CA usando armadura' },
+        { nome: 'Duelismo', descricao: '+2 dano com uma arma em uma mão' },
+        { nome: 'Interceptação', descricao: 'Reduz dano a aliado em 1d10+Prof' },
+        { nome: 'Luta às Cegas', descricao: 'Visão Cega 3m, 9m se cego' },
+        { nome: 'Protetivo', descricao: 'Impõe desvantagem em ataques contra aliados' },
+        { nome: 'Combatente Druídico', descricao: 'Aprende 2 truques de Druida; pode trocá-los ao subir de nível' }
+      ]
+    },
+    especialista: {
+      titulo: 'Explorador Hábil: Especialista (Nível 2)',
+      descricao: 'Escolha 1 perícia na qual você já tenha proficiência para ganhar Especialização.',
+      nivelMinimo: 2,
+      maxEscolhas: 1,
+      tipo: 'pericias'
+    }
+  },
   'Ladino': {
     especialista: {
       titulo: 'Especialização',
       descricao: 'Escolha 2 perícias nas quais você já tem proficiência para ter Especialização (dobra o bônus).',
+      nivelMinimo: 1,
       maxEscolhas: 2,
       tipo: 'pericias' // indica que deve usar lista de perícias do personagem
     }
@@ -263,6 +304,9 @@ function validarStep() {
       const classeEscolhas = CLASSES_ESCOLHAS[personagem.classe];
       if (classeEscolhas) {
         for (const [chave, config] of Object.entries(classeEscolhas)) {
+          // Ignorar escolhas com nivel minimo acima do nivel atual
+          const nivelMin = parseInt(config.nivelMinimo || 1);
+          if ((personagem.nivel || 1) < nivelMin) continue;
           const selecionados = personagem.escolhas_classe?.[chave] || [];
           if (selecionados.length < config.maxEscolhas) {
             toast(`Selecione ${config.maxEscolhas} opção(ões) de ${config.titulo}`, 'error');
@@ -316,6 +360,10 @@ function validarStep() {
       if (personagem.classe === 'Clérigo' && personagem.ordem_divina === 'Taumaturgo') {
         truquesNecessarios += 1;
       }
+      // Bônus de truques do Druida Xamã
+      if (personagem.classe === 'Druida' && (personagem.ordem_primal === 'Xamã' || personagem.escolhas_classe?.ordem_primal?.[0] === 'Xamã')) {
+        truquesNecessarios += 1;
+      }
 
       const truquesSelecionados = (personagem.magias_conhecidas || []).filter(m => m.circulo === 0).length;
       const preparadasSelecionadas = (personagem.magias_preparadas || []).length;
@@ -360,6 +408,12 @@ async function finalizar() {
     personagem.proficiencias_extra.push('Armas Marciais', 'Armadura Pesada');
   }
 
+  // Aplicar Ordem Primal do Druida
+  if (personagem.classe === 'Druida' && (personagem.ordem_primal === 'Protetor' || personagem.escolhas_classe?.ordem_primal?.[0] === 'Protetor')) {
+    if (!personagem.proficiencias_extra) personagem.proficiencias_extra = [];
+    personagem.proficiencias_extra.push('Armas Marciais', 'Armadura Média');
+  }
+
   if (!personagem.nome) personagem.nome = 'Sem Nome';
 
   salvarPersonagem(personagem);
@@ -379,6 +433,7 @@ function renderStepClasse(el) {
     const info = CLASSES_INFO[personagem.classe];
     const escolhasTxt = [];
     if (personagem.ordem_divina) escolhasTxt.push(personagem.ordem_divina);
+    if (personagem.ordem_primal) escolhasTxt.push(personagem.ordem_primal);
     if (personagem.escolhas_classe?.estilo_luta?.length) escolhasTxt.push(personagem.escolhas_classe.estilo_luta[0]);
     const extra = escolhasTxt.length ? ' | ' + escolhasTxt.join(', ') : '';
     resumoHtml = `
@@ -434,7 +489,7 @@ async function abrirPopupClasse(nome) {
   if (classeData?.subclasses?.length && personagem.nivel >= nivelSub) {
     subclassesHtml = `
       <div class="form-group mt-2">
-        <label class="form-label">Subclasse (obrigatoria no nivel ${nivelSub})</label>
+        <label class="form-label">Subclasse (obrigatória no nível ${nivelSub})</label>
         <select class="form-select" id="sel-subclasse">
           <option value="">Selecione uma subclasse</option>
           ${classeData.subclasses.map(s => `<option value="${s.nome}" ${personagem.subclasse === s.nome ? 'selected' : ''}>${s.nome}</option>`).join('')}
@@ -443,15 +498,18 @@ async function abrirPopupClasse(nome) {
   } else if (classeData?.subclasses?.length) {
     subclassesHtml = `
       <div class="info-box" style="font-size:0.85rem;margin-top:8px">
-        Subclasse disponivel a partir do nivel ${nivelSub}. Subclasses: ${classeData.subclasses.map(s => s.nome).join(', ')}
+        Subclasse disponível a partir do nível ${nivelSub}. Subclasses: ${classeData.subclasses.map(s => s.nome).join(', ')}
       </div>`;
   }
 
-  // Escolhas obrigatorias da classe (Ordem Divina, Estilo de Luta, etc.)
+  // Escolhas obrigatórias da classe (Ordem Divina, Estilo de Luta, etc.)
   const classeEscolhas = CLASSES_ESCOLHAS[nome];
   let escolhasHtml = '';
   if (classeEscolhas) {
     for (const [chave, config] of Object.entries(classeEscolhas)) {
+      // Filtrar por nivel minimo: nao exibir escolhas de nivel superior ao do personagem
+      const nivelMinConfig = parseInt(config.nivelMinimo || 1);
+      if ((personagem.nivel || 1) < nivelMinConfig) continue;
       const selecionados = personagem.escolhas_classe?.[chave] || [];
 
       // Tipo especial: pericias - gerar opcoes a partir das pericias da classe
@@ -489,14 +547,14 @@ async function abrirPopupClasse(nome) {
     }
   }
 
-  // Caracteristicas de nivel 1
+  // Características de nível 1
   const caracteristicasExcluir = ['Ordem Divina', 'Estilo de Luta', 'Especialista'];
   let caracteristicas1 = '';
   if (classeData?.caracteristicas) {
     const feats = classeData.caracteristicas.filter(c => c.nivel === 1 && !caracteristicasExcluir.includes(c.nome));
     if (feats.length) {
       caracteristicas1 = `
-        <div class="section-divider"><span>Caracteristicas Nivel 1</span></div>
+        <div class="section-divider"><span>Características Nível 1</span></div>
         ${feats.map(f => `
           <details style="margin-bottom:8px">
             <summary style="font-weight:600;cursor:pointer;font-size:0.9rem">${f.nome}</summary>
@@ -512,13 +570,13 @@ async function abrirPopupClasse(nome) {
       <span style="font-size:0.85rem;color:var(--text-muted)">${info.conjurador ? 'Conjurador' : 'Marcial'}</span>
     </div>
     <div class="row" style="font-size:0.85rem">
-      <div class="col-2"><strong>Atributo Primario:</strong> ${info.atributo_primario}</div>
+      <div class="col-2"><strong>Atributo Primário:</strong> ${info.atributo_primario}</div>
       <div class="col-2"><strong>Salvaguardas:</strong> ${salvaguardas}</div>
       <div class="col-2"><strong>Armaduras:</strong> ${armaduras}</div>
       <div class="col-2"><strong>Armas:</strong> ${armas}</div>
     </div>
     <div style="font-size:0.85rem;margin-top:8px">
-      <strong>Pericias (escolha ${info.num_pericias}):</strong> ${pericias}
+      <strong>Perícias (escolha ${info.num_pericias}):</strong> ${pericias}
     </div>
     ${subclassesHtml}
     ${escolhasHtml}
@@ -566,6 +624,13 @@ async function abrirPopupClasse(nome) {
             personagem.extras_classe = { ordem: selecionados[0], ...opt.efeito };
           }
         }
+        if (chave === 'ordem_primal') {
+          personagem.ordem_primal = selecionados[0] || '';
+          const opt = config.opcoes?.find(o => o.nome === selecionados[0]);
+          if (opt?.efeito) {
+            personagem.extras_classe = { ordem: selecionados[0], ...opt.efeito };
+          }
+        }
 
         // Atualizar visual
         document.querySelectorAll(`[data-escolha-classe="${chave}"]`).forEach(c => {
@@ -580,6 +645,8 @@ async function abrirPopupClasse(nome) {
     // Validar escolhas obrigatórias antes de confirmar
     if (classeEscolhas) {
       for (const [chave, config] of Object.entries(classeEscolhas)) {
+        const nivelMinimo = parseInt(config.nivelMinimo || 1);
+        if ((personagem.nivel || 1) < nivelMinimo) continue;
         const selecionados = personagem.escolhas_classe?.[chave] || [];
         if (selecionados.length < config.maxEscolhas) {
           toast(`Selecione ${config.maxEscolhas} opção(ões) de ${config.titulo}`, 'error');
@@ -589,9 +656,13 @@ async function abrirPopupClasse(nome) {
     }
     personagem.classe = nome;
     // Compatibilidade: migrar ordem_divina
-    if (nome === 'Clerigo' && personagem.ordem_divina && !personagem.escolhas_classe?.ordem_divina) {
+    if (nome === 'Clérigo' && personagem.ordem_divina && !personagem.escolhas_classe?.ordem_divina) {
       if (!personagem.escolhas_classe) personagem.escolhas_classe = {};
       personagem.escolhas_classe.ordem_divina = [personagem.ordem_divina];
+    }
+    if (nome === 'Druida' && personagem.ordem_primal && !personagem.escolhas_classe?.ordem_primal) {
+      if (!personagem.escolhas_classe) personagem.escolhas_classe = {};
+      personagem.escolhas_classe.ordem_primal = [personagem.ordem_primal];
     }
     window.fecharModal();
     // Re-renderizar o passo com o resumo atualizado
@@ -1117,12 +1188,15 @@ function renderStepAtributos(el) {
       Atributo primário: ${info?.atributo_primario || 'N/A'}
     </div>
 
-    <div style="display:flex;gap:8px;margin-bottom:16px">
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
       <label class="form-check">
         <input type="radio" name="attr-mode" value="standard" ${(!dadosCache.attrMode || dadosCache.attrMode === 'standard') ? 'checked' : ''}> Conjunto Padrão
       </label>
       <label class="form-check">
         <input type="radio" name="attr-mode" value="pointbuy" ${dadosCache.attrMode === 'pointbuy' ? 'checked' : ''}> Compra de Pontos
+      </label>
+      <label class="form-check">
+        <input type="radio" name="attr-mode" value="rolagem" ${dadosCache.attrMode === 'rolagem' ? 'checked' : ''}> Rolagem 4d6
       </label>
       <label class="form-check">
         <input type="radio" name="attr-mode" value="manual" ${dadosCache.attrMode === 'manual' ? 'checked' : ''}> Manual
@@ -1146,6 +1220,7 @@ function renderStepAtributos(el) {
     switch (modo) {
       case 'standard': renderStandardArray(attrEl); break;
       case 'pointbuy': renderPointBuy(attrEl); break;
+      case 'rolagem': renderRolagem4d6(attrEl); break;
       case 'manual': renderManual(attrEl); break;
     }
   };
@@ -1153,6 +1228,114 @@ function renderStepAtributos(el) {
   el.querySelectorAll('[name="attr-mode"]').forEach(r => r.addEventListener('change', renderAttr));
   renderAttr();
   renderPericiasSeletor();
+}
+
+// Rola 4d6 e descarta o menor dado
+function rolar4d6() {
+  const dados = Array.from({ length: 4 }, () => Math.floor(Math.random() * 6) + 1);
+  dados.sort((a, b) => a - b);
+  const descartado = dados.shift(); // remove o menor
+  return { total: dados.reduce((s, d) => s + d, 0), dados: [descartado, ...dados], descartado };
+}
+
+function renderRolagem4d6(el) {
+  const info = CLASSES_INFO[personagem.classe];
+
+  // Inicializar valores de rolagem se necessário
+  if (!dadosCache.rolagemValores) {
+    dadosCache.rolagemValores = {};
+    dadosCache.rolagemDados = {};
+  }
+
+  // Verificar se já tem valores rolados para atribuir
+  const valoresRolados = Object.values(dadosCache.rolagemValores);
+  const todosRolados = ATRIBUTOS_KEYS.every(k => dadosCache.rolagemValores[k] !== undefined);
+
+  // Montar distribuição: se usou assign mode
+  if (!dadosCache.rolagemAssign) dadosCache.rolagemAssign = {};
+  const usados = Object.values(dadosCache.rolagemAssign);
+
+  el.innerHTML = `
+    <div class="info-box info">
+      Role 4d6 para cada atributo e descarte o menor dado. Clique em "Rolar" para gerar valores.
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+      <button class="btn btn-sm btn-accent" id="btn-rolar-todos">Rolar Todos</button>
+      <button class="btn btn-sm btn-secondary" id="btn-limpar-rolagem">Limpar</button>
+    </div>
+    <div class="atributos-grid">
+      ${ATRIBUTOS_KEYS.map(key => {
+        const nome = ATRIBUTOS_NOMES[key];
+        const rolagemInfo = dadosCache.rolagemDados[key];
+        const valorBase = dadosCache.rolagemValores[key];
+        const bonus = personagem.bonus_antecedente[key] || 0;
+        const valorFinal = valorBase !== undefined ? valorBase + bonus : null;
+        const mod = valorFinal !== null ? calcMod(valorFinal) : null;
+        const ehPrimario = info?.atributo_primario?.includes(nome);
+
+        // Mostrar dados rolados
+        let dadosHtml = '';
+        if (rolagemInfo) {
+          dadosHtml = rolagemInfo.dados.map((d, i) =>
+            `<span style="display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;border-radius:4px;font-size:0.75rem;font-weight:700;${i === 0 ? 'background:#fee;color:#c00;text-decoration:line-through;opacity:0.5' : 'background:var(--bg-tertiary);color:var(--text-primary)'}">${d}</span>`
+          ).join(' ');
+        }
+
+        return `
+          <div class="atributo-box ${ehPrimario ? 'destaque' : ''}" data-key="${key}">
+            <div class="atributo-nome">${nome}${ehPrimario ? ' *' : ''}</div>
+            <button class="btn btn-sm ${valorBase !== undefined ? 'btn-secondary' : 'btn-primary'}" data-rolar-key="${key}" style="margin:4px 0;font-size:0.75rem">
+              ${valorBase !== undefined ? 'Re-rolar' : 'Rolar'}
+            </button>
+            ${dadosHtml ? `<div style="display:flex;gap:2px;justify-content:center;margin:2px 0">${dadosHtml}</div>` : ''}
+            ${bonus > 0 ? `<div style="font-size:0.7rem;color:var(--success)">+${bonus} antec.</div>` : ''}
+            ${valorFinal !== null ? `
+              <div class="atributo-mod">${fmtMod(mod)}</div>
+              <div class="atributo-valor">${valorFinal}</div>
+            ` : '<div class="atributo-mod" style="color:var(--text-muted)">--</div>'}
+          </div>`;
+      }).join('')}
+    </div>
+  `;
+
+  // Evento: rolar individual
+  el.querySelectorAll('[data-rolar-key]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.rolarKey;
+      const resultado = rolar4d6();
+      dadosCache.rolagemValores[key] = resultado.total;
+      dadosCache.rolagemDados[key] = resultado;
+
+      // Atualizar atributos do personagem
+      personagem.atributos_base[key] = resultado.total;
+      personagem.atributos[key] = resultado.total + (personagem.bonus_antecedente[key] || 0);
+      renderRolagem4d6(el);
+    });
+  });
+
+  // Evento: rolar todos
+  document.getElementById('btn-rolar-todos')?.addEventListener('click', () => {
+    ATRIBUTOS_KEYS.forEach(key => {
+      const resultado = rolar4d6();
+      dadosCache.rolagemValores[key] = resultado.total;
+      dadosCache.rolagemDados[key] = resultado;
+      personagem.atributos_base[key] = resultado.total;
+      personagem.atributos[key] = resultado.total + (personagem.bonus_antecedente[key] || 0);
+    });
+    renderRolagem4d6(el);
+  });
+
+  // Evento: limpar
+  document.getElementById('btn-limpar-rolagem')?.addEventListener('click', () => {
+    dadosCache.rolagemValores = {};
+    dadosCache.rolagemDados = {};
+    dadosCache.rolagemAssign = {};
+    ATRIBUTOS_KEYS.forEach(key => {
+      personagem.atributos_base[key] = 10;
+      personagem.atributos[key] = 10 + (personagem.bonus_antecedente[key] || 0);
+    });
+    renderRolagem4d6(el);
+  });
 }
 
 // Distribuições sugeridas de atributos padrão por classe (índices do STANDARD_ARRAY [15,14,13,12,10,8])
@@ -1540,8 +1723,17 @@ function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
     const quantidade = qtyMatch ? parseInt(qtyMatch[1]) : 1;
     const nomeItem = qtyMatch ? qtyMatch[2] : itemStr;
 
-    // Tentar encontrar nos dados de armas
-    const arma = dadosCache.armas?.find(a => semAcento(a.nome).toLowerCase() === semAcento(nomeItem).toLowerCase());
+    // Singularizar nome para busca (ex: "Adagas" -> "Adaga", "Flechas" -> "Flecha")
+    const nomeSingular = nomeItem
+      .replace(/([ãõ])es$/i, '$1o')  // ex: não usado aqui, mas seguro
+      .replace(/ões$/i, 'ão')
+      .replace(/s$/i, '');
+
+    // Tentar encontrar nos dados de armas (tenta plural original e depois singular)
+    const arma = dadosCache.armas?.find(a => {
+      const nomeArma = semAcento(a.nome).toLowerCase();
+      return nomeArma === semAcento(nomeItem).toLowerCase() || nomeArma === semAcento(nomeSingular).toLowerCase();
+    });
     if (arma) {
       personagem.inventario.push({
         nome: arma.nome,
@@ -1555,8 +1747,11 @@ function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
       continue;
     }
 
-    // Tentar encontrar nas armaduras
-    const armadura = dadosCache.armaduras?.find(a => semAcento(a.nome).toLowerCase() === semAcento(nomeItem).toLowerCase());
+    // Tentar encontrar nas armaduras (tenta plural e singular)
+    const armadura = dadosCache.armaduras?.find(a => {
+      const nomeArm = semAcento(a.nome).toLowerCase();
+      return nomeArm === semAcento(nomeItem).toLowerCase() || nomeArm === semAcento(nomeSingular).toLowerCase();
+    });
     if (armadura) {
       personagem.inventario.push({
         nome: armadura.nome,
@@ -1570,8 +1765,11 @@ function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
       continue;
     }
 
-    // Tentar encontrar em equipamento de aventura
-    const equip = dadosCache.equipAvent?.find(e => semAcento(e.nome).toLowerCase() === semAcento(nomeItem).toLowerCase());
+    // Tentar encontrar em equipamento de aventura (tenta plural e singular)
+    const equip = dadosCache.equipAvent?.find(e => {
+      const nomeEquip = semAcento(e.nome).toLowerCase();
+      return nomeEquip === semAcento(nomeItem).toLowerCase() || nomeEquip === semAcento(nomeSingular).toLowerCase();
+    });
     if (equip) {
       personagem.inventario.push({
         nome: equip.nome,
@@ -1820,8 +2018,6 @@ function renderItemInventario(item, idx) {
         </div>
       </div>
       <div class="inv-item-acoes">
-        <button class="btn btn-sm btn-icon inv-btn-mover" data-mover-idx="${idx}" data-dir="up" title="Mover para cima">&uarr;</button>
-        <button class="btn btn-sm btn-icon inv-btn-mover" data-mover-idx="${idx}" data-dir="down" title="Mover para baixo">&darr;</button>
         <label class="form-check inv-equip-label" title="Equipar/Desequipar">
           <input type="checkbox" data-equip-idx="${idx}" ${item.equipado ? 'checked' : ''}> Eq.
         </label>
@@ -1864,27 +2060,6 @@ function setupEventosInventario(containerEl) {
           listaEl.innerHTML = renderListaInventario();
           setupEventosInventario(containerEl);
         }
-      }
-    });
-  });
-
-  // Mover item para cima/baixo
-  containerEl.querySelectorAll('.inv-btn-mover').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const idx = parseInt(btn.dataset.moverIdx);
-      const dir = btn.dataset.dir;
-      const inv = personagem.inventario;
-
-      if (dir === 'up' && idx > 0) {
-        [inv[idx], inv[idx - 1]] = [inv[idx - 1], inv[idx]];
-      } else if (dir === 'down' && idx < inv.length - 1) {
-        [inv[idx], inv[idx + 1]] = [inv[idx + 1], inv[idx]];
-      }
-
-      const listaEl = document.getElementById('lista-inventario');
-      if (listaEl) {
-        listaEl.innerHTML = renderListaInventario();
-        setupEventosInventario(containerEl);
       }
     });
   });
@@ -2259,6 +2434,8 @@ function mostrarDetalheItem(item) {
 // ============================================================
 async function renderStepMagias(el) {
   const info = CLASSES_INFO[personagem.classe];
+  const tipoConj = info?.tipo_conjuracao || 'preparadas';
+  const labelMagias = tipoConj === 'conhecidas' ? 'Magias conhecidas' : 'Magias preparadas';
 
   if (!info?.conjurador) {
     el.innerHTML = `
@@ -2284,6 +2461,11 @@ async function renderStepMagias(el) {
 
   // Bônus de truques do Clérigo Taumaturgo
   if (personagem.classe === 'Clérigo' && personagem.ordem_divina === 'Taumaturgo') {
+    numTruques += 1;
+  }
+
+  // Bônus de truques do Druida Xamã
+  if (personagem.classe === 'Druida' && (personagem.ordem_primal === 'Xamã' || personagem.escolhas_classe?.ordem_primal?.[0] === 'Xamã')) {
     numTruques += 1;
   }
 
@@ -2330,13 +2512,13 @@ async function renderStepMagias(el) {
     <h3 style="margin-bottom:12px">Magias - ${personagem.classe}</h3>
     <div class="info-box info" id="magias-contadores">
       Truques: <strong>${(personagem.magias_conhecidas || []).filter(m => m.circulo === 0).length}/${numTruques}</strong> |
-      Magias preparadas: <strong>${(personagem.magias_preparadas || []).length}/${numPreparadas}</strong> |
+      ${labelMagias}: <strong>${(personagem.magias_preparadas || []).length}/${numPreparadas}</strong> |
       Atributo: <strong>${info.atributo_conjuracao}</strong>
     </div>
 
     <div class="tabs" id="tabs-magias">
       <div class="tab active" data-tab-circ="0">Truques</div>
-      ${Object.keys(espacos).sort((a,b) => Number(a) - Number(b)).map(c => `<div class="tab" data-tab-circ="${c}">${c}&ordm; Círculo (${espacos[c]?.total || 0})</div>`).join('')}
+      ${Array.from({ length: maxCirculo }, (_, i) => i + 1).map(c => `<div class="tab" data-tab-circ="${c}">${c}&ordm; Círculo (${espacos[c]?.total || 0})</div>`).join('')}
     </div>
     <div class="search-box"><input type="text" id="busca-magia" placeholder="Buscar magia..." class="form-input"></div>
     <div id="magias-lista"></div>
@@ -2367,7 +2549,7 @@ async function renderStepMagias(el) {
 
     listaEl.innerHTML = `
       <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">
-        ${isTruque ? `Truques selecionados: ${selecionadas.length}/${maxSel}` : `Magias preparadas: ${totalSel}/${maxSel}`}
+        ${isTruque ? `Truques selecionados: ${selecionadas.length}/${maxSel}` : `${labelMagias}: ${totalSel}/${maxSel}`}
         ${magiasDaClasse.length > 0 ? ` | ${magiasDaClasse.length} disponíveis` : ''}
       </div>
       ${magiasDaClasse.length === 0
@@ -2434,13 +2616,15 @@ async function renderStepMagias(el) {
 }
 
 function toggleMagia(nome, circulo, isTruque, maxTruques, maxPreparadas) {
+  const tipoConj = CLASSES_INFO[personagem.classe]?.tipo_conjuracao || 'preparadas';
+  const labelMagias = tipoConj === 'conhecidas' ? 'magias conhecidas' : 'magias preparadas';
   if (isTruque) {
     const idx = (personagem.magias_conhecidas || []).findIndex(m => m.nome === nome);
     if (idx >= 0) {
       personagem.magias_conhecidas.splice(idx, 1);
     } else {
       const truquesAtual = personagem.magias_conhecidas.filter(m => m.circulo === 0).length;
-      if (truquesAtual >= maxTruques) { toast(`Maximo de ${maxTruques} truques`, 'error'); return; }
+      if (truquesAtual >= maxTruques) { toast(`Máximo de ${maxTruques} truques`, 'error'); return; }
       personagem.magias_conhecidas.push({ nome, circulo });
     }
   } else {
@@ -2448,7 +2632,7 @@ function toggleMagia(nome, circulo, isTruque, maxTruques, maxPreparadas) {
     if (idx >= 0) {
       personagem.magias_preparadas.splice(idx, 1);
     } else {
-      if (personagem.magias_preparadas.length >= maxPreparadas) { toast(`Maximo de ${maxPreparadas} magias preparadas`, 'error'); return; }
+      if (personagem.magias_preparadas.length >= maxPreparadas) { toast(`Máximo de ${maxPreparadas} ${labelMagias}`, 'error'); return; }
       personagem.magias_preparadas.push({ nome, circulo });
     }
   }
@@ -2459,18 +2643,20 @@ function atualizarContadoresMagia(maxTruques, maxPrep) {
   if (!infoBox) return;
   const numT = (personagem.magias_conhecidas || []).filter(m => m.circulo === 0).length;
   const numP = (personagem.magias_preparadas || []).length;
-  infoBox.innerHTML = `Truques: <strong>${numT}/${maxTruques}</strong> | Magias preparadas: <strong>${numP}/${maxPrep}</strong> | Atributo: <strong>${CLASSES_INFO[personagem.classe]?.atributo_conjuracao || ''}</strong>`;
+  const tipoConj = CLASSES_INFO[personagem.classe]?.tipo_conjuracao || 'preparadas';
+  const labelMagias = tipoConj === 'conhecidas' ? 'Magias conhecidas' : 'Magias preparadas';
+  infoBox.innerHTML = `Truques: <strong>${numT}/${maxTruques}</strong> | ${labelMagias}: <strong>${numP}/${maxPrep}</strong> | Atributo: <strong>${CLASSES_INFO[personagem.classe]?.atributo_conjuracao || ''}</strong>`;
 }
 
 async function mostrarDetalheMagia(nome, circulo) {
   // Buscar magia completa
   const dados = await import('../db.js').then(m => m.getMagiasPorCirculo(circulo));
   const magia = dados?.magias?.find(m => m.nome === nome);
-  if (!magia) { toast('Magia nao encontrada', 'error'); return; }
+  if (!magia) { toast('Magia não encontrada', 'error'); return; }
 
   abrirModal(magia.nome, `
     <div class="magia-meta" style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:8px;font-size:0.85rem">
-      <span class="badge badge-primary">${circulo === 0 ? 'Truque' : circulo + 'o Circulo'}</span>
+      <span class="badge badge-primary">${circulo === 0 ? 'Truque' : circulo + 'º Círculo'}</span>
       <span class="badge badge-secondary">${magia.escola}</span>
       <span>${magia.tempo_conjuracao}</span>
       <span>${magia.alcance}</span>
@@ -2478,7 +2664,7 @@ async function mostrarDetalheMagia(nome, circulo) {
       <span>${magia.duracao}</span>
     </div>
     <div class="md-content">${mdParaHtml(magia.descricao)}</div>
-    ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em circulos superiores:</strong> ${magia.circulo_superior}</div>` : ''}
+    ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em círculos superiores:</strong> ${magia.circulo_superior}</div>` : ''}
     <div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px">Classes: ${(magia.classes || []).join(', ')}</div>
   `);
 }
@@ -2486,10 +2672,86 @@ async function mostrarDetalheMagia(nome, circulo) {
 // ============================================================
 // PASSO 7: DETALHES
 // ============================================================
+
+// PHB 2024 (cap. 2): personagem conhece Comum + 2 idiomas da lista de Idiomas Comuns
+const IDIOMAS_COMUNS_2024 = [
+  'Comum', 'Língua de Sinais Comum', 'Dracônico', 'Anão', 'Élfico',
+  'Gigante', 'Gnômico', 'Goblin', 'Pequenino', 'Orc'
+];
+
+function obterRegraIdiomasAtual() {
+  const antecedente = dadosCache.antecedentes?.find(a => a.nome === personagem.antecedente);
+  const especie = dadosCache.especies?.find(e => e.nome === personagem.especie);
+
+  const obrigatorios = new Set(['Comum']);
+  let maxAdicionais = antecedente ? 2 : 0;
+  let opcoes = new Set(IDIOMAS_COMUNS_2024.filter(i => i !== 'Comum'));
+
+  // Extensível por dados: se no futuro os JSONs tiverem campos de idiomas, esta função já suporta
+  const aplicarConfig = (obj) => {
+    if (!obj) return;
+    if (Array.isArray(obj.idiomas_obrigatorios)) {
+      obj.idiomas_obrigatorios.forEach(i => obrigatorios.add(i));
+    }
+    if (Array.isArray(obj.idiomas_opcoes)) {
+      opcoes = new Set(obj.idiomas_opcoes.filter(i => !obrigatorios.has(i)));
+    }
+    if (Array.isArray(obj.idiomas_extra_opcoes)) {
+      obj.idiomas_extra_opcoes.forEach(i => { if (!obrigatorios.has(i)) opcoes.add(i); });
+    }
+    if (Number.isInteger(obj.idiomas_adicionais)) {
+      maxAdicionais = Math.max(0, obj.idiomas_adicionais);
+    }
+    if (Number.isInteger(obj.idiomas_bonus)) {
+      maxAdicionais += Math.max(0, obj.idiomas_bonus);
+    }
+  };
+
+  aplicarConfig(antecedente);
+  aplicarConfig(especie);
+
+  return {
+    obrigatorios: [...obrigatorios],
+    opcoes: [...opcoes],
+    maxAdicionais
+  };
+}
+
+function sanitizarIdiomasSelecionados(listaIdiomas, regraIdiomas) {
+  const obrigatoriosSet = new Set(regraIdiomas.obrigatorios);
+  const opcoesSet = new Set(regraIdiomas.opcoes);
+  const entrada = Array.isArray(listaIdiomas) ? listaIdiomas : [];
+
+  const adicionais = [...new Set(
+    entrada.filter(i => !obrigatoriosSet.has(i) && opcoesSet.has(i))
+  )].slice(0, regraIdiomas.maxAdicionais);
+
+  return [...regraIdiomas.obrigatorios, ...adicionais];
+}
+
 function renderStepDetalhes(el) {
   const info = CLASSES_INFO[personagem.classe];
   const modCon = calcMod(personagem.atributos.constituicao);
   const pvCalc = info ? calcPVNivel1(info.dado_vida, modCon) : 0;
+  const regraIdiomas = obterRegraIdiomasAtual();
+  const obrigatoriosIdiomasSet = new Set(regraIdiomas.obrigatorios);
+
+  // Saneamento: aplica a regra atual de idiomas ao estado do personagem
+  personagem.idiomas = sanitizarIdiomasSelecionados(personagem.idiomas, regraIdiomas);
+
+  // Detectar se a espécie permite escolha de tamanho
+  const espData = dadosCache.especies?.find(e => e.nome === personagem.especie);
+  const textoEsp = espData?.texto_completo || '';
+  const permiteTamanhoEscolha = /Médio.*ou Pequeno|Pequeno.*ou Médio/i.test(textoEsp);
+
+  // Tamanho: usar o salvo, ou detectar do texto da espécie
+  if (!personagem.tamanho && espData) {
+    if (permiteTamanhoEscolha) {
+      personagem.tamanho = 'Médio'; // padrão quando há escolha
+    } else {
+      personagem.tamanho = getTamanho(textoEsp) || 'Médio';
+    }
+  }
 
   el.innerHTML = `
     <h3 style="margin-bottom:12px">Detalhes do Personagem</h3>
@@ -2504,7 +2766,7 @@ function renderStepDetalhes(el) {
         </div>
         <div class="col">
           <div class="form-group">
-            <label class="form-label">Nivel</label>
+            <label class="form-label">Nível</label>
             <input type="number" class="form-input" id="det-nivel" value="${personagem.nivel}" min="1" max="20">
           </div>
         </div>
@@ -2516,6 +2778,44 @@ function renderStepDetalhes(el) {
         Antecedente: ${personagem.antecedente} |
         PV: ${pvCalc} |
         Talento: ${personagem.talentos.join(', ') || 'Nenhum'}
+      </div>
+    </div>
+
+    <!-- Tamanho (se a espécie permite escolha) -->
+    ${permiteTamanhoEscolha ? `
+    <div class="card mb-2">
+      <div class="card-header"><h3>Tamanho da Criatura</h3></div>
+      <div class="info-box info" style="font-size:0.85rem">
+        A espécie <strong>${personagem.especie}</strong> permite escolher entre Médio ou Pequeno.
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <label class="form-check">
+          <input type="radio" name="det-tamanho" value="Médio" ${personagem.tamanho === 'Médio' ? 'checked' : ''}> Médio
+        </label>
+        <label class="form-check">
+          <input type="radio" name="det-tamanho" value="Pequeno" ${personagem.tamanho === 'Pequeno' ? 'checked' : ''}> Pequeno
+        </label>
+      </div>
+    </div>
+    ` : ''}
+
+    <!-- Idiomas -->
+    <div class="card mb-2">
+      <div class="card-header"><h3>Idiomas</h3></div>
+      <div class="info-box info" style="font-size:0.85rem">
+        Regra validada pelo Livro do Jogador 2024: idiomas da origem (Comum + adicionais).
+        <div id="det-idiomas-contador" style="margin-top:4px">Selecionados: <strong>${personagem.idiomas.filter(i => !obrigatoriosIdiomasSet.has(i)).length}/${regraIdiomas.maxAdicionais}</strong></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px" id="det-idiomas-grid">
+        ${[...regraIdiomas.obrigatorios, ...regraIdiomas.opcoes].map(idioma => {
+          const selecionado = personagem.idiomas.includes(idioma);
+          const ehObrigatorio = obrigatoriosIdiomasSet.has(idioma);
+          const atingiuLimite = personagem.idiomas.filter(i => !obrigatoriosIdiomasSet.has(i)).length >= regraIdiomas.maxAdicionais;
+          return `
+            <label class="form-check" style="min-width:160px;${ehObrigatorio ? 'opacity:0.6' : ''}">
+              <input type="checkbox" data-idioma="${idioma}" ${selecionado ? 'checked' : ''} ${ehObrigatorio ? 'disabled' : ''} ${(!ehObrigatorio && !selecionado && atingiuLimite) ? 'disabled' : ''}> ${idioma}
+            </label>`;
+        }).join('')}
       </div>
     </div>
 
@@ -2566,6 +2866,38 @@ function renderStepDetalhes(el) {
       </div>
     </div>
   `;
+
+  // Validação interativa de idiomas por regra dinâmica
+  const atualizarEstadoIdiomas = () => {
+    const checks = [...document.querySelectorAll('[data-idioma]')];
+    const selecionadosAdicionais = checks.filter(c => !obrigatoriosIdiomasSet.has(c.dataset.idioma) && c.checked).length;
+
+    checks.forEach(c => {
+      const ehObrigatorio = obrigatoriosIdiomasSet.has(c.dataset.idioma);
+      if (ehObrigatorio) return;
+      if (!c.checked && selecionadosAdicionais >= regraIdiomas.maxAdicionais) c.disabled = true;
+      else c.disabled = false;
+    });
+
+    const contador = document.getElementById('det-idiomas-contador');
+    if (contador) {
+      contador.innerHTML = `Selecionados: <strong>${selecionadosAdicionais}/${regraIdiomas.maxAdicionais}</strong>`;
+    }
+  };
+
+  document.querySelectorAll('[data-idioma]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const checks = [...document.querySelectorAll('[data-idioma]')];
+      const selecionadosAdicionais = checks.filter(c => !obrigatoriosIdiomasSet.has(c.dataset.idioma) && c.checked).length;
+      if (selecionadosAdicionais > regraIdiomas.maxAdicionais) {
+        cb.checked = false;
+        toast(`Você pode selecionar no máximo ${regraIdiomas.maxAdicionais} idioma(s) adicional(is).`, 'error');
+      }
+      atualizarEstadoIdiomas();
+    });
+  });
+
+  atualizarEstadoIdiomas();
 }
 
 function coletarDetalhes() {
@@ -2578,4 +2910,16 @@ function coletarDetalhes() {
   personagem.defeitos = document.getElementById('det-defeitos')?.value || '';
   personagem.historia_personagem = document.getElementById('det-historia')?.value || '';
   personagem.notas = document.getElementById('det-notas')?.value || '';
+
+  // Coletar idiomas selecionados
+  const idiomasSelecionados = [];
+  document.querySelectorAll('[data-idioma]').forEach(cb => {
+    if (cb.checked) idiomasSelecionados.push(cb.dataset.idioma);
+  });
+  const regraIdiomas = obterRegraIdiomasAtual();
+  personagem.idiomas = sanitizarIdiomasSelecionados(idiomasSelecionados, regraIdiomas);
+
+  // Coletar tamanho escolhido
+  const tamanhoSel = document.querySelector('[name="det-tamanho"]:checked');
+  if (tamanhoSel) personagem.tamanho = tamanhoSel.value;
 }

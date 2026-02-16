@@ -6,6 +6,32 @@ import { getClasse, getEspecies, getIndiceMagias } from './db.js';
 import { calcMod, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas } from './utils.js';
 
 /**
+ * Retorna os espaços de magia do Cavaleiro Místico para o nível atual.
+ * Progressão de conjurador de 1/3 com espaços próprios.
+ */
+function getCavaleiroMisticoEspacos(nivel) {
+  if (nivel < 3) return {};
+  // Tabela de progressão do Cavaleiro Místico (nível do Guerreiro → espaços)
+  const tabela = {
+    3:  { 1: { total: 2, usados: 0 } },
+    4:  { 1: { total: 3, usados: 0 } },
+    7:  { 1: { total: 4, usados: 0 }, 2: { total: 2, usados: 0 } },
+    8:  { 1: { total: 4, usados: 0 }, 2: { total: 2, usados: 0 } },
+    10: { 1: { total: 4, usados: 0 }, 2: { total: 3, usados: 0 } },
+    13: { 1: { total: 4, usados: 0 }, 2: { total: 3, usados: 0 }, 3: { total: 2, usados: 0 } },
+    16: { 1: { total: 4, usados: 0 }, 2: { total: 3, usados: 0 }, 3: { total: 3, usados: 0 } },
+    19: { 1: { total: 4, usados: 0 }, 2: { total: 3, usados: 0 }, 3: { total: 3, usados: 0 }, 4: { total: 1, usados: 0 } }
+  };
+
+  const niveis = Object.keys(tabela).map(Number).sort((a, b) => a - b);
+  let entrada = {};
+  for (const n of niveis) {
+    if (n <= nivel) entrada = tabela[n];
+  }
+  return entrada;
+}
+
+/**
  * Tabela de XP necessário para cada nível (D&D 2024)
  */
 export const XP_POR_NIVEL = {
@@ -76,6 +102,28 @@ export function calcularHPGanho(classe, modCon) {
 }
 
 /**
+ * Calcula HP ganho ao subir de nível (fixo ou rolagem)
+ * @param {string} classe - Nome da classe
+ * @param {number} modCon - Modificador de Constituição
+ * @param {Object} opcoes - Opções de cálculo ({ hp_modo: 'fixo'|'rolado', hp_rolado: number })
+ * @returns {number} HP ganho
+ */
+export function calcularHPGanhoComOpcao(classe, modCon, opcoes = {}) {
+  const info = CLASSES_INFO[classe];
+  if (!info || !info.dado_vida) return 0;
+
+  const modo = opcoes.hp_modo === 'rolado' ? 'rolado' : 'fixo';
+  if (modo === 'rolado') {
+    const rolado = parseInt(opcoes.hp_rolado);
+    if (!Number.isNaN(rolado) && rolado >= 1 && rolado <= info.dado_vida) {
+      return Math.max(1, rolado + modCon);
+    }
+  }
+
+  return calcularHPGanho(classe, modCon);
+}
+
+/**
  * Obtém as características que o personagem ganha em um nível específico
  */
 export async function obterCaracteristicasNivel(classe, nivel) {
@@ -83,9 +131,10 @@ export async function obterCaracteristicasNivel(classe, nivel) {
   if (!classeData || !classeData.tabela_caracteristicas) return [];
   
   const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === nivel);
-  if (!row || !row['Características']) return [];
-  
-  const caracteristicas = row['Características'];
+  if (!row) return [];
+
+  const caracteristicas = row['Características de Classe'] ?? row['Características'];
+  if (!caracteristicas) return [];
   if (caracteristicas === '—' || caracteristicas === '-') return [];
   
   // Dividir por vírgula e limpar espaços
@@ -135,6 +184,145 @@ export function exigeSubclasse(classe, nivel) {
   };
   
   return nivel === niveisSubclasse[classe];
+}
+
+/**
+ * Verifica se o nível exige escolha de Especialização do Bardo
+ */
+export function exigeEspecializacaoBardo(classe, nivel) {
+  return classe === 'Bardo' && (nivel === 2 || nivel === 9);
+}
+
+/**
+ * Verifica se o nível exige escolha de Especialista do Guardião
+ */
+export function exigeEspecializacaoGuardiao(classe, nivel) {
+  return classe === 'Guardião' && nivel === 9;
+}
+
+/**
+ * Extrai magias sempre preparadas de tabelas markdown no nível alvo.
+ * Ex.: | 5 | *Passo Nebuloso* |
+ */
+function extrairMagiasSemprePreparadasTabela(descricao, nivelAlvo) {
+  if (!descricao || !nivelAlvo) return [];
+  const texto = descricao.toLowerCase();
+  if (!texto.includes('sempre') || !texto.includes('preparad')) return [];
+
+  const nomes = new Set();
+  const linhas = descricao.split('\n');
+
+  for (const linha of linhas) {
+    const m = linha.match(/^\|\s*\**(\d+)\**\s*\|\s*(.+?)\s*\|\s*$/);
+    if (!m) continue;
+
+    const nivelLinha = parseInt(m[1], 10);
+    if (nivelLinha !== nivelAlvo) continue;
+
+    const colunaMagias = (m[2] || '').trim();
+    const nomesItalico = [...colunaMagias.matchAll(/\*([^*]+)\*/g)]
+      .map(x => (x[1] || '').trim())
+      .filter(Boolean);
+
+    const nomesLinha = (nomesItalico.length ? nomesItalico : colunaMagias.split(','))
+      .map(n => n.replace(/[*_`]/g, '').trim())
+      .filter(Boolean);
+
+    nomesLinha.forEach(n => nomes.add(n));
+  }
+
+  return [...nomes];
+}
+
+/**
+ * Extrai magias sempre preparadas descritas em texto corrido.
+ * Ex.: "Você sempre tem a magia *Marca do Predador* preparada."
+ */
+function extrairMagiasSemprePreparadasTexto(descricao) {
+  if (!descricao) return [];
+  const texto = descricao.toLowerCase();
+  if (!texto.includes('sempre') || !texto.includes('preparad')) return [];
+
+  const nomes = [];
+  const regex = /\*([^*]+)\*/g;
+  let match;
+  while ((match = regex.exec(descricao)) !== null) {
+    const nome = (match[1] || '').trim();
+    if (!nome) continue;
+    if (nome.includes('|')) continue;
+    if (nome.length < 2) continue;
+    nomes.push(nome);
+  }
+  return nomes;
+}
+
+/**
+ * Obtém magias sempre preparadas concedidas no nível atual.
+ */
+export async function obterMagiasSemprePreparadasNivel(classe, subclasse, nivel) {
+  const classeData = await getClasse(classe);
+  if (!classeData) return [];
+
+  const nomes = new Set();
+
+  const featsClasse = classeData.caracteristicas || [];
+
+  // Características da classe no nível atual (texto corrido + tabela)
+  featsClasse
+    .filter(c => c.nivel === nivel)
+    .forEach(f => {
+      extrairMagiasSemprePreparadasTexto(f.descricao).forEach(n => nomes.add(n));
+      extrairMagiasSemprePreparadasTabela(f.descricao, nivel).forEach(n => nomes.add(n));
+    });
+
+  // Características da classe de níveis anteriores (apenas tabela, para linhas que escalam por nível)
+  featsClasse
+    .filter(c => c.nivel < nivel)
+    .forEach(f => {
+      extrairMagiasSemprePreparadasTabela(f.descricao, nivel).forEach(n => nomes.add(n));
+    });
+
+  // Características da subclasse no nível
+  if (subclasse) {
+    const sc = (classeData.subclasses || []).find(s => s.nome === subclasse);
+    const featsSubclasse = sc?.caracteristicas || [];
+
+    featsSubclasse
+      .filter(c => c.nivel === nivel)
+      .forEach(f => {
+        extrairMagiasSemprePreparadasTexto(f.descricao).forEach(n => nomes.add(n));
+        extrairMagiasSemprePreparadasTabela(f.descricao, nivel).forEach(n => nomes.add(n));
+      });
+
+    featsSubclasse
+      .filter(c => c.nivel < nivel)
+      .forEach(f => {
+        extrairMagiasSemprePreparadasTabela(f.descricao, nivel).forEach(n => nomes.add(n));
+      });
+  }
+
+  if (nomes.size === 0) return [];
+
+  const indice = await getIndiceMagias();
+  const idx = indice?.magias || [];
+  return [...nomes]
+    .map(nome => {
+      const m = idx.find(x => x.nome === nome);
+      return m ? { nome, circulo: m.circulo || 1 } : null;
+    })
+    .filter(Boolean);
+}
+
+/**
+ * Obtém todas as magias sempre preparadas até o nível atual.
+ */
+export async function obterTodasMagiasSemprePreparadas(classe, subclasse, nivelAtual) {
+  const todas = [];
+  for (let nivel = 1; nivel <= (nivelAtual || 1); nivel++) {
+    const magias = await obterMagiasSemprePreparadasNivel(classe, subclasse, nivel);
+    todas.push(...magias);
+  }
+  return todas;
 }
 
 /**
@@ -207,7 +395,7 @@ export async function obterMagiasDominioNivel(classe, subclasse, nivel) {
   
   // Encontrar a feature de magias de domínio (nível 3)
   const magiasFeat = sc.caracteristicas.find(c => 
-    c.nivel === 3 && c.nome.toLowerCase().startsWith('magias de')
+    c.nivel === 3 && /^magias?\s+de/i.test((c.nome || '').trim())
   );
   if (!magiasFeat) return [];
   
@@ -320,8 +508,8 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   }
   
   // Calcular ganho de HP
-  const modCon = calcMod(personagem.atributos.constituicao);
-  const hpGanho = calcularHPGanho(personagem.classe, modCon);
+  const modConAntes = calcMod(personagem.atributos.constituicao);
+  const hpGanho = calcularHPGanhoComOpcao(personagem.classe, modConAntes, opcoes);
   
   // Obter características do novo nível
   const caracteristicas = await obterCaracteristicasNivel(personagem.classe, novoNivel);
@@ -332,6 +520,8 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   
   // Verificar se ganha aumento de atributo
   const ganhaAumentoAtributo = concedeAumentoAtributo(personagem.classe, novoNivel);
+  const exigeEspecializacao = exigeEspecializacaoBardo(personagem.classe, novoNivel);
+  const exigeEspecializacaoGuardiaoNivel = exigeEspecializacaoGuardiao(personagem.classe, novoNivel);
   
   // Se precisa de escolhas do jogador e não foram fornecidas, retornar pendências
   if (precisaSubclasse && !opcoes.subclasse) {
@@ -351,6 +541,30 @@ export async function subirDeNivel(personagem, opcoes = {}) {
       mensagem: 'É necessário escolher aumento de atributos ou um talento'
     };
   }
+
+  if (exigeEspecializacao) {
+    const selecionadas = Array.isArray(opcoes.bardo_expertise) ? opcoes.bardo_expertise : [];
+    if (selecionadas.length !== 2) {
+      return {
+        sucesso: false,
+        pendente: true,
+        tipo_pendencia: 'bardo_expertise',
+        mensagem: 'É necessário escolher 2 perícias para Especialização do Bardo'
+      };
+    }
+  }
+
+  if (exigeEspecializacaoGuardiaoNivel) {
+    const selecionadas = Array.isArray(opcoes.guardiao_expertise) ? opcoes.guardiao_expertise : [];
+    if (selecionadas.length !== 2) {
+      return {
+        sucesso: false,
+        pendente: true,
+        tipo_pendencia: 'guardiao_expertise',
+        mensagem: 'É necessário escolher 2 perícias para Especialista do Guardião'
+      };
+    }
+  }
   
   // Aplicar mudanças ao personagem
   personagem.nivel = novoNivel;
@@ -367,6 +581,27 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   const info = CLASSES_INFO[personagem.classe];
   if (info && info.conjurador) {
     await atualizarEspacosMagia(personagem, classeData);
+  }
+
+  // Cavaleiro Místico: atualizar espaços de magia da subclasse
+  if (personagem.classe === 'Guerreiro' && personagem.subclasse === 'Cavaleiro Místico' && novoNivel >= 3) {
+    const tabelaCM = getCavaleiroMisticoEspacos(novoNivel);
+    Object.keys(tabelaCM).forEach(circulo => {
+      if (personagem.espacos_magia[circulo]) {
+        personagem.espacos_magia[circulo].total = tabelaCM[circulo].total;
+        if (personagem.espacos_magia[circulo].usados > tabelaCM[circulo].total) {
+          personagem.espacos_magia[circulo].usados = tabelaCM[circulo].total;
+        }
+      } else {
+        personagem.espacos_magia[circulo] = tabelaCM[circulo];
+      }
+    });
+    // Remover círculos que não existem mais
+    Object.keys(personagem.espacos_magia).forEach(circulo => {
+      if (!tabelaCM[circulo]) {
+        delete personagem.espacos_magia[circulo];
+      }
+    });
   }
   
   // Aplicar escolha de subclasse
@@ -388,6 +623,17 @@ export async function subirDeNivel(personagem, opcoes = {}) {
       }
     }
   }
+
+  // Adicionar automaticamente magias sempre preparadas
+  const magiasSempre = await obterMagiasSemprePreparadasNivel(personagem.classe, subclasseAtual, novoNivel);
+  if (magiasSempre.length > 0) {
+    if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
+    for (const magia of magiasSempre) {
+      if (!personagem.magias_preparadas.find(m => m.nome === magia.nome)) {
+        personagem.magias_preparadas.push({ ...magia, origem: 'sempre' });
+      }
+    }
+  }
   
   // Aplicar aumentos de atributo
   if (ganhaAumentoAtributo && opcoes.aumentos_atributo) {
@@ -401,11 +647,47 @@ export async function subirDeNivel(personagem, opcoes = {}) {
       }
     }
   }
+
+  // Regra retroativa de Constituição: se o modificador de CON aumentar,
+  // PV máximos aumentam em +1 por nível para cada +1 de modificador.
+  const modConDepois = calcMod(personagem.atributos.constituicao);
+  let bonusConRetroativo = 0;
+  if (modConDepois > modConAntes) {
+    bonusConRetroativo = (modConDepois - modConAntes) * novoNivel;
+    personagem.pv_max += bonusConRetroativo;
+    personagem.pv_atual += bonusConRetroativo;
+  }
   
   // Aplicar talento (se escolhido ao invés de aumento)
   if (ganhaAumentoAtributo && opcoes.talento) {
     if (!personagem.talentos) personagem.talentos = [];
     personagem.talentos.push(opcoes.talento);
+  }
+
+  // Aplicar Especialização do Bardo (2 escolhas nos níveis 2 e 9)
+  let expertiseBardoAplicada = [];
+  if (exigeEspecializacao) {
+    if (!personagem.pericias_expertise) personagem.pericias_expertise = [];
+    const selecionadas = (opcoes.bardo_expertise || []).filter(Boolean);
+    for (const pericia of selecionadas) {
+      if (!personagem.pericias_expertise.includes(pericia)) {
+        personagem.pericias_expertise.push(pericia);
+        expertiseBardoAplicada.push(pericia);
+      }
+    }
+  }
+
+  // Aplicar Especialista do Guardião (2 escolhas no nível 9)
+  let expertiseGuardiaoAplicada = [];
+  if (exigeEspecializacaoGuardiaoNivel) {
+    if (!personagem.pericias_expertise) personagem.pericias_expertise = [];
+    const selecionadas = (opcoes.guardiao_expertise || []).filter(Boolean);
+    for (const pericia of selecionadas) {
+      if (!personagem.pericias_expertise.includes(pericia)) {
+        personagem.pericias_expertise.push(pericia);
+        expertiseGuardiaoAplicada.push(pericia);
+      }
+    }
   }
   
   // Retornar resumo do level-up
@@ -414,16 +696,22 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     nivel_anterior: nivelAnterior,
     nivel_novo: novoNivel,
     hp_ganho: hpGanho,
+    hp_modo: opcoes.hp_modo === 'rolado' ? 'rolado' : 'fixo',
+    hp_rolado: opcoes.hp_modo === 'rolado' ? (parseInt(opcoes.hp_rolado) || null) : null,
+    bonus_con_retroativo: bonusConRetroativo,
     bonus_proficiencia: bonusNovo,
     bonus_mudou: bonusMudou,
     caracteristicas: caracteristicas,
     caracteristicas_especie: caracteristicasEspecie,
     caracteristicas_subclasse: caracteristicasSubclasse,
     magias_dominio_adicionadas: magiasDominio,
+    magias_sempre_adicionadas: magiasSempre,
     subclasse_escolhida: precisaSubclasse ? opcoes.subclasse : null,
     aumento_atributo: ganhaAumentoAtributo,
     aumentos_aplicados: opcoes.aumentos_atributo || null,
-    talento_aplicado: opcoes.talento || null
+    talento_aplicado: opcoes.talento || null,
+    expertise_bardo_aplicada: expertiseBardoAplicada,
+    expertise_guardiao_aplicada: expertiseGuardiaoAplicada
   };
 }
 

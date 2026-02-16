@@ -1,8 +1,8 @@
 {
   "nome": "Mago",
   "tracos_basicos": {
-    "Atributo Primário": "Equipamento Inicial",
-    "Inteligência": "Escolha A ou B: (A) 2 Adagas, Foco Arcano (Cajado), Kit de Erudito, Livro de Magias, Túnica e 5 PO; ou (B) 55 PO"
+    "Atributo Primário": "Inteligência",
+    "Equipamento Inicial": "Escolha A ou B: (A) 2 Adagas, Foco Arcano (Cajado), Kit de Erudito, Livro de Magias, Túnica e 5 PO; ou (B) 55 PO"
   },
   "tabela_caracteristicas": [
     {
@@ -601,250 +601,1236 @@
     }
   ],
   "lista_magias": {
+    "Truques": [
+      {
+        "nome": "Amigos",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Badalar Fúnebre",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Bolha Ácida",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Elementalismo",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Golpe Certeiro",
+        "escola": "Adivinhação",
+        "especial": "M"
+      },
+      {
+        "nome": "Ilusão Menor",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Luz",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Luzes Dançantes",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Mãos Mágicas",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Mensagem",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Prestidigitação Arcana",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Proteção Contra Lâminas",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Raio de Fogo",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Raio de Gelo",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Rajada de Veneno",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Reparar",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Talho Mental",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Toque Chocante",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Toque Necrótico",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Trovão",
+        "escola": "Evocação",
+        "especial": "—"
+      }
+    ],
+    "1º Círculo": [
+      {
+        "nome": "Alarme",
+        "escola": "Abjuração",
+        "especial": "R"
+      },
+      {
+        "nome": "Armadura Arcana",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Compreender Idiomas",
+        "escola": "Adivinhação",
+        "especial": "R"
+      },
+      {
+        "nome": "Convocar Familiar",
+        "escola": "Invocação",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Detectar Magia",
+        "escola": "Adivinhação",
+        "especial": "C, R"
+      },
+      {
+        "nome": "Disco Flutuante de Tenser",
+        "escola": "Invocação",
+        "especial": "R"
+      },
+      {
+        "nome": "Disfarçar-se",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Enfeitiçar Pessoa",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Escrita Ilusória",
+        "escola": "Ilusão",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Escudo Arcano",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Faca de Gelo",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Gargalhada Nefasta de Tasha",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Graxa",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Identificar",
+        "escola": "Adivinhação",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Imagem Silenciosa",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Leque Cromático",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Mãos Flamejantes",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Mísseis Mágicos",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Névoa Obscurecente",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Onda Trovejante",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Orbe Cromático",
+        "escola": "Evocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Passos Largos",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Proteção Contra o Bem e o Mal",
+        "escola": "Abjuração",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Queda Suave",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Raio de Bruxa",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Raio Nauseante",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Retirada Acelerada",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Salto",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Servo Invisível",
+        "escola": "Invocação",
+        "especial": "R"
+      },
+      {
+        "nome": "Sono",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Vitalidade Vazia",
+        "escola": "Necromancia",
+        "especial": "—"
+      }
+    ],
+    "2º Círculo": [
+      {
+        "nome": "Alterar-se",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Aprimorar Atributo",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Arma Mágica",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Arrombar",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Augúrio",
+        "escola": "Adivinhação",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Aumentar/Reduzir",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Aura Mágica de Nystul",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Boca Encantada",
+        "escola": "Ilusão",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Cegueira/Surdez",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Chama Contínua",
+        "escola": "Evocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Corda Extradimensional",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Coroa da Loucura",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Despedaçar",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Detectar Pensamentos",
+        "escola": "Adivinhação",
+        "especial": "C"
+      },
+      {
+        "nome": "Escalada de Aranha",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Escuridão",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Esfera Flamejante",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Espinho Mental",
+        "escola": "Adivinhação",
+        "especial": "C"
+      },
+      {
+        "nome": "Flecha Ácida de Melf",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Força Espectral",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Invisibilidade",
+        "escola": "Ilusão",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Levitação",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Localizar Objeto",
+        "escola": "Adivinhação",
+        "especial": "C"
+      },
+      {
+        "nome": "Lufada de Vento",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Nuvem de Adagas",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Paralisar Pessoa",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Passo Nebuloso",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Raio Ardente",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Raio do Enfraquecimento",
+        "escola": "Necromancia",
+        "especial": "C"
+      },
+      {
+        "nome": "Reflexos",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Repouso Tranquilo",
+        "escola": "Necromancia",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Sopro de Dragão",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Sugestão",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Teia",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Tranca Arcana",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Turvar",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Ver o Invisível",
+        "escola": "Adivinhação",
+        "especial": "—"
+      },
+      {
+        "nome": "Vigor Arcano",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Visão no Escuro",
+        "escola": "Transmutação",
+        "especial": "—"
+      }
+    ],
+    "3º Círculo": [
+      {
+        "nome": "Animar Mortos",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Bola de Fogo",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Celeridade",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Círculo Mágico",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Clarividência",
+        "escola": "Adivinhação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Contramagia",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Convocar Feérico",
+        "escola": "Invocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Dissipar Magia",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Falar com Mortos",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Forma Gasosa",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Glifo de Proteção",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Imagem Maior",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Indetectável",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Invocar Morto-Vivo",
+        "escola": "Necromancia",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Lentidão",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Línguas",
+        "escola": "Adivinhação",
+        "especial": "—"
+      },
+      {
+        "nome": "Medo",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Montaria Fantasmagórica",
+        "escola": "Ilusão",
+        "especial": "R"
+      },
+      {
+        "nome": "Nevasca",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Nuvem Fétida",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Padrão Hipnótico",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Pequeno Refúgio de Leomund",
+        "escola": "Evocação",
+        "especial": "R"
+      },
+      {
+        "nome": "Piscar",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Proteção Contra Energia",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Relâmpago",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Remeter",
+        "escola": "Adivinhação",
+        "especial": "—"
+      },
+      {
+        "nome": "Remover Maldição",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Respirar na Água",
+        "escola": "Transmutação",
+        "especial": "R"
+      },
+      {
+        "nome": "Rogar Maldição",
+        "escola": "Necromancia",
+        "especial": "C"
+      },
+      {
+        "nome": "Simular Morte",
+        "escola": "Necromancia",
+        "especial": "R"
+      },
+      {
+        "nome": "Toque Vampírico",
+        "escola": "Necromancia",
+        "especial": "C"
+      },
+      {
+        "nome": "Voo",
+        "escola": "Transmutação",
+        "especial": "C"
+      }
+    ],
+    "4º Círculo": [
+      {
+        "nome": "Arca Secreta de Leomund",
+        "escola": "Invocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Assassino Fantasmagórico",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Banimento",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Cão Fiel de Mordenkainen",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Confusão",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Controlar Água",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Convocar Elemental",
+        "escola": "Invocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Enfeitiçar Monstro",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Escudo Ardente",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Esfera Resiliente de Otiluke",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Esfera Vitriólica",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Fabricar",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Invisibilidade Maior",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Invocar Aberração",
+        "escola": "Invocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Invocar Constructo",
+        "escola": "Invocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Invocar Elementais Menores",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Localizar Criatura",
+        "escola": "Adivinhação",
+        "especial": "C"
+      },
+      {
+        "nome": "Malogro",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Moldar Rochas",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Muralha de Fogo",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Olho Arcano",
+        "escola": "Adivinhação",
+        "especial": "C"
+      },
+      {
+        "nome": "Pele-Rocha",
+        "escola": "Transmutação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Polimorfia",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Porta Dimensional",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Presságio",
+        "escola": "Adivinhação",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Santuário Particular de Mordenkainen",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Tempestade Glacial",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Tentáculos Negros de Evard",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Terreno Alucinatório",
+        "escola": "Ilusão",
+        "especial": "—"
+      }
+    ],
+    "5º Círculo": [
+      {
+        "nome": "Âncora Planar",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Animar Objetos",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Círculo de Poder",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Círculo de Teleporte",
+        "escola": "Invocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Cone de Frio",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Contato Extraplanar",
+        "escola": "Adivinhação",
+        "especial": "R"
+      },
+      {
+        "nome": "Criação",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Criar Passagem",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Despistar",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Dominar Pessoa",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Estática Sináptica",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Golpe de Arço",
+        "escola": "Invocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Invocar Dragão",
+        "escola": "Invocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Invocar Elemental",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Lendas e Histórias",
+        "escola": "Adivinhação",
+        "especial": "M"
+      },
+      {
+        "nome": "Ligação Telepática de Rary",
+        "escola": "Adivinhação",
+        "especial": "R"
+      },
+      {
+        "nome": "Mão de Bigby",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Missão",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Modificar Memória",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Muralha de Energia",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Muralha de Pedra",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Névoa Mortal",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Paralisar Monstro",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Presença Régia de Yolande",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Similaridade",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Sonho",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Telecinese",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Tempestade Radiante de Jallarzi",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Vidência",
+        "escola": "Adivinhação",
+        "especial": "C, M"
+      }
+    ],
+    "6º Círculo": [
+      {
+        "nome": "Caldeirão Borbulhante de Tasha",
+        "escola": "Invocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Círculo da Morte",
+        "escola": "Necromancia",
+        "especial": "M"
+      },
+      {
+        "nome": "Contingência",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Corrente de Relâmpagos",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Criar Mortos-Vivos",
+        "escola": "Necromancia",
+        "especial": "M"
+      },
+      {
+        "nome": "Dança Irresistível de Otto",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "De Carne para Pedra",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Desintegrar",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Esfera Congelante de Otiluke",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Globo de Invulnerabilidade",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Ilusão Programada",
+        "escola": "Ilusão",
+        "especial": "M"
+      },
+      {
+        "nome": "Invocação Instantânea de Drawmij",
+        "escola": "Invocação",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Invocar Ínfero",
+        "escola": "Invocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Mau Olhado",
+        "escola": "Necromancia",
+        "especial": "C"
+      },
+      {
+        "nome": "Mover Terra",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Muralha de Gelo",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Portais Arcanos",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Proteger Fortaleza",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Raio Solar",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Receptáculo Arcano",
+        "escola": "Necromancia",
+        "especial": "M"
+      },
+      {
+        "nome": "Sugestão em Massa",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Visão da Verdade",
+        "escola": "Adivinhação",
+        "especial": "M"
+      }
+    ],
+    "7º Círculo": [
+      {
+        "nome": "Bola de Fogo Adiável",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Cárcere de Energia",
+        "escola": "Evocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Dedo da Morte",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Espada de Mordenkainen",
+        "escola": "Evocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Forma Etérea",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Inverter a Gravidade",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Mansão Magnífica de Mordenkainen",
+        "escola": "Invocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Miragem Arcana",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Projetar Imagem",
+        "escola": "Ilusão",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Rajada Prismática",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Refugiar",
+        "escola": "Transmutação",
+        "especial": "M"
+      },
+      {
+        "nome": "Símbolo",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Simulacro",
+        "escola": "Ilusão",
+        "especial": "M"
+      },
+      {
+        "nome": "Teleporte",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Transição Planar",
+        "escola": "Invocação",
+        "especial": "M"
+      }
+    ],
+    "8º Círculo": [
+      {
+        "nome": "Antipatia/Simpatia",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Campo Antimagia",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Clone",
+        "escola": "Necromancia",
+        "especial": "M"
+      },
+      {
+        "nome": "Controlar o Clima",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Dominar Monstro",
+        "escola": "Encantamento",
+        "especial": "C"
+      },
+      {
+        "nome": "Explosão Solar",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Labirinto",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Limpar a Mente",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Nuvem Incendiária",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Palavra de Poder: Atordoar",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Semiplano",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Suplício",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Telepatia",
+        "escola": "Adivinhação",
+        "especial": "—"
+      }
+    ],
     "9º Círculo": [
-      "Amigos",
-      "Badalar Fúnebre",
-      "Bolha Ácida",
-      "Elementalismo",
-      "Golpe Certeiro",
-      "Ilusão Menor",
-      "Luz",
-      "Luzes Dançantes",
-      "Mãos Mágicas",
-      "Mensagem",
-      "Prestidigitação Arcana",
-      "Proteção Contra Lâminas",
-      "Raio de Fogo",
-      "Raio de Gelo",
-      "Rajada de Veneno",
-      "Reparar",
-      "Talho Mental",
-      "Toque Chocante",
-      "Toque Necrótico",
-      "Trovão",
-      "Alarme",
-      "Armadura Arcana",
-      "Compreender Idiomas",
-      "Convocar Familiar",
-      "Detectar Magia",
-      "Disco Flutuante de Tenser",
-      "Disfarçar-se",
-      "Enfeitiçar Pessoa",
-      "Escrita Ilusória",
-      "Escudo Arcano",
-      "Faca de Gelo",
-      "Gargalhada Nefasta de Tasha",
-      "Graxa",
-      "Identificar",
-      "Imagem Silenciosa",
-      "Leque Cromático",
-      "Mãos Flamejantes",
-      "Mísseis Mágicos",
-      "Névoa Obscurecente",
-      "Onda Trovejante",
-      "Orbe Cromático",
-      "Passos Largos",
-      "Proteção Contra o Bem e o Mal",
-      "Queda Suave",
-      "Raio de Bruxa",
-      "Raio Nauseante",
-      "Retirada Acelerada",
-      "Salto",
-      "Servo Invisível",
-      "Sono",
-      "Vitalidade Vazia",
-      "Alterar-se",
-      "Aprimorar Atributo",
-      "Arma Mágica",
-      "Arrombar",
-      "Augúrio",
-      "Aumentar/Reduzir",
-      "Aura Mágica de Nystul",
-      "Boca Encantada",
-      "Cegueira/Surdez",
-      "Chama Contínua",
-      "Corda Extradimensional",
-      "Coroa da Loucura",
-      "Despedaçar",
-      "Detectar Pensamentos",
-      "Escalada de Aranha",
-      "Escuridão",
-      "Esfera Flamejante",
-      "Espinho Mental",
-      "Flecha Ácida de Melf",
-      "Força Espectral",
-      "Invisibilidade",
-      "Levitação",
-      "Localizar Objeto",
-      "Lufada de Vento",
-      "Nuvem de Adagas",
-      "Paralisar Pessoa",
-      "Passo Nebuloso",
-      "Raio Ardente",
-      "Raio do Enfraquecimento",
-      "Reflexos",
-      "Repouso Tranquilo",
-      "Sopro de Dragão",
-      "Sugestão",
-      "Teia",
-      "Tranca Arcana",
-      "Turvar",
-      "Ver o Invisível",
-      "Vigor Arcano",
-      "Visão no Escuro",
-      "Animar Mortos",
-      "Bola de Fogo",
-      "Celeridade",
-      "Círculo Mágico",
-      "Clarividência",
-      "Contramagia",
-      "Convocar Feérico",
-      "Dissipar Magia",
-      "Falar com Mortos",
-      "Forma Gasosa",
-      "Glifo de Proteção",
-      "Imagem Maior",
-      "Indetectável",
-      "Invocar Morto-vivo",
-      "Lentidão",
-      "Línguas",
-      "Medo",
-      "Montaria Fantasmagórica",
-      "Nevasca",
-      "Nuvem Fétida",
-      "Padrão Hipnótico",
-      "Pequeno Refúgio de Leomund",
-      "Piscar",
-      "Proteção contra Energia",
-      "Relâmpago",
-      "Remeter",
-      "Remover Maldição",
-      "Respirar na Água",
-      "Rogar Maldição",
-      "Simular Morte",
-      "Toque Vampírico",
-      "Voo",
-      "Arca Secreta de Leomund",
-      "Assassino Fantasmagórico",
-      "Banimento",
-      "Cão Fiel de Mordenkainen",
-      "Confusão",
-      "Controlar Água",
-      "Convocar Elemental",
-      "Enfeitiçar Monstro",
-      "Escudo Ardente",
-      "Esfera Resiliente de Otiluke",
-      "Esfera Vitriólica",
-      "Fabricar",
-      "Invisibilidade Maior",
-      "Invocar Aberração",
-      "Invocar Constructo",
-      "Invocar Elementais Menores",
-      "Localizar Criatura",
-      "Malogro",
-      "Moldar Rochas",
-      "Muralha de Fogo",
-      "Olho Arcano",
-      "Pele-Rocha",
-      "Polimorfia",
-      "Porta Dimensional",
-      "Presságio",
-      "Santuário Particular de Mordenkainen",
-      "Tempestade Glacial",
-      "Tentáculos Negros de Evard",
-      "Terreno Alucinatório",
-      "Âncora Planar",
-      "Animar Objetos",
-      "Círculo de Poder",
-      "Círculo de Teleporte",
-      "Cone de Frio",
-      "Contato Extraplanar",
-      "Criação",
-      "Criar Passagem",
-      "Despistar",
-      "Dominar Pessoa",
-      "Estática Sináptica",
-      "Golpe de Arço",
-      "Invocar Dragão",
-      "Invocar Elemental",
-      "Lendas e Histórias",
-      "Ligação Telepática de Rary",
-      "Mão de Bigby",
-      "Missão",
-      "Modificar Memória",
-      "Muralha de Energia",
-      "Muralha de Pedra",
-      "Névoa Mortal",
-      "Paralisar Monstro",
-      "Presença Régia de Yolande",
-      "Similaridade",
-      "Sonho",
-      "Telecinese",
-      "Tempestade Radiante de Jallazar",
-      "Vidência",
-      "Caldeirão Borbulhante de Tasha",
-      "Círculo da Morte",
-      "Contingência",
-      "Corrente de Relâmpagos",
-      "Criar Mortos-Vivos",
-      "Dança Irresistível de Otto",
-      "De Carne para Pedra",
-      "Desintegrar",
-      "Esfera Congelante de Otiluke",
-      "Globo de Invulnerabilidade",
-      "Ilusão Programada",
-      "Invocação Instantânea de Drawmij",
-      "Invocar Ínfero",
-      "Mau Olhado",
-      "Mover Terra",
-      "Muralha de Gelo",
-      "Portais Arcanos",
-      "Proteger Fortaleza",
-      "Raio Solar",
-      "Receptáculo Arcano",
-      "Sugestão em Massa",
-      "Visão da Verdade",
-      "Bola de Fogo Adiável",
-      "Cárcere de Energia",
-      "Dedo da Morte",
-      "Espada de Mordenkainen",
-      "Forma Etérea",
-      "Inverter a Gravidade",
-      "Mansão Magnífica de Mordenkainen",
-      "Miragem Arcana",
-      "Projetar Imagem",
-      "Rajada Prismática",
-      "Refugiar",
-      "Símbolo",
-      "Simulacro",
-      "Teleporte",
-      "Transição Planar",
-      "Antipatia/Simpatia",
-      "Campo Antimagia",
-      "Clone",
-      "Controlar o Clima",
-      "Dominar Monstro",
-      "Explosão Solar",
-      "Labirinto",
-      "Limpar a Mente",
-      "Nuvem Incendiária",
-      "Palavra de Poder: Atordoar",
-      "Semiplano",
-      "Suplício",
-      "Telepatia",
-      "Aprisionamento",
-      "Chuva de Meteoros",
-      "Desejo",
-      "Encarnação Fantasmagórica",
-      "Metamorfose",
-      "Muralha Prismática",
-      "Palavra de Poder: Matar",
-      "Parar o Tempo",
-      "Polimorfia Total",
-      "Portal",
-      "Projeção Astral",
-      "Sexto Sentido"
+      {
+        "nome": "Aprisionamento",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Chuva de Meteoros",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Desejo",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Encarnação Fantasmagórica",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Metamorfose",
+        "escola": "Transmutação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Muralha Prismática",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Palavra de Poder: Matar",
+        "escola": "Encantamento",
+        "especial": "—"
+      },
+      {
+        "nome": "Parar o Tempo",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Polimorfia Total",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Portal",
+        "escola": "Invocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Projeção Astral",
+        "escola": "Necromancia",
+        "especial": "M"
+      },
+      {
+        "nome": "Sexto Sentido",
+        "escola": "Adivinhação",
+        "especial": "—"
+      }
     ]
   },
-  "texto_completo": "Um Estudioso Usuário de Magia Arcana\n\nMagos são reconhecidos por seu estudo aprofundado da magia. Eles conjuram magias explosivas, raios, ilusões e transformações notáveis, além de invocar criaturas de outros planos, prever o futuro e criar barreiras protetoras. Suas magias mais poderosas podem transformar substâncias, invocar meteoros ou abrir portais para outros mundos.\n\nGeralmente, os Magos adotam uma abordagem acadêmica, explorando os fundamentos teóricos e categorizando magias em escolas. Figuras renomadas como Bigby, Tasha, Mordenkainen e Yolande contribuíram para a criação de magias icônicas reconhecidas por todo o multiverso.\n\nO máximo que um Mago pode vivenciar de maneira comum é atuar como sábio ou mentor. Muitos oferecem serviços como conselheiros, servem em forças militares ou se envolvem com o crime ou a dominação.\n\nEntretanto, a busca pelo conhecimento leva até os magos mais cautelosos a abandonar a segurança de suas bibliotecas e laboratórios em busca de ruínas decadentes e cidades perdidas. A maioria acredita que civilizações antigas guardavam segredos de magia que poderiam conceder um poder maior do que o disponível na atualidade.\n\n**Traços Básicos de Mago**\n\n| **Atributo Primário**                          | Inteligência                                                                                                       |\n|------------------------------------------------|--------------------------------------------------------------------------------------------------------------------|\n| **Dado de Ponto de Vida**                      | D6 por nível de Mago                                                                                               |\n| **Pontos de Vida no Nível 1**                  | 6 + modificador de Constituição                                                                                    |\n| **Pontos de Vida por Nível adicional de Mago** | D6 + seu modificador de Constituição, ou, 4 + seu modificador de Constituição                                      |\n| **Proficiência em Salvaguarda**                | Inteligência e Sabedoria                                                                                           |\n| **Proficiências em Perícias**                  | *Escolha 2:* Arcanismo, História, Intuição, Investigação, Medicina ou Religião.                                    |\n| **Proficiências com Armas**                    | Armas Simples                                                                                                      |\n| **Proficiência com Armaduras**                 | Nenhuma                                                                                                            |\n| **Equipamento Inicial**                        | *Escolha A ou B:* (A) 2 Adagas, Foco Arcano (Cajado), Kit de Erudito, Livro de Magias, Túnica e 5 PO; ou (B) 55 PO |\n\n## Tornando-se um Mago…\n\n### Como Personagem de Nível 1\n\n-   Adquira todos os traços da tabela Traços Básicos de Mago.\n-   Adquira as características de nível 1 de Mago, detalhadas na tabela Características de Mago.\n\n### Como um Personagem Multiclasse\n\n-   Adquira o Dado de Ponto de Vida da tabela Traços Básicos de Mago.\n-   Adquira as características de nível 1 de Mago, detalhadas na tabela Características de Mago. Veja também regras de multiclasse no capítulo 2 para determinar seus espaços de magia disponíveis.\n\n## Características de Classe de Mago\n\nComo Mago, você adquire as seguintes características de classe ao atingir os níveis especificados de Mago. Essas características estão apresentadas na tabela Características de Mago.\n\n| **Nível** | **Bônus de Proficiência** | **Características de Classe**                    | **Truques** | **Magias Preparadas** | **1** | **2** | **3** | **4** | **5** | **6** | **7** | **8** | **9** |\n|-----------|---------------------------|--------------------------------------------------|-------------|-----------------------|-------|-------|-------|-------|-------|-------|-------|-------|-------|\n| 1         | +2                        | Adepto de Ritual, Conjuração, Recuperação Arcana | 3           | 4                     | 2     | —     | —     | —     | —     | —     | —     | —     | —     |\n| 2         | +2                        | Acadêmico                                        | 3           | 5                     | 3     | —     | —     | —     | —     | —     | —     | —     | —     |\n| 3         | +2                        | Subclasse de Mago                                | 3           | 6                     | 4     | 2     | —     | —     | —     | —     | —     | —     | —     |\n| 4         | +2                        | Aumento no Valor de Atributo                     | 4           | 7                     | 4     | 3     | —     | —     | —     | —     | —     | —     | —     |\n| 5         | +3                        | Memorizar Magia                                  | 4           | 9                     | 4     | 3     | 2     | —     | —     | —     | —     | —     | —     |\n| 6         | +3                        | Característica de Subclasse                      | 4           | 10                    | 4     | 3     | 3     | —     | —     | —     | —     | —     | —     |\n| 7         | +3                        | —                                                | 4           | 11                    | 4     | 3     | 3     | 1     | —     | —     | —     | —     | —     |\n| 8         | +3                        | Aumento no Valor de Atributo                     | 4           | 12                    | 4     | 3     | 3     | 2     | —     | —     | —     | —     | —     |\n| 9         | +4                        | —                                                | 4           | 14                    | 4     | 3     | 3     | 3     | 1     | —     | —     | —     | —     |\n| 10        | +4                        | Característica de Subclasse                      | 5           | 15                    | 4     | 3     | 3     | 3     | 2     | —     | —     | —     | —     |\n| 11        | +4                        | —                                                | 5           | 16                    | 4     | 3     | 3     | 3     | 2     | 1     | —     | —     | —     |\n| 12        | +4                        | Aumento no Valor de Atributo                     | 5           | 16                    | 4     | 3     | 3     | 3     | 2     | 1     | —     | —     | —     |\n| 13        | +5                        | —                                                | 5           | 17                    | 4     | 3     | 3     | 3     | 2     | 1     | 1     | —     | —     |\n| 14        | +5                        | Característica de Subclasse                      | 5           | 18                    | 4     | 3     | 3     | 3     | 2     | 1     | 1     | —     | —     |\n| 15        | +5                        | —                                                | 5           | 19                    | 4     | 3     | 3     | 3     | 2     | 1     | 1     | 1     | —     |\n| 16        | +5                        | Aumento no Valor de Atributo                     | 5           | 21                    | 4     | 3     | 3     | 3     | 2     | 1     | 1     | 1     | —     |\n| 17        | +6                        | —                                                | 5           | 22                    | 4     | 3     | 3     | 3     | 2     | 1     | 1     | 1     | 1     |\n| 18        | +6                        | Maestria de Magias                               | 5           | 23                    | 4     | 3     | 3     | 3     | 3     | 1     | 1     | 1     | 1     |\n| 19        | +6                        | Dádiva Épica                                     | 5           | 24                    | 4     | 3     | 3     | 3     | 3     | 2     | 1     | 1     | 1     |\n| 20        | +6                        | Assinatura Mágica                                | 5           | 25                    | 4     | 3     | 3     | 3     | 3     | 2     | 2     | 1     | 1     |\n\n### Nível 1: Adepto de Ritual\n\nVocê pode conjurar qualquer magia como um Ritual se essa magia tiver o marcador Ritual e a magia estiver em seu livro de magias. Você não precisa ter a magia preparada, mas deve ler o livro para conjurar uma magia deste modo.\n\n### Nível 1: Conjuração\n\nComo estudante de magia arcana, você aprendeu a conjurar magias. Veja o capítulo 7 para as regras sobre conjuração de magias. As informações abaixo detalham como você usa essas regras com magias de Mago, que aparecem na lista de magias de Mago mais adiante na descrição da classe.\n\n**Truques.** Você conhece três truques de Mago à sua escolha. *Luz*, *Mãos Mágicas* e *Raio de Gelo* são recomendados. Ao completar um Descanso Longo, você pode substituir um dos seus truques dessa característica por outro truque de Mago à sua escolha.\n\nAo atingir os níveis 4 e 10 de Mago, você aprende mais um truque de Mago à sua escolha, conforme detalhado na coluna Truques da tabela Características de Mago.\n\n**Livro de Magias.** Seu aprendizado de mago culminou na criação de um livro único: seu livro de magias. É um objeto Minúsculo que pesa 1,5 quilo, contém 100 páginas e pode ser lido apenas por você ou por alguém que conjure *Identificar*. Você determina a aparência e os materiais do livro, como um tomo com bordas douradas ou uma coleção de pergaminhos amarrados com barbante.\n\nO livro contém as magias de 1º círculo ou superior que você conhece. Ele começa com seis magias de mago 1º círculo à sua escolha. *Armadura Arcana*, *Detectar Magia*, *Mísseis Mágicos*, *Onda Trovejante*, *Queda Suave* e *Sono* são recomendadas.\n\nAo atingir um nível de Mago após o primeiro, adicione duas magias de Mago à sua escolha ao seu livro de magias. Cada uma dessas magias deve ser de um círculo para o qual você tenha espaços de magia, conforme detalhado na tabela Características de Mago. As magias são o ponto culminante da pesquisa arcana que você faz regularmente.\n\n**Espaços de Magia.** A tabela Características de Mago mostra quantos espaços de magia você tem para conjurar suas magias de 1º círculo ou superior. Você restaura todos os espaços gastos ao completar um Descanso Longo.\n\n**Magias Preparadas de 1º Círculo ou Superior.** Você prepara a lista de magias de 1º círculo ou superior que estão disponíveis para você conjurar com essa característica. Para isso, escolha quatro magias do seu livro de magias. As magias escolhidas devem ser de um círculo para o qual você tenha espaços de magia.\n\nO número de magias em sua lista aumenta à medida que você alcança níveis de Mago, conforme detalhado na coluna Magias Preparadas da tabela Características de Mago. Sempre que esse número aumentar, escolha magias adicionais de Mago até que o número de magias em sua lista corresponda ao número na tabela. As magias escolhidas devem ser de um círculo para o qual você possua espaços de magia. Por exemplo, se você é um Mago de nível 3, sua lista de magias preparadas, escolhidas do seu livro de magias, pode incluir seis magias de 1º ou 2º círculo, em qualquer combinação.\n\nSe outra característica de Mago lhe conceder magias que você sempre tem preparadas, essas magias não contam para o número de magias que você pode preparar com esta característica, mas essas magias, de outra forma, contam como magias de Mago para você.\n\n**Mudando Suas Magias Preparadas.** Ao completar um Descanso Longo, você pode alterar sua lista de magias preparadas, substituindo qualquer uma das magias por outras do seu livro de magias.\n\n**Atributo de Conjuração.** Inteligência é seu atributo de conjuração para suas magias de Mago.\n\n**Foco de Conjuração.** Você pode usar um Foco Arcano ou seu livro de magias como um Foco de Conjuração para suas magias de Mago.\n\n**Expandindo e Substituindo um Livro de Magias**\n\nAs magias que você adiciona ao seu livro de magias à medida que avança de nível refletem sua pesquisa mágica em andamento. Durante suas aventuras, você pode encontrar outras magias que podem ser incorporadas ao livro, como uma magia de Mago em um Pergaminho Mágico, que você pode copiar para o livro de magias.\n\n**Copiando uma Magia para o Livro.** Ao encontrar uma magia de Mago de 1º círculo ou superior, você pode copiá-la para o seu livro de magias se for de um círculo que você possa preparar e se tiver tempo para copiá-la. Para cada círculo de magia, a transcrição leva 2 horas e custa 50 PO. Depois disso, você pode preparar a magia como as outras magias em seu livro de magias.\n\n**Copiando o Livro.** Você pode copiar uma magia do seu livro de magias para outro livro. Isso é como copiar uma nova magia em seu livro de magias, mas mais rápido, já que você já sabe como conjurá-la. Você precisa gastar apenas 1 hora e 10 PO para cada círculo de magia copiada.\n\nSe você perder seu livro de magias, você pode usar o mesmo procedimento para transcrever as magias de Mago que preparou em um novo livro de magias. Preencher o restante do novo livro exige que você encontre novas magias para fazê-lo. Por esse motivo, muitos magos mantêm um livro de magias reserva.\n\n### Nível 1: Recuperação Arcana\n\nVocê pode recuperar um pouco de sua energia mágica estudando seu livro de magias. Ao completar um Descanso Curto, você pode escolher recuperar espaços de magia gastos. Os espaços de magia podem ter um círculo combinado igual a não mais da metade do seu nível de Mago (arredondado para cima), e nenhum dos espaços pode ser de 6º círculo ou superior. Por exemplo, se você é um Mago de nível 4, pode recuperar um valor de até dois círculos de espaços de magia, recuperando um espaço de magia de 2º círculo ou dois espaços de magia de 1º círculo.\n\nVocê pode usar esta característica novamente após completar um Descanso Longo.\n\n### Nível 2: Acadêmico\n\nEnquanto estudava magia, você também se especializou em outro campo de estudo. Escolha uma das seguintes perícias nas quais você tem proficiência: Arcanismo, História, Investigação, Medicina, Natureza ou Religião. Você tem Especialização na perícia escolhida.\n\n### Nível 3: Subclasse de Mago\n\nVocê adquire uma subclasse de Mago à sua escolha. As subclasses Abjurador, Adivinhador, Evocador e Ilusionista estão detalhadas após a descrição desta classe.Uma subclasse é uma especialidade que concede a você características em determinados níveis de Mago. Durante toda sua jornada, você adquire cada uma das características de sua subclasse de seu nível de Mago ou menor.\n\n### Nível 4: Aumento no Valor de Atributo\n\nVocê adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 8, 12 e 16 de Mago.\n\n### Nível 5: Memorizar Magia\n\nAo completar um Descanso Curto, você pode estudar seu livro de magias e substituir uma das magias de Mago de 1º círculo ou superior que você preparou para sua característica Conjuração por outra magia de 1º círculo ou superior do livro.\n\n### Nível 18: Maestria de Magias\n\nVocê alcançou tal domínio sobre certas magias que pode conjurá-las à vontade. Escolha uma magia de 1º e uma de 2º círculo em seu livro de magias que tenham um tempo de conjuração de uma ação. Você sempre tem essas magias preparadas, e pode conjurá-las em seu círculo mais baixo sem gastar um espaço de magia. Para conjurar qualquer uma delas em um círculo superior, você deve gastar um espaço de magia.\n\nAo completar um Descanso Longo, você pode estudar seu livro de magias e substituir uma dessas magias por uma magia elegível do mesmo círculo do livro.\n\n### Nível 19: Dádiva Épica\n\nVocê adquire o talento Dádiva Épica (veja o capítulo 5) ou outro talento à sua escolha para o qual se qualifica. Dádiva da Recordação de Magia é recomendado.\n\n### Nível 20: Assinatura Mágica\n\nEscolha duas magias de 3º círculo em seu livro de magias como suas assinaturas mágicas. Você sempre tem essas magias preparadas e pode conjurá-las, cada uma delas, uma vez no 3º círculo sem gastar um espaço de magia. Ao realizar isso, você não pode conjurá-las deste modo novamente até completar um Descanso Curto ou Longo. Para conjurar uma das magias em um círculo superior, você deve gastar um espaço de magia.\n\n## Lista de Magias de Mago\n\nEsta seção apresenta a lista de magias de Mago, organizadas por círculo de magia e em ordem alfabética, com suas respectivas escolas. Na coluna Especial, *C* indica que a magia requer Concentração, *R* que é um Ritual e *M* que necessita de um componente Material específico.\n\n**Truques (Magias de Mago de Círculo 0)**\n\n| **Magia**                 | **Escola**   | **Especial** |\n|---------------------------|--------------|--------------|\n| *Amigos*                  | Encantamento | C            |\n| *Badalar Fúnebre*         | Necromancia  | —            |\n| *Bolha Ácida*             | Evocação     | —            |\n| *Elementalismo*           | Transmutação | —            |\n| *Golpe Certeiro*          | Adivinhação  | M            |\n| *Ilusão Menor*            | Ilusão       | —            |\n| *Luz*                     | Evocação     | —            |\n| *Luzes Dançantes*         | Ilusão       | C            |\n| *Mãos Mágicas*            | Invocação    | —            |\n| *Mensagem*                | Transmutação | —            |\n| *Prestidigitação Arcana*  | Transmutação | —            |\n| *Proteção Contra Lâminas* | Abjuração    | C            |\n| *Raio de Fogo*            | Evocação     | —            |\n| *Raio de Gelo*            | Evocação     | —            |\n| *Rajada de Veneno*        | Necromancia  | —            |\n| *Reparar*                 | Transmutação | —            |\n| *Talho Mental*            | Encantamento | —            |\n| *Toque Chocante*          | Evocação     | —            |\n| *Toque Necrótico*         | Necromancia  | —            |\n| *Trovão*                  | Evocação     | —            |\n\n**Magias de Mago de 1º Círculo**\n\n| **Magia**                       | **Escola**   | **Especial** |\n|---------------------------------|--------------|--------------|\n| *Alarme*                        | Abjuração    | R            |\n| *Armadura Arcana*               | Abjuração    | —            |\n| *Compreender Idiomas*           | Adivinhação  | R            |\n| *Convocar Familiar*             | Invocação    | R, M         |\n| *Detectar Magia*                | Adivinhação  | C, R         |\n| *Disco Flutuante de Tenser*     | Invocação    | R            |\n| *Disfarçar-se*                  | Ilusão       | —            |\n| *Enfeitiçar Pessoa*             | Encantamento | —            |\n| *Escrita Ilusória*              | Ilusão       | R, M         |\n| *Escudo Arcano*                 | Abjuração    | —            |\n| *Faca de Gelo*                  | Invocação    | —            |\n| *Gargalhada Nefasta de Tasha*   | Encantamento | C            |\n| *Graxa*                         | Invocação    | —            |\n| *Identificar*                   | Adivinhação  | R, M         |\n| *Imagem Silenciosa*             | Ilusão       | C            |\n| *Leque Cromático*               | Ilusão       | —            |\n| *Mãos Flamejantes*              | Evocação     | —            |\n| *Mísseis Mágicos*               | Evocação     | —            |\n| *Névoa Obscurecente*            | Invocação    | C            |\n| *Onda Trovejante*               | Evocação     | —            |\n| *Orbe Cromático*                | Evocação     | M            |\n| *Passos Largos*                 | Transmutação | —            |\n| *Proteção Contra o Bem e o Mal* | Abjuração    | C, M         |\n| *Queda Suave*                   | Transmutação | —            |\n| *Raio de Bruxa*                 | Evocação     | C            |\n| *Raio Nauseante*                | Necromancia  | —            |\n| *Retirada Acelerada*            | Transmutação | C            |\n| *Salto*                         | Transmutação | —            |\n| *Servo Invisível*               | Invocação    | R            |\n| *Sono*                          | Encantamento | C            |\n| *Vitalidade Vazia*              | Necromancia  | —            |\n\n**Magias de Mago de 2º Círculo**\n\n| **Magia**                 | **Escola**   | **Especial** |\n|---------------------------|--------------|--------------|\n| *Alterar-se*              | Transmutação | C            |\n| *Aprimorar Atributo*      | Transmutação | C            |\n| *Arma Mágica*             | Transmutação | —            |\n| *Arrombar*                | Transmutação | —            |\n| *Augúrio*                 | Adivinhação  | R, M         |\n| *Aumentar/Reduzir*        | Transmutação | C            |\n| *Aura Mágica de Nystul*   | Ilusão       | —            |\n| *Boca Encantada*          | Ilusão       | R, M         |\n| *Cegueira/Surdez*         | Transmutação | —            |\n| *Chama Contínua*          | Evocação     | M            |\n| *Corda Extradimensional*  | Transmutação | —            |\n| *Coroa da Loucura*        | Encantamento | C            |\n| *Despedaçar*              | Evocação     | —            |\n| *Detectar Pensamentos*    | Adivinhação  | C            |\n| *Escalada de Aranha*      | Transmutação | C            |\n| *Escuridão*               | Evocação     | C            |\n| *Esfera Flamejante*       | Evocação     | C            |\n| *Espinho Mental*          | Adivinhação  | C            |\n| *Flecha Ácida de Melf*    | Evocação     | —            |\n| *Força Espectral*         | Ilusão       | C            |\n| *Invisibilidade*          | Ilusão       | C, M         |\n| *Levitação*               | Transmutação | C            |\n| *Localizar Objeto*        | Adivinhação  | C            |\n| *Lufada de Vento*         | Evocação     | C            |\n| *Nuvem de Adagas*         | Invocação    | C            |\n| *Paralisar Pessoa*        | Encantamento | C            |\n| *Passo Nebuloso*          | Invocação    | —            |\n| *Raio Ardente*            | Evocação     | —            |\n| *Raio do Enfraquecimento* | Necromancia  | C            |\n| *Reflexos*                | Ilusão       | —            |\n| *Repouso Tranquilo*       | Necromancia  | R, M         |\n| *Sopro de Dragão*         | Transmutação | C            |\n| *Sugestão*                | Encantamento | C            |\n| *Teia*                    | Invocação    | C            |\n| *Tranca Arcana*           | Abjuração    | M            |\n| *Turvar*                  | Ilusão       | C            |\n| *Ver o Invisível*         | Adivinhação  | —            |\n| *Vigor Arcano*            | Abjuração    | —            |\n| *Visão no Escuro*         | Transmutação | —            |\n\n**Magias de Mago de 3º Círculo**\n\n| **Magia**                    | **Escola**   | **Especial** |\n|------------------------------|--------------|--------------|\n| *Animar Mortos*              | Necromancia  | —            |\n| *Bola de Fogo*               | Evocação     | —            |\n| *Celeridade*                 | Transmutação | C            |\n| *Círculo Mágico*             | Abjuração    | M            |\n| *Clarividência*              | Adivinhação  | C, M         |\n| *Contramagia*                | Abjuração    | —            |\n| *Convocar Feérico*           | Invocação    | C, M         |\n| *Dissipar Magia*             | Abjuração    | —            |\n| *Falar com Mortos*           | Necromancia  | —            |\n| *Forma Gasosa*               | Transmutação | C            |\n| *Glifo de Proteção*          | Abjuração    | M            |\n| *Imagem Maior*               | Ilusão       | C            |\n| *Indetectável*               | Abjuração    | M            |\n| *Invocar Morto-vivo*         | Necromancia  | C, M         |\n| *Lentidão*                   | Transmutação | C            |\n| *Línguas*                    | Adivinhação  | —            |\n| *Medo*                       | Ilusão       | C            |\n| *Montaria Fantasmagórica*    | Ilusão       | R            |\n| *Nevasca*                    | Invocação    | C            |\n| *Nuvem Fétida*               | Invocação    | C            |\n| *Padrão Hipnótico*           | Ilusão       | C            |\n| *Pequeno Refúgio de Leomund* | Evocação     | R            |\n| *Piscar*                     | Transmutação | C            |\n| *Proteção contra Energia*    | Abjuração    | C            |\n| *Relâmpago*                  | Evocação     | —            |\n| *Remeter*                    | Adivinhação  | —            |\n| *Remover Maldição*           | Abjuração    | —            |\n| *Respirar na Água*           | Transmutação | R            |\n| *Rogar Maldição*             | Necromancia  | C            |\n| *Simular Morte*              | Necromancia  | R            |\n| *Toque Vampírico*            | Necromancia  | C            |\n| *Voo*                        | Transmutação | C            |\n\n**Magias de Mago de 4º Círculo**\n\n| **Magia**                              | **Escola**   | **Especial** |\n|----------------------------------------|--------------|--------------|\n| *Arca Secreta de Leomund*              | Invocação    | M            |\n| *Assassino Fantasmagórico*             | Ilusão       | C            |\n| *Banimento*                            | Abjuração    | C            |\n| *Cão Fiel de Mordenkainen*             | Invocação    | —            |\n| *Confusão*                             | Encantamento | C            |\n| *Controlar Água*                       | Transmutação | C            |\n| *Convocar Elemental*                   | Invocação    | C, M         |\n| *Enfeitiçar Monstro*                   | Encantamento | —            |\n| *Escudo Ardente*                       | Evocação     | —            |\n| *Esfera Resiliente de Otiluke*         | Abjuração    | C            |\n| *Esfera Vitriólica*                    | Evocação     | —            |\n| *Fabricar*                             | Transmutação | —            |\n| *Invisibilidade Maior*                 | Ilusão       | C            |\n| *Invocar Aberração*                    | Invocação    | C, M         |\n| *Invocar Constructo*                   | Invocação    | C, M         |\n| *Invocar Elementais Menores*           | Invocação    | C            |\n| *Localizar Criatura*                   | Adivinhação  | C            |\n| *Malogro*                              | Necromancia  | —            |\n| *Moldar Rochas*                        | Transmutação | —            |\n| *Muralha de Fogo*                      | Evocação     | C            |\n| *Olho Arcano*                          | Adivinhação  | C            |\n| *Pele-Rocha*                           | Transmutação | C, M         |\n| *Polimorfia*                           | Transmutação | C            |\n| *Porta Dimensional*                    | Invocação    | —            |\n| *Presságio*                            | Adivinhação  | R, M         |\n| *Santuário Particular de Mordenkainen* | Abjuração    | —            |\n| *Tempestade Glacial*                   | Evocação     | —            |\n| *Tentáculos Negros de Evard*           | Invocação    | C            |\n| *Terreno Alucinatório*                 | Ilusão       | —            |\n\n**Magias de Mago de 5º Círculo**\n\n| **Magia**                         | **Escola**   | **Especial** |\n|-----------------------------------|--------------|--------------|\n| *Âncora Planar*                   | Abjuração    | M            |\n| *Animar Objetos*                  | Transmutação | C            |\n| *Círculo de Poder*                | Abjuração    | C            |\n| *Círculo de Teleporte*            | Invocação    | M            |\n| *Cone de Frio*                    | Evocação     | —            |\n| *Contato Extraplanar*             | Adivinhação  | R            |\n| *Criação*                         | Ilusão       | —            |\n| *Criar Passagem*                  | Transmutação | —            |\n| *Despistar*                       | Ilusão       | C            |\n| *Dominar Pessoa*                  | Encantamento | C            |\n| *Estática Sináptica*              | Encantamento | —            |\n| *Golpe de Arço*                   | Invocação    | M            |\n| *Invocar Dragão*                  | Invocação    | C, M         |\n| *Invocar Elemental*               | Invocação    | C            |\n| *Lendas e Histórias*              | Adivinhação  | M            |\n| *Ligação Telepática de Rary*      | Adivinhação  | R            |\n| *Mão de Bigby*                    | Evocação     | C            |\n| *Missão*                          | Encantamento | —            |\n| *Modificar Memória*               | Encantamento | C            |\n| *Muralha de Energia*              | Evocação     | C            |\n| *Muralha de Pedra*                | Evocação     | C            |\n| *Névoa Mortal*                    | Invocação    | C            |\n| *Paralisar Monstro*               | Encantamento | C            |\n| *Presença Régia de Yolande*       | Encantamento | C            |\n| *Similaridade*                    | Ilusão       | —            |\n| *Sonho*                           | Ilusão       | —            |\n| *Telecinese*                      | Transmutação | C            |\n| *Tempestade Radiante de Jallazar* | Evocação     | C            |\n| *Vidência*                        | Adivinhação  | C, M         |\n\n**Magias de Mago de 6º Círculo**\n\n| **Magia**                          | **Escola**   | **Especial** |\n|------------------------------------|--------------|--------------|\n| *Caldeirão Borbulhante de Tasha*   | Invocação    | M            |\n| *Círculo da Morte*                 | Necromancia  | M            |\n| *Contingência*                     | Abjuração    | M            |\n| *Corrente de Relâmpagos*           | Evocação     | —            |\n| *Criar Mortos-Vivos*               | Necromancia  | M            |\n| *Dança Irresistível de Otto*       | Encantamento | C            |\n| *De Carne para Pedra*              | Transmutação | C            |\n| *Desintegrar*                      | Transmutação | —            |\n| *Esfera Congelante de Otiluke*     | Evocação     | —            |\n| *Globo de Invulnerabilidade*       | Abjuração    | C            |\n| *Ilusão Programada*                | Ilusão       | M            |\n| *Invocação Instantânea de Drawmij* | Invocação    | R, M         |\n| *Invocar Ínfero*                   | Invocação    | C, M         |\n| *Mau Olhado*                       | Necromancia  | C            |\n| *Mover Terra*                      | Transmutação | C            |\n| *Muralha de Gelo*                  | Evocação     | C            |\n| *Portais Arcanos*                  | Invocação    | C            |\n| *Proteger Fortaleza*               | Abjuração    | M            |\n| *Raio Solar*                       | Evocação     | C            |\n| *Receptáculo Arcano*               | Necromancia  | M            |\n| *Sugestão em Massa*                | Encantamento | —            |\n| *Visão da Verdade*                 | Adivinhação  | M            |\n\n**Magias de Mago de 7º Círculo**\n\n| **Magia**                          | **Escola**   | **Especial** |\n|------------------------------------|--------------|--------------|\n| *Bola de Fogo Adiável*             | Evocação     | C            |\n| *Cárcere de Energia*               | Evocação     | C, M         |\n| *Dedo da Morte*                    | Necromancia  | —            |\n| *Espada de Mordenkainen*           | Evocação     | C, M         |\n| *Forma Etérea*                     | Invocação    | —            |\n| *Inverter a Gravidade*             | Transmutação | C            |\n| *Mansão Magnífica de Mordenkainen* | Invocação    | M            |\n| *Miragem Arcana*                   | Ilusão       | —            |\n| *Projetar Imagem*                  | Ilusão       | C, M         |\n| *Rajada Prismática*                | Evocação     | —            |\n| *Refugiar*                         | Transmutação | M            |\n| *Símbolo*                          | Abjuração    | M            |\n| *Simulacro*                        | Ilusão       | M            |\n| *Teleporte*                        | Invocação    | —            |\n| *Transição Planar*                 | Invocação    | M            |\n\n**Magias de Mago de 8º Círculo**\n\n| **Magia**                    | **Escola**   | **Especial** |\n|------------------------------|--------------|--------------|\n| *Antipatia/Simpatia*         | Encantamento | —            |\n| *Campo Antimagia*            | Abjuração    | C            |\n| *Clone*                      | Necromancia  | M            |\n| *Controlar o Clima*          | Transmutação | C            |\n| *Dominar Monstro*            | Encantamento | C            |\n| *Explosão Solar*             | Evocação     | —            |\n| *Labirinto*                  | Invocação    | C            |\n| *Limpar a Mente*             | Abjuração    | —            |\n| *Nuvem Incendiária*          | Invocação    | C            |\n| *Palavra de Poder: Atordoar* | Encantamento | —            |\n| *Semiplano*                  | Invocação    | —            |\n| *Suplício*                   | Encantamento | —            |\n| *Telepatia*                  | Adivinhação  | —            |\n\n**Magias de Mago de 9º Círculo**\n\n| **Magia**                   | **Escola**   | **Especial** |\n|-----------------------------|--------------|--------------|\n| *Aprisionamento*            | Abjuração    | M            |\n| *Chuva de Meteoros*         | Evocação     | —            |\n| *Desejo*                    | Invocação    | —            |\n| *Encarnação Fantasmagórica* | Ilusão       | C            |\n| *Metamorfose*               | Transmutação | C, M         |\n| *Muralha Prismática*        | Abjuração    | —            |\n| *Palavra de Poder: Matar*   | Encantamento | —            |\n| *Parar o Tempo*             | Transmutação | —            |\n| *Polimorfia Total*          | Transmutação | C            |\n| *Portal*                    | Invocação    | C, M         |\n| *Projeção Astral*           | Necromancia  | M            |\n| *Sexto Sentido*             | Adivinhação  | —            |\n\n# Subclasses de Mago\n\nUma subclasse de Mago é uma especialização que concede características em certos níveis de Mago, conforme especificado na subclasse. Esta seção apresenta as subclasses Abjurador, Adivinhador, Evocador e Ilusionista.\n\n## Abjurador\n\n*Proteja seus Companheiros e Bana Inimigos*\n\nSeu estudo da magia concentra-se em magias de bloqueio, banimento e proteção, eliminando efeitos nocivos, repelindo influências malignas e defendendo os fracos. Abjuradores são chamados para exorcizar espíritos malignos, proteger locais contra espionagem mágica e fechar portais para outros planos de existência. Grupos de aventureiros valorizam os Abjuradores por sua proteção contra diversas magias hostis e ataques.\n\n### Nível 3: Proteção Arcana\n\nVocê pode tecer magia ao seu redor para se proteger. Ao conjurar uma magia de Abjuração com um espaço de magia, você pode usar simultaneamente um fio da magia para criar uma proteção mágica em si que dura até você completar um Descanso Longo. A proteção tem Pontos de Vida máximos iguais ao dobro do seu nível de Mago mais seu modificador de Inteligência. Ao sofrer dano, a proteção o absorve em vez de você. Aplique qualquer Resistência ou Vulnerabilidade antes de reduzir os Pontos de Vida da proteção. Se o dano reduzir a proteção a 0 Pontos de Vida, você sofre o dano restante. Com 0 Pontos de Vida, a proteção não pode mais absorver dano, mas sua magia permanece.\n\nAo conjurar uma magia Abjuração com um espaço de magia, a proteção restaura um número de Pontos de Vida igual ao dobro do nível do espaço de magia. Você também pode, como uma Ação Bônus, gastar um espaço de magia, e a proteção recupera um número de Pontos de Vida igual ao dobro do nível do espaço de magia gasto.\n\nApós conjurar a proteção, você não pode conjurá-la novamente até completar um Descanso Longo.\n\n### Nível 3: Versado em Abjuração\n\nEscolha duas magias de Mago da escola de Abjuração, cada uma deve ser de 2º círculo ou inferior e adicione-as gratuitamente ao seu livro de magias.\n\nAlém disso, ao adquirir acesso a um novo círculo de espaços de magia nesta classe, você pode adicionar gratuitamente uma magia de Mago da escola de Abjuração ao seu livro de magias. A magia escolhida deve ser de um círculo para o qual você tenha espaços de magia.\n\n### Nível 6: Proteção Projetada\n\nQuando uma criatura à sua vista a até 9 metros de você sofrer dano, você pode executar uma Reação para que sua Proteção Arcana absorva esse dano. Caso isto reduza a proteção a 0 Pontos de Vida, a criatura protegida sofre qualquer dano restante. Se essa criatura tiver alguma Resistência ou Vulnerabilidade, aplique-as antes de reduzir os Pontos de Vida da proteção.\n\n### Nível 10: Rompe-Magia\n\nVocê sempre tem as magias *Contramagia* e *Dissipar Magia* preparadas. Além disso, você pode conjurar *Dissipar Magia* como uma Ação Bônus e pode adicionar seu Bônus de Proficiência ao seu teste de atributo.\n\nAo conjurar uma das magias com um espaço de magia, esse espaço não é gasto se a magia falhar em interromper uma magia.\n\n### Nível 14: Resistência à Magia\n\nVocê tem Vantagem em salvaguardas contra magias e Resistência ao dano proveniente de magias.\n\n## Adivinhador\n\n*Conheça os Segredos do Multiverso*\n\nA orientação de um Adivinhador é buscada por quem deseja entender melhor o passado, presente e futuro. Como Adivinhador, você se empenha em desvendar os véus do espaço, tempo e consciência, dominando magias de discernimento, visão remota, conhecimento sobrenatural e previsão.\n\n### Nível 3: Prodígio\n\nVislumbres do futuro começam a pressionar sua percepção. Ao completar um Descanso Longo, jogue dois d20s e registre os números obtidos. Você pode substituir qualquer Teste de D20 realizado por você ou por uma criatura à sua vista com uma dessas jogadas de previsão. Você deve escolher fazer isso antes da jogada do Teste de D20 e pode substituir uma jogada deste modo apenas uma vez por turno.\n\nCada jogada de previsão pode ser usada apenas uma vez. Ao completar um Descanso Longo você perde quaisquer jogadas de previsão não utilizadas.\n\n### Nível 3: Versado em Adivinhação\n\nEscolha duas magias de Mago da escola de Adivinhação, cada uma deve ser de 2º círculo ou inferior, e adicione-as gratuitamente ao seu livro de magias.\n\nAlém disso, ao adquirir acesso a um novo círculo de espaços de magia nesta classe, você pode adicionar gratuitamente uma magia de Mago da escola de Adivinhação ao seu livro de magias. A magia escolhida deve ser de um círculo para o qual você tenha espaços de magia.\n\n### Nível 6: Perito em Adivinhação\n\nConjurar magias de Adivinhação é tão fácil para você que gasta apenas uma fração de seus esforços de conjuração. Ao conjurar uma magia de Adivinhação usando um espaço de magia de 2º círculo ou superior, você recupera um espaço de magia gasto. O espaço que você recupera deve ser de um círculo inferior ao espaço que você conjurou e não pode ser superior ao 5º círculo.\n\n### Nível 10: O Terceiro Olho\n\nVocê pode ampliar seus poderes de percepção. Como uma Ação Bônus, escolha um dos seguintes benefícios, que dura até você iniciar um Descanso Curto ou Longo. Você não pode usar essa característica novamente até completar um Descanso Curto ou Longo.\n\n**Compreensão Superior.** Você pode ler qualquer idioma.\n\n**Ver o Invisível.** Você pode conjurar *Ver o Invisível* sem gastar um espaço de magia.\n\n**Visão no Escuro.** Você adquire Visão no Escuro com um alcance de 36 metros.\n\n### Nível 14: Prodígio Maior\n\nAs visões em seus sonhos se intensificam e formam uma imagem mais precisa em sua mente do que está por vir. Jogue três d20s para sua característica Prodígio em vez de dois.\n\n## Evocador\n\n*Crie Efeitos Elementais Explosivos*\n\nSeus estudos se concentram em magia que cria poderosos efeitos elementais, como frio intenso, chamas abrasadoras, trovões ensurdecedores, relâmpagos crepitantes e ácido corrosivo. Alguns Evocadores atuam em forças militares, servindo como artilharia para atacar exércitos à distância. Outros utilizam seus poderes para proteção, enquanto alguns buscam benefício pessoal.\n\n### Nível 3: Truque Potente\n\nSeus truques que causam dano afetam até criaturas que evitam os efeitos deles. Ao conjurar um truque em uma criatura e errar o ataque ou o alvo ser bem-sucedido na salvaguarda contra o truque, ele sofre metade do dano (se houver), mas não sofre efeitos adicionais do truque.\n\n### Nível 3: Versado em Evocação\n\nEscolha duas magias de Mago da escola de Evocação, cada uma deve ser de 2º círculo ou inferior, e adicione-as gratuitamente ao seu livro de magias.\n\nAlém disso, ao adquirir acesso a um novo círculo de espaços de magia nesta classe, você pode adicionar gratuitamente uma magia de Mago da escola de Evocação ao seu livro de magias. A magia escolhida deve ser de um círculo para o qual você tenha espaços de magia.\n\n### Nível 6: Esculpir Magias\n\nVocê pode criar zonas de segurança nos efeitos das suas evocações. Ao conjurar uma magia de Evocação que afeta criaturas à sua vista, você pode escolher um número delas igual a 1 mais o círculo da magia. Criaturas escolhidas são bem-sucedidas automaticamente em suas salvaguardas e não sofrem dano se normalmente sofreriam metade do dano em caso de sucesso.\n\n### Nível 10: Evocação Potencializada\n\nAo conjurar uma magia de Mago da escola de Evocação, você pode adicionar seu modificador de Inteligência a uma jogada de dano dessa magia.\n\n### Nível 14: Sobrecarga\n\nVocê pode aumentar o poder de suas magias. Ao conjurar uma magia de Mago que cause dano com um espaço de magia de 1º a 5º círculo, você pode causar dano máximo com essa magia no turno no qual a conjurar.\n\nAo fazer isso pela primeira vez, você não sofre nenhum efeito adverso. Se usar esta característica novamente antes de completar um Descanso Longo, você sofre 2d12 pontos de dano Necrótico para cada círculo do espaço de magia imediatamente após conjurá-la. Esse dano ignora Resistência e Imunidade.\n\nToda vez que você usa esta característica novamente antes de completar um Descanso Longo, o dano Necrótico por círculo de magia aumenta em 1d12.\n\n## Ilusionista\n\n*Teça Magias Sutis de Enganação*\n\nVocê se especializa em magia que deslumbra os sentidos e engana a mente, e as ilusões que você cria fazem o impossível parecer real.\n\n### Nível 3: Ilusões Aprimoradas\n\nVocê pode conjurar magias de Ilusão sem fornecer componentes Verbais e se uma magia de Ilusão que você conjurar tiver um alcance de 3 metros ou mais, o alcance aumenta em 18 metros.\n\nVocê também conhece o truque *Ilusão Menor*. Se já o conhece, você aprende um truque de Mago diferente à sua escolha. O truque não conta para o seu número de truques conhecidos. Você pode criar um som e uma imagem com uma única conjuração de *Ilusão Menor* e pode conjurá-la como uma Ação Bônus.\n\n### Nível 3: Versado em Ilusão\n\nEscolha duas magias de Mago da escola de Ilusão, cada uma deve ser de 2º círculo ou inferior e adicione-as gratuitamente ao seu livro de magias.\n\nAlém disso, ao adquirir acesso a um novo círculo de espaços de magia nesta classe, você pode adicionar gratuitamente uma magia de Mago da escola de Ilusão ao seu livro de magias. A magia escolhida deve ser de um círculo para o qual você tenha espaços de magia.\n\n### Nível 6: Criaturas Espectrais\n\nVocê sempre tem as magias *Convocar Feérico* e *Invocar Fera* preparadas. Ao conjurar qualquer uma das magias, você pode mudar sua escola para Ilusão, o que faz com que a criatura invocada pareça espectral. Você pode conjurar a versão Ilusão de cada magia sem gastar um espaço de magia, mas conjurá-la sem um espaço de magia reduz pela metade os Pontos de Vida da criatura. Após conjurar qualquer uma das magias sem um espaço de magia, você deve completar um Descanso Longo antes de conjurar novamente a magia desta forma.\n\n### Nível 10: Autoimagem Ilusória\n\nAo ser atingido pela jogada de ataque de uma criatura, você pode usar uma Reação para criar uma duplicata ilusória de si entre você e o atacante. O ataque erra automaticamente e a ilusão se dissipa.\n\nApós usar esta característica, você não pode utilizá-la novamente até completar um Descanso Curto ou Longo. Você também pode restaurar seu uso gastando um espaço de magia de 2º círculo ou superior (nenhuma ação é necessária).\n\n### Nível 14: Realidade Ilusória\n\nVocê aprendeu a tecer magia sombria em suas ilusões para dar a elas uma semi-realidade. Ao conjurar uma magia Ilusão com um espaço de magia, você pode escolher um objeto inanimado e não mágico que faça parte da ilusão e tornar esse objeto real. Você pode executar isso no seu turno como uma Ação Bônus, enquanto a magia estiver em andamento. O objeto permanece real por 1 minuto, durante o qual não pode causar dano ou conferir quaisquer condições. Por exemplo, você pode criar uma ilusão de uma ponte sobre um abismo e, em seguida, torná-la real e atravessá-la."
+  "texto_completo": "Um Estudioso Usuário de Magia Arcana\n\nMagos são reconhecidos por seu estudo aprofundado da magia. Eles conjuram magias explosivas, raios, ilusões e transformações notáveis, além de invocar criaturas de outros planos, prever o futuro e criar barreiras protetoras. Suas magias mais poderosas podem transformar substâncias, invocar meteoros ou abrir portais para outros mundos.\n\nGeralmente, os Magos adotam uma abordagem acadêmica, explorando os fundamentos teóricos e categorizando magias em escolas. Figuras renomadas como Bigby, Tasha, Mordenkainen e Yolande contribuíram para a criação de magias icônicas reconhecidas por todo o multiverso.\n\nO máximo que um Mago pode vivenciar de maneira comum é atuar como sábio ou mentor. Muitos oferecem serviços como conselheiros, servem em forças militares ou se envolvem com o crime ou a dominação.\n\nEntretanto, a busca pelo conhecimento leva até os magos mais cautelosos a abandonar a segurança de suas bibliotecas e laboratórios em busca de ruínas decadentes e cidades perdidas. A maioria acredita que civilizações antigas guardavam segredos de magia que poderiam conceder um poder maior do que o disponível na atualidade.\n\n**Traços Básicos de Mago**\n\n| **Atributo Primário**                          | Inteligência                                                                                                       |\n|------------------------------------------------|--------------------------------------------------------------------------------------------------------------------|\n| **Dado de Ponto de Vida**                      | D6 por nível de Mago                                                                                               |\n| **Pontos de Vida no Nível 1**                  | 6 + modificador de Constituição                                                                                    |\n| **Pontos de Vida por Nível adicional de Mago** | D6 + seu modificador de Constituição, ou, 4 + seu modificador de Constituição                                      |\n| **Proficiência em Salvaguarda**                | Inteligência e Sabedoria                                                                                           |\n| **Proficiências em Perícias**                  | *Escolha 2:* Arcanismo, História, Intuição, Investigação, Medicina ou Religião.                                    |\n| **Proficiências com Armas**                    | Armas Simples                                                                                                      |\n| **Proficiência com Armaduras**                 | Nenhuma                                                                                                            |\n| **Equipamento Inicial**                        | *Escolha A ou B:* (A) 2 Adagas, Foco Arcano (Cajado), Kit de Erudito, Livro de Magias, Túnica e 5 PO; ou (B) 55 PO |\n\n## Tornando-se um Mago…\n\n### Como Personagem de Nível 1\n\n-   Adquira todos os traços da tabela Traços Básicos de Mago.\n-   Adquira as características de nível 1 de Mago, detalhadas na tabela Características de Mago.\n\n### Como um Personagem Multiclasse\n\n-   Adquira o Dado de Ponto de Vida da tabela Traços Básicos de Mago.\n-   Adquira as características de nível 1 de Mago, detalhadas na tabela Características de Mago. Veja também regras de multiclasse no capítulo 2 para determinar seus espaços de magia disponíveis.\n\n## Características de Classe de Mago\n\nComo Mago, você adquire as seguintes características de classe ao atingir os níveis especificados de Mago. Essas características estão apresentadas na tabela Características de Mago.\n\n| **Nível** | **Bônus de Proficiência** | **Características de Classe**                    | **Truques** | **Magias Preparadas** | **1** | **2** | **3** | **4** | **5** | **6** | **7** | **8** | **9** |\n|-----------|---------------------------|--------------------------------------------------|-------------|-----------------------|-------|-------|-------|-------|-------|-------|-------|-------|-------|\n| 1         | +2                        | Adepto de Ritual, Conjuração, Recuperação Arcana | 3           | 4                     | 2     | —     | —     | —     | —     | —     | —     | —     | —     |\n| 2         | +2                        | Acadêmico                                        | 3           | 5                     | 3     | —     | —     | —     | —     | —     | —     | —     | —     |\n| 3         | +2                        | Subclasse de Mago                                | 3           | 6                     | 4     | 2     | —     | —     | —     | —     | —     | —     | —     |\n| 4         | +2                        | Aumento no Valor de Atributo                     | 4           | 7                     | 4     | 3     | —     | —     | —     | —     | —     | —     | —     |\n| 5         | +3                        | Memorizar Magia                                  | 4           | 9                     | 4     | 3     | 2     | —     | —     | —     | —     | —     | —     |\n| 6         | +3                        | Característica de Subclasse                      | 4           | 10                    | 4     | 3     | 3     | —     | —     | —     | —     | —     | —     |\n| 7         | +3                        | —                                                | 4           | 11                    | 4     | 3     | 3     | 1     | —     | —     | —     | —     | —     |\n| 8         | +3                        | Aumento no Valor de Atributo                     | 4           | 12                    | 4     | 3     | 3     | 2     | —     | —     | —     | —     | —     |\n| 9         | +4                        | —                                                | 4           | 14                    | 4     | 3     | 3     | 3     | 1     | —     | —     | —     | —     |\n| 10        | +4                        | Característica de Subclasse                      | 5           | 15                    | 4     | 3     | 3     | 3     | 2     | —     | —     | —     | —     |\n| 11        | +4                        | —                                                | 5           | 16                    | 4     | 3     | 3     | 3     | 2     | 1     | —     | —     | —     |\n| 12        | +4                        | Aumento no Valor de Atributo                     | 5           | 16                    | 4     | 3     | 3     | 3     | 2     | 1     | —     | —     | —     |\n| 13        | +5                        | —                                                | 5           | 17                    | 4     | 3     | 3     | 3     | 2     | 1     | 1     | —     | —     |\n| 14        | +5                        | Característica de Subclasse                      | 5           | 18                    | 4     | 3     | 3     | 3     | 2     | 1     | 1     | —     | —     |\n| 15        | +5                        | —                                                | 5           | 19                    | 4     | 3     | 3     | 3     | 2     | 1     | 1     | 1     | —     |\n| 16        | +5                        | Aumento no Valor de Atributo                     | 5           | 21                    | 4     | 3     | 3     | 3     | 2     | 1     | 1     | 1     | —     |\n| 17        | +6                        | —                                                | 5           | 22                    | 4     | 3     | 3     | 3     | 2     | 1     | 1     | 1     | 1     |\n| 18        | +6                        | Maestria de Magias                               | 5           | 23                    | 4     | 3     | 3     | 3     | 3     | 1     | 1     | 1     | 1     |\n| 19        | +6                        | Dádiva Épica                                     | 5           | 24                    | 4     | 3     | 3     | 3     | 3     | 2     | 1     | 1     | 1     |\n| 20        | +6                        | Assinatura Mágica                                | 5           | 25                    | 4     | 3     | 3     | 3     | 3     | 2     | 2     | 1     | 1     |\n\n### Nível 1: Adepto de Ritual\n\nVocê pode conjurar qualquer magia como um Ritual se essa magia tiver o marcador Ritual e a magia estiver em seu livro de magias. Você não precisa ter a magia preparada, mas deve ler o livro para conjurar uma magia deste modo.\n\n### Nível 1: Conjuração\n\nComo estudante de magia arcana, você aprendeu a conjurar magias. Veja o capítulo 7 para as regras sobre conjuração de magias. As informações abaixo detalham como você usa essas regras com magias de Mago, que aparecem na lista de magias de Mago mais adiante na descrição da classe.\n\n**Truques.** Você conhece três truques de Mago à sua escolha. *Luz*, *Mãos Mágicas* e *Raio de Gelo* são recomendados. Ao completar um Descanso Longo, você pode substituir um dos seus truques dessa característica por outro truque de Mago à sua escolha.\n\nAo atingir os níveis 4 e 10 de Mago, você aprende mais um truque de Mago à sua escolha, conforme detalhado na coluna Truques da tabela Características de Mago.\n\n**Livro de Magias.** Seu aprendizado de mago culminou na criação de um livro único: seu livro de magias. É um objeto Minúsculo que pesa 1,5 quilo, contém 100 páginas e pode ser lido apenas por você ou por alguém que conjure *Identificar*. Você determina a aparência e os materiais do livro, como um tomo com bordas douradas ou uma coleção de pergaminhos amarrados com barbante.\n\nO livro contém as magias de 1º círculo ou superior que você conhece. Ele começa com seis magias de mago 1º círculo à sua escolha. *Armadura Arcana*, *Detectar Magia*, *Mísseis Mágicos*, *Onda Trovejante*, *Queda Suave* e *Sono* são recomendadas.\n\nAo atingir um nível de Mago após o primeiro, adicione duas magias de Mago à sua escolha ao seu livro de magias. Cada uma dessas magias deve ser de um círculo para o qual você tenha espaços de magia, conforme detalhado na tabela Características de Mago. As magias são o ponto culminante da pesquisa arcana que você faz regularmente.\n\n**Espaços de Magia.** A tabela Características de Mago mostra quantos espaços de magia você tem para conjurar suas magias de 1º círculo ou superior. Você restaura todos os espaços gastos ao completar um Descanso Longo.\n\n**Magias Preparadas de 1º Círculo ou Superior.** Você prepara a lista de magias de 1º círculo ou superior que estão disponíveis para você conjurar com essa característica. Para isso, escolha quatro magias do seu livro de magias. As magias escolhidas devem ser de um círculo para o qual você tenha espaços de magia.\n\nO número de magias em sua lista aumenta à medida que você alcança níveis de Mago, conforme detalhado na coluna Magias Preparadas da tabela Características de Mago. Sempre que esse número aumentar, escolha magias adicionais de Mago até que o número de magias em sua lista corresponda ao número na tabela. As magias escolhidas devem ser de um círculo para o qual você possua espaços de magia. Por exemplo, se você é um Mago de nível 3, sua lista de magias preparadas, escolhidas do seu livro de magias, pode incluir seis magias de 1º ou 2º círculo, em qualquer combinação.\n\nSe outra característica de Mago lhe conceder magias que você sempre tem preparadas, essas magias não contam para o número de magias que você pode preparar com esta característica, mas essas magias, de outra forma, contam como magias de Mago para você.\n\n**Mudando Suas Magias Preparadas.** Ao completar um Descanso Longo, você pode alterar sua lista de magias preparadas, substituindo qualquer uma das magias por outras do seu livro de magias.\n\n**Atributo de Conjuração.** Inteligência é seu atributo de conjuração para suas magias de Mago.\n\n**Foco de Conjuração.** Você pode usar um Foco Arcano ou seu livro de magias como um Foco de Conjuração para suas magias de Mago.\n\n**Expandindo e Substituindo um Livro de Magias**\n\nAs magias que você adiciona ao seu livro de magias à medida que avança de nível refletem sua pesquisa mágica em andamento. Durante suas aventuras, você pode encontrar outras magias que podem ser incorporadas ao livro, como uma magia de Mago em um Pergaminho Mágico, que você pode copiar para o livro de magias.\n\n**Copiando uma Magia para o Livro.** Ao encontrar uma magia de Mago de 1º círculo ou superior, você pode copiá-la para o seu livro de magias se for de um círculo que você possa preparar e se tiver tempo para copiá-la. Para cada círculo de magia, a transcrição leva 2 horas e custa 50 PO. Depois disso, você pode preparar a magia como as outras magias em seu livro de magias.\n\n**Copiando o Livro.** Você pode copiar uma magia do seu livro de magias para outro livro. Isso é como copiar uma nova magia em seu livro de magias, mas mais rápido, já que você já sabe como conjurá-la. Você precisa gastar apenas 1 hora e 10 PO para cada círculo de magia copiada.\n\nSe você perder seu livro de magias, você pode usar o mesmo procedimento para transcrever as magias de Mago que preparou em um novo livro de magias. Preencher o restante do novo livro exige que você encontre novas magias para fazê-lo. Por esse motivo, muitos magos mantêm um livro de magias reserva.\n\n### Nível 1: Recuperação Arcana\n\nVocê pode recuperar um pouco de sua energia mágica estudando seu livro de magias. Ao completar um Descanso Curto, você pode escolher recuperar espaços de magia gastos. Os espaços de magia podem ter um círculo combinado igual a não mais da metade do seu nível de Mago (arredondado para cima), e nenhum dos espaços pode ser de 6º círculo ou superior. Por exemplo, se você é um Mago de nível 4, pode recuperar um valor de até dois círculos de espaços de magia, recuperando um espaço de magia de 2º círculo ou dois espaços de magia de 1º círculo.\n\nVocê pode usar esta característica novamente após completar um Descanso Longo.\n\n### Nível 2: Acadêmico\n\nEnquanto estudava magia, você também se especializou em outro campo de estudo. Escolha uma das seguintes perícias nas quais você tem proficiência: Arcanismo, História, Investigação, Medicina, Natureza ou Religião. Você tem Especialização na perícia escolhida.\n\n### Nível 3: Subclasse de Mago\n\nVocê adquire uma subclasse de Mago à sua escolha. As subclasses Abjurador, Adivinhador, Evocador e Ilusionista estão detalhadas após a descrição desta classe.Uma subclasse é uma especialidade que concede a você características em determinados níveis de Mago. Durante toda sua jornada, você adquire cada uma das características de sua subclasse de seu nível de Mago ou menor.\n\n### Nível 4: Aumento no Valor de Atributo\n\nVocê adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 8, 12 e 16 de Mago.\n\n### Nível 5: Memorizar Magia\n\nAo completar um Descanso Curto, você pode estudar seu livro de magias e substituir uma das magias de Mago de 1º círculo ou superior que você preparou para sua característica Conjuração por outra magia de 1º círculo ou superior do livro.\n\n### Nível 18: Maestria de Magias\n\nVocê alcançou tal domínio sobre certas magias que pode conjurá-las à vontade. Escolha uma magia de 1º e uma de 2º círculo em seu livro de magias que tenham um tempo de conjuração de uma ação. Você sempre tem essas magias preparadas, e pode conjurá-las em seu círculo mais baixo sem gastar um espaço de magia. Para conjurar qualquer uma delas em um círculo superior, você deve gastar um espaço de magia.\n\nAo completar um Descanso Longo, você pode estudar seu livro de magias e substituir uma dessas magias por uma magia elegível do mesmo círculo do livro.\n\n### Nível 19: Dádiva Épica\n\nVocê adquire o talento Dádiva Épica (veja o capítulo 5) ou outro talento à sua escolha para o qual se qualifica. Dádiva da Recordação de Magia é recomendado.\n\n### Nível 20: Assinatura Mágica\n\nEscolha duas magias de 3º círculo em seu livro de magias como suas assinaturas mágicas. Você sempre tem essas magias preparadas e pode conjurá-las, cada uma delas, uma vez no 3º círculo sem gastar um espaço de magia. Ao realizar isso, você não pode conjurá-las deste modo novamente até completar um Descanso Curto ou Longo. Para conjurar uma das magias em um círculo superior, você deve gastar um espaço de magia.\n\n## Lista de Magias de Mago\n\nEsta seção apresenta a lista de magias de Mago, organizadas por círculo de magia e em ordem alfabética, com suas respectivas escolas. Na coluna Especial, *C* indica que a magia requer Concentração, *R* que é um Ritual e *M* que necessita de um componente Material específico.\n\n**Truques (Magias de Mago de Círculo 0)**\n\n| **Magia**                 | **Escola**   | **Especial** |\n|---------------------------|--------------|--------------|\n| *Amigos*                  | Encantamento | C            |\n| *Badalar Fúnebre*         | Necromancia  | —            |\n| *Bolha Ácida*             | Evocação     | —            |\n| *Elementalismo*           | Transmutação | —            |\n| *Golpe Certeiro*          | Adivinhação  | M            |\n| *Ilusão Menor*            | Ilusão       | —            |\n| *Luz*                     | Evocação     | —            |\n| *Luzes Dançantes*         | Ilusão       | C            |\n| *Mãos Mágicas*            | Invocação    | —            |\n| *Mensagem*                | Transmutação | —            |\n| *Prestidigitação Arcana*  | Transmutação | —            |\n| *Proteção Contra Lâminas* | Abjuração    | C            |\n| *Raio de Fogo*            | Evocação     | —            |\n| *Raio de Gelo*            | Evocação     | —            |\n| *Rajada de Veneno*        | Necromancia  | —            |\n| *Reparar*                 | Transmutação | —            |\n| *Talho Mental*            | Encantamento | —            |\n| *Toque Chocante*          | Evocação     | —            |\n| *Toque Necrótico*         | Necromancia  | —            |\n| *Trovão*                  | Evocação     | —            |\n\n**Magias de Mago de 1º Círculo**\n\n| **Magia**                       | **Escola**   | **Especial** |\n|---------------------------------|--------------|--------------|\n| *Alarme*                        | Abjuração    | R            |\n| *Armadura Arcana*               | Abjuração    | —            |\n| *Compreender Idiomas*           | Adivinhação  | R            |\n| *Convocar Familiar*             | Invocação    | R, M         |\n| *Detectar Magia*                | Adivinhação  | C, R         |\n| *Disco Flutuante de Tenser*     | Invocação    | R            |\n| *Disfarçar-se*                  | Ilusão       | —            |\n| *Enfeitiçar Pessoa*             | Encantamento | —            |\n| *Escrita Ilusória*              | Ilusão       | R, M         |\n| *Escudo Arcano*                 | Abjuração    | —            |\n| *Faca de Gelo*                  | Invocação    | —            |\n| *Gargalhada Nefasta de Tasha*   | Encantamento | C            |\n| *Graxa*                         | Invocação    | —            |\n| *Identificar*                   | Adivinhação  | R, M         |\n| *Imagem Silenciosa*             | Ilusão       | C            |\n| *Leque Cromático*               | Ilusão       | —            |\n| *Mãos Flamejantes*              | Evocação     | —            |\n| *Mísseis Mágicos*               | Evocação     | —            |\n| *Névoa Obscurecente*            | Invocação    | C            |\n| *Onda Trovejante*               | Evocação     | —            |\n| *Orbe Cromático*                | Evocação     | M            |\n| *Passos Largos*                 | Transmutação | —            |\n| *Proteção Contra o Bem e o Mal* | Abjuração    | C, M         |\n| *Queda Suave*                   | Transmutação | —            |\n| *Raio de Bruxa*                 | Evocação     | C            |\n| *Raio Nauseante*                | Necromancia  | —            |\n| *Retirada Acelerada*            | Transmutação | C            |\n| *Salto*                         | Transmutação | —            |\n| *Servo Invisível*               | Invocação    | R            |\n| *Sono*                          | Encantamento | C            |\n| *Vitalidade Vazia*              | Necromancia  | —            |\n\n**Magias de Mago de 2º Círculo**\n\n| **Magia**                 | **Escola**   | **Especial** |\n|---------------------------|--------------|--------------|\n| *Alterar-se*              | Transmutação | C            |\n| *Aprimorar Atributo*      | Transmutação | C            |\n| *Arma Mágica*             | Transmutação | —            |\n| *Arrombar*                | Transmutação | —            |\n| *Augúrio*                 | Adivinhação  | R, M         |\n| *Aumentar/Reduzir*        | Transmutação | C            |\n| *Aura Mágica de Nystul*   | Ilusão       | —            |\n| *Boca Encantada*          | Ilusão       | R, M         |\n| *Cegueira/Surdez*         | Transmutação | —            |\n| *Chama Contínua*          | Evocação     | M            |\n| *Corda Extradimensional*  | Transmutação | —            |\n| *Coroa da Loucura*        | Encantamento | C            |\n| *Despedaçar*              | Evocação     | —            |\n| *Detectar Pensamentos*    | Adivinhação  | C            |\n| *Escalada de Aranha*      | Transmutação | C            |\n| *Escuridão*               | Evocação     | C            |\n| *Esfera Flamejante*       | Evocação     | C            |\n| *Espinho Mental*          | Adivinhação  | C            |\n| *Flecha Ácida de Melf*    | Evocação     | —            |\n| *Força Espectral*         | Ilusão       | C            |\n| *Invisibilidade*          | Ilusão       | C, M         |\n| *Levitação*               | Transmutação | C            |\n| *Localizar Objeto*        | Adivinhação  | C            |\n| *Lufada de Vento*         | Evocação     | C            |\n| *Nuvem de Adagas*         | Invocação    | C            |\n| *Paralisar Pessoa*        | Encantamento | C            |\n| *Passo Nebuloso*          | Invocação    | —            |\n| *Raio Ardente*            | Evocação     | —            |\n| *Raio do Enfraquecimento* | Necromancia  | C            |\n| *Reflexos*                | Ilusão       | —            |\n| *Repouso Tranquilo*       | Necromancia  | R, M         |\n| *Sopro de Dragão*         | Transmutação | C            |\n| *Sugestão*                | Encantamento | C            |\n| *Teia*                    | Invocação    | C            |\n| *Tranca Arcana*           | Abjuração    | M            |\n| *Turvar*                  | Ilusão       | C            |\n| *Ver o Invisível*         | Adivinhação  | —            |\n| *Vigor Arcano*            | Abjuração    | —            |\n| *Visão no Escuro*         | Transmutação | —            |\n\n**Magias de Mago de 3º Círculo**\n\n| **Magia**                    | **Escola**   | **Especial** |\n|------------------------------|--------------|--------------|\n| *Animar Mortos*              | Necromancia  | —            |\n| *Bola de Fogo*               | Evocação     | —            |\n| *Celeridade*                 | Transmutação | C            |\n| *Círculo Mágico*             | Abjuração    | M            |\n| *Clarividência*              | Adivinhação  | C, M         |\n| *Contramagia*                | Abjuração    | —            |\n| *Convocar Feérico*           | Invocação    | C, M         |\n| *Dissipar Magia*             | Abjuração    | —            |\n| *Falar com Mortos*           | Necromancia  | —            |\n| *Forma Gasosa*               | Transmutação | C            |\n| *Glifo de Proteção*          | Abjuração    | M            |\n| *Imagem Maior*               | Ilusão       | C            |\n| *Indetectável*               | Abjuração    | M            |\n| *Invocar Morto-vivo*         | Necromancia  | C, M         |\n| *Lentidão*                   | Transmutação | C            |\n| *Línguas*                    | Adivinhação  | —            |\n| *Medo*                       | Ilusão       | C            |\n| *Montaria Fantasmagórica*    | Ilusão       | R            |\n| *Nevasca*                    | Invocação    | C            |\n| *Nuvem Fétida*               | Invocação    | C            |\n| *Padrão Hipnótico*           | Ilusão       | C            |\n| *Pequeno Refúgio de Leomund* | Evocação     | R            |\n| *Piscar*                     | Transmutação | C            |\n| *Proteção contra Energia*    | Abjuração    | C            |\n| *Relâmpago*                  | Evocação     | —            |\n| *Remeter*                    | Adivinhação  | —            |\n| *Remover Maldição*           | Abjuração    | —            |\n| *Respirar na Água*           | Transmutação | R            |\n| *Rogar Maldição*             | Necromancia  | C            |\n| *Simular Morte*              | Necromancia  | R            |\n| *Toque Vampírico*            | Necromancia  | C            |\n| *Voo*                        | Transmutação | C            |\n\n**Magias de Mago de 4º Círculo**\n\n| **Magia**                              | **Escola**   | **Especial** |\n|----------------------------------------|--------------|--------------|\n| *Arca Secreta de Leomund*              | Invocação    | M            |\n| *Assassino Fantasmagórico*             | Ilusão       | C            |\n| *Banimento*                            | Abjuração    | C            |\n| *Cão Fiel de Mordenkainen*             | Invocação    | —            |\n| *Confusão*                             | Encantamento | C            |\n| *Controlar Água*                       | Transmutação | C            |\n| *Convocar Elemental*                   | Invocação    | C, M         |\n| *Enfeitiçar Monstro*                   | Encantamento | —            |\n| *Escudo Ardente*                       | Evocação     | —            |\n| *Esfera Resiliente de Otiluke*         | Abjuração    | C            |\n| *Esfera Vitriólica*                    | Evocação     | —            |\n| *Fabricar*                             | Transmutação | —            |\n| *Invisibilidade Maior*                 | Ilusão       | C            |\n| *Invocar Aberração*                    | Invocação    | C, M         |\n| *Invocar Constructo*                   | Invocação    | C, M         |\n| *Invocar Elementais Menores*           | Invocação    | C            |\n| *Localizar Criatura*                   | Adivinhação  | C            |\n| *Malogro*                              | Necromancia  | —            |\n| *Moldar Rochas*                        | Transmutação | —            |\n| *Muralha de Fogo*                      | Evocação     | C            |\n| *Olho Arcano*                          | Adivinhação  | C            |\n| *Pele-Rocha*                           | Transmutação | C, M         |\n| *Polimorfia*                           | Transmutação | C            |\n| *Porta Dimensional*                    | Invocação    | —            |\n| *Presságio*                            | Adivinhação  | R, M         |\n| *Santuário Particular de Mordenkainen* | Abjuração    | —            |\n| *Tempestade Glacial*                   | Evocação     | —            |\n| *Tentáculos Negros de Evard*           | Invocação    | C            |\n| *Terreno Alucinatório*                 | Ilusão       | —            |\n\n**Magias de Mago de 5º Círculo**\n\n| **Magia**                         | **Escola**   | **Especial** |\n|-----------------------------------|--------------|--------------|\n| *Âncora Planar*                   | Abjuração    | M            |\n| *Animar Objetos*                  | Transmutação | C            |\n| *Círculo de Poder*                | Abjuração    | C            |\n| *Círculo de Teleporte*            | Invocação    | M            |\n| *Cone de Frio*                    | Evocação     | —            |\n| *Contato Extraplanar*             | Adivinhação  | R            |\n| *Criação*                         | Ilusão       | —            |\n| *Criar Passagem*                  | Transmutação | —            |\n| *Despistar*                       | Ilusão       | C            |\n| *Dominar Pessoa*                  | Encantamento | C            |\n| *Estática Sináptica*              | Encantamento | —            |\n| *Golpe de Arço*                   | Invocação    | M            |\n| *Invocar Dragão*                  | Invocação    | C, M         |\n| *Invocar Elemental*               | Invocação    | C            |\n| *Lendas e Histórias*              | Adivinhação  | M            |\n| *Ligação Telepática de Rary*      | Adivinhação  | R            |\n| *Mão de Bigby*                    | Evocação     | C            |\n| *Missão*                          | Encantamento | —            |\n| *Modificar Memória*               | Encantamento | C            |\n| *Muralha de Energia*              | Evocação     | C            |\n| *Muralha de Pedra*                | Evocação     | C            |\n| *Névoa Mortal*                    | Invocação    | C            |\n| *Paralisar Monstro*               | Encantamento | C            |\n| *Presença Régia de Yolande*       | Encantamento | C            |\n| *Similaridade*                    | Ilusão       | —            |\n| *Sonho*                           | Ilusão       | —            |\n| *Telecinese*                      | Transmutação | C            |\n| *Tempestade Radiante de Jallarzi* | Evocação     | C            |\n| *Vidência*                        | Adivinhação  | C, M         |\n\n**Magias de Mago de 6º Círculo**\n\n| **Magia**                          | **Escola**   | **Especial** |\n|------------------------------------|--------------|--------------|\n| *Caldeirão Borbulhante de Tasha*   | Invocação    | M            |\n| *Círculo da Morte*                 | Necromancia  | M            |\n| *Contingência*                     | Abjuração    | M            |\n| *Corrente de Relâmpagos*           | Evocação     | —            |\n| *Criar Mortos-Vivos*               | Necromancia  | M            |\n| *Dança Irresistível de Otto*       | Encantamento | C            |\n| *De Carne para Pedra*              | Transmutação | C            |\n| *Desintegrar*                      | Transmutação | —            |\n| *Esfera Congelante de Otiluke*     | Evocação     | —            |\n| *Globo de Invulnerabilidade*       | Abjuração    | C            |\n| *Ilusão Programada*                | Ilusão       | M            |\n| *Invocação Instantânea de Drawmij* | Invocação    | R, M         |\n| *Invocar Ínfero*                   | Invocação    | C, M         |\n| *Mau Olhado*                       | Necromancia  | C            |\n| *Mover Terra*                      | Transmutação | C            |\n| *Muralha de Gelo*                  | Evocação     | C            |\n| *Portais Arcanos*                  | Invocação    | C            |\n| *Proteger Fortaleza*               | Abjuração    | M            |\n| *Raio Solar*                       | Evocação     | C            |\n| *Receptáculo Arcano*               | Necromancia  | M            |\n| *Sugestão em Massa*                | Encantamento | —            |\n| *Visão da Verdade*                 | Adivinhação  | M            |\n\n**Magias de Mago de 7º Círculo**\n\n| **Magia**                          | **Escola**   | **Especial** |\n|------------------------------------|--------------|--------------|\n| *Bola de Fogo Adiável*             | Evocação     | C            |\n| *Cárcere de Energia*               | Evocação     | C, M         |\n| *Dedo da Morte*                    | Necromancia  | —            |\n| *Espada de Mordenkainen*           | Evocação     | C, M         |\n| *Forma Etérea*                     | Invocação    | —            |\n| *Inverter a Gravidade*             | Transmutação | C            |\n| *Mansão Magnífica de Mordenkainen* | Invocação    | M            |\n| *Miragem Arcana*                   | Ilusão       | —            |\n| *Projetar Imagem*                  | Ilusão       | C, M         |\n| *Rajada Prismática*                | Evocação     | —            |\n| *Refugiar*                         | Transmutação | M            |\n| *Símbolo*                          | Abjuração    | M            |\n| *Simulacro*                        | Ilusão       | M            |\n| *Teleporte*                        | Invocação    | —            |\n| *Transição Planar*                 | Invocação    | M            |\n\n**Magias de Mago de 8º Círculo**\n\n| **Magia**                    | **Escola**   | **Especial** |\n|------------------------------|--------------|--------------|\n| *Antipatia/Simpatia*         | Encantamento | —            |\n| *Campo Antimagia*            | Abjuração    | C            |\n| *Clone*                      | Necromancia  | M            |\n| *Controlar o Clima*          | Transmutação | C            |\n| *Dominar Monstro*            | Encantamento | C            |\n| *Explosão Solar*             | Evocação     | —            |\n| *Labirinto*                  | Invocação    | C            |\n| *Limpar a Mente*             | Abjuração    | —            |\n| *Nuvem Incendiária*          | Invocação    | C            |\n| *Palavra de Poder: Atordoar* | Encantamento | —            |\n| *Semiplano*                  | Invocação    | —            |\n| *Suplício*                   | Encantamento | —            |\n| *Telepatia*                  | Adivinhação  | —            |\n\n**Magias de Mago de 9º Círculo**\n\n| **Magia**                   | **Escola**   | **Especial** |\n|-----------------------------|--------------|--------------|\n| *Aprisionamento*            | Abjuração    | M            |\n| *Chuva de Meteoros*         | Evocação     | —            |\n| *Desejo*                    | Invocação    | —            |\n| *Encarnação Fantasmagórica* | Ilusão       | C            |\n| *Metamorfose*               | Transmutação | C, M         |\n| *Muralha Prismática*        | Abjuração    | —            |\n| *Palavra de Poder: Matar*   | Encantamento | —            |\n| *Parar o Tempo*             | Transmutação | —            |\n| *Polimorfia Total*          | Transmutação | C            |\n| *Portal*                    | Invocação    | C, M         |\n| *Projeção Astral*           | Necromancia  | M            |\n| *Sexto Sentido*             | Adivinhação  | —            |\n\n# Subclasses de Mago\n\nUma subclasse de Mago é uma especialização que concede características em certos níveis de Mago, conforme especificado na subclasse. Esta seção apresenta as subclasses Abjurador, Adivinhador, Evocador e Ilusionista.\n\n## Abjurador\n\n*Proteja seus Companheiros e Bana Inimigos*\n\nSeu estudo da magia concentra-se em magias de bloqueio, banimento e proteção, eliminando efeitos nocivos, repelindo influências malignas e defendendo os fracos. Abjuradores são chamados para exorcizar espíritos malignos, proteger locais contra espionagem mágica e fechar portais para outros planos de existência. Grupos de aventureiros valorizam os Abjuradores por sua proteção contra diversas magias hostis e ataques.\n\n### Nível 3: Proteção Arcana\n\nVocê pode tecer magia ao seu redor para se proteger. Ao conjurar uma magia de Abjuração com um espaço de magia, você pode usar simultaneamente um fio da magia para criar uma proteção mágica em si que dura até você completar um Descanso Longo. A proteção tem Pontos de Vida máximos iguais ao dobro do seu nível de Mago mais seu modificador de Inteligência. Ao sofrer dano, a proteção o absorve em vez de você. Aplique qualquer Resistência ou Vulnerabilidade antes de reduzir os Pontos de Vida da proteção. Se o dano reduzir a proteção a 0 Pontos de Vida, você sofre o dano restante. Com 0 Pontos de Vida, a proteção não pode mais absorver dano, mas sua magia permanece.\n\nAo conjurar uma magia Abjuração com um espaço de magia, a proteção restaura um número de Pontos de Vida igual ao dobro do nível do espaço de magia. Você também pode, como uma Ação Bônus, gastar um espaço de magia, e a proteção recupera um número de Pontos de Vida igual ao dobro do nível do espaço de magia gasto.\n\nApós conjurar a proteção, você não pode conjurá-la novamente até completar um Descanso Longo.\n\n### Nível 3: Versado em Abjuração\n\nEscolha duas magias de Mago da escola de Abjuração, cada uma deve ser de 2º círculo ou inferior e adicione-as gratuitamente ao seu livro de magias.\n\nAlém disso, ao adquirir acesso a um novo círculo de espaços de magia nesta classe, você pode adicionar gratuitamente uma magia de Mago da escola de Abjuração ao seu livro de magias. A magia escolhida deve ser de um círculo para o qual você tenha espaços de magia.\n\n### Nível 6: Proteção Projetada\n\nQuando uma criatura à sua vista a até 9 metros de você sofrer dano, você pode executar uma Reação para que sua Proteção Arcana absorva esse dano. Caso isto reduza a proteção a 0 Pontos de Vida, a criatura protegida sofre qualquer dano restante. Se essa criatura tiver alguma Resistência ou Vulnerabilidade, aplique-as antes de reduzir os Pontos de Vida da proteção.\n\n### Nível 10: Rompe-Magia\n\nVocê sempre tem as magias *Contramagia* e *Dissipar Magia* preparadas. Além disso, você pode conjurar *Dissipar Magia* como uma Ação Bônus e pode adicionar seu Bônus de Proficiência ao seu teste de atributo.\n\nAo conjurar uma das magias com um espaço de magia, esse espaço não é gasto se a magia falhar em interromper uma magia.\n\n### Nível 14: Resistência à Magia\n\nVocê tem Vantagem em salvaguardas contra magias e Resistência ao dano proveniente de magias.\n\n## Adivinhador\n\n*Conheça os Segredos do Multiverso*\n\nA orientação de um Adivinhador é buscada por quem deseja entender melhor o passado, presente e futuro. Como Adivinhador, você se empenha em desvendar os véus do espaço, tempo e consciência, dominando magias de discernimento, visão remota, conhecimento sobrenatural e previsão.\n\n### Nível 3: Prodígio\n\nVislumbres do futuro começam a pressionar sua percepção. Ao completar um Descanso Longo, jogue dois d20s e registre os números obtidos. Você pode substituir qualquer Teste de D20 realizado por você ou por uma criatura à sua vista com uma dessas jogadas de previsão. Você deve escolher fazer isso antes da jogada do Teste de D20 e pode substituir uma jogada deste modo apenas uma vez por turno.\n\nCada jogada de previsão pode ser usada apenas uma vez. Ao completar um Descanso Longo você perde quaisquer jogadas de previsão não utilizadas.\n\n### Nível 3: Versado em Adivinhação\n\nEscolha duas magias de Mago da escola de Adivinhação, cada uma deve ser de 2º círculo ou inferior, e adicione-as gratuitamente ao seu livro de magias.\n\nAlém disso, ao adquirir acesso a um novo círculo de espaços de magia nesta classe, você pode adicionar gratuitamente uma magia de Mago da escola de Adivinhação ao seu livro de magias. A magia escolhida deve ser de um círculo para o qual você tenha espaços de magia.\n\n### Nível 6: Perito em Adivinhação\n\nConjurar magias de Adivinhação é tão fácil para você que gasta apenas uma fração de seus esforços de conjuração. Ao conjurar uma magia de Adivinhação usando um espaço de magia de 2º círculo ou superior, você recupera um espaço de magia gasto. O espaço que você recupera deve ser de um círculo inferior ao espaço que você conjurou e não pode ser superior ao 5º círculo.\n\n### Nível 10: O Terceiro Olho\n\nVocê pode ampliar seus poderes de percepção. Como uma Ação Bônus, escolha um dos seguintes benefícios, que dura até você iniciar um Descanso Curto ou Longo. Você não pode usar essa característica novamente até completar um Descanso Curto ou Longo.\n\n**Compreensão Superior.** Você pode ler qualquer idioma.\n\n**Ver o Invisível.** Você pode conjurar *Ver o Invisível* sem gastar um espaço de magia.\n\n**Visão no Escuro.** Você adquire Visão no Escuro com um alcance de 36 metros.\n\n### Nível 14: Prodígio Maior\n\nAs visões em seus sonhos se intensificam e formam uma imagem mais precisa em sua mente do que está por vir. Jogue três d20s para sua característica Prodígio em vez de dois.\n\n## Evocador\n\n*Crie Efeitos Elementais Explosivos*\n\nSeus estudos se concentram em magia que cria poderosos efeitos elementais, como frio intenso, chamas abrasadoras, trovões ensurdecedores, relâmpagos crepitantes e ácido corrosivo. Alguns Evocadores atuam em forças militares, servindo como artilharia para atacar exércitos à distância. Outros utilizam seus poderes para proteção, enquanto alguns buscam benefício pessoal.\n\n### Nível 3: Truque Potente\n\nSeus truques que causam dano afetam até criaturas que evitam os efeitos deles. Ao conjurar um truque em uma criatura e errar o ataque ou o alvo ser bem-sucedido na salvaguarda contra o truque, ele sofre metade do dano (se houver), mas não sofre efeitos adicionais do truque.\n\n### Nível 3: Versado em Evocação\n\nEscolha duas magias de Mago da escola de Evocação, cada uma deve ser de 2º círculo ou inferior, e adicione-as gratuitamente ao seu livro de magias.\n\nAlém disso, ao adquirir acesso a um novo círculo de espaços de magia nesta classe, você pode adicionar gratuitamente uma magia de Mago da escola de Evocação ao seu livro de magias. A magia escolhida deve ser de um círculo para o qual você tenha espaços de magia.\n\n### Nível 6: Esculpir Magias\n\nVocê pode criar zonas de segurança nos efeitos das suas evocações. Ao conjurar uma magia de Evocação que afeta criaturas à sua vista, você pode escolher um número delas igual a 1 mais o círculo da magia. Criaturas escolhidas são bem-sucedidas automaticamente em suas salvaguardas e não sofrem dano se normalmente sofreriam metade do dano em caso de sucesso.\n\n### Nível 10: Evocação Potencializada\n\nAo conjurar uma magia de Mago da escola de Evocação, você pode adicionar seu modificador de Inteligência a uma jogada de dano dessa magia.\n\n### Nível 14: Sobrecarga\n\nVocê pode aumentar o poder de suas magias. Ao conjurar uma magia de Mago que cause dano com um espaço de magia de 1º a 5º círculo, você pode causar dano máximo com essa magia no turno no qual a conjurar.\n\nAo fazer isso pela primeira vez, você não sofre nenhum efeito adverso. Se usar esta característica novamente antes de completar um Descanso Longo, você sofre 2d12 pontos de dano Necrótico para cada círculo do espaço de magia imediatamente após conjurá-la. Esse dano ignora Resistência e Imunidade.\n\nToda vez que você usa esta característica novamente antes de completar um Descanso Longo, o dano Necrótico por círculo de magia aumenta em 1d12.\n\n## Ilusionista\n\n*Teça Magias Sutis de Enganação*\n\nVocê se especializa em magia que deslumbra os sentidos e engana a mente, e as ilusões que você cria fazem o impossível parecer real.\n\n### Nível 3: Ilusões Aprimoradas\n\nVocê pode conjurar magias de Ilusão sem fornecer componentes Verbais e se uma magia de Ilusão que você conjurar tiver um alcance de 3 metros ou mais, o alcance aumenta em 18 metros.\n\nVocê também conhece o truque *Ilusão Menor*. Se já o conhece, você aprende um truque de Mago diferente à sua escolha. O truque não conta para o seu número de truques conhecidos. Você pode criar um som e uma imagem com uma única conjuração de *Ilusão Menor* e pode conjurá-la como uma Ação Bônus.\n\n### Nível 3: Versado em Ilusão\n\nEscolha duas magias de Mago da escola de Ilusão, cada uma deve ser de 2º círculo ou inferior e adicione-as gratuitamente ao seu livro de magias.\n\nAlém disso, ao adquirir acesso a um novo círculo de espaços de magia nesta classe, você pode adicionar gratuitamente uma magia de Mago da escola de Ilusão ao seu livro de magias. A magia escolhida deve ser de um círculo para o qual você tenha espaços de magia.\n\n### Nível 6: Criaturas Espectrais\n\nVocê sempre tem as magias *Convocar Feérico* e *Invocar Fera* preparadas. Ao conjurar qualquer uma das magias, você pode mudar sua escola para Ilusão, o que faz com que a criatura invocada pareça espectral. Você pode conjurar a versão Ilusão de cada magia sem gastar um espaço de magia, mas conjurá-la sem um espaço de magia reduz pela metade os Pontos de Vida da criatura. Após conjurar qualquer uma das magias sem um espaço de magia, você deve completar um Descanso Longo antes de conjurar novamente a magia desta forma.\n\n### Nível 10: Autoimagem Ilusória\n\nAo ser atingido pela jogada de ataque de uma criatura, você pode usar uma Reação para criar uma duplicata ilusória de si entre você e o atacante. O ataque erra automaticamente e a ilusão se dissipa.\n\nApós usar esta característica, você não pode utilizá-la novamente até completar um Descanso Curto ou Longo. Você também pode restaurar seu uso gastando um espaço de magia de 2º círculo ou superior (nenhuma ação é necessária).\n\n### Nível 14: Realidade Ilusória\n\nVocê aprendeu a tecer magia sombria em suas ilusões para dar a elas uma semi-realidade. Ao conjurar uma magia Ilusão com um espaço de magia, você pode escolher um objeto inanimado e não mágico que faça parte da ilusão e tornar esse objeto real. Você pode executar isso no seu turno como uma Ação Bônus, enquanto a magia estiver em andamento. O objeto permanece real por 1 minuto, durante o qual não pode causar dano ou conferir quaisquer condições. Por exemplo, você pode criar uma ilusão de uma ponte sobre um abismo e, em seguida, torná-la real e atravessá-la."
 }

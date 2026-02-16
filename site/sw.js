@@ -1,6 +1,6 @@
 // Service Worker para PWA D&D 5.5 Ficha de Personagem
 // Incrementar esta versão a cada deploy para forçar atualização dos caches
-const CACHE_VERSION = 9;
+const CACHE_VERSION = 10;
 const CACHE_STATIC = `dnd-ficha-static-v${CACHE_VERSION}`;
 const CACHE_DATA = `dnd-ficha-data-v${CACHE_VERSION}`;
 
@@ -22,6 +22,8 @@ const STATIC_ASSETS = [
 ];
 
 self.addEventListener('install', (event) => {
+  // Forçar ativação imediata do novo SW (sem esperar abas fecharem)
+  self.skipWaiting();
   // Pré-cachear assets estáticos na nova versão
   event.waitUntil(
     caches.open(CACHE_STATIC).then((cache) => {
