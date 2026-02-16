@@ -332,8 +332,13 @@ export function detectarRecarga(descricao) {
 /**
  * Detecta se uma habilidade é ativa (tem ação, reação, etc.) vs passiva.
  */
-export function ehHabilidadeAtiva(descricao) {
+export function ehHabilidadeAtiva(descricao, nome) {
   if (!descricao) return false;
+  // Habilidades que sao descritivas por natureza (listas de magias, conjuracao), nao importa o conteudo
+  if (nome) {
+    const n = nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (n.includes('conjuracao') || n.includes('pacto magico') || n.includes('magia de pacto') || n.startsWith('magias d')) return false;
+  }
   const d = descricao.toLowerCase();
   const recarga = detectarRecarga(descricao);
   if (recarga) return true;

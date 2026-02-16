@@ -996,7 +996,7 @@ async function abrirModalRecursosBruxo() {
            data-inv-toggle="${o.nome}" style="${bloqueado ? 'opacity:0.35;cursor:not-allowed;' : 'cursor:pointer;'};position:relative">
         <span class="magia-card-check"></span>
         <div class="magia-card-nome">${ehPacto ? '<span class="badge-dominio">&#9733;</span> ' : ''}${o.nome}${qtd > 1 ? ` <span class="badge" style="font-size:0.6rem;background:var(--accent);color:#fff">x${qtd}</span>` : ''}
-          <span class="btn-info-inv" data-inv-info="${o.nome}" title="Ver descricao" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--secondary);color:#fff;font-size:0.6rem;font-weight:700;cursor:pointer;margin-left:4px;vertical-align:middle;flex-shrink:0">i</span>
+          <span class="btn-info-inv" data-inv-info="${o.nome}" title="Ver descricao" style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--secondary);color:#fff;font-size:0.7rem;font-weight:700;cursor:pointer;margin-left:4px;vertical-align:middle;flex-shrink:0;-webkit-tap-highlight-color:transparent">i</span>
         </div>
         <div class="magia-card-meta">
           ${preResumo ? `<span style="font-size:0.65rem">${preResumo}</span>` : ''}
@@ -2125,13 +2125,6 @@ function renderFichaCompleta() {
 
     <!-- Stats combate -->
     <div class="card">
-      <!-- Inspiração Heroica (toggle compacto) -->
-      <div class="no-print" id="inspiracao-toggle" title="${char.inspiracao_heroica ? 'Inspiração Heroica: Disponível (clique para usar)' : 'Inspiração Heroica: Indisponível (clique para conceder)'}" style="position:fixed;bottom:calc(16px + var(--safe-bottom));right:16px;z-index:90;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-lg);transition:background 0.2s,transform 0.15s;background:${char.inspiracao_heroica ? 'var(--secondary)' : 'var(--border)'};border:2px solid ${char.inspiracao_heroica ? 'var(--secondary-light)' : 'var(--border-light)'}">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="${char.inspiracao_heroica ? '#fff' : 'var(--text-muted)'}" stroke="none">
-          <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
-        </svg>
-      </div>
-
       ${estadoFuria ? `
         <div class="info-box ${estadoFuria.ativa ? 'danger' : 'info'}" style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
           <div style="font-size:0.85rem">
@@ -2445,6 +2438,15 @@ function renderFichaCompleta() {
 
       <!-- HP -->
       <div style="display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap">
+        <!-- Inspiracao Heroica (inline) -->
+        <div id="inspiracao-toggle" class="no-print" style="text-align:center;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent" title="Inspiração Heroica">
+          <div style="width:44px;height:44px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;background:${char.inspiracao_heroica ? 'var(--primary)' : 'var(--border-light)'};border:2px solid ${char.inspiracao_heroica ? 'var(--primary)' : 'var(--border)'};transition:background 0.2s,border-color 0.2s">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="${char.inspiracao_heroica ? '#fff' : 'var(--text-muted)'}" stroke="none">
+              <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 3c.6 0 1.1.1 1.6.3L12 8.5l-1.6-3.2c.5-.2 1-.3 1.6-.3zm-4.2 2.5L10 10.3l-3.5.5c.3-.8.7-1.5 1.3-2.1v-.2zM5.5 13.5l3.5-.5-2.2 2.8c-.6-.7-1-1.4-1.3-2.3zm4.7 5.2L12 15.5l1.8 3.2c-.5.2-1.1.3-1.8.3s-1.3-.1-1.8-.3zm6-2.9L14 13l3.5-.5c-.3.9-.7 1.6-1.3 2.3zm1.3-5.3l-3.5.5 2.2-2.8c.6.6 1 1.3 1.3 2.1v.2z"/>
+            </svg>
+          </div>
+          <div style="font-size:0.55rem;font-weight:700;text-transform:uppercase;color:${char.inspiracao_heroica ? 'var(--primary)' : 'var(--text-muted)'};margin-top:2px;line-height:1">Heroica</div>
+        </div>
         <div style="text-align:center">
           <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--text-muted)">Pontos de Vida</div>
           <div style="font-size:1.3rem;font-weight:800;color:${char.pv_atual <= (char.pv_max_override || char.pv_max) * 0.25 ? 'var(--danger)' : char.pv_atual <= (char.pv_max_override || char.pv_max) * 0.5 ? 'var(--warning)' : 'var(--success)'}">
@@ -2812,22 +2814,19 @@ function setupEventosHP() {
   });
 
   document.getElementById('hp-max-override')?.addEventListener('click', () => {
+    const pvBase = char.pv_max;
+    const pvAtual = char.pv_max_override || pvBase;
     abrirModal('Sobrescrever PV Máximo',
-      `<div class="form-group">
-        <label class="form-label">PV Máximo Base (fixo)</label>
-        <div style="font-size:1rem;font-weight:700;margin-bottom:8px">${char.pv_max}</div>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="input-pv-max-override">PV Máximo Atual (com bônus temporário)</label>
-        <input type="number" class="form-input" id="input-pv-max-override" value="${char.pv_max_override || char.pv_max}" min="1" autofocus>
-        <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">
+      `<div style="font-size:0.85rem;color:var(--text-muted);text-align:center;margin-bottom:8px">PV Máximo Base (fixo): <strong>${pvBase}</strong></div>` +
+      numberPickerHtml('input-pv-max', pvAtual, 1, Math.max(pvBase + 50, pvAtual + 20), 'PV Máximo Atual') +
+      `<div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;text-align:center">
           Use para magias que aumentam PV máximo temporariamente (ex: Ajuda, Heróis do Banquete).
-        </div>
-      </div>`,
+        </div>`,
       `<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
        <button class="btn btn-warning" id="btn-resetar-pv-max">Resetar</button>
        <button class="btn btn-primary" id="btn-aplicar-pv-max">Aplicar</button>`
     );
+    setupNumberPicker('input-pv-max');
     document.getElementById('btn-resetar-pv-max')?.addEventListener('click', () => {
       delete char.pv_max_override;
       char.pv_atual = Math.min(char.pv_atual, char.pv_max);
@@ -2836,7 +2835,7 @@ function setupEventosHP() {
       renderFichaCompleta();
     });
     document.getElementById('btn-aplicar-pv-max')?.addEventListener('click', () => {
-      const novoMax = parseInt(document.getElementById('input-pv-max-override')?.value) || char.pv_max;
+      const novoMax = parseInt(document.getElementById('input-pv-max-val')?.value) || char.pv_max;
       if (novoMax !== char.pv_max) {
         char.pv_max_override = novoMax;
       } else {
@@ -3777,7 +3776,7 @@ function setupEventosHabilidades() {
                    data-meta-toggle="${o.nome}" style="${cheio ? 'opacity:0.35;' : 'cursor:pointer;'}">
                 <span class="magia-card-check"></span>
                 <div class="magia-card-nome">${o.nome}
-                  <span class="btn-info-meta" data-meta-info="${o.nome}" title="Ver descricao" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--secondary);color:#fff;font-size:0.6rem;font-weight:700;cursor:pointer;margin-left:4px;vertical-align:middle;flex-shrink:0">i</span>
+                  <span class="btn-info-meta" data-meta-info="${o.nome}" title="Ver descricao" style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--secondary);color:#fff;font-size:0.7rem;font-weight:700;cursor:pointer;margin-left:4px;vertical-align:middle;flex-shrink:0;-webkit-tap-highlight-color:transparent">i</span>
                 </div>
                 <div class="magia-card-meta">
                   <span style="font-size:0.65rem">${o.custo} PF</span>
@@ -3840,15 +3839,14 @@ function setupEventosHabilidades() {
       }
 
       if (acao === 'metamagia-gastar') {
-        abrirModal('Gastar Pontos de Feitiçaria', `
-          <div class="form-group">
-            <label class="form-label" for="metamagia-custo">Custo em PF</label>
-            <input type="number" class="form-input" id="metamagia-custo" value="1" min="1" max="20">
-          </div>
-        `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-gastar-metamagia">Gastar</button>');
+        abrirModal('Gastar Pontos de Feitiçaria',
+          numberPickerHtml('metamagia-custo', 1, 1, 20, 'Custo em PF'),
+          '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-gastar-metamagia">Gastar</button>'
+        );
+        setupNumberPicker('metamagia-custo');
 
         document.getElementById('btn-gastar-metamagia')?.addEventListener('click', () => {
-          const custo = Math.max(1, parseInt(document.getElementById('metamagia-custo')?.value) || 1);
+          const custo = Math.max(1, parseInt(document.getElementById('metamagia-custo-val')?.value) || 1);
           if (!gastarPontosFeiticaria(custo)) {
             toast('Pontos de Feitiçaria insuficientes.', 'error');
             return;
@@ -3868,14 +3866,13 @@ function setupEventosHabilidades() {
       }
 
       if (acao === 'revelacao-carne') {
-        abrirModal('Revelação em Carne', `
-          <div class="form-group">
-            <label class="form-label" for="revelacao-custo">Pontos de Feitiçaria gastos</label>
-            <input type="number" class="form-input" id="revelacao-custo" value="1" min="1" max="10">
-          </div>
-        `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-revelacao-carne">Ativar</button>');
+        abrirModal('Revelação em Carne',
+          numberPickerHtml('revelacao-custo', 1, 1, 10, 'Pontos de Feitiçaria gastos'),
+          '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-revelacao-carne">Ativar</button>'
+        );
+        setupNumberPicker('revelacao-custo');
         document.getElementById('btn-revelacao-carne')?.addEventListener('click', () => {
-          const custo = Math.max(1, parseInt(document.getElementById('revelacao-custo')?.value) || 1);
+          const custo = Math.max(1, parseInt(document.getElementById('revelacao-custo-val')?.value) || 1);
           if (!gastarPontosFeiticaria(custo)) {
             toast('Pontos de Feitiçaria insuficientes.', 'error');
             return;
@@ -3949,14 +3946,13 @@ function setupEventosHabilidades() {
       }
 
       if (acao === 'bastiao-lei') {
-        abrirModal('Bastião da Lei', `
-          <div class="form-group">
-            <label class="form-label" for="bastiao-custo">PF gastos (1 a 5)</label>
-            <input type="number" class="form-input" id="bastiao-custo" value="1" min="1" max="5">
-          </div>
-        `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-bastiao-lei">Criar</button>');
+        abrirModal('Bastião da Lei',
+          numberPickerHtml('bastiao-custo', 1, 1, 5, 'PF gastos (1 a 5)'),
+          '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-bastiao-lei">Criar</button>'
+        );
+        setupNumberPicker('bastiao-custo');
         document.getElementById('btn-bastiao-lei')?.addEventListener('click', () => {
-          const custo = Math.max(1, Math.min(5, parseInt(document.getElementById('bastiao-custo')?.value) || 1));
+          const custo = Math.max(1, Math.min(5, parseInt(document.getElementById('bastiao-custo-val')?.value) || 1));
           if (!gastarPontosFeiticaria(custo)) {
             toast('Pontos de Feitiçaria insuficientes.', 'error');
             return;
@@ -4348,10 +4344,7 @@ function setupEventosHabilidades() {
           <div class="info-box info" style="margin-bottom:12px">
             Reserva disponível: <strong>${estado.maosAtuais} PV</strong> de ${estado.maosMax}
           </div>
-          <div style="margin-bottom:12px">
-            <label style="font-size:0.85rem;font-weight:600">Quantidade de PV a restaurar:</label>
-            <input type="number" id="maos-consagradas-qtd" min="1" max="${estado.maosAtuais}" value="1" style="width:100%;padding:8px;border-radius:var(--radius);border:1px solid var(--border);margin-top:4px">
-          </div>
+          ` + numberPickerHtml('maos-consagradas-qtd', 1, 1, estado.maosAtuais, 'Quantidade de PV a restaurar') + `
           <div style="font-size:0.8rem;color:var(--text-muted)">
             Remover Envenenado: gasta 5 PV da reserva sem restaurar PV.
             ${estado.toqueRestauradorAtivo ? '<br>Toque Restaurador: remover condição por 5 PV adicionais.' : ''}
@@ -4361,8 +4354,9 @@ function setupEventosHabilidades() {
           <button class="btn btn-accent" id="btn-maos-confirmar">Curar</button>
           <button class="btn btn-primary" id="btn-maos-envenenado" ${estado.maosAtuais < 5 ? 'disabled style="opacity:0.5"' : ''}>Remover Envenenado (5 PV)</button>
         `);
+        setupNumberPicker('maos-consagradas-qtd');
         document.getElementById('btn-maos-confirmar')?.addEventListener('click', () => {
-          const qtd = Math.min(parseInt(document.getElementById('maos-consagradas-qtd')?.value) || 1, estado.maosAtuais);
+          const qtd = Math.min(parseInt(document.getElementById('maos-consagradas-qtd-val')?.value) || 1, estado.maosAtuais);
           char.recursos.paladino.maos_consagradas_gastos += qtd;
           toast(`Mãos Consagradas: ${qtd} PV de cura aplicados.`, 'success');
           salvar();
@@ -5993,14 +5987,13 @@ async function abrirModalLevelUp() {
             <div class="magia-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}"
                  data-grid-nome="${m.nome}" data-grid-circ="${m.circulo}"
                  style="${bloqueado ? 'opacity:0.35;cursor:default' : ''}">
-              <span class="magia-card-check"></span>
-              <div class="magia-card-nome">${m.nome}</div>
+              <span class="magia-card-check" data-grid-check="${m.nome}"></span>
+              <div class="magia-card-nome" data-grid-info="${m.nome}" data-grid-info-circ="${m.circulo}">${m.nome}</div>
               <div class="magia-card-meta">
                 <span>${m.circulo === 0 ? 'Truque' : m.circulo + 'º Círculo'}</span>
                 <span>${m.escola || ''}</span>
-                ${m.especial === 'C' ? '<span title="Concentração">C</span>' : ''}
+                ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
               </div>
-              <span class="magia-card-info" data-grid-info="${m.nome}" data-grid-info-circ="${m.circulo}" title="Ver detalhes">&#9432;</span>
             </div>`;
         }).join('');
 
@@ -6011,11 +6004,11 @@ async function abrirModalLevelUp() {
           cntEl.style.color = selecionadosSet.size === maxSelecoes ? 'var(--success)' : (selecionadosSet.size > maxSelecoes ? 'var(--danger)' : 'inherit');
         }
 
-        // Eventos de toggle no grid
-        gridEl.querySelectorAll('[data-grid-nome]').forEach(card => {
-          card.addEventListener('click', (e) => {
-            if (e.target.closest('[data-grid-info]')) return;
-            const nome = card.dataset.gridNome;
+        // Eventos: clicar no check faz toggle, clicar no nome/card abre detalhes
+        gridEl.querySelectorAll('[data-grid-check]').forEach(check => {
+          check.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const nome = check.dataset.gridCheck;
             if (selecionadosSet.has(nome)) {
               selecionadosSet.delete(nome);
             } else {
@@ -6027,12 +6020,12 @@ async function abrirModalLevelUp() {
           });
         });
 
-        // Info detalhes
-        gridEl.querySelectorAll('[data-grid-info]').forEach(btn => {
-          btn.addEventListener('click', async (e) => {
+        // Clicar no nome/card abre detalhes da magia
+        gridEl.querySelectorAll('[data-grid-info]').forEach(el => {
+          el.addEventListener('click', async (e) => {
             e.stopPropagation();
-            const nome = btn.dataset.gridInfo;
-            const circ = parseInt(btn.dataset.gridInfoCirc);
+            const nome = el.dataset.gridInfo;
+            const circ = parseInt(el.dataset.gridInfoCirc);
             const dados = await getMagiasPorCirculo(circ);
             const magia = dados?.magias?.find(m => m.nome === nome);
             if (!magia) return;
@@ -6044,7 +6037,7 @@ async function abrirModalLevelUp() {
                 <span>${magia.componentes}</span> <span>${magia.duracao}</span>
               </div>
               <div class="md-content">${mdParaHtml(magia.descricao)}</div>
-              ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em círculos superiores:</strong><div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
+              ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em circulos superiores:</strong><div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
             `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
           });
         });
@@ -6101,12 +6094,11 @@ async function abrirModalLevelUp() {
             matches = matches.slice(0, 20);
             resultadoTrocaEl.innerHTML = `<div class="magias-grid">${matches.map(m => `
               <div class="magia-card" data-troca-nome="${m.nome}" data-troca-circ="${m.circulo}">
-                <div class="magia-card-nome">${m.nome}</div>
+                <div class="magia-card-nome" data-lvlup-info="${m.nome}" data-lvlup-circ="${m.circulo}">${m.nome}</div>
                 <div class="magia-card-meta">
                   <span>${m.circulo}º Círculo</span><span>${m.escola || ''}</span>
-                  ${m.especial === 'C' ? '<span title="Concentração">C</span>' : ''}
+                  ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
                 </div>
-                <span class="magia-card-info" data-lvlup-info="${m.nome}" data-lvlup-circ="${m.circulo}" title="Ver detalhes">&#9432;</span>
               </div>
             `).join('')}</div>`;
             resultadoTrocaEl.querySelectorAll('[data-troca-nome]').forEach(el => {
@@ -6479,7 +6471,7 @@ function renderFeatureItem(f, source) {
   let recarga = detectarRecarga(f.descricao);
   // Features that are purely descriptive should always be passive
   const nomeNorm = semAcento(f.nome);
-  const ativa = nomeNorm.includes('conjuracao') ? false : ehHabilidadeAtiva(f.descricao);
+  const ativa = ehHabilidadeAtiva(f.descricao, f.nome);
   const key = `${source}_${f.nome}`;
   if (!char.usos_habilidades) char.usos_habilidades = {};
 
@@ -7324,8 +7316,8 @@ function renderSecaoCaracteristicas() {
     }
   }
 
-  const passivas = feats.filter(f => !ehHabilidadeAtiva(f.descricao));
-  const ativas = feats.filter(f => ehHabilidadeAtiva(f.descricao));
+  const passivas = feats.filter(f => !ehHabilidadeAtiva(f.descricao, f.nome));
+  const ativas = feats.filter(f => ehHabilidadeAtiva(f.descricao, f.nome));
 
   return `
     <div class="card print-break-before">
@@ -7351,8 +7343,8 @@ function renderSecaoSubclasse() {
   const feats = sc.caracteristicas.filter(c => c.nivel <= char.nivel);
   if (!feats.length) return '';
 
-  const passivas = feats.filter(f => !ehHabilidadeAtiva(f.descricao));
-  const ativas = feats.filter(f => ehHabilidadeAtiva(f.descricao));
+  const passivas = feats.filter(f => !ehHabilidadeAtiva(f.descricao, f.nome));
+  const ativas = feats.filter(f => ehHabilidadeAtiva(f.descricao, f.nome));
 
   return `
     <div class="card print-break-before">
@@ -7692,28 +7684,25 @@ function badgesMagiaRapidos(nomeMagia) {
     badges.push(`<span class="magia-tag tag-escola">${info.escola}</span>`);
   }
 
-  // Tempo de conjuração - ícone simplificado
+  // Tempo de conjuração - texto legível sem depender de title
   if (info.tempo_conjuracao) {
     const tc = info.tempo_conjuracao.toLowerCase();
-    let icone = '';
     let label = info.tempo_conjuracao;
-    if (tc === 'ação' || tc === 'acao') { icone = 'A'; label = 'Ação'; }
-    else if (tc.includes('ação bônus') || tc.includes('acao bonus')) { icone = 'AB'; label = 'Ação Bônus'; }
-    else if (tc === 'reação' || tc === 'reacao') { icone = 'R'; label = 'Reação'; }
-    else if (tc.includes('minuto')) { icone = 'M'; }
-    else if (tc.includes('hora')) { icone = 'H'; }
-    badges.push(`<span class="magia-tag tag-tempo" title="${label}">${icone || label}</span>`);
+    if (tc === 'ação' || tc === 'acao') label = 'Ação';
+    else if (tc.includes('ação bônus') || tc.includes('acao bonus')) label = 'Bônus';
+    else if (tc === 'reação' || tc === 'reacao') label = 'Reação';
+    badges.push(`<span class="magia-tag tag-tempo">${label}</span>`);
   }
 
   // Duração - concentração ou instantâneo
   if (info.duracao) {
     const dur = info.duracao.toLowerCase();
     if (dur.includes('concentra')) {
-      badges.push(`<span class="magia-tag tag-conc" title="${info.duracao}">Conc.</span>`);
+      badges.push(`<span class="magia-tag tag-conc">Conc.</span>`);
     } else if (dur.includes('instant')) {
-      badges.push(`<span class="magia-tag tag-inst" title="${info.duracao}">Inst.</span>`);
+      badges.push(`<span class="magia-tag tag-inst">Inst.</span>`);
     } else {
-      badges.push(`<span class="magia-tag tag-dur" title="${info.duracao}">${info.duracao.replace('até ', '').replace('Até ', '')}</span>`);
+      badges.push(`<span class="magia-tag tag-dur">${info.duracao.replace('até ', '').replace('Até ', '')}</span>`);
     }
   }
 
@@ -7723,7 +7712,7 @@ function badgesMagiaRapidos(nomeMagia) {
     let label = info.alcance;
     if (alc === 'pessoal') label = 'Pessoal';
     else if (alc === 'toque') label = 'Toque';
-    badges.push(`<span class="magia-tag tag-alcance" title="Alcance: ${info.alcance}">${label}</span>`);
+    badges.push(`<span class="magia-tag tag-alcance">${label}</span>`);
   }
 
   return `<div class="magia-tags">${badges.join('')}</div>`;
@@ -8086,7 +8075,7 @@ function renderSecaoMagias() {
                 <div style="display:flex;justify-content:space-between;align-items:center">
                   <div>
                     <div class="magia-nome">
-                      ${ehEspecial ? `<span class="badge-dominio" title="${origemLabel}">&#9733;</span> ` : ''}${m.nome}
+                      ${ehEspecial ? `<span class="badge-dominio">&#9733;</span> ` : ''}${m.nome}
                     </div>
                     ${badgesMagiaRapidos(m.nome)}
                     ${ehEspecial ? `<div style="font-size:0.65rem;color:var(--secondary);font-weight:600;margin-top:1px">${origemLabel}</div>` : ''}
@@ -8144,7 +8133,7 @@ function renderSecaoMagias() {
               <div class="magia-item magia-dominio" data-magia-nome="${m.nome}" data-magia-circ="0">
                 <div style="display:flex;justify-content:space-between;align-items:center">
                   <div>
-                    <div class="magia-nome"><span class="badge-dominio" title="Truque de Espécie">&#9733;</span> ${m.nome}</div>
+                    <div class="magia-nome"><span class="badge-dominio">&#9733;</span> ${m.nome}</div>
                     ${badgesMagiaRapidos(m.nome)}
                     <div style="font-size:0.65rem;color:var(--secondary);font-weight:600;margin-top:1px">Espécie</div>
                   </div>
@@ -8162,7 +8151,7 @@ function renderSecaoMagias() {
               <div class="magia-item ${mods.length > 0 ? 'magia-dominio' : ''}" data-magia-nome="${m.nome}" data-magia-circ="0">
                 <div style="display:flex;justify-content:space-between;align-items:center">
                   <div>
-                    <div class="magia-nome">${mods.length > 0 ? '<span class="badge-dominio" title="Modificado por Invocacao">&#9889;</span> ' : ''}${m.nome}</div>
+                    <div class="magia-nome">${mods.length > 0 ? '<span class="badge-dominio">&#9889;</span> ' : ''}${m.nome}</div>
                     ${badgesMagiaRapidos(m.nome)}
                     ${modHtml}
                   </div>
@@ -8440,29 +8429,27 @@ async function mostrarBuscaMagia() {
       const filtradas = termo.length >= 2 ? normais.filter(m => semAcento(m.nome).includes(termo)) : normais;
       const filtradasDom = termo.length >= 2 ? especiais.filter(m => semAcento(m.nome).includes(termo)) : especiais;
 
-      html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">${labelMg}s: ${normais.length}/${maxPrep} | Clique para remover</div>`;
+      html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">${labelMg}s: ${normais.length}/${maxPrep} | Use o <strong>check</strong> para (des)marcar</div>`;
 
       if (filtradasDom.length > 0) {
         html += `<div style="font-size:0.75rem;font-weight:700;color:var(--secondary);margin:8px 0 4px">Magias Especiais</div>`;
         html += `<div class="magias-grid">${filtradasDom.map(m => `
           <div class="magia-card selecionada magia-dominio" style="opacity:0.7;cursor:default">
             <span class="magia-card-check"></span>
-            <div class="magia-card-nome"><span class="badge-dominio">&#9733;</span> ${m.nome}</div>
+            <div class="magia-card-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="${m.circulo}" style="cursor:pointer"><span class="badge-dominio">&#9733;</span> ${m.nome}</div>
             <div class="magia-card-meta"><span>${rotuloOrigemMagia(m)}</span></div>
-            <span class="magia-card-info" data-detalhe-magia="${m.nome}" data-detalhe-circ="${m.circulo}" title="Ver detalhes">&#9432;</span>
           </div>
         `).join('')}</div>`;
       }
 
       if (filtradas.length > 0) {
         html += `<div class="magias-grid">${filtradas.map(m => `
-          <div class="magia-card selecionada" style="cursor:pointer" data-remover-prep="${m.nome}">
-            <span class="magia-card-check"></span>
-            <div class="magia-card-nome">${m.nome}</div>
+          <div class="magia-card selecionada">
+            <span class="magia-card-check" data-remover-check="${m.nome}" style="cursor:pointer"></span>
+            <div class="magia-card-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="${m.circulo}" style="cursor:pointer">${m.nome}</div>
             <div class="magia-card-meta">
-              <span>${m.circulo || 0}º Círculo</span>
+              <span>${m.circulo || 0}º Circulo</span>
             </div>
-            <span class="magia-card-info" data-detalhe-magia="${m.nome}" data-detalhe-circ="${m.circulo}" title="Ver detalhes">&#9432;</span>
           </div>
         `).join('')}</div>`;
       } else if (normais.length === 0) {
@@ -8486,9 +8473,8 @@ async function mostrarBuscaMagia() {
         html += `<div class="magias-grid">${listaEsp.map(m => `
           <div class="magia-card selecionada magia-dominio" style="opacity:0.7;cursor:default">
             <span class="magia-card-check"></span>
-            <div class="magia-card-nome"><span class="badge-dominio">&#9733;</span> ${m.nome}</div>
-            <div class="magia-card-meta"><span>Espécie</span></div>
-            <span class="magia-card-info" data-detalhe-magia="${m.nome}" data-detalhe-circ="0" title="Ver detalhes">&#9432;</span>
+            <div class="magia-card-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="0" style="cursor:pointer"><span class="badge-dominio">&#9733;</span> ${m.nome}</div>
+            <div class="magia-card-meta"><span>Especie</span></div>
           </div>
         `).join('')}</div>`;
       }
@@ -8510,13 +8496,12 @@ async function mostrarBuscaMagia() {
         return `
           <div class="magia-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}"
                data-toggle-truque="${m.nome}" style="${bloqueado ? 'opacity:0.35;' : ''}">
-            <span class="magia-card-check"></span>
-            <div class="magia-card-nome">${m.nome}</div>
+            <span class="magia-card-check" data-truque-check="${m.nome}" style="cursor:pointer"></span>
+            <div class="magia-card-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="0" style="cursor:pointer">${m.nome}</div>
             <div class="magia-card-meta">
               <span>${m.escola || ''}</span>
-              ${m.especial === 'C' ? '<span title="Concentração">C</span>' : ''}
+              ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
             </div>
-            <span class="magia-card-info" data-detalhe-magia="${m.nome}" data-detalhe-circ="0" title="Ver detalhes">&#9432;</span>
           </div>`;
       }).join('')}</div>`;
     } else {
@@ -8543,16 +8528,14 @@ async function mostrarBuscaMagia() {
         const bloqueado = cheio && !sel && !isDominio;
         return `
           <div class="magia-card ${sel ? 'selecionada' : ''} ${isDominio ? 'magia-dominio' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}"
-               ${isDominio ? '' : `data-toggle-magia="${m.nome}" data-toggle-circ="${circ}"`}
                style="${bloqueado ? 'opacity:0.35;' : ''}${isDominio ? 'opacity:0.7;' : ''}">
-            <span class="magia-card-check"></span>
-            <div class="magia-card-nome">${isDominio ? '<span class="badge-dominio">&#9733;</span> ' : ''}${m.nome}</div>
+            <span class="magia-card-check" ${isDominio ? '' : `data-circ-check="${m.nome}" data-circ-check-val="${circ}" style="cursor:pointer"`}></span>
+            <div class="magia-card-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="${circ}" style="cursor:pointer">${isDominio ? '<span class="badge-dominio">&#9733;</span> ' : ''}${m.nome}</div>
             <div class="magia-card-meta">
               <span>${m.escola || ''}</span>
-              ${m.especial === 'C' ? '<span title="Concentração">C</span>' : ''}
+              ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
               ${isDominio ? '<span>Especial</span>' : ''}
             </div>
-            <span class="magia-card-info" data-detalhe-magia="${m.nome}" data-detalhe-circ="${circ}" title="Ver detalhes">&#9432;</span>
           </div>`;
       }).join('')}</div>`;
     }
@@ -8562,11 +8545,11 @@ async function mostrarBuscaMagia() {
   }
 
   function bindEventosTab() {
-    // Remover magia preparada
-    resultadoEl.querySelectorAll('[data-remover-prep]').forEach(el => {
+    // Remover magia preparada (via check na aba "Preparadas Atuais")
+    resultadoEl.querySelectorAll('[data-remover-check]').forEach(el => {
       el.addEventListener('click', (e) => {
-        if (e.target.closest('[data-detalhe-magia]')) return;
-        const nome = el.dataset.removerPrep;
+        e.stopPropagation();
+        const nome = el.dataset.removerCheck;
         const idx = char.magias_preparadas.findIndex(m => m.nome === nome);
         if (idx >= 0) {
           char.magias_preparadas.splice(idx, 1);
@@ -8578,11 +8561,11 @@ async function mostrarBuscaMagia() {
       });
     });
 
-    // Toggle truque
-    resultadoEl.querySelectorAll('[data-toggle-truque]').forEach(el => {
+    // Toggle truque (via check)
+    resultadoEl.querySelectorAll('[data-truque-check]').forEach(el => {
       el.addEventListener('click', (e) => {
-        if (e.target.closest('[data-detalhe-magia]')) return;
-        const nome = el.dataset.toggleTruque;
+        e.stopPropagation();
+        const nome = el.dataset.truqueCheck;
         // Não permitir remover truques de espécie
         const entradaExistente = (char.magias_conhecidas || []).find(m => m.nome === nome);
         if (entradaExistente && entradaExistente.origem === 'especie') return;
@@ -8603,12 +8586,12 @@ async function mostrarBuscaMagia() {
       });
     });
 
-    // Toggle magia de círculo
-    resultadoEl.querySelectorAll('[data-toggle-magia]').forEach(el => {
+    // Toggle magia de circulo (via check)
+    resultadoEl.querySelectorAll('[data-circ-check]').forEach(el => {
       el.addEventListener('click', (e) => {
-        if (e.target.closest('[data-detalhe-magia]')) return;
-        const nome = el.dataset.toggleMagia;
-        const circ = parseInt(el.dataset.toggleCirc);
+        e.stopPropagation();
+        const nome = el.dataset.circCheck;
+        const circ = parseInt(el.dataset.circCheckVal);
         const idx = char.magias_preparadas.findIndex(m => m.nome === nome);
         if (idx >= 0) {
           // Remover
@@ -8901,7 +8884,7 @@ async function mostrarTrocaMagias(callbackPosTroca = null) {
 
     if (tabAtiva === 'selecionadas') {
       // Magias atualmente selecionadas para preparar
-      html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">Clique para remover</div>`;
+      html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">Use o <strong>check</strong> para (des)marcar. Toque no <strong>nome</strong> para ver detalhes.</div>`;
 
       if (nomesDominio.size > 0) {
         const domMagias = magiasDisponiveis.filter(m => nomesDominio.has(m.nome));
@@ -8914,9 +8897,8 @@ async function mostrarTrocaMagias(callbackPosTroca = null) {
           html += `<div class="magias-grid">${filtDomNomes.map(nome => `
             <div class="magia-card selecionada magia-dominio" style="opacity:0.7;cursor:default">
               <span class="magia-card-check"></span>
-              <div class="magia-card-nome"><span class="badge-dominio">&#9733;</span> ${nome}</div>
+              <div class="magia-card-nome" data-troca-info="${nome}" data-troca-info-circ="${circuloMap[nome] || 1}"><span class="badge-dominio">&#9733;</span> ${nome}</div>
               <div class="magia-card-meta"><span>Especial</span></div>
-              <span class="magia-card-info" data-troca-info="${nome}" data-troca-info-circ="${circuloMap[nome] || 1}" title="Ver detalhes">&#9432;</span>
             </div>
           `).join('')}</div>`;
         }
@@ -8927,10 +8909,9 @@ async function mostrarTrocaMagias(callbackPosTroca = null) {
       if (filtSel.length > 0) {
         html += `<div class="magias-grid">${filtSel.map(nome => `
           <div class="magia-card selecionada" style="cursor:pointer" data-troca-toggle="${nome}">
-            <span class="magia-card-check"></span>
-            <div class="magia-card-nome">${nome}</div>
+            <span class="magia-card-check" data-troca-check="${nome}"></span>
+            <div class="magia-card-nome" data-troca-info="${nome}" data-troca-info-circ="${circuloMap[nome] || 1}">${nome}</div>
             <div class="magia-card-meta"><span>${circuloMap[nome] || '?'}º Círculo</span></div>
-            <span class="magia-card-info" data-troca-info="${nome}" data-troca-info-circ="${circuloMap[nome] || 1}" title="Ver detalhes">&#9432;</span>
           </div>
         `).join('')}</div>`;
       } else if (selecionadasSet.size === 0) {
@@ -8960,14 +8941,13 @@ async function mostrarTrocaMagias(callbackPosTroca = null) {
           <div class="magia-card ${sel || isDominio ? 'selecionada' : ''} ${isDominio ? 'magia-dominio' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}"
                ${isDominio ? '' : `data-troca-toggle="${m.nome}"`}
                style="${bloqueado ? 'opacity:0.35;' : ''}${isDominio ? 'opacity:0.7;cursor:default;' : ''}">
-            <span class="magia-card-check"></span>
-            <div class="magia-card-nome">${isDominio ? '<span class="badge-dominio">&#9733;</span> ' : ''}${m.nome}</div>
+            <span class="magia-card-check" ${isDominio ? '' : `data-troca-check="${m.nome}"`}></span>
+            <div class="magia-card-nome" data-troca-info="${m.nome}" data-troca-info-circ="${circ}">${isDominio ? '<span class="badge-dominio">&#9733;</span> ' : ''}${m.nome}</div>
             <div class="magia-card-meta">
               <span>${m.escola || ''}</span>
-              ${m.especial === 'C' ? '<span title="Concentração">C</span>' : ''}
+              ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
               ${isDominio ? '<span>Especial</span>' : ''}
             </div>
-            <span class="magia-card-info" data-troca-info="${m.nome}" data-troca-info-circ="${circ}" title="Ver detalhes">&#9432;</span>
           </div>`;
       }).join('')}</div>`;
     }
@@ -8977,11 +8957,11 @@ async function mostrarTrocaMagias(callbackPosTroca = null) {
   }
 
   function bindEventosTroca() {
-    // Toggle seleção
-    resultadoEl.querySelectorAll('[data-troca-toggle]').forEach(el => {
-      el.addEventListener('click', (e) => {
-        if (e.target.closest('[data-troca-info]')) return;
-        const nome = el.dataset.trocaToggle;
+    // Toggle seleção ao clicar no check
+    resultadoEl.querySelectorAll('[data-troca-check]').forEach(chk => {
+      chk.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const nome = chk.dataset.trocaCheck;
         if (selecionadasSet.has(nome)) {
           selecionadasSet.delete(nome);
         } else {
@@ -8996,12 +8976,12 @@ async function mostrarTrocaMagias(callbackPosTroca = null) {
       });
     });
 
-    // Info detalhes
-    resultadoEl.querySelectorAll('[data-troca-info]').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
+    // Info detalhes ao clicar no nome
+    resultadoEl.querySelectorAll('[data-troca-info]').forEach(el => {
+      el.addEventListener('click', async (e) => {
         e.stopPropagation();
-        const nome = btn.dataset.trocaInfo;
-        const circ = parseInt(btn.dataset.trocaInfoCirc);
+        const nome = el.dataset.trocaInfo;
+        const circ = parseInt(el.dataset.trocaInfoCirc);
         const dados = await getMagiasPorCirculo(circ);
         const magia = dados?.magias?.find(m => m.nome === nome);
         if (!magia) { toast('Detalhes não encontrados', 'error'); return; }
@@ -9153,7 +9133,7 @@ function renderSecaoCondicoes() {
           ${condicoes.map(c => {
             const info = CONDICOES_DD.find(cd => cd.nome === c) || { icone: '?', cor: '#666' };
             const desc = CONDICOES_DESCRICAO[c] || '';
-            return `<span class="badge" style="font-size:0.75rem;padding:4px 8px;background:${info.cor};color:#fff;cursor:help" title="${desc}">${info.icone} ${c}</span>`;
+            return `<span class="badge" style="font-size:0.75rem;padding:4px 8px;background:${info.cor};color:#fff;cursor:pointer" data-condicao-info="${c}">${info.icone} ${c}</span>`;
           }).join('')}
         </div>
         ${condicoes.includes('Exaustão') ? `
@@ -9277,6 +9257,17 @@ function renderSecaoSentidos() {
 
 /** Setup de eventos para gerenciar condicoes */
 function setupEventosCondicoes() {
+  // Clicar na badge de condicao para ver descricao
+  document.querySelectorAll('[data-condicao-info]').forEach(el => {
+    el.addEventListener('click', () => {
+      const nome = el.dataset.condicaoInfo;
+      const info = CONDICOES_DD.find(c => c.nome === nome);
+      const desc = CONDICOES_DESCRICAO[nome] || 'Sem descricao disponivel.';
+      abrirModal(`${info?.icone || ''} ${nome}`, `<div style="font-size:0.9rem;line-height:1.6">${desc}</div>`,
+        '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
+    });
+  });
+
   document.getElementById('btn-gerenciar-condicoes')?.addEventListener('click', () => {
     const condicoesAtuais = new Set(char.condicoes || []);
 
@@ -9287,22 +9278,22 @@ function setupEventosCondicoes() {
           const desc = CONDICOES_DESCRICAO[c.nome] || '';
           return `
             <div class="selection-card ${ativa ? 'selected' : ''}" data-condicao-toggle="${c.nome}" 
-                 style="min-width:130px;max-width:170px;cursor:pointer;text-align:center;border:2px solid ${ativa ? c.cor : 'var(--border-light)'};${ativa ? `background:${c.cor}15` : ''}" 
-                 title="${desc}">
+                 style="min-width:130px;max-width:170px;cursor:pointer;text-align:center;border:2px solid ${ativa ? c.cor : 'var(--border-light)'};${ativa ? `background:${c.cor}15` : ''}">
               <div style="font-size:1.2rem">${c.icone}</div>
               <div style="font-size:0.8rem;font-weight:600">${c.nome}</div>
             </div>
           `;
         }).join('')}
       </div>
-      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:8px;text-align:center">Clique para ativar/desativar. Multiplas condicoes podem estar ativas ao mesmo tempo.</div>
+      <div id="condicao-desc-area" style="font-size:0.8rem;color:var(--text);margin-top:8px;padding:8px 10px;border-radius:6px;background:var(--bg-card);border:1px solid var(--border-light);min-height:20px;display:none"></div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:8px;text-align:center">Clique para ativar/desativar. Segure para ver descricao.</div>
     `;
 
     abrirModal('Gerenciar Condicoes', html,
       '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-condicoes">Salvar</button>'
     );
 
-    // Eventos de toggle
+    // Eventos de toggle + mostrar descricao
     document.querySelectorAll('[data-condicao-toggle]').forEach(el => {
       el.addEventListener('click', () => {
         const nome = el.dataset.condicaoToggle;
@@ -9315,6 +9306,15 @@ function setupEventosCondicoes() {
           const info = CONDICOES_DD.find(c => c.nome === nome);
           el.style.borderColor = info?.cor || 'var(--accent)';
           el.style.background = `${info?.cor || 'var(--accent)'}15`;
+        }
+        // Mostrar descricao da condicao clicada
+        const descArea = document.getElementById('condicao-desc-area');
+        if (descArea) {
+          const desc = CONDICOES_DESCRICAO[nome] || '';
+          if (desc) {
+            descArea.innerHTML = `<strong>${nome}:</strong> ${desc}`;
+            descArea.style.display = 'block';
+          }
         }
       });
     });
