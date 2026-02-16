@@ -375,6 +375,91 @@ const ANTECEDENTES_ESCOLHAS = {
   }
 };
 
+// Mapa de kits que sao colecoes de itens (devem ser expandidos nos componentes individuais)
+// Kits funcionais (Kit de Curandeiro, Kit de Escalada) NAO devem ser expandidos
+const KITS_EXPANSAO = {
+  'Kit de Artista': [
+    { nome: 'Caixa para Fogo', qtd: 1 },
+    { nome: 'Cantil (cheio)', qtd: 1 },
+    { nome: 'Espelho', qtd: 1 },
+    { nome: 'Roupas, Fantasia', qtd: 3 },
+    { nome: 'Lanterna Foca-facho', qtd: 1 },
+    { nome: 'Mochila', qtd: 1 },
+    { nome: 'Óleo', qtd: 8 },
+    { nome: 'Rações', qtd: 9 },
+    { nome: 'Saco de Dormir', qtd: 1 },
+    { nome: 'Sino', qtd: 1 },
+  ],
+  'Kit de Assaltante': [
+    { nome: 'Caixa para Fogo', qtd: 1 },
+    { nome: 'Cantil (cheio)', qtd: 1 },
+    { nome: 'Corda', qtd: 1 },
+    { nome: 'Esferas de Metal', qtd: 1 },
+    { nome: 'Lanterna Coberta', qtd: 1 },
+    { nome: 'Mochila', qtd: 1 },
+    { nome: 'Óleo', qtd: 7 },
+    { nome: 'Pé de Cabra', qtd: 1 },
+    { nome: 'Rações', qtd: 5 },
+    { nome: 'Sino', qtd: 1 },
+    { nome: 'Vela', qtd: 10 },
+  ],
+  'Kit de Aventureiro': [
+    { nome: 'Caixa para Fogo', qtd: 1 },
+    { nome: 'Cantil (cheio)', qtd: 1 },
+    { nome: 'Corda', qtd: 1 },
+    { nome: 'Mochila', qtd: 1 },
+    { nome: 'Óleo', qtd: 2 },
+    { nome: 'Rações', qtd: 10 },
+    { nome: 'Saco de Dormir', qtd: 1 },
+    { nome: 'Tocha', qtd: 10 },
+  ],
+  'Kit de Diplomata': [
+    { nome: 'Baú', qtd: 1 },
+    { nome: 'Caixa para Fogo', qtd: 1 },
+    { nome: 'Caneta Tinteiro', qtd: 5 },
+    { nome: 'Estojo, Mapa ou Pergaminho', qtd: 2 },
+    { nome: 'Lâmpada', qtd: 1 },
+    { nome: 'Óleo', qtd: 4 },
+    { nome: 'Perfume', qtd: 1 },
+    { nome: 'Papel', qtd: 5 },
+    { nome: 'Pergaminho', qtd: 5 },
+    { nome: 'Roupas, Finas', qtd: 1 },
+    { nome: 'Tinta', qtd: 1 },
+  ],
+  'Kit de Erudito': [
+    { nome: 'Caixa para Fogo', qtd: 1 },
+    { nome: 'Caneta Tinteiro', qtd: 1 },
+    { nome: 'Lâmpada', qtd: 1 },
+    { nome: 'Livro', qtd: 1 },
+    { nome: 'Mochila', qtd: 1 },
+    { nome: 'Óleo', qtd: 10 },
+    { nome: 'Pergaminho', qtd: 10 },
+    { nome: 'Tinta', qtd: 1 },
+  ],
+  'Kit de Explorador de Masmorras': [
+    { nome: 'Caixa para Fogo', qtd: 1 },
+    { nome: 'Cantil (cheio)', qtd: 1 },
+    { nome: 'Corda', qtd: 1 },
+    { nome: 'Estrepes', qtd: 1 },
+    { nome: 'Mochila', qtd: 1 },
+    { nome: 'Óleo', qtd: 2 },
+    { nome: 'Pé de Cabra', qtd: 1 },
+    { nome: 'Rações', qtd: 10 },
+    { nome: 'Tocha', qtd: 10 },
+  ],
+  'Kit de Sacerdote': [
+    { nome: 'Água Benta', qtd: 1 },
+    { nome: 'Caixa para Fogo', qtd: 1 },
+    { nome: 'Cobertor', qtd: 1 },
+    { nome: 'Lâmpada', qtd: 1 },
+    { nome: 'Mochila', qtd: 1 },
+    { nome: 'Rações', qtd: 7 },
+    { nome: 'Túnica', qtd: 1 },
+  ],
+};
+// Alias: "Kit de Explorador" (Druida) aponta para "Kit de Explorador de Masmorras"
+KITS_EXPANSAO['Kit de Explorador'] = KITS_EXPANSAO['Kit de Explorador de Masmorras'];
+
 let personagem = null;
 let stepAtual = 0;
 let dadosCache = {};
@@ -2467,6 +2552,39 @@ function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
     const qtyParenMatch = !qtyMatch ? itemStr.match(/^(.+?)\s*\((\d+)\s+\w+\)$/) : null;
     const quantidade = qtyMatch ? parseInt(qtyMatch[1]) : (qtyParenMatch ? parseInt(qtyParenMatch[2]) : 1);
     const nomeItem = qtyMatch ? qtyMatch[2] : (qtyParenMatch ? qtyParenMatch[1].trim() : itemStr);
+
+    // Expandir kits que sao colecoes de itens (ex: Kit de Sacerdote -> seus itens individuais)
+    const kitConteudo = KITS_EXPANSAO[nomeItem];
+    if (kitConteudo) {
+      for (const comp of kitConteudo) {
+        const equipComp = dadosCache.equipAvent?.find(e =>
+          semAcento(e.nome).toLowerCase() === semAcento(comp.nome).toLowerCase()
+        );
+        if (equipComp) {
+          personagem.inventario.push({
+            nome: equipComp.nome,
+            tipo: 'equipamento',
+            quantidade: comp.qtd,
+            equipado: false,
+            dados: { custo: equipComp.custo, peso: equipComp.peso, tipo_uso: equipComp.tipo_uso || '', descricao: equipComp.descricao || '' },
+            origemTipo: tipoOrigem,
+            origemNome: nomeOrigem
+          });
+        } else {
+          // Fallback: item nao encontrado no banco, adicionar como generico
+          personagem.inventario.push({
+            nome: comp.nome,
+            tipo: 'generico',
+            quantidade: comp.qtd,
+            equipado: false,
+            dados: {},
+            origemTipo: tipoOrigem,
+            origemNome: nomeOrigem
+          });
+        }
+      }
+      continue;
+    }
 
     // Singularizar nome para busca (ex: "Adagas" -> "Adaga", "Flechas" -> "Flecha")
     const nomeSingular = nomeItem
