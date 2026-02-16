@@ -24,6 +24,7 @@
   --success: #27ae60;
   --danger: #c0392b;
   --warning: #f39c12;
+  --info: #2980b9;
   --radius: 8px;
   --radius-sm: 4px;
   --shadow: 0 2px 8px rgba(0,0,0,0.08);
@@ -362,7 +363,7 @@ tr:hover td { background: #faf8f4; }
 /* Inventário: handle de drag */
 .inv-drag-handle {
   cursor: grab; color: var(--text-muted); font-size: 1rem;
-  user-select: none; padding: 0 2px; opacity: 0.5;
+  user-select: none; padding: 0 2px; opacity: 0.7;
   transition: opacity 0.2s;
 }
 .inv-item:hover .inv-drag-handle { opacity: 1; }
@@ -412,7 +413,7 @@ tr:hover td { background: #faf8f4; }
 
 /* Item com/sem proficiência nos seletores */
 .item-proficiente { opacity: 1; }
-.item-sem-prof { opacity: 0.65; }
+.item-sem-prof { opacity: 0.75; }
 .item-sem-prof:hover { opacity: 1; }
 
 /* Filtros de arma/armadura */
@@ -449,23 +450,26 @@ tr:hover td { background: #faf8f4; }
 .magia-card .magia-card-nome { font-weight: 700; font-size: 0.85rem; line-height: 1.2; }
 .magia-card .magia-card-meta { font-size: 0.7rem; color: var(--text-muted); display: flex; gap: 6px; flex-wrap: wrap; }
 .magia-card .magia-card-check {
-  position: absolute; top: 6px; right: 6px;
-  width: 18px; height: 18px; border-radius: 50%;
+  position: absolute; top: 2px; right: 2px;
+  width: 28px; height: 28px; border-radius: 50%;
   border: 2px solid var(--border); background: white;
   display: flex; align-items: center; justify-content: center;
-  font-size: 0.7rem; color: white; transition: all 0.2s;
+  font-size: 0.8rem; color: white; transition: all 0.2s;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  z-index: 2;
 }
 .magia-card.selecionada .magia-card-check {
   background: var(--primary); border-color: var(--primary);
 }
 .magia-card.selecionada .magia-card-check::after { content: '\2713'; }
-.magia-card .magia-card-info {
-  position: absolute; bottom: 4px; right: 6px;
-  font-size: 0.7rem; color: var(--text-muted); opacity: 0.6;
+.magia-card .magia-card-nome {
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
-.magia-card .magia-card-info:hover { opacity: 1; color: var(--primary); }
+.magia-card .magia-card-info {
+  display: none;
+}
 .magia-card-bloqueada { pointer-events: none; }
-.magia-card-bloqueada .magia-card-info { pointer-events: auto; }
+.magia-card-bloqueada .magia-card-check { pointer-events: none; }
 
 /* Tags de identificação rápida de magia na ficha */
 .magia-tags {

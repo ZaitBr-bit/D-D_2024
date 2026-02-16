@@ -2958,24 +2958,23 @@ async function renderStepMagias(el) {
             const sel = selecionadas.includes(nome);
             return `
               <div class="magia-card ${sel ? 'selecionada' : ''}" data-magia-nome="${nome}" data-magia-circ="${circ}">
-                <span class="magia-card-check"></span>
-                <div class="magia-card-nome">${nome}</div>
+                <span class="magia-card-check" data-creator-check="${nome}"></span>
+                <div class="magia-card-nome" data-creator-info="${nome}" data-creator-info-circ="${circ}">${nome}</div>
                 <div class="magia-card-meta">
                   <span>${m.escola || ''}</span>
-                  ${m.especial === 'C' ? '<span title="Concentração">C</span>' : ''}
-                  ${m.especial === 'M' ? '<span title="Material (custo)">M$</span>' : ''}
+                  ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
+                  ${m.especial === 'M' ? '<span>M$</span>' : ''}
                 </div>
-                <span class="magia-card-info" data-info-magia="${nome}" data-info-circ="${circ}" title="Ver detalhes">&#9432;</span>
               </div>`;
           }).join('')}</div>`
       }
     `;
 
-    // Eventos de toggle ao clicar no card
-    listaEl.querySelectorAll('.magia-card').forEach(card => {
-      card.addEventListener('click', (e) => {
-        // Ignorar clique no botão de info
-        if (e.target.closest('[data-info-magia]')) return;
+    // Eventos de toggle ao clicar no check
+    listaEl.querySelectorAll('[data-creator-check]').forEach(chk => {
+      chk.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = chk.closest('.magia-card');
         const nome = card.dataset.magiaNome;
         toggleMagia(nome, circ, isTruque, numTruques, numPreparadas);
         renderMagiasCirculo(circ);
@@ -2983,12 +2982,12 @@ async function renderStepMagias(el) {
       });
     });
 
-    // Detalhe ao clicar no ícone de info
-    listaEl.querySelectorAll('[data-info-magia]').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
+    // Detalhe ao clicar no nome da magia
+    listaEl.querySelectorAll('[data-creator-info]').forEach(el => {
+      el.addEventListener('click', async (e) => {
         e.stopPropagation();
-        const nome = btn.dataset.infoMagia;
-        const c = parseInt(btn.dataset.infoCirc);
+        const nome = el.dataset.creatorInfo;
+        const c = parseInt(el.dataset.creatorInfoCirc);
         await mostrarDetalheMagia(nome, c);
       });
     });
