@@ -1011,6 +1011,63 @@ tr:hover td { background: #faf8f4; }
     font-weight: 800;
   }
 
+  /* --- Proficiencias de armaduras/armas na impressao --- */
+  .print-prof-row {
+    display: flex;
+    gap: 4mm;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 3mm;
+    padding: 1.5mm 2mm;
+    border: 1px solid #bbb;
+    border-radius: 3px;
+    background: #fafafa;
+  }
+  .print-prof-group {
+    display: flex;
+    align-items: center;
+    gap: 1.5mm;
+    flex-wrap: wrap;
+  }
+  .print-prof-label {
+    font-size: 7pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #555;
+    letter-spacing: 0.3px;
+  }
+  .print-prof-badge {
+    font-size: 7.5pt;
+    font-weight: 600;
+    padding: 0.5mm 2mm;
+    border-radius: 2px;
+    border: 1px solid #999;
+  }
+  .print-prof-armadura {
+    border-color: #2980b9;
+    color: #2980b9;
+  }
+  .print-prof-arma {
+    border-color: #c0392b;
+    color: #c0392b;
+  }
+  .print-prof-nenhuma {
+    color: #999;
+    font-style: italic;
+    border-color: #ccc;
+  }
+  .print-prof-extra {
+    border-style: dashed;
+    font-style: italic;
+  }
+  .print-prof-nota {
+    width: 100%;
+    font-size: 6pt;
+    color: #888;
+    text-align: center;
+    margin-top: 0.5mm;
+  }
+
   /* --- Secao generica de impressao --- */
   .print-section {
     margin-bottom: 3mm;

@@ -14702,6 +14702,39 @@ async function gerarHtmlImpressao() {
   }
   pag1 += `<div class="print-stats-row">${statsHtml}</div>`;
 
+  // --- Proficiencias de Armaduras e Armas ---
+  {
+    const extras = (char.proficiencias_extra || []).map(p => p.toLowerCase());
+    const armadurasProf = [...(info.armaduras || [])];
+    const armasProf = [...(info.armas || [])];
+    const armadurasExtras = [];
+    const armasExtras = [];
+    for (const extra of extras) {
+      if (extra === 'armadura pesada' && !armadurasProf.includes('Pesada')) { armadurasProf.push('Pesada'); armadurasExtras.push('Pesada'); }
+      else if ((extra === 'armadura média' || extra === 'armadura media') && !armadurasProf.includes('Média')) { armadurasProf.push('Média'); armadurasExtras.push('Média'); }
+      else if (extra === 'armadura leve' && !armadurasProf.includes('Leve')) { armadurasProf.push('Leve'); armadurasExtras.push('Leve'); }
+      else if (extra === 'escudo' && !armadurasProf.includes('Escudo')) { armadurasProf.push('Escudo'); armadurasExtras.push('Escudo'); }
+      else if (extra === 'armas marciais' && !armasProf.includes('Marcial')) { armasProf.push('Marcial'); armasExtras.push('Marcial'); }
+      else if (extra === 'armas simples' && !armasProf.includes('Simples')) { armasProf.push('Simples'); armasExtras.push('Simples'); }
+    }
+    pag1 += `
+      <div class="print-prof-row">
+        <div class="print-prof-group">
+          <span class="print-prof-label">Armaduras:</span>
+          ${armadurasProf.length > 0
+            ? armadurasProf.map(a => `<span class="print-prof-badge print-prof-armadura${armadurasExtras.includes(a) ? ' print-prof-extra' : ''}">${a}${armadurasExtras.includes(a) ? '*' : ''}</span>`).join('')
+            : '<span class="print-prof-badge print-prof-nenhuma">Nenhuma</span>'
+          }
+        </div>
+        <div class="print-prof-group">
+          <span class="print-prof-label">Armas:</span>
+          ${armasProf.map(a => `<span class="print-prof-badge print-prof-arma${armasExtras.includes(a) ? ' print-prof-extra' : ''}">${a}${armasExtras.includes(a) ? '*' : ''}</span>`).join('')}
+        </div>
+        ${armadurasExtras.length > 0 || armasExtras.length > 0 ? '<div class="print-prof-nota">* Concedida por subclasse/talento</div>' : ''}
+      </div>
+    `;
+  }
+
   // --- Atributos ---
   pag1 += `
     <div class="print-section">
