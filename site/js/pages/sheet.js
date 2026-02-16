@@ -1223,18 +1223,26 @@ async function abrirModalRecursosBruxo() {
           </div>`;
       }).join('');
     }
+    // Descricao formatada (exibida ao clicar no nome)
+    const descHtml = mdParaHtml(o.descricao || 'Sem descricao disponivel.');
     return `
       <div class="magia-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''} ${ehPacto ? 'magia-dominio' : ''}"
-           data-inv-toggle="${o.nome}" style="${bloqueado ? 'opacity:0.35;cursor:not-allowed;' : 'cursor:pointer;'};position:relative">
-        <span class="magia-card-check"></span>
-        <div class="magia-card-nome">${ehPacto ? '<span class="badge-dominio">&#9733;</span> ' : ''}${o.nome}${qtd > 1 ? ` <span class="badge" style="font-size:0.6rem;background:var(--accent);color:#fff">x${qtd}</span>` : ''}
-          <span class="btn-info-inv" data-inv-info="${o.nome}" title="Ver descricao" style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--secondary);color:#fff;font-size:0.7rem;font-weight:700;cursor:pointer;margin-left:4px;vertical-align:middle;flex-shrink:0;-webkit-tap-highlight-color:transparent">i</span>
-        </div>
-        <div class="magia-card-meta">
-          ${preResumo ? `<span style="font-size:0.65rem">${preResumo}</span>` : ''}
-          ${o.repetivel ? '<span style="font-size:0.65rem;color:var(--accent)">Repetivel</span>' : ''}
+           data-inv-card="${o.nome}" style="${bloqueado ? 'opacity:0.35;cursor:not-allowed;' : ''};position:relative">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="magia-card-check" data-inv-toggle="${o.nome}" style="cursor:pointer;flex-shrink:0"></span>
+          <div style="flex:1;min-width:0">
+            <div class="magia-card-nome" data-inv-info="${o.nome}" style="cursor:pointer">${ehPacto ? '<span class="badge-dominio">&#9733;</span> ' : ''}${o.nome}${qtd > 1 ? ` <span class="badge" style="font-size:0.6rem;background:var(--accent);color:#fff">x${qtd}</span>` : ''}</div>
+            <div class="magia-card-meta">
+              ${preResumo ? `<span style="font-size:0.65rem">${preResumo}</span>` : ''}
+              ${o.repetivel ? '<span style="font-size:0.65rem;color:var(--accent)">Repetivel</span>' : ''}
+            </div>
+          </div>
         </div>
         ${paramHtml}
+        <div class="inv-desc-inline" data-inv-desc="${o.nome}" style="display:none;margin-top:6px;padding:6px 8px;border-top:1px solid var(--border-light);font-size:0.75rem;color:var(--text-muted)">
+          ${o.prerequisito ? `<div style="font-size:0.7rem;color:var(--secondary);font-weight:600;margin-bottom:4px">${o.prerequisito}</div>` : ''}
+          <div class="md-content">${descHtml}</div>
+        </div>
       </div>`;
   }
 
@@ -1279,8 +1287,7 @@ async function abrirModalRecursosBruxo() {
   abrirModal('Recursos do Bruxo', `
     <div class="section-divider"><span>Invocaçoes Misticas</span></div>
     <div class="search-box" style="margin-bottom:8px"><input type="text" id="busca-inv-bruxo" placeholder="Buscar invocacao..." class="form-input"></div>
-    <div id="bruxo-inv-grid" style="max-height:45vh;overflow-y:auto"></div>
-    <div id="bruxo-inv-desc" style="font-size:0.78rem;color:var(--text-muted);margin-top:8px;padding:8px 10px;border-radius:6px;background:var(--bg-card);border:1px solid var(--border-light);min-height:20px;display:none"></div>
+    <div id="bruxo-inv-grid" style="max-height:55vh;overflow-y:auto"></div>
     ${arcanumHtml}
   `,
   '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-bruxo-recursos">Salvar</button>');
@@ -1310,8 +1317,10 @@ async function abrirModalRecursosBruxo() {
   }
 
   function attachInvToggleListeners() {
+    // Toggle de selecao ao clicar no checkbox
     gridEl.querySelectorAll('[data-inv-toggle]').forEach(el => {
-      el.addEventListener('click', () => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
         const nome = el.dataset.invToggle;
         const opcao = opcoes.find(o => o.nome === nome);
         if (!opcao) return;
@@ -1345,14 +1354,13 @@ async function abrirModalRecursosBruxo() {
       });
     });
 
-    // Para repetíveis: botão + para adicionar outra ocorrência
-    gridEl.querySelectorAll('[data-inv-toggle]').forEach(el => {
-      const nome = el.dataset.invToggle;
+    // Para repetiveis: adicionar botao +1 ao card
+    gridEl.querySelectorAll('[data-inv-card]').forEach(el => {
+      const nome = el.dataset.invCard;
       const opcao = opcoes.find(o => o.nome === nome);
       if (!opcao?.repetivel) return;
       const qtd = contarInv(invSelecionadas, nome);
       if (qtd >= 1) {
-        // Adicionar botão de + ao card
         const metaDiv = el.querySelector('.magia-card-meta');
         if (metaDiv) {
           const addBtn = document.createElement('span');
@@ -1373,36 +1381,32 @@ async function abrirModalRecursosBruxo() {
       }
     });
 
-    // Botoes de informacao (i) para mostrar descricao da invocacao
-    gridEl.querySelectorAll('[data-inv-info]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+    // Clicar no nome da invocacao mostra/oculta descricao inline
+    gridEl.querySelectorAll('[data-inv-info]').forEach(nomeEl => {
+      nomeEl.addEventListener('click', (e) => {
         e.stopPropagation();
-        const nome = btn.dataset.invInfo;
-        const opcao = opcoes.find(o => o.nome === nome);
-        const descEl = document.getElementById('bruxo-inv-desc');
-        if (!opcao || !descEl) return;
-        if (descEl.style.display !== 'none' && descEl.dataset.invAtual === nome) {
-          descEl.style.display = 'none';
-          descEl.dataset.invAtual = '';
-          return;
-        }
-        const descHtml = mdParaHtml(opcao.descricao || 'Sem descricao disponivel.');
-        descEl.innerHTML = `<strong>${opcao.nome}</strong>${opcao.prerequisito ? ` <span style="font-size:0.7rem;color:var(--secondary)">(${opcao.prerequisito})</span>` : ''}<br>${descHtml}`;
-        descEl.style.display = 'block';
-        descEl.dataset.invAtual = nome;
-        descEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        const nome = nomeEl.dataset.invInfo;
+        const card = nomeEl.closest('[data-inv-card]');
+        if (!card) return;
+        const descEl = card.querySelector(`[data-inv-desc="${nome}"]`);
+        if (!descEl) return;
+        // Ocultar outras descricoes abertas
+        gridEl.querySelectorAll('.inv-desc-inline').forEach(d => {
+          if (d !== descEl) d.style.display = 'none';
+        });
+        // Toggle da descricao clicada
+        descEl.style.display = descEl.style.display === 'none' ? 'block' : 'none';
       });
     });
 
     // Listeners dos selects de parametro (truque ou talento)
     gridEl.querySelectorAll('[data-inv-param-sel]').forEach(sel => {
-      sel.addEventListener('click', (e) => e.stopPropagation()); // Evitar toggle ao clicar no select
+      sel.addEventListener('click', (e) => e.stopPropagation());
       sel.addEventListener('change', (e) => {
         e.stopPropagation();
         const nome = sel.dataset.invParamSel;
         const idx = parseInt(sel.dataset.invParamSelidx);
-        const campo = sel.dataset.invParamCampo; // 'truque' ou 'talento'
-        // Encontrar a n-esima instancia dessa invocacao no array
+        const campo = sel.dataset.invParamCampo;
         let count = 0;
         for (let i = 0; i < invSelecionadas.length; i++) {
           if (invSelecionadas[i].nome === nome) {
@@ -1411,7 +1415,6 @@ async function abrirModalRecursosBruxo() {
               if (sel.value) { novoObj[campo] = sel.value; }
               else { delete novoObj[campo]; }
               invSelecionadas[i] = novoObj;
-              // Para talentos, re-renderizar para atualizar opcoes filtradas
               if (campo === 'talento') renderGrid();
               break;
             }
@@ -8736,6 +8739,34 @@ function renderSecaoTalentos() {
             infoEscolhas = `<div class="info-box info" style="font-size:0.8rem;margin-top:6px"><strong>Domínio Elemental:</strong> ${todos.join(', ')}</div>`;
           }
         }
+        // Talentos com escolhas de proficiencias/ferramentas/instrumentos
+        if (['Habilidoso', 'Artifista', 'Músico'].includes(nome) && char.escolhas_talento) {
+          const entradas = [];
+          const ctxLabels = { antecedente: 'Antecedente', versatil: 'Versátil' };
+          for (const [ctx, escolhas] of Object.entries(char.escolhas_talento)) {
+            if (!Array.isArray(escolhas) || escolhas.length === 0) continue;
+            // Filtrar: contexto versatil pertence ao talento_versatil
+            if (ctx === 'versatil' && char.talento_versatil !== nome) continue;
+            // Contexto antecedente: sem como saber qual talento, mostra se o nome atual esta nos talentos
+            // e o talento_versatil nao e o mesmo (evita duplicar)
+            if (ctx === 'antecedente' && char.talento_versatil === nome) {
+              // So mostrar se Habilidoso aparece mais de 1 vez nos talentos
+              const count = char.talentos.filter(t => (typeof t === 'string' ? t : t.nome) === nome).length;
+              if (count <= 1) continue;
+            }
+            let label = ctxLabels[ctx] || ctx;
+            if (ctx.startsWith('levelup_')) {
+              label = `Nível ${ctx.replace('levelup_', '')}`;
+            }
+            entradas.push({ label, escolhas });
+          }
+          if (entradas.length > 0) {
+            const rotulo = nome === 'Artifista' ? 'Ferramentas' : nome === 'Músico' ? 'Instrumentos' : 'Proficiências';
+            infoEscolhas += entradas.map(e =>
+              `<div class="info-box info" style="font-size:0.8rem;margin-top:6px"><strong>${e.label} — ${rotulo}:</strong> ${e.escolhas.join(', ')}</div>`
+            ).join('');
+          }
+        }
         
         return `
           <details style="margin-bottom:6px">
@@ -11425,6 +11456,21 @@ function renderTracoEspecie(traco, herdaAncestralidade = false, ehSubRevelacao =
     `;
   }
 
+  // Informacoes de escolhas vinculadas ao traco
+  let infoEscolhaTraco = '';
+  if ((traco.nome === 'Hábil' || traco.nome === 'Sentidos Aguçados') && char.pericia_especie) {
+    infoEscolhaTraco = `<div class="info-box info" style="font-size:0.8rem;margin-top:6px"><strong>Pericia escolhida:</strong> ${char.pericia_especie}</div>`;
+  }
+  if (traco.nome === 'Versátil' && char.talento_versatil) {
+    // Mostrar o talento escolhido e, se houver escolhas associadas (ex: Habilidoso), tambem
+    let detalheVersatil = `<strong>Talento escolhido:</strong> ${char.talento_versatil}`;
+    const escolhasVersatil = char.escolhas_talento?.versatil;
+    if (escolhasVersatil?.length > 0) {
+      detalheVersatil += `<br><strong>Proficiencias:</strong> ${escolhasVersatil.join(', ')}`;
+    }
+    infoEscolhaTraco = `<div class="info-box info" style="font-size:0.8rem;margin-top:6px">${detalheVersatil}</div>`;
+  }
+
   return `
     <details style="margin-bottom:6px">
       <summary style="font-weight:600;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;flex-wrap:wrap;gap:2px">
@@ -11435,6 +11481,7 @@ function renderTracoEspecie(traco, herdaAncestralidade = false, ehSubRevelacao =
       </summary>
       ${usosHtmlBody}
       <div class="md-content" style="padding:6px 0 6px 16px;font-size:0.85rem">${mdParaHtml(traco.descricao)}</div>
+      ${infoEscolhaTraco}
     </details>
   `;
 }
@@ -11613,6 +11660,10 @@ function renderSecaoPactoBruxo() {
 
   if (pacto === 'Pacto do Tomo') {
     const tomoData = estado.pactoTomo || { truques: [], rituais: [] };
+    // Circulo do slot de pacto do Bruxo (o unico circulo onde ele tem espacos)
+    const circuloPacto = Object.keys(char.espacos_magia || {}).sort((a, b) => Number(b) - Number(a))[0] || '1';
+    const slotPacto = char.espacos_magia?.[circuloPacto];
+    const slotEsgotado = slotPacto ? slotPacto.usados >= slotPacto.total : true;
     // Detectar conflitos: magias do Tomo que o personagem ja possui por outros meios
     const truquesConhecidos = new Set((char.magias_conhecidas || []).filter(m => m.circulo === 0).map(m => m.nome));
     const magiasPreparadas = new Set((char.magias_preparadas || []).map(m => m.nome));
@@ -11645,9 +11696,15 @@ function renderSecaoPactoBruxo() {
             ${tomoData.truques.map(t => {
               const conflito = truquesConhecidos.has(t.nome);
               return `
-              <div class="magia-item ${conflito ? '' : ''}" style="margin:2px 0;padding:4px 8px;border-left:2px solid ${conflito ? 'var(--danger)' : 'var(--accent)'}">
-                <div class="magia-nome" style="font-size:0.8rem">${t.nome} <span style="font-size:0.6rem;color:var(--text-muted)">(${t.classe || '?'})</span>${conflito ? ' <span style="font-size:0.6rem;color:var(--danger);font-weight:700">Duplicado</span>' : ''}</div>
-                ${t.nome ? badgesMagiaRapidos(t.nome) : ''}
+              <div class="magia-item ${conflito ? '' : ''}" data-magia-nome="${t.nome}" data-magia-circ="0" style="margin:2px 0;padding:4px 8px;border-left:2px solid ${conflito ? 'var(--danger)' : 'var(--accent)'};cursor:pointer">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div class="magia-nome" style="font-size:0.8rem">${t.nome} <span style="font-size:0.6rem;color:var(--text-muted)">(${t.classe || '?'})</span>${conflito ? ' <span style="font-size:0.6rem;color:var(--danger);font-weight:700">Duplicado</span>' : ''}</div>
+                    ${t.nome ? badgesMagiaRapidos(t.nome) : ''}
+                  </div>
+                  <button class="btn btn-sm btn-primary no-print" data-conjurar-pacto="${t.nome}" style="font-size:0.7rem;flex-shrink:0">Conjurar</button>
+                </div>
+                <div class="magia-desc" style="margin-top:4px;font-size:0.78rem;color:var(--text-muted)"></div>
               </div>`;
             }).join('')}
           </div>
@@ -11658,9 +11715,18 @@ function renderSecaoPactoBruxo() {
             ${tomoData.rituais.map(r => {
               const conflito = magiasPreparadas.has(r.nome);
               return `
-              <div class="magia-item" style="margin:2px 0;padding:4px 8px;border-left:2px solid ${conflito ? 'var(--danger)' : 'var(--accent)'}">
-                <div class="magia-nome" style="font-size:0.8rem">${r.nome} <span style="font-size:0.6rem;color:var(--text-muted)">(${r.classe || '?'}) - Ritual</span>${conflito ? ' <span style="font-size:0.6rem;color:var(--danger);font-weight:700">Duplicado</span>' : ''}</div>
-                ${r.nome ? badgesMagiaRapidos(r.nome) : ''}
+              <div class="magia-item" data-magia-nome="${r.nome}" data-magia-circ="1" style="margin:2px 0;padding:4px 8px;border-left:2px solid ${conflito ? 'var(--danger)' : 'var(--accent)'};cursor:pointer">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div class="magia-nome" style="font-size:0.8rem">${r.nome} <span style="font-size:0.6rem;color:var(--text-muted)">(${r.classe || '?'}) - Ritual</span>${conflito ? ' <span style="font-size:0.6rem;color:var(--danger);font-weight:700">Duplicado</span>' : ''}</div>
+                    ${r.nome ? badgesMagiaRapidos(r.nome) : ''}
+                  </div>
+                  <div class="no-print" style="display:flex;gap:4px;flex-shrink:0">
+                    <button class="btn btn-sm ${slotEsgotado ? 'btn-secondary' : 'btn-primary'}" data-conjurar="${r.nome}" data-conj-circ="${circuloPacto}" style="font-size:0.7rem" ${slotEsgotado ? 'disabled style="font-size:0.7rem;opacity:0.5;cursor:not-allowed"' : ''}>Conjurar (${circuloPacto}o)</button>
+                    <button class="btn btn-sm btn-secondary" data-conjurar-pacto="${r.nome}" style="font-size:0.7rem">Ritual</button>
+                  </div>
+                </div>
+                <div class="magia-desc" style="margin-top:4px;font-size:0.78rem;color:var(--text-muted)"></div>
               </div>`;
             }).join('')}
           </div>
@@ -11724,15 +11790,19 @@ function renderSecaoPactoBruxo() {
     html += '<div style="margin-top:8px">';
     html += '<div style="font-size:0.7rem;font-weight:700;color:var(--secondary);margin-bottom:4px">Magias via Invocacoes:</div>';
     for (const inv of invocacoesComMagia) {
+      const infoMagia = indiceMagiasCache?.find(m => m.nome === inv.magia);
+      const circ = infoMagia?.circulo ?? 1;
       html += `
-        <div class="magia-item" style="margin:2px 0;padding:4px 8px;border-left:2px solid var(--secondary)">
+        <div class="magia-item" data-magia-nome="${inv.magia}" data-magia-circ="${circ}" style="margin:2px 0;padding:4px 8px;border-left:2px solid var(--secondary);cursor:pointer">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <div>
               <div class="magia-nome" style="font-size:0.8rem">${inv.magia}</div>
+              ${inv.magia ? badgesMagiaRapidos(inv.magia) : ''}
               <div style="font-size:0.6rem;color:var(--text-muted)">${inv.invocacao} (sem gastar espaco)</div>
             </div>
-            <button class="btn btn-sm btn-primary" data-conjurar-pacto="${inv.magia}" style="font-size:0.7rem">Conjurar</button>
+            <button class="btn btn-sm btn-primary no-print" data-conjurar-pacto="${inv.magia}" style="font-size:0.7rem;flex-shrink:0">Conjurar</button>
           </div>
+          <div class="magia-desc" style="margin-top:4px;font-size:0.78rem;color:var(--text-muted)"></div>
         </div>`;
     }
     html += '</div>';
