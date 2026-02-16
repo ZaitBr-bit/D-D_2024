@@ -312,7 +312,35 @@ tr:hover td { background: #faf8f4; }
 .pericia-prof.ativo { background: var(--primary); border-color: var(--primary); }
 .pericia-prof.expertise { background: var(--secondary); border-color: var(--secondary); }
 .pericia-bonus { font-weight: 700; min-width: 24px; text-align: right; color: var(--primary); }
-.pericia-nome { color: var(--text); }
+.pericia-nome { color: var(--text); flex: 1; }
+
+/* Badges de Vantagem/Desvantagem nas pericias */
+.pericia-vd-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  line-height: 1;
+  cursor: help;
+}
+.pericia-vd-badge.vantagem {
+  background: var(--success);
+  color: #fff;
+}
+.pericia-vd-badge.desvantagem {
+  background: var(--danger);
+  color: #fff;
+}
+.pericia-vd-badge.neutro {
+  background: var(--text-muted);
+  color: #fff;
+  font-size: 0.7rem;
+}
 
 /* --- Salvaguardas --- */
 .salvaguardas-grid {

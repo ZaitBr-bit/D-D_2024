@@ -756,9 +756,160 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   }
   
   // Aplicar talento (se escolhido ao invés de aumento)
+  let escolhasTalentoLevelup = [];
   if (ganhaAumentoAtributo && opcoes.talento) {
     if (!personagem.talentos) personagem.talentos = [];
     personagem.talentos.push(opcoes.talento);
+
+    // Aplicar escolhas do talento (Habilidoso/Artifista/Músico)
+    if (Array.isArray(opcoes.escolhas_talento_levelup) && opcoes.escolhas_talento_levelup.length > 0) {
+      if (!personagem.escolhas_talento) personagem.escolhas_talento = {};
+      const chave = `levelup_${novoNivel}`;
+      personagem.escolhas_talento[chave] = opcoes.escolhas_talento_levelup;
+      escolhasTalentoLevelup = opcoes.escolhas_talento_levelup;
+
+      // Aplicar pericias do Habilidoso nas proficiencias
+      if (opcoes.talento === 'Habilidoso') {
+        if (!personagem.pericias_proficientes) personagem.pericias_proficientes = [];
+        const _periciasNomes = [
+          'Acrobacia','Arcanismo','Atletismo','Atuação','Enganação','Furtividade',
+          'História','Intimidação','Intuição','Investigação','Lidar com Animais',
+          'Medicina','Natureza','Percepção','Persuasão','Prestidigitação',
+          'Religião','Sobrevivência'
+        ];
+        for (const escolha of opcoes.escolhas_talento_levelup) {
+          if (_periciasNomes.includes(escolha) && !personagem.pericias_proficientes.includes(escolha)) {
+            personagem.pericias_proficientes.push(escolha);
+          }
+        }
+      }
+    }
+
+    // Aplicar bonus de PV do Vigoroso (dobro do nivel ao obter)
+    if (opcoes.talento === 'Vigoroso') {
+      const bonusVigoroso = novoNivel * 2;
+      personagem.pv_max = (personagem.pv_max || 0) + bonusVigoroso;
+      personagem.pv_atual = Math.min(personagem.pv_atual + bonusVigoroso, personagem.pv_max);
+      personagem.bonus_pv_vigoroso_aplicado = bonusVigoroso;
+    }
+
+    // Aplicar ASI do talento (Adepto Elemental, Agressor, etc.)
+    if (opcoes.talento_asi) {
+      const chaveAttr = opcoes.talento_asi;
+      const valorAtual = personagem.atributos[chaveAttr] || 10;
+      personagem.atributos[chaveAttr] = Math.min(20, valorAtual + 1);
+    }
+
+    // Aplicar Analítico / Mente Aguçada (proficiência ou expertise)
+    if (opcoes.talento_tipo_escolha === 'analitico' || opcoes.talento_tipo_escolha === 'mente_agucada') {
+      const pericia = opcoes.escolhas_talento_levelup?.[0];
+      if (pericia) {
+        if (!personagem.pericias_proficientes) personagem.pericias_proficientes = [];
+        if (!personagem.pericias_expertise) personagem.pericias_expertise = [];
+        if (personagem.pericias_proficientes.includes(pericia)) {
+          // Já proficiente: adquire Especialização
+          if (!personagem.pericias_expertise.includes(pericia)) {
+            personagem.pericias_expertise.push(pericia);
+          }
+        } else {
+          // Sem proficiência: adquire Proficiência
+          personagem.pericias_proficientes.push(pericia);
+        }
+      }
+    }
+
+    // Aplicar Especialista em Perícia (1 proficiência + 1 expertise)
+    if (opcoes.talento_tipo_escolha === 'especialista_pericia') {
+      const [profPericia, expPericia] = opcoes.escolhas_talento_levelup || [];
+      if (profPericia) {
+        if (!personagem.pericias_proficientes) personagem.pericias_proficientes = [];
+        if (!personagem.pericias_proficientes.includes(profPericia)) {
+          personagem.pericias_proficientes.push(profPericia);
+        }
+      }
+      if (expPericia) {
+        if (!personagem.pericias_expertise) personagem.pericias_expertise = [];
+        if (!personagem.pericias_expertise.includes(expPericia)) {
+          personagem.pericias_expertise.push(expPericia);
+        }
+      }
+    }
+
+    // Aplicar Resiliente (proficiência em salvaguarda do atributo escolhido)
+    if (opcoes.talento_tipo_escolha === 'resiliente' && opcoes.resiliente_atributo) {
+      if (!personagem.salvaguardas_proficientes) personagem.salvaguardas_proficientes = [];
+      const _mapaAttrNome = {
+        'forca': 'Força', 'destreza': 'Destreza', 'constituicao': 'Constituição',
+        'inteligencia': 'Inteligência', 'sabedoria': 'Sabedoria', 'carisma': 'Carisma'
+      };
+      const nomeAttr = _mapaAttrNome[opcoes.resiliente_atributo];
+      if (nomeAttr && !personagem.salvaguardas_proficientes.includes(nomeAttr)) {
+        personagem.salvaguardas_proficientes.push(nomeAttr);
+      }
+    }
+
+    // Aplicar Adepto Elemental (tipo de dano) — push no array de tipos
+    if (opcoes.talento_tipo_escolha === 'adepto_elemental') {
+      const tipoEscolhido = opcoes.escolhas_talento_levelup?.[0] || '';
+      if (tipoEscolhido) {
+        if (!personagem.adepto_elemental_tipos) personagem.adepto_elemental_tipos = [];
+        if (!personagem.adepto_elemental_tipos.includes(tipoEscolhido)) {
+          personagem.adepto_elemental_tipos.push(tipoEscolhido);
+        }
+      }
+    }
+
+    // Aplicar Tocado Por Fadas / Tocado Pelas Sombras (magia extra)
+    if (opcoes.talento_tipo_escolha === 'tocado_fadas' || opcoes.talento_tipo_escolha === 'tocado_sombras') {
+      const nomeMagia = opcoes.escolhas_talento_levelup?.[0];
+      if (nomeMagia) {
+        if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
+        const origem = opcoes.talento_tipo_escolha === 'tocado_fadas' ? 'tocado_por_fadas' : 'tocado_pelas_sombras';
+        if (!personagem.magias_preparadas.find(m => m.nome === nomeMagia)) {
+          personagem.magias_preparadas.push({ nome: nomeMagia, circulo: 1, origem });
+        }
+      }
+    }
+
+    // Aplicar Conjurador Ritualista (magias rituais)
+    if (opcoes.talento_tipo_escolha === 'conjurador_ritualista') {
+      if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
+      for (const nomeMagia of (opcoes.escolhas_talento_levelup || [])) {
+        if (!personagem.magias_preparadas.find(m => m.nome === nomeMagia)) {
+          personagem.magias_preparadas.push({ nome: nomeMagia, circulo: 1, origem: 'conjurador_ritualista' });
+        }
+      }
+    }
+
+    // Aplicar Iniciado em Magia (lista + atributo + truques + magia) — push no array de instâncias
+    if (opcoes.talento_tipo_escolha === 'iniciado_em_magia' && opcoes.iniciado_em_magia) {
+      const im = opcoes.iniciado_em_magia;
+      if (!personagem.iniciado_em_magia_instancias) personagem.iniciado_em_magia_instancias = [];
+      const novaInstancia = {
+        lista: im.lista,
+        atributo: im.atributo,
+        truques: [...(im.truques || [])],
+        magia: im.magia
+      };
+      // Só adiciona se a lista ainda não foi usada
+      if (!personagem.iniciado_em_magia_instancias.some(i => i.lista === im.lista)) {
+        personagem.iniciado_em_magia_instancias.push(novaInstancia);
+      }
+      // Adicionar truques às magias conhecidas
+      if (!personagem.magias_conhecidas) personagem.magias_conhecidas = [];
+      for (const nome of (im.truques || [])) {
+        if (!personagem.magias_conhecidas.find(m => m.nome === nome)) {
+          personagem.magias_conhecidas.push({ nome, circulo: 0, origem: 'iniciado_em_magia' });
+        }
+      }
+      // Adicionar magia de 1o círculo às preparadas
+      if (im.magia) {
+        if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
+        if (!personagem.magias_preparadas.find(m => m.nome === im.magia)) {
+          personagem.magias_preparadas.push({ nome: im.magia, circulo: 1, origem: 'iniciado_em_magia' });
+        }
+      }
+    }
   }
 
   // Aplicar Especialização do Bardo (2 escolhas nos níveis 2 e 9)
@@ -826,6 +977,19 @@ export async function subirDeNivel(personagem, opcoes = {}) {
       }
     }
   }
+
+  // Campeão Primitivo (Bárbaro nível 20): FOR e CON +4 (máx 25)
+  if (personagem.classe === 'Bárbaro' && novoNivel === 20) {
+    personagem.atributos.forca = Math.min(25, (personagem.atributos.forca || 10) + 4);
+    personagem.atributos.constituicao = Math.min(25, (personagem.atributos.constituicao || 10) + 4);
+    // Recalcular PV com novo mod de CON (retroativo para todos os níveis)
+    const modConCampeao = calcMod(personagem.atributos.constituicao);
+    if (modConCampeao > modConDepois) {
+      const bonusCampeao = (modConCampeao - modConDepois) * novoNivel;
+      personagem.pv_max += bonusCampeao;
+      personagem.pv_atual += bonusCampeao;
+    }
+  }
   
   // Retornar resumo do level-up
   return {
@@ -847,6 +1011,8 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     aumento_atributo: ganhaAumentoAtributo,
     aumentos_aplicados: opcoes.aumentos_atributo || null,
     talento_aplicado: opcoes.talento || null,
+    talento_asi_aplicado: opcoes.talento_asi || null,
+    escolhas_talento_levelup: escolhasTalentoLevelup,
     expertise_bardo_aplicada: expertiseBardoAplicada,
     expertise_guardiao_aplicada: expertiseGuardiaoAplicada,
     estilo_luta_aplicado: estiloLutaAplicado,

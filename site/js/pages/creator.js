@@ -96,6 +96,120 @@ function obterTruquesEspecie(especie, tracosEscolhidos) {
   return truques;
 }
 
+// Opcoes de ferramentas para talentos que exigem escolhas de proficiencia
+const FERRAMENTAS_TODAS = [
+  'Ferramentas de Carpinteiro', 'Ferramentas de Cartógrafo', 'Ferramentas de Coureiro',
+  'Ferramentas de Entalhador', 'Ferramentas de Ferreiro', 'Ferramentas de Funileiro',
+  'Ferramentas de Joalheiro', 'Ferramentas de Oleiro', 'Ferramentas de Pedreiro',
+  'Ferramentas de Sapateiro', 'Ferramentas de Tecelão', 'Ferramentas de Vidreiro',
+  'Suprimentos de Alquimista', 'Suprimentos de Calígrafo', 'Suprimentos de Cervejeiro',
+  'Suprimentos de Pintor', 'Utensílios de Cozinheiro',
+  'Ferramentas de Ladrão', 'Ferramentas de Navegador',
+  'Kit de Disfarce', 'Kit de Falsificação', 'Kit de Herbalismo', 'Kit de Veneno'
+];
+
+const INSTRUMENTOS_MUSICAIS = [
+  'Alaúde', 'Flauta', 'Flauta de Pan', 'Gaita de Foles', 'Lira',
+  'Oboé', 'Tambor', 'Trombeta', 'Violino', 'Xilofone'
+];
+
+const FERRAMENTAS_ARTESAO = [
+  'Ferramentas de Carpinteiro', 'Ferramentas de Cartógrafo', 'Ferramentas de Coureiro',
+  'Ferramentas de Entalhador', 'Ferramentas de Ferreiro', 'Ferramentas de Funileiro',
+  'Ferramentas de Joalheiro', 'Ferramentas de Oleiro', 'Ferramentas de Pedreiro',
+  'Ferramentas de Sapateiro', 'Ferramentas de Tecelão', 'Ferramentas de Vidreiro',
+  'Suprimentos de Alquimista', 'Suprimentos de Calígrafo', 'Suprimentos de Cervejeiro',
+  'Suprimentos de Pintor', 'Utensílios de Cozinheiro'
+];
+
+/** Renderiza descricao completa de um talento (descricao + beneficios) */
+function renderDescricaoTalento(td) {
+  if (!td) return '';
+  let html = '';
+  if (td.descricao) html += `<div class="md-content">${mdParaHtml(td.descricao)}</div>`;
+  if (td.beneficios?.length) {
+    html += '<div style="margin-top:6px">';
+    td.beneficios.forEach(b => {
+      html += `<div style="margin-bottom:4px"><strong>${b.nome}:</strong> ${mdParaHtml(b.descricao)}</div>`;
+    });
+    html += '</div>';
+  }
+  return html;
+}
+
+/** Gera HTML de selecao de escolhas para talentos que exigem (Habilidoso, Artifista, Musico) */
+function renderEscolhasTalentoHtml(talentoNome, contexto) {
+  // contexto: 'versatil' ou 'antecedente'
+  const prefix = `escolha-talento-${contexto}`;
+  const escolhasAtuais = personagem.escolhas_talento?.[contexto] || [];
+
+  if (talentoNome === 'Habilidoso') {
+    // 3 pericias ou ferramentas a escolha
+    const periciasList = PERICIAS.map(p => p.nome);
+    const todasOpcoes = [...periciasList, ...FERRAMENTAS_TODAS];
+    let html = `<div class="section-divider" style="margin-top:8px"><span>Escolhas — Habilidoso</span></div>`;
+    html += `<div class="info-box info" style="font-size:0.8rem">Escolha 3 pericias ou ferramentas para adquirir proficiencia.</div>`;
+    for (let i = 0; i < 3; i++) {
+      const valorAtual = escolhasAtuais[i] || '';
+      html += `<select class="${prefix}" data-idx="${i}" style="width:100%;padding:6px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:0.85rem;margin:4px 0">`;
+      html += `<option value="">-- Escolha ${i + 1} --</option>`;
+      html += `<optgroup label="Pericias">`;
+      periciasList.forEach(p => {
+        html += `<option value="${p}" ${valorAtual === p ? 'selected' : ''}>${p}</option>`;
+      });
+      html += `</optgroup><optgroup label="Ferramentas">`;
+      FERRAMENTAS_TODAS.forEach(f => {
+        html += `<option value="${f}" ${valorAtual === f ? 'selected' : ''}>${f}</option>`;
+      });
+      html += `</optgroup></select>`;
+    }
+    return html;
+  }
+
+  if (talentoNome === 'Artifista') {
+    let html = `<div class="section-divider" style="margin-top:8px"><span>Escolhas — Artifista</span></div>`;
+    html += `<div class="info-box info" style="font-size:0.8rem">Escolha 3 Ferramentas de Artesao para adquirir proficiencia.</div>`;
+    for (let i = 0; i < 3; i++) {
+      const valorAtual = escolhasAtuais[i] || '';
+      html += `<select class="${prefix}" data-idx="${i}" style="width:100%;padding:6px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:0.85rem;margin:4px 0">`;
+      html += `<option value="">-- Escolha ${i + 1} --</option>`;
+      FERRAMENTAS_ARTESAO.forEach(f => {
+        html += `<option value="${f}" ${valorAtual === f ? 'selected' : ''}>${f}</option>`;
+      });
+      html += `</select>`;
+    }
+    return html;
+  }
+
+  if (talentoNome === 'Músico') {
+    let html = `<div class="section-divider" style="margin-top:8px"><span>Escolhas — Musico</span></div>`;
+    html += `<div class="info-box info" style="font-size:0.8rem">Escolha 3 Instrumentos Musicais para adquirir proficiencia.</div>`;
+    for (let i = 0; i < 3; i++) {
+      const valorAtual = escolhasAtuais[i] || '';
+      html += `<select class="${prefix}" data-idx="${i}" style="width:100%;padding:6px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:0.85rem;margin:4px 0">`;
+      html += `<option value="">-- Escolha ${i + 1} --</option>`;
+      INSTRUMENTOS_MUSICAIS.forEach(inst => {
+        html += `<option value="${inst}" ${valorAtual === inst ? 'selected' : ''}>${inst}</option>`;
+      });
+      html += `</select>`;
+    }
+    return html;
+  }
+
+  return '';
+}
+
+/** Verifica se um talento exige escolhas adicionais */
+function talentoExigeEscolhas(nome) {
+  return ['Habilidoso', 'Artifista', 'Músico'].includes(nome);
+}
+
+/** Retorna quantas escolhas o talento exige */
+function talentoNumEscolhas(nome) {
+  if (['Habilidoso', 'Artifista', 'Músico'].includes(nome)) return 3;
+  return 0;
+}
+
 // Nível obrigatório de subclasse por classe
 const NIVEL_SUBCLASSE = {
   'Bárbaro': 3, 'Bardo': 3, 'Bruxo': 3, 'Clérigo': 3, 'Druida': 3,
@@ -552,38 +666,50 @@ function validarStep() {
       }
       return true;
     }
-    case 'magias':
+    case 'magias': {
       // Validar seleção de truques e magias para conjuradores
       const infoMagia = CLASSES_INFO[personagem.classe];
-      if (!infoMagia?.conjurador) return true; // Não-conjurador pode avançar
+      const _temIM = (personagem.talentos || []).includes('Iniciado em Magia');
 
-      const tabelaCaract = dadosCache.classeData?.tabela_caracteristicas;
-      if (!tabelaCaract) return true;
+      if (infoMagia?.conjurador) {
+        const tabelaCaract = dadosCache.classeData?.tabela_caracteristicas;
+        if (!tabelaCaract) return true;
 
-      let truquesNecessarios = getTruquesConhecidos(tabelaCaract, personagem.nivel);
-      const preparadasNecessarias = getMagiaPreparadas(tabelaCaract, personagem.nivel);
+        let truquesNecessarios = getTruquesConhecidos(tabelaCaract, personagem.nivel);
+        const preparadasNecessarias = getMagiaPreparadas(tabelaCaract, personagem.nivel);
 
-      // Bônus de truques do Clérigo Taumaturgo
-      if (personagem.classe === 'Clérigo' && personagem.ordem_divina === 'Taumaturgo') {
-        truquesNecessarios += 1;
+        // Bonus de truques do Clerigo Taumaturgo
+        if (personagem.classe === 'Clérigo' && personagem.ordem_divina === 'Taumaturgo') {
+          truquesNecessarios += 1;
+        }
+        // Bonus de truques do Druida Xama
+        if (personagem.classe === 'Druida' && (personagem.ordem_primal === 'Xamã' || personagem.escolhas_classe?.ordem_primal?.[0] === 'Xamã')) {
+          truquesNecessarios += 1;
+        }
+
+        const truquesSelecionados = (personagem.magias_conhecidas || []).filter(m => m.circulo === 0).length;
+        const preparadasSelecionadas = (personagem.magias_preparadas || []).length;
+
+        if (truquesNecessarios > 0 && truquesSelecionados < truquesNecessarios) {
+          toast(`Selecione ${truquesNecessarios} truques (${truquesSelecionados} selecionados)`, 'error');
+          return false;
+        }
+        if (preparadasNecessarias > 0 && preparadasSelecionadas < preparadasNecessarias) {
+          toast(`Selecione ${preparadasNecessarias} magias (${preparadasSelecionadas} selecionadas)`, 'error');
+          return false;
+        }
       }
-      // Bônus de truques do Druida Xamã
-      if (personagem.classe === 'Druida' && (personagem.ordem_primal === 'Xamã' || personagem.escolhas_classe?.ordem_primal?.[0] === 'Xamã')) {
-        truquesNecessarios += 1;
-      }
 
-      const truquesSelecionados = (personagem.magias_conhecidas || []).filter(m => m.circulo === 0).length;
-      const preparadasSelecionadas = (personagem.magias_preparadas || []).length;
-
-      if (truquesNecessarios > 0 && truquesSelecionados < truquesNecessarios) {
-        toast(`Selecione ${truquesNecessarios} truques (${truquesSelecionados} selecionados)`, 'error');
-        return false;
-      }
-      if (preparadasNecessarias > 0 && preparadasSelecionadas < preparadasNecessarias) {
-        toast(`Selecione ${preparadasNecessarias} magias (${preparadasSelecionadas} selecionadas)`, 'error');
-        return false;
+      // Validar Iniciado em Magia
+      if (_temIM) {
+        const im = personagem.iniciado_em_magia;
+        if (!im?.lista) { toast('Iniciado em Magia: selecione a lista de magias', 'error'); return false; }
+        if (!im?.atributo) { toast('Iniciado em Magia: selecione o atributo de conjuração', 'error'); return false; }
+        if ((im?.truques || []).length < 2) { toast('Iniciado em Magia: selecione 2 truques', 'error'); return false; }
+        if (!im?.magia) { toast('Iniciado em Magia: selecione 1 magia de 1o círculo', 'error'); return false; }
       }
       return true;
+    }
     case 'detalhes':
       return true;
   }
@@ -616,6 +742,18 @@ async function finalizar() {
   if (info) {
     const modCon = calcMod(personagem.atributos.constituicao);
     personagem.pv_max = calcPVNivel1(info.dado_vida, modCon);
+    // Tenacidade Anã: +1 PV por nível
+    if (personagem.especie === 'Anão') {
+      personagem.pv_max += personagem.nivel || 1;
+      personagem.bonus_pv_anao_aplicado = personagem.nivel || 1;
+    }
+    // Vigoroso: +2 PV por nível
+    const _temVigoroso = (personagem.talentos || []).some(t => (typeof t === 'string' ? t : t.nome) === 'Vigoroso');
+    if (_temVigoroso) {
+      const _bonusVig = (personagem.nivel || 1) * 2;
+      personagem.pv_max += _bonusVig;
+      personagem.bonus_pv_vigoroso_aplicado = _bonusVig;
+    }
     personagem.pv_atual = personagem.pv_max;
     personagem.dados_vida_total = personagem.nivel;
     personagem.salvaguardas_proficientes = info.salvaguardas;
@@ -722,6 +860,24 @@ async function finalizar() {
     for (const nome of truquesEspecie) {
       if (!personagem.magias_conhecidas.find(m => m.nome === nome)) {
         personagem.magias_conhecidas.push({ nome, circulo: 0, origem: 'especie' });
+      }
+    }
+  }
+
+  // Adicionar magias do Iniciado em Magia (truques e magia de 1o circulo)
+  if (personagem.iniciado_em_magia?.lista) {
+    const im = personagem.iniciado_em_magia;
+    if (!personagem.magias_conhecidas) personagem.magias_conhecidas = [];
+    for (const nome of (im.truques || [])) {
+      if (!personagem.magias_conhecidas.find(m => m.nome === nome)) {
+        personagem.magias_conhecidas.push({ nome, circulo: 0, origem: 'iniciado_em_magia' });
+      }
+    }
+    // A magia de 1o circulo fica sempre preparada (origem especial)
+    if (im.magia) {
+      if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
+      if (!personagem.magias_preparadas.find(m => m.nome === im.magia)) {
+        personagem.magias_preparadas.push({ nome: im.magia, circulo: 1, origem: 'iniciado_em_magia' });
       }
     }
   }
@@ -1136,10 +1292,57 @@ function abrirPopupEspecie(nome) {
     `;
   }
 
+  // HTML de selecao de pericia de especie (Habil / Sentidos Aguçados)
+  let periciaEspecieHtml = '';
+  if (nome === 'Humano') {
+    // Habil: qualquer pericia
+    const opcsPericia = PERICIAS.map(p => {
+      const sel = personagem.pericia_especie === p.nome ? 'selected' : '';
+      return `<option value="${p.nome}" ${sel}>${p.nome} (${p.atributo})</option>`;
+    }).join('');
+    periciaEspecieHtml = `
+      <div class="section-divider"><span>Habil — Pericia Extra</span></div>
+      <div class="info-box info" style="font-size:0.85rem">O traco Habil concede proficiencia em uma pericia a sua escolha.</div>
+      <select id="select-pericia-especie" style="width:100%;padding:8px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:0.9rem;margin:8px 0">
+        <option value="">-- Escolha uma pericia --</option>
+        ${opcsPericia}
+      </select>
+    `;
+  } else if (nome === 'Elfo') {
+    // Sentidos Aguçados: Intuição, Percepção ou Sobrevivência
+    const opcsElfo = ['Intuição', 'Percepção', 'Sobrevivência'].map(p => {
+      const sel = personagem.pericia_especie === p ? 'selected' : '';
+      return `<option value="${p}" ${sel}>${p}</option>`;
+    }).join('');
+    periciaEspecieHtml = `
+      <div class="section-divider"><span>Sentidos Aguçados — Pericia</span></div>
+      <div class="info-box info" style="font-size:0.85rem">Voce tem proficiencia na pericia Intuição, Percepção ou Sobrevivência.</div>
+      <select id="select-pericia-especie" style="width:100%;padding:8px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:0.9rem;margin:8px 0">
+        <option value="">-- Escolha uma pericia --</option>
+        ${opcsElfo}
+      </select>
+    `;
+  }
+
+  // HTML especial para Humano: selecao de talento de origem (Versatil)
+  let versatilHtml = '';
+  if (nome === 'Humano') {
+    versatilHtml = `
+      <div class="section-divider"><span>Versatil — Talento de Origem</span></div>
+      <div class="info-box info" style="font-size:0.85rem">O traco Versatil concede um talento de Origem extra. Escolha abaixo:</div>
+      <select id="select-talento-versatil" style="width:100%;padding:8px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:0.9rem;margin:8px 0">
+        <option value="">-- Escolha um talento de Origem --</option>
+      </select>
+      <div id="versatil-talento-detalhe"></div>
+    `;
+  }
+
   const corpoHtml = `
     <p style="font-size:0.85rem;margin-bottom:12px">${esp.descricao?.split('\n')[0] || ''}</p>
     <div style="font-size:0.85rem;margin-bottom:8px"><strong>Deslocamento:</strong> ${deslocamento}</div>
     ${escolhaHtml}
+    ${periciaEspecieHtml}
+    ${versatilHtml}
     <div class="section-divider"><span>Tracos Raciais${escolhaConfig ? ' (Fixos)' : ''}</span></div>
     ${tracosFixos.map(t => `
       <details style="margin-bottom:6px">
@@ -1202,6 +1405,49 @@ function abrirPopupEspecie(nome) {
     }
   }
 
+  // Carregar talentos de origem para o select Versatil (Humano)
+  if (nome === 'Humano') {
+    (async () => {
+      try {
+        const talentosData = await getTalentos();
+        const talentosOrigem = (talentosData?.por_categoria?.['de Origem'] || []).sort((a, b) => a.nome.localeCompare(b.nome));
+        const selectEl = document.getElementById('select-talento-versatil');
+        if (selectEl) {
+          talentosOrigem.forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t.nome;
+            opt.textContent = t.nome;
+            if (personagem.talento_versatil === t.nome) opt.selected = true;
+            selectEl.appendChild(opt);
+          });
+
+          // Funcao auxiliar para atualizar detalhe + escolhas do talento
+          const atualizarDetalheVersatil = (nomeT) => {
+            const detalheEl = document.getElementById('versatil-talento-detalhe');
+            if (!detalheEl) return;
+            if (!nomeT) { detalheEl.innerHTML = ''; return; }
+            const td = talentosOrigem.find(t => t.nome === nomeT);
+            if (!td) { detalheEl.innerHTML = ''; return; }
+            let html = `<div class="info-box success" style="font-size:0.85rem">${renderDescricaoTalento(td)}</div>`;
+            html += renderEscolhasTalentoHtml(nomeT, 'versatil');
+            detalheEl.innerHTML = html;
+          };
+
+          // Mostrar detalhe do talento ja selecionado
+          if (personagem.talento_versatil) {
+            atualizarDetalheVersatil(personagem.talento_versatil);
+          }
+          selectEl.addEventListener('change', () => {
+            // Limpar escolhas anteriores ao trocar de talento
+            if (!personagem.escolhas_talento) personagem.escolhas_talento = {};
+            delete personagem.escolhas_talento.versatil;
+            atualizarDetalheVersatil(selectEl.value);
+          });
+        }
+      } catch (e) { console.error('Erro ao carregar talentos de Origem:', e); }
+    })();
+  }
+
   // Botao de confirmacao (com validação de traços obrigatórios)
   document.getElementById('popup-confirmar-especie')?.addEventListener('click', () => {
     // Validar seleção de traços obrigatórios
@@ -1211,8 +1457,54 @@ function abrirPopupEspecie(nome) {
         return;
       }
     }
+    // Validar pericia de especie (Habil / Sentidos Aguçados)
+    if (nome === 'Humano' || nome === 'Elfo') {
+      const selectPericia = document.getElementById('select-pericia-especie');
+      if (!selectPericia?.value) {
+        const traco = nome === 'Humano' ? 'Habil' : 'Sentidos Aguçados';
+        toast(`Selecione a pericia de ${traco}`, 'error');
+        return;
+      }
+      personagem.pericia_especie = selectPericia.value;
+    }
+    // Validar talento Versatil para Humano
+    if (nome === 'Humano') {
+      const selectVersatil = document.getElementById('select-talento-versatil');
+      if (!selectVersatil?.value) {
+        toast('Selecione um Talento de Origem (Versatil)', 'error');
+        return;
+      }
+      personagem.talento_versatil = selectVersatil.value;
+
+      // Validar e salvar escolhas do talento Versatil (Habilidoso, Artifista, Musico)
+      const numEscolhas = talentoNumEscolhas(selectVersatil.value);
+      if (numEscolhas > 0) {
+        const selects = document.querySelectorAll('.escolha-talento-versatil');
+        const vals = [...selects].map(s => s.value).filter(Boolean);
+        if (vals.length < numEscolhas) {
+          toast(`Selecione todas as ${numEscolhas} escolhas de ${selectVersatil.value}`, 'error');
+          return;
+        }
+        // Verificar duplicatas
+        if (new Set(vals).size < vals.length) {
+          toast('Nao repita opcoes nas escolhas do talento', 'error');
+          return;
+        }
+        if (!personagem.escolhas_talento) personagem.escolhas_talento = {};
+        personagem.escolhas_talento.versatil = vals;
+      } else {
+        if (!personagem.escolhas_talento) personagem.escolhas_talento = {};
+        delete personagem.escolhas_talento.versatil;
+      }
+    }
     // Limpar tracos se mudou de especie
-    if (personagem.especie !== nome) personagem.tracos_escolhidos = [];
+    if (personagem.especie !== nome) {
+      personagem.tracos_escolhidos = [];
+      // Limpar talento versatil se mudou de especie
+      if (nome !== 'Humano') delete personagem.talento_versatil;
+      // Limpar pericia de especie se mudou para especie sem essa escolha
+      if (nome !== 'Humano' && nome !== 'Elfo') delete personagem.pericia_especie;
+    }
     personagem.especie = nome;
     personagem.tracos_escolhidos = [...selecionadosTemp];
     window.fecharModal();
@@ -1302,6 +1594,12 @@ function abrirPopupAntecedente(nome) {
     `;
   }
 
+  // Escolhas do talento (Habilidoso, Artifista, Musico)
+  let escolhaTalentoHtml = '';
+  if (talentoExigeEscolhas(talentoNome)) {
+    escolhaTalentoHtml = renderEscolhasTalentoHtml(talentoNome, 'antecedente');
+  }
+
   const corpoHtml = `
     <p style="font-size:0.85rem;margin-bottom:12px;font-style:italic">${ant.descricao || ''}</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.85rem">
@@ -1314,6 +1612,7 @@ function abrirPopupAntecedente(nome) {
       <strong>Equipamento:</strong> ${ant.equipamento?.replace(/\*/g, '') || ''}
     </div>
     ${escolhaHtml}
+    ${escolhaTalentoHtml}
   `;
 
   abrirModal(ant.nome, corpoHtml, `
@@ -1345,11 +1644,29 @@ function abrirPopupAntecedente(nome) {
       toast(`Selecione ${antEscolha.titulo}`, 'error');
       return;
     }
+    // Validar escolhas do talento do antecedente (Habilidoso, Artifista, Musico)
+    const numEsc = talentoNumEscolhas(talentoNome);
+    if (numEsc > 0) {
+      const selects = document.querySelectorAll('.escolha-talento-antecedente');
+      const vals = [...selects].map(s => s.value).filter(Boolean);
+      if (vals.length < numEsc) {
+        toast(`Selecione todas as ${numEsc} escolhas de ${talentoNome}`, 'error');
+        return;
+      }
+      if (new Set(vals).size < vals.length) {
+        toast('Nao repita opcoes nas escolhas do talento', 'error');
+        return;
+      }
+      if (!personagem.escolhas_talento) personagem.escolhas_talento = {};
+      personagem.escolhas_talento.antecedente = vals;
+    }
     // Se mudou de antecedente, limpar dados especificos do anterior
     if (personagem.antecedente && personagem.antecedente !== nome) {
       personagem.bonus_antecedente = {};
       personagem.escolhas_antecedente = {};
       personagem.talentos = [];
+      if (personagem.escolhas_talento) delete personagem.escolhas_talento.antecedente;
+      delete personagem.iniciado_em_magia;
       delete dadosCache.bonus2;
       delete dadosCache.bonus1;
       delete dadosCache.bonus111;
@@ -1363,6 +1680,19 @@ function abrirPopupAntecedente(nome) {
     // Talento do antecedente
     if (talentoNome && !personagem.talentos.includes(talentoNome)) {
       personagem.talentos = [talentoNome];
+    }
+
+    // Preservar talento Versatil (Humano) no array de talentos
+    // Verificar conflito: mesmo talento não-repetível do antecedente e Versátil
+    if (personagem.talento_versatil && personagem.talento_versatil === talentoNome) {
+      const _talentosOrigemRepetiveis = ['Habilidoso', 'Iniciado em Magia'];
+      if (!_talentosOrigemRepetiveis.includes(talentoNome)) {
+        toast(`O talento "${talentoNome}" já está selecionado como Versátil e não é repetível. Altere sua escolha na etapa de Espécie.`, 'error');
+        return;
+      }
+    }
+    if (personagem.talento_versatil && !personagem.talentos.includes(personagem.talento_versatil)) {
+      personagem.talentos.push(personagem.talento_versatil);
     }
 
     window.fecharModal();
@@ -1563,6 +1893,18 @@ function renderStepAtributos(el) {
     <div class="info-box info">
       Escolha ${info?.num_pericias || 2} perícias da classe.
       ${dadosCache.pericias_antecedente?.length ? `<br>Já possui do antecedente: <strong>${dadosCache.pericias_antecedente.join(', ')}</strong>` : ''}
+      ${personagem.pericia_especie ? `<br>Já possui da espécie: <strong>${personagem.pericia_especie}</strong>` : ''}
+      ${(() => {
+        const pTalento = [];
+        if (personagem.escolhas_talento) {
+          ['antecedente', 'versatil'].forEach(ctx => {
+            (personagem.escolhas_talento[ctx] || []).forEach(e => {
+              if (PERICIAS.some(p => p.nome === e)) pTalento.push(e);
+            });
+          });
+        }
+        return pTalento.length ? `<br>Já possui dos talentos: <strong>${pTalento.join(', ')}</strong>` : '';
+      })()}
     </div>
     <div id="pericias-content"></div>
   `;
@@ -1913,7 +2255,23 @@ function renderPericiasSeletor() {
   const el = document.getElementById('pericias-content');
   if (!el || !info) return;
 
-  const periciasBg = dadosCache.pericias_antecedente || [];
+  const periciasBg = [...(dadosCache.pericias_antecedente || [])];
+  // Incluir pericia de especie (Habil / Sentidos Aguçados) se houver
+  if (personagem.pericia_especie && !periciasBg.includes(personagem.pericia_especie)) {
+    periciasBg.push(personagem.pericia_especie);
+  }
+  // Incluir pericias dos talentos (Habilidoso concede pericias/ferramentas)
+  if (personagem.escolhas_talento) {
+    ['antecedente', 'versatil'].forEach(ctx => {
+      const escolhas = personagem.escolhas_talento[ctx] || [];
+      escolhas.forEach(e => {
+        // So incluir se for uma pericia (nao ferramenta)
+        if (PERICIAS.some(p => p.nome === e) && !periciasBg.includes(e)) {
+          periciasBg.push(e);
+        }
+      });
+    });
+  }
   const opcoesClasse = info.pericias_opcoes || PERICIAS.map(p => p.nome);
   // Filtrar as que já são do antecedente
   const disponiveis = opcoesClasse.filter(p => !periciasBg.includes(p));
@@ -2836,7 +3194,18 @@ async function renderStepMagias(el) {
   const tipoConj = info?.tipo_conjuracao || 'preparadas';
   const labelMagias = tipoConj === 'conhecidas' ? 'Magias conhecidas' : 'Magias preparadas';
 
+  const temIniciadoEmMagia = (personagem.talentos || []).includes('Iniciado em Magia');
+
   if (!info?.conjurador) {
+    if (temIniciadoEmMagia) {
+      // Classe não-conjuradora mas com Iniciado em Magia: renderizar seleção de magias do talento
+      el.innerHTML = `
+        <h3 style="margin-bottom:12px">Magias</h3>
+        <div class="info-box info">A classe <strong>${personagem.classe}</strong> não é conjuradora, mas você possui o talento <strong>Iniciado em Magia</strong>.</div>
+      `;
+      await _renderIniciadoEmMagia(el);
+      return;
+    }
     el.innerHTML = `
       <h3 style="margin-bottom:12px">Magias</h3>
       <div class="info-box info">A classe <strong>${personagem.classe}</strong> não é conjuradora. Você pode pular este passo.</div>
@@ -3011,6 +3380,178 @@ async function renderStepMagias(el) {
   });
 
   renderMagiasCirculo(0);
+
+  // Se tiver Iniciado em Magia, adicionar seção extra após as magias da classe
+  if (temIniciadoEmMagia) {
+    const divIM = document.createElement('div');
+    divIM.style.marginTop = '20px';
+    el.appendChild(divIM);
+    await _renderIniciadoEmMagia(divIM);
+  }
+}
+
+// --- Iniciado em Magia: seleção de lista, truques e magia de 1o circulo ---
+async function _renderIniciadoEmMagia(container) {
+  if (!personagem.iniciado_em_magia) {
+    personagem.iniciado_em_magia = { lista: '', atributo: '', truques: [], magia: '' };
+  }
+  const im = personagem.iniciado_em_magia;
+  const listasDisponiveis = ['Clérigo', 'Druida', 'Mago'];
+  const atributosDisponiveis = ['Inteligência', 'Sabedoria', 'Carisma'];
+
+  container.innerHTML = `
+    <div class="card" style="border-color:var(--accent)">
+      <div class="card-header"><h3>Iniciado em Magia</h3></div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px">
+        <div style="flex:1;min-width:150px">
+          <label class="form-label">Lista de magias</label>
+          <select class="form-input" id="im-lista">
+            <option value="">Selecione...</option>
+            ${listasDisponiveis.map(l => `<option value="${l}" ${im.lista === l ? 'selected' : ''}>${l}</option>`).join('')}
+          </select>
+        </div>
+        <div style="flex:1;min-width:150px">
+          <label class="form-label">Atributo de conjuracao</label>
+          <select class="form-input" id="im-atributo">
+            <option value="">Selecione...</option>
+            ${atributosDisponiveis.map(a => `<option value="${a}" ${im.atributo === a ? 'selected' : ''}>${a}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div id="im-contadores" style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
+        Truques: <strong>${im.truques.length}/2</strong> | Magia 1o circulo: <strong>${im.magia ? '1' : '0'}/1</strong>
+      </div>
+      <div id="im-magias-area"></div>
+    </div>
+  `;
+
+  const atualizarContadoresIM = () => {
+    const cEl = document.getElementById('im-contadores');
+    if (cEl) {
+      cEl.innerHTML = `Truques: <strong>${im.truques.length}/2</strong> | Magia 1o circulo: <strong>${im.magia ? '1' : '0'}/1</strong>`;
+    }
+  };
+
+  const renderMagiasIM = async () => {
+    const area = document.getElementById('im-magias-area');
+    if (!area || !im.lista) { if (area) area.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:10px">Selecione uma lista de magias acima</div>'; return; }
+
+    // Carregar magias da lista selecionada
+    const dados = await getMagiasClasse(im.lista);
+    const listaMagias = dados?.lista_magias || {};
+    const truquesDisp = (listaMagias['Truques'] || []).map(m => typeof m === 'string' ? { nome: m } : m);
+    const c1Disp = (listaMagias['1º Círculo'] || []).map(m => typeof m === 'string' ? { nome: m } : m);
+
+    area.innerHTML = `
+      <div class="tabs" id="tabs-im">
+        <div class="tab active" data-im-tab="truques">Truques (${truquesDisp.length})</div>
+        <div class="tab" data-im-tab="c1">1o Circulo (${c1Disp.length})</div>
+      </div>
+      <div class="search-box"><input type="text" id="busca-im" placeholder="Buscar magia..." class="form-input"></div>
+      <div id="im-lista-magias"></div>
+    `;
+
+    let tabAtiva = 'truques';
+
+    const renderTabIM = (tab) => {
+      tabAtiva = tab;
+      const listaEl = document.getElementById('im-lista-magias');
+      if (!listaEl) return;
+      const isTruque = tab === 'truques';
+      const magias = isTruque ? truquesDisp : c1Disp;
+      const selecionadas = isTruque ? im.truques : (im.magia ? [im.magia] : []);
+
+      listaEl.innerHTML = `
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">
+          ${isTruque ? `Truques: ${im.truques.length}/2` : `Magia 1o circulo: ${im.magia ? '1' : '0'}/1`}
+          | ${magias.length} disponíveis
+        </div>
+        ${magias.length === 0
+          ? '<div style="color:var(--text-muted);text-align:center;padding:20px">Nenhuma magia disponível</div>'
+          : `<div class="magias-grid">${magias.map(m => {
+              const nome = m.nome || m;
+              const sel = selecionadas.includes(nome);
+              return `
+                <div class="magia-card ${sel ? 'selecionada' : ''}" data-im-magia="${nome}" data-im-tipo="${tab}">
+                  <span class="magia-card-check" data-im-check="${nome}"></span>
+                  <div class="magia-card-nome" data-im-info="${nome}" data-im-info-circ="${isTruque ? 0 : 1}">${nome}</div>
+                  <div class="magia-card-meta">
+                    <span>${m.escola || ''}</span>
+                    ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
+                    ${m.especial === 'M' ? '<span>M$</span>' : ''}
+                  </div>
+                </div>`;
+            }).join('')}</div>`
+        }
+      `;
+
+      // Eventos de toggle
+      listaEl.querySelectorAll('[data-im-check]').forEach(chk => {
+        chk.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const card = chk.closest('.magia-card');
+          const nome = card.dataset.imMagia;
+          if (isTruque) {
+            const idx = im.truques.indexOf(nome);
+            if (idx >= 0) { im.truques.splice(idx, 1); }
+            else if (im.truques.length >= 2) { toast('Máximo de 2 truques para Iniciado em Magia', 'error'); return; }
+            else { im.truques.push(nome); }
+          } else {
+            if (im.magia === nome) { im.magia = ''; }
+            else { im.magia = nome; }
+          }
+          renderTabIM(tab);
+          atualizarContadoresIM();
+        });
+      });
+
+      // Detalhe ao clicar no nome
+      listaEl.querySelectorAll('[data-im-info]').forEach(el => {
+        el.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const nome = el.dataset.imInfo;
+          const c = parseInt(el.dataset.imInfoCirc);
+          await mostrarDetalheMagia(nome, c);
+        });
+      });
+    };
+
+    // Tabs IM
+    area.querySelectorAll('[data-im-tab]').forEach(tab => {
+      tab.addEventListener('click', () => {
+        area.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        renderTabIM(tab.dataset.imTab);
+      });
+    });
+
+    // Busca IM
+    document.getElementById('busca-im')?.addEventListener('input', (e) => {
+      const termo = semAcento(e.target.value);
+      document.querySelectorAll('#im-lista-magias .magia-card').forEach(el => {
+        el.style.display = semAcento(el.textContent).includes(termo) ? '' : 'none';
+      });
+    });
+
+    renderTabIM('truques');
+  };
+
+  // Eventos de selects
+  document.getElementById('im-lista')?.addEventListener('change', (e) => {
+    im.lista = e.target.value;
+    // Limpar seleções ao trocar de lista
+    im.truques = [];
+    im.magia = '';
+    atualizarContadoresIM();
+    renderMagiasIM();
+  });
+
+  document.getElementById('im-atributo')?.addEventListener('change', (e) => {
+    im.atributo = e.target.value;
+  });
+
+  // Renderizar magias se já tiver lista selecionada
+  await renderMagiasIM();
 }
 
 function toggleMagia(nome, circulo, isTruque, maxTruques, maxPreparadas) {
@@ -3130,7 +3671,10 @@ function sanitizarIdiomasSelecionados(listaIdiomas, regraIdiomas) {
 function renderStepDetalhes(el) {
   const info = CLASSES_INFO[personagem.classe];
   const modCon = calcMod(personagem.atributos.constituicao);
-  const pvCalc = info ? calcPVNivel1(info.dado_vida, modCon) : 0;
+  const pvCalc = info ? calcPVNivel1(info.dado_vida, modCon) 
+    + (personagem.especie === 'Anão' ? (personagem.nivel || 1) : 0) 
+    + ((personagem.talentos || []).some(t => (typeof t === 'string' ? t : t.nome) === 'Vigoroso') ? (personagem.nivel || 1) * 2 : 0)
+    : 0;
   const regraIdiomas = obterRegraIdiomasAtual();
   const obrigatoriosIdiomasSet = new Set(regraIdiomas.obrigatorios);
 
@@ -3234,6 +3778,7 @@ function renderStepDetalhes(el) {
         Antecedente: ${personagem.antecedente} |
         PV: ${pvCalc} |
         Talento: ${personagem.talentos.join(', ') || 'Nenhum'}
+        ${personagem.iniciado_em_magia?.lista ? `<br>Iniciado em Magia: Lista ${personagem.iniciado_em_magia.lista} | Atributo: ${personagem.iniciado_em_magia.atributo} | Truques: ${(personagem.iniciado_em_magia.truques||[]).join(', ')} | Magia: ${personagem.iniciado_em_magia.magia}` : ''}
       </div>
     </div>
 
