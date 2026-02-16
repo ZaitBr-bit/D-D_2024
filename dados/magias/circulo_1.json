@@ -46,7 +46,7 @@
       "alcance": "Toque",
       "componentes": "V, S, M (um pedaço de couro curtido)",
       "duracao": "8 horas",
-      "descricao": "Um Mago humano afasta o perigo com a Armadura Arcana e os raios infalíveis dos Mísseis Mágicos.\nVocê toca uma criatura voluntária que não está usando armadura. Até que a magia termine, a CA base do alvo se torna 13 mais o modificador de Destreza dele. A magia se encerra se o alvo vestir uma armadura.",
+      "descricao": "Você toca uma criatura voluntária que não está usando armadura. Até que a magia termine, a CA base do alvo se torna 13 mais o modificador de Destreza dele. A magia se encerra se o alvo vestir uma armadura.",
       "circulo_superior": ""
     },
     {
@@ -60,7 +60,7 @@
       "alcance": "Pessoal",
       "componentes": "V, S, M (um caco de vidro azul)",
       "duracao": "1 hora",
-      "descricao": "Um Golias Bruxo convoca a Armadura de Agathys e os Braços de Hadar para combater inimigos das profundezas.\nUm frio mágico protetor envolve você. Você recebe 5 Pontos de Vida Temporários. Se uma criatura acertar você com uma jogada de ataque corpo a corpo antes que a magia termine, a criatura sofre 5 pontos de dano Gélido. A magia encerra se você não tiver Pontos de Vida Temporários.",
+      "descricao": "Um frio mágico protetor envolve você. Você recebe 5 Pontos de Vida Temporários. Se uma criatura acertar você com uma jogada de ataque corpo a corpo antes que a magia termine, a criatura sofre 5 pontos de dano Gélido. A magia encerra se você não tiver Pontos de Vida Temporários.",
       "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. Os Pontos de Vida Temporários e o dano Gélido aumentam em 5 para cada círculo de espaço de magia acima de 1."
     },
     {
@@ -151,7 +151,7 @@
       "alcance": "3 metros",
       "componentes": "V, S, M (incenso queimando no valor de 10 ou mais PO, que a magia consome)",
       "duracao": "Instantânea",
-      "descricao": "Espíritos invocados por Convocar Familiar assumem formas inspiradas pelos magos que os conjuram.\nVocê adquire o serviço de um familiar, um espírito que assume uma forma animal que você escolhe: Aranha, Coruja, Corvo, Doninha, Falcão, Gato, Lagarto, Morcego, Polvo, Rato, Sapo ou outra Fera que tenha um Nível de Desafio 0. Aparecendo em um espaço desocupado no alcance da magia, o familiar tem as estatísticas da forma escolhida (veja o apêndice B), embora seja um Celestial, Feérico ou Ínfero (à sua escolha) em vez de uma Fera. Seu familiar age independentemente de você, mas obedece aos seus comandos.\nConexão Telepática. Enquanto seu familiar estiver a até 30 metros de você, você pode se comunicar telepaticamente com ele. Além disso, como uma Ação Bônus, você pode ver através dos olhos do familiar e ouvir o que ele ouve até o início do seu próximo turno, obtendo os benefícios de quaisquer sentidos especiais que ele tenha.\nPor fim, ao conjurar uma magia com um alcance de toque, seu familiar pode entregar o toque. Seu familiar deve estar a até 30 metros de você, e ele deve executar uma Reação para entregar o toque quando você conjurar a magia.\nCombate. O familiar é um aliado seu e de seus aliados. Ele joga a Iniciativa dele e age no turno dele. Um familiar não pode atacar, mas pode realizar outras ações normalmente.\nDesaparecimento do Familiar. Quando o familiar é reduzido a 0 Pontos de Vida, ele desaparece. Ele reaparece depois que você conjura esta magia novamente. Como uma ação Usar Magia, você pode descartar temporariamente o familiar para uma mini dimensão. Como alternativa, você pode descartá-lo para sempre. Como uma ação Usar Magia enquanto está temporariamente descartado, você pode fazer com que ele reapareça em um espaço desocupado a até 9 metros de você. Sempre que o familiar é reduzido a 0 Pontos de Vida ou desaparece na mini dimensão, ele deixa para trás no espaço que ocupava qualquer coisa que estivesse vestindo ou carregando.\nApenas um Familiar. Você não pode ter mais de um familiar ao mesmo tempo. Ao conjurar esta magia enquanto você tem um familiar, você faz com que ele adote uma nova forma elegível.",
+      "descricao": "Você adquire o serviço de um familiar, um espírito que assume uma forma animal que você escolhe: Aranha, Coruja, Corvo, Doninha, Falcão, Gato, Lagarto, Morcego, Polvo, Rato, Sapo ou outra Fera que tenha um Nível de Desafio 0. Aparecendo em um espaço desocupado no alcance da magia, o familiar tem as estatísticas da forma escolhida (veja o apêndice B), embora seja um Celestial, Feérico ou Ínfero (à sua escolha) em vez de uma Fera. Seu familiar age independentemente de você, mas obedece aos seus comandos.\nConexão Telepática. Enquanto seu familiar estiver a até 30 metros de você, você pode se comunicar telepaticamente com ele. Além disso, como uma Ação Bônus, você pode ver através dos olhos do familiar e ouvir o que ele ouve até o início do seu próximo turno, obtendo os benefícios de quaisquer sentidos especiais que ele tenha.\nPor fim, ao conjurar uma magia com um alcance de toque, seu familiar pode entregar o toque. Seu familiar deve estar a até 30 metros de você, e ele deve executar uma Reação para entregar o toque quando você conjurar a magia.\nCombate. O familiar é um aliado seu e de seus aliados. Ele joga a Iniciativa dele e age no turno dele. Um familiar não pode atacar, mas pode realizar outras ações normalmente.\nDesaparecimento do Familiar. Quando o familiar é reduzido a 0 Pontos de Vida, ele desaparece. Ele reaparece depois que você conjura esta magia novamente. Como uma ação Usar Magia, você pode descartar temporariamente o familiar para uma mini dimensão. Como alternativa, você pode descartá-lo para sempre. Como uma ação Usar Magia enquanto está temporariamente descartado, você pode fazer com que ele reapareça em um espaço desocupado a até 9 metros de você. Sempre que o familiar é reduzido a 0 Pontos de Vida ou desaparece na mini dimensão, ele deixa para trás no espaço que ocupava qualquer coisa que estivesse vestindo ou carregando.\nApenas um Familiar. Você não pode ter mais de um familiar ao mesmo tempo. Ao conjurar esta magia enquanto você tem um familiar, você faz com que ele adote uma nova forma elegível.",
       "circulo_superior": ""
     },
     {
@@ -210,9 +210,9 @@
       ],
       "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após acertar um alvo com uma arma Corpo a Corpo ou um Ataque Desarmado",
       "alcance": "Pessoal",
-      "componentes": "",
+      "componentes": "V",
       "duracao": "1 minuto",
-      "descricao": "Componente: V\nAo acertar o alvo, o ataque causa 1d6 pontos de dano Ígneo adicional. No início de cada turno do alvo, até que a magia termine, ele sofre 1d6 pontos de dano Ígneo e, então, realiza uma salvaguarda de Constituição. Se falhar, a magia continua; se for bem-sucedido, a magia se encerra.",
+      "descricao": "Ao acertar o alvo, o ataque causa 1d6 pontos de dano Ígneo adicional. No início de cada turno do alvo, até que a magia termine, ele sofre 1d6 pontos de dano Ígneo e, então, realiza uma salvaguarda de Constituição. Se falhar, a magia continua; se for bem-sucedido, a magia se encerra.",
       "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. Todo dano aumenta em 1d6 para cada círculo de espaço de magia acima de 1."
     },
     {
@@ -240,7 +240,7 @@
       "alcance": "Pessoal",
       "componentes": "V",
       "duracao": "Instantânea",
-      "descricao": "Uma anã Paladina fortalece sua arma com Destruição Divina, desencadeando a ira sagrada em ínferos Mezzoloths.\nO alvo sofre 2d8 pontos de dano Radiante adicionais do ataque. O dano aumenta em 1d8 se o alvo for um Ínfero ou um Morto-vivo.",
+      "descricao": "O alvo sofre 2d8 pontos de dano Radiante adicionais do ataque. O dano aumenta em 1d8 se o alvo for um Ínfero ou um Morto-vivo.",
       "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano aumenta em 1d8 para cada círculo de espaço de magia acima de 1."
     },
     {
@@ -252,9 +252,9 @@
       ],
       "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após acertar um alvo com uma arma Corpo a Corpo ou um Ataque Desarmado",
       "alcance": "Pessoal",
-      "componentes": "",
+      "componentes": "V",
       "duracao": "Instantânea",
-      "descricao": "Componente: V\nSeu ataque soa como um trovão audível a até 90 metros de você, e o alvo sofre 2d6 pontos de dano Trovejante adicionais do ataque. Além disso, se o alvo for uma criatura, ele deve ser bem-sucedido em uma salvaguarda de Força ou é empurrado 3 metros para longe de você e tem a condição Caído.",
+      "descricao": "Seu ataque soa como um trovão audível a até 90 metros de você, e o alvo sofre 2d6 pontos de dano Trovejante adicionais do ataque. Além disso, se o alvo for uma criatura, ele deve ser bem-sucedido em uma salvaguarda de Força ou é empurrado 3 metros para longe de você e tem a condição Caído.",
       "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano aumenta em 1d6 pontos para cada círculo de espaço de magia acima de 1."
     },
     {
@@ -321,7 +321,7 @@
       "alcance": "9 metros",
       "componentes": "V, S, M (uma gota de mercúrio)",
       "duracao": "1 hora",
-      "descricao": "Um Mago Vermelho de Thay ordena que servos esqueléticos empilhem tesouros no disco do Disco Flutuante de Tenser.\nEsta magia cria um disco circular horizontal formado de energia com 1 metro de diâmetro e 2,5 centímetros de altura, que flutua a 1 metro do chão em um espaço desocupado à sua escolha, à sua vista e no alcance da magia. O disco permanece pela duração da magia e pode carregar até 225 quilos. Se mais peso for colocado sobre ele, a magia se encerra e tudo no disco cai no chão.\nO disco fica imóvel enquanto você estiver a até 6 metros dele. Se você se mover a mais de 6 metros de distância dele, o disco segue você, permanecendo a até 6 metros de distância. Ele pode atravessar terrenos irregulares, subir ou descer escadas, declives e afins, mas não pode atravessar uma mudança de elevação de 3 metros ou mais. Por exemplo, o disco não pode se mover através de um fosso de 3 metros de profundidade, nem poderia deixar tal fosso se fosse criado no fundo dele.\nSe você se mover a mais de 30 metros do disco (normalmente porque ele não pode se mover em torno de um obstáculo para segui-lo), a magia encerra.",
+      "descricao": "Esta magia cria um disco circular horizontal formado de energia com 1 metro de diâmetro e 2,5 centímetros de altura, que flutua a 1 metro do chão em um espaço desocupado à sua escolha, à sua vista e no alcance da magia. O disco permanece pela duração da magia e pode carregar até 225 quilos. Se mais peso for colocado sobre ele, a magia se encerra e tudo no disco cai no chão.\nO disco fica imóvel enquanto você estiver a até 6 metros dele. Se você se mover a mais de 6 metros de distância dele, o disco segue você, permanecendo a até 6 metros de distância. Ele pode atravessar terrenos irregulares, subir ou descer escadas, declives e afins, mas não pode atravessar uma mudança de elevação de 3 metros ou mais. Por exemplo, o disco não pode se mover através de um fosso de 3 metros de profundidade, nem poderia deixar tal fosso se fosse criado no fundo dele.\nSe você se mover a mais de 30 metros do disco (normalmente porque ele não pode se mover em torno de um obstáculo para segui-lo), a magia encerra.",
       "circulo_superior": ""
     },
     {
@@ -366,7 +366,7 @@
       "alcance": "27 metros",
       "componentes": "V, S",
       "duracao": "Concentração, até 1 minuto",
-      "descricao": "Um draconato Druida usa Emaranhar para conter gnolls em frenesi.\nPlantas agarradoras brotam do chão em um quadrado de 6 metros de lado no alcance da magia. Pela duração da magia, essas plantas transformam o terreno em Terreno Difícil. Elas desaparecem quando a magia termina.\nCada criatura (exceto você) na área quando você conjura a magia deve ser bem-sucedida em uma salvaguarda de Força ou tem a condição Contido até que a magia termine. Uma criatura Contida pode executar uma ação para realizar um teste de Força (Atletismo) contra a CD para evitar sua magia. Em caso de sucesso, ela se liberta das plantas agarradoras e não está mais Contida por elas.",
+      "descricao": "Plantas agarradoras brotam do chão em um quadrado de 6 metros de lado no alcance da magia. Pela duração da magia, essas plantas transformam o terreno em Terreno Difícil. Elas desaparecem quando a magia termina.\nCada criatura (exceto você) na área quando você conjura a magia deve ser bem-sucedida em uma salvaguarda de Força ou tem a condição Contido até que a magia termine. Uma criatura Contida pode executar uma ação para realizar um teste de Força (Atletismo) contra a CD para evitar sua magia. Em caso de sucesso, ela se liberta das plantas agarradoras e não está mais Contida por elas.",
       "circulo_superior": ""
     },
     {
@@ -463,7 +463,7 @@
       "alcance": "Pessoal",
       "componentes": "V, S",
       "duracao": "10 minutos",
-      "descricao": "Um Druida humano usa Falar com Animais para conversar com seu melhor amigo urso\nPela duração da magia, você pode compreender e se comunicar verbalmente com Feras, e pode usar com elas qualquer uma das opções de perícia da ação Influenciar.\nA maioria das Feras oferece pouca informação sobre assuntos que não estejam diretamente ligados à sobrevivência ou ao companheirismo mas, no mínimo, uma Fera pode fornecer informações sobre áreas vizinhas e monstros, incluindo o que percebeu no último dia.",
+      "descricao": "Pela duração da magia, você pode compreender e se comunicar verbalmente com Feras, e pode usar com elas qualquer uma das opções de perícia da ação Influenciar.\nA maioria das Feras oferece pouca informação sobre assuntos que não estejam diretamente ligados à sobrevivência ou ao companheirismo mas, no mínimo, uma Fera pode fornecer informações sobre áreas vizinhas e monstros, incluindo o que percebeu no último dia.",
       "circulo_superior": ""
     },
     {
@@ -583,7 +583,7 @@
       "alcance": "18 metros",
       "componentes": "V, S, M (um pouco de lã)",
       "duracao": "Concentração, até 10 minutos",
-      "descricao": "Imagem Silenciosa pode criar ilusões mundanas e excêntricas\nVocê cria a imagem de um objeto, uma criatura ou algum outro fenômeno visível que não seja maior do que um Cubo de 4,5 metros de lado. A imagem aparece em um local pela duração e no alcance da magia. A imagem é puramente visual; não é acompanhada por som, cheiro ou outros efeitos sensoriais.\nComo uma ação Usar Magia, você pode mover a imagem para qualquer ponto no alcance da magia. À medida que a imagem muda de local, você pode alterar a aparência da imagem para que os movimentos dela pareçam naturais para a imagem. Por exemplo, se você criar a imagem de uma criatura e movê-la, pode alterá-la para que pareça estar andando.\nA interação física com a imagem revela que ela é uma ilusão, pois as coisas podem passar por ela. Uma criatura que executa uma ação Analisar para examinar a imagem pode determinar que ela é uma ilusão com um teste bem-sucedido de Inteligência (Investigação) contra a CD para evitar sua magia. Se uma criatura perceber a ilusão pelo que ela é, a criatura pode ver através da imagem.",
+      "descricao": "Você cria a imagem de um objeto, uma criatura ou algum outro fenômeno visível que não seja maior do que um Cubo de 4,5 metros de lado. A imagem aparece em um local pela duração e no alcance da magia. A imagem é puramente visual; não é acompanhada por som, cheiro ou outros efeitos sensoriais.\nComo uma ação Usar Magia, você pode mover a imagem para qualquer ponto no alcance da magia. À medida que a imagem muda de local, você pode alterar a aparência da imagem para que os movimentos dela pareçam naturais para a imagem. Por exemplo, se você criar a imagem de uma criatura e movê-la, pode alterá-la para que pareça estar andando.\nA interação física com a imagem revela que ela é uma ilusão, pois as coisas podem passar por ela. Uma criatura que executa uma ação Analisar para examinar a imagem pode determinar que ela é uma ilusão com um teste bem-sucedido de Inteligência (Investigação) contra a CD para evitar sua magia. Se uma criatura perceber a ilusão pelo que ela é, a criatura pode ver através da imagem.",
       "circulo_superior": ""
     },
     {
@@ -706,7 +706,7 @@
       "alcance": "27 metros",
       "componentes": "V, S, M (um diamante no valor de 50 ou mais PO)",
       "duracao": "Instantânea",
-      "descricao": "Um humano Feiticeiro repreende carniçais com a energia imprevisível do Orbe Cromático.\nVocê arremessa um orbe de energia em um alvo no alcance da magia. Escolha Ácido, Elétrico, Gélido, Ígneo, Trovejante ou Venenoso para o tipo de orbe que você criar e, em seguida, realize um ataque mágico à distância contra o alvo. Em caso de acerto, o alvo sofre 3d8 pontos de dano do tipo escolhido.\nSe você jogar o mesmo número em dois ou mais dos dados d8, o orbe salta para outro alvo à sua escolha dentro de 9 metros do alvo. Realize uma jogada de ataque contra o novo alvo e realize uma nova jogada de dano. A esfera não pode saltar novamente, a menos que você conjure a magia usando um espaço de magia de 2º círculo ou superior.",
+      "descricao": "Você arremessa um orbe de energia em um alvo no alcance da magia. Escolha Ácido, Elétrico, Gélido, Ígneo, Trovejante ou Venenoso para o tipo de orbe que você criar e, em seguida, realize um ataque mágico à distância contra o alvo. Em caso de acerto, o alvo sofre 3d8 pontos de dano do tipo escolhido.\nSe você jogar o mesmo número em dois ou mais dos dados d8, o orbe salta para outro alvo à sua escolha dentro de 9 metros do alvo. Realize uma jogada de ataque contra o novo alvo e realize uma nova jogada de dano. A esfera não pode saltar novamente, a menos que você conjure a magia usando um espaço de magia de 2º círculo ou superior.",
       "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano aumenta em 1d8 para cada círculo de espaço de magia acima de 1. O orbe pode saltar um número máximo de vezes igual ao círculo do espaço de magia utilizado, e uma criatura pode ser atingida apenas uma vez por cada conjuração desta magia."
     },
     {
@@ -850,7 +850,7 @@
       "alcance": "18 metros",
       "componentes": "V, S, M (um galho atingido por um raio)",
       "duracao": "Concentração, até 1 minuto",
-      "descricao": "Um pequenino Bruxo atinge um zumbi com o arco elétrico do Raio de Bruxa.\nUm feixe de energia crepitante é lançado em direção a uma criatura no alcance da magia, formando um arco sustentado de relâmpago entre você e o alvo. Realize um ataque mágico à distância contra ele. Em caso de acerto, o alvo sofre 2d12 pontos de dano Elétrico.\nEm cada um dos seus turnos posteriores, você pode executar uma ação Bônus para causar 1d12 pontos de dano Elétrico automaticamente ao alvo, mesmo que o primeiro ataque tenha falhado.\nA magia encerra se o alvo estiver fora do alcance da magia ou se tiver Cobertura Total em relação a você.",
+      "descricao": "Um feixe de energia crepitante é lançado em direção a uma criatura no alcance da magia, formando um arco sustentado de relâmpago entre você e o alvo. Realize um ataque mágico à distância contra ele. Em caso de acerto, o alvo sofre 2d12 pontos de dano Elétrico.\nEm cada um dos seus turnos posteriores, você pode executar uma ação Bônus para causar 1d12 pontos de dano Elétrico automaticamente ao alvo, mesmo que o primeiro ataque tenha falhado.\nA magia encerra se o alvo estiver fora do alcance da magia ou se tiver Cobertura Total em relação a você.",
       "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano inicial aumenta em 1d12 para cada círculo de espaço de magia acima de 1."
     },
     {
@@ -895,9 +895,9 @@
       ],
       "tempo_conjuracao": "Ação Bônus",
       "alcance": "Toque",
-      "componentes": "",
+      "componentes": "V, S, M (perna traseira de um gafanhoto)",
       "duracao": "1 minuto",
-      "descricao": "Componente: V, S, M (perna traseira de um gafanhoto)\nVocê toca uma criatura voluntária. Uma vez em cada um dos turnos dela até que a magia encerre, essa criatura pode saltar até 9 metros gastando 3 metros de movimento.",
+      "descricao": "Você toca uma criatura voluntária. Uma vez em cada um dos turnos dela até que a magia encerre, essa criatura pode saltar até 9 metros gastando 3 metros de movimento.",
       "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. Você pode escolher uma criatura adicional para cada círculo de espaço de magia acima de 1."
     },
     {

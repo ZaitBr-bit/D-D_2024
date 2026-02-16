@@ -162,7 +162,7 @@
         "categoria": "de Origem",
         "prerequisito": "",
         "beneficios": [],
-        "descricao": "Seus Pontos de Vida máximos aumentam em um valor igual ao dobro do seu nível de personagem ao obter este talento. Sempre que você alcança um nível de personagem depois disso, seus Pontos de Vida máximos aumentam em 2 Pontos de Vida adicionais.\n## Talentos Gerais\nEsses talentos estão na categoria Geral."
+        "descricao": "Seus Pontos de Vida máximos aumentam em um valor igual ao dobro do seu nível de personagem ao obter este talento. Sempre que você alcança um nível de personagem depois disso, seus Pontos de Vida máximos aumentam em 2 Pontos de Vida adicionais."
       }
     ],
     "Geral": [
@@ -1008,7 +1008,7 @@
             "descricao": "Ataques de Oportunidade têm Desvantagem contra você."
           }
         ],
-        "descricao": "Você adquire os seguintes benefícios.\n## Talentos de Estilo de Luta\n*Esses talentos estão na categoria Estilo de Luta.*"
+        "descricao": "Você adquire os seguintes benefícios."
       }
     ],
     "de Estilo de Luta": [
@@ -1080,7 +1080,7 @@
         "categoria": "de Estilo de Luta",
         "prerequisito": "Característica de Estilo de Luta",
         "beneficios": [],
-        "descricao": "Quando uma criatura à sua vista ataca um alvo que não é você e que está a até 1,5 metro de distância, você pode executar uma Reação para interpor seu Escudo, se o estiver segurando. Isso impõe Desvantagem na jogada de ataque que acionou a reação e em todas as jogadas contra o alvo até o início do seu próximo turno, enquanto você estiver a até 1,5 metro do alvo.\n## Talentos de Dádiva Épica\n*Esses talentos estão na categoria Dádiva Épica.*"
+        "descricao": "Quando uma criatura à sua vista ataca um alvo que não é você e que está a até 1,5 metro de distância, você pode executar uma Reação para interpor seu Escudo, se o estiver segurando. Isso impõe Desvantagem na jogada de ataque que acionou a reação e em todas as jogadas contra o alvo até o início do seu próximo turno, enquanto você estiver a até 1,5 metro do alvo."
       }
     ],
     "de Dádiva Épica": [
@@ -2330,7 +2330,7 @@
       "categoria": "de Estilo de Luta",
       "prerequisito": "Característica de Estilo de Luta",
       "beneficios": [],
-      "descricao": "Quando uma criatura à sua vista ataca um alvo que não é você e que está a até 1,5 metro de distância, você pode executar uma Reação para interpor seu Escudo, se o estiver segurando. Isso impõe Desvantagem na jogada de ataque que acionou a reação e em todas as jogadas contra o alvo até o início do seu próximo turno, enquanto você estiver a até 1,5 metro do alvo.\n## Talentos de Dádiva Épica\n*Esses talentos estão na categoria Dádiva Épica.*"
+      "descricao": "Quando uma criatura à sua vista ataca um alvo que não é você e que está a até 1,5 metro de distância, você pode executar uma Reação para interpor seu Escudo, se o estiver segurando. Isso impõe Desvantagem na jogada de ataque que acionou a reação e em todas as jogadas contra o alvo até o início do seu próximo turno, enquanto você estiver a até 1,5 metro do alvo."
     },
     {
       "nome": "Resiliente",
@@ -2586,14 +2586,14 @@
           "descricao": "Ataques de Oportunidade têm Desvantagem contra você."
         }
       ],
-      "descricao": "Você adquire os seguintes benefícios.\n## Talentos de Estilo de Luta\n*Esses talentos estão na categoria Estilo de Luta.*"
+      "descricao": "Você adquire os seguintes benefícios."
     },
     {
       "nome": "Vigoroso",
       "categoria": "de Origem",
       "prerequisito": "",
       "beneficios": [],
-      "descricao": "Seus Pontos de Vida máximos aumentam em um valor igual ao dobro do seu nível de personagem ao obter este talento. Sempre que você alcança um nível de personagem depois disso, seus Pontos de Vida máximos aumentam em 2 Pontos de Vida adicionais.\n## Talentos Gerais\nEsses talentos estão na categoria Geral."
+      "descricao": "Seus Pontos de Vida máximos aumentam em um valor igual ao dobro do seu nível de personagem ao obter este talento. Sempre que você alcança um nível de personagem depois disso, seus Pontos de Vida máximos aumentam em 2 Pontos de Vida adicionais."
     }
   ]
 }

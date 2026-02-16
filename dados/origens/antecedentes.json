@@ -101,7 +101,7 @@
       "nome": "Fazendeiro",
       "valores_atributo": "Força, Constituição, Sabedoria",
       "talento": "Vigoroso (veja o capítulo 5)",
-      "pericias": "Adestrar Animais, Natureza",
+      "pericias": "Lidar com Animais, Natureza",
       "ferramentas": "Ferramentas de Carpinteiro",
       "idiomas_obrigatorios": ["Comum"],
       "idiomas_adicionais": 2,
@@ -149,13 +149,13 @@
       "nome": "Mercador",
       "valores_atributo": "Constituição, Inteligência, Carisma",
       "talento": "Sortudo (veja o capítulo 5)",
-      "pericias": "Adestrar Animais, Persuasão",
+      "pericias": "Lidar com Animais, Persuasão",
       "ferramentas": "Ferramentas de Navegador",
       "idiomas_obrigatorios": ["Comum"],
       "idiomas_adicionais": 2,
       "idiomas_opcoes": ["Língua de Sinais Comum", "Dracônico", "Anão", "Élfico", "Gigante", "Gnômico", "Goblin", "Pequenino", "Orc"],
       "equipamento": "*Escolha A ou B:* (A) Ferramentas de Navegador, 2 Algibeiras, Roupas de Viagem, 22 PO; ou (B) 50 PO",
-      "descricao": "**Proficiência em Perícia:** Adestrar Animais, Persuasão\nVocê foi aprendiz de um comerciante, mestre de caravanas ou lojista, aprendendo os fundamentos do comércio. Com ele, viajou bastante e ganhou a vida comprando e vendendo as matérias-primas que os artesãos precisam para praticar seu ofício, ou trabalhos acabados de tais artesãos. Você pode ter transportado mercadorias de um lugar para outro (por navio, carroça ou caravana) ou comprado de comerciantes viajantes e vendido em sua própria loja."
+      "descricao": "Você foi aprendiz de um comerciante, mestre de caravanas ou lojista, aprendendo os fundamentos do comércio. Com ele, viajou bastante e ganhou a vida comprando e vendendo as matérias-primas que os artesãos precisam para praticar seu ofício, ou trabalhos acabados de tais artesãos. Você pode ter transportado mercadorias de um lugar para outro (por navio, carroça ou caravana) ou comprado de comerciantes viajantes e vendido em sua própria loja."
     },
     {
       "nome": "Nobre",

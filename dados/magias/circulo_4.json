@@ -168,7 +168,7 @@
       "alcance": "9 metros",
       "componentes": "V",
       "duracao": "8 horas",
-      "descricao": "Um pequenino Clérigo conjura o Defensor da Fé para afastar um worg faminto.\nUm defensor espectral Grande aparece e paira pela duração da magia em um espaço desocupado à sua vista e no alcance da magia. O defensor ocupa esse espaço e não pode ser atingido, e aparece em uma forma apropriada para sua divindade ou panteão.\nQualquer inimigo que se mova para um espaço a até 3 metros do defensor pela primeira vez em um turno ou inicie o turno lá realiza uma salvaguarda de Destreza, sofrendo 20 pontos de dano Radiante se falhar, ou metade desse dano em caso de sucesso. O defensor desaparece quando causa um total de 60 pontos de dano.",
+      "descricao": "Um defensor espectral Grande aparece e paira pela duração da magia em um espaço desocupado à sua vista e no alcance da magia. O defensor ocupa esse espaço e não pode ser atingido, e aparece em uma forma apropriada para sua divindade ou panteão.\nQualquer inimigo que se mova para um espaço a até 3 metros do defensor pela primeira vez em um turno ou inicie o turno lá realiza uma salvaguarda de Destreza, sofrendo 20 pontos de dano Radiante se falhar, ou metade desse dano em caso de sucesso. O defensor desaparece quando causa um total de 60 pontos de dano.",
       "circulo_superior": ""
     },
     {
@@ -180,9 +180,9 @@
       ],
       "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após atingir uma criatura com uma arma Corpo a Corpo ou um Ataque Desarmado",
       "alcance": "Pessoal",
-      "componentes": "",
+      "componentes": "V",
       "duracao": "Instantânea",
-      "descricao": "Componente: V\nO alvo sofre 4d6 pontos de dano Psíquico adicionais do ataque e deve ser bem-sucedido em uma salvaguarda de Sabedoria ou tem a condição Atordoado até o final do seu próximo turno.",
+      "descricao": "O alvo sofre 4d6 pontos de dano Psíquico adicionais do ataque e deve ser bem-sucedido em uma salvaguarda de Sabedoria ou tem a condição Atordoado até o final do seu próximo turno.",
       "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano adicional aumenta em 1d6 para cada círculo de espaço de magia acima de 4."
     },
     {
@@ -261,7 +261,7 @@
       "alcance": "45 metros",
       "componentes": "V, S, M (uma gota de bile)",
       "duracao": "Instantânea",
-      "descricao": "Um tiferino Feiticeiro libera a Esfera Vitriólica em nóticos.\nVocê aponta para um local no alcance da magia, e uma bola de ácido brilhante de 30 centímetros de diâmetro se espalha lá e explode em uma Esfera de 6 metros de raio. Cada criatura nessa área realiza uma salvaguarda de Destreza. Se falhar, uma criatura sofre 10d4 pontos de dano Ácido e outros 5d4 pontos de dano Ácido no final do próximo turno dela. Em caso de sucesso, uma criatura recebe apenas metade do dano inicial.",
+      "descricao": "Você aponta para um local no alcance da magia, e uma bola de ácido brilhante de 30 centímetros de diâmetro se espalha lá e explode em uma Esfera de 6 metros de raio. Cada criatura nessa área realiza uma salvaguarda de Destreza. Se falhar, uma criatura sofre 10d4 pontos de dano Ácido e outros 5d4 pontos de dano Ácido no final do próximo turno dela. Em caso de sucesso, uma criatura recebe apenas metade do dano inicial.",
       "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano inicial aumenta em 2d4 para cada círculo de espaço de magia acima de 4."
     },
     {
@@ -335,7 +335,7 @@
       "alcance": "27 metros",
       "componentes": "V, S, M (um tentáculo em conserva e um globo ocular em um frasco incrustado de platina no valor de 400 ou mais PO)",
       "duracao": "Concentração, até 1 hora",
-      "descricao": "Espírito Aberrante (Pseudo-observador)\nVocê invoca um Espírito Aberrante. Ele se manifesta em um espaço desocupado à sua vista e no alcance da magia e usa o bloco de estatísticas do Espírito Aberrante. Ao conjurar a magia, escolha entre Devorador de Mentes, Pseudo-observador ou Slaad. A criatura se assemelha a uma Aberração desse tipo, o que determina certos detalhes no bloco de estatísticas da criatura. A criatura desaparece ao ser reduzida a 0 Pontos de Vida ou quando a magia termina.\nA criatura é uma aliada sua e de seus aliados. Em combate, ela compartilha sua contagem de Iniciativa, mas o turno dela é imediatamente após o seu. Ela obedece aos seus comandos verbais (nenhuma ação é necessária). Se você não emitir nenhum, ela executa a ação Esquivar e usa o movimento dela para evitar o perigo.",
+      "descricao": "Você invoca um Espírito Aberrante. Ele se manifesta em um espaço desocupado à sua vista e no alcance da magia e usa o bloco de estatísticas do Espírito Aberrante. Ao conjurar a magia, escolha entre Devorador de Mentes, Pseudo-observador ou Slaad. A criatura se assemelha a uma Aberração desse tipo, o que determina certos detalhes no bloco de estatísticas da criatura. A criatura desaparece ao ser reduzida a 0 Pontos de Vida ou quando a magia termina.\nA criatura é uma aliada sua e de seus aliados. Em combate, ela compartilha sua contagem de Iniciativa, mas o turno dela é imediatamente após o seu. Ela obedece aos seus comandos verbais (nenhuma ação é necessária). Se você não emitir nenhum, ela executa a ação Esquivar e usa o movimento dela para evitar o perigo.",
       "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. Use o círculo do espaço de magia para o círculo da magia no bloco de estatísticas.\n\n### Espírito Aberrante\n\nAberração Média, Neutra\n\nCA 11 + o círculo da magia\n\nPV 40 + 10 para cada círculo de magia acima de 4\n\nDeslocamento 9 m; Voo 9 m (pairar; apenas Pseudo-observador)\n\n|         |    | Mod | SG |         |    | Mod | SG |         |    | Mod | SG |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| For | 16 | +3      | +3     | Des | 10 | +0      | +0     | Con | 15 | +2      | +2     |\n| Int | 16 | +0      | +0     | Sab | 10 | +0      | +0     | Car | 6  | -2      | -2     |\n\nImunidades Psíquico\n\nSentidos Visão no Escuro 18 m, Percepção Passiva 10\n\nIdiomas Dialeto Obscuro, entende os idiomas que você fala\n\nND Nenhum (XP 0; BP é igual ao seu Bônus de Proficiência)\n\nTraços\n\nAura Sussurrante (Apenas Devorador de Mentes). No início de cada turno do espírito, ele emite energia psiônica se não tem a condição Incapacitado. Salvaguarda de Sabedoria: CD é igual a CD para evitar sua magia, cada criatura (exceto você) a até 1,5 metro do espírito. Falha: 2d6 pontos de dano Psíquico.\n\nRegeneração (Apenas Slaad). O espírito recupera 5 Pontos de Vida no início do turno dele se tiver pelo menos 1 Ponto de Vida.\n\nAções\n\nAtaques Múltiplos. O espírito realiza um número de ataques igual à metade do círculo da magia (arredondado para baixo).\n\nGarras (Apenas Slaad). Jogada de Ataque Corpo a Corpo: Bônus é igual ao seu modificador de ataque mágico, alcance 1,5 m. Dano: 1d10 + 3 + o círculo da magia em pontos de dano Cortante, e o alvo não pode recuperar Pontos de Vida até o início do próximo turno do espírito.\n\nPancada Psíquica (Apenas Devorador de Mentes). Jogada de Ataque Corpo a Corpo: Bônus é igual ao seu modificador de ataque mágico, alcance 1,5 m. Dano: 1d8 + 3 + o círculo da magia em pontos de dano Psíquico.\n\nRaio Ocular (Somente Pseudo-observador). Jogada de Ataque à Distância: Bônus é igual ao seu modificador de ataque mágico, alcance 45 m. Dano: 1d8 + 3 + o círculo da magia em pontos de dano Psíquico."
     },
     {
@@ -604,7 +604,7 @@
       "alcance": "27 metros",
       "componentes": "V, S, M (um tentáculo)",
       "duracao": "Concentração, até 1 minuto",
-      "descricao": "O Mago Evard invoca sua infame magia, os Tentáculos Negros de Evard, para ensinar uma lição aos bandidos imprudentes.\nTentáculos pretos contorcendo-se enchem um quadrado de 6 metros de lados no chão à sua vista e no alcance da magia. Pela duração da magia, esses tentáculos transformam o terreno nessa área em Terreno Difícil.\nCada criatura nessa área realiza uma salvaguarda de Força. Se falhar, ela sofre 3d6 pontos de dano Contundente e tem a condição Contido até que a magia termine. Uma criatura também realiza essa salvaguarda se entrar na área ou terminar o turno nela. Uma criatura realiza essa salvaguarda apenas uma vez por turno.\nUma criatura Contida pode executar uma ação para realizar um teste de Força (Atletismo) contra a CD para evitar sua magia, encerrando a condição em si mesma em caso de sucesso.",
+      "descricao": "Tentáculos pretos contorcendo-se enchem um quadrado de 6 metros de lados no chão à sua vista e no alcance da magia. Pela duração da magia, esses tentáculos transformam o terreno nessa área em Terreno Difícil.\nCada criatura nessa área realiza uma salvaguarda de Força. Se falhar, ela sofre 3d6 pontos de dano Contundente e tem a condição Contido até que a magia termine. Uma criatura também realiza essa salvaguarda se entrar na área ou terminar o turno nela. Uma criatura realiza essa salvaguarda apenas uma vez por turno.\nUma criatura Contida pode executar uma ação para realizar um teste de Força (Atletismo) contra a CD para evitar sua magia, encerrando a condição em si mesma em caso de sucesso.",
       "circulo_superior": ""
     },
     {

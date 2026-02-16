@@ -62,7 +62,7 @@
       "alcance": "45 metros",
       "componentes": "V, S, M (uma bola de guano de morcego e enxofre)",
       "duracao": "Instantânea",
-      "descricao": "Um elfo Mago demonstra o potencial de resolução de problema da magia Bola de Fogo.\nUma faixa brilhante emerge de você até um ponto à sua escolha no alcance da magia e, em seguida, desabrocha com um estrondo baixo em uma explosão de fogo. Cada criatura em uma Esfera de 6 metros de raio centrada nesse ponto realiza uma salvaguarda de Destreza, sofrendo 8d6 pontos de dano Ígneo se falhar, ou metade desse dano em caso de sucesso.\nObjetos inflamáveis na área que não estão sendo usados ou carregados entram em combustão.",
+      "descricao": "Uma faixa brilhante emerge de você até um ponto à sua escolha no alcance da magia e, em seguida, desabrocha com um estrondo baixo em uma explosão de fogo. Cada criatura em uma Esfera de 6 metros de raio centrada nesse ponto realiza uma salvaguarda de Destreza, sofrendo 8d6 pontos de dano Ígneo se falhar, ou metade desse dano em caso de sucesso.\nObjetos inflamáveis na área que não estão sendo usados ou carregados entram em combustão.",
       "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano aumenta em 1d6 para cada círculo de espaço de magia acima de 3."
     },
     {
@@ -144,7 +144,7 @@
       "alcance": "27 metros",
       "componentes": "V, S, M (uma flor dourada no valor de 300 ou mais PO)",
       "duracao": "Concentração, até 1 hora",
-      "descricao": "Um Guardião conjura Invocar Feérico, conjurando um Espírito Feérico enfurecido para enfrentar um Merrow saqueador.\nVocê invoca um Espírito Feérico. Ele se manifesta em um espaço desocupado à sua vista e no alcance da magia e usa o bloco de estatísticas do Espírito Feérico. Ao conjurar a magia, escolha um humor: Alegre, Enfurecido ou Malandro. A criatura se assemelha a uma criatura Feérica à sua escolha definida pelo humor escolhido, o que determina certos detalhes no bloco de estatísticas da criatura. A criatura desaparece se reduzida a 0 Pontos de Vida ou quando a magia termina.\nA criatura é uma aliada sua e de seus aliados. Em combate, ela compartilha sua contagem de Iniciativa, mas o turno dela é imediatamente após o seu. Ela obedece aos seus comandos verbais (nenhuma ação é necessária). Se você não emitir nenhum, ela executa a ação Esquivar e usa o movimento dela para evitar o perigo.",
+      "descricao": "Você invoca um Espírito Feérico. Ele se manifesta em um espaço desocupado à sua vista e no alcance da magia e usa o bloco de estatísticas do Espírito Feérico. Ao conjurar a magia, escolha um humor: Alegre, Enfurecido ou Malandro. A criatura se assemelha a uma criatura Feérica à sua escolha definida pelo humor escolhido, o que determina certos detalhes no bloco de estatísticas da criatura. A criatura desaparece se reduzida a 0 Pontos de Vida ou quando a magia termina.\nA criatura é uma aliada sua e de seus aliados. Em combate, ela compartilha sua contagem de Iniciativa, mas o turno dela é imediatamente após o seu. Ela obedece aos seus comandos verbais (nenhuma ação é necessária). Se você não emitir nenhum, ela executa a ação Esquivar e usa o movimento dela para evitar o perigo.",
       "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. Use o círculo do espaço de magia para o círculo da magia no bloco de estatísticas.\n\nEspírito Feérico\n\nFeérico Pequeno, Neutro\n\nCA 12 + o círculo da magia\n\nPV 30 + 10 para cada círculo de magia acima de 3\n\nDeslocamento 9 m, Voo 9 m\n\n|         |    | Mod | SG |         |    | Mod | SG |         |    | Mod | SG |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| For | 13 | +1      | +1     | Des | 16 | +3      | +3     | Con | 14 | +2      | +2     |\n| Int | 14 | +2      | +2     | Sab | 11 | +0      | +0     | Car | 16 | +3      | +3     |\n\nImunidades Enfeitiçado\n\nSentidos Visão no Escuro 18 m, Percepção Passiva 10\n\nIdiomas Silvestre, compreende os idiomas que você fala\n\nND Nenhum (XP 0; BP é igual ao seu Bônus de Proficiência)\n\nAções\n\nAtaques Múltiplos. O espírito realiza um número de ataques com Lâmina Feérica igual à metade do círculo da magia (arredondado para baixo).\n\nLâmina Feérica. Jogada de Ataque Corpo a Corpo: Bônus é igual ao seu modificador de ataque mágico, alcance 1,5 m. Dano: 3d6 + 3 + o círculo da magia pontos de dano Energético.\n\nAções Bônus\n\nPasso Feérico. O espírito se teleporta magicamente até 9 metros para um espaço desocupado à vista dele. Em seguida, ocorre um dos seguintes efeitos, com base no humor escolhido para o espírito:\n\nAlegre. Salvaguarda de Sabedoria: CD é igual a CD para evitar sua magia, uma criatura à vista do espírito e a até 3 metros dele. Falha: O alvo fica Enfeitiçado por você e pelo espírito por 1 minuto ou até que o alvo sofra qualquer dano.\n\nEnfurecido. O espírito tem Vantagem na próxima jogada de ataque que realizar antes do final deste turno.\n\nMalandro. O espírito preenche um Cubo de 3 metros de lado a até 1,5 metro dele com Escuridão mágica, que dura até o final do próximo turno dele."
     },
     {
@@ -218,9 +218,9 @@
       ],
       "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após atingir uma criatura com uma arma Corpo a Corpo ou um Ataque Desarmado",
       "alcance": "Pessoal",
-      "componentes": "",
+      "componentes": "V",
       "duracao": "1 minuto",
-      "descricao": "Componente: V\nO alvo atingido pelo ataque sofre 3d8 pontos de dano Radiante adicionais e tem a condição Cego até que a magia termine. No final de cada um dos turnos dele, o alvo Cego realiza uma salvaguarda de Constituição, encerrando a magia em caso de sucesso.",
+      "descricao": "O alvo atingido pelo ataque sofre 3d8 pontos de dano Radiante adicionais e tem a condição Cego até que a magia termine. No final de cada um dos turnos dele, o alvo Cego realiza uma salvaguarda de Constituição, encerrando a magia em caso de sucesso.",
       "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano adicional aumenta em 1d8 para cada círculo de espaço de magia acima de 3."
     },
     {
@@ -301,7 +301,7 @@
       "alcance": "45 metros",
       "componentes": "V, S, M (um tentáculo em conserva)",
       "duracao": "Concentração, até 1 minuto",
-      "descricao": "Um Aasimar Bruxo expõe inimigos à Fome de Hadar, que tudo consome.\nVocê abre uma porta de entrada para o Reino Distante, uma região infestada de horrores indizíveis. Uma Esfera de Escuridão de 6 metros de raio aparece, centrada em um ponto no alcance e pela duração da magia. A Esfera é considerada Terreno Difícil, e está cheia de sussurros estranhos e sons de sucção que podem ser ouvidos a até 9 metros de distância. Nenhuma luz, seja mágica ou não, pode iluminar a área, e criaturas totalmente dentro da área têm a condição Cego.\nQualquer criatura que comece seu turno na área sofre 2d6 pontos de dano Gélido. Qualquer criatura que termine seu turno na área deve ser bem-sucedida em uma salvaguarda de Destreza ou sofre 2d6 pontos de dano Ácido enquanto tentáculos esbranquiçados de outro mundo se esfregam nela.",
+      "descricao": "Você abre uma porta de entrada para o Reino Distante, uma região infestada de horrores indizíveis. Uma Esfera de Escuridão de 6 metros de raio aparece, centrada em um ponto no alcance e pela duração da magia. A Esfera é considerada Terreno Difícil, e está cheia de sussurros estranhos e sons de sucção que podem ser ouvidos a até 9 metros de distância. Nenhuma luz, seja mágica ou não, pode iluminar a área, e criaturas totalmente dentro da área têm a condição Cego.\nQualquer criatura que comece seu turno na área sofre 2d6 pontos de dano Gélido. Qualquer criatura que termine seu turno na área deve ser bem-sucedida em uma salvaguarda de Destreza ou sofre 2d6 pontos de dano Ácido enquanto tentáculos esbranquiçados de outro mundo se esfregam nela.",
       "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano Ácido ou Gélido (à sua escolha) aumenta em 1d6 para cada círculo de espaço de magia acima de 3."
     },
     {
@@ -458,7 +458,7 @@
       "alcance": "18 metros",
       "componentes": "V, S",
       "duracao": "1 hora",
-      "descricao": "Um elfo Clérigo usa a magia Luz do Dia para trazer a luz do amanhecer para uma corte de vampiros.\nPela duração da magia, a luz do sol se espalha de um ponto no alcance da magia e preenche uma Esfera de 18 metros de raio. A área da luz do sol é Luz Plena e emite Meia-luz por mais 18 metros.\nComo alternativa, você conjura a magia em um objeto que não esteja sendo usado ou carregado, fazendo com que a luz do sol preencha uma Emanação de 18 metros originada desse objeto. Cobrir esse objeto com algo opaco, como uma tigela ou elmo, bloqueia a luz do sol.\nSe qualquer área desta magia se sobrepuser a uma área de Escuridão criada por uma magia de 3º círculo ou inferior, essa outra magia é dissipada.",
+      "descricao": "Pela duração da magia, a luz do sol se espalha de um ponto no alcance da magia e preenche uma Esfera de 18 metros de raio. A área da luz do sol é Luz Plena e emite Meia-luz por mais 18 metros.\nComo alternativa, você conjura a magia em um objeto que não esteja sendo usado ou carregado, fazendo com que a luz do sol preencha uma Emanação de 18 metros originada desse objeto. Cobrir esse objeto com algo opaco, como uma tigela ou elmo, bloqueia a luz do sol.\nSe qualquer área desta magia se sobrepuser a uma área de Escuridão criada por uma magia de 3º círculo ou inferior, essa outra magia é dissipada.",
       "circulo_superior": ""
     },
     {
@@ -729,7 +729,7 @@
       "alcance": "9 metros",
       "componentes": "V, S, M (um pedaço de junco)",
       "duracao": "24 horas",
-      "descricao": "Magias como Caminhar Sobre as Águas e Respirar na Água auxiliam viagens a reinos aquáticos.\nEsta magia concede a até dez criaturas voluntárias à sua escolha no alcance da magia a capacidade de respirar debaixo d'água até que a magia termine. As criaturas afetadas também mantêm seu modo normal de respiração.",
+      "descricao": "Esta magia concede a até dez criaturas voluntárias à sua escolha no alcance da magia a capacidade de respirar debaixo d'água até que a magia termine. As criaturas afetadas também mantêm seu modo normal de respiração.",
       "circulo_superior": ""
     },
     {

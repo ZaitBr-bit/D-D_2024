@@ -96,6 +96,7 @@ export function criarPersonagemVazio() {
     subclasse: '',
     especie: '',
     antecedente: '',
+    alinhamento: '',
     ordem_divina: '',
     ordem_primal: '',
     tracos_escolhidos: [],

@@ -63,7 +63,7 @@
       "alcance": "18 metros",
       "componentes": "V, S",
       "duracao": "Concentração, até 1 minuto",
-      "descricao": "Um Golias Clérigo conjura Arma Espiritual em batalha contra um Tríbulo Brutal.\nVocê cria uma energia espectral flutuante que se assemelha a uma arma à sua escolha e permanece pela duração da magia.\nA energia aparece no alcance da magia em um espaço à sua escolha, e você pode realizar imediatamente um ataque mágico corpo a corpo contra uma criatura a até 1,5 metro dela. Em caso de acerto, o alvo sofre 1d8 pontos de dano Energético mais o seu modificador de atributo de conjuração.\nComo uma Ação Bônus em seus turnos posteriores, você pode mover a energia até 6 metros e repetir o ataque contra uma criatura a até 1,5 metro dela.",
+      "descricao": "Você cria uma energia espectral flutuante que se assemelha a uma arma à sua escolha e permanece pela duração da magia.\nA energia aparece no alcance da magia em um espaço à sua escolha, e você pode realizar imediatamente um ataque mágico corpo a corpo contra uma criatura a até 1,5 metro dela. Em caso de acerto, o alvo sofre 1d8 pontos de dano Energético mais o seu modificador de atributo de conjuração.\nComo uma Ação Bônus em seus turnos posteriores, você pode mover a energia até 6 metros e repetir o ataque contra uma criatura a até 1,5 metro dela.",
       "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano aumenta em 1d8 para cada círculo de espaço de magia acima de 2."
     },
     {
@@ -326,9 +326,9 @@
       ],
       "tempo_conjuracao": "Ação Bônus, que você realiza imediatamente após atingir uma criatura com uma arma Corpo a Corpo ou um Ataque Desarmado",
       "alcance": "Pessoal",
-      "componentes": "",
+      "componentes": "V",
       "duracao": "Concentração, até 1 minuto",
-      "descricao": "Componente: V\nO alvo atingido pelo ataque sofre um adicional de 2d6 pontos de dano Radiante. Até que a magia termine, o alvo emite Luz Plena em um raio de 1,5 metro, e jogadas de ataque contra ele têm Vantagem e ele não pode se beneficiar da condição Invisível.",
+      "descricao": "O alvo atingido pelo ataque sofre um adicional de 2d6 pontos de dano Radiante. Até que a magia termine, o alvo emite Luz Plena em um raio de 1,5 metro, e jogadas de ataque contra ele têm Vantagem e ele não pode se beneficiar da condição Invisível.",
       "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano aumenta em 1d6 para cada círculo de espaço de magia acima de 2."
     },
     {
@@ -453,7 +453,7 @@
       "alcance": "27 metros",
       "componentes": "V, S, M (folha de ruibarbo em pó)",
       "duracao": "Instantânea",
-      "descricao": "O ousado Mago Melf mira em um troll furioso com a Flecha Ácida de Melf.\nUma flecha verde brilhante dispara em direção a um alvo no alcance da magia, explodindo em um borrifo de ácido. Realize um ataque mágico à distância contra o alvo. Em caso de acerto, o alvo sofre 4d4 pontos de dano Ácido e 2d4 pontos de dano Ácido no final do próximo turno dele. Se falhar, a flecha respinga ácido no alvo, causando somente metade do dano inicial.",
+      "descricao": "Uma flecha verde brilhante dispara em direção a um alvo no alcance da magia, explodindo em um borrifo de ácido. Realize um ataque mágico à distância contra o alvo. Em caso de acerto, o alvo sofre 4d4 pontos de dano Ácido e 2d4 pontos de dano Ácido no final do próximo turno dele. Se falhar, a flecha respinga ácido no alvo, causando somente metade do dano inicial.",
       "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano (inicial e posterior) aumenta em 1d4 para cada círculo de espaço de magia acima de 2."
     },
     {
@@ -694,9 +694,9 @@
       ],
       "tempo_conjuracao": "Ação Bônus",
       "alcance": "Toque",
-      "componentes": "",
+      "componentes": "V, S, M (um punhado de casca de árvore)",
       "duracao": "1 hora",
-      "descricao": "Componente: V, S, M (um punhado de casca de árvore)\nVocê toca uma criatura voluntária. Até que a magia termine, a pele do alvo assume uma aparência de casca de árvore, e o alvo tem uma Classe de Armadura de 17 se sua CA for menor que isso.",
+      "descricao": "Você toca uma criatura voluntária. Até que a magia termine, a pele do alvo assume uma aparência de casca de árvore, e o alvo tem uma Classe de Armadura de 17 se sua CA for menor que isso.",
       "circulo_superior": ""
     },
     {
@@ -808,7 +808,7 @@
       "alcance": "Toque",
       "componentes": "V, S",
       "duracao": "Instantânea",
-      "descricao": "Um Druida humano conjura Restauração Menor para aliviar o sofrimento de um amigo que foi envenenado em batalha.\nVocê toca uma criatura e remove uma condição: Cego, Envenenado, Paralisado ou Surdo.",
+      "descricao": "Você toca uma criatura e remove uma condição: Cego, Envenenado, Paralisado ou Surdo.",
       "circulo_superior": ""
     },
     {
@@ -944,9 +944,9 @@
       ],
       "tempo_conjuracao": "Ação Bônus",
       "alcance": "Pessoal",
-      "componentes": "",
+      "componentes": "V, S",
       "duracao": "Instantânea",
-      "descricao": "Componente: V, S\nVocê usa sua energia vital para se curar. Jogue um ou dois de seus Dados de Pontos de Vida não gastos e recupera um número de Pontos de Vida igual ao total do teste mais seu modificador de atributo de conjuração. Esses dados são, então, gastos.",
+      "descricao": "Você usa sua energia vital para se curar. Jogue um ou dois de seus Dados de Pontos de Vida não gastos e recupera um número de Pontos de Vida igual ao total do teste mais seu modificador de atributo de conjuração. Esses dados são, então, gastos.",
       "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O número de Dados de Vida não gastos que você pode jogar aumenta em um para cada círculo de espaço de magia acima de 2."
     },
     {

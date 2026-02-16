@@ -22,18 +22,21 @@
         },
         {
           "nome": "Revelação Celestial",
-          "descricao": "No nível 3 de personagem, você pode se transformar como uma Ação Bônus usando uma das opções abaixo (escolha a opção cada vez que você se transformar). A transformação se mantém por 1 minuto ou até você a encerrar (nenhuma ação é necessária). Uma vez que você se transforma, não pode fazê-lo novamente até completar um Descanso Longo."
+          "descricao": "No nível 3 de personagem, você pode se transformar como uma Ação Bônus usando uma das opções abaixo (escolha a opção cada vez que você se transformar). A transformação se mantém por 1 minuto ou até você a encerrar (nenhuma ação é necessária). Uma vez que você se transforma, não pode fazê-lo novamente até completar um Descanso Longo.\n\nUma vez em cada um dos seus turnos, até que a transformação termine, você pode infligir dano adicional a um alvo ao causar dano a ele com um ataque ou uma magia. O dano adicional é igual ao seu Bônus de Proficiência, e o tipo de dano adicional é Necrótico para Manto Necrótico ou Radiante para Asas Celestiais e Transfiguração Radiante."
         },
         {
           "nome": "Asas Celestiais",
+          "nivel_minimo": 3,
           "descricao": "Duas asas espectrais brotam em suas costas temporariamente. Até que a transformação se encerre, você tem um Deslocamento de Voo igual ao seu Deslocamento."
         },
         {
           "nome": "Manto Necrótico",
+          "nivel_minimo": 3,
           "descricao": "Seus olhos se tornam brevemente poças de escuridão, e asas que não voam brotam em suas costas temporariamente. Criaturas que não sejam seus aliados a até 3 metros de você devem ser bem-sucedidas em uma salvaguarda de Carisma (CD 8 + seu modificador de Carisma e seu Bônus de Proficiência) ou têm a condição Amedrontado até o final do seu próximo turno."
         },
         {
           "nome": "Transfiguração Radiante",
+          "nivel_minimo": 3,
           "descricao": "Luz abrasadora irradia temporariamente de seus olhos e boca. Pela duração da transformação, você emite Luz Plena em um raio de 3 metros e Meia-luz por mais 3 metros, e no fim de cada um de seus turnos, cada criatura a até 3 metros de você sofre dano Radiante igual ao seu Bônus de Proficiência."
         }
       ],
@@ -57,7 +60,7 @@
         },
         {
           "nome": "Conhecimento de Pedras",
-          "descricao": "Como uma Ação Bônus, você adquire Sismiconsciência com um alcance de 18 metros por 10 minutos. Você deve estar em, ou tocar, uma superfície de pedra para usar a Sismiconsciência. A pedra pode ser natural ou trabalhada."
+          "descricao": "Como uma Ação Bônus, você adquire Sismiconsciência com um alcance de 18 metros por 10 minutos. Você deve estar em, ou tocar, uma superfície de pedra para usar a Sismiconsciência. A pedra pode ser natural ou trabalhada.\n\nVocê pode usar essa Ação Bônus um número de vezes igual ao seu Bônus de Proficiência, e você restaura todos os usos gastos quando completa um Descanso Longo."
         }
       ],
       "descricao": "Anões foram criados da terra nos tempos antigos por uma divindade da forja, conhecida por diversos nomes como Moradin e Reorx. Esse deus conferiu aos anões uma afinidade por pedra, metal e pela vida subterrânea, além de torná-los resilientes como as montanhas, com uma expectativa de vida de cerca de 350 anos.\nBaixos e frequentemente barbudos, os anões originais esculpiram cidades e fortalezas nas montanhas e sob a terra. Suas lendas mais antigas relatam conflitos com monstros tanto do topo das montanhas quanto da Umbraeterna, sejam eles gigantes imponentes ou horrores subterrâneos. Motivados por essas histórias, anões de diversas culturas costumam cantar sobre proezas valentes — especialmente sobre os pequenos superando os poderosos.\nEm alguns mundos do multiverso, os primeiros povoados de anões foram erguidos em colinas ou montanhas, e as famílias que descendem desses locais são conhecidas como anões da colina ou anões da montanha. Os cenários de Greyhawk e Dragonlance incluem essas comunidades.",
@@ -72,7 +75,7 @@
         },
         {
           "nome": "Ataque de Sopro",
-          "descricao": "Ao executar a ação Atacar no seu turno, você pode substituir um de seus ataques por uma emissão de energia mágica em um Cone de 4,5 metros ou em uma Linha de 9 metros de comprimento e 1,5 metros de largura (escolha a forma a cada vez). Cada criatura nessa área deve realizar uma salvaguarda de Destreza (CD 8 + seu modificador de Constituição e seu Bônus de Proficiência). Se falhar, uma criatura sofre 1d10 pontos de dano do tipo determinado por seu traço Herança Dracônica. Em caso de sucesso, uma criatura sofre metade do dano. Esse dano aumenta em 1d10 quando você atinge os níveis de personagem 5 (2d10), 11 (3d10) e 17 (4d10)."
+          "descricao": "Ao executar a ação Atacar no seu turno, você pode substituir um de seus ataques por uma emissão de energia mágica em um Cone de 4,5 metros ou em uma Linha de 9 metros de comprimento e 1,5 metros de largura (escolha a forma a cada vez). Cada criatura nessa área deve realizar uma salvaguarda de Destreza (CD 8 + seu modificador de Constituição e seu Bônus de Proficiência). Se falhar, uma criatura sofre 1d10 pontos de dano do tipo determinado por seu traço Herança Dracônica. Em caso de sucesso, uma criatura sofre metade do dano. Esse dano aumenta em 1d10 quando você atinge os níveis de personagem 5 (2d10), 11 (3d10) e 17 (4d10).\n\nVocê pode usar esse Ataque de Sopro um número de vezes igual ao seu Bônus de Proficiência, e você restaura todos os usos gastos quando completa um Descanso Longo."
         },
         {
           "nome": "Resistência a Dano",
@@ -211,7 +214,7 @@
       "tracos": [
         {
           "nome": "Pico de Adrenalina",
-          "descricao": "Você pode executar a ação Correr como uma Ação Bônus. Ao executar isso, você adquire um número de Pontos de Vida Temporários igual ao seu Bônus de Proficiência."
+          "descricao": "Você pode executar a ação Correr como uma Ação Bônus. Ao executar isso, você adquire um número de Pontos de Vida Temporários igual ao seu Bônus de Proficiência.\n\nVocê pode usar este traço um número de vezes igual ao seu Bônus de Proficiência, e você restaura todos os usos gastos quando completa um Descanso Curto ou Longo."
         },
         {
           "nome": "Visão no Escuro",
