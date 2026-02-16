@@ -13828,10 +13828,14 @@ function renderSheetInvItem(item, idx) {
   return `
     <div class="inv-item ${item.equipado ? 'inv-item-equipado' : ''} ${isZeroQtd ? 'inv-item-zerado' : ''}" data-idx="${idx}" draggable="true">
       <div class="inv-drag-handle no-print" title="Arrastar para reordenar">&#9776;</div>
-      <div style="flex:1;cursor:pointer" data-info-inv-sheet="${idx}" title="Ver detalhes">
+      <div style="flex:1;min-width:0;cursor:pointer" data-info-inv-sheet="${idx}" title="Ver detalhes">
         <div class="inv-item-nome">
-          ${item.nome} ${profBadge} ${maestriaBadge} ${ataqueInfo} ${vantagemInfo} ${danoAutoInfo} ${tipoBadge} ${customBadges}
+          ${item.nome} ${profBadge}
         </div>
+        ${(ataqueInfo || danoAutoInfo || vantagemInfo || maestriaBadge || tipoBadge || customBadges)
+          ? `<div class="inv-item-badges" style="display:flex;flex-wrap:wrap;gap:3px;margin-top:2px">${ataqueInfo}${danoAutoInfo}${vantagemInfo}${maestriaBadge}${tipoBadge}${customBadges}</div>`
+          : ''
+        }
         <div class="inv-item-detalhe">
           ${item.tipo === 'arma' ? `${danoExibicao} | ${item.dados?.propriedades || ''}` : ''}
           ${item.tipo === 'armadura' ? `CA: ${item.dados?.ca || ''} | ${item.dados?.categoria || ''}` : ''}

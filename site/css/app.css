@@ -1246,6 +1246,94 @@ tr:hover td { background: #faf8f4; }
   .selection-grid { grid-template-columns: repeat(2, 1fr); }
   .pericias-lista { columns: 1; }
   .col-2, .col-3, .col-4 { flex: 0 0 100%; }
+
+  /* Stats: grid uniforme em mobile */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  .stat-box {
+    min-width: unset;
+    padding: 6px 4px;
+  }
+  .stat-label { font-size: 0.6rem; }
+  .stat-value { font-size: 1.15rem; }
+
+  /* Inventario: compactar em mobile */
+  .inv-item {
+    padding: 8px 6px;
+    gap: 6px;
+  }
+  .inv-item-nome { font-size: 0.82rem; }
+  .inv-item-detalhe { font-size: 0.72rem; }
+  .inv-item-acoes {
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-end !important;
+  }
+  .inv-qty-control {
+    order: 1;
+  }
+  .inv-equip-label {
+    font-size: 0.65rem;
+    gap: 3px !important;
+    padding: 2px 0 !important;
+    order: 2;
+  }
+  .inv-item-acoes .btn-icon {
+    width: 28px; height: 28px;
+    font-size: 0.9rem;
+  }
+  .inv-item-acoes [data-sheet-rem-inv] {
+    order: 3;
+  }
+  .inv-drag-handle {
+    font-size: 0.8rem;
+    padding: 0;
+  }
+
+  /* Descricao curta: limitar altura em mobile */
+  .inv-item .inv-item-detalhe {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Cards: padding menor em mobile */
+  .card { padding: 12px; }
+  .card-header { margin-bottom: 8px; padding-bottom: 6px; }
+  .card-header h2 { font-size: 0.92rem; }
+
+  /* Pericias: mais compactas */
+  .pericia-item { 
+    font-size: 0.88rem; 
+    padding: 3px 0;
+  }
+  .pericias-grupo-header {
+    font-size: 0.68rem;
+    padding: 2px 6px;
+  }
+
+  /* Botoes menores em mobile */
+  .btn-sm { padding: 5px 10px; font-size: 0.75rem; }
+
+  /* Content padding menor */
+  #app-content { padding: 10px; }
+
+  /* Atributos: mais compactos */
+  .atributo-box { padding: 8px 4px; }
+  .atributo-mod { font-size: 1.4rem; }
+  .atributo-nome { font-size: 0.6rem; }
+
+  /* Salvaguardas */
+  .salva-item { font-size: 0.8rem; padding: 4px 6px; }
+
+  /* Slots de magia: compactar */
+  .slots-grupo label { font-size: 0.78rem; min-width: 65px; }
+  .slot-bolha { width: 20px; height: 20px; }
 }
 
 @media (min-width: 481px) and (max-width: 768px) {
