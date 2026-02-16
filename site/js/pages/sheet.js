@@ -11119,6 +11119,21 @@ function renderFeatureItem(f, source) {
         </div>
       `;
     }
+  } else if (f.nome === 'Ordem Divina' || f.nome === 'Ordem Primal') {
+    // Exibir somente a opcao escolhida (Protetor/Taumaturgo/Xama)
+    const _chaveOrdem = f.nome === 'Ordem Divina' ? 'ordem_divina' : 'ordem_primal';
+    const _ordemEscolhida = char[_chaveOrdem] || char.escolhas_classe?.[_chaveOrdem]?.[0] || '';
+    if (_ordemEscolhida) {
+      const _regexOpcao = new RegExp(`\\*\\*${_ordemEscolhida}\\.\\*\\*\\s*(.+?)(?=\\n\\*\\*|$)`, 's');
+      const _matchOpcao = f.descricao.match(_regexOpcao);
+      const _descOpcao = _matchOpcao ? _matchOpcao[1].trim() : '';
+      usosHtmlBody = `
+        <div style="display:flex;align-items:center;gap:8px;padding:4px 0 4px 16px;flex-wrap:wrap">
+          <span class="badge badge-accent" style="font-size:0.8rem">${_ordemEscolhida}</span>
+          <span style="font-size:0.8rem">${_descOpcao}</span>
+        </div>
+      `;
+    }
   }
 
   if (!usosHtmlBody && temMultiplosUsos) {
@@ -11150,7 +11165,8 @@ function renderFeatureItem(f, source) {
         ${usosHtmlSummary}
       </summary>
       ${usosHtmlBody}
-      <div class="md-content" style="padding:6px 0 6px 16px;font-size:0.85rem">${mdParaHtml(f.descricao)}</div>
+      ${(f.nome === 'Ordem Divina' || f.nome === 'Ordem Primal') && (char.ordem_divina || char.ordem_primal || char.escolhas_classe?.ordem_divina?.length || char.escolhas_classe?.ordem_primal?.length)
+        ? '' : `<div class="md-content" style="padding:6px 0 6px 16px;font-size:0.85rem">${mdParaHtml(f.descricao)}</div>`}
       ${subHabilidades.length > 0 ? `
         <div style="padding:4px 0 4px 16px;font-size:0.8rem;color:var(--text-muted)">
           <strong>Sub-habilidades:</strong> ${subHabilidades.join(', ')}
@@ -14958,10 +14974,21 @@ async function gerarHtmlImpressao() {
     if (feats.length > 0) {
       pag2 += `<div class="print-section"><div class="print-section-title">Caracteristicas de Classe</div>`;
       feats.forEach(f => {
+        // Para Ordem Divina/Primal, exibir somente a opcao selecionada
+        let descPrint = f.descricao || '';
+        if (f.nome === 'Ordem Divina' || f.nome === 'Ordem Primal') {
+          const _chvOrd = f.nome === 'Ordem Divina' ? 'ordem_divina' : 'ordem_primal';
+          const _ordEsc = char[_chvOrd] || char.escolhas_classe?.[_chvOrd]?.[0] || '';
+          if (_ordEsc) {
+            const _rxOrd = new RegExp(`\\*\\*${_ordEsc}\\.\\*\\*\\s*(.+?)(?=\\n\\*\\*|$)`, 's');
+            const _mOrd = descPrint.match(_rxOrd);
+            descPrint = _mOrd ? `**${_ordEsc}.** ${_mOrd[1].trim()}` : descPrint;
+          }
+        }
         pag2 += `
           <div class="print-feature">
             <div class="print-feature-name">${f.nome} <span style="font-weight:400;font-size:7pt;color:#666">(Nivel ${f.nivel})</span></div>
-            ${f.descricao ? `<div class="print-feature-desc"><div class="md-content">${mdParaHtml(f.descricao)}</div></div>` : ''}
+            ${descPrint ? `<div class="print-feature-desc"><div class="md-content">${mdParaHtml(descPrint)}</div></div>` : ''}
           </div>`;
       });
       pag2 += `</div>`;
@@ -14990,13 +15017,36 @@ async function gerarHtmlImpressao() {
     const tracosEscolhidos = char.tracos_escolhidos || [];
     let tracosMostrar = [..._espData.tracos];
 
-    // Filtrar sub-tracos nao escolhidos
-    if (SUBTRACOS_ESPECIE[char.especie]) {
-      const opcoes = SUBTRACOS_ESPECIE[char.especie];
-      const escolhido = tracosEscolhidos.find(e => opcoes[e]);
-      if (escolhido) {
-        const naoEscolhidos = Object.keys(opcoes).filter(k => k !== escolhido);
-        tracosMostrar = tracosMostrar.filter(t => !naoEscolhidos.some(ne => t.nome.includes(ne)));
+    // Mesma logica de filtragem da ficha (renderSecaoTracosEspecie)
+    const _TRACOS_PAI_PRINT = ['Ancestralidade Gigante', 'Linhagem Gnômica', 'Herança Dracônica', 'Linhagem Élfica', 'Legado Ínfero'];
+    const _TRACOS_ESCOLHA_GOLIAS_PRINT = ['Arrepio do Gelo (Gigante do Gelo)', 'Queimadura de Fogo (Gigante de Fogo)', 'Resistência da Pedra (Gigante da Pedra)', 'Salto da Nuvem (Gigante das Nuvens)', 'Tombo da Colina (Gigante da Colina)', 'Trovão da Tempestade (Gigante da Tempestade)'];
+    const _TRACOS_ESCOLHA_GNOMO_PRINT = ['Gnomo das Rochas', 'Gnomo do Bosque'];
+
+    if (tracosEscolhidos.length > 0) {
+      tracosMostrar = _espData.tracos.filter(t => {
+        // Remover tracos-pai (sao substituidos pelo traco sintetico ou pela escolha)
+        if (_TRACOS_PAI_PRINT.includes(t.nome)) return false;
+        // Golias/Gnomo: manter apenas o traco escolhido
+        if (_TRACOS_ESCOLHA_GOLIAS_PRINT.includes(t.nome) || _TRACOS_ESCOLHA_GNOMO_PRINT.includes(t.nome)) {
+          return tracosEscolhidos.includes(t.nome);
+        }
+        return true;
+      });
+
+      // Filtrar sub-tracos nao escolhidos (Tiferino, Elfo, Draconato)
+      if (SUBTRACOS_ESPECIE[char.especie]) {
+        const opcoes = SUBTRACOS_ESPECIE[char.especie];
+        const escolhido = tracosEscolhidos.find(e => opcoes[e]);
+        if (escolhido) {
+          const naoEscolhidos = Object.keys(opcoes).filter(k => k !== escolhido);
+          tracosMostrar = tracosMostrar.filter(t => !naoEscolhidos.some(ne => t.nome.includes(ne)));
+        }
+      }
+
+      // Adicionar traco sintetico para especies com opcoes (Tiferino, Elfo, Draconato)
+      const tracoSintetico = gerarTracoSinteticoEspecie(char.especie, tracosEscolhidos, char.nivel);
+      if (tracoSintetico) {
+        tracosMostrar.push(tracoSintetico);
       }
     }
 
