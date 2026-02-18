@@ -1,0 +1,1009 @@
+{
+  "gerado_em": "2025-07-15",
+  "descricao": "Especificacao tecnica de implementacao para magias/truques da lista base, agrupados por tipo de mecanica",
+  "referencia_base": "dados/controle/magias_truques_sem_mecanica.json",
+  "como_usar": "Grupos com mecanica especifica detalham o que implementar e onde. Grupos toast (sem_mecanica) requerem apenas o toast ja existente via [data-conjurar] e [data-lancar-truque].",
+  "formato_alvo": {
+    "descricao": "Padrao unificado para indicar se a magia/truque permite alvo em voce e/ou em outro alvo.",
+    "campos": {
+      "permite_self": "true quando pode conjurar em voce",
+      "permite_outro": "true quando pode conjurar em outro alvo valido",
+      "tipo_alvo": "self | criatura | aura | area | objeto | invocacao | variavel",
+      "requer_selecao_alvo": "true quando a UI deve abrir seletor de alvo"
+    },
+    "regras_semanticas": {
+      "objeto": "Quando tipo_alvo='objeto', permite_self=true significa que um objeto/equipamento proprio tambem e alvo valido; ainda assim requer_selecao_alvo deve permanecer true para escolher qual item sera afetado."
+    }
+  },
+
+  "tipos_implementacao": {
+    "pv_temporarios": "Atribui Pontos de Vida Temporarios em char.pv_temporarios. Campo ja deve existir na ficha.",
+    "efeito_ca": "Adicionar entrada no mapa MAGIAS_EFEITO_CA (sheet.js) e no calcCA() (utils.js). Tipos: bonus (soma), base (substitui base), minimo (CA minima).",
+    "penalidade_ataque_inimigo": "Registra em char.efeitos_magicos que atacantes tem penalidade nas jogadas de ataque. Exibir badge como lembrete.",
+    "condicao_self": "Registrar em char.efeitos_magicos com tipo='condicao'. Exibir badge na secao de status/defesas.",
+    "resistencia_temporaria": "Adicionar em char.efeitos_magicos com tipo='resistencia' + lista de tipos de dano.",
+    "resistencia_e_imunidade": "Combinacao de resistencia a dano e imunidade a condicao. Ambas registradas em char.efeitos_magicos.",
+    "protecao_magica": "Vantagem em SG e/ou penalidade em ataques de criaturas especificas. Registrar em char.efeitos_magicos com tipo='protecao'.",
+    "buff_ataque_save": "Registrar bonus em char.efeitos_magicos com tipo='buff_d20'. Campo bonus pode ser '+1d4', 'vantagem', etc.",
+    "buff_arma": "Bônus no ataque e/ou dano de armas. Registrar em char.efeitos_magicos com tipo='buff_arma'.",
+    "buff_deslocamento": "Adicionar tipo de deslocamento especial em char.efeitos_magicos com tipo='deslocamento'. Campos: tipo_velocidade e valor em metros.",
+    "buff_pericia": "Bonus em pericia especifica. Registrar em char.efeitos_magicos com tipo='bonus_pericia'.",
+    "cura_pv": "Abrir modal de confirmacao (com valores) e aplicar em char.pv_atual respeitando char.pv_max.",
+    "cura_condicao": "Exibir lista de char.condicoes e char.efeitos_magicos para selecionar o que remover.",
+    "efeito_composto": "Combinacao de dois ou mais tipos acima. Cada sub-efeito implementado separadamente.",
+    "toast_generico": "Apenas exibe toast de lancamento. Comportamento ja existente via [data-conjurar] / [data-lancar-truque]."
+  },
+
+  "grupos_com_mecanica": [
+    {
+      "id": "pv_temporarios",
+      "tipo": "pv_temporarios",
+      "prioridade": "alta",
+      "complexidade_codigo": "simples",
+      "descricao_mecanica": "Concede Pontos de Vida Temporarios ao personagem conjurador. PV temp substituem os atuais se o novo valor for maior.",
+      "implementacao_tecnica": "Adicionar entrada no mapa MAGIAS_EFEITO_CA com tipo_efeito='pv_temp' e formula. Alternativa: criar funcao _aplicarPVTemporarios() em sheet.js chamada por _executarConjuracao().",
+      "campo_char": "char.pv_temporarios (Number)",
+      "remover_em": "manual (gasto ao sofrer dano) ou ao final do descanso longo",
+      "alvo_por_magia": {
+        "Vitalidade Vazia": { "permite_self": true, "permite_outro": false, "tipo_alvo": "self", "requer_selecao_alvo": false }
+      },
+      "magias": [
+        {
+          "nome": "Vitalidade Vazia",
+          "circulo": 1,
+          "duracao": "Instantânea",
+          "formula_pv": "2d4 + 4",
+          "nota": "Formula fixa nao escala com circulo conjurado. Resultado deve ser rollado ou mostrar valor medio (9)."
+        }
+      ]
+    },
+
+    {
+      "id": "efeito_ca_reflexos",
+      "tipo": "efeito_ca",
+      "prioridade": "media",
+      "complexidade_codigo": "media",
+      "descricao_mecanica": "Cria 3 copias ilusorias. Cada vez que o personagem e acertado por um ataque, jogar 1d6 por copia restante. Se qualquer d6 >= 3, uma copia e destruida em vez do personagem. Magia encerra quando todas as copias sao destruidas. Ineficaz contra criaturas com Visao as Cegas ou Visao Verdadeira.",
+      "implementacao_tecnica": "Opcao A (simplificada): adicionar ao MAGIAS_EFEITO_CA como tipo_efeito='bonus' valor=3 (representa as 3 copias dando ~+3 CA efetivo). Opcao B (fiel): registrar em char.efeitos_magicos com tipo='reflexos' e campo copias=3; exibir contador de copias restantes na ficha; botao manual para 'destruir copia'.",
+      "campo_char": "char.efeitos_magicos[].copias (Number, 1-3)",
+      "remover_em": "concentracao_quebrada ou copias_zeradas ou 1 minuto",
+      "alvo_por_magia": {
+        "Reflexos": { "permite_self": true, "permite_outro": false, "tipo_alvo": "self", "requer_selecao_alvo": false }
+      },
+      "magias": [
+        {
+          "nome": "Reflexos",
+          "circulo": 2,
+          "duracao": "1 minuto",
+          "concentracao": false,
+          "nota": "NAO requer concentracao. Encerra quando as 3 copias sao destruidas. Criaturas com Visao as Cegas/Visao Verdadeira nao sao afetadas."
+        }
+      ]
+    },
+
+    {
+      "id": "penalidade_ataque_inimigo",
+      "tipo": "penalidade_ataque_inimigo",
+      "prioridade": "media",
+      "complexidade_codigo": "simples",
+      "descricao_mecanica": "Atacantes subtraem 1d4 de suas jogadas de ataque contra voce enquanto a magia estiver ativa.",
+      "implementacao_tecnica": "Registrar em char.efeitos_magicos com tipo='penalidade_ataque_contra_mim' e valor='1d4'. Exibir badge de aviso na secao de CA para lembrar o jogador de aplicar a penalidade quando for atacado.",
+      "campo_char": "char.efeitos_magicos[{ tipo: 'penalidade_ataque_contra_mim', valor: '1d4', nome: '...' }]",
+      "remover_em": "concentracao_quebrada ou 1 minuto",
+      "alvo_por_magia": {
+        "Proteção Contra Lâminas": { "permite_self": true, "permite_outro": false, "tipo_alvo": "self", "requer_selecao_alvo": false }
+      },
+      "magias": [
+        {
+          "nome": "Proteção Contra Lâminas",
+          "circulo": 0,
+          "duracao": "Concentração, até 1 minuto",
+          "concentracao": true,
+          "nota": "Truque (circulo 0). Funciona como suporte visual; o jogador precisa informar ao mestre que o atacante tem -1d4."
+        }
+      ]
+    },
+
+    {
+      "id": "condicao_self_invisivel",
+      "tipo": "condicao_self",
+      "prioridade": "alta",
+      "complexidade_codigo": "simples",
+      "descricao_mecanica": "Aplica a condicao Invisivel ao personagem. Exibir badge conspicuo na ficha.",
+      "implementacao_tecnica": "Registrar em char.efeitos_magicos com tipo='condicao', condicao='Invisivel'. Variante _permanente: a magia NAO encerra ao atacar/conjurar. Variante _temporaria: encerra automaticamente quando jogador usa ataque ou lanca magia (detectar via evento).",
+      "campo_char": "char.efeitos_magicos[{ tipo: 'condicao', condicao: 'Invisivel', encerra_ao_atacar: true|false, nome: '...' }]",
+      "remover_em": "concentracao_quebrada, ou ao_atacar/causar_dano/conjurar (depende da variante)",
+      "alvo_por_magia": {
+        "Invisibilidade": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true },
+        "Invisibilidade Maior": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true }
+      },
+      "magias": [
+        {
+          "nome": "Invisibilidade",
+          "circulo": 2,
+          "duracao": "Concentração, até 1 hora",
+          "concentracao": true,
+          "variante": "temporaria",
+          "nota": "Encerra IMEDIATAMENTE se o alvo realizar jogada de ataque, causar dano ou conjurar magia."
+        },
+        {
+          "nome": "Invisibilidade Maior",
+          "circulo": 4,
+          "duracao": "Concentração, até 1 minuto",
+          "concentracao": true,
+          "variante": "permanente",
+          "nota": "NAO encerra ao atacar ou conjurar. Permanece ate concentracao ser quebrada."
+        }
+      ]
+    },
+
+    {
+      "id": "condicao_self_especiais",
+      "tipo": "condicao_self",
+      "prioridade": "media",
+      "complexidade_codigo": "media",
+      "descricao_mecanica": "Magias que aplicam condicoes complexas ao conjurador. Cada uma tem regras especificas de remocao e restricoes de acoes.",
+      "implementacao_tecnica": "Registrar em char.efeitos_magicos com tipo='condicao' e nome especifico. Exibir badge + tooltip com restricoes. Implementar botao 'Encerrar' manual ou logica especifica por magia.",
+      "campo_char": "char.efeitos_magicos[{ tipo: 'condicao', condicao: '<nome>', nome: '<magia>' }]",
+      "remover_em": "depende_da_magia (ver notas individuais)",
+      "alvo_por_magia": {
+        "Despistar": { "permite_self": true, "permite_outro": false, "tipo_alvo": "self", "requer_selecao_alvo": false },
+        "Forma Gasosa": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true },
+        "Santuário": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true },
+        "Simular Morte": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true },
+        "Mesclar-se às Rochas": { "permite_self": true, "permite_outro": false, "tipo_alvo": "self", "requer_selecao_alvo": false }
+      },
+      "magias": [
+        {
+          "nome": "Despistar",
+          "circulo": 5,
+          "duracao": "Concentração, até 1 hora",
+          "concentracao": true,
+          "condicao": "Invisivel_com_copia",
+          "nota": "Personagem fica Invisivel E uma copia ilusoria aparece onde estava. A invisibilidade (mas nao a copia) encerra ao atacar/causar dano/conjurar. Copia pode ser movida como Usar Magia."
+        },
+        {
+          "nome": "Forma Gasosa",
+          "circulo": 3,
+          "duracao": "Concentração, até 1 hora",
+          "concentracao": true,
+          "condicao": "Forma_Gasosa",
+          "mecanica_detalhada": "Voo 3m e pode pairar. Resistencia a dano Contundente, Cortante e Perfurante. Imunidade a condicao Caido. Vantagem em SG de Forca, Destreza e Constituicao. NAO pode atacar nem conjurar magias.",
+          "nota": "Altamente restritivo: bloqueia ataque e conjuracao. Exibir aviso proeminente."
+        },
+        {
+          "nome": "Santuário",
+          "circulo": 1,
+          "duracao": "1 minuto",
+          "concentracao": false,
+          "condicao": "Santuario",
+          "mecanica_detalhada": "Atacantes que miram o personagem com ataque ou magia de dano devem ser bem-sucedidos em SG de Sabedoria ou perdem o ataque/magia. NAO protege contra area de efeito. Encerra se o personagem atacar, conjurar ou causar dano.",
+          "nota": "Magia de protecao defensiva. Encerra ao atacar/conjurar como Invisibilidade."
+        },
+        {
+          "nome": "Simular Morte",
+          "circulo": 3,
+          "duracao": "1 hora",
+          "concentracao": false,
+          "condicao": "Simular_Morte",
+          "nota": "Personagem parece morto para todos os meios de deteccao. Baixa utilidade na ficha, apenas badge visivel."
+        },
+        {
+          "nome": "Mesclar-se às Rochas",
+          "circulo": 3,
+          "duracao": "8 horas",
+          "concentracao": false,
+          "condicao": "Mesclado_Rochas",
+          "nota": "Personagem dentro de pedra ou terra. Badge apenas."
+        }
+      ]
+    },
+
+    {
+      "id": "resistencia_temporaria",
+      "tipo": "resistencia_temporaria",
+      "prioridade": "alta",
+      "complexidade_codigo": "simples",
+      "descricao_mecanica": "Concede Resistencia a um ou mais tipos de dano enquanto o efeito estiver ativo. Exibir junto as resistencias permanentes do personagem.",
+      "implementacao_tecnica": "Adicionar em char.efeitos_magicos com tipo='resistencia' e array tipos_dano. A secao de defesas (renderSecaoDefesas) deve ler char.efeitos_magicos para listar resistencias temporarias separadas das permanentes. Resistencia temporaria a um tipo escolhido requer modal de selecao antes de aplicar.",
+      "campo_char": "char.efeitos_magicos[{ tipo: 'resistencia', tipos_dano: ['Gélido'], nome: '...', concentracao: true }]",
+      "remover_em": "concentracao_quebrada ou duracao_fixa",
+      "alvo_por_magia": {
+        "Proteção Contra Energia": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true },
+        "Pele-Rocha": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true }
+      },
+      "magias": [
+        {
+          "nome": "Proteção Contra Energia",
+          "circulo": 3,
+          "duracao": "Concentração, até 1 hora",
+          "concentracao": true,
+          "tipos_dano": "1 tipo a escolher: Ácido, Elétrico, Gélido, Ígneo ou Trovejante",
+          "nota": "Requer modal de selecao de tipo no momento do lancamento."
+        },
+        {
+          "nome": "Pele-Rocha",
+          "circulo": 4,
+          "duracao": "Concentração, até 1 hora",
+          "concentracao": true,
+          "tipos_dano": ["Contundente", "Cortante", "Perfurante"],
+          "nota": "Em 5.5e (2024) a resistencia se aplica a danos nao-magicos E magicos (sem restricao 'nao-magico' do 5e original)."
+        }
+      ]
+    },
+
+    {
+      "id": "resistencia_e_imunidade_veneno",
+      "tipo": "resistencia_e_imunidade",
+      "prioridade": "media",
+      "complexidade_codigo": "simples",
+      "descricao_mecanica": "Remove condicao Envenenado existente, concede Vantagem nas SG contra Envenenado e Resistencia a dano Venenoso.",
+      "implementacao_tecnica": "1) Remover 'Envenenado' de char.condicoes se presente. 2) Adicionar em char.efeitos_magicos: tipo='resistencia', tipos_dano=['Venenoso'] E tipo='buff_save_condicao', condicao='Envenenado', bonus='vantagem'.",
+      "campo_char": "char.condicoes (remover Envenenado) + char.efeitos_magicos (resistencia + vantagem SG)",
+      "remover_em": "duracao_fixa (1 hora)",
+      "alvo_por_magia": {
+        "Proteção Contra Veneno": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true }
+      },
+      "magias": [
+        {
+          "nome": "Proteção Contra Veneno",
+          "circulo": 2,
+          "duracao": "1 hora",
+          "concentracao": false,
+          "nota": "NAO requer concentracao. Remove Envenenado imediatamente ao lancar. Tres efeitos distintos em um."
+        }
+      ]
+    },
+
+    {
+      "id": "protecao_contra_entidades",
+      "tipo": "protecao_magica",
+      "prioridade": "media",
+      "complexidade_codigo": "simples",
+      "descricao_mecanica": "Criaturas de tipos especificos (Aberracao, Celestial, Elemental, Feerico, Infero, Morto-Vivo) tem Desvantagem em ataques contra o personagem, e o personagem e imune a Possuido, Amedrontado e Enfeiticado vindo dessas criaturas.",
+      "implementacao_tecnica": "Registrar em char.efeitos_magicos com tipo='protecao_bem_e_mal'. Exibir badge de aviso. Funciona principalmente como lembrete visual para o jogador aplicar as regras.",
+      "campo_char": "char.efeitos_magicos[{ tipo: 'protecao_bem_e_mal', nome: '...' }]",
+      "remover_em": "concentracao_quebrada ou 10 minutos",
+      "alvo_por_magia": {
+        "Proteção Contra o Bem e o Mal": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true }
+      },
+      "magias": [
+        {
+          "nome": "Proteção Contra o Bem e o Mal",
+          "circulo": 1,
+          "duracao": "Concentração, até 10 minutos",
+          "concentracao": true,
+          "entidades_protegidas": ["Aberração", "Celestial", "Elemental", "Féerico", "Ínfero", "Morto-Vivo"],
+          "nota": "Inclui Vantagem em SG contra efeitos dessas criaturas se ja estiver Possuido/Amedrontado/Enfeiticado."
+        }
+      ]
+    },
+
+    {
+      "id": "aura_de_pureza",
+      "tipo": "resistencia_temporaria",
+      "prioridade": "media",
+      "complexidade_codigo": "simples",
+      "descricao_mecanica": "Aura de 9 metros: conjurador e aliados tem Resistencia a dano Venenoso e Vantagem nas SG contra Amedrontado, Atordoado, Cego, Enfeiticado, Envenenado, Paralisado e Surdo.",
+      "implementacao_tecnica": "Para o personagem central: adicionar em char.efeitos_magicos tipo='resistencia' (Venenoso) + tipo='vantagem_sg_condicoes'. Badge indicando aura ativa. Efeito se aplica em 9m de raio para aliados tambem (informar apenas).",
+      "campo_char": "char.efeitos_magicos[{ tipo: 'resistencia', ... }, { tipo: 'vantagem_sg_condicoes', ... }]",
+      "remover_em": "concentracao_quebrada ou 10 minutos",
+      "alvo_por_magia": {
+        "Aura de Pureza": { "permite_self": true, "permite_outro": false, "tipo_alvo": "aura", "requer_selecao_alvo": false }
+      },
+      "magias": [
+        {
+          "nome": "Aura de Pureza",
+          "circulo": 4,
+          "duracao": "Concentração, até 10 minutos",
+          "concentracao": true,
+          "condicoes_protegidas": ["Amedrontado", "Atordoado", "Cego", "Enfeitiçado", "Envenenado", "Paralisado", "Surdo"]
+        }
+      ]
+    },
+
+    {
+      "id": "buff_ataque_save_bencao",
+      "tipo": "buff_ataque_save",
+      "prioridade": "alta",
+      "complexidade_codigo": "simples",
+      "descricao_mecanica": "Adiciona 1d4 a jogadas de ataque E salvaguardas do personagem (e de ate mais 2 aliados) enquanto a concentracao e mantida.",
+      "implementacao_tecnica": "Adicionar em char.efeitos_magicos com tipo='buff_d20', bonus='+1d4', aplica_em=['ataques','salvaguardas']. Exibir badge nos ataques e salvaguardas da ficha como lembrete. Quando o personagem eh alvo (ele proprio), aplicar ao personagem.",
+      "campo_char": "char.efeitos_magicos[{ tipo: 'buff_d20', bonus: '1d4', aplica_em: ['ataque','salvaguarda'], nome: 'Bênção' }]",
+      "remover_em": "concentracao_quebrada ou 1 minuto",
+      "alvo_por_magia": {
+        "Bênção": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true }
+      },
+      "magias": [
+        {
+          "nome": "Bênção",
+          "circulo": 1,
+          "duracao": "Concentração, até 1 minuto",
+          "concentracao": true,
+          "nota": "Pode afetar ate 3 criaturas. Se conjurador se incluir como alvo, receberá o buff tambem."
+        }
+      ]
+    },
+
+    {
+      "id": "buff_arma_temporaria",
+      "tipo": "buff_arma",
+      "prioridade": "media",
+      "complexidade_codigo": "media",
+      "descricao_mecanica": "Concede bonus nas jogadas de ataque e/ou dano com arma especifica. Algumas variacoes adicionam dano elemental extra.",
+      "implementacao_tecnica": "Registrar em char.efeitos_magicos com tipo='buff_arma'. Exibir na secao de ataques da ficha como modificador. Arma Elemental requer modal de selecao de tipo elemental. Aljava Veloz habilita botao de acao bonus de ataque ranged.",
+      "campo_char": "char.efeitos_magicos[{ tipo: 'buff_arma', bonus_ataque: '+1', bonus_dano: '+1', dano_extra: null|'1d4 Igneo', nome: '...' }]",
+      "remover_em": "concentracao_interrompida ou duracao_fixa",
+      "alvo_por_magia": {
+        "Arma Mágica": { "permite_self": true, "permite_outro": true, "tipo_alvo": "objeto", "requer_selecao_alvo": true },
+        "Arma Elemental": { "permite_self": true, "permite_outro": true, "tipo_alvo": "objeto", "requer_selecao_alvo": true },
+        "Aljava Veloz": { "permite_self": true, "permite_outro": false, "tipo_alvo": "self", "requer_selecao_alvo": false }
+      },
+      "magias": [
+        {
+          "nome": "Arma Mágica",
+          "circulo": 2,
+          "duracao": "1 hora",
+          "concentracao": false,
+          "bonus_ataque": "+1",
+          "bonus_dano": "+1",
+          "dano_extra": null,
+          "nota": "NAO requer concentracao. +1 em ataque e dano na arma tocada."
+        },
+        {
+          "nome": "Arma Elemental",
+          "circulo": 3,
+          "duracao": "Concentração, até 1 hora",
+          "concentracao": true,
+          "bonus_ataque": "+1",
+          "bonus_dano": null,
+          "dano_extra": "1d4 (tipo a escolher: Ácido, Elétrico, Gélido, Ígneo ou Trovejante)",
+          "nota": "Requer modal de selecao de tipo elemental. Exibir tipo escolhido no badge."
+        },
+        {
+          "nome": "Aljava Veloz",
+          "circulo": 5,
+          "duracao": "Concentração, até 1 minuto",
+          "concentracao": true,
+          "mecanica_especial": "Habilita 2 ataques com arma de projetil (Arco/Besta) como Acao Bonus por turno. A magia gera a municao necessaria.",
+          "nota": "Nao e +1 numerico, mas habilitar ataque extra como Acao Bonus. Exibir badge 'Aljava Veloz ativa' como lembrete."
+        }
+      ]
+    },
+
+    {
+      "id": "buff_save_magias",
+      "tipo": "buff_ataque_save",
+      "prioridade": "media",
+      "complexidade_codigo": "simples",
+      "descricao_mecanica": "Concede vantagem em salvaguardas contra magias e efeitos magicos para o conjurador e aliados dentro da aura.",
+      "implementacao_tecnica": "Registrar em char.efeitos_magicos com tipo='buff_d20', aplica_em=['salvaguarda_magias'], bonus='vantagem'. Badge indicando aura ativa. Para Aura Sagrada, adicionar tambem tipo='desv_ataques_contra_mim'.",
+      "campo_char": "char.efeitos_magicos[{ tipo: 'buff_d20', bonus: 'vantagem', aplica_em: ['salvaguarda'], nome: '...' }]",
+      "remover_em": "concentracao_quebrada",
+      "alvo_por_magia": {
+        "Círculo de Poder": { "permite_self": true, "permite_outro": false, "tipo_alvo": "aura", "requer_selecao_alvo": false },
+        "Aura Sagrada": { "permite_self": true, "permite_outro": false, "tipo_alvo": "aura", "requer_selecao_alvo": false }
+      },
+      "magias": [
+        {
+          "nome": "Círculo de Poder",
+          "circulo": 5,
+          "duracao": "Concentração, até 10 minutos",
+          "concentracao": true,
+          "nota": "Aura de 9m. Aliados na aura: Vantagem em SG contra magias + nenhum dano em SG de metade bem-sucedida."
+        },
+        {
+          "nome": "Aura Sagrada",
+          "circulo": 8,
+          "duracao": "Concentração, até 1 minuto",
+          "concentracao": true,
+          "mecanica_adicional": "Criaturas afetadas: Vantagem em TODAS as SG. Inimigos tem Desvantagem em ataques contra as criaturas afetadas. Inferos/Mortos-Vivos que acertam MCA fazem SG Con ou ficam Cegos.",
+          "nota": "Mais poderoso que Circulo de Poder: Vantagem em TODAS SG (nao so magias) + Desvantagem em ataques contra afetados."
+        }
+      ]
+    },
+
+    {
+      "id": "buff_deslocamento",
+      "tipo": "buff_deslocamento",
+      "prioridade": "media",
+      "complexidade_codigo": "simples",
+      "descricao_mecanica": "Adiciona ou altera o tipo/valor de deslocamento do personagem (voo, escalada, natacao, acrescimo na base, Dash como acao bonus).",
+      "implementacao_tecnica": "Registrar em char.efeitos_magicos com tipo='deslocamento'. Campos: tipo_velocidade ('voo'|'escalada'|'base_bonus'|'natacao'|'nao_impedido') e valor em metros. Exibir velocidades especiais na secao de deslocamento da ficha.",
+      "campo_char": "char.efeitos_magicos[{ tipo: 'deslocamento', tipo_velocidade: 'voo', valor: 18, nome: '...' }]",
+      "remover_em": "concentracao_quebrada ou duracao_fixa",
+      "alvo_por_magia": {
+        "Passos Largos": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true },
+        "Retirada Acelerada": { "permite_self": true, "permite_outro": false, "tipo_alvo": "self", "requer_selecao_alvo": false },
+        "Escalada de Aranha": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true },
+        "Levitação": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true },
+        "Voo": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true },
+        "Movimentação Livre": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true },
+        "Caminhar Sobre as Águas": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true },
+        "Caminhar no Vento": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true }
+      },
+      "magias": [
+        {
+          "nome": "Passos Largos",
+          "circulo": 1,
+          "duracao": "1 hora",
+          "concentracao": false,
+          "tipo_velocidade": "base_bonus",
+          "valor_metros": 3,
+          "nota": "NAO requer concentracao. Simples: +3m ao deslocamento base."
+        },
+        {
+          "nome": "Retirada Acelerada",
+          "circulo": 1,
+          "duracao": "Concentração, até 10 minutos",
+          "concentracao": true,
+          "tipo_velocidade": "dash_acao_bonus",
+          "nota": "Habilita a acao Disparada como Acao Bonus. Exibir badge como lembrete."
+        },
+        {
+          "nome": "Escalada de Aranha",
+          "circulo": 2,
+          "duracao": "Concentração, até 1 hora",
+          "concentracao": true,
+          "tipo_velocidade": "escalada",
+          "valor_metros": "igual ao deslocamento base",
+          "nota": "Escalar paredes/tetos sem teste de atletismo."
+        },
+        {
+          "nome": "Levitação",
+          "circulo": 2,
+          "duracao": "Concentração, até 10 minutos",
+          "concentracao": true,
+          "tipo_velocidade": "levitacao",
+          "valor_metros": 20,
+          "nota": "Movimento vertical apenas (sobe/desce). Pode pairar sem mover."
+        },
+        {
+          "nome": "Voo",
+          "circulo": 3,
+          "duracao": "Concentração, até 10 minutos",
+          "concentracao": true,
+          "tipo_velocidade": "voo",
+          "valor_metros": 18,
+          "nota": "Pode pairar. Ao terminar a magia em altitude, o alvo CAI a menos que possa impedir."
+        },
+        {
+          "nome": "Movimentação Livre",
+          "circulo": 4,
+          "duracao": "1 hora",
+          "concentracao": false,
+          "tipo_velocidade": "nao_impedido",
+          "mecanica_multi": [
+            "Terreno Difícil nao reduz deslocamento",
+            "Imune as condicoes Contido e Paralisado (por magia/efeito magico)",
+            "Deslocamento de Natacao = Deslocamento de caminhada",
+            "1,5m de movimento para escapar de restricoes nao magicas"
+          ],
+          "nota": "NAO requer concentracao. Exibir badges 'Movimentacao Livre ativa'."
+        },
+        {
+          "nome": "Caminhar Sobre as Águas",
+          "circulo": 3,
+          "duracao": "1 hora",
+          "concentracao": false,
+          "tipo_velocidade": "sobre_liquidos",
+          "nota": "Anda sobre agua/liquidos como superficie solida. Badge informativo."
+        },
+        {
+          "nome": "Caminhar no Vento",
+          "circulo": 6,
+          "duracao": "8 horas",
+          "concentracao": false,
+          "tipo_velocidade": "voo_rapido",
+          "valor_metros": 48,
+          "nota": "Deslocamento de voo 48m por 8h sem concentracao. Personagem se transforma em nuvem de vapor opcionalmente."
+        }
+      ]
+    },
+
+    {
+      "id": "buff_pericia",
+      "tipo": "buff_pericia",
+      "prioridade": "media",
+      "complexidade_codigo": "simples",
+      "descricao_mecanica": "Concede bonus ou Vantagem em testes de uma pericia especifica.",
+      "implementacao_tecnica": "Registrar em char.efeitos_magicos com tipo='bonus_pericia'. Campos: pericia (ex: 'Furtividade') e bonus (ex: '+10' ou 'vantagem'). Para Aprimorar Atributo, a 'pericia' e na verdade 'testes_do_atributo_X'. A secao de pericias deve checar char.efeitos_magicos e exibir junto ao valor.",
+      "campo_char": "char.efeitos_magicos[{ tipo: 'bonus_pericia', pericia: 'Furtividade', bonus: '+10', nome: '...' }]",
+      "remover_em": "concentracao_quebrada",
+      "alvo_por_magia": {
+        "Passo Sem Rastro": { "permite_self": true, "permite_outro": false, "tipo_alvo": "aura", "requer_selecao_alvo": false },
+        "Aprimorar Atributo": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true }
+      },
+      "magias": [
+        {
+          "nome": "Passo Sem Rastro",
+          "circulo": 2,
+          "duracao": "Concentração, até 1 hora",
+          "concentracao": true,
+          "pericia": "Furtividade",
+          "bonus": "+10",
+          "efeito_extra": "Nao deixa rastros fisicos ou magicos. Aura de 9m (afeta aliados tambem).",
+          "nota": "O bonus +10 e fixo, nao e Vantagem."
+        },
+        {
+          "nome": "Aprimorar Atributo",
+          "circulo": 2,
+          "duracao": "Concentração, até 1 hora",
+          "concentracao": true,
+          "atributo_selecionavel": true,
+          "opcoes_atributo": ["Força", "Destreza", "Inteligência", "Sabedoria", "Carisma"],
+          "bonus": "vantagem",
+          "nota": "Requer modal de selecao de atributo. Vantagem em TESTES do atributo escolhido (nao inclui SG)."
+        }
+      ]
+    },
+
+    {
+      "id": "cura_pv",
+      "tipo": "cura_pv",
+      "prioridade": "alta",
+      "complexidade_codigo": "simples",
+      "descricao_mecanica": "Restaura Pontos de Vida. Pode ser cura parcial, total ou revivificacao.",
+      "implementacao_tecnica": "Chamar modal de confirmacao mostrando o valor a ser aplicado. Aplicar em char.pv_atual = Math.min(char.pv_atual + valor, char.pv_max). Para Ressurreicao e Reviver os Mortos, requer input do nome do personagem e tratar logica especial de penalidade -4.",
+      "campo_char": "char.pv_atual (Number)",
+      "remover_em": "aplicacao_imediata (instantaneo)",
+      "alvo_por_magia": {
+        "Cura Completa": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true },
+        "Cura Completa em Massa": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true },
+        "Reviver os Mortos": { "permite_self": false, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true },
+        "Ressurreição": { "permite_self": false, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true }
+      },
+      "magias": [
+        {
+          "nome": "Cura Completa",
+          "circulo": 6,
+          "duracao": "Instantânea",
+          "concentracao": false,
+          "valor_cura": 70,
+          "efeito_extra": "Remove as condicoes Cego, Envenenado e Surdo do alvo alem dos PV.",
+          "nota": "Valor fixo de 70 PV. Chamar tambem remocao das condicoes se o alvo for o personagem."
+        },
+        {
+          "nome": "Cura Completa em Massa",
+          "circulo": 9,
+          "duracao": "Instantânea",
+          "concentracao": false,
+          "valor_cura": 70,
+          "alvo": "até 6 criaturas",
+          "nota": "Igual a Cura Completa mas para multiplos alvos. Botao unico aplica para o personagem."
+        },
+        {
+          "nome": "Reviver os Mortos",
+          "circulo": 5,
+          "duracao": "Instantânea",
+          "concentracao": false,
+          "valor_cura": 1,
+          "penalidade_pos_revivificacao": "-4 em Testes de D20, reduz 1 por Descanso Longo",
+          "nota": "Revive morto ha ate 10 dias. Retorna com 1 PV. Aplicar penalidade de -4 em todos os ataques/SG/testes do alvo."
+        },
+        {
+          "nome": "Ressurreição",
+          "circulo": 7,
+          "duracao": "Instantânea",
+          "concentracao": false,
+          "valor_cura": "todos os PV",
+          "penalidade_pos_revivificacao": "-4 em Testes de D20, reduz 1 por Descanso Longo",
+          "nota": "Retorna com TODOS os PV (diferente de Reviver os Mortos). Morto ha ate 1 seculo. Mesma penalidade de -4 pos-revivificacao."
+        }
+      ]
+    },
+
+    {
+      "id": "cura_condicao",
+      "tipo": "cura_condicao",
+      "prioridade": "alta",
+      "complexidade_codigo": "simples",
+      "descricao_mecanica": "Remove condicoes/efeitos negativos ativos do personagem.",
+      "implementacao_tecnica": "Exibir modal com lista de char.condicoes + char.efeitos_magicos negativos ativos. Jogador seleciona o que remover dentro do escopo da magia. Restauracao Menor: remove 1 condicao da lista especifica. Restauracao Maior: mais opcoes. Limpar a Mente: aplica imunidade de 24h.",
+      "campo_char": "char.condicoes (Array) + char.efeitos_magicos (remover negativos)",
+      "remover_em": "aplicacao_imediata",
+      "alvo_por_magia": {
+        "Restauração Menor": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true },
+        "Restauração Maior": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true },
+        "Limpar a Mente": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true }
+      },
+      "magias": [
+        {
+          "nome": "Restauração Menor",
+          "circulo": 2,
+          "duracao": "Instantânea",
+          "concentracao": false,
+          "condicoes_removiveis": ["Cego", "Envenenado", "Paralisado", "Surdo"],
+          "nota": "Remove UMA condicao da lista acima. Mostrar lista filtrada pelo que o personagem realmente tem ativo."
+        },
+        {
+          "nome": "Restauração Maior",
+          "circulo": 5,
+          "duracao": "Instantânea",
+          "concentracao": false,
+          "efeitos_removiveis": [
+            "1 nível de Exaustão",
+            "Condição Enfeitiçado",
+            "Condição Petrificado",
+            "Maldição (incluindo Sintonização com item amaldiçoado)",
+            "Redução de atributo",
+            "Redução de Pontos de Vida máximos"
+          ],
+          "nota": "Remove UM efeito da lista acima. Mais poderoso que Restauracao Menor."
+        },
+        {
+          "nome": "Limpar a Mente",
+          "circulo": 8,
+          "duracao": "24 horas",
+          "concentracao": false,
+          "imunidades_concedidas": ["dano Psíquico", "condição Enfeitiçado"],
+          "efeitos_extras": [
+            "Não pode ser detectado emocionalmente/magicamente",
+            "Não pode ter alinhamento lido",
+            "Localização não detectável magicamente",
+            "Mente não pode ser controlada por magias (incluindo Desejo)"
+          ],
+          "nota": "Diferente das outras: aplica imunidades temporarias por 24h (NAO instantaneo). Registrar em char.efeitos_magicos."
+        }
+      ]
+    },
+
+    {
+      "id": "efeito_composto_armadura_agathys",
+      "tipo": "efeito_composto",
+      "prioridade": "alta",
+      "complexidade_codigo": "media",
+      "descricao_mecanica": "PV Temporarios (5 por circulo) + Dano Gelido reativo (5 por circulo) ao atacante quando atingido em MCA enquanto PV temp existirem.",
+      "implementacao_tecnica": "1) Atribuir char.pv_temporarios = 5 * circulo_conjurado. 2) Registrar em char.efeitos_magicos { tipo: 'dano_reativo', dano: '5*circulo', tipo_dano: 'Gelido', condicao: 'quando_atingido_em_mca', nome: 'Armadura de Agathys' }. 3) Exibir badge 'Dano reativo X Gelido' na ficha como lembrete. A magia ENCERRA quando PV temp chegam a 0.",
+      "campo_char": "char.pv_temporarios (Number) + char.efeitos_magicos (dano_reativo)",
+      "remover_em": "pv_temporarios_zerados ou 1 hora",
+      "alvo_por_magia": {
+        "Armadura de Agathys": { "permite_self": true, "permite_outro": false, "tipo_alvo": "self", "requer_selecao_alvo": false }
+      },
+      "magias": [
+        {
+          "nome": "Armadura de Agathys",
+          "circulo": 1,
+          "duracao": "1 hora",
+          "concentracao": false,
+          "pv_temporarios": "5 × círculo conjurado",
+          "dano_reativo": "5 × círculo conjurado (Gélido)",
+          "condicao_dano_reativo": "Atacante em MCA enquanto PV temp > 0",
+          "nota": "Escala com upcast: circulo 1 = 5 PV temp + 5 dano. Circulo 3 = 15 PV temp + 15 dano."
+        }
+      ]
+    },
+
+    {
+      "id": "efeito_composto_heroismo",
+      "tipo": "efeito_composto",
+      "prioridade": "alta",
+      "complexidade_codigo": "media",
+      "descricao_mecanica": "No inicio de CADA turno do alvo: concede PV Temporarios = modificador de atributo de conjuracao. Simultaneamente: imunidade a condicao Amedrontado.",
+      "implementacao_tecnica": "1) Registrar em char.efeitos_magicos { tipo: 'pv_temp_por_turno', valor: '<modCar|modSab etc>', nome: 'Heroísmo' }. 2) Exibir badge 'Heroísmo ativo – recebe X PV temp/turno'. 3) Jogador clica botao 'Novo Turno' para adicionar PV temp. 4) Imunidade Amedrontado: registrar { tipo: 'imunidade_condicao', condicao: 'Amedrontado', nome: 'Heroísmo' }.",
+      "campo_char": "char.efeitos_magicos (pv_temp_por_turno + imunidade_condicao)",
+      "remover_em": "concentracao_quebrada ou 1 minuto",
+      "alvo_por_magia": {
+        "Heroísmo": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true }
+      },
+      "magias": [
+        {
+          "nome": "Heroísmo",
+          "circulo": 1,
+          "duracao": "Concentração, até 1 minuto",
+          "concentracao": true,
+          "pv_temp_por_turno": "modificador do atributo de conjuracao do lançador",
+          "imunidades": ["Amedrontado"],
+          "nota": "Os PV temp sao renovados A CADA turno (nao apenas uma vez). Empilha com PV temp ja existentes escolhendo o maior."
+        }
+      ]
+    },
+
+    {
+      "id": "efeito_composto_escudo_ardente",
+      "tipo": "efeito_composto",
+      "prioridade": "alta",
+      "complexidade_codigo": "media",
+      "descricao_mecanica": "Escolha escudo quente ou frio. Escudo quente: Resistencia a dano Gelido + atacante em MCA sofre 2d8 Igneo. Escudo frio: Resistencia a dano Igneo + atacante em MCA sofre 2d8 Gelido.",
+      "implementacao_tecnica": "1) Modal de selecao no lancamento: 'Escudo Quente (Resist. Gelido)' ou 'Escudo Frio (Resist. Igneo)'. 2) Adicionar resistencia correspondente em char.efeitos_magicos. 3) Exibir badge 'Escudo Ardente [Quente/Frio] – atacantes MCA: 2d8 dano'. 4) Funciona como lembrete; jogador aplica o dano manualmente.",
+      "campo_char": "char.efeitos_magicos[{ tipo: 'resistencia', tipos_dano: ['Gélido'|'Ígneo'] }, { tipo: 'dano_reativo', dano: '2d8', nome: 'Escudo Ardente' }]",
+      "remover_em": "duracao_fixa (10 minutos, NAO concentracao)",
+      "alvo_por_magia": {
+        "Escudo Ardente": { "permite_self": true, "permite_outro": false, "tipo_alvo": "self", "requer_selecao_alvo": false }
+      },
+      "magias": [
+        {
+          "nome": "Escudo Ardente",
+          "circulo": 4,
+          "duracao": "10 minutos",
+          "concentracao": false,
+          "variantes": {
+            "escudo_quente": { "resistencia": "Gélido", "dano_reativo": "2d8 Ígneo" },
+            "escudo_frio": { "resistencia": "Ígneo", "dano_reativo": "2d8 Gélido" }
+          },
+          "nota": "NAO requer concentracao. 10 minutos de duracao fixa."
+        }
+      ]
+    },
+
+    {
+      "id": "efeito_composto_aura_de_vida",
+      "tipo": "efeito_composto",
+      "prioridade": "media",
+      "complexidade_codigo": "media",
+      "descricao_mecanica": "Aura de 9m: Resistencia a dano Necrotico para o conjurador e aliados. PV maximos nao podem ser reduzidos. Aliados com 0 PV que comecem o turno na aura recuperam 1 PV.",
+      "implementacao_tecnica": "1) Adicionar em char.efeitos_magicos: resistencia Necrotico + bloqueio de reducao de PV max. 2) Exibir badge 'Aura de Vida ativa – aliados com 0 PV na aura recuperam 1 PV/turno'.",
+      "campo_char": "char.efeitos_magicos[{ tipo: 'resistencia', tipos_dano: ['Necrótico'] }, { tipo: 'bloquear_reducao_pv_max' }]",
+      "remover_em": "concentracao_quebrada ou 10 minutos",
+      "alvo_por_magia": {
+        "Aura de Vida": { "permite_self": true, "permite_outro": false, "tipo_alvo": "aura", "requer_selecao_alvo": false }
+      },
+      "magias": [
+        {
+          "nome": "Aura de Vida",
+          "circulo": 4,
+          "duracao": "Concentração, até 10 minutos",
+          "concentracao": true,
+          "nota": "Aura de 9m. Afeta aliados Mortos-Vivos tambem (se forem aliados)."
+        }
+      ]
+    },
+
+    {
+      "id": "efeito_composto_banquete",
+      "tipo": "efeito_composto",
+      "prioridade": "media",
+      "complexidade_codigo": "media",
+      "descricao_mecanica": "Apos 1h consumindo o banquete, por 24h: Resistencia a dano Venenoso, Imunidade as condicoes Amedrontado e Envenenado, PV maximos aumentam em 2d10 e recebe esse valor em PV.",
+      "implementacao_tecnica": "1) Ao ativar: rolar 2d10 (ou media 11). 2) Adicionar ao char.pv_max o valor rolado E char.pv_atual o mesmo valor. 3) Registrar em char.efeitos_magicos: resistencia Venenoso + imunidade Amedrontado + imunidade Envenenado. 4) Ao remover o efeito (24h): subtrair 2d10 de char.pv_max (nao deixar pv_max abaixo do base).",
+      "campo_char": "char.pv_max (aumentar temporariamente) + char.efeitos_magicos (resistencia + imunidades)",
+      "remover_em": "duracao_fixa (24 horas)",
+      "alvo_por_magia": {
+        "Banquete de Heróis": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true }
+      },
+      "magias": [
+        {
+          "nome": "Banquete de Heróis",
+          "circulo": 6,
+          "duracao": "Instantânea (efeitos duram 24h)",
+          "concentracao": false,
+          "lanche": "1 hora para consumir",
+          "efeitos_24h": [
+            "Resistência a dano Venenoso",
+            "Imunidade à condição Amedrontado",
+            "Imunidade à condição Envenenado",
+            "PV max +2d10 (e PV atuais sobem o mesmo valor)"
+          ],
+          "nota": "PV max temporariamente elevados devem ser revertidos ao fim das 24h."
+        }
+      ]
+    }
+  ],
+
+  "sem_mecanica_especifica": [
+    {
+      "id": "toast_dano",
+      "tipo": "toast_generico",
+      "prioridade": "baixa",
+      "descricao": "Magias de dano direto a alvos ou areas. Apenas toast de lancamento. Sem mudanca de estado na ficha.",
+      "alvo_padrao": { "permite_self": false, "permite_outro": true, "tipo_alvo": "area", "requer_selecao_alvo": true },
+      "alvo_excecoes": {
+        "Fome de Hadar": { "permite_self": false, "permite_outro": true, "tipo_alvo": "area", "requer_selecao_alvo": true },
+        "Guardiões Espirituais": { "permite_self": true, "permite_outro": false, "tipo_alvo": "aura", "requer_selecao_alvo": false },
+        "Espinho Mental": { "permite_self": false, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true }
+      },
+      "truques": [
+        "Badalar Fúnebre", "Bolha Ácida", "Chama Sagrada", "Explosão Elemental",
+        "Fagulha Estelar", "Palavra de Radiância", "Raio de Gelo", "Raio Místico",
+        "Talho Mental", "Toque Chocante", "Trovão", "Zombaria Perversa"
+      ],
+      "circulo_1": [
+        "Braços de Hadar", "Destruição Cauterizante", "Destruição Colérica",
+        "Destruição Estrondosa", "Faca de Gelo", "Infligir Ferimentos",
+        "Leque Cromático", "Mãos Flamejantes", "Onda Trovejante", "Orbe Cromático",
+        "Raio de Bruxa", "Repreensão Diabólica", "Saraivada de Espinhos", "Sussurros Dissonantes"
+      ],
+      "circulo_2": [
+        "Despedaçar", "Esfera Flamejante", "Raio Lunar", "Raio do Enfraquecimento", "Sopro de Dragão"
+      ],
+      "circulo_3": [
+        "Bola de Fogo", "Destruição Cegante", "Flecha Relâmpago",
+        "Fome de Hadar", "Invocar Barragem", "Relâmpago"
+      ],
+      "circulo_4": [
+        "Destruição Atordoante", "Esfera Vitriólica", "Tempestade Glacial"
+      ],
+      "circulo_5": [
+        "Coluna de Chamas", "Cone de Frio", "Estática Sináptica",
+        "Invocar Saraivada", "Onda Destrutiva"
+      ],
+      "circulo_6": [
+        "Barreira de Lâminas", "Círculo da Morte", "Corrente de Relâmpagos",
+        "Desintegrar", "Raio Solar"
+      ],
+      "circulo_7": [
+        "Bola de Fogo Adiável", "Dedo da Morte", "Rajada Prismática", "Tempestade de Fogo"
+      ],
+      "circulo_8": ["Explosão Solar", "Suplício"],
+      "circulo_9": ["Chuva de Meteoros", "Tempestade da Vingança", "Tsunami"],
+      "notas_especiais": {
+        "Raio Guia": "Circulo 1. Primariamente dano Radiante (4d6). Efeito secundario: alvo fica marcado e proximo ataque contra ele tem Vantagem. Toast com nota do efeito secundario.",
+        "Fogo das Fadas": "Circulo 1. Ilumina alvos concedendo Vantagem a TODOS que os attackem. Toast informando efeito.",
+        "Lâmina Flamejante": "Circulo 2. Cria espada ilusoria de fogo. Requer Acao Bonus para usar. Toast.",
+        "Espinho Mental": "Circulo 2. Dano Psiquico ao ALVO (nao ao conjurador). Toast.",
+        "Guardiões Espirituais": "Circulo 3. Dano em area de 4,5m ao redor do conjurador. Toast com nota de aura de dano ativa.",
+        "Palavra Sagrada": "Circulo 7. Condicoes em inimigos baseado em PV. Toast.",
+        "Palavra de Poder: Atordoar": "Circulo 8. Atordoa alvo baseado em PV. Toast.",
+        "Palavra de Poder: Salvar": "Circulo 9. Cura alvo com <= PV definido. Toast."
+      }
+    },
+
+    {
+      "id": "toast_controle",
+      "tipo": "toast_generico",
+      "prioridade": "baixa",
+      "descricao": "Magias de controle de inimigos (condicoes, compulsao, encantamento). Efeitos aplicam-se em alvos externos, sem mudanca de estado da ficha do conjurador.",
+      "alvo_padrao": { "permite_self": false, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true },
+      "alvo_excecoes": {
+        "Emaranhar": { "permite_self": false, "permite_outro": true, "tipo_alvo": "area", "requer_selecao_alvo": true },
+        "Teia": { "permite_self": false, "permite_outro": true, "tipo_alvo": "area", "requer_selecao_alvo": true },
+        "Símbolo": { "permite_self": false, "permite_outro": false, "tipo_alvo": "area", "requer_selecao_alvo": true }
+      },
+      "circulo_1": [
+        "Amizade Animal", "Comando", "Danação", "Duelo Compelido", "Emaranhar",
+        "Enfeitiçar Pessoa", "Gargalhada Nefasta de Tasha", "Golpe Constritor",
+        "Perdição", "Sono"
+      ],
+      "circulo_2": [
+        "Acalmar Emoções", "Cativar", "Cegueira/Surdez", "Coroa da Loucura",
+        "Paralisar Pessoa", "Sugestão", "Teia", "Turvar", "Zona da Verdade"
+      ],
+      "circulo_3": ["Medo", "Padrão Hipnótico", "Rogar Maldição"],
+      "circulo_4": [
+        "Banimento", "Compulsão", "Confusão", "Dominar Fera",
+        "Enfeitiçar Monstro", "Tentáculos Negros de Evard", "Vinha Agarradora"
+      ],
+      "circulo_5": [
+        "Antipatia/Simpatia", "Destruição Banidora", "Dominar Pessoa",
+        "Missão", "Paralisar Monstro", "Presença Régia de Yolande",
+        "Telecinese"
+      ],
+      "circulo_6": [
+        "Dança Irresistível de Otto", "De Carne para Pedra",
+        "Modificar Memória", "Mau Olhado", "Sugestão em Massa"
+      ],
+      "circulo_7": ["Símbolo"],
+      "circulo_8": ["Dominar Monstro", "Palavra de Poder: Atordoar"],
+      "circulo_9": ["Aprisionamento", "Encarnação Fantasmagórica", "Palavra de Poder: Salvar"]
+    },
+
+    {
+      "id": "toast_invocar",
+      "tipo": "toast_generico",
+      "prioridade": "baixa",
+      "descricao": "Invocacoes de criaturas, objetos animados e guardioes. Implementacao de ficha de companheiro e gerenciamento de aliados estao fora do escopo desta versao.",
+      "alvo_padrao": { "permite_self": false, "permite_outro": false, "tipo_alvo": "invocacao", "requer_selecao_alvo": true },
+      "alvo_excecoes": {
+        "Polimorfia": { "permite_self": true, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true },
+        "Arma Espiritual": { "permite_self": false, "permite_outro": false, "tipo_alvo": "invocacao", "requer_selecao_alvo": true }
+      },
+      "circulo_1": ["Convocar Familiar", "Servo Invisível"],
+      "circulo_2": ["Arma Espiritual"],
+      "circulo_3": [
+        "Animar Mortos", "Convocar Feérico", "Invocar Animais",
+        "Invocar Morto-Vivo", "Montaria Fantasmagórica"
+      ],
+      "circulo_4": [
+        "Cão Fiel de Mordenkainen", "Convocar Elemental", "Defensor da Fé",
+        "Inseto Gigante", "Invocar Aberração", "Invocar Constructo",
+        "Invocar Seres da Floresta", "Polimorfia"
+      ],
+      "circulo_5": [
+        "Animar Objetos", "Convocar Celestial", "Invocar Dragão",
+        "Invocar Elemental", "Mão de Bigby"
+      ],
+      "circulo_6": ["Criar Mortos-Vivos", "Invocar Feérico", "Invocar Ínfero"],
+      "circulo_7": ["Espada de Mordenkainen", "Invocar Celestial"],
+      "circulo_8": ["Formas Animais"],
+      "notas": "Guardioes Espirituais (circulo 3) e Defensor da Fe (circulo 4) criam presencas que causam dano a inimigos. Toast com descricao do efeito. Polimorfia e Encarnacao Fantasmagorica sao muito complexas para automatizacao."
+    },
+
+    {
+      "id": "toast_utilidade",
+      "tipo": "toast_generico",
+      "prioridade": "baixa",
+      "descricao": "Magias de utilidade, ilusao, transmutacao ou narrativa sem impacto direto nas mecanicas da ficha de combate.",
+      "alvo_padrao": { "permite_self": true, "permite_outro": true, "tipo_alvo": "variavel", "requer_selecao_alvo": true },
+      "alvo_excecoes": {
+        "Taumaturgia": { "permite_self": true, "permite_outro": false, "tipo_alvo": "self", "requer_selecao_alvo": false },
+        "Contramagia": { "permite_self": false, "permite_outro": true, "tipo_alvo": "criatura", "requer_selecao_alvo": true },
+        "Desejo": { "permite_self": true, "permite_outro": true, "tipo_alvo": "variavel", "requer_selecao_alvo": true }
+      },
+      "truques": ["Amigos", "Luzes Dançantes", "Taumaturgia"],
+      "circulo_1": [
+        "Bom Fruto", "Fogo das Fadas", "Graxa", "Marca do Predador"
+      ],
+      "circulo_2": [
+        "Alterar-se", "Corda Extradimensional", "Cordão de Flechas",
+        "Detectar Pensamentos", "Força Espectral", "Lufada de Vento",
+        "Mensageiro Animal", "Silêncio", "Ver o Invisível"
+      ],
+      "circulo_3": [
+        "Clarividência", "Círculo Mágico", "Convocar Relâmpagos",
+        "Contramagia", "Crescimento de Plantas", "Glifo de Proteção",
+        "Imagem Maior", "Muralha de Vento", "Nevasca",
+        "Nuvem Fétida", "Sinal de Esperança"
+      ],
+      "circulo_4": [
+        "Assassino Fantasmagórico", "Controlar Água", "Esfera Resiliente de Otiluke",
+        "Fonte do Luar", "Malogro", "Muralha de Fogo", "Olho Arcano"
+      ],
+      "circulo_5": [
+        "Âncora Planar", "Consagrar", "Contágio", "Contato Extraplanar",
+        "Despertar", "Dissipar o Bem e o Mal", "Névoa Mortal", "Similaridade",
+        "Sonho", "Vidência"
+      ],
+      "circulo_6": [
+        "Caldeirão Borbulhante de Tasha", "Invocação Instantânea de Drawmij",
+        "Mover Terra", "Muralha de Espinhos", "Muralha de Gelo",
+        "Portais Arcanos", "Proteger Fortaleza", "Receptáculo Arcano"
+      ],
+      "circulo_7": [
+        "Cárcere de Energia", "Inverter a Gravidade", "Refugiar",
+        "Muralha Prismática"
+      ],
+      "circulo_8": ["Nuvem Incendiária", "Semiplano", "Terremoto"],
+      "circulo_9": ["Desejo", "Metamorfose", "Polimorfia Total", "Sexto Sentido"],
+      "notas_especiais": {
+        "Bom Fruto": "Circulo 1. Cria frutos que curam 1d8 PV ao serem consumidos. Poderia virar cura_pv ao clicar 'consumir fruto'. Prioridade media.",
+        "Marca do Predador": "Circulo 1 (Guardiao). Dano extra + vantagem em rastreio. Mecânica de classe específica.",
+        "Sinal de Esperança": "Circulo 3. Aumenta cura maxima de magias de cura dentro da aura. Toast informativo.",
+        "Dissipar o Bem e o Mal": "Circulo 5. Protecao temporaria similar a Protecao Contra o Bem e o Mal. Poderia virar protecao_magica.",
+        "Sexto Sentido": "Circulo 9. Varios beneficios de percepcao e nao-surpresa por 8h. Poderia virar buff_percepcao.",
+        "Similaridade": "Circulo 5. Copia ilusoria de si mesmo para distrair. Badge informativo."
+      }
+    }
+  ],
+
+  "resumo": {
+    "total_grupos_com_mecanica": 16,
+    "total_grupos_toast": 4,
+    "magias_com_mecanica_especifica": [
+      "Vitalidade Vazia", "Reflexos", "Proteção Contra Lâminas",
+      "Invisibilidade", "Invisibilidade Maior", "Despistar",
+      "Forma Gasosa", "Santuário", "Simular Morte", "Mesclar-se às Rochas",
+      "Proteção Contra Energia", "Pele-Rocha",
+      "Proteção Contra Veneno",
+      "Proteção Contra o Bem e o Mal",
+      "Aura de Pureza",
+      "Bênção",
+      "Arma Mágica", "Arma Elemental", "Aljava Veloz",
+      "Círculo de Poder", "Aura Sagrada",
+      "Passos Largos", "Retirada Acelerada", "Escalada de Aranha",
+      "Levitação", "Voo", "Movimentação Livre",
+      "Caminhar Sobre as Águas", "Caminhar no Vento",
+      "Passo Sem Rastro", "Aprimorar Atributo",
+      "Cura Completa", "Cura Completa em Massa", "Reviver os Mortos", "Ressurreição",
+      "Restauração Menor", "Restauração Maior", "Limpar a Mente",
+      "Armadura de Agathys", "Heroísmo",
+      "Escudo Ardente", "Aura de Vida", "Banquete de Heróis"
+    ],
+    "total_magias_com_mecanica": 43,
+    "já_implementadas_no_codigo": [
+      "Armadura Arcana", "Escudo Arcano", "Escudo da Fé",
+      "Pele-Casca", "Vínculo de Proteção", "Celeridade", "Lentidão"
+    ],
+    "prioridade_sugerida_implementacao": [
+      "1. cura_pv (Cura Completa, Reviver os Mortos, Ressurreição)",
+      "2. cura_condicao (Restauração Menor, Restauração Maior, Limpar a Mente)",
+      "3. pv_temporarios (Vitalidade Vazia)",
+      "4. efeito_composto_armadura_agathys + efeito_composto_heroismo",
+      "5. condicao_self_invisivel (Invisibilidade, Invisibilidade Maior)",
+      "6. resistencia_temporaria (Proteção Contra Energia, Pele-Rocha)",
+      "7. buff_ataque_save_bencao (Bênção)",
+      "8. efeito_composto_escudo_ardente",
+      "9. buff_deslocamento (Voo, Passos Largos, Movimentação Livre)",
+      "10. demais grupos conforme necessidade"
+    ]
+  }
+}
