@@ -2852,8 +2852,12 @@ function renderFichaCompleta() {
           ${(() => {
             const efs = char.efeitos_magicos || [];
             // Deduplicar por nome base (compostos geram filhos com " (Reativo)" etc.)
+            // Excluir concentracao_generica (so aparece no indicador de condicoes)
             const vistos = new Set();
-            const unicos = efs.filter(ef => { const base = ef.nome.replace(/ \(.*\)$/, ''); if (vistos.has(base)) return false; vistos.add(base); return true; });
+            const unicos = efs.filter(ef => {
+              if (ef.tipo === 'concentracao_generica') return false;
+              const base = ef.nome.replace(/ \(.*\)$/, ''); if (vistos.has(base)) return false; vistos.add(base); return true;
+            });
             if (unicos.length === 0) return '';
             return `<div style="font-size:0.6rem;margin-top:2px">${unicos.map(ef => {
               const base = ef.nome.replace(/ \(.*\)$/, '');
@@ -3527,6 +3531,27 @@ function setupEventosDescanso() {
       salvar();
       renderFichaCompleta();
       toast(`Efeito de ${nome} removido.`, 'info');
+    });
+  });
+
+  // Quebrar concentracao manualmente
+  document.querySelectorAll('[data-quebrar-concentracao]').forEach(el => {
+    el.addEventListener('click', () => {
+      const concAtiva = getConcentracaoAtiva();
+      if (!concAtiva) return;
+      // Reverter bonus de PV maximo se necessario
+      const efsPVMax = (char.efeitos_magicos || []).filter(e => e.concentracao && e.tipo === 'bonus_pv_max');
+      for (const ef of efsPVMax) {
+        if (char.pv_max_override) {
+          char.pv_max_override -= ef.valor || 0;
+          if (char.pv_max_override <= char.pv_max) delete char.pv_max_override;
+          char.pv_atual = Math.min(char.pv_atual, char.pv_max_override || char.pv_max);
+        }
+      }
+      char.efeitos_magicos = (char.efeitos_magicos || []).filter(e => !e.concentracao);
+      salvar();
+      renderFichaCompleta();
+      toast(`Concentração em ${concAtiva} encerrada.`, 'info');
     });
   });
 
@@ -12430,6 +12455,40 @@ const MAGIAS_EFEITO = {
   ], concentracao: false, permite_self: true, permite_outro: true, rotulo: 'Resist. Venenoso + Imunidades + PV máx +2d10 (24h)' }
 };
 
+// Retorna o nome da magia de concentracao ativa (ou null)
+function getConcentracaoAtiva() {
+  const efMag = char.efeitos_magicos || [];
+  const ef = efMag.find(e => e.concentracao);
+  return ef ? ef.nome.replace(/ \(.*\)$/, '') : null;
+}
+
+// Verifica se uma magia e de concentracao (via MAGIAS_EFEITO ou indiceMagiasCache)
+function ehMagiaConcentracao(nomeMagia) {
+  const config = MAGIAS_EFEITO[nomeMagia];
+  if (config) return !!config.concentracao;
+  const info = indiceMagiasCache?.find(m => m.nome === nomeMagia);
+  if (info?.duracao) return /concentra/i.test(info.duracao);
+  return false;
+}
+
+// Modal de confirmacao para substituir concentracao ativa
+function confirmarSubstituirConcentracao(magiaAtual, magiaNova, onConfirmar, onCancelar) {
+  abrirModal('Substituir Concentração', `
+    <div style="text-align:center;margin-bottom:12px">
+      <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">Você está concentrado em:</div>
+      <div style="font-size:1.1rem;font-weight:700;color:var(--warning);margin-bottom:12px">${magiaAtual}</div>
+      <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:4px">Conjurar <strong>${magiaNova}</strong> cancelará a concentração atual.</div>
+      <div style="font-size:0.8rem;color:var(--danger);margin-top:8px">Deseja continuar?</div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:16px">
+      <button class="btn btn-danger" id="conc-confirmar">Sim, conjurar ${magiaNova}</button>
+      <button class="btn btn-secondary" id="conc-cancelar">Cancelar</button>
+    </div>
+  `, '');
+  document.getElementById('conc-confirmar')?.addEventListener('click', () => { window.fecharModal(); onConfirmar(); });
+  document.getElementById('conc-cancelar')?.addEventListener('click', () => { window.fecharModal(); if (onCancelar) onCancelar(); });
+}
+
 // Aplica efeito mecanico da magia no personagem. Retorna {detalhe} para toast ou null.
 function aplicarEfeitoMagico(nomeMagia, circ, opcoes) {
   if (!opcoes) opcoes = {};
@@ -12723,6 +12782,13 @@ function setupEventosEspacosMagia() {
         return;
       }
 
+      // Verificar conflito de concentracao ANTES de prosseguir
+      const magiaEhConc = ehMagiaConcentracao(nome);
+      const concAtiva = getConcentracaoAtiva();
+      const temConflitoConc = magiaEhConc && concAtiva && concAtiva !== nome;
+
+      const _prosseguirConjuracao = () => {
+
       const config = MAGIAS_EFEITO[nome];
       if (config) {
         const precisaAlvo = config.permite_self && config.permite_outro;
@@ -12766,6 +12832,15 @@ function setupEventosEspacosMagia() {
 
       // Magia sem efeito especifico - apenas gasta slot e mostra toast
       _executarConjuracao(nome, circ, btn.dataset.conjCirc, false);
+
+      }; // fim de _prosseguirConjuracao
+
+      // Se ha conflito de concentracao, pedir confirmacao
+      if (temConflitoConc) {
+        confirmarSubstituirConcentracao(concAtiva, nome, _prosseguirConjuracao);
+      } else {
+        _prosseguirConjuracao();
+      }
     });
   });
 
@@ -12783,6 +12858,16 @@ function setupEventosEspacosMagia() {
     let resultado = null;
     if (aplicarEfeitoSelf) {
       resultado = aplicarEfeitoMagico(nome, circ, opcoes);
+    }
+
+    // Rastrear concentracao de magias sem mecanica no MAGIAS_EFEITO
+    const magiaTemConc = ehMagiaConcentracao(nome);
+    if (magiaTemConc && !aplicarEfeitoSelf) {
+      if (!char.efeitos_magicos) char.efeitos_magicos = [];
+      // Remover concentracoes anteriores
+      char.efeitos_magicos = char.efeitos_magicos.filter(e => !e.concentracao);
+      // Registrar concentracao generica
+      char.efeitos_magicos.push({ nome: nome, tipo: 'concentracao_generica', concentracao: true, circulo: parseInt(circ) || 0, rotulo: `Concentrando em ${nome}` });
     }
 
     salvar();
@@ -13881,6 +13966,17 @@ function renderSecaoCondicoes() {
         <h2>Condicoes${temCondicao ? ` (${condicoes.length})` : ''}</h2>
         <button class="btn btn-sm btn-secondary no-print" id="btn-gerenciar-condicoes">Gerenciar</button>
       </div>
+      ${(() => {
+        const concAtiva = getConcentracaoAtiva();
+        if (!concAtiva) return '';
+        return `
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;margin-bottom:6px;background:linear-gradient(90deg, rgba(193,122,0,0.1), transparent);border-left:3px solid var(--warning);border-radius:var(--radius-sm)">
+            <span style="font-size:0.85rem;font-weight:700;color:var(--warning)">Concentrando:</span>
+            <span style="font-size:0.85rem;font-weight:600">${concAtiva}</span>
+            <button class="btn btn-sm btn-secondary no-print" style="margin-left:auto;font-size:0.65rem;padding:2px 8px" data-quebrar-concentracao="1">Quebrar</button>
+          </div>
+        `;
+      })()}
       ${furiaIrracionalAtiva ? `
         <div style="display:flex;flex-wrap:wrap;gap:6px;padding:4px 0;margin-bottom:4px">
           <span class="badge" style="font-size:0.7rem;padding:3px 7px;background:var(--success);color:#fff">Imune: Amedrontado (Furia Irracional)</span>
