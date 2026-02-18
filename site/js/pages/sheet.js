@@ -13108,7 +13108,7 @@ async function mostrarBuscaMagia() {
       ${Object.keys(magiasCirculo).map(c => `<div class="tab" data-tab-mg="${c}">${c}º Círculo</div>`).join('')}
     </div>
     <div class="search-box"><input type="text" id="busca-magia-add" placeholder="Buscar magia..." class="form-input"></div>
-    <div id="resultado-magias" style="max-height:50vh;overflow-y:auto"></div>
+    <div id="resultado-magias" style="min-height:35dvh;max-height:50dvh;overflow-y:auto"></div>
   `, '', () => renderFichaCompleta());
 
   const resultadoEl = document.getElementById('resultado-magias');
@@ -13453,7 +13453,7 @@ async function mostrarBuscaGrimorio() {
       <small>Disponível: ${char.po || 0} PO</small>
     </div>
     <div class="search-box"><input type="text" id="busca-grimorio" placeholder="Buscar magia de Mago..." class="form-input" autofocus></div>
-    <div id="resultado-grimorio" style="max-height:50vh;overflow-y:auto"></div>
+    <div id="resultado-grimorio" style="min-height:35dvh;max-height:50dvh;overflow-y:auto"></div>
   `);
 
   const resultadoEl = document.getElementById('resultado-grimorio');
@@ -13561,7 +13561,7 @@ async function mostrarTrocaMagias(callbackPosTroca = null) {
       ${Object.keys(magiasCirculo).map(c => `<div class="tab" data-tab-troca="${c}">${c}º Círculo</div>`).join('')}
     </div>
     <div class="search-box"><input type="text" id="busca-troca-magia" placeholder="Buscar magia..." class="form-input"></div>
-    <div id="resultado-troca" style="max-height:50vh;overflow-y:auto"></div>
+    <div id="resultado-troca" style="min-height:35dvh;max-height:50dvh;overflow-y:auto"></div>
   `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-confirmar-troca">Confirmar</button>');
 
   const resultadoEl = document.getElementById('resultado-troca');
@@ -15138,7 +15138,7 @@ async function mostrarSeletorCategoria() {
         </button>
       `).join('')}
     </div>
-    <div id="lista-inv-cat" style="max-height:50vh;overflow-y:auto"></div>
+    <div id="lista-inv-cat" style="min-height:35dvh;max-height:50dvh;overflow-y:auto"></div>
   `;
 
   abrirModal('Adicionar Item', html);

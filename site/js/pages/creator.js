@@ -3073,7 +3073,7 @@ function mostrarSeletorArma() {
       <button class="btn btn-sm btn-outline filtro-arma" data-filtro="simples">Simples</button>
       <button class="btn btn-sm btn-outline filtro-arma" data-filtro="marcial">Marcial</button>
     </div>
-    <div id="lista-armas" style="max-height:50vh;overflow-y:auto">
+    <div id="lista-armas" style="min-height:35dvh;max-height:50dvh;overflow-y:auto">
       ${armasOrdenadas.map((a, i) => {
         const prof = temProficienciaArma(a);
         const tipoCateg = a.categoria?.includes('Simples') ? 'simples' : 'marcial';
@@ -3151,7 +3151,7 @@ function mostrarSeletorArmadura() {
       <button class="btn btn-sm btn-outline filtro-armadura" data-filtro="média">Média</button>
       <button class="btn btn-sm btn-outline filtro-armadura" data-filtro="pesada">Pesada</button>
     </div>
-    <div id="lista-armaduras" style="max-height:55vh;overflow-y:auto">
+    <div id="lista-armaduras" style="min-height:35dvh;max-height:50dvh;overflow-y:auto">
       ${armadurasOrdenadas.map((a, i) => {
         const prof = temProficienciaArmadura(a);
         const reqOk = atendeRequisitoForca(a);
@@ -3207,7 +3207,7 @@ function mostrarSeletorItem() {
   const itens = dadosCache.equipAvent || [];
   const html = `
     <div class="search-box"><input type="text" id="busca-item" placeholder="Buscar item..." class="form-input"></div>
-    <div id="lista-itens" style="max-height:50vh;overflow-y:auto">
+    <div id="lista-itens" style="min-height:35dvh;max-height:50dvh;overflow-y:auto">
       ${itens.map((it, i) => `
         <div class="inv-item" style="cursor:pointer" data-item-idx="${i}">
           <div>
