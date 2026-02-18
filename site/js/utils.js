@@ -111,6 +111,21 @@ export function calcCA(personagem) {
     ca += parseInt(i.dados.bonus_ca) || 0;
   });
 
+  // Efeitos mágicos ativos que afetam CA
+  const efeitos = personagem.efeitos_magicos || [];
+  for (const ef of efeitos) {
+    if (ef.tipo_efeito === 'bonus') {
+      ca += ef.valor || 0;
+    } else if (ef.tipo_efeito === 'base') {
+      // CA base substitui (ex: Armadura Arcana = 13 + Des)
+      const caBase = (ef.valor || 13) + modDes;
+      if (caBase > ca) ca = caBase;
+    } else if (ef.tipo_efeito === 'minimo') {
+      // CA mínima (ex: Pele-Casca = mín 17)
+      if ((ef.valor || 0) > ca) ca = ef.valor;
+    }
+  }
+
   return ca;
 }
 

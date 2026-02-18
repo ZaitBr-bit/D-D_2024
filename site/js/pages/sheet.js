@@ -2822,6 +2822,15 @@ function renderFichaCompleta() {
         <div class="stat-box">
           <div class="stat-label">CA</div>
           <div class="stat-value">${ca}</div>
+          ${(char.efeitos_magicos || []).length > 0 ? `
+            <div style="font-size:0.6rem;margin-top:2px">
+              ${char.efeitos_magicos.map(ef => `
+                <span class="no-print" style="display:inline-flex;align-items:center;gap:2px;background:var(--accent);color:#fff;padding:1px 5px;border-radius:8px;margin:1px;cursor:pointer;font-size:0.6rem" data-remover-efeito="${ef.nome}" title="Remover efeito de ${ef.nome}">
+                  ${ef.nome}${ef.concentracao ? ' (C)' : ''} &times;
+                </span>
+              `).join('')}
+            </div>
+          ` : ''}
         </div>
         <div class="stat-box">
           <div class="stat-label">Iniciativa</div>
@@ -3464,6 +3473,17 @@ function restaurarHabilidades(tipoDescanso) {
 }
 
 function setupEventosDescanso() {
+  // Remover efeitos mágicos ativos (badge na CA)
+  document.querySelectorAll('[data-remover-efeito]').forEach(el => {
+    el.addEventListener('click', () => {
+      const nome = el.dataset.removerEfeito;
+      char.efeitos_magicos = (char.efeitos_magicos || []).filter(e => e.nome !== nome);
+      salvar();
+      renderFichaCompleta();
+      toast(`Efeito de ${nome} removido.`, 'info');
+    });
+  });
+
   // Inspiração Heroica (toggle estrela)
   document.getElementById('inspiracao-toggle')?.addEventListener('click', () => {
     char.inspiracao_heroica = !char.inspiracao_heroica;
@@ -3716,6 +3736,8 @@ function setupEventosDescanso() {
         char.espacos_magia[k].usados = 0;
       });
     }
+    // Limpar efeitos mágicos ativos
+    char.efeitos_magicos = [];
     // Restaurar todas as habilidades
     restaurarHabilidades('longo');
 
@@ -12133,7 +12155,7 @@ function renderSecaoMagias() {
                     ${badgesMagiaRapidos(m.nome)}
                     <div style="font-size:0.65rem;color:var(--secondary);font-weight:600;margin-top:1px">Espécie</div>
                   </div>
-                  <button class="btn btn-sm btn-primary" data-conjurar="${m.nome}" data-conj-circ="0">Conjurar</button>
+                  <button class="btn btn-sm btn-cantrip" data-lancar-truque="${m.nome}">Lançar</button>
                 </div>
                 <div class="magia-desc"></div>
               </div>
@@ -12146,7 +12168,7 @@ function renderSecaoMagias() {
                     ${badgesMagiaRapidos(m.nome)}
                     <div style="font-size:0.65rem;color:var(--secondary);font-weight:600;margin-top:1px">${rotuloOrigemMagia(m)}</div>
                   </div>
-                  <button class="btn btn-sm btn-primary" data-conjurar="${m.nome}" data-conj-circ="0">Conjurar</button>
+                  <button class="btn btn-sm btn-cantrip" data-lancar-truque="${m.nome}">Lançar</button>
                 </div>
                 <div class="magia-desc"></div>
               </div>
@@ -12164,7 +12186,7 @@ function renderSecaoMagias() {
                     ${badgesMagiaRapidos(m.nome)}
                     ${modHtml}
                   </div>
-                  <button class="btn btn-sm btn-primary" data-conjurar="${m.nome}" data-conj-circ="0">Conjurar</button>
+                  <button class="btn btn-sm btn-cantrip" data-lancar-truque="${m.nome}">Lançar</button>
                 </div>
                 <div class="magia-desc"></div>
               </div>`;
@@ -12233,6 +12255,60 @@ function renderSecaoMagias() {
   `;
 }
 
+// Mapa de magias que afetam CA quando conjuradas em si mesmo
+const MAGIAS_EFEITO_CA = {
+  'Armadura Arcana':  { tipo_efeito: 'base', valor: 13, concentracao: false, permite_self: true, permite_outro: true, rotulo: 'CA = 13 + Des' },
+  'Escudo Arcano':    { tipo_efeito: 'bonus', valor: 5, concentracao: false, permite_self: true, permite_outro: false, rotulo: '+5 CA (1 rodada)' },
+  'Escudo da Fé':     { tipo_efeito: 'bonus', valor: 2, concentracao: true, permite_self: true, permite_outro: true, rotulo: '+2 CA (concentração)' },
+  'Pele-Casca':       { tipo_efeito: 'minimo', valor: 17, concentracao: true, permite_self: true, permite_outro: true, rotulo: 'CA mín. 17 (concentração)' },
+  'Vínculo de Proteção': { tipo_efeito: null, concentracao: false, permite_self: false, permite_outro: true, rotulo: 'Apenas outro alvo' },
+  'Celeridade':       { tipo_efeito: 'bonus', valor: 2, concentracao: true, permite_self: true, permite_outro: true, rotulo: '+2 CA (concentração)' },
+  'Lentidão':         { tipo_efeito: null, concentracao: true, permite_self: false, permite_outro: true, rotulo: 'Apenas inimigos' }
+};
+
+function aplicarEfeitoMagico(nomeMagia, circ) {
+  const config = MAGIAS_EFEITO_CA[nomeMagia];
+  if (!config || !config.tipo_efeito) return;
+
+  if (!char.efeitos_magicos) char.efeitos_magicos = [];
+
+  // Se for concentração, remover efeitos de concentração anteriores
+  if (config.concentracao) {
+    char.efeitos_magicos = char.efeitos_magicos.filter(e => !e.concentracao);
+  }
+
+  // Remover efeito duplicado da mesma magia
+  char.efeitos_magicos = char.efeitos_magicos.filter(e => e.nome !== nomeMagia);
+
+  char.efeitos_magicos.push({
+    nome: nomeMagia,
+    tipo_efeito: config.tipo_efeito,
+    valor: config.valor,
+    concentracao: config.concentracao,
+    circulo: parseInt(circ)
+  });
+}
+
+function mostrarModalAlvoMagia(nomeMagia, circ, onEscolha) {
+  const config = MAGIAS_EFEITO_CA[nomeMagia];
+  if (!config) { onEscolha('self'); return; }
+  if (config.permite_self && !config.permite_outro) { onEscolha('self'); return; }
+  if (!config.permite_self && config.permite_outro) { onEscolha('outro'); return; }
+
+  abrirModal('Alvo da Magia', `
+    <div style="text-align:center;margin-bottom:12px">
+      <strong>${nomeMagia}</strong> (${circ}º Círculo)
+      <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">${config.rotulo}</div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center">
+      <button class="btn btn-primary" id="alvo-self">Em mim</button>
+      <button class="btn btn-secondary" id="alvo-outro">Outra criatura</button>
+    </div>
+  `, '');
+  document.getElementById('alvo-self')?.addEventListener('click', () => { window.fecharModal(); onEscolha('self'); });
+  document.getElementById('alvo-outro')?.addEventListener('click', () => { window.fecharModal(); onEscolha('outro'); });
+}
+
 function setupEventosEspacosMagia() {
   // Clicar nas bolhas de espaço de magia
   document.querySelectorAll('.slot-bolha').forEach(el => {
@@ -12271,25 +12347,60 @@ function setupEventosEspacosMagia() {
         toast(`Sem espaços de ${circ}º círculo!`, 'error');
         return;
       }
-      char.espacos_magia[circ].usados++;
 
-      if (char.classe === 'Feiticeiro' && semAcento(char.subclasse || '') === semAcento('Feitiçaria Selvagem')) {
-        const estadoFeiticeiro = getEstadoRecursosFeiticeiro();
-        if (estadoFeiticeiro && !estadoFeiticeiro.subclasses.selvagem.mares_caos_disponivel) {
-          char.recursos.feiticeiro.subclasses.selvagem.mares_caos_disponivel = true;
-          char.recursos.feiticeiro.subclasses.selvagem.surto_pendente_automatico = true;
-        }
+      // Verifica se é magia que afeta CA e precisa de seleção de alvo
+      const configCA = MAGIAS_EFEITO_CA[nome];
+      if (configCA && configCA.permite_self && configCA.permite_outro) {
+        mostrarModalAlvoMagia(nome, circ, (alvo) => {
+          _executarConjuracao(nome, circ, btn.dataset.conjCirc, alvo === 'self');
+        });
+        return;
       }
 
-      salvar();
-      const baseCirc = btn.dataset.conjCirc;
-      const upcast = parseInt(circ) > parseInt(baseCirc);
-      if (char.classe === 'Feiticeiro' && semAcento(char.subclasse || '') === semAcento('Feitiçaria Selvagem') && char.recursos?.feiticeiro?.subclasses?.selvagem?.surto_pendente_automatico) {
-        toast(`${nome} conjurada${upcast ? ` no ${circ}º círculo` : ''}! Surto de Magia Selvagem automático pendente.`, 'success');
-      } else {
-        toast(`${nome} conjurada${upcast ? ` no ${circ}º círculo` : ''}!`, 'success');
+      // Magia que só afeta self (ex: Escudo Arcano) aplica automaticamente
+      const aplicarSelf = configCA && configCA.permite_self && !configCA.permite_outro;
+      _executarConjuracao(nome, circ, btn.dataset.conjCirc, aplicarSelf);
+    });
+  });
+
+  function _executarConjuracao(nome, circ, baseCirc, aplicarEfeitoSelf) {
+    char.espacos_magia[circ].usados++;
+
+    if (char.classe === 'Feiticeiro' && semAcento(char.subclasse || '') === semAcento('Feitiçaria Selvagem')) {
+      const estadoFeiticeiro = getEstadoRecursosFeiticeiro();
+      if (estadoFeiticeiro && !estadoFeiticeiro.subclasses.selvagem.mares_caos_disponivel) {
+        char.recursos.feiticeiro.subclasses.selvagem.mares_caos_disponivel = true;
+        char.recursos.feiticeiro.subclasses.selvagem.surto_pendente_automatico = true;
       }
-      renderFichaCompleta();
+    }
+
+    // Aplicar efeito na CA se for alvo self
+    if (aplicarEfeitoSelf) {
+      aplicarEfeitoMagico(nome, circ);
+    }
+
+    salvar();
+    const upcast = parseInt(circ) > parseInt(baseCirc);
+    const sufixoAlvo = aplicarEfeitoSelf ? ' (em você)' : '';
+    if (char.classe === 'Feiticeiro' && semAcento(char.subclasse || '') === semAcento('Feitiçaria Selvagem') && char.recursos?.feiticeiro?.subclasses?.selvagem?.surto_pendente_automatico) {
+      toast(`${nome} conjurada${upcast ? ` no ${circ}º círculo` : ''}${sufixoAlvo}! Surto de Magia Selvagem automático pendente.`, 'success');
+    } else {
+      toast(`${nome} conjurada${upcast ? ` no ${circ}º círculo` : ''}${sufixoAlvo}!`, 'success');
+    }
+    renderFichaCompleta();
+  }
+
+  // Lançar truque (não gasta espaço de magia)
+  document.querySelectorAll('[data-lancar-truque]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const estadoFuria = getEstadoFuria();
+      if (estadoFuria?.ativa) {
+        toast('Não é possível conjurar magias enquanto a Fúria estiver ativa.', 'error');
+        return;
+      }
+      const nome = btn.dataset.lancarTruque;
+      toast(`${nome} lançado!`, 'success');
     });
   });
 
@@ -14075,11 +14186,53 @@ function setupEventosInventarioSheet() {
 
   // Editar PO
   document.getElementById('btn-edit-po')?.addEventListener('click', () => {
-    abrirModal('Pecas de Ouro', `
-      <div class="form-group"><label class="form-label" for="edit-po">PO</label><input type="number" class="form-input" id="edit-po" value="${char.po || 0}" min="0"></div>
-    `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-po">Salvar</button>');
+    abrirModal('Peças de Ouro', `
+      <div style="text-align:center;margin-bottom:12px">
+        <div style="font-size:1.3rem;font-weight:700;color:var(--primary)">${char.po || 0} PO</div>
+        <div style="font-size:0.75rem;color:var(--text-muted)">Saldo atual</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:flex-end;margin-bottom:12px">
+        <div class="form-group" style="flex:1;margin-bottom:0">
+          <label class="form-label" for="edit-po-qtd">Quantidade</label>
+          <input type="number" class="form-input" id="edit-po-qtd" value="0" min="0">
+        </div>
+        <button class="btn btn-success btn-sm" id="btn-po-add" style="height:40px">+ Adicionar</button>
+        <button class="btn btn-danger btn-sm" id="btn-po-sub" style="height:40px">- Remover</button>
+      </div>
+      <div style="border-top:1px solid var(--border-light);padding-top:8px;margin-top:4px">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label" for="edit-po-total">Definir valor total</label>
+          <input type="number" class="form-input" id="edit-po-total" value="${char.po || 0}" min="0">
+        </div>
+      </div>
+    `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-po">Salvar Total</button>');
+
+    document.getElementById('btn-po-add')?.addEventListener('click', () => {
+      const qtd = parseInt(document.getElementById('edit-po-qtd')?.value) || 0;
+      if (qtd <= 0) return;
+      char.po = (char.po || 0) + qtd;
+      salvar();
+      window.fecharModal();
+      renderFichaCompleta();
+      toast(`+${qtd} PO adicionadas! Total: ${char.po} PO`, 'success');
+    });
+
+    document.getElementById('btn-po-sub')?.addEventListener('click', () => {
+      const qtd = parseInt(document.getElementById('edit-po-qtd')?.value) || 0;
+      if (qtd <= 0) return;
+      if (qtd > (char.po || 0)) {
+        toast('PO insuficiente!', 'error');
+        return;
+      }
+      char.po = (char.po || 0) - qtd;
+      salvar();
+      window.fecharModal();
+      renderFichaCompleta();
+      toast(`-${qtd} PO removidas! Total: ${char.po} PO`, 'success');
+    });
+
     document.getElementById('btn-salvar-po')?.addEventListener('click', () => {
-      char.po = parseInt(document.getElementById('edit-po')?.value) || 0;
+      char.po = parseInt(document.getElementById('edit-po-total')?.value) || 0;
       salvar();
       window.fecharModal();
       renderFichaCompleta();
@@ -14110,13 +14263,14 @@ function reRenderSheetInv() {
   setupEventosInventarioSheet();
 }
 
-/** Drag and drop no inventário da ficha */
+/** Drag and drop no inventário da ficha (desktop e mobile) */
 function setupSheetDragDrop() {
   const listaEl = document.getElementById('sheet-inventario');
   if (!listaEl) return;
 
   let dragIdx = null;
 
+  // ---- Eventos de mouse (desktop) ----
   listaEl.querySelectorAll('.inv-item[draggable]').forEach(el => {
     el.addEventListener('dragstart', (e) => {
       dragIdx = parseInt(el.dataset.idx);
@@ -14149,6 +14303,92 @@ function setupSheetDragDrop() {
         salvar();
         reRenderSheetInv();
       }
+    });
+  });
+
+  // ---- Eventos de toque (mobile) ----
+  let touchDragEl = null;
+  let touchClone = null;
+  let touchOffsetX = 0;
+  let touchOffsetY = 0;
+
+  listaEl.querySelectorAll('.inv-item[draggable]').forEach(el => {
+    el.addEventListener('touchstart', (e) => {
+      // Ignorar toque em botões internos
+      if (e.target.closest('button') || e.target.closest('select') || e.target.closest('input')) return;
+      const touch = e.touches[0];
+      dragIdx = parseInt(el.dataset.idx);
+      touchDragEl = el;
+
+      const rect = el.getBoundingClientRect();
+      touchOffsetX = touch.clientX - rect.left;
+      touchOffsetY = touch.clientY - rect.top;
+
+      // Criar clone visual para arrastar
+      touchClone = el.cloneNode(true);
+      touchClone.style.cssText = `
+        position: fixed;
+        left: ${rect.left}px;
+        top: ${rect.top}px;
+        width: ${rect.width}px;
+        opacity: 0.85;
+        pointer-events: none;
+        z-index: 9999;
+        background: var(--bg-card);
+        border: 2px solid var(--primary);
+        border-radius: var(--radius-sm);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      `;
+      document.body.appendChild(touchClone);
+      el.classList.add('inv-item-dragging');
+    }, { passive: true });
+
+    el.addEventListener('touchmove', (e) => {
+      if (!touchClone || !touchDragEl) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+
+      // Mover clone
+      touchClone.style.left = `${touch.clientX - touchOffsetX}px`;
+      touchClone.style.top = `${touch.clientY - touchOffsetY}px`;
+
+      // Destacar item abaixo do toque
+      listaEl.querySelectorAll('.inv-item').forEach(item => item.classList.remove('inv-item-dragover'));
+      touchClone.style.display = 'none';
+      const elementoAbaixo = document.elementFromPoint(touch.clientX, touch.clientY);
+      touchClone.style.display = '';
+      const alvo = elementoAbaixo?.closest('.inv-item[data-idx]');
+      if (alvo && alvo !== touchDragEl) {
+        alvo.classList.add('inv-item-dragover');
+      }
+    }, { passive: false });
+
+    el.addEventListener('touchend', (e) => {
+      if (!touchDragEl) return;
+      const touch = e.changedTouches[0];
+
+      // Identificar destino
+      touchClone.style.display = 'none';
+      const elementoAbaixo = document.elementFromPoint(touch.clientX, touch.clientY);
+      touchClone.style.display = '';
+      const alvo = elementoAbaixo?.closest('.inv-item[data-idx]');
+
+      if (alvo && alvo !== touchDragEl) {
+        const dropIdx = parseInt(alvo.dataset.idx);
+        if (dragIdx !== null && dragIdx !== dropIdx) {
+          const [item] = char.inventario.splice(dragIdx, 1);
+          char.inventario.splice(dropIdx, 0, item);
+          salvar();
+          reRenderSheetInv();
+        }
+      }
+
+      // Limpar
+      if (touchClone) { touchClone.remove(); touchClone = null; }
+      touchDragEl.classList.remove('inv-item-dragging');
+      listaEl.querySelectorAll('.inv-item').forEach(item => item.classList.remove('inv-item-dragover'));
+      touchDragEl = null;
+      dragIdx = null;
     });
   });
 }

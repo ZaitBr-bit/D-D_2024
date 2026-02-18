@@ -196,6 +196,7 @@ export function criarPersonagemVazio() {
     talentos: [],
     itens_customizados: [],
     magias_customizadas: [],
+    efeitos_magicos: [],
     usos_habilidades: {},
     aparencia: '',
     personalidade: '',

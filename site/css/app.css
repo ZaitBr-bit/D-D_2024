@@ -119,6 +119,8 @@ body {
 }
 .btn-outline:hover { background: var(--primary); color: #fff; }
 .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+.btn-cantrip { background: transparent; color: var(--accent); border: 2px solid var(--accent); font-weight: 700; }
+.btn-cantrip:hover { background: var(--accent); color: #fff; }
 .btn-lg { padding: 14px 28px; font-size: 1rem; }
 .btn-block { width: 100%; }
 .btn-icon {
