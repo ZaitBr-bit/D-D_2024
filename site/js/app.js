@@ -98,10 +98,10 @@ function verificarAtualizacaoSW(registration) {
 
   if (novoSW) {
     if (novoSW.state === 'installed') {
-      mostrarPromptAtualizar(novoSW);
+      if (navigator.serviceWorker.controller) mostrarPromptAtualizar(novoSW);
     } else {
       novoSW.addEventListener('statechange', () => {
-        if (novoSW.state === 'installed') {
+        if (novoSW.state === 'installed' && navigator.serviceWorker.controller) {
           mostrarPromptAtualizar(novoSW);
         }
       });
@@ -143,9 +143,11 @@ function init() {
     });
 
     // Recarregar página quando o novo SW assumir controle (pós-atualização)
+    // hadController evita reload desnecessário na primeira instalação
+    const hadController = !!navigator.serviceWorker.controller;
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (refreshing) return;
+      if (!hadController || refreshing) return;
       refreshing = true;
       window.location.reload();
     });
