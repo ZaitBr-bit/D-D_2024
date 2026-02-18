@@ -98,6 +98,14 @@ function calcVantagemDesvantagemPericia(nomePericia) {
     }
   }
 
+  // --- Efeitos magicos: bonus_pericia com bonus='vantagem' (Aprimorar Atributo) ---
+  const efMag = char.efeitos_magicos || [];
+  efMag.forEach(e => {
+    if (e.tipo === 'bonus_pericia' && e.bonus === 'vantagem' && e.atributo && pericia?.atributo === e.atributo) {
+      vantagens.push(e.nome.replace(/ \(.*\)$/, ''));
+    }
+  });
+
   return { vantagens, desvantagens };
 }
 
@@ -2140,7 +2148,26 @@ function getDeslocamentoFinal(baseDeslocamento) {
     if (final < 0) final = 0;
   }
 
-  return `${String(final).replace('.', ',')} metros`;
+  // Efeitos magicos de deslocamento (ex: Passos Largos +3m, Voo 18m)
+  const efMag = char?.efeitos_magicos || [];
+  const extras = [];
+  for (const ef of efMag) {
+    if (ef.tipo === 'deslocamento') {
+      if (ef.tipo_velocidade === 'base_bonus' && ef.valor_metros) {
+        final += ef.valor_metros;
+      } else if (ef.tipo_velocidade === 'voo' && ef.valor_metros) {
+        extras.push(`Voo ${ef.valor_metros}m`);
+      } else if (ef.tipo_velocidade === 'escalada') {
+        extras.push(`Escalada ${final}m`);
+      } else if (ef.tipo_velocidade === 'levitacao' && ef.valor_metros) {
+        extras.push(`Levitação ${ef.valor_metros}m`);
+      }
+    }
+  }
+
+  let resultado = `${String(final).replace('.', ',')} metros`;
+  if (extras.length) resultado += ` (${extras.join(', ')})`;
+  return resultado;
 }
 
 function getAtaquesPorAcao() {
@@ -2822,15 +2849,18 @@ function renderFichaCompleta() {
         <div class="stat-box">
           <div class="stat-label">CA</div>
           <div class="stat-value">${ca}</div>
-          ${(char.efeitos_magicos || []).length > 0 ? `
-            <div style="font-size:0.6rem;margin-top:2px">
-              ${char.efeitos_magicos.map(ef => `
-                <span class="no-print" style="display:inline-flex;align-items:center;gap:2px;background:var(--accent);color:#fff;padding:1px 5px;border-radius:8px;margin:1px;cursor:pointer;font-size:0.6rem" data-remover-efeito="${ef.nome}" title="Remover efeito de ${ef.nome}">
-                  ${ef.nome}${ef.concentracao ? ' (C)' : ''} &times;
-                </span>
-              `).join('')}
-            </div>
-          ` : ''}
+          ${(() => {
+            const efs = char.efeitos_magicos || [];
+            // Deduplicar por nome base (compostos geram filhos com " (Reativo)" etc.)
+            const vistos = new Set();
+            const unicos = efs.filter(ef => { const base = ef.nome.replace(/ \(.*\)$/, ''); if (vistos.has(base)) return false; vistos.add(base); return true; });
+            if (unicos.length === 0) return '';
+            return `<div style="font-size:0.6rem;margin-top:2px">${unicos.map(ef => {
+              const base = ef.nome.replace(/ \(.*\)$/, '');
+              const tooltip = ef.rotulo || ef.nome;
+              return `<span class="no-print" style="display:inline-flex;align-items:center;gap:2px;background:var(--accent);color:#fff;padding:1px 5px;border-radius:8px;margin:1px;cursor:pointer;font-size:0.6rem" data-remover-efeito="${base}" title="${tooltip}">${base}${ef.concentracao ? ' (C)' : ''} &times;</span>`;
+            }).join('')}</div>`;
+          })()}
         </div>
         <div class="stat-box">
           <div class="stat-label">Iniciativa</div>
@@ -3473,11 +3503,27 @@ function restaurarHabilidades(tipoDescanso) {
 }
 
 function setupEventosDescanso() {
-  // Remover efeitos mágicos ativos (badge na CA)
+  // Remover efeitos magicos ativos (badges)
   document.querySelectorAll('[data-remover-efeito]').forEach(el => {
     el.addEventListener('click', () => {
       const nome = el.dataset.removerEfeito;
-      char.efeitos_magicos = (char.efeitos_magicos || []).filter(e => e.nome !== nome);
+      // Reverter bonus de PV maximo de efeitos compostos (ex: Banquete de Herois)
+      const efsPVMax = (char.efeitos_magicos || []).filter(e => {
+        const base = e.nome.replace(/ \(.*\)$/, '');
+        return base === nome && e.tipo === 'bonus_pv_max';
+      });
+      for (const ef of efsPVMax) {
+        if (char.pv_max_override) {
+          char.pv_max_override -= ef.valor || 0;
+          if (char.pv_max_override <= char.pv_max) delete char.pv_max_override;
+          char.pv_atual = Math.min(char.pv_atual, char.pv_max_override || char.pv_max);
+        }
+      }
+      // Remover todos os efeitos com mesmo nome base (filhos compostos)
+      char.efeitos_magicos = (char.efeitos_magicos || []).filter(e => {
+        const base = e.nome.replace(/ \(.*\)$/, '');
+        return base !== nome;
+      });
       salvar();
       renderFichaCompleta();
       toast(`Efeito de ${nome} removido.`, 'info');
@@ -3714,6 +3760,14 @@ function setupEventosDescanso() {
   });
 
   document.getElementById('btn-descanso-longo')?.addEventListener('click', () => {
+    // Reverter bonus de PV maximo de efeitos magicos antes de limpar
+    const efsPVMax = (char.efeitos_magicos || []).filter(e => e.tipo === 'bonus_pv_max');
+    for (const ef of efsPVMax) {
+      if (char.pv_max_override) {
+        char.pv_max_override -= ef.valor || 0;
+        if (char.pv_max_override <= char.pv_max) delete char.pv_max_override;
+      }
+    }
     const pvMax = char.pv_max_override || char.pv_max;
     char.pv_atual = pvMax;
     char.pv_temporario = 0;
@@ -12255,42 +12309,319 @@ function renderSecaoMagias() {
   `;
 }
 
-// Mapa de magias que afetam CA quando conjuradas em si mesmo
-const MAGIAS_EFEITO_CA = {
+// Mapa unificado de magias com efeitos mecanicos quando conjuradas
+const MAGIAS_EFEITO = {
+  // --- Efeitos de CA (ja implementados) ---
   'Armadura Arcana':  { tipo_efeito: 'base', valor: 13, concentracao: false, permite_self: true, permite_outro: true, rotulo: 'CA = 13 + Des' },
   'Escudo Arcano':    { tipo_efeito: 'bonus', valor: 5, concentracao: false, permite_self: true, permite_outro: false, rotulo: '+5 CA (1 rodada)' },
   'Escudo da Fé':     { tipo_efeito: 'bonus', valor: 2, concentracao: true, permite_self: true, permite_outro: true, rotulo: '+2 CA (concentração)' },
   'Pele-Casca':       { tipo_efeito: 'minimo', valor: 17, concentracao: true, permite_self: true, permite_outro: true, rotulo: 'CA mín. 17 (concentração)' },
   'Vínculo de Proteção': { tipo_efeito: null, concentracao: false, permite_self: false, permite_outro: true, rotulo: 'Apenas outro alvo' },
   'Celeridade':       { tipo_efeito: 'bonus', valor: 2, concentracao: true, permite_self: true, permite_outro: true, rotulo: '+2 CA (concentração)' },
-  'Lentidão':         { tipo_efeito: null, concentracao: true, permite_self: false, permite_outro: true, rotulo: 'Apenas inimigos' }
+  'Lentidão':         { tipo_efeito: null, concentracao: true, permite_self: false, permite_outro: true, rotulo: 'Apenas inimigos' },
+
+  // --- PV Temporarios ---
+  'Vitalidade Vazia': { tipo: 'pv_temp', media: 9, concentracao: false, permite_self: true, permite_outro: false, rotulo: 'PV Temp: 2d4+4 (média 9)' },
+
+  // --- Reflexos (copias ilusorias) ---
+  'Reflexos': { tipo: 'reflexos', copias: 3, concentracao: false, permite_self: true, permite_outro: false, rotulo: '3 Cópias Ilusórias' },
+
+  // --- Penalidade de ataque contra o conjurador ---
+  'Proteção Contra Lâminas': { tipo: 'penalidade_ataque', valor: '1d4', concentracao: true, permite_self: true, permite_outro: false, rotulo: 'Atacantes -1d4 (concentração)', truque: true },
+
+  // --- Condicoes ---
+  'Invisibilidade':       { tipo: 'condicao', condicao: 'Invisível', encerra_ao_atacar: true, concentracao: true, permite_self: true, permite_outro: true, rotulo: 'Invisível (encerra ao atacar)' },
+  'Invisibilidade Maior': { tipo: 'condicao', condicao: 'Invisível', encerra_ao_atacar: false, concentracao: true, permite_self: true, permite_outro: true, rotulo: 'Invisível (não encerra ao atacar)' },
+  'Despistar':            { tipo: 'condicao', condicao: 'Invisível + Cópia', encerra_ao_atacar: true, concentracao: true, permite_self: true, permite_outro: false, rotulo: 'Invisível + Cópia Ilusória' },
+  'Forma Gasosa':         { tipo: 'condicao', condicao: 'Forma Gasosa', concentracao: true, permite_self: true, permite_outro: true, rotulo: 'Forma Gasosa (voo 3m, resistências, não ataca)' },
+  'Santuário':            { tipo: 'condicao', condicao: 'Santuário', encerra_ao_atacar: true, concentracao: false, permite_self: true, permite_outro: true, rotulo: 'Santuário (encerra ao atacar/conjurar)' },
+  'Simular Morte':        { tipo: 'condicao', condicao: 'Simular Morte', concentracao: false, permite_self: true, permite_outro: true, rotulo: 'Aparenta estar morto' },
+  'Mesclar-se às Rochas': { tipo: 'condicao', condicao: 'Mesclado às Rochas', concentracao: false, permite_self: true, permite_outro: false, rotulo: 'Fundido em rocha/terra' },
+
+  // --- Resistencia temporaria ---
+  'Proteção Contra Energia': { tipo: 'resistencia', tipos_dano: null, selecionar_tipo: ['Ácido', 'Elétrico', 'Gélido', 'Ígneo', 'Trovejante'], concentracao: true, permite_self: true, permite_outro: true, rotulo: 'Resistência a 1 tipo (escolher)' },
+  'Pele-Rocha':              { tipo: 'resistencia', tipos_dano: ['Contundente', 'Cortante', 'Perfurante'], concentracao: true, permite_self: true, permite_outro: true, rotulo: 'Resist. Contundente/Cortante/Perfurante' },
+
+  // --- Resistencia + imunidade veneno ---
+  'Proteção Contra Veneno': { tipo: 'composto', efeitos: [
+    { tipo: 'resistencia', tipos_dano: ['Venenoso'] },
+    { tipo: 'buff_save_condicao', condicao: 'Envenenado', bonus: 'vantagem' },
+    { tipo: 'remover_condicao', condicao: 'Envenenado' }
+  ], concentracao: false, permite_self: true, permite_outro: true, rotulo: 'Resist. Venenoso + Vant. SG Envenenado' },
+
+  // --- Protecao contra entidades ---
+  'Proteção Contra o Bem e o Mal': { tipo: 'protecao', concentracao: true, permite_self: true, permite_outro: true, rotulo: 'Proteção vs Aber./Cel./Elem./Feér./Ínf./M-V' },
+
+  // --- Aura de pureza ---
+  'Aura de Pureza': { tipo: 'composto', efeitos: [
+    { tipo: 'resistencia', tipos_dano: ['Venenoso'] },
+    { tipo: 'vantagem_sg_condicoes', condicoes: ['Amedrontado', 'Atordoado', 'Cego', 'Enfeitiçado', 'Envenenado', 'Paralisado', 'Surdo'] }
+  ], concentracao: true, permite_self: true, permite_outro: false, rotulo: 'Aura 9m: Resist. Venenoso + Vant. SG condições' },
+
+  // --- Buff d20 ---
+  'Bênção': { tipo: 'buff_d20', bonus: '+1d4', aplica_em: ['ataque', 'salvaguarda'], concentracao: true, permite_self: true, permite_outro: true, rotulo: '+1d4 ataques e salvaguardas' },
+
+  // --- Buff arma ---
+  'Arma Mágica':   { tipo: 'buff_arma', bonus_ataque: 1, bonus_dano: 1, concentracao: false, permite_self: true, permite_outro: true, rotulo: '+1 ataque e dano (arma)' },
+  'Arma Elemental': { tipo: 'buff_arma', bonus_ataque: 1, dano_extra: '1d4', selecionar_tipo: ['Ácido', 'Elétrico', 'Gélido', 'Ígneo', 'Trovejante'], concentracao: true, permite_self: true, permite_outro: true, rotulo: '+1 ataque + 1d4 elemental (arma)' },
+  'Aljava Veloz':   { tipo: 'buff_arma', mecanica: 'ataque_bonus', concentracao: true, permite_self: true, permite_outro: false, rotulo: '2 ataques ranged como Ação Bônus' },
+
+  // --- Buff salvaguarda contra magias ---
+  'Círculo de Poder': { tipo: 'buff_d20', bonus: 'vantagem', aplica_em: ['salvaguarda_magias'], concentracao: true, permite_self: true, permite_outro: false, rotulo: 'Aura 9m: Vant. SG vs magias' },
+  'Aura Sagrada': { tipo: 'composto', efeitos: [
+    { tipo: 'buff_d20', bonus: 'vantagem', aplica_em: ['salvaguarda'] },
+    { tipo: 'desv_ataques_contra_mim' }
+  ], concentracao: true, permite_self: true, permite_outro: false, rotulo: 'Aura: Vant. TODAS SG + Desv. ataques contra' },
+
+  // --- Buff deslocamento ---
+  'Passos Largos':           { tipo: 'deslocamento', tipo_velocidade: 'base_bonus', valor_metros: 3, concentracao: false, permite_self: true, permite_outro: true, rotulo: '+3m deslocamento' },
+  'Retirada Acelerada':      { tipo: 'deslocamento', tipo_velocidade: 'dash_acao_bonus', concentracao: true, permite_self: true, permite_outro: false, rotulo: 'Disparada como Ação Bônus' },
+  'Escalada de Aranha':      { tipo: 'deslocamento', tipo_velocidade: 'escalada', concentracao: true, permite_self: true, permite_outro: true, rotulo: 'Escalada = deslocamento base' },
+  'Levitação':               { tipo: 'deslocamento', tipo_velocidade: 'levitacao', valor_metros: 6, concentracao: true, permite_self: true, permite_outro: true, rotulo: 'Levitação (6m vertical/turno)' },
+  'Voo':                     { tipo: 'deslocamento', tipo_velocidade: 'voo', valor_metros: 18, concentracao: true, permite_self: true, permite_outro: true, rotulo: 'Voo 18m' },
+  'Movimentação Livre':      { tipo: 'deslocamento', tipo_velocidade: 'nao_impedido', concentracao: false, permite_self: true, permite_outro: true, rotulo: 'Sem restrição de movimento' },
+  'Caminhar Sobre as Águas': { tipo: 'deslocamento', tipo_velocidade: 'sobre_liquidos', concentracao: false, permite_self: true, permite_outro: true, rotulo: 'Caminhar sobre líquidos' },
+  'Caminhar no Vento':       { tipo: 'deslocamento', tipo_velocidade: 'voo', valor_metros: 48, concentracao: false, permite_self: true, permite_outro: true, rotulo: 'Voo 48m (8h)' },
+
+  // --- Buff pericia ---
+  'Passo Sem Rastro':  { tipo: 'bonus_pericia', pericia: 'Furtividade', bonus: 10, concentracao: true, permite_self: true, permite_outro: false, rotulo: 'Aura 9m: +10 Furtividade' },
+  'Aprimorar Atributo': { tipo: 'bonus_pericia', selecionar_atributo: ['Força', 'Destreza', 'Inteligência', 'Sabedoria', 'Carisma'], bonus: 'vantagem', concentracao: true, permite_self: true, permite_outro: true, rotulo: 'Vant. testes do atributo (escolher)' },
+
+  // --- Cura PV ---
+  'Cura Completa':          { tipo: 'cura_pv', valor: 70, remove_condicoes: ['Cego', 'Envenenado', 'Surdo'], concentracao: false, permite_self: true, permite_outro: true, rotulo: 'Cura 70 PV + remove Cego/Envenenado/Surdo' },
+  'Cura Completa em Massa': { tipo: 'cura_pv', valor: 70, remove_condicoes: ['Cego', 'Envenenado', 'Surdo'], concentracao: false, permite_self: true, permite_outro: true, rotulo: 'Cura 70 PV (até 6 criaturas)' },
+  'Reviver os Mortos':      { tipo: 'cura_pv', valor: 1, penalidade: -4, concentracao: false, permite_self: false, permite_outro: true, rotulo: 'Revive com 1 PV (penalidade -4 d20)' },
+  'Ressurreição':           { tipo: 'cura_pv', valor: 'max', penalidade: -4, concentracao: false, permite_self: false, permite_outro: true, rotulo: 'Revive com PV máx (penalidade -4 d20)' },
+
+  // --- Cura condicao ---
+  'Restauração Menor': { tipo: 'cura_condicao', condicoes: ['Cego', 'Envenenado', 'Paralisado', 'Surdo'], concentracao: false, permite_self: true, permite_outro: true, rotulo: 'Remove 1 condição' },
+  'Restauração Maior': { tipo: 'cura_condicao', efeitos: ['Exaustão (1 nível)', 'Enfeitiçado', 'Petrificado', 'Maldição', 'Redução de atributo', 'Redução de PV máximos'], concentracao: false, permite_self: true, permite_outro: true, rotulo: 'Remove 1 efeito severo' },
+  'Limpar a Mente': { tipo: 'composto', efeitos: [
+    { tipo: 'imunidade_condicao', condicao: 'Enfeitiçado' },
+    { tipo: 'resistencia', tipos_dano: ['Psíquico'] }
+  ], concentracao: false, permite_self: true, permite_outro: true, rotulo: 'Imune Enfeitiçado + Resist. Psíquico (24h)' },
+
+  // --- Efeitos compostos ---
+  'Armadura de Agathys': { tipo: 'composto', escala_circulo: true, efeitos: [
+    { tipo: 'pv_temp', formula_circ: 5 },
+    { tipo: 'dano_reativo', dano_circ: 5, tipo_dano: 'Gélido' }
+  ], concentracao: false, permite_self: true, permite_outro: false, rotulo: 'PV Temp + Dano Gélido reativo (5×círculo)' },
+
+  'Heroísmo': { tipo: 'composto', efeitos: [
+    { tipo: 'pv_temp_por_turno', valor: 'mod_conj' },
+    { tipo: 'imunidade_condicao', condicao: 'Amedrontado' }
+  ], concentracao: true, permite_self: true, permite_outro: true, rotulo: 'PV Temp/turno + Imune Amedrontado' },
+
+  'Escudo Ardente': { tipo: 'composto', selecionar_variante: {
+    'Escudo Quente (Resist. Gélido, dano 2d8 Ígneo)': { resistencia: 'Gélido', dano_reativo: '2d8 Ígneo' },
+    'Escudo Frio (Resist. Ígneo, dano 2d8 Gélido)': { resistencia: 'Ígneo', dano_reativo: '2d8 Gélido' }
+  }, concentracao: false, permite_self: true, permite_outro: false, rotulo: 'Resist. + Dano reativo (Quente/Frio)' },
+
+  'Aura de Vida': { tipo: 'composto', efeitos: [
+    { tipo: 'resistencia', tipos_dano: ['Necrótico'] },
+    { tipo: 'protecao_pv_max' }
+  ], concentracao: true, permite_self: true, permite_outro: false, rotulo: 'Aura 9m: Resist. Necrótico + PV máx protegidos' },
+
+  'Banquete de Heróis': { tipo: 'composto', efeitos: [
+    { tipo: 'resistencia', tipos_dano: ['Venenoso'] },
+    { tipo: 'imunidade_condicao', condicao: 'Amedrontado' },
+    { tipo: 'imunidade_condicao', condicao: 'Envenenado' },
+    { tipo: 'bonus_pv_max', media: 11 }
+  ], concentracao: false, permite_self: true, permite_outro: true, rotulo: 'Resist. Venenoso + Imunidades + PV máx +2d10 (24h)' }
 };
 
-function aplicarEfeitoMagico(nomeMagia, circ) {
-  const config = MAGIAS_EFEITO_CA[nomeMagia];
-  if (!config || !config.tipo_efeito) return;
-
+// Aplica efeito mecanico da magia no personagem. Retorna {detalhe} para toast ou null.
+function aplicarEfeitoMagico(nomeMagia, circ, opcoes) {
+  if (!opcoes) opcoes = {};
+  const config = MAGIAS_EFEITO[nomeMagia];
+  if (!config) return null;
   if (!char.efeitos_magicos) char.efeitos_magicos = [];
+  const concentracao = config.concentracao;
 
-  // Se for concentração, remover efeitos de concentração anteriores
-  if (config.concentracao) {
+  // Se for concentracao, remover efeitos de concentracao anteriores
+  if (concentracao) {
     char.efeitos_magicos = char.efeitos_magicos.filter(e => !e.concentracao);
   }
-
-  // Remover efeito duplicado da mesma magia
-  char.efeitos_magicos = char.efeitos_magicos.filter(e => e.nome !== nomeMagia);
-
-  char.efeitos_magicos.push({
-    nome: nomeMagia,
-    tipo_efeito: config.tipo_efeito,
-    valor: config.valor,
-    concentracao: config.concentracao,
-    circulo: parseInt(circ)
+  // Remover efeito duplicado da mesma magia (e filhos compostos)
+  char.efeitos_magicos = char.efeitos_magicos.filter(e => {
+    const base = e.nome.replace(/ \(.*\)$/, '');
+    return base !== nomeMagia;
   });
+
+  const tipo = config.tipo || null;
+  const circuloNum = parseInt(circ) || 0;
+
+  // --- Efeitos de CA (tipo_efeito legado) ---
+  if (config.tipo_efeito && ['bonus', 'base', 'minimo'].includes(config.tipo_efeito)) {
+    char.efeitos_magicos.push({ nome: nomeMagia, tipo_efeito: config.tipo_efeito, valor: config.valor, concentracao: concentracao, circulo: circuloNum });
+    return null;
+  }
+
+  // --- PV Temporarios ---
+  if (tipo === 'pv_temp') {
+    const valor = config.media || 0;
+    char.pv_temporario = Math.max(char.pv_temporario || 0, valor);
+    return { detalhe: `+${valor} PV Temporários` };
+  }
+
+  // --- Reflexos ---
+  if (tipo === 'reflexos') {
+    char.efeitos_magicos.push({ nome: nomeMagia, tipo: 'reflexos', copias: config.copias, concentracao: concentracao, circulo: circuloNum, rotulo: config.rotulo });
+    return null;
+  }
+
+  // --- Penalidade ataque contra o conjurador ---
+  if (tipo === 'penalidade_ataque') {
+    char.efeitos_magicos.push({ nome: nomeMagia, tipo: 'penalidade_ataque_contra_mim', valor: config.valor, concentracao: concentracao, circulo: circuloNum, rotulo: config.rotulo });
+    return null;
+  }
+
+  // --- Condicao ---
+  if (tipo === 'condicao') {
+    char.efeitos_magicos.push({ nome: nomeMagia, tipo: 'condicao', condicao: config.condicao, encerra_ao_atacar: config.encerra_ao_atacar || false, concentracao: concentracao, circulo: circuloNum, rotulo: config.rotulo });
+    return null;
+  }
+
+  // --- Resistencia ---
+  if (tipo === 'resistencia') {
+    const tipos_dano = opcoes.tipo_selecionado ? [opcoes.tipo_selecionado] : config.tipos_dano;
+    char.efeitos_magicos.push({ nome: nomeMagia, tipo: 'resistencia', tipos_dano: tipos_dano, concentracao: concentracao, circulo: circuloNum, rotulo: tipos_dano ? `Resist. ${tipos_dano.join(', ')}` : config.rotulo });
+    return null;
+  }
+
+  // --- Protecao contra entidades ---
+  if (tipo === 'protecao') {
+    char.efeitos_magicos.push({ nome: nomeMagia, tipo: 'protecao_bem_e_mal', concentracao: concentracao, circulo: circuloNum, rotulo: config.rotulo });
+    return null;
+  }
+
+  // --- Buff d20 ---
+  if (tipo === 'buff_d20') {
+    char.efeitos_magicos.push({ nome: nomeMagia, tipo: 'buff_d20', bonus: config.bonus, aplica_em: config.aplica_em, concentracao: concentracao, circulo: circuloNum, rotulo: config.rotulo });
+    return null;
+  }
+
+  // --- Buff arma ---
+  if (tipo === 'buff_arma') {
+    const entry = { nome: nomeMagia, tipo: 'buff_arma', concentracao: concentracao, circulo: circuloNum, rotulo: config.rotulo };
+    if (config.bonus_ataque) entry.bonus_ataque = config.bonus_ataque;
+    if (config.bonus_dano) entry.bonus_dano = config.bonus_dano;
+    if (config.dano_extra) { entry.dano_extra = config.dano_extra; if (opcoes.tipo_selecionado) entry.tipo_dano_extra = opcoes.tipo_selecionado; }
+    if (config.mecanica) entry.mecanica = config.mecanica;
+    char.efeitos_magicos.push(entry);
+    return null;
+  }
+
+  // --- Deslocamento ---
+  if (tipo === 'deslocamento') {
+    char.efeitos_magicos.push({ nome: nomeMagia, tipo: 'deslocamento', tipo_velocidade: config.tipo_velocidade, valor_metros: config.valor_metros || 0, concentracao: concentracao, circulo: circuloNum, rotulo: config.rotulo });
+    return null;
+  }
+
+  // --- Buff pericia ---
+  if (tipo === 'bonus_pericia') {
+    const atributo = opcoes.atributo_selecionado || null;
+    char.efeitos_magicos.push({ nome: nomeMagia, tipo: 'bonus_pericia', pericia: config.pericia || null, atributo: atributo, bonus: config.bonus, concentracao: concentracao, circulo: circuloNum, rotulo: atributo ? `Vant. testes de ${atributo}` : config.rotulo });
+    return null;
+  }
+
+  // --- Cura PV ---
+  if (tipo === 'cura_pv') {
+    const pvMax = char.pv_max_override || char.pv_max;
+    let cura;
+    if (config.valor === 'max') {
+      cura = pvMax - (char.pv_atual || 0);
+      char.pv_atual = pvMax;
+    } else {
+      cura = config.valor;
+      char.pv_atual = Math.min((char.pv_atual || 0) + cura, pvMax);
+    }
+    if (config.remove_condicoes) {
+      config.remove_condicoes.forEach(c => { char.condicoes = (char.condicoes || []).filter(cond => cond !== c); });
+    }
+    if (config.penalidade) {
+      char.efeitos_magicos.push({ nome: nomeMagia, tipo: 'penalidade_d20', valor: config.penalidade, concentracao: false, circulo: circuloNum, rotulo: `${config.penalidade} em d20 (reduz 1/Descanso Longo)` });
+    }
+    return { detalhe: `${config.valor === 'max' ? 'PV ao máximo' : `+${cura} PV`}${config.remove_condicoes ? ', condições removidas' : ''}` };
+  }
+
+  // --- Cura condicao ---
+  if (tipo === 'cura_condicao') {
+    if (opcoes.condicao_removida) {
+      if (opcoes.condicao_removida === 'Exaustão (1 nível)') {
+        char.exaustao = Math.max(0, (char.exaustao || 0) - 1);
+        if (char.exaustao === 0) char.condicoes = (char.condicoes || []).filter(c => c !== 'Exaustão');
+      } else if (opcoes.condicao_removida === 'Redução de PV máximos') {
+        delete char.pv_max_override;
+      } else {
+        const nomeCondicao = opcoes.condicao_removida.replace(' (1 nível)', '');
+        char.condicoes = (char.condicoes || []).filter(c => c !== nomeCondicao);
+      }
+      return { detalhe: `${opcoes.condicao_removida} removida` };
+    }
+    return null;
+  }
+
+  // --- Efeito composto ---
+  if (tipo === 'composto') {
+    const efeitos = config.efeitos || [];
+    // Variante selecionada (ex: Escudo Ardente)
+    if (config.selecionar_variante && opcoes.variante_selecionada) {
+      const v = config.selecionar_variante[opcoes.variante_selecionada];
+      if (v) {
+        if (v.resistencia) char.efeitos_magicos.push({ nome: nomeMagia, tipo: 'resistencia', tipos_dano: [v.resistencia], concentracao: concentracao, circulo: circuloNum, rotulo: `Resist. ${v.resistencia}` });
+        if (v.dano_reativo) char.efeitos_magicos.push({ nome: nomeMagia + ' (Reativo)', tipo: 'dano_reativo', dano: v.dano_reativo, concentracao: concentracao, circulo: circuloNum, rotulo: `Dano reativo: ${v.dano_reativo}` });
+      }
+      return null;
+    }
+    // Processar sub-efeitos
+    for (const ef of efeitos) {
+      if (ef.tipo === 'pv_temp') {
+        const valor = ef.formula_circ ? ef.formula_circ * circuloNum : (ef.media || 0);
+        char.pv_temporario = Math.max(char.pv_temporario || 0, valor);
+      } else if (ef.tipo === 'dano_reativo') {
+        const dano = ef.dano_circ ? ef.dano_circ * circuloNum : ef.dano;
+        char.efeitos_magicos.push({ nome: nomeMagia + ' (Reativo)', tipo: 'dano_reativo', dano: `${dano} ${ef.tipo_dano}`, concentracao: concentracao, circulo: circuloNum, rotulo: `Dano reativo: ${dano} ${ef.tipo_dano}` });
+      } else if (ef.tipo === 'pv_temp_por_turno') {
+        let valor = 0;
+        if (ef.valor === 'mod_conj') {
+          const infoClasse = CLASSES_INFO[char.classe];
+          if (infoClasse?.atributo_conjuracao) { const key = ATRIBUTO_NOME_PARA_KEY[infoClasse.atributo_conjuracao]; valor = calcMod(char.atributos[key]); }
+        }
+        valor = Math.max(1, valor);
+        char.efeitos_magicos.push({ nome: nomeMagia, tipo: 'pv_temp_por_turno', valor: valor, concentracao: concentracao, circulo: circuloNum, rotulo: `+${valor} PV Temp/turno` });
+        char.pv_temporario = Math.max(char.pv_temporario || 0, valor);
+      } else if (ef.tipo === 'imunidade_condicao') {
+        char.efeitos_magicos.push({ nome: nomeMagia, tipo: 'imunidade_condicao', condicao: ef.condicao, concentracao: concentracao, circulo: circuloNum, rotulo: `Imune: ${ef.condicao}` });
+      } else if (ef.tipo === 'resistencia') {
+        char.efeitos_magicos.push({ nome: nomeMagia, tipo: 'resistencia', tipos_dano: ef.tipos_dano, concentracao: concentracao, circulo: circuloNum, rotulo: `Resist. ${ef.tipos_dano.join(', ')}` });
+      } else if (ef.tipo === 'remover_condicao') {
+        char.condicoes = (char.condicoes || []).filter(c => c !== ef.condicao);
+      } else if (ef.tipo === 'buff_save_condicao') {
+        char.efeitos_magicos.push({ nome: nomeMagia, tipo: 'buff_save_condicao', condicao: ef.condicao, bonus: ef.bonus, concentracao: concentracao, circulo: circuloNum, rotulo: `Vant. SG ${ef.condicao}` });
+      } else if (ef.tipo === 'vantagem_sg_condicoes') {
+        char.efeitos_magicos.push({ nome: nomeMagia, tipo: 'vantagem_sg_condicoes', condicoes: ef.condicoes, concentracao: concentracao, circulo: circuloNum, rotulo: 'Vant. SG contra condições' });
+      } else if (ef.tipo === 'buff_d20') {
+        char.efeitos_magicos.push({ nome: nomeMagia, tipo: 'buff_d20', bonus: ef.bonus, aplica_em: ef.aplica_em, concentracao: concentracao, circulo: circuloNum, rotulo: config.rotulo });
+      } else if (ef.tipo === 'desv_ataques_contra_mim') {
+        char.efeitos_magicos.push({ nome: nomeMagia + ' (Desv.)', tipo: 'desv_ataques_contra_mim', concentracao: concentracao, circulo: circuloNum, rotulo: 'Inimigos: Desv. ataques contra você' });
+      } else if (ef.tipo === 'protecao_pv_max') {
+        char.efeitos_magicos.push({ nome: nomeMagia, tipo: 'protecao_pv_max', concentracao: concentracao, circulo: circuloNum, rotulo: 'PV máximos protegidos' });
+      } else if (ef.tipo === 'bonus_pv_max') {
+        const bonusPV = ef.media || 11;
+        char.pv_max_override = (char.pv_max_override || char.pv_max) + bonusPV;
+        char.pv_atual = (char.pv_atual || 0) + bonusPV;
+        char.efeitos_magicos.push({ nome: nomeMagia + ' (PV Máx)', tipo: 'bonus_pv_max', valor: bonusPV, concentracao: concentracao, circulo: circuloNum, rotulo: `PV máx +${bonusPV}` });
+      }
+    }
+    return null;
+  }
+  return null;
 }
 
+// Modal de selecao de alvo (self/outro)
 function mostrarModalAlvoMagia(nomeMagia, circ, onEscolha) {
-  const config = MAGIAS_EFEITO_CA[nomeMagia];
+  const config = MAGIAS_EFEITO[nomeMagia];
   if (!config) { onEscolha('self'); return; }
   if (config.permite_self && !config.permite_outro) { onEscolha('self'); return; }
   if (!config.permite_self && config.permite_outro) { onEscolha('outro'); return; }
@@ -12307,6 +12638,50 @@ function mostrarModalAlvoMagia(nomeMagia, circ, onEscolha) {
   `, '');
   document.getElementById('alvo-self')?.addEventListener('click', () => { window.fecharModal(); onEscolha('self'); });
   document.getElementById('alvo-outro')?.addEventListener('click', () => { window.fecharModal(); onEscolha('outro'); });
+}
+
+// Modal de selecao de opcao (tipo de dano, atributo, variante)
+function mostrarModalSelecaoMagia(nomeMagia, circ, listaOpcoes, titulo, onSelecao) {
+  const html = `
+    <div style="text-align:center;margin-bottom:12px">
+      <strong>${nomeMagia}</strong> (${circ}º Círculo)
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+      ${listaOpcoes.map((op, i) => `<button class="btn btn-secondary" data-sel-idx="${i}">${op}</button>`).join('')}
+    </div>
+  `;
+  abrirModal(titulo, html, '');
+  listaOpcoes.forEach((op, i) => {
+    document.querySelector(`[data-sel-idx="${i}"]`)?.addEventListener('click', () => { window.fecharModal(); onSelecao(op); });
+  });
+}
+
+// Modal de selecao de condicao a remover (Restauracao Menor/Maior)
+function mostrarModalCuraCondicao(nomeMagia, circ, opcoesRemover, onSelecao) {
+  const condicoesAtivas = char.condicoes || [];
+  let disponiveis;
+  if (nomeMagia === 'Restauração Maior') {
+    disponiveis = opcoesRemover;
+  } else {
+    disponiveis = opcoesRemover.filter(c => condicoesAtivas.includes(c));
+  }
+  if (disponiveis.length === 0) {
+    toast(`${nomeMagia}: Nenhuma condição removível encontrada.`, 'info');
+    return;
+  }
+  const html = `
+    <div style="text-align:center;margin-bottom:12px">
+      <strong>${nomeMagia}</strong> (${circ}º Círculo)<br>
+      <span style="font-size:0.8rem;color:var(--text-muted)">Selecione a condição a remover:</span>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+      ${disponiveis.map((c, i) => `<button class="btn btn-secondary" data-cura-idx="${i}">${c}</button>`).join('')}
+    </div>
+  `;
+  abrirModal('Remover Condição', html, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>');
+  disponiveis.forEach((c, i) => {
+    document.querySelector(`[data-cura-idx="${i}"]`)?.addEventListener('click', () => { window.fecharModal(); onSelecao(c); });
+  });
 }
 
 function setupEventosEspacosMagia() {
@@ -12348,22 +12723,53 @@ function setupEventosEspacosMagia() {
         return;
       }
 
-      // Verifica se é magia que afeta CA e precisa de seleção de alvo
-      const configCA = MAGIAS_EFEITO_CA[nome];
-      if (configCA && configCA.permite_self && configCA.permite_outro) {
-        mostrarModalAlvoMagia(nome, circ, (alvo) => {
-          _executarConjuracao(nome, circ, btn.dataset.conjCirc, alvo === 'self');
-        });
+      const config = MAGIAS_EFEITO[nome];
+      if (config) {
+        const precisaAlvo = config.permite_self && config.permite_outro;
+        const autoSelf = config.permite_self && !config.permite_outro;
+
+        const prosseguir = (aplicarSelf) => {
+          if (!aplicarSelf) {
+            _executarConjuracao(nome, circ, btn.dataset.conjCirc, false);
+            return;
+          }
+          // Verificar modais de selecao necessarios
+          if (config.selecionar_tipo) {
+            mostrarModalSelecaoMagia(nome, circ, config.selecionar_tipo, 'Escolher Tipo', (tipo) => {
+              _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, { tipo_selecionado: tipo });
+            });
+          } else if (config.selecionar_atributo) {
+            mostrarModalSelecaoMagia(nome, circ, config.selecionar_atributo, 'Escolher Atributo', (attr) => {
+              _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, { atributo_selecionado: attr });
+            });
+          } else if (config.selecionar_variante) {
+            mostrarModalSelecaoMagia(nome, circ, Object.keys(config.selecionar_variante), 'Escolher Variante', (v) => {
+              _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, { variante_selecionada: v });
+            });
+          } else if (config.tipo === 'cura_condicao') {
+            const lista = config.condicoes || config.efeitos || [];
+            mostrarModalCuraCondicao(nome, circ, lista, (c) => {
+              _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, { condicao_removida: c });
+            });
+          } else {
+            _executarConjuracao(nome, circ, btn.dataset.conjCirc, true);
+          }
+        };
+
+        if (precisaAlvo) {
+          mostrarModalAlvoMagia(nome, circ, (alvo) => prosseguir(alvo === 'self'));
+        } else {
+          prosseguir(autoSelf);
+        }
         return;
       }
 
-      // Magia que só afeta self (ex: Escudo Arcano) aplica automaticamente
-      const aplicarSelf = configCA && configCA.permite_self && !configCA.permite_outro;
-      _executarConjuracao(nome, circ, btn.dataset.conjCirc, aplicarSelf);
+      // Magia sem efeito especifico - apenas gasta slot e mostra toast
+      _executarConjuracao(nome, circ, btn.dataset.conjCirc, false);
     });
   });
 
-  function _executarConjuracao(nome, circ, baseCirc, aplicarEfeitoSelf) {
+  function _executarConjuracao(nome, circ, baseCirc, aplicarEfeitoSelf, opcoes) {
     char.espacos_magia[circ].usados++;
 
     if (char.classe === 'Feiticeiro' && semAcento(char.subclasse || '') === semAcento('Feitiçaria Selvagem')) {
@@ -12374,23 +12780,24 @@ function setupEventosEspacosMagia() {
       }
     }
 
-    // Aplicar efeito na CA se for alvo self
+    let resultado = null;
     if (aplicarEfeitoSelf) {
-      aplicarEfeitoMagico(nome, circ);
+      resultado = aplicarEfeitoMagico(nome, circ, opcoes);
     }
 
     salvar();
     const upcast = parseInt(circ) > parseInt(baseCirc);
     const sufixoAlvo = aplicarEfeitoSelf ? ' (em você)' : '';
+    const detalhe = resultado?.detalhe ? ` — ${resultado.detalhe}` : '';
     if (char.classe === 'Feiticeiro' && semAcento(char.subclasse || '') === semAcento('Feitiçaria Selvagem') && char.recursos?.feiticeiro?.subclasses?.selvagem?.surto_pendente_automatico) {
-      toast(`${nome} conjurada${upcast ? ` no ${circ}º círculo` : ''}${sufixoAlvo}! Surto de Magia Selvagem automático pendente.`, 'success');
+      toast(`${nome} conjurada${upcast ? ` no ${circ}º círculo` : ''}${sufixoAlvo}${detalhe}! Surto de Magia Selvagem automático pendente.`, 'success');
     } else {
-      toast(`${nome} conjurada${upcast ? ` no ${circ}º círculo` : ''}${sufixoAlvo}!`, 'success');
+      toast(`${nome} conjurada${upcast ? ` no ${circ}º círculo` : ''}${sufixoAlvo}${detalhe}!`, 'success');
     }
     renderFichaCompleta();
   }
 
-  // Lançar truque (não gasta espaço de magia)
+  // Lancar truque (nao gasta espaco de magia)
   document.querySelectorAll('[data-lancar-truque]').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -12400,6 +12807,15 @@ function setupEventosEspacosMagia() {
         return;
       }
       const nome = btn.dataset.lancarTruque;
+      // Truque com efeito mecanico (ex: Protecao Contra Laminas)
+      const config = MAGIAS_EFEITO[nome];
+      if (config && config.truque && config.permite_self) {
+        aplicarEfeitoMagico(nome, 0);
+        salvar();
+        renderFichaCompleta();
+        toast(`${nome} lançado (em você)!`, 'success');
+        return;
+      }
       toast(`${nome} lançado!`, 'success');
     });
   });
@@ -13441,7 +13857,7 @@ function renderSecaoCondicoes() {
   const condicoes = char.condicoes || [];
   const temCondicao = condicoes.length > 0;
 
-  // Verificar imunidades da Fúria Irracional (Berserker 6+)
+  // Verificar imunidades da Furia Irracional (Berserker 6+)
   const estadoFuriaImune = getEstadoFuria();
   const furiaIrracionalAtiva = estadoFuriaImune?.ativa && estadoFuriaImune?.furiaIrracional;
 
@@ -13449,6 +13865,15 @@ function renderSecaoCondicoes() {
   const _epCondicoes = getEstadoRecursosPaladino();
   const auraCoragemImune = _epCondicoes?.auraCoragemAtiva && !furiaIrracionalAtiva;
   const auraDevocaoImune = _epCondicoes?.auraDevocaoAtiva && !furiaIrracionalAtiva;
+
+  // Imunidades e efeitos de magias ativas
+  const efMag = char.efeitos_magicos || [];
+  const imunidadesMagia = efMag.filter(e => e.tipo === 'imunidade_condicao').map(e => ({ condicao: e.condicao, fonte: e.nome.replace(/ \(.*\)$/, '') }));
+  const condicoesMagia = efMag.filter(e => e.tipo === 'condicao').map(e => ({ condicao: e.condicao, fonte: e.nome, rotulo: e.rotulo }));
+  const efeitosAtivos = efMag.filter(e => ['penalidade_ataque_contra_mim', 'protecao_bem_e_mal', 'buff_d20', 'buff_arma', 'deslocamento', 'bonus_pericia', 'reflexos', 'dano_reativo', 'pv_temp_por_turno', 'buff_save_condicao', 'vantagem_sg_condicoes', 'desv_ataques_contra_mim', 'protecao_pv_max', 'penalidade_d20'].includes(e.tipo));
+  // Deduplicar por nome base
+  const efeitosVistos = new Set();
+  const efeitosUnicos = efeitosAtivos.filter(e => { const base = e.nome.replace(/ \(.*\)$/, ''); if (efeitosVistos.has(base)) return false; efeitosVistos.add(base); return true; });
 
   return `
     <div class="card" style="${temCondicao ? 'border-color:var(--warning)' : ''}">
@@ -13472,6 +13897,21 @@ function renderSecaoCondicoes() {
           <span class="badge" style="font-size:0.7rem;padding:3px 7px;background:var(--success);color:#fff">Imune: Enfeitiçado (Aura de Devoção)</span>
         </div>
       ` : ''}
+      ${imunidadesMagia.length > 0 ? `
+        <div style="display:flex;flex-wrap:wrap;gap:6px;padding:4px 0;margin-bottom:4px">
+          ${imunidadesMagia.map(im => `<span class="badge" style="font-size:0.7rem;padding:3px 7px;background:var(--success);color:#fff">Imune: ${im.condicao} (${im.fonte})</span>`).join('')}
+        </div>
+      ` : ''}
+      ${condicoesMagia.length > 0 ? `
+        <div style="display:flex;flex-wrap:wrap;gap:6px;padding:4px 0;margin-bottom:4px">
+          ${condicoesMagia.map(cm => `<span class="badge" style="font-size:0.7rem;padding:3px 7px;background:var(--accent);color:#fff" title="${cm.rotulo || cm.condicao}">${cm.condicao} (${cm.fonte})</span>`).join('')}
+        </div>
+      ` : ''}
+      ${efeitosUnicos.length > 0 ? `
+        <div style="display:flex;flex-wrap:wrap;gap:6px;padding:4px 0;margin-bottom:4px">
+          ${efeitosUnicos.map(ef => `<span class="badge" style="font-size:0.7rem;padding:3px 7px;background:var(--info);color:#fff" title="${ef.rotulo || ef.nome}">${ef.rotulo || ef.nome}${ef.concentracao ? ' (C)' : ''}</span>`).join('')}
+        </div>
+      ` : ''}
       ${temCondicao ? `
         <div style="display:flex;flex-wrap:wrap;gap:6px;padding:4px 0">
           ${condicoes.map(c => {
@@ -13489,7 +13929,7 @@ function renderSecaoCondicoes() {
             <span style="font-size:0.7rem;color:var(--text-muted)">(-${(char.exaustao || 0) * 2} em d20 e CD)</span>
           </div>
         ` : ''}
-      ` : '<div style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:8px">Nenhuma condicao ativa</div>'}
+      ` : `${(condicoesMagia.length + efeitosUnicos.length + imunidadesMagia.length) === 0 ? '<div style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:8px">Nenhuma condicao ativa</div>' : ''}`}
     </div>
   `;
 }
@@ -13498,21 +13938,32 @@ function renderSecaoCondicoes() {
 function renderSecaoDefesas() {
   const resistencias = [...(char.resistencias || [])];
   const vulnerabilidades = char.vulnerabilidades || [];
-  const imunidades = char.imunidades || [];
+  const imunidades = [...(char.imunidades || [])];
 
-  // Resistências dinâmicas da Fúria ativa
+  // Resistencias dinamicas da Furia ativa
   const _efDef = getEstadoFuria();
   const resistenciasFuriaAtivas = (_efDef?.ativa && _efDef?.resistencias) ? _efDef.resistencias : [];
-  // Combinar sem duplicar
   const resistenciasTotais = [...resistencias];
   resistenciasFuriaAtivas.forEach(r => {
     if (!resistenciasTotais.includes(r)) resistenciasTotais.push(r);
   });
 
-  // Resistência da espécie Anão a Venenoso (já deve estar em char.resistencias, mas garantir)
-  // Nenhuma adição extra necessária aqui — isso é feito no criador
+  // Resistencias e imunidades temporarias de efeitos magicos
+  const efeitosMag = char.efeitos_magicos || [];
+  const resistenciasMagicas = [];
+  const imunidadesMagicas = [];
+  efeitosMag.forEach(e => {
+    if (e.tipo === 'resistencia' && e.tipos_dano) {
+      e.tipos_dano.forEach(t => { if (!resistenciasTotais.includes(t) && !resistenciasMagicas.includes(t)) resistenciasMagicas.push(t); });
+    }
+    if (e.tipo === 'imunidade_condicao') {
+      const txt = `${e.condicao} (${e.nome.replace(/ \(.*\)$/, '')})`;
+      if (!imunidadesMagicas.includes(txt)) imunidadesMagicas.push(txt);
+    }
+  });
+  resistenciasMagicas.forEach(r => { if (!resistenciasTotais.includes(r)) resistenciasTotais.push(r); });
 
-  const temDefesa = resistenciasTotais.length > 0 || vulnerabilidades.length > 0 || imunidades.length > 0;
+  const temDefesa = resistenciasTotais.length > 0 || vulnerabilidades.length > 0 || imunidades.length > 0 || imunidadesMagicas.length > 0;
 
   if (!temDefesa) {
     return `
@@ -13535,26 +13986,30 @@ function renderSecaoDefesas() {
   `;
 
   if (resistenciasTotais.length > 0) {
-    // Separar fixas (char.resistencias) das temporárias (Fúria)
     const fixas = resistencias;
-    const temporarias = resistenciasFuriaAtivas.filter(r => !fixas.includes(r));
+    const temporariasFuria = resistenciasFuriaAtivas.filter(r => !fixas.includes(r));
+    const temporariasMagia = resistenciasMagicas.filter(r => !fixas.includes(r) && !temporariasFuria.includes(r));
     let textoRes = '';
     if (fixas.length > 0) textoRes += fixas.join(', ');
-    if (temporarias.length > 0) {
+    if (temporariasFuria.length > 0) {
       if (textoRes) textoRes += ', ';
-      textoRes += temporarias.map(r => `<span style="color:var(--danger);font-weight:600" title="Fúria ativa">${r} (Fúria)</span>`).join(', ');
+      textoRes += temporariasFuria.map(r => `<span style="color:var(--danger);font-weight:600" title="Fúria ativa">${r} (Fúria)</span>`).join(', ');
     }
-    // Se todos vieram da Fúria, exibir com fonte colorida
-    if (fixas.length === 0 && temporarias.length > 0) {
-      textoRes = temporarias.map(r => `<span style="color:var(--danger);font-weight:600" title="Fúria ativa">${r} (Fúria)</span>`).join(', ');
+    if (temporariasMagia.length > 0) {
+      if (textoRes) textoRes += ', ';
+      textoRes += temporariasMagia.map(r => `<span style="color:var(--accent);font-weight:600" title="Efeito mágico">${r} (Magia)</span>`).join(', ');
+    }
+    if (fixas.length === 0 && temporariasFuria.length > 0 && temporariasMagia.length === 0) {
+      textoRes = temporariasFuria.map(r => `<span style="color:var(--danger);font-weight:600" title="Fúria ativa">${r} (Fúria)</span>`).join(', ');
     }
     html += `<div style="margin-bottom:4px"><span style="font-size:0.75rem;font-weight:700;color:var(--info)">Resistencias:</span> <span style="font-size:0.8rem">${textoRes}</span></div>`;
   }
   if (vulnerabilidades.length > 0) {
     html += `<div style="margin-bottom:4px"><span style="font-size:0.75rem;font-weight:700;color:var(--danger)">Vulnerabilidades:</span> <span style="font-size:0.8rem">${vulnerabilidades.join(', ')}</span></div>`;
   }
-  if (imunidades.length > 0) {
-    html += `<div style="margin-bottom:4px"><span style="font-size:0.75rem;font-weight:700;color:var(--success)">Imunidades:</span> <span style="font-size:0.8rem">${imunidades.join(', ')}</span></div>`;
+  if (imunidades.length > 0 || imunidadesMagicas.length > 0) {
+    const todasImunidades = [...imunidades.map(i => i), ...imunidadesMagicas.map(i => `<span style="color:var(--accent);font-weight:600">${i}</span>`)];
+    html += `<div style="margin-bottom:4px"><span style="font-size:0.75rem;font-weight:700;color:var(--success)">Imunidades:</span> <span style="font-size:0.8rem">${todasImunidades.join(', ')}</span></div>`;
   }
 
   html += '</div>';
@@ -13985,7 +14440,7 @@ function renderSheetInvItem(item, idx) {
   const isZeroQtd = (item.quantidade ?? 1) <= 0;
 
   return `
-    <div class="inv-item ${item.equipado ? 'inv-item-equipado' : ''} ${isZeroQtd ? 'inv-item-zerado' : ''}" data-idx="${idx}" draggable="true">
+    <div class="inv-item ${item.equipado ? 'inv-item-equipado' : ''} ${isZeroQtd ? 'inv-item-zerado' : ''}" data-idx="${idx}">
       <div class="inv-drag-handle no-print" title="Arrastar para reordenar">&#9776;</div>
       <div style="flex:1;min-width:0;cursor:pointer" data-info-inv-sheet="${idx}" title="Ver detalhes">
         <div class="inv-item-nome">
@@ -14270,9 +14725,18 @@ function setupSheetDragDrop() {
 
   let dragIdx = null;
 
-  // ---- Eventos de mouse (desktop) ----
-  listaEl.querySelectorAll('.inv-item[draggable]').forEach(el => {
+  // ---- Eventos de mouse (desktop): drag inicia apenas pelo handle ----
+  listaEl.querySelectorAll('.inv-item[data-idx]').forEach(el => {
+    const handle = el.querySelector('.inv-drag-handle');
+    if (handle) {
+      handle.addEventListener('mousedown', () => {
+        el.setAttribute('draggable', 'true');
+      });
+    }
+
     el.addEventListener('dragstart', (e) => {
+      // Seguranca: so permite drag se iniciado pelo handle
+      if (!el.getAttribute('draggable')) { e.preventDefault(); return; }
       dragIdx = parseInt(el.dataset.idx);
       el.classList.add('inv-item-dragging');
       e.dataTransfer.effectAllowed = 'move';
@@ -14280,6 +14744,7 @@ function setupSheetDragDrop() {
 
     el.addEventListener('dragend', () => {
       el.classList.remove('inv-item-dragging');
+      el.removeAttribute('draggable');
       listaEl.querySelectorAll('.inv-item').forEach(item => item.classList.remove('inv-item-dragover'));
       dragIdx = null;
     });
@@ -14306,15 +14771,15 @@ function setupSheetDragDrop() {
     });
   });
 
-  // ---- Eventos de toque (mobile) ----
+  // ---- Eventos de toque (mobile): drag inicia apenas pelo handle ----
   let touchDragEl = null;
   let touchClone = null;
   let touchOffsetX = 0;
   let touchOffsetY = 0;
 
-  listaEl.querySelectorAll('.inv-item[draggable]').forEach(el => {
+  listaEl.querySelectorAll('.inv-item[data-idx]').forEach(el => {
     el.addEventListener('touchstart', (e) => {
-      // Só inicia drag se o toque for no handle de organização
+      // So inicia drag se o toque for no handle de organizacao
       if (!e.target.closest('.inv-drag-handle')) return;
       const touch = e.touches[0];
       dragIdx = parseInt(el.dataset.idx);

@@ -219,6 +219,14 @@ export function calcBonusPericia(personagem, nomePericia, opcoes = {}) {
     bonus += Math.max(1, calcMod(personagem.atributos.sabedoria));
   }
 
+  // Efeitos magicos: bonus numerico de pericia (ex: Passo Sem Rastro +10 Furtividade)
+  const efMag = personagem.efeitos_magicos || [];
+  for (const ef of efMag) {
+    if (ef.tipo === 'bonus_pericia' && typeof ef.bonus === 'number' && ef.pericia === nomePericia) {
+      bonus += ef.bonus;
+    }
+  }
+
   return bonus;
 }
 
