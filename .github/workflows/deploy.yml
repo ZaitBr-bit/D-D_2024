@@ -29,6 +29,7 @@ jobs:
           cp -r dados site/dados
           sed -i "s|const BASE_PATH = '../dados'|const BASE_PATH = './dados'|" site/js/db.js
           sed -i "s|const DATA_PREFIX = '../dados/'|const DATA_PREFIX = './dados/'|" site/sw.js
+          sed -i "s|const CACHE_VERSION = 0; // AUTO|const CACHE_VERSION = ${{ github.run_number }};|" site/sw.js
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
