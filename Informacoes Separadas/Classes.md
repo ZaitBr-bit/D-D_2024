@@ -4870,7 +4870,7 @@ Esta seção apresenta a lista de magias de Mago, organizadas por círculo de ma
 | *Similaridade*                    | Ilusão       | —            |
 | *Sonho*                           | Ilusão       | —            |
 | *Telecinese*                      | Transmutação | C            |
-| *Tempestade Radiante de Jallazar* | Evocação     | C            |
+| *Tempestade Radiante de Jallarzi* | Evocação     | C            |
 | *Vidência*                        | Adivinhação  | C, M         |
 
 **Magias de Mago de 6º Círculo**

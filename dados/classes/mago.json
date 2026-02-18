@@ -2,6 +2,13 @@
   "nome": "Mago",
   "tracos_basicos": {
     "Atributo Primário": "Inteligência",
+    "Dado de Ponto de Vida": "D6 por nível de Mago",
+    "Pontos de Vida no Nível 1": "6 + modificador de Constituição",
+    "Pontos de Vida por Nível adicional de Mago": "D6 + seu modificador de Constituição, ou, 4 + seu modificador de Constituição",
+    "Proficiência em Salvaguarda": "Inteligência e Sabedoria",
+    "Proficiências em Perícias": "Escolha 2: Arcanismo, História, Intuição, Investigação, Medicina ou Religião.",
+    "Proficiências com Armas": "Armas Simples",
+    "Proficiência com Armaduras": "Nenhuma",
     "Equipamento Inicial": "Escolha A ou B: (A) 2 Adagas, Foco Arcano (Cajado), Kit de Erudito, Livro de Magias, Túnica e 5 PO; ou (B) 55 PO"
   },
   "tabela_caracteristicas": [
