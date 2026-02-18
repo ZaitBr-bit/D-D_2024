@@ -14314,8 +14314,8 @@ function setupSheetDragDrop() {
 
   listaEl.querySelectorAll('.inv-item[draggable]').forEach(el => {
     el.addEventListener('touchstart', (e) => {
-      // Ignorar toque em botões internos
-      if (e.target.closest('button') || e.target.closest('select') || e.target.closest('input')) return;
+      // Só inicia drag se o toque for no handle de organização
+      if (!e.target.closest('.inv-drag-handle')) return;
       const touch = e.touches[0];
       dragIdx = parseInt(el.dataset.idx);
       touchDragEl = el;
