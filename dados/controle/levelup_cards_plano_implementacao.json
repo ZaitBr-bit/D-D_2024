@@ -1,0 +1,339 @@
+{
+  "gerado_em": "2026-02-18",
+  "descricao": "Plano estruturado para refatorar o fluxo de level up para cards dinâmicos com steps condicionais por classe e por escolhas do jogador.",
+  "referencia_codigo": {
+    "ui_atual": "site/js/pages/sheet.js (funcao abrirModalLevelUp)",
+    "regras_negocio": "site/js/levelup.js (subirDeNivel e validacoes)",
+    "metadados_classe": "site/js/dados-classes.js (CLASSES_INFO)",
+    "dados_detalhados_classe": "dados/classes/*.json"
+  },
+  "objetivo": {
+    "principal": "Substituir o modal monolítico de subida de nível por um motor de fluxo em cards, gerando steps em tempo de execução conforme classe, nível e escolhas.",
+    "resultados_esperados": [
+      "Cada etapa aparece somente quando aplicável.",
+      "A navegação reflete decisões do usuário (steps podem surgir/remover dinamicamente).",
+      "Regra de negócio permanece centralizada no levelup.js; UI passa a ser declarativa.",
+      "A experiência visual fica alinhada ao modelo dos screenshots (cards, progressão, confirmação guiada)."
+    ]
+  },
+  "diagnostico_atual": {
+    "problemas_identificados": [
+      "Fluxo de level up está concentrado em uma única função muito extensa (sheet.js), com forte acoplamento entre renderização, estado e validação.",
+      "Condições de exibição (subclasse, ASI, expertise, magias, etc.) são espalhadas no template HTML, dificultando manutenção.",
+      "A ordem de passos não é tratada como grafo/estado; é um bloco único com várias seções opcionais.",
+      "Validações de UI e validações de domínio coexistem de forma redundante em muitos pontos.",
+      "Reuso é baixo: componentes de seleção (cards, grids, checklists) aparecem com variações ad hoc."
+    ],
+    "impacto": [
+      "Maior risco de regressão ao adicionar novas classes/subclasses.",
+      "Custo alto para ajustar UX de passos condicionais.",
+      "Dificuldade para testar cada decisão de fluxo isoladamente."
+    ]
+  },
+  "escopo_funcional": {
+    "inclui": [
+      "Fluxo multi-step com indicador de progresso dinâmico.",
+      "Cards de ganho automático, escolhas obrigatórias e escolhas opcionais.",
+      "Geração condicional de steps por classe/nível/escolhas.",
+      "Sincronização com regras já existentes em levelup.js.",
+      "Persistência final usando subirDeNivel(char, opcoes)."
+    ],
+    "nao_inclui": [
+      "Mudanças de regra de D&D fora do escopo do level up.",
+      "Alterar estrutura de dados base dos personagens sem necessidade.",
+      "Reescrever telas fora do fluxo de level up."
+    ]
+  },
+  "matriz_regras_por_classe": {
+    "fonte_verdade": "site/js/levelup.js",
+    "subclasse": {
+      "nivel": 3,
+      "classes": [
+        "Bárbaro",
+        "Bardo",
+        "Bruxo",
+        "Clérigo",
+        "Druida",
+        "Feiticeiro",
+        "Guardião",
+        "Guerreiro",
+        "Ladino",
+        "Mago",
+        "Monge",
+        "Paladino"
+      ]
+    },
+    "aumento_atributo": {
+      "Clérigo": [4, 8, 12, 16],
+      "Bárbaro": [4, 8, 12, 16, 19],
+      "Bardo": [4, 8, 12, 16, 19],
+      "Bruxo": [4, 8, 12, 16, 19],
+      "Druida": [4, 8, 12, 16, 19],
+      "Feiticeiro": [4, 8, 12, 16, 19],
+      "Guardião": [4, 8, 12, 16, 19],
+      "Guerreiro": [4, 6, 8, 12, 14, 16, 19],
+      "Ladino": [4, 8, 10, 12, 16, 19],
+      "Mago": [4, 8, 12, 16, 19],
+      "Monge": [4, 8, 12, 16, 19],
+      "Paladino": [4, 8, 12, 16, 19]
+    },
+    "escolhas_especiais": [
+      {
+        "regra": "Especialização do Bardo",
+        "classe": "Bardo",
+        "niveis": [2, 9],
+        "input": "bardo_expertise (2 perícias)"
+      },
+      {
+        "regra": "Especialista do Guardião",
+        "classe": "Guardião",
+        "niveis": [9],
+        "input": "guardiao_expertise (2 perícias)"
+      },
+      {
+        "regra": "Estilo de Luta",
+        "classe": ["Guardião", "Paladino"],
+        "niveis": [2],
+        "input": "estilo_luta (1 opção)"
+      },
+      {
+        "regra": "Explorador Hábil",
+        "classe": "Guardião",
+        "niveis": [2],
+        "input": "explorador_expertise (1) + explorador_idiomas (2)"
+      },
+      {
+        "regra": "Acadêmico",
+        "classe": "Mago",
+        "niveis": [2],
+        "input": "academico_expertise (2 perícias)"
+      }
+    ],
+    "conjuracao": {
+      "classes_conjuradoras": {
+        "Bardo": "conhecidas",
+        "Bruxo": "conhecidas",
+        "Feiticeiro": "conhecidas",
+        "Clérigo": "preparadas",
+        "Druida": "preparadas",
+        "Guardião": "preparadas",
+        "Mago": "preparadas",
+        "Paladino": "preparadas"
+      },
+      "subclasses_conjuradoras": [
+        "Guerreiro/Cavaleiro Místico",
+        "Ladino/Trapaceiro Arcano"
+      ],
+      "observacoes": [
+        "Classes de magias conhecidas podem ganhar magias novas e trocar 1 magia conhecida no level up.",
+        "Mago adiciona 2 magias ao grimório no level up.",
+        "Truques ganhos dependem da tabela da classe/subclasse no nível alvo."
+      ]
+    }
+  },
+  "arquitetura_alvo": {
+    "visao_geral": "Introduzir um Flow Engine declarativo: buildLevelUpFlow(contexto) retorna uma lista de steps/cards a renderizar. A UI navega em cima desse fluxo, não em ifs espalhados no template.",
+    "modulos_sugeridos": [
+      {
+        "arquivo": "site/js/levelup-flow.js",
+        "responsabilidade": "Gerar contexto de level up e montar steps dinâmicos (metadados + estado inicial)."
+      },
+      {
+        "arquivo": "site/js/levelup-cards.js",
+        "responsabilidade": "Renderização de cards e componentes de step (ganhos, escolhas, magias, revisão)."
+      },
+      {
+        "arquivo": "site/js/levelup-validations.js",
+        "responsabilidade": "Validações por step e agregação final de opcoes para subirDeNivel()."
+      },
+      {
+        "arquivo": "site/js/pages/sheet.js",
+        "responsabilidade": "Ponto de integração: dispara fluxo, injeta modal e recebe resultado final."
+      }
+    ],
+    "modelo_step": {
+      "schema": {
+        "id": "string",
+        "ordem": "number",
+        "titulo": "string",
+        "tipo": "ganho | escolha | magia | revisao",
+        "obrigatorio": "boolean",
+        "visivel": "(ctx, state) => boolean",
+        "completo": "(ctx, state) => boolean",
+        "render": "(ctx, state) => html",
+        "collect": "(ctx, state) => parcial_opcoes"
+      },
+      "exemplo_fluxo_base": [
+        "ganhos_nivel",
+        "escolhas_poder",
+        "efeitos_poder",
+        "selecao_magias",
+        "revisao_confirmacao"
+      ],
+      "regras_dinamicas": [
+        "Step só entra no fluxo quando a condição visivel() for verdadeira.",
+        "Se uma escolha muda o cenário (ex.: ASI por atributo em vez de talento), steps derivados são recalculados em tempo real.",
+        "A barra de progresso usa apenas steps visíveis no momento atual."
+      ]
+    }
+  },
+  "mapeamento_de_steps_dinamicos": [
+    {
+      "id": "ganhos_nivel",
+      "titulo": "Ganhos do Nível",
+      "objetivo": "Exibir ganhos automáticos (PV, mana/recursos, características de classe/espécie/subclasse).",
+      "sempre_visivel": true,
+      "tipo_card": "informativo"
+    },
+    {
+      "id": "escolhas_poder",
+      "titulo": "Escolha de Poder",
+      "objetivo": "Concentrar escolhas obrigatórias de classe/subclasse/talento/perícias/estilo.",
+      "visibilidade": "Quando existir pelo menos 1 pendência obrigatória no nível alvo.",
+      "tipo_card": "interativo"
+    },
+    {
+      "id": "efeitos_poder",
+      "titulo": "Efeitos do Poder",
+      "objetivo": "Mostrar preview dos efeitos resultantes das escolhas (ex.: talento escolhido, expertise aplicada).",
+      "visibilidade": "Quando houver escolhas em andamento que alterem estado ou concedam efeitos não triviais.",
+      "tipo_card": "resumo"
+    },
+    {
+      "id": "selecao_magias",
+      "titulo": "Seleção de Magias",
+      "objetivo": "Coletar truques/magias/trocas/grimório quando aplicável.",
+      "visibilidade": "Somente para classes/subclasses conjuradoras e apenas quando houver ação do usuário necessária.",
+      "tipo_card": "interativo"
+    },
+    {
+      "id": "revisao_confirmacao",
+      "titulo": "Revisão e Confirmação",
+      "objetivo": "Consolidar decisões e validar antes de chamar subirDeNivel().",
+      "sempre_visivel": true,
+      "tipo_card": "resumo_final"
+    }
+  ],
+  "logica_de_composicao_fluxo": {
+    "entrada": {
+      "contexto": [
+        "personagem atual",
+        "classeData",
+        "nivelAtual e nivelNovo",
+        "flags de regras (subclasse, ASI, expertise, estilo, explorador, acadêmico)",
+        "dados de conjuração (tipo, limites de truques/magias, círculos)"
+      ],
+      "estado_ui": [
+        "escolhas parciais do usuário",
+        "step atual",
+        "erros de validação por step"
+      ]
+    },
+    "processo": [
+      "1) buildContext: calcula todas as flags e metadados do nível alvo.",
+      "2) buildSteps: cria array de steps com visibilidade dinâmica.",
+      "3) renderStep: exibe cards do step ativo.",
+      "4) validateStep: bloqueia avanço quando obrigatório não concluído.",
+      "5) collectAll: consolida opcoes no formato esperado por subirDeNivel().",
+      "6) submit: chama subirDeNivel(), processa resumo e persiste."
+    ],
+    "saida": {
+      "opcoes_final": "Objeto compatível com levelup.js",
+      "resultado": "Retorno de subirDeNivel() + resumo visual"
+    }
+  },
+  "compatibilidade_com_regra_existente": {
+    "diretriz": "Não duplicar regra de negócio. levelup.js continua autoridade de validação e aplicação.",
+    "ui_valida_minimo": [
+      "Campos obrigatórios por step para UX imediata.",
+      "Limites simples (ex.: máximo de checkboxes)."
+    ],
+    "dominio_valida_final": [
+      "subirDeNivel() mantém validação canônica (pendências e consistência)."
+    ]
+  },
+  "plano_de_implementacao_fases": [
+    {
+      "fase": 1,
+      "nome": "Extração do contexto de fluxo",
+      "entregas": [
+        "Criar buildLevelUpContext() desacoplado da renderização.",
+        "Mapear pendências obrigatórias em estrutura única (array de requirements).",
+        "Cobrir classes conjuradoras e subclasses conjuradoras."
+      ],
+      "risco": "baixo"
+    },
+    {
+      "fase": 2,
+      "nome": "Motor de steps dinâmicos",
+      "entregas": [
+        "Criar registro declarativo de steps com visibilidade/completude.",
+        "Implementar barra de progresso dinâmica (índice recalculado quando fluxo muda).",
+        "Navegação Voltar/Próximo respeitando apenas steps visíveis."
+      ],
+      "risco": "médio"
+    },
+    {
+      "fase": 3,
+      "nome": "Render de cards por domínio",
+      "entregas": [
+        "Cards de ganhos automáticos.",
+        "Cards de escolhas (subclasse, ASI/talento, especializações, estilo, etc.).",
+        "Cards de magias reutilizando grid atual como componente."
+      ],
+      "risco": "médio"
+    },
+    {
+      "fase": 4,
+      "nome": "Coleta unificada e submissão",
+      "entregas": [
+        "Consolidar state -> opcoes para subirDeNivel().",
+        "Remover montagem manual de opcoes espalhada no handler final.",
+        "Preservar resumo final e persistência."
+      ],
+      "risco": "médio"
+    },
+    {
+      "fase": 5,
+      "nome": "Refino visual e regressão",
+      "entregas": [
+        "Ajustar layout para padrão card dos screenshots.",
+        "Testes manuais por classe e por níveis críticos.",
+        "Limpeza de código legado do modal antigo."
+      ],
+      "risco": "médio"
+    }
+  ],
+  "casos_de_teste_obrigatorios": {
+    "fluxo_dinamico": [
+      "Quando ASI = aumento de atributo: não deve existir step extra de escolhas de talento.",
+      "Quando ASI = talento: step de escolhas específicas do talento deve aparecer se aplicável.",
+      "Quando não há pendências obrigatórias de classe: step de escolha de poder deve ser omitido.",
+      "Quando personagem é conjurador sem ação necessária de magia: step de seleção de magias deve ser omitido.",
+      "Quando personagem ganha truques/magias: step de seleção de magias deve ser criado."
+    ],
+    "regras_por_classe": [
+      "Bardo nível 2/9 exige 2 especializações.",
+      "Guardião nível 2 exige estilo de luta + explorador hábil; nível 9 exige especialista.",
+      "Mago nível 2 exige acadêmico; nível com conjuração deve suportar grimório +2.",
+      "Guerreiro/Ladino com subclasses conjuradoras devem abrir fluxo de magias a partir da ativação de subclasse."
+    ],
+    "integridade": [
+      "subirDeNivel deve receber payload válido em todos os fluxos.",
+      "Resumo final deve refletir escolhas feitas nos cards.",
+      "Sem regressão em hp_modo fixo/rolado e validações de limites."
+    ]
+  },
+  "criterios_de_aceite": [
+    "O fluxo de level up é composto por cards e steps dinâmicos (não seções fixas).",
+    "A quantidade e ordem de steps mudam conforme classe, nível e escolhas do usuário.",
+    "Nenhum step irrelevante aparece para uma combinação classe/nível.",
+    "A lógica canônica de aplicação permanece em levelup.js, sem divergência funcional.",
+    "UX permite avançar/voltar sem perder estado das escolhas já feitas."
+  ],
+  "observacoes_tecnicas": [
+    "Recomenda-se manter feature flag temporária (ex.: LEVELUP_FLOW_V2) para migração segura.",
+    "Reaproveitar estilos e componentes existentes de cards (magia-card, badges, grids) para reduzir retrabalho.",
+    "Evitar nova duplicação de validações; centralizar em funções de step + validação final de domínio."
+  ]
+}
