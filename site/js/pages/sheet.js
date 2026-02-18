@@ -11737,6 +11737,17 @@ async function obterMagiasDisponiveisClasseAtual() {
   return [...mapa.values()];
 }
 
+// Prioridade de ordenacao: Acao=0, Acao Bonus=1, Reacao=2, outros=3
+function prioridadeConjuracao(nomeMagia) {
+  const info = indiceMagiasCache?.find(m => m.nome === nomeMagia);
+  if (!info?.tempo_conjuracao) return 3;
+  const tc = info.tempo_conjuracao.toLowerCase();
+  if (tc === 'ação' || tc === 'acao') return 0;
+  if (tc.includes('ação bônus') || tc.includes('acao bonus')) return 1;
+  if (tc.includes('reação') || tc.includes('reacao')) return 2;
+  return 3;
+}
+
 // Retorna badges HTML compactos com metadados da magia (tipo, tempo, alcance, duração)
 function badgesMagiaRapidos(nomeMagia) {
   if (!indiceMagiasCache?.length) return '';
@@ -11750,14 +11761,15 @@ function badgesMagiaRapidos(nomeMagia) {
     badges.push(`<span class="magia-tag tag-escola">${info.escola}</span>`);
   }
 
-  // Tempo de conjuração - texto legível sem depender de title
+  // Tempo de conjuração - cores diferentes por tipo
   if (info.tempo_conjuracao) {
     const tc = info.tempo_conjuracao.toLowerCase();
     let label = info.tempo_conjuracao;
-    if (tc === 'ação' || tc === 'acao') label = 'Ação';
-    else if (tc.includes('ação bônus') || tc.includes('acao bonus')) label = 'Bônus';
-    else if (tc === 'reação' || tc === 'reacao') label = 'Reação';
-    badges.push(`<span class="magia-tag tag-tempo">${label}</span>`);
+    let tagClass = 'tag-tempo';
+    if (tc === 'ação' || tc === 'acao') { label = 'Ação'; tagClass = 'tag-acao'; }
+    else if (tc.includes('ação bônus') || tc.includes('acao bonus')) { label = 'Ação Bônus'; tagClass = 'tag-acao-bonus'; }
+    else if (tc.includes('reação') || tc.includes('reacao')) { label = 'Reação'; tagClass = 'tag-reacao'; }
+    badges.push(`<span class="magia-tag ${tagClass}">${label}</span>`);
   }
 
   // Duração - concentração ou instantâneo
@@ -12161,7 +12173,7 @@ function renderSecaoMagias() {
             ${circ}º Círculo (${magias.length})
           </summary>
           <div style="padding-top:4px">
-            ${magias.map(m => {
+            ${magias.slice().sort((a, b) => prioridadeConjuracao(a.nome) - prioridadeConjuracao(b.nome)).map(m => {
               const ehEspecial = magiaEhEspecial(m);
               const origemLabel = rotuloOrigemMagia(m);
               const circulos = Object.keys(espacos).filter(c => parseInt(c) >= m.circulo).sort((a, b) => parseInt(a) - parseInt(b));
@@ -12226,7 +12238,7 @@ function renderSecaoMagias() {
             Truques (${truquesClasse.length}${maxTruques ? ' / ' + maxTruques : ''}${truquesEspecie.length > 0 ? ` + ${truquesEspecie.length} espécie` : ''}${truquesTalento.length > 0 ? ` + ${truquesTalento.length} talento` : ''})
           </summary>
           <div style="padding-top:4px">
-            ${truquesEspecie.map(m => `
+            ${truquesEspecie.slice().sort((a, b) => prioridadeConjuracao(a.nome) - prioridadeConjuracao(b.nome)).map(m => `
               <div class="magia-item magia-dominio" data-magia-nome="${m.nome}" data-magia-circ="0">
                 <div style="display:flex;justify-content:space-between;align-items:center">
                   <div>
@@ -12239,7 +12251,7 @@ function renderSecaoMagias() {
                 <div class="magia-desc"></div>
               </div>
             `).join('')}
-            ${truquesTalento.map(m => `
+            ${truquesTalento.slice().sort((a, b) => prioridadeConjuracao(a.nome) - prioridadeConjuracao(b.nome)).map(m => `
               <div class="magia-item magia-dominio" data-magia-nome="${m.nome}" data-magia-circ="0">
                 <div style="display:flex;justify-content:space-between;align-items:center">
                   <div>
@@ -12252,7 +12264,7 @@ function renderSecaoMagias() {
                 <div class="magia-desc"></div>
               </div>
             `).join('')}
-            ${truquesClasse.map(m => {
+            ${truquesClasse.slice().sort((a, b) => prioridadeConjuracao(a.nome) - prioridadeConjuracao(b.nome)).map(m => {
               const mods = truquesModificadosMapa[m.nome] || [];
               const modHtml = mods.length > 0
                 ? `<div style="font-size:0.6rem;color:var(--accent);font-weight:600;margin-top:1px">${mods.map(mod => `${mod.invocacao}: ${mod.efeito}`).join(' | ')}</div>`
@@ -12284,7 +12296,7 @@ function renderSecaoMagias() {
             Livro de Magias. Prepare magias a partir daqui (limite: ${maxPreparadas}). Magias com marcador Ritual podem ser conjuradas sem preparar.
           </div>
           <div style="padding-top:4px">
-            ${grimorio.map(m => {
+            ${grimorio.slice().sort((a, b) => prioridadeConjuracao(a.nome) - prioridadeConjuracao(b.nome)).map(m => {
               const jaPreparada = preparadas.some(p => p.nome === m.nome);
               const infoMagia = indiceMagiasCache?.find(im => im.nome === m.nome);
               const ehRitual = infoMagia?.tempo_conjuracao && /ritual/i.test(infoMagia.tempo_conjuracao);
@@ -12892,16 +12904,38 @@ function setupEventosEspacosMagia() {
         return;
       }
       const nome = btn.dataset.lancarTruque;
-      // Truque com efeito mecanico (ex: Protecao Contra Laminas)
-      const config = MAGIAS_EFEITO[nome];
-      if (config && config.truque && config.permite_self) {
-        aplicarEfeitoMagico(nome, 0);
-        salvar();
-        renderFichaCompleta();
-        toast(`${nome} lançado (em você)!`, 'success');
-        return;
+
+      // Verificar conflito de concentracao antes de executar
+      const truqueEhConc = ehMagiaConcentracao(nome);
+      const concAtiva = getConcentracaoAtiva();
+      const temConflitoConc = truqueEhConc && concAtiva && concAtiva !== nome;
+
+      const _executarTruque = () => {
+        // Truque com efeito mecanico (ex: Protecao Contra Laminas)
+        const config = MAGIAS_EFEITO[nome];
+        if (config && config.truque && config.permite_self) {
+          aplicarEfeitoMagico(nome, 0);
+          salvar();
+          renderFichaCompleta();
+          toast(`${nome} lançado (em você)!`, 'success');
+          return;
+        }
+        // Truque de concentracao sem mecanica: rastrear genericamente
+        if (truqueEhConc) {
+          if (!char.efeitos_magicos) char.efeitos_magicos = [];
+          char.efeitos_magicos = char.efeitos_magicos.filter(e => !e.concentracao);
+          char.efeitos_magicos.push({ nome: nome, tipo: 'concentracao_generica', concentracao: true, circulo: 0, rotulo: `Concentrando em ${nome}` });
+          salvar();
+          renderFichaCompleta();
+        }
+        toast(`${nome} lançado!`, 'success');
+      };
+
+      if (temConflitoConc) {
+        confirmarSubstituirConcentracao(concAtiva, nome, _executarTruque);
+      } else {
+        _executarTruque();
       }
-      toast(`${nome} lançado!`, 'success');
     });
   });
 

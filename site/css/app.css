@@ -590,8 +590,11 @@ tr:hover td { background: #faf8f4; }
 }
 .tag-escola { background: #f0ece4; color: #7a6840; border-color: #e0d8c8; }
 .tag-tempo { background: #e8f0e8; color: #3a6a3a; border-color: #c8dcc8; }
+.tag-acao { background: #e8f0e8; color: #3a6a3a; border-color: #c8dcc8; }
+.tag-acao-bonus { background: #e3f2fd; color: #1565c0; border-color: #90caf9; font-weight: 700; }
+.tag-reacao { background: #fff8e1; color: #b45309; border-color: #fde68a; }
 .tag-conc { background: #fff3e0; color: #c17a00; border-color: #ffe0b0; }
-.tag-inst { background: #e3f2fd; color: #1565c0; border-color: #bbdefb; }
+.tag-inst { background: #f3e5f5; color: #6a1b9a; border-color: #e1bee7; }
 .tag-dur { background: #fce4ec; color: #ad1457; border-color: #f8bbd0; }
 .tag-alcance { background: #ede7f6; color: #5e35b1; border-color: #d1c4e9; }
 
@@ -1377,6 +1380,9 @@ tr:hover td { background: #faf8f4; }
 
 /* --- Responsivo --- */
 @media (max-width: 480px) {
+  /* Prevenir zoom automatico do iOS ao focar em campos de texto */
+  .form-input, .form-select, .form-textarea, input, select, textarea { font-size: 16px !important; }
+
   .atributos-grid { grid-template-columns: repeat(3, 1fr); }
   .selection-grid { grid-template-columns: repeat(2, 1fr); }
   .pericias-lista { columns: 1; }
