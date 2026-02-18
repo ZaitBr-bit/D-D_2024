@@ -23,8 +23,6 @@ const STATIC_ASSETS = [
 ];
 
 self.addEventListener('install', (event) => {
-  // Forçar ativação imediata do novo SW (sem esperar abas fecharem)
-  self.skipWaiting();
   // Pré-cachear assets estáticos na nova versão
   event.waitUntil(
     caches.open(CACHE_STATIC).then((cache) => {
