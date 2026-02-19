@@ -3730,6 +3730,11 @@ function setupEventosDescanso() {
           (char.recursos.paladino.canalizar_divindade_usos_gastos || 0) - 1
         );
       }
+      // Devoção: desativar efeitos temporários (duração expirada)
+      if (estado && char.subclasse === 'Juramento de Devoção' && char.recursos.paladino.subclasses?.devocao) {
+        char.recursos.paladino.subclasses.devocao.arma_sagrada_ativa = false;
+        char.recursos.paladino.subclasses.devocao.resplendor_sagrado_ativo = false;
+      }
     }
 
     // Monge: descanso curto restaura todos os pontos de foco
@@ -4065,6 +4070,12 @@ function setupEventosDescanso() {
         if (char.subclasse === 'Juramento dos Anciões' && char.recursos.paladino.subclasses?.ancioes) {
           char.recursos.paladino.subclasses.ancioes.sentinela_imortal_usada = false;
           char.recursos.paladino.subclasses.ancioes.campeao_ancestral_usado = false;
+        }
+        // Devoção: restaurar todos os recursos de subclasse
+        if (char.subclasse === 'Juramento de Devoção' && char.recursos.paladino.subclasses?.devocao) {
+          char.recursos.paladino.subclasses.devocao.arma_sagrada_ativa = false;
+          char.recursos.paladino.subclasses.devocao.resplendor_sagrado_usado = false;
+          char.recursos.paladino.subclasses.devocao.resplendor_sagrado_ativo = false;
         }
       }
     }
@@ -4732,8 +4743,18 @@ function setupEventosHabilidades() {
         if (!estado) return;
         const acao = el.dataset.druidaSubclasseAcao;
         if (acao === 'constelacao_escolha') {
-          char.recursos.druida.subclasses.estrelas.constelacao_ativa = el.value;
-          toast(`Constelação ativa: ${el.value || 'Nenhuma'}`, 'success');
+          const novaConstelacao = el.value;
+          const constelacaoAnterior = char.recursos.druida.subclasses.estrelas.constelacao_ativa || '';
+          // Ativar constelação consome 1 uso de Forma Selvagem
+          if (novaConstelacao && !constelacaoAnterior) {
+            if (!consumirUsoFormaSelvagem(1)) {
+              toast('Sem usos de Forma Selvagem disponíveis.', 'error');
+              el.value = constelacaoAnterior;
+              return;
+            }
+          }
+          char.recursos.druida.subclasses.estrelas.constelacao_ativa = novaConstelacao;
+          toast(`Constelação ativa: ${novaConstelacao || 'Nenhuma'}`, 'success');
         }
         if (acao === 'pressagio_tipo') {
           char.recursos.druida.subclasses.estrelas.pressagio_tipo = el.value;
@@ -4748,7 +4769,7 @@ function setupEventosHabilidades() {
     }
   });
 
-  // Bardo: subclasses interativas (Glamour)
+  // Bardo: subclasses interativas (Glamour + Dança + Conhecimento)
   document.querySelectorAll('[data-bardo-subclasse-acao]').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -4762,7 +4783,43 @@ function setupEventosHabilidades() {
       const acao = btn.dataset.bardoSubclasseAcao;
       const glamour = char.recursos.bardo.subclasses.glamour;
 
+      // Ações que consomem 1 Inspiração de Bardo
+      const usaInspiracao = [
+        'danca_gingado_coordenado', 'danca_movimento_inspirador',
+        'conhecimento_palavras_interrupcao', 'conhecimento_pericia_inigualavel',
+        'glamour_manto_inspiracao'
+      ].includes(acao);
+
+      if (usaInspiracao) {
+        const estadoInsp = getEstadoInspiracaoBardo();
+        if (!estadoInsp || estadoInsp.usosDisponiveis <= 0) {
+          toast('Sem usos de Inspiração Bárdica disponíveis.', 'error');
+          return;
+        }
+        char.recursos.inspiracao_bardo_usos_gastos += 1;
+      }
+
       switch (acao) {
+        case 'danca_gingado_coordenado':
+          toast('Gingado Coordenado! +dado de Inspiração na Iniciativa para você e aliados em 9m.', 'success');
+          break;
+
+        case 'danca_movimento_inspirador':
+          toast('Movimento Inspirador! Reação: mova sem provocar + aliado em 9m também move.', 'success');
+          break;
+
+        case 'conhecimento_palavras_interrupcao':
+          toast('Palavras de Interrupção! Reação: subtraia dado de Inspiração do resultado do alvo.', 'success');
+          break;
+
+        case 'conhecimento_pericia_inigualavel':
+          toast('Perícia Inigualável! +dado de Inspiração ao teste/ataque falho.', 'success');
+          break;
+
+        case 'glamour_manto_inspiracao':
+          toast('Manto de Inspiração ativado! PV temporários + Reação para mover sem provocar.', 'success');
+          break;
+
         case 'glamour_magia_fascinante':
           if (glamour.magia_fascinante_usada) {
             toast('Magia Fascinante já usada.', 'error');
@@ -5588,7 +5645,8 @@ function setupEventosHabilidades() {
       // Ações que consomem Canalizar Divindade
       const usaCanalizar = [
         'gloria_atleta', 'gloria_destruicao_inspiradora',
-        'vinganca_voto_inimizade', 'ancioes_ira_natureza'
+        'vinganca_voto_inimizade', 'ancioes_ira_natureza',
+        'devocao_arma_sagrada'
       ].includes(acao);
 
       if (usaCanalizar && estado.canalizarDisponiveis <= 0) {
@@ -5681,6 +5739,58 @@ function setupEventosHabilidades() {
           }
           char.recursos.paladino.subclasses.ancioes.campeao_ancestral_usado = true;
           toast('Campeão Ancestral ativado! 1min: Desv. salvaguardas de inimigos, magias como Bônus, +10 PV por turno.', 'success');
+          break;
+        }
+
+        // === Devoção ===
+        case 'devocao_arma_sagrada': {
+          if (!char.recursos.paladino.subclasses.devocao) char.recursos.paladino.subclasses.devocao = {};
+          char.recursos.paladino.canalizar_divindade_usos_gastos += 1;
+          char.recursos.paladino.subclasses.devocao.arma_sagrada_ativa = true;
+          toast('Arma Sagrada ativada! 10min: +mod CAR no ataque, luz brilhante 6m + penumbra 6m.', 'success');
+          break;
+        }
+
+        case 'devocao_arma_sagrada_desativar': {
+          if (!char.recursos.paladino.subclasses.devocao) char.recursos.paladino.subclasses.devocao = {};
+          char.recursos.paladino.subclasses.devocao.arma_sagrada_ativa = false;
+          toast('Arma Sagrada encerrada.', 'info');
+          break;
+        }
+
+        case 'devocao_resplendor_ativar': {
+          if (!char.recursos.paladino.subclasses.devocao) char.recursos.paladino.subclasses.devocao = {};
+          if (char.recursos.paladino.subclasses.devocao.resplendor_sagrado_usado) {
+            toast('Resplendor Sagrado já usado neste descanso longo.', 'error');
+            return;
+          }
+          char.recursos.paladino.subclasses.devocao.resplendor_sagrado_usado = true;
+          char.recursos.paladino.subclasses.devocao.resplendor_sagrado_ativo = true;
+          toast('Resplendor Sagrado ativado! 10min: emanação 9m de luz Radiante, +mod CAR à salvaguarda.', 'success');
+          break;
+        }
+
+        case 'devocao_resplendor_desativar': {
+          if (!char.recursos.paladino.subclasses.devocao) char.recursos.paladino.subclasses.devocao = {};
+          char.recursos.paladino.subclasses.devocao.resplendor_sagrado_ativo = false;
+          toast('Resplendor Sagrado encerrado.', 'info');
+          break;
+        }
+
+        case 'devocao_resplendor_restaurar': {
+          if (!char.recursos.paladino.subclasses.devocao) char.recursos.paladino.subclasses.devocao = {};
+          // Gastar espaço de magia de 5º círculo para restaurar
+          const slots = char.espacos_magia || {};
+          const usados5 = slots['5_usado'] || 0;
+          const max5 = (getEspacosMagia(char.classe, char.nivel || 1) || {})[5] || 0;
+          if (usados5 >= max5) {
+            toast('Sem espaço de magia de 5º círculo disponível.', 'error');
+            return;
+          }
+          if (!char.espacos_magia) char.espacos_magia = {};
+          char.espacos_magia['5_usado'] = usados5 + 1;
+          char.recursos.paladino.subclasses.devocao.resplendor_sagrado_usado = false;
+          toast('Resplendor Sagrado restaurado (1 espaço de 5º círculo gasto).', 'success');
           break;
         }
 
@@ -7620,6 +7730,10 @@ function renderFeatureItem(f, source) {
   const ehAncioesAuraResistencia = ehSubclassePaladino && ehAncioes && f.nome === 'Aura de Resistência';
   const ehAncioesSentinelaImortal = ehSubclassePaladino && ehAncioes && f.nome === 'Sentinela Imortal';
   const ehAncioesCampeaoAncestral = ehSubclassePaladino && ehAncioes && f.nome === 'Campeão Ancestral';
+  // Juramento da Devoção
+  const ehDevocao = ehPaladino && char.subclasse === 'Juramento da Devoção';
+  const ehDevocaoArmaSagrada = ehSubclassePaladino && ehDevocao && f.nome === 'Arma Sagrada';
+  const ehDevocaoResplendorSagrado = ehSubclassePaladino && ehDevocao && f.nome === 'Resplendor Sagrado';
 
   // Para habilidades com múltiplos usos, usar contador
   let usosAtual = 0;
@@ -7632,7 +7746,9 @@ function renderFeatureItem(f, source) {
     }
   }
   const usado = temMultiplosUsos ? usosAtual >= usosMax : (char.usos_habilidades[key] || false);
-  const estadoClerigo = (ehCanalizarDivindadeClerigo || ehIntervencaoDivinaClerigo || ehIntervencaoDivinaMaiorClerigo || ehGolpesAbencoadosClerigo)
+  const estadoClerigo = (ehCanalizarDivindadeClerigo || ehIntervencaoDivinaClerigo || ehIntervencaoDivinaMaiorClerigo || ehGolpesAbencoadosClerigo
+    || ehGuerraBencaoDeus || ehLuzBrilho || ehVidaPreservar
+    || ehGuerraAtaqueDirecionado || ehTrapacaInvocar)
     ? getEstadoRecursosClerigo()
     : null;
   const estadoSubclassesClerigo = (
@@ -7839,6 +7955,32 @@ function renderFeatureItem(f, source) {
       </div>
     `;
     recarga = 'longo';
+  } else if (ehFuriaIrracional) {
+    // Berserker nv6: Fúria Irracional — passiva durante Fúria
+    const furiaAtiva = !!getEstadoFuria()?.ativa;
+    usosHtmlBody = `
+      <div style="padding:4px 0 4px 16px;font-size:0.8rem;color:${furiaAtiva ? 'var(--success)' : 'var(--text-muted)'}">
+        ${furiaAtiva ? '<strong>Ativo:</strong> Imune a Amedrontado e Enfeitiçado enquanto em Fúria.' : 'Requer Fúria ativa — concede Imunidade a Amedrontado e Enfeitiçado.'}
+      </div>
+    `;
+  } else if (ehPoderSelvagens) {
+    // Coração Selvagem nv14: Poder dos Selvagens — aprimora Fúria dos Selvagens
+    usosHtmlBody = `
+      <div style="padding:4px 0 4px 16px;font-size:0.8rem">
+        <div style="color:var(--accent);font-weight:600">Passiva — Aprimora Fúria dos Selvagens</div>
+        <div style="color:var(--text-muted);font-size:0.75rem;margin-top:2px">
+          Ao entrar em Fúria: escolha <strong>2 espíritos animais</strong> em vez de apenas 1.
+        </div>
+      </div>
+    `;
+  } else if (ehPercorrerArvore) {
+    // Árvore do Mundo nv6: Percorrer a Árvore — Ação Bônus durante Fúria
+    const furiaAtiva = !!getEstadoFuria()?.ativa;
+    usosHtmlBody = `
+      <div style="padding:4px 0 4px 16px;font-size:0.8rem;color:${furiaAtiva ? 'var(--success)' : 'var(--text-muted)'}">
+        ${furiaAtiva ? '<strong>Disponível:</strong> Ação Bônus — teleporte até 18m para espaço desocupado visível.' : 'Requer Fúria ativa — Ação Bônus para teleportar até 18m.'}
+      </div>
+    `;
   } else if (ehContraEncantamento) {
     // Contra-Encantamento (Bardo nível 7): reação ilimitada
     usosHtmlBody = `
@@ -7900,24 +8042,25 @@ function renderFeatureItem(f, source) {
     `;
   } else if (ehDancaGingadoCoordenado) {
     // Dança: Gingado Coordenado (nv6) — gasta Inspiração
-    const dadoInsp = getEstadoInspiracaoBardo()?.dado || 6;
+    const estadoInsp = getEstadoInspiracaoBardo();
+    const dadoInsp = estadoInsp?.dado || 6;
+    const semInsp = !estadoInsp || estadoInsp.usosDisponiveis <= 0;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">Insp. ${estadoInsp?.usosDisponiveis || 0}/${estadoInsp?.usosMax || 0}</span>`;
     usosHtmlBody = `
-      <div style="padding:4px 0 4px 16px;font-size:0.8rem">
-        <div style="color:var(--accent);font-weight:600">Gasta 1 Inspiração de Bardo</div>
-        <div style="color:var(--text-muted);font-size:0.75rem;margin-top:2px">
-          Ao jogar Iniciativa: +d${dadoInsp} na Iniciativa para você e aliados em 9m.
-        </div>
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-bardo-subclasse-acao="danca_gingado_coordenado" ${semInsp ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Gastar Inspiração</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Iniciativa: +d${dadoInsp} para você e aliados em 9m</span>
       </div>
     `;
   } else if (ehDancaMovimentoInspirador) {
     // Dança: Movimento Inspirador (nv6) — reação + gasta Inspiração
+    const estadoInsp = getEstadoInspiracaoBardo();
+    const semInsp = !estadoInsp || estadoInsp.usosDisponiveis <= 0;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">Insp. ${estadoInsp?.usosDisponiveis || 0}/${estadoInsp?.usosMax || 0}</span>`;
     usosHtmlBody = `
-      <div style="padding:4px 0 4px 16px;font-size:0.8rem">
-        <div style="color:var(--accent);font-weight:600">Reação — Gasta 1 Inspiração</div>
-        <div style="color:var(--text-muted);font-size:0.75rem;margin-top:2px">
-          Quando inimigo encerra turno a 1,5m: move metade do Deslocamento sem provocar.<br>
-          Aliado em 9m também move (sem provocar).
-        </div>
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-bardo-subclasse-acao="danca_movimento_inspirador" ${semInsp ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Gastar Inspiração (Reação)</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Move sem provocar + aliado em 9m também move</span>
       </div>
     `;
   } else if (ehDancaEvasaoLiderada) {
@@ -7933,13 +8076,14 @@ function renderFeatureItem(f, source) {
     `;
   } else if (ehConhecimentoPalavrasInterrupcao) {
     // Conhecimento: Palavras de Interrupção (nv3) — usa Inspiração + Reação
-    const dadoInsp = getEstadoInspiracaoBardo()?.dado || 6;
+    const estadoInsp = getEstadoInspiracaoBardo();
+    const dadoInsp = estadoInsp?.dado || 6;
+    const semInsp = !estadoInsp || estadoInsp.usosDisponiveis <= 0;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">Insp. ${estadoInsp?.usosDisponiveis || 0}/${estadoInsp?.usosMax || 0}</span>`;
     usosHtmlBody = `
-      <div style="padding:4px 0 4px 16px;font-size:0.8rem">
-        <div style="color:var(--accent);font-weight:600">Reação — Gasta 1 Inspiração de Bardo</div>
-        <div style="color:var(--text-muted);font-size:0.75rem;margin-top:2px">
-          Criatura a 18m: subtraia d${dadoInsp} do resultado de dano, teste de atributo ou ataque.
-        </div>
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-bardo-subclasse-acao="conhecimento_palavras_interrupcao" ${semInsp ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Gastar Inspiração (Reação)</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Criatura a 18m: -d${dadoInsp} no dano, teste ou ataque</span>
       </div>
     `;
   } else if (ehConhecimentoProficienciasBonus) {
@@ -7965,14 +8109,14 @@ function renderFeatureItem(f, source) {
     `;
   } else if (ehConhecimentoPericiaInigualavel) {
     // Conhecimento: Perícia Inigualável (nv14) — usa Inspiração
-    const dadoInsp = getEstadoInspiracaoBardo()?.dado || 6;
+    const estadoInsp = getEstadoInspiracaoBardo();
+    const dadoInsp = estadoInsp?.dado || 6;
+    const semInsp = !estadoInsp || estadoInsp.usosDisponiveis <= 0;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">Insp. ${estadoInsp?.usosDisponiveis || 0}/${estadoInsp?.usosMax || 0}</span>`;
     usosHtmlBody = `
-      <div style="padding:4px 0 4px 16px;font-size:0.8rem">
-        <div style="color:var(--accent);font-weight:600">Gasta 1 Inspiração de Bardo (não gasta se ainda falhar)</div>
-        <div style="color:var(--text-muted);font-size:0.75rem;margin-top:2px">
-          Ao falhar teste de atributo ou ataque: +d${dadoInsp} ao d20.
-          Se ainda falhar, não gasta a Inspiração.
-        </div>
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-bardo-subclasse-acao="conhecimento_pericia_inigualavel" ${semInsp ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Gastar Inspiração</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Falha em teste/ataque: +d${dadoInsp} (não gasta se ainda falhar)</span>
       </div>
     `;
   } else if (ehGlamourMagiaFascinante) {
@@ -7995,15 +8139,15 @@ function renderFeatureItem(f, source) {
     recarga = 'longo';
   } else if (ehGlamourMantoInspiracao) {
     // Glamour: Manto de Inspiração (nv3) — gasta Inspiração de Bardo
-    const dadoInsp = getEstadoInspiracaoBardo()?.dado || 6;
+    const estadoInsp = getEstadoInspiracaoBardo();
+    const dadoInsp = estadoInsp?.dado || 6;
     const modCar = Math.max(1, calcMod(char.atributos.carisma));
+    const semInsp = !estadoInsp || estadoInsp.usosDisponiveis <= 0;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">Insp. ${estadoInsp?.usosDisponiveis || 0}/${estadoInsp?.usosMax || 0}</span>`;
     usosHtmlBody = `
-      <div style="padding:4px 0 4px 16px;font-size:0.8rem">
-        <div style="color:var(--accent);font-weight:600">Ação Bônus — Gasta 1 Inspiração de Bardo</div>
-        <div style="color:var(--text-muted);font-size:0.75rem;margin-top:2px">
-          Até ${modCar} criaturas em 18m recebem ${2 * dadoInsp} PV temporários.<br>
-          + Reação para mover sem provocar Ataques de Oportunidade.
-        </div>
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-bardo-subclasse-acao="glamour_manto_inspiracao" ${semInsp ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Gastar Inspiração (Ação Bônus)</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">${modCar} criaturas: ${2 * dadoInsp} PVT + mover sem provocar</span>
       </div>
     `;
   } else if (ehGlamourMantoMajestade) {
@@ -8292,11 +8436,15 @@ function renderFeatureItem(f, source) {
   } else if (ehEstrelasForma && estadoDruidaSub) {
     // Círculo das Estrelas nv3: Forma Estrelada — escolha de constelação
     const constelacao = estadoDruidaSub.constelacaoAtiva;
-    usosHtmlSummary = constelacao ? `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">Ativa: ${constelacao}</span>` : '';
+    const semForma = estadoDruidaSub.usosDisponiveis <= 0;
+    const selectDesabilitado = semForma && !constelacao;
+    usosHtmlSummary = constelacao
+      ? `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">Ativa: ${constelacao}</span>`
+      : `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">FS ${estadoDruidaSub.usosDisponiveis}/${estadoDruidaSub.usosMax}</span>`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
         <span style="font-size:0.8rem;font-weight:600">Constelação:</span>
-        <select data-druida-subclasse-acao="constelacao_escolha" style="padding:4px 8px;border-radius:4px;border:1px solid var(--border);font-size:0.8rem;background:var(--bg-card);color:var(--text)">
+        <select data-druida-subclasse-acao="constelacao_escolha" ${selectDesabilitado ? 'disabled' : ''} style="padding:4px 8px;border-radius:4px;border:1px solid var(--border);font-size:0.8rem;background:var(--bg-card);color:var(--text)${selectDesabilitado ? ';opacity:0.5;cursor:not-allowed' : ''}">
           <option value="" ${!constelacao ? 'selected' : ''}>Nenhuma</option>
           <option value="Arqueiro" ${constelacao === 'Arqueiro' ? 'selected' : ''}>Arqueiro (1d8 Radiante + SAB)</option>
           <option value="Dragão" ${constelacao === 'Dragão' ? 'selected' : ''}>Dragão (mín 10 em INT/SAB/CON conc.)</option>
@@ -8609,10 +8757,13 @@ function renderFeatureItem(f, source) {
         <button class="btn btn-sm btn-primary" data-feiticeiro-acao="fala-telepatica">Iniciar Telepatia</button>
       </div>
     `;
-  } else if (ehRevelacaoCarne) {
+  } else if (ehRevelacaoCarne && estadoFeiticeiro) {
+    const semPF = estadoFeiticeiro.pontosAtuais <= 0;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">PF ${estadoFeiticeiro.pontosAtuais}/${estadoFeiticeiro.pontosMax}</span>`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
-        <button class="btn btn-sm btn-primary" data-feiticeiro-acao="revelacao-carne">Ativar Revelação em Carne</button>
+        <button class="btn btn-sm btn-primary" data-feiticeiro-acao="revelacao-carne" ${semPF ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Ativar Revelação em Carne</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Custo: 1-10 PF (1 benefício por PF)</span>
       </div>
     `;
   } else if (ehAfinidadeElemental && estadoFeiticeiro) {
@@ -8625,10 +8776,11 @@ function renderFeatureItem(f, source) {
   } else if (ehAsasDragao && estadoFeiticeiro) {
     const ativa = !!estadoFeiticeiro.subclasses.draconica.asas_ativas;
     const usada = !!estadoFeiticeiro.subclasses.draconica.asas_usada_desde_descanso;
+    const semPFReativar = usada && !ativa && estadoFeiticeiro.pontosAtuais < 3;
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${ativa ? 'Ativas' : (usada ? 'Gasta' : 'Disponível')}</span>`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
-        <button class="btn btn-sm ${ativa ? 'btn-secondary' : 'btn-primary'}" data-feiticeiro-acao="${ativa ? 'desativar-asas-dragao' : 'ativar-asas-dragao'}">${ativa ? 'Recolher Asas' : 'Abrir Asas'}</button>
+        <button class="btn btn-sm ${ativa ? 'btn-secondary' : 'btn-primary'}" data-feiticeiro-acao="${ativa ? 'desativar-asas-dragao' : 'ativar-asas-dragao'}" ${semPFReativar ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${ativa ? 'Recolher Asas' : (usada ? 'Reabrir Asas (3 PF)' : 'Abrir Asas')}</button>
       </div>
     `;
   } else if (ehCompanheiroDraconico && estadoFeiticeiro) {
@@ -8649,18 +8801,22 @@ function renderFeatureItem(f, source) {
       </div>
     `;
   } else if (ehBastiaoLei && estadoFeiticeiro) {
+    const semPF = estadoFeiticeiro.pontosAtuais <= 0;
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">Escudo: ${estadoFeiticeiro.subclasses.mecanica.bastiao_dados || 0}d8</span>`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
-        <button class="btn btn-sm btn-primary" data-feiticeiro-acao="bastiao-lei">Criar Bastião da Lei</button>
+        <button class="btn btn-sm btn-primary" data-feiticeiro-acao="bastiao-lei" ${semPF ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Criar Bastião da Lei</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Custo: 1-5 PF</span>
       </div>
     `;
   } else if (ehTranseOrdem && estadoFeiticeiro) {
     const ativo = !!estadoFeiticeiro.subclasses.mecanica.transe_ordem_ativo;
+    const usado = !!estadoFeiticeiro.subclasses.mecanica.transe_ordem_usado_desde_descanso;
+    const semPFReativar = usado && !ativo && estadoFeiticeiro.pontosAtuais < 5;
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${ativo ? 'Ativo' : 'Inativo'}</span>`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
-        <button class="btn btn-sm ${ativo ? 'btn-secondary' : 'btn-primary'}" data-feiticeiro-acao="${ativo ? 'desativar-transe-ordem' : 'ativar-transe-ordem'}">${ativo ? 'Encerrar Transe' : 'Ativar Transe'}</button>
+        <button class="btn btn-sm ${ativo ? 'btn-secondary' : 'btn-primary'}" data-feiticeiro-acao="${ativo ? 'desativar-transe-ordem' : 'ativar-transe-ordem'}" ${semPFReativar ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${ativo ? 'Encerrar Transe' : (usado ? 'Reativar Transe (5 PF)' : 'Ativar Transe')}</button>
       </div>
     `;
   } else if (ehMaresCaos && estadoFeiticeiro) {
@@ -9239,6 +9395,34 @@ function renderFeatureItem(f, source) {
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
         <button class="btn btn-sm ${usado ? 'btn-secondary' : 'btn-danger'}" data-paladino-subclasse-acao="ancioes_campeao_ancestral" ${usado ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Ativar Campeão Ancestral</button>
         <span style="font-size:0.75rem;color:var(--text-muted)">Ação Bônus 1min: Desv. salv. inimigos, magias como Bônus, +10 PV/turno</span>
+      </div>
+    `;
+    recarga = 'longo';
+  } else if (ehDevocaoArmaSagrada && estadoPaladino) {
+    // Devoção nv3: Arma Sagrada — usa Canalizar Divindade
+    if (!char.recursos.paladino.subclasses) char.recursos.paladino.subclasses = {};
+    if (!char.recursos.paladino.subclasses.devocao) char.recursos.paladino.subclasses.devocao = {};
+    const ativa = !!char.recursos.paladino.subclasses.devocao.arma_sagrada_ativa;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">CD ${estadoPaladino.canalizarDisponiveis}/${estadoPaladino.canalizarMax}${ativa ? ' | Ativa' : ''}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm ${ativa ? 'btn-secondary' : 'btn-primary'}" data-paladino-subclasse-acao="${ativa ? 'devocao_arma_sagrada_desativar' : 'devocao_arma_sagrada'}" ${(!ativa && estadoPaladino.canalizarDisponiveis <= 0) ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${ativa ? 'Encerrar Arma Sagrada' : 'Ativar Arma Sagrada'}</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">10min: +mod CAR no ataque, luz brilhante 6m</span>
+      </div>
+    `;
+    recarga = 'curto_ou_longo';
+  } else if (ehDevocaoResplendorSagrado && estadoPaladino) {
+    // Devoção nv20: Resplendor Sagrado — 1x/longo ou gastar slot 5º
+    if (!char.recursos.paladino.subclasses) char.recursos.paladino.subclasses = {};
+    if (!char.recursos.paladino.subclasses.devocao) char.recursos.paladino.subclasses.devocao = {};
+    const ativo = !!char.recursos.paladino.subclasses.devocao.resplendor_sagrado_ativo;
+    const usado = !!char.recursos.paladino.subclasses.devocao.resplendor_sagrado_usado;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${ativo ? 'Ativo' : (usado ? 'Usado' : 'Disponível')}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm ${ativo ? 'btn-secondary' : 'btn-danger'}" data-paladino-subclasse-acao="${ativo ? 'devocao_resplendor_desativar' : 'devocao_resplendor_ativar'}" ${(!ativo && usado) ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${ativo ? 'Encerrar Resplendor' : 'Ativar Resplendor Sagrado'}</button>
+        ${usado && !ativo ? '<button class="btn btn-sm btn-warning" data-paladino-subclasse-acao="devocao_resplendor_restaurar">Restaurar (gastar slot 5º)</button>' : ''}
+        <span style="font-size:0.75rem;color:var(--text-muted)">Ação Bônus 10min: Radiante 9m, +mod CAR à salvaguarda</span>
       </div>
     `;
     recarga = 'longo';
