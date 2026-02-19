@@ -1,0 +1,315 @@
+{
+  "titulo": "Correções: Habilidades com Custo Composto (Ação + Recurso)",
+  "descricao": "Auditoria de habilidades que exigem gastar um recurso de classe (Canalizar Divindade, Forma Selvagem, Pontos de Foco, etc.) além de uma ação, e que apresentam problemas na ficha digital.",
+  "data_criacao": "2025-02-19",
+  "referencia": "D&D 5.5 - Livro do Jogador (2024) 5.3.7",
+  "problema_original": "Brilho do Amanhecer (Clérigo - Domínio da Luz) aparece como habilidade ativa sem validar se há usos de Canalizar Divindade disponíveis. Investigação revelou outros problemas semelhantes em várias classes.",
+
+  "categorias": [
+    {
+      "severidade": "CRITICA",
+      "titulo": "Habilidades que consomem recurso mas não têm handler dedicado",
+      "descricao": "Features que caem no handler genérico (toggle booleano em usos_habilidades) em vez de consumir o recurso de classe correto.",
+      "itens": [
+        {
+          "id": "C01",
+          "classe": "Paladino",
+          "subclasse": "Juramento da Devoção",
+          "habilidade": "Arma Sagrada",
+          "nivel": 3,
+          "acao_requerida": "Parte da ação Atacar",
+          "recurso_consumido": "1 uso de Canalizar Divindade",
+          "descricao_regra": "Ao executar a ação Atacar, você pode gastar um uso de seu Canalizar Divindade para imbuir uma arma Corpo a Corpo com energia positiva por 10 minutos.",
+          "bug": "Não existe variável ehDevocaoArmaSagrada nem branch no renderFeatureItem. A feature cai no handler genérico data-toggle-uso que apenas alterna um booleano — NÃO consome Canalizar Divindade.",
+          "impacto": "O jogador clica 'Disponível/Usado' mas o contador de Canalizar Divindade não é decrementado. O recurso nunca é gasto.",
+          "correcao_necessaria": "Criar detecção ehDevocaoArmaSagrada no renderFeatureItem, exibir botão com verificação de canalizarDivindadeUsosDisponiveis, adicionar handler em data-paladino-subclasse-acao que consuma canalizar_divindade_usos_gastos e permita toggle ativo/inativo (10 min de duração).",
+          "arquivo": "site/js/pages/sheet.js",
+          "localizacao": "Após linha ~7622 (seção de detecção de subclasses do Paladino) e na seção de render ~9190+"
+        },
+        {
+          "id": "C02",
+          "classe": "Paladino",
+          "subclasse": "Juramento da Devoção",
+          "habilidade": "Resplendor Sagrado",
+          "nivel": 20,
+          "acao_requerida": "Ação Bônus",
+          "recurso_consumido": "1 uso por Descanso Longo (recuperável gastando espaço de magia de 5º círculo)",
+          "descricao_regra": "Como uma Ação Bônus, você pode imbuir sua Aura de Proteção com poder sagrado por 10 minutos. Após usar, recupera com Descanso Longo ou gastando espaço de 5º círculo.",
+          "bug": "Não existe detecção nem handler dedicado. Feature cai no handler genérico toggle sem controle de ativação/desativação, sem opção de gastar espaço de magia para recuperar uso.",
+          "impacto": "Toggle genérico 'Disponível/Usado' sem funcionalidade real.",
+          "correcao_necessaria": "Criar handler dedicado com botão ativar/desativar, campo de tracking booleano resplendor_sagrado_usado e opção de recuperar uso gastando espaço de 5º círculo.",
+          "arquivo": "site/js/pages/sheet.js",
+          "localizacao": "Após as demais subclasses do Paladino (~9190+)"
+        }
+      ]
+    },
+    {
+      "severidade": "MODERADA",
+      "titulo": "Habilidade de subclasse que não consome recurso apesar de indicar visualmente",
+      "descricao": "A UI mostra texto indicando consumo de Forma Selvagem mas o handler não realiza o consumo.",
+      "itens": [
+        {
+          "id": "M01",
+          "classe": "Druida",
+          "subclasse": "Círculo das Estrelas",
+          "habilidade": "Forma Estrelada",
+          "nivel": 3,
+          "acao_requerida": "Ação Bônus",
+          "recurso_consumido": "1 uso de Forma Selvagem",
+          "descricao_regra": "Como uma Ação Bônus, você pode gastar um uso de Forma Selvagem para assumir uma forma estrelada (Arqueiro, Cálice ou Dragão).",
+          "bug": "O render mostra um select para escolher constelação com texto 'Gasta 1 uso de Forma Selvagem', mas o handler constelacao_escolha apenas salva constelacao_ativa = valor sem chamar consumirUsoFormaSelvagem().",
+          "impacto": "O jogador pode trocar de constelação sem gastar Forma Selvagem. O recurso nunca é consumido automaticamente.",
+          "correcao_necessaria": "No handler do select de constelação (ou adicionar botão dedicado), chamar consumirUsoFormaSelvagem(1) antes de ativar a Forma Estrelada. Desabilitar a troca quando usosDisponiveis <= 0.",
+          "arquivo": "site/js/pages/sheet.js",
+          "localizacao": "Handler do select: buscar por 'constelacao_escolha' ou 'constelacao_ativa' (~linha 4746)"
+        },
+        {
+          "id": "M02",
+          "classe": "Bárbaro",
+          "subclasse": "Trilha do Berserker",
+          "habilidade": "Fúria Irracional",
+          "nivel": 6,
+          "acao_requerida": "Passiva (durante Fúria)",
+          "recurso_consumido": "Nenhum — ativa automaticamente durante Fúria",
+          "descricao_regra": "Enquanto estiver em Fúria, você tem Imunidade às condições Amedrontado e Enfeitiçado.",
+          "bug": "Variável ehFuriaIrracional declarada mas nunca usada no if/else de renderFeatureItem. Se ehHabilidadeAtiva classificar como ativa (por keywords na descrição), recebe toggle genérico desnecessário.",
+          "impacto": "Pode mostrar toggle Disponível/Usado para uma habilidade que deveria ser passiva (ativa automaticamente durante Fúria).",
+          "correcao_necessaria": "Adicionar branch dedicado no renderFeatureItem mostrando indicador visual de que a imunidade está ativa quando Fúria estiver ativa (similar a outras features do Bárbaro).",
+          "arquivo": "site/js/pages/sheet.js",
+          "localizacao": "~linha 7538"
+        },
+        {
+          "id": "M03",
+          "classe": "Bárbaro",
+          "subclasse": "Trilha do Coração Selvagem",
+          "habilidade": "Poder dos Selvagens",
+          "nivel": 14,
+          "acao_requerida": "Passiva (aprimora Fúria)",
+          "recurso_consumido": "Nenhum — modifica Fúria dos Selvagens",
+          "descricao_regra": "Ao entrar em Fúria, você pode escolher dois espíritos animais em vez de apenas um.",
+          "bug": "Variável ehPoderSelvagens declarada mas nunca usada. Cai no handler genérico.",
+          "impacto": "Exibe toggle irrelevante em vez de bloco informativo.",
+          "correcao_necessaria": "Adicionar branch dedicado com bloco informativo mostrando que pode escolher 2 espíritos animais.",
+          "arquivo": "site/js/pages/sheet.js",
+          "localizacao": "~linha 7528"
+        },
+        {
+          "id": "M04",
+          "classe": "Bárbaro",
+          "subclasse": "Trilha da Árvore do Mundo",
+          "habilidade": "Percorrer a Árvore",
+          "nivel": 6,
+          "acao_requerida": "Ação Bônus (durante Fúria)",
+          "recurso_consumido": "Nenhum — requer Fúria ativa",
+          "descricao_regra": "Durante Fúria, como Ação Bônus, você pode teleportar até 18m para espaço desocupado visto.",
+          "bug": "Variável ehPercorrerArvore declarada mas nunca usada. Toggle genérico não verifica se Fúria está ativa.",
+          "impacto": "Mostra 'Disponível' mesmo quando Fúria não está ativa.",
+          "correcao_necessaria": "Adicionar branch dedicado que verifica se Fúria está ativa e mostra botão condicional.",
+          "arquivo": "site/js/pages/sheet.js",
+          "localizacao": "~linha 7530"
+        }
+      ]
+    },
+    {
+      "severidade": "MENOR",
+      "titulo": "Botões de habilidade não desabilitados quando recurso está esgotado",
+      "descricao": "O handler interno valida e mostra toast de erro, mas o botão permanece clicável e sem indicação visual de indisponibilidade.",
+      "itens": [
+        {
+          "id": "L01",
+          "classe": "Feiticeiro",
+          "subclasse": "Mente Anômala (Aberrante)",
+          "habilidade": "Revelação em Carne",
+          "nivel": 14,
+          "recurso_consumido": "Pontos de Feitiçaria variável (ou 1x/Descanso Longo grátis)",
+          "bug": "Botão sempre ativo mesmo com Pontos de Feitiçaria = 0.",
+          "correcao_necessaria": "Adicionar verificação disabled quando pontosAtuais <= custoMinimo.",
+          "arquivo": "site/js/pages/sheet.js",
+          "localizacao": "~linha 8615"
+        },
+        {
+          "id": "L02",
+          "classe": "Feiticeiro",
+          "subclasse": "Feitiçaria Dracônica",
+          "habilidade": "Asas de Dragão (reativação)",
+          "nivel": 14,
+          "recurso_consumido": "3 Pontos de Feitiçaria (após 1º uso gratuito)",
+          "bug": "Após 1º uso, botão de reativação não verifica se tem 3 PF disponíveis.",
+          "correcao_necessaria": "Verificar pontosAtuais >= 3 para reativação e desabilitar botão caso contrário.",
+          "arquivo": "site/js/pages/sheet.js",
+          "localizacao": "~linha 8630"
+        },
+        {
+          "id": "L03",
+          "classe": "Feiticeiro",
+          "subclasse": "Magia do Relógio (Mecânica)",
+          "habilidade": "Bastião da Lei",
+          "nivel": 14,
+          "recurso_consumido": "1-5 Pontos de Feitiçaria",
+          "bug": "Botão sempre ativo mesmo com PF = 0.",
+          "correcao_necessaria": "Desabilitar botão quando pontosAtuais <= 0.",
+          "arquivo": "site/js/pages/sheet.js",
+          "localizacao": "~linha 8655"
+        },
+        {
+          "id": "L04",
+          "classe": "Feiticeiro",
+          "subclasse": "Magia do Relógio (Mecânica)",
+          "habilidade": "Transe da Ordem (reativação)",
+          "nivel": 14,
+          "recurso_consumido": "5 Pontos de Feitiçaria (após 1º uso gratuito)",
+          "bug": "Após 1º uso, botão de reativação não verifica 5 PF.",
+          "correcao_necessaria": "Verificar pontosAtuais >= 5 para reativação.",
+          "arquivo": "site/js/pages/sheet.js",
+          "localizacao": "~linha 8662"
+        }
+      ]
+    },
+    {
+      "severidade": "INFORMATIVA",
+      "titulo": "Habilidades de subclasse com consumo de recurso apenas textual (sem tracking)",
+      "descricao": "Features que consomem Inspiração de Bardo mas mostram apenas texto informativo sem botão de consumo. Pode ser design intencional (autodeclaratório) mas diverge do padrão das demais subclasses.",
+      "itens": [
+        {
+          "id": "I01",
+          "classe": "Bardo",
+          "subclasse": "Colégio da Dança",
+          "habilidade": "Gingado Coordenado",
+          "nivel": 3,
+          "recurso_consumido": "1 Inspiração de Bardo",
+          "comportamento_atual": "Texto 'Gasta 1 Inspiração de Bardo' sem botão e sem consumo automático."
+        },
+        {
+          "id": "I02",
+          "classe": "Bardo",
+          "subclasse": "Colégio da Dança",
+          "habilidade": "Movimento Inspirador",
+          "nivel": 6,
+          "recurso_consumido": "1 Inspiração de Bardo (Reação)",
+          "comportamento_atual": "Texto informativo sem consumo automático."
+        },
+        {
+          "id": "I03",
+          "classe": "Bardo",
+          "subclasse": "Colégio do Conhecimento",
+          "habilidade": "Palavras de Interrupção",
+          "nivel": 3,
+          "recurso_consumido": "1 Inspiração de Bardo (Reação)",
+          "comportamento_atual": "Texto informativo sem consumo automático."
+        },
+        {
+          "id": "I04",
+          "classe": "Bardo",
+          "subclasse": "Colégio do Conhecimento",
+          "habilidade": "Perícia Inigualável",
+          "nivel": 6,
+          "recurso_consumido": "1 Inspiração de Bardo",
+          "comportamento_atual": "Texto informativo sem consumo automático."
+        },
+        {
+          "id": "I05",
+          "classe": "Bardo",
+          "subclasse": "Colégio do Glamour",
+          "habilidade": "Manto de Inspiração",
+          "nivel": 3,
+          "recurso_consumido": "1 Inspiração de Bardo (Ação Bônus)",
+          "comportamento_atual": "Texto informativo sem consumo automático."
+        }
+      ]
+    }
+  ],
+
+  "habilidades_corretamente_implementadas": {
+    "descricao": "Para referência, estes sistemas de recurso composto estão corretamente implementados e podem servir de modelo.",
+    "classes": [
+      {
+        "classe": "Clérigo",
+        "subclasses": ["Domínio da Guerra", "Domínio da Luz", "Domínio da Trapaça", "Domínio da Vida"],
+        "recurso": "Canalizar Divindade",
+        "validacao": "Todas as subclasses verificam canalizarDivindadeUsosDisponiveis com disabled adequado no botão.",
+        "nota": "Brilho do Amanhecer (Domínio da Luz) — o botão É desabilitado quando sem usos de CD. O bug reportado pode ser visual (UX) e não funcional: a habilidade aparece na seção 'Ativas' por causa da detecção de ehHabilidadeAtiva, mas o botão de uso funciona corretamente."
+      },
+      {
+        "classe": "Paladino",
+        "subclasses": ["Juramento da Glória", "Juramento da Vingança", "Juramento dos Anciões"],
+        "recurso": "Canalizar Divindade",
+        "validacao": "Handler data-paladino-subclasse-acao com lista usaCanalizar que decrementa canalizar_divindade_usos_gastos corretamente."
+      },
+      {
+        "classe": "Druida",
+        "subclasses": ["Círculo da Lua", "Círculo da Terra"],
+        "recurso": "Forma Selvagem",
+        "validacao": "Handlers dedicados com consumo correto via consumirUsoFormaSelvagem()."
+      },
+      {
+        "classe": "Monge",
+        "subclasses": ["Mão Espalmada", "Misericórdia", "Elementos"],
+        "recurso": "Pontos de Foco",
+        "validacao": "Handlers dedicados com consumo correto de pontos_foco_gastos."
+      },
+      {
+        "classe": "Bruxo",
+        "subclasses": ["Arquifada", "Celestial", "Grande Antigo", "Ínfero"],
+        "recurso": "Invocações / Arcana Mística / recursos de subclasse",
+        "validacao": "Handlers dedicados para cada subclasse."
+      },
+      {
+        "classe": "Guerreiro",
+        "subclasses": ["Mestre da Batalha", "Combatente Psíquico"],
+        "recurso": "Dados de Superioridade / Dados Psiônicos",
+        "validacao": "Verificação de disponibilidade dos dados com disabled nos botões."
+      }
+    ]
+  },
+
+  "referencia_funcoes_chave": {
+    "ehHabilidadeAtiva": {
+      "arquivo": "site/js/utils.js",
+      "linha": 358,
+      "descricao": "Detecta se habilidade é ativa por keywords na descrição. Pode gerar falsos positivos para habilidades passivas que mencionam ações na descrição."
+    },
+    "renderFeatureItem": {
+      "arquivo": "site/js/pages/sheet.js",
+      "linha": 7310,
+      "descricao": "Renderiza cada feature com handlers dedicados para classes com recursos compostos. Features sem branch dedicado caem no handler genérico toggle."
+    },
+    "getEstadoRecursosClerigo": {
+      "arquivo": "site/js/pages/sheet.js",
+      "linha_aprox": 260,
+      "descricao": "Modelo de referência para tracking de Canalizar Divindade. Padrão a seguir para novas implementações."
+    },
+    "getEstadoRecursosPaladino": {
+      "arquivo": "site/js/pages/sheet.js",
+      "linha_aprox": 1720,
+      "descricao": "Já implementa canalizarDisponiveis mas falta integração com subclasse Devoção."
+    }
+  },
+
+  "plano_de_acao": [
+    {
+      "prioridade": 1,
+      "acao": "Implementar handler para Arma Sagrada (Paladino - Devoção)",
+      "detalhes": "Criar variáveis ehDevocao, ehDevocaoArmaSagrada no renderFeatureItem. Adicionar branch de render com botão Ativar/Desativar que consome Canalizar Divindade. Adicionar case 'devocao_arma_sagrada' no handler data-paladino-subclasse-acao. Adicionar campo recursos.paladino.subclasses.devocao.arma_sagrada_ativa no estado."
+    },
+    {
+      "prioridade": 2,
+      "acao": "Implementar handler para Resplendor Sagrado (Paladino - Devoção nv20)",
+      "detalhes": "Criar branch de render com botão Ativar/Desativar + opção de recuperar uso gastando espaço de 5º círculo. Adicionar campo recursos.paladino.subclasses.devocao.resplendor_sagrado_usado."
+    },
+    {
+      "prioridade": 3,
+      "acao": "Corrigir consumo de Forma Selvagem na Forma Estrelada (Druida - Estrelas)",
+      "detalhes": "No handler do select de constelação, adicionar chamada a consumirUsoFormaSelvagem(1) ao ativar. Desabilitar select quando usosDisponiveis <= 0. Adicionar botão 'Encerrar Forma' para desativar sem consumir uso adicional."
+    },
+    {
+      "prioridade": 4,
+      "acao": "Implementar branchs para variáveis declaradas não utilizadas do Bárbaro",
+      "detalhes": "Fúria Irracional, Poder dos Selvagens, Percorrer a Árvore — adicionar blocos informativos/condicionais no renderFeatureItem."
+    },
+    {
+      "prioridade": 5,
+      "acao": "Adicionar verificação disabled nos botões do Feiticeiro",
+      "detalhes": "Revelação em Carne, Asas de Dragão (reativação), Bastião da Lei, Transe da Ordem (reativação) — verificar pontosAtuais antes de habilitar botão."
+    }
+  ]
+}
