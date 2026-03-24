@@ -63,6 +63,9 @@ self.addEventListener('fetch', (event) => {
   const request = event.request;
   const url = new URL(request.url);
 
+  // Ignorar esquemas que o Cache API não suporta (ex: chrome-extension://)
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
+
   // Firebase e APIs Google: sempre rede, nunca cachear
   if (url.hostname.includes('googleapis.com') || url.hostname.includes('gstatic.com') || url.hostname.includes('firebaseapp.com') || url.hostname.includes('firebaseio.com')) {
     return;

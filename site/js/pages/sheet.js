@@ -2564,6 +2564,9 @@ function renderFichaCompleta() {
   const _espData = especiesCache?.especies?.find(e => e.nome === char.especie);
   const _deslocamentoBase = _espData ? getDeslocamento(_espData.texto_completo) : '9 metros';
   const _deslocamento = getDeslocamentoFinal(_deslocamentoBase);
+  const _deslMatch = _deslocamento.match(/^([\d,\.]+)\s*metros(.*)$/);
+  const _deslNumero = _deslMatch ? _deslMatch[1] : _deslocamento;
+  const _deslExtra = _deslMatch ? (_deslMatch[2] || '').trim() : '';
   const _tamanho = char.tamanho || (_espData ? getTamanho(_espData.texto_completo) : 'Médio');
 
   const container = containerRef;
