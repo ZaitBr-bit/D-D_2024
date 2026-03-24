@@ -2915,7 +2915,8 @@ function renderFichaCompleta() {
         </div>
         <div class="stat-box">
           <div class="stat-label">Deslocamento</div>
-          <div class="stat-value">${_deslocamento}</div>
+          <div class="stat-value">${_deslNumero}<br><span class="stat-unit">metros</span></div>
+          ${_deslExtra ? `<div style="font-size:0.6rem;color:var(--text-muted)">${_deslExtra}</div>` : ''}
         </div>
         <div class="stat-box">
           <div class="stat-label">Ataques</div>
@@ -3531,16 +3532,31 @@ function restaurarHabilidades(tipoDescanso) {
       });
     }
   }
+  // Coletar traço sintético da espécie (Tiferino, Elfo, etc.)
+  if (char.especie && char.tracos_escolhidos?.length > 0) {
+    const tracoSintetico = gerarTracoSinteticoEspecie(char.especie, char.tracos_escolhidos, char.nivel);
+    if (tracoSintetico) {
+      allFeats.push({ key: `especie_${tracoSintetico.nome}`, descricao: tracoSintetico.descricao });
+    }
+  }
+  // Tracos Golias que herdam recarga "descanso longo" do pai "Ancestralidade Gigante"
+  const TRACOS_HERDAM_ANCESTRALIDADE_RESTAURAR = ['Arrepio do Gelo (Gigante do Gelo)', 'Queimadura de Fogo (Gigante de Fogo)', 'Resistência da Pedra (Gigante da Pedra)', 'Salto da Nuvem (Gigante das Nuvens)', 'Tombo da Colina (Gigante da Colina)', 'Trovão da Tempestade (Gigante da Tempestade)'];
+
   allFeats.forEach(({ key, descricao }) => {
-    const recarga = detectarRecarga(descricao);
+    let recarga = detectarRecarga(descricao);
+    // Tracos de Ancestralidade Gigante nao mencionam recarga na propria descricao
+    const nomeTraco = key.startsWith('especie_') ? key.substring(8) : '';
+    if (!recarga && TRACOS_HERDAM_ANCESTRALIDADE_RESTAURAR.includes(nomeTraco)) {
+      recarga = 'longo';
+    }
     if (!recarga) return;
     if (tipoDescanso === 'longo') {
       // Long rest: reset all uses (handle both boolean and numeric tracking)
       char.usos_habilidades[key] = typeof char.usos_habilidades[key] === 'number' ? 0 : false;
     } else if (tipoDescanso === 'curto' && (recarga === 'curto' || recarga === 'curto_ou_longo')) {
-      // Short rest: restore 1 use if numeric (reduce "used" count by 1), or reset if boolean
+      // Descanso curto: restaura todos os usos (mesmo comportamento do longo para habilidades genéricas)
       if (typeof char.usos_habilidades[key] === 'number') {
-        char.usos_habilidades[key] = Math.max(0, char.usos_habilidades[key] - 1);
+        char.usos_habilidades[key] = 0;
       } else {
         char.usos_habilidades[key] = false;
       }

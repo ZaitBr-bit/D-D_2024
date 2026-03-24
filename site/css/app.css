@@ -298,6 +298,7 @@ tr:hover td { background: #faf8f4; }
 }
 .stat-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
 .stat-value { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
+.stat-unit { font-size: 0.55em; font-weight: 600; color: var(--text-muted); }
 
 /* --- Proficiencias de Equipamento --- */
 .prof-equip-row {
@@ -1388,15 +1389,18 @@ tr:hover td { background: #faf8f4; }
   .pericias-lista { columns: 1; }
   .col-2, .col-3, .col-4 { flex: 0 0 100%; }
 
-  /* Stats: grid uniforme em mobile */
+  /* Stats: flex centrado para alinhar ultima linha */
   .stats-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    flex-wrap: wrap;
     gap: 6px;
+    justify-content: center;
   }
   .stat-box {
     min-width: unset;
     padding: 6px 4px;
+    flex: 1 1 calc(33.33% - 6px);
+    max-width: calc(33.33% - 4px);
   }
   .stat-label { font-size: 0.6rem; }
   .stat-value { font-size: 1.15rem; }
@@ -1484,6 +1488,7 @@ tr:hover td { background: #faf8f4; }
   /* HP section mobile */
   .hp-section { gap: 10px; }
   .hp-main { min-width: 140px; }
+  .hp-buttons { flex-wrap: wrap; }
   .hp-pv-value { font-size: 1.2rem; }
   .hp-secondary { gap: 8px; }
   .hp-sub-box { padding: 6px 8px; min-width: 75px; }
