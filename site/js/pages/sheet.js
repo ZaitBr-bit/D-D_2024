@@ -746,6 +746,8 @@ function getEstadoRecursosFeiticeiro() {
   if (!r.subclasses.draconica) r.subclasses.draconica = { afinidade_elemental: '', asas_ativas: false, asas_usada_desde_descanso: false, companheiro_draconico_usado: false, bonus_pv_aplicado: 0 };
   if (!r.subclasses.mecanica) r.subclasses.mecanica = { restaurar_equilibrio_usos_gastos: 0, transe_ordem_ativo: false, transe_ordem_usado_desde_descanso: false, bastiao_dados: 0 };
   if (!r.subclasses.selvagem) r.subclasses.selvagem = { mares_caos_disponivel: true, surto_pendente_automatico: false, surto_controlado_usado: false };
+  if (typeof r.apoteose_gratis_usado_turno !== 'boolean') r.apoteose_gratis_usado_turno = false;
+  if (!Array.isArray(r.metamagia_historico)) r.metamagia_historico = [];
 
   const prog = getProgressaoFeiticeiro() || { pontosMax: 0 };
   const pontosAtuais = Math.max(0, prog.pontosMax - r.pontos_feiticaria_gastos);
@@ -3737,6 +3739,12 @@ function setupEventosDescanso() {
         char.recursos.feiticeiro.subclasses.aberrante.revelacao_carne_ativa = false;
         char.recursos.feiticeiro.subclasses.draconica.asas_ativas = false;
         char.recursos.feiticeiro.subclasses.mecanica.transe_ordem_ativo = false;
+
+        // Resetar flag Apoteose Arcana e efeitos temporarios de metamagia
+        char.recursos.feiticeiro.apoteose_gratis_usado_turno = false;
+        if (char.efeitos_magicos) {
+          char.efeitos_magicos = char.efeitos_magicos.filter(e => !e.temporario);
+        }
       }
     }
 
@@ -4065,6 +4073,9 @@ function setupEventosDescanso() {
         char.recursos.feiticeiro.subclasses.selvagem.mares_caos_disponivel = true;
         char.recursos.feiticeiro.subclasses.selvagem.surto_pendente_automatico = false;
         char.recursos.feiticeiro.subclasses.selvagem.surto_controlado_usado = false;
+
+        // Resetar flag de Apoteose Arcana (uso gratuito por turno)
+        char.recursos.feiticeiro.apoteose_gratis_usado_turno = false;
       }
     }
 
@@ -4998,19 +5009,7 @@ function setupEventosHabilidades() {
       }
 
       if (acao === 'metamagia-config') {
-        // Opções de Metamagia com seletor visual
-        const OPCOES_METAMAGIA = [
-          { nome: 'Magia Acelerada', custo: 2, desc: 'Ao conjurar uma magia com tempo de 1 ação, gaste 2 PF para mudar para Ação Bônus.' },
-          { nome: 'Magia Agravada', custo: 2, desc: 'Ao conjurar com teste de resistência, gaste 2 PF para dar Desvantagem na salvaguarda.' },
-          { nome: 'Magia Buscadora', custo: 1, desc: 'Jogada de ataque com magia que erra: gaste 1 PF para re-jogar (deve usar o novo resultado).' },
-          { nome: 'Magia Cautelosa', custo: 1, desc: 'Ao conjurar com salvaguarda, gaste 1 PF e escolha criaturas = mod. Car. que passam automaticamente.' },
-          { nome: 'Magia Distante', custo: 1, desc: 'Magia com alcance 1,5m+: gaste 1 PF para dobrar. Alcance Toque vira 9m.' },
-          { nome: 'Magia Duplicada', custo: 1, desc: 'Magia que mira apenas uma criatura e não tem auto-alcance: gaste 1 PF para mirar uma segunda.' },
-          { nome: 'Magia Persistente', custo: 1, desc: 'Ao conjurar com Concentração e duração 1 min+: gaste 1 PF, não requer Concentração por 1 min.' },
-          { nome: 'Magia Potencializada', custo: 1, desc: 'Ao rolar dano de magia: gaste 1 PF para re-jogar até mod. Car. dados de dano (deve usar novos).' },
-          { nome: 'Magia Sutil', custo: 1, desc: 'Ao conjurar: gaste 1 PF para conjurar sem componentes Verbais ou Somáticos.' },
-          { nome: 'Magia Transmutada', custo: 1, desc: 'Ao conjurar com dano: gaste 1 PF para trocar tipo de dano por Ácido/Elétrico/Gélido/Ígneo/Trovejante/Venenoso.' }
-        ];
+        // Usa constante global OPCOES_METAMAGIA
         const nivel = char.nivel || 1;
         const maxMeta = (nivel >= 17 ? 6 : nivel >= 10 ? 4 : 2);
         const metasSelecionadas = new Set(estado.metamagias || []);
@@ -10818,6 +10817,20 @@ function renderSecaoMagias() {
 }
 
 // Mapa unificado de magias com efeitos mecanicos quando conjuradas
+// Opcoes de Metamagia (Feiticeiro) - constante global para uso no cast engine e config
+const OPCOES_METAMAGIA = [
+  { nome: 'Magia Acelerada', custo: 2, desc: 'Ao conjurar uma magia com tempo de 1 ação, gaste 2 PF para mudar para Ação Bônus.', validar: (info) => info && /^Ação$/i.test((info.tempo_conjuracao || '').trim()), combina: false },
+  { nome: 'Magia Agravada', custo: 2, desc: 'Ao conjurar com teste de resistência, gaste 2 PF para dar Desvantagem na salvaguarda.', validar: null, combina: false },
+  { nome: 'Magia Buscadora', custo: 1, desc: 'Jogada de ataque com magia que erra: gaste 1 PF para re-jogar (deve usar o novo resultado).', validar: null, combina: true },
+  { nome: 'Magia Cautelosa', custo: 1, desc: 'Ao conjurar com salvaguarda, gaste 1 PF e escolha criaturas = mod. Car. que passam automaticamente.', validar: null, combina: false },
+  { nome: 'Magia Distante', custo: 1, desc: 'Magia com alcance 1,5m+: gaste 1 PF para dobrar. Alcance Toque vira 9m.', validar: (info) => info && info.alcance && !/pessoal/i.test(info.alcance), combina: false },
+  { nome: 'Magia Duplicada', custo: 1, desc: 'Magia que mira apenas uma criatura e não tem auto-alcance: gaste 1 PF para mirar uma segunda.', validar: (info) => info && info.alcance && !/pessoal/i.test(info.alcance), combina: false },
+  { nome: 'Magia Persistente', custo: 1, desc: 'Ao conjurar com Concentração e duração 1 min+: gaste 1 PF, não requer Concentração por 1 min.', validar: (info) => info && /concentra/i.test(info.duracao || ''), combina: false },
+  { nome: 'Magia Potencializada', custo: 1, desc: 'Ao rolar dano de magia: gaste 1 PF para re-jogar até mod. Car. dados de dano (deve usar novos).', validar: null, combina: true },
+  { nome: 'Magia Sutil', custo: 1, desc: 'Ao conjurar: gaste 1 PF para conjurar sem componentes Verbais ou Somáticos.', validar: (info) => info && /[VS]/.test(info.componentes || 'V, S'), combina: false },
+  { nome: 'Magia Transmutada', custo: 1, desc: 'Ao conjurar com dano: gaste 1 PF para trocar tipo de dano por Ácido/Elétrico/Gélido/Ígneo/Trovejante/Venenoso.', validar: null, combina: false }
+];
+
 const MAGIAS_EFEITO = {
   // --- Efeitos de CA (ja implementados) ---
   'Armadura Arcana':  { tipo_efeito: 'base', valor: 13, concentracao: false, permite_self: true, permite_outro: true, rotulo: 'CA = 13 + Des' },
@@ -10952,6 +10965,336 @@ function ehMagiaConcentracao(nomeMagia) {
   const info = indiceMagiasCache?.find(m => m.nome === nomeMagia);
   if (info?.duracao) return /concentra/i.test(info.duracao);
   return false;
+}
+
+// Busca info de magia no cache do indice para validacao de metamagia
+function getInfoMagiaParaMetamagia(nomeMagia) {
+  if (!indiceMagiasCache?.length) return null;
+  return indiceMagiasCache.find(m => m.nome === nomeMagia) || null;
+}
+
+// Modal de seleção de metamagia durante a conjuração (Feiticeiro)
+function mostrarModalMetamagiaConjuracao(nomeMagia, circulo, onSelecao) {
+  const estado = getEstadoRecursosFeiticeiro();
+  if (!estado) { onSelecao([], {}); return; }
+
+  const metamagiasConhecidas = estado.metamagias || [];
+  if (metamagiasConhecidas.length === 0) { onSelecao([], {}); return; }
+
+  const infoMagia = getInfoMagiaParaMetamagia(nomeMagia);
+  const feiticariaEncarnada = estado.feiticariaInataAtiva;
+  const nivelChar = char.nivel || 1;
+  const temApoteose = nivelChar >= 20;
+  const apoteoseGratisUsado = char.recursos?.feiticeiro?.apoteose_gratis_usado_turno || false;
+
+  // Maximo de metamagias por conjuracao (regra base: 1, Encarnada: 2)
+  // Excecao: Buscadora e Potencializada podem combinar com outra opcao
+  const maxPorConjuracao = feiticariaEncarnada ? 2 : 1;
+
+  const opcoesDisponiveis = OPCOES_METAMAGIA.filter(o => metamagiasConhecidas.includes(o.nome));
+  const selecionadas = new Set();
+
+  function calcularCustos() {
+    let custoTotal = 0;
+    let gratisUsado = false;
+    for (const nome of selecionadas) {
+      const op = OPCOES_METAMAGIA.find(o => o.nome === nome);
+      if (!op) continue;
+      if (temApoteose && !apoteoseGratisUsado && !gratisUsado) {
+        gratisUsado = true;
+      } else {
+        custoTotal += op.custo;
+      }
+    }
+    return { custoTotal, gratisUsado };
+  }
+
+  function podeAdicionarOpcao(nomeOpcao) {
+    if (selecionadas.has(nomeOpcao)) return true; // remover sempre pode
+    const op = OPCOES_METAMAGIA.find(o => o.nome === nomeOpcao);
+    if (!op) return false;
+
+    // Verificar elegibilidade da opcao para esta magia
+    if (op.validar && !op.validar(infoMagia)) return false;
+
+    if (selecionadas.size < maxPorConjuracao) return true;
+
+    // Acima do limite base: verificar combinacao Buscadora/Potencializada
+    if (selecionadas.size >= 2) return false;
+    // Tamanho == maxPorConjuracao (1 sem Encarnada): permitir apenas combinacao
+    const selArray = [...selecionadas];
+    const todasCombinaveis = selArray.every(n => OPCOES_METAMAGIA.find(x => x.nome === n)?.combina);
+    return op.combina && todasCombinaveis;
+  }
+
+  function renderModalMetaConjuracao() {
+    const pfAtuais = estado.pontosMax - (char.recursos.feiticeiro.pontos_feiticaria_gastos || 0);
+    const { custoTotal } = calcularCustos();
+
+    let html = `<div style="text-align:center;margin-bottom:8px">
+      <strong>${nomeMagia}</strong> (${circulo}º Círculo)
+      <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">PF disponíveis: <strong>${pfAtuais}</strong>${custoTotal > 0 ? ` | Custo: <strong style="color:var(--danger)">${custoTotal} PF</strong>` : ''}</div>
+      <div style="font-size:0.75rem;color:var(--text-muted)">Máx. ${maxPorConjuracao} opç${maxPorConjuracao > 1 ? 'ões' : 'ão'} por conjuração${feiticariaEncarnada ? ' (Feitiçaria Encarnada)' : ''}${temApoteose && !apoteoseGratisUsado ? ' | Apoteose: 1ª grátis' : ''}</div>
+    </div>`;
+
+    html += '<div style="display:flex;flex-direction:column;gap:6px">';
+    for (const op of opcoesDisponiveis) {
+      const sel = selecionadas.has(op.nome);
+      const elegivel = !op.validar || op.validar(infoMagia);
+      const podeCombinar = podeAdicionarOpcao(op.nome);
+
+      // Custo efetivo para exibicao
+      let custoExibir = op.custo;
+      if (temApoteose && !apoteoseGratisUsado) {
+        const { gratisUsado } = calcularCustos();
+        if (!gratisUsado && !sel && selecionadas.size === 0) custoExibir = 0;
+        if (sel && selecionadas.size === 1 && !gratisUsado) custoExibir = 0;
+      }
+
+      const { custoTotal: custoAtual } = calcularCustos();
+      const semPF = !sel && custoExibir > 0 && (custoAtual + op.custo) > pfAtuais;
+      const bloqueado = (!elegivel || (!sel && !podeCombinar) || semPF) && !sel;
+
+      html += `
+        <div data-meta-cast="${op.nome}"
+             style="padding:8px 10px;border-radius:6px;border:1px solid ${sel ? 'var(--primary)' : 'var(--border-light)'};background:${sel ? 'var(--bg-active, rgba(var(--primary-rgb,59,130,246),0.1))' : 'var(--bg-card)'};${bloqueado ? 'opacity:0.4;cursor:not-allowed;' : 'cursor:pointer;'}">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <strong style="font-size:0.85rem">${sel ? '✓ ' : ''}${op.nome}</strong>
+              ${!elegivel ? '<span style="font-size:0.65rem;color:var(--danger);margin-left:4px">(N/A para esta magia)</span>' : ''}
+              ${semPF ? '<span style="font-size:0.65rem;color:var(--danger);margin-left:4px">(PF insuf.)</span>' : ''}
+            </div>
+            <span style="font-size:0.75rem;color:var(--text-muted)">${custoExibir === 0 ? 'Grátis' : op.custo + ' PF'}</span>
+          </div>
+          <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px">${op.desc}</div>
+        </div>`;
+    }
+    html += '</div>';
+    return html;
+  }
+
+  abrirModal('Metamagia', `
+    <div id="metamagia-cast-container">${renderModalMetaConjuracao()}</div>
+  `, `
+    <button class="btn btn-secondary" id="meta-cast-pular">Sem Metamagia</button>
+    <button class="btn btn-primary" id="meta-cast-aplicar">Aplicar e Conjurar</button>
+  `);
+
+  function attachMetaCastListeners() {
+    document.querySelectorAll('[data-meta-cast]').forEach(el => {
+      el.addEventListener('click', () => {
+        const nome = el.dataset.metaCast;
+        if (selecionadas.has(nome)) {
+          selecionadas.delete(nome);
+        } else {
+          if (!podeAdicionarOpcao(nome)) {
+            if (selecionadas.size >= maxPorConjuracao) {
+              toast(`Máx. ${maxPorConjuracao} metamagia(s) por conjuração.`, 'error');
+            }
+            return;
+          }
+          selecionadas.add(nome);
+        }
+        const container = document.getElementById('metamagia-cast-container');
+        if (container) container.innerHTML = renderModalMetaConjuracao();
+        attachMetaCastListeners();
+      });
+    });
+  }
+  attachMetaCastListeners();
+
+  document.getElementById('meta-cast-pular')?.addEventListener('click', () => {
+    window.fecharModal();
+    onSelecao([], {});
+  });
+
+  document.getElementById('meta-cast-aplicar')?.addEventListener('click', () => {
+    const selecionadasArray = [...selecionadas];
+    if (selecionadasArray.length === 0) {
+      window.fecharModal();
+      onSelecao([], {});
+      return;
+    }
+
+    // Se Magia Transmutada foi selecionada, perguntar tipo de dano
+    if (selecionadasArray.includes('Magia Transmutada')) {
+      const tipos = ['Ácido', 'Elétrico', 'Gélido', 'Ígneo', 'Trovejante', 'Venenoso'];
+      const container = document.getElementById('metamagia-cast-container');
+      if (container) {
+        container.innerHTML = `
+          <div style="text-align:center;margin-bottom:12px">
+            <strong>Magia Transmutada</strong>
+            <div style="font-size:0.8rem;color:var(--text-muted)">Escolha o novo tipo de dano:</div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+            ${tipos.map(t => `<button class="btn btn-secondary" data-meta-dano="${t}">${t}</button>`).join('')}
+          </div>`;
+        tipos.forEach(t => {
+          document.querySelector(`[data-meta-dano="${t}"]`)?.addEventListener('click', () => {
+            window.fecharModal();
+            onSelecao(selecionadasArray, { tipo_dano_transmutado: t });
+          });
+        });
+      }
+      return;
+    }
+
+    window.fecharModal();
+    onSelecao(selecionadasArray, {});
+  });
+}
+
+// Aplica efeito mecanico de uma opcao de metamagia na conjuracao
+function _aplicarEfeitoMetamagia(metaNome, nomeMagia, circ) {
+  if (!char.efeitos_magicos) char.efeitos_magicos = [];
+
+  switch (metaNome) {
+    case 'Magia Persistente': {
+      // Remover flag de concentracao do efeito da magia recem-aplicada
+      const efConc = char.efeitos_magicos.find(e => {
+        const base = e.nome.replace(/ \(.*\)$/, '');
+        return base === nomeMagia && e.concentracao;
+      });
+      if (efConc) {
+        efConc.concentracao = false;
+        efConc.metamagia_persistente = true;
+        efConc.rotulo = (efConc.rotulo || '') + ' [Persistente]';
+      }
+      break;
+    }
+    case 'Magia Cautelosa': {
+      const modCar = Math.max(1, calcMod(char.atributos.carisma));
+      char.efeitos_magicos.push({
+        nome: `${nomeMagia} (Cautelosa)`,
+        tipo: 'metamagia_info',
+        concentracao: false,
+        circulo: parseInt(circ) || 0,
+        rotulo: `Cautelosa: ${modCar} criatura(s) passam auto na SG`,
+        temporario: true
+      });
+      break;
+    }
+    case 'Magia Agravada': {
+      char.efeitos_magicos.push({
+        nome: `${nomeMagia} (Agravada)`,
+        tipo: 'metamagia_info',
+        concentracao: false,
+        circulo: parseInt(circ) || 0,
+        rotulo: 'Agravada: Desvantagem na salvaguarda',
+        temporario: true
+      });
+      break;
+    }
+    case 'Magia Distante': {
+      char.efeitos_magicos.push({
+        nome: `${nomeMagia} (Distante)`,
+        tipo: 'metamagia_info',
+        concentracao: false,
+        circulo: parseInt(circ) || 0,
+        rotulo: 'Distante: Alcance dobrado',
+        temporario: true
+      });
+      break;
+    }
+    case 'Magia Duplicada': {
+      char.efeitos_magicos.push({
+        nome: `${nomeMagia} (Duplicada)`,
+        tipo: 'metamagia_info',
+        concentracao: false,
+        circulo: parseInt(circ) || 0,
+        rotulo: 'Duplicada: +1 alvo adicional',
+        temporario: true
+      });
+      break;
+    }
+    case 'Magia Buscadora': {
+      char.efeitos_magicos.push({
+        nome: `${nomeMagia} (Buscadora)`,
+        tipo: 'metamagia_info',
+        concentracao: false,
+        circulo: parseInt(circ) || 0,
+        rotulo: 'Buscadora: Re-jogar ataque se errar',
+        temporario: true
+      });
+      break;
+    }
+    case 'Magia Potencializada': {
+      const modCar = Math.max(1, calcMod(char.atributos.carisma));
+      char.efeitos_magicos.push({
+        nome: `${nomeMagia} (Potencializada)`,
+        tipo: 'metamagia_info',
+        concentracao: false,
+        circulo: parseInt(circ) || 0,
+        rotulo: `Potencializada: Re-jogar até ${modCar} dado(s) de dano`,
+        temporario: true
+      });
+      break;
+    }
+    case 'Magia Transmutada': {
+      // Tipo de dano eh registrado via opcoesMeta.tipo_dano_transmutado no historico
+      break;
+    }
+    // Magia Acelerada e Magia Sutil: efeitos puramente informativos, sem estado adicional
+  }
+}
+
+// Processa todas as metamagias selecionadas para uma conjuracao, gasta PF e aplica efeitos
+function _processarMetamagiasConjuracao(metamagiasAplicadas, opcoesMeta, nomeMagia, circ) {
+  const estado = getEstadoRecursosFeiticeiro();
+  if (!estado) return '';
+
+  const temApoteose = (char.nivel || 1) >= 20;
+  let gratisUsada = false;
+  const detalhes = [];
+
+  // Limpar efeitos temporarios de metamagia anteriores
+  if (char.efeitos_magicos) {
+    char.efeitos_magicos = char.efeitos_magicos.filter(e => !e.temporario);
+  }
+
+  for (const metaNome of metamagiasAplicadas) {
+    const op = OPCOES_METAMAGIA.find(o => o.nome === metaNome);
+    if (!op) continue;
+
+    // Custo (Apoteose Arcana: primeira gratis por turno)
+    let custo = op.custo;
+    if (temApoteose && !(char.recursos.feiticeiro.apoteose_gratis_usado_turno) && !gratisUsada) {
+      custo = 0;
+      gratisUsada = true;
+      char.recursos.feiticeiro.apoteose_gratis_usado_turno = true;
+    }
+
+    if (custo > 0) {
+      if (!gastarPontosFeiticaria(custo)) {
+        toast(`PF insuficientes para ${metaNome}.`, 'error');
+        continue;
+      }
+    }
+
+    _aplicarEfeitoMetamagia(metaNome, nomeMagia, circ);
+
+    let detalheExtra = '';
+    if (metaNome === 'Magia Transmutada' && opcoesMeta?.tipo_dano_transmutado) {
+      detalheExtra = ` → ${opcoesMeta.tipo_dano_transmutado}`;
+    }
+    detalhes.push(`${metaNome}${detalheExtra}${custo > 0 ? ` (-${custo} PF)` : ' (grátis)'}`);
+  }
+
+  // Registrar no historico de metamagias
+  if (!char.recursos.feiticeiro.metamagia_historico) char.recursos.feiticeiro.metamagia_historico = [];
+  char.recursos.feiticeiro.metamagia_historico.push({
+    magia: nomeMagia,
+    circulo: parseInt(circ),
+    metamagias: [...metamagiasAplicadas],
+    opcoes: opcoesMeta || {},
+    timestamp: Date.now()
+  });
+  // Manter apenas ultimos 20 registros
+  if (char.recursos.feiticeiro.metamagia_historico.length > 20) {
+    char.recursos.feiticeiro.metamagia_historico = char.recursos.feiticeiro.metamagia_historico.slice(-20);
+  }
+
+  return detalhes.length > 0 ? ` [${detalhes.join(', ')}]` : '';
 }
 
 // Modal de confirmacao para substituir concentracao ativa
@@ -11279,29 +11622,29 @@ function setupEventosEspacosMagia() {
 
         const prosseguir = (aplicarSelf) => {
           if (!aplicarSelf) {
-            _executarConjuracao(nome, circ, btn.dataset.conjCirc, false);
+            _executarConjuracao(nome, circ, btn.dataset.conjCirc, false, undefined, _metasAplicadas, _opcoesMetaConj);
             return;
           }
           // Verificar modais de selecao necessarios
           if (config.selecionar_tipo) {
             mostrarModalSelecaoMagia(nome, circ, config.selecionar_tipo, 'Escolher Tipo', (tipo) => {
-              _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, { tipo_selecionado: tipo });
+              _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, { tipo_selecionado: tipo }, _metasAplicadas, _opcoesMetaConj);
             });
           } else if (config.selecionar_atributo) {
             mostrarModalSelecaoMagia(nome, circ, config.selecionar_atributo, 'Escolher Atributo', (attr) => {
-              _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, { atributo_selecionado: attr });
+              _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, { atributo_selecionado: attr }, _metasAplicadas, _opcoesMetaConj);
             });
           } else if (config.selecionar_variante) {
             mostrarModalSelecaoMagia(nome, circ, Object.keys(config.selecionar_variante), 'Escolher Variante', (v) => {
-              _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, { variante_selecionada: v });
+              _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, { variante_selecionada: v }, _metasAplicadas, _opcoesMetaConj);
             });
           } else if (config.tipo === 'cura_condicao') {
             const lista = config.condicoes || config.efeitos || [];
             mostrarModalCuraCondicao(nome, circ, lista, (c) => {
-              _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, { condicao_removida: c });
+              _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, { condicao_removida: c }, _metasAplicadas, _opcoesMetaConj);
             });
           } else {
-            _executarConjuracao(nome, circ, btn.dataset.conjCirc, true);
+            _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, undefined, _metasAplicadas, _opcoesMetaConj);
           }
         };
 
@@ -11314,20 +11657,39 @@ function setupEventosEspacosMagia() {
       }
 
       // Magia sem efeito especifico - apenas gasta slot e mostra toast
-      _executarConjuracao(nome, circ, btn.dataset.conjCirc, false);
+      _executarConjuracao(nome, circ, btn.dataset.conjCirc, false, undefined, _metasAplicadas, _opcoesMetaConj);
 
       }; // fim de _prosseguirConjuracao
 
+      // Estado de metamagia para esta conjuracao (Feiticeiro)
+      let _metasAplicadas = [];
+      let _opcoesMetaConj = {};
+
+      const _iniciarConjuracaoComMetamagia = () => {
+        if (char.classe === 'Feiticeiro' && (char.nivel || 1) >= 2) {
+          const estadoFeit = getEstadoRecursosFeiticeiro();
+          if (estadoFeit && estadoFeit.metamagias.length > 0 && estadoFeit.pontosAtuais > 0) {
+            mostrarModalMetamagiaConjuracao(nome, circ, (metas, opcoesMeta) => {
+              _metasAplicadas = metas || [];
+              _opcoesMetaConj = opcoesMeta || {};
+              _prosseguirConjuracao();
+            });
+            return;
+          }
+        }
+        _prosseguirConjuracao();
+      };
+
       // Se ha conflito de concentracao, pedir confirmacao
       if (temConflitoConc) {
-        confirmarSubstituirConcentracao(concAtiva, nome, _prosseguirConjuracao);
+        confirmarSubstituirConcentracao(concAtiva, nome, _iniciarConjuracaoComMetamagia);
       } else {
-        _prosseguirConjuracao();
+        _iniciarConjuracaoComMetamagia();
       }
     });
   });
 
-  function _executarConjuracao(nome, circ, baseCirc, aplicarEfeitoSelf, opcoes) {
+  function _executarConjuracao(nome, circ, baseCirc, aplicarEfeitoSelf, opcoes, metamagiasAplicadas, opcoesMeta) {
     char.espacos_magia[circ].usados++;
 
     if (char.classe === 'Feiticeiro' && semAcento(char.subclasse || '') === semAcento('Feitiçaria Selvagem')) {
@@ -11353,14 +11715,20 @@ function setupEventosEspacosMagia() {
       char.efeitos_magicos.push({ nome: nome, tipo: 'concentracao_generica', concentracao: true, circulo: parseInt(circ) || 0, rotulo: `Concentrando em ${nome}` });
     }
 
+    // Processar metamagias aplicadas (Feiticeiro)
+    let metaTexto = '';
+    if (metamagiasAplicadas && metamagiasAplicadas.length > 0 && char.classe === 'Feiticeiro') {
+      metaTexto = _processarMetamagiasConjuracao(metamagiasAplicadas, opcoesMeta, nome, circ);
+    }
+
     salvar();
     const upcast = parseInt(circ) > parseInt(baseCirc);
     const sufixoAlvo = aplicarEfeitoSelf ? ' (em você)' : '';
     const detalhe = resultado?.detalhe ? ` — ${resultado.detalhe}` : '';
     if (char.classe === 'Feiticeiro' && semAcento(char.subclasse || '') === semAcento('Feitiçaria Selvagem') && char.recursos?.feiticeiro?.subclasses?.selvagem?.surto_pendente_automatico) {
-      toast(`${nome} conjurada${upcast ? ` no ${circ}º círculo` : ''}${sufixoAlvo}${detalhe}! Surto de Magia Selvagem automático pendente.`, 'success');
+      toast(`${nome} conjurada${upcast ? ` no ${circ}º círculo` : ''}${sufixoAlvo}${detalhe}${metaTexto}! Surto de Magia Selvagem automático pendente.`, 'success');
     } else {
-      toast(`${nome} conjurada${upcast ? ` no ${circ}º círculo` : ''}${sufixoAlvo}${detalhe}!`, 'success');
+      toast(`${nome} conjurada${upcast ? ` no ${circ}º círculo` : ''}${sufixoAlvo}${detalhe}${metaTexto}!`, 'success');
     }
     renderFichaCompleta();
   }
