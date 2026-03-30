@@ -103,6 +103,21 @@ export function restaurarPersonagensLocais() {
   localStorage.removeItem(BACKUP_KEY);
 }
 
+/**
+ * Valida que um objeto tem a estrutura minima de personagem.
+ * Rejeita objetos que nao parecem ser personagens validos.
+ * @param {*} p - Objeto a validar.
+ * @returns {boolean}
+ */
+function _validarPersonagem(p) {
+  if (!p || typeof p !== 'object') return false;
+  if (typeof p.id !== 'string' || !p.id.trim()) return false;
+  if (typeof p.nome !== 'string') return false;
+  if (typeof p.nivel !== 'number' || p.nivel < 1 || p.nivel > 20) return false;
+  if (!p.atributos || typeof p.atributos !== 'object') return false;
+  return true;
+}
+
 /** Importa personagens de um JSON string (merge com existentes) */
 export function importarPersonagens(jsonStr) {
   try {
@@ -111,6 +126,7 @@ export function importarPersonagens(jsonStr) {
     const lista = listarPersonagens();
     let countNovos = 0;
     for (const p of importados) {
+      if (!_validarPersonagem(p)) continue; // Ignorar objetos malformados
       if (!lista.find(e => e.id === p.id)) {
         lista.push(p);
         countNovos++;
