@@ -71,6 +71,9 @@ function _renderConteudo(container, personagens, usuario) {
     `;
     _setupAuthEvents(container);
     setupImportar(container);
+
+    // Sincronizar automaticamente ao renderizar a home se logado
+    _sincronizarSeLogado(container);
     return;
   }
 
