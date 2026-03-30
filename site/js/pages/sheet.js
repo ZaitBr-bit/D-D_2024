@@ -4,7 +4,7 @@
 import { CLASSES_INFO, PERICIAS, ATRIBUTOS_NOMES, ATRIBUTOS_KEYS, ATRIBUTO_NOME_PARA_KEY } from '../dados-classes.js';
 import { getPersonagem, salvarPersonagem, removerPersonagem } from '../store.js';
 import { getClasse, getMagiasClasse, getMagiasPorCirculo, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura, getTalentos, getEspecies } from '../db.js';
-import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagia, calcPercepcaoPassiva, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcBonusPericia, calcPVTotal, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, gerarId, detectarRecarga, ehHabilidadeAtiva, getDeslocamento, getTamanho } from '../utils.js';
+import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagia, calcPercepcaoPassiva, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcBonusPericia, calcPVTotal, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, gerarId, detectarRecarga, ehHabilidadeAtiva, getDeslocamento, getTamanho, escHtml } from '../utils.js';
 import { podeSubirDeNivel, subirDeNivel, XP_POR_NIVEL, adicionarXP, obterTodasMagiasDominio, obterTodasMagiasSemprePreparadas, exigeEspecializacaoBardo, exigeEspecializacaoGuardiao, exigeEstiloLuta, exigeExploradorHabil, exigeAcademico } from '../levelup.js';
 import { abrirLevelUpCards } from '../levelup-ui.js';
 import { getSyncStatus, onSyncStatusChange } from '../sync.js';
@@ -2625,12 +2625,12 @@ function renderFichaCompleta() {
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:8px">
         <div>
-          <h2 style="font-size:1.3rem;margin-bottom:2px" id="char-nome-display">${char.nome || 'Sem Nome'}</h2>
+          <h2 style="font-size:1.3rem;margin-bottom:2px" id="char-nome-display">${escHtml(char.nome) || 'Sem Nome'}</h2>
           <div style="font-size:0.9rem;color:var(--text-muted)">
-            ${char.especie || ''} ${char.classe || ''} ${char.subclasse ? `(${char.subclasse})` : ''} &middot; Nível ${char.nivel}
+            ${escHtml(char.especie || '')} ${escHtml(char.classe || '')} ${char.subclasse ? `(${escHtml(char.subclasse)})` : ''} &middot; Nível ${char.nivel}
           </div>
-          <div style="font-size:0.8rem;color:var(--text-muted)">Antecedente: ${char.antecedente || '–'}${char.alinhamento ? ' | Alinhamento: ' + char.alinhamento : ''}</div>
-          <div style="font-size:0.8rem;color:var(--text-muted)">Tamanho: ${_tamanho}${(char.idiomas && char.idiomas.length) ? ' | Idiomas: ' + char.idiomas.join(', ') : ''}</div>
+          <div style="font-size:0.8rem;color:var(--text-muted)">Antecedente: ${escHtml(char.antecedente || '–')}${char.alinhamento ? ' | Alinhamento: ' + escHtml(char.alinhamento) : ''}</div>
+          <div style="font-size:0.8rem;color:var(--text-muted)">Tamanho: ${escHtml(_tamanho)}${(char.idiomas && char.idiomas.length) ? ' | Idiomas: ' + char.idiomas.map(escHtml).join(', ') : ''}</div>
           ${(estadoGuardiao && estadoGuardiao.sentidosSelvagensAtivo) ? '<div style="font-size:0.8rem;color:var(--text-muted)">Sentidos: Visão às Cegas 9 m</div>' : ''}
           ${(estadoGuardiao && estadoGuardiao.exaustao > 0) ? `<div style="font-size:0.8rem;color:var(--danger)">Exaustão: ${estadoGuardiao.exaustao}</div>` : ''}
           <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">
