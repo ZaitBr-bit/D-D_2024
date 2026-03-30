@@ -14412,7 +14412,7 @@ async function gerarHtmlImpressao() {
         ${char.alinhamento ? ` | ${escHtml(char.alinhamento)}` : ''}
       </div>
       <div class="print-char-sub">
-        Tamanho: ${_tamanho}${(char.idiomas?.length) ? ' | Idiomas: ' + char.idiomas.join(', ') : ''}
+        Tamanho: ${escHtml(_tamanho)}${(char.idiomas?.length) ? ' | Idiomas: ' + char.idiomas.map(escHtml).join(', ') : ''}
       </div>
     </div>
   `;
