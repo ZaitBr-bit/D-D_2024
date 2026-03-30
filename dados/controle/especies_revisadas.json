@@ -50,6 +50,16 @@
     {
       "nome": "Tiferino",
       "revisado": false
+    },
+    {
+      "nome": "Kenku",
+      "revisado": true,
+      "data_revisao": "2026-03-30",
+      "caracteristicas_especiais": [
+        "Memória Kenku (2 perícias à escolha)",
+        "Mimetismo (CD baseada em Bônus Prof + Carisma)"
+      ],
+      "notas": "Usa campo pericias_especie (array de 2) em vez de pericia_especie (string). Tamanho Médio ou Pequeno à escolha."
     }
   ]
 }

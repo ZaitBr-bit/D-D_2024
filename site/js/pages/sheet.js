@@ -2276,6 +2276,7 @@ export async function renderSheet(container, charId) {
   migrarNomePericiaLidarAnimais();
   migrarTalentoVersatilHumano();
   migrarPericiaEspecie();
+  migrarPericiasEspecie();
   migrarPericiasTalentos();
   migrarIniciadoEmMagiaInstancias();
   migrarAdeptoElementalTipos();
@@ -2518,6 +2519,20 @@ function migrarPericiaEspecie() {
     char.pericias_proficientes.push(char.pericia_especie);
     salvar();
   }
+}
+
+/** Garante que pericias de especie (array, ex: Kenku) estejam nas proficiencias */
+function migrarPericiasEspecie() {
+  if (!char.pericias_especie?.length) return;
+  if (!char.pericias_proficientes) char.pericias_proficientes = [];
+  let changed = false;
+  char.pericias_especie.forEach(p => {
+    if (p && !char.pericias_proficientes.includes(p)) {
+      char.pericias_proficientes.push(p);
+      changed = true;
+    }
+  });
+  if (changed) salvar();
 }
 
 /** Garante que pericias de talentos (Habilidoso) estejam nas proficiencias */
@@ -10138,6 +10153,17 @@ function renderTracoEspecie(traco, herdaAncestralidade = false, ehSubRevelacao =
   if ((traco.nome === 'Hábil' || traco.nome === 'Sentidos Aguçados') && char.pericia_especie) {
     infoEscolhaTraco = `<div class="info-box info" style="font-size:0.8rem;margin-top:6px"><strong>Pericia escolhida:</strong> ${char.pericia_especie}</div>`;
   }
+  if (traco.nome === 'Memória Kenku' && char.pericias_especie?.length) {
+    const todasProf = (char.pericias_proficientes || []).slice().sort((a, b) => a.localeCompare(b));
+    infoEscolhaTraco = `<div class="info-box info" style="font-size:0.8rem;margin-top:6px">
+      <strong>Perícias escolhidas (Kenku):</strong> ${char.pericias_especie.join(', ')}
+      ${todasProf.length ? `<br><strong>Perícias com proficiência:</strong> ${todasProf.join(', ')}` : ''}
+    </div>`;
+  }
+  if (traco.nome === 'Mimetismo' && char.especie === 'Kenku') {
+    const cdMimetismo = 8 + bonusProficiencia(char.nivel) + calcMod(char.atributos?.carisma || 10);
+    infoEscolhaTraco = `<div class="info-box info" style="font-size:0.8rem;margin-top:6px"><strong>CD do Mimetismo:</strong> ${cdMimetismo} (8 + Bônus Prof. + mod. Carisma)</div>`;
+  }
   if (traco.nome === 'Versátil' && char.talento_versatil) {
     // Mostrar o talento escolhido e, se houver escolhas associadas (ex: Habilidoso), tambem
     let detalheVersatil = `<strong>Talento escolhido:</strong> ${char.talento_versatil}`;
@@ -12330,14 +12356,20 @@ async function mostrarBuscaGrimorio() {
   `);
 
   const resultadoEl = document.getElementById('resultado-grimorio');
-  document.getElementById('busca-grimorio')?.addEventListener('input', (e) => {
-    const termo = semAcento(e.target.value);
-    if (termo.length < 2) { resultadoEl.innerHTML = ''; return; }
 
+  function renderGrimorio() {
+    const termo = semAcento(document.getElementById('busca-grimorio')?.value || '');
     const jaNoGrimorio = new Set((char.grimorio || []).map(m => m.nome));
-    let matches = magias.filter(m => semAcento(m.nome).includes(termo) && !jaNoGrimorio.has(m.nome)).slice(0, 20);
+    let lista = magias.filter(m => !jaNoGrimorio.has(m.nome));
+    if (termo.length >= 2) lista = lista.filter(m => semAcento(m.nome).includes(termo));
+    lista = lista.slice(0, 50);
 
-    resultadoEl.innerHTML = matches.map(m => {
+    if (lista.length === 0) {
+      resultadoEl.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:16px">Nenhuma magia encontrada.</div>`;
+      return;
+    }
+
+    resultadoEl.innerHTML = lista.map(m => {
       const custo = m.circulo * 50;
       const temPO = (char.po || 0) >= custo;
       return `
@@ -12369,7 +12401,10 @@ async function mostrarBuscaGrimorio() {
         toast(`${nome} copiada para o grimório! (-${custo} PO)`, 'success');
       });
     });
-  });
+  }
+
+  document.getElementById('busca-grimorio')?.addEventListener('input', renderGrimorio);
+  renderGrimorio();
 }
 
 /** Modal de troca de magias preparadas (usado no descanso longo para classes preparadas) */

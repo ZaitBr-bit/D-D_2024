@@ -944,6 +944,16 @@ async function finalizar() {
     }
   }
 
+  // Aplicar pericias de especie (Kenku: Memória Kenku — 2 pericias à escolha)
+  if (personagem.pericias_especie?.length) {
+    if (!personagem.pericias_proficientes) personagem.pericias_proficientes = [];
+    personagem.pericias_especie.forEach(p => {
+      if (p && !personagem.pericias_proficientes.includes(p)) {
+        personagem.pericias_proficientes.push(p);
+      }
+    });
+  }
+
   // Adicionar truques concedidos pela espécie/traço (sem duplicar)
   const truquesEspecie = obterTruquesEspecie(especie, tracosEscolhidos);
   if (truquesEspecie.length > 0) {
@@ -1413,6 +1423,31 @@ function abrirPopupEspecie(nome) {
         ${opcsElfo}
       </select>
     `;
+  } else if (nome === 'Kenku') {
+    // Memória Kenku: 2 perícias quaisquer à escolha
+    const periciasSel = personagem.pericias_especie || [];
+    const opcsKenku1 = PERICIAS.map(p => {
+      const sel = periciasSel[0] === p.nome ? 'selected' : '';
+      return `<option value="${p.nome}" ${sel}>${p.nome} (${p.atributo})</option>`;
+    }).join('');
+    const opcsKenku2 = PERICIAS.map(p => {
+      const sel = periciasSel[1] === p.nome ? 'selected' : '';
+      return `<option value="${p.nome}" ${sel}>${p.nome} (${p.atributo})</option>`;
+    }).join('');
+    periciaEspecieHtml = `
+      <div class="section-divider"><span>Memória Kenku — 2 Perícias</span></div>
+      <div class="info-box info" style="font-size:0.85rem">O traço Memória Kenku concede proficiência em duas perícias de sua escolha.</div>
+      <div style="display:flex;gap:8px;margin:8px 0">
+        <select id="select-kenku-pericia-1" style="flex:1;padding:8px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:0.9rem">
+          <option value="">-- 1ª perícia --</option>
+          ${opcsKenku1}
+        </select>
+        <select id="select-kenku-pericia-2" style="flex:1;padding:8px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:0.9rem">
+          <option value="">-- 2ª perícia --</option>
+          ${opcsKenku2}
+        </select>
+      </div>
+    `;
   }
 
   // HTML especial para Humano: selecao de talento de origem (Versatil)
@@ -1558,6 +1593,20 @@ function abrirPopupEspecie(nome) {
       }
       personagem.pericia_especie = selectPericia.value;
     }
+    // Validar pericias de especie Kenku (Memória Kenku: 2 perícias)
+    if (nome === 'Kenku') {
+      const sel1 = document.getElementById('select-kenku-pericia-1')?.value;
+      const sel2 = document.getElementById('select-kenku-pericia-2')?.value;
+      if (!sel1 || !sel2) {
+        toast('Selecione as 2 perícias de Memória Kenku', 'error');
+        return;
+      }
+      if (sel1 === sel2) {
+        toast('Escolha perícias diferentes para Memória Kenku', 'error');
+        return;
+      }
+      personagem.pericias_especie = [sel1, sel2];
+    }
     // Validar talento Versatil para Humano
     if (nome === 'Humano') {
       const selectVersatil = document.getElementById('select-talento-versatil');
@@ -1595,6 +1644,8 @@ function abrirPopupEspecie(nome) {
       if (nome !== 'Humano') delete personagem.talento_versatil;
       // Limpar pericia de especie se mudou para especie sem essa escolha
       if (nome !== 'Humano' && nome !== 'Elfo') delete personagem.pericia_especie;
+      // Limpar pericias de especie (Kenku) se mudou para especie sem essa escolha
+      if (nome !== 'Kenku') delete personagem.pericias_especie;
     }
     personagem.especie = nome;
     personagem.tracos_escolhidos = [...selecionadosTemp];
@@ -1985,6 +2036,7 @@ function renderStepAtributos(el) {
       Escolha ${info?.num_pericias || 2} perícias da classe.
       ${dadosCache.pericias_antecedente?.length ? `<br>Já possui do antecedente: <strong>${dadosCache.pericias_antecedente.join(', ')}</strong>` : ''}
       ${personagem.pericia_especie ? `<br>Já possui da espécie: <strong>${personagem.pericia_especie}</strong>` : ''}
+      ${(personagem.pericias_especie?.length) ? `<br>Já possui da espécie (Kenku): <strong>${personagem.pericias_especie.join(', ')}</strong>` : ''}
       ${(() => {
         const pTalento = [];
         if (personagem.escolhas_talento) {
@@ -2350,6 +2402,12 @@ function renderPericiasSeletor() {
   // Incluir pericia de especie (Habil / Sentidos Aguçados) se houver
   if (personagem.pericia_especie && !periciasBg.includes(personagem.pericia_especie)) {
     periciasBg.push(personagem.pericia_especie);
+  }
+  // Incluir pericias de especie (Kenku: Memória Kenku)
+  if (personagem.pericias_especie?.length) {
+    personagem.pericias_especie.forEach(p => {
+      if (p && !periciasBg.includes(p)) periciasBg.push(p);
+    });
   }
   // Incluir pericias dos talentos (Habilidoso concede pericias/ferramentas)
   if (personagem.escolhas_talento) {
