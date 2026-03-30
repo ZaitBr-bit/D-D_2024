@@ -376,15 +376,16 @@ export function gerarId() {
   );
 }
 
-/** Escapa caracteres HTML especiais para prevenir XSS em innerHTML */
+const _ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+/**
+ * Escapa caracteres HTML especiais para prevenir XSS em innerHTML.
+ * Nao adequado para contextos de atributos de evento ou URLs.
+ * @param {*} str - Valor a escapar (null/undefined retorna '').
+ * @returns {string} String com &, <, >, ", ' escapados.
+ */
 export function escHtml(str) {
   if (str == null) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+  return String(str).replace(/[&<>"']/g, c => _ESC_MAP[c]);
 }
 
 /** Formata data para exibição */
