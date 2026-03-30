@@ -105,16 +105,16 @@ export function restaurarPersonagensLocais() {
 
 /**
  * Valida que um objeto tem a estrutura minima de personagem.
- * Rejeita objetos que nao parecem ser personagens validos.
- * @param {*} p - Objeto a validar.
- * @returns {boolean}
+ * Campos exigidos: id (string nao vazia), nome (string nao vazia), nivel (numero inteiro 1-20), atributos (objeto).
+ * @param {object} p - Objeto a validar.
+ * @returns {boolean} true se o objeto e um personagem valido.
  */
 function _validarPersonagem(p) {
-  if (!p || typeof p !== 'object') return false;
+  if (!p || typeof p !== 'object' || Array.isArray(p)) return false;
   if (typeof p.id !== 'string' || !p.id.trim()) return false;
-  if (typeof p.nome !== 'string') return false;
-  if (typeof p.nivel !== 'number' || p.nivel < 1 || p.nivel > 20) return false;
-  if (!p.atributos || typeof p.atributos !== 'object') return false;
+  if (typeof p.nome !== 'string' || !p.nome.trim()) return false;
+  if (typeof p.nivel !== 'number' || !Number.isFinite(p.nivel) || p.nivel < 1 || p.nivel > 20) return false;
+  if (!p.atributos || typeof p.atributos !== 'object' || Array.isArray(p.atributos)) return false;
   return true;
 }
 
@@ -125,8 +125,12 @@ export function importarPersonagens(jsonStr) {
     if (!Array.isArray(importados)) throw new Error('Formato inválido');
     const lista = listarPersonagens();
     let countNovos = 0;
-    for (const p of importados) {
-      if (!_validarPersonagem(p)) continue; // Ignorar objetos malformados
+    for (let i = 0; i < importados.length; i++) {
+      const p = importados[i];
+      if (!_validarPersonagem(p)) {
+        console.warn('importarPersonagens: personagem ignorado (estrutura invalida)', p?.id ?? `indice ${i}`);
+        continue;
+      }
       if (!lista.find(e => e.id === p.id)) {
         lista.push(p);
         countNovos++;
