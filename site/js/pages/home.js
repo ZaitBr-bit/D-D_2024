@@ -3,7 +3,7 @@
 // ============================================================
 import { listarPersonagens, removerPersonagem, duplicarPersonagem, exportarTodos, importarPersonagens, atualizarListaLocal, backupPersonagensLocais, restaurarPersonagensLocais } from '../store.js';
 import { enfileirarSync, obterIdsPendentesRemocao } from '../sync.js';
-import { toast, abrirModal, fmtData } from '../utils.js';
+import { toast, abrirModal, fmtData, escHtml } from '../utils.js';
 import { CLASSES_INFO } from '../dados-classes.js';
 import { iniciarAuth, getUsuario, loginComGoogle, logout, onAuthChange, buscarPersonagensCloud } from '../auth.js';
 
@@ -34,9 +34,9 @@ function _renderConteudo(container, personagens, usuario) {
   // Barra de conta Google (opcional)
   const contaHtml = usuario
     ? `<div class="card" style="display:flex;align-items:center;gap:10px;padding:10px 14px;margin-bottom:12px;background:var(--bg-input)">
-        <img src="${usuario.photoURL || ''}" alt="" style="width:32px;height:32px;border-radius:50%;${usuario.photoURL ? '' : 'display:none'}" referrerpolicy="no-referrer">
+        <img src="${escHtml(usuario.photoURL || '')}" alt="" style="width:32px;height:32px;border-radius:50%;${usuario.photoURL ? '' : 'display:none'}" referrerpolicy="no-referrer">
         <div style="flex:1;min-width:0">
-          <div style="font-size:0.85rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${usuario.displayName || usuario.email}</div>
+          <div style="font-size:0.85rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(usuario.displayName || usuario.email || '')}</div>
           <div style="font-size:0.7rem;color:var(--text-muted)">Personagens sincronizados com a nuvem</div>
         </div>
         <button class="btn btn-sm btn-secondary" id="btn-sync-cloud" title="Sincronizar agora">&#x21bb;</button>
@@ -119,7 +119,7 @@ function _renderConteudo(container, personagens, usuario) {
       const p = personagens.find(x => x.id === id);
       abrirModal(
         'Excluir Personagem',
-        `<p>Tem certeza que deseja excluir <strong>${p?.nome || 'este personagem'}</strong>?</p><p style="color:var(--danger);font-size:0.85rem;margin-top:8px;">Esta acao nao pode ser desfeita.</p>`,
+        `<p>Tem certeza que deseja excluir <strong>${escHtml(p?.nome) || 'este personagem'}</strong>?</p><p style="color:var(--danger);font-size:0.85rem;margin-top:8px;">Esta acao nao pode ser desfeita.</p>`,
         `<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
          <button class="btn btn-danger" id="btn-confirmar-excluir">Excluir</button>`
       );
@@ -306,13 +306,13 @@ function renderCharCard(p) {
   const dadoVida = info ? `d${info.dado_vida}` : '';
 
   return `
-    <div class="card char-card" data-id="${p.id}">
-      <div class="char-avatar">${inicial}</div>
+    <div class="card char-card" data-id="${escHtml(p.id)}">
+      <div class="char-avatar">${escHtml(inicial)}</div>
       <div class="char-info">
-        <div class="char-nome">${p.nome || 'Sem nome'}</div>
+        <div class="char-nome">${escHtml(p.nome) || 'Sem nome'}</div>
         <div class="char-detalhe">
-          ${p.especie || ''} ${p.classe || ''}
-          ${p.subclasse ? `(${p.subclasse})` : ''}
+          ${escHtml(p.especie || '')} ${escHtml(p.classe || '')}
+          ${p.subclasse ? `(${escHtml(p.subclasse)})` : ''}
           ${dadoVida ? `&middot; ${dadoVida}` : ''}
         </div>
       </div>
