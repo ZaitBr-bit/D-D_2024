@@ -13,6 +13,7 @@ const STATIC_ASSETS = [
   './js/app.js',
   './js/db.js',
   './js/store.js',
+  './js/sync.js',
   './js/utils.js',
   './js/dados-classes.js',
   './js/levelup.js',

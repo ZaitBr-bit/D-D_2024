@@ -7,6 +7,7 @@ import { getClasse, getMagiasClasse, getMagiasPorCirculo, getIndiceMagias, getAr
 import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagia, calcPercepcaoPassiva, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcBonusPericia, calcPVTotal, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, gerarId, detectarRecarga, ehHabilidadeAtiva, getDeslocamento, getTamanho } from '../utils.js';
 import { podeSubirDeNivel, subirDeNivel, XP_POR_NIVEL, adicionarXP, obterTodasMagiasDominio, obterTodasMagiasSemprePreparadas, exigeEspecializacaoBardo, exigeEspecializacaoGuardiao, exigeEstiloLuta, exigeExploradorHabil, exigeAcademico } from '../levelup.js';
 import { abrirLevelUpCards } from '../levelup-ui.js';
+import { getSyncStatus, onSyncStatusChange } from '../sync.js';
 
 // Estilos visuais (cor e emoji) para cada atributo
 const ATRIBUTO_ESTILO = {
@@ -26,6 +27,7 @@ let talentosCache = null;
 let especiesCache = null;
 let magiasDominioCache = null;
 let magiasSempreCache = null;
+let _syncSubscribed = false;
 
 // Feature flag de migração do fluxo de level up em cards.
 // Pode ser sobrescrita por:
@@ -2340,7 +2342,38 @@ export async function renderSheet(container, charId) {
 
   renderFichaCompleta();
 
+  // Registrar atualização do indicador de sync (somente uma vez por sessão)
+  if (!_syncSubscribed) {
+    _syncSubscribed = true;
+    onSyncStatusChange(_atualizarIndicadorSync);
+  }
+
   document.getElementById('btn-print')?.addEventListener('click', () => imprimirFicha());
+}
+
+/** Retorna texto e cor CSS do indicador de sync conforme o status atual */
+function _textoStatusSync(status) {
+  switch (status) {
+    case 'sincronizando': return { texto: '\u27F3 Salvando...', cor: 'var(--text-muted)' };
+    case 'ok':            return { texto: '\u2713 Salvo', cor: 'var(--success, #2e7d32)' };
+    case 'erro':          return { texto: '! Erro ao salvar', cor: 'var(--danger, #c62828)' };
+    case 'offline':       return { texto: '\u23F8 Offline', cor: 'var(--warning, #e65100)' };
+    default:              return { texto: '', cor: '' };
+  }
+}
+
+/** Retorna HTML do elemento do indicador com o status atual */
+function _renderSyncIndicadorHtml() {
+  const { texto, cor } = _textoStatusSync(getSyncStatus());
+  return `<div id="sync-status-indicator" style="font-size:0.7rem;text-align:right;min-height:1em"><span style="color:${cor}">${texto}</span></div>`;
+}
+
+/** Atualiza o indicador de sync no DOM sem re-render completo */
+function _atualizarIndicadorSync(status) {
+  const el = document.getElementById('sync-status-indicator');
+  if (!el) return;
+  const { texto, cor } = _textoStatusSync(status);
+  el.innerHTML = `<span style="color:${cor}">${texto}</span>`;
 }
 
 function salvar() {
@@ -2598,6 +2631,7 @@ function renderFichaCompleta() {
               Imprimir
             </button>
           </div>
+          ${_renderSyncIndicadorHtml()}
           ${char.nivel < 20 ? `
             <button class="btn btn-sm btn-accent" id="btn-levelup" style="font-weight:700">
               ⬆ Subir de Nível (Nível ${char.nivel + 1})
