@@ -316,7 +316,7 @@ function renderCharCard(p) {
           ${dadoVida ? `&middot; ${dadoVida}` : ''}
         </div>
       </div>
-      <div class="char-nivel">Nv. ${p.nivel || 1}</div>
+      <div class="char-nivel">Nv. ${escHtml(p.nivel ?? 1)}</div>
       <div class="char-actions" style="display:flex;gap:4px;margin-left:8px;">
         <button class="btn btn-sm btn-secondary" data-action="duplicar" title="Duplicar">&#x2398;</button>
         <button class="btn btn-sm btn-danger" data-action="excluir" title="Excluir">&times;</button>
