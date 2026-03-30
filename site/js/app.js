@@ -4,6 +4,7 @@
 import { renderHome } from './pages/home.js';
 import { renderCreator } from './pages/creator.js';
 import { renderSheet } from './pages/sheet.js';
+import { inicializarSync } from './sync.js';
 
 // --- Router baseado em hash ---
 const routes = {
@@ -122,6 +123,9 @@ function verificarAtualizacaoSW(registration) {
 
 // --- Inicialização ---
 function init() {
+  // Inicializar módulo de sync (registra listeners online/offline e processa fila pendente)
+  inicializarSync();
+
   // Registrar Service Worker e verificar atualizações
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').then(registration => {

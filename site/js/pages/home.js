@@ -2,6 +2,7 @@
 // Pagina inicial - Lista de personagens
 // ============================================================
 import { listarPersonagens, removerPersonagem, duplicarPersonagem, exportarTodos, importarPersonagens, atualizarListaLocal, backupPersonagensLocais, restaurarPersonagensLocais } from '../store.js';
+import { enfileirarSync, obterIdsPendentesRemocao } from '../sync.js';
 import { toast, abrirModal, fmtData } from '../utils.js';
 import { CLASSES_INFO } from '../dados-classes.js';
 import { iniciarAuth, getUsuario, loginComGoogle, logout, onAuthChange, buscarPersonagensCloud } from '../auth.js';
@@ -192,7 +193,11 @@ function _setupAuthEvents(container) {
   });
 }
 
-/** Sincroniza personagens com a nuvem (se logado) */
+/**
+ * Sincroniza personagens com a nuvem (se logado).
+ * Usa merge por atualizado_em: para cada personagem, vence a versão mais recente.
+ * Personagens locais mais recentes são reenviados à nuvem via enfileirarSync.
+ */
 async function _sincronizarSeLogado(container, manual = false) {
   const usuario = getUsuario();
   if (!usuario || _sincronizando) return;
@@ -200,20 +205,65 @@ async function _sincronizarSeLogado(container, manual = false) {
   _sincronizando = true;
   try {
     if (manual) toast('Sincronizando...', 'info');
-    // Fazer backup dos personagens locais antes de substituir com os da nuvem
     backupPersonagensLocais();
     const listaCloud = await buscarPersonagensCloud();
-    const listaAnterior = listarPersonagens();
-    atualizarListaLocal(listaCloud);
+    const listaLocal = listarPersonagens();
+
+    // Merge por atualizado_em: vence a versão mais recente de cada personagem
+    const mapaCloud = new Map(listaCloud.map(p => [p.id, p]));
+    const mapaLocal = new Map(listaLocal.map(p => [p.id, p]));
+    const todosIds = new Set([...mapaCloud.keys(), ...mapaLocal.keys()]);
+    // IDs com remoção pendente neste dispositivo (deletados offline)
+    const idsPendentesRemocao = obterIdsPendentesRemocao();
+
+    const listaMergida = [];
+    const paraEnviarCloud = [];
+
+    for (const id of todosIds) {
+      const cloud = mapaCloud.get(id);
+      const local = mapaLocal.get(id);
+
+      if (!local) {
+        // Existe só na nuvem: verificar se foi deletado offline neste dispositivo
+        if (!idsPendentesRemocao.has(id)) {
+          listaMergida.push(cloud);
+        }
+        // Se há remoção pendente, não readicionar — a fila de sync enviará a remoção à nuvem
+      } else if (!cloud) {
+        // Existe só localmente: manter e enfileirar para a nuvem
+        listaMergida.push(local);
+        paraEnviarCloud.push(local);
+      } else {
+        // Existe em ambos: usar o mais recente por atualizado_em
+        const tCloud = new Date(cloud.atualizado_em || 0).getTime();
+        const tLocal = new Date(local.atualizado_em || 0).getTime();
+        if (tLocal > tCloud) {
+          listaMergida.push(local);
+          paraEnviarCloud.push(local);
+        } else {
+          listaMergida.push(cloud);
+        }
+      }
+    }
+
+    atualizarListaLocal(listaMergida);
+
+    // Reenviar à nuvem os personagens em que o local estava mais atualizado
+    for (const p of paraEnviarCloud) {
+      enfileirarSync(p);
+    }
+
     if (manual) {
       toast('Sincronizado com sucesso!', 'success');
       renderHome(container);
     } else {
-      // Re-renderizar se houve mudanca
-      if (listaCloud.length !== listaAnterior.length ||
-          JSON.stringify(listaCloud.map(p => p.id).sort()) !== JSON.stringify(listaAnterior.map(p => p.id).sort())) {
-        renderHome(container);
-      }
+      // Re-renderizar se houve mudança de IDs ou de conteúdo (atualizado_em)
+      const mudou = listaMergida.length !== listaLocal.length ||
+        listaMergida.some(m => {
+          const l = mapaLocal.get(m.id);
+          return !l || m.atualizado_em !== l.atualizado_em;
+        });
+      if (mudou) renderHome(container);
     }
   } catch (err) {
     console.warn('Erro na sincronizacao:', err);

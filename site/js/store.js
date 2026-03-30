@@ -2,7 +2,7 @@
 // Persistencia de personagens no localStorage + Firestore (se logado)
 // ============================================================
 import { gerarId } from './utils.js';
-import { getUsuario, salvarPersonagemCloud, removerPersonagemCloud } from './auth.js';
+import { enfileirarSync, enfileirarRemocao } from './sync.js';
 
 const STORAGE_KEY = 'dnd_personagens';
 const BACKUP_KEY = 'dnd_personagens_backup';
@@ -37,12 +37,8 @@ export function salvarPersonagem(personagem) {
   }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
 
-  // Sincronizar com Firestore em background se logado
-  if (getUsuario()) {
-    salvarPersonagemCloud(personagem).catch(err =>
-      console.warn('Erro ao salvar na nuvem:', err.message)
-    );
-  }
+  // Enfileirar sync na nuvem (processa se logado e online, aguarda caso contrário)
+  enfileirarSync(personagem);
 
   return personagem;
 }
@@ -52,12 +48,8 @@ export function removerPersonagem(id) {
   const lista = listarPersonagens().filter(p => p.id !== id);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
 
-  // Remover da nuvem em background se logado
-  if (getUsuario()) {
-    removerPersonagemCloud(id).catch(err =>
-      console.warn('Erro ao remover da nuvem:', err.message)
-    );
-  }
+  // Enfileirar remoção na nuvem (processa se logado e online, aguarda caso contrário)
+  enfileirarRemocao(id);
 }
 
 /** Duplica um personagem */
@@ -73,12 +65,8 @@ export function duplicarPersonagem(id) {
   lista.push(copia);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
 
-  // Salvar copia na nuvem em background
-  if (getUsuario()) {
-    salvarPersonagemCloud(copia).catch(err =>
-      console.warn('Erro ao duplicar na nuvem:', err.message)
-    );
-  }
+  // Enfileirar sync na nuvem
+  enfileirarSync(copia);
 
   return copia;
 }
@@ -126,10 +114,8 @@ export function importarPersonagens(jsonStr) {
       if (!lista.find(e => e.id === p.id)) {
         lista.push(p);
         countNovos++;
-        // Enviar para nuvem em background
-        if (getUsuario()) {
-          salvarPersonagemCloud(p).catch(() => {});
-        }
+        // Enfileirar sync na nuvem
+        enfileirarSync(p);
       }
     }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
