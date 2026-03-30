@@ -2805,7 +2805,7 @@ function renderFichaCompleta() {
       ${estadoGuerreiro && (estadoGuerreiro.ehMestreBatalha || estadoGuerreiro.ehCombatentePsiquico) ? `
         <div class="info-box info" style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
           <div style="font-size:0.85rem">
-            <strong>Recursos do Guerreiro (${char.subclasse}):</strong>
+            <strong>Recursos do Guerreiro (${escHtml(char.subclasse)}):</strong>
             ${estadoGuerreiro.ehMestreBatalha ? `
               Dados de Superioridade: ${estadoGuerreiro.dadosSuperioridadeDisponiveis}/${estadoGuerreiro.dadosSuperioridadeMax} (${estadoGuerreiro.tipoDadoSuperioridade})
               &nbsp;|&nbsp; CD: ${estadoGuerreiro.cdSuperioridade}
@@ -4272,7 +4272,7 @@ function setupEventosDescanso() {
         conteudoModal += `
           <p style="font-size:0.9rem">Deseja trocar suas maestrias de arma?</p>
           <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">
-            Como ${char.classe}, você pode ${trocaUma ? 'alterar <strong>uma</strong> escolha de' : 'alterar suas escolhas de'} maestria após um Descanso Longo.
+            Como ${escHtml(char.classe)}, você pode ${trocaUma ? 'alterar <strong>uma</strong> escolha de' : 'alterar suas escolhas de'} maestria após um Descanso Longo.
           </p>
         `;
       }
@@ -4281,14 +4281,14 @@ function setupEventosDescanso() {
           conteudoModal += `
             <p style="font-size:0.9rem">Deseja trocar uma magia conhecida?</p>
             <p style="font-size:0.8rem;color:var(--text-muted)">
-              Como ${char.classe}${ehSubConj ? ' (' + char.subclasse + ')' : ''}, você pode trocar <strong>1 magia conhecida</strong> por outra da lista de classe após um Descanso Longo.
+              Como ${escHtml(char.classe)}${ehSubConj ? ' (' + escHtml(char.subclasse) + ')' : ''}, você pode trocar <strong>1 magia conhecida</strong> por outra da lista de classe após um Descanso Longo.
             </p>
           `;
         } else {
           conteudoModal += `
             <p style="font-size:0.9rem">Deseja trocar suas magias preparadas?</p>
             <p style="font-size:0.8rem;color:var(--text-muted)">
-              Como ${char.classe}, você pode alterar sua lista de magias preparadas após um Descanso Longo.
+              Como ${escHtml(char.classe)}, você pode alterar sua lista de magias preparadas após um Descanso Longo.
             </p>
           `;
         }
@@ -4335,7 +4335,7 @@ function setupEventosDescanso() {
 
   document.getElementById('btn-excluir-char')?.addEventListener('click', () => {
     abrirModal('Excluir Personagem',
-      `<p>Excluir <strong>${char.nome}</strong> permanentemente?</p>`,
+      `<p>Excluir <strong>${escHtml(char.nome)}</strong> permanentemente?</p>`,
       '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-danger" id="btn-confirmar-del">Excluir</button>'
     );
     document.getElementById('btn-confirmar-del')?.addEventListener('click', () => {
@@ -6943,7 +6943,7 @@ async function abrirModalMaestrias() {
     `;
   };
 
-  abrirModal(`Maestrias em Arma (${char.classe})`, `
+  abrirModal(`Maestrias em Arma (${escHtml(char.classe)})`, `
     <div class="search-box"><input type="text" id="maestria-busca" class="form-input" placeholder="Buscar arma..."></div>
     <div id="maestria-conteudo">${renderLista('')}</div>
     <div style="font-size:0.75rem;color:var(--text-muted);margin-top:8px">
@@ -7042,7 +7042,7 @@ async function abrirModalTrocaMaestriaDescanso(callbackPosTroca = null) {
   const renderConteudo = () => {
     return `
       <p style="font-size:0.85rem;margin-bottom:12px">
-        Como ${char.classe}, você pode trocar <strong>uma</strong> escolha de maestria por Descanso Longo.
+        Como ${escHtml(char.classe)}, você pode trocar <strong>uma</strong> escolha de maestria por Descanso Longo.
       </p>
       <div style="margin-bottom:12px">
         <label class="form-label" style="font-size:0.85rem">Qual arma deseja remover?</label>
@@ -7069,7 +7069,7 @@ async function abrirModalTrocaMaestriaDescanso(callbackPosTroca = null) {
     `;
   };
 
-  abrirModal(`Trocar Maestria (${char.classe})`, renderConteudo(),
+  abrirModal(`Trocar Maestria (${escHtml(char.classe)})`, renderConteudo(),
     '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-confirmar-troca-maestria">Trocar</button>'
   );
 
@@ -7147,7 +7147,7 @@ function setupEventosEdicao() {
     abrirModal('Editar Personagem', `
       <div class="form-group">
         <label class="form-label" for="edit-nome">Nome</label>
-        <input type="text" class="form-input" id="edit-nome" value="${char.nome}">
+        <input type="text" class="form-input" id="edit-nome" value="${escHtml(char.nome)}">
       </div>
       <div class="form-group">
         <label class="form-label" for="edit-alinhamento">Alinhamento</label>
@@ -7172,7 +7172,7 @@ function setupEventosEdicao() {
         </div>
         <div class="col">
           <label class="form-label">Subclasse</label>
-          <div style="font-size:1rem;font-weight:700;padding:6px;background:var(--surface-variant);border-radius:4px">${char.subclasse || '—'}</div>
+          <div style="font-size:1rem;font-weight:700;padding:6px;background:var(--surface-variant);border-radius:4px">${escHtml(char.subclasse) || '—'}</div>
           <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px">Definida ao subir de nível</div>
         </div>
       </div>
@@ -9850,7 +9850,7 @@ function renderSecaoSubclasse() {
 
   return `
     <div class="card print-break-before">
-      <div class="card-header"><h2>Subclasse — ${char.subclasse}</h2></div>
+      <div class="card-header"><h2>Subclasse — ${escHtml(char.subclasse)}</h2></div>
       ${ativas.length > 0 ? `
         <div class="section-divider"><span>Habilidades Ativas</span></div>
         ${ativas.map(f => renderFeatureItem(f, 'subclasse')).join('')}
@@ -10008,7 +10008,7 @@ function renderSecaoTracosEspecie() {
 
   return `
     <div class="card print-break-before">
-      <div class="card-header"><h2>Traços de Espécie — ${char.especie}</h2></div>
+      <div class="card-header"><h2>Traços de Espécie — ${escHtml(char.especie)}</h2></div>
       ${ativos.length > 0 ? `
         <div class="section-divider"><span>Habilidades Ativas</span></div>
         ${ativos.map(t => renderTracoEspecie(t, TRACOS_HERDAM_ANCESTRALIDADE.includes(t.nome), TRACOS_REVELACAO_CELESTIAL.includes(t.nome))).join('')}
@@ -10151,12 +10151,12 @@ function renderTracoEspecie(traco, herdaAncestralidade = false, ehSubRevelacao =
   // Informacoes de escolhas vinculadas ao traco
   let infoEscolhaTraco = '';
   if ((traco.nome === 'Hábil' || traco.nome === 'Sentidos Aguçados') && char.pericia_especie) {
-    infoEscolhaTraco = `<div class="info-box info" style="font-size:0.8rem;margin-top:6px"><strong>Pericia escolhida:</strong> ${char.pericia_especie}</div>`;
+    infoEscolhaTraco = `<div class="info-box info" style="font-size:0.8rem;margin-top:6px"><strong>Pericia escolhida:</strong> ${escHtml(char.pericia_especie || '')}</div>`;
   }
   if (traco.nome === 'Memória Kenku' && char.pericias_especie?.length) {
     const todasProf = (char.pericias_proficientes || []).slice().sort((a, b) => a.localeCompare(b));
     infoEscolhaTraco = `<div class="info-box info" style="font-size:0.8rem;margin-top:6px">
-      <strong>Perícias escolhidas (Kenku):</strong> ${char.pericias_especie.join(', ')}
+      <strong>Perícias escolhidas (Kenku):</strong> ${char.pericias_especie.map(escHtml).join(', ')}
       ${todasProf.length ? `<br><strong>Perícias com proficiência:</strong> ${todasProf.join(', ')}` : ''}
     </div>`;
   }
@@ -10166,7 +10166,7 @@ function renderTracoEspecie(traco, herdaAncestralidade = false, ehSubRevelacao =
   }
   if (traco.nome === 'Versátil' && char.talento_versatil) {
     // Mostrar o talento escolhido e, se houver escolhas associadas (ex: Habilidoso), tambem
-    let detalheVersatil = `<strong>Talento escolhido:</strong> ${char.talento_versatil}`;
+    let detalheVersatil = `<strong>Talento escolhido:</strong> ${escHtml(char.talento_versatil || '')}`;
     const escolhasVersatil = char.escolhas_talento?.versatil;
     if (escolhasVersatil?.length > 0) {
       detalheVersatil += `<br><strong>Proficiencias:</strong> ${escolhasVersatil.join(', ')}`;
@@ -14405,11 +14405,11 @@ async function gerarHtmlImpressao() {
   // --- Cabecalho ---
   pag1 += `
     <div class="print-char-header">
-      <div class="print-char-name">${char.nome || 'Sem Nome'}</div>
+      <div class="print-char-name">${escHtml(char.nome) || 'Sem Nome'}</div>
       <div class="print-char-sub">
-        ${char.especie || ''} ${char.classe || ''} ${char.subclasse ? `(${char.subclasse})` : ''} &mdash; Nivel ${char.nivel}
-        ${char.antecedente ? ` | Antecedente: ${char.antecedente}` : ''}
-        ${char.alinhamento ? ` | ${char.alinhamento}` : ''}
+        ${escHtml(char.especie || '')} ${escHtml(char.classe || '')} ${char.subclasse ? `(${escHtml(char.subclasse)})` : ''} &mdash; Nivel ${char.nivel}
+        ${char.antecedente ? ` | Antecedente: ${escHtml(char.antecedente)}` : ''}
+        ${char.alinhamento ? ` | ${escHtml(char.alinhamento)}` : ''}
       </div>
       <div class="print-char-sub">
         Tamanho: ${_tamanho}${(char.idiomas?.length) ? ' | Idiomas: ' + char.idiomas.join(', ') : ''}
@@ -14739,7 +14739,7 @@ async function gerarHtmlImpressao() {
     const sc = classeData.subclasses.find(s => s.nome === char.subclasse);
     const feats = sc?.caracteristicas?.filter(c => c.nivel <= char.nivel) || [];
     if (feats.length > 0) {
-      pag2 += `<div class="print-section"><div class="print-section-title">Subclasse &mdash; ${char.subclasse}</div>`;
+      pag2 += `<div class="print-section"><div class="print-section-title">Subclasse &mdash; ${escHtml(char.subclasse)}</div>`;
       feats.forEach(f => {
         pag2 += `
           <div class="print-feature">
@@ -14798,7 +14798,7 @@ async function gerarHtmlImpressao() {
     });
 
     if (tracosMostrar.length > 0) {
-      pag2 += `<div class="print-section"><div class="print-section-title">Tracos de Especie &mdash; ${char.especie}</div><div class="print-multi-col">`;
+      pag2 += `<div class="print-section"><div class="print-section-title">Tracos de Especie &mdash; ${escHtml(char.especie)}</div><div class="print-multi-col">`;
       tracosMostrar.forEach(t => {
         pag2 += `
           <div class="print-feature">
