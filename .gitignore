@@ -49,6 +49,9 @@ credentials.json
 *.key
 *.pem
 
+# Worktrees
+.worktrees/
+
 # Arquivos temporários
 tmp/
 temp/
