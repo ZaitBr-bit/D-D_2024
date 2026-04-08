@@ -8,6 +8,7 @@ import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagi
 import { podeSubirDeNivel, subirDeNivel, XP_POR_NIVEL, adicionarXP, obterTodasMagiasDominio, obterTodasMagiasSemprePreparadas, exigeEspecializacaoBardo, exigeEspecializacaoGuardiao, exigeEstiloLuta, exigeExploradorHabil, exigeAcademico } from '../levelup.js';
 import { abrirLevelUpCards } from '../levelup-ui.js';
 import { getSyncStatus, onSyncStatusChange } from '../sync.js';
+import { resolverPassivosTalentos } from '../talentos-effects.js';
 
 // Estilos visuais (cor e emoji) para cada atributo
 const ATRIBUTO_ESTILO = {
@@ -27,6 +28,7 @@ let talentosCache = null;
 let especiesCache = null;
 let magiasDominioCache = null;
 let magiasSempreCache = null;
+let passivosTalentosCache = null;
 let _syncSubscribed = false;
 
 // Feature flag de migração do fluxo de level up em cards.
@@ -2165,19 +2167,35 @@ function getEstadoRecursosMago() {
   };
 }
 
-function getDeslocamentoFinal(baseDeslocamento) {
-  const texto = String(baseDeslocamento || '9 metros');
-  const match = texto.match(/(\d+(?:[\.,]\d+)?)/);
-  const base = match ? parseFloat(match[1].replace(',', '.')) : 9;
+function parseMetros(valor, fallback = 9) {
+  const txt = String(valor ?? '');
+  const m = txt.match(/(\d+(?:[\.,]\d+)?)/);
+  return m ? parseFloat(m[1].replace(',', '.')) : fallback;
+}
 
-  let final = base;
+function formatarMetros(valor) {
+  return String(valor).replace('.', ',');
+}
+
+function addExtraVelocidade(extrasSet, tipo, metros, sufixo = '') {
+  extrasSet.add(`${tipo} ${formatarMetros(metros)}m${sufixo ? ` ${sufixo}` : ''}`);
+}
+
+function getDeslocamentoFinal(baseDeslocamento) {
+  let final = parseMetros(baseDeslocamento, 9);
+
+  // ── Fase 1: ajustes de valor base ──────────────────────────────────
+  // Elfo Silvestre: deslocamento base mínimo de 10,5m
+  if (char?.especie === 'Elfo' && (char?.tracos_escolhidos || []).includes('Elfo Silvestre')) {
+    final = Math.max(final, 10.5);
+  }
+
   if (char?.classe === 'Bárbaro' && (char?.nivel || 1) >= 5 && !temArmaduraPesadaEquipada()) {
     final += 3;
   }
   if (char?.classe === 'Guardião' && (char?.nivel || 1) >= 6 && !temArmaduraPesadaEquipada()) {
     final += 3;
   }
-  // Monge: Movimento sem Armadura (nível 2+, sem armadura e sem escudo)
   if (char?.classe === 'Monge' && (char?.nivel || 1) >= 2) {
     const inv = char?.inventario || [];
     const temArmadura = inv.some(i => i.equipado && i.tipo === 'armadura' && i.nome !== 'Escudo');
@@ -2188,31 +2206,77 @@ function getDeslocamentoFinal(baseDeslocamento) {
     }
   }
 
-  // Exaustao: Deslocamento reduzido em 1,5m x nivel de exaustao
+  // Paladino Juramento da Glória nível 7: Aura de Vivacidade (+3m para si)
+  if (char?.classe === 'Paladino' && char?.subclasse === 'Juramento da Glória' && (char?.nivel || 1) >= 7) {
+    final += 3;
+  }
+
+  // Bônus de deslocamento de talentos (resolvido centralmente)
+  const passivos = passivosTalentosCache || {};
+  final += passivos.bonusDeslocamento || 0;
+
   if (char?.exaustao > 0) {
     final -= 1.5 * char.exaustao;
     if (final < 0) final = 0;
   }
 
-  // Efeitos magicos de deslocamento (ex: Passos Largos +3m, Voo 18m)
   const efMag = char?.efeitos_magicos || [];
-  const extras = [];
+  for (const ef of efMag) {
+    if (ef.tipo === 'deslocamento' && ef.tipo_velocidade === 'base_bonus' && ef.valor_metros) {
+      final += ef.valor_metros;
+    }
+  }
+
+  // ── Fase 2: velocidades derivadas (dependem de final) ──────────────
+  const extras = new Set();
+
+  if (char?.classe === 'Guardião' && (char?.nivel || 1) >= 6 && !temArmaduraPesadaEquipada()) {
+    addExtraVelocidade(extras, 'Escalada', final);
+    addExtraVelocidade(extras, 'Natação', final);
+  }
+
+  // Bárbaro Trilha do Coração Selvagem nível 6: Aspecto dos Selvagens
+  const aspectoSelvagem = char?.recursos?.aspecto_selvagem;
+  if (char?.classe === 'Bárbaro' && char?.subclasse === 'Trilha do Coração Selvagem' && (char?.nivel || 1) >= 6) {
+    if (aspectoSelvagem === 'Pantera') addExtraVelocidade(extras, 'Escalada', final);
+    if (aspectoSelvagem === 'Salmão') addExtraVelocidade(extras, 'Natação', final);
+  }
+
+  // Bárbaro Trilha do Coração Selvagem nível 14: Voo (Falcão) durante Fúria sem armadura
+  const emFuria = !!char?.recursos?.furia_ativa;
+  const animalFuria = char?.recursos?.furia_animal;
+  const temQualquerArmaduraEquipada = (char?.inventario || []).some(i => i.equipado && i.tipo === 'armadura' && i.nome !== 'Escudo');
+  if (char?.classe === 'Bárbaro' && char?.subclasse === 'Trilha do Coração Selvagem' && (char?.nivel || 1) >= 14
+      && emFuria && animalFuria === 'Falcão' && !temQualquerArmaduraEquipada) {
+    addExtraVelocidade(extras, 'Voo', final);
+  }
+
+  // Bárbaro Trilha do Fanático nível 14: Voo (pairar) durante Fúria dos Deuses
+  const furiaDeusesAtiva = !!char?.recursos?.furia_deuses_ativa;
+  if (char?.classe === 'Bárbaro' && char?.subclasse === 'Trilha do Fanático' && (char?.nivel || 1) >= 14
+      && emFuria && furiaDeusesAtiva) {
+    addExtraVelocidade(extras, 'Voo', final, '(pairar)');
+  }
+
+  // Ladino Ladrão nível 3: Andarilho de Telhados (Escalada = deslocamento)
+  if (char?.classe === 'Ladino' && char?.subclasse === 'Ladrão' && (char?.nivel || 1) >= 3) {
+    addExtraVelocidade(extras, 'Escalada', final);
+  }
+
   for (const ef of efMag) {
     if (ef.tipo === 'deslocamento') {
-      if (ef.tipo_velocidade === 'base_bonus' && ef.valor_metros) {
-        final += ef.valor_metros;
-      } else if (ef.tipo_velocidade === 'voo' && ef.valor_metros) {
-        extras.push(`Voo ${ef.valor_metros}m`);
+      if (ef.tipo_velocidade === 'voo' && ef.valor_metros) {
+        addExtraVelocidade(extras, 'Voo', ef.valor_metros);
       } else if (ef.tipo_velocidade === 'escalada') {
-        extras.push(`Escalada ${final}m`);
+        addExtraVelocidade(extras, 'Escalada', final); // escalada = igual ao deslocamento final (ef.valor_metros ignorado intencionalmente)
       } else if (ef.tipo_velocidade === 'levitacao' && ef.valor_metros) {
-        extras.push(`Levitação ${ef.valor_metros}m`);
+        addExtraVelocidade(extras, 'Levitação', ef.valor_metros);
       }
     }
   }
 
-  let resultado = `${String(final).replace('.', ',')} metros`;
-  if (extras.length) resultado += ` (${extras.join(', ')})`;
+  let resultado = `${formatarMetros(final)} metros`;
+  if (extras.size > 0) resultado += ` (${[...extras].join(', ')})`;
   return resultado;
 }
 
@@ -2233,10 +2297,11 @@ function getAtaquesPorAcao() {
 
 function getModIniciativa() {
   const base = calcMod(char.atributos.destreza);
+  const passivos = passivosTalentosCache || {};
   // Bárbaro nível 7+ (Instinto Selvagem) ou Guerreiro/Campeão nível 3+ (Atleta Extraordinário)
   const vantagem = (char?.classe === 'Bárbaro' && (char?.nivel || 1) >= 7)
     || (char?.classe === 'Guerreiro' && char?.subclasse === 'Campeão' && (char?.nivel || 1) >= 3);
-  return { valor: base, vantagem };
+  return { valor: base + (passivos.bonusIniciativa || 0), vantagem };
 }
 
 function forcaPrimordialAtiva() {
@@ -2254,6 +2319,9 @@ export async function renderSheet(container, charId) {
     container.innerHTML = '<div class="empty-state"><h2>Personagem nao encontrado</h2><button class="btn btn-primary" onclick="navegar(\'home\')">Voltar</button></div>';
     return;
   }
+
+  // Resolver efeitos passivos de talentos (consumo em tasks futuras)
+  passivosTalentosCache = resolverPassivosTalentos(char);
 
   // Atualizar header
   document.getElementById('header-titulo').textContent = char.nome || 'Ficha';
@@ -2298,20 +2366,36 @@ export async function renderSheet(container, charId) {
   if (_infoClasse?.conjurador && classeData?.tabela_caracteristicas) {
     const _espacosCorretos = getEspacosMagia(classeData.tabela_caracteristicas, char.nivel);
     if (!char.espacos_magia) char.espacos_magia = {};
-    // Atualizar totais conforme tabela da classe
+    const _extras = char.espacos_magia_extras || {};
+
+    // Atualizar totais conforme tabela da classe + slots extras de Fonte de Magia
     Object.keys(_espacosCorretos).forEach(circ => {
+      const baseTotal = _espacosCorretos[circ].total;
+      const extraTotal = _extras[circ] || 0;
       if (!char.espacos_magia[circ]) {
-        char.espacos_magia[circ] = { total: _espacosCorretos[circ].total, usados: 0 };
+        char.espacos_magia[circ] = { total: baseTotal + extraTotal, usados: 0 };
       } else {
-        char.espacos_magia[circ].total = _espacosCorretos[circ].total;
+        char.espacos_magia[circ].total = baseTotal + extraTotal;
         if (char.espacos_magia[circ].usados > char.espacos_magia[circ].total) {
           char.espacos_magia[circ].usados = char.espacos_magia[circ].total;
         }
       }
     });
-    // Remover circulos que nao existem mais neste nivel
+
+    // Slots extras em círculos que não existem na tabela base
+    Object.keys(_extras).forEach(circ => {
+      if (!_espacosCorretos[circ] && _extras[circ] > 0) {
+        if (!char.espacos_magia[circ]) {
+          char.espacos_magia[circ] = { total: _extras[circ], usados: 0 };
+        } else {
+          char.espacos_magia[circ].total = _extras[circ];
+        }
+      }
+    });
+
+    // Remover círculos que não existem mais E não têm extras
     Object.keys(char.espacos_magia).forEach(circ => {
-      if (!_espacosCorretos[circ]) {
+      if (!_espacosCorretos[circ] && !(_extras[circ] > 0)) {
         delete char.espacos_magia[circ];
       }
     });
@@ -2583,7 +2667,7 @@ function renderFichaCompleta() {
   const estadoDetails = salvarEstadoDetails();
   const info = CLASSES_INFO[char.classe] || {};
   const prof = bonusProficiencia(char.nivel);
-  const ca = calcCA(char);
+  const ca = calcCA(char, passivosTalentosCache);
   const modCon = calcMod(char.atributos.constituicao);
   const iniciativa = getModIniciativa();
   const ataquesPorAcao = getAtaquesPorAcao();
@@ -3252,6 +3336,23 @@ function renderFichaCompleta() {
 
     <!-- Talentos -->
     ${renderSecaoTalentos()}
+
+    <!-- Sortudo: Pontos de Sorte -->
+    ${passivosTalentosCache?.flags?.sortudo ? (() => {
+      if (!char.recursos) char.recursos = {};
+      if (!char.recursos.sortudo) char.recursos.sortudo = { pontos_gastos: 0 };
+      const total = bonusProficiencia(char.nivel);
+      const disponiveis = Math.max(0, total - (char.recursos.sortudo.pontos_gastos || 0));
+      return `
+    <div class="card" style="border-left:3px solid var(--accent)">
+      <div class="card-header" style="padding-bottom:4px"><h2 style="font-size:0.95rem">Sortudo — Pontos de Sorte</h2></div>
+      <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:6px">${disponiveis}/${total} disponível(is) · Recarrega no Descanso Longo</div>
+      <div class="no-print" style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-primary" data-sortudo-acao="vantagem" ${disponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Gastar: Vantagem</button>
+        <button class="btn btn-sm btn-secondary" data-sortudo-acao="desvantagem" ${disponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Gastar: Desvantagem (reação)</button>
+      </div>
+    </div>`;
+    })() : ''}
 
     <!-- Características de Classe -->
     ${renderSecaoCaracteristicas()}
@@ -3938,8 +4039,33 @@ function setupEventosDescanso() {
         char.espacos_magia[k].usados = 0;
       });
     }
+    // Remover slots extras criados por Fonte de Magia e recalcular totais
+    char.espacos_magia_extras = {};
+    // Recalcular totais sem os extras (corrige exibição antes do próximo renderSheet)
+    if (char.espacos_magia && classeData?.tabela_caracteristicas) {
+      const _infoClasseRest = CLASSES_INFO[char.classe];
+      if (_infoClasseRest?.conjurador) {
+        const _espacosBase = getEspacosMagia(classeData.tabela_caracteristicas, char.nivel);
+        Object.keys(char.espacos_magia).forEach(circ => {
+          if (_espacosBase[circ]) {
+            char.espacos_magia[circ].total = _espacosBase[circ].total;
+          } else {
+            // Círculo que não existe mais na tabela base — remover
+            delete char.espacos_magia[circ];
+          }
+        });
+      }
+    }
     // Limpar efeitos mágicos ativos
     char.efeitos_magicos = [];
+    // Resetar conjurações gratuitas de talentos (Tocado Por Fadas, Sombras, Iniciado em Magia)
+    (char.magias_preparadas || []).forEach(m => {
+      if (m.gratis_usado === true) m.gratis_usado = false;
+    });
+    // Restaurar Pontos de Sorte do Sortudo
+    if (char.recursos?.sortudo) {
+      char.recursos.sortudo.pontos_gastos = 0;
+    }
     // Restaurar todas as habilidades
     restaurarHabilidades('longo');
 
@@ -5047,6 +5173,10 @@ function setupEventosHabilidades() {
             toast('Pontos de Feitiçaria insuficientes.', 'error');
             return;
           }
+          // Rastrear slots extras separadamente para não serem sobrescritos pelo sync
+          if (!char.espacos_magia_extras) char.espacos_magia_extras = {};
+          char.espacos_magia_extras[c] = (char.espacos_magia_extras[c] || 0) + 1;
+          // Atualizar total imediatamente (o sync em renderSheet so roda no carregamento)
           if (!char.espacos_magia[c]) char.espacos_magia[c] = { total: 0, usados: 0 };
           char.espacos_magia[c].total += 1;
           salvar();
@@ -9161,11 +9291,14 @@ function renderFeatureItem(f, source) {
     recarga = 'longo';
   } else if (ehAndarilhoTelhados) {
     // Ladrão nv3: Andarilho de Telhados — passiva
+    const espAndarilho = especiesCache?.especies?.find(e => e.nome === char.especie);
+    const baseAndarilho = espAndarilho ? getDeslocamento(espAndarilho.texto_completo) : '9 metros';
+    const deslocAndarilhoNum = parseMetros(getDeslocamentoFinal(baseAndarilho), 9);
     usosHtmlBody = `
       <div style="padding:4px 0 4px 16px;font-size:0.8rem">
         <div style="color:var(--accent);font-weight:600">Passiva</div>
         <div style="color:var(--text-muted);font-size:0.75rem;margin-top:2px">
-          Deslocamento de Escalada = Deslocamento normal (${char.deslocamento || 9}m).<br>
+          Deslocamento de Escalada = Deslocamento normal (${formatarMetros(deslocAndarilhoNum)}m).<br>
           Saltos usam Destreza em vez de Força.
         </div>
       </div>
@@ -10677,17 +10810,23 @@ function renderSecaoMagias() {
       <!-- Espaços de magia -->
       ${Object.keys(espacos).length > 0 ? `
         <div style="margin-bottom:12px">
-          ${Object.entries(espacos).map(([circ, data]) => `
+          ${Object.entries(espacos).map(([circ, data]) => {
+            const _extrasCirculo = (char.espacos_magia_extras || {})[circ] || 0;
+            const _baseTotal = data.total - _extrasCirculo;
+            return `
             <div class="slots-grupo">
               <label>${circ}&ordm; Círculo</label>
               <div style="display:flex;gap:4px">
                 ${Array.from({ length: data.total }, (_, i) => `
-                  <div class="slot-bolha ${i < data.usados ? 'usado' : ''}" data-slot-circ="${circ}" data-slot-idx="${i}"></div>
+                  <div class="slot-bolha ${i < data.usados ? 'usado' : ''} ${i >= _baseTotal ? 'slot-extra' : ''}" data-slot-circ="${circ}" data-slot-idx="${i}"></div>
                 `).join('')}
               </div>
-              <span style="font-size:0.75rem;color:var(--text-muted)">${data.total - data.usados}/${data.total}</span>
-            </div>
-          `).join('')}
+              <span style="font-size:0.75rem;color:var(--text-muted)">
+                ${data.total - data.usados}/${data.total}
+                ${_extrasCirculo > 0 ? `<span style="color:var(--accent)">(+${_extrasCirculo} FM)</span>` : ''}
+              </span>
+            </div>`;
+          }).join('')}
         </div>
       ` : ''}
 
@@ -10725,6 +10864,7 @@ function renderSecaoMagias() {
                         ${circulos.map(c => `<option value="${c}"${c == m.circulo ? ' selected' : ''}>${c}º</option>`).join('')}
                       </select>
                     ` : ''}
+                    ${(m.gratis_usado === false) ? `<button class="btn btn-sm btn-accent" data-conjurar-gratis="${m.nome}">Grátis</button>` : ''}
                     <button class="btn btn-sm ${todosEsgotados ? 'btn-secondary' : 'btn-primary'}" data-conjurar="${m.nome}" data-conj-circ="${circulos[0] || m.circulo}" ${todosEsgotados ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Conjurar</button>
                   </div>
                 </div>
@@ -11648,6 +11788,26 @@ function setupEventosEspacosMagia() {
     });
   });
 
+  // Sortudo: gastar ponto de sorte
+  document.querySelectorAll('[data-sortudo-acao]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!char.recursos) char.recursos = {};
+      if (!char.recursos.sortudo) char.recursos.sortudo = { pontos_gastos: 0 };
+      const total = bonusProficiencia(char.nivel);
+      if (char.recursos.sortudo.pontos_gastos >= total) return;
+      char.recursos.sortudo.pontos_gastos++;
+      const acao = btn.dataset.sortudoAcao;
+      const disponiveis = total - char.recursos.sortudo.pontos_gastos;
+      if (acao === 'vantagem') {
+        toast(`Sortudo: Vantagem ativada! Role novamente e use o melhor resultado. (${disponiveis} ponto(s) restante(s))`, 'success');
+      } else {
+        toast(`Sortudo: Desvantagem imposta ao atacante como Reação! (${disponiveis} ponto(s) restante(s))`, 'success');
+      }
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
   // Conjurar magia (gasta slot)
   document.querySelectorAll('[data-conjurar]').forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -11736,6 +11896,10 @@ function setupEventosEspacosMagia() {
             });
             return;
           }
+          // Feedback quando metamagia é pulada por falta de PF
+          if (estadoFeit && estadoFeit.metamagias.length > 0 && estadoFeit.pontosAtuais === 0) {
+            toast('Metamagia indisponível: sem Pontos de Feitiçaria.', 'info');
+          }
         }
         _prosseguirConjuracao();
       };
@@ -11792,6 +11956,71 @@ function setupEventosEspacosMagia() {
     }
     renderFichaCompleta();
   }
+
+  // Função auxiliar para conjuração gratuita (talentos)
+  function _executarConjuracaoGratis(entrada, nome) {
+    entrada.gratis_usado = true;
+
+    // Aplicar efeito mágico se existir
+    const config = MAGIAS_EFEITO[nome];
+    if (config) {
+      const precisaAlvo = config.permite_self && config.permite_outro;
+      const autoSelf = config.permite_self && !config.permite_outro;
+
+      if (precisaAlvo) {
+        mostrarModalAlvoMagia(nome, entrada.circulo, (alvo) => {
+          if (alvo === 'self') aplicarEfeitoMagia(nome, entrada.circulo);
+          toast(`${nome} conjurada gratuitamente (talento)!`, 'success');
+          salvar();
+          renderFichaCompleta();
+        });
+        return;
+      }
+      if (autoSelf) aplicarEfeitoMagia(nome, entrada.circulo);
+    }
+
+    // Concentração
+    if (ehMagiaConcentracao(nome)) {
+      setConcentracao(nome);
+    }
+
+    toast(`${nome} conjurada gratuitamente (talento)!`, 'success');
+    salvar();
+    renderFichaCompleta();
+  }
+
+  // Conjurar magia gratuitamente (talentos: 1x por descanso longo)
+  document.querySelectorAll('[data-conjurar-gratis]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+
+      const estadoFuria = getEstadoFuria();
+      if (estadoFuria?.ativa) {
+        toast('Não é possível conjurar magias enquanto a Fúria estiver ativa.', 'error');
+        return;
+      }
+
+      const nome = btn.dataset.conjurarGratis;
+      const entrada = char.magias_preparadas.find(m => m.nome === nome && m.gratis_usado === false);
+      if (!entrada) return;
+
+      // Verificar conflito de concentração
+      const magiaEhConc = ehMagiaConcentracao(nome);
+      const concAtiva = getConcentracaoAtiva();
+      if (magiaEhConc && concAtiva && concAtiva !== nome) {
+        confirmar(
+          `Você já está concentrando em <strong>${escHtml(concAtiva)}</strong>. Deseja perder a concentração e conjurar <strong>${escHtml(nome)}</strong> gratuitamente?`,
+          () => {
+            removerConcentracao();
+            _executarConjuracaoGratis(entrada, nome);
+          }
+        );
+        return;
+      }
+
+      _executarConjuracaoGratis(entrada, nome);
+    });
+  });
 
   // Lancar truque (nao gasta espaco de magia)
   document.querySelectorAll('[data-lancar-truque]').forEach(btn => {
@@ -13416,7 +13645,12 @@ function renderSheetInvItem(item, idx) {
 
     const temProf = sheetTemProfArma({ categoria: item.dados.categoria, propriedades: item.dados.propriedades || '' });
     const bonusAtq = modAtq + (temProf ? prof : 0);
-    ataqueInfo = `<span class="badge badge-secondary" style="font-size:0.65rem">Atq ${fmtMod(bonusAtq)}</span>`;
+    // Bônus de ataque de talentos
+    let bonusAtqTalento = 0;
+    const _passivos = passivosTalentosCache || {};
+    if (isDistancia) bonusAtqTalento += _passivos.bonusAtaqueDistancia || 0;
+    const bonusAtqFinal = bonusAtq + bonusAtqTalento;
+    ataqueInfo = `<span class="badge badge-secondary" style="font-size:0.65rem">Atq ${fmtMod(bonusAtqFinal)}</span>`;
     if (ataqueImprudenteAtivo() && usaForcaNoAtaque) {
       vantagemInfo = '<span class="badge" style="font-size:0.6rem;background:#fff3cd;color:#8a6d3b;border:1px solid #ffeeba">Vantagem (Imprudente)</span>';
     }
@@ -13434,14 +13668,21 @@ function renderSheetInvItem(item, idx) {
       const estadoFuria = getEstadoFuria();
       const bonusFuria = estadoFuria?.ativa && usaForcaNoAtaque ? (estadoFuria.dano || 0) : 0;
       const bonusTotalDano = modAtq + bonusFuria;
+      // Bônus de dano de talentos
+      let bonusDanoTalento = 0;
+      const ehArremesso = props.includes('arremesso');
+      const usaUmaMao = !props.includes('duas mãos') && !props.includes('pesada');
+      if (usaUmaMao && !isDistancia) bonusDanoTalento += _passivos.bonusDanoUmaMao || 0;
+      if (ehArremesso) bonusDanoTalento += _passivos.bonusDanoArremesso || 0;
+      const bonusTotalDanoFinal = bonusTotalDano + bonusDanoTalento;
 
       if (modExistente) {
         const modBase = parseInt(String(modExistente).replace(/\s+/g, '')) || 0;
-        const modFinal = modBase + bonusFuria;
+        const modFinal = modBase + bonusFuria + bonusDanoTalento;
         const sinal = modFinal >= 0 ? `+${modFinal}` : `${modFinal}`;
         danoExibicao = `${dado}${sinal}${sufixo}`.replace(/\s+/g, ' ').trim();
-      } else if (bonusTotalDano !== 0) {
-        const sinal = bonusTotalDano >= 0 ? `+${bonusTotalDano}` : `${bonusTotalDano}`;
+      } else if (bonusTotalDanoFinal !== 0) {
+        const sinal = bonusTotalDanoFinal >= 0 ? `+${bonusTotalDanoFinal}` : `${bonusTotalDanoFinal}`;
         danoExibicao = `${dado}${sinal}${sufixo}`.replace(/\s+/g, ' ').trim();
       } else {
         danoExibicao = danoBase;
@@ -13607,7 +13848,7 @@ function setupEventosInventarioSheet() {
       <div class="row gap-1">
         <div class="col">
           <label class="form-label" for="ic-ca">Bonus CA</label>
-          <input type="number" class="form-input" id="ic-ca" value="0" min="-5" max="5">
+          <input type="number" class="form-input" id="ic-ca" placeholder="0" min="-5" max="5">
           <div style="font-size:0.65rem;color:var(--text-muted)">-5 a +5</div>
         </div>
         <div class="col">
@@ -13617,7 +13858,7 @@ function setupEventosInventarioSheet() {
         </div>
         <div class="col">
           <label class="form-label" for="ic-atq">Bonus Atq</label>
-          <input type="number" class="form-input" id="ic-atq" value="0" min="-5" max="10">
+          <input type="number" class="form-input" id="ic-atq" placeholder="0" min="-5" max="10">
           <div style="font-size:0.65rem;color:var(--text-muted)">-5 a +10</div>
         </div>
       </div>
@@ -13678,7 +13919,8 @@ function setupEventosInventarioSheet() {
   };
 
   // Editar PO
-  document.getElementById('btn-edit-po')?.addEventListener('click', () => {
+  const _btnEditPo = document.getElementById('btn-edit-po');
+  if (_btnEditPo) _btnEditPo.onclick = () => {
     abrirModal('Peças de Ouro', `
       <div style="text-align:center;margin-bottom:12px">
         <div style="font-size:1.3rem;font-weight:700;color:var(--primary)">${char.po || 0} PO</div>
@@ -13687,7 +13929,7 @@ function setupEventosInventarioSheet() {
       <div style="display:flex;gap:8px;align-items:flex-end;margin-bottom:12px">
         <div class="form-group" style="flex:1;margin-bottom:0">
           <label class="form-label" for="edit-po-qtd">Quantidade</label>
-          <input type="number" class="form-input" id="edit-po-qtd" value="0" min="0">
+          <input type="number" class="form-input" id="edit-po-qtd" min="0" placeholder="0">
         </div>
         <button class="btn btn-success btn-sm" id="btn-po-add" style="height:40px">+ Adicionar</button>
         <button class="btn btn-danger btn-sm" id="btn-po-sub" style="height:40px">- Remover</button>
@@ -13730,6 +13972,67 @@ function setupEventosInventarioSheet() {
       window.fecharModal();
       renderFichaCompleta();
     });
+  };
+}
+
+/** Abre modal para editar um item customizado existente no inventário */
+function abrirModalEditarItemCustomizado(item, idx) {
+  const d = item.dados || {};
+  abrirModal('Editar Item Customizado', `
+    <div class="form-group"><label class="form-label" for="ic-nome">Nome</label><input type="text" class="form-input" id="ic-nome" value="${(item.nome || '').replace(/"/g, '&quot;')}"></div>
+    <div class="form-group"><label class="form-label" for="ic-desc">Descricao</label><textarea class="form-textarea" id="ic-desc" rows="2">${item.descricao || ''}</textarea></div>
+    <div class="row gap-1">
+      <div class="col">
+        <label class="form-label" for="ic-ca">Bonus CA</label>
+        <input type="number" class="form-input" id="ic-ca" value="${parseInt(d.bonus_ca) || ''}" placeholder="0" min="-5" max="5">
+        <div style="font-size:0.65rem;color:var(--text-muted)">-5 a +5</div>
+      </div>
+      <div class="col">
+        <label class="form-label" for="ic-dano">Dano</label>
+        <input type="text" class="form-input" id="ic-dano" value="${(d.dano || '').replace(/"/g, '&quot;')}" placeholder="1d8 Cortante">
+        <div style="font-size:0.65rem;color:var(--text-muted)">Ex: 2d6 Cortante</div>
+      </div>
+      <div class="col">
+        <label class="form-label" for="ic-atq">Bonus Atq</label>
+        <input type="number" class="form-input" id="ic-atq" value="${parseInt(d.bonus_ataque) || ''}" placeholder="0" min="-5" max="10">
+        <div style="font-size:0.65rem;color:var(--text-muted)">-5 a +10</div>
+      </div>
+    </div>
+    <div id="ic-erros" style="display:none;color:var(--danger);font-size:0.8rem;margin-top:8px"></div>
+  `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-ic">Salvar</button>');
+
+  document.getElementById('btn-salvar-ic')?.addEventListener('click', () => {
+    const nome = document.getElementById('ic-nome')?.value?.trim();
+    const desc = document.getElementById('ic-desc')?.value?.trim() || '';
+    const ca = parseInt(document.getElementById('ic-ca')?.value) || 0;
+    const danoVal = document.getElementById('ic-dano')?.value?.trim() || '';
+    const atq = parseInt(document.getElementById('ic-atq')?.value) || 0;
+    const errosEl = document.getElementById('ic-erros');
+    const erros = [];
+
+    if (!nome) erros.push('Informe um nome para o item.');
+    if (danoVal) {
+      const regexDano = /^\d+d\d+(\s*[+\-]\s*\d+)?(\s+\w+)?$/i;
+      if (!regexDano.test(danoVal)) erros.push('Dano deve seguir o formato de dados: 1d8, 2d6 Cortante, 1d4+2 Perfurante');
+    }
+    if (ca < -5 || ca > 5) erros.push('Bonus de CA deve ser entre -5 e +5.');
+    if (atq < -5 || atq > 10) erros.push('Bonus de Ataque deve ser entre -5 e +10.');
+
+    if (erros.length > 0) {
+      if (errosEl) { errosEl.style.display = 'block'; errosEl.innerHTML = erros.join('<br>'); }
+      return;
+    }
+
+    char.inventario[idx].nome = nome;
+    char.inventario[idx].descricao = desc;
+    if (!char.inventario[idx].dados) char.inventario[idx].dados = {};
+    char.inventario[idx].dados.bonus_ca = String(ca);
+    char.inventario[idx].dados.dano = danoVal;
+    char.inventario[idx].dados.bonus_ataque = String(atq);
+    salvar();
+    window.fecharModal();
+    renderFichaCompleta();
+    toast(`${nome} atualizado!`, 'success');
   });
 }
 
@@ -14013,7 +14316,19 @@ async function mostrarDetalheItemSheet(item) {
 
   if (!corpo.trim()) corpo = '<div style="color:var(--text-muted)">Sem informações adicionais disponíveis.</div>';
 
-  abrirModal(item.nome, corpo);
+  if (item.tipo === 'customizado') {
+    const _idxItem = char.inventario.indexOf(item);
+    abrirModal(item.nome, corpo,
+      `<button class="btn btn-secondary" onclick="fecharModal()">Fechar</button>
+       <button class="btn btn-primary" id="btn-editar-item-custom">Editar</button>`
+    );
+    document.getElementById('btn-editar-item-custom')?.addEventListener('click', () => {
+      window.fecharModal();
+      abrirModalEditarItemCustomizado(item, _idxItem);
+    });
+  } else {
+    abrirModal(item.nome, corpo);
+  }
 }
 
 /** Abre o seletor de itens dividido por categorias */
@@ -14385,7 +14700,7 @@ function htmlMagiaImpressao(nome, circulo, cacheMagias, origemExtra) {
 async function gerarHtmlImpressao() {
   const info = CLASSES_INFO[char.classe] || {};
   const prof = bonusProficiencia(char.nivel);
-  const ca = calcCA(char);
+  const ca = calcCA(char, passivosTalentosCache);
   const modCon = calcMod(char.atributos.constituicao);
   const iniciativa = getModIniciativa();
   const ataquesPorAcao = getAtaquesPorAcao();

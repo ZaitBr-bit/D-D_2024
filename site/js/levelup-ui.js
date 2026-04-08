@@ -274,6 +274,14 @@ function salvarStateDoDOM(ctx, state, step) {
         // Magias rituais
         const rituais = [...document.querySelectorAll('.levelup-ritual-check:checked')];
         if (rituais.length > 0) state.escolhasTalento = rituais.map(cb => cb.value);
+        // Dádiva da Resistência à Energia: coletar tipos de energia escolhidos
+        const energiaSelects = [...document.querySelectorAll('.dadiva-energia-escolha')];
+        if (energiaSelects.length > 0) {
+          const tiposEscolhidos = energiaSelects.map(s => s.value).filter(Boolean);
+          if (tiposEscolhidos.length > 0) {
+            state.dadivaResistenciaEnergia = tiposEscolhidos;
+          }
+        }
       }
       break;
     }
@@ -560,8 +568,8 @@ function renderEscolhasTalento(nome, talentoData, ctx) {
   }
 
   if (nome === 'Tocado Por Fadas' || nome === 'Tocado Pelas Sombras') {
-    const escola = nome === 'Tocado Por Fadas' ? 'Encantamento' : 'Necromancia';
-    html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Magia de 1º Círculo (${escola})</div>`;
+    const label = nome === 'Tocado Por Fadas' ? 'Adivinhação ou Encantamento' : 'Ilusão ou Necromancia';
+    html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Magia de 1º Círculo (${label})</div>`;
     html += `<select id="levelup-magia-escola-select" class="form-input" style="width:100%;margin:4px 0"><option value="">Carregando...</option></select>`;
     // Será populado assincronamente em bindEscolhasTalento
   }
@@ -588,15 +596,26 @@ function renderEscolhasTalento(nome, talentoData, ctx) {
     `;
   }
 
+  // Dádiva da Resistência à Energia: escolher 2 tipos de energia
+  if (nome === 'Dádiva da Resistência à Energia') {
+    const tiposEnergia = ['Ácido', 'Elétrico', 'Gélido', 'Ígneo', 'Necrótico', 'Psíquico', 'Radiante', 'Trovejante', 'Venenoso'];
+    html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Resistências à Energia (2)</div>`;
+    for (let i = 0; i < 2; i++) {
+      html += `<select class="dadiva-energia-escolha form-input" style="width:100%;margin:4px 0"><option value="">-- Tipo ${i + 1} --</option>`;
+      html += tiposEnergia.map(t => `<option value="${t}">${t}</option>`).join('');
+      html += `</select>`;
+    }
+  }
+
   return html;
 }
 
 function bindEscolhasTalento(nome, talentoData, ctx) {
   // Tocado Por Fadas / Sombras: carregar magias assincronamente
   if (nome === 'Tocado Por Fadas' || nome === 'Tocado Pelas Sombras') {
-    const escola = nome === 'Tocado Por Fadas' ? 'Encantamento' : 'Necromancia';
+    const escolas = nome === 'Tocado Por Fadas' ? ['Adivinhação', 'Encantamento'] : ['Ilusão', 'Necromancia'];
     getMagiasPorCirculo(1).then(dados => {
-      const magias = (dados?.magias || []).filter(m => m.escola === escola);
+      const magias = (dados?.magias || []).filter(m => escolas.includes(m.escola));
       const sel = document.getElementById('levelup-magia-escola-select');
       if (sel) {
         sel.innerHTML = `<option value="">-- Selecione --</option>` +
@@ -950,6 +969,7 @@ async function confirmarLevelUp(ctx, state) {
     if (talNome === 'Tocado Pelas Sombras') state.talentoTipoEscolha = 'tocado_sombras';
     if (talNome === 'Conjurador Ritualista') state.talentoTipoEscolha = 'conjurador_ritualista';
     if (talNome === 'Iniciado em Magia') state.talentoTipoEscolha = 'iniciado_em_magia';
+    if (talNome === 'Dádiva da Resistência à Energia') state.talentoTipoEscolha = 'dadiva_resistencia_energia';
   }
 
   const opcoes = collectOpcoes(ctx, state);

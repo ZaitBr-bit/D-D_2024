@@ -783,6 +783,40 @@ export async function subirDeNivel(personagem, opcoes = {}) {
           }
         }
       }
+
+      // Aplicar ferramentas do Artifista nas proficiencias
+      if (opcoes.talento === 'Artifista') {
+        if (!personagem.proficiencias_ferramentas) personagem.proficiencias_ferramentas = [];
+        const _ferramentasNomes = [
+          'Ferramentas de Carpinteiro','Ferramentas de Cartógrafo','Ferramentas de Coureiro',
+          'Ferramentas de Entalhador','Ferramentas de Ferreiro','Ferramentas de Funileiro',
+          'Ferramentas de Joalheiro','Ferramentas de Oleiro','Ferramentas de Pedreiro',
+          'Ferramentas de Sapateiro','Ferramentas de Tecelão','Ferramentas de Vidreiro',
+          'Suprimentos de Alquimista','Suprimentos de Calígrafo','Suprimentos de Cervejeiro',
+          'Suprimentos de Pintor','Utensílios de Cozinheiro',
+          'Ferramentas de Ladrão','Ferramentas de Navegador',
+          'Kit de Disfarce','Kit de Falsificação','Kit de Herbalismo','Kit de Veneno'
+        ];
+        for (const escolha of opcoes.escolhas_talento_levelup) {
+          if (_ferramentasNomes.includes(escolha) && !personagem.proficiencias_ferramentas.includes(escolha)) {
+            personagem.proficiencias_ferramentas.push(escolha);
+          }
+        }
+      }
+
+      // Aplicar instrumentos do Músico nas proficiencias
+      if (opcoes.talento === 'Músico') {
+        if (!personagem.proficiencias_instrumentos) personagem.proficiencias_instrumentos = [];
+        const _instrumentosNomes = [
+          'Alaúde','Flauta','Flauta de Pan','Gaita de Foles','Lira',
+          'Oboé','Tambor','Trombeta','Violino','Xilofone'
+        ];
+        for (const escolha of opcoes.escolhas_talento_levelup) {
+          if (_instrumentosNomes.includes(escolha) && !personagem.proficiencias_instrumentos.includes(escolha)) {
+            personagem.proficiencias_instrumentos.push(escolha);
+          }
+        }
+      }
     }
 
     // Aplicar bonus de PV do Vigoroso (dobro do nivel ao obter)
@@ -791,6 +825,19 @@ export async function subirDeNivel(personagem, opcoes = {}) {
       personagem.pv_max = (personagem.pv_max || 0) + bonusVigoroso;
       personagem.pv_atual = Math.min(personagem.pv_atual + bonusVigoroso, personagem.pv_max);
       personagem.bonus_pv_vigoroso_aplicado = bonusVigoroso;
+    }
+
+    // Aplicar Dádiva da Fortitude: +40 PV máximo
+    if (opcoes.talento === 'Dádiva da Fortitude') {
+      personagem.pv_max = (personagem.pv_max || 0) + 40;
+      personagem.pv_atual = Math.min((personagem.pv_atual || 0) + 40, personagem.pv_max);
+      personagem.bonus_pv_dadiva_fortitude = 40;
+    }
+
+    // Persistir parâmetros de dádivas épicas (ex.: tipos de energia escolhidos)
+    if (opcoes.dadiva_resistencia_energia) {
+      if (!personagem.talentos_parametros) personagem.talentos_parametros = {};
+      personagem.talentos_parametros.dadiva_resistencia_energia = opcoes.dadiva_resistencia_energia;
     }
 
     // Aplicar ASI do talento (Adepto Elemental, Agressor, etc.)
@@ -859,15 +906,19 @@ export async function subirDeNivel(personagem, opcoes = {}) {
       }
     }
 
-    // Aplicar Tocado Por Fadas / Tocado Pelas Sombras (magia extra)
+    // Aplicar Tocado Por Fadas / Tocado Pelas Sombras (magia escolhida + magia parceira)
     if (opcoes.talento_tipo_escolha === 'tocado_fadas' || opcoes.talento_tipo_escolha === 'tocado_sombras') {
       const nomeMagia = opcoes.escolhas_talento_levelup?.[0];
-      if (nomeMagia) {
-        if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
-        const origem = opcoes.talento_tipo_escolha === 'tocado_fadas' ? 'tocado_por_fadas' : 'tocado_pelas_sombras';
-        if (!personagem.magias_preparadas.find(m => m.nome === nomeMagia)) {
-          personagem.magias_preparadas.push({ nome: nomeMagia, circulo: 1, origem });
-        }
+      if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
+      const origem = opcoes.talento_tipo_escolha === 'tocado_fadas' ? 'tocado_por_fadas' : 'tocado_pelas_sombras';
+      // Magia escolhida (1º círculo)
+      if (nomeMagia && !personagem.magias_preparadas.find(m => m.nome === nomeMagia)) {
+        personagem.magias_preparadas.push({ nome: nomeMagia, circulo: 1, origem, gratis_usado: false });
+      }
+      // Magia parceira sempre-preparada (2º círculo): Passo Nebuloso para Fadas, Invisibilidade para Sombras
+      const nomeParceiro = opcoes.talento_tipo_escolha === 'tocado_fadas' ? 'Passo Nebuloso' : 'Invisibilidade';
+      if (!personagem.magias_preparadas.find(m => m.nome === nomeParceiro)) {
+        personagem.magias_preparadas.push({ nome: nomeParceiro, circulo: 2, origem, gratis_usado: false });
       }
     }
 
@@ -902,11 +953,11 @@ export async function subirDeNivel(personagem, opcoes = {}) {
           personagem.magias_conhecidas.push({ nome, circulo: 0, origem: 'iniciado_em_magia' });
         }
       }
-      // Adicionar magia de 1o círculo às preparadas
+      // Adicionar magia de 1o círculo às preparadas (com flag de uso gratuito por descanso longo)
       if (im.magia) {
         if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
         if (!personagem.magias_preparadas.find(m => m.nome === im.magia)) {
-          personagem.magias_preparadas.push({ nome: im.magia, circulo: 1, origem: 'iniciado_em_magia' });
+          personagem.magias_preparadas.push({ nome: im.magia, circulo: 1, origem: 'iniciado_em_magia', gratis_usado: false });
         }
       }
     }

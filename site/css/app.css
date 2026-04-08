@@ -652,6 +652,10 @@ tr:hover td { background: #faf8f4; }
   transition: background 0.2s;
 }
 .slot-bolha.usado { background: var(--primary); }
+.slot-bolha.slot-extra {
+  border-style: dashed;
+  opacity: 0.8;
+}
 
 /* --- Home: lista de personagens --- */
 .char-list { display: flex; flex-direction: column; gap: 10px; }

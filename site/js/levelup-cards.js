@@ -132,15 +132,19 @@ export function renderCardSubclasse(ctx, state) {
 export function renderCardASI(ctx, state, talentosCache) {
   const { char } = ctx;
 
-  // Montar lista de talentos disponíveis
+  // Montar lista de talentos disponíveis (inclui Dádivas Épicas no nível 19+)
   const talentosDisponiveis = [];
+  const nivelNovo = (char.nivel || 1) + 1;
   if (talentosCache?.por_categoria) {
     Object.values(talentosCache.por_categoria).forEach(lista => {
       lista.forEach(t => {
         const preq = (t.prerequisito || '').toLowerCase();
         const ehNivel4 = preq.includes('nível 4') || preq.includes('nivel 4');
+        const ehNivel19 = preq.includes('nível 19') || preq.includes('nivel 19');
         const ehOrigem = t.categoria === 'de Origem';
-        if (ehNivel4 || ehOrigem) {
+        const ehDadiva = t.categoria === 'de Dádiva Épica';
+        // Incluir se: nível 4 (sempre nos ASI), origem, OU dádiva épica quando nível 19+
+        if (ehNivel4 || ehOrigem || (ehDadiva && ehNivel19 && nivelNovo >= 19)) {
           if (t.nome === 'Aumento no Valor de Atributo') return;
           const jaTem = (char.talentos || []).some(ct => (typeof ct === 'string' ? ct : ct.nome) === t.nome);
           const repetivel = (t.beneficios || []).some(b => b.nome === 'Repetível');
