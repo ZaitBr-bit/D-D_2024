@@ -34,7 +34,7 @@ export function calcPVTotal(dadoVida, nivel, modCon) {
 }
 
 /** Calcula CA baseado na armadura equipada */
-export function calcCA(personagem) {
+export function calcCA(personagem, passivos = null) {
   const modDes = calcMod(personagem.atributos.destreza);
   const modCon = calcMod(personagem.atributos.constituicao);
   const modSab = calcMod(personagem.atributos.sabedoria);
@@ -76,7 +76,8 @@ export function calcCA(personagem) {
     if (armadura.dados?.categoria === 'Leve') {
       ca = caBase + modDes;
     } else if (armadura.dados?.categoria === 'Média') {
-      ca = caBase + Math.min(modDes, 2);
+      const maxDes = passivos?.bonusCAArmaduraMediaMaxDes ?? 2;
+      ca = caBase + Math.min(modDes, maxDes);
     } else if (armadura.dados?.categoria === 'Pesada') {
       ca = caBase;
     } else {
@@ -125,6 +126,9 @@ export function calcCA(personagem) {
       if ((ef.valor || 0) > ca) ca = ef.valor;
     }
   }
+
+  // Bônus genérico de CA de talentos
+  ca += passivos?.bonusCA || 0;
 
   return ca;
 }

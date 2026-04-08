@@ -38,6 +38,8 @@ export function collectOpcoes(ctx, state) {
       if (state.talentoTipoEscolha) opcoes.talento_tipo_escolha = state.talentoTipoEscolha;
       if (state.resilienteAtributo) opcoes.resiliente_atributo = state.resilienteAtributo;
       if (state.iniciadoEmMagia) opcoes.iniciado_em_magia = state.iniciadoEmMagia;
+      // Parâmetros de Dádiva da Resistência à Energia
+      if (state.dadivaResistenciaEnergia?.length > 0) opcoes.dadiva_resistencia_energia = state.dadivaResistenciaEnergia;
     }
   }
 
@@ -66,6 +68,12 @@ export function validateAll(ctx, state) {
       return 'Distribua exatamente 2 pontos de atributo.';
     if (state.asiModo === 'talento' && !state.talento)
       return 'Selecione um talento.';
+    // Validar escolha de tipos de energia da Dádiva da Resistência à Energia
+    if (state.asiModo === 'talento' && state.talento === 'Dádiva da Resistência à Energia') {
+      const tipos = state.dadivaResistenciaEnergia || [];
+      if (tipos.length !== 2) return 'Selecione 2 tipos de energia para a Dádiva da Resistência à Energia.';
+      if (tipos[0] === tipos[1]) return 'Os dois tipos de energia devem ser diferentes.';
+    }
   }
 
   if (ctx.precisaExpertiseBardo && state.bardoExpertise.length !== 2) return 'Selecione 2 perícias para Especialização do Bardo.';

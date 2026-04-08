@@ -217,6 +217,10 @@ export function criarPersonagemVazio() {
     resistencias: [],
     vulnerabilidades: [],
     imunidades: [],
+    proficiencias_ferramentas: [],
+    proficiencias_instrumentos: [],
+    talentos_flags: {},
+    talentos_parametros: {},
     criado_em: new Date().toISOString(),
     atualizado_em: new Date().toISOString()
   };

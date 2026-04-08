@@ -3,6 +3,7 @@ Livro do Jogador 2024
 **Versão:** 4ª Edição, 18 de Abril de 2025
 
 [6x.work/heroisanonimos](https://6x.work/heroisanonimos)
+https://sites.google.com/view/heroisanonimos/ldj-2024
 
 Créditos
 

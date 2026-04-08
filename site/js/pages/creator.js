@@ -983,6 +983,23 @@ async function finalizar() {
     }
   }
 
+  // Distribuir escolhas de talentos nas arrays de proficiência corretas
+  if (personagem.escolhas_talento) {
+    if (!personagem.proficiencias_ferramentas) personagem.proficiencias_ferramentas = [];
+    if (!personagem.proficiencias_instrumentos) personagem.proficiencias_instrumentos = [];
+    for (const contexto of Object.keys(personagem.escolhas_talento)) {
+      const escolhas = personagem.escolhas_talento[contexto];
+      if (!Array.isArray(escolhas)) continue;
+      for (const escolha of escolhas) {
+        if (INSTRUMENTOS_MUSICAIS.includes(escolha) && !personagem.proficiencias_instrumentos.includes(escolha)) {
+          personagem.proficiencias_instrumentos.push(escolha);
+        } else if (FERRAMENTAS_TODAS.includes(escolha) && !personagem.proficiencias_ferramentas.includes(escolha)) {
+          personagem.proficiencias_ferramentas.push(escolha);
+        }
+      }
+    }
+  }
+
   salvarPersonagem(personagem);
   toast('Personagem criado com sucesso!', 'success');
   window.navegar(`ficha/${personagem.id}`);
