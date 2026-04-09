@@ -465,6 +465,47 @@ tr:hover td { background: #faf8f4; }
   padding: 8px 10px 4px;
   border-bottom: 1px solid var(--border-light);
   background: rgba(0,0,0,0.02);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+.inv-secao-titulo:hover {
+  background: rgba(0,0,0,0.05);
+}
+.inv-secao-chevron {
+  font-size: 0.8rem;
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+.inv-secao-titulo.inv-secao-colapsada .inv-secao-chevron {
+  transform: rotate(-90deg);
+}
+.inv-secao-body.inv-secao-body-oculto {
+  display: none;
+}
+
+/* Detalhes: header colapsável */
+.detalhes-header-colapsavel {
+  cursor: pointer;
+  user-select: none;
+}
+.detalhes-header-colapsavel:hover {
+  background: rgba(0,0,0,0.03);
+}
+.detalhes-chevron {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+.detalhes-header-colapsado .detalhes-chevron {
+  transform: rotate(-90deg);
+}
+.detalhes-body-oculto {
+  display: none;
 }
 
 /* Inventário: handle de drag */
