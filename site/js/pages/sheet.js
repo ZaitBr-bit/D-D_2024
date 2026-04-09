@@ -30,6 +30,49 @@ let magiasDominioCache = null;
 let magiasSempreCache = null;
 let passivosTalentosCache = null;
 let _syncSubscribed = false;
+// Estado de colapso das seções do inventário (sobrevive a re-renders parciais)
+const _secoesInvColapsadas = { equipados: false, mochila: false, esgotados: false };
+// Estado de colapso da seção de Detalhes
+let _detalhesColapsada = false;
+// Estado de colapso da seção de Truques (padrão: colapsada)
+let _truquesColapsados = true;
+
+/** Chave localStorage para persistir estado de colapso do personagem atual */
+function _getCollapseStorageKey() {
+  return `sheet_collapse_${char?.id || 'default'}`;
+}
+
+/** Carrega estado de colapso do localStorage (resetando para defaults antes) */
+function _carregarEstadoColapso() {
+  _secoesInvColapsadas.equipados = false;
+  _secoesInvColapsadas.mochila = false;
+  _secoesInvColapsadas.esgotados = false;
+  _detalhesColapsada = false;
+  _truquesColapsados = true;
+  try {
+    const raw = localStorage.getItem(_getCollapseStorageKey());
+    if (!raw) return;
+    const estado = JSON.parse(raw);
+    if (typeof estado.equipados === 'boolean') _secoesInvColapsadas.equipados = estado.equipados;
+    if (typeof estado.mochila === 'boolean') _secoesInvColapsadas.mochila = estado.mochila;
+    if (typeof estado.esgotados === 'boolean') _secoesInvColapsadas.esgotados = estado.esgotados;
+    if (typeof estado.detalhes === 'boolean') _detalhesColapsada = estado.detalhes;
+    if (typeof estado.truques === 'boolean') _truquesColapsados = estado.truques;
+  } catch (_) { /* ignorar erros de parse */ }
+}
+
+/** Persiste estado de colapso atual no localStorage */
+function _salvarEstadoColapso() {
+  try {
+    localStorage.setItem(_getCollapseStorageKey(), JSON.stringify({
+      equipados: _secoesInvColapsadas.equipados,
+      mochila: _secoesInvColapsadas.mochila,
+      esgotados: _secoesInvColapsadas.esgotados,
+      detalhes: _detalhesColapsada,
+      truques: _truquesColapsados
+    }));
+  } catch (_) { /* ignorar erros de storage */ }
+}
 
 // Feature flag de migração do fluxo de level up em cards.
 // Pode ser sobrescrita por:
@@ -2425,6 +2468,7 @@ export async function renderSheet(container, charId) {
     }
   }
 
+  _carregarEstadoColapso();
   renderFichaCompleta();
 
   // Registrar atualização do indicador de sync (somente uma vez por sessão)
@@ -3391,6 +3435,8 @@ function renderFichaCompleta() {
   setupEventosCondicoes();
   setupEventosDefesas();
   setupEventosVantagemDesvantagem();
+  setupEventosDetalhesColapso();
+  setupEventosTruquesColapso();
 
   // Restaurar estado dos details
   restaurarEstadoDetails(estadoDetails);
@@ -3402,6 +3448,31 @@ function setupEventosVantagemDesvantagem() {
     el.addEventListener('click', () => {
       toast(el.dataset.vdInfo, 'info');
     });
+  });
+}
+
+/** Setup de evento para colapsar/expandir a seção Detalhes */
+function setupEventosDetalhesColapso() {
+  const header = document.querySelector('[data-toggle-detalhes]');
+  if (!header) return;
+  header.addEventListener('click', e => {
+    // Não colapsar se o clique foi no botão Editar
+    if (e.target.closest('#btn-edit-detalhes')) return;
+    _detalhesColapsada = !_detalhesColapsada;
+    header.classList.toggle('detalhes-header-colapsado', _detalhesColapsada);
+    const body = document.getElementById('detalhes-body');
+    if (body) body.classList.toggle('detalhes-body-oculto', _detalhesColapsada);
+    _salvarEstadoColapso();
+  });
+}
+
+/** Setup de evento para persistir colapso da seção Truques */
+function setupEventosTruquesColapso() {
+  const details = document.getElementById('details-truques');
+  if (!details) return;
+  details.addEventListener('toggle', () => {
+    _truquesColapsados = !details.open;
+    _salvarEstadoColapso();
   });
 }
 
@@ -10903,7 +10974,7 @@ function renderSecaoMagias() {
 
       <!-- Truques -->
       ${todosTruques.length > 0 ? `
-        <details open style="margin-bottom:8px">
+        <details id="details-truques"${_truquesColapsados ? '' : ' open'} style="margin-bottom:8px">
           <summary style="font-weight:700;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--border-light)">
             Truques (${truquesClasse.length}${maxTruques ? ' / ' + maxTruques : ''}${truquesEspecie.length > 0 ? ` + ${truquesEspecie.length} espécie` : ''}${truquesTalento.length > 0 ? ` + ${truquesTalento.length} talento` : ''})
           </summary>
@@ -13581,18 +13652,36 @@ function renderSheetInvLista(equipados, naoEquipados, zerados) {
   let html = '';
 
   if (equipados.length > 0) {
-    html += '<div class="inv-secao-titulo"><span>Equipados</span></div>';
+    const colapsada = _secoesInvColapsadas.equipados;
+    html += `<div class="inv-secao-titulo${colapsada ? ' inv-secao-colapsada' : ''}" data-inv-secao="equipados">
+      <span>Equipados (${equipados.length})</span>
+      <span class="inv-secao-chevron">&#9660;</span>
+    </div>`;
+    html += `<div class="inv-secao-body${colapsada ? ' inv-secao-body-oculto' : ''}" data-inv-secao-body="equipados">`;
     html += equipados.map(idx => renderSheetInvItem(char.inventario[idx], idx)).join('');
+    html += '</div>';
   }
 
   if (naoEquipados.length > 0) {
-    html += '<div class="inv-secao-titulo"><span>Mochila</span></div>';
+    const colapsada = _secoesInvColapsadas.mochila;
+    html += `<div class="inv-secao-titulo${colapsada ? ' inv-secao-colapsada' : ''}" data-inv-secao="mochila">
+      <span>Mochila (${naoEquipados.length})</span>
+      <span class="inv-secao-chevron">&#9660;</span>
+    </div>`;
+    html += `<div class="inv-secao-body${colapsada ? ' inv-secao-body-oculto' : ''}" data-inv-secao-body="mochila">`;
     html += naoEquipados.map(idx => renderSheetInvItem(char.inventario[idx], idx)).join('');
+    html += '</div>';
   }
 
   if (zerados && zerados.length > 0) {
-    html += '<div class="inv-secao-titulo"><span>Esgotados</span></div>';
+    const colapsada = _secoesInvColapsadas.esgotados;
+    html += `<div class="inv-secao-titulo${colapsada ? ' inv-secao-colapsada' : ''}" data-inv-secao="esgotados">
+      <span>Esgotados (${zerados.length})</span>
+      <span class="inv-secao-chevron">&#9660;</span>
+    </div>`;
+    html += `<div class="inv-secao-body${colapsada ? ' inv-secao-body-oculto' : ''}" data-inv-secao-body="esgotados">`;
     html += zerados.map(idx => renderSheetInvItem(char.inventario[idx], idx)).join('');
+    html += '</div>';
   }
 
   return html;
@@ -13756,6 +13845,23 @@ function renderSheetInvItem(item, idx) {
 
 function setupEventosInventarioSheet() {
   const invContainer = document.getElementById('sheet-inventario');
+  if (!invContainer) return;
+
+  // Recolher / expandir seções do inventário
+  invContainer.querySelectorAll('[data-inv-secao]').forEach(titulo => {
+    titulo.addEventListener('click', () => {
+      const secao = titulo.dataset.invSecao;
+      if (!(secao in _secoesInvColapsadas)) return;
+      _secoesInvColapsadas[secao] = !_secoesInvColapsadas[secao];
+
+      const colapsada = _secoesInvColapsadas[secao];
+      titulo.classList.toggle('inv-secao-colapsada', colapsada);
+
+      const body = invContainer.querySelector(`[data-inv-secao-body="${secao}"]`);
+      if (body) body.classList.toggle('inv-secao-body-oculto', colapsada);
+      _salvarEstadoColapso();
+    });
+  });
 
   // Equipar/desequipar — re-renderiza a ficha completa para atualizar CA e stats
   document.querySelectorAll('[data-sheet-equip]').forEach(cb => {
@@ -14570,17 +14676,24 @@ function renderSecaoDetalhes() {
     </div>
   `;
 
+  const colapsada = _detalhesColapsada;
   return `
     <div class="card">
-      <div class="card-header"><h2>Detalhes</h2>
-        <button class="btn btn-sm btn-secondary no-print" id="btn-edit-detalhes">Editar</button>
-      </div>
-      ${campos.filter(c => char[c.key]).map(c => `
-        <div style="margin-bottom:8px">
-          <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:var(--text-muted)">${c.label}</div>
-          <div style="font-size:0.85rem">${char[c.key]}</div>
+      <div class="card-header detalhes-header-colapsavel${colapsada ? ' detalhes-header-colapsado' : ''}" data-toggle-detalhes>
+        <h2>Detalhes</h2>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="btn btn-sm btn-secondary no-print" id="btn-edit-detalhes">Editar</button>
+          <span class="detalhes-chevron">&#9660;</span>
         </div>
-      `).join('')}
+      </div>
+      <div id="detalhes-body"${colapsada ? ' class="detalhes-body-oculto"' : ''}>
+        ${campos.filter(c => char[c.key]).map(c => `
+          <div style="margin-bottom:8px">
+            <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:var(--text-muted)">${c.label}</div>
+            <div style="font-size:0.85rem">${char[c.key]}</div>
+          </div>
+        `).join('')}
+      </div>
     </div>
   `;
 }
