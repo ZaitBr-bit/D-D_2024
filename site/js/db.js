@@ -3,9 +3,9 @@
 // Cache em memória para evitar re-fetch
 // ============================================================
 
-// Resolve o caminho de dados relativo ao proprio db.js (site/js/db.js -> raiz/dados/)
-// Funciona independente de onde o servidor HTTP é iniciado.
-const BASE_PATH = new URL('../../dados', import.meta.url).href;
+// Caminho base para os arquivos de dados.
+// No deploy (GitHub Pages), o workflow substitui '../dados' por './dados' via sed.
+const BASE_PATH = '../dados';
 const cache = {};
 
 /** Busca um JSON com cache em memória */
