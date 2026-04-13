@@ -1486,7 +1486,7 @@ function abrirPopupEspecie(nome) {
     ${escolhaHtml}
     ${periciaEspecieHtml}
     ${versatilHtml}
-    <div class="section-divider"><span>Tracos Raciais${escolhaConfig ? ' (Fixos)' : ''}</span></div>
+    <div class="section-divider"><span>Traços da Espécie${escolhaConfig ? ' (Fixos)' : ''}</span></div>
     ${tracosFixos.map(t => `
       <details style="margin-bottom:6px">
         <summary style="font-weight:600;cursor:pointer;font-size:0.9rem">${t.nome}</summary>
