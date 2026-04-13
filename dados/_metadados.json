@@ -62,7 +62,7 @@
     "classes/": "Uma JSON por classe com traços, características, subclasses e lista de magias",
     "classes/magias_*.json": "Lista de magias disponíveis por classe conjuradora",
     "origens/antecedentes.json": "Os 16 antecedentes com atributos, talentos e proficiências",
-    "origens/especies.json": "As 10 espécies com traços raciais",
+    "origens/especies.json": "As 10 espécies com traços da espécie",
     "talentos/talentos.json": "Todos os talentos organizados por categoria",
     "equipamento/armas.json": "Todas as armas com dano, propriedades e maestrias",
     "equipamento/armaduras.json": "Armaduras com CA e requisitos",
