@@ -750,7 +750,11 @@ function bindEventosMagias(ctx, state) {
   const grimorioSel = new Set(state.grimorioSelecionados);
 
   const jaTemTruques = new Set((ctx.char.magias_conhecidas || []).map(m => m.nome));
-  const jaTemMagias = new Set((ctx.char.magias_preparadas || []).map(m => m.nome));
+  const jaTemMagias = new Set([
+    ...(ctx.char.magias_preparadas || []).map(m => m.nome),
+    ...(ctx.magiasDominioNivel || []).map(m => m.nome),
+    ...(ctx.magiasSempreNivel || []).map(m => m.nome)
+  ]);
   const jaTemGrimorio = new Set((ctx.char.grimorio || []).map(m => m.nome));
 
   function sincronizarSetsParaState() {

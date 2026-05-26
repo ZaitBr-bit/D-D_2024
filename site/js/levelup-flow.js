@@ -12,7 +12,8 @@ import {
   exigeEspecializacaoBardo, exigeEspecializacaoGuardiao,
   exigeEstiloLuta, exigeExploradorHabil, exigeAcademico,
   obterCaracteristicasNivel, obterCaracteristicasEspecieNivel,
-  obterCaracteristicasSubclasseNivel, obterMagiasDominioNivel
+  obterCaracteristicasSubclasseNivel, obterMagiasDominioNivel,
+  obterMagiasSemprePreparadasNivel
 } from './levelup.js';
 
 // ---- Fase 1: Construir contexto de level up ----
@@ -49,6 +50,9 @@ export async function buildLevelUpContext(char, classeData, helpers = {}) {
     : [];
   const magiasDominioNivel = char.subclasse
     ? await obterMagiasDominioNivel(char.classe, char.subclasse, nivelNovo)
+    : [];
+  const magiasSempreNivel = char.subclasse
+    ? await obterMagiasSemprePreparadasNivel(char.classe, char.subclasse, nivelNovo)
     : [];
 
   // Subclasses disponíveis
@@ -148,6 +152,7 @@ export async function buildLevelUpContext(char, classeData, helpers = {}) {
     caracteristicasEspecie,
     caracteristicasSubclasse,
     magiasDominioNivel,
+    magiasSempreNivel,
     subclassesDisponiveis,
     ehConjurador,
     conjuracao,

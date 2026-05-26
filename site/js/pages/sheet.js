@@ -2382,6 +2382,7 @@ export async function renderSheet(container, charId) {
   magiasSempreCache = await obterTodasMagiasSemprePreparadas(char.classe, char.subclasse, char.nivel);
   migrarMagiasDominio();
   migrarMagiasSemprePreparadas();
+  migrarSlotsMagiaLivre();
   migrarTruquesEspecie();
   migrarEscolhasClasseLegadas();
   migrarNomePericiaLidarAnimais();
@@ -2524,9 +2525,39 @@ function migrarMagiasDominio() {
 }
 
 /** Migra magias sempre preparadas legadas adicionando origem: 'sempre' */
+/**
+ * Detecta retroativamente se o personagem tem menos magias manuais do que o
+ * limite permite — situação causada por magias salvas com origem: 'sempre'
+ * antes de a migração registrar os slots liberados.
+ */
+function migrarSlotsMagiaLivre() {
+  const info = CLASSES_INFO[char.classe];
+  const subConj = getSubclasseConjuradoraConjuracao();
+  const tipoConj = info?.tipo_conjuracao || (subConj ? 'conhecidas' : 'preparadas');
+  if (tipoConj !== 'conhecidas') return; // só Feiticeiro-like conta magias conhecidas fixas
+
+  const tabela = classeData?.tabela_caracteristicas;
+  if (!tabela) return;
+
+  const maxEsperado = getMagiaPreparadas(tabela, char.nivel);
+  if (!maxEsperado) return;
+
+  const atual = (char.magias_preparadas || []).filter(m => magiaContaNoLimite(m)).length;
+  const deficit = maxEsperado - atual;
+  if (deficit <= 0) return; // não há gap
+
+  // Se o slot já foi contabilizado, não duplicar
+  const jaRegistrado = char._slots_magia_livre || 0;
+  if (deficit <= jaRegistrado) return;
+
+  char._slots_magia_livre = deficit;
+  salvar();
+}
+
 function migrarMagiasSemprePreparadas() {
   if (!char.magias_preparadas?.length) return;
   let alterado = false;
+  let slotsLiberados = 0;
   const nomesSempre = new Set((magiasSempreCache || []).map(m => m.nome));
 
   // Higienização: remove magias marcadas como "sempre" que não estão mais
@@ -2541,9 +2572,18 @@ function migrarMagiasSemprePreparadas() {
   char.magias_preparadas.forEach(m => {
     if (nomesSempre.has(m.nome) && m.origem !== 'dominio' && m.origem !== 'sempre') {
       m.origem = 'sempre';
+      slotsLiberados++;
       alterado = true;
     }
   });
+
+  // Se havia magias sem origem que agora são "sempre", o jogador perdeu uma
+  // escolha manual — marcar para que a UI ofereça preencher o slot.
+  if (slotsLiberados > 0) {
+    char._slots_magia_livre = (char._slots_magia_livre || 0) + slotsLiberados;
+    alterado = true;
+  }
+
   if (alterado) salvar();
 }
 
@@ -10837,6 +10877,12 @@ function renderSecaoMagias() {
           <button class="btn btn-sm btn-secondary" id="btn-add-magia-custom">+ Custom</button>
         </div>
       </div>
+      ${(char._slots_magia_livre || 0) > 0 && tipoConj === 'conhecidas' ? `
+        <div class="info-box warning no-print" style="margin:0 0 8px;font-size:0.85rem;display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <span>Você tem <strong>${char._slots_magia_livre}</strong> vaga(s) de magia conhecida disponível(is) por ajuste automático.</span>
+          <button class="btn btn-sm btn-primary" id="btn-preencher-slot-magia">Escolher</button>
+        </div>
+      ` : ''}
 
       <!-- Contador de magias preparadas/conhecidas e truques -->
       <div class="magia-contadores" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
@@ -12174,6 +12220,9 @@ function setupEventosEspacosMagia() {
   // Adicionar magia do livro
   document.getElementById('btn-add-magia')?.addEventListener('click', () => mostrarBuscaMagia());
 
+  // Preencher slot de magia liberado por ajuste automático (bug de magia passiva duplicada)
+  document.getElementById('btn-preencher-slot-magia')?.addEventListener('click', () => abrirPreenchimentoSlotMagia());
+
   // Adicionar magia customizada
   document.getElementById('btn-add-magia-custom')?.addEventListener('click', () => mostrarFormMagiaCustom());
 
@@ -12935,6 +12984,126 @@ async function mostrarTrocaMagias(callbackPosTroca = null) {
 }
 
 /** Modal de troca de 1 magia conhecida (Descanso Longo - Bardo, Feiticeiro, Bruxo, subclasses conjuradoras) */
+/**
+ * Abre modal para o jogador escolher uma magia conhecida que preencha um slot
+ * liberado pelo ajuste automático (bug de magia passiva selecionada manualmente).
+ */
+async function abrirPreenchimentoSlotMagia() {
+  const subConj = getSubclasseConjuradoraConjuracao();
+  let espacosNivel = classeData?.tabela_caracteristicas
+    ? getEspacosMagia(classeData.tabela_caracteristicas, char.nivel) : {};
+  if (subConj && Object.keys(espacosNivel).length === 0) {
+    espacosNivel = subConj.espacos || {};
+  }
+  const maxCirculo = Math.max(...Object.keys(espacosNivel).map(Number), 0);
+
+  const magiasClasse = await obterMagiasDisponiveisClasseAtual();
+  const sempreNomes = new Set((magiasSempreCache || []).map(m => m.nome));
+  const dominioNomes = new Set((magiasDominioCache || []).map(m => m.nome));
+  const jaTemSet = new Set((char.magias_preparadas || []).map(m => m.nome));
+
+  const disponiveis = magiasClasse.filter(m =>
+    m.circulo > 0 && m.circulo <= maxCirculo &&
+    !jaTemSet.has(m.nome) &&
+    !sempreNomes.has(m.nome) &&
+    !dominioNomes.has(m.nome)
+  ).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+
+  let magiaSelecionada = null;
+  let circuloSelecionado = null;
+
+  abrirModal('Escolher Magia Conhecida', `
+    <div class="info-box info" style="margin-bottom:12px;font-size:0.85rem">
+      Uma magia que você havia escolhido foi reclassificada como <strong>Sempre Preparada</strong> pela sua subclasse,
+      liberando uma vaga. Escolha uma nova magia para substituí-la.
+    </div>
+    <div class="search-box" style="margin-bottom:8px">
+      <input type="text" id="busca-preencher-slot" placeholder="Buscar magia..." class="form-input">
+    </div>
+    <div id="resultado-preencher-slot" style="max-height:40vh;overflow-y:auto;margin-bottom:8px"></div>
+    <div style="font-size:0.85rem;color:var(--text-muted)">
+      Selecionada: <strong id="preencher-slot-nome" style="color:var(--accent)">—</strong>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
+     <button class="btn btn-primary" id="btn-confirmar-preencher" disabled>Confirmar</button>`);
+
+  const resultadoEl = document.getElementById('resultado-preencher-slot');
+  const confirmarBtn = document.getElementById('btn-confirmar-preencher');
+
+  function renderLista() {
+    const termo = semAcento(document.getElementById('busca-preencher-slot')?.value || '');
+    let filtradas = disponiveis;
+    if (termo.length >= 2) filtradas = disponiveis.filter(m => semAcento(m.nome).includes(termo));
+    filtradas = filtradas.sort((a, b) => a.circulo - b.circulo || a.nome.localeCompare(b.nome, 'pt-BR'));
+
+    const porCirculo = filtradas.reduce((acc, m) => { if (!acc[m.circulo]) acc[m.circulo] = []; acc[m.circulo].push(m); return acc; }, {});
+    resultadoEl.innerHTML = Object.entries(porCirculo).map(([circ, magias]) => `
+      <div style="margin-bottom:8px">
+        <div style="font-size:0.78rem;font-weight:700;color:var(--accent);padding:4px 0 2px;border-bottom:1px solid var(--border-color);margin-bottom:6px">${circ}\u00ba C\u00edrculo</div>
+        <div class="magias-grid">${magias.map(m => `
+          <div class="magia-card ${m.nome === magiaSelecionada ? 'selecionada' : ''}"
+               data-preencher-nome="${m.nome}" data-preencher-circ="${m.circulo}" style="cursor:pointer">
+            <span class="magia-card-check"></span>
+            <div class="magia-card-nome" data-preencher-detalhe="${m.nome}" data-preencher-detalhe-circ="${m.circulo}" style="cursor:pointer">${m.nome}</div>
+            <div class="magia-card-meta">
+              <span>${m.escola || ''}</span>
+              ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
+            </div>
+          </div>
+        `).join('')}</div>
+      </div>
+    `).join('');
+
+    resultadoEl.querySelectorAll('[data-preencher-nome]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        if (e.target.closest('[data-preencher-detalhe]')) return;
+        magiaSelecionada = el.dataset.preencherNome;
+        circuloSelecionado = parseInt(el.dataset.preencherCirc);
+        document.getElementById('preencher-slot-nome').textContent = magiaSelecionada;
+        confirmarBtn.disabled = false;
+        renderLista();
+      });
+    });
+
+    resultadoEl.querySelectorAll('[data-preencher-detalhe]').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const nome = btn.dataset.preencherDetalhe;
+        const circ = parseInt(btn.dataset.preencherDetalheCirc);
+        const dados = await getMagiasPorCirculo(circ);
+        const magia = dados?.magias?.find(m => m.nome === nome);
+        if (!magia) return;
+        abrirModal(magia.nome, `
+          <div class="magia-meta" style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:8px;font-size:0.85rem">
+            <span class="badge badge-primary">${circ}\u00ba Circulo</span>
+            <span class="badge badge-secondary">${magia.escola}</span>
+            <span>${magia.tempo_conjuracao}</span> <span>${magia.alcance}</span>
+            <span>${magia.componentes}</span> <span>${magia.duracao}</span>
+          </div>
+          <div class="md-content">${mdParaHtml(magia.descricao)}</div>
+          ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em circulos superiores:</strong><div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
+        `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
+      });
+    });
+  }
+
+  document.getElementById('busca-preencher-slot')?.addEventListener('input', renderLista);
+
+  confirmarBtn?.addEventListener('click', () => {
+    if (!magiaSelecionada) return;
+    if (!char.magias_preparadas) char.magias_preparadas = [];
+    char.magias_preparadas.push({ nome: magiaSelecionada, circulo: circuloSelecionado });
+    char._slots_magia_livre = Math.max(0, (char._slots_magia_livre || 1) - 1);
+    if (char._slots_magia_livre === 0) delete char._slots_magia_livre;
+    salvar();
+    window.fecharModal();
+    renderFichaCompleta();
+    toast(`${magiaSelecionada} adicionada como magia conhecida`, 'success');
+  });
+
+  renderLista();
+}
+
 async function mostrarTrocaMagiaConhecida(callbackPosTroca = null) {
   const subConj = getSubclasseConjuradoraConjuracao();
 
@@ -13003,18 +13172,24 @@ async function mostrarTrocaMagiaConhecida(callbackPosTroca = null) {
       !jaTemSet.has(m.nome) && m.nome !== magiaRemover
     );
     if (termo.length >= 2) disponiveis = disponiveis.filter(m => semAcento(m.nome).includes(termo));
-    disponiveis = disponiveis.slice(0, 30);
+    disponiveis = disponiveis.sort((a, b) => a.circulo - b.circulo || a.nome.localeCompare(b.nome, 'pt-BR'));
 
-    resultadoEl.innerHTML = `<div class="magias-grid">${disponiveis.map(m => `
-      <div class="magia-card ${m.nome === magiaAdicionar ? 'selecionada' : ''}" data-selecionar-troca="${m.nome}" data-selecionar-circ="${m.circulo}" style="cursor:pointer">
-        <span class="magia-card-check"></span>
-        <div class="magia-card-nome" data-troca-detalhe="${m.nome}" data-troca-detalhe-circ="${m.circulo}" style="cursor:pointer">${m.nome}</div>
-        <div class="magia-card-meta">
-          <span>${m.circulo}\u00ba Circulo</span><span>${m.escola || ''}</span>
-          ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
-        </div>
+    const porCirculo = disponiveis.reduce((acc, m) => { if (!acc[m.circulo]) acc[m.circulo] = []; acc[m.circulo].push(m); return acc; }, {});
+    resultadoEl.innerHTML = Object.entries(porCirculo).map(([circ, magias]) => `
+      <div style="margin-bottom:8px">
+        <div style="font-size:0.78rem;font-weight:700;color:var(--accent);padding:4px 0 2px;border-bottom:1px solid var(--border-color);margin-bottom:6px">${circ}\u00ba C\u00edrculo</div>
+        <div class="magias-grid">${magias.map(m => `
+          <div class="magia-card ${m.nome === magiaAdicionar ? 'selecionada' : ''}" data-selecionar-troca="${m.nome}" data-selecionar-circ="${m.circulo}" style="cursor:pointer">
+            <span class="magia-card-check"></span>
+            <div class="magia-card-nome" data-troca-detalhe="${m.nome}" data-troca-detalhe-circ="${m.circulo}" style="cursor:pointer">${m.nome}</div>
+            <div class="magia-card-meta">
+              <span>${m.escola || ''}</span>
+              ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
+            </div>
+          </div>
+        `).join('')}</div>
       </div>
-    `).join('')}</div>`;
+    `).join('');
 
     // Selecionar magia substituta
     resultadoEl.querySelectorAll('[data-selecionar-troca]').forEach(el => {
