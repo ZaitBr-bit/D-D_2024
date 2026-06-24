@@ -2,6 +2,11 @@
 // Validações e Coleta de opções do Level Up
 // Fase 4: Coleta unificada e submissão
 // ============================================================
+import { exigeManobrasGuerreiro } from './levelup.js';
+
+function precisaManobrasAgora(ctx, state) {
+  return exigeManobrasGuerreiro(ctx.char.classe, state.subclasse || ctx.char.subclasse, ctx.nivelNovo);
+}
 
 /**
  * Consolida o state do fluxo no formato esperado por subirDeNivel().
@@ -53,6 +58,16 @@ export function collectOpcoes(ctx, state) {
   }
   if (ctx.precisaAcademico) opcoes.academico_expertise = state.academicoExpertise;
 
+  // Manobras (Mestre da Batalha)
+  const precisaManobrasLive = precisaManobrasAgora(ctx, state);
+  if (precisaManobrasLive) {
+    opcoes.manobras_novas = state.manobrasNovasSelecionadas || [];
+    if (state.manobraTrocarDe && state.manobraTrocarPara) {
+      opcoes.manobra_trocar_de = state.manobraTrocarDe;
+      opcoes.manobra_trocar_para = state.manobraTrocarPara;
+    }
+  }
+
   return opcoes;
 }
 
@@ -61,6 +76,8 @@ export function collectOpcoes(ctx, state) {
  * @returns {string|null} Mensagem de erro ou null se tudo ok.
  */
 export function validateAll(ctx, state) {
+  const precisaManobrasLive = precisaManobrasAgora(ctx, state);
+
   if (ctx.precisaSubclasse && !state.subclasse) return 'Escolha uma subclasse.';
 
   if (ctx.ganhaASI) {
@@ -82,6 +99,13 @@ export function validateAll(ctx, state) {
   if (ctx.precisaExploradorHabil && !state.exploradorExpertise) return 'Selecione 1 perícia para Explorador Hábil.';
   if (ctx.precisaExploradorHabil && state.exploradorIdiomas.length !== 2) return 'Selecione 2 idiomas (Explorador Hábil).';
   if (ctx.precisaAcademico && state.academicoExpertise.length !== 2) return 'Selecione 2 perícias para Acadêmico.';
+
+  if (precisaManobrasLive && ctx.manobrasGuerreiro) {
+    if ((state.manobrasNovasSelecionadas || []).length !== ctx.manobrasGuerreiro.qtdNova)
+      return `Selecione ${ctx.manobrasGuerreiro.qtdNova} manobra(s) (Mestre da Batalha).`;
+    if (state.manobraTrocarDe && !state.manobraTrocarPara)
+      return 'Escolha a manobra substituta ou desmarque a troca.';
+  }
 
   if (ctx.ehConjurador && ctx.conjuracao) {
     const c = ctx.conjuracao;

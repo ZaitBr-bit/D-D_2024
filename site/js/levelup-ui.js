@@ -8,13 +8,14 @@ import {
 } from './levelup-flow.js';
 import {
   renderCardGanhosNivel, renderCardSubclasse, renderCardASI,
-  renderCardEscolhasClasse, renderCardMagias, renderCardRevisao
+  renderCardEscolhasClasse, renderCardMagias, renderCardManobrasGuerreiro, renderCardRevisao
 } from './levelup-cards.js';
 import { collectOpcoes, validateAll } from './levelup-validations.js';
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ATRIBUTO_NOME_PARA_KEY, PERICIAS } from './dados-classes.js';
 import { getMagiasPorCirculo, getMagiasClasse } from './db.js';
 import { abrirModal, fecharModal, toast, mdParaHtml, semAcento, calcMod, getEspacosMagia } from './utils.js';
 import { subirDeNivel } from './levelup.js';
+import { abrirGridManobras } from './manobras-ui.js';
 
 // Referências injetadas pelo sheet.js
 let _salvarFn = null;
@@ -132,6 +133,9 @@ function renderModal(ctx, state, caches) {
       break;
     case 'selecao_magias':
       conteudo = renderCardMagias(ctx, state);
+      break;
+    case 'manobras_guerreiro':
+      conteudo = renderCardManobrasGuerreiro(ctx, state);
       break;
     case 'revisao_confirmacao':
       conteudo = renderCardRevisao(ctx, state, steps);
@@ -300,6 +304,11 @@ function salvarStateDoDOM(ctx, state, step) {
       state.trocarParaCirculo = parseInt(document.getElementById('levelup-trocar-para-circ')?.value) || 0;
       break;
     }
+    case 'manobras_guerreiro': {
+      const selDe = document.getElementById('lvlup-manobra-trocar-de')?.value || '';
+      if (selDe) state.manobraTrocarDe = selDe;
+      break;
+    }
   }
 }
 
@@ -314,6 +323,7 @@ function bindEventosStep(ctx, state, step, caches) {
     case 'aumento_atributo': bindEventosASI(ctx, state, caches); break;
     case 'escolhas_classe': bindEventosEscolhasClasse(ctx, state); break;
     case 'selecao_magias': bindEventosMagias(ctx, state); break;
+    case 'manobras_guerreiro': bindEventosManobrasGuerreiro(ctx, state); break;
   }
 }
 
@@ -938,6 +948,57 @@ function montarBuscaTroca(ctx, nomeTroca, listaMagiasClasse, maxCirculoNovo) {
 
   buscaInput.addEventListener('input', renderResultados);
   renderResultados();
+}
+
+// --- Manobras (Mestre da Batalha) ---
+function bindEventosManobrasGuerreiro(ctx, state) {
+  const mg = ctx.manobrasGuerreiro;
+  if (!mg) return;
+
+  const manobrasSel = new Set(state.manobrasNovasSelecionadas);
+  const jaTemManobras = new Set(mg.manobrasConhecidasAtuais);
+  const candidatasNovas = mg.opcoesDisponiveis.filter(m => !jaTemManobras.has(m.nome));
+
+  function sincronizarSetParaState() {
+    state.manobrasNovasSelecionadas = [...manobrasSel];
+  }
+
+  function atualizarResumoManobras() {
+    const resumo = document.getElementById('lvlup-manobras-resumo');
+    const badges = document.getElementById('lvlup-manobras-badges');
+    if (resumo) {
+      if (manobrasSel.size === 0) resumo.innerHTML = `<span style="color:var(--danger)">Nenhuma selecionada. Selecione ${mg.qtdNova}.</span>`;
+      else if (manobrasSel.size < mg.qtdNova) resumo.innerHTML = `<span style="color:var(--warning-dark,orange)">${manobrasSel.size}/${mg.qtdNova}</span>`;
+      else resumo.innerHTML = `<span style="color:var(--success)">${manobrasSel.size}/${mg.qtdNova}</span>`;
+    }
+    if (badges) badges.innerHTML = [...manobrasSel].map(n => `<span class="badge badge-accent" style="font-size:0.75rem">${n}</span>`).join('');
+  }
+
+  document.getElementById('btn-lvlup-manobras')?.addEventListener('click', () => {
+    abrirGridManobras(`Selecionar Manobras (+${mg.qtdNova})`, mg.qtdNova, candidatasNovas, manobrasSel, () => {
+      sincronizarSetParaState();
+      atualizarResumoManobras();
+    });
+  });
+
+  document.getElementById('lvlup-manobra-trocar-de')?.addEventListener('change', (e) => {
+    state.manobraTrocarDe = e.target.value;
+    state.manobraTrocarPara = '';
+    const btnPara = document.getElementById('btn-lvlup-manobra-trocar-para');
+    if (btnPara) { btnPara.disabled = !state.manobraTrocarDe; btnPara.textContent = 'Escolher nova'; }
+  });
+
+  document.getElementById('btn-lvlup-manobra-trocar-para')?.addEventListener('click', () => {
+    if (!state.manobraTrocarDe) return;
+    const candidatasTroca = mg.opcoesDisponiveis.filter(m => !jaTemManobras.has(m.nome) && !manobrasSel.has(m.nome));
+    const trocaSel = new Set(state.manobraTrocarPara ? [state.manobraTrocarPara] : []);
+    abrirGridManobras(`Trocar "${state.manobraTrocarDe}" por...`, 1, candidatasTroca, trocaSel, (selecionadas) => {
+      state.manobraTrocarPara = selecionadas[0] || '';
+      fecharModal();
+      const btnPara = document.getElementById('btn-lvlup-manobra-trocar-para');
+      if (btnPara) btnPara.textContent = state.manobraTrocarPara || 'Escolher nova';
+    });
+  });
 }
 
 // ============================================================

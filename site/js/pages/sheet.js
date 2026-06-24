@@ -9,6 +9,7 @@ import { podeSubirDeNivel, subirDeNivel, XP_POR_NIVEL, adicionarXP, obterTodasMa
 import { abrirLevelUpCards } from '../levelup-ui.js';
 import { getSyncStatus, onSyncStatusChange } from '../sync.js';
 import { resolverPassivosTalentos } from '../talentos-effects.js';
+import { abrirGridManobras } from '../manobras-ui.js';
 
 // Estilos visuais (cor e emoji) para cada atributo
 const ATRIBUTO_ESTILO = {
@@ -916,6 +917,8 @@ function getEstadoRecursosGuerreiro() {
       }
     };
   }
+  if (!Array.isArray(char.manobras_conhecidas)) char.manobras_conhecidas = [];
+
   const sub = char.recursos.guerreiro.subclasses;
   if (!sub.mestre_batalha) sub.mestre_batalha = { dados_superioridade_gastos: 0, conheca_inimigo_usado: false };
   if (!sub.combatente_psiquico) sub.combatente_psiquico = { dados_psionicos_gastos: 0, movimento_telecinetico_usado: false, salto_impulsao_usado: false, baluarte_usado: false, mestre_telecinetico_usado: false };
@@ -961,13 +964,21 @@ function getEstadoRecursosGuerreiro() {
   const cdSuperioridade = ehMestreBatalha
     ? 8 + Math.max(calcMod(char.atributos?.forca || 10), calcMod(char.atributos?.destreza || 10)) + bonusProficiencia(nivel)
     : 0;
-  let manobrasConhecidas = 0;
+  let manobrasEsperadas = 0;
   if (ehMestreBatalha && nivel >= 3) {
-    manobrasConhecidas = 3;
-    if (nivel >= 15) manobrasConhecidas = 9;
-    else if (nivel >= 10) manobrasConhecidas = 7;
-    else if (nivel >= 7) manobrasConhecidas = 5;
+    manobrasEsperadas = 3;
+    if (nivel >= 15) manobrasEsperadas = 9;
+    else if (nivel >= 10) manobrasEsperadas = 7;
+    else if (nivel >= 7) manobrasEsperadas = 5;
   }
+  const manobrasConhecidasLista = char.manobras_conhecidas || [];
+  const manobrasConhecidas = manobrasConhecidasLista.length;
+  const manobrasPendentes = Math.max(0, manobrasEsperadas - manobrasConhecidas);
+  const opcoesManobraTexto = classeData?.subclasses?.find(sc => sc.nome === 'Mestre da Batalha')?.opcoes_manobra || [];
+  const manobrasComDescricao = manobrasConhecidasLista.map(nome => {
+    const op = opcoesManobraTexto.find(o => o.nome === nome);
+    return { nome, descricao: op?.descricao || '' };
+  });
   const conhecaInimigoAtivo = ehMestreBatalha && nivel >= 7;
   const implacavelAtivo = ehMestreBatalha && nivel >= 15;
 
@@ -1007,6 +1018,9 @@ function getEstadoRecursosGuerreiro() {
     tipoDadoSuperioridade,
     cdSuperioridade,
     manobrasConhecidas,
+    manobrasEsperadas,
+    manobrasPendentes,
+    manobrasComDescricao,
     conhecaInimigoAtivo,
     conhecaInimigoUsado: mb.conheca_inimigo_usado,
     implacavelAtivo,
@@ -2479,6 +2493,23 @@ export async function renderSheet(container, charId) {
   }
 
   document.getElementById('btn-print')?.addEventListener('click', () => imprimirFicha());
+
+  document.getElementById('btn-escolher-manobras-pendentes')?.addEventListener('click', () => {
+    const estado = getEstadoRecursosGuerreiro();
+    if (!estado) return;
+    const opcoesDisponiveis = classeData?.subclasses?.find(sc => sc.nome === 'Mestre da Batalha')?.opcoes_manobra || [];
+    const jaTem = new Set(char.manobras_conhecidas || []);
+    const candidatas = opcoesDisponiveis.filter(m => !jaTem.has(m.nome));
+    const selSet = new Set();
+    const qtdPendente = estado.manobrasPendentes;
+    abrirGridManobras(`Escolher ${qtdPendente} manobra(s) pendente(s)`, qtdPendente, candidatas, selSet, (selecionadas) => {
+      if (selecionadas.length !== qtdPendente) return;
+      char.manobras_conhecidas = [...jaTem, ...selecionadas];
+      salvar();
+      window.fecharModal();
+      renderFichaCompleta();
+    });
+  });
 }
 
 /** Retorna texto e cor CSS do indicador de sync conforme o status atual */
@@ -2977,7 +3008,8 @@ function renderFichaCompleta() {
             ${estadoGuerreiro.ehMestreBatalha ? `
               Dados de Superioridade: ${estadoGuerreiro.dadosSuperioridadeDisponiveis}/${estadoGuerreiro.dadosSuperioridadeMax} (${estadoGuerreiro.tipoDadoSuperioridade})
               &nbsp;|&nbsp; CD: ${estadoGuerreiro.cdSuperioridade}
-              &nbsp;|&nbsp; Manobras: ${estadoGuerreiro.manobrasConhecidas}
+              &nbsp;|&nbsp; Manobras: ${estadoGuerreiro.manobrasConhecidas}/${estadoGuerreiro.manobrasEsperadas}
+              ${estadoGuerreiro.manobrasPendentes > 0 ? `<span style="color:var(--danger)">(${estadoGuerreiro.manobrasPendentes} pendente(s) — ver banner abaixo)</span>` : ''}
               ${estadoGuerreiro.conhecaInimigoAtivo ? `&nbsp;|&nbsp; Conheça Inimigo: ${estadoGuerreiro.conhecaInimigoUsado ? 'Usado' : 'Disponível'}` : ''}
             ` : ''}
             ${estadoGuerreiro.ehCombatentePsiquico ? `
@@ -2989,7 +3021,7 @@ function renderFichaCompleta() {
             ` : ''}
           </div>
           <div class="no-print" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-            ${estadoGuerreiro.ehMestreBatalha ? `
+            ${estadoGuerreiro.ehMestreBatalha && estadoGuerreiro.manobrasComDescricao.length === 0 ? `
               <button class="btn btn-sm btn-primary" data-guerreiro-acao="usar-superioridade" ${estadoGuerreiro.dadosSuperioridadeDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Dado Superioridade</button>
             ` : ''}
             ${estadoGuerreiro.ehCombatentePsiquico ? `
@@ -3002,6 +3034,22 @@ function renderFichaCompleta() {
             ${estadoGuerreiro.ehCombatentePsiquico && estadoGuerreiro.resguardoMentalAtivo ? 'Resguardo Mental: Resistência a dano Psíquico. Gaste dado para encerrar Amedrontado/Enfeitiçado. ' : ''}
           </div>
         </div>
+        ${estadoGuerreiro.ehMestreBatalha && estadoGuerreiro.manobrasComDescricao.length > 0 ? `
+          <div style="width:100%;margin-top:6px;font-size:0.78rem">
+            ${estadoGuerreiro.manobrasComDescricao.map(m => `
+              <details style="margin-bottom:2px">
+                <summary style="cursor:pointer;font-weight:600">${escHtml(m.nome)}</summary>
+                <div style="color:var(--text-muted);padding-left:12px">${escHtml(m.descricao)}</div>
+              </details>
+            `).join('')}
+          </div>
+        ` : ''}
+        ${estadoGuerreiro.ehMestreBatalha && estadoGuerreiro.manobrasPendentes > 0 ? `
+          <div class="info-box warning" style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px">
+            <span style="font-size:0.85rem">Você tem <strong>${estadoGuerreiro.manobrasPendentes}</strong> manobra(s) pendente(s) de escolha (Mestre da Batalha).</span>
+            <button class="btn btn-sm btn-accent no-print" id="btn-escolher-manobras-pendentes">Escolher agora</button>
+          </div>
+        ` : ''}
       ` : ''}
 
       ${estadoPaladino ? `
@@ -6651,8 +6699,9 @@ function setupEventosHabilidades() {
           toast('Sem Dados de Superioridade disponíveis.', 'error');
           return;
         }
+        const nomeManobra = btn.dataset.manobraNome || 'manobra';
         char.recursos.guerreiro.subclasses.mestre_batalha.dados_superioridade_gastos += 1;
-        toast(`Dado de Superioridade gasto! Role 1${estado.tipoDadoSuperioridade} para a manobra. CD: ${estado.cdSuperioridade}.`, 'success');
+        toast(`${nomeManobra}: Dado de Superioridade gasto! Role 1${estado.tipoDadoSuperioridade}. CD: ${estado.cdSuperioridade}.`, 'success');
       }
 
       if (acao === 'conheca-inimigo') {
@@ -9184,9 +9233,16 @@ function renderFeatureItem(f, source) {
     // Mestre da Batalha: Dados de Superioridade
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoGuerreiro.dadosSuperioridadeDisponiveis}/${estadoGuerreiro.dadosSuperioridadeMax} ${estadoGuerreiro.tipoDadoSuperioridade}</span>`;
     usosHtmlBody = `
-      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
-        <button class="btn btn-sm btn-primary" data-guerreiro-acao="usar-superioridade" ${estadoGuerreiro.dadosSuperioridadeDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Dado de Superioridade</button>
-        <span style="font-size:0.75rem;color:var(--text-muted)">CD: ${estadoGuerreiro.cdSuperioridade} | Manobras: ${estadoGuerreiro.manobrasConhecidas}</span>
+      <div class="no-print" style="padding:4px 0 4px 16px">
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:4px">CD: ${estadoGuerreiro.cdSuperioridade} | Manobras conhecidas: ${estadoGuerreiro.manobrasConhecidas}/${estadoGuerreiro.manobrasEsperadas}</div>
+        ${estadoGuerreiro.manobrasComDescricao.length === 0
+          ? '<div style="font-size:0.75rem;color:var(--warning,orange)">Nenhuma manobra escolhida ainda. Use o assistente de subida de nível para escolher.</div>'
+          : estadoGuerreiro.manobrasComDescricao.map(m => `
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+            <button class="btn btn-sm btn-primary" data-guerreiro-acao="usar-superioridade" data-manobra-nome="${escHtml(m.nome)}" ${estadoGuerreiro.dadosSuperioridadeDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar</button>
+            <span style="font-size:0.78rem"><strong>${escHtml(m.nome)}</strong></span>
+          </div>
+        `).join('')}
       </div>
       ${estadoGuerreiro.implacavelAtivo ? '<div style="font-size:0.72rem;color:var(--text-muted);padding:2px 0 0 16px">Implacável: 1x/turno role 1d8 grátis em vez de gastar dado.</div>' : ''}
     `;

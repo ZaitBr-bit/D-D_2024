@@ -522,6 +522,58 @@ export function renderCardMagias(ctx, state) {
 }
 
 // ============================================================
+// CARD: Manobras do Guerreiro (Mestre da Batalha)
+// ============================================================
+export function renderCardManobrasGuerreiro(ctx, state) {
+  const { manobrasGuerreiro } = ctx;
+  if (!manobrasGuerreiro) return '';
+
+  const { qtdNova, manobrasConhecidasAtuais } = manobrasGuerreiro;
+
+  let html = `
+    <div class="levelup-card">
+      <div class="levelup-card-header">Novas Manobras (+${qtdNova})</div>
+      <div class="levelup-card-body">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div id="lvlup-manobras-resumo" style="font-size:0.85rem;color:var(--text-muted)">
+            ${state.manobrasNovasSelecionadas.length === 0
+              ? `<span style="color:var(--danger)">Nenhuma selecionada. Selecione ${qtdNova}.</span>`
+              : `<span style="color:${state.manobrasNovasSelecionadas.length === qtdNova ? 'var(--success)' : 'var(--warning-dark,orange)'}">${state.manobrasNovasSelecionadas.length}/${qtdNova}</span>`
+            }
+          </div>
+          <button class="btn btn-sm btn-accent" id="btn-lvlup-manobras">Selecionar</button>
+        </div>
+        <div id="lvlup-manobras-badges" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">
+          ${state.manobrasNovasSelecionadas.map(n => `<span class="badge badge-accent" style="font-size:0.75rem">${n}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+
+  if (manobrasConhecidasAtuais.length > 0) {
+    html += `
+      <div class="levelup-card">
+        <div class="levelup-card-header">Trocar Manobra Conhecida (opcional)</div>
+        <div class="levelup-card-body">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:0.85rem">
+            <select id="lvlup-manobra-trocar-de" class="form-input" style="flex:1">
+              <option value="">Não trocar</option>
+              ${manobrasConhecidasAtuais.map(n => `<option value="${n}" ${state.manobraTrocarDe === n ? 'selected' : ''}>${n}</option>`).join('')}
+            </select>
+            <span>&rarr;</span>
+            <button class="btn btn-sm btn-secondary" id="btn-lvlup-manobra-trocar-para" ${!state.manobraTrocarDe ? 'disabled' : ''}>
+              ${state.manobraTrocarPara || 'Escolher nova'}
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  return html;
+}
+
+// ============================================================
 // CARD: Revisão e Confirmação
 // ============================================================
 export function renderCardRevisao(ctx, state, steps) {
@@ -564,6 +616,8 @@ export function renderCardRevisao(ctx, state, steps) {
   if (state.magiasSelecionadas.length > 0) html += `<li><strong>Magias:</strong> ${state.magiasSelecionadas.join(', ')}</li>`;
   if (state.grimorioSelecionados.length > 0) html += `<li><strong>Grimório:</strong> ${state.grimorioSelecionados.join(', ')}</li>`;
   if (state.trocarDe && state.trocarPara) html += `<li><strong>Troca:</strong> ${state.trocarDe} &rarr; ${state.trocarPara}</li>`;
+  if (state.manobrasNovasSelecionadas.length > 0) html += `<li><strong>Manobras:</strong> ${state.manobrasNovasSelecionadas.join(', ')}</li>`;
+  if (state.manobraTrocarDe && state.manobraTrocarPara) html += `<li><strong>Troca de Manobra:</strong> ${state.manobraTrocarDe} &rarr; ${state.manobraTrocarPara}</li>`;
 
   html += `</ul>`;
 

@@ -208,6 +208,23 @@ export function exigeEstiloLuta(classe, nivel) {
 }
 
 /**
+ * Verifica se o nível exige escolha de Manobras (Mestre da Batalha)
+ */
+export function exigeManobrasGuerreiro(classe, subclasse, nivel) {
+  return classe === 'Guerreiro' && subclasse === 'Mestre da Batalha' &&
+         [3, 7, 10, 15].includes(nivel);
+}
+
+/**
+ * Quantidade de NOVAS manobras aprendidas neste nível (não é o total acumulado)
+ */
+export function getQuantidadeNovasManobras(nivel) {
+  if (nivel === 3) return 3;
+  if (nivel === 7 || nivel === 10 || nivel === 15) return 2;
+  return 0;
+}
+
+/**
  * Verifica se o nível exige escolha de Explorador Hábil (Guardião nv2: 1 expertise + 2 idiomas)
  */
 export function exigeExploradorHabil(classe, nivel) {
@@ -582,6 +599,8 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   const exigeEstiloLutaNivel = exigeEstiloLuta(personagem.classe, novoNivel);
   const exigeExploradorHabilNivel = exigeExploradorHabil(personagem.classe, novoNivel);
   const exigeAcademicoNivel = exigeAcademico(personagem.classe, novoNivel);
+  const subclasseEfetivaManobras = opcoes.subclasse || personagem.subclasse;
+  const exigeManobrasNivel = exigeManobrasGuerreiro(personagem.classe, subclasseEfetivaManobras, novoNivel);
   
   // Se precisa de escolhas do jogador e não foram fornecidas, retornar pendências
   if (precisaSubclasse && !opcoes.subclasse) {
@@ -646,6 +665,31 @@ export async function subirDeNivel(personagem, opcoes = {}) {
         pendente: true,
         tipo_pendencia: 'explorador_habil',
         mensagem: 'É necessário escolher 1 perícia para Especialização (Explorador Hábil)'
+      };
+    }
+  }
+
+  // Validar Manobras do Mestre da Batalha (níveis 3, 7, 10, 15)
+  if (exigeManobrasNivel) {
+    const qtdNova = getQuantidadeNovasManobras(novoNivel);
+    const novasManobras = Array.isArray(opcoes.manobras_novas) ? opcoes.manobras_novas : [];
+    const manobraTrocarDe = opcoes.manobra_trocar_de || null;
+    const manobraTrocarPara = opcoes.manobra_trocar_para || null;
+
+    if (novasManobras.length !== qtdNova) {
+      return {
+        sucesso: false,
+        pendente: true,
+        tipo_pendencia: 'manobras_guerreiro',
+        mensagem: `É necessário escolher ${qtdNova} manobra(s) nova(s) para o Mestre da Batalha`
+      };
+    }
+    if ((manobraTrocarDe && !manobraTrocarPara) || (!manobraTrocarDe && manobraTrocarPara)) {
+      return {
+        sucesso: false,
+        pendente: true,
+        tipo_pendencia: 'manobras_guerreiro',
+        mensagem: 'Troca de manobra incompleta: escolha a manobra de origem e a de destino'
       };
     }
   }
@@ -1016,6 +1060,27 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     }
   }
 
+  // Aplicar Manobras do Mestre da Batalha
+  let manobrasNovasAplicadas = [];
+  let manobraTrocaAplicada = null;
+  if (exigeManobrasNivel) {
+    if (!Array.isArray(personagem.manobras_conhecidas)) personagem.manobras_conhecidas = [];
+    for (const nome of opcoes.manobras_novas) {
+      if (!personagem.manobras_conhecidas.includes(nome)) {
+        personagem.manobras_conhecidas.push(nome);
+        manobrasNovasAplicadas.push(nome);
+      }
+    }
+
+    if (opcoes.manobra_trocar_de && opcoes.manobra_trocar_para) {
+      const idx = personagem.manobras_conhecidas.indexOf(opcoes.manobra_trocar_de);
+      if (idx >= 0) {
+        personagem.manobras_conhecidas[idx] = opcoes.manobra_trocar_para;
+        manobraTrocaAplicada = { de: opcoes.manobra_trocar_de, para: opcoes.manobra_trocar_para };
+      }
+    }
+  }
+
   // Aplicar Acadêmico do Mago (nível 2: 2 expertise acadêmicas)
   let academicoAplicado = [];
   if (exigeAcademicoNivel) {
@@ -1068,7 +1133,9 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     expertise_guardiao_aplicada: expertiseGuardiaoAplicada,
     estilo_luta_aplicado: estiloLutaAplicado,
     explorador_habil_aplicado: exploradorHabilAplicado,
-    academico_aplicado: academicoAplicado
+    academico_aplicado: academicoAplicado,
+    manobras_novas_aplicadas: manobrasNovasAplicadas,
+    manobra_troca_aplicada: manobraTrocaAplicada
   };
 }
 
