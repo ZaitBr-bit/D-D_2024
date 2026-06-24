@@ -11,6 +11,7 @@ import {
   concedeAumentoAtributo, exigeSubclasse,
   exigeEspecializacaoBardo, exigeEspecializacaoGuardiao,
   exigeEstiloLuta, exigeExploradorHabil, exigeAcademico,
+  exigeManobrasGuerreiro, getQuantidadeNovasManobras,
   obterCaracteristicasNivel, obterCaracteristicasEspecieNivel,
   obterCaracteristicasSubclasseNivel, obterMagiasDominioNivel,
   obterMagiasSemprePreparadasNivel
@@ -41,6 +42,16 @@ export async function buildLevelUpContext(char, classeData, helpers = {}) {
   const precisaEstiloLuta = exigeEstiloLuta(char.classe, nivelNovo);
   const precisaExploradorHabil = exigeExploradorHabil(char.classe, nivelNovo);
   const precisaAcademico = exigeAcademico(char.classe, nivelNovo);
+  let manobrasGuerreiro = null;
+  if (char.classe === 'Guerreiro') {
+    const opcoesDisponiveis = classeData?.subclasses
+      ?.find(sc => sc.nome === 'Mestre da Batalha')?.opcoes_manobra || [];
+    manobrasGuerreiro = {
+      opcoesDisponiveis,
+      qtdNova: getQuantidadeNovasManobras(nivelNovo),
+      manobrasConhecidasAtuais: char.manobras_conhecidas || []
+    };
+  }
 
   // Características ganhas neste nível
   const caracteristicas = await obterCaracteristicasNivel(char.classe, nivelNovo);
@@ -148,6 +159,7 @@ export async function buildLevelUpContext(char, classeData, helpers = {}) {
     precisaEstiloLuta,
     precisaExploradorHabil,
     precisaAcademico,
+    manobrasGuerreiro,
     caracteristicas,
     caracteristicasEspecie,
     caracteristicasSubclasse,
@@ -236,6 +248,19 @@ const STEP_DEFINITIONS = [
     }
   },
   {
+    id: 'manobras_guerreiro',
+    titulo: 'Manobras (Mestre da Batalha)',
+    tipo: 'escolha',
+    obrigatorio: true,
+    visivel: (ctx, state) => exigeManobrasGuerreiro(ctx.char.classe, state?.subclasse || ctx.char.subclasse, ctx.nivelNovo),
+    completo: (ctx, state) => {
+      if (!ctx.manobrasGuerreiro) return false;
+      if ((state.manobrasNovasSelecionadas || []).length !== ctx.manobrasGuerreiro.qtdNova) return false;
+      if (state.manobraTrocarDe && !state.manobraTrocarPara) return false;
+      return true;
+    }
+  },
+  {
     id: 'revisao_confirmacao',
     titulo: 'Revisão e Confirmação',
     tipo: 'revisao',
@@ -296,6 +321,10 @@ export function createInitialState() {
     trocarDe: '',
     trocarPara: '',
     trocarParaCirculo: 0,
+    // Manobras (Mestre da Batalha)
+    manobrasNovasSelecionadas: [],
+    manobraTrocarDe: '',
+    manobraTrocarPara: '',
     // Navegação
     stepAtual: 0
   };

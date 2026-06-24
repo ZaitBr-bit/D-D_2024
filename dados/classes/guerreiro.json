@@ -242,6 +242,88 @@
           "nome": "Superioridade em Combate Suprema",
           "descricao": "Seu Dado de Superioridade se torna um d12."
         }
+      ],
+      "opcoes_manobra": [
+        {
+          "nome": "Aparar",
+          "descricao": "Ao receber dano de outra criatura em uma jogada de ataque corpo a corpo, você pode executar uma Reação e gastar um Dado de Superioridade para reduzir o dano pelo número obtido no Dado de Superioridade mais seu modificador de Força ou Destreza (à sua escolha)."
+        },
+        {
+          "nome": "Ataque Ameaçador",
+          "descricao": "Ao atingir uma criatura com uma jogada de ataque, você pode gastar um Dado de Superioridade para tentar amedrontar o alvo. Adicione o resultado do Dado de Superioridade à jogada de dano do ataque. O alvo deve ser bem-sucedido em uma salvaguarda de Sabedoria ou tem a condição Amedrontado até o final do seu próximo turno."
+        },
+        {
+          "nome": "Ataque de Varredura",
+          "descricao": "Ao atingir uma criatura com uma jogada de ataque corpo a corpo usando uma arma ou um Ataque Desarmado, você pode gastar um Dado de Superioridade para tentar causar dano a outra criatura. Escolha outra criatura a até 1,5 metro do alvo original e ao seu alcance. Se a jogada de ataque original atingir a segunda criatura, ela sofre dano igual ao resultado do Dado de Superioridade. O dano é do mesmo tipo causado pelo ataque original."
+        },
+        {
+          "nome": "Ataque Estendido",
+          "descricao": "Como uma Ação Bônus, você pode gastar um Dado de Superioridade e executar a ação Correr. Se você se mover pelo menos 1,5 metro em linha reta imediatamente antes de realizar um ataque corpo a corpo como parte da ação Atacar neste turno, pode adicionar o resultado do Dado de Superioridade à jogada de dano do ataque."
+        },
+        {
+          "nome": "Ataque para Distrair",
+          "descricao": "Ao atingir uma criatura com uma jogada de ataque, você pode gastar um Dado de Superioridade para distrair o alvo. Adicione o resultado do Dado de Superioridade à jogada de dano do ataque. A próxima jogada de ataque contra o alvo por um atacante diferente de você tem Vantagem se o ataque for realizado antes do início do seu próximo turno."
+        },
+        {
+          "nome": "Ataque Preciso",
+          "descricao": "Ao errar uma jogada de ataque, você pode gastar um Dado de Superioridade e adicionar resultado à jogada de ataque, fazendo potencialmente o ataque acertar."
+        },
+        {
+          "nome": "Ataque Provocante",
+          "descricao": "Ao atingir uma criatura com uma jogada de ataque, você pode gastar um Dado de Superioridade para provocar o alvo a atacá-lo. Adicione o resultado do Dado de Superioridade à jogada de dano do ataque. O alvo deve ser bem-sucedido em uma salvaguarda de Sabedoria ou tem Desvantagem em jogadas de ataque contra alvos diferentes de você até o final do seu próximo turno."
+        },
+        {
+          "nome": "Avaliação Tática",
+          "descricao": "Ao realizar um teste de Inteligência (História ou Investigação) ou um teste de Sabedoria (Intuição), você pode gastar um Dado de Superioridade e adicionar o resultado ao teste de atributo."
+        },
+        {
+          "nome": "Contra-ataque",
+          "descricao": "Quando uma criatura erra uma jogada de ataque corpo a corpo contra você, você pode executar uma Reação e gastar um Dado de Superioridade para realizar uma jogada de ataque corpo a corpo com uma arma ou um Ataque Desarmado contra a criatura. Se você acertar, adicione o resultado do Dado de Superioridade ao dano do ataque."
+        },
+        {
+          "nome": "Desarme",
+          "descricao": "Ao atingir uma criatura com uma jogada de ataque, você pode gastar um Dado de Superioridade para tentar desarmar o alvo. Adicione o resultado do Dado de Superioridade à jogada de dano do ataque. O alvo deve ser bem-sucedido em uma salvaguarda de Força ou soltar um objeto à sua escolha que esteja segurando, com o objeto caindo no espaço dele."
+        },
+        {
+          "nome": "Emboscada",
+          "descricao": "Ao realizar um teste de Destreza (Furtividade) ou jogar Iniciativa, você pode gastar um Dado de Superioridade e adicionar o resultado ao teste, a menos que tenha a condição Incapacitado."
+        },
+        {
+          "nome": "Encontrão",
+          "descricao": "Ao atingir uma criatura com uma jogada de ataque usando uma arma ou um Ataque Desarmado, você pode gastar um Dado de Superioridade para tentar fazer o alvo recuar. Adicione o resultado do Dado de Superioridade à jogada de dano do ataque. Se o alvo for Grande ou menor, ele deve ser bem-sucedido em uma salvaguarda de Força ou é empurrado até 4,5 metros para longe de você."
+        },
+        {
+          "nome": "Finta",
+          "descricao": "Como uma Ação Bônus, você pode gastar um Dado de Superioridade para fintar, escolhendo uma criatura a até 1,5 metro de você como seu alvo. Você tem Vantagem em sua próxima jogada de ataque contra esse alvo neste turno. Se o ataque acertar, adicione o resultado do Dado de Superioridade à jogada de dano do ataque."
+        },
+        {
+          "nome": "Gato Por Lebre",
+          "descricao": "Ao estar a até 1,5 metro de uma criatura no seu turno, você pode gastar um Dado de Superioridade e trocar de lugar com essa criatura, desde que você gaste pelo menos 1,5 metro de movimento e a criatura seja voluntária e não tenha a condição Incapacitado. Este movimento não provoca Ataques de Oportunidade. Jogue o Dado de Superioridade. Até o início do seu próximo turno, você ou a outra criatura (à sua escolha) adquire um bônus de CA igual ao número do resultado."
+        },
+        {
+          "nome": "Golpe do Comandante",
+          "descricao": "Ao executar a ação Atacar no seu turno, você pode substituir um de seus ataques para instruir um de seus companheiros a atacar. Ao fazer isso, escolha uma criatura voluntária que possa vê-lo ou ouvi-lo e gaste um Dado de Superioridade. Essa criatura pode usar imediatamente a Reação dela para realizar um ataque com uma arma ou um Ataque Desarmado, adicionando o resultado do Dado de Superioridade à jogada de dano do ataque em caso de acerto."
+        },
+        {
+          "nome": "Manobrar",
+          "descricao": "Ao atingir uma criatura com uma jogada de ataque, você pode gastar um Dado de Superioridade para manobrar um de seus companheiros para outra posição. Adicione o resultado do Dado de Superioridade à jogada de dano do ataque e escolha uma criatura voluntária que possa vê-lo ou ouvi-lo. Essa criatura pode usar a Reação dela para se mover até metade do Deslocamento sem provocar Ataques de Oportunidade do alvo de seu ataque."
+        },
+        {
+          "nome": "Movimentação Evasiva",
+          "descricao": "Como uma Ação Bônus, você pode gastar um Dado de Superioridade e executar a ação Desengajar. Você também joga o dado e adiciona o número obtido à sua CA até o início do seu próximo turno."
+        },
+        {
+          "nome": "Presença de Autoridade",
+          "descricao": "Ao realizar um teste de Carisma (Atuação, Intimidação ou Persuasão), você pode gastar um Dado de Superioridade e adicionar o resultado ao teste."
+        },
+        {
+          "nome": "Prostrar",
+          "descricao": "Ao atingir uma criatura com uma jogada de ataque usando uma arma ou um Ataque Desarmado, você pode gastar um Dado de Superioridade e adicionar o resultado à jogada de dano do ataque. Se o alvo for Grande ou menor, ele deve ser bem-sucedido em uma salvaguarda de Força ou tem a condição Caído."
+        },
+        {
+          "nome": "Recuperar Energia",
+          "descricao": "Como uma Ação Bônus, você pode gastar um Dado de Superioridade para encorajar a determinação de um companheiro. Escolha um aliado seu a até 9 metros de você que possa vê-lo ou ouvi-lo. Essa criatura adquire Pontos de Vida Temporários igual ao resultado do Dado de Superioridade mais metade do seu nível de Guerreiro (arredondado para baixo)."
+        }
       ]
     }
   ],
