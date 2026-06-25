@@ -72,10 +72,10 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Navegação: Network-first com fallback pro cache
+  // Navegação: Network-first com fallback pro cache (bypass total do cache HTTP)
   if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(request)
+      fetch(request, { cache: 'no-store' })
         .then((response) => {
           const clone = response.clone();
           caches.open(CACHE_STATIC).then((cache) => cache.put(request, clone));
@@ -86,10 +86,10 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Dados JSON (/dados/): Network-first com cache para offline
+  // Dados JSON (/dados/): Network-first com cache para offline (bypass total do cache HTTP)
   if (url.pathname.includes('/dados/')) {
     event.respondWith(
-      fetch(request)
+      fetch(request, { cache: 'no-store' })
         .then((response) => {
           if (response.ok) {
             const clone = response.clone();
@@ -102,10 +102,10 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Assets estáticos (JS, CSS, imagens): Network-first com fallback cache
+  // Assets estáticos (JS, CSS, imagens): Network-first com fallback cache (bypass total do cache HTTP)
   if (url.pathname.match(/\.(js|css|png|jpg|ico|svg|woff2?)$/)) {
     event.respondWith(
-      fetch(request)
+      fetch(request, { cache: 'no-store' })
         .then((response) => {
           if (response.ok) {
             const clone = response.clone();

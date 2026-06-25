@@ -12,7 +12,7 @@ const cache = {};
 async function fetchJSON(caminho) {
   if (cache[caminho]) return cache[caminho];
   try {
-    const resp = await fetch(`${BASE_PATH}/${caminho}`);
+    const resp = await fetch(`${BASE_PATH}/${caminho}`, { cache: 'no-store' });
     if (!resp.ok) throw new Error(`Erro ${resp.status}: ${caminho}`);
     const dados = await resp.json();
     cache[caminho] = dados;
