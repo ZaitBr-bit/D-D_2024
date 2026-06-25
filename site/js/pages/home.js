@@ -1,7 +1,7 @@
 // ============================================================
 // Pagina inicial - Lista de personagens
 // ============================================================
-import { listarPersonagens, removerPersonagem, duplicarPersonagem, exportarTodos, importarPersonagens, atualizarListaLocal, backupPersonagensLocais, restaurarPersonagensLocais } from '../store.js';
+import { listarPersonagens, removerPersonagem, duplicarPersonagem, exportarTodos, exportarPersonagem, importarPersonagens, atualizarListaLocal, backupPersonagensLocais, restaurarPersonagensLocais } from '../store.js';
 import { enfileirarSync, obterIdsPendentesRemocao } from '../sync.js';
 import { toast, abrirModal, fmtData, escHtml } from '../utils.js';
 import { CLASSES_INFO } from '../dados-classes.js';
@@ -79,13 +79,16 @@ function _renderConteudo(container, personagens, usuario) {
 
   container.innerHTML = `
     ${contaHtml}
-    <div class="flex justify-between items-center mb-2">
+    <div class="flex justify-between items-center mb-1">
       <h2 style="font-size:1.1rem;color:var(--text)">Meus Personagens</h2>
       <div class="flex gap-1">
-        <button class="btn btn-sm btn-secondary" id="btn-exportar" title="Exportar">Exportar</button>
-        <button class="btn btn-sm btn-secondary" id="btn-importar" title="Importar">Importar</button>
+        <button class="btn btn-sm btn-secondary" id="btn-exportar" title="Exportar todos os personagens num único arquivo">Exportar Todos</button>
+        <button class="btn btn-sm btn-secondary" id="btn-importar" title="Importar arquivo com 1 ou vários personagens">Importar</button>
       </div>
     </div>
+    <p style="font-size:0.72rem;color:var(--text-muted);margin:0 0 10px 0">
+      "Exportar Todos" salva a lista inteira num arquivo. Pra exportar um personagem só, use o botão &#x21E9; no card dele. "Importar" aceita arquivos com 1 ou vários personagens.
+    </p>
     <div class="char-list">
       ${personagens.map(p => renderCharCard(p)).join('')}
     </div>
@@ -112,6 +115,27 @@ function _renderConteudo(container, personagens, usuario) {
       duplicarPersonagem(id);
       toast('Personagem duplicado!', 'success');
       renderHome(container);
+    });
+  });
+
+  container.querySelectorAll('[data-action="exportar-individual"]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.closest('.char-card').dataset.id;
+      const p = personagens.find(x => x.id === id);
+      const json = exportarPersonagem(id);
+      if (!json) {
+        toast('Erro ao exportar personagem', 'error');
+        return;
+      }
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `dnd_personagem_${(p?.nome || 'sem_nome').replace(/[^\w\-]+/g, '_')}_${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast(`${p?.nome || 'Personagem'} exportado!`, 'success');
     });
   });
 
@@ -321,6 +345,7 @@ function renderCharCard(p) {
       </div>
       <div class="char-nivel">Nv. ${escHtml(p.nivel ?? 1)}</div>
       <div class="char-actions" style="display:flex;gap:4px;margin-left:8px;">
+        <button class="btn btn-sm btn-secondary" data-action="exportar-individual" title="Exportar este personagem (arquivo só com ele)">&#x21E9;</button>
         <button class="btn btn-sm btn-secondary" data-action="duplicar" title="Duplicar">&#x2398;</button>
         <button class="btn btn-sm btn-danger" data-action="excluir" title="Excluir">&times;</button>
       </div>
