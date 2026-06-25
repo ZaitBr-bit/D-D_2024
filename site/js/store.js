@@ -76,6 +76,13 @@ export function exportarTodos() {
   return JSON.stringify(listarPersonagens(), null, 2);
 }
 
+/** Exporta um único personagem (por id) como JSON string, no mesmo formato (array) usado por exportarTodos/importarPersonagens */
+export function exportarPersonagem(id) {
+  const p = getPersonagem(id);
+  if (!p) return null;
+  return JSON.stringify([p], null, 2);
+}
+
 /** Substitui toda a lista local (usado apos sincronizacao com nuvem) */
 export function atualizarListaLocal(lista) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
