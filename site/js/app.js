@@ -5,6 +5,7 @@ import { renderHome } from './pages/home.js';
 import { renderCreator } from './pages/creator.js';
 import { renderSheet } from './pages/sheet.js';
 import { inicializarSync } from './sync.js';
+import { toast } from './utils.js';
 
 // --- Router baseado em hash ---
 const routes = {
@@ -63,47 +64,36 @@ function processarRota() {
 
 // --- PWA Update ---
 /**
- * Verifica se existe uma nova versão do Service Worker e exibe um banner
- * convidando o usuário a atualizar. Quando o usuário clica em "Atualizar",
- * limpa todos os caches, envia SKIP_WAITING ao SW novo e recarrega a página.
+ * Verifica se existe uma nova versão do Service Worker. Quando encontra,
+ * limpa os caches do SW e envia SKIP_WAITING automaticamente (sem exigir
+ * clique do usuário). Limpar caches do SW nunca afeta personagens, que
+ * vivem só em localStorage (store.js), separado do Cache Storage do SW.
  * @param {ServiceWorkerRegistration} registration - Registro do SW ativo
  */
 function verificarAtualizacaoSW(registration) {
   const novoSW = registration.waiting || registration.installing;
 
-  function mostrarPromptAtualizar(sw) {
-    // Evitar duplicar banner
-    if (document.getElementById('update-banner')) return;
+  function aplicarAtualizacao(sw) {
+    // Evitar disparar mais de uma vez pro mesmo SW
+    if (sw._dndAtualizacaoAplicada) return;
+    sw._dndAtualizacaoAplicada = true;
 
-    const banner = document.createElement('div');
-    banner.id = 'update-banner';
-    banner.className = 'update-banner';
-    banner.innerHTML = `
-      <span>Nova versao disponivel!</span>
-      <button class="update-banner-btn" id="btn-atualizar">Atualizar agora</button>
-    `;
-    document.body.appendChild(banner);
-    document.getElementById('btn-atualizar').addEventListener('click', () => {
-      banner.querySelector('#btn-atualizar').textContent = 'Atualizando...';
-      banner.querySelector('#btn-atualizar').disabled = true;
-      // Limpar todos os caches e forçar o novo SW
-      if ('caches' in window) {
-        caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).then(() => {
-          sw.postMessage({ type: 'SKIP_WAITING' });
-        });
-      } else {
+    if ('caches' in window) {
+      caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).then(() => {
         sw.postMessage({ type: 'SKIP_WAITING' });
-      }
-    });
+      });
+    } else {
+      sw.postMessage({ type: 'SKIP_WAITING' });
+    }
   }
 
   if (novoSW) {
     if (novoSW.state === 'installed') {
-      if (navigator.serviceWorker.controller) mostrarPromptAtualizar(novoSW);
+      if (navigator.serviceWorker.controller) aplicarAtualizacao(novoSW);
     } else {
       novoSW.addEventListener('statechange', () => {
         if (novoSW.state === 'installed' && navigator.serviceWorker.controller) {
-          mostrarPromptAtualizar(novoSW);
+          aplicarAtualizacao(novoSW);
         }
       });
     }
@@ -114,11 +104,38 @@ function verificarAtualizacaoSW(registration) {
     if (instalando) {
       instalando.addEventListener('statechange', () => {
         if (instalando.state === 'installed' && navigator.serviceWorker.controller) {
-          mostrarPromptAtualizar(instalando);
+          aplicarAtualizacao(instalando);
         }
       });
     }
   });
+}
+
+/**
+ * Recarrega a página assim que for seguro (sem modal aberto), pra não
+ * interromper o usuário no meio de uma edição (ex: wizard de level-up).
+ * Se já estiver seguro, recarrega na hora.
+ */
+function recarregarQuandoSeguro() {
+  const overlay = document.getElementById('modal-overlay');
+  const modalAberto = overlay && overlay.style.display === 'flex';
+
+  if (!modalAberto) {
+    window.location.reload();
+    return;
+  }
+
+  toast('Nova versão disponível — será aplicada ao fechar esta janela.', '');
+  // Polling em vez do callback onClose de abrirModal() (utils.js): esse callback é
+  // um slot único por modal, já pode estar ocupado pela lógica do próprio wizard/modal
+  // em andamento — registrar aqui substituiria esse callback e quebraria a limpeza dele.
+  const interval = setInterval(() => {
+    const aindaAberto = overlay && overlay.style.display === 'flex';
+    if (!aindaAberto) {
+      clearInterval(interval);
+      window.location.reload();
+    }
+  }, 500);
 }
 
 // --- Inicialização ---
@@ -153,7 +170,7 @@ function init() {
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (!hadController || refreshing) return;
       refreshing = true;
-      window.location.reload();
+      recarregarQuandoSeguro();
     });
   }
 
