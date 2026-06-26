@@ -4,7 +4,7 @@
 import { CLASSES_INFO, PERICIAS, ATRIBUTOS_NOMES, ATRIBUTOS_KEYS, ATRIBUTO_NOME_PARA_KEY, STANDARD_ARRAY, POINT_BUY_CUSTOS, POINT_BUY_TOTAL } from '../dados-classes.js';
 import { getClasse, getAntecedentes, getEspecies, getTalentos, getMagiasClasse, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura } from '../db.js';
 import { criarPersonagemVazio, salvarPersonagem } from '../store.js';
-import { calcMod, fmtMod, calcPVNivel1, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, getDeslocamento, getTamanho } from '../utils.js';
+import { calcMod, fmtMod, calcPVNivel1, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, getDeslocamento, getTamanho, escHtml, processarImagemArquivo } from '../utils.js';
 
 const STEPS = [
   { id: 'classe', label: 'Classe' },
@@ -4022,6 +4022,16 @@ function renderStepDetalhes(el) {
             <input type="text" class="form-input" id="det-nome" value="${personagem.nome}" placeholder="Nome do seu personagem">
           </div>
         </div>
+        <div class="col" style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+          <div class="char-avatar" id="det-imagem-preview" style="width:56px;height:56px;font-size:1.4rem">
+            ${personagem.imagem ? `<img src="${personagem.imagem}" alt="">` : escHtml((personagem.nome || personagem.classe || '?').charAt(0).toUpperCase() || '?')}
+          </div>
+          <div style="display:flex;gap:4px">
+            <button type="button" class="btn btn-sm btn-secondary" id="det-imagem-btn">Foto</button>
+            <button type="button" class="btn btn-sm btn-danger" id="det-imagem-remover" title="Remover imagem" style="${personagem.imagem ? '' : 'display:none'}">&times;</button>
+          </div>
+          <input type="file" accept="image/*" id="det-imagem-input" style="display:none">
+        </div>
       </div>
 
       <div class="info-box success">
@@ -4186,6 +4196,36 @@ function renderStepDetalhes(el) {
         c.classList.toggle('selected', c.dataset.alinhamento === valor);
       });
     });
+  });
+
+  document.getElementById('det-imagem-btn')?.addEventListener('click', () => {
+    document.getElementById('det-imagem-input')?.click();
+  });
+
+  const detImagemInicial = () => (personagem.nome || personagem.classe || '?').charAt(0).toUpperCase() || '?';
+
+  document.getElementById('det-imagem-input')?.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    const dataUrl = await processarImagemArquivo(file, 300);
+    if (!dataUrl) {
+      toast('Não foi possível processar essa imagem', 'error');
+      return;
+    }
+    personagem.imagem = dataUrl;
+    const preview = document.getElementById('det-imagem-preview');
+    if (preview) preview.innerHTML = `<img src="${dataUrl}" alt="">`;
+    const btnRemover = document.getElementById('det-imagem-remover');
+    if (btnRemover) btnRemover.style.display = '';
+  });
+
+  document.getElementById('det-imagem-remover')?.addEventListener('click', () => {
+    personagem.imagem = '';
+    const preview = document.getElementById('det-imagem-preview');
+    if (preview) preview.textContent = detImagemInicial();
+    const btnRemover = document.getElementById('det-imagem-remover');
+    if (btnRemover) btnRemover.style.display = 'none';
   });
 }
 

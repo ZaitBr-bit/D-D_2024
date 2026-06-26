@@ -334,7 +334,7 @@ function renderCharCard(p) {
 
   return `
     <div class="card char-card" data-id="${escHtml(p.id)}">
-      <div class="char-avatar">${escHtml(inicial)}</div>
+      <div class="char-avatar">${p.imagem ? `<img src="${p.imagem}" alt="">` : escHtml(inicial)}</div>
       <div class="char-info">
         <div class="char-nome">${escHtml(p.nome) || 'Sem nome'}</div>
         <div class="char-detalhe">

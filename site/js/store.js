@@ -158,6 +158,7 @@ export function criarPersonagemVazio() {
   return {
     id: gerarId(),
     nome: '',
+    imagem: '',
     nivel: 1,
     xp: 0,
     exaustao: 0,
