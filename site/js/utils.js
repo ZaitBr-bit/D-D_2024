@@ -508,3 +508,47 @@ export function parsearCA(caStr) {
   const match = caStr.match(/^[+]?(\d+)/);
   return match ? parseInt(match[1]) : 10;
 }
+
+/**
+ * Lê um arquivo de imagem, redimensiona (mantendo proporção, máximo maxDim
+ * em qualquer lado) e retorna como data URL JPEG comprimido — pequeno o
+ * bastante pra guardar direto no objeto do personagem (localStorage + sync
+ * na nuvem) sem estourar limite de tamanho.
+ * @param {File} file - arquivo escolhido pelo usuário (input type=file)
+ * @param {number} maxDim - dimensão máxima em pixels (largura ou altura)
+ * @returns {Promise<string|null>} data URL da imagem redimensionada, ou null se inválido
+ */
+export function processarImagemArquivo(file, maxDim = 300) {
+  return new Promise((resolve) => {
+    if (!file || !file.type || !file.type.startsWith('image/')) {
+      resolve(null);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round(height * (maxDim / width));
+            width = maxDim;
+          } else {
+            width = Math.round(width * (maxDim / height));
+            height = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.8));
+      };
+      img.onerror = () => resolve(null);
+      img.src = ev.target.result;
+    };
+    reader.onerror = () => resolve(null);
+    reader.readAsDataURL(file);
+  });
+}

@@ -4,7 +4,7 @@
 import { CLASSES_INFO, PERICIAS, ATRIBUTOS_NOMES, ATRIBUTOS_KEYS, ATRIBUTO_NOME_PARA_KEY } from '../dados-classes.js';
 import { getPersonagem, salvarPersonagem, removerPersonagem } from '../store.js';
 import { getClasse, getMagiasClasse, getMagiasPorCirculo, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura, getTalentos, getEspecies } from '../db.js';
-import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagia, calcPercepcaoPassiva, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcBonusPericia, calcPVTotal, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, gerarId, detectarRecarga, ehHabilidadeAtiva, getDeslocamento, getTamanho, escHtml } from '../utils.js';
+import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagia, calcPercepcaoPassiva, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcBonusPericia, calcPVTotal, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, gerarId, detectarRecarga, ehHabilidadeAtiva, getDeslocamento, getTamanho, escHtml, processarImagemArquivo } from '../utils.js';
 import { podeSubirDeNivel, subirDeNivel, XP_POR_NIVEL, adicionarXP, obterTodasMagiasDominio, obterTodasMagiasSemprePreparadas, exigeEspecializacaoBardo, exigeEspecializacaoGuardiao, exigeEstiloLuta, exigeExploradorHabil, exigeAcademico } from '../levelup.js';
 import { abrirLevelUpCards } from '../levelup-ui.js';
 import { getSyncStatus, onSyncStatusChange } from '../sync.js';
@@ -2823,19 +2823,22 @@ function renderFichaCompleta() {
     <!-- Cabeçalho do personagem -->
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:8px">
-        <div>
-          <h2 style="font-size:1.3rem;margin-bottom:2px" id="char-nome-display">${escHtml(char.nome) || 'Sem Nome'}</h2>
-          <div style="font-size:0.9rem;color:var(--text-muted)">
-            ${escHtml(char.especie || '')} ${escHtml(char.classe || '')} ${char.subclasse ? `(${escHtml(char.subclasse)})` : ''} &middot; Nível ${char.nivel}
+        <div style="display:flex;align-items:start;gap:10px;flex:1;min-width:0">
+          <div style="flex:1;min-width:0">
+            <h2 style="font-size:1.3rem;margin-bottom:2px" id="char-nome-display">${escHtml(char.nome) || 'Sem Nome'}</h2>
+            <div style="font-size:0.9rem;color:var(--text-muted)">
+              ${escHtml(char.especie || '')} ${escHtml(char.classe || '')} ${char.subclasse ? `(${escHtml(char.subclasse)})` : ''} &middot; Nível ${char.nivel}
+            </div>
+            <div style="font-size:0.8rem;color:var(--text-muted)">Antecedente: ${escHtml(char.antecedente || '–')}${char.alinhamento ? ' | Alinhamento: ' + escHtml(char.alinhamento) : ''}</div>
+            <div style="font-size:0.8rem;color:var(--text-muted)">Tamanho: ${escHtml(_tamanho)}${(char.idiomas && char.idiomas.length) ? ' | Idiomas: ' + char.idiomas.map(escHtml).join(', ') : ''}</div>
+            ${(estadoGuardiao && estadoGuardiao.sentidosSelvagensAtivo) ? '<div style="font-size:0.8rem;color:var(--text-muted)">Sentidos: Visão às Cegas 9 m</div>' : ''}
+            ${(estadoGuardiao && estadoGuardiao.exaustao > 0) ? `<div style="font-size:0.8rem;color:var(--danger)">Exaustão: ${estadoGuardiao.exaustao}</div>` : ''}
+            <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">
+              XP: <span style="font-weight:600;color:var(--accent);cursor:pointer" id="xp-display" title="Clique para editar XP">${char.xp || 0}</span>
+              ${char.nivel < 20 ? ` / ${XP_POR_NIVEL[char.nivel + 1]}` : ' (Nível Máximo)'}
+            </div>
           </div>
-          <div style="font-size:0.8rem;color:var(--text-muted)">Antecedente: ${escHtml(char.antecedente || '–')}${char.alinhamento ? ' | Alinhamento: ' + escHtml(char.alinhamento) : ''}</div>
-          <div style="font-size:0.8rem;color:var(--text-muted)">Tamanho: ${escHtml(_tamanho)}${(char.idiomas && char.idiomas.length) ? ' | Idiomas: ' + char.idiomas.map(escHtml).join(', ') : ''}</div>
-          ${(estadoGuardiao && estadoGuardiao.sentidosSelvagensAtivo) ? '<div style="font-size:0.8rem;color:var(--text-muted)">Sentidos: Visão às Cegas 9 m</div>' : ''}
-          ${(estadoGuardiao && estadoGuardiao.exaustao > 0) ? `<div style="font-size:0.8rem;color:var(--danger)">Exaustão: ${estadoGuardiao.exaustao}</div>` : ''}
-          <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">
-            XP: <span style="font-weight:600;color:var(--accent);cursor:pointer" id="xp-display" title="Clique para editar XP">${char.xp || 0}</span>
-            ${char.nivel < 20 ? ` / ${XP_POR_NIVEL[char.nivel + 1]}` : ' (Nível Máximo)'}
-          </div>
+          ${char.imagem ? `<div class="char-avatar" style="width:64px;height:64px;font-size:1.6rem;flex-shrink:0"><img src="${char.imagem}" alt=""></div>` : ''}
         </div>
         <div class="no-print" style="display:flex;gap:4px;flex-direction:column">
           <div style="display:flex;gap:4px">
@@ -7440,6 +7443,17 @@ function setupEventosEdicao() {
         <input type="text" class="form-input" id="edit-nome" value="${escHtml(char.nome)}">
       </div>
       <div class="form-group">
+        <label class="form-label">Imagem</label>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="char-avatar" id="edit-imagem-preview" style="width:56px;height:56px;font-size:1.4rem">
+            ${char.imagem ? `<img src="${char.imagem}" alt="">` : escHtml((char.nome || char.classe || '?').charAt(0).toUpperCase() || '?')}
+          </div>
+          <button type="button" class="btn btn-sm btn-secondary" id="edit-imagem-btn">Trocar Foto</button>
+          <button type="button" class="btn btn-sm btn-danger" id="edit-imagem-remover" title="Remover imagem" style="${char.imagem ? '' : 'display:none'}">&times;</button>
+          <input type="file" accept="image/*" id="edit-imagem-input" style="display:none">
+        </div>
+      </div>
+      <div class="form-group">
         <label class="form-label" for="edit-alinhamento">Alinhamento</label>
         <select class="form-input" id="edit-alinhamento">
           <option value="">— Nenhum —</option>
@@ -7479,6 +7493,36 @@ function setupEventosEdicao() {
         `).join('')}
       </div>
     `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-edit">Salvar</button>');
+
+    const editImagemInicial = () => (char.nome || char.classe || '?').charAt(0).toUpperCase() || '?';
+
+    document.getElementById('edit-imagem-btn')?.addEventListener('click', () => {
+      document.getElementById('edit-imagem-input')?.click();
+    });
+
+    document.getElementById('edit-imagem-input')?.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      e.target.value = '';
+      if (!file) return;
+      const dataUrl = await processarImagemArquivo(file, 300);
+      if (!dataUrl) {
+        toast('Não foi possível processar essa imagem', 'error');
+        return;
+      }
+      char.imagem = dataUrl;
+      const preview = document.getElementById('edit-imagem-preview');
+      if (preview) preview.innerHTML = `<img src="${dataUrl}" alt="">`;
+      const btnRemover = document.getElementById('edit-imagem-remover');
+      if (btnRemover) btnRemover.style.display = '';
+    });
+
+    document.getElementById('edit-imagem-remover')?.addEventListener('click', () => {
+      char.imagem = '';
+      const preview = document.getElementById('edit-imagem-preview');
+      if (preview) preview.textContent = editImagemInicial();
+      const btnRemover = document.getElementById('edit-imagem-remover');
+      if (btnRemover) btnRemover.style.display = 'none';
+    });
 
     document.getElementById('btn-salvar-edit')?.addEventListener('click', () => {
       char.nome = document.getElementById('edit-nome')?.value?.trim() || char.nome;
