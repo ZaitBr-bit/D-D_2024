@@ -1568,9 +1568,17 @@ async function abrirModalRecursosBruxo() {
       }
     });
 
+    const novosTalentos = sincronizarTalentosInvocacoes();
+
     salvar();
     window.fecharModal();
     renderFichaCompleta();
+
+    // Se ganhou Iniciado em Magia via invocação (possivelmente mais de uma vez), abrir fluxo de escolha em cadeia
+    const qtdNovoIM = novosTalentos.filter(t => t === 'Iniciado em Magia').length;
+    if (qtdNovoIM > 0) {
+      abrirModalIniciadoEmMagiaFicha(qtdNovoIM);
+    }
   });
 }
 
@@ -2612,6 +2620,21 @@ function migrarMagiasSemprePreparadas() {
   // escolha manual — marcar para que a UI ofereça preencher o slot.
   if (slotsLiberados > 0) {
     char._slots_magia_livre = (char._slots_magia_livre || 0) + slotsLiberados;
+    alterado = true;
+  }
+
+  // Realocar truques sempre-preparados salvos errado como magias de 1º círculo
+  // (bug antigo: circulo 0 virava 1 e caía em magias_preparadas)
+  const circuloPorNome = new Map((magiasSempreCache || []).map(m => [m.nome, m.circulo]));
+  const realocar = char.magias_preparadas.filter(m => m.origem === 'sempre' && circuloPorNome.get(m.nome) === 0);
+  if (realocar.length > 0) {
+    if (!char.magias_conhecidas) char.magias_conhecidas = [];
+    for (const m of realocar) {
+      if (!char.magias_conhecidas.find(x => x.nome === m.nome)) {
+        char.magias_conhecidas.push({ nome: m.nome, circulo: 0, origem: 'sempre' });
+      }
+    }
+    char.magias_preparadas = char.magias_preparadas.filter(m => !(m.origem === 'sempre' && circuloPorNome.get(m.nome) === 0));
     alterado = true;
   }
 
@@ -7624,7 +7647,7 @@ async function abrirModalLevelUp() {
 
 // --- Talentos ---
 function renderSecaoTalentos() {
-  if (!char.talentos?.length) return '';
+  if (!char.talentos) char.talentos = [];
   
   // Buscar descrições dos talentos no cache
   const todosOsTalentos = [];
@@ -7636,8 +7659,11 @@ function renderSecaoTalentos() {
   
   return `
     <div class="card">
-      <div class="card-header"><h2>Talentos</h2></div>
-      ${char.talentos.map(t => {
+      <div class="card-header">
+        <h2>Talentos</h2>
+        <button class="btn btn-sm btn-accent no-print" id="btn-add-talento">+ Talento</button>
+      </div>
+      ${char.talentos.map((t, tIdx) => {
         const nome = typeof t === 'string' ? t : t.nome;
         // Busca exata primeiro; se não encontrar, tenta pelo nome base (sem parênteses)
         let talentoData = todosOsTalentos.find(td => td.nome === nome);
@@ -7649,20 +7675,25 @@ function renderSecaoTalentos() {
         const beneficios = talentoData?.beneficios || [];
 
         // Informações de escolhas específicas do talento
+        // Entradas podem vir com sufixo de lista do antecedente, ex. "Iniciado em Magia (Clérigo)"
+        const _ehIM = (n) => n.replace(/\s*\(.*\)$/, '').trim() === 'Iniciado em Magia';
         let infoEscolhas = '';
-        if (nome === 'Iniciado em Magia') {
+        if (_ehIM(nome)) {
           // Formato novo: array de instâncias
           const instancias = char.iniciado_em_magia_instancias || [];
           // Formato legado (pré-migração)
           const legado = char.iniciado_em_magia?.lista ? [char.iniciado_em_magia] : [];
           const todas = instancias.length > 0 ? instancias : legado;
-          if (todas.length > 0) {
-            infoEscolhas = todas.map((im, idx) => `<div class="info-box info" style="font-size:0.8rem;margin-top:6px">
-              ${todas.length > 1 ? `<strong>Instância ${idx + 1}:</strong> ` : ''}
-              <strong>Lista:</strong> ${im.lista} | <strong>Atributo:</strong> ${im.atributo || '—'}
+          // Cada entrada "Iniciado em Magia" em char.talentos corresponde a UMA instância,
+          // pela posição ordinal entre as entradas com esse nome (evita listar todas em cada uma)
+          const ordinal = char.talentos.slice(0, tIdx).filter(x => _ehIM(typeof x === 'string' ? x : x.nome || '')).length;
+          const im = todas[ordinal];
+          if (im) {
+            infoEscolhas = `<div class="info-box info" style="font-size:0.8rem;margin-top:6px">
+              <strong>Lista:</strong> ${im.lista} | <strong>Atributo:</strong> ${ATRIBUTOS_NOMES[im.atributo] || im.atributo || '—'}
               <br><strong>Truques:</strong> ${(im.truques || []).join(', ') || '—'}
               <br><strong>Magia 1o Círculo:</strong> ${im.magia || '—'}
-            </div>`).join('');
+            </div>`;
           }
         }
         if (nome === 'Adepto Elemental') {
@@ -7730,6 +7761,35 @@ function renderSecaoTalentos() {
   `;
 }
 
+/** Sincroniza char.talentos com talentos concedidos por invocações (Lições dos Grandes Antigos) */
+function sincronizarTalentosInvocacoes() {
+  const invs = char.recursos?.bruxo?.invocacoes || [];
+  const desejados = invs
+    .filter(i => semAcento(i.nome || '') === semAcento('Lições dos Grandes Antigos') && i.talento)
+    .map(i => i.talento);
+  if (!char.talentos) char.talentos = [];
+
+  // Remover TODAS as entradas que esta função adicionou anteriormente (tag própria) —
+  // nunca toca em entradas manuais (string simples) ou de outras origens.
+  char.talentos = char.talentos.filter(t => !(typeof t === 'object' && t?.origem === 'invocacao_grandes_antigos'));
+
+  // Recriar entradas para o estado atual desejado
+  const anteriores = char.talentos_via_invocacao || [];
+  const novos = [];
+  const contagemAnteriores = {};
+  anteriores.forEach(t => { contagemAnteriores[t] = (contagemAnteriores[t] || 0) + 1; });
+  const contagemAtual = {};
+  for (const t of desejados) {
+    contagemAtual[t] = (contagemAtual[t] || 0) + 1;
+    char.talentos.push({ nome: t, origem: 'invocacao_grandes_antigos' });
+    if (contagemAtual[t] > (contagemAnteriores[t] || 0)) {
+      novos.push(t);
+    }
+  }
+  char.talentos_via_invocacao = desejados;
+  return novos;
+}
+
 /** Migra formato antigo de Iniciado em Magia (objeto) para array de instâncias */
 function migrarIniciadoEmMagiaInstancias() {
   if (char.iniciado_em_magia && typeof char.iniciado_em_magia === 'object' && !Array.isArray(char.iniciado_em_magia)) {
@@ -7770,6 +7830,177 @@ function obterListasIniciadoEmMagiaUsadas() {
     usadas.push(char.iniciado_em_magia.lista);
   }
   return usadas;
+}
+
+/** Modal para escolher lista/atributo/truques/magia de uma nova instância de Iniciado em Magia */
+async function abrirModalIniciadoEmMagiaFicha(restantes = 1) {
+  const listasUsadas = obterListasIniciadoEmMagiaUsadas();
+  const listas = ['Clérigo', 'Druida', 'Mago'].filter(l => !listasUsadas.includes(l));
+  if (listas.length === 0) {
+    toast('Todas as listas de Iniciado em Magia já foram usadas', 'error');
+    return;
+  }
+
+  const estado = { lista: '', atributo: 'sabedoria', truques: [], magia: '' };
+
+  const renderCorpo = () => `
+    <div class="info-box info" style="font-size:0.8rem">Escolha a lista, o atributo de conjuração, 2 truques e 1 magia de 1º círculo.</div>
+    <label class="form-label">Lista de magias</label>
+    <select class="form-input" id="im-ficha-lista">
+      <option value="">Selecione...</option>
+      ${listas.map(l => `<option value="${l}" ${estado.lista === l ? 'selected' : ''}>${l}</option>`).join('')}
+    </select>
+    <label class="form-label" style="margin-top:8px">Atributo de conjuração</label>
+    <select class="form-input" id="im-ficha-atributo">
+      ${[['inteligencia', 'Inteligência'], ['sabedoria', 'Sabedoria'], ['carisma', 'Carisma']].map(([k, n]) => `<option value="${k}" ${estado.atributo === k ? 'selected' : ''}>${n}</option>`).join('')}
+    </select>
+    <div id="im-ficha-magias" style="margin-top:8px"></div>
+  `;
+
+  abrirModal('Iniciado em Magia — Escolhas', `<div id="im-ficha-conteudo">${renderCorpo()}</div>`,
+    '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-im-ficha">Salvar</button>');
+
+  const renderMagias = async () => {
+    const area = document.getElementById('im-ficha-magias');
+    if (!area) return;
+    if (!estado.lista) { area.innerHTML = ''; return; }
+    const dados = await getMagiasClasse(estado.lista);
+    const listaMagias = dados?.lista_magias || {};
+    const truquesDisp = (listaMagias['Truques'] || []).map(m => typeof m === 'string' ? { nome: m } : m);
+    const c1Disp = (listaMagias['1º Círculo'] || []).map(m => typeof m === 'string' ? { nome: m } : m);
+
+    // Truques/magias já conhecidos por outra fonte — impede escolher duplicata sem ganho
+    const jaTemTruqueIM = new Set((char.magias_conhecidas || []).filter(m => m.circulo === 0).map(m => m.nome));
+    const jaTemMagiaIM = new Set([
+      ...(char.magias_preparadas || []).map(m => m.nome),
+      ...(char.magias_conhecidas || []).filter(m => m.circulo === 1).map(m => m.nome)
+    ]);
+
+    area.innerHTML = `
+      <div style="font-weight:600;font-size:0.85rem">Truques (<span id="im-ficha-truques-count">${estado.truques.length}</span>/2)</div>
+      <div style="max-height:25vh;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:4px;margin:4px 0">
+        ${truquesDisp.map(m => {
+          const bloqueado = jaTemTruqueIM.has(m.nome) && !estado.truques.includes(m.nome);
+          return `
+          <label style="display:flex;align-items:center;gap:4px;font-size:0.82rem;padding:2px 4px;border:1px solid var(--border-light);border-radius:4px${bloqueado ? ';opacity:0.4' : ''}">
+            <input type="checkbox" class="im-ficha-truque" value="${m.nome}" ${estado.truques.includes(m.nome) ? 'checked' : ''} ${bloqueado ? 'disabled' : ''}> ${m.nome}${bloqueado ? ' (já conhecido)' : ''}
+          </label>
+        `;
+        }).join('')}
+      </div>
+      <div style="font-weight:600;font-size:0.85rem;margin-top:8px">Magia de 1º Círculo</div>
+      <select class="form-input" id="im-ficha-magia">
+        <option value="">Selecione...</option>
+        ${c1Disp.map(m => {
+          const bloqueado = jaTemMagiaIM.has(m.nome) && estado.magia !== m.nome;
+          return `<option value="${m.nome}" ${estado.magia === m.nome ? 'selected' : ''} ${bloqueado ? 'disabled' : ''}>${m.nome}${bloqueado ? ' (já conhecida)' : ''}</option>`;
+        }).join('')}
+      </select>
+    `;
+
+    area.querySelectorAll('.im-ficha-truque').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const marcados = [...area.querySelectorAll('.im-ficha-truque:checked')].map(c => c.value);
+        if (marcados.length > 2) { cb.checked = false; return; }
+        estado.truques = [...area.querySelectorAll('.im-ficha-truque:checked')].map(c => c.value);
+        const cnt = document.getElementById('im-ficha-truques-count');
+        if (cnt) cnt.textContent = estado.truques.length;
+      });
+    });
+    document.getElementById('im-ficha-magia')?.addEventListener('change', (e) => { estado.magia = e.target.value; });
+  };
+
+  document.getElementById('im-ficha-lista')?.addEventListener('change', async (e) => {
+    estado.lista = e.target.value;
+    estado.truques = [];
+    estado.magia = '';
+    await renderMagias();
+  });
+  document.getElementById('im-ficha-atributo')?.addEventListener('change', (e) => { estado.atributo = e.target.value; });
+
+  document.getElementById('btn-salvar-im-ficha')?.addEventListener('click', () => {
+    if (!estado.lista) { toast('Selecione a lista de magias', 'error'); return; }
+    if (estado.truques.length < 2) { toast('Selecione 2 truques', 'error'); return; }
+    if (!estado.magia) { toast('Selecione 1 magia de 1º círculo', 'error'); return; }
+
+    if (!char.iniciado_em_magia_instancias) char.iniciado_em_magia_instancias = [];
+    char.iniciado_em_magia_instancias.push({
+      lista: estado.lista,
+      atributo: estado.atributo,
+      truques: [...estado.truques],
+      magia: estado.magia
+    });
+    if (!char.magias_conhecidas) char.magias_conhecidas = [];
+    for (const nome of estado.truques) {
+      if (!char.magias_conhecidas.find(m => m.nome === nome)) {
+        char.magias_conhecidas.push({ nome, circulo: 0, origem: 'iniciado_em_magia' });
+      }
+    }
+    if (!char.magias_preparadas) char.magias_preparadas = [];
+    if (!char.magias_preparadas.find(m => m.nome === estado.magia)) {
+      char.magias_preparadas.push({ nome: estado.magia, circulo: 1, origem: 'iniciado_em_magia', gratis_usado: false });
+    }
+
+    salvar();
+    window.fecharModal();
+    renderFichaCompleta();
+    toast('Iniciado em Magia configurado!', 'success');
+
+    if (restantes > 1) {
+      abrirModalIniciadoEmMagiaFicha(restantes - 1);
+    }
+  });
+}
+
+/** Modal para adicionar um talento manualmente à ficha */
+async function abrirModalAdicionarTalento() {
+  const data = talentosCache || await getTalentos();
+  const categorias = Object.keys(data?.por_categoria || {});
+  if (categorias.length === 0) { toast('Não foi possível carregar os talentos', 'error'); return; }
+
+  const jaTem = new Set((char.talentos || []).map(t => typeof t === 'string' ? t : t.nome));
+  const ehRepetivel = (talento) => (talento.beneficios || []).some(b => b.nome === 'Repetível');
+
+  const renderOpcoes = (cat) => {
+    const lista = (data.por_categoria[cat] || []);
+    return lista.map(t => {
+      const bloqueado = jaTem.has(t.nome) && !ehRepetivel(t);
+      return `<option value="${t.nome}" ${bloqueado ? 'disabled' : ''}>${t.nome}${bloqueado ? ' (já possui)' : ''}</option>`;
+    }).join('');
+  };
+
+  abrirModal('Adicionar Talento', `
+    <div class="info-box warning" style="font-size:0.8rem">Use para talentos concedidos fora do fluxo normal (invocações, bênçãos do Mestre etc.). Efeitos com escolhas (perícias, magias) podem exigir configuração manual.</div>
+    <label class="form-label">Categoria</label>
+    <select class="form-input" id="add-tal-categoria">
+      ${categorias.map(c => `<option value="${c}">${c}</option>`).join('')}
+    </select>
+    <label class="form-label" style="margin-top:8px">Talento</label>
+    <select class="form-input" id="add-tal-nome">
+      <option value="">Selecione...</option>
+      ${renderOpcoes(categorias[0])}
+    </select>
+  `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-confirmar-add-talento">Adicionar</button>');
+
+  document.getElementById('add-tal-categoria')?.addEventListener('change', (e) => {
+    const sel = document.getElementById('add-tal-nome');
+    if (sel) sel.innerHTML = `<option value="">Selecione...</option>` + renderOpcoes(e.target.value);
+  });
+
+  document.getElementById('btn-confirmar-add-talento')?.addEventListener('click', () => {
+    const nome = document.getElementById('add-tal-nome')?.value;
+    if (!nome) { toast('Selecione um talento', 'error'); return; }
+    if (!char.talentos) char.talentos = [];
+    char.talentos.push(nome);
+    salvar();
+    window.fecharModal();
+    renderFichaCompleta();
+    if (nome === 'Iniciado em Magia') {
+      abrirModalIniciadoEmMagiaFicha();
+    } else {
+      toast(`Talento "${nome}" adicionado`, 'success');
+    }
+  });
 }
 
 /** Retorna tipos de dano já usados pelo talento Adepto Elemental */
@@ -10909,7 +11140,8 @@ function renderSecaoMagias() {
   const truquesEspecie = todosTruques.filter(m => m.origem === 'especie');
   const _origensTalento = ['iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
   const truquesTalento = todosTruques.filter(m => _origensTalento.includes(m.origem));
-  const truquesClasse = todosTruques.filter(m => m.origem !== 'especie' && !_origensTalento.includes(m.origem));
+  const truquesSempre = todosTruques.filter(m => m.origem === 'sempre');
+  const truquesClasse = todosTruques.filter(m => m.origem !== 'especie' && m.origem !== 'sempre' && !_origensTalento.includes(m.origem));
   const preparadas = char.magias_preparadas || [];
   const espacos = char.espacos_magia || {};
 
@@ -11002,6 +11234,12 @@ function renderSecaoMagias() {
           <div class="magia-contador contador-dominio">
             <span class="contador-label">Truques (Talento)</span>
             <span class="contador-valor">${truquesTalento.length}</span>
+          </div>
+        ` : ''}
+        ${truquesSempre.length > 0 ? `
+          <div class="magia-contador contador-dominio">
+            <span class="contador-label">Truques (Subclasse)</span>
+            <span class="contador-valor">${truquesSempre.length}</span>
           </div>
         ` : ''}
         ${maxPreparadas > 0 ? `
@@ -11122,7 +11360,7 @@ function renderSecaoMagias() {
       ${todosTruques.length > 0 ? `
         <details id="details-truques"${_truquesColapsados ? '' : ' open'} style="margin-bottom:8px">
           <summary style="font-weight:700;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--border-light)">
-            Truques (${truquesClasse.length}${maxTruques ? ' / ' + maxTruques : ''}${truquesEspecie.length > 0 ? ` + ${truquesEspecie.length} espécie` : ''}${truquesTalento.length > 0 ? ` + ${truquesTalento.length} talento` : ''})
+            Truques (${truquesClasse.length}${maxTruques ? ' / ' + maxTruques : ''}${truquesEspecie.length > 0 ? ` + ${truquesEspecie.length} espécie` : ''}${truquesTalento.length > 0 ? ` + ${truquesTalento.length} talento` : ''}${truquesSempre.length > 0 ? ` + ${truquesSempre.length} subclasse` : ''})
           </summary>
           <div style="padding-top:4px">
             ${truquesEspecie.slice().sort((a, b) => prioridadeConjuracao(a.nome) - prioridadeConjuracao(b.nome)).map(m => `
@@ -11145,6 +11383,19 @@ function renderSecaoMagias() {
                     <div class="magia-nome"><span class="badge-dominio">&#9733;</span> ${m.nome}</div>
                     ${badgesMagiaRapidos(m.nome)}
                     <div style="font-size:0.65rem;color:var(--secondary);font-weight:600;margin-top:1px">${rotuloOrigemMagia(m)}</div>
+                  </div>
+                  <button class="btn btn-sm btn-cantrip" data-lancar-truque="${m.nome}">Lançar</button>
+                </div>
+                <div class="magia-desc"></div>
+              </div>
+            `).join('')}
+            ${truquesSempre.slice().sort((a, b) => prioridadeConjuracao(a.nome) - prioridadeConjuracao(b.nome)).map(m => `
+              <div class="magia-item magia-dominio" data-magia-nome="${m.nome}" data-magia-circ="0">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div class="magia-nome"><span class="badge-dominio">&#9733;</span> ${m.nome}</div>
+                    ${badgesMagiaRapidos(m.nome)}
+                    <div style="font-size:0.65rem;color:var(--secondary);font-weight:600;margin-top:1px">Subclasse</div>
                   </div>
                   <button class="btn btn-sm btn-cantrip" data-lancar-truque="${m.nome}">Lançar</button>
                 </div>
@@ -12174,31 +12425,48 @@ function setupEventosEspacosMagia() {
     renderFichaCompleta();
   }
 
+  // Rastreia concentração genérica (magias de concentração sem mecânica própria em
+  // MAGIAS_EFEITO aplicada a si mesmo) — mesmo padrão usado na conjuração normal (não-grátis)
+  function _rastrearConcentracaoGenerica(nome, circulo) {
+    if (!ehMagiaConcentracao(nome)) return;
+    if (!char.efeitos_magicos) char.efeitos_magicos = [];
+    char.efeitos_magicos = char.efeitos_magicos.filter(e => !e.concentracao);
+    char.efeitos_magicos.push({ nome, tipo: 'concentracao_generica', concentracao: true, circulo: circulo || 0, rotulo: `Concentrando em ${nome}` });
+  }
+
   // Função auxiliar para conjuração gratuita (talentos)
   function _executarConjuracaoGratis(entrada, nome) {
     entrada.gratis_usado = true;
 
     // Aplicar efeito mágico se existir
     const config = MAGIAS_EFEITO[nome];
+    let efeitoAplicadoSelf = false;
     if (config) {
       const precisaAlvo = config.permite_self && config.permite_outro;
       const autoSelf = config.permite_self && !config.permite_outro;
 
       if (precisaAlvo) {
         mostrarModalAlvoMagia(nome, entrada.circulo, (alvo) => {
-          if (alvo === 'self') aplicarEfeitoMagia(nome, entrada.circulo);
+          if (alvo === 'self') {
+            aplicarEfeitoMagico(nome, entrada.circulo);
+          } else {
+            // Efeito aplicado em outra criatura: aplicarEfeitoMagico já cuida da
+            // concentração quando o alvo é self; quando é "outro", rastrear aqui
+            _rastrearConcentracaoGenerica(nome, entrada.circulo);
+          }
           toast(`${nome} conjurada gratuitamente (talento)!`, 'success');
           salvar();
           renderFichaCompleta();
         });
         return;
       }
-      if (autoSelf) aplicarEfeitoMagia(nome, entrada.circulo);
+      if (autoSelf) { aplicarEfeitoMagico(nome, entrada.circulo); efeitoAplicadoSelf = true; }
     }
 
-    // Concentração
-    if (ehMagiaConcentracao(nome)) {
-      setConcentracao(nome);
+    // Concentração genérica (só quando o efeito não foi aplicado a si mesmo acima —
+    // aplicarEfeitoMagico já cuida da concentração nesse caso)
+    if (!efeitoAplicadoSelf) {
+      _rastrearConcentracaoGenerica(nome, entrada.circulo);
     }
 
     toast(`${nome} conjurada gratuitamente (talento)!`, 'success');
@@ -12319,6 +12587,9 @@ function setupEventosEspacosMagia() {
 
   // Adicionar magia do livro
   document.getElementById('btn-add-magia')?.addEventListener('click', () => mostrarBuscaMagia());
+
+  // Adicionar talento manualmente
+  document.getElementById('btn-add-talento')?.addEventListener('click', () => abrirModalAdicionarTalento());
 
   // Preencher slot de magia liberado por ajuste automático (bug de magia passiva duplicada)
   document.getElementById('btn-preencher-slot-magia')?.addEventListener('click', () => abrirPreenchimentoSlotMagia());
@@ -15346,7 +15617,7 @@ async function gerarHtmlImpressao() {
     }
 
     pag2 += `<div class="print-section"><div class="print-section-title">Talentos</div>`;
-    char.talentos.forEach(t => {
+    char.talentos.forEach((t, tIdx) => {
       const nome = typeof t === 'string' ? t : t.nome;
       let talentoData = todosOsTalentos.find(td => td.nome === nome);
       if (!talentoData) {
@@ -15357,18 +15628,21 @@ async function gerarHtmlImpressao() {
       const beneficios = talentoData?.beneficios || [];
       const catBadge = talentoData?.categoria ? `<span class="print-feature-badge">${talentoData.categoria}</span>` : '';
 
+      // Entradas podem vir com sufixo de lista do antecedente, ex. "Iniciado em Magia (Clérigo)"
+      const _ehIMPrint = (n) => n.replace(/\s*\(.*\)$/, '').trim() === 'Iniciado em Magia';
       let infoEscolhas = '';
-      if (nome === 'Iniciado em Magia') {
+      if (_ehIMPrint(nome)) {
         const instancias = char.iniciado_em_magia_instancias || [];
-        if (instancias.length > 0) {
-          infoEscolhas = instancias.map((im, idx) =>
-            `<div style="margin-top:1mm;font-size:7.5pt;border:0.5px solid #ccc;padding:1mm 2mm;border-radius:2px">
-              ${instancias.length > 1 ? `<strong>Instancia ${idx + 1}:</strong> ` : ''}
-              <strong>Lista:</strong> ${im.lista} | <strong>Atributo:</strong> ${im.atributo || '—'}
-              | <strong>Truques:</strong> ${(im.truques || []).join(', ') || '—'}
-              | <strong>Magia:</strong> ${im.magia || '—'}
-            </div>`
-          ).join('');
+        // Cada entrada "Iniciado em Magia" em char.talentos corresponde a UMA instância,
+        // pela posição ordinal entre as entradas com esse nome (evita listar todas em cada uma)
+        const ordinal = char.talentos.slice(0, tIdx).filter(x => _ehIMPrint(typeof x === 'string' ? x : x.nome || '')).length;
+        const im = instancias[ordinal];
+        if (im) {
+          infoEscolhas = `<div style="margin-top:1mm;font-size:7.5pt;border:0.5px solid #ccc;padding:1mm 2mm;border-radius:2px">
+            <strong>Lista:</strong> ${im.lista} | <strong>Atributo:</strong> ${ATRIBUTOS_NOMES[im.atributo] || im.atributo || '—'}
+            | <strong>Truques:</strong> ${(im.truques || []).join(', ') || '—'}
+            | <strong>Magia:</strong> ${im.magia || '—'}
+          </div>`;
         }
       }
       if (nome === 'Adepto Elemental') {

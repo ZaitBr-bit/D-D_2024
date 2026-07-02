@@ -379,7 +379,7 @@ export async function obterMagiasSemprePreparadasNivel(classe, subclasse, nivel)
   return [...nomes]
     .map(nome => {
       const m = idx.find(x => x.nome === nome);
-      return m ? { nome, circulo: m.circulo || 1 } : null;
+      return m ? { nome, circulo: (m.circulo ?? 1) } : null;
     })
     .filter(Boolean);
 }
@@ -765,12 +765,17 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     }
   }
 
-  // Adicionar automaticamente magias sempre preparadas
+  // Adicionar automaticamente magias sempre preparadas (truques vão para magias_conhecidas)
   const magiasSempre = await obterMagiasSemprePreparadasNivel(personagem.classe, subclasseAtual, novoNivel);
   if (magiasSempre.length > 0) {
     if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
+    if (!personagem.magias_conhecidas) personagem.magias_conhecidas = [];
     for (const magia of magiasSempre) {
-      if (!personagem.magias_preparadas.find(m => m.nome === magia.nome)) {
+      if (magia.circulo === 0) {
+        if (!personagem.magias_conhecidas.find(m => m.nome === magia.nome)) {
+          personagem.magias_conhecidas.push({ ...magia, origem: 'sempre' });
+        }
+      } else if (!personagem.magias_preparadas.find(m => m.nome === magia.nome)) {
         personagem.magias_preparadas.push({ ...magia, origem: 'sempre' });
       }
     }
