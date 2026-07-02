@@ -11,7 +11,7 @@ import {
   renderCardEscolhasClasse, renderCardMagias, renderCardManobrasGuerreiro, renderCardRevisao
 } from './levelup-cards.js';
 import { collectOpcoes, validateAll } from './levelup-validations.js';
-import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ATRIBUTO_NOME_PARA_KEY, PERICIAS } from './dados-classes.js';
+import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, PERICIAS } from './dados-classes.js';
 import { getMagiasPorCirculo, getMagiasClasse } from './db.js';
 import { abrirModal, fecharModal, toast, mdParaHtml, semAcento, calcMod, getEspacosMagia } from './utils.js';
 import { subirDeNivel } from './levelup.js';
@@ -592,7 +592,8 @@ function renderEscolhasTalento(nome, talentoData, ctx) {
 
   if (nome === 'Iniciado em Magia') {
     const listasUsadas = ctx.helpers.obterListasIniciadoEmMagiaUsadas?.() || [];
-    const listasDisponiveis = ['Bardo', 'Bruxo', 'Clérigo', 'Druida', 'Feiticeiro', 'Mago']
+    // Regra 2024: apenas listas de Clérigo, Druida ou Mago
+    const listasDisponiveis = ['Clérigo', 'Druida', 'Mago']
       .filter(l => !listasUsadas.includes(l));
     html += `
       <div style="font-weight:600;font-size:0.85rem;margin-top:8px">Lista de Magias</div>
@@ -665,37 +666,46 @@ function bindEscolhasTalento(nome, talentoData, ctx) {
       const lista = selLista.value;
       if (!lista) return;
 
-      // Atributo
-      const attrMap = {
-        'Bardo': 'Carisma', 'Bruxo': 'Carisma', 'Feiticeiro': 'Carisma',
-        'Clérigo': 'Sabedoria', 'Druida': 'Sabedoria', 'Mago': 'Inteligência'
-      };
-      const atributoConjuracao = attrMap[lista] || 'Carisma';
-      const chaveAttr = ATRIBUTO_NOME_PARA_KEY[atributoConjuracao] || 'carisma';
+      // Atributo: Inteligência, Sabedoria ou Carisma à escolha (padrão sugerido pela lista)
+      const attrPadrao = { 'Clérigo': 'sabedoria', 'Druida': 'sabedoria', 'Mago': 'inteligencia' }[lista] || 'carisma';
       const attrContainer = document.getElementById('levelup-im-atributo-container');
       if (attrContainer) {
         attrContainer.innerHTML = `
-          <div style="font-size:0.85rem;margin:4px 0">Atributo: <strong>${atributoConjuracao}</strong></div>
-          <input type="hidden" id="levelup-im-atributo" value="${chaveAttr}">
+          <div style="font-weight:600;font-size:0.85rem;margin-top:8px">Atributo de Conjuração</div>
+          <select id="levelup-im-atributo" class="form-input" style="width:100%;margin:4px 0">
+            ${['inteligencia', 'sabedoria', 'carisma'].map(k => `<option value="${k}" ${k === attrPadrao ? 'selected' : ''}>${ATRIBUTOS_NOMES[k]}</option>`).join('')}
+          </select>
         `;
         attrContainer.style.display = 'block';
       }
 
-      // Carregar truques da lista
-      const magiasLista = await getMagiasClasse(lista.toLowerCase());
-      const truquesLista = (magiasLista || []).filter(m => m.circulo === 0);
-      const magiasCirc1 = (magiasLista || []).filter(m => m.circulo === 1);
+      // Carregar truques da lista (JSON tem formato { classe, lista_magias: { 'Truques': [...], '1º Círculo': [...] } })
+      const dadosMagias = await getMagiasClasse(lista);
+      if (selLista.value !== lista) return; // usuário trocou a lista antes desta resposta chegar
+      const listaMagias = dadosMagias?.lista_magias || {};
+      const truquesLista = (listaMagias['Truques'] || []).map(m => typeof m === 'string' ? { nome: m } : m);
+      const magiasCirc1 = (listaMagias['1º Círculo'] || []).map(m => typeof m === 'string' ? { nome: m } : m);
+
+      // Truques/magias já conhecidos por outra fonte — impede escolher duplicata sem ganho
+      const jaTemTruqueIM = new Set((ctx.char.magias_conhecidas || []).filter(m => m.circulo === 0).map(m => m.nome));
+      const jaTemMagiaIM = new Set([
+        ...(ctx.char.magias_preparadas || []).map(m => m.nome),
+        ...(ctx.char.magias_conhecidas || []).filter(m => m.circulo === 1).map(m => m.nome)
+      ]);
 
       const truquesContainer = document.getElementById('levelup-im-truques-container');
       if (truquesContainer) {
         truquesContainer.innerHTML = `
           <div style="font-weight:600;font-size:0.85rem;margin-top:8px">Truques (2)</div>
           <div style="max-height:20vh;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:4px;margin:4px 0">
-            ${truquesLista.map(m => `
-              <label style="display:flex;align-items:center;gap:4px;font-size:0.82rem;padding:2px 4px;border:1px solid var(--border-light);border-radius:4px">
-                <input type="checkbox" class="levelup-im-truque" value="${m.nome}"> ${m.nome}
+            ${truquesLista.map(m => {
+              const bloqueado = jaTemTruqueIM.has(m.nome);
+              return `
+              <label style="display:flex;align-items:center;gap:4px;font-size:0.82rem;padding:2px 4px;border:1px solid var(--border-light);border-radius:4px${bloqueado ? ';opacity:0.4' : ''}">
+                <input type="checkbox" class="levelup-im-truque" value="${m.nome}" ${bloqueado ? 'disabled' : ''}> ${m.nome}${bloqueado ? ' (já conhecido)' : ''}
               </label>
-            `).join('')}
+            `;
+            }).join('')}
           </div>
           <div style="font-size:0.8rem;color:var(--text-muted)">Selecionados: <span id="levelup-im-truques-count">0</span>/2</div>
         `;
@@ -718,7 +728,7 @@ function bindEscolhasTalento(nome, talentoData, ctx) {
           <div style="font-weight:600;font-size:0.85rem;margin-top:8px">Magia de 1º Círculo (1)</div>
           <select id="levelup-im-magia" class="form-input" style="width:100%;margin:4px 0">
             <option value="">-- Selecione --</option>
-            ${magiasCirc1.map(m => `<option value="${m.nome}">${m.nome}</option>`).join('')}
+            ${magiasCirc1.map(m => `<option value="${m.nome}" ${jaTemMagiaIM.has(m.nome) ? 'disabled' : ''}>${m.nome}${jaTemMagiaIM.has(m.nome) ? ' (já conhecida)' : ''}</option>`).join('')}
           </select>
         `;
         magiaContainer.style.display = 'block';

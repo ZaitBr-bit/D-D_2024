@@ -760,7 +760,7 @@ function validarStep() {
     case 'magias': {
       // Validar seleção de truques e magias para conjuradores
       const infoMagia = CLASSES_INFO[personagem.classe];
-      const _temIM = (personagem.talentos || []).includes('Iniciado em Magia');
+      const _temIM = (personagem.talentos || []).some(t => _nomeBaseTalento(t) === 'Iniciado em Magia');
 
       if (infoMagia?.conjurador) {
         const tabelaCaract = dadosCache.classeData?.tabela_caracteristicas;
@@ -791,13 +791,24 @@ function validarStep() {
         }
       }
 
-      // Validar Iniciado em Magia
+      // Validar Iniciado em Magia (todas as instâncias)
       if (_temIM) {
-        const im = personagem.iniciado_em_magia;
-        if (!im?.lista) { toast('Iniciado em Magia: selecione a lista de magias', 'error'); return false; }
-        if (!im?.atributo) { toast('Iniciado em Magia: selecione o atributo de conjuração', 'error'); return false; }
-        if ((im?.truques || []).length < 2) { toast('Iniciado em Magia: selecione 2 truques', 'error'); return false; }
-        if (!im?.magia) { toast('Iniciado em Magia: selecione 1 magia de 1o círculo', 'error'); return false; }
+        const instancias = personagem.iniciado_em_magia_instancias || [];
+        const numEsperado = _contarInstanciasIM();
+        for (let i = 0; i < numEsperado; i++) {
+          const im = instancias[i];
+          const rotulo = numEsperado > 1 ? `Iniciado em Magia (${i + 1})` : 'Iniciado em Magia';
+          if (!im?.lista) { toast(`${rotulo}: selecione a lista de magias`, 'error'); return false; }
+          if (!im?.atributo) { toast(`${rotulo}: selecione o atributo de conjuração`, 'error'); return false; }
+          if ((im?.truques || []).length < 2) { toast(`${rotulo}: selecione 2 truques`, 'error'); return false; }
+          if (!im?.magia) { toast(`${rotulo}: selecione 1 magia de 1o círculo`, 'error'); return false; }
+        }
+        // Listas devem ser diferentes entre instâncias
+        const listas = instancias.slice(0, numEsperado).map(i => i.lista);
+        if (new Set(listas).size < listas.length) {
+          toast('Iniciado em Magia: cada instância deve usar uma lista de magias diferente', 'error');
+          return false;
+        }
       }
       return true;
     }
@@ -965,20 +976,20 @@ async function finalizar() {
     }
   }
 
-  // Adicionar magias do Iniciado em Magia (truques e magia de 1o circulo)
-  if (personagem.iniciado_em_magia?.lista) {
-    const im = personagem.iniciado_em_magia;
+  // Adicionar magias do Iniciado em Magia (truques e magia de 1o circulo) — todas as instâncias
+  for (const im of (personagem.iniciado_em_magia_instancias || [])) {
+    if (!im?.lista) continue;
     if (!personagem.magias_conhecidas) personagem.magias_conhecidas = [];
     for (const nome of (im.truques || [])) {
       if (!personagem.magias_conhecidas.find(m => m.nome === nome)) {
         personagem.magias_conhecidas.push({ nome, circulo: 0, origem: 'iniciado_em_magia' });
       }
     }
-    // A magia de 1o circulo fica sempre preparada (origem especial)
+    // A magia de 1o circulo fica sempre preparada (origem especial, 1 uso grátis por descanso longo)
     if (im.magia) {
       if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
       if (!personagem.magias_preparadas.find(m => m.nome === im.magia)) {
-        personagem.magias_preparadas.push({ nome: im.magia, circulo: 1, origem: 'iniciado_em_magia' });
+        personagem.magias_preparadas.push({ nome: im.magia, circulo: 1, origem: 'iniciado_em_magia', gratis_usado: false });
       }
     }
   }
@@ -1631,6 +1642,12 @@ function abrirPopupEspecie(nome) {
         toast('Selecione um Talento de Origem (Versatil)', 'error');
         return;
       }
+      // Verificar conflito: mesmo talento não-repetível já escolhido no antecedente
+      const _talentosOrigemRepetiveisEsp = ['Habilidoso', 'Iniciado em Magia'];
+      if (personagem.talento_antecedente && personagem.talento_antecedente === selectVersatil.value && !_talentosOrigemRepetiveisEsp.includes(selectVersatil.value)) {
+        toast(`O talento "${selectVersatil.value}" já está selecionado no Antecedente e não é repetível. Escolha outro talento aqui.`, 'error');
+        return;
+      }
       personagem.talento_versatil = selectVersatil.value;
 
       // Validar e salvar escolhas do talento Versatil (Habilidoso, Artifista, Musico)
@@ -1666,6 +1683,9 @@ function abrirPopupEspecie(nome) {
     }
     personagem.especie = nome;
     personagem.tracos_escolhidos = [...selecionadosTemp];
+    // Sincronizar personagem.talentos com o estado atual de talento_versatil
+    // (cobre tanto a seleção quanto a limpeza ao trocar de espécie)
+    _reconstruirTalentosBase();
     window.fecharModal();
     // Re-renderizar o passo com o resumo
     const wizContent = document.getElementById('wizard-content');
@@ -1721,6 +1741,17 @@ function renderStepAntecedente(el) {
   // Se ja tem antecedente, mostrar distribuicao de atributos inline
   if (personagem.antecedente) {
     renderDistribuicaoInline();
+  }
+}
+
+// Reconstrói personagem.talentos a partir das duas fontes possíveis (antecedente + Versátil),
+// deterministicamente. Precisa ser chamada sempre que QUALQUER uma das duas fontes mudar
+// (não só quando o antecedente é confirmado), pois o usuário pode navegar entre os passos
+// Espécie e Antecedente fora de ordem.
+function _reconstruirTalentosBase() {
+  personagem.talentos = personagem.talento_antecedente ? [personagem.talento_antecedente] : [];
+  if (personagem.talento_versatil) {
+    personagem.talentos.push(personagem.talento_versatil);
   }
 }
 
@@ -1826,6 +1857,7 @@ function abrirPopupAntecedente(nome) {
       personagem.talentos = [];
       if (personagem.escolhas_talento) delete personagem.escolhas_talento.antecedente;
       delete personagem.iniciado_em_magia;
+      delete personagem.iniciado_em_magia_instancias;
       delete dadosCache.bonus2;
       delete dadosCache.bonus1;
       delete dadosCache.bonus111;
@@ -1836,23 +1868,18 @@ function abrirPopupAntecedente(nome) {
     dadosCache.pericias_antecedente = pericias;
     dadosCache.atributos_antecedente = atributosDisponiveis;
 
-    // Talento do antecedente
-    if (talentoNome && !personagem.talentos.includes(talentoNome)) {
-      personagem.talentos = [talentoNome];
+    // Verificar conflito: mesmo talento não-repetível do antecedente e Versátil
+    const _talentosOrigemRepetiveis = ['Habilidoso', 'Iniciado em Magia'];
+    if (personagem.talento_versatil && personagem.talento_versatil === talentoNome && !_talentosOrigemRepetiveis.includes(talentoNome)) {
+      toast(`O talento "${talentoNome}" já está selecionado como Versátil e não é repetível. Altere sua escolha na etapa de Espécie.`, 'error');
+      return;
     }
 
-    // Preservar talento Versatil (Humano) no array de talentos
-    // Verificar conflito: mesmo talento não-repetível do antecedente e Versátil
-    if (personagem.talento_versatil && personagem.talento_versatil === talentoNome) {
-      const _talentosOrigemRepetiveis = ['Habilidoso', 'Iniciado em Magia'];
-      if (!_talentosOrigemRepetiveis.includes(talentoNome)) {
-        toast(`O talento "${talentoNome}" já está selecionado como Versátil e não é repetível. Altere sua escolha na etapa de Espécie.`, 'error');
-        return;
-      }
-    }
-    if (personagem.talento_versatil && !personagem.talentos.includes(personagem.talento_versatil)) {
-      personagem.talentos.push(personagem.talento_versatil);
-    }
+    // Persistir o talento do antecedente e reconstruir array de talentos de forma
+    // determinística a partir das duas fontes (evita duplicação ao re-selecionar,
+    // e mantém consistência se o usuário revisitar o passo Espécie depois)
+    personagem.talento_antecedente = talentoNome || '';
+    _reconstruirTalentosBase();
 
     window.fecharModal();
     // Re-renderizar o passo com o resumo e distribuicao de atributos
@@ -3446,7 +3473,7 @@ async function renderStepMagias(el) {
   const tipoConj = info?.tipo_conjuracao || 'preparadas';
   const labelMagias = tipoConj === 'conhecidas' ? 'Magias conhecidas' : 'Magias preparadas';
 
-  const temIniciadoEmMagia = (personagem.talentos || []).includes('Iniciado em Magia');
+  const temIniciadoEmMagia = (personagem.talentos || []).some(t => _nomeBaseTalento(t) === 'Iniciado em Magia');
 
   if (!info?.conjurador) {
     if (temIniciadoEmMagia) {
@@ -3545,6 +3572,9 @@ async function renderStepMagias(el) {
   `;
 
   let circuloAtivo = 0;
+  // Referência ao container da seção Iniciado em Magia (se existir), para re-sincronizar
+  // as duas seções quando uma muda o estado de truques/magias conhecidas da outra
+  let _imContainerEl = null;
 
   const renderMagiasCirculo = (circ) => {
     circuloAtivo = circ;
@@ -3567,6 +3597,16 @@ async function renderStepMagias(el) {
       ? selecionadas.length
       : (personagem.magias_preparadas || []).length;
 
+    // Nomes já ocupados por instâncias de Iniciado em Magia (evita "aprender" o mesmo truque/
+    // magia de 1º círculo duas vezes sem ganho nenhum). Só se aplica às abas Truques e 1º Círculo.
+    const jaEscolhidoPorIM = new Set();
+    if (temIniciadoEmMagia && (circ === 0 || circ === 1)) {
+      (personagem.iniciado_em_magia_instancias || []).forEach(o => {
+        if (circ === 0) (o.truques || []).forEach(n => jaEscolhidoPorIM.add(n));
+        else if (o.magia) jaEscolhidoPorIM.add(o.magia);
+      });
+    }
+
     listaEl.innerHTML = `
       <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">
         ${isTruque ? `Truques selecionados: ${selecionadas.length}/${maxSel}` : `${labelMagias}: ${totalSel}/${maxSel}`}
@@ -3577,10 +3617,11 @@ async function renderStepMagias(el) {
         : `<div class="magias-grid">${magiasDaClasse.map(m => {
             const nome = m.nome || m;
             const sel = selecionadas.includes(nome);
+            const bloqueadoPorIM = !sel && jaEscolhidoPorIM.has(nome);
             return `
-              <div class="magia-card ${sel ? 'selecionada' : ''}" data-magia-nome="${nome}" data-magia-circ="${circ}">
+              <div class="magia-card ${sel ? 'selecionada' : ''} ${bloqueadoPorIM ? 'magia-card-bloqueada' : ''}" data-magia-nome="${nome}" data-magia-circ="${circ}" ${bloqueadoPorIM ? 'style="opacity:0.4"' : ''}>
                 <span class="magia-card-check" data-creator-check="${nome}"></span>
-                <div class="magia-card-nome" data-creator-info="${nome}" data-creator-info-circ="${circ}">${nome}</div>
+                <div class="magia-card-nome" data-creator-info="${nome}" data-creator-info-circ="${circ}">${nome}${bloqueadoPorIM ? ' (já conhecido)' : ''}</div>
                 <div class="magia-card-meta">
                   <span>${m.escola || ''}</span>
                   ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
@@ -3597,9 +3638,19 @@ async function renderStepMagias(el) {
         e.stopPropagation();
         const card = chk.closest('.magia-card');
         const nome = card.dataset.magiaNome;
+        const jaSelecionado = selecionadas.includes(nome);
+        if (!jaSelecionado && jaEscolhidoPorIM.has(nome)) {
+          toast(`"${nome}" já é conhecido por Iniciado em Magia — escolha um diferente`, 'error');
+          return;
+        }
         toggleMagia(nome, circ, isTruque, numTruques, numPreparadas);
         renderMagiasCirculo(circ);
         atualizarContadoresMagia(numTruques, numPreparadas);
+        // A seleção da classe pode ter liberado/ocupado um nome que a seção
+        // Iniciado em Magia também precisa refletir (contra-duplicata cruzada)
+        if (temIniciadoEmMagia && _imContainerEl) {
+          _renderIniciadoEmMagia(_imContainerEl, () => renderMagiasCirculo(circuloAtivo));
+        }
       });
     });
 
@@ -3638,80 +3689,160 @@ async function renderStepMagias(el) {
     const divIM = document.createElement('div');
     divIM.style.marginTop = '20px';
     el.appendChild(divIM);
-    await _renderIniciadoEmMagia(divIM);
+    _imContainerEl = divIM;
+    await _renderIniciadoEmMagia(divIM, () => renderMagiasCirculo(circuloAtivo));
   }
 }
 
-// --- Iniciado em Magia: seleção de lista, truques e magia de 1o circulo ---
-async function _renderIniciadoEmMagia(container) {
-  if (!personagem.iniciado_em_magia) {
-    personagem.iniciado_em_magia = { lista: '', atributo: '', truques: [], magia: '' };
-  }
-  const im = personagem.iniciado_em_magia;
-  const listasDisponiveis = ['Clérigo', 'Druida', 'Mago'];
-  const atributosDisponiveis = ['Inteligência', 'Sabedoria', 'Carisma'];
+// --- Iniciado em Magia: seleção de lista, truques e magia de 1o circulo (multi-instância) ---
+// Entradas em personagem.talentos podem vir com sufixo de lista fixa do antecedente,
+// ex.: "Iniciado em Magia (Clérigo)" (Acólito). Comparar sempre pelo nome-base.
+function _nomeBaseTalento(t) {
+  return (typeof t === 'string' ? t : t?.nome || '').replace(/\s*\(.*\)$/, '').trim();
+}
 
-  container.innerHTML = `
-    <div class="card" style="border-color:var(--accent)">
-      <div class="card-header"><h3>Iniciado em Magia</h3></div>
+// Uma posição por entrada de Iniciado em Magia em personagem.talentos (na ordem);
+// valor = lista fixa extraída do sufixo (ex. 'Clérigo'), ou null quando a lista é livre
+function _listasFixasIM() {
+  return (personagem.talentos || [])
+    .map(t => (typeof t === 'string' ? t : t?.nome || ''))
+    .filter(n => _nomeBaseTalento(n) === 'Iniciado em Magia')
+    .map(n => {
+      const m = n.match(/\(([^)]+)\)/);
+      const lista = m ? m[1].trim() : '';
+      return ['Clérigo', 'Druida', 'Mago'].includes(lista) ? lista : null;
+    });
+}
+
+function _contarInstanciasIM() {
+  return (personagem.talentos || []).filter(t => _nomeBaseTalento(t) === 'Iniciado em Magia').length;
+}
+
+function _sincronizarInstanciasIM() {
+  // Migrar formato legado (objeto único) se existir
+  if (personagem.iniciado_em_magia && personagem.iniciado_em_magia.lista && !(personagem.iniciado_em_magia_instancias || []).length) {
+    personagem.iniciado_em_magia_instancias = [{ ...personagem.iniciado_em_magia }];
+  }
+  delete personagem.iniciado_em_magia;
+
+  if (!Array.isArray(personagem.iniciado_em_magia_instancias)) personagem.iniciado_em_magia_instancias = [];
+  const fixas = _listasFixasIM();
+  const num = fixas.length;
+  while (personagem.iniciado_em_magia_instancias.length < num) {
+    personagem.iniciado_em_magia_instancias.push({ lista: '', atributo: '', truques: [], magia: '' });
+  }
+  personagem.iniciado_em_magia_instancias.length = num;
+
+  // Instâncias vindas de antecedente têm a lista determinada pela regra (ex.: Acólito → Clérigo)
+  fixas.forEach((lista, i) => {
+    const im = personagem.iniciado_em_magia_instancias[i];
+    if (lista && im.lista !== lista) {
+      im.lista = lista;
+      im.truques = [];
+      im.magia = '';
+    }
+  });
+}
+
+// aoMudar: callback opcional chamado sempre que um truque/magia é alterado dentro de uma
+// instância de Iniciado em Magia — usado pra re-sincronizar o grid de truques da classe
+async function _renderIniciadoEmMagia(container, aoMudar) {
+  _sincronizarInstanciasIM();
+  const instancias = personagem.iniciado_em_magia_instancias;
+  const listasFixas = _listasFixasIM();
+  const listasDisponiveis = ['Clérigo', 'Druida', 'Mago'];
+  const atributosDisponiveis = ['inteligencia', 'sabedoria', 'carisma'];
+
+  container.innerHTML = instancias.map((im, idx) => `
+    <div class="card" style="border-color:var(--accent);margin-bottom:12px">
+      <div class="card-header"><h3>Iniciado em Magia${instancias.length > 1 ? ` (${idx + 1} de ${instancias.length})` : ''}</h3></div>
       <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px">
         <div style="flex:1;min-width:150px">
           <label class="form-label">Lista de magias</label>
-          <select class="form-input" id="im-lista">
+          <select class="form-input" id="im-lista-${idx}" ${listasFixas[idx] ? 'disabled' : ''}>
             <option value="">Selecione...</option>
-            ${listasDisponiveis.map(l => `<option value="${l}" ${im.lista === l ? 'selected' : ''}>${l}</option>`).join('')}
+            ${listasDisponiveis.map(l => {
+              const usadaOutra = instancias.some((o, i) => i !== idx && o.lista === l);
+              return `<option value="${l}" ${im.lista === l ? 'selected' : ''} ${usadaOutra && !listasFixas[idx] ? 'disabled' : ''}>${l}${usadaOutra && !listasFixas[idx] ? ' (já usada)' : ''}</option>`;
+            }).join('')}
           </select>
+          ${listasFixas[idx] ? `<div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px">Lista fixa (concedida pelo antecedente)</div>` : ''}
         </div>
         <div style="flex:1;min-width:150px">
           <label class="form-label">Atributo de conjuracao</label>
-          <select class="form-input" id="im-atributo">
+          <select class="form-input" id="im-atributo-${idx}">
             <option value="">Selecione...</option>
-            ${atributosDisponiveis.map(a => `<option value="${a}" ${im.atributo === a ? 'selected' : ''}>${a}</option>`).join('')}
+            ${atributosDisponiveis.map(a => `<option value="${a}" ${im.atributo === a ? 'selected' : ''}>${ATRIBUTOS_NOMES[a] || a}</option>`).join('')}
           </select>
         </div>
       </div>
-      <div id="im-contadores" style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
+      <div id="im-contadores-${idx}" style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
         Truques: <strong>${im.truques.length}/2</strong> | Magia 1o circulo: <strong>${im.magia ? '1' : '0'}/1</strong>
       </div>
-      <div id="im-magias-area"></div>
+      <div id="im-magias-area-${idx}"></div>
     </div>
-  `;
+  `).join('');
+
+  for (let idx = 0; idx < instancias.length; idx++) {
+    await _bindInstanciaIM(container, idx, aoMudar);
+  }
+}
+
+// Nomes de truque/magia já escolhidos em OUTRO lugar (outra instância de Iniciado em Magia,
+// truques/magias já selecionados da classe, ou truques concedidos pela espécie) — usado para
+// impedir "aprender" o mesmo truque/magia duas vezes sem ganho nenhum (redundante)
+function _nomesJaEscolhidosIM(idxAtual, tipo) {
+  const nomes = new Set();
+  (personagem.iniciado_em_magia_instancias || []).forEach((o, i) => {
+    if (i === idxAtual) return;
+    if (tipo === 'truque') (o.truques || []).forEach(n => nomes.add(n));
+    else if (o.magia) nomes.add(o.magia);
+  });
+  if (tipo === 'truque') {
+    (personagem.magias_conhecidas || []).filter(m => m.circulo === 0).forEach(m => nomes.add(m.nome));
+    obterTruquesEspecie(personagem.especie, personagem.tracos_escolhidos).forEach(n => nomes.add(n));
+  } else {
+    (personagem.magias_preparadas || []).forEach(m => nomes.add(m.nome));
+    (personagem.magias_conhecidas || []).filter(m => m.circulo === 1).forEach(m => nomes.add(m.nome));
+  }
+  return nomes;
+}
+
+async function _bindInstanciaIM(container, idx, aoMudar) {
+  const im = personagem.iniciado_em_magia_instancias[idx];
 
   const atualizarContadoresIM = () => {
-    const cEl = document.getElementById('im-contadores');
+    const cEl = document.getElementById(`im-contadores-${idx}`);
     if (cEl) {
       cEl.innerHTML = `Truques: <strong>${im.truques.length}/2</strong> | Magia 1o circulo: <strong>${im.magia ? '1' : '0'}/1</strong>`;
     }
   };
 
   const renderMagiasIM = async () => {
-    const area = document.getElementById('im-magias-area');
+    const area = document.getElementById(`im-magias-area-${idx}`);
     if (!area || !im.lista) { if (area) area.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:10px">Selecione uma lista de magias acima</div>'; return; }
 
-    // Carregar magias da lista selecionada
     const dados = await getMagiasClasse(im.lista);
     const listaMagias = dados?.lista_magias || {};
     const truquesDisp = (listaMagias['Truques'] || []).map(m => typeof m === 'string' ? { nome: m } : m);
     const c1Disp = (listaMagias['1º Círculo'] || []).map(m => typeof m === 'string' ? { nome: m } : m);
 
     area.innerHTML = `
-      <div class="tabs" id="tabs-im">
+      <div class="tabs" id="tabs-im-${idx}">
         <div class="tab active" data-im-tab="truques">Truques (${truquesDisp.length})</div>
         <div class="tab" data-im-tab="c1">1o Circulo (${c1Disp.length})</div>
       </div>
-      <div class="search-box"><input type="text" id="busca-im" placeholder="Buscar magia..." class="form-input"></div>
-      <div id="im-lista-magias"></div>
+      <div class="search-box"><input type="text" id="busca-im-${idx}" placeholder="Buscar magia..." class="form-input"></div>
+      <div id="im-lista-magias-${idx}"></div>
     `;
 
-    let tabAtiva = 'truques';
-
     const renderTabIM = (tab) => {
-      tabAtiva = tab;
-      const listaEl = document.getElementById('im-lista-magias');
+      const listaEl = document.getElementById(`im-lista-magias-${idx}`);
       if (!listaEl) return;
       const isTruque = tab === 'truques';
       const magias = isTruque ? truquesDisp : c1Disp;
       const selecionadas = isTruque ? im.truques : (im.magia ? [im.magia] : []);
+      const jaEscolhidos = _nomesJaEscolhidosIM(idx, isTruque ? 'truque' : 'magia');
 
       listaEl.innerHTML = `
         <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">
@@ -3723,10 +3854,11 @@ async function _renderIniciadoEmMagia(container) {
           : `<div class="magias-grid">${magias.map(m => {
               const nome = m.nome || m;
               const sel = selecionadas.includes(nome);
+              const bloqueado = jaEscolhidos.has(nome) && !sel;
               return `
-                <div class="magia-card ${sel ? 'selecionada' : ''}" data-im-magia="${nome}" data-im-tipo="${tab}">
+                <div class="magia-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}" data-im-magia="${nome}" data-im-tipo="${tab}" ${bloqueado ? 'style="opacity:0.4"' : ''}>
                   <span class="magia-card-check" data-im-check="${nome}"></span>
-                  <div class="magia-card-nome" data-im-info="${nome}" data-im-info-circ="${isTruque ? 0 : 1}">${nome}</div>
+                  <div class="magia-card-nome" data-im-info="${nome}" data-im-info-circ="${isTruque ? 0 : 1}">${nome}${bloqueado ? ' (já conhecido)' : ''}</div>
                   <div class="magia-card-meta">
                     <span>${m.escola || ''}</span>
                     ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
@@ -3737,15 +3869,19 @@ async function _renderIniciadoEmMagia(container) {
         }
       `;
 
-      // Eventos de toggle
       listaEl.querySelectorAll('[data-im-check]').forEach(chk => {
         chk.addEventListener('click', (e) => {
           e.stopPropagation();
           const card = chk.closest('.magia-card');
           const nome = card.dataset.imMagia;
+          const jaSelecionado = isTruque ? im.truques.includes(nome) : im.magia === nome;
+          if (!jaSelecionado && jaEscolhidos.has(nome)) {
+            toast(`"${nome}" já é conhecido por outra fonte — escolha um diferente`, 'error');
+            return;
+          }
           if (isTruque) {
-            const idx = im.truques.indexOf(nome);
-            if (idx >= 0) { im.truques.splice(idx, 1); }
+            const i = im.truques.indexOf(nome);
+            if (i >= 0) { im.truques.splice(i, 1); }
             else if (im.truques.length >= 2) { toast('Máximo de 2 truques para Iniciado em Magia', 'error'); return; }
             else { im.truques.push(nome); }
           } else {
@@ -3754,10 +3890,11 @@ async function _renderIniciadoEmMagia(container) {
           }
           renderTabIM(tab);
           atualizarContadoresIM();
+          // Truque/magia da classe pode precisar refletir esta escolha (contra-duplicata cruzada)
+          aoMudar?.();
         });
       });
 
-      // Detalhe ao clicar no nome
       listaEl.querySelectorAll('[data-im-info]').forEach(el => {
         el.addEventListener('click', async (e) => {
           e.stopPropagation();
@@ -3768,7 +3905,6 @@ async function _renderIniciadoEmMagia(container) {
       });
     };
 
-    // Tabs IM
     area.querySelectorAll('[data-im-tab]').forEach(tab => {
       tab.addEventListener('click', () => {
         area.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -3777,10 +3913,9 @@ async function _renderIniciadoEmMagia(container) {
       });
     });
 
-    // Busca IM
-    document.getElementById('busca-im')?.addEventListener('input', (e) => {
+    document.getElementById(`busca-im-${idx}`)?.addEventListener('input', (e) => {
       const termo = semAcento(e.target.value);
-      document.querySelectorAll('#im-lista-magias .magia-card').forEach(el => {
+      document.querySelectorAll(`#im-lista-magias-${idx} .magia-card`).forEach(el => {
         el.style.display = semAcento(el.textContent).includes(termo) ? '' : 'none';
       });
     });
@@ -3788,21 +3923,18 @@ async function _renderIniciadoEmMagia(container) {
     renderTabIM('truques');
   };
 
-  // Eventos de selects
-  document.getElementById('im-lista')?.addEventListener('change', (e) => {
+  document.getElementById(`im-lista-${idx}`)?.addEventListener('change', async (e) => {
     im.lista = e.target.value;
-    // Limpar seleções ao trocar de lista
     im.truques = [];
     im.magia = '';
-    atualizarContadoresIM();
-    renderMagiasIM();
+    await _renderIniciadoEmMagia(container, aoMudar);
+    aoMudar?.();
   });
 
-  document.getElementById('im-atributo')?.addEventListener('change', (e) => {
+  document.getElementById(`im-atributo-${idx}`)?.addEventListener('change', (e) => {
     im.atributo = e.target.value;
   });
 
-  // Renderizar magias se já tiver lista selecionada
   await renderMagiasIM();
 }
 
@@ -4040,7 +4172,7 @@ function renderStepDetalhes(el) {
         Antecedente: ${personagem.antecedente} |
         PV: ${pvCalc} |
         Talento: ${personagem.talentos.join(', ') || 'Nenhum'}
-        ${personagem.iniciado_em_magia?.lista ? `<br>Iniciado em Magia: Lista ${personagem.iniciado_em_magia.lista} | Atributo: ${personagem.iniciado_em_magia.atributo} | Truques: ${(personagem.iniciado_em_magia.truques||[]).join(', ')} | Magia: ${personagem.iniciado_em_magia.magia}` : ''}
+        ${(personagem.iniciado_em_magia_instancias || []).filter(im => im.lista).map(im => `<br>Iniciado em Magia (${im.lista}): Atributo ${ATRIBUTOS_NOMES[im.atributo] || im.atributo} | Truques: ${(im.truques||[]).join(', ')} | Magia: ${im.magia}`).join('')}
       </div>
     </div>
 

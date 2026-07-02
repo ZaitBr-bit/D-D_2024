@@ -5,7 +5,7 @@ import { renderHome } from './pages/home.js';
 import { renderCreator } from './pages/creator.js';
 import { renderSheet } from './pages/sheet.js';
 import { inicializarSync } from './sync.js';
-import { toast } from './utils.js';
+import { toast, abrirModal } from './utils.js';
 
 // --- Router baseado em hash ---
 const routes = {
@@ -179,6 +179,21 @@ function init() {
     if (e.target.id === 'modal-overlay') {
       window.fecharModal();
     }
+  });
+
+  // FAB Reportar Bug (global, disponível em todas as telas)
+  document.getElementById('btn-reportar-bug')?.addEventListener('click', () => {
+    abrirModal(
+      'Reportar Problema',
+      `
+        <p style="margin-bottom:12px">Para reportar problemas ou solicitar melhorias entre em contato via Reddit:</p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <a class="btn btn-accent" href="https://www.reddit.com/r/rpgbrasil/comments/1sgrj1j/criador_de_ficha_dd_55_2024_web_e_mobile_gratuito/" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none">💬 Comentário no post</a>
+          <a class="btn btn-secondary" href="https://www.reddit.com/user/ZaitBrz/" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none">✉ Mensagem direta</a>
+        </div>
+      `,
+      '<button class="btn btn-secondary" onclick="fecharModal()">Fechar</button>'
+    );
   });
 
   // Listener de rota

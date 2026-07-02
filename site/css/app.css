@@ -958,6 +958,19 @@ tr:hover td { background: #faf8f4; }
   animation: fadeIn 0.2s;
 }
 
+/* --- FAB Reportar Bug (Floating Action Button, canto superior esquerdo, global) --- */
+.fab-reportar-bug {
+  position: fixed;
+  top: calc(var(--header-h) + var(--safe-top) + 12px);
+  left: 12px;
+  z-index: 100;
+}
+.fab-reportar-bug .fab-btn {
+  width: 44px; height: 44px;
+  font-size: 1.2rem;
+  background: var(--accent);
+}
+
 /* ============================================================
    ESTILOS DE IMPRESSÃO / PDF
    ============================================================ */
