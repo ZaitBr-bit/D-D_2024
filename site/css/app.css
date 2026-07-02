@@ -69,6 +69,13 @@ body {
   cursor: pointer; border-radius: 50%; flex-shrink: 0;
 }
 .header-btn:active { background: rgba(255,255,255,0.15); }
+#label-reportar-bug {
+  font-size: 0.8rem; color: #fff; opacity: 0.9;
+  white-space: nowrap; flex-shrink: 0;
+}
+#btn-reportar-bug {
+  font-size: 1.2rem;
+}
 #header-acoes { display: flex; gap: 4px; }
 
 /* --- Main content --- */
@@ -956,19 +963,6 @@ tr:hover td { background: #faf8f4; }
   border-radius: var(--radius);
   box-shadow: var(--shadow-lg);
   animation: fadeIn 0.2s;
-}
-
-/* --- FAB Reportar Bug (Floating Action Button, canto superior esquerdo, global) --- */
-.fab-reportar-bug {
-  position: fixed;
-  top: calc(var(--header-h) + var(--safe-top) + 12px);
-  left: 12px;
-  z-index: 100;
-}
-.fab-reportar-bug .fab-btn {
-  width: 44px; height: 44px;
-  font-size: 1.2rem;
-  background: var(--accent);
 }
 
 /* ============================================================
