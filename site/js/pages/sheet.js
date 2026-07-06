@@ -2502,6 +2502,11 @@ export async function renderSheet(container, charId) {
 
   document.getElementById('btn-print')?.addEventListener('click', () => imprimirFicha());
 
+  // Pre-aquecer cache de descricoes de magias em segundo plano, para que o
+  // clique em Imprimir nao dependa de fetch de rede (mobile exige window.print()
+  // sincrono no gesto do usuario; fetch no meio quebra a ativacao e o print e ignorado).
+  carregarDescricoesMagias().catch(() => {});
+
   document.getElementById('btn-escolher-manobras-pendentes')?.addEventListener('click', () => {
     const estado = getEstadoRecursosGuerreiro();
     if (!estado) return;
@@ -16001,10 +16006,9 @@ async function imprimirFicha() {
     // Registrar cleanup ANTES de chamar window.print()
     window.addEventListener('afterprint', limparOverlay);
 
-    // Aguardar renderizacao do DOM
-    await new Promise(r => setTimeout(r, 200));
-
-    // Imprimir
+    // Imprimir imediatamente (sem setTimeout/delay): mobile (iOS Safari, Android
+    // Chrome) exige window.print() disparado de forma sincrona dentro do gesto
+    // de clique, senao o navegador bloqueia o print automatico silenciosamente.
     window.print();
 
     // Fallback: se afterprint nao disparar em 5s, limpar manualmente
