@@ -20,6 +20,24 @@ export function navegar(rota) {
 }
 window.navegar = navegar;
 
+// Versao do app (injetada no deploy no span #header-versao do index.html).
+// Capturada uma vez porque o texto do header e reescrito a cada navegacao.
+const APP_VERSION = document.getElementById('header-versao')?.textContent?.trim() || '';
+
+/** Define o texto do header preservando o selo de versao ao lado. */
+export function definirTituloHeader(texto) {
+  const el = document.getElementById('header-titulo');
+  if (!el) return;
+  el.textContent = texto;
+  if (APP_VERSION) {
+    const span = document.createElement('span');
+    span.className = 'header-versao';
+    span.textContent = ' ' + APP_VERSION;
+    el.appendChild(span);
+  }
+}
+window.definirTituloHeader = definirTituloHeader;
+
 /** Processa a rota atual do hash */
 function processarRota() {
   const hash = window.location.hash.slice(1) || 'home';
@@ -30,7 +48,6 @@ function processarRota() {
   const render = routes[pagina];
   const content = document.getElementById('app-content');
   const btnVoltar = document.getElementById('btn-voltar');
-  const titulo = document.getElementById('header-titulo');
   const acoes = document.getElementById('header-acoes');
 
   // Limpar estado anterior
@@ -53,7 +70,7 @@ function processarRota() {
     'criar': 'Novo Personagem',
     'ficha': 'Ficha'
   };
-  titulo.textContent = titulos[pagina] || 'D&D 5.5 Ficha';
+  definirTituloHeader(titulos[pagina] || 'D&D 5.5 Ficha');
 
   if (render) {
     render(content, param);
