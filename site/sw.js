@@ -20,7 +20,8 @@ const STATIC_ASSETS = [
   './js/pages/home.js',
   './js/pages/creator.js',
   './js/pages/sheet.js',
-  './js/auth.js'
+  './js/auth.js',
+  './js/vendor/pdf-lib.min.js'
 ];
 
 self.addEventListener('install', (event) => {
