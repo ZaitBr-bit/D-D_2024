@@ -2389,7 +2389,7 @@ export async function renderSheet(container, charId) {
   passivosTalentosCache = resolverPassivosTalentos(char);
 
   // Atualizar header
-  document.getElementById('header-titulo').textContent = char.nome || 'Ficha';
+  window.definirTituloHeader?.(char.nome || 'Ficha');
   document.getElementById('header-acoes').innerHTML = '';
 
   // Carregar dados complementares
@@ -7557,7 +7557,7 @@ function setupEventosEdicao() {
 
       salvar();
       window.fecharModal();
-      document.getElementById('header-titulo').textContent = char.nome;
+      window.definirTituloHeader?.(char.nome);
       renderFichaCompleta();
     });
   });
