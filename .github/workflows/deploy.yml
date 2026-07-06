@@ -26,11 +26,17 @@ jobs:
 
       - name: Prepare site
         run: |
-          cp -r dados site/dados
-          sed -i "s|const BASE_PATH = '../dados'|const BASE_PATH = './dados'|" site/js/db.js
-          sed -i "s|const DATA_PREFIX = '../dados/'|const DATA_PREFIX = './dados/'|" site/sw.js
-          sed -i "s|const CACHE_VERSION = 0; // AUTO|const CACHE_VERSION = ${{ github.run_number }};|" site/sw.js
-          sed -i "s|v0</span><!-- VERSION_AUTO -->|v${{ github.run_number }}</span><!-- VERSION_AUTO -->|" site/index.html
+          # Monta o artifact preservando a estrutura atual servida em producao:
+          # raiz com redirect -> /site/, a app em site/ e os dados em dados/
+          # (a app usa BASE_PATH '../dados', que resolve para /D-D_2024/dados).
+          # Assim a URL publica continua .../D-D_2024/site/ apos migrar o Pages
+          # para GitHub Actions, e o sed passa a valer de fato em producao.
+          mkdir -p _dist
+          cp index.html _dist/index.html
+          cp -r site _dist/site
+          cp -r dados _dist/dados
+          sed -i "s|const CACHE_VERSION = 0; // AUTO|const CACHE_VERSION = ${{ github.run_number }};|" _dist/site/sw.js
+          sed -i "s|v0</span><!-- VERSION_AUTO -->|v${{ github.run_number }}</span><!-- VERSION_AUTO -->|" _dist/site/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -38,8 +44,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: site
-          include-hidden-files: true
+          path: _dist
 
       - name: Deploy to GitHub Pages
         id: deployment
