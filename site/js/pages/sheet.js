@@ -4,7 +4,7 @@
 import { CLASSES_INFO, PERICIAS, ATRIBUTOS_NOMES, ATRIBUTOS_KEYS, ATRIBUTO_NOME_PARA_KEY } from '../dados-classes.js';
 import { getPersonagem, salvarPersonagem, removerPersonagem } from '../store.js';
 import { getClasse, getMagiasClasse, getMagiasPorCirculo, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura, getTalentos, getEspecies } from '../db.js';
-import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagia, calcPercepcaoPassiva, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcBonusPericia, calcPVTotal, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, gerarId, detectarRecarga, ehHabilidadeAtiva, getDeslocamento, getTamanho, escHtml, processarImagemArquivo } from '../utils.js';
+import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagia, calcPercepcaoPassiva, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcBonusPericia, calcPVTotal, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, gerarId, detectarRecarga, ehHabilidadeAtiva, getDeslocamento, getTamanho, escHtml, processarImagemArquivo, parsePeso, fmtPeso, getCapacidadeCarga, getMultiplicadorCarga, getPesoTotalInventario } from '../utils.js';
 import { podeSubirDeNivel, subirDeNivel, XP_POR_NIVEL, adicionarXP, obterTodasMagiasDominio, obterTodasMagiasSemprePreparadas, exigeEspecializacaoBardo, exigeEspecializacaoGuardiao, exigeEstiloLuta, exigeExploradorHabil, exigeAcademico } from '../levelup.js';
 import { abrirLevelUpCards } from '../levelup-ui.js';
 import { getSyncStatus, onSyncStatusChange } from '../sync.js';
@@ -2246,6 +2246,32 @@ function addExtraVelocidade(extrasSet, tipo, metros, sufixo = '') {
   extrasSet.add(`${tipo} ${formatarMetros(metros)}m${sufixo ? ` ${sufixo}` : ''}`);
 }
 
+// Popup com o cálculo real da capacidade de carga (clique no peso do inventário).
+window.mostrarCalculoCarga = function () {
+  const forca = char?.atributos?.forca || 0;
+  const tamanho = char?.tamanho || 'Médio';
+  const mult = getMultiplicadorCarga(tamanho);
+  const _c = getEstadoCarga();
+  const disp = _c.capacidade - _c.pesoAtual;
+  abrirModal('Capacidade de Carga', `
+    <div style="font-size:0.9rem;line-height:1.7">
+      <div style="font-weight:700;margin-bottom:4px">Cálculo do peso máximo</div>
+      <div>Força ${forca} × ${fmtPeso(mult)} (${escHtml(tamanho)}) = <strong>${fmtPeso(_c.capacidade)} kg</strong></div>
+      <hr style="border:none;border-top:1px solid var(--border-light);margin:8px 0">
+      <div>Peso atual: <strong>${fmtPeso(_c.pesoAtual)} kg</strong></div>
+      <div>${disp >= 0
+        ? `Disponível: <strong>${fmtPeso(disp)} kg</strong>`
+        : `<span style="color:var(--danger);font-weight:700">&#9888; Excede em ${fmtPeso(-disp)} kg</span>`}</div>
+    </div>
+  `, '<button class="btn btn-secondary" onclick="fecharModal()">Fechar</button>');
+};
+
+// Aviso ao clicar no Deslocamento quando reduzido por sobrecarga de peso.
+window.avisarSobrecargaDeslocamento = function () {
+  const _c = getEstadoCarga();
+  toast(`Deslocamento reduzido a 1,5 m: sobrecarga de peso (carga ${fmtPeso(_c.pesoAtual)} kg acima da capacidade de ${fmtPeso(_c.capacidade)} kg).`, 'info');
+};
+
 function getDeslocamentoFinal(baseDeslocamento) {
   let final = parseMetros(baseDeslocamento, 9);
 
@@ -2289,6 +2315,15 @@ function getDeslocamentoFinal(baseDeslocamento) {
   for (const ef of efMag) {
     if (ef.tipo === 'deslocamento' && ef.tipo_velocidade === 'base_bonus' && ef.valor_metros) {
       final += ef.valor_metros;
+    }
+  }
+
+  // Sobrecarga de peso (opcional, padrão desligado): carga acima da
+  // capacidade de carregar limita o deslocamento a no máximo 1,5 m.
+  if (char?.config?.sobrecarga_afeta_deslocamento) {
+    const _carga = getEstadoCarga();
+    if (_carga.sobrecarregado) {
+      final = Math.min(final, 1.5);
     }
   }
 
@@ -2845,6 +2880,7 @@ function renderFichaCompleta() {
   const _deslNumero = _deslMatch ? _deslMatch[1] : _deslocamento;
   const _deslExtra = _deslMatch ? (_deslMatch[2] || '').trim() : '';
   const _tamanho = char.tamanho || (_espData ? getTamanho(_espData.texto_completo) : 'Médio');
+  const _deslSobrecarga = !!(char?.config?.sobrecarga_afeta_deslocamento && getEstadoCarga().sobrecarregado);
 
   const container = containerRef;
   container.innerHTML = `
@@ -3213,10 +3249,11 @@ function renderFichaCompleta() {
           <div class="stat-value">${fmtMod(iniciativa.valor)}</div>
           ${iniciativa.vantagem ? '<div style="font-size:0.65rem;color:var(--success);font-weight:700">Vantagem</div>' : ''}
         </div>
-        <div class="stat-box">
+        <div class="stat-box" ${_deslSobrecarga ? 'style="cursor:pointer;position:relative" onclick="window.avisarSobrecargaDeslocamento()"' : ''}>
           <div class="stat-label">Deslocamento</div>
           <div class="stat-value">${_deslNumero}<br><span class="stat-unit">metros</span></div>
           ${_deslExtra ? `<div style="font-size:0.6rem;color:var(--text-muted)">${_deslExtra}</div>` : ''}
+          ${_deslSobrecarga ? '<div class="no-print" style="position:absolute;bottom:2px;left:0;right:0;font-size:0.55rem;color:var(--danger);font-weight:700">&#9888; Sobrecarga</div>' : ''}
         </div>
         <div class="stat-box">
           <div class="stat-label">Ataques</div>
@@ -14164,8 +14201,22 @@ function setupEventosDefesas() {
 }
 
 // --- Inventário na ficha ---
+/** Estado de carga do personagem: peso atual, capacidade e flag de sobrecarga. */
+function getEstadoCarga() {
+  const forca = char?.atributos?.forca || 0;
+  const tamanho = char?.tamanho || 'Médio';
+  const pesoAtual = getPesoTotalInventario(char?.inventario || []);
+  const capacidade = getCapacidadeCarga(forca, tamanho);
+  const sobrecarregado = capacidade > 0 && pesoAtual > capacidade;
+  return { pesoAtual, capacidade, sobrecarregado };
+}
+
 function renderSecaoInventario() {
   const inv = char.inventario || [];
+  const _carga = getEstadoCarga();
+  // Só sinaliza "Sobrecarregado" quando a regra de sobrecarga está ativa.
+  const _mostrarSobrecarga = _carga.sobrecarregado && !!char?.config?.sobrecarga_afeta_deslocamento;
+  const _corCarga = _mostrarSobrecarga ? 'var(--danger)' : 'var(--text-muted)';
 
   // Separar equipados, não equipados, e zerados
   const equipados = [];
@@ -14186,6 +14237,16 @@ function renderSecaoInventario() {
           <button class="btn btn-sm btn-accent" id="btn-add-inv">+ Item</button>
           <button class="btn btn-sm btn-secondary" id="btn-add-inv-custom">+ Custom</button>
         </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-light);margin-bottom:6px">
+        <span id="sheet-peso-valor" style="font-size:0.8rem;cursor:pointer;color:${_corCarga}" onclick="window.mostrarCalculoCarga()" title="Ver cálculo da capacidade de carga">
+          Peso: <strong>${fmtPeso(_carga.pesoAtual)}</strong> / ${fmtPeso(_carga.capacidade)} kg
+          ${_mostrarSobrecarga ? '<span style="font-weight:700;margin-left:4px">&#9888; Sobrecarregado</span>' : ''}
+        </span>
+        <label class="no-print" style="display:flex;align-items:center;gap:4px;font-size:0.72rem;color:var(--text-muted);cursor:pointer" title="Se ligado, sobrecarga reduz o Deslocamento para 1,5 m">
+          <input type="checkbox" id="cfg-sobrecarga" ${char?.config?.sobrecarga_afeta_deslocamento ? 'checked' : ''}>
+          Sobrecarga afeta deslocamento
+        </label>
       </div>
       <div id="sheet-inventario">
         ${inv.length === 0
@@ -14394,6 +14455,17 @@ function renderSheetInvItem(item, idx) {
 }
 
 function setupEventosInventarioSheet() {
+  // Toggle de sobrecarga (fora do container da lista)
+  const cfgSobrecarga = document.getElementById('cfg-sobrecarga');
+  if (cfgSobrecarga) {
+    cfgSobrecarga.addEventListener('change', () => {
+      if (!char.config) char.config = {};
+      char.config.sobrecarga_afeta_deslocamento = cfgSobrecarga.checked;
+      salvar();
+      renderFichaCompleta();
+    });
+  }
+
   const invContainer = document.getElementById('sheet-inventario');
   if (!invContainer) return;
 
@@ -14518,6 +14590,11 @@ function setupEventosInventarioSheet() {
           <div style="font-size:0.65rem;color:var(--text-muted)">-5 a +10</div>
         </div>
       </div>
+      <div class="form-group" style="margin-top:8px">
+        <label class="form-label" for="ic-peso">Peso (opcional)</label>
+        <input type="number" class="form-input" id="ic-peso" placeholder="0" min="0" step="0.1" style="max-width:140px">
+        <div style="font-size:0.65rem;color:var(--text-muted)">em kg (ex: 0,5)</div>
+      </div>
       <div id="ic-erros" style="display:none;color:var(--danger);font-size:0.8rem;margin-top:8px"></div>
     `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-add-ic">Adicionar</button>');
 
@@ -14527,6 +14604,8 @@ function setupEventosInventarioSheet() {
       const ca = parseInt(document.getElementById('ic-ca')?.value) || 0;
       const danoVal = document.getElementById('ic-dano')?.value?.trim() || '';
       const atq = parseInt(document.getElementById('ic-atq')?.value) || 0;
+      const pesoRaw = document.getElementById('ic-peso')?.value?.trim() || '';
+      const pesoNum = pesoRaw ? parseFloat(pesoRaw.replace(',', '.')) : 0;
       const errosEl = document.getElementById('ic-erros');
       const erros = [];
 
@@ -14564,7 +14643,8 @@ function setupEventosInventarioSheet() {
         dados: {
           bonus_ca: String(ca),
           dano: danoVal,
-          bonus_ataque: String(atq)
+          bonus_ataque: String(atq),
+          peso: (pesoNum > 0 ? `${fmtPeso(pesoNum)} kg` : '')
         }
       });
       salvar();
@@ -14694,6 +14774,10 @@ function abrirModalEditarItemCustomizado(item, idx) {
 
 /** Re-renderiza apenas a lista do inventário sem refazer a ficha toda */
 function reRenderSheetInv() {
+  // Se a sobrecarga afeta o deslocamento, mudanças de peso alteram stats globais
+  // (deslocamento, badges) — re-render completo garante consistência.
+  if (char?.config?.sobrecarga_afeta_deslocamento) { renderFichaCompleta(); return; }
+
   const invEl = document.getElementById('sheet-inventario');
   if (!invEl) { renderFichaCompleta(); return; }
 
@@ -14710,6 +14794,16 @@ function reRenderSheetInv() {
   invEl.innerHTML = inv.length === 0
     ? '<div style="color:var(--text-muted);text-align:center;padding:12px;font-size:0.85rem">Inventario vazio</div>'
     : renderSheetInvLista(equipados, naoEquipados, zerados);
+
+  // Atualizar barra de peso atual (fica fora de #sheet-inventario)
+  const pesoEl = document.getElementById('sheet-peso-valor');
+  if (pesoEl) {
+    const _carga = getEstadoCarga();
+    const _mostrarSobrecarga = _carga.sobrecarregado && !!char?.config?.sobrecarga_afeta_deslocamento;
+    pesoEl.style.color = _mostrarSobrecarga ? 'var(--danger)' : 'var(--text-muted)';
+    pesoEl.innerHTML = `Peso: <strong>${fmtPeso(_carga.pesoAtual)}</strong> / ${fmtPeso(_carga.capacidade)} kg`
+      + (_mostrarSobrecarga ? ' <span style="font-weight:700;margin-left:4px">&#9888; Sobrecarregado</span>' : '');
+  }
 
   // Re-bind eventos
   setupEventosInventarioSheet();

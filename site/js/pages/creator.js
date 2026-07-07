@@ -4,7 +4,7 @@
 import { CLASSES_INFO, PERICIAS, ATRIBUTOS_NOMES, ATRIBUTOS_KEYS, ATRIBUTO_NOME_PARA_KEY, STANDARD_ARRAY, POINT_BUY_CUSTOS, POINT_BUY_TOTAL } from '../dados-classes.js';
 import { getClasse, getAntecedentes, getEspecies, getTalentos, getMagiasClasse, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura } from '../db.js';
 import { criarPersonagemVazio, salvarPersonagem } from '../store.js';
-import { calcMod, fmtMod, calcPVNivel1, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, getDeslocamento, getTamanho, escHtml, processarImagemArquivo } from '../utils.js';
+import { calcMod, fmtMod, calcPVNivel1, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, getDeslocamento, getTamanho, escHtml, processarImagemArquivo, getCapacidadeCarga, getPesoTotalInventario, descreverCapacidadeCarga, fmtPeso } from '../utils.js';
 
 const STEPS = [
   { id: 'classe', label: 'Classe' },
@@ -2866,6 +2866,17 @@ async function renderStepEquipamento(el) {
       personagem.escolha_equip_antecedente
     ) : ''}
 
+    <div class="card mb-2" style="border-left:3px solid var(--primary)">
+      <label class="form-check" style="display:flex;align-items:center;gap:6px;cursor:pointer">
+        <input type="checkbox" id="cfg-sobrecarga-creator" ${personagem.config?.sobrecarga_afeta_deslocamento ? 'checked' : ''}>
+        <span>Sobrecarga de peso reduz o Deslocamento</span>
+      </label>
+      <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px">
+        Opcional. Se ligado, carregar peso acima da capacidade máxima limita o Deslocamento a 1,5 m.
+        Pode ser alterado depois no setor Inventário da ficha.
+      </div>
+    </div>
+
     <div class="card mb-2">
       <div class="card-header"><h3>Inventário</h3>
         <div style="display:flex;gap:4px">
@@ -2885,6 +2896,15 @@ async function renderStepEquipamento(el) {
       <input type="number" class="form-input" id="input-po" value="${personagem.po}" min="0" style="max-width:120px">
     </div>
   `;
+
+  // Toggle de sobrecarga de peso
+  const _cfgSobrecarga = document.getElementById('cfg-sobrecarga-creator');
+  if (_cfgSobrecarga) {
+    _cfgSobrecarga.addEventListener('change', () => {
+      if (!personagem.config) personagem.config = {};
+      personagem.config.sobrecarga_afeta_deslocamento = _cfgSobrecarga.checked;
+    });
+  }
 
   // Eventos de seleção de equipamento
   el.querySelectorAll('[data-equip-tipo]').forEach(card => {
@@ -2952,8 +2972,13 @@ async function renderStepEquipamento(el) {
 
 /** Renderiza a lista completa do inventário com equipados primeiro */
 function renderListaInventario() {
+  // Barra de peso (atual / máximo) — recalculada a cada re-render da lista.
+  const _pesoAtual = getPesoTotalInventario(personagem.inventario || []);
+  const _cap = getCapacidadeCarga(personagem.atributos?.forca || 0, personagem.tamanho || 'Médio');
+  const _barraPeso = `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border-light);margin-bottom:6px;font-size:0.8rem;color:var(--text-muted)"><span>Peso: <strong>${fmtPeso(_pesoAtual)}</strong> / ${fmtPeso(_cap)} kg</span></div>`;
+
   if (personagem.inventario.length === 0) {
-    return '<div style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:12px">Nenhum item adicionado</div>';
+    return _barraPeso + '<div style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:12px">Nenhum item adicionado</div>';
   }
 
   // Criar array de índices originais, separar equipados e não equipados
@@ -2964,7 +2989,7 @@ function renderListaInventario() {
     else naoEquipados.push(idx);
   });
 
-  let html = '';
+  let html = _barraPeso;
 
   if (equipados.length > 0) {
     html += '<div class="inv-secao-titulo"><span>Equipados</span></div>';
@@ -3368,6 +3393,11 @@ function mostrarFormCustomItem() {
         <input type="number" class="form-input" id="custom-ataque" value="0">
       </div>
     </div>
+    <div class="form-group" style="margin-top:8px">
+      <label class="form-label">Peso (opcional)</label>
+      <input type="number" class="form-input" id="custom-peso" placeholder="0" min="0" step="0.1" style="max-width:140px">
+      <div style="font-size:0.65rem;color:var(--text-muted)">em kg (ex: 0,5)</div>
+    </div>
   `;
 
   abrirModal('Item Customizado', html,
@@ -3378,6 +3408,8 @@ function mostrarFormCustomItem() {
     const nome = document.getElementById('custom-nome')?.value?.trim();
     if (!nome) { toast('Informe um nome', 'error'); return; }
 
+    const _pesoRaw = document.getElementById('custom-peso')?.value?.trim() || '';
+    const _pesoNum = _pesoRaw ? parseFloat(_pesoRaw.replace(',', '.')) : 0;
     personagem.inventario.push({
       nome: nome,
       tipo: 'customizado',
@@ -3387,7 +3419,8 @@ function mostrarFormCustomItem() {
       dados: {
         bonus_ca: document.getElementById('custom-ca')?.value || '0',
         dano: document.getElementById('custom-dano')?.value || '',
-        bonus_ataque: document.getElementById('custom-ataque')?.value || '0'
+        bonus_ataque: document.getElementById('custom-ataque')?.value || '0',
+        peso: (_pesoNum > 0 ? `${fmtPeso(_pesoNum)} kg` : '')
       }
     });
     window.fecharModal();
@@ -4088,6 +4121,7 @@ function renderStepDetalhes(el) {
     const alturaPequeno = matchPequeno ? matchPequeno[1] : 'cerca de 0,60-1,20 metro';
     const borderMedio = personagem.tamanho === 'Médio' ? 'var(--primary)' : 'var(--border-light)';
     const borderPequeno = personagem.tamanho === 'Pequeno' ? 'var(--primary)' : 'var(--border-light)';
+    const _forcaCarga = personagem.atributos?.forca || 0;
     tamanhoCardHtml = `
     <div class="card mb-2">
       <div class="card-header"><h3>Tamanho da Criatura</h3></div>
@@ -4102,7 +4136,7 @@ function renderStepDetalhes(el) {
           <div style="font-size:0.8rem;color:var(--text-muted)">
             <div>Altura: ${alturaMedio}</div>
             <div>Espaco em combate: 1,5 x 1,5 m</div>
-            <div>Capacidade de carga: For x 7 kg</div>
+            <div>Capacidade de carga: <strong>${descreverCapacidadeCarga(_forcaCarga, 'Médio')}</strong></div>
           </div>
         </div>
         <div style="border:2px solid ${borderPequeno};border-radius:8px;padding:10px;cursor:pointer;transition:border-color 0.2s" data-tamanho-card="Pequeno">
@@ -4112,7 +4146,7 @@ function renderStepDetalhes(el) {
           <div style="font-size:0.8rem;color:var(--text-muted)">
             <div>Altura: ${alturaPequeno}</div>
             <div>Espaco em combate: 1,5 x 1,5 m</div>
-            <div>Capacidade de carga: For x 7 kg</div>
+            <div>Capacidade de carga: <strong>${descreverCapacidadeCarga(_forcaCarga, 'Pequeno')}</strong></div>
           </div>
         </div>
       </div>
@@ -4128,6 +4162,8 @@ function renderStepDetalhes(el) {
     const alturaFixa = matchAltura ? matchAltura[1] : '';
     const tamanhoFixo = personagem.tamanho || 'Médio';
     const espacoCombate = tamanhoFixo === 'Pequeno' ? '1,5 x 1,5 m' : (tamanhoFixo === 'Grande' ? '3 x 3 m' : '1,5 x 1,5 m');
+    const _forcaCargaFixo = personagem.atributos?.forca || 0;
+    const _capFixo = descreverCapacidadeCarga(_forcaCargaFixo, tamanhoFixo);
     tamanhoCardHtml = `
     <div class="card mb-2">
       <div class="card-header"><h3>Tamanho da Criatura</h3></div>
@@ -4136,7 +4172,7 @@ function renderStepDetalhes(el) {
         <div style="font-size:0.8rem;color:var(--text-muted)">
           ${alturaFixa ? '<div>Altura: ' + alturaFixa + '</div>' : ''}
           <div>Espaco em combate: ${espacoCombate}</div>
-          <div>Capacidade de carga: For x 7 kg</div>
+          <div>Capacidade de carga: <strong>${_capFixo}</strong></div>
         </div>
       </div>
     </div>
