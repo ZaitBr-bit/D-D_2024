@@ -95,13 +95,11 @@ function verificarAtualizacaoSW(registration) {
     if (sw._dndAtualizacaoAplicada) return;
     sw._dndAtualizacaoAplicada = true;
 
-    if ('caches' in window) {
-      caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).then(() => {
-        sw.postMessage({ type: 'SKIP_WAITING' });
-      });
-    } else {
-      sw.postMessage({ type: 'SKIP_WAITING' });
-    }
+    // NAO apagar caches aqui. O proprio SW (evento 'activate') remove apenas os
+    // caches de versoes antigas. Apagar tudo do cliente destroi o cache que o novo
+    // SW acabou de popular no 'install', deixando o app sem conteudo offline
+    // (erro "Returned response is null" ao abrir sem rede).
+    sw.postMessage({ type: 'SKIP_WAITING' });
   }
 
   if (novoSW) {

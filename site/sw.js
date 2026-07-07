@@ -25,12 +25,43 @@ const STATIC_ASSETS = [
 ];
 
 self.addEventListener('install', (event) => {
-  // Pré-cachear assets estáticos na nova versão
-  event.waitUntil(
-    caches.open(CACHE_STATIC).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
-    })
-  );
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_STATIC);
+    // Cachear individualmente: um asset que falhe (404 / rede) NAO pode abortar
+    // todo o precache — comportamento do cache.addAll — o que deixaria o app sem
+    // shell offline. allSettled garante que os demais sejam cacheados mesmo assim.
+    await Promise.allSettled(
+      STATIC_ASSETS.map(async (url) => {
+        try {
+          const resp = await fetch(url, { cache: 'no-store' });
+          if (resp.ok) await cache.put(url, resp.clone());
+        } catch (e) {
+          // asset indisponivel no install; sera cacheado on-demand pelo fetch handler
+        }
+      })
+    );
+
+    // Precache dos dados de jogo (classes, magias, especies...) para ficha offline.
+    // A lista e gerada no deploy (dados-precache.json). Local/dev pode nao existir:
+    // nesse caso os dados sao cacheados on-demand pelo fetch handler.
+    try {
+      const respLista = await fetch('./dados-precache.json', { cache: 'no-store' });
+      if (respLista.ok) {
+        const lista = await respLista.json();
+        const cacheData = await caches.open(CACHE_DATA);
+        await Promise.allSettled(
+          lista.map(async (dadoUrl) => {
+            try {
+              const r = await fetch(dadoUrl, { cache: 'no-store' });
+              if (r.ok) await cacheData.put(dadoUrl, r.clone());
+            } catch (e) { /* ignora arquivo indisponivel */ }
+          })
+        );
+      }
+    } catch (e) {
+      // sem manifesto (dev): dados serao cacheados on-demand
+    }
+  })());
 });
 
 self.addEventListener('activate', (event) => {
@@ -73,54 +104,70 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Navegação: Network-first com fallback pro cache (bypass total do cache HTTP)
+  // Navegacao: rede primeiro; offline serve o shell cacheado (nunca null)
   if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request, { cache: 'no-store' })
-        .then((response) => {
-          const clone = response.clone();
-          caches.open(CACHE_STATIC).then((cache) => cache.put(request, clone));
-          return response;
-        })
-        .catch(() => caches.match('./index.html'))
-    );
+    event.respondWith((async () => {
+      try {
+        const fresh = await fetch(request, { cache: 'no-store' });
+        const cache = await caches.open(CACHE_STATIC);
+        cache.put(request, fresh.clone());
+        return fresh;
+      } catch {
+        return (await caches.match(request))
+          || (await caches.match('./index.html'))
+          || new Response(
+            '<!doctype html><meta charset="utf-8"><title>Offline</title>'
+            + '<p>App indisponivel offline. Abra online uma vez para instalar.</p>',
+            { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+          );
+      }
+    })());
     return;
   }
 
-  // Dados JSON (/dados/): Network-first com cache para offline (bypass total do cache HTTP)
+  // Dados JSON (/dados/): rede primeiro, cache para offline; nunca null
   if (url.pathname.includes('/dados/')) {
-    event.respondWith(
-      fetch(request, { cache: 'no-store' })
-        .then((response) => {
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(CACHE_DATA).then((cache) => cache.put(request, clone));
-          }
-          return response;
-        })
-        .catch(() => caches.match(request))
-    );
+    event.respondWith((async () => {
+      try {
+        const fresh = await fetch(request, { cache: 'no-store' });
+        if (fresh.ok) {
+          const cache = await caches.open(CACHE_DATA);
+          cache.put(request, fresh.clone());
+        }
+        return fresh;
+      } catch {
+        return (await caches.match(request))
+          || new Response('null', { status: 200, headers: { 'Content-Type': 'application/json' } });
+      }
+    })());
     return;
   }
 
-  // Assets estáticos (JS, CSS, imagens): Network-first com fallback cache (bypass total do cache HTTP)
-  if (url.pathname.match(/\.(js|css|png|jpg|ico|svg|woff2?)$/)) {
-    event.respondWith(
-      fetch(request, { cache: 'no-store' })
-        .then((response) => {
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(CACHE_STATIC).then((cache) => cache.put(request, clone));
-          }
-          return response;
-        })
-        .catch(() => caches.match(request))
-    );
+  // Assets estaticos (JS, CSS, imagens): rede primeiro, fallback cache; nunca null
+  if (url.pathname.match(/\.(js|css|png|jpg|jpeg|ico|svg|woff2?)$/)) {
+    event.respondWith((async () => {
+      try {
+        const fresh = await fetch(request, { cache: 'no-store' });
+        if (fresh.ok) {
+          const cache = await caches.open(CACHE_STATIC);
+          cache.put(request, fresh.clone());
+        }
+        return fresh;
+      } catch {
+        return (await caches.match(request))
+          || new Response('', { status: 504, statusText: 'Offline' });
+      }
+    })());
     return;
   }
 
-  // Outras requisições: tentar rede, depois cache
-  event.respondWith(
-    fetch(request).catch(() => caches.match(request))
-  );
+  // Outras requisicoes (ex: manifest.json): rede, depois cache; nunca null
+  event.respondWith((async () => {
+    try {
+      return await fetch(request);
+    } catch {
+      return (await caches.match(request))
+        || new Response('', { status: 504, statusText: 'Offline' });
+    }
+  })());
 });

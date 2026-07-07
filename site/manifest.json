@@ -2,6 +2,8 @@
   "name": "D&D 5.5 - Ficha de Personagem",
   "short_name": "D&D Ficha",
   "description": "Criador de fichas de personagem para D&D 5.5 (2024)",
+  "id": "./",
+  "scope": "./",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#faf8f4",
