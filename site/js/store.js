@@ -221,6 +221,7 @@ export function criarPersonagemVazio() {
     notas: '',
     idiomas: ['Comum'],
     tamanho: '',
+    config: { sobrecarga_afeta_deslocamento: false },
     condicoes: [],
     resistencias: [],
     vulnerabilidades: [],

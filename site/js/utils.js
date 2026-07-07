@@ -552,3 +552,62 @@ export function processarImagemArquivo(file, maxDim = 300) {
     reader.readAsDataURL(file);
   });
 }
+
+/** Converte string de peso ("0,5 kg", "250 g", "1 kg (saco)", "—", "Varia") em kg (number). */
+export function parsePeso(pesoStr) {
+  if (pesoStr == null) return 0;
+  const txt = String(pesoStr).trim();
+  if (!txt || txt === '—' || txt === '-' || /varia/i.test(txt)) return 0;
+  // "kg" tem prioridade sobre "g" para não casar o 'g' de 'kg'
+  const mkg = txt.match(/(\d+(?:[.,]\d+)?)\s*kg/i);
+  if (mkg) return parseFloat(mkg[1].replace(',', '.'));
+  const mg = txt.match(/(\d+(?:[.,]\d+)?)\s*g\b/i);
+  if (mg) return parseFloat(mg[1].replace(',', '.')) / 1000;
+  const m = txt.match(/(\d+(?:[.,]\d+)?)/);
+  return m ? parseFloat(m[1].replace(',', '.')) : 0;
+}
+
+/** Formata kg com vírgula decimal (ex: 3.5 -> "3,5"). */
+export function fmtPeso(kg) {
+  const n = Math.round((Number(kg) || 0) * 100) / 100;
+  return n.toString().replace('.', ',');
+}
+
+/** Multiplicador de capacidade de carregar por tamanho de criatura. */
+export function getMultiplicadorCarga(tamanho) {
+  const t = String(tamanho || 'Médio').trim();
+  const mult = {
+    'Minúsculo': 3.5, 'Pequeno': 7, 'Médio': 7,
+    'Grande': 13.5, 'Enorme': 27, 'Colossal': 54.5
+  };
+  if (mult[t] != null) return mult[t];
+  // "Médio ou Pequeno" e variações
+  if (/Grande/i.test(t)) return 13.5;
+  if (/Pequeno|Médio/i.test(t)) return 7;
+  return 7;
+}
+
+/** Capacidade de carregar em kg: Força (valor) × multiplicador de tamanho. */
+export function getCapacidadeCarga(forca, tamanho) {
+  const f = parseInt(forca) || 0;
+  return f * getMultiplicadorCarga(tamanho);
+}
+
+/** Descrição do cálculo real da capacidade (ex: "Força 15 × 7 (Pequeno) = 105 kg"). */
+export function descreverCapacidadeCarga(forca, tamanho) {
+  const f = parseInt(forca) || 0;
+  const mult = getMultiplicadorCarga(tamanho);
+  const total = f * mult;
+  return `Força ${f} × ${fmtPeso(mult)} (${tamanho || 'Médio'}) = ${fmtPeso(total)} kg`;
+}
+
+/** Peso total do inventário em kg (peso × quantidade; ignora itens com qtd <= 0). */
+export function getPesoTotalInventario(inventario) {
+  if (!Array.isArray(inventario)) return 0;
+  return inventario.reduce((total, item) => {
+    const qtd = item.quantidade ?? 1;
+    if (qtd <= 0) return total;
+    const peso = parsePeso(item.dados?.peso ?? item.peso);
+    return total + peso * qtd;
+  }, 0);
+}
