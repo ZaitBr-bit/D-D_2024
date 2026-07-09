@@ -207,7 +207,14 @@ const STEP_DEFINITIONS = [
     obrigatorio: true,
     visivel: (ctx) => ctx.ganhaASI,
     completo: (ctx, state) => {
-      if (state.asiModo === 'talento') return !!state.talento;
+      if (state.asiModo === 'talento') {
+        if (!state.talento) return false;
+        if (state.talento === 'Iniciado em Magia') {
+          const im = state.iniciadoEmMagia;
+          if (!im || !im.lista || !im.atributo || (im.truques?.length || 0) < 2 || !im.magia) return false;
+        }
+        return true;
+      }
       if (state.asiModo === 'atributo') return state.pontosDistribuidos === 2;
       return false;
     }

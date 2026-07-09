@@ -7734,6 +7734,9 @@ function renderSecaoTalentos() {
               <strong>Lista:</strong> ${im.lista} | <strong>Atributo:</strong> ${ATRIBUTOS_NOMES[im.atributo] || im.atributo || '—'}
               <br><strong>Truques:</strong> ${(im.truques || []).join(', ') || '—'}
               <br><strong>Magia 1o Círculo:</strong> ${im.magia || '—'}
+              <div class="no-print" style="margin-top:6px">
+                <button class="btn btn-sm btn-secondary" data-editar-im="${ordinal}">Substituir magia</button>
+              </div>
             </div>`;
           }
         }
@@ -7990,6 +7993,124 @@ async function abrirModalIniciadoEmMagiaFicha(restantes = 1) {
     if (restantes > 1) {
       abrirModalIniciadoEmMagiaFicha(restantes - 1);
     }
+  });
+}
+
+/**
+ * Modal de "Substituição de Magia" do talento Iniciado em Magia.
+ * Regra 2024: ao alcançar um novo nível, pode substituir uma das magias escolhidas
+ * para o talento por outra do mesmo círculo, da mesma lista. A lista e o atributo
+ * de conjuração ficam fixos; troca-se truques (círculo 0) e/ou a magia de 1º círculo.
+ * @param {number} ordinal - índice da instância em char.iniciado_em_magia_instancias
+ */
+async function abrirModalEditarIniciadoEmMagia(ordinal) {
+  const instancias = char.iniciado_em_magia_instancias || [];
+  const inst = instancias[ordinal];
+  if (!inst) { toast('Instância de Iniciado em Magia não encontrada', 'error'); return; }
+
+  // Estado de edição (cópia; só aplica ao salvar)
+  const estado = { truques: [...(inst.truques || [])], magia: inst.magia || '' };
+  const outrasInstancias = instancias.filter((_, i) => i !== ordinal);
+
+  abrirModal('Iniciado em Magia — Substituir Magia',
+    `<div class="info-box info" style="font-size:0.8rem">Lista: <strong>${inst.lista}</strong> · Atributo: <strong>${ATRIBUTOS_NOMES[inst.atributo] || inst.atributo || '—'}</strong><br>Substitua truques ou a magia de 1º círculo por outras da mesma lista.</div>
+     <div id="im-edit-magias" style="margin-top:8px">Carregando...</div>`,
+    '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-im-edit">Salvar</button>');
+
+  const dados = await getMagiasClasse(inst.lista);
+  const listaMagias = dados?.lista_magias || {};
+  const truquesDisp = (listaMagias['Truques'] || []).map(m => typeof m === 'string' ? { nome: m } : m);
+  const c1Disp = (listaMagias['1º Círculo'] || []).map(m => typeof m === 'string' ? { nome: m } : m);
+
+  const renderMagias = () => {
+    const area = document.getElementById('im-edit-magias');
+    if (!area) return;
+
+    // Truques/magias já conhecidos por OUTRA fonte (não pela seleção atual desta instância)
+    const jaTemTruqueIM = new Set((char.magias_conhecidas || []).filter(m => m.circulo === 0).map(m => m.nome));
+    const jaTemMagiaIM = new Set([
+      ...(char.magias_preparadas || []).map(m => m.nome),
+      ...(char.magias_conhecidas || []).filter(m => m.circulo === 1).map(m => m.nome)
+    ]);
+
+    area.innerHTML = `
+      <div style="font-weight:600;font-size:0.85rem">Truques (<span id="im-edit-truques-count">${estado.truques.length}</span>/2)</div>
+      <div style="max-height:25vh;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:4px;margin:4px 0">
+        ${truquesDisp.map(m => {
+          const bloqueado = jaTemTruqueIM.has(m.nome) && !estado.truques.includes(m.nome);
+          return `
+          <label style="display:flex;align-items:center;gap:4px;font-size:0.82rem;padding:2px 4px;border:1px solid var(--border-light);border-radius:4px${bloqueado ? ';opacity:0.4' : ''}">
+            <input type="checkbox" class="im-edit-truque" value="${m.nome}" ${estado.truques.includes(m.nome) ? 'checked' : ''} ${bloqueado ? 'disabled' : ''}> ${m.nome}${bloqueado ? ' (já conhecido)' : ''}
+          </label>
+        `;
+        }).join('')}
+      </div>
+      <div style="font-weight:600;font-size:0.85rem;margin-top:8px">Magia de 1º Círculo</div>
+      <select class="form-input" id="im-edit-magia">
+        <option value="">Selecione...</option>
+        ${c1Disp.map(m => {
+          const bloqueado = jaTemMagiaIM.has(m.nome) && estado.magia !== m.nome;
+          return `<option value="${m.nome}" ${estado.magia === m.nome ? 'selected' : ''} ${bloqueado ? 'disabled' : ''}>${m.nome}${bloqueado ? ' (já conhecida)' : ''}</option>`;
+        }).join('')}
+      </select>
+    `;
+
+    area.querySelectorAll('.im-edit-truque').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const marcados = [...area.querySelectorAll('.im-edit-truque:checked')].map(c => c.value);
+        if (marcados.length > 2) { cb.checked = false; return; }
+        estado.truques = marcados;
+        const cnt = document.getElementById('im-edit-truques-count');
+        if (cnt) cnt.textContent = estado.truques.length;
+      });
+    });
+    document.getElementById('im-edit-magia')?.addEventListener('change', (e) => { estado.magia = e.target.value; });
+  };
+
+  renderMagias();
+
+  document.getElementById('btn-salvar-im-edit')?.addEventListener('click', () => {
+    if (estado.truques.length !== 2) { toast('Selecione exatamente 2 truques', 'error'); return; }
+    if (!estado.magia) { toast('Selecione 1 magia de 1º círculo', 'error'); return; }
+
+    const oldTruques = inst.truques || [];
+    const oldMagia = inst.magia || '';
+    // Truques ainda usados por outras instâncias — não remover das conhecidas
+    const truquesOutras = new Set(outrasInstancias.flatMap(i => i.truques || []));
+    const magiasOutras = new Set(outrasInstancias.map(i => i.magia).filter(Boolean));
+
+    if (!char.magias_conhecidas) char.magias_conhecidas = [];
+    if (!char.magias_preparadas) char.magias_preparadas = [];
+
+    // Remover truques que saíram (se vieram do IM e não são usados por outra instância)
+    for (const nome of oldTruques) {
+      if (estado.truques.includes(nome)) continue;
+      if (truquesOutras.has(nome)) continue;
+      char.magias_conhecidas = char.magias_conhecidas.filter(m => !(m.nome === nome && m.circulo === 0 && m.origem === 'iniciado_em_magia'));
+    }
+    // Adicionar truques novos
+    for (const nome of estado.truques) {
+      if (!char.magias_conhecidas.find(m => m.nome === nome && m.circulo === 0)) {
+        char.magias_conhecidas.push({ nome, circulo: 0, origem: 'iniciado_em_magia' });
+      }
+    }
+    // Trocar magia de 1º círculo, se mudou
+    if (oldMagia !== estado.magia) {
+      if (oldMagia && !magiasOutras.has(oldMagia)) {
+        char.magias_preparadas = char.magias_preparadas.filter(m => !(m.nome === oldMagia && m.origem === 'iniciado_em_magia'));
+      }
+      if (!char.magias_preparadas.find(m => m.nome === estado.magia)) {
+        char.magias_preparadas.push({ nome: estado.magia, circulo: 1, origem: 'iniciado_em_magia', gratis_usado: false });
+      }
+    }
+
+    inst.truques = [...estado.truques];
+    inst.magia = estado.magia;
+
+    salvar();
+    window.fecharModal();
+    renderFichaCompleta();
+    toast('Magias do talento substituídas!', 'success');
   });
 }
 
@@ -12631,6 +12752,11 @@ function setupEventosEspacosMagia() {
 
   // Adicionar talento manualmente
   document.getElementById('btn-add-talento')?.addEventListener('click', () => abrirModalAdicionarTalento());
+
+  // Substituição de Magia (Iniciado em Magia): trocar truques/magia de uma instância
+  document.querySelectorAll('[data-editar-im]').forEach(btn => {
+    btn.addEventListener('click', () => abrirModalEditarIniciadoEmMagia(parseInt(btn.dataset.editarIm)));
+  });
 
   // Preencher slot de magia liberado por ajuste automático (bug de magia passiva duplicada)
   document.getElementById('btn-preencher-slot-magia')?.addEventListener('click', () => abrirPreenchimentoSlotMagia());

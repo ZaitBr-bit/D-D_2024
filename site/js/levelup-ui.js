@@ -286,6 +286,19 @@ function salvarStateDoDOM(ctx, state, step) {
             state.dadivaResistenciaEnergia = tiposEscolhidos;
           }
         }
+        // Iniciado em Magia: cascata (lista + atributo + truques + magia).
+        // Persistir aqui porque o DOM deste step é destruído ao avançar para a
+        // revisão — confirmarLevelUp precisa ler de state, não do DOM.
+        if (state.talento === 'Iniciado em Magia') {
+          const imLista = document.getElementById('levelup-im-lista')?.value || '';
+          const imAtributo = document.getElementById('levelup-im-atributo')?.value || '';
+          const imTruques = [...document.querySelectorAll('.levelup-im-truque:checked')].map(cb => cb.value);
+          const imMagia = document.getElementById('levelup-im-magia')?.value || '';
+          if (imLista || imAtributo || imTruques.length > 0 || imMagia) {
+            state.iniciadoEmMagia = { lista: imLista, atributo: imAtributo, truques: imTruques, magia: imMagia };
+            state.talentoTipoEscolha = 'iniciado_em_magia';
+          }
+        }
       }
       break;
     }
@@ -1019,17 +1032,14 @@ async function confirmarLevelUp(ctx, state) {
   const erro = validateAll(ctx, state);
   if (erro) { toast(erro, 'error'); return; }
 
-  // Validar e coletar dados de Iniciado em Magia
+  // Validar dados de Iniciado em Magia (já persistidos em state por salvarStateDoDOM;
+  // o DOM do step de talento não existe mais nesta etapa de revisão).
   if (ctx.ganhaASI && state.asiModo === 'talento' && state.talento === 'Iniciado em Magia') {
-    const lista = document.getElementById('levelup-im-lista')?.value;
-    const atributo = document.getElementById('levelup-im-atributo')?.value;
-    const truques = [...document.querySelectorAll('.levelup-im-truque:checked')].map(cb => cb.value);
-    const magia = document.getElementById('levelup-im-magia')?.value;
-    if (!lista || !atributo || truques.length < 2 || !magia) {
+    const im = state.iniciadoEmMagia;
+    if (!im || !im.lista || !im.atributo || (im.truques?.length || 0) < 2 || !im.magia) {
       toast('Preencha todas as escolhas de Iniciado em Magia', 'error');
       return;
     }
-    state.iniciadoEmMagia = { lista, atributo, truques, magia };
   }
 
   // Coletar tipo de escolha para talentos especiais
