@@ -553,6 +553,22 @@ export async function atualizarEspacosMagia(personagem, classeData) {
 }
 
 /**
+ * Adiciona uma magia concedida automaticamente (domínio/sempre-preparada) a uma lista.
+ * Se a magia já existe na lista (ex.: escolhida manualmente antes da característica
+ * que a concede automaticamente existir), promove a entrada existente em vez de
+ * ignorá-la - senão ela fica presa contando no limite normal de magias preparadas.
+ */
+function _concederMagiaAutomatica(lista, magia, origem) {
+  const existente = lista.find(m => m.nome === magia.nome);
+  if (existente) {
+    existente.origem = origem;
+    existente.circulo = magia.circulo;
+  } else {
+    lista.push({ ...magia, origem });
+  }
+}
+
+/**
  * Função principal de level-up
  * @param {Object} personagem - Objeto do personagem
  * @param {Object} opcoes - Opções para o level-up
@@ -759,24 +775,24 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   if (magiasDominio.length > 0) {
     if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
     for (const magia of magiasDominio) {
-      if (!personagem.magias_preparadas.find(m => m.nome === magia.nome)) {
-        personagem.magias_preparadas.push({ ...magia, origem: 'dominio' });
-      }
+      _concederMagiaAutomatica(personagem.magias_preparadas, magia, 'dominio');
     }
   }
 
   // Adicionar automaticamente magias sempre preparadas (truques vão para magias_conhecidas)
-  const magiasSempre = await obterMagiasSemprePreparadasNivel(personagem.classe, subclasseAtual, novoNivel);
+  // Excluir magias já concedidas por Domínio - a mesma magia pode aparecer em ambas as
+  // listas porque o texto de "Magias de Domínio" também casa com o parser de "sempre
+  // preparada"; Domínio deve ganhar (mantém origem: 'dominio', não 'sempre').
+  const magiasSempre = (await obterMagiasSemprePreparadasNivel(personagem.classe, subclasseAtual, novoNivel))
+    .filter(magia => !magiasDominio.some(d => d.nome === magia.nome));
   if (magiasSempre.length > 0) {
     if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
     if (!personagem.magias_conhecidas) personagem.magias_conhecidas = [];
     for (const magia of magiasSempre) {
       if (magia.circulo === 0) {
-        if (!personagem.magias_conhecidas.find(m => m.nome === magia.nome)) {
-          personagem.magias_conhecidas.push({ ...magia, origem: 'sempre' });
-        }
-      } else if (!personagem.magias_preparadas.find(m => m.nome === magia.nome)) {
-        personagem.magias_preparadas.push({ ...magia, origem: 'sempre' });
+        _concederMagiaAutomatica(personagem.magias_conhecidas, magia, 'sempre');
+      } else {
+        _concederMagiaAutomatica(personagem.magias_preparadas, magia, 'sempre');
       }
     }
   }
