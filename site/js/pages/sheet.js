@@ -2,7 +2,8 @@
 // Ficha de Personagem - Visualização e Edição
 // ============================================================
 import { CLASSES_INFO, PERICIAS, ATRIBUTOS_NOMES, ATRIBUTOS_KEYS, ATRIBUTO_NOME_PARA_KEY } from '../dados-classes.js';
-import { getPersonagem, salvarPersonagem, removerPersonagem } from '../store.js';
+import { getPersonagem, salvarPersonagem, removerPersonagem, salvarTaxasMoeda, resetarTaxasMoeda, carregarComprarAtivoPadrao, salvarComprarAtivoPadrao } from '../store.js';
+import { DENOMINACOES, NOMES_MOEDA, ICONE_MOEDA, VALOR_EM_COBRE, formatarCarteira, adicionarMoeda, podePagar, retirarValor, removerQuantidadeMoeda, proximaDenominacaoMaior, converterParaMaior, taxasSaoPadrao, totalEmCobre, parseCusto, podePagarCusto, pagarCusto } from '../moedas.js';
 import { getClasse, getMagiasClasse, getMagiasPorCirculo, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura, getTalentos, getEspecies } from '../db.js';
 import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagia, calcPercepcaoPassiva, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcBonusPericia, calcPVTotal, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, gerarId, detectarRecarga, ehHabilidadeAtiva, getDeslocamento, getTamanho, escHtml, processarImagemArquivo, parsePeso, fmtPeso, getCapacidadeCarga, getMultiplicadorCarga, getPesoTotalInventario } from '../utils.js';
 import { podeSubirDeNivel, subirDeNivel, XP_POR_NIVEL, adicionarXP, obterTodasMagiasDominio, obterTodasMagiasSemprePreparadas, exigeEspecializacaoBardo, exigeEspecializacaoGuardiao, exigeEstiloLuta, exigeExploradorHabil, exigeAcademico } from '../levelup.js';
@@ -13236,7 +13237,7 @@ async function mostrarBuscaGrimorio() {
   abrirModal('Copiar Magia para o Grimório', `
     <div class="info-box warning" style="margin-bottom:8px">
       <strong>Custo:</strong> 50 PO por círculo da magia | <strong>Tempo:</strong> 2h por círculo<br>
-      <small>Disponível: ${char.po || 0} PO</small>
+      <small>Disponível: ${formatarCarteira(char.moedas)}</small>
     </div>
     <div class="search-box"><input type="text" id="busca-grimorio" placeholder="Buscar magia de Mago..." class="form-input" autofocus></div>
     <div id="resultado-grimorio" style="min-height:35dvh;max-height:50dvh;overflow-y:auto"></div>
@@ -13258,7 +13259,7 @@ async function mostrarBuscaGrimorio() {
 
     resultadoEl.innerHTML = lista.map(m => {
       const custo = m.circulo * 50;
-      const temPO = (char.po || 0) >= custo;
+      const temPO = podePagar(char.moedas, custo * VALOR_EM_COBRE.po);
       return `
       <div class="magia-item" style="cursor:pointer${!temPO ? ';opacity:0.5' : ''}" data-grim-nome="${m.nome}" data-grim-circ="${m.circulo}" data-grim-custo="${custo}">
         <div class="magia-nome">${m.nome}</div>
@@ -13275,13 +13276,14 @@ async function mostrarBuscaGrimorio() {
         const nome = el.dataset.grimNome;
         const circ = parseInt(el.dataset.grimCirc);
         const custo = parseInt(el.dataset.grimCusto);
-        if ((char.po || 0) < custo) {
+        const custoCobre = custo * VALOR_EM_COBRE.po;
+        if (!podePagar(char.moedas, custoCobre)) {
           toast(`PO insuficiente! Necessário: ${custo} PO`, 'error');
           return;
         }
         if (!char.grimorio) char.grimorio = [];
         char.grimorio.push({ nome, circulo: circ });
-        char.po = (char.po || 0) - custo;
+        char.moedas = retirarValor(char.moedas, custoCobre).moedas;
         salvar();
         window.fecharModal();
         renderFichaCompleta();
@@ -14359,7 +14361,7 @@ function renderSecaoInventario() {
       <div class="card-header">
         <h2>Inventario</h2>
         <div class="no-print" style="display:flex;gap:4px;align-items:center">
-          <span style="font-weight:700;color:var(--secondary);font-size:0.9rem;cursor:pointer" id="btn-edit-po" title="Editar PO">${char.po || 0} PO</span>
+          <span style="font-weight:700;color:var(--secondary);font-size:0.9rem;cursor:pointer" id="btn-edit-po" title="Editar Carteira">${formatarCarteira(char.moedas)}</span>
           <button class="btn btn-sm btn-accent" id="btn-add-inv">+ Item</button>
           <button class="btn btn-sm btn-secondary" id="btn-add-inv-custom">+ Custom</button>
         </div>
@@ -14780,60 +14782,164 @@ function setupEventosInventarioSheet() {
     });
   };
 
-  // Editar PO
+  // Editar Carteira (moedas)
   const _btnEditPo = document.getElementById('btn-edit-po');
   if (_btnEditPo) _btnEditPo.onclick = () => {
-    abrirModal('Peças de Ouro', `
+    const renderLinhasCarteira = () => DENOMINACOES.map(tipo => {
+      const prox = proximaDenominacaoMaior(tipo);
+      const podeConverter = prox && (char.moedas[tipo] || 0) >= prox.taxa;
+      const labelConv = prox ? `↑ ${prox.tipoDestino.toUpperCase()}` : '↑';
+      const tituloConv = prox ? `Converter ${prox.taxa} ${tipo.toUpperCase()} em 1 ${prox.tipoDestino.toUpperCase()}` : '';
+      return `
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+          <span style="width:150px;font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${NOMES_MOEDA[tipo]} (${tipo.toUpperCase()})">${ICONE_MOEDA[tipo]} ${NOMES_MOEDA[tipo]}</span>
+          <span style="min-width:60px;text-align:right;font-weight:700">${char.moedas[tipo] || 0}</span>
+          <input type="number" class="form-input" id="edit-moeda-${tipo}" min="0" placeholder="0" style="width:90px;box-sizing:border-box">
+          <button class="btn btn-success btn-sm" data-moeda-add="${tipo}" style="height:36px">+</button>
+          <button class="btn btn-danger btn-sm" data-moeda-sub="${tipo}" style="height:36px">-</button>
+          <button class="btn btn-secondary btn-sm" data-moeda-conv="${tipo}" style="height:36px;min-width:52px${podeConverter ? '' : ';visibility:hidden'}" title="${tituloConv}" ${podeConverter ? '' : 'tabindex="-1"'}>${labelConv}</button>
+        </div>
+      `;
+    }).join('');
+
+    const renderLegendaTaxas = () => {
+      const partes = ['pc', 'pp', 'pe', 'po'].map(tipo => {
+        const prox = proximaDenominacaoMaior(tipo);
+        return `${prox.taxa} ${tipo.toUpperCase()} = 1 ${prox.tipoDestino.toUpperCase()}`;
+      });
+      return `Tabela atual: ${partes.join(' | ')}`;
+    };
+
+    // Cadeia de conversao no estilo da tabela do livro (X menor = 1 maior)
+    const CADEIA_TAXAS = [
+      { de: 'pc', para: 'pp' },
+      { de: 'pp', para: 'pe' },
+      { de: 'pe', para: 'po' },
+      { de: 'po', para: 'pl' }
+    ];
+
+    const renderCorpoTaxas = () => `
+      <div style="text-align:center;margin-bottom:12px;font-size:0.75rem;color:var(--text-muted)">
+        Quantas moedas menores formam 1 moeda maior, como na tabela do livro. Muda o valor real das moedas já guardadas.
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;max-width:280px;margin:0 auto">
+        ${CADEIA_TAXAS.map(({ de, para }) => {
+          const prox = proximaDenominacaoMaior(de);
+          return `
+            <div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:0.85rem">
+              <input type="number" class="form-input" id="taxa-${de}-${para}" min="1" step="1" value="${prox.taxa}" style="width:80px;text-align:center;box-sizing:border-box">
+              <span style="white-space:nowrap">${ICONE_MOEDA[de]} ${de.toUpperCase()} = 1 ${ICONE_MOEDA[para]} ${para.toUpperCase()}</span>
+            </div>
+          `;
+        }).join('')}
+      </div>
+      <div style="display:flex;gap:6px;margin-top:16px;justify-content:center">
+        <button class="btn btn-primary btn-sm" id="btn-salvar-taxas">Salvar</button>
+        ${!taxasSaoPadrao() ? '<button class="btn btn-secondary btn-sm" id="btn-resetar-taxas">Restaurar padrão</button>' : ''}
+      </div>
+    `;
+
+    function wireEventosTaxas(subOverlay) {
+      subOverlay.querySelector('#btn-salvar-taxas')?.addEventListener('click', () => {
+        const lerTaxa = (de, para) => parseInt(subOverlay.querySelector(`#taxa-${de}-${para}`)?.value);
+        const rPcPp = lerTaxa('pc', 'pp');
+        const rPpPe = lerTaxa('pp', 'pe');
+        const rPePo = lerTaxa('pe', 'po');
+        const rPoPl = lerTaxa('po', 'pl');
+        const pp = rPcPp;
+        const pe = pp * rPpPe;
+        const po = pe * rPePo;
+        const pl = po * rPoPl;
+        const resultado = salvarTaxasMoeda({ pp, pe, po, pl });
+        if (!resultado.sucesso) {
+          toast(resultado.erro, 'error');
+          return;
+        }
+        atualizarModalCarteira();
+        subOverlay.querySelector('[data-fechar-sub]')?.click();
+        toast('Taxas de conversão salvas!', 'success');
+      });
+
+      subOverlay.querySelector('#btn-resetar-taxas')?.addEventListener('click', () => {
+        resetarTaxasMoeda();
+        atualizarModalCarteira();
+        subOverlay.querySelector('[data-fechar-sub]')?.click();
+        toast('Taxas restauradas ao padrão!', 'success');
+      });
+    }
+
+    const renderCorpoCarteira = () => `
       <div style="text-align:center;margin-bottom:12px">
-        <div style="font-size:1.3rem;font-weight:700;color:var(--primary)">${char.po || 0} PO</div>
-        <div style="font-size:0.75rem;color:var(--text-muted)">Saldo atual</div>
+        <div style="font-size:1.1rem;font-weight:700;color:var(--primary)">${formatarCarteira(char.moedas)}</div>
+        <div style="font-size:0.75rem;color:var(--text-muted)">Saldo atual — remover converte moedas maiores automaticamente se necessário</div>
       </div>
-      <div style="display:flex;gap:8px;align-items:flex-end;margin-bottom:12px">
-        <div class="form-group" style="flex:1;margin-bottom:0">
-          <label class="form-label" for="edit-po-qtd">Quantidade</label>
-          <input type="number" class="form-input" id="edit-po-qtd" min="0" placeholder="0">
-        </div>
-        <button class="btn btn-success btn-sm" id="btn-po-add" style="height:40px">+ Adicionar</button>
-        <button class="btn btn-danger btn-sm" id="btn-po-sub" style="height:40px">- Remover</button>
+      ${renderLinhasCarteira()}
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px">
+        <div style="font-size:0.7rem;color:var(--text-muted)">${renderLegendaTaxas()}</div>
+        <button class="btn btn-secondary btn-sm" id="btn-abrir-taxas" style="white-space:nowrap">⚙ Taxas</button>
       </div>
-      <div style="border-top:1px solid var(--border-light);padding-top:8px;margin-top:4px">
-        <div class="form-group" style="margin-bottom:0">
-          <label class="form-label" for="edit-po-total">Definir valor total</label>
-          <input type="number" class="form-input" id="edit-po-total" value="${char.po || 0}" min="0">
-        </div>
-      </div>
-    `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-po">Salvar Total</button>');
+    `;
 
-    document.getElementById('btn-po-add')?.addEventListener('click', () => {
-      const qtd = parseInt(document.getElementById('edit-po-qtd')?.value) || 0;
-      if (qtd <= 0) return;
-      char.po = (char.po || 0) + qtd;
-      salvar();
-      window.fecharModal();
-      renderFichaCompleta();
-      toast(`+${qtd} PO adicionadas! Total: ${char.po} PO`, 'success');
-    });
+    const atualizarModalCarteira = () => {
+      const corpoEl = document.getElementById('modal-corpo');
+      if (corpoEl) corpoEl.innerHTML = renderCorpoCarteira();
+      wireEventosCarteira();
+    };
 
-    document.getElementById('btn-po-sub')?.addEventListener('click', () => {
-      const qtd = parseInt(document.getElementById('edit-po-qtd')?.value) || 0;
-      if (qtd <= 0) return;
-      if (qtd > (char.po || 0)) {
-        toast('PO insuficiente!', 'error');
-        return;
-      }
-      char.po = (char.po || 0) - qtd;
-      salvar();
-      window.fecharModal();
-      renderFichaCompleta();
-      toast(`-${qtd} PO removidas! Total: ${char.po} PO`, 'success');
-    });
+    function wireEventosCarteira() {
+      document.querySelectorAll('[data-moeda-add]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tipo = btn.dataset.moedaAdd;
+          const qtd = parseInt(document.getElementById(`edit-moeda-${tipo}`)?.value) || 0;
+          if (qtd <= 0) return;
+          char.moedas = adicionarMoeda(char.moedas, tipo, qtd);
+          salvar();
+          renderFichaCompleta();
+          atualizarModalCarteira();
+          toast(`+${qtd} ${tipo.toUpperCase()} adicionadas!`, 'success');
+        });
+      });
 
-    document.getElementById('btn-salvar-po')?.addEventListener('click', () => {
-      char.po = parseInt(document.getElementById('edit-po-total')?.value) || 0;
-      salvar();
-      window.fecharModal();
-      renderFichaCompleta();
-    });
+      document.querySelectorAll('[data-moeda-sub]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tipo = btn.dataset.moedaSub;
+          const qtd = parseInt(document.getElementById(`edit-moeda-${tipo}`)?.value) || 0;
+          if (qtd <= 0) return;
+          const resultado = removerQuantidadeMoeda(char.moedas, tipo, qtd);
+          if (!resultado.sucesso) {
+            toast('Saldo insuficiente!', 'error');
+            return;
+          }
+          char.moedas = resultado.moedas;
+          salvar();
+          renderFichaCompleta();
+          atualizarModalCarteira();
+          toast(`-${qtd} ${tipo.toUpperCase()} removidas (conversão automática se necessário)!`, 'success');
+        });
+      });
+
+      document.querySelectorAll('[data-moeda-conv]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tipo = btn.dataset.moedaConv;
+          const resultado = converterParaMaior(char.moedas, tipo);
+          if (!resultado.sucesso) return;
+          char.moedas = resultado.moedas;
+          salvar();
+          renderFichaCompleta();
+          atualizarModalCarteira();
+          toast('Moedas convertidas!', 'success');
+        });
+      });
+
+      document.getElementById('btn-abrir-taxas')?.addEventListener('click', () => {
+        abrirModal('Taxas de Conversão', renderCorpoTaxas(), '<button class="btn btn-secondary" data-fechar-sub="true">Fechar</button>');
+        const subOverlay = document.querySelectorAll('.sub-modal-overlay');
+        wireEventosTaxas(subOverlay[subOverlay.length - 1]);
+      });
+    }
+
+    abrirModal('Carteira', renderCorpoCarteira(), '<button class="btn btn-secondary" onclick="fecharModal()">Fechar</button>');
+    wireEventosCarteira();
   };
 }
 
@@ -15240,9 +15346,26 @@ async function mostrarSeletorCategoria() {
     <div id="lista-inv-cat" style="min-height:35dvh;max-height:50dvh;overflow-y:auto"></div>
   `;
 
-  abrirModal('Adicionar Item', html);
+  abrirModal('Adicionar Item', html, '', () => {
+    document.getElementById('toggle-comprar-item')?.closest('label')?.remove();
+  });
 
   let catAtual = 'armas';
+  let comprarAtivo = carregarComprarAtivoPadrao();
+
+  const headerFechar = document.querySelector('#modal-header .modal-fechar');
+  if (headerFechar) {
+    headerFechar.insertAdjacentHTML('beforebegin', `
+      <label class="form-check" style="display:flex;align-items:center;gap:6px;font-size:0.75rem;font-weight:400;white-space:nowrap;cursor:pointer;margin-left:auto">
+        <input type="checkbox" id="toggle-comprar-item" ${comprarAtivo ? 'checked' : ''}>
+        💰 Comprar
+      </label>
+    `);
+    document.getElementById('toggle-comprar-item')?.addEventListener('change', (e) => {
+      comprarAtivo = e.target.checked;
+      salvarComprarAtivoPadrao(comprarAtivo);
+    });
+  }
 
   function renderCategoria(cat, filtroTexto) {
     const listaEl = document.getElementById('lista-inv-cat');
@@ -15369,17 +15492,86 @@ async function mostrarSeletorCategoria() {
         }
         if (!descCorpo.trim()) descCorpo = '<div style="color:var(--text-muted)">Sem descrição disponível.</div>';
 
+        const custoItemStr = item.dados?.custo || '';
+        const custoParseado = comprarAtivo ? parseCusto(custoItemStr) : null;
+        const labelBtnConfirmar = comprarAtivo ? 'Comprar e adicionar ao inventário' : 'Adicionar ao Inventário';
+        let quantidadeSelecionada = 1;
+
         abrirModal(item.nome,
           descCorpo,
           `<button class="btn btn-secondary" onclick="fecharModal()">Voltar</button>
-           <button class="btn btn-primary" id="btn-confirmar-add-item">Adicionar ao Inventário</button>`
+           <button class="btn btn-primary" id="btn-confirmar-add-item">${labelBtnConfirmar}</button>`
         );
 
-        document.getElementById('btn-confirmar-add-item')?.addEventListener('click', () => {
+        const subOverlays = document.querySelectorAll('.sub-modal-overlay');
+        const subHeaderFechar = subOverlays[subOverlays.length - 1]?.querySelector('.modal-header .modal-fechar');
+
+        if (subHeaderFechar) {
+          subHeaderFechar.insertAdjacentHTML('beforebegin', `
+            <div style="display:flex;align-items:center;gap:4px;margin-left:auto">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-qtd-item-menos" disabled style="width:26px;height:26px;padding:0;line-height:1;font-weight:700">−</button>
+              <span id="valor-qtd-item" style="min-width:18px;text-align:center;font-weight:700;font-size:0.85rem">1</span>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-qtd-item-mais" style="width:26px;height:26px;padding:0;line-height:1;font-weight:700">+</button>
+            </div>
+          `);
+
+          if (comprarAtivo) {
+            subHeaderFechar.insertAdjacentHTML('beforebegin', `
+              <span id="badge-custo-item" style="font-weight:700;font-size:0.85rem;color:var(--primary);white-space:nowrap"></span>
+            `);
+          }
+
+          const atualizarUiQtd = () => {
+            const valorEl = document.getElementById('valor-qtd-item');
+            if (valorEl) valorEl.textContent = quantidadeSelecionada;
+            const menosEl = document.getElementById('btn-qtd-item-menos');
+            if (menosEl) menosEl.disabled = quantidadeSelecionada <= 1;
+            const badgeEl = document.getElementById('badge-custo-item');
+            if (badgeEl) {
+              badgeEl.textContent = custoParseado
+                ? `💰 ${custoParseado.qtd * quantidadeSelecionada} ${custoParseado.tipo.toUpperCase()}`
+                : (custoItemStr ? `💰 ${custoItemStr}` : '💰 Custo indefinido');
+            }
+          };
+          atualizarUiQtd();
+
+          document.getElementById('btn-qtd-item-menos')?.addEventListener('click', () => {
+            if (quantidadeSelecionada > 1) {
+              quantidadeSelecionada--;
+              atualizarUiQtd();
+            }
+          });
+          document.getElementById('btn-qtd-item-mais')?.addEventListener('click', () => {
+            quantidadeSelecionada++;
+            atualizarUiQtd();
+          });
+        }
+
+        document.getElementById('btn-confirmar-add-item')?.addEventListener('click', (e) => {
+          e.target.disabled = true;
+          let sufixoToast = '';
+          const prefixoQtd = quantidadeSelecionada > 1 ? `${quantidadeSelecionada}x ` : '';
+
+          if (comprarAtivo) {
+            if (!custoParseado) {
+              sufixoToast = ' (custo indeterminado, sem cobrança)';
+            } else {
+              const custoTotalStr = `${custoParseado.qtd * quantidadeSelecionada} ${custoParseado.tipo.toUpperCase()}`;
+              if (!podePagarCusto(char.moedas, custoTotalStr)) {
+                toast(`Saldo insuficiente para comprar ${prefixoQtd}${item.nome}!`, 'error');
+                e.target.disabled = false;
+                return;
+              }
+              const resultadoPagamento = pagarCusto(char.moedas, custoTotalStr);
+              char.moedas = resultadoPagamento.moedas;
+              sufixoToast = ` por ${custoTotalStr}`;
+            }
+          }
+
           const novoItem = {
             nome: item.nome,
             tipo: item.tipo,
-            quantidade: 1,
+            quantidade: quantidadeSelecionada,
             equipado: false,
             descricao: item.tipo === 'arma' ? `${item.dados.dano}` : item.tipo === 'armadura' ? `CA: ${item.dados.ca}` : '',
             dados: { ...item.dados }
@@ -15388,7 +15580,7 @@ async function mostrarSeletorCategoria() {
           // Verificar se já existe no inventário (agrupar)
           const existente = char.inventario.find(inv => inv.nome === item.nome && inv.tipo === item.tipo);
           if (existente && ['equipamento', 'generico'].includes(item.tipo)) {
-            existente.quantidade = (existente.quantidade || 1) + 1;
+            existente.quantidade = (existente.quantidade || 1) + quantidadeSelecionada;
           } else {
             char.inventario.push(novoItem);
           }
@@ -15396,7 +15588,7 @@ async function mostrarSeletorCategoria() {
           salvar();
           window.fecharModal();
           renderFichaCompleta();
-          toast(`${item.nome} adicionado!`, 'success');
+          toast(`${prefixoQtd}${item.nome} adicionado${sufixoToast}!`, 'success');
         });
       });
     });
@@ -16119,10 +16311,10 @@ async function gerarHtmlImpressao() {
 
   // --- Inventario (itens NAO equipados) ---
   const naoEquipados = inv.filter(i => !i.equipado && (i.quantidade ?? 1) > 0);
-  if (naoEquipados.length > 0 || (char.po ?? 0) > 0) {
+  if (naoEquipados.length > 0 || totalEmCobre(char.moedas) > 0) {
     pagFinal += `<div class="print-section"><div class="print-section-title">Inventario (Mochila)</div>`;
-    if ((char.po ?? 0) > 0) {
-      pagFinal += `<div style="font-size:8.5pt;font-weight:700;margin-bottom:1mm">Ouro: ${char.po} PO</div>`;
+    if (totalEmCobre(char.moedas) > 0) {
+      pagFinal += `<div style="font-size:8.5pt;font-weight:700;margin-bottom:1mm">Moedas: ${formatarCarteira(char.moedas)}</div>`;
     }
     naoEquipados.forEach(item => {
       let detalhe = '';

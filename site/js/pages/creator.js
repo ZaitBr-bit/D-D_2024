@@ -4,6 +4,7 @@
 import { CLASSES_INFO, PERICIAS, ATRIBUTOS_NOMES, ATRIBUTOS_KEYS, ATRIBUTO_NOME_PARA_KEY, STANDARD_ARRAY, POINT_BUY_CUSTOS, POINT_BUY_TOTAL } from '../dados-classes.js';
 import { getClasse, getAntecedentes, getEspecies, getTalentos, getMagiasClasse, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura } from '../db.js';
 import { criarPersonagemVazio, salvarPersonagem } from '../store.js';
+import { DENOMINACOES, ICONE_MOEDA, criarCarteiraVazia, adicionarMoeda, removerQuantidadeMoeda } from '../moedas.js';
 import { calcMod, fmtMod, calcPVNivel1, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, getDeslocamento, getTamanho, escHtml, processarImagemArquivo, getCapacidadeCarga, getPesoTotalInventario, descreverCapacidadeCarga, fmtPeso } from '../utils.js';
 
 const STEPS = [
@@ -524,7 +525,7 @@ function limparDadosDoPasso(stepIndex) {
       personagem.escolha_equip_classe = null;
       personagem.escolha_equip_antecedente = null;
       personagem.instrumento_classe_escolhido = null;
-      personagem.po = 0;
+      personagem.moedas = criarCarteiraVazia();
       break;
 
     case 'magias':
@@ -2595,19 +2596,21 @@ function parseEquipamentoOpcoes(texto) {
     const m = texto.match(regex);
     if (m) {
       const conteudo = m[1].trim().replace(/;?\s*$/, '');
-      // Extrair PO se houver
-      const poMatch = conteudo.match(/(\d+)\s*PO$/i);
-      const po = poMatch ? parseInt(poMatch[1]) : 0;
-      // Extrair itens (tudo antes do PO ou todo conteúdo se for só PO)
-      // Remove também a conjuncao " e" residual antes do valor de PO (ex: "Kit de Artista e 19 PO" -> "Kit de Artista")
-      let itensStr = poMatch ? conteudo.replace(/,?\s*e?\s*\d+\s*PO$/i, '').trim() : conteudo;
-      // Se for só PO (sem itens), marcar como opção de dinheiro
+      // Extrair moeda se houver (qualquer uma das 5 denominacoes)
+      const moedaMatch = conteudo.match(/(\d+)\s*(PC|PP|PE|PO|PL)$/i);
+      const moedaQtd = moedaMatch ? parseInt(moedaMatch[1]) : 0;
+      const moedaTipo = moedaMatch ? moedaMatch[2].toLowerCase() : 'po';
+      // Extrair itens (tudo antes da moeda ou todo conteúdo se for só moeda)
+      // Remove também a conjuncao " e" residual antes do valor (ex: "Kit de Artista e 19 PO" -> "Kit de Artista")
+      let itensStr = moedaMatch ? conteudo.replace(/,?\s*e?\s*\d+\s*(PC|PP|PE|PO|PL)$/i, '').trim() : conteudo;
+      // Se for só moeda (sem itens), marcar como opção de dinheiro
       const apenasOuro = !itensStr || itensStr.length < 3;
       opcoes.push({
         letra,
         conteudo: conteudo,
         itens: apenasOuro ? [] : itensStr.split(',').map(i => i.trim()).filter(Boolean),
-        po,
+        moedaTipo,
+        moedaQtd,
         apenasOuro
       });
     }
@@ -2624,8 +2627,8 @@ function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
   );
 
   if (opcao.apenasOuro) {
-    // Opção de apenas ouro - adicionar ao PO
-    personagem.po = (personagem.po || 0) + opcao.po;
+    // Opção de apenas dinheiro - adicionar à carteira
+    personagem.moedas = adicionarMoeda(personagem.moedas, opcao.moedaTipo, opcao.moedaQtd);
     return;
   }
 
@@ -2765,9 +2768,9 @@ function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
     });
   }
 
-  // Adicionar PO da opção (se houver)
-  if (opcao.po > 0 && !opcao.apenasOuro) {
-    personagem.po = (personagem.po || 0) + opcao.po;
+  // Adicionar moeda da opção (se houver)
+  if (opcao.moedaQtd > 0 && !opcao.apenasOuro) {
+    personagem.moedas = adicionarMoeda(personagem.moedas, opcao.moedaTipo, opcao.moedaQtd);
   }
 }
 
@@ -2821,7 +2824,7 @@ async function renderStepEquipamento(el) {
                  style="flex:1;min-width:200px;cursor:pointer">
               <div class="card-nome" style="font-size:0.9rem;font-weight:600">Opção ${op.letra}</div>
               <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">
-                ${op.apenasOuro ? `<strong>${op.po} PO</strong> (apenas ouro)` : op.conteudo}
+                ${op.apenasOuro ? `<strong>${op.moedaQtd} ${op.moedaTipo.toUpperCase()}</strong> (apenas dinheiro)` : op.conteudo}
               </div>
             </div>
           `).join('')}
@@ -2891,9 +2894,16 @@ async function renderStepEquipamento(el) {
       </div>
     </div>
 
-    <div class="form-group">
-      <label class="form-label">Peças de Ouro (PO)</label>
-      <input type="number" class="form-input" id="input-po" value="${personagem.po}" min="0" style="max-width:120px">
+    <div class="card mb-2">
+      <div class="card-header"><h3>Carteira</h3></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;padding:4px 0">
+        ${DENOMINACOES.map(tipo => `
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">${ICONE_MOEDA[tipo]} ${tipo.toUpperCase()}</label>
+            <input type="number" class="form-input" id="input-moeda-${tipo}" value="${personagem.moedas[tipo] || 0}" min="0" style="max-width:90px">
+          </div>
+        `).join('')}
+      </div>
     </div>
   `;
 
@@ -2916,15 +2926,15 @@ async function renderStepEquipamento(el) {
       const nomeOrigem = tipo === 'classe' ? personagem.classe : personagem.antecedente;
 
       if (opcao) {
-        // Salvar escolha atual
-        const poAnterior = personagem.po || 0;
-        // Remover PO de escolha anterior se houver
+        // Remover moeda da escolha anterior, se houver (com conversao automatica)
         const escolhaAnterior = tipo === 'classe' ? personagem.escolha_equip_classe : personagem.escolha_equip_antecedente;
         if (escolhaAnterior) {
           const opAnterior = opcoes.find(o => o.letra === escolhaAnterior);
-          if (opAnterior) {
-            // Subtrair PO e itens anteriores
-            personagem.po = Math.max(0, (personagem.po || 0) - (opAnterior.po || 0));
+          if (opAnterior && opAnterior.moedaQtd > 0) {
+            const resultado = removerQuantidadeMoeda(personagem.moedas, opAnterior.moedaTipo, opAnterior.moedaQtd);
+            if (resultado.sucesso) {
+              personagem.moedas = resultado.moedas;
+            }
           }
         }
 
@@ -2942,8 +2952,10 @@ async function renderStepEquipamento(el) {
   });
 
   // Eventos
-  document.getElementById('input-po')?.addEventListener('input', (e) => {
-    personagem.po = parseInt(e.target.value) || 0;
+  DENOMINACOES.forEach(tipo => {
+    document.getElementById(`input-moeda-${tipo}`)?.addEventListener('input', (e) => {
+      personagem.moedas[tipo] = Math.max(0, parseInt(e.target.value) || 0);
+    });
   });
 
   // Evento de escolha de instrumento musical da classe
