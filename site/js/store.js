@@ -3,15 +3,55 @@
 // ============================================================
 import { gerarId } from './utils.js';
 import { enfileirarSync, enfileirarRemocao } from './sync.js';
+import { criarCarteiraVazia, normalizarCarteira, definirTaxas, resetarTaxas } from './moedas.js';
 
 const STORAGE_KEY = 'dnd_personagens';
 const BACKUP_KEY = 'dnd_personagens_backup';
+const TAXAS_MOEDA_KEY = 'dnd_taxas_moeda';
+const COMPRAR_ATIVO_KEY = 'dnd_comprar_ativo_padrao';
+
+/** Preferencia global do usuario (todos os personagens): togle "Comprar" do seletor de itens vem marcado por padrao */
+export function carregarComprarAtivoPadrao() {
+  return localStorage.getItem(COMPRAR_ATIVO_KEY) === '1';
+}
+
+/** Salva a preferencia global do togle "Comprar" */
+export function salvarComprarAtivoPadrao(ativo) {
+  localStorage.setItem(COMPRAR_ATIVO_KEY, ativo ? '1' : '0');
+}
+
+/** Carrega taxas de conversao de moeda customizadas (se houver) e aplica no motor de moedas */
+export function carregarTaxasMoeda() {
+  try {
+    const raw = localStorage.getItem(TAXAS_MOEDA_KEY);
+    if (raw) definirTaxas(JSON.parse(raw));
+  } catch {
+    // ignora taxas corrompidas, mantem o padrao
+  }
+}
+
+/** Salva e aplica taxas de conversao customizadas. Retorna { sucesso, erro? } */
+export function salvarTaxasMoeda(taxas) {
+  const resultado = definirTaxas(taxas);
+  if (resultado.sucesso) {
+    localStorage.setItem(TAXAS_MOEDA_KEY, JSON.stringify(resultado.taxas));
+  }
+  return resultado;
+}
+
+/** Restaura as taxas de conversao padrao e remove a customizacao salva */
+export function resetarTaxasMoeda() {
+  const taxas = resetarTaxas();
+  localStorage.removeItem(TAXAS_MOEDA_KEY);
+  return taxas;
+}
 
 /** Retorna todos os personagens salvos */
 export function listarPersonagens() {
   try {
     const dados = localStorage.getItem(STORAGE_KEY);
-    return dados ? JSON.parse(dados) : [];
+    const lista = dados ? JSON.parse(dados) : [];
+    return lista.map(migrarMoedasLegado);
   } catch {
     return [];
   }
@@ -111,6 +151,19 @@ export function restaurarPersonagensLocais() {
 }
 
 /**
+ * Migra um personagem salvo no formato antigo (campo unico `po`) para a
+ * carteira multi-moeda `moedas`. Preserva o valor antigo como PO (nao redistribui),
+ * evitando reshuffle de saldo em personagens ja existentes. Idempotente.
+ */
+export function migrarMoedasLegado(p) {
+  if (!p || typeof p !== 'object') return p;
+  const base = p.moedas && typeof p.moedas === 'object' ? p.moedas : { po: p.po };
+  p.moedas = normalizarCarteira(base);
+  delete p.po;
+  return p;
+}
+
+/**
  * Valida que um objeto tem a estrutura minima de personagem.
  * Campos exigidos: id (string nao vazia), nome (string nao vazia), nivel (numero inteiro 1-20), atributos (objeto).
  * @param {object} p - Objeto a validar.
@@ -134,6 +187,7 @@ export function importarPersonagens(jsonStr) {
     let countNovos = 0;
     for (let i = 0; i < importados.length; i++) {
       const p = importados[i];
+      migrarMoedasLegado(p);
       if (!_validarPersonagem(p)) {
         console.warn('importarPersonagens: personagem ignorado (estrutura invalida)', p?.id ?? `indice ${i}`);
         continue;
@@ -202,7 +256,7 @@ export function criarPersonagemVazio() {
     inventario: [],
     escolha_equip_classe: null,
     escolha_equip_antecedente: null,
-    po: 0,
+    moedas: criarCarteiraVazia(),
     magias_conhecidas: [],
     magias_preparadas: [],
     grimorio: [],

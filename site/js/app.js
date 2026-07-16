@@ -5,6 +5,7 @@ import { renderHome } from './pages/home.js';
 import { renderCreator } from './pages/creator.js';
 import { renderSheet } from './pages/sheet.js';
 import { inicializarSync } from './sync.js';
+import { carregarTaxasMoeda } from './store.js';
 import { toast, abrirModal } from './utils.js';
 
 // --- Router baseado em hash ---
@@ -155,6 +156,9 @@ function recarregarQuandoSeguro() {
 
 // --- Inicialização ---
 function init() {
+  // Carregar taxas de conversao de moeda customizadas (se houver), antes de qualquer ficha renderizar
+  carregarTaxasMoeda();
+
   // Inicializar módulo de sync (registra listeners online/offline e processa fila pendente)
   inicializarSync();
 
