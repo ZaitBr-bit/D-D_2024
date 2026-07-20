@@ -4,6 +4,7 @@
 import { CLASSES_INFO } from './dados-classes.js';
 import { getClasse, getEspecies, getIndiceMagias } from './db.js';
 import { calcMod, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas } from './utils.js';
+import { aplicarDeltaSistema } from './ficha-edicoes.js';
 
 /**
  * Retorna os espaços de magia do Cavaleiro Místico para o nível atual.
@@ -800,12 +801,8 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   // Aplicar aumentos de atributo
   if (ganhaAumentoAtributo && opcoes.aumentos_atributo) {
     for (const [atributo, valor] of Object.entries(opcoes.aumentos_atributo)) {
-      if (personagem.atributos[atributo]) {
-        personagem.atributos[atributo] += valor;
-        // Cap em 20
-        if (personagem.atributos[atributo] > 20) {
-          personagem.atributos[atributo] = 20;
-        }
+      if (personagem.atributos[atributo] !== undefined) {
+        aplicarDeltaSistema(personagem, `atributos.${atributo}`, valor, 20);
       }
     }
   }
@@ -908,8 +905,7 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     // Aplicar ASI do talento (Adepto Elemental, Agressor, etc.)
     if (opcoes.talento_asi) {
       const chaveAttr = opcoes.talento_asi;
-      const valorAtual = personagem.atributos[chaveAttr] || 10;
-      personagem.atributos[chaveAttr] = Math.min(20, valorAtual + 1);
+      aplicarDeltaSistema(personagem, `atributos.${chaveAttr}`, 1, 20);
     }
 
     // Aplicar Analítico / Mente Aguçada (proficiência ou expertise)

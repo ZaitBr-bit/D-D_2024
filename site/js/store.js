@@ -51,7 +51,7 @@ export function listarPersonagens() {
   try {
     const dados = localStorage.getItem(STORAGE_KEY);
     const lista = dados ? JSON.parse(dados) : [];
-    return lista.map(migrarMoedasLegado);
+    return lista.map(p => migrarEdicoesLegado(migrarMoedasLegado(p)));
   } catch {
     return [];
   }
@@ -163,6 +163,18 @@ export function migrarMoedasLegado(p) {
   return p;
 }
 
+/** Adiciona metadados de edição sem alterar campos existentes da ficha. */
+export function migrarEdicoesLegado(p) {
+  if (!p || typeof p !== 'object') return p;
+  if (!p.edicoes || p.edicoes.versao !== 1) p.edicoes = { versao: 1, campos: {} };
+  if (!p.edicoes.campos || typeof p.edicoes.campos !== 'object') p.edicoes.campos = {};
+  if (!p.configuracao_criacao || typeof p.configuracao_criacao !== 'object') p.configuracao_criacao = {};
+  if (!p.configuracao_criacao.atributos) {
+    p.configuracao_criacao.atributos = { metodo: null, valoresBase: null, rolagens: null };
+  }
+  return p;
+}
+
 /**
  * Valida que um objeto tem a estrutura minima de personagem.
  * Campos exigidos: id (string nao vazia), nome (string nao vazia), nivel (numero inteiro 1-20), atributos (objeto).
@@ -236,6 +248,10 @@ export function criarPersonagemVazio() {
       sabedoria: 10,
       carisma: 10
     },
+    configuracao_criacao: {
+      atributos: { metodo: null, valoresBase: null, rolagens: null }
+    },
+    edicoes: { versao: 1, campos: {} },
     atributos_base: {
       forca: 10,
       destreza: 10,
