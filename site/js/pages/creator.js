@@ -1012,6 +1012,13 @@ async function finalizar() {
     }
   }
 
+  personagem.configuracao_criacao = {
+    atributos: {
+      metodo: dadosCache.attrMode || 'manual',
+      valoresBase: { ...personagem.atributos_base },
+      rolagens: dadosCache.attrMode === 'rolagem' ? { ...(dadosCache.rolagemValores || {}) } : null
+    }
+  };
   salvarPersonagem(personagem);
   toast('Personagem criado com sucesso!', 'success');
   window.navegar(`ficha/${personagem.id}`);
