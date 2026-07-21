@@ -3295,7 +3295,7 @@ Se outra característica de Guardião lhe der magias que você sempre tem prepar
 
 ### Nível 1: Inimigo Favorito
 
-Você sempre tem a magia *Marca do Predador* preparada. Você pode conjurá-la duas vezes sem gastar um espaço de magia, e você restaura todos os usos gastos desta característica ao completar um Descanso Longo.
+Você sempre tem a magia *Marca do Caçador* preparada. Você pode conjurá-la duas vezes sem gastar um espaço de magia, e você restaura todos os usos gastos desta característica ao completar um Descanso Longo.
 
 O número de vezes que você pode conjurar a magia sem um espaço de magia aumenta ao atingir certos níveis de Guardião, conforme mostrado na coluna Inimigo Favorito da tabela Características de Guardião.
 
@@ -3349,7 +3349,7 @@ As forças primordiais agora ajudam a impulsioná-lo em suas jornadas, concedend
 
 ### Nível 13: Predador Implacável
 
-Sofrer dano não quebra sua Concentração da *Marca do Predador*.
+Sofrer dano não quebra sua Concentração da *Marca do Caçador*.
 
 ### Nível 14: Véu da Natureza
 
@@ -3359,7 +3359,7 @@ Você pode usar essa característica um número de vezes igual ao seu modificado
 
 ### Nível 17: Caçador Preciso
 
-Você tem Vantagem em jogadas de ataque contra a criatura marcada pela sua *Marca do Predador*.
+Você tem Vantagem em jogadas de ataque contra a criatura marcada pela sua *Marca do Caçador*.
 
 ### Nível 18: Sentidos Selvagens
 
@@ -3371,7 +3371,7 @@ Você adquire o talento Dádiva Épica (veja o capítulo 5) ou outro talento à 
 
 ### Nível 20: Matador de Inimigos Favoritos
 
-O dado de dano da sua *Marca do Predador* é um d10 em vez de um d6.
+O dado de dano da sua *Marca do Caçador* é um d10 em vez de um d6.
 
 ## Lista de Magias de Guardião
 
@@ -3390,7 +3390,7 @@ Esta seção apresenta a lista de magias de Guardião, organizadas por círculo 
 | *Emaranhar*                | Invocação    | C            |
 | *Falar com Animais*        | Adivinhação  | R            |
 | *Golpe Constritor*         | Invocação    | C            |
-| *Marca do Predador*        | Adivinhação  | C            |
+| *Marca do Caçador*        | Adivinhação  | C            |
 | *Névoa Obscurecente*       | Invocação    | C            |
 | *Passos Largos*            | Transmutação | —            |
 | *Salto*                    | Transmutação | —            |
@@ -3536,7 +3536,7 @@ Você persegue presas nos ermos e em outros lugares, usando suas habilidades com
 
 ### Nível 3: Conhecimento do Caçador
 
-Você pode recorrer às forças da natureza para revelar certos pontos fortes e fracos de sua presa. Enquanto uma criatura está marcada pela *Marca do Predador*, você sabe se essa criatura tem Imunidades, Resistências ou Vulnerabilidades, e se a criatura tiver alguma, você sabe quais são.
+Você pode recorrer às forças da natureza para revelar certos pontos fortes e fracos de sua presa. Enquanto uma criatura está marcada pela *Marca do Caçador*, você sabe se essa criatura tem Imunidades, Resistências ou Vulnerabilidades, e se a criatura tiver alguma, você sabe quais são.
 
 ### Nível 3: Presa do Caçador
 
@@ -3556,7 +3556,7 @@ Você recebe uma das seguintes opções de características à sua escolha. Ao c
 
 ### Nível 11: Presa do Caçador Superior
 
-Uma vez por turno, ao causar dano a uma criatura marcada pela *Marca do Predador*, você também pode causar dano adicional dessa magia a uma criatura diferente à sua vista e a até 9 metros da primeira criatura.
+Uma vez por turno, ao causar dano a uma criatura marcada pela *Marca do Caçador*, você também pode causar dano adicional dessa magia a uma criatura diferente à sua vista e a até 9 metros da primeira criatura.
 
 ### Nível 15: Defesa do Caçador Superior
 
@@ -3687,7 +3687,7 @@ Além disso, sempre que a fera acertar com uma jogada de ataque e causar dano, e
 
 Ao ordenar sua fera Companheira Primal a executar a ação Golpe da Fera, ela pode usá-la duas vezes.
 
-Além disso, na primeira vez em cada turno que ela atinge uma criatura sob o efeito da magia *Marca do Predador*, a fera causa dano Energético adicional igual ao dano bônus dessa magia.
+Além disso, na primeira vez em cada turno que ela atinge uma criatura sob o efeito da magia *Marca do Caçador*, a fera causa dano Energético adicional igual ao dano bônus dessa magia.
 
 ### Nível 15: Compartilhar Magias
 
@@ -5822,7 +5822,7 @@ A magia do seu juramento garante que você sempre tenha certas magias prontas; q
 
 | **Nível de Paladino** | **Magias**                            |
 |-----------------------|---------------------------------------|
-| *3*                   | *Marca do Predador, Perdição*          |
+| *3*                   | *Marca do Caçador, Perdição*          |
 | *5*                   | *Paralisar Pessoa, Passo Nebuloso*    |
 | *9*                   | *Celeridade, Proteção Contra Energia* |
 | *13*                  | *Banimento, Porta Dimensional*        |

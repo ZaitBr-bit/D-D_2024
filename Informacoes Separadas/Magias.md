@@ -4834,7 +4834,7 @@ Como uma ação Usar Magia em seus próximos turnos, você pode controlar a mão
 
 A mão não pode atacar, ativar itens mágicos ou carregar mais de 5 quilos.
 
-## Marca do Predador
+## Marca do Caçador
 
 *1º Círculo, Adivinhação (Guardião)*
 

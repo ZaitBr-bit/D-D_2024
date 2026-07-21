@@ -3045,7 +3045,7 @@ function renderFichaCompleta() {
         <div class="info-box info" style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
           <div style="font-size:0.85rem">
             <strong>Recursos do Guardião:</strong>
-            Marca do Predador: ${estadoGuardiao.marcaPredadorAtiva ? 'Ativa' : 'Inativa'}
+            Marca do Caçador: ${estadoGuardiao.marcaPredadorAtiva ? 'Ativa' : 'Inativa'}
             &nbsp;|&nbsp; Inimigo Favorito: ${estadoGuardiao.inimigoFavoritoDisponiveis}/${estadoGuardiao.inimigoFavoritoMax}
             &nbsp;|&nbsp; Dano da Marca: ${estadoGuardiao.marcaPredadorDado}
             ${estadoGuardiao.incansavelAtivo ? `&nbsp;|&nbsp; Incansável: ${estadoGuardiao.incansavelDisponiveis}/${estadoGuardiao.incansavelMax}` : ''}
@@ -3059,7 +3059,7 @@ function renderFichaCompleta() {
             ${estadoGuardiao.veuNaturezaAtivo ? `<button class="btn btn-sm btn-secondary" data-guardiao-acao="veu" ${estadoGuardiao.veuNaturezaDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Véu da Natureza</button>` : ''}
           </div>
           <div style="width:100%;font-size:0.78rem;color:var(--text-muted)">
-            ${estadoGuardiao.predadorImplacavelAtivo ? 'Predador Implacável: sofrer dano não quebra sua Concentração de Marca do Predador. ' : ''}
+            ${estadoGuardiao.predadorImplacavelAtivo ? 'Predador Implacável: sofrer dano não quebra sua Concentração de Marca do Caçador. ' : ''}
             ${estadoGuardiao.cacadorPrecisoAtivo ? 'Caçador Preciso: ataques contra alvo marcado têm vantagem. ' : ''}
             ${estadoGuardiao.sentidosSelvagensAtivo ? 'Sentidos Selvagens: Visão às Cegas 9 m.' : ''}
           </div>
@@ -3785,7 +3785,7 @@ function setupEventosHP() {
       char.pv_atual = Math.max(0, char.pv_atual - dano);
       const estadoGuardiao = getEstadoRecursosGuardiao();
       if (estadoGuardiao?.predadorImplacavelAtivo && estadoGuardiao?.marcaPredadorAtiva && dano > 0) {
-        toast('Predador Implacável: sua concentração de Marca do Predador não é quebrada por dano.', 'info');
+        toast('Predador Implacável: sua concentração de Marca do Caçador não é quebrada por dano.', 'info');
       }
       salvar();
       window.fecharModal();
@@ -5950,12 +5950,12 @@ function setupEventosHabilidades() {
         }
         char.recursos.guardiao.inimigo_favorito_usos_gastos += 1;
         char.recursos.guardiao.marca_predador_ativa = true;
-        toast('Marca do Predador ativada sem gastar espaço de magia.', 'success');
+        toast('Marca do Caçador ativada sem gastar espaço de magia.', 'success');
       }
 
       if (acao === 'encerrar-marca') {
         char.recursos.guardiao.marca_predador_ativa = false;
-        toast('Marca do Predador encerrada.', 'info');
+        toast('Marca do Caçador encerrada.', 'info');
       }
 
       if (acao === 'incansavel') {

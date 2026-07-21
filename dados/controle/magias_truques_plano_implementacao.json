@@ -921,7 +921,7 @@
       },
       "truques": ["Amigos", "Luzes Dançantes", "Taumaturgia"],
       "circulo_1": [
-        "Bom Fruto", "Fogo das Fadas", "Graxa", "Marca do Predador"
+        "Bom Fruto", "Fogo das Fadas", "Graxa", "Marca do Caçador"
       ],
       "circulo_2": [
         "Alterar-se", "Corda Extradimensional", "Cordão de Flechas",
@@ -956,7 +956,7 @@
       "circulo_9": ["Desejo", "Metamorfose", "Polimorfia Total", "Sexto Sentido"],
       "notas_especiais": {
         "Bom Fruto": "Circulo 1. Cria frutos que curam 1d8 PV ao serem consumidos. Poderia virar cura_pv ao clicar 'consumir fruto'. Prioridade media.",
-        "Marca do Predador": "Circulo 1 (Guardiao). Dano extra + vantagem em rastreio. Mecânica de classe específica.",
+        "Marca do Caçador": "Circulo 1 (Guardiao). Dano extra + vantagem em rastreio. Mecânica de classe específica.",
         "Sinal de Esperança": "Circulo 3. Aumenta cura maxima de magias de cura dentro da aura. Toast informativo.",
         "Dissipar o Bem e o Mal": "Circulo 5. Protecao temporaria similar a Protecao Contra o Bem e o Mal. Poderia virar protecao_magica.",
         "Sexto Sentido": "Circulo 9. Varios beneficios de percepcao e nao-surpresa por 8h. Poderia virar buff_percepcao.",
