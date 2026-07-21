@@ -3566,7 +3566,7 @@ Esta seção apresenta a lista de magias de Bruxo, organizadas por círculo de m
 | *Fome de Hadar*      | Conjuração   | C            |
 | *Forma Gasosa*       | Transmutação | C            |
 | *Imagem Maior*       | Ilusão       | C            |
-| *Invocar Morto-vivo* | Necromancia  | C, M         |
+| *Invocar Morto-Vivo* | Necromancia  | C, M         |
 | *Línguas*            | Adivinhação  | —            |
 | *Medo*               | Ilusão       | C            |
 | *Padrão Hipnótico*   | Ilusão       | C            |
@@ -4209,7 +4209,7 @@ Sua conexão com este domínio divino garante que você sempre tenha certas magi
 
 | **Nível de Clérigo** | **Magias Preparadas**                                          |
 |----------------------|----------------------------------------------------------------|
-| 3                    | *Fogo das Fadas, Mãos Ardentes, Raio Ardente, Ver o Invisível* |
+| 3                    | *Fogo das Fadas, Mãos Flamejantes, Raio Ardente, Ver o Invisível* |
 | 5                    | *Bola de Fogo, Luz do Dia*                                     |
 | 7                    | *Muralha de Fogo, Olho Arcano*                                 |
 | 9                    | *Coluna de Chamas, Vidência*                                   |
@@ -4557,7 +4557,7 @@ A vitalidade da natureza floresce constantemente dentro de você, concedendo-lhe
 | *Mensageiro Animal*            | Encantamento | R            |
 | *Paralisar Pessoa*             | Encantamento | C            |
 | *Passo Sem Rastro*             | Abjuração    | C            |
-| *Pele-casca*                   | Transmutação | —            |
+| *Pele-Casca*                   | Transmutação | —            |
 | *Proteção Contra Veneno*       | Abjuração    | —            |
 | *Raio Lunar*                   | Evocação     | C            |
 | *Restauração Menor*            | Abjuração    | —            |
@@ -5762,7 +5762,7 @@ Esta seção apresenta a lista de magias de Guardião, organizadas por círculo 
 | *Lufada de Vento*              | Evocação     | C            |
 | *Mensageiro Animal*            | Encantamento | R            |
 | *Passo Sem Rastro*             | Abjuração    | C            |
-| *Pele-casca*                   | Transmutação | —            |
+| *Pele-Casca*                   | Transmutação | —            |
 | *Proteção Contra Veneno*       | Abjuração    | —            |
 | *Restauração Menor*            | Abjuração    | —            |
 | *Sentido Feral*                | Adivinhação  | C, R         |
@@ -7135,7 +7135,7 @@ Esta seção apresenta a lista de magias de Mago, organizadas por círculo de ma
 | *Glifo de Proteção*          | Abjuração    | M            |
 | *Imagem Maior*               | Ilusão       | C            |
 | *Indetectável*               | Abjuração    | M            |
-| *Invocar Morto-vivo*         | Necromancia  | C, M         |
+| *Invocar Morto-Vivo*         | Necromancia  | C, M         |
 | *Lentidão*                   | Transmutação | C            |
 | *Línguas*                    | Adivinhação  | —            |
 | *Medo*                       | Ilusão       | C            |
@@ -17547,7 +17547,7 @@ Oito raios luminosos partem de você em um Cone de 18 metros. Cada criatura no C
 
 Seu corpo entra em um estado catatônico enquanto sua alma se desprende dele e adentra o receptáculo que você utilizou como componente Material da magia. Enquanto sua alma habita o receptáculo, você percebe os arredores como se estivesse no espaço ocupado por ele. Você não pode se mover ou usar Reações. A única ação que pode realizar é projetar sua alma a até 30 metros do receptáculo, seja retornando ao seu corpo vivo (e encerrando a magia) ou tentando possuir um corpo Humanoide.
 
-Você pode tentar possuir qualquer criatura Humanoide a até 30 metros do seu alcance e que esteja à sua vista (criaturas protegidas pela magia *Círculo Mágico* ou *Proteção contra o Bem e o Mal* não podem ser possuídas). O alvo deve realizar uma salvaguarda de Carisma. Se falhar, a sua alma projeta-se do receptáculo para dentro do corpo do alvo, expulsando a alma dele, que agora fica aprisionada no receptáculo. Em caso de sucesso, o alvo resiste aos seus esforços para possuí-lo, e você não pode tentar novamente por 24 horas.
+Você pode tentar possuir qualquer criatura Humanoide a até 30 metros do seu alcance e que esteja à sua vista (criaturas protegidas pela magia *Círculo Mágico* ou *Proteção Contra o Bem e o Mal* não podem ser possuídas). O alvo deve realizar uma salvaguarda de Carisma. Se falhar, a sua alma projeta-se do receptáculo para dentro do corpo do alvo, expulsando a alma dele, que agora fica aprisionada no receptáculo. Em caso de sucesso, o alvo resiste aos seus esforços para possuí-lo, e você não pode tentar novamente por 24 horas.
 
 Uma vez que possua o corpo de uma criatura, você a controla. Seus Pontos de Vida, Dados de Vida, Força, Destreza, Constituição, Deslocamento e sentidos são substituídos pelos da criatura. Por outro lado, você mantém suas estatísticas de jogo.
 
@@ -21515,7 +21515,7 @@ Se uma regra estabelece que você pode usar algo um certo número de vezes por d
 
 ### Possessão
 
-Alguns efeitos provocam a possessão de uma criatura por outra criatura ou entidade. Um efeito de possessão determina como a possessão funciona. A possessão pode ser evitada pela magia *Proteção contra o Bem e o Mal* e encerrada pela magia *Dissipar o Bem e o Mal*.
+Alguns efeitos provocam a possessão de uma criatura por outra criatura ou entidade. Um efeito de possessão determina como a possessão funciona. A possessão pode ser evitada pela magia *Proteção Contra o Bem e o Mal* e encerrada pela magia *Dissipar o Bem e o Mal*.
 
 ### Preparar [Ação]
 

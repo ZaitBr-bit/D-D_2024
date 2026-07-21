@@ -1216,7 +1216,7 @@ Esta seção apresenta a lista de magias de Bruxo, organizadas por círculo de m
 | *Fome de Hadar*      | Conjuração   | C            |
 | *Forma Gasosa*       | Transmutação | C            |
 | *Imagem Maior*       | Ilusão       | C            |
-| *Invocar Morto-vivo* | Necromancia  | C, M         |
+| *Invocar Morto-Vivo* | Necromancia  | C, M         |
 | *Línguas*            | Adivinhação  | —            |
 | *Medo*               | Ilusão       | C            |
 | *Padrão Hipnótico*   | Ilusão       | C            |
@@ -1859,7 +1859,7 @@ Sua conexão com este domínio divino garante que você sempre tenha certas magi
 
 | **Nível de Clérigo** | **Magias Preparadas**                                          |
 |----------------------|----------------------------------------------------------------|
-| 3                    | *Fogo das Fadas, Mãos Ardentes, Raio Ardente, Ver o Invisível* |
+| 3                    | *Fogo das Fadas, Mãos Flamejantes, Raio Ardente, Ver o Invisível* |
 | 5                    | *Bola de Fogo, Luz do Dia*                                     |
 | 7                    | *Muralha de Fogo, Olho Arcano*                                 |
 | 9                    | *Coluna de Chamas, Vidência*                                   |
@@ -2207,7 +2207,7 @@ A vitalidade da natureza floresce constantemente dentro de você, concedendo-lhe
 | *Mensageiro Animal*            | Encantamento | R            |
 | *Paralisar Pessoa*             | Encantamento | C            |
 | *Passo Sem Rastro*             | Abjuração    | C            |
-| *Pele-casca*                   | Transmutação | —            |
+| *Pele-Casca*                   | Transmutação | —            |
 | *Proteção Contra Veneno*       | Abjuração    | —            |
 | *Raio Lunar*                   | Evocação     | C            |
 | *Restauração Menor*            | Abjuração    | —            |
@@ -3412,7 +3412,7 @@ Esta seção apresenta a lista de magias de Guardião, organizadas por círculo 
 | *Lufada de Vento*              | Evocação     | C            |
 | *Mensageiro Animal*            | Encantamento | R            |
 | *Passo Sem Rastro*             | Abjuração    | C            |
-| *Pele-casca*                   | Transmutação | —            |
+| *Pele-Casca*                   | Transmutação | —            |
 | *Proteção Contra Veneno*       | Abjuração    | —            |
 | *Restauração Menor*            | Abjuração    | —            |
 | *Sentido Feral*                | Adivinhação  | C, R         |
@@ -4785,7 +4785,7 @@ Esta seção apresenta a lista de magias de Mago, organizadas por círculo de ma
 | *Glifo de Proteção*          | Abjuração    | M            |
 | *Imagem Maior*               | Ilusão       | C            |
 | *Indetectável*               | Abjuração    | M            |
-| *Invocar Morto-vivo*         | Necromancia  | C, M         |
+| *Invocar Morto-Vivo*         | Necromancia  | C, M         |
 | *Lentidão*                   | Transmutação | C            |
 | *Línguas*                    | Adivinhação  | —            |
 | *Medo*                       | Ilusão       | C            |

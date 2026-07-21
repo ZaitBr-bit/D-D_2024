@@ -813,7 +813,7 @@ Se uma regra estabelece que você pode usar algo um certo número de vezes por d
 
 ### Possessão
 
-Alguns efeitos provocam a possessão de uma criatura por outra criatura ou entidade. Um efeito de possessão determina como a possessão funciona. A possessão pode ser evitada pela magia *Proteção contra o Bem e o Mal* e encerrada pela magia *Dissipar o Bem e o Mal*.
+Alguns efeitos provocam a possessão de uma criatura por outra criatura ou entidade. Um efeito de possessão determina como a possessão funciona. A possessão pode ser evitada pela magia *Proteção Contra o Bem e o Mal* e encerrada pela magia *Dissipar o Bem e o Mal*.
 
 ### Preparar [Ação]
 
