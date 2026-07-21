@@ -276,7 +276,7 @@ function extrairMagiasSemprePreparadasTabela(descricao, nivelAlvo) {
 
 /**
  * Extrai magias sempre preparadas descritas em texto corrido.
- * Ex.: "Você sempre tem a magia *Marca do Predador* preparada."
+ * Ex.: "Você sempre tem a magia *Marca do Caçador* preparada."
  */
 function extrairMagiasSemprePreparadasTexto(descricao) {
   if (!descricao) return [];
