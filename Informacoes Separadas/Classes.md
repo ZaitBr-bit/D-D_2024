@@ -1699,7 +1699,7 @@ Esta seção apresenta a lista de magias de Clérigo. As magias estão organizad
 | *Luz do Dia*                | Evocação     | —            |
 | *Mesclar-se às Rochas*      | Transmutação | R            |
 | *Palavra Curativa em Massa* | Abjuração    | —            |
-| *Proteção contra Energia*   | Abjuração    | C            |
+| *Proteção Contra Energia*   | Abjuração    | C            |
 | *Remeter*                   | Evocação     | —            |
 | *Remover Maldição*          | Abjuração    | —            |
 | *Revivificar*               | Necromancia  | M            |
@@ -2231,7 +2231,7 @@ A vitalidade da natureza floresce constantemente dentro de você, concedendo-lhe
 | *Mesclar-se às Rochas*    | Transmutação | R            |
 | *Muralha de Vento*        | Evocação     | C            |
 | *Nevasca*                 | Invocação    | C            |
-| *Proteção contra Energia* | Abjuração    | C            |
+| *Proteção Contra Energia* | Abjuração    | C            |
 | *Respirar na Água*        | Transmutação | R            |
 | *Revivificar*             | Necromancia  | M            |
 | *Simular Morte*           | Necromancia  | R            |
@@ -2900,7 +2900,7 @@ Esta seção apresenta a lista de magias de Feiticeiro, organizadas por círculo
 | *Nuvem Fétida*            | Invocação    |  C           |
 | *Padrão Hipnótico*        | Ilusão       | C            |
 | *Piscar*                  | Transmutação | —            |
-| *Proteção contra Energia* | Abjuração    | C            |
+| *Proteção Contra Energia* | Abjuração    | C            |
 | *Relâmpago*               | Evocação     | —            |
 | *Respirar na Água*        | Transmutação | R            |
 | *Toque Vampírico*         | Necromancia  | C            |
@@ -3108,7 +3108,7 @@ Ao atingir um nível de Feiticeiro detalhado na tabela Magias Mecânicas, você 
 | **Nível de Feiticeiro** | **Magias**                                                          |
 |-------------------------|---------------------------------------------------------------------|
 | 3                       | *Alarme, Auxílio, Proteção Contra o Bem e o Mal, Restauração Menor* |
-| 5                       | *Dissipar Magia, Proteção contra Energia*                           |
+| 5                       | *Dissipar Magia, Proteção Contra Energia*                           |
 | 7                       | *Invocar Constructo, Movimentação Livre*                            |
 | 9                       | *Muralha de Energia, Restauração Maior*                             |
 
@@ -3436,7 +3436,7 @@ Esta seção apresenta a lista de magias de Guardião, organizadas por círculo 
 | *Luz do Dia*              | Evocação     | —            |
 | *Mesclar-se às Rochas*    | Transmutação | R            |
 | *Muralha de Vento*        | Evocação     | C            |
-| *Proteção contra Energia* | Abjuração    | C            |
+| *Proteção Contra Energia* | Abjuração    | C            |
 | *Respirar na Água*        | Transmutação | R            |
 | *Revivificar*             | Necromancia  | M            |
 
@@ -4795,7 +4795,7 @@ Esta seção apresenta a lista de magias de Mago, organizadas por círculo de ma
 | *Padrão Hipnótico*           | Ilusão       | C            |
 | *Pequeno Refúgio de Leomund* | Evocação     | R            |
 | *Piscar*                     | Transmutação | C            |
-| *Proteção contra Energia*    | Abjuração    | C            |
+| *Proteção Contra Energia*    | Abjuração    | C            |
 | *Relâmpago*                  | Evocação     | —            |
 | *Remeter*                    | Adivinhação  | —            |
 | *Remover Maldição*           | Abjuração    | —            |
@@ -5776,7 +5776,7 @@ A magia do seu juramento garante que você sempre tenha certas magias prontas; a
 |-----------------------|-------------------------------------------------|
 | 3                     | *Heroísmo, Raio Guia*                           |
 | 5                     | *Aprimorar Atributo, Arma Mágica*               |
-| 9                     | *Celeridade, Proteção contra Energia*           |
+| 9                     | *Celeridade, Proteção Contra Energia*           |
 | 13                    | *Compulsão, Movimentação Livre*                 |
 | 17                    | *Lendas e Histórias, Presença Régia de Yolande* |
 
@@ -5822,9 +5822,9 @@ A magia do seu juramento garante que você sempre tenha certas magias prontas; q
 
 | **Nível de Paladino** | **Magias**                            |
 |-----------------------|---------------------------------------|
-| *3*                   | *Marca do Caçador, Perdição*          |
+| *3*                   | *Marca do Predador, Perdição*          |
 | *5*                   | *Paralisar Pessoa, Passo Nebuloso*    |
-| *9*                   | *Celeridade, Proteção contra Energia* |
+| *9*                   | *Celeridade, Proteção Contra Energia* |
 | *13*                  | *Banimento, Porta Dimensional*        |
 | *17*                  | *Paralisar Monstro, Vidência*         |
 
@@ -5876,7 +5876,7 @@ A magia do seu juramento garante que você sempre tenha certas magias prontas; q
 |-----------------------|---------------------------------------------------|
 | 3                     | *Falar com Animais, Golpe Constritor*             |
 | 5                     | *Passo Nebuloso, Raio Lunar*                      |
-| 9                     | *Crescimento de Plantas, Proteção contra Energia* |
+| 9                     | *Crescimento de Plantas, Proteção Contra Energia* |
 | 13                    | *Pele-Rocha, Tempestade Glacial*                  |
 | 17                    | *Comunhão com a Natureza, Passo Arbóreo*          |
 
