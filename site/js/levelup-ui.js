@@ -16,6 +16,7 @@ import { getMagiasPorCirculo, getMagiasClasse } from './db.js';
 import { abrirModal, fecharModal, toast, mdParaHtml, semAcento, calcMod, getEspacosMagia } from './utils.js';
 import { subirDeNivel } from './levelup.js';
 import { abrirGridManobras } from './manobras-ui.js';
+import { clonarFonte, renderSeloFonte } from './fontes.js';
 
 // Referências injetadas pelo sheet.js
 let _salvarFn = null;
@@ -52,6 +53,29 @@ const _FERRAMENTAS_ARTESAO = [
   'Suprimentos de Alquimista','Suprimentos de Calígrafo','Suprimentos de Cervejeiro',
   'Suprimentos de Pintor','Utensílios de Cozinheiro'
 ];
+
+function criarEntradaMagiaLevelUp(magia, extras = {}) {
+  if (!magia) return null;
+  const nome = typeof magia === 'string' ? magia : magia.nome;
+  const circulo = extras.circulo ?? (typeof magia === 'string' ? 0 : (magia.circulo || 0));
+  const fonte = typeof magia === 'string' ? null : clonarFonte(magia.fonte);
+  return {
+    nome,
+    circulo,
+    ...(fonte ? { fonte } : {}),
+    ...extras
+  };
+}
+
+function sufixoFonteOption(magia) {
+  return magia?.fonte?.rotulo ? ` (${magia.fonte.rotulo})` : '';
+}
+
+function encontrarMagiaLevelUp(listaMagiasClasse, nome, circulo = null) {
+  return listaMagiasClasse.find(magia =>
+    magia.nome === nome && (circulo === null || Number(magia.circulo) === Number(circulo))
+  ) || null;
+}
 
 // ============================================================
 // PONTO DE ENTRADA PRINCIPAL
@@ -715,7 +739,7 @@ function bindEscolhasTalento(nome, talentoData, ctx) {
               const bloqueado = jaTemTruqueIM.has(m.nome);
               return `
               <label style="display:flex;align-items:center;gap:4px;font-size:0.82rem;padding:2px 4px;border:1px solid var(--border-light);border-radius:4px${bloqueado ? ';opacity:0.4' : ''}">
-                <input type="checkbox" class="levelup-im-truque" value="${m.nome}" ${bloqueado ? 'disabled' : ''}> ${m.nome}${bloqueado ? ' (já conhecido)' : ''}
+                <input type="checkbox" class="levelup-im-truque" value="${m.nome}" ${bloqueado ? 'disabled' : ''}> ${m.nome}${sufixoFonteOption(m)}${bloqueado ? ' (já conhecido)' : ''}
               </label>
             `;
             }).join('')}
@@ -741,7 +765,7 @@ function bindEscolhasTalento(nome, talentoData, ctx) {
           <div style="font-weight:600;font-size:0.85rem;margin-top:8px">Magia de 1º Círculo (1)</div>
           <select id="levelup-im-magia" class="form-input" style="width:100%;margin:4px 0">
             <option value="">-- Selecione --</option>
-            ${magiasCirc1.map(m => `<option value="${m.nome}" ${jaTemMagiaIM.has(m.nome) ? 'disabled' : ''}>${m.nome}${jaTemMagiaIM.has(m.nome) ? ' (já conhecida)' : ''}</option>`).join('')}
+            ${magiasCirc1.map(m => `<option value="${m.nome}" ${jaTemMagiaIM.has(m.nome) ? 'disabled' : ''}>${m.nome}${sufixoFonteOption(m)}${jaTemMagiaIM.has(m.nome) ? ' (já conhecida)' : ''}</option>`).join('')}
           </select>
         `;
         magiaContainer.style.display = 'block';
@@ -851,7 +875,7 @@ function bindEventosMagias(ctx, state) {
                data-grid-nome="${m.nome}" data-grid-circ="${m.circulo}"
                style="${bloqueado ? 'opacity:0.35;cursor:default' : ''}">
             <span class="magia-card-check" data-grid-check="${m.nome}"></span>
-            <div class="magia-card-nome" data-grid-info="${m.nome}" data-grid-info-circ="${m.circulo}">${m.nome}</div>
+            <div class="magia-card-nome" data-grid-info="${m.nome}" data-grid-info-circ="${m.circulo}">${m.nome} ${renderSeloFonte(m.fonte)}</div>
             <div class="magia-card-meta">
               <span>${m.circulo === 0 ? 'Truque' : m.circulo + 'º Círculo'}</span>
               <span>${m.escola || ''}</span>
@@ -887,6 +911,7 @@ function bindEventosMagias(ctx, state) {
           const magia = dados?.magias?.find(m => m.nome === n);
           if (!magia) return;
           abrirModal(magia.nome, `
+            <div style="margin-bottom:8px">${renderSeloFonte(magia.fonte)}</div>
             <div style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:8px;font-size:0.85rem">
               <span class="badge badge-primary">${circ === 0 ? 'Truque' : circ + 'º Círculo'}</span>
               <span class="badge badge-secondary">${magia.escola}</span>
@@ -894,6 +919,9 @@ function bindEventosMagias(ctx, state) {
               <span>${magia.componentes}</span> <span>${magia.duracao}</span>
             </div>
             <div class="md-content">${mdParaHtml(magia.descricao)}</div>
+            ${magia.dano?.length ? `<div class="info-box info mt-1"><strong>Dano:</strong> ${magia.dano.map(d => `${d.formula} ${d.tipo}${d.observacao ? ` (${d.observacao})` : ''}`).join('; ')}</div>` : ''}
+            ${magia.pre_requisitos ? `<div class="info-box info mt-1"><strong>Pré-requisitos:</strong> classe compatível, ${magia.pre_requisitos.circulo_minimo === 0 ? 'truque' : magia.pre_requisitos.circulo_minimo + 'º círculo'} e componentes ${magia.pre_requisitos.componentes || magia.componentes}.</div>` : ''}
+            ${magia.circulo_magico?.disponivel_na_fonte ? '<div class="info-box warning mt-1"><strong>Circle Magic:</strong> reservado ao escopo 9.</div>' : ''}
             ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em círculos superiores:</strong><div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
           `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
         });
@@ -952,7 +980,7 @@ function montarBuscaTroca(ctx, nomeTroca, listaMagiasClasse, maxCirculoNovo) {
     resultadoEl.innerHTML = filtradas.map(m => `
       <div class="troca-magia-item" data-troca-nome="${m.nome}" data-troca-circ="${m.circulo}"
            style="padding:6px 8px;cursor:pointer;border-bottom:1px solid var(--border-light);font-size:0.85rem;display:flex;justify-content:space-between;align-items:center">
-        <span>${m.nome}</span>
+        <span>${m.nome} ${renderSeloFonte(m.fonte)}</span>
         <span style="font-size:0.75rem;color:var(--text-muted)">${m.circulo}º</span>
       </div>
     `).join('');
@@ -1071,31 +1099,31 @@ async function confirmarLevelUp(ctx, state) {
   if (ctx.ehConjurador) {
     // Truques
     state.truquesSelecionados.forEach(nome => {
-      const m = listaMagiasClasse.find(x => x.nome === nome);
+      const m = encontrarMagiaLevelUp(listaMagiasClasse, nome, 0);
       if (m && !char.magias_conhecidas?.find(x => x.nome === nome)) {
         if (!char.magias_conhecidas) char.magias_conhecidas = [];
-        char.magias_conhecidas.push({ nome, circulo: 0 });
+        char.magias_conhecidas.push(criarEntradaMagiaLevelUp(m, { circulo: 0 }));
         truquesAdicionados.push(nome);
       }
     });
 
     // Magias conhecidas
     state.magiasSelecionadas.forEach(nome => {
-      const m = listaMagiasClasse.find(x => x.nome === nome);
+      const m = encontrarMagiaLevelUp(listaMagiasClasse, nome);
       if (m && !char.magias_preparadas?.find(x => x.nome === nome)) {
         if (!char.magias_preparadas) char.magias_preparadas = [];
-        char.magias_preparadas.push({ nome, circulo: m.circulo });
+        char.magias_preparadas.push(criarEntradaMagiaLevelUp(m));
         magiasAdicionadas.push(nome);
       }
     });
 
     // Grimório
     state.grimorioSelecionados.forEach(nome => {
-      const m = listaMagiasClasse.find(x => x.nome === nome);
+      const m = encontrarMagiaLevelUp(listaMagiasClasse, nome);
       if (m) {
         if (!char.grimorio) char.grimorio = [];
         if (!char.grimorio.find(x => x.nome === nome)) {
-          char.grimorio.push({ nome, circulo: m.circulo });
+          char.grimorio.push(criarEntradaMagiaLevelUp(m));
           grimorioAdicionado.push(nome);
         }
       }
@@ -1108,7 +1136,8 @@ async function confirmarLevelUp(ctx, state) {
         magiaTrocadaDe = state.trocarDe;
         magiaTrocadaPara = state.trocarPara;
         char.magias_preparadas.splice(idx, 1);
-        char.magias_preparadas.push({ nome: state.trocarPara, circulo: state.trocarParaCirculo });
+        const magiaNova = encontrarMagiaLevelUp(listaMagiasClasse, state.trocarPara, state.trocarParaCirculo);
+        char.magias_preparadas.push(criarEntradaMagiaLevelUp(magiaNova || { nome: state.trocarPara, circulo: state.trocarParaCirculo }));
       }
     }
   }
