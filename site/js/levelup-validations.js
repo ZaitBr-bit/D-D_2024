@@ -3,6 +3,7 @@
 // Fase 4: Coleta unificada e submissão
 // ============================================================
 import { exigeManobrasGuerreiro } from './levelup.js';
+import { validarEscolhasTalento } from './regras-cobertura.js';
 
 function precisaManobrasAgora(ctx, state) {
   return exigeManobrasGuerreiro(ctx.char.classe, state.subclasse || ctx.char.subclasse, ctx.nivelNovo);
@@ -38,10 +39,13 @@ export function collectOpcoes(ctx, state) {
       opcoes.aumentos_atributo = aumentos;
     } else if (state.asiModo === 'talento' && state.talento) {
       opcoes.talento = state.talento;
+      if (state.talento === 'Aumento no Valor de Atributo') {
+        opcoes.aumentos_atributo = { ...state.aumentos };
+      }
       if (state.talentoASI) opcoes.talento_asi = state.talentoASI;
       if (state.escolhasTalento.length > 0) opcoes.escolhas_talento_levelup = state.escolhasTalento;
       if (state.talentoTipoEscolha) opcoes.talento_tipo_escolha = state.talentoTipoEscolha;
-      if (state.resilienteAtributo) opcoes.resiliente_atributo = state.resilienteAtributo;
+      if (state.resilienteAtributo || state.talento === 'Resiliente') opcoes.resiliente_atributo = state.resilienteAtributo || state.talentoASI;
       if (state.iniciadoEmMagia) opcoes.iniciado_em_magia = state.iniciadoEmMagia;
       // Parâmetros de Dádiva da Resistência à Energia
       if (state.dadivaResistenciaEnergia?.length > 0) opcoes.dadiva_resistencia_energia = state.dadivaResistenciaEnergia;
@@ -57,6 +61,7 @@ export function collectOpcoes(ctx, state) {
     opcoes.explorador_idiomas = state.exploradorIdiomas;
   }
   if (ctx.precisaAcademico) opcoes.academico_expertise = state.academicoExpertise;
+  if (ctx.conjuracao?.ehMago) opcoes.grimorio_selecionados = state.grimorioSelecionados || [];
 
   // Manobras (Mestre da Batalha)
   const precisaManobrasLive = precisaManobrasAgora(ctx, state);
@@ -81,15 +86,45 @@ export function validateAll(ctx, state) {
   if (ctx.precisaSubclasse && !state.subclasse) return 'Escolha uma subclasse.';
 
   if (ctx.ganhaASI) {
+    if (ctx.exigeDadivaEpica && state.asiModo !== 'talento')
+      return 'Selecione uma Dádiva Épica ou outro talento.';
     if (state.asiModo === 'atributo' && state.pontosDistribuidos !== 2)
       return 'Distribua exatamente 2 pontos de atributo.';
     if (state.asiModo === 'talento' && !state.talento)
       return 'Selecione um talento.';
+    if (state.asiModo === 'talento' && state.talento === 'Aumento no Valor de Atributo' && state.pontosDistribuidos !== 2)
+      return 'Distribua exatamente 2 pontos de atributo para o talento Aumento no Valor de Atributo.';
     // Validar escolha de tipos de energia da Dádiva da Resistência à Energia
     if (state.asiModo === 'talento' && state.talento === 'Dádiva da Resistência à Energia') {
       const tipos = state.dadivaResistenciaEnergia || [];
       if (tipos.length !== 2) return 'Selecione 2 tipos de energia para a Dádiva da Resistência à Energia.';
       if (tipos[0] === tipos[1]) return 'Os dois tipos de energia devem ser diferentes.';
+    }
+    if (state.asiModo === 'talento' && state.talento === 'Dádiva da Proficiência em Perícia') {
+      const escolhas = state.escolhasTalento || [];
+      const pericia = escolhas.length === 1 ? escolhas[0] : '';
+      if (!pericia || !(ctx.char.pericias_proficientes || []).includes(pericia) ||
+          (ctx.char.pericias_expertise || []).includes(pericia)) {
+        return 'Escolha uma perícia em que já possua proficiência e ainda não tenha Especialização.';
+      }
+    }
+    if (state.asiModo === 'talento' && ['Habilidoso', 'Artifista', 'Músico'].includes(state.talento)) {
+      const escolhas = state.escolhasTalento || [];
+      if (escolhas.length !== 3 || new Set(escolhas).size !== 3) {
+        return `Selecione 3 opções diferentes para ${state.talento}.`;
+      }
+    }
+    if (state.asiModo === 'talento' && state.talento) {
+      const validacaoTalento = validarEscolhasTalento(ctx.char, state.talento, {
+        atributo: state.talentoASI || state.resilienteAtributo || state.iniciadoEmMagia?.atributo,
+        talento_asi: state.talentoASI,
+        selecoes: state.escolhasTalento || [],
+        magia: state.escolhasTalento?.[0],
+        rituais: state.talento === 'Conjurador Ritualista' ? state.escolhasTalento : undefined,
+        energias: state.dadivaResistenciaEnergia,
+        iniciado_em_magia: state.iniciadoEmMagia
+      });
+      if (!validacaoTalento.valido) return validacaoTalento.erro;
     }
   }
 
@@ -98,7 +133,15 @@ export function validateAll(ctx, state) {
   if (ctx.precisaEstiloLuta && !state.estiloLuta) return 'Selecione um Estilo de Luta.';
   if (ctx.precisaExploradorHabil && !state.exploradorExpertise) return 'Selecione 1 perícia para Explorador Hábil.';
   if (ctx.precisaExploradorHabil && state.exploradorIdiomas.length !== 2) return 'Selecione 2 idiomas (Explorador Hábil).';
-  if (ctx.precisaAcademico && state.academicoExpertise.length !== 2) return 'Selecione 2 perícias para Acadêmico.';
+  if (ctx.precisaAcademico) {
+    const periciasAcademicas = new Set(['Arcanismo', 'História', 'Investigação', 'Medicina', 'Natureza', 'Religião']);
+    const pericia = state.academicoExpertise[0];
+    if (state.academicoExpertise.length !== 1 || !periciasAcademicas.has(pericia) ||
+        !(ctx.char.pericias_proficientes || []).includes(pericia) ||
+        (ctx.char.pericias_expertise || []).includes(pericia)) {
+      return 'Selecione 1 perícia acadêmica elegível em que você já é proficiente para Acadêmico.';
+    }
+  }
 
   if (precisaManobrasLive && ctx.manobrasGuerreiro) {
     if ((state.manobrasNovasSelecionadas || []).length !== ctx.manobrasGuerreiro.qtdNova)
@@ -113,8 +156,17 @@ export function validateAll(ctx, state) {
       return `Selecione ${c.truquesGanhos} truque(s).`;
     if (c.tipoConj === 'conhecidas' && c.magiasGanhas > 0 && state.magiasSelecionadas.length !== c.magiasGanhas)
       return `Selecione ${c.magiasGanhas} magia(s) conhecida(s).`;
-    if (c.ehMago && state.grimorioSelecionados.length !== 2)
-      return 'Selecione 2 magias para o Grimório.';
+    if (c.ehMago) {
+      const selecionadas = state.grimorioSelecionados || [];
+      const nomesNoGrimorio = new Set((ctx.char.grimorio || []).map(m => m?.nome));
+      const magiasPorNome = new Map((ctx._listaMagiasClasse || []).map(m => [m.nome, m]));
+      const escolhasValidas = selecionadas.length === 2 && new Set(selecionadas).size === 2 &&
+        selecionadas.every(nome => {
+          const magia = magiasPorNome.get(nome);
+          return magia && magia.circulo > 0 && magia.circulo <= c.maxCirculoNovo && !nomesNoGrimorio.has(nome);
+        });
+      if (!escolhasValidas) return 'Selecione 2 magias novas de círculos para os quais você possui espaços no Grimório.';
+    }
     if (state.trocarDe && !state.trocarPara)
       return 'Escolha a magia substituta ou desmarque a troca.';
   }

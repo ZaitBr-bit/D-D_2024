@@ -1,7 +1,7 @@
 // ============================================================
 // Persistencia de personagens no localStorage + Firestore (se logado)
 // ============================================================
-import { gerarId } from './utils.js';
+import { gerarId, normalizarGrimorioMago } from './utils.js';
 import { enfileirarSync, enfileirarRemocao } from './sync.js';
 import { criarCarteiraVazia, normalizarCarteira, definirTaxas, resetarTaxas } from './moedas.js';
 
@@ -51,7 +51,20 @@ export function listarPersonagens() {
   try {
     const dados = localStorage.getItem(STORAGE_KEY);
     const lista = dados ? JSON.parse(dados) : [];
-    return lista.map(p => migrarEdicoesLegado(migrarMoedasLegado(p)));
+    let grimorioAlterado = false;
+    const personagens = lista.map(p => {
+      const personagem = migrarEdicoesLegado(migrarMoedasLegado(p));
+      if (normalizarGrimorioMago(personagem).alterado) grimorioAlterado = true;
+      return personagem;
+    });
+    if (grimorioAlterado) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(personagens));
+      } catch {
+        // A ficha já carregada continua disponível se a persistência falhar.
+      }
+    }
+    return personagens;
   } catch {
     return [];
   }

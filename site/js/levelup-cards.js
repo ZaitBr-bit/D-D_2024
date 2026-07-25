@@ -5,6 +5,7 @@
 import { CLASSES_INFO, ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ATRIBUTO_NOME_PARA_KEY } from './dados-classes.js';
 import { getMagiasClasse, getMagiasPorCirculo } from './db.js';
 import { calcMod, bonusProficiencia, mdParaHtml, semAcento, toast, abrirModal } from './utils.js';
+import { obterTalentosElegiveis } from './levelup.js';
 
 // ============================================================
 // CARD: Ganhos do Nível
@@ -132,29 +133,10 @@ export function renderCardSubclasse(ctx, state) {
 export function renderCardASI(ctx, state, talentosCache) {
   const { char } = ctx;
 
-  // Montar lista de talentos disponíveis (inclui Dádivas Épicas no nível 19+)
-  const talentosDisponiveis = [];
+  // A mesma regra de elegibilidade é usada pela validação central e pela recuperação legada.
   const nivelNovo = (char.nivel || 1) + 1;
-  if (talentosCache?.por_categoria) {
-    Object.values(talentosCache.por_categoria).forEach(lista => {
-      lista.forEach(t => {
-        const preq = (t.prerequisito || '').toLowerCase();
-        const ehNivel4 = preq.includes('nível 4') || preq.includes('nivel 4');
-        const ehNivel19 = preq.includes('nível 19') || preq.includes('nivel 19');
-        const ehOrigem = t.categoria === 'de Origem';
-        const ehDadiva = t.categoria === 'de Dádiva Épica';
-        // Incluir se: nível 4 (sempre nos ASI), origem, OU dádiva épica quando nível 19+
-        if (ehNivel4 || ehOrigem || (ehDadiva && ehNivel19 && nivelNovo >= 19)) {
-          if (t.nome === 'Aumento no Valor de Atributo') return;
-          const jaTem = (char.talentos || []).some(ct => (typeof ct === 'string' ? ct : ct.nome) === t.nome);
-          const repetivel = (t.beneficios || []).some(b => b.nome === 'Repetível');
-          if (jaTem && !repetivel) return;
-          talentosDisponiveis.push(t);
-        }
-      });
-    });
-  }
-  talentosDisponiveis.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+  const talentosDisponiveis = obterTalentosElegiveis(char, talentosCache, nivelNovo)
+    .filter(talento => ctx.exigeDadivaEpica || talento.nome !== 'Aumento no Valor de Atributo');
 
   // Agrupar por categoria
   const porCat = {};
@@ -166,18 +148,18 @@ export function renderCardASI(ctx, state, talentosCache) {
 
   return `
     <div class="levelup-card">
-      <div class="levelup-card-header">Aumento de Atributo ou Talento</div>
-      <div class="levelup-card-body">
-        <div style="display:flex;gap:12px;margin-bottom:10px">
+        <div class="levelup-card-header">${ctx.exigeDadivaEpica ? 'Dádiva Épica ou Outro Talento' : 'Aumento de Atributo ou Talento'}</div>
+        <div class="levelup-card-body">
+        ${ctx.exigeDadivaEpica ? '' : `<div style="display:flex;gap:12px;margin-bottom:10px">
           <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.9rem">
             <input type="radio" name="levelup-asi-modo" value="atributo" ${state.asiModo === 'atributo' ? 'checked' : ''}> Aumentar Atributos
           </label>
           <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.9rem">
             <input type="radio" name="levelup-asi-modo" value="talento" ${state.asiModo === 'talento' ? 'checked' : ''}> Escolher Talento
           </label>
-        </div>
+        </div>`}
 
-        <div id="levelup-asi-atributos" style="display:${state.asiModo === 'atributo' ? 'block' : 'none'}">
+        ${ctx.exigeDadivaEpica ? '' : `<div id="levelup-asi-atributos" style="display:${state.asiModo === 'atributo' ? 'block' : 'none'}">
           <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
             Aumente um atributo em +2, ou dois em +1 cada (máximo 20).
           </div>
@@ -197,11 +179,13 @@ export function renderCardASI(ctx, state, talentosCache) {
           <div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px;text-align:center">
             Total de pontos: <span id="levelup-pontos-total" style="font-weight:700">${state.pontosDistribuidos}</span> / 2
           </div>
-        </div>
+        </div>`}
 
-        <div id="levelup-asi-talento" style="display:${state.asiModo === 'talento' ? 'block' : 'none'}">
+        <div id="levelup-asi-talento" style="display:${ctx.exigeDadivaEpica || state.asiModo === 'talento' ? 'block' : 'none'}">
           <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
-            Escolha um talento em vez de aumentar atributos.
+            ${ctx.exigeDadivaEpica
+              ? 'Escolha uma Dádiva Épica ou outro talento para o qual atenda aos pré-requisitos.'
+              : 'Escolha um talento em vez de aumentar atributos.'}
           </div>
           <select id="levelup-talento-select" class="form-input" style="width:100%;margin-bottom:8px">
             <option value="">-- Selecione um talento --</option>
@@ -363,15 +347,16 @@ export function renderCardEscolhasClasse(ctx, state) {
   // Acadêmico
   if (precisaAcademico) {
     const periciasAcademicas = ['Arcanismo', 'História', 'Investigação', 'Medicina', 'Natureza', 'Religião'];
+    const proficientes = new Set(char.pericias_proficientes || []);
     const expertiseAtual = new Set(char.pericias_expertise || []);
-    const elegiveisAc = periciasAcademicas.filter(p => !expertiseAtual.has(p));
+    const elegiveisAc = periciasAcademicas.filter(p => proficientes.has(p) && !expertiseAtual.has(p));
 
     html += `
       <div class="levelup-card">
         <div class="levelup-card-header">Acadêmico</div>
         <div class="levelup-card-body">
           <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
-            Selecione 2 perícias de conhecimento para Especialização.
+            Selecione 1 perícia acadêmica em que você já é proficiente para Especialização.
           </div>
           <div id="levelup-academico" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px">
             ${elegiveisAc.map(p => `
@@ -381,7 +366,7 @@ export function renderCardEscolhasClasse(ctx, state) {
             `).join('')}
           </div>
           <div class="levelup-counter">
-            Selecionadas: <span id="levelup-academico-count" style="font-weight:700">${state.academicoExpertise.length}</span>/2
+            Selecionada: <span id="levelup-academico-count" style="font-weight:700">${state.academicoExpertise.length}</span>/1
           </div>
         </div>
       </div>
