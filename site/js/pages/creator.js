@@ -2,10 +2,19 @@
 // Wizard de Criação de Personagem (7 passos)
 // ============================================================
 import { CLASSES_INFO, PERICIAS, ATRIBUTOS_NOMES, ATRIBUTOS_KEYS, ATRIBUTO_NOME_PARA_KEY, STANDARD_ARRAY, POINT_BUY_CUSTOS, POINT_BUY_TOTAL } from '../dados-classes.js';
-import { getClasse, getAntecedentes, getEspecies, getTalentos, getMagiasClasse, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura } from '../db.js';
+import { getClasse, getAntecedentes, getEspecies, getTalentos, getMagiasClasse, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura, getItensMagicosFRHOF } from '../db.js';
 import { criarPersonagemVazio, salvarPersonagem } from '../store.js';
 import { DENOMINACOES, ICONE_MOEDA, criarCarteiraVazia, adicionarMoeda, removerQuantidadeMoeda } from '../moedas.js';
 import { calcMod, fmtMod, calcPVNivel1, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, getDeslocamento, getTamanho, escHtml, processarImagemArquivo, getCapacidadeCarga, getPesoTotalInventario, descreverCapacidadeCarga, fmtPeso } from '../utils.js';
+import { clonarFonte, extrairDadosConteudo, renderSeloFonte } from '../fontes.js';
+
+function renderDanoMagia(magia) {
+  if (!magia?.dano?.length) return '';
+  const texto = magia.dano
+    .map(d => `${escHtml(d.formula)} ${escHtml(d.tipo)}${d.observacao ? ` (${escHtml(d.observacao)})` : ''}`)
+    .join('; ');
+  return `<div class="info-box info mt-1"><strong>Dano:</strong> ${texto}</div>`;
+}
 
 const STEPS = [
   { id: 'classe', label: 'Classe' },
@@ -465,6 +474,83 @@ let personagem = null;
 let stepAtual = 0;
 let dadosCache = {};
 let containerRef = null;
+
+const LIMITE_SINTONIZACOES = 3;
+
+/** Helpers de estado de itens mágicos (mantêm compatibilidade com personagens legados). */
+export function ehItemMagico(item) { return item?.tipo === 'item_magico'; }
+export function contarSintonizacoes(inventario = []) {
+  const vistos = new Set();
+  return inventario.filter(ehItemMagico).filter(item => {
+    if (!item.requer_sintonizacao || !item.sintonizado) return false;
+    const multiplo = item.dados?.efeitos?.multiplos_contam_como_um_item || item.efeitos?.multiplos_contam_como_um_item;
+    const chave = multiplo ? `${item.fonte?.id || ''}:membro-protetico` : item;
+    if (vistos.has(chave)) return false;
+    vistos.add(chave);
+    return true;
+  }).length;
+}
+export function alternarSintonizacaoItemMagico(item, inventario = []) {
+  if (!ehItemMagico(item) || !item.requer_sintonizacao) return false;
+  if (item.sintonizado) { item.sintonizado = false; return true; }
+  if (contarSintonizacoes(inventario) >= LIMITE_SINTONIZACOES) return false;
+  item.sintonizado = true;
+  return true;
+}
+export function gastarCargaItemMagico(item, quantidade = 1) {
+  if (!ehItemMagico(item)) return false;
+  const max = Number(item.cargas_maximas ?? item.dados?.cargas_maximas ?? 0);
+  if (!max) return false;
+  const atual = Number(item.cargas_atuais ?? max);
+  const n = Math.max(0, Number(quantidade) || 1);
+  if (atual < n) return false;
+  item.cargas_atuais = atual - n;
+  return true;
+}
+export function restaurarCargasItemMagico(item) {
+  if (!ehItemMagico(item)) return false;
+  const max = Number(item.cargas_maximas ?? item.dados?.cargas_maximas ?? 0);
+  if (!max) return false;
+  item.cargas_atuais = max;
+  return true;
+}
+export function alternarFormaWindskiff(item) {
+  if (!ehItemMagico(item) || item.nome !== 'Windskiff') return false;
+  if (item.forma_ativa) { item.forma_ativa = false; return false; }
+  const gasto = Number(item.gasto_por_uso ?? item.dados?.efeitos?.transformacao?.gasto_por_uso ?? 1);
+  if (!gastarCargaItemMagico(item, gasto)) return false;
+  item.gasto_por_uso = gasto;
+  item.forma_ativa = true;
+  return item.forma_ativa;
+}
+export function formatarItemMagicoImpressao(item) {
+  const d = item?.dados || {};
+  const partes = [item?.raridade || d.raridade, item?.requer_sintonizacao ? (item.sintonizado ? 'Sintonizado' : 'Requer sintonização') : '', item?.cargas_maximas ? `Cargas ${item.cargas_atuais ?? item.cargas_maximas}/${item.cargas_maximas}` : '', item?.descricao || d.descricao].filter(Boolean);
+  if (item?.nome === 'Windskiff' && d.efeitos?.veiculo) {
+    const v = d.efeitos.veiculo;
+    partes.push(`Veículo (${item.forma_ativa ? 'forma ativa' : 'forma inativa'}): CA ${v.ca} | PV ${v.pv} | Deslocamento ${v.velocidade_pes} pés | Planeio ${v.planeio_razao}${v.sem_dano_queda ? ' | Sem dano de queda' : ''}`);
+  }
+  return partes.join(' | ');
+}
+export function criarInstanciaItemMagico(item) {
+  const max = Number(item?.efeitos?.cargas?.maximas || 0);
+  return {
+    nome: item.nome,
+    tipo: 'item_magico',
+    quantidade: 1,
+    equipado: false,
+    descricao: item.descricao || '',
+    fonte: clonarFonte(item.fonte),
+    raridade: item.raridade,
+    requer_sintonizacao: !!item.requer_sintonizacao,
+    sintonizado: false,
+    cargas_maximas: max || undefined,
+    cargas_atuais: max || undefined,
+    gasto_por_uso: item.efeitos?.transformacao?.gasto_por_uso,
+    forma_ativa: false,
+    dados: { ...item, fonte: clonarFonte(item.fonte), efeitos: item.efeitos ? JSON.parse(JSON.stringify(item.efeitos)) : undefined }
+  };
+}
 
 export async function renderCreator(container) {
   containerRef = container;
@@ -983,14 +1069,14 @@ async function finalizar() {
     if (!personagem.magias_conhecidas) personagem.magias_conhecidas = [];
     for (const nome of (im.truques || [])) {
       if (!personagem.magias_conhecidas.find(m => m.nome === nome)) {
-        personagem.magias_conhecidas.push({ nome, circulo: 0, origem: 'iniciado_em_magia' });
+        personagem.magias_conhecidas.push(criarEntradaMagiaSelecionada(nome, 0, { origem: 'iniciado_em_magia' }));
       }
     }
     // A magia de 1o circulo fica sempre preparada (origem especial, 1 uso grátis por descanso longo)
     if (im.magia) {
       if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
       if (!personagem.magias_preparadas.find(m => m.nome === im.magia)) {
-        personagem.magias_preparadas.push({ nome: im.magia, circulo: 1, origem: 'iniciado_em_magia', gratis_usado: false });
+        personagem.magias_preparadas.push(criarEntradaMagiaSelecionada(im.magia, 1, { origem: 'iniciado_em_magia', gratis_usado: false }));
       }
     }
   }
@@ -2678,7 +2764,8 @@ function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
             tipo: 'equipamento',
             quantidade: comp.qtd,
             equipado: false,
-            dados: { custo: equipComp.custo, peso: equipComp.peso, tipo_uso: equipComp.tipo_uso || '', descricao: equipComp.descricao || '' },
+            fonte: clonarFonte(equipComp.fonte),
+            dados: extrairDadosConteudo(equipComp),
             origemTipo: tipoOrigem,
             origemNome: nomeOrigem
           });
@@ -2756,7 +2843,8 @@ function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
         tipo: 'equipamento',
         quantidade,
         equipado: false,
-        dados: { custo: equip.custo, peso: equip.peso, tipo_uso: equip.tipo_uso || '', descricao: equip.descricao || '' },
+        fonte: clonarFonte(equip.fonte),
+        dados: extrairDadosConteudo(equip),
         origemTipo: tipoOrigem,
         origemNome: nomeOrigem
       });
@@ -2793,15 +2881,17 @@ async function renderStepEquipamento(el) {
   const equipAntecedente = antecedente?.equipamento?.replace(/\*/g, '') || '';
 
   // Carregar armas e armaduras disponíveis
-  const [armasData, armadurasData, equipAventData] = await Promise.all([
+  const [armasData, armadurasData, equipAventData, itensMagicosData] = await Promise.all([
     getArmas(),
     getArmaduras(),
-    getEquipamentoAventura()
+    getEquipamentoAventura(),
+    getItensMagicosFRHOF()
   ]);
   dadosCache.armas = armasData?.armas || [];
   dadosCache.propriedadesArmas = armasData?.propriedades || [];
   dadosCache.armaduras = armadurasData?.armaduras || [];
   dadosCache.equipAvent = equipAventData?.itens || [];
+  dadosCache.itensMagicos = itensMagicosData?.itens || [];
 
   // Parsear opções de equipamento
   const opcoesClasse = parseEquipamentoOpcoes(equipClasse);
@@ -2893,6 +2983,7 @@ async function renderStepEquipamento(el) {
           <button class="btn btn-sm btn-accent" id="btn-add-arma">+ Arma</button>
           <button class="btn btn-sm btn-accent" id="btn-add-armadura">+ Armadura</button>
           <button class="btn btn-sm btn-accent" id="btn-add-item">+ Item</button>
+          <button class="btn btn-sm btn-accent" id="btn-add-item-magico">+ Item Mágico</button>
           <button class="btn btn-sm btn-secondary" id="btn-add-custom">+ Custom</button>
         </div>
       </div>
@@ -2983,6 +3074,7 @@ async function renderStepEquipamento(el) {
   document.getElementById('btn-add-arma')?.addEventListener('click', () => mostrarSeletorArma());
   document.getElementById('btn-add-armadura')?.addEventListener('click', () => mostrarSeletorArmadura());
   document.getElementById('btn-add-item')?.addEventListener('click', () => mostrarSeletorItem());
+  document.getElementById('btn-add-item-magico')?.addEventListener('click', () => mostrarSeletorItemMagico());
   document.getElementById('btn-add-custom')?.addEventListener('click', () => mostrarFormCustomItem());
 
   // Eventos de remover item
@@ -3041,10 +3133,14 @@ function renderItemInventario(item, idx) {
   if (tipoUso === 'consumivel') {
     tipoBadge = '<span class="badge" style="font-size:0.6rem;background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7">Consumível</span>';
   }
+  if (ehItemMagico(item)) {
+    tipoBadge += `<span class="badge" style="font-size:0.6rem;background:#f3e5f5;color:#6a1b9a;border:1px solid #ce93d8">${item.raridade || item.dados?.raridade || 'Item mágico'}</span>`;
+    if (item.requer_sintonizacao) tipoBadge += `<span class="badge" style="font-size:0.6rem;background:#fff3e0;color:#e65100;border:1px solid #ffcc80">${item.sintonizado ? 'Sintonizado' : 'Requer sintonização'}</span>`;
+  }
 
   // Descricao curta para equipamentos
   const descCurta = item.dados?.descricao || item.descricao || '';
-  const descPreview = descCurta && item.tipo === 'equipamento'
+  const descPreview = descCurta && (item.tipo === 'equipamento' || ehItemMagico(item))
     ? `<div class="inv-item-detalhe" style="font-size:0.7rem;color:var(--text-muted);margin-top:1px">${descCurta.length > 80 ? descCurta.substring(0, 80) + '...' : descCurta}</div>`
     : '';
 
@@ -3052,16 +3148,18 @@ function renderItemInventario(item, idx) {
     <div class="inv-item ${item.equipado ? 'inv-item-equipado' : ''}" data-idx="${idx}" draggable="true">
       <div class="inv-drag-handle" title="Arrastar para reordenar">&#9776;</div>
       <div style="flex:1;cursor:pointer" data-info-inv="${idx}" title="Ver detalhes">
-        <div class="inv-item-nome">${item.nome} ${profBadge} ${tipoBadge}</div>
+        <div class="inv-item-nome">${item.nome} ${renderSeloFonte(item.fonte)} ${profBadge} ${tipoBadge}</div>
         <div class="inv-item-detalhe">
           ${item.tipo === 'arma' ? `${item.dados?.dano || ''} | ${item.dados?.propriedades || ''}` : ''}
           ${item.tipo === 'armadura' ? `CA: ${item.dados?.ca || ''} | ${item.dados?.categoria || ''}` : ''}
           ${item.tipo === 'escudo' ? `CA: ${item.dados?.ca || ''} | Escudo` : ''}
           ${item.tipo === 'equipamento' ? `${item.dados?.custo || ''} ${item.dados?.peso ? '| ' + item.dados.peso : ''}` : ''}
+          ${ehItemMagico(item) ? `${item.dados?.catalogo || ''}${item.cargas_maximas ? ` | Cargas: ${item.cargas_atuais ?? item.cargas_maximas}/${item.cargas_maximas}` : ''}${item.forma_ativa ? ' | Forma ativa' : ''}` : ''}
           ${item.tipo === 'customizado' ? `${item.descricao || ''}` : ''}
           ${item.tipo === 'generico' ? `${item.descricao || ''}` : ''}
         </div>
         ${descPreview}
+        ${ehItemMagico(item) && item.nome === 'Windskiff' && item.dados?.efeitos?.veiculo ? `<div class="inv-item-detalhe" style="font-size:0.7rem;color:var(--text-muted)"><strong>Veículo:</strong> CA ${item.dados.efeitos.veiculo.ca} | PV ${item.dados.efeitos.veiculo.pv} | ${item.dados.efeitos.veiculo.velocidade_pes} pés</div>` : ''}
       </div>
       <div class="inv-item-acoes" style="align-items:center">
         <div class="inv-qty-control" style="display:flex;align-items:center;gap:2px">
@@ -3069,6 +3167,9 @@ function renderItemInventario(item, idx) {
           <span style="min-width:20px;text-align:center;font-size:0.8rem;font-weight:700">${item.quantidade ?? 1}</span>
           <button class="btn btn-sm btn-icon" data-qty-plus-inv="${idx}" style="font-size:0.7rem;padding:1px 5px">+</button>
         </div>
+        ${ehItemMagico(item) && item.requer_sintonizacao ? `<button class="btn btn-sm btn-secondary" data-sintonizar-magico="${idx}">${item.sintonizado ? 'Desintonizar' : 'Sintonizar'}</button>` : ''}
+        ${ehItemMagico(item) && item.cargas_maximas ? `<button class="btn btn-sm btn-secondary" data-gastar-carga-magico="${idx}" ${item.cargas_atuais <= 0 ? 'disabled' : ''}>- Carga</button><button class="btn btn-sm btn-secondary" data-restaurar-carga-magico="${idx}">Restaurar</button>` : ''}
+        ${ehItemMagico(item) && item.nome === 'Windskiff' ? `<button class="btn btn-sm btn-secondary" data-forma-windskiff="${idx}">${item.forma_ativa ? 'Desativar' : 'Ativar'} Windskiff</button>` : ''}
         <label class="form-check inv-equip-label" title="Equipar/Desequipar">
           <input type="checkbox" data-equip-idx="${idx}" ${item.equipado ? 'checked' : ''}> Eq.
         </label>
@@ -3079,6 +3180,24 @@ function renderItemInventario(item, idx) {
 }
 
 function setupEventosInventario(containerEl) {
+  containerEl.querySelectorAll('[data-sintonizar-magico]').forEach(btn => btn.addEventListener('click', e => {
+    e.stopPropagation();
+    const idx = Number(btn.dataset.sintonizarMagico); const item = personagem.inventario[idx];
+    if (!alternarSintonizacaoItemMagico(item, personagem.inventario)) { toast('Limite de três sintonizações atingido.', 'error'); return; }
+    const listaEl = document.getElementById('lista-inventario'); if (listaEl) { listaEl.innerHTML = renderListaInventario(); setupEventosInventario(containerEl); }
+  }));
+  containerEl.querySelectorAll('[data-gastar-carga-magico]').forEach(btn => btn.addEventListener('click', e => {
+    e.stopPropagation(); const item = personagem.inventario[Number(btn.dataset.gastarCargaMagico)];
+    if (gastarCargaItemMagico(item)) { const listaEl = document.getElementById('lista-inventario'); if (listaEl) { listaEl.innerHTML = renderListaInventario(); setupEventosInventario(containerEl); } }
+  }));
+  containerEl.querySelectorAll('[data-restaurar-carga-magico]').forEach(btn => btn.addEventListener('click', e => {
+    e.stopPropagation(); const item = personagem.inventario[Number(btn.dataset.restaurarCargaMagico)];
+    if (restaurarCargasItemMagico(item)) { const listaEl = document.getElementById('lista-inventario'); if (listaEl) { listaEl.innerHTML = renderListaInventario(); setupEventosInventario(containerEl); } }
+  }));
+  containerEl.querySelectorAll('[data-forma-windskiff]').forEach(btn => btn.addEventListener('click', e => {
+    e.stopPropagation(); alternarFormaWindskiff(personagem.inventario[Number(btn.dataset.formaWindskiff)]);
+    const listaEl = document.getElementById('lista-inventario'); if (listaEl) { listaEl.innerHTML = renderListaInventario(); setupEventosInventario(containerEl); }
+  }));
   // Remover item (com confirmação)
   containerEl.querySelectorAll('[data-remover-idx]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -3357,7 +3476,7 @@ function mostrarSeletorItem() {
       ${itens.map((it, i) => `
         <div class="inv-item" style="cursor:pointer" data-item-idx="${i}">
           <div>
-            <div class="inv-item-nome">${it.nome}</div>
+            <div class="inv-item-nome">${it.nome} ${renderSeloFonte(it.fonte)}</div>
             <div class="inv-item-detalhe">${it.peso || ''} | ${it.custo || ''}</div>
           </div>
         </div>
@@ -3378,14 +3497,35 @@ function mostrarSeletorItem() {
     el.addEventListener('click', () => {
       const item = itens[parseInt(el.dataset.itemIdx)];
       personagem.inventario.push({
-        nome: item.nome, tipo: 'equipamento', quantidade: 1, equipado: false,
-        descricao: '', dados: { peso: item.peso, custo: item.custo }
+        nome: item.nome,
+        tipo: 'equipamento',
+        quantidade: 1,
+        equipado: false,
+        descricao: item.descricao || '',
+        fonte: clonarFonte(item.fonte),
+        dados: extrairDadosConteudo(item)
       });
       window.fecharModal();
       const wizContent = document.getElementById('wizard-content');
       if (wizContent) renderStepEquipamento(wizContent);
     });
   });
+}
+
+function mostrarSeletorItemMagico() {
+  const itens = dadosCache.itensMagicos || [];
+  const html = `<div class="search-box"><input type="text" id="busca-item-magico" placeholder="Buscar item mágico..." class="form-input"></div>
+    <div id="lista-itens-magicos" style="min-height:35dvh;max-height:50dvh;overflow-y:auto">${itens.map((it, i) => `<div class="inv-item" style="cursor:pointer" data-item-magico-idx="${i}"><div><div class="inv-item-nome">${it.nome} ${renderSeloFonte(it.fonte)} <span class="badge">${it.raridade || ''}</span>${it.requer_sintonizacao ? ' <span class="badge">Requer sintonização</span>' : ''}</div><div class="inv-item-detalhe">${it.custo || ''} | ${it.catalogo || ''}</div></div></div>`).join('')}</div>`;
+  abrirModal('Adicionar Item Mágico', html);
+  document.getElementById('busca-item-magico')?.addEventListener('input', e => {
+    const termo = semAcento(e.target.value);
+    document.querySelectorAll('#lista-itens-magicos [data-item-magico-idx]').forEach(el => { el.style.display = semAcento(el.textContent).includes(termo) ? '' : 'none'; });
+  });
+  document.querySelectorAll('#lista-itens-magicos [data-item-magico-idx]').forEach(el => el.addEventListener('click', () => {
+    const item = itens[Number(el.dataset.itemMagicoIdx)]; if (!item) return;
+    personagem.inventario.push(criarInstanciaItemMagico(item));
+    window.fecharModal(); const wizContent = document.getElementById('wizard-content'); if (wizContent) renderStepEquipamento(wizContent);
+  }));
 }
 
 function mostrarFormCustomItem() {
@@ -3451,7 +3591,7 @@ function mostrarFormCustomItem() {
 // Mostra popup com detalhes completos de um item do inventário
 function mostrarDetalheItem(item) {
   if (!item) return;
-  let corpo = '';
+  let corpo = renderSeloFonte(item.fonte);
 
   if (item.tipo === 'arma') {
     const d = item.dados || {};
@@ -3502,6 +3642,13 @@ function mostrarDetalheItem(item) {
     if (d.furtividade && d.furtividade !== '—') corpo += `<strong>Furtividade:</strong> ${d.furtividade}<br>`;
     if (d.custo || d.peso) corpo += `<strong>Custo:</strong> ${d.custo || '—'} | <strong>Peso:</strong> ${d.peso || '—'}`;
     corpo += `</div>`;
+  } else if (ehItemMagico(item)) {
+    const d = item.dados || {};
+    corpo += `<div style="font-size:0.85rem;margin-bottom:6px"><span class="badge">${item.raridade || d.raridade || 'Item mágico'}</span>${item.requer_sintonizacao ? ` <span class="badge">${item.sintonizado ? 'Sintonizado' : 'Requer sintonização'}</span>` : ''}</div>`;
+    if (d.catalogo || d.custo) corpo += `<div style="font-size:0.85rem"><strong>Catálogo:</strong> ${d.catalogo || '—'} | <strong>Custo:</strong> ${d.custo || '—'}</div>`;
+    if (item.cargas_maximas) corpo += `<div style="font-size:0.85rem"><strong>Cargas:</strong> ${item.cargas_atuais ?? item.cargas_maximas}/${item.cargas_maximas} (${d.efeitos?.cargas?.recuperacao || 'recuperação'})</div>`;
+    if (item.nome === 'Windskiff' && d.efeitos?.veiculo) { const v = d.efeitos.veiculo; corpo += `<div class="section-divider mt-1"><span>Veículo (forma ${item.forma_ativa ? 'ativa' : 'inativa'})</span></div><div style="font-size:0.85rem">Tamanho: ${v.tamanho} | CA: ${v.ca} | PV: ${v.pv} | Deslocamento: ${v.velocidade_pes} pés | Planeio: ${v.planeio_razao}${v.sem_dano_queda ? ' | Sem dano de queda' : ''}</div>`; }
+    if (item.descricao || d.descricao) corpo += `<div class="md-content" style="margin-top:6px;font-size:0.85rem">${mdParaHtml(item.descricao || d.descricao)}</div>`;
   } else {
     const d = item.dados || {};
     if (d.custo || d.peso) {
@@ -3673,7 +3820,7 @@ async function renderStepMagias(el) {
             return `
               <div class="magia-card ${sel ? 'selecionada' : ''} ${bloqueadoPorIM ? 'magia-card-bloqueada' : ''}" data-magia-nome="${nome}" data-magia-circ="${circ}" ${bloqueadoPorIM ? 'style="opacity:0.4"' : ''}>
                 <span class="magia-card-check" data-creator-check="${nome}"></span>
-                <div class="magia-card-nome" data-creator-info="${nome}" data-creator-info-circ="${circ}">${nome}${bloqueadoPorIM ? ' (já conhecido)' : ''}</div>
+                <div class="magia-card-nome" data-creator-info="${nome}" data-creator-info-circ="${circ}">${nome} ${renderSeloFonte(m.fonte)}${bloqueadoPorIM ? ' (já conhecido)' : ''}</div>
                 <div class="magia-card-meta">
                   <span>${m.escola || ''}</span>
                   ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
@@ -3910,7 +4057,7 @@ async function _bindInstanciaIM(container, idx, aoMudar) {
               return `
                 <div class="magia-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}" data-im-magia="${nome}" data-im-tipo="${tab}" ${bloqueado ? 'style="opacity:0.4"' : ''}>
                   <span class="magia-card-check" data-im-check="${nome}"></span>
-                  <div class="magia-card-nome" data-im-info="${nome}" data-im-info-circ="${isTruque ? 0 : 1}">${nome}${bloqueado ? ' (já conhecido)' : ''}</div>
+                  <div class="magia-card-nome" data-im-info="${nome}" data-im-info-circ="${isTruque ? 0 : 1}">${nome} ${renderSeloFonte(m.fonte)}${bloqueado ? ' (já conhecido)' : ''}</div>
                   <div class="magia-card-meta">
                     <span>${m.escola || ''}</span>
                     ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
@@ -3990,6 +4137,16 @@ async function _bindInstanciaIM(container, idx, aoMudar) {
   await renderMagiasIM();
 }
 
+function criarEntradaMagiaSelecionada(nome, circulo, extras = {}) {
+  const info = (dadosCache.indiceMagias || []).find(m => m.nome === nome);
+  return {
+    nome,
+    circulo,
+    ...(info?.fonte ? { fonte: clonarFonte(info.fonte) } : {}),
+    ...extras
+  };
+}
+
 function toggleMagia(nome, circulo, isTruque, maxTruques, maxPreparadas) {
   const tipoConj = CLASSES_INFO[personagem.classe]?.tipo_conjuracao || 'preparadas';
   const labelMagias = tipoConj === 'conhecidas' ? 'magias conhecidas' : 'magias preparadas';
@@ -4000,7 +4157,7 @@ function toggleMagia(nome, circulo, isTruque, maxTruques, maxPreparadas) {
     } else {
       const truquesAtual = personagem.magias_conhecidas.filter(m => m.circulo === 0).length;
       if (truquesAtual >= maxTruques) { toast(`Máximo de ${maxTruques} truques`, 'error'); return; }
-      personagem.magias_conhecidas.push({ nome, circulo });
+      personagem.magias_conhecidas.push(criarEntradaMagiaSelecionada(nome, circulo));
     }
   } else {
     const idx = (personagem.magias_preparadas || []).findIndex(m => m.nome === nome);
@@ -4008,7 +4165,7 @@ function toggleMagia(nome, circulo, isTruque, maxTruques, maxPreparadas) {
       personagem.magias_preparadas.splice(idx, 1);
     } else {
       if (personagem.magias_preparadas.length >= maxPreparadas) { toast(`Máximo de ${maxPreparadas} ${labelMagias}`, 'error'); return; }
-      personagem.magias_preparadas.push({ nome, circulo });
+      personagem.magias_preparadas.push(criarEntradaMagiaSelecionada(nome, circulo));
     }
   }
 }
@@ -4030,6 +4187,7 @@ async function mostrarDetalheMagia(nome, circulo) {
   if (!magia) { toast('Magia não encontrada', 'error'); return; }
 
   abrirModal(magia.nome, `
+    <div style="margin-bottom:8px">${renderSeloFonte(magia.fonte)}</div>
     <div class="magia-meta" style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:8px;font-size:0.85rem">
       <span class="badge badge-primary">${circulo === 0 ? 'Truque' : circulo + 'º Círculo'}</span>
       <span class="badge badge-secondary">${magia.escola}</span>
@@ -4039,7 +4197,9 @@ async function mostrarDetalheMagia(nome, circulo) {
       <span>${magia.duracao}</span>
     </div>
     <div class="md-content">${mdParaHtml(magia.descricao)}</div>
+    ${renderDanoMagia(magia)}
     ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em círculos superiores:</strong> ${magia.circulo_superior}</div>` : ''}
+    ${magia.circulo_magico?.disponivel_na_fonte ? '<div class="info-box warning mt-1"><strong>Circle Magic:</strong> reservado ao escopo 9.</div>' : ''}
     <div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px">Classes: ${(magia.classes || []).join(', ')}</div>
   `);
 }

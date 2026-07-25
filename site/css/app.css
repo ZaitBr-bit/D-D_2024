@@ -201,6 +201,15 @@ body {
 .badge-accent { background: var(--accent); color: #fff; }
 .badge-success { background: #d4edda; color: #155724; }
 .badge-warning { background: #fff3cd; color: #856404; }
+.badge-fonte {
+  background: #e8ddc2;
+  border: 1px solid #9a7b3f;
+  color: #4d3714;
+  font-size: 0.62rem;
+  font-weight: 700;
+  margin-left: 0.3rem;
+  white-space: nowrap;
+}
 
 /* --- Tabelas --- */
 .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -991,6 +1000,12 @@ tr:hover td { background: #faf8f4; }
   }
 
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+  .badge-fonte {
+    background: transparent !important;
+    border-color: #555 !important;
+    color: #222 !important;
+  }
 
   body {
     padding: 0 !important; margin: 0 !important; background: #fff;
