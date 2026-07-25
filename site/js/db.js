@@ -41,7 +41,36 @@ export async function getMagiasClasse(nomeClasse) {
   const nomeArq = nomeClasse.toLowerCase()
     .replace(/á/g, 'a').replace(/ã/g, 'a').replace(/é/g, 'e')
     .replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u');
-  return fetchJSON(`classes/magias_${nomeArq}.json`);
+  const [base, frhof] = await Promise.all([
+    fetchJSON(`classes/magias_${nomeArq}.json`),
+    getMagiasFRHOF()
+  ]);
+
+  const listaMagias = { ...(base?.lista_magias || {}) };
+  for (const magia of frhof?.magias || []) {
+    if (!magia.classes?.includes(nomeClasse)) continue;
+    const chave = magia.circulo === 0 ? 'Truques' : `${magia.circulo}º Círculo`;
+    if (!Array.isArray(listaMagias[chave])) listaMagias[chave] = [];
+    const jaExiste = listaMagias[chave].some(item => (typeof item === 'string' ? item : item.nome) === magia.nome);
+    if (jaExiste) continue;
+    const especial = [
+      magia.concentracao ? 'C' : '',
+      typeof magia.componentes === 'string' && magia.componentes.includes('M') ? 'M' : ''
+    ].filter(Boolean).join(', ') || '—';
+    listaMagias[chave].push({
+      nome: magia.nome,
+      nome_original: magia.nome_original,
+      circulo: magia.circulo,
+      escola: magia.escola,
+      especial,
+      fonte: magia.fonte
+    });
+  }
+
+  return {
+    ...(base || { classe: nomeClasse }),
+    lista_magias: listaMagias
+  };
 }
 
 // --- Origens ---
@@ -54,6 +83,17 @@ export async function getAntecedentes() {
 /** Carrega todas as espécies */
 export async function getEspecies() {
   return fetchJSON('origens/especies.json');
+}
+
+// --- Fontes ---
+
+export async function getFontes() {
+  return fetchJSON('fontes.json');
+}
+
+export async function getFonte(id) {
+  const dados = await getFontes();
+  return dados?.fontes?.find(fonte => fonte.id === id) || null;
 }
 
 // --- Talentos ---
@@ -75,9 +115,29 @@ export async function getArmaduras() {
   return fetchJSON('equipamento/armaduras.json');
 }
 
+export async function getEquipamentosRegionaisFRHOF() {
+  return fetchJSON('equipamento/equipamentos_regionais_frhof.json');
+}
+
+/** Carrega itens mágicos de Forgotten Realms: Heroes of Faerûn */
+export async function getItensMagicosFRHOF() {
+  return fetchJSON('equipamento/itens_magicos_frhof.json');
+}
+
 /** Carrega equipamento de aventura */
 export async function getEquipamentoAventura() {
-  return fetchJSON('equipamento/equipamento_aventura.json');
+  const [base, regional] = await Promise.all([
+    fetchJSON('equipamento/equipamento_aventura.json'),
+    getEquipamentosRegionaisFRHOF()
+  ]);
+
+  const itensBase = base?.itens || [];
+  const itensRegionais = regional?.itens || [];
+  return {
+    ...(base || {}),
+    total_itens: itensBase.length + itensRegionais.length,
+    itens: [...itensBase, ...itensRegionais]
+  };
 }
 
 /** Carrega ferramentas */
@@ -87,15 +147,60 @@ export async function getFerramentas() {
 
 // --- Magias ---
 
+function resumirMagia(magia) {
+  return {
+    nome: magia.nome,
+    nome_original: magia.nome_original,
+    circulo: magia.circulo,
+    escola: magia.escola,
+    classes: magia.classes,
+    tempo_conjuracao: magia.tempo_conjuracao,
+    alcance: magia.alcance,
+    componentes: magia.componentes,
+    duracao: magia.duracao,
+    fonte: magia.fonte
+  };
+}
+
+function dedupeMagiasPorNome(magias) {
+  const vistos = new Set();
+  return magias.filter(magia => {
+    const chave = (magia.nome_original || magia.nome || '').toLowerCase();
+    if (vistos.has(chave)) return false;
+    vistos.add(chave);
+    return true;
+  });
+}
+
+/** Carrega magias de Forgotten Realms: Heroes of Faerun */
+export async function getMagiasFRHOF() {
+  return fetchJSON('magias/magias_frhof.json');
+}
+
 /** Carrega índice de todas as magias (resumido) */
 export async function getIndiceMagias() {
-  return fetchJSON('magias/_indice.json');
+  const [base, frhof] = await Promise.all([
+    fetchJSON('magias/_indice.json'),
+    getMagiasFRHOF()
+  ]);
+  const magiasBase = base?.magias || [];
+  const magiasFRHOF = (frhof?.magias || []).map(resumirMagia);
+  const magias = dedupeMagiasPorNome([...magiasBase, ...magiasFRHOF]);
+  return { ...(base || {}), total_magias: magias.length, magias };
 }
 
 /** Carrega magias de um círculo específico (com descrição completa) */
 export async function getMagiasPorCirculo(circulo) {
   const nome = circulo === 0 ? 'truques' : `circulo_${circulo}`;
-  return fetchJSON(`magias/${nome}.json`);
+  const [base, frhof] = await Promise.all([
+    fetchJSON(`magias/${nome}.json`),
+    getMagiasFRHOF()
+  ]);
+  const circuloNum = Number(circulo);
+  const magiasBase = base?.magias || [];
+  const magiasFRHOF = (frhof?.magias || []).filter(magia => magia.circulo === circuloNum);
+  const magias = dedupeMagiasPorNome([...magiasBase, ...magiasFRHOF]);
+  return { ...(base || {}), total_magias: magias.length, magias };
 }
 
 /** Carrega magias de uma classe (lista resumida: nome, circulo, escola) */
@@ -103,7 +208,16 @@ export async function getMagiasPorClasseLista(nomeClasse) {
   const nomeArq = nomeClasse.toLowerCase()
     .replace(/á/g, 'a').replace(/ã/g, 'a').replace(/é/g, 'e')
     .replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u');
-  return fetchJSON(`magias/por_classe/${nomeArq}.json`);
+  const [base, frhof] = await Promise.all([
+    fetchJSON(`magias/por_classe/${nomeArq}.json`),
+    getMagiasFRHOF()
+  ]);
+  const magiasBase = base?.magias || [];
+  const magiasFRHOF = (frhof?.magias || [])
+    .filter(magia => magia.classes?.includes(nomeClasse))
+    .map(resumirMagia);
+  const magias = dedupeMagiasPorNome([...magiasBase, ...magiasFRHOF]);
+  return { ...(base || {}), total_magias: magias.length, magias };
 }
 
 /** Busca uma magia específica pelo nome (carrega o círculo inteiro) */

@@ -1,0 +1,615 @@
+{
+  "_metadados_preparacao": {
+    "fonte_id": "frhof-2025",
+    "objetivo": "Arquivo de insumo no formato planejado para dados/origens/antecedentes_frhof.json. Nao e consumido automaticamente pelo app.",
+    "fontes_consultadas": [
+      "https://www.dndbeyond.com/backgrounds",
+      "https://nat20.fyi/",
+      "https://dnd2024.wikidot.com/background:all",
+      "https://dnd2024.wikidot.com/background:chondathan-freebooter",
+      "https://dnd2024.wikidot.com/background:dead-magic-dweller",
+      "https://dnd2024.wikidot.com/background:dragon-cultist",
+      "https://dnd2024.wikidot.com/background:emerald-enclave-caretaker",
+      "https://dnd2024.wikidot.com/background:flaming-fist-mercenary",
+      "https://dnd2024.wikidot.com/background:genie-touched",
+      "https://dnd2024.wikidot.com/background:harper",
+      "https://dnd2024.wikidot.com/background:ice-fisher",
+      "https://dnd2024.wikidot.com/background:knight-of-the-gauntlet",
+      "https://dnd2024.wikidot.com/background:lords-alliance-vassal",
+      "https://dnd2024.wikidot.com/background:moonwell-pilgrim",
+      "https://dnd2024.wikidot.com/background:mulhorandi-tomb-raider",
+      "https://dnd2024.wikidot.com/background:mythalkeeper",
+      "https://dnd2024.wikidot.com/background:purple-dragon-squire",
+      "https://dnd2024.wikidot.com/background:rashemi-wanderer",
+      "https://dnd2024.wikidot.com/background:shadowmasters-exile",
+      "https://dnd2024.wikidot.com/background:spellfire-initiate",
+      "https://dnd2024.wikidot.com/background:zhentarim-mercenary"
+    ],
+    "pendente": [
+      "Revisar traducoes finais dos nomes de antecedentes e talentos FRHOF.",
+      "Decidir se itens ausentes no catalogo atual devem ser cadastrados ou tratados apenas como texto do pacote de antecedente."
+    ],
+    "validacao_catalogo_atual": {
+      "ferramentas": {
+        "status": "ok",
+        "observacao": "Todas as ferramentas principais existem em dados/equipamento/ferramentas.json; Kit de Jogo (a escolha) mapeia para Kit de Jogos."
+      },
+      "equipamentos": {
+        "status": "parcial",
+        "nomes_ajustados_para_catalogo": {
+          "Roupas de Viajante": "Roupas, Viagem",
+          "Roupas Finas": "Roupas, Finas",
+          "Fantasia": "Roupas, Fantasia",
+          "Robe": "Túnica",
+          "Lanterna Direcional": "Lanterna Foca-facho",
+          "Aríete Portátil": "Aríete Portável"
+        },
+        "itens_sem_cadastro_exato": [
+          "Vara"
+        ],
+        "observacao": "Vara nao existe como registro individual no catalogo atual. Flechas validam contra a secao municao de dados/equipamento/equipamento_aventura.json. Implementacao deve decidir se cria Vara no catalogo base/FRHOF ou se mantem o pacote como texto."
+      }
+    }
+  },
+  "total": 18,
+  "antecedentes": [
+    {
+      "nome": "Saqueador Chondathano",
+      "nome_original": "Chondathan Freebooter",
+      "valores_atributo": "Força, Destreza, Sabedoria",
+      "talento": "Habilidoso",
+      "talento_original": "Skilled",
+      "pericias": "Atletismo, Prestidigitação",
+      "ferramentas": "Ferramentas de Tecelão",
+      "ferramentas_original": "Weaver's Tools",
+      "idiomas_obrigatorios": ["Comum"],
+      "idiomas_adicionais": 2,
+      "idiomas_opcoes": ["Língua de Sinais Comum", "Dracônico", "Anão", "Élfico", "Gigante", "Gnômico", "Goblin", "Pequenino", "Orc"],
+      "equipamento": "*Escolha A ou B:* (A) Adaga, Ferramentas de Tecelão, Mochila, Esferas de Metal, Cesta, Saco de Dormir, Balde, Rações (3 dias), Corda, Apito Sinalizador, Roupas, Viagem, 38 PO; ou (B) 50 PO",
+      "equipamento_original": "(A) Dagger, Weaver's Tools, Backpack, Ball Bearings, Basket, Bedroll, Bucket, Rations (3 days' worth), Rope, Signal Whistle, Traveler's Clothes, 38 GP; or (B) 50 GP",
+      "descricao": "Você rompeu com a vida controlada de Chondath e ganhou experiência como saqueador livre nas rotas do Vilhon. Sua formação combina serviço forçado rejeitado, sobrevivência itinerante e contatos locais.",
+      "dependencias_talentos": {
+        "concede_origem": "Skilled",
+        "desbloqueia_geral": null
+      },
+      "preparacao": {
+        "descricao_pendente": false,
+        "talento_novo_frhof": false
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Habitante de Magia Morta",
+      "nome_original": "Dead Magic Dweller",
+      "valores_atributo": "Força, Constituição, Sabedoria",
+      "talento": "Curandeiro",
+      "talento_original": "Healer",
+      "pericias": "Medicina, Sobrevivência",
+      "ferramentas": "Ferramentas de Coureiro",
+      "ferramentas_original": "Leatherworker's Tools",
+      "idiomas_obrigatorios": ["Comum"],
+      "idiomas_adicionais": 2,
+      "idiomas_opcoes": ["Língua de Sinais Comum", "Dracônico", "Anão", "Élfico", "Gigante", "Gnômico", "Goblin", "Pequenino", "Orc"],
+      "equipamento": "*Escolha A ou B:* (A) Clava Grande, Ferramentas de Coureiro, Saco de Dormir, Cobertor, Kit de Curandeiro, Vara, Rações (3 dias), Tenda, Caixa para Fogo, 5 Tochas, Roupas, Viagem, Cantil (cheio), 32 PO; ou (B) 50 PO",
+      "equipamento_original": "(A) Greatclub, Leatherworker's Tools, Bedroll, Blanket, Healer's Kit, Pole, Rations (3 days' worth), Tent, Tinderbox, 5 Torches, Traveler's Clothes, Waterskin, 32 GP; or (B) 50 GP",
+      "descricao": "Você aprendeu a sobreviver em uma região onde a magia falha ou é temida. Sua experiência favorece resistência física, cuidados práticos e soluções mundanas quando recursos mágicos não bastam.",
+      "dependencias_talentos": {
+        "concede_origem": "Healer",
+        "desbloqueia_geral": null
+      },
+      "preparacao": {
+        "descricao_pendente": false,
+        "talento_novo_frhof": false
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Cultista do Dragão",
+      "nome_original": "Dragon Cultist",
+      "valores_atributo": "Destreza, Constituição, Inteligência",
+      "talento": "Iniciado do Culto do Dragão",
+      "talento_original": "Cult of the Dragon Initiate",
+      "pericias": "Enganação, Furtividade",
+      "ferramentas": "Suprimentos de Calígrafo",
+      "ferramentas_original": "Calligrapher's Supplies",
+      "idiomas_obrigatorios": ["Comum"],
+      "idiomas_adicionais": 2,
+      "idiomas_opcoes": ["Língua de Sinais Comum", "Dracônico", "Anão", "Élfico", "Gigante", "Gnômico", "Goblin", "Pequenino", "Orc"],
+      "equipamento": "*Escolha A ou B:* (A) Suprimentos de Calígrafo, Adaga, Garrafa de Vidro (1 litro), Lâmpada, Grilhões, Óleo (5 frascos), 2 Algibeiras, Túnica, Corda, 30 PO; ou (B) 50 PO",
+      "equipamento_original": "(A) Calligrapher's Supplies, Dagger, Glass Bottle, Lamp, Manacles, Oil (5 flasks), 2 Pouches, Robe, Rope, 30 GP; or (B) 50 GP",
+      "descricao": "Você serviu ou foi moldado por cultistas dracônicos, aprendendo a esconder intenções e circular entre símbolos, ritos e ameaças ligadas a dragões.",
+      "dependencias_talentos": {
+        "concede_origem": "Cult of the Dragon Initiate",
+        "desbloqueia_geral": "Dragonscarred"
+      },
+      "preparacao": {
+        "descricao_pendente": false,
+        "talento_novo_frhof": true
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Cuidador do Enclave Esmeralda",
+      "nome_original": "Emerald Enclave Caretaker",
+      "valores_atributo": "Constituição, Inteligência, Sabedoria",
+      "talento": "Aprendiz do Enclave Esmeralda",
+      "talento_original": "Emerald Enclave Fledgling",
+      "pericias": "Natureza, Sobrevivência",
+      "ferramentas": "Kit de Herbalismo",
+      "ferramentas_original": "Herbalism Kit",
+      "idiomas_obrigatorios": ["Comum"],
+      "idiomas_adicionais": 2,
+      "idiomas_opcoes": ["Língua de Sinais Comum", "Dracônico", "Anão", "Élfico", "Gigante", "Gnômico", "Goblin", "Pequenino", "Orc"],
+      "equipamento": "*Escolha A ou B:* (A) Arco Curto, 20 Flechas, Kit de Herbalismo, Saco de Dormir, Cobertor, Algibeira, Tenda, Roupas, Viagem, 13 PO; ou (B) 50 PO",
+      "equipamento_original": "(A) Shortbow, 20 Arrows, Herbalism Kit, Bedroll, Blanket, Pouch, Tent, Traveler's Clothes, 13 GP; or (B) 50 GP",
+      "descricao": "Você cuidou de lugares selvagens e comunidades ligadas ao Enclave Esmeralda. Sua rotina misturou patrulha, cura natural e proteção de criaturas e trilhas.",
+      "dependencias_talentos": {
+        "concede_origem": "Emerald Enclave Fledgling",
+        "desbloqueia_geral": "Enclave Magic"
+      },
+      "preparacao": {
+        "descricao_pendente": false,
+        "talento_novo_frhof": true
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Mercenário do Punho Flamejante",
+      "nome_original": "Flaming Fist Mercenary",
+      "valores_atributo": "Força, Constituição, Carisma",
+      "talento": "Vigoroso",
+      "talento_original": "Tough",
+      "pericias": "Intimidação, Percepção",
+      "ferramentas": "Ferramentas de Ferreiro",
+      "ferramentas_original": "Smith's Tools",
+      "idiomas_obrigatorios": ["Comum"],
+      "idiomas_adicionais": 2,
+      "idiomas_opcoes": ["Língua de Sinais Comum", "Dracônico", "Anão", "Élfico", "Gigante", "Gnômico", "Goblin", "Pequenino", "Orc"],
+      "equipamento": "*Escolha A ou B:* (A) Maça, Ferramentas de Ferreiro, Roupas, Finas, Grilhões, Aríete Portável, 4 PO; ou (B) 50 PO",
+      "equipamento_original": "(A) Mace, Smith's Tools, Fine Clothes, Manacles, Portable Ram, 4 GP; or (B) 50 GP",
+      "descricao": "Você trabalhou como mercenário do Punho Flamejante, habituado a disciplina dura, contratos perigosos e presença marcial em cidades e fronteiras.",
+      "dependencias_talentos": {
+        "concede_origem": "Tough",
+        "desbloqueia_geral": null
+      },
+      "preparacao": {
+        "descricao_pendente": false,
+        "talento_novo_frhof": false
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Tocado por Gênio",
+      "nome_original": "Genie Touched",
+      "valores_atributo": "Destreza, Sabedoria, Carisma",
+      "talento": "Iniciado em Magia (Mago)",
+      "talento_original": "Magic Initiate (Wizard)",
+      "pericias": "Percepção, Persuasão",
+      "ferramentas": "Ferramentas de Vidreiro",
+      "ferramentas_original": "Glassblower's Tools",
+      "idiomas_obrigatorios": ["Comum"],
+      "idiomas_adicionais": 2,
+      "idiomas_opcoes": ["Língua de Sinais Comum", "Dracônico", "Anão", "Élfico", "Gigante", "Gnômico", "Goblin", "Pequenino", "Orc"],
+      "equipamento": "*Escolha A ou B:* (A) Martelo Leve, Ferramentas de Vidreiro, Roupas, Finas, Lâmpada, Óleo (3 frascos), Cantil (cheio), 2 PO; ou (B) 50 PO",
+      "equipamento_original": "(A) Light Hammer, Glassblower's Tools, Fine Clothes, Lamp, Oil (3 flasks), Waterskin, 2 GP; or (B) 50 GP",
+      "descricao": "Você teve contato marcante com magia elemental ou influência de gênios. Essa origem combina presença social, percepção aguçada e conhecimento arcano aprendido por circunstância incomum.",
+      "dependencias_talentos": {
+        "concede_origem": "Magic Initiate (Wizard)",
+        "desbloqueia_geral": null
+      },
+      "preparacao": {
+        "descricao_pendente": false,
+        "talento_novo_frhof": false
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Harpista",
+      "nome_original": "Harper",
+      "valores_atributo": "Destreza, Inteligência, Carisma",
+      "talento": "Agente Harpista",
+      "talento_original": "Harper Agent",
+      "pericias": "Atuação, Prestidigitação",
+      "ferramentas": "Kit de Disfarce",
+      "ferramentas_original": "Disguise Kit",
+      "idiomas_obrigatorios": ["Comum"],
+      "idiomas_adicionais": 2,
+      "idiomas_opcoes": ["Língua de Sinais Comum", "Dracônico", "Anão", "Élfico", "Gigante", "Gnômico", "Goblin", "Pequenino", "Orc"],
+      "equipamento": "*Escolha A ou B:* (A) Kit de Disfarce, Saco de Dormir, Roupas, Fantasia, Arpéu, Corda, Roupas, Viagem, 14 PO; ou (B) 50 PO",
+      "equipamento_original": "(A) Disguise Kit, Bedroll, Costume, Grappling Hook, Rope, Traveler's Clothes, 14 GP; or (B) 50 GP",
+      "descricao": "Você atuou com os Harpistas, usando disfarce, arte e sutileza para ajudar aliados e interferir em abusos de poder sem chamar atenção desnecessária.",
+      "dependencias_talentos": {
+        "concede_origem": "Harper Agent",
+        "desbloqueia_geral": "Harper Teamwork"
+      },
+      "preparacao": {
+        "descricao_pendente": false,
+        "talento_novo_frhof": true
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Pescador do Gelo",
+      "nome_original": "Ice Fisher",
+      "valores_atributo": "Força, Destreza, Constituição",
+      "talento": "Alerta",
+      "talento_original": "Alert",
+      "pericias": "Lidar com Animais, Atletismo",
+      "ferramentas": "Ferramentas de Entalhador",
+      "ferramentas_original": "Woodcarver's Tools",
+      "idiomas_obrigatorios": ["Comum"],
+      "idiomas_adicionais": 2,
+      "idiomas_opcoes": ["Língua de Sinais Comum", "Dracônico", "Anão", "Élfico", "Gigante", "Gnômico", "Goblin", "Pequenino", "Orc"],
+      "equipamento": "*Escolha A ou B:* (A) Ferramentas de Entalhador, Cesta, Roldana e Polias, Balde, Corrente, Armadilha de Caça, Rede, Vara, Rações (3 dias), Corda, Roupas, Viagem, 32 PO; ou (B) 50 PO",
+      "equipamento_original": "(A) Woodcarver's Tools, Basket, Block and Tackle, Bucket, Chain, Hunting Trap, Net, Pole, Rations (3 days' worth), Rope, Traveler's Clothes, 32 GP; or (B) 50 GP",
+      "descricao": "Você aprendeu a viver de pesca e trabalho duro em regiões congeladas. Sua origem enfatiza resistência, manejo de animais, improviso e atenção a perigos ambientais.",
+      "dependencias_talentos": {
+        "concede_origem": "Alert",
+        "desbloqueia_geral": null
+      },
+      "preparacao": {
+        "descricao_pendente": false,
+        "talento_novo_frhof": false
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Cavaleiro da Manopla",
+      "nome_original": "Knight of the Gauntlet",
+      "valores_atributo": "Força, Inteligência, Sabedoria",
+      "talento": "Neófito da Manopla",
+      "talento_original": "Tyro of the Gauntlet",
+      "pericias": "Atletismo, Medicina",
+      "ferramentas": "Ferramentas de Ferreiro",
+      "ferramentas_original": "Smith's Tools",
+      "idiomas_obrigatorios": ["Comum"],
+      "idiomas_adicionais": 2,
+      "idiomas_opcoes": ["Língua de Sinais Comum", "Dracônico", "Anão", "Élfico", "Gigante", "Gnômico", "Goblin", "Pequenino", "Orc"],
+      "equipamento": "*Escolha A ou B:* (A) Lança, Ferramentas de Ferreiro, Lanterna Foca-facho, Símbolo Sagrado, Grilhões, Óleo (5 frascos), Caixa para Fogo, Roupas, Viagem, 9 PO; ou (B) 50 PO",
+      "equipamento_original": "(A) Spear, Smith's Tools, Bullseye Lantern, Holy Symbol, Manacles, Oil (5 flasks), Tinderbox, Traveler's Clothes, 9 GP; or (B) 50 GP",
+      "descricao": "Você foi treinado em serviço religioso-militar pela Ordem da Manopla, combinando disciplina, medicina de campanha e disposição para enfrentar ameaças sobrenaturais.",
+      "dependencias_talentos": {
+        "concede_origem": "Tyro of the Gauntlet",
+        "desbloqueia_geral": "Order's Resilience"
+      },
+      "preparacao": {
+        "descricao_pendente": false,
+        "talento_novo_frhof": true
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Vassalo da Aliança dos Lordes",
+      "nome_original": "Lords' Alliance Vassal",
+      "valores_atributo": "Força, Inteligência, Carisma",
+      "talento": "Agente da Aliança dos Lordes",
+      "talento_original": "Lords' Alliance Agent",
+      "pericias": "Intuição, Persuasão",
+      "ferramentas": "Suprimentos de Calígrafo",
+      "ferramentas_original": "Calligrapher's Supplies",
+      "idiomas_obrigatorios": ["Comum"],
+      "idiomas_adicionais": 2,
+      "idiomas_opcoes": ["Língua de Sinais Comum", "Dracônico", "Anão", "Élfico", "Gigante", "Gnômico", "Goblin", "Pequenino", "Orc"],
+      "equipamento": "*Escolha A ou B:* (A) 2 Azagaias, Suprimentos de Calígrafo, Roupas, Finas, Tinta, 5 Canetas Tinteiro, Pergaminho (9 folhas), 13 PO; ou (B) 50 PO",
+      "equipamento_original": "(A) 2 Javelins, Calligrapher's Supplies, Fine Clothes, Ink, 5 Ink Pens, Parchment (9 sheets), 13 GP; or (B) 50 GP",
+      "descricao": "Você serviu uma casa, autoridade ou patrono ligado à Aliança dos Lordes. Sua formação privilegia etiqueta, documentos, negociação e leitura de intenções.",
+      "dependencias_talentos": {
+        "concede_origem": "Lords' Alliance Agent",
+        "desbloqueia_geral": "Lordly Resolve"
+      },
+      "preparacao": {
+        "descricao_pendente": false,
+        "talento_novo_frhof": true
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Peregrino do Poço Lunar",
+      "nome_original": "Moonwell Pilgrim",
+      "valores_atributo": "Constituição, Sabedoria, Carisma",
+      "talento": "Iniciado em Magia (Druida)",
+      "talento_original": "Magic Initiate (Druid)",
+      "pericias": "Natureza, Atuação",
+      "ferramentas": "Suprimentos de Pintor",
+      "ferramentas_original": "Painter's Supplies",
+      "idiomas_obrigatorios": ["Comum"],
+      "idiomas_adicionais": 2,
+      "idiomas_opcoes": ["Língua de Sinais Comum", "Dracônico", "Anão", "Élfico", "Gigante", "Gnômico", "Goblin", "Pequenino", "Orc"],
+      "equipamento": "*Escolha A ou B:* (A) Cajado, Suprimentos de Pintor, Saco de Dormir, Sino, Algibeira, Túnica, Cordão, Roupas, Viagem, Cantil (cheio), 34 PO; ou (B) 50 PO",
+      "equipamento_original": "(A) Quarterstaff, Painter's Supplies, Bedroll, Bell, Pouch, Robe, String, Traveler's Clothes, Waterskin, 34 GP; or (B) 50 GP",
+      "descricao": "Você peregrinou por locais sagrados das Ilhas Moonshae e tradições druídicas. Sua experiência une reverência natural, performance ritual e magia aprendida em jornadas.",
+      "dependencias_talentos": {
+        "concede_origem": "Magic Initiate (Druid)",
+        "desbloqueia_geral": null
+      },
+      "preparacao": {
+        "descricao_pendente": false,
+        "talento_novo_frhof": false
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Saqueador de Tumbas Mulhorandi",
+      "nome_original": "Mulhorandi Tomb Raider",
+      "valores_atributo": "Destreza, Constituição, Inteligência",
+      "talento": "Sortudo",
+      "talento_original": "Lucky",
+      "pericias": "Investigação, Religião",
+      "ferramentas": "Ferramentas de Pedreiro",
+      "ferramentas_original": "Mason's Tools",
+      "idiomas_obrigatorios": ["Comum"],
+      "idiomas_adicionais": 2,
+      "idiomas_opcoes": ["Língua de Sinais Comum", "Dracônico", "Anão", "Élfico", "Gigante", "Gnômico", "Goblin", "Pequenino", "Orc"],
+      "equipamento": "*Escolha A ou B:* (A) Adaga, Martelo Leve, Ferramentas de Pedreiro, Mochila, Saco de Dormir, Pé de Cabra, Escada, Vara, 2 Algibeiras, Corda, Cordão, Caixa para Fogo, 5 Tochas, Roupas, Viagem, Cantil (cheio), 26 PO; ou (B) 50 PO",
+      "equipamento_original": "(A) Dagger, Light Hammer, Mason's Tools, Backpack, Bedroll, Crowbar, Ladder, Pole, 2 Pouches, Rope, String, Tinderbox, 5 Torches, Traveler's Clothes, Waterskin, 26 GP; or (B) 50 GP",
+      "descricao": "Você explorou tumbas e ruínas mulhorandi em busca de relíquias, história ou sobrevivência. Sua origem combina investigação, religião e trabalho físico em locais perigosos.",
+      "dependencias_talentos": {
+        "concede_origem": "Lucky",
+        "desbloqueia_geral": null
+      },
+      "preparacao": {
+        "descricao_pendente": false,
+        "talento_novo_frhof": false
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Guardião de Mythal",
+      "nome_original": "Mythalkeeper",
+      "valores_atributo": "Inteligência, Sabedoria, Carisma",
+      "talento": "Artifista",
+      "talento_original": "Crafter",
+      "pericias": "Arcanismo, História",
+      "ferramentas": "Ferramentas de Joalheiro",
+      "ferramentas_original": "Jeweler's Tools",
+      "idiomas_obrigatorios": ["Comum"],
+      "idiomas_adicionais": 2,
+      "idiomas_opcoes": ["Língua de Sinais Comum", "Dracônico", "Anão", "Élfico", "Gigante", "Gnômico", "Goblin", "Pequenino", "Orc"],
+      "equipamento": "*Escolha A ou B:* (A) Cajado, Ferramentas de Joalheiro, Perfume, Algibeira, Túnica, Pá, Cordão, Cantil (cheio), 16 PO; ou (B) 50 PO",
+      "equipamento_original": "(A) Quarterstaff, Jeweler's Tools, Perfume, Pouch, Robe, Shovel, String, Waterskin, 16 GP; or (B) 50 GP",
+      "descricao": "Você estudou mythals e ruínas élficas, mantendo saberes arcanos ligados a grandes obras mágicas. Sua formação é acadêmica, artesanal e voltada a lugares de poder.",
+      "dependencias_talentos": {
+        "concede_origem": "Crafter",
+        "desbloqueia_geral": null
+      },
+      "preparacao": {
+        "descricao_pendente": false,
+        "talento_novo_frhof": false
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Escudeiro do Dragão Púrpura",
+      "nome_original": "Purple Dragon Squire",
+      "valores_atributo": "Força, Sabedoria, Carisma",
+      "talento": "Novato do Dragão Púrpura",
+      "talento_original": "Purple Dragon Rook",
+      "pericias": "Lidar com Animais, Intuição",
+      "ferramentas": "Ferramentas de Navegador",
+      "ferramentas_original": "Navigator's Tools",
+      "idiomas_obrigatorios": ["Comum"],
+      "idiomas_adicionais": 2,
+      "idiomas_opcoes": ["Língua de Sinais Comum", "Dracônico", "Anão", "Élfico", "Gigante", "Gnômico", "Goblin", "Pequenino", "Orc"],
+      "equipamento": "*Escolha A ou B:* (A) Lança, Ferramentas de Navegador, Roupas, Finas, 9 PO; ou (B) 50 PO",
+      "equipamento_original": "(A) Spear, Navigator's Tools, Fine Clothes, 9 GP; or (B) 50 GP",
+      "descricao": "Você serviu como escudeiro ligado aos Dragões Púrpuras de Cormyr. Sua experiência envolve disciplina, montarias, etiqueta militar e apoio direto a combatentes.",
+      "dependencias_talentos": {
+        "concede_origem": "Purple Dragon Rook",
+        "desbloqueia_geral": "Purple Dragon Commandant"
+      },
+      "preparacao": {
+        "descricao_pendente": false,
+        "talento_novo_frhof": true
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Andarilho Rashemi",
+      "nome_original": "Rashemi Wanderer",
+      "valores_atributo": "Força, Constituição, Carisma",
+      "talento": "Vigoroso",
+      "talento_original": "Tough",
+      "pericias": "Intimidação, Percepção",
+      "ferramentas": "Ferramentas de Cartógrafo",
+      "ferramentas_original": "Cartographer's Tools",
+      "idiomas_obrigatorios": ["Comum"],
+      "idiomas_adicionais": 2,
+      "idiomas_opcoes": ["Língua de Sinais Comum", "Dracônico", "Anão", "Élfico", "Gigante", "Gnômico", "Goblin", "Pequenino", "Orc"],
+      "equipamento": "*Escolha A ou B:* (A) Ferramentas de Cartógrafo, Mochila, Saco de Dormir, Lanterna Coberta, Óleo (3 frascos), Corda, Caixa para Fogo, Roupas, Viagem, Cantil (cheio), 23 PO; ou (B) 50 PO",
+      "equipamento_original": "(A) Cartographer's Tools, Backpack, Bedroll, Hooded Lantern, Oil (3 flasks), Rope, Tinderbox, Traveler's Clothes, Waterskin, 23 GP; or (B) 50 GP",
+      "descricao": "Você vagou por Rashemen ou suas fronteiras, aprendendo a navegar terras severas, lidar com estranhos e sobreviver pela força de presença e resistência.",
+      "dependencias_talentos": {
+        "concede_origem": "Tough",
+        "desbloqueia_geral": null
+      },
+      "preparacao": {
+        "descricao_pendente": false,
+        "talento_novo_frhof": false
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Exilado dos Mestres das Sombras",
+      "nome_original": "Shadowmasters Exile",
+      "valores_atributo": "Destreza, Inteligência, Carisma",
+      "talento": "Atacante Selvagem",
+      "talento_original": "Savage Attacker",
+      "pericias": "Acrobacia, Furtividade",
+      "ferramentas": "Ferramentas de Ladrão",
+      "ferramentas_original": "Thieves' Tools",
+      "idiomas_obrigatorios": ["Comum"],
+      "idiomas_adicionais": 2,
+      "idiomas_opcoes": ["Língua de Sinais Comum", "Dracônico", "Anão", "Élfico", "Gigante", "Gnômico", "Goblin", "Pequenino", "Orc"],
+      "equipamento": "*Escolha A ou B:* (A) 2 Adagas, Ferramentas de Ladrão, Estrepes, Roupas, Fantasia, Arpéu, Estacas de Ferro, Espelho, 2 Algibeiras, Corda, Roupas, Viagem, 3 PO; ou (B) 50 PO",
+      "equipamento_original": "(A) 2 Daggers, Thieves' Tools, Caltrops, Costume, Grappling Hook, Iron Spikes, Mirror, 2 Pouches, Rope, Traveler's Clothes, 3 GP; or (B) 50 GP",
+      "descricao": "Você deixou para trás uma vida ligada aos Mestres das Sombras, levando consigo métodos de infiltração, fuga e violência rápida aprendidos em organizações clandestinas.",
+      "dependencias_talentos": {
+        "concede_origem": "Savage Attacker",
+        "desbloqueia_geral": null
+      },
+      "preparacao": {
+        "descricao_pendente": false,
+        "talento_novo_frhof": false
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Iniciado em Spellfire",
+      "nome_original": "Spellfire Initiate",
+      "valores_atributo": "Constituição, Inteligência, Carisma",
+      "talento": "Centelha de Spellfire",
+      "talento_original": "Spellfire Spark",
+      "pericias": "Arcanismo, Percepção",
+      "ferramentas": "Kit de Jogo (à escolha)",
+      "ferramentas_original": "One kind of Gaming Set",
+      "idiomas_obrigatorios": ["Comum"],
+      "idiomas_adicionais": 2,
+      "idiomas_opcoes": ["Língua de Sinais Comum", "Dracônico", "Anão", "Élfico", "Gigante", "Gnômico", "Goblin", "Pequenino", "Orc"],
+      "equipamento": "*Escolha A ou B:* (A) Kit de Jogos (o mesmo escolhido), Foco Arcano (Cristal ou Varinha), 2 Algibeiras, Roupas, Viagem, 36 PO; ou (B) 50 PO",
+      "equipamento_original": "(A) Gaming Set (same as above), Arcane Focus (Crystal or Wand), 2 Pouches, Traveler's Clothes, 36 GP; or (B) 50 GP",
+      "descricao": "Você manifestou ou estudou spellfire, tornando-se alvo de curiosidade e temor. Sua origem combina sensibilidade arcana, atenção constante e preparação para lidar com energia mágica instável.",
+      "dependencias_talentos": {
+        "concede_origem": "Spellfire Spark",
+        "desbloqueia_geral": "Spellfire Adept"
+      },
+      "preparacao": {
+        "descricao_pendente": false,
+        "talento_novo_frhof": true
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Mercenário Zhentarim",
+      "nome_original": "Zhentarim Mercenary",
+      "valores_atributo": "Força, Destreza, Carisma",
+      "talento": "Brutamontes Zhentarim",
+      "talento_original": "Zhentarim Ruffian",
+      "pericias": "Intimidação, Percepção",
+      "ferramentas": "Kit de Falsificação",
+      "ferramentas_original": "Forgery Kit",
+      "idiomas_obrigatorios": ["Comum"],
+      "idiomas_adicionais": 2,
+      "idiomas_opcoes": ["Língua de Sinais Comum", "Dracônico", "Anão", "Élfico", "Gigante", "Gnômico", "Goblin", "Pequenino", "Orc"],
+      "equipamento": "*Escolha A ou B:* (A) Clava, Adaga, Kit de Falsificação, Roupas, Finas, Lanterna Coberta, Óleo (3 frascos), 2 Algibeiras, Cordão, Caixa para Fogo, 11 PO; ou (B) 50 PO",
+      "equipamento_original": "(A) Club, Dagger, Forgery Kit, Fine Clothes, Hooded Lantern, Oil (3 flasks), 2 Pouches, String, Tinderbox, 11 GP; or (B) 50 GP",
+      "descricao": "Você trabalhou como mercenário ou agente Zhentarim, acostumado a intimidação, contratos duros e pragmatismo. Sua formação favorece presença ameaçadora e leitura de risco.",
+      "dependencias_talentos": {
+        "concede_origem": "Zhentarim Ruffian",
+        "desbloqueia_geral": "Zhentarim Tactics"
+      },
+      "preparacao": {
+        "descricao_pendente": false,
+        "talento_novo_frhof": true
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    }
+  ]
+}

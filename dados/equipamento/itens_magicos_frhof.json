@@ -1,0 +1,94 @@
+{
+  "total_itens": 3,
+  "itens": [
+    {
+      "nome": "Anel do Aventureiro",
+      "nome_original": "Adventurer's Ring",
+      "categoria": "item mágico",
+      "tipo": "anel",
+      "raridade": "comum",
+      "requer_sintonizacao": false,
+      "catalogo": "Dalelands Wares",
+      "custo": "250 PO",
+      "descricao": "Ao abrir a tampa, o anel produz uma chama sem calor e sem consumir combustível, emitindo luz plena por 6 m e penumbra por mais 6 m. Abrir ou fechar é uma ação bônus.",
+      "efeitos": {
+        "chama": {
+          "sem_calor": true,
+          "sem_combustivel": true
+        },
+        "luz": {
+          "plena_m": 6,
+          "penumbra_adicional_m": 6
+        },
+        "acao": "ação bônus"
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Membro Protético",
+      "nome_original": "Prosthetic Limb",
+      "categoria": "item mágico",
+      "tipo": "item maravilhoso",
+      "raridade": "comum",
+      "requer_sintonizacao": true,
+      "catalogo": "Calimshan Wares",
+      "custo": "—",
+      "descricao": "Este membro substitui uma parte perdida e permite executar tarefas como o membro original. A sintonização é feita por uma criatura sem parte de um membro; vários membros protéticos contam como um único item para sintonização.",
+      "efeitos": {
+        "sintonizacao_condicao": "criatura sem parte de um membro",
+        "substitui_funcionalmente": true,
+        "multiplos_contam_como_um_item": true
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Windskiff",
+      "nome_original": "Windskiff",
+      "categoria": "item mágico",
+      "tipo": "item maravilhoso",
+      "raridade": "raro",
+      "requer_sintonizacao": false,
+      "catalogo": "Moonshae Isles Wares",
+      "custo": "4.000 PO",
+      "descricao": "A joia possui 3 cargas, recuperadas ao amanhecer. Com uma ação mágica, transforma-se em um veículo Médio por 1 hora ou até a palavra de comando; o veículo plana e protege veículo e passageiros contra dano de queda.",
+      "efeitos": {
+        "cargas": {
+          "maximas": 3,
+          "recuperacao": "ao amanhecer"
+        },
+        "transformacao": {
+          "acao": "ação mágica",
+          "duracao": "1 hora ou palavra de comando",
+          "gasto_por_uso": 1
+        },
+        "veiculo": {
+          "tamanho": "Médio",
+          "ca": 12,
+          "pv": 30,
+          "velocidade_pes": 40,
+          "planeio_razao": "5:1",
+          "sem_dano_queda": true
+        }
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    }
+  ]
+}

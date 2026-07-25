@@ -33,6 +33,92 @@ export function calcPVTotal(dadoVida, nivel, modCon) {
   return dadoVida + modCon + (nivel - 1) * (mediaSubida + modCon);
 }
 
+/**
+ * Verifica se uma magia registrada pelo nome pertence ao grimório do mago.
+ * @param {object} personagem
+ * @param {string} nome
+ * @returns {boolean}
+ */
+export function magiaMagoEstaNoGrimorio(personagem, nome) {
+  if (personagem?.classe !== 'Mago' || typeof nome !== 'string') return false;
+  return Array.isArray(personagem.grimorio) && personagem.grimorio.some(m => m?.nome === nome);
+}
+
+/**
+ * Normaliza o grimório de personagens Magos legados sem inventar magias.
+ * Magias preparadas normais de 1º círculo ou superior também devem constar
+ * no grimório; magias concedidas por outra origem não contam para essa regra.
+ *
+ * @param {object} personagem
+ * @param {number} [limitePreparadas]
+ * @returns {{alterado: boolean, pendentes: number}}
+ */
+export function normalizarGrimorioMago(personagem, limitePreparadas) {
+  if (!personagem || typeof personagem !== 'object' || personagem.classe !== 'Mago') {
+    return { alterado: false, pendentes: 0 };
+  }
+
+  let alterado = false;
+  if (!Array.isArray(personagem.grimorio)) {
+    // Formatos legados malformados ainda podem conter dados. Encapsulá-los
+    // preserva a entrada e permite que a migração siga sem apagá-la.
+    personagem.grimorio = personagem.grimorio == null ? [] : [personagem.grimorio];
+    alterado = true;
+  }
+
+  const indicesPorNome = new Map();
+  const grimorioNormalizado = [];
+  for (const magia of personagem.grimorio) {
+    const nome = magia?.nome;
+    if (typeof nome !== 'string' || !nome) {
+      grimorioNormalizado.push(magia);
+      continue;
+    }
+
+    const indiceExistente = indicesPorNome.get(nome);
+    if (indiceExistente == null) {
+      indicesPorNome.set(nome, grimorioNormalizado.length);
+      grimorioNormalizado.push(magia);
+      continue;
+    }
+
+    // Em duplicatas legadas, manter a entrada com o menor círculo numérico
+    // confiável e preservar todos os demais dados dessa entrada.
+    const existente = grimorioNormalizado[indiceExistente];
+    const valorCirculoExistente = existente?.circulo;
+    const valorCirculoAtual = magia?.circulo;
+    const existenteConfiavel = (typeof valorCirculoExistente === 'number' && Number.isFinite(valorCirculoExistente)) ||
+      (typeof valorCirculoExistente === 'string' && valorCirculoExistente.trim() !== '' && Number.isFinite(Number(valorCirculoExistente)));
+    const atualConfiavel = (typeof valorCirculoAtual === 'number' && Number.isFinite(valorCirculoAtual)) ||
+      (typeof valorCirculoAtual === 'string' && valorCirculoAtual.trim() !== '' && Number.isFinite(Number(valorCirculoAtual)));
+    const circuloExistente = Number(valorCirculoExistente);
+    const circuloAtual = Number(valorCirculoAtual);
+    if (atualConfiavel && (!existenteConfiavel || circuloAtual < circuloExistente)) {
+      grimorioNormalizado[indiceExistente] = magia;
+    }
+    alterado = true;
+  }
+  if (grimorioNormalizado.length !== personagem.grimorio.length) {
+    personagem.grimorio = grimorioNormalizado;
+  }
+
+  const origensEspeciais = ['dominio', 'sempre', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
+  const preparadasNormais = (Array.isArray(personagem.magias_preparadas) ? personagem.magias_preparadas : [])
+    .filter(magia => magia && typeof magia === 'object' && typeof magia.nome === 'string' && magia.nome && !origensEspeciais.includes(magia.origem) && Number(magia.circulo) > 0);
+
+  for (const magia of preparadasNormais) {
+    if (!magiaMagoEstaNoGrimorio(personagem, magia.nome)) {
+      personagem.grimorio.push({ ...magia });
+      alterado = true;
+    }
+  }
+
+  const pendentes = typeof limitePreparadas === 'number' && Number.isFinite(limitePreparadas)
+    ? Math.max(0, limitePreparadas - preparadasNormais.length)
+    : 0;
+  return { alterado, pendentes };
+}
+
 /** Calcula CA baseado na armadura equipada */
 export function calcCA(personagem, passivos = null) {
   const modDes = calcMod(personagem.atributos.destreza);

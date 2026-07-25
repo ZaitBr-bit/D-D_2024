@@ -1,0 +1,221 @@
+{
+  "total_itens": 12,
+  "itens": [
+    {
+      "nome": "Manto Fúngico Luminoso",
+      "nome_original": "Bright Fungal Cloak",
+      "categoria": "equipamento de aventura",
+      "catalogo": "Icewind Dale Wares",
+      "peso": "2 kg",
+      "peso_original": "4 lb.",
+      "custo": "25 PO",
+      "tipo_uso": "equipamento",
+      "descricao": "Como Ação Bônus, abra ou feche o manto. Aberto, ele emite luz plena em 1,5 m e penumbra por mais 1,5 m. Seus 0,5 kg de fungo servem como comida; depois que todo o fungo é consumido, o item se torna uma Roupa de Viajante.",
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Roupas do Deserto",
+      "nome_original": "Desert Clothing",
+      "categoria": "equipamento de aventura",
+      "catalogo": "Calimshan Wares",
+      "peso": "2 kg",
+      "peso_original": "4 lb.",
+      "custo": "10 PO",
+      "tipo_uso": "equipamento",
+      "descricao": "Enquanto usa estas roupas sem vestir armadura média ou pesada, você obtém sucesso automático em testes para suportar calor extremo.",
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Máscara de Diabo",
+      "nome_original": "Devil Mask",
+      "categoria": "equipamento de aventura",
+      "catalogo": "Baldur's Gate Wares",
+      "peso": "—",
+      "peso_original": "—",
+      "custo": "25 PO",
+      "tipo_uso": "equipamento",
+      "descricao": "Enquanto você usa esta máscara, outras criaturas têm Desvantagem em testes de Inteligência (Investigação) e Sabedoria (Intuição) para discernir sua identidade ou suas intenções.",
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Traje de Luz e Sombra",
+      "nome_original": "Garb of Light and Shadow",
+      "categoria": "equipamento de aventura",
+      "catalogo": "Moonshae Isles Wares",
+      "peso": "3 kg",
+      "peso_original": "6 lb.",
+      "custo": "50 PO",
+      "tipo_uso": "equipamento",
+      "descricao": "Ao obter o traje, escolha um Domínio do Deleite. Enquanto o veste, você tem Vantagem em testes de atributo feitos para influenciar Fadas associadas ao domínio escolhido.",
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Robe de Gênio",
+      "nome_original": "Genie Robe",
+      "categoria": "equipamento de aventura",
+      "catalogo": "Calimshan Wares",
+      "peso": "3 kg",
+      "peso_original": "6 lb.",
+      "custo": "50 PO",
+      "tipo_uso": "equipamento",
+      "descricao": "Ao obter o robe, escolha Ar, Terra, Fogo ou Água. Enquanto o veste, você tem Vantagem em testes de atributo feitos para influenciar Elementais do plano correspondente ao elemento escolhido.",
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Livro de Magias com Fechadura",
+      "nome_original": "Locking Spellbook",
+      "categoria": "equipamento de aventura",
+      "catalogo": "Dalelands Wares",
+      "peso": "1,5 kg",
+      "peso_original": "3 lb.",
+      "custo": "35 PO",
+      "tipo_uso": "equipamento",
+      "descricao": "Este livro de magias tem 100 páginas e uma fechadura com chave. Sem a chave, uma criatura pode executar a ação Utilizar e usar Ferramentas de Ladrão para fazer um teste de Destreza (Prestidigitação) CD 15, abrindo-o em caso de sucesso.",
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Camuflagem de Monstro",
+      "nome_original": "Monster Camouflage",
+      "categoria": "equipamento de aventura",
+      "catalogo": "Icewind Dale Wares",
+      "peso": "3 kg",
+      "peso_original": "6 lb.",
+      "custo": "50 PO",
+      "tipo_uso": "equipamento",
+      "descricao": "Esta roupa disfarça você como uma Besta ou Monstruosidade específica. Uma criatura pode executar a ação Estudar e fazer um teste de Inteligência (Investigação ou Natureza) CD 10 para reconhecer o disfarce, com Vantagem se estiver a até 9 m. Ela obtém sucesso automático se você agir de uma forma impossível para o monstro imitado.",
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Roupas Fúngicas Quentes",
+      "nome_original": "Warm Fungal Clothing",
+      "categoria": "equipamento de aventura",
+      "catalogo": "Icewind Dale Wares",
+      "peso": "2 kg",
+      "peso_original": "4 lb.",
+      "custo": "15 PO",
+      "tipo_uso": "equipamento",
+      "descricao": "Enquanto veste estas roupas, você obtém sucesso automático em testes para suportar frio extremo. Seus 0,5 kg de fungo servem como comida; depois que todo o fungo é consumido, o item se torna uma Roupa de Viajante.",
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Camuflagem de Inverno",
+      "nome_original": "Winter Camouflage",
+      "categoria": "equipamento de aventura",
+      "catalogo": "Icewind Dale Wares",
+      "peso": "2 kg",
+      "peso_original": "4 lb.",
+      "custo": "50 PO",
+      "tipo_uso": "equipamento",
+      "descricao": "Enquanto usa esta camuflagem em um ambiente apropriado, você tem Vantagem em testes de Destreza (Furtividade).",
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Bandore",
+      "nome_original": "Bandore",
+      "categoria": "instrumento musical",
+      "catalogo": "Moonshae Isles Wares",
+      "peso": "1,5 kg",
+      "peso_original": "3 lb.",
+      "custo": "65 PO",
+      "tipo_uso": "ferramenta",
+      "descricao": "Este é um instrumento musical. Se você tiver proficiência com ele, adicione seu Bônus de Proficiência aos testes de atributo pertinentes.",
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Cittern",
+      "nome_original": "Cittern",
+      "categoria": "instrumento musical",
+      "catalogo": "Moonshae Isles Wares",
+      "peso": "1 kg",
+      "peso_original": "2 lb.",
+      "custo": "65 PO",
+      "tipo_uso": "ferramenta",
+      "descricao": "Este é um instrumento musical. Se você tiver proficiência com ele, adicione seu Bônus de Proficiência aos testes de atributo pertinentes.",
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    },
+    {
+      "nome": "Yarting",
+      "nome_original": "Yarting",
+      "categoria": "instrumento musical",
+      "catalogo": "Moonshae Isles Wares",
+      "peso": "1 kg",
+      "peso_original": "2 lb.",
+      "custo": "40 PO",
+      "tipo_uso": "ferramenta",
+      "descricao": "Este é um instrumento musical. Se você tiver proficiência com ele, adicione seu Bônus de Proficiência aos testes de atributo pertinentes.",
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      }
+    }
+  ]
+}

@@ -5,7 +5,8 @@ import { CLASSES_INFO, PERICIAS, ATRIBUTOS_NOMES, ATRIBUTOS_KEYS, ATRIBUTO_NOME_
 import { getClasse, getAntecedentes, getEspecies, getTalentos, getMagiasClasse, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura, getItensMagicosFRHOF } from '../db.js';
 import { criarPersonagemVazio, salvarPersonagem } from '../store.js';
 import { DENOMINACOES, ICONE_MOEDA, criarCarteiraVazia, adicionarMoeda, removerQuantidadeMoeda } from '../moedas.js';
-import { calcMod, fmtMod, calcPVNivel1, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, getDeslocamento, getTamanho, escHtml, processarImagemArquivo, getCapacidadeCarga, getPesoTotalInventario, descreverCapacidadeCarga, fmtPeso } from '../utils.js';
+import { calcMod, fmtMod, calcPVNivel1, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, getDeslocamento, getTamanho, escHtml, processarImagemArquivo, getCapacidadeCarga, getPesoTotalInventario, descreverCapacidadeCarga, fmtPeso, magiaMagoEstaNoGrimorio } from '../utils.js';
+import { validarEscolhasTalento } from '../regras-cobertura.js';
 import { clonarFonte, extrairDadosConteudo, renderSeloFonte } from '../fontes.js';
 
 function renderDanoMagia(magia) {
@@ -218,6 +219,35 @@ function talentoExigeEscolhas(nome) {
 function talentoNumEscolhas(nome) {
   if (['Habilidoso', 'Artifista', 'Músico'].includes(nome)) return 3;
   return 0;
+}
+
+function configurarSelectsExclusivos(seletor) {
+  const selects = [...document.querySelectorAll(seletor)];
+  if (selects.length < 2) return;
+  const opcoesOriginais = new Map(selects.map(select => [select, select.innerHTML]));
+  const vistos = new Set();
+  selects.forEach(select => {
+    if (select.value && vistos.has(select.value)) select.value = '';
+    if (select.value) vistos.add(select.value);
+  });
+  const atualizar = () => {
+    const escolhidas = selects.map(select => select.value).filter(Boolean);
+    selects.forEach(select => {
+      const propria = select.value;
+      const temporario = document.createElement('select');
+      temporario.innerHTML = opcoesOriginais.get(select);
+      temporario.querySelectorAll('option').forEach(opcao => {
+        if (opcao.value && opcao.value !== propria && escolhidas.includes(opcao.value)) opcao.remove();
+      });
+      temporario.querySelectorAll('optgroup').forEach(grupo => {
+        if (!grupo.querySelector('option')) grupo.remove();
+      });
+      select.innerHTML = temporario.innerHTML;
+      select.value = propria;
+    });
+  };
+  selects.forEach(select => select.addEventListener('change', atualizar));
+  atualizar();
 }
 
 // Nível obrigatório de subclasse por classe
@@ -876,6 +906,18 @@ function validarStep() {
           toast(`Selecione ${preparadasNecessarias} magias (${preparadasSelecionadas} selecionadas)`, 'error');
           return false;
         }
+        if (personagem.classe === 'Mago' && personagem.nivel === 1) {
+          const grimorio = Array.isArray(personagem.grimorio) ? personagem.grimorio : [];
+          const preparadas = Array.isArray(personagem.magias_preparadas) ? personagem.magias_preparadas : [];
+          if (grimorio.length !== 6 || grimorio.some(m => Number(m?.circulo) !== 1)) {
+            toast(`Selecione 6 magias de 1º círculo para o grimório (${grimorio.length} selecionadas)`, 'error');
+            return false;
+          }
+          if (preparadas.length !== 4 || preparadas.some(m => !magiaMagoEstaNoGrimorio(personagem, m?.nome))) {
+            toast('Selecione 4 magias preparadas que também estejam no grimório', 'error');
+            return false;
+          }
+        }
       }
 
       // Validar Iniciado em Magia (todas as instâncias)
@@ -889,6 +931,17 @@ function validarStep() {
           if (!im?.atributo) { toast(`${rotulo}: selecione o atributo de conjuração`, 'error'); return false; }
           if ((im?.truques || []).length < 2) { toast(`${rotulo}: selecione 2 truques`, 'error'); return false; }
           if (!im?.magia) { toast(`${rotulo}: selecione 1 magia de 1o círculo`, 'error'); return false; }
+          const personagemSemInstanciaAtual = {
+            ...personagem,
+            iniciado_em_magia_instancias: instancias.filter((_, indice) => indice !== i)
+          };
+          const validacaoIM = validarEscolhasTalento(personagemSemInstanciaAtual, 'Iniciado em Magia', {
+            iniciado_em_magia: im
+          });
+          if (!validacaoIM.valido) {
+            toast(`${rotulo}: ${validacaoIM.erro}`, 'error');
+            return false;
+          }
         }
         // Listas devem ser diferentes entre instâncias
         const listas = instancias.slice(0, numEsperado).map(i => i.lista);
@@ -1549,10 +1602,12 @@ function abrirPopupEspecie(nome) {
     // Memória Kenku: 2 perícias quaisquer à escolha
     const periciasSel = personagem.pericias_especie || [];
     const opcsKenku1 = PERICIAS.map(p => {
+      if (periciasSel[1] === p.nome) return '';
       const sel = periciasSel[0] === p.nome ? 'selected' : '';
       return `<option value="${p.nome}" ${sel}>${p.nome} (${p.atributo})</option>`;
     }).join('');
     const opcsKenku2 = PERICIAS.map(p => {
+      if (periciasSel[0] === p.nome) return '';
       const sel = periciasSel[1] === p.nome ? 'selected' : '';
       return `<option value="${p.nome}" ${sel}>${p.nome} (${p.atributo})</option>`;
     }).join('');
@@ -1604,6 +1659,28 @@ function abrirPopupEspecie(nome) {
     <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
     <button class="btn btn-primary" id="popup-confirmar-especie">Selecionar ${esp.nome}</button>
   `);
+
+  if (nome === 'Kenku') {
+    const primeiraPericia = document.getElementById('select-kenku-pericia-1');
+    const segundaPericia = document.getElementById('select-kenku-pericia-2');
+    const preencherOpcoesKenku = (select, valorAtual, valorExcluido, rotulo) => {
+      if (!select) return;
+      select.innerHTML = `<option value="">-- ${rotulo} --</option>${PERICIAS
+        .filter(pericia => pericia.nome !== valorExcluido)
+        .map(pericia => `<option value="${pericia.nome}">${pericia.nome} (${pericia.atributo})</option>`)
+        .join('')}`;
+      select.value = valorAtual || '';
+    };
+    const atualizarOpcoesKenku = () => {
+      const valorPrimeira = primeiraPericia?.value || '';
+      const valorSegunda = segundaPericia?.value || '';
+      preencherOpcoesKenku(primeiraPericia, valorPrimeira, valorSegunda, '1ª perícia');
+      preencherOpcoesKenku(segundaPericia, valorSegunda, valorPrimeira, '2ª perícia');
+    };
+    primeiraPericia?.addEventListener('change', atualizarOpcoesKenku);
+    segundaPericia?.addEventListener('change', atualizarOpcoesKenku);
+    atualizarOpcoesKenku();
+  }
 
   // Eventos de selecao de traco no popup
   if (escolhaConfig) {
@@ -1679,6 +1756,7 @@ function abrirPopupEspecie(nome) {
             let html = `<div class="info-box success" style="font-size:0.85rem">${renderDescricaoTalento(td)}</div>`;
             html += renderEscolhasTalentoHtml(nomeT, 'versatil');
             detalheEl.innerHTML = html;
+            if (talentoExigeEscolhas(nomeT)) configurarSelectsExclusivos('.escolha-talento-versatil');
           };
 
           // Mostrar detalhe do talento ja selecionado
@@ -1904,6 +1982,8 @@ function abrirPopupAntecedente(nome) {
     <button class="btn btn-primary" id="popup-confirmar-antecedente">Selecionar ${ant.nome}</button>
   `);
 
+  if (talentoExigeEscolhas(talentoNome)) configurarSelectsExclusivos('.escolha-talento-antecedente');
+
   // Eventos de escolha de ferramenta/instrumento
   if (antEscolha) {
     document.querySelectorAll('[data-escolha-ant]').forEach(card => {
@@ -2099,12 +2179,15 @@ function renderDistribuicaoAtributos(atributos) {
     if (dadosCache.bonus2 || dadosCache.bonus1) atualizar();
   } else {
     // Modo +1/+1/+1
+    // Todos os antecedentes atuais oferecem exatamente três atributos elegíveis.
+    // Nesse caso, a distribuição é única e deve iniciar integralmente selecionada.
+    if (atributos.length === 3) dadosCache.bonus111 = [...atributos];
     distEl.innerHTML = `
       <div class="info-box info">Selecione 3 atributos para receber +1 cada:</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px">
         ${atributos.map(a => `
           <label class="chip ${(dadosCache.bonus111 || []).includes(a) ? 'selected' : ''}" data-attr="${a}">
-            <input type="checkbox" style="display:none" value="${a}" ${(dadosCache.bonus111 || []).includes(a) ? 'checked' : ''}>
+            <input type="checkbox" style="display:none" value="${a}" ${(dadosCache.bonus111 || []).includes(a) ? 'checked' : ''} ${atributos.length === 3 ? 'disabled' : ''}>
             ${a}
           </label>
         `).join('')}
@@ -2113,6 +2196,7 @@ function renderDistribuicaoAtributos(atributos) {
 
     distEl.querySelectorAll('.chip').forEach(chip => {
       chip.addEventListener('click', () => {
+        if (atributos.length === 3) return;
         const cb = chip.querySelector('input');
         const selecionados = distEl.querySelectorAll('input:checked');
         if (!cb.checked && selecionados.length >= 3) return; // Máximo 3
@@ -2568,13 +2652,17 @@ function renderPericiasSeletor() {
     dadosCache.pericias_classe_sel = [];
   }
   const maxSel = info.num_pericias;
+  dadosCache.pericias_classe_sel = [...new Set(dadosCache.pericias_classe_sel)]
+    .filter(pericia => disponiveis.includes(pericia))
+    .slice(0, maxSel);
 
   el.innerHTML = `
     <div style="display:flex;flex-wrap:wrap;gap:6px">
       ${disponiveis.map(p => {
         const sel = dadosCache.pericias_classe_sel.includes(p);
+        const desabilitada = !sel && dadosCache.pericias_classe_sel.length >= maxSel;
         return `<label class="chip ${sel ? 'selected' : ''}" data-pericia="${p}">
-          <input type="checkbox" style="display:none" value="${p}" ${sel ? 'checked' : ''}>
+          <input type="checkbox" style="display:none" value="${p}" ${sel ? 'checked' : ''} ${desabilitada ? 'disabled' : ''}>
           ${p}
         </label>`;
       }).join('')}
@@ -2584,21 +2672,26 @@ function renderPericiasSeletor() {
     </div>
   `;
 
-  el.querySelectorAll('.chip').forEach(chip => {
-    chip.addEventListener('click', () => {
+  const atualizarEstado = () => {
+    const selecionadas = [...el.querySelectorAll('input:checked')].map(input => input.value);
+    dadosCache.pericias_classe_sel = selecionadas;
+    personagem.pericias_proficientes = [...periciasBg, ...selecionadas];
+    const limiteAtingido = selecionadas.length >= maxSel;
+    el.querySelectorAll('.chip').forEach(chip => {
       const cb = chip.querySelector('input');
-      if (!cb.checked && dadosCache.pericias_classe_sel.length >= maxSel) return;
-      cb.checked = !cb.checked;
+      const desabilitada = limiteAtingido && !cb.checked;
+      cb.disabled = desabilitada;
       chip.classList.toggle('selected', cb.checked);
-
-      dadosCache.pericias_classe_sel = [...el.querySelectorAll('input:checked')].map(i => i.value);
-      personagem.pericias_proficientes = [...periciasBg, ...dadosCache.pericias_classe_sel];
-
-      // Atualizar contador
-      const contador = el.querySelector('div:last-child');
-      if (contador) contador.textContent = `Selecionadas: ${dadosCache.pericias_classe_sel.length}/${maxSel}`;
+      chip.classList.toggle('disabled', desabilitada);
+      chip.style.opacity = desabilitada ? '0.5' : '';
+      chip.style.cursor = desabilitada ? 'not-allowed' : '';
     });
-  });
+    const contador = el.querySelector('div:last-child');
+    if (contador) contador.textContent = `Selecionadas: ${selecionadas.length}/${maxSel}`;
+  };
+
+  el.querySelectorAll('.chip input').forEach(cb => cb.addEventListener('change', atualizarEstado));
+  atualizarEstado();
 }
 
 // ============================================================
@@ -3704,6 +3797,8 @@ async function renderStepMagias(el) {
   const numPreparadas = getMagiaPreparadas(tabelaCaract, personagem.nivel);
   const espacos = getEspacosMagia(tabelaCaract, personagem.nivel);
   const maxCirculo = Math.max(...Object.keys(espacos).map(Number), 0);
+  const magoNivel1 = personagem.classe === 'Mago' && personagem.nivel === 1;
+  const limiteGrimorio = magoNivel1 ? 6 : 0;
 
   // Bônus de truques do Clérigo Taumaturgo
   if (personagem.classe === 'Clérigo' && personagem.ordem_divina === 'Taumaturgo') {
@@ -3758,7 +3853,7 @@ async function renderStepMagias(el) {
     <h3 style="margin-bottom:12px">Magias - ${personagem.classe}</h3>
     <div class="info-box info" id="magias-contadores">
       Truques: <strong>${(personagem.magias_conhecidas || []).filter(m => m.circulo === 0).length}/${numTruques}</strong> |
-      ${labelMagias}: <strong>${(personagem.magias_preparadas || []).length}/${numPreparadas}</strong> |
+      ${magoNivel1 ? `Grimório: <strong>${(personagem.grimorio || []).length}/${limiteGrimorio}</strong> | ` : ''}${labelMagias}: <strong>${(personagem.magias_preparadas || []).length}/${numPreparadas}</strong> |
       Atributo: <strong>${info.atributo_conjuracao}</strong>
     </div>
 
@@ -3775,7 +3870,7 @@ async function renderStepMagias(el) {
   // as duas seções quando uma muda o estado de truques/magias conhecidas da outra
   let _imContainerEl = null;
 
-  const renderMagiasCirculo = (circ) => {
+  let renderMagiasCirculo = (circ) => {
     circuloAtivo = circ;
     const listaEl = document.getElementById('magias-lista');
     if (!listaEl) return;
@@ -3789,12 +3884,12 @@ async function renderStepMagias(el) {
     // Para magias, gerenciar magias_preparadas
     const selecionadas = isTruque
       ? (personagem.magias_conhecidas || []).filter(m => m.circulo === 0).map(m => m.nome)
-      : (personagem.magias_preparadas || []).map(m => m.nome);
+      : magoNivel1 ? (personagem.grimorio || []).map(m => m.nome) : (personagem.magias_preparadas || []).map(m => m.nome);
 
-    const maxSel = isTruque ? numTruques : numPreparadas;
+    const maxSel = isTruque ? numTruques : magoNivel1 ? limiteGrimorio : numPreparadas;
     const totalSel = isTruque
       ? selecionadas.length
-      : (personagem.magias_preparadas || []).length;
+      : selecionadas.length;
 
     // Nomes já ocupados por instâncias de Iniciado em Magia (evita "aprender" o mesmo truque/
     // magia de 1º círculo duas vezes sem ganho nenhum). Só se aplica às abas Truques e 1º Círculo.
@@ -3808,7 +3903,7 @@ async function renderStepMagias(el) {
 
     listaEl.innerHTML = `
       <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">
-        ${isTruque ? `Truques selecionados: ${selecionadas.length}/${maxSel}` : `${labelMagias}: ${totalSel}/${maxSel}`}
+        ${isTruque ? `Truques selecionados: ${selecionadas.length}/${maxSel}` : magoNivel1 ? `Grimório: ${totalSel}/${maxSel}. Depois escolha 4 preparadas abaixo.` : `${labelMagias}: ${totalSel}/${maxSel}`}
         ${magiasDaClasse.length > 0 ? ` | ${magiasDaClasse.length} disponíveis` : ''}
       </div>
       ${magiasDaClasse.length === 0
@@ -3842,9 +3937,9 @@ async function renderStepMagias(el) {
           toast(`"${nome}" já é conhecido por Iniciado em Magia — escolha um diferente`, 'error');
           return;
         }
-        toggleMagia(nome, circ, isTruque, numTruques, numPreparadas);
+        toggleMagia(nome, circ, isTruque, numTruques, numPreparadas, magoNivel1, limiteGrimorio);
         renderMagiasCirculo(circ);
-        atualizarContadoresMagia(numTruques, numPreparadas);
+        atualizarContadoresMagia(numTruques, numPreparadas, magoNivel1, limiteGrimorio);
         // A seleção da classe pode ter liberado/ocupado um nome que a seção
         // Iniciado em Magia também precisa refletir (contra-duplicata cruzada)
         if (temIniciadoEmMagia && _imContainerEl) {
@@ -3882,6 +3977,41 @@ async function renderStepMagias(el) {
   });
 
   renderMagiasCirculo(0);
+
+  if (magoNivel1) {
+    const preparadasEl = document.createElement('div');
+    preparadasEl.id = 'mago-preparadas-iniciais';
+    preparadasEl.style.marginTop = '20px';
+    el.appendChild(preparadasEl);
+
+    const renderPreparadasMago = () => {
+      const grimorio = Array.isArray(personagem.grimorio) ? personagem.grimorio : [];
+      const preparadas = Array.isArray(personagem.magias_preparadas) ? personagem.magias_preparadas : [];
+      preparadasEl.innerHTML = `
+        <div class="card" style="border-color:var(--accent)">
+          <div class="card-header"><h3>Magias Preparadas</h3></div>
+          <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">Escolha exatamente 4 das magias registradas no grimório: ${preparadas.length}/${numPreparadas}</div>
+          <div class="magias-grid">${grimorio.map(m => {
+            const sel = preparadas.some(p => p.nome === m.nome);
+            return `<div class="magia-card ${sel ? 'selecionada' : ''}" data-mago-preparada="${m.nome}" data-mago-preparada-circ="${m.circulo}" style="cursor:pointer">
+              <span class="magia-card-check"></span><div class="magia-card-nome">${m.nome} ${renderSeloFonte(m.fonte)}</div><div class="magia-card-meta"><span>${m.circulo}º Círculo</span></div>
+            </div>`;
+          }).join('') || '<div style="color:var(--text-muted);padding:8px">Selecione as 6 magias do grimório acima primeiro.</div>'}</div>
+        </div>`;
+      preparadasEl.querySelectorAll('[data-mago-preparada]').forEach(card => card.addEventListener('click', () => {
+        const nome = card.dataset.magoPreparada;
+        const idx = personagem.magias_preparadas.findIndex(m => m.nome === nome);
+        if (idx >= 0) personagem.magias_preparadas.splice(idx, 1);
+        else if (personagem.magias_preparadas.length >= numPreparadas) toast(`Máximo de ${numPreparadas} magias preparadas`, 'error');
+        else personagem.magias_preparadas.push(criarEntradaMagiaSelecionada(nome, Number(card.dataset.magoPreparadaCirc)));
+        renderPreparadasMago();
+        atualizarContadoresMagia(numTruques, numPreparadas, magoNivel1, limiteGrimorio);
+      }));
+    };
+    renderPreparadasMago();
+    const renderCirculoOriginal = renderMagiasCirculo;
+    renderMagiasCirculo = (circ) => { renderCirculoOriginal(circ); renderPreparadasMago(); };
+  }
 
   // Se tiver Iniciado em Magia, adicionar seção extra após as magias da classe
   if (temIniciadoEmMagia) {
@@ -4147,7 +4277,7 @@ function criarEntradaMagiaSelecionada(nome, circulo, extras = {}) {
   };
 }
 
-function toggleMagia(nome, circulo, isTruque, maxTruques, maxPreparadas) {
+function toggleMagia(nome, circulo, isTruque, maxTruques, maxPreparadas, magoNivel1 = false, limiteGrimorio = 0) {
   const tipoConj = CLASSES_INFO[personagem.classe]?.tipo_conjuracao || 'preparadas';
   const labelMagias = tipoConj === 'conhecidas' ? 'magias conhecidas' : 'magias preparadas';
   if (isTruque) {
@@ -4158,6 +4288,16 @@ function toggleMagia(nome, circulo, isTruque, maxTruques, maxPreparadas) {
       const truquesAtual = personagem.magias_conhecidas.filter(m => m.circulo === 0).length;
       if (truquesAtual >= maxTruques) { toast(`Máximo de ${maxTruques} truques`, 'error'); return; }
       personagem.magias_conhecidas.push(criarEntradaMagiaSelecionada(nome, circulo));
+    }
+  } else if (magoNivel1) {
+    if (!Array.isArray(personagem.grimorio)) personagem.grimorio = [];
+    const idx = personagem.grimorio.findIndex(m => m.nome === nome);
+    if (idx >= 0) {
+      personagem.grimorio.splice(idx, 1);
+      personagem.magias_preparadas = (personagem.magias_preparadas || []).filter(m => m.nome !== nome);
+    } else {
+      if (personagem.grimorio.length >= limiteGrimorio) { toast(`Máximo de ${limiteGrimorio} magias no grimório`, 'error'); return; }
+      personagem.grimorio.push(criarEntradaMagiaSelecionada(nome, circulo));
     }
   } else {
     const idx = (personagem.magias_preparadas || []).findIndex(m => m.nome === nome);
@@ -4170,14 +4310,15 @@ function toggleMagia(nome, circulo, isTruque, maxTruques, maxPreparadas) {
   }
 }
 
-function atualizarContadoresMagia(maxTruques, maxPrep) {
+function atualizarContadoresMagia(maxTruques, maxPrep, magoNivel1 = false, limiteGrimorio = 0) {
   const infoBox = document.querySelector('#wizard-content .info-box.info');
   if (!infoBox) return;
   const numT = (personagem.magias_conhecidas || []).filter(m => m.circulo === 0).length;
   const numP = (personagem.magias_preparadas || []).length;
   const tipoConj = CLASSES_INFO[personagem.classe]?.tipo_conjuracao || 'preparadas';
   const labelMagias = tipoConj === 'conhecidas' ? 'Magias conhecidas' : 'Magias preparadas';
-  infoBox.innerHTML = `Truques: <strong>${numT}/${maxTruques}</strong> | ${labelMagias}: <strong>${numP}/${maxPrep}</strong> | Atributo: <strong>${CLASSES_INFO[personagem.classe]?.atributo_conjuracao || ''}</strong>`;
+  const grimorio = Array.isArray(personagem.grimorio) ? personagem.grimorio.length : 0;
+  infoBox.innerHTML = `Truques: <strong>${numT}/${maxTruques}</strong> | ${magoNivel1 ? `Grimório: <strong>${grimorio}/${limiteGrimorio}</strong> | ` : ''}${labelMagias}: <strong>${numP}/${maxPrep}</strong> | Atributo: <strong>${CLASSES_INFO[personagem.classe]?.atributo_conjuracao || ''}</strong>`;
 }
 
 async function mostrarDetalheMagia(nome, circulo) {

@@ -148,6 +148,13 @@ Criado por `store.js:criarPersonagemVazio()`. Persistido como array em
   quantidade: 1,          // qtd <= 0 => seção "Esgotados"
   equipado: false,
   descricao: '',
+  fonte?: {            // conteúdo novo da expansão
+    id: 'frhof-2025',
+    nome: 'Forgotten Realms: Heroes of Faerûn',
+    rotulo: 'Heróis de Faerûn',
+    tipo: 'expansao',
+    ano: 2025
+  } | null,            // conteúdo-base ou legado: ausente ou null
   dados: {                // varia por tipo; campos vindos dos JSON de dados
     // arma:        dano, propriedades, maestria, categoria, peso, custo
     // armadura:    ca, categoria, requisito_forca, furtividade, peso, custo
@@ -157,6 +164,11 @@ Criado por `store.js:criarPersonagemVazio()`. Persistido como array em
 }
 ```
 
+`fonte` é opcional (`fonte?: { ... } | null`). Conteúdo novo da expansão usa o registro
+canônico; conteúdo-base e legado podem ter a propriedade ausente ou `null`, e ambos
+significam que não há fonte identificada. O objeto completo do personagem é serializado,
+logo salvar, sincronizar, exportar e importar preservam `inventario[].fonte`.
+
 **Peso** vem como string nos JSON: `"0,5 kg"`, `"250 g"`, `"1 kg (saco)"`, `"—"`,
 `"Varia"`. Sempre normalizar antes de calcular (vírgula decimal; gramas → kg).
 
@@ -164,11 +176,16 @@ Criado por `store.js:criarPersonagemVazio()`. Persistido como array em
 
 ## Carregamento de dados (db.js)
 
-`fetchJSON(caminho)` busca `dados/<caminho>` com cache em memória. Funções prontas:
+`fetchJSON(caminho)` busca `dados/<caminho>` com cache em memória, incluindo
+`dados/fontes.json`. Funções prontas:
 `getClasse`, `getMagiasClasse`, `getAntecedentes`, `getEspecies`, `getTalentos`,
 `getArmas`, `getArmaduras`, `getEquipamentoAventura`, `getFerramentas`,
 `getIndiceMagias`, `getMagiasPorCirculo`, `getMagia`, `buscarMagias`, `getCriaturas`,
-`getGlossario`. `precarregarDadosCriacao()` pré-aquece o essencial do wizard.
+`getGlossario`, `getFontes`, `getFonte(id)`. `precarregarDadosCriacao()` pré-aquece o
+essencial do wizard.
+
+`site/js/fontes.js` centraliza `FONTE_FRHOF`, a identificação e clonagem de fontes, o
+rótulo textual e o selo HTML.
 
 Nomes de arquivo de classe/magia são normalizados sem acento (`á→a`, `ã→a`, ...).
 

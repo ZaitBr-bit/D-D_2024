@@ -1,0 +1,1265 @@
+{
+  "total_magias": 19,
+  "fonte": {
+    "id": "frhof-2025",
+    "nome": "Forgotten Realms: Heroes of Faerûn",
+    "rotulo": "Heróis de Faerûn",
+    "tipo": "expansao",
+    "ano": 2025
+  },
+  "magias": [
+    {
+      "nome": "Labareda de Spellfire",
+      "nome_original": "Spellfire Flare",
+      "circulo": 1,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Instantânea",
+      "concentracao": false,
+      "descricao": "Você dispara uma labareda de spellfire contra uma criatura ou objeto no alcance. O efeito causa dano imediato e não cria estado persistente na ficha.",
+      "circulo_superior": "Você cria um disparo adicional para cada espaço de magia acima do 1º. Os disparos podem ter o mesmo alvo ou alvos diferentes, e cada disparo exige uma jogada de ataque separada.",
+      "efeitos_ficha": {
+        "propriedades": [],
+        "modo": "instantaneo",
+        "operacoes": []
+      },
+      "recursos_temporarios": [],
+      "circulo_magico": {
+        "disponivel_na_fonte": false,
+        "implementado": false,
+        "motivo": "Escopo 9 - Magia de Círculo"
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      },
+      "dano": [
+        {
+          "tipo": "Radiante",
+          "formula": "2d10",
+          "observacao": "ataque mágico à distância"
+        }
+      ],
+      "pre_requisitos": {
+        "classes": [
+          "Feiticeiro",
+          "Mago"
+        ],
+        "circulo_minimo": 1,
+        "componentes": "V, S",
+        "ritual": false,
+        "material_consumido": false,
+        "custo_material": null,
+        "nivel_minimo_personagem": null,
+        "atributo_minimo": null,
+        "talento_exigido": null,
+        "observacao": "Sem pré-requisito adicional além de classe compatível, círculo da magia e componentes."
+      }
+    },
+    {
+      "nome": "Repelir Aproximação",
+      "nome_original": "Wardaway",
+      "circulo": 1,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Paladino",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (uma pequena mão de argila)",
+      "duracao": "Instantânea",
+      "concentracao": false,
+      "descricao": "Você atinge uma criatura com energia protetora que dificulta sua aproximação. Em falha na salvaguarda, o alvo sofre dano, tem o deslocamento reduzido e fica limitado a uma opção de ação no próximo turno.",
+      "circulo_superior": "O dano aumenta em 2d4 para cada espaço de magia acima do 1º.",
+      "efeitos_ficha": {
+        "propriedades": [
+          "deslocamento",
+          "acoes",
+          "condicoes"
+        ],
+        "modo": "temporario_rodada",
+        "operacoes": [
+          "metade_deslocamento",
+          "limitar_acao_proximo_turno"
+        ]
+      },
+      "recursos_temporarios": [],
+      "circulo_magico": {
+        "disponivel_na_fonte": false,
+        "implementado": false,
+        "motivo": "Escopo 9 - Magia de Círculo"
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      },
+      "dano": [
+        {
+          "tipo": "Força",
+          "formula": "2d4",
+          "observacao": "salvaguarda de Constituição; metade do dano em sucesso; aumenta em 2d4 por espaço acima do 1º"
+        }
+      ],
+      "pre_requisitos": {
+        "classes": [
+          "Bardo",
+          "Clérigo",
+          "Paladino",
+          "Mago"
+        ],
+        "circulo_minimo": 1,
+        "componentes": "V, S, M (uma pequena mão de argila)",
+        "ritual": false,
+        "material_consumido": false,
+        "custo_material": null,
+        "nivel_minimo_personagem": null,
+        "atributo_minimo": null,
+        "talento_exigido": null,
+        "observacao": "Sem pré-requisito adicional além de classe compatível, círculo da magia e componentes."
+      }
+    },
+    {
+      "nome": "Armadura da Morte",
+      "nome_original": "Death Armor",
+      "circulo": 2,
+      "escola": "Necromancia",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S, M (uma ônix de 50+ PO, consumida pela magia)",
+      "duracao": "1 hora",
+      "concentracao": false,
+      "descricao": "Energia necromântica envolve uma criatura que você toca. Enquanto a magia dura, o alvo recebe vantagem em testes contra morte, e uma criatura que o acerte com um ataque corpo a corpo a até 1,5 metro sofre dano necrótico reativo uma vez por turno.",
+      "circulo_superior": "O dano aumenta em 1d4 para cada espaço de magia acima do 2º.",
+      "efeitos_ficha": {
+        "propriedades": [
+          "salvaguardas",
+          "acoes",
+          "dano_reativo"
+        ],
+        "modo": "temporario_duracao",
+        "operacoes": [
+          "vantagem_testes_morte",
+          "dano_necrotico_reativo"
+        ]
+      },
+      "recursos_temporarios": [],
+      "circulo_magico": {
+        "disponivel_na_fonte": false,
+        "implementado": false,
+        "motivo": "Escopo 9 - Magia de Círculo"
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      },
+      "dano": [
+        {
+          "tipo": "Necrótico",
+          "formula": "2d4",
+          "observacao": "dano reativo contra criatura que acerta o alvo com ataque corpo a corpo a até 1,5 metro; aumenta em 1d4 por espaço acima do 2º"
+        }
+      ],
+      "pre_requisitos": {
+        "classes": [
+          "Feiticeiro",
+          "Mago"
+        ],
+        "circulo_minimo": 2,
+        "componentes": "V, S, M (uma ônix de 50+ PO, consumida pela magia)",
+        "ritual": false,
+        "material_consumido": true,
+        "custo_material": "50+ PO",
+        "nivel_minimo_personagem": null,
+        "atributo_minimo": null,
+        "talento_exigido": null,
+        "observacao": "Sem pré-requisito adicional além de classe compatível, círculo da magia e componentes."
+      }
+    },
+    {
+      "nome": "Homúnculos Prestativos de Deryan",
+      "nome_original": "Deryan's Helpful Homunculi",
+      "circulo": 2,
+      "escola": "Conjuração",
+      "classes": [
+        "Clérigo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação ou Ritual",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (gemas pulverizadas de 100+ PO, consumidas pela magia, e um conjunto de ferramentas de artesão com o qual você tenha proficiência)",
+      "duracao": "8 horas",
+      "concentracao": false,
+      "descricao": "Você conjura pequenos homúnculos temporários para ajudar em tarefas de fabricação, reparo ou manutenção. O efeito é registrado como apoio narrativo e de ferramenta, não como bônus automático de combate.",
+      "circulo_superior": null,
+      "efeitos_ficha": {
+        "propriedades": [
+          "ferramentas"
+        ],
+        "modo": "manual",
+        "operacoes": [
+          "assistencia_fabricacao"
+        ]
+      },
+      "recursos_temporarios": [],
+      "circulo_magico": {
+        "disponivel_na_fonte": false,
+        "implementado": false,
+        "motivo": "Escopo 9 - Magia de Círculo"
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      },
+      "dano": [],
+      "pre_requisitos": {
+        "classes": [
+          "Clérigo",
+          "Mago"
+        ],
+        "circulo_minimo": 2,
+        "componentes": "V, S, M (gemas pulverizadas de 100+ PO, consumidas pela magia, e um conjunto de ferramentas de artesão com o qual você tenha proficiência)",
+        "ritual": true,
+        "material_consumido": true,
+        "custo_material": "100+ PO",
+        "nivel_minimo_personagem": null,
+        "atributo_minimo": null,
+        "talento_exigido": null,
+        "observacao": "Sem pré-requisito adicional além de classe compatível, círculo da magia e componentes.",
+        "ferramenta_exigida": "um conjunto de ferramentas de artesão com o qual você tenha proficiência"
+      }
+    },
+    {
+      "nome": "Elusão de Elminster",
+      "nome_original": "Elminster's Elusion",
+      "circulo": 2,
+      "escola": "Abjuração",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos",
+      "concentracao": true,
+      "descricao": "Você se torna difícil de prender com magia. Enquanto se concentra, recebe vantagem contra magias e efeitos mágicos, e um salvamento bem-sucedido evita sofrer metade do dano.",
+      "circulo_superior": null,
+      "efeitos_ficha": {
+        "propriedades": [
+          "salvaguardas",
+          "defesa_magica"
+        ],
+        "modo": "temporario_concentracao",
+        "operacoes": [
+          "vantagem_salvaguardas_magia",
+          "evasao_contra_magia"
+        ]
+      },
+      "recursos_temporarios": [],
+      "circulo_magico": {
+        "disponivel_na_fonte": false,
+        "implementado": false,
+        "motivo": "Escopo 9 - Magia de Círculo"
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      },
+      "dano": [],
+      "pre_requisitos": {
+        "classes": [
+          "Mago"
+        ],
+        "circulo_minimo": 2,
+        "componentes": "V, S",
+        "ritual": false,
+        "material_consumido": false,
+        "custo_material": null,
+        "nivel_minimo_personagem": null,
+        "atributo_minimo": null,
+        "talento_exigido": null,
+        "observacao": "Sem pré-requisito adicional além de classe compatível, círculo da magia e componentes."
+      }
+    },
+    {
+      "nome": "Escudo Cacofônico",
+      "nome_original": "Cacophonic Shield",
+      "circulo": 3,
+      "escola": "Evocação",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 10 minutos",
+      "concentracao": true,
+      "descricao": "Ondas sonoras defensivas cercam você. A magia concede resistência a dano trovejante, prejudica ataques à distância contra você e pode deixar criaturas próximas Surdas.",
+      "circulo_superior": "O dano aumenta em 1d6 para cada espaço de magia acima do 3º.",
+      "efeitos_ficha": {
+        "propriedades": [
+          "resistencias",
+          "ataques",
+          "condicoes"
+        ],
+        "modo": "temporario_concentracao",
+        "operacoes": [
+          "resistencia_trovejante",
+          "desvantagem_ataques_distancia_contra_voce",
+          "surdo_area"
+        ]
+      },
+      "recursos_temporarios": [],
+      "circulo_magico": {
+        "disponivel_na_fonte": false,
+        "implementado": false,
+        "motivo": "Escopo 9 - Magia de Círculo"
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      },
+      "dano": [
+        {
+          "tipo": "Trovejante",
+          "formula": "3d6",
+          "observacao": "em falha na salvaguarda de Constituição, também aplica Surdo até o início do seu próximo turno; aumenta em 1d6 por espaço acima do 3º"
+        }
+      ],
+      "pre_requisitos": {
+        "classes": [
+          "Bardo",
+          "Feiticeiro",
+          "Mago"
+        ],
+        "circulo_minimo": 3,
+        "componentes": "V, S",
+        "ritual": false,
+        "material_consumido": false,
+        "custo_material": null,
+        "nivel_minimo_personagem": null,
+        "atributo_minimo": null,
+        "talento_exigido": null,
+        "observacao": "Sem pré-requisito adicional além de classe compatível, círculo da magia e componentes."
+      }
+    },
+    {
+      "nome": "Conjurar Constructos",
+      "nome_original": "Conjure Constructs",
+      "circulo": 3,
+      "escola": "Conjuração",
+      "classes": [
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (uma engrenagem de latão)",
+      "duracao": "Concentração, até 10 minutos",
+      "concentracao": true,
+      "descricao": "Você chama constructos temporários que obedecem comandos simples. Eles podem causar dano de Força ou fornecer proteção temporária a uma criatura.",
+      "circulo_superior": "O dano e os pontos de vida temporários aumentam em 1d6 para cada espaço de magia acima do 3º.",
+      "efeitos_ficha": {
+        "propriedades": [
+          "pv_temporarios",
+          "acoes",
+          "dano"
+        ],
+        "modo": "temporario_concentracao",
+        "operacoes": [
+          "dano_forca_recorrente",
+          "conceder_pv_temporarios"
+        ]
+      },
+      "recursos_temporarios": [
+        {
+          "id": "constructos",
+          "quantidade": null,
+          "recuperacao": "termina_com_a_magia"
+        }
+      ],
+      "circulo_magico": {
+        "disponivel_na_fonte": false,
+        "implementado": false,
+        "motivo": "Escopo 9 - Magia de Círculo"
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      },
+      "dano": [
+        {
+          "tipo": "Força",
+          "formula": "3d6",
+          "observacao": "salvaguarda de Destreza; metade em sucesso; alternativa concede PV temporários; dano e PV temporários aumentam em 1d6 por espaço acima do 3º"
+        }
+      ],
+      "pre_requisitos": {
+        "classes": [
+          "Mago"
+        ],
+        "circulo_minimo": 3,
+        "componentes": "V, S, M (uma engrenagem de latão)",
+        "ritual": false,
+        "material_consumido": false,
+        "custo_material": null,
+        "nivel_minimo_personagem": null,
+        "atributo_minimo": null,
+        "talento_exigido": null,
+        "observacao": "Sem pré-requisito adicional além de classe compatível, círculo da magia e componentes."
+      }
+    },
+    {
+      "nome": "Lança Prateada de Laeral",
+      "nome_original": "Laeral's Silver Lance",
+      "circulo": 3,
+      "escola": "Evocação",
+      "classes": [
+        "Clérigo",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (um alfinete de prata de 250+ PO)",
+      "duracao": "Instantânea",
+      "concentracao": false,
+      "descricao": "Você lança energia prateada contra uma criatura. O alvo sofre dano de Força e pode cair no chão após falhar na salvaguarda apropriada.",
+      "circulo_superior": "O dano aumenta em 1d10 para cada espaço de magia acima do 3º.",
+      "efeitos_ficha": {
+        "propriedades": [
+          "condicoes",
+          "dano"
+        ],
+        "modo": "instantaneo",
+        "operacoes": [
+          "dano_forca",
+          "aplicar_caido"
+        ]
+      },
+      "recursos_temporarios": [],
+      "circulo_magico": {
+        "disponivel_na_fonte": false,
+        "implementado": false,
+        "motivo": "Escopo 9 - Magia de Círculo"
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      },
+      "dano": [
+        {
+          "tipo": "Força",
+          "formula": "3d10",
+          "observacao": "linha; salvaguarda de Força; metade em sucesso; pode derrubar criaturas em falha; aumenta em 1d10 por espaço acima do 3º"
+        }
+      ],
+      "pre_requisitos": {
+        "classes": [
+          "Clérigo",
+          "Feiticeiro",
+          "Mago"
+        ],
+        "circulo_minimo": 3,
+        "componentes": "V, S, M (um alfinete de prata de 250+ PO)",
+        "ritual": false,
+        "material_consumido": false,
+        "custo_material": "250+ PO",
+        "nivel_minimo_personagem": null,
+        "atributo_minimo": null,
+        "talento_exigido": null,
+        "observacao": "Sem pré-requisito adicional além de classe compatível, círculo da magia e componentes."
+      }
+    },
+    {
+      "nome": "Víbora de Syluné",
+      "nome_original": "Sylune's Viper",
+      "circulo": 3,
+      "escola": "Conjuração",
+      "classes": [
+        "Druida",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma presa de serpente)",
+      "duracao": "1 hora",
+      "concentracao": false,
+      "descricao": "Uma manifestação serpentina concede 15 pontos de vida temporários, deslocamento de escalada igual ao seu deslocamento e um ataque venenoso que pode impor Envenenado ou Incapacitado.",
+      "circulo_superior": "Para cada espaço de magia acima do 3º, os pontos de vida temporários aumentam em 5, e o dano da Mordida Venenosa aumenta em 1d6.",
+      "efeitos_ficha": {
+        "propriedades": [
+          "pv_temporarios",
+          "deslocamento",
+          "condicoes",
+          "acoes"
+        ],
+        "modo": "temporario_duracao",
+        "operacoes": [
+          "pv_temporarios_15",
+          "escalada_igual_deslocamento",
+          "ataque_envenenado_incapacitado"
+        ]
+      },
+      "recursos_temporarios": [],
+      "circulo_magico": {
+        "disponivel_na_fonte": false,
+        "implementado": false,
+        "motivo": "Escopo 9 - Magia de Círculo"
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      },
+      "dano": [
+        {
+          "tipo": "Força",
+          "formula": "1d6",
+          "observacao": "ataque mágico à distância da víbora; aumenta em 1d6 por espaço acima do 3º"
+        }
+      ],
+      "pre_requisitos": {
+        "classes": [
+          "Druida",
+          "Mago"
+        ],
+        "circulo_minimo": 3,
+        "componentes": "V, S, M (uma presa de serpente)",
+        "ritual": false,
+        "material_consumido": false,
+        "custo_material": null,
+        "nivel_minimo_personagem": null,
+        "atributo_minimo": null,
+        "talento_exigido": null,
+        "observacao": "Sem pré-requisito adicional além de classe compatível, círculo da magia e componentes."
+      }
+    },
+    {
+      "nome": "Retaliação Mágica",
+      "nome_original": "Backlash",
+      "circulo": 4,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Feiticeiro",
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Reação, ao sofrer dano",
+      "alcance": "18 metros",
+      "componentes": "V",
+      "duracao": "Instantânea",
+      "concentracao": false,
+      "descricao": "Você ergue uma reação abjurante contra dano recebido. Parte do dano é reduzida, e a energia pode retornar ao agressor como dano de Força.",
+      "circulo_superior": "A redução de dano e o dano de Força aumentam em 1d6 para cada espaço de magia acima do 4º.",
+      "efeitos_ficha": {
+        "propriedades": [
+          "acoes",
+          "reducao_dano",
+          "dano_reativo"
+        ],
+        "modo": "instantaneo",
+        "operacoes": [
+          "reacao_reduzir_dano",
+          "dano_forca_reativo"
+        ]
+      },
+      "recursos_temporarios": [],
+      "circulo_magico": {
+        "disponivel_na_fonte": false,
+        "implementado": false,
+        "motivo": "Escopo 9 - Magia de Círculo"
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      },
+      "dano": [
+        {
+          "tipo": "Força",
+          "formula": "4d6",
+          "observacao": "dano reativo em falha na salvaguarda de Constituição; metade em sucesso; redução e dano aumentam em 1d6 por espaço acima do 4º"
+        }
+      ],
+      "pre_requisitos": {
+        "classes": [
+          "Bardo",
+          "Feiticeiro",
+          "Bruxo",
+          "Mago"
+        ],
+        "circulo_minimo": 4,
+        "componentes": "V",
+        "ritual": false,
+        "material_consumido": false,
+        "custo_material": null,
+        "nivel_minimo_personagem": null,
+        "atributo_minimo": null,
+        "talento_exigido": null,
+        "observacao": "Sem pré-requisito adicional além de classe compatível, círculo da magia e componentes."
+      }
+    },
+    {
+      "nome": "Maré da Perdição",
+      "nome_original": "Doomtide",
+      "circulo": 4,
+      "escola": "Conjuração",
+      "classes": [
+        "Bardo",
+        "Clérigo",
+        "Bruxo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S, M (fuligem e uma enguia seca)",
+      "duracao": "Concentração, até 1 minuto",
+      "concentracao": true,
+      "descricao": "Você cria uma área de escuridão mágica opressiva. Criaturas afetadas sofrem dano psíquico e têm penalidade em salvaguardas enquanto permanecem sob a maré.",
+      "circulo_superior": null,
+      "efeitos_ficha": {
+        "propriedades": [
+          "area",
+          "salvaguardas",
+          "condicoes",
+          "dano"
+        ],
+        "modo": "area_concentracao",
+        "operacoes": [
+          "escuridao_magica",
+          "dano_psiquico",
+          "penalidade_1d6_salvaguardas"
+        ]
+      },
+      "recursos_temporarios": [],
+      "circulo_magico": {
+        "disponivel_na_fonte": true,
+        "implementado": false,
+        "motivo": "Escopo 9 - Magia de Círculo"
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      },
+      "dano": [
+        {
+          "tipo": "Psíquico",
+          "formula": "5d6",
+          "observacao": "falha na salvaguarda; também subtrai 1d6 de salvaguardas até o fim do próximo turno"
+        }
+      ],
+      "pre_requisitos": {
+        "classes": [
+          "Bardo",
+          "Clérigo",
+          "Bruxo"
+        ],
+        "circulo_minimo": 4,
+        "componentes": "V, S, M (fuligem e uma enguia seca)",
+        "ritual": false,
+        "material_consumido": false,
+        "custo_material": null,
+        "nivel_minimo_personagem": null,
+        "atributo_minimo": null,
+        "talento_exigido": null,
+        "observacao": "Sem pré-requisito adicional além de classe compatível, círculo da magia e componentes."
+      }
+    },
+    {
+      "nome": "Tempestade de Spellfire",
+      "nome_original": "Spellfire Storm",
+      "circulo": 4,
+      "escola": "Evocação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto",
+      "concentracao": true,
+      "descricao": "Você cria uma tempestade luminosa de spellfire que causa dano radiante e pode interferir em magias conjuradas dentro da área.",
+      "circulo_superior": "O dano aumenta em 1d10 para cada espaço de magia acima do 4º.",
+      "efeitos_ficha": {
+        "propriedades": [
+          "area",
+          "dano",
+          "magia"
+        ],
+        "modo": "area_concentracao",
+        "operacoes": [
+          "dano_radiante_area",
+          "dissipar_magia_na_area"
+        ]
+      },
+      "recursos_temporarios": [],
+      "circulo_magico": {
+        "disponivel_na_fonte": true,
+        "implementado": false,
+        "motivo": "Escopo 9 - Magia de Círculo"
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      },
+      "dano": [
+        {
+          "tipo": "Radiante",
+          "formula": "4d10",
+          "observacao": "cilindro; salvaguarda de Constituição; metade em sucesso; efeitos adicionais contra conjuração na área; aumenta em 1d10 por espaço acima do 4º"
+        }
+      ],
+      "pre_requisitos": {
+        "classes": [
+          "Feiticeiro",
+          "Mago"
+        ],
+        "circulo_minimo": 4,
+        "componentes": "V, S",
+        "ritual": false,
+        "material_consumido": false,
+        "custo_material": null,
+        "nivel_minimo_personagem": null,
+        "atributo_minimo": null,
+        "talento_exigido": null,
+        "observacao": "Sem pré-requisito adicional além de classe compatível, círculo da magia e componentes."
+      }
+    },
+    {
+      "nome": "Manto de Lua de Alustriel",
+      "nome_original": "Alustriel's Mooncloak",
+      "circulo": 5,
+      "escola": "Abjuração",
+      "classes": [
+        "Bardo",
+        "Druida",
+        "Guardião",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma pedra da lua de 50+ PO)",
+      "duracao": "Concentração, até 1 minuto",
+      "concentracao": true,
+      "descricao": "Luz lunar forma um manto defensivo ao seu redor. Você recebe meia cobertura, resistência a frio, elétrico e radiante, além de opções reativas de libertação e cura.",
+      "circulo_superior": null,
+      "efeitos_ficha": {
+        "propriedades": [
+          "ca",
+          "salvaguardas_destreza",
+          "resistencias",
+          "condicoes",
+          "cura_pv"
+        ],
+        "modo": "temporario_concentracao",
+        "operacoes": [
+          "meia_cobertura",
+          "resistencia_frio_eletrico_radiante",
+          "libertacao_reacao",
+          "cura_4d10_mod_conjuracao"
+        ]
+      },
+      "recursos_temporarios": [],
+      "circulo_magico": {
+        "disponivel_na_fonte": true,
+        "implementado": false,
+        "motivo": "Escopo 9 - Magia de Círculo"
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      },
+      "dano": [],
+      "pre_requisitos": {
+        "classes": [
+          "Bardo",
+          "Druida",
+          "Guardião",
+          "Mago"
+        ],
+        "circulo_minimo": 5,
+        "componentes": "V, S, M (uma pedra da lua de 50+ PO)",
+        "ritual": false,
+        "material_consumido": false,
+        "custo_material": "50+ PO",
+        "nivel_minimo_personagem": null,
+        "atributo_minimo": null,
+        "talento_exigido": null,
+        "observacao": "Sem pré-requisito adicional além de classe compatível, círculo da magia e componentes."
+      }
+    },
+    {
+      "nome": "Sufusão Elemental de Songol",
+      "nome_original": "Songol's Elemental Suffusion",
+      "circulo": 5,
+      "escola": "Transmutação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma pérola de 100+ PO)",
+      "duracao": "Concentração, até 1 minuto",
+      "concentracao": true,
+      "descricao": "Você se envolve em energia elemental escolhida. O efeito concede voo, resistência ligada ao elemento e uma descarga de área que pode derrubar criaturas.",
+      "circulo_superior": null,
+      "efeitos_ficha": {
+        "propriedades": [
+          "deslocamento",
+          "resistencias",
+          "area",
+          "condicoes",
+          "dano"
+        ],
+        "modo": "temporario_concentracao",
+        "operacoes": [
+          "voo",
+          "resistencia_elemental_escolhida",
+          "dano_area_elemental",
+          "aplicar_caido"
+        ]
+      },
+      "recursos_temporarios": [
+        {
+          "id": "elemento",
+          "quantidade": null,
+          "recuperacao": "escolha_da_conjuracao"
+        }
+      ],
+      "circulo_magico": {
+        "disponivel_na_fonte": true,
+        "implementado": false,
+        "motivo": "Escopo 9 - Magia de Círculo"
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      },
+      "dano": [
+        {
+          "tipo": "Ácido, Frio, Fogo, Elétrico ou Trovejante",
+          "formula": "2d6",
+          "observacao": "tipo escolhido; descarga em área; aumenta em círculos superiores"
+        }
+      ],
+      "pre_requisitos": {
+        "classes": [
+          "Druida",
+          "Feiticeiro",
+          "Mago"
+        ],
+        "circulo_minimo": 5,
+        "componentes": "V, S, M (uma pérola de 100+ PO)",
+        "ritual": false,
+        "material_consumido": false,
+        "custo_material": "100+ PO",
+        "nivel_minimo_personagem": null,
+        "atributo_minimo": null,
+        "talento_exigido": null,
+        "observacao": "Sem pré-requisito adicional além de classe compatível, círculo da magia e componentes."
+      }
+    },
+    {
+      "nome": "Lamento Fúnebre",
+      "nome_original": "Dirge",
+      "circulo": 6,
+      "escola": "Encantamento",
+      "classes": [
+        "Bardo",
+        "Clérigo"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V",
+      "duracao": "Concentração, até 1 minuto",
+      "concentracao": true,
+      "descricao": "Uma canção fúnebre sobrenatural ocupa a área. Criaturas afetadas sofrem dano, podem cair, têm o deslocamento reduzido e não recuperam pontos de vida enquanto o efeito se mantém.",
+      "circulo_superior": null,
+      "efeitos_ficha": {
+        "propriedades": [
+          "area",
+          "cura_pv",
+          "condicoes",
+          "deslocamento",
+          "dano"
+        ],
+        "modo": "area_concentracao",
+        "operacoes": [
+          "impedir_recuperacao_pv",
+          "dano_area",
+          "aplicar_caido",
+          "metade_deslocamento"
+        ]
+      },
+      "recursos_temporarios": [],
+      "circulo_magico": {
+        "disponivel_na_fonte": true,
+        "implementado": false,
+        "motivo": "Escopo 9 - Magia de Círculo"
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      },
+      "dano": [
+        {
+          "tipo": "Necrótico",
+          "formula": "3d10",
+          "observacao": "falha na salvaguarda; também pode deixar Caído"
+        }
+      ],
+      "pre_requisitos": {
+        "classes": [
+          "Bardo",
+          "Clérigo"
+        ],
+        "circulo_minimo": 6,
+        "componentes": "V",
+        "ritual": false,
+        "material_consumido": false,
+        "custo_material": null,
+        "nivel_minimo_personagem": null,
+        "atributo_minimo": null,
+        "talento_exigido": null,
+        "observacao": "Sem pré-requisito adicional além de classe compatível, círculo da magia e componentes."
+      }
+    },
+    {
+      "nome": "Esferas Resplandecentes de Elminster",
+      "nome_original": "Elminster's Effulgent Spheres",
+      "circulo": 6,
+      "escola": "Evocação",
+      "classes": [
+        "Druida",
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma opala de 1.000+ PO)",
+      "duracao": "1 hora",
+      "concentracao": false,
+      "descricao": "Seis esferas luminosas orbitam você. Cada esfera pode ser gasta para uma reação defensiva ou para um ataque com ação bônus. A magia termina quando as esferas acabam.",
+      "circulo_superior": "O número de esferas aumenta em 1 para cada espaço de magia acima do 6º.",
+      "efeitos_ficha": {
+        "propriedades": [
+          "recursos_temporarios",
+          "resistencias",
+          "acoes",
+          "dano"
+        ],
+        "modo": "temporario_duracao",
+        "operacoes": [
+          "seis_esferas",
+          "gastar_esfera_resistencia",
+          "gastar_esfera_ataque"
+        ]
+      },
+      "recursos_temporarios": [
+        {
+          "id": "esferas",
+          "quantidade": 6,
+          "recuperacao": "termina_com_a_magia"
+        }
+      ],
+      "circulo_magico": {
+        "disponivel_na_fonte": false,
+        "implementado": false,
+        "motivo": "Escopo 9 - Magia de Círculo"
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      },
+      "dano": [
+        {
+          "tipo": "Ácido, Frio, Fogo, Elétrico ou Trovejante",
+          "formula": "3d6",
+          "observacao": "ataque mágico usando uma esfera; consome 1 das 6 esferas"
+        }
+      ],
+      "pre_requisitos": {
+        "classes": [
+          "Druida",
+          "Feiticeiro",
+          "Mago"
+        ],
+        "circulo_minimo": 6,
+        "componentes": "V, S, M (uma opala de 1.000+ PO)",
+        "ritual": false,
+        "material_consumido": false,
+        "custo_material": "000+ PO",
+        "nivel_minimo_personagem": null,
+        "atributo_minimo": null,
+        "talento_exigido": null,
+        "observacao": "Sem pré-requisito adicional além de classe compatível, círculo da magia e componentes."
+      }
+    },
+    {
+      "nome": "Synostodweomer da Simbul",
+      "nome_original": "Simbul's Synostodweomer",
+      "circulo": 7,
+      "escola": "Transmutação",
+      "classes": [
+        "Feiticeiro",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação",
+      "alcance": "Toque",
+      "componentes": "V, S",
+      "duracao": "1 hora",
+      "concentracao": false,
+      "descricao": "O alvo converte parte da energia de magias futuras em cura. Quando gasta um espaço de magia, pode recuperar pontos de vida consumindo Dados de Vida.",
+      "circulo_superior": null,
+      "efeitos_ficha": {
+        "propriedades": [
+          "cura_pv",
+          "dados_de_vida",
+          "espacos_magia"
+        ],
+        "modo": "temporario_duracao",
+        "operacoes": [
+          "cura_ao_gastar_espaco",
+          "consumir_dados_de_vida"
+        ]
+      },
+      "recursos_temporarios": [
+        {
+          "id": "sinostodweomer",
+          "quantidade": null,
+          "recuperacao": "termina_com_a_magia"
+        }
+      ],
+      "circulo_magico": {
+        "disponivel_na_fonte": false,
+        "implementado": false,
+        "motivo": "Escopo 9 - Magia de Círculo"
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      },
+      "dano": [],
+      "pre_requisitos": {
+        "classes": [
+          "Feiticeiro",
+          "Mago"
+        ],
+        "circulo_minimo": 7,
+        "componentes": "V, S",
+        "ritual": false,
+        "material_consumido": false,
+        "custo_material": null,
+        "nivel_minimo_personagem": null,
+        "atributo_minimo": null,
+        "talento_exigido": null,
+        "observacao": "Sem pré-requisito adicional além de classe compatível, círculo da magia e componentes."
+      }
+    },
+    {
+      "nome": "Estrela Sagrada de Mystra",
+      "nome_original": "Holy Star of Mystra",
+      "circulo": 8,
+      "escola": "Evocação",
+      "classes": [
+        "Clérigo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto",
+      "concentracao": true,
+      "descricao": "Uma estrela sagrada o acompanha. Ela pode conceder três-quartos de cobertura, atacar com energia de Força ou Radiante, ou defletir ataques por reação.",
+      "circulo_superior": null,
+      "efeitos_ficha": {
+        "propriedades": [
+          "ca",
+          "salvaguardas_destreza",
+          "acoes",
+          "dano"
+        ],
+        "modo": "temporario_concentracao",
+        "operacoes": [
+          "tres_quartos_cobertura",
+          "raio_forca_radiante",
+          "deflexao_reacao"
+        ]
+      },
+      "recursos_temporarios": [],
+      "circulo_magico": {
+        "disponivel_na_fonte": false,
+        "implementado": false,
+        "motivo": "Escopo 9 - Magia de Círculo"
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      },
+      "dano": [
+        {
+          "tipo": "Força ou Radiante",
+          "formula": "4d10 + modificador de conjuração",
+          "observacao": "ataque mágico à distância do mote; tipo escolhido ao acertar"
+        }
+      ],
+      "pre_requisitos": {
+        "classes": [
+          "Clérigo",
+          "Mago"
+        ],
+        "circulo_minimo": 8,
+        "componentes": "V, S",
+        "ritual": false,
+        "material_consumido": false,
+        "custo_material": null,
+        "nivel_minimo_personagem": null,
+        "atributo_minimo": null,
+        "talento_exigido": null,
+        "observacao": "Sem pré-requisito adicional além de classe compatível, círculo da magia e componentes."
+      }
+    },
+    {
+      "nome": "Lâmina do Desastre",
+      "nome_original": "Blade of Disaster",
+      "circulo": 9,
+      "escola": "Conjuração",
+      "classes": [
+        "Feiticeiro",
+        "Bruxo",
+        "Mago"
+      ],
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto",
+      "concentracao": true,
+      "descricao": "Você cria uma fenda planar em forma de lâmina. Ela pode se mover e atacar criaturas próximas, causando dano de Força com margem crítica ampliada.",
+      "circulo_superior": null,
+      "efeitos_ficha": {
+        "propriedades": [
+          "recursos_temporarios",
+          "acoes",
+          "dano"
+        ],
+        "modo": "temporario_concentracao",
+        "operacoes": [
+          "lamina_movel",
+          "ataques_critico_18_20",
+          "dano_forca"
+        ]
+      },
+      "recursos_temporarios": [
+        {
+          "id": "lamina",
+          "quantidade": 1,
+          "recuperacao": "termina_com_a_magia"
+        }
+      ],
+      "circulo_magico": {
+        "disponivel_na_fonte": false,
+        "implementado": false,
+        "motivo": "Escopo 9 - Magia de Círculo"
+      },
+      "fonte": {
+        "id": "frhof-2025",
+        "nome": "Forgotten Realms: Heroes of Faerûn",
+        "rotulo": "Heróis de Faerûn",
+        "tipo": "expansao",
+        "ano": 2025
+      },
+      "dano": [
+        {
+          "tipo": "Força",
+          "formula": "10d6",
+          "observacao": "ataque da lâmina; crítico em 18–20"
+        }
+      ],
+      "pre_requisitos": {
+        "classes": [
+          "Feiticeiro",
+          "Bruxo",
+          "Mago"
+        ],
+        "circulo_minimo": 9,
+        "componentes": "V, S",
+        "ritual": false,
+        "material_consumido": false,
+        "custo_material": null,
+        "nivel_minimo_personagem": null,
+        "atributo_minimo": null,
+        "talento_exigido": null,
+        "observacao": "Sem pré-requisito adicional além de classe compatível, círculo da magia e componentes."
+      }
+    }
+  ]
+}
