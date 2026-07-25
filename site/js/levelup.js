@@ -2,9 +2,260 @@
 // Sistema de Level-Up D&D 2024
 // ============================================================
 import { CLASSES_INFO } from './dados-classes.js';
-import { getClasse, getEspecies, getIndiceMagias } from './db.js';
+import { getClasse, getEspecies, getIndiceMagias, getTalentos } from './db.js';
 import { calcMod, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas } from './utils.js';
 import { aplicarDeltaSistema } from './ficha-edicoes.js';
+import { aplicarEfeitoTalento, validarEscolhasTalento } from './regras-cobertura.js';
+
+const _ATRIBUTOS_ASI_TALENTO = {
+  'Força': 'forca', 'Destreza': 'destreza', 'Constituição': 'constituicao',
+  'Inteligência': 'inteligencia', 'Sabedoria': 'sabedoria', 'Carisma': 'carisma'
+};
+const _PERICIAS_TODAS = [
+  'Acrobacia', 'Arcanismo', 'Atletismo', 'Atuação', 'Enganação', 'Furtividade',
+  'História', 'Intimidação', 'Intuição', 'Investigação', 'Lidar com Animais',
+  'Medicina', 'Natureza', 'Percepção', 'Persuasão', 'Prestidigitação',
+  'Religião', 'Sobrevivência'
+];
+
+export function obterAtributosASITalento(talento) {
+  const beneficio = talento?.beneficios?.find(b => b.nome === 'Aumento no Valor de Atributo');
+  if (!beneficio?.descricao) return [];
+  const atributosNomeados = Object.entries(_ATRIBUTOS_ASI_TALENTO)
+    .filter(([nome]) => beneficio.descricao.includes(nome))
+    .map(([, chave]) => chave);
+  if (atributosNomeados.length > 0) return atributosNomeados;
+
+  // Textos como "um valor de atributo à sua escolha" não citam nomes,
+  // mas permitem qualquer um dos seis atributos.
+  if (/um valor de atributo à sua escolha|escolha um atributo/i.test(beneficio.descricao)) {
+    return Object.values(_ATRIBUTOS_ASI_TALENTO);
+  }
+  return [];
+}
+
+export function getLimiteASITalento(talento) {
+  const beneficio = talento?.beneficios?.find(b => b.nome === 'Aumento no Valor de Atributo');
+  return /máximo 30/i.test(beneficio?.descricao || '') ? 30 : 20;
+}
+
+export function aplicarASITalento(personagem, talento, atributo) {
+  const elegiveis = obterAtributosASITalento(talento);
+  if (elegiveis.length === 0) return { sucesso: true, aplicado: false };
+  if (!atributo || !elegiveis.includes(atributo)) {
+    return { sucesso: false, erro: 'Escolha um atributo elegível para o talento.' };
+  }
+  const atual = Number(personagem?.atributos?.[atributo]);
+  const limite = getLimiteASITalento(talento);
+  if (!Number.isFinite(atual) || atual >= limite) {
+    return { sucesso: false, erro: `O atributo escolhido deve estar abaixo de ${limite}.` };
+  }
+  aplicarDeltaSistema(personagem, `atributos.${atributo}`, 1, limite);
+  return { sucesso: true, aplicado: true };
+}
+
+function encontrarTalentoPorNome(dadosTalentos, nome) {
+  for (const lista of Object.values(dadosTalentos?.por_categoria || {})) {
+    const talento = lista.find(item => item.nome === nome);
+    if (talento) return talento;
+  }
+  return null;
+}
+
+export const CLASSES_COM_DADIVA_EPICA = [
+  'Bárbaro', 'Bardo', 'Bruxo', 'Clérigo', 'Druida', 'Feiticeiro',
+  'Guardião', 'Guerreiro', 'Ladino', 'Mago', 'Monge', 'Paladino'
+];
+
+export function exigeDadivaEpica(classe, nivel) {
+  return nivel === 19 && CLASSES_COM_DADIVA_EPICA.includes(classe);
+}
+
+function _normalizarTextoRegra(texto) {
+  return (texto || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+function _atributosAtendemPrerequisito(personagem, prerequisito) {
+  const texto = _normalizarTextoRegra(prerequisito);
+  const nomes = {
+    forca: 'forca', destreza: 'destreza', constituicao: 'constituicao',
+    inteligencia: 'inteligencia', sabedoria: 'sabedoria', carisma: 'carisma'
+  };
+  const citados = Object.entries(nomes)
+    .filter(([nome]) => new RegExp(`\\b${nome}\\b`).test(texto))
+    .map(([, chave]) => Number(personagem?.atributos?.[chave]));
+  if (!texto.includes('13 ou superior') || citados.length === 0) return true;
+  return citados.some(valor => Number.isFinite(valor) && valor >= 13);
+}
+
+function _personagemTemConjuracao(personagem) {
+  if (CLASSES_INFO[personagem?.classe]?.conjurador) return true;
+  if (personagem?.classe === 'Guerreiro' && personagem?.subclasse === 'Cavaleiro Místico') return true;
+  if (personagem?.classe === 'Ladino' && personagem?.subclasse === 'Trapaceiro Arcano') return true;
+  return personagem?.caracteristica_conjuracao === true || personagem?.magia_de_pacto === true;
+}
+
+export function talentoElegivelParaPersonagem(personagem, talento, nivel = personagem?.nivel || 1, opcoes = {}) {
+  if (!personagem || !talento) return false;
+  const prerequisito = talento.prerequisito || '';
+  const texto = _normalizarTextoRegra(prerequisito);
+  const minimo = Number(texto.match(/nivel\s*(\d+)/)?.[1] || 0);
+  if (nivel < minimo) return false;
+  if (!_atributosAtendemPrerequisito(personagem, prerequisito)) return false;
+
+  const info = CLASSES_INFO[personagem.classe] || {};
+  const exigeConjuracao = /caracteristica (?:de )?conjuracao/.test(texto) || texto.includes('magia de pacto');
+  if (exigeConjuracao && !_personagemTemConjuracao(personagem)) {
+    return false;
+  }
+
+  const armaduras = new Set([
+    ...(info.armaduras || []),
+    ...(personagem.proficiencias_armaduras || []),
+    ...(personagem.treinamentos_armadura || [])
+  ].map(_normalizarTextoRegra));
+  if (texto.includes('treinamento com armadura leve') && !armaduras.has('leve')) return false;
+  if (texto.includes('treinamento com armadura media') && !armaduras.has('media')) return false;
+  if (texto.includes('treinamento com armadura pesada') && !armaduras.has('pesada')) return false;
+  if (texto.includes('treinamento com escudo') && !armaduras.has('escudo')) return false;
+  if (texto.includes('caracteristica de estilo de luta') && !personagem?.escolhas_classe?.estilo_luta?.length) return false;
+
+  const jaTem = (personagem.talentos || []).some(item =>
+    (typeof item === 'string' ? item : item?.nome) === talento.nome);
+  const repetivel = (talento.beneficios || []).some(beneficio => beneficio.nome === 'Repetível');
+  return opcoes.permitirExistente === true || !jaTem || repetivel;
+}
+
+export function obterTalentosElegiveis(personagem, dadosTalentos, nivel, opcoes = {}) {
+  return Object.values(dadosTalentos?.por_categoria || {})
+    .flat()
+    .filter(talento => talentoElegivelParaPersonagem(personagem, talento, nivel, opcoes))
+    .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+}
+
+function validarDistribuicaoASI(personagem, aumentos, limite = 20) {
+  if (!aumentos || typeof aumentos !== 'object' || Array.isArray(aumentos)) return false;
+  let total = 0;
+  for (const [atributo, valor] of Object.entries(aumentos)) {
+    const atual = Number(personagem?.atributos?.[atributo]);
+    if (!Object.values(_ATRIBUTOS_ASI_TALENTO).includes(atributo) ||
+        !Number.isInteger(valor) || valor < 1 || valor > 2 ||
+        !Number.isFinite(atual) || atual + valor > limite) return false;
+    total += valor;
+  }
+  return total === 2;
+}
+
+function validarEscolhaDadivaProficiencia(personagem, opcoes) {
+  const escolhas = opcoes?.escolhas_talento_levelup;
+  const pericia = Array.isArray(escolhas) && escolhas.length === 1 ? escolhas[0] : '';
+  return _PERICIAS_TODAS.includes(pericia) &&
+    (personagem?.pericias_proficientes || []).includes(pericia) &&
+    !(personagem?.pericias_expertise || []).includes(pericia);
+}
+
+function montarEscolhasCoberturaTalento(opcoes = {}) {
+  return {
+    atributo: opcoes.talento_asi || opcoes.resiliente_atributo || opcoes.iniciado_em_magia?.atributo,
+    talento_asi: opcoes.talento_asi,
+    selecoes: Array.isArray(opcoes.escolhas_talento_levelup)
+      ? [...opcoes.escolhas_talento_levelup]
+      : [],
+    iniciado_em_magia: opcoes.iniciado_em_magia,
+    magia: opcoes.escolhas_talento_levelup?.[0],
+    rituais: opcoes.talento_tipo_escolha === 'conjurador_ritualista'
+      ? [...(opcoes.escolhas_talento_levelup || [])]
+      : undefined,
+    energias: opcoes.dadiva_resistencia_energia
+  };
+}
+
+function aplicarDadivaProficiencia(personagem, opcoes) {
+  const pericia = opcoes.escolhas_talento_levelup[0];
+  if (!personagem.pericias_proficientes) personagem.pericias_proficientes = [];
+  if (!personagem.pericias_expertise) personagem.pericias_expertise = [];
+  for (const nome of _PERICIAS_TODAS) {
+    if (!personagem.pericias_proficientes.includes(nome)) personagem.pericias_proficientes.push(nome);
+  }
+  if (!personagem.pericias_expertise.includes(pericia)) personagem.pericias_expertise.push(pericia);
+}
+
+export function talentoPermitidoNaRecuperacaoDadiva(talento) {
+  return talento?.nome === 'Aumento no Valor de Atributo' ||
+    talento?.nome === 'Dádiva da Proficiência em Perícia';
+}
+
+export function registrarDadivaEpicaLegada(personagem, opcoes, dadosTalentos) {
+  if (!exigeDadivaEpica(personagem?.classe, 19) || Number(personagem?.nivel) < 19) {
+    return { sucesso: false, erro: 'O personagem não possui a escolha de Dádiva Épica de nível 19.' };
+  }
+  if (personagem?.escolhas_classe?.dadiva_epica_nivel_19) {
+    return { sucesso: false, erro: 'A escolha de nível 19 já foi registrada.' };
+  }
+
+  const talento = encontrarTalentoPorNome(dadosTalentos, opcoes?.talento);
+  if (!talento || !talentoPermitidoNaRecuperacaoDadiva(talento) ||
+      !talentoElegivelParaPersonagem(personagem, talento, 19)) {
+    return { sucesso: false, erro: 'Talento inválido ou com pré-requisitos não atendidos.' };
+  }
+
+  if (talento.nome === 'Aumento no Valor de Atributo') {
+    if (!validarDistribuicaoASI(personagem, opcoes.aumentos_atributo, 20)) {
+      return { sucesso: false, erro: 'Distribua +2 em um atributo ou +1 em dois atributos, até o máximo 20.' };
+    }
+  } else {
+    const atributosASI = obterAtributosASITalento(talento);
+    const atributo = opcoes.talento_asi;
+    const atual = Number(personagem?.atributos?.[atributo]);
+    const limite = getLimiteASITalento(talento);
+    if (atributosASI.length > 0 &&
+        (!atributo || !atributosASI.includes(atributo) || !Number.isFinite(atual) || atual >= limite)) {
+      return { sucesso: false, erro: `Escolha um atributo elegível abaixo de ${limite} para o talento.` };
+    }
+  }
+  if (talento.nome === 'Dádiva da Proficiência em Perícia' &&
+      !validarEscolhaDadivaProficiencia(personagem, opcoes)) {
+    return { sucesso: false, erro: 'Escolha uma perícia em que já possua proficiência e ainda não tenha Especialização.' };
+  }
+  if (talento.nome === 'Dádiva da Resistência à Energia') {
+    const tipos = opcoes?.dadiva_resistencia_energia;
+    if (!Array.isArray(tipos) || tipos.length !== 2 || new Set(tipos).size !== 2) {
+      return { sucesso: false, erro: 'Selecione 2 tipos de energia diferentes.' };
+    }
+  }
+
+  if (talento.nome === 'Aumento no Valor de Atributo') {
+    for (const [atributo, valor] of Object.entries(opcoes.aumentos_atributo)) {
+      aplicarDeltaSistema(personagem, `atributos.${atributo}`, valor, 20);
+    }
+  } else {
+    const resultadoASI = aplicarASITalento(personagem, talento, opcoes.talento_asi);
+    if (!resultadoASI.sucesso) return resultadoASI;
+  }
+
+  if (talento.nome === 'Dádiva da Fortitude') {
+    personagem.pv_max = (personagem.pv_max || 0) + 40;
+    personagem.pv_atual = Math.min((personagem.pv_atual || 0) + 40, personagem.pv_max);
+    personagem.bonus_pv_dadiva_fortitude = 40;
+  }
+  if (talento.nome === 'Dádiva da Proficiência em Perícia') {
+    aplicarDadivaProficiencia(personagem, opcoes);
+  }
+  if (!personagem.talentos) personagem.talentos = [];
+  personagem.talentos.push(talento.nome);
+
+  if (Array.isArray(opcoes.escolhas_talento_levelup) && opcoes.escolhas_talento_levelup.length > 0) {
+    if (!personagem.escolhas_talento) personagem.escolhas_talento = {};
+    personagem.escolhas_talento.dadiva_epica_nivel_19 = [...opcoes.escolhas_talento_levelup];
+  }
+  if (opcoes.dadiva_resistencia_energia) {
+    if (!personagem.talentos_parametros) personagem.talentos_parametros = {};
+    personagem.talentos_parametros.dadiva_resistencia_energia = [...opcoes.dadiva_resistencia_energia];
+  }
+  if (!personagem.escolhas_classe) personagem.escolhas_classe = {};
+  personagem.escolhas_classe.dadiva_epica_nivel_19 = talento.nome;
+  return { sucesso: true, talento: talento.nome };
+}
 
 /**
  * Retorna os espaços de magia do Cavaleiro Místico para o nível atual.
@@ -147,7 +398,7 @@ export async function obterCaracteristicasNivel(classe, nivel) {
  */
 export function concedeAumentoAtributo(classe, nivel) {
   const aumentos = {
-    'Clérigo': [4, 8, 12, 16],
+    'Clérigo': [4, 8, 12, 16, 19],
     'Bárbaro': [4, 8, 12, 16, 19],
     'Bardo': [4, 8, 12, 16, 19],
     'Bruxo': [4, 8, 12, 16, 19],
@@ -233,7 +484,7 @@ export function exigeExploradorHabil(classe, nivel) {
 }
 
 /**
- * Verifica se o nível exige escolha de Acadêmico (Mago nv2: 2 expertise em perícias de conhecimento)
+ * Verifica se o nível exige escolha de Acadêmico (Mago nv2: 1 expertise em perícia de conhecimento)
  */
 export function exigeAcademico(classe, nivel) {
   return classe === 'Mago' && nivel === 2;
@@ -611,13 +862,16 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   
   // Verificar se ganha aumento de atributo
   const ganhaAumentoAtributo = concedeAumentoAtributo(personagem.classe, novoNivel);
+  const requerDadivaEpica = exigeDadivaEpica(personagem.classe, novoNivel);
   const exigeEspecializacao = exigeEspecializacaoBardo(personagem.classe, novoNivel);
   const exigeEspecializacaoGuardiaoNivel = exigeEspecializacaoGuardiao(personagem.classe, novoNivel);
   const exigeEstiloLutaNivel = exigeEstiloLuta(personagem.classe, novoNivel);
   const exigeExploradorHabilNivel = exigeExploradorHabil(personagem.classe, novoNivel);
   const exigeAcademicoNivel = exigeAcademico(personagem.classe, novoNivel);
+  const exigeGrimorioMago = personagem.classe === 'Mago' && novoNivel > 1;
   const subclasseEfetivaManobras = opcoes.subclasse || personagem.subclasse;
   const exigeManobrasNivel = exigeManobrasGuerreiro(personagem.classe, subclasseEfetivaManobras, novoNivel);
+  let magiasGrimorioSelecionadas = [];
   
   // Se precisa de escolhas do jogador e não foram fornecidas, retornar pendências
   if (precisaSubclasse && !opcoes.subclasse) {
@@ -629,6 +883,15 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     };
   }
   
+  if (requerDadivaEpica && !opcoes.talento) {
+    return {
+      sucesso: false,
+      pendente: true,
+      tipo_pendencia: 'dadiva_epica',
+      mensagem: 'É necessário escolher uma Dádiva Épica ou outro talento'
+    };
+  }
+
   if (ganhaAumentoAtributo && !opcoes.aumentos_atributo && !opcoes.talento) {
     return {
       sucesso: false,
@@ -636,6 +899,67 @@ export async function subirDeNivel(personagem, opcoes = {}) {
       tipo_pendencia: 'aumento_atributo',
       mensagem: 'É necessário escolher aumento de atributos ou um talento'
     };
+  }
+
+  // Validação central: chamadas sem UI também precisam respeitar o ASI do talento.
+  let talentoData = null;
+  if (ganhaAumentoAtributo && opcoes.talento) {
+    talentoData = encontrarTalentoPorNome(await getTalentos(), opcoes.talento);
+    if (!talentoData) return { sucesso: false, erro: 'Talento selecionado não encontrado.' };
+    if (!talentoElegivelParaPersonagem(personagem, talentoData, novoNivel)) {
+      return { sucesso: false, erro: 'O personagem não atende aos pré-requisitos do talento selecionado.' };
+    }
+
+    const ehASIPadrao = opcoes.talento === 'Aumento no Valor de Atributo';
+    if (ehASIPadrao && !validarDistribuicaoASI(personagem, opcoes.aumentos_atributo, 20)) {
+      return { sucesso: false, pendente: true, tipo_pendencia: 'talento_asi', mensagem: 'Distribua +2 em um atributo ou +1 em dois atributos, até o máximo 20.' };
+    }
+    if (!ehASIPadrao && opcoes.aumentos_atributo) {
+      return { sucesso: false, erro: 'A distribuição direta de atributos só é válida com o talento Aumento no Valor de Atributo.' };
+    }
+    if (opcoes.talento === 'Dádiva da Proficiência em Perícia' &&
+        !validarEscolhaDadivaProficiencia(personagem, opcoes)) {
+      return { sucesso: false, pendente: true, tipo_pendencia: 'dadiva_proficiencia_pericia', mensagem: 'Escolha uma perícia em que já possua proficiência e ainda não tenha Especialização.' };
+    }
+    if (opcoes.talento === 'Dádiva da Resistência à Energia') {
+      const tipos = opcoes.dadiva_resistencia_energia;
+      if (!Array.isArray(tipos) || tipos.length !== 2 || new Set(tipos).size !== 2) {
+        return { sucesso: false, pendente: true, tipo_pendencia: 'dadiva_resistencia_energia', mensagem: 'Selecione 2 tipos de energia diferentes.' };
+      }
+    }
+
+    const atributosASI = obterAtributosASITalento(talentoData);
+    const atributo = opcoes.talento_asi;
+    const atual = Number(personagem?.atributos?.[atributo]);
+    const limiteASI = getLimiteASITalento(talentoData);
+    if (atributosASI.length > 0 && (!atributo || !atributosASI.includes(atributo) || !Number.isFinite(atual) || atual >= limiteASI)) {
+      return { sucesso: false, pendente: true, tipo_pendencia: 'talento_asi', mensagem: `Escolha um atributo elegível abaixo de ${limiteASI} para o talento.` };
+    }
+    if (opcoes.talento === 'Resiliente') {
+      const nomesAtributo = { forca: 'Força', destreza: 'Destreza', constituicao: 'Constituição', inteligencia: 'Inteligência', sabedoria: 'Sabedoria', carisma: 'Carisma' };
+      if ((personagem.salvaguardas_proficientes || []).includes(nomesAtributo[atributo])) {
+        return { sucesso: false, pendente: true, tipo_pendencia: 'talento_asi', mensagem: 'Escolha um atributo sem proficiência em salvaguarda para Resiliente.' };
+      }
+    }
+
+    const validacaoCobertura = validarEscolhasTalento(
+      personagem,
+      opcoes.talento,
+      montarEscolhasCoberturaTalento(opcoes)
+    );
+    if (!validacaoCobertura.valido) {
+      return {
+        sucesso: false,
+        pendente: true,
+        tipo_pendencia: 'escolhas_talento',
+        mensagem: validacaoCobertura.erro
+      };
+    }
+  }
+
+  if (ganhaAumentoAtributo && opcoes.aumentos_atributo && !opcoes.talento &&
+      !validarDistribuicaoASI(personagem, opcoes.aumentos_atributo, 20)) {
+    return { sucesso: false, erro: 'A distribuição de atributos é inválida.' };
   }
 
   if (exigeEspecializacao) {
@@ -711,15 +1035,50 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     }
   }
 
-  // Validar Acadêmico (Mago nível 2: 2 expertise)
+  // Validar Acadêmico (Mago nível 2: 1 expertise em perícia acadêmica já proficiente)
+  // Validar novas magias do grimório antes de alterar o personagem.
+  if (exigeGrimorioMago) {
+    const selecionadas = Array.isArray(opcoes.grimorio_selecionados)
+      ? opcoes.grimorio_selecionados.filter(nome => typeof nome === 'string' && nome)
+      : [];
+    const espacosNovoNivel = getEspacosMagia(classeData.tabela_caracteristicas, novoNivel);
+    const nomesNoGrimorio = new Set((personagem.grimorio || []).map(magia => magia?.nome));
+    const indice = await getIndiceMagias();
+    const magiasPorNome = new Map((indice?.magias || []).map(magia => [magia.nome, magia]));
+    const escolhasValidas = selecionadas.length === 2 && new Set(selecionadas).size === 2 &&
+      selecionadas.every(nome => {
+        const magia = magiasPorNome.get(nome);
+        return magia && Array.isArray(magia.classes) && magia.classes.includes('Mago') &&
+          magia.circulo > 0 && (espacosNovoNivel[magia.circulo]?.total || 0) > 0 &&
+          !nomesNoGrimorio.has(nome);
+      });
+    if (!escolhasValidas) {
+      return {
+        sucesso: false,
+        pendente: true,
+        tipo_pendencia: 'grimorio',
+        mensagem: 'Selecione 2 magias novas de Mago para o Grimório em círculos para os quais você possui espaços'
+      };
+    }
+    magiasGrimorioSelecionadas = selecionadas.map(nome => {
+      const magia = magiasPorNome.get(nome);
+      return { nome: magia.nome, circulo: magia.circulo };
+    });
+  }
+
   if (exigeAcademicoNivel) {
-    const selecionadas = Array.isArray(opcoes.academico_expertise) ? opcoes.academico_expertise : [];
-    if (selecionadas.length !== 2) {
+    const selecionadas = Array.isArray(opcoes.academico_expertise) ? opcoes.academico_expertise.filter(Boolean) : [];
+    const periciasAcademicas = new Set(['Arcanismo', 'História', 'Investigação', 'Medicina', 'Natureza', 'Religião']);
+    const proficientes = new Set(personagem.pericias_proficientes || []);
+    const expertiseAtual = new Set(personagem.pericias_expertise || []);
+    const pericia = selecionadas[0];
+    if (selecionadas.length !== 1 || !periciasAcademicas.has(pericia) ||
+        !proficientes.has(pericia) || expertiseAtual.has(pericia)) {
       return {
         sucesso: false,
         pendente: true,
         tipo_pendencia: 'academico',
-        mensagem: 'É necessário escolher 2 perícias para Acadêmico do Mago'
+        mensagem: 'Escolha 1 perícia elegível e já proficiente para Acadêmico do Mago'
       };
     }
   }
@@ -846,6 +1205,10 @@ export async function subirDeNivel(personagem, opcoes = {}) {
         }
       }
 
+      if (opcoes.talento === 'Dádiva da Proficiência em Perícia') {
+        aplicarDadivaProficiencia(personagem, opcoes);
+      }
+
       // Aplicar ferramentas do Artifista nas proficiencias
       if (opcoes.talento === 'Artifista') {
         if (!personagem.proficiencias_ferramentas) personagem.proficiencias_ferramentas = [];
@@ -902,10 +1265,24 @@ export async function subirDeNivel(personagem, opcoes = {}) {
       personagem.talentos_parametros.dadiva_resistencia_energia = opcoes.dadiva_resistencia_energia;
     }
 
-    // Aplicar ASI do talento (Adepto Elemental, Agressor, etc.)
-    if (opcoes.talento_asi) {
-      const chaveAttr = opcoes.talento_asi;
-      aplicarDeltaSistema(personagem, `atributos.${chaveAttr}`, 1, 20);
+    // Aplicar o ASI exatamente uma vez, após todas as validações.
+    if (talentoData) {
+      const resultadoASI = aplicarASITalento(personagem, talentoData, opcoes.talento_asi);
+      if (!resultadoASI.sucesso) return { sucesso: false, erro: resultadoASI.erro };
+    }
+
+    const resultadoCoberturaTalento = aplicarEfeitoTalento(
+      personagem,
+      opcoes.talento,
+      montarEscolhasCoberturaTalento(opcoes)
+    );
+    if (!resultadoCoberturaTalento.sucesso) {
+      return { sucesso: false, erro: resultadoCoberturaTalento.erro };
+    }
+
+    if (requerDadivaEpica) {
+      if (!personagem.escolhas_classe) personagem.escolhas_classe = {};
+      personagem.escolhas_classe.dadiva_epica_nivel_19 = opcoes.talento;
     }
 
     // Aplicar Analítico / Mente Aguçada (proficiência ou expertise)
@@ -1098,16 +1475,14 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     }
   }
 
-  // Aplicar Acadêmico do Mago (nível 2: 2 expertise acadêmicas)
+  // Aplicar Acadêmico do Mago (nível 2: 1 expertise acadêmica)
   let academicoAplicado = [];
   if (exigeAcademicoNivel) {
     if (!personagem.pericias_expertise) personagem.pericias_expertise = [];
-    const selecionadas = (opcoes.academico_expertise || []).filter(Boolean);
-    for (const pericia of selecionadas) {
-      if (!personagem.pericias_expertise.includes(pericia)) {
-        personagem.pericias_expertise.push(pericia);
-        academicoAplicado.push(pericia);
-      }
+    const pericia = opcoes.academico_expertise[0];
+    if (!personagem.pericias_expertise.includes(pericia)) {
+      personagem.pericias_expertise.push(pericia);
+      academicoAplicado.push(pericia);
     }
   }
 
@@ -1122,6 +1497,13 @@ export async function subirDeNivel(personagem, opcoes = {}) {
       personagem.pv_max += bonusCampeao;
       personagem.pv_atual += bonusCampeao;
     }
+  }
+
+  // As duas magias de nível entram no grimório somente após todas as outras
+  // validações e aplicações do level-up terem sido concluídas com sucesso.
+  if (exigeGrimorioMago) {
+    if (!Array.isArray(personagem.grimorio)) personagem.grimorio = [];
+    personagem.grimorio.push(...magiasGrimorioSelecionadas);
   }
   
   // Retornar resumo do level-up
@@ -1151,6 +1533,7 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     estilo_luta_aplicado: estiloLutaAplicado,
     explorador_habil_aplicado: exploradorHabilAplicado,
     academico_aplicado: academicoAplicado,
+    grimorio_adicionado: magiasGrimorioSelecionadas,
     manobras_novas_aplicadas: manobrasNovasAplicadas,
     manobra_troca_aplicada: manobraTrocaAplicada
   };

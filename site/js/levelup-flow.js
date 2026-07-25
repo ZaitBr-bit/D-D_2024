@@ -8,7 +8,7 @@ import {
   calcMod, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas
 } from './utils.js';
 import {
-  concedeAumentoAtributo, exigeSubclasse,
+  concedeAumentoAtributo, exigeDadivaEpica, exigeSubclasse,
   exigeEspecializacaoBardo, exigeEspecializacaoGuardiao,
   exigeEstiloLuta, exigeExploradorHabil, exigeAcademico,
   exigeManobrasGuerreiro, getQuantidadeNovasManobras,
@@ -37,6 +37,7 @@ export async function buildLevelUpContext(char, classeData, helpers = {}) {
   // Flags de regras
   const precisaSubclasse = exigeSubclasse(char.classe, nivelNovo) && !char.subclasse;
   const ganhaASI = concedeAumentoAtributo(char.classe, nivelNovo);
+  const exigeDadivaEpicaNivel = exigeDadivaEpica(char.classe, nivelNovo);
   const precisaExpertiseBardo = exigeEspecializacaoBardo(char.classe, nivelNovo);
   const precisaExpertiseGuardiao = exigeEspecializacaoGuardiao(char.classe, nivelNovo);
   const precisaEstiloLuta = exigeEstiloLuta(char.classe, nivelNovo);
@@ -128,12 +129,13 @@ export async function buildLevelUpContext(char, classeData, helpers = {}) {
   // Requirements: array de pendências obrigatórias
   const requirements = [];
   if (precisaSubclasse) requirements.push({ tipo: 'subclasse', label: 'Escolher subclasse' });
-  if (ganhaASI) requirements.push({ tipo: 'asi', label: 'Distribuir 2 pontos de atributo ou Talento' });
+  if (exigeDadivaEpicaNivel) requirements.push({ tipo: 'dadiva_epica', label: 'Dádiva Épica ou Outro Talento' });
+  else if (ganhaASI) requirements.push({ tipo: 'asi', label: 'Distribuir 2 pontos de atributo ou Talento' });
   if (precisaExpertiseBardo) requirements.push({ tipo: 'bardo_expertise', label: 'Especialização do Bardo (2 perícias)' });
   if (precisaExpertiseGuardiao) requirements.push({ tipo: 'guardiao_expertise', label: 'Especialista do Guardião (2 perícias)' });
   if (precisaEstiloLuta) requirements.push({ tipo: 'estilo_luta', label: 'Escolher Estilo de Luta' });
   if (precisaExploradorHabil) requirements.push({ tipo: 'explorador_habil', label: 'Explorador Hábil (1 perícia + 2 idiomas)' });
-  if (precisaAcademico) requirements.push({ tipo: 'academico', label: 'Acadêmico do Mago (2 perícias)' });
+  if (precisaAcademico) requirements.push({ tipo: 'academico', label: 'Acadêmico do Mago (1 perícia)' });
   if (ehConjurador && conjuracao) {
     if (conjuracao.truquesGanhos > 0) requirements.push({ tipo: 'truques', label: `Selecionar ${conjuracao.truquesGanhos} truque(s)` });
     if (tipoConj === 'conhecidas' && conjuracao.magiasGanhas > 0) requirements.push({ tipo: 'magias_conhecidas', label: `Selecionar ${conjuracao.magiasGanhas} magia(s)` });
@@ -154,6 +156,7 @@ export async function buildLevelUpContext(char, classeData, helpers = {}) {
     hpGanhoFixo,
     precisaSubclasse,
     ganhaASI,
+    exigeDadivaEpica: exigeDadivaEpicaNivel,
     precisaExpertiseBardo,
     precisaExpertiseGuardiao,
     precisaEstiloLuta,
@@ -209,6 +212,9 @@ const STEP_DEFINITIONS = [
     completo: (ctx, state) => {
       if (state.asiModo === 'talento') {
         if (!state.talento) return false;
+        if (state.talento === 'Aumento no Valor de Atributo' && state.pontosDistribuidos !== 2) return false;
+        if (state.talento === 'Dádiva da Proficiência em Perícia' &&
+            (state.escolhasTalento || []).length !== 1) return false;
         if (state.talento === 'Iniciado em Magia') {
           const im = state.iniciadoEmMagia;
           if (!im || !im.lista || !im.atributo || (im.truques?.length || 0) < 2 || !im.magia) return false;
@@ -231,7 +237,7 @@ const STEP_DEFINITIONS = [
       if (ctx.precisaExpertiseGuardiao && (state.guardiaoExpertise || []).length !== 2) return false;
       if (ctx.precisaEstiloLuta && !state.estiloLuta) return false;
       if (ctx.precisaExploradorHabil && (!state.exploradorExpertise || (state.exploradorIdiomas || []).length !== 2)) return false;
-      if (ctx.precisaAcademico && (state.academicoExpertise || []).length !== 2) return false;
+      if (ctx.precisaAcademico && (state.academicoExpertise || []).length !== 1) return false;
       return true;
     }
   },
@@ -288,6 +294,9 @@ export function buildVisibleSteps(ctx, state) {
   const visibles = STEP_DEFINITIONS.filter(s => s.visivel(ctx, state));
   return visibles.map((s, i) => ({
     ...s,
+    titulo: s.id === 'aumento_atributo' && ctx.exigeDadivaEpica
+      ? 'Dádiva Épica ou Outro Talento'
+      : s.titulo,
     ordem: i,
     _completo: s.completo(ctx, state)
   }));

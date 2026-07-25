@@ -14,7 +14,7 @@ import { collectOpcoes, validateAll } from './levelup-validations.js';
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, PERICIAS } from './dados-classes.js';
 import { getMagiasPorCirculo, getMagiasClasse } from './db.js';
 import { abrirModal, fecharModal, toast, mdParaHtml, semAcento, calcMod, getEspacosMagia } from './utils.js';
-import { subirDeNivel } from './levelup.js';
+import { subirDeNivel, obterAtributosASITalento, getLimiteASITalento } from './levelup.js';
 import { abrirGridManobras } from './manobras-ui.js';
 
 // Referências injetadas pelo sheet.js
@@ -77,6 +77,7 @@ export async function abrirLevelUpCards(char, classeData, helpers, caches, salva
   try {
     const ctx = await buildLevelUpContext(char, classeData, helpers);
     const state = createInitialState();
+    if (ctx.exigeDadivaEpica) state.asiModo = 'talento';
 
     // Carregar lista de magias disponíveis para uso interno
     if (ctx.ehConjurador && helpers.obterMagiasDisponiveisClasseAtual) {
@@ -210,7 +211,7 @@ function bindNavegacao(ctx, state, caches) {
 
   document.getElementById('btn-confirmar-levelup')?.addEventListener('click', async () => {
     salvarStateDoDOM(ctx, state, steps[state.stepAtual]);
-    await confirmarLevelUp(ctx, state);
+    await confirmarLevelUp(ctx, state, caches);
   });
 
   // Clique nos steps da barra de progresso
@@ -256,6 +257,17 @@ function salvarStateDoDOM(ctx, state, step) {
         state.pontosDistribuidos = total;
       } else {
         state.talento = document.getElementById('levelup-talento-select')?.value || '';
+        if (state.talento === 'Aumento no Valor de Atributo') {
+          const aumentos = {};
+          let total = 0;
+          ATRIBUTOS_KEYS.forEach(key => {
+            const valor = parseInt(document.getElementById(`levelup-talento-attr-${key}`)?.value) || 0;
+            if (valor > 0) aumentos[key] = valor;
+            total += valor;
+          });
+          state.aumentos = aumentos;
+          state.pontosDistribuidos = total;
+        }
         // ASI do talento
         const asiEl = document.getElementById('levelup-talento-asi');
         if (asiEl) state.talentoASI = asiEl.value || '';
@@ -427,16 +439,16 @@ function bindEventosASI(ctx, state, caches) {
   selTalento?.addEventListener('change', () => {
     const nome = selTalento.value;
     state.talento = nome;
-    mostrarDetalhesTalento(nome, ctx, caches);
+    mostrarDetalhesTalento(nome, ctx, caches, state);
   });
 
   // Se já tem talento selecionado, mostrar detalhes
   if (state.talento) {
-    mostrarDetalhesTalento(state.talento, ctx, caches);
+    mostrarDetalhesTalento(state.talento, ctx, caches, state);
   }
 }
 
-function mostrarDetalhesTalento(nome, ctx, caches) {
+function mostrarDetalhesTalento(nome, ctx, caches, state) {
   const detalheEl = document.getElementById('levelup-talento-detalhe');
   const escolhasEl = document.getElementById('levelup-talento-escolhas');
   if (!nome || !detalheEl) return;
@@ -468,32 +480,45 @@ function mostrarDetalhesTalento(nome, ctx, caches) {
 
   // Escolhas específicas do talento
   if (escolhasEl) {
-    escolhasEl.innerHTML = renderEscolhasTalento(nome, talentoData, ctx);
-    bindEscolhasTalento(nome, talentoData, ctx);
+    escolhasEl.innerHTML = renderEscolhasTalento(nome, talentoData, ctx, state);
+    bindEscolhasTalento(nome, talentoData, ctx, state);
+    bindDistribuicaoASITalento();
   }
 }
 
-function _extrairAtributosASI(talentoData) {
-  if (!talentoData?.beneficios) return [];
-  const benASI = talentoData.beneficios.find(b => b.nome === 'Aumento no Valor de Atributo');
-  if (!benASI?.descricao) return [];
-  const mapa = {
-    'Força': 'forca', 'Destreza': 'destreza', 'Constituição': 'constituicao',
-    'Inteligência': 'inteligencia', 'Sabedoria': 'sabedoria', 'Carisma': 'carisma'
-  };
-  const encontrados = [];
-  for (const [nome, chave] of Object.entries(mapa)) {
-    if (benASI.descricao.includes(nome)) encontrados.push({ nome, chave });
-  }
-  return encontrados;
-}
-
-function renderEscolhasTalento(nome, talentoData, ctx) {
+export function renderEscolhasTalento(nome, talentoData, ctx, state = {}) {
   const { char } = ctx;
   let html = '';
 
+  if (nome === 'Aumento no Valor de Atributo') {
+    html += `
+      <div style="font-weight:600;font-size:0.85rem;margin-top:8px">Aumento de Atributo</div>
+      <div style="font-size:0.8rem;color:var(--text-muted);margin:4px 0 8px">
+        Aumente um atributo em +2, ou dois em +1 cada (máximo 20).
+      </div>
+      <div class="atributos-grid">
+        ${ATRIBUTOS_KEYS.map(key => {
+          const atual = Number(char.atributos?.[key]);
+          return `
+            <div class="form-group" style="text-align:center">
+              <label class="form-label" for="levelup-talento-attr-${key}">${ATRIBUTOS_NOMES[key]}</label>
+              <div style="font-size:0.8rem;margin-bottom:2px">${atual}</div>
+              <select class="form-input levelup-talento-asi-distribuicao" style="text-align:center" id="levelup-talento-attr-${key}" data-atributo="${key}">
+                <option value="0">+0</option>
+                <option value="1" ${(state.aumentos?.[key] || 0) === 1 ? 'selected' : ''} ${atual >= 20 ? 'disabled' : ''}>+1</option>
+                <option value="2" ${(state.aumentos?.[key] || 0) === 2 ? 'selected' : ''} ${atual >= 19 ? 'disabled' : ''}>+2</option>
+              </select>
+            </div>`;
+        }).join('')}
+      </div>
+      <div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px;text-align:center">
+        Total de pontos: <span id="levelup-talento-pontos-total" style="font-weight:700">${state.pontosDistribuidos || 0}</span> / 2
+      </div>`;
+  }
+
   // ASI embutido no talento
-  const atributosASI = _extrairAtributosASI(talentoData);
+  const atributosASI = obterAtributosASITalento(talentoData).map(chave => ({ nome: ATRIBUTOS_NOMES[chave], chave }));
+  const limiteASI = getLimiteASITalento(talentoData);
   if (atributosASI.length > 0) {
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Aumento de Atributo (+1)</div>`;
     if (atributosASI.length === 1) {
@@ -504,7 +529,9 @@ function renderEscolhasTalento(nome, talentoData, ctx) {
       html += `<option value="">-- Escolha o atributo --</option>`;
       atributosASI.forEach(a => {
         const v = char.atributos[a.chave] || 10;
-        html += `<option value="${a.chave}" ${v >= 20 ? 'disabled' : ''}>${a.nome} (atual: ${v})${v >= 20 ? ' - máximo' : ''}</option>`;
+        const jaTemSalvaguarda = nome === 'Resiliente' && (char.salvaguardas_proficientes || []).includes(a.nome);
+        const bloqueado = v >= limiteASI || jaTemSalvaguarda;
+        html += `<option value="${a.chave}" ${state.talentoASI === a.chave ? 'selected' : ''} ${bloqueado ? 'disabled' : ''}>${a.nome} (atual: ${v})${v >= limiteASI ? ' - máximo' : jaTemSalvaguarda ? ' - já proficiente em salvaguarda' : ''}</option>`;
       });
       html += `</select>`;
     }
@@ -513,9 +540,10 @@ function renderEscolhasTalento(nome, talentoData, ctx) {
   if (nome === 'Habilidoso') {
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Proficiências (3)</div>`;
     for (let i = 0; i < 3; i++) {
+      const selecionada = state.escolhasTalento?.[i] || '';
       html += `<select class="escolha-talento-levelup form-input" style="width:100%;margin:4px 0"><option value="">-- Escolha ${i + 1} --</option>`;
-      html += `<optgroup label="Perícias">${_PERICIAS_NOMES.map(p => `<option value="${p}">${p}</option>`).join('')}</optgroup>`;
-      html += `<optgroup label="Ferramentas">${_FERRAMENTAS_TODAS.map(f => `<option value="${f}">${f}</option>`).join('')}</optgroup>`;
+      html += `<optgroup label="Perícias">${_PERICIAS_NOMES.map(p => `<option value="${p}" ${selecionada === p ? 'selected' : ''}>${p}</option>`).join('')}</optgroup>`;
+      html += `<optgroup label="Ferramentas">${_FERRAMENTAS_TODAS.map(f => `<option value="${f}" ${selecionada === f ? 'selected' : ''}>${f}</option>`).join('')}</optgroup>`;
       html += `</select>`;
     }
   }
@@ -523,8 +551,9 @@ function renderEscolhasTalento(nome, talentoData, ctx) {
   if (nome === 'Artifista') {
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Ferramentas de Artesão (3)</div>`;
     for (let i = 0; i < 3; i++) {
+      const selecionada = state.escolhasTalento?.[i] || '';
       html += `<select class="escolha-talento-levelup form-input" style="width:100%;margin:4px 0"><option value="">-- Escolha ${i + 1} --</option>`;
-      html += _FERRAMENTAS_ARTESAO.map(f => `<option value="${f}">${f}</option>`).join('');
+      html += _FERRAMENTAS_ARTESAO.map(f => `<option value="${f}" ${selecionada === f ? 'selected' : ''}>${f}</option>`).join('');
       html += `</select>`;
     }
   }
@@ -532,8 +561,9 @@ function renderEscolhasTalento(nome, talentoData, ctx) {
   if (nome === 'Músico') {
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Instrumentos (3)</div>`;
     for (let i = 0; i < 3; i++) {
+      const selecionada = state.escolhasTalento?.[i] || '';
       html += `<select class="escolha-talento-levelup form-input" style="width:100%;margin:4px 0"><option value="">-- Escolha ${i + 1} --</option>`;
-      html += _INSTRUMENTOS.map(f => `<option value="${f}">${f}</option>`).join('');
+      html += _INSTRUMENTOS.map(f => `<option value="${f}" ${selecionada === f ? 'selected' : ''}>${f}</option>`).join('');
       html += `</select>`;
     }
   }
@@ -559,22 +589,23 @@ function renderEscolhasTalento(nome, talentoData, ctx) {
     const exps = new Set(char.pericias_expertise || []);
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Proficiência</div>`;
     html += `<select class="escolha-talento-levelup form-input" data-tipo="proficiencia" style="width:100%;margin:4px 0"><option value="">-- Proficiência --</option>`;
-    html += _PERICIAS_NOMES.filter(p => !profs.includes(p)).map(p => `<option value="${p}">${p}</option>`).join('');
+    html += _PERICIAS_NOMES.filter(p => !profs.includes(p)).map(p => `<option value="${p}" ${state.escolhasTalento?.[0] === p ? 'selected' : ''}>${p}</option>`).join('');
     html += `</select>`;
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Especialização</div>`;
     html += `<select class="escolha-talento-levelup form-input" data-tipo="expertise" style="width:100%;margin:4px 0"><option value="">-- Especialização --</option>`;
-    html += profs.filter(p => !exps.has(p)).map(p => `<option value="${p}">${p}</option>`).join('');
+    html += profs.filter(p => !exps.has(p)).map(p => `<option value="${p}" ${state.escolhasTalento?.[1] === p ? 'selected' : ''}>${p}</option>`).join('');
     html += `</select>`;
   }
 
-  if (nome === 'Resiliente') {
-    html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Atributo para Salvaguarda</div>`;
-    html += `<select id="levelup-talento-resiliente" class="form-input" style="width:100%;margin:4px 0"><option value="">-- Atributo --</option>`;
-    const salvJa = new Set(char.salvaguardas_proficiente || []);
-    ATRIBUTOS_KEYS.forEach(k => {
-      const desab = salvJa.has(k) ? 'disabled' : '';
-      html += `<option value="${k}" ${desab}>${ATRIBUTOS_NOMES[k]}${salvJa.has(k) ? ' (já proficiente)' : ''}</option>`;
-    });
+  if (nome === 'Dádiva da Proficiência em Perícia') {
+    const proficientes = char.pericias_proficientes || [];
+    const expertise = new Set(char.pericias_expertise || []);
+    const elegiveis = proficientes.filter(pericia => !expertise.has(pericia));
+    const selecionada = state.escolhasTalento?.[0] || '';
+    html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Especialização em Perícia</div>`;
+    html += `<select class="escolha-talento-levelup form-input" data-tipo="dadiva_proficiencia_pericia" style="width:100%;margin:4px 0">`;
+    html += `<option value="">-- Escolha uma perícia proficiente --</option>`;
+    html += elegiveis.map(pericia => `<option value="${pericia}" ${selecionada === pericia ? 'selected' : ''}>${pericia}</option>`).join('');
     html += `</select>`;
   }
 
@@ -612,7 +643,7 @@ function renderEscolhasTalento(nome, talentoData, ctx) {
       <div style="font-weight:600;font-size:0.85rem;margin-top:8px">Lista de Magias</div>
       <select id="levelup-im-lista" class="form-input" style="width:100%;margin:4px 0">
         <option value="">-- Lista --</option>
-        ${listasDisponiveis.map(l => `<option value="${l}">${l}</option>`).join('')}
+        ${listasDisponiveis.map(l => `<option value="${l}" ${state.iniciadoEmMagia?.lista === l ? 'selected' : ''}>${l}</option>`).join('')}
       </select>
       <div id="levelup-im-atributo-container" style="display:none"></div>
       <div id="levelup-im-truques-container" style="display:none"></div>
@@ -626,7 +657,7 @@ function renderEscolhasTalento(nome, talentoData, ctx) {
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Resistências à Energia (2)</div>`;
     for (let i = 0; i < 2; i++) {
       html += `<select class="dadiva-energia-escolha form-input" style="width:100%;margin:4px 0"><option value="">-- Tipo ${i + 1} --</option>`;
-      html += tiposEnergia.map(t => `<option value="${t}">${t}</option>`).join('');
+      html += tiposEnergia.map(t => `<option value="${t}" ${state.dadivaResistenciaEnergia?.[i] === t ? 'selected' : ''}>${t}</option>`).join('');
       html += `</select>`;
     }
   }
@@ -634,7 +665,51 @@ function renderEscolhasTalento(nome, talentoData, ctx) {
   return html;
 }
 
-function bindEscolhasTalento(nome, talentoData, ctx) {
+function bindDistribuicaoASITalento() {
+  const atualizar = () => {
+    const total = [...document.querySelectorAll('.levelup-talento-asi-distribuicao')]
+      .reduce((soma, select) => soma + (parseInt(select.value) || 0), 0);
+    const el = document.getElementById('levelup-talento-pontos-total');
+    if (el) {
+      el.textContent = total;
+      el.style.color = total === 2 ? 'var(--success)' : total > 2 ? 'var(--danger)' : 'inherit';
+    }
+  };
+  document.querySelectorAll('.levelup-talento-asi-distribuicao')
+    .forEach(select => select.addEventListener('change', atualizar));
+}
+
+function configurarSelectsTalentoExclusivos() {
+  const selects = [...document.querySelectorAll('.escolha-talento-levelup')];
+  if (selects.length < 2) return;
+  const opcoesOriginais = new Map(selects.map(select => [select, select.innerHTML]));
+  const vistos = new Set();
+  selects.forEach(select => {
+    if (select.value && vistos.has(select.value)) select.value = '';
+    if (select.value) vistos.add(select.value);
+  });
+  const atualizar = () => {
+    const escolhidas = selects.map(select => select.value).filter(Boolean);
+    selects.forEach(select => {
+      const propria = select.value;
+      const temporario = document.createElement('select');
+      temporario.innerHTML = opcoesOriginais.get(select);
+      temporario.querySelectorAll('option').forEach(opcao => {
+        if (opcao.value && opcao.value !== propria && escolhidas.includes(opcao.value)) opcao.remove();
+      });
+      temporario.querySelectorAll('optgroup').forEach(grupo => {
+        if (!grupo.querySelector('option')) grupo.remove();
+      });
+      select.innerHTML = temporario.innerHTML;
+      select.value = propria;
+    });
+  };
+  selects.forEach(select => select.addEventListener('change', atualizar));
+  atualizar();
+}
+
+export function bindEscolhasTalento(nome, talentoData, ctx, state = {}) {
+  if (['Habilidoso', 'Artifista', 'Músico'].includes(nome)) configurarSelectsTalentoExclusivos();
   // Tocado Por Fadas / Sombras: carregar magias assincronamente
   if (nome === 'Tocado Por Fadas' || nome === 'Tocado Pelas Sombras') {
     const escolas = nome === 'Tocado Por Fadas' ? ['Adivinhação', 'Encantamento'] : ['Ilusão', 'Necromancia'];
@@ -643,7 +718,7 @@ function bindEscolhasTalento(nome, talentoData, ctx) {
       const sel = document.getElementById('levelup-magia-escola-select');
       if (sel) {
         sel.innerHTML = `<option value="">-- Selecione --</option>` +
-          magias.map(m => `<option value="${m.nome}">${m.nome}</option>`).join('');
+          magias.map(m => `<option value="${m.nome}" ${state.escolhasTalento?.[0] === m.nome ? 'selected' : ''}>${m.nome}</option>`).join('');
       }
     });
   }
@@ -664,7 +739,7 @@ function bindEscolhasTalento(nome, talentoData, ctx) {
           <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:4px">Selecione ${bonusProf} magias rituais de 1º círculo:</div>
           ${rituais.map(m => `
             <label style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:0.85rem">
-              <input type="checkbox" class="levelup-ritual-check" value="${m.nome}"> ${m.nome}
+              <input type="checkbox" class="levelup-ritual-check" value="${m.nome}" ${state.escolhasTalento?.includes(m.nome) ? 'checked' : ''}> ${m.nome}
             </label>
           `).join('')}
         `;
@@ -680,7 +755,9 @@ function bindEscolhasTalento(nome, talentoData, ctx) {
       if (!lista) return;
 
       // Atributo: Inteligência, Sabedoria ou Carisma à escolha (padrão sugerido pela lista)
-      const attrPadrao = { 'Clérigo': 'sabedoria', 'Druida': 'sabedoria', 'Mago': 'inteligencia' }[lista] || 'carisma';
+      const attrPadrao = state.iniciadoEmMagia?.lista === lista && state.iniciadoEmMagia?.atributo
+        ? state.iniciadoEmMagia.atributo
+        : ({ 'Clérigo': 'sabedoria', 'Druida': 'sabedoria', 'Mago': 'inteligencia' }[lista] || 'carisma');
       const attrContainer = document.getElementById('levelup-im-atributo-container');
       if (attrContainer) {
         attrContainer.innerHTML = `
@@ -712,15 +789,17 @@ function bindEscolhasTalento(nome, talentoData, ctx) {
           <div style="font-weight:600;font-size:0.85rem;margin-top:8px">Truques (2)</div>
           <div style="max-height:20vh;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:4px;margin:4px 0">
             ${truquesLista.map(m => {
-              const bloqueado = jaTemTruqueIM.has(m.nome);
+              const restaurado = state.iniciadoEmMagia?.lista === lista &&
+                state.iniciadoEmMagia?.truques?.includes(m.nome);
+              const bloqueado = jaTemTruqueIM.has(m.nome) && !restaurado;
               return `
               <label style="display:flex;align-items:center;gap:4px;font-size:0.82rem;padding:2px 4px;border:1px solid var(--border-light);border-radius:4px${bloqueado ? ';opacity:0.4' : ''}">
-                <input type="checkbox" class="levelup-im-truque" value="${m.nome}" ${bloqueado ? 'disabled' : ''}> ${m.nome}${bloqueado ? ' (já conhecido)' : ''}
+                <input type="checkbox" class="levelup-im-truque" value="${m.nome}" ${restaurado ? 'checked' : ''} ${bloqueado ? 'disabled' : ''}> ${m.nome}${bloqueado ? ' (já conhecido)' : ''}
               </label>
             `;
             }).join('')}
           </div>
-          <div style="font-size:0.8rem;color:var(--text-muted)">Selecionados: <span id="levelup-im-truques-count">0</span>/2</div>
+          <div style="font-size:0.8rem;color:var(--text-muted)">Selecionados: <span id="levelup-im-truques-count">${state.iniciadoEmMagia?.lista === lista ? state.iniciadoEmMagia?.truques?.length || 0 : 0}</span>/2</div>
         `;
         truquesContainer.style.display = 'block';
 
@@ -741,12 +820,17 @@ function bindEscolhasTalento(nome, talentoData, ctx) {
           <div style="font-weight:600;font-size:0.85rem;margin-top:8px">Magia de 1º Círculo (1)</div>
           <select id="levelup-im-magia" class="form-input" style="width:100%;margin:4px 0">
             <option value="">-- Selecione --</option>
-            ${magiasCirc1.map(m => `<option value="${m.nome}" ${jaTemMagiaIM.has(m.nome) ? 'disabled' : ''}>${m.nome}${jaTemMagiaIM.has(m.nome) ? ' (já conhecida)' : ''}</option>`).join('')}
+            ${magiasCirc1.map(m => {
+              const restaurada = state.iniciadoEmMagia?.lista === lista && state.iniciadoEmMagia?.magia === m.nome;
+              const bloqueada = jaTemMagiaIM.has(m.nome) && !restaurada;
+              return `<option value="${m.nome}" ${restaurada ? 'selected' : ''} ${bloqueada ? 'disabled' : ''}>${m.nome}${bloqueada ? ' (já conhecida)' : ''}</option>`;
+            }).join('')}
           </select>
         `;
         magiaContainer.style.display = 'block';
       }
     });
+    if (selLista?.value) selLista.dispatchEvent(new Event('change'));
   }
 }
 
@@ -767,7 +851,7 @@ function bindEventosEscolhasClasse(ctx, state) {
   limitarCheckboxes('[data-bardo-expertise]', 2, 'levelup-bardo-expertise-count');
   limitarCheckboxes('[data-guardiao-expertise]', 2, 'levelup-guardiao-expertise-count');
   limitarCheckboxes('[data-explorador-idioma]', 2, 'levelup-explorador-idiomas-count');
-  limitarCheckboxes('[data-academico-expertise]', 2, 'levelup-academico-count');
+  limitarCheckboxes('[data-academico-expertise]', 1, 'levelup-academico-count');
 }
 
 // --- Magias ---
@@ -810,6 +894,8 @@ function bindEventosMagias(ctx, state) {
   }
 
   function abrirGridSelecao(titulo, maxSel, selSet, filtroCirc, jaTemSet, resumoId, badgesId) {
+    const circulosExpandidos = new Set();
+    const circulosComEstadoDefinido = new Set();
     let disponiveis = listaMagiasClasse.filter(m => {
       if (filtroCirc === 0) return m.circulo === 0;
       if (filtroCirc === 'magia') return m.circulo > 0 && m.circulo <= maxCirculoNovo;
@@ -828,7 +914,7 @@ function bindEventosMagias(ctx, state) {
         <div class="search-box" style="flex:1;margin-left:12px"><input type="text" id="grid-busca" placeholder="Buscar..." class="form-input" style="padding:6px 10px;font-size:0.85rem"></div>
       </div>
       <div id="grid-magias-container" style="max-height:55vh;overflow-y:auto">
-        <div class="magias-grid" id="grid-magias"></div>
+        <div id="grid-magias"></div>
       </div>
     `;
 
@@ -843,7 +929,17 @@ function bindEventosMagias(ctx, state) {
       const gridEl = document.getElementById('grid-magias');
       if (!gridEl) return;
 
-      gridEl.innerHTML = filtradas.map(m => {
+      const magiasPorCirculo = new Map();
+      filtradas.forEach(m => {
+        if (!magiasPorCirculo.has(m.circulo)) magiasPorCirculo.set(m.circulo, []);
+        magiasPorCirculo.get(m.circulo).push(m);
+      });
+      gridEl.innerHTML = filtradas.length === 0
+        ? '<div style="text-align:center;color:var(--text-muted);padding:16px">Nenhuma magia encontrada.</div>'
+        : [...magiasPorCirculo.entries()].sort(([a], [b]) => a - b).map(([circulo, magias]) => `
+          <details data-grid-circulo="${circulo}" ${termo.length >= 2 || circulosExpandidos.has(circulo) || (circulo === 0 && !circulosComEstadoDefinido.has(circulo)) ? 'open' : ''} style="margin:8px 0">
+            <summary class="section-divider" style="margin:0;cursor:pointer"><span>${circulo === 0 ? 'Truques' : `${circulo}º Círculo`} (${magias.length})</span></summary>
+            <div class="magias-grid">${magias.map(m => {
         const sel = selSet.has(m.nome);
         const bloqueado = cheio && !sel;
         return `
@@ -858,13 +954,23 @@ function bindEventosMagias(ctx, state) {
               ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
             </div>
           </div>`;
-      }).join('');
+      }).join('')}</div>
+          </details>`).join('');
 
       const cntEl = document.getElementById('grid-sel-count');
       if (cntEl) {
         cntEl.textContent = selSet.size;
         cntEl.style.color = selSet.size === maxSel ? 'var(--success)' : 'inherit';
       }
+
+      gridEl.querySelectorAll('[data-grid-circulo]').forEach(grupo => {
+        grupo.addEventListener('toggle', () => {
+          const circulo = Number(grupo.dataset.gridCirculo);
+          circulosComEstadoDefinido.add(circulo);
+          if (grupo.open) circulosExpandidos.add(circulo);
+          else circulosExpandidos.delete(circulo);
+        });
+      });
 
       gridEl.querySelectorAll('[data-grid-check]').forEach(check => {
         check.addEventListener('click', (e) => {
@@ -1028,9 +1134,23 @@ function bindEventosManobrasGuerreiro(ctx, state) {
 // CONFIRMAÇÃO / SUBMISSÃO
 // ============================================================
 
-async function confirmarLevelUp(ctx, state) {
+export async function confirmarLevelUp(ctx, state, caches) {
+  if (state.confirmando) return;
   const erro = validateAll(ctx, state);
   if (erro) { toast(erro, 'error'); return; }
+
+  if (ctx.ganhaASI && state.asiModo === 'talento') {
+    const talentoData = Object.values(caches.talentosCache?.por_categoria || {})
+      .flat().find(talento => talento.nome === state.talento);
+    const atributosASI = obterAtributosASITalento(talentoData);
+    const atributo = state.talentoASI;
+    const valorAtual = Number(ctx.char.atributos?.[atributo]);
+    const limiteASI = getLimiteASITalento(talentoData);
+    if (atributosASI.length > 0 && (!atributo || !atributosASI.includes(atributo) || !Number.isFinite(valorAtual) || valorAtual >= limiteASI)) {
+      toast(`Escolha um atributo elegível abaixo de ${limiteASI} para o talento.`, 'error');
+      return;
+    }
+  }
 
   // Validar dados de Iniciado em Magia (já persistidos em state por salvarStateDoDOM;
   // o DOM do step de talento não existe mais nesta etapa de revisão).
@@ -1055,8 +1175,10 @@ async function confirmarLevelUp(ctx, state) {
     if (talNome === 'Conjurador Ritualista') state.talentoTipoEscolha = 'conjurador_ritualista';
     if (talNome === 'Iniciado em Magia') state.talentoTipoEscolha = 'iniciado_em_magia';
     if (talNome === 'Dádiva da Resistência à Energia') state.talentoTipoEscolha = 'dadiva_resistencia_energia';
+    if (talNome === 'Dádiva da Proficiência em Perícia') state.talentoTipoEscolha = 'dadiva_proficiencia_pericia';
   }
 
+  state.confirmando = true;
   const opcoes = collectOpcoes(ctx, state);
   const { char } = ctx;
 
@@ -1089,18 +1211,6 @@ async function confirmarLevelUp(ctx, state) {
       }
     });
 
-    // Grimório
-    state.grimorioSelecionados.forEach(nome => {
-      const m = listaMagiasClasse.find(x => x.nome === nome);
-      if (m) {
-        if (!char.grimorio) char.grimorio = [];
-        if (!char.grimorio.find(x => x.nome === nome)) {
-          char.grimorio.push({ nome, circulo: m.circulo });
-          grimorioAdicionado.push(nome);
-        }
-      }
-    });
-
     // Troca
     if (state.trocarDe && state.trocarPara) {
       const idx = char.magias_preparadas?.findIndex(m => m.nome === state.trocarDe);
@@ -1117,6 +1227,7 @@ async function confirmarLevelUp(ctx, state) {
   const resultado = await subirDeNivel(char, opcoes);
 
   if (resultado.sucesso) {
+    grimorioAdicionado = (resultado.grimorio_adicionado || []).map(magia => magia.nome);
     _salvarFn?.();
     window.fecharModalTodos?.();
 
@@ -1125,6 +1236,7 @@ async function confirmarLevelUp(ctx, state) {
     abrirModal('Subida de Nível Concluída!', resumo, '<button class="btn btn-primary" onclick="fecharModal()">OK</button>');
     _renderFichaFn?.();
   } else {
+    state.confirmando = false;
     toast(resultado.erro || 'Erro ao subir de nível', 'error');
   }
 }

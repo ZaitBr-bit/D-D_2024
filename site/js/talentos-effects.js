@@ -58,6 +58,8 @@ export function resolverPassivosTalentos(char) {
     bonusDanoDesarmado: null,
     proficienciasExtra: [],
     resistenciasExtra: [],
+    cdTalentos: {},
+    visaoVerdadeira: 0,
     flags: {},
     estilosAtivos: new Set()
   };
@@ -177,6 +179,11 @@ export function resolverPassivosTalentos(char) {
   if (nomes.has('Envenenador')) {
     passivos.flags.envenenador_potente = true;
     passivos.flags.envenenador_preparar = true;
+    const atributo = char?.talentos_parametros?.envenenador?.atributo;
+    const valor = Number(char?.atributos?.[atributo]);
+    if (Number.isFinite(valor)) {
+      passivos.cdTalentos.envenenador = 8 + Math.floor((valor - 10) / 2) + bonusProficiencia(char.nivel || 1);
+    }
   }
 
   // Esmagador: empurrar e crítico aprimorado
@@ -316,12 +323,59 @@ export function resolverPassivosTalentos(char) {
   if (nomes.has('Telecinético')) {
     passivos.flags.telecinetico_menor = true;
     passivos.flags.telecinetico_empurrao = true;
+    const atributo = char?.talentos_parametros?.telecinetico?.atributo;
+    const valor = Number(char?.atributos?.[atributo]);
+    if (Number.isFinite(valor)) {
+      passivos.cdTalentos.telecinetico = 8 + Math.floor((valor - 10) / 2) + bonusProficiencia(char.nivel || 1);
+    }
   }
 
   // Telepático: enunciado e detecção
   if (nomes.has('Telepático')) {
     passivos.flags.telepatico_enunciado = true;
     passivos.flags.telepatico_detectar = true;
+  }
+
+  // ==========================================================
+  // --- Dádivas Épicas ---
+  // ==========================================================
+
+  if (nomes.has('Dádiva da Fortitude')) {
+    passivos.flags.dadiva_fortitude_cura_adicional = true;
+  }
+  if (nomes.has('Dádiva da Proeza em Combate')) {
+    passivos.flags.dadiva_proeza_acerto_automatico = true;
+  }
+  if (nomes.has('Dádiva da Recordação de Magia')) {
+    passivos.flags.dadiva_recordacao_magia = true;
+  }
+  if (nomes.has('Dádiva da Recuperação')) {
+    passivos.flags.dadiva_recuperacao = true;
+  }
+  if (nomes.has('Dádiva da Resistência à Energia')) {
+    const escolhidas = char?.talentos_parametros?.dadiva_resistencia_energia || [];
+    passivos.resistenciasExtra.push(...escolhidas);
+    passivos.flags.dadiva_redirecionamento_energia = true;
+  }
+  if (nomes.has('Dádiva da Velocidade')) {
+    passivos.flags.dadiva_velocidade_desengajar = true;
+  }
+  if (nomes.has('Dádiva da Viagem Dimensional')) {
+    passivos.flags.dadiva_viagem_dimensional = true;
+  }
+  if (nomes.has('Dádiva da Visão Verdadeira')) {
+    passivos.visaoVerdadeira = Math.max(passivos.visaoVerdadeira, 18);
+  }
+  if (nomes.has('Dádiva do Ataque Irresistível')) {
+    passivos.flags.dadiva_ataque_ignora_resistencia = true;
+    passivos.flags.dadiva_ataque_critico_adicional = true;
+  }
+  if (nomes.has('Dádiva do Destino')) {
+    passivos.flags.dadiva_destino = true;
+  }
+  if (nomes.has('Dádiva do Espírito da Noite')) {
+    passivos.flags.dadiva_espirito_noite_invisivel = true;
+    passivos.flags.dadiva_espirito_noite_resistencia = true;
   }
 
   // ==========================================================
