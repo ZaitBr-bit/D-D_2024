@@ -2,7 +2,7 @@
 // Motor de Fluxo de Level Up - Cards Dinâmicos
 // Fase 1: Contexto + Fase 2: Steps dinâmicos
 // ============================================================
-import { CLASSES_INFO, ATRIBUTOS_KEYS, ATRIBUTOS_NOMES } from './dados-classes.js';
+import { CLASSES_INFO, ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ESCOLAS_SUBCLASSE_MAGO } from './dados-classes.js';
 import { getClasse, getMagiasClasse, getMagiasPorCirculo } from './db.js';
 import {
   calcMod, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas
@@ -112,6 +112,27 @@ export async function buildLevelUpContext(char, classeData, helpers = {}) {
     }
     const maxCirculoNovo = Math.max(...Object.keys(espacosNovo).map(Number), 0);
 
+    // Ganhou um círculo de magia totalmente novo neste nível (independe de já saber a escola/subclasse)
+    const espacosAntes = nivelAtual >= 1 ? getEspacosMagia(tabela, nivelAtual) : {};
+    const ganhouNovoCirculo = Object.entries(espacosNovo).some(([c, d]) =>
+      (d?.total || 0) > 0 && (espacosAntes[c]?.total || 0) === 0);
+
+    // char.subclasse só reflete a escolha feita em level-ups anteriores; para a escolha
+    // feita nesta mesma sessão de level-up (state.subclasse), use calcularSubclasseArcana(ctx, state).
+    const subclasseEfetiva = char.subclasse;
+    const escolaSubclasse = char.classe === 'Mago' &&
+      Object.prototype.hasOwnProperty.call(ESCOLAS_SUBCLASSE_MAGO, subclasseEfetiva)
+      ? ESCOLAS_SUBCLASSE_MAGO[subclasseEfetiva] : null;
+    let subclasseArcana = null;
+    if (escolaSubclasse) {
+      let quantidade = 0;
+      if (nivelNovo === 3) quantidade += 2;
+      if (ganhouNovoCirculo) quantidade += 1;
+      if (quantidade > 0) {
+        subclasseArcana = { escola: escolaSubclasse, quantidade, circuloMax: maxCirculoNovo };
+      }
+    }
+
     conjuracao = {
       tipoConj,
       truquesAtual,
@@ -122,7 +143,9 @@ export async function buildLevelUpContext(char, classeData, helpers = {}) {
       magiasGanhas: magiasNovo - magiasAtual,
       maxCirculoNovo,
       espacosNovo,
-      ehMago: char.classe === 'Mago'
+      ehMago: char.classe === 'Mago',
+      subclasseArcana,
+      ganhouNovoCirculo
     };
   }
 
@@ -140,6 +163,10 @@ export async function buildLevelUpContext(char, classeData, helpers = {}) {
     if (conjuracao.truquesGanhos > 0) requirements.push({ tipo: 'truques', label: `Selecionar ${conjuracao.truquesGanhos} truque(s)` });
     if (tipoConj === 'conhecidas' && conjuracao.magiasGanhas > 0) requirements.push({ tipo: 'magias_conhecidas', label: `Selecionar ${conjuracao.magiasGanhas} magia(s)` });
     if (conjuracao.ehMago) requirements.push({ tipo: 'grimorio', label: 'Grimório: +2 magias' });
+    if (conjuracao.subclasseArcana) requirements.push({
+      tipo: 'subclasse_magias_arcana',
+      label: `${conjuracao.subclasseArcana.escola}: +${conjuracao.subclasseArcana.quantidade} magia(s)`
+    });
   }
 
   // Bônus de proficiência
@@ -177,6 +204,29 @@ export async function buildLevelUpContext(char, classeData, helpers = {}) {
     bonusMudou: bonusNovo !== bonusAnterior,
     helpers
   };
+}
+
+/**
+ * Calcula a exigência de "Versado em Escola" (magias grátis de subclasse arcana do Mago)
+ * de forma reativa ao estado do fluxo de level-up: usa `state.subclasse` (escolha feita
+ * nesta mesma sessão) com fallback para `ctx.char.subclasse` (escolha de level-ups anteriores).
+ * Não depende do valor congelado calculado em `buildLevelUpContext`, que só enxerga
+ * `char.subclasse` no momento em que o contexto foi construído.
+ * @param {Object} ctx - Contexto do buildLevelUpContext
+ * @param {Object} state - Estado atual das escolhas do usuário
+ * @returns {{ escola: string, quantidade: number, circuloMax: number } | null}
+ */
+export function calcularSubclasseArcana(ctx, state) {
+  const subclasseEfetiva = state?.subclasse || ctx.char?.subclasse;
+  const escolaSubclasse = ctx.char?.classe === 'Mago' &&
+    Object.prototype.hasOwnProperty.call(ESCOLAS_SUBCLASSE_MAGO, subclasseEfetiva)
+    ? ESCOLAS_SUBCLASSE_MAGO[subclasseEfetiva] : null;
+  if (!escolaSubclasse || !ctx.conjuracao) return null;
+  let quantidade = 0;
+  if (ctx.nivelNovo === 3) quantidade += 2;
+  if (ctx.conjuracao.ganhouNovoCirculo) quantidade += 1;
+  if (quantidade === 0) return null;
+  return { escola: escolaSubclasse, quantidade, circuloMax: ctx.conjuracao.maxCirculoNovo };
 }
 
 // ---- Fase 2: Motor de steps dinâmicos ----
@@ -246,10 +296,15 @@ const STEP_DEFINITIONS = [
     titulo: 'Seleção de Magias',
     tipo: 'magia',
     obrigatorio: true,
-    visivel: (ctx) => {
+    visivel: (ctx, state) => {
       if (!ctx.ehConjurador || !ctx.conjuracao) return false;
       const c = ctx.conjuracao;
-      return c.truquesGanhos > 0 || (c.tipoConj === 'conhecidas' && c.magiasGanhas > 0) || c.ehMago;
+      // Nota: !!subclasseArcana é redundante hoje (só é truthy quando c.ehMago já é true,
+      // pois deriva de ctx.char.classe, que não muda durante o level-up), mas mantido
+      // explícito via calcularSubclasseArcana para não depender de ctx.conjuracao.subclasseArcana
+      // (congelado) e para deixar a intenção clara caso a regra mude no futuro.
+      const subclasseArcana = calcularSubclasseArcana(ctx, state);
+      return c.truquesGanhos > 0 || (c.tipoConj === 'conhecidas' && c.magiasGanhas > 0) || c.ehMago || !!subclasseArcana;
     },
     completo: (ctx, state) => {
       const c = ctx.conjuracao;
@@ -257,6 +312,8 @@ const STEP_DEFINITIONS = [
       if (c.truquesGanhos > 0 && (state.truquesSelecionados || []).length !== c.truquesGanhos) return false;
       if (c.tipoConj === 'conhecidas' && c.magiasGanhas > 0 && (state.magiasSelecionadas || []).length !== c.magiasGanhas) return false;
       if (c.ehMago && (state.grimorioSelecionados || []).length !== 2) return false;
+      const subclasseArcana = calcularSubclasseArcana(ctx, state);
+      if (subclasseArcana && (state.subclasseMagiasSelecionados || []).length !== subclasseArcana.quantidade) return false;
       return true;
     }
   },
@@ -334,6 +391,7 @@ export function createInitialState() {
     truquesSelecionados: [],
     magiasSelecionadas: [],
     grimorioSelecionados: [],
+    subclasseMagiasSelecionados: [],
     trocarDe: '',
     trocarPara: '',
     trocarParaCirculo: 0,

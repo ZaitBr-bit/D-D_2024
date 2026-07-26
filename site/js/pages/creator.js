@@ -5,7 +5,7 @@ import { CLASSES_INFO, PERICIAS, ATRIBUTOS_NOMES, ATRIBUTOS_KEYS, ATRIBUTO_NOME_
 import { getClasse, getAntecedentes, getEspecies, getTalentos, getMagiasClasse, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura } from '../db.js';
 import { criarPersonagemVazio, salvarPersonagem } from '../store.js';
 import { DENOMINACOES, ICONE_MOEDA, criarCarteiraVazia, adicionarMoeda, removerQuantidadeMoeda } from '../moedas.js';
-import { calcMod, fmtMod, calcPVNivel1, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, getDeslocamento, getTamanho, escHtml, processarImagemArquivo, getCapacidadeCarga, getPesoTotalInventario, descreverCapacidadeCarga, fmtPeso, magiaMagoEstaNoGrimorio } from '../utils.js';
+import { calcMod, fmtMod, calcPVNivel1, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, getDeslocamento, getTamanho, escHtml, processarImagemArquivo, getCapacidadeCarga, getPesoTotalInventario, descreverCapacidadeCarga, fmtPeso, magiaMagoEstaNoGrimorio, nomesMagiaCirculo1Conhecidas } from '../utils.js';
 import { validarEscolhasTalento } from '../regras-cobertura.js';
 
 const STEPS = [
@@ -1042,7 +1042,11 @@ async function finalizar() {
     // A magia de 1o circulo fica sempre preparada (origem especial, 1 uso grátis por descanso longo)
     if (im.magia) {
       if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
-      if (!personagem.magias_preparadas.find(m => m.nome === im.magia)) {
+      const existenteIM = personagem.magias_preparadas.find(m => m.nome === im.magia);
+      if (existenteIM) {
+        existenteIM.origem = 'iniciado_em_magia';
+        existenteIM.gratis_usado = false;
+      } else {
         personagem.magias_preparadas.push({ nome: im.magia, circulo: 1, origem: 'iniciado_em_magia', gratis_usado: false });
       }
     }
@@ -3984,9 +3988,19 @@ function _nomesJaEscolhidosIM(idxAtual, tipo) {
     (personagem.magias_conhecidas || []).filter(m => m.circulo === 0).forEach(m => nomes.add(m.nome));
     obterTruquesEspecie(personagem.especie, personagem.tracos_escolhidos).forEach(n => nomes.add(n));
   } else {
-    (personagem.magias_preparadas || []).forEach(m => nomes.add(m.nome));
-    (personagem.magias_conhecidas || []).filter(m => m.circulo === 1).forEach(m => nomes.add(m.nome));
+    nomesMagiaCirculo1Conhecidas(personagem).forEach(n => nomes.add(n));
   }
+  return nomes;
+}
+
+// Nomes de magia de 1o circulo escolhidos por OUTRAS instâncias de Iniciado em Magia
+// (apenas colisão entre instâncias do próprio talento — não conta grimório/preparadas/conhecidas)
+function _outrasInstanciasIMMagia(idxAtual) {
+  const nomes = new Set();
+  (personagem.iniciado_em_magia_instancias || []).forEach((o, i) => {
+    if (i === idxAtual) return;
+    if (o.magia) nomes.add(o.magia);
+  });
   return nomes;
 }
 
@@ -4025,6 +4039,7 @@ async function _bindInstanciaIM(container, idx, aoMudar) {
       const magias = isTruque ? truquesDisp : c1Disp;
       const selecionadas = isTruque ? im.truques : (im.magia ? [im.magia] : []);
       const jaEscolhidos = _nomesJaEscolhidosIM(idx, isTruque ? 'truque' : 'magia');
+      const outrasInstanciasIM = isTruque ? new Set() : _outrasInstanciasIMMagia(idx);
 
       listaEl.innerHTML = `
         <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">
@@ -4037,8 +4052,9 @@ async function _bindInstanciaIM(container, idx, aoMudar) {
               const nome = m.nome || m;
               const sel = selecionadas.includes(nome);
               const bloqueado = jaEscolhidos.has(nome) && !sel;
+              const bloqueioVisual = isTruque && bloqueado;
               return `
-                <div class="magia-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}" data-im-magia="${nome}" data-im-tipo="${tab}" ${bloqueado ? 'style="opacity:0.4"' : ''}>
+                <div class="magia-card ${sel ? 'selecionada' : ''} ${bloqueioVisual ? 'magia-card-bloqueada' : ''}" data-im-magia="${nome}" data-im-tipo="${tab}" ${bloqueioVisual ? 'style="opacity:0.4"' : ''}>
                   <span class="magia-card-check" data-im-check="${nome}"></span>
                   <div class="magia-card-nome" data-im-info="${nome}" data-im-info-circ="${isTruque ? 0 : 1}">${nome}${bloqueado ? ' (já conhecido)' : ''}</div>
                   <div class="magia-card-meta">
@@ -4057,8 +4073,12 @@ async function _bindInstanciaIM(container, idx, aoMudar) {
           const card = chk.closest('.magia-card');
           const nome = card.dataset.imMagia;
           const jaSelecionado = isTruque ? im.truques.includes(nome) : im.magia === nome;
-          if (!jaSelecionado && jaEscolhidos.has(nome)) {
+          if (isTruque && !jaSelecionado && jaEscolhidos.has(nome)) {
             toast(`"${nome}" já é conhecido por outra fonte — escolha um diferente`, 'error');
+            return;
+          }
+          if (!isTruque && !jaSelecionado && outrasInstanciasIM.has(nome)) {
+            toast(`"${nome}" já foi escolhido por outra instância de Iniciado em Magia — escolha outra`, 'error');
             return;
           }
           if (isTruque) {

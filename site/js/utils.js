@@ -45,6 +45,27 @@ export function magiaMagoEstaNoGrimorio(personagem, nome) {
 }
 
 /**
+ * Retorna o conjunto de nomes de magias de 1º círculo que o personagem já
+ * conhece por qualquer fonte: magias atualmente preparadas, magias conhecidas
+ * de conjuradores espontâneos, e — para o Mago — todo o grimório (não apenas
+ * as magias preparadas no momento).
+ * @param {object} personagem
+ * @returns {Set<string>}
+ */
+export function nomesMagiaCirculo1Conhecidas(personagem) {
+  const nomes = new Set([
+    ...(personagem?.magias_preparadas || []).filter(m => Number(m?.circulo) === 1).map(m => m.nome),
+    ...(personagem?.magias_conhecidas || []).filter(m => Number(m?.circulo) === 1).map(m => m.nome)
+  ]);
+  if (personagem?.classe === 'Mago') {
+    (personagem.grimorio || []).forEach(m => {
+      if (Number(m?.circulo) === 1 && typeof m.nome === 'string') nomes.add(m.nome);
+    });
+  }
+  return nomes;
+}
+
+/**
  * Normaliza o grimório de personagens Magos legados sem inventar magias.
  * Magias preparadas normais de 1º círculo ou superior também devem constar
  * no grimório; magias concedidas por outra origem não contam para essa regra.

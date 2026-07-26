@@ -4,6 +4,7 @@
 // ============================================================
 import { exigeManobrasGuerreiro } from './levelup.js';
 import { validarEscolhasTalento } from './regras-cobertura.js';
+import { calcularSubclasseArcana } from './levelup-flow.js';
 
 function precisaManobrasAgora(ctx, state) {
   return exigeManobrasGuerreiro(ctx.char.classe, state.subclasse || ctx.char.subclasse, ctx.nivelNovo);
@@ -62,6 +63,8 @@ export function collectOpcoes(ctx, state) {
   }
   if (ctx.precisaAcademico) opcoes.academico_expertise = state.academicoExpertise;
   if (ctx.conjuracao?.ehMago) opcoes.grimorio_selecionados = state.grimorioSelecionados || [];
+  const subclasseArcana = calcularSubclasseArcana(ctx, state);
+  if (subclasseArcana) opcoes.subclasse_magias_selecionadas = state.subclasseMagiasSelecionados || [];
 
   // Manobras (Mestre da Batalha)
   const precisaManobrasLive = precisaManobrasAgora(ctx, state);
@@ -166,6 +169,24 @@ export function validateAll(ctx, state) {
           return magia && magia.circulo > 0 && magia.circulo <= c.maxCirculoNovo && !nomesNoGrimorio.has(nome);
         });
       if (!escolhasValidas) return 'Selecione 2 magias novas de círculos para os quais você possui espaços no Grimório.';
+    }
+    const subclasseArcana = calcularSubclasseArcana(ctx, state);
+    if (subclasseArcana) {
+      const selecionadas = state.subclasseMagiasSelecionados || [];
+      const nomesNoGrimorio = new Set([
+        ...(ctx.char.grimorio || []).map(m => m?.nome),
+        ...(state.grimorioSelecionados || [])
+      ]);
+      const magiasPorNome = new Map((ctx._listaMagiasClasse || []).map(m => [m.nome, m]));
+      const escolhasValidas = selecionadas.length === subclasseArcana.quantidade &&
+        new Set(selecionadas).size === subclasseArcana.quantidade &&
+        selecionadas.every(nome => {
+          const magia = magiasPorNome.get(nome);
+          return magia && magia.escola === subclasseArcana.escola &&
+            magia.circulo > 0 && magia.circulo <= subclasseArcana.circuloMax &&
+            !nomesNoGrimorio.has(nome);
+        });
+      if (!escolhasValidas) return `Selecione ${subclasseArcana.quantidade} magia(s) de ${subclasseArcana.escola} para o Grimório.`;
     }
     if (state.trocarDe && !state.trocarPara)
       return 'Escolha a magia substituta ou desmarque a troca.';

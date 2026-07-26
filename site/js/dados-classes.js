@@ -145,6 +145,13 @@ export const CLASSES_INFO = {
   }
 };
 
+export const ESCOLAS_SUBCLASSE_MAGO = {
+  'Abjurador': 'Abjuração',
+  'Adivinhador': 'Adivinhação',
+  'Evocador': 'Evocação',
+  'Ilusionista': 'Ilusão'
+};
+
 // Lista completa de todas as perícias com seus atributos associados
 export const PERICIAS = [
   { nome: "Acrobacia", atributo: "Destreza" },

@@ -6,6 +6,7 @@ import { CLASSES_INFO, ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ATRIBUTO_NOME_PARA_KEY }
 import { getMagiasClasse, getMagiasPorCirculo } from './db.js';
 import { calcMod, bonusProficiencia, mdParaHtml, semAcento, toast, abrirModal } from './utils.js';
 import { obterTalentosElegiveis } from './levelup.js';
+import { calcularSubclasseArcana } from './levelup-flow.js';
 
 // ============================================================
 // CARD: Ganhos do Nível
@@ -488,6 +489,31 @@ export function renderCardMagias(ctx, state) {
     `;
   }
 
+  // Versado em [Escola] (subclasse do Mago)
+  const subclasseArcana = calcularSubclasseArcana(ctx, state);
+  if (subclasseArcana) {
+    const { escola, quantidade } = subclasseArcana;
+    html += `
+      <div class="levelup-card">
+        <div class="levelup-card-header">${escola}: +${quantidade} Magia(s)</div>
+        <div class="levelup-card-body">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <div id="lvlup-subclasse-arcana-resumo" style="font-size:0.85rem;color:var(--text-muted)">
+              ${state.subclasseMagiasSelecionados.length === 0
+                ? `<span style="color:var(--danger)">Nenhuma selecionada. Selecione ${quantidade}.</span>`
+                : `<span style="color:${state.subclasseMagiasSelecionados.length === quantidade ? 'var(--success)' : 'var(--warning-dark,orange)'}">${state.subclasseMagiasSelecionados.length}/${quantidade}</span>`
+              }
+            </div>
+            <button class="btn btn-sm btn-accent" id="btn-lvlup-subclasse-arcana">Selecionar</button>
+          </div>
+          <div id="lvlup-subclasse-arcana-badges" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">
+            ${state.subclasseMagiasSelecionados.map(n => `<span class="badge badge-accent" style="font-size:0.75rem">${n}</span>`).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   // Preparadas (informativo)
   if (tipoConj === 'preparadas' && char.classe !== 'Mago') {
     html += `
@@ -600,6 +626,7 @@ export function renderCardRevisao(ctx, state, steps) {
   if (state.truquesSelecionados.length > 0) html += `<li><strong>Truques:</strong> ${state.truquesSelecionados.join(', ')}</li>`;
   if (state.magiasSelecionadas.length > 0) html += `<li><strong>Magias:</strong> ${state.magiasSelecionadas.join(', ')}</li>`;
   if (state.grimorioSelecionados.length > 0) html += `<li><strong>Grimório:</strong> ${state.grimorioSelecionados.join(', ')}</li>`;
+  if (state.subclasseMagiasSelecionados.length > 0) html += `<li><strong>${calcularSubclasseArcana(ctx, state)?.escola || 'Subclasse'}:</strong> ${state.subclasseMagiasSelecionados.join(', ')}</li>`;
   if (state.trocarDe && state.trocarPara) html += `<li><strong>Troca:</strong> ${state.trocarDe} &rarr; ${state.trocarPara}</li>`;
   if (state.manobrasNovasSelecionadas.length > 0) html += `<li><strong>Manobras:</strong> ${state.manobrasNovasSelecionadas.join(', ')}</li>`;
   if (state.manobraTrocarDe && state.manobraTrocarPara) html += `<li><strong>Troca de Manobra:</strong> ${state.manobraTrocarDe} &rarr; ${state.manobraTrocarPara}</li>`;
