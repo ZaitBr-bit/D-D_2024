@@ -56,7 +56,7 @@ export async function buildLevelUpContext(char, classeData, helpers = {}) {
 
   // Características ganhas neste nível
   const caracteristicas = await obterCaracteristicasNivel(char.classe, nivelNovo);
-  const caracteristicasEspecie = await obterCaracteristicasEspecieNivel(char.especie, nivelNovo);
+  const caracteristicasEspecie = await obterCaracteristicasEspecieNivel(char.especie, nivelNovo, char.tracos_escolhidos);
   const caracteristicasSubclasse = char.subclasse
     ? await obterCaracteristicasSubclasseNivel(char.classe, char.subclasse, nivelNovo)
     : [];
@@ -126,8 +126,11 @@ export async function buildLevelUpContext(char, classeData, helpers = {}) {
     let subclasseArcana = null;
     if (escolaSubclasse) {
       let quantidade = 0;
-      if (nivelNovo === 3) quantidade += 2;
-      if (ganhouNovoCirculo) quantidade += 1;
+      if (nivelNovo === 3) {
+        quantidade += 2;
+      } else if (ganhouNovoCirculo) {
+        quantidade += 1;
+      }
       if (quantidade > 0) {
         subclasseArcana = { escola: escolaSubclasse, quantidade, circuloMax: maxCirculoNovo };
       }
@@ -223,8 +226,11 @@ export function calcularSubclasseArcana(ctx, state) {
     ? ESCOLAS_SUBCLASSE_MAGO[subclasseEfetiva] : null;
   if (!escolaSubclasse || !ctx.conjuracao) return null;
   let quantidade = 0;
-  if (ctx.nivelNovo === 3) quantidade += 2;
-  if (ctx.conjuracao.ganhouNovoCirculo) quantidade += 1;
+  if (ctx.nivelNovo === 3) {
+    quantidade += 2;
+  } else if (ctx.conjuracao.ganhouNovoCirculo) {
+    quantidade += 1;
+  }
   if (quantidade === 0) return null;
   return { escola: escolaSubclasse, quantidade, circuloMax: ctx.conjuracao.maxCirculoNovo };
 }
@@ -304,7 +310,13 @@ const STEP_DEFINITIONS = [
       // explícito via calcularSubclasseArcana para não depender de ctx.conjuracao.subclasseArcana
       // (congelado) e para deixar a intenção clara caso a regra mude no futuro.
       const subclasseArcana = calcularSubclasseArcana(ctx, state);
-      return c.truquesGanhos > 0 || (c.tipoConj === 'conhecidas' && c.magiasGanhas > 0) || c.ehMago || !!subclasseArcana;
+      // Task 1: a troca de truque é universal a qualquer classe que conheça truques de
+      // classe, mesmo em níveis sem ganho de truque/magia novo - então o step também
+      // precisa ficar visível quando há pelo menos 1 truque elegível para troca (mesma
+      // lista de origens especiais usada no card de troca em levelup-cards.js).
+      const origensEspeciais = ['especie', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
+      const temTruqueTrocavel = (ctx.char.magias_conhecidas || []).some(m => m.circulo === 0 && !origensEspeciais.includes(m?.origem));
+      return c.truquesGanhos > 0 || (c.tipoConj === 'conhecidas' && c.magiasGanhas > 0) || c.ehMago || !!subclasseArcana || temTruqueTrocavel;
     },
     completo: (ctx, state) => {
       const c = ctx.conjuracao;
@@ -395,6 +407,8 @@ export function createInitialState() {
     trocarDe: '',
     trocarPara: '',
     trocarParaCirculo: 0,
+    truqueTrocarDe: '',
+    truqueTrocarPara: '',
     // Manobras (Mestre da Batalha)
     manobrasNovasSelecionadas: [],
     manobraTrocarDe: '',

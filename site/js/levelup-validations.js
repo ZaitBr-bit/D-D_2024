@@ -190,6 +190,8 @@ export function validateAll(ctx, state) {
     }
     if (state.trocarDe && !state.trocarPara)
       return 'Escolha a magia substituta ou desmarque a troca.';
+    if (state.truqueTrocarDe && !state.truqueTrocarPara)
+      return 'Escolha o truque substituto ou desmarque a troca.';
   }
 
   return null;

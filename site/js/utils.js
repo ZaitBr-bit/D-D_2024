@@ -123,7 +123,7 @@ export function normalizarGrimorioMago(personagem, limitePreparadas) {
     personagem.grimorio = grimorioNormalizado;
   }
 
-  const origensEspeciais = ['dominio', 'sempre', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
+  const origensEspeciais = ['dominio', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
   const preparadasNormais = (Array.isArray(personagem.magias_preparadas) ? personagem.magias_preparadas : [])
     .filter(magia => magia && typeof magia === 'object' && typeof magia.nome === 'string' && magia.nome && !origensEspeciais.includes(magia.origem) && Number(magia.circulo) > 0);
 

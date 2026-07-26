@@ -6,7 +6,7 @@ import { getPersonagem, salvarPersonagem, removerPersonagem, salvarTaxasMoeda, r
 import { DENOMINACOES, NOMES_MOEDA, ICONE_MOEDA, VALOR_EM_COBRE, formatarCarteira, adicionarMoeda, podePagar, retirarValor, removerQuantidadeMoeda, proximaDenominacaoMaior, converterParaMaior, taxasSaoPadrao, totalEmCobre, parseCusto, podePagarCusto, pagarCusto } from '../moedas.js';
 import { getClasse, getMagiasClasse, getMagiasPorCirculo, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura, getTalentos, getEspecies } from '../db.js';
 import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagia, calcPercepcaoPassiva, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcBonusPericia, calcPVTotal, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, gerarId, detectarRecarga, ehHabilidadeAtiva, getDeslocamento, getTamanho, escHtml, processarImagemArquivo, parsePeso, fmtPeso, getCapacidadeCarga, getMultiplicadorCarga, getPesoTotalInventario, normalizarGrimorioMago, magiaMagoEstaNoGrimorio, nomesMagiaCirculo1Conhecidas } from '../utils.js';
-import { podeSubirDeNivel, subirDeNivel, XP_POR_NIVEL, adicionarXP, obterTodasMagiasDominio, obterTodasMagiasSemprePreparadas, exigeEspecializacaoBardo, exigeEspecializacaoGuardiao, exigeEstiloLuta, exigeExploradorHabil, exigeAcademico, exigeDadivaEpica, obterTalentosElegiveis, talentoPermitidoNaRecuperacaoDadiva, registrarDadivaEpicaLegada, obterAtributosASITalento, getLimiteASITalento, aplicarASITalento } from '../levelup.js';
+import { podeSubirDeNivel, subirDeNivel, XP_POR_NIVEL, adicionarXP, obterTodasMagiasDominio, obterTodasMagiasSemprePreparadas, exigeEspecializacaoBardo, exigeEspecializacaoGuardiao, exigeEstiloLuta, exigeExploradorHabil, exigeAcademico, exigeDadivaEpica, obterTalentosElegiveis, talentoPermitidoNaRecuperacaoDadiva, registrarDadivaEpicaLegada, obterAtributosASITalento, getLimiteASITalento, aplicarASITalento, MAGIAS_LEGADO_ESPECIE, _concederMagiaAutomatica } from '../levelup.js';
 import { abrirLevelUpCards, renderEscolhasTalento, bindEscolhasTalento } from '../levelup-ui.js';
 import { getSyncStatus, onSyncStatusChange } from '../sync.js';
 import { resolverPassivosTalentos } from '../talentos-effects.js';
@@ -124,7 +124,7 @@ function salvarFlagLevelUpFlowV2(ativo) {
 }
 
 function magiaContaNoLimite(magia) {
-  const origensEspeciais = ['dominio', 'sempre', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
+  const origensEspeciais = ['dominio', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
   return !origensEspeciais.includes(magia?.origem);
 }
 
@@ -135,6 +135,7 @@ function magiaEhEspecial(magia) {
 function rotuloOrigemMagia(magia) {
   if (magia?.origem === 'dominio') return 'Domínio';
   if (magia?.origem === 'sempre') return 'Sempre Preparada';
+  if (magia?.origem === 'especie_legado') return 'Sempre Preparada';
   if (magia?.origem === 'iniciado_em_magia') return 'Iniciado em Magia';
   if (magia?.origem === 'tocado_por_fadas') return 'Tocado Por Fadas';
   if (magia?.origem === 'tocado_pelas_sombras') return 'Tocado Pelas Sombras';
@@ -2711,6 +2712,7 @@ export async function renderSheet(container, charId) {
   migrarMagiasSemprePreparadas();
   migrarSlotsMagiaLivre();
   migrarTruquesEspecie();
+  migrarMagiasLegadoEspecie();
   migrarEscolhasClasseLegadas();
   migrarNomePericiaLidarAnimais();
   migrarTalentoVersatilHumano();
@@ -2880,7 +2882,7 @@ function migrarMagiasDominio() {
   let alterado = false;
   const nomesDominio = new Set(magiasDominioCache.map(m => m.nome));
   char.magias_preparadas.forEach(m => {
-    if (nomesDominio.has(m.nome) && m.origem !== 'dominio' && m.origem !== 'sempre') {
+    if (nomesDominio.has(m.nome) && m.origem !== 'dominio' && m.origem !== 'sempre' && m.origem !== 'especie_legado') {
       m.origem = 'dominio';
       alterado = true;
     }
@@ -2934,7 +2936,7 @@ function migrarMagiasSemprePreparadas() {
   });
 
   char.magias_preparadas.forEach(m => {
-    if (nomesSempre.has(m.nome) && m.origem !== 'dominio' && m.origem !== 'sempre') {
+    if (nomesSempre.has(m.nome) && m.origem !== 'dominio' && m.origem !== 'sempre' && m.origem !== 'especie_legado') {
       m.origem = 'sempre';
       slotsLiberados++;
       alterado = true;
@@ -2979,6 +2981,33 @@ function migrarTruquesEspecie() {
       char.magias_conhecidas.push({ nome, circulo: 0, origem: 'especie' });
       alterado = true;
     }
+  }
+  if (alterado) salvar();
+}
+
+/**
+ * Migração retroativa: concede a magia de Legado Ínfero (Tiferino) / Linhagem
+ * Élfica (Elfo) dos níveis 3 e 5 para fichas que já estavam nesses níveis antes
+ * de essa concessão automática existir em subirDeNivel (Task 4). Idempotente,
+ * no mesmo padrão de migrarTruquesEspecie.
+ */
+function migrarMagiasLegadoEspecie() {
+  if (!char.especie || !char.nivel) return;
+  const legadoEscolhido = (char.tracos_escolhidos || [])[0];
+  const tabelaLegado = MAGIAS_LEGADO_ESPECIE[char.especie]?.[legadoEscolhido];
+  if (!tabelaLegado) return;
+
+  if (!char.magias_preparadas) char.magias_preparadas = [];
+  let alterado = false;
+  for (const [nivelStr, nomeMagia] of Object.entries(tabelaLegado)) {
+    const nivel = Number(nivelStr);
+    if (nivel > char.nivel) continue;
+    const jaTem = char.magias_preparadas.find(m => m.nome === nomeMagia && m.origem === 'especie_legado');
+    if (jaTem) continue;
+    const magiaIdx = (indiceMagiasCache || []).find(m => m.nome === nomeMagia);
+    const circulo = magiaIdx?.circulo ?? (nivel === 3 ? 1 : 2);
+    _concederMagiaAutomatica(char.magias_preparadas, { nome: nomeMagia, circulo }, 'especie_legado');
+    alterado = true;
   }
   if (alterado) salvar();
 }
@@ -4209,12 +4238,12 @@ function restaurarHabilidades(tipoDescanso) {
       });
     }
   }
-  // Coletar traço sintético da espécie (Tiferino, Elfo, etc.)
+  // Coletar traços sintéticos da espécie (Tiferino, Elfo, etc.)
   if (char.especie && char.tracos_escolhidos?.length > 0) {
-    const tracoSintetico = gerarTracoSinteticoEspecie(char.especie, char.tracos_escolhidos, char.nivel);
-    if (tracoSintetico) {
-      allFeats.push({ key: `especie_${tracoSintetico.nome}`, descricao: tracoSintetico.descricao });
-    }
+    const tracosSinteticos = gerarTracoSinteticoEspecie(char.especie, char.tracos_escolhidos, char.nivel) || [];
+    tracosSinteticos.forEach(t => {
+      allFeats.push({ key: `especie_${t.nome}`, descricao: t.descricao });
+    });
   }
   // Tracos Golias que herdam recarga "descanso longo" do pai "Ancestralidade Gigante"
   const TRACOS_HERDAM_ANCESTRALIDADE_RESTAURAR = ['Arrepio do Gelo (Gigante do Gelo)', 'Queimadura de Fogo (Gigante de Fogo)', 'Resistência da Pedra (Gigante da Pedra)', 'Salto da Nuvem (Gigante das Nuvens)', 'Tombo da Colina (Gigante da Colina)', 'Trovão da Tempestade (Gigante da Tempestade)'];
@@ -11239,7 +11268,7 @@ const SUBTRACOS_ESPECIE = {
     },
     'Elfo Silvestre': {
       descBase: 'Seu Deslocamento aumenta para 10,5 metros. Você também conhece o truque *Arte Druídica*.',
-      magias: { 3: 'Passos Largos', 5: 'Passos Sem Rastro' }
+      magias: { 3: 'Passos Largos', 5: 'Passo Sem Rastro' }
     }
   },
   'Draconato': {
@@ -11275,25 +11304,26 @@ function gerarTracoSinteticoEspecie(especie, tracosEscolhidos, nivel) {
 
   const info = mapa[escolha];
   const tituloPai = TITULO_TRACO_PAI[especie] || '';
-  let desc = info.descBase;
 
-  // Adicionar magias desbloqueadas por nível
+  const entradas = [{
+    nome: `${tituloPai} — ${escolha}`,
+    descricao: info.descBase
+  }];
+
+  // Uma entrada de traço sintético independente por magia de legado desbloqueada,
+  // para que cada uma tenha seu próprio controle de uso (1x/Descanso Longo).
   if (info.magias) {
-    const magiasDesbloqueadas = [];
     for (const [nv, nomeMagia] of Object.entries(info.magias)) {
       if (nivel >= parseInt(nv)) {
-        magiasDesbloqueadas.push(`*${nomeMagia}* (nível ${nv})`);
+        entradas.push({
+          nome: `${tituloPai} — ${escolha} (${nomeMagia})`,
+          descricao: `Magia sempre preparada: *${nomeMagia}* (nível ${nv}). Pode ser conjurada uma vez sem gastar um espaço de magia, restaurando ao completar um Descanso Longo.`
+        });
       }
-    }
-    if (magiasDesbloqueadas.length > 0) {
-      desc += `\n\nMagias sempre preparadas: ${magiasDesbloqueadas.join(', ')}. Essas magias podem ser conjuradas uma vez sem gastar um espaço de magia, restaurando ao completar um Descanso Longo.`;
     }
   }
 
-  return {
-    nome: `${tituloPai} — ${escolha}`,
-    descricao: desc
-  };
+  return entradas;
 }
 
 // --- Traços da Espécie/Raça ---
@@ -11321,11 +11351,9 @@ function renderSecaoTracosEspecie() {
       return true;
     });
 
-    // Adicionar traço sintético para espécies com opcoes (sem sub-traço no JSON)
-    const tracoSintetico = gerarTracoSinteticoEspecie(char.especie, tracosEscolhidos, char.nivel);
-    if (tracoSintetico) {
-      tracosMostrar.push(tracoSintetico);
-    }
+    // Adicionar traços sintéticos para espécies com opcoes (sem sub-traço no JSON)
+    const tracosSinteticos = gerarTracoSinteticoEspecie(char.especie, tracosEscolhidos, char.nivel) || [];
+    tracosMostrar.push(...tracosSinteticos);
   }
 
   // Filtrar traços por requisito de nível (ex: "A partir do nível 5", "No nível 3")
@@ -17256,11 +17284,9 @@ async function gerarHtmlImpressao() {
         }
       }
 
-      // Adicionar traco sintetico para especies com opcoes (Tiferino, Elfo, Draconato)
-      const tracoSintetico = gerarTracoSinteticoEspecie(char.especie, tracosEscolhidos, char.nivel);
-      if (tracoSintetico) {
-        tracosMostrar.push(tracoSintetico);
-      }
+      // Adicionar tracos sinteticos para especies com opcoes (Tiferino, Elfo, Draconato)
+      const tracosSinteticos = gerarTracoSinteticoEspecie(char.especie, tracosEscolhidos, char.nivel) || [];
+      tracosMostrar.push(...tracosSinteticos);
     }
 
     // Filtrar por nivel

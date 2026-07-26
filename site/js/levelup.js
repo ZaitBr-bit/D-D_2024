@@ -648,17 +648,41 @@ export async function obterTodasMagiasSemprePreparadas(classe, subclasse, nivelA
   return todas;
 }
 
+// Magias concedidas automaticamente por espécie nos níveis 3 e 5 (Legado Ínfero do
+// Tiferino, Linhagem Élfica do Elfo). Mesmos nomes usados em site/js/pages/sheet.js
+// (SUBTRACOS_ESPECIE) e site/js/pages/creator.js (obterTruquesEspecie) para os truques
+// de nível 1 dessas mesmas espécies/escolhas.
+export const MAGIAS_LEGADO_ESPECIE = {
+  'Tiferino': {
+    'Abissal': { 3: 'Raio Nauseante', 5: 'Paralisar Pessoa' },
+    'Ctônico': { 3: 'Vitalidade Vazia', 5: 'Raio do Enfraquecimento' },
+    'Infernal': { 3: 'Repreensão Diabólica', 5: 'Escuridão' }
+  },
+  'Elfo': {
+    'Alto Elfo': { 3: 'Detectar Magia', 5: 'Passo Nebuloso' },
+    'Drow': { 3: 'Fogo das Fadas', 5: 'Escuridão' },
+    'Elfo Silvestre': { 3: 'Passos Largos', 5: 'Passo Sem Rastro' }
+  }
+};
+
+// Nome do traço-pai exibido no level-up para cada espécie da tabela acima — mesmo
+// mapeamento de TITULO_TRACO_PAI em site/js/pages/sheet.js:11260-11264.
+const TITULO_LEGADO_ESPECIE = {
+  'Tiferino': 'Legado Ínfero',
+  'Elfo': 'Linhagem Élfica'
+};
+
 /**
  * Obtém características de espécie que desbloqueiam em níveis específicos
  */
-export async function obterCaracteristicasEspecieNivel(especie, nivel) {
+export async function obterCaracteristicasEspecieNivel(especie, nivel, tracosEscolhidos = []) {
   const especiesData = await getEspecies();
   const especieData = especiesData?.especies?.find(e => e.nome === especie);
-  
+
   if (!especieData) return [];
-  
+
   const caracteristicas = [];
-  
+
   // Golias: Forma Grande no nível 5
   if (especie === 'Golias' && nivel === 5) {
     caracteristicas.push({
@@ -666,7 +690,7 @@ export async function obterCaracteristicasEspecieNivel(especie, nivel) {
       descricao: 'A partir do nível 5, você pode alterar seu tamanho para Grande como uma Ação Bônus.'
     });
   }
-  
+
   // Aasimar: Revelação Celestial no nível 3
   if (especie === 'Aasimar' && nivel === 3) {
     caracteristicas.push({
@@ -674,9 +698,23 @@ export async function obterCaracteristicasEspecieNivel(especie, nivel) {
       descricao: 'No nível 3, você pode se transformar como uma Ação Bônus.'
     });
   }
-  
+
+  // Tiferino (Legado Ínfero) / Elfo (Linhagem Élfica): magia automática nos níveis 3 e 5
+  const legadoEscolhido = (tracosEscolhidos || [])[0];
+  const nomeMagiaLegado = MAGIAS_LEGADO_ESPECIE[especie]?.[legadoEscolhido]?.[nivel];
+  if (nomeMagiaLegado) {
+    const indice = await getIndiceMagias();
+    const magiaIdx = (indice?.magias || []).find(m => m.nome === nomeMagiaLegado);
+    const tituloPai = TITULO_LEGADO_ESPECIE[especie] || especie;
+    caracteristicas.push({
+      nome: `${tituloPai} — ${legadoEscolhido}`,
+      descricao: `Você aprende automaticamente a magia *${nomeMagiaLegado}*, que fica sempre preparada. Pode conjurá-la uma vez sem gastar um espaço de magia; esse uso gratuito é restaurado ao completar um Descanso Longo.`,
+      magiaConcedida: { nome: nomeMagiaLegado, circulo: magiaIdx?.circulo ?? (nivel === 3 ? 1 : 2) }
+    });
+  }
+
   // Adicione outras espécies conforme necessário
-  
+
   return caracteristicas;
 }
 
@@ -810,7 +848,7 @@ export async function atualizarEspacosMagia(personagem, classeData) {
  * que a concede automaticamente existir), promove a entrada existente em vez de
  * ignorá-la - senão ela fica presa contando no limite normal de magias preparadas.
  */
-function _concederMagiaAutomatica(lista, magia, origem) {
+export function _concederMagiaAutomatica(lista, magia, origem) {
   const existente = lista.find(m => m.nome === magia.nome);
   if (existente) {
     existente.origem = origem;
@@ -870,7 +908,7 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   
   // Obter características do novo nível
   const caracteristicas = await obterCaracteristicasNivel(personagem.classe, novoNivel);
-  const caracteristicasEspecie = await obterCaracteristicasEspecieNivel(personagem.especie, novoNivel);
+  const caracteristicasEspecie = await obterCaracteristicasEspecieNivel(personagem.especie, novoNivel, personagem.tracos_escolhidos);
   
   // Verificar se precisa escolher subclasse
   const precisaSubclasse = exigeSubclasse(personagem.classe, novoNivel) && !personagem.subclasse;
@@ -893,8 +931,11 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   let qtdMagiasSubclasseArcana = 0;
   if (escolaSubclasseArcana) {
     const ganhouNovoCirculoNivel = ganhouNovoCirculoDeEspacos(classeData.tabela_caracteristicas, nivelAnterior, novoNivel);
-    if (novoNivel === 3) qtdMagiasSubclasseArcana += 2; // bônus inicial de entrada na subclasse
-    if (ganhouNovoCirculoNivel) qtdMagiasSubclasseArcana += 1; // bônus recorrente por novo círculo (inclui o próprio nível 3)
+    if (novoNivel === 3) {
+      qtdMagiasSubclasseArcana += 2; // bônus inicial de entrada na subclasse (já cobre o 2º círculo do próprio nível 3)
+    } else if (ganhouNovoCirculoNivel) {
+      qtdMagiasSubclasseArcana += 1; // bônus recorrente, apenas nos níveis seguintes que desbloqueiam novo círculo
+    }
   }
   const exigeMagiasSubclasseArcana = qtdMagiasSubclasseArcana > 0;
   let magiasSubclasseArcanaSelecionadas = [];
@@ -1222,7 +1263,21 @@ export async function subirDeNivel(personagem, opcoes = {}) {
       }
     }
   }
-  
+
+  // Magia de Legado Ínfero (Tiferino) / Linhagem Élfica (Elfo), níveis 3 e 5:
+  // sempre preparada, uso gratuito 1x/Descanso Longo
+  const magiaLegadoEspecie = caracteristicasEspecie.find(c => c.magiaConcedida)?.magiaConcedida || null;
+  if (magiaLegadoEspecie) {
+    if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
+    // Origem própria 'especie_legado' (não 'sempre'): a origem 'sempre' é
+    // higienizada em migrarMagiasSemprePreparadas (site/js/pages/sheet.js), que
+    // remove qualquer magia 'sempre' ausente de magiasSempreCache — cache que só
+    // conhece magias sempre-preparadas de classe/subclasse, nunca as de legado de
+    // espécie. Usar uma origem distinta evita que a magia de legado seja apagada
+    // ao reabrir a ficha.
+    _concederMagiaAutomatica(personagem.magias_preparadas, magiaLegadoEspecie, 'especie_legado');
+  }
+
   // Aplicar aumentos de atributo
   if (ganhaAumentoAtributo && opcoes.aumentos_atributo) {
     for (const [atributo, valor] of Object.entries(opcoes.aumentos_atributo)) {
@@ -1596,6 +1651,7 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     caracteristicas_subclasse: caracteristicasSubclasse,
     magias_dominio_adicionadas: magiasDominio,
     magias_sempre_adicionadas: magiasSempre,
+    magia_legado_especie_adicionada: magiaLegadoEspecie,
     subclasse_escolhida: precisaSubclasse ? opcoes.subclasse : null,
     aumento_atributo: ganhaAumentoAtributo,
     aumentos_aplicados: opcoes.aumentos_atributo || null,

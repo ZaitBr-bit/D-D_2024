@@ -46,7 +46,7 @@ const ESPECIES_TRACOS_ESCOLHA = {
     opcoes: [
       { nome: 'Alto Elfo', descricao: 'Truque Prestidigitação Arcana + Detectar Magia (nv.3) + Passo Nebuloso (nv.5)' },
       { nome: 'Drow', descricao: 'Visão no Escuro 36m + Luzes Dançantes + Fogo das Fadas (nv.3) + Escuridão (nv.5)' },
-      { nome: 'Elfo Silvestre', descricao: 'Deslocamento 10,5m + Arte Druídica + Passos Largos (nv.3) + Passos Sem Rastro (nv.5)' }
+      { nome: 'Elfo Silvestre', descricao: 'Deslocamento 10,5m + Arte Druídica + Passos Largos (nv.3) + Passo Sem Rastro (nv.5)' }
     ]
   },
   'Gnomo': {
@@ -1773,6 +1773,17 @@ function abrirPopupEspecie(nome) {
     }
     personagem.especie = nome;
     personagem.tracos_escolhidos = [...selecionadosTemp];
+    // Purga truques escolhidos manualmente na etapa de Magias que passam a ser
+    // concedidos de graça pela nova espécie/legado (ex.: escolher "Rajada de Veneno"
+    // como truque normal, voltar e trocar o legado para Abissal, que já concede o
+    // mesmo truque) — evita desperdiçar o pick que a concessão automática deveria
+    // liberar (Minor 4 da revisão final).
+    const novosTruquesEspecie = obterTruquesEspecie(personagem.especie, personagem.tracos_escolhidos);
+    if (novosTruquesEspecie.length > 0 && Array.isArray(personagem.magias_conhecidas)) {
+      personagem.magias_conhecidas = personagem.magias_conhecidas.filter(m =>
+        !(m.circulo === 0 && m.origem !== 'especie' && novosTruquesEspecie.includes(m.nome))
+      );
+    }
     // Sincronizar personagem.talentos com o estado atual de talento_versatil
     // (cobre tanto a seleção quanto a limpeza ao trocar de espécie)
     _reconstruirTalentosBase();
@@ -3758,6 +3769,13 @@ async function renderStepMagias(el) {
       });
     }
 
+    // Truques já concedidos gratuitamente pela espécie/traço (ex.: Rajada de Veneno do
+    // Tiferino Abissal) — não devem poder ser "escolhidos" de novo como truque de classe.
+    const jaConcedidoPorEspecie = new Set();
+    if (isTruque) {
+      obterTruquesEspecie(personagem.especie, personagem.tracos_escolhidos).forEach(n => jaConcedidoPorEspecie.add(n));
+    }
+
     listaEl.innerHTML = `
       <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">
         ${isTruque ? `Truques selecionados: ${selecionadas.length}/${maxSel}` : magoNivel1 ? `Grimório: ${totalSel}/${maxSel}. Depois escolha 4 preparadas abaixo.` : `${labelMagias}: ${totalSel}/${maxSel}`}
@@ -3769,10 +3787,12 @@ async function renderStepMagias(el) {
             const nome = m.nome || m;
             const sel = selecionadas.includes(nome);
             const bloqueadoPorIM = !sel && jaEscolhidoPorIM.has(nome);
+            const bloqueadoPorEspecie = !sel && jaConcedidoPorEspecie.has(nome);
+            const bloqueado = bloqueadoPorIM || bloqueadoPorEspecie;
             return `
-              <div class="magia-card ${sel ? 'selecionada' : ''} ${bloqueadoPorIM ? 'magia-card-bloqueada' : ''}" data-magia-nome="${nome}" data-magia-circ="${circ}" ${bloqueadoPorIM ? 'style="opacity:0.4"' : ''}>
+              <div class="magia-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}" data-magia-nome="${nome}" data-magia-circ="${circ}" ${bloqueado ? 'style="opacity:0.4"' : ''}>
                 <span class="magia-card-check" data-creator-check="${nome}"></span>
-                <div class="magia-card-nome" data-creator-info="${nome}" data-creator-info-circ="${circ}">${nome}${bloqueadoPorIM ? ' (já conhecido)' : ''}</div>
+                <div class="magia-card-nome" data-creator-info="${nome}" data-creator-info-circ="${circ}">${nome}${bloqueadoPorIM ? ' (já conhecido)' : ''}${bloqueadoPorEspecie ? ' (já concedido pela espécie)' : ''}</div>
                 <div class="magia-card-meta">
                   <span>${m.escola || ''}</span>
                   ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
@@ -3792,6 +3812,10 @@ async function renderStepMagias(el) {
         const jaSelecionado = selecionadas.includes(nome);
         if (!jaSelecionado && jaEscolhidoPorIM.has(nome)) {
           toast(`"${nome}" já é conhecido por Iniciado em Magia — escolha um diferente`, 'error');
+          return;
+        }
+        if (!jaSelecionado && jaConcedidoPorEspecie.has(nome)) {
+          toast(`"${nome}" já é concedido gratuitamente pela sua espécie — escolha um diferente`, 'error');
           return;
         }
         toggleMagia(nome, circ, isTruque, numTruques, numPreparadas, magoNivel1, limiteGrimorio);
