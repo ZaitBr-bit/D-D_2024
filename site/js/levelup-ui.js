@@ -331,6 +331,8 @@ function salvarStateDoDOM(ctx, state, step) {
       state.trocarDe = document.getElementById('levelup-trocar-de')?.value || '';
       state.trocarPara = document.getElementById('levelup-trocar-para')?.value || '';
       state.trocarParaCirculo = parseInt(document.getElementById('levelup-trocar-para-circ')?.value) || 0;
+      state.truqueTrocarDe = document.getElementById('levelup-truque-trocar-de')?.value || '';
+      state.truqueTrocarPara = document.getElementById('levelup-truque-trocar-para')?.value || '';
       break;
     }
     case 'manobras_guerreiro': {
@@ -1061,11 +1063,27 @@ function bindEventosMagias(ctx, state) {
   selTrocarDe?.addEventListener('change', () => {
     const container = document.getElementById('levelup-trocar-para-container');
     if (container) container.style.display = selTrocarDe.value ? 'block' : 'none';
-    montarBuscaTroca(ctx, selTrocarDe.value, listaMagiasClasse, maxCirculoNovo);
+    montarBuscaTroca(ctx, state, selTrocarDe.value, listaMagiasClasse, maxCirculoNovo);
   });
+  // Se o step foi reaberto com uma troca já em andamento, popular a busca imediatamente
+  // (sem depender do usuário re-tocar no select) - ver Minor 3 da revisão final.
+  if (selTrocarDe?.value) {
+    montarBuscaTroca(ctx, state, selTrocarDe.value, listaMagiasClasse, maxCirculoNovo);
+  }
+
+  // Troca de truque
+  const selTruqueTrocarDe = document.getElementById('levelup-truque-trocar-de');
+  selTruqueTrocarDe?.addEventListener('change', () => {
+    const container = document.getElementById('levelup-truque-trocar-para-container');
+    if (container) container.style.display = selTruqueTrocarDe.value ? 'block' : 'none';
+    montarBuscaTrocaTruque(ctx, state, selTruqueTrocarDe.value, listaMagiasClasse);
+  });
+  if (selTruqueTrocarDe?.value) {
+    montarBuscaTrocaTruque(ctx, state, selTruqueTrocarDe.value, listaMagiasClasse);
+  }
 }
 
-function montarBuscaTroca(ctx, nomeTroca, listaMagiasClasse, maxCirculoNovo) {
+function montarBuscaTroca(ctx, state, nomeTroca, listaMagiasClasse, maxCirculoNovo) {
   if (!nomeTroca) return;
 
   const buscaInput = document.getElementById('busca-troca-levelup');
@@ -1075,7 +1093,8 @@ function montarBuscaTroca(ctx, nomeTroca, listaMagiasClasse, maxCirculoNovo) {
   const disponiveis = listaMagiasClasse.filter(m =>
     m.circulo > 0 && m.circulo <= maxCirculoNovo &&
     m.nome !== nomeTroca &&
-    !(ctx.char.magias_preparadas || []).some(p => p.nome === m.nome)
+    !(ctx.char.magias_preparadas || []).some(p => p.nome === m.nome) &&
+    !(state.magiasSelecionadas || []).includes(m.nome)
   ).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
 
   function renderResultados() {
@@ -1099,6 +1118,47 @@ function montarBuscaTroca(ctx, nomeTroca, listaMagiasClasse, maxCirculoNovo) {
         document.getElementById('levelup-trocar-para').value = nome;
         document.getElementById('levelup-trocar-para-circ').value = circ;
         const nomeEl = document.getElementById('levelup-trocar-para-nome');
+        if (nomeEl) nomeEl.textContent = nome;
+      });
+    });
+  }
+
+  buscaInput.addEventListener('input', renderResultados);
+  renderResultados();
+}
+
+function montarBuscaTrocaTruque(ctx, state, nomeTroca, listaMagiasClasse) {
+  if (!nomeTroca) return;
+
+  const buscaInput = document.getElementById('busca-troca-truque-levelup');
+  const resultadoEl = document.getElementById('resultado-troca-truque-levelup');
+  if (!buscaInput || !resultadoEl) return;
+
+  const disponiveis = listaMagiasClasse.filter(m =>
+    m.circulo === 0 &&
+    m.nome !== nomeTroca &&
+    !(ctx.char.magias_conhecidas || []).some(p => p.nome === m.nome) &&
+    !(state.truquesSelecionados || []).includes(m.nome)
+  ).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+
+  function renderResultados() {
+    const termo = semAcento(buscaInput.value || '');
+    const filtradas = termo.length >= 2
+      ? disponiveis.filter(m => semAcento(m.nome).includes(termo))
+      : disponiveis.slice(0, 20);
+
+    resultadoEl.innerHTML = filtradas.map(m => `
+      <div class="troca-magia-item" data-troca-truque-nome="${m.nome}"
+           style="padding:6px 8px;cursor:pointer;border-bottom:1px solid var(--border-light);font-size:0.85rem">
+        <span>${m.nome}</span>
+      </div>
+    `).join('');
+
+    resultadoEl.querySelectorAll('[data-troca-truque-nome]').forEach(el => {
+      el.addEventListener('click', () => {
+        const nome = el.dataset.trocaTruqueNome;
+        document.getElementById('levelup-truque-trocar-para').value = nome;
+        const nomeEl = document.getElementById('levelup-truque-trocar-para-nome');
         if (nomeEl) nomeEl.textContent = nome;
       });
     });
@@ -1217,6 +1277,8 @@ export async function confirmarLevelUp(ctx, state, caches) {
   let grimorioAdicionado = [];
   let magiaTrocadaDe = null;
   let magiaTrocadaPara = null;
+  let truqueTrocadoDe = null;
+  let truqueTrocadoPara = null;
   const listaMagiasClasse = ctx._listaMagiasClasse || [];
 
   if (ctx.ehConjurador) {
@@ -1250,6 +1312,17 @@ export async function confirmarLevelUp(ctx, state, caches) {
         char.magias_preparadas.push({ nome: state.trocarPara, circulo: state.trocarParaCirculo });
       }
     }
+
+    // Troca de truque
+    if (state.truqueTrocarDe && state.truqueTrocarPara) {
+      const idx = char.magias_conhecidas?.findIndex(m => m.nome === state.truqueTrocarDe);
+      if (idx !== undefined && idx !== -1) {
+        truqueTrocadoDe = state.truqueTrocarDe;
+        truqueTrocadoPara = state.truqueTrocarPara;
+        char.magias_conhecidas.splice(idx, 1);
+        char.magias_conhecidas.push({ nome: state.truqueTrocarPara, circulo: 0 });
+      }
+    }
   }
 
   // Executar level up
@@ -1262,7 +1335,7 @@ export async function confirmarLevelUp(ctx, state, caches) {
     window.fecharModalTodos?.();
 
     // Resumo
-    const resumo = montarResumoFinal(resultado, char, truquesAdicionados, magiasAdicionadas, grimorioAdicionado, magiaTrocadaDe, magiaTrocadaPara, subclasseMagiasAdicionadas);
+    const resumo = montarResumoFinal(resultado, char, truquesAdicionados, magiasAdicionadas, grimorioAdicionado, magiaTrocadaDe, magiaTrocadaPara, subclasseMagiasAdicionadas, truqueTrocadoDe, truqueTrocadoPara);
     abrirModal('Subida de Nível Concluída!', resumo, '<button class="btn btn-primary" onclick="fecharModal()">OK</button>');
     _renderFichaFn?.();
   } else {
@@ -1271,7 +1344,7 @@ export async function confirmarLevelUp(ctx, state, caches) {
   }
 }
 
-function montarResumoFinal(resultado, char, truquesAdicionados, magiasAdicionadas, grimorioAdicionado, magiaTrocadaDe, magiaTrocadaPara, subclasseMagiasAdicionadas = []) {
+function montarResumoFinal(resultado, char, truquesAdicionados, magiasAdicionadas, grimorioAdicionado, magiaTrocadaDe, magiaTrocadaPara, subclasseMagiasAdicionadas = [], truqueTrocadoDe = null, truqueTrocadoPara = null) {
   const attrNomes = { forca: 'Força', destreza: 'Destreza', constituicao: 'Constituição', inteligencia: 'Inteligência', sabedoria: 'Sabedoria', carisma: 'Carisma' };
 
   // Icones SVG inline
@@ -1310,6 +1383,7 @@ function montarResumoFinal(resultado, char, truquesAdicionados, magiasAdicionada
     itens.push(`${label}: +${subclasseMagiasAdicionadas.join(', ')}`);
   }
   if (magiaTrocadaDe) itens.push(`Troca: ${magiaTrocadaDe} ${iconArrow} ${magiaTrocadaPara}`);
+  if (truqueTrocadoDe) itens.push(`Troca de truque: ${truqueTrocadoDe} ${iconArrow} ${truqueTrocadoPara}`);
 
   // HTML Final
   return `

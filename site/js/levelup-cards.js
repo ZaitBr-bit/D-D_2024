@@ -436,7 +436,7 @@ export function renderCardMagias(ctx, state) {
   // Troca de magia (classes conhecidas)
   if (tipoConj === 'conhecidas') {
     const magiasAtuais = (char.magias_preparadas || []).filter(m => {
-      const origensEspeciais = ['dominio', 'sempre', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
+      const origensEspeciais = ['dominio', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
       return m.circulo > 0 && !origensEspeciais.includes(m?.origem);
     });
     if (magiasAtuais.length > 0) {
@@ -464,6 +464,36 @@ export function renderCardMagias(ctx, state) {
         </div>
       `;
     }
+  }
+
+  // Troca de truque (qualquer classe conjuradora com truques de classe conhecidos)
+  const truquesAtuais = (char.magias_conhecidas || []).filter(m => {
+    const origensEspeciais = ['especie', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
+    return m.circulo === 0 && !origensEspeciais.includes(m?.origem);
+  });
+  if (truquesAtuais.length > 0) {
+    html += `
+      <div class="levelup-card">
+        <div class="levelup-card-header">Trocar Truque (Opcional)</div>
+        <div class="levelup-card-body">
+          <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
+            Troque 1 truque conhecido por outro da lista de ${char.classe}.
+          </div>
+          <select class="form-input" id="levelup-truque-trocar-de" style="margin-bottom:8px">
+            <option value="">Não trocar</option>
+            ${truquesAtuais.map(m => `<option value="${m.nome}" ${state.truqueTrocarDe === m.nome ? 'selected' : ''}>${m.nome}</option>`).join('')}
+          </select>
+          <div id="levelup-truque-trocar-para-container" style="display:${state.truqueTrocarDe ? 'block' : 'none'}">
+            <div class="search-box"><input type="text" id="busca-troca-truque-levelup" placeholder="Buscar substituto..." class="form-input"></div>
+            <div id="resultado-troca-truque-levelup" style="max-height:25vh;overflow-y:auto;margin-bottom:8px"></div>
+            <div style="font-size:0.8rem;color:var(--text-muted)">
+              Trocar por: <span id="levelup-truque-trocar-para-nome" style="font-weight:700;color:var(--accent)">${state.truqueTrocarPara || '—'}</span>
+              <input type="hidden" id="levelup-truque-trocar-para" value="${state.truqueTrocarPara}">
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
   }
 
   // Grimório do Mago
