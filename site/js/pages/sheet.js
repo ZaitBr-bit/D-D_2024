@@ -5,7 +5,7 @@ import { CLASSES_INFO, PERICIAS, ATRIBUTOS_NOMES, ATRIBUTOS_KEYS, ATRIBUTO_NOME_
 import { getPersonagem, salvarPersonagem, removerPersonagem, salvarTaxasMoeda, resetarTaxasMoeda, carregarComprarAtivoPadrao, salvarComprarAtivoPadrao } from '../store.js';
 import { DENOMINACOES, NOMES_MOEDA, ICONE_MOEDA, VALOR_EM_COBRE, formatarCarteira, adicionarMoeda, podePagar, retirarValor, removerQuantidadeMoeda, proximaDenominacaoMaior, converterParaMaior, taxasSaoPadrao, totalEmCobre, parseCusto, podePagarCusto, pagarCusto } from '../moedas.js';
 import { getClasse, getMagiasClasse, getMagiasPorCirculo, getIndiceMagias, getArmas, getArmaduras, getEquipamentoAventura, getTalentos, getEspecies } from '../db.js';
-import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagia, calcPercepcaoPassiva, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcBonusPericia, calcPVTotal, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, gerarId, detectarRecarga, ehHabilidadeAtiva, getDeslocamento, getTamanho, escHtml, processarImagemArquivo, parsePeso, fmtPeso, getCapacidadeCarga, getMultiplicadorCarga, getPesoTotalInventario, normalizarGrimorioMago, magiaMagoEstaNoGrimorio } from '../utils.js';
+import { calcMod, fmtMod, bonusProficiencia, calcCA, calcCDMagia, calcAtaqueMagia, calcPercepcaoPassiva, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcBonusPericia, calcPVTotal, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, toast, abrirModal, mdParaHtml, semAcento, gerarId, detectarRecarga, ehHabilidadeAtiva, getDeslocamento, getTamanho, escHtml, processarImagemArquivo, parsePeso, fmtPeso, getCapacidadeCarga, getMultiplicadorCarga, getPesoTotalInventario, normalizarGrimorioMago, magiaMagoEstaNoGrimorio, nomesMagiaCirculo1Conhecidas } from '../utils.js';
 import { podeSubirDeNivel, subirDeNivel, XP_POR_NIVEL, adicionarXP, obterTodasMagiasDominio, obterTodasMagiasSemprePreparadas, exigeEspecializacaoBardo, exigeEspecializacaoGuardiao, exigeEstiloLuta, exigeExploradorHabil, exigeAcademico, exigeDadivaEpica, obterTalentosElegiveis, talentoPermitidoNaRecuperacaoDadiva, registrarDadivaEpicaLegada, obterAtributosASITalento, getLimiteASITalento, aplicarASITalento } from '../levelup.js';
 import { abrirLevelUpCards, renderEscolhasTalento, bindEscolhasTalento } from '../levelup-ui.js';
 import { getSyncStatus, onSyncStatusChange } from '../sync.js';
@@ -176,7 +176,8 @@ function renderDetalhesMagiaPersonalizada(magia) {
   `;
 }
 
-function renderLinhaMagiaPersonalizada(magia, indice) {
+function renderLinhaMagiaPersonalizada(magia, indice, opts = {}) {
+  const { naoPreparada = false } = opts;
   const tags = [];
   if (magia.escola) tags.push(`<span class="magia-tag tag-escola">${escHtml(magia.escola)}</span>`);
   if (magia.tempo_conjuracao) {
@@ -222,7 +223,12 @@ function renderLinhaMagiaPersonalizada(magia, indice) {
   );
   const controlesConjuracao = magia.circulo === 0
     ? `<button class="btn btn-sm btn-cantrip" data-lancar-magia-custom="${indice}">Lançar</button>`
-    : `
+    : naoPreparada
+      ? `
+        <span style="font-size:0.65rem;color:var(--text-muted);font-style:italic">Não preparada</span>
+        ${magia.ritual ? `<button class="btn btn-sm btn-secondary" data-conjurar-ritual-custom="${indice}" title="Conjurar como Ritual (sem gastar espaço)">Ritual</button>` : ''}
+      `
+      : `
       ${temUpcast ? `
         <select class="form-input" data-conj-select-custom="${indice}" style="width:auto;padding:2px 4px;font-size:0.75rem">
           ${circulosDisponiveis.map(circulo => `<option value="${circulo}"${circulo === magia.circulo ? ' selected' : ''}>${circulo}º</option>`).join('')}
@@ -8456,10 +8462,7 @@ async function abrirModalIniciadoEmMagiaFicha(restantes = 1, aoSalvar = null) {
 
     // Truques/magias já conhecidos por outra fonte — impede escolher duplicata sem ganho
     const jaTemTruqueIM = new Set((char.magias_conhecidas || []).filter(m => m.circulo === 0).map(m => m.nome));
-    const jaTemMagiaIM = new Set([
-      ...(char.magias_preparadas || []).map(m => m.nome),
-      ...(char.magias_conhecidas || []).filter(m => m.circulo === 1).map(m => m.nome)
-    ]);
+    const jaTemMagiaIM = nomesMagiaCirculo1Conhecidas(char);
 
     area.innerHTML = `
       <div style="font-weight:600;font-size:0.85rem">Truques (<span id="im-ficha-truques-count">${estado.truques.length}</span>/2)</div>
@@ -8477,8 +8480,8 @@ async function abrirModalIniciadoEmMagiaFicha(restantes = 1, aoSalvar = null) {
       <select class="form-input" id="im-ficha-magia">
         <option value="">Selecione...</option>
         ${c1Disp.map(m => {
-          const bloqueado = jaTemMagiaIM.has(m.nome) && estado.magia !== m.nome;
-          return `<option value="${m.nome}" ${estado.magia === m.nome ? 'selected' : ''} ${bloqueado ? 'disabled' : ''}>${m.nome}${bloqueado ? ' (já conhecida)' : ''}</option>`;
+          const jaConhecida = jaTemMagiaIM.has(m.nome) && estado.magia !== m.nome;
+          return `<option value="${m.nome}" ${estado.magia === m.nome ? 'selected' : ''}>${m.nome}${jaConhecida ? ' (já conhecida)' : ''}</option>`;
         }).join('')}
       </select>
     `;
@@ -8565,10 +8568,7 @@ async function abrirModalEditarIniciadoEmMagia(ordinal) {
 
     // Truques/magias já conhecidos por OUTRA fonte (não pela seleção atual desta instância)
     const jaTemTruqueIM = new Set((char.magias_conhecidas || []).filter(m => m.circulo === 0).map(m => m.nome));
-    const jaTemMagiaIM = new Set([
-      ...(char.magias_preparadas || []).map(m => m.nome),
-      ...(char.magias_conhecidas || []).filter(m => m.circulo === 1).map(m => m.nome)
-    ]);
+    const jaTemMagiaIM = nomesMagiaCirculo1Conhecidas(char);
 
     area.innerHTML = `
       <div style="font-weight:600;font-size:0.85rem">Truques (<span id="im-edit-truques-count">${estado.truques.length}</span>/2)</div>
@@ -8586,8 +8586,8 @@ async function abrirModalEditarIniciadoEmMagia(ordinal) {
       <select class="form-input" id="im-edit-magia">
         <option value="">Selecione...</option>
         ${c1Disp.map(m => {
-          const bloqueado = jaTemMagiaIM.has(m.nome) && estado.magia !== m.nome;
-          return `<option value="${m.nome}" ${estado.magia === m.nome ? 'selected' : ''} ${bloqueado ? 'disabled' : ''}>${m.nome}${bloqueado ? ' (já conhecida)' : ''}</option>`;
+          const jaConhecida = jaTemMagiaIM.has(m.nome) && estado.magia !== m.nome;
+          return `<option value="${m.nome}" ${estado.magia === m.nome ? 'selected' : ''}>${m.nome}${jaConhecida ? ' (já conhecida)' : ''}</option>`;
         }).join('')}
       </select>
     `;
@@ -8636,7 +8636,11 @@ async function abrirModalEditarIniciadoEmMagia(ordinal) {
       if (oldMagia && !magiasOutras.has(oldMagia)) {
         char.magias_preparadas = char.magias_preparadas.filter(m => !(m.nome === oldMagia && m.origem === 'iniciado_em_magia'));
       }
-      if (!char.magias_preparadas.find(m => m.nome === estado.magia)) {
+      const existenteIM = char.magias_preparadas.find(m => m.nome === estado.magia);
+      if (existenteIM) {
+        existenteIM.origem = 'iniciado_em_magia';
+        existenteIM.gratis_usado = false;
+      } else {
         char.magias_preparadas.push({ nome: estado.magia, circulo: 1, origem: 'iniciado_em_magia', gratis_usado: false });
       }
     }
@@ -11953,11 +11957,10 @@ function renderSecaoMagias() {
   preparadas.forEach(m => {
     const circ = m.circulo || 1;
     if (!preparadasPorCirculo[circ]) preparadasPorCirculo[circ] = [];
-    preparadasPorCirculo[circ].push(m);
-  });
-  magiasPersonalizadas.filter(m => m.circulo > 0).forEach(m => {
-    if (!preparadasPorCirculo[m.circulo]) preparadasPorCirculo[m.circulo] = [];
-    preparadasPorCirculo[m.circulo].push(m);
+    const item = m.personalizada
+      ? (magiasPersonalizadas.find(mp => mp.nome === m.nome && mp.circulo === circ) || m)
+      : m;
+    preparadasPorCirculo[circ].push(item);
   });
 
   // Verificar se é Mago (para grimório)
@@ -12124,32 +12127,6 @@ function renderSecaoMagias() {
         </details>`;
       }).join('')}
 
-      <!-- Magias customizadas -->
-      ${false ? `
-        <details style="margin-bottom:8px">
-          <summary style="font-weight:700;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--border-light)">
-            Magias Customizadas (${char.magias_customizadas.length})
-          </summary>
-          <div style="padding-top:4px">
-            ${char.magias_customizadas.map((m, i) => `
-              <div class="magia-item">
-                <div style="display:flex;justify-content:space-between;align-items:center">
-                  <div>
-                    <div class="magia-nome">${m.nome}</div>
-                    <div class="magia-meta">
-                      <span>${m.circulo === 0 ? 'Truque' : m.circulo + 'º Círculo'}</span>
-                      <span>${m.escola || ''}</span>
-                    </div>
-                  </div>
-                  <button class="btn btn-sm btn-danger btn-icon no-print" data-remover-magia-custom="${i}">&times;</button>
-                </div>
-                <div class="magia-desc" style="display:block">${mdParaHtml(m.descricao || '')}</div>
-              </div>
-            `).join('')}
-          </div>
-        </details>
-      ` : ''}
-
       <!-- Truques -->
       ${todosTruques.length > 0 ? `
         <details id="details-truques"${_truquesColapsados ? '' : ' open'} style="margin-bottom:8px">
@@ -12282,6 +12259,21 @@ function renderSecaoMagias() {
           Grimório vazio. <button class="btn btn-sm btn-accent" id="btn-add-grimorio">+ Copiar magia</button>
         </div>
       ` : ''}
+
+      <!-- Magias Customizadas (círculo > 0) não preparadas: garante local visível para editar/remover -->
+      ${(() => {
+        const naoPreparadas = magiasPersonalizadas.filter(m => m.circulo > 0 && !preparadas.some(p => p.nome === m.nome));
+        return naoPreparadas.length > 0 ? `
+        <details data-details-id="magias-customizadas-circulo" style="margin-bottom:8px">
+          <summary style="font-weight:700;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--border-light);color:var(--accent)">
+            Magias Customizadas (${naoPreparadas.length})
+          </summary>
+          <div style="padding-top:4px">
+            ${naoPreparadas.slice().sort((a, b) => a.circulo - b.circulo || a.nome.localeCompare(b.nome, 'pt-BR')).map(m => renderLinhaMagiaPersonalizada(m, m.indicePersonalizada, { naoPreparada: true })).join('')}
+          </div>
+        </details>
+      ` : '';
+      })()}
     </div>
   `;
 }
@@ -13563,6 +13555,11 @@ function setupEventosEspacosMagia() {
           return;
         }
         const nome = String(atual.nome || 'Magia personalizada');
+        if (char.classe === 'Mago' && Array.isArray(char.grimorio)) {
+          const idxGrimorio = char.grimorio.findIndex(m => m?.nome === atual.nome);
+          if (idxGrimorio >= 0) char.grimorio.splice(idxGrimorio, 1);
+        }
+        char.magias_preparadas = (char.magias_preparadas || []).filter(m => !(m.personalizada && m.nome === atual.nome));
         char.magias_customizadas.splice(idx, 1);
         fecharModal();
         salvar();
@@ -13589,7 +13586,8 @@ function setupEventosEspacosMagia() {
         return;
       }
 
-      char.magias_preparadas.push({ nome, circulo: circ });
+      const ehCustomizadaCirculo = (char.magias_customizadas || []).some(m => m?.nome === nome && Number(m.circulo) > 0);
+      char.magias_preparadas.push({ nome, circulo: circ, ...(ehCustomizadaCirculo ? { personalizada: true } : {}) });
       salvar();
       renderFichaCompleta();
       toast(`${nome} preparada a partir do grimório (${preparadasNormais.length + 1}/${maxPrep})`, 'success');
@@ -14195,8 +14193,31 @@ async function mostrarFormMagiaCustom(indiceEdicao = null) {
       dano: document.getElementById('mc-dano')?.value || '',
       ritual: Boolean(document.getElementById('mc-ritual')?.checked)
     };
+    const nomeAnterior = magiaExistente?.nome;
+    const circuloAnterior = magiaExistente ? (Number(magiaExistente.circulo) || 0) : null;
     if (magiaExistente) char.magias_customizadas[indiceEdicao] = magiaSalva;
     else char.magias_customizadas.push(magiaSalva);
+    const identidadeMudou = Boolean(magiaExistente) && (nomeAnterior !== magiaSalva.nome || circuloAnterior !== magiaSalva.circulo);
+    if (char.classe === 'Mago' && (!magiaExistente || identidadeMudou)) {
+      if (nomeAnterior && Array.isArray(char.grimorio)) {
+        const idxAntigo = char.grimorio.findIndex(m => m?.nome === nomeAnterior);
+        if (idxAntigo >= 0) char.grimorio.splice(idxAntigo, 1);
+      }
+      if (magiaSalva.circulo > 0 && !magiaMagoEstaNoGrimorio(char, magiaSalva.nome)) {
+        if (!char.grimorio) char.grimorio = [];
+        char.grimorio.push({ nome: magiaSalva.nome, circulo: magiaSalva.circulo });
+      }
+    }
+    if (magiaExistente && nomeAnterior) {
+      const idxPrep = (char.magias_preparadas || []).findIndex(m => m?.personalizada && m.nome === nomeAnterior);
+      if (idxPrep >= 0) {
+        if (magiaSalva.circulo > 0) {
+          char.magias_preparadas[idxPrep] = { ...char.magias_preparadas[idxPrep], nome: magiaSalva.nome, circulo: magiaSalva.circulo };
+        } else {
+          char.magias_preparadas.splice(idxPrep, 1);
+        }
+      }
+    }
     salvar();
     window.fecharModal();
     renderFichaCompleta();
@@ -14322,11 +14343,17 @@ async function mostrarTrocaMagias(callbackPosTroca = null) {
   const maxCirculo = Math.max(...Object.keys(espacosNivel).map(Number), 0);
 
   // Buscar lista de magias disponíveis (classe ou grimório)
+  const magiasCustomizadasCirculo = (char.magias_customizadas || [])
+    .filter(m => Number(m.circulo) > 0)
+    .map(m => ({ nome: m.nome, circulo: Number(m.circulo), escola: m.escola, personalizada: true }));
+  const nomesPersonalizadasSet = new Set(magiasCustomizadasCirculo.map(m => m.nome));
+
   let magiasDisponiveis = [];
   if (ehMago) {
     magiasDisponiveis = (char.grimorio || []).map(m => ({ ...m }));
   } else {
-    magiasDisponiveis = (await obterMagiasDisponiveisClasseAtual()).filter(m => m.circulo > 0);
+    const doCatalogo = (await obterMagiasDisponiveisClasseAtual()).filter(m => m.circulo > 0);
+    magiasDisponiveis = [...doCatalogo, ...magiasCustomizadasCirculo.filter(m => !doCatalogo.some(d => d.nome === m.nome && Number(d.circulo) === m.circulo))];
   }
 
   // Identificar magias de domínio (não removíveis)
@@ -14480,6 +14507,19 @@ async function mostrarTrocaMagias(callbackPosTroca = null) {
         e.stopPropagation();
         const nome = el.dataset.trocaInfo;
         const circ = parseInt(el.dataset.trocaInfoCirc);
+        const custom = (char.magias_customizadas || []).find(m => m.nome === nome && Number(m.circulo) === circ);
+        if (custom) {
+          abrirModal(custom.nome, `
+            <div class="magia-meta" style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:8px;font-size:0.85rem">
+              <span class="badge badge-primary">${circ === 0 ? 'Truque' : circ + 'º Círculo'}</span>
+              <span class="badge badge-secondary">${custom.escola || ''}</span>
+              <span>${custom.tempo_conjuracao || ''}</span> <span>${custom.alcance || ''}</span>
+              <span>${custom.componentes || ''}</span> <span>${custom.duracao || ''}</span>
+            </div>
+            <div class="md-content">${mdParaHtml(custom.descricao || '')}</div>
+          `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
+          return;
+        }
         const dados = await getMagiasPorCirculo(circ);
         const magia = dados?.magias?.find(m => m.nome === nome);
         if (!magia) { toast('Detalhes não encontrados', 'error'); return; }
@@ -14513,7 +14553,11 @@ async function mostrarTrocaMagias(callbackPosTroca = null) {
 
   // Confirmar troca
   document.getElementById('btn-confirmar-troca')?.addEventListener('click', () => {
-    const novasPreparadas = [...selecionadasSet].map(nome => ({ nome, circulo: circuloMap[nome] || 1 }));
+    const novasPreparadas = [...selecionadasSet].map(nome => {
+      const base = { nome, circulo: circuloMap[nome] || 1 };
+      if (nomesPersonalizadasSet.has(nome)) base.personalizada = true;
+      return base;
+    });
     if (novasPreparadas.length > maxPreparadas) {
       toast(`Limite de ${maxPreparadas} magias preparadas excedido.`, 'error');
       return;

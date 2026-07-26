@@ -301,11 +301,16 @@ export function aplicarEfeitoTalento(char, nome, escolhas = {}) {
       { nome: magia, circulo: 0, origem: 'iniciado_em_magia' },
       atual => atual?.nome === magia
     ));
-    adicionarUnico(
-      garantirArray(char, 'magias_preparadas'),
-      { nome: iniciado.magia, circulo: 1, origem: 'iniciado_em_magia', gratis_usado: false },
-      atual => atual?.nome === iniciado.magia
-    );
+    {
+      const preparadasIM = garantirArray(char, 'magias_preparadas');
+      const existenteIM = preparadasIM.find(m => m?.nome === iniciado.magia);
+      if (existenteIM) {
+        existenteIM.origem = 'iniciado_em_magia';
+        existenteIM.gratis_usado = false;
+      } else {
+        preparadasIM.push({ nome: iniciado.magia, circulo: 1, origem: 'iniciado_em_magia', gratis_usado: false });
+      }
+    }
   }
 
   if (nome === 'Dádiva da Resistência à Energia') {

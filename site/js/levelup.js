@@ -1,7 +1,7 @@
 // ============================================================
 // Sistema de Level-Up D&D 2024
 // ============================================================
-import { CLASSES_INFO } from './dados-classes.js';
+import { CLASSES_INFO, ESCOLAS_SUBCLASSE_MAGO } from './dados-classes.js';
 import { getClasse, getEspecies, getIndiceMagias, getTalentos } from './db.js';
 import { calcMod, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas } from './utils.js';
 import { aplicarDeltaSistema } from './ficha-edicoes.js';
@@ -821,6 +821,21 @@ function _concederMagiaAutomatica(lista, magia, origem) {
 }
 
 /**
+ * Verdadeiro quando o personagem adquire acesso a um círculo de espaços de
+ * magia que não possuía no nível anterior (ex.: nível 3 = 2º círculo pela
+ * primeira vez). Usado pelo bônus recorrente de "Versado em [Escola]".
+ */
+function ganhouNovoCirculoDeEspacos(tabelaCaracteristicas, nivelAnterior, novoNivel) {
+  const espacosAntes = nivelAnterior >= 1 ? getEspacosMagia(tabelaCaracteristicas, nivelAnterior) : {};
+  const espacosDepois = getEspacosMagia(tabelaCaracteristicas, novoNivel);
+  return Object.entries(espacosDepois).some(([circulo, dados]) => {
+    const totalDepois = dados?.total || 0;
+    const totalAntes = espacosAntes[circulo]?.total || 0;
+    return totalDepois > 0 && totalAntes === 0;
+  });
+}
+
+/**
  * Função principal de level-up
  * @param {Object} personagem - Objeto do personagem
  * @param {Object} opcoes - Opções para o level-up
@@ -872,6 +887,17 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   const subclasseEfetivaManobras = opcoes.subclasse || personagem.subclasse;
   const exigeManobrasNivel = exigeManobrasGuerreiro(personagem.classe, subclasseEfetivaManobras, novoNivel);
   let magiasGrimorioSelecionadas = [];
+  // Versado em [Escola] (subclasse do Mago): magias grátis de escola no grimório.
+  const escolaSubclasseArcana = personagem.classe === 'Mago' && Object.prototype.hasOwnProperty.call(ESCOLAS_SUBCLASSE_MAGO, subclasseEfetivaManobras)
+    ? ESCOLAS_SUBCLASSE_MAGO[subclasseEfetivaManobras] : null;
+  let qtdMagiasSubclasseArcana = 0;
+  if (escolaSubclasseArcana) {
+    const ganhouNovoCirculoNivel = ganhouNovoCirculoDeEspacos(classeData.tabela_caracteristicas, nivelAnterior, novoNivel);
+    if (novoNivel === 3) qtdMagiasSubclasseArcana += 2; // bônus inicial de entrada na subclasse
+    if (ganhouNovoCirculoNivel) qtdMagiasSubclasseArcana += 1; // bônus recorrente por novo círculo (inclui o próprio nível 3)
+  }
+  const exigeMagiasSubclasseArcana = qtdMagiasSubclasseArcana > 0;
+  let magiasSubclasseArcanaSelecionadas = [];
   
   // Se precisa de escolhas do jogador e não foram fornecidas, retornar pendências
   if (precisaSubclasse && !opcoes.subclasse) {
@@ -1062,6 +1088,46 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     }
     magiasGrimorioSelecionadas = selecionadas.map(nome => {
       const magia = magiasPorNome.get(nome);
+      return { nome: magia.nome, circulo: magia.circulo };
+    });
+  }
+
+  // Validar magias grátis de "Versado em [Escola]" (subclasse arcana do Mago)
+  if (exigeMagiasSubclasseArcana) {
+    const selecionadas = Array.isArray(opcoes.subclasse_magias_selecionadas)
+      ? opcoes.subclasse_magias_selecionadas.filter(nome => typeof nome === 'string' && nome)
+      : [];
+    const espacosNovoNivel = getEspacosMagia(classeData.tabela_caracteristicas, novoNivel);
+    const circuloMaxInicial = 2;
+    const circuloMaxRecorrente = Math.max(...Object.keys(espacosNovoNivel)
+      .filter(c => (espacosNovoNivel[c]?.total || 0) > 0).map(Number), 0);
+    const nomesNoGrimorioArcana = new Set([...(personagem.grimorio || []), ...magiasGrimorioSelecionadas].map(magia => magia?.nome));
+    const indiceArcana = await getIndiceMagias();
+    const magiasPorNomeArcana = new Map((indiceArcana?.magias || []).map(magia => [magia.nome, magia]));
+    const escolhasValidasArcana = selecionadas.length === qtdMagiasSubclasseArcana &&
+      new Set(selecionadas).size === qtdMagiasSubclasseArcana &&
+      selecionadas.every(nome => {
+        const magia = magiasPorNomeArcana.get(nome);
+        if (!magia || !Array.isArray(magia.classes) || !magia.classes.includes('Mago')) return false;
+        if (magia.escola !== escolaSubclasseArcana) return false;
+        if (magia.circulo <= 0 || nomesNoGrimorioArcana.has(nome)) return false;
+        // No nível 3 com bônus duplo (inicial + recorrente), o círculo máximo permitido
+        // é o maior entre os dois limites (2 do bônus inicial, ou o círculo com espaços
+        // do bônus recorrente, o que for maior nesse nível).
+        const circuloMaxPermitido = Math.max(circuloMaxInicial, circuloMaxRecorrente >= 1 && novoNivel === 3 ? circuloMaxRecorrente : 0);
+        return magia.circulo <= (novoNivel === 3 ? circuloMaxPermitido : circuloMaxRecorrente) &&
+          (espacosNovoNivel[magia.circulo]?.total || 0) > 0;
+      });
+    if (!escolhasValidasArcana) {
+      return {
+        sucesso: false,
+        pendente: true,
+        tipo_pendencia: 'subclasse_magias_arcana',
+        mensagem: `Selecione ${qtdMagiasSubclasseArcana} magia(s) de ${escolaSubclasseArcana} para o Grimório`
+      };
+    }
+    magiasSubclasseArcanaSelecionadas = selecionadas.map(nome => {
+      const magia = magiasPorNomeArcana.get(nome);
       return { nome: magia.nome, circulo: magia.circulo };
     });
   }
@@ -1394,7 +1460,11 @@ export async function subirDeNivel(personagem, opcoes = {}) {
       // Adicionar magia de 1o círculo às preparadas (com flag de uso gratuito por descanso longo)
       if (im.magia) {
         if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
-        if (!personagem.magias_preparadas.find(m => m.nome === im.magia)) {
+        const existenteIM = personagem.magias_preparadas.find(m => m.nome === im.magia);
+        if (existenteIM) {
+          existenteIM.origem = 'iniciado_em_magia';
+          existenteIM.gratis_usado = false;
+        } else {
           personagem.magias_preparadas.push({ nome: im.magia, circulo: 1, origem: 'iniciado_em_magia', gratis_usado: false });
         }
       }
@@ -1505,7 +1575,11 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     if (!Array.isArray(personagem.grimorio)) personagem.grimorio = [];
     personagem.grimorio.push(...magiasGrimorioSelecionadas);
   }
-  
+  if (exigeMagiasSubclasseArcana) {
+    if (!Array.isArray(personagem.grimorio)) personagem.grimorio = [];
+    personagem.grimorio.push(...magiasSubclasseArcanaSelecionadas);
+  }
+
   // Retornar resumo do level-up
   return {
     sucesso: true,
@@ -1534,6 +1608,7 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     explorador_habil_aplicado: exploradorHabilAplicado,
     academico_aplicado: academicoAplicado,
     grimorio_adicionado: magiasGrimorioSelecionadas,
+    subclasse_magias_adicionadas: magiasSubclasseArcanaSelecionadas,
     manobras_novas_aplicadas: manobrasNovasAplicadas,
     manobra_troca_aplicada: manobraTrocaAplicada
   };

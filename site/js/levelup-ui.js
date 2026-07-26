@@ -4,7 +4,7 @@
 // ============================================================
 import {
   buildLevelUpContext, buildVisibleSteps, createInitialState,
-  proximoStep, stepAnterior, todosStepsCompletos
+  proximoStep, stepAnterior, todosStepsCompletos, calcularSubclasseArcana
 } from './levelup-flow.js';
 import {
   renderCardGanhosNivel, renderCardSubclasse, renderCardASI,
@@ -240,7 +240,11 @@ function salvarStateDoDOM(ctx, state, step) {
       break;
     }
     case 'escolha_subclasse': {
-      state.subclasse = document.getElementById('levelup-subclasse')?.value || '';
+      const novaSubclasse = document.getElementById('levelup-subclasse')?.value || '';
+      if (novaSubclasse !== state.subclasse) {
+        state.subclasseMagiasSelecionados = [];
+      }
+      state.subclasse = novaSubclasse;
       break;
     }
     case 'aumento_atributo': {
@@ -380,6 +384,9 @@ function bindEventosSubclasse(ctx, state) {
       const nome = card.dataset.subclasse;
       const idx = parseInt(card.dataset.idx);
       document.getElementById('levelup-subclasse').value = nome;
+      if (nome !== state.subclasse) {
+        state.subclasseMagiasSelecionados = [];
+      }
       state.subclasse = nome;
 
       document.querySelectorAll('.levelup-subclasse-card').forEach(c => c.classList.remove('selecionada'));
@@ -865,6 +872,7 @@ function bindEventosMagias(ctx, state) {
   const truquesSel = new Set(state.truquesSelecionados);
   const magiasSel = new Set(state.magiasSelecionadas);
   const grimorioSel = new Set(state.grimorioSelecionados);
+  const subclasseArcanaSel = new Set(state.subclasseMagiasSelecionados);
 
   const jaTemTruques = new Set((ctx.char.magias_conhecidas || []).map(m => m.nome));
   const jaTemMagias = new Set([
@@ -878,6 +886,7 @@ function bindEventosMagias(ctx, state) {
     state.truquesSelecionados = [...truquesSel];
     state.magiasSelecionadas = [...magiasSel];
     state.grimorioSelecionados = [...grimorioSel];
+    state.subclasseMagiasSelecionados = [...subclasseArcanaSel];
   }
 
   function atualizarResumo(containerId, badgesId, set, max) {
@@ -893,14 +902,16 @@ function bindEventosMagias(ctx, state) {
     }
   }
 
-  function abrirGridSelecao(titulo, maxSel, selSet, filtroCirc, jaTemSet, resumoId, badgesId) {
+  function abrirGridSelecao(titulo, maxSel, selSet, filtroCirc, jaTemSet, resumoId, badgesId, escolaFiltro = null, circuloMaxOverride = null) {
     const circulosExpandidos = new Set();
     const circulosComEstadoDefinido = new Set();
+    const circuloLimite = circuloMaxOverride != null ? circuloMaxOverride : maxCirculoNovo;
     let disponiveis = listaMagiasClasse.filter(m => {
       if (filtroCirc === 0) return m.circulo === 0;
-      if (filtroCirc === 'magia') return m.circulo > 0 && m.circulo <= maxCirculoNovo;
+      if (filtroCirc === 'magia') return m.circulo > 0 && m.circulo <= circuloLimite;
       return true;
-    }).filter(m => !jaTemSet.has(m.nome));
+    }).filter(m => !jaTemSet.has(m.nome))
+      .filter(m => !escolaFiltro || m.escola === escolaFiltro);
 
     disponiveis.sort((a, b) => {
       const aS = selSet.has(a.nome) ? 0 : 1;
@@ -1023,7 +1034,25 @@ function bindEventosMagias(ctx, state) {
   }
   if (conj.ehMago) {
     document.getElementById('btn-lvlup-grimorio')?.addEventListener('click', () => {
-      abrirGridSelecao('Grimório: +2 Magias', 2, grimorioSel, 'magia', jaTemGrimorio, 'lvlup-grimorio-resumo', 'lvlup-grimorio-badges');
+      const jaTemSet = new Set([...jaTemGrimorio, ...subclasseArcanaSel]);
+      abrirGridSelecao('Grimório: +2 Magias', 2, grimorioSel, 'magia', jaTemSet, 'lvlup-grimorio-resumo', 'lvlup-grimorio-badges');
+    });
+  }
+  const subclasseArcana = calcularSubclasseArcana(ctx, state);
+  if (subclasseArcana) {
+    document.getElementById('btn-lvlup-subclasse-arcana')?.addEventListener('click', () => {
+      const jaTemSet = new Set([...jaTemGrimorio, ...grimorioSel]);
+      abrirGridSelecao(
+        `${subclasseArcana.escola}: +${subclasseArcana.quantidade} Magia(s)`,
+        subclasseArcana.quantidade,
+        subclasseArcanaSel,
+        'magia',
+        jaTemSet,
+        'lvlup-subclasse-arcana-resumo',
+        'lvlup-subclasse-arcana-badges',
+        subclasseArcana.escola,
+        subclasseArcana.circuloMax
+      );
     });
   }
 
@@ -1228,20 +1257,21 @@ export async function confirmarLevelUp(ctx, state, caches) {
 
   if (resultado.sucesso) {
     grimorioAdicionado = (resultado.grimorio_adicionado || []).map(magia => magia.nome);
+    const subclasseMagiasAdicionadas = (resultado.subclasse_magias_adicionadas || []).map(magia => magia.nome);
     _salvarFn?.();
     window.fecharModalTodos?.();
 
     // Resumo
-    const resumo = montarResumoFinal(resultado, char, truquesAdicionados, magiasAdicionadas, grimorioAdicionado, magiaTrocadaDe, magiaTrocadaPara);
+    const resumo = montarResumoFinal(resultado, char, truquesAdicionados, magiasAdicionadas, grimorioAdicionado, magiaTrocadaDe, magiaTrocadaPara, subclasseMagiasAdicionadas);
     abrirModal('Subida de Nível Concluída!', resumo, '<button class="btn btn-primary" onclick="fecharModal()">OK</button>');
     _renderFichaFn?.();
   } else {
     state.confirmando = false;
-    toast(resultado.erro || 'Erro ao subir de nível', 'error');
+    toast(resultado.erro || resultado.mensagem || 'Erro ao subir de nível', 'error');
   }
 }
 
-function montarResumoFinal(resultado, char, truquesAdicionados, magiasAdicionadas, grimorioAdicionado, magiaTrocadaDe, magiaTrocadaPara) {
+function montarResumoFinal(resultado, char, truquesAdicionados, magiasAdicionadas, grimorioAdicionado, magiaTrocadaDe, magiaTrocadaPara, subclasseMagiasAdicionadas = []) {
   const attrNomes = { forca: 'Força', destreza: 'Destreza', constituicao: 'Constituição', inteligencia: 'Inteligência', sabedoria: 'Sabedoria', carisma: 'Carisma' };
 
   // Icones SVG inline
@@ -1275,6 +1305,10 @@ function montarResumoFinal(resultado, char, truquesAdicionados, magiasAdicionada
   if (truquesAdicionados.length > 0) itens.push(`Truques: +${truquesAdicionados.join(', ')}`);
   if (magiasAdicionadas.length > 0) itens.push(`Magias: +${magiasAdicionadas.join(', ')}`);
   if (grimorioAdicionado.length > 0) itens.push(`Grimório: +${grimorioAdicionado.join(', ')}`);
+  if (subclasseMagiasAdicionadas.length > 0) {
+    const label = resultado.subclasse_escolhida ? `Magias de Subclasse (${resultado.subclasse_escolhida})` : 'Magias de Subclasse';
+    itens.push(`${label}: +${subclasseMagiasAdicionadas.join(', ')}`);
+  }
   if (magiaTrocadaDe) itens.push(`Troca: ${magiaTrocadaDe} ${iconArrow} ${magiaTrocadaPara}`);
 
   // HTML Final
