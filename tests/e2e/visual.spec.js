@@ -125,12 +125,23 @@ test.describe('@visual Ficha', () => {
     });
   });
 
-  test('modal crítico: gerenciar condições', async ({ page }) => {
+  // Antigo "modal crítico: gerenciar condições" (`#btn-gerenciar-condicoes` ->
+  // modal -> `#btn-salvar-condicoes`) referenciava a UI do monólito, já
+  // substituída por comandos canônicos diretos (add-condition/remove-condition,
+  // sem modal — ver a tabela Legado->Novo em sheet-rules.spec.js). Este teste
+  // nunca foi atualizado depois da reescrita da ficha; a seleção abaixo segue
+  // exatamente a mesma interação já provada em
+  // "adicionar e remover condição são comandos canônicos e persistem"
+  // (sheet-rules.spec.js).
+  test('seção crítica: gerenciar condições', async ({ page }) => {
     await resetApp(page, { characters: [PERSONAGEM_BASE] });
     await goFicha(page, PERSONAGEM_BASE.id);
-    await page.locator('#btn-gerenciar-condicoes').click();
-    await expect(page.locator('#modal-overlay')).toHaveCSS('display', 'flex');
-    await expect(page.locator('#modal-container')).toHaveScreenshot('modal-condicoes.png');
+    await page.locator('[data-sheet-condition-input]').fill('Enfeitiçado');
+    await page.locator('[data-action="add-condition"]').click();
+    await expect(page.locator('[data-sheet-condition="Enfeitiçado"]')).toBeVisible();
+    await expect(page.locator('[data-sheet-section="conditions-defenses-senses"]')).toHaveScreenshot(
+      'secao-condicoes.png'
+    );
   });
 
   test('modal crítico: excluir personagem (home)', async ({ page }) => {
