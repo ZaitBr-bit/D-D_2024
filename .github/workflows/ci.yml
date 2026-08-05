@@ -110,6 +110,17 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.62.0-noble
+    env:
+      # Em jobs com `container:`, o GitHub Actions roda os steps como root mas
+      # define HOME=/github/home — um mount do host cujo dono é o usuário do
+      # runner (uid 1001), não o root. O Firefox tem uma guarda própria e SE
+      # RECUSA a iniciar quando $HOME não pertence ao usuário atual ("Firefox is
+      # unable to launch if the $HOME folder isn't owned by the current user"),
+      # derrubando todo o projeto `firefox-critical` já no launch do browser.
+      # Chromium e WebKit não fazem essa verificação, por isso só o Firefox
+      # falhava. Apontar HOME para /root (que pertence ao root) resolve na causa
+      # e é o workaround oficial do próprio Playwright para jobs de container.
+      HOME: /root
     steps:
       - name: Checkout
         uses: actions/checkout@v4
