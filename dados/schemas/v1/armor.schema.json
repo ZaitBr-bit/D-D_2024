@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.fichas-de-nimb.dev/v1/armor.schema.json",
+  "title": "Armor entity (v1)",
+  "description": "Armadura (ex.: Cota de Malha).",
+  "type": "object",
+  "allOf": [
+    { "$ref": "common.schema.json#/$defs/entityBase" },
+    {
+      "type": "object",
+      "properties": {
+        "type": { "const": "armor" },
+        "armorCategory": { "enum": ["light", "medium", "heavy", "shield"] },
+        "baseArmorClass": { "type": "integer", "minimum": 10 },
+        "addDexModifier": { "type": "boolean" },
+        "maxDexBonus": { "type": "integer", "minimum": 0 },
+        "armorClassBonus": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Bônus de CA de um item que NÃO tem CA base própria (ex.: Escudo, \"+2\"): soma-se à CA calculada de outra forma, em vez de substituí-la. Mutuamente exclusivo com `baseArmorClass` — o `oneOf` no fim deste schema exige exatamente um dos dois."
+        },
+        "strengthRequirement": { "type": "integer", "minimum": 0 },
+        "stealthDisadvantage": { "type": "boolean" },
+        "weight": { "type": "number", "minimum": 0 },
+        "cost": { "$ref": "common.schema.json#/$defs/cost" }
+      },
+      "required": ["type", "armorCategory", "addDexModifier"]
+    },
+    {
+      "description": "Exatamente um de `baseArmorClass` (armadura com CA própria) ou `armorClassBonus` (item como Escudo, que só soma a uma CA já calculada de outra forma) — nunca os dois, nunca nenhum.",
+      "oneOf": [
+        { "required": ["baseArmorClass"], "not": { "required": ["armorClassBonus"] } },
+        { "required": ["armorClassBonus"], "not": { "required": ["baseArmorClass"] } }
+      ]
+    }
+  ],
+  "unevaluatedProperties": false
+}

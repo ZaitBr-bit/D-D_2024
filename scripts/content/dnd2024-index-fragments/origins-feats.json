@@ -1,0 +1,617 @@
+{
+  "schemaVersion": "1.0.0",
+  "entries": [
+    {
+      "id": "dnd2024:species:aasimar",
+      "type": "species",
+      "path": "species/catalog.json",
+      "pointer": "/items/0"
+    },
+    {
+      "id": "dnd2024:species:anao",
+      "type": "species",
+      "path": "species/catalog.json",
+      "pointer": "/items/1"
+    },
+    {
+      "id": "dnd2024:species:draconato",
+      "type": "species",
+      "path": "species/catalog.json",
+      "pointer": "/items/2"
+    },
+    {
+      "id": "dnd2024:species:elfo",
+      "type": "species",
+      "path": "species/catalog.json",
+      "pointer": "/items/3"
+    },
+    {
+      "id": "dnd2024:species:gnomo",
+      "type": "species",
+      "path": "species/catalog.json",
+      "pointer": "/items/4"
+    },
+    {
+      "id": "dnd2024:species:golias",
+      "type": "species",
+      "path": "species/catalog.json",
+      "pointer": "/items/5"
+    },
+    {
+      "id": "dnd2024:species:humano",
+      "type": "species",
+      "path": "species/catalog.json",
+      "pointer": "/items/6"
+    },
+    {
+      "id": "dnd2024:species:orc",
+      "type": "species",
+      "path": "species/catalog.json",
+      "pointer": "/items/7"
+    },
+    {
+      "id": "dnd2024:species:pequenino",
+      "type": "species",
+      "path": "species/catalog.json",
+      "pointer": "/items/8"
+    },
+    {
+      "id": "dnd2024:species:tiferino",
+      "type": "species",
+      "path": "species/catalog.json",
+      "pointer": "/items/9"
+    },
+    {
+      "id": "dnd2024:species:kenku",
+      "type": "species",
+      "path": "species/catalog.json",
+      "pointer": "/items/10"
+    },
+    {
+      "id": "dnd2024:background:acolito",
+      "type": "background",
+      "path": "backgrounds/catalog.json",
+      "pointer": "/items/0"
+    },
+    {
+      "id": "dnd2024:background:andarilho",
+      "type": "background",
+      "path": "backgrounds/catalog.json",
+      "pointer": "/items/1"
+    },
+    {
+      "id": "dnd2024:background:artesao",
+      "type": "background",
+      "path": "backgrounds/catalog.json",
+      "pointer": "/items/2"
+    },
+    {
+      "id": "dnd2024:background:artista",
+      "type": "background",
+      "path": "backgrounds/catalog.json",
+      "pointer": "/items/3"
+    },
+    {
+      "id": "dnd2024:background:charlatao",
+      "type": "background",
+      "path": "backgrounds/catalog.json",
+      "pointer": "/items/4"
+    },
+    {
+      "id": "dnd2024:background:criminoso",
+      "type": "background",
+      "path": "backgrounds/catalog.json",
+      "pointer": "/items/5"
+    },
+    {
+      "id": "dnd2024:background:eremita",
+      "type": "background",
+      "path": "backgrounds/catalog.json",
+      "pointer": "/items/6"
+    },
+    {
+      "id": "dnd2024:background:escriba",
+      "type": "background",
+      "path": "backgrounds/catalog.json",
+      "pointer": "/items/7"
+    },
+    {
+      "id": "dnd2024:background:fazendeiro",
+      "type": "background",
+      "path": "backgrounds/catalog.json",
+      "pointer": "/items/8"
+    },
+    {
+      "id": "dnd2024:background:guarda",
+      "type": "background",
+      "path": "backgrounds/catalog.json",
+      "pointer": "/items/9"
+    },
+    {
+      "id": "dnd2024:background:guia",
+      "type": "background",
+      "path": "backgrounds/catalog.json",
+      "pointer": "/items/10"
+    },
+    {
+      "id": "dnd2024:background:marinheiro",
+      "type": "background",
+      "path": "backgrounds/catalog.json",
+      "pointer": "/items/11"
+    },
+    {
+      "id": "dnd2024:background:mercador",
+      "type": "background",
+      "path": "backgrounds/catalog.json",
+      "pointer": "/items/12"
+    },
+    {
+      "id": "dnd2024:background:nobre",
+      "type": "background",
+      "path": "backgrounds/catalog.json",
+      "pointer": "/items/13"
+    },
+    {
+      "id": "dnd2024:background:sabio",
+      "type": "background",
+      "path": "backgrounds/catalog.json",
+      "pointer": "/items/14"
+    },
+    {
+      "id": "dnd2024:background:soldado",
+      "type": "background",
+      "path": "backgrounds/catalog.json",
+      "pointer": "/items/15"
+    },
+    {
+      "id": "dnd2024:feat:adepto-elemental",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/0"
+    },
+    {
+      "id": "dnd2024:feat:agressor",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/1"
+    },
+    {
+      "id": "dnd2024:feat:alerta",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/2"
+    },
+    {
+      "id": "dnd2024:feat:analitico",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/3"
+    },
+    {
+      "id": "dnd2024:feat:arquearia",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/4"
+    },
+    {
+      "id": "dnd2024:feat:artifista",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/5"
+    },
+    {
+      "id": "dnd2024:feat:atacante-selvagem",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/6"
+    },
+    {
+      "id": "dnd2024:feat:atirador-arcano",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/7"
+    },
+    {
+      "id": "dnd2024:feat:atleta",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/8"
+    },
+    {
+      "id": "dnd2024:feat:ator",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/9"
+    },
+    {
+      "id": "dnd2024:feat:aumento-no-valor-de-atributo",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/10"
+    },
+    {
+      "id": "dnd2024:feat:chef",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/11"
+    },
+    {
+      "id": "dnd2024:feat:combate-desarmado",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/12"
+    },
+    {
+      "id": "dnd2024:feat:combate-com-armas-grandes",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/13"
+    },
+    {
+      "id": "dnd2024:feat:combate-com-armas-de-arremesso",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/14"
+    },
+    {
+      "id": "dnd2024:feat:combate-com-duas-armas",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/15"
+    },
+    {
+      "id": "dnd2024:feat:combatente-montado",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/16"
+    },
+    {
+      "id": "dnd2024:feat:conjurador-belico",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/17"
+    },
+    {
+      "id": "dnd2024:feat:conjurador-ritualista",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/18"
+    },
+    {
+      "id": "dnd2024:feat:curandeiro",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/19"
+    },
+    {
+      "id": "dnd2024:feat:defensivo",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/20"
+    },
+    {
+      "id": "dnd2024:feat:duelismo",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/21"
+    },
+    {
+      "id": "dnd2024:feat:duelista-defensivo",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/22"
+    },
+    {
+      "id": "dnd2024:feat:dadiva-da-fortitude",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/23"
+    },
+    {
+      "id": "dnd2024:feat:dadiva-da-proeza-em-combate",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/24"
+    },
+    {
+      "id": "dnd2024:feat:dadiva-da-proficiencia-em-pericia",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/25"
+    },
+    {
+      "id": "dnd2024:feat:dadiva-da-recordacao-de-magia",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/26"
+    },
+    {
+      "id": "dnd2024:feat:dadiva-da-recuperacao",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/27"
+    },
+    {
+      "id": "dnd2024:feat:dadiva-da-resistencia-a-energia",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/28"
+    },
+    {
+      "id": "dnd2024:feat:dadiva-da-velocidade",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/29"
+    },
+    {
+      "id": "dnd2024:feat:dadiva-da-viagem-dimensional",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/30"
+    },
+    {
+      "id": "dnd2024:feat:dadiva-da-visao-verdadeira",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/31"
+    },
+    {
+      "id": "dnd2024:feat:dadiva-do-ataque-irresistivel",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/32"
+    },
+    {
+      "id": "dnd2024:feat:dadiva-do-destino",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/33"
+    },
+    {
+      "id": "dnd2024:feat:dadiva-do-espirito-da-noite",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/34"
+    },
+    {
+      "id": "dnd2024:feat:envenenador",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/35"
+    },
+    {
+      "id": "dnd2024:feat:esmagador",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/36"
+    },
+    {
+      "id": "dnd2024:feat:especialista-ambidestro",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/37"
+    },
+    {
+      "id": "dnd2024:feat:especialista-em-armaduras-leves",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/38"
+    },
+    {
+      "id": "dnd2024:feat:especialista-em-armaduras-medias",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/39"
+    },
+    {
+      "id": "dnd2024:feat:especialista-em-armaduras-pesadas",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/40"
+    },
+    {
+      "id": "dnd2024:feat:especialista-em-besta",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/41"
+    },
+    {
+      "id": "dnd2024:feat:especialista-em-pericia",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/42"
+    },
+    {
+      "id": "dnd2024:feat:exterminador-de-conjuradores",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/43"
+    },
+    {
+      "id": "dnd2024:feat:habilidoso",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/44"
+    },
+    {
+      "id": "dnd2024:feat:imobilizador",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/45"
+    },
+    {
+      "id": "dnd2024:feat:iniciado-em-magia",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/46"
+    },
+    {
+      "id": "dnd2024:feat:interceptacao",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/47"
+    },
+    {
+      "id": "dnd2024:feat:luta-as-cegas",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/48"
+    },
+    {
+      "id": "dnd2024:feat:lider-inspirador",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/49"
+    },
+    {
+      "id": "dnd2024:feat:mente-agucada",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/50"
+    },
+    {
+      "id": "dnd2024:feat:mestre-das-armas",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/51"
+    },
+    {
+      "id": "dnd2024:feat:mestre-em-armaduras-medias",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/52"
+    },
+    {
+      "id": "dnd2024:feat:mestre-em-armaduras-pesadas",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/53"
+    },
+    {
+      "id": "dnd2024:feat:mestre-em-armas-grandes",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/54"
+    },
+    {
+      "id": "dnd2024:feat:mestre-em-armas-de-haste",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/55"
+    },
+    {
+      "id": "dnd2024:feat:mestre-em-escudos",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/56"
+    },
+    {
+      "id": "dnd2024:feat:mestre-atirador",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/57"
+    },
+    {
+      "id": "dnd2024:feat:musico",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/58"
+    },
+    {
+      "id": "dnd2024:feat:perfurador",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/59"
+    },
+    {
+      "id": "dnd2024:feat:protetivo",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/60"
+    },
+    {
+      "id": "dnd2024:feat:resiliente",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/61"
+    },
+    {
+      "id": "dnd2024:feat:resistente",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/62"
+    },
+    {
+      "id": "dnd2024:feat:sentinela",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/63"
+    },
+    {
+      "id": "dnd2024:feat:sorrateiro",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/64"
+    },
+    {
+      "id": "dnd2024:feat:sortudo",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/65"
+    },
+    {
+      "id": "dnd2024:feat:talhador",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/66"
+    },
+    {
+      "id": "dnd2024:feat:telecinetico",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/67"
+    },
+    {
+      "id": "dnd2024:feat:telepatico",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/68"
+    },
+    {
+      "id": "dnd2024:feat:tocado-pelas-sombras",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/69"
+    },
+    {
+      "id": "dnd2024:feat:tocado-por-fadas",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/70"
+    },
+    {
+      "id": "dnd2024:feat:treinamento-com-armas-marciais",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/71"
+    },
+    {
+      "id": "dnd2024:feat:valentao-de-taverna",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/72"
+    },
+    {
+      "id": "dnd2024:feat:velocista",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/73"
+    },
+    {
+      "id": "dnd2024:feat:vigoroso",
+      "type": "feat",
+      "path": "feats/catalog.json",
+      "pointer": "/items/74"
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "fixtureVersion": 1,
+  "compatibilityBaseline": "e43c5ea",
+  "generatedAt": "2026-07-26T00:00:00.000Z",
+  "cases": [
+    {
+      "id": "v2-compativel-guerreiro",
+      "descricao": "Personagem v2 hipotético (schemaVersion 2) que renomeia/reagrupa campos v1 sem perder informação.",
+      "notas": "Este schema v2 é ilustrativo — nenhuma implementação v2 existe ainda no app atual (site/js só produz v1).",
+      "schemaVersion": 2,
+      "personagemV1Original": {
+        "id": "v2c1-v2c1-v2c1",
+        "nome": "Compatível V2",
+        "imagem": "",
+        "nivel": 2,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Guerreiro",
+        "subclasse": "",
+        "especie": "",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 20,
+        "pv_atual": 20,
+        "pv_temporario": 0,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 0,
+        "pericias_proficientes": [],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [],
+        "inventario": [],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [],
+        "grimorio": [],
+        "espacos_magia": {},
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z"
+      },
+      "personagemV2": {
+        "schemaVersion": 2,
+        "identity": {
+          "id": "v2c1-v2c1-v2c1",
+          "nome": "Compatível V2",
+          "origemV1": "id,nome"
+        },
+        "build": {
+          "classe": "Guerreiro",
+          "nivel": 2,
+          "origemV1": "classe,nivel"
+        },
+        "state": {
+          "pv_max": 20,
+          "pv_atual": 20,
+          "origemV1": "pv_max,pv_atual"
+        }
+      }
+    }
+  ]
+}

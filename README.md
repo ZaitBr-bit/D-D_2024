@@ -1,248 +1,165 @@
 # D&D 5.5 — Criador de Ficha (Fichas de Nimb)
 
-Aplicação web (PWA) para criar e gerenciar fichas de personagem de D&D 5.5 (2024).
-SPA estática em JavaScript puro (ES modules), sem build/bundler. Funciona offline
-via Service Worker e sincroniza opcionalmente na nuvem (Firestore) quando logado.
+Aplicação web (PWA) para criar e gerenciar fichas de personagem de D&D 5.5
+(2024). SPA estática em JavaScript puro (ES modules), **sem build/bundler**.
+Funciona offline via Service Worker e sincroniza opcionalmente na nuvem
+(Firestore) quando logado.
 
-Este README documenta a arquitetura do site para acelerar futuras implementações.
+Este README descreve a arquitetura FINAL após a refatoração
+(plano em `docs/superpowers/plans/2026-07-26-refatoracao-arquitetura-regras.md`).
+Documentação detalhada por tema em `docs/`:
+
+- `docs/architecture/content-packages.md` — pacotes de conteúdo, schemas e o contrato para fontes futuras.
+- `docs/architecture/character-storage-v2.md` — registro v2, migração, backup e modo somente leitura.
+- `docs/testing.md` — toda a matriz de testes e checks (o que roda onde).
+- `docs/deploy-pwa.md` — pipeline de deploy no GitHub Pages e o Service Worker transacional.
 
 ---
 
 ## Como rodar
 
+Runtime local **não precisa de Node** — qualquer servidor estático na raiz do
+repositório serve:
+
 ```powershell
-# servidor local (raiz do repo)
+# fallback sem Node (python -m http.server) — abre navegador só com -AbrirNavegador
 pwsh -File iniciar_servidor.ps1
+
+# ou, com Node instalado, o mesmo servidor usado pelos testes:
+pwsh -File iniciar_servidor.ps1 -UsarNode
+# (equivalente a: npm run serve:test  ->  http://127.0.0.1:4173/site/)
 ```
 
-Serve `site/index.html`. Sem etapa de build — editar JS e recarregar a página.
-
-Validar sintaxe de um arquivo alterado:
+Node (`>= 22.17`, ver `.nvmrc`) é obrigatório apenas para **testes, validação e
+geração do artifact de deploy**:
 
 ```bash
-node --check site/js/pages/sheet.js
+npm ci                       # dependências de desenvolvimento
 ```
 
-**Deploy:** GitHub Pages. Um workflow ajusta caminhos no deploy — `db.js` usa
-`BASE_PATH = '../dados'` em dev; o workflow troca `'../dados'` por `'./dados'` via `sed`.
+### Comandos principais
+
+| Comando | O que faz |
+|---|---|
+| `npm run check:syntax` | `node --check` em todo JS (site, scripts, tests, configs Playwright) |
+| `npm run check:architecture` | direção de camadas, domínio puro, capacidades oficiais restritas |
+| `npm run check:entrypoints` | `pages/creator.js`/`pages/sheet.js` continuam composition roots finos |
+| `npm run check:inline-handlers` | nenhum handler inline; globais `window.*` só da allowlist |
+| `npm run check:validators` / `generate:validators` | validadores Ajv standalone gerados dos schemas |
+| `npm run validate:data` | valida `dados/pacotes/**` contra `dados/schemas/v1/**` |
+| `npm run test:node` | unit + contract + integration + deploy (Node puro) |
+| `npm run test:extractor` | contrato do extrator Python (`_extrair_json.py`) |
+| `npm run test:firebase` | testes contra o Firestore **Emulator** (requer Java 21) |
+| `npm run test:e2e` | Playwright funcional (Chromium/Firefox/WebKit) |
+| `npm run test:e2e:compat` | round-trip com o app BASELINE `e43c5ea` materializado |
+| `npm run test:e2e:pwa` | instalação transacional do Service Worker |
+| `npm run test:e2e:visual` | screenshots — só na imagem Linux pinada do Playwright |
+| `npm run build:pages -- --out _dist --version vX` | artifact determinístico do GitHub Pages |
+| `npm run verify:pages -- --dir _dist` | verificação independente do artifact |
+| `npm run verify` | tudo acima que é funcional, em sequência (sem o gate visual) |
 
 ---
 
-## Estrutura de pastas
+## Arquitetura (`site/js/`)
+
+Camadas com direção de dependência verificada por `check:architecture`
+(`core -> content -> domain -> infra/features/ui -> pages`):
 
 ```
-D&D/
-├── index.html               # redireciona/entra no app (raiz)
-├── iniciar_servidor.ps1     # servidor local de desenvolvimento
-├── _extrair_json.py         # utilitário de extração de dados (gera dados/*.json)
-├── site/                    # APP servido
-│   ├── index.html           # shell da SPA (header, #app-content, modal-overlay)
-│   ├── manifest.json        # PWA
-│   ├── sw.js                # Service Worker (cache offline)
-│   ├── css/app.css          # estilos globais (usa CSS vars: --primary, --danger, ...)
-│   └── js/                  # ver "Módulos JS" abaixo
-├── dados/                   # dados de jogo em JSON (fonte de verdade do conteúdo)
-│   ├── classes/             # <classe>.json, magias_<classe>.json
-│   ├── origens/             # especies.json, antecedentes.json
-│   ├── talentos/            # talentos.json
-│   ├── equipamento/         # armas, armaduras, equipamento_aventura, ferramentas,
-│   │                        #   servicos, montarias_veiculos
-│   ├── magias/              # _indice.json, truques.json, circulo_N.json, por_classe/
-│   └── apendices/           # criaturas.json, glossario.json
-├── Informacoes Separadas/   # regras em Markdown (referência humana, não consumidas em runtime)
-│   ├── Equipamento.md
-│   └── Abreviações e Definição de Regras.md   # ex.: "Capacidade de Carga" (linha ~228)
-└── docs/superpowers/plans/  # planos de implementação
+site/js/
+├── app.js               # shell: boot, hash router (rotas lazy via import())
+├── app-context.js       # COMPOSITION ROOT: catálogo, repositório, sync, capacidades oficiais
+├── core/                # Result/AppError, ContentId, semver, hash-router
+├── content/             # ContentRegistry, validação (Ajv gerado), capacidades de fonte
+├── domain/              # REGRAS PURAS: personagem canônico v2, comandos, efeitos,
+│   │                    #   progressão, magias, inventário, handlers dnd2024
+│   └── (proibido: DOM, rede, storage, Firebase — verificado estaticamente)
+├── infra/               # portas concretas: codec v2, repositório localStorage,
+│   │                    #   projeção legada, sync/Firestore, imagem, RNG, PWA
+├── features/            # criador (7 passos + sessão) e ficha (seções + sessão)
+├── ui/                  # primitivas seguras: escapeHtml, delegação, modal, toast
+└── pages/               # ENTRYPOINTS FINOS: creator.js (renderCreator),
+                         #   sheet.js (renderSheet), home.js
 ```
 
----
+- **Entradas públicas**: `renderCreator(container)` e
+  `renderSheet(container, charId)`, chamadas pelo router
+  (`core/hash-router.js`) e devolvendo `Result<disposer, AppError>`.
+- **Fachadas de compatibilidade** mantidas finas e cobertas por teste:
+  `db.js` (projeção do catálogo no shape legado), `moedas.js` (delega a
+  `domain/inventory/wallet.js`), `dados-classes.js` (constantes usadas por
+  home/utils). Nenhuma tem regra própria.
+- Conteúdo oficial é resolvido pelo `ContentRegistry` a partir de
+  **`dados/pacotes/dnd2024`** — a única fonte mecânica de runtime. Os JSON
+  legados (`dados/classes/**` etc.) permanecem no repositório apenas como
+  oráculo de teste/referência histórica; um teste E2E prova que o app nunca
+  os requisita.
 
-## Módulos JS (`site/js/`)
-
-Tudo é **ES module** (`import`/`export`). O ponto de entrada é `app.js`, carregado
-por `site/index.html` como `<script type="module">`.
-
-| Arquivo | Responsabilidade | Tamanho |
-|---|---|---|
-| `app.js` | Router SPA (hash), init, registro do Service Worker, FAB reportar bug | pequeno |
-| `pages/home.js` | Tela inicial: lista de personagens, import/export, login | médio |
-| `pages/creator.js` | Wizard de criação (7 passos): Classe, Espécie, Antecedente, Atributos, Talentos, Equipamento, Detalhes | ~4,4k linhas |
-| `pages/sheet.js` | Ficha do personagem (render + toda a lógica de jogo em uso) | ~16k linhas |
-| `store.js` | Persistência em `localStorage` + `criarPersonagemVazio()` (schema do personagem) | médio |
-| `db.js` | Carregador de `dados/*.json` com cache em memória (`fetchJSON`) | pequeno |
-| `sync.js` | Fila de sincronização em nuvem (retry, status online/offline) | médio |
-| `auth.js` | Login e I/O com Firestore | médio |
-| `utils.js` | Helpers puros: cálculos (`calcMod`, `calcCA`, `bonusProficiencia`...), `parseMetros`-like, `getDeslocamento`, `getTamanho`, `abrirModal`, `toast`, `escHtml`, markdown | ~550 linhas |
-| `levelup*.js` | Fluxo, UI, cards e validações de subida de nível | vários |
-| `talentos-effects.js` | Efeitos passivos de talentos (cache aplicado na ficha) | médio |
-| `manobras-ui.js` | UI de manobras de combate | pequeno |
-| `dados-classes.js` | Constantes: `CLASSES_INFO`, `PERICIAS`, `ATRIBUTOS_*`, `STANDARD_ARRAY`, point-buy | médio |
-
-### Dependências entre módulos (típico)
+## Dados e schemas
 
 ```
-app.js → pages/{home,creator,sheet}.js
-pages/* → db.js (dados) , store.js (persistência) , utils.js (helpers) , dados-classes.js (constantes)
-store.js → sync.js → auth.js
+dados/
+├── pacotes/dnd2024/     # PACOTE OFICIAL versionado (manifest, index, entidades)
+├── schemas/v1/          # JSON Schemas de todas as entidades + registro v2
+├── classes/, magias/, equipamento/, ...   # JSON legados (só oráculo de teste)
 ```
 
-`utils.js` é o lugar certo para **helpers puros reutilizados** por creator.js e sheet.js
-(ambos importam de `../utils.js`). Cuidado: creator.js usa a variável `personagem` e
-sheet.js usa `char` — helpers puros devem receber dados por parâmetro, não ler globais.
+Ver `docs/architecture/content-packages.md` para o contrato completo
+(manifesto, `entitySchemaVersions`, índice determinístico, migrações de
+referência) e `docs/architecture/character-storage-v2.md` para o registro de
+personagem (v2 = registro plano legado + canais reservados `_schema`,
+`content_refs`, `overrides`, `pv_rolagens`, `_local_sync`), incluindo
+backup/restauração e o modo **somente leitura/exportável** para schemas
+futuros.
 
 ---
 
-## Router (app.js)
+## Testes
 
-Baseado em `window.location.hash`. Rotas:
+Matriz completa em `docs/testing.md`. Resumo do que cada gate cobre:
 
-| Hash | Página | Função |
-|---|---|---|
-| `#home` (default) | Home | `renderHome(content)` |
-| `#criar` | Wizard | `renderCreator(content, param)` |
-| `#ficha/<id>` | Ficha | `renderSheet(content, param)` — `param` é o id do personagem |
-
-`navegar(rota)` (global `window.navegar`) muda o hash; `processarRota()` despacha.
-Cada render recebe o container `#app-content` e reescreve seu `innerHTML`.
-
----
-
-## Modelo de dados do personagem
-
-Criado por `store.js:criarPersonagemVazio()`. Persistido como array em
-`localStorage['dnd_personagens']` (backup em `dnd_personagens_backup`, fila de sync em
-`dnd_sync_queue`). Campos principais:
-
-```js
-{
-  id, nome, imagem, nivel, xp, exaustao,
-  classe, subclasse, especie, antecedente, alinhamento,
-  tracos_escolhidos: [], escolhas_classe: {}, escolhas_antecedente: {},
-  atributos:       { forca, destreza, constituicao, inteligencia, sabedoria, carisma }, // VALORES (ex: 15)
-  atributos_base:  { ... },
-  pv_max, pv_atual, pv_temporario, dados_vida_total, dados_vida_usados,
-  pericias_proficientes: [], pericias_expertise: [], salvaguardas_proficientes: [],
-  inventario: [ /* ver abaixo */ ],
-  po: 0,                       // peças de ouro
-  magias_conhecidas: [], magias_preparadas: [], grimorio: [], espacos_magia: {},
-  talentos: [], efeitos_magicos: [], usos_habilidades: {},
-  idiomas: ['Comum'],
-  tamanho: '',                 // 'Pequeno' | 'Médio' | 'Grande' | 'Médio ou Pequeno' | ''
-  condicoes: [], resistencias: [], vulnerabilidades: [], imunidades: [],
-  recursos: { furia_ativa, ... },   // estado de recursos de classe em uso
-  config: { ... },             // configurações opcionais da ficha (flags de regras)
-  criado_em, atualizado_em
-}
-```
-
-> Atributos guardam o **valor** (ex. 15). O modificador vem de `calcMod(valor)` (utils.js).
-
-### Item de inventário
-
-`char.inventario` é um array. Cada item:
-
-```js
-{
-  nome: 'Espada Longa',
-  tipo: 'arma' | 'armadura' | 'escudo' | 'equipamento' | 'customizado' | 'generico',
-  quantidade: 1,          // qtd <= 0 => seção "Esgotados"
-  equipado: false,
-  descricao: '',
-  dados: {                // varia por tipo; campos vindos dos JSON de dados
-    // arma:        dano, propriedades, maestria, categoria, peso, custo
-    // armadura:    ca, categoria, requisito_forca, furtividade, peso, custo
-    // equipamento: custo, peso, tipo_uso, descricao
-    // customizado: bonus_ca, dano, bonus_ataque   (+ peso opcional em kg, string "X kg")
-  }
-}
-```
-
-**Peso** vem como string nos JSON: `"0,5 kg"`, `"250 g"`, `"1 kg (saco)"`, `"—"`,
-`"Varia"`. Sempre normalizar antes de calcular (vírgula decimal; gramas → kg).
+- **Node** (`test:node`): domínio, codec, contratos de paridade com o legado
+  (oráculos em `tests/helpers/legacy-*.js` + fixtures congeladas do commit
+  `e43c5ea`), estrutura dos workflows.
+- **Firebase** (`test:firebase`): Firestore Emulator (Java 21; o preflight
+  recusa com instrução clara quando falta).
+- **E2E** (`test:e2e`): fluxo real no navegador — home, criador, ficha,
+  impressão/PDF, import/export, storage, segurança/CSP, rotas lazy.
+- **Compat** (`test:e2e:compat`): materializa o app LEGADO do commit
+  `e43c5ea` (via `git show`, sem tocar o worktree) e faz o round-trip
+  criar → exportar → editar no baseline → reimportar, sem perda.
+- **PWA** (`test:e2e:pwa`): instalação transacional do SW, offline e update.
+- **Visual** (`test:e2e:visual`): screenshots, exclusivamente na imagem
+  `mcr.microsoft.com/playwright:v1.62.0-noble` (Linux) — nunca no host.
 
 ---
 
-## Carregamento de dados (db.js)
+## Deploy (GitHub Pages)
 
-`fetchJSON(caminho)` busca `dados/<caminho>` com cache em memória. Funções prontas:
-`getClasse`, `getMagiasClasse`, `getAntecedentes`, `getEspecies`, `getTalentos`,
-`getArmas`, `getArmaduras`, `getEquipamentoAventura`, `getFerramentas`,
-`getIndiceMagias`, `getMagiasPorCirculo`, `getMagia`, `buscarMagias`, `getCriaturas`,
-`getGlossario`. `precarregarDadosCriacao()` pré-aquece o essencial do wizard.
+Pipeline determinístico, sem `sed`/cópias manuais (detalhes em
+`docs/deploy-pwa.md`):
 
-Nomes de arquivo de classe/magia são normalizados sem acento (`á→a`, `ã→a`, ...).
+1. `npm run build:pages -- --out _dist --version <versão>` gera o artifact
+   (marcador `__DEPLOY_VERSION__` substituído, manifesto de precache com
+   SHA-256 real).
+2. `npm run verify:pages -- --dir _dist` verifica o artifact de forma
+   independente.
+3. `.github/workflows/deploy.yml` publica SOMENTE se o workflow reutilizável
+   `ci.yml` (jobs Node/dados, Firestore Emulator e browser) passar.
 
-Formato dos JSON de equipamento: objeto com contagem + array nomeado
-(ex. `armas.json` = `{ total, armas: [...] }`; `equipamento_aventura.json` =
-`{ total_itens, itens: [...] }`).
-
----
-
-## Persistência e sincronização
-
-- **Local:** `store.js` grava/lê `localStorage`. `salvarPersonagem()` atualiza
-  `atualizado_em` e enfileira sync. `importarPersonagens()` valida estrutura mínima
-  (`_validarPersonagem`) antes de aceitar.
-- **Nuvem:** `sync.js` mantém fila persistente (`dnd_sync_queue`), com retry
-  (`MAX_TENTATIVAS = 3`, `RETRY_DELAY_MS = 5000`) e status
-  `idle | sincronizando | ok | erro | offline`. Só sobe se logado (`auth.js`/Firestore).
-- **Offline/PWA:** `sw.js` cacheia o app. `app.js` aplica atualizações do SW
-  automaticamente e recarrega "quando seguro" (sem modal aberto).
-
----
-
-## Padrões de UI
-
-- **Sem framework.** Render por template string → `element.innerHTML = ...`; eventos
-  religados após cada render (`addEventListener` / `element.onclick`). Padrão comum:
-  `data-*` no HTML + `querySelectorAll('[data-x]')` numa função `setupEventos...()`.
-- **Modais:** `abrirModal(titulo, corpoHtml, rodapeHtml)` e `window.fecharModal()`
-  (utils.js). Suportam pilha; clicar fora fecha.
-- **Feedback:** `toast(mensagem, tipo)` — tipos usados: `'success'`, `'error'`,
-  `'info'` (e `''`).
-- **Estilo:** CSS variables em `css/app.css` (`--primary`, `--secondary`, `--accent`,
-  `--danger`, `--success`, `--text-muted`, `--border-light`, `--bg-hover`). Classe
-  `no-print` esconde elementos na impressão da ficha.
-- **Escapar entrada do usuário** com `escHtml()` ao interpolar em HTML.
-- **Funções globais** (`window.x`) só quando chamadas por `onclick=""` inline; caso
-  contrário mantenha no escopo do módulo.
-
----
-
-## Cálculos-chave (onde mexer)
-
-- **Modificador:** `calcMod(valor)` — utils.js.
-- **Proficiência:** `bonusProficiencia(nivel)` — utils.js.
-- **CA:** `calcCA(...)` — utils.js.
-- **Deslocamento:** base da espécie via `getDeslocamento(texto)` (utils.js);
-  valor final (classe/talentos/efeitos/exaustão) via `getDeslocamentoFinal(base)`
-  em sheet.js (~L2249). Usado no painel da ficha (~L2843) e na impressão (~L15374).
-- **Tamanho:** `getTamanho(texto)` (utils.js) ou `char.tamanho`.
-- **Painel de inventário:** `renderSecaoInventario()` (sheet.js ~L14167),
-  itens por `renderSheetInvItem()` (~L14240), eventos em
-  `setupEventosInventarioSheet()` (~L14396).
-- **Item custom:** modal na ficha em `btn-add-inv-custom` (sheet.js ~L14500);
-  no wizard em `mostrarFormCustomItem()` (creator.js ~L3355).
-- **Wizard de tamanho/capacidade:** etapa "Detalhes" do creator.js (~L4091),
-  cards `[data-tamanho-card]`.
-
----
-
-## Regras de conteúdo (referência)
-
-As regras completas estão em `Informacoes Separadas/*.md` (Markdown, leitura humana).
-Ex.: **Capacidade de Carga** = Força × multiplicador de tamanho
-(`Abreviações e Definição de Regras.md`, ~linha 228). Os JSON em `dados/` são a fonte
-consumida em runtime; os `.md` alimentam o entendimento das regras ao implementar.
+O Service Worker (`site/sw.js`) instala de forma transacional: cache-first
+estrito pelo manifesto de precache + cache separado sob demanda; a versão só
+vira depois de todo o precache validado.
 
 ---
 
 ## Convenções gerais
 
-- Comentários e UI em **pt-BR** (com acentuação correta).
-- Arquivos `sheet.js`/`creator.js` são grandes: prefira `Grep`/`Read` por trecho a ler
-  inteiro; siga o padrão local ao editar (não reestruture sem necessidade).
-- Compatibilidade com personagens antigos: campos novos devem ser lidos com optional
-  chaining (`char?.config?.x`) e escritos com guarda (`if (!char.config) char.config = {}`),
-  pois fichas já salvas não terão o campo.
+- Comentários e UI em **pt-BR**; funções novas sempre com comentário do que fazem.
+- Sem framework: markup nasce em `features/**` com as primitivas de `ui/**`
+  (`escapeHtml`, delegação por `data-action`); **nenhum handler inline** e
+  nenhum global `window.*` novo (gate `check:inline-handlers`).
+- CSP sem `'unsafe-inline'` em `script-src` (mantido apenas em `style-src`).
+- Compatibilidade com fichas antigas é garantida pelo codec v2 + testes de
+  round-trip; nunca descarte campo desconhecido (passthrough).
 - Não commitar automaticamente (política do repositório).

@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.googleusercontent.com https://*.google.com; connect-src 'self' https://*.googleapis.com https://firestore.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; font-src 'self'; frame-src https://accounts.google.com https://*.firebaseapp.com; object-src 'none'; base-uri 'self';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.googleusercontent.com https://*.google.com; connect-src 'self' https://*.googleapis.com https://firestore.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://www.gstatic.com; font-src 'self'; frame-src https://accounts.google.com https://*.firebaseapp.com; object-src 'none'; base-uri 'self';">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#7b2d26">
   <title>D&D 5.5 - Ficha de Personagem</title>
@@ -22,7 +22,9 @@
     <button id="btn-voltar" class="header-btn" style="display:none">
       <svg id="icone-voltar" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
-    <h1 id="header-titulo">D&D 5.5 Ficha <span id="header-versao" class="header-versao">v0</span><!-- VERSION_AUTO --></h1>
+    <!-- O texto da versão é substituído por scripts/prepare-pages.mjs (Task 35)
+         via marcador único __DEPLOY_VERSION__, sem sed. -->
+    <h1 id="header-titulo">D&D 5.5 Ficha <span id="header-versao" class="header-versao">v__DEPLOY_VERSION__</span></h1>
     <div id="header-acoes"></div>
     <span id="label-reportar-bug" class="no-print">Reportar Bugs</span>
     <button id="btn-reportar-bug" class="header-btn no-print" title="Reportar problema ou sugestão">🐛</button>
@@ -36,7 +38,10 @@
     <div id="modal-container" class="modal-container">
       <div id="modal-header" class="modal-header">
         <h2 id="modal-titulo"></h2>
-        <button class="modal-fechar" onclick="fecharModal()">&times;</button>
+        <!-- Sem `onclick` inline (Task 24): o listener é registrado por
+             site/js/ui/modal.js#createModalService, criado no boot em
+             site/js/app.js#init. -->
+        <button class="modal-fechar">&times;</button>
       </div>
       <div id="modal-corpo" class="modal-corpo"></div>
       <div id="modal-acoes" class="modal-acoes"></div>

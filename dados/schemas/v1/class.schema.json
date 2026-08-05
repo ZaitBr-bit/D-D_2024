@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.fichas-de-nimb.dev/v1/class.schema.json",
+  "title": "Class entity (v1)",
+  "description": "Classe de personagem (ex.: Guerreiro, Mago).",
+  "type": "object",
+  "allOf": [
+    { "$ref": "common.schema.json#/$defs/entityBase" },
+    {
+      "type": "object",
+      "properties": {
+        "type": { "const": "class" },
+        "hitDie": { "enum": ["d6", "d8", "d10", "d12"] },
+        "primaryAbility": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "common.schema.json#/$defs/abilityRef" }
+        },
+        "savingThrowProficiencies": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "common.schema.json#/$defs/abilityRef" }
+        },
+        "spellcasting": {
+          "type": "object",
+          "properties": {
+            "ability": { "$ref": "common.schema.json#/$defs/abilityRef" },
+            "progression": { "enum": ["full", "half", "third", "pact", "none"] }
+          },
+          "required": ["ability", "progression"],
+          "additionalProperties": false
+        },
+        "legacyPresentation": {
+          "type": "object",
+          "description": "DÍVIDA TEMPORÁRIA (Task 23b), NÃO É MODELO DE DOMÍNIO. Cópia VERBATIM (byte a byte) do arquivo legado `dados/classes/<slug>.json`, gerada por scripts/content/migrate-classes.mjs. Existe por um motivo só: `site/js/pages/sheet.js` e `site/js/pages/creator.js` ainda consomem `getClasse()` no formato do arquivo legado (tabela_caracteristicas, texto_completo, tracos_basicos, caracteristicas na ordem do markdown, lista_magias, tabelas específicas de classe), e reescrevê-los está fora de escopo até as Tasks 25-32. O modelo de domínio REAL desses dados já existe e é o que qualquer código novo deve usar: as entidades `feature`/`subclass` deste mesmo pacote e as consultas de `site/js/domain/progression/progression-queries.js` (Task 23). Nenhum campo aqui pode ser reconciliado semanticamente com o catálogo — é cópia intencional do legado, defeitos inclusive. REMOVER este campo (e o ramo correspondente de `projetarClasse` em site/js/infra/content/legacy-db-projection.js) assim que as Tasks 25-32 eliminarem os consumidores legados.",
+          "properties": {
+            "nome": { "type": "string" },
+            "tracos_basicos": { "type": "object" },
+            "tabela_caracteristicas": { "type": "array" },
+            "caracteristicas": { "type": "array" },
+            "subclasses": { "type": "array" },
+            "lista_magias": { "type": "object" },
+            "texto_completo": { "type": "string" },
+            "tabela_forma_selvagem": { "type": "array" },
+            "tabela_pontos_feiticaria": { "type": "object" }
+          },
+          "required": ["nome", "tracos_basicos", "tabela_caracteristicas", "caracteristicas", "subclasses", "lista_magias"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["type", "hitDie", "primaryAbility", "savingThrowProficiencies"]
+    }
+  ],
+  "unevaluatedProperties": false
+}

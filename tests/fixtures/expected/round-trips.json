@@ -1,0 +1,349 @@
+{
+  "fixtureVersion": 1,
+  "compatibilityBaseline": "e43c5ea",
+  "generatedAt": "2026-07-26T00:00:00.000Z",
+  "cases": [
+    {
+      "id": "salvar-personagem-sobrescreve-atualizado-em",
+      "descricao": "salvarPersonagem EXECUTADO de verdade: sempre sobrescreve atualizado_em com o relógio atual no momento da chamada, mesmo que o personagem já tenha um atualizado_em de entrada.",
+      "origemReal": "site/js/store.js#salvarPersonagem (EXECUTADO, linha 82)",
+      "relogioFixado": "2026-07-26T00:00:00.000Z",
+      "personagemAntesDeSalvar": {
+        "id": "rt01-rt01-rt01",
+        "nome": "Round Trip Salvar",
+        "criado_em": "2026-01-10T08:00:00.000Z",
+        "atualizado_em": "2026-01-10T08:00:00.000Z"
+      },
+      "operacao": {
+        "fn": "salvarPersonagem"
+      },
+      "personagemDepoisDeSalvar": {
+        "id": "rt01-rt01-rt01",
+        "nome": "Round Trip Salvar",
+        "criado_em": "2026-01-10T08:00:00.000Z",
+        "atualizado_em": "2026-07-26T00:00:00.000Z"
+      },
+      "notas": "atualizado_em de entrada (2026-01-10) é completamente ignorado; o campo de saída é sempre o relógio no momento de salvarPersonagem."
+    },
+    {
+      "id": "salvar-personagem-novo-define-id-e-criado-em",
+      "descricao": "salvarPersonagem EXECUTADO de verdade sobre um personagem sem id: gera um id real (gerarId) e define criado_em, além de atualizado_em.",
+      "origemReal": "site/js/store.js#salvarPersonagem (EXECUTADO, linhas 86-89)",
+      "relogioFixado": "2026-07-26T00:00:00.000Z",
+      "personagemAntesDeSalvar": {
+        "nome": "Personagem Novo Sem Id"
+      },
+      "operacao": {
+        "fn": "salvarPersonagem"
+      },
+      "personagemDepoisDeSalvar": {
+        "nome": "Personagem Novo Sem Id",
+        "atualizado_em": "2026-07-26T00:00:00.000Z",
+        "id": "0000-0000-0000",
+        "criado_em": "2026-07-26T00:00:00.000Z"
+      },
+      "notas": "id gerado por gerarId() real (site/js/utils.js), com Math.random() fixado em 0 apenas para esta chamada (determinismo do gerador de fixtures) — o valor \"0000-0000-0000\" reflete o formato real \"xxxx-xxxx-xxxx\", não um id digitado à mão."
+    },
+    {
+      "id": "exportar-e-importar-preserva-campos-desconhecidos",
+      "descricao": "exportarTodos + importarPersonagens EXECUTADOS de verdade: preserva campos desconhecidos do personagem inteiro.",
+      "origemReal": "site/js/store.js#exportarTodos + #importarPersonagens + #_validarPersonagem (EXECUTADOS)",
+      "personagemOriginal": {
+        "id": "rt02-rt02-rt02",
+        "nome": "Round Trip Export/Import",
+        "imagem": "",
+        "nivel": 1,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "",
+        "subclasse": "",
+        "especie": "",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 0,
+        "pv_atual": 0,
+        "pv_temporario": 0,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 0,
+        "pericias_proficientes": [],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [],
+        "inventario": [],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [],
+        "grimorio": [],
+        "espacos_magia": {},
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z",
+        "_flag_beta_interface_nova": true,
+        "preferencias_ui": {
+          "tema": "escuro"
+        }
+      },
+      "operacao": {
+        "fn": "exportarTodos->importarPersonagens"
+      },
+      "personagemAposRoundTrip": {
+        "id": "rt02-rt02-rt02",
+        "nome": "Round Trip Export/Import",
+        "imagem": "",
+        "nivel": 1,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "",
+        "subclasse": "",
+        "especie": "",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 0,
+        "pv_atual": 0,
+        "pv_temporario": 0,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 0,
+        "pericias_proficientes": [],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [],
+        "inventario": [],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pl": 0,
+          "po": 0,
+          "pe": 0,
+          "pp": 0,
+          "pc": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [],
+        "grimorio": [],
+        "espacos_magia": {},
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z",
+        "_flag_beta_interface_nova": true,
+        "preferencias_ui": {
+          "tema": "escuro"
+        }
+      },
+      "notas": "importarPersonagens só adiciona o personagem à lista se nenhum outro com o mesmo id já existir."
+    },
+    {
+      "id": "importar-personagem-invalido-e-descartado",
+      "descricao": "importarPersonagens EXECUTADO de verdade: descarta itens que falham em _validarPersonagem, continuando os demais.",
+      "origemReal": "site/js/store.js#importarPersonagens (EXECUTADO, linhas 216-219)",
+      "jsonImportado": [
+        {
+          "id": "ok1-ok1-ok1-ok1",
+          "nome": "Válido",
+          "nivel": 1,
+          "atributos": {
+            "forca": 10
+          }
+        },
+        {
+          "id": "",
+          "nome": "Sem Id",
+          "nivel": 1,
+          "atributos": {}
+        },
+        {
+          "id": "ok2-ok2-ok2-ok2",
+          "nome": "Nível Fora de Faixa",
+          "nivel": 25,
+          "atributos": {}
+        }
+      ],
+      "resultadoOperacao": {
+        "countNovos": 1
+      },
+      "notas": "Apenas o primeiro item passa em _validarPersonagem; os outros dois são descartados sem interromper o loop."
+    },
+    {
+      "id": "migracoes-de-listarPersonagens-sao-idempotentes",
+      "descricao": "listarPersonagens EXECUTADO de verdade duas vezes seguidas sobre o mesmo localStorage: produz exatamente o mesmo resultado (idempotência).",
+      "origemReal": "site/js/store.js#listarPersonagens (EXECUTADO, linhas 50-71)",
+      "personagemArmazenado": {
+        "id": "rt03-rt03-rt03",
+        "nome": "Idempotência de Leitura",
+        "po": 30
+      },
+      "primeiraLeitura": {
+        "id": "rt03-rt03-rt03",
+        "nome": "Idempotência de Leitura",
+        "moedas": {
+          "pl": 0,
+          "po": 30,
+          "pe": 0,
+          "pp": 0,
+          "pc": 0
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        }
+      },
+      "segundaLeitura": {
+        "id": "rt03-rt03-rt03",
+        "nome": "Idempotência de Leitura",
+        "moedas": {
+          "pl": 0,
+          "po": 30,
+          "pe": 0,
+          "pp": 0,
+          "pc": 0
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        }
+      },
+      "notas": "Primeira e segunda leitura produzem o mesmo objeto; o campo legado `po` já foi removido e não reaparece."
+    }
+  ]
+}

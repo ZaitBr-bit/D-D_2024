@@ -2,8 +2,128 @@
 // Utilitários de cálculo D&D 5.5 e helpers gerais
 // ============================================================
 import { ATRIBUTOS_KEYS, ATRIBUTO_NOME_PARA_KEY, PERICIAS, CLASSES_INFO } from './dados-classes.js';
+import { appContext } from './app-context.js';
+import { escapeHtml } from './ui/html.js';
+import { renderSafeMarkdownToHtml } from './ui/markdown.js';
+import { createModalService } from './ui/modal.js';
+import { createToastService } from './ui/toast.js';
+import { createLegacyAliasResolver } from './infra/character/legacy-alias-resolver.js';
+import { projectLegacyCharacterForQueries } from './infra/character/legacy-query-adapter.js';
+import { getArmorClass, getDefenses, getSkillProjection } from './domain/character/queries/index.js';
+import { resolveCarryingCapacityMultiplier } from './domain/character/queries/movement.js';
 
 // --- Cálculos D&D ---
+//
+// TASK 16 (fix round 1, achado C1): as funções desta seção agora DELEGAM
+// para as consultas puras de `site/js/domain/character/queries/*` sempre
+// que o catálogo de conteúdo já foi inicializado (`appContext`) e o
+// personagem em memória decodifica com sucesso via
+// `infra/character/legacy-query-adapter.js`. Cada função mantém a MESMA
+// assinatura pública (criador/ficha/impressão/PDF continuam chamando-as sem
+// mudança) e um fallback mínimo de UMA linha — nunca uma segunda cópia do
+// motor de cálculo — para os dois casos em que a delegação não está
+// disponível: (a) o catálogo ainda não foi inicializado (cedo demais no
+// boot), ou (b) o registro específico não decodifica (ex.: subclasse sem
+// alias exato no pacote atual). Ajustes que a consulta de domínio ainda não
+// reproduz (efeitos mágicos temporários sobre CA/perícia, CD de magia do
+// Feiticeiro com Feitiçaria Inata, bônus da Ordem Divina/Ordem Primal, troca
+// de atributo por Força Primordial do Bárbaro) continuam aplicados aqui como
+// ajustes residuais explícitos — ver relatório da Task 16 (fix round 1) para
+// o inventário completo desses gaps herdados/não migrados.
+
+const ALIAS_ENTITY_ID = 'dnd2024:migration-map:character-v1-aliases';
+/** @type {object | null} */
+let _cachedAliasResolver = null;
+/** @type {object | null | undefined} */
+let _legacyQueryContextOverrideForTests = undefined;
+
+/**
+ * Resolve `{aliasResolver, registry, now}` para a camada de adaptação desta
+ * seção delegar às consultas de domínio. Devolve `null` quando o catálogo de
+ * conteúdo ainda não foi inicializado (`appContext.initializeContent()`
+ * ainda não resolveu) ou quando a entidade de aliases legados não está
+ * carregada — quem chama trata isso caindo no fallback mínimo, nunca
+ * reimplementando o cálculo inteiro.
+ * @returns {{aliasResolver: object, registry: object, now: string} | null}
+ */
+function resolveLegacyQueryContext() {
+  if (_legacyQueryContextOverrideForTests !== undefined) {
+    return _legacyQueryContextOverrideForTests;
+  }
+  const registry = typeof appContext?.getContentRegistry === 'function' ? appContext.getContentRegistry() : null;
+  if (!registry) {
+    return null;
+  }
+  if (!_cachedAliasResolver) {
+    const aliasEntity = registry.get(ALIAS_ENTITY_ID);
+    if (!aliasEntity) {
+      return null;
+    }
+    try {
+      _cachedAliasResolver = createLegacyAliasResolver(aliasEntity);
+    } catch {
+      return null;
+    }
+  }
+  return { aliasResolver: _cachedAliasResolver, registry, now: new Date().toISOString() };
+}
+
+/**
+ * Uso exclusivo de teste: injeta (ou limpa, passando `undefined`) um
+ * `context` fixo para `resolveLegacyQueryContext()`, evitando depender do
+ * boot real de `appContext`/Firebase em ambiente Node. Nunca chamado por
+ * código de produção.
+ * @param {{aliasResolver: object, registry: object, now: string} | null | undefined} override
+ */
+export function _setLegacyQueryContextOverrideForTests(override) {
+  _legacyQueryContextOverrideForTests = override;
+}
+
+/**
+ * Mapeia a saída de `resolverPassivosTalentos` (site/js/talentos-effects.js
+ * — ÚNICA fonte de verdade de quais talentos concedem o quê) para o
+ * vocabulário fechado `context.talentPassives` que as consultas de domínio
+ * entendem (fix round 1, C2). Só reformata números já calculados; nunca
+ * decide sozinha se um talento concede ou não um bônus.
+ * @param {object | null} passivos
+ * @returns {object | undefined}
+ */
+function mapTalentPassivesForQueries(passivos) {
+  if (!passivos || typeof passivos !== 'object') {
+    return undefined;
+  }
+  return {
+    armorClassBonus: passivos.bonusCA || 0,
+    mediumArmorMaxDexBonus: typeof passivos.bonusCAArmaduraMediaMaxDes === 'number' ? passivos.bonusCAArmaduraMediaMaxDes : null,
+    initiativeBonus: passivos.bonusIniciativa || 0,
+    speedBonus: passivos.bonusDeslocamento || 0,
+  };
+}
+
+// Perícia (nome de exibição em português) -> ContentId do ruleset dnd2024,
+// usado só para que esta camada de adaptação saiba QUAL consulta delegada
+// chamar — nunca um lookup textual usado para decidir REGRAS de jogo (essas
+// já são decididas dentro de `domain/character/queries/*` por ID estável).
+const PERICIA_NOME_PARA_SKILL_ID = Object.freeze({
+  'Acrobacia': 'dnd2024:skill:acrobacia',
+  'Lidar com Animais': 'dnd2024:skill:lidar-com-animais',
+  'Arcanismo': 'dnd2024:skill:arcanismo',
+  'Atletismo': 'dnd2024:skill:atletismo',
+  'Atuação': 'dnd2024:skill:atuacao',
+  'Enganação': 'dnd2024:skill:enganacao',
+  'Furtividade': 'dnd2024:skill:furtividade',
+  'História': 'dnd2024:skill:historia',
+  'Intimidação': 'dnd2024:skill:intimidacao',
+  'Intuição': 'dnd2024:skill:intuicao',
+  'Investigação': 'dnd2024:skill:investigacao',
+  'Medicina': 'dnd2024:skill:medicina',
+  'Natureza': 'dnd2024:skill:natureza',
+  'Percepção': 'dnd2024:skill:percepcao',
+  'Persuasão': 'dnd2024:skill:persuasao',
+  'Prestidigitação': 'dnd2024:skill:prestidigitacao',
+  'Religião': 'dnd2024:skill:religiao',
+  'Sobrevivência': 'dnd2024:skill:sobrevivencia',
+});
 
 /** Calcula modificador de atributo */
 export function calcMod(valor) {
@@ -140,15 +260,57 @@ export function normalizarGrimorioMago(personagem, limitePreparadas) {
   return { alterado, pendentes };
 }
 
-/** Calcula CA baseado na armadura equipada */
-export function calcCA(personagem, passivos = null) {
+/**
+ * Aplica, por cima de uma CA já calculada, os efeitos mágicos temporários
+ * (`efeitos_magicos`) — ainda não modelados no personagem canônico (Task 12
+ * não migra esse campo para `state.activeEffects`), por isso continua um
+ * ajuste local tanto no caminho delegado quanto no fallback legado completo.
+ * @param {object} personagem
+ * @param {number} ca
+ * @param {number} modDes
+ * @returns {number}
+ */
+function aplicarEfeitosMagicosCA(personagem, ca, modDes) {
+  let resultado = ca;
+  const efeitos = personagem?.efeitos_magicos || [];
+  for (const ef of efeitos) {
+    if (ef.tipo_efeito === 'bonus') {
+      resultado += ef.valor || 0;
+    } else if (ef.tipo_efeito === 'base') {
+      // CA base substitui (ex: Armadura Arcana = 13 + Des)
+      const caBase = (ef.valor || 13) + modDes;
+      if (caBase > resultado) resultado = caBase;
+    } else if (ef.tipo_efeito === 'minimo') {
+      // CA mínima (ex: Pele-Casca = mín 17)
+      if ((ef.valor || 0) > resultado) resultado = ef.valor;
+    }
+  }
+  return resultado;
+}
+
+/**
+ * Fórmula COMPLETA (não simplificada) de cálculo de CA — a mesma lógica que
+ * existia em `calcCA` antes da Task 16, incluindo armadura/escudo/Defesa sem
+ * Armadura por classe/Estilo de Luta Defensivo/bônus de CA de itens
+ * customizados/efeitos mágicos temporários/bônus genérico de CA de talento.
+ * Usada como fallback de `calcCA` sempre que a delegação a
+ * `domain/character/queries/combat.js#getArmorClass` não está disponível
+ * (fix round 2, achado NEW-1: o fallback anterior, `10 + modDes`, perdia
+ * silenciosamente armadura/escudo/talentos sempre que o registro não
+ * decodificava — um caso REAL e frequente, não hipotético, ex.: subclasse
+ * com nomenclatura antiga sem alias em `character-v1-aliases.json`, como em
+ * `tests/fixtures/characters/legacy-all-fields.json`/`legacy-known-casters.json`).
+ * @param {object} personagem
+ * @param {object | null} passivos
+ * @returns {number}
+ */
+function calcCALegacyFull(personagem, passivos = null) {
   const modDes = calcMod(personagem.atributos.destreza);
   const modCon = calcMod(personagem.atributos.constituicao);
   const modSab = calcMod(personagem.atributos.sabedoria);
   const modCar = calcMod(personagem.atributos.carisma);
   const inv = personagem.inventario || [];
 
-  // Verificar armadura equipada
   const armadura = inv.find(i => i.equipado && i.tipo === 'armadura' && i.nome !== 'Escudo');
   const escudo = inv.find(i => i.equipado && (i.nome === 'Escudo' || i.tipo === 'escudo'));
 
@@ -219,20 +381,7 @@ export function calcCA(personagem, passivos = null) {
     ca += parseInt(i.dados.bonus_ca) || 0;
   });
 
-  // Efeitos mágicos ativos que afetam CA
-  const efeitos = personagem.efeitos_magicos || [];
-  for (const ef of efeitos) {
-    if (ef.tipo_efeito === 'bonus') {
-      ca += ef.valor || 0;
-    } else if (ef.tipo_efeito === 'base') {
-      // CA base substitui (ex: Armadura Arcana = 13 + Des)
-      const caBase = (ef.valor || 13) + modDes;
-      if (caBase > ca) ca = caBase;
-    } else if (ef.tipo_efeito === 'minimo') {
-      // CA mínima (ex: Pele-Casca = mín 17)
-      if ((ef.valor || 0) > ca) ca = ef.valor;
-    }
-  }
+  ca = aplicarEfeitosMagicosCA(personagem, ca, modDes);
 
   // Bônus genérico de CA de talentos
   ca += passivos?.bonusCA || 0;
@@ -240,15 +389,63 @@ export function calcCA(personagem, passivos = null) {
   return ca;
 }
 
-/** Calcula CD de magia */
-export function calcCDMagia(personagem) {
-  const info = CLASSES_INFO[personagem.classe];
-  if (!info || !info.atributo_conjuracao) return 0;
-  const key = ATRIBUTO_NOME_PARA_KEY[info.atributo_conjuracao];
-  const modAttr = calcMod(personagem.atributos[key]);
-  let cd = 8 + bonusProficiencia(personagem.nivel) + modAttr;
+/**
+ * Calcula CA baseado na armadura equipada. DELEGA para
+ * `domain/character/queries/combat.js#getArmorClass` (fix round 1, C1)
+ * quando o catálogo está pronto e o personagem decodifica; quando a
+ * delegação NÃO está disponível (catálogo não inicializado, OU o registro
+ * específico não decodifica — ex.: subclasse sem alias exato), o fallback é
+ * a fórmula legada COMPLETA (`calcCALegacyFull`), não um valor simplificado
+ * (fix round 2, achado NEW-1 — ver comentário de `calcCALegacyFull`). O
+ * único ajuste residual aplicado por cima do caminho DELEGADO são os
+ * efeitos mágicos temporários (`efeitos_magicos`), ainda não modelados no
+ * personagem canônico.
+ */
+export function calcCA(personagem, passivos = null) {
+  const ctx = resolveLegacyQueryContext();
+  if (ctx) {
+    const projected = projectLegacyCharacterForQueries(personagem, ctx);
+    if (projected.ok) {
+      const result = getArmorClass(projected.value, {
+        registry: ctx.registry,
+        talentPassives: mapTalentPassivesForQueries(passivos),
+      });
+      if (result.ok) {
+        const modDes = calcMod(personagem?.atributos?.destreza ?? 10);
+        return aplicarEfeitosMagicosCA(personagem, result.value, modDes);
+      }
+    }
+  }
+  return calcCALegacyFull(personagem, passivos);
+}
 
-  // Feiticeiro: Feitiçaria Inata ativa aumenta CD em +1
+/**
+ * Calcula CD de magia. DELEGA para
+ * `domain/character/queries/defenses.js#getDefenses` (fix round 1, C1); o
+ * bônus do Feiticeiro com Feitiçaria Inata ativa continua local (ainda não
+ * extraído — ver relatório da Task 16, fix round 1, Minor).
+ */
+export function calcCDMagia(personagem) {
+  let cd;
+  const ctx = resolveLegacyQueryContext();
+  if (ctx) {
+    const projected = projectLegacyCharacterForQueries(personagem, ctx);
+    if (projected.ok) {
+      const result = getDefenses(projected.value, { registry: ctx.registry });
+      if (result.ok) {
+        cd = result.value.spellSaveDC ?? 0;
+      }
+    }
+  }
+  if (cd === undefined) {
+    const info = CLASSES_INFO[personagem.classe];
+    if (!info || !info.atributo_conjuracao) return 0;
+    const key = ATRIBUTO_NOME_PARA_KEY[info.atributo_conjuracao];
+    const modAttr = calcMod(personagem.atributos[key]);
+    cd = 8 + bonusProficiencia(personagem.nivel) + modAttr;
+  }
+
+  // Feiticeiro: Feitiçaria Inata ativa aumenta CD em +1 (ainda local).
   if (personagem.classe === 'Feiticeiro' && personagem?.recursos?.feiticeiro?.feiticaria_inata_ativa) {
     cd += 1;
   }
@@ -256,8 +453,21 @@ export function calcCDMagia(personagem) {
   return cd;
 }
 
-/** Calcula bônus de ataque de magia */
+/**
+ * Calcula bônus de ataque de magia. DELEGA para
+ * `domain/character/queries/defenses.js#getDefenses` (fix round 1, C1).
+ */
 export function calcAtaqueMagia(personagem) {
+  const ctx = resolveLegacyQueryContext();
+  if (ctx) {
+    const projected = projectLegacyCharacterForQueries(personagem, ctx);
+    if (projected.ok) {
+      const result = getDefenses(projected.value, { registry: ctx.registry });
+      if (result.ok) {
+        return result.value.spellAttackBonus ?? 0;
+      }
+    }
+  }
   const info = CLASSES_INFO[personagem.classe];
   if (!info || !info.atributo_conjuracao) return 0;
   const key = ATRIBUTO_NOME_PARA_KEY[info.atributo_conjuracao];
@@ -265,8 +475,21 @@ export function calcAtaqueMagia(personagem) {
   return bonusProficiencia(personagem.nivel) + modAttr;
 }
 
-/** Calcula Percepção Passiva */
+/**
+ * Calcula Percepção Passiva. DELEGA para
+ * `domain/character/queries/skills.js#getSkillProjection` (fix round 1, C1).
+ */
 export function calcPercepcaoPassiva(personagem) {
+  const ctx = resolveLegacyQueryContext();
+  if (ctx) {
+    const projected = projectLegacyCharacterForQueries(personagem, ctx);
+    if (projected.ok) {
+      const result = getSkillProjection(projected.value, 'dnd2024:skill:percepcao', { registry: ctx.registry });
+      if (result.ok) {
+        return result.value.passive;
+      }
+    }
+  }
   const modSab = calcMod(personagem.atributos.sabedoria);
   const prof = (personagem.pericias_proficientes || []).includes('Percepção');
   const exp = (personagem.pericias_expertise || []).includes('Percepção');
@@ -289,7 +512,15 @@ export function calcInvestigacaoPassiva(personagem) {
   return 10 + calcBonusPericia(personagem, 'Investigação');
 }
 
-/** Calcula bônus de uma perícia */
+/**
+ * Calcula bônus de uma perícia. DELEGA para
+ * `domain/character/queries/skills.js#getSkillProjection` (fix round 1, C1)
+ * — EXCETO quando a Força Primordial do Bárbaro em Fúria troca o atributo
+ * usado (a consulta delegada ainda não suporta troca de atributo; ver
+ * relatório da Task 16, fix round 1, Minor). Os bônus da Ordem Divina
+ * (Taumaturgo)/Ordem Primal (Xamã) e de efeitos mágicos temporários
+ * continuam locais (ainda não modelados no personagem canônico).
+ */
 export function calcBonusPericia(personagem, nomePericia, opcoes = {}) {
   const pericia = PERICIAS.find(p => p.nome === nomePericia);
   if (!pericia) return 0;
@@ -297,18 +528,32 @@ export function calcBonusPericia(personagem, nomePericia, opcoes = {}) {
   const emFuria = !!opcoes.emFuria;
   const forcaPrimordialAtiva = !!opcoes.forcaPrimordialAtiva;
   const periciasConhecimentoPrimordial = ['Acrobacia', 'Furtividade', 'Intimidação', 'Percepção', 'Sobrevivência'];
-
   const usarForcaPrimordial = emFuria && forcaPrimordialAtiva && periciasConhecimentoPrimordial.includes(nomePericia);
-  const key = usarForcaPrimordial ? 'forca' : ATRIBUTO_NOME_PARA_KEY[pericia.atributo];
-  const mod = calcMod(personagem.atributos[key]);
-  const prof = (personagem.pericias_proficientes || []).includes(nomePericia);
-  const exp = (personagem.pericias_expertise || []).includes(nomePericia);
-  let bonus = mod;
-  if (prof) bonus += bonusProficiencia(personagem.nivel);
-  if (exp) bonus += bonusProficiencia(personagem.nivel);
-  // Bardo: Pau pra Toda Obra (metade da proficiência em perícias sem proficiência)
-  if (personagem.classe === 'Bardo' && (personagem.nivel || 1) >= 2 && !prof && !exp) {
-    bonus += Math.floor(bonusProficiencia(personagem.nivel) / 2);
+
+  let bonus;
+  const skillId = PERICIA_NOME_PARA_SKILL_ID[nomePericia];
+  const ctx = usarForcaPrimordial ? null : resolveLegacyQueryContext();
+  if (ctx && skillId) {
+    const projected = projectLegacyCharacterForQueries(personagem, ctx);
+    if (projected.ok) {
+      const result = getSkillProjection(projected.value, skillId, { registry: ctx.registry });
+      if (result.ok) {
+        bonus = result.value.bonus;
+      }
+    }
+  }
+  if (bonus === undefined) {
+    const key = usarForcaPrimordial ? 'forca' : ATRIBUTO_NOME_PARA_KEY[pericia.atributo];
+    const mod = calcMod(personagem.atributos[key]);
+    const prof = (personagem.pericias_proficientes || []).includes(nomePericia);
+    const exp = (personagem.pericias_expertise || []).includes(nomePericia);
+    bonus = mod;
+    if (prof) bonus += bonusProficiencia(personagem.nivel);
+    if (exp) bonus += bonusProficiencia(personagem.nivel);
+    // Bardo: Pau pra Toda Obra (metade da proficiência em perícias sem proficiência)
+    if (personagem.classe === 'Bardo' && (personagem.nivel || 1) >= 2 && !prof && !exp) {
+      bonus += Math.floor(bonusProficiencia(personagem.nivel) / 2);
+    }
   }
 
   // Clérigo (Ordem Divina: Taumaturgo) - bônus em Arcanismo e Religião
@@ -402,45 +647,25 @@ export function formatarDados(texto) {
   return texto.replace(/(\d+)[dD](\d+)/g, '🎲$1d$2🎲');
 }
 
-/** Converte markdown básico para HTML */
+/**
+ * Converte markdown básico para HTML.
+ *
+ * FACHADA (Task 24): a implementação real vive em
+ * `site/js/ui/markdown.js#renderSafeMarkdown`, que monta um DocumentFragment
+ * com `createElement`/`createTextNode` a partir de uma allowlist fechada de
+ * tags. Aqui o fragmento é apenas serializado de volta para string, porque os
+ * consumidores legados (ficha, criador, impressão, PDF) ainda fazem
+ * `innerHTML = mdParaHtml(...)`. Código novo deve chamar `renderSafeMarkdown`
+ * e inserir o fragmento — sem passar por string em momento algum.
+ *
+ * `tests/unit/ui/markdown-fidelity.test.js` prova, sobre TODAS as descrições
+ * reais do pacote `dnd2024`, que a saída continua equivalente à do baseline.
+ * @param {string} texto
+ * @returns {string} HTML
+ */
 export function mdParaHtml(texto) {
   if (!texto) return '';
-  let html = texto
-    // Escapar HTML
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    // Formatar dados (🎲XdY🎲) antes de outras transformações
-    .replace(/(\d+)[dD](\d+)/g, '🎲$1d$2🎲')
-    // Headers
-    .replace(/^#### (.+)$/gm, '<h4>$1</h4>')
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    // Negrito e itálico
-    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // Listas
-    .replace(/^[-•]\s+(.+)$/gm, '<li>$1</li>')
-    // Tabelas simples (pipes)
-    .replace(/\|(.+)\|/g, (match) => {
-      const cells = match.split('|').filter(c => c.trim());
-      if (cells.every(c => /^[\s-:]+$/.test(c))) return ''; // Separador
-      const tag = cells.some(c => /^\*\*.+\*\*$/.test(c.trim())) ? 'th' : 'td';
-      return '<tr>' + cells.map(c => `<${tag}>${c.trim().replace(/\*\*/g, '')}</${tag}>`).join('') + '</tr>';
-    });
-
-  // Agrupar <li> em <ul>
-  html = html.replace(/((?:<li>.+<\/li>\n?)+)/g, '<ul>$1</ul>');
-  // Agrupar <tr> em <table>
-  html = html.replace(/((?:<tr>.+<\/tr>\n?)+)/g, '<div class="table-wrapper"><table>$1</table></div>');
-
-  // Parágrafos (linhas que não são tags)
-  html = html.split('\n').map(line => {
-    const trimmed = line.trim();
-    if (!trimmed) return '';
-    if (trimmed.startsWith('<')) return trimmed;
-    return `<p>${trimmed}</p>`;
-  }).join('\n');
-
-  return html;
+  return renderSafeMarkdownToHtml(document, texto);
 }
 
 // --- Helpers gerais ---
@@ -487,16 +712,19 @@ export function gerarId() {
   );
 }
 
-const _ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 /**
  * Escapa caracteres HTML especiais para prevenir XSS em innerHTML.
  * Nao adequado para contextos de atributos de evento ou URLs.
+ *
+ * FACHADA (Task 24): delega para `site/js/ui/html.js#escapeHtml`, que é o
+ * único ponto do projeto que define o mapa de escape. Para montar VALOR DE
+ * ATRIBUTO use `escapeHtmlAttribute` (conjunto de escape maior); para URLs,
+ * `resolveSafeUrl`.
  * @param {*} str - Valor a escapar (null/undefined retorna '').
  * @returns {string} String com &, <, >, ", ' escapados.
  */
 export function escHtml(str) {
-  if (str == null) return '';
-  return String(str).replace(/[&<>"']/g, c => _ESC_MAP[c]);
+  return escapeHtml(str);
 }
 
 /** Formata data para exibição */
@@ -506,14 +734,121 @@ export function fmtData(iso) {
   return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
-/** Mostra toast de notificação */
+// ------------------------------------------------------------------
+// FACHADA (Task 24) para os serviços de `site/js/ui/*`.
+//
+// Os serviços são criados sob demanda (não no topo do módulo) porque
+// `utils.js` é avaliado antes de `DOMContentLoaded`, quando os elementos do
+// shell (`#modal-overlay`, `#toast-container`, ...) ainda não existem.
+// ------------------------------------------------------------------
+
+/** @type {object | null} */
+let _toastService = null;
+/** @type {object | null} */
+let _modalService = null;
+
+/**
+ * Devolve (criando na primeira chamada) o serviço de toast ligado ao
+ * `#toast-container` do shell.
+ * @returns {object}
+ */
+function getToastService() {
+  if (!_toastService) {
+    _toastService = createToastService({
+      documentRef: document,
+      container: document.getElementById('toast-container'),
+    });
+  }
+  return _toastService;
+}
+
+/**
+ * Devolve (criando na primeira chamada) o serviço de modal ligado ao markup
+ * de modal do shell (`site/index.html`). O botão de fechar do cabeçalho é
+ * registrado aqui — é o que substitui o `onclick="fecharModal()"` inline
+ * removido do HTML nesta task.
+ * @returns {object}
+ */
+function getModalService() {
+  if (!_modalService) {
+    const overlay = document.getElementById('modal-overlay');
+    _modalService = createModalService({
+      documentRef: document,
+      overlay,
+      container: document.getElementById('modal-container'),
+      titleElement: document.getElementById('modal-titulo'),
+      bodyElement: document.getElementById('modal-corpo'),
+      actionsElement: document.getElementById('modal-acoes'),
+      closeButton: overlay ? overlay.querySelector('.modal-fechar') : null,
+    });
+  }
+  return _modalService;
+}
+
+/**
+ * Converte uma string de HTML legada em nós, para entregar ao serviço de
+ * modal (que só aceita nós).
+ *
+ * Este é o ÚNICO ponto onde markup ainda nasce de string, e existe só
+ * enquanto ficha/criador/level-up montarem seu conteúdo assim (Tasks 29-32).
+ * O comportamento é idêntico ao do baseline, que fazia `innerHTML = html`
+ * diretamente nos mesmos elementos — nenhuma capacidade nova é concedida
+ * aqui, e nenhum conteúdo passa a ser confiável por causa disso.
+ * @param {string|object|null} html
+ * @returns {object|null} DocumentFragment com os nós, ou `null`.
+ */
+function nosDeHtmlLegado(html) {
+  if (html === null || html === undefined || html === '') return null;
+  if (typeof html === 'object' && typeof html.nodeType === 'number') return html;
+  const template = document.createElement('div');
+  template.innerHTML = String(html);
+  const fragment = document.createDocumentFragment();
+  while (template.firstChild) {
+    fragment.appendChild(template.firstChild);
+  }
+  return fragment;
+}
+
+/**
+ * Cria e liga, de uma vez, os serviços de UI do shell (modal e toast).
+ * Chamado pelo shell (`site/js/app.js#init`) para que os listeners do
+ * cabeçalho do modal — que substituíram o `onclick` inline de
+ * `site/index.html` — existam desde o boot, e não só a partir do primeiro
+ * `abrirModal`.
+ * @returns {void}
+ */
+export function inicializarUiDoShell() {
+  getModalService();
+  getToastService();
+}
+
+/**
+ * Devolve o `ModalService` do shell.
+ *
+ * `abrirModal`/`fecharModal` continuam sendo a fachada para o código legado
+ * (que fala em string de HTML e depende do comportamento congelado do
+ * baseline). Quem já foi migrado — hoje o criador novo
+ * (`features/creator/creator-controller.js`, que abre modal a partir de NÓS,
+ * com pilha e `onClose` próprios) — precisa do serviço em si; sem este acesso
+ * o composition root teria de construir um SEGUNDO `ModalService` sobre os
+ * mesmos elementos do shell, e os dois brigariam pela mesma pilha.
+ * @returns {object} o `ModalService` ligado ao markup de `site/index.html`.
+ */
+export function obterServicoDeModal() {
+  return getModalService();
+}
+
+/**
+ * Mostra toast de notificação.
+ *
+ * FACHADA (Task 24): delega para `site/js/ui/toast.js`, que escreve a
+ * mensagem com `setSafeText`.
+ * @param {*} msg
+ * @param {string} [tipo]
+ * @returns {void}
+ */
 export function toast(msg, tipo = '') {
-  const container = document.getElementById('toast-container');
-  const el = document.createElement('div');
-  el.className = `toast ${tipo}`;
-  el.textContent = msg;
-  container.appendChild(el);
-  setTimeout(() => el.remove(), 3000);
+  getToastService().show(msg, tipo);
 }
 
 /** Debounce simples */
@@ -530,80 +865,69 @@ export function semAcento(str) {
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 }
 
-/** Contador de sub-modais ativos */
-let _subModalCount = 0;
-/** Callback opcional ao fechar o modal principal */
-let _onModalClose = null;
-
-/** Abre modal global. onClose é chamado quando o modal principal é fechado. */
+/**
+ * Abre modal global. onClose é chamado quando o modal principal é fechado.
+ *
+ * FACHADA (Task 24): delega para `site/js/ui/modal.js#createModalService`.
+ * Três detalhes de compatibilidade, deliberados, para que NENHUM chamador
+ * legado mude de comportamento:
+ *
+ *  - `closeOnEscape`/`manageFocus` ficam DESLIGADOS. O serviço suporta os
+ *    dois (e os testes de `tests/unit/ui/modal.test.js` os exercitam), mas o
+ *    baseline não fechava com Escape nem mexia no foco; ligar isso agora
+ *    mudaria o comportamento de 92 chamadas de `abrirModal` de uma vez, o
+ *    que não é escopo desta task. As Tasks 29-32 ligam por tela.
+ *  - `onClose` só é registrado quando este é o modal PRINCIPAL, porque no
+ *    baseline o 4º argumento era silenciosamente ignorado em sub-modais.
+ *  - Botões com `data-action="fechar-modal"` (a forma declarativa que
+ *    substituiu o handler inline legado na Task 37) são ligados para fechar
+ *    o PRÓPRIO modal aberto por esta chamada (inclusive sub-modais).
+ *
+ * @param {string} titulo
+ * @param {string} corpoHtml
+ * @param {string} [acoesHtml]
+ * @param {Function|null} [onClose]
+ * @returns {object} handle do modal (`close`, `isOpen`, `element`).
+ */
 export function abrirModal(titulo, corpoHtml, acoesHtml = '', onClose = null) {
-  const overlay = document.getElementById('modal-overlay');
-  const tituloEl = document.getElementById('modal-titulo');
-  const corpoEl = document.getElementById('modal-corpo');
-  const acoesEl = document.getElementById('modal-acoes');
+  const service = getModalService();
+  const ehPrincipal = service.getStackSize() === 0;
+  const handle = service.open({
+    title: titulo,
+    content: nosDeHtmlLegado(corpoHtml),
+    actions: nosDeHtmlLegado(acoesHtml),
+    onClose: ehPrincipal ? onClose : null,
+    closeOnEscape: false,
+    manageFocus: false,
+  });
 
-  // Se ja existe modal aberto, abrir como sub-modal (overlay empilhado)
-  if (overlay.style.display === 'flex') {
-    _subModalCount++;
-    const sub = document.createElement('div');
-    sub.className = 'modal-overlay sub-modal-overlay';
-    sub.id = `sub-modal-overlay-${_subModalCount}`;
-    sub.style.display = 'flex';
-    sub.style.zIndex = 200 + _subModalCount;
-    sub.innerHTML = `
-      <div class="modal-container" style="animation:slideUp 0.2s">
-        <div class="modal-header" style="position:sticky;top:0;background:var(--bg-card);z-index:1">
-          <h2 style="font-size:1rem;font-weight:700">${titulo}</h2>
-          <button class="modal-fechar" data-fechar-sub="true">&times;</button>
-        </div>
-        <div class="modal-corpo" style="padding:16px">${corpoHtml}</div>
-        <div class="modal-acoes" style="padding:12px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--border-light)">${acoesHtml}</div>
-      </div>
-    `;
-    document.body.appendChild(sub);
-    // Fechar sub-modal ao clicar fora ou no X
-    sub.addEventListener('click', (e) => {
-      if (e.target === sub || e.target.closest('[data-fechar-sub]')) {
-        sub.remove();
-        _subModalCount--;
-      }
-    });
-    // Substituir onclick="fecharModal()" nos botões do sub-modal
-    sub.querySelectorAll('[onclick*="fecharModal"]').forEach(btn => {
-      btn.removeAttribute('onclick');
-      btn.addEventListener('click', () => { sub.remove(); _subModalCount--; });
-    });
-    return;
-  }
-
-  tituloEl.textContent = titulo;
-  corpoEl.innerHTML = corpoHtml;
-  acoesEl.innerHTML = acoesHtml;
-  overlay.style.display = 'flex';
-  _onModalClose = onClose;
-  document.getElementById('modal-container').scrollTop = 0;
+  // Fechamento DECLARATIVO (Task 37): qualquer `[data-action="fechar-modal"]`
+  // dentro do modal fecha ESTE modal (o do handle, não o do topo da pilha —
+  // que em sub-modais seria o mesmo, mas aqui fica explícito). Substitui o
+  // antigo `onclick="fecharModal()"` inline, eliminado de todo o `site/**`
+  // para permitir remover `'unsafe-inline'` de `script-src` na CSP.
+  handle.element.querySelectorAll('[data-action="fechar-modal"]').forEach(btn => {
+    btn.addEventListener('click', () => handle.close('data-action-fechar-modal'));
+  });
+  return handle;
 }
 
-/** Fecha modal global */
+/**
+ * Fecha modal global (o do topo da pilha, como no baseline).
+ * FACHADA (Task 24) sobre `ModalService.closeTop`.
+ * @returns {void}
+ */
 export function fecharModal() {
-  // Se existem sub-modais, fechar o mais recente
-  if (_subModalCount > 0) {
-    const sub = document.getElementById(`sub-modal-overlay-${_subModalCount}`);
-    if (sub) sub.remove();
-    _subModalCount--;
-    return;
-  }
-  document.getElementById('modal-overlay').style.display = 'none';
-  if (_onModalClose) { const cb = _onModalClose; _onModalClose = null; cb(); }
+  getModalService().closeTop('legacy-fechar-modal');
 }
 
-/** Fecha todos os modais (principal + sub-modais) */
+/**
+ * Fecha todos os modais (principal + sub-modais).
+ * FACHADA (Task 24) sobre `ModalService.closeAll`.
+ * @returns {void}
+ */
 export function fecharModalTodos() {
-  // Remover todos sub-modais
-  document.querySelectorAll('.sub-modal-overlay').forEach(el => el.remove());
-  _subModalCount = 0;
-  document.getElementById('modal-overlay').style.display = 'none';
-  if (_onModalClose) { const cb = _onModalClose; _onModalClose = null; cb(); }
+  getModalService().closeAll('legacy-fechar-todos');
 }
 // Expor para onclick inline
 window.fecharModal = fecharModal;
@@ -680,18 +1004,14 @@ export function fmtPeso(kg) {
   return n.toString().replace('.', ',');
 }
 
-/** Multiplicador de capacidade de carregar por tamanho de criatura. */
+/**
+ * Multiplicador de capacidade de carregar por tamanho de criatura. DELEGA
+ * para `domain/character/queries/movement.js#resolveCarryingCapacityMultiplier`
+ * (fix round 1, C1) — única tabela de multiplicadores do projeto, nunca uma
+ * segunda cópia mantida aqui.
+ */
 export function getMultiplicadorCarga(tamanho) {
-  const t = String(tamanho || 'Médio').trim();
-  const mult = {
-    'Minúsculo': 3.5, 'Pequeno': 7, 'Médio': 7,
-    'Grande': 13.5, 'Enorme': 27, 'Colossal': 54.5
-  };
-  if (mult[t] != null) return mult[t];
-  // "Médio ou Pequeno" e variações
-  if (/Grande/i.test(t)) return 13.5;
-  if (/Pequeno|Médio/i.test(t)) return 7;
-  return 7;
+  return resolveCarryingCapacityMultiplier(tamanho);
 }
 
 /** Capacidade de carregar em kg: Força (valor) × multiplicador de tamanho. */

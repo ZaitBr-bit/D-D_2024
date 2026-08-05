@@ -1,0 +1,230 @@
+{
+  "fixtureVersion": 1,
+  "descricao": "Payloads de conteúdo hostil usados pelos testes da fronteira de UI (Task 24). Cada caso descreve o que o payload TENTA fazer e o que o sink correspondente tem de garantir. Nenhum payload aqui pode virar tag, atributo, handler de evento ou navegação — em NENHUM dos sinks (texto, atributo, URL por modo, Markdown). Esta fixture é consumida por tests/unit/ui/*.test.js e por tests/e2e/security-content.spec.js (que a executa em um navegador real).",
+  "textoEAtributo": [
+    {
+      "id": "script-tag",
+      "payload": "<script>window.__xss = 1;</script>",
+      "ataque": "Injeção direta de script via innerHTML.",
+      "esperado": "Sobrevive como texto literal; nenhum elemento script no DOM."
+    },
+    {
+      "id": "img-onerror",
+      "payload": "<img src=x onerror=\"window.__xss = 1\">",
+      "ataque": "Handler de evento em atributo de uma tag com carregamento que falha de propósito.",
+      "esperado": "Nenhum elemento img; nenhum atributo começando por on."
+    },
+    {
+      "id": "svg-onload",
+      "payload": "<svg/onload=window.__xss=1>",
+      "ataque": "SVG inline com handler e sem aspas, forma que engana sanitizadores por blacklist.",
+      "esperado": "Nenhum elemento svg; texto literal."
+    },
+    {
+      "id": "tag-malformada",
+      "payload": "<img src=\"x\" onerror=alert(1) //><<script>alert(2)</script>",
+      "ataque": "Markup malformado, que parsers permissivos tendem a 'consertar' criando as tags.",
+      "esperado": "Texto literal; nenhuma tag criada."
+    },
+    {
+      "id": "quebra-de-atributo",
+      "payload": "x\" onmouseover=\"window.__xss=1\" data-y=\"",
+      "ataque": "Fechar o atributo atual e abrir um handler de evento no mesmo elemento.",
+      "esperado": "escapeHtmlAttribute neutraliza aspas, espaço e '='; nenhum atributo novo aparece."
+    },
+    {
+      "id": "quebra-de-atributo-sem-aspas",
+      "payload": "x onmouseover=window.__xss=1",
+      "ataque": "Injetar um atributo aproveitando um valor de atributo SEM aspas.",
+      "esperado": "escapeHtmlAttribute escapa o espaço e o '='; o valor continua um único atributo."
+    },
+    {
+      "id": "entidade-dupla",
+      "payload": "&lt;script&gt;window.__xss=1&lt;/script&gt;",
+      "ataque": "Confiar em uma segunda decodificação de entidades para reconstruir a tag.",
+      "esperado": "Aparece na tela literalmente como <script>...; nunca é decodificado duas vezes."
+    },
+    {
+      "id": "template-literal",
+      "payload": "${constructor.constructor('window.__xss=1')()}",
+      "ataque": "Expressão de template, caso a string seja avaliada em algum ponto.",
+      "esperado": "Texto literal."
+    }
+  ],
+  "urls": [
+    {
+      "id": "javascript-scheme",
+      "kind": "app-link",
+      "payload": "javascript:window.__xss=1",
+      "esperado": "rejeitado"
+    },
+    {
+      "id": "javascript-scheme-maiusculas",
+      "kind": "app-link",
+      "payload": "JaVaScRiPt:window.__xss=1",
+      "esperado": "rejeitado"
+    },
+    {
+      "id": "data-html",
+      "kind": "app-link",
+      "payload": "data:text/html;base64,PHNjcmlwdD53aW5kb3cuX194c3M9MTwvc2NyaXB0Pg==",
+      "esperado": "rejeitado"
+    },
+    {
+      "id": "link-externo-nao-listado",
+      "kind": "app-link",
+      "payload": "https://evil.example.com/phish",
+      "esperado": "rejeitado"
+    },
+    {
+      "id": "reddit-parecido",
+      "kind": "app-link",
+      "payload": "https://www.reddit.com.evil.example/user/ZaitBrz/",
+      "esperado": "rejeitado"
+    },
+    {
+      "id": "travessia-de-raiz",
+      "kind": "app-link",
+      "payload": "../../../../etc/passwd",
+      "esperado": "rejeitado"
+    },
+    {
+      "id": "travessia-codificada",
+      "kind": "app-link",
+      "payload": "..%2f..%2f..%2fetc/passwd",
+      "esperado": "rejeitado"
+    },
+    {
+      "id": "travessia-por-caminho-absoluto",
+      "kind": "app-link",
+      "payload": "/../../admin",
+      "esperado": "rejeitado"
+    },
+    {
+      "id": "protocolo-relativo",
+      "kind": "app-link",
+      "payload": "//evil.example.com/x",
+      "esperado": "rejeitado"
+    },
+    {
+      "id": "link-local-valido",
+      "kind": "app-link",
+      "payload": "css/app.css",
+      "esperado": "aceito"
+    },
+    {
+      "id": "avatar-host-falso",
+      "kind": "google-avatar",
+      "payload": "https://googleusercontent.com.evil.example/foto.png",
+      "esperado": "rejeitado"
+    },
+    {
+      "id": "avatar-com-credenciais",
+      "kind": "google-avatar",
+      "payload": "https://evil.example.com@lh3.googleusercontent.com/foto.png",
+      "esperado": "rejeitado"
+    },
+    {
+      "id": "avatar-http",
+      "kind": "google-avatar",
+      "payload": "http://lh3.googleusercontent.com/foto.png",
+      "esperado": "rejeitado"
+    },
+    {
+      "id": "avatar-valido",
+      "kind": "google-avatar",
+      "payload": "https://lh3.googleusercontent.com/a/ACg8ocK=s96-c",
+      "esperado": "aceito"
+    },
+    {
+      "id": "imagem-svg",
+      "kind": "character-image",
+      "payload": "data:image/svg+xml;base64,PHN2ZyBvbmxvYWQ9IndpbmRvdy5fX3hzcz0xIj48L3N2Zz4=",
+      "esperado": "rejeitado"
+    },
+    {
+      "id": "imagem-svg-sem-base64",
+      "kind": "character-image",
+      "payload": "data:image/svg+xml,<svg onload=\"window.__xss=1\"></svg>",
+      "esperado": "rejeitado"
+    },
+    {
+      "id": "imagem-html-disfarcada",
+      "kind": "character-image",
+      "payload": "data:image/png;base64,PHNjcmlwdD53aW5kb3cuX194c3M9MTwvc2NyaXB0Pg==",
+      "ataque": "MIME de imagem declarado, bytes de HTML.",
+      "esperado": "rejeitado"
+    },
+    {
+      "id": "imagem-mime-divergente",
+      "kind": "character-image",
+      "payload": "data:image/png;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD3+iiigD//2Q==",
+      "ataque": "Declara image/png mas os bytes são de JPEG.",
+      "esperado": "rejeitado"
+    },
+    {
+      "id": "imagem-base64-truncada",
+      "kind": "character-image",
+      "payload": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJgg",
+      "ataque": "Payload base64 truncado (comprimento não múltiplo de 4).",
+      "esperado": "rejeitado"
+    },
+    {
+      "id": "imagem-com-charset",
+      "kind": "character-image",
+      "payload": "data:image/png;charset=utf-8;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+      "ataque": "Parâmetro extra no data URL para escapar de uma comparação de prefixo.",
+      "esperado": "rejeitado"
+    },
+    {
+      "id": "imagem-png-valida",
+      "kind": "character-image",
+      "payload": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+      "esperado": "aceito"
+    }
+  ],
+  "markdown": [
+    {
+      "id": "script-em-descricao",
+      "payload": "Uma magia **poderosa**.\n<script>window.__xss = 1;</script>\nFim.",
+      "ataque": "Descrição de catálogo com script embutido.",
+      "esperado": "Negrito preservado; script vira texto."
+    },
+    {
+      "id": "iframe-javascript",
+      "payload": "### Título\n<iframe src=\"javascript:window.__xss=1\"></iframe>",
+      "ataque": "Iframe com esquema javascript dentro de Markdown.",
+      "esperado": "h3 preservado; nenhum iframe."
+    },
+    {
+      "id": "link-html-cru",
+      "payload": "- <a href=\"javascript:window.__xss=1\">clique</a>",
+      "ataque": "Âncora crua dentro de item de lista.",
+      "esperado": "li preservado; nenhuma âncora, nenhum href."
+    },
+    {
+      "id": "img-data-url",
+      "payload": "|<img src=\"data:image/svg+xml,<svg onload=window.__xss=1>\">|x|",
+      "ataque": "Imagem com data URL de SVG dentro de célula de tabela.",
+      "esperado": "Tabela preservada; nenhum img."
+    },
+    {
+      "id": "atributo-em-negrito",
+      "payload": "**\" onmouseover=\"window.__xss=1**",
+      "ataque": "Tentar que o conteúdo do negrito vire atributo do <strong>.",
+      "esperado": "strong com o texto literal; nenhum atributo."
+    },
+    {
+      "id": "comentario-condicional",
+      "payload": "<!--[if IE]><script>window.__xss=1</script><![endif]-->",
+      "ataque": "Comentário condicional, que alguns parsers executam.",
+      "esperado": "Texto literal; nenhum nó de comentário com script."
+    },
+    {
+      "id": "style-injetado",
+      "payload": "<style>body{display:none}</style>Texto",
+      "ataque": "Injeção de CSS para desfigurar/ocultar a interface.",
+      "esperado": "Texto literal; nenhum elemento style."
+    }
+  ]
+}

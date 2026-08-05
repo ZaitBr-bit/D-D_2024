@@ -1,0 +1,2361 @@
+{
+  "schemaVersion": "1.0.0",
+  "type": "class",
+  "items": [
+    {
+      "id": "dnd2024:class:guerreiro",
+      "type": "class",
+      "schemaVersion": "1.0.0",
+      "name": "Guerreiro",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "hitDie": "d10",
+      "primaryAbility": [
+        "dnd2024:ability:forca",
+        "dnd2024:ability:destreza"
+      ],
+      "savingThrowProficiencies": [
+        "dnd2024:ability:forca",
+        "dnd2024:ability:constituicao"
+      ],
+      "effects": [
+        {
+          "id": "pericias-de-classe",
+          "type": "choice",
+          "choice": {
+            "id": "pericias-de-classe",
+            "prompt": "Escolha 2 perícia(s)",
+            "min": 2,
+            "max": 2,
+            "options": [
+              {
+                "id": "acrobacia",
+                "label": "Acrobacia",
+                "grants": [
+                  {
+                    "type": "proficiency",
+                    "target": "dnd2024:skill:acrobacia",
+                    "level": "proficient"
+                  }
+                ]
+              },
+              {
+                "id": "lidar-com-animais",
+                "label": "Lidar com Animais",
+                "grants": [
+                  {
+                    "type": "proficiency",
+                    "target": "dnd2024:skill:lidar-com-animais",
+                    "level": "proficient"
+                  }
+                ]
+              },
+              {
+                "id": "atletismo",
+                "label": "Atletismo",
+                "grants": [
+                  {
+                    "type": "proficiency",
+                    "target": "dnd2024:skill:atletismo",
+                    "level": "proficient"
+                  }
+                ]
+              },
+              {
+                "id": "historia",
+                "label": "História",
+                "grants": [
+                  {
+                    "type": "proficiency",
+                    "target": "dnd2024:skill:historia",
+                    "level": "proficient"
+                  }
+                ]
+              },
+              {
+                "id": "intimidacao",
+                "label": "Intimidação",
+                "grants": [
+                  {
+                    "type": "proficiency",
+                    "target": "dnd2024:skill:intimidacao",
+                    "level": "proficient"
+                  }
+                ]
+              },
+              {
+                "id": "intuicao",
+                "label": "Intuição",
+                "grants": [
+                  {
+                    "type": "proficiency",
+                    "target": "dnd2024:skill:intuicao",
+                    "level": "proficient"
+                  }
+                ]
+              },
+              {
+                "id": "percepcao",
+                "label": "Percepção",
+                "grants": [
+                  {
+                    "type": "proficiency",
+                    "target": "dnd2024:skill:percepcao",
+                    "level": "proficient"
+                  }
+                ]
+              },
+              {
+                "id": "persuasao",
+                "label": "Persuasão",
+                "grants": [
+                  {
+                    "type": "proficiency",
+                    "target": "dnd2024:skill:persuasao",
+                    "level": "proficient"
+                  }
+                ]
+              },
+              {
+                "id": "sobrevivencia",
+                "label": "Sobrevivência",
+                "grants": [
+                  {
+                    "type": "proficiency",
+                    "target": "dnd2024:skill:sobrevivencia",
+                    "level": "proficient"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "equipamento-inicial",
+          "type": "choice",
+          "choice": {
+            "id": "equipamento-inicial",
+            "prompt": "Escolha seu equipamento inicial",
+            "min": 1,
+            "max": 1,
+            "options": [
+              {
+                "id": "opcao-a",
+                "label": "Cota de Malha, Espada Grande, Mangual, 8 Azagaias, Kit de Explorador de Masmorras e 4 PO",
+                "grants": [
+                  {
+                    "type": "grant-item",
+                    "item": "dnd2024:armor:cota-de-malha"
+                  },
+                  {
+                    "type": "grant-item",
+                    "item": "dnd2024:weapon:espada-grande"
+                  },
+                  {
+                    "type": "grant-item",
+                    "item": "dnd2024:weapon:mangual"
+                  },
+                  {
+                    "type": "grant-item",
+                    "item": "dnd2024:weapon:azagaia",
+                    "quantity": 8
+                  },
+                  {
+                    "type": "grant-item",
+                    "item": "dnd2024:equipment:kit-de-explorador-de-masmorras"
+                  }
+                ]
+              },
+              {
+                "id": "opcao-b",
+                "label": "Armadura de Couro Batido, Cimitarra, Espada Curta, Arco Longo, 20 Flechas, Aljava, Kit de Explorador de Masmorras e 11 PO",
+                "grants": [
+                  {
+                    "type": "grant-item",
+                    "item": "dnd2024:armor:couro-batido"
+                  },
+                  {
+                    "type": "grant-item",
+                    "item": "dnd2024:weapon:cimitarra"
+                  },
+                  {
+                    "type": "grant-item",
+                    "item": "dnd2024:weapon:espada-curta"
+                  },
+                  {
+                    "type": "grant-item",
+                    "item": "dnd2024:weapon:arco-longo"
+                  },
+                  {
+                    "type": "grant-item",
+                    "item": "dnd2024:equipment:aljava"
+                  },
+                  {
+                    "type": "grant-item",
+                    "item": "dnd2024:equipment:kit-de-explorador-de-masmorras"
+                  }
+                ]
+              },
+              {
+                "id": "opcao-c",
+                "label": "155 PO",
+                "grants": []
+              }
+            ]
+          }
+        },
+        {
+          "id": "subclasse",
+          "type": "choice",
+          "when": {
+            "kind": "level",
+            "min": 3
+          },
+          "choice": {
+            "id": "subclasse",
+            "prompt": "Escolha sua subclasse de Guerreiro",
+            "min": 1,
+            "max": 1,
+            "options": [
+              {
+                "id": "campeao",
+                "label": "Campeão",
+                "grants": []
+              },
+              {
+                "id": "cavaleiro-mistico",
+                "label": "Cavaleiro Místico",
+                "grants": []
+              },
+              {
+                "id": "combatente-psiquico",
+                "label": "Combatente Psíquico",
+                "grants": []
+              },
+              {
+                "id": "mestre-da-batalha",
+                "label": "Mestre da Batalha",
+                "grants": []
+              }
+            ]
+          }
+        },
+        {
+          "id": "treinamento-armadura-acolchoada",
+          "type": "proficiency",
+          "target": "dnd2024:armor:acolchoada",
+          "level": "proficient"
+        },
+        {
+          "id": "treinamento-armadura-couro",
+          "type": "proficiency",
+          "target": "dnd2024:armor:couro",
+          "level": "proficient"
+        },
+        {
+          "id": "treinamento-armadura-couro-batido",
+          "type": "proficiency",
+          "target": "dnd2024:armor:couro-batido",
+          "level": "proficient"
+        },
+        {
+          "id": "treinamento-armadura-gibao-de-peles",
+          "type": "proficiency",
+          "target": "dnd2024:armor:gibao-de-peles",
+          "level": "proficient"
+        },
+        {
+          "id": "treinamento-armadura-cota-de-malha-parcial",
+          "type": "proficiency",
+          "target": "dnd2024:armor:cota-de-malha-parcial",
+          "level": "proficient"
+        },
+        {
+          "id": "treinamento-armadura-loriga-de-escamas",
+          "type": "proficiency",
+          "target": "dnd2024:armor:loriga-de-escamas",
+          "level": "proficient"
+        },
+        {
+          "id": "treinamento-armadura-couraca-peitoral",
+          "type": "proficiency",
+          "target": "dnd2024:armor:couraca-peitoral",
+          "level": "proficient"
+        },
+        {
+          "id": "treinamento-armadura-placas-parcial",
+          "type": "proficiency",
+          "target": "dnd2024:armor:placas-parcial",
+          "level": "proficient"
+        },
+        {
+          "id": "treinamento-armadura-cota-de-aneis",
+          "type": "proficiency",
+          "target": "dnd2024:armor:cota-de-aneis",
+          "level": "proficient"
+        },
+        {
+          "id": "treinamento-armadura-cota-de-malha",
+          "type": "proficiency",
+          "target": "dnd2024:armor:cota-de-malha",
+          "level": "proficient"
+        },
+        {
+          "id": "treinamento-armadura-armadura-de-talas",
+          "type": "proficiency",
+          "target": "dnd2024:armor:armadura-de-talas",
+          "level": "proficient"
+        },
+        {
+          "id": "treinamento-armadura-placas",
+          "type": "proficiency",
+          "target": "dnd2024:armor:placas",
+          "level": "proficient"
+        },
+        {
+          "id": "treinamento-armadura-escudo",
+          "type": "proficiency",
+          "target": "dnd2024:armor:escudo",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-adaga",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:adaga",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-azagaia",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:azagaia",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-cajado",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:cajado",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-clava",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:clava",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-clava-grande",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:clava-grande",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-foice",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:foice",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-lanca",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:lanca",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-maca",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:maca",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-machadinha",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:machadinha",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-martelo-leve",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:martelo-leve",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-arco-curto",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:arco-curto",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-besta-leve",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:besta-leve",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-dardo",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:dardo",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-funda",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:funda",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-alabarda",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:alabarda",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-chicote",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:chicote",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-cimitarra",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:cimitarra",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-espada-curta",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:espada-curta",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-espada-grande",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:espada-grande",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-espada-longa",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:espada-longa",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-glaive",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:glaive",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-lanca-de-montaria",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:lanca-de-montaria",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-lanca-longa",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:lanca-longa",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-maca-estrela",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:maca-estrela",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-machado-de-batalha",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:machado-de-batalha",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-machado-grande",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:machado-grande",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-malho",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:malho",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-mangual",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:mangual",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-martelo-de-guerra",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:martelo-de-guerra",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-picareta-de-guerra",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:picareta-de-guerra",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-rapieira",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:rapieira",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-tridente",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:tridente",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-arco-longo",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:arco-longo",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-besta-de-mao",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:besta-de-mao",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-besta-pesada",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:besta-pesada",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-mosquete",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:mosquete",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-pistola",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:pistola",
+          "level": "proficient"
+        },
+        {
+          "id": "proficiencia-arma-zarabatana",
+          "type": "proficiency",
+          "target": "dnd2024:weapon:zarabatana",
+          "level": "proficient"
+        },
+        {
+          "id": "recuperar-folego-1",
+          "type": "resource",
+          "when": {
+            "kind": "level",
+            "min": 1,
+            "max": 3
+          },
+          "resource": "recuperar-folego",
+          "max": 2,
+          "priority": 1,
+          "stackKey": "recuperar-folego",
+          "stackable": false
+        },
+        {
+          "id": "recuperar-folego-4",
+          "type": "resource",
+          "when": {
+            "kind": "level",
+            "min": 4,
+            "max": 9
+          },
+          "resource": "recuperar-folego",
+          "max": 3,
+          "priority": 4,
+          "stackKey": "recuperar-folego",
+          "stackable": false
+        },
+        {
+          "id": "recuperar-folego-10",
+          "type": "resource",
+          "when": {
+            "kind": "level",
+            "min": 10
+          },
+          "resource": "recuperar-folego",
+          "max": 4,
+          "priority": 10,
+          "stackKey": "recuperar-folego",
+          "stackable": false
+        },
+        {
+          "id": "maestria-em-arma-1",
+          "type": "resource",
+          "when": {
+            "kind": "level",
+            "min": 1,
+            "max": 3
+          },
+          "resource": "maestria-em-arma",
+          "max": 3,
+          "priority": 1,
+          "stackKey": "maestria-em-arma",
+          "stackable": false
+        },
+        {
+          "id": "maestria-em-arma-4",
+          "type": "resource",
+          "when": {
+            "kind": "level",
+            "min": 4,
+            "max": 9
+          },
+          "resource": "maestria-em-arma",
+          "max": 4,
+          "priority": 4,
+          "stackKey": "maestria-em-arma",
+          "stackable": false
+        },
+        {
+          "id": "maestria-em-arma-10",
+          "type": "resource",
+          "when": {
+            "kind": "level",
+            "min": 10,
+            "max": 15
+          },
+          "resource": "maestria-em-arma",
+          "max": 5,
+          "priority": 10,
+          "stackKey": "maestria-em-arma",
+          "stackable": false
+        },
+        {
+          "id": "maestria-em-arma-16",
+          "type": "resource",
+          "when": {
+            "kind": "level",
+            "min": 16
+          },
+          "resource": "maestria-em-arma",
+          "max": 6,
+          "priority": 16,
+          "stackKey": "maestria-em-arma",
+          "stackable": false
+        },
+        {
+          "id": "escolha-estilo-luta",
+          "type": "choice",
+          "when": {
+            "kind": "level",
+            "min": 1
+          },
+          "choice": {
+            "id": "estilo-luta",
+            "prompt": "Estilo de Luta",
+            "min": 1,
+            "max": 1,
+            "options": [
+              {
+                "id": "arquearia",
+                "label": "Arquearia: +2 em ataques à distância com armas",
+                "grants": []
+              },
+              {
+                "id": "arremesso",
+                "label": "Arremesso: +2 de dano com armas de Arremesso",
+                "grants": []
+              },
+              {
+                "id": "armas-grandes",
+                "label": "Armas Grandes: Trata 1-2 como 3 nos dados de dano (duas mãos)",
+                "grants": []
+              },
+              {
+                "id": "duas-armas",
+                "label": "Duas Armas: Adiciona mod. ao dano da mão secundária",
+                "grants": []
+              },
+              {
+                "id": "desarmado",
+                "label": "Desarmado: Dano desarmado d6/d8+For",
+                "grants": []
+              },
+              {
+                "id": "defensivo",
+                "label": "Defensivo: +1 CA usando armadura",
+                "grants": []
+              },
+              {
+                "id": "duelismo",
+                "label": "Duelismo: +2 dano com uma arma em uma mão",
+                "grants": []
+              },
+              {
+                "id": "interceptacao",
+                "label": "Interceptação: Reduz dano a aliado em 1d10+Prof",
+                "grants": []
+              },
+              {
+                "id": "luta-as-cegas",
+                "label": "Luta às Cegas: Visão Cega 3m, 9m se cego",
+                "grants": []
+              },
+              {
+                "id": "protetivo",
+                "label": "Protetivo: Impõe desvantagem em ataques contra aliados",
+                "grants": []
+              }
+            ]
+          }
+        },
+        {
+          "id": "handler-de-classe",
+          "type": "official-handler",
+          "handlerId": "class-guerreiro",
+          "params": {}
+        },
+        {
+          "id": "surto-de-acao-2",
+          "type": "resource",
+          "when": {
+            "kind": "level",
+            "min": 2,
+            "max": 16
+          },
+          "resource": "surto-de-acao",
+          "max": 1,
+          "priority": 2,
+          "stackKey": "surto-de-acao",
+          "stackable": false
+        },
+        {
+          "id": "surto-de-acao-17",
+          "type": "resource",
+          "when": {
+            "kind": "level",
+            "min": 17
+          },
+          "resource": "surto-de-acao",
+          "max": 2,
+          "priority": 17,
+          "stackKey": "surto-de-acao",
+          "stackable": false
+        },
+        {
+          "id": "indomavel-9",
+          "type": "resource",
+          "when": {
+            "kind": "level",
+            "min": 9,
+            "max": 12
+          },
+          "resource": "indomavel",
+          "max": 1,
+          "priority": 9,
+          "stackKey": "indomavel",
+          "stackable": false
+        },
+        {
+          "id": "indomavel-13",
+          "type": "resource",
+          "when": {
+            "kind": "level",
+            "min": 13,
+            "max": 16
+          },
+          "resource": "indomavel",
+          "max": 2,
+          "priority": 13,
+          "stackKey": "indomavel",
+          "stackable": false
+        },
+        {
+          "id": "indomavel-17",
+          "type": "resource",
+          "when": {
+            "kind": "level",
+            "min": 17
+          },
+          "resource": "indomavel",
+          "max": 3,
+          "priority": 17,
+          "stackKey": "indomavel",
+          "stackable": false
+        }
+      ],
+      "legacyPresentation": {
+        "nome": "Guerreiro",
+        "tracos_basicos": {
+          "Atributo Primário": "Força ou Destreza",
+          "Dado de Ponto de Vida": "D10 por nível de Guerreiro",
+          "Proficiência em Salvaguardas": "Força e Constituição",
+          "Proficiências em Perícias": "Escolha 2: Acrobacia, Atletismo, História, Intimidação, Intuição, Lidar com Animais, Percepção, Persuasão ou Sobrevivência",
+          "Proficiências com Armas": "Armas Simples e Marciais",
+          "Treinamento com Armadura": "Armaduras Leves, Médias e Pesadas e Escudos",
+          "Equipamento Inicial": "Escolha A, B ou C: (A) Cota de Malha, Espada Grande, Mangual, 8 Azagaias, Kit de Explorador de Masmorras e 4 PO; (B) Armadura de Couro Batido, Cimitarra, Espada Curta, Arco Longo, 20 Flechas, Aljava, Kit de Explorador de Masmorras e 11 PO; ou (C) 155 PO"
+        },
+        "tabela_caracteristicas": [
+          {
+            "Nível": "1",
+            "Bônus de Proficiência": "+2",
+            "Características": "Estilo de Luta, Maestria em Arma, Recuperar Fôlego",
+            "Recuperar Fôlego": "2",
+            "Maestria em Arma": "3"
+          },
+          {
+            "Nível": "2",
+            "Bônus de Proficiência": "+2",
+            "Características": "Mente Tática, Surto de Ação",
+            "Recuperar Fôlego": "2",
+            "Maestria em Arma": "3"
+          },
+          {
+            "Nível": "3",
+            "Bônus de Proficiência": "+2",
+            "Características": "Subclasse de Guerreiro",
+            "Recuperar Fôlego": "2",
+            "Maestria em Arma": "3"
+          },
+          {
+            "Nível": "4",
+            "Bônus de Proficiência": "+2",
+            "Características": "Aumento no Valor de Atributo",
+            "Recuperar Fôlego": "3",
+            "Maestria em Arma": "4"
+          },
+          {
+            "Nível": "5",
+            "Bônus de Proficiência": "+3",
+            "Características": "Ajuste Tático, Ataque Extra",
+            "Recuperar Fôlego": "3",
+            "Maestria em Arma": "4"
+          },
+          {
+            "Nível": "6",
+            "Bônus de Proficiência": "+3",
+            "Características": "Aumento no Valor de Atributo",
+            "Recuperar Fôlego": "3",
+            "Maestria em Arma": "4"
+          },
+          {
+            "Nível": "7",
+            "Bônus de Proficiência": "+3",
+            "Características": "Característica de Subclasse",
+            "Recuperar Fôlego": "3",
+            "Maestria em Arma": "4"
+          },
+          {
+            "Nível": "8",
+            "Bônus de Proficiência": "+3",
+            "Características": "Aumento no Valor de Atributo",
+            "Recuperar Fôlego": "3",
+            "Maestria em Arma": "4"
+          },
+          {
+            "Nível": "9",
+            "Bônus de Proficiência": "+4",
+            "Características": "Indomável, Mestre Tático",
+            "Recuperar Fôlego": "3",
+            "Maestria em Arma": "4"
+          },
+          {
+            "Nível": "10",
+            "Bônus de Proficiência": "+4",
+            "Características": "Característica de Subclasse",
+            "Recuperar Fôlego": "4",
+            "Maestria em Arma": "5"
+          },
+          {
+            "Nível": "11",
+            "Bônus de Proficiência": "+4",
+            "Características": "Dois Ataques Extras",
+            "Recuperar Fôlego": "4",
+            "Maestria em Arma": "5"
+          },
+          {
+            "Nível": "12",
+            "Bônus de Proficiência": "+4",
+            "Características": "Aumento no Valor de Atributo",
+            "Recuperar Fôlego": "4",
+            "Maestria em Arma": "5"
+          },
+          {
+            "Nível": "13",
+            "Bônus de Proficiência": "+5",
+            "Características": "Ataques Estudados, Indomável",
+            "Recuperar Fôlego": "4",
+            "Maestria em Arma": "5"
+          },
+          {
+            "Nível": "14",
+            "Bônus de Proficiência": "+5",
+            "Características": "Aumento no Valor de Atributo",
+            "Recuperar Fôlego": "4",
+            "Maestria em Arma": "5"
+          },
+          {
+            "Nível": "15",
+            "Bônus de Proficiência": "+5",
+            "Características": "Característica de Subclasse",
+            "Recuperar Fôlego": "4",
+            "Maestria em Arma": "5"
+          },
+          {
+            "Nível": "16",
+            "Bônus de Proficiência": "+5",
+            "Características": "Aumento no Valor de Atributo",
+            "Recuperar Fôlego": "4",
+            "Maestria em Arma": "6"
+          },
+          {
+            "Nível": "17",
+            "Bônus de Proficiência": "+6",
+            "Características": "Indomável, Surto de Ação",
+            "Recuperar Fôlego": "4",
+            "Maestria em Arma": "6"
+          },
+          {
+            "Nível": "18",
+            "Bônus de Proficiência": "+6",
+            "Características": "Característica de Subclasse",
+            "Recuperar Fôlego": "4",
+            "Maestria em Arma": "6"
+          },
+          {
+            "Nível": "19",
+            "Bônus de Proficiência": "+6",
+            "Características": "Dádiva Épica",
+            "Recuperar Fôlego": "4",
+            "Maestria em Arma": "6"
+          },
+          {
+            "Nível": "20",
+            "Bônus de Proficiência": "+6",
+            "Características": "Três Ataques Extras",
+            "Recuperar Fôlego": "4",
+            "Maestria em Arma": "6"
+          }
+        ],
+        "caracteristicas": [
+          {
+            "nivel": 1,
+            "nome": "Estilo de Luta",
+            "descricao": "Você aprimorou suas proezas marciais e tem um talento de Estilo de Luta à sua escolha (veja também o capítulo 5). Defensivo é o recomendado.\nSempre que atinge um nível de Guerreiro, você pode substituir o talento que escolheu por um talento diferente de Estilo de Luta."
+          },
+          {
+            "nivel": 1,
+            "nome": "Maestria em Arma",
+            "descricao": "Seu treinamento com armas permite que você utilize as propriedades de maestria com três tipos de armas Simples ou Marciais à sua escolha. Sempre que completar um Descanso Longo, você pode praticar movimentos com armas e alterar uma dessas escolhas de armas.\nAo alcançar certos níveis de Guerreiro, você adquire a habilidade de usar as propriedades de maestria de mais tipos de armas, conforme mostrado na coluna Maestria em Armas da tabela Características de Guerreiro."
+          },
+          {
+            "nivel": 1,
+            "nome": "Recuperar Fôlego",
+            "descricao": "Você tem uma reserva limitada de resistência física e mental que pode usar. Como uma Ação Bônus, você pode usá-la para recuperar Pontos de Vida iguais a 1d10 mais seu nível de Guerreiro.\nVocê pode usar essa característica duas vezes. Você recupera um uso gasto quando completa um Descanso Curto e restaura todos os usos gastos quando completa um Descanso Longo.\nAo atingir certos níveis de Guerreiro, você adquire mais usos dessa característica, conforme mostrado na coluna Recuperar Fôlego da tabela Características de Guerreiro."
+          },
+          {
+            "nivel": 2,
+            "nome": "Mente Tática",
+            "descricao": "Você tem uma mente para táticas dentro e fora do campo de batalha. Ao falhar em um teste de atributo, você pode gastar um uso de seu Recuperar Fôlego para tentar alcançar a vitória. Em vez de recuperar Pontos de Vida, você joga 1d10 e adiciona o resultado ao teste de atributo, potencialmente transformando-o em sucesso. Se o teste ainda assim falhar, esse uso do Recuperar Fôlego não é gasto."
+          },
+          {
+            "nivel": 2,
+            "nome": "Surto de Ação",
+            "descricao": "Você pode se esforçar além de seus limites normais por um momento. No seu turno, você pode executar uma ação adicional, exceto a ação Usar Magia.\nApós usar esta característica, você não pode usá-la novamente até completar um Descanso Curto ou Longo. A partir do nível 17, você pode usá-lo duas vezes antes de um descanso, mas apenas uma vez em um turno."
+          },
+          {
+            "nivel": 3,
+            "nome": "Subclasse de Guerreiro",
+            "descricao": "Você adquire uma subclasse de Guerreiro à sua escolha. As subclasses Campeão, Cavaleiro Místico, Combatente Psíquico e Mestre da Batalha estão detalhadas após a descrição desta classe. Uma subclasse é uma especialidade que concede a você características em determinados níveis de Guerreiro. Pelo resto de sua jornada, você adquire cada uma das características de sua subclasse de seu nível de Guerreiro ou menor."
+          },
+          {
+            "nivel": 4,
+            "nome": "Aumento no Valor de Atributo",
+            "descricao": "Você adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 6, 8, 12, 14 e 16 de Guerreiro."
+          },
+          {
+            "nivel": 5,
+            "nome": "Ajuste Tático",
+            "descricao": "Sempre que executar uma Ação Bônus para seu Recuperar Fôlego, você pode mover-se até metade do seu Deslocamento sem provocar Ataques de Oportunidade."
+          },
+          {
+            "nivel": 5,
+            "nome": "Ataque Extra",
+            "descricao": "Você pode atacar duas vezes, em vez de uma, sempre que executar a ação Atacar no seu turno."
+          },
+          {
+            "nivel": 9,
+            "nome": "Indomável",
+            "descricao": "Ao falhar em uma salvaguarda, você pode jogá-la novamente adicionando um bônus igual ao seu nível de Guerreiro. Você deve usar o novo resultado e não pode usar essa característica novamente até completar um Descanso Longo.\nA partir do nível 13, você pode usar essa característica duas vezes antes de um Descanso Longo e três vezes antes de um Descanso Longo ao atingir o nível 17."
+          },
+          {
+            "nivel": 9,
+            "nome": "Mestre Tático",
+            "descricao": "Ao atacar com uma arma cuja propriedade de maestria você pode usar, você pode substituir essa propriedade pela propriedade Empurrar, Drenar ou Lentidão para esse ataque."
+          },
+          {
+            "nivel": 11,
+            "nome": "Dois Ataques Extras",
+            "descricao": "Você pode atacar três vezes, em vez de uma, sempre que executar a ação Atacar no seu turno."
+          },
+          {
+            "nivel": 13,
+            "nome": "Ataques Estudados",
+            "descricao": "Você estuda seus oponentes e aprende com cada ataque que realiza. Se você realizar uma jogada de ataque contra uma criatura e errar, você tem Vantagem em sua próxima jogada de ataque contra essa criatura antes do final do seu próximo turno."
+          },
+          {
+            "nivel": 19,
+            "nome": "Dádiva Épica",
+            "descricao": "Você adquire o talento Dádiva Épica (veja o capítulo 5) ou outro talento à sua escolha para o qual se qualifica. Dádiva da Proeza em Combate é recomendada."
+          },
+          {
+            "nivel": 20,
+            "nome": "Três Ataques Extras",
+            "descricao": "Você pode atacar quatro vezes, em vez de uma, sempre que executar a ação Atacar no seu turno."
+          }
+        ],
+        "subclasses": [
+          {
+            "nome": "Campeão",
+            "caracteristicas": [
+              {
+                "nivel": 3,
+                "nome": "Atleta Extraordinário",
+                "descricao": "Graças ao seu atletismo, você tem Vantagem em jogadas de Iniciativa e testes de Força (Atletismo).\nAlém disso, imediatamente após obter um Acerto Crítico, você pode se mover até metade do seu Deslocamento sem provocar Ataques de Oportunidade."
+              },
+              {
+                "nivel": 3,
+                "nome": "Crítico Aprimorado",
+                "descricao": "Suas jogadas de ataque com armas e Ataques Desarmados obtém Acerto Crítico em jogadas com resultados 19 ou 20 no d20."
+              },
+              {
+                "nivel": 7,
+                "nome": "Estilo de Luta Adicional",
+                "descricao": "Você adquire outro talento de Estilo de Luta à sua escolha."
+              },
+              {
+                "nivel": 10,
+                "nome": "Combatente Heroico",
+                "descricao": "A emoção da batalha leva você à vitória. Durante o combate, você pode se conceder Inspiração Heroica sempre que começar seu turno sem ela."
+              },
+              {
+                "nivel": 15,
+                "nome": "Crítico Superior",
+                "descricao": "Suas jogadas de ataque com armas e Ataques Desarmados agora obtém Acerto Crítico em jogadas com resultados 18 a 20 no d20."
+              },
+              {
+                "nivel": 18,
+                "nome": "Sobrevivente",
+                "descricao": "Você atinge o auge da resiliência em batalha, concedendo-lhe os seguintes benefícios.\n**Desafie a Morte.** Você tem Vantagem em Salvaguardas Contra Morte. Além disso, ao obter um 18–20 em uma Salvaguarda Contra Morte, você obtém um 20 como resultado.\n**Regeneração Heroica.** No início de cada um dos seus turnos, você recupera Pontos de Vida iguais a 5 mais seu modificador de Constituição se estiver Sangrando e ter ao menos 1 Ponto de Vida."
+              }
+            ]
+          },
+          {
+            "nome": "Cavaleiro Místico",
+            "caracteristicas": [
+              {
+                "nivel": 3,
+                "nome": "Conjuração",
+                "descricao": "Você aprendeu a conjurar magias. Veja o capítulo 7 para as regras sobre conjuração de magias. As informações abaixo detalham como você usa essas regras como um Cavaleiro Místico.\n**Truques.** Você conhece dois truques à sua escolha da lista de magias de Mago. *Raio de Gelo* e *Toque Chocante* são recomendados. Sempre que você atinge um nível de Guerreiro, pode substituir um desses truques por outro truque à sua escolha da lista de magias de Mago.\nAo atingir o nível 10 de Guerreiro, você aprende mais um truque de Mago à sua escolha.\n**Espaços de Magia.** A tabela Conjuração de Cavaleiro Místico apresenta quantos espaços de magia você tem para conjurar suas magias de 1º círculo ou superior. Você restaura todos os espaços gastos ao completar um Descanso Longo.\n**Atributo de Conjuração.** Inteligência é seu atributo de conjuração para suas magias de Mago.\n**Foco de Conjuração.** Você pode usar um Foco Arcano como um Foco de Conjuração para suas magias de Mago."
+              },
+              {
+                "nivel": 3,
+                "nome": "Vínculo com Arma",
+                "descricao": "Você aprende um ritual que cria um vínculo mágico entre você e uma arma. Você realiza o ritual ao longo de 1 hora, o que pode ser concluído durante um Descanso Curto. A arma deve estar ao seu alcance durante todo o ritual e, ao concluí-lo, você toca a arma e estabelece o vínculo. O vínculo falha se outro Guerreiro estiver ligado à arma ou se a arma for um item mágico com o qual outra pessoa está sintonizada.\nApós ter vinculado uma arma a si, ela não pode ser desarmada de você, a menos que você tenha a condição Incapacitado. Se ela estiver no mesmo plano de existência, você pode invocar essa arma como uma Ação Bônus, teleportando-a instantaneamente para sua mão.\nVocê pode ter até dois vínculos com armas, mas pode invocar apenas uma de cada vez com uma Ação Bônus. Se você tentar se vincular com uma terceira arma, você deve quebrar o vínculo com uma das outras duas."
+              },
+              {
+                "nivel": 7,
+                "nome": "Magia de Guerra",
+                "descricao": "Ao executar a ação Atacar no seu turno, você pode substituir um dos ataques por uma conjuração de um de seus truques de Mago que tenha um tempo de conjuração de uma ação."
+              },
+              {
+                "nivel": 10,
+                "nome": "Golpe Místico",
+                "descricao": "Você aprende a usar seus ataques com armas para reduzir a resistência de uma criatura às suas magias. Ao atingir uma criatura com um ataque usando uma arma, essa criatura sofre Desvantagem na próxima salvaguarda que realizar contra uma magia que você conjurar antes do final do seu próximo turno."
+              },
+              {
+                "nivel": 15,
+                "nome": "Investida Mística",
+                "descricao": "Ao usar seu Surto de Ação, você pode se teleportar até 9 metros para um espaço desocupado à sua vista. Você pode se teleportar antes ou depois da ação adicional."
+              },
+              {
+                "nivel": 18,
+                "nome": "Magia de Guerra Aprimorada",
+                "descricao": "Ao executar a ação Atacar no seu turno, você pode substituir dois ataques pela conjuração de uma das suas magias de Mago de 1º ou 2º círculo que tenha um tempo de conjuração de uma ação."
+              }
+            ]
+          },
+          {
+            "nome": "Combatente Psíquico",
+            "caracteristicas": [
+              {
+                "nivel": 3,
+                "nome": "Poder Psiônico",
+                "descricao": "Você possui uma fonte de energia psiônica, representada pelos seus Dados de Energia Psiônica, que alimenta os poderes desta subclasse. A tabela Dados de Energia do Combatente Psíquico indica o tipo e a quantidade desses dados conforme você atinge certos níveis de Guerreiro.\n**Dados de Energia do Combatente Psíquico**\n| **Nível de Guerreiro** | **Tipo de Dado** | **Quantidade** |\n|------------------------|------------------|----------------|\n| 3                      | D6               | 4              |\n| 5                      | D8               | 6              |\n| 9                      | D8               | 8              |\n| 11                     | D10              | 8              |\n| 13                     | D10              | 10             |\n| 17                     | D12              | 12             |\nQualquer característica desta subclasse que utilize um Dado de Energia Psiônica emprega apenas os dados dessa subclasse. Alguns poderes consomem esse Dado, conforme detalhado na respectiva descrição, e você não pode usar um poder se ele exigir um dado e todos os seus Dados de Energia Psiônica estiverem esgotados.\nVocê recupera um de seus Dados de Energia Psiônica gastos ao completar um Descanso Curto, e restaura todos ao completar um Descanso Longo.\n**Golpe Psiônico.** Você pode impulsionar suas armas com força psiônica. Uma vez em cada um dos seus turnos, imediatamente após atingir um alvo a até 9 metros de você com um ataque e causar dano a ele com uma arma, você pode gastar um Dado de Energia Psiônica, jogá-lo e causar dano Energético ao alvo igual ao resultado obtido mais seu modificador de Inteligência.\n**Movimento Telecinético.** Você pode mover um objeto ou uma criatura com sua mente. Como uma ação Usar Magia, escolha um alvo à sua vista a até 9 metros de você; o alvo deve ser um objeto solto que seja Grande ou menor, ou uma criatura voluntária que não seja você. Você transporta o alvo até 9 metros para um espaço desocupado à sua vista. Como alternativa, se o alvo for um objeto Minúsculo, você pode transportá-lo de ou para sua mão.\nApós executar essa ação, você não pode fazer isso novamente até completar um Descanso Curto ou Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar o uso.\n**Vínculo Protetivo.** Quando você ou outra criatura à sua vista a até 9 metros de você sofrer dano, você pode executar uma Reação para gastar um Dado de Energia Psiônica, jogar o dado e reduzir o dano sofrido pelo resultado mais seu modificador de Inteligência (redução mínima de 1), enquanto cria um escudo momentâneo de força telecinética."
+              },
+              {
+                "nivel": 7,
+                "nome": "Adepto Telecinético",
+                "descricao": "Você dominou novas maneiras de usar suas habilidades telecinéticas, detalhadas abaixo.\n**Estocada Telecinética.** Ao causar dano a um alvo com seu Golpe Psiônico, você pode forçá-lo a realizar uma salvaguarda de Força (CD 8 mais seu modificador de Inteligência e seu Bônus de Proficiência). Se falhar, você pode impor ao alvo a condição Caído ou transportá-lo horizontalmente até 3 metros.\n**Salto com Impulsão Psíquica.** Como uma Ação Bônus, você adquire um Deslocamento de Voo igual ao dobro do seu Deslocamento até o final do turno atual. Após executar essa Ação Bônus, você não pode fazer isso novamente até completar um Descanso Curto ou Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar o uso."
+              },
+              {
+                "nivel": 10,
+                "nome": "Resguardo Mental",
+                "descricao": "Você tem Resistência a Dano Psíquico. Além disso, ao iniciar seu turno com a condição Amedrontado ou Enfeitiçado, você pode gastar um Dado de Energia Psiônica (nenhuma ação é necessária) e encerrar todos os efeitos em você que lhe impõe essas condições."
+              },
+              {
+                "nivel": 15,
+                "nome": "Baluarte de Energia",
+                "descricao": "Você pode proteger a si e aos outros com força telecinética. Como uma Ação Bônus, você pode escolher criaturas, incluindo você mesmo, a até 9 metros, até um número de criaturas igual ao seu modificador de Inteligência (mínimo de uma criatura). Cada uma das criaturas escolhidas tem Cobertura Parcial por 1 minuto ou até você ter a condição Incapacitado.\nApós usar essa característica, você não pode fazer isso novamente até completar um Descanso Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar seu uso."
+              },
+              {
+                "nivel": 18,
+                "nome": "Mestre Telecinético",
+                "descricao": "Você sempre tem a magia *Telecinese* preparada. Com esta característica, você pode conjurá-la sem um espaço de magia ou componentes, e seu atributo de conjuração para ela é a Inteligência. Em cada um dos seus turnos enquanto você mantém a Concentração nela, incluindo o turno quando a conjura, você pode realizar um ataque com arma como uma Ação Bônus.\nApós conjurar a magia por meio dessa característica, você não pode fazer isso deste modo até completar um Descanso Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar o uso."
+              }
+            ]
+          },
+          {
+            "nome": "Mestre da Batalha",
+            "caracteristicas": [
+              {
+                "nivel": 3,
+                "nome": "Estudioso da Guerra",
+                "descricao": "Você adquire proficiência com um tipo de Ferramentas de Artesão à sua escolha e adquire proficiência em uma perícia à sua escolha das perícias disponíveis para Guerreiros no nível 1."
+              },
+              {
+                "nivel": 3,
+                "nome": "Superioridade em Combate",
+                "descricao": "Sua experiência em combate aprimorou suas técnicas de luta, permitindo que você aprenda manobras com base em dados especiais chamados Dados de Superioridade.\n**Manobras.** Você aprende três manobras à sua escolha na seção \"Opções de Manobras\" mais adiante na descrição desta subclasse. Muitas manobras aprimoram, de alguma forma, um ataque. Você pode usar apenas uma manobra por ataque.\nVocê aprende duas manobras adicionais à sua escolha quando atinge os níveis 7, 10 e 15 de Guerreiro. Cada vez que aprende novas manobras, você também pode substituir uma manobra que você conhece por uma diferente.\n**Dados de Superioridade.** Você tem quatro Dados de Superioridade, os quais são d8s. Um Dado de Superioridade é gasto ao usá-lo. Você restaura todos os Dados de Superioridade gastos quando completa um Descanso Curto ou Longo.\nVocê adquire um Dado de Superioridade adicional ao atingir os níveis 7 (cinco dados no total) e 15 (seis dados no total) de Guerreiro.\n**Salvaguardas.** Se uma manobra exigir uma salvaguarda, a CD é igual a 8 mais seu modificador de Força ou Destreza (à sua escolha) e seu Bônus de Proficiência."
+              },
+              {
+                "nivel": 7,
+                "nome": "Conheça Seu Inimigo",
+                "descricao": "Como uma Ação Bônus, você pode examinar certos pontos fortes e fracos de uma criatura à sua vista a até 9 metros de você; você sabe se essa criatura tem Imunidades, Resistências ou Vulnerabilidades, e se a criatura tiver alguma, você sabe quais são.\nApós usar essa característica, você não pode fazer isso novamente até completar um Descanso Longo. Você também pode recuperar um uso da característica gastando um Dado de Superioridade (nenhuma ação é necessária)."
+              },
+              {
+                "nivel": 10,
+                "nome": "Superioridade em Combate Aprimorada",
+                "descricao": "Seu Dado de Superioridade se torna um d10."
+              },
+              {
+                "nivel": 15,
+                "nome": "Implacável",
+                "descricao": "Uma vez por turno, ao usar uma manobra, você pode jogar 1d8 e usar o resultado em vez de gastar um Dado de Superioridade."
+              },
+              {
+                "nivel": 18,
+                "nome": "Superioridade em Combate Suprema",
+                "descricao": "Seu Dado de Superioridade se torna um d12."
+              }
+            ],
+            "opcoes_manobra": [
+              {
+                "nome": "Aparar",
+                "descricao": "Ao receber dano de outra criatura em uma jogada de ataque corpo a corpo, você pode executar uma Reação e gastar um Dado de Superioridade para reduzir o dano pelo número obtido no Dado de Superioridade mais seu modificador de Força ou Destreza (à sua escolha)."
+              },
+              {
+                "nome": "Ataque Ameaçador",
+                "descricao": "Ao atingir uma criatura com uma jogada de ataque, você pode gastar um Dado de Superioridade para tentar amedrontar o alvo. Adicione o resultado do Dado de Superioridade à jogada de dano do ataque. O alvo deve ser bem-sucedido em uma salvaguarda de Sabedoria ou tem a condição Amedrontado até o final do seu próximo turno."
+              },
+              {
+                "nome": "Ataque de Varredura",
+                "descricao": "Ao atingir uma criatura com uma jogada de ataque corpo a corpo usando uma arma ou um Ataque Desarmado, você pode gastar um Dado de Superioridade para tentar causar dano a outra criatura. Escolha outra criatura a até 1,5 metro do alvo original e ao seu alcance. Se a jogada de ataque original atingir a segunda criatura, ela sofre dano igual ao resultado do Dado de Superioridade. O dano é do mesmo tipo causado pelo ataque original."
+              },
+              {
+                "nome": "Ataque Estendido",
+                "descricao": "Como uma Ação Bônus, você pode gastar um Dado de Superioridade e executar a ação Correr. Se você se mover pelo menos 1,5 metro em linha reta imediatamente antes de realizar um ataque corpo a corpo como parte da ação Atacar neste turno, pode adicionar o resultado do Dado de Superioridade à jogada de dano do ataque."
+              },
+              {
+                "nome": "Ataque para Distrair",
+                "descricao": "Ao atingir uma criatura com uma jogada de ataque, você pode gastar um Dado de Superioridade para distrair o alvo. Adicione o resultado do Dado de Superioridade à jogada de dano do ataque. A próxima jogada de ataque contra o alvo por um atacante diferente de você tem Vantagem se o ataque for realizado antes do início do seu próximo turno."
+              },
+              {
+                "nome": "Ataque Preciso",
+                "descricao": "Ao errar uma jogada de ataque, você pode gastar um Dado de Superioridade e adicionar resultado à jogada de ataque, fazendo potencialmente o ataque acertar."
+              },
+              {
+                "nome": "Ataque Provocante",
+                "descricao": "Ao atingir uma criatura com uma jogada de ataque, você pode gastar um Dado de Superioridade para provocar o alvo a atacá-lo. Adicione o resultado do Dado de Superioridade à jogada de dano do ataque. O alvo deve ser bem-sucedido em uma salvaguarda de Sabedoria ou tem Desvantagem em jogadas de ataque contra alvos diferentes de você até o final do seu próximo turno."
+              },
+              {
+                "nome": "Avaliação Tática",
+                "descricao": "Ao realizar um teste de Inteligência (História ou Investigação) ou um teste de Sabedoria (Intuição), você pode gastar um Dado de Superioridade e adicionar o resultado ao teste de atributo."
+              },
+              {
+                "nome": "Contra-ataque",
+                "descricao": "Quando uma criatura erra uma jogada de ataque corpo a corpo contra você, você pode executar uma Reação e gastar um Dado de Superioridade para realizar uma jogada de ataque corpo a corpo com uma arma ou um Ataque Desarmado contra a criatura. Se você acertar, adicione o resultado do Dado de Superioridade ao dano do ataque."
+              },
+              {
+                "nome": "Desarme",
+                "descricao": "Ao atingir uma criatura com uma jogada de ataque, você pode gastar um Dado de Superioridade para tentar desarmar o alvo. Adicione o resultado do Dado de Superioridade à jogada de dano do ataque. O alvo deve ser bem-sucedido em uma salvaguarda de Força ou soltar um objeto à sua escolha que esteja segurando, com o objeto caindo no espaço dele."
+              },
+              {
+                "nome": "Emboscada",
+                "descricao": "Ao realizar um teste de Destreza (Furtividade) ou jogar Iniciativa, você pode gastar um Dado de Superioridade e adicionar o resultado ao teste, a menos que tenha a condição Incapacitado."
+              },
+              {
+                "nome": "Encontrão",
+                "descricao": "Ao atingir uma criatura com uma jogada de ataque usando uma arma ou um Ataque Desarmado, você pode gastar um Dado de Superioridade para tentar fazer o alvo recuar. Adicione o resultado do Dado de Superioridade à jogada de dano do ataque. Se o alvo for Grande ou menor, ele deve ser bem-sucedido em uma salvaguarda de Força ou é empurrado até 4,5 metros para longe de você."
+              },
+              {
+                "nome": "Finta",
+                "descricao": "Como uma Ação Bônus, você pode gastar um Dado de Superioridade para fintar, escolhendo uma criatura a até 1,5 metro de você como seu alvo. Você tem Vantagem em sua próxima jogada de ataque contra esse alvo neste turno. Se o ataque acertar, adicione o resultado do Dado de Superioridade à jogada de dano do ataque."
+              },
+              {
+                "nome": "Gato Por Lebre",
+                "descricao": "Ao estar a até 1,5 metro de uma criatura no seu turno, você pode gastar um Dado de Superioridade e trocar de lugar com essa criatura, desde que você gaste pelo menos 1,5 metro de movimento e a criatura seja voluntária e não tenha a condição Incapacitado. Este movimento não provoca Ataques de Oportunidade. Jogue o Dado de Superioridade. Até o início do seu próximo turno, você ou a outra criatura (à sua escolha) adquire um bônus de CA igual ao número do resultado."
+              },
+              {
+                "nome": "Golpe do Comandante",
+                "descricao": "Ao executar a ação Atacar no seu turno, você pode substituir um de seus ataques para instruir um de seus companheiros a atacar. Ao fazer isso, escolha uma criatura voluntária que possa vê-lo ou ouvi-lo e gaste um Dado de Superioridade. Essa criatura pode usar imediatamente a Reação dela para realizar um ataque com uma arma ou um Ataque Desarmado, adicionando o resultado do Dado de Superioridade à jogada de dano do ataque em caso de acerto."
+              },
+              {
+                "nome": "Manobrar",
+                "descricao": "Ao atingir uma criatura com uma jogada de ataque, você pode gastar um Dado de Superioridade para manobrar um de seus companheiros para outra posição. Adicione o resultado do Dado de Superioridade à jogada de dano do ataque e escolha uma criatura voluntária que possa vê-lo ou ouvi-lo. Essa criatura pode usar a Reação dela para se mover até metade do Deslocamento sem provocar Ataques de Oportunidade do alvo de seu ataque."
+              },
+              {
+                "nome": "Movimentação Evasiva",
+                "descricao": "Como uma Ação Bônus, você pode gastar um Dado de Superioridade e executar a ação Desengajar. Você também joga o dado e adiciona o número obtido à sua CA até o início do seu próximo turno."
+              },
+              {
+                "nome": "Presença de Autoridade",
+                "descricao": "Ao realizar um teste de Carisma (Atuação, Intimidação ou Persuasão), você pode gastar um Dado de Superioridade e adicionar o resultado ao teste."
+              },
+              {
+                "nome": "Prostrar",
+                "descricao": "Ao atingir uma criatura com uma jogada de ataque usando uma arma ou um Ataque Desarmado, você pode gastar um Dado de Superioridade e adicionar o resultado à jogada de dano do ataque. Se o alvo for Grande ou menor, ele deve ser bem-sucedido em uma salvaguarda de Força ou tem a condição Caído."
+              },
+              {
+                "nome": "Recuperar Energia",
+                "descricao": "Como uma Ação Bônus, você pode gastar um Dado de Superioridade para encorajar a determinação de um companheiro. Escolha um aliado seu a até 9 metros de você que possa vê-lo ou ouvi-lo. Essa criatura adquire Pontos de Vida Temporários igual ao resultado do Dado de Superioridade mais metade do seu nível de Guerreiro (arredondado para baixo)."
+              }
+            ]
+          }
+        ],
+        "lista_magias": {}
+      }
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-estilo-de-luta",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Estilo de Luta",
+      "description": "Você aprimorou suas proezas marciais e tem um talento de Estilo de Luta à sua escolha (veja também o capítulo 5). Defensivo é o recomendado.\nSempre que atinge um nível de Guerreiro, você pode substituir o talento que escolheu por um talento diferente de Estilo de Luta.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:class:guerreiro",
+      "level": 1,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você aprimorou suas proezas marciais e tem um talento de Estilo de Luta à sua escolha (veja também o capítulo 5). Defensivo é o recomendado.\nSempre que atinge um nível de Guerreiro, você pode substituir o talento que escolheu por um talento diferente de Estilo de Luta."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-maestria-em-arma",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Maestria em Arma",
+      "description": "Seu treinamento com armas permite que você utilize as propriedades de maestria com três tipos de armas Simples ou Marciais à sua escolha. Sempre que completar um Descanso Longo, você pode praticar movimentos com armas e alterar uma dessas escolhas de armas.\nAo alcançar certos níveis de Guerreiro, você adquire a habilidade de usar as propriedades de maestria de mais tipos de armas, conforme mostrado na coluna Maestria em Armas da tabela Características de Guerreiro.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:class:guerreiro",
+      "level": 1,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Seu treinamento com armas permite que você utilize as propriedades de maestria com três tipos de armas Simples ou Marciais à sua escolha. Sempre que completar um Descanso Longo, você pode praticar movimentos com armas e alterar uma dessas escolhas de armas.\nAo alcançar certos níveis de Guerreiro, você adquire a habilidade de usar as propriedades de maestria de mais tipos de armas, conforme mostrado na coluna Maestria em Armas da tabela Características de Guerreiro."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-recuperar-folego",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Recuperar Fôlego",
+      "description": "Você tem uma reserva limitada de resistência física e mental que pode usar. Como uma Ação Bônus, você pode usá-la para recuperar Pontos de Vida iguais a 1d10 mais seu nível de Guerreiro.\nVocê pode usar essa característica duas vezes. Você recupera um uso gasto quando completa um Descanso Curto e restaura todos os usos gastos quando completa um Descanso Longo.\nAo atingir certos níveis de Guerreiro, você adquire mais usos dessa característica, conforme mostrado na coluna Recuperar Fôlego da tabela Características de Guerreiro.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:class:guerreiro",
+      "level": 1,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você tem uma reserva limitada de resistência física e mental que pode usar. Como uma Ação Bônus, você pode usá-la para recuperar Pontos de Vida iguais a 1d10 mais seu nível de Guerreiro.\nVocê pode usar essa característica duas vezes. Você recupera um uso gasto quando completa um Descanso Curto e restaura todos os usos gastos quando completa um Descanso Longo.\nAo atingir certos níveis de Guerreiro, você adquire mais usos dessa característica, conforme mostrado na coluna Recuperar Fôlego da tabela Características de Guerreiro."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-mente-tatica",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Mente Tática",
+      "description": "Você tem uma mente para táticas dentro e fora do campo de batalha. Ao falhar em um teste de atributo, você pode gastar um uso de seu Recuperar Fôlego para tentar alcançar a vitória. Em vez de recuperar Pontos de Vida, você joga 1d10 e adiciona o resultado ao teste de atributo, potencialmente transformando-o em sucesso. Se o teste ainda assim falhar, esse uso do Recuperar Fôlego não é gasto.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:class:guerreiro",
+      "level": 2,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você tem uma mente para táticas dentro e fora do campo de batalha. Ao falhar em um teste de atributo, você pode gastar um uso de seu Recuperar Fôlego para tentar alcançar a vitória. Em vez de recuperar Pontos de Vida, você joga 1d10 e adiciona o resultado ao teste de atributo, potencialmente transformando-o em sucesso. Se o teste ainda assim falhar, esse uso do Recuperar Fôlego não é gasto."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-surto-de-acao-2",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Surto de Ação",
+      "description": "Você pode se esforçar além de seus limites normais por um momento. No seu turno, você pode executar uma ação adicional, exceto a ação Usar Magia.\nApós usar esta característica, você não pode usá-la novamente até completar um Descanso Curto ou Longo. A partir do nível 17, você pode usá-lo duas vezes antes de um descanso, mas apenas uma vez em um turno.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:class:guerreiro",
+      "level": 2,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você pode se esforçar além de seus limites normais por um momento. No seu turno, você pode executar uma ação adicional, exceto a ação Usar Magia.\nApós usar esta característica, você não pode usá-la novamente até completar um Descanso Curto ou Longo. A partir do nível 17, você pode usá-lo duas vezes antes de um descanso, mas apenas uma vez em um turno."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-aumento-no-valor-de-atributo-4",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Aumento no Valor de Atributo",
+      "description": "Você adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 6, 8, 12, 14 e 16 de Guerreiro.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:class:guerreiro",
+      "level": 4,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 6, 8, 12, 14 e 16 de Guerreiro."
+        },
+        {
+          "id": "asi-ou-talento",
+          "type": "official-handler",
+          "handlerId": "asi-or-feat",
+          "params": {}
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-ajuste-tatico",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Ajuste Tático",
+      "description": "Sempre que executar uma Ação Bônus para seu Recuperar Fôlego, você pode mover-se até metade do seu Deslocamento sem provocar Ataques de Oportunidade.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:class:guerreiro",
+      "level": 5,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Sempre que executar uma Ação Bônus para seu Recuperar Fôlego, você pode mover-se até metade do seu Deslocamento sem provocar Ataques de Oportunidade."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-ataque-extra",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Ataque Extra",
+      "description": "Você pode atacar duas vezes, em vez de uma, sempre que executar a ação Atacar no seu turno.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:class:guerreiro",
+      "level": 5,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você pode atacar duas vezes, em vez de uma, sempre que executar a ação Atacar no seu turno."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-aumento-no-valor-de-atributo-6",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Aumento no Valor de Atributo",
+      "description": "Você adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 6, 8, 12, 14 e 16 de Guerreiro.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:class:guerreiro",
+      "level": 6,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 6, 8, 12, 14 e 16 de Guerreiro."
+        },
+        {
+          "id": "asi-ou-talento",
+          "type": "official-handler",
+          "handlerId": "asi-or-feat",
+          "params": {}
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-aumento-no-valor-de-atributo-8",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Aumento no Valor de Atributo",
+      "description": "Você adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 6, 8, 12, 14 e 16 de Guerreiro.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:class:guerreiro",
+      "level": 8,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 6, 8, 12, 14 e 16 de Guerreiro."
+        },
+        {
+          "id": "asi-ou-talento",
+          "type": "official-handler",
+          "handlerId": "asi-or-feat",
+          "params": {}
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-indomavel-9",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Indomável",
+      "description": "Ao falhar em uma salvaguarda, você pode jogá-la novamente adicionando um bônus igual ao seu nível de Guerreiro. Você deve usar o novo resultado e não pode usar essa característica novamente até completar um Descanso Longo.\nA partir do nível 13, você pode usar essa característica duas vezes antes de um Descanso Longo e três vezes antes de um Descanso Longo ao atingir o nível 17.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:class:guerreiro",
+      "level": 9,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Ao falhar em uma salvaguarda, você pode jogá-la novamente adicionando um bônus igual ao seu nível de Guerreiro. Você deve usar o novo resultado e não pode usar essa característica novamente até completar um Descanso Longo.\nA partir do nível 13, você pode usar essa característica duas vezes antes de um Descanso Longo e três vezes antes de um Descanso Longo ao atingir o nível 17."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-mestre-tatico",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Mestre Tático",
+      "description": "Ao atacar com uma arma cuja propriedade de maestria você pode usar, você pode substituir essa propriedade pela propriedade Empurrar, Drenar ou Lentidão para esse ataque.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:class:guerreiro",
+      "level": 9,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Ao atacar com uma arma cuja propriedade de maestria você pode usar, você pode substituir essa propriedade pela propriedade Empurrar, Drenar ou Lentidão para esse ataque."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-dois-ataques-extras",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Dois Ataques Extras",
+      "description": "Você pode atacar três vezes, em vez de uma, sempre que executar a ação Atacar no seu turno.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:class:guerreiro",
+      "level": 11,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você pode atacar três vezes, em vez de uma, sempre que executar a ação Atacar no seu turno."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-aumento-no-valor-de-atributo-12",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Aumento no Valor de Atributo",
+      "description": "Você adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 6, 8, 12, 14 e 16 de Guerreiro.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:class:guerreiro",
+      "level": 12,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 6, 8, 12, 14 e 16 de Guerreiro."
+        },
+        {
+          "id": "asi-ou-talento",
+          "type": "official-handler",
+          "handlerId": "asi-or-feat",
+          "params": {}
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-ataques-estudados",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Ataques Estudados",
+      "description": "Você estuda seus oponentes e aprende com cada ataque que realiza. Se você realizar uma jogada de ataque contra uma criatura e errar, você tem Vantagem em sua próxima jogada de ataque contra essa criatura antes do final do seu próximo turno.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:class:guerreiro",
+      "level": 13,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você estuda seus oponentes e aprende com cada ataque que realiza. Se você realizar uma jogada de ataque contra uma criatura e errar, você tem Vantagem em sua próxima jogada de ataque contra essa criatura antes do final do seu próximo turno."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-indomavel-13",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Indomável",
+      "description": "Ao falhar em uma salvaguarda, você pode jogá-la novamente adicionando um bônus igual ao seu nível de Guerreiro. Você deve usar o novo resultado e não pode usar essa característica novamente até completar um Descanso Longo.\nA partir do nível 13, você pode usar essa característica duas vezes antes de um Descanso Longo e três vezes antes de um Descanso Longo ao atingir o nível 17.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:class:guerreiro",
+      "level": 13,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Ao falhar em uma salvaguarda, você pode jogá-la novamente adicionando um bônus igual ao seu nível de Guerreiro. Você deve usar o novo resultado e não pode usar essa característica novamente até completar um Descanso Longo.\nA partir do nível 13, você pode usar essa característica duas vezes antes de um Descanso Longo e três vezes antes de um Descanso Longo ao atingir o nível 17."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-aumento-no-valor-de-atributo-14",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Aumento no Valor de Atributo",
+      "description": "Você adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 6, 8, 12, 14 e 16 de Guerreiro.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:class:guerreiro",
+      "level": 14,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 6, 8, 12, 14 e 16 de Guerreiro."
+        },
+        {
+          "id": "asi-ou-talento",
+          "type": "official-handler",
+          "handlerId": "asi-or-feat",
+          "params": {}
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-aumento-no-valor-de-atributo-16",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Aumento no Valor de Atributo",
+      "description": "Você adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 6, 8, 12, 14 e 16 de Guerreiro.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:class:guerreiro",
+      "level": 16,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você adquire o talento Aumento no Valor de Atributo (veja o capítulo 5) ou outro talento à sua escolha para o qual atenda os pré-requisitos. Você adquire essa característica novamente nos níveis 6, 8, 12, 14 e 16 de Guerreiro."
+        },
+        {
+          "id": "asi-ou-talento",
+          "type": "official-handler",
+          "handlerId": "asi-or-feat",
+          "params": {}
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-indomavel-17",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Indomável",
+      "description": "Ao falhar em uma salvaguarda, você pode jogá-la novamente adicionando um bônus igual ao seu nível de Guerreiro. Você deve usar o novo resultado e não pode usar essa característica novamente até completar um Descanso Longo.\nA partir do nível 13, você pode usar essa característica duas vezes antes de um Descanso Longo e três vezes antes de um Descanso Longo ao atingir o nível 17.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:class:guerreiro",
+      "level": 17,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Ao falhar em uma salvaguarda, você pode jogá-la novamente adicionando um bônus igual ao seu nível de Guerreiro. Você deve usar o novo resultado e não pode usar essa característica novamente até completar um Descanso Longo.\nA partir do nível 13, você pode usar essa característica duas vezes antes de um Descanso Longo e três vezes antes de um Descanso Longo ao atingir o nível 17."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-surto-de-acao-17",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Surto de Ação",
+      "description": "Você pode se esforçar além de seus limites normais por um momento. No seu turno, você pode executar uma ação adicional, exceto a ação Usar Magia.\nApós usar esta característica, você não pode usá-la novamente até completar um Descanso Curto ou Longo. A partir do nível 17, você pode usá-lo duas vezes antes de um descanso, mas apenas uma vez em um turno.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:class:guerreiro",
+      "level": 17,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você pode se esforçar além de seus limites normais por um momento. No seu turno, você pode executar uma ação adicional, exceto a ação Usar Magia.\nApós usar esta característica, você não pode usá-la novamente até completar um Descanso Curto ou Longo. A partir do nível 17, você pode usá-lo duas vezes antes de um descanso, mas apenas uma vez em um turno."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-dadiva-epica",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Dádiva Épica",
+      "description": "Você adquire o talento Dádiva Épica (veja o capítulo 5) ou outro talento à sua escolha para o qual se qualifica. Dádiva da Proeza em Combate é recomendada.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:class:guerreiro",
+      "level": 19,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você adquire o talento Dádiva Épica (veja o capítulo 5) ou outro talento à sua escolha para o qual se qualifica. Dádiva da Proeza em Combate é recomendada."
+        },
+        {
+          "id": "dadiva-epica",
+          "type": "official-handler",
+          "handlerId": "asi-or-feat",
+          "params": {
+            "epicBoon": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-tres-ataques-extras",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Três Ataques Extras",
+      "description": "Você pode atacar quatro vezes, em vez de uma, sempre que executar a ação Atacar no seu turno.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:class:guerreiro",
+      "level": 20,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você pode atacar quatro vezes, em vez de uma, sempre que executar a ação Atacar no seu turno."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:subclass:campeao",
+      "type": "subclass",
+      "schemaVersion": "1.0.0",
+      "name": "Campeão",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "class": "dnd2024:class:guerreiro"
+    },
+    {
+      "id": "dnd2024:feature:campeao-atleta-extraordinario",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Atleta Extraordinário",
+      "description": "Graças ao seu atletismo, você tem Vantagem em jogadas de Iniciativa e testes de Força (Atletismo).\nAlém disso, imediatamente após obter um Acerto Crítico, você pode se mover até metade do seu Deslocamento sem provocar Ataques de Oportunidade.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:campeao",
+      "level": 3,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Graças ao seu atletismo, você tem Vantagem em jogadas de Iniciativa e testes de Força (Atletismo).\nAlém disso, imediatamente após obter um Acerto Crítico, você pode se mover até metade do seu Deslocamento sem provocar Ataques de Oportunidade."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:campeao-critico-aprimorado",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Crítico Aprimorado",
+      "description": "Suas jogadas de ataque com armas e Ataques Desarmados obtém Acerto Crítico em jogadas com resultados 19 ou 20 no d20.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:campeao",
+      "level": 3,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Suas jogadas de ataque com armas e Ataques Desarmados obtém Acerto Crítico em jogadas com resultados 19 ou 20 no d20."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:campeao-estilo-de-luta-adicional",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Estilo de Luta Adicional",
+      "description": "Você adquire outro talento de Estilo de Luta à sua escolha.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:campeao",
+      "level": 7,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você adquire outro talento de Estilo de Luta à sua escolha."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:campeao-combatente-heroico",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Combatente Heroico",
+      "description": "A emoção da batalha leva você à vitória. Durante o combate, você pode se conceder Inspiração Heroica sempre que começar seu turno sem ela.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:campeao",
+      "level": 10,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "A emoção da batalha leva você à vitória. Durante o combate, você pode se conceder Inspiração Heroica sempre que começar seu turno sem ela."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:campeao-critico-superior",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Crítico Superior",
+      "description": "Suas jogadas de ataque com armas e Ataques Desarmados agora obtém Acerto Crítico em jogadas com resultados 18 a 20 no d20.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:campeao",
+      "level": 15,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Suas jogadas de ataque com armas e Ataques Desarmados agora obtém Acerto Crítico em jogadas com resultados 18 a 20 no d20."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:campeao-sobrevivente",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Sobrevivente",
+      "description": "Você atinge o auge da resiliência em batalha, concedendo-lhe os seguintes benefícios.\n**Desafie a Morte.** Você tem Vantagem em Salvaguardas Contra Morte. Além disso, ao obter um 18–20 em uma Salvaguarda Contra Morte, você obtém um 20 como resultado.\n**Regeneração Heroica.** No início de cada um dos seus turnos, você recupera Pontos de Vida iguais a 5 mais seu modificador de Constituição se estiver Sangrando e ter ao menos 1 Ponto de Vida.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:campeao",
+      "level": 18,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você atinge o auge da resiliência em batalha, concedendo-lhe os seguintes benefícios.\n**Desafie a Morte.** Você tem Vantagem em Salvaguardas Contra Morte. Além disso, ao obter um 18–20 em uma Salvaguarda Contra Morte, você obtém um 20 como resultado.\n**Regeneração Heroica.** No início de cada um dos seus turnos, você recupera Pontos de Vida iguais a 5 mais seu modificador de Constituição se estiver Sangrando e ter ao menos 1 Ponto de Vida."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:subclass:cavaleiro-mistico",
+      "type": "subclass",
+      "schemaVersion": "1.0.0",
+      "name": "Cavaleiro Místico",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "class": "dnd2024:class:guerreiro",
+      "effects": [
+        {
+          "id": "conjuracao-um-terco",
+          "type": "official-handler",
+          "handlerId": "third-caster-slots",
+          "params": {
+            "table": {
+              "3": {
+                "1": 2
+              },
+              "4": {
+                "1": 3
+              },
+              "7": {
+                "1": 4,
+                "2": 2
+              },
+              "8": {
+                "1": 4,
+                "2": 2
+              },
+              "10": {
+                "1": 4,
+                "2": 3
+              },
+              "13": {
+                "1": 4,
+                "2": 3,
+                "3": 2
+              },
+              "16": {
+                "1": 4,
+                "2": 3,
+                "3": 3
+              },
+              "19": {
+                "1": 4,
+                "2": 3,
+                "3": 3,
+                "4": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:cavaleiro-mistico-conjuracao",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Conjuração",
+      "description": "Você aprendeu a conjurar magias. Veja o capítulo 7 para as regras sobre conjuração de magias. As informações abaixo detalham como você usa essas regras como um Cavaleiro Místico.\n**Truques.** Você conhece dois truques à sua escolha da lista de magias de Mago. *Raio de Gelo* e *Toque Chocante* são recomendados. Sempre que você atinge um nível de Guerreiro, pode substituir um desses truques por outro truque à sua escolha da lista de magias de Mago.\nAo atingir o nível 10 de Guerreiro, você aprende mais um truque de Mago à sua escolha.\n**Espaços de Magia.** A tabela Conjuração de Cavaleiro Místico apresenta quantos espaços de magia você tem para conjurar suas magias de 1º círculo ou superior. Você restaura todos os espaços gastos ao completar um Descanso Longo.\n**Atributo de Conjuração.** Inteligência é seu atributo de conjuração para suas magias de Mago.\n**Foco de Conjuração.** Você pode usar um Foco Arcano como um Foco de Conjuração para suas magias de Mago.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:cavaleiro-mistico",
+      "level": 3,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você aprendeu a conjurar magias. Veja o capítulo 7 para as regras sobre conjuração de magias. As informações abaixo detalham como você usa essas regras como um Cavaleiro Místico.\n**Truques.** Você conhece dois truques à sua escolha da lista de magias de Mago. *Raio de Gelo* e *Toque Chocante* são recomendados. Sempre que você atinge um nível de Guerreiro, pode substituir um desses truques por outro truque à sua escolha da lista de magias de Mago.\nAo atingir o nível 10 de Guerreiro, você aprende mais um truque de Mago à sua escolha.\n**Espaços de Magia.** A tabela Conjuração de Cavaleiro Místico apresenta quantos espaços de magia você tem para conjurar suas magias de 1º círculo ou superior. Você restaura todos os espaços gastos ao completar um Descanso Longo.\n**Atributo de Conjuração.** Inteligência é seu atributo de conjuração para suas magias de Mago.\n**Foco de Conjuração.** Você pode usar um Foco Arcano como um Foco de Conjuração para suas magias de Mago."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:cavaleiro-mistico-vinculo-com-arma",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Vínculo com Arma",
+      "description": "Você aprende um ritual que cria um vínculo mágico entre você e uma arma. Você realiza o ritual ao longo de 1 hora, o que pode ser concluído durante um Descanso Curto. A arma deve estar ao seu alcance durante todo o ritual e, ao concluí-lo, você toca a arma e estabelece o vínculo. O vínculo falha se outro Guerreiro estiver ligado à arma ou se a arma for um item mágico com o qual outra pessoa está sintonizada.\nApós ter vinculado uma arma a si, ela não pode ser desarmada de você, a menos que você tenha a condição Incapacitado. Se ela estiver no mesmo plano de existência, você pode invocar essa arma como uma Ação Bônus, teleportando-a instantaneamente para sua mão.\nVocê pode ter até dois vínculos com armas, mas pode invocar apenas uma de cada vez com uma Ação Bônus. Se você tentar se vincular com uma terceira arma, você deve quebrar o vínculo com uma das outras duas.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:cavaleiro-mistico",
+      "level": 3,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você aprende um ritual que cria um vínculo mágico entre você e uma arma. Você realiza o ritual ao longo de 1 hora, o que pode ser concluído durante um Descanso Curto. A arma deve estar ao seu alcance durante todo o ritual e, ao concluí-lo, você toca a arma e estabelece o vínculo. O vínculo falha se outro Guerreiro estiver ligado à arma ou se a arma for um item mágico com o qual outra pessoa está sintonizada.\nApós ter vinculado uma arma a si, ela não pode ser desarmada de você, a menos que você tenha a condição Incapacitado. Se ela estiver no mesmo plano de existência, você pode invocar essa arma como uma Ação Bônus, teleportando-a instantaneamente para sua mão.\nVocê pode ter até dois vínculos com armas, mas pode invocar apenas uma de cada vez com uma Ação Bônus. Se você tentar se vincular com uma terceira arma, você deve quebrar o vínculo com uma das outras duas."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:cavaleiro-mistico-magia-de-guerra",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Magia de Guerra",
+      "description": "Ao executar a ação Atacar no seu turno, você pode substituir um dos ataques por uma conjuração de um de seus truques de Mago que tenha um tempo de conjuração de uma ação.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:cavaleiro-mistico",
+      "level": 7,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Ao executar a ação Atacar no seu turno, você pode substituir um dos ataques por uma conjuração de um de seus truques de Mago que tenha um tempo de conjuração de uma ação."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:cavaleiro-mistico-golpe-mistico",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Golpe Místico",
+      "description": "Você aprende a usar seus ataques com armas para reduzir a resistência de uma criatura às suas magias. Ao atingir uma criatura com um ataque usando uma arma, essa criatura sofre Desvantagem na próxima salvaguarda que realizar contra uma magia que você conjurar antes do final do seu próximo turno.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:cavaleiro-mistico",
+      "level": 10,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você aprende a usar seus ataques com armas para reduzir a resistência de uma criatura às suas magias. Ao atingir uma criatura com um ataque usando uma arma, essa criatura sofre Desvantagem na próxima salvaguarda que realizar contra uma magia que você conjurar antes do final do seu próximo turno."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:cavaleiro-mistico-investida-mistica",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Investida Mística",
+      "description": "Ao usar seu Surto de Ação, você pode se teleportar até 9 metros para um espaço desocupado à sua vista. Você pode se teleportar antes ou depois da ação adicional.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:cavaleiro-mistico",
+      "level": 15,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Ao usar seu Surto de Ação, você pode se teleportar até 9 metros para um espaço desocupado à sua vista. Você pode se teleportar antes ou depois da ação adicional."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:cavaleiro-mistico-magia-de-guerra-aprimorada",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Magia de Guerra Aprimorada",
+      "description": "Ao executar a ação Atacar no seu turno, você pode substituir dois ataques pela conjuração de uma das suas magias de Mago de 1º ou 2º círculo que tenha um tempo de conjuração de uma ação.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:cavaleiro-mistico",
+      "level": 18,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Ao executar a ação Atacar no seu turno, você pode substituir dois ataques pela conjuração de uma das suas magias de Mago de 1º ou 2º círculo que tenha um tempo de conjuração de uma ação."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:subclass:combatente-psiquico",
+      "type": "subclass",
+      "schemaVersion": "1.0.0",
+      "name": "Combatente Psíquico",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "class": "dnd2024:class:guerreiro",
+      "effects": [
+        {
+          "id": "dados-psionicos-3",
+          "type": "resource",
+          "when": {
+            "kind": "level",
+            "min": 3,
+            "max": 4
+          },
+          "resource": "dados-psionicos",
+          "max": 4,
+          "priority": 3,
+          "stackKey": "dados-psionicos",
+          "stackable": false
+        },
+        {
+          "id": "dados-psionicos-5",
+          "type": "resource",
+          "when": {
+            "kind": "level",
+            "min": 5,
+            "max": 8
+          },
+          "resource": "dados-psionicos",
+          "max": 6,
+          "priority": 5,
+          "stackKey": "dados-psionicos",
+          "stackable": false
+        },
+        {
+          "id": "dados-psionicos-9",
+          "type": "resource",
+          "when": {
+            "kind": "level",
+            "min": 9,
+            "max": 12
+          },
+          "resource": "dados-psionicos",
+          "max": 8,
+          "priority": 9,
+          "stackKey": "dados-psionicos",
+          "stackable": false
+        },
+        {
+          "id": "dados-psionicos-13",
+          "type": "resource",
+          "when": {
+            "kind": "level",
+            "min": 13,
+            "max": 16
+          },
+          "resource": "dados-psionicos",
+          "max": 10,
+          "priority": 13,
+          "stackKey": "dados-psionicos",
+          "stackable": false
+        },
+        {
+          "id": "dados-psionicos-17",
+          "type": "resource",
+          "when": {
+            "kind": "level",
+            "min": 17
+          },
+          "resource": "dados-psionicos",
+          "max": 12,
+          "priority": 17,
+          "stackKey": "dados-psionicos",
+          "stackable": false
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:combatente-psiquico-poder-psionico",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Poder Psiônico",
+      "description": "Você possui uma fonte de energia psiônica, representada pelos seus Dados de Energia Psiônica, que alimenta os poderes desta subclasse. A tabela Dados de Energia do Combatente Psíquico indica o tipo e a quantidade desses dados conforme você atinge certos níveis de Guerreiro.\n**Dados de Energia do Combatente Psíquico**\n| **Nível de Guerreiro** | **Tipo de Dado** | **Quantidade** |\n|------------------------|------------------|----------------|\n| 3                      | D6               | 4              |\n| 5                      | D8               | 6              |\n| 9                      | D8               | 8              |\n| 11                     | D10              | 8              |\n| 13                     | D10              | 10             |\n| 17                     | D12              | 12             |\nQualquer característica desta subclasse que utilize um Dado de Energia Psiônica emprega apenas os dados dessa subclasse. Alguns poderes consomem esse Dado, conforme detalhado na respectiva descrição, e você não pode usar um poder se ele exigir um dado e todos os seus Dados de Energia Psiônica estiverem esgotados.\nVocê recupera um de seus Dados de Energia Psiônica gastos ao completar um Descanso Curto, e restaura todos ao completar um Descanso Longo.\n**Golpe Psiônico.** Você pode impulsionar suas armas com força psiônica. Uma vez em cada um dos seus turnos, imediatamente após atingir um alvo a até 9 metros de você com um ataque e causar dano a ele com uma arma, você pode gastar um Dado de Energia Psiônica, jogá-lo e causar dano Energético ao alvo igual ao resultado obtido mais seu modificador de Inteligência.\n**Movimento Telecinético.** Você pode mover um objeto ou uma criatura com sua mente. Como uma ação Usar Magia, escolha um alvo à sua vista a até 9 metros de você; o alvo deve ser um objeto solto que seja Grande ou menor, ou uma criatura voluntária que não seja você. Você transporta o alvo até 9 metros para um espaço desocupado à sua vista. Como alternativa, se o alvo for um objeto Minúsculo, você pode transportá-lo de ou para sua mão.\nApós executar essa ação, você não pode fazer isso novamente até completar um Descanso Curto ou Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar o uso.\n**Vínculo Protetivo.** Quando você ou outra criatura à sua vista a até 9 metros de você sofrer dano, você pode executar uma Reação para gastar um Dado de Energia Psiônica, jogar o dado e reduzir o dano sofrido pelo resultado mais seu modificador de Inteligência (redução mínima de 1), enquanto cria um escudo momentâneo de força telecinética.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:combatente-psiquico",
+      "level": 3,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você possui uma fonte de energia psiônica, representada pelos seus Dados de Energia Psiônica, que alimenta os poderes desta subclasse. A tabela Dados de Energia do Combatente Psíquico indica o tipo e a quantidade desses dados conforme você atinge certos níveis de Guerreiro.\n**Dados de Energia do Combatente Psíquico**\n| **Nível de Guerreiro** | **Tipo de Dado** | **Quantidade** |\n|------------------------|------------------|----------------|\n| 3                      | D6               | 4              |\n| 5                      | D8               | 6              |\n| 9                      | D8               | 8              |\n| 11                     | D10              | 8              |\n| 13                     | D10              | 10             |\n| 17                     | D12              | 12             |\nQualquer característica desta subclasse que utilize um Dado de Energia Psiônica emprega apenas os dados dessa subclasse. Alguns poderes consomem esse Dado, conforme detalhado na respectiva descrição, e você não pode usar um poder se ele exigir um dado e todos os seus Dados de Energia Psiônica estiverem esgotados.\nVocê recupera um de seus Dados de Energia Psiônica gastos ao completar um Descanso Curto, e restaura todos ao completar um Descanso Longo.\n**Golpe Psiônico.** Você pode impulsionar suas armas com força psiônica. Uma vez em cada um dos seus turnos, imediatamente após atingir um alvo a até 9 metros de você com um ataque e causar dano a ele com uma arma, você pode gastar um Dado de Energia Psiônica, jogá-lo e causar dano Energético ao alvo igual ao resultado obtido mais seu modificador de Inteligência.\n**Movimento Telecinético.** Você pode mover um objeto ou uma criatura com sua mente. Como uma ação Usar Magia, escolha um alvo à sua vista a até 9 metros de você; o alvo deve ser um objeto solto que seja Grande ou menor, ou uma criatura voluntária que não seja você. Você transporta o alvo até 9 metros para um espaço desocupado à sua vista. Como alternativa, se o alvo for um objeto Minúsculo, você pode transportá-lo de ou para sua mão.\nApós executar essa ação, você não pode fazer isso novamente até completar um Descanso Curto ou Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar o uso.\n**Vínculo Protetivo.** Quando você ou outra criatura à sua vista a até 9 metros de você sofrer dano, você pode executar uma Reação para gastar um Dado de Energia Psiônica, jogar o dado e reduzir o dano sofrido pelo resultado mais seu modificador de Inteligência (redução mínima de 1), enquanto cria um escudo momentâneo de força telecinética."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:combatente-psiquico-adepto-telecinetico",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Adepto Telecinético",
+      "description": "Você dominou novas maneiras de usar suas habilidades telecinéticas, detalhadas abaixo.\n**Estocada Telecinética.** Ao causar dano a um alvo com seu Golpe Psiônico, você pode forçá-lo a realizar uma salvaguarda de Força (CD 8 mais seu modificador de Inteligência e seu Bônus de Proficiência). Se falhar, você pode impor ao alvo a condição Caído ou transportá-lo horizontalmente até 3 metros.\n**Salto com Impulsão Psíquica.** Como uma Ação Bônus, você adquire um Deslocamento de Voo igual ao dobro do seu Deslocamento até o final do turno atual. Após executar essa Ação Bônus, você não pode fazer isso novamente até completar um Descanso Curto ou Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar o uso.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:combatente-psiquico",
+      "level": 7,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você dominou novas maneiras de usar suas habilidades telecinéticas, detalhadas abaixo.\n**Estocada Telecinética.** Ao causar dano a um alvo com seu Golpe Psiônico, você pode forçá-lo a realizar uma salvaguarda de Força (CD 8 mais seu modificador de Inteligência e seu Bônus de Proficiência). Se falhar, você pode impor ao alvo a condição Caído ou transportá-lo horizontalmente até 3 metros.\n**Salto com Impulsão Psíquica.** Como uma Ação Bônus, você adquire um Deslocamento de Voo igual ao dobro do seu Deslocamento até o final do turno atual. Após executar essa Ação Bônus, você não pode fazer isso novamente até completar um Descanso Curto ou Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar o uso."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:combatente-psiquico-resguardo-mental",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Resguardo Mental",
+      "description": "Você tem Resistência a Dano Psíquico. Além disso, ao iniciar seu turno com a condição Amedrontado ou Enfeitiçado, você pode gastar um Dado de Energia Psiônica (nenhuma ação é necessária) e encerrar todos os efeitos em você que lhe impõe essas condições.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:combatente-psiquico",
+      "level": 10,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você tem Resistência a Dano Psíquico. Além disso, ao iniciar seu turno com a condição Amedrontado ou Enfeitiçado, você pode gastar um Dado de Energia Psiônica (nenhuma ação é necessária) e encerrar todos os efeitos em você que lhe impõe essas condições."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:combatente-psiquico-baluarte-de-energia",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Baluarte de Energia",
+      "description": "Você pode proteger a si e aos outros com força telecinética. Como uma Ação Bônus, você pode escolher criaturas, incluindo você mesmo, a até 9 metros, até um número de criaturas igual ao seu modificador de Inteligência (mínimo de uma criatura). Cada uma das criaturas escolhidas tem Cobertura Parcial por 1 minuto ou até você ter a condição Incapacitado.\nApós usar essa característica, você não pode fazer isso novamente até completar um Descanso Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar seu uso.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:combatente-psiquico",
+      "level": 15,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você pode proteger a si e aos outros com força telecinética. Como uma Ação Bônus, você pode escolher criaturas, incluindo você mesmo, a até 9 metros, até um número de criaturas igual ao seu modificador de Inteligência (mínimo de uma criatura). Cada uma das criaturas escolhidas tem Cobertura Parcial por 1 minuto ou até você ter a condição Incapacitado.\nApós usar essa característica, você não pode fazer isso novamente até completar um Descanso Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar seu uso."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:combatente-psiquico-mestre-telecinetico",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Mestre Telecinético",
+      "description": "Você sempre tem a magia *Telecinese* preparada. Com esta característica, você pode conjurá-la sem um espaço de magia ou componentes, e seu atributo de conjuração para ela é a Inteligência. Em cada um dos seus turnos enquanto você mantém a Concentração nela, incluindo o turno quando a conjura, você pode realizar um ataque com arma como uma Ação Bônus.\nApós conjurar a magia por meio dessa característica, você não pode fazer isso deste modo até completar um Descanso Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar o uso.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:combatente-psiquico",
+      "level": 18,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você sempre tem a magia *Telecinese* preparada. Com esta característica, você pode conjurá-la sem um espaço de magia ou componentes, e seu atributo de conjuração para ela é a Inteligência. Em cada um dos seus turnos enquanto você mantém a Concentração nela, incluindo o turno quando a conjura, você pode realizar um ataque com arma como uma Ação Bônus.\nApós conjurar a magia por meio dessa característica, você não pode fazer isso deste modo até completar um Descanso Longo, a menos que gaste um Dado de Energia Psiônica (nenhuma ação é necessária) para recuperar o uso."
+        },
+        {
+          "id": "grant-spell-telecinese",
+          "type": "grant-spell",
+          "when": {
+            "kind": "level",
+            "min": 18
+          },
+          "spell": "dnd2024:spell:telecinese",
+          "alwaysPrepared": true
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:subclass:mestre-da-batalha",
+      "type": "subclass",
+      "schemaVersion": "1.0.0",
+      "name": "Mestre da Batalha",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "class": "dnd2024:class:guerreiro",
+      "effects": [
+        {
+          "id": "manobras-conhecidas",
+          "type": "official-handler",
+          "handlerId": "combat-maneuvers-known",
+          "params": {
+            "newManeuversByLevel": {
+              "3": 3,
+              "7": 2,
+              "10": 2,
+              "15": 2
+            }
+          }
+        },
+        {
+          "id": "dados-de-superioridade-3",
+          "type": "resource",
+          "when": {
+            "kind": "level",
+            "min": 3,
+            "max": 6
+          },
+          "resource": "dados-de-superioridade",
+          "max": 4,
+          "priority": 3,
+          "stackKey": "dados-de-superioridade",
+          "stackable": false
+        },
+        {
+          "id": "dados-de-superioridade-7",
+          "type": "resource",
+          "when": {
+            "kind": "level",
+            "min": 7,
+            "max": 14
+          },
+          "resource": "dados-de-superioridade",
+          "max": 5,
+          "priority": 7,
+          "stackKey": "dados-de-superioridade",
+          "stackable": false
+        },
+        {
+          "id": "dados-de-superioridade-15",
+          "type": "resource",
+          "when": {
+            "kind": "level",
+            "min": 15
+          },
+          "resource": "dados-de-superioridade",
+          "max": 6,
+          "priority": 15,
+          "stackKey": "dados-de-superioridade",
+          "stackable": false
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:mestre-da-batalha-estudioso-da-guerra",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Estudioso da Guerra",
+      "description": "Você adquire proficiência com um tipo de Ferramentas de Artesão à sua escolha e adquire proficiência em uma perícia à sua escolha das perícias disponíveis para Guerreiros no nível 1.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:mestre-da-batalha",
+      "level": 3,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Você adquire proficiência com um tipo de Ferramentas de Artesão à sua escolha e adquire proficiência em uma perícia à sua escolha das perícias disponíveis para Guerreiros no nível 1."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:mestre-da-batalha-superioridade-em-combate",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Superioridade em Combate",
+      "description": "Sua experiência em combate aprimorou suas técnicas de luta, permitindo que você aprenda manobras com base em dados especiais chamados Dados de Superioridade.\n**Manobras.** Você aprende três manobras à sua escolha na seção \"Opções de Manobras\" mais adiante na descrição desta subclasse. Muitas manobras aprimoram, de alguma forma, um ataque. Você pode usar apenas uma manobra por ataque.\nVocê aprende duas manobras adicionais à sua escolha quando atinge os níveis 7, 10 e 15 de Guerreiro. Cada vez que aprende novas manobras, você também pode substituir uma manobra que você conhece por uma diferente.\n**Dados de Superioridade.** Você tem quatro Dados de Superioridade, os quais são d8s. Um Dado de Superioridade é gasto ao usá-lo. Você restaura todos os Dados de Superioridade gastos quando completa um Descanso Curto ou Longo.\nVocê adquire um Dado de Superioridade adicional ao atingir os níveis 7 (cinco dados no total) e 15 (seis dados no total) de Guerreiro.\n**Salvaguardas.** Se uma manobra exigir uma salvaguarda, a CD é igual a 8 mais seu modificador de Força ou Destreza (à sua escolha) e seu Bônus de Proficiência.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:mestre-da-batalha",
+      "level": 3,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Sua experiência em combate aprimorou suas técnicas de luta, permitindo que você aprenda manobras com base em dados especiais chamados Dados de Superioridade.\n**Manobras.** Você aprende três manobras à sua escolha na seção \"Opções de Manobras\" mais adiante na descrição desta subclasse. Muitas manobras aprimoram, de alguma forma, um ataque. Você pode usar apenas uma manobra por ataque.\nVocê aprende duas manobras adicionais à sua escolha quando atinge os níveis 7, 10 e 15 de Guerreiro. Cada vez que aprende novas manobras, você também pode substituir uma manobra que você conhece por uma diferente.\n**Dados de Superioridade.** Você tem quatro Dados de Superioridade, os quais são d8s. Um Dado de Superioridade é gasto ao usá-lo. Você restaura todos os Dados de Superioridade gastos quando completa um Descanso Curto ou Longo.\nVocê adquire um Dado de Superioridade adicional ao atingir os níveis 7 (cinco dados no total) e 15 (seis dados no total) de Guerreiro.\n**Salvaguardas.** Se uma manobra exigir uma salvaguarda, a CD é igual a 8 mais seu modificador de Força ou Destreza (à sua escolha) e seu Bônus de Proficiência."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:mestre-da-batalha-conheca-seu-inimigo",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Conheça Seu Inimigo",
+      "description": "Como uma Ação Bônus, você pode examinar certos pontos fortes e fracos de uma criatura à sua vista a até 9 metros de você; você sabe se essa criatura tem Imunidades, Resistências ou Vulnerabilidades, e se a criatura tiver alguma, você sabe quais são.\nApós usar essa característica, você não pode fazer isso novamente até completar um Descanso Longo. Você também pode recuperar um uso da característica gastando um Dado de Superioridade (nenhuma ação é necessária).",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:mestre-da-batalha",
+      "level": 7,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Como uma Ação Bônus, você pode examinar certos pontos fortes e fracos de uma criatura à sua vista a até 9 metros de você; você sabe se essa criatura tem Imunidades, Resistências ou Vulnerabilidades, e se a criatura tiver alguma, você sabe quais são.\nApós usar essa característica, você não pode fazer isso novamente até completar um Descanso Longo. Você também pode recuperar um uso da característica gastando um Dado de Superioridade (nenhuma ação é necessária)."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:mestre-da-batalha-superioridade-em-combate-aprimorada",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Superioridade em Combate Aprimorada",
+      "description": "Seu Dado de Superioridade se torna um d10.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:mestre-da-batalha",
+      "level": 10,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Seu Dado de Superioridade se torna um d10."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:mestre-da-batalha-implacavel",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Implacável",
+      "description": "Uma vez por turno, ao usar uma manobra, você pode jogar 1d8 e usar o resultado em vez de gastar um Dado de Superioridade.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:mestre-da-batalha",
+      "level": 15,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Uma vez por turno, ao usar uma manobra, você pode jogar 1d8 e usar o resultado em vez de gastar um Dado de Superioridade."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:feature:mestre-da-batalha-superioridade-em-combate-suprema",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Superioridade em Combate Suprema",
+      "description": "Seu Dado de Superioridade se torna um d12.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "grantedBy": "dnd2024:subclass:mestre-da-batalha",
+      "level": 18,
+      "effects": [
+        {
+          "id": "descricao",
+          "type": "manual",
+          "text": "Seu Dado de Superioridade se torna um d12."
+        }
+      ]
+    }
+  ]
+}

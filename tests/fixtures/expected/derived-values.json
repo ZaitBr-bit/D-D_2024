@@ -1,0 +1,2553 @@
+{
+  "fixtureVersion": 1,
+  "compatibilityBaseline": "e43c5ea",
+  "generatedAt": "2026-07-26T00:00:00.000Z",
+  "cases": [
+    {
+      "id": "pv-convergente",
+      "categoria": "pv",
+      "campo": "PV (Pontos de Vida atual/máximo)",
+      "origemReal": "char.pv_atual/char.pv_max são lidos diretamente (mesmo par de campos) por screen (sheet.js ~3654-3658), print (gerarHtmlImpressao, sheet.js:16920-16928) e PDF (_montarDadosCartao, sheet.js:17629) — sem helper de cálculo (são campos de estado direto, não derivados).",
+      "personagem": {
+        "id": "dv01-dv01-dv01",
+        "nome": "Referência de Valores Derivados",
+        "imagem": "",
+        "nivel": 5,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Clérigo",
+        "subclasse": "Domínio da Vida",
+        "especie": "Humano",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 12,
+          "destreza": 14,
+          "constituicao": 14,
+          "inteligencia": 10,
+          "sabedoria": 16,
+          "carisma": 12
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 38,
+        "pv_atual": 20,
+        "pv_temporario": 6,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 2,
+        "pericias_proficientes": [
+          "Percepção",
+          "Religião",
+          "Intuição"
+        ],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [],
+        "inventario": [
+          {
+            "nome": "Cota de Malha",
+            "tipo": "armadura",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "ca": "16",
+              "categoria": "Pesada",
+              "peso": "20 kg"
+            }
+          },
+          {
+            "nome": "Escudo",
+            "tipo": "escudo",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "peso": "3 kg"
+            }
+          },
+          {
+            "nome": "Mochila de Aventureiro",
+            "tipo": "equipamento",
+            "equipado": false,
+            "quantidade": 1,
+            "dados": {
+              "peso": "5 kg"
+            }
+          }
+        ],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [
+          {
+            "nome": "Abençoar",
+            "circulo": 1,
+            "origem": "dominio"
+          },
+          {
+            "nome": "Curar Ferimentos",
+            "circulo": 1
+          }
+        ],
+        "grimorio": [],
+        "espacos_magia": {
+          "1": {
+            "total": 4,
+            "usados": 1
+          },
+          "2": {
+            "total": 3,
+            "usados": 0
+          },
+          "3": {
+            "total": 2,
+            "usados": 0
+          }
+        },
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z",
+        "recursos": {
+          "talentos": {
+            "dadiva_destino": {
+              "usado": false
+            }
+          }
+        }
+      },
+      "baselineObserved": {
+        "domainHelper": null,
+        "screen": "20/38",
+        "print": "20/38",
+        "pdf": "20/38"
+      },
+      "expectedUnified": "20/38",
+      "baselineDifferences": [],
+      "notas": "Sem helper público compartilhado (PV é lido diretamente do campo, não calculado); expectedUnified = valor da tela principal, igual em todas as saídas no baseline atual."
+    },
+    {
+      "id": "ca-convergente",
+      "categoria": "ca",
+      "campo": "CA (Classe de Armadura)",
+      "origemReal": "site/js/utils.js#calcCA — chamado de forma idêntica em screen (sheet.js:3162), print (linha 16887) e PDF (linha 17622): sempre calcCA(char, passivosTalentosCache).",
+      "personagem": {
+        "id": "dv01-dv01-dv01",
+        "nome": "Referência de Valores Derivados",
+        "imagem": "",
+        "nivel": 5,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Clérigo",
+        "subclasse": "Domínio da Vida",
+        "especie": "Humano",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 12,
+          "destreza": 14,
+          "constituicao": 14,
+          "inteligencia": 10,
+          "sabedoria": 16,
+          "carisma": 12
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 38,
+        "pv_atual": 20,
+        "pv_temporario": 6,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 2,
+        "pericias_proficientes": [
+          "Percepção",
+          "Religião",
+          "Intuição"
+        ],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [],
+        "inventario": [
+          {
+            "nome": "Cota de Malha",
+            "tipo": "armadura",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "ca": "16",
+              "categoria": "Pesada",
+              "peso": "20 kg"
+            }
+          },
+          {
+            "nome": "Escudo",
+            "tipo": "escudo",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "peso": "3 kg"
+            }
+          },
+          {
+            "nome": "Mochila de Aventureiro",
+            "tipo": "equipamento",
+            "equipado": false,
+            "quantidade": 1,
+            "dados": {
+              "peso": "5 kg"
+            }
+          }
+        ],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [
+          {
+            "nome": "Abençoar",
+            "circulo": 1,
+            "origem": "dominio"
+          },
+          {
+            "nome": "Curar Ferimentos",
+            "circulo": 1
+          }
+        ],
+        "grimorio": [],
+        "espacos_magia": {
+          "1": {
+            "total": 4,
+            "usados": 1
+          },
+          "2": {
+            "total": 3,
+            "usados": 0
+          },
+          "3": {
+            "total": 2,
+            "usados": 0
+          }
+        },
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z",
+        "recursos": {
+          "talentos": {
+            "dadiva_destino": {
+              "usado": false
+            }
+          }
+        }
+      },
+      "baselineObserved": {
+        "domainHelper": 18,
+        "screen": 18,
+        "print": 18,
+        "pdf": 18
+      },
+      "expectedUnified": 18,
+      "baselineDifferences": [],
+      "notas": "Cota de Malha (Pesada, CA base 16, sem bônus de Des) + Escudo (+2) = 18. Todas as telas chamam o mesmo helper público com os mesmos argumentos: já convergido no baseline atual."
+    },
+    {
+      "id": "iniciativa-convergente",
+      "categoria": "iniciativa",
+      "campo": "Iniciativa",
+      "origemReal": "site/js/pages/sheet.js#getModIniciativa — chamado de forma idêntica em screen (3164), print (16889) e PDF (17623).",
+      "personagem": {
+        "id": "dv01-dv01-dv01",
+        "nome": "Referência de Valores Derivados",
+        "imagem": "",
+        "nivel": 5,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Clérigo",
+        "subclasse": "Domínio da Vida",
+        "especie": "Humano",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 12,
+          "destreza": 14,
+          "constituicao": 14,
+          "inteligencia": 10,
+          "sabedoria": 16,
+          "carisma": 12
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 38,
+        "pv_atual": 20,
+        "pv_temporario": 6,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 2,
+        "pericias_proficientes": [
+          "Percepção",
+          "Religião",
+          "Intuição"
+        ],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [],
+        "inventario": [
+          {
+            "nome": "Cota de Malha",
+            "tipo": "armadura",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "ca": "16",
+              "categoria": "Pesada",
+              "peso": "20 kg"
+            }
+          },
+          {
+            "nome": "Escudo",
+            "tipo": "escudo",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "peso": "3 kg"
+            }
+          },
+          {
+            "nome": "Mochila de Aventureiro",
+            "tipo": "equipamento",
+            "equipado": false,
+            "quantidade": 1,
+            "dados": {
+              "peso": "5 kg"
+            }
+          }
+        ],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [
+          {
+            "nome": "Abençoar",
+            "circulo": 1,
+            "origem": "dominio"
+          },
+          {
+            "nome": "Curar Ferimentos",
+            "circulo": 1
+          }
+        ],
+        "grimorio": [],
+        "espacos_magia": {
+          "1": {
+            "total": 4,
+            "usados": 1
+          },
+          "2": {
+            "total": 3,
+            "usados": 0
+          },
+          "3": {
+            "total": 2,
+            "usados": 0
+          }
+        },
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z",
+        "recursos": {
+          "talentos": {
+            "dadiva_destino": {
+              "usado": false
+            }
+          }
+        }
+      },
+      "baselineObserved": {
+        "domainHelper": 2,
+        "screen": 2,
+        "print": 2,
+        "pdf": 2
+      },
+      "expectedUnified": 2,
+      "baselineDifferences": [],
+      "notas": "getModIniciativa não está em utils.js (é local a sheet.js), mas é a mesma função reaproveitada nas três saídas: já convergido."
+    },
+    {
+      "id": "pv-temporario-divergente",
+      "categoria": "pv",
+      "campo": "PV Temporário",
+      "origemReal": "Campo do personagem é `pv_temporario` (site/js/store.js#criarPersonagemVazio). A tela principal lê corretamente `char.pv_temporario` (sheet.js:3658). O HTML de impressão (gerarHtmlImpressao, sheet.js:16932) e o cartão do PDF (_montarDadosCartao, sheet.js:17634) leem, em vez disso, `char.pv_temp` — um campo que NUNCA é escrito em nenhum lugar do app.",
+      "personagem": {
+        "id": "dv01-dv01-dv01",
+        "nome": "Referência de Valores Derivados",
+        "imagem": "",
+        "nivel": 5,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Clérigo",
+        "subclasse": "Domínio da Vida",
+        "especie": "Humano",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 12,
+          "destreza": 14,
+          "constituicao": 14,
+          "inteligencia": 10,
+          "sabedoria": 16,
+          "carisma": 12
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 38,
+        "pv_atual": 20,
+        "pv_temporario": 6,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 2,
+        "pericias_proficientes": [
+          "Percepção",
+          "Religião",
+          "Intuição"
+        ],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [],
+        "inventario": [
+          {
+            "nome": "Cota de Malha",
+            "tipo": "armadura",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "ca": "16",
+              "categoria": "Pesada",
+              "peso": "20 kg"
+            }
+          },
+          {
+            "nome": "Escudo",
+            "tipo": "escudo",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "peso": "3 kg"
+            }
+          },
+          {
+            "nome": "Mochila de Aventureiro",
+            "tipo": "equipamento",
+            "equipado": false,
+            "quantidade": 1,
+            "dados": {
+              "peso": "5 kg"
+            }
+          }
+        ],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [
+          {
+            "nome": "Abençoar",
+            "circulo": 1,
+            "origem": "dominio"
+          },
+          {
+            "nome": "Curar Ferimentos",
+            "circulo": 1
+          }
+        ],
+        "grimorio": [],
+        "espacos_magia": {
+          "1": {
+            "total": 4,
+            "usados": 1
+          },
+          "2": {
+            "total": 3,
+            "usados": 0
+          },
+          "3": {
+            "total": 2,
+            "usados": 0
+          }
+        },
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z",
+        "recursos": {
+          "talentos": {
+            "dadiva_destino": {
+              "usado": false
+            }
+          }
+        }
+      },
+      "baselineObserved": {
+        "domainHelper": null,
+        "screen": 6,
+        "print": 0,
+        "pdf": 0
+      },
+      "expectedUnified": 6,
+      "baselineDifferences": [
+        {
+          "onde": "print",
+          "valorAtual": 0,
+          "valorEsperado": 6,
+          "motivo": "gerarHtmlImpressao lê char.pv_temp (inexistente) em vez de char.pv_temporario."
+        },
+        {
+          "onde": "pdf",
+          "valorAtual": 0,
+          "valorEsperado": 6,
+          "motivo": "_montarDadosCartao lê char.pv_temp (inexistente) em vez de char.pv_temporario."
+        }
+      ],
+      "notas": "Não há helper público compartilhado para PV temporário; expectedUnified usa o valor mostrado na tela principal."
+    },
+    {
+      "id": "dados-de-vida-restantes-divergente",
+      "categoria": "dados_de_vida",
+      "campo": "Dados de Vida restantes",
+      "origemReal": "Screen calcula corretamente `char.nivel - (char.dados_vida_usados || 0)` (sheet.js:3662, 4169, 4338). Print (sheet.js:16936) lê `char.dados_vida_disponiveis ?? char.nivel` — campo nunca escrito, sempre cai no fallback nivel. PDF omite Dados de Vida do cartão.",
+      "personagem": {
+        "id": "dv01-dv01-dv01",
+        "nome": "Referência de Valores Derivados",
+        "imagem": "",
+        "nivel": 5,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Clérigo",
+        "subclasse": "Domínio da Vida",
+        "especie": "Humano",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 12,
+          "destreza": 14,
+          "constituicao": 14,
+          "inteligencia": 10,
+          "sabedoria": 16,
+          "carisma": 12
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 38,
+        "pv_atual": 20,
+        "pv_temporario": 6,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 2,
+        "pericias_proficientes": [
+          "Percepção",
+          "Religião",
+          "Intuição"
+        ],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [],
+        "inventario": [
+          {
+            "nome": "Cota de Malha",
+            "tipo": "armadura",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "ca": "16",
+              "categoria": "Pesada",
+              "peso": "20 kg"
+            }
+          },
+          {
+            "nome": "Escudo",
+            "tipo": "escudo",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "peso": "3 kg"
+            }
+          },
+          {
+            "nome": "Mochila de Aventureiro",
+            "tipo": "equipamento",
+            "equipado": false,
+            "quantidade": 1,
+            "dados": {
+              "peso": "5 kg"
+            }
+          }
+        ],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [
+          {
+            "nome": "Abençoar",
+            "circulo": 1,
+            "origem": "dominio"
+          },
+          {
+            "nome": "Curar Ferimentos",
+            "circulo": 1
+          }
+        ],
+        "grimorio": [],
+        "espacos_magia": {
+          "1": {
+            "total": 4,
+            "usados": 1
+          },
+          "2": {
+            "total": 3,
+            "usados": 0
+          },
+          "3": {
+            "total": 2,
+            "usados": 0
+          }
+        },
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z",
+        "recursos": {
+          "talentos": {
+            "dadiva_destino": {
+              "usado": false
+            }
+          }
+        }
+      },
+      "baselineObserved": {
+        "domainHelper": null,
+        "screen": 3,
+        "print": 5,
+        "pdf": null
+      },
+      "expectedUnified": 3,
+      "baselineDifferences": [
+        {
+          "onde": "print",
+          "valorAtual": 5,
+          "valorEsperado": 3,
+          "motivo": "gerarHtmlImpressao lê char.dados_vida_disponiveis (inexistente) em vez de calcular nivel - dados_vida_usados."
+        },
+        {
+          "onde": "pdf",
+          "valorAtual": null,
+          "valorEsperado": 3,
+          "motivo": "_montarDadosCartao não inclui Dados de Vida na lista de stats do cartão — campo omitido."
+        }
+      ],
+      "notas": "Sem helper público compartilhado; expectedUnified usa o valor da tela principal (nivel - dados_vida_usados = 5 - 2 = 3)."
+    },
+    {
+      "id": "cd-magia-convergente",
+      "categoria": "cd_magia",
+      "campo": "CD de Magia",
+      "origemReal": "site/js/utils.js#calcCDMagia — chamado de forma idêntica em screen, print e PDF (17636, apenas quando info.conjurador).",
+      "personagem": {
+        "id": "dv01-dv01-dv01",
+        "nome": "Referência de Valores Derivados",
+        "imagem": "",
+        "nivel": 5,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Clérigo",
+        "subclasse": "Domínio da Vida",
+        "especie": "Humano",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 12,
+          "destreza": 14,
+          "constituicao": 14,
+          "inteligencia": 10,
+          "sabedoria": 16,
+          "carisma": 12
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 38,
+        "pv_atual": 20,
+        "pv_temporario": 6,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 2,
+        "pericias_proficientes": [
+          "Percepção",
+          "Religião",
+          "Intuição"
+        ],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [],
+        "inventario": [
+          {
+            "nome": "Cota de Malha",
+            "tipo": "armadura",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "ca": "16",
+              "categoria": "Pesada",
+              "peso": "20 kg"
+            }
+          },
+          {
+            "nome": "Escudo",
+            "tipo": "escudo",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "peso": "3 kg"
+            }
+          },
+          {
+            "nome": "Mochila de Aventureiro",
+            "tipo": "equipamento",
+            "equipado": false,
+            "quantidade": 1,
+            "dados": {
+              "peso": "5 kg"
+            }
+          }
+        ],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [
+          {
+            "nome": "Abençoar",
+            "circulo": 1,
+            "origem": "dominio"
+          },
+          {
+            "nome": "Curar Ferimentos",
+            "circulo": 1
+          }
+        ],
+        "grimorio": [],
+        "espacos_magia": {
+          "1": {
+            "total": 4,
+            "usados": 1
+          },
+          "2": {
+            "total": 3,
+            "usados": 0
+          },
+          "3": {
+            "total": 2,
+            "usados": 0
+          }
+        },
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z",
+        "recursos": {
+          "talentos": {
+            "dadiva_destino": {
+              "usado": false
+            }
+          }
+        }
+      },
+      "baselineObserved": {
+        "domainHelper": 14,
+        "screen": 14,
+        "print": 14,
+        "pdf": 14
+      },
+      "expectedUnified": 14,
+      "baselineDifferences": [],
+      "notas": "8 + bônus de proficiência (3 no nível 5) + mod Sabedoria (16 -> +3) = 14."
+    },
+    {
+      "id": "ataque-magia-convergente",
+      "categoria": "ataque_magia",
+      "campo": "Bônus de Ataque de Magia",
+      "origemReal": "site/js/utils.js#calcAtaqueMagia — mesma chamada em screen/print/PDF.",
+      "personagem": {
+        "id": "dv01-dv01-dv01",
+        "nome": "Referência de Valores Derivados",
+        "imagem": "",
+        "nivel": 5,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Clérigo",
+        "subclasse": "Domínio da Vida",
+        "especie": "Humano",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 12,
+          "destreza": 14,
+          "constituicao": 14,
+          "inteligencia": 10,
+          "sabedoria": 16,
+          "carisma": 12
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 38,
+        "pv_atual": 20,
+        "pv_temporario": 6,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 2,
+        "pericias_proficientes": [
+          "Percepção",
+          "Religião",
+          "Intuição"
+        ],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [],
+        "inventario": [
+          {
+            "nome": "Cota de Malha",
+            "tipo": "armadura",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "ca": "16",
+              "categoria": "Pesada",
+              "peso": "20 kg"
+            }
+          },
+          {
+            "nome": "Escudo",
+            "tipo": "escudo",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "peso": "3 kg"
+            }
+          },
+          {
+            "nome": "Mochila de Aventureiro",
+            "tipo": "equipamento",
+            "equipado": false,
+            "quantidade": 1,
+            "dados": {
+              "peso": "5 kg"
+            }
+          }
+        ],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [
+          {
+            "nome": "Abençoar",
+            "circulo": 1,
+            "origem": "dominio"
+          },
+          {
+            "nome": "Curar Ferimentos",
+            "circulo": 1
+          }
+        ],
+        "grimorio": [],
+        "espacos_magia": {
+          "1": {
+            "total": 4,
+            "usados": 1
+          },
+          "2": {
+            "total": 3,
+            "usados": 0
+          },
+          "3": {
+            "total": 2,
+            "usados": 0
+          }
+        },
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z",
+        "recursos": {
+          "talentos": {
+            "dadiva_destino": {
+              "usado": false
+            }
+          }
+        }
+      },
+      "baselineObserved": {
+        "domainHelper": 6,
+        "screen": 6,
+        "print": 6,
+        "pdf": 6
+      },
+      "expectedUnified": 6,
+      "baselineDifferences": [],
+      "notas": "bônus de proficiência (3) + mod Sabedoria (+3) = +6."
+    },
+    {
+      "id": "percepcao-passiva-convergente",
+      "categoria": "pericias_passivas",
+      "campo": "Percepção Passiva",
+      "origemReal": "site/js/utils.js#calcPercepcaoPassiva — chamado de forma idêntica em screen (15160), print (17032) e PDF (17661).",
+      "personagem": {
+        "id": "dv01-dv01-dv01",
+        "nome": "Referência de Valores Derivados",
+        "imagem": "",
+        "nivel": 5,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Clérigo",
+        "subclasse": "Domínio da Vida",
+        "especie": "Humano",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 12,
+          "destreza": 14,
+          "constituicao": 14,
+          "inteligencia": 10,
+          "sabedoria": 16,
+          "carisma": 12
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 38,
+        "pv_atual": 20,
+        "pv_temporario": 6,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 2,
+        "pericias_proficientes": [
+          "Percepção",
+          "Religião",
+          "Intuição"
+        ],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [],
+        "inventario": [
+          {
+            "nome": "Cota de Malha",
+            "tipo": "armadura",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "ca": "16",
+              "categoria": "Pesada",
+              "peso": "20 kg"
+            }
+          },
+          {
+            "nome": "Escudo",
+            "tipo": "escudo",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "peso": "3 kg"
+            }
+          },
+          {
+            "nome": "Mochila de Aventureiro",
+            "tipo": "equipamento",
+            "equipado": false,
+            "quantidade": 1,
+            "dados": {
+              "peso": "5 kg"
+            }
+          }
+        ],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [
+          {
+            "nome": "Abençoar",
+            "circulo": 1,
+            "origem": "dominio"
+          },
+          {
+            "nome": "Curar Ferimentos",
+            "circulo": 1
+          }
+        ],
+        "grimorio": [],
+        "espacos_magia": {
+          "1": {
+            "total": 4,
+            "usados": 1
+          },
+          "2": {
+            "total": 3,
+            "usados": 0
+          },
+          "3": {
+            "total": 2,
+            "usados": 0
+          }
+        },
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z",
+        "recursos": {
+          "talentos": {
+            "dadiva_destino": {
+              "usado": false
+            }
+          }
+        }
+      },
+      "baselineObserved": {
+        "domainHelper": 16,
+        "screen": 16,
+        "print": 16,
+        "pdf": 16
+      },
+      "expectedUnified": 16,
+      "baselineDifferences": [],
+      "notas": "10 + mod Sabedoria (+3) + bônus de proficiência (3, pois \"Percepção\" está em pericias_proficientes) = 16."
+    },
+    {
+      "id": "intuicao-passiva-convergente",
+      "categoria": "pericias_passivas",
+      "campo": "Intuição Passiva",
+      "origemReal": "site/js/utils.js#calcIntuicaoPassiva (linha 283) — chamado de forma idêntica em screen (15161), print (17033) e PDF (17662).",
+      "personagem": {
+        "id": "dv01-dv01-dv01",
+        "nome": "Referência de Valores Derivados",
+        "imagem": "",
+        "nivel": 5,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Clérigo",
+        "subclasse": "Domínio da Vida",
+        "especie": "Humano",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 12,
+          "destreza": 14,
+          "constituicao": 14,
+          "inteligencia": 10,
+          "sabedoria": 16,
+          "carisma": 12
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 38,
+        "pv_atual": 20,
+        "pv_temporario": 6,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 2,
+        "pericias_proficientes": [
+          "Percepção",
+          "Religião",
+          "Intuição"
+        ],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [],
+        "inventario": [
+          {
+            "nome": "Cota de Malha",
+            "tipo": "armadura",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "ca": "16",
+              "categoria": "Pesada",
+              "peso": "20 kg"
+            }
+          },
+          {
+            "nome": "Escudo",
+            "tipo": "escudo",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "peso": "3 kg"
+            }
+          },
+          {
+            "nome": "Mochila de Aventureiro",
+            "tipo": "equipamento",
+            "equipado": false,
+            "quantidade": 1,
+            "dados": {
+              "peso": "5 kg"
+            }
+          }
+        ],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [
+          {
+            "nome": "Abençoar",
+            "circulo": 1,
+            "origem": "dominio"
+          },
+          {
+            "nome": "Curar Ferimentos",
+            "circulo": 1
+          }
+        ],
+        "grimorio": [],
+        "espacos_magia": {
+          "1": {
+            "total": 4,
+            "usados": 1
+          },
+          "2": {
+            "total": 3,
+            "usados": 0
+          },
+          "3": {
+            "total": 2,
+            "usados": 0
+          }
+        },
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z",
+        "recursos": {
+          "talentos": {
+            "dadiva_destino": {
+              "usado": false
+            }
+          }
+        }
+      },
+      "baselineObserved": {
+        "domainHelper": 16,
+        "screen": 16,
+        "print": 16,
+        "pdf": 16
+      },
+      "expectedUnified": 16,
+      "baselineDifferences": [],
+      "notas": "10 + mod Sabedoria (+3) + bônus de proficiência (3, pois \"Intuição\" está em pericias_proficientes) = 16. Segundo caso de perícia passiva coberto (calcPercepcaoPassiva já coberto acima), demonstrando que calcIntuicaoPassiva/calcInvestigacaoPassiva seguem o mesmo padrão de calcBonusPericia."
+    },
+    {
+      "id": "carga-somente-na-tela",
+      "categoria": "carga",
+      "campo": "Capacidade de Carga / Peso Total do Inventário",
+      "origemReal": "site/js/utils.js#getCapacidadeCarga / #getPesoTotalInventario, usados apenas na tela principal (sheet.js:15422-15423). Print e PDF não exibem esse valor em nenhum lugar (omissão, não cálculo divergente).",
+      "personagem": {
+        "id": "dv01-dv01-dv01",
+        "nome": "Referência de Valores Derivados",
+        "imagem": "",
+        "nivel": 5,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Clérigo",
+        "subclasse": "Domínio da Vida",
+        "especie": "Humano",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 12,
+          "destreza": 14,
+          "constituicao": 14,
+          "inteligencia": 10,
+          "sabedoria": 16,
+          "carisma": 12
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 38,
+        "pv_atual": 20,
+        "pv_temporario": 6,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 2,
+        "pericias_proficientes": [
+          "Percepção",
+          "Religião",
+          "Intuição"
+        ],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [],
+        "inventario": [
+          {
+            "nome": "Cota de Malha",
+            "tipo": "armadura",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "ca": "16",
+              "categoria": "Pesada",
+              "peso": "20 kg"
+            }
+          },
+          {
+            "nome": "Escudo",
+            "tipo": "escudo",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "peso": "3 kg"
+            }
+          },
+          {
+            "nome": "Mochila de Aventureiro",
+            "tipo": "equipamento",
+            "equipado": false,
+            "quantidade": 1,
+            "dados": {
+              "peso": "5 kg"
+            }
+          }
+        ],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [
+          {
+            "nome": "Abençoar",
+            "circulo": 1,
+            "origem": "dominio"
+          },
+          {
+            "nome": "Curar Ferimentos",
+            "circulo": 1
+          }
+        ],
+        "grimorio": [],
+        "espacos_magia": {
+          "1": {
+            "total": 4,
+            "usados": 1
+          },
+          "2": {
+            "total": 3,
+            "usados": 0
+          },
+          "3": {
+            "total": 2,
+            "usados": 0
+          }
+        },
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z",
+        "recursos": {
+          "talentos": {
+            "dadiva_destino": {
+              "usado": false
+            }
+          }
+        }
+      },
+      "baselineObserved": {
+        "domainHelper": 84,
+        "screen": 84,
+        "print": null,
+        "pdf": null
+      },
+      "expectedUnified": 84,
+      "baselineDifferences": [
+        {
+          "onde": "print",
+          "valorAtual": null,
+          "valorEsperado": 84,
+          "motivo": "Capacidade de carga não é exibida na impressão (omissão de feature, não bug de valor)."
+        },
+        {
+          "onde": "pdf",
+          "valorAtual": null,
+          "valorEsperado": 84,
+          "motivo": "Capacidade de carga não é exibida no PDF (omissão de feature, não bug de valor)."
+        }
+      ],
+      "notas": "Força 12 × multiplicador Médio (7) = 84 kg. Peso total do inventário = 20 + 3 + 5 = 28 kg."
+    },
+    {
+      "id": "espacos-de-magia-convergente",
+      "categoria": "espacos",
+      "campo": "Espaços de Magia (1º círculo, disponíveis)",
+      "origemReal": "char.espacos_magia é lido diretamente (mesmo objeto em memória) por screen, print e PDF.",
+      "personagem": {
+        "id": "dv01-dv01-dv01",
+        "nome": "Referência de Valores Derivados",
+        "imagem": "",
+        "nivel": 5,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Clérigo",
+        "subclasse": "Domínio da Vida",
+        "especie": "Humano",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 12,
+          "destreza": 14,
+          "constituicao": 14,
+          "inteligencia": 10,
+          "sabedoria": 16,
+          "carisma": 12
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 38,
+        "pv_atual": 20,
+        "pv_temporario": 6,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 2,
+        "pericias_proficientes": [
+          "Percepção",
+          "Religião",
+          "Intuição"
+        ],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [],
+        "inventario": [
+          {
+            "nome": "Cota de Malha",
+            "tipo": "armadura",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "ca": "16",
+              "categoria": "Pesada",
+              "peso": "20 kg"
+            }
+          },
+          {
+            "nome": "Escudo",
+            "tipo": "escudo",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "peso": "3 kg"
+            }
+          },
+          {
+            "nome": "Mochila de Aventureiro",
+            "tipo": "equipamento",
+            "equipado": false,
+            "quantidade": 1,
+            "dados": {
+              "peso": "5 kg"
+            }
+          }
+        ],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [
+          {
+            "nome": "Abençoar",
+            "circulo": 1,
+            "origem": "dominio"
+          },
+          {
+            "nome": "Curar Ferimentos",
+            "circulo": 1
+          }
+        ],
+        "grimorio": [],
+        "espacos_magia": {
+          "1": {
+            "total": 4,
+            "usados": 1
+          },
+          "2": {
+            "total": 3,
+            "usados": 0
+          },
+          "3": {
+            "total": 2,
+            "usados": 0
+          }
+        },
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z",
+        "recursos": {
+          "talentos": {
+            "dadiva_destino": {
+              "usado": false
+            }
+          }
+        }
+      },
+      "baselineObserved": {
+        "domainHelper": null,
+        "screen": 3,
+        "print": 3,
+        "pdf": 3
+      },
+      "expectedUnified": 3,
+      "baselineDifferences": [],
+      "notas": "espacos_magia[\"1\"] = { total: 4, usados: 1 } -> 3 disponíveis."
+    },
+    {
+      "id": "deslocamento-convergente",
+      "categoria": "deslocamento",
+      "campo": "Deslocamento",
+      "origemReal": "site/js/utils.js#getDeslocamento — chamado de forma idêntica em screen (sheet.js, cálculo de deslocamento final via getDeslocamentoFinal), print (sheet.js:16894-16895/16944) e PDF (sheet.js:17625/17631), sempre envolvido por getDeslocamentoFinal(getDeslocamento(especieTexto)).",
+      "personagem": {
+        "id": "dv01-dv01-dv01",
+        "nome": "Referência de Valores Derivados",
+        "imagem": "",
+        "nivel": 5,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Clérigo",
+        "subclasse": "Domínio da Vida",
+        "especie": "Humano",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 12,
+          "destreza": 14,
+          "constituicao": 14,
+          "inteligencia": 10,
+          "sabedoria": 16,
+          "carisma": 12
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 38,
+        "pv_atual": 20,
+        "pv_temporario": 6,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 2,
+        "pericias_proficientes": [
+          "Percepção",
+          "Religião",
+          "Intuição"
+        ],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [],
+        "inventario": [
+          {
+            "nome": "Cota de Malha",
+            "tipo": "armadura",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "ca": "16",
+              "categoria": "Pesada",
+              "peso": "20 kg"
+            }
+          },
+          {
+            "nome": "Escudo",
+            "tipo": "escudo",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "peso": "3 kg"
+            }
+          },
+          {
+            "nome": "Mochila de Aventureiro",
+            "tipo": "equipamento",
+            "equipado": false,
+            "quantidade": 1,
+            "dados": {
+              "peso": "5 kg"
+            }
+          }
+        ],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [
+          {
+            "nome": "Abençoar",
+            "circulo": 1,
+            "origem": "dominio"
+          },
+          {
+            "nome": "Curar Ferimentos",
+            "circulo": 1
+          }
+        ],
+        "grimorio": [],
+        "espacos_magia": {
+          "1": {
+            "total": 4,
+            "usados": 1
+          },
+          "2": {
+            "total": 3,
+            "usados": 0
+          },
+          "3": {
+            "total": 2,
+            "usados": 0
+          }
+        },
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z",
+        "recursos": {
+          "talentos": {
+            "dadiva_destino": {
+              "usado": false
+            }
+          }
+        }
+      },
+      "baselineObserved": {
+        "domainHelper": "9 metros",
+        "screen": "9 metros",
+        "print": "9 metros",
+        "pdf": "9 metros"
+      },
+      "expectedUnified": "9 metros",
+      "baselineDifferences": [],
+      "notas": "Espécie \"Humano\" sem texto_completo customizado no personagem de referência: getDeslocamento retorna o fallback padrão \"9 metros\" quando não há string \"Deslocamento: Xm\" para casar — mesmo valor nas três saídas."
+    },
+    {
+      "id": "recursos-de-talento-convergente",
+      "categoria": "recursos",
+      "campo": "Recursos de talento (recursos.talentos.*)",
+      "origemReal": "char.recursos é lido diretamente (mesmo objeto em memória); restaurarRecursosTalentos (site/js/regras-cobertura.js#345, EXECUTADO neste caso) é a única lógica compartilhada sobre esse campo, e é chamada a partir do fluxo de descanso da tela principal — não há renderização própria de \"recursos\" em print/PDF (eles não exibem uma seção dedicada a recursos de talento).",
+      "personagem": {
+        "id": "dv01-dv01-dv01",
+        "nome": "Referência de Valores Derivados",
+        "imagem": "",
+        "nivel": 5,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Clérigo",
+        "subclasse": "Domínio da Vida",
+        "especie": "Humano",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 12,
+          "destreza": 14,
+          "constituicao": 14,
+          "inteligencia": 10,
+          "sabedoria": 16,
+          "carisma": 12
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 38,
+        "pv_atual": 20,
+        "pv_temporario": 6,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 2,
+        "pericias_proficientes": [
+          "Percepção",
+          "Religião",
+          "Intuição"
+        ],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [],
+        "inventario": [
+          {
+            "nome": "Cota de Malha",
+            "tipo": "armadura",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "ca": "16",
+              "categoria": "Pesada",
+              "peso": "20 kg"
+            }
+          },
+          {
+            "nome": "Escudo",
+            "tipo": "escudo",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "peso": "3 kg"
+            }
+          },
+          {
+            "nome": "Mochila de Aventureiro",
+            "tipo": "equipamento",
+            "equipado": false,
+            "quantidade": 1,
+            "dados": {
+              "peso": "5 kg"
+            }
+          }
+        ],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [
+          {
+            "nome": "Abençoar",
+            "circulo": 1,
+            "origem": "dominio"
+          },
+          {
+            "nome": "Curar Ferimentos",
+            "circulo": 1
+          }
+        ],
+        "grimorio": [],
+        "espacos_magia": {
+          "1": {
+            "total": 4,
+            "usados": 1
+          },
+          "2": {
+            "total": 3,
+            "usados": 0
+          },
+          "3": {
+            "total": 2,
+            "usados": 0
+          }
+        },
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z",
+        "recursos": {
+          "talentos": {
+            "dadiva_destino": {
+              "usado": false
+            }
+          }
+        }
+      },
+      "baselineObserved": {
+        "domainHelper": false,
+        "screen": false,
+        "print": null,
+        "pdf": null
+      },
+      "expectedUnified": false,
+      "baselineDifferences": [
+        {
+          "onde": "print",
+          "valorAtual": null,
+          "valorEsperado": false,
+          "motivo": "Recursos de talento não têm uma seção própria na impressão (omissão de feature)."
+        },
+        {
+          "onde": "pdf",
+          "valorAtual": null,
+          "valorEsperado": false,
+          "motivo": "Recursos de talento não têm uma seção própria no PDF (omissão de feature)."
+        }
+      ],
+      "notas": "char.recursos.talentos.dadiva_destino.usado = false (valor direto do campo, sem transformação); print/PDF simplesmente não têm UI para isso."
+    },
+    {
+      "id": "resistencias-convergente",
+      "categoria": "resistencias",
+      "campo": "Resistências a dano",
+      "origemReal": "char.resistencias é lido diretamente (mesmo array em memória, nomes de exibição em português) por screen/print/PDF — sem helper de cálculo compartilhado (é uma lista de estado, não um valor derivado por fórmula). Caso adicionado no fix round 1 da Task 16 (achado I5): nenhum caso de resistências existia neste fixture; resistência a dano Ígneo (fogo) adicionada para dar ao teste de contrato de domain/character/queries um oráculo real, não só um teste unitário sintético.",
+      "personagem": {
+        "id": "dv01-dv01-dv01",
+        "nome": "Referência de Valores Derivados",
+        "imagem": "",
+        "nivel": 5,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Clérigo",
+        "subclasse": "Domínio da Vida",
+        "especie": "Humano",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 12,
+          "destreza": 14,
+          "constituicao": 14,
+          "inteligencia": 10,
+          "sabedoria": 16,
+          "carisma": 12
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 38,
+        "pv_atual": 20,
+        "pv_temporario": 6,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 2,
+        "pericias_proficientes": [
+          "Percepção",
+          "Religião",
+          "Intuição"
+        ],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [],
+        "inventario": [
+          {
+            "nome": "Cota de Malha",
+            "tipo": "armadura",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "ca": "16",
+              "categoria": "Pesada",
+              "peso": "20 kg"
+            }
+          },
+          {
+            "nome": "Escudo",
+            "tipo": "escudo",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "peso": "3 kg"
+            }
+          },
+          {
+            "nome": "Mochila de Aventureiro",
+            "tipo": "equipamento",
+            "equipado": false,
+            "quantidade": 1,
+            "dados": {
+              "peso": "5 kg"
+            }
+          }
+        ],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [
+          {
+            "nome": "Abençoar",
+            "circulo": 1,
+            "origem": "dominio"
+          },
+          {
+            "nome": "Curar Ferimentos",
+            "circulo": 1
+          }
+        ],
+        "grimorio": [],
+        "espacos_magia": {
+          "1": {
+            "total": 4,
+            "usados": 1
+          },
+          "2": {
+            "total": 3,
+            "usados": 0
+          },
+          "3": {
+            "total": 2,
+            "usados": 0
+          }
+        },
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [
+          "Ígneo"
+        ],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z",
+        "recursos": {
+          "talentos": {
+            "dadiva_destino": {
+              "usado": false
+            }
+          }
+        }
+      },
+      "baselineObserved": {
+        "domainHelper": null,
+        "screen": "Ígneo",
+        "print": "Ígneo",
+        "pdf": "Ígneo"
+      },
+      "expectedUnified": "Ígneo",
+      "baselineDifferences": [],
+      "notas": "resistencias: [\"Ígneo\"] é lido/exibido verbatim (nome de exibição em português) por screen/print/pdf no legado — expectedUnified segue a mesma convenção escalar das demais entradas deste fixture (política \"bate com screen\"). O teste de contrato de domain/character/queries confere, à parte, que o alias real de dados/pacotes/dnd2024/migrations/character-v1-aliases.json resolve \"Ígneo\" para \"dnd2024:damage-type:fogo\" em build.legacyGrants.resistanceIds — a mesma resistência, representada como ContentId em vez de nome de exibição (não um valor diferente)."
+    }
+  ]
+}

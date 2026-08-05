@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.fichas-de-nimb.dev/v1/feature.schema.json",
+  "title": "Feature entity (v1)",
+  "description": "Característica de classe/subclasse/espécie/antecedente/talento (ex.: Ataque Extra). `grantedBy` e `level` são opcionais para permitir features standalone reutilizáveis.",
+  "type": "object",
+  "allOf": [
+    { "$ref": "common.schema.json#/$defs/entityBase" },
+    {
+      "type": "object",
+      "properties": {
+        "type": { "const": "feature" },
+        "grantedBy": { "$ref": "common.schema.json#/$defs/featureGrantorRef" },
+        "level": { "type": "integer", "minimum": 1, "maximum": 20 }
+      },
+      "required": ["type"]
+    }
+  ],
+  "unevaluatedProperties": false
+}

@@ -1,0 +1,83 @@
+{
+  "fixtureVersion": 1,
+  "compatibilityBaseline": "e43c5ea",
+  "generatedAt": "2026-07-26T00:00:00.000Z",
+  "cases": [
+    {
+      "id": "po-legado-sem-moedas",
+      "descricao": "Personagem salvo antes da carteira multi-moeda existir: só tem `po` (número), sem `moedas`. Migração executada de verdade contra site/js/store.js#migrarMoedasLegado.",
+      "origemReal": "site/js/store.js#migrarMoedasLegado (EXECUTADO)",
+      "personagemAntes": {
+        "id": "po11-po22-po33",
+        "nome": "Legado PO Simples",
+        "po": 120
+      },
+      "operacao": "migrarMoedasLegado",
+      "personagemDepois": {
+        "id": "po11-po22-po33",
+        "nome": "Legado PO Simples",
+        "moedas": {
+          "pl": 0,
+          "po": 120,
+          "pe": 0,
+          "pp": 0,
+          "pc": 0
+        }
+      }
+    },
+    {
+      "id": "po-legado-com-moedas-parcial",
+      "descricao": "Personagem que já tem `moedas` parcial (faltando denominações) e ainda o campo legado `po` residual; migrarMoedasLegado ignora `po` quando `moedas` já é objeto (usa moedas como base) e normaliza via normalizarCarteira. Executado de verdade.",
+      "origemReal": "site/js/store.js#migrarMoedasLegado + site/js/moedas.js#normalizarCarteira (EXECUTADO)",
+      "personagemAntes": {
+        "id": "po44-po55-po66",
+        "nome": "Legado PO Parcial",
+        "moedas": {
+          "po": 10,
+          "pp": "3"
+        },
+        "po": 999
+      },
+      "operacao": "migrarMoedasLegado",
+      "personagemDepois": {
+        "id": "po44-po55-po66",
+        "nome": "Legado PO Parcial",
+        "moedas": {
+          "pl": 0,
+          "po": 10,
+          "pe": 0,
+          "pp": 3,
+          "pc": 0
+        }
+      }
+    },
+    {
+      "id": "po-migracao-idempotente",
+      "descricao": "Rodar migrarMoedasLegado novamente sobre um personagem já migrado não altera nada (idempotente). Executado de verdade.",
+      "origemReal": "site/js/store.js#migrarMoedasLegado (EXECUTADO)",
+      "personagemAntes": {
+        "id": "po77-po88-po99",
+        "nome": "Já Migrado",
+        "moedas": {
+          "pc": 5,
+          "pp": 0,
+          "pe": 0,
+          "po": 20,
+          "pl": 0
+        }
+      },
+      "operacao": "migrarMoedasLegado",
+      "personagemDepois": {
+        "id": "po77-po88-po99",
+        "nome": "Já Migrado",
+        "moedas": {
+          "pl": 0,
+          "po": 20,
+          "pe": 0,
+          "pp": 0,
+          "pc": 5
+        }
+      }
+    }
+  ]
+}

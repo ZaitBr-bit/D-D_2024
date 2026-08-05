@@ -1,0 +1,1342 @@
+{
+  "schemaVersion": "1.0.0",
+  "type": "equipment",
+  "items": [
+    {
+      "id": "dnd2024:equipment:acido",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Ácido",
+      "description": "Ao executar a ação Atacar, você pode substituir um de seus ataques arremessando um frasco de Ácido. Ataque uma criatura ou objeto à sua vista a até 6 metros de você. O alvo deve ser bem-sucedido em uma salvaguarda de Destreza (CD 8 mais seu modificador de Destreza e Bônus de Proficiência) ou sofre 2d6 pontos de dano Ácido.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Consumível",
+      "weight": 0.5,
+      "cost": {
+        "amount": 25,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:agua-benta",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Água Benta",
+      "description": "Ao executar a ação Atacar, você pode substituir um de seus ataques arremessando um pote de Água Benta. Escolha como alvo uma criatura à sua vista a até 6 metros de você. O alvo deve ser bem-sucedido em uma salvaguarda de Destreza (CD 8 mais seu modificador de Destreza e Bônus de Proficiência) ou sofre 2d8 pontos de dano Radiante se for um Ínfero ou um Morto-vivo.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Consumível",
+      "weight": 0.5,
+      "cost": {
+        "amount": 25,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:algibeira",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Algibeira",
+      "description": "Uma Algibeira comporta até 3 kg em um volume de 6 litros.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 0.5,
+      "cost": {
+        "amount": 5,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:aljava",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Aljava",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 0.5,
+      "cost": {
+        "amount": 1,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:antitoxina",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Antitoxina",
+      "description": "Como uma Ação Bônus, você pode beber um frasco de Antitoxina para obter Vantagem nas salvaguardas para evitar ou encerrar a condição Envenenado por 1 hora.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Consumível",
+      "cost": {
+        "amount": 50,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:apito-sinalizador",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Apito Sinalizador",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "cost": {
+        "amount": 5,
+        "currency": "cp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:ariete-portavel",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Aríete Portável",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 16.5,
+      "cost": {
+        "amount": 4,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:armadilha-de-caca",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Armadilha de Caça",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 12.5,
+      "cost": {
+        "amount": 5,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:arpeu",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Arpéu",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 2,
+      "cost": {
+        "amount": 2,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:balde",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Balde",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 1,
+      "cost": {
+        "amount": 5,
+        "currency": "cp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:baliza",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Baliza",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 3.5,
+      "cost": {
+        "amount": 5,
+        "currency": "cp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:barril",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Barril",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 35,
+      "cost": {
+        "amount": 2,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:bau",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Baú",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 12.5,
+      "cost": {
+        "amount": 5,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:bolsa-de-componentes",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Bolsa de Componentes",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 1,
+      "cost": {
+        "amount": 25,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:cadeado",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Cadeado",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 0.5,
+      "cost": {
+        "amount": 10,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:caixa-para-fogo",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Caixa para Fogo",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 0.5,
+      "cost": {
+        "amount": 5,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:caneta-tinteiro",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Caneta Tinteiro",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "cost": {
+        "amount": 2,
+        "currency": "cp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:cantil-cheio",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Cantil (cheio)",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 2.5,
+      "cost": {
+        "amount": 2,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:cesta",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Cesta",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 1,
+      "cost": {
+        "amount": 4,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:cobertor",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Cobertor",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 1.5,
+      "cost": {
+        "amount": 5,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:corda",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Corda",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 2.5,
+      "cost": {
+        "amount": 1,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:cordao",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Cordão",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "cost": {
+        "amount": 1,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:corrente",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Corrente",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 5,
+      "cost": {
+        "amount": 5,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:escada",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Escada",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 12.5,
+      "cost": {
+        "amount": 1,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:esferas-de-metal",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Esferas de Metal",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 1,
+      "weightDisplay": "1 kg (saco)",
+      "cost": {
+        "amount": 1,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:espelho",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Espelho",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 0.25,
+      "cost": {
+        "amount": 5,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:estacas-de-ferro",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Estacas de Ferro",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 2.5,
+      "cost": {
+        "amount": 1,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:estojo-mapa-ou-pergaminho",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Estojo, Mapa ou Pergaminho",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 0.5,
+      "cost": {
+        "amount": 1,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:estojo-virote-de-besta",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Estojo, Virote de Besta",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 0.5,
+      "cost": {
+        "amount": 1,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:estrepes",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Estrepes",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 1,
+      "weightDisplay": "1 kg (saco)",
+      "cost": {
+        "amount": 1,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:foco-arcano",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Foco Arcano",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weightDisplay": "Varia",
+      "costDisplay": "Varia",
+      "legacySections": [
+        {
+          "title": "Um Bruxo canaliza magia através de um Foco Arcano",
+          "text": ""
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:equipment:foco-druidico",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Foco Druídico",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weightDisplay": "Varia",
+      "costDisplay": "Varia"
+    },
+    {
+      "id": "dnd2024:equipment:fogo-alquimico",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Fogo Alquímico",
+      "description": "Ao executar a ação Atacar, você pode substituir um de seus ataques arremessando um frasco de Fogo Alquímico. Escolha como alvo uma criatura ou objeto à sua vista a até 6 metros de você. O alvo deve ser bem-sucedido em uma salvaguarda de Destreza (CD 8 mais seu modificador de Destreza e Bônus de Proficiência) ou sofre 1d4 pontos de dano Ígneo e entra em combustão (veja o glossário de regras).",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Consumível",
+      "weight": 0.5,
+      "cost": {
+        "amount": 50,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:frasco",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Frasco",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "cost": {
+        "amount": 1,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:garrafa-de-vidro-1-litro",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Garrafa de Vidro (1 litro)",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 1,
+      "cost": {
+        "amount": 2,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:grilhoes",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Grilhões",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 3,
+      "cost": {
+        "amount": 2,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:jarro-4-litros",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Jarro (4 litros)",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 2,
+      "cost": {
+        "amount": 2,
+        "currency": "cp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:kit-de-artista",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Kit de Artista",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 29,
+      "cost": {
+        "amount": 40,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:kit-de-assaltante",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Kit de Assaltante",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 21,
+      "cost": {
+        "amount": 16,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:kit-de-aventureiro",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Kit de Aventureiro",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 27.5,
+      "cost": {
+        "amount": 10,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:kit-de-curandeiro",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Kit de Curandeiro",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 1.5,
+      "cost": {
+        "amount": 5,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:kit-de-diplomata",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Kit de Diplomata",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 19.5,
+      "cost": {
+        "amount": 39,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:kit-de-erudito",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Kit de Erudito",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 11,
+      "cost": {
+        "amount": 40,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:kit-de-escalada",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Kit de Escalada",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 6,
+      "cost": {
+        "amount": 25,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:kit-de-explorador-de-masmorras",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Kit de Explorador de Masmorras",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 27.5,
+      "cost": {
+        "amount": 12,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:kit-de-sacerdote",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Kit de Sacerdote",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 14.5,
+      "cost": {
+        "amount": 33,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:lampada",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Lâmpada",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 0.5,
+      "cost": {
+        "amount": 5,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:lanterna-coberta",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Lanterna Coberta",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 1,
+      "cost": {
+        "amount": 5,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:lanterna-foca-facho",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Lanterna Foca-facho",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 1,
+      "cost": {
+        "amount": 10,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:livro",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Livro",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 2.5,
+      "cost": {
+        "amount": 25,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:luneta",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Luneta",
+      "description": "Objetos vistos através de uma luneta são ampliados ao dobro do seu tamanho.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 0.5,
+      "cost": {
+        "amount": 1000,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:lupa",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Lupa",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "cost": {
+        "amount": 100,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:mapa",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Mapa",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "cost": {
+        "amount": 1,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:mochila",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Mochila",
+      "description": "Uma Mochila armazena até 15 quilos dentro de 30 centímetros cúbicos. Também pode servir como um alforje.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 2.5,
+      "cost": {
+        "amount": 2,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:municao",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Munição",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weightDisplay": "Varia",
+      "costDisplay": "Varia"
+    },
+    {
+      "id": "dnd2024:equipment:oleo",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Óleo",
+      "description": "Você pode cobrir uma criatura, objeto ou área com Óleo ou utilizá-lo como combustível. **Cobrindo uma Criatura ou um Objeto:** Ao executar a ação Atacar, você pode substituir um de seus ataques por arremessar um frasco de Óleo. Escolha uma criatura ou objeto a até 6 metros. O alvo deve ser bem-sucedido em uma salvaguarda de Destreza (CD 8 mais seu modificador de Destreza e Bônus de Proficiência) ou fica coberto de óleo. Se o alvo sofrer dano Ígneo antes que o óleo seque (após 1 minuto), ele sofre 5 pontos de dano Ígneo adicionais. **Combustível:** O Óleo serve como combustível para Lâmpadas e Lanternas, queimando por 6 horas.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Consumível",
+      "weight": 0.5,
+      "cost": {
+        "amount": 1,
+        "currency": "sp"
+      },
+      "legacySections": [
+        {
+          "title": "Cobrindo uma Criatura ou um Objeto",
+          "text": "Ao executar a ação Atacar, você pode substituir um de seus ataques por arremessar um frasco de Óleo. Escolha uma criatura ou objeto a até 6 metros de distância. O alvo deve ser bem-sucedido em uma salvaguarda de Destreza (CD 8 mais seu modificador de Destreza e seu Bônus de Proficiência) ou fica coberto de óleo. Se o alvo sofrer dano Ígneo antes que o óleo seque (após 1 minuto), ele sofre 5 pontos de dano Ígneo adicionais devido ao óleo em combustão."
+        },
+        {
+          "title": "Cobrindo um Espaço",
+          "text": "Você pode executar a ação Usar Objeto para despejar um pote de Óleo em um terreno plano para cobrir uma área quadrada de 1,5 metro de lado a até 1,5 metro de você. Ao ser aceso, o óleo queima até o fim do turno 2 rodadas depois (ou 12 segundos) e causa 5 pontos de dano Ígneo a qualquer criatura que entre ou termine o turno na área. Uma criatura sofre esse dano apenas uma vez por turno."
+        },
+        {
+          "title": "Combustível",
+          "text": "O Óleo serve como combustível para Lâmpadas e Lanternas. Uma vez aceso, um pote de Óleo queima por 6 horas em uma Lâmpada ou Lanterna. Esse tempo de queima não precisa ser consecutivo; você pode extinguir o Óleo em combustão (como uma ação Usar Objeto) e acendê-lo até que ele tenha queimado por um total de 6 horas."
+        }
+      ]
+    },
+    {
+      "id": "dnd2024:equipment:pa",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Pá",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 2.5,
+      "cost": {
+        "amount": 2,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:papel",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Papel",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "cost": {
+        "amount": 2,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:pe-de-cabra",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Pé de Cabra",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 2.5,
+      "cost": {
+        "amount": 2,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:perfume",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Perfume",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "cost": {
+        "amount": 5,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:pergaminho",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Pergaminho",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "cost": {
+        "amount": 1,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:pergaminho-magico-1-circulo",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Pergaminho Mágico (1º Círculo)",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "cost": {
+        "amount": 50,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:pergaminho-magico-truque",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Pergaminho Mágico (Truque)",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "cost": {
+        "amount": 30,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:pocao-de-cura",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Poção de Cura",
+      "description": "Esta poção é um item mágico. Como uma Ação Bônus, você pode bebê-la ou administrá-la a outra criatura a até 1,5 metro de você. A criatura que beber o líquido vermelho mágico deste frasco restaura 2d4 + 2 Pontos de Vida.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Consumível",
+      "weight": 0.25,
+      "cost": {
+        "amount": 50,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:pote",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Pote",
+      "description": "Um Pote armazena até meio litro.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 0.5,
+      "cost": {
+        "amount": 2,
+        "currency": "cp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:pote-ferro",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Pote, Ferro",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 5,
+      "cost": {
+        "amount": 2,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:racoes",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Rações",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 1,
+      "cost": {
+        "amount": 5,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:rede",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Rede",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 1.5,
+      "cost": {
+        "amount": 1,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:roldana-e-polias",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Roldana e Polias",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 2.5,
+      "cost": {
+        "amount": 1,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:roupas-fantasia",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Roupas, Fantasia",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 2,
+      "cost": {
+        "amount": 5,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:roupas-finas",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Roupas, Finas",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 3,
+      "cost": {
+        "amount": 15,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:roupas-viagem",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Roupas, Viagem",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 2,
+      "cost": {
+        "amount": 2,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:saca",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Saca",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 0.25,
+      "cost": {
+        "amount": 1,
+        "currency": "cp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:saco-de-dormir",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Saco de Dormir",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 3.5,
+      "cost": {
+        "amount": 1,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:simbolo-sagrado",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Símbolo Sagrado",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weightDisplay": "Varia",
+      "costDisplay": "Varia"
+    },
+    {
+      "id": "dnd2024:equipment:sino",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Sino",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "cost": {
+        "amount": 1,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:tenda",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Tenda",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 10,
+      "cost": {
+        "amount": 2,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:tinta",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Tinta",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "cost": {
+        "amount": 10,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:tocha",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Tocha",
+      "description": "Uma Tocha entra em combustão por 1 hora, emitindo Luz Plena em um raio de 6 metros e Meia-luz por mais 6 metros. Ao executar a ação Atacar, você pode atacar com a Tocha, usando-a como uma arma Simples Corpo a Corpo. Em caso de acerto, o alvo sofre 1 ponto de dano Ígneo.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Consumível",
+      "weight": 0.5,
+      "cost": {
+        "amount": 1,
+        "currency": "cp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:tunica",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Túnica",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "weight": 2,
+      "cost": {
+        "amount": 1,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:vela",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Vela",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Equipamento",
+      "cost": {
+        "amount": 1,
+        "currency": "cp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:veneno-basico",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Veneno Básico",
+      "description": "Como uma Ação Bônus, você pode usar um frasco de Veneno Básico para revestir uma arma ou até três peças de munição. Uma criatura que sofre dano Perfurante ou Cortante da arma ou munição envenenada sofre 1d4 pontos de dano Venenoso adicional. Uma vez aplicado, o veneno retém a potência por 1 minuto ou até que o dano dele seja causado, o que ocorrer primeiro.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Consumível",
+      "cost": {
+        "amount": 100,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:agulhas",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Agulhas",
+      "description": "Munição vendida em conjuntos de 50, armazenada em: Algibeira.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Munição",
+      "weight": 0.5,
+      "cost": {
+        "amount": 1,
+        "currency": "gp"
+      },
+      "ammunition": {
+        "quantity": "50",
+        "storage": "Algibeira"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:balas-arma-de-fogo",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Balas, Arma de Fogo",
+      "description": "Munição vendida em conjuntos de 10, armazenada em: Algibeira.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Munição",
+      "weight": 0.75,
+      "cost": {
+        "amount": 3,
+        "currency": "gp"
+      },
+      "ammunition": {
+        "quantity": "10",
+        "storage": "Algibeira"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:balas-funda",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Balas, Funda",
+      "description": "Munição vendida em conjuntos de 20, armazenada em: Algibeira.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Munição",
+      "weight": 0.25,
+      "cost": {
+        "amount": 4,
+        "currency": "cp"
+      },
+      "ammunition": {
+        "quantity": "20",
+        "storage": "Algibeira"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:flechas",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Flechas",
+      "description": "Munição vendida em conjuntos de 20, armazenada em: Aljava.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Munição",
+      "weight": 0.5,
+      "cost": {
+        "amount": 1,
+        "currency": "gp"
+      },
+      "ammunition": {
+        "quantity": "20",
+        "storage": "Aljava"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:virotes",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Virotes",
+      "description": "Munição vendida em conjuntos de 20, armazenada em: Estojo.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Munição",
+      "weight": 0.75,
+      "cost": {
+        "amount": 1,
+        "currency": "gp"
+      },
+      "ammunition": {
+        "quantity": "20",
+        "storage": "Estojo"
+      }
+    }
+  ]
+}

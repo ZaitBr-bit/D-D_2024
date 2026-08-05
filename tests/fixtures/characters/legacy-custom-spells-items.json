@@ -1,0 +1,270 @@
+{
+  "fixtureVersion": 1,
+  "compatibilityBaseline": "e43c5ea",
+  "generatedAt": "2026-07-26T00:00:00.000Z",
+  "cases": [
+    {
+      "id": "itens-customizados-basico",
+      "descricao": "Item de inventário totalmente customizado pelo jogador (sem referência a dados/equipamento/*.json), incluindo bônus de CA lido por calcCA (site/js/utils.js linha ~218).",
+      "origemReal": "site/js/utils.js#calcCA (bônus de itens customizados equipados)",
+      "personagem": {
+        "id": "cu01-cu01-cu01",
+        "nome": "Item Customizado",
+        "imagem": "",
+        "nivel": 4,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Guerreiro",
+        "subclasse": "",
+        "especie": "",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 15,
+          "destreza": 12,
+          "constituicao": 14,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 8
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 0,
+        "pv_atual": 0,
+        "pv_temporario": 0,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 0,
+        "pericias_proficientes": [],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [],
+        "inventario": [
+          {
+            "nome": "Anel de Proteção Caseiro",
+            "tipo": "anel",
+            "equipado": true,
+            "quantidade": 1,
+            "dados": {
+              "bonus_ca": 1,
+              "peso": "0 kg"
+            }
+          }
+        ],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [],
+        "grimorio": [],
+        "espacos_magia": {},
+        "talentos": [],
+        "itens_customizados": [
+          {
+            "nome": "Anel de Proteção Caseiro",
+            "tipo": "anel",
+            "descricao": "Homebrew do grupo.",
+            "dados": {
+              "bonus_ca": 1,
+              "peso": "0 kg"
+            }
+          }
+        ],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z"
+      }
+    },
+    {
+      "id": "magias-customizadas-basico",
+      "descricao": "Magia totalmente customizada (fora de dados/magias/*.json) registrada em magias_customizadas e referenciada tanto no grimório quanto em magias_conhecidas e magias_preparadas via origem \"customizada\" (para caracterizar todos os pontos onde uma magia customizada pode aparecer referenciada).",
+      "origemReal": "site/js/pages/sheet.js (fluxo de magia customizada)",
+      "personagem": {
+        "id": "cu02-cu02-cu02",
+        "nome": "Magia Customizada",
+        "imagem": "",
+        "nivel": 3,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Mago",
+        "subclasse": "",
+        "especie": "",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 8,
+          "destreza": 14,
+          "constituicao": 12,
+          "inteligencia": 16,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 0,
+        "pv_atual": 0,
+        "pv_temporario": 0,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 0,
+        "pericias_proficientes": [],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [],
+        "inventario": [],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [
+          {
+            "nome": "Explosão de Faísca (Homebrew)",
+            "circulo": 1,
+            "origem": "customizada"
+          }
+        ],
+        "magias_preparadas": [
+          {
+            "nome": "Explosão de Faísca (Homebrew)",
+            "circulo": 1,
+            "origem": "customizada"
+          }
+        ],
+        "grimorio": [
+          {
+            "nome": "Explosão de Faísca (Homebrew)",
+            "circulo": 1,
+            "origem": "customizada"
+          }
+        ],
+        "espacos_magia": {
+          "1": {
+            "total": 4,
+            "usados": 0
+          },
+          "2": {
+            "total": 2,
+            "usados": 0
+          }
+        },
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [
+          {
+            "nome": "Explosão de Faísca (Homebrew)",
+            "circulo": 1,
+            "escola": "Evocação",
+            "descricao": "Magia autoral do grupo, dano 2d6 ígneo em área pequena."
+          }
+        ],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z"
+      }
+    }
+  ]
+}

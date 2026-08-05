@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.fichas-de-nimb.dev/v1/equipment.schema.json",
+  "title": "Equipment entity (v1)",
+  "description": "Item de equipamento genérico (não arma nem armadura, que têm schemas próprios).",
+  "type": "object",
+  "allOf": [
+    { "$ref": "common.schema.json#/$defs/entityBase" },
+    {
+      "type": "object",
+      "properties": {
+        "type": { "const": "equipment" },
+        "category": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+        "weight": { "type": "number", "minimum": 0 },
+        "cost": { "$ref": "common.schema.json#/$defs/cost" },
+        "weightDisplay": {
+          "description": "Peso como o legado o exibe quando NÃO é um número puro (\"Varia\", \"1 kg (saco)\"). Acrescentado na Task 23b. Só existe nesses casos: quando ausente, o peso de exibição é derivado de `weight`. Nunca é um default — item sem peso numérico e sem este campo continua sem peso.",
+          "type": "string",
+          "minLength": 1
+        },
+        "costDisplay": {
+          "description": "Custo como o legado o exibe quando NÃO é um valor monetário estruturado (\"Varia\"). Mesma regra de ausência que `weightDisplay`.",
+          "type": "string",
+          "minLength": 1
+        },
+        "ammunition": {
+          "type": "object",
+          "description": "Dados de venda de munição (`dados/equipamento/equipamento_aventura.json#municao[]`): quantidade por conjunto e recipiente de armazenamento. Só existe nos itens de categoria \"Munição\".",
+          "properties": {
+            "quantity": { "type": "string", "minLength": 1 },
+            "storage": { "type": "string", "minLength": 1 }
+          },
+          "required": ["quantity", "storage"],
+          "additionalProperties": false
+        },
+        "legacySections": {
+          "type": "array",
+          "description": "Verbetes de prosa que o legado publicava num bloco `descricoes` solto no topo de `equipamento_aventura.json`, aqui reancorados ao item a que pertencem (Foco Arcano, Óleo). Apresentação pura: nenhuma regra é derivada daqui.",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string", "minLength": 1 },
+              "text": { "type": "string" }
+            },
+            "required": ["title", "text"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["type", "category"]
+    }
+  ],
+  "unevaluatedProperties": false
+}
