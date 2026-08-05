@@ -5,104 +5,27 @@ Script para extrair dados estruturados do arquivo MD do Livro do Jogador D&D 5.5
 e gerar arquivos JSON organizados por capítulo/seção.
 """
 
-import argparse
 import json
 import os
 import re
 import sys
 
-# Diretório canônico do pacote de conteúdo v1 (`dados/pacotes/dnd2024`).
-# A extração NUNCA pode escrever aqui nem em nenhum subdiretório dele: esse
-# é o pacote versionado/auditado por `scripts/validate-content.mjs` e pelos
-# conversores determinísticos de `scripts/content/migrate-*.mjs` (Tasks 8-10)
-# — antes desta tarefa, nada impedia `_extrair_json.py` de sobrescrever esse
-# JSON canônico silenciosamente. `REPO_ROOT` é fixo (diretório deste
-# arquivo), independente de onde o script é invocado.
-REPO_ROOT = os.path.dirname(os.path.abspath(__file__))
-CAMINHO_PROIBIDO = os.path.join(REPO_ROOT, "dados", "pacotes", "dnd2024")
+# Caminho do arquivo fonte
+MD_FILE = os.path.join(os.path.dirname(__file__), "D&D 5.5 - Livro do Jogador (2024) 5.3.7.md")
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "dados")
 
-
-class SaidaProibidaError(Exception):
-    """Levantado quando `--output` aponta para dentro do pacote canônico."""
-
-
-def validar_caminho_de_saida(caminho_saida):
-    """
-    Recusa qualquer `--output` que resolva para dentro (ou exatamente igual
-    a) `dados/pacotes/dnd2024`. Usa `os.path.realpath` dos dois lados para
-    normalizar `..`/links simbólicos/maiúsculas de unidade do Windows antes
-    de comparar, e checa tanto igualdade quanto "é subdiretório de" via
-    `os.path.commonpath` — nunca uma comparação de string ingênua, que um
-    caminho relativo diferente (ex.: "dados/pacotes/../pacotes/dnd2024")
-    contornaria.
-    """
-    alvo = os.path.realpath(caminho_saida)
-    proibido = os.path.realpath(CAMINHO_PROIBIDO)
-    if alvo == proibido:
-        raise SaidaProibidaError(
-            f'--output ("{caminho_saida}") aponta exatamente para o pacote de conteúdo canônico ({CAMINHO_PROIBIDO}); recusado.'
-        )
-    # `os.path.commonpath` LANÇA `ValueError` (não devolve um valor "sem
-    # prefixo comum") quando os dois caminhos estão em unidades/raízes
-    # diferentes no Windows (ex.: `alvo` em "D:\\..." e `proibido` em
-    # "C:\\...") — sem este `try`, esse caso (uma saída claramente FORA do
-    # pacote canônico) crashava com um traceback não tratado em vez da
-    # recusa limpa e documentada. Caminhos sem prefixo comum nunca podem
-    # estar "dentro" um do outro, então isso sempre significa liberado, não
-    # recusado.
-    try:
-        comum = os.path.commonpath([alvo, proibido])
-    except ValueError:
-        return
-    if comum == proibido:
-        raise SaidaProibidaError(
-            f'--output ("{caminho_saida}") está dentro do pacote de conteúdo canônico ({CAMINHO_PROIBIDO}); recusado.'
-        )
-
-
-def analisar_argumentos(argv):
-    """
-    Exige `--source` (caminho do .md fonte) e `--output` (diretório de
-    saída) explicitamente — sem default implícito, ao contrário da versão
-    anterior deste script (que sempre lia/escrevia em caminhos fixos do
-    repositório e podia sobrescrever `dados/` sem aviso).
-    """
-    parser = argparse.ArgumentParser(
-        description="Extrai dados estruturados do Livro do Jogador D&D 5.5 (2024) em Markdown para JSON de staging.",
-    )
-    parser.add_argument("--source", required=True, help="Caminho do arquivo .md fonte (ex.: \"Informacoes Separadas/D&D 5.5 - Livro do Jogador (2024) 5.3.7.md\").")
-    parser.add_argument("--output", required=True, help="Diretório de saída para o JSON extraído (NUNCA dados/pacotes/dnd2024 — recusado). Uso recomendado: .tmp/content-staging/<algo>.")
-    return parser.parse_args(argv)
-
-
-# Buffer em memória: `salvar_json` NUNCA escreve em disco diretamente.
-# `main()` só chama `flush_buffer` (grava tudo de uma vez) depois que TODOS
-# os extratores terminam sem exceção — uma falha no meio da extração (ex.:
-# uma seção do livro com formatação inesperada) não deixa nenhum arquivo
-# parcial no diretório de saída, só um traceback e código de saída != 0.
-_BUFFER = {}
-
-
-def ler_arquivo(caminho_fonte):
-    """Lê o arquivo .md fonte e retorna as linhas."""
-    with open(caminho_fonte, "r", encoding="utf-8") as f:
+def ler_arquivo():
+    """Lê o arquivo MD e retorna as linhas."""
+    with open(MD_FILE, "r", encoding="utf-8") as f:
         return f.readlines()
 
-
 def salvar_json(caminho_relativo, dados):
-    """Empilha `dados` no buffer em memória, sob `caminho_relativo` (dentro do diretório de saída) — nada é escrito em disco aqui (ver `flush_buffer`)."""
-    _BUFFER[caminho_relativo] = dados
-    print(f"  Preparado (staging): {caminho_relativo}")
-
-
-def flush_buffer(output_dir):
-    """Grava todo o conteúdo do buffer em disco, sob `output_dir` — chamado uma única vez, ao final de uma extração 100% bem-sucedida."""
-    for caminho_relativo, dados in _BUFFER.items():
-        caminho = os.path.join(output_dir, caminho_relativo)
-        os.makedirs(os.path.dirname(caminho), exist_ok=True)
-        with open(caminho, "w", encoding="utf-8") as f:
-            json.dump(dados, f, ensure_ascii=False, indent=2)
-    print(f"  {len(_BUFFER)} arquivo(s) gravado(s) em: {output_dir}")
+    """Salva dados em JSON no diretório de saída."""
+    caminho = os.path.join(OUTPUT_DIR, caminho_relativo)
+    os.makedirs(os.path.dirname(caminho), exist_ok=True)
+    with open(caminho, "w", encoding="utf-8") as f:
+        json.dump(dados, f, ensure_ascii=False, indent=2)
+    print(f"  Salvo: {caminho_relativo}")
 
 def limpar_texto(texto):
     """Remove formatação markdown básica de um texto."""
@@ -1623,33 +1546,20 @@ def extrair_metadados(linhas):
 # MAIN
 # ============================================================================
 
-def main(argv=None):
+def main():
     print("=" * 60)
     print("Extraindo dados do Livro do Jogador D&D 5.5 para JSON")
     print("=" * 60)
-
-    args = analisar_argumentos(sys.argv[1:] if argv is None else argv)
-
-    # Portão de segurança: recusa ANTES de tocar no disco (nem ler a fonte)
-    # se --output mirar o pacote de conteúdo canônico. Ver comentário de
-    # `validar_caminho_de_saida`.
-    validar_caminho_de_saida(args.output)
-
-    if not os.path.isfile(args.source):
-        raise FileNotFoundError(f'--source ("{args.source}") não existe ou não é um arquivo.')
-
+    
+    # Criar diretório de saída
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    
     # Ler arquivo
-    print(f"\nLendo: {args.source}")
-    linhas = ler_arquivo(args.source)
+    print(f"\nLendo: {MD_FILE}")
+    linhas = ler_arquivo()
     print(f"  {len(linhas)} linhas lidas\n")
-
-    if len(linhas) == 0:
-        raise ValueError(f'--source ("{args.source}") está vazio; nada para extrair.')
-
-    # Executar todos os extratores — todos escrevem só no buffer em memória
-    # (`salvar_json`/`_BUFFER`); nenhum grava em disco. Se qualquer um deles
-    # levantar uma exceção, a propagação interrompe `main()` ANTES do
-    # `flush_buffer` no final da função — nenhum arquivo parcial é criado.
+    
+    # Executar todos os extratores
     extrair_metadados(linhas)
     print()
     extrair_regras_cap1(linhas)
@@ -1683,16 +1593,10 @@ def main(argv=None):
     extrair_multiverso(linhas)
     print()
     extrair_glossario(linhas)
-
-    # Todos os extratores terminaram sem exceção — só agora, com a fonte
-    # inteira já validada/processada com sucesso, o buffer é gravado em
-    # disco (destino recomendado: `.tmp/content-staging/`, nunca
-    # `dados/pacotes/dnd2024` — já recusado acima).
-    flush_buffer(args.output)
-
+    
     print("\n" + "=" * 60)
     print("Extração concluída!")
-    print(f"Arquivos salvos em: {args.output}")
+    print(f"Arquivos salvos em: {OUTPUT_DIR}")
     print("=" * 60)
 
 

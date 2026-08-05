@@ -1,47 +1,17 @@
 // ============================================================
 // Pagina inicial - Lista de personagens
 // ============================================================
-import {
-  listarPersonagens, removerPersonagem, duplicarPersonagem, exportarTodos, exportarPersonagem,
-  importarPersonagensDetalhado, backupPersonagensLocais, restaurarPersonagensLocais,
-  isCharacterStorageReady, getCharacterStorageInitResult, initializeCharacterStorage,
-  exportarBackupRefatoracao, restaurarBackupRefatoracao, prepararExportacaoBrutaSeguranca, confirmarExportacaoBrutaSeguranca,
-} from '../store.js';
-import { sincronizarComNuvem } from '../sync.js';
+import { listarPersonagens, removerPersonagem, duplicarPersonagem, exportarTodos, exportarPersonagem, importarPersonagens, atualizarListaLocal, backupPersonagensLocais, restaurarPersonagensLocais } from '../store.js';
+import { enfileirarSync, obterIdsPendentesRemocao } from '../sync.js';
 import { toast, abrirModal, fmtData, escHtml } from '../utils.js';
 import { CLASSES_INFO } from '../dados-classes.js';
-import { iniciarAuth, getUsuario, loginComGoogle, logout, onAuthChange } from '../auth.js';
-import { ok } from '../core/result.js';
+import { iniciarAuth, getUsuario, loginComGoogle, logout, onAuthChange, buscarPersonagensCloud } from '../auth.js';
 
 let _containerRef = null;
 let _sincronizando = false;
 
-/**
- * Disposer no-op da rota `home` (Task 34): esta página não registra nada
- * fora do próprio `container` (que a próxima rota substitui por completo),
- * então não há nada a limpar — mas o contrato do router exige um disposer
- * explícito, nunca `undefined`.
- * @returns {void}
- */
-function _semNadaParaDescartar() {}
-
-/**
- * Renderiza a página inicial em `container`.
- *
- * A assinatura é a MESMA que o router (`site/js/core/hash-router.js`, Task
- * 34) sempre chamou. O retorno é um `Result<() => void, AppError>` — aqui
- * sempre `ok(disposer)`, já que a home nunca recusa a montagem.
- * @param {object} container - `#app-content`.
- * @returns {{ok: true, value: () => void}}
- */
 export function renderHome(container) {
   _containerRef = container;
-
-  if (!isCharacterStorageReady()) {
-    _renderEstadoRecuperavel(container);
-    return ok(_semNadaParaDescartar);
-  }
-
   const personagens = listarPersonagens();
   const usuario = getUsuario();
 
@@ -51,147 +21,13 @@ export function renderHome(container) {
     if (!renderHome._authRegistrado) {
       renderHome._authRegistrado = true;
       onAuthChange(() => {
-        // Re-renderizar ao mudar estado de auth — só quando a rota ATUAL
-        // ainda é a home: `onAuthChange` pode disparar de forma síncrona
-        // (site/js/auth.js#onAuthChange chama o callback na hora se o auth
-        // já estava resolvido) e, com a inicialização de storage agora
-        // assíncrona (initializeCharacterStorage), essa reentrada pode
-        // acontecer depois que o usuário já navegou para outra rota —
-        // sobrescrever #app-content às cegas destruiria a rota atual.
-        const rotaAtual = (window.location.hash.slice(1) || 'home').split('/')[0];
-        if (_containerRef && rotaAtual === 'home') renderHome(_containerRef);
+        // Re-renderizar ao mudar estado de auth
+        if (_containerRef) renderHome(_containerRef);
       });
     }
   });
 
   _renderConteudo(container, personagens, usuario);
-  return ok(_semNadaParaDescartar);
-}
-
-/**
- * Renderiza o estado recuperável de inicialização do armazenamento de
- * personagens (`initializeCharacterStorage()` falhou ou nunca terminou):
- * nunca mostra a lista/CRUD normal, oferece "tentar novamente" e — só
- * quando aplicável — o fluxo de backup pré-migração ou de exportação bruta
- * de segurança.
- * @param {HTMLElement} container
- */
-function _renderEstadoRecuperavel(container) {
-  const resultado = getCharacterStorageInitResult();
-  const erro = resultado && !resultado.ok ? resultado.error : null;
-
-  const validacaoBackup = _validarBackupRefatoracao();
-
-  container.innerHTML = `
-    <div class="empty-state">
-      <h2>Não foi possível carregar seus personagens</h2>
-      <p style="color:var(--text-muted);font-size:0.85rem">${erro ? escHtml(`${erro.code}: ${erro.message}`) : 'Inicialização ainda em andamento ou não realizada.'}</p>
-      <button class="btn btn-primary" id="btn-retry-storage">Tentar novamente</button>
-    </div>
-    <div class="card" style="margin-top:12px">
-      ${validacaoBackup.valid
-        ? `<h3 style="font-size:0.95rem">Backup de segurança encontrado</h3>
-           <p style="font-size:0.8rem;color:var(--text-muted)">Foi feita uma cópia dos seus dados originais antes da tentativa de migração. Você pode baixá-la ou restaurá-la.</p>
-           <div style="display:flex;gap:8px;margin-top:8px">
-             <button class="btn btn-sm btn-secondary" id="btn-baixar-backup">Baixar backup</button>
-             <button class="btn btn-sm btn-danger" id="btn-restaurar-backup">Restaurar backup</button>
-           </div>`
-        : `<h3 style="font-size:0.95rem">Exportar dados brutos</h3>
-           <p style="font-size:0.8rem;color:var(--text-muted)">Não há backup automático disponível. Baixe uma cópia bruta dos seus dados antes de tentar novamente.</p>
-           <button class="btn btn-sm btn-secondary" id="btn-exportar-bruto">Exportar dados brutos</button>`
-      }
-    </div>
-  `;
-
-  document.getElementById('btn-retry-storage')?.addEventListener('click', async () => {
-    toast('Tentando novamente...', 'info');
-    await initializeCharacterStorage();
-    renderHome(container);
-  });
-
-  document.getElementById('btn-baixar-backup')?.addEventListener('click', () => {
-    const resultadoExport = exportarBackupRefatoracao();
-    if (!resultadoExport.ok) {
-      toast('Erro ao exportar backup: ' + resultadoExport.error.message, 'error');
-      return;
-    }
-    _baixarArquivo(resultadoExport.value, `dnd_backup_refatoracao_${Date.now()}.json`);
-  });
-
-  document.getElementById('btn-restaurar-backup')?.addEventListener('click', () => {
-    const preview = restaurarBackupRefatoracao();
-    if (!preview.ok) {
-      toast('Erro ao inspecionar backup: ' + preview.error.message, 'error');
-      return;
-    }
-    abrirModal(
-      'Restaurar backup',
-      `<p>Isso substituirá os dados atuais de <code>dnd_personagens</code> pelo backup salvo antes da tentativa de migração.</p>
-       <p style="font-size:0.85rem;color:var(--text-muted)">Backup: ${preview.value.characterCount} personagem(ns), ${preview.value.byteLength} bytes.</p>`,
-      `<button class="btn btn-secondary" data-action="fechar-modal">Cancelar</button>
-       <button class="btn btn-danger" id="btn-confirmar-restaurar-backup">Restaurar</button>`,
-    );
-    document.getElementById('btn-confirmar-restaurar-backup')?.addEventListener('click', async () => {
-      const restoreResult = restaurarBackupRefatoracao({ confirmationToken: preview.value.confirmationToken, confirmed: true });
-      window.fecharModal();
-      if (!restoreResult.ok) {
-        toast('Erro ao restaurar backup: ' + restoreResult.error.message, 'error');
-        return;
-      }
-      toast('Backup restaurado. Tentando carregar novamente...', 'success');
-      await initializeCharacterStorage();
-      renderHome(container);
-    });
-  });
-
-  document.getElementById('btn-exportar-bruto')?.addEventListener('click', () => {
-    const prepared = prepararExportacaoBrutaSeguranca();
-    if (!prepared.ok) {
-      toast('Erro ao preparar exportação: ' + prepared.error.message, 'error');
-      return;
-    }
-    _baixarArquivo(prepared.value.jsonText, `dnd_exportacao_seguranca_${Date.now()}.json`);
-    abrirModal(
-      'Confirmar download',
-      `<p>Confirme que o arquivo foi baixado (${prepared.value.characterCount} personagem(ns)) para permitir que a inicialização prossiga sem o backup automático.</p>`,
-      `<button class="btn btn-secondary" data-action="fechar-modal">Cancelar</button>
-       <button class="btn btn-primary" id="btn-confirmar-exportacao-bruta">Já baixei, continuar</button>`,
-    );
-    document.getElementById('btn-confirmar-exportacao-bruta')?.addEventListener('click', async () => {
-      window.fecharModal();
-      const confirmResult = await confirmarExportacaoBrutaSeguranca({ confirmationToken: prepared.value.confirmationToken, confirmed: true });
-      if (!confirmResult.ok) {
-        toast('Erro ao continuar: ' + confirmResult.error.message, 'error');
-        return;
-      }
-      toast('Continuado com sucesso.', 'success');
-      renderHome(container);
-    });
-  });
-}
-
-/** @returns {{valid: boolean}} valida (sem lançar) se o backup pré-migração existe e é utilizável. */
-function _validarBackupRefatoracao() {
-  try {
-    const resultado = restaurarBackupRefatoracao();
-    return { valid: resultado.ok };
-  } catch {
-    return { valid: false };
-  }
-}
-
-/**
- * @param {string} texto
- * @param {string} nomeArquivo
- */
-function _baixarArquivo(texto, nomeArquivo) {
-  const blob = new Blob([texto], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = nomeArquivo;
-  a.click();
-  URL.revokeObjectURL(url);
 }
 
 function _renderConteudo(container, personagens, usuario) {
@@ -225,7 +61,7 @@ function _renderConteudo(container, personagens, usuario) {
         </svg>
         <h2>Nenhum personagem criado</h2>
         <p>Crie seu primeiro personagem e comece sua aventura!</p>
-        <button class="btn btn-primary btn-lg" data-action="ir-criar">
+        <button class="btn btn-primary btn-lg" onclick="navegar('criar')">
           + Novo Personagem
         </button>
       </div>
@@ -235,7 +71,6 @@ function _renderConteudo(container, personagens, usuario) {
     `;
     _setupAuthEvents(container);
     setupImportar(container);
-    _ligarBotoesNovoPersonagem(container);
 
     // Sincronizar automaticamente ao renderizar a home se logado
     _sincronizarSeLogado(container);
@@ -258,13 +93,11 @@ function _renderConteudo(container, personagens, usuario) {
       ${personagens.map(p => renderCharCard(p)).join('')}
     </div>
     <div class="mt-3 text-center">
-      <button class="btn btn-primary btn-lg btn-block" data-action="ir-criar">
+      <button class="btn btn-primary btn-lg btn-block" onclick="navegar('criar')">
         + Novo Personagem
       </button>
     </div>
   `;
-
-  _ligarBotoesNovoPersonagem(container);
 
   // Eventos de clique nos cards
   container.querySelectorAll('.char-card').forEach(card => {
@@ -314,7 +147,7 @@ function _renderConteudo(container, personagens, usuario) {
       abrirModal(
         'Excluir Personagem',
         `<p>Tem certeza que deseja excluir <strong>${escHtml(p?.nome) || 'este personagem'}</strong>?</p><p style="color:var(--danger);font-size:0.85rem;margin-top:8px;">Esta acao nao pode ser desfeita.</p>`,
-        `<button class="btn btn-secondary" data-action="fechar-modal">Cancelar</button>
+        `<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
          <button class="btn btn-danger" id="btn-confirmar-excluir">Excluir</button>`
       );
       document.getElementById('btn-confirmar-excluir').addEventListener('click', () => {
@@ -331,10 +164,6 @@ function _renderConteudo(container, personagens, usuario) {
   if (btnExportar) {
     btnExportar.addEventListener('click', () => {
       const json = exportarTodos();
-      if (!json) {
-        toast('Erro ao exportar personagens', 'error');
-        return;
-      }
       const blob = new Blob([json], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -354,20 +183,6 @@ function _renderConteudo(container, personagens, usuario) {
 }
 
 /** Configura eventos de login/logout/sync */
-/**
- * Liga os botões "+ Novo Personagem" (`[data-action="ir-criar"]`) à navegação
- * para a rota `criar`. Substitui o antigo `onclick="navegar('criar')"` inline
- * (Task 37: nenhum handler inline sobra em `site/**`, o que permite remover
- * `'unsafe-inline'` de `script-src` na CSP).
- * @param {HTMLElement} container - raiz renderizada da home.
- * @returns {void}
- */
-function _ligarBotoesNovoPersonagem(container) {
-  container.querySelectorAll('[data-action="ir-criar"]').forEach((btn) => {
-    btn.addEventListener('click', () => navegar('criar'));
-  });
-}
-
 function _setupAuthEvents(container) {
   // Login com Google
   document.getElementById('btn-login-google')?.addEventListener('click', async () => {
@@ -407,16 +222,8 @@ function _setupAuthEvents(container) {
 
 /**
  * Sincroniza personagens com a nuvem (se logado).
- *
- * O merge por `atualizado_em` NÃO é mais feito aqui: ele vive em
- * `infra/sync/merge-character-records.js` e é aplicado por
- * `syncQueue.adoptRemoteMerge()` (via `sincronizarComNuvem()`), que decodifica
- * cada documento remoto pelo codec v1->v2, adota o resultado pelo repositório
- * transacional com `expectedStorageRevisionToken` (nunca por escrita direta no
- * storage) e REENFILEIRA os personagens em que o lado local venceu — o que a
- * versão anterior desta função fazia à mão, sem precondição de revisão e sem
- * tratar timestamp ausente/inválido (que agora é retido como conflito em vez
- * de eleger um vencedor silencioso).
+ * Usa merge por atualizado_em: para cada personagem, vence a versão mais recente.
+ * Personagens locais mais recentes são reenviados à nuvem via enfileirarSync.
  */
 async function _sincronizarSeLogado(container, manual = false) {
   const usuario = getUsuario();
@@ -426,23 +233,64 @@ async function _sincronizarSeLogado(container, manual = false) {
   try {
     if (manual) toast('Sincronizando...', 'info');
     backupPersonagensLocais();
+    const listaCloud = await buscarPersonagensCloud();
+    const listaLocal = listarPersonagens();
 
-    const idsAntes = listarPersonagens().map(p => `${p.id}:${p.atualizado_em}`).join('|');
-    const adotado = await sincronizarComNuvem();
+    // Merge por atualizado_em: vence a versão mais recente de cada personagem
+    const mapaCloud = new Map(listaCloud.map(p => [p.id, p]));
+    const mapaLocal = new Map(listaLocal.map(p => [p.id, p]));
+    const todosIds = new Set([...mapaCloud.keys(), ...mapaLocal.keys()]);
+    // IDs com remoção pendente neste dispositivo (deletados offline)
+    const idsPendentesRemocao = obterIdsPendentesRemocao();
 
-    if (!adotado) {
-      if (manual) toast('Não foi possível sincronizar agora.', 'error');
-      return;
+    const listaMergida = [];
+    const paraEnviarCloud = [];
+
+    for (const id of todosIds) {
+      const cloud = mapaCloud.get(id);
+      const local = mapaLocal.get(id);
+
+      if (!local) {
+        // Existe só na nuvem: verificar se foi deletado offline neste dispositivo
+        if (!idsPendentesRemocao.has(id)) {
+          listaMergida.push(cloud);
+        }
+        // Se há remoção pendente, não readicionar — a fila de sync enviará a remoção à nuvem
+      } else if (!cloud) {
+        // Existe só localmente: manter e enfileirar para a nuvem
+        listaMergida.push(local);
+        paraEnviarCloud.push(local);
+      } else {
+        // Existe em ambos: usar o mais recente por atualizado_em
+        const tCloud = new Date(cloud.atualizado_em || 0).getTime();
+        const tLocal = new Date(local.atualizado_em || 0).getTime();
+        if (tLocal > tCloud) {
+          listaMergida.push(local);
+          paraEnviarCloud.push(local);
+        } else {
+          listaMergida.push(cloud);
+        }
+      }
     }
 
-    const idsDepois = listarPersonagens().map(p => `${p.id}:${p.atualizado_em}`).join('|');
+    atualizarListaLocal(listaMergida);
+
+    // Reenviar à nuvem os personagens em que o local estava mais atualizado
+    for (const p of paraEnviarCloud) {
+      enfileirarSync(p);
+    }
 
     if (manual) {
       toast('Sincronizado com sucesso!', 'success');
       renderHome(container);
-    } else if (idsDepois !== idsAntes) {
-      // Re-renderizar só quando a lista de fato mudou (ids ou atualizado_em).
-      renderHome(container);
+    } else {
+      // Re-renderizar se houve mudança de IDs ou de conteúdo (atualizado_em)
+      const mudou = listaMergida.length !== listaLocal.length ||
+        listaMergida.some(m => {
+          const l = mapaLocal.get(m.id);
+          return !l || m.atualizado_em !== l.atualizado_em;
+        });
+      if (mudou) renderHome(container);
     }
   } catch (err) {
     console.warn('Erro na sincronizacao:', err);
@@ -464,28 +312,13 @@ function setupImportar(container) {
         if (!file) return;
         const reader = new FileReader();
         reader.onload = (ev) => {
-          const result = importarPersonagensDetalhado(ev.target.result);
-          if (!result.ok) {
-            toast('Erro ao importar arquivo: ' + result.error.message, 'error');
-            return;
+          const result = importarPersonagens(ev.target.result);
+          if (result >= 0) {
+            toast(`${result} personagem(ns) importado(s)!`, 'success');
+            renderHome(container);
+          } else {
+            toast('Erro ao importar arquivo', 'error');
           }
-          const { imported, duplicates, readOnly, rejected, warnings } = result.value;
-          const totalNovos = imported.length + readOnly.length;
-          // Mesma mensagem/contagem histórica de `importarPersonagens` (só
-          // conta os NOVOS efetivamente gravados) — sempre exibida, mesmo
-          // quando há duplicatas/rejeições/avisos a relatar (abaixo).
-          toast(`${totalNovos} personagem(ns) importado(s)!`, 'success');
-          if (duplicates.length > 0 || rejected.length > 0 || warnings.length > 0) {
-            abrirModal(
-              'Relatório de importação',
-              `<p>${totalNovos} importado(s) com sucesso${readOnly.length ? ` (${readOnly.length} em modo somente leitura, schema não reconhecido)` : ''}.</p>
-               ${duplicates.length ? `<p>${duplicates.length} ignorado(s) por duplicidade (id já existente).</p>` : ''}
-               ${rejected.length ? `<p style="color:var(--danger)">${rejected.length} rejeitado(s):</p><ul style="font-size:0.8rem;max-height:150px;overflow:auto">${rejected.map((r) => `<li>índice ${r.index}${r.id ? ` (id ${escHtml(r.id)})` : ''}: ${escHtml(r.errors.map((e) => e.message).join('; '))}</li>`).join('')}</ul>` : ''}
-               ${warnings.length ? `<p style="font-size:0.8rem;color:var(--text-muted)">${warnings.length} aviso(s) durante a importação.</p>` : ''}`,
-              `<button class="btn btn-primary" data-action="fechar-modal">Ok</button>`,
-            );
-          }
-          renderHome(container);
         };
         reader.readAsText(file);
       });

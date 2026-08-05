@@ -14,19 +14,12 @@ const FIREBASE_CONFIG = {
   measurementId: "G-RET2BV4Z36"
 };
 
-import { loadFirestoreApi } from './infra/firebase/firebase-browser.js';
-import { createFirestoreCharacterGateway } from './infra/firebase/firestore-character-gateway.js';
-
 let _app = null;
 let _auth = null;
 let _db = null;
 let _usuario = null;
 let _inicializado = false;
 let _onAuthChangeCallbacks = [];
-// Cache do gateway de personagens, sempre vinculado ao uid que o originou:
-// uma troca de usuário nunca reaproveita o gateway do usuário anterior
-// (ele carrega o caminho `users/{uid}/...` no fechamento).
-let _gatewayPersonagens = null; // {uid, gateway}
 
 /**
  * Inicializa o Firebase de forma lazy (apenas quando necessario).
@@ -50,8 +43,6 @@ async function inicializarFirebase() {
     // Escutar mudancas de autenticacao
     onAuthStateChanged(_auth, (user) => {
       _usuario = user || null;
-      // Qualquer mudança de sessão invalida o gateway em cache.
-      _gatewayPersonagens = null;
       _onAuthChangeCallbacks.forEach(cb => cb(_usuario));
     });
   } catch (err) {
@@ -94,45 +85,6 @@ export async function logout() {
   const { signOut } = await import('https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js');
   await signOut(_auth);
   _usuario = null;
-  _gatewayPersonagens = null;
-}
-
-/**
- * Constrói (e memoiza por uid) o gateway Firestore de personagens usado
- * pela fila de sincronização. Esta é a única ponte entre a fachada de
- * navegador e a camada `infra/firebase`: as funções do SDK são carregadas
- * pela CDN e INJETADAS no gateway, que não importa SDK nenhum — é o que
- * permite testar o mesmo gateway contra o Firestore Emulator.
- *
- * Devolve `null` (nunca lança) quando não há usuário logado ou quando o
- * Firebase não pôde ser inicializado/carregado — estar offline é um estado
- * esperado deste app.
- * @param {{decode: Function, encode: Function}} codec
- * @returns {Promise<object|null>}
- */
-export async function obterGatewayPersonagens(codec) {
-  await inicializarFirebase();
-  if (!_db || !_usuario) return null;
-  if (!codec || typeof codec.decode !== 'function' || typeof codec.encode !== 'function') return null;
-
-  if (_gatewayPersonagens && _gatewayPersonagens.uid === _usuario.uid) {
-    return _gatewayPersonagens.gateway;
-  }
-
-  const api = await loadFirestoreApi();
-  if (!api.ok) {
-    console.warn('auth.js: módulo Firestore indisponível:', api.error.message);
-    return null;
-  }
-
-  try {
-    const gateway = createFirestoreCharacterGateway({ db: _db, uid: _usuario.uid, api: api.value, codec });
-    _gatewayPersonagens = { uid: _usuario.uid, gateway };
-    return gateway;
-  } catch (cause) {
-    console.warn('auth.js: não foi possível construir o gateway de personagens:', cause?.message ?? cause);
-    return null;
-  }
 }
 
 /** Inicializa Firebase em segundo plano (chamado no boot da app) */
