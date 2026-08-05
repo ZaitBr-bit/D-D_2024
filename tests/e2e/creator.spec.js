@@ -256,6 +256,15 @@ test.describe('Criador de personagem (rota pública)', () => {
         { message: 'o campo clicado precisa continuar focado depois do re-render' },
       )
       .toBe('personality');
+    // O clique também disparou o `change` (blur) do campo `name`, cujo
+    // dispatch é assíncrono (creator-session.js) — o poll de foco acima só
+    // garante QUE o re-render já aconteceu uma vez, não que ele TERMINOU de
+    // vez. Esperar o valor do `name` com uma asserção de retry garante que
+    // esse re-render assentou antes de começar a digitar, evitando que ele
+    // reconstrua o textarea de `personality` no meio da digitação e embaralhe
+    // caracteres (achado ao depurar falha intermitente em chromium-desktop
+    // sob carga real de CI).
+    await expect(page.locator('#app-content [data-det-field="name"]')).toHaveValue('Foco de Primeira');
 
     // E o que o jogador digita a seguir chega ao personagem.
     await page.keyboard.type('Fala pouco.');
