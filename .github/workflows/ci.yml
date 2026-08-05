@@ -136,23 +136,30 @@ jobs:
       # causa e é o workaround oficial do próprio Playwright para jobs de
       # container.
       #
-      # ESCOPO DELIBERADAMENTE LIMITADO a este passo: `/github/home` vem
-      # PRÉ-CONFIGURADO pelo runner do GitHub com uma entrada `safe.directory`
-      # para o workspace — é assim que comandos `git` avulsos (fora do
-      # `actions/checkout`, como o `git` cru de
-      # `scripts/materialize-baseline.mjs` no passo `test:e2e:compat` abaixo)
-      # conseguem rodar sem "detected dubious ownership", mesmo o processo
-      # sendo root e o diretório pertencendo ao uid do runner. Definir HOME=
-      # /root no JOB inteiro (tentativa anterior) tirava TODOS os passos
-      # dessa configuração confiável — `test:e2e:compat` passou a falhar com
-      # "dubious ownership" porque `/root/.gitconfig` não tem aquele
-      # `safe.directory`. Nenhum outro passo deste job usa Firefox
-      # (`playwright.compat.config.js` e `playwright.pwa.config.js` só têm
-      # projetos Chromium), então não há necessidade de estender o override.
+      # ESCOPO DELIBERADAMENTE LIMITADO a este passo: nenhum outro passo deste
+      # job usa Firefox (`playwright.compat.config.js` e
+      # `playwright.pwa.config.js` só têm projetos Chromium), então não há
+      # necessidade de estender o override — e estendê-lo ao job inteiro já se
+      # provou ter um efeito colateral (ver o passo "Configurar git
+      # safe.directory" abaixo).
       - name: test:e2e (funcional, todos os browsers)
         run: npm run test:e2e
         env:
           HOME: /root
+
+      # `actions/checkout` só grava `safe.directory` num $HOME TEMPORÁRIO e
+      # descartável ("Temporarily overriding HOME=... antes de mudanças
+      # globais de git config", visível nos logs do próprio checkout) — essa
+      # entrada nunca fica disponível para os passos seguintes, com NENHUM
+      # $HOME (nem o padrão do runner, nem /root). Sem isso, qualquer chamada
+      # de `git` avulsa fora do `actions/checkout` (como o `git show`/`git
+      # cat-file` cru de `scripts/materialize-baseline.mjs`, usado por
+      # `test:e2e:compat` logo abaixo) falha com "detected dubious ownership"
+      # — o processo do container roda como root, mas o workspace pertence ao
+      # uid do runner do host. Configuramos aqui, uma vez, no $HOME padrão do
+      # job (sem override), antes de qualquer passo que precise dele.
+      - name: Configurar git safe.directory (necessário para scripts com git cru, ex. materialize-baseline.mjs)
+        run: git config --global --add safe.directory "${{ github.workspace }}"
 
       # Round-trip contra o baseline `e43c5ea` (Task 37). O materializador
       # reconstrói a aplicação legada com `git show`, por isso o checkout
