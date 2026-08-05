@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.fichas-de-nimb.dev/v1/condition.schema.json",
+  "title": "Condition entity (v1)",
+  "description": "Entidade de condição de status (ex.: Cego, Caído). Distinta da expressão de gating 'condition' de effect.schema.json — esta é a descrição jogável da condição, referenciada por efeitos do tipo 'condition' via contentId.",
+  "type": "object",
+  "allOf": [
+    { "$ref": "common.schema.json#/$defs/entityBase" },
+    {
+      "type": "object",
+      "properties": {
+        "type": { "const": "condition" }
+      },
+      "required": ["type"]
+    }
+  ],
+  "unevaluatedProperties": false
+}

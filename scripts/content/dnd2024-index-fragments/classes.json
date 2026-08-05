@@ -1,0 +1,3077 @@
+{
+  "schemaVersion": "1.0.0",
+  "entries": [
+    {
+      "id": "dnd2024:class:barbaro",
+      "type": "class",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/0"
+    },
+    {
+      "id": "dnd2024:feature:barbaro-defesa-sem-armadura",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/1"
+    },
+    {
+      "id": "dnd2024:feature:barbaro-furia",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/2"
+    },
+    {
+      "id": "dnd2024:feature:barbaro-maestria-em-arma",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/3"
+    },
+    {
+      "id": "dnd2024:feature:barbaro-ataque-imprudente",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/4"
+    },
+    {
+      "id": "dnd2024:feature:barbaro-sentido-de-perigo",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/5"
+    },
+    {
+      "id": "dnd2024:feature:barbaro-conhecimento-primordial",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/6"
+    },
+    {
+      "id": "dnd2024:feature:barbaro-aumento-no-valor-de-atributo-4",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/7"
+    },
+    {
+      "id": "dnd2024:feature:barbaro-ataque-extra",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/8"
+    },
+    {
+      "id": "dnd2024:feature:barbaro-movimento-rapido",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/9"
+    },
+    {
+      "id": "dnd2024:feature:barbaro-bote-instintivo",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/10"
+    },
+    {
+      "id": "dnd2024:feature:barbaro-instintos-primitivos",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/11"
+    },
+    {
+      "id": "dnd2024:feature:barbaro-aumento-no-valor-de-atributo-8",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/12"
+    },
+    {
+      "id": "dnd2024:feature:barbaro-golpe-brutal",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/13"
+    },
+    {
+      "id": "dnd2024:feature:barbaro-furia-implacavel",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/14"
+    },
+    {
+      "id": "dnd2024:feature:barbaro-aumento-no-valor-de-atributo-12",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/15"
+    },
+    {
+      "id": "dnd2024:feature:barbaro-golpe-brutal-aprimorado-13",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/16"
+    },
+    {
+      "id": "dnd2024:feature:barbaro-furia-persistente",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/17"
+    },
+    {
+      "id": "dnd2024:feature:barbaro-aumento-no-valor-de-atributo-16",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/18"
+    },
+    {
+      "id": "dnd2024:feature:barbaro-golpe-brutal-aprimorado-17",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/19"
+    },
+    {
+      "id": "dnd2024:feature:barbaro-forca-indomavel",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/20"
+    },
+    {
+      "id": "dnd2024:feature:barbaro-dadiva-epica",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/21"
+    },
+    {
+      "id": "dnd2024:feature:barbaro-campeao-primitivo",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/22"
+    },
+    {
+      "id": "dnd2024:subclass:trilha-da-arvore-do-mundo",
+      "type": "subclass",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/23"
+    },
+    {
+      "id": "dnd2024:feature:trilha-da-arvore-do-mundo-vitalidade-da-arvore",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/24"
+    },
+    {
+      "id": "dnd2024:feature:trilha-da-arvore-do-mundo-ramos-da-arvore",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/25"
+    },
+    {
+      "id": "dnd2024:feature:trilha-da-arvore-do-mundo-raizes-devastadoras",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/26"
+    },
+    {
+      "id": "dnd2024:feature:trilha-da-arvore-do-mundo-percorrer-a-arvore",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/27"
+    },
+    {
+      "id": "dnd2024:subclass:trilha-do-berserker",
+      "type": "subclass",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/28"
+    },
+    {
+      "id": "dnd2024:feature:trilha-do-berserker-frenesi",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/29"
+    },
+    {
+      "id": "dnd2024:feature:trilha-do-berserker-furia-irracional",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/30"
+    },
+    {
+      "id": "dnd2024:feature:trilha-do-berserker-retaliacao",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/31"
+    },
+    {
+      "id": "dnd2024:feature:trilha-do-berserker-presenca-intimidante",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/32"
+    },
+    {
+      "id": "dnd2024:subclass:trilha-do-coracao-selvagem",
+      "type": "subclass",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/33"
+    },
+    {
+      "id": "dnd2024:feature:trilha-do-coracao-selvagem-arauto-da-fauna",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/34"
+    },
+    {
+      "id": "dnd2024:feature:trilha-do-coracao-selvagem-furia-dos-selvagens",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/35"
+    },
+    {
+      "id": "dnd2024:feature:trilha-do-coracao-selvagem-aspecto-dos-selvagens",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/36"
+    },
+    {
+      "id": "dnd2024:feature:trilha-do-coracao-selvagem-arauto-da-natureza",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/37"
+    },
+    {
+      "id": "dnd2024:feature:trilha-do-coracao-selvagem-poder-dos-selvagens",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/38"
+    },
+    {
+      "id": "dnd2024:subclass:trilha-do-fanatico",
+      "type": "subclass",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/39"
+    },
+    {
+      "id": "dnd2024:feature:trilha-do-fanatico-campeao-dos-deuses",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/40"
+    },
+    {
+      "id": "dnd2024:feature:trilha-do-fanatico-furia-divina",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/41"
+    },
+    {
+      "id": "dnd2024:feature:trilha-do-fanatico-concentracao-fanatica",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/42"
+    },
+    {
+      "id": "dnd2024:feature:trilha-do-fanatico-presenca-zelosa",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/43"
+    },
+    {
+      "id": "dnd2024:feature:trilha-do-fanatico-furia-dos-deuses",
+      "type": "feature",
+      "path": "classes/barbaro.json",
+      "pointer": "/items/44"
+    },
+    {
+      "id": "dnd2024:class:bardo",
+      "type": "class",
+      "path": "classes/bardo.json",
+      "pointer": "/items/0"
+    },
+    {
+      "id": "dnd2024:feature:bardo-inspiracao-de-bardo",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/1"
+    },
+    {
+      "id": "dnd2024:feature:bardo-conjuracao",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/2"
+    },
+    {
+      "id": "dnd2024:feature:bardo-especialista-2",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/3"
+    },
+    {
+      "id": "dnd2024:feature:bardo-pau-pra-toda-obra",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/4"
+    },
+    {
+      "id": "dnd2024:feature:bardo-aumento-no-valor-de-atributo-4",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/5"
+    },
+    {
+      "id": "dnd2024:feature:bardo-fonte-de-inspiracao",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/6"
+    },
+    {
+      "id": "dnd2024:feature:bardo-contra-encantamento",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/7"
+    },
+    {
+      "id": "dnd2024:feature:bardo-aumento-no-valor-de-atributo-8",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/8"
+    },
+    {
+      "id": "dnd2024:feature:bardo-especialista-9",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/9"
+    },
+    {
+      "id": "dnd2024:feature:bardo-segredos-magicos",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/10"
+    },
+    {
+      "id": "dnd2024:feature:bardo-aumento-no-valor-de-atributo-12",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/11"
+    },
+    {
+      "id": "dnd2024:feature:bardo-aumento-no-valor-de-atributo-16",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/12"
+    },
+    {
+      "id": "dnd2024:feature:bardo-inspiracao-superior",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/13"
+    },
+    {
+      "id": "dnd2024:feature:bardo-dadiva-epica",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/14"
+    },
+    {
+      "id": "dnd2024:feature:bardo-palavras-de-criacao",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/15"
+    },
+    {
+      "id": "dnd2024:subclass:colegio-da-bravura",
+      "type": "subclass",
+      "path": "classes/bardo.json",
+      "pointer": "/items/16"
+    },
+    {
+      "id": "dnd2024:feature:colegio-da-bravura-inspiracao-em-combate",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/17"
+    },
+    {
+      "id": "dnd2024:feature:colegio-da-bravura-treinamento-marcial",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/18"
+    },
+    {
+      "id": "dnd2024:feature:colegio-da-bravura-ataque-extra",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/19"
+    },
+    {
+      "id": "dnd2024:feature:colegio-da-bravura-magia-de-batalha",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/20"
+    },
+    {
+      "id": "dnd2024:subclass:colegio-da-danca",
+      "type": "subclass",
+      "path": "classes/bardo.json",
+      "pointer": "/items/21"
+    },
+    {
+      "id": "dnd2024:feature:colegio-da-danca-ginga-fascinante",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/22"
+    },
+    {
+      "id": "dnd2024:feature:colegio-da-danca-gingado-coordenado",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/23"
+    },
+    {
+      "id": "dnd2024:feature:colegio-da-danca-movimento-inspirador",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/24"
+    },
+    {
+      "id": "dnd2024:feature:colegio-da-danca-evasao-liderada",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/25"
+    },
+    {
+      "id": "dnd2024:subclass:colegio-do-conhecimento",
+      "type": "subclass",
+      "path": "classes/bardo.json",
+      "pointer": "/items/26"
+    },
+    {
+      "id": "dnd2024:feature:colegio-do-conhecimento-palavras-de-interrupcao",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/27"
+    },
+    {
+      "id": "dnd2024:feature:colegio-do-conhecimento-proficiencias-bonus",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/28"
+    },
+    {
+      "id": "dnd2024:feature:colegio-do-conhecimento-descobertas-magicas",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/29"
+    },
+    {
+      "id": "dnd2024:feature:colegio-do-conhecimento-pericia-inigualavel",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/30"
+    },
+    {
+      "id": "dnd2024:subclass:colegio-do-glamour",
+      "type": "subclass",
+      "path": "classes/bardo.json",
+      "pointer": "/items/31"
+    },
+    {
+      "id": "dnd2024:feature:colegio-do-glamour-magia-fascinante",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/32"
+    },
+    {
+      "id": "dnd2024:feature:colegio-do-glamour-manto-de-inspiracao",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/33"
+    },
+    {
+      "id": "dnd2024:feature:colegio-do-glamour-manto-de-majestade",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/34"
+    },
+    {
+      "id": "dnd2024:feature:colegio-do-glamour-majestade-inquebravel",
+      "type": "feature",
+      "path": "classes/bardo.json",
+      "pointer": "/items/35"
+    },
+    {
+      "id": "dnd2024:class:bruxo",
+      "type": "class",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/0"
+    },
+    {
+      "id": "dnd2024:feature:bruxo-invocacoes-misticas",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/1"
+    },
+    {
+      "id": "dnd2024:feature:bruxo-magia-de-pacto",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/2"
+    },
+    {
+      "id": "dnd2024:feature:bruxo-astucia-magica",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/3"
+    },
+    {
+      "id": "dnd2024:feature:bruxo-aumento-no-valor-de-atributo-4",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/4"
+    },
+    {
+      "id": "dnd2024:feature:bruxo-aumento-no-valor-de-atributo-8",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/5"
+    },
+    {
+      "id": "dnd2024:feature:bruxo-contatar-patrono",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/6"
+    },
+    {
+      "id": "dnd2024:feature:bruxo-arcana-mistica-11",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/7"
+    },
+    {
+      "id": "dnd2024:feature:bruxo-aumento-no-valor-de-atributo-12",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/8"
+    },
+    {
+      "id": "dnd2024:feature:bruxo-arcana-mistica-13",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/9"
+    },
+    {
+      "id": "dnd2024:feature:bruxo-arcana-mistica-15",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/10"
+    },
+    {
+      "id": "dnd2024:feature:bruxo-aumento-no-valor-de-atributo-16",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/11"
+    },
+    {
+      "id": "dnd2024:feature:bruxo-arcana-mistica-17",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/12"
+    },
+    {
+      "id": "dnd2024:feature:bruxo-dadiva-epica",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/13"
+    },
+    {
+      "id": "dnd2024:feature:bruxo-mestre-mistico",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/14"
+    },
+    {
+      "id": "dnd2024:subclass:patrono-arquifada",
+      "type": "subclass",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/15"
+    },
+    {
+      "id": "dnd2024:feature:patrono-arquifada-magias-de-pacto-da-arquifada",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/16"
+    },
+    {
+      "id": "dnd2024:feature:patrono-arquifada-passos-feericos",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/17"
+    },
+    {
+      "id": "dnd2024:feature:patrono-arquifada-fuga-em-nevoa",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/18"
+    },
+    {
+      "id": "dnd2024:feature:patrono-arquifada-defesas-sedutoras",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/19"
+    },
+    {
+      "id": "dnd2024:feature:patrono-arquifada-magia-sedutora",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/20"
+    },
+    {
+      "id": "dnd2024:subclass:patrono-celestial",
+      "type": "subclass",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/21"
+    },
+    {
+      "id": "dnd2024:feature:patrono-celestial-luz-medicinal",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/22"
+    },
+    {
+      "id": "dnd2024:feature:patrono-celestial-magia-de-pacto-do-celestial",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/23"
+    },
+    {
+      "id": "dnd2024:feature:patrono-celestial-alma-radiante",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/24"
+    },
+    {
+      "id": "dnd2024:feature:patrono-celestial-resiliencia-celestial",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/25"
+    },
+    {
+      "id": "dnd2024:feature:patrono-celestial-vinganca-calcinante",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/26"
+    },
+    {
+      "id": "dnd2024:subclass:patrono-o-grande-antigo",
+      "type": "subclass",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/27"
+    },
+    {
+      "id": "dnd2024:feature:patrono-o-grande-antigo-magias-de-pacto-do-grande-antigo",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/28"
+    },
+    {
+      "id": "dnd2024:feature:patrono-o-grande-antigo-magias-psiquicas",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/29"
+    },
+    {
+      "id": "dnd2024:feature:patrono-o-grande-antigo-mente-desperta",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/30"
+    },
+    {
+      "id": "dnd2024:feature:patrono-o-grande-antigo-combatente-clarividente",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/31"
+    },
+    {
+      "id": "dnd2024:feature:patrono-o-grande-antigo-danacao-mistica",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/32"
+    },
+    {
+      "id": "dnd2024:feature:patrono-o-grande-antigo-escudo-mental",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/33"
+    },
+    {
+      "id": "dnd2024:feature:patrono-o-grande-antigo-criar-servo",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/34"
+    },
+    {
+      "id": "dnd2024:subclass:patrono-infero",
+      "type": "subclass",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/35"
+    },
+    {
+      "id": "dnd2024:feature:patrono-infero-bencao-do-tenebroso",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/36"
+    },
+    {
+      "id": "dnd2024:feature:patrono-infero-magias-de-pacto-do-infero",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/37"
+    },
+    {
+      "id": "dnd2024:feature:patrono-infero-a-sorte-do-proprio-tenebroso",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/38"
+    },
+    {
+      "id": "dnd2024:feature:patrono-infero-resistencia-infera",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/39"
+    },
+    {
+      "id": "dnd2024:feature:patrono-infero-lancar-no-inferno",
+      "type": "feature",
+      "path": "classes/bruxo.json",
+      "pointer": "/items/40"
+    },
+    {
+      "id": "dnd2024:class:clerigo",
+      "type": "class",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/0"
+    },
+    {
+      "id": "dnd2024:feature:clerigo-conjuracao",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/1"
+    },
+    {
+      "id": "dnd2024:feature:clerigo-ordem-divina",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/2"
+    },
+    {
+      "id": "dnd2024:feature:clerigo-canalizar-divindade",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/3"
+    },
+    {
+      "id": "dnd2024:feature:clerigo-aumento-no-valor-de-atributo-4",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/4"
+    },
+    {
+      "id": "dnd2024:feature:clerigo-fulminar-mortos-vivos",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/5"
+    },
+    {
+      "id": "dnd2024:feature:clerigo-golpes-abencoados",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/6"
+    },
+    {
+      "id": "dnd2024:feature:clerigo-aumento-no-valor-de-atributo-8",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/7"
+    },
+    {
+      "id": "dnd2024:feature:clerigo-intervencao-divina",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/8"
+    },
+    {
+      "id": "dnd2024:feature:clerigo-aumento-no-valor-de-atributo-12",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/9"
+    },
+    {
+      "id": "dnd2024:feature:clerigo-golpes-abencoados-aprimorados",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/10"
+    },
+    {
+      "id": "dnd2024:feature:clerigo-aumento-no-valor-de-atributo-16",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/11"
+    },
+    {
+      "id": "dnd2024:feature:clerigo-dadiva-epica",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/12"
+    },
+    {
+      "id": "dnd2024:feature:clerigo-intervencao-divina-maior",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/13"
+    },
+    {
+      "id": "dnd2024:subclass:dominio-da-guerra",
+      "type": "subclass",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/14"
+    },
+    {
+      "id": "dnd2024:feature:dominio-da-guerra-magias-de-dominio-da-guerra",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/15"
+    },
+    {
+      "id": "dnd2024:feature:dominio-da-guerra-ataque-direcionado",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/16"
+    },
+    {
+      "id": "dnd2024:feature:dominio-da-guerra-sacerdote-da-guerra",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/17"
+    },
+    {
+      "id": "dnd2024:feature:dominio-da-guerra-bencao-do-deus-da-guerra",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/18"
+    },
+    {
+      "id": "dnd2024:feature:dominio-da-guerra-avatar-da-guerra",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/19"
+    },
+    {
+      "id": "dnd2024:subclass:dominio-da-luz",
+      "type": "subclass",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/20"
+    },
+    {
+      "id": "dnd2024:feature:dominio-da-luz-brilho-do-amanhecer",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/21"
+    },
+    {
+      "id": "dnd2024:feature:dominio-da-luz-labareda-protetora",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/22"
+    },
+    {
+      "id": "dnd2024:feature:dominio-da-luz-magias-de-dominio-da-luz",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/23"
+    },
+    {
+      "id": "dnd2024:feature:dominio-da-luz-labareda-protetora-aprimorada",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/24"
+    },
+    {
+      "id": "dnd2024:feature:dominio-da-luz-coroa-de-luz",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/25"
+    },
+    {
+      "id": "dnd2024:subclass:dominio-da-trapaca",
+      "type": "subclass",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/26"
+    },
+    {
+      "id": "dnd2024:feature:dominio-da-trapaca-magias-de-dominio-da-trapaca",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/27"
+    },
+    {
+      "id": "dnd2024:feature:dominio-da-trapaca-bencao-do-trapaceiro",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/28"
+    },
+    {
+      "id": "dnd2024:feature:dominio-da-trapaca-invocar-duplicidade",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/29"
+    },
+    {
+      "id": "dnd2024:feature:dominio-da-trapaca-transposicao-do-trapaceiro",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/30"
+    },
+    {
+      "id": "dnd2024:feature:dominio-da-trapaca-duplicidade-aprimorada",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/31"
+    },
+    {
+      "id": "dnd2024:subclass:dominio-da-vida",
+      "type": "subclass",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/32"
+    },
+    {
+      "id": "dnd2024:feature:dominio-da-vida-magias-de-dominio-da-vida",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/33"
+    },
+    {
+      "id": "dnd2024:feature:dominio-da-vida-discipulo-da-vida",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/34"
+    },
+    {
+      "id": "dnd2024:feature:dominio-da-vida-preservar-a-vida",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/35"
+    },
+    {
+      "id": "dnd2024:feature:dominio-da-vida-curandeiro-abencoado",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/36"
+    },
+    {
+      "id": "dnd2024:feature:dominio-da-vida-cura-suprema",
+      "type": "feature",
+      "path": "classes/clerigo.json",
+      "pointer": "/items/37"
+    },
+    {
+      "id": "dnd2024:class:druida",
+      "type": "class",
+      "path": "classes/druida.json",
+      "pointer": "/items/0"
+    },
+    {
+      "id": "dnd2024:feature:druida-conjuracao",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/1"
+    },
+    {
+      "id": "dnd2024:feature:druida-idioma-druidico",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/2"
+    },
+    {
+      "id": "dnd2024:feature:druida-ordem-primal",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/3"
+    },
+    {
+      "id": "dnd2024:feature:druida-companheiro-selvagem",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/4"
+    },
+    {
+      "id": "dnd2024:feature:druida-forma-selvagem",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/5"
+    },
+    {
+      "id": "dnd2024:feature:druida-aumento-no-valor-de-atributo-4",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/6"
+    },
+    {
+      "id": "dnd2024:feature:druida-ressurgimento-selvagem",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/7"
+    },
+    {
+      "id": "dnd2024:feature:druida-furia-elemental",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/8"
+    },
+    {
+      "id": "dnd2024:feature:druida-aumento-no-valor-de-atributo-8",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/9"
+    },
+    {
+      "id": "dnd2024:feature:druida-aumento-no-valor-de-atributo-12",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/10"
+    },
+    {
+      "id": "dnd2024:feature:druida-furia-elemental-aprimorada",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/11"
+    },
+    {
+      "id": "dnd2024:feature:druida-aumento-no-valor-de-atributo-16",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/12"
+    },
+    {
+      "id": "dnd2024:feature:druida-magias-bestiais",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/13"
+    },
+    {
+      "id": "dnd2024:feature:druida-dadiva-epica",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/14"
+    },
+    {
+      "id": "dnd2024:feature:druida-arquidruida",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/15"
+    },
+    {
+      "id": "dnd2024:subclass:circulo-da-lua",
+      "type": "subclass",
+      "path": "classes/druida.json",
+      "pointer": "/items/16"
+    },
+    {
+      "id": "dnd2024:feature:circulo-da-lua-formas-animais-dos-circulos-druidicos",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/17"
+    },
+    {
+      "id": "dnd2024:feature:circulo-da-lua-magias-do-circulo-da-lua",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/18"
+    },
+    {
+      "id": "dnd2024:feature:circulo-da-lua-formas-animais-dos-circulos-druidicos-aprimorada",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/19"
+    },
+    {
+      "id": "dnd2024:feature:circulo-da-lua-passo-lunar",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/20"
+    },
+    {
+      "id": "dnd2024:feature:circulo-da-lua-forma-lunar",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/21"
+    },
+    {
+      "id": "dnd2024:subclass:circulo-da-terra",
+      "type": "subclass",
+      "path": "classes/druida.json",
+      "pointer": "/items/22"
+    },
+    {
+      "id": "dnd2024:feature:circulo-da-terra-auxilio-da-terra",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/23"
+    },
+    {
+      "id": "dnd2024:feature:circulo-da-terra-magias-do-circulo-da-terra",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/24"
+    },
+    {
+      "id": "dnd2024:feature:circulo-da-terra-recuperacao-natural",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/25"
+    },
+    {
+      "id": "dnd2024:feature:circulo-da-terra-protecao-natural",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/26"
+    },
+    {
+      "id": "dnd2024:feature:circulo-da-terra-santuario-natural",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/27"
+    },
+    {
+      "id": "dnd2024:subclass:circulo-das-estrelas",
+      "type": "subclass",
+      "path": "classes/druida.json",
+      "pointer": "/items/28"
+    },
+    {
+      "id": "dnd2024:feature:circulo-das-estrelas-forma-estrelada",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/29"
+    },
+    {
+      "id": "dnd2024:feature:circulo-das-estrelas-mapa-estelar",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/30"
+    },
+    {
+      "id": "dnd2024:feature:circulo-das-estrelas-pressagio-cosmico",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/31"
+    },
+    {
+      "id": "dnd2024:feature:circulo-das-estrelas-constelacoes-cintilantes",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/32"
+    },
+    {
+      "id": "dnd2024:feature:circulo-das-estrelas-repleto-de-estrelas",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/33"
+    },
+    {
+      "id": "dnd2024:subclass:circulo-do-mar",
+      "type": "subclass",
+      "path": "classes/druida.json",
+      "pointer": "/items/34"
+    },
+    {
+      "id": "dnd2024:feature:circulo-do-mar-ira-do-mar",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/35"
+    },
+    {
+      "id": "dnd2024:feature:circulo-do-mar-magias-do-circulo-do-mar",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/36"
+    },
+    {
+      "id": "dnd2024:feature:circulo-do-mar-afinidade-aquatica",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/37"
+    },
+    {
+      "id": "dnd2024:feature:circulo-do-mar-filho-da-tempestade",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/38"
+    },
+    {
+      "id": "dnd2024:feature:circulo-do-mar-manifestacao-oceanica",
+      "type": "feature",
+      "path": "classes/druida.json",
+      "pointer": "/items/39"
+    },
+    {
+      "id": "dnd2024:class:feiticeiro",
+      "type": "class",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/0"
+    },
+    {
+      "id": "dnd2024:feature:feiticeiro-conjuracao",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/1"
+    },
+    {
+      "id": "dnd2024:feature:feiticeiro-feiticaria-inata",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/2"
+    },
+    {
+      "id": "dnd2024:feature:feiticeiro-fonte-de-magia",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/3"
+    },
+    {
+      "id": "dnd2024:feature:feiticeiro-metamagia-2",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/4"
+    },
+    {
+      "id": "dnd2024:feature:feiticeiro-aumento-no-valor-de-atributo-4",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/5"
+    },
+    {
+      "id": "dnd2024:feature:feiticeiro-restauracao-feiticeira",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/6"
+    },
+    {
+      "id": "dnd2024:feature:feiticeiro-feiticaria-encarnada",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/7"
+    },
+    {
+      "id": "dnd2024:feature:feiticeiro-aumento-no-valor-de-atributo-8",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/8"
+    },
+    {
+      "id": "dnd2024:feature:feiticeiro-metamagia-10",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/9"
+    },
+    {
+      "id": "dnd2024:feature:feiticeiro-aumento-no-valor-de-atributo-12",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/10"
+    },
+    {
+      "id": "dnd2024:feature:feiticeiro-aumento-no-valor-de-atributo-16",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/11"
+    },
+    {
+      "id": "dnd2024:feature:feiticeiro-metamagia-17",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/12"
+    },
+    {
+      "id": "dnd2024:feature:feiticeiro-dadiva-epica",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/13"
+    },
+    {
+      "id": "dnd2024:feature:feiticeiro-apoteose-arcana",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/14"
+    },
+    {
+      "id": "dnd2024:subclass:feiticaria-aberrante",
+      "type": "subclass",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/15"
+    },
+    {
+      "id": "dnd2024:feature:feiticaria-aberrante-fala-telepatica",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/16"
+    },
+    {
+      "id": "dnd2024:feature:feiticaria-aberrante-magias-psionicas",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/17"
+    },
+    {
+      "id": "dnd2024:feature:feiticaria-aberrante-defesas-psiquicas",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/18"
+    },
+    {
+      "id": "dnd2024:feature:feiticaria-aberrante-feiticaria-psionica",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/19"
+    },
+    {
+      "id": "dnd2024:feature:feiticaria-aberrante-revelacao-em-carne",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/20"
+    },
+    {
+      "id": "dnd2024:feature:feiticaria-aberrante-implosao-de-distorcao",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/21"
+    },
+    {
+      "id": "dnd2024:subclass:feiticaria-draconica",
+      "type": "subclass",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/22"
+    },
+    {
+      "id": "dnd2024:feature:feiticaria-draconica-magias-draconicas",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/23"
+    },
+    {
+      "id": "dnd2024:feature:feiticaria-draconica-resiliencia-draconica",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/24"
+    },
+    {
+      "id": "dnd2024:feature:feiticaria-draconica-afinidade-elemental",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/25"
+    },
+    {
+      "id": "dnd2024:feature:feiticaria-draconica-asas-de-dragao",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/26"
+    },
+    {
+      "id": "dnd2024:feature:feiticaria-draconica-companheiro-draconico",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/27"
+    },
+    {
+      "id": "dnd2024:subclass:feiticaria-mecanica",
+      "type": "subclass",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/28"
+    },
+    {
+      "id": "dnd2024:feature:feiticaria-mecanica-magias-mecanicas",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/29"
+    },
+    {
+      "id": "dnd2024:feature:feiticaria-mecanica-restaurar-equilibrio",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/30"
+    },
+    {
+      "id": "dnd2024:feature:feiticaria-mecanica-bastiao-da-lei",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/31"
+    },
+    {
+      "id": "dnd2024:feature:feiticaria-mecanica-transe-da-ordem",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/32"
+    },
+    {
+      "id": "dnd2024:feature:feiticaria-mecanica-cavalgada-mecanica",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/33"
+    },
+    {
+      "id": "dnd2024:subclass:feiticaria-selvagem",
+      "type": "subclass",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/34"
+    },
+    {
+      "id": "dnd2024:feature:feiticaria-selvagem-mares-do-caos",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/35"
+    },
+    {
+      "id": "dnd2024:feature:feiticaria-selvagem-surto-de-magia-selvagem",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/36"
+    },
+    {
+      "id": "dnd2024:feature:feiticaria-selvagem-distorcer-a-sorte",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/37"
+    },
+    {
+      "id": "dnd2024:feature:feiticaria-selvagem-caos-controlado",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/38"
+    },
+    {
+      "id": "dnd2024:feature:feiticaria-selvagem-surto-controlado",
+      "type": "feature",
+      "path": "classes/feiticeiro.json",
+      "pointer": "/items/39"
+    },
+    {
+      "id": "dnd2024:class:guardiao",
+      "type": "class",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/0"
+    },
+    {
+      "id": "dnd2024:feature:guardiao-conjuracao",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/1"
+    },
+    {
+      "id": "dnd2024:feature:guardiao-inimigo-favorito",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/2"
+    },
+    {
+      "id": "dnd2024:feature:guardiao-maestria-em-arma",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/3"
+    },
+    {
+      "id": "dnd2024:feature:guardiao-estilo-de-luta",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/4"
+    },
+    {
+      "id": "dnd2024:feature:guardiao-explorador-habil",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/5"
+    },
+    {
+      "id": "dnd2024:feature:guardiao-aumento-no-valor-de-atributo-4",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/6"
+    },
+    {
+      "id": "dnd2024:feature:guardiao-ataque-extra",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/7"
+    },
+    {
+      "id": "dnd2024:feature:guardiao-errante",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/8"
+    },
+    {
+      "id": "dnd2024:feature:guardiao-aumento-no-valor-de-atributo-8",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/9"
+    },
+    {
+      "id": "dnd2024:feature:guardiao-especialista",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/10"
+    },
+    {
+      "id": "dnd2024:feature:guardiao-incansavel",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/11"
+    },
+    {
+      "id": "dnd2024:feature:guardiao-aumento-no-valor-de-atributo-12",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/12"
+    },
+    {
+      "id": "dnd2024:feature:guardiao-predador-implacavel",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/13"
+    },
+    {
+      "id": "dnd2024:feature:guardiao-veu-da-natureza",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/14"
+    },
+    {
+      "id": "dnd2024:feature:guardiao-aumento-no-valor-de-atributo-16",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/15"
+    },
+    {
+      "id": "dnd2024:feature:guardiao-cacador-preciso",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/16"
+    },
+    {
+      "id": "dnd2024:feature:guardiao-sentidos-selvagens",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/17"
+    },
+    {
+      "id": "dnd2024:feature:guardiao-dadiva-epica",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/18"
+    },
+    {
+      "id": "dnd2024:feature:guardiao-matador-de-inimigos-favoritos",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/19"
+    },
+    {
+      "id": "dnd2024:subclass:andarilho-feerico",
+      "type": "subclass",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/20"
+    },
+    {
+      "id": "dnd2024:feature:andarilho-feerico-glamour-transcendental",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/21"
+    },
+    {
+      "id": "dnd2024:feature:andarilho-feerico-golpes-terriveis",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/22"
+    },
+    {
+      "id": "dnd2024:feature:andarilho-feerico-magias-do-andarilho-feerico",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/23"
+    },
+    {
+      "id": "dnd2024:feature:andarilho-feerico-detalhe-sedutor",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/24"
+    },
+    {
+      "id": "dnd2024:feature:andarilho-feerico-reforcos-feericos",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/25"
+    },
+    {
+      "id": "dnd2024:feature:andarilho-feerico-andarilho-nebuloso",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/26"
+    },
+    {
+      "id": "dnd2024:subclass:cacador",
+      "type": "subclass",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/27"
+    },
+    {
+      "id": "dnd2024:feature:cacador-conhecimento-do-cacador",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/28"
+    },
+    {
+      "id": "dnd2024:feature:cacador-presa-do-cacador",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/29"
+    },
+    {
+      "id": "dnd2024:feature:cacador-taticas-defensivas",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/30"
+    },
+    {
+      "id": "dnd2024:feature:cacador-presa-do-cacador-superior",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/31"
+    },
+    {
+      "id": "dnd2024:feature:cacador-defesa-do-cacador-superior",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/32"
+    },
+    {
+      "id": "dnd2024:subclass:senhor-das-feras",
+      "type": "subclass",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/33"
+    },
+    {
+      "id": "dnd2024:feature:senhor-das-feras-companheiro-primal",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/34"
+    },
+    {
+      "id": "dnd2024:feature:senhor-das-feras-treinamento-excepcional",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/35"
+    },
+    {
+      "id": "dnd2024:feature:senhor-das-feras-furia-bestial",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/36"
+    },
+    {
+      "id": "dnd2024:feature:senhor-das-feras-compartilhar-magias",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/37"
+    },
+    {
+      "id": "dnd2024:subclass:vigilante-das-sombras",
+      "type": "subclass",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/38"
+    },
+    {
+      "id": "dnd2024:feature:vigilante-das-sombras-emboscador-das-sombras",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/39"
+    },
+    {
+      "id": "dnd2024:feature:vigilante-das-sombras-magias-do-vigilante-das-sombras",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/40"
+    },
+    {
+      "id": "dnd2024:feature:vigilante-das-sombras-visao-umbrosa",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/41"
+    },
+    {
+      "id": "dnd2024:feature:vigilante-das-sombras-mente-de-ferro",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/42"
+    },
+    {
+      "id": "dnd2024:feature:vigilante-das-sombras-torrente-do-vigilante",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/43"
+    },
+    {
+      "id": "dnd2024:feature:vigilante-das-sombras-esquiva-sombria",
+      "type": "feature",
+      "path": "classes/guardiao.json",
+      "pointer": "/items/44"
+    },
+    {
+      "id": "dnd2024:class:guerreiro",
+      "type": "class",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/0"
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-estilo-de-luta",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/1"
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-maestria-em-arma",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/2"
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-recuperar-folego",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/3"
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-mente-tatica",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/4"
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-surto-de-acao-2",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/5"
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-aumento-no-valor-de-atributo-4",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/6"
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-ajuste-tatico",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/7"
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-ataque-extra",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/8"
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-aumento-no-valor-de-atributo-6",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/9"
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-aumento-no-valor-de-atributo-8",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/10"
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-indomavel-9",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/11"
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-mestre-tatico",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/12"
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-dois-ataques-extras",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/13"
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-aumento-no-valor-de-atributo-12",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/14"
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-ataques-estudados",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/15"
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-indomavel-13",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/16"
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-aumento-no-valor-de-atributo-14",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/17"
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-aumento-no-valor-de-atributo-16",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/18"
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-indomavel-17",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/19"
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-surto-de-acao-17",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/20"
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-dadiva-epica",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/21"
+    },
+    {
+      "id": "dnd2024:feature:guerreiro-tres-ataques-extras",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/22"
+    },
+    {
+      "id": "dnd2024:subclass:campeao",
+      "type": "subclass",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/23"
+    },
+    {
+      "id": "dnd2024:feature:campeao-atleta-extraordinario",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/24"
+    },
+    {
+      "id": "dnd2024:feature:campeao-critico-aprimorado",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/25"
+    },
+    {
+      "id": "dnd2024:feature:campeao-estilo-de-luta-adicional",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/26"
+    },
+    {
+      "id": "dnd2024:feature:campeao-combatente-heroico",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/27"
+    },
+    {
+      "id": "dnd2024:feature:campeao-critico-superior",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/28"
+    },
+    {
+      "id": "dnd2024:feature:campeao-sobrevivente",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/29"
+    },
+    {
+      "id": "dnd2024:subclass:cavaleiro-mistico",
+      "type": "subclass",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/30"
+    },
+    {
+      "id": "dnd2024:feature:cavaleiro-mistico-conjuracao",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/31"
+    },
+    {
+      "id": "dnd2024:feature:cavaleiro-mistico-vinculo-com-arma",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/32"
+    },
+    {
+      "id": "dnd2024:feature:cavaleiro-mistico-magia-de-guerra",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/33"
+    },
+    {
+      "id": "dnd2024:feature:cavaleiro-mistico-golpe-mistico",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/34"
+    },
+    {
+      "id": "dnd2024:feature:cavaleiro-mistico-investida-mistica",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/35"
+    },
+    {
+      "id": "dnd2024:feature:cavaleiro-mistico-magia-de-guerra-aprimorada",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/36"
+    },
+    {
+      "id": "dnd2024:subclass:combatente-psiquico",
+      "type": "subclass",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/37"
+    },
+    {
+      "id": "dnd2024:feature:combatente-psiquico-poder-psionico",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/38"
+    },
+    {
+      "id": "dnd2024:feature:combatente-psiquico-adepto-telecinetico",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/39"
+    },
+    {
+      "id": "dnd2024:feature:combatente-psiquico-resguardo-mental",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/40"
+    },
+    {
+      "id": "dnd2024:feature:combatente-psiquico-baluarte-de-energia",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/41"
+    },
+    {
+      "id": "dnd2024:feature:combatente-psiquico-mestre-telecinetico",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/42"
+    },
+    {
+      "id": "dnd2024:subclass:mestre-da-batalha",
+      "type": "subclass",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/43"
+    },
+    {
+      "id": "dnd2024:feature:mestre-da-batalha-estudioso-da-guerra",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/44"
+    },
+    {
+      "id": "dnd2024:feature:mestre-da-batalha-superioridade-em-combate",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/45"
+    },
+    {
+      "id": "dnd2024:feature:mestre-da-batalha-conheca-seu-inimigo",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/46"
+    },
+    {
+      "id": "dnd2024:feature:mestre-da-batalha-superioridade-em-combate-aprimorada",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/47"
+    },
+    {
+      "id": "dnd2024:feature:mestre-da-batalha-implacavel",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/48"
+    },
+    {
+      "id": "dnd2024:feature:mestre-da-batalha-superioridade-em-combate-suprema",
+      "type": "feature",
+      "path": "classes/guerreiro.json",
+      "pointer": "/items/49"
+    },
+    {
+      "id": "dnd2024:class:ladino",
+      "type": "class",
+      "path": "classes/ladino.json",
+      "pointer": "/items/0"
+    },
+    {
+      "id": "dnd2024:feature:ladino-ataque-furtivo",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/1"
+    },
+    {
+      "id": "dnd2024:feature:ladino-especialista-1",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/2"
+    },
+    {
+      "id": "dnd2024:feature:ladino-giria-do-ladrao",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/3"
+    },
+    {
+      "id": "dnd2024:feature:ladino-maestria-em-arma",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/4"
+    },
+    {
+      "id": "dnd2024:feature:ladino-acao-ardilosa",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/5"
+    },
+    {
+      "id": "dnd2024:feature:ladino-mira-firme",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/6"
+    },
+    {
+      "id": "dnd2024:feature:ladino-aumento-no-valor-de-atributo-4",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/7"
+    },
+    {
+      "id": "dnd2024:feature:ladino-esquiva-sobrenatural",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/8"
+    },
+    {
+      "id": "dnd2024:feature:ladino-golpe-astuto",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/9"
+    },
+    {
+      "id": "dnd2024:feature:ladino-especialista-6",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/10"
+    },
+    {
+      "id": "dnd2024:feature:ladino-evasao",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/11"
+    },
+    {
+      "id": "dnd2024:feature:ladino-talento-confiavel",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/12"
+    },
+    {
+      "id": "dnd2024:feature:ladino-aumento-no-valor-de-atributo-8",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/13"
+    },
+    {
+      "id": "dnd2024:feature:ladino-aumento-no-valor-de-atributo-10",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/14"
+    },
+    {
+      "id": "dnd2024:feature:ladino-golpe-astuto-aprimorado",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/15"
+    },
+    {
+      "id": "dnd2024:feature:ladino-aumento-no-valor-de-atributo-12",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/16"
+    },
+    {
+      "id": "dnd2024:feature:ladino-golpes-sujos",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/17"
+    },
+    {
+      "id": "dnd2024:feature:ladino-mente-escorregadia",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/18"
+    },
+    {
+      "id": "dnd2024:feature:ladino-aumento-no-valor-de-atributo-16",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/19"
+    },
+    {
+      "id": "dnd2024:feature:ladino-elusivo",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/20"
+    },
+    {
+      "id": "dnd2024:feature:ladino-dadiva-epica",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/21"
+    },
+    {
+      "id": "dnd2024:feature:ladino-golpe-de-sorte",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/22"
+    },
+    {
+      "id": "dnd2024:subclass:adaga-espiritual",
+      "type": "subclass",
+      "path": "classes/ladino.json",
+      "pointer": "/items/23"
+    },
+    {
+      "id": "dnd2024:feature:adaga-espiritual-laminas-psiquicas",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/24"
+    },
+    {
+      "id": "dnd2024:feature:adaga-espiritual-poder-psionico",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/25"
+    },
+    {
+      "id": "dnd2024:feature:adaga-espiritual-laminas-da-alma",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/26"
+    },
+    {
+      "id": "dnd2024:feature:adaga-espiritual-veu-psiquico",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/27"
+    },
+    {
+      "id": "dnd2024:feature:adaga-espiritual-rasgar-mente",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/28"
+    },
+    {
+      "id": "dnd2024:subclass:assassino",
+      "type": "subclass",
+      "path": "classes/ladino.json",
+      "pointer": "/items/29"
+    },
+    {
+      "id": "dnd2024:feature:assassino-assassinar",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/30"
+    },
+    {
+      "id": "dnd2024:feature:assassino-ferramentas-de-assassino",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/31"
+    },
+    {
+      "id": "dnd2024:feature:assassino-especialista-em-infiltracao",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/32"
+    },
+    {
+      "id": "dnd2024:feature:assassino-armas-venenosas",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/33"
+    },
+    {
+      "id": "dnd2024:feature:assassino-golpe-mortal",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/34"
+    },
+    {
+      "id": "dnd2024:subclass:ladrao",
+      "type": "subclass",
+      "path": "classes/ladino.json",
+      "pointer": "/items/35"
+    },
+    {
+      "id": "dnd2024:feature:ladrao-andarilho-de-telhados",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/36"
+    },
+    {
+      "id": "dnd2024:feature:ladrao-mao-leve",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/37"
+    },
+    {
+      "id": "dnd2024:feature:ladrao-furtividade-suprema",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/38"
+    },
+    {
+      "id": "dnd2024:feature:ladrao-usar-dispositivo-magico",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/39"
+    },
+    {
+      "id": "dnd2024:feature:ladrao-reflexos-de-ladrao",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/40"
+    },
+    {
+      "id": "dnd2024:subclass:trapaceiro-arcano",
+      "type": "subclass",
+      "path": "classes/ladino.json",
+      "pointer": "/items/41"
+    },
+    {
+      "id": "dnd2024:feature:trapaceiro-arcano-conjuracao",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/42"
+    },
+    {
+      "id": "dnd2024:feature:trapaceiro-arcano-maos-magicas-ligeiras",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/43"
+    },
+    {
+      "id": "dnd2024:feature:trapaceiro-arcano-emboscada-magica",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/44"
+    },
+    {
+      "id": "dnd2024:feature:trapaceiro-arcano-trapaceiro-versatil",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/45"
+    },
+    {
+      "id": "dnd2024:feature:trapaceiro-arcano-ladrao-de-magias",
+      "type": "feature",
+      "path": "classes/ladino.json",
+      "pointer": "/items/46"
+    },
+    {
+      "id": "dnd2024:class:mago",
+      "type": "class",
+      "path": "classes/mago.json",
+      "pointer": "/items/0"
+    },
+    {
+      "id": "dnd2024:feature:mago-adepto-de-ritual",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/1"
+    },
+    {
+      "id": "dnd2024:feature:mago-conjuracao",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/2"
+    },
+    {
+      "id": "dnd2024:feature:mago-recuperacao-arcana",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/3"
+    },
+    {
+      "id": "dnd2024:feature:mago-academico",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/4"
+    },
+    {
+      "id": "dnd2024:feature:mago-aumento-no-valor-de-atributo-4",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/5"
+    },
+    {
+      "id": "dnd2024:feature:mago-memorizar-magia",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/6"
+    },
+    {
+      "id": "dnd2024:feature:mago-aumento-no-valor-de-atributo-8",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/7"
+    },
+    {
+      "id": "dnd2024:feature:mago-aumento-no-valor-de-atributo-12",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/8"
+    },
+    {
+      "id": "dnd2024:feature:mago-aumento-no-valor-de-atributo-16",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/9"
+    },
+    {
+      "id": "dnd2024:feature:mago-maestria-de-magias",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/10"
+    },
+    {
+      "id": "dnd2024:feature:mago-dadiva-epica",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/11"
+    },
+    {
+      "id": "dnd2024:feature:mago-assinatura-magica",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/12"
+    },
+    {
+      "id": "dnd2024:subclass:abjurador",
+      "type": "subclass",
+      "path": "classes/mago.json",
+      "pointer": "/items/13"
+    },
+    {
+      "id": "dnd2024:feature:abjurador-protecao-arcana",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/14"
+    },
+    {
+      "id": "dnd2024:feature:abjurador-versado-em-abjuracao",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/15"
+    },
+    {
+      "id": "dnd2024:feature:abjurador-protecao-projetada",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/16"
+    },
+    {
+      "id": "dnd2024:feature:abjurador-rompe-magia",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/17"
+    },
+    {
+      "id": "dnd2024:feature:abjurador-resistencia-a-magia",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/18"
+    },
+    {
+      "id": "dnd2024:subclass:adivinhador",
+      "type": "subclass",
+      "path": "classes/mago.json",
+      "pointer": "/items/19"
+    },
+    {
+      "id": "dnd2024:feature:adivinhador-prodigio",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/20"
+    },
+    {
+      "id": "dnd2024:feature:adivinhador-versado-em-adivinhacao",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/21"
+    },
+    {
+      "id": "dnd2024:feature:adivinhador-perito-em-adivinhacao",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/22"
+    },
+    {
+      "id": "dnd2024:feature:adivinhador-o-terceiro-olho",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/23"
+    },
+    {
+      "id": "dnd2024:feature:adivinhador-prodigio-maior",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/24"
+    },
+    {
+      "id": "dnd2024:subclass:evocador",
+      "type": "subclass",
+      "path": "classes/mago.json",
+      "pointer": "/items/25"
+    },
+    {
+      "id": "dnd2024:feature:evocador-truque-potente",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/26"
+    },
+    {
+      "id": "dnd2024:feature:evocador-versado-em-evocacao",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/27"
+    },
+    {
+      "id": "dnd2024:feature:evocador-esculpir-magias",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/28"
+    },
+    {
+      "id": "dnd2024:feature:evocador-evocacao-potencializada",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/29"
+    },
+    {
+      "id": "dnd2024:feature:evocador-sobrecarga",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/30"
+    },
+    {
+      "id": "dnd2024:subclass:ilusionista",
+      "type": "subclass",
+      "path": "classes/mago.json",
+      "pointer": "/items/31"
+    },
+    {
+      "id": "dnd2024:feature:ilusionista-ilusoes-aprimoradas",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/32"
+    },
+    {
+      "id": "dnd2024:feature:ilusionista-versado-em-ilusao",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/33"
+    },
+    {
+      "id": "dnd2024:feature:ilusionista-criaturas-espectrais",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/34"
+    },
+    {
+      "id": "dnd2024:feature:ilusionista-autoimagem-ilusoria",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/35"
+    },
+    {
+      "id": "dnd2024:feature:ilusionista-realidade-ilusoria",
+      "type": "feature",
+      "path": "classes/mago.json",
+      "pointer": "/items/36"
+    },
+    {
+      "id": "dnd2024:class:monge",
+      "type": "class",
+      "path": "classes/monge.json",
+      "pointer": "/items/0"
+    },
+    {
+      "id": "dnd2024:feature:monge-artes-marciais",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/1"
+    },
+    {
+      "id": "dnd2024:feature:monge-defesa-sem-armadura",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/2"
+    },
+    {
+      "id": "dnd2024:feature:monge-foco-do-monge",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/3"
+    },
+    {
+      "id": "dnd2024:feature:monge-movimento-sem-armadura",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/4"
+    },
+    {
+      "id": "dnd2024:feature:monge-metabolismo-incomum",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/5"
+    },
+    {
+      "id": "dnd2024:feature:monge-defletir-ataques",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/6"
+    },
+    {
+      "id": "dnd2024:feature:monge-aumento-no-valor-de-atributo-4",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/7"
+    },
+    {
+      "id": "dnd2024:feature:monge-queda-lenta",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/8"
+    },
+    {
+      "id": "dnd2024:feature:monge-ataque-extra",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/9"
+    },
+    {
+      "id": "dnd2024:feature:monge-golpe-atordoante",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/10"
+    },
+    {
+      "id": "dnd2024:feature:monge-golpes-potencializados",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/11"
+    },
+    {
+      "id": "dnd2024:feature:monge-evasao",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/12"
+    },
+    {
+      "id": "dnd2024:feature:monge-aumento-no-valor-de-atributo-8",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/13"
+    },
+    {
+      "id": "dnd2024:feature:monge-movimento-acrobatico",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/14"
+    },
+    {
+      "id": "dnd2024:feature:monge-restauro-pessoal",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/15"
+    },
+    {
+      "id": "dnd2024:feature:monge-foco-aprimorado",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/16"
+    },
+    {
+      "id": "dnd2024:feature:monge-aumento-no-valor-de-atributo-12",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/17"
+    },
+    {
+      "id": "dnd2024:feature:monge-defletir-energia",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/18"
+    },
+    {
+      "id": "dnd2024:feature:monge-sobrevivente-disciplinado",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/19"
+    },
+    {
+      "id": "dnd2024:feature:monge-foco-perfeito",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/20"
+    },
+    {
+      "id": "dnd2024:feature:monge-aumento-no-valor-de-atributo-16",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/21"
+    },
+    {
+      "id": "dnd2024:feature:monge-defesa-superior",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/22"
+    },
+    {
+      "id": "dnd2024:feature:monge-dadiva-epica",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/23"
+    },
+    {
+      "id": "dnd2024:feature:monge-corpo-e-mente",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/24"
+    },
+    {
+      "id": "dnd2024:subclass:combatente-da-mao-espalmada",
+      "type": "subclass",
+      "path": "classes/monge.json",
+      "pointer": "/items/25"
+    },
+    {
+      "id": "dnd2024:feature:combatente-da-mao-espalmada-tecnica-da-mao-espalmada",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/26"
+    },
+    {
+      "id": "dnd2024:feature:combatente-da-mao-espalmada-integridade-corporal",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/27"
+    },
+    {
+      "id": "dnd2024:feature:combatente-da-mao-espalmada-passo-veloz",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/28"
+    },
+    {
+      "id": "dnd2024:feature:combatente-da-mao-espalmada-palma-vibrante",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/29"
+    },
+    {
+      "id": "dnd2024:subclass:combatente-da-misericordia",
+      "type": "subclass",
+      "path": "classes/monge.json",
+      "pointer": "/items/30"
+    },
+    {
+      "id": "dnd2024:feature:combatente-da-misericordia-implementos-de-misericordia",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/31"
+    },
+    {
+      "id": "dnd2024:feature:combatente-da-misericordia-mao-de-cura",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/32"
+    },
+    {
+      "id": "dnd2024:feature:combatente-da-misericordia-mao-de-dolo",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/33"
+    },
+    {
+      "id": "dnd2024:feature:combatente-da-misericordia-toque-de-medico",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/34"
+    },
+    {
+      "id": "dnd2024:feature:combatente-da-misericordia-torrente-de-cura-e-dolo",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/35"
+    },
+    {
+      "id": "dnd2024:feature:combatente-da-misericordia-mao-da-misericordia-final",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/36"
+    },
+    {
+      "id": "dnd2024:subclass:combatente-das-sombras",
+      "type": "subclass",
+      "path": "classes/monge.json",
+      "pointer": "/items/37"
+    },
+    {
+      "id": "dnd2024:feature:combatente-das-sombras-artes-das-sombras",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/38"
+    },
+    {
+      "id": "dnd2024:feature:combatente-das-sombras-passo-da-sombra",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/39"
+    },
+    {
+      "id": "dnd2024:feature:combatente-das-sombras-passo-da-sombra-aprimorado",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/40"
+    },
+    {
+      "id": "dnd2024:feature:combatente-das-sombras-manto-da-sombra",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/41"
+    },
+    {
+      "id": "dnd2024:subclass:combatente-dos-elementos",
+      "type": "subclass",
+      "path": "classes/monge.json",
+      "pointer": "/items/42"
+    },
+    {
+      "id": "dnd2024:feature:combatente-dos-elementos-manipular-elementos",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/43"
+    },
+    {
+      "id": "dnd2024:feature:combatente-dos-elementos-sintonia-elemental",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/44"
+    },
+    {
+      "id": "dnd2024:feature:combatente-dos-elementos-explosao-elemental",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/45"
+    },
+    {
+      "id": "dnd2024:feature:combatente-dos-elementos-passo-dos-elementos",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/46"
+    },
+    {
+      "id": "dnd2024:feature:combatente-dos-elementos-apice-elemental",
+      "type": "feature",
+      "path": "classes/monge.json",
+      "pointer": "/items/47"
+    },
+    {
+      "id": "dnd2024:class:paladino",
+      "type": "class",
+      "path": "classes/paladino.json",
+      "pointer": "/items/0"
+    },
+    {
+      "id": "dnd2024:feature:paladino-conjuracao",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/1"
+    },
+    {
+      "id": "dnd2024:feature:paladino-maestria-em-arma",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/2"
+    },
+    {
+      "id": "dnd2024:feature:paladino-maos-consagradas",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/3"
+    },
+    {
+      "id": "dnd2024:feature:paladino-destruicao-do-paladino",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/4"
+    },
+    {
+      "id": "dnd2024:feature:paladino-estilo-de-luta",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/5"
+    },
+    {
+      "id": "dnd2024:feature:paladino-canalizar-divindade",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/6"
+    },
+    {
+      "id": "dnd2024:feature:paladino-aumento-no-valor-de-atributo-4",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/7"
+    },
+    {
+      "id": "dnd2024:feature:paladino-ataque-extra",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/8"
+    },
+    {
+      "id": "dnd2024:feature:paladino-montaria-fiel",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/9"
+    },
+    {
+      "id": "dnd2024:feature:paladino-aura-de-protecao",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/10"
+    },
+    {
+      "id": "dnd2024:feature:paladino-aumento-no-valor-de-atributo-8",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/11"
+    },
+    {
+      "id": "dnd2024:feature:paladino-repudiar-inimigos",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/12"
+    },
+    {
+      "id": "dnd2024:feature:paladino-aura-de-coragem",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/13"
+    },
+    {
+      "id": "dnd2024:feature:paladino-golpes-radiantes",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/14"
+    },
+    {
+      "id": "dnd2024:feature:paladino-aumento-no-valor-de-atributo-12",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/15"
+    },
+    {
+      "id": "dnd2024:feature:paladino-toque-restaurador",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/16"
+    },
+    {
+      "id": "dnd2024:feature:paladino-aumento-no-valor-de-atributo-16",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/17"
+    },
+    {
+      "id": "dnd2024:feature:paladino-aura-expandida",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/18"
+    },
+    {
+      "id": "dnd2024:feature:paladino-dadiva-epica",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/19"
+    },
+    {
+      "id": "dnd2024:subclass:juramento-da-devocao",
+      "type": "subclass",
+      "path": "classes/paladino.json",
+      "pointer": "/items/20"
+    },
+    {
+      "id": "dnd2024:feature:juramento-da-devocao-magias-do-juramento-da-devocao",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/21"
+    },
+    {
+      "id": "dnd2024:feature:juramento-da-devocao-arma-sagrada",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/22"
+    },
+    {
+      "id": "dnd2024:feature:juramento-da-devocao-aura-de-devocao",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/23"
+    },
+    {
+      "id": "dnd2024:feature:juramento-da-devocao-destruicao-protetora",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/24"
+    },
+    {
+      "id": "dnd2024:feature:juramento-da-devocao-resplendor-sagrado",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/25"
+    },
+    {
+      "id": "dnd2024:subclass:juramento-da-gloria",
+      "type": "subclass",
+      "path": "classes/paladino.json",
+      "pointer": "/items/26"
+    },
+    {
+      "id": "dnd2024:feature:juramento-da-gloria-atleta-inigualavel",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/27"
+    },
+    {
+      "id": "dnd2024:feature:juramento-da-gloria-destruicao-inspiradora",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/28"
+    },
+    {
+      "id": "dnd2024:feature:juramento-da-gloria-magias-do-juramento-da-gloria",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/29"
+    },
+    {
+      "id": "dnd2024:feature:juramento-da-gloria-aura-de-vivacidade",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/30"
+    },
+    {
+      "id": "dnd2024:feature:juramento-da-gloria-defesa-gloriosa",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/31"
+    },
+    {
+      "id": "dnd2024:feature:juramento-da-gloria-lenda-viva",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/32"
+    },
+    {
+      "id": "dnd2024:subclass:juramento-da-vinganca",
+      "type": "subclass",
+      "path": "classes/paladino.json",
+      "pointer": "/items/33"
+    },
+    {
+      "id": "dnd2024:feature:juramento-da-vinganca-magias-do-juramento-da-vinganca",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/34"
+    },
+    {
+      "id": "dnd2024:feature:juramento-da-vinganca-voto-de-inimizade",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/35"
+    },
+    {
+      "id": "dnd2024:feature:juramento-da-vinganca-vingador-implacavel",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/36"
+    },
+    {
+      "id": "dnd2024:feature:juramento-da-vinganca-alma-vingativa",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/37"
+    },
+    {
+      "id": "dnd2024:feature:juramento-da-vinganca-anjo-vingador",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/38"
+    },
+    {
+      "id": "dnd2024:subclass:juramento-dos-ancioes",
+      "type": "subclass",
+      "path": "classes/paladino.json",
+      "pointer": "/items/39"
+    },
+    {
+      "id": "dnd2024:feature:juramento-dos-ancioes-a-ira-da-natureza",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/40"
+    },
+    {
+      "id": "dnd2024:feature:juramento-dos-ancioes-magias-do-juramento-dos-ancioes",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/41"
+    },
+    {
+      "id": "dnd2024:feature:juramento-dos-ancioes-aura-de-resistencia",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/42"
+    },
+    {
+      "id": "dnd2024:feature:juramento-dos-ancioes-sentinela-imortal",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/43"
+    },
+    {
+      "id": "dnd2024:feature:juramento-dos-ancioes-campeao-ancestral",
+      "type": "feature",
+      "path": "classes/paladino.json",
+      "pointer": "/items/44"
+    }
+  ]
+}

@@ -1,0 +1,408 @@
+{
+  "_comment": "Baseline extraída INDEPENDENTEMENTE de scripts/content/migrate-origins-feats.mjs, direto de dados/origens/especies.json, dados/origens/antecedentes.json e dados/talentos/talentos.json (Task 9). Usada por tests/contract/dnd2024-origins-feats.test.js para que o teste não vire tautologia (migrate-origins-feats comparado consigo mesmo).",
+  "species": {
+    "Aasimar": {
+      "size": "medium",
+      "sizeChoice": true,
+      "speed": 9,
+      "darkvision": 18,
+      "resistances": [
+        "Necrótico",
+        "Radiante"
+      ]
+    },
+    "Anão": {
+      "size": "medium",
+      "sizeChoice": false,
+      "speed": 9,
+      "darkvision": 36,
+      "resistances": [
+        "Venenoso"
+      ]
+    },
+    "Draconato": {
+      "size": "medium",
+      "sizeChoice": false,
+      "speed": 9,
+      "darkvision": 18,
+      "resistances": []
+    },
+    "Elfo": {
+      "size": "medium",
+      "sizeChoice": false,
+      "speed": 9,
+      "darkvision": 18,
+      "resistances": []
+    },
+    "Gnomo": {
+      "size": "small",
+      "sizeChoice": false,
+      "speed": 9,
+      "darkvision": 18,
+      "resistances": []
+    },
+    "Golias": {
+      "size": "medium",
+      "sizeChoice": false,
+      "speed": 10.5,
+      "darkvision": null,
+      "resistances": []
+    },
+    "Humano": {
+      "size": "medium",
+      "sizeChoice": true,
+      "speed": 9,
+      "darkvision": null,
+      "resistances": []
+    },
+    "Orc": {
+      "size": "medium",
+      "sizeChoice": false,
+      "speed": 9,
+      "darkvision": 36,
+      "resistances": []
+    },
+    "Pequenino": {
+      "size": "small",
+      "sizeChoice": false,
+      "speed": 9,
+      "darkvision": null,
+      "resistances": []
+    },
+    "Tiferino": {
+      "size": "medium",
+      "sizeChoice": true,
+      "speed": 9,
+      "darkvision": 18,
+      "resistances": []
+    },
+    "Kenku": {
+      "size": "medium",
+      "sizeChoice": true,
+      "speed": 9,
+      "darkvision": null,
+      "resistances": []
+    }
+  },
+  "speciesChoiceIds": {
+    "Draconato": [
+      "heranca-draconica"
+    ],
+    "Elfo": [
+      "linhagem-elfica",
+      "sentidos-agucados"
+    ],
+    "Gnomo": [
+      "linhagem-gnomica"
+    ],
+    "Golias": [
+      "ancestralidade-gigante"
+    ],
+    "Humano": [
+      "habil",
+      "tamanho"
+    ],
+    "Tiferino": [
+      "legado-infero",
+      "tamanho"
+    ],
+    "Kenku": [
+      "memoria-kenku",
+      "tamanho"
+    ]
+  },
+  "backgrounds": {
+    "Acólito": {
+      "abilities": [
+        "Inteligência",
+        "Sabedoria",
+        "Carisma"
+      ],
+      "skills": [
+        "Intuição",
+        "Religião"
+      ],
+      "grantedFeat": "Iniciado em Magia",
+      "presetSpellList": "clerigo"
+    },
+    "Andarilho": {
+      "abilities": [
+        "Destreza",
+        "Sabedoria",
+        "Carisma"
+      ],
+      "skills": [
+        "Furtividade",
+        "Intuição"
+      ],
+      "grantedFeat": "Sortudo"
+    },
+    "Artesão": {
+      "abilities": [
+        "Força",
+        "Destreza",
+        "Inteligência"
+      ],
+      "skills": [
+        "Investigação",
+        "Persuasão"
+      ],
+      "grantedFeat": "Artifista"
+    },
+    "Artista": {
+      "abilities": [
+        "Força",
+        "Destreza",
+        "Carisma"
+      ],
+      "skills": [
+        "Acrobacia",
+        "Atuação"
+      ],
+      "grantedFeat": "Músico"
+    },
+    "Charlatão": {
+      "abilities": [
+        "Destreza",
+        "Constituição",
+        "Carisma"
+      ],
+      "skills": [
+        "Enganação",
+        "Prestidigitação"
+      ],
+      "grantedFeat": "Habilidoso"
+    },
+    "Criminoso": {
+      "abilities": [
+        "Destreza",
+        "Constituição",
+        "Inteligência"
+      ],
+      "skills": [
+        "Furtividade",
+        "Prestidigitação"
+      ],
+      "grantedFeat": "Alerta"
+    },
+    "Eremita": {
+      "abilities": [
+        "Constituição",
+        "Sabedoria",
+        "Carisma"
+      ],
+      "skills": [
+        "Medicina",
+        "Religião"
+      ],
+      "grantedFeat": "Curandeiro"
+    },
+    "Escriba": {
+      "abilities": [
+        "Destreza",
+        "Inteligência",
+        "Sabedoria"
+      ],
+      "skills": [
+        "Investigação",
+        "Percepção"
+      ],
+      "grantedFeat": "Habilidoso"
+    },
+    "Fazendeiro": {
+      "abilities": [
+        "Força",
+        "Constituição",
+        "Sabedoria"
+      ],
+      "skills": [
+        "Lidar com Animais",
+        "Natureza"
+      ],
+      "grantedFeat": "Vigoroso"
+    },
+    "Guarda": {
+      "abilities": [
+        "Força",
+        "Inteligência",
+        "Sabedoria"
+      ],
+      "skills": [
+        "Atletismo",
+        "Percepção"
+      ],
+      "grantedFeat": "Alerta"
+    },
+    "Guia": {
+      "abilities": [
+        "Destreza",
+        "Constituição",
+        "Sabedoria"
+      ],
+      "skills": [
+        "Furtividade",
+        "Sobrevivência"
+      ],
+      "grantedFeat": "Iniciado em Magia",
+      "presetSpellList": "druida"
+    },
+    "Marinheiro": {
+      "abilities": [
+        "Força",
+        "Destreza",
+        "Sabedoria"
+      ],
+      "skills": [
+        "Acrobacia",
+        "Percepção"
+      ],
+      "grantedFeat": "Valentão de Taverna"
+    },
+    "Mercador": {
+      "abilities": [
+        "Constituição",
+        "Inteligência",
+        "Carisma"
+      ],
+      "skills": [
+        "Lidar com Animais",
+        "Persuasão"
+      ],
+      "grantedFeat": "Sortudo"
+    },
+    "Nobre": {
+      "abilities": [
+        "Força",
+        "Inteligência",
+        "Carisma"
+      ],
+      "skills": [
+        "História",
+        "Persuasão"
+      ],
+      "grantedFeat": "Habilidoso"
+    },
+    "Sábio": {
+      "abilities": [
+        "Constituição",
+        "Inteligência",
+        "Sabedoria"
+      ],
+      "skills": [
+        "Arcanismo",
+        "História"
+      ],
+      "grantedFeat": "Iniciado em Magia",
+      "presetSpellList": "mago"
+    },
+    "Soldado": {
+      "abilities": [
+        "Força",
+        "Destreza",
+        "Constituição"
+      ],
+      "skills": [
+        "Atletismo",
+        "Intimidação"
+      ],
+      "grantedFeat": "Atacante Selvagem"
+    }
+  },
+  "featCategoryCounts": {
+    "origin": 10,
+    "general": 43,
+    "fighting-style": 10,
+    "epic-boon": 12
+  },
+  "featTotal": 75,
+  "repeatableFeats": [
+    "Adepto Elemental",
+    "Aumento no Valor de Atributo",
+    "Habilidoso",
+    "Iniciado em Magia"
+  ],
+  "featPrerequisiteLevel": {
+    "Adepto Elemental": 4,
+    "Alerta": null,
+    "Vigoroso": null,
+    "Arquearia": null,
+    "Dádiva da Fortitude": 19,
+    "Dádiva do Espírito da Noite": 19,
+    "Resistente": 4
+  },
+  "featAsiAbilities": {
+    "Agressor": [
+      "Força",
+      "Destreza"
+    ],
+    "Ator": [
+      "Carisma"
+    ],
+    "Mente Aguçada": [
+      "Inteligência"
+    ],
+    "Resistente": [
+      "Constituição"
+    ],
+    "Especialista em Perícia": [
+      "Força",
+      "Destreza",
+      "Constituição",
+      "Inteligência",
+      "Sabedoria",
+      "Carisma"
+    ],
+    "Dádiva do Ataque Irresistível": [
+      "Força",
+      "Destreza"
+    ],
+    "Dádiva da Recordação de Magia": [
+      "Inteligência",
+      "Sabedoria",
+      "Carisma"
+    ]
+  },
+  "featsWithoutAsi": [
+    "Alerta",
+    "Artifista",
+    "Atacante Selvagem",
+    "Curandeiro",
+    "Habilidoso",
+    "Iniciado em Magia",
+    "Músico",
+    "Sortudo",
+    "Valentão de Taverna",
+    "Vigoroso",
+    "Arquearia",
+    "Duelismo"
+  ],
+  "iniciadoEmMagiaSpellListOptions": [
+    "clerigo",
+    "druida",
+    "mago"
+  ],
+  "nonStackingEffects": {
+    "_comment": "Levantamento dos efeitos de espécie/antecedente/talento que NÃO ACUMULAM, para a Task 15. Diferente das classes, aqui NÃO existe ladder de nível: nenhuma entidade destes catálogos declara dois efeitos do mesmo alvo/recurso, e nenhum recurso concedido repete entre entidades. Por isso nenhum efeito destes catálogos recebeu `stackKey`/`stackable`/`priority` — e a AUSÊNCIA desses campos é o contrato correto (\"sempre acumula\"), não um esquecimento. Os dois únicos alvos de `modifier set` que aparecem em mais de uma entidade estão listados em `sharedSetTargets` com a razão pela qual continuam determinísticos sem `stackKey`; o teste de contrato reexecuta essa verificação em vez de confiar no comentário.",
+    "resourceLadders": {},
+    "modifierLadders": {},
+    "sharedSetTargets": {
+      "senses.darkvision": {
+        "sourceType": "species",
+        "distinctValues": [
+          18,
+          36
+        ],
+        "requiresStackKey": false,
+        "reason": "Um personagem tem exatamente UMA espécie, então dois efeitos `set` de Visão no Escuro nunca coexistem no mesmo personagem. Não há conflito a desempatar."
+      },
+      "senses.blindsight": {
+        "sourceType": "feat",
+        "distinctValues": [
+          3
+        ],
+        "requiresStackKey": false,
+        "reason": "Os dois talentos que concedem Visão às Cegas (Luta às Cegas e Sorrateiro) usam o MESMO valor (3 m). Dois `set` de valor idêntico na mesma prioridade não são conflito e o resultado é determinístico; somar seria errado, e é justamente o que `set` impede."
+      }
+    }
+  }
+}

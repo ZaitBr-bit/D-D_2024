@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.fichas-de-nimb.dev/v1/index.schema.json",
+  "title": "Index (v1)",
+  "description": "Índice ordenado de todas as entidades de um pacote de conteúdo. `entries` é sempre um array ordenado de {id, type, path, pointer?} — nunca um objeto indexado por id — para que duplicatas possam ser detectadas antes de qualquer dedup/mapeamento. `uniqueItems` rejeita entradas integralmente repetidas; duplicatas semânticas de `id` com `path`/`pointer` diferentes são detectadas em runtime por validateReferences, não expressáveis em JSON Schema puro.",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "$ref": "common.schema.json#/$defs/semVer" },
+    "entries": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/indexEntry" },
+      "uniqueItems": true
+    }
+  },
+  "required": ["schemaVersion", "entries"],
+  "additionalProperties": false,
+  "$defs": {
+    "indexEntry": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/contentId" },
+        "type": { "$ref": "common.schema.json#/$defs/entityType" },
+        "path": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+        "pointer": {
+          "type": "string",
+          "description": "JSON Pointer opcional para localizar a entidade dentro do arquivo em `path`, quando o arquivo é uma coleção (collection.schema.json)."
+        }
+      },
+      "required": ["id", "type", "path"],
+      "additionalProperties": false
+    }
+  }
+}

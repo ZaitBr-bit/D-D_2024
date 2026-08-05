@@ -1,0 +1,1067 @@
+{
+  "schemaVersion": "1.0.0",
+  "type": "weapon",
+  "items": [
+    {
+      "id": "dnd2024:weapon:adaga",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Adaga",
+      "description": "Propriedades: Acuidade, Arremesso (Alcance 6/18), Leve. Maestria: Ágil.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "simple",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d4",
+        "type": "dnd2024:damage-type:perfurante"
+      },
+      "properties": [
+        "finesse",
+        "thrown",
+        "light"
+      ],
+      "range": {
+        "normal": "6",
+        "long": "18"
+      },
+      "mastery": "nick",
+      "weight": 0.5,
+      "cost": {
+        "amount": 2,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:azagaia",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Azagaia",
+      "description": "Propriedades: Arremesso (Alcance 9/36). Maestria: Lentidão.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "simple",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d6",
+        "type": "dnd2024:damage-type:perfurante"
+      },
+      "properties": [
+        "thrown"
+      ],
+      "range": {
+        "normal": "9",
+        "long": "36"
+      },
+      "mastery": "slow",
+      "weight": 1,
+      "cost": {
+        "amount": 5,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:cajado",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Cajado",
+      "description": "Propriedades: Versátil (1d8). Maestria: Derrubar.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "simple",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d6",
+        "type": "dnd2024:damage-type:contundente"
+      },
+      "properties": [
+        "versatile"
+      ],
+      "versatileDamage": "1d8",
+      "mastery": "topple",
+      "weight": 2,
+      "cost": {
+        "amount": 2,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:clava",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Clava",
+      "description": "Propriedades: Leve. Maestria: Lentidão.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "simple",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d4",
+        "type": "dnd2024:damage-type:contundente"
+      },
+      "properties": [
+        "light"
+      ],
+      "mastery": "slow",
+      "weight": 1,
+      "cost": {
+        "amount": 1,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:clava-grande",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Clava Grande",
+      "description": "Propriedades: Duas Mãos. Maestria: Empurrar.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "simple",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d8",
+        "type": "dnd2024:damage-type:contundente"
+      },
+      "properties": [
+        "two-handed"
+      ],
+      "mastery": "push",
+      "weight": 5,
+      "cost": {
+        "amount": 2,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:foice",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Foice",
+      "description": "Propriedades: Leve. Maestria: Ágil.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "simple",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d4",
+        "type": "dnd2024:damage-type:cortante"
+      },
+      "properties": [
+        "light"
+      ],
+      "mastery": "nick",
+      "weight": 1,
+      "cost": {
+        "amount": 1,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:lanca",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Lança",
+      "description": "Propriedades: Arremesso (Alcance 6/18), Versátil (1d8). Maestria: Drenar.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "simple",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d6",
+        "type": "dnd2024:damage-type:perfurante"
+      },
+      "properties": [
+        "thrown",
+        "versatile"
+      ],
+      "range": {
+        "normal": "6",
+        "long": "18"
+      },
+      "versatileDamage": "1d8",
+      "mastery": "sap",
+      "weight": 1.5,
+      "cost": {
+        "amount": 1,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:maca",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Maça",
+      "description": "Propriedades: —. Maestria: Drenar.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "simple",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d6",
+        "type": "dnd2024:damage-type:contundente"
+      },
+      "properties": [],
+      "mastery": "sap",
+      "weight": 2,
+      "cost": {
+        "amount": 5,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:machadinha",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Machadinha",
+      "description": "Propriedades: Arremesso (Alcance 6/18), Leve. Maestria: Afligir.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "simple",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d6",
+        "type": "dnd2024:damage-type:cortante"
+      },
+      "properties": [
+        "thrown",
+        "light"
+      ],
+      "range": {
+        "normal": "6",
+        "long": "18"
+      },
+      "mastery": "vex",
+      "weight": 1,
+      "cost": {
+        "amount": 5,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:martelo-leve",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Martelo Leve",
+      "description": "Propriedades: Arremesso (Alcance 6/18), Leve. Maestria: Ágil.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "simple",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d4",
+        "type": "dnd2024:damage-type:contundente"
+      },
+      "properties": [
+        "thrown",
+        "light"
+      ],
+      "range": {
+        "normal": "6",
+        "long": "18"
+      },
+      "mastery": "nick",
+      "weight": 1,
+      "cost": {
+        "amount": 2,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:arco-curto",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Arco Curto",
+      "description": "Propriedades: Duas Mãos, Munição (Alcance 24/96; Flecha). Maestria: Afligir.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "simple",
+      "rangeCategory": "ranged",
+      "damage": {
+        "dice": "1d6",
+        "type": "dnd2024:damage-type:perfurante"
+      },
+      "properties": [
+        "two-handed",
+        "ammunition"
+      ],
+      "range": {
+        "normal": "24",
+        "long": "96"
+      },
+      "ammunitionType": "Flecha",
+      "mastery": "vex",
+      "weight": 1,
+      "cost": {
+        "amount": 25,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:besta-leve",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Besta Leve",
+      "description": "Propriedades: Duas Mãos, Munição (Alcance 24/96; Virote), Recarga. Maestria: Lentidão.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "simple",
+      "rangeCategory": "ranged",
+      "damage": {
+        "dice": "1d8",
+        "type": "dnd2024:damage-type:perfurante"
+      },
+      "properties": [
+        "two-handed",
+        "ammunition",
+        "loading"
+      ],
+      "range": {
+        "normal": "24",
+        "long": "96"
+      },
+      "ammunitionType": "Virote",
+      "mastery": "slow",
+      "weight": 2.5,
+      "cost": {
+        "amount": 25,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:dardo",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Dardo",
+      "description": "Propriedades: Acuidade, Arremesso (Alcance 6/18). Maestria: Afligir.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "simple",
+      "rangeCategory": "ranged",
+      "damage": {
+        "dice": "1d4",
+        "type": "dnd2024:damage-type:perfurante"
+      },
+      "properties": [
+        "finesse",
+        "thrown"
+      ],
+      "range": {
+        "normal": "6",
+        "long": "18"
+      },
+      "mastery": "vex",
+      "weight": 0.15,
+      "cost": {
+        "amount": 5,
+        "currency": "cp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:funda",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Funda",
+      "description": "Propriedades: Munição (Alcance 9/36; Bala). Maestria: Lentidão.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "simple",
+      "rangeCategory": "ranged",
+      "damage": {
+        "dice": "1d4",
+        "type": "dnd2024:damage-type:contundente"
+      },
+      "properties": [
+        "ammunition"
+      ],
+      "range": {
+        "normal": "9",
+        "long": "36"
+      },
+      "ammunitionType": "Bala",
+      "mastery": "slow",
+      "cost": {
+        "amount": 1,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:alabarda",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Alabarda",
+      "description": "Propriedades: Duas Mãos, Extensão, Pesada. Maestria: Trespassar.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d10",
+        "type": "dnd2024:damage-type:cortante"
+      },
+      "properties": [
+        "two-handed",
+        "reach",
+        "heavy"
+      ],
+      "mastery": "cleave",
+      "weight": 3,
+      "cost": {
+        "amount": 20,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:chicote",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Chicote",
+      "description": "Propriedades: Acuidade, Extensão. Maestria: Lentidão.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d4",
+        "type": "dnd2024:damage-type:cortante"
+      },
+      "properties": [
+        "finesse",
+        "reach"
+      ],
+      "mastery": "slow",
+      "weight": 1.5,
+      "cost": {
+        "amount": 2,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:cimitarra",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Cimitarra",
+      "description": "Propriedades: Acuidade, Leve. Maestria: Ágil.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d6",
+        "type": "dnd2024:damage-type:cortante"
+      },
+      "properties": [
+        "finesse",
+        "light"
+      ],
+      "mastery": "nick",
+      "weight": 1.5,
+      "cost": {
+        "amount": 25,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:espada-curta",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Espada Curta",
+      "description": "Propriedades: Acuidade, Leve. Maestria: Afligir.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d6",
+        "type": "dnd2024:damage-type:perfurante"
+      },
+      "properties": [
+        "finesse",
+        "light"
+      ],
+      "mastery": "vex",
+      "weight": 1,
+      "cost": {
+        "amount": 10,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:espada-grande",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Espada Grande",
+      "description": "Propriedades: Duas Mãos, Pesada. Maestria: Garantido.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "2d6",
+        "type": "dnd2024:damage-type:cortante"
+      },
+      "properties": [
+        "two-handed",
+        "heavy"
+      ],
+      "mastery": "graze",
+      "weight": 3,
+      "cost": {
+        "amount": 50,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:espada-longa",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Espada Longa",
+      "description": "Propriedades: Versátil (1d10). Maestria: Drenar.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d8",
+        "type": "dnd2024:damage-type:cortante"
+      },
+      "properties": [
+        "versatile"
+      ],
+      "versatileDamage": "1d10",
+      "mastery": "sap",
+      "weight": 1.5,
+      "cost": {
+        "amount": 15,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:glaive",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Glaive",
+      "description": "Propriedades: Duas Mãos, Extensão, Pesada. Maestria: Garantido.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d10",
+        "type": "dnd2024:damage-type:cortante"
+      },
+      "properties": [
+        "two-handed",
+        "reach",
+        "heavy"
+      ],
+      "mastery": "graze",
+      "weight": 3,
+      "cost": {
+        "amount": 20,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:lanca-de-montaria",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Lança de Montaria",
+      "description": "Propriedades: Duas Mãos (a menos que montado), Extensão, Pesada. Maestria: Derrubar.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d10",
+        "type": "dnd2024:damage-type:perfurante"
+      },
+      "properties": [
+        "two-handed",
+        "reach",
+        "heavy"
+      ],
+      "propertyNotes": {
+        "two-handed": "a menos que montado"
+      },
+      "mastery": "topple",
+      "weight": 3,
+      "cost": {
+        "amount": 10,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:lanca-longa",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Lança Longa",
+      "description": "Propriedades: Duas Mãos, Extensão, Pesada. Maestria: Empurrar.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d10",
+        "type": "dnd2024:damage-type:perfurante"
+      },
+      "properties": [
+        "two-handed",
+        "reach",
+        "heavy"
+      ],
+      "mastery": "push",
+      "weight": 9,
+      "cost": {
+        "amount": 5,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:maca-estrela",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Maça Estrela",
+      "description": "Propriedades: —. Maestria: Drenar.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d8",
+        "type": "dnd2024:damage-type:perfurante"
+      },
+      "properties": [],
+      "mastery": "sap",
+      "weight": 2,
+      "cost": {
+        "amount": 15,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:machado-de-batalha",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Machado de Batalha",
+      "description": "Propriedades: Versátil (1d10). Maestria: Derrubar.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d8",
+        "type": "dnd2024:damage-type:cortante"
+      },
+      "properties": [
+        "versatile"
+      ],
+      "versatileDamage": "1d10",
+      "mastery": "topple",
+      "weight": 2,
+      "cost": {
+        "amount": 10,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:machado-grande",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Machado Grande",
+      "description": "Propriedades: Duas Mãos, Pesada. Maestria: Trespassar.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d12",
+        "type": "dnd2024:damage-type:cortante"
+      },
+      "properties": [
+        "two-handed",
+        "heavy"
+      ],
+      "mastery": "cleave",
+      "weight": 3.5,
+      "cost": {
+        "amount": 30,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:malho",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Malho",
+      "description": "Propriedades: Duas Mãos, Pesada. Maestria: Derrubar.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "2d6",
+        "type": "dnd2024:damage-type:contundente"
+      },
+      "properties": [
+        "two-handed",
+        "heavy"
+      ],
+      "mastery": "topple",
+      "weight": 5,
+      "cost": {
+        "amount": 10,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:mangual",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Mangual",
+      "description": "Propriedades: —. Maestria: Drenar.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d8",
+        "type": "dnd2024:damage-type:contundente"
+      },
+      "properties": [],
+      "mastery": "sap",
+      "weight": 1,
+      "cost": {
+        "amount": 10,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:martelo-de-guerra",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Martelo de Guerra",
+      "description": "Propriedades: Versátil (1d10). Maestria: Empurrar.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d8",
+        "type": "dnd2024:damage-type:contundente"
+      },
+      "properties": [
+        "versatile"
+      ],
+      "versatileDamage": "1d10",
+      "mastery": "push",
+      "weight": 2.5,
+      "cost": {
+        "amount": 15,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:picareta-de-guerra",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Picareta de Guerra",
+      "description": "Propriedades: Versátil (1d10). Maestria: Drenar.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d8",
+        "type": "dnd2024:damage-type:perfurante"
+      },
+      "properties": [
+        "versatile"
+      ],
+      "versatileDamage": "1d10",
+      "mastery": "sap",
+      "weight": 1,
+      "cost": {
+        "amount": 5,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:rapieira",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Rapieira",
+      "description": "Propriedades: Acuidade. Maestria: Afligir.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d8",
+        "type": "dnd2024:damage-type:perfurante"
+      },
+      "properties": [
+        "finesse"
+      ],
+      "mastery": "vex",
+      "weight": 1,
+      "cost": {
+        "amount": 25,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:tridente",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Tridente",
+      "description": "Propriedades: Arremesso (Alcance 6/18), Versátil (1d10). Maestria: Derrubar.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "melee",
+      "damage": {
+        "dice": "1d8",
+        "type": "dnd2024:damage-type:perfurante"
+      },
+      "properties": [
+        "thrown",
+        "versatile"
+      ],
+      "range": {
+        "normal": "6",
+        "long": "18"
+      },
+      "versatileDamage": "1d10",
+      "mastery": "topple",
+      "weight": 2,
+      "cost": {
+        "amount": 5,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:arco-longo",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Arco Longo",
+      "description": "Propriedades: Duas Mãos, Munição (Alcance 45/180; Flecha), Pesada. Maestria: Lentidão.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "ranged",
+      "damage": {
+        "dice": "1d8",
+        "type": "dnd2024:damage-type:perfurante"
+      },
+      "properties": [
+        "two-handed",
+        "ammunition",
+        "heavy"
+      ],
+      "range": {
+        "normal": "45",
+        "long": "180"
+      },
+      "ammunitionType": "Flecha",
+      "mastery": "slow",
+      "weight": 1,
+      "cost": {
+        "amount": 50,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:besta-de-mao",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Besta de Mão",
+      "description": "Propriedades: Leve, Munição (Alcance 9/36; Virote), Recarga. Maestria: Empurrar.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "ranged",
+      "damage": {
+        "dice": "1d6",
+        "type": "dnd2024:damage-type:perfurante"
+      },
+      "properties": [
+        "light",
+        "ammunition",
+        "loading"
+      ],
+      "range": {
+        "normal": "9",
+        "long": "36"
+      },
+      "ammunitionType": "Virote",
+      "mastery": "push",
+      "weight": 1.5,
+      "cost": {
+        "amount": 75,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:besta-pesada",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Besta Pesada",
+      "description": "Propriedades: Duas Mãos, Munição (Alcance 30/120; Virote), Pesada, Recarga. Maestria: Lentidão.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "ranged",
+      "damage": {
+        "dice": "1d10",
+        "type": "dnd2024:damage-type:perfurante"
+      },
+      "properties": [
+        "two-handed",
+        "ammunition",
+        "heavy",
+        "loading"
+      ],
+      "range": {
+        "normal": "30",
+        "long": "120"
+      },
+      "ammunitionType": "Virote",
+      "mastery": "slow",
+      "weight": 9,
+      "cost": {
+        "amount": 50,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:mosquete",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Mosquete",
+      "description": "Propriedades: Duas Mãos, Munição (Alcance 12/36; Bala), Recarga. Maestria: Lentidão.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "ranged",
+      "damage": {
+        "dice": "1d12",
+        "type": "dnd2024:damage-type:perfurante"
+      },
+      "properties": [
+        "two-handed",
+        "ammunition",
+        "loading"
+      ],
+      "range": {
+        "normal": "12",
+        "long": "36"
+      },
+      "ammunitionType": "Bala",
+      "mastery": "slow",
+      "weight": 5,
+      "cost": {
+        "amount": 500,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:pistola",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Pistola",
+      "description": "Propriedades: Munição (Alcance 9/27; Bala), Recarga. Maestria: Afligir.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "ranged",
+      "damage": {
+        "dice": "1d10",
+        "type": "dnd2024:damage-type:perfurante"
+      },
+      "properties": [
+        "ammunition",
+        "loading"
+      ],
+      "range": {
+        "normal": "9",
+        "long": "27"
+      },
+      "ammunitionType": "Bala",
+      "mastery": "vex",
+      "weight": 1.5,
+      "cost": {
+        "amount": 250,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:weapon:zarabatana",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Zarabatana",
+      "description": "Propriedades: Munição (Alcance 7,5/30; Agulha), Recarga. Maestria: Afligir.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "weaponCategory": "martial",
+      "rangeCategory": "ranged",
+      "damage": {
+        "dice": "1",
+        "type": "dnd2024:damage-type:perfurante"
+      },
+      "properties": [
+        "ammunition",
+        "loading"
+      ],
+      "range": {
+        "normal": "7,5",
+        "long": "30"
+      },
+      "ammunitionType": "Agulha",
+      "mastery": "vex",
+      "weight": 0.5,
+      "cost": {
+        "amount": 10,
+        "currency": "gp"
+      }
+    }
+  ]
+}

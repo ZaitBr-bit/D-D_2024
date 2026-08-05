@@ -15,7 +15,14 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Reaproveita o workflow de CI inteiro (checks, testes, Firestore Emulator,
+  # funcional/visual/PWA) — o deploy só prossegue se TUDO passar. É por isso
+  # que o job de publicação abaixo declara `needs: verify`.
+  verify:
+    uses: ./.github/workflows/ci.yml
+
   deploy:
+    needs: verify
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -23,33 +30,38 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Prepare site
-        run: |
-          # Monta o artifact preservando a estrutura atual servida em producao:
-          # raiz com redirect -> /site/, a app em site/ e os dados em dados/
-          # (a app usa BASE_PATH '../dados', que resolve para /D-D_2024/dados).
-          # Assim a URL publica continua .../D-D_2024/site/ apos migrar o Pages
-          # para GitHub Actions, e o sed passa a valer de fato em producao.
-          mkdir -p _dist
-          cp index.html _dist/index.html
-          cp -r site _dist/site
-          cp -r dados _dist/dados
-          # Lista de todos os JSON de dados para precache offline do Service Worker.
-          # URLs relativas ao escopo do SW (/site/): ../dados/....json
-          python3 - <<'PY'
-          import os, json
-          urls = []
-          for root, _, files in os.walk('_dist/dados'):
-              for f in files:
-                  if f.endswith('.json'):
-                      p = os.path.join(root, f).replace('_dist/dados', '../dados').replace(os.sep, '/')
-                      urls.append(p)
-          with open('_dist/site/dados-precache.json', 'w', encoding='utf-8') as fh:
-              json.dump(sorted(urls), fh, ensure_ascii=False)
-          PY
-          sed -i "s|const CACHE_VERSION = 0; // AUTO|const CACHE_VERSION = ${{ github.run_number }};|" _dist/site/sw.js
-          sed -i "s|v0</span><!-- VERSION_AUTO -->|v${{ github.run_number }}</span><!-- VERSION_AUTO -->|" _dist/site/index.html
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.17.1"
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: check:syntax
+        run: npm run check:syntax
+
+      - name: check:architecture
+        run: npm run check:architecture
+
+      - name: check:validators
+        run: npm run check:validators
+
+      # Gera o artifact de deploy de forma DETERMINÍSTICA (Task 35): copia
+      # site/ e dados/ byte-a-byte, injeta a versão via marcador único (sem
+      # sed, sem Python inline) e escreve o manifesto de precache com SHA-256
+      # real de cada asset.
+      - name: build:pages
+        run: npm run build:pages -- --out _dist --version "${{ github.sha }}-${{ github.run_number }}"
+
+      # Recalcula o mesmo grafo de completude contra o artifact JÁ
+      # construído e compara byte-a-byte — garante que o que será publicado é
+      # exatamente o que o Service Worker vai instalar.
+      - name: verify:pages
+        run: npm run verify:pages -- --dir _dist
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

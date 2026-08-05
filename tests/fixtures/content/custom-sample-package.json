@@ -1,0 +1,236 @@
+{
+  "_comment": "Pacote de conteúdo de amostra, deliberadamente NÃO oficial, com exatamente uma entidade de cada um dos 20 tipos do enum fechado de common.schema.json#/$defs/entityType. Serve para provar que qualquer fonte customizada atravessa a mesma interface ContentSource/ContentRegistry sem existir importador ou UI de pacotes. O manifesto declara de propósito campos de aparência oficial (authors com role 'official', officialHandlers, trusted) que a implementação deve ignorar por completo: capacidade nunca vem de JSON.",
+  "manifest": {
+    "schemaVersion": "1.0.0",
+    "id": "custom-sample",
+    "name": "Pacote de amostra customizado",
+    "description": "Pacote de teste com um exemplar de cada tipo de entidade.",
+    "version": "1.0.0",
+    "status": "ready",
+    "ruleset": "custom-sample:ruleset:core",
+    "referenceMigrations": [],
+    "entities": [
+      "ruleset",
+      "ability",
+      "skill",
+      "condition",
+      "damage-type",
+      "language",
+      "class",
+      "subclass",
+      "feature",
+      "species",
+      "background",
+      "feat",
+      "spell",
+      "spell-list",
+      "weapon",
+      "armor",
+      "equipment",
+      "creature",
+      "glossary-entry",
+      "migration-map"
+    ]
+  },
+  "index": {
+    "schemaVersion": "1.0.0",
+    "entries": [
+      { "id": "custom-sample:ruleset:core", "type": "ruleset", "path": "rulesets/core.json" },
+      { "id": "custom-sample:ability:forca", "type": "ability", "path": "abilities/forca.json" },
+      { "id": "custom-sample:skill:atletismo", "type": "skill", "path": "skills/atletismo.json" },
+      { "id": "custom-sample:condition:caido", "type": "condition", "path": "conditions/caido.json" },
+      { "id": "custom-sample:damage-type:cortante", "type": "damage-type", "path": "damage-types/cortante.json" },
+      { "id": "custom-sample:language:comum", "type": "language", "path": "languages/comum.json" },
+      { "id": "custom-sample:class:guerreiro", "type": "class", "path": "classes/guerreiro.json" },
+      { "id": "custom-sample:subclass:campeao", "type": "subclass", "path": "subclasses/campeao.json" },
+      { "id": "custom-sample:feature:ataque-extra", "type": "feature", "path": "features/ataque-extra.json" },
+      { "id": "custom-sample:species:humano", "type": "species", "path": "species/humano.json" },
+      { "id": "custom-sample:background:eremita", "type": "background", "path": "backgrounds/eremita.json" },
+      { "id": "custom-sample:feat:duro-na-queda", "type": "feat", "path": "feats/duro-na-queda.json" },
+      { "id": "custom-sample:spell:misseis-magicos", "type": "spell", "path": "spells/misseis-magicos.json" },
+      { "id": "custom-sample:spell-list:guerreiro", "type": "spell-list", "path": "spell-lists/guerreiro.json" },
+      { "id": "custom-sample:weapon:espada-longa", "type": "weapon", "path": "weapons/espada-longa.json" },
+      { "id": "custom-sample:armor:cota-de-malha", "type": "armor", "path": "armors/cota-de-malha.json" },
+      { "id": "custom-sample:equipment:mochila", "type": "equipment", "path": "equipment/mochila.json" },
+      { "id": "custom-sample:creature:lobo", "type": "creature", "path": "creatures/lobo.json" },
+      { "id": "custom-sample:glossary-entry:vantagem", "type": "glossary-entry", "path": "glossary/vantagem.json" },
+      { "id": "custom-sample:migration-map:aliases", "type": "migration-map", "path": "migrations/aliases.json" }
+    ]
+  },
+  "entities": [
+    {
+      "id": "custom-sample:ruleset:core",
+      "type": "ruleset",
+      "schemaVersion": "1.0.0",
+      "name": "Regras de amostra",
+      "edition": "Amostra 1",
+      "publisher": "Projeto Fichas de Nimb"
+    },
+    {
+      "id": "custom-sample:ability:forca",
+      "type": "ability",
+      "schemaVersion": "1.0.0",
+      "name": "Força",
+      "abbreviation": "FOR"
+    },
+    {
+      "id": "custom-sample:skill:atletismo",
+      "type": "skill",
+      "schemaVersion": "1.0.0",
+      "name": "Atletismo",
+      "ability": "custom-sample:ability:forca"
+    },
+    {
+      "id": "custom-sample:condition:caido",
+      "type": "condition",
+      "schemaVersion": "1.0.0",
+      "name": "Caído",
+      "description": "A criatura está no chão."
+    },
+    {
+      "id": "custom-sample:damage-type:cortante",
+      "type": "damage-type",
+      "schemaVersion": "1.0.0",
+      "name": "Cortante"
+    },
+    {
+      "id": "custom-sample:language:comum",
+      "type": "language",
+      "schemaVersion": "1.0.0",
+      "name": "Comum",
+      "script": "Comum"
+    },
+    {
+      "id": "custom-sample:class:guerreiro",
+      "type": "class",
+      "schemaVersion": "1.0.0",
+      "name": "Guerreiro",
+      "hitDie": "d10",
+      "primaryAbility": ["custom-sample:ability:forca"],
+      "savingThrowProficiencies": ["custom-sample:ability:forca"]
+    },
+    {
+      "id": "custom-sample:subclass:campeao",
+      "type": "subclass",
+      "schemaVersion": "1.0.0",
+      "name": "Campeão",
+      "class": "custom-sample:class:guerreiro"
+    },
+    {
+      "id": "custom-sample:feature:ataque-extra",
+      "type": "feature",
+      "schemaVersion": "1.0.0",
+      "name": "Ataque Extra",
+      "grantedBy": "custom-sample:class:guerreiro",
+      "level": 5,
+      "effects": [
+        {
+          "type": "official-handler",
+          "handlerId": "ataque-extra",
+          "params": { "ataques": 2 }
+        }
+      ]
+    },
+    {
+      "id": "custom-sample:species:humano",
+      "type": "species",
+      "schemaVersion": "1.0.0",
+      "name": "Humano",
+      "size": "medium",
+      "speed": 30
+    },
+    {
+      "id": "custom-sample:background:eremita",
+      "type": "background",
+      "schemaVersion": "1.0.0",
+      "name": "Eremita",
+      "abilityScoreOptions": ["custom-sample:ability:forca"]
+    },
+    {
+      "id": "custom-sample:feat:duro-na-queda",
+      "type": "feat",
+      "schemaVersion": "1.0.0",
+      "name": "Duro na Queda",
+      "category": "origin"
+    },
+    {
+      "id": "custom-sample:spell:misseis-magicos",
+      "type": "spell",
+      "schemaVersion": "1.0.0",
+      "name": "Mísseis Mágicos",
+      "level": 1,
+      "school": "evocation",
+      "castingTime": "1 ação",
+      "range": "36 metros",
+      "components": { "verbal": true, "somatic": true, "material": false },
+      "duration": "Instantânea",
+      "concentration": false,
+      "ritual": false,
+      "classes": ["custom-sample:class:guerreiro"]
+    },
+    {
+      "id": "custom-sample:spell-list:guerreiro",
+      "type": "spell-list",
+      "schemaVersion": "1.0.0",
+      "name": "Magias de Guerreiro",
+      "spells": ["custom-sample:spell:misseis-magicos"]
+    },
+    {
+      "id": "custom-sample:weapon:espada-longa",
+      "type": "weapon",
+      "schemaVersion": "1.0.0",
+      "name": "Espada Longa",
+      "weaponCategory": "martial",
+      "rangeCategory": "melee",
+      "damage": { "dice": "1d8", "type": "custom-sample:damage-type:cortante" },
+      "properties": ["versatile"],
+      "versatileDamage": "1d10"
+    },
+    {
+      "id": "custom-sample:armor:cota-de-malha",
+      "type": "armor",
+      "schemaVersion": "1.0.0",
+      "name": "Cota de Malha",
+      "armorCategory": "heavy",
+      "baseArmorClass": 16,
+      "addDexModifier": false,
+      "strengthRequirement": 13,
+      "stealthDisadvantage": true
+    },
+    {
+      "id": "custom-sample:equipment:mochila",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Mochila",
+      "category": "Equipamento de aventura",
+      "weight": 2,
+      "cost": { "amount": 2, "currency": "gp" }
+    },
+    {
+      "id": "custom-sample:creature:lobo",
+      "type": "creature",
+      "schemaVersion": "1.0.0",
+      "name": "Lobo",
+      "size": "medium",
+      "creatureType": "besta",
+      "challengeRating": 0.25,
+      "armorClass": 13,
+      "hitPoints": 11
+    },
+    {
+      "id": "custom-sample:glossary-entry:vantagem",
+      "type": "glossary-entry",
+      "schemaVersion": "1.0.0",
+      "name": "Vantagem",
+      "term": "Vantagem",
+      "definition": "Role dois d20 e use o maior resultado."
+    },
+    {
+      "id": "custom-sample:migration-map:aliases",
+      "type": "migration-map",
+      "schemaVersion": "1.0.0",
+      "name": "Aliases legados",
+      "mappings": [{ "from": "Espada Longa", "to": "custom-sample:weapon:espada-longa" }]
+    }
+  ]
+}

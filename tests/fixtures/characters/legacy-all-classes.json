@@ -1,0 +1,1616 @@
+{
+  "fixtureVersion": 1,
+  "compatibilityBaseline": "e43c5ea",
+  "generatedAt": "2026-07-26T00:00:00.000Z",
+  "cases": [
+    {
+      "id": "classe-barbaro",
+      "descricao": "Personagem nível 1 da classe Bárbaro (dado de vida d12, salvaguardas Força/Constituição, não-conjurador).",
+      "origemReal": "site/js/dados-classes.js#CLASSES_INFO (import real, sem cópia manual)",
+      "classeInfoEsperado": {
+        "dado_vida": 12,
+        "atributo_primario": "Força",
+        "salvaguardas": [
+          "Força",
+          "Constituição"
+        ],
+        "armaduras": [
+          "Leve",
+          "Média",
+          "Escudo"
+        ],
+        "armas": [
+          "Simples",
+          "Marcial"
+        ],
+        "pericias_opcoes": [
+          "Lidar com Animais",
+          "Atletismo",
+          "Intimidação",
+          "Natureza",
+          "Percepção",
+          "Sobrevivência"
+        ],
+        "num_pericias": 2,
+        "conjurador": false,
+        "atributo_conjuracao": null
+      },
+      "personagem": {
+        "id": "cl01-cl01-cl01",
+        "nome": "Exemplo de Bárbaro",
+        "imagem": "",
+        "nivel": 1,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Bárbaro",
+        "subclasse": "",
+        "especie": "",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 0,
+        "pv_atual": 0,
+        "pv_temporario": 0,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 0,
+        "pericias_proficientes": [],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [
+          "Força",
+          "Constituição"
+        ],
+        "inventario": [],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [],
+        "grimorio": [],
+        "espacos_magia": {},
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z"
+      }
+    },
+    {
+      "id": "classe-bardo",
+      "descricao": "Personagem nível 1 da classe Bardo (dado de vida d8, salvaguardas Destreza/Carisma, conjurador tipo \"conhecidas\" via Carisma).",
+      "origemReal": "site/js/dados-classes.js#CLASSES_INFO (import real, sem cópia manual)",
+      "classeInfoEsperado": {
+        "dado_vida": 8,
+        "atributo_primario": "Carisma",
+        "salvaguardas": [
+          "Destreza",
+          "Carisma"
+        ],
+        "armaduras": [
+          "Leve"
+        ],
+        "armas": [
+          "Simples"
+        ],
+        "pericias_opcoes": null,
+        "num_pericias": 3,
+        "conjurador": true,
+        "atributo_conjuracao": "Carisma",
+        "tipo_conjuracao": "conhecidas"
+      },
+      "personagem": {
+        "id": "cl02-cl02-cl02",
+        "nome": "Exemplo de Bardo",
+        "imagem": "",
+        "nivel": 1,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Bardo",
+        "subclasse": "",
+        "especie": "",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 0,
+        "pv_atual": 0,
+        "pv_temporario": 0,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 0,
+        "pericias_proficientes": [],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [
+          "Destreza",
+          "Carisma"
+        ],
+        "inventario": [],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [],
+        "grimorio": [],
+        "espacos_magia": {},
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z"
+      }
+    },
+    {
+      "id": "classe-bruxo",
+      "descricao": "Personagem nível 1 da classe Bruxo (dado de vida d8, salvaguardas Sabedoria/Carisma, conjurador tipo \"conhecidas\" via Carisma).",
+      "origemReal": "site/js/dados-classes.js#CLASSES_INFO (import real, sem cópia manual)",
+      "classeInfoEsperado": {
+        "dado_vida": 8,
+        "atributo_primario": "Carisma",
+        "salvaguardas": [
+          "Sabedoria",
+          "Carisma"
+        ],
+        "armaduras": [
+          "Leve"
+        ],
+        "armas": [
+          "Simples"
+        ],
+        "pericias_opcoes": [
+          "Arcanismo",
+          "Enganação",
+          "História",
+          "Intimidação",
+          "Investigação",
+          "Natureza",
+          "Religião"
+        ],
+        "num_pericias": 2,
+        "conjurador": true,
+        "atributo_conjuracao": "Carisma",
+        "tipo_conjuracao": "conhecidas"
+      },
+      "personagem": {
+        "id": "cl03-cl03-cl03",
+        "nome": "Exemplo de Bruxo",
+        "imagem": "",
+        "nivel": 1,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Bruxo",
+        "subclasse": "",
+        "especie": "",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 0,
+        "pv_atual": 0,
+        "pv_temporario": 0,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 0,
+        "pericias_proficientes": [],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [
+          "Sabedoria",
+          "Carisma"
+        ],
+        "inventario": [],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [],
+        "grimorio": [],
+        "espacos_magia": {},
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z"
+      }
+    },
+    {
+      "id": "classe-clerigo",
+      "descricao": "Personagem nível 1 da classe Clérigo (dado de vida d8, salvaguardas Sabedoria/Carisma, conjurador tipo \"preparadas\" via Sabedoria).",
+      "origemReal": "site/js/dados-classes.js#CLASSES_INFO (import real, sem cópia manual)",
+      "classeInfoEsperado": {
+        "dado_vida": 8,
+        "atributo_primario": "Sabedoria",
+        "salvaguardas": [
+          "Sabedoria",
+          "Carisma"
+        ],
+        "armaduras": [
+          "Leve",
+          "Média",
+          "Escudo"
+        ],
+        "armas": [
+          "Simples"
+        ],
+        "pericias_opcoes": [
+          "História",
+          "Intuição",
+          "Medicina",
+          "Persuasão",
+          "Religião"
+        ],
+        "num_pericias": 2,
+        "conjurador": true,
+        "atributo_conjuracao": "Sabedoria",
+        "tipo_conjuracao": "preparadas"
+      },
+      "personagem": {
+        "id": "cl04-cl04-cl04",
+        "nome": "Exemplo de Clérigo",
+        "imagem": "",
+        "nivel": 1,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Clérigo",
+        "subclasse": "",
+        "especie": "",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 0,
+        "pv_atual": 0,
+        "pv_temporario": 0,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 0,
+        "pericias_proficientes": [],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [
+          "Sabedoria",
+          "Carisma"
+        ],
+        "inventario": [],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [],
+        "grimorio": [],
+        "espacos_magia": {},
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z"
+      }
+    },
+    {
+      "id": "classe-druida",
+      "descricao": "Personagem nível 1 da classe Druida (dado de vida d8, salvaguardas Inteligência/Sabedoria, conjurador tipo \"preparadas\" via Sabedoria).",
+      "origemReal": "site/js/dados-classes.js#CLASSES_INFO (import real, sem cópia manual)",
+      "classeInfoEsperado": {
+        "dado_vida": 8,
+        "atributo_primario": "Sabedoria",
+        "salvaguardas": [
+          "Inteligência",
+          "Sabedoria"
+        ],
+        "armaduras": [
+          "Leve",
+          "Escudo"
+        ],
+        "armas": [
+          "Simples"
+        ],
+        "pericias_opcoes": [
+          "Arcanismo",
+          "Lidar com Animais",
+          "Intuição",
+          "Medicina",
+          "Natureza",
+          "Percepção",
+          "Religião",
+          "Sobrevivência"
+        ],
+        "num_pericias": 2,
+        "conjurador": true,
+        "atributo_conjuracao": "Sabedoria",
+        "tipo_conjuracao": "preparadas"
+      },
+      "personagem": {
+        "id": "cl05-cl05-cl05",
+        "nome": "Exemplo de Druida",
+        "imagem": "",
+        "nivel": 1,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Druida",
+        "subclasse": "",
+        "especie": "",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 0,
+        "pv_atual": 0,
+        "pv_temporario": 0,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 0,
+        "pericias_proficientes": [],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [
+          "Inteligência",
+          "Sabedoria"
+        ],
+        "inventario": [],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [],
+        "grimorio": [],
+        "espacos_magia": {},
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z"
+      }
+    },
+    {
+      "id": "classe-feiticeiro",
+      "descricao": "Personagem nível 1 da classe Feiticeiro (dado de vida d6, salvaguardas Constituição/Carisma, conjurador tipo \"conhecidas\" via Carisma).",
+      "origemReal": "site/js/dados-classes.js#CLASSES_INFO (import real, sem cópia manual)",
+      "classeInfoEsperado": {
+        "dado_vida": 6,
+        "atributo_primario": "Carisma",
+        "salvaguardas": [
+          "Constituição",
+          "Carisma"
+        ],
+        "armaduras": [],
+        "armas": [
+          "Simples"
+        ],
+        "pericias_opcoes": [
+          "Arcanismo",
+          "Enganação",
+          "Intuição",
+          "Intimidação",
+          "Persuasão",
+          "Religião"
+        ],
+        "num_pericias": 2,
+        "conjurador": true,
+        "atributo_conjuracao": "Carisma",
+        "tipo_conjuracao": "conhecidas"
+      },
+      "personagem": {
+        "id": "cl06-cl06-cl06",
+        "nome": "Exemplo de Feiticeiro",
+        "imagem": "",
+        "nivel": 1,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Feiticeiro",
+        "subclasse": "",
+        "especie": "",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 0,
+        "pv_atual": 0,
+        "pv_temporario": 0,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 0,
+        "pericias_proficientes": [],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [
+          "Constituição",
+          "Carisma"
+        ],
+        "inventario": [],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [],
+        "grimorio": [],
+        "espacos_magia": {},
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z"
+      }
+    },
+    {
+      "id": "classe-guardiao",
+      "descricao": "Personagem nível 1 da classe Guardião (dado de vida d10, salvaguardas Força/Destreza, conjurador tipo \"preparadas\" via Sabedoria).",
+      "origemReal": "site/js/dados-classes.js#CLASSES_INFO (import real, sem cópia manual)",
+      "classeInfoEsperado": {
+        "dado_vida": 10,
+        "atributo_primario": "Destreza e Sabedoria",
+        "salvaguardas": [
+          "Força",
+          "Destreza"
+        ],
+        "armaduras": [
+          "Leve",
+          "Média",
+          "Escudo"
+        ],
+        "armas": [
+          "Simples",
+          "Marcial"
+        ],
+        "pericias_opcoes": [
+          "Lidar com Animais",
+          "Atletismo",
+          "Furtividade",
+          "Intuição",
+          "Investigação",
+          "Natureza",
+          "Percepção",
+          "Sobrevivência"
+        ],
+        "num_pericias": 3,
+        "conjurador": true,
+        "atributo_conjuracao": "Sabedoria",
+        "tipo_conjuracao": "preparadas"
+      },
+      "personagem": {
+        "id": "cl07-cl07-cl07",
+        "nome": "Exemplo de Guardião",
+        "imagem": "",
+        "nivel": 1,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Guardião",
+        "subclasse": "",
+        "especie": "",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 0,
+        "pv_atual": 0,
+        "pv_temporario": 0,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 0,
+        "pericias_proficientes": [],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [
+          "Força",
+          "Destreza"
+        ],
+        "inventario": [],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [],
+        "grimorio": [],
+        "espacos_magia": {},
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z"
+      }
+    },
+    {
+      "id": "classe-guerreiro",
+      "descricao": "Personagem nível 1 da classe Guerreiro (dado de vida d10, salvaguardas Força/Constituição, não-conjurador).",
+      "origemReal": "site/js/dados-classes.js#CLASSES_INFO (import real, sem cópia manual)",
+      "classeInfoEsperado": {
+        "dado_vida": 10,
+        "atributo_primario": "Força ou Destreza",
+        "salvaguardas": [
+          "Força",
+          "Constituição"
+        ],
+        "armaduras": [
+          "Leve",
+          "Média",
+          "Pesada",
+          "Escudo"
+        ],
+        "armas": [
+          "Simples",
+          "Marcial"
+        ],
+        "pericias_opcoes": [
+          "Acrobacia",
+          "Lidar com Animais",
+          "Atletismo",
+          "História",
+          "Intimidação",
+          "Intuição",
+          "Percepção",
+          "Persuasão",
+          "Sobrevivência"
+        ],
+        "num_pericias": 2,
+        "conjurador": false,
+        "atributo_conjuracao": null
+      },
+      "personagem": {
+        "id": "cl08-cl08-cl08",
+        "nome": "Exemplo de Guerreiro",
+        "imagem": "",
+        "nivel": 1,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Guerreiro",
+        "subclasse": "",
+        "especie": "",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 0,
+        "pv_atual": 0,
+        "pv_temporario": 0,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 0,
+        "pericias_proficientes": [],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [
+          "Força",
+          "Constituição"
+        ],
+        "inventario": [],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [],
+        "grimorio": [],
+        "espacos_magia": {},
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z"
+      }
+    },
+    {
+      "id": "classe-ladino",
+      "descricao": "Personagem nível 1 da classe Ladino (dado de vida d8, salvaguardas Destreza/Inteligência, não-conjurador).",
+      "origemReal": "site/js/dados-classes.js#CLASSES_INFO (import real, sem cópia manual)",
+      "classeInfoEsperado": {
+        "dado_vida": 8,
+        "atributo_primario": "Destreza",
+        "salvaguardas": [
+          "Destreza",
+          "Inteligência"
+        ],
+        "armaduras": [
+          "Leve"
+        ],
+        "armas": [
+          "Simples",
+          "Marcial (Acuidade)"
+        ],
+        "pericias_opcoes": [
+          "Acrobacia",
+          "Atletismo",
+          "Enganação",
+          "Furtividade",
+          "Intimidação",
+          "Intuição",
+          "Investigação",
+          "Percepção",
+          "Persuasão",
+          "Prestidigitação"
+        ],
+        "num_pericias": 4,
+        "conjurador": false,
+        "atributo_conjuracao": null
+      },
+      "personagem": {
+        "id": "cl09-cl09-cl09",
+        "nome": "Exemplo de Ladino",
+        "imagem": "",
+        "nivel": 1,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Ladino",
+        "subclasse": "",
+        "especie": "",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 0,
+        "pv_atual": 0,
+        "pv_temporario": 0,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 0,
+        "pericias_proficientes": [],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [
+          "Destreza",
+          "Inteligência"
+        ],
+        "inventario": [],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [],
+        "grimorio": [],
+        "espacos_magia": {},
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z"
+      }
+    },
+    {
+      "id": "classe-mago",
+      "descricao": "Personagem nível 1 da classe Mago (dado de vida d6, salvaguardas Inteligência/Sabedoria, conjurador tipo \"preparadas\" via Inteligência).",
+      "origemReal": "site/js/dados-classes.js#CLASSES_INFO (import real, sem cópia manual)",
+      "classeInfoEsperado": {
+        "dado_vida": 6,
+        "atributo_primario": "Inteligência",
+        "salvaguardas": [
+          "Inteligência",
+          "Sabedoria"
+        ],
+        "armaduras": [],
+        "armas": [
+          "Simples"
+        ],
+        "pericias_opcoes": [
+          "Arcanismo",
+          "História",
+          "Intuição",
+          "Investigação",
+          "Medicina",
+          "Religião"
+        ],
+        "num_pericias": 2,
+        "conjurador": true,
+        "atributo_conjuracao": "Inteligência",
+        "tipo_conjuracao": "preparadas"
+      },
+      "personagem": {
+        "id": "cl10-cl10-cl10",
+        "nome": "Exemplo de Mago",
+        "imagem": "",
+        "nivel": 1,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Mago",
+        "subclasse": "",
+        "especie": "",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 0,
+        "pv_atual": 0,
+        "pv_temporario": 0,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 0,
+        "pericias_proficientes": [],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [
+          "Inteligência",
+          "Sabedoria"
+        ],
+        "inventario": [],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [],
+        "grimorio": [],
+        "espacos_magia": {},
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z"
+      }
+    },
+    {
+      "id": "classe-monge",
+      "descricao": "Personagem nível 1 da classe Monge (dado de vida d8, salvaguardas Força/Destreza, não-conjurador).",
+      "origemReal": "site/js/dados-classes.js#CLASSES_INFO (import real, sem cópia manual)",
+      "classeInfoEsperado": {
+        "dado_vida": 8,
+        "atributo_primario": "Destreza e Sabedoria",
+        "salvaguardas": [
+          "Força",
+          "Destreza"
+        ],
+        "armaduras": [],
+        "armas": [
+          "Simples",
+          "Marcial (Leve)"
+        ],
+        "pericias_opcoes": [
+          "Acrobacia",
+          "Atletismo",
+          "Furtividade",
+          "História",
+          "Intuição",
+          "Religião"
+        ],
+        "num_pericias": 2,
+        "conjurador": false,
+        "atributo_conjuracao": null
+      },
+      "personagem": {
+        "id": "cl11-cl11-cl11",
+        "nome": "Exemplo de Monge",
+        "imagem": "",
+        "nivel": 1,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Monge",
+        "subclasse": "",
+        "especie": "",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 0,
+        "pv_atual": 0,
+        "pv_temporario": 0,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 0,
+        "pericias_proficientes": [],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [
+          "Força",
+          "Destreza"
+        ],
+        "inventario": [],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [],
+        "grimorio": [],
+        "espacos_magia": {},
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z"
+      }
+    },
+    {
+      "id": "classe-paladino",
+      "descricao": "Personagem nível 1 da classe Paladino (dado de vida d10, salvaguardas Sabedoria/Carisma, conjurador tipo \"preparadas\" via Carisma).",
+      "origemReal": "site/js/dados-classes.js#CLASSES_INFO (import real, sem cópia manual)",
+      "classeInfoEsperado": {
+        "dado_vida": 10,
+        "atributo_primario": "Força e Carisma",
+        "salvaguardas": [
+          "Sabedoria",
+          "Carisma"
+        ],
+        "armaduras": [
+          "Leve",
+          "Média",
+          "Pesada",
+          "Escudo"
+        ],
+        "armas": [
+          "Simples",
+          "Marcial"
+        ],
+        "pericias_opcoes": [
+          "Atletismo",
+          "Intimidação",
+          "Intuição",
+          "Medicina",
+          "Persuasão",
+          "Religião"
+        ],
+        "num_pericias": 2,
+        "conjurador": true,
+        "atributo_conjuracao": "Carisma",
+        "tipo_conjuracao": "preparadas"
+      },
+      "personagem": {
+        "id": "cl12-cl12-cl12",
+        "nome": "Exemplo de Paladino",
+        "imagem": "",
+        "nivel": 1,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Paladino",
+        "subclasse": "",
+        "especie": "",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 0,
+        "pv_atual": 0,
+        "pv_temporario": 0,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 0,
+        "pericias_proficientes": [],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [
+          "Sabedoria",
+          "Carisma"
+        ],
+        "inventario": [],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [],
+        "magias_preparadas": [],
+        "grimorio": [],
+        "espacos_magia": {},
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z"
+      }
+    }
+  ]
+}

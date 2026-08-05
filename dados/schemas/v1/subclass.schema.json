@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.fichas-de-nimb.dev/v1/subclass.schema.json",
+  "title": "Subclass entity (v1)",
+  "description": "Subclasse (ex.: Campeão), sempre associada a uma classe pai.",
+  "type": "object",
+  "allOf": [
+    { "$ref": "common.schema.json#/$defs/entityBase" },
+    {
+      "type": "object",
+      "properties": {
+        "type": { "const": "subclass" },
+        "class": { "$ref": "common.schema.json#/$defs/classRef" }
+      },
+      "required": ["type", "class"]
+    }
+  ],
+  "unevaluatedProperties": false
+}

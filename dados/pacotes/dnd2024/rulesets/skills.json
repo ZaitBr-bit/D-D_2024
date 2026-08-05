@@ -1,0 +1,132 @@
+{
+  "schemaVersion": "1.0.0",
+  "type": "skill",
+  "items": [
+    {
+      "id": "dnd2024:skill:acrobacia",
+      "type": "skill",
+      "schemaVersion": "1.0.0",
+      "name": "Acrobacia",
+      "ability": "dnd2024:ability:destreza"
+    },
+    {
+      "id": "dnd2024:skill:arcanismo",
+      "type": "skill",
+      "schemaVersion": "1.0.0",
+      "name": "Arcanismo",
+      "ability": "dnd2024:ability:inteligencia"
+    },
+    {
+      "id": "dnd2024:skill:atletismo",
+      "type": "skill",
+      "schemaVersion": "1.0.0",
+      "name": "Atletismo",
+      "ability": "dnd2024:ability:forca"
+    },
+    {
+      "id": "dnd2024:skill:atuacao",
+      "type": "skill",
+      "schemaVersion": "1.0.0",
+      "name": "Atuação",
+      "ability": "dnd2024:ability:carisma"
+    },
+    {
+      "id": "dnd2024:skill:enganacao",
+      "type": "skill",
+      "schemaVersion": "1.0.0",
+      "name": "Enganação",
+      "ability": "dnd2024:ability:carisma"
+    },
+    {
+      "id": "dnd2024:skill:furtividade",
+      "type": "skill",
+      "schemaVersion": "1.0.0",
+      "name": "Furtividade",
+      "ability": "dnd2024:ability:destreza"
+    },
+    {
+      "id": "dnd2024:skill:historia",
+      "type": "skill",
+      "schemaVersion": "1.0.0",
+      "name": "História",
+      "ability": "dnd2024:ability:inteligencia"
+    },
+    {
+      "id": "dnd2024:skill:intimidacao",
+      "type": "skill",
+      "schemaVersion": "1.0.0",
+      "name": "Intimidação",
+      "ability": "dnd2024:ability:carisma"
+    },
+    {
+      "id": "dnd2024:skill:intuicao",
+      "type": "skill",
+      "schemaVersion": "1.0.0",
+      "name": "Intuição",
+      "ability": "dnd2024:ability:sabedoria"
+    },
+    {
+      "id": "dnd2024:skill:investigacao",
+      "type": "skill",
+      "schemaVersion": "1.0.0",
+      "name": "Investigação",
+      "ability": "dnd2024:ability:inteligencia"
+    },
+    {
+      "id": "dnd2024:skill:lidar-com-animais",
+      "type": "skill",
+      "schemaVersion": "1.0.0",
+      "name": "Lidar com Animais",
+      "ability": "dnd2024:ability:sabedoria"
+    },
+    {
+      "id": "dnd2024:skill:medicina",
+      "type": "skill",
+      "schemaVersion": "1.0.0",
+      "name": "Medicina",
+      "ability": "dnd2024:ability:sabedoria"
+    },
+    {
+      "id": "dnd2024:skill:natureza",
+      "type": "skill",
+      "schemaVersion": "1.0.0",
+      "name": "Natureza",
+      "ability": "dnd2024:ability:inteligencia"
+    },
+    {
+      "id": "dnd2024:skill:percepcao",
+      "type": "skill",
+      "schemaVersion": "1.0.0",
+      "name": "Percepção",
+      "ability": "dnd2024:ability:sabedoria"
+    },
+    {
+      "id": "dnd2024:skill:persuasao",
+      "type": "skill",
+      "schemaVersion": "1.0.0",
+      "name": "Persuasão",
+      "ability": "dnd2024:ability:carisma"
+    },
+    {
+      "id": "dnd2024:skill:prestidigitacao",
+      "type": "skill",
+      "schemaVersion": "1.0.0",
+      "name": "Prestidigitação",
+      "ability": "dnd2024:ability:destreza"
+    },
+    {
+      "id": "dnd2024:skill:religiao",
+      "type": "skill",
+      "schemaVersion": "1.0.0",
+      "name": "Religião",
+      "ability": "dnd2024:ability:inteligencia"
+    },
+    {
+      "id": "dnd2024:skill:sobrevivencia",
+      "type": "skill",
+      "schemaVersion": "1.0.0",
+      "name": "Sobrevivência",
+      "ability": "dnd2024:ability:sabedoria"
+    }
+  ]
+}

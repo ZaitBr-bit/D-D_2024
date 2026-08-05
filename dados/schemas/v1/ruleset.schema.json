@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.fichas-de-nimb.dev/v1/ruleset.schema.json",
+  "title": "Ruleset entity (v1)",
+  "description": "Entidade que identifica uma edição/fonte de regras (ex.: 'PHB 2024'), referenciada por manifest.ruleset. `tables` (acrescentado na Task 7) reúne as referências tipadas às coleções auxiliares do pacote (atributos, perícias, salvaguardas, condições, tipos de dano, idiomas, tamanhos) e as tabelas numéricas básicas (moedas, array padrão, point-buy, progressão de proficiência, XP por nível, regras de descanso) que hoje ficam hardcoded no monólito legado — a entidade ruleset central de um pacote é o único lugar canônico para essas tabelas cruzarem referências tipadas para as outras entidades do pacote.",
+  "type": "object",
+  "allOf": [
+    { "$ref": "common.schema.json#/$defs/entityBase" },
+    {
+      "type": "object",
+      "properties": {
+        "type": { "const": "ruleset" },
+        "edition": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+        "publisher": { "type": "string" },
+        "tables": {
+          "type": "object",
+          "description": "Tabelas básicas do sistema de regras: referências tipadas às coleções auxiliares e os valores numéricos fixos de criação/progressão de personagem.",
+          "properties": {
+            "abilities": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "$ref": "common.schema.json#/$defs/abilityRef" }
+            },
+            "skills": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "$ref": "common.schema.json#/$defs/skillRef" }
+            },
+            "savingThrows": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "$ref": "common.schema.json#/$defs/abilityRef" }
+            },
+            "conditions": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "$ref": "common.schema.json#/$defs/conditionRef" }
+            },
+            "damageTypes": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "$ref": "common.schema.json#/$defs/damageTypeRef" }
+            },
+            "languages": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "$ref": "common.schema.json#/$defs/languageRef" }
+            },
+            "sizes": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "enum": ["tiny", "small", "medium", "large", "huge", "gargantuan"] }
+            },
+            "currency": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "code": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+                  "name": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+                  "copperValue": { "type": "integer", "minimum": 1 }
+                },
+                "required": ["code", "name", "copperValue"],
+                "additionalProperties": false
+              }
+            },
+            "standardArray": {
+              "type": "array",
+              "minItems": 6,
+              "maxItems": 6,
+              "items": { "type": "integer", "minimum": 1 }
+            },
+            "pointBuy": {
+              "type": "object",
+              "properties": {
+                "budget": { "type": "integer", "minimum": 1 },
+                "minScore": { "type": "integer", "minimum": 1 },
+                "maxScore": { "type": "integer", "minimum": 1 },
+                "costs": {
+                  "type": "object",
+                  "additionalProperties": { "type": "integer", "minimum": 0 }
+                }
+              },
+              "required": ["budget", "minScore", "maxScore", "costs"],
+              "additionalProperties": false
+            },
+            "proficiencyBonusByLevel": {
+              "type": "array",
+              "minItems": 20,
+              "maxItems": 20,
+              "items": { "type": "integer", "minimum": 2 }
+            },
+            "experienceByLevel": {
+              "type": "array",
+              "minItems": 20,
+              "maxItems": 20,
+              "items": { "type": "integer", "minimum": 0 }
+            },
+            "weaponProperties": {
+              "type": "array",
+              "description": "Glossário das propriedades de arma (Acuidade, Alcance, Arremesso, ...), na ordem em que o capítulo de equipamento as apresenta. Acrescentado na Task 23b: o legado publicava esse dicionário como um bloco solto no topo de `dados/equipamento/armas.json`, e a entidade ruleset é o único lugar canônico do pacote para uma tabela de vocabulário que vale para TODAS as armas em vez de para uma.",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+                  "description": { "$ref": "common.schema.json#/$defs/nonEmptyString" }
+                },
+                "required": ["name", "description"],
+                "additionalProperties": false
+              }
+            },
+            "restRules": {
+              "type": "object",
+              "properties": {
+                "shortRest": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+                "longRest": { "$ref": "common.schema.json#/$defs/nonEmptyString" }
+              },
+              "required": ["shortRest", "longRest"],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["type", "edition"]
+    }
+  ],
+  "unevaluatedProperties": false
+}

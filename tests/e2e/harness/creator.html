@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Harness — criador (features/creator)</title>
+<!--
+  Página de HARNESS. Serve exclusivamente aos testes E2E da Task 25 e não faz
+  parte do artifact publicado (fica fora de `site/`). Ela existe para montar o
+  controller/step registry novos com portas em memória, num navegador real,
+  antes do cutover público do criador.
+
+  Nenhum `onclick` inline aqui, de propósito: o controller instala listeners
+  delegados na raiz, exatamente como fará no app.
+-->
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0; padding: 16px; }
+  .harness-col { display: inline-block; vertical-align: top; width: 48%; }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); align-items: center; justify-content: center; }
+  .modal-container { background: #fff; min-width: 280px; max-width: 90vw; }
+  .placeholder-option { display: block; width: 100%; text-align: left; }
+</style>
+</head>
+<body>
+  <h1>Harness do criador</h1>
+  <p>Duas sessões simultâneas, isoladas, sobre <code>features/creator</code>.</p>
+
+  <div class="harness-col"><h2>Sessão A</h2><div id="creator-a"></div></div>
+  <div class="harness-col"><h2>Sessão B</h2><div id="creator-b"></div></div>
+
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-container" id="modal-container">
+      <div class="modal-header">
+        <h2 id="modal-titulo"></h2>
+        <button class="modal-fechar" id="modal-fechar" type="button">&times;</button>
+      </div>
+      <div class="modal-corpo" id="modal-corpo"></div>
+      <div class="modal-acoes" id="modal-acoes"></div>
+    </div>
+  </div>
+
+  <script type="module" src="./creator-harness.js"></script>
+</body>
+</html>

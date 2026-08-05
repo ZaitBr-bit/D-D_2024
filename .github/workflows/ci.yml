@@ -1,0 +1,141 @@
+name: CI
+
+# Workflow reutilizável (Task 36): acionado diretamente em push/pull_request
+# para validar a branch, e também chamado por deploy.yml (job `verify`) antes
+# de publicar — o deploy NUNCA publica se este workflow falhar (Firebase,
+# browser, visual ou PWA), porque deploy.yml declara `needs: verify`.
+on:
+  push:
+    branches: ["main", "refatoracao"]
+  pull_request:
+  workflow_call:
+
+env:
+  NODE_VERSION: "22.17.1"
+  PYTHON_VERSION: "3.12"
+  JAVA_VERSION: "21"
+
+jobs:
+  # ----------------------------------------------------------------------
+  # Node/dados/deploy: checks estáticos, testes de unidade/contrato/
+  # integração/deploy, geração determinística do artifact Pages e o
+  # contrato do extrator Python (_extrair_json.py).
+  # ----------------------------------------------------------------------
+  node-data-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "${{ env.NODE_VERSION }}"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "${{ env.PYTHON_VERSION }}"
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: check:syntax
+        run: npm run check:syntax
+
+      - name: check:architecture
+        run: npm run check:architecture
+
+      - name: check:entrypoints (composition roots finos, Task 37)
+        run: npm run check:entrypoints
+
+      - name: check:inline-handlers (sem handler inline / globais fora da allowlist)
+        run: npm run check:inline-handlers
+
+      - name: check:validators
+        run: npm run check:validators
+
+      - name: validate:data
+        run: npm run validate:data
+
+      - name: test:node (unit + contract + integration + deploy)
+        run: npm run test:node
+
+      - name: test:extractor (contrato Python)
+        run: npm run test:extractor
+
+      - name: build:pages (artifact determinístico)
+        run: npm run build:pages -- --out _dist --version "ci-${{ github.run_id }}"
+
+      - name: verify:pages
+        run: npm run verify:pages -- --dir _dist
+
+  # ----------------------------------------------------------------------
+  # Firestore Emulator: testes de integração com Firebase real (emulado).
+  # Requer Java 21 (runtime do emulador).
+  # ----------------------------------------------------------------------
+  firestore-emulator:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "${{ env.NODE_VERSION }}"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "${{ env.JAVA_VERSION }}"
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: test:firebase (Firestore Emulator)
+        run: npm run test:firebase
+
+  # ----------------------------------------------------------------------
+  # Browser: funcional, visual e PWA — imagem oficial do Playwright, que já
+  # traz Chromium/Firefox/WebKit com as dependências de sistema corretas.
+  # Screenshots NUNCA são atualizados aqui (sem --update-snapshots).
+  # ----------------------------------------------------------------------
+  browser:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.0-noble
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "${{ env.NODE_VERSION }}"
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: test:e2e (funcional, todos os browsers)
+        run: npm run test:e2e
+
+      # Round-trip contra o baseline `e43c5ea` (Task 37). O materializador
+      # reconstrói a aplicação legada com `git show`, por isso o checkout
+      # deste job PRECISA de fetch-depth: 0 (o commit-baseline não existiria
+      # num clone raso).
+      - name: test:e2e:compat (round-trip com o baseline e43c5ea)
+        run: npm run test:e2e:compat
+
+      - name: test:e2e:pwa (Service Worker transacional)
+        run: npm run test:e2e:pwa
+
+      - name: test:e2e:visual (screenshots — nunca atualizados)
+        run: npm run test:e2e:visual

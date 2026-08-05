@@ -1,0 +1,111 @@
+{
+  "schemaVersion": "1.0.0",
+  "type": "condition",
+  "items": [
+    {
+      "id": "dnd2024:condition:agarrado",
+      "type": "condition",
+      "schemaVersion": "1.0.0",
+      "name": "Agarrado",
+      "description": "O deslocamento de uma criatura Agarrada se torna 0, e ela não pode se beneficiar de nenhum bônus ao seu deslocamento."
+    },
+    {
+      "id": "dnd2024:condition:amedrontado",
+      "type": "condition",
+      "schemaVersion": "1.0.0",
+      "name": "Amedrontado",
+      "description": "Uma criatura Amedrontada tem Desvantagem em testes de habilidade e jogadas de ataque enquanto a fonte do medo estiver dentro da linha de visão, e não pode se aproximar voluntariamente dela."
+    },
+    {
+      "id": "dnd2024:condition:atordoado",
+      "type": "condition",
+      "schemaVersion": "1.0.0",
+      "name": "Atordoado",
+      "description": "Uma criatura Atordoada está Incapacitada, não pode se mover e fala de forma titubeante; jogadas de ataque contra ela têm Vantagem; falha automaticamente em salvaguardas de Força e Destreza."
+    },
+    {
+      "id": "dnd2024:condition:caido",
+      "type": "condition",
+      "schemaVersion": "1.0.0",
+      "name": "Caído",
+      "description": "Uma criatura Caída só pode se mover rastejando; tem Desvantagem em jogadas de ataque; jogadas de ataque contra ela têm Vantagem se o atacante estiver a até 1,5 metro, e Desvantagem caso contrário."
+    },
+    {
+      "id": "dnd2024:condition:cego",
+      "type": "condition",
+      "schemaVersion": "1.0.0",
+      "name": "Cego",
+      "description": "Uma criatura Cega falha automaticamente em qualquer teste de habilidade que exija visão, tem Desvantagem em jogadas de ataque e jogadas de ataque contra ela têm Vantagem."
+    },
+    {
+      "id": "dnd2024:condition:contido",
+      "type": "condition",
+      "schemaVersion": "1.0.0",
+      "name": "Contido",
+      "description": "O deslocamento de uma criatura Contida se torna 0; tem Desvantagem em jogadas de ataque; jogadas de ataque contra ela têm Vantagem; e tem Desvantagem em salvaguardas de Destreza."
+    },
+    {
+      "id": "dnd2024:condition:enfeiticado",
+      "type": "condition",
+      "schemaVersion": "1.0.0",
+      "name": "Enfeitiçado",
+      "description": "Uma criatura Enfeitiçada não pode atacar quem a enfeitiçou nem alvejá-la com efeitos prejudiciais, e quem a enfeitiçou tem Vantagem em testes de habilidade para interagir socialmente com ela."
+    },
+    {
+      "id": "dnd2024:condition:envenenado",
+      "type": "condition",
+      "schemaVersion": "1.0.0",
+      "name": "Envenenado",
+      "description": "Uma criatura Envenenada tem Desvantagem em jogadas de ataque e em testes de habilidade."
+    },
+    {
+      "id": "dnd2024:condition:exaustao",
+      "type": "condition",
+      "schemaVersion": "1.0.0",
+      "name": "Exaustão",
+      "description": "Exaustão é medida em níveis; cada nível impõe uma penalidade cumulativa (redução em testes de D20, deslocamento e pontos de vida máximos); 6 níveis causam morte."
+    },
+    {
+      "id": "dnd2024:condition:incapacitado",
+      "type": "condition",
+      "schemaVersion": "1.0.0",
+      "name": "Incapacitado",
+      "description": "Uma criatura Incapacitada não pode realizar ações nem Reações."
+    },
+    {
+      "id": "dnd2024:condition:inconsciente",
+      "type": "condition",
+      "schemaVersion": "1.0.0",
+      "name": "Inconsciente",
+      "description": "Uma criatura Inconsciente está Incapacitada, não pode se mover ou falar, e não tem consciência dos arredores; larga o que segura e cai Caída; falha automaticamente em salvaguardas de Força e Destreza; jogadas de ataque contra ela têm Vantagem; qualquer acerto a até 1,5 metro é crítico."
+    },
+    {
+      "id": "dnd2024:condition:invisivel",
+      "type": "condition",
+      "schemaVersion": "1.0.0",
+      "name": "Invisível",
+      "description": "Uma criatura Invisível é impossível de ver sem o auxílio de magia ou de um sentido especial; jogadas de ataque contra ela têm Desvantagem, e suas jogadas de ataque têm Vantagem."
+    },
+    {
+      "id": "dnd2024:condition:paralisado",
+      "type": "condition",
+      "schemaVersion": "1.0.0",
+      "name": "Paralisado",
+      "description": "Uma criatura Paralisada está Incapacitada e não pode se mover ou falar; falha automaticamente em salvaguardas de Força e Destreza; jogadas de ataque contra ela têm Vantagem; qualquer acerto a até 1,5 metro é crítico."
+    },
+    {
+      "id": "dnd2024:condition:petrificado",
+      "type": "condition",
+      "schemaVersion": "1.0.0",
+      "name": "Petrificado",
+      "description": "Uma criatura Petrificada é transformada, junto com quaisquer objetos não mágicos que carrega, em substância sólida inanimada; está Incapacitada, não pode se mover ou falar, e não tem consciência dos arredores; jogadas de ataque contra ela têm Vantagem; falha automaticamente em salvaguardas de Força e Destreza; tem Resistência a todo dano; é imune a veneno e doença."
+    },
+    {
+      "id": "dnd2024:condition:surdo",
+      "type": "condition",
+      "schemaVersion": "1.0.0",
+      "name": "Surdo",
+      "description": "Uma criatura Surda não pode ouvir e falha automaticamente em qualquer teste de habilidade que exija audição."
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+rules_version = '2';
+
+// ============================================================
+// REGRAS DE TESTE — usadas SOMENTE pelo Firestore Emulator
+// (`firebase.json` -> `firestore.rules`), projeto `demo-dnd-refactor`.
+// NÃO são as regras de produção do projeto `ded2024`, que continuam
+// gerenciadas fora deste repositório e não são tocadas por esta tarefa.
+//
+// O que estas regras existem para provar (e o que os testes em
+// `tests/firebase/` verificam contra o Emulator real):
+//
+// 1. `users/{uid}/personagens/{charId}` — o registro vivo: leitura e
+//    escrita completas para o dono.
+//
+// 2. `users/{uid}/personagens_backup_v1/{charId}` — o backup pré-migração:
+//    isolado pelo MESMO dono, mas com escrita reduzida a `create` em
+//    documento INEXISTENTE. `update` e `delete` são negados
+//    explicitamente, para que nem um bug do client nem o próprio usuário
+//    (ou alguém com o token dele) consiga alterar ou apagar o backup
+//    depois de criado. É a contraparte remota da semântica "criado uma
+//    única vez" do backup local (`PreMigrationBackupService`, Task 12).
+//
+// 3. Todo o resto é negado.
+//
+// NOTA SOBRE `request.auth` (limitação conhecida e deliberada):
+// a suíte roda com `emulators:exec --only firestore`, isto é, SEM o Auth
+// Emulator, então o SDK Web se conecta sem token e `request.auth` é
+// sempre `null`. Uma checagem `request.auth.uid == userId` rejeitaria
+// 100% das operações e tornaria os testes vacuosos (tudo "negado", nada
+// provado). Por isso `isOwner()` aceita o cliente não autenticado do
+// harness, MAS mantém a checagem real quando há autenticação — e, o mais
+// importante, as garantias que de fato importam para o backup
+// (`create`-somente-se-ausente, `update`/`delete` negados) são
+// INDEPENDENTES de autenticação e ficam genuinamente exercitadas.
+// ============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Dono do caminho. Ver a nota sobre `request.auth` no cabeçalho: no
+    // harness do Emulator (sem Auth Emulator) `request.auth` é null; com
+    // autenticação presente, só o próprio dono passa.
+    function isOwner(userId) {
+      return request.auth == null || request.auth.uid == userId;
+    }
+
+    // O registro vivo do personagem.
+    match /users/{userId}/personagens/{charId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // O backup pré-migração: criado uma única vez, nunca alterado nem
+    // apagado pelo client.
+    match /users/{userId}/personagens_backup_v1/{charId} {
+      allow read: if isOwner(userId);
+
+      // `resource == null` é a condição "o documento ainda não existe":
+      // uma segunda tentativa de criar sobre um backup já existente é
+      // negada pelas próprias regras, não só pela lógica do gateway.
+      //
+      // O sufixo `denybackup-` é um GANCHO DE TESTE deliberado (legítimo
+      // porque este arquivo é exclusivo do Emulator): ele permite simular
+      // uma falha de escrita do backup e provar que, quando o backup
+      // falha, o documento v2 TAMBÉM não é gravado — a atomicidade
+      // fail-closed do `WriteBatch`, que é o ponto central do requisito.
+      allow create: if isOwner(userId)
+                    && resource == null
+                    && !charId.matches('^denybackup-.*');
+
+      allow update, delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "name": "fichas-de-nimb",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.17.0"
+  },
+  "scripts": {
+    "check:syntax": "node scripts/check-syntax.mjs",
+    "check:architecture": "node scripts/check-architecture.mjs",
+    "check:entrypoints": "node scripts/check-thin-entrypoints.mjs",
+    "check:inline-handlers": "node scripts/check-inline-handlers.mjs",
+    "generate:validators": "node scripts/generate-schema-validators.mjs --write",
+    "check:validators": "node scripts/generate-schema-validators.mjs --check",
+    "validate:data": "node scripts/validate-content.mjs",
+    "test:files": "node scripts/run-node-tests.mjs",
+    "test:unit": "node scripts/run-node-tests.mjs tests/unit",
+    "test:contract": "node scripts/run-node-tests.mjs tests/contract",
+    "test:integration": "node scripts/run-node-tests.mjs tests/integration",
+    "test:deploy": "node scripts/run-node-tests.mjs tests/deploy",
+    "test:node": "node scripts/run-node-tests.mjs tests/unit tests/contract tests/integration tests/deploy",
+    "test:extractor": "node scripts/run-extractor-contract.mjs",
+    "build:pages": "node scripts/prepare-pages.mjs",
+    "verify:pages": "node scripts/verify-pages-artifact.mjs",
+    "test:firebase:preflight": "node scripts/check-firebase-prerequisites.mjs",
+    "test:firebase": "npm run test:firebase:preflight && firebase emulators:exec --only firestore --project demo-dnd-refactor \"node --test tests/firebase/firestore-character-gateway.test.js tests/firebase/sync-queue-firestore.test.js\"",
+    "serve:test": "node scripts/serve-static.mjs --root . --host 127.0.0.1 --port 4173",
+    "test:e2e": "playwright test --grep-invert @visual",
+    "test:e2e:compat": "node scripts/run-baseline-roundtrip.mjs",
+    "test:e2e:pwa": "playwright test --config=playwright.pwa.config.js --project=pwa-pages --workers=1",
+    "test:e2e:critical": "playwright test --grep @critical --grep-invert @visual",
+    "test:e2e:dom": "node scripts/run-dom-baseline.mjs",
+    "test:e2e:update-dom": "node scripts/run-dom-baseline.mjs --update",
+    "test:e2e:visual": "node scripts/run-playwright-visual-linux.mjs",
+    "test:e2e:update-snapshots": "node scripts/run-playwright-visual-linux.mjs --update-snapshots",
+    "verify": "npm run check:syntax && npm run check:architecture && npm run check:validators && npm run validate:data && npm run check:entrypoints && npm run check:inline-handlers && npm run test:node && npm run test:extractor && npm run test:deploy && npm run test:firebase && npm run test:e2e && npm run test:e2e:compat && npm run test:e2e:pwa"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.0",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "firebase": "12.16.0",
+    "firebase-tools": "15.24.0",
+    "linkedom": "0.18.13",
+    "yaml": "2.9.0"
+  }
+}

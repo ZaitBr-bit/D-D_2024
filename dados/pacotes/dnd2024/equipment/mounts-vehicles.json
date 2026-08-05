@@ -1,0 +1,380 @@
+{
+  "schemaVersion": "1.0.0",
+  "type": "equipment",
+  "items": [
+    {
+      "id": "dnd2024:equipment:camelo",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Camelo",
+      "description": "Capacidade de Carga: 225 kg.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Montaria",
+      "cost": {
+        "amount": 50,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:cavalo-de-carga",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Cavalo de Carga",
+      "description": "Capacidade de Carga: 270 kg.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Montaria",
+      "cost": {
+        "amount": 50,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:cavalo-de-guerra",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Cavalo de Guerra",
+      "description": "Capacidade de Carga: 270 kg.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Montaria",
+      "cost": {
+        "amount": 400,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:cavalo-de-montaria",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Cavalo de Montaria",
+      "description": "Capacidade de Carga: 240 kg.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Montaria",
+      "cost": {
+        "amount": 75,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:elefante",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Elefante",
+      "description": "Capacidade de Carga: 660 kg.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Montaria",
+      "cost": {
+        "amount": 200,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:mastim",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Mastim",
+      "description": "Capacidade de Carga: 93 kg.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Montaria",
+      "cost": {
+        "amount": 25,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:mula",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Mula",
+      "description": "Capacidade de Carga: 210 kg.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Montaria",
+      "cost": {
+        "amount": 8,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:ponei",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Pônei",
+      "description": "Capacidade de Carga: 112 kg.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Montaria",
+      "cost": {
+        "amount": 30,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:alimentacao-por-dia",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Alimentação por dia",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Veículo/Arreio",
+      "weight": 5,
+      "cost": {
+        "amount": 5,
+        "currency": "cp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:biga",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Biga",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Veículo/Arreio",
+      "weight": 50,
+      "cost": {
+        "amount": 250,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:carroca",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Carroça",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Veículo/Arreio",
+      "weight": 100,
+      "cost": {
+        "amount": 15,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:carruagem",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Carruagem",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Veículo/Arreio",
+      "weight": 300,
+      "cost": {
+        "amount": 100,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:estabulo-por-dia",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Estábulo por dia",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Veículo/Arreio",
+      "cost": {
+        "amount": 5,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:sela-exotica",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Sela — Exótica",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Veículo/Arreio",
+      "weight": 20,
+      "cost": {
+        "amount": 60,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:sela-militar",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Sela — Militar",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Veículo/Arreio",
+      "weight": 15,
+      "cost": {
+        "amount": 20,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:sela-viagem",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Sela — Viagem",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Veículo/Arreio",
+      "weight": 12.5,
+      "cost": {
+        "amount": 10,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:treno",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Trenó",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Veículo/Arreio",
+      "weight": 150,
+      "cost": {
+        "amount": 20,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:vagao",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Vagão",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Veículo/Arreio",
+      "weight": 200,
+      "cost": {
+        "amount": 35,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:aeronau",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Aeronau",
+      "description": "Deslocamento: 13 km/h. Tripulação: 10. Passageiros: 20. Carga: 1 toneladas. CA: 13. PV: 300. Limiar de Dano: —.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Veículo",
+      "cost": {
+        "amount": 40000,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:barco-a-remo",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Barco a Remo",
+      "description": "Deslocamento: 2,4 km/h. Tripulação: 1. Passageiros: 3. Carga: — toneladas. CA: 11. PV: 50. Limiar de Dano: —.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Veículo",
+      "cost": {
+        "amount": 50,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:barco-de-quilha",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Barco de Quilha",
+      "description": "Deslocamento: 1,6 km/h. Tripulação: 1. Passageiros: 6. Carga: 0,5 toneladas. CA: 15. PV: 100. Limiar de Dano: 10.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Veículo",
+      "cost": {
+        "amount": 3000,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:dracar",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Dracar",
+      "description": "Deslocamento: 4,8 km/h. Tripulação: 40. Passageiros: 150. Carga: 10 toneladas. CA: 15. PV: 300. Limiar de Dano: 15.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Veículo",
+      "cost": {
+        "amount": 10000,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:galera",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Galera",
+      "description": "Deslocamento: 6,5 km/h. Tripulação: 80. Passageiros: —. Carga: 150 toneladas. CA: 15. PV: 500. Limiar de Dano: 20.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Veículo",
+      "cost": {
+        "amount": 30000,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:navio-de-guerra",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Navio de Guerra",
+      "description": "Deslocamento: 4 km/h. Tripulação: 60. Passageiros: 60. Carga: 200 toneladas. CA: 15. PV: 500. Limiar de Dano: 20.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Veículo",
+      "cost": {
+        "amount": 25000,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:veleiro",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Veleiro",
+      "description": "Deslocamento: 3,2 km/h. Tripulação: 20. Passageiros: 20. Carga: 100 toneladas. CA: 15. PV: 300. Limiar de Dano: 15.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Veículo",
+      "cost": {
+        "amount": 10000,
+        "currency": "gp"
+      }
+    }
+  ]
+}

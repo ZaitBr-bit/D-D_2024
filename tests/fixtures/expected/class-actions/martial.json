@@ -1,0 +1,620 @@
+{
+  "fixtureVersion": 1,
+  "compatibilityBaseline": "e43c5ea",
+  "descricao": "Projeções e transições esperadas dos quatro handlers marciais da Task 20. Cada caso cita a linha do monólito (site/js/pages/sheet.js, commit e43c5ea) de onde a regra foi extraída. Os valores foram escritos A PARTIR do monólito, não capturados da implementação nova — se um handler mudar de comportamento, este arquivo continua sendo o oráculo. Os placeholders \"@class\" e \"@subclass\" são substituídos pelo teste pelo sourceInstanceId determinístico de deriveSourceInstanceId({collection, index:0, key}) (Task 15); chaves de state.usageFlags aparecem como \"@class:<flag>\"/\"@subclass:<flag>\".",
+  "projections": [
+    {
+      "id": "barbaro-nv5-recurso-ausente",
+      "origemReal": "sheet.js:387-395 getEstadoFuria + regra de recurso ausente do brief da Task 20",
+      "handlerId": "class-barbaro",
+      "classId": "dnd2024:class:barbaro",
+      "subclassId": null,
+      "level": 5,
+      "before": { "resources": {}, "usageFlags": {} },
+      "expected": {
+        "resources": { "dnd2024:resource:furias": { "current": null, "missing": true, "max": 3 } },
+        "actions": {
+          "entrar-em-furia": { "available": false, "reason": "HANDLER_RESOURCE_NOT_INITIALIZED" },
+          "encerrar-furia": { "available": false, "reason": "HANDLER_ACTION_FLAG_STATE_INVALID" },
+          "restaurar-furias-persistente": { "available": false, "reason": "HANDLER_ACTION_LEVEL_TOO_LOW" }
+        }
+      }
+    },
+    {
+      "id": "barbaro-nv17-teto-maximo",
+      "origemReal": "dados/pacotes/dnd2024/classes/barbaro.json#furias-17 (tabela_caracteristicas do baseline)",
+      "handlerId": "class-barbaro",
+      "classId": "dnd2024:class:barbaro",
+      "subclassId": "dnd2024:subclass:trilha-do-berserker",
+      "level": 17,
+      "before": { "resources": { "dnd2024:resource:furias": { "current": 6, "sourceInstanceId": "@class" } }, "usageFlags": {} },
+      "expected": {
+        "resources": { "dnd2024:resource:furias": { "current": 6, "missing": false, "max": 6 } },
+        "actions": {
+          "entrar-em-furia": { "available": true, "reason": null },
+          "restaurar-furias-persistente": { "available": true, "reason": null },
+          "presenca-intimidante": { "available": true, "reason": null },
+          "presenca-zelosa": { "available": false, "reason": "HANDLER_ACTION_SUBCLASS_REQUIRED" }
+        }
+      }
+    },
+    {
+      "id": "guerreiro-nv1-sem-surto-nem-indomavel",
+      "origemReal": "sheet.js:1119-1125 (Surto de Ação só a partir da característica de nível 2; Indomável a partir de 9)",
+      "handlerId": "class-guerreiro",
+      "classId": "dnd2024:class:guerreiro",
+      "subclassId": null,
+      "level": 1,
+      "before": { "resources": {}, "usageFlags": {} },
+      "expected": {
+        "resources": { "dnd2024:resource:recuperar-folego": { "current": null, "missing": true, "max": 2 } },
+        "actions": {
+          "usar-recuperar-folego": { "available": false, "reason": "HANDLER_RESOURCE_NOT_INITIALIZED" },
+          "usar-surto-de-acao": { "available": false, "reason": "HANDLER_ACTION_LEVEL_TOO_LOW" },
+          "usar-indomavel": { "available": false, "reason": "HANDLER_ACTION_LEVEL_TOO_LOW" }
+        }
+      }
+    },
+    {
+      "id": "guerreiro-nv17-todos-os-tetos",
+      "origemReal": "sheet.js:1119-1125 (surtoMax 2 em nv17, indomavelMax 3 em nv17) + guerreiro.json#recuperar-folego-10",
+      "handlerId": "class-guerreiro",
+      "classId": "dnd2024:class:guerreiro",
+      "subclassId": null,
+      "level": 17,
+      "before": {
+        "resources": {
+          "dnd2024:resource:recuperar-folego": { "current": 0, "sourceInstanceId": "@class" },
+          "dnd2024:resource:surto-de-acao": { "current": 0, "sourceInstanceId": "@class" },
+          "dnd2024:resource:indomavel": { "current": 1, "sourceInstanceId": "@class" }
+        },
+        "usageFlags": {}
+      },
+      "expected": {
+        "resources": {
+          "dnd2024:resource:recuperar-folego": { "current": 0, "missing": false, "max": 4 },
+          "dnd2024:resource:surto-de-acao": { "current": 0, "missing": false, "max": 2 },
+          "dnd2024:resource:indomavel": { "current": 1, "missing": false, "max": 3 }
+        },
+        "actions": {
+          "usar-recuperar-folego": { "available": false, "reason": "HANDLER_RESOURCE_INSUFFICIENT" },
+          "usar-surto-de-acao": { "available": false, "reason": "HANDLER_RESOURCE_INSUFFICIENT" },
+          "usar-indomavel": { "available": true, "reason": null }
+        }
+      }
+    },
+    {
+      "id": "guerreiro-mestre-da-batalha-nv15",
+      "origemReal": "sheet.js:1130-1133 (4/5/6 dados nos níveis 3/7/15)",
+      "handlerId": "class-guerreiro",
+      "classId": "dnd2024:class:guerreiro",
+      "subclassId": "dnd2024:subclass:mestre-da-batalha",
+      "level": 15,
+      "before": {
+        "resources": { "dnd2024:resource:dados-de-superioridade": { "current": 2, "sourceInstanceId": "@subclass" } },
+        "usageFlags": {}
+      },
+      "expected": {
+        "resources": {
+          "dnd2024:resource:recuperar-folego": { "current": null, "missing": true, "max": 4 },
+          "dnd2024:resource:surto-de-acao": { "current": null, "missing": true, "max": 1 },
+          "dnd2024:resource:indomavel": { "current": null, "missing": true, "max": 2 },
+          "dnd2024:resource:dados-de-superioridade": { "current": 2, "missing": false, "max": 6 }
+        },
+        "actions": {
+          "usar-dado-de-superioridade": { "available": true, "reason": null },
+          "conheca-seu-inimigo": { "available": true, "reason": null },
+          "gastar-dado-psionico": { "available": false, "reason": "HANDLER_ACTION_SUBCLASS_REQUIRED" }
+        }
+      }
+    },
+    {
+      "id": "guerreiro-combatente-psiquico-nv9",
+      "origemReal": "sheet.js:1160-1168 (8 dados psiônicos a partir do nível 9)",
+      "handlerId": "class-guerreiro",
+      "classId": "dnd2024:class:guerreiro",
+      "subclassId": "dnd2024:subclass:combatente-psiquico",
+      "level": 9,
+      "before": {
+        "resources": { "dnd2024:resource:dados-psionicos": { "current": 8, "sourceInstanceId": "@subclass" } },
+        "usageFlags": {}
+      },
+      "expected": {
+        "resources": {
+          "dnd2024:resource:recuperar-folego": { "current": null, "missing": true, "max": 3 },
+          "dnd2024:resource:surto-de-acao": { "current": null, "missing": true, "max": 1 },
+          "dnd2024:resource:indomavel": { "current": null, "missing": true, "max": 1 },
+          "dnd2024:resource:dados-psionicos": { "current": 8, "missing": false, "max": 8 }
+        },
+        "actions": { "gastar-dado-psionico": { "available": true, "reason": null } }
+      }
+    },
+    {
+      "id": "ladino-nv19-sem-golpe-de-sorte",
+      "origemReal": "sheet.js:2245 (Golpe de Sorte só no nível 20)",
+      "handlerId": "class-ladino",
+      "classId": "dnd2024:class:ladino",
+      "subclassId": null,
+      "level": 19,
+      "before": { "resources": {}, "usageFlags": {} },
+      "expected": {
+        "resources": {},
+        "actions": { "usar-golpe-de-sorte": { "available": false, "reason": "HANDLER_ACTION_LEVEL_TOO_LOW" } }
+      }
+    },
+    {
+      "id": "ladino-adaga-espiritual-nv17",
+      "origemReal": "sheet.js:2280-2288 (12 dados psiônicos d12 no nível 17)",
+      "handlerId": "class-ladino",
+      "classId": "dnd2024:class:ladino",
+      "subclassId": "dnd2024:subclass:adaga-espiritual",
+      "level": 17,
+      "before": {
+        "resources": { "dnd2024:resource:dados-psionicos": { "current": 0, "sourceInstanceId": "@subclass" } },
+        "usageFlags": { "@subclass:rasgar-mente-usado": true }
+      },
+      "expected": {
+        "resources": { "dnd2024:resource:dados-psionicos": { "current": 0, "missing": false, "max": 12 } },
+        "actions": {
+          "gastar-dado-psionico": { "available": false, "reason": "HANDLER_RESOURCE_INSUFFICIENT" },
+          "rasgar-mente": { "available": false, "reason": "HANDLER_ACTION_FLAG_STATE_INVALID" },
+          "veu-psiquico": { "available": true, "reason": null }
+        }
+      }
+    },
+    {
+      "id": "monge-nv1-sem-pontos-de-foco",
+      "origemReal": "monge.json (a escada pontos-de-foco começa no nível 2)",
+      "handlerId": "class-monge",
+      "classId": "dnd2024:class:monge",
+      "subclassId": null,
+      "level": 1,
+      "before": { "resources": {}, "usageFlags": {} },
+      "expected": {
+        "resources": {},
+        "actions": {
+          "gastar-ponto-de-foco": { "available": false, "reason": "HANDLER_ACTION_LEVEL_TOO_LOW" },
+          "golpe-atordoante": { "available": false, "reason": "HANDLER_ACTION_LEVEL_TOO_LOW" }
+        }
+      }
+    },
+    {
+      "id": "monge-nv11-pontos-parciais",
+      "origemReal": "sheet.js:2063-2065 (pontosAtuais = pontosMax - gastos; pontosMax = nível)",
+      "handlerId": "class-monge",
+      "classId": "dnd2024:class:monge",
+      "subclassId": "dnd2024:subclass:combatente-dos-elementos",
+      "level": 11,
+      "before": {
+        "resources": { "dnd2024:resource:pontos-de-foco": { "current": 4, "sourceInstanceId": "@class" } },
+        "usageFlags": { "@class:metabolismo-incomum-usado": true }
+      },
+      "expected": {
+        "resources": { "dnd2024:resource:pontos-de-foco": { "current": 4, "missing": false, "max": 11 } },
+        "actions": {
+          "gastar-ponto-de-foco": { "available": true, "reason": null },
+          "golpe-atordoante": { "available": true, "reason": null },
+          "metabolismo-incomum": { "available": false, "reason": "HANDLER_ACTION_FLAG_STATE_INVALID" }
+        }
+      }
+    }
+  ],
+  "transitions": [
+    {
+      "id": "barbaro-entrar-em-furia",
+      "origemReal": "sheet.js:7208 data-furia-toggle=ativar (gasta 1 uso e liga furia_ativa)",
+      "handlerId": "class-barbaro",
+      "classId": "dnd2024:class:barbaro",
+      "subclassId": null,
+      "level": 5,
+      "before": {
+        "resources": { "dnd2024:resource:furias": { "current": 3, "sourceInstanceId": "@class" } },
+        "usageFlags": {}
+      },
+      "op": { "kind": "execute", "actionId": "entrar-em-furia" },
+      "expected": {
+        "ok": true,
+        "affected": ["state.resources", "state.usageFlags"],
+        "resources": { "dnd2024:resource:furias": { "current": 2, "sourceInstanceId": "@class" } },
+        "usageFlags": { "@class:furia-ativa": true }
+      }
+    },
+    {
+      "id": "barbaro-entrar-em-furia-sem-usos",
+      "origemReal": "sheet.js:3270 (botão desabilitado quando usosDisponiveis <= 0)",
+      "handlerId": "class-barbaro",
+      "classId": "dnd2024:class:barbaro",
+      "subclassId": null,
+      "level": 5,
+      "before": {
+        "resources": { "dnd2024:resource:furias": { "current": 0, "sourceInstanceId": "@class" } },
+        "usageFlags": {}
+      },
+      "op": { "kind": "execute", "actionId": "entrar-em-furia" },
+      "expected": { "ok": false, "errorCode": "HANDLER_RESOURCE_INSUFFICIENT" }
+    },
+    {
+      "id": "barbaro-entrar-em-furia-recurso-ausente",
+      "origemReal": "regra de recurso ausente do brief: só progressão/migração materializa o valor inicial",
+      "handlerId": "class-barbaro",
+      "classId": "dnd2024:class:barbaro",
+      "subclassId": null,
+      "level": 5,
+      "before": { "resources": {}, "usageFlags": {} },
+      "op": { "kind": "execute", "actionId": "entrar-em-furia" },
+      "expected": { "ok": false, "errorCode": "HANDLER_RESOURCE_NOT_INITIALIZED" }
+    },
+    {
+      "id": "barbaro-furia-persistente-restaura-todos-os-usos",
+      "origemReal": "sheet.js:7299-7312 data-furia-iniciativa (nv15: furia_usos_gastos = 0 e furia_persistente_usada = true)",
+      "handlerId": "class-barbaro",
+      "classId": "dnd2024:class:barbaro",
+      "subclassId": null,
+      "level": 15,
+      "before": {
+        "resources": { "dnd2024:resource:furias": { "current": 1, "sourceInstanceId": "@class" } },
+        "usageFlags": {}
+      },
+      "op": { "kind": "execute", "actionId": "restaurar-furias-persistente" },
+      "expected": {
+        "ok": true,
+        "affected": ["state.resources", "state.usageFlags"],
+        "resources": { "dnd2024:resource:furias": { "current": 5, "sourceInstanceId": "@class" } },
+        "usageFlags": { "@class:furia-persistente-usada": true }
+      }
+    },
+    {
+      "id": "barbaro-furia-persistente-so-uma-vez",
+      "origemReal": "sheet.js:7303-7306 (recusa com toast quando furia_persistente_usada já é true)",
+      "handlerId": "class-barbaro",
+      "classId": "dnd2024:class:barbaro",
+      "subclassId": null,
+      "level": 15,
+      "before": {
+        "resources": { "dnd2024:resource:furias": { "current": 1, "sourceInstanceId": "@class" } },
+        "usageFlags": { "@class:furia-persistente-usada": true }
+      },
+      "op": { "kind": "execute", "actionId": "restaurar-furias-persistente" },
+      "expected": { "ok": false, "errorCode": "HANDLER_ACTION_FLAG_STATE_INVALID" }
+    },
+    {
+      "id": "barbaro-furia-persistente-antes-do-nivel-15",
+      "origemReal": "sheet.js:7301 (`if (char.classe !== 'Bárbaro' || char.nivel < 15) return;`)",
+      "handlerId": "class-barbaro",
+      "classId": "dnd2024:class:barbaro",
+      "subclassId": null,
+      "level": 14,
+      "before": {
+        "resources": { "dnd2024:resource:furias": { "current": 1, "sourceInstanceId": "@class" } },
+        "usageFlags": {}
+      },
+      "op": { "kind": "execute", "actionId": "restaurar-furias-persistente" },
+      "expected": { "ok": false, "errorCode": "HANDLER_ACTION_LEVEL_TOO_LOW" }
+    },
+    {
+      "id": "barbaro-furia-persistente-com-recurso-ausente-nao-queima-o-uso",
+      "origemReal": "regra de recurso ausente do brief + simetria com o caminho de gasto: sem valor materializado a ação falha, em vez de consumir o uso único sem restaurar nada",
+      "handlerId": "class-barbaro",
+      "classId": "dnd2024:class:barbaro",
+      "subclassId": null,
+      "level": 15,
+      "before": { "resources": {}, "usageFlags": {} },
+      "op": { "kind": "execute", "actionId": "restaurar-furias-persistente" },
+      "expected": { "ok": false, "errorCode": "HANDLER_RESOURCE_NOT_INITIALIZED" }
+    },
+    {
+      "id": "barbaro-descanso-curto-recupera-um-uso",
+      "origemReal": "sheet.js:4357 furia_usos_gastos = max(0, gastos - 1)",
+      "handlerId": "class-barbaro",
+      "classId": "dnd2024:class:barbaro",
+      "subclassId": null,
+      "level": 6,
+      "before": {
+        "resources": { "dnd2024:resource:furias": { "current": 0, "sourceInstanceId": "@class" } },
+        "usageFlags": { "@class:furia-ativa": true }
+      },
+      "op": { "kind": "rest", "restKind": "short" },
+      "expected": {
+        "ok": true,
+        "affected": ["state.resources"],
+        "resources": { "dnd2024:resource:furias": { "current": 1, "sourceInstanceId": "@class" } },
+        "usageFlags": { "@class:furia-ativa": true }
+      }
+    },
+    {
+      "id": "barbaro-descanso-curto-nao-passa-do-teto",
+      "origemReal": "sheet.js:394 usosDisponiveis = max(0, furiasMax - gastos) — nunca acima do máximo",
+      "handlerId": "class-barbaro",
+      "classId": "dnd2024:class:barbaro",
+      "subclassId": null,
+      "level": 6,
+      "before": {
+        "resources": { "dnd2024:resource:furias": { "current": 4, "sourceInstanceId": "@class" } },
+        "usageFlags": {}
+      },
+      "op": { "kind": "rest", "restKind": "short" },
+      "expected": {
+        "ok": true,
+        "affected": [],
+        "resources": { "dnd2024:resource:furias": { "current": 4, "sourceInstanceId": "@class" } },
+        "usageFlags": {}
+      }
+    },
+    {
+      "id": "barbaro-descanso-longo-restaura-tudo-e-encerra-furia",
+      "origemReal": "sheet.js:4635-4643",
+      "handlerId": "class-barbaro",
+      "classId": "dnd2024:class:barbaro",
+      "subclassId": "dnd2024:subclass:trilha-do-fanatico",
+      "level": 14,
+      "before": {
+        "resources": { "dnd2024:resource:furias": { "current": 1, "sourceInstanceId": "@class" } },
+        "usageFlags": { "@class:furia-ativa": true, "@class:furia-deuses-ativa": true, "@class:presenca-zelosa-usada": true }
+      },
+      "op": { "kind": "rest", "restKind": "long" },
+      "expected": {
+        "ok": true,
+        "affected": ["state.resources", "state.usageFlags"],
+        "resources": { "dnd2024:resource:furias": { "current": 5, "sourceInstanceId": "@class" } },
+        "usageFlags": {
+          "@class:furia-ativa": false,
+          "@class:furia-deuses-ativa": false,
+          "@class:presenca-zelosa-usada": false
+        }
+      }
+    },
+    {
+      "id": "barbaro-descanso-recurso-ausente-continua-ausente",
+      "origemReal": "regra de recurso ausente do brief (o descanso não materializa default de jogo)",
+      "handlerId": "class-barbaro",
+      "classId": "dnd2024:class:barbaro",
+      "subclassId": null,
+      "level": 5,
+      "before": { "resources": {}, "usageFlags": {} },
+      "op": { "kind": "rest", "restKind": "long" },
+      "expected": { "ok": true, "affected": [], "resources": {}, "usageFlags": {} }
+    },
+    {
+      "id": "guerreiro-descanso-curto-quatro-recargas-diferentes",
+      "origemReal": "sheet.js:4415-4436 (fôlego +1, surto ao máximo, superioridade ao máximo)",
+      "handlerId": "class-guerreiro",
+      "classId": "dnd2024:class:guerreiro",
+      "subclassId": "dnd2024:subclass:mestre-da-batalha",
+      "level": 7,
+      "before": {
+        "resources": {
+          "dnd2024:resource:recuperar-folego": { "current": 0, "sourceInstanceId": "@class" },
+          "dnd2024:resource:surto-de-acao": { "current": 0, "sourceInstanceId": "@class" },
+          "dnd2024:resource:dados-de-superioridade": { "current": 1, "sourceInstanceId": "@subclass" }
+        },
+        "usageFlags": {}
+      },
+      "op": { "kind": "rest", "restKind": "short" },
+      "expected": {
+        "ok": true,
+        "affected": ["state.resources"],
+        "resources": {
+          "dnd2024:resource:recuperar-folego": { "current": 1, "sourceInstanceId": "@class" },
+          "dnd2024:resource:surto-de-acao": { "current": 1, "sourceInstanceId": "@class" },
+          "dnd2024:resource:dados-de-superioridade": { "current": 5, "sourceInstanceId": "@subclass" }
+        },
+        "usageFlags": {}
+      }
+    },
+    {
+      "id": "guerreiro-descanso-curto-nao-restaura-indomavel",
+      "origemReal": "sheet.js:4415-4436 — Indomável NÃO aparece na recarga de descanso curto (só em 4665)",
+      "handlerId": "class-guerreiro",
+      "classId": "dnd2024:class:guerreiro",
+      "subclassId": null,
+      "level": 13,
+      "before": {
+        "resources": {
+          "dnd2024:resource:recuperar-folego": { "current": 4, "sourceInstanceId": "@class" },
+          "dnd2024:resource:surto-de-acao": { "current": 1, "sourceInstanceId": "@class" },
+          "dnd2024:resource:indomavel": { "current": 0, "sourceInstanceId": "@class" }
+        },
+        "usageFlags": {}
+      },
+      "op": { "kind": "rest", "restKind": "short" },
+      "expected": {
+        "ok": true,
+        "affected": [],
+        "resources": {
+          "dnd2024:resource:recuperar-folego": { "current": 4, "sourceInstanceId": "@class" },
+          "dnd2024:resource:surto-de-acao": { "current": 1, "sourceInstanceId": "@class" },
+          "dnd2024:resource:indomavel": { "current": 0, "sourceInstanceId": "@class" }
+        },
+        "usageFlags": {}
+      }
+    },
+    {
+      "id": "guerreiro-descanso-longo-restaura-indomavel",
+      "origemReal": "sheet.js:4663-4665",
+      "handlerId": "class-guerreiro",
+      "classId": "dnd2024:class:guerreiro",
+      "subclassId": null,
+      "level": 13,
+      "before": {
+        "resources": {
+          "dnd2024:resource:recuperar-folego": { "current": 0, "sourceInstanceId": "@class" },
+          "dnd2024:resource:surto-de-acao": { "current": 0, "sourceInstanceId": "@class" },
+          "dnd2024:resource:indomavel": { "current": 0, "sourceInstanceId": "@class" }
+        },
+        "usageFlags": {}
+      },
+      "op": { "kind": "rest", "restKind": "long" },
+      "expected": {
+        "ok": true,
+        "affected": ["state.resources"],
+        "resources": {
+          "dnd2024:resource:recuperar-folego": { "current": 4, "sourceInstanceId": "@class" },
+          "dnd2024:resource:surto-de-acao": { "current": 1, "sourceInstanceId": "@class" },
+          "dnd2024:resource:indomavel": { "current": 2, "sourceInstanceId": "@class" }
+        },
+        "usageFlags": {}
+      }
+    },
+    {
+      "id": "guerreiro-combatente-psiquico-descanso-curto-um-dado",
+      "origemReal": "sheet.js:4429-4436 (1 dado psiônico + flags de movimento/salto)",
+      "handlerId": "class-guerreiro",
+      "classId": "dnd2024:class:guerreiro",
+      "subclassId": "dnd2024:subclass:combatente-psiquico",
+      "level": 18,
+      "before": {
+        "resources": { "dnd2024:resource:dados-psionicos": { "current": 0, "sourceInstanceId": "@subclass" } },
+        "usageFlags": {
+          "@subclass:movimento-telecinetico-usado": true,
+          "@subclass:baluarte-usado": true
+        }
+      },
+      "op": { "kind": "rest", "restKind": "short" },
+      "expected": {
+        "ok": true,
+        "affected": ["state.resources", "state.usageFlags"],
+        "resources": { "dnd2024:resource:dados-psionicos": { "current": 1, "sourceInstanceId": "@subclass" } },
+        "usageFlags": {
+          "@subclass:movimento-telecinetico-usado": false,
+          "@subclass:baluarte-usado": true
+        }
+      }
+    },
+    {
+      "id": "guerreiro-conheca-seu-inimigo-uma-vez",
+      "origemReal": "sheet.js:10340 (botão desabilitado depois de usado, até o descanso longo)",
+      "handlerId": "class-guerreiro",
+      "classId": "dnd2024:class:guerreiro",
+      "subclassId": "dnd2024:subclass:mestre-da-batalha",
+      "level": 7,
+      "before": {
+        "resources": { "dnd2024:resource:dados-de-superioridade": { "current": 5, "sourceInstanceId": "@subclass" } },
+        "usageFlags": { "@subclass:conheca-seu-inimigo-usado": true }
+      },
+      "op": { "kind": "execute", "actionId": "conheca-seu-inimigo" },
+      "expected": { "ok": false, "errorCode": "HANDLER_ACTION_FLAG_STATE_INVALID" }
+    },
+    {
+      "id": "ladino-golpe-de-sorte-volta-no-curto",
+      "origemReal": "sheet.js:4495 golpe_sorte_usado = false no descanso curto",
+      "handlerId": "class-ladino",
+      "classId": "dnd2024:class:ladino",
+      "subclassId": null,
+      "level": 20,
+      "before": {
+        "resources": { "dnd2024:resource:golpe-de-sorte": { "current": 0, "sourceInstanceId": "@class" } },
+        "usageFlags": {}
+      },
+      "op": { "kind": "rest", "restKind": "short" },
+      "expected": {
+        "ok": true,
+        "affected": ["state.resources"],
+        "resources": { "dnd2024:resource:golpe-de-sorte": { "current": 1, "sourceInstanceId": "@class" } },
+        "usageFlags": {}
+      }
+    },
+    {
+      "id": "ladino-adaga-espiritual-descanso-longo-limpa-flags",
+      "origemReal": "sheet.js:4882-4887",
+      "handlerId": "class-ladino",
+      "classId": "dnd2024:class:ladino",
+      "subclassId": "dnd2024:subclass:adaga-espiritual",
+      "level": 17,
+      "before": {
+        "resources": { "dnd2024:resource:dados-psionicos": { "current": 3, "sourceInstanceId": "@subclass" } },
+        "usageFlags": {
+          "@subclass:sussurros-gratis-usado": true,
+          "@subclass:veu-psiquico-usado": true,
+          "@subclass:rasgar-mente-usado": true
+        }
+      },
+      "op": { "kind": "rest", "restKind": "long" },
+      "expected": {
+        "ok": true,
+        "affected": ["state.resources", "state.usageFlags"],
+        "resources": { "dnd2024:resource:dados-psionicos": { "current": 12, "sourceInstanceId": "@subclass" } },
+        "usageFlags": {
+          "@subclass:sussurros-gratis-usado": false,
+          "@subclass:veu-psiquico-usado": false,
+          "@subclass:rasgar-mente-usado": false
+        }
+      }
+    },
+    {
+      "id": "monge-gastar-quatro-pontos-de-foco",
+      "origemReal": "sheet.js:6629 (Passo do Vento composto gasta 4 pontos)",
+      "handlerId": "class-monge",
+      "classId": "dnd2024:class:monge",
+      "subclassId": null,
+      "level": 11,
+      "before": {
+        "resources": { "dnd2024:resource:pontos-de-foco": { "current": 11, "sourceInstanceId": "@class" } },
+        "usageFlags": {}
+      },
+      "op": { "kind": "execute", "actionId": "gastar-ponto-de-foco", "payload": { "amount": 4 } },
+      "expected": {
+        "ok": true,
+        "affected": ["state.resources"],
+        "resources": { "dnd2024:resource:pontos-de-foco": { "current": 7, "sourceInstanceId": "@class" } },
+        "usageFlags": {}
+      }
+    },
+    {
+      "id": "monge-metabolismo-incomum-restaura-tudo",
+      "origemReal": "sheet.js:6591-6592 (pontos_foco_gastos = 0 e metabolismo_usado = true)",
+      "handlerId": "class-monge",
+      "classId": "dnd2024:class:monge",
+      "subclassId": null,
+      "level": 11,
+      "before": {
+        "resources": { "dnd2024:resource:pontos-de-foco": { "current": 0, "sourceInstanceId": "@class" } },
+        "usageFlags": {}
+      },
+      "op": { "kind": "execute", "actionId": "metabolismo-incomum" },
+      "expected": {
+        "ok": true,
+        "affected": ["state.resources", "state.usageFlags"],
+        "resources": { "dnd2024:resource:pontos-de-foco": { "current": 11, "sourceInstanceId": "@class" } },
+        "usageFlags": { "@class:metabolismo-incomum-usado": true }
+      }
+    },
+    {
+      "id": "monge-descanso-curto-restaura-todos-os-pontos",
+      "origemReal": "sheet.js:4480 pontos_foco_gastos = 0 no descanso curto",
+      "handlerId": "class-monge",
+      "classId": "dnd2024:class:monge",
+      "subclassId": "dnd2024:subclass:combatente-dos-elementos",
+      "level": 9,
+      "before": {
+        "resources": { "dnd2024:resource:pontos-de-foco": { "current": 2, "sourceInstanceId": "@class" } },
+        "usageFlags": { "@subclass:sintonia-ativa": true, "@class:metabolismo-incomum-usado": true }
+      },
+      "op": { "kind": "rest", "restKind": "short" },
+      "expected": {
+        "ok": true,
+        "affected": ["state.resources", "state.usageFlags"],
+        "resources": { "dnd2024:resource:pontos-de-foco": { "current": 9, "sourceInstanceId": "@class" } },
+        "usageFlags": { "@subclass:sintonia-ativa": false, "@class:metabolismo-incomum-usado": true }
+      }
+    },
+    {
+      "id": "monge-descanso-longo-limpa-metabolismo",
+      "origemReal": "sheet.js:4852-4853",
+      "handlerId": "class-monge",
+      "classId": "dnd2024:class:monge",
+      "subclassId": null,
+      "level": 9,
+      "before": {
+        "resources": { "dnd2024:resource:pontos-de-foco": { "current": 9, "sourceInstanceId": "@class" } },
+        "usageFlags": { "@class:metabolismo-incomum-usado": true }
+      },
+      "op": { "kind": "rest", "restKind": "long" },
+      "expected": {
+        "ok": true,
+        "affected": ["state.usageFlags"],
+        "resources": { "dnd2024:resource:pontos-de-foco": { "current": 9, "sourceInstanceId": "@class" } },
+        "usageFlags": { "@class:metabolismo-incomum-usado": false }
+      }
+    }
+  ]
+}

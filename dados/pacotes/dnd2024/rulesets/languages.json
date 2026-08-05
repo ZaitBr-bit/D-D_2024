@@ -1,0 +1,158 @@
+{
+  "schemaVersion": "1.0.0",
+  "type": "language",
+  "items": [
+    {
+      "id": "dnd2024:language:comum",
+      "type": "language",
+      "schemaVersion": "1.0.0",
+      "name": "Comum",
+      "description": "Idioma padrão, falado pela maioria das raças humanoides.",
+      "script": "Comum"
+    },
+    {
+      "id": "dnd2024:language:lingua-de-sinais-comum",
+      "type": "language",
+      "schemaVersion": "1.0.0",
+      "name": "Língua de Sinais Comum",
+      "description": "Linguagem gestual usada por criaturas surdas ou em silêncio.",
+      "script": "Nenhum"
+    },
+    {
+      "id": "dnd2024:language:draconico",
+      "type": "language",
+      "schemaVersion": "1.0.0",
+      "name": "Dracônico",
+      "description": "Idioma antigo falado por dragões e criaturas dracônicas.",
+      "script": "Dracônico"
+    },
+    {
+      "id": "dnd2024:language:anao",
+      "type": "language",
+      "schemaVersion": "1.0.0",
+      "name": "Anão",
+      "description": "Idioma falado pelos anões.",
+      "script": "Anão"
+    },
+    {
+      "id": "dnd2024:language:elfico",
+      "type": "language",
+      "schemaVersion": "1.0.0",
+      "name": "Élfico",
+      "description": "Idioma falado pelos elfos.",
+      "script": "Élfico"
+    },
+    {
+      "id": "dnd2024:language:gigante",
+      "type": "language",
+      "schemaVersion": "1.0.0",
+      "name": "Gigante",
+      "description": "Idioma falado por gigantes e ogros.",
+      "script": "Anão"
+    },
+    {
+      "id": "dnd2024:language:gnomico",
+      "type": "language",
+      "schemaVersion": "1.0.0",
+      "name": "Gnômico",
+      "description": "Idioma falado pelos gnomos.",
+      "script": "Anão"
+    },
+    {
+      "id": "dnd2024:language:goblin",
+      "type": "language",
+      "schemaVersion": "1.0.0",
+      "name": "Goblin",
+      "description": "Idioma falado por goblinoides.",
+      "script": "Anão"
+    },
+    {
+      "id": "dnd2024:language:halfling",
+      "type": "language",
+      "schemaVersion": "1.0.0",
+      "name": "Halfling",
+      "description": "Idioma falado pelos halflings.",
+      "script": "Comum"
+    },
+    {
+      "id": "dnd2024:language:orc",
+      "type": "language",
+      "schemaVersion": "1.0.0",
+      "name": "Orc",
+      "description": "Idioma falado pelos orcs.",
+      "script": "Anão"
+    },
+    {
+      "id": "dnd2024:language:abissal",
+      "type": "language",
+      "schemaVersion": "1.0.0",
+      "name": "Abissal",
+      "description": "Idioma raro falado por demônios e criaturas do Abismo.",
+      "script": "Infernal"
+    },
+    {
+      "id": "dnd2024:language:celestial",
+      "type": "language",
+      "schemaVersion": "1.0.0",
+      "name": "Celestial",
+      "description": "Idioma raro falado por celestiais.",
+      "script": "Celestial"
+    },
+    {
+      "id": "dnd2024:language:fala-profunda",
+      "type": "language",
+      "schemaVersion": "1.0.0",
+      "name": "Fala Profunda",
+      "description": "Idioma raro, mutável e perturbador, falado por aberrações.",
+      "script": "Nenhum"
+    },
+    {
+      "id": "dnd2024:language:druidico",
+      "type": "language",
+      "schemaVersion": "1.0.0",
+      "name": "Druídico",
+      "description": "Idioma secreto e raro, conhecido apenas por druidas.",
+      "script": "Druídico"
+    },
+    {
+      "id": "dnd2024:language:infernal",
+      "type": "language",
+      "schemaVersion": "1.0.0",
+      "name": "Infernal",
+      "description": "Idioma raro falado por diabos e criaturas dos Nove Infernos.",
+      "script": "Infernal"
+    },
+    {
+      "id": "dnd2024:language:primordial",
+      "type": "language",
+      "schemaVersion": "1.0.0",
+      "name": "Primordial",
+      "description": "Idioma raro falado por elementais, com quatro dialetos regionais mutuamente inteligíveis.",
+      "script": "Dracônico"
+    },
+    {
+      "id": "dnd2024:language:silvestre",
+      "type": "language",
+      "schemaVersion": "1.0.0",
+      "name": "Silvestre",
+      "description": "Idioma raro falado por fadas e criaturas do Feywild.",
+      "script": "Élfico"
+    },
+    {
+      "id": "dnd2024:language:giria-dos-ladroes",
+      "type": "language",
+      "schemaVersion": "1.0.0",
+      "name": "Gíria dos Ladrões",
+      "description": "Idioma secreto e raro, misto de dialeto e código, usado por criminosos.",
+      "script": "Nenhum"
+    },
+    {
+      "id": "dnd2024:language:subcomum",
+      "type": "language",
+      "schemaVersion": "1.0.0",
+      "name": "Subcomum",
+      "description": "Idioma raro falado nas profundezas do Submundo.",
+      "script": "Élfico"
+    }
+  ]
+}

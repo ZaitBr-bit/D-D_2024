@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "1.0.0",
+  "type": "damage-type",
+  "items": [
+    {
+      "id": "dnd2024:damage-type:acido",
+      "type": "damage-type",
+      "schemaVersion": "1.0.0",
+      "name": "Ácido",
+      "description": "Dano corrosivo por contato ou aspersão de substâncias ácidas."
+    },
+    {
+      "id": "dnd2024:damage-type:contundente",
+      "type": "damage-type",
+      "schemaVersion": "1.0.0",
+      "name": "Contundente",
+      "description": "Dano de impacto contundente, causado por golpes, quedas ou esmagamento."
+    },
+    {
+      "id": "dnd2024:damage-type:cortante",
+      "type": "damage-type",
+      "schemaVersion": "1.0.0",
+      "name": "Cortante",
+      "description": "Dano causado por lâminas ou garras cortantes."
+    },
+    {
+      "id": "dnd2024:damage-type:forca",
+      "type": "damage-type",
+      "schemaVersion": "1.0.0",
+      "name": "Força",
+      "description": "Energia mágica pura, canalizada para causar dano físico."
+    },
+    {
+      "id": "dnd2024:damage-type:fogo",
+      "type": "damage-type",
+      "schemaVersion": "1.0.0",
+      "name": "Fogo",
+      "description": "Dano por queimadura ou combustão."
+    },
+    {
+      "id": "dnd2024:damage-type:frio",
+      "type": "damage-type",
+      "schemaVersion": "1.0.0",
+      "name": "Frio",
+      "description": "Dano por congelamento ou frio extremo."
+    },
+    {
+      "id": "dnd2024:damage-type:necrotico",
+      "type": "damage-type",
+      "schemaVersion": "1.0.0",
+      "name": "Necrótico",
+      "description": "Energia da morte que mirra e corrói a matéria viva."
+    },
+    {
+      "id": "dnd2024:damage-type:perfurante",
+      "type": "damage-type",
+      "schemaVersion": "1.0.0",
+      "name": "Perfurante",
+      "description": "Dano causado por presas, pontas ou ataques de perfuração."
+    },
+    {
+      "id": "dnd2024:damage-type:psiquico",
+      "type": "damage-type",
+      "schemaVersion": "1.0.0",
+      "name": "Psíquico",
+      "description": "Dano causado por assalto mental ou emanações psíquicas."
+    },
+    {
+      "id": "dnd2024:damage-type:radiante",
+      "type": "damage-type",
+      "schemaVersion": "1.0.0",
+      "name": "Radiante",
+      "description": "Energia divina que queima a carne e a alma."
+    },
+    {
+      "id": "dnd2024:damage-type:relampago",
+      "type": "damage-type",
+      "schemaVersion": "1.0.0",
+      "name": "Relâmpago",
+      "description": "Dano causado por descargas elétricas."
+    },
+    {
+      "id": "dnd2024:damage-type:trovao",
+      "type": "damage-type",
+      "schemaVersion": "1.0.0",
+      "name": "Trovão",
+      "description": "Dano causado por ondas de som concussivas."
+    },
+    {
+      "id": "dnd2024:damage-type:veneno",
+      "type": "damage-type",
+      "schemaVersion": "1.0.0",
+      "name": "Veneno",
+      "description": "Dano causado por toxinas."
+    }
+  ]
+}

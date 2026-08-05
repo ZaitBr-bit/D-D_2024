@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.fichas-de-nimb.dev/v1/manifest.schema.json",
+  "title": "Manifest (v1)",
+  "description": "Metadados de um pacote de conteúdo (fonte de regras): identidade, versão e quais tipos de entidade ele contém. Admite caminhos auxiliares tipados em legacyAdapters (ponte para o formato monolítico legado), deliberadamente sem campos de capacidade/confiança. `description`/`authors` são somente apresentação (não confiáveis): passam pelo mesmo escape/sanitização de qualquer outro texto de conteúdo e nunca participam de decisão de namespace/capacidade (ver site/js/content/capabilities.js). `status`/`referenceMigrations` foram acrescentados na Task 7 para dar suporte ao pacote oficial dnd2024: `status` é o único campo que o runtime (site/js/content/registry.js) usa para decidir se um pacote pode ser ativado (`READY_STATUS = 'ready'`; qualquer outro valor, incluindo `'building'`, fica de fora do catálogo publicado mesmo que passe neste schema) — deliberadamente OPCIONAL aqui e não `required`, pois a ausência de `status` já é tratada como 'não pronto' pelo próprio registry, não como erro de schema. `referenceMigrations` é consumido por site/js/content/reference-migrations.js.",
+  "type": "object",
+  "properties": {
+    "schemaVersion": { "$ref": "common.schema.json#/$defs/semVer" },
+    "id": { "$ref": "common.schema.json#/$defs/localSlug" },
+    "name": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "description": { "type": "string" },
+    "authors": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "role": { "type": "string" }
+        },
+        "required": ["name"],
+        "additionalProperties": false
+      }
+    },
+    "version": { "$ref": "common.schema.json#/$defs/semVer" },
+    "status": { "enum": ["building", "ready"] },
+    "ruleset": { "$ref": "common.schema.json#/$defs/rulesetRef" },
+    "entitySchemaVersions": {
+      "type": "object",
+      "propertyNames": { "$ref": "common.schema.json#/$defs/entityType" },
+      "additionalProperties": { "$ref": "common.schema.json#/$defs/semVer" }
+    },
+    "entities": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "common.schema.json#/$defs/entityType" }
+    },
+    "dependencies": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "$ref": "common.schema.json#/$defs/localSlug" },
+          "version": { "$ref": "common.schema.json#/$defs/semVer" }
+        },
+        "required": ["id"],
+        "additionalProperties": false
+      }
+    },
+    "referenceMigrations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "from": { "$ref": "common.schema.json#/$defs/semVer" },
+          "to": { "$ref": "common.schema.json#/$defs/semVer" },
+          "entities": {
+            "type": "object",
+            "additionalProperties": { "$ref": "common.schema.json#/$defs/contentId" }
+          },
+          "choices": {
+            "type": "object",
+            "additionalProperties": { "type": "string", "minLength": 1 }
+          },
+          "removed": {
+            "type": "array",
+            "items": { "$ref": "common.schema.json#/$defs/contentId" }
+          }
+        },
+        "required": ["from", "to"],
+        "additionalProperties": false
+      }
+    },
+    "legacyAdapters": {
+      "oneOf": [
+        {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+              "path": { "$ref": "common.schema.json#/$defs/nonEmptyString" }
+            },
+            "required": ["type", "path"],
+            "additionalProperties": false
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": { "$ref": "common.schema.json#/$defs/migrationMapRef" }
+        }
+      ]
+    }
+  },
+  "required": ["schemaVersion", "id", "name", "version", "ruleset", "entities"],
+  "additionalProperties": false
+}

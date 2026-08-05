@@ -1,0 +1,880 @@
+{
+  "fixtureVersion": 1,
+  "compatibilityBaseline": "e43c5ea",
+  "generatedAt": "2026-07-26T00:00:00.000Z",
+  "cases": [
+    {
+      "id": "fila-upsert-pendente",
+      "descricao": "Um upsert pendente na fila (personagem alterado offline ou aguardando sync), no shape exato produzido por enfileirarSync: { id, dados, tentativas }, sem campo `acao`.",
+      "origemReal": "site/js/sync.js#enfileirarSync",
+      "localStorageKey": "dnd_sync_queue",
+      "filaAntes": [],
+      "operacao": {
+        "fn": "enfileirarSync",
+        "personagem": {
+          "id": "sy01-sy01-sy01",
+          "nome": "Fila de Sync",
+          "imagem": "",
+          "nivel": 2,
+          "xp": 0,
+          "exaustao": 0,
+          "classe": "Ladino",
+          "subclasse": "",
+          "especie": "",
+          "antecedente": "",
+          "alinhamento": "",
+          "ordem_divina": "",
+          "ordem_primal": "",
+          "tracos_escolhidos": [],
+          "extras_classe": {},
+          "escolhas_classe": {},
+          "escolhas_antecedente": {},
+          "proficiencias_extra": [],
+          "atributos": {
+            "forca": 10,
+            "destreza": 10,
+            "constituicao": 10,
+            "inteligencia": 10,
+            "sabedoria": 10,
+            "carisma": 10
+          },
+          "configuracao_criacao": {
+            "atributos": {
+              "metodo": null,
+              "valoresBase": null,
+              "rolagens": null
+            }
+          },
+          "edicoes": {
+            "versao": 1,
+            "campos": {}
+          },
+          "atributos_base": {
+            "forca": 10,
+            "destreza": 10,
+            "constituicao": 10,
+            "inteligencia": 10,
+            "sabedoria": 10,
+            "carisma": 10
+          },
+          "bonus_antecedente": {},
+          "pv_max": 0,
+          "pv_atual": 0,
+          "pv_temporario": 0,
+          "dados_vida_total": 1,
+          "dados_vida_usados": 0,
+          "pericias_proficientes": [],
+          "pericias_expertise": [],
+          "salvaguardas_proficientes": [],
+          "inventario": [],
+          "escolha_equip_classe": null,
+          "escolha_equip_antecedente": null,
+          "moedas": {
+            "pc": 0,
+            "pp": 0,
+            "pe": 0,
+            "po": 0,
+            "pl": 0
+          },
+          "magias_conhecidas": [],
+          "magias_preparadas": [],
+          "grimorio": [],
+          "espacos_magia": {},
+          "talentos": [],
+          "itens_customizados": [],
+          "magias_customizadas": [],
+          "efeitos_magicos": [],
+          "usos_habilidades": {},
+          "aparencia": "",
+          "personalidade": "",
+          "ideais": "",
+          "lacos": "",
+          "defeitos": "",
+          "historia_personagem": "",
+          "notas": "",
+          "idiomas": [
+            "Comum"
+          ],
+          "tamanho": "",
+          "config": {
+            "sobrecarga_afeta_deslocamento": false
+          },
+          "condicoes": [],
+          "resistencias": [],
+          "vulnerabilidades": [],
+          "imunidades": [],
+          "proficiencias_ferramentas": [],
+          "proficiencias_instrumentos": [],
+          "talentos_flags": {},
+          "talentos_parametros": {},
+          "criado_em": "2026-07-01T12:00:00.000Z",
+          "atualizado_em": "2026-07-01T12:00:00.000Z"
+        }
+      },
+      "filaDepois": [
+        {
+          "id": "sy01-sy01-sy01",
+          "dados": {
+            "id": "sy01-sy01-sy01",
+            "nome": "Fila de Sync",
+            "imagem": "",
+            "nivel": 2,
+            "xp": 0,
+            "exaustao": 0,
+            "classe": "Ladino",
+            "subclasse": "",
+            "especie": "",
+            "antecedente": "",
+            "alinhamento": "",
+            "ordem_divina": "",
+            "ordem_primal": "",
+            "tracos_escolhidos": [],
+            "extras_classe": {},
+            "escolhas_classe": {},
+            "escolhas_antecedente": {},
+            "proficiencias_extra": [],
+            "atributos": {
+              "forca": 10,
+              "destreza": 10,
+              "constituicao": 10,
+              "inteligencia": 10,
+              "sabedoria": 10,
+              "carisma": 10
+            },
+            "configuracao_criacao": {
+              "atributos": {
+                "metodo": null,
+                "valoresBase": null,
+                "rolagens": null
+              }
+            },
+            "edicoes": {
+              "versao": 1,
+              "campos": {}
+            },
+            "atributos_base": {
+              "forca": 10,
+              "destreza": 10,
+              "constituicao": 10,
+              "inteligencia": 10,
+              "sabedoria": 10,
+              "carisma": 10
+            },
+            "bonus_antecedente": {},
+            "pv_max": 0,
+            "pv_atual": 0,
+            "pv_temporario": 0,
+            "dados_vida_total": 1,
+            "dados_vida_usados": 0,
+            "pericias_proficientes": [],
+            "pericias_expertise": [],
+            "salvaguardas_proficientes": [],
+            "inventario": [],
+            "escolha_equip_classe": null,
+            "escolha_equip_antecedente": null,
+            "moedas": {
+              "pc": 0,
+              "pp": 0,
+              "pe": 0,
+              "po": 0,
+              "pl": 0
+            },
+            "magias_conhecidas": [],
+            "magias_preparadas": [],
+            "grimorio": [],
+            "espacos_magia": {},
+            "talentos": [],
+            "itens_customizados": [],
+            "magias_customizadas": [],
+            "efeitos_magicos": [],
+            "usos_habilidades": {},
+            "aparencia": "",
+            "personalidade": "",
+            "ideais": "",
+            "lacos": "",
+            "defeitos": "",
+            "historia_personagem": "",
+            "notas": "",
+            "idiomas": [
+              "Comum"
+            ],
+            "tamanho": "",
+            "config": {
+              "sobrecarga_afeta_deslocamento": false
+            },
+            "condicoes": [],
+            "resistencias": [],
+            "vulnerabilidades": [],
+            "imunidades": [],
+            "proficiencias_ferramentas": [],
+            "proficiencias_instrumentos": [],
+            "talentos_flags": {},
+            "talentos_parametros": {},
+            "criado_em": "2026-07-01T12:00:00.000Z",
+            "atualizado_em": "2026-07-01T12:00:00.000Z"
+          },
+          "tentativas": 0
+        }
+      ]
+    },
+    {
+      "id": "fila-upsert-substituido-por-novo-upsert",
+      "descricao": "enfileirarSync faz upsert por id: uma segunda chamada para o mesmo personagem substitui a entrada anterior na mesma posição.",
+      "origemReal": "site/js/sync.js#enfileirarSync",
+      "localStorageKey": "dnd_sync_queue",
+      "filaAntes": [
+        {
+          "id": "sy01-sy01-sy01",
+          "dados": {
+            "id": "sy01-sy01-sy01",
+            "nome": "Fila de Sync (versão antiga)",
+            "imagem": "",
+            "nivel": 2,
+            "xp": 0,
+            "exaustao": 0,
+            "classe": "Ladino",
+            "subclasse": "",
+            "especie": "",
+            "antecedente": "",
+            "alinhamento": "",
+            "ordem_divina": "",
+            "ordem_primal": "",
+            "tracos_escolhidos": [],
+            "extras_classe": {},
+            "escolhas_classe": {},
+            "escolhas_antecedente": {},
+            "proficiencias_extra": [],
+            "atributos": {
+              "forca": 10,
+              "destreza": 10,
+              "constituicao": 10,
+              "inteligencia": 10,
+              "sabedoria": 10,
+              "carisma": 10
+            },
+            "configuracao_criacao": {
+              "atributos": {
+                "metodo": null,
+                "valoresBase": null,
+                "rolagens": null
+              }
+            },
+            "edicoes": {
+              "versao": 1,
+              "campos": {}
+            },
+            "atributos_base": {
+              "forca": 10,
+              "destreza": 10,
+              "constituicao": 10,
+              "inteligencia": 10,
+              "sabedoria": 10,
+              "carisma": 10
+            },
+            "bonus_antecedente": {},
+            "pv_max": 0,
+            "pv_atual": 0,
+            "pv_temporario": 0,
+            "dados_vida_total": 1,
+            "dados_vida_usados": 0,
+            "pericias_proficientes": [],
+            "pericias_expertise": [],
+            "salvaguardas_proficientes": [],
+            "inventario": [],
+            "escolha_equip_classe": null,
+            "escolha_equip_antecedente": null,
+            "moedas": {
+              "pc": 0,
+              "pp": 0,
+              "pe": 0,
+              "po": 0,
+              "pl": 0
+            },
+            "magias_conhecidas": [],
+            "magias_preparadas": [],
+            "grimorio": [],
+            "espacos_magia": {},
+            "talentos": [],
+            "itens_customizados": [],
+            "magias_customizadas": [],
+            "efeitos_magicos": [],
+            "usos_habilidades": {},
+            "aparencia": "",
+            "personalidade": "",
+            "ideais": "",
+            "lacos": "",
+            "defeitos": "",
+            "historia_personagem": "",
+            "notas": "",
+            "idiomas": [
+              "Comum"
+            ],
+            "tamanho": "",
+            "config": {
+              "sobrecarga_afeta_deslocamento": false
+            },
+            "condicoes": [],
+            "resistencias": [],
+            "vulnerabilidades": [],
+            "imunidades": [],
+            "proficiencias_ferramentas": [],
+            "proficiencias_instrumentos": [],
+            "talentos_flags": {},
+            "talentos_parametros": {},
+            "criado_em": "2026-07-01T12:00:00.000Z",
+            "atualizado_em": "2026-07-01T12:00:00.000Z"
+          },
+          "tentativas": 2
+        }
+      ],
+      "operacao": {
+        "fn": "enfileirarSync",
+        "personagem": {
+          "id": "sy01-sy01-sy01",
+          "nome": "Fila de Sync",
+          "imagem": "",
+          "nivel": 2,
+          "xp": 0,
+          "exaustao": 0,
+          "classe": "Ladino",
+          "subclasse": "",
+          "especie": "",
+          "antecedente": "",
+          "alinhamento": "",
+          "ordem_divina": "",
+          "ordem_primal": "",
+          "tracos_escolhidos": [],
+          "extras_classe": {},
+          "escolhas_classe": {},
+          "escolhas_antecedente": {},
+          "proficiencias_extra": [],
+          "atributos": {
+            "forca": 10,
+            "destreza": 10,
+            "constituicao": 10,
+            "inteligencia": 10,
+            "sabedoria": 10,
+            "carisma": 10
+          },
+          "configuracao_criacao": {
+            "atributos": {
+              "metodo": null,
+              "valoresBase": null,
+              "rolagens": null
+            }
+          },
+          "edicoes": {
+            "versao": 1,
+            "campos": {}
+          },
+          "atributos_base": {
+            "forca": 10,
+            "destreza": 10,
+            "constituicao": 10,
+            "inteligencia": 10,
+            "sabedoria": 10,
+            "carisma": 10
+          },
+          "bonus_antecedente": {},
+          "pv_max": 0,
+          "pv_atual": 0,
+          "pv_temporario": 0,
+          "dados_vida_total": 1,
+          "dados_vida_usados": 0,
+          "pericias_proficientes": [],
+          "pericias_expertise": [],
+          "salvaguardas_proficientes": [],
+          "inventario": [],
+          "escolha_equip_classe": null,
+          "escolha_equip_antecedente": null,
+          "moedas": {
+            "pc": 0,
+            "pp": 0,
+            "pe": 0,
+            "po": 0,
+            "pl": 0
+          },
+          "magias_conhecidas": [],
+          "magias_preparadas": [],
+          "grimorio": [],
+          "espacos_magia": {},
+          "talentos": [],
+          "itens_customizados": [],
+          "magias_customizadas": [],
+          "efeitos_magicos": [],
+          "usos_habilidades": {},
+          "aparencia": "",
+          "personalidade": "",
+          "ideais": "",
+          "lacos": "",
+          "defeitos": "",
+          "historia_personagem": "",
+          "notas": "",
+          "idiomas": [
+            "Comum"
+          ],
+          "tamanho": "",
+          "config": {
+            "sobrecarga_afeta_deslocamento": false
+          },
+          "condicoes": [],
+          "resistencias": [],
+          "vulnerabilidades": [],
+          "imunidades": [],
+          "proficiencias_ferramentas": [],
+          "proficiencias_instrumentos": [],
+          "talentos_flags": {},
+          "talentos_parametros": {},
+          "criado_em": "2026-07-01T12:00:00.000Z",
+          "atualizado_em": "2026-07-01T12:00:00.000Z"
+        }
+      },
+      "filaDepois": [
+        {
+          "id": "sy01-sy01-sy01",
+          "dados": {
+            "id": "sy01-sy01-sy01",
+            "nome": "Fila de Sync",
+            "imagem": "",
+            "nivel": 2,
+            "xp": 0,
+            "exaustao": 0,
+            "classe": "Ladino",
+            "subclasse": "",
+            "especie": "",
+            "antecedente": "",
+            "alinhamento": "",
+            "ordem_divina": "",
+            "ordem_primal": "",
+            "tracos_escolhidos": [],
+            "extras_classe": {},
+            "escolhas_classe": {},
+            "escolhas_antecedente": {},
+            "proficiencias_extra": [],
+            "atributos": {
+              "forca": 10,
+              "destreza": 10,
+              "constituicao": 10,
+              "inteligencia": 10,
+              "sabedoria": 10,
+              "carisma": 10
+            },
+            "configuracao_criacao": {
+              "atributos": {
+                "metodo": null,
+                "valoresBase": null,
+                "rolagens": null
+              }
+            },
+            "edicoes": {
+              "versao": 1,
+              "campos": {}
+            },
+            "atributos_base": {
+              "forca": 10,
+              "destreza": 10,
+              "constituicao": 10,
+              "inteligencia": 10,
+              "sabedoria": 10,
+              "carisma": 10
+            },
+            "bonus_antecedente": {},
+            "pv_max": 0,
+            "pv_atual": 0,
+            "pv_temporario": 0,
+            "dados_vida_total": 1,
+            "dados_vida_usados": 0,
+            "pericias_proficientes": [],
+            "pericias_expertise": [],
+            "salvaguardas_proficientes": [],
+            "inventario": [],
+            "escolha_equip_classe": null,
+            "escolha_equip_antecedente": null,
+            "moedas": {
+              "pc": 0,
+              "pp": 0,
+              "pe": 0,
+              "po": 0,
+              "pl": 0
+            },
+            "magias_conhecidas": [],
+            "magias_preparadas": [],
+            "grimorio": [],
+            "espacos_magia": {},
+            "talentos": [],
+            "itens_customizados": [],
+            "magias_customizadas": [],
+            "efeitos_magicos": [],
+            "usos_habilidades": {},
+            "aparencia": "",
+            "personalidade": "",
+            "ideais": "",
+            "lacos": "",
+            "defeitos": "",
+            "historia_personagem": "",
+            "notas": "",
+            "idiomas": [
+              "Comum"
+            ],
+            "tamanho": "",
+            "config": {
+              "sobrecarga_afeta_deslocamento": false
+            },
+            "condicoes": [],
+            "resistencias": [],
+            "vulnerabilidades": [],
+            "imunidades": [],
+            "proficiencias_ferramentas": [],
+            "proficiencias_instrumentos": [],
+            "talentos_flags": {},
+            "talentos_parametros": {},
+            "criado_em": "2026-07-01T12:00:00.000Z",
+            "atualizado_em": "2026-07-01T12:00:00.000Z"
+          },
+          "tentativas": 0
+        }
+      ]
+    },
+    {
+      "id": "fila-remocao-pendente-cancela-upsert",
+      "descricao": "enfileirarRemocao remove qualquer upsert pendente do mesmo id e enfileira uma remoção no shape { id, acao: \"remover\", tentativas }, sem campo `dados`.",
+      "origemReal": "site/js/sync.js#enfileirarRemocao",
+      "localStorageKey": "dnd_sync_queue",
+      "filaAntes": [
+        {
+          "id": "sy01-sy01-sy01",
+          "dados": {
+            "id": "sy01-sy01-sy01",
+            "nome": "Fila de Sync",
+            "imagem": "",
+            "nivel": 2,
+            "xp": 0,
+            "exaustao": 0,
+            "classe": "Ladino",
+            "subclasse": "",
+            "especie": "",
+            "antecedente": "",
+            "alinhamento": "",
+            "ordem_divina": "",
+            "ordem_primal": "",
+            "tracos_escolhidos": [],
+            "extras_classe": {},
+            "escolhas_classe": {},
+            "escolhas_antecedente": {},
+            "proficiencias_extra": [],
+            "atributos": {
+              "forca": 10,
+              "destreza": 10,
+              "constituicao": 10,
+              "inteligencia": 10,
+              "sabedoria": 10,
+              "carisma": 10
+            },
+            "configuracao_criacao": {
+              "atributos": {
+                "metodo": null,
+                "valoresBase": null,
+                "rolagens": null
+              }
+            },
+            "edicoes": {
+              "versao": 1,
+              "campos": {}
+            },
+            "atributos_base": {
+              "forca": 10,
+              "destreza": 10,
+              "constituicao": 10,
+              "inteligencia": 10,
+              "sabedoria": 10,
+              "carisma": 10
+            },
+            "bonus_antecedente": {},
+            "pv_max": 0,
+            "pv_atual": 0,
+            "pv_temporario": 0,
+            "dados_vida_total": 1,
+            "dados_vida_usados": 0,
+            "pericias_proficientes": [],
+            "pericias_expertise": [],
+            "salvaguardas_proficientes": [],
+            "inventario": [],
+            "escolha_equip_classe": null,
+            "escolha_equip_antecedente": null,
+            "moedas": {
+              "pc": 0,
+              "pp": 0,
+              "pe": 0,
+              "po": 0,
+              "pl": 0
+            },
+            "magias_conhecidas": [],
+            "magias_preparadas": [],
+            "grimorio": [],
+            "espacos_magia": {},
+            "talentos": [],
+            "itens_customizados": [],
+            "magias_customizadas": [],
+            "efeitos_magicos": [],
+            "usos_habilidades": {},
+            "aparencia": "",
+            "personalidade": "",
+            "ideais": "",
+            "lacos": "",
+            "defeitos": "",
+            "historia_personagem": "",
+            "notas": "",
+            "idiomas": [
+              "Comum"
+            ],
+            "tamanho": "",
+            "config": {
+              "sobrecarga_afeta_deslocamento": false
+            },
+            "condicoes": [],
+            "resistencias": [],
+            "vulnerabilidades": [],
+            "imunidades": [],
+            "proficiencias_ferramentas": [],
+            "proficiencias_instrumentos": [],
+            "talentos_flags": {},
+            "talentos_parametros": {},
+            "criado_em": "2026-07-01T12:00:00.000Z",
+            "atualizado_em": "2026-07-01T12:00:00.000Z"
+          },
+          "tentativas": 0
+        },
+        {
+          "id": "sy02-sy02-sy02",
+          "dados": {
+            "id": "sy02-sy02-sy02",
+            "nome": "Outro Personagem",
+            "imagem": "",
+            "nivel": 1,
+            "xp": 0,
+            "exaustao": 0,
+            "classe": "",
+            "subclasse": "",
+            "especie": "",
+            "antecedente": "",
+            "alinhamento": "",
+            "ordem_divina": "",
+            "ordem_primal": "",
+            "tracos_escolhidos": [],
+            "extras_classe": {},
+            "escolhas_classe": {},
+            "escolhas_antecedente": {},
+            "proficiencias_extra": [],
+            "atributos": {
+              "forca": 10,
+              "destreza": 10,
+              "constituicao": 10,
+              "inteligencia": 10,
+              "sabedoria": 10,
+              "carisma": 10
+            },
+            "configuracao_criacao": {
+              "atributos": {
+                "metodo": null,
+                "valoresBase": null,
+                "rolagens": null
+              }
+            },
+            "edicoes": {
+              "versao": 1,
+              "campos": {}
+            },
+            "atributos_base": {
+              "forca": 10,
+              "destreza": 10,
+              "constituicao": 10,
+              "inteligencia": 10,
+              "sabedoria": 10,
+              "carisma": 10
+            },
+            "bonus_antecedente": {},
+            "pv_max": 0,
+            "pv_atual": 0,
+            "pv_temporario": 0,
+            "dados_vida_total": 1,
+            "dados_vida_usados": 0,
+            "pericias_proficientes": [],
+            "pericias_expertise": [],
+            "salvaguardas_proficientes": [],
+            "inventario": [],
+            "escolha_equip_classe": null,
+            "escolha_equip_antecedente": null,
+            "moedas": {
+              "pc": 0,
+              "pp": 0,
+              "pe": 0,
+              "po": 0,
+              "pl": 0
+            },
+            "magias_conhecidas": [],
+            "magias_preparadas": [],
+            "grimorio": [],
+            "espacos_magia": {},
+            "talentos": [],
+            "itens_customizados": [],
+            "magias_customizadas": [],
+            "efeitos_magicos": [],
+            "usos_habilidades": {},
+            "aparencia": "",
+            "personalidade": "",
+            "ideais": "",
+            "lacos": "",
+            "defeitos": "",
+            "historia_personagem": "",
+            "notas": "",
+            "idiomas": [
+              "Comum"
+            ],
+            "tamanho": "",
+            "config": {
+              "sobrecarga_afeta_deslocamento": false
+            },
+            "condicoes": [],
+            "resistencias": [],
+            "vulnerabilidades": [],
+            "imunidades": [],
+            "proficiencias_ferramentas": [],
+            "proficiencias_instrumentos": [],
+            "talentos_flags": {},
+            "talentos_parametros": {},
+            "criado_em": "2026-07-01T12:00:00.000Z",
+            "atualizado_em": "2026-07-01T12:00:00.000Z"
+          },
+          "tentativas": 1
+        }
+      ],
+      "operacao": {
+        "fn": "enfileirarRemocao",
+        "id": "sy01-sy01-sy01"
+      },
+      "filaDepois": [
+        {
+          "id": "sy02-sy02-sy02",
+          "dados": {
+            "id": "sy02-sy02-sy02",
+            "nome": "Outro Personagem",
+            "imagem": "",
+            "nivel": 1,
+            "xp": 0,
+            "exaustao": 0,
+            "classe": "",
+            "subclasse": "",
+            "especie": "",
+            "antecedente": "",
+            "alinhamento": "",
+            "ordem_divina": "",
+            "ordem_primal": "",
+            "tracos_escolhidos": [],
+            "extras_classe": {},
+            "escolhas_classe": {},
+            "escolhas_antecedente": {},
+            "proficiencias_extra": [],
+            "atributos": {
+              "forca": 10,
+              "destreza": 10,
+              "constituicao": 10,
+              "inteligencia": 10,
+              "sabedoria": 10,
+              "carisma": 10
+            },
+            "configuracao_criacao": {
+              "atributos": {
+                "metodo": null,
+                "valoresBase": null,
+                "rolagens": null
+              }
+            },
+            "edicoes": {
+              "versao": 1,
+              "campos": {}
+            },
+            "atributos_base": {
+              "forca": 10,
+              "destreza": 10,
+              "constituicao": 10,
+              "inteligencia": 10,
+              "sabedoria": 10,
+              "carisma": 10
+            },
+            "bonus_antecedente": {},
+            "pv_max": 0,
+            "pv_atual": 0,
+            "pv_temporario": 0,
+            "dados_vida_total": 1,
+            "dados_vida_usados": 0,
+            "pericias_proficientes": [],
+            "pericias_expertise": [],
+            "salvaguardas_proficientes": [],
+            "inventario": [],
+            "escolha_equip_classe": null,
+            "escolha_equip_antecedente": null,
+            "moedas": {
+              "pc": 0,
+              "pp": 0,
+              "pe": 0,
+              "po": 0,
+              "pl": 0
+            },
+            "magias_conhecidas": [],
+            "magias_preparadas": [],
+            "grimorio": [],
+            "espacos_magia": {},
+            "talentos": [],
+            "itens_customizados": [],
+            "magias_customizadas": [],
+            "efeitos_magicos": [],
+            "usos_habilidades": {},
+            "aparencia": "",
+            "personalidade": "",
+            "ideais": "",
+            "lacos": "",
+            "defeitos": "",
+            "historia_personagem": "",
+            "notas": "",
+            "idiomas": [
+              "Comum"
+            ],
+            "tamanho": "",
+            "config": {
+              "sobrecarga_afeta_deslocamento": false
+            },
+            "condicoes": [],
+            "resistencias": [],
+            "vulnerabilidades": [],
+            "imunidades": [],
+            "proficiencias_ferramentas": [],
+            "proficiencias_instrumentos": [],
+            "talentos_flags": {},
+            "talentos_parametros": {},
+            "criado_em": "2026-07-01T12:00:00.000Z",
+            "atualizado_em": "2026-07-01T12:00:00.000Z"
+          },
+          "tentativas": 1
+        },
+        {
+          "id": "sy01-sy01-sy01",
+          "acao": "remover",
+          "tentativas": 0
+        }
+      ]
+    },
+    {
+      "id": "fila-remocao-com-tentativas-esgotadas",
+      "descricao": "Entrada de remoção que já falhou MAX_TENTATIVAS (3) vezes: permanece na fila (não é descartada automaticamente), apenas loga aviso.",
+      "origemReal": "site/js/sync.js#_processarFilaSync (MAX_TENTATIVAS=3)",
+      "localStorageKey": "dnd_sync_queue",
+      "filaAntes": [
+        {
+          "id": "sy03-sy03-sy03",
+          "acao": "remover",
+          "tentativas": 3
+        }
+      ]
+    }
+  ]
+}

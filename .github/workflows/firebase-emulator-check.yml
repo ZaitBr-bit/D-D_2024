@@ -1,0 +1,73 @@
+name: firebase-emulator-check
+
+# ============================================================
+# Workflow read-only que roda a suíte do Firestore Emulator num runner
+# com Java 21 (Temurin), porque o host de desenvolvimento atual tem
+# apenas Java 8 e o preflight local aborta de propósito.
+#
+# Nunca commita, nunca faz push, nunca usa credencial: o Emulator roda
+# offline contra o projeto `demo-dnd-refactor`, que por começar com
+# `demo-` jamais fala com um backend Firebase real.
+#
+# Gatilhos:
+# - push do PRÓPRIO arquivo deste workflow na branch `refatoracao` (o
+#   primeiro push que o cria/atualiza no repositório);
+# - push de qualquer tag `firebase-emulator-*` — filtros de path não se
+#   aplicam a push de tag, então esse gatilho permite retry (criar um novo
+#   tag) sem exigir nenhuma mudança de fonte;
+# - workflow_dispatch, disponível assim que o arquivo já existir na branch
+#   padrão do repositório (pré-requisito do próprio GitHub).
+# ============================================================
+
+on:
+  push:
+    branches:
+      - refatoracao
+    paths:
+      - '.github/workflows/firebase-emulator-check.yml'
+    tags:
+      - 'firebase-emulator-*'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  firestore-emulator:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (history completo)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Node 22.17.1
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.1'
+
+      - name: Configurar Java 21 (Temurin) — exigido pelo Firestore Emulator
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Preflight — Java 21, firebase.json e projeto demo-dnd-refactor
+        run: npm run test:firebase:preflight
+
+      - name: Suíte do Firestore Emulator (gateway + fila de sync)
+        run: npm run test:firebase
+
+      - name: Publicar logs do Emulator
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: firebase-emulator-logs-${{ github.sha }}
+          path: |
+            firebase-debug.log
+            firestore-debug.log
+          if-no-files-found: ignore
+          retention-days: 30

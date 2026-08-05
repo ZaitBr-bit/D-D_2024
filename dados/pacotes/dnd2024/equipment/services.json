@@ -1,0 +1,453 @@
+{
+  "schemaVersion": "1.0.0",
+  "type": "equipment",
+  "items": [
+    {
+      "id": "dnd2024:equipment:alojamento-por-dia-desvalido",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Alojamento por Dia — Desvalido",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 7,
+        "currency": "cp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:alojamento-por-dia-pobre",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Alojamento por Dia — Pobre",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 1,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:alojamento-por-dia-modesto",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Alojamento por Dia — Modesto",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 5,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:alojamento-por-dia-confortavel",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Alojamento por Dia — Confortável",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 8,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:alojamento-por-dia-abastado",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Alojamento por Dia — Abastado",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 2,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:alojamento-por-dia-aristocratico",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Alojamento por Dia — Aristocrático",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 4,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:cerveja-caneca",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Cerveja (caneca)",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 4,
+        "currency": "cp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:pao-fatia",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Pão (fatia)",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 2,
+        "currency": "cp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:queijo-fatia",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Queijo (fatia)",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 1,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:refeicoes-desvalido",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Refeições — Desvalido",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 1,
+        "currency": "cp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:refeicoes-pobre",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Refeições — Pobre",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 2,
+        "currency": "cp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:refeicoes-modesto",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Refeições — Modesto",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 1,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:refeicoes-confortavel",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Refeições — Confortável",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 2,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:refeicoes-abastado",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Refeições — Abastado",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 3,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:refeicoes-aristocratico",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Refeições — Aristocrático",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 6,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:vinho-garrafa-comum",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Vinho (garrafa) — Comum",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 2,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:vinho-garrafa-bom",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Vinho (garrafa) — Bom",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 10,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:conducao-de-carroca-dentro-de-uma-cidade",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Condução de carroça dentro de uma cidade",
+      "description": "Custo: 1 PC por quilômetro.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 1,
+        "currency": "cp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:conducao-de-carroca-entre-aldeias-cidades",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Condução de carroça entre aldeias/cidades",
+      "description": "Custo: 2 PC por quilômetro.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 2,
+        "currency": "cp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:passagem-de-navio",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Passagem de navio",
+      "description": "Custo: 6 PC por quilômetro.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 6,
+        "currency": "cp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:pedagio-de-estrada-ou-portao",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Pedágio (de estrada ou portão)",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 1,
+        "currency": "cp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:mensageiro",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Mensageiro",
+      "description": "Custo: 2 PC por 1,5 quilômetro.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 2,
+        "currency": "cp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:trabalhador-nao-qualificado",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Trabalhador não-qualificado",
+      "description": "Custo: 2 PP por dia.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 2,
+        "currency": "sp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:trabalhador-qualificado",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Trabalhador qualificado",
+      "description": "Custo: 2 PO por dia.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 2,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:conjuracao-sob-encomenda-circulo-truque",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Conjuração sob Encomenda — Círculo Truque",
+      "description": "Disponibilidade: Vila, aldeia ou cidade.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 30,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:conjuracao-sob-encomenda-circulo-1",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Conjuração sob Encomenda — Círculo 1",
+      "description": "Disponibilidade: Vila, aldeia ou cidade.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 50,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:conjuracao-sob-encomenda-circulo-2",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Conjuração sob Encomenda — Círculo 2",
+      "description": "Disponibilidade: Vila, aldeia ou cidade.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 200,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:conjuracao-sob-encomenda-circulo-3",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Conjuração sob Encomenda — Círculo 3",
+      "description": "Disponibilidade: Apenas aldeia ou cidade.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 300,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:conjuracao-sob-encomenda-circulo-4-5",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Conjuração sob Encomenda — Círculo 4–5",
+      "description": "Disponibilidade: Apenas aldeia ou cidade.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 2000,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:conjuracao-sob-encomenda-circulo-6-8",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Conjuração sob Encomenda — Círculo 6–8",
+      "description": "Disponibilidade: Apenas cidade.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 20000,
+        "currency": "gp"
+      }
+    },
+    {
+      "id": "dnd2024:equipment:conjuracao-sob-encomenda-circulo-9",
+      "type": "equipment",
+      "schemaVersion": "1.0.0",
+      "name": "Conjuração sob Encomenda — Círculo 9",
+      "description": "Disponibilidade: Apenas cidade.",
+      "source": {
+        "book": "Livro do Jogador (2024)"
+      },
+      "category": "Serviço",
+      "cost": {
+        "amount": 100000,
+        "currency": "gp"
+      }
+    }
+  ]
+}

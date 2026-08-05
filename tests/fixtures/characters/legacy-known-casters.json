@@ -1,0 +1,259 @@
+{
+  "fixtureVersion": 1,
+  "compatibilityBaseline": "e43c5ea",
+  "generatedAt": "2026-07-26T00:00:00.000Z",
+  "cases": [
+    {
+      "id": "conhecidas-bardo",
+      "descricao": "Bardo nível 3, tipo_conjuracao real=\"conhecidas\" (importado de dados-classes.js): magias_conhecidas fixas (Carisma), sem magias_preparadas.",
+      "origemReal": "site/js/dados-classes.js#CLASSES_INFO + site/js/utils.js#getMagiaPreparadas",
+      "personagem": {
+        "id": "kc01-kc01-kc01",
+        "nome": "Bardo Conhecido",
+        "imagem": "",
+        "nivel": 3,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Bardo",
+        "subclasse": "Colégio do Saber",
+        "especie": "",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 8,
+          "destreza": 14,
+          "constituicao": 13,
+          "inteligencia": 10,
+          "sabedoria": 12,
+          "carisma": 16
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 0,
+        "pv_atual": 0,
+        "pv_temporario": 0,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 0,
+        "pericias_proficientes": [],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [],
+        "inventario": [],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [
+          {
+            "nome": "Palavra de Cura",
+            "circulo": 1,
+            "origem": "classe"
+          },
+          {
+            "nome": "Luzes Dançantes",
+            "circulo": 0,
+            "origem": "classe"
+          }
+        ],
+        "magias_preparadas": [],
+        "grimorio": [],
+        "espacos_magia": {
+          "1": {
+            "total": 4,
+            "usados": 1
+          },
+          "2": {
+            "total": 2,
+            "usados": 0
+          }
+        },
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z"
+      }
+    },
+    {
+      "id": "conhecidas-feiticeiro",
+      "descricao": "Feiticeiro nível 5, tipo_conjuracao real=\"conhecidas\".",
+      "origemReal": "site/js/dados-classes.js#CLASSES_INFO",
+      "personagem": {
+        "id": "kc02-kc02-kc02",
+        "nome": "Feiticeiro Conhecido",
+        "imagem": "",
+        "nivel": 5,
+        "xp": 0,
+        "exaustao": 0,
+        "classe": "Feiticeiro",
+        "subclasse": "Feitiçaria Dracônica",
+        "especie": "",
+        "antecedente": "",
+        "alinhamento": "",
+        "ordem_divina": "",
+        "ordem_primal": "",
+        "tracos_escolhidos": [],
+        "extras_classe": {},
+        "escolhas_classe": {},
+        "escolhas_antecedente": {},
+        "proficiencias_extra": [],
+        "atributos": {
+          "forca": 8,
+          "destreza": 14,
+          "constituicao": 14,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 17
+        },
+        "configuracao_criacao": {
+          "atributos": {
+            "metodo": null,
+            "valoresBase": null,
+            "rolagens": null
+          }
+        },
+        "edicoes": {
+          "versao": 1,
+          "campos": {}
+        },
+        "atributos_base": {
+          "forca": 10,
+          "destreza": 10,
+          "constituicao": 10,
+          "inteligencia": 10,
+          "sabedoria": 10,
+          "carisma": 10
+        },
+        "bonus_antecedente": {},
+        "pv_max": 0,
+        "pv_atual": 0,
+        "pv_temporario": 0,
+        "dados_vida_total": 1,
+        "dados_vida_usados": 0,
+        "pericias_proficientes": [],
+        "pericias_expertise": [],
+        "salvaguardas_proficientes": [],
+        "inventario": [],
+        "escolha_equip_classe": null,
+        "escolha_equip_antecedente": null,
+        "moedas": {
+          "pc": 0,
+          "pp": 0,
+          "pe": 0,
+          "po": 0,
+          "pl": 0
+        },
+        "magias_conhecidas": [
+          {
+            "nome": "Mísseis Mágicos",
+            "circulo": 1,
+            "origem": "classe"
+          },
+          {
+            "nome": "Bola de Fogo",
+            "circulo": 3,
+            "origem": "classe"
+          }
+        ],
+        "magias_preparadas": [],
+        "grimorio": [],
+        "espacos_magia": {
+          "1": {
+            "total": 4,
+            "usados": 0
+          },
+          "2": {
+            "total": 3,
+            "usados": 1
+          },
+          "3": {
+            "total": 2,
+            "usados": 0
+          }
+        },
+        "talentos": [],
+        "itens_customizados": [],
+        "magias_customizadas": [],
+        "efeitos_magicos": [],
+        "usos_habilidades": {},
+        "aparencia": "",
+        "personalidade": "",
+        "ideais": "",
+        "lacos": "",
+        "defeitos": "",
+        "historia_personagem": "",
+        "notas": "",
+        "idiomas": [
+          "Comum"
+        ],
+        "tamanho": "",
+        "config": {
+          "sobrecarga_afeta_deslocamento": false
+        },
+        "condicoes": [],
+        "resistencias": [],
+        "vulnerabilidades": [],
+        "imunidades": [],
+        "proficiencias_ferramentas": [],
+        "proficiencias_instrumentos": [],
+        "talentos_flags": {},
+        "talentos_parametros": {},
+        "criado_em": "2026-07-01T12:00:00.000Z",
+        "atualizado_em": "2026-07-01T12:00:00.000Z"
+      }
+    }
+  ]
+}
