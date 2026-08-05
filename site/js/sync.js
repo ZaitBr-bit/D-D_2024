@@ -1,41 +1,17 @@
 // ============================================================
-// Módulo de sincronização em nuvem — FACHADA
-//
-// Toda a lógica de fila (persistência, migração do formato legado, escopo
-// por uid, protocolo de preparo, merge, retry, status) vive agora em
-// `infra/sync/sync-queue.js`, testável sem rede/DOM/SDK. Este arquivo
-// preserva exatamente as exportações que o app legado já consome
-// (`enfileirarSync`, `enfileirarRemocao`, `obterIdsPendentesRemocao`,
-// `processarFilaSync`, `inicializarSync`, `getSyncStatus`,
-// `onSyncStatusChange`) e os mesmos status observáveis
-// (`idle | sincronizando | ok | erro | offline`).
-//
-// A fila só existe quando há um usuário autenticado E o armazenamento
-// local de personagens já foi inicializado (é `store.js` que registra o
-// contexto via `registrarContextoPersonagens`). Sem uma das duas coisas o
-// status permanece `idle`, exatamente como antes.
-//
-// O gateway é PREGUIÇOSO: seu `uid` é lido de forma síncrona da sessão
-// atual (para a fila decidir na hora o que é dela e o que está em
-// quarentena), mas o SDK do Firestore só é carregado da CDN quando uma
-// operação de rede acontece de fato. É isso que mantém `enfileirarSync`
-// síncrono e durável (persiste antes de retornar) mesmo estando offline.
+// Módulo de sincronização em nuvem
+// Gerencia fila persistente, retry automático e status de sync
 // ============================================================
-import { getUsuario, obterGatewayPersonagens } from './auth.js';
-import { createSyncQueue } from './infra/sync/sync-queue.js';
-import { ok, err } from './core/result.js';
-import { createAppError } from './core/errors.js';
+import { getUsuario, salvarPersonagemCloud, removerPersonagemCloud } from './auth.js';
 
-const SCOPE = 'sync';
+const SYNC_QUEUE_KEY = 'dnd_sync_queue';
+const MAX_TENTATIVAS = 3;
+const RETRY_DELAY_MS = 5000;
 
 // Status possíveis: 'idle' | 'sincronizando' | 'ok' | 'erro' | 'offline'
 let _status = 'idle';
 let _statusCallbacks = [];
-
-let _contexto = null; // {repository, codec} registrado por store.js
-let _queue = null;
-let _uidDaFila = null;
-let _cancelarAssinatura = null;
+let _processando = false;
 
 /** Retorna o status atual de sincronização */
 export function getSyncStatus() {
@@ -48,309 +24,55 @@ export function onSyncStatusChange(cb) {
   return () => { _statusCallbacks = _statusCallbacks.filter(c => c !== cb); };
 }
 
+/** Lê a fila de sync do localStorage */
+function _lerFila() {
+  try {
+    return JSON.parse(localStorage.getItem(SYNC_QUEUE_KEY) || '[]');
+  } catch {
+    return [];
+  }
+}
+
+/** Persiste a fila de sync no localStorage */
+function _salvarFila(fila) {
+  localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(fila));
+}
+
 /** Atualiza o status e notifica os callbacks registrados */
 function _setStatus(novoStatus) {
-  if (novoStatus === _status) return;
   _status = novoStatus;
   _statusCallbacks.forEach(cb => cb(novoStatus));
 }
 
 /**
- * Registra o repositório de personagens e o codec já configurados por
- * `store.js`. Sem isto a fila não é construída (ela precisa do repositório
- * para reconciliar preparos e adotar merges remotos com token de revisão).
- * Chamado uma vez, ao fim de `initializeCharacterStorage()`.
- */
-export function registrarContextoPersonagens(contexto) {
-  _contexto = contexto ?? null;
-  _descartarFila();
-}
-
-/** Descarta a fila atual (troca de usuário, novo contexto, logout). */
-function _descartarFila() {
-  if (_cancelarAssinatura) _cancelarAssinatura();
-  _cancelarAssinatura = null;
-  if (_queue) _queue.dispose();
-  _queue = null;
-  _uidDaFila = null;
-}
-
-/**
- * Gateway preguiçoso: expõe o `uid` da sessão de forma síncrona e só
- * carrega o SDK da CDN quando uma operação de rede realmente ocorre.
- * Firebase indisponível (offline/bloqueado) vira um erro estruturado
- * retryable, nunca uma exceção.
- */
-function _criarGatewayPreguicoso() {
-  const indisponivel = () => err(createAppError({
-    code: 'REMOTE_UNAVAILABLE',
-    scope: SCOPE,
-    message: 'Firebase indisponível no momento (offline, bloqueado ou não inicializado).',
-  }));
-
-  const comGateway = async (executar) => {
-    let gateway = null;
-    try {
-      gateway = await obterGatewayPersonagens(_contexto?.codec);
-    } catch (cause) {
-      console.warn('sync.js: falha ao obter o gateway do Firestore:', cause?.message ?? cause);
-      return indisponivel();
-    }
-    if (!gateway) return indisponivel();
-    return executar(gateway);
-  };
-
-  return {
-    get uid() {
-      return getUsuario()?.uid ?? null;
-    },
-    list: () => comGateway((g) => g.list()),
-    upsert: (envelope) => comGateway((g) => g.upsert(envelope)),
-    remove: (characterId) => comGateway((g) => g.remove(characterId)),
-  };
-}
-
-/**
- * Devolve a fila do usuário atual, construindo-a (e carregando/migrando a
- * fila persistida) na primeira necessidade. Devolve `null` quando não há
- * usuário logado, quando o storage de personagens ainda não foi
- * inicializado, ou quando a fila persistida está corrompida — neste último
- * caso os bytes são preservados e o erro é logado, nunca apagado.
- */
-function _obterFila() {
-  const usuario = getUsuario();
-  if (!usuario || !_contexto) {
-    if (_queue) _descartarFila();
-    return null;
-  }
-  if (_queue && _uidDaFila === usuario.uid) {
-    return _queue;
-  }
-
-  _descartarFila();
-
-  let queue;
-  try {
-    queue = createSyncQueue({
-      storage: localStorage,
-      gateway: _criarGatewayPreguicoso(),
-      characterRepository: _contexto.repository,
-      connectivity: { isOnline: () => navigator.onLine },
-      scheduler: {
-        schedule: (fn, delay) => setTimeout(fn, delay),
-        cancel: (handle) => clearTimeout(handle),
-      },
-      codec: _contexto.codec,
-    });
-  } catch (cause) {
-    console.error('sync.js: não foi possível construir a fila de sincronização:', cause?.message ?? cause);
-    return null;
-  }
-
-  const inicializada = queue.initialize();
-  if (!inicializada.ok) {
-    // Fila corrompida: os bytes originais permanecem intactos (a fila
-    // nunca limpa o que não conseguiu interpretar) e nenhuma sincronização
-    // acontece até o problema ser resolvido.
-    console.error('sync.js: fila de sincronização não pôde ser carregada:', inicializada.error.message);
-    queue.dispose();
-    return null;
-  }
-
-  _cancelarAssinatura = queue.subscribe((snapshot) => {
-    _setStatus(snapshot.status);
-    _publicarSnapshotDaFila(snapshot);
-  });
-  _queue = queue;
-  _uidDaFila = usuario.uid;
-  _setStatus(inicializada.value.status);
-  return queue;
-}
-
-/** @type {Array<Function>} assinantes do snapshot da fila (Task 33). */
-let _assinantesDaFila = [];
-
-/**
- * Publica o snapshot da fila para quem assinou por `portaDeFilaDaFicha`.
- * Um assinante que lança não derruba os demais nem a fila.
- * @param {object} snapshot - snapshot publicado pela fila.
- * @returns {void}
- */
-function _publicarSnapshotDaFila(snapshot) {
-  for (const assinante of [..._assinantesDaFila]) {
-    try {
-      assinante(snapshot);
-    } catch (cause) {
-      console.warn('sync.js: assinante da fila lançou durante a notificação:', cause?.message ?? cause);
-    }
-  }
-}
-
-/**
- * Porta da fila usada pela SESSÃO DA FICHA (`features/sheet/sheet-session.js`,
- * cutover da Task 33).
- *
- * Ela precisa de três coisas que `portaDeMutacaoDuravel` não expõe: assinar o
- * snapshot (para mostrar as falhas REMOTAS assíncronas com botão de "tentar
- * novamente"), `retry(failureId)` e `reconcilePrepared()`.
- *
- * É uma porta ESTÁVEL sobre uma fila INSTÁVEL, e essa é a razão de existir: a
- * instância da fila nasce, morre e é trocada conforme o usuário entra e sai
- * (`_obterFila` a reconstrói por uid). Uma sessão de ficha que tivesse
- * guardado a instância diretamente continuaria assinando uma fila morta depois
- * de um logout — sem erro e sem aviso, só parando de mostrar falha de
- * sincronização. Aqui a resolução é feita A CADA CHAMADA, e a assinatura vive
- * neste módulo, que é quem sabe quando a fila trocou.
- *
- * Sem fila (deslogado, storage não inicializado, fila corrompida) as operações
- * RECUSAM com erro nomeado — nunca fingem sucesso.
- */
-export const portaDeFilaDaFicha = Object.freeze({
-  /**
-   * Assina o snapshot da fila. Devolve o disposer, idempotente.
-   * @param {Function} listener - recebe o snapshot da fila.
-   * @returns {() => void}
-   */
-  subscribe(listener) {
-    if (typeof listener !== 'function') {
-      throw new TypeError('portaDeFilaDaFicha.subscribe: "listener" deve ser uma função.');
-    }
-    _assinantesDaFila.push(listener);
-    // A fila pode já existir e já ter falhas: publicar o estado atual na
-    // assinatura evita que a ficha só descubra a pendência no próximo evento.
-    const queue = _obterFila();
-    if (queue) {
-      try {
-        listener(queue.getSnapshot());
-      } catch (cause) {
-        console.warn('sync.js: assinante da fila lançou na assinatura:', cause?.message ?? cause);
-      }
-    }
-    let removido = false;
-    return () => {
-      if (removido) return;
-      removido = true;
-      _assinantesDaFila = _assinantesDaFila.filter((entrada) => entrada !== listener);
-    };
-  },
-
-  /**
-   * Retenta uma falha registrada pela fila.
-   * @param {string} failureId - id da falha.
-   * @returns {import('./core/result.js').Result}
-   */
-  retry(failureId) {
-    const queue = _obterFila();
-    if (!queue) {
-      return err(createAppError({ code: 'SYNC_QUEUE_UNAVAILABLE', scope: SCOPE, message: 'Não há fila de sincronização ativa para retentar.' }));
-    }
-    return queue.retry(failureId);
-  },
-
-  /**
-   * Promove os jobs preparados que ficaram sem confirmação.
-   * @returns {import('./core/result.js').Result}
-   */
-  reconcilePrepared() {
-    const queue = _obterFila();
-    if (!queue) {
-      return err(createAppError({ code: 'SYNC_QUEUE_UNAVAILABLE', scope: SCOPE, message: 'Não há fila de sincronização ativa para reconciliar.' }));
-    }
-    return queue.reconcilePrepared();
-  },
-});
-
-/**
- * Porta da fila usada pelo PROTOCOLO DE MUTAÇÃO DURÁVEL de `store.js`
- * (`infra/sync/durable-character-mutation`). Expõe exatamente
- * `prepareMutation`/`confirmPrepared` da fila, com uma única adaptação: sem
- * usuário logado (ou com a fila persistida corrompida) não há o que
- * preparar, e a preparação devolve `preparationId: null` — um "no-op
- * durável". Isso preserva a regra histórica de que salvar deslogado é uma
- * operação puramente local e nunca falha por causa de sincronização.
- *
- * `confirmPrepared` é também o ponto onde o flush imediato acontece (era o
- * fim de `enfileirarSync`): só depois de o job virar enviável.
- */
-export const portaDeMutacaoDuravel = Object.freeze({
-  /**
-   * Grava o job `prepared` (não enviável) ANTES da escrita local.
-   * @param {object} params - repassados intactos para a fila.
-   * @returns {import('./core/result.js').Result} Result<{preparationId}, AppError>
-   */
-  prepareMutation(params) {
-    const queue = _obterFila();
-    if (!queue) return ok(Object.freeze({ preparationId: null }));
-    return queue.prepareMutation(params);
-  },
-
-  /**
-   * Torna o job enviável depois de a escrita local ter sido adotada e, se
-   * online, dispara o envio.
-   * @param {string|null} preparationId
-   * @returns {import('./core/result.js').Result} Result<{jobId}, AppError>
-   */
-  confirmPrepared(preparationId) {
-    if (preparationId === null) return ok(Object.freeze({ jobId: null }));
-    const queue = _obterFila();
-    if (!queue) return ok(Object.freeze({ jobId: null }));
-
-    const confirmado = queue.confirmPrepared(preparationId);
-    if (!confirmado.ok) {
-      // O save local já aconteceu e é válido: NÃO é revertido. O job fica
-      // preparado e a reconciliação do próximo boot o promove pelo marcador
-      // de mutação. Ver durable-character-mutation.js.
-      console.warn('sync.js: preparo não pôde ser confirmado; será reconciliado no próximo boot:', confirmado.error.message);
-      return confirmado;
-    }
-
-    if (navigator.onLine) queue.flush();
-    return confirmado;
-  },
-
-  /**
-   * Desfaz o preparo quando a escrita local falhou, restaurando o job que
-   * ele havia deslocado (por exemplo, um upsert já confirmado e pendente
-   * offline). Sem isso a fila ficaria com um `prepared` órfão, que o
-   * snapshot mostra como "sincronizando" sem falha visível até o próximo
-   * boot.
-   * @param {string|null} preparationId
-   * @returns {import('./core/result.js').Result} Result<{jobId}, AppError>
-   */
-  abortPrepared(preparationId) {
-    if (preparationId === null) return ok(Object.freeze({ jobId: null }));
-    const queue = _obterFila();
-    if (!queue) return ok(Object.freeze({ jobId: null }));
-    return queue.abortPrepared(preparationId);
-  },
-});
-
-/**
  * Enfileira um personagem para sincronização com a nuvem.
- * Faz upsert na fila (substitui a versão anterior do mesmo personagem).
+ * Faz upsert na fila (substitui versão anterior do mesmo personagem).
  * Não enfileira se o usuário não estiver logado.
- * Se estiver online, inicia o processamento imediato.
- *
- * Continua sendo o caminho da IMPORTAÇÃO em massa (`store.js#importarDados`),
- * onde os registros já foram adotados no repositório em bloco e o que resta
- * é propagá-los. O save individual do criador/ficha passa pelo protocolo
- * durável (`portaDeMutacaoDuravel`), não por aqui.
+ * Se estiver online, inicia processamento imediato.
  */
 export function enfileirarSync(personagem) {
-  const queue = _obterFila();
-  if (!queue) return;
+  if (!getUsuario()) return;
 
-  // `personagem` é o registro plano legado já persistido; ele é embrulhado
-  // como envelope editável e será passado pelo codec (migrando v1->v2)
-  // antes de qualquer envio.
-  const resultado = queue.enqueueUpsert({ mode: 'editable', rawRecord: personagem });
-  if (!resultado.ok) {
-    console.warn('sync.js: não foi possível enfileirar o personagem:', resultado.error.message);
+  const fila = _lerFila();
+  const idx = fila.findIndex(e => e.id === personagem.id);
+  const entrada = {
+    id: personagem.id,
+    dados: JSON.parse(JSON.stringify(personagem)),
+    tentativas: 0
+  };
+  if (idx >= 0) {
+    fila[idx] = entrada;
+  } else {
+    fila.push(entrada);
+  }
+  _salvarFila(fila);
+
+  if (!navigator.onLine) {
+    _setStatus('offline');
     return;
   }
 
-  if (!navigator.onLine) return;
-  queue.flush();
+  _processarFilaSync();
 }
 
 /**
@@ -359,17 +81,19 @@ export function enfileirarSync(personagem) {
  * Não enfileira se o usuário não estiver logado.
  */
 export function enfileirarRemocao(id) {
-  const queue = _obterFila();
-  if (!queue) return;
+  if (!getUsuario()) return;
 
-  const resultado = queue.enqueueRemoval({ characterId: id });
-  if (!resultado.ok) {
-    console.warn('sync.js: não foi possível enfileirar a remoção:', resultado.error.message);
+  // Remover qualquer upsert pendente para o mesmo id antes de enfileirar a remoção
+  const fila = _lerFila().filter(e => e.id !== id);
+  fila.push({ id, acao: 'remover', tentativas: 0 });
+  _salvarFila(fila);
+
+  if (!navigator.onLine) {
+    _setStatus('offline');
     return;
   }
 
-  if (!navigator.onLine) return;
-  queue.flush();
+  _processarFilaSync();
 }
 
 /**
@@ -378,56 +102,92 @@ export function enfileirarRemocao(id) {
  * personagens que foram deletados offline.
  */
 export function obterIdsPendentesRemocao() {
-  const queue = _obterFila();
-  return new Set(queue ? queue.getPendingRemovalIds() : []);
+  return new Set(
+    _lerFila()
+      .filter(e => e.acao === 'remover')
+      .map(e => e.id)
+  );
 }
 
 /** Exportado para uso externo (ex: app.js ao detectar reconexão) */
 export async function processarFilaSync() {
-  const queue = _obterFila();
-  if (!queue) return;
-  await queue.flush();
+  await _processarFilaSync();
 }
 
-/**
- * Busca a lista remota, faz o merge por `atualizado_em` e adota o
- * resultado no repositório local com precondição de revisão. Os
- * vencedores locais são reenfileirados automaticamente pela fila.
- * @returns {Promise<boolean>} true se o merge foi adotado com sucesso.
- */
-export async function sincronizarComNuvem() {
-  const queue = _obterFila();
-  if (!queue) return false;
+async function _processarFilaSync() {
+  if (_processando) return;
 
-  const adotado = await queue.adoptRemoteMerge();
-  if (!adotado.ok) {
-    console.warn('sync.js: merge remoto não pôde ser adotado:', adotado.error.message);
-    return false;
+  const fila = _lerFila();
+  if (fila.length === 0) {
+    if (_status !== 'ok') _setStatus('idle');
+    return;
   }
-  await queue.flush();
-  return true;
+
+  const usuario = getUsuario();
+  if (!usuario) return;
+
+  _processando = true;
+  _setStatus('sincronizando');
+
+  const filaAtual = [..._lerFila()];
+  let houveErro = false;
+
+  for (const entrada of filaAtual) {
+    try {
+      if (entrada.acao === 'remover') {
+        await removerPersonagemCloud(entrada.id);
+      } else {
+        await salvarPersonagemCloud(entrada.dados);
+      }
+      // Remover da fila após sucesso
+      const f = _lerFila();
+      _salvarFila(f.filter(e => e.id !== entrada.id));
+    } catch (err) {
+      console.warn(`Sync falhou para ${entrada.id} (tentativa ${(entrada.tentativas || 0) + 1}):`, err.message);
+      const f = _lerFila();
+      const e = f.find(x => x.id === entrada.id);
+      if (e) {
+        e.tentativas = (e.tentativas || 0) + 1;
+        _salvarFila(f);
+        if (e.tentativas >= MAX_TENTATIVAS) {
+          console.warn(`Sync falhou após ${MAX_TENTATIVAS} tentativas para ${entrada.id} — item permanece na fila`);
+        }
+      }
+      houveErro = true;
+    }
+  }
+
+  _processando = false;
+  const filaRestante = _lerFila();
+  if (filaRestante.length === 0) {
+    _setStatus(houveErro ? 'erro' : 'ok');
+  } else {
+    _setStatus('erro');
+    // Agendar retry com backoff
+    setTimeout(() => _processarFilaSync(), RETRY_DELAY_MS);
+  }
 }
 
 /**
- * Inicializa o módulo: registra eventos online/offline e processa a fila
- * pendente se houver conectividade. Deve ser chamado uma única vez no boot
- * da aplicação (depois de `initializeCharacterStorage()`).
+ * Inicializa o módulo: registra eventos online/offline
+ * e processa fila pendente se houver conectividade.
+ * Deve ser chamado uma única vez no boot da aplicação.
  */
 export function inicializarSync() {
   window.addEventListener('online', () => {
-    processarFilaSync();
+    _processarFilaSync();
   });
 
   window.addEventListener('offline', () => {
-    const queue = _obterFila();
-    if (queue) _setStatus(queue.getSnapshot().status);
+    if (_lerFila().length > 0) {
+      _setStatus('offline');
+    }
   });
 
-  // Processar pendências da sessão anterior ao abrir o app.
-  if (navigator.onLine) {
-    processarFilaSync();
-  } else {
-    const queue = _obterFila();
-    if (queue) _setStatus(queue.getSnapshot().status);
+  // Processar pendências da sessão anterior ao abrir o app
+  if (navigator.onLine && _lerFila().length > 0) {
+    _processarFilaSync();
+  } else if (!navigator.onLine && _lerFila().length > 0) {
+    _setStatus('offline');
   }
 }
