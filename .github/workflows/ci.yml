@@ -110,17 +110,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.62.0-noble
-    env:
-      # Em jobs com `container:`, o GitHub Actions roda os steps como root mas
-      # define HOME=/github/home — um mount do host cujo dono é o usuário do
-      # runner (uid 1001), não o root. O Firefox tem uma guarda própria e SE
-      # RECUSA a iniciar quando $HOME não pertence ao usuário atual ("Firefox is
-      # unable to launch if the $HOME folder isn't owned by the current user"),
-      # derrubando todo o projeto `firefox-critical` já no launch do browser.
-      # Chromium e WebKit não fazem essa verificação, por isso só o Firefox
-      # falhava. Apontar HOME para /root (que pertence ao root) resolve na causa
-      # e é o workaround oficial do próprio Playwright para jobs de container.
-      HOME: /root
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -135,8 +124,35 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
+      # HOME só é sobrescrito NESTE passo (não no job inteiro): em jobs com
+      # `container:`, o GitHub Actions roda os steps como root mas define
+      # HOME=/github/home — um mount do host cujo dono é o usuário do runner
+      # (uid 1001), não o root. O Firefox tem uma guarda própria e SE RECUSA a
+      # iniciar quando $HOME não pertence ao usuário atual ("Firefox is unable
+      # to launch if the $HOME folder isn't owned by the current user"),
+      # derrubando todo o projeto `firefox-critical` já no launch do browser.
+      # Chromium e WebKit não fazem essa verificação, por isso só o Firefox
+      # falhava. Apontar HOME para /root (que pertence ao root) resolve na
+      # causa e é o workaround oficial do próprio Playwright para jobs de
+      # container.
+      #
+      # ESCOPO DELIBERADAMENTE LIMITADO a este passo: `/github/home` vem
+      # PRÉ-CONFIGURADO pelo runner do GitHub com uma entrada `safe.directory`
+      # para o workspace — é assim que comandos `git` avulsos (fora do
+      # `actions/checkout`, como o `git` cru de
+      # `scripts/materialize-baseline.mjs` no passo `test:e2e:compat` abaixo)
+      # conseguem rodar sem "detected dubious ownership", mesmo o processo
+      # sendo root e o diretório pertencendo ao uid do runner. Definir HOME=
+      # /root no JOB inteiro (tentativa anterior) tirava TODOS os passos
+      # dessa configuração confiável — `test:e2e:compat` passou a falhar com
+      # "dubious ownership" porque `/root/.gitconfig` não tem aquele
+      # `safe.directory`. Nenhum outro passo deste job usa Firefox
+      # (`playwright.compat.config.js` e `playwright.pwa.config.js` só têm
+      # projetos Chromium), então não há necessidade de estender o override.
       - name: test:e2e (funcional, todos os browsers)
         run: npm run test:e2e
+        env:
+          HOME: /root
 
       # Round-trip contra o baseline `e43c5ea` (Task 37). O materializador
       # reconstrói a aplicação legada com `git show`, por isso o checkout
