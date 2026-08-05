@@ -158,8 +158,19 @@ jobs:
       # — o processo do container roda como root, mas o workspace pertence ao
       # uid do runner do host. Configuramos aqui, uma vez, no $HOME padrão do
       # job (sem override), antes de qualquer passo que precise dele.
+      #
+      # `$GITHUB_WORKSPACE` (variável de ambiente, expandida pelo SHELL
+      # DENTRO do container), não `${{ github.workspace }}` (expressão do
+      # GitHub Actions, resolvida pelo RUNNER, FORA do container, antes de
+      # entrar nele): a primeira tentativa usou a expressão e configurou
+      # `/home/runner/work/DeD_2024/DeD_2024` (caminho do HOST) — o `git`
+      # dentro do container enxerga o mesmo bind mount em
+      # `/__w/DeD_2024/DeD_2024` (caminho do CONTAINER), uma string diferente,
+      # então a config nunca batia e o erro persistia mesmo com o passo
+      # "passando". O `actions/checkout` acerta porque lê `$GITHUB_WORKSPACE`
+      # em tempo de execução, já dentro do container.
       - name: Configurar git safe.directory (necessário para scripts com git cru, ex. materialize-baseline.mjs)
-        run: git config --global --add safe.directory "${{ github.workspace }}"
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       # Round-trip contra o baseline `e43c5ea` (Task 37). O materializador
       # reconstrói a aplicação legada com `git show`, por isso o checkout
