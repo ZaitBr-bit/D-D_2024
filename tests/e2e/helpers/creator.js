@@ -246,6 +246,13 @@ export async function escolherAtributosRolagem(page) {
   await page.check('#app-content [data-attr-mode="rolagem"]');
   await expect(page.locator('#app-content #attr-content')).toHaveAttribute('data-attr-method', 'rolagem');
   await page.click('#app-content [data-roll-all]');
+  // O dispatch da intenção é assíncrono (creator-session.js) e o `click` do
+  // Playwright não aguarda essa promise, só o listener síncrono — sem esta
+  // espera com retry automático, uma leitura logo em seguida (ex.:
+  // `evaluateAll`) pode pegar o DOM antes da re-renderização, vendo "--" num
+  // atributo ainda não repintado (achado ao depurar falha intermitente em
+  // chromium-desktop sob carga real de CI).
+  await expect(page.locator('#app-content .atributo-dados')).toHaveCount(ATRIBUTOS.length);
 }
 
 /** Confirma que o modo "Manual" continua visível e desabilitado. */
