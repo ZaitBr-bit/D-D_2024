@@ -60,10 +60,15 @@ let codec;
 let legacyMinimalRaw;
 let contador = 0;
 
-/** Id único por teste. */
+// Prefixo de arquivo ("sq-"): `node --test` roda este arquivo e
+// firestore-character-gateway.test.js em paralelo contra o MESMO Firestore
+// Emulator, e os dois tinham a mesma sequência `uid-1`/`char-2`, colidindo no
+// mesmo caminho de documento e causando races reais no emulador (achado ao
+// depurar `remoteBackup` retornando "created" em vez de "not-applicable").
+/** Id único por teste, também único entre os arquivos de teste do Firestore. */
 function novoId(prefixo = 'char') {
   contador += 1;
-  return `${prefixo}-${contador}`;
+  return `sq-${prefixo}-${contador}`;
 }
 
 const firestoreApi = { collection, doc, getDoc, getDocs, deleteDoc, runTransaction };
