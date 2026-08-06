@@ -487,3 +487,39 @@ para qualquer regra de quantidade que venha depois.
 
 NAO E REGRESSAO: o site original para no mesmo lugar. E limitacao do driver de
 teste, nao defeito da aplicacao.
+
+[2026-08-06] Mago pelo WIZARD: hipotese testada, e o wizard tambem nao chega la
+Voce perguntou se os testes usavam ficha semeada ou visual. A resposta expos
+uma hipotese melhor: um Mago SEMEADO e estado sintetico, e a tela do Grimorio
+pede "2 magias NOVAS" -- provavelmente calculadas a partir do estado. Um Mago
+criado pelo WIZARD chegaria coerente.
+
+Testei. O wizard nao conclui a criacao de um Mago, entao a hipotese continua
+SEM RESPOSTA. Mas o caminho ate ali rendeu tres correcoes reais no driver:
+
+  1. AGRUPAMENTO DE CARDS. `satisfazerPasso` clicava no primeiro card
+     nao-selecionado da TELA. O passo de Equipamento tem dois grupos, e
+     escolher a segunda opcao de um desfaz a primeira -- o driver ciclava no
+     grupo da classe e nunca chegava ao do antecedente. Agrupar por atributo
+     `data-*` NAO resolve: no Equipamento os quatro cards compartilham o NOME
+     `data-equip-tipo` e so o VALOR os separa, enquanto no passo de Classe cada
+     card tem valor unico e agrupar por valor criaria doze grupos. O criterio
+     que serve nos dois e o ELEMENTO PAI. Passo 4 -> passo 5.
+  2. TERCEIRO VOCABULARIO DE CARD. O criador usa `.magia-card`/`selecionada`
+     (alem de `.selection-card`/`selected` e
+     `.levelup-subclasse-card`/`selecionada`).
+  3. O HANDLER NAO ESTA NO CARD. Esta num filho `[data-creator-check]`, que
+     ainda faz `stopPropagation()`. Clicar no card nao seleciona nada.
+
+ONDE PARA AGORA: passo 5 (Magias), com "Maximo de 3 truques". Truques e magias
+de 1o circulo ficam em ABAS DE CIRCULO separadas (`renderMagiasCirculo(circ)`),
+e o driver so enxerga a aba visivel. Ele satura os truques e nunca troca de
+aba para preparar magias.
+
+PROXIMO PASSO, concreto: ensinar o driver a trocar a aba de circulo quando o
+grupo visivel satura. E a quarta categoria de interacao -- depois de card,
+select/radio/checkbox e botao que abre sub-modal.
+
+NAO E REGRESSAO EM NENHUM CASO: o site original se comporta igual. Suite segue
+em 329 testes, 328 passando, 1 pulado, zero falhas -- as mudancas no driver nao
+quebraram nada e melhoraram a criacao em lockstep das 12 classes.

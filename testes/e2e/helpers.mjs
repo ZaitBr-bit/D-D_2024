@@ -376,8 +376,70 @@ export async function satisfazerPasso(page, { maxVoltas = 24 } = {}) {
       for (const c of raiz.querySelectorAll('input[type="checkbox"]')) {
         if (!c.checked && !c.disabled) { c.click(); return true; }
       }
+      // Cards agrupados pelo elemento PAI, que e como um humano ve os grupos.
+      //
+      // "O primeiro nao-selecionado da tela" nao serve: o passo de Equipamento
+      // tem dois grupos e escolher a segunda opcao de um desfaz a primeira, o
+      // que fazia o driver ciclar dentro do grupo da classe e nunca chegar ao
+      // do antecedente ("Selecione o equipamento do antecedente").
+      //
+      // Agrupar por atributo `data-*` tambem nao serve, e por dois motivos
+      // opostos: no Equipamento os quatro cards compartilham o NOME
+      // `data-equip-tipo` e so o VALOR os separa; ja no passo de Classe cada
+      // card tem um valor unico (`data-classe="Mago"`), e agrupar por valor
+      // criaria doze grupos e faria o driver escolher todas as classes.
+      // O pai resolve os dois: um container por grupo, um grid para as classes.
+      const porPai = new Map();
       for (const card of raiz.querySelectorAll('.selection-card')) {
-        if (!card.classList.contains('selected')) { card.click(); return true; }
+        const pai = card.parentElement;
+        if (!porPai.has(pai)) porPai.set(pai, []);
+        porPai.get(pai).push(card);
+      }
+      for (const cards of porPai.values()) {
+        if (cards.some((c) => c.classList.contains('selected'))) continue;
+        cards[0].click();
+        return true;
+      }
+
+      // Cards de magia do criador: terceiro vocabulario (`.magia-card` com
+      // estado `selecionada`, bloqueadas marcadas com `.magia-card-bloqueada`).
+      //
+      // Aqui NAO ha limite de um por grupo: o passo pede "3 truques". Escolher
+      // UMA por vez e deixar o laco de fora tentar avancar e o que faz a conta
+      // fechar -- o app recusa com "(N selecionados)" ate chegar no numero, e
+      // o driver nao precisa saber qual e esse numero.
+      // Cards de magia: distribuir entre os grupos, e detectar saturacao.
+      //
+      // A tela tem mais de uma secao (truques e preparadas, por circulo), cada
+      // uma com seu limite. Escolher sempre no mesmo grupo enche um e ignora o
+      // outro -- o driver ficava em "Maximo de 3 truques" sem nunca preparar
+      // magia nenhuma.
+      //
+      // Estrategia: clicar sempre no grupo com MENOS selecionadas. Se o clique
+      // nao selecionar (o app recusou por limite), marcar o grupo como saturado
+      // para nao voltar nele. O driver nao precisa saber nenhum dos limites.
+      const gruposMagia = new Map();
+      for (const card of raiz.querySelectorAll('.magia-card')) {
+        const pai = card.parentElement;
+        if (pai.dataset.testeSaturado) continue;
+        if (!gruposMagia.has(pai)) gruposMagia.set(pai, []);
+        gruposMagia.get(pai).push(card);
+      }
+      const ordenados = [...gruposMagia.entries()].sort((a, b) => {
+        const sel = (cs) => cs.filter((c) => c.classList.contains('selecionada')).length;
+        return sel(a[1]) - sel(b[1]);
+      });
+      for (const [pai, cards] of ordenados) {
+        const livre = cards.find((c) => !c.classList.contains('selecionada')
+          && !c.classList.contains('magia-card-bloqueada'));
+        if (!livre) continue;
+        // O handler NAO esta no card: esta num filho `[data-creator-check]`,
+        // que ainda faz `stopPropagation()`.
+        const check = livre.querySelector('[data-creator-check]');
+        if (!check) continue;
+        check.click();
+        if (!livre.classList.contains('selecionada')) pai.dataset.testeSaturado = '1';
+        return true;
       }
       return false;
     });
