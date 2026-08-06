@@ -23,6 +23,14 @@ const ATRIBUTOS = { forca: 15, destreza: 14, constituicao: 14,
 // qualquer forma, nao porque resolveu.
 const XP_NIVEL_20 = 355000;
 
+// Um personagem semeado nasce SEM pericias proficientes, e varios talentos de
+// antecedente exigem escolher entre as que voce ja tem -- o Academico (do
+// Sabio) pede "1 pericia academica elegivel em que voce ja e proficiente".
+// Sem nenhuma, o fluxo de subida trava com essa mensagem e o personagem nunca
+// passa do nivel 1. Nao e bug do app: e fixture irreal.
+const PERICIAS = ['Arcanismo', 'História', 'Investigação', 'Percepção',
+                  'Atletismo', 'Persuasão'];
+
 /** Nivel atual do unico personagem no localStorage. */
 async function nivelAtual(page) {
   return page.evaluate(async () => {
@@ -76,6 +84,7 @@ test('subir de nivel funciona no site ORIGINAL', async ({ context }) => {
   await abrirFichaSemeada(lados, {
     nome: 'Sobe Nivel', classe: 'Guerreiro', especie: 'Humano',
     antecedente: 'Soldado', nivel: 1, xp: XP_NIVEL_20, atributos: ATRIBUTOS,
+    pericias_proficientes: PERICIAS,
   }, 'lvl-orig');
 
   const depois = await subirUmNivel(lados[0].page);
@@ -93,6 +102,7 @@ for (const classe of ['Guerreiro', 'Mago', 'Paladino']) {
     await abrirFichaSemeada(lados, {
       nome: `Escalada ${classe}`, classe, especie: 'Humano',
       antecedente: 'Soldado', nivel: 1, xp: XP_NIVEL_20, atributos: ATRIBUTOS,
+    pericias_proficientes: PERICIAS,
     }, `lvl-${classe.normalize('NFD').replace(/[^a-z]/gi, '').toLowerCase()}`);
 
     let ultimo = 1;
@@ -112,17 +122,22 @@ for (const classe of ['Guerreiro', 'Mago', 'Paladino']) {
       ultimo = niveis[0];
     }
 
-    // NAO se afirma "chegou ao nivel 20", e o nome do teste e otimista demais.
-    // Medido: Guerreiro para no 2, Mago e Paladino no 1 -- no ORIGINAL tambem.
-    // Duas hipoteses ja foram descartadas por medicao: (a) o resolvedor
-    // generico nao completar as escolhas -- o diagnostico instrumentado nunca
-    // registra tela travada, o modal fecha sozinho; (b) falta de XP -- dar
-    // 355.000 nao mudou nada.
+    // NAO se afirma "chegou ao nivel 20". Medido hoje: Guerreiro e Paladino
+    // chegam ao 3, Mago para no 1 -- no ORIGINAL tambem, entao nao e
+    // regressao. As causas foram investigadas e sao do TESTE, nao do produto:
     //
-    // Ate investigar o proprio `subirDeNivel`, a assercao que vale e a de
-    // dentro do laco: os dois lados sobem para o MESMO nivel, com a MESMA
-    // ficha. Isso cobre a transicao, ainda que numa faixa menor que a
-    // desejada.
+    //   - ate o nivel 2: `resolverModalAberto` avancava antes de escolher e
+    //     atravessava a tela de subclasse. Corrigido: preencher, depois
+    //     avancar (ver o comentario do helper);
+    //   - a tela de subclasse usa `.levelup-subclasse-card`/`selecionada`, um
+    //     vocabulario que o resolvedor nao conhecia. Acrescentado;
+    //   - o Mago trava no talento Academico, que exige EXATAMENTE 1 pericia
+    //     academica entre as que o personagem ja tem (levelup.js:1178-1182).
+    //     A fixture ganhou pericias elegiveis e o resolvedor passou a marcar
+    //     no maximo um card por tela, e ainda assim nao passa. FICA ABERTO.
+    //
+    // A assercao que vale continua sendo a de dentro do laco: os dois lados
+    // sobem para o MESMO nivel, com a MESMA ficha, a cada passo.
     console.log(`  ${classe}: os dois sites chegaram ao nivel ${ultimo}`);
     expect(relatorioErros(lados), `erros subindo ${classe}`).toBe('');
   });

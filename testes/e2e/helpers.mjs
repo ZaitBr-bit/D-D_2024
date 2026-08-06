@@ -150,47 +150,96 @@ export async function nosDois(lados, acao) {
 }
 
 /**
- * Resolve o modal aberto: faz as escolhas obrigatorias e confirma.
+ * Resolve o modal aberto: preenche a tela atual e so entao avanca.
  *
- * Nao conhece nenhum id especifico -- procura o botao primario da area de
- * acoes. Se o app recusar com toast, escolhe mais uma opcao e tenta de novo.
- * Se nao conseguir fechar, fecha a forca, para nao travar o driver.
+ * Este helper errou de tres formas diferentes antes de chegar aqui, e cada
+ * erro tem uma licao propria:
+ *
+ * 1. "avancar primeiro, escolher se recusar" -- atravessava a tela de
+ *    subclasse sem escolher, e a subida parava no nivel 2;
+ * 2. "avancar e seguir se a tela mudar" -- mesma falha: na subclasse o botao
+ *    AVANCA para a revisao sem exigir a escolha, entao "a tela mudou" nao
+ *    prova progresso;
+ * 3. "esgotar TODAS as escolhas" -- marcava todas as caixas de um grupo, e o
+ *    Mago travava porque o talento Academico exige EXATAMENTE 1 pericia
+ *    (`selecionadas.length !== 1` em levelup.js:1182).
+ *
+ * O que funciona: esgotar as escolhas de opcao UNICA (cards, selects, radios
+ * -- onde escolher a segunda desfaz a primeira) e marcar NO MAXIMO UMA
+ * caixa por tela, porque checkbox e a unica categoria com limite de
+ * quantidade. So depois disso, avancar.
  */
-export async function resolverModalAberto(page, maxTentativas = 10) {
-  for (let i = 0; i < maxTentativas; i++) {
+export async function resolverModalAberto(page, maxTelas = 16) {
+  for (let i = 0; i < maxTelas; i++) {
     if (!await page.locator('#modal-overlay').isVisible()) return true;
 
-    const clicou = await page.evaluate(() => {
-      const acoes = document.getElementById('modal-acoes');
-      const botao = acoes?.querySelector(
-        '.btn-primary:not([disabled]), .btn-success:not([disabled]), .btn-accent:not([disabled])');
-      if (botao) { botao.click(); return true; }
-      return false;
-    });
-    await page.waitForTimeout(300);
-    if (!await page.locator('#modal-overlay').isVisible()) return true;
-
-    const escolheu = await page.evaluate(() => {
-      const corpo = document.getElementById('modal-corpo');
-      if (!corpo) return false;
-      for (const card of corpo.querySelectorAll('.selection-card')) {
-        if (!card.classList.contains('selected')) { card.click(); return true; }
-      }
-      for (const sel of corpo.querySelectorAll('select')) {
-        if (!sel.value && sel.options.length > 1) {
-          sel.selectedIndex = 1;
-          sel.dispatchEvent(new Event('change', { bubbles: true }));
-          return true;
+    // 1. Escolhas de opcao unica: pode esgotar sem risco.
+    for (let j = 0; j < 20; j++) {
+      const escolheu = await page.evaluate(() => {
+        const corpo = document.getElementById('modal-corpo');
+        if (!corpo) return false;
+        // Dois vocabularios de card convivem: `.selection-card`/`selected`
+        // (criador e modais da ficha) e `.levelup-subclasse-card`/
+        // `selecionada` (subida de nivel).
+        const CARDS = [
+          ['.selection-card', 'selected'],
+          ['.levelup-subclasse-card', 'selecionada'],
+        ];
+        // UM card por tela, nao todos: nem todo grupo de cards e de escolha
+        // unica. O talento Academico do Mago usa cards e exige EXATAMENTE 1;
+        // esgotar marcava todos e a validacao recusava.
+        for (const [seletor, marcado] of CARDS) {
+          const cards = [...corpo.querySelectorAll(seletor)];
+          if (cards.some((c) => c.classList.contains(marcado))) continue;
+          const livre = cards[0];
+          if (livre) { livre.click(); return true; }
         }
-      }
-      for (const c of corpo.querySelectorAll('input[type="checkbox"]')) {
-        if (!c.checked && !c.disabled) { c.click(); return true; }
-      }
+        const selects = [...corpo.querySelectorAll('select')];
+        const usados = new Set(selects.map((s) => s.value).filter(Boolean));
+        for (const sel of selects) {
+          if (sel.value) continue;
+          for (const opt of sel.options) {
+            if (!opt.value || opt.disabled || usados.has(opt.value)) continue;
+            sel.value = opt.value;
+            sel.dispatchEvent(new Event('change', { bubbles: true }));
+            return true;
+          }
+        }
+        const grupos = new Set(
+          [...corpo.querySelectorAll('input[type="radio"]')].map((r) => r.name));
+        for (const g of grupos) {
+          const ops = [...corpo.querySelectorAll(`input[type="radio"][name="${g}"]`)];
+          if (ops.length && !ops.some((o) => o.checked)) { ops[0].click(); return true; }
+        }
+        return false;
+      });
+      if (!escolheu) break;
+      await page.waitForTimeout(160);
+    }
+
+    // 2. Checkbox: no MAXIMO uma por tela.
+    await page.evaluate(() => {
+      const corpo = document.getElementById('modal-corpo');
+      if (!corpo) return;
+      const caixas = [...corpo.querySelectorAll('input[type="checkbox"]')];
+      if (caixas.some((c) => c.checked)) return;
+      const livre = caixas.find((c) => !c.disabled);
+      if (livre) livre.click();
+    });
+    await page.waitForTimeout(160);
+
+    // 3. Avancar.
+    const avancou = await page.evaluate(() => {
+      const acoes = document.getElementById('modal-acoes');
+      const b = acoes?.querySelector(
+        '.btn-primary:not([disabled]), .btn-success:not([disabled]), .btn-accent:not([disabled])');
+      if (b) { b.click(); return true; }
       return false;
     });
-    if (!clicou && !escolheu) break;
-    await page.waitForTimeout(250);
+    await page.waitForTimeout(400);
+    if (!avancou) break;
   }
+
   await page.evaluate(() => window.fecharModal?.());
   await page.waitForTimeout(250);
   return !(await page.locator('#modal-overlay').isVisible());
