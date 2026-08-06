@@ -50,6 +50,21 @@ regra de negócio dentro do teste), e arrastar item no inventário (o caminho
 real é de toque, não de mouse). Um `skip` sem motivo escrito é omissão
 silenciosa — ver `PERGUNTAS-PARA-REVISAO.txt`.
 
+### Escopo: o que pode diferir do original
+
+A refatoração exige que nada fora de `site/js/{sheet,creator}/` e dos dois
+coordenadores mude. Duas exceções existem **de propósito**, e o motivo tem de
+continuar escrito aqui — uma exceção sem motivo vira, com o tempo, uma
+verificação que ninguém confia:
+
+| Arquivo | Por quê |
+|---|---|
+| `site/sw.js` | Passou a consumir `js-precache.json`. A lista manual de 12 arquivos cobria 12 de 22 módulos antes da quebra e 12 de 61 depois — de 52,4% para 18,3%. Agora são 100%. |
+| `.github/workflows/deploy.yml` | Gera `js-precache.json` varrendo `site/js/**`, espelhando o que já fazia para `dados/`. |
+
+Tudo o mais — `dados/`, `css/`, `img/`, `index.html`, `manifest.json` e os 18
+módulos JS fora de escopo — continua byte a byte idêntico ao `D-D_2024`.
+
 ### O projeto `offline`
 
 Todos os testes bloqueiam o Service Worker de propósito, para o cache nunca

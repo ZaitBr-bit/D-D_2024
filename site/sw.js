@@ -61,6 +61,33 @@ self.addEventListener('install', (event) => {
     } catch (e) {
       // sem manifesto (dev): dados serao cacheados on-demand
     }
+
+    // Precache dos modulos JS. A lista e gerada no deploy (js-precache.json)
+    // varrendo site/js/**, pelo mesmo caminho que ja produz o manifesto de
+    // dados acima. Em desenvolvimento o arquivo nao existe: nesse caso os
+    // modulos continuam sendo cacheados sob demanda pelo fetch handler, que e
+    // o comportamento que sempre houve.
+    //
+    // STATIC_ASSETS no topo permanece como rede de seguranca, para o caso de
+    // o manifesto faltar em producao. Ele lista 12 arquivos: cobria 12 de 22
+    // modulos antes da quebra dos monolitos e passou a cobrir 12 de 61 depois
+    // -- e esta lista gerada que fecha essa lacuna.
+    try {
+      const respModulos = await fetch('./js-precache.json', { cache: 'no-store' });
+      if (respModulos.ok) {
+        const modulos = await respModulos.json();
+        await Promise.allSettled(
+          modulos.map(async (url) => {
+            try {
+              const r = await fetch(url, { cache: 'no-store' });
+              if (r.ok) await cache.put(url, r.clone());
+            } catch (e) { /* modulo indisponivel: fica para o fetch handler */ }
+          })
+        );
+      }
+    } catch (e) {
+      // sem manifesto (dev): modulos serao cacheados on-demand
+    }
   })());
 });
 

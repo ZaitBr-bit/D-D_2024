@@ -26,8 +26,18 @@ python scripts/verificar_extracao.py tudo
 Não há dependência de Node neste repositório — nem para desenvolver, nem para
 publicar. O workflow de deploy usa apenas Python e `sed`.
 
-**Deploy:** GitHub Pages. Um workflow ajusta caminhos no deploy — `db.js` usa
-`BASE_PATH = '../dados'` em dev; o workflow troca `'../dados'` por `'./dados'` via `sed`.
+**Precache offline:** o workflow gera **dois** manifestos que o Service Worker
+consome no `install` — `dados-precache.json` (varrendo `dados/`) e
+`js-precache.json` (varrendo `site/js/**`). Eles são artefatos de deploy e não
+são versionados: uma lista fixa no repositório ficaria desatualizada em
+relação à árvore, que é exatamente o problema que eles resolvem.
+
+**Deploy:** GitHub Pages. O workflow monta `_dist` com `index.html`, `site/` e
+`dados/` como irmãos — a mesma estrutura do repositório — e por isso o
+`BASE_PATH = '../dados'` do `db.js` resolve igual em dev e em produção.
+**Não há reescrita de caminho**: os únicos `sed` do workflow injetam a versão
+do cache no `sw.js` e o número da versão no header. (Este parágrafo já afirmou
+o contrário; era impreciso e foi corrigido em 2026-08-05.)
 
 ---
 
