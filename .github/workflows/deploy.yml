@@ -48,6 +48,22 @@ jobs:
           with open('_dist/site/dados-precache.json', 'w', encoding='utf-8') as fh:
               json.dump(sorted(urls), fh, ensure_ascii=False)
           PY
+          # Lista de todos os modulos JS para precache offline do Service Worker.
+          # O sw.js tinha uma lista MANUAL de 12 arquivos: cobria 12 de 22
+          # modulos antes da refatoracao e passou a cobrir 12 de 61 depois.
+          # URLs relativas ao escopo do SW (/site/): ./js/....js
+          python3 - <<'PY'
+          import os, json
+          urls = []
+          for root, _, files in os.walk('_dist/site/js'):
+              for f in files:
+                  if f.endswith('.js'):
+                      p = os.path.join(root, f).replace('_dist/site', '.').replace(os.sep, '/')
+                      urls.append(p)
+          with open('_dist/site/js-precache.json', 'w', encoding='utf-8') as fh:
+              json.dump(sorted(urls), fh, ensure_ascii=False)
+          print(f'js-precache.json: {len(urls)} modulos')
+          PY
           sed -i "s|const CACHE_VERSION = 0; // AUTO|const CACHE_VERSION = ${{ github.run_number }};|" _dist/site/sw.js
           sed -i "s|v0</span><!-- VERSION_AUTO -->|v${{ github.run_number }}</span><!-- VERSION_AUTO -->|" _dist/site/index.html
 

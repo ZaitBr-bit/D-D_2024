@@ -1,0 +1,1249 @@
+// ============================================================
+// Buscas e trocas de magia
+//
+// Modais de busca, grimorio do Mago, troca por descanso e preenchimento
+// de espaco livre.
+// Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
+// ============================================================
+import { CLASSES_INFO } from '../dados-classes.js';
+import { getIndiceMagias, getMagiasPorCirculo } from '../db.js';
+import { VALOR_EM_COBRE, formatarCarteira, podePagar, retirarValor } from '../moedas.js';
+import { abrirModal, escHtml, getEspacosMagia, getMagiaPreparadas, getTruquesConhecidos, magiaMagoEstaNoGrimorio, mdParaHtml, normalizarGrimorioMago, semAcento, toast } from '../utils.js';
+import { getTruquesExtraEstiloLuta } from './combate.js';
+import { char, classeData, indiceMagiasCache, magiasDominioCache, magiasSempreCache, salvar } from './estado.js';
+import { renderFichaCompleta } from './ficha.js';
+import { ehSubclasseConjuradora, getSubclasseConjuradoraConjuracao, magiaContaNoLimite, magiaEhEspecial, obterMagiasDisponiveisClasseAtual, rotuloOrigemMagia } from './magias.js';
+
+export async function mostrarBuscaMagia() {
+  const info = CLASSES_INFO[char.classe] || {};
+  const subConj = getSubclasseConjuradoraConjuracao();
+  const tipoConj = info.tipo_conjuracao || (subConj ? 'conhecidas' : 'preparadas');
+  const labelMg = tipoConj === 'conhecidas' ? 'Conhecida' : 'Preparada';
+  const ehMago = char.classe === 'Mago';
+  // Classes "conhecidas" (Bardo, Bruxo, Feiticeiro) e subclasses conjuradoras: somente consulta
+  const somenteConsulta = tipoConj === 'conhecidas';
+  const tabela = classeData?.tabela_caracteristicas;
+  let maxPrep = tabela ? getMagiaPreparadas(tabela, char.nivel) : 99;
+  let maxTruq = tabela ? getTruquesConhecidos(tabela, char.nivel) : 99;
+
+  // Fallback para subclasses conjuradoras
+  if (subConj && maxPrep === 99) {
+    maxPrep = subConj.preparadas || 99;
+  }
+  if (subConj && maxTruq === 99) {
+    maxTruq = subConj.truques || 99;
+  }
+  // Truques extras de Combatente Druídico / Abençoado
+  maxTruq += getTruquesExtraEstiloLuta();
+
+  // Espaços de magia para determinar círculos disponíveis
+  let espacosNivel = tabela ? getEspacosMagia(tabela, char.nivel) : {};
+  // Fallback para subclasses conjuradoras
+  if (subConj && Object.keys(espacosNivel).length === 0) {
+    espacosNivel = subConj.espacos || {};
+  }
+  const circulosDisponiveis = Object.keys(espacosNivel).map(Number).sort((a, b) => a - b);
+  const maxCirculo = circulosDisponiveis.length > 0 ? Math.max(...circulosDisponiveis) : 9;
+
+  // Carregar magias da classe (pré-carrega tudo)
+  const magiasClasseClasse = await obterMagiasDisponiveisClasseAtual();
+  // Magias de círculo do Mago só podem ser preparadas se já estiverem registradas.
+  // Truques continuam usando a lista de classe, pois não pertencem ao grimório.
+  const magiasClasse = ehMago
+    ? [
+        ...magiasClasseClasse.filter(m => m.circulo === 0),
+        ...(Array.isArray(char.grimorio) ? char.grimorio : []).map(registrada => ({
+          ...(magiasClasseClasse.find(m => m.nome === registrada?.nome) || {}),
+          ...registrada
+        }))
+      ]
+    : magiasClasseClasse;
+
+  // Magias já possuídas
+  const jaPreparadas = new Set((char.magias_preparadas || []).map(m => m.nome));
+  const jaConhecidas = new Set((char.magias_conhecidas || []).map(m => m.nome));
+  const preparadasNormais = (char.magias_preparadas || []).filter(m => magiaContaNoLimite(m));
+
+  // Separar por círculo
+  const truquesClasse = magiasClasse.filter(m => m.circulo === 0);
+  const magiasCirculo = {};
+  for (let c = 1; c <= maxCirculo; c++) {
+    const doCirculo = magiasClasse.filter(m => m.circulo === c);
+    if (doCirculo.length > 0) magiasCirculo[c] = doCirculo;
+  }
+
+  // Tabs: Preparadas, Truques, 1º, 2º, ...
+  const tabs = ['preparadas', 'truques'];
+  Object.keys(magiasCirculo).forEach(c => tabs.push(c));
+
+  abrirModal(somenteConsulta ? 'Consultar Magias' : 'Gerenciar Magias', `
+    ${somenteConsulta ? '<div class="info-box info" style="margin-bottom:8px;font-size:0.85rem">Magias conhecidas sao definidas na <strong>subida de nivel</strong>. Use o <strong>Descanso Longo</strong> para trocar 1 magia.</div>' : ''}
+    <div style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:6px;font-size:0.78rem">
+      <span class="magia-contador ${(char.magias_conhecidas || []).filter(m => m.circulo === 0 && m.origem !== 'especie').length >= maxTruq ? 'contador-cheio' : ''}" id="gm-contador-truques">
+        Truques: ${(char.magias_conhecidas || []).filter(m => m.circulo === 0 && m.origem !== 'especie').length}/${maxTruq}
+      </span>
+      <span class="magia-contador ${preparadasNormais.length >= maxPrep ? 'contador-cheio' : preparadasNormais.length > maxPrep ? 'contador-excedido' : ''}" id="gm-contador-preparadas">
+        ${labelMg}s: ${preparadasNormais.length}/${maxPrep}
+      </span>
+    </div>
+    <div class="tabs" id="tabs-gerenciar-magias" style="margin-bottom:8px;overflow-x:auto;white-space:nowrap">
+      <div class="tab active" data-tab-mg="preparadas">${labelMg}s Atuais</div>
+      <div class="tab" data-tab-mg="truques">Truques</div>
+      ${Object.keys(magiasCirculo).map(c => `<div class="tab" data-tab-mg="${c}">${c}º Círculo</div>`).join('')}
+    </div>
+    <div class="search-box"><input type="text" id="busca-magia-add" placeholder="Buscar magia..." class="form-input"></div>
+    <div id="resultado-magias" style="min-height:35dvh;max-height:50dvh;overflow-y:auto"></div>
+  `, '', () => renderFichaCompleta());
+
+  const resultadoEl = document.getElementById('resultado-magias');
+  let tabAtiva = 'preparadas';
+
+  function renderTab() {
+    const termo = semAcento(document.getElementById('busca-magia-add')?.value || '');
+    let html = '';
+
+    if (tabAtiva === 'preparadas') {
+      // Mostrar magias preparadas/conhecidas atuais (para remover)
+      const especiais = (char.magias_preparadas || []).filter(m => magiaEhEspecial(m));
+      const normais = (char.magias_preparadas || []).filter(m => magiaContaNoLimite(m));
+      const filtradas = termo.length >= 2 ? normais.filter(m => semAcento(m.nome).includes(termo)) : normais;
+      const filtradasDom = termo.length >= 2 ? especiais.filter(m => semAcento(m.nome).includes(termo)) : especiais;
+
+      html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">${labelMg}s: ${normais.length}/${maxPrep}${somenteConsulta ? '' : ' | Use o <strong>check</strong> para (des)marcar'}</div>`;
+
+      if (filtradasDom.length > 0) {
+        html += `<div style="font-size:0.75rem;font-weight:700;color:var(--secondary);margin:8px 0 4px">Magias Especiais</div>`;
+        html += `<div class="magias-grid">${filtradasDom.map(m => `
+          <div class="magia-card selecionada magia-dominio" style="opacity:0.7;cursor:default">
+            <span class="magia-card-check"></span>
+            <div class="magia-card-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="${m.circulo}" style="cursor:pointer"><span class="badge-dominio">&#9733;</span> ${m.nome}</div>
+            <div class="magia-card-meta"><span>${rotuloOrigemMagia(m)}</span></div>
+          </div>
+        `).join('')}</div>`;
+      }
+
+      if (filtradas.length > 0) {
+        html += `<div class="magias-grid">${filtradas.map(m => `
+          <div class="magia-card selecionada">
+            <span class="magia-card-check" ${somenteConsulta ? '' : `data-remover-check="${m.nome}" style="cursor:pointer"`}></span>
+            <div class="magia-card-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="${m.circulo}" style="cursor:pointer">${m.nome}</div>
+            <div class="magia-card-meta">
+              <span>${m.circulo || 0}º Circulo</span>
+            </div>
+          </div>
+        `).join('')}</div>`;
+      } else if (normais.length === 0) {
+        html += `<div style="text-align:center;color:var(--text-muted);padding:16px">Nenhuma magia ${labelMg.toLowerCase()} ainda.</div>`;
+      }
+    } else if (tabAtiva === 'truques') {
+      // Truques: grid da classe com toggle
+      const truquesAtuais = (char.magias_conhecidas || []).filter(m => m.circulo === 0);
+      const truquesEsp = truquesAtuais.filter(m => m.origem === 'especie');
+      const numTruq = truquesAtuais.length - truquesEsp.length;
+      html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">Truques: ${numTruq}/${maxTruq}${truquesEsp.length > 0 ? ` (+${truquesEsp.length} espécie)` : ''}</div>`;
+
+      const selecionadosSet = new Set(truquesAtuais.map(m => m.nome));
+      const truquesEspSet = new Set(truquesEsp.map(m => m.nome));
+
+      // Exibir truques de espécie (não removíveis) primeiro
+      if (truquesEsp.length > 0) {
+        let listaEsp = truquesEsp;
+        if (termo.length >= 2) listaEsp = listaEsp.filter(m => semAcento(m.nome).includes(termo));
+        html += `<div style="font-size:0.75rem;font-weight:700;color:var(--secondary);margin:8px 0 4px">Truques de Espécie</div>`;
+        html += `<div class="magias-grid">${listaEsp.map(m => `
+          <div class="magia-card selecionada magia-dominio" style="opacity:0.7;cursor:default">
+            <span class="magia-card-check"></span>
+            <div class="magia-card-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="0" style="cursor:pointer"><span class="badge-dominio">&#9733;</span> ${m.nome}</div>
+            <div class="magia-card-meta"><span>Especie</span></div>
+          </div>
+        `).join('')}</div>`;
+      }
+
+      let lista = [...truquesClasse];
+      lista.sort((a, b) => {
+        const aSel = selecionadosSet.has(a.nome) ? 0 : 1;
+        const bSel = selecionadosSet.has(b.nome) ? 0 : 1;
+        return aSel - bSel || a.nome.localeCompare(b.nome);
+      });
+      // Filtrar truques de espécie da lista de classe (evitar duplicatas)
+      lista = lista.filter(m => !truquesEspSet.has(m.nome));
+      if (termo.length >= 2) lista = lista.filter(m => semAcento(m.nome).includes(termo));
+      const cheioTruq = numTruq >= maxTruq;
+
+      html += `<div class="magias-grid">${lista.map(m => {
+        const sel = selecionadosSet.has(m.nome);
+        const bloqueado = cheioTruq && !sel;
+        return `
+          <div class="magia-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}"
+               ${somenteConsulta ? '' : `data-toggle-truque="${m.nome}"`} style="${bloqueado ? 'opacity:0.35;' : ''}">
+            <span class="magia-card-check" ${somenteConsulta ? '' : `data-truque-check="${m.nome}" style="cursor:pointer"`}></span>
+            <div class="magia-card-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="0" style="cursor:pointer">${m.nome}</div>
+            <div class="magia-card-meta">
+              <span>${m.escola || ''}</span>
+              ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
+            </div>
+          </div>`;
+      }).join('')}</div>`;
+    } else {
+      // Magias de um círculo específico — grid
+      const circ = parseInt(tabAtiva);
+      const magiasDoCirc = magiasCirculo[circ] || [];
+      const selecionadasSet = new Set((char.magias_preparadas || []).filter(m => m.circulo === circ).map(m => m.nome));
+      const numAtual = preparadasNormais.length;
+      const cheio = numAtual >= maxPrep;
+
+      html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">${labelMg}s: ${numAtual}/${maxPrep}${cheio ? ' <span style="color:var(--danger)">(Limite atingido)</span>' : ''}</div>`;
+
+      let lista = [...magiasDoCirc];
+      lista.sort((a, b) => {
+        const aSel = selecionadasSet.has(a.nome) ? 0 : 1;
+        const bSel = selecionadasSet.has(b.nome) ? 0 : 1;
+        return aSel - bSel || a.nome.localeCompare(b.nome);
+      });
+      if (termo.length >= 2) lista = lista.filter(m => semAcento(m.nome).includes(termo));
+
+      html += `<div class="magias-grid">${lista.map(m => {
+        const sel = selecionadasSet.has(m.nome);
+        const isDominio = (char.magias_preparadas || []).find(p => p.nome === m.nome && magiaEhEspecial(p));
+        const bloqueado = cheio && !sel && !isDominio;
+        return `
+          <div class="magia-card ${sel ? 'selecionada' : ''} ${isDominio ? 'magia-dominio' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}"
+               style="${bloqueado ? 'opacity:0.35;' : ''}${isDominio ? 'opacity:0.7;' : ''}">
+            <span class="magia-card-check" ${isDominio || somenteConsulta ? '' : `data-circ-check="${m.nome}" data-circ-check-val="${circ}" style="cursor:pointer"`}></span>
+            <div class="magia-card-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="${circ}" style="cursor:pointer">${isDominio ? '<span class="badge-dominio">&#9733;</span> ' : ''}${m.nome}</div>
+            <div class="magia-card-meta">
+              <span>${m.escola || ''}</span>
+              ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
+              ${isDominio ? '<span>Especial</span>' : ''}
+            </div>
+          </div>`;
+      }).join('')}</div>`;
+    }
+
+    resultadoEl.innerHTML = html;
+    bindEventosTab();
+  }
+
+  function bindEventosTab() {
+    // Remover magia preparada (via check na aba "Preparadas Atuais")
+    resultadoEl.querySelectorAll('[data-remover-check]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const nome = el.dataset.removerCheck;
+        const idx = char.magias_preparadas.findIndex(m => m.nome === nome);
+        if (idx >= 0) {
+          char.magias_preparadas.splice(idx, 1);
+          salvar();
+          toast(`${nome} removida`, 'success');
+          atualizarContadores();
+          renderTab();
+        }
+      });
+    });
+
+    // Toggle truque (via check)
+    resultadoEl.querySelectorAll('[data-truque-check]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const nome = el.dataset.truqueCheck;
+        // Não permitir remover truques de espécie
+        const entradaExistente = (char.magias_conhecidas || []).find(m => m.nome === nome);
+        if (entradaExistente && entradaExistente.origem === 'especie') return;
+        const idx = (char.magias_conhecidas || []).findIndex(m => m.nome === nome);
+        if (idx >= 0) {
+          char.magias_conhecidas.splice(idx, 1);
+          salvar();
+          toast(`${nome} removido`, 'success');
+        } else {
+          const numAtual = (char.magias_conhecidas || []).filter(m => m.circulo === 0 && m.origem !== 'especie').length;
+          if (numAtual >= maxTruq) { toast(`Limite de ${maxTruq} truques atingido`, 'error'); return; }
+          char.magias_conhecidas.push({ nome, circulo: 0 });
+          salvar();
+          toast(`${nome} adicionado`, 'success');
+        }
+        atualizarContadores();
+        renderTab();
+      });
+    });
+
+    // Toggle magia de circulo (via check)
+    resultadoEl.querySelectorAll('[data-circ-check]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const nome = el.dataset.circCheck;
+        const circ = parseInt(el.dataset.circCheckVal);
+        const idx = char.magias_preparadas.findIndex(m => m.nome === nome);
+        if (idx >= 0) {
+          // Remover
+          char.magias_preparadas.splice(idx, 1);
+          salvar();
+          toast(`${nome} removida`, 'success');
+        } else {
+          // Adicionar — verificar limite
+          const numAtual = (char.magias_preparadas || []).filter(m => magiaContaNoLimite(m)).length;
+          if (numAtual >= maxPrep) { toast(`Limite de ${maxPrep} magias atingido. Remova uma antes de adicionar.`, 'error'); return; }
+          if (ehMago && !magiaMagoEstaNoGrimorio(char, nome)) {
+            toast('Essa magia não está registrada no grimório.', 'error');
+            return;
+          }
+          char.magias_preparadas.push({ nome, circulo: circ });
+          salvar();
+          toast(`${nome} adicionada`, 'success');
+        }
+        atualizarContadores();
+        renderTab();
+      });
+    });
+
+    // Botão de detalhes da magia
+    resultadoEl.querySelectorAll('[data-detalhe-magia]').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const nome = btn.dataset.detalheMagia;
+        const circ = parseInt(btn.dataset.detalheCirc);
+        const dados = await getMagiasPorCirculo(circ);
+        const magia = dados?.magias?.find(m => m.nome === nome);
+        if (!magia) { toast('Detalhes não encontrados', 'error'); return; }
+        // Abrir sub-modal com detalhes
+        const detalhesHtml = `
+          <div class="magia-meta" style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:8px;font-size:0.85rem">
+            <span class="badge badge-primary">${circ === 0 ? 'Truque' : circ + 'º Círculo'}</span>
+            <span class="badge badge-secondary">${magia.escola}</span>
+            <span>${magia.tempo_conjuracao}</span>
+            <span>${magia.alcance}</span>
+            <span>${magia.componentes}</span>
+            <span>${magia.duracao}</span>
+          </div>
+          <div class="md-content">${mdParaHtml(magia.descricao)}</div>
+          ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em círculos superiores:</strong><div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
+          ${(magia.classes || []).length > 0 ? `<div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px">Classes: ${magia.classes.join(', ')}</div>` : ''}
+        `;
+        abrirModal(magia.nome, detalhesHtml, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
+      });
+    });
+  }
+
+  function atualizarContadores() {
+    // Recalcular preparadas normais a partir do char
+    preparadasNormais.length = 0;
+    (char.magias_preparadas || []).filter(m => magiaContaNoLimite(m)).forEach(m => preparadasNormais.push(m));
+
+    // Atualizar contador de truques no topo do modal
+    // Excluir truques de espécie do contador de classe
+    const numTruques = (char.magias_conhecidas || []).filter(m => m.circulo === 0 && m.origem !== 'especie').length;
+    const contTruques = document.getElementById('gm-contador-truques');
+    if (contTruques) {
+      contTruques.textContent = `Truques: ${numTruques}/${maxTruq}`;
+      contTruques.className = `magia-contador ${numTruques >= maxTruq ? 'contador-cheio' : ''}`;
+    }
+
+    // Atualizar contador de preparadas no topo do modal
+    const contPrep = document.getElementById('gm-contador-preparadas');
+    if (contPrep) {
+      contPrep.textContent = `${labelMg}s: ${preparadasNormais.length}/${maxPrep}`;
+      contPrep.className = `magia-contador ${preparadasNormais.length >= maxPrep ? 'contador-cheio' : preparadasNormais.length > maxPrep ? 'contador-excedido' : ''}`;
+    }
+  }
+
+  // Tabs
+  document.querySelectorAll('#tabs-gerenciar-magias .tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('#tabs-gerenciar-magias .tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      tabAtiva = tab.dataset.tabMg;
+      document.getElementById('busca-magia-add').value = '';
+      renderTab();
+    });
+  });
+
+  // Busca
+  document.getElementById('busca-magia-add')?.addEventListener('input', renderTab);
+
+  // Renderizar tab inicial (preparadas atuais)
+  renderTab();
+}
+
+export async function mostrarFormMagiaCustom(indiceEdicao = null) {
+  const magiaExistente = Number.isInteger(indiceEdicao)
+    ? (char.magias_customizadas || [])[indiceEdicao]
+    : null;
+  if (Number.isInteger(indiceEdicao) && !magiaExistente) return;
+  let indice = null;
+  try {
+    indice = await getIndiceMagias();
+  } catch (_) {
+    // O cache carregado pela ficha ainda permite criar a magia sem bloquear a tela.
+  }
+  const magiasIndice = indice?.magias || indiceMagiasCache || [];
+  const tempoConjuracaoMagiaValido = (valor) => {
+    const tempo = String(valor || '').trim();
+    if (!tempo || /^(ama\s+ação|ama\s+acao)$/i.test(tempo)) return false;
+    if (/crescimento excessivo|fertiliza[cç][aã]o|arma|ataque desarmado/i.test(tempo)) return false;
+    return /^(?:a[cç][aã]o(?:\s+ou\s+ritual)?|a[cç][aã]o\s+b[oô]nus|1\s+a[cç][aã]o(?:\s+ou\s+ritual)?|rea[cç][aã]o(?:\b|\s+ou\s+ritual)|\d+\s+(?:minuto|minutos|hora|horas|dia|dias)(?:\s+ou\s+ritual)?)(?:\s|,|$)/i.test(tempo);
+  };
+  const valoresUnicos = campo => [...new Set(magiasIndice
+    .map(magia => String(magia?.[campo] || '').trim())
+    .filter(valor => Boolean(valor) && (campo !== 'tempo_conjuracao' || tempoConjuracaoMagiaValido(valor))))]
+    .sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  const opcoes = {
+    escolas: valoresUnicos('escola'),
+    tempos: [
+      'Ação', 'Ação Bônus', 'Reação', '1 ação', '1 minuto', '10 minutos',
+      '1 hora', '8 horas', '12 horas', '24 horas', 'Ação ou Ritual',
+      '1 ação ou Ritual', '1 minuto ou Ritual', '10 minutos ou Ritual', '1 hora ou Ritual'
+    ],
+    duracoes: valoresUnicos('duracao')
+  };
+  const opcoesSelect = (valores, rotulo) => `
+    <option value="">Selecione ${rotulo}</option>
+    ${valores.map(valor => `<option value="${escHtml(valor)}">${escHtml(valor)}</option>`).join('')}
+    <option value="__personalizado__">Personalizado…</option>`;
+
+  abrirModal(magiaExistente ? 'Editar Magia Personalizada' : 'Magia Personalizada', `
+    <div class="form-group">
+      <label class="form-label" for="mc-nome">Nome</label>
+      <input type="text" class="form-input" id="mc-nome" placeholder="Nome da magia">
+    </div>
+    <div class="row gap-1">
+      <div class="col">
+        <label class="form-label" for="mc-circulo">Circulo</label>
+        <select class="form-select" id="mc-circulo">
+          <option value="0">Truque</option>
+          ${[1,2,3,4,5,6,7,8,9].map(i => `<option value="${i}">${i}o Circulo</option>`).join('')}
+        </select>
+      </div>
+      <div class="col">
+        <label class="form-label" for="mc-escola">Escola</label>
+        <select class="form-select" id="mc-escola">${opcoesSelect(opcoes.escolas, 'a escola')}</select>
+        <input type="text" class="form-input" id="mc-escola-personalizada" placeholder="Informe a escola" style="display:none;margin-top:6px">
+      </div>
+    </div>
+    <div class="row gap-1">
+      <div class="col">
+        <label class="form-label" for="mc-tempo">Tempo de Conjuração</label>
+        <select class="form-select" id="mc-tempo">${opcoesSelect(opcoes.tempos, 'o tempo')}</select>
+        <input type="text" class="form-input" id="mc-tempo-personalizado" placeholder="Informe o tempo de conjuração" style="display:none;margin-top:6px">
+        <input type="text" class="form-input" id="mc-gatilho-reacao" placeholder="Gatilho da reação (opcional)" style="display:none;margin-top:6px">
+      </div>
+      <div class="col"><label class="form-label" for="mc-alcance">Alcance</label><input type="text" class="form-input" id="mc-alcance" value="9 metros"></div>
+    </div>
+    <div class="row gap-1">
+      <div class="col">
+        <label class="form-label">Componentes</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin:4px 0">
+          <label><input type="checkbox" id="mc-comp-v" value="V"> V — Verbal</label>
+          <label><input type="checkbox" id="mc-comp-s" value="S"> S — Somático</label>
+          <label><input type="checkbox" id="mc-comp-m" value="M"> M — Material</label>
+        </div>
+        <input type="text" class="form-input" id="mc-comp-outro" placeholder="Outro componente ou detalhe material (opcional)">
+      </div>
+      <div class="col">
+        <label class="form-label" for="mc-duracao">Duração</label>
+        <select class="form-select" id="mc-duracao">${opcoesSelect(opcoes.duracoes, 'a duração')}</select>
+        <div id="mc-duracao-personalizada" style="display:none;margin-top:6px">
+          <div style="display:flex;gap:6px">
+            <input type="number" min="1" step="1" class="form-input" id="mc-duracao-quantidade" placeholder="Quantidade" style="min-width:0">
+            <select class="form-select" id="mc-duracao-unidade" style="min-width:0">
+              <option value="turnos">turnos</option>
+              <option value="minutos">minutos</option>
+              <option value="horas">horas</option>
+              <option value="dias">dias</option>
+            </select>
+          </div>
+          <input type="text" class="form-input" id="mc-duracao-texto" placeholder="Ou duração complementar, ex.: Até ser dissipada" style="margin-top:6px">
+        </div>
+      </div>
+    </div>
+    <label style="display:flex;align-items:center;gap:6px;margin:10px 0"><input type="checkbox" id="mc-ritual"> Pode ser conjurada como Ritual</label>
+    <div class="form-group">
+      <label class="form-label" for="mc-desc">Descricao</label>
+      <textarea class="form-textarea" id="mc-desc" rows="4" placeholder="Descricao da magia..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="mc-dano">Dano / Efeito</label>
+      <input type="text" class="form-input" id="mc-dano" placeholder="Ex: 3d6 fogo">
+    </div>
+  `, `<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-mc">${magiaExistente ? 'Salvar Alterações' : 'Adicionar'}</button>`);
+
+  const alternarPersonalizado = (selectId, campoId) => {
+    const select = document.getElementById(selectId);
+    const campo = document.getElementById(campoId);
+    if (!select || !campo) return;
+    const atualizar = () => { campo.style.display = select.value === '__personalizado__' ? '' : 'none'; };
+    select.addEventListener('change', atualizar);
+    atualizar();
+  };
+  alternarPersonalizado('mc-escola', 'mc-escola-personalizada');
+  alternarPersonalizado('mc-tempo', 'mc-tempo-personalizado');
+  alternarPersonalizado('mc-duracao', 'mc-duracao-personalizada');
+
+  const atualizarGatilhoReacao = () => {
+    const selectTempo = document.getElementById('mc-tempo');
+    const campo = document.getElementById('mc-gatilho-reacao');
+    if (!selectTempo || !campo) return;
+    campo.style.display = /^rea[cç][aã]o$/i.test(selectTempo.value) ? '' : 'none';
+  };
+  document.getElementById('mc-tempo')?.addEventListener('change', atualizarGatilhoReacao);
+  atualizarGatilhoReacao();
+
+  if (magiaExistente) {
+    const definirSelectOuPersonalizado = (selectId, inputId, valor) => {
+      const select = document.getElementById(selectId);
+      const input = document.getElementById(inputId);
+      if (!select || !input) return;
+      const possuiOpcao = [...select.options].some(opcao => opcao.value === valor);
+      select.value = possuiOpcao ? valor : '__personalizado__';
+      input.value = valor;
+      select.dispatchEvent(new Event('change'));
+    };
+    document.getElementById('mc-nome').value = magiaExistente.nome || '';
+    document.getElementById('mc-circulo').value = String(Number(magiaExistente.circulo) || 0);
+    definirSelectOuPersonalizado('mc-escola', 'mc-escola-personalizada', magiaExistente.escola || '');
+    const tempoExistente = String(magiaExistente.tempo_conjuracao || '');
+    const matchReacao = tempoExistente.match(/^rea[cç][aã]o\s*,\s*(.+)$/i);
+    definirSelectOuPersonalizado('mc-tempo', 'mc-tempo-personalizado', matchReacao ? 'Reação' : tempoExistente);
+    if (matchReacao) document.getElementById('mc-gatilho-reacao').value = matchReacao[1];
+    atualizarGatilhoReacao();
+    definirSelectOuPersonalizado('mc-duracao', 'mc-duracao-texto', magiaExistente.duracao || '');
+    document.getElementById('mc-alcance').value = magiaExistente.alcance || '';
+    document.getElementById('mc-desc').value = magiaExistente.descricao || '';
+    document.getElementById('mc-dano').value = magiaExistente.dano || '';
+    document.getElementById('mc-ritual').checked = Boolean(magiaExistente.ritual);
+    const componentes = String(magiaExistente.componentes || '').split(',').map(valor => valor.trim());
+    ['V', 'S', 'M'].forEach(letra => { document.getElementById(`mc-comp-${letra.toLowerCase()}`).checked = componentes.includes(letra); });
+    document.getElementById('mc-comp-outro').value = componentes.filter(valor => !['V', 'S', 'M'].includes(valor)).join(', ');
+  }
+
+  const sincronizarRitualComTempo = () => {
+    const selectTempo = document.getElementById('mc-tempo');
+    const inputTempo = document.getElementById('mc-tempo-personalizado');
+    const ritual = document.getElementById('mc-ritual');
+    if (!selectTempo || !inputTempo || !ritual) return;
+    const tempo = selectTempo.value === '__personalizado__' ? inputTempo.value : selectTempo.value;
+    ritual.checked = /\britual\b/i.test(tempo || '');
+  };
+  document.getElementById('mc-tempo')?.addEventListener('change', sincronizarRitualComTempo);
+  document.getElementById('mc-tempo-personalizado')?.addEventListener('input', sincronizarRitualComTempo);
+  sincronizarRitualComTempo();
+
+  document.getElementById('btn-salvar-mc')?.addEventListener('click', () => {
+    const nome = document.getElementById('mc-nome')?.value?.trim();
+    if (!nome) { toast('Informe um nome', 'error'); return; }
+
+    const valorSelecionado = (selectId, personalizadoId) => {
+      const selecionado = document.getElementById(selectId)?.value || '';
+      return (selecionado === '__personalizado__'
+        ? document.getElementById(personalizadoId)?.value
+        : selecionado)?.trim() || '';
+    };
+    const escola = valorSelecionado('mc-escola', 'mc-escola-personalizada');
+    const tempoConjuracao = valorSelecionado('mc-tempo', 'mc-tempo-personalizado');
+    if (!tempoConjuracaoMagiaValido(tempoConjuracao)) {
+      toast('Informe um tempo de conjuração válido para uma magia (por exemplo: Ação, Ação Bônus, Reação, 1 minuto ou 1 hora).', 'error');
+      return;
+    }
+    const alcance = document.getElementById('mc-alcance')?.value?.trim() || '';
+    const componentesBase = ['v', 's', 'm']
+      .filter(letra => document.getElementById(`mc-comp-${letra}`)?.checked)
+      .map(letra => letra.toUpperCase());
+    const outroComponente = document.getElementById('mc-comp-outro')?.value?.trim() || '';
+    const componentes = [...componentesBase, outroComponente].filter(Boolean).join(', ');
+    const duracaoSelecionada = document.getElementById('mc-duracao')?.value || '';
+    const quantidadeDuracao = document.getElementById('mc-duracao-quantidade')?.value?.trim() || '';
+    const unidadeDuracao = document.getElementById('mc-duracao-unidade')?.value || '';
+    const textoDuracao = document.getElementById('mc-duracao-texto')?.value?.trim() || '';
+    const duracao = duracaoSelecionada === '__personalizado__'
+      ? [quantidadeDuracao && `${quantidadeDuracao} ${unidadeDuracao}`, textoDuracao].filter(Boolean).join(', ')
+      : duracaoSelecionada;
+
+    const obrigatorios = [
+      ['escola', escola], ['tempo de conjuração', tempoConjuracao], ['alcance', alcance],
+      ['componentes', componentes], ['duração', duracao]
+    ];
+    const faltante = obrigatorios.find(([, valor]) => !valor);
+    if (faltante) { toast(`Informe ${faltante[0]}`, 'error'); return; }
+
+    if (!char.magias_customizadas) char.magias_customizadas = [];
+    const magiaSalva = {
+      nome,
+      circulo: parseInt(document.getElementById('mc-circulo')?.value) || 0,
+      escola,
+      tempo_conjuracao: tempoConjuracao,
+      alcance,
+      componentes,
+      duracao,
+      descricao: document.getElementById('mc-desc')?.value || '',
+      dano: document.getElementById('mc-dano')?.value || '',
+      ritual: Boolean(document.getElementById('mc-ritual')?.checked)
+    };
+    const nomeAnterior = magiaExistente?.nome;
+    const circuloAnterior = magiaExistente ? (Number(magiaExistente.circulo) || 0) : null;
+    if (magiaExistente) char.magias_customizadas[indiceEdicao] = magiaSalva;
+    else char.magias_customizadas.push(magiaSalva);
+    const identidadeMudou = Boolean(magiaExistente) && (nomeAnterior !== magiaSalva.nome || circuloAnterior !== magiaSalva.circulo);
+    if (char.classe === 'Mago' && (!magiaExistente || identidadeMudou)) {
+      if (nomeAnterior && Array.isArray(char.grimorio)) {
+        const idxAntigo = char.grimorio.findIndex(m => m?.nome === nomeAnterior);
+        if (idxAntigo >= 0) char.grimorio.splice(idxAntigo, 1);
+      }
+      if (magiaSalva.circulo > 0 && !magiaMagoEstaNoGrimorio(char, magiaSalva.nome)) {
+        if (!char.grimorio) char.grimorio = [];
+        char.grimorio.push({ nome: magiaSalva.nome, circulo: magiaSalva.circulo });
+      }
+    }
+    if (magiaExistente && nomeAnterior) {
+      const idxPrep = (char.magias_preparadas || []).findIndex(m => m?.personalizada && m.nome === nomeAnterior);
+      if (idxPrep >= 0) {
+        if (magiaSalva.circulo > 0) {
+          char.magias_preparadas[idxPrep] = { ...char.magias_preparadas[idxPrep], nome: magiaSalva.nome, circulo: magiaSalva.circulo };
+        } else {
+          char.magias_preparadas.splice(idxPrep, 1);
+        }
+      }
+    }
+    salvar();
+    window.fecharModal();
+    renderFichaCompleta();
+    toast(`${nome} ${magiaExistente ? 'atualizada' : 'adicionada'}!`, 'success');
+  });
+}
+
+/** Busca de magia para copiar no Grimório do Mago */
+export async function mostrarBuscaGrimorio() {
+  const indice = await getIndiceMagias();
+  const magias = (indice?.magias || []).filter(m => m.circulo > 0 && (m.classes || []).includes('Mago'));
+  const espacosMago = classeData?.tabela_caracteristicas
+    ? getEspacosMagia(classeData.tabela_caracteristicas, char.nivel) : (char.espacos_magia || {});
+  const circulosPreparaveis = new Set(Object.entries(espacosMago)
+    .filter(([, espaco]) => (espaco?.total || 0) > 0)
+    .map(([circulo]) => Number(circulo)));
+
+  abrirModal('Copiar Magia para o Grimório', `
+    <div class="info-box warning" style="margin-bottom:8px">
+      <strong>Custo:</strong> 50 PO por círculo da magia | <strong>Tempo:</strong> 2h por círculo<br>
+      <small id="grimorio-carteira-disponivel">Disponível: ${formatarCarteira(char.moedas)}</small>
+    </div>
+    <div class="search-box"><input type="text" id="busca-grimorio" placeholder="Buscar magia de Mago..." class="form-input" autofocus></div>
+    <div id="resultado-grimorio" style="min-height:35dvh;max-height:50dvh;overflow-y:auto"></div>
+  `, '', () => renderFichaCompleta());
+
+  const resultadoEl = document.getElementById('resultado-grimorio');
+  const circulosExpandidos = new Set();
+
+  function renderGrimorio() {
+    const termo = semAcento(document.getElementById('busca-grimorio')?.value || '');
+    const jaNoGrimorio = new Set((char.grimorio || []).map(m => m.nome));
+    let lista = magias.filter(m => !jaNoGrimorio.has(m.nome) && circulosPreparaveis.has(m.circulo));
+    if (termo.length >= 2) lista = lista.filter(m => semAcento(m.nome).includes(termo));
+    lista = lista.sort((a, b) => a.circulo - b.circulo || a.nome.localeCompare(b.nome, 'pt-BR')).slice(0, 50);
+
+    if (lista.length === 0) {
+      resultadoEl.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:16px">Nenhuma magia encontrada.</div>`;
+      return;
+    }
+
+    const magiasPorCirculo = new Map();
+    lista.forEach(m => {
+      if (!magiasPorCirculo.has(m.circulo)) magiasPorCirculo.set(m.circulo, []);
+      magiasPorCirculo.get(m.circulo).push(m);
+    });
+
+    resultadoEl.innerHTML = [...magiasPorCirculo.entries()].map(([circulo, magiasDoCirculo]) => `
+      <details data-grimorio-circulo="${circulo}" ${termo.length >= 2 || circulosExpandidos.has(circulo) ? 'open' : ''} style="margin:8px 0">
+        <summary class="section-divider" style="margin:0;cursor:pointer"><span>${circulo}º Círculo (${magiasDoCirculo.length})</span></summary>
+        ${magiasDoCirculo.map(m => {
+      const custo = m.circulo * 50;
+      const temPO = podePagar(char.moedas, custo * VALOR_EM_COBRE.po);
+      return `
+      <div class="magia-item" style="cursor:pointer${!temPO ? ';opacity:0.5' : ''}" data-grim-nome="${m.nome}" data-grim-circ="${m.circulo}" data-grim-custo="${custo}">
+        <div class="magia-nome">${m.nome}</div>
+        <div class="magia-meta">
+          <span>${m.circulo}º Círculo</span>
+          <span>${m.escola}</span>
+          <span style="font-weight:600;color:${temPO ? 'var(--success)' : 'var(--danger)'}">Custo: ${custo} PO</span>
+        </div>
+      </div>`;
+    }).join('')}
+      </details>`).join('');
+
+    resultadoEl.querySelectorAll('[data-grimorio-circulo]').forEach(grupo => {
+      grupo.addEventListener('toggle', () => {
+        const circulo = Number(grupo.dataset.grimorioCirculo);
+        if (grupo.open) circulosExpandidos.add(circulo);
+        else circulosExpandidos.delete(circulo);
+      });
+    });
+
+    resultadoEl.querySelectorAll('[data-grim-nome]').forEach(el => {
+      el.addEventListener('click', () => {
+        const nome = el.dataset.grimNome;
+        const circ = parseInt(el.dataset.grimCirc);
+        const custo = parseInt(el.dataset.grimCusto);
+        const custoCobre = custo * VALOR_EM_COBRE.po;
+        if (!circulosPreparaveis.has(circ)) {
+          toast('Seu Mago ainda não pode preparar magias desse círculo.', 'error');
+          return;
+        }
+        if (!podePagar(char.moedas, custoCobre)) {
+          toast(`PO insuficiente! Necessário: ${custo} PO`, 'error');
+          return;
+        }
+        if (!char.grimorio) char.grimorio = [];
+        char.grimorio.push({ nome, circulo: circ });
+        char.moedas = retirarValor(char.moedas, custoCobre).moedas;
+        salvar();
+        const carteiraEl = document.getElementById('grimorio-carteira-disponivel');
+        if (carteiraEl) carteiraEl.textContent = `Disponível: ${formatarCarteira(char.moedas)}`;
+        renderGrimorio();
+        toast(`${nome} copiada para o grimório! (-${custo} PO)`, 'success');
+      });
+    });
+  }
+
+  document.getElementById('busca-grimorio')?.addEventListener('input', renderGrimorio);
+  renderGrimorio();
+}
+
+/** Modal de troca de magias preparadas (usado no descanso longo para classes preparadas) */
+export async function mostrarTrocaMagias(callbackPosTroca = null) {
+  const info = CLASSES_INFO[char.classe] || {};
+  const subConj = getSubclasseConjuradoraConjuracao();
+  let maxPreparadas = classeData?.tabela_caracteristicas
+    ? getMagiaPreparadas(classeData.tabela_caracteristicas, char.nivel) : 0;
+  // Fallback para subclasses conjuradoras
+  if (subConj && maxPreparadas === 0) {
+    maxPreparadas = subConj.preparadas || 0;
+  }
+  const ehMago = char.classe === 'Mago';
+  if (ehMago && normalizarGrimorioMago(char, maxPreparadas).alterado) salvar();
+
+  // Espaços de magia para determinar círculos disponíveis
+  let espacosNivel = classeData?.tabela_caracteristicas
+    ? getEspacosMagia(classeData.tabela_caracteristicas, char.nivel) : {};
+  if (subConj && Object.keys(espacosNivel).length === 0) {
+    espacosNivel = subConj.espacos || {};
+  }
+  const maxCirculo = Math.max(...Object.keys(espacosNivel).map(Number), 0);
+
+  // Buscar lista de magias disponíveis (classe ou grimório)
+  const magiasCustomizadasCirculo = (char.magias_customizadas || [])
+    .filter(m => Number(m.circulo) > 0)
+    .map(m => ({ nome: m.nome, circulo: Number(m.circulo), escola: m.escola, personalizada: true }));
+  const nomesPersonalizadasSet = new Set(magiasCustomizadasCirculo.map(m => m.nome));
+
+  let magiasDisponiveis = [];
+  if (ehMago) {
+    magiasDisponiveis = (char.grimorio || []).map(m => ({ ...m }));
+  } else {
+    const doCatalogo = (await obterMagiasDisponiveisClasseAtual()).filter(m => m.circulo > 0);
+    magiasDisponiveis = [...doCatalogo, ...magiasCustomizadasCirculo.filter(m => !doCatalogo.some(d => d.nome === m.nome && Number(d.circulo) === m.circulo))];
+  }
+
+  // Identificar magias de domínio (não removíveis)
+  const nomesDominio = new Set((char.magias_preparadas || []).filter(m => magiaEhEspecial(m)).map(m => m.nome));
+
+  // Set temporário com magias selecionadas (excluindo domínio)
+  const selecionadasSet = new Set((char.magias_preparadas || []).filter(m => magiaContaNoLimite(m)).map(m => m.nome));
+  // Mapa nome->circulo para reconstruir ao confirmar
+  const circuloMap = {};
+  magiasDisponiveis.forEach(m => { circuloMap[m.nome] = m.circulo; });
+  (char.magias_preparadas || []).forEach(m => { circuloMap[m.nome] = m.circulo; });
+
+  // Separar por círculo
+  const magiasCirculo = {};
+  for (let c = 1; c <= maxCirculo; c++) {
+    const doCirculo = magiasDisponiveis.filter(m => m.circulo === c);
+    if (doCirculo.length > 0) magiasCirculo[c] = doCirculo;
+  }
+
+  // Tabs
+  const tabs = ['selecionadas'];
+  Object.keys(magiasCirculo).forEach(c => tabs.push(c));
+  let tabAtiva = 'selecionadas';
+
+  abrirModal('Trocar Magias Preparadas', `
+    <div style="margin-bottom:8px">
+      <span class="magia-contador ${selecionadasSet.size >= maxPreparadas ? 'contador-cheio' : selecionadasSet.size > maxPreparadas ? 'contador-excedido' : ''}">
+        Preparadas: <strong id="troca-contador">${selecionadasSet.size}</strong>/${maxPreparadas}
+      </span>
+      ${nomesDominio.size > 0 ? `<span style="font-size:0.75rem;color:var(--secondary);margin-left:8px">+ ${nomesDominio.size} de Domínio</span>` : ''}
+    </div>
+    <div class="tabs" id="tabs-troca-magias" style="margin-bottom:8px;overflow-x:auto;white-space:nowrap">
+      <div class="tab active" data-tab-troca="selecionadas">Selecionadas</div>
+      ${Object.keys(magiasCirculo).map(c => `<div class="tab" data-tab-troca="${c}">${c}º Círculo</div>`).join('')}
+    </div>
+    <div class="search-box"><input type="text" id="busca-troca-magia" placeholder="Buscar magia..." class="form-input"></div>
+    <div id="resultado-troca" style="min-height:35dvh;max-height:50dvh;overflow-y:auto"></div>
+  `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-confirmar-troca">Confirmar</button>');
+
+  const resultadoEl = document.getElementById('resultado-troca');
+
+  function atualizarContadorTroca() {
+    const el = document.getElementById('troca-contador');
+    if (el) {
+      el.textContent = selecionadasSet.size;
+      el.style.color = selecionadasSet.size === maxPreparadas ? 'var(--success)' : (selecionadasSet.size > maxPreparadas ? 'var(--danger)' : 'inherit');
+    }
+  }
+
+  function renderTabTroca() {
+    const termo = semAcento(document.getElementById('busca-troca-magia')?.value || '');
+    let html = '';
+
+    if (tabAtiva === 'selecionadas') {
+      // Magias atualmente selecionadas para preparar
+      html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">Use o <strong>check</strong> para (des)marcar. Toque no <strong>nome</strong> para ver detalhes.</div>`;
+
+      if (nomesDominio.size > 0) {
+        const domMagias = magiasDisponiveis.filter(m => nomesDominio.has(m.nome));
+        const filtDom = termo.length >= 2 ? domMagias.filter(m => semAcento(m.nome).includes(termo)) : domMagias;
+        if (filtDom.length > 0 || (termo.length < 2 && nomesDominio.size > 0)) {
+          html += `<div style="font-size:0.75rem;font-weight:700;color:var(--secondary);margin:4px 0">Magias Especiais</div>`;
+          // Garantir que domínio apareca mesmo se nao esta em magiasDisponiveis
+          const domNomes = [...nomesDominio];
+          const filtDomNomes = termo.length >= 2 ? domNomes.filter(n => semAcento(n).includes(termo)) : domNomes;
+          html += `<div class="magias-grid">${filtDomNomes.map(nome => `
+            <div class="magia-card selecionada magia-dominio" style="opacity:0.7;cursor:default">
+              <span class="magia-card-check"></span>
+              <div class="magia-card-nome" data-troca-info="${nome}" data-troca-info-circ="${circuloMap[nome] || 1}"><span class="badge-dominio">&#9733;</span> ${nome}</div>
+              <div class="magia-card-meta"><span>Especial</span></div>
+            </div>
+          `).join('')}</div>`;
+        }
+      }
+
+      const selNomes = [...selecionadasSet];
+      const filtSel = termo.length >= 2 ? selNomes.filter(n => semAcento(n).includes(termo)) : selNomes;
+      if (filtSel.length > 0) {
+        html += `<div class="magias-grid">${filtSel.map(nome => `
+          <div class="magia-card selecionada" style="cursor:pointer" data-troca-toggle="${nome}">
+            <span class="magia-card-check" data-troca-check="${nome}"></span>
+            <div class="magia-card-nome" data-troca-info="${nome}" data-troca-info-circ="${circuloMap[nome] || 1}">${nome}</div>
+            <div class="magia-card-meta"><span>${circuloMap[nome] || '?'}º Círculo</span></div>
+          </div>
+        `).join('')}</div>`;
+      } else if (selecionadasSet.size === 0) {
+        html += `<div style="text-align:center;color:var(--text-muted);padding:16px">Nenhuma magia selecionada. Use as tabs de círculo para adicionar.</div>`;
+      }
+    } else {
+      // Magias de um círculo específico
+      const circ = parseInt(tabAtiva);
+      const magiasDoCirc = magiasCirculo[circ] || [];
+      const cheio = selecionadasSet.size >= maxPreparadas;
+
+      html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">Preparadas: ${selecionadasSet.size}/${maxPreparadas}${cheio ? ' <span style="color:var(--danger)">(Limite)</span>' : ''}</div>`;
+
+      let lista = [...magiasDoCirc];
+      lista.sort((a, b) => {
+        const aS = selecionadasSet.has(a.nome) ? 0 : 1;
+        const bS = selecionadasSet.has(b.nome) ? 0 : 1;
+        return aS - bS || a.nome.localeCompare(b.nome);
+      });
+      if (termo.length >= 2) lista = lista.filter(m => semAcento(m.nome).includes(termo));
+
+      html += `<div class="magias-grid">${lista.map(m => {
+        const sel = selecionadasSet.has(m.nome);
+        const isDominio = nomesDominio.has(m.nome);
+        const bloqueado = cheio && !sel && !isDominio;
+        return `
+          <div class="magia-card ${sel || isDominio ? 'selecionada' : ''} ${isDominio ? 'magia-dominio' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}"
+               ${isDominio ? '' : `data-troca-toggle="${m.nome}"`}
+               style="${bloqueado ? 'opacity:0.35;' : ''}${isDominio ? 'opacity:0.7;cursor:default;' : ''}">
+            <span class="magia-card-check" ${isDominio ? '' : `data-troca-check="${m.nome}"`}></span>
+            <div class="magia-card-nome" data-troca-info="${m.nome}" data-troca-info-circ="${circ}">${isDominio ? '<span class="badge-dominio">&#9733;</span> ' : ''}${m.nome}</div>
+            <div class="magia-card-meta">
+              <span>${m.escola || ''}</span>
+              ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
+              ${isDominio ? '<span>Especial</span>' : ''}
+            </div>
+          </div>`;
+      }).join('')}</div>`;
+    }
+
+    resultadoEl.innerHTML = html;
+    bindEventosTroca();
+  }
+
+  function bindEventosTroca() {
+    // Toggle seleção ao clicar no check
+    resultadoEl.querySelectorAll('[data-troca-check]').forEach(chk => {
+      chk.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const nome = chk.dataset.trocaCheck;
+        if (selecionadasSet.has(nome)) {
+          selecionadasSet.delete(nome);
+        } else {
+          if (selecionadasSet.size >= maxPreparadas) {
+            toast(`Limite de ${maxPreparadas} magias! Remova uma antes.`, 'error');
+            return;
+          }
+          selecionadasSet.add(nome);
+        }
+        atualizarContadorTroca();
+        renderTabTroca();
+      });
+    });
+
+    // Info detalhes ao clicar no nome
+    resultadoEl.querySelectorAll('[data-troca-info]').forEach(el => {
+      el.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const nome = el.dataset.trocaInfo;
+        const circ = parseInt(el.dataset.trocaInfoCirc);
+        const custom = (char.magias_customizadas || []).find(m => m.nome === nome && Number(m.circulo) === circ);
+        if (custom) {
+          abrirModal(custom.nome, `
+            <div class="magia-meta" style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:8px;font-size:0.85rem">
+              <span class="badge badge-primary">${circ === 0 ? 'Truque' : circ + 'º Círculo'}</span>
+              <span class="badge badge-secondary">${custom.escola || ''}</span>
+              <span>${custom.tempo_conjuracao || ''}</span> <span>${custom.alcance || ''}</span>
+              <span>${custom.componentes || ''}</span> <span>${custom.duracao || ''}</span>
+            </div>
+            <div class="md-content">${mdParaHtml(custom.descricao || '')}</div>
+          `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
+          return;
+        }
+        const dados = await getMagiasPorCirculo(circ);
+        const magia = dados?.magias?.find(m => m.nome === nome);
+        if (!magia) { toast('Detalhes não encontrados', 'error'); return; }
+        abrirModal(magia.nome, `
+          <div class="magia-meta" style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:8px;font-size:0.85rem">
+            <span class="badge badge-primary">${circ === 0 ? 'Truque' : circ + 'º Círculo'}</span>
+            <span class="badge badge-secondary">${magia.escola}</span>
+            <span>${magia.tempo_conjuracao}</span> <span>${magia.alcance}</span>
+            <span>${magia.componentes}</span> <span>${magia.duracao}</span>
+          </div>
+          <div class="md-content">${mdParaHtml(magia.descricao)}</div>
+          ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em círculos superiores:</strong><div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
+        `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
+      });
+    });
+  }
+
+  // Tabs
+  document.querySelectorAll('#tabs-troca-magias .tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('#tabs-troca-magias .tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      tabAtiva = tab.dataset.tabTroca;
+      document.getElementById('busca-troca-magia').value = '';
+      renderTabTroca();
+    });
+  });
+
+  // Busca
+  document.getElementById('busca-troca-magia')?.addEventListener('input', renderTabTroca);
+
+  // Confirmar troca
+  document.getElementById('btn-confirmar-troca')?.addEventListener('click', () => {
+    const novasPreparadas = [...selecionadasSet].map(nome => {
+      const base = { nome, circulo: circuloMap[nome] || 1 };
+      if (nomesPersonalizadasSet.has(nome)) base.personalizada = true;
+      return base;
+    });
+    if (novasPreparadas.length > maxPreparadas) {
+      toast(`Limite de ${maxPreparadas} magias preparadas excedido.`, 'error');
+      return;
+    }
+    if (ehMago && novasPreparadas.some(m => !magiaMagoEstaNoGrimorio(char, m.nome))) {
+      toast('Todas as magias preparadas precisam estar no grimório.', 'error');
+      return;
+    }
+    char.magias_preparadas = [
+      ...(char.magias_preparadas || []).filter(m => magiaEhEspecial(m)),
+      ...novasPreparadas
+    ];
+    salvar();
+    window.fecharModal();
+    renderFichaCompleta();
+    toast('Magias preparadas atualizadas!', 'success');
+    // Encadear próxima ação (ex.: troca de maestrias após magias)
+    if (callbackPosTroca) callbackPosTroca();
+  });
+
+  renderTabTroca();
+}
+
+/** Modal de troca de 1 magia conhecida (Descanso Longo - Bardo, Feiticeiro, Bruxo, subclasses conjuradoras) */
+/**
+ * Abre modal para o jogador escolher uma magia conhecida que preencha um slot
+ * liberado pelo ajuste automático (bug de magia passiva selecionada manualmente).
+ */
+export async function abrirPreenchimentoSlotMagia() {
+  const subConj = getSubclasseConjuradoraConjuracao();
+  let espacosNivel = classeData?.tabela_caracteristicas
+    ? getEspacosMagia(classeData.tabela_caracteristicas, char.nivel) : {};
+  if (subConj && Object.keys(espacosNivel).length === 0) {
+    espacosNivel = subConj.espacos || {};
+  }
+  const maxCirculo = Math.max(...Object.keys(espacosNivel).map(Number), 0);
+
+  const magiasClasse = await obterMagiasDisponiveisClasseAtual();
+  const sempreNomes = new Set((magiasSempreCache || []).map(m => m.nome));
+  const dominioNomes = new Set((magiasDominioCache || []).map(m => m.nome));
+  const jaTemSet = new Set((char.magias_preparadas || []).map(m => m.nome));
+
+  const disponiveis = magiasClasse.filter(m =>
+    m.circulo > 0 && m.circulo <= maxCirculo &&
+    !jaTemSet.has(m.nome) &&
+    !sempreNomes.has(m.nome) &&
+    !dominioNomes.has(m.nome)
+  ).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+
+  let magiaSelecionada = null;
+  let circuloSelecionado = null;
+
+  abrirModal('Escolher Magia Conhecida', `
+    <div class="info-box info" style="margin-bottom:12px;font-size:0.85rem">
+      Uma magia que você havia escolhido foi reclassificada como <strong>Sempre Preparada</strong> pela sua subclasse,
+      liberando uma vaga. Escolha uma nova magia para substituí-la.
+    </div>
+    <div class="search-box" style="margin-bottom:8px">
+      <input type="text" id="busca-preencher-slot" placeholder="Buscar magia..." class="form-input">
+    </div>
+    <div id="resultado-preencher-slot" style="max-height:40vh;overflow-y:auto;margin-bottom:8px"></div>
+    <div style="font-size:0.85rem;color:var(--text-muted)">
+      Selecionada: <strong id="preencher-slot-nome" style="color:var(--accent)">—</strong>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
+     <button class="btn btn-primary" id="btn-confirmar-preencher" disabled>Confirmar</button>`);
+
+  const resultadoEl = document.getElementById('resultado-preencher-slot');
+  const confirmarBtn = document.getElementById('btn-confirmar-preencher');
+
+  function renderLista() {
+    const termo = semAcento(document.getElementById('busca-preencher-slot')?.value || '');
+    let filtradas = disponiveis;
+    if (termo.length >= 2) filtradas = disponiveis.filter(m => semAcento(m.nome).includes(termo));
+    filtradas = filtradas.sort((a, b) => a.circulo - b.circulo || a.nome.localeCompare(b.nome, 'pt-BR'));
+
+    const porCirculo = filtradas.reduce((acc, m) => { if (!acc[m.circulo]) acc[m.circulo] = []; acc[m.circulo].push(m); return acc; }, {});
+    resultadoEl.innerHTML = Object.entries(porCirculo).map(([circ, magias]) => `
+      <div style="margin-bottom:8px">
+        <div style="font-size:0.78rem;font-weight:700;color:var(--accent);padding:4px 0 2px;border-bottom:1px solid var(--border-color);margin-bottom:6px">${circ}\u00ba C\u00edrculo</div>
+        <div class="magias-grid">${magias.map(m => `
+          <div class="magia-card ${m.nome === magiaSelecionada ? 'selecionada' : ''}"
+               data-preencher-nome="${m.nome}" data-preencher-circ="${m.circulo}" style="cursor:pointer">
+            <span class="magia-card-check"></span>
+            <div class="magia-card-nome" data-preencher-detalhe="${m.nome}" data-preencher-detalhe-circ="${m.circulo}" style="cursor:pointer">${m.nome}</div>
+            <div class="magia-card-meta">
+              <span>${m.escola || ''}</span>
+              ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
+            </div>
+          </div>
+        `).join('')}</div>
+      </div>
+    `).join('');
+
+    resultadoEl.querySelectorAll('[data-preencher-nome]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        if (e.target.closest('[data-preencher-detalhe]')) return;
+        magiaSelecionada = el.dataset.preencherNome;
+        circuloSelecionado = parseInt(el.dataset.preencherCirc);
+        document.getElementById('preencher-slot-nome').textContent = magiaSelecionada;
+        confirmarBtn.disabled = false;
+        renderLista();
+      });
+    });
+
+    resultadoEl.querySelectorAll('[data-preencher-detalhe]').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const nome = btn.dataset.preencherDetalhe;
+        const circ = parseInt(btn.dataset.preencherDetalheCirc);
+        const dados = await getMagiasPorCirculo(circ);
+        const magia = dados?.magias?.find(m => m.nome === nome);
+        if (!magia) return;
+        abrirModal(magia.nome, `
+          <div class="magia-meta" style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:8px;font-size:0.85rem">
+            <span class="badge badge-primary">${circ}\u00ba Circulo</span>
+            <span class="badge badge-secondary">${magia.escola}</span>
+            <span>${magia.tempo_conjuracao}</span> <span>${magia.alcance}</span>
+            <span>${magia.componentes}</span> <span>${magia.duracao}</span>
+          </div>
+          <div class="md-content">${mdParaHtml(magia.descricao)}</div>
+          ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em circulos superiores:</strong><div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
+        `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
+      });
+    });
+  }
+
+  document.getElementById('busca-preencher-slot')?.addEventListener('input', renderLista);
+
+  confirmarBtn?.addEventListener('click', () => {
+    if (!magiaSelecionada) return;
+    if (!char.magias_preparadas) char.magias_preparadas = [];
+    char.magias_preparadas.push({ nome: magiaSelecionada, circulo: circuloSelecionado });
+    char._slots_magia_livre = Math.max(0, (char._slots_magia_livre || 1) - 1);
+    if (char._slots_magia_livre === 0) delete char._slots_magia_livre;
+    salvar();
+    window.fecharModal();
+    renderFichaCompleta();
+    toast(`${magiaSelecionada} adicionada como magia conhecida`, 'success');
+  });
+
+  renderLista();
+}
+
+export async function mostrarTrocaMagiaConhecida(callbackPosTroca = null) {
+  const subConj = getSubclasseConjuradoraConjuracao();
+
+  // Espacos de magia para determinar circulos disponiveis
+  let espacosNivel = classeData?.tabela_caracteristicas
+    ? getEspacosMagia(classeData.tabela_caracteristicas, char.nivel) : {};
+  if (subConj && Object.keys(espacosNivel).length === 0) {
+    espacosNivel = subConj.espacos || {};
+  }
+  const maxCirculo = Math.max(...Object.keys(espacosNivel).map(Number), 0);
+
+  // Magias conhecidas atuais (apenas as que contam no limite e tem circulo > 0)
+  const magiasAtuais = (char.magias_preparadas || []).filter(m => m.circulo > 0 && magiaContaNoLimite(m));
+
+  if (magiasAtuais.length === 0) {
+    toast('Nenhuma magia conhecida para trocar', 'error');
+    if (callbackPosTroca) callbackPosTroca();
+    else renderFichaCompleta();
+    return;
+  }
+
+  // Carregar magias disponiveis da classe
+  const magiasClasse = await obterMagiasDisponiveisClasseAtual();
+  const jaTemSet = new Set((char.magias_preparadas || []).map(m => m.nome));
+
+  let magiaRemover = null;
+  let magiaAdicionar = null;
+  let circuloAdicionar = null;
+
+  const nomeClasse = char.subclasse && ehSubclasseConjuradora() ? `${char.classe} (${char.subclasse})` : char.classe;
+
+  abrirModal('Trocar Magia Conhecida', `
+    <div class="info-box info" style="margin-bottom:12px;font-size:0.85rem">
+      Apos um Descanso Longo, voce pode trocar <strong>1 magia conhecida</strong> por outra da lista de ${nomeClasse}.
+    </div>
+
+    <div style="margin-bottom:12px">
+      <label class="form-label" style="font-weight:700;color:var(--accent)">Magia a remover:</label>
+      <select class="form-input" id="troca-conhecida-remover" style="margin-bottom:4px">
+        <option value="">Selecione uma magia...</option>
+        ${magiasAtuais.map(m => `<option value="${m.nome}" data-circ="${m.circulo}">${m.nome} (${m.circulo}\u00ba Circulo)</option>`).join('')}
+      </select>
+    </div>
+
+    <div id="troca-conhecida-adicionar-container" style="display:none">
+      <label class="form-label" style="font-weight:700;color:var(--accent)">Nova magia:</label>
+      <div class="search-box" style="margin-bottom:8px"><input type="text" id="busca-troca-conhecida" placeholder="Buscar magia..." class="form-input"></div>
+      <div id="resultado-troca-conhecida" style="max-height:35vh;overflow-y:auto;margin-bottom:8px"></div>
+      <div style="font-size:0.85rem;color:var(--text-muted)">
+        Selecionada: <strong id="troca-conhecida-nome" style="color:var(--accent)">\u2014</strong>
+      </div>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
+     <button class="btn btn-secondary" id="btn-pular-troca-conhecida">Nao Trocar</button>
+     <button class="btn btn-primary" id="btn-confirmar-troca-conhecida" disabled>Confirmar Troca</button>`);
+
+  const containerAdicionar = document.getElementById('troca-conhecida-adicionar-container');
+  const resultadoEl = document.getElementById('resultado-troca-conhecida');
+  const confirmarBtn = document.getElementById('btn-confirmar-troca-conhecida');
+
+  function renderListaSubstituta() {
+    const termo = semAcento(document.getElementById('busca-troca-conhecida')?.value || '');
+    // Filtrar magias da classe que podem ser escolhidas
+    let disponiveis = magiasClasse.filter(m =>
+      m.circulo > 0 && m.circulo <= maxCirculo &&
+      !jaTemSet.has(m.nome) && m.nome !== magiaRemover
+    );
+    if (termo.length >= 2) disponiveis = disponiveis.filter(m => semAcento(m.nome).includes(termo));
+    disponiveis = disponiveis.sort((a, b) => a.circulo - b.circulo || a.nome.localeCompare(b.nome, 'pt-BR'));
+
+    const porCirculo = disponiveis.reduce((acc, m) => { if (!acc[m.circulo]) acc[m.circulo] = []; acc[m.circulo].push(m); return acc; }, {});
+    resultadoEl.innerHTML = Object.entries(porCirculo).map(([circ, magias]) => `
+      <div style="margin-bottom:8px">
+        <div style="font-size:0.78rem;font-weight:700;color:var(--accent);padding:4px 0 2px;border-bottom:1px solid var(--border-color);margin-bottom:6px">${circ}\u00ba C\u00edrculo</div>
+        <div class="magias-grid">${magias.map(m => `
+          <div class="magia-card ${m.nome === magiaAdicionar ? 'selecionada' : ''}" data-selecionar-troca="${m.nome}" data-selecionar-circ="${m.circulo}" style="cursor:pointer">
+            <span class="magia-card-check"></span>
+            <div class="magia-card-nome" data-troca-detalhe="${m.nome}" data-troca-detalhe-circ="${m.circulo}" style="cursor:pointer">${m.nome}</div>
+            <div class="magia-card-meta">
+              <span>${m.escola || ''}</span>
+              ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
+            </div>
+          </div>
+        `).join('')}</div>
+      </div>
+    `).join('');
+
+    // Selecionar magia substituta
+    resultadoEl.querySelectorAll('[data-selecionar-troca]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        if (e.target.closest('[data-troca-detalhe]')) return;
+        magiaAdicionar = el.dataset.selecionarTroca;
+        circuloAdicionar = parseInt(el.dataset.selecionarCirc);
+        document.getElementById('troca-conhecida-nome').textContent = magiaAdicionar;
+        confirmarBtn.disabled = false;
+        renderListaSubstituta();
+      });
+    });
+
+    // Detalhes da magia
+    resultadoEl.querySelectorAll('[data-troca-detalhe]').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const nome = btn.dataset.trocaDetalhe;
+        const circ = parseInt(btn.dataset.trocaDetalheCirc);
+        const dados = await getMagiasPorCirculo(circ);
+        const magia = dados?.magias?.find(m => m.nome === nome);
+        if (!magia) return;
+        abrirModal(magia.nome, `
+          <div class="magia-meta" style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:8px;font-size:0.85rem">
+            <span class="badge badge-primary">${circ}\u00ba Circulo</span>
+            <span class="badge badge-secondary">${magia.escola}</span>
+            <span>${magia.tempo_conjuracao}</span> <span>${magia.alcance}</span>
+            <span>${magia.componentes}</span> <span>${magia.duracao}</span>
+          </div>
+          <div class="md-content">${mdParaHtml(magia.descricao)}</div>
+          ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em circulos superiores:</strong><div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
+        `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
+      });
+    });
+  }
+
+  // Quando selecionar magia a remover
+  document.getElementById('troca-conhecida-remover')?.addEventListener('change', (e) => {
+    magiaRemover = e.target.value || null;
+    magiaAdicionar = null;
+    circuloAdicionar = null;
+    document.getElementById('troca-conhecida-nome').textContent = '\u2014';
+    confirmarBtn.disabled = true;
+    if (magiaRemover) {
+      containerAdicionar.style.display = 'block';
+      renderListaSubstituta();
+    } else {
+      containerAdicionar.style.display = 'none';
+    }
+  });
+
+  // Busca
+  document.getElementById('busca-troca-conhecida')?.addEventListener('input', renderListaSubstituta);
+
+  // Nao trocar
+  document.getElementById('btn-pular-troca-conhecida')?.addEventListener('click', () => {
+    window.fecharModal();
+    if (callbackPosTroca) callbackPosTroca();
+    else renderFichaCompleta();
+  });
+
+  // Confirmar troca
+  confirmarBtn?.addEventListener('click', () => {
+    if (!magiaRemover || !magiaAdicionar) return;
+    const idx = char.magias_preparadas.findIndex(m => m.nome === magiaRemover);
+    if (idx >= 0) {
+      char.magias_preparadas.splice(idx, 1);
+      char.magias_preparadas.push({ nome: magiaAdicionar, circulo: circuloAdicionar });
+      salvar();
+      toast(`Trocou ${magiaRemover} por ${magiaAdicionar}`, 'success');
+    }
+    window.fecharModal();
+    if (callbackPosTroca) callbackPosTroca();
+    else renderFichaCompleta();
+  });
+}

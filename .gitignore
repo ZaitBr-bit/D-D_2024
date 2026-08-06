@@ -27,6 +27,13 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Playwright (testes/e2e/) - a aplicacao em site/ continua sem dependencia de
+# Node; so a suite de testes usa. Os artefatos de execucao nao vao pro repo.
+testes/e2e/test-results/
+testes/e2e/playwright-report/
+testes/e2e/blob-report/
+testes/e2e/package-lock.json
+
 # Visual Studio Code
 .vscode/
 *.code-workspace
