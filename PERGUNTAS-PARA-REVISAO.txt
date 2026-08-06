@@ -420,3 +420,39 @@ elaborada ("exigiria replicar regra de negocio dentro do teste") sem ter
 diagnosticado a causa. A causa real era uma linha da minha propria fixture.
 Justificativa nao e diagnostico -- e quanto mais convincente ela soa, mais
 ela adia a investigacao de verdade.
+
+[2026-08-06] Subida de nivel investigada - NAO havia bug no produto
+Voce pediu para investigar "para testes e ficha", suspeitando do produto. A
+suspeita era justa -- eu vinha tratando "para no nivel 2" como limitacao do
+teste so porque acontece no original tambem, e "o original tambem faz" nao e
+prova de que esta certo. Mas a investigacao mostrou que o produto esta correto:
+o fluxo pede as escolhas certas e recusa com mensagem clara quando faltam.
+
+Os tres defeitos eram todos do meu helper `resolverModalAberto`:
+  1. ORDEM. Ele avancava e so escolhia se o modal continuasse aberto. Na tela
+     de subclasse o botao "Proximo" AVANCA sem exigir a escolha, entao ele
+     passava batido e a confirmacao final recusava com "Escolha uma
+     subclasse". Corrigido: preencher a tela, depois avancar.
+  2. VOCABULARIO. A subclasse usa `.levelup-subclasse-card` com estado
+     `selecionada`, e nao `.selection-card`/`selected` como o resto do app.
+     O resolvedor nao conhecia essa categoria. Acrescentada.
+  3. QUANTIDADE. Ele "esgotava" as escolhas, marcando tudo. O talento
+     Academico exige EXATAMENTE 1 pericia (levelup.js:1178-1182), entao marcar
+     todas fazia a validacao recusar. Passou a marcar no maximo um card e uma
+     caixa por tela.
+
+Resultado medido: Guerreiro 2 -> 3, Paladino 1 -> 3.
+
+AINDA ABERTO: Mago continua no nivel 1. A fixture ganhou pericias academicas
+elegiveis (Arcanismo, Historia, Investigacao estao no conjunto de
+levelup.js:1178) e o resolvedor ja limita a um card por tela, e mesmo assim
+o Academico nao e satisfeito. Falta ver COMO essa tela renderiza -- se as
+pericias sao cards, caixas ou outra coisa. Nao investiguei ate o fim.
+
+MEU PADRAO, PELA TERCEIRA VEZ NESTA RODADA: escrevi tres diagnosticos avulsos
+(inventario, subida de nivel duas vezes) e os TRES discordaram da suite,
+sempre pelo mesmo motivo -- navegavam com `goto` + espera fixa em vez de usar
+o `assentar()` dos helpers, e acabavam medindo a HOME achando que era a ficha.
+Um deles chegou a me convencer de que o botao de subir de nivel nao existia.
+Licao: investigacao vai DENTRO da suite, usando os mesmos helpers que os
+testes usam. Ferramenta paralela mente com confianca.
