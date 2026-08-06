@@ -82,6 +82,11 @@ async function criarEmLockstep(lados, classe) {
 
 for (const classe of classes()) {
   test(`criacao em lockstep: ${classe}`, async ({ context }) => {
+    // 4 minutos: desde que o driver aprendeu abas de circulo, grimorio e
+    // preparo, a criacao de um conjurador vai ate o fim -- e isso leva bem
+    // mais que os 90s padrao. O teste ficou mais lento porque passou a fazer
+    // mais, nao porque piorou.
+    test.setTimeout(240_000);
     const lados = await abrirParelha(context, '#criar');
     const passo = await criarEmLockstep(lados, classe);
     expect(passo, `${classe}: nem o original passou do passo 3`)
