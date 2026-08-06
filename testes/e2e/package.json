@@ -1,0 +1,14 @@
+{
+  "name": "fichas-de-nimb-e2e",
+  "private": true,
+  "type": "module",
+  "description": "Testes de paridade entre este repositorio e o original D-D_2024. Vive isolado em testes/e2e/ para que a aplicacao em site/ continue sem nenhuma dependencia de Node.",
+  "scripts": {
+    "test": "playwright test",
+    "test:esm": "node checar_esm.mjs",
+    "instalar": "npm install && npx playwright install chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0"
+  }
+}

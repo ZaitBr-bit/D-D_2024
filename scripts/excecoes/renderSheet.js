@@ -1,27 +1,5 @@
-// ============================================================
-// Ficha de Personagem - Visualização e Edição
-// ============================================================
-import { CLASSES_INFO } from '../dados-classes.js';
-import { getPersonagem } from '../store.js';
-import { getClasse, getIndiceMagias, getTalentos, getEspecies } from '../db.js';
-import { getEspacosMagia, getMagiaPreparadas, normalizarGrimorioMago } from '../utils.js';
-import { obterTodasMagiasDominio, obterTodasMagiasSemprePreparadas } from '../levelup.js';
-import { getSyncStatus, onSyncStatusChange } from '../sync.js';
-import { resolverPassivosTalentos } from '../talentos-effects.js';
-import { abrirGridManobras } from '../manobras-ui.js';
-import { definirChar, definirContainer, definirClasseData, definirIndiceMagias, definirTalentos, definirEspecies, definirMagiasDominio, definirMagiasSempre, definirPassivosTalentos } from '../sheet/estado.js';
-import { getEstadoRecursosGuerreiro } from '../sheet/classes/guerreiro.js';
-import { _carregarEstadoColapso } from '../sheet/colapso.js';
-import { char, classeData, salvar } from '../sheet/estado.js';
-import { renderFichaCompleta } from '../sheet/ficha.js';
-import { carregarDescricoesMagias } from '../sheet/impressao.js';
-import { ehSubclasseConjuradora, getSubclasseConjuradoraConjuracao } from '../sheet/magias.js';
-import { migrarEscolhasClasseLegadas, migrarMagiasDominio, migrarMagiasLegadoEspecie, migrarMagiasSemprePreparadas, migrarNomePericiaLidarAnimais, migrarPericiaEspecie, migrarPericiasEspecie, migrarPericiasTalentos, migrarSlotsMagiaLivre, migrarTalentoVersatilHumano, migrarTruquesEspecie } from '../sheet/migracoes.js';
-import { baixarPdfFicha } from '../sheet/pdf.js';
-import { migrarAdeptoElementalTipos, migrarIniciadoEmMagiaInstancias } from '../sheet/talentos.js';
-let _syncSubscribed = false;
 
-export async function renderSheet(container, charId) {
+async function renderSheet(container, charId) {
   definirContainer(container);
   definirChar(getPersonagem(charId));
   if (!char) {
@@ -161,29 +139,4 @@ export async function renderSheet(container, charId) {
       renderFichaCompleta();
     });
   });
-}
-
-/** Retorna texto e cor CSS do indicador de sync conforme o status atual */
-function _textoStatusSync(status) {
-  switch (status) {
-    case 'sincronizando': return { texto: '\u27F3 Salvando...', cor: 'var(--text-muted)' };
-    case 'ok':            return { texto: '\u2713 Salvo', cor: 'var(--success, #2e7d32)' };
-    case 'erro':          return { texto: '! Erro ao salvar', cor: 'var(--danger, #c62828)' };
-    case 'offline':       return { texto: '\u23F8 Offline', cor: 'var(--warning, #e65100)' };
-    default:              return { texto: '', cor: '' };
-  }
-}
-
-/** Retorna HTML do elemento do indicador com o status atual */
-export function _renderSyncIndicadorHtml() {
-  const { texto, cor } = _textoStatusSync(getSyncStatus());
-  return `<div id="sync-status-indicator" style="font-size:0.7rem;text-align:right;min-height:1em"><span style="color:${cor}">${texto}</span></div>`;
-}
-
-/** Atualiza o indicador de sync no DOM sem re-render completo */
-function _atualizarIndicadorSync(status) {
-  const el = document.getElementById('sync-status-indicator');
-  if (!el) return;
-  const { texto, cor } = _textoStatusSync(status);
-  el.innerHTML = `<span style="color:${cor}">${texto}</span>`;
 }

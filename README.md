@@ -17,11 +17,14 @@ pwsh -File iniciar_servidor.ps1
 
 Serve `site/index.html`. Sem etapa de build — editar JS e recarregar a página.
 
-Validar sintaxe de um arquivo alterado:
+Validar a integridade dos módulos da ficha e do criador:
 
 ```bash
-node --check site/js/pages/sheet.js
+python scripts/verificar_extracao.py tudo
 ```
+
+Não há dependência de Node neste repositório — nem para desenvolver, nem para
+publicar. O workflow de deploy usa apenas Python e `sed`.
 
 **Deploy:** GitHub Pages. Um workflow ajusta caminhos no deploy — `db.js` usa
 `BASE_PATH = '../dados'` em dev; o workflow troca `'../dados'` por `'./dados'` via `sed`.
@@ -66,8 +69,10 @@ por `site/index.html` como `<script type="module">`.
 |---|---|---|
 | `app.js` | Router SPA (hash), init, registro do Service Worker, FAB reportar bug | pequeno |
 | `pages/home.js` | Tela inicial: lista de personagens, import/export, login | médio |
-| `pages/creator.js` | Wizard de criação (7 passos): Classe, Espécie, Antecedente, Atributos, Talentos, Equipamento, Detalhes | ~4,4k linhas |
-| `pages/sheet.js` | Ficha do personagem (render + toda a lógica de jogo em uso) | ~16k linhas |
+| `pages/creator.js` | Entrada da rota do criador: monta o estado inicial e chama o wizard | 23 linhas |
+| `pages/sheet.js` | Entrada da rota da ficha: carrega o personagem, roda as migrações e chama o render | 188 linhas |
+| `creator/*.js` | Wizard de criação, um arquivo por passo — ver tabela abaixo | 9 arquivos |
+| `sheet/*.js` | Ficha do personagem, um arquivo por assunto — ver tabela abaixo | 30 arquivos |
 | `store.js` | Persistência em `localStorage` + `criarPersonagemVazio()` (schema do personagem) | médio |
 | `db.js` | Carregador de `dados/*.json` com cache em memória (`fetchJSON`) | pequeno |
 | `sync.js` | Fila de sincronização em nuvem (retry, status online/offline) | médio |
@@ -78,17 +83,92 @@ por `site/index.html` como `<script type="module">`.
 | `manobras-ui.js` | UI de manobras de combate | pequeno |
 | `dados-classes.js` | Constantes: `CLASSES_INFO`, `PERICIAS`, `ATRIBUTOS_*`, `STANDARD_ARRAY`, point-buy | médio |
 
+### Ficha (`site/js/sheet/`)
+
+Cortado **por assunto**, não por camada: render, eventos e regras de um mesmo
+tema ficam no mesmo arquivo. Para mexer em magias, abra `magias.js`; para mexer
+no Bárbaro, `classes/barbaro.js`.
+
+| Arquivo | Responsabilidade | Linhas |
+|---|---|---|
+| `estado.js` | `char`, `containerRef`, `classeData` e os 6 caches, mais `salvar` e os selos de edição | 87 |
+| `colapso.js` | Quais seções estão recolhidas, persistido por personagem | 68 |
+| `migracoes.js` | As 12 migrações de fichas legadas, rodadas na abertura | 264 |
+| `ficha.js` | `renderFichaCompleta`: monta a página chamando os `renderSecao*` | 812 |
+| `hp-descanso.js` | PV, dados de vida, descanso curto e longo | 1.137 |
+| `habilidades.js` | Habilidades ativas e itens de característica | 4.688 |
+| `combate.js` | Deslocamento, ataques, iniciativa, perícias, carga | 268 |
+| `maestrias.js` | Modais de maestria em arma (Bárbaro, Guerreiro, Guardião) | 239 |
+| `edicao.js` | Modal de edição da ficha e subida de nível | 482 |
+| `talentos.js` | Seção de talentos, Iniciado em Magia, Dádiva Épica | 711 |
+| `caracteristicas.js` | Características de classe, subclasse e traços de espécie | 400 |
+| `magias.js` | Seção de magias, espaços, concentração, metamagia, magias personalizadas | 2.089 |
+| `grimorio.js` | Buscas e trocas de magia, grimório do Mago | 1.241 |
+| `condicoes.js` | Condições, defesas, sentidos e proficiências | 528 |
+| `inventario.js` | Inventário, arrasta-e-solta, seletores, itens personalizados | 1.298 |
+| `detalhes.js` | Detalhes pessoais | 46 |
+| `impressao.js` | Versão formatada para impressão | 842 |
+| `pdf.js` | Geração do PDF | 379 |
+| `classes/*.js` | Progressão e recursos de cada uma das 12 classes | 30 a 1.018 |
+
+`habilidades.js` continua grande de propósito: `renderFeatureItem` e
+`setupEventosHabilidades` calculam as flags por classe no topo e as costuram
+dentro de um único template literal, então quebrá-las exigiria reescrever a
+montagem do HTML. Ver a seção 5.3 da spec.
+
+### Criador (`site/js/creator/`)
+
+| Arquivo | Responsabilidade | Linhas |
+|---|---|---|
+| `wizard.js` | `personagem`, `stepAtual`, `dadosCache`, `containerRef`, navegação, validação e finalização | 615 |
+| `comum.js` | Tabelas de escolha e helpers de talento e espécie | 475 |
+| `passo-classe.js` | Passo 1 | 280 |
+| `passo-especie.js` | Passo 2 | 442 |
+| `passo-antecedente.js` | Passo 3 | 200 |
+| `passo-atributos.js` | Passo 4: rolagem, array padrão, compra por pontos, manual | 634 |
+| `passo-equipamento.js` | Passo 5 | 1.007 |
+| `passo-magias.js` | Passo 6 | 608 |
+| `passo-detalhes.js` | Passo 7 | 400 |
+
+### Estado compartilhado: live binding
+
+`sheet/estado.js` e `creator/wizard.js` exportam o estado mutável como
+`export let`. Quem importa enxerga sempre o valor atual — é *live binding* de
+módulo ES, não uma cópia.
+
+**Só o módulo dono pode reatribuir.** Gravar num nome importado é erro de
+sintaxe: o arquivo inteiro para de carregar. Por isso `renderSheet` e
+`renderCreator` usam setters (`definirChar`, `definirStep`, ...) em vez de
+atribuir direto. `scripts/verificar_extracao.py` checa isso a cada execução.
+
 ### Dependências entre módulos (típico)
 
 ```
-app.js → pages/{home,creator,sheet}.js
-pages/* → db.js (dados) , store.js (persistência) , utils.js (helpers) , dados-classes.js (constantes)
+app.js  → pages/{home,creator,sheet}.js
+pages/sheet.js   → sheet/{estado,migracoes,ficha}.js → sheet/**
+pages/creator.js → creator/wizard.js → creator/passo-*.js
+sheet/**, creator/** → db.js (dados), store.js (persistência),
+                       utils.js (helpers), dados-classes.js (constantes)
 store.js → sync.js → auth.js
 ```
 
-`utils.js` é o lugar certo para **helpers puros reutilizados** por creator.js e sheet.js
-(ambos importam de `../utils.js`). Cuidado: creator.js usa a variável `personagem` e
-sheet.js usa `char` — helpers puros devem receber dados por parâmetro, não ler globais.
+Ciclos de import entre módulos da ficha são esperados e seguros: declarações de
+função são *hoisted* e nenhum módulo chama nada durante a avaliação de topo.
+
+`utils.js` é o lugar certo para **helpers puros reutilizados** pelo criador e
+pela ficha. Cuidado: o criador usa a variável `personagem` e a ficha usa `char`
+— helpers puros devem receber dados por parâmetro, não ler globais.
+
+### Verificar a integridade da extração
+
+```bash
+python scripts/verificar_extracao.py tudo
+```
+
+Compara cada declaração contra `scripts/baseline/` e confere presença,
+integridade byte a byte, duplicação, símbolos sem import, imports quebrados e
+gravação em binding importado. Ver
+`docs/superpowers/specs/2026-08-05-quebra-monolitos-design.md`.
 
 ---
 
