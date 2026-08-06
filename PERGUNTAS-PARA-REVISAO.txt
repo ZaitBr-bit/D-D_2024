@@ -557,3 +557,47 @@ secao que ainda nao vi.
 
 NAO E REGRESSAO: o site original se comporta igual. Suite em 329 testes, 328
 passando, 1 pulado, zero falhas.
+
+[2026-08-06] CRIACAO DO MAGO PELO WIZARD: CONCLUIDA
+O wizard agora cria um Mago completo, do zero, pela interface:
+  {classe:"Mago", nivel:1, grimorio:6, preparadas:5, espacos:1}
+
+Foram NOVE defeitos do driver, cada um escondendo o seguinte. Vale a lista,
+porque o padrao se repete:
+
+  1. AGRUPAMENTO DE CARDS pelo elemento PAI. Agrupar por atributo `data-*` nao
+     serve: no Equipamento os cards compartilham o NOME e so o VALOR os separa;
+     no passo de Classe cada valor e unico. O pai resolve os dois.
+  2. TERCEIRO VOCABULARIO: `.magia-card`/`selecionada`.
+  3. HANDLER NO FILHO: `[data-creator-check]`, com `stopPropagation()`.
+  4. TROCA DE ABA de circulo (`[data-tab-circ]`); so a aba ativa esta no DOM.
+  5. ELEMENTO ORFAO: o app re-renderiza a lista a cada clique, entao a
+     referencia guardada nunca recebe a classe `selecionada`. Recontar no DOM.
+  6. MARCADORES NA RAIZ: `dataset` gravado nas abas some no re-render, o que
+     fazia uma secao nunca "esgotar" e matar de fome as outras.
+  7. CONTAGEM COM ESCOPO: contar `.magia-card.selecionada` global misturava as
+     secoes de preparo e de Iniciado em Magia; quando uma delas mudava, o
+     driver achava que o clique fora recusado.
+  8. SECOES IRMAS: preparo do Mago (`[data-mago-preparada]`) e Iniciado em
+     Magia (`[data-im-magia]`) usam a mesma classe `.magia-card` mas tem
+     containers, abas e limites proprios. Sem excluir umas das outras, nenhuma
+     fechava a conta.
+  9. CONTROLES OPCIONAIS: caixas sem atributo `data-*` e selects cujo id
+     contem "troca" sao alternadores OPCIONAIS. Preencher um deles CRIA
+     exigencia ("Escolha o truque substituto ou desmarque a troca").
+
+SUBIDA DE NIVEL, medida depois:
+  Mago      1 -> 3
+  Guerreiro 3 -> 7
+  Paladino  3 -> 11
+Tambem entrou a distribuicao de pontos de atributo (dois widgets distintos:
+`#levelup-attr-<attr>` e `.levelup-talento-asi-distribuicao`, ambos com soma
+exatamente 2) e repeticao por nivel -- uma passagem nem sempre basta.
+
+AINDA ABERTO: o Mago para no 3->4 pedindo de novo "2 magias novas ... no
+Grimorio" -- a MESMA tela que ja funciona no nivel 1. E refinamento da grade,
+nao bloqueio de natureza nova.
+
+EFEITO COLATERAL: `criacao em lockstep: Mago` estourou os 90s padrao porque
+agora vai ate o fim da criacao. Timeout ampliado para 4 minutos. O teste ficou
+mais lento porque passou a fazer MAIS, nao porque piorou.

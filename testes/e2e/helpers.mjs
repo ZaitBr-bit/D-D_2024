@@ -168,31 +168,46 @@ export async function nosDois(lados, acao) {
  * Tambem abre sub-selecoes: varias escolhas ficam atras de um botao no CORPO
  * do modal (`#btn-lvlup-grimorio` e afins), que abre um segundo overlay.
  */
-export async function resolverModalAberto(page, maxTelas = 20) {
+export async function resolverModalAberto(page, maxTelas = 24) {
   for (let i = 0; i < maxTelas; i++) {
     if (!await page.locator('#modal-overlay').isVisible()) return true;
 
     await preencherTela(page);
 
-    // Sub-selecoes atras de botao no corpo: abrir, preencher e confirmar.
-    const abriu = await page.evaluate(() => {
-      const corpo = document.getElementById('modal-corpo');
-      const b = [...(corpo?.querySelectorAll('button') ?? [])]
-        .find((x) => !x.disabled && !x.dataset.resolvido);
-      if (b) { b.dataset.resolvido = '1'; b.click(); return true; }
-      return false;
-    });
-    if (abriu) {
+    // Abrir as sub-selecoes DESTA tela antes de avancar.
+    //
+    // Nao dava para deixar isso so para depois de um avanco recusado: o botao
+    // do grimorio vive na tela "Selecao de Magias", e o app deixa avancar dela
+    // sem preencher -- a recusa so acontece la na "Revisao e Confirmacao",
+    // onde o botao ja nao existe. Era a mesma falacia do "a tela mudou, entao
+    // progrediu" que ja tinha atrapalhado na escolha de subclasse.
+    for (let s = 0; s < 6; s++) {
+      const abriu = await page.evaluate(() => {
+        const corpo = document.getElementById('modal-corpo');
+        const b = [...(corpo?.querySelectorAll('button') ?? [])]
+          .find((x) => !x.disabled && !x.dataset.resolvido);
+        if (!b) return false;
+        b.dataset.resolvido = '1';
+        b.click();
+        return true;
+      });
+      if (!abriu) break;
       await page.waitForTimeout(500);
       await preencherTela(page);
       await page.evaluate(() => {
-        const overlays = document.querySelectorAll('.modal-overlay');
+        const overlays = [...document.querySelectorAll('.modal-overlay')]
+          .filter((o) => getComputedStyle(o).display !== 'none');
+        if (overlays.length < 2) return;  // nao abriu sub-modal: nada a fechar
         const topo = overlays[overlays.length - 1];
-        topo?.querySelector('.btn-primary:not([disabled]), .btn-success:not([disabled])')?.click();
+        // A grade do level up confirma com um `btn-secondary` rotulado
+        // "Confirmar Selecao".
+        topo.querySelector('#modal-acoes button:not([disabled])')?.click();
       });
-      await page.waitForTimeout(500);
-      continue;  // volta a tela principal, que pode ter mais botoes
+      await page.waitForTimeout(400);
     }
+
+    const antes = await page.evaluate(
+      () => document.getElementById('modal-corpo')?.innerHTML.length ?? 0);
 
     const avancou = await page.evaluate(() => {
       const acoes = document.getElementById('modal-acoes');
@@ -202,7 +217,59 @@ export async function resolverModalAberto(page, maxTelas = 20) {
       return false;
     });
     await page.waitForTimeout(400);
-    if (!avancou) break;
+    if (!await page.locator('#modal-overlay').isVisible()) return true;
+
+    const depois = await page.evaluate(
+      () => document.getElementById('modal-corpo')?.innerHTML.length ?? 0);
+    if (avancou && depois !== antes) continue;
+
+    // So agora: o avanco foi RECUSADO, entao falta alguma escolha que esta
+    // atras de um botao no corpo (por exemplo o grimorio do Mago ao subir de
+    // nivel). Abrir botao antes disso era o erro da versao anterior: ela
+    // clicava em TODOS os botoes do corpo, inclusive os opcionais como
+    // "trocar truque", que criam exigencia nova ("Escolha o truque
+    // substituto ou desmarque a troca").
+    const abriu = await page.evaluate(() => {
+      const corpo = document.getElementById('modal-corpo');
+      const botoes = [...(corpo?.querySelectorAll('button') ?? [])]
+        .filter((x) => !x.disabled);
+      if (!botoes.length) return false;
+
+      // Escolhe o botao pelo TOAST de erro: o app diz o que falta
+      // ("...no Grimorio") e o rotulo do botao diz o que ele abre
+      // ("Grimorio: +2 Magias"). Casar as duas coisas evita abrir os botoes
+      // opcionais, como o de trocar truque -- e nao depende de marcador no
+      // DOM, que some quando o corpo re-renderiza.
+      const toasts = [...document.querySelectorAll('#toast-container .toast')];
+      const erro = (toasts[toasts.length - 1]?.textContent || '').toLowerCase();
+      const palavras = erro.split(/[^a-zà-ÿ]+/i).filter((p) => p.length > 4);
+      const casa = botoes.find((b) => {
+        const rot = b.textContent.toLowerCase();
+        return palavras.some((p) => rot.includes(p));
+      });
+      const alvo = casa || botoes.find((x) => !x.dataset.resolvido);
+      if (!alvo) return false;
+      alvo.dataset.resolvido = '1';
+      alvo.click();
+      return true;
+    });
+    if (!abriu) break;
+
+    await page.waitForTimeout(500);
+    await preencherTela(page);
+    await page.evaluate(() => {
+      const overlays = [...document.querySelectorAll('.modal-overlay')]
+        .filter((o) => getComputedStyle(o).display !== 'none');
+      const topo = overlays[overlays.length - 1];
+      // A grade do level up confirma com um `btn-secondary` rotulado
+      // "Confirmar Selecao" -- procurar so por primary/success/accent
+      // deixava a grade aberta para sempre.
+      const b = topo?.querySelector(
+        '#modal-acoes .btn-primary:not([disabled]), #modal-acoes .btn-success:not([disabled]),'
+        + ' #modal-acoes .btn-secondary:not([disabled]), #modal-acoes button:not([disabled])');
+      b?.click();
+    });
+    await page.waitForTimeout(500);
   }
 
   await page.evaluate(() => window.fecharModal?.());
@@ -245,7 +312,70 @@ async function preencherTela(page, maxEscolhas = 30) {
         }
       }
 
-      const selects = [...corpo.querySelectorAll('select')];
+      // Grade de selecao do level up (`abrirGridSelecao`): cards
+      // `[data-grid-nome]` com o handler no filho `[data-grid-check]`, que
+      // ainda faz `stopPropagation()`. E onde o Mago escolhe as "2 magias
+      // novas" para o grimorio ao subir de nivel.
+      //
+      // Como a grade nao desabilita o botao de confirmar, `faltaAlgo` nao
+      // ajuda aqui: o proprio contador (`#grid-sel-count`) diz quantas faltam.
+      const contador = corpo.querySelector('#grid-sel-count');
+      if (contador) {
+        const atual = Number(contador.textContent) || 0;
+        const alvo = Number((contador.parentElement?.textContent || '')
+          .replace(/\s+/g, '').split('/')[1]) || 0;
+        if (atual < alvo) {
+          const livre = [...corpo.querySelectorAll('[data-grid-nome]')].find(
+            (c) => !c.classList.contains('selecionada')
+              && !c.classList.contains('magia-card-bloqueada'));
+          const check = livre?.querySelector('[data-grid-check]');
+          if (check) { check.click(); return true; }
+        }
+      }
+
+      // Distribuicao de pontos de atributo (`+0/+1/+2`, total exatamente 2).
+      //
+      // Estes selects NAO entram na regra geral: o valor padrao deles e "0",
+      // que e truthy, entao o driver os considerava "ja preenchidos" e nunca
+      // distribuia nada -- a subida travava em "Distribua exatamente 2 pontos
+      // de atributo". Tambem nao da para so escolher a primeira opcao livre:
+      // a soma tem de fechar em 2, nem mais nem menos.
+      // Dois widgets distintos: o ASI simples usa ids `levelup-attr-<attr>`
+      // e o do talento "Aumento no Valor de Atributo" usa a classe
+      // `.levelup-talento-asi-distribuicao`. Os dois pedem soma exatamente 2.
+      const asi = [...corpo.querySelectorAll(
+        '.levelup-talento-asi-distribuicao, [id^="levelup-attr-"]')];
+      if (asi.length) {
+        const soma = () => asi.reduce((s, x) => s + (parseInt(x.value) || 0), 0);
+        if (soma() !== 2) {
+          for (const s of asi) { s.value = '0'; s.dispatchEvent(new Event('change', { bubbles: true })); }
+          // Preferir +2 num atributo; se estiver bloqueado (valor >= 19),
+          // cair para +1 em dois atributos diferentes.
+          const doisPontos = asi.find((s) =>
+            [...s.options].some((o) => o.value === '2' && !o.disabled));
+          if (doisPontos) {
+            doisPontos.value = '2';
+            doisPontos.dispatchEvent(new Event('change', { bubbles: true }));
+          } else {
+            const umPonto = asi.filter((s) =>
+              [...s.options].some((o) => o.value === '1' && !o.disabled)).slice(0, 2);
+            for (const s of umPonto) {
+              s.value = '1';
+              s.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+          }
+          return true;
+        }
+      }
+
+      // Selects de TROCA sao opcionais: vazio significa "nao trocar". Preencher
+      // um deles LIGA a troca e cria uma exigencia nova ("Escolha o truque
+      // substituto ou desmarque a troca"), que foi o que travou a subida de
+      // nivel do Mago. O mesmo vale para o `select` de magia.
+      const selects = [...corpo.querySelectorAll('select')]
+        .filter((s) => !/troca/i.test(s.id))
+        .filter((s) => !s.classList.contains('levelup-talento-asi-distribuicao'))
+        .filter((s) => !/^levelup-attr-/.test(s.id));
       const usados = new Set(selects.map((s) => s.value).filter(Boolean));
       for (const sel of selects) {
         if (sel.value) continue;
@@ -269,7 +399,12 @@ async function preencherTela(page, maxEscolhas = 30) {
       const porGrupo = new Map();
       for (const c of corpo.querySelectorAll('input[type="checkbox"]')) {
         const chave = [...c.attributes].map((a) => a.name)
-          .find((n) => n.startsWith('data-')) || '(sem-grupo)';
+          .find((n) => n.startsWith('data-'));
+        // Caixa SEM atributo `data-*` e alternador opcional, nao escolha
+        // obrigatoria. Marcar uma delas cria exigencia onde nao havia -- foi
+        // o que aconteceu com "trocar truque" no level up, que passou a pedir
+        // "Escolha o truque substituto ou desmarque a troca".
+        if (!chave) continue;
         if (!porGrupo.has(chave)) porGrupo.set(chave, []);
         porGrupo.get(chave).push(c);
       }
@@ -319,7 +454,12 @@ export async function lerToastErro(page) {
  *
  * @returns {Promise<boolean>} true se o passo avancou.
  */
-export async function satisfazerPasso(page, { maxVoltas = 24 } = {}) {
+export async function satisfazerPasso(page, { maxVoltas = 80 } = {}) {
+  // 80, e nao 24: o passo de Magias do Mago pede 3 truques + 6 do grimorio +
+  // 4 preparadas, mais as trocas de aba entre elas. Cada uma dessas acoes
+  // consome uma volta, e o teto antigo acabava antes de a fase de preparo
+  // comecar -- o que parecia "o driver nao sabe preparar" era so o laco
+  // terminando cedo.
   const inicial = await passoAtual(page);
   for (let volta = 0; volta < maxVoltas; volta++) {
     // Clicar num card de especie/antecedente ABRE um modal, e enquanto ele
@@ -401,6 +541,43 @@ export async function satisfazerPasso(page, { maxVoltas = 24 } = {}) {
         return true;
       }
 
+      // Talento INICIADO EM MAGIA: secao com abas PROPRIAS (`[data-im-tab]`,
+      // truques e 1o circulo) e cards proprios (`[data-im-magia]`, com o
+      // handler no filho `[data-im-check]`).
+      //
+      // Busca direta na raiz, sem tentar delimitar container: a barra de abas
+      // e a lista de cards sao elementos IRMAOS, entao subir pelo `closest`
+      // a partir das abas nao alcanca os cards -- foi o que fez a primeira
+      // versao deste bloco nao surtir efeito nenhum.
+      const cardsIM = [...raiz.querySelectorAll('[data-im-magia]')];
+      if (cardsIM.length) {
+        const contarIM = () =>
+          raiz.querySelectorAll('[data-im-magia].selecionada').length;
+        const livreIM = cardsIM.find((c) => !c.classList.contains('selecionada')
+          && !c.classList.contains('magia-card-bloqueada'));
+        if (livreIM) {
+          const check = livreIM.querySelector('[data-im-check]');
+          if (check) {
+            const antesIM = contarIM();
+            check.click();
+            if (contarIM() > antesIM) return true;
+          }
+        }
+        // Marcadores de aba vivem na RAIZ, nao nas abas.
+        //
+        // Trocar a aba de circulo do grimorio RE-RENDERIZA a secao do Iniciado
+        // em Magia, e um `dataset` gravado na propria aba desaparece junto. Com
+        // isso o IM nunca "esgotava", devolvia true para sempre e matava de
+        // fome os blocos abaixo -- os truques principais ficavam em 1.
+        const abasIM = [...raiz.querySelectorAll('[data-im-tab]')];
+        const vistasIM = new Set((raiz.dataset.testeAbasIm || '').split(',').filter(Boolean));
+        const ativaIM = abasIM.find((a) => a.classList.contains('active'));
+        if (ativaIM) vistasIM.add(ativaIM.dataset.imTab);
+        raiz.dataset.testeAbasIm = [...vistasIM].join(',');
+        const proximaIM = abasIM.find((a) => !vistasIM.has(a.dataset.imTab));
+        if (proximaIM) { proximaIM.click(); return true; }
+      }
+
       // Cards de magia do criador: terceiro vocabulario (`.magia-card` com
       // estado `selecionada`, bloqueadas marcadas com `.magia-card-bloqueada`).
       //
@@ -419,9 +596,25 @@ export async function satisfazerPasso(page, { maxVoltas = 24 } = {}) {
       // seleciona, ou nao ha mais card livre), marcar a aba como visitada e
       // passar para a proxima. O driver nao precisa saber quantas magias cada
       // aba pede nem quantas abas existem.
-      const cardsMagia = [...raiz.querySelectorAll('.magia-card')];
+      // `:not([data-mago-preparada])` e essencial: os cards da secao de
+      // preparo do Mago TAMBEM sao `.magia-card`. Sem excluir, este bloco os
+      // consumia e enchia "preparadas" em vez do grimorio -- o grimorio parava
+      // em 4 e o passo nunca era satisfeito.
+      // Exclui os cards que pertencem a OUTRAS secoes: a de preparo do Mago
+      // (`[data-mago-preparada]`) e a do talento Iniciado em Magia
+      // (`[data-im-magia]`). As tres usam a mesma classe `.magia-card`, mas
+      // tem containers, abas e limites proprios -- sem separar, este bloco as
+      // consumia e nenhuma das tres fechava a conta.
+      const cardsMagia = [...raiz.querySelectorAll(
+        '.magia-card:not([data-mago-preparada]):not([data-im-magia])')];
       if (cardsMagia.length) {
-        const contarSel = () => raiz.querySelectorAll('.magia-card.selecionada').length;
+        // Conta SO os cards desta lista. Contar `.magia-card.selecionada`
+        // global incluia as secoes de preparo e do Iniciado em Magia, que
+        // re-renderizam junto -- se uma delas perdia uma selecao no mesmo
+        // instante, o total nao subia e o driver concluia que o clique fora
+        // recusado, trocando de aba com 1 truque escolhido de 3.
+        const contarSel = () => raiz.querySelectorAll(
+          '.magia-card:not([data-mago-preparada]):not([data-im-magia]).selecionada').length;
         const livre = cardsMagia.find((c) => !c.classList.contains('selecionada')
           && !c.classList.contains('magia-card-bloqueada'));
         if (livre) {
@@ -439,13 +632,33 @@ export async function satisfazerPasso(page, { maxVoltas = 24 } = {}) {
             // Nao aumentou: esta aba atingiu o limite.
           }
         }
+        // Mesmo motivo do IM: marcador na raiz, que sobrevive ao re-render.
         const abas = [...raiz.querySelectorAll('[data-tab-circ]')];
+        const vistas = new Set((raiz.dataset.testeAbasCirc || '').split(',').filter(Boolean));
         const ativa = abas.find((a) => a.classList.contains('active'));
-        if (ativa) ativa.dataset.testeVisitado = '1';
-        const proxima = abas.find((a) => !a.dataset.testeVisitado
-          && !a.classList.contains('active'));
+        if (ativa) vistas.add(ativa.dataset.tabCirc);
+        raiz.dataset.testeAbasCirc = [...vistas].join(',');
+        const proxima = abas.find((a) => !vistas.has(a.dataset.tabCirc));
         if (proxima) { proxima.click(); return true; }
       }
+
+      // Magias PREPARADAS do Mago de nivel 1: secao propria
+      // (`#mago-preparadas-iniciais`), fora das abas de circulo, e com o
+      // handler NO PROPRIO CARD -- nao no filho `[data-creator-check]` como o
+      // resto. Vem DEPOIS do fluxo de abas de proposito: a secao so oferece o
+      // que ja esta no grimorio, entao o grimorio precisa encher antes.
+      const preparadas = [...raiz.querySelectorAll('[data-mago-preparada]')]
+        .filter((c) => !c.classList.contains('selecionada'));
+      if (preparadas.length) {
+        const contarPrep = () =>
+          raiz.querySelectorAll('[data-mago-preparada].selecionada').length;
+        const antesPrep = contarPrep();
+        preparadas[0].click();
+        // A secao tambem re-renderiza, entao a contagem vale mais que a
+        // referencia guardada.
+        if (contarPrep() > antesPrep) return true;
+      }
+
       return false;
     });
     if (!marcou) return false;

@@ -39,8 +39,25 @@ async function nivelAtual(page) {
   });
 }
 
-/** Sobe UM nivel pela interface, resolvendo as escolhas que aparecerem. */
+/**
+ * Sobe UM nivel pela interface, resolvendo as escolhas que aparecerem.
+ *
+ * Tenta ate tres vezes: uma passagem nem sempre basta. O nivel 2->3 do Mago,
+ * por exemplo, so fecha na segunda -- a primeira preenche o grimorio da
+ * subclasse e a segunda confirma. Nao e falha do app; e o resolvedor
+ * descobrindo a tela por tentativa.
+ */
 async function subirUmNivel(page) {
+  const inicial = await nivelAtual(page);
+  for (let tentativa = 0; tentativa < 3; tentativa++) {
+    const n = await _subirUmaVez(page);
+    if (n > inicial) return n;
+  }
+  return nivelAtual(page);
+}
+
+/** Uma passagem pelo fluxo de subida. */
+async function _subirUmaVez(page) {
   await page.evaluate(() => {
     // Garante o fluxo v2 ligado: o modal da feature flag desviaria o teste.
     localStorage.setItem('feature.levelup.flow.v2', '1');
