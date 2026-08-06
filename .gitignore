@@ -27,6 +27,11 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Manifesto de precache dos modulos: ARTEFATO de deploy, gerado pelo workflow
+# varrendo site/js/**. Versiona-lo garantiria que um dia ficaria desatualizado
+# em relacao a arvore -- que e exatamente o problema que ele resolve.
+site/js-precache.json
+
 # Playwright (testes/e2e/) - a aplicacao em site/ continua sem dependencia de
 # Node; so a suite de testes usa. Os artefatos de execucao nao vao pro repo.
 testes/e2e/test-results/

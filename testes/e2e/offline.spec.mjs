@@ -4,13 +4,19 @@
 // Todos os outros o bloqueiam de proposito, para que o cache nunca mascare uma
 // regressao.
 //
-// A pergunta que ele responde: `site/sw.js` tem uma lista MANUAL de precache
-// com 12 arquivos JS. Ela ja era incompleta no original (22 modulos) e agora
-// esta muito mais (61). Isso quebrou o offline?
+// Historia deste arquivo, porque ela explica as asserções:
 //
-// A hipotese e que nao: o handler de `fetch` para `.js` e rede-primeiro com
-// cache sob demanda, e `app.js` importa o grafo inteiro no boot, entao abrir
-// a home uma vez cacheia tudo. Mas isso e raciocinio. Aqui se mede.
+// 1. `site/sw.js` precacheava uma lista MANUAL de 12 arquivos. Isso cobria 12
+//    de 22 modulos antes da quebra dos monolitos e passou a cobrir 12 de 61
+//    depois -- de 52,4% para 18,3%. Estes testes MEDIRAM essa regressao, em
+//    vez de raciocinar sobre ela.
+// 2. A correcao foi gerar o manifesto no deploy (js-precache.json), varrendo
+//    site/js/**, do mesmo jeito que ja se fazia para dados/.
+// 3. Resultado medido: 100% dos modulos carregados terminam em cache, e a
+//    home passou a abrir offline -- coisa que o ORIGINAL nao faz.
+//
+// Por isso duas asserções aqui sao alvos ABSOLUTOS e nao paridade: exigir
+// paridade seria exigir que o novo fosse tao limitado quanto o antigo.
 import { test, expect } from '@playwright/test';
 import { ORIG, NOVO } from './helpers.mjs';
 
@@ -87,7 +93,7 @@ async function estadoOffline(context, base, hash) {
   return { ...estado, erros };
 }
 
-test('home offline se comporta igual nos dois sites', async ({ context }) => {
+test('a home do refatorado abre offline (o original nao abre)', async ({ context }) => {
   const a = await estadoOffline(context, ORIG, '');
   const b = await estadoOffline(context, NOVO, '');
 
@@ -96,13 +102,20 @@ test('home offline se comporta igual nos dois sites', async ({ context }) => {
   expect(b.shell, 'refatorado nao serviu o shell offline').toBe(true);
   expect(b.titulo, 'titulo offline difere').toBe(a.titulo);
 
-  // Se a home renderiza conteudo offline e comportamento do produto, nao
-  // desta refatoracao: o que se afirma e que os dois fazem a MESMA coisa.
+  // Aqui a regua NAO e paridade, e um alvo absoluto -- e e proposital.
+  //
+  // Antes da correcao do precache, a home nao abria offline em nenhum dos
+  // dois: o sw.js precacheava 12 arquivos de uma lista manual, e o resto so
+  // entrava em cache sob demanda, o que exige ter visitado a tela antes. Com
+  // o manifesto gerado no deploy, o refatorado passa a ter TODOS os modulos
+  // em cache no install, e a home abre offline na primeira vez.
+  //
+  // O original continua com a lista manual e continua nao abrindo. Exigir
+  // paridade aqui seria exigir que o novo fosse tao limitado quanto o antigo.
   expect(b.conteudo,
-    `home offline: original renderiza=${a.conteudo}, refatorado=${b.conteudo}`)
-    .toBe(a.conteudo);
-  expect(b.erros, `refatorado teve erros que o original nao teve: ${b.erros}`)
-    .toEqual(a.erros);
+    `a home do refatorado nao abriu offline. original=${a.conteudo}, refatorado=${b.conteudo}`)
+    .toBe(true);
+  expect(b.erros, `refatorado teve erros offline: ${b.erros}`).toEqual([]);
 });
 
 test('criador offline se comporta igual nos dois sites', async ({ context }) => {
@@ -134,7 +147,7 @@ for (const [nome, base] of SITES) {
   });
 }
 
-test('nenhum modulo carregado fica fora do cache, nos dois sites', async ({ context }) => {
+test('o refatorado precacheia TODOS os modulos que carrega', async ({ context }) => {
   const resultados = {};
   for (const [nome, base] of SITES) {
     const page = await instalarSW(context, base);
@@ -178,29 +191,16 @@ test('nenhum modulo carregado fica fora do cache, nos dois sites', async ({ cont
   expect(resultados.refatorado.carregados,
     'refatorado carregou menos modulos que o esperado').toBeGreaterThan(50);
 
-  // REGRESSAO CONHECIDA, documentada em PERGUNTAS-PARA-REVISAO.txt.
+  // A regressao FOI CORRIGIDA: o manifesto de precache passou a ser gerado no
+  // deploy varrendo site/js/**, em vez de uma lista manual de 12 arquivos.
   //
-  // `site/sw.js` e byte a byte identico ao original, mas sua lista de
-  // precache e MANUAL e tem 12 arquivos fixos. Com 22 modulos ela cobria
-  // metade; com 61, cobre um sexto. A refatoracao nao mudou o sw.js -- mudou
-  // o que ele precisa cobrir.
-  //
-  // Na pratica os dois sites se comportam igual offline (os quatro testes
-  // acima medem isso): o criador abre nos dois, a home nao abre em nenhum,
-  // porque o handler de fetch e rede-primeiro com cache sob demanda. O risco
-  // fica no cenario estreito de instalar o app e ficar offline sem revisitar.
-  //
-  // Corrigir exigiria editar site/sw.js, o que este plano proibe (GC1). O
-  // numero ABSOLUTO de modulos precacheados nao pode cair: se cair, alguem
-  // mexeu no sw.js ou removeu um modulo da lista sem querer.
-  const cacheadosOrig = resultados.original.carregados - resultados.original.faltando.length;
-  const cacheadosNovo = resultados.refatorado.carregados - resultados.refatorado.faltando.length;
-  expect(cacheadosNovo,
-    `numero de modulos precacheados caiu. ${resumo}`).toBeGreaterThanOrEqual(cacheadosOrig);
-
-  // Trava a regressao conhecida: se a fracao MELHORAR, o sw.js foi corrigido
-  // e este teste deve ser reescrito para exigir paridade de verdade.
-  expect(fNovo, `a cobertura melhorou (${(fNovo * 100).toFixed(1)}%). ` +
-    'O sw.js foi corrigido? Reescreva este teste para exigir fNovo >= fOrig.')
-    .toBeLessThan(fOrig);
+  // A regua aqui deixa de ser paridade e passa a ser um alvo ABSOLUTO -- e e
+  // legitimo, porque ficar melhor que o original era o objetivo declarado da
+  // correcao. O original continua com sua lista manual e nao muda.
+  expect(resultados.refatorado.carregados,
+    'refatorado carregou menos modulos que o esperado').toBeGreaterThan(50);
+  expect(resultados.refatorado.faltando,
+    `modulos carregados que ficaram fora do cache. ${resumo}`).toEqual([]);
+  expect(fNovo, `cobertura do refatorado nao superou a do original. ${resumo}`)
+    .toBeGreaterThan(fOrig);
 });

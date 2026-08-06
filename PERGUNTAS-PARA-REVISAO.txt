@@ -333,3 +333,49 @@ raciocinio: era interferencia entre testes, como o diagnostico indicava
 Licao: o arquivo so foi notado porque o `git add` avisou sobre finais de linha
 num nome que eu nao reconhecia. Vale conferir a lista de arquivos antes de
 commitar, e nao so o resumo por contagem.
+
+[2026-08-05] REGRESSAO DE PRECACHE CORRIGIDA - medida antes e depois
+                          antes      depois
+  modulos carregados        60         60
+  fora do cache             49          0
+  cobertura              18,3%     100,0%
+  home abre offline?        nao        SIM
+(o original permanece em 52,4% e continua nao abrindo a home offline)
+
+Como: o workflow passou a gerar `site/js-precache.json` varrendo site/js/**, e
+o sw.js passou a consome-lo no install -- espelhando exatamente o que ja
+existia para dados/. Nenhuma invencao.
+
+O diff do sw.js e PURAMENTE ADITIVO: 27 linhas acrescentadas, ZERO removidas
+ou alteradas. O handler de fetch, o STATIC_ASSETS e o activate ficaram
+intocados, e `Promise.allSettled` foi mantido para que um modulo indisponivel
+nao aborte o precache inteiro.
+
+CONSEQUENCIA ASSUMIDA: site/sw.js e .github/workflows/deploy.yml deixaram de
+ser byte a byte identicos ao D-D_2024. A verificacao de escopo passou a
+lista-los como excecao COM O MOTIVO ESCRITO ao lado, em testes/e2e/README.md.
+Todo o resto -- dados/, css/, img/, index.html, manifest.json e os 18 modulos
+JS fora de escopo -- continua identico.
+
+[2026-08-05] Erro meu, pela QUINTA vez: assercao absoluta sem checar o original
+Ao inverter a trava da regressao eu atualizei o teste de cobertura de cache mas
+esqueci o da home offline, que continuava exigindo PARIDADE. Ele falhou com
+"original renderiza=false, refatorado=true" -- ou seja, falhou porque a
+correcao FUNCIONOU e tornou o novo melhor que o antigo.
+E o mesmo padrao das outras quatro vezes, so que invertido: antes eu exigia do
+refatorado algo que o original nao fazia; agora eu exigia que ele fosse tao
+limitado quanto o original. A licao e a mesma -- toda assercao precisa dizer
+POR QUE aquele e o alvo certo, e paridade so e o alvo certo enquanto o
+objetivo for preservar comportamento.
+Tambem renomeei dois testes cujos titulos passaram a mentir depois da
+correcao ("se comporta igual nos dois sites").
+
+[2026-08-05] Imprecisao PRE-EXISTENTE no README, corrigida
+O README afirmava: "o workflow troca '../dados' por './dados' via sed". Isso
+nao acontece. O deploy.yml tem exatamente DOIS `sed`, e nenhum mexe em
+caminho: um injeta CACHE_VERSION no sw.js, o outro o numero da versao no
+header. O `BASE_PATH = '../dados'` funciona em producao porque o artefato
+monta index.html, site/ e dados/ como irmaos -- a mesma estrutura do repo.
+Nao e erro desta refatoracao (a frase ja estava la), mas induziria alguem a
+"consertar" um caminho que funciona. Corrigido, com nota de que a frase
+anterior estava errada.
