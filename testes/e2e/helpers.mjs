@@ -408,38 +408,43 @@ export async function satisfazerPasso(page, { maxVoltas = 24 } = {}) {
       // UMA por vez e deixar o laco de fora tentar avancar e o que faz a conta
       // fechar -- o app recusa com "(N selecionados)" ate chegar no numero, e
       // o driver nao precisa saber qual e esse numero.
-      // Cards de magia: distribuir entre os grupos, e detectar saturacao.
+      // Cards de magia do criador, com troca de ABA.
       //
-      // A tela tem mais de uma secao (truques e preparadas, por circulo), cada
-      // uma com seu limite. Escolher sempre no mesmo grupo enche um e ignora o
-      // outro -- o driver ficava em "Maximo de 3 truques" sem nunca preparar
-      // magia nenhuma.
+      // Truques e cada circulo ficam em abas separadas (`[data-tab-circ]`), e
+      // so a aba ativa esta no DOM. Sem trocar de aba, o driver enchia os 3
+      // truques, batia em "Maximo de 3 truques" e nunca preparava magia
+      // nenhuma -- o wizard travava no passo 5.
       //
-      // Estrategia: clicar sempre no grupo com MENOS selecionadas. Se o clique
-      // nao selecionar (o app recusou por limite), marcar o grupo como saturado
-      // para nao voltar nele. O driver nao precisa saber nenhum dos limites.
-      const gruposMagia = new Map();
-      for (const card of raiz.querySelectorAll('.magia-card')) {
-        const pai = card.parentElement;
-        if (pai.dataset.testeSaturado) continue;
-        if (!gruposMagia.has(pai)) gruposMagia.set(pai, []);
-        gruposMagia.get(pai).push(card);
-      }
-      const ordenados = [...gruposMagia.entries()].sort((a, b) => {
-        const sel = (cs) => cs.filter((c) => c.classList.contains('selecionada')).length;
-        return sel(a[1]) - sel(b[1]);
-      });
-      for (const [pai, cards] of ordenados) {
-        const livre = cards.find((c) => !c.classList.contains('selecionada')
+      // Estrategia: escolher na aba visivel; quando ela satura (o clique nao
+      // seleciona, ou nao ha mais card livre), marcar a aba como visitada e
+      // passar para a proxima. O driver nao precisa saber quantas magias cada
+      // aba pede nem quantas abas existem.
+      const cardsMagia = [...raiz.querySelectorAll('.magia-card')];
+      if (cardsMagia.length) {
+        const contarSel = () => raiz.querySelectorAll('.magia-card.selecionada').length;
+        const livre = cardsMagia.find((c) => !c.classList.contains('selecionada')
           && !c.classList.contains('magia-card-bloqueada'));
-        if (!livre) continue;
-        // O handler NAO esta no card: esta num filho `[data-creator-check]`,
-        // que ainda faz `stopPropagation()`.
-        const check = livre.querySelector('[data-creator-check]');
-        if (!check) continue;
-        check.click();
-        if (!livre.classList.contains('selecionada')) pai.dataset.testeSaturado = '1';
-        return true;
+        if (livre) {
+          // O handler NAO esta no card: esta num filho `[data-creator-check]`,
+          // que ainda faz `stopPropagation()`.
+          const check = livre.querySelector('[data-creator-check]');
+          if (check) {
+            const antesSel = contarSel();
+            check.click();
+            // O app RE-RENDERIZA a lista no clique, entao o elemento que
+            // tinhamos em maos fica orfao e nunca recebe a classe
+            // `selecionada` -- verificar nele daria sempre falso e o driver
+            // trocaria de aba a cada escolha. Recontar no DOM e o certo.
+            if (contarSel() > antesSel) return true;
+            // Nao aumentou: esta aba atingiu o limite.
+          }
+        }
+        const abas = [...raiz.querySelectorAll('[data-tab-circ]')];
+        const ativa = abas.find((a) => a.classList.contains('active'));
+        if (ativa) ativa.dataset.testeVisitado = '1';
+        const proxima = abas.find((a) => !a.dataset.testeVisitado
+          && !a.classList.contains('active'));
+        if (proxima) { proxima.click(); return true; }
       }
       return false;
     });
