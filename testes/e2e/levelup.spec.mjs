@@ -122,19 +122,24 @@ for (const classe of ['Guerreiro', 'Mago', 'Paladino']) {
       ultimo = niveis[0];
     }
 
-    // NAO se afirma "chegou ao nivel 20". Medido hoje: Guerreiro e Paladino
+    // NAO se afirma "chegou ao nivel 20". Medido: Guerreiro e Paladino
     // chegam ao 3, Mago para no 1 -- no ORIGINAL tambem, entao nao e
-    // regressao. As causas foram investigadas e sao do TESTE, nao do produto:
+    // regressao desta refatoracao.
     //
-    //   - ate o nivel 2: `resolverModalAberto` avancava antes de escolher e
-    //     atravessava a tela de subclasse. Corrigido: preencher, depois
-    //     avancar (ver o comentario do helper);
-    //   - a tela de subclasse usa `.levelup-subclasse-card`/`selecionada`, um
-    //     vocabulario que o resolvedor nao conhecia. Acrescentado;
-    //   - o Mago trava no talento Academico, que exige EXATAMENTE 1 pericia
-    //     academica entre as que o personagem ja tem (levelup.js:1178-1182).
-    //     A fixture ganhou pericias elegiveis e o resolvedor passou a marcar
-    //     no maximo um card por tela, e ainda assim nao passa. FICA ABERTO.
+    // Onde o Mago para, exatamente: na tela "Selecao de Magias" do fluxo de
+    // subida, com o toast "Selecione 2 magias novas de circulos para os quais
+    // voce possui espacos no Grimorio". As magias ficam atras do botao
+    // `#btn-lvlup-grimorio`, no CORPO do modal, que abre uma segunda camada
+    // (`abrirGridSelecao`, levelup-ui.js:1038). O resolvedor ja abre botoes do
+    // corpo e ja preenche a camada de cima, mas as opcoes dessa grade nao sao
+    // reconhecidas -- provavelmente usam outro markup que nao `.selection-card`.
+    //
+    // JA DESCARTADO por medicao: falta de XP; falta de pericias proficientes;
+    // o talento Academico (a tela dele e alcancada e tem 3 checkboxes
+    // `data-academico-expertise`); ordem de preenchimento; e o vocabulario de
+    // card da subclasse.
+    //
+    // PROXIMO PASSO: inspecionar o markup que `abrirGridSelecao` produz.
     //
     // A assercao que vale continua sendo a de dentro do laco: os dois lados
     // sobem para o MESMO nivel, com a MESMA ficha, a cada passo.

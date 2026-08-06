@@ -456,3 +456,34 @@ o `assentar()` dos helpers, e acabavam medindo a HOME achando que era a ficha.
 Um deles chegou a me convencer de que o botao de subir de nivel nao existia.
 Licao: investigacao vai DENTRO da suite, usando os mesmos helpers que os
 testes usam. Ferramenta paralela mente com confianca.
+
+[2026-08-06] Mago no nivel 1: NAO CORRIGIDO. Onde exatamente ele para.
+Voce pediu para corrigir e eu nao consegui. O que ficou apurado:
+
+O Mago para na tela "Selecao de Magias" do fluxo de subida, com o toast
+"Selecione 2 magias novas de circulos para os quais voce possui espacos no
+Grimorio". As magias NAO estao na tela: ficam atras do botao
+`#btn-lvlup-grimorio`, no CORPO do modal, que chama `abrirGridSelecao`
+(levelup-ui.js:1038) e abre uma SEGUNDA camada de modal.
+
+O resolvedor ja foi ensinado a abrir botoes do corpo e a preencher a camada de
+cima, e ainda assim as opcoes dessa grade nao sao reconhecidas -- provavelmente
+usam markup diferente de `.selection-card`. Falta inspecionar o que
+`abrirGridSelecao` produz. Nao cheguei la.
+
+DESCARTADO POR MEDICAO (nao por raciocinio):
+  - falta de XP: dei 355.000, nao mudou nada;
+  - falta de pericias proficientes: adicionadas, nao mudou nada;
+  - o talento Academico: a tela dele E alcancada, com 3 checkboxes
+    `data-academico-expertise`; nao e ele que trava;
+  - ordem de preenchimento e vocabulario de card da subclasse: corrigidos, e
+    foi o que levou Guerreiro de 2 para 3 e Paladino de 1 para 3.
+
+GANHO DESTA RODADA, mesmo sem fechar o Mago: o resolvedor passou a usar o
+BOTAO DE CONFIRMAR como sinal de requisito cumprido, em vez de adivinhar
+quantas opcoes marcar. Isso cobre "exatamente 1" (Academico) e "exatamente 2"
+(Grimorio) sem o teste conhecer nenhuma das duas regras -- e e o desenho certo
+para qualquer regra de quantidade que venha depois.
+
+NAO E REGRESSAO: o site original para no mesmo lugar. E limitacao do driver de
+teste, nao defeito da aplicacao.

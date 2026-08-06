@@ -150,85 +150,50 @@ export async function nosDois(lados, acao) {
 }
 
 /**
- * Resolve o modal aberto: preenche a tela atual e so entao avanca.
+ * Resolve o modal aberto: preenche a tela e avanca, ate fechar.
  *
- * Este helper errou de tres formas diferentes antes de chegar aqui, e cada
- * erro tem uma licao propria:
+ * Quatro defeitos foram corrigidos aqui, e cada um vale como aviso:
  *
- * 1. "avancar primeiro, escolher se recusar" -- atravessava a tela de
- *    subclasse sem escolher, e a subida parava no nivel 2;
- * 2. "avancar e seguir se a tela mudar" -- mesma falha: na subclasse o botao
- *    AVANCA para a revisao sem exigir a escolha, entao "a tela mudou" nao
- *    prova progresso;
- * 3. "esgotar TODAS as escolhas" -- marcava todas as caixas de um grupo, e o
- *    Mago travava porque o talento Academico exige EXATAMENTE 1 pericia
- *    (`selecionadas.length !== 1` em levelup.js:1182).
+ * 1. ORDEM -- avancava antes de escolher, e atravessava a tela de subclasse
+ *    sem escolher nada;
+ * 2. "a tela mudou" nao prova progresso -- na subclasse o botao AVANCA sem
+ *    exigir a escolha, e a recusa so aparece na confirmacao final;
+ * 3. VOCABULARIO -- a subclasse usa `.levelup-subclasse-card`/`selecionada`,
+ *    e nao `.selection-card`/`selected` como o resto do app;
+ * 4. QUANTIDADE -- contar quantas opcoes marcar e adivinhacao. O sinal certo
+ *    e o BOTAO DE CONFIRMAR: o app o habilita quando o requisito e cumprido.
+ *    Marcar ate ele habilitar cobre "exatamente 1" (Academico) e "exatamente
+ *    2" (Grimorio do Mago) sem o teste saber de nenhum dos dois.
  *
- * O que funciona: esgotar as escolhas de opcao UNICA (cards, selects, radios
- * -- onde escolher a segunda desfaz a primeira) e marcar NO MAXIMO UMA
- * caixa por tela, porque checkbox e a unica categoria com limite de
- * quantidade. So depois disso, avancar.
+ * Tambem abre sub-selecoes: varias escolhas ficam atras de um botao no CORPO
+ * do modal (`#btn-lvlup-grimorio` e afins), que abre um segundo overlay.
  */
-export async function resolverModalAberto(page, maxTelas = 16) {
+export async function resolverModalAberto(page, maxTelas = 20) {
   for (let i = 0; i < maxTelas; i++) {
     if (!await page.locator('#modal-overlay').isVisible()) return true;
 
-    // 1. Escolhas de opcao unica: pode esgotar sem risco.
-    for (let j = 0; j < 20; j++) {
-      const escolheu = await page.evaluate(() => {
-        const corpo = document.getElementById('modal-corpo');
-        if (!corpo) return false;
-        // Dois vocabularios de card convivem: `.selection-card`/`selected`
-        // (criador e modais da ficha) e `.levelup-subclasse-card`/
-        // `selecionada` (subida de nivel).
-        const CARDS = [
-          ['.selection-card', 'selected'],
-          ['.levelup-subclasse-card', 'selecionada'],
-        ];
-        // UM card por tela, nao todos: nem todo grupo de cards e de escolha
-        // unica. O talento Academico do Mago usa cards e exige EXATAMENTE 1;
-        // esgotar marcava todos e a validacao recusava.
-        for (const [seletor, marcado] of CARDS) {
-          const cards = [...corpo.querySelectorAll(seletor)];
-          if (cards.some((c) => c.classList.contains(marcado))) continue;
-          const livre = cards[0];
-          if (livre) { livre.click(); return true; }
-        }
-        const selects = [...corpo.querySelectorAll('select')];
-        const usados = new Set(selects.map((s) => s.value).filter(Boolean));
-        for (const sel of selects) {
-          if (sel.value) continue;
-          for (const opt of sel.options) {
-            if (!opt.value || opt.disabled || usados.has(opt.value)) continue;
-            sel.value = opt.value;
-            sel.dispatchEvent(new Event('change', { bubbles: true }));
-            return true;
-          }
-        }
-        const grupos = new Set(
-          [...corpo.querySelectorAll('input[type="radio"]')].map((r) => r.name));
-        for (const g of grupos) {
-          const ops = [...corpo.querySelectorAll(`input[type="radio"][name="${g}"]`)];
-          if (ops.length && !ops.some((o) => o.checked)) { ops[0].click(); return true; }
-        }
-        return false;
+    await preencherTela(page);
+
+    // Sub-selecoes atras de botao no corpo: abrir, preencher e confirmar.
+    const abriu = await page.evaluate(() => {
+      const corpo = document.getElementById('modal-corpo');
+      const b = [...(corpo?.querySelectorAll('button') ?? [])]
+        .find((x) => !x.disabled && !x.dataset.resolvido);
+      if (b) { b.dataset.resolvido = '1'; b.click(); return true; }
+      return false;
+    });
+    if (abriu) {
+      await page.waitForTimeout(500);
+      await preencherTela(page);
+      await page.evaluate(() => {
+        const overlays = document.querySelectorAll('.modal-overlay');
+        const topo = overlays[overlays.length - 1];
+        topo?.querySelector('.btn-primary:not([disabled]), .btn-success:not([disabled])')?.click();
       });
-      if (!escolheu) break;
-      await page.waitForTimeout(160);
+      await page.waitForTimeout(500);
+      continue;  // volta a tela principal, que pode ter mais botoes
     }
 
-    // 2. Checkbox: no MAXIMO uma por tela.
-    await page.evaluate(() => {
-      const corpo = document.getElementById('modal-corpo');
-      if (!corpo) return;
-      const caixas = [...corpo.querySelectorAll('input[type="checkbox"]')];
-      if (caixas.some((c) => c.checked)) return;
-      const livre = caixas.find((c) => !c.disabled);
-      if (livre) livre.click();
-    });
-    await page.waitForTimeout(160);
-
-    // 3. Avancar.
     const avancou = await page.evaluate(() => {
       const acoes = document.getElementById('modal-acoes');
       const b = acoes?.querySelector(
@@ -243,6 +208,83 @@ export async function resolverModalAberto(page, maxTelas = 16) {
   await page.evaluate(() => window.fecharModal?.());
   await page.waitForTimeout(250);
   return !(await page.locator('#modal-overlay').isVisible());
+}
+
+/**
+ * Marca opcoes na tela/overlay mais ao topo ate o confirmar habilitar.
+ *
+ * Sempre garante ao menos uma escolha por grupo; depois disso, so continua
+ * enquanto o botao de confirmar estiver desabilitado -- que e o app dizendo
+ * "ainda falta".
+ */
+async function preencherTela(page, maxEscolhas = 30) {
+  for (let i = 0; i < maxEscolhas; i++) {
+    const escolheu = await page.evaluate(() => {
+      const overlays = [...document.querySelectorAll('.modal-overlay')]
+        .filter((o) => getComputedStyle(o).display !== 'none');
+      const raiz = overlays[overlays.length - 1] || document;
+      const corpo = raiz.querySelector('#modal-corpo') || raiz;
+      if (!corpo) return false;
+
+      const confirmar = raiz.querySelector(
+        '#modal-acoes .btn-primary, #modal-acoes .btn-success, .btn-primary, .btn-success');
+      const faltaAlgo = confirmar ? confirmar.disabled : true;
+
+      const CARDS = [
+        ['.selection-card', 'selected'],
+        ['.levelup-subclasse-card', 'selecionada'],
+      ];
+      for (const [seletor, marcado] of CARDS) {
+        const cards = [...corpo.querySelectorAll(seletor)];
+        if (!cards.length) continue;
+        const marcados = cards.filter((c) => c.classList.contains(marcado)).length;
+        // Uma escolha sempre; mais so enquanto o app disser que falta.
+        if (marcados === 0 || faltaAlgo) {
+          const livre = cards.find((c) => !c.classList.contains(marcado));
+          if (livre) { livre.click(); return true; }
+        }
+      }
+
+      const selects = [...corpo.querySelectorAll('select')];
+      const usados = new Set(selects.map((s) => s.value).filter(Boolean));
+      for (const sel of selects) {
+        if (sel.value) continue;
+        for (const opt of sel.options) {
+          if (!opt.value || opt.disabled || usados.has(opt.value)) continue;
+          sel.value = opt.value;
+          sel.dispatchEvent(new Event('change', { bubbles: true }));
+          return true;
+        }
+      }
+
+      const grupos = new Set(
+        [...corpo.querySelectorAll('input[type="radio"]')].map((r) => r.name));
+      for (const g of grupos) {
+        const ops = [...corpo.querySelectorAll(`input[type="radio"][name="${g}"]`)];
+        if (ops.length && !ops.some((o) => o.checked)) { ops[0].click(); return true; }
+      }
+
+      // Checkboxes agrupadas pelo primeiro atributo data-*, que e como o app
+      // distingue os grupos (`data-academico-expertise`, e assim por diante).
+      const porGrupo = new Map();
+      for (const c of corpo.querySelectorAll('input[type="checkbox"]')) {
+        const chave = [...c.attributes].map((a) => a.name)
+          .find((n) => n.startsWith('data-')) || '(sem-grupo)';
+        if (!porGrupo.has(chave)) porGrupo.set(chave, []);
+        porGrupo.get(chave).push(c);
+      }
+      for (const caixas of porGrupo.values()) {
+        const marcadas = caixas.filter((c) => c.checked).length;
+        if (marcadas === 0 || faltaAlgo) {
+          const livre = caixas.find((c) => !c.checked && !c.disabled);
+          if (livre) { livre.click(); return true; }
+        }
+      }
+      return false;
+    });
+    if (!escolheu) return;
+    await page.waitForTimeout(160);
+  }
 }
 
 /** Indice do passo ativo do wizard, ou -1 se nao houver wizard na tela. */
