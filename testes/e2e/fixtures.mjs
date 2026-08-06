@@ -56,7 +56,14 @@ export function conjuradorPreparado(classe, nivel = 5) {
     // `magias_conhecidas`).
     magias_conhecidas: [...truques, ...primeiro, ...segundo],
     magias_preparadas: [...truques, ...primeiro, ...segundo],
-    grimorio: classe === 'Mago' ? [...primeiro, ...segundo] : [],
+    // O grimorio guarda OBJETOS `{nome, circulo}`, nao strings -- e assim que
+    // creator/passo-magias.js o preenche (linha 570). Com strings, o render
+    // faz `magia.circulo` e `a.nome.localeCompare(...)` sobre undefined e a
+    // ficha inteira lanca.
+    grimorio: classe === 'Mago'
+      ? [...primeiro.map((nome) => ({ nome, circulo: 1 })),
+         ...segundo.map((nome) => ({ nome, circulo: 2 }))]
+      : [],
     espacos_magia: espacos,
   };
 }

@@ -14,8 +14,7 @@ import { conjuradoras } from './dados.mjs';
 
 const slug = (s) => s.normalize('NFD').replace(/[^a-z]/gi, '').toLowerCase();
 
-// PULADO junto com o teste de conjuracao: ver o comentario abaixo.
-test.skip('a fixture do conjurador produz magias conjuraveis na tela', async ({ context }) => {
+test('a fixture do conjurador produz magias conjuraveis na tela', async ({ context }) => {
   const lados = await abrirParelha(context);
   await abrirFichaSemeada(lados, conjuradorPreparado('Mago', 5), 'mag-fix');
 
@@ -27,13 +26,12 @@ test.skip('a fixture do conjurador produz magias conjuraveis na tela', async ({ 
   }
 });
 
-// PULADO: a fixture nao consegue produzir uma magia CONJURAVEL. O botao
-// `data-conjurar` so aparece com a combinacao certa de magia preparada,
-// circulo e espaco disponivel, e reproduzir isso semeando exigiria replicar
-// regra de negocio dentro do teste -- o que o tornaria um teste do teste.
-// O caminho certo e criar o personagem pelo wizard (Tarefa 3 ja o percorre) e
-// so entao conjurar. Registrado em PERGUNTAS-PARA-REVISAO.txt.
-test.skip('conjurar uma magia gasta o mesmo espaco nos dois', async ({ context }) => {
+// Este teste ficou pulado com a justificativa de que semear nao produzia
+// estado conjuravel. Estava errado: a causa era o `grimorio` da fixture
+// guardar strings em vez de objetos `{nome, circulo}`, o que fazia o render
+// da secao de magias lancar ANTES de criar os botoes de conjurar. Corrigida
+// a fixture, semear basta -- nao foi preciso passar pelo wizard.
+test('conjurar uma magia gasta o mesmo espaco nos dois', async ({ context }) => {
   const lados = await abrirParelha(context);
   await abrirFichaSemeada(lados, conjuradorPreparado('Mago', 5), 'mag-conj');
 
@@ -75,18 +73,9 @@ for (const classe of conjuradoras()) {
     // nos dois sites. E limitacao da fixture (ver PERGUNTAS-PARA-REVISAO),
     // nao regressao. O que se afirma e que o refatorado nao erra nada que o
     // original nao erre.
-    // NAO se compara a lista de erros aqui, de proposito.
-    //
-    // Esta fixture leva o app a um caminho de excecao (`localeCompare` sobre
-    // undefined) em Guardiao, Mago e Paladino -- nos DOIS sites. Erros de
-    // pagina sao capturados por listener assincrono, entao comparar excecoes
-    // entre dois navegadores e instavel por natureza: o mesmo teste passava e
-    // falhava em execucoes seguidas.
-    //
-    // O sinal real deste arquivo e a paridade de DOM acima, que e
-    // deterministica e cobre o que a refatoracao pode ter quebrado. A fixture
-    // imperfeita esta registrada em PERGUNTAS-PARA-REVISAO.txt; corrigi-la e
-    // trabalho proprio, nao motivo para deixar um teste intermitente no
-    // repositorio.
+    // Agora a fixture nao leva mais o app a lancar (o grimorio passou a ser
+    // objetos `{nome, circulo}` em vez de strings), entao a ausencia de erros
+    // volta a ser exigivel -- e o ORIGINAL tambem a satisfaz.
+    expect(relatorioErros(lados), `erros na ficha de ${classe}`).toBe('');
   });
 }

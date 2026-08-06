@@ -14,6 +14,7 @@ por definição.
 cd testes/e2e
 npm run instalar     # uma vez: deps + Chromium
 npm test             # a suíte inteira (~6 min, 329 testes, 4 workers)
+                     # 328 passam, 1 pulado (arrastar item)
 npx playwright test --project=offline   # só os testes de Service Worker
 npx playwright test ficha.spec.mjs      # só um arquivo
 npm run test:esm ../..                  # parse ESM de todos os módulos
@@ -44,11 +45,17 @@ está no `.gitignore`.
 
 ### Testes pulados, e por quê
 
-Três testes estão marcados com `test.skip` e o motivo está escrito no próprio
-arquivo: conjurar uma magia e a fixture que a sustenta (exigiria replicar
-regra de negócio dentro do teste), e arrastar item no inventário (o caminho
-real é de toque, não de mouse). Um `skip` sem motivo escrito é omissão
-silenciosa — ver `PERGUNTAS-PARA-REVISAO.txt`.
+**Um** teste está marcado com `test.skip`, e o motivo está escrito no próprio
+arquivo: arrastar item no inventário. O gesto de toque sintetizado não surtiu
+efeito nem no site original, então comparar os dois lados não mediria nada.
+
+Os outros dois `skip` foram removidos: a conjuração de magia estava bloqueada
+por uma fixture errada — o `grimorio` guardava strings em vez de objetos
+`{nome, circulo}`, o que fazia o render da seção de magias lançar antes de
+criar os botões de conjurar. Corrigida a fixture, os dois voltaram a rodar.
+
+Um `skip` sem motivo escrito é omissão silenciosa — ver
+`PERGUNTAS-PARA-REVISAO.txt`.
 
 ### Escopo: o que pode diferir do original
 

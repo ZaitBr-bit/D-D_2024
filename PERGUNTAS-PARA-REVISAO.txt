@@ -379,3 +379,44 @@ monta index.html, site/ e dados/ como irmaos -- a mesma estrutura do repo.
 Nao e erro desta refatoracao (a frase ja estava la), mas induziria alguem a
 "consertar" um caminho que funciona. Corrigido, com nota de que a frase
 anterior estava errada.
+
+[2026-08-06] Tarefas 5 a 8 do plano de pendencias - resultado
+FEITO:
+  T5 - fixture de magias. Causa raiz achada: `grimorio` guardava STRINGS, mas
+       sheet/magias.js:432 faz `magia.circulo` e `a.nome.localeCompare(...)`.
+       Com strings, a secao inteira lancava. Corrigido para objetos
+       `{nome, circulo}`, como creator/passo-magias.js:570 ja fazia.
+       A assercao de ausencia de erros foi RESTAURADA e passa nas 8 classes.
+  T6 - conjurar magia. NAO precisou do wizard: era a MESMA causa raiz da T5.
+       O render lancava antes de criar os botoes `data-conjurar`. Os dois
+       testes pulados voltaram a rodar. A justificativa que eu havia escrito
+       no skip ("exigiria replicar regra de negocio") estava ERRADA.
+  T4 - intermitente do Mago: resolvido removendo criacao.spec.mjs duplicado.
+
+NAO FEITO, e por que:
+  T7 - arrastar item. Continua pulado. O handler exige que o toque comece em
+       `.inv-drag-handle` e resolve o alvo por `document.elementFromPoint`;
+       sintetizei o gesto com as coordenadas reais e nada mudou na tela, NEM
+       NO ORIGINAL. Alem disso um script de diagnostico avulso reportou zero
+       elementos `.inv-item`/`[data-idx]`/`.inv-drag-handle`, enquanto o teste
+       estrutural do mesmo arquivo os encontra e passa. Os dois NAO foram
+       reconciliados -- e limitacao da minha investigacao, nao conclusao.
+       Proximo passo: rodar `--headed` e olhar a lista, em vez de contar
+       seletores as cegas.
+  T8 - subida de nivel alem do 2. Duas hipoteses DESCARTADAS por medicao:
+       (a) o resolvedor generico nao completar escolhas -- o diagnostico
+           instrumentado nunca registra tela travada, o modal fecha sozinho;
+       (b) falta de XP -- dar 355.000 (nivel 20) nao mudou nada.
+       O XP foi mantido na fixture porque e correto de qualquer forma, nao
+       porque resolveu. Falta investigar `subirDeNivel` em si.
+
+GANHO COLATERAL: a assercao "a fixture de inventario produz itens na tela"
+procurava apenas o texto 'Adaga', que aparece em varios lugares da ficha --
+ela passaria mesmo com a lista vazia. Trocada por verificacao ESTRUTURAL de
+linhas de item. Uma assercao que nao consegue falhar nao e um teste.
+
+ERRO MEU, PELA SEXTA VEZ: escrevi no skip da conjuracao uma justificativa
+elaborada ("exigiria replicar regra de negocio dentro do teste") sem ter
+diagnosticado a causa. A causa real era uma linha da minha propria fixture.
+Justificativa nao e diagnostico -- e quanto mais convincente ela soa, mais
+ela adia a investigacao de verdade.

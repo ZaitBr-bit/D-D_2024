@@ -13,6 +13,16 @@ import {
 const ATRIBUTOS = { forca: 15, destreza: 14, constituicao: 14,
                     inteligencia: 13, sabedoria: 12, carisma: 10 };
 
+// `podeSubirDeNivel` exige `xp >= XP_POR_NIVEL[nivel + 1]`, e o nivel 20 pede
+// 355.000. Um personagem com xp 0 nao pode subir, entao a fixture precisa de
+// XP para o teste fazer sentido.
+//
+// ATENCAO: dar XP NAO foi suficiente. Com 355.000 o Guerreiro continua parando
+// no nivel 2 e os conjuradores no 1. A hipotese de que XP era o bloqueio
+// estava ERRADA -- o que trava vem depois. O XP fica porque e correto de
+// qualquer forma, nao porque resolveu.
+const XP_NIVEL_20 = 355000;
+
 /** Nivel atual do unico personagem no localStorage. */
 async function nivelAtual(page) {
   return page.evaluate(async () => {
@@ -40,7 +50,20 @@ async function subirUmNivel(page) {
     if (!await page.locator('#modal-overlay').isVisible()) break;
     const depois = await page.evaluate(
       () => document.getElementById('modal-corpo')?.innerHTML.length ?? 0);
-    if (antes === depois) break;  // tela nao mudou: nao ha mais o que fazer
+    if (antes === depois) {
+      // Diagnostico: quando a tela para de mudar, registrar o QUE esta na
+      // frente. Sem isso, "nao avancou" e uma afirmacao sem conteudo.
+      const d = await page.evaluate(() => ({
+        titulo: document.getElementById('modal-header')?.textContent?.trim().slice(0, 60),
+        acoes: [...document.querySelectorAll('#modal-acoes button')]
+          .map((b) => b.textContent.trim() + (b.disabled ? ' [OFF]' : '')),
+        cards: document.querySelectorAll('#modal-corpo .selection-card').length,
+        selects: document.querySelectorAll('#modal-corpo select').length,
+        checks: document.querySelectorAll('#modal-corpo input[type="checkbox"]').length,
+      }));
+      console.log('  [levelup] travou em: ' + JSON.stringify(d));
+      break;
+    }
   }
   await page.evaluate(() => window.fecharModal?.());
   await page.waitForTimeout(500);
@@ -52,7 +75,7 @@ test('subir de nivel funciona no site ORIGINAL', async ({ context }) => {
   const lados = await abrirParelha(context);
   await abrirFichaSemeada(lados, {
     nome: 'Sobe Nivel', classe: 'Guerreiro', especie: 'Humano',
-    antecedente: 'Soldado', nivel: 1, atributos: ATRIBUTOS,
+    antecedente: 'Soldado', nivel: 1, xp: XP_NIVEL_20, atributos: ATRIBUTOS,
   }, 'lvl-orig');
 
   const depois = await subirUmNivel(lados[0].page);
@@ -69,7 +92,7 @@ for (const classe of ['Guerreiro', 'Mago', 'Paladino']) {
     const lados = await abrirParelha(context);
     await abrirFichaSemeada(lados, {
       nome: `Escalada ${classe}`, classe, especie: 'Humano',
-      antecedente: 'Soldado', nivel: 1, atributos: ATRIBUTOS,
+      antecedente: 'Soldado', nivel: 1, xp: XP_NIVEL_20, atributos: ATRIBUTOS,
     }, `lvl-${classe.normalize('NFD').replace(/[^a-z]/gi, '').toLowerCase()}`);
 
     let ultimo = 1;
@@ -89,12 +112,17 @@ for (const classe of ['Guerreiro', 'Mago', 'Paladino']) {
       ultimo = niveis[0];
     }
 
-    // NAO se afirma "chegou ao nivel 20". O resolvedor generico nao completa
-    // as escolhas de magia do fluxo de subida, entao conjuradores param cedo
-    // -- no ORIGINAL tambem. Afirmar um alvo absoluto seria inventar uma
-    // expectativa que o proprio original nao cumpre (foi o erro que este
-    // arquivo ja cometeu). As asserções que valem sao as de dentro do laco:
-    // os dois lados sobem para o MESMO nivel, com a MESMA ficha, sempre.
+    // NAO se afirma "chegou ao nivel 20", e o nome do teste e otimista demais.
+    // Medido: Guerreiro para no 2, Mago e Paladino no 1 -- no ORIGINAL tambem.
+    // Duas hipoteses ja foram descartadas por medicao: (a) o resolvedor
+    // generico nao completar as escolhas -- o diagnostico instrumentado nunca
+    // registra tela travada, o modal fecha sozinho; (b) falta de XP -- dar
+    // 355.000 nao mudou nada.
+    //
+    // Ate investigar o proprio `subirDeNivel`, a assercao que vale e a de
+    // dentro do laco: os dois lados sobem para o MESMO nivel, com a MESMA
+    // ficha. Isso cobre a transicao, ainda que numa faixa menor que a
+    // desejada.
     console.log(`  ${classe}: os dois sites chegaram ao nivel ${ultimo}`);
     expect(relatorioErros(lados), `erros subindo ${classe}`).toBe('');
   });
