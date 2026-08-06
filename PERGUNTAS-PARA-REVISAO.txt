@@ -523,3 +523,37 @@ select/radio/checkbox e botao que abre sub-modal.
 NAO E REGRESSAO EM NENHUM CASO: o site original se comporta igual. Suite segue
 em 329 testes, 328 passando, 1 pulado, zero falhas -- as mudancas no driver nao
 quebraram nada e melhoraram a criacao em lockstep das 12 classes.
+
+[2026-08-06] Criacao do Mago pelo wizard: avancou muito, mas NAO concluiu
+Progresso medido nesta rodada:
+  antes: travava no passo 4 (Equipamento)
+  agora: passo 5, com 3 truques E 6 magias no grimorio ja selecionados
+  falta: as "4 magias preparadas que tambem estejam no grimorio"
+
+Duas correcoes novas no driver, alem das tres da rodada anterior:
+
+  4. TROCA DE ABA. Truques e cada circulo ficam em abas separadas
+     (`[data-tab-circ]`), e so a aba ativa esta no DOM. O driver enchia os 3
+     truques, batia em "Maximo de 3 truques" e nunca trocava de aba. Agora,
+     quando a aba visivel satura, ele marca a aba como visitada e passa para a
+     proxima -- sem saber quantas abas existem nem o limite de cada uma.
+  5. ELEMENTO ORFAO. O app RE-RENDERIZA a lista a cada clique, entao o card
+     que o driver tinha em maos ficava destacado do documento e NUNCA recebia
+     a classe `selecionada`. A verificacao dava sempre falso e ele trocava de
+     aba a cada escolha (ficou em "1 selecionados"). Corrigido: recontar
+     `.magia-card.selecionada` no DOM em vez de olhar o elemento guardado.
+     Essa e sutil e vale lembrar: em app que re-renderiza, referencia guardada
+     mente.
+
+ONDE PARA: para o Mago de nivel 1, `toggleMagia` adiciona a magia ao GRIMORIO
+(passo-magias.js, ramo `magoNivel1`), nao a `magias_preparadas`. Preparar as 4
+tem de acontecer em outro controle -- o card so tem UM check
+(`[data-creator-check]`). Provavelmente ha uma secao de preparo que aparece
+depois que o grimorio enche. Nao localizei.
+
+PROXIMO PASSO: inspecionar o passo 5 DEPOIS de encher o grimorio, e achar o
+controle de preparo. Nao e mais uma questao de vocabulario de card: e uma
+secao que ainda nao vi.
+
+NAO E REGRESSAO: o site original se comporta igual. Suite em 329 testes, 328
+passando, 1 pulado, zero falhas.
