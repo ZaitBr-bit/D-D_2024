@@ -41,7 +41,7 @@ ver a seção sobre os specs Playwright abaixo):
 ```bash
 cd testes/e2e
 npm run test:regras            # as duas suítes de regras, em sequência
-npm run test:regras:unidade    # só os 6 motores de node:test
+npm run test:regras:unidade    # só os 7 motores de node:test
 npm run test:regras:e2e        # só os specs Playwright (regras/*.spec.mjs)
 ```
 
@@ -118,7 +118,7 @@ linha contra `Talentos.md` no relatório de desenho do motor
 
 ## O que cada motor prova — e o que não prova
 
-Seis motores de `node:test` em `unidade/`, mais cinco specs Playwright em
+Sete motores de `node:test` em `unidade/`, mais cinco specs Playwright em
 `../e2e/regras/`. Cada um confronta uma fatia diferente do livro, e nenhum
 sozinho prova a regra inteira.
 
@@ -130,13 +130,15 @@ sozinho prova a regra inteira.
 | `passivos.test.mjs` | Bônus numéricos e flags internas que `resolverPassivosTalentos()` deveria produzir | 62 |
 | `escolha-morta.test.mjs` | Uma escolha reoferecida depois de saturar o personagem (aplicar o efeito até não crescer mais) precisa ser recusada — nenhuma seção do livro proíbe isso com todas as letras, é o próprio estado do app confrontado contra si mesmo | 59 (15 rodam a asserção; **44 skip**, cada um com o motivo escrito no próprio `t.skip`) |
 | `antecedentes.test.mjs` | Catálogo dos 16 antecedentes × `dados/origens/antecedentes.json`: bijeção/schema/citação (19), os cinco campos do livro por antecedente (atributos, talento, perícias, ferramenta, equipamento — 80), e coerência cruzada com `catalogo/talentos.mjs` (o talento de origem existe e é `'de Origem'` — 16) | 115 |
+| `ficha-transversal.test.mjs` | Completude do catálogo (MODIFICADORES_ATRIBUTO cobre exatamente 1-30, EVOLUCAO_PERSONAGEM cobre exatamente 1-20, PV_NIVEL_1/PV_NIVEL_SEGUINTE cobrem exatamente as classes de CLASSES_INFO) e validação de citações (todas as entradas de CITACOES resolvem para trechos reais do livro); mais as fórmulas transversais da ficha confrontadas com as tabelas do livro por **varredura exaustiva** (não amostragem): modificador de atributo (30/30 valores), Bônus de Proficiência (20/20 níveis) e `calcularNivelPorXP` (os 20 pisos, mais interior de faixa e bordas), PV de nível 1 e dos níveis seguintes (12 classes × mod. Constituição -5..+10, e também × níveis 1-20 para os níveis seguintes), CA base sem armadura (30 valores de Destreza), CD e ataque de magia (8 classes conjuradoras × 20 níveis × 30 valores de atributo) e Percepção Passiva (3 estados de proficiência × 30 valores de Sabedoria × 20 níveis) | 14 |
 
-Total: **514 testes** em `unidade/` — **470 passam, 44 skip, 0 falham**. Os
+Total: **528 testes** em `unidade/` — **484 passam, 44 skip, 0 falham**. Os
 skips não somem dentro do total: são talentos cujo `aplicarEfeitoTalento` não
 faz nenhum campo de lista crescer (fora do escopo deste motor específico, não
 do livro), e cada um carrega o motivo por escrito — um skip silencioso, aqui,
 seria a mesma omissão que uma lacuna sem `motivo` já é proibida de ser. Nenhum
-skip novo veio do motor de antecedentes.
+skip novo veio do motor de antecedentes nem do de regras transversais da
+ficha.
 
 ### O que `escolha-morta.test.mjs` cobre que os outros quatro não cobrem
 
@@ -528,23 +530,92 @@ A mesma diferença estrutural aparece nos caminhos do usuário: antecedente tem
 justamente a quarta que escondeu o bug que abriu o projeto — aqui, com uma
 via só, não há porta esquecida por definição.
 
+## Achados do domínio Regras Transversais da Ficha (2026-08-07)
+
+Diferente de talentos e antecedentes, este domínio **não encontrou nenhuma
+divergência**. `lacunas-conhecidas.mjs` termina a rodada com a mesma **1**
+entrada de antes (`Aumento no Valor de Atributo`/`escolhas`,
+`limitacao-observabilidade`, deixada pelo domínio de talentos) — zero
+entradas novas, de qualquer `tipo`.
+
+Uma afirmação de "zero divergências" só vale o que a varredura por trás dela
+cobre, então o que foi varrido, por completo, sem amostragem:
+
+- **Modificador de atributo**: os 30 valores de 1 a 30 (18 tabelados no
+  livro, 12 extrapolados da fórmula e marcados como tal) contra `calcMod`.
+- **Bônus de Proficiência e XP**: os 20 níveis da tabela Evolução do
+  Personagem contra `bonusProficiencia`, mais a coluna de XP contra
+  `calcularNivelPorXP` — pisos exatos, interior de cada faixa (derivado da
+  própria tabela) e dois casos de borda.
+- **Pontos de Vida**: as 12 classes × modificador de Constituição de -5 a
+  +10 no nível 1 (`calcPVNivel1`), e as mesmas 12 classes × níveis 1-20 ×
+  mod. Constituição -5..+10 (3.840 combinações) para `calcPVTotal` contra a
+  tabela "Pontos de Vida Fixos por Classe".
+- **CA base sem armadura**: os 30 valores de Destreza contra `calcCA`, numa
+  classe sem ramo de CA especial.
+- **CD e ataque de magia**: as 8 classes conjuradoras de `CLASSES_INFO` ×
+  níveis 1-20 × 30 valores do atributo de conjuração (4.800 combinações,
+  duas asserções cada) contra `calcCDMagia`/`calcAtaqueMagia`.
+- **Percepção Passiva**: os três estados reais de proficiência (sem, com, e
+  com Especialização) × 30 valores de Sabedoria × 20 níveis (1.800
+  combinações) contra `calcPercepcaoPassiva`.
+
+O app implementa todas as seis fórmulas exatamente como o livro descreve, em
+toda combinação varrida.
+
+**Fronteira de escopo com o domínio de classes/níveis.** Três funções
+transversais têm ramos de característica de classe que este domínio
+deliberadamente deixou de fora — são a exceção que o livro concede a uma
+classe/subclasse específica, não a regra que vale para qualquer personagem:
+
+- `calcCA`: os ramos de Bárbaro (Defesa sem Armadura), Monge (Defesa sem
+  Armadura), Bardo do Colégio da Dança (nível ≥3) e Feiticeiro da Feitiçaria
+  Dracônica (nível ≥3).
+- `calcBonusPericia`: os ramos de Bárbaro em fúria (Força Primordial troca o
+  atributo-chave de 5 perícias) e Clérigo da Ordem Divina Taumaturgo (bônus
+  em Arcanismo/Religião). Esta função não ganhou teste nenhum aqui — só a
+  fronteira ficou anotada, para o domínio seguinte não a esquecer.
+- `calcPercepcaoPassiva`: o ramo de Bardo (Pau pra Toda Obra, nível ≥2).
+
+**Sobreposição declarada com classes/níveis.** A tabela Evolução do
+Personagem — incluindo a coluna de XP — está coberta inteira aqui
+(`bonusProficiencia` e `calcularNivelPorXP`/`XP_POR_NIVEL`, ambos
+confrontados nos 20 níveis). O domínio de classes/níveis não deve duplicar
+essa tabela quando chegar a sua vez.
+
 ## Mapa de domínios futuros
 
-Talentos foi o piloto. A ordem sugerida para os próximos domínios (do spec de
-design deste projeto):
+Talentos foi o piloto. A ordem sugerida originalmente (do spec de design
+deste projeto) tinha "Regras transversais da ficha" por último — mas o
+pré-voo deste domínio (ver o plano,
+`docs/superpowers/plans/2026-08-07-regras-transversais-ficha.md`) mediu que
+`site/js/utils.js` é o módulo com a maior densidade de função pura de todos
+os domínios pendentes (`calcMod`, `bonusProficiencia`, `calcPVNivel1`,
+`calcPVTotal`, `calcCA`, `calcCDMagia`, `calcAtaqueMagia`,
+`calcPercepcaoPassiva`, `calcIntuicaoPassiva`, `calcInvestigacaoPassiva`,
+`calcBonusPericia`) e não precisa de navegador — uma medição, não um
+palpite. Por isso ele foi adiantado para antes de Espécies; a ordem abaixo é
+a que foi seguida de fato, não a original:
 
 1. ~~Talentos~~ — feito, este projeto (75 talentos)
 2. ~~Antecedentes~~ — feito (16 antecedentes; achados acima, corrigidos em 2026-08-07)
-3. **Espécies** — traços, deslocamento, magias raciais
-4. **Classes/níveis** — características por nível, espaços de magia, escolhas
-   de subclasse
-5. **Magias** — preparo, limites por círculo
-6. **Regras transversais da ficha** — CA, PV, bônus de proficiência, testes
+3. ~~Regras transversais da ficha~~ — feito (achados acima; adiantado por
+   densidade de função pura medida no pré-voo)
+4. **Espécies** — traços, deslocamento, magias raciais
+5. **Classes/níveis** — características por nível, espaços de magia, escolhas
+   de subclasse; herda os ramos de classe anotados acima (`calcCA`,
+   `calcBonusPericia`, `calcPercepcaoPassiva`) e não deve duplicar a tabela
+   Evolução do Personagem, já coberta acima
+6. **Magias** — preparo, limites por círculo
 
 Cada domínio novo é **um arquivo de catálogo + um motor** — a estrutura não
 muda. Não é preciso reprojetar nada para crescer: copiar o padrão de
 `catalogo/talentos.mjs` (dado curado, citação por entrada) e de
-`unidade/*.test.mjs` (motor genérico dirigido pelo catálogo) basta.
+`unidade/*.test.mjs` (motor genérico dirigido pelo catálogo) basta —
+lembrando que o padrão certo depende do domínio: `ficha-transversal.mjs`
+mostrou que quando o livro traz **tabela** fechada em vez de prosa, o
+catálogo vira transcrição e o confronto vira varredura exaustiva, não
+amostragem.
 
 A estrutura não muda, mas os erros se repetem: copiar o padrão **não** protege
 de medir arquitetura em vez de comportamento, de esquecer um caminho do

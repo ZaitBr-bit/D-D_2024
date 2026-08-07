@@ -1,7 +1,8 @@
 # Guia para os próximos domínios
 
-Talentos foi o piloto. Faltam antecedentes, espécies, classes/níveis, magias e
-as regras transversais da ficha — muito mais superfície do que já foi coberta.
+Talentos foi o piloto. Antecedentes e as regras transversais da ficha também já
+foram cobertos; faltam espécies, classes/níveis e magias — muito mais
+superfície do que já foi coberta.
 
 Este documento não explica a arquitetura (isso é o [README](README.md)). Ele
 registra **os erros que a primeira rodada cometeu e como não repeti-los**. Cada
@@ -373,6 +374,96 @@ fechado — um identificador que descreve *para onde o valor vai*, em vez do
 próprio valor — prefira rotear por ele: um conjunto fechado de rótulos
 conhecidos não tem como "esquecer" um valor futuro, porque o valor nunca
 entra na comparação.
+
+---
+
+## A lição do domínio Regras Transversais da Ficha: busca honesta antes de concluir ausência (2026-08-07)
+
+**O que aconteceu.** O pré-voo do plano deste domínio tratou duas fórmulas
+de dois jeitos diferentes, e vale notar a diferença porque só um dos dois
+era um erro. Para a CD de salvaguarda de magia, o plano **declarou ausência**
+("Fórmula ainda não localizada", linha 37) — uma conclusão, não uma tarefa.
+Para a regra de ganho de PV nos níveis 2 em diante, o plano não concluiu
+nada: deixou uma **instrução de busca condicional** ("encontre o trecho...
+Se encontrar: [...]. Se **não** encontrar: [...]", linhas 250/252/254) — uma
+pergunta em aberto, não uma alegação. **As duas fórmulas existiam no livro.**
+A Tarefa 3 achou a regra de PV em `Criação de Personagens.md:497-510` (passo
+2 de "Adquirindo Um Nível", mais a tabela "Pontos de Vida Fixos por Classe");
+a Tarefa 4 achou a CD de magia em `Criação de Personagens.md:441` e `:443`,
+repetida em `Magias.md:183` e `:189`. A causa não era ausência no livro —
+era busca com os termos errados no arquivo errado: o pré-voo da CD tinha
+procurado algo como "8 mais" no glossário (`Abreviações e Definição de
+Regras.md`), quando o livro usa os rótulos "CD para evitar magia" e "Bônus
+de ataque mágico", numa seção diferente. O relatório da Tarefa 4 documenta
+quatro rodadas de busca com termos supostos a priori (`CD de Conjuração`,
+`Classe de Dificuldade da Magia`, `Bônus de Ataque com Magia`...) antes de
+achar os rótulos reais na quinta; as três primeiras não acharam nada
+relacionado, e a quarta achou o glossário geral de CD
+(`Abreviações e Definição de Regras.md:265-267`), que confirma a FORMA da
+regra ("a CD é determinada pelo atributo de conjuração e pelo Bônus de
+Proficiência") mas não trazia a fórmula numérica exata — texto relacionado,
+não a resposta, e ainda assim insuficiente para fechar a busca sem achar o
+"8 +" explícito.
+
+**Por que é útil saber.** A CD de magia é o erro real: o plano concluiu
+ausência sem ter procurado o suficiente, e só a instrução mais forte do
+próprio brief da Tarefa 4 ("procure a implementação em todo `site/js/`... e
+reporte honestamente dos dois jeitos") mandou o implementador continuar
+procurando em vez de aceitar a conclusão do rascunho. A regra de PV mostra o
+contrário funcionando: como o plano nunca declarou ausência ali, não havia
+conclusão errada para desfazer — só uma pergunta que a Tarefa 3 foi resolver
+de verdade, achando a fórmula na primeira busca dirigida. A mesma
+incerteza ("não sei se isso está no livro") produziu dois resultados de
+plano diferentes — uma alegação falsa num caso, uma tarefa bem formulada no
+outro — e é essa diferença de formulação, não o tamanho da superfície
+coberta, que decidiu se o implementador continuou procurando.
+
+**Como aplicar.** Um plano não deve entregar ao implementador uma conclusão
+negativa pronta ("a fórmula X não existe no livro") quando ainda não
+esgotou a busca — deve entregar uma tarefa de busca ("procure X; se achar,
+cite arquivo e linha; se não achar depois de tentar termos alternativos em
+todos os arquivos de `Informacoes Separadas/`, registre a ausência com a
+lista do que foi tentado"), do jeito que o próprio plano já fez para a regra
+de PV. Ausência de evidência no seu grep não é evidência de ausência no
+livro — pode ser só o vocabulário errado — e um achado parcial (texto
+relacionado que confirma a forma da regra, mas não a fórmula exata) é sinal
+para tentar mais um termo, não para concluir que só falta a numeração.
+
+---
+
+## A lição do domínio Regras Transversais da Ficha: valor esperado não pode vir da função sob teste (2026-08-07)
+
+**O que aconteceu.** A revisão da Tarefa 4 pegou dois blocos deste motor
+(CD/ataque de magia, e Percepção Passiva) que montavam o valor **esperado**
+da asserção chamando `utils.bonusProficiencia(nivel)` — a mesma função que
+`calcCDMagia`, `calcAtaqueMagia` e `calcPercepcaoPassiva` já chamam por
+dentro para obter o Bônus de Proficiência. Um bug em como `nivel` chega até
+essa chamada dentro do app (por exemplo, `nivel - 1`, ou um campo nunca
+atualizado) produziria o mesmo valor errado nos dois lados da mesma
+asserção, e as 9.600 + 1.800 comparações desses dois blocos não pegariam
+isso — o teste comparava o app contra ele mesmo nesse termo específico,
+apesar do volume. O conserto trocou a chamada por uma função local
+(`bonusProficienciaLivro`, em `ficha-transversal.test.mjs`) que lê
+`EVOLUCAO_PERSONAGEM` — o catálogo já derivado do livro na Tarefa 2, e já
+confrontado contra `utils.bonusProficiencia` no primeiro teste do mesmo
+arquivo — uma fonte independente da função sob teste, não uma reimplementação
+nova.
+
+**Por que é útil saber.** O erro 3 deste guia ("testes verdes que não
+afirmam nada") já cobria comparação frouxa e `return` de escape; este é um
+caso mais sutil da mesma família, porque a chamada suspeita não parece um
+atalho — parece só "buscar um número auxiliar". A regra fica mais fácil de
+aplicar dita à parte: um valor esperado nunca pode vir da função sob teste,
+nem de um helper que ela chama por dentro, mesmo que a chamada pareça
+inofensiva. O que tornou o conserto barato foi o catálogo já ter, no mesmo
+domínio, uma tabela derivada do livro que servia como fonte independente —
+não foi preciso curar uma nova fonte, só parar de ignorar a que já existia.
+
+**Como aplicar.** Ao montar o valor esperado de uma asserção, pergunte se
+algum ingrediente dele vem de chamar a própria função sob teste ou uma
+função que ela chama internamente. Se vier, procure primeiro se o domínio já
+tem uma fonte independente (uma tabela do catálogo, uma constante curada do
+livro) antes de aceitar o atalho de reusar a função do app.
 
 ---
 

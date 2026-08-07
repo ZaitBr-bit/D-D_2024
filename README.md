@@ -81,8 +81,8 @@ D&D/
 │   ├── playwright.config.mjs
 │   └── regras/              # specs da suíte de regras (vivem aqui pelo node_modules)
 ├── testes/regras/           # suíte de regras de negócio — ver "Testes"
-│   ├── catalogo/            # 75 talentos + 16 antecedentes curados do livro, com citação
-│   ├── unidade/             # 6 motores em node:test, sem dependência
+│   ├── catalogo/            # 75 talentos + 16 antecedentes curados do livro, com citação, mais as tabelas transversais da ficha
+│   ├── unidade/             # 7 motores em node:test, sem dependência
 │   ├── lacunas-conhecidas.mjs   # divergências app-vs-livro já encontradas
 │   └── GUIA-PROXIMOS-DOMINIOS.md  # ler antes de cobrir um domínio novo
 ├── scripts/                 # verificação da quebra dos monólitos
@@ -359,7 +359,7 @@ Três verificações independentes, que respondem perguntas diferentes:
 |---|---|---|
 | Extração dos monólitos | `python scripts/verificar_extracao.py tudo` | "os módulos ainda batem com o baseline?" — estático, sem navegador |
 | Paridade E2E | `cd testes/e2e && npm test` | "a tela é a mesma do repositório original?" — Playwright, 329 testes |
-| Regras de negócio | `cd testes/e2e && npm run test:regras` | "o app obedece ao **livro**?" — 514 de unidade (470 passam, 44 skip) + 111 de navegador |
+| Regras de negócio | `cd testes/e2e && npm run test:regras` | "o app obedece ao **livro**?" — 528 de unidade (484 passam, 44 skip) + 111 de navegador |
 
 As duas últimas são independentes de propósito: um erro de regra presente
 **nos dois** repositórios passa na paridade para sempre, porque paridade só
@@ -406,7 +406,10 @@ registra os erros da primeira rodada e traz um checklist de pré-voo.
 - Fonte da verdade: `catalogo/talentos.mjs` (75 talentos) e
   `catalogo/antecedentes.mjs` (16 antecedentes), curados à mão do livro, cada
   entrada citando sua seção. Um teste garante cobertura de 100% do que existe
-  em `dados/` — sem amostragem.
+  em `dados/` — sem amostragem. `catalogo/ficha-transversal.mjs` é diferente:
+  não há entidade a curar, são as tabelas fechadas do livro (modificador de
+  atributo, Evolução do Personagem, PV por classe) transcritas e varridas por
+  exaustão.
 - Camada de unidade em `node:test` (sem dependência nova) e camada de navegador
   em `testes/e2e/regras/`, que reaproveita o `node_modules` da paridade.
 - `lacunas-conhecidas.mjs` é o produto: as divergências app-vs-livro já
