@@ -583,10 +583,20 @@ export function renderEscolhasTalento(nome, talentoData, ctx, state = {}) {
     }
   }
 
+  // Analítico/Mente Aguçada: "Se não tiver proficiência na perícia
+  // escolhida, você a adquire; se já for proficiente, adquire
+  // Especialização" (Talentos.md §Analítico/§Mente Aguçada). Ou seja, só a
+  // perícia que já tem proficiência E Especialização não concede nada — as
+  // outras duas (sem nada, ou proficiência sem Especialização) continuam
+  // válidas e por isso NÃO entram no mesmo filtro de Habilidoso/Artifista/
+  // Músico acima.
   if (nome === 'Analítico') {
     // Talentos.md §Analítico: Intuição, Investigação ou Percepção.
-    const ops = _PERICIAS_ANALITICO;
+    const periciasExpertise = char.pericias_expertise || [];
+    const periciasProf = char.pericias_proficientes || [];
+    const ops = _PERICIAS_ANALITICO.filter(p => !(periciasProf.includes(p) && periciasExpertise.includes(p)));
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Perícia (1)</div>`;
+    html += _avisoOpcoesInsuficientes(ops.length, 1);
     html += `<select class="escolha-talento-levelup form-input" data-tipo="analitico" style="width:100%;margin:4px 0"><option value="">-- Escolha --</option>`;
     html += ops.map(p => `<option value="${p}">${p}</option>`).join('');
     html += `</select>`;
@@ -595,8 +605,11 @@ export function renderEscolhasTalento(nome, talentoData, ctx, state = {}) {
   if (nome === 'Mente Aguçada') {
     // Talentos.md §Mente Aguçada: Arcanismo, História, Investigação,
     // Natureza ou Religião.
-    const ops = _PERICIAS_MENTE_AGUCADA;
+    const periciasExpertise = char.pericias_expertise || [];
+    const periciasProf = char.pericias_proficientes || [];
+    const ops = _PERICIAS_MENTE_AGUCADA.filter(p => !(periciasProf.includes(p) && periciasExpertise.includes(p)));
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Perícia (1)</div>`;
+    html += _avisoOpcoesInsuficientes(ops.length, 1);
     html += `<select class="escolha-talento-levelup form-input" data-tipo="mente_agucada" style="width:100%;margin:4px 0"><option value="">-- Escolha --</option>`;
     html += ops.map(p => `<option value="${p}">${p}</option>`).join('');
     html += `</select>`;
@@ -646,10 +659,15 @@ export function renderEscolhasTalento(nome, talentoData, ctx, state = {}) {
     // Simples ou Marcial à escolha (o pré-requisito de proficiência com a
     // arma não é filtrado aqui pelo mesmo motivo documentado em
     // validarEscolhasTalento: o personagem não guarda proficiência de arma
-    // por item).
+    // por item). Já a MAESTRIA em si é filtrada: fica de fora a arma em que
+    // o personagem já tem mastria (char.maestrias_arma), pois uma maestria
+    // repetida não concede nada.
+    const maestriasAtuais = char.maestrias_arma || [];
+    const armasDisponiveis = _ARMAS_SIMPLES_MARCIAIS.filter(a => !maestriasAtuais.includes(a));
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Propriedade de Maestria (Arma)</div>`;
+    html += _avisoOpcoesInsuficientes(armasDisponiveis.length, 1);
     html += `<select class="escolha-talento-levelup form-input" data-tipo="mestre_armas" style="width:100%;margin:4px 0"><option value="">-- Escolha a arma --</option>`;
-    html += _ARMAS_SIMPLES_MARCIAIS.map(a => `<option value="${a}">${a}</option>`).join('');
+    html += armasDisponiveis.map(a => `<option value="${a}">${a}</option>`).join('');
     html += `</select>`;
   }
 

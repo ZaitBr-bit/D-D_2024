@@ -337,11 +337,17 @@ export function validarEscolhasTalento(char, nome, escolhas = {}) {
 
   // Analítico: perícia entre Intuição/Investigação/Percepção. Qualquer uma
   // das três é válida — vira proficiência ou Especialização dependendo do
-  // estado atual do personagem (aplicarEfeitoTalento decide isso).
+  // estado atual do personagem (aplicarEfeitoTalento decide isso). Só a
+  // terceira combinação — já proficiente E já com Especialização na perícia
+  // escolhida — não concede nada, pois nenhum dos dois ramos do texto do
+  // talento se aplica mais; é a única rejeitada aqui.
   if (nome === 'Analítico') {
     const pericia = valor(escolhas, 'pericia', 0);
     if (!PERICIAS_ANALITICO.includes(pericia)) {
       return resultadoInvalido('Escolha Intuição, Investigação ou Percepção para Analítico.');
+    }
+    if ((char.pericias_proficientes || []).includes(pericia) && (char.pericias_expertise || []).includes(pericia)) {
+      return resultadoInvalido('Escolha uma perícia em que ainda não tenha proficiência e Especialização para Analítico.');
     }
   }
 
@@ -350,6 +356,9 @@ export function validarEscolhasTalento(char, nome, escolhas = {}) {
     const pericia = valor(escolhas, 'pericia', 0);
     if (!PERICIAS_MENTE_AGUCADA.includes(pericia)) {
       return resultadoInvalido('Escolha Arcanismo, História, Investigação, Natureza ou Religião para Mente Aguçada.');
+    }
+    if ((char.pericias_proficientes || []).includes(pericia) && (char.pericias_expertise || []).includes(pericia)) {
+      return resultadoInvalido('Escolha uma perícia em que ainda não tenha proficiência e Especialização para Mente Aguçada.');
     }
   }
 
@@ -377,10 +386,16 @@ export function validarEscolhasTalento(char, nome, escolhas = {}) {
   // isso este ramo confere só existência e categoria — o mesmo limite que
   // já se aplica a qualquer outro pré-requisito não observável a partir do
   // personagem.
+  // A MAESTRIA em si (diferente da proficiência acima) é armazenada por
+  // item em char.maestrias_arma, então uma arma em que o personagem já tem
+  // maestria é rejeitada aqui: maestria repetida não concede nada.
   if (nome === 'Mestre das Armas') {
     const arma = valor(escolhas, 'arma', 0);
     if (!ARMAS_SIMPLES_MARCIAIS.includes(arma)) {
       return resultadoInvalido('Escolha uma arma Simples ou Marcial válida para Mestre das Armas.');
+    }
+    if ((char.maestrias_arma || []).includes(arma)) {
+      return resultadoInvalido('Escolha uma arma em que ainda não tenha maestria para Mestre das Armas.');
     }
   }
 
