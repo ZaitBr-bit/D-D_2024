@@ -1303,65 +1303,27 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     if (!personagem.talentos) personagem.talentos = [];
     personagem.talentos.push(opcoes.talento);
 
-    // Aplicar escolhas do talento (Habilidoso/Artifista/Músico)
+    // Registrar escolhas do talento (Habilidoso/Artifista/Músico/etc.) para
+    // persistência e histórico. A APLICAÇÃO da proficiência em si (perícia/
+    // ferramenta/instrumento) NÃO é feita aqui -- fica só a cargo de
+    // aplicarEfeitoTalento (regras-cobertura.js, chamado mais abaixo), que é
+    // o único lugar que conhece a regra "já possuída não conta" adicionada a
+    // validarEscolhasTalento. Até 2026-08-06 este bloco tinha uma cópia
+    // própria (hardcoded) da aplicação de Habilidoso/Artifista/Músico, que
+    // rodava ANTES de aplicarEfeitoTalento -- então quando
+    // validarEscolhasTalento passou a rejeitar proficiência repetida, a
+    // segunda aplicação (dentro de aplicarEfeitoTalento) via o personagem já
+    // mutado pela primeira e rejeitava a própria escolha que acabara de
+    // aplicar. Duas fontes da verdade para o mesmo efeito é o bug raiz --
+    // não "restaurar" a cópia hardcoded removida abaixo.
     if (Array.isArray(opcoes.escolhas_talento_levelup) && opcoes.escolhas_talento_levelup.length > 0) {
       if (!personagem.escolhas_talento) personagem.escolhas_talento = {};
       const chave = `levelup_${novoNivel}`;
       personagem.escolhas_talento[chave] = opcoes.escolhas_talento_levelup;
       escolhasTalentoLevelup = opcoes.escolhas_talento_levelup;
 
-      // Aplicar pericias do Habilidoso nas proficiencias
-      if (opcoes.talento === 'Habilidoso') {
-        if (!personagem.pericias_proficientes) personagem.pericias_proficientes = [];
-        const _periciasNomes = [
-          'Acrobacia','Arcanismo','Atletismo','Atuação','Enganação','Furtividade',
-          'História','Intimidação','Intuição','Investigação','Lidar com Animais',
-          'Medicina','Natureza','Percepção','Persuasão','Prestidigitação',
-          'Religião','Sobrevivência'
-        ];
-        for (const escolha of opcoes.escolhas_talento_levelup) {
-          if (_periciasNomes.includes(escolha) && !personagem.pericias_proficientes.includes(escolha)) {
-            personagem.pericias_proficientes.push(escolha);
-          }
-        }
-      }
-
       if (opcoes.talento === 'Dádiva da Proficiência em Perícia') {
         aplicarDadivaProficiencia(personagem, opcoes);
-      }
-
-      // Aplicar ferramentas do Artifista nas proficiencias
-      if (opcoes.talento === 'Artifista') {
-        if (!personagem.proficiencias_ferramentas) personagem.proficiencias_ferramentas = [];
-        const _ferramentasNomes = [
-          'Ferramentas de Carpinteiro','Ferramentas de Cartógrafo','Ferramentas de Coureiro',
-          'Ferramentas de Entalhador','Ferramentas de Ferreiro','Ferramentas de Funileiro',
-          'Ferramentas de Joalheiro','Ferramentas de Oleiro','Ferramentas de Pedreiro',
-          'Ferramentas de Sapateiro','Ferramentas de Tecelão','Ferramentas de Vidreiro',
-          'Suprimentos de Alquimista','Suprimentos de Calígrafo','Suprimentos de Cervejeiro',
-          'Suprimentos de Pintor','Utensílios de Cozinheiro',
-          'Ferramentas de Ladrão','Ferramentas de Navegador',
-          'Kit de Disfarce','Kit de Falsificação','Kit de Herbalismo','Kit de Veneno'
-        ];
-        for (const escolha of opcoes.escolhas_talento_levelup) {
-          if (_ferramentasNomes.includes(escolha) && !personagem.proficiencias_ferramentas.includes(escolha)) {
-            personagem.proficiencias_ferramentas.push(escolha);
-          }
-        }
-      }
-
-      // Aplicar instrumentos do Músico nas proficiencias
-      if (opcoes.talento === 'Músico') {
-        if (!personagem.proficiencias_instrumentos) personagem.proficiencias_instrumentos = [];
-        const _instrumentosNomes = [
-          'Alaúde','Flauta','Flauta de Pan','Gaita de Foles','Lira',
-          'Oboé','Tambor','Trombeta','Violino','Xilofone'
-        ];
-        for (const escolha of opcoes.escolhas_talento_levelup) {
-          if (_instrumentosNomes.includes(escolha) && !personagem.proficiencias_instrumentos.includes(escolha)) {
-            personagem.proficiencias_instrumentos.push(escolha);
-          }
-        }
       }
     }
 

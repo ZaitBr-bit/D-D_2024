@@ -130,18 +130,53 @@ export function renderDescricaoTalento(td) {
   return html;
 }
 
+// Reune tudo que o personagem ja tem de proficiencia em pericia/ferramenta/
+// instrumento neste ponto do assistente. Alem dos campos definitivos
+// (pericias_proficientes/proficiencias_ferramentas/proficiencias_instrumentos,
+// que so sao consolidados no final em validarFinal()), soma tambem as
+// escolhas de talento ja confirmadas em OUTROS contextos (escolhas_talento.
+// antecedente/versatil) -- sem isso, um Habilidoso repetido (Versatil +
+// antecedente, ja que Habilidoso e repetivel) nao veria as 3 escolhas feitas
+// no primeiro enquanto o assistente ainda esta em andamento. O contexto
+// atual e excluido para nao esconder do proprio select o valor ja marcado
+// nele (reabrir o popup para editar precisa continuar mostrando a escolha).
+function _proficienciasJaAdquiridas(contextoAtual) {
+  const jaTem = new Set([
+    ...(personagem.pericias_proficientes || []),
+    ...(personagem.proficiencias_ferramentas || []),
+    ...(personagem.proficiencias_instrumentos || [])
+  ]);
+  const escolhas = personagem.escolhas_talento || {};
+  for (const contexto of Object.keys(escolhas)) {
+    if (contexto === contextoAtual) continue;
+    (escolhas[contexto] || []).forEach(item => jaTem.add(item));
+  }
+  return jaTem;
+}
+
+// Aviso quando a filtragem de "ja possui" deixa menos opcoes elegiveis do
+// que o numero de escolhas exigidas. Evita renderizar um formulario que
+// nunca podera ser concluido sem explicar o motivo.
+function _avisoOpcoesInsuficientes(disponiveis, exigidas) {
+  if (disponiveis >= exigidas) return '';
+  return `<div class="info-box warning" style="font-size:0.8rem;margin-top:4px">Restam apenas ${disponiveis} opcao(oes) elegivel(is) -- o personagem ja e proficiente em todo o resto. Nao e possivel completar as ${exigidas} escolhas exigidas.</div>`;
+}
+
 /** Gera HTML de selecao de escolhas para talentos que exigem (Habilidoso, Artifista, Musico) */
 export function renderEscolhasTalentoHtml(talentoNome, contexto) {
   // contexto: 'versatil' ou 'antecedente'
   const prefix = `escolha-talento-${contexto}`;
   const escolhasAtuais = personagem.escolhas_talento?.[contexto] || [];
+  const jaTem = _proficienciasJaAdquiridas(contexto);
 
   if (talentoNome === 'Habilidoso') {
-    // 3 pericias ou ferramentas a escolha
-    const periciasList = PERICIAS.map(p => p.nome);
-    const todasOpcoes = [...periciasList, ...FERRAMENTAS_TODAS];
+    // 3 pericias ou ferramentas a escolha, exceto as que o personagem ja tem
+    // (proficiencia repetida nao concede nada nesta edicao)
+    const periciasList = PERICIAS.map(p => p.nome).filter(p => !jaTem.has(p));
+    const ferramentasList = FERRAMENTAS_TODAS.filter(f => !jaTem.has(f));
     let html = `<div class="section-divider" style="margin-top:8px"><span>Escolhas — Habilidoso</span></div>`;
     html += `<div class="info-box info" style="font-size:0.8rem">Escolha 3 pericias ou ferramentas para adquirir proficiencia.</div>`;
+    html += _avisoOpcoesInsuficientes(periciasList.length + ferramentasList.length, 3);
     for (let i = 0; i < 3; i++) {
       const valorAtual = escolhasAtuais[i] || '';
       html += `<select class="${prefix}" data-idx="${i}" style="width:100%;padding:6px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:0.85rem;margin:4px 0">`;
@@ -151,7 +186,7 @@ export function renderEscolhasTalentoHtml(talentoNome, contexto) {
         html += `<option value="${p}" ${valorAtual === p ? 'selected' : ''}>${p}</option>`;
       });
       html += `</optgroup><optgroup label="Ferramentas">`;
-      FERRAMENTAS_TODAS.forEach(f => {
+      ferramentasList.forEach(f => {
         html += `<option value="${f}" ${valorAtual === f ? 'selected' : ''}>${f}</option>`;
       });
       html += `</optgroup></select>`;
@@ -160,13 +195,15 @@ export function renderEscolhasTalentoHtml(talentoNome, contexto) {
   }
 
   if (talentoNome === 'Artifista') {
+    const ferramentasList = FERRAMENTAS_ARTESAO.filter(f => !jaTem.has(f));
     let html = `<div class="section-divider" style="margin-top:8px"><span>Escolhas — Artifista</span></div>`;
     html += `<div class="info-box info" style="font-size:0.8rem">Escolha 3 Ferramentas de Artesao para adquirir proficiencia.</div>`;
+    html += _avisoOpcoesInsuficientes(ferramentasList.length, 3);
     for (let i = 0; i < 3; i++) {
       const valorAtual = escolhasAtuais[i] || '';
       html += `<select class="${prefix}" data-idx="${i}" style="width:100%;padding:6px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:0.85rem;margin:4px 0">`;
       html += `<option value="">-- Escolha ${i + 1} --</option>`;
-      FERRAMENTAS_ARTESAO.forEach(f => {
+      ferramentasList.forEach(f => {
         html += `<option value="${f}" ${valorAtual === f ? 'selected' : ''}>${f}</option>`;
       });
       html += `</select>`;
@@ -175,13 +212,15 @@ export function renderEscolhasTalentoHtml(talentoNome, contexto) {
   }
 
   if (talentoNome === 'Músico') {
+    const instrumentosList = INSTRUMENTOS_MUSICAIS.filter(inst => !jaTem.has(inst));
     let html = `<div class="section-divider" style="margin-top:8px"><span>Escolhas — Musico</span></div>`;
     html += `<div class="info-box info" style="font-size:0.8rem">Escolha 3 Instrumentos Musicais para adquirir proficiencia.</div>`;
+    html += _avisoOpcoesInsuficientes(instrumentosList.length, 3);
     for (let i = 0; i < 3; i++) {
       const valorAtual = escolhasAtuais[i] || '';
       html += `<select class="${prefix}" data-idx="${i}" style="width:100%;padding:6px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:0.85rem;margin:4px 0">`;
       html += `<option value="">-- Escolha ${i + 1} --</option>`;
-      INSTRUMENTOS_MUSICAIS.forEach(inst => {
+      instrumentosList.forEach(inst => {
         html += `<option value="${inst}" ${valorAtual === inst ? 'selected' : ''}>${inst}</option>`;
       });
       html += `</select>`;

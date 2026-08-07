@@ -293,7 +293,11 @@ export function validarEscolhasTalento(char, nome, escolhas = {}) {
     }
   }
 
-  // Habilidoso: 3 perícias OU ferramentas, em qualquer combinação, distintas.
+  // Habilidoso: 3 perícias OU ferramentas, em qualquer combinação, distintas
+  // e ainda não possuídas. Proficiência repetida não concede nada nesta
+  // edição — só Especialização dobra, e ela vem de talento que a concede
+  // explicitamente (Analítico/Mente Aguçada, que dizem isso no texto).
+  // Mesma checagem de "já possui" que 'Especialista em Perícia' faz acima.
   if (nome === 'Habilidoso') {
     const selecoes = escolhas.selecoes || [];
     const validas = [...PERICIAS_TODAS, ...FERRAMENTAS_TODAS];
@@ -301,23 +305,33 @@ export function validarEscolhasTalento(char, nome, escolhas = {}) {
         selecoes.some(item => !validas.includes(item))) {
       return resultadoInvalido('Escolha 3 perícias ou ferramentas distintas e válidas para Habilidoso.');
     }
+    const jaPossuidas = [...(char.pericias_proficientes || []), ...(char.proficiencias_ferramentas || [])];
+    if (selecoes.some(item => jaPossuidas.includes(item))) {
+      return resultadoInvalido('Escolha perícias ou ferramentas em que ainda não tenha proficiência para Habilidoso.');
+    }
   }
 
-  // Artifista: 3 Ferramentas de Artesão distintas.
+  // Artifista: 3 Ferramentas de Artesão distintas e ainda não possuídas.
   if (nome === 'Artifista') {
     const selecoes = escolhas.selecoes || [];
     if (selecoes.length !== 3 || new Set(selecoes).size !== 3 ||
         selecoes.some(item => !FERRAMENTAS_ARTESAO.includes(item))) {
       return resultadoInvalido('Escolha 3 Ferramentas de Artesão distintas para Artifista.');
     }
+    if (selecoes.some(item => (char.proficiencias_ferramentas || []).includes(item))) {
+      return resultadoInvalido('Escolha Ferramentas de Artesão em que ainda não tenha proficiência para Artifista.');
+    }
   }
 
-  // Músico: 3 Instrumentos Musicais distintos.
+  // Músico: 3 Instrumentos Musicais distintos e ainda não possuídos.
   if (nome === 'Músico') {
     const selecoes = escolhas.selecoes || [];
     if (selecoes.length !== 3 || new Set(selecoes).size !== 3 ||
         selecoes.some(item => !INSTRUMENTOS_MUSICAIS.includes(item))) {
       return resultadoInvalido('Escolha 3 Instrumentos Musicais distintos para Músico.');
+    }
+    if (selecoes.some(item => (char.proficiencias_instrumentos || []).includes(item))) {
+      return resultadoInvalido('Escolha Instrumentos Musicais em que ainda não tenha proficiência para Músico.');
     }
   }
 
