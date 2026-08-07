@@ -528,6 +528,147 @@ Antes de dar o domínio por pronto:
 
 ---
 
+## A lição do domínio Classes/Níveis: rastrear a consequência no código antes de registrar a lacuna (2026-08-07)
+
+**O que aconteceu.** As duas vezes em que este domínio quase produziu uma
+alegação errada, o que salvou foi a mesma disciplina, aplicada em dois pontos
+diferentes do projeto -- com desfechos opostos, mas pela mesma causa. Na
+Task 5, a primeira redação do achado do Ladino (proficiência de armas
+incompleta, `site/js/dados-classes.js:105`) concluiu "consequência real
+hoje: nenhuma" -- baseada em não ter achado, de memória, uma função
+`temProficienciaComArma` óbvia. Isso violava a própria exigência da tarefa
+("a consequência funcional REAL -- medida no código, não suposta"): supor a
+ausência de um consumidor em vez de procurar por ele. Um `grep` por `.armas`
+em `site/js/` inteiro -- pelo CAMPO usado, não pelo nome de função
+hipotético que não existia -- achou dois consumidores reais
+(`temProficienciaArma` em `passo-equipamento.js`, `sheetTemProfArma` em
+`condicoes.js`), e rastreá-los até `site/js/sheet/inventario.js:163-164`
+revelou o achado forte da rodada: a Besta de Mão, com o bônus de ataque
+exibido na ficha subestimado pelo bônus de proficiência inteiro para um
+Ladino -- não um "falta Leve" genérico e sem efeito, que teria sido a
+conclusão se a primeira redação tivesse ficado. Na Task 6, o motor de
+gatilhos deu **13 falhas** na primeira rodada do laço de `GATILHOS`;
+rastrear cada uma até o consumidor real do app, antes de classificar
+qualquer uma como lacuna, mostrou que eram só **duas asserções mal
+formuladas** (medindo arquitetura em vez de comportamento -- o erro nº 1
+deste guia, o mesmo que gerou 31 lacunas falsas na rodada de Talentos). As
+13 voltaram a zero corrigindo o teste, sem tocar `site/js/` -- nenhuma delas
+virou entrada em `lacunas-conhecidas.mjs`.
+
+**Por que é útil saber.** As duas situações pareciam, à primeira vista, ter
+desfechos opostos -- uma virou lacuna real e específica (Ladino), a outra
+não virou lacuna nenhuma (gatilhos) -- mas o passo que decidiu os dois foi o
+mesmo: seguir o dado (ou a falha) até o código de produção que o consome ou
+que a causa, antes de escrever qualquer alegação sobre o app. Pular esse
+passo carrega o mesmo risco nos dois sentidos, não só no de registrar
+lacuna demais: concluir "sem consequência" por não lembrar de um consumidor
+de cabeça (quase o desfecho da Task 5) é o mesmo erro de raciocínio que
+registrar 13 lacunas por não perceber que a falha era do teste, não do app
+(o que quase aconteceu na Task 6) -- os dois pulam a mesma verificação, só
+erram para lados opostos.
+
+**Como aplicar.** Antes de escrever "consequência: nenhuma" ou
+"consequência: X" no motivo de uma lacuna, faça `grep` pelo CAMPO ou pela
+FUNÇÃO envolvida em `site/js/` **inteiro** -- não confie em lembrar os
+consumidores de cabeça, e não pare no primeiro achado (a Task 5 achou dois,
+não um). Antes de registrar qualquer falha como lacuna, pergunte se ela
+sobreviveria a essa mesma busca: se rastrear até o código real muda a
+conclusão -- de "bug do app" para "asserção mal formulada", ou de "sem
+efeito" para "efeito medido e numérico" --, foi a busca que valeu a tarefa,
+não a primeira leitura.
+
+---
+
+## A lição do incremento Ladino nv6: confrontar o mecanismo não cobre o mecanismo que falta (2026-08-07)
+
+**O que aconteceu.** O domínio Classes/Níveis foi dado por pronto com o
+motor de gatilhos (`classes.test.mjs`) em 427/427 -- e mesmo assim deixou
+passar um bug real, achado depois por um humano usando o app: o Ladino
+ganha Especialização em 2 perícias no nível 1 (`Classes.md:4183`) e em
+mais 2 no nível 6 (`Classes.md:4188`, prosa em `:4216`), e o app só
+implementa a metade do nível 1 (`site/js/creator/wizard.js:466-473`, no
+fluxo de criação) -- o nível 6 não tem NENHUM mecanismo em lugar nenhum
+de `site/js/`: `levelup.js` tem `exigeEspecializacaoBardo` e
+`exigeEspecializacaoGuardiao`, e nada equivalente para Ladino. O motor de
+gatilhos não pegou porque não tinha como: ele testa, PARA CADA FUNÇÃO,
+"ela dispara só onde deveria?" -- e a regex de
+`especializacaoGuardiao` (`/^Especialista$/`, sem saber de classe) CASA
+com a célula do Ladino nível 6, só que o gatilho correspondente no laço
+de `GATILHOS` tem `apenas: ['Guardião']`, então o ESPERADO para o Ladino
+vira `false`. A função também devolve `false` (porque ela só olha para
+`classe === 'Guardião'`). Os dois lados concordam, a asserção
+`exigeEspecializacaoGuardiao('Ladino', 6) === false` é logicamente
+CORRETA, e o teste passa verde sobre uma característica que nenhuma
+função do app reconhece. A suíte inteira podia estar 427/427 e essa
+lacuna continuava lá -- não porque uma asserção estivesse errada, mas
+porque a pergunta "existe alguma função para este rótulo, em qualquer
+classe?" nunca tinha sido feita: cada teste do laço só pergunta pela SUA
+própria função, uma de cada vez, com escopo já restrito por `apenas`.
+
+**Por que é útil saber.** Isto é uma variação mais sutil da lição do
+"motor de escolha morta" (acima, 2026-08-07): lá, a pergunta que faltava
+não tinha frase do livro para citar. Aqui a pergunta TEM frase do
+livro -- a tabela imprime "Especialista" na célula certa -- mas não tem
+NENHUM teste que a confronte, porque toda asserção do domínio parte de
+uma função do app já escrita e pergunta se ela está certa. Uma função
+que nunca foi escrita não aparece em nenhum laço "para cada função",
+pelo motivo mais simples possível: não existe para o laço iterar sobre
+ela. `apenas` não é o vilão -- ele é necessário para a asserção original
+fazer sentido (sem ele, `exigeEspecializacaoGuardiao('Bardo', 9)`
+precisaria ser `true`, o que é falso) -- mas ele tem o efeito colateral
+de fazer "nenhuma função cobre esta classe" e "a função certa está
+ausente" produzirem o MESMO resultado observável (`false === false`).
+Medir "cada mecanismo existente dispara no lugar certo" (a forma de
+todos os motores deste domínio até aqui) não é a mesma pergunta que
+"todo lugar que precisa de um mecanismo tem um" -- e só a segunda pega
+uma característica que o app esqueceu INTEIRA.
+
+**Como aplicar.** Todo motor que testa "uma lista de mecanismos, cada um
+restrito ao seu escopo declarado" (`apenas`, `só para X`, um `switch`
+com `default` mudo, um mapa que devolve `undefined` fora dele) precisa
+de um SEGUNDO teste que ignore essa restrição e pergunte, célula por
+célula ou entidade por entidade: "o livro pede algo aqui, e o mecanismo
+DO PRÓPRIO RÓTULO responde?". A revisão independente deste incremento
+(2026-08-07) pegou dois jeitos de essa segunda pergunta sair errada
+mesmo depois de escrita, e os dois valem registrar:
+
+- **Errado perguntar por CÉLULA em vez de por RÓTULO.** A primeira versão
+  perguntava "alguma das N funções dispara NESTE NÍVEL?", sem exigir que
+  fosse a função do PRÓPRIO rótulo -- uma célula com dois rótulos de
+  escolha deixava um mecanismo presente encobrir um ausente (prova: uma
+  célula com "Estilo de Luta" + "Explorador Hábil" no mesmo nível
+  continuava verde com "Explorador Hábil" fingindo não ter tratamento
+  nenhum, porque a OUTRA função disparava no mesmo nível). A pergunta
+  certa é por rótulo: para cada rótulo da célula, alguma função CUJO
+  PRÓPRIO REGEX CASOU com ele dispara?
+- **Barato não é de graça.** Reusar os rótulos curados (aqui,
+  `ROTULOS_GATILHO`) e a lista de funções (aqui, `GATILHOS`) já
+  existentes é o que torna este teste converso barato de escrever -- mas
+  é exatamente esse reuso que fixa o ALCANCE do teste no que os
+  mecanismos já escritos reconhecem, não no que o livro pede. Medido
+  neste incremento: dos 138 rótulos distintos do catálogo de
+  classes/níveis, só 19 casam com algum `ROTULOS_GATILHO` -- os outros
+  119 (uma escolha de arma, um idioma à escolha, etc.) ficam fora do
+  teste converso mesmo que exijam decisão do jogador e o app não tenha
+  mecanismo nenhum para eles. O Ladino nv6 só foi pego porque a regex
+  responsável (`/^Especialista$/`) por acaso não sabe de classe; um
+  rótulo esquecido com regex própria continuaria invisível. Fechar essa
+  cobertura exigiria uma lista de rótulos curada a partir do LIVRO (uma
+  varredura de toda a coluna "Características", perguntando "isto exige
+  escolha?" célula por célula), não derivada das funções que o app já
+  tem -- é mais trabalho, e é preciso dizer isso em voz alta em vez de
+  vender o teste barato como se cobrisse tudo.
+
+O sinal de que o teste converso falta: se toda asserção do domínio é
+escrita como `fn(x) === esperado(x)` para uma função já conhecida, nada
+no arquivo pergunta "existe uma `fn` para isto?" quando a resposta é
+não. O sinal de que o teste converso existe mas está incompleto: se ele
+foi escrito perguntando "algo dispara neste nível?" em vez de "a função
+deste rótulo dispara?", ou se a lista de rótulos que ele confere veio
+das funções do app em vez de uma leitura do livro.
+
+---
+
 ## O que fazer quando o app e o livro discordam
 
 Nem toda divergência é bug do app, e a distinção muda o que se escreve:

@@ -27,6 +27,26 @@ export const TESTES_VALIDOS = [
   // que representa "a mesma ferramenta escolhida" não é resolvido para a
   // escolha real do jogador nos 5 antecedentes por categoria.
   'antecedentes-e2e-ferramenta-proficiencia', 'antecedentes-e2e-pacote-mesma-ferramenta',
+  // Domínio Classes/Níveis (testes/regras/unidade/classes.test.mjs).
+  // 'classes-tabela' cobre o confronto do catálogo contra
+  // dados/classes/*.json; 'classes-info' é a SEGUNDA fonte de verdade
+  // (site/js/dados-classes.js). Uma chave só entra nesta lista quando
+  // já existe pelo menos um `comLacuna(`/`lacuna(` que a usa em
+  // testes/regras/ ou testes/e2e/regras/ -- ver o teste "toda chave de
+  // TESTES_VALIDOS tem consumidor" em completude.test.mjs, que rejeita
+  // qualquer chave declarada aqui sem call site (achado I2 da revisão
+  // final: 'classes-gatilho', 'classes-progressao' e 'classes-sanidade'
+  // foram declaradas mas nunca referenciadas por nenhum comLacuna/lacuna
+  // -- três chaves capazes de hospedar uma lacuna inventada e
+  // indetectável, removidas nesta correção).
+  'classes-tabela', 'classes-info',
+  // Incremento de 2026-08-07 (Ladino nv6 "Especialista"): 'classes-gatilho-ausente'
+  // é o TESTE CONVERSO em classes.test.mjs -- diferente de 'classes-tabela'/
+  // 'classes-info' (que confrontam dado transcrito), este confronta se ALGUMA
+  // das oito funções de gatilho de levelup.js dispara para uma célula que o
+  // livro marca como exigindo escolha, sem a restrição `apenas` que escondia
+  // o caso do Ladino no laço original de GATILHOS.
+  'classes-gatilho-ausente',
 ];
 
 // Achado I4: o README chama esta lista de "o backlog real de correções do
@@ -201,6 +221,155 @@ export const LACUNAS = [
   // substitui pelo valor em personagem.escolhas_antecedente[campo] do
   // antecedente de origem, ao lado do tratamento já existente de "à sua
   // escolha".
+
+  // ---------- Domínio Classes/Níveis (2026-08-07) ----------
+  //
+  // Duas causas-raiz, não três lacunas independentes -- ver
+  // task-4-report.md, task-5-report.md e task-10-report.md
+  // (.superpowers/sdd/2026-08-07-regras-classes-niveis/) para a
+  // investigação completa. As entradas abaixo cobrem os 3 testes
+  // vermelhos do motor estrutural (classes.test.mjs): a mesma entrada de
+  // Clérigo é referenciada por DOIS pontos de comLacuna() -- o teste que
+  // lê a célula bruta de dados/classes/clerigo.json ("tabela: Clérigo
+  // nível 3") e o que passa pela função de produção que lê a mesma
+  // célula ("obterCaracteristicasNivel × livro: Clérigo") -- porque é o
+  // mesmo dado ruim visto por duas rotas, não um segundo defeito.
+
+  // Causa 1 -- Clérigo nível 3: a célula da TABELA diverge da forma que
+  // dados/classes/clerigo.json grava, sem consequência funcional (a
+  // string só é exibida, nunca comparada).
+  { talento: 'Clérigo', teste: 'classes-tabela',
+    tipo: 'app-diverge-do-livro',
+    motivo: 'A célula da tabela do livro (Classes.md:1515, coluna "Características" ' +
+      'da linha do nível 3 da tabela "Características de Clérigo") traz "Subclasse ' +
+      'Clérigo", sem "de". dados/classes/clerigo.json grava "Subclasse de Clérigo" ' +
+      '(com "de") na mesma célula (tabela_caracteristicas[nível 3][\'Características\']) ' +
+      'e no campo estruturado irmão caracteristicas[].nome do mesmo nível -- essa forma ' +
+      'não foi inventada pelo app: é o texto exato do heading de prosa que abre a ' +
+      'descrição da característica, Classes.md:1584 ("### Nível 3: Subclasse de ' +
+      'Clérigo"), só que não é a forma da CÉLULA DA TABELA. É isolado ao Clérigo: ' +
+      'Bárbaro e Ladino têm o mesmo padrão textual "Subclasse X" sem "de" na tabela do ' +
+      'nível 3, e dados/ reproduz sem "de" corretamente nos dois. Observado por duas ' +
+      'rotas de código: leitura direta da célula (dados/classes/clerigo.json) e ' +
+      'obterCaracteristicasNivel (site/js/levelup.js:381-394, que lê ' +
+      'row[\'Características de Classe\'] ?? row[\'Características\'] e faz ' +
+      'split(\',\')) -- as duas leem o mesmo dado ruim, não são dois defeitos. ' +
+      'Consequência real, medida no código (não suposta): nenhuma. O único consumidor ' +
+      'de obterCaracteristicasNivel (site/js/levelup-flow.js:58 -> ' +
+      'levelup-cards.js:51) só renderiza a lista recebida como ' +
+      '`caracteristicas.map(c => `<li>${c}</li>`)` -- nunca compara nenhum elemento ' +
+      'contra um literal. exigeSubclasse (site/js/levelup.js:421-439), que decide se a ' +
+      'escolha de subclasse é obrigatória, usa uma tabela fixa {\'Clérigo\': 3, ...} ' +
+      'indexada por nome de classe e nível, sem ler caracteristicas/ ' +
+      'tabela_caracteristicas -- a divergência de texto não afeta essa decisão. O ' +
+      'campo estruturado irmão (classeData.caracteristicas[].nome, consumido por ' +
+      'site/js/sheet/caracteristicas.js:11,61, site/js/sheet/impressao.js:461, ' +
+      'site/js/sheet/hp-descanso.js:338,346 e site/js/creator/passo-classe.js:157) só ' +
+      'filtra por nivel e exibe nome/descricao -- nenhum desses locais compara nome ' +
+      'contra um literal como \'Subclasse Clérigo\'; a busca por comparação literal de ' +
+      'nome de característica em todo site/js/ não achou nenhuma. Efeito real, único: ' +
+      'o card de level-up e a ficha/impressão do Clérigo no nível 3 exibem "Subclasse ' +
+      'de Clérigo" em vez de "Subclasse Clérigo" -- diferença de exibição de uma ' +
+      'palavra, sem efeito em nenhuma decisão do app.' },
+
+  // Causa 2 -- Ladino, proficiência com Armas Marciais incompleta: falta
+  // "Leve" ao lado de "Acuidade", com consequência funcional real e
+  // medida (a única das duas causas com efeito no bônus de ataque).
+  { talento: 'Ladino', teste: 'classes-info',
+    tipo: 'app-diverge-do-livro',
+    motivo: 'O livro (Classes.md:4152, tabela "Proficiências com Armas" do Ladino) ' +
+      'concede proficiência com "Armas Simples e Armas Marciais que tem a propriedade ' +
+      'Acuidade ou Leve" -- as duas propriedades, ligadas por "ou". ' +
+      'site/js/dados-classes.js:105 codifica armas: [\'Simples\', \'Marcial ' +
+      '(Acuidade)\'] -- só Acuidade; falta Leve. O campo TEM consumidores ativos que ' +
+      'resolvem a string contra a propriedade de uma arma específica, não é só dado de ' +
+      'referência exibido: site/js/creator/passo-equipamento.js:19-43 ' +
+      '(temProficienciaArma) e site/js/sheet/condicoes.js:17-30 (sheetTemProfArma) ' +
+      'fazem, ambos, `info.armas.some(a => a.includes(\'Leve\'))` -- falso para o ' +
+      'Ladino, porque nenhuma entrada de [\'Simples\', \'Marcial (Acuidade)\'] contém a ' +
+      'substring "Leve". Consequência real, medida com uma arma de verdade do jogo: a ' +
+      'Besta de Mão (dados/equipamento/armas.json, "Marcial à Distância", propriedade ' +
+      'leve, sem acuidade) é a ÚNICA arma Marcial do catálogo com Leve e sem Acuidade ' +
+      '(Cimitarra e Espada Curta têm as duas propriedades; as demais armas Leves são ' +
+      'Simples) -- um Ladino equipado com Besta de Mão é rotulado "Sem Prof" tanto na ' +
+      'ficha (site/js/sheet/inventario.js:123,1067) quanto no assistente de criação ' +
+      '(site/js/creator/passo-equipamento.js:535-536,715-729), e o bônus de ataque ' +
+      'exibido na ficha (site/js/sheet/inventario.js:163-164: `bonusAtq = modAtq + ' +
+      '(temProf ? prof : 0)`) omite o bônus de proficiência inteiro (+2 a +6 conforme o ' +
+      'nível), apesar de Classes.md:4152 conceder essa proficiência explicitamente. O ' +
+      'Monge, com a mesma FORMA de restrição mas exigindo só "Leve" no livro ' +
+      '(Classes.md:5107), bate: dados-classes.js:128 codifica armas: [\'Simples\', ' +
+      '\'Marcial (Leve)\'] exatamente a única propriedade que o livro pede -- a ' +
+      'divergência é de CONTEÚDO, isolada ao Ladino, não um erro sistemático do ' +
+      'formato "categoria (propriedade)".' },
+
+  // ---------- Incremento de 2026-08-07: bug achado à mão por um humano ----------
+  //
+  // Ladino nível 6 "Especialista" (Classes.md:4188, célula da tabela
+  // "Características de Ladino") nunca vira pendência de subida de nível --
+  // o app esqueceu a característica INTEIRA, não implementou errado. Achado
+  // fora desta suíte, usando o app: um Ladino subindo do nível 1 ao 20 termina
+  // com pericias_expertise vazio. A suíte não pegou sozinha porque o motor de
+  // gatilhos (classes.test.mjs, laço de GATILHOS) testa cada função na forma
+  // "ela dispara só onde deveria?", e para exigeEspecializacaoGuardiao(classe,
+  // nivel) o `apenas: ['Guardião']` do laço faz o ESPERADO virar `false` para
+  // o Ladino -- a função também devolve `false`, os dois lados concordam, e o
+  // teste passa verde sobre uma característica que não tem NENHUM mecanismo.
+  // O 'classes-gatilho-ausente' (teste converso, mesmo arquivo) fecha esse
+  // buraco: para toda célula em que o livro imprime um rótulo de escolha
+  // (via os mesmos ROTULOS_GATILHO, sem `apenas`), exige que ALGUMA das oito
+  // funções dispare -- e é o único caso que falha.
+  { talento: 'Ladino', teste: 'classes-gatilho-ausente',
+    tipo: 'app-diverge-do-livro',
+    motivo: 'O livro concede Especialização (dobra o bônus de proficiência) em 2 ' +
+      'perícias no nível 1 de Ladino (Classes.md:4183, célula da tabela ' +
+      '"Características de Ladino"; prosa em Classes.md:4212-4214, "### Nível 1: ' +
+      'Especialista") e em MAIS 2 perícias no nível 6 (Classes.md:4188, mesma ' +
+      'tabela, célula "Especialista"; prosa em Classes.md:4216, "No nível 6 de ' +
+      'Ladino, você obtém Especialização em mais duas perícias nas quais já seja ' +
+      'proficiente à sua escolha"). O app implementa só a metade do nível 1: ' +
+      'CLASSES_ESCOLHAS.Ladino.especialista (site/js/creator/comum.js:354-360) é ' +
+      'renderizado no assistente de criação (site/js/creator/passo-classe.js:93-114) ' +
+      'e consolidado em personagem.pericias_expertise por ' +
+      'site/js/creator/wizard.js:466-473 -- essa parte funciona. O app NÃO implementa ' +
+      'o nível 6 em lugar nenhum: site/js/levelup.js tem exigeEspecializacaoBardo ' +
+      '(:444-446, Bardo níveis 2 e 9) e exigeEspecializacaoGuardiao (:451-453, ' +
+      'Guardião nível 9), mas nenhuma exigeEspecializacaoLadino nem qualquer outro ' +
+      'ramo que cite "Ladino" perto de Especialização/Especialista -- grep por ' +
+      '"Ladino" em levelup.js, levelup-validations.js, levelup-ui.js, ' +
+      'levelup-cards.js e levelup-flow.js não encontrou nenhuma ocorrência ligada a ' +
+      'essa característica (as únicas 4 ocorrências de "Ladino" nesses arquivos são ' +
+      'a lista de classes válidas, o ramo de Trapaceiro Arcano, a tabela de ASI e a ' +
+      'tabela de nível de subclasse -- levelup.js:67,94,409,432). ' +
+      'Confirmado dinamicamente chamando subirDeNivel(personagem, {}) direto (sem ' +
+      'passar nenhuma opção de escolha), COM PRECONDIÇÃO: personagem.nivel = 5 e ' +
+      'personagem.xp = levelup.XP_POR_NIVEL[6] (14000) -- sem XP suficiente a chamada ' +
+      'devolve {sucesso:false, erro:"XP insuficiente..."} antes mesmo de chegar perto ' +
+      'da característica, o que não reproduz nada sobre Especialização; quem for ' +
+      'reproduzir precisa dar XP ao personagem primeiro. Com a precondição, do nível 5 ' +
+      'para o 6 de um Ladino, o app devolve sucesso:true de primeira -- "caracteristicas":["Especialista"] aparece ' +
+      'no resultado (a lista que o card de level-up exibe), mas nenhum campo de ' +
+      'pendência (não pede resultado.pendente/tipo_pendencia, como pede para ' +
+      'expertise_bardo_aplicada/expertise_guardiao_aplicada em Bardo/Guardião) -- e ' +
+      'personagem.pericias_expertise continua [] depois da subida. Um Ladino subindo ' +
+      'de 1 a 20 (escadaDeNivel, harness.mjs) termina com pericias_expertise contendo ' +
+      'só as 2 perícias do nível 1 -- nunca ganha as 2 do nível 6. Consequência funcional, ' +
+      'medida no código que lê o campo (não suposta): calcBonusPericia ' +
+      '(site/js/utils.js:293-308) soma bonusProficiencia(nivel) DUAS VEZES quando a ' +
+      'perícia está em pericias_expertise (uma pela proficiência, outra pela ' +
+      'Especialização) -- para as 2 perícias que o Ladino deveria escolher no nível ' +
+      '6 e nunca chega a escolher, o bônus exibido na ficha fica subestimado em ' +
+      'exatamente bonusProficiencia(nivel) (+3 a partir do nível 5, subindo até +6 no ' +
+      'nível 17+, conforme EVOLUCAO_PERSONAGEM). O efeito é menor do que "a ' +
+      'característica não existe": as escolhas do nível 1 continuam corretas, e o ' +
+      'campo pericias_expertise em si funciona (é lido por levelup-cards.js:217, ' +
+      '244, 311, 352; levelup-ui.js:595, 608, 620, 633; site/js/sheet/edicao.js:132, ' +
+      '252; site/js/sheet/ficha.js:727; site/js/sheet/impressao.js:347; ' +
+      'site/js/sheet/pdf.js:91 -- todos consomem o campo normalmente, sem ramo ' +
+      'quebrado) -- só nunca recebe as 2 entradas que o nível 6 do Ladino deveria ' +
+      'adicionar. Nenhuma perda de proficiência simples (diferente do achado do ' +
+      'Ladino em \'classes-info\', acima): as 2 perícias continuam com bônus de ' +
+      'proficiência normal, só sem o dobro que a Especialização concederia.' },
 ];
 
 // Busca a lacuna registrada para um par (talento, teste), se houver.
