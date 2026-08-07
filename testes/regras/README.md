@@ -1,8 +1,9 @@
 # Testes de regras de negócio
 
 Confrontam este app com o **livro** (D&D 5.5, `Informacoes Separadas/`),
-executando as regras reais de talentos contra o que a ficha e o assistente de
-criação/subida de nível realmente fazem.
+executando as regras reais — talentos, antecedentes e as fórmulas transversais
+da ficha — contra o que a ficha e o assistente de criação/subida de nível
+realmente fazem.
 
 A pergunta que esta suíte responde não é "a tela é a mesma do original" — essa
 é a paridade, em `testes/e2e/`. É **"o app obedece ao livro?"**. As duas
@@ -12,10 +13,32 @@ dois lados entre si. É esta suíte que confronta cada lado com a regra escrita
 e pega esse erro.
 
 > **Vai começar um domínio novo?** Leia antes o
-> [GUIA-PROXIMOS-DOMINIOS.md](GUIA-PROXIMOS-DOMINIOS.md). Ele registra os sete
-> erros que a rodada de talentos cometeu — incluindo 31 lacunas falsas e um bug
-> que só apareceu no quarto caminho de aquisição — e traz o checklist de
-> pré-voo. Quase nenhum deles é óbvio no momento em que se comete.
+> [GUIA-PROXIMOS-DOMINIOS.md](GUIA-PROXIMOS-DOMINIOS.md). Ele registra os erros
+> que as rodadas anteriores cometeram — entre eles 31 lacunas falsas, um bug
+> que só apareceu no quarto caminho de aquisição e duas fórmulas dadas como
+> ausentes do livro que existiam — e traz o checklist de pré-voo. Quase nenhum
+> deles é óbvio no momento em que se comete.
+
+## A paridade não é mais restrição
+
+Isto muda como você trabalha, então está aqui e não numa nota de rodapé.
+
+A suíte de paridade (`testes/e2e/`, 329 testes) compara este repositório com o
+original `D-D_2024` e existiu para guardar a refatoração: qualquer diferença
+era regressão, por definição. **Esse papel acabou.** O DeD_2024 vai substituir
+o D-D_2024, então comparar o projeto de correções com o original deixou de
+fazer sentido como restrição.
+
+Na prática, ao corrigir um bug que esta suíte encontrar:
+
+- **Falha de paridade não bloqueia a correção.** Corrigir um bug faz os dois
+  lados divergirem — é o resultado esperado, não um problema a evitar.
+- **Ainda vale medir antes e depois**, e escrever o resultado. Nas três rodadas
+  de correção até aqui a paridade ficou idêntica (328 passando, 1 pulado), o
+  que não significa "não houve regressão": significa que ela não exercita os
+  caminhos alterados. Quem cobre esse território é esta suíte.
+- **Ninguém apagou nem reescreveu a paridade**, e isso é decisão em aberto. Ela
+  ainda pega regressão de renderização em tudo que a correção não tocou.
 
 ## Fonte da verdade
 
