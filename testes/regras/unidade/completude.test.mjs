@@ -5,6 +5,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { CATALOGO_TALENTOS, TIPOS_ESCOLHA } from '../catalogo/talentos.mjs';
+import { CATALOGO_ANTECEDENTES } from '../catalogo/antecedentes.mjs';
 import { LACUNAS, TESTES_VALIDOS, TIPOS_LACUNA } from '../lacunas-conhecidas.mjs';
 import { EXCECOES_ESCOLHA_REPETIDA } from '../excecoes-escolha-repetida.mjs';
 import { lerTalentosDados, lerTitulosLivro } from './harness.mjs';
@@ -13,6 +14,14 @@ const dados = lerTalentosDados();
 const titulos = lerTitulosLivro();
 const nomesDados = new Set(dados.map((t) => t.nome));
 const nomesCatalogo = new Set(Object.keys(CATALOGO_TALENTOS));
+// A bijeção/schema/citação do catálogo de antecedentes contra dados/ e
+// Antecedente.md tem motor próprio (unidade/antecedentes.test.mjs) --
+// a razão de não duplicar aqui está no relatório da Tarefa 2
+// (.superpowers/sdd/antecedentes/tarefa-2-report.md). O que É
+// compartilhado com talentos é a higiene de LACUNAS logo abaixo: o
+// campo `talento` de uma entrada é só um identificador genérico, e
+// pode nomear um antecedente tanto quanto um talento.
+const nomesAntecedentes = new Set(Object.keys(CATALOGO_ANTECEDENTES));
 const ATRIBUTOS_VALIDOS = ['forca', 'destreza', 'constituicao', 'inteligencia', 'sabedoria', 'carisma'];
 
 test('todo talento de dados/ tem entrada no catálogo', () => {
@@ -73,7 +82,12 @@ for (const [nome, e] of Object.entries(CATALOGO_TALENTOS)) {
 
 test('lacunas conhecidas: todas com talento real, teste válido, motivo e tipo escritos', () => {
   for (const l of LACUNAS) {
-    assert.ok(nomesCatalogo.has(l.talento), `lacuna de talento inexistente: ${l.talento}`);
+    // `talento` é o identificador genérico da entidade sob teste -- pode
+    // ser um nome de talento (talentos.mjs) ou, desde o domínio
+    // Antecedentes, um nome de antecedente (antecedentes.mjs). Uma
+    // entrada só é rejeitada se não existir em NENHUM dos dois.
+    assert.ok(nomesCatalogo.has(l.talento) || nomesAntecedentes.has(l.talento),
+      `lacuna de entidade inexistente (nem talento nem antecedente): ${l.talento}`);
     assert.ok(TESTES_VALIDOS.includes(l.teste), `teste desconhecido: ${l.teste}`);
     assert.ok(l.motivo?.trim(), `lacuna sem motivo: ${l.talento}/${l.teste}`);
     // Achado I4: `tipo` distingue "o app diverge do livro" (o backlog real

@@ -78,6 +78,27 @@ export function lerTitulosLivro() {
   return new Set([...md.matchAll(/^###\s+(.+?)\s*$/gm)].map((m) => m[1]));
 }
 
+// Achata dados/origens/antecedentes.json na lista de 16 antecedentes que o
+// app realmente consome em runtime -- é este arquivo, não o livro, que o
+// motor de unidade de antecedentes confronta contra o catálogo curado.
+export function lerAntecedentesDados() {
+  const d = JSON.parse(readFileSync(resolve(RAIZ, 'dados/origens/antecedentes.json'), 'utf-8'));
+  return d.antecedentes;
+}
+
+// Títulos `## Nome` de Antecedente.md -- para conferir as citações do
+// catálogo de antecedentes. Nível de heading diferente de Talentos.md
+// (`###`) porque Antecedente.md usa `##` para cada seção de antecedente
+// (e também para "Antecedentes de Personagens"/"Espécies de Personagem",
+// que não são antecedentes -- o teste de citação só confere que toda
+// citação do catálogo aponta para um heading real, não que todo heading é
+// um antecedente).
+export function lerHeadingsAntecedente() {
+  const md = readFileSync(
+    resolve(RAIZ, 'Informacoes Separadas', 'Antecedente.md'), 'utf-8');
+  return new Set([...md.matchAll(/^##\s+(.+?)\s*$/gm)].map((m) => m[1]));
+}
+
 // Personagem mínimo dos testes de validação/passivos. Nível 4 (bônus
 // de proficiência +2) e duas perícias proficientes, porque algumas
 // validações exigem proficiência prévia (Dádiva da Proficiência em Perícia).

@@ -16,6 +16,17 @@
 export const TESTES_VALIDOS = [
   'escolhas', 'aumento-atributo', 'validacao', 'validacao-negativa', 'passivos',
   'e2e-levelup', 'e2e-criador', 'e2e-criador-versatil', 'e2e-repetivel', 'e2e-ficha',
+  // Domínio Antecedentes (testes/regras/unidade/antecedentes.test.mjs):
+  // as cinco partes do livro confrontadas contra dados/origens/antecedentes.json,
+  // mais a coerência cruzada com o catálogo de talentos.
+  'antecedentes-atributos', 'antecedentes-talento', 'antecedentes-pericias',
+  'antecedentes-ferramenta', 'antecedentes-equipamento', 'antecedentes-coerencia-talento',
+  // Domínio Antecedentes (testes/e2e/regras/antecedentes.spec.mjs): a
+  // ferramenta/instrumento concedido pelo antecedente nunca vira
+  // proficiência reconhecida (os 16), e o item do pacote de equipamento
+  // que representa "a mesma ferramenta escolhida" não é resolvido para a
+  // escolha real do jogador nos 5 antecedentes por categoria.
+  'antecedentes-e2e-ferramenta-proficiencia', 'antecedentes-e2e-pacote-mesma-ferramenta',
 ];
 
 // Achado I4: o README chama esta lista de "o backlog real de correções do
@@ -160,6 +171,36 @@ export const LACUNAS = [
   // mesmos ramos já usados pelo level-up) em vez de persistir direto.
   // Confirmado ao vivo por talentos-ficha.spec.mjs (teste 'e2e-ficha') para
   // os três. Sem lacuna remanescente nessa chave.
+
+  // ---------- Domínio Antecedentes: e2e do criador (Playwright) ----------
+  //
+  // As 21 lacunas encontradas por antecedentes.spec.mjs (16 em
+  // 'antecedentes-e2e-ferramenta-proficiencia' + 5 em
+  // 'antecedentes-e2e-pacote-mesma-ferramenta') foram corrigidas na rodada de
+  // 2026-08-07 -- ver docs/superpowers/plans/2026-08-07-regras-antecedentes.md
+  // e .superpowers/sdd/antecedentes/correcao-report.md para o desenho da
+  // correção e a evidência de execução.
+  //
+  // Achado (1) (16 entradas): a ferramenta/instrumento do antecedente nunca
+  // virava proficiência reconhecida. Corrigido em passo-antecedente.js --
+  // nova função _consolidarFerramentaAntecedente(), chamada na confirmação
+  // do popup do antecedente, grava a ferramenta específica (ant.ferramentas)
+  // ou a escolha por categoria (personagem.escolhas_antecedente[campo]) em
+  // proficiencias_ferramentas/.proficiencias_instrumentos. Roteamento por
+  // CAMPO conhecido (ANTECEDENTES_ESCOLHAS[...].campo), não por lista de
+  // valores -- checar contra INSTRUMENTOS_MUSICAIS/FERRAMENTAS_TODAS (como o
+  // bloco de escolhas_talento em wizard.js já faz) teria descartado em
+  // silêncio as opções de Kit de Jogos (Baralho, Conjunto de Dados, Xadrez de
+  // Dragão, Jogo de Três Dragões), que não pertencem a nenhuma das duas
+  // listas.
+  //
+  // Achado (2) (5 entradas): o item do pacote de equipamento "(a mesma/o
+  // mesmo que acima)" nunca era resolvido para a escolha real do jogador.
+  // Corrigido em passo-equipamento.js -- novo ramo em
+  // adicionarItensEquipamentoInicial() reconhece o marcador via regex e
+  // substitui pelo valor em personagem.escolhas_antecedente[campo] do
+  // antecedente de origem, ao lado do tratamento já existente de "à sua
+  // escolha".
 ];
 
 // Busca a lacuna registrada para um par (talento, teste), se houver.

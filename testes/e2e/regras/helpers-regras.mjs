@@ -137,6 +137,27 @@ export async function abrirFicha(context, campos, id = 'regras-teste-1') {
   return lado;
 }
 
+// ---------- Navegação compartilhada do domínio Antecedentes ----------
+
+/**
+ * Avança o wizard do passo 1 (classe) até os cards de antecedente
+ * aparecerem, escolhendo Guerreiro (classe simples, não-conjuradora, sem
+ * escolhas próprias que atrapalhem o driver genérico). Usado por
+ * antecedentes.spec.mjs -- lição 7 do guia: vive aqui, importado, em vez
+ * de copiado em cada spec (foi exatamente uma cópia divergente que causou
+ * um flake real neste projeto).
+ */
+export async function irAtePassoAntecedente(page) {
+  await page.click('[data-classe="Guerreiro"]');
+  await confirmarModal(page, 'popup-confirmar-classe').catch(() => {});
+  for (let i = 0; i < 8; i++) {
+    if (await page.locator('[data-antecedente]').count()) return true;
+    if (!await satisfazerPasso(page)) return false;
+    await assentar(page).catch(() => {});
+  }
+  return page.locator('[data-antecedente]').count() > 0;
+}
+
 // Lê o personagem salvo (o único) direto do store do app.
 export async function personagemSalvo(page) {
   return page.evaluate(async () => {

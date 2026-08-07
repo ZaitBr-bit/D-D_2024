@@ -81,8 +81,8 @@ D&D/
 │   ├── playwright.config.mjs
 │   └── regras/              # specs da suíte de regras (vivem aqui pelo node_modules)
 ├── testes/regras/           # suíte de regras de negócio — ver "Testes"
-│   ├── catalogo/            # os 75 talentos curados do livro, com citação
-│   ├── unidade/             # 5 motores em node:test, sem dependência
+│   ├── catalogo/            # 75 talentos + 16 antecedentes curados do livro, com citação
+│   ├── unidade/             # 6 motores em node:test, sem dependência
 │   ├── lacunas-conhecidas.mjs   # divergências app-vs-livro já encontradas
 │   └── GUIA-PROXIMOS-DOMINIOS.md  # ler antes de cobrir um domínio novo
 ├── scripts/                 # verificação da quebra dos monólitos
@@ -359,7 +359,7 @@ Três verificações independentes, que respondem perguntas diferentes:
 |---|---|---|
 | Extração dos monólitos | `python scripts/verificar_extracao.py tudo` | "os módulos ainda batem com o baseline?" — estático, sem navegador |
 | Paridade E2E | `cd testes/e2e && npm test` | "a tela é a mesma do repositório original?" — Playwright, 329 testes |
-| Regras de negócio | `cd testes/e2e && npm run test:regras` | "o app obedece ao **livro**?" — 399 de unidade (355 passam, 44 skip) + 72 de navegador |
+| Regras de negócio | `cd testes/e2e && npm run test:regras` | "o app obedece ao **livro**?" — 514 de unidade (470 passam, 44 skip) + 111 de navegador |
 
 As duas últimas são independentes de propósito: um erro de regra presente
 **nos dois** repositórios passa na paridade para sempre, porque paridade só
@@ -403,9 +403,10 @@ domínio novo deve ler antes o
 **[guia de próximos domínios](testes/regras/GUIA-PROXIMOS-DOMINIOS.md)**, que
 registra os erros da primeira rodada e traz um checklist de pré-voo.
 
-- Fonte da verdade: `catalogo/talentos.mjs`, com os 75 talentos curados à mão do
-  livro, cada entrada citando sua seção. Um teste garante cobertura de 100% do
-  que existe em `dados/` — sem amostragem.
+- Fonte da verdade: `catalogo/talentos.mjs` (75 talentos) e
+  `catalogo/antecedentes.mjs` (16 antecedentes), curados à mão do livro, cada
+  entrada citando sua seção. Um teste garante cobertura de 100% do que existe
+  em `dados/` — sem amostragem.
 - Camada de unidade em `node:test` (sem dependência nova) e camada de navegador
   em `testes/e2e/regras/`, que reaproveita o `node_modules` da paridade.
 - `lacunas-conhecidas.mjs` é o produto: as divergências app-vs-livro já

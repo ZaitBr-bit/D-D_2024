@@ -41,7 +41,7 @@ ver a seção sobre os specs Playwright abaixo):
 ```bash
 cd testes/e2e
 npm run test:regras            # as duas suítes de regras, em sequência
-npm run test:regras:unidade    # só os 5 motores de node:test
+npm run test:regras:unidade    # só os 6 motores de node:test
 npm run test:regras:e2e        # só os specs Playwright (regras/*.spec.mjs)
 ```
 
@@ -118,7 +118,7 @@ linha contra `Talentos.md` no relatório de desenho do motor
 
 ## O que cada motor prova — e o que não prova
 
-Cinco motores de `node:test` em `unidade/`, mais quatro specs Playwright em
+Seis motores de `node:test` em `unidade/`, mais cinco specs Playwright em
 `../e2e/regras/`. Cada um confronta uma fatia diferente do livro, e nenhum
 sozinho prova a regra inteira.
 
@@ -129,12 +129,14 @@ sozinho prova a regra inteira.
 | `validacao.test.mjs` | Um exemplo válido (curado do livro) é aceito; mutações inválidas (item removido, duplicata) são rejeitadas, quando aplicável | 64 |
 | `passivos.test.mjs` | Bônus numéricos e flags internas que `resolverPassivosTalentos()` deveria produzir | 62 |
 | `escolha-morta.test.mjs` | Uma escolha reoferecida depois de saturar o personagem (aplicar o efeito até não crescer mais) precisa ser recusada — nenhuma seção do livro proíbe isso com todas as letras, é o próprio estado do app confrontado contra si mesmo | 59 (15 rodam a asserção; **44 skip**, cada um com o motivo escrito no próprio `t.skip`) |
+| `antecedentes.test.mjs` | Catálogo dos 16 antecedentes × `dados/origens/antecedentes.json`: bijeção/schema/citação (19), os cinco campos do livro por antecedente (atributos, talento, perícias, ferramenta, equipamento — 80), e coerência cruzada com `catalogo/talentos.mjs` (o talento de origem existe e é `'de Origem'` — 16) | 115 |
 
-Total: **399 testes** em `unidade/` — **355 passam, 44 skip, 0 falham**. Os
+Total: **514 testes** em `unidade/` — **470 passam, 44 skip, 0 falham**. Os
 skips não somem dentro do total: são talentos cujo `aplicarEfeitoTalento` não
 faz nenhum campo de lista crescer (fora do escopo deste motor específico, não
 do livro), e cada um carrega o motivo por escrito — um skip silencioso, aqui,
-seria a mesma omissão que uma lacuna sem `motivo` já é proibida de ser.
+seria a mesma omissão que uma lacuna sem `motivo` já é proibida de ser. Nenhum
+skip novo veio do motor de antecedentes.
 
 ### O que `escolha-morta.test.mjs` cobre que os outros quatro não cobrem
 
@@ -167,8 +169,8 @@ enxerga ramos de renderização "hard-coded" por nome dentro de
 Elemental/Analítico/Mente Aguçada existe só como HTML gerado em runtime). A
 pergunta "o controle realmente aparece na tela, com as opções certas, e é
 exigido antes de concluir?" só o Playwright consegue responder — é o que os
-quatro specs de `../e2e/regras/` fazem, dirigindo o navegador de verdade
-contra este site (**72 testes**):
+quatro specs de talentos em `../e2e/regras/` fazem, dirigindo o navegador de
+verdade contra este site (**72 testes**):
 
 | Spec | O que confronta | Testes |
 |---|---|---|
@@ -176,6 +178,19 @@ contra este site (**72 testes**):
 | `talentos-criador.spec.mjs` | O mesmo confronto pelas outras duas vias de aquisição no assistente de criação: talento de origem do antecedente, e traço Versátil da espécie Humana | 5 |
 | `talentos-repetivel.spec.mjs` | Talento já adquirido reaparece na lista do level-up quando (e só quando) o livro o marca como repetível — casos derivados do catálogo (achado M8), não mais uma lista fixa | 5 |
 | `talentos-ficha.spec.mjs` | A **quarta** via de aquisição, descoberta na rodada de 2026-08-06: o botão "+ Talento" da ficha (fora do criador e do level-up), para Habilidoso/Artifista/Músico — é a via que reproduz o sintoma que abriu este projeto | 3 |
+
+Antecedentes tem uma via só de aquisição (ver "Achados desta rodada", mais
+abaixo, para o porquê), então um quinto spec cobre os 16 antecedentes do
+catálogo inteiros num único fluxo contínuo pelo assistente de criação
+(**39 testes**):
+
+| Spec | O que confronta | Testes |
+|---|---|---|
+| `antecedentes.spec.mjs` | As cinco partes do livro, para os 16 antecedentes, ao vivo no assistente: as duas perícias entram em `pericias_proficientes`, o talento de origem correto é concedido (incluindo a lista de magias de Iniciado em Magia), a distribuição de atributo (+2/+1 e +1/+1/+1) restringe aos três atributos do antecedente e persiste na forma escolhida, a ferramenta/instrumento do antecedente entra em `proficiencias_ferramentas`/`.proficiencias_instrumentos`, e a escolha entre pacote e 50 PO persiste (moedas e inventário, incluindo o item do pacote resolvido para a escolha real). Os 39 casos passam de verdade — as 21 lacunas que este spec registrou na rodada de 2026-08-05 foram corrigidas em 2026-08-07 (ver "Achados do domínio Antecedentes") | 39 |
+
+Total dos cinco specs: **111 testes**, todos verdes de verdade — nenhum cita
+`test.fail()` sobre uma lacuna hoje (ver a mecânica de `lacunas-conhecidas.mjs`,
+acima).
 
 `irAteEscolhaDeTalento` (a navegação até a tela de ASI/talento) e
 `sementeParaTalento` (a escolha de personagem-semente por pré-requisito do
@@ -217,11 +232,11 @@ aqui.
 ## Por que os specs Playwright vivem em `testes/e2e/regras/`
 
 `testes/regras/` guarda catálogo e motores de `node:test` — zero dependência
-de Node além do runtime. Mas os quatro specs que dirigem o navegador de
+de Node além do runtime. Mas os cinco specs que dirigem o navegador de
 verdade (`talentos-levelup.spec.mjs`, `talentos-criador.spec.mjs`,
-`talentos-repetivel.spec.mjs`, `talentos-ficha.spec.mjs`) precisam de
-`@playwright/test`, e a resolução desse pacote sobe a árvore de diretórios a
-partir do arquivo que o importa.
+`talentos-repetivel.spec.mjs`, `talentos-ficha.spec.mjs`,
+`antecedentes.spec.mjs`) precisam de `@playwright/test`, e a resolução desse
+pacote sobe a árvore de diretórios a partir do arquivo que o importa.
 `testes/e2e/` é o **único** `node_modules` do projeto (a aplicação em `site/`
 continua sem build e sem dependência nenhuma). Por isso os specs moram em
 `testes/e2e/regras/`, com config própria
@@ -392,13 +407,134 @@ nenhuma lacuna registrada: o sintoma que abriu o projeto está fechado nas
 quatro vias de aquisição, não só nas três que a investigação original tinha
 coberto.
 
+## Achados do domínio Antecedentes (encontrados e corrigidos em 2026-08-07)
+
+Diferente de talentos, aqui a rodada que relatou e a rodada que corrigiu
+aconteceram no mesmo dia. `antecedentes.spec.mjs` registrou **21 entradas**
+em `lacunas-conhecidas.mjs`, todas `tipo: 'app-diverge-do-livro'`, por
+**duas causas raiz** — e uma correção fechou as 21 no mesmo projeto
+(`.superpowers/sdd/antecedentes/correcao-report.md`), do jeito que o
+mecanismo de `lacunas-conhecidas.mjs` exige: o app passou a obedecer ao
+livro, não o teste foi afrouxado. Ler só o número "21" dá uma impressão
+errada tanto do tamanho do problema (2 causas, não 21 bugs independentes)
+quanto do desfecho:
+
+- **16 entradas** (`antecedentes-e2e-ferramenta-proficiencia`, uma por
+  antecedente): a ferramenta/instrumento que um antecedente concede nunca
+  virava uma proficiência gravada no personagem — nem a específica (ex.:
+  "Suprimentos de Calígrafo" do Acólito), nem a escolhida por categoria (ex.:
+  "Suprimentos de Alquimista" do Artesão). `passo-antecedente.js:111`
+  **exibia** o texto da ferramenta no popup do antecedente, mas não gravava
+  nada. A consolidação que preenche `personagem.proficiencias_ferramentas`/
+  `.proficiencias_instrumentos`, em `wizard.js:582-597`, lia **só**
+  `personagem.escolhas_talento` (as escolhas do talento Habilidoso/Artifista/
+  Músico). `personagem.escolhas_antecedente` era escrito em
+  `passo-antecedente.js:136` e não era lido em lugar nenhum de `site/js/`
+  (conferido por grep) para alimentar essas duas listas. **Corrigido**: nova
+  função exportada `_consolidarFerramentaAntecedente()` em
+  `passo-antecedente.js`, chamada na confirmação do popup do antecedente
+  (logo depois de `_reconstruirTalentosBase()`) — remove a contribuição do
+  antecedente anterior, se houver, e grava a ferramenta/instrumento atual (a
+  específica de `ant.ferramentas`, ou `personagem.escolhas_antecedente[campo]`
+  para os 5 de categoria) em `proficiencias_instrumentos` (Artista) ou
+  `proficiencias_ferramentas` (os outros 15). Rodar na confirmação do popup,
+  e não em `wizard.js:finalizar()` (onde vive o bloco irmão de
+  `escolhas_talento`), foi deliberado: o spec lê o personagem logo depois de
+  confirmar o antecedente, antes do assistente terminar. Uma primeira
+  tentativa espelhando o padrão de `finalizar()` foi implementada, testada —
+  as 16 continuaram falhando como esperado, porque o teste lê o personagem
+  antes de `finalizar()` rodar — e revertida; `wizard.js` termina a correção
+  sem alteração líquida (`git diff` vazio nesse arquivo).
+- **5 entradas** (`antecedentes-e2e-pacote-mesma-ferramenta`, para os
+  antecedentes cuja ferramenta é escolhida por categoria — Artesão, Artista,
+  Guarda, Nobre, Soldado): o item do pacote de equipamento que o livro
+  descreve como "a mesma ferramenta/o mesmo instrumento/kit que acima" nunca
+  era resolvido para a escolha real do jogador. `passo-equipamento.js`
+  resolvia o texto "à sua escolha" (usado pelo instrumento musical de
+  classe), mas não tratava "(a mesma/o mesmo que acima)" — o item caía no
+  ramo genérico e virava, literalmente, um item chamado "Ferramentas de
+  Artesão (a mesma que acima)" no inventário, em vez do nome da ferramenta
+  escolhida. **Corrigido**: novo ramo em `adicionarItensEquipamentoInicial()`
+  (`passo-equipamento.js`) reconhece o marcador via regex
+  (`/\((?:a mesma|o mesmo)\s+que\s+acima\)/i`) e substitui pelo valor em
+  `personagem.escolhas_antecedente[campo]` — o mesmo campo que a correção
+  acima já lê, sem uma segunda fonte de verdade para "qual foi a escolha do
+  jogador".
+
+As duas causas eram independentes uma da outra (a segunda não era
+consequência da primeira), mas atingiam a mesma parte do livro — a
+ferramenta do antecedente — por dois pontos de código diferentes.
+
+**A armadilha de desenho que a correção evitou.** Rotear a ferramenta/
+instrumento consolidada checando o valor escolhido contra
+`FERRAMENTAS_TODAS`/`INSTRUMENTOS_MUSICAIS` — o padrão que o bloco irmão de
+`escolhas_talento` já usa em `wizard.js` — teria reintroduzido o mesmo bug
+uma camada acima, em silêncio. `FERRAMENTAS_TODAS` (`comum.js:93-102`) não
+contém nenhuma das 4 opções de Kit de Jogos (Baralho, Conjunto de Dados,
+Xadrez de Dragão, Jogo de Três Dragões); `INSTRUMENTOS_MUSICAIS`
+(`comum.js:104-107`) não contém Corne, Flauta de Pã (com til) nem Harpa —
+três das dez opções que a tela do Artista realmente oferece. Checar contra
+qualquer uma das duas listas teria descartado essas escolhas sem aviso. A
+correção não compara o valor escolhido contra lista nenhuma: roteia pelo
+**campo** declarado em `ANTECEDENTES_ESCOLHAS[nome].campo`, que só tem três
+valores possíveis (`ferramenta_escolhida`, `instrumento_escolhido`,
+`jogos_escolhido`) — fixos no próprio catálogo de 5 entradas — então não há
+"valor que não bate com nenhuma lista" capaz de ser descartado.
+
+Vale registrar também: este era um bug presente **nos dois lados** — o app
+refatorado (este repositório) e o original — porque nenhum dos dois gravava
+a proficiência nem resolvia o marcador de equipamento antes da correção. A
+suíte de paridade (`testes/e2e/`, 329 testes) não podia ver essa classe de
+erro por definição: ela só compara os dois lados entre si, e os dois faziam
+a mesma coisa errada — e continua não vendo, porque a correção de
+2026-08-07 tocou só este site refatorado (paridade medida depois da
+correção: 328 passando, 1 pulado, idêntica ao baseline). É exatamente o tipo
+de bug que esta suíte de regras existe para pegar — e a primeira rodada do
+domínio 2 confirma que o achado do piloto (talentos) generaliza: um app pode
+divergir do livro num jeito que a paridade nunca vai enxergar.
+
+**Estado final:** zero entradas `app-diverge-do-livro` em
+`lacunas-conhecidas.mjs`; **1** entrada `limitacao-observabilidade` — a de
+talentos, `Aumento no Valor de Atributo`/`escolhas` (ver acima), não tocada
+por esta correção e não é bug do app. Suíte de unidade em **514 testes**
+(470 passam, 44 skip, 0 falham) — inalterada pela correção, porque nenhum
+motor de unidade toca os arquivos corrigidos. Suíte de navegador de regras
+em **111/111**, todos verdes de verdade (nenhum cita lacuna hoje). Paridade
+em **328 passando, 1 pulado** (329 coletados). As três medidas depois da
+correção, não só antes dela. Relatório da correção:
+`.superpowers/sdd/antecedentes/correcao-report.md`.
+
+### Por que o motor de unidade confronta `dados/` em vez de uma função do app
+
+Diferente de talentos, o motor de unidade de antecedentes
+(`unidade/antecedentes.test.mjs`) não confronta nenhuma função pura do app —
+`passo-antecedente.js` só exporta `renderStepAntecedente` e
+`_reconstruirTalentosBase`; o resto do comportamento vive dentro de handlers
+de evento, sem um ponto de entrada isolável em Node. Por isso o motor
+confronta o catálogo contra `dados/origens/antecedentes.json` — o arquivo que
+o app de fato lê em runtime — em vez de uma função: se `dados/` divergisse do
+livro, todo fluxo que o consome estaria errado na origem, sem precisar de
+navegador para provar. Essa camada não encontrou nenhuma divergência (as 115
+asserções passam sem lacuna); é a confrontação **comportamental** — "o
+assistente realmente aplica esses dados ao personagem?" — que vive inteira em
+`antecedentes.spec.mjs`, e foi lá que as 21 lacunas apareceram (corrigidas em
+2026-08-07 — ver "Achados do domínio Antecedentes", acima).
+
+A mesma diferença estrutural aparece nos caminhos do usuário: antecedente tem
+**uma** via de aquisição (o passo do assistente de criação) — não há botão
+"trocar antecedente" na ficha; `site/js/sheet/edicao.js` só *lê*
+`bonus_antecedente` para exibir e para validar o teto de 20
+(`ficha-edicao-validacoes.js:14`). Talentos tinha quatro vias, e foi
+justamente a quarta que escondeu o bug que abriu o projeto — aqui, com uma
+via só, não há porta esquecida por definição.
+
 ## Mapa de domínios futuros
 
 Talentos foi o piloto. A ordem sugerida para os próximos domínios (do spec de
 design deste projeto):
 
 1. ~~Talentos~~ — feito, este projeto (75 talentos)
-2. **Antecedentes** — talento de origem, perícias e ferramenta concedidos
+2. ~~Antecedentes~~ — feito (16 antecedentes; achados acima, corrigidos em 2026-08-07)
 3. **Espécies** — traços, deslocamento, magias raciais
 4. **Classes/níveis** — características por nível, espaços de magia, escolhas
    de subclasse

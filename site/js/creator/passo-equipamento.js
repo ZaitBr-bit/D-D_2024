@@ -6,7 +6,7 @@ import { CLASSES_INFO } from '../dados-classes.js';
 import { getArmaduras, getArmas, getClasse, getEquipamentoAventura } from '../db.js';
 import { DENOMINACOES, ICONE_MOEDA, adicionarMoeda, removerQuantidadeMoeda } from '../moedas.js';
 import { abrirModal, fmtPeso, getCapacidadeCarga, getPesoTotalInventario, mdParaHtml, semAcento, toast } from '../utils.js';
-import { KITS_EXPANSAO } from './comum.js';
+import { ANTECEDENTES_ESCOLHAS, KITS_EXPANSAO } from './comum.js';
 import { containerRef, dadosCache, personagem } from './wizard.js';
 
 // ============================================================
@@ -150,6 +150,17 @@ function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
         // Outros itens "à sua escolha" - remover sufixo
         itemStr = itemStr.replace(/\s*à sua escolha/i, '').trim();
       }
+    } else if (/\((?:a mesma|o mesmo)\s+que\s+acima\)/i.test(itemStr)) {
+      // Pacote de equipamento do antecedente referenciando a própria ferramenta/
+      // instrumento/kit escolhido na seção "Ferramentas" do antecedente (ex.:
+      // Artesão: "Ferramentas de Artesão (a mesma que acima)"). Resolver para a
+      // escolha real do jogador (personagem.escolhas_antecedente, o mesmo campo
+      // que o popup do antecedente grava) em vez de deixar o marcador de texto
+      // virar item genérico no inventário. Só o pacote do ANTECEDENTE usa esse
+      // marcador -- tipoOrigem é 'antecedente' nesse caso.
+      const antEscolha = tipoOrigem === 'antecedente' ? ANTECEDENTES_ESCOLHAS[nomeOrigem] : null;
+      const escolhida = antEscolha ? personagem.escolhas_antecedente?.[antEscolha.campo] : null;
+      itemStr = escolhida || itemStr.replace(/\s*\((?:a mesma|o mesmo)\s+que\s+acima\)/i, '').trim();
     }
 
     // Verificar se tem quantidade (ex: "2 Adagas", "20 Flechas")
