@@ -228,6 +228,48 @@ do mesmo mecanismo.
 
 ---
 
+## A lição do motor de escolha morta (2026-08-07)
+
+**O que aconteceu.** Os quatro primeiros motores de `unidade/` foram todos
+desenhados para a mesma pergunta: "o app faz o que o livro manda?" — um
+exemplo válido é aceito, uma mutação inválida é rejeitada, um bônus bate com
+o texto. É uma pergunta poderosa, mas tem uma borda que não aparece olhando
+para dentro da suíte: ela só consegue confrontar uma regra que **o livro
+escreveu**. Uma regra que nenhuma frase do livro afirma — "um talento não
+deve oferecer, de novo, uma escolha que não concede nada ao personagem" —
+nunca vira uma asserção, porque não existe frase para citar como padrão de
+comparação. A suíte inteira podia ficar verde e essa classe inteira de bug
+continuaria invisível, não por falta de cobertura de talentos, mas porque a
+pergunta certa nunca tinha sido formulada. Prova disso: os dois bugs desse
+formato que existiram neste app (commits `5606c52` e `a0e3793`) foram achados
+**os dois** por um humano perguntando "isso devia estar oferecendo essa opção
+de novo?" — nenhum deles foi pego pela suíte, porque nenhum dos quatro
+motores tinha uma pergunta capaz de pegá-los. Só depois da segunda vez esse
+padrão virou um quinto motor (`escolha-morta.test.mjs`), que não compara
+contra o catálogo — aplica o efeito de verdade e confronta o app contra o
+próprio estado que acabou de criar, exatamente para não depender de uma
+frase citável.
+
+**Por que é traiçoeiro.** "Confrontar com o livro" é o objetivo certo, mas
+vira sem querer um teto: se a pergunta de desenho é sempre "que frase do
+livro isso testa?", qualquer regra sem frase própria fica fora do exercício
+de desenhar o motor, não só fora de um motor específico. E o sintoma não é
+um teste vermelho — é a ausência de um teste, que não aparece em nenhum
+relatório de cobertura.
+
+**Como evitar.** Ao começar um domínio novo, depois de listar o que o livro
+diz (checklist de pré-voo, acima), faça uma segunda pergunta que não sai do
+livro: **o que um usuário consideraria obviamente quebrado, mesmo que o
+livro nunca precise dizer isso em voz alta?** Ofertar uma escolha que não
+muda nada é um exemplo; provavelmente há outros por domínio (uma
+característica de classe reoferecida sem efeito, uma magia listada duas
+vezes no grimório sem motivo, um espaço de magia que não desconta). Essa
+pergunta não tem uma seção do livro para apontar como fonte — a fonte é o
+bom senso de quem usaria o app, e é exatamente por isso que ela fica de fora
+se ninguém a formular de propósito.
+
+---
+
 ## Dois vícios de relatório
 
 **Motivo que superafirma.** Um motivo de lacuna dizia que a verificação do app

@@ -41,7 +41,7 @@ ver a seção sobre os specs Playwright abaixo):
 ```bash
 cd testes/e2e
 npm run test:regras            # as duas suítes de regras, em sequência
-npm run test:regras:unidade    # só os 4 motores de node:test
+npm run test:regras:unidade    # só os 5 motores de node:test
 npm run test:regras:e2e        # só os specs Playwright (regras/*.spec.mjs)
 ```
 
@@ -78,20 +78,88 @@ vermelho esperando alguém investigar; uma lacuna falsa é a suíte inteira
 mentindo verde sobre um bug que não existe, escondendo o próximo bug de
 verdade que cair no mesmo talento.
 
+## A mecânica de `excecoes-escolha-repetida.mjs`
+
+`escolha-morta.test.mjs` (ver tabela abaixo) tem sua própria lista de
+exceções, `excecoes-escolha-repetida.mjs` — deliberadamente um módulo
+separado de `lacunas-conhecidas.mjs`, não um export dentro dele.
+
+O motivo é o invariante da seção acima: toda entrada de `LACUNAS` é "o app
+está errado". Uma entrada de `excecoes-escolha-repetida.mjs` afirma o
+**oposto** — "o app está CERTO em aceitar a mesma escolha de novo, porque o
+livro concede algo A MAIS na repetição" (Tocado Por Fadas e Tocado Pelas
+Sombras deixam a magia sempre preparada com uma conjuração grátis por
+Descanso Longo; Conjurador Ritualista soma Ritual Rápido; Dádiva da
+Resistência à Energia habilita a Reação de Redirecionamento para o tipo
+escolhido de novo). Misturar as duas listas no mesmo array quebraria a leitura
+de `LACUNAS` como "toda entrada é um bug" — quem lesse teria de checar um
+campo extra para saber se está olhando um defeito ou o seu espelho. Duas
+listas separadas mantêm os dois invariantes limpos.
+
+O mecanismo (`excecaoEscolhaRepetida`, usado por `escolha-morta.test.mjs`) é
+a mesma inversão de expectativa que `comLacuna` já faz, aplicada ao caso
+oposto:
+
+- **Sem exceção registrada**: a mesma escolha, reoferecida a um personagem já
+  saturado, precisa ser **recusada**. Se for aceita, é escolha morta — falha.
+- **Com exceção registrada**: a mesma escolha precisa continuar sendo
+  **aceita**. Se o app passar a recusá-la, o teste quebra pedindo a remoção da
+  entrada — o ganho real que a justificava deixou de existir, ou nunca
+  existiu.
+- **Motivo em branco é erro**, mesmo padrão de `LACUNAS`: `completude.test.mjs`
+  rejeita qualquer entrada sem talento real no catálogo ou sem `motivo`
+  preenchido, e cada `motivo` precisa citar a seção do livro e o benefício
+  extra concreto — não basta dizer "é exceção".
+
+Hoje são **4 entradas**: Tocado Por Fadas, Tocado Pelas Sombras, Conjurador
+Ritualista e Dádiva da Resistência à Energia — as quatro verificadas linha a
+linha contra `Talentos.md` no relatório de desenho do motor
+(`.superpowers/sdd/correcao-lacunas/motor-escolha-morta-report.md`).
+
 ## O que cada motor prova — e o que não prova
 
-Quatro motores de `node:test` em `unidade/`, mais quatro specs Playwright em
+Cinco motores de `node:test` em `unidade/`, mais quatro specs Playwright em
 `../e2e/regras/`. Cada um confronta uma fatia diferente do livro, e nenhum
 sozinho prova a regra inteira.
 
 | Motor | O que confronta | Testes |
 |---|---|---|
-| `completude.test.mjs` | Catálogo × `dados/`: bijeção, schema (1 por talento, incluindo `opcoes` e `aumento_atributo`), citação real, higiene das lacunas (incluindo o campo `tipo`) | 79 |
+| `completude.test.mjs` | Catálogo × `dados/`: bijeção, schema (1 por talento, incluindo `opcoes` e `aumento_atributo`), citação real, higiene das lacunas (incluindo o campo `tipo`) e higiene das exceções de escolha repetida | 80 |
 | `escolhas.test.mjs` | Talento com escolha no livro é *reconhecido* pelo app (via `obterAtributosASITalento` para ASI embutido, ou `REGRAS_TALENTOS`/`talentoExigeEscolhas` para o resto) — **e**, para as 75 entradas, `aumento_atributo` do catálogo confrontado contra `obterAtributosASITalento` (achado I3: campo curado à mão que antes nada confrontava) | 134 |
 | `validacao.test.mjs` | Um exemplo válido (curado do livro) é aceito; mutações inválidas (item removido, duplicata) são rejeitadas, quando aplicável | 64 |
 | `passivos.test.mjs` | Bônus numéricos e flags internas que `resolverPassivosTalentos()` deveria produzir | 62 |
+| `escolha-morta.test.mjs` | Uma escolha reoferecida depois de saturar o personagem (aplicar o efeito até não crescer mais) precisa ser recusada — nenhuma seção do livro proíbe isso com todas as letras, é o próprio estado do app confrontado contra si mesmo | 59 (15 rodam a asserção; **44 skip**, cada um com o motivo escrito no próprio `t.skip`) |
 
-Total: **339 testes** em `unidade/`.
+Total: **399 testes** em `unidade/` — **355 passam, 44 skip, 0 falham**. Os
+skips não somem dentro do total: são talentos cujo `aplicarEfeitoTalento` não
+faz nenhum campo de lista crescer (fora do escopo deste motor específico, não
+do livro), e cada um carrega o motivo por escrito — um skip silencioso, aqui,
+seria a mesma omissão que uma lacuna sem `motivo` já é proibida de ser.
+
+### O que `escolha-morta.test.mjs` cobre que os outros quatro não cobrem
+
+Os quatro motores acima fazem, cada um à sua maneira, a mesma pergunta: **"o
+app faz o que o livro manda?"** — um exemplo válido é aceito, uma mutação
+inválida é rejeitada, um bônus bate com o texto. Todos citam uma frase do
+livro como padrão de comparação.
+
+`escolha-morta.test.mjs` faz uma pergunta que nenhuma frase do livro responde
+diretamente: **"o app evita oferecer uma escolha que não concederia nada?"**
+Proficiência repetida, maestria repetida, uma perícia que já tem
+Especialização — o livro nunca lista isso como proibição, porque é um
+princípio implícito, não uma regra citável por talento. Por isso o motor não
+compara contra um valor esperado do catálogo: ele aplica o efeito de verdade
+num personagem limpo até saturar (ver comentário no próprio arquivo sobre
+talentos de dois estágios, como Analítico/Mente Aguçada), e então confronta o
+app contra o **próprio estado que acabou de criar** — a mesma escolha,
+reoferecida, precisa ser recusada.
+
+Essa lacuna de cobertura não era teórica: os dois rounds de bugs que
+motivaram este motor (commits `5606c52` e `a0e3793`) foram achados por um
+humano perguntando "isso devia estar oferecendo essa opção de novo?", não
+pela suíte — nenhum dos quatro motores anteriores, nem os specs Playwright,
+tinha uma pergunta capaz de pegar esse formato de bug, porque nenhum deles
+compara o app contra o livro num ponto em que o livro é silencioso.
 
 `escolhas.test.mjs` tem um limite explícito no próprio arquivo: ele não
 enxerga ramos de renderização "hard-coded" por nome dentro de

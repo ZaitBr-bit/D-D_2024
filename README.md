@@ -82,7 +82,7 @@ D&D/
 │   └── regras/              # specs da suíte de regras (vivem aqui pelo node_modules)
 ├── testes/regras/           # suíte de regras de negócio — ver "Testes"
 │   ├── catalogo/            # os 75 talentos curados do livro, com citação
-│   ├── unidade/             # 4 motores em node:test, sem dependência
+│   ├── unidade/             # 5 motores em node:test, sem dependência
 │   ├── lacunas-conhecidas.mjs   # divergências app-vs-livro já encontradas
 │   └── GUIA-PROXIMOS-DOMINIOS.md  # ler antes de cobrir um domínio novo
 ├── scripts/                 # verificação da quebra dos monólitos
@@ -359,7 +359,7 @@ Três verificações independentes, que respondem perguntas diferentes:
 |---|---|---|
 | Extração dos monólitos | `python scripts/verificar_extracao.py tudo` | "os módulos ainda batem com o baseline?" — estático, sem navegador |
 | Paridade E2E | `cd testes/e2e && npm test` | "a tela é a mesma do repositório original?" — Playwright, 329 testes |
-| Regras de negócio | `cd testes/e2e && npm run test:regras` | "o app obedece ao **livro**?" — 339 de unidade + 72 de navegador |
+| Regras de negócio | `cd testes/e2e && npm run test:regras` | "o app obedece ao **livro**?" — 399 de unidade (355 passam, 44 skip) + 72 de navegador |
 
 As duas últimas são independentes de propósito: um erro de regra presente
 **nos dois** repositórios passa na paridade para sempre, porque paridade só
