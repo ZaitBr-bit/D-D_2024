@@ -7,6 +7,35 @@ export const PERICIAS_TODAS = [
   'Religião', 'Sobrevivência'
 ];
 
+// Ferramentas, Ferramentas de Artesão e Instrumentos Musicais válidos para
+// Habilidoso/Artifista/Músico. Fonte única: levelup-ui.js importa estas
+// constantes em vez de manter cópia própria, para as listas de opção da
+// tela e a validação central nunca divergirem entre si.
+export const FERRAMENTAS_TODAS = [
+  'Ferramentas de Carpinteiro', 'Ferramentas de Cartógrafo', 'Ferramentas de Coureiro',
+  'Ferramentas de Entalhador', 'Ferramentas de Ferreiro', 'Ferramentas de Funileiro',
+  'Ferramentas de Joalheiro', 'Ferramentas de Oleiro', 'Ferramentas de Pedreiro',
+  'Ferramentas de Sapateiro', 'Ferramentas de Tecelão', 'Ferramentas de Vidreiro',
+  'Suprimentos de Alquimista', 'Suprimentos de Calígrafo', 'Suprimentos de Cervejeiro',
+  'Suprimentos de Pintor', 'Utensílios de Cozinheiro',
+  'Ferramentas de Ladrão', 'Ferramentas de Navegador',
+  'Kit de Disfarce', 'Kit de Falsificação', 'Kit de Herbalismo', 'Kit de Veneno'
+];
+
+export const FERRAMENTAS_ARTESAO = [
+  'Ferramentas de Carpinteiro', 'Ferramentas de Cartógrafo', 'Ferramentas de Coureiro',
+  'Ferramentas de Entalhador', 'Ferramentas de Ferreiro', 'Ferramentas de Funileiro',
+  'Ferramentas de Joalheiro', 'Ferramentas de Oleiro', 'Ferramentas de Pedreiro',
+  'Ferramentas de Sapateiro', 'Ferramentas de Tecelão', 'Ferramentas de Vidreiro',
+  'Suprimentos de Alquimista', 'Suprimentos de Calígrafo', 'Suprimentos de Cervejeiro',
+  'Suprimentos de Pintor', 'Utensílios de Cozinheiro'
+];
+
+export const INSTRUMENTOS_MUSICAIS = [
+  'Alaúde', 'Flauta', 'Flauta de Pan', 'Gaita de Foles', 'Lira',
+  'Oboé', 'Tambor', 'Trombeta', 'Violino', 'Xilofone'
+];
+
 export const ATRIBUTOS_SALVAGUARDA = {
   forca: 'Força',
   destreza: 'Destreza',
@@ -19,6 +48,48 @@ export const ATRIBUTOS_SALVAGUARDA = {
 const TIPOS_ENERGIA = [
   'Ácido', 'Elétrico', 'Gélido', 'Ígneo', 'Necrótico',
   'Psíquico', 'Radiante', 'Trovejante', 'Venenoso'
+];
+
+// Talentos.md §Adepto Elemental ("Domínio Elemental"): só 5 dos 9 tipos de
+// energia contam para este talento. Deriva de TIPOS_ENERGIA (em vez de uma
+// lista literal própria) para nunca divergir na grafia de "Gélido"/"Ígneo".
+// Fonte única: levelup-ui.js importa esta constante para as opções da tela.
+export const TIPOS_DANO_ADEPTO_ELEMENTAL = TIPOS_ENERGIA.filter(tipo =>
+  ['Ácido', 'Elétrico', 'Gélido', 'Ígneo', 'Trovejante'].includes(tipo)
+);
+
+// Talentos.md §Analítico ("Observador Atento"): perícia entre Intuição,
+// Investigação ou Percepção. Fonte única com levelup-ui.js.
+export const PERICIAS_ANALITICO = ['Intuição', 'Investigação', 'Percepção'];
+
+// Talentos.md §Mente Aguçada ("Conhecimento Vasto"): perícia entre
+// Arcanismo, História, Investigação, Natureza ou Religião. Fonte única
+// com levelup-ui.js.
+export const PERICIAS_MENTE_AGUCADA = ['Arcanismo', 'História', 'Investigação', 'Natureza', 'Religião'];
+
+// Talentos.md §Mestre das Armas ("Propriedade de Maestria"): uma arma
+// Simples ou Marcial à escolha. Cópia curada de dados/equipamento/armas.json
+// (campo `nome`, filtrando `categoria` que contém "Simples" ou "Marciais") —
+// mesmo padrão de lista literal já usado por FERRAMENTAS_TODAS/
+// INSTRUMENTOS_MUSICAIS acima: regras-cobertura.js é módulo síncrono e "puro"
+// (sem DOM/fetch), reaproveitado pelo harness de teste de unidade fora do
+// navegador, então não pode carregar o JSON via fetch em tempo de execução
+// como site/js/db.js faz para a tela de equipamento. Fonte única com
+// levelup-ui.js.
+export const ARMAS_SIMPLES_MARCIAIS = [
+  // Armas Simples Corpo a Corpo
+  'Adaga', 'Azagaia', 'Cajado', 'Clava', 'Clava Grande', 'Foice', 'Lança',
+  'Maça', 'Machadinha', 'Martelo Leve',
+  // Armas Simples à Distância
+  'Arco Curto', 'Besta Leve', 'Dardo', 'Funda',
+  // Armas Marciais Corpo a Corpo
+  'Alabarda', 'Chicote', 'Cimitarra', 'Espada Curta', 'Espada Grande',
+  'Espada Longa', 'Glaive', 'Lança de Montaria', 'Lança Longa', 'Maça Estrela',
+  'Machado de Batalha', 'Machado Grande', 'Malho', 'Mangual',
+  'Martelo de Guerra', 'Picareta de Guerra', 'Rapieira', 'Tridente',
+  // Armas Marciais à Distância
+  'Arco Longo', 'Besta de Mão', 'Besta Pesada', 'Mosquete', 'Pistola',
+  'Zarabatana'
 ];
 
 const regra = (escolhas = [], persistir = '', tipo = 'passiva') => ({
@@ -71,7 +142,49 @@ export const REGRAS_TALENTOS = Object.freeze({
   'Dádiva da Visão Verdadeira': regra(['atributo_talento'], 'talentos_parametros'),
   'Dádiva do Ataque Irresistível': regra(['atributo_talento'], 'talentos_parametros'),
   'Dádiva do Destino': regra(['atributo_talento'], 'recursos.talentos', 'recurso'),
-  'Dádiva do Espírito da Noite': regra(['atributo_talento'], 'talentos_parametros')
+  'Dádiva do Espírito da Noite': regra(['atributo_talento'], 'talentos_parametros'),
+  // Talentos.md §Habilidoso: "proficiência em qualquer combinação de três
+  // perícias ou ferramentas à sua escolha". Sem aumento de atributo, sem
+  // pré-requisito, repetível.
+  'Habilidoso': regra(
+    ['tres_pericias_ou_ferramentas'],
+    'pericias_proficientes/proficiencias_ferramentas'
+  ),
+  // Talentos.md §Artifista: "proficiência com três Ferramentas de Artesão
+  // diferentes à sua escolha".
+  'Artifista': regra(['tres_ferramentas_artesao'], 'proficiencias_ferramentas'),
+  // Talentos.md §Músico: "proficiência com três Instrumentos Musicais à
+  // sua escolha".
+  'Músico': regra(['tres_instrumentos'], 'proficiencias_instrumentos'),
+  // Talentos.md §Analítico: "Observador Atento" — perícia entre
+  // Intuição/Investigação/Percepção; vira proficiência ou Especialização
+  // dependendo do estado atual (ver aplicarEfeitoTalento). ASI embutido
+  // (Inteligência ou Sabedoria) é a mesma 'atributo_talento' das Dádivas.
+  'Analítico': regra(
+    ['atributo_talento', 'pericia_analitico'],
+    'pericias_proficientes/pericias_expertise'
+  ),
+  // Talentos.md §Mente Aguçada: "Conhecimento Vasto" — mesma regra de
+  // Analítico (proficiência ou Especialização), lista de perícias diferente.
+  'Mente Aguçada': regra(
+    ['atributo_talento', 'pericia_mente_agucada'],
+    'pericias_proficientes/pericias_expertise'
+  ),
+  // Talentos.md §Adepto Elemental: "Domínio Elemental" — tipo de dano entre
+  // Ácido/Elétrico/Gélido/Ígneo/Trovejante. Repetível, mas cada aquisição
+  // exige um tipo ainda não escolhido (ver validarEscolhasTalento).
+  'Adepto Elemental': regra(
+    ['atributo_talento', 'tipo_dano_elemental'],
+    'adepto_elemental_tipos'
+  ),
+  // Talentos.md §Mestre das Armas: "Propriedade de Maestria" — uma arma
+  // Simples ou Marcial à escolha, desde que o personagem tenha proficiência
+  // com ela (ver comentário em validarEscolhasTalento sobre por que este
+  // pré-requisito não é checado aqui). ASI embutido (Força ou Destreza) é a
+  // mesma 'atributo_talento' das Dádivas. Persiste em maestrias_arma — o
+  // mesmo campo que já guarda as maestrias concedidas pela classe (ver
+  // site/js/sheet/maestrias.js), em vez de um campo paralelo.
+  'Mestre das Armas': regra(['atributo_talento', 'arma_maestria'], 'maestrias_arma')
 });
 
 export function getRegraTalento(nome) {
@@ -180,6 +293,83 @@ export function validarEscolhasTalento(char, nome, escolhas = {}) {
     }
   }
 
+  // Habilidoso: 3 perícias OU ferramentas, em qualquer combinação, distintas.
+  if (nome === 'Habilidoso') {
+    const selecoes = escolhas.selecoes || [];
+    const validas = [...PERICIAS_TODAS, ...FERRAMENTAS_TODAS];
+    if (selecoes.length !== 3 || new Set(selecoes).size !== 3 ||
+        selecoes.some(item => !validas.includes(item))) {
+      return resultadoInvalido('Escolha 3 perícias ou ferramentas distintas e válidas para Habilidoso.');
+    }
+  }
+
+  // Artifista: 3 Ferramentas de Artesão distintas.
+  if (nome === 'Artifista') {
+    const selecoes = escolhas.selecoes || [];
+    if (selecoes.length !== 3 || new Set(selecoes).size !== 3 ||
+        selecoes.some(item => !FERRAMENTAS_ARTESAO.includes(item))) {
+      return resultadoInvalido('Escolha 3 Ferramentas de Artesão distintas para Artifista.');
+    }
+  }
+
+  // Músico: 3 Instrumentos Musicais distintos.
+  if (nome === 'Músico') {
+    const selecoes = escolhas.selecoes || [];
+    if (selecoes.length !== 3 || new Set(selecoes).size !== 3 ||
+        selecoes.some(item => !INSTRUMENTOS_MUSICAIS.includes(item))) {
+      return resultadoInvalido('Escolha 3 Instrumentos Musicais distintos para Músico.');
+    }
+  }
+
+  // Analítico: perícia entre Intuição/Investigação/Percepção. Qualquer uma
+  // das três é válida — vira proficiência ou Especialização dependendo do
+  // estado atual do personagem (aplicarEfeitoTalento decide isso).
+  if (nome === 'Analítico') {
+    const pericia = valor(escolhas, 'pericia', 0);
+    if (!PERICIAS_ANALITICO.includes(pericia)) {
+      return resultadoInvalido('Escolha Intuição, Investigação ou Percepção para Analítico.');
+    }
+  }
+
+  // Mente Aguçada: mesma regra de Analítico, lista de perícias diferente.
+  if (nome === 'Mente Aguçada') {
+    const pericia = valor(escolhas, 'pericia', 0);
+    if (!PERICIAS_MENTE_AGUCADA.includes(pericia)) {
+      return resultadoInvalido('Escolha Arcanismo, História, Investigação, Natureza ou Religião para Mente Aguçada.');
+    }
+  }
+
+  // Adepto Elemental: tipo de dano válido e ainda não usado por uma
+  // aquisição anterior (repetível "mas deve escolher um tipo de dano
+  // diferente a cada vez" — Talentos.md §Adepto Elemental).
+  if (nome === 'Adepto Elemental') {
+    const tipo = valor(escolhas, 'energia', 0);
+    if (!TIPOS_DANO_ADEPTO_ELEMENTAL.includes(tipo)) {
+      return resultadoInvalido('Escolha um tipo de dano válido para Adepto Elemental.');
+    }
+    if ((char.adepto_elemental_tipos || []).includes(tipo)) {
+      return resultadoInvalido('Escolha um tipo de dano ainda não usado por Adepto Elemental.');
+    }
+  }
+
+  // Mestre das Armas: uma arma Simples ou Marcial válida. O livro também
+  // exige "desde que você tenha proficiência com ela", mas o personagem não
+  // guarda proficiência de arma por item — só por classe/traço em texto
+  // livre (dados/classes/*.json, campo "Proficiências com Armas") — não há
+  // hoje um campo estruturado no personagem para cruzar contra a arma
+  // escolhida sem uma busca assíncrona (fetch dos dados de classe), que
+  // validarEscolhasTalento não pode fazer: é síncrona e chamada tanto pelo
+  // navegador quanto pelo harness de teste de unidade (sem fetch/DOM). Por
+  // isso este ramo confere só existência e categoria — o mesmo limite que
+  // já se aplica a qualquer outro pré-requisito não observável a partir do
+  // personagem.
+  if (nome === 'Mestre das Armas') {
+    const arma = valor(escolhas, 'arma', 0);
+    if (!ARMAS_SIMPLES_MARCIAIS.includes(arma)) {
+      return resultadoInvalido('Escolha uma arma Simples ou Marcial válida para Mestre das Armas.');
+    }
+  }
+
   return { valido: true };
 }
 
@@ -250,6 +440,61 @@ export function aplicarEfeitoTalento(char, nome, escolhas = {}) {
     const proficientes = garantirArray(char, 'pericias_proficientes');
     PERICIAS_TODAS.forEach(pericia => adicionarUnico(proficientes, pericia));
     adicionarUnico(garantirArray(char, 'pericias_expertise'), expertise);
+  }
+
+  // Habilidoso: cada escolha vira proficiência em perícia OU em ferramenta,
+  // dependendo de a que lista o item escolhido pertence.
+  if (nome === 'Habilidoso') {
+    const proficientes = garantirArray(char, 'pericias_proficientes');
+    const ferramentas = garantirArray(char, 'proficiencias_ferramentas');
+    for (const escolha of selecoes) {
+      if (PERICIAS_TODAS.includes(escolha)) adicionarUnico(proficientes, escolha);
+      else adicionarUnico(ferramentas, escolha);
+    }
+  }
+
+  // Artifista: as 3 escolhas são sempre Ferramentas de Artesão.
+  if (nome === 'Artifista') {
+    const ferramentas = garantirArray(char, 'proficiencias_ferramentas');
+    for (const escolha of selecoes) adicionarUnico(ferramentas, escolha);
+  }
+
+  // Músico: as 3 escolhas são sempre Instrumentos Musicais.
+  if (nome === 'Músico') {
+    const instrumentos = garantirArray(char, 'proficiencias_instrumentos');
+    for (const escolha of selecoes) adicionarUnico(instrumentos, escolha);
+  }
+
+  // Analítico / Mente Aguçada: "Se não tiver proficiência na perícia
+  // escolhida, você a adquire; se já for proficiente, adquire
+  // Especialização" (Talentos.md §Analítico/§Mente Aguçada).
+  if (nome === 'Analítico' || nome === 'Mente Aguçada') {
+    const pericia = valor(escolhas, 'pericia', 0);
+    const proficientes = garantirArray(char, 'pericias_proficientes');
+    if (proficientes.includes(pericia)) {
+      adicionarUnico(garantirArray(char, 'pericias_expertise'), pericia);
+    } else {
+      adicionarUnico(proficientes, pericia);
+    }
+  }
+
+  // Adepto Elemental: registra o tipo de dano escolhido nesta aquisição.
+  // Repetível — cada aquisição grava um tipo distinto (garantido pela
+  // validação acima).
+  if (nome === 'Adepto Elemental') {
+    const tipo = valor(escolhas, 'energia', 0);
+    adicionarUnico(garantirArray(char, 'adepto_elemental_tipos'), tipo);
+  }
+
+  // Mestre das Armas: grava a arma escolhida em maestrias_arma, o mesmo
+  // array que site/js/sheet/maestrias.js usa para as maestrias concedidas
+  // pela classe — a "vaga extra" que o talento concede é sinalizada
+  // separadamente pela flag mestre_armas_maestria_extra (já calculada em
+  // talentos-effects.js) e consumida por maestrias.js para somar +1 ao
+  // limite normal da classe.
+  if (nome === 'Mestre das Armas') {
+    const arma = valor(escolhas, 'arma', 0);
+    adicionarUnico(garantirArray(char, 'maestrias_arma'), arma);
   }
 
   if (nome === 'Envenenador') {

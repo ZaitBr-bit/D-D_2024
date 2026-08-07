@@ -7,9 +7,19 @@
 import { abrirModal, escHtml, semAcento, toast } from '../utils.js';
 import { getProgressaoBarbaro } from './classes/barbaro.js';
 import { getProgressaoGuerreiro } from './classes/guerreiro.js';
-import { char, salvar } from './estado.js';
+import { char, passivosTalentosCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { carregarDadosEquipSheet } from './inventario.js';
+
+// Talentos.md §Mestre das Armas: "Propriedade de Maestria" concede uma vaga
+// de maestria em arma ADICIONAL às que a classe já dá — não uma lista
+// paralela. resolverPassivosTalentos() (talentos-effects.js) já calcula a
+// flag mestre_armas_maestria_extra sempre que o personagem tem o talento;
+// aqui é o único lugar que a consome, somando +1 ao limite normal da
+// classe para quem já usa este sistema de maestrias.
+function bonusMaestriaTalento() {
+  return passivosTalentosCache?.flags?.mestre_armas_maestria_extra ? 1 : 0;
+}
 
 export async function abrirModalMaestrias() {
   // Classes que possuem Maestria em Arma
@@ -25,6 +35,7 @@ export async function abrirModalMaestrias() {
     const prog = getProgressaoGuerreiro();
     maestriasMax = prog?.maestriasMax || 3;
   }
+  maestriasMax += bonusMaestriaTalento();
 
   const dados = await carregarDadosEquipSheet();
   // Filtrar armas conforme regras de proficiência por classe
@@ -147,6 +158,7 @@ export async function abrirModalTrocaMaestriaDescanso(callbackPosTroca = null) {
     const prog = getProgressaoGuerreiro();
     maestriasMax = prog?.maestriasMax || 3;
   }
+  maestriasMax += bonusMaestriaTalento();
 
   const atuais = char.maestrias_arma || [];
   if (atuais.length === 0) {
