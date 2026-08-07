@@ -83,7 +83,11 @@ export const CATALOGO_TALENTOS = {
     escolhas: [{ tipo: 'pericia_ou_ferramenta', qtd: 3 }],
     aumento_atributo: null,
     passivos: null,
-    exemplo_valido: { selecoes: ['Atletismo', 'História', 'Ferramentas de Ferreiro'] },
+    // Nem Atletismo nem História podem entrar aqui: charBase() (harness.mjs)
+    // já é proficiente nas duas, e validarEscolhasTalento agora rejeita
+    // proficiência repetida em Habilidoso (não concede nada nesta edição).
+    // Não "restaurar" para Atletismo/História.
+    exemplo_valido: { selecoes: ['Acrobacia', 'Furtividade', 'Ferramentas de Ferreiro'] },
   },
   'Iniciado em Magia': {
     livro: 'Talentos.md §Iniciado em Magia',

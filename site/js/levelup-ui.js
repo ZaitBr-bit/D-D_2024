@@ -476,6 +476,15 @@ function mostrarDetalhesTalento(nome, ctx, caches, state) {
   }
 }
 
+// Aviso quando a filtragem de "já possui" deixa menos opções elegíveis do
+// que o número de escolhas exigidas (personagem já proficiente em quase
+// tudo do pool). Evita renderizar um formulário que nunca poderá ser
+// concluído sem explicar o motivo.
+function _avisoOpcoesInsuficientes(disponiveis, exigidas) {
+  if (disponiveis >= exigidas) return '';
+  return `<div class="info-box warning" style="font-size:0.8rem;margin-top:4px">Restam apenas ${disponiveis} opção(ões) elegível(is) — o personagem já é proficiente em todo o resto. Não é possível completar as ${exigidas} escolhas exigidas.</div>`;
+}
+
 export function renderEscolhasTalento(nome, talentoData, ctx, state = {}) {
   const { char } = ctx;
   let html = '';
@@ -527,33 +536,49 @@ export function renderEscolhasTalento(nome, talentoData, ctx, state = {}) {
     }
   }
 
+  // Habilidoso/Artifista/Músico: uma proficiência repetida não concede nada
+  // nesta edição (só Especialização dobra, e ela vem de talentos que a
+  // concedem explicitamente — Analítico/Mente Aguçada). Por isso as opções
+  // já possuídas pelo personagem saem da lista, no mesmo padrão que
+  // 'Especialista em Perícia' já usa logo abaixo (_PERICIAS_NOMES.filter).
   if (nome === 'Habilidoso') {
+    const periciasProf = char.pericias_proficientes || [];
+    const ferramentasProf = char.proficiencias_ferramentas || [];
+    const periciasDisponiveis = _PERICIAS_NOMES.filter(p => !periciasProf.includes(p));
+    const ferramentasDisponiveis = _FERRAMENTAS_TODAS.filter(f => !ferramentasProf.includes(f));
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Proficiências (3)</div>`;
+    html += _avisoOpcoesInsuficientes(periciasDisponiveis.length + ferramentasDisponiveis.length, 3);
     for (let i = 0; i < 3; i++) {
       const selecionada = state.escolhasTalento?.[i] || '';
       html += `<select class="escolha-talento-levelup form-input" style="width:100%;margin:4px 0"><option value="">-- Escolha ${i + 1} --</option>`;
-      html += `<optgroup label="Perícias">${_PERICIAS_NOMES.map(p => `<option value="${p}" ${selecionada === p ? 'selected' : ''}>${p}</option>`).join('')}</optgroup>`;
-      html += `<optgroup label="Ferramentas">${_FERRAMENTAS_TODAS.map(f => `<option value="${f}" ${selecionada === f ? 'selected' : ''}>${f}</option>`).join('')}</optgroup>`;
+      html += `<optgroup label="Perícias">${periciasDisponiveis.map(p => `<option value="${p}" ${selecionada === p ? 'selected' : ''}>${p}</option>`).join('')}</optgroup>`;
+      html += `<optgroup label="Ferramentas">${ferramentasDisponiveis.map(f => `<option value="${f}" ${selecionada === f ? 'selected' : ''}>${f}</option>`).join('')}</optgroup>`;
       html += `</select>`;
     }
   }
 
   if (nome === 'Artifista') {
+    const ferramentasProf = char.proficiencias_ferramentas || [];
+    const ferramentasDisponiveis = _FERRAMENTAS_ARTESAO.filter(f => !ferramentasProf.includes(f));
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Ferramentas de Artesão (3)</div>`;
+    html += _avisoOpcoesInsuficientes(ferramentasDisponiveis.length, 3);
     for (let i = 0; i < 3; i++) {
       const selecionada = state.escolhasTalento?.[i] || '';
       html += `<select class="escolha-talento-levelup form-input" style="width:100%;margin:4px 0"><option value="">-- Escolha ${i + 1} --</option>`;
-      html += _FERRAMENTAS_ARTESAO.map(f => `<option value="${f}" ${selecionada === f ? 'selected' : ''}>${f}</option>`).join('');
+      html += ferramentasDisponiveis.map(f => `<option value="${f}" ${selecionada === f ? 'selected' : ''}>${f}</option>`).join('');
       html += `</select>`;
     }
   }
 
   if (nome === 'Músico') {
+    const instrumentosProf = char.proficiencias_instrumentos || [];
+    const instrumentosDisponiveis = _INSTRUMENTOS.filter(f => !instrumentosProf.includes(f));
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Instrumentos (3)</div>`;
+    html += _avisoOpcoesInsuficientes(instrumentosDisponiveis.length, 3);
     for (let i = 0; i < 3; i++) {
       const selecionada = state.escolhasTalento?.[i] || '';
       html += `<select class="escolha-talento-levelup form-input" style="width:100%;margin:4px 0"><option value="">-- Escolha ${i + 1} --</option>`;
-      html += _INSTRUMENTOS.map(f => `<option value="${f}" ${selecionada === f ? 'selected' : ''}>${f}</option>`).join('');
+      html += instrumentosDisponiveis.map(f => `<option value="${f}" ${selecionada === f ? 'selected' : ''}>${f}</option>`).join('');
       html += `</select>`;
     }
   }
