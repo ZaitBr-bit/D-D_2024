@@ -26,7 +26,8 @@ export default defineConfig({
   projects: [
     {
       name: 'paridade',
-      testIgnore: 'offline.spec.mjs',
+      // regras/** é outra suíte (testes de regras do livro), com config própria.
+      testIgnore: ['offline.spec.mjs', 'regras/**'],
       // O Service Worker cachearia a versao anterior entre execucoes e
       // mascararia regressoes; estes testes tem de ver os arquivos do disco.
       use: { serviceWorkers: 'block' },

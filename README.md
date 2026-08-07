@@ -23,8 +23,11 @@ Validar a integridade dos módulos da ficha e do criador:
 python scripts/verificar_extracao.py tudo
 ```
 
-Não há dependência de Node neste repositório — nem para desenvolver, nem para
-publicar. O workflow de deploy usa apenas Python e `sed`.
+A **aplicação** não tem dependência de Node — nem para desenvolver, nem para
+publicar: não existe etapa de build, e o workflow de deploy usa apenas Python e
+`sed`. Node aparece num único lugar, isolado: a suíte de testes em
+`testes/e2e/`, cujo `node_modules/` está no `.gitignore`. Ver
+**[Testes](#testes)**.
 
 **Precache offline:** o workflow gera **dois** manifestos que o Service Worker
 consome no `install` — `dados-precache.json` (varrendo `dados/`) e
@@ -38,6 +41,9 @@ relação à árvore, que é exatamente o problema que eles resolvem.
 **Não há reescrita de caminho**: os únicos `sed` do workflow injetam a versão
 do cache no `sw.js` e o número da versão no header. (Este parágrafo já afirmou
 o contrário; era impreciso e foi corrigido em 2026-08-05.)
+
+Detalhes do pipeline, como conferir se um deploy foi mesmo ao ar e o que fazer
+quando ele falha estão em **[Deploy e manutenção](#deploy-e-manutenção)**.
 
 ---
 
@@ -65,6 +71,24 @@ D&D/
 ├── Informacoes Separadas/   # regras em Markdown (referência humana, não consumidas em runtime)
 │   ├── Equipamento.md
 │   └── Abreviações e Definição de Regras.md   # ex.: "Capacidade de Carga" (linha ~228)
+├── testes/e2e/              # suíte Playwright de paridade — ver "Testes"
+│   ├── *.spec.mjs           # 10 arquivos, 329 testes
+│   ├── helpers.mjs          # driver de UI: criador, ficha e subida de nível
+│   ├── fixtures.mjs         # personagens semeados via store.criarPersonagemVazio()
+│   ├── dados.mjs            # lê dados/ e dados-classes.js (cobertura cresce sozinha)
+│   ├── servidor.mjs         # servidor estático (8801 = original, 8802 = refatorado)
+│   ├── checar_esm.mjs       # força o parser de módulo ES em todos os JS
+│   ├── playwright.config.mjs
+│   └── regras/              # specs da suíte de regras (vivem aqui pelo node_modules)
+├── testes/regras/           # suíte de regras de negócio — ver "Testes"
+│   ├── catalogo/            # os 75 talentos curados do livro, com citação
+│   ├── unidade/             # 4 motores em node:test, sem dependência
+│   ├── lacunas-conhecidas.mjs   # divergências app-vs-livro já encontradas
+│   └── GUIA-PROXIMOS-DOMINIOS.md  # ler antes de cobrir um domínio novo
+├── scripts/                 # verificação da quebra dos monólitos
+│   ├── verificar_extracao.py
+│   ├── baseline/            # sheet.js e creator.js pré-quebra, para comparação
+│   └── excecoes/            # divergências aceitas e justificadas
 └── docs/superpowers/plans/  # planos de implementação
 ```
 
@@ -324,6 +348,264 @@ As regras completas estão em `Informacoes Separadas/*.md` (Markdown, leitura hu
 Ex.: **Capacidade de Carga** = Força × multiplicador de tamanho
 (`Abreviações e Definição de Regras.md`, ~linha 228). Os JSON em `dados/` são a fonte
 consumida em runtime; os `.md` alimentam o entendimento das regras ao implementar.
+
+---
+
+## Testes
+
+Três verificações independentes, que respondem perguntas diferentes:
+
+| Verificação | Comando | Pergunta que responde |
+|---|---|---|
+| Extração dos monólitos | `python scripts/verificar_extracao.py tudo` | "os módulos ainda batem com o baseline?" — estático, sem navegador |
+| Paridade E2E | `cd testes/e2e && npm test` | "a tela é a mesma do repositório original?" — Playwright, 329 testes |
+| Regras de negócio | `cd testes/e2e && npm run test:regras` | "o app obedece ao **livro**?" — 339 de unidade + 72 de navegador |
+
+As duas últimas são independentes de propósito: um erro de regra presente
+**nos dois** repositórios passa na paridade para sempre, porque paridade só
+compara os dois lados entre si. Quem pega esse caso é a suíte de regras.
+
+### Suíte de paridade (`testes/e2e/`)
+
+A documentação completa vive em **[`testes/e2e/README.md`](testes/e2e/README.md)**
+— cobertura arquivo por arquivo, escopo e o histórico de por que a suíte existe.
+Não repito aqui; o essencial para se localizar:
+
+- Compara **este** repositório com o original `D-D_2024` lado a lado, executando
+  as mesmas ações nos dois e exigindo resultado idêntico. Quase nenhuma asserção
+  escreve o valor esperado à mão: a pergunta não é "a tela está correta", é "a
+  tela é a mesma".
+- Sobe os dois servidores estáticos sozinha. O original é procurado em
+  `../../../D-D_2024`; `REPO_ORIGINAL=/caminho` aponta para outro lugar.
+- Dois projetos Playwright: `paridade`, que **bloqueia** o Service Worker para o
+  cache não mascarar regressão, e `offline`, o único que o permite — serial,
+  porque ali o SW é o objeto do teste.
+- **329 testes em 10 arquivos**, ~6 min com 4 workers. Um único `test.skip`
+  (`inventario.spec.mjs`, arrastar item por toque), com o motivo escrito no
+  próprio arquivo.
+
+```bash
+cd testes/e2e
+npm run instalar                         # uma vez: deps + Chromium
+npm test                                 # a suíte inteira
+npx playwright test --project=offline    # só Service Worker
+npx playwright test ficha.spec.mjs       # só um arquivo
+npx playwright test --list               # o que existe, sem executar
+npm run test:esm ../..                   # parse ESM de todos os módulos
+```
+
+### Suíte de regras de negócio (`testes/regras/`)
+
+Confronta o app com o **livro** (`Informacoes Separadas/`) em vez de com o
+repositório original. Documentação completa em
+**[`testes/regras/README.md`](testes/regras/README.md)**; quem for cobrir um
+domínio novo deve ler antes o
+**[guia de próximos domínios](testes/regras/GUIA-PROXIMOS-DOMINIOS.md)**, que
+registra os erros da primeira rodada e traz um checklist de pré-voo.
+
+- Fonte da verdade: `catalogo/talentos.mjs`, com os 75 talentos curados à mão do
+  livro, cada entrada citando sua seção. Um teste garante cobertura de 100% do
+  que existe em `dados/` — sem amostragem.
+- Camada de unidade em `node:test` (sem dependência nova) e camada de navegador
+  em `testes/e2e/regras/`, que reaproveita o `node_modules` da paridade.
+- `lacunas-conhecidas.mjs` é o produto: as divergências app-vs-livro já
+  encontradas. Uma falha documentada mantém a suíte verde; corrigido o app, o
+  teste passa a cobrar a remoção da entrada.
+
+```bash
+cd testes/e2e
+npm run test:regras                      # unidade + navegador
+npm run test:regras:unidade              # só node:test
+npm run test:regras:e2e                  # só Playwright
+```
+
+### Manutenção da suíte
+
+- **Conteúdo novo entra na cobertura sozinho.** `classes.spec.mjs` e
+  `especies.spec.mjs` leem as listas de `dados/`, de `dados-classes.js` e a
+  tabela de níveis de `levelup.js` através de `dados.mjs`. Classe, espécie,
+  antecedente ou nível novo passa a ser testado no dia em que entra no jogo —
+  não há lista de casos para lembrar de editar.
+- **Não há amostragem**: as 12 classes em todos os 20 níveis, as 11 espécies e
+  os 16 antecedentes. Trocar isso por um "subconjunto representativo" é
+  exatamente o que a suíte existe para impedir.
+- **Os personagens vêm da fábrica do próprio app** (`store.criarPersonagemVazio()`),
+  semeados no `localStorage` — percorrer o wizard 240 vezes seria inviável. Se o
+  schema do personagem mudar, o ajuste é em `fixtures.mjs`, não nos specs. Uma
+  fixture errada já bloqueou dois testes e parecia bug do produto.
+- **O driver de UI está concentrado em `helpers.mjs`** (~33 KB, o maior arquivo
+  da suíte). Mudança de seletor ou de fluxo do wizard se conserta ali, num lugar
+  só, e não espalhada pelos specs.
+- **`test.skip` sem motivo escrito é omissão silenciosa.** A regra do
+  repositório é que todo skip carregue a justificativa no próprio arquivo; as
+  pendências ficam em `PERGUNTAS-PARA-REVISAO.txt`.
+- **Duas divergências do original são intencionais** e estão registradas no
+  README da suíte: `site/sw.js` (passou a consumir `js-precache.json`) e
+  `.github/workflows/deploy.yml` (passou a gerá-lo). Todo o resto — `dados/`,
+  `css/`, `img/`, `index.html`, `manifest.json` e os módulos fora de escopo —
+  tem de continuar byte a byte idêntico.
+- **`checar_esm.mjs` existe por um motivo específico:** `node --check` num
+  arquivo `.js` usa detecção de tipo e não força o parser de módulo, deixando
+  passar erro de sintaxe que quebra o site inteiro. Copiar para `.mjs` força o
+  parser. Já pegou um comentário de bloco partido entre `impressao.js` e
+  `pdf.js` que nenhuma checagem estática viu.
+
+---
+
+## Deploy e manutenção
+
+Publicação em GitHub Pages por `.github/workflows/deploy.yml`, com a fonte do
+Pages configurada como **GitHub Actions** (não "deploy from a branch"). Sem Node
+e sem bundler: o workflow usa apenas Python e `sed`.
+
+### Gatilhos e permissões
+
+| Item | Valor |
+|---|---|
+| Gatilhos | `push` em `main` e `workflow_dispatch` (execução manual) |
+| Concorrência | grupo `pages`, `cancel-in-progress: false` — deploys enfileiram, não se cancelam |
+| Permissões | `contents: read`, `pages: write`, `id-token: write` |
+| Ambiente | `github-pages`, com a URL pública exposta como saída do job |
+
+### Os 5 passos do workflow
+
+| # | Passo | O que faz |
+|---|---|---|
+| 1 | `actions/checkout@v4` | Clona o repositório |
+| 2 | `Prepare site` | Monta `_dist/`, gera os dois manifestos de precache e injeta a versão |
+| 3 | `actions/configure-pages@v5` | Lê a configuração do Pages do repositório |
+| 4 | `actions/upload-pages-artifact@v3` | Empacota `_dist/` em `artifact.tar` e envia |
+| 5 | `actions/deploy-pages@v4` | Cria o deployment e espera o backend do Pages publicar |
+
+O passo 2 é o único com lógica própria:
+
+1. `_dist/` recebe `index.html`, `site/` e `dados/` como irmãos — **a mesma
+   estrutura do repositório**, que é o motivo de `BASE_PATH = '../dados'`
+   funcionar igual em dev e em produção.
+2. Um script Python varre `_dist/dados/**` e grava `site/dados-precache.json`
+   com URLs `../dados/….json`.
+3. Outro varre `_dist/site/js/**` e grava `site/js-precache.json` com URLs
+   `./js/….js`, imprimindo a contagem no log (hoje: `61 modulos`).
+4. Dois `sed` trocam `CACHE_VERSION = 0` no `sw.js` e `v0` no header do
+   `index.html` pelo `github.run_number`.
+
+### Versionamento automático (e como ele serve de sonda)
+
+No repositório os marcadores ficam **sempre** em zero — `const CACHE_VERSION = 0; // AUTO`
+e `v0</span><!-- VERSION_AUTO -->`. Só o artifact publicado carrega o número do
+run. Isso tem uma consequência prática muito útil: **o número em produção diz
+exatamente qual run está no ar**, sem depender do log do Actions.
+
+Dois detalhes que já confundiram o diagnóstico:
+
+- **Re-run preserva o `run_number`.** Re-executar o run #19 publica `v19` de
+  novo, não `v20`. Se o número não avançou, não significa que o deploy falhou.
+- **Os manifestos de precache não são versionados.** Se `js-precache.json`
+  responde em produção, é prova de que o conteúdo veio do artifact do workflow
+  — não há como ele existir servindo direto de uma branch.
+
+### Conferir se um deploy realmente foi ao ar
+
+Não confie só no status do Actions; pergunte à produção. Roda em qualquer
+PowerShell:
+
+```powershell
+foreach ($u in @("site/index.html","site/sw.js","site/js-precache.json")) {
+  $r = Invoke-WebRequest -Uri "https://zaitbr-bit.github.io/DeD_2024/$u`?cb=$(Get-Random)" -UseBasicParsing
+  if     ($u -like "*index.html") { "index.html -> " + [regex]::Match($r.Content,'v\d+</span><!-- VERSION_AUTO -->').Value }
+  elseif ($u -like "*sw.js")      { "sw.js      -> " + [regex]::Match($r.Content,'const CACHE_VERSION = \d+').Value }
+  else                            { "js-precache-> " + ($r.Content | ConvertFrom-Json).Count + " modulos" }
+}
+```
+
+O `?cb=` é obrigatório: sem ele o CDN do Pages pode devolver a versão anterior.
+Os três valores têm de bater entre si — mesmo número de run e a contagem de
+módulos igual à impressa no log do passo 2.
+
+Para acompanhar um deploy lento sem ficar recarregando a página, um poll simples
+(Git Bash) que sai sozinho quando a versão mudar:
+
+```bash
+ATUAL=19   # versão que já está no ar
+for i in $(seq 1 40); do
+  v=$(curl -s "https://zaitbr-bit.github.io/DeD_2024/site/sw.js?cb=$i" \
+      | grep -o 'const CACHE_VERSION = [0-9]*' | grep -o '[0-9]*$')
+  [ -n "$v" ] && [ "$v" != "$ATUAL" ] && { echo "publicado: v$v"; break; }
+  echo "ainda v$v"; sleep 20
+done
+```
+
+### Manutenção do precache offline
+
+Os manifestos são **gerados por varredura**, então o caso comum não pede
+manutenção nenhuma:
+
+- Adicionar/remover JSON em `dados/` ou módulo em `site/js/**` → nada a fazer,
+  entram sozinhos no próximo deploy.
+- **Mover** `site/js/` ou `dados/` de lugar → aí sim, ajustar os `os.walk` e os
+  `.replace(...)` no passo `Prepare site`, porque as URLs gravadas são relativas
+  ao escopo do Service Worker (`/site/`).
+- Mudar o texto `const CACHE_VERSION = 0; // AUTO` ou o marcador
+  `v0</span><!-- VERSION_AUTO -->` → os `sed` deixam de casar **em silêncio**.
+  Não há erro no log; o site publica com `v0` e o cache do SW para de invalidar.
+  Se produção mostrar `v0`, é isso.
+
+### Diagnóstico de falhas de deploy
+
+O log do run diz em qual fronteira quebrou. As mensagens do passo 5 são as que
+importam:
+
+| Sintoma no log | Significado | Ação |
+|---|---|---|
+| `Current status: deployment_queued` repetido até `Timeout reached, aborting!` | O deployment foi criado e aceito, mas o backend do Pages nunca pegou o job | Ambiente do GitHub. Re-executar o run |
+| `deployment_in_progress` por vários minutos | O backend pegou o job, só está lento | Esperar; conferir produção pelo bloco acima |
+| `Timeout reached, aborting!` seguido de `Canceled deployment with ID …` | A action desistiu **e cancelou** o deployment | Re-executar; ver "aumentar o timeout" abaixo |
+| Falha em `configure-pages` | Pages desabilitado ou fonte fora de "GitHub Actions" | Settings → Pages → Source = GitHub Actions |
+| Deploy verde mas produção com `v0` | Os `sed` não casaram | Ver "Manutenção do precache offline" |
+| 404 em `dados/*.json` em produção | Arquivo fora do artifact | Conferir a listagem `Archive artifact` no log |
+
+Vale saber o que **não** é gargalo aqui: o artifact tem ~130 arquivos e ~1 MB, e
+os passos 1 a 4 levam poucos segundos no total. Quando um deploy demora, o tempo
+está no passo 5, esperando o backend do Pages — não no build.
+
+### Incidente de 2026-08-06 (registro)
+
+Deploy do commit `fc27f30` falhou com `Timeout reached, aborting!` após 10 min
+inteiros em `deployment_queued`, e o deployment foi cancelado.
+
+Investigação: passos 1 a 4 todos verdes (artifact de 1.029.387 bytes enviado, 61
+módulos no precache) e o deployment chegou a ser criado e aceito pela API. A
+configuração foi descartada como causa por evidência de produção — o site servia
+`v18`/`CACHE_VERSION = 18` e um `js-precache.json` que não existe no repositório,
+provando que a fonte do Pages já era GitHub Actions e que o run anterior havia
+publicado pelo mesmo pipeline. Também descartados limite de builds por hora (o
+push anterior fora 88 min antes) e artifact problemático.
+
+Re-executando, o deployment passou a `deployment_in_progress` e publicou em
+torno dos 11 min do início do job. **Causa: ambiente do GitHub** — fila e
+publicação do backend do Pages, fora do repositório. Nenhuma alteração de código
+foi necessária, e nenhuma foi mantida.
+
+Se repetir: re-executar o run é a primeira e normalmente única ação.
+
+### Se o timeout precisar de folga
+
+O `actions/deploy-pages@v4` espera **600000 ms (10 min)** por padrão, contados da
+criação do deployment até a publicação. Hoje o workflow **não sobrescreve** esse
+valor. Se as filas do Pages voltarem a passar de 10 min com frequência, dá para
+alargar a janela:
+
+```yaml
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          timeout: 1200000   # 20 min em vez dos 10 min padrão
+```
+
+Isso não acelera nada — só evita abortar um deploy que ainda ia completar. Como
+a causa é externa, é o único ajuste possível deste lado, e o custo é queimar mais
+minutos de Actions quando a fila estiver de fato travada.
 
 ---
 

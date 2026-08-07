@@ -6,7 +6,10 @@
   "scripts": {
     "test": "playwright test",
     "test:esm": "node checar_esm.mjs",
-    "instalar": "npm install && npx playwright install chromium"
+    "instalar": "npm install && npx playwright install chromium",
+    "test:regras": "npm run test:regras:unidade && npm run test:regras:e2e",
+    "test:regras:unidade": "node --test \"../regras/unidade/*.test.mjs\"",
+    "test:regras:e2e": "playwright test --config=regras/playwright.config.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.0"
