@@ -52,14 +52,16 @@ export async function modulosApp() {
   if (_cache) return _cache;
   instalarStubs();
   const importar = (rel) => import(pathToFileURL(resolve(RAIZ, rel)).href);
-  const [regras, efeitos, store, levelup, criador] = await Promise.all([
+  const [regras, efeitos, store, levelup, criador, utils, dadosClasses] = await Promise.all([
     importar('site/js/regras-cobertura.js'),
     importar('site/js/talentos-effects.js'),
     importar('site/js/store.js'),
     importar('site/js/levelup.js'),
     importar('site/js/creator/comum.js'),
+    importar('site/js/utils.js'),
+    importar('site/js/dados-classes.js'),
   ]);
-  _cache = { regras, efeitos, store, levelup, criador };
+  _cache = { regras, efeitos, store, levelup, criador, utils, dadosClasses };
   return _cache;
 }
 
@@ -76,6 +78,16 @@ export function lerTitulosLivro() {
   const md = readFileSync(
     resolve(RAIZ, 'Informacoes Separadas', 'Talentos.md'), 'utf-8');
   return new Set([...md.matchAll(/^###\s+(.+?)\s*$/gm)].map((m) => m[1]));
+}
+
+// Lê qualquer arquivo de `Informacoes Separadas/` como texto bruto -- usado
+// por motores que citam mais de um arquivo do livro (ex.:
+// ficha-transversal.test.mjs, cujas CITACOES apontam para "Criação de
+// Personagens.md", "Abreviações e Definição de Regras.md" e "Magias.md"),
+// onde uma função só-um-arquivo como lerTitulosLivro/lerHeadingsAntecedente
+// não serve.
+export function lerConteudoLivro(nomeArquivo) {
+  return readFileSync(resolve(RAIZ, 'Informacoes Separadas', nomeArquivo), 'utf-8');
 }
 
 // Achata dados/origens/antecedentes.json na lista de 16 antecedentes que o
