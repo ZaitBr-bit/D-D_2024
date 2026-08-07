@@ -4,11 +4,14 @@
 // ============================================================
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readdirSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { CATALOGO_TALENTOS, TIPOS_ESCOLHA } from '../catalogo/talentos.mjs';
 import { CATALOGO_ANTECEDENTES } from '../catalogo/antecedentes.mjs';
+import { PROGRESSAO } from '../catalogo/classes.mjs';
 import { LACUNAS, TESTES_VALIDOS, TIPOS_LACUNA } from '../lacunas-conhecidas.mjs';
 import { EXCECOES_ESCOLHA_REPETIDA } from '../excecoes-escolha-repetida.mjs';
-import { lerTalentosDados, lerTitulosLivro } from './harness.mjs';
+import { lerTalentosDados, lerTitulosLivro, RAIZ } from './harness.mjs';
 
 const dados = lerTalentosDados();
 const titulos = lerTitulosLivro();
@@ -20,8 +23,18 @@ const nomesCatalogo = new Set(Object.keys(CATALOGO_TALENTOS));
 // (.superpowers/sdd/antecedentes/tarefa-2-report.md). O que É
 // compartilhado com talentos é a higiene de LACUNAS logo abaixo: o
 // campo `talento` de uma entrada é só um identificador genérico, e
-// pode nomear um antecedente tanto quanto um talento.
+// pode nomear um antecedente tanto quanto um talento. O mesmo padrão se
+// repete no domínio Classes/Níveis: a bijeção/schema/citação do
+// catálogo de classes contra dados/classes/*.json vive em
+// unidade/classes.test.mjs (Task 4 do projeto
+// 2026-08-07-regras-classes-niveis), não aqui -- só a higiene de
+// LACUNAS é compartilhada, e por isso `talento` também aceita um nome
+// de classe.
 const nomesAntecedentes = new Set(Object.keys(CATALOGO_ANTECEDENTES));
+// Desde o domínio Classes/Níveis, `talento` também pode nomear uma das
+// 12 classes -- o campo é o identificador genérico da entidade sob
+// teste, não um nome de talento.
+const nomesClasses = new Set(Object.keys(PROGRESSAO));
 const ATRIBUTOS_VALIDOS = ['forca', 'destreza', 'constituicao', 'inteligencia', 'sabedoria', 'carisma'];
 
 test('todo talento de dados/ tem entrada no catálogo', () => {
@@ -83,11 +96,13 @@ for (const [nome, e] of Object.entries(CATALOGO_TALENTOS)) {
 test('lacunas conhecidas: todas com talento real, teste válido, motivo e tipo escritos', () => {
   for (const l of LACUNAS) {
     // `talento` é o identificador genérico da entidade sob teste -- pode
-    // ser um nome de talento (talentos.mjs) ou, desde o domínio
-    // Antecedentes, um nome de antecedente (antecedentes.mjs). Uma
-    // entrada só é rejeitada se não existir em NENHUM dos dois.
-    assert.ok(nomesCatalogo.has(l.talento) || nomesAntecedentes.has(l.talento),
-      `lacuna de entidade inexistente (nem talento nem antecedente): ${l.talento}`);
+    // ser um nome de talento (talentos.mjs), um nome de antecedente
+    // (antecedentes.mjs, desde o domínio Antecedentes) ou, desde o
+    // domínio Classes/Níveis, um nome de classe (classes.mjs). Uma
+    // entrada só é rejeitada se não existir em NENHUM dos três.
+    assert.ok(nomesCatalogo.has(l.talento) || nomesAntecedentes.has(l.talento)
+      || nomesClasses.has(l.talento),
+      `lacuna de entidade inexistente (nem talento, nem antecedente, nem classe): ${l.talento}`);
     assert.ok(TESTES_VALIDOS.includes(l.teste), `teste desconhecido: ${l.teste}`);
     assert.ok(l.motivo?.trim(), `lacuna sem motivo: ${l.talento}/${l.teste}`);
     // Achado I4: `tipo` distingue "o app diverge do livro" (o backlog real
@@ -96,6 +111,33 @@ test('lacunas conhecidas: todas com talento real, teste válido, motivo e tipo e
     // sem essa marca, as duas ficavam misturadas no mesmo contador.
     assert.ok(TIPOS_LACUNA.includes(l.tipo), `tipo de lacuna desconhecido: ${l.talento}/${l.teste} -> ${l.tipo}`);
   }
+});
+
+// Achado I2 da revisão final: TESTES_VALIDOS tinha três chaves
+// ('classes-gatilho', 'classes-progressao', 'classes-sanidade') sem
+// nenhum call site de comLacuna()/lacuna() em toda a suíte -- ou seja,
+// três "portas" abertas para uma lacuna inventada que nenhum teste
+// jamais poderia falsificar (o corpo confrontado nunca existia, então
+// nunca lançava, então a inversão de comLacuna nunca era exercitada).
+// Este teste fecha a porta: toda chave declarada em TESTES_VALIDOS
+// precisa aparecer, como literal de string, em pelo menos um arquivo de
+// motor (unidade/*.test.mjs ou e2e/regras/*.spec.mjs) -- é a mesma
+// checagem que o achado I2 pediu, agora automática em vez de depender
+// de alguém notar na revisão.
+test('toda chave de TESTES_VALIDOS é referenciada por algum motor de teste', () => {
+  const arquivosUnidade = readdirSync(resolve(RAIZ, 'testes/regras/unidade'))
+    .filter((f) => f.endsWith('.test.mjs'))
+    .map((f) => resolve(RAIZ, 'testes/regras/unidade', f));
+  const arquivosE2E = readdirSync(resolve(RAIZ, 'testes/e2e/regras'))
+    .filter((f) => f.endsWith('.spec.mjs'))
+    .map((f) => resolve(RAIZ, 'testes/e2e/regras', f));
+  const conteudo = [...arquivosUnidade, ...arquivosE2E]
+    .map((f) => readFileSync(f, 'utf-8'))
+    .join('\n');
+  const semConsumidor = TESTES_VALIDOS.filter((chave) => !conteudo.includes(`'${chave}'`));
+  assert.deepEqual(semConsumidor, [],
+    `chave(s) de TESTES_VALIDOS sem nenhuma chamada comLacuna()/lacuna() que a use: ` +
+    `${semConsumidor.join(', ')} -- remova a chave de TESTES_VALIDOS ou acrescente o call site`);
 });
 
 // Mesma higiene de LACUNAS, aplicada a excecoes-escolha-repetida.mjs

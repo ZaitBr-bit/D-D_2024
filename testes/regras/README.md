@@ -64,7 +64,7 @@ ver a seção sobre os specs Playwright abaixo):
 ```bash
 cd testes/e2e
 npm run test:regras            # as duas suítes de regras, em sequência
-npm run test:regras:unidade    # só os 7 motores de node:test
+npm run test:regras:unidade    # só os 9 motores de node:test
 npm run test:regras:e2e        # só os specs Playwright (regras/*.spec.mjs)
 ```
 
@@ -141,27 +141,29 @@ linha contra `Talentos.md` no relatório de desenho do motor
 
 ## O que cada motor prova — e o que não prova
 
-Sete motores de `node:test` em `unidade/`, mais cinco specs Playwright em
+Nove motores de `node:test` em `unidade/`, mais cinco specs Playwright em
 `../e2e/regras/`. Cada um confronta uma fatia diferente do livro, e nenhum
 sozinho prova a regra inteira.
 
 | Motor | O que confronta | Testes |
 |---|---|---|
-| `completude.test.mjs` | Catálogo × `dados/`: bijeção, schema (1 por talento, incluindo `opcoes` e `aumento_atributo`), citação real, higiene das lacunas (incluindo o campo `tipo`) e higiene das exceções de escolha repetida | 80 |
+| `completude.test.mjs` | Catálogo × `dados/`: bijeção, schema (1 por talento, incluindo `opcoes` e `aumento_atributo`), citação real, higiene das lacunas (incluindo o campo `tipo`), higiene das exceções de escolha repetida, e (achado I2 da revisão final) toda chave de `TESTES_VALIDOS` tem pelo menos um call site de `comLacuna()`/`lacuna()` na suíte | 81 |
 | `escolhas.test.mjs` | Talento com escolha no livro é *reconhecido* pelo app (via `obterAtributosASITalento` para ASI embutido, ou `REGRAS_TALENTOS`/`talentoExigeEscolhas` para o resto) — **e**, para as 75 entradas, `aumento_atributo` do catálogo confrontado contra `obterAtributosASITalento` (achado I3: campo curado à mão que antes nada confrontava) | 134 |
 | `validacao.test.mjs` | Um exemplo válido (curado do livro) é aceito; mutações inválidas (item removido, duplicata) são rejeitadas, quando aplicável | 64 |
 | `passivos.test.mjs` | Bônus numéricos e flags internas que `resolverPassivosTalentos()` deveria produzir | 62 |
 | `escolha-morta.test.mjs` | Uma escolha reoferecida depois de saturar o personagem (aplicar o efeito até não crescer mais) precisa ser recusada — nenhuma seção do livro proíbe isso com todas as letras, é o próprio estado do app confrontado contra si mesmo | 59 (15 rodam a asserção; **44 skip**, cada um com o motivo escrito no próprio `t.skip`) |
 | `antecedentes.test.mjs` | Catálogo dos 16 antecedentes × `dados/origens/antecedentes.json`: bijeção/schema/citação (19), os cinco campos do livro por antecedente (atributos, talento, perícias, ferramenta, equipamento — 80), e coerência cruzada com `catalogo/talentos.mjs` (o talento de origem existe e é `'de Origem'` — 16) | 115 |
 | `ficha-transversal.test.mjs` | Completude do catálogo (MODIFICADORES_ATRIBUTO cobre exatamente 1-30, EVOLUCAO_PERSONAGEM cobre exatamente 1-20, PV_NIVEL_1/PV_NIVEL_SEGUINTE cobrem exatamente as classes de CLASSES_INFO) e validação de citações (todas as entradas de CITACOES resolvem para trechos reais do livro); mais as fórmulas transversais da ficha confrontadas com as tabelas do livro por **varredura exaustiva** (não amostragem): modificador de atributo (30/30 valores), Bônus de Proficiência (20/20 níveis) e `calcularNivelPorXP` (os 20 pisos, mais interior de faixa e bordas), PV de nível 1 e dos níveis seguintes (12 classes × mod. Constituição -5..+10, e também × níveis 1-20 para os níveis seguintes), CA base sem armadura (30 valores de Destreza), CD e ataque de magia (8 classes conjuradoras × 20 níveis × 30 valores de atributo) e Percepção Passiva (3 estados de proficiência × 30 valores de Sabedoria × 20 níveis) | 14 |
+| `classes.test.mjs` | Motor **estrutural** do domínio Classes/Níveis: o catálogo (transcrito do livro, 12 classes × 20 níveis) confrontado contra as DUAS fontes de verdade do app para os mesmos fatos — `dados/classes/*.json` (bijeção, schema por classe, os 48 nomes de subclasse, e as 240 linhas de tabela coluna a coluna) e `CLASSES_INFO` (`site/js/dados-classes.js`, a segunda fonte, que alimenta PV e CD/ataque de magia); mais as funções puras que leem a tabela (`getEspacosMagia`, `getTruquesConhecidos`, `getMagiaPreparadas`, `calcularHPGanho`, `obterCaracteristicasNivel`) e as oito listas hard-coded de `levelup.js` que decidem o que cada nível exige (gatilhos de subclasse, ASI/Dádiva Épica, Estilo de Luta, Especialização de Bardo/Guardião, Explorador Hábil, Acadêmico, mais as manobras do Mestre da Batalha); mais o **teste converso** (incremento de 2026-08-07, achado do Ladino nv6): para toda célula em que o livro imprime um rótulo que exige escolha (via os mesmos `ROTULOS_GATILHO`, sem a restrição `apenas`), alguma das oito funções precisa disparar — as duas exceções de nível 1 (Guerreiro/Estilo de Luta, Ladino/Especialização, cobertas pelo fluxo de criação) são uma lista curada e exigida como **exata**, não puladas | 440 |
+| `classes-progressao.test.mjs` | Motor **comportamental** do domínio Classes/Níveis: sobe um personagem de cada uma das 12 classes do nível 1 ao 20 de verdade, via `subirDeNivel()` (`site/js/levelup.js`) — sem navegador, ver "Achados do domínio Classes/Níveis" abaixo — e confronta, em cada nível, bônus de proficiência, PV máximo (regra retroativa de Constituição) e espaços de magia contra a tabela do livro; mais as pendências que o app de fato exige (subclasse, ASI, Dádiva Épica, as 5 pendências de classe única) contra os níveis do livro, e duas asserções de bom senso sem frase do livro para citar, comportamentais (dirigem `escadaDeNivel` de verdade): espaço de magia nunca diminui ao subir, subclasse não é reoferecida depois de escolhida. Uma terceira asserção do mesmo bloco, "característica não é concedida duas vezes", NÃO é comportamental (achado M2 da revisão final) — é uma autoconferência do catálogo contra si mesmo (`PROGRESSAO` × `REPETEM_NO_LIVRO`), sem tocar `escadaDeNivel` nem nenhum personagem; útil (achou 4 exceções reais do livro), mas não um confronto com o app | 62 |
 
-Total: **528 testes** em `unidade/` — **484 passam, 44 skip, 0 falham**. Os
+Total: **1031 testes** em `unidade/` — **987 passam, 44 skip, 0 falham**. Os
 skips não somem dentro do total: são talentos cujo `aplicarEfeitoTalento` não
 faz nenhum campo de lista crescer (fora do escopo deste motor específico, não
 do livro), e cada um carrega o motivo por escrito — um skip silencioso, aqui,
 seria a mesma omissão que uma lacuna sem `motivo` já é proibida de ser. Nenhum
-skip novo veio do motor de antecedentes nem do de regras transversais da
-ficha.
+skip novo veio do motor de antecedentes, do de regras transversais da ficha
+nem do domínio Classes/Níveis.
 
 ### O que `escolha-morta.test.mjs` cobre que os outros quatro não cobrem
 
@@ -606,6 +608,101 @@ Personagem — incluindo a coluna de XP — está coberta inteira aqui
 confrontados nos 20 níveis). O domínio de classes/níveis não deve duplicar
 essa tabela quando chegar a sua vez.
 
+## Achados do domínio Classes/Níveis (2026-08-07)
+
+**O que foi varrido, por completo, sem amostragem.** As 12 classes × 20
+níveis — as 240 linhas da tabela "Características de Classe" de cada uma,
+transcritas do livro para `catalogo/classes.mjs` e conferidas célula a célula
+por revisão independente contra `dados/classes/*.json` e `CLASSES_INFO`
+(`classes.test.mjs`) — mais a subida de nível 1 a 20 **de verdade**, via
+`subirDeNivel()`, para as 12 classes (`classes-progressao.test.mjs`).
+Diferente dos domínios anteriores (Talentos, Antecedentes), este confrontou
+comportamento **sem navegador**: `subirDeNivel()` é dirigível em Node porque
+`db.js` lê `dados/` do disco por trás de um stub de `fetch` (harness.mjs) —
+não precisou de Playwright para provar que o app aplica a tabela a um
+personagem de verdade, nível a nível.
+
+**Duas causas-raiz, não três lacunas independentes.** `lacunas-conhecidas.mjs`
+termina a rodada com 2 entradas novas (`Clérigo`/`classes-tabela` e
+`Ladino`/`classes-info`), cobrindo os 3 testes vermelhos do motor estrutural
+— ler "3" teria dado uma impressão errada do tamanho do problema:
+
+- **Clérigo, nível 3 (2 dos 3 testes).** A célula da tabela do livro
+  (`Classes.md:1515`) traz "Subclasse Clérigo", sem "de";
+  `dados/classes/clerigo.json` grava "Subclasse de Clérigo" — a forma do
+  heading de prosa que abre a característica (`Classes.md:1584`), não a da
+  célula da tabela. É isolado ao Clérigo (Bárbaro e Ladino têm o mesmo padrão
+  "Subclasse X" sem "de" na tabela, e `dados/` reproduz sem "de" corretamente
+  nos dois). Os dois testes vermelhos são o **mesmo defeito** visto por duas
+  rotas de código — leitura crua da célula, e `obterCaracteristicasNivel`
+  (`site/js/levelup.js:381-394`), que lê a mesma célula — não um segundo
+  achado. Consequência funcional, medida no código, não suposta:
+  **nenhuma**. O único consumidor da função só renderiza a lista recebida
+  como `<li>${c}</li>`; `exigeSubclasse` decide a obrigatoriedade de escolher
+  subclasse por uma tabela fixa `{classe: nível}`, sem ler a característica;
+  e nenhum `.nome === '...'` em `site/js/` compara este texto. O efeito real,
+  único, é de exibição: o card de level-up e a ficha/impressão do Clérigo no
+  nível 3 mostram uma palavra a mais.
+- **Ladino, proficiência com armas (1 dos 3 testes).** `Classes.md:4152`
+  concede proficiência com armas Marciais que tenham a propriedade
+  "Acuidade **ou** Leve"; `site/js/dados-classes.js:105` codifica só
+  Acuidade. Diferente do achado do Clérigo, este TEM consequência funcional
+  real e medida: a Besta de Mão (`dados/equipamento/armas.json`) é a única
+  arma Marcial do jogo com Leve e sem Acuidade, então um Ladino equipado com
+  ela é rotulado "Sem Prof" na ficha e no criador, com o bônus de ataque
+  exibido subestimado pelo bônus de proficiência inteiro
+  (`site/js/sheet/inventario.js:163-164`).
+
+Os motivos completos, com arquivo e linha dos dois lados, vivem em
+`lacunas-conhecidas.mjs`; a investigação passo a passo está em
+`task-4-report.md` e `task-5-report.md`
+(`.superpowers/sdd/2026-08-07-regras-classes-niveis/`).
+
+**13 falhas do motor de gatilhos NÃO eram lacunas.** A primeira rodada do
+laço de `GATILHOS` (`classes.test.mjs`, Task 6) deu 13 falhas. Nenhuma virou
+entrada em `lacunas-conhecidas.mjs`: rastrear cada uma até o consumidor real
+do app, antes de classificar, mostrou que eram **duas asserções mal
+formuladas** medindo arquitetura em vez de comportamento (o erro nº 1 do
+[GUIA-PROXIMOS-DOMINIOS.md](GUIA-PROXIMOS-DOMINIOS.md) — o mesmo que gerou 31
+lacunas falsas na rodada de Talentos). Corrigidas as duas asserções, as 13
+voltaram a zero sem tocar em `site/js/`. O que impediu 13 lacunas falsas foi
+essa disciplina — rastrear a consequência no código antes de reportar —, não
+um teste ter pego o erro sozinho.
+
+**O escopo declarado fora**, em voz alta:
+
+- **Características de subclasse por nível** (as 48 subclasses) — o
+  catálogo já traz os 48 nomes (bijeção conferida contra `dados/`), só falta
+  pendurar as características por nível. Isto é **dependência direta da
+  rodada seguinte** (Subclasses), não um esquecimento.
+- **Listas de magias por classe** — domínio Magias.
+- **Multiclasse** — o app não implementa.
+- **Os ramos de classe herdados de `ficha-transversal.test.mjs`**
+  (`calcCA`, `calcBonusPericia`, `calcPercepcaoPassiva`) — três deles
+  dependem de subclasse (Bardo do Colégio da Dança, Feiticeiro da
+  Feitiçaria Dracônica, Clérigo da Ordem Divina Taumaturgo), então
+  acompanham a rodada de Subclasses; nenhum ganhou teste nesta rodada.
+
+**A tabela Evolução do Personagem não foi duplicada.** Bônus de Proficiência
+e XP já estavam cobertos, nos 20 níveis, por `ficha-transversal.test.mjs`
+(domínio anterior); este domínio só confronta a coluna DA CLASSE contra essa
+mesma progressão (`classes-progressao.test.mjs`), não a tabela geral de novo.
+
+**Os limites declarados dos dois motores**, escritos no cabeçalho de
+`classes-progressao.test.mjs` para que "1031 testes verdes" não pareça uma
+garantia maior do que é:
+
+- A asserção de Bônus de Proficiência no motor comportamental é
+  utils×catálogo, **não** comportamental de verdade — `subirDeNivel` não
+  grava um campo de bônus de proficiência na ficha (o app deriva na hora via
+  `utils.bonusProficiencia(nivel)`), então não existe um valor gravado para
+  confrontar.
+- O motor comportamental **não** afirma as colunas de recurso específicas de
+  cada classe (Truques, Magias Preparadas, Fúrias, Dano da Fúria, Maestria em
+  Arma etc.) — o catálogo as transcreve e o motor **estrutural**
+  (`classes.test.mjs`) as confronta célula a célula; o comportamental só
+  confronta bônus de proficiência, PV e espaços de magia.
+
 ## Mapa de domínios futuros
 
 Talentos foi o piloto. A ordem sugerida originalmente (do spec de design
@@ -625,11 +722,14 @@ a que foi seguida de fato, não a original:
 3. ~~Regras transversais da ficha~~ — feito (achados acima; adiantado por
    densidade de função pura medida no pré-voo)
 4. **Espécies** — traços, deslocamento, magias raciais
-5. **Classes/níveis** — características por nível, espaços de magia, escolhas
-   de subclasse; herda os ramos de classe anotados acima (`calcCA`,
-   `calcBonusPericia`, `calcPercepcaoPassiva`) e não deve duplicar a tabela
-   Evolução do Personagem, já coberta acima
-6. **Magias** — preparo, limites por círculo
+5. ~~Classes/níveis~~ — feito (achados acima; as características de
+   subclasse por nível ficaram deliberadamente fora, ver "escopo declarado
+   fora" acima)
+6. **Subclasses** — as características por nível das 48 subclasses, cujos
+   nomes o catálogo de Classes/Níveis já traz (bijeção conferida contra
+   `dados/`); herda também os ramos de classe que dependem de subclasse
+   (`calcCA`, `calcBonusPericia`, `calcPercepcaoPassiva`, anotados acima)
+7. **Magias** — preparo, limites por círculo
 
 Cada domínio novo é **um arquivo de catálogo + um motor** — a estrutura não
 muda. Não é preciso reprojetar nada para crescer: copiar o padrão de
