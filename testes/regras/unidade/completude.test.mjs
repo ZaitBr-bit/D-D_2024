@@ -6,6 +6,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { CATALOGO_TALENTOS, TIPOS_ESCOLHA } from '../catalogo/talentos.mjs';
 import { LACUNAS, TESTES_VALIDOS, TIPOS_LACUNA } from '../lacunas-conhecidas.mjs';
+import { EXCECOES_ESCOLHA_REPETIDA } from '../excecoes-escolha-repetida.mjs';
 import { lerTalentosDados, lerTitulosLivro } from './harness.mjs';
 
 const dados = lerTalentosDados();
@@ -80,5 +81,18 @@ test('lacunas conhecidas: todas com talento real, teste válido, motivo e tipo e
     // limitação de quem está testando, não uma alegação sobre o app) --
     // sem essa marca, as duas ficavam misturadas no mesmo contador.
     assert.ok(TIPOS_LACUNA.includes(l.tipo), `tipo de lacuna desconhecido: ${l.talento}/${l.teste} -> ${l.tipo}`);
+  }
+});
+
+// Mesma higiene de LACUNAS, aplicada a excecoes-escolha-repetida.mjs
+// (motor unidade/escolha-morta.test.mjs): talento real e motivo preenchido.
+// Diferente de LACUNAS, esta lista não tem campo `teste` (só existe uma
+// chave de teste possível, 'escolha-morta') nem `tipo` -- toda entrada
+// aqui é da mesma natureza ("o livro concede algo a mais na repetição"),
+// então não há duas alegações a distinguir como em TIPOS_LACUNA.
+test('exceções de escolha repetida: todas com talento real e motivo escrito', () => {
+  for (const ex of EXCECOES_ESCOLHA_REPETIDA) {
+    assert.ok(nomesCatalogo.has(ex.talento), `exceção de talento inexistente: ${ex.talento}`);
+    assert.ok(ex.motivo?.trim(), `exceção sem motivo: ${ex.talento}`);
   }
 });
