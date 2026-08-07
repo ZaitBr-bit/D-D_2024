@@ -270,6 +270,112 @@ se ninguém a formular de propósito.
 
 ---
 
+## A lição do domínio Antecedentes (2026-08-07)
+
+**O que aconteceu.** Os motores de unidade de talentos são todos desenhados
+em cima de funções puras do app — `obterAtributosASITalento`,
+`validarEscolhasTalento`, `resolverPassivosTalentos` — e o hábito natural,
+copiando essa estrutura, seria procurar o equivalente para antecedentes. Não
+existe: `passo-antecedente.js` só exporta `renderStepAntecedente` e
+`_reconstruirTalentosBase` (verificado no pré-voo do plano, e confirmado de
+novo ao desenhar o motor); o resto do comportamento vive dentro de handlers
+de evento, sem ponto de entrada isolável em Node. O motor de unidade
+(`antecedentes.test.mjs`) confrontou outra coisa: `dados/origens/
+antecedentes.json`, o arquivo que o app de fato lê em runtime. Se `dados/`
+divergisse do livro, todo fluxo que o consome estaria errado na origem, sem
+precisar de navegador para provar — um confronto de alto retorno que **não
+existia** no desenho de talentos, porque lá o catálogo era confrontado contra
+funções do app, não contra o arquivo de dados de origem. Foi esse motor que
+sobrou com zero lacunas (115 asserções, todas batendo); as 21 lacunas reais
+só apareceram na camada de navegador, que aqui carregou sozinha toda a
+confrontação comportamental — "o assistente realmente aplica esses dados ao
+personagem?" — que em talentos tinha sido dividida entre unidade e Playwright.
+
+**Por que é útil saber.** "Copiar o padrão do domínio anterior" (a própria
+recomendação da seção "Mapa de domínios futuros" deste README) é seguro para
+a *estrutura de arquivos* — um catálogo, um motor de unidade, specs de
+navegador — mas não para *o que o motor de unidade confronta*. Isso depende
+de quais mecanismos o domínio realmente tem no app, e só se descobre lendo o
+código daquele domínio especificamente. Se a Tarefa 2 deste projeto tivesse
+tentado forçar o formato de talentos (procurar uma função para chamar,
+comparar contra um exemplo válido do jeito que `validacao.test.mjs` faz),
+teria produzido um motor fraco ou vazio — não porque antecedentes seja mais
+simples, mas porque a pergunta de maior retorno neste domínio vive num lugar
+diferente da árvore.
+
+**Como aplicar.** Ao montar o desenho de um domínio novo (a seção "onde cada
+confronto vive" do plano), não presuma que a divisão entre unidade e
+navegador do domínio anterior vai se repetir. Pergunte, para *este* domínio
+especificamente: existe função pura que produz o resultado final, ou o
+resultado só existe depois de uma sequência de eventos de DOM? Se for a
+segunda, o motor de unidade de maior retorno normalmente é outro: confrontar
+o arquivo de `dados/` que o app consome contra o livro, deixando toda a
+confrontação comportamental para o navegador — como aconteceu aqui.
+
+(Um segundo candidato a lição foi cogitado e descartado: a hipótese de que 21
+lacunas chegando juntas pareceriam, à primeira vista, o cheiro de "bug de
+driver" que o erro 6 deste guia adverte. Não foi isso que aconteceu — o
+relatório da Tarefa 3 registra que a primeira rodada completa do spec já
+correu 39/39 verde, porque os 21 casos usam `test.fail()` desde a escrita,
+citando a lacuna correspondente; nunca houve um momento de suíte vermelha em
+massa para desconfiar. Registrar essa lição inventaria uma dificuldade que
+este domínio não teve.)
+
+---
+
+## A lição da correção de Antecedentes (2026-08-07)
+
+**O que aconteceu.** A correção das 21 lacunas de antecedentes (ver
+`.superpowers/sdd/antecedentes/correcao-report.md`) tinha um jeito óbvio de
+rotear a ferramenta/instrumento consolidada até a proficiência certa: checar
+o valor escolhido contra as listas que o app já tem para isso —
+`FERRAMENTAS_TODAS` e `INSTRUMENTOS_MUSICAIS` (`comum.js`), o mesmo padrão
+que o bloco irmão de `escolhas_talento` já usa em `wizard.js`. Investigando
+antes de copiar esse padrão, quem corrigiu achou que as duas listas estão
+incompletas, cada uma por um motivo diferente: `FERRAMENTAS_TODAS`
+(`comum.js:93-102`) não contém nenhuma das 4 opções de Kit de Jogos que
+Guarda/Nobre/Soldado oferecem (Baralho, Conjunto de Dados, Xadrez de Dragão,
+Jogo de Três Dragões); `INSTRUMENTOS_MUSICAIS` (`comum.js:104-107`) não
+contém três das dez opções que a tela do Artista realmente oferece (Corne,
+Flauta de Pã com til, Harpa). Rotear por associação de lista teria
+descartado essas escolhas em silêncio — a mesma classe de bug que a
+correção existia para fechar, só que uma camada acima: em vez de "a
+ferramenta nunca é gravada", teria virado "a ferramenta é gravada, exceto
+quando o jogador escolhe uma das opções que a lista esqueceu" — um bug mais
+raro, mais difícil de notar, e indistinguível de sucesso em qualquer teste
+que não cubra literalmente essas opções. A correção evitou isso roteando por
+outra coisa: o **campo** declarado em `ANTECEDENTES_ESCOLHAS[nome].campo`,
+que só tem três valores possíveis (`ferramenta_escolhida`,
+`instrumento_escolhido`, `jogos_escolhido`), fixos no próprio catálogo de 5
+entradas — um conjunto fechado, sem "valor que não bate com nada" para
+descartar, porque não compara o VALOR escolhido contra lista nenhuma.
+
+**Por que é útil saber.** Um bug de "valor descartado em silêncio" quase
+sempre tem uma causa parecida: em algum ponto, uma checagem de pertencimento
+(`.includes()`, `switch` com `default` mudo, mapa que devolve `undefined`)
+decide se o valor é reconhecido, e a lista por trás dessa checagem foi
+escrita numa época diferente das opções que o valor pode assumir hoje. Uma
+correção que reaproveita essa mesma checagem herda o mesmo risco — só que
+agora escondido atrás de "eu só copiei o padrão que já existia", o que faz o
+risco parecer menor do que é. Aqui não foi hipotético: eram **duas**
+armadilhas desse tipo, não uma — a segunda (`INSTRUMENTOS_MUSICAIS`) nem
+tinha sido apontada pelo enunciado do bug, só apareceu porque quem corrigiu
+foi checar as duas listas candidatas, não só a que o relato mencionava.
+
+**Como aplicar.** Ao corrigir um bug do tipo "valor X nunca chega a Y":
+antes de rotear pelo mecanismo mais próximo que já existe, pergunte se esse
+mecanismo consegue representar **toda opção que a tela realmente oferece**
+hoje — não só os casos que motivaram a correção. Se o roteamento depende de
+comparar o valor contra uma lista de opções válidas, enumere as opções reais
+(a tela, não a documentação) e confira uma a uma — nas duas listas
+candidatas, não só na mais óbvia. Se existir um campo mais estreito e
+fechado — um identificador que descreve *para onde o valor vai*, em vez do
+próprio valor — prefira rotear por ele: um conjunto fechado de rótulos
+conhecidos não tem como "esquecer" um valor futuro, porque o valor nunca
+entra na comparação.
+
+---
+
 ## Dois vícios de relatório
 
 **Motivo que superafirma.** Um motivo de lacuna dizia que a verificação do app

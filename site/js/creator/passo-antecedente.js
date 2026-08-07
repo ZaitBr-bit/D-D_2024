@@ -69,6 +69,62 @@ export function _reconstruirTalentosBase() {
   }
 }
 
+// Consolida a ferramenta/instrumento do antecedente ATUAL (personagem.antecedente)
+// em proficiencias_ferramentas/proficiencias_instrumentos -- determinística,
+// igual a _reconstruirTalentosBase() acima: remove a contribuição do antecedente
+// anterior (guardada em dadosCache.ferramentaAntecedenteAtual) antes de recalcular,
+// então pode ser chamada de novo com segurança sempre que o antecedente ou a
+// escolha de ferramenta/instrumento mudar, sem duplicar nem deixar uma
+// proficiência órfã de um antecedente trocado.
+//
+// Roteamento por CAMPO conhecido (o `campo` de ANTECEDENTES_ESCOLHAS), não por
+// lista de valores: só existem três campos possíveis (ferramenta_escolhida,
+// instrumento_escolhido, jogos_escolhido) e cada um mapeia para exatamente uma
+// das duas arrays. Checar a escolha contra INSTRUMENTOS_MUSICAIS.includes()/
+// FERRAMENTAS_TODAS.includes() (como o bloco de escolhas_talento em wizard.js
+// já faz) NÃO serve aqui: as opções de Kit de Jogos (Baralho, Conjunto de
+// Dados, Xadrez de Dragão, Jogo de Três Dragões) não pertencem a nenhuma das
+// duas listas, e a escolha de Guarda/Nobre/Soldado desapareceria em silêncio
+// -- exatamente o tipo de bug que esta função existe para corrigir.
+//
+// Roda na confirmação do popup do antecedente (não só no fim do assistente,
+// em wizard.js:finalizar) porque o personagem em construção já deve refletir
+// a ferramenta assim que o antecedente é confirmado -- não existe uma segunda
+// via de aquisição de antecedente para consolidar depois.
+export function _consolidarFerramentaAntecedente() {
+  // Remover a contribuição do antecedente anterior, se houver, antes de recalcular
+  if (dadosCache.ferramentaAntecedenteAtual) {
+    const { valor, campo } = dadosCache.ferramentaAntecedenteAtual;
+    const arr = campo === 'instrumento_escolhido' ? personagem.proficiencias_instrumentos : personagem.proficiencias_ferramentas;
+    const idx = arr ? arr.indexOf(valor) : -1;
+    if (idx >= 0) arr.splice(idx, 1);
+    dadosCache.ferramentaAntecedenteAtual = null;
+  }
+
+  if (!personagem.antecedente) return;
+  const ant = dadosCache.antecedentes.find(a => a.nome === personagem.antecedente);
+  const antEscolha = ANTECEDENTES_ESCOLHAS[personagem.antecedente];
+
+  // Ferramenta por categoria (Artesão/Artista/Guarda/Nobre/Soldado) usa a
+  // escolha do jogador; os outros 11 antecedentes têm ferramenta específica
+  // fixa no próprio dado (ant.ferramentas).
+  let valor, campo;
+  if (antEscolha) {
+    valor = personagem.escolhas_antecedente?.[antEscolha.campo] || null;
+    campo = antEscolha.campo;
+  } else {
+    valor = ant?.ferramentas?.trim() || null;
+    campo = 'ferramenta_escolhida';
+  }
+  if (!valor) return;
+
+  if (!personagem.proficiencias_ferramentas) personagem.proficiencias_ferramentas = [];
+  if (!personagem.proficiencias_instrumentos) personagem.proficiencias_instrumentos = [];
+  const destino = campo === 'instrumento_escolhido' ? personagem.proficiencias_instrumentos : personagem.proficiencias_ferramentas;
+  if (!destino.includes(valor)) destino.push(valor);
+  dadosCache.ferramentaAntecedenteAtual = { valor, campo };
+}
+
 function abrirPopupAntecedente(nome) {
   const ant = dadosCache.antecedentes.find(a => a.nome === nome);
   if (!ant) return;
@@ -196,6 +252,10 @@ function abrirPopupAntecedente(nome) {
     // e mantém consistência se o usuário revisitar o passo Espécie depois)
     personagem.talento_antecedente = talentoNome || '';
     _reconstruirTalentosBase();
+    // Grava a ferramenta/instrumento do antecedente nas arrays de proficiência
+    // (achado do spec de regras: nada fazia isso antes -- ver comentário na
+    // função para o porquê de rodar aqui, não só no fim do assistente).
+    _consolidarFerramentaAntecedente();
 
     window.fecharModal();
     // Re-renderizar o passo com o resumo e distribuicao de atributos
