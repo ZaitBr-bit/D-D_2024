@@ -161,79 +161,123 @@ continua sem build e sem dependência nenhuma). Por isso os specs moram em
 original) — e os scripts `test:regras:*` em `testes/e2e/package.json` são o
 jeito de rodar as duas metades (unidade e e2e) sem sair dessa árvore.
 
-## Achados desta rodada
+## Achados desta rodada (encontrados em 2026-08-05, corrigidos em 2026-08-06)
 
-O produto real deste projeto não é "339 + 72 testes verdes" — é a lista de
-lacunas que eles produziram. `lacunas-conhecidas.mjs` tem **15 entradas**,
-todas em talentos de escolha (nenhuma em passivos/flags), mas nem todas são
-a mesma alegação — cada uma carrega um campo `tipo` (achado I4) distinguindo:
+O produto real deste projeto não foi "339 + 72 testes verdes" — foi a lista de
+lacunas que eles produziram. Quando a rodada de testes fechou,
+`lacunas-conhecidas.mjs` tinha **15 entradas**, todas em talentos de escolha
+(nenhuma em passivos/flags), distinguidas por um campo `tipo` (achado I4):
 
-- **`'app-diverge-do-livro'`** (11 entradas, **7 talentos**): o app faz algo
+- **`'app-diverge-do-livro'`** (11 entradas, **7 talentos**): o app fazia algo
   diferente do que o livro manda, confirmado por leitura de código e/ou
-  empiricamente no navegador. **Este é o backlog real**:
-  - **Mestre das Armas** — a tela de subida de nível não renderiza *nenhum*
+  empiricamente no navegador. Este era o backlog real — e é o que uma rodada
+  de correção, em 2026-08-06, fechou por completo: **as 11 entradas foram
+  corrigidas e removidas**. O plano e os relatórios de execução vivem em
+  `docs/superpowers/plans/2026-08-06-correcao-lacunas-talentos.md` e
+  `.superpowers/sdd/correcao-lacunas/tarefa-{a,b,c}-report.md`. O que cada uma
+  era, e o que a corrigiu:
+  - **Mestre das Armas** — a tela de subida de nível não renderizava *nenhum*
     controle para a escolha de arma da "Propriedade de Maestria" que o
-    livro exige (`Talentos.md:532`). Nem sequer aparece um `<select>`
-    errado; não aparece nada. Confirmado dos dois lados (`escolhas`: nenhum
+    livro exige (`Talentos.md:532`). Nem sequer aparecia um `<select>`
+    errado; não aparecia nada. Confirmado dos dois lados (`escolhas`: nenhum
     ramo em `levelup-ui.js:renderEscolhasTalento` para este talento;
-    `e2e-levelup`: a tela mesmo, ao vivo, não oferece nada).
-  - **Adepto Elemental** — o `<select>` de tipo de dano existe, mas com três
-    rótulos trocados: oferece Frio/Fogo/Trovão onde o livro pede
-    Gélido/Ígneo/Trovejante (`Talentos.md:244`). Além disso, a escolha não é
-    exigida para concluir a subida de nível.
-  - **Analítico** — o `<select>` de perícia oferece Medicina no lugar de
-    Percepção (`Talentos.md:268`) — Percepção nunca aparece como opção. A
-    escolha também não é exigida para concluir.
-  - **Mente Aguçada** — as opções do `<select>` batem certinho com o livro
-    (nenhum rótulo trocado), mas, como os dois talentos acima, a tela deixa
-    concluir a subida sem preencher a escolha.
+    `e2e-levelup`: a tela mesma, ao vivo, não oferecia nada). Era o único dos
+    sete sem nenhum tratamento no app. **Corrigido**: ganhou entrada em
+    `REGRAS_TALENTOS` (`regras-cobertura.js`), um ramo de render em
+    `levelup-ui.js` com a lista de armas Simples/Marciais
+    (`ARMAS_SIMPLES_MARCIAIS`, curada de `dados/equipamento/armas.json`), e
+    passou a gravar a arma escolhida em `char.maestrias_arma` — reaproveitando
+    o sistema de maestrias já existente (`sheet/maestrias.js`), que ganhou uma
+    vaga extra (`bonusMaestriaTalento()`) em vez de um campo paralelo.
+  - **Adepto Elemental** — o `<select>` de tipo de dano existia, mas com três
+    rótulos trocados: oferecia Frio/Fogo/Trovão onde o livro pede
+    Gélido/Ígneo/Trovejante (`Talentos.md:244`). Além disso, a escolha não era
+    exigida para concluir a subida de nível. **Corrigido**: os rótulos passaram
+    a vir de `TIPOS_DANO_ADEPTO_ELEMENTAL` (derivada de `TIPOS_ENERGIA`, para
+    nunca divergir de novo), e a nova entrada em `REGRAS_TALENTOS` passou a
+    exigir a escolha — inclusive recusando um tipo de dano já escolhido numa
+    aquisição anterior (o talento é repetível).
+  - **Analítico** — o `<select>` de perícia oferecia Medicina no lugar de
+    Percepção (`Talentos.md:268`) — Percepção nunca aparecia como opção. A
+    escolha também não era exigida para concluir. **Corrigido**: a lista
+    passou a ser `PERICIAS_ANALITICO = ['Intuição', 'Investigação',
+    'Percepção']`, a escolha passou a ser exigida, e o efeito passou a
+    implementar a regra do livro que o app não fazia em lugar nenhum antes
+    ("se não tiver proficiência na perícia escolhida, você a adquire; se já
+    for proficiente, adquire Especialização").
+  - **Mente Aguçada** — as opções do `<select>` já batiam com o livro (nenhum
+    rótulo trocado), mas, como os dois talentos acima, a tela deixava
+    concluir a subida sem preencher a escolha. **Corrigido**: mesma entrada
+    declarativa em `REGRAS_TALENTOS` passou a exigir a escolha, e o mesmo
+    efeito proficiência-ou-Especialização passou a se aplicar.
   - **Habilidoso, Artifista, Músico** (`validacao-negativa`) —
-    `validarEscolhasTalento`, a função central de validação do app, aceita
+    `validarEscolhasTalento`, a função central de validação do app, aceitava
     QUALQUER conjunto de escolhas para estes três quando chamada como o
     resto do app a chama para outros talentos (item removido ou duplicado
     incluídos). A única checagem real (quantidade + distinção, nunca se os
-    itens são perícias/ferramentas válidas) vive hard-coded no fluxo de
-    level-up, fora dessa função — e só roda ali.
-  - **Habilidoso, Artifista, Músico** (`e2e-ficha`, achado desta rodada,
-    2026-08-06) — pela **quarta** via de aquisição, o botão "+ Talento" da
-    ficha (`abrirModalAdicionarTalento`, `site/js/sheet/talentos.js:586`),
-    nem a checagem hard-coded de quantidade do level-up é alcançada:
-    `site/js/sheet/talentos.js:663-669` decide se abre o popup de escolhas
+    itens eram perícias/ferramentas válidas) vivia hard-coded no fluxo de
+    level-up, fora dessa função — e só rodava ali. **Corrigido**: os três
+    ganharam entrada em `REGRAS_TALENTOS`, e `validarEscolhasTalento` passou a
+    exigir exatamente 3 itens distintos, cada um pertencente à lista válida do
+    talento (perícias+ferramentas para Habilidoso, só Ferramentas de Artesão
+    para Artifista, só Instrumentos Musicais para Músico).
+  - **Habilidoso, Artifista, Músico** (`e2e-ficha`) — pela **quarta** via de
+    aquisição, o botão "+ Talento" da ficha
+    (`abrirModalAdicionarTalento`, `site/js/sheet/talentos.js:586`),
+    nem a checagem hard-coded de quantidade do level-up era alcançada:
+    `site/js/sheet/talentos.js:663-669` decidia se abria o popup de escolhas
     consultando só `obterAtributosASITalento` (vazio para os três) e
     `obterEscolhasObrigatoriasTalento`/`getRegraTalento` (vazio também —
-    nenhum dos três tem entrada em `REGRAS_TALENTOS`). Nunca consulta
-    `talentoExigeEscolhas` (`creator/comum.js:196-198`), que é quem
-    reconhece esses três talentos nas outras vias. Resultado, confirmado ao
+    nenhum dos três tinha entrada em `REGRAS_TALENTOS`). Nunca consultava
+    `talentoExigeEscolhas` (`creator/comum.js:196-198`), que era quem
+    reconhecia esses três talentos nas outras vias. Resultado, confirmado ao
     vivo em `talentos-ficha.spec.mjs`: escolher Habilidoso/Artifista/Músico
-    e clicar "Adicionar" grava o talento na ficha imediatamente, sem abrir
+    e clicar "Adicionar" gravava o talento na ficha imediatamente, sem abrir
     nenhum popup — 0 controles `.escolha-talento-levelup` na tela onde o
-    livro exige 3 — e o personagem salvo não ganha nenhuma proficiência
-    nova (`pericias_proficientes`/`proficiencias_ferramentas`/
-    `proficiencias_instrumentos` seguem exatamente como estavam antes).
-    **Esta é a via que reproduz o sintoma relatado no início do projeto**
-    ("o talento Habilidoso, ao ser selecionado não aparecem as opções de
-    escolha") — ver seção abaixo.
-- **`'limitacao-observabilidade'`** (4 entradas): não são alegações sobre o
-  app — são registros de que UMA rota específica de teste não consegue
-  observar um mecanismo que vive em outro lugar (ramo hard-coded por nome,
-  ou função module-private). Mantidas porque documentam um limite real do
-  motor, não porque acusam um bug:
-  - `Adepto Elemental`/`Analítico`/`Mente Aguçada` em `escolhas`: a escolha
-    É reconhecida pelo app (a tela renderiza um `<select>`), só que via um
-    ramo hard-coded em `levelup-ui.js`, invisível para
-    `REGRAS_TALENTOS`/`talentoExigeEscolhas` — os mecanismos declarativos
-    que esta rota confronta. O defeito real de cada um (rótulo trocado,
-    escolha não exigida) já está registrado na entrada gêmea de
-    `e2e-levelup`, acima.
-  - `Aumento no Valor de Atributo` em `escolhas`: o próprio `motivo` da
-    entrada confirma que o app VALIDA a distribuição de 2 pontos
-    (`levelup-validations.js:98-99`, mais `validarDistribuicaoASI`, função
-    module-private em `levelup.js:136` — sem `export`, o motor de unidade
-    não consegue importá-la para testar isoladamente) — e o spec de
+    livro exige 3 — e o personagem salvo não ganhava nenhuma proficiência
+    nova. **Esta era a via que reproduzia o sintoma relatado no início do
+    projeto** ("o talento Habilidoso, ao ser selecionado não aparecem as
+    opções de escolha") — ver a seção seguinte para o desfecho. **Corrigido**
+    sem tocar em `sheet/talentos.js`: assim que os três ganharam entrada em
+    `REGRAS_TALENTOS` (para fechar `validacao-negativa`, acima),
+    `getRegraTalento` deixou de devolver `null` e
+    `obterEscolhasObrigatoriasTalento` passou a devolver uma lista não-vazia
+    — o suficiente para o botão da ficha deixar de tomar o atalho de
+    persistir direto e abrir o popup de configuração, que já reusava o
+    mesmo render do level-up.
+- **`'limitacao-observabilidade'`** (4 entradas na época): não eram alegações
+  sobre o app — eram registros de que UMA rota específica de teste não
+  conseguia observar um mecanismo que vivia em outro lugar (ramo hard-coded
+  por nome, ou função module-private). Das quatro, três desapareceram como
+  **efeito colateral** da correção acima, e uma permanece — é a única entrada
+  que resta na lista hoje:
+  - `Adepto Elemental`/`Analítico`/`Mente Aguçada` em `escolhas` — a escolha
+    já era reconhecida pelo app antes da correção (a tela renderizava um
+    `<select>`), só que via um ramo hard-coded em `levelup-ui.js`, invisível
+    para `REGRAS_TALENTOS`/`talentoExigeEscolhas`. Assim que os três ganharam
+    entrada em `REGRAS_TALENTOS` (Tarefa B, acima), o mecanismo declarativo
+    que esta rota confronta passou a enxergá-los de verdade — a lacuna ficou
+    estruturalmente inválida e foi removida junto com as de `e2e-levelup`.
+    **Nenhuma delas restou.**
+  - `Aumento no Valor de Atributo` em `escolhas` — **esta é a única entrada
+    que resta em `lacunas-conhecidas.mjs` hoje**, e não é um bug do app. O
+    próprio `motivo` da entrada confirma que o app VALIDA a distribuição de 2
+    pontos (`levelup-validations.js:98-99`, mais `validarDistribuicaoASI`,
+    função module-private em `levelup.js:136` — sem `export`, o motor de
+    unidade não consegue importá-la para testar isoladamente) — e o spec de
     level-up (Playwright) prova isso executando o fluxo real de ponta a
-    ponta, sem nenhuma lacuna registrada lá.
+    ponta, sem nenhuma lacuna registrada lá. Nada aqui aponta para código
+    incorreto: é um limite de uma rota específica do motor de unidade
+    (`obterAtributosASITalento`, que devolve `[]` para este talento porque seu
+    benefício não segue o padrão textual "+1 a X/Y/Z" que a função reconhece),
+    não da regra em si, que outra rota já confronta e aprova.
 
-### O sintoma que abriu o projeto — encontrado na quarta via
+**Estado final:** zero entradas `app-diverge-do-livro`; **1** entrada
+`limitacao-observabilidade` (a de cima). Suíte de unidade em 339/339, suíte de
+navegador em 72/72 — as duas verificadas depois da correção, não só antes
+dela.
+
+### O sintoma que abriu o projeto, e o seu desfecho
 
 Este projeto começou com um relato: "o talento Habilidoso, ao ser
 selecionado não aparecem as opções de escolha". A rodada anterior investigou
@@ -241,7 +285,7 @@ três vias de aquisição — concedido por antecedente, concedido pelo traço
 Versátil (espécie Humana) e reaquisição via level-up (ele é repetível) — e
 concluiu que o app estava correto nas três, e que o sintoma relatado não se
 reproduzia. **Essa conclusão estava errada**: faltava investigar uma quarta
-via, e é justamente nela que o sintoma acontece.
+via, e foi justamente nela que o sintoma apareceu.
 
 O app oferece **quatro** formas de um personagem ganhar um talento, não três:
 
@@ -253,22 +297,32 @@ O app oferece **quatro** formas de um personagem ganhar um talento, não três:
    lacuna).
 4. **O botão "+ Talento" da ficha** (`abrirModalAdicionarTalento`,
    `site/js/sheet/talentos.js:586`) — pensado para talentos concedidos fora
-   do fluxo normal (invocações, bênçãos do Mestre etc.). **É aqui que o
-   sintoma reportado reproduz de verdade**: escolher Habilidoso (ou
-   Artifista, ou Músico) e confirmar não abre nenhuma tela de escolha —
-   nenhum select de perícia/ferramenta/instrumento aparece em lugar nenhum,
-   e o talento é gravado na ficha sem as três proficiências que o livro
+   do fluxo normal (invocações, bênçãos do Mestre etc.). **Foi aqui que o
+   sintoma reportado reproduziu de verdade**: escolher Habilidoso (ou
+   Artifista, ou Músico) e confirmar não abria nenhuma tela de escolha —
+   nenhum select de perícia/ferramenta/instrumento aparecia em lugar nenhum,
+   e o talento era gravado na ficha sem as três proficiências que o livro
    concede. Confirmado ao vivo pelos três casos de `talentos-ficha.spec.mjs`
-   (chave de teste `e2e-ficha`, lacunas registradas para Habilidoso,
-   Artifista e Músico).
+   (chave de teste `e2e-ficha`).
 
-A causa é a mesma para os três: este botão só consulta
+A causa era a mesma para os três: este botão só consultava
 `obterAtributosASITalento` e `obterEscolhasObrigatoriasTalento`/
-`getRegraTalento` antes de decidir se abre o popup de configuração — nunca
-`talentoExigeEscolhas`, o mecanismo que as outras três vias usam para
+`getRegraTalento` antes de decidir se abria o popup de configuração — nunca
+`talentoExigeEscolhas`, o mecanismo que as outras três vias usavam para
 reconhecer especificamente Habilidoso/Artifista/Músico. Com as duas
-consultadas vazias para os três, o app persiste o talento direto, sem
+consultas vazias para os três, o app persistia o talento direto, sem
 perguntar nada.
+
+**O desfecho**: a correção de 2026-08-06 (Tarefa A) deu entrada aos três
+talentos em `REGRAS_TALENTOS`, o mapa declarativo do qual `sheet/talentos.js`
+já dependia sem saber que dependia. Nenhuma linha de `sheet/talentos.js`
+precisou mudar — assim que `getRegraTalento('Habilidoso')` deixou de devolver
+`null`, o próprio botão "+ Talento" passou a abrir o popup de escolhas
+sozinho, pelo mesmo caminho de código que já usava, só que agora alimentado
+com dados de verdade. `talentos-ficha.spec.mjs` confirma isso hoje sem
+nenhuma lacuna registrada: o sintoma que abriu o projeto está fechado nas
+quatro vias de aquisição, não só nas três que a investigação original tinha
+coberto.
 
 ## Mapa de domínios futuros
 

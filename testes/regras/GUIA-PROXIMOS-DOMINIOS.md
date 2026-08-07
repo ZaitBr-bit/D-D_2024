@@ -184,6 +184,50 @@ evidência.
 
 ---
 
+## A lição da rodada de correção (2026-08-06)
+
+O erro 2 acima ("não enumerar todos os caminhos do usuário") já registrava que
+duplicação manual é sintoma de caminho esquecido. A rodada que corrigiu as 11
+lacunas confirmou isso na prática e acrescentou a parte que faltava: **o
+mesmo sinal também aponta o conserto**.
+
+**O que aconteceu.** Nove das onze divergências (Habilidoso, Artifista,
+Músico, Analítico, Mente Aguçada, Adepto Elemental, Mestre das Armas) tinham
+uma única causa raiz: os sete talentos não tinham entrada em
+`REGRAS_TALENTOS` (`site/js/regras-cobertura.js`) — o mapa declarativo que
+decide simultaneamente se a escolha é oferecida, se é validada e se é
+persistida. Sem ele, cada fluxo tinha compensado por conta própria com
+checagem escrita à mão (level-up em `levelup-validations.js:114-119`,
+criador em `passo-antecedente.js:153-168` e `passo-especie.js:396-408`) — e
+foi exatamente por isso que a quarta via de aquisição, o botão "+ Talento" da
+ficha, ficou sem nenhuma checagem: ninguém tinha escrito a cópia manual para
+ela. Adicionar as sete entradas em `REGRAS_TALENTOS` (Tarefas A e B da
+correção) não só validou a escolha onde faltava — também destravou o popup de
+configuração no botão "+ Talento" da ficha **sem que uma única linha de
+`sheet/talentos.js` precisasse mudar**, porque esse botão já consultava o
+mapa declarativo, só que o mapa estava vazio para esses talentos. Um conserto
+na camada certa reparou os dois fluxos de uma vez.
+
+**Por que é útil saber.** Quando uma regra é imposta por checagem manual
+copiada em cada fluxo em vez de por um mecanismo único e declarativo, isso não
+é só sinal de que um caminho pode estar sem a checagem (erro 2) — é também
+sinal de que **o conserto certo não é copiar a checagem mais uma vez para o
+caminho que falta**. É mover a regra para o mecanismo declarativo que os
+outros fluxos já deveriam estar consultando. Consertar no lugar errado (mais
+uma cópia manual) resolve um sintoma e deixa a causa — e o próximo caminho
+esquecido — para a próxima rodada achar.
+
+**Como aplicar.** Ao encontrar uma regra validada por código escrito à mão em
+mais de um lugar: antes de corrigir cada cópia, pergunte se existe (ou deveria
+existir) um mecanismo declarativo único do qual todos os fluxos já dependem —
+mesmo que hoje dependam dele incompletamente, como `sheet/talentos.js`
+dependia de `REGRAS_TALENTOS` sem essa dependência nunca ter sido "ativada"
+pelos sete talentos que faltavam no mapa. Corrigir ali tende a reparar todos
+os fluxos de uma vez, incluindo os que ninguém tinha percebido que dependiam
+do mesmo mecanismo.
+
+---
+
 ## Dois vícios de relatório
 
 **Motivo que superafirma.** Um motivo de lacuna dizia que a verificação do app

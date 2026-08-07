@@ -16,6 +16,13 @@ import { getMagiasPorCirculo, getMagiasClasse } from './db.js';
 import { abrirModal, fecharModal, toast, mdParaHtml, semAcento, calcMod, getEspacosMagia } from './utils.js';
 import { subirDeNivel, obterAtributosASITalento, getLimiteASITalento } from './levelup.js';
 import { abrirGridManobras } from './manobras-ui.js';
+import {
+  PERICIAS_TODAS as _PERICIAS_NOMES, FERRAMENTAS_TODAS as _FERRAMENTAS_TODAS,
+  FERRAMENTAS_ARTESAO as _FERRAMENTAS_ARTESAO, INSTRUMENTOS_MUSICAIS as _INSTRUMENTOS,
+  PERICIAS_ANALITICO as _PERICIAS_ANALITICO, PERICIAS_MENTE_AGUCADA as _PERICIAS_MENTE_AGUCADA,
+  TIPOS_DANO_ADEPTO_ELEMENTAL as _TIPOS_DANO_ADEPTO_ELEMENTAL,
+  ARMAS_SIMPLES_MARCIAIS as _ARMAS_SIMPLES_MARCIAIS
+} from './regras-cobertura.js';
 
 // Referências injetadas pelo sheet.js
 let _salvarFn = null;
@@ -23,35 +30,9 @@ let _renderFichaFn = null;
 let _levelUpFluxoAtivo = false;
 let _levelUpModalPrincipalAberto = false;
 
-// Constantes para escolhas de talentos
-const _PERICIAS_NOMES = [
-  'Acrobacia','Arcanismo','Atletismo','Atuação','Enganação','Furtividade',
-  'História','Intimidação','Intuição','Investigação','Lidar com Animais',
-  'Medicina','Natureza','Percepção','Persuasão','Prestidigitação',
-  'Religião','Sobrevivência'
-];
-const _FERRAMENTAS_TODAS = [
-  'Ferramentas de Carpinteiro','Ferramentas de Cartógrafo','Ferramentas de Coureiro',
-  'Ferramentas de Entalhador','Ferramentas de Ferreiro','Ferramentas de Funileiro',
-  'Ferramentas de Joalheiro','Ferramentas de Oleiro','Ferramentas de Pedreiro',
-  'Ferramentas de Sapateiro','Ferramentas de Tecelão','Ferramentas de Vidreiro',
-  'Suprimentos de Alquimista','Suprimentos de Calígrafo','Suprimentos de Cervejeiro',
-  'Suprimentos de Pintor','Utensílios de Cozinheiro',
-  'Ferramentas de Ladrão','Ferramentas de Navegador',
-  'Kit de Disfarce','Kit de Falsificação','Kit de Herbalismo','Kit de Veneno'
-];
-const _INSTRUMENTOS = [
-  'Alaúde','Flauta','Flauta de Pan','Gaita de Foles','Lira',
-  'Oboé','Tambor','Trombeta','Violino','Xilofone'
-];
-const _FERRAMENTAS_ARTESAO = [
-  'Ferramentas de Carpinteiro','Ferramentas de Cartógrafo','Ferramentas de Coureiro',
-  'Ferramentas de Entalhador','Ferramentas de Ferreiro','Ferramentas de Funileiro',
-  'Ferramentas de Joalheiro','Ferramentas de Oleiro','Ferramentas de Pedreiro',
-  'Ferramentas de Sapateiro','Ferramentas de Tecelão','Ferramentas de Vidreiro',
-  'Suprimentos de Alquimista','Suprimentos de Calígrafo','Suprimentos de Cervejeiro',
-  'Suprimentos de Pintor','Utensílios de Cozinheiro'
-];
+// As listas de perícias/ferramentas/ferramentas de artesão/instrumentos
+// vêm de regras-cobertura.js (única fonte) para não divergir da validação
+// central em validarEscolhasTalento — ver os aliases importados acima.
 
 // ============================================================
 // PONTO DE ENTRADA PRINCIPAL
@@ -578,7 +559,8 @@ export function renderEscolhasTalento(nome, talentoData, ctx, state = {}) {
   }
 
   if (nome === 'Analítico') {
-    const ops = ['Investigação', 'Intuição', 'Medicina'];
+    // Talentos.md §Analítico: Intuição, Investigação ou Percepção.
+    const ops = _PERICIAS_ANALITICO;
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Perícia (1)</div>`;
     html += `<select class="escolha-talento-levelup form-input" data-tipo="analitico" style="width:100%;margin:4px 0"><option value="">-- Escolha --</option>`;
     html += ops.map(p => `<option value="${p}">${p}</option>`).join('');
@@ -586,7 +568,9 @@ export function renderEscolhasTalento(nome, talentoData, ctx, state = {}) {
   }
 
   if (nome === 'Mente Aguçada') {
-    const ops = ['Arcanismo', 'História', 'Investigação', 'Natureza', 'Religião'];
+    // Talentos.md §Mente Aguçada: Arcanismo, História, Investigação,
+    // Natureza ou Religião.
+    const ops = _PERICIAS_MENTE_AGUCADA;
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Perícia (1)</div>`;
     html += `<select class="escolha-talento-levelup form-input" data-tipo="mente_agucada" style="width:100%;margin:4px 0"><option value="">-- Escolha --</option>`;
     html += ops.map(p => `<option value="${p}">${p}</option>`).join('');
@@ -619,14 +603,28 @@ export function renderEscolhasTalento(nome, talentoData, ctx, state = {}) {
   }
 
   if (nome === 'Adepto Elemental') {
-    const tipos = ['Ácido', 'Frio', 'Fogo', 'Elétrico', 'Trovão'];
+    // Talentos.md §Adepto Elemental: Ácido, Elétrico, Gélido, Ígneo ou
+    // Trovejante.
+    const tipos = _TIPOS_DANO_ADEPTO_ELEMENTAL;
     const usados = ctx.helpers.obterTiposAdeptoElementalUsados?.() || [];
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Tipo de Dano</div>`;
-    html += `<select class="escolha-talento-levelup form-input" style="width:100%;margin:4px 0"><option value="">-- Tipo --</option>`;
+    html += `<select class="escolha-talento-levelup form-input" data-tipo="adepto_elemental" style="width:100%;margin:4px 0"><option value="">-- Tipo --</option>`;
     tipos.forEach(t => {
       const desab = usados.includes(t) ? 'disabled' : '';
       html += `<option value="${t}" ${desab}>${t}${usados.includes(t) ? ' (já escolhido)' : ''}</option>`;
     });
+    html += `</select>`;
+  }
+
+  if (nome === 'Mestre das Armas') {
+    // Talentos.md §Mestre das Armas: "Propriedade de Maestria" — uma arma
+    // Simples ou Marcial à escolha (o pré-requisito de proficiência com a
+    // arma não é filtrado aqui pelo mesmo motivo documentado em
+    // validarEscolhasTalento: o personagem não guarda proficiência de arma
+    // por item).
+    html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Propriedade de Maestria (Arma)</div>`;
+    html += `<select class="escolha-talento-levelup form-input" data-tipo="mestre_armas" style="width:100%;margin:4px 0"><option value="">-- Escolha a arma --</option>`;
+    html += _ARMAS_SIMPLES_MARCIAIS.map(a => `<option value="${a}">${a}</option>`).join('');
     html += `</select>`;
   }
 
