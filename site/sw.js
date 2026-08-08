@@ -21,6 +21,8 @@ const STATIC_ASSETS = [
   './js/pages/creator.js',
   './js/pages/sheet.js',
   './js/auth.js',
+  './js/notas-versao.js',
+  './js/versao.js',
   './js/vendor/pdf-lib.min.js'
 ];
 

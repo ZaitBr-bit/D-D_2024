@@ -67,20 +67,59 @@ body {
   font-size: 0.6em; font-weight: 400; text-transform: lowercase;
   opacity: 0.65; vertical-align: middle;
 }
+/* Selo de versão clicável: a classe só é aplicada quando a rota atual é a
+   home (ver atualizarSeloVersaoClicavel em app.js). Nas demais rotas o
+   selo continua sem cursor de mão nem sublinhado -- é texto inerte. */
+.header-versao--clicavel {
+  cursor: pointer;
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+}
+.header-versao--clicavel:hover,
+.header-versao--clicavel:active {
+  opacity: 1;
+}
 .header-btn {
   background: none; border: none; color: #fff;
   width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
   cursor: pointer; border-radius: 50%; flex-shrink: 0;
 }
 .header-btn:active { background: rgba(255,255,255,0.15); }
-#label-reportar-bug {
+/* Botão com ícone + rótulo em texto (ex.: "📋 Notas de versão"), diferente
+   do .header-btn circular só-ícone (voltar, reportar bug). */
+.header-btn-rotulado {
+  background: none; border: none; color: #fff;
+  height: 40px; padding: 0 10px; display: flex; align-items: center; gap: 6px;
+  cursor: pointer; border-radius: 20px; flex-shrink: 0;
+  font-size: 0.85rem; white-space: nowrap;
+}
+.header-btn-rotulado:active { background: rgba(255,255,255,0.15); }
+.header-icone { font-size: 1.1rem; line-height: 1; }
+.header-rotulo {
   font-size: 0.8rem; color: #fff; opacity: 0.9;
   white-space: nowrap; flex-shrink: 0;
 }
 #btn-reportar-bug {
   font-size: 1.2rem;
 }
-#header-acoes { display: flex; gap: 4px; }
+#header-acoes { display: flex; align-items: center; gap: 4px; }
+/* Separador visual entre o bloco de notas de versão e o de reportar bug.
+   Some sozinho quando #header-acoes está vazio (fora da home, sem botão
+   de notas -- não há bloco pra separar). */
+.header-separador {
+  width: 1px; height: 24px; background: rgba(255,255,255,0.25);
+  margin: 0 8px; flex-shrink: 0;
+}
+#header-acoes:empty + .header-separador { display: none; }
+
+@media (max-width: 480px) {
+  /* No mobile os rótulos em texto somem e sobra só o ícone, com espaço
+     suficiente entre os botões pra não ficar tudo grudado. */
+  .header-rotulo { display: none; }
+  .header-btn-rotulado { padding: 0; width: 40px; justify-content: center; border-radius: 50%; }
+  #header-acoes { gap: 8px; }
+  .header-separador { margin: 0 6px; }
+}
 
 /* --- Main content --- */
 #app-content {
@@ -1931,4 +1970,32 @@ tr:hover td { background: #faf8f4; }
   .atributos-grid { grid-template-columns: repeat(6, 1fr); }
 }
 
+/* --- Notas de versão --- */
+.nv-container { display: flex; flex-direction: column; gap: 10px; }
+.nv-versao {
+  border: 1px solid var(--border-light); border-radius: var(--radius);
+  background: var(--bg-card); padding: 8px 12px;
+}
+.nv-versao-atual { border-color: var(--primary); box-shadow: var(--shadow); }
+.nv-versao-cabecalho {
+  cursor: pointer; display: flex; align-items: center; gap: 8px;
+  font-weight: 700; list-style: none;
+}
+.nv-versao-cabecalho::-webkit-details-marker { display: none; }
+.nv-versao-numero { color: var(--primary); font-size: 1rem; }
+.nv-versao-data { color: var(--text-light); font-size: 0.8rem; font-weight: 400; }
+.nv-marcador {
+  margin-left: auto; font-size: 0.75rem; font-weight: 700;
+  color: var(--primary); background: var(--bg-input);
+  border-radius: var(--radius-sm); padding: 2px 8px; white-space: nowrap;
+}
+.nv-resumo { color: var(--text-muted); font-size: 0.85rem; margin: 8px 0 4px; }
+.nv-grupo { margin-top: 10px; }
+.nv-grupo-titulo { font-size: 0.9rem; margin: 0 0 4px; color: var(--text); }
+.nv-lista { margin: 0; padding-left: 20px; }
+.nv-item { font-size: 0.85rem; color: var(--text); margin-bottom: 3px; }
+.nv-build {
+  margin-top: 14px; padding-top: 8px; border-top: 1px solid var(--border-light);
+  font-size: 0.75rem; color: var(--text-light);
+}
 

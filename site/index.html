@@ -22,10 +22,19 @@
     <button id="btn-voltar" class="header-btn" style="display:none">
       <svg id="icone-voltar" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
-    <h1 id="header-titulo">D&D 5.5 Ficha <span id="header-versao" class="header-versao">v0</span><!-- VERSION_AUTO --></h1>
+    <h1 id="header-titulo">D&D 5.5 Ficha <span class="header-versao"></span></h1>
+    <!-- Número da build do GitHub Actions. Fica oculto e serve só para
+         diagnóstico (aparece no rodapé das notas de versão). O selo visível
+         do header é a versão MANUAL, definida em js/versao.js. -->
+    <span id="build-numero" hidden>v0</span><!-- VERSION_AUTO -->
     <div id="header-acoes"></div>
-    <span id="label-reportar-bug" class="no-print">Reportar Bugs</span>
-    <button id="btn-reportar-bug" class="header-btn no-print" title="Reportar problema ou sugestão">🐛</button>
+    <!-- Separador visual entre o bloco de notas de versão (#header-acoes) e
+         o bloco de reportar bug: sem ele os dois grudam e o emoji de um
+         parece pertencer ao outro (ver app.css). Some sozinho quando
+         #header-acoes está vazio, via CSS. -->
+    <span class="header-separador no-print" aria-hidden="true"></span>
+    <span id="label-reportar-bug" class="header-rotulo no-print">Reportar Bugs</span>
+    <button id="btn-reportar-bug" class="header-btn no-print" title="Reportar problema ou sugestão" aria-label="Reportar Bugs">🐛</button>
   </header>
 
   <!-- Conteúdo principal (gerenciado pelo router) -->
