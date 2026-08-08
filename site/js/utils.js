@@ -363,6 +363,36 @@ export function getTruquesConhecidos(tabelaCaracteristicas, nivel) {
   return row ? (parseInt(row['Truques']) || 0) : 0;
 }
 
+/**
+ * Bônus de truques conhecidos concedido por escolha de classe (fora da
+ * tabela): Ordem Divina "Taumaturgo" do Clérigo e Ordem Primal "Xamã" do
+ * Druida dão +1 truque de classe (Classes.md:1568/2060). Fica FORA de
+ * getTruquesConhecidos de propósito -- essa função é confrontada direto
+ * contra a tabela do livro pelo motor de testes de classes/níveis e precisa
+ * continuar refletindo só a tabela, sem bônus nenhum somado.
+ *
+ * Único lugar que decide o bônus, para os dois fluxos que precisam do total
+ * (criador em creator/passo-magias.js e creator/wizard.js; ficha em
+ * sheet/grimorio.js e sheet/magias.js; subida de nível em levelup-flow.js)
+ * chamarem em vez de repetir a checagem `classe === 'Clérigo' && ordem_divina
+ * === 'Taumaturgo'` em cada arquivo -- foi exatamente essa cópia manual,
+ * faltando em 3 dos 5 fluxos, que deixava a ficha de um Taumaturgo/Xamã
+ * recém-criado exibir "Truques: 4/3" (ver GUIA-PROXIMOS-DOMINIOS.md, "A
+ * lição da rodada de correção").
+ *
+ * Aceita tanto o objeto do criador (`personagem`) quanto o da ficha (`char`)
+ * -- os dois gravam a ordem escolhida do mesmo jeito, direto no campo
+ * (ordem_divina/ordem_primal) ou em escolhas_classe.
+ */
+export function getBonusTruquesOrdem(personagem) {
+  if (!personagem) return 0;
+  const ordemDivina = personagem.ordem_divina || personagem.escolhas_classe?.ordem_divina?.[0] || '';
+  if (personagem.classe === 'Clérigo' && ordemDivina === 'Taumaturgo') return 1;
+  const ordemPrimal = personagem.ordem_primal || personagem.escolhas_classe?.ordem_primal?.[0] || '';
+  if (personagem.classe === 'Druida' && ordemPrimal === 'Xamã') return 1;
+  return 0;
+}
+
 /** Magias preparadas por nível (da tabela da classe) */
 export function getMagiaPreparadas(tabelaCaracteristicas, nivel) {
   if (!tabelaCaracteristicas) return 0;

@@ -5,12 +5,12 @@
 import { CLASSES_INFO, ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ESCOLAS_SUBCLASSE_MAGO } from './dados-classes.js';
 import { getClasse, getMagiasClasse, getMagiasPorCirculo } from './db.js';
 import {
-  calcMod, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas
+  calcMod, bonusProficiencia, getBonusTruquesOrdem, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas
 } from './utils.js';
 import {
   concedeAumentoAtributo, exigeDadivaEpica, exigeSubclasse,
-  exigeEspecializacaoBardo, exigeEspecializacaoGuardiao,
-  exigeEstiloLuta, exigeExploradorHabil, exigeAcademico,
+  exigeEspecializacaoBardo, exigeEspecializacaoGuardiao, exigeEspecializacaoLadino,
+  exigeEstiloLuta, exigeTrocaEstiloLutaGuerreiro, exigeExploradorHabil, exigeAcademico,
   exigeManobrasGuerreiro, getQuantidadeNovasManobras,
   obterCaracteristicasNivel, obterCaracteristicasEspecieNivel,
   obterCaracteristicasSubclasseNivel, obterMagiasDominioNivel,
@@ -41,6 +41,14 @@ export async function buildLevelUpContext(char, classeData, helpers = {}) {
   const precisaExpertiseBardo = exigeEspecializacaoBardo(char.classe, nivelNovo);
   const precisaExpertiseGuardiao = exigeEspecializacaoGuardiao(char.classe, nivelNovo);
   const precisaEstiloLuta = exigeEstiloLuta(char.classe, nivelNovo);
+  // Troca de Estilo de Luta do Guerreiro (Classes.md:3812): opcional, por
+  // isso não entra em `requirements` (que só lista pendências
+  // obrigatórias) -- só controla se o card de troca aparece na tela.
+  const podeTrocarEstiloLutaGuerreiro = exigeTrocaEstiloLutaGuerreiro(char.classe, nivelNovo);
+  // Especialização adicional do Ladino (Classes.md:4188, nível 6):
+  // também opcional -- subirDeNivel preenche sozinho se o jogador não
+  // escolher (ver levelup.js).
+  const precisaExpertiseLadino = exigeEspecializacaoLadino(char.classe, nivelNovo);
   const precisaExploradorHabil = exigeExploradorHabil(char.classe, nivelNovo);
   const precisaAcademico = exigeAcademico(char.classe, nivelNovo);
   let manobrasGuerreiro = null;
@@ -100,6 +108,25 @@ export async function buildLevelUpContext(char, classeData, helpers = {}) {
       magiasAtual = subAtual?.preparadas || 0;
       magiasNovo = subNovo?.preparadas || 0;
     }
+
+    // Truques extras do Clérigo Taumaturgo / Druida Xamã (utils.js, mesma
+    // função que o criador/ficha usam). NO-OP HOJE para o único valor que
+    // este bloco expõe a quem consome: os 3 leitores reais
+    // (levelup-cards.js:renderCardMagias, levelup-ui.js:setupEventListeners,
+    // levelup-validations.js:validateAll) leem só `conjuracao.truquesGanhos`
+    // (a DIFERENÇA truquesNovo-truquesAtual, algumas linhas abaixo) --
+    // ordem_divina/ordem_primal não muda dentro de uma mesma chamada de
+    // subirDeNivel (foi escolhida na criação, nível 1), então o bônus é
+    // IDÊNTICO nos dois lados e se cancela na subtração:
+    // (novo+1)-(atual+1) === novo-atual. Mantido mesmo sendo no-op, por
+    // defesa: truquesAtual/truquesNovo são expostos BRUTOS em `conjuracao`
+    // (objeto retornado logo abaixo) e nada impede um consumidor futuro de
+    // ler um dos dois direto (ex.: um card que mostrasse "Truques: X → Y"
+    // em vez de só o delta) -- sem o bônus aqui, esse consumidor hipotético
+    // exibiria o valor sem o +1. 0 para subclasses conjuradoras (não são
+    // Clérigo/Druida), então soma sem risco nos dois ramos acima.
+    truquesAtual += getBonusTruquesOrdem(char);
+    truquesNovo += getBonusTruquesOrdem(char);
 
     // Espaços de magia no nível novo
     let espacosNovo = tabela ? getEspacosMagia(tabela, nivelNovo) : {};
@@ -190,6 +217,8 @@ export async function buildLevelUpContext(char, classeData, helpers = {}) {
     precisaExpertiseBardo,
     precisaExpertiseGuardiao,
     precisaEstiloLuta,
+    podeTrocarEstiloLutaGuerreiro,
+    precisaExpertiseLadino,
     precisaExploradorHabil,
     precisaAcademico,
     manobrasGuerreiro,
@@ -286,8 +315,20 @@ const STEP_DEFINITIONS = [
     titulo: 'Escolhas de Classe',
     tipo: 'escolha',
     obrigatorio: true,
+    // IMPORTANTE: a troca opcional de Estilo de Luta do Guerreiro
+    // (podeTrocarEstiloLutaGuerreiro) e a Especialização opcional do
+    // Ladino nível 6 (precisaExpertiseLadino) DELIBERADAMENTE não entram
+    // nesta condição de visibilidade -- essas duas nunca introduzem um
+    // step novo na tela (ver renderCardRevisao/'revisao_confirmacao'
+    // abaixo, onde os dois cards aparecem). talentos-levelup.spec.mjs
+    // (testes/e2e/regras/) hardcoda que, semeando um Guerreiro ou
+    // Paladino, o step de ASI/talento é seguido DIRETAMENTE pela Revisão
+    // ("um Próximo, um Confirmar") -- inserir aqui um step visível em
+    // TODO nível >= 2 de Guerreiro quebraria essa suposição para dezenas
+    // de testes de talento, sem relação nenhuma com Estilo de Luta.
     visivel: (ctx) => ctx.precisaExpertiseBardo || ctx.precisaExpertiseGuardiao ||
-                       ctx.precisaEstiloLuta || ctx.precisaExploradorHabil || ctx.precisaAcademico,
+                       ctx.precisaEstiloLuta ||
+                       ctx.precisaExploradorHabil || ctx.precisaAcademico,
     completo: (ctx, state) => {
       if (ctx.precisaExpertiseBardo && (state.bardoExpertise || []).length !== 2) return false;
       if (ctx.precisaExpertiseGuardiao && (state.guardiaoExpertise || []).length !== 2) return false;
@@ -396,6 +437,9 @@ export function createInitialState() {
     bardoExpertise: [],
     guardiaoExpertise: [],
     estiloLuta: '',
+    estiloLutaTrocarDe: '',
+    estiloLutaTrocarPara: '',
+    ladinoExpertise: [],
     exploradorExpertise: '',
     exploradorIdiomas: [],
     academicoExpertise: [],

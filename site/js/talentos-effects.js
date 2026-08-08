@@ -13,19 +13,36 @@ export function normalizarTalentos(talentos = []) {
 }
 
 /**
- * Normaliza o estilo de luta ativo do personagem, unificando fontes
- * (escolha de classe e talentos) em um Set canônico sem duplicações.
+ * CAMADA DE COMPATIBILIDADE (não apagar): traduz os nomes ABREVIADOS de
+ * Estilo de Luta que o seletor de classe (creator/comum.js) gravava ANTES da
+ * unificação de vocabulário (Task 7, 2026-08-07) para os nomes CANÔNICOS de
+ * dados/talentos/talentos.json. Personagens criados/editados depois da Task 7
+ * já gravam o nome canônico direto em escolhas_classe.estilo_luta -- para
+ * esses, esta função é um passthrough (a chave não existe no mapa, cai no
+ * `|| nome`). Personagens salvos ANTES da Task 7 ainda têm o nome abreviado
+ * gravado -- é só para eles que esta tradução importa. Apagar este mapa faz
+ * o estilo escolhido por essas fichas antigas parar de ser reconhecido, tanto
+ * no efeito numérico (getEstiloAtivo, abaixo) quanto no texto exibido
+ * (sheet/habilidades.js, que também chama esta função antes de consultar seu
+ * mapa de exibição).
  */
-function getEstiloAtivo(char, nomesTalentos) {
-  const estilo = char?.escolhas_classe?.estilo_luta?.[0] || '';
-  // Mapa de nomes abreviados (escolha de classe) para nomes canônicos (talentos.json)
+export function normalizarEstiloLuta(nome) {
   const mapaEstilos = {
     'Arremesso': 'Combate com Armas de Arremesso',
     'Armas Grandes': 'Combate com Armas Grandes',
     'Duas Armas': 'Combate com Duas Armas',
     'Desarmado': 'Combate Desarmado'
   };
-  const estiloCanon = mapaEstilos[estilo] || estilo;
+  return mapaEstilos[nome] || nome;
+}
+
+/**
+ * Normaliza o estilo de luta ativo do personagem, unificando fontes
+ * (escolha de classe e talentos) em um Set canônico sem duplicações.
+ */
+function getEstiloAtivo(char, nomesTalentos) {
+  const estilo = char?.escolhas_classe?.estilo_luta?.[0] || '';
+  const estiloCanon = normalizarEstiloLuta(estilo);
   const ativos = new Set();
   if (estiloCanon) ativos.add(estiloCanon);
   // Nomes canônicos de todos os estilos de luta

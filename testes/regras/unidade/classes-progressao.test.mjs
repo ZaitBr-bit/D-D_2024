@@ -55,7 +55,7 @@ const CLASSES = Object.keys(PROGRESSAO);
 // então classes com mais janelas de ASI acabam elevando também a
 // Constituição mais vezes -- e o Bárbaro ainda ganha +4
 // Força/Constituição automaticamente no capstone de nível 20
-// (levelup.js:1576-1587). Um cálculo de PV que apenas SOMA a cada
+// (levelup.js:1681-1692). Um cálculo de PV que apenas SOMA a cada
 // nível o ganho fixo usando o modCon CORRENTE daquele nível (a
 // abordagem ingênua) só estaria certo se um aumento de Constituição
 // não fosse retroativo -- e ele é.
@@ -73,7 +73,7 @@ const CLASSES = Object.keys(PROGRESSAO);
 //   recebidos ao atingir o nível 8."
 // site/js/levelup.js:1290-1298 implementa exatamente essa fórmula
 // (`bonusConRetroativo = (modConDepois - modConAntes) * novoNivel`),
-// e o capstone do Bárbaro (levelup.js:1576-1587) reaproveita a mesma
+// e o capstone do Bárbaro (levelup.js:1681-1692) reaproveita a mesma
 // lógica -- então o app SEGUE a regra do livro aqui (achado positivo:
 // não é a divergência que se esperava ao ler só o brief).
 //
@@ -105,7 +105,7 @@ const CLASSES = Object.keys(PROGRESSAO);
 // deriva de nada, é transcrição direta de duas linhas de tabela.
 // modCon(N) vem de `MODIFICADORES_ATRIBUTO` (mesmo catálogo), não de
 // `utils.calcMod` -- `utils.calcMod` é a MESMA função que
-// `levelup.js:906/1292/1581` chama por dentro para aplicar a regra
+// `levelup.js:929/1341/1686` chama por dentro para aplicar a regra
 // retroativa; usá-la aqui violaria "o esperado nunca vem de um helper
 // que a função sob teste chama por dentro". `constituicaoAtual` continua
 // vindo do PRÓPRIO personagem (`p.atributos.constituicao`) -- efeito
@@ -223,9 +223,9 @@ const PENDENCIAS_DE_CLASSE_UNICA = [
   // levelup.js:458, exigeEstiloLuta -- Guardião OU Paladino, não Guerreiro
   // (conferido direto na função do app, não suposto).
   { tipo: 'estilo_luta', classes: ['Guardião', 'Paladino'], rotulo: ROTULOS_GATILHO.estiloLuta() },
-  // levelup.js:482, exigeExploradorHabil.
+  // levelup.js:505, exigeExploradorHabil.
   { tipo: 'explorador_habil', classes: ['Guardião'], rotulo: ROTULOS_GATILHO.exploradorHabil() },
-  // levelup.js:489, exigeAcademico.
+  // levelup.js:512, exigeAcademico.
   { tipo: 'academico', classes: ['Mago'], rotulo: ROTULOS_GATILHO.academico() },
 ];
 

@@ -4,7 +4,7 @@
 // ============================================================
 import { ATRIBUTOS_NOMES, CLASSES_INFO } from '../dados-classes.js';
 import { getClasse, getIndiceMagias, getMagiasClasse } from '../db.js';
-import { abrirModal, getEspacosMagia, getMagiaPreparadas, getTruquesConhecidos, mdParaHtml, nomesMagiaCirculo1Conhecidas, semAcento, toast } from '../utils.js';
+import { abrirModal, getBonusTruquesOrdem, getEspacosMagia, getMagiaPreparadas, getTruquesConhecidos, mdParaHtml, nomesMagiaCirculo1Conhecidas, semAcento, toast } from '../utils.js';
 import { obterTruquesEspecie } from './comum.js';
 import { dadosCache, personagem } from './wizard.js';
 
@@ -51,15 +51,9 @@ export async function renderStepMagias(el) {
   const magoNivel1 = personagem.classe === 'Mago' && personagem.nivel === 1;
   const limiteGrimorio = magoNivel1 ? 6 : 0;
 
-  // Bônus de truques do Clérigo Taumaturgo
-  if (personagem.classe === 'Clérigo' && personagem.ordem_divina === 'Taumaturgo') {
-    numTruques += 1;
-  }
-
-  // Bônus de truques do Druida Xamã
-  if (personagem.classe === 'Druida' && (personagem.ordem_primal === 'Xamã' || personagem.escolhas_classe?.ordem_primal?.[0] === 'Xamã')) {
-    numTruques += 1;
-  }
+  // Bônus de truques do Clérigo Taumaturgo / Druida Xamã (utils.js, mesma
+  // função que o resto do app -- ver comentário de getBonusTruquesOrdem)
+  numTruques += getBonusTruquesOrdem(personagem);
 
   // Construir lista de magias disponíveis por círculo
   // A lista de magias tem formato: { "Truques": [...], "1º Círculo": [...], ... } OU { "9º Círculo": [...] } (lista única)

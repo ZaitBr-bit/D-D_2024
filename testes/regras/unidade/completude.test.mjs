@@ -140,6 +140,60 @@ test('toda chave de TESTES_VALIDOS é referenciada por algum motor de teste', ()
     `${semConsumidor.join(', ')} -- remova a chave de TESTES_VALIDOS ou acrescente o call site`);
 });
 
+// Achado de higiene (2026-08-07): o teste acima fecha só UM sentido -- toda
+// chave de TESTES_VALIDOS precisa ter call site. Mas o sentido contrário
+// também precisa ser garantido: um `comLacuna(`/`lacuna(` podia citar uma
+// chave que já foi REMOVIDA de TESTES_VALIDOS (ex.: uma lacuna corrigida e
+// aposentada). Nesse estado, `lacuna()` devolve null e o wrapper vira inerte
+// -- a asserção roda normal, então o teste continua verde -- mas o call site
+// fica enganoso, e é uma porta aberta: se alguém no futuro redeclarar essa
+// mesma chave com uma entrada nova em LACUNAS, o wrapper esquecido passaria
+// a inverter a expectativa num lugar que ninguém pretendia. Este teste
+// fecha essa porta: todo `comLacuna(`/`lacuna(` cujo segundo argumento seja
+// um literal de string precisa citar uma chave que ainda existe em
+// TESTES_VALIDOS.
+test('toda chave literal usada em comLacuna()/lacuna() está declarada em TESTES_VALIDOS', () => {
+  const arquivosUnidade = readdirSync(resolve(RAIZ, 'testes/regras/unidade'))
+    .filter((f) => f.endsWith('.test.mjs'))
+    .map((f) => resolve(RAIZ, 'testes/regras/unidade', f));
+  const arquivosE2E = readdirSync(resolve(RAIZ, 'testes/e2e/regras'))
+    .filter((f) => f.endsWith('.spec.mjs'))
+    .map((f) => resolve(RAIZ, 'testes/e2e/regras', f));
+
+  const chavesForaDeTestesValidos = [];
+  for (const arquivo of [...arquivosUnidade, ...arquivosE2E]) {
+    // Remove comentários de bloco e de linha antes de procurar call sites --
+    // um `comLacuna('X', 'chave', ...)` mencionado dentro de um comentário
+    // (ex.: explicando uma correção antiga, como classes.test.mjs faz para
+    // 'classes-info') não é uma chamada real e não deve ser cobrado aqui.
+    const semComentarios = readFileSync(arquivo, 'utf-8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\/\/.*$/gm, '');
+    // Casa linha a linha (todo call site real da suíte cabe numa linha só,
+    // confirmado por inspeção) e exige que o primeiro argumento pareça
+    // código de verdade (identificador/member expression ou string) -- não
+    // texto solto. Isso evita o falso positivo de tentar casar através de
+    // prosa (ex.: a mensagem de erro do teste anterior, que menciona
+    // "comLacuna()/lacuna()" com parênteses vazios em texto corrido: sem
+    // essa restrição, um regex "guloso" atravessaria vírgulas e aspas de
+    // template strings distantes e casaria lixo). Só o segundo argumento
+    // importa (é ele que nomeia o teste em TESTES_VALIDOS); chamadas cujo
+    // segundo argumento também é variável (ex.:
+    // `comLacuna(causa.talento, causa.teste, ...)`) não têm como ser
+    // conferidas estaticamente e são ignoradas de propósito.
+    for (const linha of semComentarios.split('\n')) {
+      const m = linha.match(/\b(?:comLacuna|lacuna)\(\s*(?:[\w.]+|'[^']*')\s*,\s*'([^']+)'/);
+      if (m && !TESTES_VALIDOS.includes(m[1])) {
+        chavesForaDeTestesValidos.push(`${m[1]} (${arquivo})`);
+      }
+    }
+  }
+  assert.deepEqual(chavesForaDeTestesValidos, [],
+    `comLacuna()/lacuna() citando chave ausente de TESTES_VALIDOS -- lacuna já aposentada mas o ` +
+    `wrapper ficou no call site (hoje inerte, mas pronto para inverter a expectativa se a chave ` +
+    `for reintroduzida em LACUNAS no futuro): ${chavesForaDeTestesValidos.join(', ')}`);
+});
+
 // Mesma higiene de LACUNAS, aplicada a excecoes-escolha-repetida.mjs
 // (motor unidade/escolha-morta.test.mjs): talento real e motivo preenchido.
 // Diferente de LACUNAS, esta lista não tem campo `teste` (só existe uma

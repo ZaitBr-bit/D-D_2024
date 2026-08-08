@@ -460,6 +460,29 @@ export function exigeEstiloLuta(classe, nivel) {
 }
 
 /**
+ * Verifica se o nível oferece a chance de trocar o Estilo de Luta do
+ * Guerreiro (Classes.md:3812: "Sempre que atinge um nível de Guerreiro,
+ * você pode substituir o talento que escolheu por um talento diferente
+ * de Estilo de Luta"). Vale em todo nível >= 2 -- o nível 1 já é
+ * atendido no assistente de criação (CLASSES_ESCOLHAS.Guerreiro.estilo_luta,
+ * site/js/creator/comum.js), um fluxo separado deste.
+ */
+export function exigeTrocaEstiloLutaGuerreiro(classe, nivel) {
+  return classe === 'Guerreiro' && nivel >= 2;
+}
+
+/**
+ * Verifica se o nível concede a Especialização adicional do Ladino
+ * (Classes.md:4188: no nível 6, Especialização em mais 2 perícias nas
+ * quais já é proficiente, à escolha do jogador -- a primeira leva de 2
+ * já é atendida no assistente de criação, nível 1,
+ * CLASSES_ESCOLHAS.Ladino.especialista).
+ */
+export function exigeEspecializacaoLadino(classe, nivel) {
+  return classe === 'Ladino' && nivel === 6;
+}
+
+/**
  * Verifica se o nível exige escolha de Manobras (Mestre da Batalha)
  */
 export function exigeManobrasGuerreiro(classe, subclasse, nivel) {
@@ -919,6 +942,8 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   const exigeEspecializacao = exigeEspecializacaoBardo(personagem.classe, novoNivel);
   const exigeEspecializacaoGuardiaoNivel = exigeEspecializacaoGuardiao(personagem.classe, novoNivel);
   const exigeEstiloLutaNivel = exigeEstiloLuta(personagem.classe, novoNivel);
+  const exigeTrocaEstiloLutaGuerreiroNivel = exigeTrocaEstiloLutaGuerreiro(personagem.classe, novoNivel);
+  const exigeEspecializacaoLadinoNivel = exigeEspecializacaoLadino(personagem.classe, novoNivel);
   const exigeExploradorHabilNivel = exigeExploradorHabil(personagem.classe, novoNivel);
   const exigeAcademicoNivel = exigeAcademico(personagem.classe, novoNivel);
   const exigeGrimorioMago = personagem.classe === 'Mago' && novoNivel > 1;
@@ -1061,6 +1086,30 @@ export async function subirDeNivel(personagem, opcoes = {}) {
         pendente: true,
         tipo_pendencia: 'estilo_luta',
         mensagem: 'É necessário escolher um Estilo de Luta'
+      };
+    }
+  }
+
+  // Troca de Estilo de Luta do Guerreiro (Classes.md:3812): a cada nível
+  // o Guerreiro PODE substituir o Estilo de Luta escolhido por outro --
+  // não é obrigatório (o jogador pode manter o que já tem), e por isso
+  // NUNCA bloqueia a subida de nível por si só (diferente da escolha
+  // obrigatória de Guardião/Paladino, acima). Segue o mesmo padrão de
+  // manobra_trocar_de/manobra_trocar_para (mais abaixo, no bloco de
+  // Manobras do Mestre da Batalha): só passa a validar quando o jogador
+  // começa a preencher um dos dois campos sem o outro (troca incompleta).
+  // Reaproveita o tipo_pendencia 'estilo_luta' pela mesma razão que a
+  // manobra reaproveita 'manobras_guerreiro' -- é a MESMA escolha de
+  // classe, só que em modo de correção em vez de aquisição.
+  if (exigeTrocaEstiloLutaGuerreiroNivel) {
+    const estiloLutaTrocarDe = opcoes.estilo_luta_trocar_de || null;
+    const estiloLutaTrocarPara = opcoes.estilo_luta_trocar_para || null;
+    if ((estiloLutaTrocarDe && !estiloLutaTrocarPara) || (!estiloLutaTrocarDe && estiloLutaTrocarPara)) {
+      return {
+        sucesso: false,
+        pendente: true,
+        tipo_pendencia: 'estilo_luta',
+        mensagem: 'Troca de Estilo de Luta incompleta: escolha o estilo de origem e o de destino'
       };
     }
   }
@@ -1522,6 +1571,62 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     estiloLutaAplicado = opcoes.estilo_luta;
   }
 
+  // Aplicar troca de Estilo de Luta do Guerreiro. Como a validação acima
+  // nunca exige esta escolha (é sempre opcional), a aplicação só faz algo
+  // quando o jogador de fato preencheu os dois lados da troca. Também
+  // aceita a gravação direta de opcoes.estilo_luta quando o personagem
+  // ainda não tem NENHUM Estilo de Luta registrado -- caso defensivo (não
+  // deveria acontecer com um personagem criado pelo assistente, que já
+  // concede um no nível 1), sem exigir nada: se não vier, simplesmente
+  // não aplica nada neste nível.
+  let estiloLutaTrocaAplicada = null;
+  if (exigeTrocaEstiloLutaGuerreiroNivel) {
+    if (!personagem.escolhas_classe) personagem.escolhas_classe = {};
+    const jaTinhaEstiloLuta = !!personagem.escolhas_classe.estilo_luta?.length;
+    if (!jaTinhaEstiloLuta && opcoes.estilo_luta) {
+      personagem.escolhas_classe.estilo_luta = [opcoes.estilo_luta];
+      estiloLutaAplicado = opcoes.estilo_luta;
+    } else if (opcoes.estilo_luta_trocar_de && opcoes.estilo_luta_trocar_para) {
+      const atuais = personagem.escolhas_classe.estilo_luta || [];
+      const idx = atuais.indexOf(opcoes.estilo_luta_trocar_de);
+      if (idx >= 0) {
+        atuais[idx] = opcoes.estilo_luta_trocar_para;
+        estiloLutaTrocaAplicada = { de: opcoes.estilo_luta_trocar_de, para: opcoes.estilo_luta_trocar_para };
+      }
+    }
+  }
+
+  // Aplicar Especialização adicional do Ladino (nível 6: +2 perícias já
+  // proficientes, à escolha do jogador -- Classes.md:4188). Diferente de
+  // Especialização do Bardo/Especialista do Guardião, esta escolha NÃO é
+  // implementada como pendência bloqueante: o motor de testes de unidade
+  // (testes/regras/unidade/harness.mjs, PENDENCIAS_CONHECIDAS) enumera um
+  // conjunto FECHADO de tipos de pendência que subirDeNivel pode devolver,
+  // e reaproveitar 'bardo_expertise'/'guardiao_expertise' para o Ladino
+  // quebraria a asserção de classes-progressao.test.mjs que confere que
+  // essas duas pendências NUNCA disparam fora de Bardo/Guardião. Por isso
+  // a escolha é sempre aplicada diretamente: quando opcoes.ladino_expertise
+  // vier com perícias válidas (já proficientes, ainda sem Especialização),
+  // usa essas; o que faltar para completar 2 é preenchido automaticamente
+  // com as próximas perícias proficientes elegíveis -- a subida de nível
+  // nunca fica bloqueada esperando esta escolha.
+  let expertiseLadinoAplicada = [];
+  if (exigeEspecializacaoLadinoNivel) {
+    if (!personagem.pericias_expertise) personagem.pericias_expertise = [];
+    const jaExpertise = new Set(personagem.pericias_expertise);
+    const proficientes = personagem.pericias_proficientes || [];
+    const informadas = (Array.isArray(opcoes.ladino_expertise) ? opcoes.ladino_expertise : [])
+      .filter(pericia => proficientes.includes(pericia) && !jaExpertise.has(pericia));
+    const automaticas = proficientes.filter(pericia => !jaExpertise.has(pericia) && !informadas.includes(pericia));
+    const escolhidas = [...new Set([...informadas, ...automaticas])].slice(0, 2);
+    for (const pericia of escolhidas) {
+      if (!personagem.pericias_expertise.includes(pericia)) {
+        personagem.pericias_expertise.push(pericia);
+        expertiseLadinoAplicada.push(pericia);
+      }
+    }
+  }
+
   // Aplicar Explorador Hábil (Guardião nível 2: 1 expertise + 2 idiomas)
   let exploradorHabilAplicado = { expertise: null, idiomas: [] };
   if (exigeExploradorHabilNivel) {
@@ -1622,7 +1727,9 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     escolhas_talento_levelup: escolhasTalentoLevelup,
     expertise_bardo_aplicada: expertiseBardoAplicada,
     expertise_guardiao_aplicada: expertiseGuardiaoAplicada,
+    expertise_ladino_aplicada: expertiseLadinoAplicada,
     estilo_luta_aplicado: estiloLutaAplicado,
+    estilo_luta_troca_aplicada: estiloLutaTrocaAplicada,
     explorador_habil_aplicado: exploradorHabilAplicado,
     academico_aplicado: academicoAplicado,
     grimorio_adicionado: magiasGrimorioSelecionadas,

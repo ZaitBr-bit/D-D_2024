@@ -8,7 +8,7 @@
 import { CLASSES_INFO } from '../dados-classes.js';
 import { getIndiceMagias, getMagiasPorCirculo } from '../db.js';
 import { VALOR_EM_COBRE, formatarCarteira, podePagar, retirarValor } from '../moedas.js';
-import { abrirModal, escHtml, getEspacosMagia, getMagiaPreparadas, getTruquesConhecidos, magiaMagoEstaNoGrimorio, mdParaHtml, normalizarGrimorioMago, semAcento, toast } from '../utils.js';
+import { abrirModal, escHtml, getBonusTruquesOrdem, getEspacosMagia, getMagiaPreparadas, getTruquesConhecidos, magiaMagoEstaNoGrimorio, mdParaHtml, normalizarGrimorioMago, semAcento, toast } from '../utils.js';
 import { getTruquesExtraEstiloLuta } from './combate.js';
 import { char, classeData, indiceMagiasCache, magiasDominioCache, magiasSempreCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
@@ -35,6 +35,10 @@ export async function mostrarBuscaMagia() {
   }
   // Truques extras de Combatente Druídico / Abençoado
   maxTruq += getTruquesExtraEstiloLuta();
+  // Truques extras do Clérigo Taumaturgo / Druida Xamã (utils.js, mesma
+  // função que o criador usa -- antes só o criador somava esse bônus, e a
+  // ficha calculava o limite sem ele)
+  maxTruq += getBonusTruquesOrdem(char);
 
   // Espaços de magia para determinar círculos disponíveis
   let espacosNivel = tabela ? getEspacosMagia(tabela, char.nivel) : {};
