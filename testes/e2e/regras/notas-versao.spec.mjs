@@ -148,6 +148,78 @@ test('dentro de uma ficha, o selo de versão não abre as notas de versão', asy
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
 
+// ------------------------------------------------------------------------
+// Abertura automática ao atualizar (pedido do usuário depois da Task 7):
+// o site deve abrir as notas de versão sozinho quando detecta que passou
+// a rodar uma versão diferente da que este navegador já viu -- mas só uma
+// vez por atualização, e nunca na primeira visita (que não é atualização
+// nenhuma). Chave: `dnd_versao_vista` em localStorage (app.js).
+// ------------------------------------------------------------------------
+
+test('primeira visita: não abre as notas sozinho, mas grava a versão vista', async ({ context }) => {
+  const { page, erros } = await abrirSite(context);
+
+  // Nada foi salvo antes desta visita -- não é uma atualização.
+  await expect(page.locator('#modal-overlay'), 'primeira visita não deveria abrir o modal sozinho')
+    .not.toBeVisible();
+
+  const vista = await page.evaluate(() => localStorage.getItem('dnd_versao_vista'));
+  expect(vista, 'a primeira visita deveria gravar a versão atual, mesmo sem abrir o modal')
+    .toBe(VERSAO_ATUAL);
+
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});
+
+test('site atualizado para uma versão diferente: abre as notas sozinho, uma vez', async ({ context }) => {
+  // Simula um navegador que já visitou o site numa versão anterior --
+  // precisa ser gravado ANTES do app carregar, por isso addInitScript
+  // (roda antes de qualquer script da página, em TODA navegação desta
+  // context -- inclusive no reload do fim deste teste). Por isso a
+  // condição: só força a versão antiga enquanto o app ainda não tiver
+  // gravado a atual; depois que ele gravar (pós-abertura automática), o
+  // reload seguinte encontra a versão já vista e não mexe em nada.
+  await context.addInitScript((versaoAtual) => {
+    if (localStorage.getItem('dnd_versao_vista') !== versaoAtual) {
+      localStorage.setItem('dnd_versao_vista', '0.0.0-versao-anterior-de-teste');
+    }
+  }, VERSAO_ATUAL);
+
+  const { page, erros } = await abrirSite(context);
+
+  await page.waitForSelector('#modal-overlay', { state: 'visible' });
+  const atual = page.locator('details.nv-versao.nv-versao-atual');
+  await expect(atual, 'o modal aberto sozinho deveria mostrar a versão atual marcada')
+    .toHaveAttribute('open', '');
+
+  const vista = await page.evaluate(() => localStorage.getItem('dnd_versao_vista'));
+  expect(vista, 'depois de abrir sozinho, a versão vista deveria virar a atual')
+    .toBe(VERSAO_ATUAL);
+
+  // Fecha o modal e recarrega a página inteira -- não é só navegar de
+  // rota, é simular o usuário voltando ao site depois. Não deve abrir de
+  // novo: a versão vista já é a atual.
+  await page.evaluate(() => window.fecharModalTodos());
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await assentar(page);
+  await expect(page.locator('#modal-overlay'), 'recarregar depois de já ter visto a versão atual não deveria reabrir o modal')
+    .not.toBeVisible();
+
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});
+
+test('site na mesma versão já vista: não abre as notas sozinho', async ({ context }) => {
+  await context.addInitScript((versaoAtual) => {
+    localStorage.setItem('dnd_versao_vista', versaoAtual);
+  }, VERSAO_ATUAL);
+
+  const { page, erros } = await abrirSite(context);
+
+  await expect(page.locator('#modal-overlay'), 'versão já vista não deveria abrir o modal sozinho')
+    .not.toBeVisible();
+
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});
+
 test('em 375px de largura, o header não transborda e os botões não se sobrepõem', async ({ context }) => {
   const { page, erros } = await abrirSite(context);
   await page.setViewportSize({ width: 375, height: 800 });

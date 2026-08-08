@@ -639,17 +639,23 @@ export async function mostrarBuscaGrimorio() {
     const jaNoGrimorio = new Set((char.grimorio || []).map(m => m.nome));
     let lista = magias.filter(m => !jaNoGrimorio.has(m.nome) && circulosPreparaveis.has(m.circulo));
     if (termo.length >= 2) lista = lista.filter(m => semAcento(m.nome).includes(termo));
-    lista = lista.sort((a, b) => a.circulo - b.circulo || a.nome.localeCompare(b.nome, 'pt-BR')).slice(0, 50);
+    lista = lista.sort((a, b) => a.circulo - b.circulo || a.nome.localeCompare(b.nome, 'pt-BR'));
 
     if (lista.length === 0) {
       resultadoEl.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:16px">Nenhuma magia encontrada.</div>`;
       return;
     }
 
+    // O limite de itens é por círculo, não no total combinado -- um corte
+    // global aqui (ordenado por círculo) já escondeu círculos inteiros: o
+    // 1º e o 2º círculo sozinhos passam de 50 magias de Mago, então o corte
+    // esgotava antes de chegar a qualquer círculo mais alto, mesmo quando o
+    // personagem já podia prepará-lo (achado do debug de 2026-08-08).
     const magiasPorCirculo = new Map();
     lista.forEach(m => {
       if (!magiasPorCirculo.has(m.circulo)) magiasPorCirculo.set(m.circulo, []);
-      magiasPorCirculo.get(m.circulo).push(m);
+      const doCirculo = magiasPorCirculo.get(m.circulo);
+      if (doCirculo.length < 50) doCirculo.push(m);
     });
 
     resultadoEl.innerHTML = [...magiasPorCirculo.entries()].map(([circulo, magiasDoCirculo]) => `

@@ -108,6 +108,15 @@ export const NOTAS_VERSAO = [
           'Luta às Cegas descrevia um alcance que o livro não concede.',
         ],
       },
+      {
+        grupo: '🐛 Magias',
+        itens: [
+          'O Mago deixava de conseguir copiar magias de círculos mais altos '
+            + 'para o grimório quando o 1º e o 2º círculo já somavam muitas '
+            + 'opções — o círculo simplesmente não aparecia na lista, mesmo '
+            + 'com espaço de magia disponível para ele.',
+        ],
+      },
     ],
   },
 ];
