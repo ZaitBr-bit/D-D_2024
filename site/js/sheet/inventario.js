@@ -137,6 +137,7 @@ function renderSheetInvItem(item, idx) {
   let ataqueInfo = '';
   let danoAutoInfo = '';
   let vantagemInfo = '';
+  let estiloLutaInfo = '';
   let danoExibicao = item.dados?.dano || '';
   if (item.tipo === 'arma' && item.dados) {
     const info = CLASSES_INFO[char.classe];
@@ -174,6 +175,41 @@ function renderSheetInvItem(item, idx) {
     const estadoGuardiao = getEstadoRecursosGuardiao();
     if (estadoGuardiao?.cacadorPrecisoAtivo && estadoGuardiao?.marcaPredadorAtiva) {
       vantagemInfo = '<span class="badge" style="font-size:0.6rem;background:#e3f2fd;color:#0d47a1;border:1px solid #90caf9">Vantagem (Caçador Preciso)</span>';
+    }
+
+    // Estilo de Luta: Combate com Armas Grandes / Combate com Duas Armas
+    // (Talentos.md:764/770) -- as duas flags que talentos-effects.js grava em
+    // passivos.flags.estilo_armas_grandes/estilo_duas_armas, sem consumidor
+    // até esta correção. NÃO entram no cálculo de bonusDanoTalento acima
+    // (padrão de bonusDanoUmaMao/bonusDanoArremesso) de propósito:
+    // - Armas Grandes altera o RESULTADO de cada dado de dano ("trata 1 ou 2
+    //   como 3"), não é um modificador fixo somado uma vez -- e o app não tem
+    //   nenhum motor de rolagem de dados para interceptar (danoExibicao só
+    //   mostra a FÓRMULA "XdY+Z", nunca rola). Fabricar um "bônus médio"
+    //   (esperança estatística de +3/faces por dado) misturaria um número
+    //   probabilístico com modificadores exatos na mesma badge, o que é mais
+    //   enganoso do que informativo.
+    // - Duas Armas só vale para o ATAQUE ADICIONAL (bônus de arma Leve), e a
+    //   ficha não modela "ataque adicional" como uma linha separada da arma
+    //   principal -- bonusTotalDano (abaixo) já soma modAtq à ÚNICA linha de
+    //   dano exibida por item, então somar de novo aqui contaria o mesmo
+    //   modificador duas vezes para a mesma arma.
+    // Por isso os dois viram um selo informativo na arma qualificada (mesmo
+    // padrão de vantagemInfo acima), e não um número dentro de danoExibicao.
+    //
+    // O gatilho de Armas Grandes usa a PROPRIEDADE da arma (Duas Mãos ou
+    // Versátil, exatamente o que Talentos.md:764 exige) -- não a
+    // empunhadura escolhida pelo jogador, que o app não rastreia. Uma arma
+    // Versátil pode estar sendo empunhada com UMA mão só (aí o benefício
+    // não se aplica de verdade), e o app não tem como saber -- por isso o
+    // texto do selo é condicional ("se empunhada com as duas mãos"), não
+    // uma afirmação incondicional de que o benefício está valendo.
+    const ehArmaCorpoACorpoDuasMaosOuVersatil = !isDistancia && (props.includes('duas mãos') || props.includes('versátil'));
+    if (_passivos.flags?.estilo_armas_grandes && ehArmaCorpoACorpoDuasMaosOuVersatil) {
+      estiloLutaInfo += '<span class="badge" style="font-size:0.6rem;background:#ede7f6;color:#4527a0;border:1px solid #b39ddb" title="Combate com Armas Grandes: se estiver empunhando esta arma com as DUAS mãos, trata qualquer 1 ou 2 no dado de dano como um 3 (Talentos.md) -- a ficha não sabe a empunhadura escolhida em armas Versáteis">1-2→3</span>';
+    }
+    if (_passivos.flags?.estilo_duas_armas && props.includes('leve')) {
+      estiloLutaInfo += '<span class="badge" style="font-size:0.6rem;background:#e0f2f1;color:#00695c;border:1px solid #80cbc4" title="Combate com Duas Armas: soma seu mod. de atributo ao dano do ataque adicional com esta arma, se ainda não estiver somando (Talentos.md)">+mod extra</span>';
     }
 
     const danoBase = item.dados?.dano || '';
@@ -242,8 +278,8 @@ function renderSheetInvItem(item, idx) {
         <div class="inv-item-nome">
           ${item.nome} ${profBadge}
         </div>
-        ${(ataqueInfo || danoAutoInfo || vantagemInfo || maestriaBadge || tipoBadge || customBadges)
-          ? `<div class="inv-item-badges" style="display:flex;flex-wrap:wrap;gap:3px;margin-top:2px">${ataqueInfo}${danoAutoInfo}${vantagemInfo}${maestriaBadge}${tipoBadge}${customBadges}</div>`
+        ${(ataqueInfo || danoAutoInfo || vantagemInfo || estiloLutaInfo || maestriaBadge || tipoBadge || customBadges)
+          ? `<div class="inv-item-badges" style="display:flex;flex-wrap:wrap;gap:3px;margin-top:2px">${ataqueInfo}${danoAutoInfo}${vantagemInfo}${estiloLutaInfo}${maestriaBadge}${tipoBadge}${customBadges}</div>`
           : ''
         }
         <div class="inv-item-detalhe">

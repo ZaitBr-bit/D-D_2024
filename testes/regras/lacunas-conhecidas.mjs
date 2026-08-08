@@ -43,10 +43,37 @@ export const TESTES_VALIDOS = [
   // Incremento de 2026-08-07 (Ladino nv6 "Especialista"): 'classes-gatilho-ausente'
   // é o TESTE CONVERSO em classes.test.mjs -- diferente de 'classes-tabela'/
   // 'classes-info' (que confrontam dado transcrito), este confronta se ALGUMA
-  // das oito funções de gatilho de levelup.js dispara para uma célula que o
+  // das nove funções de gatilho de levelup.js dispara para uma célula que o
   // livro marca como exigindo escolha, sem a restrição `apenas` que escondia
   // o caso do Ladino no laço original de GATILHOS.
   'classes-gatilho-ausente',
+
+  // ---------------------------------------------------------------------
+  // Domínio Classes/Trocas (testes/regras/unidade/classes-trocas.test.mjs):
+  // direitos de troca de escolha das 12 classes base. 'classes-trocas' cobre
+  // as duas rotas (estática e comportamental) que observam o mesmo achado do
+  // Guerreiro -- ver a entrada correspondente em LACUNAS.
+  'classes-trocas',
+
+  // Domínio Classes/Passivas (testes/regras/unidade/classes-passivas.test.mjs):
+  // heurística Ativa/Passiva (ehHabilidadeAtiva) confrontada contra o
+  // catálogo. As 7 chaves abaixo são as 7 CAUSAS DE CÓDIGO que agrupam as 28
+  // divergências encontradas -- cada uma referenciada por várias entradas do
+  // laço de teste (uma por característica), todas apontando para a MESMA
+  // entrada em LACUNAS (mesmo padrão do Clérigo/'classes-tabela' acima: uma
+  // causa, vários call sites).
+  'classes-passivas-ativa-no-turno', 'classes-passivas-recarga-troca-escolha',
+  'classes-passivas-clausula-lateral', 'classes-passivas-descanso-curto-janela',
+  'classes-passivas-acao-bonus-parte-de', 'classes-passivas-custo-verbo-rigido',
+  'classes-passivas-reacao-executar',
+  // As chaves 'classes-passivas-extras-classe-truque' (flag do bônus de
+  // truque do Taumaturgo/Xamã sem consumidor) e
+  // 'classes-passivas-vocabulario-estilo' (vocabulário de Estilo de Luta
+  // divergente entre criador e ficha) viviam aqui, mas as duas lacunas
+  // foram corrigidas e aposentadas na Task 7 -- ver o histórico
+  // correspondente em LACUNAS, mais abaixo, e os testes de
+  // classes-passivas.test.mjs que hoje afirmam o comportamento correto
+  // sem nenhum wrap de comLacuna().
 ];
 
 // Achado I4: o README chama esta lista de "o backlog real de correções do
@@ -69,7 +96,12 @@ export const TESTES_VALIDOS = [
 export const TIPOS_LACUNA = ['app-diverge-do-livro', 'limitacao-observabilidade'];
 
 export const LACUNAS = [
-  // Preenchida nas Tasks 6-10 conforme os motores rodarem.
+  // Entradas organizadas em blocos por domínio/rodada de trabalho (Task ou
+  // data), na ordem em que cada motor de teste as encontrou -- não em
+  // ordem alfabética nem por talento/classe. Lacunas corrigidas saem daqui
+  // (ver comentário "Sem lacuna remanescente nesta chave" nos blocos
+  // retirados, mantido como registro histórico de quando e como cada uma
+  // foi fechada).
 
   // ---------- Task 6: motor de escolhas / validação ----------
   //
@@ -91,7 +123,7 @@ export const LACUNAS = [
   //       MAS "Aumento no Valor de Atributo" é a exceção viva (achado I4,
   //       corrigindo a afirmação anterior de que não sobrava nenhum caso):
   //       sua distribuição de 2 pontos É validada pelo app
-  //       (levelup-validations.js:98-99, além de validarDistribuicaoASI,
+  //       (levelup-validations.js:112-113, além de validarDistribuicaoASI,
   //       function não exportada em levelup.js:136 — sem `export`, este
   //       motor não consegue importá-la para testar isoladamente), e o
   //       spec de level-up (Playwright) prova isso executando o fluxo
@@ -123,7 +155,7 @@ export const LACUNAS = [
   // fica de fora.
   { talento: 'Aumento no Valor de Atributo', teste: 'escolhas',
     // Achado I4: o próprio motivo abaixo confirma que o app VALIDA a
-    // distribuição (levelup-validations.js:98-99 + validarDistribuicaoASI
+    // distribuição (levelup-validations.js:112-113 + validarDistribuicaoASI
     // em levelup.js:136) -- só que por um mecanismo que esta rota do
     // teste (obterAtributosASITalento) não confronta, e que o motor de
     // unidade não consegue importar isolado (função module-private). É
@@ -133,8 +165,8 @@ export const LACUNAS = [
     tipo: 'limitacao-observabilidade',
     motivo: 'não é (A)/(C) puros: a distribuição de 2 pontos É validada, mas ' +
       'por um TERCEIRO mecanismo — state.pontosDistribuidos!==2 em ' +
-      'levelup-validations.js:98-99 e validarDistribuicaoASI em ' +
-      'levelup.js:980-983 — plenamente observável por teste de unidade, só ' +
+      'levelup-validations.js:112-113 e validarDistribuicaoASI em ' +
+      'levelup.js:1005-1008 — plenamente observável por teste de unidade, só ' +
       'não é o que esta rota do teste confronta (obterAtributosASITalento, ' +
       'que devolve [] para este talento porque seu benefício não segue o ' +
       'padrão textual "+1 a X/Y/Z" que a função reconhece; nem REGRAS_TALENTOS ' +
@@ -224,152 +256,319 @@ export const LACUNAS = [
 
   // ---------- Domínio Classes/Níveis (2026-08-07) ----------
   //
-  // Duas causas-raiz, não três lacunas independentes -- ver
-  // task-4-report.md, task-5-report.md e task-10-report.md
-  // (.superpowers/sdd/2026-08-07-regras-classes-niveis/) para a
-  // investigação completa. As entradas abaixo cobrem os 3 testes
-  // vermelhos do motor estrutural (classes.test.mjs): a mesma entrada de
-  // Clérigo é referenciada por DOIS pontos de comLacuna() -- o teste que
-  // lê a célula bruta de dados/classes/clerigo.json ("tabela: Clérigo
-  // nível 3") e o que passa pela função de produção que lê a mesma
-  // célula ("obterCaracteristicasNivel × livro: Clérigo") -- porque é o
-  // mesmo dado ruim visto por duas rotas, não um segundo defeito.
+  // Causa 1 (Clérigo nível 3, "Subclasse de Clérigo" x "Subclasse
+  // Clérigo") corrigida na Task 8 (2026-08-08) -- dados/classes/clerigo.json,
+  // tabela_caracteristicas[nível 3]['Características'] agora grava
+  // "Subclasse Clérigo" (sem "de"), batendo com a célula da tabela do
+  // livro (Classes.md:1515). O campo estruturado irmão
+  // (caracteristicas[].nome do mesmo nível) foi MANTIDO com "de" de
+  // propósito -- ele espelha o heading de prosa (Classes.md:1584, "###
+  // Nível 3: Subclasse de Clérigo"), uma citação diferente que não tem
+  // lacuna registrada. As duas rotas que liam a célula da tabela
+  // ("tabela: Clérigo nível 3" em classes.test.mjs e "obterCaracteristicasNivel
+  // × livro: Clérigo", mesma leitura por função de produção) confirmam a
+  // correção. Sem lacuna remanescente nesta chave.
 
-  // Causa 1 -- Clérigo nível 3: a célula da TABELA diverge da forma que
-  // dados/classes/clerigo.json grava, sem consequência funcional (a
-  // string só é exibida, nunca comparada).
-  { talento: 'Clérigo', teste: 'classes-tabela',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'A célula da tabela do livro (Classes.md:1515, coluna "Características" ' +
-      'da linha do nível 3 da tabela "Características de Clérigo") traz "Subclasse ' +
-      'Clérigo", sem "de". dados/classes/clerigo.json grava "Subclasse de Clérigo" ' +
-      '(com "de") na mesma célula (tabela_caracteristicas[nível 3][\'Características\']) ' +
-      'e no campo estruturado irmão caracteristicas[].nome do mesmo nível -- essa forma ' +
-      'não foi inventada pelo app: é o texto exato do heading de prosa que abre a ' +
-      'descrição da característica, Classes.md:1584 ("### Nível 3: Subclasse de ' +
-      'Clérigo"), só que não é a forma da CÉLULA DA TABELA. É isolado ao Clérigo: ' +
-      'Bárbaro e Ladino têm o mesmo padrão textual "Subclasse X" sem "de" na tabela do ' +
-      'nível 3, e dados/ reproduz sem "de" corretamente nos dois. Observado por duas ' +
-      'rotas de código: leitura direta da célula (dados/classes/clerigo.json) e ' +
-      'obterCaracteristicasNivel (site/js/levelup.js:381-394, que lê ' +
-      'row[\'Características de Classe\'] ?? row[\'Características\'] e faz ' +
-      'split(\',\')) -- as duas leem o mesmo dado ruim, não são dois defeitos. ' +
-      'Consequência real, medida no código (não suposta): nenhuma. O único consumidor ' +
-      'de obterCaracteristicasNivel (site/js/levelup-flow.js:58 -> ' +
-      'levelup-cards.js:51) só renderiza a lista recebida como ' +
-      '`caracteristicas.map(c => `<li>${c}</li>`)` -- nunca compara nenhum elemento ' +
-      'contra um literal. exigeSubclasse (site/js/levelup.js:421-439), que decide se a ' +
-      'escolha de subclasse é obrigatória, usa uma tabela fixa {\'Clérigo\': 3, ...} ' +
-      'indexada por nome de classe e nível, sem ler caracteristicas/ ' +
-      'tabela_caracteristicas -- a divergência de texto não afeta essa decisão. O ' +
-      'campo estruturado irmão (classeData.caracteristicas[].nome, consumido por ' +
-      'site/js/sheet/caracteristicas.js:11,61, site/js/sheet/impressao.js:461, ' +
-      'site/js/sheet/hp-descanso.js:338,346 e site/js/creator/passo-classe.js:157) só ' +
-      'filtra por nivel e exibe nome/descricao -- nenhum desses locais compara nome ' +
-      'contra um literal como \'Subclasse Clérigo\'; a busca por comparação literal de ' +
-      'nome de característica em todo site/js/ não achou nenhuma. Efeito real, único: ' +
-      'o card de level-up e a ficha/impressão do Clérigo no nível 3 exibem "Subclasse ' +
-      'de Clérigo" em vez de "Subclasse Clérigo" -- diferença de exibição de uma ' +
-      'palavra, sem efeito em nenhuma decisão do app.' },
-
-  // Causa 2 -- Ladino, proficiência com Armas Marciais incompleta: falta
-  // "Leve" ao lado de "Acuidade", com consequência funcional real e
-  // medida (a única das duas causas com efeito no bônus de ataque).
-  { talento: 'Ladino', teste: 'classes-info',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'O livro (Classes.md:4152, tabela "Proficiências com Armas" do Ladino) ' +
-      'concede proficiência com "Armas Simples e Armas Marciais que tem a propriedade ' +
-      'Acuidade ou Leve" -- as duas propriedades, ligadas por "ou". ' +
-      'site/js/dados-classes.js:105 codifica armas: [\'Simples\', \'Marcial ' +
-      '(Acuidade)\'] -- só Acuidade; falta Leve. O campo TEM consumidores ativos que ' +
-      'resolvem a string contra a propriedade de uma arma específica, não é só dado de ' +
-      'referência exibido: site/js/creator/passo-equipamento.js:19-43 ' +
-      '(temProficienciaArma) e site/js/sheet/condicoes.js:17-30 (sheetTemProfArma) ' +
-      'fazem, ambos, `info.armas.some(a => a.includes(\'Leve\'))` -- falso para o ' +
-      'Ladino, porque nenhuma entrada de [\'Simples\', \'Marcial (Acuidade)\'] contém a ' +
-      'substring "Leve". Consequência real, medida com uma arma de verdade do jogo: a ' +
-      'Besta de Mão (dados/equipamento/armas.json, "Marcial à Distância", propriedade ' +
-      'leve, sem acuidade) é a ÚNICA arma Marcial do catálogo com Leve e sem Acuidade ' +
-      '(Cimitarra e Espada Curta têm as duas propriedades; as demais armas Leves são ' +
-      'Simples) -- um Ladino equipado com Besta de Mão é rotulado "Sem Prof" tanto na ' +
-      'ficha (site/js/sheet/inventario.js:123,1067) quanto no assistente de criação ' +
-      '(site/js/creator/passo-equipamento.js:535-536,715-729), e o bônus de ataque ' +
-      'exibido na ficha (site/js/sheet/inventario.js:163-164: `bonusAtq = modAtq + ' +
-      '(temProf ? prof : 0)`) omite o bônus de proficiência inteiro (+2 a +6 conforme o ' +
-      'nível), apesar de Classes.md:4152 conceder essa proficiência explicitamente. O ' +
-      'Monge, com a mesma FORMA de restrição mas exigindo só "Leve" no livro ' +
-      '(Classes.md:5107), bate: dados-classes.js:128 codifica armas: [\'Simples\', ' +
-      '\'Marcial (Leve)\'] exatamente a única propriedade que o livro pede -- a ' +
-      'divergência é de CONTEÚDO, isolada ao Ladino, não um erro sistemático do ' +
-      'formato "categoria (propriedade)".' },
+  // Causa 2 -- RETIRADA na Task 8 (2026-08-08). Ladino, proficiência com
+  // Armas Marciais incompleta: faltava "Leve" ao lado de "Acuidade"
+  // (Classes.md:4152). Corrigido em site/js/dados-classes.js: armas
+  // agora é ['Simples', 'Marcial (Acuidade ou Leve)'] -- um único item,
+  // texto do próprio livro; os dois consumidores
+  // (creator/passo-equipamento.js:temProficienciaArma e
+  // sheet/condicoes.js:sheetTemProfArma) já faziam
+  // `info.armas.some(a => a.includes('Leve'))` (mesma checagem usada
+  // para o Monge), então nenhum dos dois precisou mudar.
+  //
+  // O motor de teste também precisou de correção, não só o app: a
+  // asserção de restrição (classes.test.mjs, corpoArmasRestricao)
+  // empacotava o resultado do app como `[match[1]]` -- sempre um array
+  // de 1 elemento -- e comparava contra `armasRestricao.Ladino.Marcial`
+  // (2 elementos no catálogo, `['Acuidade', 'Leve']`) com
+  // `assert.deepEqual`, que falha por COMPRIMENTO sempre que os dois
+  // lados têm tamanhos diferentes -- nenhuma string possível em
+  // `armas` teria feito essa asserção passar. Corrigido o parser para
+  // separar as propriedades pelo conectivo "ou" do próprio livro
+  // (`match[1].split(/\s+ou\s+/i)`) e comparar as duas listas
+  // ordenadas. Confirmado com prova de reversão (ver task-8-report.md):
+  // app revertido -> teste acusa a ausência de "Leve"; app restaurado ->
+  // teste passa. Sem lacuna remanescente nesta chave.
 
   // ---------- Incremento de 2026-08-07: bug achado à mão por um humano ----------
+  // RETIRADA na Task 8 (2026-08-08).
   //
   // Ladino nível 6 "Especialista" (Classes.md:4188, célula da tabela
-  // "Características de Ladino") nunca vira pendência de subida de nível --
-  // o app esqueceu a característica INTEIRA, não implementou errado. Achado
-  // fora desta suíte, usando o app: um Ladino subindo do nível 1 ao 20 termina
-  // com pericias_expertise vazio. A suíte não pegou sozinha porque o motor de
-  // gatilhos (classes.test.mjs, laço de GATILHOS) testa cada função na forma
-  // "ela dispara só onde deveria?", e para exigeEspecializacaoGuardiao(classe,
-  // nivel) o `apenas: ['Guardião']` do laço faz o ESPERADO virar `false` para
-  // o Ladino -- a função também devolve `false`, os dois lados concordam, e o
-  // teste passa verde sobre uma característica que não tem NENHUM mecanismo.
-  // O 'classes-gatilho-ausente' (teste converso, mesmo arquivo) fecha esse
-  // buraco: para toda célula em que o livro imprime um rótulo de escolha
-  // (via os mesmos ROTULOS_GATILHO, sem `apenas`), exige que ALGUMA das oito
-  // funções dispare -- e é o único caso que falha.
-  { talento: 'Ladino', teste: 'classes-gatilho-ausente',
+  // "Características de Ladino") não virava pendência de subida de nível --
+  // o app esquecia a característica INTEIRA. Corrigido em site/js/levelup.js:
+  // nova exigeEspecializacaoLadino(classe, nivel), aplicada sem bloquear a
+  // subida (opcoes.ladino_expertise quando o jogador escolhe; completada
+  // automaticamente quando não escolhe -- ver o motivo da entrada de
+  // Guerreiro/classes-trocas, acima, para por que esta escolha não podia
+  // virar pendência bloqueante como bardo_expertise/guardiao_expertise).
+  //
+  // O motor de teste também ganhou o mecanismo que lhe faltava: GATILHOS
+  // (classes.test.mjs) tinha 8 funções fixas porque eram as 8 que o app
+  // tinha -- a Task 8 criou a nona (exigeEspecializacaoLadino) e a
+  // registrou em GATILHOS (com rótulo próprio, especializacaoLadino, em
+  // catalogo/classes.mjs -- mesmo regex de especializacaoGuardiao, já que
+  // o rótulo do livro é idêntico, "Especialista"; o que diferencia as
+  // duas é o `apenas: ['Ladino']`/`apenas: ['Guardião']` de cada entrada
+  // em GATILHOS, não o rótulo) em vez de estender
+  // exigeEspecializacaoBardo/exigeEspecializacaoGuardiao (que quebraria as
+  // asserções por classe dessas duas, sem relação nenhuma com o Ladino).
+  // O teste converso ('classes-gatilho-ausente') agora encontra a função
+  // certa disparando para (Ladino, 6). Confirmado com prova de reversão
+  // (ver task-8-report.md): app revertido -> teste acusa a característica
+  // ausente; app restaurado -> teste passa. Sem lacuna remanescente nesta
+  // chave.
+
+  // ---------- Domínio Classes/Trocas (2026-08-07) ----------
+  //
+  // classes-trocas.test.mjs confronta os 26 direitos de troca de escolha
+  // das 12 classes base (catalogo/classes-trocas.mjs) contra o app. Só 1
+  // das 26 entradas é observável por teste de unidade
+  // (observavelEmUnidade: true) -- as outras 25 aplicam a troca por um
+  // caminho que subirDeNivel nunca vê (mutação direta de char em
+  // levelup-ui.js:1392-1411, edição livre na ficha, ou Descanso Longo fora
+  // do fluxo de nível), então não produzem teste algum aqui, positivo ou
+  // negativo -- ver README, seção "Limites declarados". A única entrada
+  // observável é exatamente onde mora o bug relatado por um usuário real.
+  // RETIRADA na Task 8 (2026-08-08): a troca de Estilo de Luta do
+  // Guerreiro (Classes.md:3812) agora existe de verdade (ver
+  // site/js/levelup.js, exigeTrocaEstiloLutaGuerreiro + os pares
+  // opcoes.estilo_luta_trocar_de/estilo_luta_trocar_para, aplicados sem
+  // nunca bloquear a subida de nível, e exposta no card "Trocar Estilo de
+  // Luta (opcional)" do level-up, site/js/levelup-cards.js).
+  //
+  // A asserção COMPORTAMENTAL de classes-trocas.test.mjs também foi
+  // corrigida nesta tarefa (não só o app): a versão original exigia que
+  // subirDeNivel devolvesse uma pendência bloqueante 'estilo_luta' em
+  // algum nível da escada 1-20 -- mas isso media a coisa errada. O
+  // direito do livro é OPCIONAL (o jogador pode simplesmente manter o
+  // estilo), e o padrão de referência do próprio app (manobra_trocar_de/
+  // manobra_trocar_para) nunca emite pendência quando as duas escolhas são
+  // preenchidas corretamente -- só quando preenchidas pela metade. Exigir
+  // uma pendência para uma troca bem-sucedida contradizia o brief desta
+  // própria tarefa ("não a transforme em pendência bloqueante") e, por
+  // isso, colidia com classes-progressao.test.mjs (PENDENCIAS_DE_CLASSE_UNICA,
+  // que afirma, corretamente, que 'estilo_luta' nunca dispara fora de
+  // Guardião/Paladino -- esses SIM têm uma escolha obrigatória naquele
+  // nível). A asserção corrigida chama subirDeNivel com
+  // estilo_luta_trocar_de/estilo_luta_trocar_para preenchidos e confere
+  // que personagem.escolhas_classe.estilo_luta realmente mudou para o
+  // novo valor -- mais forte que a versão anterior (prova que a troca
+  // funciona, não só que ela seria "oferecida"), e sem colidir com nada.
+  // As duas rotas (estática e comportamental) confirmam "Lacuna
+  // corrigida" -- ver task-8-report.md para as saídas literais do
+  // antes/depois (app revertido -> teste acusa; app restaurado -> teste
+  // passa). Sem lacuna remanescente nesta chave.
+
+  // ---------- Domínio Classes/Passivas: heurística Ativa/Passiva (2026-08-07) ----------
+  //
+  // classes-passivas.test.mjs confronta ehHabilidadeAtiva(descricao, nome)
+  // (site/js/utils.js:499-511) -- a heurística por substring que decide em
+  // qual das duas seções da ficha ("Habilidades Ativas"/"Habilidades
+  // Passivas", site/js/sheet/caracteristicas.js:37-38,64-65) uma
+  // característica de classe aparece -- contra as 174 características de
+  // classe base, nas entradas cujo `base` do catálogo é 'custo-declarado'
+  // ou 'ausencia-de-custo' (o livro tem frase citável; 'julgamento' e
+  // `composta: true` não sustentam lacuna sozinhos, ver catálogo). 28
+  // dessas entradas divergem -- agrupadas em 7 CAUSAS DE CÓDIGO (task-4-
+  // report.md, "As 28 divergências, agrupadas por causa raiz"), não 28
+  // lacunas independentes: um ajuste em ehHabilidadeAtiva/detectarRecarga
+  // por causa resolveria todas as entradas daquela causa de uma vez. Na
+  // maioria das 7 a consequência é só de EXIBIÇÃO (qual seção da ficha
+  // mostra a característica -- nenhuma outra função do app lê
+  // ehHabilidadeAtiva para decidir se um bônus se aplica). Em DUAS delas
+  // (causas 2 e 4, abaixo) TAMBÉM há consequência interativa -- mas não em
+  // TODA característica de cada uma: `recarga` (a mesma detecção de
+  // detectarRecarga que alimenta ehHabilidadeAtiva) só alimenta, em
+  // site/js/sheet/habilidades.js:4683 (`!usosHtmlBody && ativa && recarga`),
+  // um controle INTERATIVO na ficha quando NENHUM ramo dedicado por
+  // classe/característica já preencheu `usosHtmlBody` antes (o `!` na
+  // condição). Corrigido em 2026-08-08 (achado da revisão final da Task 8):
+  // a soma real de características com consequência interativa nas duas
+  // causas juntas é 3, não as 6+2=8 que uma leitura apressada deste
+  // preâmbulo sugeriria -- causa 2 tem só 1 das 6 (Mago/Maestria de
+  // Magias; as outras 5 são "Maestria em Arma", que TÊM ramo dedicado, e
+  // por isso nunca alcançam a condição de :4683) e causa 4 tem as 2 que já
+  // tinha. Ver o motivo de cada uma para o detalhe medido.
+  //
+  // NOTA SOBRE O CAMPO `talento` NESTE BLOCO: quando uma causa afeta várias
+  // classes, `talento` recebe UMA classe representativa (a de mais
+  // entradas, ou a primeira em ordem alfabética) só para a mecânica de
+  // chave de `comLacuna` funcionar -- não é uma alegação de que o bug é
+  // específico daquela classe. Cada `motivo` abaixo lista TODAS as classes/
+  // características realmente afetadas pela causa, por extenso.
+  { talento: 'Guerreiro', teste: 'classes-passivas-ativa-no-turno',
     tipo: 'app-diverge-do-livro',
-    motivo: 'O livro concede Especialização (dobra o bônus de proficiência) em 2 ' +
-      'perícias no nível 1 de Ladino (Classes.md:4183, célula da tabela ' +
-      '"Características de Ladino"; prosa em Classes.md:4212-4214, "### Nível 1: ' +
-      'Especialista") e em MAIS 2 perícias no nível 6 (Classes.md:4188, mesma ' +
-      'tabela, célula "Especialista"; prosa em Classes.md:4216, "No nível 6 de ' +
-      'Ladino, você obtém Especialização em mais duas perícias nas quais já seja ' +
-      'proficiente à sua escolha"). O app implementa só a metade do nível 1: ' +
-      'CLASSES_ESCOLHAS.Ladino.especialista (site/js/creator/comum.js:354-360) é ' +
-      'renderizado no assistente de criação (site/js/creator/passo-classe.js:93-114) ' +
-      'e consolidado em personagem.pericias_expertise por ' +
-      'site/js/creator/wizard.js:466-473 -- essa parte funciona. O app NÃO implementa ' +
-      'o nível 6 em lugar nenhum: site/js/levelup.js tem exigeEspecializacaoBardo ' +
-      '(:444-446, Bardo níveis 2 e 9) e exigeEspecializacaoGuardiao (:451-453, ' +
-      'Guardião nível 9), mas nenhuma exigeEspecializacaoLadino nem qualquer outro ' +
-      'ramo que cite "Ladino" perto de Especialização/Especialista -- grep por ' +
-      '"Ladino" em levelup.js, levelup-validations.js, levelup-ui.js, ' +
-      'levelup-cards.js e levelup-flow.js não encontrou nenhuma ocorrência ligada a ' +
-      'essa característica (as únicas 4 ocorrências de "Ladino" nesses arquivos são ' +
-      'a lista de classes válidas, o ramo de Trapaceiro Arcano, a tabela de ASI e a ' +
-      'tabela de nível de subclasse -- levelup.js:67,94,409,432). ' +
-      'Confirmado dinamicamente chamando subirDeNivel(personagem, {}) direto (sem ' +
-      'passar nenhuma opção de escolha), COM PRECONDIÇÃO: personagem.nivel = 5 e ' +
-      'personagem.xp = levelup.XP_POR_NIVEL[6] (14000) -- sem XP suficiente a chamada ' +
-      'devolve {sucesso:false, erro:"XP insuficiente..."} antes mesmo de chegar perto ' +
-      'da característica, o que não reproduz nada sobre Especialização; quem for ' +
-      'reproduzir precisa dar XP ao personagem primeiro. Com a precondição, do nível 5 ' +
-      'para o 6 de um Ladino, o app devolve sucesso:true de primeira -- "caracteristicas":["Especialista"] aparece ' +
-      'no resultado (a lista que o card de level-up exibe), mas nenhum campo de ' +
-      'pendência (não pede resultado.pendente/tipo_pendencia, como pede para ' +
-      'expertise_bardo_aplicada/expertise_guardiao_aplicada em Bardo/Guardião) -- e ' +
-      'personagem.pericias_expertise continua [] depois da subida. Um Ladino subindo ' +
-      'de 1 a 20 (escadaDeNivel, harness.mjs) termina com pericias_expertise contendo ' +
-      'só as 2 perícias do nível 1 -- nunca ganha as 2 do nível 6. Consequência funcional, ' +
-      'medida no código que lê o campo (não suposta): calcBonusPericia ' +
-      '(site/js/utils.js:293-308) soma bonusProficiencia(nivel) DUAS VEZES quando a ' +
-      'perícia está em pericias_expertise (uma pela proficiência, outra pela ' +
-      'Especialização) -- para as 2 perícias que o Ladino deveria escolher no nível ' +
-      '6 e nunca chega a escolher, o bônus exibido na ficha fica subestimado em ' +
-      'exatamente bonusProficiencia(nivel) (+3 a partir do nível 5, subindo até +6 no ' +
-      'nível 17+, conforme EVOLUCAO_PERSONAGEM). O efeito é menor do que "a ' +
-      'característica não existe": as escolhas do nível 1 continuam corretas, e o ' +
-      'campo pericias_expertise em si funciona (é lido por levelup-cards.js:217, ' +
-      '244, 311, 352; levelup-ui.js:595, 608, 620, 633; site/js/sheet/edicao.js:132, ' +
-      '252; site/js/sheet/ficha.js:727; site/js/sheet/impressao.js:347; ' +
-      'site/js/sheet/pdf.js:91 -- todos consomem o campo normalmente, sem ramo ' +
-      'quebrado) -- só nunca recebe as 2 entradas que o nível 6 do Ladino deveria ' +
-      'adicionar. Nenhuma perda de proficiência simples (diferente do achado do ' +
-      'Ladino em \'classes-info\', acima): as 2 perícias continuam com bônus de ' +
-      'proficiência normal, só sem o dobro que a Especialização concederia.' },
+    motivo: 'ehHabilidadeAtiva (site/js/utils.js:499-511) inclui "no seu turno" na lista de frases ' +
+      'que classificam uma característica como ativa. Em 8 características de classe base o livro usa ' +
+      'essa frase para dizer QUANDO o benefício PASSIVO vale, não como ele é ativado -- todas ganham ' +
+      '"Habilidades Ativas" na ficha quando o livro nunca condiciona nenhuma delas a uma decisão ' +
+      'custeada: Ataque Extra de Bárbaro (Classes.md:125), Guardião (Classes.md:3332), Guerreiro ' +
+      '(Classes.md:3852), Monge (Classes.md:5224) e Paladino (Classes.md:5569) -- "...sempre que ' +
+      'executar a ação Atacar no seu turno", onde "você pode" é retórico (permissão de atacar duas ' +
+      'vezes, não uma escolha com custo); Dois Ataques Extras (Guerreiro nível 11, Classes.md:3866) e ' +
+      'Três Ataques Extras (Guerreiro nível 20, Classes.md:3878), mesma forma textual; Movimento ' +
+      'Acrobático (Monge nível 9, Classes.md:5242) -- "...capacidade de se mover no seu turno ao longo ' +
+      'de superfícies verticais...", "no seu turno" qualificando quando o movimento vale, não ' +
+      'ativação. Consequência medida (site/js/sheet/caracteristicas.js:37-38): estas 8 características ' +
+      'aparecem em "Habilidades Ativas" na ficha; o livro (nenhuma delas tem custo declarado) as ' +
+      'colocaria em "Habilidades Passivas". Exibição apenas -- o texto do bônus não muda, e nenhuma ' +
+      'delas tem `recarga` detectada (não entram no controle interativo das causas 2/4, abaixo).' },
+  { talento: 'Bárbaro', teste: 'classes-passivas-recarga-troca-escolha',
+    tipo: 'app-diverge-do-livro',
+    motivo: 'detectarRecarga (site/js/utils.js:482-494) casa a substring "descanso longo" em ' +
+      'qualquer lugar do texto, sem checar se ela está presa a um LIMITE DE USO -- e ehHabilidadeAtiva ' +
+      '(utils.js:508, `if (recarga) return true`) trata qualquer recarga detectada como prova de ' +
+      '"ativa". Em 6 características de classe base a cláusula de Descanso Longo não é recarga de uso ' +
+      'limitado: é a TROCA de uma escolha permanente, regrada por Descanso Longo, e a característica ' +
+      'em si é capacidade contínua. Maestria em Arma: Bárbaro (Classes.md:97) e Guerreiro ' +
+      '(Classes.md:3816) usam a mesma frase, "Sempre que completar um Descanso Longo, você pode ' +
+      'praticar movimentos com armas e alterar uma dessas escolhas de armas"; Guardião (Classes.md:3306) ' +
+      'e Paladino (Classes.md:5521) usam uma frase parecida mas DIFERENTE, "Sempre que completar um ' +
+      'Descanso Longo, você pode alterar os tipos de armas que escolheu"; Ladino (Classes.md:4226) usa ' +
+      'a mesma frase de Guardião/Paladino, mas com "Ao completar" no lugar de "Sempre que completar". ' +
+      'Maestria de Magias do Mago (nível 18, Classes.md:4652, "Ao completar um Descanso Longo, você ' +
+      'pode estudar seu livro de magias e substituir uma dessas magias..."). Consequência medida ' +
+      '(caracteristicas.js:37-38): as 6 aparecem em "Habilidades Ativas"; o livro (nenhuma delas tem ' +
+      'Ação/Ação Bônus/Reação/recurso gasto) as colocaria em "Habilidades Passivas". ' +
+      'CORRIGIDO em 2026-08-08 (achado da revisão final da Task 8, que este motivo superafirmava antes ' +
+      'da correção): "as 6 têm `recarga` detectada e `ativa===true`" é verdade, mas isso NÃO significa ' +
+      'que as 6 caem no controle interativo -- renderFeatureItem (habilidades.js) tem um ramo DEDICADO ' +
+      'por classe para "Maestria em Arma" (ehMaestriaBarbaro :2748, ehMaestriaGuerreiro :3916, ' +
+      'ehMaestriaGuardiao :3990, ehMaestriaPaladino :4000, ehMaestriaLadino :4010) que preenche ' +
+      '`usosHtmlBody` com um botão "Definir Maestrias" (`data-config-maestrias`) ANTES de chegar na ' +
+      'condição interativa -- e essa condição (`!usosHtmlBody && ativa && recarga`, habilidades.js:4683) ' +
+      'é guardada por `!usosHtmlBody`, então nunca dispara para essas 5. Só a 6ª (Maestria de Magias do ' +
+      'Mago, que não tem ramo dedicado por não ser "Maestria em Arma") cai no fallback e recebe o botão ' +
+      '"✓ Disponível"/"✗ Usado" (`data-toggle-uso`, habilidades.js:4686); clicar nele grava ' +
+      '`char.usos_habilidades[key] = !char.usos_habilidades[key]` e chama `salvar()` ' +
+      '(habilidades.js:38-41) -- uma capacidade contínua (a Maestria de Magias nunca "se esgota") passa ' +
+      'a ter um estado de uso marcável e persistido na ficha, que o livro não prevê. Confirmado ' +
+      'executando renderFeatureItem/ehHabilidadeAtiva/detectarRecarga de verdade sobre as 6 descrições ' +
+      'brutas de dados/classes/*.json: as 5 de "Maestria em Arma" produzem `data-config-maestrias`, só a ' +
+      'do Mago produz `data-toggle-uso` (script ad hoc; a alegação anterior de que as 6 tinham sido ' +
+      '"confirmadas" chamando a função de verdade não tinha, de fato, sido verificada -- rodar o script ' +
+      'de novo mostra o resultado oposto ao que o motivo antigo descrevia para 5 das 6). Para as 5 sem o ' +
+      'toggle, sobra uma consequência real mais modesta: `recargaBadge` ("🌙 Desc. Longo", ' +
+      'habilidades.js:2727-2729, injetado no card em :4699) aparece do lado do nome da característica, ' +
+      'rotulando como "recarrega no Descanso Longo" algo que na verdade nunca se esgota -- só o selo, ' +
+      'sem estado persistido nem botão clicável.' },
+  { talento: 'Bárbaro', teste: 'classes-passivas-clausula-lateral',
+    tipo: 'app-diverge-do-livro',
+    motivo: 'A frase-gatilho "você pode usar" (lista de ehHabilidadeAtiva, utils.js:499-511) casa, ' +
+      'em 6 características, uma cláusula SECUNDÁRIA do texto -- não a frase que define o benefício ' +
+      'sendo classificado. Defesa sem Armadura de Bárbaro (Classes.md:93): benefício é o cálculo de ' +
+      'CA (10+Des+Con), sem custo; a frase capturada é "Você pode usar um Escudo e ainda receber este ' +
+      'benefício" -- aviso de compatibilidade, não custo. Golpe Brutal Aprimorado (Classes.md:171 -- ' +
+      'o TÍTULO de prosa do livro chama esta característica de "Golpe Brutal Fortalecido", ' +
+      'Classes.md:169; "Aprimorado" é a forma que dados/classes/barbaro.json usa, e é a que este ' +
+      'catálogo segue por convenção com o restante da suíte, ver task-3-report.md): benefício é dano ' +
+      'numérico maior; frase capturada é "você pode usar dois efeitos diferentes de Golpe Brutal" -- ' +
+      'muda o ESCOPO de outra característica, não custo desta. Força Indomável (Classes.md:175): "você ' +
+      'pode usar esse valor no lugar do resultado total" -- piso incondicional, sem decisão real, mas ' +
+      'contém a frase literalmente. Idioma Druídico de Druida (Classes.md:2052): benefício é a magia ' +
+      'sempre preparada; frase capturada é "Você pode usar Druídico para deixar mensagens ocultas" -- ' +
+      'um USO do idioma, não ativação. Apoteose Arcana de Feiticeiro (Classes.md:2720): "você pode ' +
+      'usar uma opção de Metamagia... sem gastar Pontos de Feitiçaria" -- isenta o custo de OUTRA ' +
+      'característica, não introduz custo próprio. Defletir Energia de Monge (Classes.md:5262): "Agora ' +
+      'você pode usar sua característica Defletir Ataques contra..." -- amplia o ESCOPO de outra ' +
+      'característica, não custo desta. Consequência medida (caracteristicas.js:37-38): as 6 aparecem ' +
+      'em "Habilidades Ativas"; o livro as colocaria em "Habilidades Passivas" (nenhuma tem custo ' +
+      'próprio declarado). Exibição apenas -- nenhuma das 6 tem `recarga` detectada (não entram no ' +
+      'controle interativo das causas 2/4).' },
+  { talento: 'Mago', teste: 'classes-passivas-descanso-curto-janela',
+    tipo: 'app-diverge-do-livro',
+    motivo: 'detectarRecarga (site/js/utils.js:482-494) casa "descanso curto" como recarga de uso ' +
+      'limitado em 2 características onde o Descanso Curto é uma JANELA/RESET sem limite de reuso, ' +
+      'não uma recarga de usos gastos. Memorizar Magia do Mago (Classes.md:4646, "Ao completar um ' +
+      'Descanso Curto, você pode... substituir uma das magias") -- o próprio catálogo nota que é ' +
+      'diferente de Recuperação Arcana (que É recarga de verdade); a troca não tem limite de reuso, só ' +
+      'a janela em que é permitida. Fúria Implacável do Bárbaro (Classes.md:153, "...Ao completar um ' +
+      'Descanso Curto ou Longo, a CD volta para 10") -- é o RESET de uma CD escalonada por uso, não ' +
+      'recarga de uma capacidade com usos limitados (a salvaguarda em si não tem limite de uso, só ' +
+      'fica mais difícil a cada acionamento). Consequência medida (caracteristicas.js:37-38): as 2 ' +
+      'aparecem em "Habilidades Ativas"; o livro as colocaria em "Habilidades Passivas". Consequência ' +
+      'INTERATIVA (não só o selo, ver nota do bloco): confirmado com renderFeatureItem/ ' +
+      'detectarUsosMaximos de verdade (task-6-report.md) que as duas divergem entre si -- Memorizar ' +
+      'Magia (usosMax null) recebe o mesmo botão "✓ Disponível"/"✗ Usado" (habilidades.js:4683/4686, ' +
+      '`data-toggle-uso`) da causa 2; Fúria Implacável NÃO recebe esse botão -- recebe um controle ' +
+      'AINDA MAIS enganoso por uma causa DIFERENTE e não relacionada a esta: detectarUsosMaximos ' +
+      '(habilidades.js:2359-2369) lê "duas vezes" em "seus Pontos de Vida mudam para um número igual a ' +
+      'duas vezes seu nível de Bárbaro" (a fórmula de PV recuperado, não uma contagem de usos) e ' +
+      'devolve usosMax=2, então a característica ganha o botão "Usar"/"✗ Esgotado" ' +
+      '(habilidades.js:4674-4682, 2 usos) de uma capacidade que na verdade não tem limite de uso ' +
+      'nenhum. Registrado aqui como observação da mesma investigação; a causa raiz é de ' +
+      'detectarUsosMaximos, não de detectarRecarga/ehHabilidadeAtiva, e não tem chave própria nesta ' +
+      'lista -- fica só documentada, para não inflar o número de causas registradas por algo fora do ' +
+      'escopo confirmado desta tarefa.' },
+  { talento: 'Bárbaro', teste: 'classes-passivas-acao-bonus-parte-de',
+    tipo: 'app-diverge-do-livro',
+    motivo: 'ehHabilidadeAtiva (utils.js:499-511) reconhece "como ação bônus" (sem "uma") e "como uma ' +
+      'ação" (que também casa como prefixo de "como uma ação bônus", quando o texto usa essa variante) ' +
+      '-- mas não "como PARTE DA Ação Bônus" -- construção diferente para a mesma ideia (ação concedida ' +
+      'dentro de outra ação bônus já em andamento). Bote Instintivo do Bárbaro (nível 7, ' +
+      'Classes.md:133, "Como parte da Ação Bônus que você realiza para entrar em Fúria, você pode se ' +
+      'mover") tem custo real (é parte de uma Ação Bônus), mas nenhuma frase da lista de gatilhos casa ' +
+      'com "como parte da Ação Bônus". Consequência medida (caracteristicas.js:37-38): aparece em ' +
+      '"Habilidades Passivas"; o livro (a característica só existe presa a uma Ação Bônus) a colocaria ' +
+      'em "Habilidades Ativas". Exibição apenas -- é o único falso NEGATIVO isolado (as outras 5 ' +
+      'entradas de falso negativo estão nas causas 6 e 7 abaixo).' },
+  { talento: 'Ladino', teste: 'classes-passivas-custo-verbo-rigido',
+    tipo: 'app-diverge-do-livro',
+    motivo: 'ehHabilidadeAtiva (utils.js:499-511) só reconhece custo em recurso nomeado pelo verbo ' +
+      'literal "você pode gastar" -- o livro declara o mesmo tipo de custo com pelo menos duas outras ' +
+      'formas em 3 características. Golpe Astuto do Ladino (nível 5, Classes.md:4246) e Golpes Sujos ' +
+      '(nível 14, Classes.md:4280): custo em dados nomeado por opção ("Custo: 1d6"/"2d6"/"3d6"/"6d6"), ' +
+      'texto de ativação "você pode adicionar... com um custo em dados" -- não contém "você pode ' +
+      'gastar". Toque Restaurador do Paladino (nível 14, Classes.md:5599): "Você DEVE gastar 5 Pontos ' +
+      'de Vida da reserva de cura" -- usa "deve gastar", não "pode gastar". Consequência medida ' +
+      '(caracteristicas.js:37-38): as 3 aparecem em "Habilidades Passivas"; o livro (as 3 têm custo em ' +
+      'recurso declarado) as colocaria em "Habilidades Ativas". Exibição apenas.' },
+  { talento: 'Ladino', teste: 'classes-passivas-reacao-executar',
+    tipo: 'app-diverge-do-livro',
+    motivo: 'A lista de gatilhos de ehHabilidadeAtiva (utils.js:499-511) cobre "como uma reação" mas ' +
+      'não "executar uma reação" -- a construção mais comum no livro para Reações concedidas por ' +
+      'característica de CLASSE. Esquiva Sobrenatural do Ladino (nível 5, Classes.md:4260, "você pode ' +
+      'executar uma Reação para reduzir o dano") e Queda Lenta do Monge (nível 4, Classes.md:5220, ' +
+      '"Você pode executar uma Reação ao estar em queda para reduzir qualquer dano recebido") têm ' +
+      'custo real (gastam a Reação do turno), mas nenhuma frase da lista casa com "executar uma ' +
+      'reação". Consequência medida (caracteristicas.js:37-38): as 2 aparecem em "Habilidades ' +
+      'Passivas"; o livro (as 2 custam a Reação) as colocaria em "Habilidades Ativas". Exibição ' +
+      'apenas.' },
+
+  // ---------- Domínio Classes/Passivas: flag/campo sem consumidor,
+  // vocabulário de Estilo de Luta e bônus de truque do Taumaturgo/Xamã
+  // (2026-08-07) ----------
+  //
+  // As quatro lacunas que este bloco documentava --
+  // 'classes-passivas-flag-armas-grandes', 'classes-passivas-flag-duas-armas',
+  // 'classes-passivas-extras-classe-truque' e
+  // 'classes-passivas-vocabulario-estilo' -- foram corrigidas na Task 7
+  // (2026-08-07, .superpowers/sdd/2026-08-07-classes-trocas-passivas/
+  // task-7-report.md): vocabulário único de Estilo de Luta (comum.js grava
+  // os 10 nomes canônicos, habilidades.js:efeitosEstilo reindexado por eles,
+  // com o texto de "Combate com Armas Grandes" corrigido para a regra de
+  // 2024; talentos-effects.js:mapaEstilos virou normalizarEstiloLuta,
+  // exportada, camada de compatibilidade só para fichas salvas antes da
+  // correção -- coberta por teste próprio, ver classes-passivas.test.mjs
+  // bloco "I3"); as duas flags mortas ganharam consumidor em
+  // sheet/inventario.js (selo informativo na arma qualificada, não um
+  // número dentro do cálculo de dano -- ver comentário no próprio arquivo
+  // para o porquê -- e ver GUIA-PROXIMOS-DOMINIOS.md para o limite que
+  // persiste: nenhuma das duas mecânicas chega a alterar uma rolagem de
+  // dano de verdade, porque o app não tem motor de rolagem nenhum); e o
+  // bônus de truque do Taumaturgo/Xamã foi centralizado em
+  // utils.js:getBonusTruquesOrdem (coberta por teste do RETORNO da função,
+  // não só da chamada -- ver bloco "I1"), chamado pelos 5 fluxos (criador,
+  // ficha, subida de nível). Desses 5, só 4 mudam comportamento observável
+  // (creator/passo-magias.js, creator/wizard.js -- já aplicavam antes --
+  // mais sheet/grimorio.js e sheet/magias.js, que passaram a aplicar): a
+  // chamada em levelup-flow.js é um NO-OP hoje para o único valor que seus
+  // consumidores leem (a diferença truquesNovo-truquesAtual, onde o bônus
+  // se cancela), mantida por defesa -- ver comentário em
+  // levelup-flow.js:104-116 para o porquê.
 ];
 
 // Busca a lacuna registrada para um par (talento, teste), se houver.

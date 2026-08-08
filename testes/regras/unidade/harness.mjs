@@ -13,7 +13,7 @@ const AQUI = dirname(fileURLToPath(import.meta.url));
 export const RAIZ = resolve(AQUI, '..', '..', '..');
 
 // Instala os globais de navegador que os módulos do app tocam ao serem
-// importados. utils.js:609 faz `window.fecharModal = ...` no top-level,
+// importados. utils.js:639 faz `window.fecharModal = ...` no top-level,
 // e é importado por regras-cobertura.js, talentos-effects.js e store.js —
 // sem `window` o import lança ReferenceError. `document` acompanha porque
 // utils.js manipula DOM em toasts/modais. Se um módulo passar a exigir
@@ -224,7 +224,7 @@ export const PENDENCIAS_CONHECIDAS = [
 // GUIA-PROXIMOS-DOMINIOS.md: atributos 10 fazem escolhas sumirem da tela
 // e o teste passa verde sem testar nada. Atributo primário alto e quatro
 // perícias proficientes -- conferido contra o app (achado de revisão):
-// só 'academico' (levelup.js:1180-1182) exige proficiência prévia na
+// só 'academico' (levelup.js:1231-1233) exige proficiência prévia na
 // perícia escolhida; 'bardo_expertise'/'guardiao_expertise'/
 // 'explorador_habil' conferem apenas ARIDADE (quantas perícias vieram),
 // não se são proficientes. As quatro perícias aqui bastam para os dois
@@ -253,7 +253,7 @@ export async function personagemSemente(classe) {
   return p;
 }
 
-// Manobras novas do Mestre da Batalha. subirDeNivel (levelup.js:1087) só
+// Manobras novas do Mestre da Batalha. subirDeNivel (levelup.js:1136) só
 // confere a QUANTIDADE (`novasManobras.length !== qtdNova`), não os nomes
 // -- ainda assim a escada escolhe nomes reais de
 // subclasses[].opcoes_manobra, para não gravar lixo no personagem que as
@@ -286,14 +286,14 @@ function escolherManobras(p, classeData, quantidade) {
 
 // Magias de Mago para o grimório (pendência 'grimorio') ou para a dádiva de
 // escola da subclasse arcana (pendência 'subclasse_magias_arcana').
-// subirDeNivel (levelup.js:1109-1120 e 1136-1174) exige uma quantidade
+// subirDeNivel (levelup.js:1157-1168 e 1186-1222) exige uma quantidade
 // EXATA de magias distintas, presentes em dados/magias/_indice.json com
 // 'Mago' em `classes`, de círculo > 0 para o qual o personagem terá espaço
 // no novo nível, e ainda ausentes do grimório -- reproduzir esses filtros
 // aqui é o que impede a escada de travar num nível qualquer com uma
 // mensagem genérica.
 //
-// ACHADO: a validação de 'subclasse_magias_arcana' (levelup.js:1153) exige
+// ACHADO: a validação de 'subclasse_magias_arcana' (levelup.js:1202) exige
 // ADICIONALMENTE que `magia.escola === escolaSubclasseArcana` -- sem
 // filtrar por escola aqui, a escada travava no Mago nível 3 com a mesma
 // pendência reaparecendo (as magias escolhidas por escolherMagiasMago sem
@@ -329,7 +329,7 @@ async function escolherMagiasMago(p, classeData, novoNivel, quantidade,
 // explorador_habil). Essas três pendências disparam MAIS DE UMA VEZ na
 // escada em subida (Bardo: nível 2 e 9; Guardião: nível 2 -- explorador_habil
 // -- e nível 9 -- guardiao_expertise), e a validação do app só confere
-// ARIDADE (`selecionadas.length !== N`, levelup.js:1033/1046), não QUAIS
+// ARIDADE (`selecionadas.length !== N`, levelup.js:1059/1071), não QUAIS
 // perícias -- repetir a mesma perícia na segunda chamada não lança erro
 // nenhum, só grava um no-op silencioso (a gravação deduplica,
 // levelup.js:1495-1515). Escolher perícias ainda sem Especialização
@@ -401,7 +401,7 @@ async function resolverPendencia(tipo, opcoes, p, classeData, ATRIBUTOS,
     case 'dadiva_resistencia_energia':
       // Mesmo caso de 'dadiva_proficiencia_pericia': só dispara com
       // opcoes.talento === 'Dádiva da Resistência à Energia'
-      // (levelup.js:991-996), que a escada nunca escolhe. Defesa.
+      // (levelup.js:1016-1021), que a escada nunca escolhe. Defesa.
       opcoes.dadiva_resistencia_energia = ['Ácido', 'Gélido'];
       return;
     case 'escolhas_talento':
@@ -428,9 +428,9 @@ async function resolverPendencia(tipo, opcoes, p, classeData, ATRIBUTOS,
       const { dadosClasses } = await modulosApp();
       opcoes.explorador_expertise = proximasPericias(p, 1, dadosClasses)[0];
       // IMPORTANT (achado de revisão): o ramo original só definia
-      // `explorador_expertise`. subirDeNivel (levelup.js:1069-1078) não
+      // `explorador_expertise`. subirDeNivel (levelup.js:1118-1127) não
       // exige `explorador_idiomas` para liberar a pendência, mas a
-      // aplicação (levelup.js:1526-1542) só concede os 2 idiomas da
+      // aplicação (levelup.js:1631-1647) só concede os 2 idiomas da
       // Explorador Hábil SE eles vierem em `opcoes` -- sem isso o
       // Guardião termina o nível 20 com só o idioma inicial
       // ('Comum') e a característica nunca concede nada. O app não
@@ -450,7 +450,7 @@ async function resolverPendencia(tipo, opcoes, p, classeData, ATRIBUTOS,
     case 'subclasse_magias_arcana': {
       // Quantidade e escola exigida vêm da PRÓPRIA mensagem da pendência
       // ("Selecione N magia(s) de <Escola> para o Grimório",
-      // levelup.js:1167) -- não são supostas, porque a quantidade varia
+      // levelup.js:1216) -- não são supostas, porque a quantidade varia
       // por nível (2 no bônus inicial do nível 3, 1 nos recorrentes) e a
       // escola varia por subclasse (Abjurador -> Abjuração, etc.).
       const { quantidade, escola } = opcoes._subclasseArcana;
@@ -488,7 +488,7 @@ export async function escadaDeNivel(classe, aoSubir, opcoesEscada = {}) {
   const classeData = await db.getClasse(classe);
   const personagem = await personagemSemente(classe);
   const subclasseAlvo = opcoesEscada.subclasse || classeData.subclasses[0].nome;
-  // CRITICAL (achado de revisão): levelup.js:1232 grava
+  // CRITICAL (achado de revisão): levelup.js:1282 grava
   // `personagem.subclasse = opcoes.subclasse` sem conferir contra
   // `classeData.subclasses`, e obterCaracteristicasSubclasseNivel devolve
   // [] silenciosamente para um nome desconhecido -- um typo em
@@ -537,7 +537,7 @@ export async function escadaDeNivel(classe, aoSubir, opcoesEscada = {}) {
       // inicial do nível 3, 1 nos recorrentes; escola varia por
       // subclasse); a única fonte confiável é a própria mensagem da
       // pendência ("Selecione N magia(s) de <Escola> para o Grimório",
-      // levelup.js:1167), já que subirDeNivel não devolve nenhum dos dois
+      // levelup.js:1216), já que subirDeNivel não devolve nenhum dos dois
       // valores em outro campo do resultado.
       if (tipo === 'subclasse_magias_arcana') {
         const m = String(resultado.mensagem).match(/Selecione (\d+) magia\(s\) de (.+) para o Grimório/);

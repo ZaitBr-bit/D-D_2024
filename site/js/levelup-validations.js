@@ -57,6 +57,20 @@ export function collectOpcoes(ctx, state) {
   if (ctx.precisaExpertiseBardo) opcoes.bardo_expertise = state.bardoExpertise;
   if (ctx.precisaExpertiseGuardiao) opcoes.guardiao_expertise = state.guardiaoExpertise;
   if (ctx.precisaEstiloLuta && state.estiloLuta) opcoes.estilo_luta = state.estiloLuta;
+  // Troca de Estilo de Luta do Guerreiro (opcional, ver levelup.js) --
+  // só entra em opcoes quando o jogador preencheu os dois lados da troca,
+  // mesmo padrão de manobra_trocar_de/manobra_trocar_para logo abaixo.
+  if (ctx.podeTrocarEstiloLutaGuerreiro && state.estiloLutaTrocarDe && state.estiloLutaTrocarPara) {
+    opcoes.estilo_luta_trocar_de = state.estiloLutaTrocarDe;
+    opcoes.estilo_luta_trocar_para = state.estiloLutaTrocarPara;
+  }
+  // Especialização adicional do Ladino (nível 6, opcional -- ver
+  // levelup.js). Se o jogador não escolher nada aqui, subirDeNivel
+  // preenche automaticamente; por isso só entra em opcoes quando há
+  // alguma seleção real.
+  if (ctx.precisaExpertiseLadino && (state.ladinoExpertise || []).length > 0) {
+    opcoes.ladino_expertise = state.ladinoExpertise;
+  }
   if (ctx.precisaExploradorHabil) {
     opcoes.explorador_expertise = state.exploradorExpertise;
     opcoes.explorador_idiomas = state.exploradorIdiomas;
@@ -134,6 +148,22 @@ export function validateAll(ctx, state) {
   if (ctx.precisaExpertiseBardo && state.bardoExpertise.length !== 2) return 'Selecione 2 perícias para Especialização do Bardo.';
   if (ctx.precisaExpertiseGuardiao && state.guardiaoExpertise.length !== 2) return 'Selecione 2 perícias para Especialista do Guardião.';
   if (ctx.precisaEstiloLuta && !state.estiloLuta) return 'Selecione um Estilo de Luta.';
+  // Troca de Estilo de Luta do Guerreiro: nunca obrigatória, só trava se
+  // o jogador começou a preencher e não terminou (mesma forma da troca de
+  // manobra, mais abaixo).
+  if (ctx.podeTrocarEstiloLutaGuerreiro && state.estiloLutaTrocarDe && !state.estiloLutaTrocarPara) {
+    return 'Escolha o Estilo de Luta substituto ou desmarque a troca.';
+  }
+  // Especialização adicional do Ladino (nível 6): NUNCA bloqueia, nem
+  // parcialmente preenchida -- diferente da troca de Estilo de Luta
+  // (duas pontas de uma substituição, "de"/"para", incompleta sem as
+  // duas), aqui cada perícia marcada é uma escolha independente e válida
+  // por si só. subirDeNivel (levelup.js) já aceita 0, 1 ou 2 perícias em
+  // opcoes.ladino_expertise e completa o que faltar automaticamente com
+  // as próximas elegíveis -- bloquear aqui uma seleção de 1 (achado da
+  // revisão final: o jogador marca só a perícia que lhe importa e confia
+  // no preenchimento automático para a outra) contradiria esse desenho e
+  // impediria exatamente o uso que ele existe para suportar.
   if (ctx.precisaExploradorHabil && !state.exploradorExpertise) return 'Selecione 1 perícia para Explorador Hábil.';
   if (ctx.precisaExploradorHabil && state.exploradorIdiomas.length !== 2) return 'Selecione 2 idiomas (Explorador Hábil).';
   if (ctx.precisaAcademico) {

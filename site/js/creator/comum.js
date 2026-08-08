@@ -279,6 +279,18 @@ export const NIVEL_SUBCLASSE = {
 };
 
 // Escolhas obrigatórias de classe no nível 1
+//
+// Os 10 nomes de Estilo de Luta oferecidos abaixo (Guerreiro/Guardião/
+// Paladino) são os CANÔNICOS de dados/talentos/talentos.json (categoria "de
+// Estilo de Luta"), os mesmos que Talentos.md usa. Antes da unificação de
+// vocabulário (Task 7, 2026-08-07) quatro deles eram gravados abreviados
+// ("Arremesso", "Armas Grandes", "Duas Armas", "Desarmado") -- um vocabulário
+// diferente do mapa de exibição da ficha (sheet/habilidades.js:efeitosEstilo)
+// e do normalizador (talentos-effects.js:mapaEstilos). Personagens salvos
+// ANTES desta correção ainda têm os nomes abreviados gravados em
+// escolhas_classe.estilo_luta -- é por isso que talentos-effects.js mantém
+// mapaEstilos como camada de compatibilidade (NÃO REMOVER: apagar aquele
+// mapa faz fichas antigas pararem de reconhecer o estilo escolhido).
 export const CLASSES_ESCOLHAS = {
   'Clérigo': {
     ordem_divina: {
@@ -310,14 +322,14 @@ export const CLASSES_ESCOLHAS = {
       maxEscolhas: 1,
       opcoes: [
         { nome: 'Arquearia', descricao: '+2 em ataques à distância com armas' },
-        { nome: 'Arremesso', descricao: '+2 de dano com armas de Arremesso' },
-        { nome: 'Armas Grandes', descricao: 'Trata 1-2 como 3 nos dados de dano (duas mãos)' },
-        { nome: 'Duas Armas', descricao: 'Adiciona mod. ao dano da mão secundária' },
-        { nome: 'Desarmado', descricao: 'Dano desarmado d6/d8+For' },
+        { nome: 'Combate com Armas de Arremesso', descricao: '+2 de dano com armas de Arremesso' },
+        { nome: 'Combate com Armas Grandes', descricao: 'Trata 1-2 como 3 nos dados de dano (duas mãos)' },
+        { nome: 'Combate com Duas Armas', descricao: 'Adiciona mod. ao dano do ataque adicional com arma Leve' },
+        { nome: 'Combate Desarmado', descricao: 'Dano desarmado d6/d8+For' },
         { nome: 'Defensivo', descricao: '+1 CA usando armadura' },
         { nome: 'Duelismo', descricao: '+2 dano com uma arma em uma mão' },
         { nome: 'Interceptação', descricao: 'Reduz dano a aliado em 1d10+Prof' },
-        { nome: 'Luta às Cegas', descricao: 'Visão Cega 3m, 9m se cego' },
+        { nome: 'Luta às Cegas', descricao: 'Visão às Cegas com alcance de 3 metros' },
         { nome: 'Protetivo', descricao: 'Impõe desvantagem em ataques contra aliados' }
       ]
     }
@@ -330,14 +342,14 @@ export const CLASSES_ESCOLHAS = {
       maxEscolhas: 1,
       opcoes: [
         { nome: 'Arquearia', descricao: '+2 em ataques à distância com armas' },
-        { nome: 'Arremesso', descricao: '+2 de dano com armas de Arremesso' },
-        { nome: 'Armas Grandes', descricao: 'Trata 1-2 como 3 nos dados de dano (duas mãos)' },
-        { nome: 'Duas Armas', descricao: 'Adiciona mod. ao dano da mão secundária' },
-        { nome: 'Desarmado', descricao: 'Dano desarmado d6/d8+For' },
+        { nome: 'Combate com Armas de Arremesso', descricao: '+2 de dano com armas de Arremesso' },
+        { nome: 'Combate com Armas Grandes', descricao: 'Trata 1-2 como 3 nos dados de dano (duas mãos)' },
+        { nome: 'Combate com Duas Armas', descricao: 'Adiciona mod. ao dano do ataque adicional com arma Leve' },
+        { nome: 'Combate Desarmado', descricao: 'Dano desarmado d6/d8+For' },
         { nome: 'Defensivo', descricao: '+1 CA usando armadura' },
         { nome: 'Duelismo', descricao: '+2 dano com uma arma em uma mão' },
         { nome: 'Interceptação', descricao: 'Reduz dano a aliado em 1d10+Prof' },
-        { nome: 'Luta às Cegas', descricao: 'Visão Cega 3m, 9m se cego' },
+        { nome: 'Luta às Cegas', descricao: 'Visão às Cegas com alcance de 3 metros' },
         { nome: 'Protetivo', descricao: 'Impõe desvantagem em ataques contra aliados' },
         { nome: 'Combatente Druídico', descricao: 'Aprende 2 truques de Druida; pode trocá-los ao subir de nível' }
       ]
@@ -367,14 +379,14 @@ export const CLASSES_ESCOLHAS = {
       maxEscolhas: 1,
       opcoes: [
         { nome: 'Arquearia', descricao: '+2 em ataques à distância com armas' },
-        { nome: 'Arremesso', descricao: '+2 de dano com armas de Arremesso' },
-        { nome: 'Armas Grandes', descricao: 'Trata 1-2 como 3 nos dados de dano (duas mãos)' },
-        { nome: 'Duas Armas', descricao: 'Adiciona mod. ao dano da mão secundária' },
-        { nome: 'Desarmado', descricao: 'Dano desarmado d6/d8+For' },
+        { nome: 'Combate com Armas de Arremesso', descricao: '+2 de dano com armas de Arremesso' },
+        { nome: 'Combate com Armas Grandes', descricao: 'Trata 1-2 como 3 nos dados de dano (duas mãos)' },
+        { nome: 'Combate com Duas Armas', descricao: 'Adiciona mod. ao dano do ataque adicional com arma Leve' },
+        { nome: 'Combate Desarmado', descricao: 'Dano desarmado d6/d8+For' },
         { nome: 'Defensivo', descricao: '+1 CA usando armadura' },
         { nome: 'Duelismo', descricao: '+2 dano com uma arma em uma mão' },
         { nome: 'Interceptação', descricao: 'Reduz dano a aliado em 1d10+Prof' },
-        { nome: 'Luta às Cegas', descricao: 'Visão Cega 3m, 9m se cego' },
+        { nome: 'Luta às Cegas', descricao: 'Visão às Cegas com alcance de 3 metros' },
         { nome: 'Protetivo', descricao: 'Impõe desvantagem em ataques contra aliados' },
         { nome: 'Combatente Abençoado', descricao: 'Aprende 2 truques de Clérigo; pode trocá-los ao subir de nível' }
       ]

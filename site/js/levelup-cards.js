@@ -204,11 +204,110 @@ export function renderCardASI(ctx, state, talentosCache) {
   `;
 }
 
+// Nomes canônicos de Estilo de Luta (dados/talentos/talentos.json,
+// categoria "de Estilo de Luta"), unificados na Task 7 (2026-08-07) --
+// compartilhado entre o card de escolha obrigatória (Guardião/Paladino
+// nível 2) e o card de troca opcional (Guerreiro, qualquer nível >= 2)
+// para não haver duas listas que possam divergir.
+const OPCOES_ESTILO_LUTA_BASE = [
+  { nome: 'Arquearia', descricao: '+2 em ataques à distância com armas' },
+  { nome: 'Combate com Armas de Arremesso', descricao: '+2 de dano com armas de Arremesso' },
+  { nome: 'Combate com Armas Grandes', descricao: 'Trata 1-2 como 3 nos dados de dano (duas mãos)' },
+  { nome: 'Combate com Duas Armas', descricao: 'Adiciona mod. ao dano do ataque adicional com arma Leve' },
+  { nome: 'Combate Desarmado', descricao: 'Dano desarmado d6/d8+For' },
+  { nome: 'Defensivo', descricao: '+1 CA usando armadura' },
+  { nome: 'Duelismo', descricao: '+2 dano com uma arma em uma mão' },
+  { nome: 'Interceptação', descricao: 'Reduz dano a aliado em 1d10+Prof' },
+  { nome: 'Luta às Cegas', descricao: 'Visão às Cegas com alcance de 3 metros' },
+  { nome: 'Protetivo', descricao: 'Impõe desvantagem em ataques contra aliados' }
+];
+
+// ============================================================
+// CARDS: escolhas OPCIONAIS que nunca introduzem um step novo --
+// Troca de Estilo de Luta do Guerreiro (Classes.md:3812) e Especialização
+// adicional do Ladino nível 6 (Classes.md:4188). Renderizados dentro do
+// step "Revisão e Confirmação" (sempre visível, sempre o último), NÃO no
+// step "Escolhas de Classe" -- de propósito: talentos-levelup.spec.mjs
+// (testes/e2e/regras/) semeia Guerreiro/Paladino e hardcoda que o step de
+// ASI/talento é seguido DIRETO pela Revisão ("um Próximo, um Confirmar").
+// Um step novo visível em todo nível >= 2 de Guerreiro quebraria essa
+// suposição para dezenas de testes de talento sem relação com Estilo de
+// Luta -- ver o comentário equivalente em levelup-flow.js.
+// ============================================================
+export function renderCardTrocasOpcionais(ctx, state) {
+  const { char, podeTrocarEstiloLutaGuerreiro, precisaExpertiseLadino } = ctx;
+  let html = '';
+
+  // Troca de Estilo de Luta do Guerreiro (opcional -- o jogador pode
+  // simplesmente não mexer).
+  if (podeTrocarEstiloLutaGuerreiro) {
+    const estiloAtual = (char.escolhas_classe?.estilo_luta || [])[0] || '';
+    const opcoesTroca = OPCOES_ESTILO_LUTA_BASE.filter(opt => opt.nome !== estiloAtual);
+    html += `
+      <div class="levelup-card">
+        <div class="levelup-card-header">Trocar Estilo de Luta (opcional)</div>
+        <div class="levelup-card-body">
+          <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
+            ${estiloAtual ? `Estilo atual: <strong>${estiloAtual}</strong>. ` : ''}
+            Você pode substituir por um talento de Estilo de Luta diferente, ou manter o que já tem.
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:0.85rem">
+            <select class="form-input" id="lvlup-estilo-luta-trocar-de" style="flex:1">
+              <option value="">Não trocar</option>
+              ${estiloAtual ? `<option value="${estiloAtual}" ${state.estiloLutaTrocarDe === estiloAtual ? 'selected' : ''}>${estiloAtual}</option>` : ''}
+            </select>
+            <span>&rarr;</span>
+            <select class="form-input" id="lvlup-estilo-luta-trocar-para" style="flex:1" ${!state.estiloLutaTrocarDe ? 'disabled' : ''}>
+              <option value="">Escolher novo estilo</option>
+              ${opcoesTroca.map(opt => `<option value="${opt.nome}" ${state.estiloLutaTrocarPara === opt.nome ? 'selected' : ''}>${opt.nome}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Especialização adicional do Ladino, nível 6 (opcional -- se o
+  // jogador não escolher, o app completa automaticamente, ver
+  // levelup.js/exigeEspecializacaoLadino).
+  if (precisaExpertiseLadino) {
+    const proficientes = char.pericias_proficientes || [];
+    const expertiseAtual = new Set(char.pericias_expertise || []);
+    const elegiveis = proficientes.filter(p => !expertiseAtual.has(p));
+    html += `
+      <div class="levelup-card">
+        <div class="levelup-card-header">Especialização do Ladino (opcional)</div>
+        <div class="levelup-card-body">
+          <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
+            Escolha 2 perícias proficientes para Especialização. Se não escolher, o app completa
+            automaticamente com as próximas perícias elegíveis.
+          </div>
+          <div id="levelup-ladino-expertise" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px">
+            ${elegiveis.map(p => `
+              <label class="form-check levelup-check-label">
+                <input type="checkbox" data-ladino-expertise="${p}" ${(state.ladinoExpertise || []).includes(p) ? 'checked' : ''}> ${p}
+              </label>
+            `).join('')}
+          </div>
+          <div class="levelup-counter">
+            Selecionadas: <span id="levelup-ladino-expertise-count" style="font-weight:700">${(state.ladinoExpertise || []).length}</span>/2
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  return html;
+}
+
 // ============================================================
 // CARD: Escolhas de Classe (Expertise, Estilo de Luta, etc.)
 // ============================================================
 export function renderCardEscolhasClasse(ctx, state) {
-  const { char, precisaExpertiseBardo, precisaExpertiseGuardiao, precisaEstiloLuta, precisaExploradorHabil, precisaAcademico } = ctx;
+  const {
+    char, precisaExpertiseBardo, precisaExpertiseGuardiao, precisaEstiloLuta,
+    precisaExploradorHabil, precisaAcademico
+  } = ctx;
   let html = '';
 
   // Especialização do Bardo
@@ -266,19 +365,13 @@ export function renderCardEscolhasClasse(ctx, state) {
   }
 
   // Estilo de Luta
+  // Nomes canônicos (dados/talentos/talentos.json) -- mesmo vocabulário do
+  // seletor da criação (creator/comum.js:CLASSES_ESCOLHAS), unificado na
+  // Task 7 (2026-08-07). Antes desta correção esta lista de subida de nível
+  // gravava um vocabulário abreviado próprio, incompatível com o mapa de
+  // exibição da ficha (sheet/habilidades.js:efeitosEstilo).
   if (precisaEstiloLuta) {
-    const opcoesBase = [
-      { nome: 'Arquearia', descricao: '+2 em ataques à distância com armas' },
-      { nome: 'Arremesso', descricao: '+2 de dano com armas de Arremesso' },
-      { nome: 'Armas Grandes', descricao: 'Trata 1-2 como 3 nos dados de dano (duas mãos)' },
-      { nome: 'Duas Armas', descricao: 'Adiciona mod. ao dano da mão secundária' },
-      { nome: 'Desarmado', descricao: 'Dano desarmado d6/d8+For' },
-      { nome: 'Defensivo', descricao: '+1 CA usando armadura' },
-      { nome: 'Duelismo', descricao: '+2 dano com uma arma em uma mão' },
-      { nome: 'Interceptação', descricao: 'Reduz dano a aliado em 1d10+Prof' },
-      { nome: 'Luta às Cegas', descricao: 'Visão Cega 3m, 9m se cego' },
-      { nome: 'Protetivo', descricao: 'Impõe desvantagem em ataques contra aliados' }
-    ];
+    const opcoesBase = [...OPCOES_ESTILO_LUTA_BASE];
     if (char.classe === 'Guardião') opcoesBase.push({ nome: 'Combatente Druídico', descricao: 'Aprende 2 truques de Druida (Sabedoria)' });
     if (char.classe === 'Paladino') opcoesBase.push({ nome: 'Combatente Abençoado', descricao: 'Aprende 2 truques de Clérigo (Carisma)' });
 
@@ -651,6 +744,8 @@ export function renderCardRevisao(ctx, state, steps) {
   if (state.bardoExpertise.length > 0) html += `<li><strong>Especialização Bardo:</strong> ${state.bardoExpertise.join(', ')}</li>`;
   if (state.guardiaoExpertise.length > 0) html += `<li><strong>Especialista Guardião:</strong> ${state.guardiaoExpertise.join(', ')}</li>`;
   if (state.estiloLuta) html += `<li><strong>Estilo de Luta:</strong> ${state.estiloLuta}</li>`;
+  if (state.estiloLutaTrocarDe && state.estiloLutaTrocarPara) html += `<li><strong>Troca de Estilo de Luta:</strong> ${state.estiloLutaTrocarDe} &rarr; ${state.estiloLutaTrocarPara}</li>`;
+  if ((state.ladinoExpertise || []).length > 0) html += `<li><strong>Especialização Ladino:</strong> ${state.ladinoExpertise.join(', ')}</li>`;
   if (state.exploradorExpertise) html += `<li><strong>Explorador Hábil:</strong> ${state.exploradorExpertise}, Idiomas: ${state.exploradorIdiomas.join(', ')}</li>`;
   if (state.academicoExpertise.length > 0) html += `<li><strong>Acadêmico:</strong> ${state.academicoExpertise.join(', ')}</li>`;
   if (state.truquesSelecionados.length > 0) html += `<li><strong>Truques:</strong> ${state.truquesSelecionados.join(', ')}</li>`;
@@ -681,6 +776,12 @@ export function renderCardRevisao(ctx, state, steps) {
   }
 
   html += `</div></div>`;
+
+  // Cards de escolhas opcionais que nunca introduzem um step novo (ver
+  // comentário de renderCardTrocasOpcionais) -- Troca de Estilo de Luta do
+  // Guerreiro e Especialização adicional do Ladino nível 6.
+  html += renderCardTrocasOpcionais(ctx, state);
+
   return html;
 }
 

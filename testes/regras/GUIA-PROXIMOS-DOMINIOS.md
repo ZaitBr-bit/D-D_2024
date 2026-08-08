@@ -115,7 +115,7 @@ factuais, todos pegos só porque alguém foi conferir: um `repetivel: true` que 
 livro não diz; um `exemplo_valido` que o próprio validador do app **rejeita**
 (usava uma perícia que a fixture já tinha); a afirmação de que bastava um stub
 de `localStorage` para importar os módulos em Node (falta `window` e
-`document`, porque `utils.js:609` atribui a `window` no carregamento); e um
+`document`, porque `utils.js:639` atribui a `window` no carregamento); e um
 comando `node --test <diretório>` que falha neste Node/Windows.
 
 **Como evitar.** Trate qualquer valor herdado de um plano, de um exemplo ou de
@@ -669,6 +669,168 @@ das funções do app em vez de uma leitura do livro.
 
 ---
 
+## A lição do domínio Classes/Trocas e Classes/Passivas (2026-08-07)
+
+A implementação desta rodada não teve a dificuldade de rodadas anteriores —
+nenhuma suíte vermelha em massa para desconfiar, nenhuma fixture irreal,
+nenhum `return` de escape. Mas a REVISÃO da rodada seguinte (Task 6, o
+registro de lacunas) achou 2 Critical, 6 Important e 10 Minor de precisão
+(`task-6-report.md`) — motivo copiado da string que o APP usa para exibir
+um efeito em vez de lido do livro, uma alegação de "sem consumidor" que
+era na verdade código morto por um mecanismo diferente já cumprir a
+regra, e um wrap largo demais pela TERCEIRA vez. As lições abaixo vêm
+dessa camada: não da dificuldade de implementar, mas da disciplina de
+citar e de escopar o wrap corretamente depois que o código já existe.
+
+**(a) Varrer o livro por VÁRIOS termos relacionados e registrar o que CADA
+UM trouxe — não presumir de antemão que um tipo de busca (estrutura,
+cabeçalho) é melhor que outro (verbo).** A primeira varredura do catálogo de
+trocas buscou literalmente `"pode substituir"` em `Classes.md` — 34
+ocorrências, e pareceu completo. Uma segunda rodada testou mais termos
+(`alterar`, `trocar`, `mudar`, `escolher outr`, `no lugar de`, `em vez de`) e
+duas buscas dirigidas por cabeçalho (`**Mudando`/`**Trocando`/`**Substituindo`
+em negrito, e `### Nível X: <Nome da Característica>`) — achou **8 cláusulas
+de classe base que a primeira rodada tinha perdido inteiras**. Uma primeira
+versão desta lição atribuiu as 8 à busca por cabeçalho, e estava **errada**:
+o próprio relatório de origem (`task-1-report.md:190-198`) mostra que **6 das
+8 vieram de verbos** — 5 do termo `alterar` (Maestria em Arma de Bárbaro/
+Guardião/Guerreiro/Ladino/Paladino) e 1 do termo `mudar` (Magia Preparada de
+Druida) — e só **2 vieram da busca dirigida por cabeçalho** (Magia Preparada
+de Clérigo e Mago, cujo texto usa "pode definir/alterar... substituindo",
+forma que nenhum dos verbos testados isoladamente bateria). Dos dois
+cabeçalhos citados como "a receita" na primeira versão desta lição,
+`**Trocando` tem **zero ocorrências** em `Classes.md`, e `**Substituindo` tem
+1 ocorrência sem relação com troca de escolha — a lição errada teria mandado
+o próximo domínio confiar num cabeçalho que nem existe no livro. Ao mesmo
+tempo, ampliar com mais VERBOS soltos (`"em vez de"`, `"escolher outr"`) deu
+28 ocorrências combinadas e **nenhuma** era cláusula de troca real — puro
+ruído. **Por que é útil saber**: nenhum termo isolado (verbo OU cabeçalho)
+cobriu tudo sozinho — a cobertura real veio de rodar vários termos e
+CLASSIFICAR manualmente cada ocorrência nova, não de escolher de antemão o
+termo "certo". Atribuir o crédito a um único método, por parecer mais
+elegante de registrar, sem reconferir contra o relatório de origem, é o
+mesmo tipo de erro que este guia existe para prevenir em lacunas — só que
+desta vez o erro apareceu na PRÓPRIA lição, pego só na revisão da Task 6.
+**Como aplicar**: ao levantar cláusulas de um tipo específico pelo livro
+inteiro, rode uma lista de termos candidatos (verbos sinônimos e formas de
+cabeçalho/título), registre CADA termo e o que ele trouxe — uma tabela, não
+um resumo — e classifique manualmente toda ocorrência nova. A lista de
+termos que valem a pena só se conhece depois de rodar todos e comparar;
+presumir que um TIPO de busca é sempre superior a outro é a mesma armadilha,
+só que vestida de lição.
+
+**(b) Quando o app inventa uma taxonomia que o livro não tem, "contra o
+livro" produz alegação sem fonte — é preciso separar o citável do
+julgamento.** O par "Habilidades Ativas"/"Habilidades Passivas" é
+vocabulário do APP (a seção da ficha), não do livro — nenhuma frase de
+`Classes.md` rotula uma característica como "ativa" ou "passiva". Tratar as
+174 classificações do catálogo como uma alegação direta sobre o livro
+produziria dezenas de "lacunas" sem nenhuma frase para citar como prova. O
+catálogo resolveu isso com um campo `base` de três valores: `'custo-
+declarado'`/`'ausencia-de-custo'` (o livro tem uma frase citável -- Ação,
+recurso nomeado, ou ausência total de custo/gatilho) sustentam lacuna;
+`'julgamento'` (o livro só diz "você pode..." sem custo, e a classificação é
+leitura, não fato) não sustenta -- a heurística ainda roda e o resultado é
+registrado (`t.skip` com a mensagem, não escondido), mas nunca vira
+`assert.equal`. Das 174, 9 caíram em `'julgamento'`; sem essa separação,
+teriam produzido até 9 alegações sem fonte, a mesma classe de erro que gerou
+31 lacunas falsas na rodada de Talentos (erro 1 deste guia), só que por um
+mecanismo diferente -- lá era "arquitetura em vez de comportamento", aqui é
+"taxonomia do app tratada como se fosse do livro". **Por que é útil saber**:
+o erro 1 deste guia já ensinava a desconfiar de perguntas fáceis demais de
+responder; este é o caso em que a pergunta nem devia ter sido feita da forma
+como foi formulada -- "isto é ativa ou passiva, segundo o livro?" pressupõe
+que o livro responde, quando às vezes só o app faz essa pergunta.
+**Como aplicar**: antes de confrontar uma classificação do app contra o
+livro, pergunte se o PAR de categorias (não só o valor) existe no livro. Se
+o app inventou a categoria, task ainda vale a pena -- mas cada entrada
+precisa de um campo que separe "o livro tem frase citável para isto" de
+"isto é minha leitura mais razoável", e só o primeiro grupo pode virar
+`assert.equal`.
+
+**(c) Característica COMPOSTA (o livro empacota naturezas diferentes sob um
+nome) não sustenta lacuna sozinha.** Em 10 das 174 características, o livro
+junta, sob UM nome, cláusulas que teriam `base` diferente se fossem
+separadas -- uma parte passiva incondicional ao lado de uma parte com custo
+declarado, ou uma opção por julgamento ao lado de uma passiva. Um exemplo
+real do catálogo (corrigido nesta revisão -- uma primeira versão desta
+lição trocou a classe e a cláusula, ver abaixo): Fúria Persistente do
+Bárbaro (nível 15) combina uma cláusula de CUSTO DECLARADO -- "Ao jogar
+Iniciativa, você pode recuperar todos os usos gastos de Fúria. Após
+recuperar a Fúria deste modo, você não pode fazê-lo novamente até completar
+um Descanso Longo" (`Classes.md:165`) -- com uma cláusula PASSIVA
+incondicional -- "sua Fúria... agora dura 10 minutos sem a necessidade de
+estender a duração" (`Classes.md:167`). (A primeira versão desta lição
+atribuía o gatilho de Iniciativa a Fonte de Inspiração do BARDO -- errado:
+`Classes.md:464` fala em restaurar usos ao completar um Descanso Curto ou
+Longo, sem nenhuma menção a Iniciativa; a cláusula de Iniciativa é do
+Bárbaro, e lá é a metade COM custo, não a passiva -- o catálogo e o
+`task-3-report.md` sempre descreveram isso certo, só a lição errou ao
+resumir.) Pela regra de força do catálogo (custo-declarado sempre vence), a
+entrada resolve para `ativa: true`; mas por ser composta, mesmo essa
+classificação não sustenta uma lacuna sozinha se o app discordar -- o app
+pode estar modelando só a metade passiva (a duração de 10 minutos), não
+"errando" a Iniciativa. Tratar essas 10 como qualquer outra entrada teria
+arriscado registrar uma lacuna onde a divergência é de RECORTE, não de
+REGRA. **Por que é útil saber**: é uma
+terceira forma (depois de `'julgamento'`) de "isto não é uma alegação
+simples", e as duas merecem o MESMO tratamento estrutural (não um `if` por
+razão -- `naoSustentaAlegacaoSozinha = julgamento || composta`), porque
+produzem o mesmo efeito: nenhuma frase única do livro sustenta uma alegação
+de "app errado" sozinha. Confirmado por mutação (task-4-report.md): estragar
+`ativa` numa entrada composta faz a heurística RODAR e o resultado mudar
+(a mensagem do skip passa a dizer "divergem"), mas o teste continua verde --
+prova de que o filtro está em vigor estruturalmente, não só documentado em
+comentário. **Como aplicar**: ao ler a descrição bruta de uma característica
+para decidir seu `base`, pergunte se o parágrafo tem mais de UMA cláusula
+com força de evidência diferente (uma incondicional, outra com custo, outra
+por julgamento). Se tiver, marque como composta E deixe o valor de força
+mais alta decidir a classificação-resumo (custo-declarado sempre vence, na
+ausência dele julgamento vence ausência-de-custo) -- mas não deixe essa
+entrada sustentar uma lacuna sozinha nem a favor nem contra o app.
+
+**(d) "Estreite o wrap para a asserção divergente" é regra fácil de
+repetir e fácil de violar de um jeito NOVO a cada vez -- esta rodada
+violou de duas formas que as duas anteriores não tinham.** A instrução já
+existia neste guia (README, mecânica de `comLacuna`) por ter sido violada
+duas vezes: um wrap largo demais faz asserções IRMÃS morrerem junto com a
+divergente. A Task 6 desta rodada cometeu a MESMA classe de erro pela
+TERCEIRA vez, mas por dois mecanismos que as duas primeiras vezes não
+tinham (`task-6-report.md`, seção "Dois bugs pegos e corrigidos"): (1) o
+wrap de vocabulário de Estilo de Luta envolveu os 10 testes de
+`efeitosEstilo` em vez dos 5 realmente divergentes -- os 5 que já
+concordavam com o app (Arquearia, Arremesso, Armas Grandes, Defensivo,
+Duelismo) passaram a exigir FALHA sob `comLacuna`, e como continuavam
+passando de verdade, o mecanismo os denunciou como "Lacuna corrigida:
+remova..."; (2) um mapa de causa raiz chaveado por `classe|nome` (sem
+nível) confundiu as DUAS entradas de "Golpe Brutal Aprimorado" do Bárbaro
+(nível 13 e nível 17, só a de nível 17 diverge) -- a de nível 13, que já
+concordava, foi arrastada para o mesmo wrap e "denunciada" pelo mesmo
+motivo. Nos dois casos o SINTOMA foi idêntico ao da lição original (uma
+asserção que deveria continuar verde virou vermelha por estar contaminada
+por um wrap vizinho), mas a CAUSA era nova (largura do CONJUNTO de testes
+recebendo o wrap, e granularidade da CHAVE de agrupamento -- não a largura
+do bloco de código dentro de UM teste, que era o erro das duas vezes
+anteriores). **Por que é útil saber**: "não amplie demais o `try/catch`"
+não esgota a lição -- o mesmo defeito reaparece em qualquer lugar onde uma
+LISTA de testes é roteada para uma lacuna compartilhada por uma CHAVE
+derivada (aqui, `causa.teste`; lá, o próximo domínio pode ter outro nome
+para a mesma ideia). Cada vez que a causa raiz do erro muda de forma,
+"já sei dessa lição" é exatamente o momento de verificar de novo, não de
+pular a verificação. **Como aplicar**: ao rotear várias asserções para a
+mesma entrada de `LACUNAS` por uma chave computada (não hardcoded por
+teste), (1) a chave precisa identificar a entidade com precisão SUFICIENTE
+para não colidir duas ocorrências com o mesmo nome mas comportamento
+diferente (aqui, faltava o nível); (2) o CONJUNTO de testes que recebe o
+wrap precisa ser exatamente o conjunto que diverge, nunca "a família toda
+por conveniência" -- se um subconjunto já passa, ele fica de FORA do wrap,
+mesmo que pertença ao mesmo grupo temático. As duas checagens são
+baratas: depois de escrever o wrap, rode a suíte e confirme que o número
+de falhas bate EXATAMENTE com o que você esperava reduzir a zero -- um
+número que sobra (ou que falta) é o sinal de uma das duas formas acima.
+
+---
+
 ## O que fazer quando o app e o livro discordam
 
 Nem toda divergência é bug do app, e a distinção muda o que se escreve:
@@ -687,3 +849,48 @@ conformidade com o livro. A confrontação com o livro, ali, aconteceu na
 curadoria — e se a curadoria errou, o motor concorda com o erro em silêncio.
 Diga isso no README do domínio, para que "tudo verde" não seja lido como
 garantia maior do que é.
+
+---
+
+## Limitações conhecidas do app, não implementáveis nesta rodada (2026-08-07, Task 7)
+
+**O app não tem motor de rolagem de dados.** Achado ao corrigir as flags
+`estilo_armas_grandes`/`estilo_duas_armas` (Task 7,
+`.superpowers/sdd/2026-08-07-classes-trocas-passivas/task-7-report.md`) --
+registrado aqui, não como lacuna (retirada de `lacunas-conhecidas.mjs` junto
+com o achado "flag sem consumidor" que a hospedava), porque é um fato
+diferente que sobrevive à correção e que a remoção da entrada apagou sem
+querer.
+
+As duas flags ganharam consumidor em `site/js/sheet/inventario.js` (Task 7)
+-- um selo informativo na arma qualificada. O que continua **não**
+acontecendo, e não é implementável sem uma mudança de arquitetura maior que
+esta correção: **nenhuma parte do app aplica qualquer uma das duas mecânicas
+a uma rolagem de dano de verdade**. `danoExibicao`
+(`site/js/sheet/inventario.js`) só mostra a FÓRMULA de dano da arma
+(`XdY+Z`, string), nunca rola um dado -- não existe, em lugar nenhum de
+`site/js/`, um `Math.random()`/gerador de resultado de dado para uma jogada
+de dano de arma (a única rolagem de dado que o app faz é no assistente de
+criação, para PV/atributos, um contexto totalmente diferente). Isso significa
+que:
+
+- **Combate com Armas Grandes** ("trata qualquer 1 ou 2 num dado de dano como
+  um 3", `Talentos.md:764`) não tem onde se conectar: não há resultado de
+  dado nenhum para interceptar e substituir. A fórmula estatisticamente
+  equivalente (média de +3/faces por dado) existe e é trivial de calcular,
+  mas misturar um número PROBABILÍSTICO com os modificadores EXATOS que
+  `danoExibicao` já mostra (bônus de talento, Fúria, proficiência) seria mais
+  enganoso que informativo -- decisão registrada em comentário no próprio
+  `inventario.js`.
+- **Combate com Duas Armas** (soma o mod. de atributo ao "ataque adicional"
+  de arma Leve, `Talentos.md:770`) também não tem onde se conectar: o app
+  não modela "ataque adicional"/"segundo ataque da ação Atacar" como uma
+  entidade separada em lugar nenhum -- cada arma no inventário mostra UMA
+  linha de dano, que já representa "um ataque genérico com esta arma",
+  primário ou adicional, sem diferenciar os dois.
+
+**Se um domínio futuro (ex.: "Combate") tocar rolagem de dano de verdade**,
+essas duas mecânicas viram implementáveis de verdade (interceptar o
+resultado do dado antes de exibir/somar) -- até lá, o selo informativo é o
+teto do que este app consegue expressar sobre elas, e um motor de teste que
+exigisse mais do que isso estaria cobrando uma arquitetura que não existe.

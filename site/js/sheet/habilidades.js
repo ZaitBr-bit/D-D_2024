@@ -26,6 +26,7 @@ import { renderFichaCompleta } from './ficha.js';
 import { numberPickerHtml, setupNumberPicker } from './hp-descanso.js';
 import { abrirModalMaestrias } from './maestrias.js';
 import { OPCOES_METAMAGIA, consumirEspacoMagiaDisponivel, recuperarEspacoMagia } from './magias.js';
+import { normalizarEstiloLuta } from '../talentos-effects.js';
 
 // --- Habilidades (Ativas) ---
 export function setupEventosHabilidades() {
@@ -4616,19 +4617,32 @@ export function renderFeatureItem(f, source) {
     `;
     recarga = 'curto_ou_longo';
   } else if (f.nome === 'Estilo de Luta') {
-    // Exibir o estilo de luta escolhido com seu efeito
-    const estiloEscolhido = char.escolhas_classe?.estilo_luta?.[0] || '';
+    // Exibir o estilo de luta escolhido com seu efeito.
+    // normalizarEstiloLuta traduz nomes ABREVIADOS de fichas salvas antes da
+    // unificação de vocabulário (Task 7, 2026-08-07) para os canônicos --
+    // sem isso, fichas antigas ("Arremesso", "Armas Grandes", "Duas Armas",
+    // "Desarmado") não achariam entrada no mapa abaixo, que agora é indexado
+    // só pelos nomes canônicos de dados/talentos/talentos.json.
+    const estiloEscolhido = normalizarEstiloLuta(char.escolhas_classe?.estilo_luta?.[0] || '');
     if (estiloEscolhido) {
+      // Textos conferidos contra Talentos.md (categoria "de Estilo de Luta"),
+      // não contra a regra de 2014 -- ver correção de "Combate com Armas
+      // Grandes" (era "re-rolar 1 ou 2", a regra do livro é "trata 1 ou 2
+      // como 3") e de "Luta às Cegas" (não exige proficiência nenhuma) nesta
+      // rodada. Combatente Druídico/Abençoado não são talentos de Estilo de
+      // Luta (são opções alternativas exclusivas de Guardião/Paladino), por
+      // isso ficam fora dos 10 canônicos mas continuam no mapa.
       const efeitosEstilo = {
         'Arquearia': '+2 nas jogadas de ataque com armas à distância',
-        'Defesa Cega': 'Sentido cego de 3m (exige proficiência)',
+        'Combate com Armas de Arremesso': '+2 no dano ao acertar com arma de Arremesso à distância',
+        'Combate com Armas Grandes': 'Trata 1 ou 2 no dado de dano como 3 (arma corpo a corpo Duas Mãos ou Versátil)',
+        'Combate com Duas Armas': 'Soma o mod. de atributo ao dano do ataque adicional com arma Leve, se ainda não estiver somando',
+        'Combate Desarmado': '1d6+FOR de dano desarmado (1d8 sem arma/escudo); 1d4 extra em criatura Imobilizada',
         'Defensivo': '+1 de CA ao usar armadura',
-        'Duelismo': '+2 de dano com arma de uma mão (sem outra arma)',
-        'Armas Grandes': 're-rolar 1 ou 2 no dano de armas de duas mãos',
-        'Intercessão': '-1d10+prof do dano em aliado adjacente (reação)',
-        'Arremesso': 'saca e arremessa com +2 de dano',
-        'Combate sem Arma': '1d6+FOR de dano desarmado',
-        'Combate com Duas Armas': '+mod de atributo no dano da arma secundária',
+        'Duelismo': '+2 de dano com arma corpo a corpo em uma mão (sem outra arma)',
+        'Interceptação': 'Reação: reduz em 1d10+Prof o dano a um aliado a até 1,5m',
+        'Luta às Cegas': 'Visão às Cegas com alcance de 3 metros',
+        'Protetivo': 'Reação: impõe Desvantagem em ataque contra aliado a até 1,5m',
         'Combatente Druídico': '2 truques de Druida (Sabedoria)',
         'Combatente Abençoado': '2 truques de Clérigo (Carisma)'
       };

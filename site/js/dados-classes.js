@@ -102,7 +102,17 @@ export const CLASSES_INFO = {
     atributo_primario: "Destreza",
     salvaguardas: ["Destreza", "Inteligência"],
     armaduras: ["Leve"],
-    armas: ["Simples", "Marcial (Acuidade)"],
+    // Classes.md:4152: "Armas Simples e Armas Marciais que tem a propriedade
+    // Acuidade ou Leve" -- as duas propriedades, não só Acuidade. Um único
+    // item "Marcial (...)" (não dois itens separados) preserva a categoria
+    // "Marcial" única esperada pelos dois consumidores que resolvem esta
+    // string contra a propriedade de uma arma específica
+    // (creator/passo-equipamento.js:temProficienciaArma e
+    // sheet/condicoes.js:sheetTemProfArma) -- ambos já fazem
+    // `info.armas.some(a => a.includes('Leve'))` (mesma checagem usada para
+    // o Monge), então bastou incluir a palavra "Leve" em algum item de
+    // `armas`; nenhum dos dois arquivos precisou mudar.
+    armas: ["Simples", "Marcial (Acuidade ou Leve)"],
     pericias_opcoes: ["Acrobacia", "Atletismo", "Enganação", "Furtividade", "Intimidação", "Intuição", "Investigação", "Percepção", "Persuasão", "Prestidigitação"],
     num_pericias: 4,
     conjurador: false,

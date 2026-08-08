@@ -15,7 +15,7 @@ import { ATRIBUTOS_KEYS, CLASSES_INFO, POINT_BUY_CUSTOS, POINT_BUY_TOTAL } from 
 import { criarCarteiraVazia } from '../moedas.js';
 import { validarEscolhasTalento } from '../regras-cobertura.js';
 import { salvarPersonagem } from '../store.js';
-import { calcMod, calcPVNivel1, getEspacosMagia, getMagiaPreparadas, getTruquesConhecidos, magiaMagoEstaNoGrimorio, toast } from '../utils.js';
+import { calcMod, calcPVNivel1, getBonusTruquesOrdem, getEspacosMagia, getMagiaPreparadas, getTruquesConhecidos, magiaMagoEstaNoGrimorio, toast } from '../utils.js';
 import { ANTECEDENTES_ESCOLHAS, CLASSES_ESCOLHAS, ESPECIES_TRACOS_ESCOLHA, FERRAMENTAS_TODAS, INSTRUMENTOS_MUSICAIS, obterTruquesEspecie } from './comum.js';
 import { renderStepAntecedente } from './passo-antecedente.js';
 import { renderStepAtributos } from './passo-atributos.js';
@@ -327,14 +327,9 @@ function validarStep() {
         let truquesNecessarios = getTruquesConhecidos(tabelaCaract, personagem.nivel);
         const preparadasNecessarias = getMagiaPreparadas(tabelaCaract, personagem.nivel);
 
-        // Bonus de truques do Clerigo Taumaturgo
-        if (personagem.classe === 'Clérigo' && personagem.ordem_divina === 'Taumaturgo') {
-          truquesNecessarios += 1;
-        }
-        // Bonus de truques do Druida Xama
-        if (personagem.classe === 'Druida' && (personagem.ordem_primal === 'Xamã' || personagem.escolhas_classe?.ordem_primal?.[0] === 'Xamã')) {
-          truquesNecessarios += 1;
-        }
+        // Bonus de truques do Clerigo Taumaturgo / Druida Xama (utils.js,
+        // mesma função que o resto do app -- ver getBonusTruquesOrdem)
+        truquesNecessarios += getBonusTruquesOrdem(personagem);
 
         const truquesSelecionados = (personagem.magias_conhecidas || []).filter(m => m.circulo === 0).length;
         const preparadasSelecionadas = (personagem.magias_preparadas || []).length;

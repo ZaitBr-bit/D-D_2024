@@ -79,22 +79,22 @@ export function sementeParaTalento(entrada, nome) {
 }
 
 /**
- * Abre o modal de level-up e navega até a tela de ASI/talento,
- * confirmando as telas anteriores que aparecerem. Detecta a chegada por
- * `#levelup-talento-select`, não pelos rádios de modo -- em Dádiva Épica
- * os rádios nem existem (levelup-cards.js: exigeDadivaEpica omite o
- * toggle inteiro).
- *
- * Espera o MODAL aparecer (não um tempo fixo): com 4 workers em paralelo,
- * cada um abrindo uma ficha inteira no mesmo servidor de arquivos
- * estático, um `waitForTimeout` fixo e curto é instável -- a tela demora
- * para renderizar sob carga, `#btn-step-proximo` ainda não existe, e um
- * loop que desiste cedo demais nunca dá tempo do modal abrir (sintoma:
- * falha um talento DIFERENTE a cada corrida -- sinal de timing, não de
- * talento específico). Um timeout generoso (20s) mais uma segunda
- * tentativa de clique cobre o pior caso sob carga.
+ * Abre o modal de level-up, com retentativa de clique. Extraído de
+ * `irAteEscolhaDeTalento` (achado N3 da revisão final da Task 8): antes
+ * dessa extração, `testes/e2e/regras/classes-trocas-ui.spec.mjs` tinha sua
+ * PRÓPRIA cópia deste clique, sem a retentativa -- exatamente o tipo de
+ * cópia divergente que já causou um flake real neste projeto (ver
+ * comentário de `irAteEscolhaDeTalento`, abaixo, e o achado I1 do cabeçalho
+ * deste arquivo). Com 4 workers em paralelo, cada um abrindo uma ficha
+ * inteira no mesmo servidor de arquivos estático, um único clique sem
+ * retentativa falha sob carga (o clique pode chegar antes do listener de
+ * `#btn-levelup` estar pronto) -- sintoma: `TimeoutError` esperando
+ * `#modal-overlay` ficar visível, intermitente, não reproduzível isolado.
+ * Um timeout generoso (20s) mais uma segunda tentativa de clique cobre o
+ * pior caso sob carga. Toda spec que abre o level-up deve chamar ESTA
+ * função (ou algo que a chame), nunca reimplementar o clique.
  */
-export async function irAteEscolhaDeTalento(page) {
+export async function abrirModalLevelUp(page) {
   const clicarLevelup = () => page.evaluate(() => {
     localStorage.setItem('feature.levelup.flow.v2', '1');
     document.getElementById('btn-levelup')?.click();
@@ -107,6 +107,25 @@ export async function irAteEscolhaDeTalento(page) {
     abriu = await page.waitForSelector('#modal-overlay', { state: 'visible', timeout: 20_000 })
       .then(() => true, () => false);
   }
+  return abriu;
+}
+
+/**
+ * Abre o modal de level-up (via `abrirModalLevelUp`, com retentativa) e
+ * navega até a tela de ASI/talento, confirmando as telas anteriores que
+ * aparecerem. Detecta a chegada por `#levelup-talento-select`, não pelos
+ * rádios de modo -- em Dádiva Épica os rádios nem existem
+ * (levelup-cards.js: exigeDadivaEpica omite o toggle inteiro).
+ *
+ * O loop de "Próximo" abaixo tem a mesma disciplina sob carga: um
+ * `waitForTimeout` fixo e curto é instável -- a tela demora para
+ * renderizar sob carga, `#btn-step-proximo` ainda não existe, e um loop
+ * que desiste cedo demais nunca dá tempo do modal abrir (sintoma: falha um
+ * talento DIFERENTE a cada corrida -- sinal de timing, não de talento
+ * específico).
+ */
+export async function irAteEscolhaDeTalento(page) {
+  await abrirModalLevelUp(page);
   for (let i = 0; i < 10; i++) {
     if (await page.locator('#levelup-talento-select').count()) return true;
     const proximo = page.locator('#btn-step-proximo');

@@ -248,6 +248,20 @@ for (const classe of CLASSES) {
     // asserção com divergência conhecida -- entra em comLacuna(). Para
     // as outras 11 classes (e para o Ladino fora deste bloco), `lacuna()`
     // devolve null e o corpo roda normal, exigindo passar.
+    //
+    // CORRIGIDO em 2026-08-08 (revisão do coordenador): o parser anterior
+    // empacotava TODO o conteúdo do parêntese num array de UM elemento só
+    // (`[match[1]]`), então `assert.deepEqual` contra um `armasRestricao`
+    // de mais de uma propriedade (caso do Ladino: `['Acuidade', 'Leve']`)
+    // falhava sempre por COMPRIMENTO -- 1 elemento contra 2 --,
+    // independente do que o app escrevesse dentro do parêntese. Um teste
+    // que não consegue passar não mede o app; é a forma inversa do "teste
+    // que não consegue falhar". O parser certo separa as propriedades
+    // pelo conectivo "ou" que o próprio livro usa (Classes.md:4152, "tem
+    // a propriedade Acuidade ou Leve") -- `'Marcial (Acuidade ou
+    // Leve)'.split(/\s+ou\s+/i)` -> `['Acuidade', 'Leve']` -- e compara os
+    // dois lados ordenados (a ordem em que o livro cita as propriedades
+    // não é uma regra, só prosa).
     const corpoArmasRestricao = () => {
       if (t.armasRestricao !== null) {
         for (const [categoria, propriedadeLivro] of Object.entries(t.armasRestricao)) {
@@ -255,10 +269,12 @@ for (const classe of CLASSES) {
           assert.ok(entrada,
             `app não tem entrada de arma para a categoria restrita "${categoria}"`);
           const match = entrada.match(/\((.+)\)\s*$/);
-          const propriedadeApp = match ? [match[1]] : [];
+          const propriedadeApp = match
+            ? match[1].split(/\s+ou\s+/i).map((p) => p.trim()).filter(Boolean)
+            : [];
           const propriedadesLivro = Array.isArray(propriedadeLivro)
             ? propriedadeLivro : [propriedadeLivro];
-          assert.deepEqual(propriedadeApp, propriedadesLivro,
+          assert.deepEqual([...propriedadeApp].sort(), [...propriedadesLivro].sort(),
             `restrição de "${categoria}" divergente: livro exige `
             + `${propriedadesLivro.join(' ou ')}, app codifica "${entrada}"`);
         }
@@ -393,11 +409,13 @@ for (const classe of CLASSES) {
 }
 
 // ============================================================
-// Task 6 -- motor estrutural: oito funções de levelup.js decidem o que
+// Task 6 -- motor estrutural: nove funções de levelup.js decidem o que
 // cada nível exige por LISTA HARD-CODED (concedeAumentoAtributo,
 // exigeSubclasse, exigeDadivaEpica, exigeEspecializacaoBardo,
-// exigeEspecializacaoGuardiao, exigeEstiloLuta, exigeExploradorHabil,
-// exigeAcademico), independente de PROGRESSAO. Nada hoje confronta
+// exigeEspecializacaoGuardiao, exigeEspecializacaoLadino, exigeEstiloLuta,
+// exigeExploradorHabil, exigeAcademico -- eram oito na Task 6; a Task 8,
+// 2026-08-08, acrescentou exigeEspecializacaoLadino), independente de
+// PROGRESSAO. Nada hoje confronta
 // essas listas com a coluna "Características de Classe" do livro --
 // este é o primeiro confronto.
 //
@@ -426,6 +444,19 @@ const GATILHOS = [
   { nome: 'exigeEspecializacaoGuardiao', rotulo: ROTULOS_GATILHO.especializacaoGuardiao,
     fn: (classe, nivel) => levelup.exigeEspecializacaoGuardiao(classe, nivel),
     apenas: ['Guardião'] },
+  // Acrescentada na Task 8 (2026-08-08): a Especialização adicional do
+  // Ladino no nível 6 (Classes.md:4188) é a 9ª função de gatilho que o
+  // app tem -- GATILHOS existe para enumerar os mecanismos reais, e
+  // agora há um novo. Registrar aqui (em vez de estender
+  // exigeEspecializacaoBardo/exigeEspecializacaoGuardiao para também
+  // cobrir o Ladino) é o que preserva as asserções por classe das duas
+  // entradas vizinhas -- estendê-las faria `exigeEspecializacaoGuardiao ×
+  // livro: Ladino`, por exemplo, esperar `false` (apenas: ['Guardião'])
+  // mas observar `true`, quebrando um teste que não tem nada a ver com
+  // esta mudança.
+  { nome: 'exigeEspecializacaoLadino', rotulo: ROTULOS_GATILHO.especializacaoLadino,
+    fn: (classe, nivel) => levelup.exigeEspecializacaoLadino(classe, nivel),
+    apenas: ['Ladino'] },
   { nome: 'exigeEstiloLuta', rotulo: ROTULOS_GATILHO.estiloLuta,
     fn: (classe, nivel) => levelup.exigeEstiloLuta(classe, nivel) },
   { nome: 'exigeExploradorHabil', rotulo: ROTULOS_GATILHO.exploradorHabil,
@@ -436,10 +467,10 @@ const GATILHOS = [
     apenas: ['Mago'] },
 ];
 
-// A varredura roda sobre os níveis 2-20, não 1-20: as oito funções são o
+// A varredura roda sobre os níveis 2-20, não 1-20: as nove funções são o
 // portão de PASSO do assistente de SUBIDA de nível, que nunca processa o
 // nível 1 -- `novoNivel`/`nivelNovo` é sempre `nivelAnterior + 1` com
-// `nivelAnterior/nivelAtual >= 1` (levelup.js:884, levelup-flow.js:32), e
+// `nivelAnterior/nivelAtual >= 1` (levelup.js:907, levelup-flow.js:32), e
 // por isso essas funções nunca são chamadas com `nivel === 1` em produção.
 // Cobrar `nivel === 1` delas seria medir um nível que elas não veem -- o
 // teste abaixo ("nível 1: ...") continua varrendo o nível 1, mas afirma
@@ -504,11 +535,11 @@ test('nível 1: nenhum gatilho dispara além do Estilo de Luta do Guerreiro', ()
 // FUNÇÃO, a pergunta "ela dispara exatamente onde o livro manda?" -- e
 // `apenas` responde "não deveria disparar fora desta(s) classe(s))" para
 // as outras 11. Isso deixa uma pergunta sem resposta: para os rótulos que
-// os oito ROTULOS_GATILHO já reconhecem (NÃO todo rótulo do livro que
+// os nove ROTULOS_GATILHO já reconhecem (NÃO todo rótulo do livro que
 // exige escolha -- ver o LIMITE DECLARADO logo abaixo, Minor 1 da revisão
 // independente), será que alguma função dispara para eles em QUALQUER
 // classe? Uma característica que o app esqueceu inteira (nenhuma das
-// oito funções a reconhece em lugar nenhum) nunca aparece no laço acima,
+// nove funções a reconhece em lugar nenhum) nunca aparece no laço acima,
 // porque o valor esperado ali também é `false` fora do escopo de
 // `apenas` -- os dois lados concordam, o teste passa, e a lacuna fica
 // invisível. Foi exatamente isso que escondeu Ladino nível 6
@@ -524,7 +555,7 @@ test('nível 1: nenhum gatilho dispara além do Estilo de Luta do Guerreiro', ()
 // SE um rótulo específico exige escolha -- e então exige que ALGUMA
 // função CUJO PRÓPRIO RÓTULO CASOU com ele, chamada sem restrição de
 // classe, dispare para aquele (classe, nível). Não precisa de uma lista
-// de rótulos separada: os mesmos oito padrões que já identificam "isto é
+// de rótulos separada: os mesmos nove padrões que já identificam "isto é
 // uma escolha que exige mecanismo" continuam sendo a fonte.
 //
 // ACHADO da revisão independente (Important 2, 2026-08-07): a primeira
@@ -542,7 +573,7 @@ test('nível 1: nenhum gatilho dispara além do Estilo de Luta do Guerreiro', ()
 //
 // LIMITE DECLARADO (Minor 1, mesma revisão): este detector só enxerga
 // rótulos que ROTULOS_GATILHO reconhece -- e ROTULOS_GATILHO foi curado
-// a partir das OITO FUNÇÕES QUE O APP JÁ TEM, não a partir de uma
+// a partir das NOVE FUNÇÕES QUE O APP JÁ TEM, não a partir de uma
 // varredura do livro. Medido (não suposto): dos 138 rótulos distintos
 // que aparecem nas 240 células do catálogo, só 19 casam com algum
 // ROTULOS_GATILHO -- os outros 119 (ex.: "Maestria em Arma" do Ladino,
@@ -562,7 +593,7 @@ function algumRotuloDeEscolhaCasa(classe, label) {
 }
 
 // Nível 1 fica de fora do laço célula-a-célula abaixo pelo mesmo motivo
-// estrutural do teste anterior (as oito funções nunca são chamadas com
+// estrutural do teste anterior (as nove funções nunca são chamadas com
 // nível 1) -- mas, diferente daquele teste (que só confirma que nada
 // além do Guerreiro casa DENTRO do escopo de `apenas`), este confere o
 // universo INTEIRO, sem `apenas`, e por isso pega também "Especialização"
@@ -618,7 +649,7 @@ test('nível 1 (sem apenas): todo rótulo que exige escolha está na lista curad
   }
 });
 
-// Níveis 2-20: aqui as oito funções SÃO chamadas em produção, então a
+// Níveis 2-20: aqui as nove funções SÃO chamadas em produção, então a
 // pergunta "a função DO PRÓPRIO RÓTULO dispara?" é a confrontação real.
 // Um teste por classe (como o resto do arquivo) para o nome do teste
 // apontar direto para quem falhou. A única célula com lacuna registrada

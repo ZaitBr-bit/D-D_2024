@@ -1598,6 +1598,14 @@ export const ROTULOS_GATILHO = {
   // em classes.test.mjs usa `apenas: ['Bardo']` -- fora do escopo dessa
   // lista, o esperado é `false`, não este rótulo.
   especializacaoGuardiao: () => /^Especialista$/,
+  // Ladino nível 6, Classes.md:4188 (célula "Especialista" da tabela
+  // "Características de Ladino"; prosa em Classes.md:4216) -- acrescentada
+  // na Task 8 (2026-08-08) junto com exigeEspecializacaoLadino em
+  // levelup.js, a NONA função de gatilho (a 8ª a mais nesta lista desde a
+  // rodada anterior). Mesmo regex de especializacaoGuardiao (o rótulo do
+  // livro é idêntico, "Especialista") -- o que diferencia as duas é o
+  // `apenas` de cada entrada em GATILHOS (classes.test.mjs), não o rótulo.
+  especializacaoLadino: () => /^Especialista$/,
   estiloLuta: () => /^Estilo de Luta$/,
   exploradorHabil: () => /^Explorador Hábil$/,
   academico: () => /^Acadêmico$/,
@@ -1609,7 +1617,7 @@ export const ROTULOS_GATILHO = {
 // do Guerreiro em si (que só traz "Subclasse de Guerreiro" no nível 3 e
 // "Característica de Subclasse" nos níveis 7/10/15, sem número).
 // Confirmado por leitura direta da seção antes de transcrever, não
-// copiado do brief nem de getQuantidadeNovasManobras (levelup.js:473):
+// copiado do brief nem de getQuantidadeNovasManobras (levelup.js:496):
 //   - Classes.md:4067 "Você aprende três manobras à sua escolha" --
 //     nível 3, 3 manobras.
 //   - Classes.md:4069 "Você aprende duas manobras adicionais à sua
@@ -1627,10 +1635,11 @@ export const MANOBRAS_POR_NIVEL = { 3: 3, 7: 2, 10: 2, 15: 2 };
 // livro manda -- mas nunca confere a pergunta oposta, que todo rótulo
 // do livro que exige escolha tenha ALGUMA função que dispare. O motor
 // converso em classes.test.mjs varre as 240 células perguntando isso, e
-// precisa de uma exceção CURADA para o nível 1: as oito funções de
-// levelup.js (a lista acima de GATILHOS) só são chamadas a partir do
-// nível 2 -- `novoNivel`/`nivelNovo` é sempre `nivelAnterior + 1` com
-// `nivelAnterior >= 1` (levelup.js:884, levelup-flow.js:32) -- então
+// precisa de uma exceção CURADA para o nível 1: as nove funções de
+// levelup.js (a lista acima de GATILHOS -- oito até a Task 7, mais
+// exigeEspecializacaoLadino acrescentada na Task 8) só são chamadas a
+// partir do nível 2 -- `novoNivel`/`nivelNovo` é sempre `nivelAnterior + 1`
+// com `nivelAnterior >= 1` (levelup.js:907, levelup-flow.js:32) -- então
 // nenhuma delas jamais dispara no nível 1, mesmo quando o livro imprime
 // um rótulo de escolha ali. As duas células em que isso acontece são
 // legítimas: a escolha correspondente é feita na CRIAÇÃO do personagem,
@@ -1648,7 +1657,7 @@ export const MANOBRAS_POR_NIVEL = { 3: 3, 7: 2, 10: 2, 15: 2 };
 //     tabela "Características de Ladino"): CLASSES_ESCOLHAS.Ladino.especialista
 //     (site/js/creator/comum.js:354-360, `nivelMinimo: 1, maxEscolhas: 2`),
 //     mesma renderização de passo-classe.js, consolidada em
-//     `personagem.pericias_expertise` por site/js/creator/wizard.js:466-473.
+//     `personagem.pericias_expertise` por site/js/creator/wizard.js:461-468.
 //
 // Este conjunto é EXATO, não uma amostra: o teste correspondente falha
 // se aparecer um rótulo de nível 1 fora dele -- para que uma classe

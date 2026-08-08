@@ -321,6 +321,24 @@ function salvarStateDoDOM(ctx, state, step) {
       if (selDe) state.manobraTrocarDe = selDe;
       break;
     }
+    case 'revisao_confirmacao': {
+      // Troca de Estilo de Luta do Guerreiro e Especialização do Ladino
+      // nível 6 (site/js/levelup-cards.js:renderCardTrocasOpcionais) vivem
+      // dentro deste step, não em 'escolhas_classe' -- ver o comentário de
+      // renderCardTrocasOpcionais para o porquê. Sem este case, os dois
+      // <select>/checkboxes eram lidos do DOM errado (ou nunca lidos) e a
+      // escolha do jogador se perdia em silêncio ao confirmar -- achado da
+      // revisão final, corrigido aqui.
+      state.estiloLutaTrocarDe = document.getElementById('lvlup-estilo-luta-trocar-de')?.value || '';
+      state.estiloLutaTrocarPara = state.estiloLutaTrocarDe
+        ? (document.getElementById('lvlup-estilo-luta-trocar-para')?.value || '')
+        : '';
+      const checkboxesLadino = document.querySelectorAll('[data-ladino-expertise]');
+      if (checkboxesLadino.length > 0) {
+        state.ladinoExpertise = [...checkboxesLadino].filter(el => el.checked).map(el => el.dataset.ladinoExpertise);
+      }
+      break;
+    }
   }
 }
 
@@ -336,6 +354,7 @@ function bindEventosStep(ctx, state, step, caches) {
     case 'escolhas_classe': bindEventosEscolhasClasse(ctx, state); break;
     case 'selecao_magias': bindEventosMagias(ctx, state); break;
     case 'manobras_guerreiro': bindEventosManobrasGuerreiro(ctx, state); break;
+    case 'revisao_confirmacao': bindEventosTrocasOpcionais(ctx, state); break;
   }
 }
 
@@ -884,24 +903,50 @@ export function bindEscolhasTalento(nome, talentoData, ctx, state = {}) {
   }
 }
 
+// Limita um grupo de checkboxes a `max` marcados, atualizando o contador na
+// tela -- compartilhado por bindEventosEscolhasClasse (Bardo/Guardião/
+// Explorador Hábil/Acadêmico) e bindEventosTrocasOpcionais (Ladino nível 6),
+// que vivem em steps diferentes do assistente de subida de nível.
+function limitarCheckboxes(seletor, max, contadorId) {
+  document.querySelectorAll(seletor).forEach(cb => {
+    cb.addEventListener('change', () => {
+      const selecionados = document.querySelectorAll(seletor + ':checked');
+      if (selecionados.length > max) { cb.checked = false; return; }
+      const cnt = document.getElementById(contadorId);
+      if (cnt) cnt.textContent = selecionados.length;
+    });
+  });
+}
+
 // --- Escolhas de Classe ---
 function bindEventosEscolhasClasse(ctx, state) {
-  // Limitar checkboxes de expertise a 2
-  function limitarCheckboxes(seletor, max, contadorId) {
-    document.querySelectorAll(seletor).forEach(cb => {
-      cb.addEventListener('change', () => {
-        const selecionados = document.querySelectorAll(seletor + ':checked');
-        if (selecionados.length > max) { cb.checked = false; return; }
-        const cnt = document.getElementById(contadorId);
-        if (cnt) cnt.textContent = selecionados.length;
-      });
-    });
-  }
-
   limitarCheckboxes('[data-bardo-expertise]', 2, 'levelup-bardo-expertise-count');
   limitarCheckboxes('[data-guardiao-expertise]', 2, 'levelup-guardiao-expertise-count');
   limitarCheckboxes('[data-explorador-idioma]', 2, 'levelup-explorador-idiomas-count');
   limitarCheckboxes('[data-academico-expertise]', 1, 'levelup-academico-count');
+}
+
+// --- Trocas opcionais (Estilo de Luta do Guerreiro / Especialização do
+// Ladino nível 6) -- vivem no step 'revisao_confirmacao'
+// (levelup-cards.js:renderCardTrocasOpcionais), não em 'escolhas_classe'.
+// Achado da revisão final: os dois cards renderizavam, mas nenhum evento
+// os ligava nesse step (bindEventosStep não tinha case 'revisao_confirmacao'
+// nenhum), então o select "para" nascia desabilitado para sempre e os
+// checkboxes do Ladino nunca contavam nem limitavam -- a escolha do
+// jogador nunca chegava a virar opcoes.* no confirmar.
+function bindEventosTrocasOpcionais(ctx, state) {
+  limitarCheckboxes('[data-ladino-expertise]', 2, 'levelup-ladino-expertise-count');
+
+  // Troca de Estilo de Luta do Guerreiro: o select "para" só habilita
+  // depois que o jogador escolhe "de" (mesma UX do "Não trocar" das
+  // trocas de magia/manobra).
+  document.getElementById('lvlup-estilo-luta-trocar-de')?.addEventListener('change', (e) => {
+    const paraSelect = document.getElementById('lvlup-estilo-luta-trocar-para');
+    if (paraSelect) {
+      paraSelect.disabled = !e.target.value;
+      if (!e.target.value) paraSelect.value = '';
+    }
+  });
 }
 
 // --- Magias ---
@@ -1411,7 +1456,9 @@ function montarResumoFinal(resultado, char, truquesAdicionados, magiasAdicionada
   if ((resultado.magias_sempre_adicionadas || []).length > 0) itens.push(`Magias sempre preparadas: ${resultado.magias_sempre_adicionadas.map(m => m.nome).join(', ')}`);
   if ((resultado.expertise_bardo_aplicada || []).length > 0) itens.push(`Especialização Bardo: ${resultado.expertise_bardo_aplicada.join(', ')}`);
   if ((resultado.expertise_guardiao_aplicada || []).length > 0) itens.push(`Especialista Guardião: ${resultado.expertise_guardiao_aplicada.join(', ')}`);
+  if ((resultado.expertise_ladino_aplicada || []).length > 0) itens.push(`Especialização Ladino: ${resultado.expertise_ladino_aplicada.join(', ')}`);
   if (resultado.estilo_luta_aplicado) itens.push(`Estilo de Luta: ${resultado.estilo_luta_aplicado}`);
+  if (resultado.estilo_luta_troca_aplicada) itens.push(`Troca de Estilo de Luta: ${resultado.estilo_luta_troca_aplicada.de} ${iconArrow} ${resultado.estilo_luta_troca_aplicada.para}`);
   if (resultado.explorador_habil_aplicado?.expertise) itens.push(`Explorador Hábil: ${resultado.explorador_habil_aplicado.expertise}`);
   if ((resultado.explorador_habil_aplicado?.idiomas || []).length > 0) itens.push(`Idiomas: ${resultado.explorador_habil_aplicado.idiomas.join(', ')}`);
   if ((resultado.academico_aplicado || []).length > 0) itens.push(`Acadêmico: ${resultado.academico_aplicado.join(', ')}`);

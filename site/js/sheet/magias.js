@@ -6,7 +6,7 @@
 // ============================================================
 import { ATRIBUTO_NOME_PARA_KEY, CLASSES_INFO } from '../dados-classes.js';
 import { getMagiasClasse, getMagiasPorCirculo } from '../db.js';
-import { abrirModal, bonusProficiencia, calcMod, escHtml, getMagiaPreparadas, getTruquesConhecidos, mdParaHtml, semAcento, toast } from '../utils.js';
+import { abrirModal, bonusProficiencia, calcMod, escHtml, getBonusTruquesOrdem, getMagiaPreparadas, getTruquesConhecidos, mdParaHtml, semAcento, toast } from '../utils.js';
 import { getEstadoFuria } from './classes/barbaro.js';
 import { renderSecaoPactoBruxo } from './classes/bruxo.js';
 import { gastarPontosFeiticaria, getEstadoRecursosFeiticeiro } from './classes/feiticeiro.js';
@@ -407,6 +407,10 @@ export function renderSecaoMagias() {
   }
   // Truques extras de Combatente Druídico / Abençoado
   maxTruques += getTruquesExtraEstiloLuta();
+  // Truques extras do Clérigo Taumaturgo / Druida Xamã (utils.js, mesma
+  // função que o criador usa -- antes só o criador somava esse bônus, e a
+  // ficha calculava o limite sem ele)
+  maxTruques += getBonusTruquesOrdem(char);
 
   // Contar magias preparadas excluindo as especiais (não contam no limite)
   const preparadasNormais = preparadas.filter(m => magiaContaNoLimite(m));
