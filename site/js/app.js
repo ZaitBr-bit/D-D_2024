@@ -28,6 +28,10 @@ window.navegar = navegar;
 // no span oculto #build-numero, só para diagnóstico.
 const APP_VERSION = VERSAO_ATUAL ? 'v' + VERSAO_ATUAL : '';
 
+// Chave onde fica a última versão que este navegador já viu, para abrir as
+// notas de versão automaticamente uma única vez a cada atualização.
+const VERSAO_VISTA_KEY = 'dnd_versao_vista';
+
 /** Define o texto do header preservando o selo de versao ao lado. */
 export function definirTituloHeader(texto) {
   const el = document.getElementById('header-titulo');
@@ -199,6 +203,20 @@ function recarregarQuandoSeguro() {
   }, 500);
 }
 
+/**
+ * Abre as notas de versão sozinho, uma única vez, quando o site atualiza
+ * para uma versão diferente da última que este navegador viu. Na primeira
+ * visita (nada salvo ainda) não é uma atualização -- só grava a versão
+ * atual em silêncio, sem abrir o modal.
+ */
+function abrirNotasVersaoSeAtualizou() {
+  if (!VERSAO_ATUAL) return;
+  const vista = localStorage.getItem(VERSAO_VISTA_KEY);
+  if (vista === VERSAO_ATUAL) return;
+  if (vista) abrirNotasVersao();
+  localStorage.setItem(VERSAO_VISTA_KEY, VERSAO_ATUAL);
+}
+
 // --- Inicialização ---
 function init() {
   // Carregar taxas de conversao de moeda customizadas (se houver), antes de qualquer ficha renderizar
@@ -281,6 +299,10 @@ function init() {
 
   // Rota inicial
   processarRota();
+
+  // Notas de versão automáticas: depois da rota inicial, pra não competir
+  // com o primeiro render.
+  abrirNotasVersaoSeAtualizou();
 }
 
 document.addEventListener('DOMContentLoaded', init);
