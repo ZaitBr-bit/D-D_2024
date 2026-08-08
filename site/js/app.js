@@ -7,6 +7,8 @@ import { renderSheet } from './pages/sheet.js';
 import { inicializarSync } from './sync.js';
 import { carregarTaxasMoeda } from './store.js';
 import { toast, abrirModal } from './utils.js';
+import { VERSAO_ATUAL } from './versao.js';
+import { abrirNotasVersao } from './notas-versao.js';
 
 // --- Router baseado em hash ---
 const routes = {
@@ -21,9 +23,10 @@ export function navegar(rota) {
 }
 window.navegar = navegar;
 
-// Versao do app (injetada no deploy no span #header-versao do index.html).
-// Capturada uma vez porque o texto do header e reescrito a cada navegacao.
-const APP_VERSION = document.getElementById('header-versao')?.textContent?.trim() || '';
+// Versão exibida no header. Vem de js/versao.js (controle manual), NÃO
+// mais do número de build injetado no deploy -- esse continua existindo
+// no span oculto #build-numero, só para diagnóstico.
+const APP_VERSION = VERSAO_ATUAL ? 'v' + VERSAO_ATUAL : '';
 
 /** Define o texto do header preservando o selo de versao ao lado. */
 export function definirTituloHeader(texto) {
@@ -38,6 +41,28 @@ export function definirTituloHeader(texto) {
   }
 }
 window.definirTituloHeader = definirTituloHeader;
+
+/**
+ * Atualiza o selo de versão (`.header-versao`, dentro do `<h1>`) pra
+ * refletir se ele deve se comportar como clicável: só na home. O selo é
+ * recriado a cada navegação por `definirTituloHeader`, então essa função
+ * roda depois dela, em `processarRota`, e não mexe na assinatura nem no
+ * propósito de `definirTituloHeader` (que só define o texto do header).
+ * Fora da home o selo fica só texto: sem classe de estilo (sem cursor de
+ * mão) e sem `title` de ação -- o clique é ignorado pelo handler de
+ * delegação registrado em `init()`.
+ */
+function atualizarSeloVersaoClicavel(pagina) {
+  const selo = document.querySelector('.header-versao');
+  if (!selo) return;
+  const clicavel = pagina === 'home';
+  selo.classList.toggle('header-versao--clicavel', clicavel);
+  if (clicavel) {
+    selo.title = 'Ver notas de versão';
+  } else {
+    selo.removeAttribute('title');
+  }
+}
 
 /** Processa a rota atual do hash */
 function processarRota() {
@@ -54,6 +79,25 @@ function processarRota() {
   // Limpar estado anterior
   acoes.innerHTML = '';
   btnVoltar.style.display = pagina === 'home' ? 'none' : 'block';
+
+  // Botão de notas de versão: só na tela inicial. #header-acoes é
+  // limpo acima a cada navegação, então não é preciso removê-lo ao sair
+  // da home -- ele simplesmente não é recriado.
+  // Ícone + rótulo em texto (📋 Notas de versão) em spans separados: o
+  // rótulo some no mobile via CSS (.header-rotulo), mas o aria-label do
+  // próprio botão preserva o nome acessível mesmo com o texto escondido.
+  if (pagina === 'home') {
+    const btnNotas = document.createElement('button');
+    btnNotas.id = 'btn-notas-versao';
+    btnNotas.className = 'header-btn-rotulado no-print';
+    btnNotas.title = 'Notas de versão';
+    btnNotas.setAttribute('aria-label', 'Notas de versão');
+    btnNotas.innerHTML =
+      '<span class="header-icone" aria-hidden="true">📋</span>' +
+      '<span class="header-rotulo">Notas de versão</span>';
+    btnNotas.addEventListener('click', abrirNotasVersao);
+    acoes.appendChild(btnNotas);
+  }
 
   // Na ficha: botao voltar vira casinha para home; nas demais: seta para history.back()
   const iconeVoltar = document.getElementById('icone-voltar');
@@ -72,6 +116,7 @@ function processarRota() {
     'ficha': 'Ficha'
   };
   definirTituloHeader(titulos[pagina] || 'D&D 5.5 Ficha');
+  atualizarSeloVersaoClicavel(pagina);
 
   if (render) {
     render(content, param);
@@ -213,6 +258,22 @@ function init() {
       `,
       '<button class="btn btn-secondary" onclick="fecharModal()">Fechar</button>'
     );
+  });
+
+  // Selo de versão clicável (delegação): o span `.header-versao` é
+  // recriado a cada navegação por `definirTituloHeader`, então um listener
+  // preso nele morreria na troca de rota seguinte. Um único listener aqui,
+  // no ancestral estável `#header-titulo`, sobrevive à recriação --
+  // registrado uma vez só, nunca dentro de `processarRota` (senão
+  // acumularia um listener por navegação). A checagem de rota acontece no
+  // clique, não no cadastro, pra sempre valer a rota atual.
+  document.getElementById('header-titulo')?.addEventListener('click', (e) => {
+    const selo = e.target.closest('.header-versao');
+    if (!selo) return;
+    const hash = window.location.hash.slice(1) || 'home';
+    const pagina = hash.split('/')[0];
+    if (pagina !== 'home') return;
+    abrirNotasVersao();
   });
 
   // Listener de rota

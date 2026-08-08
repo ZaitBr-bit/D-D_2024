@@ -704,15 +704,30 @@ export async function abrirFichaSemeada(lados, campos, id = 'teste-fixo-1') {
  */
 export async function instantaneoFicha(page) {
   return page.evaluate(() => {
+    // O selo de versao aparece em DUAS formas diferentes no snapshot, e cada
+    // uma precisa da sua propria regra de normalizacao:
+    //  - no header-titulo ele entra como TEXTO PURO (textContent), porque o
+    //    span da versao e filho do proprio titulo e o textContent achata tudo;
+    //  - em qualquer outro lugar que apareca o innerHTML do span (classe
+    //    "header-versao"), ele entra como HTML, com a tag </span> logo apos
+    //    o numero.
+    // Se a normalizacao textual fosse aplicada ao snapshot inteiro (header +
+    // corpo da ficha), um "v" seguido de digitos dentro de conteudo legitimo
+    // da ficha tambem seria apagado, cegando a suite para divergencias reais.
+    // Por isso ela e aplicada SO na string do header, ancorada no fim (o selo
+    // e sempre o ultimo texto do titulo), antes de juntar com o innerHTML do
+    // conteudo -- que continua normalizado pela regra de HTML existente.
+    const headerTexto = (document.getElementById('header-titulo')?.textContent || '')
+      .replace(/\sv[\d.]+$/, ' v<VER>');
     const partes = [
-      document.getElementById('header-titulo')?.textContent || '',
+      headerTexto,
       document.getElementById('app-content')?.innerHTML || '',
     ];
     return partes.join('\n---\n')
       .replace(/\b[0-9a-f]{8,}\b/gi, '<ID>')
       .replace(/\d{4}-\d{2}-\d{2}T[\d:.]+Z?/g, '<DATA>')
       .replace(/\d{2}\/\d{2}\/\d{4}/g, '<DATA>')
-      .replace(/v\d+<\/span>/g, 'v<VER></span>')
+      .replace(/v[\d.]+<\/span>/g, 'v<VER></span>')
       .replace(/\s+/g, ' ')
       .trim();
   });
