@@ -5,9 +5,9 @@
 // equipamento e o render das escolhas de talento.
 // Extraido de site/js/pages/creator.js sem alteracao de comportamento.
 // ============================================================
-import { PERICIAS } from '../dados-classes.js';
+import { CLASSES_INFO, PERICIAS } from '../dados-classes.js';
 import { mdParaHtml } from '../utils.js';
-import { personagem } from './wizard.js';
+import { dadosCache, personagem } from './wizard.js';
 
 // Espécies que exigem seleção entre traços/linhagens
 // - tracos: nomes de traços que existem no JSON da espécie
@@ -140,11 +140,26 @@ export function renderDescricaoTalento(td) {
 // no primeiro enquanto o assistente ainda esta em andamento. O contexto
 // atual e excluido para nao esconder do proprio select o valor ja marcado
 // nele (reabrir o popup para editar precisa continuar mostrando a escolha).
-function _proficienciasJaAdquiridas(contextoAtual) {
+//
+// `extras` recebe as proficiencias concedidas pela PROPRIA selecao que abriu
+// o popup e que ainda nao foram gravadas em lugar nenhum -- as duas pericias
+// do antecedente em analise, por exemplo, que so entram em dadosCache quando
+// o botao "Selecionar <antecedente>" e clicado. Sem isso o Habilidoso do
+// Nobre oferecia Historia e Persuasao, que o proprio Nobre ja concede: uma
+// escolha morta (gastar uma das 3 sem ganhar nada).
+function _proficienciasJaAdquiridas(contextoAtual, extras = []) {
   const jaTem = new Set([
     ...(personagem.pericias_proficientes || []),
     ...(personagem.proficiencias_ferramentas || []),
-    ...(personagem.proficiencias_instrumentos || [])
+    ...(personagem.proficiencias_instrumentos || []),
+    // Pericias da classe: escolhidas no passo 4, mas lidas de dadosCache
+    // direto porque pericias_proficientes e zerada ao voltar um passo.
+    ...(dadosCache.pericias_classe_sel || []),
+    // Pericias da especie (Habil do Humano, Sentidos Agucados do Elfo,
+    // Memoria Kenku), gravadas direto em personagem ao escolher.
+    ...(personagem.pericia_especie ? [personagem.pericia_especie] : []),
+    ...(personagem.pericias_especie || []),
+    ...extras
   ]);
   const escolhas = personagem.escolhas_talento || {};
   for (const contexto of Object.keys(escolhas)) {
@@ -152,6 +167,59 @@ function _proficienciasJaAdquiridas(contextoAtual) {
     (escolhas[contexto] || []).forEach(item => jaTem.add(item));
   }
   return jaTem;
+}
+
+/**
+ * Perícias da lista da classe que NÃO podem ser oferecidas às escolhas livres
+ * (Habilidoso, Hábil do Humano, Memória Kenku) porque a classe ainda vai
+ * precisar delas.
+ *
+ * O porquê é aritmética, não preferência de regra. Clérigo tem 5 perícias na
+ * lista e escolhe 2. O Nobre concede 2 dessas 5 -- e não é escolha, é fixo --
+ * deixando 3. O Habilidoso escolhe 3. Três escolhas livres disputando as três
+ * opções de que a classe ainda precisa de duas: não cabe. Sem esta reserva o
+ * personagem fica impossível de concluir (a lista da classe esvazia abaixo do
+ * exigido) ou duplica proficiência sem ganhar nada. Isso atinge 6 das 12
+ * classes -- as de lista curta.
+ *
+ * A reserva só morde na fronteira: enquanto sobrar folga, as escolhas livres
+ * continuam irrestritas, como manda o texto do Habilidoso ("qualquer
+ * combinação de três perícias ou ferramentas à sua escolha"). O que ela
+ * remove é apenas o que tornaria o personagem inviável.
+ *
+ * A margem de +2 quando o antecedente ainda não foi escolhido cobre as duas
+ * perícias FIXAS que ele vai conceder: em 63% das combinações classe x
+ * antecedente elas caem dentro da lista da classe, e como não são escolha,
+ * não há nada que o app possa bloquear depois. Sem a margem, uma escolha
+ * livre feita no passo da espécie inviabiliza a classe lá no passo 4.
+ *
+ * @param {string[]} escolhasLivres escolhas já feitas no controle que está sendo montado
+ * @param {string[]} extras perícias concedidas pela seleção em análise e ainda não confirmada
+ * @returns {Set<string>} perícias a omitir das opções
+ */
+export function periciasReservadasParaClasse(escolhasLivres = [], extras = []) {
+  const info = CLASSES_INFO[personagem.classe];
+  if (!info) return new Set();
+
+  // pericias_opcoes null = qualquer perícia (Bardo): lista longa, nunca aperta
+  const listaClasse = info.pericias_opcoes || PERICIAS.map(p => p.nome);
+  const jaTem = new Set([
+    ...periciasDeOutrasFontes(),
+    ...(dadosCache.pericias_classe_sel || []),
+    ...extras,
+    ...escolhasLivres
+  ]);
+  const disponiveis = listaClasse.filter(p => !jaTem.has(p));
+
+  // extras.length > 0 significa que o antecedente em análise já é conhecido
+  // (o popup do antecedente sempre passa as duas perícias dele), então a
+  // margem preventiva não é mais necessária.
+  const antecedenteConhecido = Boolean(personagem.antecedente) || extras.length > 0;
+  const reserva = info.num_pericias + (antecedenteConhecido ? 0 : 2);
+
+  // Se tomar mais uma derrubaria o disponível abaixo da reserva, tranca o que
+  // resta. Enquanto houver folga, não reserva nada.
+  return disponiveis.length <= reserva ? new Set(disponiveis) : new Set();
 }
 
 // Aviso quando a filtragem de "ja possui" deixa menos opcoes elegiveis do
@@ -162,17 +230,26 @@ function _avisoOpcoesInsuficientes(disponiveis, exigidas) {
   return `<div class="info-box warning" style="font-size:0.8rem;margin-top:4px">Restam apenas ${disponiveis} opcao(oes) elegivel(is) -- o personagem ja e proficiente em todo o resto. Nao e possivel completar as ${exigidas} escolhas exigidas.</div>`;
 }
 
-/** Gera HTML de selecao de escolhas para talentos que exigem (Habilidoso, Artifista, Musico) */
-export function renderEscolhasTalentoHtml(talentoNome, contexto) {
+/**
+ * Gera HTML de selecao de escolhas para talentos que exigem (Habilidoso,
+ * Artifista, Musico). `extrasJaTem` sao proficiencias concedidas pela mesma
+ * selecao que abriu o popup e que ainda nao foram confirmadas -- ver
+ * _proficienciasJaAdquiridas().
+ */
+export function renderEscolhasTalentoHtml(talentoNome, contexto, extrasJaTem = []) {
   // contexto: 'versatil' ou 'antecedente'
   const prefix = `escolha-talento-${contexto}`;
   const escolhasAtuais = personagem.escolhas_talento?.[contexto] || [];
-  const jaTem = _proficienciasJaAdquiridas(contexto);
+  const jaTem = _proficienciasJaAdquiridas(contexto, extrasJaTem);
 
   if (talentoNome === 'Habilidoso') {
     // 3 pericias ou ferramentas a escolha, exceto as que o personagem ja tem
-    // (proficiencia repetida nao concede nada nesta edicao)
-    const periciasList = PERICIAS.map(p => p.nome).filter(p => !jaTem.has(p));
+    // (proficiencia repetida nao concede nada nesta edicao) e as reservadas
+    // para a classe (ver periciasReservadasParaClasse). A reserva e reavaliada
+    // a cada escolha em configurarSelectsExclusivos -- esta e so a inicial.
+    const reservadas = periciasReservadasParaClasse(escolhasAtuais, extrasJaTem);
+    const periciasList = PERICIAS.map(p => p.nome)
+      .filter(p => !jaTem.has(p) && !reservadas.has(p));
     const ferramentasList = FERRAMENTAS_TODAS.filter(f => !jaTem.has(f));
     let html = `<div class="section-divider" style="margin-top:8px"><span>Escolhas — Habilidoso</span></div>`;
     html += `<div class="info-box info" style="font-size:0.8rem">Escolha 3 pericias ou ferramentas para adquirir proficiencia.</div>`;
@@ -231,6 +308,55 @@ export function renderEscolhasTalentoHtml(talentoNome, contexto) {
   return '';
 }
 
+/**
+ * Perícias que o personagem ganha de tudo que NÃO é a escolha da classe:
+ * as duas do antecedente, as da espécie (Hábil, Sentidos Aguçados, Memória
+ * Kenku) e as concedidas por talentos com escolha (Habilidoso, nos contextos
+ * antecedente e versátil).
+ *
+ * É a base de duas coisas: do filtro "já possui" do seletor de perícias da
+ * classe (passo 4) e do cálculo de reserva em periciasReservadasParaClasse().
+ */
+export function periciasDeOutrasFontes() {
+  const pericias = [];
+  const adicionar = (p) => { if (p && !pericias.includes(p)) pericias.push(p); };
+
+  (dadosCache.pericias_antecedente || []).forEach(adicionar);
+  adicionar(personagem.pericia_especie);
+  (personagem.pericias_especie || []).forEach(adicionar);
+  for (const contexto of Object.keys(personagem.escolhas_talento || {})) {
+    (personagem.escolhas_talento[contexto] || []).forEach(escolha => {
+      // As escolhas de Habilidoso misturam perícias e ferramentas; só as
+      // perícias entram aqui (as ferramentas vão para proficiencias_ferramentas
+      // /proficiencias_instrumentos, em wizard.js:finalizar).
+      if (PERICIAS.some(p => p.nome === escolha)) adicionar(escolha);
+    });
+  }
+  return pericias;
+}
+
+/**
+ * Recalcula personagem.pericias_proficientes a partir de TODAS as fontes do
+ * assistente: as de outras fontes (acima) mais as escolhidas da lista da
+ * classe.
+ *
+ * É determinística -- reescreve a lista inteira a cada chamada, no mesmo
+ * espírito de _reconstruirTalentosBase() em passo-antecedente.js. Por isso
+ * pode ser chamada de novo a cada mudança sem duplicar nada nem deixar uma
+ * perícia órfã de uma escolha trocada.
+ *
+ * Antes essa montagem vivia dentro do seletor de perícias do passo 4, o que
+ * amarrava a lista definitiva a uma interação do jogador: as perícias do
+ * antecedente só entravam quando ele marcava uma perícia de classe.
+ */
+export function consolidarPericiasProficientes() {
+  const pericias = periciasDeOutrasFontes();
+  (dadosCache.pericias_classe_sel || []).forEach(p => {
+    if (p && !pericias.includes(p)) pericias.push(p);
+  });
+  personagem.pericias_proficientes = pericias;
+}
+
 /** Verifica se um talento exige escolhas adicionais */
 export function talentoExigeEscolhas(nome) {
   return ['Habilidoso', 'Artifista', 'Músico'].includes(nome);
@@ -242,7 +368,17 @@ export function talentoNumEscolhas(nome) {
   return 0;
 }
 
-export function configurarSelectsExclusivos(seletor) {
+/**
+ * Mantem os selects de escolha de talento mutuamente exclusivos.
+ *
+ * `opcoes.reservarClasse` liga a reserva das pericias da classe: a cada
+ * escolha, o conjunto reservado e recalculado e as opcoes que a classe ainda
+ * vai precisar somem das outras caixas. Precisa ser recalculado aqui, e nao
+ * so na montagem do HTML, porque a reserva depende de QUANTAS escolhas ja
+ * foram feitas -- escolher a primeira pericia da lista da classe e o que
+ * tranca as demais. Sem aviso na tela: a opcao simplesmente nao aparece.
+ */
+export function configurarSelectsExclusivos(seletor, opcoes = {}) {
   const selects = [...document.querySelectorAll(seletor)];
   if (selects.length < 2) return;
   const opcoesOriginais = new Map(selects.map(select => [select, select.innerHTML]));
@@ -253,12 +389,16 @@ export function configurarSelectsExclusivos(seletor) {
   });
   const atualizar = () => {
     const escolhidas = selects.map(select => select.value).filter(Boolean);
+    const reservadas = opcoes.reservarClasse
+      ? periciasReservadasParaClasse(escolhidas, opcoes.extras || [])
+      : new Set();
     selects.forEach(select => {
       const propria = select.value;
       const temporario = document.createElement('select');
       temporario.innerHTML = opcoesOriginais.get(select);
       temporario.querySelectorAll('option').forEach(opcao => {
-        if (opcao.value && opcao.value !== propria && escolhidas.includes(opcao.value)) opcao.remove();
+        if (!opcao.value || opcao.value === propria) return;
+        if (escolhidas.includes(opcao.value) || reservadas.has(opcao.value)) opcao.remove();
       });
       temporario.querySelectorAll('optgroup').forEach(grupo => {
         if (!grupo.querySelector('option')) grupo.remove();

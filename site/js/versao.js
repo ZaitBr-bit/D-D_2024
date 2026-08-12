@@ -13,13 +13,46 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.0.0';
+export const VERSAO_ATUAL = '2.0.1';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.0.1',
+    data: '2026-08-12',
+    resumo: 'Corrige a criação de personagem quando a classe e o antecedente '
+      + 'disputam as mesmas perícias.',
+    melhorias: [],
+    correcoes: [
+      {
+        grupo: '🐛 Criação de personagem',
+        itens: [
+          'A criação podia travar de vez na etapa de atributos: quando as '
+            + 'escolhas do antecedente tomavam as perícias de que a classe '
+            + 'ainda precisava, sobravam menos opções do que o exigido e o '
+            + 'botão de avançar nunca aceitava. Acontecia, por exemplo, com '
+            + 'Clérigo e o antecedente Nobre, e não havia nada na tela '
+            + 'explicando o motivo — só trocar de antecedente resolvia.',
+          'A mesma perícia podia entrar duas vezes na ficha, uma pela classe e '
+            + 'outra pelo antecedente, desperdiçando uma das escolhas da '
+            + 'classe. A lista de perícias da classe agora só oferece o que '
+            + 'você ainda não tem.',
+          'As escolhas livres (talento Habilidoso, Hábil do Humano e Memória '
+            + 'Kenku) deixaram de oferecer a última perícia de que a lista da '
+            + 'classe ainda precisa, para que a classe nunca fique sem opções.',
+          'O talento Habilidoso concedido por um antecedente oferecia as '
+            + 'próprias perícias daquele antecedente (História e Persuasão, no '
+            + 'Nobre), deixando gastar uma das três escolhas sem ganhar nada.',
+          'As perícias do antecedente passaram a entrar na ficha assim que o '
+            + 'antecedente é confirmado; antes só entravam depois que o '
+            + 'jogador marcasse alguma perícia da classe.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.0.0',
     data: '2026-08-08',

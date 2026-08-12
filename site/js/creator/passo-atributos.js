@@ -2,11 +2,14 @@
 // Passo 4: atributos e pericias
 //
 // Os quatro metodos de distribuicao: rolagem 4d6, array padrao,
-// compra por pontos e manual.
+// compra por pontos e manual, mais a escolha das pericias da classe (ver
+// renderPericiasSeletor, no fim do arquivo, para o porque de ela ficar aqui
+// e nao antes do antecedente).
 // Extraido de site/js/pages/creator.js sem alteracao de comportamento.
 // ============================================================
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ATRIBUTO_NOME_PARA_KEY, CLASSES_INFO, PERICIAS, POINT_BUY_CUSTOS, POINT_BUY_TOTAL, STANDARD_ARRAY } from '../dados-classes.js';
 import { bonusProficiencia, calcMod, fmtMod } from '../utils.js';
+import { consolidarPericiasProficientes, periciasDeOutrasFontes } from './comum.js';
 import { dadosCache, personagem } from './wizard.js';
 
 // Renderiza a distribuicao de atributos inline (abaixo do grid de antecedentes)
@@ -239,6 +242,78 @@ export function renderStepAtributos(el) {
   el.querySelectorAll('[name="attr-mode"]').forEach(r => r.addEventListener('change', renderAttr));
   renderAttr();
   renderPericiasSeletor();
+}
+
+// Seletor das perícias da classe.
+//
+// Fica DEPOIS do antecedente e da espécie de propósito: as duas perícias do
+// antecedente são fixas (não são escolha) e em 63% das combinações classe x
+// antecedente caem dentro da lista da classe. Escolher antes de conhecê-las
+// produzia proficiência duplicada -- História vinda da classe e do Nobre ao
+// mesmo tempo, com uma das duas escolhas da classe virando desperdício.
+// Escolhendo aqui, com tudo já sabido, a lista só oferece o que ainda vale
+// alguma coisa.
+//
+// O que garante que ainda sobram opções suficientes é a reserva feita nas
+// escolhas livres (Habilidoso, Hábil, Memória Kenku) -- ver
+// periciasReservadasParaClasse em comum.js. Sem ela esta lista podia esvaziar
+// abaixo do exigido e o passo nunca validava: o beco sem saída que originou
+// esta correção (Clérigo + Nobre + Habilidoso em Intuição e Religião deixava
+// só Medicina para 2 escolhas).
+function renderPericiasSeletor() {
+  const info = CLASSES_INFO[personagem.classe];
+  const el = document.getElementById('pericias-content');
+  if (!el || !info) return;
+
+  const jaTem = periciasDeOutrasFontes();
+  const opcoesClasse = info.pericias_opcoes || PERICIAS.map(p => p.nome);
+  const disponiveis = opcoesClasse.filter(p => !jaTem.includes(p));
+
+  // Inicializar seleção se não tiver
+  if (!dadosCache.pericias_classe_sel) {
+    dadosCache.pericias_classe_sel = [];
+  }
+  const maxSel = info.num_pericias;
+  dadosCache.pericias_classe_sel = [...new Set(dadosCache.pericias_classe_sel)]
+    .filter(pericia => disponiveis.includes(pericia))
+    .slice(0, maxSel);
+
+  el.innerHTML = `
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      ${disponiveis.map(p => {
+        const sel = dadosCache.pericias_classe_sel.includes(p);
+        const desabilitada = !sel && dadosCache.pericias_classe_sel.length >= maxSel;
+        return `<label class="chip ${sel ? 'selected' : ''}" data-pericia="${p}">
+          <input type="checkbox" style="display:none" value="${p}" ${sel ? 'checked' : ''} ${desabilitada ? 'disabled' : ''}>
+          ${p}
+        </label>`;
+      }).join('')}
+    </div>
+    <div style="font-size:0.8rem;color:var(--text-muted);margin-top:6px">
+      Selecionadas: ${dadosCache.pericias_classe_sel.length}/${maxSel}
+    </div>
+  `;
+
+  const atualizarEstado = () => {
+    const selecionadas = [...el.querySelectorAll('input:checked')].map(input => input.value);
+    dadosCache.pericias_classe_sel = selecionadas;
+    consolidarPericiasProficientes();
+    const limiteAtingido = selecionadas.length >= maxSel;
+    el.querySelectorAll('.chip').forEach(chip => {
+      const cb = chip.querySelector('input');
+      const desabilitada = limiteAtingido && !cb.checked;
+      cb.disabled = desabilitada;
+      chip.classList.toggle('selected', cb.checked);
+      chip.classList.toggle('disabled', desabilitada);
+      chip.style.opacity = desabilitada ? '0.5' : '';
+      chip.style.cursor = desabilitada ? 'not-allowed' : '';
+    });
+    const contador = el.querySelector('div:last-child');
+    if (contador) contador.textContent = `Selecionadas: ${selecionadas.length}/${maxSel}`;
+  };
+
+  el.querySelectorAll('.chip input').forEach(cb => cb.addEventListener('change', atualizarEstado));
+  atualizarEstado();
 }
 
 // Rola 4d6 e descarta o menor dado
@@ -561,82 +636,3 @@ function renderManual(el) {
     });
   });
 }
-
-function renderPericiasSeletor() {
-  const info = CLASSES_INFO[personagem.classe];
-  const el = document.getElementById('pericias-content');
-  if (!el || !info) return;
-
-  const periciasBg = [...(dadosCache.pericias_antecedente || [])];
-  // Incluir pericia de especie (Habil / Sentidos Aguçados) se houver
-  if (personagem.pericia_especie && !periciasBg.includes(personagem.pericia_especie)) {
-    periciasBg.push(personagem.pericia_especie);
-  }
-  // Incluir pericias de especie (Kenku: Memória Kenku)
-  if (personagem.pericias_especie?.length) {
-    personagem.pericias_especie.forEach(p => {
-      if (p && !periciasBg.includes(p)) periciasBg.push(p);
-    });
-  }
-  // Incluir pericias dos talentos (Habilidoso concede pericias/ferramentas)
-  if (personagem.escolhas_talento) {
-    ['antecedente', 'versatil'].forEach(ctx => {
-      const escolhas = personagem.escolhas_talento[ctx] || [];
-      escolhas.forEach(e => {
-        // So incluir se for uma pericia (nao ferramenta)
-        if (PERICIAS.some(p => p.nome === e) && !periciasBg.includes(e)) {
-          periciasBg.push(e);
-        }
-      });
-    });
-  }
-  const opcoesClasse = info.pericias_opcoes || PERICIAS.map(p => p.nome);
-  // Filtrar as que já são do antecedente
-  const disponiveis = opcoesClasse.filter(p => !periciasBg.includes(p));
-
-  // Inicializar seleção se não tiver
-  if (!dadosCache.pericias_classe_sel) {
-    dadosCache.pericias_classe_sel = [];
-  }
-  const maxSel = info.num_pericias;
-  dadosCache.pericias_classe_sel = [...new Set(dadosCache.pericias_classe_sel)]
-    .filter(pericia => disponiveis.includes(pericia))
-    .slice(0, maxSel);
-
-  el.innerHTML = `
-    <div style="display:flex;flex-wrap:wrap;gap:6px">
-      ${disponiveis.map(p => {
-        const sel = dadosCache.pericias_classe_sel.includes(p);
-        const desabilitada = !sel && dadosCache.pericias_classe_sel.length >= maxSel;
-        return `<label class="chip ${sel ? 'selected' : ''}" data-pericia="${p}">
-          <input type="checkbox" style="display:none" value="${p}" ${sel ? 'checked' : ''} ${desabilitada ? 'disabled' : ''}>
-          ${p}
-        </label>`;
-      }).join('')}
-    </div>
-    <div style="font-size:0.8rem;color:var(--text-muted);margin-top:6px">
-      Selecionadas: ${dadosCache.pericias_classe_sel.length}/${maxSel}
-    </div>
-  `;
-
-  const atualizarEstado = () => {
-    const selecionadas = [...el.querySelectorAll('input:checked')].map(input => input.value);
-    dadosCache.pericias_classe_sel = selecionadas;
-    personagem.pericias_proficientes = [...periciasBg, ...selecionadas];
-    const limiteAtingido = selecionadas.length >= maxSel;
-    el.querySelectorAll('.chip').forEach(chip => {
-      const cb = chip.querySelector('input');
-      const desabilitada = limiteAtingido && !cb.checked;
-      cb.disabled = desabilitada;
-      chip.classList.toggle('selected', cb.checked);
-      chip.classList.toggle('disabled', desabilitada);
-      chip.style.opacity = desabilitada ? '0.5' : '';
-      chip.style.cursor = desabilitada ? 'not-allowed' : '';
-    });
-    const contador = el.querySelector('div:last-child');
-    if (contador) contador.textContent = `Selecionadas: ${selecionadas.length}/${maxSel}`;
-  };
-
-  el.querySelectorAll('.chip input').forEach(cb => cb.addEventListener('change', atualizarEstado));
-  atualizarEstado();
-}

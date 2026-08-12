@@ -5,7 +5,7 @@
 import { PERICIAS } from '../dados-classes.js';
 import { getEspecies, getTalentos } from '../db.js';
 import { abrirModal, getDeslocamento, mdParaHtml, toast } from '../utils.js';
-import { ESPECIES_TRACOS_ESCOLHA, configurarSelectsExclusivos, obterTruquesEspecie, renderDescricaoTalento, renderEscolhasTalentoHtml, talentoExigeEscolhas, talentoNumEscolhas } from './comum.js';
+import { ESPECIES_TRACOS_ESCOLHA, configurarSelectsExclusivos, obterTruquesEspecie, periciasReservadasParaClasse, renderDescricaoTalento, renderEscolhasTalentoHtml, talentoExigeEscolhas, talentoNumEscolhas } from './comum.js';
 import { _reconstruirTalentosBase } from './passo-antecedente.js';
 import { dadosCache, personagem } from './wizard.js';
 
@@ -139,10 +139,19 @@ function abrirPopupEspecie(nome) {
   }
 
   // HTML de selecao de pericia de especie (Habil / Sentidos Aguçados)
+  //
+  // Habil (Humano) e Memoria Kenku escolhem entre TODAS as pericias, entao
+  // tambem podem esvaziar a lista curta de uma classe -- um Kenku Clerigo com
+  // um antecedente que concede 2 das 5 pericias do Clerigo esgota a lista
+  // sozinho. Por isso as reservadas para a classe somem daqui tambem (ver
+  // periciasReservadasParaClasse). Sentidos Agucados do Elfo NAO entra: e uma
+  // lista fixa de 3 opcoes, curta demais para ceder, e a conta prova que 1
+  // escolha nunca inviabiliza classe nenhuma.
+  const reservadasEspecie = periciasReservadasParaClasse();
   let periciaEspecieHtml = '';
   if (nome === 'Humano') {
     // Habil: qualquer pericia
-    const opcsPericia = PERICIAS.map(p => {
+    const opcsPericia = PERICIAS.filter(p => !reservadasEspecie.has(p.nome)).map(p => {
       const sel = personagem.pericia_especie === p.nome ? 'selected' : '';
       return `<option value="${p.nome}" ${sel}>${p.nome} (${p.atributo})</option>`;
     }).join('');
@@ -171,13 +180,19 @@ function abrirPopupEspecie(nome) {
   } else if (nome === 'Kenku') {
     // Memória Kenku: 2 perícias quaisquer à escolha
     const periciasSel = personagem.pericias_especie || [];
+    // A reserva e recalculada por caixa considerando a escolha da outra: a
+    // primeira pericia da lista da classe pode ser tomada, a segunda ja nao.
+    const reservadasKenku1 = periciasReservadasParaClasse([periciasSel[1]].filter(Boolean));
+    const reservadasKenku2 = periciasReservadasParaClasse([periciasSel[0]].filter(Boolean));
     const opcsKenku1 = PERICIAS.map(p => {
       if (periciasSel[1] === p.nome) return '';
+      if (reservadasKenku1.has(p.nome) && periciasSel[0] !== p.nome) return '';
       const sel = periciasSel[0] === p.nome ? 'selected' : '';
       return `<option value="${p.nome}" ${sel}>${p.nome} (${p.atributo})</option>`;
     }).join('');
     const opcsKenku2 = PERICIAS.map(p => {
       if (periciasSel[0] === p.nome) return '';
+      if (reservadasKenku2.has(p.nome) && periciasSel[1] !== p.nome) return '';
       const sel = periciasSel[1] === p.nome ? 'selected' : '';
       return `<option value="${p.nome}" ${sel}>${p.nome} (${p.atributo})</option>`;
     }).join('');
@@ -326,7 +341,12 @@ function abrirPopupEspecie(nome) {
             let html = `<div class="info-box success" style="font-size:0.85rem">${renderDescricaoTalento(td)}</div>`;
             html += renderEscolhasTalentoHtml(nomeT, 'versatil');
             detalheEl.innerHTML = html;
-            if (talentoExigeEscolhas(nomeT)) configurarSelectsExclusivos('.escolha-talento-versatil');
+            // Mesma reserva do Habilidoso do antecedente: aqui sem `extras`,
+            // porque o antecedente ainda nao foi escolhido -- a reserva usa a
+            // margem preventiva das duas pericias fixas que ele vai conceder.
+            if (talentoExigeEscolhas(nomeT)) {
+              configurarSelectsExclusivos('.escolha-talento-versatil', { reservarClasse: true });
+            }
           };
 
           // Mostrar detalhe do talento ja selecionado

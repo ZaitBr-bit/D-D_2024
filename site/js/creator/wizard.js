@@ -16,7 +16,7 @@ import { criarCarteiraVazia } from '../moedas.js';
 import { validarEscolhasTalento } from '../regras-cobertura.js';
 import { salvarPersonagem } from '../store.js';
 import { calcMod, calcPVNivel1, getBonusTruquesOrdem, getEspacosMagia, getMagiaPreparadas, getTruquesConhecidos, magiaMagoEstaNoGrimorio, toast } from '../utils.js';
-import { ANTECEDENTES_ESCOLHAS, CLASSES_ESCOLHAS, ESPECIES_TRACOS_ESCOLHA, FERRAMENTAS_TODAS, INSTRUMENTOS_MUSICAIS, obterTruquesEspecie } from './comum.js';
+import { ANTECEDENTES_ESCOLHAS, CLASSES_ESCOLHAS, ESPECIES_TRACOS_ESCOLHA, FERRAMENTAS_TODAS, INSTRUMENTOS_MUSICAIS, consolidarPericiasProficientes, obterTruquesEspecie } from './comum.js';
 import { renderStepAntecedente } from './passo-antecedente.js';
 import { renderStepAtributos } from './passo-atributos.js';
 import { renderStepClasse } from './passo-classe.js';
@@ -414,6 +414,11 @@ function validarFinal() {
 async function finalizar() {
   // Validar dados finais antes de criar
   if (!validarFinal()) return;
+
+  // Garantia da lista de pericias: a escolha da classe mora no passo 1 e as
+  // demais fontes em passos diferentes, entao a montagem final e refeita aqui
+  // (idempotente) antes de gravar, sem depender de qual passo renderizou por ultimo.
+  consolidarPericiasProficientes();
 
   // Calcular PV
   const info = CLASSES_INFO[personagem.classe];

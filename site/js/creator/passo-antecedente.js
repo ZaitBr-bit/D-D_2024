@@ -3,7 +3,7 @@
 // Extraido de site/js/pages/creator.js sem alteracao de comportamento.
 // ============================================================
 import { abrirModal, toast } from '../utils.js';
-import { ANTECEDENTES_ESCOLHAS, configurarSelectsExclusivos, renderEscolhasTalentoHtml, talentoExigeEscolhas, talentoNumEscolhas } from './comum.js';
+import { ANTECEDENTES_ESCOLHAS, configurarSelectsExclusivos, consolidarPericiasProficientes, renderEscolhasTalentoHtml, talentoExigeEscolhas, talentoNumEscolhas } from './comum.js';
 import { renderDistribuicaoInline } from './passo-atributos.js';
 import { dadosCache, personagem } from './wizard.js';
 
@@ -154,10 +154,14 @@ function abrirPopupAntecedente(nome) {
     `;
   }
 
-  // Escolhas do talento (Habilidoso, Artifista, Musico)
+  // Escolhas do talento (Habilidoso, Artifista, Musico). As duas pericias do
+  // proprio antecedente vao como "ja adquiridas": o antecedente ainda nao foi
+  // confirmado, entao elas nao estao em lugar nenhum que o filtro alcance, e
+  // sem isso o Habilidoso do Nobre oferecia Historia e Persuasao -- que o
+  // Nobre ja concede -- desperdicando uma das 3 escolhas.
   let escolhaTalentoHtml = '';
   if (talentoExigeEscolhas(talentoNome)) {
-    escolhaTalentoHtml = renderEscolhasTalentoHtml(talentoNome, 'antecedente');
+    escolhaTalentoHtml = renderEscolhasTalentoHtml(talentoNome, 'antecedente', pericias);
   }
 
   const corpoHtml = `
@@ -180,7 +184,13 @@ function abrirPopupAntecedente(nome) {
     <button class="btn btn-primary" id="popup-confirmar-antecedente">Selecionar ${ant.nome}</button>
   `);
 
-  if (talentoExigeEscolhas(talentoNome)) configurarSelectsExclusivos('.escolha-talento-antecedente');
+  // reservarClasse: as pericias que a classe ainda vai precisar escolher no
+  // passo 4 nao entram nas opcoes do Habilidoso -- ver o porque (aritmetico)
+  // em periciasReservadasParaClasse. `extras` sao as duas pericias do proprio
+  // antecedente, que ja tornam a conta exata (nao ha mais margem preventiva).
+  if (talentoExigeEscolhas(talentoNome)) {
+    configurarSelectsExclusivos('.escolha-talento-antecedente', { reservarClasse: true, extras: pericias });
+  }
 
   // Eventos de escolha de ferramenta/instrumento
   if (antEscolha) {
@@ -256,6 +266,10 @@ function abrirPopupAntecedente(nome) {
     // (achado do spec de regras: nada fazia isso antes -- ver comentário na
     // função para o porquê de rodar aqui, não só no fim do assistente).
     _consolidarFerramentaAntecedente();
+    // Perícias do antecedente (e as do Habilidoso) entram na lista definitiva
+    // agora, e não só quando o passo 4 for renderizado -- o filtro de escolha
+    // repetida dos passos seguintes lê essa lista.
+    consolidarPericiasProficientes();
 
     window.fecharModal();
     // Re-renderizar o passo com o resumo e distribuicao de atributos

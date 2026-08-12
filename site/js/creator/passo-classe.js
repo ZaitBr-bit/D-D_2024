@@ -266,6 +266,8 @@ async function abrirPopupClasse(nome) {
       personagem.extras_classe = {};
       personagem.proficiencias_extra = [];
       delete dadosCache.classeData;
+      // As pericias escolhidas eram da lista da classe anterior
+      delete dadosCache.pericias_classe_sel;
     }
     personagem.classe = nome;
     // Compatibilidade: migrar ordem_divina
