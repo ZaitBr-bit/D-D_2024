@@ -8,6 +8,7 @@ import { aplicarEdicao, consolidarEdicoesAtributos, reverterEdicao } from '../fi
 import { abrirLevelUpCards } from '../levelup-ui.js';
 import { XP_POR_NIVEL, podeSubirDeNivel } from '../levelup.js';
 import { abrirModal, calcMod, escHtml, fmtMod, processarImagemArquivo, toast } from '../utils.js';
+import { rotuloPericia } from '../opcoes-dominio.js';
 import { campoEstaEditado, char, classeData, salvar, seloEdicao, talentosCache } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { achatarMagiasClasse, ehSubclasseConjuradora, getSubclasseConjuradoraConjuracao, magiaContaNoLimite, obterMagiasDisponiveisClasseAtual } from './magias.js';
@@ -129,7 +130,7 @@ function abrirModalEdicaoFicha(secaoInicial = 'atributos') {
     }
     if (secao === 'pericias') {
       const limite = (char.pericias_proficientes || []).length;
-      return navegacao + `<div class="info-box info" style="font-size:0.8rem;margin-bottom:10px">Mantenha ${limite} proficiência(s). Especializações continuam exigindo proficiência.</div><div style="max-height:45vh;overflow:auto">${PERICIAS.map(p => `<label class="form-check" style="justify-content:flex-start;margin:0 0 6px"><input type="checkbox" data-edicao-pericia="${escHtml(p.nome)}" ${(char.pericias_proficientes || []).includes(p.nome) ? 'checked' : ''}> ${p.nome}${(char.pericias_expertise || []).includes(p.nome) ? ' (Especialização)' : ''}</label>`).join('')}</div>${campoEstaEditado('pericias_proficientes') ? '<button class="btn btn-sm btn-secondary mt-1" data-reverter-campo="pericias_proficientes">Reverter perícias</button>' : ''}`;
+      return navegacao + `<div class="info-box info" style="font-size:0.8rem;margin-bottom:10px">Mantenha ${limite} proficiência(s). Especializações continuam exigindo proficiência.</div><div style="max-height:45vh;overflow:auto">${PERICIAS.map(p => `<label class="form-check" style="justify-content:flex-start;margin:0 0 6px"><input type="checkbox" data-edicao-pericia="${escHtml(p.nome)}" ${(char.pericias_proficientes || []).includes(p.nome) ? 'checked' : ''}> ${rotuloPericia(p.nome)}${(char.pericias_expertise || []).includes(p.nome) ? ' (Especialização)' : ''}</label>`).join('')}</div>${campoEstaEditado('pericias_proficientes') ? '<button class="btn btn-sm btn-secondary mt-1" data-reverter-campo="pericias_proficientes">Reverter perícias</button>' : ''}`;
     }
     const campos = [
       { key: 'aparencia', label: 'Aparência' }, { key: 'personalidade', label: 'Personalidade' }, { key: 'ideais', label: 'Ideais' }, { key: 'lacos', label: 'Laços' }, { key: 'defeitos', label: 'Defeitos' }, { key: 'historia_personagem', label: 'História' }, { key: 'notas', label: 'Notas' }

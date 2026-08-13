@@ -160,17 +160,17 @@ export async function renderStepMagias(el) {
       </div>
       ${magiasDaClasse.length === 0
         ? '<div style="color:var(--text-muted);text-align:center;padding:20px">Nenhuma magia disponível neste círculo</div>'
-        : `<div class="magias-grid">${magiasDaClasse.map(m => {
+        : `<div class="opcao-grid densa">${magiasDaClasse.map(m => {
             const nome = m.nome || m;
             const sel = selecionadas.includes(nome);
             const bloqueadoPorIM = !sel && jaEscolhidoPorIM.has(nome);
             const bloqueadoPorEspecie = !sel && jaConcedidoPorEspecie.has(nome);
             const bloqueado = bloqueadoPorIM || bloqueadoPorEspecie;
             return `
-              <div class="magia-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}" data-magia-nome="${nome}" data-magia-circ="${circ}" ${bloqueado ? 'style="opacity:0.4"' : ''}>
-                <span class="magia-card-check" data-creator-check="${nome}"></span>
-                <div class="magia-card-nome" data-creator-info="${nome}" data-creator-info-circ="${circ}">${nome}${bloqueadoPorIM ? ' (já conhecido)' : ''}${bloqueadoPorEspecie ? ' (já concedido pela espécie)' : ''}</div>
-                <div class="magia-card-meta">
+              <div class="opcao-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'bloqueada' : ''}" data-magia-nome="${nome}" data-magia-circ="${circ}" ${bloqueado ? 'style="opacity:0.4"' : ''}>
+                <span class="opcao-check" data-creator-check="${nome}"></span>
+                <div class="opcao-nome" data-creator-info="${nome}" data-creator-info-circ="${circ}">${nome}${bloqueadoPorIM ? ' (já conhecido)' : ''}${bloqueadoPorEspecie ? ' (já concedido pela espécie)' : ''}</div>
+                <div class="opcao-resumo">
                   <span>${m.escola || ''}</span>
                   ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
                   ${m.especial === 'M' ? '<span>M$</span>' : ''}
@@ -184,7 +184,7 @@ export async function renderStepMagias(el) {
     listaEl.querySelectorAll('[data-creator-check]').forEach(chk => {
       chk.addEventListener('click', (e) => {
         e.stopPropagation();
-        const card = chk.closest('.magia-card');
+        const card = chk.closest('.opcao-card');
         const nome = card.dataset.magiaNome;
         const jaSelecionado = selecionadas.includes(nome);
         if (!jaSelecionado && jaEscolhidoPorIM.has(nome)) {
@@ -229,7 +229,7 @@ export async function renderStepMagias(el) {
   // Busca
   document.getElementById('busca-magia')?.addEventListener('input', (e) => {
     const termo = semAcento(e.target.value);
-    document.querySelectorAll('#magias-lista .magia-card').forEach(el => {
+    document.querySelectorAll('#magias-lista .opcao-card').forEach(el => {
       el.style.display = semAcento(el.textContent).includes(termo) ? '' : 'none';
     });
   });
@@ -249,10 +249,10 @@ export async function renderStepMagias(el) {
         <div class="card" style="border-color:var(--accent)">
           <div class="card-header"><h3>Magias Preparadas</h3></div>
           <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">Escolha exatamente 4 das magias registradas no grimório: ${preparadas.length}/${numPreparadas}</div>
-          <div class="magias-grid">${grimorio.map(m => {
+          <div class="opcao-grid densa">${grimorio.map(m => {
             const sel = preparadas.some(p => p.nome === m.nome);
-            return `<div class="magia-card ${sel ? 'selecionada' : ''}" data-mago-preparada="${m.nome}" data-mago-preparada-circ="${m.circulo}" style="cursor:pointer">
-              <span class="magia-card-check"></span><div class="magia-card-nome">${m.nome}</div><div class="magia-card-meta"><span>${m.circulo}º Círculo</span></div>
+            return `<div class="opcao-card ${sel ? 'selecionada' : ''}" data-mago-preparada="${m.nome}" data-mago-preparada-circ="${m.circulo}" style="cursor:pointer">
+              <span class="opcao-check"></span><div class="opcao-nome">${m.nome}</div><div class="opcao-resumo"><span>${m.circulo}º Círculo</span></div>
             </div>`;
           }).join('') || '<div style="color:var(--text-muted);padding:8px">Selecione as 6 magias do grimório acima primeiro.</div>'}</div>
         </div>`;
@@ -449,16 +449,16 @@ async function _bindInstanciaIM(container, idx, aoMudar) {
         </div>
         ${magias.length === 0
           ? '<div style="color:var(--text-muted);text-align:center;padding:20px">Nenhuma magia disponível</div>'
-          : `<div class="magias-grid">${magias.map(m => {
+          : `<div class="opcao-grid densa">${magias.map(m => {
               const nome = m.nome || m;
               const sel = selecionadas.includes(nome);
               const bloqueado = jaEscolhidos.has(nome) && !sel;
               const bloqueioVisual = isTruque && bloqueado;
               return `
-                <div class="magia-card ${sel ? 'selecionada' : ''} ${bloqueioVisual ? 'magia-card-bloqueada' : ''}" data-im-magia="${nome}" data-im-tipo="${tab}" ${bloqueioVisual ? 'style="opacity:0.4"' : ''}>
-                  <span class="magia-card-check" data-im-check="${nome}"></span>
-                  <div class="magia-card-nome" data-im-info="${nome}" data-im-info-circ="${isTruque ? 0 : 1}">${nome}${bloqueado ? ' (já conhecido)' : ''}</div>
-                  <div class="magia-card-meta">
+                <div class="opcao-card ${sel ? 'selecionada' : ''} ${bloqueioVisual ? 'bloqueada' : ''}" data-im-magia="${nome}" data-im-tipo="${tab}" ${bloqueioVisual ? 'style="opacity:0.4"' : ''}>
+                  <span class="opcao-check" data-im-check="${nome}"></span>
+                  <div class="opcao-nome" data-im-info="${nome}" data-im-info-circ="${isTruque ? 0 : 1}">${nome}${bloqueado ? ' (já conhecido)' : ''}</div>
+                  <div class="opcao-resumo">
                     <span>${m.escola || ''}</span>
                     ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
                     ${m.especial === 'M' ? '<span>M$</span>' : ''}
@@ -471,7 +471,7 @@ async function _bindInstanciaIM(container, idx, aoMudar) {
       listaEl.querySelectorAll('[data-im-check]').forEach(chk => {
         chk.addEventListener('click', (e) => {
           e.stopPropagation();
-          const card = chk.closest('.magia-card');
+          const card = chk.closest('.opcao-card');
           const nome = card.dataset.imMagia;
           const jaSelecionado = isTruque ? im.truques.includes(nome) : im.magia === nome;
           if (isTruque && !jaSelecionado && jaEscolhidos.has(nome)) {
@@ -518,7 +518,7 @@ async function _bindInstanciaIM(container, idx, aoMudar) {
 
     document.getElementById(`busca-im-${idx}`)?.addEventListener('input', (e) => {
       const termo = semAcento(e.target.value);
-      document.querySelectorAll(`#im-lista-magias-${idx} .magia-card`).forEach(el => {
+      document.querySelectorAll(`#im-lista-magias-${idx} .opcao-card`).forEach(el => {
         el.style.display = semAcento(el.textContent).includes(termo) ? '' : 'none';
       });
     });

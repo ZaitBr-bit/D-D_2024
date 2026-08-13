@@ -5,6 +5,8 @@
 import { PERICIAS } from '../dados-classes.js';
 import { getEspecies, getTalentos } from '../db.js';
 import { abrirModal, getDeslocamento, mdParaHtml, toast } from '../utils.js';
+import { montarSeletor } from '../ui-opcoes.js';
+import { deTalentos, rotuloPericia } from '../opcoes-dominio.js';
 import { ESPECIES_TRACOS_ESCOLHA, configurarSelectsExclusivos, obterTruquesEspecie, periciasReservadasParaClasse, renderDescricaoTalento, renderEscolhasTalentoHtml, talentoExigeEscolhas, talentoNumEscolhas } from './comum.js';
 import { _reconstruirTalentosBase } from './passo-antecedente.js';
 import { dadosCache, personagem } from './wizard.js';
@@ -57,12 +59,12 @@ export async function renderStepEspecie(el) {
 
   el.innerHTML = `
     <h3 style="margin-bottom:12px">Escolha sua Especie</h3>
-    <div class="selection-grid" id="grid-especies">
+    <div class="opcao-grid ampla" id="grid-especies">
       ${especies.map(e => `
-        <div class="selection-card ${personagem.especie === e.nome ? 'selected' : ''}" data-especie="${e.nome}">
-          <span class="card-check">&#10003;</span>
-          <div class="card-nome">${e.nome}</div>
-          <div class="card-detalhe">${e.tracos?.length || 0} tracos</div>
+        <div class="opcao-card ${personagem.especie === e.nome ? 'selecionada' : ''}" data-especie="${e.nome}">
+          <span class="opcao-check"></span>
+          <div class="opcao-nome">${e.nome}</div>
+          <div class="opcao-resumo">${e.tracos?.length || 0} tracos</div>
         </div>
       `).join('')}
     </div>
@@ -125,11 +127,11 @@ function abrirPopupEspecie(nome) {
           const nomeTraco = t.nome || t;
           const descTraco = t.descricao || '';
           return `
-            <div class="selection-card ${selecionadosTemp.includes(nomeTraco) ? 'selected' : ''}"
+            <div class="opcao-card ${selecionadosTemp.includes(nomeTraco) ? 'selecionada' : ''}"
                  data-traco-escolha="${nomeTraco}"
                  style="flex:1;min-width:140px;max-width:180px;cursor:pointer">
-              <div class="card-nome" style="font-size:0.85rem">${nomeTraco}</div>
-              ${descTraco ? `<div class="card-detalhe" style="font-size:0.75rem;color:var(--text-muted)">${descTraco}</div>` : ''}
+              <div class="opcao-nome" style="font-size:0.85rem">${nomeTraco}</div>
+              ${descTraco ? `<div class="opcao-resumo" style="font-size:0.75rem;color:var(--text-muted)">${descTraco}</div>` : ''}
             </div>
           `;
         }).join('')}
@@ -167,7 +169,7 @@ function abrirPopupEspecie(nome) {
     // Sentidos Aguçados: Intuição, Percepção ou Sobrevivência
     const opcsElfo = ['Intuição', 'Percepção', 'Sobrevivência'].map(p => {
       const sel = personagem.pericia_especie === p ? 'selected' : '';
-      return `<option value="${p}" ${sel}>${p}</option>`;
+      return `<option value="${p}" ${sel}>${rotuloPericia(p)}</option>`;
     }).join('');
     periciaEspecieHtml = `
       <div class="section-divider"><span>Sentidos Aguçados — Pericia</span></div>
@@ -218,9 +220,7 @@ function abrirPopupEspecie(nome) {
     versatilHtml = `
       <div class="section-divider"><span>Versatil — Talento de Origem</span></div>
       <div class="info-box info" style="font-size:0.85rem">O traco Versatil concede um talento de Origem extra. Escolha abaixo:</div>
-      <select id="select-talento-versatil" style="width:100%;padding:8px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:0.9rem;margin:8px 0">
-        <option value="">-- Escolha um talento de Origem --</option>
-      </select>
+      <div id="versatil-talento-lista"></div>
       <div id="versatil-talento-detalhe"></div>
     `;
   }
@@ -283,7 +283,7 @@ function abrirPopupEspecie(nome) {
 
         // Atualizar visual
         document.querySelectorAll('#popup-tracos-escolha [data-traco-escolha]').forEach(c => {
-          c.classList.toggle('selected', selecionadosTemp.includes(c.dataset.tracoEscolha));
+          c.classList.toggle('selecionada', selecionadosTemp.includes(c.dataset.tracoEscolha));
         });
 
         // Mostrar detalhe do traco selecionado
@@ -315,22 +315,23 @@ function abrirPopupEspecie(nome) {
     }
   }
 
+  // Talento escolhido no card do Versátil (montado abaixo) -- lido só no
+  // confirmar (`popup-confirmar-especie`), do mesmo jeito que
+  // `talentoEscolhido` em sheet/talentos.js (achado I1 da revisão da Task
+  // 13): o código antigo baseado em `<select>` só gravava
+  // `personagem.talento_versatil` no clique de "Selecionar <espécie>",
+  // depois de toda validação passar. Nasce com o valor já confirmado antes
+  // (se o jogador está reabrindo o popup para revisar a escolha).
+  let talentoVersatilEscolhido = personagem.talento_versatil || '';
+
   // Carregar talentos de origem para o select Versatil (Humano)
   if (nome === 'Humano') {
     (async () => {
       try {
         const talentosData = await getTalentos();
         const talentosOrigem = (talentosData?.por_categoria?.['de Origem'] || []).sort((a, b) => a.nome.localeCompare(b.nome));
-        const selectEl = document.getElementById('select-talento-versatil');
-        if (selectEl) {
-          talentosOrigem.forEach(t => {
-            const opt = document.createElement('option');
-            opt.value = t.nome;
-            opt.textContent = t.nome;
-            if (personagem.talento_versatil === t.nome) opt.selected = true;
-            selectEl.appendChild(opt);
-          });
-
+        const listaEl = document.getElementById('versatil-talento-lista');
+        if (listaEl) {
           // Funcao auxiliar para atualizar detalhe + escolhas do talento
           const atualizarDetalheVersatil = (nomeT) => {
             const detalheEl = document.getElementById('versatil-talento-detalhe');
@@ -349,15 +350,39 @@ function abrirPopupEspecie(nome) {
             }
           };
 
-          // Mostrar detalhe do talento ja selecionado
-          if (personagem.talento_versatil) {
-            atualizarDetalheVersatil(personagem.talento_versatil);
-          }
-          selectEl.addEventListener('change', () => {
-            // Limpar escolhas anteriores ao trocar de talento
-            if (!personagem.escolhas_talento) personagem.escolhas_talento = {};
-            delete personagem.escolhas_talento.versatil;
-            atualizarDetalheVersatil(selectEl.value);
+          // Versátil (Humano): só talentos de Origem, então sem filtro de
+          // categoria.
+          //
+          // CRITICAL da revisão da Task 13 (C1): `jaPossui` NÃO PODE incluir
+          // o próprio `talento_versatil` já confirmado -- `personagem.talentos`
+          // já contém essa escolha (via `_reconstruirTalentosBase`, chamado ao
+          // confirmar a espécie), então sem este filtro o talento se bloqueia
+          // sozinho ao REABRIR o popup: `deTalentos` marca `bloqueado`, o card
+          // nasce sem nada marcado, e (antes desta correção) o `aoMudar`
+          // automático da montagem apagava a escolha em silêncio -- 8 dos 10
+          // talentos de Origem quebravam assim (escapavam só Habilidoso e
+          // Iniciado em Magia, os dois Repetíveis, que o achado 3 já livra de
+          // bloqueio -- por isso nem o spec nem a conferência funcional
+          // anteriores, que só usaram Habilidoso, pegaram isto). Bloquear o
+          // talento do ANTECEDENTE continua correto -- é a validação
+          // recíproca de conflito, já feita no confirmar, mais abaixo.
+          montarSeletor(listaEl, {
+            opcoes: deTalentos(talentosOrigem, {
+              jaPossui: new Set((personagem.talentos || []).filter(n => n !== personagem.talento_versatil)),
+            }),
+            densidade: 'densa', max: 1, busca: true,
+            selecionadas: talentoVersatilEscolhido ? [talentoVersatilEscolhido] : [],
+            // I1: só atualiza a variável local (lida no confirmar) e o
+            // painel de detalhe/escolhas -- NUNCA mais grava direto em
+            // `personagem` aqui. Isso também elimina a necessidade do
+            // antigo guard `restaurando`/`primeiraEscolha`: como nada em
+            // `personagem` é mutado neste callback, o disparo automático da
+            // montagem (com o valor já confirmado) é inofensivo por
+            // natureza, não só por um `if` extra.
+            aoMudar: (sel) => {
+              talentoVersatilEscolhido = sel[0] || '';
+              atualizarDetalheVersatil(talentoVersatilEscolhido);
+            },
           });
         }
       } catch (e) { console.error('Erro ao carregar talentos de Origem:', e); }
@@ -399,26 +424,38 @@ function abrirPopupEspecie(nome) {
     }
     // Validar talento Versatil para Humano
     if (nome === 'Humano') {
-      const selectVersatil = document.getElementById('select-talento-versatil');
-      if (!selectVersatil?.value) {
+      // I1: lê da variável local (preenchida pelo `aoMudar` de
+      // montarSeletor, acima) -- `personagem.talento_versatil` só é gravado
+      // no FINAL desta validação, depois de tudo passar. Gravar antes (como
+      // o `aoMudar` fazia até a revisão anterior) mutava o personagem no
+      // CLIQUE do card: sair por "Cancelar" já deixava a escolha
+      // materializada (via `_reconstruirTalentosBase`, chamado depois), e um
+      // conflito com o talento do antecedente (validado abaixo) rejeitava a
+      // confirmação com o valor conflitante JÁ no modelo -- exatamente a
+      // duplicata que esta validação existe para impedir.
+      const talentoVersatil = talentoVersatilEscolhido;
+      if (!talentoVersatil) {
         toast('Selecione um Talento de Origem (Versatil)', 'error');
         return;
       }
       // Verificar conflito: mesmo talento não-repetível já escolhido no antecedente
       const _talentosOrigemRepetiveisEsp = ['Habilidoso', 'Iniciado em Magia'];
-      if (personagem.talento_antecedente && personagem.talento_antecedente === selectVersatil.value && !_talentosOrigemRepetiveisEsp.includes(selectVersatil.value)) {
-        toast(`O talento "${selectVersatil.value}" já está selecionado no Antecedente e não é repetível. Escolha outro talento aqui.`, 'error');
+      if (personagem.talento_antecedente && personagem.talento_antecedente === talentoVersatil && !_talentosOrigemRepetiveisEsp.includes(talentoVersatil)) {
+        toast(`O talento "${talentoVersatil}" já está selecionado no Antecedente e não é repetível. Escolha outro talento aqui.`, 'error');
         return;
       }
-      personagem.talento_versatil = selectVersatil.value;
 
-      // Validar e salvar escolhas do talento Versatil (Habilidoso, Artifista, Musico)
-      const numEscolhas = talentoNumEscolhas(selectVersatil.value);
+      // Validar as escolhas do talento Versatil (Habilidoso, Artifista,
+      // Musico) ANTES de gravar qualquer coisa em `personagem` -- só grava
+      // (talento_versatil + escolhas) depois que TUDO validou, mesmo motivo
+      // do comentário acima.
+      const numEscolhas = talentoNumEscolhas(talentoVersatil);
+      let escolhasVersatil = null;
       if (numEscolhas > 0) {
         const selects = document.querySelectorAll('.escolha-talento-versatil');
         const vals = [...selects].map(s => s.value).filter(Boolean);
         if (vals.length < numEscolhas) {
-          toast(`Selecione todas as ${numEscolhas} escolhas de ${selectVersatil.value}`, 'error');
+          toast(`Selecione todas as ${numEscolhas} escolhas de ${talentoVersatil}`, 'error');
           return;
         }
         // Verificar duplicatas
@@ -426,12 +463,14 @@ function abrirPopupEspecie(nome) {
           toast('Nao repita opcoes nas escolhas do talento', 'error');
           return;
         }
-        if (!personagem.escolhas_talento) personagem.escolhas_talento = {};
-        personagem.escolhas_talento.versatil = vals;
-      } else {
-        if (!personagem.escolhas_talento) personagem.escolhas_talento = {};
-        delete personagem.escolhas_talento.versatil;
+        escolhasVersatil = vals;
       }
+
+      // Tudo validado -- agora sim grava.
+      personagem.talento_versatil = talentoVersatil;
+      if (!personagem.escolhas_talento) personagem.escolhas_talento = {};
+      if (escolhasVersatil) personagem.escolhas_talento.versatil = escolhasVersatil;
+      else delete personagem.escolhas_talento.versatil;
     }
     // Limpar tracos se mudou de especie
     if (personagem.especie !== nome) {

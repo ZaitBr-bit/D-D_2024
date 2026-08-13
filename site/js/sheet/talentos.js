@@ -11,6 +11,8 @@ import { bindEscolhasTalento, renderEscolhasTalento } from '../levelup-ui.js';
 import { aplicarASITalento, exigeDadivaEpica, obterAtributosASITalento, obterTalentosElegiveis, registrarDadivaEpicaLegada, talentoPermitidoNaRecuperacaoDadiva } from '../levelup.js';
 import { aplicarEfeitoTalento, getRegraTalento, obterEscolhasObrigatoriasTalento, validarEscolhasTalento } from '../regras-cobertura.js';
 import { abrirModal, escHtml, mdParaHtml, nomesMagiaCirculo1Conhecidas, semAcento, toast } from '../utils.js';
+import { montarSeletor } from '../ui-opcoes.js';
+import { deMagias, deTalentos, motivoPreRequisito } from '../opcoes-dominio.js';
 import { char, passivosTalentosCache, salvar, talentosCache } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 
@@ -385,44 +387,50 @@ export async function abrirModalIniciadoEmMagiaFicha(restantes = 1, aoSalvar = n
     const dados = await getMagiasClasse(estado.lista);
     const listaMagias = dados?.lista_magias || {};
     const truquesDisp = (listaMagias['Truques'] || []).map(m => typeof m === 'string' ? { nome: m } : m);
-    const c1Disp = (listaMagias['1º Círculo'] || []).map(m => typeof m === 'string' ? { nome: m } : m);
+    // `circulo: 1` forçado aqui porque as entradas de `lista_magias['1º
+    // Círculo']` (dados/classes/magias_*.json) não trazem esse campo --
+    // deMagias (opcoes-dominio.js) precisa dele para o resumo do card;
+    // sem isto o card mostrava "undefinedº Círculo" (achado ao converter
+    // para montarSeletor, Task 14).
+    const c1Disp = (listaMagias['1º Círculo'] || [])
+      .map(m => typeof m === 'string' ? { nome: m } : m)
+      .map(m => ({ ...m, circulo: 1 }));
 
     // Truques/magias já conhecidos por outra fonte — impede escolher duplicata sem ganho
     const jaTemTruqueIM = new Set((char.magias_conhecidas || []).filter(m => m.circulo === 0).map(m => m.nome));
     const jaTemMagiaIM = nomesMagiaCirculo1Conhecidas(char);
 
     area.innerHTML = `
-      <div style="font-weight:600;font-size:0.85rem">Truques (<span id="im-ficha-truques-count">${estado.truques.length}</span>/2)</div>
-      <div style="max-height:25vh;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:4px;margin:4px 0">
-        ${truquesDisp.map(m => {
-          const bloqueado = jaTemTruqueIM.has(m.nome) && !estado.truques.includes(m.nome);
-          return `
-          <label style="display:flex;align-items:center;gap:4px;font-size:0.82rem;padding:2px 4px;border:1px solid var(--border-light);border-radius:4px${bloqueado ? ';opacity:0.4' : ''}">
-            <input type="checkbox" class="im-ficha-truque" value="${m.nome}" ${estado.truques.includes(m.nome) ? 'checked' : ''} ${bloqueado ? 'disabled' : ''}> ${m.nome}${bloqueado ? ' (já conhecido)' : ''}
-          </label>
-        `;
-        }).join('')}
-      </div>
+      <div style="font-weight:600;font-size:0.85rem">Truques (2)</div>
+      <div id="im-ficha-truques-lista"></div>
       <div style="font-weight:600;font-size:0.85rem;margin-top:8px">Magia de 1º Círculo</div>
-      <select class="form-input" id="im-ficha-magia">
-        <option value="">Selecione...</option>
-        ${c1Disp.map(m => {
-          const jaConhecida = jaTemMagiaIM.has(m.nome) && estado.magia !== m.nome;
-          return `<option value="${m.nome}" ${estado.magia === m.nome ? 'selected' : ''}>${m.nome}${jaConhecida ? ' (já conhecida)' : ''}</option>`;
-        }).join('')}
-      </select>
+      <div id="im-ficha-magia-lista"></div>
     `;
 
-    area.querySelectorAll('.im-ficha-truque').forEach(cb => {
-      cb.addEventListener('change', () => {
-        const marcados = [...area.querySelectorAll('.im-ficha-truque:checked')].map(c => c.value);
-        if (marcados.length > 2) { cb.checked = false; return; }
-        estado.truques = [...area.querySelectorAll('.im-ficha-truque:checked')].map(c => c.value);
-        const cnt = document.getElementById('im-ficha-truques-count');
-        if (cnt) cnt.textContent = estado.truques.length;
-      });
+    // Truques em cards, como o resto do app: em checkbox o jogador escolhia
+    // dois truques vendo so o nome. `circulo: 0` e injetado porque a lista da
+    // classe nao traz o campo, e sem ele o card nao sabe onde buscar o texto
+    // completo do "ver detalhes". A ja conhecida por outra fonte fica
+    // bloqueada, exceto as que o proprio estado ja tinha marcado.
+    const jaTemTruqueCard = new Set([...jaTemTruqueIM].filter(n => !estado.truques.includes(n)));
+    montarSeletor(document.getElementById('im-ficha-truques-lista'), {
+      opcoes: deMagias(truquesDisp.map(m => ({ ...m, circulo: 0 })), { jaTem: jaTemTruqueCard }),
+      densidade: 'densa', max: 2, busca: true,
+      selecionadas: [...estado.truques],
+      aoMudar: (sel) => { estado.truques = sel; },
     });
-    document.getElementById('im-ficha-magia')?.addEventListener('change', (e) => { estado.magia = e.target.value; });
+    // Magia de 1º Círculo: círculo e escola passam a aparecer sem clicar. A
+    // já conhecida por outra fonte fica bloqueada, exceto a que o próprio
+    // estado já tinha marcado (reabrir a lista ao trocar de lista e voltar
+    // não pode apagar a escolha em curso).
+    const jaTemMagiaCard = new Set(jaTemMagiaIM);
+    if (estado.magia) jaTemMagiaCard.delete(estado.magia);
+    montarSeletor(document.getElementById('im-ficha-magia-lista'), {
+      opcoes: deMagias(c1Disp, { jaTem: jaTemMagiaCard }),
+      densidade: 'densa', max: 1, busca: true,
+      selecionadas: estado.magia ? [estado.magia] : [],
+      aoMudar: (sel) => { estado.magia = sel[0] || ''; },
+    });
   };
 
   document.getElementById('im-ficha-lista')?.addEventListener('change', async (e) => {
@@ -487,7 +495,14 @@ export async function abrirModalEditarIniciadoEmMagia(ordinal) {
   const dados = await getMagiasClasse(inst.lista);
   const listaMagias = dados?.lista_magias || {};
   const truquesDisp = (listaMagias['Truques'] || []).map(m => typeof m === 'string' ? { nome: m } : m);
-  const c1Disp = (listaMagias['1º Círculo'] || []).map(m => typeof m === 'string' ? { nome: m } : m);
+  // `circulo: 1` forçado aqui porque as entradas de `lista_magias['1º
+  // Círculo']` (dados/classes/magias_*.json) não trazem esse campo --
+  // deMagias (opcoes-dominio.js) precisa dele para o resumo do card; sem
+  // isto o card mostrava "undefinedº Círculo" (achado ao converter para
+  // montarSeletor, Task 14).
+  const c1Disp = (listaMagias['1º Círculo'] || [])
+    .map(m => typeof m === 'string' ? { nome: m } : m)
+    .map(m => ({ ...m, circulo: 1 }));
 
   const renderMagias = () => {
     const area = document.getElementById('im-edit-magias');
@@ -498,37 +513,36 @@ export async function abrirModalEditarIniciadoEmMagia(ordinal) {
     const jaTemMagiaIM = nomesMagiaCirculo1Conhecidas(char);
 
     area.innerHTML = `
-      <div style="font-weight:600;font-size:0.85rem">Truques (<span id="im-edit-truques-count">${estado.truques.length}</span>/2)</div>
-      <div style="max-height:25vh;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:4px;margin:4px 0">
-        ${truquesDisp.map(m => {
-          const bloqueado = jaTemTruqueIM.has(m.nome) && !estado.truques.includes(m.nome);
-          return `
-          <label style="display:flex;align-items:center;gap:4px;font-size:0.82rem;padding:2px 4px;border:1px solid var(--border-light);border-radius:4px${bloqueado ? ';opacity:0.4' : ''}">
-            <input type="checkbox" class="im-edit-truque" value="${m.nome}" ${estado.truques.includes(m.nome) ? 'checked' : ''} ${bloqueado ? 'disabled' : ''}> ${m.nome}${bloqueado ? ' (já conhecido)' : ''}
-          </label>
-        `;
-        }).join('')}
-      </div>
+      <div style="font-weight:600;font-size:0.85rem">Truques (2)</div>
+      <div id="im-edit-truques-lista"></div>
       <div style="font-weight:600;font-size:0.85rem;margin-top:8px">Magia de 1º Círculo</div>
-      <select class="form-input" id="im-edit-magia">
-        <option value="">Selecione...</option>
-        ${c1Disp.map(m => {
-          const jaConhecida = jaTemMagiaIM.has(m.nome) && estado.magia !== m.nome;
-          return `<option value="${m.nome}" ${estado.magia === m.nome ? 'selected' : ''}>${m.nome}${jaConhecida ? ' (já conhecida)' : ''}</option>`;
-        }).join('')}
-      </select>
+      <div id="im-edit-magia-lista"></div>
     `;
 
-    area.querySelectorAll('.im-edit-truque').forEach(cb => {
-      cb.addEventListener('change', () => {
-        const marcados = [...area.querySelectorAll('.im-edit-truque:checked')].map(c => c.value);
-        if (marcados.length > 2) { cb.checked = false; return; }
-        estado.truques = marcados;
-        const cnt = document.getElementById('im-edit-truques-count');
-        if (cnt) cnt.textContent = estado.truques.length;
-      });
+    // Truques em cards, como o resto do app: em checkbox o jogador escolhia
+    // dois truques vendo so o nome. `circulo: 0` e injetado porque a lista da
+    // classe nao traz o campo, e sem ele o card nao sabe onde buscar o texto
+    // completo do "ver detalhes". A ja conhecida por outra fonte fica
+    // bloqueada, exceto as que o proprio estado ja tinha marcado.
+    const jaTemTruqueCard = new Set([...jaTemTruqueIM].filter(n => !estado.truques.includes(n)));
+    montarSeletor(document.getElementById('im-edit-truques-lista'), {
+      opcoes: deMagias(truquesDisp.map(m => ({ ...m, circulo: 0 })), { jaTem: jaTemTruqueCard }),
+      densidade: 'densa', max: 2, busca: true,
+      selecionadas: [...estado.truques],
+      aoMudar: (sel) => { estado.truques = sel; },
     });
-    document.getElementById('im-edit-magia')?.addEventListener('change', (e) => { estado.magia = e.target.value; });
+    // Magia de 1º Círculo: círculo e escola passam a aparecer sem clicar. A
+    // magia já conhecida por OUTRA fonte fica bloqueada -- exceto a que
+    // esta própria instância já usa (senão a magia atual apareceria
+    // bloqueada nela mesma, já que ela conta como conhecida).
+    const jaTemMagiaCard = new Set(jaTemMagiaIM);
+    if (estado.magia) jaTemMagiaCard.delete(estado.magia);
+    montarSeletor(document.getElementById('im-edit-magia-lista'), {
+      opcoes: deMagias(c1Disp, { jaTem: jaTemMagiaCard }),
+      densidade: 'densa', max: 1, busca: true,
+      selecionadas: estado.magia ? [estado.magia] : [],
+      aoMudar: (sel) => { estado.magia = sel[0] || ''; },
+    });
   };
 
   renderMagias();
@@ -589,8 +603,11 @@ export async function abrirModalAdicionarTalento() {
   if (categorias.length === 0) { toast('Não foi possível carregar os talentos', 'error'); return; }
 
   const jaTem = new Set((char.talentos || []).map(t => typeof t === 'string' ? t : t.nome));
-  const ehRepetivel = (talento) => (talento.beneficios || []).some(b => b.nome === 'Repetível');
-  const encontrarTalento = (nome) => Object.values(data.por_categoria || {}).flat().find(t => t.nome === nome);
+  const todosTalentos = Object.values(data.por_categoria || {}).flat();
+  const encontrarTalento = (nome) => todosTalentos.find(t => t.nome === nome);
+  // Talento marcado no card (montarSeletor abaixo) -- lido pelo botão
+  // "Adicionar" no lugar do antigo `#add-tal-nome`?.value.
+  let talentoEscolhido = '';
   const persistirTalento = (nome, talento, atributoASI, escolhasCobertura = {}) => {
     const nomesAtributo = { forca: 'Força', destreza: 'Destreza', constituicao: 'Constituição', inteligencia: 'Inteligência', sabedoria: 'Sabedoria', carisma: 'Carisma' };
     if (nome === 'Resiliente' && (char.salvaguardas_proficientes || []).includes(nomesAtributo[atributoASI])) {
@@ -621,34 +638,62 @@ export async function abrirModalAdicionarTalento() {
     return true;
   };
 
-  const renderOpcoes = (cat) => {
-    const lista = (data.por_categoria[cat] || []);
-    return lista.map(t => {
-      const bloqueado = jaTem.has(t.nome) && !ehRepetivel(t);
-      return `<option value="${t.nome}" ${bloqueado ? 'disabled' : ''}>${t.nome}${bloqueado ? ' (já possui)' : ''}</option>`;
-    }).join('');
-  };
-
   abrirModal('Adicionar Talento', `
     <div class="info-box warning" style="font-size:0.8rem">Use para talentos concedidos fora do fluxo normal (invocações, bênçãos do Mestre etc.). Efeitos com escolhas (perícias, magias) podem exigir configuração manual.</div>
-    <label class="form-label">Categoria</label>
-    <select class="form-input" id="add-tal-categoria">
-      ${categorias.map(c => `<option value="${c}">${c}</option>`).join('')}
-    </select>
-    <label class="form-label" style="margin-top:8px">Talento</label>
-    <select class="form-input" id="add-tal-nome">
-      <option value="">Selecione...</option>
-      ${renderOpcoes(categorias[0])}
-    </select>
+    <div id="add-talento-lista"></div>
   `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-confirmar-add-talento">Adicionar</button>');
 
-  document.getElementById('add-tal-categoria')?.addEventListener('change', (e) => {
-    const sel = document.getElementById('add-tal-nome');
-    if (sel) sel.innerHTML = `<option value="">Selecione...</option>` + renderOpcoes(e.target.value);
+  // "+ Talento" da ficha: mesma lista da subida de nível, sem o select de
+  // categoria (que vira filtro) e sem o de talento (que vira card).
+  //
+  // Decisão do dono do produto (revisão da Task 13, I2): este modal existe
+  // PARA conceder talentos fora do fluxo normal (o próprio aviso acima diz
+  // isso -- invocações, bênçãos do Mestre etc.), então pré-requisito não
+  // atendido não pode travar a seleção aqui como trava na subida de nível
+  // -- um Clérigo Força 8 recebendo um talento do Mestre não tinha outro
+  // caminho no app para registrá-lo. Por isso `motivoIndisponivel` NÃO é
+  // passado a `deTalentos` nesta tela -- ele é quem decide `bloqueado`, e
+  // um card bloqueado fica inselecionável (`pointer-events:none` em
+  // app.css) e sem "ver detalhes" (cardOpcaoHtml, ui-opcoes.js). Em vez
+  // disso, o motivo (quando existe) é dobrado dentro do `resumo` de cada
+  // opção logo abaixo -- o único campo do contrato de opção
+  // (ui-opcoes.js) que aparece incondicionalmente no card, sem desabilitar
+  // nada. "Você já possui este talento" CONTINUA vindo de `jaPossui` (não
+  // mexido): essa é a única restrição real do modal original (não dava
+  // pra readicionar o mesmo talento não-repetível pelo dropdown antigo,
+  // Task 13 entrega original) e continua bloqueando de verdade.
+  const motivosPreRequisito = new Map(
+    todosTalentos
+      .map(t => [t.nome, motivoPreRequisito(t, char)])
+      .filter(([, motivo]) => motivo)
+  );
+  const opcoesTalento = deTalentos(todosTalentos, { jaPossui: jaTem })
+    .map(o => {
+      const motivo = motivosPreRequisito.get(o.id);
+      // Só anota quem NÃO está bloqueado (o já-possuído continua mostrando
+      // só o motivo de bloqueio, sem ruído do pré-requisito por cima).
+      if (!motivo || o.bloqueado) return o;
+      return { ...o, resumo: `⚠ ${motivo}${o.resumo ? ` · ${o.resumo}` : ''}` };
+    });
+  montarSeletor(document.getElementById('add-talento-lista'), {
+    opcoes: opcoesTalento,
+    densidade: 'densa', max: 1, busca: true,
+    // Rótulos idênticos a `talento.categoria` (ver mesmo achado em
+    // levelup-ui.js/bindEventosASI).
+    filtros: ['de Origem', 'Geral', 'de Estilo de Luta', 'de Dádiva Épica'],
+    // Continua ligado: com o pré-requisito virando aviso (acima), a única
+    // razão de bloqueio que sobra nesta tela é "já possui" -- e essa
+    // continua correta e vale esconder atrás do "revelar" por padrão
+    // (declutter num catálogo de 75 talentos). Nada que o Mestre queira
+    // conceder fica escondido por isto: pré-requisito não atendido não é
+    // mais motivo de bloqueio, então nunca cai no grupo "travadas" que
+    // este filtro esconde -- só filtra o que realmente permanece proibido.
+    filtroElegiveis: true,
+    aoMudar: (sel) => { talentoEscolhido = sel[0] || ''; },
   });
 
   document.getElementById('btn-confirmar-add-talento')?.addEventListener('click', () => {
-    const nome = document.getElementById('add-tal-nome')?.value;
+    const nome = talentoEscolhido;
     if (!nome) { toast('Selecione um talento', 'error'); return; }
     const talento = encontrarTalento(nome);
     if (nome === 'Iniciado em Magia') {
@@ -679,18 +724,36 @@ export async function abrirModalAdicionarTalento() {
       <div class="info-box info" style="font-size:0.8rem">Preencha todas as escolhas obrigatórias de ${nome}.</div>
       ${renderEscolhasTalento(nome, talento, ctxTalento, {})}
     `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-confirmar-add-talento-asi">Adicionar</button>');
-    bindEscolhasTalento(nome, talento, ctxTalento);
+    // Mestre das Armas / Tocado Por Fadas / Tocado Pelas Sombras viraram
+    // cards (montarSeletor) dentro de renderEscolhasTalento/bindEscolhasTalento
+    // (levelup-ui.js, Task 14) -- a escolha é gravada pelo callback `aoMudar`
+    // no objeto passado como `state`, não mais lida de um <select> com classe
+    // `.escolha-talento-levelup`/id `levelup-magia-escola-select` (que não
+    // existem mais para estes três talentos). Sem passar este objeto, a
+    // mutação do callback iria para um `{}` descartável (o padrão de
+    // `state = {}` do parâmetro) e o botão abaixo nunca veria a escolha.
+    const escolhaCard = { escolhasTalento: [] };
+    bindEscolhasTalento(nome, talento, ctxTalento, escolhaCard);
 
     let confirmado = false;
     document.getElementById('btn-confirmar-add-talento-asi')?.addEventListener('click', () => {
       if (confirmado) return;
       const atributo = document.getElementById('levelup-talento-asi')?.value || '';
-      const selecoes = [...document.querySelectorAll('.escolha-talento-levelup')]
-        .map(select => select.value)
-        .filter(Boolean);
-      const magia = document.getElementById('levelup-magia-escola-select')?.value || '';
-      const rituais = [...document.querySelectorAll('.levelup-ritual-check:checked')]
-        .map(input => input.value);
+      const talentosViraramCard = ['Mestre das Armas', 'Tocado Por Fadas', 'Tocado Pelas Sombras', 'Conjurador Ritualista'];
+      const selecoes = talentosViraramCard.includes(nome)
+        ? (escolhaCard.escolhasTalento || [])
+        : [...document.querySelectorAll('.escolha-talento-levelup')].map(select => select.value).filter(Boolean);
+      const magia = (nome === 'Tocado Por Fadas' || nome === 'Tocado Pelas Sombras')
+        ? (escolhaCard.escolhasTalento?.[0] || '')
+        : (document.getElementById('levelup-magia-escola-select')?.value || '');
+      // Conjurador Ritualista: as magias rituais viraram cards de
+      // montarSeletor (levelup-ui.js/bindEscolhasTalento), que gravam em
+      // `escolhaCard.escolhasTalento`. Os checkboxes `.levelup-ritual-check`
+      // não existem mais -- lê-los devolveria [] e o talento seria gravado
+      // sem magia nenhuma, em silêncio.
+      const rituais = nome === 'Conjurador Ritualista'
+        ? [...(escolhaCard.escolhasTalento || [])]
+        : [];
       const energias = [...document.querySelectorAll('.dadiva-energia-escolha')]
         .map(select => select.value)
         .filter(Boolean);

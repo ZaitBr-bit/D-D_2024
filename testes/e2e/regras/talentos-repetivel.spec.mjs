@@ -61,19 +61,29 @@ for (const { nome, esperaOfertado } of CASOS) {
 
     // Prova que a lista de talentos do level-up REALMENTE carregou antes de
     // ler o caso específico -- sem isso, um erro ao montar a lista (ex.:
-    // exceção no meio do cálculo de elegibilidade) deixaria o select VAZIO
-    // para QUALQUER talento, e o caso "Alerta não reaparece" passaria por
-    // um motivo totalmente errado (select quebrado, não regra de
-    // repetibilidade cumprida).
-    const totalOpcoes = await page.locator('#levelup-talento-select option').count();
+    // exceção no meio do cálculo de elegibilidade) deixaria a lista de
+    // cards VAZIA para QUALQUER talento, e o caso "Alerta não reaparece"
+    // passaria por um motivo totalmente errado (lista quebrada, não regra
+    // de repetibilidade cumprida).
+    const totalOpcoes = await page.locator('#levelup-talento-lista .opcao-card').count();
     expect(totalOpcoes,
-      'select de talentos do level-up não ofereceu NENHUMA opção -- suspeita de falha ao montar ' +
+      'lista de talentos do level-up não ofereceu NENHUM card -- suspeita de falha ao montar ' +
       'a lista, não confirma nada sobre repetibilidade').toBeGreaterThan(0);
 
-    const oferta = await page
-      .locator(`#levelup-talento-select option[value="${nome}"]`).count();
-    expect(oferta > 0,
+    // Um repetível já possuído tem de aparecer SELECIONÁVEL (não bloqueado)
+    // -- deTalentos (opcoes-dominio.js) trata "Repetível" como exceção ao
+    // bloqueio por "já possui" (Task 13); um `.opcao-card` bloqueado não
+    // teria `data-opcao` de seleção, mas o motivo real é a ausência de
+    // `.bloqueada` na classe, checada abaixo.
+    const card = page.locator(`#levelup-talento-lista .opcao-card[data-opcao="${nome}"]`);
+    const oferta = (await card.count()) > 0;
+    expect(oferta,
       `${nome}: livro diz repetível=${esperaOfertado}, lista de talentos diz o contrário`)
       .toBe(esperaOfertado);
+    if (oferta) {
+      expect(await card.evaluate((el) => el.classList.contains('bloqueada')),
+        `${nome}: repetível já possuído reapareceu, mas como card bloqueado -- não dá para escolher de novo`)
+        .toBe(false);
+    }
   });
 }

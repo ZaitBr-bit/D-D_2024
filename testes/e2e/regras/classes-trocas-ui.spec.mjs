@@ -28,6 +28,12 @@
 // clique pode chegar antes do listener estar pronto. Corrigido importando
 // `abrirModalLevelUp` (o helper COMPARTILHADO, endurecido) em vez de uma
 // terceira cópia.
+//
+// Task 10 (2026-08-12): a Troca de Estilo de Luta trocou os dois <select>
+// "de"/"para" por montarTroca (ui-opcoes.js/opcoes-dominio.js) -- o teste de
+// troca abaixo foi reescrito para dirigir os cards novos (#lvlup-estilo-
+// luta-troca, botão [data-troca-um], grade .opcao-card[data-opcao]) em vez
+// de .selectOption() nos selects antigos, que não existem mais.
 // ============================================================
 import { test, expect } from '@playwright/test';
 import { abrirFicha, personagemSalvo, abrirModalLevelUp } from './helpers-regras.mjs';
@@ -72,18 +78,27 @@ test('level-up: troca de Estilo de Luta do Guerreiro funciona de ponta a ponta n
   await abrirLevelUpEIrParaRevisao(page);
 
   // O card "Trocar Estilo de Luta (opcional)" precisa estar presente --
-  // se não estiver, o resto do teste não prova nada.
-  const cardDe = page.locator('#lvlup-estilo-luta-trocar-de');
-  await expect(cardDe, 'card de troca de Estilo de Luta não apareceu na Revisão').toHaveCount(1);
+  // se não estiver, o resto do teste não prova nada. Desde a Task 10, é
+  // montado por montarTroca (ui-opcoes.js): passo 1 mostra o estilo atual
+  // como card de apresentação (item único, "sai" tem 1 opção só) com o
+  // botão "Trocar este"; passo 2 só aparece depois do clique.
+  const trocaContainer = page.locator('#lvlup-estilo-luta-troca');
+  await expect(trocaContainer, 'card de troca de Estilo de Luta não apareceu na Revisão').toHaveCount(1);
 
-  const cardPara = page.locator('#lvlup-estilo-luta-trocar-para');
-  await expect(cardPara, 'select "para" deveria nascer desabilitado (nenhuma troca escolhida ainda)').toBeDisabled();
+  const cardAtual = trocaContainer.locator('.opcao-card', { hasText: 'Defensivo' });
+  await expect(cardAtual, 'card de apresentação do estilo atual (Defensivo) não apareceu').toHaveCount(1);
 
-  // Escolhe o estilo de origem -- isso deve HABILITAR o select "para".
-  await cardDe.selectOption('Defensivo');
-  await expect(cardPara, 'select "para" deveria habilitar depois de escolher "de" -- ' +
-    'se continuar desabilitado, o listener de levelup-ui.js não ligou (o bug da revisão final)').toBeEnabled();
-  await cardPara.selectOption('Duelismo');
+  const passoEntra = trocaContainer.locator('#troca-passo-entra');
+  await expect(passoEntra, 'passo 2 (novo estilo) não deveria estar visível antes de "Trocar este"').toBeHidden();
+
+  // Clica em "Trocar este" -- isso deve REVELAR o passo 2 com a grade dos
+  // outros estilos.
+  await trocaContainer.locator('[data-troca-um]').click();
+  await expect(passoEntra, 'passo 2 (novo estilo) deveria aparecer depois de "Trocar este" -- ' +
+    'se continuar oculto, o listener de montarTroca não ligou').toBeVisible();
+
+  // Escolhe "Duelismo" na grade do passo 2.
+  await passoEntra.locator('.opcao-card[data-opcao="Duelismo"]').click();
 
   await page.locator('#btn-confirmar-levelup').click();
   await page.waitForTimeout(600);

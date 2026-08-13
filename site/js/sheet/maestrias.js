@@ -5,6 +5,8 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { abrirModal, escHtml, semAcento, toast } from '../utils.js';
+import { deArmas } from '../opcoes-dominio.js';
+import { montarTroca } from '../ui-opcoes.js';
 import { getProgressaoBarbaro } from './classes/barbaro.js';
 import { getProgressaoGuerreiro } from './classes/guerreiro.js';
 import { char, passivosTalentosCache, salvar } from './estado.js';
@@ -169,7 +171,8 @@ export async function abrirModalTrocaMaestriaDescanso(callbackPosTroca = null) {
 
   const dados = await carregarDadosEquipSheet();
   const todasArmas = dados?.armas || [];
-  // Filtrar armas disponiveis conforme classe
+  // Filtrar armas disponiveis conforme classe -- mantém os objetos completos
+  // (nao só o nome): deArmas precisa de dano/propriedades/maestria de cada uma.
   const armasDisponiveis = todasArmas
     .filter(a => {
       const cat = (a.categoria || '').toLowerCase();
@@ -179,78 +182,51 @@ export async function abrirModalTrocaMaestriaDescanso(callbackPosTroca = null) {
       if (char.classe === 'Bárbaro') return cat.includes('corpo a corpo');
       return true;
     })
-    .map(a => a.nome)
-    .filter(n => !atuais.includes(n))
-    .sort((a, b) => a.localeCompare(b));
+    .sort((a, b) => a.nome.localeCompare(b.nome));
 
   let armaTrocar = '';
   let armaSubstituta = '';
 
-  const renderConteudo = () => {
-    return `
-      <p style="font-size:0.85rem;margin-bottom:12px">
-        Como ${escHtml(char.classe)}, você pode trocar <strong>uma</strong> escolha de maestria por Descanso Longo.
-      </p>
-      <div style="margin-bottom:12px">
-        <label class="form-label" style="font-size:0.85rem">Qual arma deseja remover?</label>
-        <select id="maestria-remover" class="form-input" style="font-size:0.85rem">
-          <option value="">-- Selecionar --</option>
-          ${atuais.map(n => `<option value="${n}" ${armaTrocar === n ? 'selected' : ''}>${n}</option>`).join('')}
-        </select>
-      </div>
-      <div>
-        <label class="form-label" style="font-size:0.85rem">Qual arma adicionar no lugar?</label>
-        <input type="text" id="maestria-filtro-nova" class="form-input" placeholder="Buscar arma..." style="font-size:0.85rem;margin-bottom:6px">
-        <div style="max-height:30vh;overflow:auto;border:1px solid var(--border-light);border-radius:8px;padding:8px" id="maestria-nova-lista">
-          ${armasDisponiveis.map(n => `
-            <label class="form-check" style="justify-content:flex-start;margin:0 0 4px 0">
-              <input type="radio" name="maestria-nova" value="${n}" ${armaSubstituta === n ? 'checked' : ''}>
-              ${n}
-            </label>
-          `).join('')}
-        </div>
-      </div>
-      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:8px">
-        Maestrias atuais: ${atuais.join(', ')}
-      </div>
-    `;
-  };
+  // Troca de maestria: as duas pontas são armas, e o que decide a escolha
+  // (dano, propriedades, qual maestria a arma concede) só existia no JSON.
+  const renderConteudo = () => `
+    <p style="font-size:0.85rem;margin-bottom:12px">
+      Como ${escHtml(char.classe)}, você pode trocar <strong>uma</strong> escolha de maestria por Descanso Longo.
+    </p>
+    <div id="maestria-troca"></div>
+  `;
 
   abrirModal(`Trocar Maestria (${escHtml(char.classe)})`, renderConteudo(),
-    '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-confirmar-troca-maestria">Trocar</button>'
-  );
+    '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>'
+    + '<button class="btn btn-primary" id="btn-confirmar-troca-maestria">Trocar</button>');
 
-  // Filtrar lista ao digitar
-  document.getElementById('maestria-filtro-nova')?.addEventListener('input', (e) => {
-    const termo = semAcento(e.target.value || '');
-    const lista = document.getElementById('maestria-nova-lista');
-    if (!lista) return;
-    const filtradas = termo.length >= 2
-      ? armasDisponiveis.filter(n => semAcento(n).includes(termo))
-      : armasDisponiveis;
-    lista.innerHTML = filtradas.map(n => `
-      <label class="form-check" style="justify-content:flex-start;margin:0 0 4px 0">
-        <input type="radio" name="maestria-nova" value="${n}" ${armaSubstituta === n ? 'checked' : ''}>
-        ${n}
-      </label>
-    `).join('');
+  const descricoesMaestria = new Map(
+    (dados.propriedadesArmas || []).map(p => [p.nome, p.descricao]));
+  montarTroca(document.getElementById('maestria-troca'), {
+    sai: {
+      rotulo: 'Qual arma deseja remover?',
+      opcoes: deArmas(todasArmas.filter(a => atuais.includes(a.nome)), { descricoesMaestria }),
+    },
+    entra: {
+      rotulo: 'Qual arma adicionar no lugar?',
+      busca: true,
+      opcoes: deArmas(armasDisponiveis, { jaTem: new Set(atuais), descricoesMaestria }),
+    },
+    aoMudar: ({ sai, entra }) => { armaTrocar = sai; armaSubstituta = entra; },
   });
 
   document.getElementById('btn-confirmar-troca-maestria')?.addEventListener('click', () => {
-    const remover = document.getElementById('maestria-remover')?.value;
-    const nova = document.querySelector('input[name="maestria-nova"]:checked')?.value;
-
-    if (!remover || !nova) {
+    if (!armaTrocar || !armaSubstituta) {
       toast('Selecione a arma a remover e a arma substituta.', 'error');
       return;
     }
 
-    const novaLista = atuais.filter(n => n !== remover);
-    novaLista.push(nova);
+    const novaLista = atuais.filter(n => n !== armaTrocar);
+    novaLista.push(armaSubstituta);
     char.maestrias_arma = novaLista.sort((a, b) => a.localeCompare(b));
     salvar();
     window.fecharModal();
-    toast(`Maestria trocada: ${remover} → ${nova}`, 'success');
+    toast(`Maestria trocada: ${armaTrocar} → ${armaSubstituta}`, 'success');
     renderFichaCompleta();
     // Encadear próxima ação (ex.: troca de magias após maestria)
     if (callbackPosTroca) callbackPosTroca();

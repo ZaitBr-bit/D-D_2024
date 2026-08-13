@@ -754,15 +754,15 @@ export function setupEventosHabilidades() {
             Selecionadas: <strong>${selSet.size}</strong> / ${maxMeta}
             ${selSet.size > maxMeta ? '<span style="color:var(--danger)"> (excedido!)</span>' : ''}
           </div>`;
-          html += `<div class="magias-grid">${OPCOES_METAMAGIA.map(o => {
+          html += `<div class="opcao-grid densa">${OPCOES_METAMAGIA.map(o => {
             const sel = selSet.has(o.nome);
             const cheio = selSet.size >= maxMeta && !sel;
             return `
-              <div class="magia-card ${sel ? 'selecionada' : ''}"
+              <div class="opcao-card ${sel ? 'selecionada' : ''}"
                    data-meta-info="${o.nome}" title="Ver descricao" style="${cheio ? 'opacity:0.35;' : ''}cursor:pointer;">
-                <span class="magia-card-check" data-meta-toggle="${o.nome}" title="${sel ? 'Remover selecao' : 'Selecionar'}"></span>
-                <div class="magia-card-nome">${o.nome}</div>
-                <div class="magia-card-meta">
+                <span class="opcao-check" data-meta-toggle="${o.nome}" title="${sel ? 'Remover selecao' : 'Selecionar'}"></span>
+                <div class="opcao-nome">${o.nome}</div>
+                <div class="opcao-resumo">
                   <span style="font-size:0.65rem">${o.custo} PF</span>
                 </div>
               </div>`;

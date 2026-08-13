@@ -6,6 +6,7 @@ import { CLASSES_INFO } from '../dados-classes.js';
 import { getClasse } from '../db.js';
 import { abrirModal, mdParaHtml, toast } from '../utils.js';
 import { CLASSES_ESCOLHAS, NIVEL_SUBCLASSE } from './comum.js';
+import { rotuloPericia } from '../opcoes-dominio.js';
 import { dadosCache, personagem } from './wizard.js';
 
 // ============================================================
@@ -35,15 +36,15 @@ export function renderStepClasse(el) {
 
   el.innerHTML = `
     <h3 style="margin-bottom:12px">Escolha sua Classe</h3>
-    <div class="selection-grid" id="grid-classes">
+    <div class="opcao-grid ampla" id="grid-classes">
       ${classes.map(c => {
         const info = CLASSES_INFO[c];
         return `
-          <div class="selection-card ${personagem.classe === c ? 'selected' : ''}" data-classe="${c}">
-            <span class="card-check">&#10003;</span>
-            <div class="card-nome">${c}</div>
-            <div class="card-detalhe">d${info.dado_vida} &middot; ${info.atributo_primario}</div>
-            <div class="card-detalhe">${info.conjurador ? 'Conjurador' : 'Marcial'}</div>
+          <div class="opcao-card ${personagem.classe === c ? 'selecionada' : ''}" data-classe="${c}">
+            <span class="opcao-check"></span>
+            <div class="opcao-nome">${c}</div>
+            <div class="opcao-resumo">d${info.dado_vida} &middot; ${info.atributo_primario}</div>
+            <div class="opcao-resumo">${info.conjurador ? 'Conjurador' : 'Marcial'}</div>
           </div>`;
       }).join('')}
     </div>
@@ -107,10 +108,10 @@ async function abrirPopupClasse(nome) {
           <div class="info-box info" style="font-size:0.85rem">${config.descricao}</div>
           <div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0" id="escolha-${chave}">
             ${periciasDaClasse.map(p => `
-              <div class="selection-card ${selecionados.includes(p) ? 'selected' : ''}"
+              <div class="opcao-card ${selecionados.includes(p) ? 'selecionada' : ''}"
                    data-escolha-classe="${chave}" data-opcao="${p}"
                    style="flex:1;min-width:120px;max-width:180px;cursor:pointer">
-                <div class="card-nome" style="font-size:0.85rem">${p}</div>
+                <div class="opcao-nome" style="font-size:0.85rem">${rotuloPericia(p)}</div>
               </div>
             `).join('')}
           </div>
@@ -123,10 +124,10 @@ async function abrirPopupClasse(nome) {
           <div class="info-box info" style="font-size:0.85rem">${config.descricao}</div>
           <div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0" id="escolha-${chave}">
             ${opcoes.map(p => `
-              <div class="selection-card ${selecionados.includes(p) ? 'selected' : ''}"
+              <div class="opcao-card ${selecionados.includes(p) ? 'selecionada' : ''}"
                    data-escolha-classe="${chave}" data-opcao="${p}"
                    style="flex:1;min-width:120px;max-width:180px;cursor:pointer">
-                <div class="card-nome" style="font-size:0.85rem">${p}</div>
+                <div class="opcao-nome" style="font-size:0.85rem">${rotuloPericia(p)}</div>
               </div>
             `).join('')}
           </div>
@@ -137,11 +138,11 @@ async function abrirPopupClasse(nome) {
           <div class="info-box info" style="font-size:0.85rem">${config.descricao}</div>
           <div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0" id="escolha-${chave}">
             ${(config.opcoes || []).map(opt => `
-              <div class="selection-card ${selecionados.includes(opt.nome) ? 'selected' : ''}"
+              <div class="opcao-card ${selecionados.includes(opt.nome) ? 'selecionada' : ''}"
                    data-escolha-classe="${chave}" data-opcao="${opt.nome}"
                    style="flex:1;min-width:140px;max-width:200px;cursor:pointer">
-                <div class="card-nome" style="font-size:0.85rem">${opt.nome}</div>
-                ${opt.descricao ? `<div class="card-detalhe" style="font-size:0.75rem">${opt.descricao}</div>` : ''}
+                <div class="opcao-nome" style="font-size:0.85rem">${opt.nome}</div>
+                ${opt.descricao ? `<div class="opcao-resumo" style="font-size:0.75rem">${opt.descricao}</div>` : ''}
               </div>
             `).join('')}
           </div>
@@ -237,7 +238,7 @@ async function abrirPopupClasse(nome) {
 
         // Atualizar visual
         document.querySelectorAll(`[data-escolha-classe="${chave}"]`).forEach(c => {
-          c.classList.toggle('selected', selecionados.includes(c.dataset.opcao));
+          c.classList.toggle('selecionada', selecionados.includes(c.dataset.opcao));
         });
       });
     });

@@ -22,7 +22,7 @@ export function abrirGridManobras(titulo, maxSel, opcoes, selSet, aoMudar) {
       <span style="font-size:0.85rem;color:var(--text-muted)">Selecionadas: <strong id="grid-manobra-sel-count">${selSet.size}</strong>/${maxSel}</span>
       <div class="search-box" style="flex:1;margin-left:12px"><input type="text" id="grid-manobra-busca" placeholder="Buscar..." class="form-input" style="padding:6px 10px;font-size:0.85rem"></div>
     </div>
-    <div style="max-height:55vh;overflow-y:auto"><div class="magias-grid" id="grid-manobras"></div></div>
+    <div style="max-height:55vh;overflow-y:auto"><div class="opcao-grid densa" id="grid-manobras"></div></div>
   `;
   abrirModal(titulo, conteudo, '<button class="btn btn-secondary" onclick="fecharModal()">Confirmar Seleção</button>');
 
@@ -37,10 +37,10 @@ export function abrirGridManobras(titulo, maxSel, opcoes, selSet, aoMudar) {
       const sel = selSet.has(m.nome);
       const bloqueado = cheio && !sel;
       return `
-        <div class="magia-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}" style="${bloqueado ? 'opacity:0.35;cursor:default' : ''}">
-          <span class="magia-card-check" data-grid-manobra-check="${m.nome}"></span>
-          <div class="magia-card-nome">${m.nome}</div>
-          <div class="magia-card-meta" style="font-size:0.7rem;color:var(--text-muted)">${m.descricao}</div>
+        <div class="opcao-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'bloqueada' : ''}" style="${bloqueado ? 'opacity:0.35;cursor:default' : ''}">
+          <span class="opcao-check" data-grid-manobra-check="${m.nome}"></span>
+          <div class="opcao-nome">${m.nome}</div>
+          <div class="opcao-resumo" style="font-size:0.7rem;color:var(--text-muted)">${m.descricao}</div>
         </div>`;
     }).join('');
 

@@ -234,9 +234,9 @@ export function renderStepDetalhes(el) {
           { valor: 'NM', label: 'Neutro e Mau' },
           { valor: 'CM', label: 'Caotico e Mau' }
         ].map(a => `
-          <div class="selection-card ${personagem.alinhamento === a.valor ? 'selected' : ''}" data-alinhamento="${a.valor}" style="cursor:pointer;text-align:center;padding:8px 4px">
-            <div class="card-nome" style="font-size:0.8rem">${a.label}</div>
-            <div class="card-detalhe" style="font-size:0.7rem;color:var(--text-muted)">${a.valor}</div>
+          <div class="opcao-card ${personagem.alinhamento === a.valor ? 'selecionada' : ''}" data-alinhamento="${a.valor}" style="cursor:pointer;text-align:center;padding:8px 4px">
+            <div class="opcao-nome" style="font-size:0.8rem">${a.label}</div>
+            <div class="opcao-resumo" style="font-size:0.7rem;color:var(--text-muted)">${a.valor}</div>
           </div>
         `).join('')}
       </div>
@@ -342,7 +342,7 @@ export function renderStepDetalhes(el) {
       const valor = card.dataset.alinhamento;
       personagem.alinhamento = valor;
       document.querySelectorAll('[data-alinhamento]').forEach(c => {
-        c.classList.toggle('selected', c.dataset.alinhamento === valor);
+        c.classList.toggle('selecionada', c.dataset.alinhamento === valor);
       });
     });
   });

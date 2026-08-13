@@ -7,6 +7,7 @@
 // ============================================================
 import { CLASSES_INFO, PERICIAS } from '../dados-classes.js';
 import { mdParaHtml } from '../utils.js';
+import { rotuloPericia } from '../opcoes-dominio.js';
 import { dadosCache, personagem } from './wizard.js';
 
 // Espécies que exigem seleção entre traços/linhagens
@@ -260,7 +261,7 @@ export function renderEscolhasTalentoHtml(talentoNome, contexto, extrasJaTem = [
       html += `<option value="">-- Escolha ${i + 1} --</option>`;
       html += `<optgroup label="Pericias">`;
       periciasList.forEach(p => {
-        html += `<option value="${p}" ${valorAtual === p ? 'selected' : ''}>${p}</option>`;
+        html += `<option value="${p}" ${valorAtual === p ? 'selected' : ''}>${rotuloPericia(p)}</option>`;
       });
       html += `</optgroup><optgroup label="Ferramentas">`;
       ferramentasList.forEach(f => {

@@ -75,3 +75,6 @@ site/.cache/
 # Notas:
 # - Ajuste este arquivo conforme seus fluxos (por exemplo, remova `site/.cache/` se você realmente deseja versionar cache).
 # - Para aplicar o .gitignore a arquivos já comitados: execute os comandos sugeridos abaixo.
+
+# Rascunho das skills (mockups de brainstorming, ledger e pacotes de revisão)
+.superpowers/

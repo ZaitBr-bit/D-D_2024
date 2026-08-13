@@ -9,6 +9,7 @@
 // ============================================================
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ATRIBUTO_NOME_PARA_KEY, CLASSES_INFO, PERICIAS, POINT_BUY_CUSTOS, POINT_BUY_TOTAL, STANDARD_ARRAY } from '../dados-classes.js';
 import { bonusProficiencia, calcMod, fmtMod } from '../utils.js';
+import { rotuloPericia } from '../opcoes-dominio.js';
 import { consolidarPericiasProficientes, periciasDeOutrasFontes } from './comum.js';
 import { dadosCache, personagem } from './wizard.js';
 
@@ -285,7 +286,7 @@ function renderPericiasSeletor() {
         const desabilitada = !sel && dadosCache.pericias_classe_sel.length >= maxSel;
         return `<label class="chip ${sel ? 'selected' : ''}" data-pericia="${p}">
           <input type="checkbox" style="display:none" value="${p}" ${sel ? 'checked' : ''} ${desabilitada ? 'disabled' : ''}>
-          ${p}
+          ${rotuloPericia(p)}
         </label>`;
       }).join('')}
     </div>

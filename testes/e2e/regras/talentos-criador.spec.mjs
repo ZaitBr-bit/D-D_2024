@@ -270,14 +270,13 @@ test('criador: Versátil (Humano) concede Habilidoso com escolhas', async ({ con
   expect(opcoesPericia.length, 'select da perícia de Hábil não ofereceu opções').toBeGreaterThan(0);
   await page.selectOption('#select-pericia-especie', opcoesPericia[0]);
 
-  // O combo de talentos de Versátil é populado ASSINCRONAMENTE (getTalentos,
-  // passo-especie.js:304-317) -- espera a opção existir antes de selecionar.
-  // `state: 'attached'`, não o padrão 'visible': um `<option>` dentro de um
-  // `<select>` fechado é sempre reportado como "hidden" pelo Playwright,
-  // mesmo já presente no DOM -- esperar 'visible' aqui nunca resolveria.
-  await page.waitForSelector('#select-talento-versatil option[value="Habilidoso"]',
-    { state: 'attached', timeout: 10_000 });
-  await page.selectOption('#select-talento-versatil', 'Habilidoso');
+  // A lista de talentos de Versátil é populada ASSINCRONAMENTE (getTalentos,
+  // passo-especie.js) -- espera o card existir antes de clicar (Task 13: o
+  // antigo `<select id="select-talento-versatil">` virou cards de
+  // montarSeletor dentro de `#versatil-talento-lista`).
+  const cardHabilidoso = page.locator('#versatil-talento-lista .opcao-card[data-opcao="Habilidoso"]');
+  await cardHabilidoso.waitFor({ state: 'visible', timeout: 10_000 });
+  await cardHabilidoso.click();
   await page.waitForTimeout(300);
 
   // 1. Escolher Habilidoso no combo injeta os 3 selects de escolha do
@@ -323,6 +322,95 @@ test('criador: Versátil (Humano) concede Habilidoso com escolhas', async ({ con
   expect(persistido,
     `Habilidoso via Versátil: escolhas ${JSON.stringify(escolhidos)} não persistiram em ` +
     'personagem.escolhas_talento.versatil').toEqual([...escolhidos].sort());
+
+  expect(erros).toEqual([]);
+});
+
+// ---- Regressão do Critical C1 (revisão da Task 13) ----------------------
+//
+// O teste de Habilidoso acima NÃO pega este defeito por dois motivos: (1)
+// ele nunca reabre o popup depois de confirmar -- e o bug só aparece ao
+// REABRIR; (2) Habilidoso é Repetível, e é exatamente essa marca que o
+// isenta do bloqueio (achado 3 da entrega original desta task). O defeito
+// atingia 8 dos 10 talentos "de Origem" (todos MENOS os dois Repetíveis,
+// Habilidoso e Iniciado em Magia): `jaPossui` (site/js/creator/
+// passo-especie.js) incluía o PRÓPRIO `talento_versatil` já confirmado
+// (via `personagem.talentos`, preenchido por `_reconstruirTalentosBase`),
+// então reabrir o popup fazia o talento se bloquear sozinho -- o card
+// nascia cinza, sem nada marcado, `pointer-events:none` (não dava pra
+// clicar de novo), e o `aoMudar` automático da montagem apagava
+// `personagem.talento_versatil`/`escolhas_talento.versatil` em silêncio.
+// "Alerta" (sem prerequisito, sem escolhas, "de Origem") isola o defeito
+// sem nenhum ruído de talento com sub-escolhas.
+test('criador: Versátil (Humano) com talento NÃO repetível sobrevive a reabrir o popup', async ({ context }) => {
+  const { page, erros } = await abrirSite(context, '#criar');
+  expect(await irAteEspecies(page), 'não chegou ao passo de espécie').toBe(true);
+
+  await page.click('[data-especie="Humano"]');
+  await page.waitForTimeout(400);
+  const opcoesPericia = await page.locator('#select-pericia-especie option')
+    .evaluateAll((ops) => ops.map((o) => o.value).filter(Boolean));
+  await page.selectOption('#select-pericia-especie', opcoesPericia[0]);
+
+  const cardAlerta = page.locator('#versatil-talento-lista .opcao-card[data-opcao="Alerta"]');
+  await cardAlerta.waitFor({ state: 'visible', timeout: 10_000 });
+  await cardAlerta.click();
+  await page.waitForTimeout(200);
+  await page.click('#popup-confirmar-especie');
+  await page.waitForTimeout(300);
+  expect(await page.locator('#modal-overlay').isVisible(),
+    'Alerta via Versátil: modal não fechou na primeira confirmação').toBe(false);
+
+  const primeiraVez = await personagemEmCriacao(page);
+  expect(primeiraVez?.talento_versatil, 'Alerta não persistiu em talento_versatil na 1ª confirmação')
+    .toBe('Alerta');
+
+  // REABRE clicando de novo em "Humano" -- o mesmo card, mesmo fluxo que um
+  // jogador usaria para revisar ou trocar a escolha da espécie.
+  await page.click('[data-especie="Humano"]');
+  await page.waitForTimeout(400);
+  await cardAlerta.waitFor({ state: 'visible', timeout: 10_000 });
+  await page.waitForTimeout(200);
+
+  // 1. O card NÃO pode estar bloqueado (era aqui que o C1 quebrava: o
+  // próprio talento_versatil confirmado entrava em `jaPossui`).
+  expect(await cardAlerta.evaluate((el) => el.classList.contains('bloqueada')),
+    'Alerta apareceu bloqueado ao reabrir -- ele bloqueou a SI MESMO (C1)').toBe(false);
+  // 2. E tem que continuar marcado como selecionado (a escolha sobreviveu
+  // à remontagem do card, não só "não está bloqueada").
+  expect(await cardAlerta.evaluate((el) => el.classList.contains('selecionada')),
+    'Alerta não apareceu selecionado ao reabrir -- a escolha se perdeu (C1)').toBe(true);
+
+  // 3. De verdade reselecionável: um card bloqueado por C1 tinha
+  // `pointer-events:none` e um clique nele não fazia nada -- aqui um
+  // clique tem que desmarcar (max:1, clicar de novo no já selecionado
+  // desmarca) e confirmar sem nada marcado tem que voltar a recusar.
+  await cardAlerta.click();
+  await page.waitForTimeout(150);
+  expect(await cardAlerta.evaluate((el) => el.classList.contains('selecionada')),
+    'clicar em Alerta (já selecionado) não desmarcou -- sinal de bloqueio residual').toBe(false);
+  await page.click('#popup-confirmar-especie').catch(() => {});
+  await page.waitForSelector('#toast-container .toast.error', { timeout: 3000 }).catch(() => {});
+  const toastSemEscolha = await lerToastErro(page);
+  expect(toastSemEscolha, 'confirmou sem nenhum Talento de Origem marcado')
+    .toContain('Talento de Origem');
+
+  // Reseleciona e confirma de novo, pra fechar o roteiro com o personagem
+  // num estado consistente (sem duplicar "Alerta" em `talentos`).
+  await cardAlerta.click();
+  await page.waitForTimeout(150);
+  const opcoesPericia2 = await page.locator('#select-pericia-especie option')
+    .evaluateAll((ops) => ops.map((o) => o.value).filter(Boolean));
+  await page.selectOption('#select-pericia-especie', opcoesPericia2[0]);
+  await page.click('#popup-confirmar-especie');
+  await page.waitForTimeout(300);
+
+  const segundaVez = await personagemEmCriacao(page);
+  expect(segundaVez?.talento_versatil, 'Alerta não persistiu na 2ª confirmação (pós-reabertura)')
+    .toBe('Alerta');
+  const ocorrencias = (segundaVez?.talentos || []).filter((t) => t === 'Alerta').length;
+  expect(ocorrencias, `"Alerta" apareceu ${ocorrencias}x em personagem.talentos -- esperado 1x`)
+    .toBe(1);
 
   expect(erros).toEqual([]);
 });

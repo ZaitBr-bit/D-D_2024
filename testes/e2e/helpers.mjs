@@ -112,6 +112,56 @@ export async function geometria(page, seletores) {
  * app recusa a confirmacao com um toast e mantem o modal aberto. Aqui a
  * gente escolhe a primeira opcao ainda nao marcada de cada grupo e tenta de
  * novo, ate o modal fechar -- que e o que um jogador faria.
+ *
+ * EXCLUSOES -- achado da Rodada 2 de correcao da Task 9 (I4): este e o
+ * MESMO bloco CARDS de `preencherTela()`, com a MESMA vulnerabilidade
+ * (clicar no card inteiro quando o handler vive num filho com
+ * `stopPropagation`) -- mas so `preencherTela()` tinha sido corrigida.
+ * Repete aqui as mesmas exclusoes, caso algum modal de magia/manobra/
+ * invocacao venha a ser fechado por esta funcao em vez de
+ * `resolverModalAberto()`.
+ * `:not(#metamagia-grid *)` -- achado da Rodada 3: a migracao do I5 (grade
+ * de Metamagia do Feiticeiro, `habilidades.js`) criou um SEXTO grid de
+ * `.opcao-card` sem guarda nenhuma. Pior que os outros: o card la tem
+ * `data-meta-info` com listener PROPRIO (abre um sub-modal de descricao),
+ * entao o clique generico nao seria inocuo -- empilharia um overlay e
+ * mudaria o alvo de `resolverModalAberto`.
+ * `:not(#troca-passo-entra *)` -- achado da Rodada 1 de correcao da Task 10
+ * (I1, critico): a grade do que ENTRA em `montarTroca` (ui-opcoes.js,
+ * id fixo `troca-passo-entra`, compartilhado por toda troca opcional --
+ * Estilo de Luta hoje, magia/truque/manobra/maestria nas proximas tarefas)
+ * so deve ser preenchida quando o JOGADOR (ou um teste dedicado) pede a
+ * troca. Sem esta exclusao, se a grade acabar visivel por qualquer caminho,
+ * o bloco generico abaixo a trata como escolha obrigatoria (`marcados ===
+ * 0`) e clica no primeiro item livre -- exercendo uma troca que ninguem
+ * pediu.
+ * `:not(#troca-passo-sai *)` -- achado da Task 12 (Rodada 1 de correcao):
+ * a exclusao acima protege so o passo 2 (o que ENTRA). O passo 1 (o que
+ * SAI, `troca-passo-sai`) so escapava dessa vulnerabilidade enquanto tinha
+ * exatamente 1 opcao -- ai `montarTroca` desenha um card de APRESENTACAO
+ * (`selecionavel: false`, sem `data-opcao`, sem handler de clique proprio;
+ * ver comentario em `ui-opcoes.js`), que este bloco generico ignora porque
+ * so reage a cards com `data-opcao`. Magia, truque e manobra (Task 12) sao
+ * os PRIMEIROS casos do app em que o "sai" tem VARIAS opcoes -- ai
+ * `montarTroca` usa `montarSeletor` de verdade para o passo 1, com cards
+ * `data-opcao` clicaveis de verdade. Reproduzido ao vivo: um Bardo
+ * subindo de nivel com magias preparadas ja elegiveis para troca,
+ * conduzido so pelo driver generico (sem tocar em nada de troca), tinha um
+ * card do passo 1 clicado sozinho (mesmo mecanismo do achado da Task 10:
+ * `marcados === 0` == escolha obrigatoria aos olhos deste bloco); como o
+ * passo 2 ja era excluido, a subida travava para sempre em "Escolha a
+ * magia substituta ou desmarque a troca" -- o driver nunca completava a
+ * troca que ele mesmo comecou, so a deixava pela metade. A causa raiz e a
+ * mesma da Task 10 (guarda escrita para o caso que estava a mao, nao para
+ * o componente inteiro) -- por isso a exclusao aqui e do WIDGET inteiro
+ * (os dois passos), nao so do passo 1: cobre de uma vez toda troca
+ * opcional futura tambem, sem depender de quantas opcoes o "sai" tem.
+ * LIMITE: as duas exclusoes juntas tiram TODA troca de `montarTroca` do
+ * alcance do driver generico. Isso so e seguro porque toda troca no app
+ * hoje e OPCIONAL (o jogador pode sempre "nao trocar"). Se algum dia uma
+ * escolha OBRIGATORIA passar a usar `montarTroca`, excluir o componente
+ * inteiro faria o driver travar em vez de progredir -- quem fizer isso
+ * precisa rever esta guarda (e a gemea em `preencherTela()`, mais abaixo).
  */
 export async function confirmarModal(page, idBotao, maxTentativas = 8) {
   for (let i = 0; i < maxTentativas; i++) {
@@ -124,8 +174,16 @@ export async function confirmarModal(page, idBotao, maxTentativas = 8) {
     const marcou = await page.evaluate(() => {
       const modal = document.getElementById('modal-corpo');
       if (!modal) return false;
-      for (const card of modal.querySelectorAll('.selection-card')) {
-        if (!card.classList.contains('selected')) { card.click(); return true; }
+      const CARDS = [
+        ['.opcao-card:not([data-grid-nome]):not(#grid-manobras *):not(#bruxo-inv-grid *)'
+          + ':not(#resultado-magias *):not(#resultado-troca *):not(#metamagia-grid *)'
+          + ':not(#troca-passo-sai *):not(#troca-passo-entra *)', 'selecionada'],
+      ];
+      for (const [seletor, marcado] of CARDS) {
+        for (const card of modal.querySelectorAll(seletor)) {
+          if (card.classList.contains('bloqueada') || card.dataset.cheio) continue;
+          if (!card.classList.contains(marcado)) { card.click(); return true; }
+        }
       }
       for (const sel of modal.querySelectorAll('select')) {
         if (!sel.value && sel.options.length > 1) {
@@ -158,8 +216,9 @@ export async function nosDois(lados, acao) {
  *    sem escolher nada;
  * 2. "a tela mudou" nao prova progresso -- na subclasse o botao AVANCA sem
  *    exigir a escolha, e a recusa so aparece na confirmacao final;
- * 3. VOCABULARIO -- a subclasse usa `.levelup-subclasse-card`/`selecionada`,
- *    e nao `.selection-card`/`selected` como o resto do app;
+ * 3. VOCABULARIO -- a subclasse usava `.levelup-subclasse-card`/`selecionada`,
+ *    e nao `.selection-card`/`selected` como o resto do app (hoje as duas
+ *    telas usam `.opcao-card`, unificadas pela Task 9 em diante);
  * 4. QUANTIDADE -- contar quantas opcoes marcar e adivinhacao. O sinal certo
  *    e o BOTAO DE CONFIRMAR: o app o habilita quando o requisito e cumprido.
  *    Marcar ate ele habilitar cobre "exatamente 1" (Academico) e "exatamente
@@ -184,7 +243,21 @@ export async function resolverModalAberto(page, maxTelas = 24) {
     for (let s = 0; s < 6; s++) {
       const abriu = await page.evaluate(() => {
         const corpo = document.getElementById('modal-corpo');
-        const b = [...(corpo?.querySelectorAll('button') ?? [])]
+        // `:not([data-troca-um])` -- achado da Rodada 1 de correcao da Task
+        // 10 (I1, critico): o botao "Trocar este" de `montarTroca`
+        // (ui-opcoes.js, caso "sai" com 1 opcao so, ex.: Troca de Estilo de
+        // Luta do Guerreiro) e um <button> comum, habilitado, sem overlay
+        // proprio -- encaixava no mesmo criterio usado para abrir botoes
+        // como "Grimorio: +2 Magias". Clicar nele EXERCE uma troca opcional
+        // que o driver nao pediu: o passo 1 (apresentacao do item atual)
+        // some do DOM, o passo 2 (grade do que entra) aparece vazio, e o
+        // bloco generico de `.opcao-card` em `preencherTela` (mais abaixo)
+        // via `marcados === 0` clicava no primeiro item livre da grade --
+        // trocando o Estilo de Luta do personagem sozinho, sem o jogador
+        // pedir e sem nenhum erro. `montarTroca` sera reusada por troca de
+        // magia/truque/manobra/maestria nas proximas tarefas; todas usam o
+        // mesmo atributo `data-troca-um`, entao a exclusao vale para todas.
+        const b = [...(corpo?.querySelectorAll('button:not([data-troca-um])') ?? [])]
           .find((x) => !x.disabled && !x.dataset.resolvido);
         if (!b) return false;
         b.dataset.resolvido = '1';
@@ -228,10 +301,14 @@ export async function resolverModalAberto(page, maxTelas = 24) {
     // nivel). Abrir botao antes disso era o erro da versao anterior: ela
     // clicava em TODOS os botoes do corpo, inclusive os opcionais como
     // "trocar truque", que criam exigencia nova ("Escolha o truque
-    // substituto ou desmarque a troca").
+    // substituto ou desmarque a troca"). Mesmo motivo do
+    // `:not([data-troca-um])` de cima (Rodada 1 da Task 10): sem essa
+    // exclusao, o fallback abaixo (`botoes.find(x => !x.dataset.resolvido)`)
+    // poderia cair no "Trocar este" quando o toast de erro nao bate com
+    // nenhum rotulo -- e essa troca e opcional, nunca a exigencia real.
     const abriu = await page.evaluate(() => {
       const corpo = document.getElementById('modal-corpo');
-      const botoes = [...(corpo?.querySelectorAll('button') ?? [])]
+      const botoes = [...(corpo?.querySelectorAll('button:not([data-troca-um])') ?? [])]
         .filter((x) => !x.disabled);
       if (!botoes.length) return false;
 
@@ -297,9 +374,95 @@ async function preencherTela(page, maxEscolhas = 30) {
         '#modal-acoes .btn-primary, #modal-acoes .btn-success, .btn-primary, .btn-success');
       const faltaAlgo = confirmar ? confirmar.disabled : true;
 
+      // `:not([data-grid-nome])` exclui a grade de selecao do level up
+      // (`abrirGridSelecao`, Task 9: migrou `.magia-card` -> `.opcao-card`).
+      // Sem excluir, este bloco generico capturaria os cards da grade ANTES
+      // do bloco especializado do `#grid-sel-count` mais abaixo, e clicaria
+      // no card INTEIRO -- que nao tem listener proprio (o handler vive no
+      // filho `[data-grid-check]`, com `stopPropagation`). O clique nao
+      // teria efeito nenhum, mas `livre.click(); return true;` mesmo assim
+      // reportaria "progresso", e a grade nunca fecharia a conta.
+      //
+      // Mesmo motivo para `:not(#grid-manobras *)` (grade de manobras do
+      // Mestre da Batalha, `abrirGridManobras` em manobras-ui.js, chamada
+      // por `levelup-ui.js` durante a subida) e `:not(#bruxo-inv-grid *)`
+      // (invocacoes do Bruxo, `abrirModalRecursosBruxo` em
+      // classes/bruxo.js): as duas tambem migraram de `.magia-card` para
+      // `.opcao-card` na Task 9 e tambem tem o handler no filho
+      // (`[data-grid-manobra-check]`/`[data-inv-toggle]`, ambos com
+      // `stopPropagation`), sem nenhum atributo proprio no card para
+      // excluir por `:not([data-*])` como a grade do level up -- por isso a
+      // exclusao aqui e pelo container (`:not(#id *)`, valido em
+      // Selectors Level 4/Chromium), nao por atributo do card.
+      //
+      // Achado da Rodada 2 de correcao da Task 9 (I4): faltavam mais dois
+      // containers com o MESMO padrao, ambos em `site/js/sheet/grimorio.js`
+      // -- `#resultado-magias` (`mostrarBuscaMagia`: truques via
+      // `[data-truque-check]`, magias de circulo via `[data-circ-check]`,
+      // os atributos `data-toggle-truque` no card NAO tem listener nenhum)
+      // e `#resultado-troca` (`mostrarTrocaMagias`: `[data-troca-check]`,
+      // idem `data-troca-toggle` sem listener). Nenhum dos dois tem
+      // `data-grid-nome` nem vive nos containers ja excluidos, entao o
+      // ramo generico os capturava do mesmo jeito, com o dobro de cards
+      // (truques + circulos + selecionadas + por-circulo da troca).
+      //
+      // Achado da Rodada 3: `#metamagia-grid` (Metamagia do Feiticeiro,
+      // `habilidades.js`, migrada no I5 da propria Rodada 2) ficou de fora
+      // das exclusoes que a mesma rodada escreveu -- inconsistencia da
+      // correcao anterior, nao um caso novo. Ali o card tem `data-meta-info`
+      // com listener PROPRIO (abre sub-modal de descricao): o clique
+      // generico no card nao seria inocuo como nos outros, empilharia um
+      // overlay e desviaria o alvo de `resolverModalAberto`.
+      //
+      // Achado da Rodada 1 de correcao da Task 10 (I1, critico):
+      // `:not(#troca-passo-entra *)` -- a grade do que ENTRA em
+      // `montarTroca` (ui-opcoes.js) tem id fixo `troca-passo-entra`,
+      // reusado por TODA troca opcional montada com o componente (Estilo de
+      // Luta hoje; magia/truque/manobra/maestria nas proximas tarefas). Uma
+      // troca opcional comeca sem nada marcado (`marcados === 0`), que e a
+      // MESMA condicao que este bloco usa para forcar progresso numa
+      // escolha OBRIGATORIA -- sem a exclusao, o driver clicava no primeiro
+      // item livre da grade e trocava a escolha do personagem sozinho,
+      // mesmo quando ninguem pediu troca nenhuma. Reproduzido ao vivo: um
+      // Guerreiro nivel 2->3 com Estilo de Luta 'Defensivo', conduzido so
+      // pelo driver generico (sem tocar em nada de Estilo de Luta), saia do
+      // level-up com o estilo trocado para 'Arquearia'.
+      //
+      // `:not(#troca-passo-sai *)` -- achado da Task 12 (Rodada 1 de
+      // correcao): a exclusao acima so cobre o passo 2 (o que ENTRA). O
+      // passo 1 (o que SAI, `troca-passo-sai`) escapava da vulnerabilidade
+      // so enquanto tinha exatamente 1 opcao -- ai `montarTroca` desenha um
+      // card de APRESENTACAO (`selecionavel: false`, sem `data-opcao`, sem
+      // handler de clique proprio; ver comentario em `ui-opcoes.js`), que
+      // este bloco ignora porque so reage a cards com `data-opcao`. Magia,
+      // truque e manobra (Task 12) sao os PRIMEIROS casos do app em que o
+      // "sai" tem VARIAS opcoes -- ai `montarTroca` usa `montarSeletor` de
+      // verdade para o passo 1, com cards `data-opcao` clicaveis de
+      // verdade, e o mesmo mecanismo do achado da Task 10 se repete: um
+      // card do passo 1 e clicado sozinho (`marcados === 0`). Reproduzido
+      // ao vivo: um Bardo subindo de nivel com magias preparadas ja
+      // elegiveis para troca, conduzido so pelo driver generico, tinha uma
+      // magia marcada para SAIR sozinho; como o passo 2 ja era excluido, a
+      // subida travava para sempre em "Escolha a magia substituta ou
+      // desmarque a troca" -- o driver comecava uma troca que ninguem
+      // pediu e nunca conseguia terminar. A causa raiz e a mesma da Task
+      // 10 (guarda escrita para o caso que estava a mao, nao para o
+      // componente inteiro); por isso a exclusao aqui e do WIDGET inteiro
+      // (os dois passos), nao so do passo 1 -- cobre de uma vez qualquer
+      // troca opcional futura tambem, seja qual for o numero de opcoes dos
+      // dois lados.
+      //
+      // LIMITE: as duas exclusoes juntas tiram TODA troca de `montarTroca`
+      // do alcance do driver generico. So e seguro porque toda troca no
+      // app hoje e OPCIONAL (o jogador sempre pode "nao trocar"). Se algum
+      // dia uma escolha OBRIGATORIA passar a usar `montarTroca`, excluir o
+      // componente inteiro faria o driver TRAVAR em vez de progredir --
+      // quem tornar uma troca obrigatoria precisa rever esta guarda (e a
+      // gemea em `confirmarModal()`, acima).
       const CARDS = [
-        ['.selection-card', 'selected'],
-        ['.levelup-subclasse-card', 'selecionada'],
+        ['.opcao-card:not([data-grid-nome]):not(#grid-manobras *):not(#bruxo-inv-grid *)'
+          + ':not(#resultado-magias *):not(#resultado-troca *):not(#metamagia-grid *)'
+          + ':not(#troca-passo-sai *):not(#troca-passo-entra *)', 'selecionada'],
       ];
       for (const [seletor, marcado] of CARDS) {
         const cards = [...corpo.querySelectorAll(seletor)];
@@ -307,7 +470,12 @@ async function preencherTela(page, maxEscolhas = 30) {
         const marcados = cards.filter((c) => c.classList.contains(marcado)).length;
         // Uma escolha sempre; mais so enquanto o app disser que falta.
         if (marcados === 0 || faltaAlgo) {
-          const livre = cards.find((c) => !c.classList.contains(marcado));
+          // `.opcao-card` (vocabulario novo) marca bloqueio por classe
+          // (`bloqueada`) e esgotamento do limite por atributo
+          // (`data-cheio`) -- pular os dois evita clicar num card que nao
+          // aceita clique.
+          const livre = cards.find((c) => !c.classList.contains(marcado)
+            && !c.classList.contains('bloqueada') && !c.dataset.cheio);
           if (livre) { livre.click(); return true; }
         }
       }
@@ -327,7 +495,7 @@ async function preencherTela(page, maxEscolhas = 30) {
         if (atual < alvo) {
           const livre = [...corpo.querySelectorAll('[data-grid-nome]')].find(
             (c) => !c.classList.contains('selecionada')
-              && !c.classList.contains('magia-card-bloqueada'));
+              && !c.classList.contains('bloqueada'));
           const check = livre?.querySelector('[data-grid-check]');
           if (check) { check.click(); return true; }
         }
@@ -481,7 +649,17 @@ export async function satisfazerPasso(page, { maxVoltas = 80 } = {}) {
     const marcou = await page.evaluate(() => {
       const raiz = document.getElementById('wizard-content');
       if (!raiz) return false;
-      for (const inp of raiz.querySelectorAll('input[type="text"]')) {
+      // A caixa de busca do seletor de opcoes (`.opcao-busca`, montada por
+      // `montarSeletor` em `ui-opcoes.js`) e um `input[type="text"]" como
+      // qualquer outro, mas preenche-la nao satisfaz escolha nenhuma: o
+      // proprio listener da busca filtra `.opcao-lista` pelo termo digitado.
+      // "Heroi de Teste" nao bate com nenhuma opcao real, entao a lista
+      // esvazia e some exatamente o card que o driver precisa clicar mais
+      // adiante -- o passo trava sem escolher nada. Excluida por classe, e
+      // nao por id do container, para continuar valendo em qualquer passo
+      // que venha a montar o seletor (Magias, Equipamento, e os que ainda
+      // vierem na migracao para `.opcao-card`).
+      for (const inp of raiz.querySelectorAll('input[type="text"]:not(.opcao-busca)')) {
         if (!inp.value.trim()) {
           inp.value = 'Heroi de Teste';
           inp.dispatchEvent(new Event('input', { bubbles: true }));
@@ -529,14 +707,31 @@ export async function satisfazerPasso(page, { maxVoltas = 80 } = {}) {
       // card tem um valor unico (`data-classe="Mago"`), e agrupar por valor
       // criaria doze grupos e faria o driver escolher todas as classes.
       // O pai resolve os dois: um container por grupo, um grid para as classes.
+      //
+      // Cards `.opcao-card`: bloqueio proprio (classe `bloqueada`, sem
+      // `data-opcao`) e esgotamento (`data-cheio`) precisam ser pulados --
+      // senao o driver tentaria clicar num card que nao aceita clique e
+      // travaria a volta.
+      //
+      // Exclui tambem os cards de MAGIA (Task 9: `.magia-card` migrou para
+      // `.opcao-card`, mesma classe que os cards de classe/especie/
+      // antecedente que este bloco ja tratava). Sem excluir, este `porPai`
+      // generico capturaria os cards de truque/magia/preparo ANTES dos
+      // blocos especializados mais abaixo (cardsIM/cardsMagia/preparadas) --
+      // e clicaria no card INTEIRO, que nao tem listener proprio (o handler
+      // vive no filho `[data-creator-check]`/`[data-im-check]`, com
+      // `stopPropagation`), gerando clique sem efeito, "progresso" falso
+      // (`return true`) e a volta nunca convergindo.
       const porPai = new Map();
-      for (const card of raiz.querySelectorAll('.selection-card')) {
+      for (const card of raiz.querySelectorAll(
+        '.opcao-card:not([data-magia-nome]):not([data-mago-preparada]):not([data-im-magia])')) {
+        if (card.classList.contains('bloqueada') || card.dataset.cheio) continue;
         const pai = card.parentElement;
         if (!porPai.has(pai)) porPai.set(pai, []);
         porPai.get(pai).push(card);
       }
       for (const cards of porPai.values()) {
-        if (cards.some((c) => c.classList.contains('selected'))) continue;
+        if (cards.some((c) => c.classList.contains('selecionada'))) continue;
         cards[0].click();
         return true;
       }
@@ -554,7 +749,7 @@ export async function satisfazerPasso(page, { maxVoltas = 80 } = {}) {
         const contarIM = () =>
           raiz.querySelectorAll('[data-im-magia].selecionada').length;
         const livreIM = cardsIM.find((c) => !c.classList.contains('selecionada')
-          && !c.classList.contains('magia-card-bloqueada'));
+          && !c.classList.contains('bloqueada'));
         if (livreIM) {
           const check = livreIM.querySelector('[data-im-check]');
           if (check) {
@@ -578,8 +773,10 @@ export async function satisfazerPasso(page, { maxVoltas = 80 } = {}) {
         if (proximaIM) { proximaIM.click(); return true; }
       }
 
-      // Cards de magia do criador: terceiro vocabulario (`.magia-card` com
-      // estado `selecionada`, bloqueadas marcadas com `.magia-card-bloqueada`).
+      // Cards de magia do criador: migraram para o vocabulario unificado
+      // `.opcao-card` na Task 9 (antes `.magia-card`), com estado
+      // `selecionada` e bloqueadas marcadas com `.bloqueada` (antes
+      // `.magia-card-bloqueada`).
       //
       // Aqui NAO ha limite de um por grupo: o passo pede "3 truques". Escolher
       // UMA por vez e deixar o laco de fora tentar avancar e o que faz a conta
@@ -597,26 +794,26 @@ export async function satisfazerPasso(page, { maxVoltas = 80 } = {}) {
       // passar para a proxima. O driver nao precisa saber quantas magias cada
       // aba pede nem quantas abas existem.
       // `:not([data-mago-preparada])` e essencial: os cards da secao de
-      // preparo do Mago TAMBEM sao `.magia-card`. Sem excluir, este bloco os
+      // preparo do Mago TAMBEM sao `.opcao-card`. Sem excluir, este bloco os
       // consumia e enchia "preparadas" em vez do grimorio -- o grimorio parava
       // em 4 e o passo nunca era satisfeito.
       // Exclui os cards que pertencem a OUTRAS secoes: a de preparo do Mago
       // (`[data-mago-preparada]`) e a do talento Iniciado em Magia
-      // (`[data-im-magia]`). As tres usam a mesma classe `.magia-card`, mas
+      // (`[data-im-magia]`). As tres usam a mesma classe `.opcao-card`, mas
       // tem containers, abas e limites proprios -- sem separar, este bloco as
       // consumia e nenhuma das tres fechava a conta.
       const cardsMagia = [...raiz.querySelectorAll(
-        '.magia-card:not([data-mago-preparada]):not([data-im-magia])')];
+        '.opcao-card:not([data-mago-preparada]):not([data-im-magia])')];
       if (cardsMagia.length) {
-        // Conta SO os cards desta lista. Contar `.magia-card.selecionada`
+        // Conta SO os cards desta lista. Contar `.opcao-card.selecionada`
         // global incluia as secoes de preparo e do Iniciado em Magia, que
         // re-renderizam junto -- se uma delas perdia uma selecao no mesmo
         // instante, o total nao subia e o driver concluia que o clique fora
         // recusado, trocando de aba com 1 truque escolhido de 3.
         const contarSel = () => raiz.querySelectorAll(
-          '.magia-card:not([data-mago-preparada]):not([data-im-magia]).selecionada').length;
+          '.opcao-card:not([data-mago-preparada]):not([data-im-magia]).selecionada').length;
         const livre = cardsMagia.find((c) => !c.classList.contains('selecionada')
-          && !c.classList.contains('magia-card-bloqueada'));
+          && !c.classList.contains('bloqueada'));
         if (livre) {
           // O handler NAO esta no card: esta num filho `[data-creator-check]`,
           // que ainda faz `stopPropagation()`.

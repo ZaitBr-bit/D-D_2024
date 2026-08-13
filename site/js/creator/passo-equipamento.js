@@ -331,10 +331,10 @@ export async function renderStepEquipamento(el) {
         <div class="card-header"><h3>${titulo}</h3></div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0">
           ${opcoes.map(op => `
-            <div class="selection-card ${escolhaAtual === op.letra ? 'selected' : ''}"
+            <div class="opcao-card ${escolhaAtual === op.letra ? 'selecionada' : ''}"
                  data-equip-tipo="${tipoOrigem}" data-equip-letra="${op.letra}"
                  style="flex:1;min-width:200px;cursor:pointer">
-              <div class="card-nome" style="font-size:0.9rem;font-weight:600">Opção ${op.letra}</div>
+              <div class="opcao-nome" style="font-size:0.9rem;font-weight:600">Opção ${op.letra}</div>
               <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">
                 ${op.apenasOuro ? `<strong>${op.moedaQtd} ${op.moedaTipo.toUpperCase()}</strong> (apenas dinheiro)` : op.conteudo}
               </div>

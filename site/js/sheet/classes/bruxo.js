@@ -357,13 +357,13 @@ export async function abrirModalRecursosBruxo() {
     // Descricao formatada (exibida ao clicar no nome)
     const descHtml = mdParaHtml(o.descricao || 'Sem descricao disponivel.');
     return `
-      <div class="magia-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''} ${ehPacto ? 'magia-dominio' : ''}"
+      <div class="opcao-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'bloqueada' : ''} ${ehPacto ? 'magia-dominio' : ''}"
            data-inv-card="${o.nome}" style="${bloqueado ? 'opacity:0.35;cursor:not-allowed;' : ''};position:relative">
         <div style="display:flex;align-items:center;gap:6px">
-          <span class="magia-card-check" data-inv-toggle="${o.nome}" style="cursor:pointer;flex-shrink:0"></span>
+          <span class="opcao-check" data-inv-toggle="${o.nome}" style="cursor:pointer;flex-shrink:0"></span>
           <div style="flex:1;min-width:0">
-            <div class="magia-card-nome" data-inv-info="${o.nome}" style="cursor:pointer">${ehPacto ? '<span class="badge-dominio">&#9733;</span> ' : ''}${o.nome}${qtd > 1 ? ` <span class="badge" style="font-size:0.6rem;background:var(--accent);color:#fff">x${qtd}</span>` : ''}</div>
-            <div class="magia-card-meta">
+            <div class="opcao-nome" data-inv-info="${o.nome}" style="cursor:pointer">${ehPacto ? '<span class="badge-dominio">&#9733;</span> ' : ''}${o.nome}${qtd > 1 ? ` <span class="badge" style="font-size:0.6rem;background:var(--accent);color:#fff">x${qtd}</span>` : ''}</div>
+            <div class="opcao-resumo">
               ${preResumo ? `<span style="font-size:0.65rem">${preResumo}</span>` : ''}
               ${o.repetivel ? '<span style="font-size:0.65rem;color:var(--accent)">Repetivel</span>' : ''}
             </div>
@@ -385,7 +385,7 @@ export async function abrirModalRecursosBruxo() {
     </div>`;
     for (const grupo of grupos) {
       html += `<div style="font-size:0.75rem;font-weight:700;color:var(--secondary);margin:10px 0 4px">${grupo.label}</div>`;
-      html += `<div class="magias-grid">${grupo.items.map(o => renderCard(o, invArr)).join('')}</div>`;
+      html += `<div class="opcao-grid densa">${grupo.items.map(o => renderCard(o, invArr)).join('')}</div>`;
     }
     return html;
   }
@@ -438,7 +438,7 @@ export async function abrirModalRecursosBruxo() {
       </div>`;
       for (const grupo of gruposFiltrados) {
         html += `<div style="font-size:0.75rem;font-weight:700;color:var(--secondary);margin:10px 0 4px">${grupo.label}</div>`;
-        html += `<div class="magias-grid">${grupo.items.map(o => renderCard(o, invSelecionadas)).join('')}</div>`;
+        html += `<div class="opcao-grid densa">${grupo.items.map(o => renderCard(o, invSelecionadas)).join('')}</div>`;
       }
       gridEl.innerHTML = html;
     } else {
@@ -492,7 +492,7 @@ export async function abrirModalRecursosBruxo() {
       if (!opcao?.repetivel) return;
       const qtd = contarInv(invSelecionadas, nome);
       if (qtd >= 1) {
-        const metaDiv = el.querySelector('.magia-card-meta');
+        const metaDiv = el.querySelector('.opcao-resumo');
         if (metaDiv) {
           const addBtn = document.createElement('span');
           addBtn.style.cssText = 'font-size:0.7rem;cursor:pointer;padding:1px 6px;border:1px solid var(--accent);border-radius:4px;color:var(--accent);margin-left:4px';
@@ -632,12 +632,12 @@ export function abrirModalPactoDoTomo() {
       const jaTem = truquesJaPreparados.has(m.nome) && !sel;
       const cheio = truquesSel.length >= 3 && !sel;
       return `
-        <div class="magia-card ${sel ? 'selecionada' : ''} ${cheio || jaTem ? 'magia-card-bloqueada' : ''}"
+        <div class="opcao-card ${sel ? 'selecionada' : ''} ${cheio || jaTem ? 'bloqueada' : ''}"
              data-tomo-truque="${m.nome}" data-tomo-truque-classes="${(m.classes || []).join(',')}"
              style="${cheio || jaTem ? 'opacity:0.35;cursor:not-allowed;' : 'cursor:pointer;'}">
-          <span class="magia-card-check"></span>
-          <div class="magia-card-nome" style="font-size:0.75rem">${m.nome}</div>
-          <div class="magia-card-meta"><span style="font-size:0.6rem">${(m.classes || []).join(', ')}</span></div>
+          <span class="opcao-check"></span>
+          <div class="opcao-nome" style="font-size:0.75rem">${m.nome}</div>
+          <div class="opcao-resumo"><span style="font-size:0.6rem">${(m.classes || []).join(', ')}</span></div>
         </div>`;
     }).join('');
   }
@@ -650,12 +650,12 @@ export function abrirModalPactoDoTomo() {
       const jaTem = jaPreparados.has(m.nome) && !sel;
       const cheio = rituaisSel.length >= 2 && !sel;
       return `
-        <div class="magia-card ${sel ? 'selecionada' : ''} ${cheio || jaTem ? 'magia-card-bloqueada' : ''}"
+        <div class="opcao-card ${sel ? 'selecionada' : ''} ${cheio || jaTem ? 'bloqueada' : ''}"
              data-tomo-ritual="${m.nome}" data-tomo-ritual-classes="${(m.classes || []).join(',')}"
              style="${cheio || jaTem ? 'opacity:0.35;cursor:not-allowed;' : 'cursor:pointer;'}">
-          <span class="magia-card-check"></span>
-          <div class="magia-card-nome" style="font-size:0.75rem">${m.nome}</div>
-          <div class="magia-card-meta"><span style="font-size:0.6rem">${(m.classes || []).join(', ')} | Ritual</span></div>
+          <span class="opcao-check"></span>
+          <div class="opcao-nome" style="font-size:0.75rem">${m.nome}</div>
+          <div class="opcao-resumo"><span style="font-size:0.6rem">${(m.classes || []).join(', ')} | Ritual</span></div>
         </div>`;
     }).join('');
   }
@@ -671,7 +671,7 @@ export function abrirModalPactoDoTomo() {
           ${classesComTruques.map(c => `<option value="${c}" ${filtroTruque === c ? 'selected' : ''}>${c}</option>`).join('')}
         </select>
       </div>
-      <div class="magias-grid" id="tomo-truques-grid" style="max-height:25vh;overflow-y:auto">${renderTruquesGrid(filtroTruque)}</div>
+      <div class="opcao-grid densa" id="tomo-truques-grid" style="max-height:25vh;overflow-y:auto">${renderTruquesGrid(filtroTruque)}</div>
 
       <div class="section-divider"><span>Rituais de 1o Circulo (${rituaisSel.length}/2)</span></div>
       <div style="margin-bottom:6px">
@@ -680,7 +680,7 @@ export function abrirModalPactoDoTomo() {
           ${classesComRituais.map(c => `<option value="${c}" ${filtroRitual === c ? 'selected' : ''}>${c}</option>`).join('')}
         </select>
       </div>
-      <div class="magias-grid" id="tomo-rituais-grid" style="max-height:25vh;overflow-y:auto">${renderRituaisGrid(filtroRitual)}</div>
+      <div class="opcao-grid densa" id="tomo-rituais-grid" style="max-height:25vh;overflow-y:auto">${renderRituaisGrid(filtroRitual)}</div>
     `;
   }
 

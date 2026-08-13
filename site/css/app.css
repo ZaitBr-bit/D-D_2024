@@ -288,28 +288,251 @@ tr:hover td { background: #faf8f4; }
 
 /* (wizard-nav antigo removido - agora usa wizard-nav-fixed) */
 
-/* --- Cards de seleção (classe, espécie, etc.) --- */
-.selection-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 8px;
-}
-.selection-card {
-  padding: 12px; border: 2px solid var(--border-light);
-  border-radius: var(--radius); cursor: pointer;
-  text-align: center; transition: all 0.2s;
+/* --- Card de opção unificado (ui-opcoes.js) ---
+   Substitui .selection-card, .magia-card e .levelup-subclasse-card.
+   Duas densidades: `ampla` para 1-entre-poucos, `densa` para N-entre-muitos. */
+.opcao-grid { display: grid; gap: 8px; }
+.opcao-grid.ampla { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+/* Densa reproduz a .magias-grid antiga (app.css ~803): coluna via
+   auto-fill(180px) DESDE SEMPRE, sem breakpoint nenhum -- 2 colunas ja
+   cabiam a partir de ~368px de largura (2*180+8 de gap = 368). A versao
+   anterior desta regra travava em 1 coluna ate 480px e so ai trocava pra
+   auto-fill(200px): achado da Rodada 2 de correcao da Task 9 (I2), a GRADE
+   nunca tinha sido comparada, so o CARD. `margin-top: 8px` tambem vem da
+   .magias-grid -- sem ele, cabecalhos como "Magias Especiais" (grimorio.js,
+   margin:8px 0 4px) colapsavam pra 8px acima da grade e agora ficavam 4px. */
+.opcao-grid.densa { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); margin-top: 8px; }
+
+/* Padding/text-align/overflow INCONDICIONAIS na base, igual ao
+   .selection-card antigo (que sempre teve `padding: 12px`, `text-align:
+   center` e `overflow: hidden`, dentro ou fora de grade -- confirmado lendo
+   o .selection-card original, HEAD:site/css/app.css antes desta migração).
+   Task 8 corrigiu o padding pela raiz: antes ele só existia dentro de
+   .opcao-grid.ampla/.densa, e todo .opcao-card fora de grade -- os popups de
+   escolha de classe/traço/ferramenta/equipamento, e o card de condição na
+   ficha -- ficava sem respiro nenhum entre a borda e o texto.
+   Achado I1 da revisão final: `text-align: center` e `overflow: hidden`
+   tiveram a MESMA falha estrutural que o padding já teve -- `text-align`
+   morava só em `.opcao-grid.ampla .opcao-card` (escopado por grade) e
+   `overflow` nunca tinha sido levado para `.opcao-card` nenhum. Seis cards
+   migrados vivem fora de qualquer `.opcao-grid` (creator/passo-classe.js:
+   110,126,140; passo-especie.js:128; passo-antecedente.js:147;
+   passo-equipamento.js:334) e perderam a centralização; sem overflow:hidden,
+   conteúdo longo vaza da borda em vez de ser cortado. Densa (que nunca foi
+   centralizada -- o .magia-card original não tinha text-align nenhum, texto
+   à esquerda por fluxo normal) ganha o override de volta logo abaixo, no
+   mesmo bloco que já escopa os outros valores específicos dela. */
+.opcao-card {
+  padding: 12px;
+  border: 2px solid var(--border-light);
+  border-radius: var(--radius);
   background: var(--bg-card);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  user-select: none;
 }
-.selection-card:hover { border-color: var(--primary-light); background: #fef9f8; }
-.selection-card.selected {
+.opcao-card:hover { border-color: var(--primary-light); background: #fef9f8; }
+.opcao-card.selecionada {
   border-color: var(--primary); background: #fef2f0;
   box-shadow: 0 0 0 1px var(--primary);
 }
-.selection-card .card-nome {
-  font-weight: 700; font-size: 0.9rem; color: var(--text);
+/* Densa sobrepõe com os valores que o .magia-card (regra antiga, ainda em
+   app.css, linha ~772) sempre teve. Achado da Rodada 1 de correcao da
+   Task 9: ao escrever o bloco unificado (Task 1) so os valores do
+   .selection-card (ampla) foram levados pra base -- o .magia-card (densa)
+   tinha um conjunto proprio de valores para varias destas propriedades, e
+   nenhuma delas tinha sido escopada por densidade. Resultado medido: os 76
+   cards de magia, ao herdar .opcao-card na Task 9, mudaram de fonte, cor de
+   selecao, arredondamento de canto e cor de hover -- exatamente o que este
+   bloco corrige, um valor por vez, comparado com o .magia-card original.
+   `text-align: left` (achado I1 da revisão final): densa nunca foi
+   centralizada -- ver comentário do bloco base, acima. */
+.opcao-grid.densa .opcao-card { padding: 8px 10px; border-radius: var(--radius-sm); text-align: left; }
+.opcao-grid.densa .opcao-card:hover { background: #faf8f4; }
+/* copia literal da expressao do .magia-card.selecionada (linha ~787) --
+   NAO converter pra hexadecimal, o color-mix e o valor real la. */
+.opcao-grid.densa .opcao-card.selecionada { background: color-mix(in srgb, var(--primary) 8%, white); }
+
+/* `justify-content: center` INCONDICIONAL (achado I1 da revisão final):
+   igual ao padding/text-align acima, centralizar o título só valia dentro de
+   `.opcao-grid.ampla .opcao-card .opcao-nome` -- fora de grade nenhuma
+   densidade sobrepunha o `space-between` da base, e um `<div class=
+   "opcao-nome">` com um único filho de texto vira flex-start com
+   `justify-content: space-between` (a regra CSS de distribuição com 1 item
+   só), então o título ficava colado à esquerda mesmo com `text-align:
+   center` inline no HTML (que não tem efeito nenhum no eixo principal de um
+   filho flex -- quem manda ali é justify-content). Nenhum adaptador de
+   opcoes-dominio.js popula `tags` hoje (todos devolvem `[]`), então não há
+   caso real de dois filhos brigando por espaço para `center` atrapalhar; se
+   isso mudar, cabe reavaliar. Densa cancela `display:flex` inteiro (ver
+   `display: block` duas regras abaixo), então esta mudança não afeta densa.
+   `cursor: pointer` e `-webkit-tap-highlight-color: transparent` (achado I4
+   da revisão final): o `.magia-card-nome` antigo sempre teve essas duas
+   declarações (era o alvo real do toque/clique que abre a descrição da
+   magia -- grimorio.js e bruxo.js compensavam com `style="cursor:pointer"`
+   inline; creator/passo-magias.js:172,460 e levelup-ui.js:1186 tinham o
+   mesmo listener vivo no nome mas ficaram sem a declaração, e sem o
+   `-webkit-tap-highlight-color` nenhum dos cinco tinha). */
+.opcao-card .opcao-nome {
+  font-weight: 700; font-size: 0.9rem; color: var(--text); line-height: 1.2;
+  display: flex; justify-content: center; align-items: baseline; gap: 8px;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
-.selection-card .card-detalhe {
+/* Densa: fonte do nome do .magia-card-nome era 0.85rem (base do bloco unificado
+   veio do .selection-card .card-nome, que sempre foi 0.9rem -- valores
+   diferentes, nunca escopados por densidade ate aqui).
+   `display: block` TAMBEM precisou entrar aqui -- achado por MEDICAO, nao
+   so por leitura do CSS, e corrigido em DUAS rodadas: a Rodada 1 corrigiu
+   so o `justify-content` (um card com badge de dominio mostrava a estrela
+   colada na esquerda e o nome empurrado/cortado na direita), mas deixou
+   `display: flex`, `gap: 8px` e `align-items: baseline` intocados no mesmo
+   bloco -- a revisao da Rodada 2 (C1) apontou que os TRES seguiam
+   divergentes pelo MESMO motivo: `.badge-dominio` tem `margin-right: 4px`
+   (app.css ~900); no fluxo normal antigo do `.magia-card-nome` (nunca teve
+   flex nenhum) a separacao badge-nome era esse 4px mais o espaco de texto
+   entre o `</span>` e o nome (~7,4px medidos); como filho flex, esse espaco
+   em branco e descartado e quem manda e o `gap: 8px` -- uns 12px, 62% a
+   mais. `display: block` neutraliza justify-content/gap/align-items de uma
+   vez so (nenhum dos tres faz efeito fora de flex/grid), entao a linha de
+   `justify-content: flex-start` da Rodada 1 virou redundante e saiu daqui. */
+.opcao-grid.densa .opcao-card .opcao-nome { font-size: 0.85rem; display: block; }
+.opcao-card .opcao-tags {
+  font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--text-muted); font-weight: 700; white-space: nowrap;
+}
+.opcao-card .opcao-resumo {
   font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;
+}
+/* Densa: .magia-card-meta era 0.7rem, tinha `display:flex; gap:6px;
+   flex-wrap:wrap` (varias tags de escola/conc./M$ lado a lado com respiro
+   fixo) -- isso vale em qualquer profundidade, por isso descendente (sem
+   `>`) abaixo.
+   O `margin-top`, porem, PRECISA saber a profundidade -- diagnostico
+   corrigido na Rodada 2 (I3), o da Rodada 1 estava errado (atribuia a
+   diferenca a "estrutura interna" e "resumo as vezes vazio" do bruxo.js,
+   sem justificar o numero). O `gap: 2px` antigo vivia no PROPRIO
+   `.magia-card` (pai flex-column), e so afeta filhos DIRETOS em fluxo
+   normal -- em 4 dos 5 arquivos `.opcao-nome`/`.opcao-resumo` sao filhos
+   diretos do card (o `.opcao-check` e absolute, sai do fluxo, entao sobra
+   so nome+resumo pro gap:2px separar). Em bruxo.js (linhas ~347-368) o
+   card monta `.opcao-card > div[flex;gap:6px] > div[flex:1] >
+   (.opcao-nome, .opcao-resumo)` -- nome e resumo sao NETOS do card, o
+   `gap: 2px` do avo nunca os alcancava: separacao ANTIGA de 0px ali,
+   sempre, resumo vazio ou nao. Por isso o margin-top e feito em duas
+   regras: 0 por padrao (qualquer profundidade, bate com bruxo.js) e 2px
+   só quando `.opcao-resumo` é filho DIRETO do card (`>`, bate com os
+   outros 4 arquivos) -- a mais especifica por ordem de declaracao (mesma
+   especificidade do seletor descendente, o `>` nao soma pontos) vence
+   quando as duas batem. */
+.opcao-grid.densa .opcao-card .opcao-resumo {
+  font-size: 0.7rem; margin-top: 0;
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.opcao-grid.densa .opcao-card > .opcao-resumo { margin-top: 2px; }
+
+/* Marcador de seleção: um círculo no canto, que é a forma já usada pelas
+   telas de magia (76 cards). É a ÚNICA forma de marcar seleção -- tanto os
+   cards migrados quanto os que montarSeletor desenha usam este marcador. */
+.opcao-card .opcao-check {
+  position: absolute; top: 2px; right: 2px;
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid var(--border); background: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; color: white; transition: all 0.2s;
+  cursor: pointer; -webkit-tap-highlight-color: transparent; z-index: 2;
+}
+.opcao-card.selecionada .opcao-check { background: var(--primary); border-color: var(--primary); }
+.opcao-card.selecionada .opcao-check::after { content: '\2713'; }
+.opcao-card.bloqueada .opcao-check { pointer-events: none; }
+/* Densidade ampla (1-entre-poucos: classe/especie/antecedente/alinhamento do
+   criador, migrados na Task 7) reproduz o comportamento antigo do
+   .selection-card .card-check: o marcador fica OCULTO ate o card ser
+   selecionado, e so entao aparece. NAO mexe na densa -- e o vocabulario que
+   as telas de magia (76 cards, ainda .magia-card hoje) vao herdar na Task 9,
+   e la o anel SEMPRE visivel e o comportamento pretendido (e o que
+   .magia-card-check ja faz). Escopar por densidade evita que a correcao
+   visual desta tarefa mude o marcador que a Task 9 ainda vai migrar.
+   Sem padding-right reservado: o .selection-card antigo tambem nao
+   reservava espaco para o circulo (nem quando 20px, sempre oculto por
+   padrao) -- reservar aqui deixaria o nome permanentemente descentralizado
+   no estado NAO selecionado, que e o estado mais comum e por isso o que
+   mais importa bater com o original (medido em 02-vs-original.png). */
+.opcao-grid.ampla .opcao-card .opcao-check { display: none; }
+.opcao-grid.ampla .opcao-card.selecionada .opcao-check { display: flex; }
+/* DEFEITO da Task 2, achado e corrigido na Task 13: sem `display` proprio,
+   este <div> herdava o padrao de bloco e ocupava a LARGURA INTEIRA do
+   card -- so o TEXTO ficava embaixo (bloco seguinte de `.opcao-resumo`
+   quebra linha antes dele), mas a AREA CLICAVEL ia de borda a borda. Com
+   um resumo que quebra em exatamente duas linhas -- o que os 75 talentos
+   fazem, de sobra, por variarem muito de tamanho -- essa faixa cai bem no
+   centro geometrico do card, e tanto um clique automatizado no centro
+   quanto o dedo de quem mira o meio do card pra selecionar acaba abrindo
+   "ver detalhes" em vez de marcar o talento (talentos-levelup.spec.mjs,
+   caso Artifista, reproduzia isso 100% das vezes). `display: inline-block`
+   faz a caixa encolher pro tamanho do proprio texto -- continua na sua
+   propria linha (o bloco anterior, `.opcao-resumo`, sempre quebra linha
+   antes dele, com ou sem isto) e continua respeitando o `text-align` do
+   card (centralizado em `.opcao-grid.ampla`, a esquerda em `.densa`,
+   IGUAL a antes) -- so a caixa invisivel de clique fica do tamanho do
+   texto, nao do card. Nada muda visualmente (medido no navegador: mesma
+   posicao/tamanho de texto nas duas densidades, antes e depois). */
+.opcao-card .opcao-ver {
+  display: inline-block;
+  font-size: 0.72rem; color: var(--primary); margin-top: 4px;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+/* O detalhe da opção não é mais embutido no card: "ver detalhes" abre um
+   popup empilhado (ver abrirDetalheOpcao em ui-opcoes.js). Expandir dentro
+   do card empurrava a lista inteira para baixo, justamente quando o jogador
+   está comparando opções -- por isso as regras `.opcao-detalhe`/`.aberta`
+   saíram daqui. */
+
+/* Bloqueada: continua legível, mas fora da seleção. */
+.opcao-card.bloqueada {
+  opacity: 0.45; background: var(--bg-input); cursor: not-allowed;
+  pointer-events: none;
+}
+.opcao-card .opcao-motivo {
+  font-size: 0.72rem; color: var(--text-muted); font-style: italic; margin-top: 3px;
+}
+
+/* Cabeçalho de grupo e linha que revela as bloqueadas do grupo. */
+.opcao-grupo {
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--text-muted);
+  margin: 12px 0 4px; padding-bottom: 2px;
+  border-bottom: 1px solid var(--border-light);
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.opcao-revelar {
+  font-size: 0.72rem; color: var(--primary);
+  border: 1px dashed var(--border); border-radius: var(--radius-sm);
+  padding: 5px 9px; margin-top: 6px; cursor: pointer; background: var(--bg-card);
+}
+
+/* Filtros rápidos: reaproveita a aparência de .chip, sem o comportamento. */
+.opcao-filtros { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+.opcao-filtro {
+  font-size: 0.75rem; border: 1px solid var(--border); border-radius: 999px;
+  padding: 3px 10px; cursor: pointer; background: var(--bg-card); color: var(--text);
+}
+.opcao-filtro.ativo { background: var(--primary); color: #fff; border-color: var(--primary); }
+.opcao-contagem { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 6px; }
+
+/* Troca em dois passos (montarTroca). */
+.opcao-passo { margin-bottom: 10px; }
+.opcao-passo-num {
+  display: inline-block; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--primary); color: #fff; font-size: 0.7rem;
+  text-align: center; line-height: 18px; font-weight: 700; margin-right: 5px;
+}
+.opcao-passo.resolvido { opacity: 0.6; }
+.opcao-passo-alterar {
+  font-size: 0.72rem; color: var(--text-muted);
+  text-decoration: underline; cursor: pointer; margin-left: 8px;
 }
 
 /* --- Atributos (display) --- */
@@ -625,55 +848,6 @@ tr:hover td { background: #faf8f4; }
 }
 
 /* --- Magias --- */
-/* Grid compacto de magias */
-.magias-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 8px;
-  margin-top: 8px;
-}
-.magia-card {
-  padding: 8px 10px;
-  border: 2px solid var(--border-light);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  position: relative;
-  user-select: none;
-}
-.magia-card:hover { background: #faf8f4; border-color: var(--primary-light, #b8a07a); }
-.magia-card.selecionada {
-  border-color: var(--primary);
-  background: color-mix(in srgb, var(--primary) 8%, white);
-  box-shadow: 0 0 0 1px var(--primary);
-}
-.magia-card .magia-card-nome { font-weight: 700; font-size: 0.85rem; line-height: 1.2; }
-.magia-card .magia-card-meta { font-size: 0.7rem; color: var(--text-muted); display: flex; gap: 6px; flex-wrap: wrap; }
-.magia-card .magia-card-check {
-  position: absolute; top: 2px; right: 2px;
-  width: 28px; height: 28px; border-radius: 50%;
-  border: 2px solid var(--border); background: white;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.8rem; color: white; transition: all 0.2s;
-  cursor: pointer; -webkit-tap-highlight-color: transparent;
-  z-index: 2;
-}
-.magia-card.selecionada .magia-card-check {
-  background: var(--primary); border-color: var(--primary);
-}
-.magia-card.selecionada .magia-card-check::after { content: '\2713'; }
-.magia-card .magia-card-nome {
-  cursor: pointer; -webkit-tap-highlight-color: transparent;
-}
-.magia-card .magia-card-info {
-  display: none;
-}
-.magia-card-bloqueada { pointer-events: none; }
-.magia-card-bloqueada .magia-card-check { pointer-events: none; }
-
 /* Tags de identificação rápida de magia na ficha */
 .magia-tags {
   display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px;
@@ -818,7 +992,21 @@ tr:hover td { background: #faf8f4; }
 }
 .modal-fechar:hover { background: var(--bg-input); }
 .modal-corpo { padding: 16px; }
-.modal-acoes { padding: 12px 16px; display: flex; gap: 8px; justify-content: flex-end; border-top: 1px solid var(--border-light); }
+/* Rodapé de ações FIXO no fim do modal. Quem rola é o `.modal-container`
+   (max-height 85dvh, overflow-y auto), e o cabeçalho já era sticky no topo --
+   só o rodapé rolava junto com o conteúdo. Em listas longas, como os 75
+   talentos do "Adicionar Talento", isso obrigava a rolar até o fim para achar
+   Cancelar/Adicionar. Precisa de fundo opaco, senão os cards passam por baixo.
+   Em modal curto, que não chega a rolar, `sticky` não tira o rodapé do lugar:
+   ele fica no fluxo normal, como antes. */
+.modal-acoes {
+  padding: 12px 16px; display: flex; gap: 8px; justify-content: flex-end;
+  border-top: 1px solid var(--border-light);
+  position: sticky; bottom: 0; background: var(--bg-card); z-index: 1;
+}
+/* Modal sem botões (o popup de detalhe, por exemplo) não pode exibir uma
+   barra vazia com padding e borda presa no rodapé. */
+.modal-acoes:empty { display: none; }
 
 /* A largura do modal não comporta seis cards de atributo sem corte. */
 .modal-corpo .atributos-grid-edicao {
@@ -1498,7 +1686,7 @@ tr:hover td { background: #faf8f4; }
   .form-input, .form-select, .form-textarea, input, select, textarea { font-size: 16px !important; }
 
   .atributos-grid { grid-template-columns: repeat(3, 1fr); }
-  .selection-grid { grid-template-columns: repeat(2, 1fr); }
+  .opcao-grid.ampla { grid-template-columns: repeat(2, 1fr); }
   .pericias-lista { columns: 1; }
   .col-2, .col-3, .col-4 { flex: 0 0 100%; }
 
@@ -1613,11 +1801,11 @@ tr:hover td { background: #faf8f4; }
 }
 
 @media (min-width: 481px) and (max-width: 768px) {
-  .selection-grid { grid-template-columns: repeat(3, 1fr); }
+  .opcao-grid.ampla { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (min-width: 769px) {
-  .selection-grid { grid-template-columns: repeat(4, 1fr); }
+  .opcao-grid.ampla { grid-template-columns: repeat(4, 1fr); }
   .atributos-grid { grid-template-columns: repeat(6, 1fr); }
 }
 
@@ -1687,30 +1875,6 @@ tr:hover td { background: #faf8f4; }
   font-size: 0.8rem;
   color: var(--text-muted);
   margin-top: 2px;
-}
-
-/* Check nos cards selecionados */
-.selection-card {
-  position: relative;
-  overflow: hidden;
-}
-.selection-card .card-check {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--success);
-  color: #fff;
-  font-size: 0.7rem;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-}
-.selection-card.selected .card-check {
-  display: flex;
 }
 
 /* Modal melhorado p/ desktop (centralizado) */
@@ -1949,17 +2113,6 @@ tr:hover td { background: #faf8f4; }
 }
 .levelup-check-label:has(input:checked) {
   border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent);
-}
-
-/* Subclasse cards */
-.levelup-subclasse-card {
-  padding: 10px 12px; border: 2px solid var(--border-light);
-  border-radius: var(--radius); cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
-}
-.levelup-subclasse-card:hover { border-color: var(--accent); }
-.levelup-subclasse-card.selecionada {
-  border-color: var(--accent); background: var(--surface-variant, var(--bg-input));
 }
 
 /* Grid de atributos */

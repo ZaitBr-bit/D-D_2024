@@ -13,13 +13,47 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.0.1';
+export const VERSAO_ATUAL = '2.1.0';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.1.0',
+    data: '2026-08-13',
+    resumo: 'Todas as escolhas viraram cards: dá para ler o que cada opção faz '
+      + 'antes de escolher.',
+    melhorias: [
+      {
+        grupo: '🎴 Escolher ficou mais fácil',
+        itens: [
+          'Talentos, estilos de luta, maestrias, manobras, magias e truques '
+            + 'agora aparecem em cards, com o nome por extenso e um resumo. '
+            + 'Antes eram listas e caixinhas sem explicação.',
+          'Cada card tem "ver detalhes", que abre a descrição completa numa '
+            + 'janela — sem empurrar o resto da tela para baixo.',
+          'Listas grandes ganharam busca e filtros rápidos.',
+          'Ao escolher perícia, agora aparece o atributo que ela usa.',
+          'Os botões de cancelar e confirmar ficam fixos no rodapé, sem '
+            + 'precisar rolar até o fim.',
+          'Na subida de nível, escolher um talento recolhe a lista e deixa à '
+            + 'vista o que ainda falta preencher.',
+        ],
+      },
+    ],
+    correcoes: [
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'O talento Conjurador Ritualista não deixava escolher as magias '
+            + 'rituais: a lista aparecia vazia e não dava para concluir.',
+          '"Ver detalhes" às vezes abria mais de uma janela ao mesmo tempo.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.0.1',
     data: '2026-08-12',

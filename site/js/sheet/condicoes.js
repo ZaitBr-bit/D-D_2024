@@ -377,7 +377,7 @@ export function setupEventosCondicoes() {
           const imune = _condicoesImunes.includes(c.nome);
           const desc = CONDICOES_DESCRICAO[c.nome] || '';
           return `
-            <div class="selection-card ${ativa ? 'selected' : ''} ${imune ? 'disabled' : ''}" data-condicao-toggle="${c.nome}" 
+            <div class="opcao-card ${ativa ? 'selecionada' : ''} ${imune ? 'disabled' : ''}" data-condicao-toggle="${c.nome}"
                  style="min-width:130px;max-width:170px;cursor:pointer;text-align:center;border:2px solid ${ativa ? c.cor : 'var(--border-light)'};${ativa ? `background:${c.cor}15` : ''}${imune ? ';opacity:0.4;pointer-events:none' : ''}">
               <div style="font-size:1.2rem">${c.icone}</div>
               <div style="font-size:0.8rem;font-weight:600">${c.nome}</div>
@@ -398,12 +398,12 @@ export function setupEventosCondicoes() {
     document.querySelectorAll('[data-condicao-toggle]').forEach(el => {
       el.addEventListener('click', () => {
         const nome = el.dataset.condicaoToggle;
-        if (el.classList.contains('selected')) {
-          el.classList.remove('selected');
+        if (el.classList.contains('selecionada')) {
+          el.classList.remove('selecionada');
           el.style.borderColor = 'var(--border-light)';
           el.style.background = '';
         } else {
-          el.classList.add('selected');
+          el.classList.add('selecionada');
           const info = CONDICOES_DD.find(c => c.nome === nome);
           el.style.borderColor = info?.cor || 'var(--accent)';
           el.style.background = `${info?.cor || 'var(--accent)'}15`;
@@ -422,7 +422,7 @@ export function setupEventosCondicoes() {
 
     document.getElementById('btn-salvar-condicoes')?.addEventListener('click', () => {
       const novas = [];
-      document.querySelectorAll('[data-condicao-toggle].selected').forEach(el => {
+      document.querySelectorAll('[data-condicao-toggle].selecionada').forEach(el => {
         novas.push(el.dataset.condicaoToggle);
       });
 

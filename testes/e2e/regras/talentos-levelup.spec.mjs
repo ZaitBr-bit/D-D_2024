@@ -103,9 +103,17 @@ function explicaAusencia(entrada, sementeUsada) {
 // `.escolha-talento-levelup`. Mesmo filtro usado no motor de unidade
 // (comLacuna) para não fingir cobertura que a tela não dá para observar
 // de forma genérica.
+//
+// 'arma' (Mestre das Armas) entrou aqui na Task 14: o antigo
+// `<select class="escolha-talento-levelup" data-tipo="mestre_armas">`
+// virou um card de `montarSeletor` (`#lvlup-mestre-armas-lista`, dano e
+// maestria de cada arma vindos assincronamente de getArmas()) -- mesmo
+// motivo que já tirou 'magia_1_circulo'/'magia' daqui quando Tocado Por
+// Fadas/Sombras e a cascata de Iniciado em Magia converteram seus
+// próprios selects.
 const TIPOS_SEM_CONTROLE_GENERICO = [
   'atributo_talento', 'atributo_conjuracao', 'atributo_salvaguarda',
-  'lista_magias', 'truque', 'magia_1_circulo', 'magia', 'ritual',
+  'lista_magias', 'truque', 'magia_1_circulo', 'magia', 'ritual', 'arma',
 ];
 
 // Subconjunto de TIPOS_SEM_CONTROLE_GENERICO que além de não ter select
@@ -113,8 +121,8 @@ const TIPOS_SEM_CONTROLE_GENERICO = [
 // embutido dá para preencher via #levelup-talento-asi; estes não têm
 // equivalente e exigem widgets dedicados -- cascata de Iniciado em
 // Magia, busca de magia de Tocado Por Fadas/Sombras, checkboxes de
-// Conjurador Ritualista).
-const TIPOS_DINAMICOS = ['lista_magias', 'truque', 'magia_1_circulo', 'magia', 'ritual'];
+// Conjurador Ritualista, card de arma de Mestre das Armas).
+const TIPOS_DINAMICOS = ['lista_magias', 'truque', 'magia_1_circulo', 'magia', 'ritual', 'arma'];
 
 // Controles de escolha reconhecidos na tela: os selects de lista comuns
 // (`.escolha-talento-levelup`) e o par de selects específico da Dádiva
@@ -191,8 +199,11 @@ for (const [nome, entrada] of CANDIDATOS) {
     // o modo já é forçado para 'talento' -- ver achado 4) e seleciona o
     // talento-alvo.
     await page.check('input[name="levelup-asi-modo"][value="talento"]', { timeout: 1500 }).catch(() => {});
-    const select = page.locator('#levelup-talento-select');
-    const opcao = select.locator(`option[value="${nome}"]`);
+    // Task 13: o `<select id="levelup-talento-select">` virou cards de
+    // montarSeletor dentro de `#levelup-talento-lista` -- a "opção" agora é
+    // um `.opcao-card[data-opcao]`.
+    const lista = page.locator('#levelup-talento-lista');
+    const opcao = lista.locator(`.opcao-card[data-opcao="${nome}"]`);
     if (!await opcao.count()) {
       // Ausente da lista: só é aceitável se a PRÓPRIA semente violar o
       // pré-requisito do talento (nível, atributo, conjuração) -- não
@@ -210,7 +221,7 @@ for (const [nome, entrada] of CANDIDATOS) {
         .not.toBeNull();
       return;
     }
-    await select.selectOption(nome);
+    await opcao.click();
     await page.waitForTimeout(400);
 
     // 1. A tela oferece os controles de escolha que o livro exige.

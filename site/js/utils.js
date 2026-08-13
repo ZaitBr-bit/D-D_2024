@@ -587,7 +587,7 @@ export function abrirModal(titulo, corpoHtml, acoesHtml = '', onClose = null) {
           <button class="modal-fechar" data-fechar-sub="true">&times;</button>
         </div>
         <div class="modal-corpo" style="padding:16px">${corpoHtml}</div>
-        <div class="modal-acoes" style="padding:12px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--border-light)">${acoesHtml}</div>
+        ${acoesHtml ? `<div class="modal-acoes" style="padding:12px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--border-light);position:sticky;bottom:0;background:var(--bg-card);z-index:1">${acoesHtml}</div>` : ''}
       </div>
     `;
     document.body.appendChild(sub);

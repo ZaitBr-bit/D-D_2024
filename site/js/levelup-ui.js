@@ -8,13 +8,16 @@ import {
 } from './levelup-flow.js';
 import {
   renderCardGanhosNivel, renderCardSubclasse, renderCardASI,
-  renderCardEscolhasClasse, renderCardMagias, renderCardManobrasGuerreiro, renderCardRevisao
+  renderCardEscolhasClasse, renderCardMagias, renderCardManobrasGuerreiro, renderCardRevisao,
+  OPCOES_ESTILO_LUTA_BASE
 } from './levelup-cards.js';
+import { montarSeletor, montarTroca } from './ui-opcoes.js';
+import { deArmas, deEstilosLuta, deMagias, deManobras, deTalentos, motivoPreRequisito, rotuloPericia } from './opcoes-dominio.js';
 import { collectOpcoes, validateAll } from './levelup-validations.js';
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, PERICIAS } from './dados-classes.js';
-import { getMagiasPorCirculo, getMagiasClasse } from './db.js';
-import { abrirModal, fecharModal, toast, mdParaHtml, semAcento, calcMod, getEspacosMagia } from './utils.js';
-import { subirDeNivel, obterAtributosASITalento, getLimiteASITalento } from './levelup.js';
+import { getArmas, getMagiasPorCirculo, getMagiasClasse, getMagiasRituais } from './db.js';
+import { abrirModal, toast, mdParaHtml, semAcento, calcMod, getEspacosMagia } from './utils.js';
+import { subirDeNivel, obterAtributosASITalento, getLimiteASITalento, obterTalentosElegiveis } from './levelup.js';
 import { abrirGridManobras } from './manobras-ui.js';
 import {
   PERICIAS_TODAS as _PERICIAS_NOMES, FERRAMENTAS_TODAS as _FERRAMENTAS_TODAS,
@@ -241,7 +244,10 @@ function salvarStateDoDOM(ctx, state, step) {
         state.aumentos = aumentos;
         state.pontosDistribuidos = total;
       } else {
-        state.talento = document.getElementById('levelup-talento-select')?.value || '';
+        // state.talento já vem preenchido pelo callback aoMudar de
+        // montarSeletor (bindEventosASI) -- o select #levelup-talento-select
+        // não existe mais. Ler `?.value || ''` daqui zeraria a escolha em
+        // silêncio a cada navegação (armadilha descrita na Task 13).
         if (state.talento === 'Aumento no Valor de Atributo') {
           const aumentos = {};
           let total = 0;
@@ -269,12 +275,20 @@ function salvarStateDoDOM(ctx, state, step) {
             state.talentoTipoEscolha = primeiro.dataset.tipo;
           }
         }
-        // Escolhas especiais de magia
-        const selMagia = document.getElementById('levelup-magia-escola-select');
-        if (selMagia?.value) state.escolhasTalento = [selMagia.value];
-        // Magias rituais
-        const rituais = [...document.querySelectorAll('.levelup-ritual-check:checked')];
-        if (rituais.length > 0) state.escolhasTalento = rituais.map(cb => cb.value);
+        // Tocado Por Fadas / Tocado Pelas Sombras (magia de 1º círculo) e
+        // Mestre das Armas (arma): state.escolhasTalento já é gravado pelo
+        // callback de montarSeletor (bindEscolhasTalento). Não ler do DOM
+        // aqui -- os antigos #levelup-magia-escola-select e
+        // .escolha-talento-levelup[data-tipo="mestre_armas"] não existem
+        // mais, e `?.value || ''` apagaria a escolha em silêncio (mesma
+        // armadilha da Task 10, Step 3).
+        // Magias rituais do Conjurador Ritualista: viraram cards de
+        // montarSeletor junto com a correção da lista vazia, e o callback
+        // `aoMudar` já grava em state.escolhasTalento. Ler do DOM aqui
+        // (`.levelup-ritual-check:checked`) devolveria lista vazia -- os
+        // checkboxes não existem mais -- e a guarda `length > 0` que
+        // protegia disso passaria a nunca gravar nada. Mesma armadilha do
+        // Iniciado em Magia logo abaixo.
         // Dádiva da Resistência à Energia: coletar tipos de energia escolhidos
         const energiaSelects = [...document.querySelectorAll('.dadiva-energia-escolha')];
         if (energiaSelects.length > 0) {
@@ -289,8 +303,19 @@ function salvarStateDoDOM(ctx, state, step) {
         if (state.talento === 'Iniciado em Magia') {
           const imLista = document.getElementById('levelup-im-lista')?.value || '';
           const imAtributo = document.getElementById('levelup-im-atributo')?.value || '';
-          const imTruques = [...document.querySelectorAll('.levelup-im-truque:checked')].map(cb => cb.value);
-          const imMagia = document.getElementById('levelup-im-magia')?.value || '';
+          // Truques: mesma situação da magia de 1º círculo logo abaixo --
+          // viraram cards de montarSeletor, e o callback deles já grava em
+          // state.iniciadoEmMagia.truques. Os checkboxes `.levelup-im-truque`
+          // não existem mais; ler do DOM devolveria lista vazia e apagaria a
+          // escolha a cada navegação entre passos.
+          const imTruques = state.iniciadoEmMagia?.truques || [];
+          // Magia de 1º círculo: state.iniciadoEmMagia.magia já é gravada
+          // pelo callback de montarSeletor (bindEscolhasTalento) -- o select
+          // #levelup-im-magia não existe mais. Ler `?.value || ''` aqui
+          // apagaria a escolha em silêncio a cada navegação (a mesma
+          // armadilha desta lista, só que para a magia em vez da lista/
+          // atributo/truques, que continuam controles reais).
+          const imMagia = state.iniciadoEmMagia?.magia || '';
           if (imLista || imAtributo || imTruques.length > 0 || imMagia) {
             state.iniciadoEmMagia = { lista: imLista, atributo: imAtributo, truques: imTruques, magia: imMagia };
             state.talentoTipoEscolha = 'iniciado_em_magia';
@@ -302,23 +327,29 @@ function salvarStateDoDOM(ctx, state, step) {
     case 'escolhas_classe': {
       state.bardoExpertise = [...document.querySelectorAll('[data-bardo-expertise]:checked')].map(el => el.dataset.bardoExpertise);
       state.guardiaoExpertise = [...document.querySelectorAll('[data-guardiao-expertise]:checked')].map(el => el.dataset.guardiaoExpertise);
-      state.estiloLuta = document.querySelector('input[name="estilo_luta"]:checked')?.value || '';
+      // Estilo de Luta: state.estiloLuta já é gravado pelo callback de
+      // montarSeletor (levelup-cards.js/bindEventosEscolhasClasse, Task 10).
+      // Não ler do DOM aqui -- os radios não existem mais (viraram cards),
+      // e `document.querySelector(...)?.value || ''` apagaria a escolha.
       state.exploradorExpertise = document.querySelector('input[name="explorador_expertise"]:checked')?.value || '';
       state.exploradorIdiomas = [...document.querySelectorAll('[data-explorador-idioma]:checked')].map(el => el.dataset.exploradorIdioma);
       state.academicoExpertise = [...document.querySelectorAll('[data-academico-expertise]:checked')].map(el => el.dataset.academicoExpertise);
       break;
     }
     case 'selecao_magias': {
-      state.trocarDe = document.getElementById('levelup-trocar-de')?.value || '';
-      state.trocarPara = document.getElementById('levelup-trocar-para')?.value || '';
-      state.trocarParaCirculo = parseInt(document.getElementById('levelup-trocar-para-circ')?.value) || 0;
-      state.truqueTrocarDe = document.getElementById('levelup-truque-trocar-de')?.value || '';
-      state.truqueTrocarPara = document.getElementById('levelup-truque-trocar-para')?.value || '';
+      // Troca de magia e de truque: state.trocarDe/trocarPara/trocarParaCirculo
+      // e state.truqueTrocarDe/truqueTrocarPara já são gravados pelo callback
+      // de montarTroca (levelup-ui.js/bindEventosMagias, Task 12). Não ler do
+      // DOM aqui -- os selects não existem mais (viraram cards), e
+      // `document.getElementById(...)?.value || ''` apagaria a escolha.
       break;
     }
     case 'manobras_guerreiro': {
-      const selDe = document.getElementById('lvlup-manobra-trocar-de')?.value || '';
-      if (selDe) state.manobraTrocarDe = selDe;
+      // Troca de manobra: state.manobraTrocarDe/manobraTrocarPara já são
+      // gravados pelo callback de montarTroca
+      // (levelup-ui.js/bindEventosManobrasGuerreiro, Task 12). Não ler do
+      // DOM aqui -- o select não existe mais, e `?.value || ''` apagaria a
+      // escolha.
       break;
     }
     case 'revisao_confirmacao': {
@@ -329,10 +360,10 @@ function salvarStateDoDOM(ctx, state, step) {
       // <select>/checkboxes eram lidos do DOM errado (ou nunca lidos) e a
       // escolha do jogador se perdia em silêncio ao confirmar -- achado da
       // revisão final, corrigido aqui.
-      state.estiloLutaTrocarDe = document.getElementById('lvlup-estilo-luta-trocar-de')?.value || '';
-      state.estiloLutaTrocarPara = state.estiloLutaTrocarDe
-        ? (document.getElementById('lvlup-estilo-luta-trocar-para')?.value || '')
-        : '';
+      // Estilo de Luta: state.estiloLutaTrocarDe/Para já são gravados pelo
+      // callback de montarTroca (levelup-cards.js/bindEventosTrocasOpcionais,
+      // Task 10). Não ler do DOM aqui -- os selects não existem mais, e
+      // `?.value || ''` apagaria a escolha.
       const checkboxesLadino = document.querySelectorAll('[data-ladino-expertise]');
       if (checkboxesLadino.length > 0) {
         state.ladinoExpertise = [...checkboxesLadino].filter(el => el.checked).map(el => el.dataset.ladinoExpertise);
@@ -381,7 +412,7 @@ function bindEventosHP(ctx, state) {
 
 // --- Subclasse ---
 function bindEventosSubclasse(ctx, state) {
-  document.querySelectorAll('.levelup-subclasse-card').forEach(card => {
+  document.querySelectorAll('#levelup-subclasses-lista .opcao-card').forEach(card => {
     card.addEventListener('click', () => {
       const nome = card.dataset.subclasse;
       const idx = parseInt(card.dataset.idx);
@@ -391,7 +422,7 @@ function bindEventosSubclasse(ctx, state) {
       }
       state.subclasse = nome;
 
-      document.querySelectorAll('.levelup-subclasse-card').forEach(c => c.classList.remove('selecionada'));
+      document.querySelectorAll('#levelup-subclasses-lista .opcao-card').forEach(c => c.classList.remove('selecionada'));
       card.classList.add('selecionada');
 
       const sc = ctx.subclassesDisponiveis[idx];
@@ -443,24 +474,104 @@ function bindEventosASI(ctx, state, caches) {
     });
   });
 
-  // Select de talento
-  const selTalento = document.getElementById('levelup-talento-select');
-  selTalento?.addEventListener('change', () => {
-    const nome = selTalento.value;
-    state.talento = nome;
-    mostrarDetalhesTalento(nome, ctx, caches, state);
-  });
+  // Escolha de talento: 75 opções com descrição longa. O card mostra os
+  // NOMES dos benefícios como resumo e abre o texto completo sob demanda;
+  // o filtro "só os que posso pegar" tira da frente o que o nível ainda não
+  // alcança (13 Dádivas Épicas exigem nível 19).
+  const nivelNovo = (char.nivel || 1) + 1;
+  const talentosDisponiveis = obterTalentosElegiveis(char, caches.talentosCache, nivelNovo)
+    .filter(talento => ctx.exigeDadivaEpica || talento.nome !== 'Aumento no Valor de Atributo');
+  const talentoEl = document.getElementById('levelup-talento-lista');
+  if (talentoEl) {
+    // A lista se RECOLHE ao escolher: fica só o talento escolhido e um link
+    // para reabrir. Sem isso, as escolhas que o talento exige (o atributo do
+    // "Aumento no Valor de Atributo", as perícias do Habilidoso, a arma do
+    // Mestre das Armas) nascem em `#levelup-talento-escolhas`, que vem DEPOIS
+    // dos 45 cards -- fora da tela. O jogador escolhia o talento, não via a
+    // pendência, tentava avançar e só então era barrado, sem entender por quê.
+    // Recolhido, a escolha pendente é a única coisa na tela.
+    const montarListaTalentos = (recolhida) => {
+      const escolhida = recolhida
+        ? talentosDisponiveis.filter(t => t.nome === state.talento)
+        : talentosDisponiveis;
 
-  // Se já tem talento selecionado, mostrar detalhes
-  if (state.talento) {
-    mostrarDetalhesTalento(state.talento, ctx, caches, state);
+      montarSeletor(talentoEl, {
+        opcoes: deTalentos(escolhida, {
+        jaPossui: new Set((char.talentos || []).map(t => (typeof t === 'string' ? t : t.nome))),
+        // motivoPreRequisito confere nível contra o personagem recebido --
+        // aqui precisa ser o nível QUE ELE VAI TER (nivelNovo), não o atual,
+        // senão toda Dádiva Épica que exige exatamente nível 19 apareceria
+        // bloqueada bem no nível em que passa a ser elegível (mesmo cálculo
+        // que obterTalentosElegiveis já usa acima para montar a lista).
+          motivoIndisponivel: (t) => motivoPreRequisito(t, { ...char, nivel: nivelNovo }),
+        }),
+        densidade: 'densa',
+        max: 1,
+        // Recolhida não precisa de busca nem de filtro: há um card só.
+        busca: !recolhida,
+        // Rótulos IDÊNTICOS a `talento.categoria` (dados/talentos/talentos.json)
+        // -- é contra esse valor exato que ui-opcoes.js compara `o.grupo` ao
+        // filtrar (achado ao implementar: "Estilo de Luta"/"Dádiva Épica" sem
+        // o prefixo "de " nunca batiam com nenhum grupo e zeravam a lista).
+        filtros: recolhida ? [] : ['de Origem', 'Geral', 'de Estilo de Luta', 'de Dádiva Épica'],
+        filtroElegiveis: !recolhida,
+        selecionadas: state.talento ? [state.talento] : [],
+        aoMudar: (sel) => {
+          const anterior = state.talento;
+          state.talento = sel[0] || '';
+          // Desmarcar o card recolhido significa "quero escolher outro":
+          // reabre a lista inteira em vez de deixar a tela vazia.
+          if (recolhida && !state.talento) {
+            const escolhasEl = document.getElementById('levelup-talento-escolhas');
+            if (escolhasEl) escolhasEl.innerHTML = '';
+            montarListaTalentos(false);
+            return;
+          }
+          // Mesma chamada que o `change` do select fazia antigamente: ela
+          // acha o talento no cache e monta as escolhas que ele exige
+          // (perícias do Habilidoso, arma do Mestre das Armas etc.).
+          if (state.talento) mostrarDetalhesTalento(state.talento, ctx, caches, state);
+          // Recolher só na transição de "nenhum" para "escolhido" -- montar
+          // de novo a cada disparo do callback destruiria os controles de
+          // escolha que o jogador acabou de preencher.
+          if (!recolhida && state.talento && state.talento !== anterior) {
+            montarListaTalentos(true);
+          }
+        },
+      });
+
+      // Link para reabrir a lista, só quando ela está recolhida.
+      if (recolhida) {
+        const trocar = document.createElement('div');
+        trocar.className = 'opcao-ver';
+        trocar.style.textAlign = 'center';
+        trocar.dataset.trocarTalento = '1';
+        trocar.innerHTML = '&#8964; trocar talento';
+        trocar.addEventListener('click', () => {
+          state.talento = '';
+          const escolhasEl = document.getElementById('levelup-talento-escolhas');
+          if (escolhasEl) escolhasEl.innerHTML = '';
+          montarListaTalentos(false);
+        });
+        talentoEl.appendChild(trocar);
+      }
+    };
+
+    // Já recolhida na montagem se o jogador volta ao passo com o talento
+    // escolhido -- ele não precisa reencontrar a escolha no meio da lista.
+    montarListaTalentos(Boolean(state.talento));
+    if (state.talento) mostrarDetalhesTalento(state.talento, ctx, caches, state);
   }
 }
 
 function mostrarDetalhesTalento(nome, ctx, caches, state) {
   const detalheEl = document.getElementById('levelup-talento-detalhe');
   const escolhasEl = document.getElementById('levelup-talento-escolhas');
-  if (!nome || !detalheEl) return;
+  // O painel de detalhe deixou de existir (o texto completo abre dentro do
+  // card agora, via montarSeletor/ui-opcoes.js), mas as ESCOLHAS do talento
+  // continuam vindo daqui -- por isso a guarda não pode mais exigir
+  // detalheEl.
+  if (!nome) return;
 
   // Buscar dados do talento no cache
   let talentoData = null;
@@ -472,20 +583,24 @@ function mostrarDetalhesTalento(nome, ctx, caches, state) {
   }
 
   if (!talentoData) {
-    detalheEl.style.display = 'none';
+    if (detalheEl) detalheEl.style.display = 'none';
     if (escolhasEl) escolhasEl.innerHTML = '';
     return;
   }
 
-  // Descrição do talento
-  detalheEl.innerHTML = `
-    <div style="font-weight:700;margin-bottom:4px">${talentoData.nome}</div>
-    <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:6px">${talentoData.prerequisito || ''}</div>
-    ${(talentoData.beneficios || []).map(b =>
-      `<div style="margin-bottom:4px"><strong>${b.nome}:</strong> ${mdParaHtml(b.descricao)}</div>`
-    ).join('')}
-  `;
-  detalheEl.style.display = 'block';
+  // Descrição do talento -- só escreve se o painel ainda existir (a tela de
+  // subida de nível não tem mais #levelup-talento-detalhe; o texto completo
+  // já aparece no "ver detalhes" do card).
+  if (detalheEl) {
+    detalheEl.innerHTML = `
+      <div style="font-weight:700;margin-bottom:4px">${talentoData.nome}</div>
+      <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:6px">${talentoData.prerequisito || ''}</div>
+      ${(talentoData.beneficios || []).map(b =>
+        `<div style="margin-bottom:4px"><strong>${b.nome}:</strong> ${mdParaHtml(b.descricao)}</div>`
+      ).join('')}
+    `;
+    detalheEl.style.display = 'block';
+  }
 
   // Escolhas específicas do talento
   if (escolhasEl) {
@@ -570,7 +685,7 @@ export function renderEscolhasTalento(nome, talentoData, ctx, state = {}) {
     for (let i = 0; i < 3; i++) {
       const selecionada = state.escolhasTalento?.[i] || '';
       html += `<select class="escolha-talento-levelup form-input" style="width:100%;margin:4px 0"><option value="">-- Escolha ${i + 1} --</option>`;
-      html += `<optgroup label="Perícias">${periciasDisponiveis.map(p => `<option value="${p}" ${selecionada === p ? 'selected' : ''}>${p}</option>`).join('')}</optgroup>`;
+      html += `<optgroup label="Perícias">${periciasDisponiveis.map(p => `<option value="${p}" ${selecionada === p ? 'selected' : ''}>${rotuloPericia(p)}</option>`).join('')}</optgroup>`;
       html += `<optgroup label="Ferramentas">${ferramentasDisponiveis.map(f => `<option value="${f}" ${selecionada === f ? 'selected' : ''}>${f}</option>`).join('')}</optgroup>`;
       html += `</select>`;
     }
@@ -617,7 +732,7 @@ export function renderEscolhasTalento(nome, talentoData, ctx, state = {}) {
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Perícia (1)</div>`;
     html += _avisoOpcoesInsuficientes(ops.length, 1);
     html += `<select class="escolha-talento-levelup form-input" data-tipo="analitico" style="width:100%;margin:4px 0"><option value="">-- Escolha --</option>`;
-    html += ops.map(p => `<option value="${p}">${p}</option>`).join('');
+    html += ops.map(p => `<option value="${p}">${rotuloPericia(p)}</option>`).join('');
     html += `</select>`;
   }
 
@@ -630,7 +745,7 @@ export function renderEscolhasTalento(nome, talentoData, ctx, state = {}) {
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Perícia (1)</div>`;
     html += _avisoOpcoesInsuficientes(ops.length, 1);
     html += `<select class="escolha-talento-levelup form-input" data-tipo="mente_agucada" style="width:100%;margin:4px 0"><option value="">-- Escolha --</option>`;
-    html += ops.map(p => `<option value="${p}">${p}</option>`).join('');
+    html += ops.map(p => `<option value="${p}">${rotuloPericia(p)}</option>`).join('');
     html += `</select>`;
   }
 
@@ -639,11 +754,11 @@ export function renderEscolhasTalento(nome, talentoData, ctx, state = {}) {
     const exps = new Set(char.pericias_expertise || []);
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Proficiência</div>`;
     html += `<select class="escolha-talento-levelup form-input" data-tipo="proficiencia" style="width:100%;margin:4px 0"><option value="">-- Proficiência --</option>`;
-    html += _PERICIAS_NOMES.filter(p => !profs.includes(p)).map(p => `<option value="${p}" ${state.escolhasTalento?.[0] === p ? 'selected' : ''}>${p}</option>`).join('');
+    html += _PERICIAS_NOMES.filter(p => !profs.includes(p)).map(p => `<option value="${p}" ${state.escolhasTalento?.[0] === p ? 'selected' : ''}>${rotuloPericia(p)}</option>`).join('');
     html += `</select>`;
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Especialização</div>`;
     html += `<select class="escolha-talento-levelup form-input" data-tipo="expertise" style="width:100%;margin:4px 0"><option value="">-- Especialização --</option>`;
-    html += profs.filter(p => !exps.has(p)).map(p => `<option value="${p}" ${state.escolhasTalento?.[1] === p ? 'selected' : ''}>${p}</option>`).join('');
+    html += profs.filter(p => !exps.has(p)).map(p => `<option value="${p}" ${state.escolhasTalento?.[1] === p ? 'selected' : ''}>${rotuloPericia(p)}</option>`).join('');
     html += `</select>`;
   }
 
@@ -655,7 +770,7 @@ export function renderEscolhasTalento(nome, talentoData, ctx, state = {}) {
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Especialização em Perícia</div>`;
     html += `<select class="escolha-talento-levelup form-input" data-tipo="dadiva_proficiencia_pericia" style="width:100%;margin:4px 0">`;
     html += `<option value="">-- Escolha uma perícia proficiente --</option>`;
-    html += elegiveis.map(pericia => `<option value="${pericia}" ${selecionada === pericia ? 'selected' : ''}>${pericia}</option>`).join('');
+    html += elegiveis.map(pericia => `<option value="${pericia}" ${selecionada === pericia ? 'selected' : ''}>${rotuloPericia(pericia)}</option>`).join('');
     html += `</select>`;
   }
 
@@ -678,22 +793,23 @@ export function renderEscolhasTalento(nome, talentoData, ctx, state = {}) {
     // Simples ou Marcial à escolha (o pré-requisito de proficiência com a
     // arma não é filtrado aqui pelo mesmo motivo documentado em
     // validarEscolhasTalento: o personagem não guarda proficiência de arma
-    // por item). Já a MAESTRIA em si é filtrada: fica de fora a arma em que
-    // o personagem já tem mastria (char.maestrias_arma), pois uma maestria
-    // repetida não concede nada.
+    // por item). Já a MAESTRIA em si é filtrada: fica bloqueada a arma em
+    // que o personagem já tem maestria (char.maestrias_arma), pois uma
+    // maestria repetida não concede nada -- ver deArmas em
+    // opcoes-dominio.js. Dano e maestria de cada arma só existem no JSON
+    // (getArmas()), por isso a lista real é montada assincronamente em
+    // bindEscolhasTalento; aqui só o placeholder.
     const maestriasAtuais = char.maestrias_arma || [];
     const armasDisponiveis = _ARMAS_SIMPLES_MARCIAIS.filter(a => !maestriasAtuais.includes(a));
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Propriedade de Maestria (Arma)</div>`;
     html += _avisoOpcoesInsuficientes(armasDisponiveis.length, 1);
-    html += `<select class="escolha-talento-levelup form-input" data-tipo="mestre_armas" style="width:100%;margin:4px 0"><option value="">-- Escolha a arma --</option>`;
-    html += armasDisponiveis.map(a => `<option value="${a}">${a}</option>`).join('');
-    html += `</select>`;
+    html += `<div id="lvlup-mestre-armas-lista">Carregando...</div>`;
   }
 
   if (nome === 'Tocado Por Fadas' || nome === 'Tocado Pelas Sombras') {
     const label = nome === 'Tocado Por Fadas' ? 'Adivinhação ou Encantamento' : 'Ilusão ou Necromancia';
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Magia de 1º Círculo (${label})</div>`;
-    html += `<select id="levelup-magia-escola-select" class="form-input" style="width:100%;margin:4px 0"><option value="">Carregando...</option></select>`;
+    html += `<div id="lvlup-magia-escola-lista">Carregando...</div>`;
     // Será populado assincronamente em bindEscolhasTalento
   }
 
@@ -779,40 +895,78 @@ function configurarSelectsTalentoExclusivos() {
 
 export function bindEscolhasTalento(nome, talentoData, ctx, state = {}) {
   if (['Habilidoso', 'Artifista', 'Músico'].includes(nome)) configurarSelectsTalentoExclusivos();
+  // Mestre das Armas: carregar armas (dano/propriedades/maestria) assincronamente.
+  if (nome === 'Mestre das Armas') {
+    getArmas().then(dadosArmas => {
+      const el = document.getElementById('lvlup-mestre-armas-lista');
+      if (!el) return;
+      const descricoesMaestria = new Map(
+        (dadosArmas?.propriedades || []).map(p => [p.nome, p.descricao]));
+      const armasElegiveis = (dadosArmas?.armas || [])
+        .filter(a => _ARMAS_SIMPLES_MARCIAIS.includes(a.nome));
+      // Mestre das Armas: a escolha é uma arma, e o que importa é qual
+      // maestria ela concede -- dado que o select escondia.
+      montarSeletor(el, {
+        opcoes: deArmas(armasElegiveis, {
+          jaTem: new Set(ctx.char.maestrias_arma || []),
+          descricoesMaestria,
+        }),
+        densidade: 'densa', max: 1, busca: true,
+        selecionadas: state.escolhasTalento?.[0] ? [state.escolhasTalento[0]] : [],
+        aoMudar: (sel) => {
+          state.escolhasTalento = sel[0] ? [sel[0]] : [];
+          state.talentoTipoEscolha = 'mestre_armas';
+        },
+      });
+    });
+  }
+
   // Tocado Por Fadas / Sombras: carregar magias assincronamente
   if (nome === 'Tocado Por Fadas' || nome === 'Tocado Pelas Sombras') {
     const escolas = nome === 'Tocado Por Fadas' ? ['Adivinhação', 'Encantamento'] : ['Ilusão', 'Necromancia'];
     getMagiasPorCirculo(1).then(dados => {
       const magias = (dados?.magias || []).filter(m => escolas.includes(m.escola));
-      const sel = document.getElementById('levelup-magia-escola-select');
-      if (sel) {
-        sel.innerHTML = `<option value="">-- Selecione --</option>` +
-          magias.map(m => `<option value="${m.nome}" ${state.escolhasTalento?.[0] === m.nome ? 'selected' : ''}>${m.nome}</option>`).join('');
-      }
+      const el = document.getElementById('lvlup-magia-escola-lista');
+      if (!el) return;
+      // Círculo e escola passam a aparecer sem clicar.
+      montarSeletor(el, {
+        opcoes: deMagias(magias),
+        densidade: 'densa', max: 1, busca: true,
+        selecionadas: state.escolhasTalento?.[0] ? [state.escolhasTalento[0]] : [],
+        aoMudar: (sel) => { state.escolhasTalento = sel[0] ? [sel[0]] : []; },
+      });
     });
   }
 
-  // Conjurador Ritualista: carregar magias rituais
+  // Conjurador Ritualista: carregar magias rituais.
+  //
+  // A lista nascia VAZIA (o rótulo "Selecione N magias rituais" aparecia e
+  // nada abaixo dele, e confirmar batia no aviso "Escolha exatamente N
+  // magias rituais distintas"): o código varria `magias/circulo_N.json`
+  // procurando `m.ritual` ou `m.especial === 'R'`, mas aquele acervo não
+  // carrega marcador nenhum -- o Ritual só existe em
+  // `classes/magias_<classe>.json`. Quem sabe achar isso é
+  // `getMagiasRituais` (db.js), que ainda cobre os marcadores combinados
+  // ('R, M', 'C, R') que a comparação `=== 'R'` perdia. São 11 magias.
   if (nome === 'Conjurador Ritualista') {
     const bonusProf = Math.floor((ctx.char.nivel || 1) / 4) + 2;
-    Promise.all([1, 2, 3, 4, 5, 6, 7, 8, 9].map(c => getMagiasPorCirculo(c))).then(todosCirculos => {
-      const rituais = [];
-      todosCirculos.forEach(dados => {
-        (dados?.magias || []).forEach(m => {
-          if ((m.ritual || m.especial === 'R') && m.circulo <= 1) rituais.push(m);
-        });
-      });
+    getMagiasRituais(1).then(rituais => {
       const container = document.getElementById('levelup-rituais-container');
-      if (container) {
-        container.innerHTML = `
-          <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:4px">Selecione ${bonusProf} magias rituais de 1º círculo:</div>
-          ${rituais.map(m => `
-            <label style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:0.85rem">
-              <input type="checkbox" class="levelup-ritual-check" value="${m.nome}" ${state.escolhasTalento?.includes(m.nome) ? 'checked' : ''}> ${m.nome}
-            </label>
-          `).join('')}
-        `;
-      }
+      if (!container) return;
+      container.innerHTML = `
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:4px">Selecione ${bonusProf} magias rituais de 1º círculo:</div>
+        <div id="levelup-rituais-lista"></div>
+      `;
+      // Cards, como todo ponto de escolha com dados: o jogador precisa ver
+      // escola e descrição para escolher entre Identificar e Alarme. Os
+      // checkboxes antigos (.levelup-ritual-check) não existem mais -- quem
+      // lê a escolha lê de `state.escolhasTalento`, gravado aqui.
+      montarSeletor(document.getElementById('levelup-rituais-lista'), {
+        opcoes: deMagias(rituais),
+        densidade: 'densa', max: bonusProf, busca: true,
+        selecionadas: (state.escolhasTalento || []).filter(n => rituais.some(m => m.nome === n)),
+        aoMudar: (sel) => { state.escolhasTalento = [...sel]; },
+      });
     });
   }
 
@@ -843,7 +997,15 @@ export function bindEscolhasTalento(nome, talentoData, ctx, state = {}) {
       if (selLista.value !== lista) return; // usuário trocou a lista antes desta resposta chegar
       const listaMagias = dadosMagias?.lista_magias || {};
       const truquesLista = (listaMagias['Truques'] || []).map(m => typeof m === 'string' ? { nome: m } : m);
-      const magiasCirc1 = (listaMagias['1º Círculo'] || []).map(m => typeof m === 'string' ? { nome: m } : m);
+      // `circulo: 1` forçado aqui porque as entradas de `lista_magias['1º
+      // Círculo']` (dados/classes/magias_*.json) não trazem esse campo --
+      // é o balde em que já estão que diz o círculo, não um campo próprio.
+      // deMagias (opcoes-dominio.js) precisa dele para o resumo do card
+      // ("1º Círculo · Escola"); sem isto o card mostrava "undefinedº
+      // Círculo" (achado ao converter para montarSeletor, Task 14).
+      const magiasCirc1 = (listaMagias['1º Círculo'] || [])
+        .map(m => typeof m === 'string' ? { nome: m } : m)
+        .map(m => ({ ...m, circulo: 1 }));
 
       // Truques/magias já conhecidos por outra fonte — impede escolher duplicata sem ganho
       const jaTemTruqueIM = new Set((ctx.char.magias_conhecidas || []).filter(m => m.circulo === 0).map(m => m.nome));
@@ -854,32 +1016,31 @@ export function bindEscolhasTalento(nome, talentoData, ctx, state = {}) {
 
       const truquesContainer = document.getElementById('levelup-im-truques-container');
       if (truquesContainer) {
+        // Truques do Iniciado em Magia em cards, como o resto do app: em
+        // checkbox o jogador escolhia dois truques vendo só o nome, sem
+        // escola nem descrição. `circulo: 0` é injetado porque a lista da
+        // classe (`lista_magias.Truques`) não traz o campo, e sem ele o card
+        // não sabe onde buscar o texto completo do "ver detalhes".
         truquesContainer.innerHTML = `
           <div style="font-weight:600;font-size:0.85rem;margin-top:8px">Truques (2)</div>
-          <div style="max-height:20vh;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:4px;margin:4px 0">
-            ${truquesLista.map(m => {
-              const restaurado = state.iniciadoEmMagia?.lista === lista &&
-                state.iniciadoEmMagia?.truques?.includes(m.nome);
-              const bloqueado = jaTemTruqueIM.has(m.nome) && !restaurado;
-              return `
-              <label style="display:flex;align-items:center;gap:4px;font-size:0.82rem;padding:2px 4px;border:1px solid var(--border-light);border-radius:4px${bloqueado ? ';opacity:0.4' : ''}">
-                <input type="checkbox" class="levelup-im-truque" value="${m.nome}" ${restaurado ? 'checked' : ''} ${bloqueado ? 'disabled' : ''}> ${m.nome}${bloqueado ? ' (já conhecido)' : ''}
-              </label>
-            `;
-            }).join('')}
-          </div>
-          <div style="font-size:0.8rem;color:var(--text-muted)">Selecionados: <span id="levelup-im-truques-count">${state.iniciadoEmMagia?.lista === lista ? state.iniciadoEmMagia?.truques?.length || 0 : 0}</span>/2</div>
+          <div id="lvlup-im-truques-lista"></div>
         `;
         truquesContainer.style.display = 'block';
 
-        // Limitar a 2 truques
-        truquesContainer.querySelectorAll('.levelup-im-truque').forEach(cb => {
-          cb.addEventListener('change', () => {
-            const selecionados = truquesContainer.querySelectorAll('.levelup-im-truque:checked');
-            if (selecionados.length > 2) { cb.checked = false; return; }
-            const cnt = document.getElementById('levelup-im-truques-count');
-            if (cnt) cnt.textContent = selecionados.length;
-          });
+        const truquesRestaurados = state.iniciadoEmMagia?.lista === lista
+          ? (state.iniciadoEmMagia?.truques || []) : [];
+        montarSeletor(document.getElementById('lvlup-im-truques-lista'), {
+          opcoes: deMagias(
+            truquesLista.map(m => ({ ...m, circulo: 0 })),
+            { jaTem: new Set([...jaTemTruqueIM].filter(n => !truquesRestaurados.includes(n))) }
+          ),
+          densidade: 'densa',
+          max: 2,
+          busca: true,
+          selecionadas: truquesRestaurados,
+          aoMudar: (sel) => {
+            state.iniciadoEmMagia = { ...(state.iniciadoEmMagia || {}), lista, truques: sel };
+          },
         });
       }
 
@@ -887,16 +1048,28 @@ export function bindEscolhasTalento(nome, talentoData, ctx, state = {}) {
       if (magiaContainer) {
         magiaContainer.innerHTML = `
           <div style="font-weight:600;font-size:0.85rem;margin-top:8px">Magia de 1º Círculo (1)</div>
-          <select id="levelup-im-magia" class="form-input" style="width:100%;margin:4px 0">
-            <option value="">-- Selecione --</option>
-            ${magiasCirc1.map(m => {
-              const restaurada = state.iniciadoEmMagia?.lista === lista && state.iniciadoEmMagia?.magia === m.nome;
-              const bloqueada = jaTemMagiaIM.has(m.nome) && !restaurada;
-              return `<option value="${m.nome}" ${restaurada ? 'selected' : ''} ${bloqueada ? 'disabled' : ''}>${m.nome}${bloqueada ? ' (já conhecida)' : ''}</option>`;
-            }).join('')}
-          </select>
+          <div id="lvlup-im-magia-lista"></div>
         `;
         magiaContainer.style.display = 'block';
+
+        // A magia já conhecida por outra fonte fica bloqueada -- exceto a
+        // que o próprio jogador já tinha escolhido para esta MESMA lista
+        // (restauração ao navegar de volta): sem a exclusão abaixo, a
+        // própria escolha do jogador voltaria marcada como indisponível.
+        const jaTemParaCard = new Set(jaTemMagiaIM);
+        const magiaRestaurada = state.iniciadoEmMagia?.lista === lista ? state.iniciadoEmMagia?.magia : '';
+        if (magiaRestaurada) jaTemParaCard.delete(magiaRestaurada);
+
+        // Magia de 1º Círculo: círculo e escola passam a aparecer sem clicar.
+        montarSeletor(document.getElementById('lvlup-im-magia-lista'), {
+          opcoes: deMagias(magiasCirc1, { jaTem: jaTemParaCard }),
+          densidade: 'densa', max: 1, busca: true,
+          selecionadas: magiaRestaurada ? [magiaRestaurada] : [],
+          aoMudar: (sel) => {
+            if (!state.iniciadoEmMagia) state.iniciadoEmMagia = {};
+            state.iniciadoEmMagia.magia = sel[0] || '';
+          },
+        });
       }
     });
     if (selLista?.value) selLista.dispatchEvent(new Event('change'));
@@ -924,6 +1097,23 @@ function bindEventosEscolhasClasse(ctx, state) {
   limitarCheckboxes('[data-guardiao-expertise]', 2, 'levelup-guardiao-expertise-count');
   limitarCheckboxes('[data-explorador-idioma]', 2, 'levelup-explorador-idiomas-count');
   limitarCheckboxes('[data-academico-expertise]', 1, 'levelup-academico-count');
+
+  // Escolha de Estilo de Luta (Task 10): card em vez do grid de radios
+  // antigo. Guardião e Paladino ganham uma opção extra de dádiva de
+  // conjuração (Combatente Druídico/Abençoado) além das 10 base.
+  const escolhaEl = document.getElementById('lvlup-estilo-luta-escolha');
+  if (escolhaEl) {
+    const opcoesBase = [...OPCOES_ESTILO_LUTA_BASE];
+    if (ctx.char.classe === 'Guardião') opcoesBase.push({ nome: 'Combatente Druídico', descricao: 'Aprende 2 truques de Druida (Sabedoria)' });
+    if (ctx.char.classe === 'Paladino') opcoesBase.push({ nome: 'Combatente Abençoado', descricao: 'Aprende 2 truques de Clérigo (Carisma)' });
+    montarSeletor(escolhaEl, {
+      opcoes: deEstilosLuta(opcoesBase),
+      densidade: 'ampla',
+      max: 1,
+      selecionadas: state.estiloLuta ? [state.estiloLuta] : [],
+      aoMudar: (sel) => { state.estiloLuta = sel[0] || ''; },
+    });
+  }
 }
 
 // --- Trocas opcionais (Estilo de Luta do Guerreiro / Especialização do
@@ -937,16 +1127,39 @@ function bindEventosEscolhasClasse(ctx, state) {
 function bindEventosTrocasOpcionais(ctx, state) {
   limitarCheckboxes('[data-ladino-expertise]', 2, 'levelup-ladino-expertise-count');
 
-  // Troca de Estilo de Luta do Guerreiro: o select "para" só habilita
-  // depois que o jogador escolhe "de" (mesma UX do "Não trocar" das
-  // trocas de magia/manobra).
-  document.getElementById('lvlup-estilo-luta-trocar-de')?.addEventListener('change', (e) => {
-    const paraSelect = document.getElementById('lvlup-estilo-luta-trocar-para');
-    if (paraSelect) {
-      paraSelect.disabled = !e.target.value;
-      if (!e.target.value) paraSelect.value = '';
-    }
-  });
+  // Troca de Estilo de Luta do Guerreiro (Task 10): um card com o estilo
+  // atual e a grade dos demais. O "sai" tem um item só, então montarTroca
+  // mostra "Trocar este" em vez de uma escolha falsa entre uma opção e
+  // "Não trocar".
+  const trocaEl = document.getElementById('lvlup-estilo-luta-troca');
+  if (trocaEl) {
+    const estiloAtual = (ctx.char.escolhas_classe?.estilo_luta || [])[0] || '';
+    montarTroca(trocaEl, {
+      // `selecionado`: mesmo motivo do `selecionado` da troca de magia, em
+      // bindEventosMagias (achado do revisor, Task 12 Rodada 2) -- esta
+      // troca (Task 10) ficou de fora daquela correção porque o lado "sai"
+      // aqui tem um item só e usa o card de apresentação, que não dispara
+      // `aoMudar` na montagem; sem isso, a tela remontava mostrando "Trocar
+      // este" como se nada tivesse sido escolhido, enquanto o state (e a
+      // validação do confirmar) ainda tinham a troca (achado da revisão
+      // final, Critical C1).
+      sai: {
+        rotulo: 'Seu estilo atual',
+        opcoes: deEstilosLuta(OPCOES_ESTILO_LUTA_BASE.filter(o => o.nome === estiloAtual)),
+        selecionado: state.estiloLutaTrocarDe || null,
+      },
+      entra: {
+        rotulo: 'Substituir por',
+        densidade: 'ampla',
+        opcoes: deEstilosLuta(OPCOES_ESTILO_LUTA_BASE, { jaTem: new Set([estiloAtual]) }),
+        selecionado: state.estiloLutaTrocarPara || null,
+      },
+      aoMudar: ({ sai, entra }) => {
+        state.estiloLutaTrocarDe = sai || '';
+        state.estiloLutaTrocarPara = entra || '';
+      },
+    });
+  }
 }
 
 // --- Magias ---
@@ -1038,16 +1251,16 @@ function bindEventosMagias(ctx, state) {
         : [...magiasPorCirculo.entries()].sort(([a], [b]) => a - b).map(([circulo, magias]) => `
           <details data-grid-circulo="${circulo}" ${termo.length >= 2 || circulosExpandidos.has(circulo) || (circulo === 0 && !circulosComEstadoDefinido.has(circulo)) ? 'open' : ''} style="margin:8px 0">
             <summary class="section-divider" style="margin:0;cursor:pointer"><span>${circulo === 0 ? 'Truques' : `${circulo}º Círculo`} (${magias.length})</span></summary>
-            <div class="magias-grid">${magias.map(m => {
+            <div class="opcao-grid densa">${magias.map(m => {
         const sel = selSet.has(m.nome);
         const bloqueado = cheio && !sel;
         return `
-          <div class="magia-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}"
+          <div class="opcao-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'bloqueada' : ''}"
                data-grid-nome="${m.nome}" data-grid-circ="${m.circulo}"
                style="${bloqueado ? 'opacity:0.35;cursor:default' : ''}">
-            <span class="magia-card-check" data-grid-check="${m.nome}"></span>
-            <div class="magia-card-nome" data-grid-info="${m.nome}" data-grid-info-circ="${m.circulo}">${m.nome}</div>
-            <div class="magia-card-meta">
+            <span class="opcao-check" data-grid-check="${m.nome}"></span>
+            <div class="opcao-nome" data-grid-info="${m.nome}" data-grid-info-circ="${m.circulo}">${m.nome}</div>
+            <div class="opcao-resumo">
               <span>${m.circulo === 0 ? 'Truque' : m.circulo + 'º Círculo'}</span>
               <span>${m.escola || ''}</span>
               ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
@@ -1144,114 +1357,69 @@ function bindEventosMagias(ctx, state) {
     });
   }
 
-  // Troca de magia
-  const selTrocarDe = document.getElementById('levelup-trocar-de');
-  selTrocarDe?.addEventListener('change', () => {
-    const container = document.getElementById('levelup-trocar-para-container');
-    if (container) container.style.display = selTrocarDe.value ? 'block' : 'none';
-    montarBuscaTroca(ctx, state, selTrocarDe.value, listaMagiasClasse, maxCirculoNovo);
-  });
-  // Se o step foi reaberto com uma troca já em andamento, popular a busca imediatamente
-  // (sem depender do usuário re-tocar no select) - ver Minor 3 da revisão final.
-  if (selTrocarDe?.value) {
-    montarBuscaTroca(ctx, state, selTrocarDe.value, listaMagiasClasse, maxCirculoNovo);
-  }
-
-  // Troca de truque
-  const selTruqueTrocarDe = document.getElementById('levelup-truque-trocar-de');
-  selTruqueTrocarDe?.addEventListener('change', () => {
-    const container = document.getElementById('levelup-truque-trocar-para-container');
-    if (container) container.style.display = selTruqueTrocarDe.value ? 'block' : 'none';
-    montarBuscaTrocaTruque(ctx, state, selTruqueTrocarDe.value, listaMagiasClasse);
-  });
-  if (selTruqueTrocarDe?.value) {
-    montarBuscaTrocaTruque(ctx, state, selTruqueTrocarDe.value, listaMagiasClasse);
-  }
-}
-
-function montarBuscaTroca(ctx, state, nomeTroca, listaMagiasClasse, maxCirculoNovo) {
-  if (!nomeTroca) return;
-
-  const buscaInput = document.getElementById('busca-troca-levelup');
-  const resultadoEl = document.getElementById('resultado-troca-levelup');
-  if (!buscaInput || !resultadoEl) return;
-
-  const disponiveis = listaMagiasClasse.filter(m =>
-    m.circulo > 0 && m.circulo <= maxCirculoNovo &&
-    m.nome !== nomeTroca &&
-    !(ctx.char.magias_preparadas || []).some(p => p.nome === m.nome) &&
-    !(state.magiasSelecionadas || []).includes(m.nome)
-  ).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
-
-  function renderResultados() {
-    const termo = semAcento(buscaInput.value || '');
-    const filtradas = termo.length >= 2
-      ? disponiveis.filter(m => semAcento(m.nome).includes(termo))
-      : disponiveis.slice(0, 20);
-
-    resultadoEl.innerHTML = filtradas.map(m => `
-      <div class="troca-magia-item" data-troca-nome="${m.nome}" data-troca-circ="${m.circulo}"
-           style="padding:6px 8px;cursor:pointer;border-bottom:1px solid var(--border-light);font-size:0.85rem;display:flex;justify-content:space-between;align-items:center">
-        <span>${m.nome}</span>
-        <span style="font-size:0.75rem;color:var(--text-muted)">${m.circulo}º</span>
-      </div>
-    `).join('');
-
-    resultadoEl.querySelectorAll('.troca-magia-item').forEach(el => {
-      el.addEventListener('click', () => {
-        const nome = el.dataset.trocaNome;
-        const circ = el.dataset.trocaCirc;
-        document.getElementById('levelup-trocar-para').value = nome;
-        document.getElementById('levelup-trocar-para-circ').value = circ;
-        const nomeEl = document.getElementById('levelup-trocar-para-nome');
-        if (nomeEl) nomeEl.textContent = nome;
-      });
+  // Troca de magia conhecida (Task 12): o que sai são as magias preparadas
+  // do personagem (fora as de origem especial -- domínio, sempre preparadas
+  // etc., que não são escolha do jogador), o que entra é a lista de magias
+  // da classe dentro do círculo máximo já alcançado. `magiasAtuais` só tem
+  // {nome,circulo,origem} salvos no personagem -- deMagias() precisa dos
+  // dados completos (escola, duração) para mostrar círculo/escola/
+  // concentração nos dois lados, por isso busca em `listaMagiasClasse`.
+  const trocaMagiaEl = document.getElementById('levelup-troca-magia');
+  if (trocaMagiaEl) {
+    const origensEspeciaisMagia = ['dominio', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
+    const magiasAtuaisNomes = new Set((ctx.char.magias_preparadas || [])
+      .filter(m => m.circulo > 0 && !origensEspeciaisMagia.includes(m?.origem))
+      .map(m => m.nome));
+    const magiasAtuaisCompletas = listaMagiasClasse.filter(m => magiasAtuaisNomes.has(m.nome));
+    montarTroca(trocaMagiaEl, {
+      // `selecionado`: restaura a troca já escolhida antes deste bind ser
+      // refeito do zero -- ex.: "Anterior" e "Próximo" de volta a este
+      // passo. Sem isso, montarTroca (ui-opcoes.js) apagava a escolha em
+      // silêncio ao remontar (achado do revisor, Task 12 Rodada 2).
+      sai: { rotulo: 'Qual magia sai?', opcoes: deMagias(magiasAtuaisCompletas), selecionado: state.trocarDe || null },
+      entra: {
+        rotulo: 'Qual entra no lugar?', densidade: 'densa', busca: true,
+        opcoes: deMagias(
+          listaMagiasClasse.filter(m => m.circulo > 0 && m.circulo <= maxCirculoNovo),
+          { jaTem: new Set([...jaTemMagias, ...magiasSel]) }
+        ),
+        selecionado: state.trocarPara || null,
+      },
+      aoMudar: ({ sai, entra }) => {
+        state.trocarDe = sai || '';
+        state.trocarPara = entra || '';
+        state.trocarParaCirculo = entra ? (listaMagiasClasse.find(m => m.nome === entra)?.circulo || 0) : 0;
+      },
     });
   }
 
-  buscaInput.addEventListener('input', renderResultados);
-  renderResultados();
-}
-
-function montarBuscaTrocaTruque(ctx, state, nomeTroca, listaMagiasClasse) {
-  if (!nomeTroca) return;
-
-  const buscaInput = document.getElementById('busca-troca-truque-levelup');
-  const resultadoEl = document.getElementById('resultado-troca-truque-levelup');
-  if (!buscaInput || !resultadoEl) return;
-
-  const disponiveis = listaMagiasClasse.filter(m =>
-    m.circulo === 0 &&
-    m.nome !== nomeTroca &&
-    !(ctx.char.magias_conhecidas || []).some(p => p.nome === m.nome) &&
-    !(state.truquesSelecionados || []).includes(m.nome)
-  ).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
-
-  function renderResultados() {
-    const termo = semAcento(buscaInput.value || '');
-    const filtradas = termo.length >= 2
-      ? disponiveis.filter(m => semAcento(m.nome).includes(termo))
-      : disponiveis.slice(0, 20);
-
-    resultadoEl.innerHTML = filtradas.map(m => `
-      <div class="troca-magia-item" data-troca-truque-nome="${m.nome}"
-           style="padding:6px 8px;cursor:pointer;border-bottom:1px solid var(--border-light);font-size:0.85rem">
-        <span>${m.nome}</span>
-      </div>
-    `).join('');
-
-    resultadoEl.querySelectorAll('[data-troca-truque-nome]').forEach(el => {
-      el.addEventListener('click', () => {
-        const nome = el.dataset.trocaTruqueNome;
-        document.getElementById('levelup-truque-trocar-para').value = nome;
-        const nomeEl = document.getElementById('levelup-truque-trocar-para-nome');
-        if (nomeEl) nomeEl.textContent = nome;
-      });
+  // Troca de truque (Task 12): mesma forma da troca de magia, restrita a
+  // círculo 0 e sem limite de círculo máximo.
+  const trocaTruqueEl = document.getElementById('levelup-troca-truque');
+  if (trocaTruqueEl) {
+    const origensEspeciaisTruque = ['especie', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
+    const truquesAtuaisNomes = new Set((ctx.char.magias_conhecidas || [])
+      .filter(m => m.circulo === 0 && !origensEspeciaisTruque.includes(m?.origem))
+      .map(m => m.nome));
+    const truquesAtuaisCompletos = listaMagiasClasse.filter(m => truquesAtuaisNomes.has(m.nome));
+    montarTroca(trocaTruqueEl, {
+      // `selecionado`: mesmo motivo do `selecionado` da troca de magia,
+      // acima (achado do revisor, Task 12 Rodada 2).
+      sai: { rotulo: 'Qual truque sai?', opcoes: deMagias(truquesAtuaisCompletos), selecionado: state.truqueTrocarDe || null },
+      entra: {
+        rotulo: 'Qual entra no lugar?', densidade: 'densa', busca: true,
+        opcoes: deMagias(
+          listaMagiasClasse.filter(m => m.circulo === 0),
+          { jaTem: new Set([...jaTemTruques, ...truquesSel]) }
+        ),
+        selecionado: state.truqueTrocarPara || null,
+      },
+      aoMudar: ({ sai, entra }) => {
+        state.truqueTrocarDe = sai || '';
+        state.truqueTrocarPara = entra || '';
+      },
     });
   }
-
-  buscaInput.addEventListener('input', renderResultados);
-  renderResultados();
 }
 
 // --- Manobras (Mestre da Batalha) ---
@@ -1285,24 +1453,30 @@ function bindEventosManobrasGuerreiro(ctx, state) {
     });
   });
 
-  document.getElementById('lvlup-manobra-trocar-de')?.addEventListener('change', (e) => {
-    state.manobraTrocarDe = e.target.value;
-    state.manobraTrocarPara = '';
-    const btnPara = document.getElementById('btn-lvlup-manobra-trocar-para');
-    if (btnPara) { btnPara.disabled = !state.manobraTrocarDe; btnPara.textContent = 'Escolher nova'; }
-  });
-
-  document.getElementById('btn-lvlup-manobra-trocar-para')?.addEventListener('click', () => {
-    if (!state.manobraTrocarDe) return;
-    const candidatasTroca = mg.opcoesDisponiveis.filter(m => !jaTemManobras.has(m.nome) && !manobrasSel.has(m.nome));
-    const trocaSel = new Set(state.manobraTrocarPara ? [state.manobraTrocarPara] : []);
-    abrirGridManobras(`Trocar "${state.manobraTrocarDe}" por...`, 1, candidatasTroca, trocaSel, (selecionadas) => {
-      state.manobraTrocarPara = selecionadas[0] || '';
-      fecharModal();
-      const btnPara = document.getElementById('btn-lvlup-manobra-trocar-para');
-      if (btnPara) btnPara.textContent = state.manobraTrocarPara || 'Escolher nova';
+  // Troca de manobra conhecida (Task 12): as manobras já são cards com
+  // descrição no grid principal (abrirGridManobras acima) -- esta troca
+  // usava select, incoerência que este componente elimina. `sai` vem de
+  // `mg.opcoesDisponiveis` (nomes de `manobrasConhecidasAtuais` só têm o
+  // nome salvo no personagem; a lista completa da subclasse tem a
+  // descrição) filtrado pelos nomes já conhecidos.
+  const trocaManobraEl = document.getElementById('levelup-troca-manobra');
+  if (trocaManobraEl) {
+    const manobrasConhecidasCompletas = mg.opcoesDisponiveis.filter(m => jaTemManobras.has(m.nome));
+    montarTroca(trocaManobraEl, {
+      // `selecionado`: mesmo motivo do `selecionado` da troca de magia, em
+      // bindEventosMagias acima (achado do revisor, Task 12 Rodada 2).
+      sai: { rotulo: 'Qual manobra sai?', opcoes: deManobras(manobrasConhecidasCompletas), selecionado: state.manobraTrocarDe || null },
+      entra: {
+        rotulo: 'Qual entra no lugar?', densidade: 'densa', busca: true,
+        opcoes: deManobras(mg.opcoesDisponiveis, { jaTem: new Set([...jaTemManobras, ...manobrasSel]) }),
+        selecionado: state.manobraTrocarPara || null,
+      },
+      aoMudar: ({ sai, entra }) => {
+        state.manobraTrocarDe = sai || '';
+        state.manobraTrocarPara = entra || '';
+      },
     });
-  });
+  }
 }
 
 // ============================================================

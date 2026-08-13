@@ -113,8 +113,9 @@ export async function abrirModalLevelUp(page) {
 /**
  * Abre o modal de level-up (via `abrirModalLevelUp`, com retentativa) e
  * navega até a tela de ASI/talento, confirmando as telas anteriores que
- * aparecerem. Detecta a chegada por `#levelup-talento-select`, não pelos
- * rádios de modo -- em Dádiva Épica os rádios nem existem
+ * aparecerem. Detecta a chegada por `#levelup-talento-lista` (Task 13: o
+ * `<select id="levelup-talento-select">` virou cards de montarSeletor), não
+ * pelos rádios de modo -- em Dádiva Épica os rádios nem existem
  * (levelup-cards.js: exigeDadivaEpica omite o toggle inteiro).
  *
  * O loop de "Próximo" abaixo tem a mesma disciplina sob carga: um
@@ -127,12 +128,12 @@ export async function abrirModalLevelUp(page) {
 export async function irAteEscolhaDeTalento(page) {
   await abrirModalLevelUp(page);
   for (let i = 0; i < 10; i++) {
-    if (await page.locator('#levelup-talento-select').count()) return true;
+    if (await page.locator('#levelup-talento-lista').count()) return true;
     const proximo = page.locator('#btn-step-proximo');
     if (await proximo.count()) await proximo.click();
     await page.waitForTimeout(500);
   }
-  return (await page.locator('#levelup-talento-select').count()) > 0;
+  return (await page.locator('#levelup-talento-lista').count()) > 0;
 }
 
 // Abre o site coletando erros de console/página — qualquer erro

@@ -5,9 +5,22 @@
 // uma comparacao entre os dois lados, e nao um valor escrito a mao.
 import { test, expect } from '@playwright/test';
 import {
-  abrirParelha, irPara, assentar, instantaneo, classesUsadas, geometria,
-  nosDois, relatorioErros, confirmarModal,
+  abrirParelha, irPara, instantaneo, geometria, relatorioErros,
 } from './helpers.mjs';
+
+// ------------------------------------------------------------------------
+// Os testes de comparação de DOM e de classes CSS do criador foram
+// aposentados em 2026-08-12, junto da unificação dos vocabulários de card
+// (docs/superpowers/specs/2026-08-12-cards-de-escolha-design.md, decisão D9).
+//
+// Eles comparavam o DOM deste repositório com o do original a cada passo do
+// criador. Renomear `.selection-card` para `.opcao-card` quebra essa
+// comparação de forma definitiva -- o repositório original não vai mudar.
+//
+// O README da suíte já registra que paridade não é mais restrição, e quem
+// garante comportamento hoje é a suíte de regras: 126 testes e2e e 1225 de
+// unidade. O que sobrou aqui são checagens que não dependem de DOM idêntico.
+// ------------------------------------------------------------------------
 
 test.describe('paridade original x refatorado', () => {
   test('home carrega nos dois sem erro e com o mesmo DOM', async ({ context }) => {
@@ -17,27 +30,6 @@ test.describe('paridade original x refatorado', () => {
 
     const [a, b] = await Promise.all(lados.map((l) => instantaneo(l.page)));
     expect(b, 'DOM da home difere do original').toBe(a);
-  });
-
-  test('criador passo 1 carrega nos dois sem erro e com o mesmo DOM', async ({ context }) => {
-    const lados = await abrirParelha(context, '#criar');
-
-    expect(relatorioErros(lados), 'erros de console/carregamento').toBe('');
-
-    const [a, b] = await Promise.all(lados.map((l) => instantaneo(l.page)));
-    expect(b, 'DOM do passo 1 difere do original').toBe(a);
-  });
-
-  test('criador usa as mesmas classes CSS que o original', async ({ context }) => {
-    const lados = await abrirParelha(context, '#criar');
-    const [a, b] = await Promise.all(lados.map((l) => classesUsadas(l.page)));
-    expect(b, 'conjunto de classes CSS difere').toEqual(a);
-
-    // As quatro que a tentativa anterior trocou, explicitamente.
-    for (const classe of ['wizard-steps-sticky', 'wizard-content-area',
-                          'wizard-nav-fixed', 'wizard-nav-inner']) {
-      expect(b, `classe ${classe} ausente no refatorado`).toContain(classe);
-    }
   });
 
   test('barra de navegacao do criador continua fixa no rodape', async ({ context }) => {
@@ -58,47 +50,5 @@ test.describe('paridade original x refatorado', () => {
       await expect(l.page.locator('#btn-prev'), l.nome).toHaveText(/Anterior/);
       await expect(l.page.locator('#btn-next'), l.nome).toHaveText(/Próximo/);
     }
-  });
-
-  test('fluxo do criador em lockstep: classe, especie, antecedente', async ({ context }) => {
-    const lados = await abrirParelha(context, '#criar');
-
-    // Passo 1: Classe. O card abre um modal; Guerreiro exige Estilo de Luta,
-    // entao confirmarModal faz as escolhas obrigatorias antes de confirmar.
-    await nosDois(lados, async (page) => {
-      await page.click('[data-classe="Guerreiro"]');
-      await confirmarModal(page, 'popup-confirmar-classe');
-    });
-    let [a, b] = await Promise.all(lados.map((l) => instantaneo(l.page)));
-    expect(b, 'DOM apos escolher Guerreiro difere').toBe(a);
-
-    // Passo 2: Especie.
-    await nosDois(lados, async (page) => {
-      await page.click('#btn-next');
-      await page.waitForFunction(
-        () => document.querySelector('.wizard-step.active')?.dataset.step === '1');
-      await assentar(page);
-    });
-    [a, b] = await Promise.all(lados.map((l) => instantaneo(l.page)));
-    expect(b, 'DOM do passo 2 (Especie) difere').toBe(a);
-
-    await nosDois(lados, async (page) => {
-      await page.click('[data-especie="Humano"]');
-      await confirmarModal(page, 'popup-confirmar-especie');
-    });
-    [a, b] = await Promise.all(lados.map((l) => instantaneo(l.page)));
-    expect(b, 'DOM apos escolher Humano difere').toBe(a);
-
-    // Passo 3: Antecedente.
-    await nosDois(lados, async (page) => {
-      await page.click('#btn-next');
-      await page.waitForFunction(
-        () => document.querySelector('.wizard-step.active')?.dataset.step === '2');
-      await assentar(page);
-    });
-    [a, b] = await Promise.all(lados.map((l) => instantaneo(l.page)));
-    expect(b, 'DOM do passo 3 (Antecedente) difere').toBe(a);
-
-    expect(relatorioErros(lados), 'erros durante o fluxo').toBe('');
   });
 });

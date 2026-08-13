@@ -106,6 +106,30 @@ export async function getMagiasPorClasseLista(nomeClasse) {
   return fetchJSON(`magias/por_classe/${nomeArq}.json`);
 }
 
+/**
+ * Devolve as magias de um círculo que têm o marcador Ritual, com a magia
+ * inteira (descrição, alcance, componentes, duração).
+ *
+ * O marcador vem de `tempo_conjuracao` -- "1 minuto ou Ritual",
+ * "1 ação ou Ritual" etc. É o mesmo critério que o Pacto do Tomo do Bruxo
+ * (sheet/classes/bruxo.js) já usava, e é a leitura certa: o campo `ritual`
+ * booleano que o Conjurador Ritualista procurava NÃO existe em lugar nenhum
+ * do acervo, e por isso a lista dele nascia vazia.
+ *
+ * A outra fonte possível seria o campo `especial` de
+ * `classes/magias_<classe>.json` ('R', e também os combinados 'R, M' e
+ * 'C, R'). Conferido: para o 1º círculo as duas fontes dão exatamente as
+ * mesmas 11 magias. Esta é preferível por ser um arquivo só, em vez da união
+ * das oito listas de classe, e por já trazer a descrição -- os cards mostram
+ * "ver detalhes" sem uma segunda busca.
+ */
+export async function getMagiasRituais(circulo) {
+  const dados = await getMagiasPorCirculo(circulo);
+  return (dados?.magias || [])
+    .filter(m => (m.tempo_conjuracao || '').toLowerCase().includes('ritual'))
+    .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+}
+
 /** Busca uma magia específica pelo nome (carrega o círculo inteiro) */
 export async function getMagia(nome, circulo) {
   const dados = await getMagiasPorCirculo(circulo);

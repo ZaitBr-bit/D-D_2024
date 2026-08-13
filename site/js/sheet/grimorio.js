@@ -9,6 +9,8 @@ import { CLASSES_INFO } from '../dados-classes.js';
 import { getIndiceMagias, getMagiasPorCirculo } from '../db.js';
 import { VALOR_EM_COBRE, formatarCarteira, podePagar, retirarValor } from '../moedas.js';
 import { abrirModal, escHtml, getBonusTruquesOrdem, getEspacosMagia, getMagiaPreparadas, getTruquesConhecidos, magiaMagoEstaNoGrimorio, mdParaHtml, normalizarGrimorioMago, semAcento, toast } from '../utils.js';
+import { montarSeletor } from '../ui-opcoes.js';
+import { deMagias } from '../opcoes-dominio.js';
 import { getTruquesExtraEstiloLuta } from './combate.js';
 import { char, classeData, indiceMagiasCache, magiasDominioCache, magiasSempreCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
@@ -117,21 +119,21 @@ export async function mostrarBuscaMagia() {
 
       if (filtradasDom.length > 0) {
         html += `<div style="font-size:0.75rem;font-weight:700;color:var(--secondary);margin:8px 0 4px">Magias Especiais</div>`;
-        html += `<div class="magias-grid">${filtradasDom.map(m => `
-          <div class="magia-card selecionada magia-dominio" style="opacity:0.7;cursor:default">
-            <span class="magia-card-check"></span>
-            <div class="magia-card-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="${m.circulo}" style="cursor:pointer"><span class="badge-dominio">&#9733;</span> ${m.nome}</div>
-            <div class="magia-card-meta"><span>${rotuloOrigemMagia(m)}</span></div>
+        html += `<div class="opcao-grid densa">${filtradasDom.map(m => `
+          <div class="opcao-card selecionada magia-dominio" style="opacity:0.7;cursor:default">
+            <span class="opcao-check"></span>
+            <div class="opcao-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="${m.circulo}" style="cursor:pointer"><span class="badge-dominio">&#9733;</span> ${m.nome}</div>
+            <div class="opcao-resumo"><span>${rotuloOrigemMagia(m)}</span></div>
           </div>
         `).join('')}</div>`;
       }
 
       if (filtradas.length > 0) {
-        html += `<div class="magias-grid">${filtradas.map(m => `
-          <div class="magia-card selecionada">
-            <span class="magia-card-check" ${somenteConsulta ? '' : `data-remover-check="${m.nome}" style="cursor:pointer"`}></span>
-            <div class="magia-card-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="${m.circulo}" style="cursor:pointer">${m.nome}</div>
-            <div class="magia-card-meta">
+        html += `<div class="opcao-grid densa">${filtradas.map(m => `
+          <div class="opcao-card selecionada">
+            <span class="opcao-check" ${somenteConsulta ? '' : `data-remover-check="${m.nome}" style="cursor:pointer"`}></span>
+            <div class="opcao-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="${m.circulo}" style="cursor:pointer">${m.nome}</div>
+            <div class="opcao-resumo">
               <span>${m.circulo || 0}º Circulo</span>
             </div>
           </div>
@@ -154,11 +156,11 @@ export async function mostrarBuscaMagia() {
         let listaEsp = truquesEsp;
         if (termo.length >= 2) listaEsp = listaEsp.filter(m => semAcento(m.nome).includes(termo));
         html += `<div style="font-size:0.75rem;font-weight:700;color:var(--secondary);margin:8px 0 4px">Truques de Espécie</div>`;
-        html += `<div class="magias-grid">${listaEsp.map(m => `
-          <div class="magia-card selecionada magia-dominio" style="opacity:0.7;cursor:default">
-            <span class="magia-card-check"></span>
-            <div class="magia-card-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="0" style="cursor:pointer"><span class="badge-dominio">&#9733;</span> ${m.nome}</div>
-            <div class="magia-card-meta"><span>Especie</span></div>
+        html += `<div class="opcao-grid densa">${listaEsp.map(m => `
+          <div class="opcao-card selecionada magia-dominio" style="opacity:0.7;cursor:default">
+            <span class="opcao-check"></span>
+            <div class="opcao-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="0" style="cursor:pointer"><span class="badge-dominio">&#9733;</span> ${m.nome}</div>
+            <div class="opcao-resumo"><span>Especie</span></div>
           </div>
         `).join('')}</div>`;
       }
@@ -174,15 +176,15 @@ export async function mostrarBuscaMagia() {
       if (termo.length >= 2) lista = lista.filter(m => semAcento(m.nome).includes(termo));
       const cheioTruq = numTruq >= maxTruq;
 
-      html += `<div class="magias-grid">${lista.map(m => {
+      html += `<div class="opcao-grid densa">${lista.map(m => {
         const sel = selecionadosSet.has(m.nome);
         const bloqueado = cheioTruq && !sel;
         return `
-          <div class="magia-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}"
+          <div class="opcao-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'bloqueada' : ''}"
                ${somenteConsulta ? '' : `data-toggle-truque="${m.nome}"`} style="${bloqueado ? 'opacity:0.35;' : ''}">
-            <span class="magia-card-check" ${somenteConsulta ? '' : `data-truque-check="${m.nome}" style="cursor:pointer"`}></span>
-            <div class="magia-card-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="0" style="cursor:pointer">${m.nome}</div>
-            <div class="magia-card-meta">
+            <span class="opcao-check" ${somenteConsulta ? '' : `data-truque-check="${m.nome}" style="cursor:pointer"`}></span>
+            <div class="opcao-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="0" style="cursor:pointer">${m.nome}</div>
+            <div class="opcao-resumo">
               <span>${m.escola || ''}</span>
               ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
             </div>
@@ -206,16 +208,16 @@ export async function mostrarBuscaMagia() {
       });
       if (termo.length >= 2) lista = lista.filter(m => semAcento(m.nome).includes(termo));
 
-      html += `<div class="magias-grid">${lista.map(m => {
+      html += `<div class="opcao-grid densa">${lista.map(m => {
         const sel = selecionadasSet.has(m.nome);
         const isDominio = (char.magias_preparadas || []).find(p => p.nome === m.nome && magiaEhEspecial(p));
         const bloqueado = cheio && !sel && !isDominio;
         return `
-          <div class="magia-card ${sel ? 'selecionada' : ''} ${isDominio ? 'magia-dominio' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}"
+          <div class="opcao-card ${sel ? 'selecionada' : ''} ${isDominio ? 'magia-dominio' : ''} ${bloqueado ? 'bloqueada' : ''}"
                style="${bloqueado ? 'opacity:0.35;' : ''}${isDominio ? 'opacity:0.7;' : ''}">
-            <span class="magia-card-check" ${isDominio || somenteConsulta ? '' : `data-circ-check="${m.nome}" data-circ-check-val="${circ}" style="cursor:pointer"`}></span>
-            <div class="magia-card-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="${circ}" style="cursor:pointer">${isDominio ? '<span class="badge-dominio">&#9733;</span> ' : ''}${m.nome}</div>
-            <div class="magia-card-meta">
+            <span class="opcao-check" ${isDominio || somenteConsulta ? '' : `data-circ-check="${m.nome}" data-circ-check-val="${circ}" style="cursor:pointer"`}></span>
+            <div class="opcao-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="${circ}" style="cursor:pointer">${isDominio ? '<span class="badge-dominio">&#9733;</span> ' : ''}${m.nome}</div>
+            <div class="opcao-resumo">
               <span>${m.escola || ''}</span>
               ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
               ${isDominio ? '<span>Especial</span>' : ''}
@@ -812,11 +814,11 @@ export async function mostrarTrocaMagias(callbackPosTroca = null) {
           // Garantir que domínio apareca mesmo se nao esta em magiasDisponiveis
           const domNomes = [...nomesDominio];
           const filtDomNomes = termo.length >= 2 ? domNomes.filter(n => semAcento(n).includes(termo)) : domNomes;
-          html += `<div class="magias-grid">${filtDomNomes.map(nome => `
-            <div class="magia-card selecionada magia-dominio" style="opacity:0.7;cursor:default">
-              <span class="magia-card-check"></span>
-              <div class="magia-card-nome" data-troca-info="${nome}" data-troca-info-circ="${circuloMap[nome] || 1}"><span class="badge-dominio">&#9733;</span> ${nome}</div>
-              <div class="magia-card-meta"><span>Especial</span></div>
+          html += `<div class="opcao-grid densa">${filtDomNomes.map(nome => `
+            <div class="opcao-card selecionada magia-dominio" style="opacity:0.7;cursor:default">
+              <span class="opcao-check"></span>
+              <div class="opcao-nome" data-troca-info="${nome}" data-troca-info-circ="${circuloMap[nome] || 1}"><span class="badge-dominio">&#9733;</span> ${nome}</div>
+              <div class="opcao-resumo"><span>Especial</span></div>
             </div>
           `).join('')}</div>`;
         }
@@ -825,11 +827,11 @@ export async function mostrarTrocaMagias(callbackPosTroca = null) {
       const selNomes = [...selecionadasSet];
       const filtSel = termo.length >= 2 ? selNomes.filter(n => semAcento(n).includes(termo)) : selNomes;
       if (filtSel.length > 0) {
-        html += `<div class="magias-grid">${filtSel.map(nome => `
-          <div class="magia-card selecionada" style="cursor:pointer" data-troca-toggle="${nome}">
-            <span class="magia-card-check" data-troca-check="${nome}"></span>
-            <div class="magia-card-nome" data-troca-info="${nome}" data-troca-info-circ="${circuloMap[nome] || 1}">${nome}</div>
-            <div class="magia-card-meta"><span>${circuloMap[nome] || '?'}º Círculo</span></div>
+        html += `<div class="opcao-grid densa">${filtSel.map(nome => `
+          <div class="opcao-card selecionada" style="cursor:pointer" data-troca-toggle="${nome}">
+            <span class="opcao-check" data-troca-check="${nome}"></span>
+            <div class="opcao-nome" data-troca-info="${nome}" data-troca-info-circ="${circuloMap[nome] || 1}">${nome}</div>
+            <div class="opcao-resumo"><span>${circuloMap[nome] || '?'}º Círculo</span></div>
           </div>
         `).join('')}</div>`;
       } else if (selecionadasSet.size === 0) {
@@ -851,17 +853,17 @@ export async function mostrarTrocaMagias(callbackPosTroca = null) {
       });
       if (termo.length >= 2) lista = lista.filter(m => semAcento(m.nome).includes(termo));
 
-      html += `<div class="magias-grid">${lista.map(m => {
+      html += `<div class="opcao-grid densa">${lista.map(m => {
         const sel = selecionadasSet.has(m.nome);
         const isDominio = nomesDominio.has(m.nome);
         const bloqueado = cheio && !sel && !isDominio;
         return `
-          <div class="magia-card ${sel || isDominio ? 'selecionada' : ''} ${isDominio ? 'magia-dominio' : ''} ${bloqueado ? 'magia-card-bloqueada' : ''}"
+          <div class="opcao-card ${sel || isDominio ? 'selecionada' : ''} ${isDominio ? 'magia-dominio' : ''} ${bloqueado ? 'bloqueada' : ''}"
                ${isDominio ? '' : `data-troca-toggle="${m.nome}"`}
                style="${bloqueado ? 'opacity:0.35;' : ''}${isDominio ? 'opacity:0.7;cursor:default;' : ''}">
-            <span class="magia-card-check" ${isDominio ? '' : `data-troca-check="${m.nome}"`}></span>
-            <div class="magia-card-nome" data-troca-info="${m.nome}" data-troca-info-circ="${circ}">${isDominio ? '<span class="badge-dominio">&#9733;</span> ' : ''}${m.nome}</div>
-            <div class="magia-card-meta">
+            <span class="opcao-check" ${isDominio ? '' : `data-troca-check="${m.nome}"`}></span>
+            <div class="opcao-nome" data-troca-info="${m.nome}" data-troca-info-circ="${circ}">${isDominio ? '<span class="badge-dominio">&#9733;</span> ' : ''}${m.nome}</div>
+            <div class="opcao-resumo">
               <span>${m.escola || ''}</span>
               ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
               ${isDominio ? '<span>Especial</span>' : ''}
@@ -1031,12 +1033,12 @@ export async function abrirPreenchimentoSlotMagia() {
     resultadoEl.innerHTML = Object.entries(porCirculo).map(([circ, magias]) => `
       <div style="margin-bottom:8px">
         <div style="font-size:0.78rem;font-weight:700;color:var(--accent);padding:4px 0 2px;border-bottom:1px solid var(--border-color);margin-bottom:6px">${circ}\u00ba C\u00edrculo</div>
-        <div class="magias-grid">${magias.map(m => `
-          <div class="magia-card ${m.nome === magiaSelecionada ? 'selecionada' : ''}"
+        <div class="opcao-grid densa">${magias.map(m => `
+          <div class="opcao-card ${m.nome === magiaSelecionada ? 'selecionada' : ''}"
                data-preencher-nome="${m.nome}" data-preencher-circ="${m.circulo}" style="cursor:pointer">
-            <span class="magia-card-check"></span>
-            <div class="magia-card-nome" data-preencher-detalhe="${m.nome}" data-preencher-detalhe-circ="${m.circulo}" style="cursor:pointer">${m.nome}</div>
-            <div class="magia-card-meta">
+            <span class="opcao-check"></span>
+            <div class="opcao-nome" data-preencher-detalhe="${m.nome}" data-preencher-detalhe-circ="${m.circulo}" style="cursor:pointer">${m.nome}</div>
+            <div class="opcao-resumo">
               <span>${m.escola || ''}</span>
               ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
             </div>
@@ -1133,10 +1135,7 @@ export async function mostrarTrocaMagiaConhecida(callbackPosTroca = null) {
 
     <div style="margin-bottom:12px">
       <label class="form-label" style="font-weight:700;color:var(--accent)">Magia a remover:</label>
-      <select class="form-input" id="troca-conhecida-remover" style="margin-bottom:4px">
-        <option value="">Selecione uma magia...</option>
-        ${magiasAtuais.map(m => `<option value="${m.nome}" data-circ="${m.circulo}">${m.nome} (${m.circulo}\u00ba Circulo)</option>`).join('')}
-      </select>
+      <div id="troca-conhecida-remover-lista" style="margin-bottom:4px"></div>
     </div>
 
     <div id="troca-conhecida-adicionar-container" style="display:none">
@@ -1169,11 +1168,11 @@ export async function mostrarTrocaMagiaConhecida(callbackPosTroca = null) {
     resultadoEl.innerHTML = Object.entries(porCirculo).map(([circ, magias]) => `
       <div style="margin-bottom:8px">
         <div style="font-size:0.78rem;font-weight:700;color:var(--accent);padding:4px 0 2px;border-bottom:1px solid var(--border-color);margin-bottom:6px">${circ}\u00ba C\u00edrculo</div>
-        <div class="magias-grid">${magias.map(m => `
-          <div class="magia-card ${m.nome === magiaAdicionar ? 'selecionada' : ''}" data-selecionar-troca="${m.nome}" data-selecionar-circ="${m.circulo}" style="cursor:pointer">
-            <span class="magia-card-check"></span>
-            <div class="magia-card-nome" data-troca-detalhe="${m.nome}" data-troca-detalhe-circ="${m.circulo}" style="cursor:pointer">${m.nome}</div>
-            <div class="magia-card-meta">
+        <div class="opcao-grid densa">${magias.map(m => `
+          <div class="opcao-card ${m.nome === magiaAdicionar ? 'selecionada' : ''}" data-selecionar-troca="${m.nome}" data-selecionar-circ="${m.circulo}" style="cursor:pointer">
+            <span class="opcao-check"></span>
+            <div class="opcao-nome" data-troca-detalhe="${m.nome}" data-troca-detalhe-circ="${m.circulo}" style="cursor:pointer">${m.nome}</div>
+            <div class="opcao-resumo">
               <span>${m.escola || ''}</span>
               ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
             </div>
@@ -1218,18 +1217,22 @@ export async function mostrarTrocaMagiaConhecida(callbackPosTroca = null) {
   }
 
   // Quando selecionar magia a remover
-  document.getElementById('troca-conhecida-remover')?.addEventListener('change', (e) => {
-    magiaRemover = e.target.value || null;
-    magiaAdicionar = null;
-    circuloAdicionar = null;
-    document.getElementById('troca-conhecida-nome').textContent = '\u2014';
-    confirmarBtn.disabled = true;
-    if (magiaRemover) {
-      containerAdicionar.style.display = 'block';
-      renderListaSubstituta();
-    } else {
-      containerAdicionar.style.display = 'none';
-    }
+  montarSeletor(document.getElementById('troca-conhecida-remover-lista'), {
+    opcoes: deMagias(magiasAtuais),
+    densidade: 'densa', max: 1, busca: true,
+    aoMudar: (sel) => {
+      magiaRemover = sel[0] || null;
+      magiaAdicionar = null;
+      circuloAdicionar = null;
+      document.getElementById('troca-conhecida-nome').textContent = '\u2014';
+      confirmarBtn.disabled = true;
+      if (magiaRemover) {
+        containerAdicionar.style.display = 'block';
+        renderListaSubstituta();
+      } else {
+        containerAdicionar.style.display = 'none';
+      }
+    },
   });
 
   // Busca

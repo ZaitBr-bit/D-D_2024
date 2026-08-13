@@ -5,6 +5,7 @@
 import { CLASSES_INFO, ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ATRIBUTO_NOME_PARA_KEY } from './dados-classes.js';
 import { getMagiasClasse, getMagiasPorCirculo } from './db.js';
 import { calcMod, bonusProficiencia, mdParaHtml, semAcento, toast, abrirModal } from './utils.js';
+import { rotuloPericia } from './opcoes-dominio.js';
 import { obterTalentosElegiveis } from './levelup.js';
 import { calcularSubclasseArcana } from './levelup-flow.js';
 
@@ -108,8 +109,14 @@ export function renderCardSubclasse(ctx, state) {
           ${subclassesDisponiveis.map((sc, idx) => {
             const featsNivel3 = (sc.caracteristicas || []).filter(c => c.nivel === 3);
             const selecionada = state.subclasse === sc.nome;
+            // Padding inline: a classe antiga (.levelup-subclasse-card) usava
+            // "10px 12px", diferente do "12px" (igual nos 4 lados) que a base
+            // do .opcao-card adota agora para os outros cards fora de grade
+            // (Task 8, rodada 2 -- ver app.css). Como o valor original deste
+            // card era mesmo outro, o override inline continua correto e
+            // necessario para bater com a aparencia de antes da migracao.
             return `
-              <div class="levelup-subclasse-card ${selecionada ? 'selecionada' : ''}" data-subclasse="${sc.nome}" data-idx="${idx}">
+              <div class="opcao-card ${selecionada ? 'selecionada' : ''}" data-subclasse="${sc.nome}" data-idx="${idx}" style="padding:10px 12px">
                 <div style="font-weight:700;font-size:1rem;margin-bottom:4px">${sc.nome}</div>
                 <div style="font-size:0.82rem;color:var(--text-muted)">
                   ${featsNivel3.map(f => {
@@ -138,14 +145,6 @@ export function renderCardASI(ctx, state, talentosCache) {
   const nivelNovo = (char.nivel || 1) + 1;
   const talentosDisponiveis = obterTalentosElegiveis(char, talentosCache, nivelNovo)
     .filter(talento => ctx.exigeDadivaEpica || talento.nome !== 'Aumento no Valor de Atributo');
-
-  // Agrupar por categoria
-  const porCat = {};
-  talentosDisponiveis.forEach(t => {
-    const cat = t.categoria || 'Outros';
-    if (!porCat[cat]) porCat[cat] = [];
-    porCat[cat].push(t);
-  });
 
   return `
     <div class="levelup-card">
@@ -188,15 +187,7 @@ export function renderCardASI(ctx, state, talentosCache) {
               ? 'Escolha uma Dádiva Épica ou outro talento para o qual atenda aos pré-requisitos.'
               : 'Escolha um talento em vez de aumentar atributos.'}
           </div>
-          <select id="levelup-talento-select" class="form-input" style="width:100%;margin-bottom:8px">
-            <option value="">-- Selecione um talento --</option>
-            ${Object.entries(porCat).map(([cat, lista]) => `
-              <optgroup label="${cat}">
-                ${lista.map(t => `<option value="${t.nome}" ${state.talento === t.nome ? 'selected' : ''}>${t.nome}</option>`).join('')}
-              </optgroup>
-            `).join('')}
-          </select>
-          <div id="levelup-talento-detalhe" style="background:var(--surface-variant);border-radius:8px;padding:12px;font-size:0.85rem;display:none"></div>
+          <div id="levelup-talento-lista"></div>
           <div id="levelup-talento-escolhas"></div>
         </div>
       </div>
@@ -209,7 +200,10 @@ export function renderCardASI(ctx, state, talentosCache) {
 // compartilhado entre o card de escolha obrigatória (Guardião/Paladino
 // nível 2) e o card de troca opcional (Guerreiro, qualquer nível >= 2)
 // para não haver duas listas que possam divergir.
-const OPCOES_ESTILO_LUTA_BASE = [
+// Exportado: levelup-ui.js precisa da mesma lista para montar os cards de
+// escolha/troca com montarSeletor/montarTroca (Task 10) depois que este HTML
+// entra no DOM -- ver bindEventosEscolhasClasse/bindEventosTrocasOpcionais.
+export const OPCOES_ESTILO_LUTA_BASE = [
   { nome: 'Arquearia', descricao: '+2 em ataques à distância com armas' },
   { nome: 'Combate com Armas de Arremesso', descricao: '+2 de dano com armas de Arremesso' },
   { nome: 'Combate com Armas Grandes', descricao: 'Trata 1-2 como 3 nos dados de dano (duas mãos)' },
@@ -239,29 +233,21 @@ export function renderCardTrocasOpcionais(ctx, state) {
   let html = '';
 
   // Troca de Estilo de Luta do Guerreiro (opcional -- o jogador pode
-  // simplesmente não mexer).
+  // simplesmente não mexer). A grade em si (estilo atual + as opções de
+  // troca, via montarTroca/deEstilosLuta) é montada depois que este HTML
+  // entra no DOM -- ver bindEventosTrocasOpcionais em levelup-ui.js. O "sai"
+  // tem um item só (o estilo atual do personagem), então montarTroca mostra
+  // um card de apresentação e o botão "Trocar este" em vez de uma escolha
+  // falsa entre uma opção e "Não trocar".
   if (podeTrocarEstiloLutaGuerreiro) {
-    const estiloAtual = (char.escolhas_classe?.estilo_luta || [])[0] || '';
-    const opcoesTroca = OPCOES_ESTILO_LUTA_BASE.filter(opt => opt.nome !== estiloAtual);
     html += `
       <div class="levelup-card">
         <div class="levelup-card-header">Trocar Estilo de Luta (opcional)</div>
         <div class="levelup-card-body">
           <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
-            ${estiloAtual ? `Estilo atual: <strong>${estiloAtual}</strong>. ` : ''}
-            Você pode substituir por um talento de Estilo de Luta diferente, ou manter o que já tem.
+            Você pode substituir seu Estilo de Luta por outro, ou manter o que já tem.
           </div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:0.85rem">
-            <select class="form-input" id="lvlup-estilo-luta-trocar-de" style="flex:1">
-              <option value="">Não trocar</option>
-              ${estiloAtual ? `<option value="${estiloAtual}" ${state.estiloLutaTrocarDe === estiloAtual ? 'selected' : ''}>${estiloAtual}</option>` : ''}
-            </select>
-            <span>&rarr;</span>
-            <select class="form-input" id="lvlup-estilo-luta-trocar-para" style="flex:1" ${!state.estiloLutaTrocarDe ? 'disabled' : ''}>
-              <option value="">Escolher novo estilo</option>
-              ${opcoesTroca.map(opt => `<option value="${opt.nome}" ${state.estiloLutaTrocarPara === opt.nome ? 'selected' : ''}>${opt.nome}</option>`).join('')}
-            </select>
-          </div>
+          <div id="lvlup-estilo-luta-troca"></div>
         </div>
       </div>
     `;
@@ -285,7 +271,7 @@ export function renderCardTrocasOpcionais(ctx, state) {
           <div id="levelup-ladino-expertise" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px">
             ${elegiveis.map(p => `
               <label class="form-check levelup-check-label">
-                <input type="checkbox" data-ladino-expertise="${p}" ${(state.ladinoExpertise || []).includes(p) ? 'checked' : ''}> ${p}
+                <input type="checkbox" data-ladino-expertise="${p}" ${(state.ladinoExpertise || []).includes(p) ? 'checked' : ''}> ${rotuloPericia(p)}
               </label>
             `).join('')}
           </div>
@@ -325,7 +311,7 @@ export function renderCardEscolhasClasse(ctx, state) {
           <div id="levelup-bardo-expertise" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px">
             ${elegiveis.map(p => `
               <label class="form-check levelup-check-label">
-                <input type="checkbox" data-bardo-expertise="${p}" ${state.bardoExpertise.includes(p) ? 'checked' : ''}> ${p}
+                <input type="checkbox" data-bardo-expertise="${p}" ${state.bardoExpertise.includes(p) ? 'checked' : ''}> ${rotuloPericia(p)}
               </label>
             `).join('')}
           </div>
@@ -352,7 +338,7 @@ export function renderCardEscolhasClasse(ctx, state) {
           <div id="levelup-guardiao-expertise" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px">
             ${elegiveis.map(p => `
               <label class="form-check levelup-check-label">
-                <input type="checkbox" data-guardiao-expertise="${p}" ${state.guardiaoExpertise.includes(p) ? 'checked' : ''}> ${p}
+                <input type="checkbox" data-guardiao-expertise="${p}" ${state.guardiaoExpertise.includes(p) ? 'checked' : ''}> ${rotuloPericia(p)}
               </label>
             `).join('')}
           </div>
@@ -370,11 +356,11 @@ export function renderCardEscolhasClasse(ctx, state) {
   // Task 7 (2026-08-07). Antes desta correção esta lista de subida de nível
   // gravava um vocabulário abreviado próprio, incompatível com o mapa de
   // exibição da ficha (sheet/habilidades.js:efeitosEstilo).
+  // A grade em si (via montarSeletor/deEstilosLuta) é montada depois que
+  // este HTML entra no DOM -- ver bindEventosEscolhasClasse em levelup-ui.js;
+  // é lá que a lista base ganha Combatente Druídico/Abençoado para
+  // Guardião/Paladino.
   if (precisaEstiloLuta) {
-    const opcoesBase = [...OPCOES_ESTILO_LUTA_BASE];
-    if (char.classe === 'Guardião') opcoesBase.push({ nome: 'Combatente Druídico', descricao: 'Aprende 2 truques de Druida (Sabedoria)' });
-    if (char.classe === 'Paladino') opcoesBase.push({ nome: 'Combatente Abençoado', descricao: 'Aprende 2 truques de Clérigo (Carisma)' });
-
     html += `
       <div class="levelup-card">
         <div class="levelup-card-header">Estilo de Luta</div>
@@ -382,17 +368,7 @@ export function renderCardEscolhasClasse(ctx, state) {
           <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
             Escolha um Estilo de Luta. A escolha é permanente.
           </div>
-          <div id="levelup-estilo-luta" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px">
-            ${opcoesBase.map(opt => `
-              <label class="form-check levelup-check-label" style="cursor:pointer">
-                <input type="radio" name="estilo_luta" value="${opt.nome}" ${state.estiloLuta === opt.nome ? 'checked' : ''}>
-                <div>
-                  <div style="font-weight:600;font-size:0.85rem">${opt.nome}</div>
-                  <div style="font-size:0.75rem;color:var(--text-muted)">${opt.descricao}</div>
-                </div>
-              </label>
-            `).join('')}
-          </div>
+          <div id="lvlup-estilo-luta-escolha"></div>
         </div>
       </div>
     `;
@@ -418,7 +394,7 @@ export function renderCardEscolhasClasse(ctx, state) {
           <div id="levelup-explorador-expertise" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px;margin-bottom:12px">
             ${elegiveisExp.map(p => `
               <label class="form-check levelup-check-label" style="cursor:pointer">
-                <input type="radio" name="explorador_expertise" value="${p}" ${state.exploradorExpertise === p ? 'checked' : ''}> ${p}
+                <input type="radio" name="explorador_expertise" value="${p}" ${state.exploradorExpertise === p ? 'checked' : ''}> ${rotuloPericia(p)}
               </label>
             `).join('')}
           </div>
@@ -455,7 +431,7 @@ export function renderCardEscolhasClasse(ctx, state) {
           <div id="levelup-academico" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px">
             ${elegiveisAc.map(p => `
               <label class="form-check levelup-check-label">
-                <input type="checkbox" data-academico-expertise="${p}" ${state.academicoExpertise.includes(p) ? 'checked' : ''}> ${p}
+                <input type="checkbox" data-academico-expertise="${p}" ${state.academicoExpertise.includes(p) ? 'checked' : ''}> ${rotuloPericia(p)}
               </label>
             `).join('')}
           </div>
@@ -540,19 +516,7 @@ export function renderCardMagias(ctx, state) {
             <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
               Troque 1 magia conhecida por outra da lista de ${char.classe}.
             </div>
-            <select class="form-input" id="levelup-trocar-de" style="margin-bottom:8px">
-              <option value="">Não trocar</option>
-              ${magiasAtuais.map(m => `<option value="${m.nome}" ${state.trocarDe === m.nome ? 'selected' : ''}>${m.nome} (${m.circulo}º)</option>`).join('')}
-            </select>
-            <div id="levelup-trocar-para-container" style="display:${state.trocarDe ? 'block' : 'none'}">
-              <div class="search-box"><input type="text" id="busca-troca-levelup" placeholder="Buscar substituta..." class="form-input"></div>
-              <div id="resultado-troca-levelup" style="max-height:25vh;overflow-y:auto;margin-bottom:8px"></div>
-              <div style="font-size:0.8rem;color:var(--text-muted)">
-                Trocar por: <span id="levelup-trocar-para-nome" style="font-weight:700;color:var(--accent)">${state.trocarPara || '—'}</span>
-                <input type="hidden" id="levelup-trocar-para" value="${state.trocarPara}">
-                <input type="hidden" id="levelup-trocar-para-circ" value="${state.trocarParaCirculo}">
-              </div>
-            </div>
+            <div id="levelup-troca-magia"></div>
           </div>
         </div>
       `;
@@ -572,18 +536,7 @@ export function renderCardMagias(ctx, state) {
           <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
             Troque 1 truque conhecido por outro da lista de ${char.classe}.
           </div>
-          <select class="form-input" id="levelup-truque-trocar-de" style="margin-bottom:8px">
-            <option value="">Não trocar</option>
-            ${truquesAtuais.map(m => `<option value="${m.nome}" ${state.truqueTrocarDe === m.nome ? 'selected' : ''}>${m.nome}</option>`).join('')}
-          </select>
-          <div id="levelup-truque-trocar-para-container" style="display:${state.truqueTrocarDe ? 'block' : 'none'}">
-            <div class="search-box"><input type="text" id="busca-troca-truque-levelup" placeholder="Buscar substituto..." class="form-input"></div>
-            <div id="resultado-troca-truque-levelup" style="max-height:25vh;overflow-y:auto;margin-bottom:8px"></div>
-            <div style="font-size:0.8rem;color:var(--text-muted)">
-              Trocar por: <span id="levelup-truque-trocar-para-nome" style="font-weight:700;color:var(--accent)">${state.truqueTrocarPara || '—'}</span>
-              <input type="hidden" id="levelup-truque-trocar-para" value="${state.truqueTrocarPara}">
-            </div>
-          </div>
+          <div id="levelup-troca-truque"></div>
         </div>
       </div>
     `;
@@ -689,16 +642,7 @@ export function renderCardManobrasGuerreiro(ctx, state) {
       <div class="levelup-card">
         <div class="levelup-card-header">Trocar Manobra Conhecida (opcional)</div>
         <div class="levelup-card-body">
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:0.85rem">
-            <select id="lvlup-manobra-trocar-de" class="form-input" style="flex:1">
-              <option value="">Não trocar</option>
-              ${manobrasConhecidasAtuais.map(n => `<option value="${n}" ${state.manobraTrocarDe === n ? 'selected' : ''}>${n}</option>`).join('')}
-            </select>
-            <span>&rarr;</span>
-            <button class="btn btn-sm btn-secondary" id="btn-lvlup-manobra-trocar-para" ${!state.manobraTrocarDe ? 'disabled' : ''}>
-              ${state.manobraTrocarPara || 'Escolher nova'}
-            </button>
-          </div>
+          <div id="levelup-troca-manobra"></div>
         </div>
       </div>
     `;

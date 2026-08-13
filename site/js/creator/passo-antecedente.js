@@ -30,12 +30,12 @@ export function renderStepAntecedente(el) {
   el.innerHTML = `
     <h3 style="margin-bottom:12px">Escolha seu Antecedente</h3>
     <div class="info-box info">O antecedente define suas pericias, ferramentas, talento de origem e distribuicao de atributos.</div>
-    <div class="selection-grid" id="grid-antecedentes">
+    <div class="opcao-grid ampla" id="grid-antecedentes">
       ${antecedentes.map(a => `
-        <div class="selection-card ${personagem.antecedente === a.nome ? 'selected' : ''}" data-antecedente="${a.nome}">
-          <span class="card-check">&#10003;</span>
-          <div class="card-nome">${a.nome}</div>
-          <div class="card-detalhe">${a.talento?.split('(')[0]?.trim() || ''}</div>
+        <div class="opcao-card ${personagem.antecedente === a.nome ? 'selecionada' : ''}" data-antecedente="${a.nome}">
+          <span class="opcao-check"></span>
+          <div class="opcao-nome">${a.nome}</div>
+          <div class="opcao-resumo">${a.talento?.split('(')[0]?.trim() || ''}</div>
         </div>
       `).join('')}
     </div>
@@ -144,10 +144,10 @@ function abrirPopupAntecedente(nome) {
       <div class="info-box info" style="font-size:0.85rem">${antEscolha.descricao}</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">
         ${antEscolha.opcoes.map(opt => `
-          <div class="selection-card ${valorAtual === opt ? 'selected' : ''}"
+          <div class="opcao-card ${valorAtual === opt ? 'selecionada' : ''}"
                data-escolha-ant="${antEscolha.campo}" data-opcao-ant="${opt}"
                style="flex:1;min-width:130px;max-width:180px;cursor:pointer">
-            <div class="card-nome" style="font-size:0.85rem">${opt}</div>
+            <div class="opcao-nome" style="font-size:0.85rem">${opt}</div>
           </div>
         `).join('')}
       </div>
@@ -202,7 +202,7 @@ function abrirPopupAntecedente(nome) {
         personagem.escolhas_antecedente[campo] = opcao;
         // Atualizar visual
         document.querySelectorAll(`[data-escolha-ant="${campo}"]`).forEach(c => {
-          c.classList.toggle('selected', c.dataset.opcaoAnt === opcao);
+          c.classList.toggle('selecionada', c.dataset.opcaoAnt === opcao);
         });
       });
     });
