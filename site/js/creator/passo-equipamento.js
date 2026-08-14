@@ -3,82 +3,25 @@
 // Extraido de site/js/pages/creator.js sem alteracao de comportamento.
 // ============================================================
 import { CLASSES_INFO } from '../dados-classes.js';
-import { getArmaduras, getArmas, getClasse, getEquipamentoAventura } from '../db.js';
+import { getClasse } from '../db.js';
 import { DENOMINACOES, ICONE_MOEDA, adicionarMoeda, removerQuantidadeMoeda } from '../moedas.js';
 import { abrirModal, fmtPeso, getCapacidadeCarga, getPesoTotalInventario, mdParaHtml, semAcento, toast } from '../utils.js';
 import { ANTECEDENTES_ESCOLHAS, KITS_EXPANSAO } from './comum.js';
 import { containerRef, dadosCache, personagem } from './wizard.js';
+import { temProficienciaArma, temProficienciaArmadura } from '../regras-equipamento.js';
+import { abrirSeletorItens, carregarDadosEquipSheet } from '../itens-seletor.js';
+
+// Preferencia do toggle "Comprar" DENTRO do criador. Deliberadamente uma
+// variavel de modulo, e nao localStorage: guardar no localStorage faria o
+// criador lembrar entre personagens, contra a decisao de nascer desligado;
+// e resetar a cada abertura do modal obrigaria a religar o toggle a cada
+// item, ja que o modal fecha depois de cada adicao. Assim comeca desligada
+// em cada carga da pagina e sobrevive enquanto se compra.
+let _comprarAtivoCriador = false;
 
 // ============================================================
 // PASSO 5: EQUIPAMENTO
 // ============================================================
-
-// --- Funções de proficiência ---
-
-/** Verifica se o personagem tem proficiência com uma arma específica */
-function temProficienciaArma(arma) {
-  const info = CLASSES_INFO[personagem.classe];
-  if (!info) return false;
-  const cat = (arma.categoria || '').toLowerCase();
-  const extras = (personagem.proficiencias_extra || []).map(p => p.toLowerCase());
-
-  // Proficiência completa na categoria
-  if (info.armas.includes('Marcial') && cat.includes('marciai')) return true;
-  if (info.armas.includes('Simples') && cat.includes('simples')) return true;
-
-  // Proficiências extras (ex: Clérigo Protetor recebe "Armas Marciais")
-  if (extras.includes('armas marciais') && cat.includes('marciai')) return true;
-  if (extras.includes('armas simples') && cat.includes('simples')) return true;
-
-  // Ladino: Marcial com Acuidade
-  if (info.armas.some(a => a.includes('Acuidade'))) {
-    if (cat.includes('marciai') && (arma.propriedades || '').toLowerCase().includes('acuidade')) return true;
-  }
-  // Monge: Marcial com Leve
-  if (info.armas.some(a => a.includes('Leve'))) {
-    if (cat.includes('marciai') && (arma.propriedades || '').toLowerCase().includes('leve')) return true;
-  }
-
-  return false;
-}
-
-/** Verifica se o personagem tem proficiência com uma armadura específica */
-function temProficienciaArmadura(armadura) {
-  const info = CLASSES_INFO[personagem.classe];
-  if (!info) return false;
-  const cat = (armadura.categoria || '').toLowerCase();
-  const nome = (armadura.nome || '').toLowerCase();
-  const extras = (personagem.proficiencias_extra || []).map(p => p.toLowerCase());
-
-  // Escudo separado
-  if (nome === 'escudo') return info.armaduras.includes('Escudo') || extras.includes('escudo');
-
-  if (info.armaduras.includes('Pesada') && cat === 'pesada') return true;
-  if (info.armaduras.includes('Média') && (cat === 'média' || cat === 'media')) return true;
-  if (info.armaduras.includes('Leve') && cat === 'leve') return true;
-
-  // Proficiências extras (Clérigo Protetor etc)
-  if (extras.includes('armadura pesada') && cat === 'pesada') return true;
-  if (extras.includes('armadura média') && (cat === 'média' || cat === 'media')) return true;
-
-  return false;
-}
-
-/** Verifica se o personagem atende requisito de Força de uma armadura */
-function atendeRequisitoForca(armadura) {
-  if (!armadura.requisito_forca || armadura.requisito_forca === '—') return true;
-  const match = armadura.requisito_forca.match(/For\.?\s*(\d+)/i);
-  if (!match) return true;
-  return (personagem.atributos?.forca || 10) >= parseInt(match[1]);
-}
-
-/** Retorna badge HTML de proficiência */
-function badgeProficiencia(proficiente) {
-  if (proficiente) {
-    return '<span class="badge badge-prof">Proficiente</span>';
-  }
-  return '<span class="badge badge-no-prof">Sem Proficiência</span>';
-}
 
 // Função para parsear opções de equipamento (A, B, C, etc)
 function parseEquipamentoOpcoes(texto) {
@@ -250,8 +193,13 @@ function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
       continue;
     }
 
-    // Tentar encontrar em equipamento de aventura (tenta plural e singular)
-    const equip = dadosCache.equipAvent?.find(e => {
+    // Tentar encontrar em equipamento de aventura E na municao (tenta plural e singular).
+    // `municao` e lista SEPARADA de proposito -- fundi-las faria a categoria
+    // "Equipamento" do seletor listar as flechas duas vezes --, mas para
+    // resolver o nome do pacote inicial as duas valem igual: "20 Flechas" do
+    // Guardiao e do Ladino so casa na de municao.
+    const baseItens = [...(dadosCache.equipAvent || []), ...(dadosCache.municao || [])];
+    const equip = baseItens.find(e => {
       const nomeEquip = semAcento(e.nome).toLowerCase();
       return nomeEquip === semAcento(nomeItem).toLowerCase() || nomeEquip === semAcento(nomeSingular).toLowerCase();
     });
@@ -297,16 +245,24 @@ export async function renderStepEquipamento(el) {
   const antecedente = dadosCache.antecedentes?.find(a => a.nome === personagem.antecedente);
   const equipAntecedente = antecedente?.equipamento?.replace(/\*/g, '') || '';
 
-  // Carregar armas e armaduras disponíveis
-  const [armasData, armadurasData, equipAventData] = await Promise.all([
-    getArmas(),
-    getArmaduras(),
-    getEquipamentoAventura()
-  ]);
-  dadosCache.armas = armasData?.armas || [];
-  dadosCache.propriedadesArmas = armasData?.propriedades || [];
-  dadosCache.armaduras = armadurasData?.armaduras || [];
-  dadosCache.equipAvent = equipAventData?.itens || [];
+  // Carregador compartilhado com a ficha (itens-seletor.js). Antes de
+  // 2026-08-13 este passo montava o cache a mao e descartava a chave
+  // `municao` do JSON -- por isso municao era inalcancavel pelo botao
+  // "+ Item" do criador (nao dava para comprar/adicionar municao na
+  // criacao). Disponibilizar dadosCache.municao aqui tambem foi o que
+  // permitiu `adicionarItensEquipamentoInicial` (abaixo) passar a consultar
+  // essa lista -- as "20 Flechas" do pacote da classe (Guardiao, Ladino)
+  // agora resolvem com peso e custo em vez de cair no ramo generico.
+  const dadosEquip = await carregarDadosEquipSheet();
+  dadosCache.armas = dadosEquip.armas;
+  dadosCache.armaduras = dadosEquip.armaduras;
+  dadosCache.equipAvent = dadosEquip.equipAvent;
+  dadosCache.municao = dadosEquip.municao;
+  // propriedadesArmas continua sendo cacheada aqui (fora do bloco do brief):
+  // mostrarDetalheItem (abaixo) le dadosCache.propriedadesArmas de forma
+  // sincrona para mostrar a descricao das propriedades da arma no popup de
+  // detalhes; sem isso o popup perderia essa secao silenciosamente.
+  dadosCache.propriedadesArmas = dadosEquip.propriedadesArmas;
 
   // Parsear opções de equipamento
   const opcoesClasse = parseEquipamentoOpcoes(equipClasse);
@@ -395,8 +351,6 @@ export async function renderStepEquipamento(el) {
     <div class="card mb-2">
       <div class="card-header"><h3>Inventário</h3>
         <div style="display:flex;gap:4px">
-          <button class="btn btn-sm btn-accent" id="btn-add-arma">+ Arma</button>
-          <button class="btn btn-sm btn-accent" id="btn-add-armadura">+ Armadura</button>
           <button class="btn btn-sm btn-accent" id="btn-add-item">+ Item</button>
           <button class="btn btn-sm btn-secondary" id="btn-add-custom">+ Custom</button>
         </div>
@@ -485,9 +439,27 @@ export async function renderStepEquipamento(el) {
     }
   });
 
-  document.getElementById('btn-add-arma')?.addEventListener('click', () => mostrarSeletorArma());
-  document.getElementById('btn-add-armadura')?.addEventListener('click', () => mostrarSeletorArmadura());
-  document.getElementById('btn-add-item')?.addEventListener('click', () => mostrarSeletorItem());
+  document.getElementById('btn-add-item')?.addEventListener('click', () => abrirSeletorItens({
+    personagem,
+    lerComprarAtivo: () => _comprarAtivoCriador,
+    salvarComprarAtivo: (ativo) => { _comprarAtivoCriador = ativo; },
+    aoAdicionar: () => {
+      const wizContent = document.getElementById('wizard-content');
+      // renderStepEquipamento e async e a promise era descartada aqui
+      // (achado MENOR (b) da revisao final de branch): se ela rejeitasse, a
+      // rejeicao ficava sem handler DEPOIS do toast de sucesso do proprio
+      // seletor -- o jogador via "adicionado!" com a lista do passo
+      // desatualizada e nenhum aviso do erro real. O .catch cobre esse caso
+      // sem mudar o caminho feliz (que continua sincrono aos olhos de quem
+      // chama).
+      if (wizContent) {
+        renderStepEquipamento(wizContent).catch((err) => {
+          console.error('Falha ao atualizar o passo de equipamento apos adicionar item:', err);
+          toast('Item adicionado, mas a lista do passo nao atualizou -- recarregue a pagina.', 'error');
+        });
+      }
+    },
+  }));
   document.getElementById('btn-add-custom')?.addEventListener('click', () => mostrarFormCustomItem());
 
   // Eventos de remover item
@@ -532,11 +504,11 @@ function renderItemInventario(item, idx) {
   // Verificar proficiência para armas e armaduras
   let profBadge = '';
   if (item.tipo === 'arma' && item.dados?.categoria) {
-    const prof = temProficienciaArma({ categoria: item.dados.categoria, propriedades: item.dados.propriedades || '' });
+    const prof = temProficienciaArma(personagem, { categoria: item.dados.categoria, propriedades: item.dados.propriedades || '' });
     profBadge = prof ? '<span class="badge badge-prof-sm">Prof</span>' : '<span class="badge badge-no-prof-sm">Sem Prof</span>';
   }
   if ((item.tipo === 'armadura' || item.tipo === 'escudo') && item.dados?.categoria) {
-    const prof = temProficienciaArmadura({ categoria: item.dados.categoria, nome: item.nome });
+    const prof = temProficienciaArmadura(personagem, { categoria: item.dados.categoria, nome: item.nome });
     profBadge = prof ? '<span class="badge badge-prof-sm">Prof</span>' : '<span class="badge badge-no-prof-sm">Sem Prof</span>';
   }
 
@@ -704,191 +676,6 @@ function setupDragDropInventario(containerEl) {
         listaEl.innerHTML = renderListaInventario();
         setupEventosInventario(containerEl);
       }
-    });
-  });
-}
-
-function mostrarSeletorArma() {
-  const armas = dadosCache.armas || [];
-  // Ordenar: proficientes primeiro
-  const armasOrdenadas = [...armas].sort((a, b) => {
-    const pa = temProficienciaArma(a) ? 0 : 1;
-    const pb = temProficienciaArma(b) ? 0 : 1;
-    return pa - pb;
-  });
-  const html = `
-    <div class="search-box"><input type="text" id="busca-arma" placeholder="Buscar arma..." class="form-input"></div>
-    <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
-      <button class="btn btn-sm btn-outline filtro-arma active" data-filtro="todas">Todas</button>
-      <button class="btn btn-sm btn-outline filtro-arma" data-filtro="proficiente">Proficientes</button>
-      <button class="btn btn-sm btn-outline filtro-arma" data-filtro="simples">Simples</button>
-      <button class="btn btn-sm btn-outline filtro-arma" data-filtro="marcial">Marcial</button>
-    </div>
-    <div id="lista-armas" style="min-height:35dvh;max-height:50dvh;overflow-y:auto">
-      ${armasOrdenadas.map((a, i) => {
-        const prof = temProficienciaArma(a);
-        const tipoCateg = a.categoria?.includes('Simples') ? 'simples' : 'marcial';
-        const subCateg = a.categoria?.includes('Distância') ? 'Distância' : 'Corpo';
-        return `
-        <div class="inv-item ${prof ? 'item-proficiente' : 'item-sem-prof'}" style="cursor:pointer" data-arma-nome="${a.nome}" data-prof="${prof}" data-tipo="${tipoCateg}">
-          <div style="flex:1">
-            <div class="inv-item-nome">${a.nome} ${badgeProficiencia(prof)}</div>
-            <div class="inv-item-detalhe">${a.dano} | ${a.propriedades || '—'}</div>
-            <div class="inv-item-detalhe" style="font-size:0.7rem;opacity:0.7">Maestria: ${a.maestria || '—'} | ${a.custo} | ${a.peso || '—'}</div>
-          </div>
-          <span class="badge badge-secondary">${subCateg}</span>
-        </div>`;
-      }).join('')}
-    </div>
-  `;
-
-  abrirModal('Adicionar Arma', html);
-
-  // Filtros de categoria
-  let filtroAtual = 'todas';
-  document.querySelectorAll('.filtro-arma').forEach(btn => {
-    btn.addEventListener('click', () => {
-      filtroAtual = btn.dataset.filtro;
-      document.querySelectorAll('.filtro-arma').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      aplicarFiltrosArma();
-    });
-  });
-
-  function aplicarFiltrosArma() {
-    const termo = semAcento(document.getElementById('busca-arma')?.value || '');
-    document.querySelectorAll('#lista-armas [data-arma-nome]').forEach(el => {
-      const matchTexto = !termo || semAcento(el.textContent).includes(termo);
-      const matchFiltro = filtroAtual === 'todas'
-        || (filtroAtual === 'proficiente' && el.dataset.prof === 'true')
-        || (filtroAtual === el.dataset.tipo);
-      el.style.display = (matchTexto && matchFiltro) ? '' : 'none';
-    });
-  }
-
-  // Busca por texto
-  document.getElementById('busca-arma')?.addEventListener('input', () => aplicarFiltrosArma());
-
-  // Seleção
-  document.querySelectorAll('#lista-armas [data-arma-nome]').forEach(el => {
-    el.addEventListener('click', () => {
-      const arma = armasOrdenadas.find(a => a.nome === el.dataset.armaNome);
-      if (!arma) return;
-      personagem.inventario.push({
-        nome: arma.nome, tipo: 'arma', quantidade: 1, equipado: false,
-        descricao: `${arma.dano} - ${arma.propriedades}`,
-        dados: { dano: arma.dano, propriedades: arma.propriedades, maestria: arma.maestria, peso: arma.peso, custo: arma.custo, categoria: arma.categoria }
-      });
-      window.fecharModal();
-      const wizContent = document.getElementById('wizard-content');
-      if (wizContent) renderStepEquipamento(wizContent);
-    });
-  });
-}
-
-function mostrarSeletorArmadura() {
-  const armaduras = dadosCache.armaduras || [];
-  // Ordenar: proficientes primeiro
-  const armadurasOrdenadas = [...armaduras].sort((a, b) => {
-    const pa = temProficienciaArmadura(a) ? 0 : 1;
-    const pb = temProficienciaArmadura(b) ? 0 : 1;
-    return pa - pb;
-  });
-  const html = `
-    <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
-      <button class="btn btn-sm btn-outline filtro-armadura active" data-filtro="todas">Todas</button>
-      <button class="btn btn-sm btn-outline filtro-armadura" data-filtro="proficiente">Proficientes</button>
-      <button class="btn btn-sm btn-outline filtro-armadura" data-filtro="leve">Leve</button>
-      <button class="btn btn-sm btn-outline filtro-armadura" data-filtro="média">Média</button>
-      <button class="btn btn-sm btn-outline filtro-armadura" data-filtro="pesada">Pesada</button>
-    </div>
-    <div id="lista-armaduras" style="min-height:35dvh;max-height:50dvh;overflow-y:auto">
-      ${armadurasOrdenadas.map((a, i) => {
-        const prof = temProficienciaArmadura(a);
-        const reqOk = atendeRequisitoForca(a);
-        const cat = (a.categoria || '').toLowerCase();
-        return `
-        <div class="inv-item ${prof ? 'item-proficiente' : 'item-sem-prof'}" style="cursor:pointer" data-arm-nome="${a.nome}" data-prof="${prof}" data-cat="${cat}">
-          <div style="flex:1">
-            <div class="inv-item-nome">${a.nome} ${badgeProficiencia(prof)} ${!reqOk ? '<span class="badge badge-warn">For. insuficiente</span>' : ''}</div>
-            <div class="inv-item-detalhe">CA: ${a.ca} | For: ${a.requisito_forca || '—'} | ${a.custo}${a.furtividade && a.furtividade !== '—' ? ' | <em>' + a.furtividade + '</em>' : ''}</div>
-            <div class="inv-item-detalhe" style="font-size:0.7rem;opacity:0.7">Peso: ${a.peso || '—'}</div>
-          </div>
-          <span class="badge badge-secondary">${a.categoria}</span>
-        </div>`;
-      }).join('')}
-    </div>
-  `;
-
-  abrirModal('Adicionar Armadura', html);
-
-  // Filtros
-  document.querySelectorAll('.filtro-armadura').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.filtro-armadura').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const filtro = btn.dataset.filtro;
-      document.querySelectorAll('#lista-armaduras [data-arm-nome]').forEach(el => {
-        const matchFiltro = filtro === 'todas'
-          || (filtro === 'proficiente' && el.dataset.prof === 'true')
-          || el.dataset.cat === filtro;
-        el.style.display = matchFiltro ? '' : 'none';
-      });
-    });
-  });
-
-  document.querySelectorAll('#lista-armaduras [data-arm-nome]').forEach(el => {
-    el.addEventListener('click', () => {
-      const arm = armadurasOrdenadas.find(a => a.nome === el.dataset.armNome);
-      if (!arm) return;
-      personagem.inventario.push({
-        nome: arm.nome, tipo: arm.nome === 'Escudo' ? 'escudo' : 'armadura',
-        quantidade: 1, equipado: false,
-        descricao: `CA: ${arm.ca}`,
-        dados: { ca: arm.ca, categoria: arm.categoria, requisito_forca: arm.requisito_forca, furtividade: arm.furtividade, peso: arm.peso, custo: arm.custo }
-      });
-      window.fecharModal();
-      const wizContent = document.getElementById('wizard-content');
-      if (wizContent) renderStepEquipamento(wizContent);
-    });
-  });
-}
-
-function mostrarSeletorItem() {
-  const itens = dadosCache.equipAvent || [];
-  const html = `
-    <div class="search-box"><input type="text" id="busca-item" placeholder="Buscar item..." class="form-input"></div>
-    <div id="lista-itens" style="min-height:35dvh;max-height:50dvh;overflow-y:auto">
-      ${itens.map((it, i) => `
-        <div class="inv-item" style="cursor:pointer" data-item-idx="${i}">
-          <div>
-            <div class="inv-item-nome">${it.nome}</div>
-            <div class="inv-item-detalhe">${it.peso || ''} | ${it.custo || ''}</div>
-          </div>
-        </div>
-      `).join('')}
-    </div>
-  `;
-
-  abrirModal('Adicionar Item', html);
-
-  document.getElementById('busca-item')?.addEventListener('input', (e) => {
-    const termo = semAcento(e.target.value);
-    document.querySelectorAll('#lista-itens [data-item-idx]').forEach(el => {
-      el.style.display = semAcento(el.textContent).includes(termo) ? '' : 'none';
-    });
-  });
-
-  document.querySelectorAll('#lista-itens [data-item-idx]').forEach(el => {
-    el.addEventListener('click', () => {
-      const item = itens[parseInt(el.dataset.itemIdx)];
-      personagem.inventario.push({
-        nome: item.nome, tipo: 'equipamento', quantidade: 1, equipado: false,
-        descricao: '', dados: { peso: item.peso, custo: item.custo }
-      });
-      window.fecharModal();
-      const wizContent = document.getElementById('wizard-content');
-      if (wizContent) renderStepEquipamento(wizContent);
     });
   });
 }

@@ -13,13 +13,62 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.1.1';
+export const VERSAO_ATUAL = '2.2.0';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.0',
+    data: '2026-08-14',
+    resumo: 'A tela de adicionar item ficou igual na criação e na ficha — e as '
+      + 'duas ganharam o que só uma tinha.',
+    melhorias: [
+      {
+        grupo: '🎒 Uma tela só para adicionar item',
+        itens: [
+          'Na criação de personagem, os botões "+ Arma", "+ Armadura" e '
+            + '"+ Item" viraram um só: "+ Item", com as categorias Armas, '
+            + 'Armaduras, Consumíveis, Munição e Equipamento — a mesma tela '
+            + 'que a ficha já usava.',
+          'Munição (flechas, virotes, agulhas, balas) agora existe na criação. '
+            + 'Antes não havia como adicionar nenhuma antes de terminar o '
+            + 'personagem.',
+          'Dá para gastar o ouro inicial durante a criação: o "💰 Comprar" '
+            + 'desconta da carteira. Ele começa desligado.',
+          'Na criação, agora dá para escolher a quantidade, e itens repetidos '
+            + 'se agrupam em vez de virar várias linhas.',
+        ],
+      },
+      {
+        grupo: '🔎 Achar o item certo ficou mais fácil',
+        itens: [
+          'A ficha ganhou o filtro de armas (Todas, Proficientes, Simples, '
+            + 'Marcial), que só existia na criação.',
+          'As armaduras ganharam filtro por tipo (Leve, Média, Pesada) nas '
+            + 'duas telas.',
+          'Armadura que exige mais Força do que você tem agora aparece '
+            + 'marcada com um aviso — em vez de você descobrir depois. '
+            + 'Continua sendo possível pegá-la.',
+          'A busca deixou de olhar só o nome: procurar por "acuidade", '
+            + '"versátil" ou "1d8" agora encontra.',
+        ],
+      },
+    ],
+    correcoes: [
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'As 20 flechas do equipamento inicial do Guardião e do Ladino '
+            + 'entravam sem peso e não contavam na sua carga.',
+          'Na criação, itens do inventário mostravam menos detalhe que na '
+            + 'ficha: escudo aparecia sem a CA e arma sem as propriedades.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.1.1',
     data: '2026-08-13',

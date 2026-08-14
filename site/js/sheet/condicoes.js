@@ -2,7 +2,6 @@
 // Condicoes, defesas, sentidos e proficiencias
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
-import { CLASSES_INFO } from '../dados-classes.js';
 import { abrirModal, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcPercepcaoPassiva, toast } from '../utils.js';
 import { getEstadoFuria } from './classes/barbaro.js';
 import { getEstadoRecursosGuardiao } from './classes/guardiao.js';
@@ -10,47 +9,27 @@ import { getEstadoRecursosPaladino } from './classes/paladino.js';
 import { char, especiesCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { getConcentracaoAtiva } from './magias.js';
+import { temProficienciaArma, temProficienciaArmadura, badgeProficiencia } from '../regras-equipamento.js';
 
 // --- Proficiência de armas/armaduras na ficha ---
 
-/** Verifica se o personagem tem proficiência com uma arma */
+/**
+ * Proficiencia de arma do personagem ATUAL da ficha.
+ * Involucro fino sobre regras-equipamento.js (fonte unica desde 2026-08-13),
+ * mantido porque varios pontos da ficha ja chamam por este nome.
+ */
 export function sheetTemProfArma(arma) {
-  const info = CLASSES_INFO[char.classe];
-  if (!info) return false;
-  const cat = (arma.categoria || '').toLowerCase();
-  const extras = (char.proficiencias_extra || []).map(p => p.toLowerCase());
-
-  if (info.armas.includes('Marcial') && cat.includes('marciai')) return true;
-  if (info.armas.includes('Simples') && cat.includes('simples')) return true;
-  if (extras.includes('armas marciais') && cat.includes('marciai')) return true;
-  if (extras.includes('armas simples') && cat.includes('simples')) return true;
-  if (info.armas.some(a => a.includes('Acuidade')) && cat.includes('marciai') && (arma.propriedades || '').toLowerCase().includes('acuidade')) return true;
-  if (info.armas.some(a => a.includes('Leve')) && cat.includes('marciai') && (arma.propriedades || '').toLowerCase().includes('leve')) return true;
-  return false;
+  return temProficienciaArma(char, arma);
 }
 
-/** Verifica se o personagem tem proficiência com uma armadura */
+/** Proficiencia de armadura do personagem ATUAL da ficha. Ver sheetTemProfArma. */
 export function sheetTemProfArmadura(armadura) {
-  const info = CLASSES_INFO[char.classe];
-  if (!info) return false;
-  const cat = (armadura.categoria || '').toLowerCase();
-  const nome = (armadura.nome || '').toLowerCase();
-  const extras = (char.proficiencias_extra || []).map(p => p.toLowerCase());
-
-  if (nome === 'escudo') return info.armaduras.includes('Escudo') || extras.includes('escudo');
-  if (info.armaduras.includes('Pesada') && cat === 'pesada') return true;
-  if (info.armaduras.includes('Média') && (cat === 'média' || cat === 'media')) return true;
-  if (info.armaduras.includes('Leve') && cat === 'leve') return true;
-  if (extras.includes('armadura pesada') && cat === 'pesada') return true;
-  if (extras.includes('armadura média') && (cat === 'média' || cat === 'media')) return true;
-  return false;
+  return temProficienciaArmadura(char, armadura);
 }
 
-/** Badge de proficiência compacta */
+/** Badge de proficiencia compacta. Ver sheetTemProfArma. */
 export function sheetBadgeProf(proficiente) {
-  return proficiente
-    ? '<span class="badge badge-prof-sm">Prof</span>'
-    : '<span class="badge badge-no-prof-sm">Sem Prof</span>';
+  return badgeProficiencia(proficiente);
 }
 
 // --- Constantes de condicoes do D&D 5.5 ---
