@@ -981,7 +981,7 @@ tr:hover td { background: #faf8f4; }
 .modal-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 16px; border-bottom: 1px solid var(--border-light);
-  position: sticky; top: 0; background: var(--bg-card); z-index: 1;
+  position: sticky; top: 0; background: var(--bg-card); z-index: 3;
 }
 .modal-header h2 { font-size: 1rem; font-weight: 700; }
 .modal-fechar {
@@ -998,11 +998,23 @@ tr:hover td { background: #faf8f4; }
    talentos do "Adicionar Talento", isso obrigava a rolar até o fim para achar
    Cancelar/Adicionar. Precisa de fundo opaco, senão os cards passam por baixo.
    Em modal curto, que não chega a rolar, `sticky` não tira o rodapé do lugar:
-   ele fica no fluxo normal, como antes. */
+   ele fica no fluxo normal, como antes.
+
+   z-index 3, e não 1 (bug relatado em 2026-08-13, print do "Adicionar
+   Talento" no celular): o fundo opaco resolve o CORPO do card, mas não um
+   descendente dele com z-index próprio. `.opcao-check` tem `z-index: 2`
+   (regra do marcador de seleção, acima) e `.opcao-card` é
+   `position: relative` SEM `z-index` -- e position relative com z-index
+   auto NÃO abre contexto de empilhamento. Resultado: o círculo disputava a
+   pilha direto com este rodapé e vencia, aparecendo solto sobre o botão
+   "Adicionar" (o card em volta passava por baixo, porque o corpo é
+   z-index auto). Qualquer valor > 2 resolve; 3 mantém a distância mínima
+   e não invade as faixas já usadas no arquivo (overlay 200, toast 300).
+   O cabeçalho subiu junto, pelo mesmo motivo e na mesma ponta. */
 .modal-acoes {
   padding: 12px 16px; display: flex; gap: 8px; justify-content: flex-end;
   border-top: 1px solid var(--border-light);
-  position: sticky; bottom: 0; background: var(--bg-card); z-index: 1;
+  position: sticky; bottom: 0; background: var(--bg-card); z-index: 3;
 }
 /* Modal sem botões (o popup de detalhe, por exemplo) não pode exibir uma
    barra vazia com padding e borda presa no rodapé. */

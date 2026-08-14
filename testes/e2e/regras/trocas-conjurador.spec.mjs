@@ -17,7 +17,7 @@
 //      classes preparadas e as subclasses conjuradoras.
 // ============================================================
 import { test, expect } from '@playwright/test';
-import { abrirFicha, personagemSalvo, ATRIBUTOS_REGRAS, assentar, abrirModalLevelUp } from './helpers-regras.mjs';
+import { abrirFicha, personagemSalvo, ATRIBUTOS_REGRAS, assentar, abrirModalLevelUp, clicarBotaoFicha } from './helpers-regras.mjs';
 
 // Clérigo: classe preparada (dados-classes.js), justamente a categoria que
 // ficava de fora do card de troca de magia no level-up. Nível 3 com um
@@ -42,38 +42,11 @@ const CLERIGO_TROCAVEL = {
   ],
 };
 
-/**
- * Clica um botão da ficha por JS em vez de `page.click`.
- *
- * Dois motivos, os dois já vividos neste arquivo:
- *  1. Vários botões da ficha vivem dentro de um `<details>` recolhido; o
- *     Playwright recusa clicar em elemento invisível e o teste estoura em
- *     timeout, o que parece bug do produto e não é.
- *  2. `getElementById(...)?.click()` puro é um no-op SILENCIOSO se o botão
- *     ainda não foi renderizado -- o teste segue e falha lá na frente
- *     acusando o produto. Com 3 workers no mesmo servidor estático isso
- *     acontece de verdade: este mesmo teste passava sozinho e falhava em
- *     paralelo. Por isso o `waitForSelector` antes (estado 'attached',
- *     não 'visible' -- ver motivo 1) e a retentativa do efeito esperado.
- * Mesma disciplina de `abrirModalLevelUp` nos helpers.
- */
-async function clicarPorJs(page, id, { esperar = null } = {}) {
-  await page.waitForSelector(`#${id}`, { state: 'attached', timeout: 20_000 });
-  const clicar = () => page.evaluate((alvo) => document.getElementById(alvo)?.click(), id);
-  await clicar();
-  if (!esperar) return;
-  const chegou = await page.waitForSelector(esperar, { state: 'visible', timeout: 10_000 })
-    .then(() => true, () => false);
-  if (!chegou) {
-    await clicar();
-    await page.waitForSelector(esperar, { state: 'visible', timeout: 10_000 });
-  }
-}
 
 test('descanso longo: conjurador com truque de classe recebe a opção de trocar truque', async ({ context }) => {
   const { page } = await abrirFicha(context, CLERIGO_TROCAVEL);
 
-  await clicarPorJs(page, 'btn-descanso-longo', { esperar: '#modal-overlay' });
+  await clicarBotaoFicha(page, 'btn-descanso-longo', { esperar: '#modal-overlay' });
   await assentar(page);
 
   const botaoTruque = page.locator('#btn-trocar-truque-dl');
@@ -98,7 +71,7 @@ test('descanso longo: conjurador com truque de classe recebe a opção de trocar
   await expect(cardEntrando, 'a lista de truques substitutos nasceu vazia')
     .toBeVisible({ timeout: 5000 });
   await cardEntrando.click();
-  await clicarPorJs(page, 'btn-confirmar-troca-truque');
+  await clicarBotaoFicha(page, 'btn-confirmar-troca-truque');
   await assentar(page);
 
   const salvo = await personagemSalvo(page);
@@ -123,7 +96,7 @@ test('descanso longo: sem truque de classe trocável, a opção não aparece', a
   // Espera o proprio modal do Descanso Longo (e nao o botao de truque, que
   // este teste exige AUSENTE) -- sem isso, um clique perdido daria o mesmo
   // "count 0" que o teste procura, e ele passaria por acidente.
-  await clicarPorJs(page, 'btn-descanso-longo', { esperar: '#btn-pular-troca-dl' });
+  await clicarBotaoFicha(page, 'btn-descanso-longo', { esperar: '#btn-pular-troca-dl' });
   await assentar(page);
 
   await expect(page.locator('#btn-trocar-truque-dl'),

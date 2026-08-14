@@ -60,6 +60,10 @@ export const NOTAS_VERSAO = [
             + 'Armaduras Médias), o deslocamento (Velocista, Dádiva da '
             + 'Velocidade), a maestria extra do Mestre das Armas, o painel do '
             + 'Sortudo e as CDs de Envenenador e Telecinético.',
+          'Em listas longas dentro de uma janela — o "Adicionar Talento", por '
+            + 'exemplo — o círculo de seleção de um card aparecia solto por '
+            + 'cima dos botões Cancelar/Adicionar e do "X" de fechar. Além de '
+            + 'feio, o toque nesse ponto não chegava ao botão.',
         ],
       },
     ],

@@ -136,6 +136,42 @@ export async function irAteEscolhaDeTalento(page) {
   return (await page.locator('#levelup-talento-lista').count()) > 0;
 }
 
+/**
+ * Clica um botão da FICHA por JS, com as duas proteções que `page.click`
+ * sozinho não dá aqui.
+ *
+ * 1. Vários botões da ficha vivem dentro de um `<details>` recolhido. O
+ *    Playwright recusa clicar em elemento invisível e o teste estoura em
+ *    timeout, o que parece bug do produto e não é. Por isso o clique é por
+ *    JS, e o `waitForSelector` espera 'attached', não 'visible'.
+ * 2. `getElementById(...)?.click()` puro é um no-op SILENCIOSO se o botão
+ *    ainda não foi renderizado -- o teste segue e falha lá na frente
+ *    acusando o produto. Com 4 workers no mesmo servidor estático isso
+ *    acontece de verdade: os specs de troca e de sobreposição no modal
+ *    passavam sozinhos e falhavam em paralelo, sempre com a mesma cara
+ *    ("o modal não abriu"). Daí a espera antes e a retentativa do efeito.
+ *
+ * Vive AQUI, e não copiado em cada spec, pela mesma razão do achado I1 no
+ * cabeçalho deste arquivo: foi exatamente uma cópia divergente que já
+ * causou um flake real neste projeto. Mesma disciplina de
+ * `abrirModalLevelUp`.
+ *
+ * @param {string} id id do botão (sem o `#`)
+ * @param {string|null} esperar seletor que prova que o clique surtiu efeito
+ */
+export async function clicarBotaoFicha(page, id, { esperar = null } = {}) {
+  await page.waitForSelector(`#${id}`, { state: 'attached', timeout: 20_000 });
+  const clicar = () => page.evaluate((alvo) => document.getElementById(alvo)?.click(), id);
+  await clicar();
+  if (!esperar) return;
+  const chegou = await page.waitForSelector(esperar, { state: 'visible', timeout: 10_000 })
+    .then(() => true, () => false);
+  if (!chegou) {
+    await clicar();
+    await page.waitForSelector(esperar, { state: 'visible', timeout: 20_000 });
+  }
+}
+
 // Abre o site coletando erros de console/página — qualquer erro
 // derruba o teste no final (mesma disciplina da paridade).
 export async function abrirSite(context, hash = '') {
