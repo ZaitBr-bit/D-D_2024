@@ -502,25 +502,40 @@ export function renderCardMagias(ctx, state) {
     `;
   }
 
-  // Troca de magia (classes conhecidas)
-  if (tipoConj === 'conhecidas') {
-    const magiasAtuais = (char.magias_preparadas || []).filter(m => {
-      const origensEspeciais = ['dominio', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
-      return m.circulo > 0 && !origensEspeciais.includes(m?.origem);
-    });
-    if (magiasAtuais.length > 0) {
-      html += `
-        <div class="levelup-card">
-          <div class="levelup-card-header">Trocar Magia (Opcional)</div>
-          <div class="levelup-card-body">
-            <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
-              Troque 1 magia conhecida por outra da lista de ${char.classe}.
-            </div>
-            <div id="levelup-troca-magia"></div>
+  // Troca de magia -- QUALQUER classe conjuradora.
+  //
+  // Antes era `tipoConj === 'conhecidas'` (Bardo, Bruxo, Feiticeiro), o que
+  // deixava de fora as classes preparadas (Clerigo, Druida, Guardiao, Mago,
+  // Paladino) e as subclasses conjuradoras (Cavaleiro Mistico, Trapaceiro
+  // Arcano -- que nem sequer tem `tipo_conjuracao` em dados-classes.js,
+  // porque Guerreiro e Ladino sao `conjurador: false`). Decisao do dono do
+  // produto (2026-08-13): a troca vale para toda classe conjuradora, tanto
+  // ao subir de nivel quanto no Descanso Longo. O bloco que APLICA a troca
+  // (levelup-ui.js, "Troca") ja era gated so por `ctx.ehConjurador`, entao
+  // nao precisou mudar junto.
+  const magiasAtuais = (char.magias_preparadas || []).filter(m => {
+    const origensEspeciais = ['dominio', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
+    return m.circulo > 0 && !origensEspeciais.includes(m?.origem);
+  });
+  if (magiasAtuais.length > 0) {
+    // O Mago troca DENTRO do grimorio: preparar uma magia que nao esta no
+    // livro contradiz normalizarGrimorioMago (utils.js) e o proprio modal
+    // de troca do Descanso Longo (sheet/grimorio.js/mostrarTrocaMagias,
+    // que para o Mago le `char.grimorio`). O filtro da lista "entra" fica
+    // em levelup-ui.js; aqui so muda o texto.
+    const fonte = ehMago ? 'do seu grimório' : `da lista de ${char.classe}`;
+    const rotulo = tipoConj === 'conhecidas' ? 'magia conhecida' : 'magia preparada';
+    html += `
+      <div class="levelup-card">
+        <div class="levelup-card-header">Trocar Magia (Opcional)</div>
+        <div class="levelup-card-body">
+          <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
+            Troque 1 ${rotulo} por outra ${fonte}.
           </div>
+          <div id="levelup-troca-magia"></div>
         </div>
-      `;
-    }
+      </div>
+    `;
   }
 
   // Troca de truque (qualquer classe conjuradora com truques de classe conhecidos)
@@ -598,7 +613,7 @@ export function renderCardMagias(ctx, state) {
         <div class="levelup-card-body">
           <div style="font-size:0.85rem;color:var(--text-muted)">
             <strong>${magiasAtual} &rarr; ${magiasNovo}</strong>.
-            Troque magias preparadas durante um descanso longo.
+            Redefina a lista inteira num Descanso Longo; aqui você pode trocar 1 magia.
           </div>
         </div>
       </div>

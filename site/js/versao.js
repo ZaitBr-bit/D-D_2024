@@ -13,13 +13,57 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.1.0';
+export const VERSAO_ATUAL = '2.1.1';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.1.1',
+    data: '2026-08-13',
+    resumo: 'Talento adicionado pelo "+ Talento" passa a valer na hora, e '
+      + 'conjuradores podem trocar truque e magia em mais situações.',
+    melhorias: [
+      {
+        grupo: '🔄 Trocar truque e magia',
+        itens: [
+          'No Descanso Longo, qualquer classe conjuradora agora pode trocar '
+            + '1 truque por outro da lista da classe. Antes essa troca só '
+            + 'existia na subida de nível.',
+          'Ao subir de nível, a troca de 1 magia passou a aparecer também '
+            + 'para Clérigo, Druida, Guardião, Mago e Paladino, e para o '
+            + 'Cavaleiro Místico e o Trapaceiro Arcano. Antes era só para '
+            + 'Bardo, Bruxo e Feiticeiro.',
+          'O Mago troca a magia dentro do próprio grimório — não dá para '
+            + 'preparar uma magia que não está no livro dele.',
+        ],
+      },
+      {
+        grupo: '✋ Telecinético',
+        itens: [
+          'Quem já conhece Mãos Mágicas e pega o talento Telecinético agora '
+            + 'escolhe outro truque da lista de Mago no lugar. Antes o '
+            + 'talento não concedia truque nenhum a esse personagem — o caso '
+            + 'mais comum é o Trapaceiro Arcano, que já vem com Mãos Mágicas.',
+        ],
+      },
+    ],
+    correcoes: [
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'Talento adicionado pelo botão "+ Talento" da ficha não aplicava '
+            + 'nenhum efeito até recarregar a página. O Alerta não somava o '
+            + 'bônus na Iniciativa; o mesmo valia para a CA (Mestre em '
+            + 'Armaduras Médias), o deslocamento (Velocista, Dádiva da '
+            + 'Velocidade), a maestria extra do Mestre das Armas, o painel do '
+            + 'Sortudo e as CDs de Envenenador e Telecinético.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.1.0',
     data: '2026-08-13',

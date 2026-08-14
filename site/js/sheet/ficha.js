@@ -8,6 +8,7 @@
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ATRIBUTO_NOME_PARA_KEY, CLASSES_INFO, PERICIAS } from '../dados-classes.js';
 import { XP_POR_NIVEL } from '../levelup.js';
 import { _renderSyncIndicadorHtml } from '../pages/sheet.js';
+import { resolverPassivosTalentos } from '../talentos-effects.js';
 import { bonusProficiencia, calcAtaqueMagia, calcBonusPericia, calcCA, calcCDMagia, calcMod, calcPVTotal, escHtml, fmtMod, getDeslocamento, getTamanho, semAcento } from '../utils.js';
 import { renderSecaoCaracteristicas, renderSecaoSubclasse, renderSecaoTracosEspecie } from './caracteristicas.js';
 import { getEstadoFuria, setupEventosSubclasseBarbaro } from './classes/barbaro.js';
@@ -26,7 +27,7 @@ import { calcVantagemDesvantagemPericia, forcaPrimordialAtiva, getAtaquesPorAcao
 import { renderSecaoCondicoes, renderSecaoDefesas, renderSecaoSentidos, setupEventosCondicoes, setupEventosDefesas } from './condicoes.js';
 import { renderSecaoDetalhes } from './detalhes.js';
 import { setupEventosEdicao } from './edicao.js';
-import { ATRIBUTO_ESTILO, char, containerRef, especiesCache, passivosTalentosCache, salvar, seloEdicao } from './estado.js';
+import { ATRIBUTO_ESTILO, char, containerRef, definirPassivosTalentos, especiesCache, passivosTalentosCache, salvar, seloEdicao } from './estado.js';
 import { setupEventosHabilidades } from './habilidades.js';
 import { setupEventosDescanso, setupEventosHP, sincronizarBonusPvAnao, sincronizarBonusPvDraconico, sincronizarBonusPvVigoroso } from './hp-descanso.js';
 import { getEstadoCarga, renderSecaoInventario, setupEventosInventarioSheet } from './inventario.js';
@@ -53,6 +54,21 @@ function restaurarEstadoDetails(estado) {
 }
 
 export function renderFichaCompleta() {
+  // Recalcula os passivos de talentos ANTES de qualquer leitura do cache.
+  //
+  // `passivosTalentosCache` (sheet/estado.js) era escrito num unico lugar:
+  // `renderSheet` (pages/sheet.js), que so roda ao carregar/navegar para a
+  // ficha. Toda via que muta `char.talentos` (ou `char.nivel`, que entra no
+  // bonus de proficiencia de Alerta/Envenenador/Telecinetico) e depois so
+  // chama `renderFichaCompleta()` deixava o cache velho -- o talento
+  // aparecia na lista, mas nenhum efeito passivo dele entrava ate um F5.
+  // Era o caso do botao "+ Talento" da ficha (sheet/talentos.js,
+  // `persistirTalento`), do Iniciado em Magia e das invocacoes do Bruxo.
+  // Recalcular aqui cobre todas essas vias de uma vez, porque nenhuma
+  // delas altera a ficha sem passar por este render. O custo e uma
+  // varredura de Set sobre a lista de talentos por render.
+  definirPassivosTalentos(resolverPassivosTalentos(char));
+
   const estadoDetails = salvarEstadoDetails();
   const info = CLASSES_INFO[char.classe] || {};
   const prof = bonusProficiencia(char.nivel);

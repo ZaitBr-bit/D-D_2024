@@ -23,7 +23,7 @@ import { getEstadoRecursosMonge } from './classes/monge.js';
 import { getEstadoRecursosPaladino } from './classes/paladino.js';
 import { char, classeData, especiesCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
-import { mostrarTrocaMagiaConhecida, mostrarTrocaMagias } from './grimorio.js';
+import { mostrarTrocaMagiaConhecida, mostrarTrocaMagias, mostrarTrocaTruque, truquesTrocaveis } from './grimorio.js';
 import { abrirModalTrocaMaestriaDescanso } from './maestrias.js';
 import { ehSubclasseConjuradora, getConcentracaoAtiva } from './magias.js';
 
@@ -1057,8 +1057,15 @@ export function setupEventosDescanso() {
     const temTrocaPreparadas = infoClasse.conjurador && infoClasse.tipo_conjuracao === 'preparadas' && !ehSubConj;
     const temTrocaConhecida = (infoClasse.conjurador && infoClasse.tipo_conjuracao === 'conhecidas') || ehSubConj;
     const temTrocaMagia = temTrocaPreparadas || temTrocaConhecida;
+    // Troca de truque no Descanso Longo (2026-08-13): antes NAO era
+    // oferecida a ninguem aqui -- so existia na subida de nivel
+    // (levelup-cards.js). Decisao do dono do produto: vale para toda classe
+    // conjuradora, nas duas ocasioes. Depende de haver truque de classe
+    // trocavel (truquesTrocaveis, grimorio.js) -- um Paladino sem
+    // Combatente Abencoado, por exemplo, nao tem nenhum e nao ve a opcao.
+    const temTrocaTruque = (infoClasse.conjurador || ehSubConj) && truquesTrocaveis().length > 0;
 
-    if (temMaestria || temTrocaMagia) {
+    if (temMaestria || temTrocaMagia || temTrocaTruque) {
       // Montar conteudo do modal conforme opcoes disponiveis
       let conteudoModal = `
         <div class="info-box success" style="margin-bottom:12px">
@@ -1091,6 +1098,14 @@ export function setupEventosDescanso() {
           `;
         }
       }
+      if (temTrocaTruque) {
+        conteudoModal += `
+          <p style="font-size:0.9rem">Deseja trocar um truque?</p>
+          <p style="font-size:0.8rem;color:var(--text-muted)">
+            Você pode trocar <strong>1 truque</strong> por outro da lista de ${escHtml(char.classe)} após um Descanso Longo.
+          </p>
+        `;
+      }
 
       let botoesModal = '<button class="btn btn-secondary" id="btn-pular-troca-dl">Manter Tudo</button>';
       if (temMaestria) {
@@ -1098,6 +1113,9 @@ export function setupEventosDescanso() {
       }
       if (temTrocaMagia) {
         botoesModal += '<button class="btn btn-primary" id="btn-trocar-magias-dl">Trocar Magias</button>';
+      }
+      if (temTrocaTruque) {
+        botoesModal += '<button class="btn btn-primary" id="btn-trocar-truque-dl">Trocar Truque</button>';
       }
 
       abrirModal('Descanso Longo Concluído', conteudoModal, botoesModal);
@@ -1111,19 +1129,50 @@ export function setupEventosDescanso() {
         }
       };
 
+      // Encadeamento das trocas do Descanso Longo.
+      //
+      // Eram duas opcoes (maestria e magia) encadeadas na mao, uma chamando
+      // a outra pelo callback. Com a terceira (truque, 2026-08-13) o
+      // encadeamento par-a-par viraria seis combinacoes escritas a mao --
+      // e a que faltasse sumiria em silencio. Aqui a ordem e fixa
+      // (maestria -> magia -> truque) e cada botao roda dali para a frente:
+      // quem clica "Trocar Magias" ainda recebe a troca de truque depois.
+      const PASSOS = [
+        { chave: 'maestria', ativo: temMaestria, abrir: (prox) => abrirModalTrocaMaestriaDescanso(prox) },
+        { chave: 'magia', ativo: temTrocaMagia, abrir: (prox) => abrirTrocaMagias(prox) },
+        { chave: 'truque', ativo: temTrocaTruque, abrir: (prox) => mostrarTrocaTruque(prox) },
+      ].filter(p => p.ativo);
+
+      /**
+       * Monta a cadeia de modais a partir de `chave` (inclusive) e a inicia.
+       * Cada modal recebe como callback a abertura do proximo passo ativo;
+       * o ultimo recebe null e cai no renderFichaCompleta() proprio dele.
+       */
+      const iniciarTrocasAPartirDe = (chave) => {
+        const restantes = PASSOS.slice(PASSOS.findIndex(p => p.chave === chave));
+        if (restantes.length === 0) { renderFichaCompleta(); return; }
+        const cadeia = restantes.reduceRight(
+          (prox, passo) => () => passo.abrir(prox),
+          null
+        );
+        cadeia();
+      };
+
       document.getElementById('btn-pular-troca-dl')?.addEventListener('click', () => {
         window.fecharModal();
         renderFichaCompleta();
       });
-      document.getElementById('btn-trocar-maestrias-dl')?.addEventListener('click', async () => {
+      document.getElementById('btn-trocar-maestrias-dl')?.addEventListener('click', () => {
         window.fecharModal();
-        // Apos trocar maestrias, oferecer troca de magias se disponivel
-        await abrirModalTrocaMaestriaDescanso(temTrocaMagia ? () => abrirTrocaMagias() : null);
+        iniciarTrocasAPartirDe('maestria');
       });
       document.getElementById('btn-trocar-magias-dl')?.addEventListener('click', () => {
         window.fecharModal();
-        // Apos trocar magias, oferecer troca de maestrias se disponivel
-        abrirTrocaMagias(temMaestria ? () => abrirModalTrocaMaestriaDescanso() : null);
+        iniciarTrocasAPartirDe('magia');
+      });
+      document.getElementById('btn-trocar-truque-dl')?.addEventListener('click', () => {
+        window.fecharModal();
+        iniciarTrocasAPartirDe('truque');
       });
     } else {
       toast('Descanso longo realizado! PV, espaços e habilidades restaurados', 'success');

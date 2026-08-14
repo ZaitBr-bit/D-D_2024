@@ -357,7 +357,16 @@ const STEP_DEFINITIONS = [
       // lista de origens especiais usada no card de troca em levelup-cards.js).
       const origensEspeciais = ['especie', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
       const temTruqueTrocavel = (ctx.char.magias_conhecidas || []).some(m => m.circulo === 0 && !origensEspeciais.includes(m?.origem));
-      return c.truquesGanhos > 0 || (c.tipoConj === 'conhecidas' && c.magiasGanhas > 0) || c.ehMago || !!subclasseArcana || temTruqueTrocavel;
+      // 2026-08-13: a troca de MAGIA passou a valer para toda classe
+      // conjuradora (antes so `conhecidas` -- ver levelup-cards.js). Um
+      // Clerigo/Druida/Paladino/Guardiao num nivel sem truque novo e sem
+      // magia nova nao tinha nenhuma outra razao para este step aparecer,
+      // e o card de troca ficaria renderizado numa tela invisivel. Mesma
+      // lista de origens especiais do card (`dominio` entra aqui, porque
+      // magia de dominio nao e escolha do jogador e nao pode ser trocada).
+      const origensEspeciaisMagia = ['dominio', ...origensEspeciais];
+      const temMagiaTrocavel = (ctx.char.magias_preparadas || []).some(m => m.circulo > 0 && !origensEspeciaisMagia.includes(m?.origem));
+      return c.truquesGanhos > 0 || (c.tipoConj === 'conhecidas' && c.magiasGanhas > 0) || c.ehMago || !!subclasseArcana || temTruqueTrocavel || temMagiaTrocavel;
     },
     completo: (ctx, state) => {
       const c = ctx.conjuracao;

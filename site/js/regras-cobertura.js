@@ -123,7 +123,12 @@ export const REGRAS_TALENTOS = Object.freeze({
     'recurso'
   ),
   'Envenenador': regra(['atributo_talento'], 'talentos_parametros/proficiencias_ferramentas'),
-  'Telecinético': regra(['atributo_talento'], 'talentos_parametros/magias_conhecidas'),
+  // 'truque_telecinetico' é CONDICIONAL: só entra na lista de escolhas
+  // obrigatórias quando o personagem já conhece Mãos Mágicas (ver
+  // obterEscolhasObrigatoriasTalento e telecineticoPrecisaTruqueSubstituto
+  // abaixo). Para todo mundo mais, Telecinético continua sem escolha além
+  // do atributo, exatamente como o livro descreve.
+  'Telecinético': regra(['atributo_talento', 'truque_telecinetico'], 'talentos_parametros/magias_conhecidas'),
   'Dádiva da Fortitude': regra(['atributo_talento'], 'bonus_pv_dadiva_fortitude'),
   'Dádiva da Proeza em Combate': regra(['atributo_talento'], 'recursos.talentos', 'estado'),
   'Dádiva da Proficiência em Perícia': regra(
@@ -191,6 +196,27 @@ export function getRegraTalento(nome) {
   return REGRAS_TALENTOS[nome] || null;
 }
 
+// Truque que Telecinético concede pela característica "Telecinese Menor".
+export const TRUQUE_TELECINETICO = 'Mãos Mágicas';
+
+/**
+ * Diz se o personagem já conhece Mãos Mágicas e, portanto, precisa escolher
+ * um truque substituto ao adquirir Telecinético.
+ *
+ * REGRA DA CASA (decisão do dono do produto, 2026-08-13), não do livro: o
+ * PHB 2024 (§Telecinético, Talentos.md:684) diz apenas "Você aprende a
+ * magia Mãos Mágicas", sem cláusula de substituição — o texto foi conferido
+ * e não existe nem no verbete nem numa regra geral de duplicação (a de
+ * multiclasse cobre só Ataque Extra, CA e Conjuração). Sem esta regra o
+ * talento simplesmente não concederia truque nenhum a quem já tem Mãos
+ * Mágicas — o caso mais comum sendo o Trapaceiro Arcano, que a recebe
+ * obrigatoriamente. O substituto sai da lista de Mago (truque arcano, mesmo
+ * sabor do talento); ver bindEscolhasTalento em levelup-ui.js.
+ */
+export function telecineticoPrecisaTruqueSubstituto(char = {}) {
+  return (char?.magias_conhecidas || []).some(magia => magia?.nome === TRUQUE_TELECINETICO);
+}
+
 export function obterEscolhasObrigatoriasTalento(regraTalento, char = {}) {
   if (!regraTalento) return [];
   return regraTalento.escolhas.filter(escolha => {
@@ -199,6 +225,12 @@ export function obterEscolhasObrigatoriasTalento(regraTalento, char = {}) {
     }
     if (escolha === 'pericia_expertise') {
       return (char.pericias_expertise || []).length < PERICIAS_TODAS.length;
+    }
+    // Só pede o truque substituto de Telecinético a quem já tem Mãos
+    // Mágicas -- para os demais o talento continua sem escolha nenhuma
+    // além do atributo, como no livro.
+    if (escolha === 'truque_telecinetico') {
+      return telecineticoPrecisaTruqueSubstituto(char);
     }
     return true;
   });
@@ -399,6 +431,19 @@ export function validarEscolhasTalento(char, nome, escolhas = {}) {
     }
   }
 
+  // Telecinético com Mãos Mágicas já conhecida: regra da casa (ver
+  // telecineticoPrecisaTruqueSubstituto). Quem NÃO tem Mãos Mágicas não
+  // passa por aqui e continua sem escolha alguma além do atributo.
+  if (nome === 'Telecinético' && telecineticoPrecisaTruqueSubstituto(char)) {
+    const substituto = valor(escolhas, 'truque_telecinetico', 0);
+    if (!substituto) {
+      return resultadoInvalido('Você já conhece Mãos Mágicas: escolha outro truque para Telecinético.');
+    }
+    if ((char.magias_conhecidas || []).some(magia => magia?.nome === substituto)) {
+      return resultadoInvalido('Escolha um truque que você ainda não conheça para Telecinético.');
+    }
+  }
+
   return { valido: true };
 }
 
@@ -533,8 +578,18 @@ export function aplicarEfeitoTalento(char, nome, escolhas = {}) {
 
   if (nome === 'Telecinético') {
     const magias = garantirArray(char, 'magias_conhecidas');
-    adicionarUnico(magias, { nome: 'Mãos Mágicas', circulo: 0, origem: 'telecinetico' },
-      magia => magia?.nome === 'Mãos Mágicas');
+    // A checagem tem de vir ANTES do push, senão Mãos Mágicas recém-added
+    // faria o próprio talento pensar que ela já existia.
+    if (telecineticoPrecisaTruqueSubstituto(char)) {
+      const substituto = valor(escolhas, 'truque_telecinetico', 0);
+      if (substituto) {
+        adicionarUnico(magias, { nome: substituto, circulo: 0, origem: 'telecinetico' },
+          magia => magia?.nome === substituto);
+      }
+    } else {
+      adicionarUnico(magias, { nome: TRUQUE_TELECINETICO, circulo: 0, origem: 'telecinetico' },
+        magia => magia?.nome === TRUQUE_TELECINETICO);
+    }
     parametrosTalento(char, 'telecinetico').atributo = atributo;
   }
 

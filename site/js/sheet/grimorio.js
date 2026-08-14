@@ -1259,4 +1259,137 @@ export async function mostrarTrocaMagiaConhecida(callbackPosTroca = null) {
     if (callbackPosTroca) callbackPosTroca();
     else renderFichaCompleta();
   });
+}
+
+// Truques que o jogador NAO escolheu (vieram de especie, talento ou de uma
+// caracteristica que os concede fixos) -- nao podem entrar numa troca. Mesma
+// lista usada pelo card de troca de truque do level-up (levelup-cards.js) e
+// pela visibilidade do step (levelup-flow.js): as tres precisam concordar,
+// ou um truque aparece como trocavel numa tela e nao na outra.
+const ORIGENS_TRUQUE_NAO_TROCAVEL = [
+  'especie', 'sempre', 'especie_legado', 'iniciado_em_magia',
+  'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'
+];
+
+/** Lista os truques de classe do personagem que podem entrar numa troca */
+export function truquesTrocaveis() {
+  return (char?.magias_conhecidas || [])
+    .filter(m => m.circulo === 0 && !ORIGENS_TRUQUE_NAO_TROCAVEL.includes(m?.origem));
+}
+
+/**
+ * Modal de troca de 1 truque no Descanso Longo.
+ *
+ * Decisao do dono do produto (2026-08-13): toda classe conjuradora pode
+ * trocar truque tanto no Descanso Longo quanto ao subir de nivel. Antes o
+ * Descanso Longo nao oferecia troca de truque para NINGUEM (hp-descanso.js
+ * so tratava magias), e a troca de truque so existia no level-up
+ * (levelup-cards.js/levelup-ui.js). Espelha mostrarTrocaMagiaConhecida
+ * acima, restrito a circulo 0 e sem limite de circulo maximo.
+ */
+export async function mostrarTrocaTruque(callbackPosTroca = null) {
+  const truquesAtuais = truquesTrocaveis();
+  if (truquesAtuais.length === 0) {
+    toast('Nenhum truque de classe para trocar', 'error');
+    if (callbackPosTroca) callbackPosTroca();
+    else renderFichaCompleta();
+    return;
+  }
+
+  const magiasClasse = await obterMagiasDisponiveisClasseAtual();
+  const truquesClasse = magiasClasse.filter(m => m.circulo === 0);
+  // Truques ja conhecidos por QUALQUER origem entram no bloqueio: trocar um
+  // truque por outro que ja se tem geraria duplicata na lista.
+  const jaTemSet = new Set((char.magias_conhecidas || []).map(m => m.nome));
+
+  // `deMagias` precisa dos dados completos (escola, duracao) para o resumo
+  // do card; magias_conhecidas so guarda {nome, circulo, origem}.
+  const nomesAtuais = new Set(truquesAtuais.map(m => m.nome));
+  const truquesAtuaisCompletos = truquesClasse.filter(m => nomesAtuais.has(m.nome));
+
+  let truqueRemover = null;
+  let truqueAdicionar = null;
+
+  const nomeClasse = char.subclasse && ehSubclasseConjuradora() ? `${char.classe} (${char.subclasse})` : char.classe;
+
+  abrirModal('Trocar Truque', `
+    <div class="info-box info" style="margin-bottom:12px;font-size:0.85rem">
+      Apos um Descanso Longo, voce pode trocar <strong>1 truque</strong> por outro da lista de ${escHtml(nomeClasse)}.
+    </div>
+
+    <div style="margin-bottom:12px">
+      <label class="form-label" style="font-weight:700;color:var(--accent)">Truque a remover:</label>
+      <div id="troca-truque-remover-lista" style="margin-bottom:4px"></div>
+    </div>
+
+    <div id="troca-truque-adicionar-container" style="display:none">
+      <label class="form-label" style="font-weight:700;color:var(--accent)">Novo truque:</label>
+      <div id="troca-truque-adicionar-lista"></div>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
+     <button class="btn btn-secondary" id="btn-pular-troca-truque">Nao Trocar</button>
+     <button class="btn btn-primary" id="btn-confirmar-troca-truque" disabled>Confirmar Troca</button>`);
+
+  const containerAdicionar = document.getElementById('troca-truque-adicionar-container');
+  const confirmarBtn = document.getElementById('btn-confirmar-troca-truque');
+
+  /** Remonta a lista de truques substitutos, excluindo o que esta saindo */
+  function renderListaSubstituta() {
+    montarSeletor(document.getElementById('troca-truque-adicionar-lista'), {
+      opcoes: deMagias(
+        truquesClasse.filter(m => m.nome !== truqueRemover),
+        { jaTem: jaTemSet }
+      ),
+      densidade: 'densa', max: 1, busca: true,
+      // `selecionadas` (plural, array) e o nome do parametro em
+      // montarSeletor/ui-opcoes.js -- `selecionado` (singular) e do
+      // sub-objeto de montarTroca e seria ignorado em silencio aqui.
+      selecionadas: truqueAdicionar ? [truqueAdicionar] : [],
+      aoMudar: (sel) => {
+        truqueAdicionar = sel[0] || null;
+        confirmarBtn.disabled = !truqueAdicionar;
+      },
+    });
+  }
+
+  montarSeletor(document.getElementById('troca-truque-remover-lista'), {
+    opcoes: deMagias(truquesAtuaisCompletos),
+    densidade: 'densa', max: 1, busca: true,
+    aoMudar: (sel) => {
+      truqueRemover = sel[0] || null;
+      truqueAdicionar = null;
+      confirmarBtn.disabled = true;
+      if (truqueRemover) {
+        containerAdicionar.style.display = 'block';
+        renderListaSubstituta();
+      } else {
+        containerAdicionar.style.display = 'none';
+      }
+    },
+  });
+
+  document.getElementById('btn-pular-troca-truque')?.addEventListener('click', () => {
+    window.fecharModal();
+    if (callbackPosTroca) callbackPosTroca();
+    else renderFichaCompleta();
+  });
+
+  confirmarBtn?.addEventListener('click', () => {
+    if (!truqueRemover || !truqueAdicionar) return;
+    const idx = char.magias_conhecidas.findIndex(m => m.nome === truqueRemover);
+    if (idx >= 0) {
+      // Preserva a `origem` do truque que sai: o substituto ocupa a MESMA
+      // vaga, entao herda de onde ela veio (undefined = truque de classe).
+      const origem = char.magias_conhecidas[idx]?.origem;
+      char.magias_conhecidas.splice(idx, 1);
+      const novo = { nome: truqueAdicionar, circulo: 0 };
+      if (origem) novo.origem = origem;
+      char.magias_conhecidas.push(novo);
+      salvar();
+      toast(`Trocou ${truqueRemover} por ${truqueAdicionar}`, 'success');
+    }
+    window.fecharModal();
+    if (callbackPosTroca) callbackPosTroca();
+    else renderFichaCompleta();
+  });
 }

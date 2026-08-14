@@ -24,7 +24,8 @@ import {
   FERRAMENTAS_ARTESAO as _FERRAMENTAS_ARTESAO, INSTRUMENTOS_MUSICAIS as _INSTRUMENTOS,
   PERICIAS_ANALITICO as _PERICIAS_ANALITICO, PERICIAS_MENTE_AGUCADA as _PERICIAS_MENTE_AGUCADA,
   TIPOS_DANO_ADEPTO_ELEMENTAL as _TIPOS_DANO_ADEPTO_ELEMENTAL,
-  ARMAS_SIMPLES_MARCIAIS as _ARMAS_SIMPLES_MARCIAIS
+  ARMAS_SIMPLES_MARCIAIS as _ARMAS_SIMPLES_MARCIAIS,
+  telecineticoPrecisaTruqueSubstituto as _telecineticoPrecisaTruqueSubstituto
 } from './regras-cobertura.js';
 
 // Referências injetadas pelo sheet.js
@@ -806,6 +807,19 @@ export function renderEscolhasTalento(nome, talentoData, ctx, state = {}) {
     html += `<div id="lvlup-mestre-armas-lista">Carregando...</div>`;
   }
 
+  // Telecinético: só aparece para quem JÁ conhece Mãos Mágicas -- regra da
+  // casa documentada em telecineticoPrecisaTruqueSubstituto
+  // (regras-cobertura.js). Quem não tem continua sem escolha nenhuma além
+  // do atributo, e este bloco não renderiza nada.
+  if (nome === 'Telecinético' && _telecineticoPrecisaTruqueSubstituto(char)) {
+    html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Truque no lugar de Mãos Mágicas</div>`;
+    html += `<div style="font-size:0.8rem;color:var(--text-muted);margin:4px 0 8px">
+      Você já conhece <strong>Mãos Mágicas</strong>. Escolha outro truque da lista de Mago.
+    </div>`;
+    html += `<div id="lvlup-telecinetico-truque-lista">Carregando...</div>`;
+    // Será populado assincronamente em bindEscolhasTalento
+  }
+
   if (nome === 'Tocado Por Fadas' || nome === 'Tocado Pelas Sombras') {
     const label = nome === 'Tocado Por Fadas' ? 'Adivinhação ou Encantamento' : 'Ilusão ou Necromancia';
     html += `<div style="font-weight:600;font-size:0.85rem;margin-top:8px">Magia de 1º Círculo (${label})</div>`;
@@ -916,6 +930,36 @@ export function bindEscolhasTalento(nome, talentoData, ctx, state = {}) {
         aoMudar: (sel) => {
           state.escolhasTalento = sel[0] ? [sel[0]] : [];
           state.talentoTipoEscolha = 'mestre_armas';
+        },
+      });
+    });
+  }
+
+  // Telecinético com Mãos Mágicas já conhecida: carregar os truques de Mago
+  // assincronamente (mesma fonte que Iniciado em Magia usa --
+  // getMagiasClasse devolve { lista_magias: { Truques: [...] } }).
+  if (nome === 'Telecinético' && _telecineticoPrecisaTruqueSubstituto(ctx.char)) {
+    getMagiasClasse('Mago').then(dadosMagias => {
+      const el = document.getElementById('lvlup-telecinetico-truque-lista');
+      if (!el) return;
+      // As entradas de `lista_magias.Truques` podem vir como string pura ou
+      // objeto -- mesma normalização feita no fluxo de Iniciado em Magia.
+      const truques = (dadosMagias?.lista_magias?.['Truques'] || [])
+        .map(m => (typeof m === 'string' ? { nome: m } : m))
+        // `circulo: 0` é forçado porque a lista por classe não traz o campo,
+        // e sem ele deMagias (opcoes-dominio.js) agruparia como "NaNº Círculo".
+        .map(m => ({ ...m, circulo: 0 }));
+      montarSeletor(el, {
+        opcoes: deMagias(truques, {
+          // Bloqueia o que o personagem já conhece -- inclusive a própria
+          // Mãos Mágicas, que é justamente o motivo desta tela existir.
+          jaTem: new Set((ctx.char.magias_conhecidas || []).map(m => m.nome)),
+        }),
+        densidade: 'densa', max: 1, busca: true,
+        selecionadas: state.escolhasTalento?.[0] ? [state.escolhasTalento[0]] : [],
+        aoMudar: (sel) => {
+          state.escolhasTalento = sel[0] ? [sel[0]] : [];
+          state.talentoTipoEscolha = 'telecinetico_truque';
         },
       });
     });
@@ -1371,6 +1415,14 @@ function bindEventosMagias(ctx, state) {
       .filter(m => m.circulo > 0 && !origensEspeciaisMagia.includes(m?.origem))
       .map(m => m.nome));
     const magiasAtuaisCompletas = listaMagiasClasse.filter(m => magiasAtuaisNomes.has(m.nome));
+    // Fonte do lado "entra": o Mago so pode preparar o que esta no grimorio
+    // (mesma regra de sheet/grimorio.js/mostrarTrocaMagias no Descanso Longo
+    // e de normalizarGrimorioMago); as demais classes usam a lista da classe.
+    // Sem isto, abrir a troca para classes preparadas (2026-08-13) deixaria
+    // o Mago preparar magia que nao esta no livro dele.
+    const fonteEntra = conj.ehMago
+      ? (ctx.char.grimorio || []).map(m => ({ ...m }))
+      : listaMagiasClasse;
     montarTroca(trocaMagiaEl, {
       // `selecionado`: restaura a troca já escolhida antes deste bind ser
       // refeito do zero -- ex.: "Anterior" e "Próximo" de volta a este
@@ -1380,7 +1432,7 @@ function bindEventosMagias(ctx, state) {
       entra: {
         rotulo: 'Qual entra no lugar?', densidade: 'densa', busca: true,
         opcoes: deMagias(
-          listaMagiasClasse.filter(m => m.circulo > 0 && m.circulo <= maxCirculoNovo),
+          fonteEntra.filter(m => m.circulo > 0 && m.circulo <= maxCirculoNovo),
           { jaTem: new Set([...jaTemMagias, ...magiasSel]) }
         ),
         selecionado: state.trocarPara || null,
@@ -1388,7 +1440,7 @@ function bindEventosMagias(ctx, state) {
       aoMudar: ({ sai, entra }) => {
         state.trocarDe = sai || '';
         state.trocarPara = entra || '';
-        state.trocarParaCirculo = entra ? (listaMagiasClasse.find(m => m.nome === entra)?.circulo || 0) : 0;
+        state.trocarParaCirculo = entra ? (fonteEntra.find(m => m.nome === entra)?.circulo || 0) : 0;
       },
     });
   }

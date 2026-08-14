@@ -739,7 +739,13 @@ export async function abrirModalAdicionarTalento() {
     document.getElementById('btn-confirmar-add-talento-asi')?.addEventListener('click', () => {
       if (confirmado) return;
       const atributo = document.getElementById('levelup-talento-asi')?.value || '';
-      const talentosViraramCard = ['Mestre das Armas', 'Tocado Por Fadas', 'Tocado Pelas Sombras', 'Conjurador Ritualista'];
+      // 'Telecinético' entrou aqui em 2026-08-13 junto com a regra da casa
+      // do truque substituto (regras-cobertura.js): a escolha nasce de um
+      // montarSeletor e é gravada pelo callback `aoMudar` em
+      // `escolhaCard.escolhasTalento`. Lê-la de `.escolha-talento-levelup`
+      // devolveria [] -- esse select não existe para o talento -- e o
+      // truque escolhido sumiria em silêncio.
+      const talentosViraramCard = ['Mestre das Armas', 'Tocado Por Fadas', 'Tocado Pelas Sombras', 'Conjurador Ritualista', 'Telecinético'];
       const selecoes = talentosViraramCard.includes(nome)
         ? (escolhaCard.escolhasTalento || [])
         : [...document.querySelectorAll('.escolha-talento-levelup')].map(select => select.value).filter(Boolean);
