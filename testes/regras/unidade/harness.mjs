@@ -84,7 +84,7 @@ export async function modulosApp() {
   // sheetEstado.definirChar().
   const [regras, efeitos, store, levelup, criador, utils, dadosClasses, db, equip,
          levelupFlow, sheetEstado, sheetMagias, sheetMigracoes, sheetGrimorio,
-         sheetMago] = await Promise.all([
+         sheetMago, notasVersao, versao] = await Promise.all([
     importar('site/js/regras-cobertura.js'),
     importar('site/js/talentos-effects.js'),
     importar('site/js/store.js'),
@@ -100,10 +100,12 @@ export async function modulosApp() {
     importar('site/js/sheet/migracoes.js'),
     importar('site/js/sheet/grimorio.js'),
     importar('site/js/sheet/classes/mago.js'),
+    importar('site/js/notas-versao.js'),
+    importar('site/js/versao.js'),
   ]);
   _cache = { regras, efeitos, store, levelup, criador, utils, dadosClasses, db, equip,
              levelupFlow, sheetEstado, sheetMagias, sheetMigracoes, sheetGrimorio,
-             sheetMago };
+             sheetMago, notasVersao, versao };
   return _cache;
 }
 

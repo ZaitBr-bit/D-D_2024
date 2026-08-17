@@ -13,13 +13,34 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.1';
+export const VERSAO_ATUAL = '2.2.2';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.2',
+    data: '2026-08-17',
+    resumo: 'Correções da 2.2.1: as duas assinaturas mágicas do Mago, e a '
+      + 'reserva de d12 do Bárbaro Fanático voltando no Descanso Longo.',
+    correcoes: [
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'Assinatura Mágica: dava para marcar a MESMA magia nas duas vagas, '
+            + 'e o resultado ficava com uma assinatura só — parecia que o app '
+            + 'deixava escolher apenas 1. Agora, ao escolher uma magia, ela '
+            + 'fica bloqueada na outra vaga.',
+          'Bárbaro Trilha do Fanático: a reserva de d12 do Campeão dos Deuses '
+            + 'não voltava em Descanso Longo nenhum. Como o app também não '
+            + 'tinha outro jeito de recuperar esses dados, na prática a '
+            + 'reserva era de uso único por personagem.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.1',
     data: '2026-08-16',

@@ -50,6 +50,38 @@ test('ficha: Assinatura Mágica pede as duas magias de 3º círculo do livro', a
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
 
+test('ficha: as duas assinaturas têm de ser magias DIFERENTES', async ({ context }) => {
+  // O livro manda "escolha DUAS magias de 3º círculo". A primeira versão
+  // desta tela calculava o bloqueio entre as vagas uma única vez, na
+  // montagem: escolher durante o modal não atualizava a outra lista, dava
+  // para marcar a mesma magia nas duas vagas, e a gravação (que deduplica
+  // por nome) terminava com UMA assinatura -- o sintoma relatado, "só está
+  // podendo escolher 1 magia em vez de 2".
+  const { page, erros } = await abrirFicha(context, MAGO(20), 'regras-mago-assinatura-dupla');
+
+  await clicarSeletorFicha(page, '[data-mago-acao="definir-assinaturas"]',
+    { esperar: '#btn-salvar-magias-fixas' });
+  await assentar(page).catch(() => {});
+
+  await page.locator('#magia-fixa-m1 [data-opcao="Bola de Fogo"]').click();
+  await assentar(page).catch(() => {});
+
+  // A mesma magia não pode continuar disponível na outra vaga.
+  await expect(page.locator('#magia-fixa-m2 [data-opcao="Bola de Fogo"]'))
+    .toHaveClass(/bloqueada/);
+
+  await page.locator('#magia-fixa-m2 [data-opcao="Contramagia"]').click();
+  await page.click('#btn-salvar-magias-fixas');
+  await assentar(page).catch(() => {});
+
+  const salvo = await personagemSalvo(page);
+  expect(salvo.recursos.mago.assinaturas).toEqual({ m1: 'Bola de Fogo', m2: 'Contramagia' });
+  expect(salvo.magias_preparadas.filter(m => m.origem === 'assinatura_magica').map(m => m.nome))
+    .toEqual(['Bola de Fogo', 'Contramagia']);
+
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});
+
 test('ficha: Maestria de Magias pede uma magia de 1º e uma de 2º círculo', async ({ context }) => {
   const { page, erros } = await abrirFicha(context, MAGO(18), 'regras-mago-maestria');
 

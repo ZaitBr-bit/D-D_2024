@@ -68,10 +68,14 @@ test('modal de notas de versão: grupos de melhoria e de correção aparecem sep
   // escrever o emoji literal aqui, senão o spec quebra quando o texto do
   // grupo mudar. O emoji é sempre o primeiro "token" do título (formato
   // "EMOJI Nome do grupo", ver notas-versao.js:_grupoHtml/versao.js).
+  // `melhorias`/`correcoes` são OPCIONAIS: uma versão só de correções
+  // (2.2.2) é legítima, e a falta da guarda aqui quebrava este spec por
+  // motivo errado -- ele afirma sobre o histórico INTEIRO, não sobre cada
+  // versão ter as duas seções.
   const prefixosMelhoria = [...new Set(
-    NOTAS_VERSAO.flatMap((v) => v.melhorias.map((g) => g.grupo.split(' ')[0])))];
+    NOTAS_VERSAO.flatMap((v) => (v.melhorias || []).map((g) => g.grupo.split(' ')[0])))];
   const prefixosCorrecao = [...new Set(
-    NOTAS_VERSAO.flatMap((v) => v.correcoes.map((g) => g.grupo.split(' ')[0])))];
+    NOTAS_VERSAO.flatMap((v) => (v.correcoes || []).map((g) => g.grupo.split(' ')[0])))];
 
   const titulos = await page.locator('.nv-grupo-titulo').allTextContents();
 

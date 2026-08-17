@@ -783,6 +783,12 @@ export function setupEventosDescanso() {
       char.recursos.furia_deuses_usada = false;
       char.recursos.presenca_intimidante_usada = false; // Berserker nv10
       char.recursos.presenca_zelosa_usada = false; // Fanático nv10
+      // Campeão dos Deuses (Fanático nv3): "Sua reserva restaura todos os
+      // dados gastos ao completar um Descanso Longo". Este campo era
+      // escrito ao gastar e lido para exibir "N/4 d12", mas nenhum ponto
+      // do app o zerava -- na prática a reserva era de uso único por
+      // personagem.
+      char.recursos.campeao_deuses_gastos = 0;
     }
 
     // Bardo: descanso longo restaura todos os usos de Inspiração
@@ -1221,4 +1227,4 @@ export function setupEventosDescanso() {
       window.navegar('home');
     });
   });
-}
+}

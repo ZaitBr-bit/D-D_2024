@@ -1475,33 +1475,48 @@ export async function abrirEscolhaMagiasFixasMago(tipo) {
   `, `<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
      <button class="btn btn-primary" id="btn-salvar-magias-fixas">Salvar</button>`);
 
-  for (const vaga of def.vagas) {
-    // Uma magia já usada na outra vaga não pode repetir aqui: as duas
-    // vagas são escolhas distintas ("escolha uma magia de 1º e uma de 2º",
-    // "escolha duas magias de 3º círculo").
+  /**
+   * (Re)monta a lista de uma vaga. Precisa ser refeita a cada escolha, e
+   * não só na abertura: uma magia já usada na OUTRA vaga tem de ficar
+   * bloqueada aqui ("escolha uma magia de 1º e uma de 2º", "escolha DUAS
+   * magias de 3º círculo" -- são escolhas distintas). Enquanto o bloqueio
+   * era calculado uma única vez na montagem, dava para marcar a mesma
+   * magia nas duas vagas; a gravação deduplica por nome e o jogador
+   * terminava com UMA assinatura -- o sintoma "só está podendo escolher 1
+   * magia em vez de 2".
+   */
+  const montarVaga = (vaga) => {
+    const el = document.getElementById(`magia-fixa-${vaga.chave}`);
+    if (!el) return;
     const outrasVagas = def.vagas.filter(v => v.chave !== vaga.chave);
     const candidatas = grimorio
       .filter(m => Number(m.circulo) === vaga.circulo)
       .filter(m => !def.exigeAcao || ehAcao(m.nome));
     if (candidatas.length === 0) {
-      const el = document.getElementById(`magia-fixa-${vaga.chave}`);
-      if (el) {
-        el.innerHTML = `<div style="font-size:0.85rem;color:var(--text-muted)">
-          Nenhuma magia de ${vaga.circulo}º círculo${def.exigeAcao ? ' com tempo de conjuração de ação' : ''}
-          no seu livro de magias.
-        </div>`;
-      }
-      continue;
+      el.innerHTML = `<div style="font-size:0.85rem;color:var(--text-muted)">
+        Nenhuma magia de ${vaga.circulo}º círculo${def.exigeAcao ? ' com tempo de conjuração de ação' : ''}
+        no seu livro de magias.
+      </div>`;
+      return;
     }
-    montarSeletor(document.getElementById(`magia-fixa-${vaga.chave}`), {
+    montarSeletor(el, {
       opcoes: deMagias(candidatas, {
         jaTem: new Set(outrasVagas.map(v => escolhas[v.chave]).filter(Boolean))
       }),
       densidade: 'densa', max: 1, busca: candidatas.length > 8,
       selecionadas: escolhas[vaga.chave] ? [escolhas[vaga.chave]] : [],
-      aoMudar: (sel) => { escolhas[vaga.chave] = sel[0] || ''; },
+      aoMudar: (sel) => {
+        const novo = sel[0] || '';
+        if (novo === escolhas[vaga.chave]) return; // montagem, não escolha
+        escolhas[vaga.chave] = novo;
+        // Só as OUTRAS vagas são remontadas -- remontar a própria durante o
+        // seu callback reentraria em montarSeletor no meio do desenho.
+        outrasVagas.forEach(montarVaga);
+      },
     });
-  }
+  };
+
+  def.vagas.forEach(montarVaga);
 
   document.getElementById('btn-salvar-magias-fixas')?.addEventListener('click', () => {
     definirMagiasFixasMago(tipo, escolhas);

@@ -27,9 +27,13 @@ function _versaoHtml(v) {
   const marcador = ehAtual
     ? '<span class="nv-marcador" title="Versão que você está usando">▶ atual</span>'
     : '';
+  // Os dois campos são opcionais: uma versão só de correções (2.2.2) é
+  // legítima, e antes desta guarda ela derrubava o modal INTEIRO com
+  // "Cannot read properties of undefined (reading 'map')" -- nenhuma
+  // versão aparecia, nem as antigas.
   const secoes = [
-    ...v.melhorias.map(_grupoHtml),
-    ...v.correcoes.map(_grupoHtml),
+    ...(v.melhorias || []).map(_grupoHtml),
+    ...(v.correcoes || []).map(_grupoHtml),
   ].join('');
   return `
     <details class="nv-versao${ehAtual ? ' nv-versao-atual' : ''}" ${ehAtual ? 'open' : ''}>
@@ -49,6 +53,17 @@ function _versaoHtml(v) {
  * diagnóstico -- é ele que identifica a build para relatar problema,
  * enquanto a versão de cima é a numeração manual do site.
  */
+/**
+ * Monta o HTML da lista de versões. Separada de `abrirNotasVersao` (que
+ * depende de DOM e do modal) para poder ser confrontada sem navegador --
+ * ver `testes/regras/unidade/notas-versao-formato.test.mjs`, escrito
+ * depois de uma versão só-de-correções derrubar o modal inteiro.
+ * @param {Array} lista - Entradas de NOTAS_VERSAO
+ */
+export function montarNotasVersaoHtml(lista = NOTAS_VERSAO) {
+  return lista.map(_versaoHtml).join('');
+}
+
 export function abrirNotasVersao() {
   const build = document.getElementById('build-numero')?.textContent?.trim() || '';
   const rodape = build
@@ -56,7 +71,7 @@ export function abrirNotasVersao() {
     : '';
   const corpo = `
     <div class="nv-container">
-      ${NOTAS_VERSAO.map(_versaoHtml).join('')}
+      ${montarNotasVersaoHtml()}
       ${rodape}
     </div>`;
   abrirModal('Notas de versão', corpo);

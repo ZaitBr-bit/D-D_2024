@@ -168,12 +168,13 @@ linha contra `Talentos.md` no relatório de desenho do motor
 
 ## O que cada motor prova — e o que não prova
 
-Vinte motores de `node:test` em `unidade/`, mais vinte specs Playwright
+Vinte e dois motores de `node:test` em `unidade/`, mais vinte specs Playwright
 em `../e2e/regras/`. Cada um confronta uma fatia diferente do livro, e nenhum
 sozinho prova a regra inteira. A tabela abaixo descreve os motores dos
 domínios já fechados; os mais recentes (equipamento, seletor de itens,
 opções de domínio, Telecinético, subclasses conjuradoras, maestria, magias
-fixas do Mago, imports não resolvidos, cobertura de gatilhos de tela) entraram
+fixas do Mago, imports não resolvidos, cobertura de gatilhos de tela,
+restauração de recursos, formato das notas de versão) entraram
 depois e estão nas duas últimas linhas ou no próprio cabeçalho do arquivo.
 
 | Motor | O que confronta | Testes |
@@ -193,8 +194,10 @@ depois e estão nas duas últimas linhas ou no próprio cabeçalho do arquivo.
 | `maestria-armas.test.mjs` | Quais armas podem receber **Maestria em Arma**, por classe (Bárbaro só Corpo a Corpo; Guerreiro qualquer Simples/Marcial; Guardião/Paladino/Ladino as de proficiência), rodando contra `dados/equipamento/armas.json` real -- inclusive uma guarda de FORMATO (`propriedades` é string, não lista), que é o que a tela de maestrias violava | 6 |
 | `imports-nao-resolvidos.test.mjs` | Varredura de `site/js/`: nome exportado por **outro módulo do projeto** que é chamado sem estar importado (`ReferenceError` na hora em que a função rodar -- `checar_esm.mjs` não pega, porque só confere o parse). Globais publicados de propósito (`window.navegar`, `window.fecharModal`) são descobertos por varredura, não por lista fixa | 1 |
 | `gatilhos-ui-cobertos.test.mjs` | Cliquete de cobertura de tela: todo `id="btn-..."`/`data-<x>-acao="..."` declarado em `site/js/` precisa aparecer em algum spec de `testes/e2e/` -- isto é, precisa existir um teste que CLIQUE nele. A dívida histórica (133 gatilhos) está congelada em `../gatilhos-sem-cobertura.mjs` e a lista só encolhe: gatilho novo sem teste falha, e entrada que já ganhou teste (ou sumiu do código) também falha, pedindo a remoção. Nasceu de uma melhoria entregue com teste que só afirmava "o botão aparece" -- ver GUIA-PROXIMOS-DOMINIOS.md | 3 |
+| `recursos-restaurados.test.mjs` | Varredura de `site/js/`: campo de consumo (`_usado`/`_usada`/`_gasto`/`_gastos`) que é gravado mas NUNCA mencionado em `sheet/hp-descanso.js` -- recurso que se gasta e nada devolve. Exceções legítimas (restauradas por outra via, como as do talento Dádiva da Recuperação, ou por gatilho próprio, como a Concentração Fanática, que zera ao ATIVAR a Fúria) ficam numa lista com o motivo escrito, e o motor cobra a higiene dela nos dois sentidos. Nasceu do Campeão dos Deuses do Bárbaro Fanático, cuja reserva de d12 não voltava em Descanso Longo nenhum | 3 |
+| `notas-versao-formato.test.mjs` | Toda entrada de `NOTAS_VERSAO` renderiza (via `montarNotasVersaoHtml`, extraída de `notas-versao.js` para ser confrontável sem navegador), `VERSAO_ATUAL` é a entrada do topo, e todo grupo tem título e itens. `melhorias`/`correcoes` são OPCIONAIS -- foi uma versão só de correções que derrubou o modal inteiro, escondendo também as versões antigas | 4 |
 
-Total: **1364 testes** em `unidade/` (medido em 2026-08-16) — **1300 passam,
+Total: **1371 testes** em `unidade/` (medido em 2026-08-17) — **1307 passam,
 64 skip, 0 falham**. Os
 skips não somem dentro do total: são talentos cujo `aplicarEfeitoTalento` não
 faz nenhum campo de lista crescer (fora do escopo deste motor específico, não
