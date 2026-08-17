@@ -1264,6 +1264,25 @@ tr:hover td { background: #faf8f4; }
     padding-bottom: 3mm;
     margin-bottom: 3mm;
   }
+  /* Com foto, o cabecalho vira duas colunas: retrato + identidade. Sem
+     foto, o bloco de identidade ocupa a largura como sempre ocupou. */
+  .print-char-header-com-foto {
+    display: flex;
+    align-items: center;
+    gap: 4mm;
+  }
+  .print-char-identidade { flex: 1; min-width: 0; }
+  .print-char-foto {
+    width: 22mm;
+    height: 22mm;
+    object-fit: cover;
+    border: 1px solid #333;
+    border-radius: 1.5mm;
+    flex-shrink: 0;
+    /* Sem isto o Chrome descarta o fundo/contraste da imagem ao imprimir. */
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
   .print-char-name {
     font-size: 16pt;
     font-weight: 800;

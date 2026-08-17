@@ -111,6 +111,9 @@ function _montarDadosCartao() {
   return {
     nome: char.nome || 'Sem Nome',
     sub: `${char.especie || ''} ${char.classe || ''}${char.subclasse ? ` (${char.subclasse})` : ''} — Nível ${char.nivel}${char.antecedente ? ` | ${char.antecedente}` : ''}${char.alinhamento ? ` | ${char.alinhamento}` : ''}`,
+    // Data URL gravado pelo "Trocar foto" da edicao (sempre JPEG, ver
+    // processarImagemArquivo em utils.js). Vai embutido no PDF.
+    imagem: typeof char.imagem === 'string' && char.imagem.trim() ? char.imagem : '',
     stats, atributos, saves, pericias, sentidos, defesas, equipado,
   };
 }
@@ -226,6 +229,29 @@ function _pdfWrap(ctx, text, size, color, bold) {
   }
 }
 
+/**
+ * Converte o data URL da foto em bytes e embute no documento.
+ *
+ * `processarImagemArquivo` (utils.js) grava sempre JPEG, mas fichas
+ * importadas ou antigas podem trazer PNG -- os dois formatos que o PDFLib
+ * aceita. Qualquer outro (ou dado corrompido) devolve null: o PDF sai sem
+ * foto, que é muito melhor do que o botão "Gerar PDF" parar de funcionar
+ * por causa de uma imagem.
+ */
+async function _embutirFoto(doc, dataUrl) {
+  try {
+    const m = /^data:image\/(jpeg|jpg|png);base64,(.+)$/i.exec((dataUrl || '').trim());
+    if (!m) return null;
+    const bin = atob(m[2]);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return m[1].toLowerCase() === 'png' ? doc.embedPng(bytes) : doc.embedJpg(bytes);
+  } catch (err) {
+    console.error('Não foi possível embutir a foto no PDF:', err);
+    return null;
+  }
+}
+
 /** Desenha o cartao estilizado da ficha (primeira pagina, tema do app). */
 function _desenharCartao(ctx, dados) {
   const C = ctx.C;
@@ -233,8 +259,23 @@ function _desenharCartao(ctx, dados) {
   // Faixa de cabecalho (sangria total no topo)
   const bandH = 60;
   ctx.page.drawRectangle({ x: 0, y: ctx.H - bandH, width: ctx.W, height: bandH, color: C.maroon });
-  _pdfTxt(ctx, _pdfFit(dados.nome, ctx.fontB, 20, ctx.maxW), ctx.M, ctx.H - 30, ctx.fontB, 20, C.white);
-  _pdfTxt(ctx, _pdfFit(dados.sub, ctx.font, 9.5, ctx.maxW), ctx.M, ctx.H - 46, ctx.font, 9.5, C.subWhite);
+
+  // Foto do personagem, quando houver: quadrada, à direita da faixa. O
+  // texto perde essa largura para não passar por baixo dela.
+  const fotoLado = 44;
+  const temFoto = !!ctx.fotoEmbutida;
+  if (temFoto) {
+    ctx.page.drawImage(ctx.fotoEmbutida, {
+      x: ctx.W - ctx.M - fotoLado,
+      y: ctx.H - bandH + (bandH - fotoLado) / 2,
+      width: fotoLado,
+      height: fotoLado,
+    });
+  }
+  const larguraTexto = ctx.maxW - (temFoto ? fotoLado + 10 : 0);
+
+  _pdfTxt(ctx, _pdfFit(dados.nome, ctx.fontB, 20, larguraTexto), ctx.M, ctx.H - 30, ctx.fontB, 20, C.white);
+  _pdfTxt(ctx, _pdfFit(dados.sub, ctx.font, 9.5, larguraTexto), ctx.M, ctx.H - 46, ctx.font, 9.5, C.subWhite);
   ctx.y = ctx.H - bandH - 12;
 
   // Linha de stats de combate
@@ -348,6 +389,9 @@ async function _renderizarPdf(PDFLib, dados, detalhes) {
   const ctx = { doc, page: null, y: 0, W, H, M, maxW: W - 2 * M, font, fontB, C };
   ctx.newPage = () => { ctx.page = doc.addPage([W, H]); ctx.y = H - M; };
   ctx.ensure = h => { if (ctx.y - h < M) ctx.newPage(); };
+  // Embutir a foto ANTES de desenhar: _desenharCartao é síncrona, e o
+  // embed do PDFLib não é.
+  ctx.fotoEmbutida = dados.imagem ? await _embutirFoto(doc, dados.imagem) : null;
   ctx.newPage();
 
   _desenharCartao(ctx, dados);

@@ -37,17 +37,32 @@ function listar(dir, extensao, ignorar = []) {
   return fora;
 }
 
+/** Remove comentários: um exemplo citado em comentário não é um gatilho. */
+function semComentarios(texto) {
+  return texto
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .replace(/(^|[^:])\/\/[^\n]*/g, '$1 ');
+}
+
 /** Gatilhos declarados no app, com o arquivo em que aparecem. */
 function coletarGatilhos() {
   const mapa = new Map();
   for (const caminho of listar(join(RAIZ, 'site', 'js'), '.js', ['vendor'])) {
-    const texto = readFileSync(caminho, 'utf-8');
+    const texto = semComentarios(readFileSync(caminho, 'utf-8'));
     const registrar = (id) => {
       if (!mapa.has(id)) mapa.set(id, caminho);
     };
     for (const m of texto.matchAll(/\bid="(btn-[a-z0-9-]+)"/g)) registrar(m[1]);
-    for (const m of texto.matchAll(/\bdata-([a-z-]*acao)="([a-z0-9-]+)"/g)) {
+    for (const m of texto.matchAll(/\bdata-([a-z-]*acao)="([a-z0-9_-]+)"/g)) {
       registrar(`${m[1]}=${m[2]}`);
+    }
+    // Ação escolhida por ternário no próprio atributo -- padrão comum nos
+    // botões que alternam estado (`data-druida-forma-acao="${ativa ?
+    // 'desativar' : 'ativar'}"`). Os dois lados são gatilhos de verdade e
+    // ficavam INVISÍVEIS para este motor enquanto ele só olhava literais:
+    // o inventário nascia incompleto e ninguém era cobrado por eles.
+    for (const m of texto.matchAll(/\bdata-([a-z-]*acao)="\$\{([^}]*)\}"/g)) {
+      for (const lit of m[2].matchAll(/'([a-z0-9_-]+)'/g)) registrar(`${m[1]}=${lit[1]}`);
     }
   }
   return mapa;
@@ -87,6 +102,34 @@ test('nenhum gatilho de tela novo sem teste que o acione', () => {
     'testes/e2e/regras/, ou -- se houver motivo -- acrescente a entrada em ' +
     'testes/regras/gatilhos-sem-cobertura.mjs com o motivo por escrito:\n  ' +
     novos.join('\n  '));
+});
+
+test('nenhum gatilho é montado por interpolação (some do inventário)', () => {
+  // A varredura acha `data-<x>-acao="valor"` literal. Um
+  // `data-mago-acao="${acao}"` não casa com nada: o botão existe na tela,
+  // funciona, e simplesmente NÃO ENTRA na conta -- escapa da regra em
+  // silêncio, que é pior que estar na lista congelada. Aconteceu de
+  // verdade em 2026-08-17, ao extrair os botões do painel do Mago para uma
+  // função com a ação como parâmetro.
+  // Ternário com os dois lados literais é resolvido por coletarGatilhos e
+  // não é problema. O que este teste barra é a interpolação OPACA -- uma
+  // variável, uma chamada de função --, de onde nenhum nome pode ser lido.
+  const opacos = [];
+  for (const caminho of listar(join(RAIZ, 'site', 'js'), '.js', ['vendor'])) {
+    const texto = semComentarios(readFileSync(caminho, 'utf-8'));
+    const rel = caminho.slice(RAIZ.length + 1).replace(/\\/g, '/');
+    const conferir = (regex) => {
+      for (const m of texto.matchAll(regex)) {
+        if (!/'[a-z0-9_-]+'/.test(m[0])) opacos.push(`${rel}: ${m[0]}`);
+      }
+    };
+    conferir(/\bdata-[a-z-]*acao="\$\{[^}]*\}"/g);
+    conferir(/\bid="btn-[a-z0-9-]*\$\{[^}]*\}"/g);
+  }
+  assert.deepEqual(opacos, [],
+    'gatilho montado por interpolação opaca não entra no inventário e escapa ' +
+    'da cobrança de teste. Escreva o atributo literal (um por botão), ou use ' +
+    'um ternário com os dois nomes escritos:\n  ' + opacos.join('\n  '));
 });
 
 test('a lista de gatilhos sem cobertura só encolhe', () => {

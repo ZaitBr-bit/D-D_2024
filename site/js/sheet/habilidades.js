@@ -1878,6 +1878,20 @@ export function setupEventosHabilidades() {
         return;
       }
 
+      // Maestria de Magias (nível 18): à vontade no círculo mais baixo,
+      // sem gastar espaço -- não há recurso a debitar, só a confirmação de
+      // que a conjuração saiu de graça.
+      if (acao === 'maestria-1' || acao === 'maestria-2') {
+        const nome = acao === 'maestria-1' ? estado.maestriaMagia1 : estado.maestriaMagia2;
+        if (!nome) {
+          toast('Escolha antes quais magias são a sua Maestria de Magias.', 'error');
+          return;
+        }
+        const circulo = acao === 'maestria-1' ? 1 : 2;
+        toast(`${nome} conjurada no ${circulo}º círculo sem gastar espaço!`, 'success');
+        return;
+      }
+
       if (acao === 'assinatura-1' || acao === 'assinatura-2') {
         const ehPrimeira = acao === 'assinatura-1';
         const nome = ehPrimeira ? estado.assinatura1 : estado.assinatura2;
@@ -4537,9 +4551,11 @@ export function renderFeatureItem(f, source) {
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
         <button class="btn btn-sm btn-accent" data-mago-acao="definir-assinaturas">${definidas.length ? 'Trocar Magias' : 'Escolher Magias'}</button>
-        ${escolhidas.map(a => a.nome ? `
-          <button class="btn btn-sm btn-primary" data-mago-acao="${a.acao}" ${a.usada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${escHtml(a.nome)}</button>
-        ` : '').join('')}
+        ${/* Ações escritas LITERALMENTE (e não `${a.acao}`): o motor que cobra
+             teste por gatilho varre o código atrás desses literais, e uma ação
+             interpolada some do inventário -- ver gatilhos-ui-cobertos.test.mjs */''}
+        ${estadoMago.assinatura1 ? `<button class="btn btn-sm btn-primary" data-mago-acao="assinatura-1" ${estadoMago.assinatura1Usada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${escHtml(estadoMago.assinatura1)}</button>` : ''}
+        ${estadoMago.assinatura2 ? `<button class="btn btn-sm btn-primary" data-mago-acao="assinatura-2" ${estadoMago.assinatura2Usada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${escHtml(estadoMago.assinatura2)}</button>` : ''}
         <span style="font-size:0.75rem;color:var(--text-muted)">3º círculo sem espaço | Curto/Longo</span>
       </div>
     `;

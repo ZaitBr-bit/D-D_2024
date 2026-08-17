@@ -13,13 +13,45 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.2';
+export const VERSAO_ATUAL = '2.2.3';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.3',
+    data: '2026-08-17',
+    resumo: 'A foto do personagem no PDF e na impressão, e os recursos do '
+      + 'Mago à vista na ficha.',
+    melhorias: [
+      {
+        grupo: '🖼️ Foto na ficha impressa e no PDF',
+        itens: [
+          'A foto que você carrega na ficha agora sai no PDF do botão '
+            + '"Gerar PDF", ao lado do nome, no cabeçalho.',
+          'Sai também na impressão direta do navegador, no mesmo lugar.',
+          'Quem não tem foto continua com o cabeçalho como era, sem moldura '
+            + 'vazia ocupando espaço.',
+        ],
+      },
+      {
+        grupo: '📖 Recursos do Mago à vista',
+        itens: [
+          'O painel do topo da ficha passou a mostrar QUAIS magias você '
+            + 'escolheu para Maestria de Magias e Assinatura Mágica — antes '
+            + 'os botões diziam só "Assinatura 1" e "Assinatura 2", e a '
+            + 'escolha ficava escondida dentro do card recolhido.',
+          'A Maestria de Magias ganhou os botões para conjurar as duas magias '
+            + 'sem gastar espaço, à vontade. Antes só existia uma frase '
+            + 'explicando a regra.',
+          'Quando ainda não há magia escolhida, o painel avisa e leva direto '
+            + 'para a tela de escolha.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.2',
     data: '2026-08-17',

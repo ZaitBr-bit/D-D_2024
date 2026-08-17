@@ -168,16 +168,24 @@ export async function gerarHtmlImpressao() {
   let pag1 = '';
 
   // --- Cabecalho ---
+  // A foto (char.imagem) e um data URL gravado pelo "Trocar foto" da
+  // edicao -- vai embutida no HTML, entao a folha nao depende de rede nem
+  // de o arquivo original ainda existir. Sem foto, nenhum elemento e
+  // emitido: uma moldura vazia so gastaria espaco da folha.
+  const _foto = typeof char.imagem === 'string' && char.imagem.trim() ? char.imagem : '';
   pag1 += `
-    <div class="print-char-header">
-      <div class="print-char-name">${escHtml(char.nome) || 'Sem Nome'}</div>
-      <div class="print-char-sub">
-        ${escHtml(char.especie || '')} ${escHtml(char.classe || '')} ${char.subclasse ? `(${escHtml(char.subclasse)})` : ''} &mdash; Nivel ${char.nivel}
-        ${char.antecedente ? ` | Antecedente: ${escHtml(char.antecedente)}` : ''}
-        ${char.alinhamento ? ` | ${escHtml(char.alinhamento)}` : ''}
-      </div>
-      <div class="print-char-sub">
-        Tamanho: ${escHtml(_tamanho)}${(char.idiomas?.length) ? ' | Idiomas: ' + char.idiomas.map(escHtml).join(', ') : ''}
+    <div class="print-char-header${_foto ? ' print-char-header-com-foto' : ''}">
+      ${_foto ? `<img class="print-char-foto" src="${escHtml(_foto)}" alt="">` : ''}
+      <div class="print-char-identidade">
+        <div class="print-char-name">${escHtml(char.nome) || 'Sem Nome'}</div>
+        <div class="print-char-sub">
+          ${escHtml(char.especie || '')} ${escHtml(char.classe || '')} ${char.subclasse ? `(${escHtml(char.subclasse)})` : ''} &mdash; Nivel ${char.nivel}
+          ${char.antecedente ? ` | Antecedente: ${escHtml(char.antecedente)}` : ''}
+          ${char.alinhamento ? ` | ${escHtml(char.alinhamento)}` : ''}
+        </div>
+        <div class="print-char-sub">
+          Tamanho: ${escHtml(_tamanho)}${(char.idiomas?.length) ? ' | Idiomas: ' + char.idiomas.map(escHtml).join(', ') : ''}
+        </div>
       </div>
     </div>
   `;

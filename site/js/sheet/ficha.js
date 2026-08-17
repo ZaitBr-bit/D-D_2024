@@ -53,6 +53,87 @@ function restaurarEstadoDetails(estado) {
   });
 }
 
+/**
+ * Painel "Recursos do Mago" -- fica no topo da ficha, sempre aberto.
+ *
+ * Ele existe porque os botões das características vivem no card de
+ * Características de Classe, que vem RECOLHIDO: medido em 2026-08-17, o
+ * botão de escolher as magias da Maestria existia no DOM com
+ * `isVisible() === false`. Enquanto este painel mostrava só rótulos
+ * genéricos ("Assinatura 1") e uma frase solta sobre a Maestria, a escolha
+ * feita pelo jogador não aparecia em lugar nenhum que ele estivesse
+ * olhando -- daí a impressão de que a Maestria "não tinha seleção".
+ *
+ * Regra das duas características (PHB 2024):
+ * - Assinatura Mágica: cada magia 1x por Descanso Curto/Longo, de graça.
+ *   Por isso os botões desabilitam depois do uso.
+ * - Maestria de Magias: à vontade, no círculo mais baixo, sem gastar
+ *   espaço. Por isso os botões nunca desabilitam nem debitam nada.
+ */
+function renderPainelRecursosMago(estadoMago) {
+  // Os `data-mago-acao` abaixo são escritos LITERALMENTE, um por botão, e
+  // não montados por interpolação. O motor que cobra teste para cada
+  // gatilho de tela (testes/regras/unidade/gatilhos-ui-cobertos.test.mjs)
+  // varre o código atrás desses literais: um `data-mago-acao="${acao}"`
+  // desaparece do inventário e o botão passa a escapar da regra em
+  // silêncio. Aconteceu na primeira versão deste painel.
+  const corpoBotao = (nome, usada) =>
+    `${escHtml(nome)}${usada ? ' (usada)' : ''}`;
+  const attrsBotao = (usada) =>
+    `${usada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''} ` +
+    `title="${usada ? 'Já usada neste descanso' : 'Conjurar sem gastar espaço de magia'}"`;
+
+  const temAssinaturas = !!(estadoMago.assinatura1 || estadoMago.assinatura2);
+  const temMaestria = !!(estadoMago.maestriaMagia1 || estadoMago.maestriaMagia2);
+
+  return `
+    <div class="info-box info" id="painel-recursos-mago" style="margin-bottom:10px;display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+        <div style="font-size:0.85rem">
+          <strong>Recursos do Mago:</strong>
+          Recuperação Arcana: ${estadoMago.recuperacaoArcanaUsada ? 'Usada' : `Disponível (até ${estadoMago.recuperacaoArcanaMax}º combinado)`}
+        </div>
+        <div class="no-print" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-sm btn-accent" data-mago-acao="recuperacao-arcana" ${estadoMago.recuperacaoArcanaUsada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Recuperação Arcana</button>
+        </div>
+      </div>
+
+      ${estadoMago.maestriaMagiasAtiva ? `
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px solid var(--border-light);padding-top:6px">
+          <div style="font-size:0.85rem">
+            <strong>Maestria de Magias:</strong>
+            ${temMaestria ? 'à vontade, sem gastar espaço' : '<span style="color:var(--warning)">nenhuma magia escolhida</span>'}
+          </div>
+          <div class="no-print" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+            ${estadoMago.maestriaMagia1 ? `<button class="btn btn-sm btn-primary" data-mago-acao="maestria-1" ${attrsBotao(false)}>${corpoBotao(estadoMago.maestriaMagia1, false)}</button>` : ''}
+            ${estadoMago.maestriaMagia2 ? `<button class="btn btn-sm btn-primary" data-mago-acao="maestria-2" ${attrsBotao(false)}>${corpoBotao(estadoMago.maestriaMagia2, false)}</button>` : ''}
+            <button class="btn btn-sm btn-accent" data-mago-acao="definir-maestria-magias">${temMaestria ? 'Trocar' : 'Escolher Magias'}</button>
+          </div>
+        </div>
+      ` : ''}
+
+      ${estadoMago.assinaturaMagicaAtiva ? `
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px solid var(--border-light);padding-top:6px">
+          <div style="font-size:0.85rem">
+            <strong>Assinatura Mágica:</strong>
+            ${temAssinaturas ? '1x cada por Descanso Curto/Longo' : '<span style="color:var(--warning)">nenhuma magia escolhida</span>'}
+          </div>
+          <div class="no-print" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+            ${estadoMago.assinatura1 ? `<button class="btn btn-sm btn-primary" data-mago-acao="assinatura-1" ${attrsBotao(estadoMago.assinatura1Usada)}>${corpoBotao(estadoMago.assinatura1, estadoMago.assinatura1Usada)}</button>` : ''}
+            ${estadoMago.assinatura2 ? `<button class="btn btn-sm btn-primary" data-mago-acao="assinatura-2" ${attrsBotao(estadoMago.assinatura2Usada)}>${corpoBotao(estadoMago.assinatura2, estadoMago.assinatura2Usada)}</button>` : ''}
+            <button class="btn btn-sm btn-accent" data-mago-acao="definir-assinaturas">${temAssinaturas ? 'Trocar' : 'Escolher Magias'}</button>
+          </div>
+        </div>
+      ` : ''}
+
+      <div style="width:100%;font-size:0.78rem;color:var(--text-muted)">
+        Grimório: preparar magias no Descanso Longo.
+        ${estadoMago.memorizarMagiaAtivo ? ' Memorizar Magia: trocar 1 magia preparada no Descanso Curto.' : ''}
+      </div>
+    </div>
+  `;
+}
+
 export function renderFichaCompleta() {
   // Recalcula os passivos de talentos ANTES de qualquer leitura do cache.
   //
@@ -437,27 +518,7 @@ export function renderFichaCompleta() {
         </div>
       ` : ''}
 
-      ${estadoMago ? `
-        <div class="info-box info" style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
-          <div style="font-size:0.85rem">
-            <strong>Recursos do Mago:</strong>
-            Recuperação Arcana: ${estadoMago.recuperacaoArcanaUsada ? 'Usada' : `Disponível (até ${estadoMago.recuperacaoArcanaMax}º combinado)`}
-            ${estadoMago.assinaturaMagicaAtiva ? `&nbsp;|&nbsp; Assinatura 1: ${estadoMago.assinatura1Usada ? 'Usada' : 'Disponível'} | Assinatura 2: ${estadoMago.assinatura2Usada ? 'Usada' : 'Disponível'}` : ''}
-          </div>
-          <div class="no-print" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-            <button class="btn btn-sm btn-accent" data-mago-acao="recuperacao-arcana" ${estadoMago.recuperacaoArcanaUsada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Recuperação Arcana</button>
-            ${estadoMago.assinaturaMagicaAtiva ? `
-              <button class="btn btn-sm btn-primary" data-mago-acao="assinatura-1" ${estadoMago.assinatura1Usada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Assinatura 1</button>
-              <button class="btn btn-sm btn-primary" data-mago-acao="assinatura-2" ${estadoMago.assinatura2Usada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Assinatura 2</button>
-            ` : ''}
-          </div>
-          <div style="width:100%;font-size:0.78rem;color:var(--text-muted)">
-            Grimório: preparar magias no Descanso Longo.
-            ${estadoMago.memorizarMagiaAtivo ? ' Memorizar Magia: trocar 1 magia preparada no Descanso Curto.' : ''}
-            ${estadoMago.maestriaMagiasAtiva ? ' Maestria: 1ª e 2ª sem espaço no círculo base.' : ''}
-          </div>
-        </div>
-      ` : ''}
+      ${estadoMago ? renderPainelRecursosMago(estadoMago) : ''}
 
       <div class="stats-row">
         <div class="stat-box">
