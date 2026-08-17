@@ -400,6 +400,33 @@ export function getMagiaPreparadas(tabelaCaracteristicas, nivel) {
   return row ? (parseInt(row['Magias Preparadas']) || 0) : 0;
 }
 
+/**
+ * Limites de truques e de magias preparadas/conhecidas, considerando as
+ * subclasses conjuradoras.
+ *
+ * Existe porque Guerreiro e Ladino TÊM tabela de características, mas sem
+ * colunas de magia: `getTruquesConhecidos`/`getMagiaPreparadas` devolvem 0
+ * para eles, e um fallback do tipo "se veio 0 é porque não há tabela"
+ * precisa ser escrito igual em todos os lugares que mostram o limite. Ele
+ * NÃO estava: a seção Magias da ficha caía para a tabela da subclasse
+ * quando o valor era 0, mas o modal "Consultar Magias" só caía quando não
+ * havia tabela nenhuma -- o Trapaceiro Arcano via "Truques: 0/0" lá e a
+ * grade inteira de magias aparecia bloqueada.
+ *
+ * @param {Array} tabelaCaracteristicas - Tabela da classe (pode ser nula)
+ * @param {number} nivel - Nível do personagem
+ * @param {Object|null} conjSubclasse - Tabela da subclasse conjuradora
+ *   ({ truques, preparadas }), ou null quando não há
+ */
+export function getLimitesMagias(tabelaCaracteristicas, nivel, conjSubclasse = null) {
+  const truquesTabela = getTruquesConhecidos(tabelaCaracteristicas, nivel);
+  const preparadasTabela = getMagiaPreparadas(tabelaCaracteristicas, nivel);
+  return {
+    truques: truquesTabela || conjSubclasse?.truques || 0,
+    preparadas: preparadasTabela || conjSubclasse?.preparadas || 0
+  };
+}
+
 /** Deslocamento padrão da espécie (extraído do texto_completo) */
 export function getDeslocamento(especieTexto) {
   if (!especieTexto) return '9 metros';

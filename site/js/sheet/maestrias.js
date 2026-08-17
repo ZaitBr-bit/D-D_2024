@@ -5,6 +5,7 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { abrirModal, escHtml, semAcento, toast } from '../utils.js';
+import { armasElegiveisMaestria } from '../regras-equipamento.js';
 import { deArmas } from '../opcoes-dominio.js';
 import { montarTroca } from '../ui-opcoes.js';
 import { getProgressaoBarbaro } from './classes/barbaro.js';
@@ -40,28 +41,12 @@ export async function abrirModalMaestrias() {
   maestriasMax += bonusMaestriaTalento();
 
   const dados = await carregarDadosEquipSheet();
-  // Filtrar armas conforme regras de proficiência por classe
-  const todasArmas = dados?.armas || [];
-  const armas = todasArmas
-    .filter(a => {
-      const cat = (a.categoria || '').toLowerCase();
-      const ehSimples = cat.includes('simples');
-      const ehMarcial = cat.includes('marciais');
-      if (!ehSimples && !ehMarcial) return false;
-
-      // Bárbaro: apenas Corpo a Corpo (Simples ou Marcial)
-      if (char.classe === 'Bárbaro') {
-        return cat.includes('corpo a corpo');
-      }
-      // Ladino: Simples + Marciais com propriedade Acuidade
-      if (char.classe === 'Ladino') {
-        if (ehSimples) return true;
-        const props = (a.propriedades || []).map(p => p.toLowerCase());
-        return props.some(p => p.includes('acuidade'));
-      }
-      // Guerreiro, Guardião, Paladino: todas Simples e Marciais
-      return true;
-    })
+  // A regra de quais armas podem receber maestria mora em
+  // regras-equipamento.js, junto da proficiência de que ela depende (o
+  // livro amarra as duas). A cópia que existia aqui lia
+  // `arma.propriedades` como lista -- o dado é string, e o modal do Ladino
+  // quebrava com TypeError antes de abrir.
+  const armas = armasElegiveisMaestria(char, dados?.armas || [])
     .map(a => a.nome)
     .sort((a, b) => a.localeCompare(b));
 
@@ -173,15 +158,7 @@ export async function abrirModalTrocaMaestriaDescanso(callbackPosTroca = null) {
   const todasArmas = dados?.armas || [];
   // Filtrar armas disponiveis conforme classe -- mantém os objetos completos
   // (nao só o nome): deArmas precisa de dano/propriedades/maestria de cada uma.
-  const armasDisponiveis = todasArmas
-    .filter(a => {
-      const cat = (a.categoria || '').toLowerCase();
-      const ehSimples = cat.includes('simples');
-      const ehMarcial = cat.includes('marciais');
-      if (!ehSimples && !ehMarcial) return false;
-      if (char.classe === 'Bárbaro') return cat.includes('corpo a corpo');
-      return true;
-    })
+  const armasDisponiveis = armasElegiveisMaestria(char, todasArmas)
     .sort((a, b) => a.nome.localeCompare(b.nome));
 
   let armaTrocar = '';

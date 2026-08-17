@@ -75,7 +75,16 @@ export async function modulosApp() {
   if (_cache) return _cache;
   instalarStubs();
   const importar = (rel) => import(pathToFileURL(resolve(RAIZ, rel)).href);
-  const [regras, efeitos, store, levelup, criador, utils, dadosClasses, db, equip] = await Promise.all([
+  // levelupFlow/sheetEstado/sheetMagias entram aqui para o motor das
+  // subclasses conjuradoras (Cavaleiro Místico e Trapaceiro Arcano): o
+  // contexto de subida de nível (levelup-flow.js) recebe da ficha as
+  // funções que leem as tabelas dessas subclasses, e reescrevê-las no teste
+  // não confrontaria nada -- são as MESMAS funções que sheet/edicao.js
+  // injeta, apontadas para o personagem do teste via
+  // sheetEstado.definirChar().
+  const [regras, efeitos, store, levelup, criador, utils, dadosClasses, db, equip,
+         levelupFlow, sheetEstado, sheetMagias, sheetMigracoes, sheetGrimorio,
+         sheetMago] = await Promise.all([
     importar('site/js/regras-cobertura.js'),
     importar('site/js/talentos-effects.js'),
     importar('site/js/store.js'),
@@ -85,8 +94,16 @@ export async function modulosApp() {
     importar('site/js/dados-classes.js'),
     importar('site/js/db.js'),
     importar('site/js/regras-equipamento.js'),
+    importar('site/js/levelup-flow.js'),
+    importar('site/js/sheet/estado.js'),
+    importar('site/js/sheet/magias.js'),
+    importar('site/js/sheet/migracoes.js'),
+    importar('site/js/sheet/grimorio.js'),
+    importar('site/js/sheet/classes/mago.js'),
   ]);
-  _cache = { regras, efeitos, store, levelup, criador, utils, dadosClasses, db, equip };
+  _cache = { regras, efeitos, store, levelup, criador, utils, dadosClasses, db, equip,
+             levelupFlow, sheetEstado, sheetMagias, sheetMigracoes, sheetGrimorio,
+             sheetMago };
   return _cache;
 }
 

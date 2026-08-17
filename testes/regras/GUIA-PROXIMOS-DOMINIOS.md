@@ -35,6 +35,40 @@ Quando estiver em dúvida entre registrar e investigar mais: investigue.
 
 ---
 
+## A regra que governa toda melhoria nova
+
+**Melhoria entregue sem um teste que a ACIONE não está entregue.**
+
+Em 2026-08-16 três características do Mago e uma tela de maestrias foram
+corrigidas, com testes. Um deles afirmava que o botão *aparecia* — e parava
+aí. Dentro da função que o botão chamava havia um `ReferenceError`
+(`getMagiaPreparadas` usado sem import, sobra de uma refatoração no mesmo
+dia). Nada pegou:
+
+- `checar_esm.mjs` só confere que o arquivo **faz parse** como módulo, e
+  identificador livre é erro de execução, não de sintaxe;
+- os motores de unidade **importam** os módulos, mas importar não executa a
+  função onde o nome aparece;
+- o spec de navegador do fluxo **não clicava** no botão.
+
+Quem encontrou foi o usuário, no console, na primeira vez que usou.
+
+Duas defesas nasceram daí, e as duas são baratas de manter:
+
+1. `unidade/imports-nao-resolvidos.test.mjs` — varre `site/js/` procurando
+   nome exportado por outro módulo do projeto que é **chamado sem import**.
+   Fecha a classe inteira desse erro, e não só o caso do dia.
+2. `unidade/gatilhos-ui-cobertos.test.mjs` + `gatilhos-sem-cobertura.mjs` —
+   todo `id="btn-..."` e `data-<x>-acao="..."` novo precisa aparecer em
+   algum spec de `testes/e2e/`. A dívida antiga (133 gatilhos) está
+   congelada; a lista **só encolhe**.
+
+Na prática, ao acrescentar um botão: escreva o spec que clica nele e afirma
+o que acontece **depois** do clique. "O botão aparece" não é asserção de
+comportamento — é asserção de HTML.
+
+---
+
 ## Os sete erros da primeira rodada
 
 ### 1. Medir arquitetura em vez de comportamento

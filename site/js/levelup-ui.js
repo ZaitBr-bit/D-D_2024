@@ -3,7 +3,8 @@
 // Fase 5: Integra flow + cards + eventos + submissão
 // ============================================================
 import {
-  buildLevelUpContext, buildVisibleSteps, createInitialState,
+  buildLevelUpContext, buildVisibleSteps, createInitialState, calcularConjuracao,
+  carregarMagiasDisponiveis, ehConjuradorAtivo,
   proximoStep, stepAnterior, todosStepsCompletos, calcularSubclasseArcana
 } from './levelup-flow.js';
 import {
@@ -64,9 +65,11 @@ export async function abrirLevelUpCards(char, classeData, helpers, caches, salva
     const state = createInitialState();
     if (ctx.exigeDadivaEpica) state.asiModo = 'talento';
 
-    // Carregar lista de magias disponíveis para uso interno
-    if (ctx.ehConjurador && helpers.obterMagiasDisponiveisClasseAtual) {
-      ctx._listaMagiasClasse = await helpers.obterMagiasDisponiveisClasseAtual();
+    // Carregar lista de magias disponíveis para uso interno. Quem só vira
+    // conjurador ao escolher a subclasse (Cavaleiro Místico, Trapaceiro
+    // Arcano) tem a lista recarregada em irParaStep, depois da escolha.
+    if (ctx.ehConjurador) {
+      await carregarMagiasDisponiveis(ctx, state);
     }
 
     renderModal(ctx, state, caches);
@@ -179,19 +182,35 @@ function renderizarModalPrincipal(titulo, corpoHtml, acoesHtml) {
 // NAVEGAÇÃO
 // ============================================================
 
+/**
+ * Vai para um step, garantindo antes que a lista de magias corresponda à
+ * subclasse escolhida NESTA sessão: quem vira conjurador ao escolher a
+ * subclasse (Cavaleiro Místico, Trapaceiro Arcano) só passa a ter lista de
+ * Mago depois da escolha, que acontece depois de o contexto ser montado.
+ */
+async function irParaStep(ctx, state, caches, indice) {
+  state.stepAtual = indice;
+  if (ctx.ehConjurador || ehConjuradorAtivo(ctx, state)) {
+    try {
+      await carregarMagiasDisponiveis(ctx, state);
+    } catch (err) {
+      console.error('Falha ao carregar a lista de magias do nível:', err);
+    }
+  }
+  renderModal(ctx, state, caches);
+}
+
 function bindNavegacao(ctx, state, caches) {
   const steps = buildVisibleSteps(ctx, state);
 
-  document.getElementById('btn-step-anterior')?.addEventListener('click', () => {
+  document.getElementById('btn-step-anterior')?.addEventListener('click', async () => {
     salvarStateDoDOM(ctx, state, steps[state.stepAtual]);
-    state.stepAtual = stepAnterior(steps, state);
-    renderModal(ctx, state, caches);
+    await irParaStep(ctx, state, caches, stepAnterior(steps, state));
   });
 
-  document.getElementById('btn-step-proximo')?.addEventListener('click', () => {
+  document.getElementById('btn-step-proximo')?.addEventListener('click', async () => {
     salvarStateDoDOM(ctx, state, steps[state.stepAtual]);
-    state.stepAtual = proximoStep(steps, state);
-    renderModal(ctx, state, caches);
+    await irParaStep(ctx, state, caches, proximoStep(steps, state));
   });
 
   document.getElementById('btn-confirmar-levelup')?.addEventListener('click', async () => {
@@ -201,10 +220,9 @@ function bindNavegacao(ctx, state, caches) {
 
   // Clique nos steps da barra de progresso
   document.querySelectorAll('.levelup-step[data-step-idx]').forEach(el => {
-    el.addEventListener('click', () => {
+    el.addEventListener('click', async () => {
       salvarStateDoDOM(ctx, state, steps[state.stepAtual]);
-      state.stepAtual = parseInt(el.dataset.stepIdx);
-      renderModal(ctx, state, caches);
+      await irParaStep(ctx, state, caches, parseInt(el.dataset.stepIdx));
     });
   });
 }
@@ -1208,7 +1226,7 @@ function bindEventosTrocasOpcionais(ctx, state) {
 
 // --- Magias ---
 function bindEventosMagias(ctx, state) {
-  const conj = ctx.conjuracao;
+  const conj = calcularConjuracao(ctx, state);
   if (!conj) return;
   const listaMagiasClasse = ctx._listaMagiasClasse || [];
   const maxCirculoNovo = conj.maxCirculoNovo || 0;
@@ -1593,7 +1611,10 @@ export async function confirmarLevelUp(ctx, state, caches) {
   let truqueTrocadoPara = null;
   const listaMagiasClasse = ctx._listaMagiasClasse || [];
 
-  if (ctx.ehConjurador) {
+  // Reativo à subclasse escolhida agora: sem isto, as magias e truques
+  // escolhidos por quem vira conjurador neste nível eram descartados em
+  // silêncio na hora de confirmar.
+  if (ehConjuradorAtivo(ctx, state)) {
     // Truques
     state.truquesSelecionados.forEach(nome => {
       const m = listaMagiasClasse.find(x => x.nome === nome);

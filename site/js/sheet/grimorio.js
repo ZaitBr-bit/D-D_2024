@@ -8,10 +8,11 @@
 import { CLASSES_INFO } from '../dados-classes.js';
 import { getIndiceMagias, getMagiasPorCirculo } from '../db.js';
 import { VALOR_EM_COBRE, formatarCarteira, podePagar, retirarValor } from '../moedas.js';
-import { abrirModal, escHtml, getBonusTruquesOrdem, getEspacosMagia, getMagiaPreparadas, getTruquesConhecidos, magiaMagoEstaNoGrimorio, mdParaHtml, normalizarGrimorioMago, semAcento, toast } from '../utils.js';
+import { abrirModal, escHtml, getBonusTruquesOrdem, getEspacosMagia, getLimitesMagias, magiaMagoEstaNoGrimorio, mdParaHtml, normalizarGrimorioMago, semAcento, toast } from '../utils.js';
 import { montarSeletor } from '../ui-opcoes.js';
 import { deMagias } from '../opcoes-dominio.js';
 import { getTruquesExtraEstiloLuta } from './combate.js';
+import { MAGIAS_FIXAS_MAGO, definirMagiasFixasMago, getEstadoRecursosMago } from './classes/mago.js';
 import { char, classeData, indiceMagiasCache, magiasDominioCache, magiasSempreCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { ehSubclasseConjuradora, getSubclasseConjuradoraConjuracao, magiaContaNoLimite, magiaEhEspecial, obterMagiasDisponiveisClasseAtual, rotuloOrigemMagia } from './magias.js';
@@ -25,16 +26,16 @@ export async function mostrarBuscaMagia() {
   // Classes "conhecidas" (Bardo, Bruxo, Feiticeiro) e subclasses conjuradoras: somente consulta
   const somenteConsulta = tipoConj === 'conhecidas';
   const tabela = classeData?.tabela_caracteristicas;
-  let maxPrep = tabela ? getMagiaPreparadas(tabela, char.nivel) : 99;
-  let maxTruq = tabela ? getTruquesConhecidos(tabela, char.nivel) : 99;
-
-  // Fallback para subclasses conjuradoras
-  if (subConj && maxPrep === 99) {
-    maxPrep = subConj.preparadas || 99;
-  }
-  if (subConj && maxTruq === 99) {
-    maxTruq = subConj.truques || 99;
-  }
+  // Sem tabela e sem subclasse conjuradora não há limite conhecido: 99 é o
+  // "à vontade" histórico desta tela. Com qualquer uma das duas, o limite
+  // sai de getLimitesMagias (utils.js), a mesma função que a seção Magias
+  // da ficha usa -- antes o fallback daqui só valia quando NÃO havia
+  // tabela, e o Ladino (que tem tabela, sem colunas de magia) ficava com
+  // limite 0 e a grade inteira bloqueada.
+  const semLimiteConhecido = !tabela && !subConj;
+  const limites = getLimitesMagias(tabela, char.nivel, subConj);
+  let maxPrep = semLimiteConhecido ? 99 : limites.preparadas;
+  let maxTruq = semLimiteConhecido ? 99 : limites.truques;
   // Truques extras de Combatente Druídico / Abençoado
   maxTruq += getTruquesExtraEstiloLuta();
   // Truques extras do Clérigo Taumaturgo / Druida Xamã (utils.js, mesma
@@ -720,12 +721,11 @@ export async function mostrarBuscaGrimorio() {
 export async function mostrarTrocaMagias(callbackPosTroca = null) {
   const info = CLASSES_INFO[char.classe] || {};
   const subConj = getSubclasseConjuradoraConjuracao();
-  let maxPreparadas = classeData?.tabela_caracteristicas
-    ? getMagiaPreparadas(classeData.tabela_caracteristicas, char.nivel) : 0;
-  // Fallback para subclasses conjuradoras
-  if (subConj && maxPreparadas === 0) {
-    maxPreparadas = subConj.preparadas || 0;
-  }
+  // Mesmo limite que a seção Magias da ficha e o modal de consulta usam --
+  // getLimitesMagias já cai para a tabela da subclasse conjuradora quando a
+  // da classe não tem colunas de magia (utils.js).
+  const maxPreparadas = getLimitesMagias(
+    classeData?.tabela_caracteristicas, char.nivel, subConj).preparadas;
   const ehMago = char.classe === 'Mago';
   if (ehMago && normalizarGrimorioMago(char, maxPreparadas).alterado) salvar();
 
@@ -981,7 +981,8 @@ export async function mostrarTrocaMagias(callbackPosTroca = null) {
  * Abre modal para o jogador escolher uma magia conhecida que preencha um slot
  * liberado pelo ajuste automático (bug de magia passiva selecionada manualmente).
  */
-export async function abrirPreenchimentoSlotMagia() {
+export async function abrirPreenchimentoSlotMagia(tipo = 'magia') {
+  const ehTruque = tipo === 'truque';
   const subConj = getSubclasseConjuradoraConjuracao();
   let espacosNivel = classeData?.tabela_caracteristicas
     ? getEspacosMagia(classeData.tabela_caracteristicas, char.nivel) : {};
@@ -993,10 +994,12 @@ export async function abrirPreenchimentoSlotMagia() {
   const magiasClasse = await obterMagiasDisponiveisClasseAtual();
   const sempreNomes = new Set((magiasSempreCache || []).map(m => m.nome));
   const dominioNomes = new Set((magiasDominioCache || []).map(m => m.nome));
-  const jaTemSet = new Set((char.magias_preparadas || []).map(m => m.nome));
+  // Truques vivem em magias_conhecidas; magias de círculo, em magias_preparadas.
+  const jaTem = (ehTruque ? char.magias_conhecidas : char.magias_preparadas) || [];
+  const jaTemSet = new Set(jaTem.map(m => m.nome));
 
   const disponiveis = magiasClasse.filter(m =>
-    m.circulo > 0 && m.circulo <= maxCirculo &&
+    (ehTruque ? m.circulo === 0 : (m.circulo > 0 && m.circulo <= maxCirculo)) &&
     !jaTemSet.has(m.nome) &&
     !sempreNomes.has(m.nome) &&
     !dominioNomes.has(m.nome)
@@ -1005,10 +1008,11 @@ export async function abrirPreenchimentoSlotMagia() {
   let magiaSelecionada = null;
   let circuloSelecionado = null;
 
-  abrirModal('Escolher Magia Conhecida', `
+  abrirModal(ehTruque ? 'Escolher Truque' : 'Escolher Magia Conhecida', `
     <div class="info-box info" style="margin-bottom:12px;font-size:0.85rem">
-      Uma magia que você havia escolhido foi reclassificada como <strong>Sempre Preparada</strong> pela sua subclasse,
-      liberando uma vaga. Escolha uma nova magia para substituí-la.
+      ${ehTruque
+        ? 'Você tem uma vaga de <strong>truque</strong> em aberto para o seu nível. Escolha o truque que faltava.'
+        : 'Você tem uma vaga de <strong>magia conhecida</strong> em aberto para o seu nível. Escolha uma magia para preenchê-la.'}
     </div>
     <div class="search-box" style="margin-bottom:8px">
       <input type="text" id="busca-preencher-slot" placeholder="Buscar magia..." class="form-input">
@@ -1032,7 +1036,7 @@ export async function abrirPreenchimentoSlotMagia() {
     const porCirculo = filtradas.reduce((acc, m) => { if (!acc[m.circulo]) acc[m.circulo] = []; acc[m.circulo].push(m); return acc; }, {});
     resultadoEl.innerHTML = Object.entries(porCirculo).map(([circ, magias]) => `
       <div style="margin-bottom:8px">
-        <div style="font-size:0.78rem;font-weight:700;color:var(--accent);padding:4px 0 2px;border-bottom:1px solid var(--border-color);margin-bottom:6px">${circ}\u00ba C\u00edrculo</div>
+        <div style="font-size:0.78rem;font-weight:700;color:var(--accent);padding:4px 0 2px;border-bottom:1px solid var(--border-color);margin-bottom:6px">${circ === '0' ? 'Truques' : `${circ}\u00ba C\u00edrculo`}</div>
         <div class="opcao-grid densa">${magias.map(m => `
           <div class="opcao-card ${m.nome === magiaSelecionada ? 'selecionada' : ''}"
                data-preencher-nome="${m.nome}" data-preencher-circ="${m.circulo}" style="cursor:pointer">
@@ -1084,14 +1088,21 @@ export async function abrirPreenchimentoSlotMagia() {
 
   confirmarBtn?.addEventListener('click', () => {
     if (!magiaSelecionada) return;
-    if (!char.magias_preparadas) char.magias_preparadas = [];
-    char.magias_preparadas.push({ nome: magiaSelecionada, circulo: circuloSelecionado });
-    char._slots_magia_livre = Math.max(0, (char._slots_magia_livre || 1) - 1);
-    if (char._slots_magia_livre === 0) delete char._slots_magia_livre;
+    if (ehTruque) {
+      if (!char.magias_conhecidas) char.magias_conhecidas = [];
+      char.magias_conhecidas.push({ nome: magiaSelecionada, circulo: 0 });
+      char._slots_truque_livre = Math.max(0, (char._slots_truque_livre || 1) - 1);
+      if (char._slots_truque_livre === 0) delete char._slots_truque_livre;
+    } else {
+      if (!char.magias_preparadas) char.magias_preparadas = [];
+      char.magias_preparadas.push({ nome: magiaSelecionada, circulo: circuloSelecionado });
+      char._slots_magia_livre = Math.max(0, (char._slots_magia_livre || 1) - 1);
+      if (char._slots_magia_livre === 0) delete char._slots_magia_livre;
+    }
     salvar();
     window.fecharModal();
     renderFichaCompleta();
-    toast(`${magiaSelecionada} adicionada como magia conhecida`, 'success');
+    toast(`${magiaSelecionada} adicionad${ehTruque ? 'o como truque' : 'a como magia conhecida'}`, 'success');
   });
 
   renderLista();
@@ -1268,7 +1279,12 @@ export async function mostrarTrocaMagiaConhecida(callbackPosTroca = null) {
 // ou um truque aparece como trocavel numa tela e nao na outra.
 const ORIGENS_TRUQUE_NAO_TROCAVEL = [
   'especie', 'sempre', 'especie_legado', 'iniciado_em_magia',
-  'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'
+  'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista',
+  // Mãos Mágicas do Trapaceiro Arcano: o livro permite trocar os truques da
+  // subclasse "exceto Mãos Mágicas". Diferente das origens acima, esta CONTA
+  // no limite de truques da tabela -- por isso não entra nas listas que
+  // separam truques extras nos contadores da ficha.
+  'subclasse_fixa'
 ];
 
 /** Lista os truques de classe do personagem que podem entrar numa troca */
@@ -1392,4 +1408,105 @@ export async function mostrarTrocaTruque(callbackPosTroca = null) {
     if (callbackPosTroca) callbackPosTroca();
     else renderFichaCompleta();
   });
-}
+}
+/**
+ * Modal de escolha das magias que o Mago "sempre tem preparadas" por
+ * característica de classe: Maestria de Magias (nível 18) e Assinatura
+ * Mágica (nível 20).
+ *
+ * As duas escolhem DO LIVRO DE MAGIAS (char.grimorio), não da lista geral
+ * de Mago -- o texto do livro diz "em seu livro de magias" nas duas. A
+ * Maestria ainda exige tempo de conjuração de uma ação, conferido contra
+ * o índice de magias.
+ *
+ * Antes destas telas, a Assinatura Mágica tinha botões "Assinatura 1/2"
+ * que só marcavam o uso, sem nunca perguntar QUAL magia era a assinatura,
+ * e a Maestria de Magias não pedia nada.
+ *
+ * @param {string} tipo - 'maestria_magias' ou 'assinatura_magica'
+ */
+export async function abrirEscolhaMagiasFixasMago(tipo) {
+  const def = MAGIAS_FIXAS_MAGO[tipo];
+  const estado = getEstadoRecursosMago();
+  if (!def || !estado) return;
+  if ((char.nivel || 1) < def.nivel) return;
+
+  const grimorio = Array.isArray(char.grimorio) ? char.grimorio : [];
+  if (grimorio.length === 0) {
+    toast('Registre magias no seu livro de magias primeiro.', 'error');
+    return;
+  }
+
+  /**
+   * Tempo de conjuração da magia, vindo do índice já carregado na ficha.
+   * Magia que o índice não conhece (personalizada, por exemplo) NÃO é
+   * descartada: sem informação, esconder a opção seria pior que mostrá-la
+   * -- o jogador não teria como saber por que ela sumiu da lista.
+   */
+  const ehAcao = (nome) => {
+    const info = indiceMagiasCache?.find(m => m.nome === nome);
+    if (!info?.tempo_conjuracao) return true;
+    const tc = info.tempo_conjuracao.toLowerCase();
+    return tc === 'ação' || tc === 'acao';
+  };
+
+  const atual = tipo === 'maestria_magias'
+    ? { c1: estado.maestriaMagia1, c2: estado.maestriaMagia2 }
+    : { m1: estado.assinatura1, m2: estado.assinatura2 };
+  const escolhas = { ...atual };
+
+  const corpo = def.vagas.map(vaga => `
+    <div style="margin-bottom:12px">
+      <label class="form-label" style="font-weight:700;color:var(--accent)">
+        Magia de ${vaga.circulo}º Círculo${def.exigeAcao ? ' (tempo de conjuração: Ação)' : ''}
+      </label>
+      <div id="magia-fixa-${vaga.chave}"></div>
+    </div>
+  `).join('');
+
+  abrirModal(`${def.rotulo}`, `
+    <div class="info-box info" style="margin-bottom:12px;font-size:0.85rem">
+      Escolha ${def.vagas.length === 1 ? 'a magia' : 'as magias'} do seu
+      <strong>livro de magias</strong>. ${tipo === 'maestria_magias'
+        ? 'Você sempre as tem preparadas e pode conjurá-las no círculo mais baixo sem gastar espaço de magia.'
+        : 'Você sempre as tem preparadas e pode conjurar cada uma no 3º círculo, uma vez, sem gastar espaço de magia.'}
+    </div>
+    ${corpo}
+  `, `<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
+     <button class="btn btn-primary" id="btn-salvar-magias-fixas">Salvar</button>`);
+
+  for (const vaga of def.vagas) {
+    // Uma magia já usada na outra vaga não pode repetir aqui: as duas
+    // vagas são escolhas distintas ("escolha uma magia de 1º e uma de 2º",
+    // "escolha duas magias de 3º círculo").
+    const outrasVagas = def.vagas.filter(v => v.chave !== vaga.chave);
+    const candidatas = grimorio
+      .filter(m => Number(m.circulo) === vaga.circulo)
+      .filter(m => !def.exigeAcao || ehAcao(m.nome));
+    if (candidatas.length === 0) {
+      const el = document.getElementById(`magia-fixa-${vaga.chave}`);
+      if (el) {
+        el.innerHTML = `<div style="font-size:0.85rem;color:var(--text-muted)">
+          Nenhuma magia de ${vaga.circulo}º círculo${def.exigeAcao ? ' com tempo de conjuração de ação' : ''}
+          no seu livro de magias.
+        </div>`;
+      }
+      continue;
+    }
+    montarSeletor(document.getElementById(`magia-fixa-${vaga.chave}`), {
+      opcoes: deMagias(candidatas, {
+        jaTem: new Set(outrasVagas.map(v => escolhas[v.chave]).filter(Boolean))
+      }),
+      densidade: 'densa', max: 1, busca: candidatas.length > 8,
+      selecionadas: escolhas[vaga.chave] ? [escolhas[vaga.chave]] : [],
+      aoMudar: (sel) => { escolhas[vaga.chave] = sel[0] || ''; },
+    });
+  }
+
+  document.getElementById('btn-salvar-magias-fixas')?.addEventListener('click', () => {
+    definirMagiasFixasMago(tipo, escolhas);
+    window.fecharModal();
+    renderFichaCompleta();
+    toast(`${def.rotulo}: magias atualizadas.`, 'success');
+  });
+}

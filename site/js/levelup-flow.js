@@ -4,6 +4,7 @@
 // ============================================================
 import { CLASSES_INFO, ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ESCOLAS_SUBCLASSE_MAGO } from './dados-classes.js';
 import { getClasse, getMagiasClasse, getMagiasPorCirculo } from './db.js';
+import { getTruquesFixosSubclasse } from './regras-conjuracao-subclasse.js';
 import {
   calcMod, bonusProficiencia, getBonusTruquesOrdem, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas
 } from './utils.js';
@@ -18,6 +19,132 @@ import {
 } from './levelup.js';
 
 // ---- Fase 1: Construir contexto de level up ----
+
+/**
+ * Calcula o bloco de conjuração para uma subclasse HIPOTÉTICA.
+ *
+ * `subclasseEfetiva` é parâmetro, e não `char.subclasse`, porque as duas
+ * subclasses 1/3 conjuradoras (Cavaleiro Místico e Trapaceiro Arcano) são
+ * escolhidas no MESMO nível em que a conjuração começa: no nível 3 o
+ * personagem ainda não tem subclasse gravada, e um cálculo preso a
+ * `char.subclasse` devolvia "não é conjurador" -- o jogador subia sem
+ * nenhuma tela de truques/magias e sem espaços.
+ *
+ * @param {Object} char - Personagem
+ * @param {Object} classeData - Dados da classe
+ * @param {Object} info - Entrada de CLASSES_INFO da classe
+ * @param {Object} helpers - Funções da ficha (getSubclasseConjuradoraConjuracao)
+ * @param {number} nivelAtual - Nível antes de subir
+ * @param {number} nivelNovo - Nível depois de subir
+ * @param {string|null} subclasseEfetiva - Subclasse a considerar
+ * @returns {{ehConjurador:boolean, tipoConj:string, conjuracao:Object|null}}
+ */
+function montarConjuracao(char, classeData, info, helpers, nivelAtual, nivelNovo, subclasseEfetiva) {
+  const consultarSubclasse = (nivel) => helpers.getSubclasseConjuradoraConjuracao
+    ? helpers.getSubclasseConjuradoraConjuracao({ subclasse: subclasseEfetiva || null, nivel })
+    : null;
+  const subAtual = consultarSubclasse(nivelAtual);
+  const subNovo = consultarSubclasse(nivelNovo);
+  const ehSubConj = !!subNovo;
+  const ehConjurador = !!(info?.conjurador || ehSubConj);
+  const tipoConj = info?.tipo_conjuracao || (ehSubConj ? 'conhecidas' : 'preparadas');
+  if (!ehConjurador) return { ehConjurador, tipoConj, conjuracao: null };
+
+  const tabela = classeData?.tabela_caracteristicas;
+  let truquesAtual = tabela ? getTruquesConhecidos(tabela, nivelAtual) : 0;
+  let truquesNovo = tabela ? getTruquesConhecidos(tabela, nivelNovo) : 0;
+  let magiasAtual = tabela ? getMagiaPreparadas(tabela, nivelAtual) : 0;
+  let magiasNovo = tabela ? getMagiaPreparadas(tabela, nivelNovo) : 0;
+
+  // Para subclasses conjuradoras, os limites vêm da tabela da subclasse
+  if (ehSubConj) {
+    truquesAtual = subAtual?.truques || 0;
+    truquesNovo = subNovo?.truques || 0;
+    magiasAtual = subAtual?.preparadas || 0;
+    magiasNovo = subNovo?.preparadas || 0;
+  }
+
+  // Truques extras do Clérigo Taumaturgo / Druida Xamã (utils.js, mesma
+  // função que o criador/ficha usam). NO-OP HOJE para o único valor que
+  // este bloco expõe a quem consome: os 3 leitores reais
+  // (levelup-cards.js:renderCardMagias, levelup-ui.js:setupEventListeners,
+  // levelup-validations.js:validateAll) leem só `conjuracao.truquesGanhos`
+  // (a DIFERENÇA truquesNovo-truquesAtual, algumas linhas abaixo) --
+  // ordem_divina/ordem_primal não muda dentro de uma mesma chamada de
+  // subirDeNivel (foi escolhida na criação, nível 1), então o bônus é
+  // IDÊNTICO nos dois lados e se cancela na subtração:
+  // (novo+1)-(atual+1) === novo-atual. Mantido mesmo sendo no-op, por
+  // defesa: truquesAtual/truquesNovo são expostos BRUTOS em `conjuracao`
+  // (objeto retornado logo abaixo) e nada impede um consumidor futuro de
+  // ler um dos dois direto (ex.: um card que mostrasse "Truques: X → Y"
+  // em vez de só o delta) -- sem o bônus aqui, esse consumidor hipotético
+  // exibiria o valor sem o +1. 0 para subclasses conjuradoras (não são
+  // Clérigo/Druida), então soma sem risco nos dois ramos acima.
+  truquesAtual += getBonusTruquesOrdem(char);
+  truquesNovo += getBonusTruquesOrdem(char);
+
+  // Truques que a subclasse CONCEDE neste nível (Mãos Mágicas do Trapaceiro
+  // Arcano) não são escolha do jogador: saem da conta de "novos truques",
+  // senão a tela pediria 3 e o personagem terminaria com 4 de um limite 3.
+  const truquesFixosNovos = getTruquesFixosSubclasse(char.classe, subclasseEfetiva, nivelNovo)
+    .filter(nome => !(char.magias_conhecidas || []).some(m => m.nome === nome));
+
+  // Espaços de magia no nível novo
+  let espacosNovo = tabela ? getEspacosMagia(tabela, nivelNovo) : {};
+  if (ehSubConj && Object.keys(espacosNovo).length === 0) {
+    // A tabela da subclasse guarda só o total por círculo ({1: 2}); aqui o
+    // formato precisa ser o mesmo de getEspacosMagia ({1: {total, usados}}).
+    espacosNovo = Object.fromEntries(Object.entries(subNovo?.espacos || {})
+      .map(([circulo, total]) => [circulo, { total, usados: 0 }]));
+  }
+  const maxCirculoNovo = Math.max(...Object.keys(espacosNovo).map(Number), 0);
+
+  // Ganhou um círculo de magia totalmente novo neste nível (independe de já saber a escola/subclasse)
+  let espacosAntes = nivelAtual >= 1 ? getEspacosMagia(tabela, nivelAtual) : {};
+  if (ehSubConj && Object.keys(espacosAntes).length === 0) {
+    espacosAntes = Object.fromEntries(Object.entries(subAtual?.espacos || {})
+      .map(([circulo, total]) => [circulo, { total, usados: 0 }]));
+  }
+  const ganhouNovoCirculo = Object.entries(espacosNovo).some(([c, d]) =>
+    (d?.total || 0) > 0 && (espacosAntes[c]?.total || 0) === 0);
+
+  const escolaSubclasse = char.classe === 'Mago' &&
+    Object.prototype.hasOwnProperty.call(ESCOLAS_SUBCLASSE_MAGO, subclasseEfetiva)
+    ? ESCOLAS_SUBCLASSE_MAGO[subclasseEfetiva] : null;
+  let subclasseArcana = null;
+  if (escolaSubclasse) {
+    let quantidade = 0;
+    if (nivelNovo === 3) {
+      quantidade += 2;
+    } else if (ganhouNovoCirculo) {
+      quantidade += 1;
+    }
+    if (quantidade > 0) {
+      subclasseArcana = { escola: escolaSubclasse, quantidade, circuloMax: maxCirculoNovo };
+    }
+  }
+
+  return {
+    ehConjurador,
+    tipoConj,
+    conjuracao: {
+      tipoConj,
+      truquesAtual,
+      truquesNovo,
+      truquesGanhos: Math.max(0, truquesNovo - truquesAtual - truquesFixosNovos.length),
+      truquesFixosNovos,
+      magiasAtual,
+      magiasNovo,
+      magiasGanhas: magiasNovo - magiasAtual,
+      maxCirculoNovo,
+      espacosNovo,
+      ehMago: char.classe === 'Mago',
+      subclasseArcana,
+      ganhouNovoCirculo,
+      subclasseEfetiva: subclasseEfetiva || null
+    }
+  };
+}
 
 /**
  * Constrói o contexto completo para o fluxo de level up.
@@ -82,102 +209,9 @@ export async function buildLevelUpContext(char, classeData, helpers = {}) {
       .filter(sc => !sc.nome.toLowerCase().startsWith('subclasses de'));
   }
 
-  // Conjuração
-  const ehSubConj = helpers.ehSubclasseConjuradora?.() || false;
-  const ehConjurador = !!(info.conjurador || ehSubConj);
-  const tipoConj = info.tipo_conjuracao || (ehSubConj ? 'conhecidas' : 'preparadas');
-
-  let conjuracao = null;
-  if (ehConjurador) {
-    const tabela = classeData?.tabela_caracteristicas;
-    let truquesAtual = tabela ? getTruquesConhecidos(tabela, nivelAtual) : 0;
-    let truquesNovo = tabela ? getTruquesConhecidos(tabela, nivelNovo) : 0;
-    let magiasAtual = tabela ? getMagiaPreparadas(tabela, nivelAtual) : 0;
-    let magiasNovo = tabela ? getMagiaPreparadas(tabela, nivelNovo) : 0;
-
-    // Para subclasses conjuradoras, calcular limites da tabela da subclasse
-    if (ehSubConj && helpers.getSubclasseConjuradoraConjuracao) {
-      const subAtual = helpers.getSubclasseConjuradoraConjuracao();
-      // Simular nível novo temporariamente
-      const nivelOriginal = char.nivel;
-      char.nivel = nivelNovo;
-      const subNovo = helpers.getSubclasseConjuradoraConjuracao();
-      char.nivel = nivelOriginal;
-      truquesAtual = subAtual?.truques || 0;
-      truquesNovo = subNovo?.truques || 0;
-      magiasAtual = subAtual?.preparadas || 0;
-      magiasNovo = subNovo?.preparadas || 0;
-    }
-
-    // Truques extras do Clérigo Taumaturgo / Druida Xamã (utils.js, mesma
-    // função que o criador/ficha usam). NO-OP HOJE para o único valor que
-    // este bloco expõe a quem consome: os 3 leitores reais
-    // (levelup-cards.js:renderCardMagias, levelup-ui.js:setupEventListeners,
-    // levelup-validations.js:validateAll) leem só `conjuracao.truquesGanhos`
-    // (a DIFERENÇA truquesNovo-truquesAtual, algumas linhas abaixo) --
-    // ordem_divina/ordem_primal não muda dentro de uma mesma chamada de
-    // subirDeNivel (foi escolhida na criação, nível 1), então o bônus é
-    // IDÊNTICO nos dois lados e se cancela na subtração:
-    // (novo+1)-(atual+1) === novo-atual. Mantido mesmo sendo no-op, por
-    // defesa: truquesAtual/truquesNovo são expostos BRUTOS em `conjuracao`
-    // (objeto retornado logo abaixo) e nada impede um consumidor futuro de
-    // ler um dos dois direto (ex.: um card que mostrasse "Truques: X → Y"
-    // em vez de só o delta) -- sem o bônus aqui, esse consumidor hipotético
-    // exibiria o valor sem o +1. 0 para subclasses conjuradoras (não são
-    // Clérigo/Druida), então soma sem risco nos dois ramos acima.
-    truquesAtual += getBonusTruquesOrdem(char);
-    truquesNovo += getBonusTruquesOrdem(char);
-
-    // Espaços de magia no nível novo
-    let espacosNovo = tabela ? getEspacosMagia(tabela, nivelNovo) : {};
-    if (ehSubConj && Object.keys(espacosNovo).length === 0 && helpers.getSubclasseConjuradoraConjuracao) {
-      const nivelOriginal = char.nivel;
-      char.nivel = nivelNovo;
-      const subNovo = helpers.getSubclasseConjuradoraConjuracao();
-      char.nivel = nivelOriginal;
-      espacosNovo = subNovo?.espacos || {};
-    }
-    const maxCirculoNovo = Math.max(...Object.keys(espacosNovo).map(Number), 0);
-
-    // Ganhou um círculo de magia totalmente novo neste nível (independe de já saber a escola/subclasse)
-    const espacosAntes = nivelAtual >= 1 ? getEspacosMagia(tabela, nivelAtual) : {};
-    const ganhouNovoCirculo = Object.entries(espacosNovo).some(([c, d]) =>
-      (d?.total || 0) > 0 && (espacosAntes[c]?.total || 0) === 0);
-
-    // char.subclasse só reflete a escolha feita em level-ups anteriores; para a escolha
-    // feita nesta mesma sessão de level-up (state.subclasse), use calcularSubclasseArcana(ctx, state).
-    const subclasseEfetiva = char.subclasse;
-    const escolaSubclasse = char.classe === 'Mago' &&
-      Object.prototype.hasOwnProperty.call(ESCOLAS_SUBCLASSE_MAGO, subclasseEfetiva)
-      ? ESCOLAS_SUBCLASSE_MAGO[subclasseEfetiva] : null;
-    let subclasseArcana = null;
-    if (escolaSubclasse) {
-      let quantidade = 0;
-      if (nivelNovo === 3) {
-        quantidade += 2;
-      } else if (ganhouNovoCirculo) {
-        quantidade += 1;
-      }
-      if (quantidade > 0) {
-        subclasseArcana = { escola: escolaSubclasse, quantidade, circuloMax: maxCirculoNovo };
-      }
-    }
-
-    conjuracao = {
-      tipoConj,
-      truquesAtual,
-      truquesNovo,
-      truquesGanhos: truquesNovo - truquesAtual,
-      magiasAtual,
-      magiasNovo,
-      magiasGanhas: magiasNovo - magiasAtual,
-      maxCirculoNovo,
-      espacosNovo,
-      ehMago: char.classe === 'Mago',
-      subclasseArcana,
-      ganhouNovoCirculo
-    };
-  }
+  // Conjuração — congelada sobre `char.subclasse`, ver `calcularConjuracao`
+  const { ehConjurador, tipoConj, conjuracao } = montarConjuracao(
+    char, classeData, info, helpers, nivelAtual, nivelNovo, char.subclasse);
 
   // Requirements: array de pendências obrigatórias
   const requirements = [];
@@ -248,20 +282,72 @@ export async function buildLevelUpContext(char, classeData, helpers = {}) {
  * @param {Object} state - Estado atual das escolhas do usuário
  * @returns {{ escola: string, quantidade: number, circuloMax: number } | null}
  */
+/**
+ * Bloco de conjuração considerando a subclasse escolhida NESTA sessão de
+ * subida de nível (`state.subclasse`), com fallback para a já gravada.
+ *
+ * É o que torna a tela de magias visível para quem vira conjurador no
+ * mesmo nível em que escolhe a subclasse (Cavaleiro Místico e Trapaceiro
+ * Arcano, nível 3). O valor congelado em `ctx.conjuracao` continua lá para
+ * quem só precisa do estado anterior à escolha.
+ *
+ * O resultado é memoizado por subclasse dentro do próprio ctx: esta função
+ * é chamada em toda re-renderização do modal.
+ */
+export function calcularConjuracao(ctx, state) {
+  const subclasseEfetiva = state?.subclasse || ctx.char?.subclasse || null;
+  if (!ctx._conjuracaoCache) ctx._conjuracaoCache = new Map();
+  const chave = subclasseEfetiva || '';
+  if (!ctx._conjuracaoCache.has(chave)) {
+    ctx._conjuracaoCache.set(chave, montarConjuracao(
+      ctx.char, ctx.classeData, ctx.info, ctx.helpers || {},
+      ctx.nivelAtual, ctx.nivelNovo, subclasseEfetiva));
+  }
+  return ctx._conjuracaoCache.get(chave).conjuracao;
+}
+
+/** Se o personagem conjura considerando a subclasse escolhida agora. */
+export function ehConjuradorAtivo(ctx, state) {
+  return !!calcularConjuracao(ctx, state);
+}
+
+/**
+ * Lista de magias que a tela de seleção oferece, já considerando a
+ * subclasse escolhida nesta sessão -- um Ladino só passa a enxergar a
+ * lista de Mago depois de escolher Trapaceiro Arcano, e a escolha acontece
+ * DEPOIS de o contexto ser montado. Memoizada por subclasse.
+ */
+export async function carregarMagiasDisponiveis(ctx, state) {
+  const subclasseEfetiva = state?.subclasse || ctx.char?.subclasse || null;
+  if (!ctx.helpers?.obterMagiasDisponiveisClasseAtual) return ctx._listaMagiasClasse || [];
+  if (!ctx._magiasCache) ctx._magiasCache = new Map();
+  const chave = subclasseEfetiva || '';
+  if (!ctx._magiasCache.has(chave)) {
+    ctx._magiasCache.set(chave, await ctx.helpers.obterMagiasDisponiveisClasseAtual(
+      { subclasse: subclasseEfetiva, nivel: ctx.nivelNovo }));
+  }
+  const lista = ctx._magiasCache.get(chave) || [];
+  // Os consumidores de tela leem ctx._listaMagiasClasse; manter sincronizado
+  // evita que uma re-renderização use a lista da subclasse anterior.
+  ctx._listaMagiasClasse = lista;
+  return lista;
+}
+
 export function calcularSubclasseArcana(ctx, state) {
   const subclasseEfetiva = state?.subclasse || ctx.char?.subclasse;
   const escolaSubclasse = ctx.char?.classe === 'Mago' &&
     Object.prototype.hasOwnProperty.call(ESCOLAS_SUBCLASSE_MAGO, subclasseEfetiva)
     ? ESCOLAS_SUBCLASSE_MAGO[subclasseEfetiva] : null;
-  if (!escolaSubclasse || !ctx.conjuracao) return null;
+  const conjuracao = calcularConjuracao(ctx, state);
+  if (!escolaSubclasse || !conjuracao) return null;
   let quantidade = 0;
   if (ctx.nivelNovo === 3) {
     quantidade += 2;
-  } else if (ctx.conjuracao.ganhouNovoCirculo) {
+  } else if (conjuracao.ganhouNovoCirculo) {
     quantidade += 1;
   }
   if (quantidade === 0) return null;
-  return { escola: escolaSubclasse, quantidade, circuloMax: ctx.conjuracao.maxCirculoNovo };
+  return { escola: escolaSubclasse, quantidade, circuloMax: conjuracao.maxCirculoNovo };
 }
 
 // ---- Fase 2: Motor de steps dinâmicos ----
@@ -344,8 +430,10 @@ const STEP_DEFINITIONS = [
     tipo: 'magia',
     obrigatorio: true,
     visivel: (ctx, state) => {
-      if (!ctx.ehConjurador || !ctx.conjuracao) return false;
-      const c = ctx.conjuracao;
+      // Reativo à subclasse escolhida agora (ver calcularConjuracao): quem
+      // vira conjurador neste mesmo nível não tinha step nenhum antes.
+      const c = calcularConjuracao(ctx, state);
+      if (!c) return false;
       // Nota: !!subclasseArcana é redundante hoje (só é truthy quando c.ehMago já é true,
       // pois deriva de ctx.char.classe, que não muda durante o level-up), mas mantido
       // explícito via calcularSubclasseArcana para não depender de ctx.conjuracao.subclasseArcana
@@ -355,7 +443,7 @@ const STEP_DEFINITIONS = [
       // classe, mesmo em níveis sem ganho de truque/magia novo - então o step também
       // precisa ficar visível quando há pelo menos 1 truque elegível para troca (mesma
       // lista de origens especiais usada no card de troca em levelup-cards.js).
-      const origensEspeciais = ['especie', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
+      const origensEspeciais = ['especie', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista', 'subclasse_fixa'];
       const temTruqueTrocavel = (ctx.char.magias_conhecidas || []).some(m => m.circulo === 0 && !origensEspeciais.includes(m?.origem));
       // 2026-08-13: a troca de MAGIA passou a valer para toda classe
       // conjuradora (antes so `conhecidas` -- ver levelup-cards.js). Um
@@ -369,7 +457,7 @@ const STEP_DEFINITIONS = [
       return c.truquesGanhos > 0 || (c.tipoConj === 'conhecidas' && c.magiasGanhas > 0) || c.ehMago || !!subclasseArcana || temTruqueTrocavel || temMagiaTrocavel;
     },
     completo: (ctx, state) => {
-      const c = ctx.conjuracao;
+      const c = calcularConjuracao(ctx, state);
       if (!c) return true;
       if (c.truquesGanhos > 0 && (state.truquesSelecionados || []).length !== c.truquesGanhos) return false;
       if (c.tipoConj === 'conhecidas' && c.magiasGanhas > 0 && (state.magiasSelecionadas || []).length !== c.magiasGanhas) return false;

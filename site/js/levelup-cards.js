@@ -7,7 +7,7 @@ import { getMagiasClasse, getMagiasPorCirculo } from './db.js';
 import { calcMod, bonusProficiencia, mdParaHtml, semAcento, toast, abrirModal } from './utils.js';
 import { rotuloPericia } from './opcoes-dominio.js';
 import { obterTalentosElegiveis } from './levelup.js';
-import { calcularSubclasseArcana } from './levelup-flow.js';
+import { calcularConjuracao, calcularSubclasseArcana } from './levelup-flow.js';
 
 // ============================================================
 // CARD: Ganhos do Nível
@@ -450,11 +450,34 @@ export function renderCardEscolhasClasse(ctx, state) {
 // CARD: Seleção de Magias
 // ============================================================
 export function renderCardMagias(ctx, state) {
-  const { char, conjuracao, info } = ctx;
+  const { char, info } = ctx;
+  // Reativo à subclasse escolhida nesta sessão (Cavaleiro Místico /
+  // Trapaceiro Arcano começam a conjurar no mesmo nível em que são
+  // escolhidos) -- ver calcularConjuracao em levelup-flow.js.
+  const conjuracao = calcularConjuracao(ctx, state);
   if (!conjuracao) return '';
 
   const { truquesGanhos, tipoConj, magiasGanhas, magiasNovo, magiasAtual, ehMago } = conjuracao;
   let html = '';
+
+  // Truques que a subclasse concede sem escolha (Mãos Mágicas do Trapaceiro
+  // Arcano): aparecem aqui para o jogador não procurá-los na lista.
+  const truquesFixos = conjuracao.truquesFixosNovos || [];
+  if (truquesFixos.length > 0) {
+    html += `
+      <div class="levelup-card">
+        <div class="levelup-card-header">Truque${truquesFixos.length > 1 ? 's' : ''} da Subclasse</div>
+        <div class="levelup-card-body">
+          <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:6px">
+            Concedido${truquesFixos.length > 1 ? 's' : ''} automaticamente, sem ocupar suas escolhas.
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px">
+            ${truquesFixos.map(n => `<span class="badge badge-accent" style="font-size:0.75rem">${n}</span>`).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  }
 
   // Truques
   if (truquesGanhos > 0) {
@@ -540,7 +563,7 @@ export function renderCardMagias(ctx, state) {
 
   // Troca de truque (qualquer classe conjuradora com truques de classe conhecidos)
   const truquesAtuais = (char.magias_conhecidas || []).filter(m => {
-    const origensEspeciais = ['especie', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
+    const origensEspeciais = ['especie', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista', 'subclasse_fixa'];
     return m.circulo === 0 && !origensEspeciais.includes(m?.origem);
   });
   if (truquesAtuais.length > 0) {

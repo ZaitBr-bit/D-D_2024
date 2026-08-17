@@ -25,7 +25,7 @@ import { char, classeData, especiesCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { mostrarTrocaMagiaConhecida, mostrarTrocaMagias, mostrarTrocaTruque, truquesTrocaveis } from './grimorio.js';
 import { abrirModalTrocaMaestriaDescanso } from './maestrias.js';
-import { ehSubclasseConjuradora, getConcentracaoAtiva } from './magias.js';
+import { ehSubclasseConjuradora, getConcentracaoAtiva, magiaContaNoLimite } from './magias.js';
 
 export function sincronizarBonusPvDraconico() {
   if (char?.classe !== 'Feiticeiro') return;
@@ -649,18 +649,38 @@ export function setupEventosDescanso() {
 
     salvar();
 
+    // Memorizar Magia (Mago nível 5+): "Ao completar um Descanso Curto,
+    // você pode estudar seu livro de magias e substituir uma das magias
+    // preparadas". Antes o Descanso Curto não oferecia nada -- a
+    // característica só existia como texto na ficha.
+    const memorizarMagia = char.classe === 'Mago' && (char.nivel || 1) >= 5
+      && (char.magias_preparadas || []).some(m => m.circulo > 0 && magiaContaNoLimite(m));
+    const botaoMemorizar = memorizarMagia
+      ? '<button class="btn btn-secondary" id="btn-memorizar-magia-curto">Memorizar Magia</button>'
+      : '';
+    const bindMemorizar = () => {
+      document.getElementById('btn-memorizar-magia-curto')?.addEventListener('click', () => {
+        window.fecharModal();
+        mostrarTrocaMagias();
+      });
+    };
+
     // Se tem dados de vida restantes e nao esta com PV cheio, oferecer modal
     if (dvRestantes > 0 && !jaCheio && info?.dado_vida) {
       abrirModal('Descanso Curto',
         `<div class="info-box success" style="margin-bottom:12px">Habilidades de descanso curto restauradas!</div>` +
+        (memorizarMagia ? `<div style="font-size:0.85rem;margin-bottom:8px">
+            <strong>Memorizar Magia:</strong> você pode trocar 1 magia preparada por outra do seu livro.
+          </div>` : '') +
         numberPickerHtml('input-qtd-dv-curto', 0, 0, dvRestantes, 'Quantos dados de vida usar para cura?') +
         `<div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;text-align:center">
             Restantes: ${dvRestantes} / ${char.nivel} (d${info.dado_vida} + ${modCon} CON por dado)<br>
             <em>Apenas desconta os dados - use seus dados reais para cura.</em>
         </div>`,
-        '<button class="btn btn-secondary" onclick="fecharModal()">Pular Cura</button><button class="btn btn-primary" id="btn-aplicar-dv-curto">Usar Dados de Vida</button>'
+        `<button class="btn btn-secondary" onclick="fecharModal()">Pular Cura</button>${botaoMemorizar}<button class="btn btn-primary" id="btn-aplicar-dv-curto">Usar Dados de Vida</button>`
       );
       setupNumberPicker('input-qtd-dv-curto');
+      bindMemorizar();
       document.getElementById('btn-aplicar-dv-curto')?.addEventListener('click', () => {
         const qtd = Math.min(dvRestantes, Math.max(0, parseInt(document.getElementById('input-qtd-dv-curto-val')?.value) || 0));
         if (qtd > 0) {
@@ -673,6 +693,16 @@ export function setupEventosDescanso() {
         window.fecharModal();
         renderFichaCompleta();
       });
+    } else if (memorizarMagia) {
+      abrirModal('Descanso Curto Concluído',
+        `<div class="info-box success" style="margin-bottom:12px">Habilidades de descanso curto restauradas!</div>
+         <div style="font-size:0.85rem">
+           <strong>Memorizar Magia:</strong> você pode estudar seu livro de magias e trocar
+           1 magia preparada por outra do livro.
+         </div>`,
+        `<button class="btn btn-secondary" onclick="fecharModal()">Manter Tudo</button>${botaoMemorizar}`
+      );
+      bindMemorizar();
     } else {
       toast('Descanso curto realizado!', 'success');
       renderFichaCompleta();

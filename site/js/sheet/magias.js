@@ -6,7 +6,7 @@
 // ============================================================
 import { ATRIBUTO_NOME_PARA_KEY, CLASSES_INFO } from '../dados-classes.js';
 import { getMagiasClasse, getMagiasPorCirculo } from '../db.js';
-import { abrirModal, bonusProficiencia, calcMod, escHtml, getBonusTruquesOrdem, getMagiaPreparadas, getTruquesConhecidos, mdParaHtml, semAcento, toast } from '../utils.js';
+import { abrirModal, bonusProficiencia, calcMod, escHtml, getBonusTruquesOrdem, getLimitesMagias, getMagiaPreparadas, mdParaHtml, semAcento, toast } from '../utils.js';
 import { getEstadoFuria } from './classes/barbaro.js';
 import { renderSecaoPactoBruxo } from './classes/bruxo.js';
 import { gastarPontosFeiticaria, getEstadoRecursosFeiticeiro } from './classes/feiticeiro.js';
@@ -20,7 +20,12 @@ import { abrirPreenchimentoSlotMagia, mostrarBuscaGrimorio, mostrarBuscaMagia, m
 import { abrirModalAdicionarTalento, abrirModalEditarIniciadoEmMagia } from './talentos.js';
 
 export function magiaContaNoLimite(magia) {
-  const origensEspeciais = ['dominio', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
+  // 'maestria_magias' e 'assinatura_magica': o livro diz que o Mago
+  // "sempre tem essas magias preparadas" (nível 18 e 20) -- como as de
+  // domínio, elas não gastam vaga do limite de preparadas.
+  const origensEspeciais = ['dominio', 'sempre', 'especie_legado', 'iniciado_em_magia',
+    'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista',
+    'maestria_magias', 'assinatura_magica'];
   return !origensEspeciais.includes(magia?.origem);
 }
 
@@ -36,6 +41,9 @@ export function rotuloOrigemMagia(magia) {
   if (magia?.origem === 'tocado_por_fadas') return 'Tocado Por Fadas';
   if (magia?.origem === 'tocado_pelas_sombras') return 'Tocado Pelas Sombras';
   if (magia?.origem === 'conjurador_ritualista') return 'Conjurador Ritualista';
+  if (magia?.origem === 'subclasse_fixa') return 'Subclasse';
+  if (magia?.origem === 'maestria_magias') return 'Maestria de Magias';
+  if (magia?.origem === 'assinatura_magica') return 'Assinatura Mágica';
   return '';
 }
 
@@ -198,17 +206,17 @@ function conjurarMagiaPersonalizada(indice, circuloSelecionado) {
   return true;
 }
 
-// Retorna a tabela de conjuração da subclasse ativa (Cavaleiro Místico ou Trapaceiro Arcano)
-export function getSubclasseConjuradoraConjuracao() {
-  return getCavaleiroMisticoConjuracao() || getTrapaceiroArcanoConjuracao();
+// Retorna a tabela de conjuração da subclasse ativa (Cavaleiro Místico ou
+// Trapaceiro Arcano). `opcoes` ({ subclasse, nivel }) permite consultar uma
+// combinação ainda não gravada em `char` -- a subida de nível precisa disso
+// porque a subclasse é escolhida no MESMO nível em que a conjuração começa.
+export function getSubclasseConjuradoraConjuracao(opcoes = {}) {
+  return getCavaleiroMisticoConjuracao(opcoes) || getTrapaceiroArcanoConjuracao(opcoes);
 }
 
-// Verifica se a subclasse atual concede conjuração
-export function ehSubclasseConjuradora() {
-  const nivel = char?.nivel || 1;
-  if (nivel < 3) return false;
-  return (char?.classe === 'Guerreiro' && char?.subclasse === 'Cavaleiro Místico')
-      || (char?.classe === 'Ladino' && char?.subclasse === 'Trapaceiro Arcano');
+// Verifica se a subclasse concede conjuração (ver `opcoes` acima)
+export function ehSubclasseConjuradora(opcoes = {}) {
+  return !!getSubclasseConjuradoraConjuracao(opcoes);
 }
 
 export function consumirEspacoMagiaDisponivel(circuloMinimo = 1) {
@@ -260,10 +268,10 @@ export function achatarMagiasClasse(magiasClasseData) {
   return resultado;
 }
 
-export async function obterMagiasDisponiveisClasseAtual() {
+export async function obterMagiasDisponiveisClasseAtual(opcoes = {}) {
   // Subclasses conjuradoras (Cavaleiro Místico e Trapaceiro Arcano) usam a lista de magias do Mago
   let classeParaMagias = char.classe;
-  if (ehSubclasseConjuradora()) {
+  if (ehSubclasseConjuradora(opcoes)) {
     classeParaMagias = 'Mago';
   }
   const magiasClasseData = await getMagiasClasse(classeParaMagias);
@@ -393,18 +401,12 @@ export function renderSecaoMagias() {
 
   // Calcular limites de magias preparadas/conhecidas e truques
   // Para subclasses conjuradoras (Cavaleiro Místico / Trapaceiro Arcano), usar tabela da subclasse
-  let maxPreparadas = classeData?.tabela_caracteristicas
-    ? getMagiaPreparadas(classeData.tabela_caracteristicas, char.nivel) : 0;
-  let maxTruques = classeData?.tabela_caracteristicas
-    ? getTruquesConhecidos(classeData.tabela_caracteristicas, char.nivel) : 0;
-
-  // Fallback para subclasses conjuradoras se a tabela principal não tem colunas de magias
-  if (subConj && maxPreparadas === 0) {
-    maxPreparadas = subConj.preparadas || 0;
-  }
-  if (subConj && maxTruques === 0) {
-    maxTruques = subConj.truques || 0;
-  }
+  // getLimitesMagias já cai para a tabela da subclasse quando a tabela da
+  // classe não tem colunas de magia (Guerreiro/Ladino) -- mesma função que
+  // o modal de consulta usa, para os dois não divergirem (ver utils.js).
+  const _limites = getLimitesMagias(classeData?.tabela_caracteristicas, char.nivel, subConj);
+  let maxPreparadas = _limites.preparadas;
+  let maxTruques = _limites.truques;
   // Truques extras de Combatente Druídico / Abençoado
   maxTruques += getTruquesExtraEstiloLuta();
   // Truques extras do Clérigo Taumaturgo / Druida Xamã (utils.js, mesma
@@ -473,9 +475,15 @@ export function renderSecaoMagias() {
           <button class="btn btn-sm btn-secondary" id="btn-add-magia-custom">Magia Personalizada</button>
         </div>
       </div>
+      ${(char._slots_truque_livre || 0) > 0 && tipoConj === 'conhecidas' ? `
+        <div class="info-box warning no-print" style="margin:0 0 8px;font-size:0.85rem;display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <span>Você tem <strong>${char._slots_truque_livre}</strong> vaga(s) de truque em aberto para o seu nível.</span>
+          <button class="btn btn-sm btn-primary" id="btn-preencher-slot-truque">Escolher</button>
+        </div>
+      ` : ''}
       ${(char._slots_magia_livre || 0) > 0 && tipoConj === 'conhecidas' ? `
         <div class="info-box warning no-print" style="margin:0 0 8px;font-size:0.85rem;display:flex;align-items:center;justify-content:space-between;gap:8px">
-          <span>Você tem <strong>${char._slots_magia_livre}</strong> vaga(s) de magia conhecida disponível(is) por ajuste automático.</span>
+          <span>Você tem <strong>${char._slots_magia_livre}</strong> vaga(s) de magia conhecida em aberto para o seu nível.</span>
           <button class="btn btn-sm btn-primary" id="btn-preencher-slot-magia">Escolher</button>
         </div>
       ` : ''}
@@ -1991,7 +1999,8 @@ export function setupEventosEspacosMagia() {
   });
 
   // Preencher slot de magia liberado por ajuste automático (bug de magia passiva duplicada)
-  document.getElementById('btn-preencher-slot-magia')?.addEventListener('click', () => abrirPreenchimentoSlotMagia());
+  document.getElementById('btn-preencher-slot-magia')?.addEventListener('click', () => abrirPreenchimentoSlotMagia('magia'));
+  document.getElementById('btn-preencher-slot-truque')?.addEventListener('click', () => abrirPreenchimentoSlotMagia('truque'));
 
   // Adicionar magia customizada
   document.getElementById('btn-add-magia-custom')?.addEventListener('click', () => mostrarFormMagiaCustom());

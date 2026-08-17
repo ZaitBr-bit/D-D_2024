@@ -4,38 +4,24 @@
 // Consultado pela ficha, pelos descansos e pelas habilidades ativas.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
+import { getConjuracaoSubclasse } from '../../regras-conjuracao-subclasse.js';
 import { bonusProficiencia, calcMod } from '../../utils.js';
 import { char, classeData } from '../estado.js';
 
-// Tabela de conjuração do Trapaceiro Arcano (subclasse do Ladino)
-// Mesma progressão de espaços que o Cavaleiro Místico (1/3 conjurador), mas truques diferentes
-export function getTrapaceiroArcanoConjuracao() {
-  if (char?.classe !== 'Ladino' || char?.subclasse !== 'Trapaceiro Arcano') return null;
-  const nivel = char.nivel || 1;
-  if (nivel < 3) return null;
-
-  // Truques: 3 até nível 9 (Mãos Mágicas + 2), 4 a partir do nível 10 (Mãos Mágicas + 3)
-  const tabela = {
-    3:  { truques: 3, preparadas: 3,  espacos: {1: 2} },
-    4:  { truques: 3, preparadas: 4,  espacos: {1: 3} },
-    5:  { truques: 3, preparadas: 4,  espacos: {1: 3} },
-    7:  { truques: 3, preparadas: 5,  espacos: {1: 4, 2: 2} },
-    8:  { truques: 3, preparadas: 6,  espacos: {1: 4, 2: 2} },
-    10: { truques: 4, preparadas: 7,  espacos: {1: 4, 2: 3} },
-    11: { truques: 4, preparadas: 8,  espacos: {1: 4, 2: 3} },
-    13: { truques: 4, preparadas: 9,  espacos: {1: 4, 2: 3, 3: 2} },
-    14: { truques: 4, preparadas: 10, espacos: {1: 4, 2: 3, 3: 2} },
-    16: { truques: 4, preparadas: 11, espacos: {1: 4, 2: 3, 3: 3} },
-    19: { truques: 4, preparadas: 12, espacos: {1: 4, 2: 3, 3: 3, 4: 1} },
-    20: { truques: 4, preparadas: 13, espacos: {1: 4, 2: 3, 3: 3, 4: 1} }
-  };
-
-  const niveis = Object.keys(tabela).map(Number).sort((a, b) => a - b);
-  let entrada = null;
-  for (const n of niveis) {
-    if (n <= nivel) entrada = tabela[n];
-  }
-  return entrada;
+/**
+ * Tabela de conjuração do Trapaceiro Arcano (subclasse do Ladino) para o
+ * personagem aberto na ficha.
+ *
+ * `opcoes` permite consultar uma combinação diferente da que está gravada
+ * -- é o que a subida de nível usa para perguntar "e se a subclasse
+ * escolhida AGORA fosse esta, no nível para o qual estou subindo?", já que
+ * `char.subclasse` só é gravada depois que o nível é confirmado.
+ */
+export function getTrapaceiroArcanoConjuracao(opcoes = {}) {
+  const classe = opcoes.classe ?? char?.classe;
+  const subclasse = opcoes.subclasse ?? char?.subclasse;
+  const nivel = opcoes.nivel ?? char?.nivel ?? 1;
+  return getConjuracaoSubclasse(classe, subclasse === 'Trapaceiro Arcano' ? subclasse : null, nivel);
 }
 
 // ============================================================

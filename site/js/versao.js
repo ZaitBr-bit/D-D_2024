@@ -13,13 +13,76 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.0';
+export const VERSAO_ATUAL = '2.2.1';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.1',
+    data: '2026-08-16',
+    resumo: 'O Trapaceiro Arcano e o Cavaleiro Místico finalmente recebem '
+      + 'magias e espaços ao chegar no nível 3.',
+    melhorias: [
+      {
+        grupo: '✋ Mãos Mágicas automática',
+        itens: [
+          'O Trapaceiro Arcano recebe Mãos Mágicas junto com a Conjuração, '
+            + 'como manda o livro, e escolhe só os outros 2 truques. Ela '
+            + 'conta no seu limite de truques e não pode ser trocada.',
+        ],
+      },
+      {
+        grupo: '📖 Mago: as magias agora são escolhidas',
+        itens: [
+          'Assinatura Mágica (nível 20) pergunta QUAIS são as suas duas '
+            + 'magias de 3º círculo. Antes havia só os botões "Assinatura 1" '
+            + 'e "Assinatura 2", sem nunca escolher a magia; agora cada botão '
+            + 'tem o nome da sua magia.',
+          'Maestria de Magias (nível 18) pede a magia de 1º e a de 2º círculo '
+            + 'do seu livro (só as de tempo de conjuração "Ação", como o livro '
+            + 'exige). Antes não pedia nada.',
+          'As magias das duas características entram como sempre preparadas e '
+            + 'não ocupam vaga do seu limite de magias preparadas.',
+          'Memorizar Magia (nível 5) aparece no Descanso Curto, com o botão '
+            + 'para trocar 1 magia preparada por outra do seu livro. Antes era '
+            + 'só um texto na ficha.',
+        ],
+      },
+      {
+        grupo: '🩹 Fichas que já estavam sem magia',
+        itens: [
+          'Quem já tinha subido para o nível 3 e ficou sem nada agora vê, na '
+            + 'seção Magias, quantas vagas de truque e de magia conhecida '
+            + 'estão em aberto, com um botão para escolher cada uma.',
+        ],
+      },
+    ],
+    correcoes: [
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'Ao escolher Trapaceiro Arcano ou Cavaleiro Místico no nível 3, a '
+            + 'subida de nível não mostrava nenhuma tela de magias: o '
+            + 'personagem chegava ao nível 3 sem truque e sem magia nenhuma. '
+            + 'Agora a tela aparece assim que a subclasse é escolhida, já com '
+            + 'a lista de Mago.',
+          'O Trapaceiro Arcano não ganhava espaço de magia nenhum ao subir de '
+            + 'nível, e o Cavaleiro Místico só ganhava a partir do nível 4.',
+          'No modal "Consultar Magias" do Trapaceiro Arcano, os contadores '
+            + 'mostravam "0/0" e a lista inteira aparecia bloqueada.',
+          'O botão "Definir Maestrias" do Ladino não abria nada (nem pela '
+            + 'ficha, nem pelo "Trocar Maestrias" do Descanso Longo): a tela '
+            + 'quebrava ao ler as propriedades da arma.',
+          'A lista de maestrias do Ladino deixava de fora as armas Marciais '
+            + 'de propriedade Leve, como a Besta de Mão, que ele tem '
+            + 'proficiência para usar.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.0',
     data: '2026-08-14',

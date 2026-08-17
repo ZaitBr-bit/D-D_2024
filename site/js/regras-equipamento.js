@@ -36,6 +36,35 @@ export function temProficienciaArma(personagem, arma) {
   return false;
 }
 
+/**
+ * Armas que podem receber Maestria em Arma, para a classe do personagem.
+ *
+ * O livro amarra a maestria à PROFICIENCIA ("dois tipos de armas à sua
+ * escolha com as quais você tem proficiência" -- Ladino, Guardião,
+ * Paladino; Guerreiro e Bárbaro dizem "Simples ou Marciais", que é a
+ * proficiência dos dois). Por isso a lista sai de temProficienciaArma, e
+ * não de uma cópia da regra: a cópia que existia em sheet/maestrias.js
+ * tinha DOIS defeitos que a função aqui nunca teve -- lia
+ * `arma.propriedades` como se fosse lista (o dado é string, e o modal do
+ * Ladino quebrava com TypeError antes de abrir) e conferia só Acuidade,
+ * deixando de fora as Marciais de propriedade Leve.
+ *
+ * Única exceção de classe: o Bárbaro diz "armas Corpo a Corpo Simples ou
+ * Marciais" -- as à distância ficam de fora mesmo com proficiência.
+ *
+ * @param {Object} personagem - Personagem (classe e proficiencias_extra)
+ * @param {Array} armas - Lista de armas de dados/equipamento/armas.json
+ */
+export function armasElegiveisMaestria(personagem, armas = []) {
+  return armas.filter(arma => {
+    if (!temProficienciaArma(personagem, arma)) return false;
+    if (personagem?.classe === 'Bárbaro') {
+      return (arma?.categoria || '').toLowerCase().includes('corpo a corpo');
+    }
+    return true;
+  });
+}
+
 /** Verifica se o personagem tem proficiencia com uma armadura especifica */
 export function temProficienciaArmadura(personagem, armadura) {
   const info = CLASSES_INFO[personagem?.classe];

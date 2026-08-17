@@ -3,6 +3,7 @@
 // ============================================================
 import { CLASSES_INFO, ESCOLAS_SUBCLASSE_MAGO } from './dados-classes.js';
 import { getClasse, getEspecies, getIndiceMagias, getTalentos } from './db.js';
+import { getEspacosSubclasseConjuradora, getTruquesFixosSubclasse } from './regras-conjuracao-subclasse.js';
 import { calcMod, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas } from './utils.js';
 import { aplicarDeltaSistema } from './ficha-edicoes.js';
 import { aplicarEfeitoTalento, validarEscolhasTalento } from './regras-cobertura.js';
@@ -255,32 +256,6 @@ export function registrarDadivaEpicaLegada(personagem, opcoes, dadosTalentos) {
   if (!personagem.escolhas_classe) personagem.escolhas_classe = {};
   personagem.escolhas_classe.dadiva_epica_nivel_19 = talento.nome;
   return { sucesso: true, talento: talento.nome };
-}
-
-/**
- * Retorna os espaços de magia do Cavaleiro Místico para o nível atual.
- * Progressão de conjurador de 1/3 com espaços próprios.
- */
-function getCavaleiroMisticoEspacos(nivel) {
-  if (nivel < 3) return {};
-  // Tabela de progressão do Cavaleiro Místico (nível do Guerreiro → espaços)
-  const tabela = {
-    3:  { 1: { total: 2, usados: 0 } },
-    4:  { 1: { total: 3, usados: 0 } },
-    7:  { 1: { total: 4, usados: 0 }, 2: { total: 2, usados: 0 } },
-    8:  { 1: { total: 4, usados: 0 }, 2: { total: 2, usados: 0 } },
-    10: { 1: { total: 4, usados: 0 }, 2: { total: 3, usados: 0 } },
-    13: { 1: { total: 4, usados: 0 }, 2: { total: 3, usados: 0 }, 3: { total: 2, usados: 0 } },
-    16: { 1: { total: 4, usados: 0 }, 2: { total: 3, usados: 0 }, 3: { total: 3, usados: 0 } },
-    19: { 1: { total: 4, usados: 0 }, 2: { total: 3, usados: 0 }, 3: { total: 3, usados: 0 }, 4: { total: 1, usados: 0 } }
-  };
-
-  const niveis = Object.keys(tabela).map(Number).sort((a, b) => a - b);
-  let entrada = {};
-  for (const n of niveis) {
-    if (n <= nivel) entrada = tabela[n];
-  }
-  return entrada;
 }
 
 /**
@@ -1256,32 +1231,58 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     await atualizarEspacosMagia(personagem, classeData);
   }
 
-  // Cavaleiro Místico: atualizar espaços de magia da subclasse
-  if (personagem.classe === 'Guerreiro' && personagem.subclasse === 'Cavaleiro Místico' && novoNivel >= 3) {
-    const tabelaCM = getCavaleiroMisticoEspacos(novoNivel);
-    Object.keys(tabelaCM).forEach(circulo => {
-      if (personagem.espacos_magia[circulo]) {
-        personagem.espacos_magia[circulo].total = tabelaCM[circulo].total;
-        if (personagem.espacos_magia[circulo].usados > tabelaCM[circulo].total) {
-          personagem.espacos_magia[circulo].usados = tabelaCM[circulo].total;
-        }
-      } else {
-        personagem.espacos_magia[circulo] = tabelaCM[circulo];
-      }
-    });
-    // Remover círculos que não existem mais
-    Object.keys(personagem.espacos_magia).forEach(circulo => {
-      if (!tabelaCM[circulo]) {
-        delete personagem.espacos_magia[circulo];
-      }
-    });
-  }
-  
   // Aplicar escolha de subclasse
   if (precisaSubclasse && opcoes.subclasse) {
     personagem.subclasse = opcoes.subclasse;
   }
-  
+
+  // Subclasses conjuradoras (Cavaleiro Místico, Trapaceiro Arcano):
+  // espaços de magia e truques concedidos pela característica.
+  //
+  // Este bloco tem de vir DEPOIS da gravação da subclasse acima: as duas
+  // subclasses começam a conjurar no nível 3, o MESMO em que são
+  // escolhidas, e enquanto ele rodava antes `personagem.subclasse` ainda
+  // estava vazia -- nenhum dos dois recebia espaço de magia ao virar
+  // conjurador (o Cavaleiro Místico só ganhava no nível 4, e o Trapaceiro
+  // Arcano nunca, porque a condição citava só o Cavaleiro).
+  const espacosSubclasse = getEspacosSubclasseConjuradora(
+    personagem.classe, personagem.subclasse, novoNivel);
+  if (Object.keys(espacosSubclasse).length > 0) {
+    if (!personagem.espacos_magia) personagem.espacos_magia = {};
+    Object.keys(espacosSubclasse).forEach(circulo => {
+      const total = espacosSubclasse[circulo].total;
+      if (personagem.espacos_magia[circulo]) {
+        personagem.espacos_magia[circulo].total = total;
+        if (personagem.espacos_magia[circulo].usados > total) {
+          personagem.espacos_magia[circulo].usados = total;
+        }
+      } else {
+        personagem.espacos_magia[circulo] = espacosSubclasse[circulo];
+      }
+    });
+    // Remover círculos que não existem mais
+    Object.keys(personagem.espacos_magia).forEach(circulo => {
+      if (!espacosSubclasse[circulo]) {
+        delete personagem.espacos_magia[circulo];
+      }
+    });
+
+    // Truques concedidos pela subclasse (Mãos Mágicas do Trapaceiro
+    // Arcano): entram como truque de classe normal, porque contam no
+    // limite da tabela da subclasse. A tela de seleção já desconta esses
+    // truques da quantidade que pede ao jogador (levelup-flow.js).
+    const truquesFixos = getTruquesFixosSubclasse(
+      personagem.classe, personagem.subclasse, novoNivel);
+    if (truquesFixos.length > 0) {
+      if (!personagem.magias_conhecidas) personagem.magias_conhecidas = [];
+      for (const nome of truquesFixos) {
+        if (!personagem.magias_conhecidas.some(m => m.nome === nome)) {
+          personagem.magias_conhecidas.push({ nome, circulo: 0, origem: 'subclasse_fixa' });
+        }
+      }
+    }
+  }
+
   // Obter características de subclasse para este nível
   const subclasseAtual = personagem.subclasse;
   const caracteristicasSubclasse = await obterCaracteristicasSubclasseNivel(personagem.classe, subclasseAtual, novoNivel);

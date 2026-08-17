@@ -4,6 +4,7 @@
 // Consultado pela ficha, pelos descansos e pelas habilidades ativas.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
+import { getConjuracaoSubclasse } from '../../regras-conjuracao-subclasse.js';
 import { bonusProficiencia, calcMod } from '../../utils.js';
 import { char, classeData } from '../estado.js';
 
@@ -170,33 +171,17 @@ export function getEstadoRecursosGuerreiro() {
   };
 }
 
-// Tabela de conjuração do Cavaleiro Místico (subclasse do Guerreiro)
-export function getCavaleiroMisticoConjuracao() {
-  if (char?.classe !== 'Guerreiro' || char?.subclasse !== 'Cavaleiro Místico') return null;
-  const nivel = char.nivel || 1;
-  if (nivel < 3) return null;
-
-  // Tabela: truques, preparadas (magias conhecidas), espaços por círculo
-  const tabela = {
-    3:  { truques: 2, preparadas: 3,  espacos: {1: 2} },
-    4:  { truques: 2, preparadas: 4,  espacos: {1: 3} },
-    5:  { truques: 2, preparadas: 4,  espacos: {1: 3} },
-    7:  { truques: 2, preparadas: 5,  espacos: {1: 4, 2: 2} },
-    8:  { truques: 2, preparadas: 6,  espacos: {1: 4, 2: 2} },
-    10: { truques: 3, preparadas: 7,  espacos: {1: 4, 2: 3} },
-    11: { truques: 3, preparadas: 8,  espacos: {1: 4, 2: 3} },
-    13: { truques: 3, preparadas: 9,  espacos: {1: 4, 2: 3, 3: 2} },
-    14: { truques: 3, preparadas: 10, espacos: {1: 4, 2: 3, 3: 2} },
-    16: { truques: 3, preparadas: 11, espacos: {1: 4, 2: 3, 3: 3} },
-    19: { truques: 3, preparadas: 12, espacos: {1: 4, 2: 3, 3: 3, 4: 1} },
-    20: { truques: 3, preparadas: 13, espacos: {1: 4, 2: 3, 3: 3, 4: 1} }
-  };
-
-  // Encontrar a entrada mais próxima (menor ou igual ao nível atual)
-  const niveis = Object.keys(tabela).map(Number).sort((a, b) => a - b);
-  let entrada = null;
-  for (const n of niveis) {
-    if (n <= nivel) entrada = tabela[n];
-  }
-  return entrada;
+/**
+ * Tabela de conjuração do Cavaleiro Místico (subclasse do Guerreiro) para o
+ * personagem aberto na ficha.
+ *
+ * `opcoes` permite consultar uma combinação diferente da gravada -- mesma
+ * necessidade do Trapaceiro Arcano (ver sheet/classes/ladino.js): na subida
+ * para o nível 3 a subclasse ainda não está em `char`.
+ */
+export function getCavaleiroMisticoConjuracao(opcoes = {}) {
+  const classe = opcoes.classe ?? char?.classe;
+  const subclasse = opcoes.subclasse ?? char?.subclasse;
+  const nivel = opcoes.nivel ?? char?.nivel ?? 1;
+  return getConjuracaoSubclasse(classe, subclasse === 'Cavaleiro Místico' ? subclasse : null, nivel);
 }

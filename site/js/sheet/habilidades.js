@@ -18,6 +18,7 @@ import { getEstadoRecursosGuardiao } from './classes/guardiao.js';
 import { getEstadoRecursosGuerreiro } from './classes/guerreiro.js';
 import { getEstadoRecursosLadino } from './classes/ladino.js';
 import { getEstadoRecursosMago } from './classes/mago.js';
+import { abrirEscolhaMagiasFixasMago, mostrarTrocaMagias } from './grimorio.js';
 import { getEstadoRecursosMonge } from './classes/monge.js';
 import { getEstadoRecursosPaladino } from './classes/paladino.js';
 import { ataqueImprudenteAtivo, formatarMetros, getDeslocamentoFinal, parseMetros, temArmaduraPesadaEquipada } from './combate.js';
@@ -1860,22 +1861,38 @@ export function setupEventosHabilidades() {
         return;
       }
 
-      if (acao === 'assinatura-1') {
-        if (estado.assinatura1Usada) {
-          toast('Assinatura Mágica 1 já usada neste descanso.', 'error');
-          return;
-        }
-        char.recursos.mago.assinatura_magia_1_usada = true;
-        toast('Assinatura Mágica 1 conjurada no 3º círculo sem gastar espaço!', 'success');
+      // Escolha das magias que ficam sempre preparadas (nível 18 e 20)
+      if (acao === 'definir-maestria-magias') {
+        abrirEscolhaMagiasFixasMago('maestria_magias');
+        return;
+      }
+      if (acao === 'definir-assinaturas') {
+        abrirEscolhaMagiasFixasMago('assinatura_magica');
+        return;
+      }
+      // Memorizar Magia (nível 5): troca 1 magia preparada por outra do
+      // livro de magias -- para o Mago, mostrarTrocaMagias já troca dentro
+      // do grimório.
+      if (acao === 'memorizar-magia') {
+        mostrarTrocaMagias();
+        return;
       }
 
-      if (acao === 'assinatura-2') {
-        if (estado.assinatura2Usada) {
-          toast('Assinatura Mágica 2 já usada neste descanso.', 'error');
+      if (acao === 'assinatura-1' || acao === 'assinatura-2') {
+        const ehPrimeira = acao === 'assinatura-1';
+        const nome = ehPrimeira ? estado.assinatura1 : estado.assinatura2;
+        const usada = ehPrimeira ? estado.assinatura1Usada : estado.assinatura2Usada;
+        if (!nome) {
+          toast('Escolha antes qual magia é esta assinatura mágica.', 'error');
           return;
         }
-        char.recursos.mago.assinatura_magia_2_usada = true;
-        toast('Assinatura Mágica 2 conjurada no 3º círculo sem gastar espaço!', 'success');
+        if (usada) {
+          toast(`${nome} já foi usada como assinatura neste descanso.`, 'error');
+          return;
+        }
+        if (ehPrimeira) char.recursos.mago.assinatura_magia_1_usada = true;
+        else char.recursos.mago.assinatura_magia_2_usada = true;
+        toast(`${nome} conjurada no 3º círculo sem gastar espaço!`, 'success');
       }
 
       salvar();
@@ -2563,6 +2580,8 @@ export function renderFeatureItem(f, source) {
   const ehMago = char.classe === 'Mago';
   const ehRecuperacaoArcana = ehMago && f.nome === 'Recuperação Arcana';
   const ehAssinaturaMagica = ehMago && f.nome === 'Assinatura Mágica';
+  const ehMaestriaMagias = ehMago && f.nome === 'Maestria de Magias';
+  const ehMemorizarMagia = ehMago && f.nome === 'Memorizar Magia';
   const estadoMago = ehMago ? getEstadoRecursosMago() : null;
   // Subclasses de Mago
   const ehSubclasseMago = ehMago && source === 'subclasse';
@@ -4505,17 +4524,49 @@ export function renderFeatureItem(f, source) {
     `;
     recarga = 'longo';
   } else if (ehAssinaturaMagica && estadoMago && estadoMago.assinaturaMagicaAtiva) {
-    const disp1 = estadoMago.assinatura1Usada ? 'Usada' : 'Pronta';
-    const disp2 = estadoMago.assinatura2Usada ? 'Usada' : 'Pronta';
-    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${disp1} / ${disp2}</span>`;
+    // As duas assinaturas são magias ESCOLHIDAS do livro de magias; antes
+    // os botões existiam sem nunca perguntar quais eram.
+    const escolhidas = [
+      { nome: estadoMago.assinatura1, usada: estadoMago.assinatura1Usada, acao: 'assinatura-1' },
+      { nome: estadoMago.assinatura2, usada: estadoMago.assinatura2Usada, acao: 'assinatura-2' }
+    ];
+    const definidas = escolhidas.filter(a => a.nome);
+    usosHtmlSummary = definidas.length < 2
+      ? `<span style="font-size:0.7rem;font-weight:600;margin-left:auto;color:var(--warning)">${definidas.length}/2 escolhidas</span>`
+      : `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${escolhidas.filter(a => !a.usada).length}/2 prontas</span>`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
-        <button class="btn btn-sm btn-primary" data-mago-acao="assinatura-1" ${estadoMago.assinatura1Usada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Assinatura 1</button>
-        <button class="btn btn-sm btn-primary" data-mago-acao="assinatura-2" ${estadoMago.assinatura2Usada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Assinatura 2</button>
+        <button class="btn btn-sm btn-accent" data-mago-acao="definir-assinaturas">${definidas.length ? 'Trocar Magias' : 'Escolher Magias'}</button>
+        ${escolhidas.map(a => a.nome ? `
+          <button class="btn btn-sm btn-primary" data-mago-acao="${a.acao}" ${a.usada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${escHtml(a.nome)}</button>
+        ` : '').join('')}
         <span style="font-size:0.75rem;color:var(--text-muted)">3º círculo sem espaço | Curto/Longo</span>
       </div>
     `;
     recarga = 'curto_ou_longo';
+  } else if (ehMaestriaMagias && estadoMago && estadoMago.maestriaMagiasAtiva) {
+    // Magia de 1º e de 2º círculo, à vontade no círculo mais baixo.
+    const escolhidas = [estadoMago.maestriaMagia1, estadoMago.maestriaMagia2].filter(Boolean);
+    usosHtmlSummary = escolhidas.length < 2
+      ? `<span style="font-size:0.7rem;font-weight:600;margin-left:auto;color:var(--warning)">${escolhidas.length}/2 escolhidas</span>`
+      : '<span style="font-size:0.7rem;font-weight:600;margin-left:auto">À vontade</span>';
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-mago-acao="definir-maestria-magias">${escolhidas.length ? 'Trocar Magias' : 'Escolher Magias'}</button>
+        ${escolhidas.map(nome => `<span class="badge badge-accent" style="font-size:0.75rem">${escHtml(nome)}</span>`).join('')}
+        <span style="font-size:0.75rem;color:var(--text-muted)">Sem gastar espaço no círculo mais baixo</span>
+      </div>
+    `;
+    recarga = 'nenhuma';
+  } else if (ehMemorizarMagia && estadoMago && estadoMago.memorizarMagiaAtivo) {
+    usosHtmlSummary = '<span style="font-size:0.7rem;font-weight:600;margin-left:auto">Descanso Curto</span>';
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-accent" data-mago-acao="memorizar-magia">Trocar Magia Preparada</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">1 magia preparada por outra do livro</span>
+      </div>
+    `;
+    recarga = 'curto';
   } else if (ehAbjuradorProtecao && estadoMagoSub) {
     const pv = estadoMagoSub.protecaoPvAtual;
     const pvMax = estadoMagoSub.protecaoPvMax;

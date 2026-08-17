@@ -8,7 +8,8 @@
 // ============================================================
 import { CLASSES_INFO } from '../dados-classes.js';
 import { MAGIAS_LEGADO_ESPECIE, _concederMagiaAutomatica } from '../levelup.js';
-import { getMagiaPreparadas } from '../utils.js';
+import { getTruquesFixosAcumulados } from '../regras-conjuracao-subclasse.js';
+import { getLimitesMagias } from '../utils.js';
 import { char, classeData, indiceMagiasCache, magiasDominioCache, magiasSempreCache, salvar } from './estado.js';
 import { getSubclasseConjuradoraConjuracao, magiaContaNoLimite } from './magias.js';
 
@@ -41,19 +42,58 @@ export function migrarSlotsMagiaLivre() {
   const tabela = classeData?.tabela_caracteristicas;
   if (!tabela) return;
 
-  const maxEsperado = getMagiaPreparadas(tabela, char.nivel);
-  if (!maxEsperado) return;
+  // getLimitesMagias cai para a tabela da subclasse quando a da classe não
+  // tem colunas de magia: sem isso o limite de um Trapaceiro Arcano/
+  // Cavaleiro Místico era lido como 0 e a vaga nunca era oferecida -- foi o
+  // que deixou sem saída os personagens que subiram para o nível 3 antes da
+  // correção do fluxo de subida (que não pedia truque nem magia nenhuma).
+  const limites = getLimitesMagias(tabela, char.nivel, subConj);
+  let alterado = false;
 
-  const atual = (char.magias_preparadas || []).filter(m => magiaContaNoLimite(m)).length;
-  const deficit = maxEsperado - atual;
-  if (deficit <= 0) return; // não há gap
+  if (limites.preparadas > 0) {
+    const atual = (char.magias_preparadas || []).filter(m => magiaContaNoLimite(m)).length;
+    const deficit = limites.preparadas - atual;
+    // Se o slot já foi contabilizado, não duplicar
+    if (deficit > 0 && deficit > (char._slots_magia_livre || 0)) {
+      char._slots_magia_livre = deficit;
+      alterado = true;
+    }
+  }
 
-  // Se o slot já foi contabilizado, não duplicar
-  const jaRegistrado = char._slots_magia_livre || 0;
-  if (deficit <= jaRegistrado) return;
+  if (limites.truques > 0) {
+    // Truques de espécie/talento não ocupam o limite de classe (mesma
+    // separação que a seção Magias da ficha faz nos contadores).
+    const origensForaDoLimite = ['especie', 'especie_legado', 'iniciado_em_magia',
+      'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista', 'telecinetico'];
+    const atuais = (char.magias_conhecidas || [])
+      .filter(m => m.circulo === 0 && !origensForaDoLimite.includes(m?.origem)).length;
+    const deficit = limites.truques - atuais;
+    if (deficit > 0 && deficit > (char._slots_truque_livre || 0)) {
+      char._slots_truque_livre = deficit;
+      alterado = true;
+    }
+  }
 
-  char._slots_magia_livre = deficit;
-  salvar();
+  if (alterado) salvar();
+}
+
+/**
+ * Concede os truques que a subclasse dá de graça (Mãos Mágicas do
+ * Trapaceiro Arcano) a fichas que subiram de nível antes de o fluxo de
+ * subida passar a concedê-los.
+ */
+export function migrarTruquesFixosSubclasse() {
+  const fixos = getTruquesFixosAcumulados(char.classe, char.subclasse, char.nivel || 1);
+  if (fixos.length === 0) return;
+  if (!char.magias_conhecidas) char.magias_conhecidas = [];
+  let alterado = false;
+  for (const nome of fixos) {
+    if (!char.magias_conhecidas.some(m => m.nome === nome)) {
+      char.magias_conhecidas.push({ nome, circulo: 0, origem: 'subclasse_fixa' });
+      alterado = true;
+    }
+  }
+  if (alterado) salvar();
 }
 
 export function migrarMagiasSemprePreparadas() {

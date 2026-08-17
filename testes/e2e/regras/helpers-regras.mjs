@@ -172,6 +172,28 @@ export async function clicarBotaoFicha(page, id, { esperar = null } = {}) {
   }
 }
 
+/**
+ * Mesma disciplina de `clicarBotaoFicha`, para botões que a ficha
+ * identifica por atributo (`[data-mago-acao="..."]`, `[data-config-maestrias]`)
+ * em vez de `id` -- é o caso dos botões dentro dos cards de característica
+ * de classe. Vive aqui, e não copiado no spec, pelo motivo do cabeçalho
+ * deste arquivo: sob 4 workers um clique sem espera/retentativa dispara
+ * antes de a ficha terminar de renderizar, o `?.click()` não acha nada e o
+ * teste falha de forma intermitente.
+ */
+export async function clicarSeletorFicha(page, seletor, { esperar = null } = {}) {
+  await page.waitForSelector(seletor, { state: 'attached', timeout: 20_000 });
+  const clicar = () => page.evaluate((alvo) => document.querySelector(alvo)?.click(), seletor);
+  await clicar();
+  if (!esperar) return;
+  const chegou = await page.waitForSelector(esperar, { state: 'visible', timeout: 10_000 })
+    .then(() => true, () => false);
+  if (!chegou) {
+    await clicar();
+    await page.waitForSelector(esperar, { state: 'visible', timeout: 20_000 });
+  }
+}
+
 // Abre o site coletando erros de console/página — qualquer erro
 // derruba o teste no final (mesma disciplina da paridade).
 export async function abrirSite(context, hash = '') {

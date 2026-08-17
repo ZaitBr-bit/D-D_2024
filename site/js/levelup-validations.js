@@ -4,7 +4,7 @@
 // ============================================================
 import { exigeManobrasGuerreiro } from './levelup.js';
 import { validarEscolhasTalento } from './regras-cobertura.js';
-import { calcularSubclasseArcana } from './levelup-flow.js';
+import { calcularConjuracao, calcularSubclasseArcana } from './levelup-flow.js';
 
 function precisaManobrasAgora(ctx, state) {
   return exigeManobrasGuerreiro(ctx.char.classe, state.subclasse || ctx.char.subclasse, ctx.nivelNovo);
@@ -76,7 +76,7 @@ export function collectOpcoes(ctx, state) {
     opcoes.explorador_idiomas = state.exploradorIdiomas;
   }
   if (ctx.precisaAcademico) opcoes.academico_expertise = state.academicoExpertise;
-  if (ctx.conjuracao?.ehMago) opcoes.grimorio_selecionados = state.grimorioSelecionados || [];
+  if (calcularConjuracao(ctx, state)?.ehMago) opcoes.grimorio_selecionados = state.grimorioSelecionados || [];
   const subclasseArcana = calcularSubclasseArcana(ctx, state);
   if (subclasseArcana) opcoes.subclasse_magias_selecionadas = state.subclasseMagiasSelecionados || [];
 
@@ -183,8 +183,12 @@ export function validateAll(ctx, state) {
       return 'Escolha a manobra substituta ou desmarque a troca.';
   }
 
-  if (ctx.ehConjurador && ctx.conjuracao) {
-    const c = ctx.conjuracao;
+  // Reativo à subclasse escolhida nesta sessão (ver calcularConjuracao):
+  // sem isso, um Cavaleiro Místico/Trapaceiro Arcano recém-escolhido
+  // confirmaria o nível sem nenhuma cobrança de truque ou magia.
+  const conjuracaoAtiva = calcularConjuracao(ctx, state);
+  if (conjuracaoAtiva) {
+    const c = conjuracaoAtiva;
     if (c.truquesGanhos > 0 && state.truquesSelecionados.length !== c.truquesGanhos)
       return `Selecione ${c.truquesGanhos} truque(s).`;
     if (c.tipoConj === 'conhecidas' && c.magiasGanhas > 0 && state.magiasSelecionadas.length !== c.magiasGanhas)

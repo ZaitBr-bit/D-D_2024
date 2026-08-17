@@ -11,12 +11,13 @@ import { resolverPassivosTalentos } from '../talentos-effects.js';
 import { abrirGridManobras } from '../manobras-ui.js';
 import { definirChar, definirContainer, definirClasseData, definirIndiceMagias, definirTalentos, definirEspecies, definirMagiasDominio, definirMagiasSempre, definirPassivosTalentos } from '../sheet/estado.js';
 import { getEstadoRecursosGuerreiro } from '../sheet/classes/guerreiro.js';
+import { sincronizarMagiasFixasMago } from '../sheet/classes/mago.js';
 import { _carregarEstadoColapso } from '../sheet/colapso.js';
 import { char, classeData, salvar } from '../sheet/estado.js';
 import { renderFichaCompleta } from '../sheet/ficha.js';
 import { carregarDescricoesMagias } from '../sheet/impressao.js';
 import { ehSubclasseConjuradora, getSubclasseConjuradoraConjuracao } from '../sheet/magias.js';
-import { migrarEscolhasClasseLegadas, migrarMagiasDominio, migrarMagiasLegadoEspecie, migrarMagiasSemprePreparadas, migrarNomePericiaLidarAnimais, migrarPericiaEspecie, migrarPericiasEspecie, migrarPericiasTalentos, migrarSlotsMagiaLivre, migrarTalentoVersatilHumano, migrarTruquesEspecie } from '../sheet/migracoes.js';
+import { migrarEscolhasClasseLegadas, migrarMagiasDominio, migrarMagiasLegadoEspecie, migrarMagiasSemprePreparadas, migrarNomePericiaLidarAnimais, migrarPericiaEspecie, migrarPericiasEspecie, migrarPericiasTalentos, migrarSlotsMagiaLivre, migrarTalentoVersatilHumano, migrarTruquesEspecie, migrarTruquesFixosSubclasse } from '../sheet/migracoes.js';
 import { baixarPdfFicha } from '../sheet/pdf.js';
 import { migrarAdeptoElementalTipos, migrarIniciadoEmMagiaInstancias } from '../sheet/talentos.js';
 let _syncSubscribed = false;
@@ -48,6 +49,12 @@ export async function renderSheet(container, charId) {
   definirMagiasSempre(await obterTodasMagiasSemprePreparadas(char.classe, char.subclasse, char.nivel));
   migrarMagiasDominio();
   migrarMagiasSemprePreparadas();
+  // Antes de migrarSlotsMagiaLivre: o truque concedido pela subclasse conta
+  // no limite, e contá-lo depois ofereceria uma vaga livre a mais.
+  migrarTruquesFixosSubclasse();
+  // Mago nível 18/20: mantém as magias de Maestria de Magias e Assinatura
+  // Mágica sempre preparadas (e tira as que deixaram de ser escolhidas).
+  if (sincronizarMagiasFixasMago()) salvar();
   migrarSlotsMagiaLivre();
   migrarTruquesEspecie();
   migrarMagiasLegadoEspecie();
