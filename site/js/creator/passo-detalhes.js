@@ -210,7 +210,7 @@ export function renderStepDetalhes(el) {
           const atingiuLimite = personagem.idiomas.filter(i => !obrigatoriosIdiomasSet.has(i)).length >= regraIdiomas.maxAdicionais;
           return `
             <label class="form-check" style="min-width:160px;${ehObrigatorio ? 'opacity:0.6' : ''}">
-              <input type="checkbox" data-idioma="${idioma}" ${selecionado ? 'checked' : ''} ${ehObrigatorio ? 'disabled' : ''} ${(!ehObrigatorio && !selecionado && atingiuLimite) ? 'disabled' : ''}> ${idioma}
+              <input type="checkbox" data-idioma="${escHtml(idioma)}" ${selecionado ? 'checked' : ''} ${ehObrigatorio ? 'disabled' : ''} ${(!ehObrigatorio && !selecionado && atingiuLimite) ? 'disabled' : ''}> ${escHtml(idioma)}
             </label>`;
         }).join('')}
       </div>
@@ -234,9 +234,9 @@ export function renderStepDetalhes(el) {
           { valor: 'NM', label: 'Neutro e Mau' },
           { valor: 'CM', label: 'Caotico e Mau' }
         ].map(a => `
-          <div class="opcao-card ${personagem.alinhamento === a.valor ? 'selecionada' : ''}" data-alinhamento="${a.valor}" style="cursor:pointer;text-align:center;padding:8px 4px">
-            <div class="opcao-nome" style="font-size:0.8rem">${a.label}</div>
-            <div class="opcao-resumo" style="font-size:0.7rem;color:var(--text-muted)">${a.valor}</div>
+          <div class="opcao-card ${personagem.alinhamento === a.valor ? 'selecionada' : ''}" data-alinhamento="${escHtml(a.valor)}" style="cursor:pointer;text-align:center;padding:8px 4px">
+            <div class="opcao-nome" style="font-size:0.8rem">${escHtml(a.label)}</div>
+            <div class="opcao-resumo" style="font-size:0.7rem;color:var(--text-muted)">${escHtml(a.valor)}</div>
           </div>
         `).join('')}
       </div>
