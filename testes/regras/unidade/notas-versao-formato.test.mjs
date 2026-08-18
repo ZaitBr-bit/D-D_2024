@@ -45,6 +45,13 @@ test('toda versão tem os campos que o modal exibe', () => {
   for (const v of versao.NOTAS_VERSAO) {
     assert.ok(v.data, `versão ${v.versao} sem data`);
     assert.ok(v.resumo, `versão ${v.versao} sem resumo`);
+    // `rotulo` é o resumo de uma ou duas palavras que aparece no cabeçalho
+    // RECOLHIDO, no lugar onde a data ficava. É obrigatório: sem ele, a
+    // versão vira uma linha só com o número numa lista de dez, que é
+    // exatamente o problema que o campo veio resolver. `_versaoHtml` usa
+    // `v.rotulo || ''` para não quebrar o modal (mesma lição da 2.2.2), então
+    // a falta passaria despercebida na tela -- este assert é o que a pega.
+    assert.ok(v.rotulo, `versão ${v.versao} sem rotulo`);
     // melhorias/correcoes são OPCIONAIS -- mas pelo menos um dos dois
     // precisa existir, senão a versão não diz o que mudou.
     const grupos = [...(v.melhorias || []), ...(v.correcoes || [])];
@@ -53,5 +60,32 @@ test('toda versão tem os campos que o modal exibe', () => {
       assert.ok(g.grupo, `versão ${v.versao} tem grupo sem título`);
       assert.ok((g.itens || []).length > 0, `grupo "${g.grupo}" da ${v.versao} está vazio`);
     }
+  }
+});
+
+test('o rótulo de cada versão aparece no cabeçalho recolhido, e a data sai dele', () => {
+  for (const v of versao.NOTAS_VERSAO) {
+    const html = notasVersao.montarNotasVersaoHtml([v]);
+    const cabecalho = html.slice(html.indexOf('<summary'), html.indexOf('</summary>'));
+    assert.ok(cabecalho.includes(v.rotulo),
+      `o rótulo "${v.rotulo}" da versão ${v.versao} não apareceu no cabeçalho recolhido`);
+    assert.ok(!cabecalho.includes(v.data),
+      `a data ${v.data} continua no cabeçalho da versão ${v.versao} -- ela foi movida para dentro do corpo`);
+    assert.ok(html.includes(v.data),
+      `a data ${v.data} sumiu do modal da versão ${v.versao} -- ela sai do cabeçalho, não do card`);
+  }
+});
+
+test('rótulo é curto o bastante para caber ao lado do número', () => {
+  // Não é regra de estilo por capricho: o cabeçalho é um flex de uma linha
+  // com o selo "atual" à direita, e um rótulo longo empurra ou trunca. O
+  // teto de 3 palavras vem do pedido ("uma palavra, talvez duas") com uma
+  // folga; o de caracteres é o que a coluna comporta em 375px.
+  for (const v of versao.NOTAS_VERSAO) {
+    const palavras = v.rotulo.trim().split(/\s+/).length;
+    assert.ok(palavras <= 3,
+      `rotulo da versão ${v.versao} tem ${palavras} palavras ("${v.rotulo}") -- o cabeçalho comporta até 3`);
+    assert.ok(v.rotulo.length <= 28,
+      `rotulo da versão ${v.versao} tem ${v.rotulo.length} caracteres ("${v.rotulo}") -- o teto é 28`);
   }
 });

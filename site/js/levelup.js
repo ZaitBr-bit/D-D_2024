@@ -495,7 +495,13 @@ export function exigeAcademico(classe, nivel) {
 function extrairMagiasSemprePreparadasTabela(descricao, nivelAlvo) {
   if (!descricao || !nivelAlvo) return [];
   const texto = descricao.toLowerCase();
-  if (!texto.includes('sempre') || !texto.includes('preparad')) return [];
+  // A palavra "sempre" NAO e o invariante da concessao -- varias frases do
+  // livro concedem sem ela ("voce tem a lista de magias preparadas",
+  // Circulo da Lua/do Mar/Vigilante das Sombras), e outras a usam para
+  // qualificar a FREQUENCIA de uma escolha, nao a preparacao ("Sempre que
+  // completar um Descanso Longo, escolha um tipo de terreno"). O que
+  // realmente marca a concessao e "preparad" + nome de magia em italico.
+  if (!texto.includes('preparad')) return [];
 
   const nomes = new Set();
   const linhas = descricao.split('\n');
@@ -530,10 +536,16 @@ function extrairMagiasSemprePreparadasTabela(descricao, nivelAlvo) {
 function extrairMagiasSemprePreparadasTexto(descricao) {
   if (!descricao) return [];
   const texto = descricao.toLowerCase();
-  if (!texto.includes('sempre') || !texto.includes('preparad')) return [];
+  // Mesma razao da funcao irma acima: o invariante e "preparad", nao "sempre".
+  if (!texto.includes('preparad')) return [];
 
-  // Se a descricao contem uma tabela markdown, pular - a funcao de tabela cuida disso
-  if (/\|\s*\d+\s*\|/.test(descricao) || /\|\s*\*\d+\*\s*\|/.test(descricao)) return [];
+  // Se a descricao contem uma tabela DE NIVEL, pular -- a funcao de tabela
+  // cuida disso. A guarda anterior desistia diante de QUALQUER tabela
+  // markdown com numero na primeira coluna, e por isso engolia o Mapa
+  // Estelar (Circulo das Estrelas), cuja unica tabela e "1d6 | Formato do
+  // Mapa" -- aparencia do objeto, nada a ver com magia. O que distingue as
+  // duas e o cabecalho: tabela de nivel diz "Nivel" nele.
+  if (/\|[^|\n]*[Nn][íi]vel[^|\n]*\|/.test(descricao)) return [];
 
   // Extrair apenas de frases que contenham "sempre" + "preparad" + itálico juntos
   // Ex.: "Você sempre tem a magia *Destruição Divina* preparada."
@@ -542,7 +554,11 @@ function extrairMagiasSemprePreparadasTexto(descricao) {
   const frases = descricao.split(/(?:\.\s|\n\n|\*\*)/);
   for (const frase of frases) {
     const fl = frase.toLowerCase();
-    if (!fl.includes('sempre') || !fl.includes('preparad')) continue;
+    // A frase de concessao do Mapa Estelar (Classes.md:2493) comeca com
+    // "Enquanto estiver segurando o mapa, voce tem as magias *Orientacao* e
+    // *Raio Guia* preparadas" -- exigir "sempre" AQUI, na mesma frase,
+    // descartava a concessao inteira.
+    if (!fl.includes('preparad')) continue;
     // Extrair nomes em itálico dentro desta frase
     const regex = /\*([^*]+)\*/g;
     let match;
@@ -752,12 +768,28 @@ export async function obterMagiasDominioNivel(classe, subclasse, nivel) {
   const sc = classeData.subclasses.find(s => s.nome === subclasse);
   if (!sc || !sc.caracteristicas) return [];
   
-  // Encontrar a feature de magias de domínio (nível 3)
-  const magiasFeat = sc.caracteristicas.find(c => 
-    c.nivel === 3 && /^magias?\s+de/i.test((c.nome || '').trim())
+  // Encontrar a feature de magias de dominio (nivel 3). O livro usa
+  // "Magias DE Dominio" (Clerigo), mas tambem "Magias DO Circulo da Lua",
+  // "Magias DO Vigilante das Sombras", "Magias DA ..." -- o filtro antigo
+  // exigia "de" e por isso deixava essas de fora, com a rota inteira morta.
+  const magiasFeat = sc.caracteristicas.find(c =>
+    c.nivel === 3 && /^magias?\s+d[aeo]s?\s/i.test((c.nome || '').trim())
   );
   if (!magiasFeat) return [];
-  
+
+  // Uma caracteristica com MAIS DE UMA tabela de nivel oferece tabelas
+  // ALTERNATIVAS, e qual delas vale depende de uma escolha do jogador que
+  // esta funcao nao recebe -- Magias do Circulo da Terra tem quatro (uma por
+  // terreno: arido, polar, temperado, tropical) e o livro manda escolher UMA
+  // a cada Descanso Longo. Somar as quatro entregaria 12 magias no nivel 3
+  // onde o livro concede 3, misturando terrenos que o personagem nao
+  // escolheu. Enquanto a escolha de terreno nao for modelada, a resposta
+  // honesta e lista vazia, nao um palpite. Medido: das caracteristicas de
+  // nivel 3 cujo nome casa o filtro acima, so Circulo da Terra tem mais de
+  // uma tabela de nivel.
+  const tabelasDeNivel = (magiasFeat.descricao.match(/\|[^|\n]*[Nn][íi]vel[^|\n]*\|/g) || []).length;
+  if (tabelasDeNivel > 1) return [];
+
   // Parsear tabela markdown para extrair magias por nível
   // Formato: | 3 | *Magia1, Magia2, Magia3* |
   const linhas = magiasFeat.descricao.split('\n');
@@ -765,7 +797,12 @@ export async function obterMagiasDominioNivel(classe, subclasse, nivel) {
   
   for (const linha of linhas) {
     // Procurar linhas da tabela com nível e magias
-    const match = linha.match(/\|\s*(\d+)\s*\|\s*\*([^*]+)\*\s*\|/);
+    // O nivel pode vir em italico na tabela do livro ("| *3* | *Marca do
+    // Cacador, Perdicao* |", Magias do Juramento da Vinganca) -- a funcao
+    // irma extrairMagiasSemprePreparadasTabela (:510) ja tolerava os
+    // asteriscos; esta nao, e por isso essa unica trilha do Paladino ficava
+    // de fora da rota de dominio enquanto as outras tres entravam.
+    const match = linha.match(/\|\s*\**(\d+)\**\s*\|\s*\*([^*]+)\*\s*\|/);
     if (match) {
       const nivelMagia = parseInt(match[1]);
       if (nivelMagia === nivel) {

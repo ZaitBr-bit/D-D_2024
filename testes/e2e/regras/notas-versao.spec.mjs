@@ -274,3 +274,41 @@ test('em 375px de largura, o header não transborda e os botões não se sobrep�
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
+
+// ------------------------------------------------------------------------
+// Ajuste pedido pelo usuário depois de ver a lista pronta (2026-08-18): no
+// cabeçalho RECOLHIDO, a data ao lado do número virou um resumo de uma ou
+// duas palavras. Numa lista de dez versões, dez datas quase iguais não
+// ajudam a achar nada; o rótulo diz o que aquela versão mudou. A data não
+// foi perdida -- saiu do cabeçalho e ficou dentro do card aberto.
+// ------------------------------------------------------------------------
+
+test('modal de notas de versão: o cabeçalho recolhido mostra o rótulo, não a data', async ({ context }) => {
+  const { page, erros } = await abrirSite(context);
+
+  await page.locator('#btn-notas-versao').click();
+  await page.waitForSelector('#modal-overlay', { state: 'visible' });
+
+  // Um rótulo por versão, e cada um com o texto que versao.js declara --
+  // derivado de NOTAS_VERSAO, nunca escrito à mão aqui.
+  const rotulos = page.locator('.nv-versao-rotulo');
+  await expect(rotulos, 'deveria existir um rótulo por entrada de NOTAS_VERSAO')
+    .toHaveCount(NOTAS_VERSAO.length);
+  await expect(rotulos).toHaveText(NOTAS_VERSAO.map((v) => v.rotulo));
+
+  // A data saiu do cabeçalho: nenhum <summary> pode conter uma data.
+  const cabecalhos = await page.locator('summary.nv-versao-cabecalho').allTextContents();
+  for (const v of NOTAS_VERSAO) {
+    expect(cabecalhos.some((t) => t.includes(v.data)),
+      `a data ${v.data} ainda aparece no cabeçalho recolhido -- ela deveria ter ido para dentro do card`)
+      .toBe(false);
+  }
+
+  // ...mas continua no card, para quem quiser saber quando a versão saiu.
+  const datas = await page.locator('.nv-data').allTextContents();
+  for (const v of NOTAS_VERSAO) {
+    expect(datas, `a data ${v.data} sumiu do card da versão ${v.versao}`).toContain(v.data);
+  }
+
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});

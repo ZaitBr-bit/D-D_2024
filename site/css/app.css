@@ -2167,7 +2167,14 @@ tr:hover td { background: #faf8f4; }
 }
 .nv-versao-cabecalho::-webkit-details-marker { display: none; }
 .nv-versao-numero { color: var(--primary); font-size: 1rem; }
-.nv-versao-data { color: var(--text-light); font-size: 0.8rem; font-weight: 400; }
+/* Resumo de uma ou duas palavras no cabecalho recolhido -- substituiu a
+   data, que so aparecia como ruido numa lista de dez versoes. A data
+   continua visivel, dentro da versao aberta (.nv-data). */
+.nv-versao-rotulo {
+  color: var(--text-muted); font-size: 0.85rem; font-weight: 400;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+}
+.nv-data { color: var(--text-light); font-size: 0.75rem; font-weight: 400; margin: 6px 0 0; }
 .nv-marcador {
   margin-left: auto; font-size: 0.75rem; font-weight: 700;
   color: var(--primary); background: var(--bg-input);

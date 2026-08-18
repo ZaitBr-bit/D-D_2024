@@ -1154,6 +1154,75 @@ Níveis já tinha anotado como dependência direta desta rodada:
 
 ## Achados do domínio Subclasses / Magias (2026-08-17)
 
+✅ **Duas das três causas corrigidas em 2026-08-18** (Plano 2 da rodada de
+correção, `docs/superpowers/plans/2026-08-18-correcao-2-magias-subclasse.md`).
+A Causa 1 (Círculo da Lua, Círculo do Mar, Vigilante das Sombras) e a Causa 3
+(Círculo das Estrelas) fecharam com as **mesmas** mudanças em
+`site/js/levelup.js` — três guardas que exigiam a palavra "sempre" passaram a
+exigir só o invariante real da concessão (`preparad` + nome em itálico), e a
+guarda que desistia diante de qualquer tabela markdown virou um discriminador de
+tabela **de nível** (cabeçalho que diz "Nível"), o que deixa passar a tabela
+"1d6 | Formato do Mapa" do Mapa Estelar. Uma quarta mudança, no filtro de nome
+da rota de domínio (`de` → `de/do/da/dos/das`), reanima a rota que alimenta o
+card da tela de subida de nível — sem ela a lacuna fecharia sem o jogador ver
+diferença nenhuma, porque `magiasSempreNivel` não alimenta card algum
+(`levelup-ui.js:1241-1245` é seu único consumidor em toda `site/js/`).
+
+**A Causa 3 não precisava de trabalho próprio.** O spec de desenho a tratava como
+separada, com três bloqueios distintos; medido contra os dados reais, os três
+caem com as mudanças da Causa 1. É o oposto do erro que este domínio já cometeu
+duas vezes (declarar causa compartilhada onde havia duas) — aqui a leitura
+pessimista é que estava errada, e só rodar o app mostrou.
+
+**Medição da regressão, feita ANTES do conserto:** varredura da união dos dois
+acessores nas 48 subclasses × 20 níveis, com a mudança aplicada em caráter
+experimental e revertida em seguida — **+14 linhas de concessão, 0 removidas,
+0 alteradas**. As 14 são exatamente as quatro subclasses do alvo, com os números
+do livro (Lua 3/1/1/1, Mar 5/2/2/2, Vigilante 1/1/1/1/1, Estrelas 2).
+
+**Achado extra, fora do que o plano previa:** reanimar a rota de domínio revelou
+que `Juramento da Vingança` continuava de fora enquanto as outras três trilhas do
+Paladino entravam. A tabela dele escreve o nível em itálico (`| *3* | *Marca do
+Caçador, Perdição* |`) e o parser de domínio (`levelup.js:800`) exigia dígito
+puro — enquanto a função irmã `extrairMagiasSemprePreparadasTabela` (`:510`) já
+tolerava os asteriscos havia tempo. As duas foram alinhadas. A união de magias
+não muda (Vingança já recebia pela rota "sempre"); o que muda é o card da tela,
+que deixa de tratar uma das quatro trilhas diferente das outras.
+
+**Limite que o conserto NÃO remove, medido e registrado:** no **nível 3** o card
+"Magias de Domínio — Automáticas" continua vazio para as quatro subclasses,
+porque `levelup-flow.js:198` calcula `magiasDominioNivel` a partir de
+`char.subclasse` — a subclasse **já salva** —, e no nível 3 ela está sendo
+escolhida naquela mesma sessão. Mesma família da Conjuração do Cavaleiro Místico
+(contexto reativo à escolha da sessão). A ficha grava certo nos dois casos; o
+card só aparece dos níveis de concessão seguintes em diante.
+
+**A Causa 2 (Círculo da Terra) continua aberta**, e é do Plano 4: o app soma as
+quatro tabelas de terreno porque nunca pergunta qual o jogador escolheu. A rota
+de domínio foi ensinada a **recusar** uma característica com mais de uma tabela
+de nível, em vez de somar — sem isso, o conserto do filtro de nome teria feito a
+tela de nível passar a mostrar 9 magias de terrenos misturados onde antes
+mostrava nada. Medido: das características de nível 3 que casam o filtro, só
+Círculo da Terra tem mais de uma tabela de nível (4, uma por terreno).
+
+### O spec de navegador: `subclasse-magias-levelup.spec.mjs`
+
+Dois testes (`../e2e/regras/subclasse-magias-levelup.spec.mjs`), acrescentados
+junto com o conserto acima. Sobem um Druida já de Círculo da Lua do nível **4
+para o 5** e afirmam as duas pontas: o card "Magias de Domínio — Automáticas"
+aparece na tela listando *Invocar Animais*, e a magia fica gravada em
+`magias_preparadas` do personagem salvo.
+
+O nível escolhido não é acidente — é o limite declarado acima. Do 2 para o 3 o
+card ficaria vazio mesmo com o conserto, porque a subclasse ainda não está em
+`char.subclasse` quando `levelup-flow.js:198` monta o contexto. Um spec escrito
+naquele nível falharia por um motivo que nada tem a ver com o que o Plano 2
+consertou, e seria lido como conserto incompleto.
+
+**Prova de reversão feita:** com `site/js/levelup.js` revertido, os dois testes
+falham (`toBeVisible()` do card, e a ausência da magia na ficha); com o conserto,
+passam. O spec não nasceu verde.
+
 Plano 2 do mesmo domínio — o Plano 1, acima, cobriu só nível e nome das 241
 características; nenhuma magia. Este motor (`subclasses-magias.test.mjs`)
 confronta as magias que cada subclasse concede de verdade ao personagem.

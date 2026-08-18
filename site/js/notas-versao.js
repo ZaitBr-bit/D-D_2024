@@ -39,9 +39,10 @@ function _versaoHtml(v) {
     <details class="nv-versao${ehAtual ? ' nv-versao-atual' : ''}" ${ehAtual ? 'open' : ''}>
       <summary class="nv-versao-cabecalho">
         <span class="nv-versao-numero">${escHtml(v.versao)}</span>
-        <span class="nv-versao-data">${escHtml(v.data)}</span>
+        <span class="nv-versao-rotulo">${escHtml(v.rotulo || '')}</span>
         ${marcador}
       </summary>
+      <p class="nv-data">${escHtml(v.data)}</p>
       <p class="nv-resumo">${escHtml(v.resumo)}</p>
       ${secoes}
     </details>`;

@@ -13,7 +13,7 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.5';
+export const VERSAO_ATUAL = '2.2.6';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
@@ -21,8 +21,32 @@ export const VERSAO_ATUAL = '2.2.5';
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
   {
+    versao: '2.2.6',
+    data: '2026-08-18',
+    rotulo: 'Magias de subclasse',
+    resumo: 'Quatro subclasses que nunca recebiam as magias concedidas pelo '
+      + 'livro passaram a recebê-las.',
+    correcoes: [
+      {
+        grupo: '🌙 Magias que a subclasse concede',
+        itens: [
+          'Um Druida de Círculo da Lua, do Mar ou das Estrelas, e um Guardião '
+            + 'Vigilante das Sombras, nunca recebiam as magias que a própria '
+            + 'subclasse concede — chegavam ao nível 20 sem nenhuma delas.',
+          'Agora as magias entram na ficha no nível certo: o Círculo da Lua '
+            + 'recebe Curar Ferimentos, Fagulha Estelar e Raio Lunar já no '
+            + 'nível 3, e assim por diante em cada nível de concessão.',
+          'O Paladino de Juramento da Vingança era a única das quatro trilhas '
+            + 'que não listava as magias do juramento no resumo da subida de '
+            + 'nível; agora aparece como as outras três.',
+        ],
+      },
+    ],
+  },
+  {
     versao: '2.2.5',
     data: '2026-08-18',
+    rotulo: 'Descanso do Paladino',
     resumo: 'O Paladino volta a recuperar os recursos da sua subclasse no '
       + 'descanso — três das quatro trilhas de Juramento nunca recuperavam.',
     correcoes: [
@@ -46,6 +70,7 @@ export const NOTAS_VERSAO = [
   {
     versao: '2.2.4',
     data: '2026-08-18',
+    rotulo: 'Relatar problemas',
     resumo: 'Relato de problemas agora pelo GitHub, e fichas recebidas de '
       + 'outras pessoas passaram a ser tratadas com segurança.',
     melhorias: [
@@ -93,6 +118,7 @@ export const NOTAS_VERSAO = [
   {
     versao: '2.2.3',
     data: '2026-08-17',
+    rotulo: 'Foto no PDF',
     resumo: 'A foto do personagem no PDF e na impressão, e os recursos do '
       + 'Mago à vista na ficha.',
     melhorias: [
@@ -125,6 +151,7 @@ export const NOTAS_VERSAO = [
   {
     versao: '2.2.2',
     data: '2026-08-17',
+    rotulo: 'Mago e Bárbaro',
     resumo: 'Correções da 2.2.1: as duas assinaturas mágicas do Mago, e a '
       + 'reserva de d12 do Bárbaro Fanático voltando no Descanso Longo.',
     correcoes: [
@@ -146,6 +173,7 @@ export const NOTAS_VERSAO = [
   {
     versao: '2.2.1',
     data: '2026-08-16',
+    rotulo: 'Subclasses conjuradoras',
     resumo: 'O Trapaceiro Arcano e o Cavaleiro Místico finalmente recebem '
       + 'magias e espaços ao chegar no nível 3.',
     melhorias: [
@@ -209,6 +237,7 @@ export const NOTAS_VERSAO = [
   {
     versao: '2.2.0',
     data: '2026-08-14',
+    rotulo: 'Seletor de itens',
     resumo: 'A tela de adicionar item ficou igual na criação e na ficha — e as '
       + 'duas ganharam o que só uma tinha.',
     melhorias: [
@@ -258,6 +287,7 @@ export const NOTAS_VERSAO = [
   {
     versao: '2.1.1',
     data: '2026-08-13',
+    rotulo: 'Talentos na ficha',
     resumo: 'Talento adicionado pelo "+ Talento" passa a valer na hora, e '
       + 'conjuradores podem trocar truque e magia em mais situações.',
     melhorias: [
@@ -306,6 +336,7 @@ export const NOTAS_VERSAO = [
   {
     versao: '2.1.0',
     data: '2026-08-13',
+    rotulo: 'Cards de escolha',
     resumo: 'Todas as escolhas viraram cards: dá para ler o que cada opção faz '
       + 'antes de escolher.',
     melhorias: [
@@ -340,6 +371,7 @@ export const NOTAS_VERSAO = [
   {
     versao: '2.0.1',
     data: '2026-08-12',
+    rotulo: 'Perícias na criação',
     resumo: 'Corrige a criação de personagem quando a classe e o antecedente '
       + 'disputam as mesmas perícias.',
     melhorias: [],
@@ -373,6 +405,7 @@ export const NOTAS_VERSAO = [
   {
     versao: '2.0.0',
     data: '2026-08-08',
+    rotulo: 'Primeira versão',
     resumo: 'Primeira versão com numeração própria. Reúne tudo que mudou desde '
       + 'a reorganização interna do site.',
     melhorias: [

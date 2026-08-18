@@ -700,53 +700,41 @@ export const LACUNAS = [
   // Causa 1 (3 subclasses: Círculo da Lua, Círculo do Mar, Vigilante das
   // Sombras) -- rota "parser + escada de nível". Círculo das Estrelas NÃO
   // está aqui (ver Causa 3, mais abaixo, e o comentário de CORREÇÃO acima).
-  { talento: 'Círculo da Lua', teste: 'subclasses-magias',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'Causa 1 de 3 desta rodada -- três subclasses de magia sempre preparada que o app não ' +
-      'concede nenhuma. Raiz: extrairMagiasSemprePreparadasTabela (site/js/levelup.js:495-524) e ' +
-      'extrairMagiasSemprePreparadasTexto (levelup.js:530-560) só processam a descrição da ' +
-      'característica se `texto.includes(\'sempre\') && texto.includes(\'preparad\')` (levelup.js:498 e ' +
-      ':533) -- nenhuma das três frases de concessão do livro usa a palavra "sempre" (dizem só "...você ' +
-      'tem a lista de magias preparadas", sem "sempre" antes), então a guarda barra a extração INTEIRA ' +
-      '(tabela) antes mesmo de tentar ler os nomes em itálico -- confirmado rodando ' +
-      'obterMagiasSemprePreparadasNivel de verdade: devolve [] para as três em todo nível de concessão. ' +
-      'As três TAMBÉM não passam por obterMagiasDominioNivel (levelup.js:746-788): o filtro de nome ' +
-      '`/^magias?\\s+de/i` (levelup.js:757) exige "de" logo após "magia(s)", mas as três características ' +
-      'se chamam "Magias DO Círculo da Lua"/"...DO Círculo do Mar"/"...DO Vigilante das Sombras" -- "do" ' +
-      'não casa com o regex; confirmado rodando obterMagiasDominioNivel de verdade: também devolve [] ' +
-      'para as três. As DUAS rotas mortas ao mesmo tempo, pela mesma frase do livro, é o que faz das três ' +
-      'UMA causa: afrouxar só a guarda "sempre" (levelup.js:498/:533) já basta -- a rota de domínio pode ' +
-      'continuar quebrada, porque o motor confronta a UNIÃO das duas rotas, não uma específica. Por ' +
-      'subclasse, o que o livro concede (lido em Classes.md) contra o que o app entrega (medido chamando ' +
-      'obterMagiasDominioNivel+obterMagiasSemprePreparadasNivel de verdade, nível a nível, script ad hoc ' +
-      'sobre o app real): Círculo da Lua (Druida), Classes.md:2355-2368 ("Ao atingir um nível de Druida ' +
-      'detalhado na tabela Magias do Círculo da Lua, você tem a lista de magias preparadas", tabela em ' +
-      ':2361-2368, as quatro linhas de nível) -- nv3 Curar Ferimentos/Fagulha Estelar/Raio Lunar, nv5 ' +
-      'Invocar Animais, nv7 Fonte do Luar, nv9 Curar Ferimentos em Massa; app entrega [] nos quatro ' +
-      'níveis (dados/classes/druida.json transcreve a tabela do livro corretamente -- a divergência é só ' +
-      'na LEITURA do app, não na transcrição). Círculo do Mar (Druida), Classes.md:2540-2551 (mesma frase ' +
-      'de abertura, "Magias do Círculo do Mar") -- nv3 Despedaçar/Lufada de Vento/Névoa Obscurecente/ ' +
-      'Onda Trovejante/Raio de Gelo, nv5 Relâmpago/Respirar na Água, nv7 Controlar Água/Tempestade ' +
-      'Glacial, nv9 Invocar Elemental/Paralisar Monstro; app entrega [] nos quatro níveis. Vigilante das ' +
-      'Sombras (Guardião), Classes.md:3712-3724 ("Magias do Vigilante das Sombras") -- nv3 Disfarçar-se, ' +
-      'nv5 Corda Extradimensional, nv9 Medo, nv13 Invisibilidade Maior, nv17 Similaridade; app entrega [] ' +
-      'nos cinco níveis. Consequência medida hoje, e o que mudaria só com o conserto da guarda (grep em ' +
-      'site/js/ inteiro por obterMagiasDominioNivel/obterMagiasSemprePreparadasNivel -- três ' +
-      'consumidores, não um: dois cobertos aqui, o terceiro em \'subclasses-magias-ficha\'): (1) na TELA ' +
-      'de subida de nível, nada muda mesmo com o conserto -- o único card que renderiza magia lá é ' +
-      '"Magias de Domínio — Automáticas" (site/js/levelup-cards.js:77-90), alimentado por ' +
-      'magiasDominioNivel (levelup-flow.js:198-200), que continua vazio para as três por um bug ' +
-      'INDEPENDENTE (o regex de nome "de"/"do" citado acima, que o conserto da guarda não toca); ' +
-      'magiasSempreNivel (levelup-flow.js:201-203 -- a variável que o conserto da guarda tornaria ' +
-      'não-vazia) NUNCA alimenta card nenhum: seu único consumidor em toda site/js/ é o Set de ' +
-      'deduplicação em levelup-ui.js:1241-1245 (confirmado por grep, não há outro). (2) subirDeNivel ' +
-      '(levelup.js:1303-1313, o bloco que grava a rota "sempre"; o bloco irmão de domínio, :1291-1297, ' +
-      'permanece morto por causa do bug independente do regex "de"/"do") hoje não grava nenhuma dessas ' +
-      'magias em personagem.magias_preparadas/magias_conhecidas -- confirmado dirigindo escadaDeNivel de ' +
-      'verdade e contando por origem: um personagem real, subido do nível 1 ao 20 com qualquer uma das ' +
-      'três subclasses, termina sem nenhuma delas, permanentemente. Depois do conserto da guarda, o ' +
-      'efeito visível apareceria só na FICHA salva (via subirDeNivel gravando com origem \'sempre\'), ' +
-      'nunca na tela de subida de nível.' },
+  // Círculo da Lua (Causa 1) e Círculo das Estrelas (Causa 3) -- CORRIGIDAS em
+  // 2026-08-18 (Plano 2 da rodada de correção), nas duas rotas
+  // ('subclasses-magias' e 'subclasses-magias-ficha'). A Causa 1 afetava três
+  // subclasses sob a chave representativa 'Círculo da Lua' (ela mesma, Círculo
+  // do Mar e Vigilante das Sombras): as duas rotas de concessão estavam mortas
+  // pela mesma frase do livro. Cinco pontos de site/js/levelup.js mudaram:
+  //   :498 e :533  exigiam a palavra "sempre" no texto -- o invariante real da
+  //                concessão é "preparad" + nome de magia em itálico; "sempre"
+  //                nem sempre aparece ("você tem a lista de magias preparadas")
+  //                e, quando aparece, às vezes qualifica a FREQUÊNCIA de uma
+  //                escolha, não a preparação ("Sempre que completar um Descanso
+  //                Longo, escolha um tipo de terreno").
+  //   :536         desistia diante de QUALQUER tabela markdown com número na
+  //                primeira coluna -- virou discriminador de tabela DE NÍVEL
+  //                (cabeçalho que diz "Nível"), o que deixa passar a tabela
+  //                "1d6 | Formato do Mapa" do Mapa Estelar, que é aparência do
+  //                objeto, não concessão de magia.
+  //   :545         exigia "sempre" na MESMA FRASE da concessão -- a frase do
+  //                Mapa Estelar começa com "Enquanto estiver segurando o mapa".
+  //   :757         exigia "magias DE" no nome da característica -- passou a
+  //                aceitar de/do/da/dos/das, o que reanima a rota de DOMÍNIO
+  //                (a única que alimenta o card da tela de subida de nível).
+  //
+  // A Causa 3 (Círculo das Estrelas) era dada como trabalho separado no spec de
+  // desenho; medido, ela fecha com as MESMAS mudanças -- ver o registro no
+  // README. Medição da regressão, feita ANTES do conserto: varredura das 48
+  // subclasses × 20 níveis, +14 linhas de concessão, 0 removidas, 0 alteradas.
+  // Sem lacuna remanescente nessas duas chaves para estas subclasses.
+  //
+  // Círculo da Terra (Causa 2) CONTINUA aberto nas duas chaves, logo abaixo: o
+  // app soma as quatro tabelas de terreno porque nunca pergunta qual o jogador
+  // escolheu, e essa escolha é do Plano 4. A rota de domínio foi ensinada a
+  // RECUSAR uma característica com mais de uma tabela de nível, em vez de somar
+  // -- sem isso, o conserto de :757 teria feito a tela de nível passar a mostrar
+  // 9 magias de terrenos misturados, onde antes mostrava nada.
   { talento: 'Círculo da Terra', teste: 'subclasses-magias',
     tipo: 'app-diverge-do-livro',
     motivo: 'Causa 2 de 3 desta rodada -- CORRIGIDO nesta revisão (a versão anterior deste motivo ' +
@@ -805,77 +793,11 @@ export const LACUNAS = [
   // conserto da Causa 1 (afrouxar a guarda "sempre") contra os dados reais
   // mostra que Estrelas continua devolvendo [] -- três bloqueios próprios,
   // nenhum deles resolvido pelo fix da Causa 1.
-  { talento: 'Círculo das Estrelas', teste: 'subclasses-magias',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'Causa 3 de 3 desta rodada -- Círculo das Estrelas (Druida) NÃO compartilha a Causa 1, ' +
-      'apesar do sintoma idêntico (app entrega [] onde o livro concede magia). Confirmado simulando o ' +
-      'conserto que a Causa 1 prescreve (ler o código com a guarda de levelup.js:498/:533 mentalmente ' +
-      'afrouxada, e testar cada bloqueio contra a descrição real da característica, ' +
-      'dados/classes/druida.json): (1) extrairMagiasSemprePreparadasTexto desiste ANTES de extrair nomes ' +
-      '-- levelup.js:536, `if (/\\|\\s*\\d+\\s*\\|/.test(descricao) ...) return [];` -- porque a ' +
-      'descrição de "Mapa Estelar" contém uma tabela markdown (a tabela "1d6 | Formato do Mapa" que ' +
-      'descreve a aparência física do mapa, nada a ver com magia); confirmado rodando o regex de verdade ' +
-      'contra a descrição real: bate positivo. (2) mesmo com a guarda de :533 afrouxada, a guarda POR ' +
-      'FRASE em levelup.js:545 (`if (!fl.includes(\'sempre\') || !fl.includes(\'preparad\')) continue;`, ' +
-      'dentro do laço de frases) continua exigindo "sempre" NA MESMA FRASE que "preparad" -- e a frase ' +
-      'de concessão, Classes.md:2493 ("Enquanto estiver segurando o mapa, você tem as magias Orientação ' +
-      'e Raio Guia preparadas..."), não tem a palavra "sempre" em lugar nenhum dela (confirmado lendo o ' +
-      'texto: "Enquanto" no lugar de "Sempre"). (3) SE alguém também afrouxasse a guarda de :498 ' +
-      '(extrairMagiasSemprePreparadasTabela) para tentar cobrir Estrelas pela via de tabela, o resultado ' +
-      'seria PIOR: a função passaria a ler a tabela "1d6 | Formato do Mapa" como se os resultados do dado ' +
-      '(1-6) fossem níveis de Druida -- para nível 3 pedido, a linha `| 3 | Uma pele de urso-coruja ' +
-      'trabalhada com símbolos estelares |` bateria no regex de linha (levelup.js:504) e essa frase ' +
-      'viraria um "nome de magia" candidato; hoje esse lixo já é descartado em silêncio por não existir ' +
-      'no índice de magias (levelup.js:629-634, `idx.find(x => x.nome === nome)` devolve undefined -> ' +
-      'null -> filtrado) -- não é um bug ativo hoje, mas é um AVISO para quem for consertar a Causa 1: um ' +
-      'conserto ingênuo que só remova "sempre" da guarda de tabela, sem também impedir a leitura de ' +
-      'tabelas de formato/aparência como se fossem tabelas de nível, criaria uma categoria nova de lixo ' +
-      'silencioso. Livro: Classes.md:2489-2493, "Mapa Estelar" (NÃO é uma tabela "Magias de/do X" -- é ' +
-      'prosa, então obterMagiasDominioNivel nem tenta): "Enquanto estiver segurando o mapa, você tem as ' +
-      'magias Orientação e Raio Guia preparadas..." -- concessão CONDICIONADA a segurar o objeto que a ' +
-      'própria característica cria no nível 3 (e permite recriar via cerimônia de 1 hora se perdido); ' +
-      'tratá-la como efetivamente permanente a partir do nível 3 é uma leitura defensável, mas a condição ' +
-      'existe e este motivo não a omite. App entrega [] no nível 3 (único nível de concessão) -- ' +
-      'confirmado rodando obterMagiasSemprePreparadasNivel(\'Druida\',\'Círculo das Estrelas\',3) de ' +
-      'verdade. Consequência medida: mesma ausência de card estrutural da Causa 1 (magiasSempreNivel ' +
-      'nunca alimenta card nenhum na tela de subida de nível, ver levelup-ui.js:1241-1245); a ficha salva ' +
-      'de um Druida de Círculo das Estrelas de nível 3+ nunca ganha Orientação nem Raio Guia, em ' +
-      'personagem.magias_preparadas nem personagem.magias_conhecidas -- confirmado dirigindo ' +
-      'escadaDeNivel de verdade.' },
 
   // As três causas, vistas pela rota separada dos acessores que a FICHA
   // salva usa (site/js/pages/sheet.js:48-49), não pela subida de nível em
   // si -- por isso 'subclasses-magias-ficha', não 'subclasses-magias' (ver
   // comentário de TESTES_VALIDOS acima).
-  { talento: 'Círculo da Lua', teste: 'subclasses-magias-ficha',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'Mesma Causa 1 (ver a entrada \'subclasses-magias\' acima para a citação completa, por ' +
-      'subclasse, do livro e do app) -- vista pela rota que a FICHA usa depois de salva. ' +
-      'site/js/pages/sheet.js:48-49 monta a ficha chamando obterTodasMagiasDominio(classe, subclasse, ' +
-      'nivel) (levelup.js:797-807) e obterTodasMagiasSemprePreparadas(classe, subclasse, nivel) ' +
-      '(levelup.js:640-647) -- as duas, por dentro, chamam os MESMOS obterMagiasDominioNivel/ ' +
-      'obterMagiasSemprePreparadasNivel bloqueados pela guarda "sempre" (levelup.js:498, :533) e pelo ' +
-      'regex de nome (levelup.js:757) descritos na entrada acima -- confirmado rodando as duas de ' +
-      'verdade para as três subclasses no nível 20: as duas devolvem [] (0 itens). Consequência medida: ' +
-      'um Druida de Círculo da Lua/Mar ou um Guardião Vigilante das Sombras, em qualquer nível igual ou ' +
-      'maior ao de concessão (3, e também 5/7/9 para Lua/Mar, e também 5/9/13/17 para Vigilante), abre a ' +
-      'ficha salva e a aba de "Magias" não lista nenhuma dessas magias -- nem sob o rótulo "Domínio" nem ' +
-      'sob "Sempre Preparada" (rotuloOrigemMagia, site/js/sheet/magias.js:36-39, chamado nos pontos de ' +
-      'render em magias.js:574 e :632, sheet/grimorio.js:127 e sheet/impressao.js:624/687 -- confirmado ' +
-      'por grep que estes são os consumidores reais do rótulo).' },
-  { talento: 'Círculo das Estrelas', teste: 'subclasses-magias-ficha',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'Mesma Causa 3 (ver a entrada própria de Círculo das Estrelas em \'subclasses-magias\' ' +
-      'acima para a citação completa dos três bloqueios) -- vista pela rota dos acessores da ficha. ' +
-      'site/js/pages/sheet.js:48-49 chama obterTodasMagiasDominio (levelup.js:797-807, não se aplica ' +
-      'aqui -- Mapa Estelar não é uma tabela "Magias de/do X") e ' +
-      'obterTodasMagiasSemprePreparadas(classe, \'Círculo das Estrelas\', nivel) (levelup.js:640-647), ' +
-      'que varre 1..nivelAtual chamando obterMagiasSemprePreparadasNivel a cada nível -- bloqueada pelos ' +
-      'três mecanismos descritos na entrada \'subclasses-magias\' (tabela de formato do mapa embutida, ' +
-      'guarda por frase, e o risco de lixo se a guarda de tabela for afrouxada sem cuidado). Confirmado ' +
-      'rodando de verdade: obterTodasMagiasSemprePreparadas(\'Druida\',\'Círculo das Estrelas\',20) não ' +
-      'inclui Orientação nem Raio Guia. Consequência: a ficha de um Druida de Círculo das Estrelas de ' +
-      'nível 3+ nunca mostra as duas magias na aba "Magias", em nenhum rótulo de origem.' },
   { talento: 'Círculo da Terra', teste: 'subclasses-magias-ficha',
     tipo: 'app-diverge-do-livro',
     motivo: 'Mesma Causa 2 (ver a entrada acima -- CORRIGIDA nesta revisão), vista pela rota dos ' +
