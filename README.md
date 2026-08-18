@@ -219,7 +219,7 @@ D-D_2024/
 ├── testes/
 │   ├── e2e/                 # Playwright: paridade + specs de regra em regras/
 │   └── regras/              # regras de negócio confrontadas com o livro
-├── scripts/                 # verificar_extracao.py, baseline/, excecoes/
+├── scripts/                 # verificar_extracao.py, excecoes/
 └── docs/
     ├── ARQUITETURA.md       # aprofundamento técnico
     └── DEPLOY.md            # pipeline de publicação e diagnóstico
@@ -251,7 +251,7 @@ Três verificações independentes, que respondem perguntas diferentes:
 
 | Verificação | Comando | Pergunta que responde |
 |---|---|---|
-| Estrutura dos módulos | `python scripts/verificar_extracao.py tudo` | "os módulos ainda batem com o baseline?" — estático, sem navegador |
+| Estrutura dos módulos | `python scripts/verificar_extracao.py tudo` | "algum módulo tem símbolo sem import, import quebrado, declaração duplicada ou gravação em binding importado?" — estático, sem navegador |
 | Regras de negócio | `cd testes/e2e && npm run test:regras` | "o app obedece ao **livro**?" |
 | Paridade E2E | `cd testes/e2e && npm test` | "a tela é a mesma do repositório original?" — Playwright |
 

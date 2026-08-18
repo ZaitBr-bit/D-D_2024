@@ -308,6 +308,27 @@ def resolver_import_original(spec, arquivo_atual, coordenador):
     return caminho_relativo_entre(arquivo_atual, alvo)
 
 
+def exporta(texto, nome):
+    """Confere se `texto` exporta `nome`, nas duas formas que o projeto usa.
+
+    A primeira e a declaracao direta (`export function x`, `export const x`).
+    A segunda e a LISTA (`export { x };`), usada quando o modulo reexporta um
+    binding que ele mesmo importou -- o caso de `sheet/inventario.js`, que
+    reexporta `carregarDadosEquipSheet` vindo de `itens-seletor.js` para nao
+    quebrar quem ja importava dali. Sem esta segunda forma o verificador
+    acusava import quebrado num import que funciona, e o aviso ficou
+    escondido enquanto o baseline enchia a saida com 79 problemas.
+    """
+    if re.search(r'^export\s+(?:async\s+)?(?:function|const|let|var)\s+'
+                 + re.escape(nome) + r'\b', texto, re.M):
+        return True
+    for lista in re.findall(r'^export\s*\{([^}]*)\}\s*;', texto, re.M):
+        for parte in lista.split(','):
+            if parte.split(' as ')[-1].strip() == nome:
+                return True
+    return False
+
+
 def verificar(alvo):
     """Roda todas as checagens do alvo. Devolve a lista de erros."""
     cfg = ALVOS[alvo]
@@ -441,8 +462,7 @@ def verificar(alvo):
         faltando = []
         texto = ler(os.path.join(RAIZ, arquivo))
         for nome in sorted(nomes):
-            if not re.search(r'^export\s+(?:async\s+)?(?:function|const|let|var)\s+'
-                             + re.escape(nome) + r'\b', texto, re.M):
+            if not exporta(texto, nome):
                 faltando.append(nome)
         if faltando:
             avisos.append('%s precisa exportar: %s' % (arquivo, ', '.join(faltando)))
@@ -472,9 +492,7 @@ def verificar(alvo):
                 if not parte:
                     continue
                 origem_nome = parte.split(' as ')[0].strip()
-                padrao = (r'^export\s+(?:async\s+)?(?:function|const|let|var)\s+'
-                          + re.escape(origem_nome) + r'\b')
-                if not re.search(padrao, texto_destino, re.M):
+                if not exporta(texto_destino, origem_nome):
                     quebrados += 1
                     erros.append('%s importa `%s` de `%s`, que nao o exporta'
                                  % (rel(caminho), origem_nome, spec))

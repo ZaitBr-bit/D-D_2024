@@ -292,8 +292,14 @@ negócio, que por isso não roda inteira sem eles.
 python scripts/verificar_extracao.py tudo
 ```
 
-Compara cada declaração contra `scripts/baseline/` e confere presença,
-integridade byte a byte, duplicação, símbolos sem import, imports quebrados e
-gravação em binding importado. Divergências aceitas ficam em
-`scripts/excecoes/`. Desenho completo na spec da quebra dos monólitos
-(`docs/superpowers/specs/2026-08-05-quebra-monolitos-design.md`, local).
+Confere declaração duplicada, símbolo usado sem import, import que aponta
+para um nome que o módulo de destino não exporta, e gravação em binding
+importado — esta última é erro de sintaxe em módulo ES, e derruba o arquivo
+inteiro. Divergências aceitas ficam em `scripts/excecoes/`.
+
+Até 2026-08-18 ele também comparava cada declaração, byte a byte, contra os
+monólitos pré-refatoração guardados em `scripts/baseline/`. Essa comparação
+foi aposentada: a refatoração que ela guardava terminou, e desde a v2.2.0 o
+código legitimamente divergiu do baseline — a checagem acusava 79 problemas
+que eram todos evolução esperada. Verificador permanentemente vermelho não
+verifica nada, só ensina a ignorar. Os arquivos continuam no histórico.
