@@ -579,7 +579,7 @@ export function setupEventosDescanso() {
         );
       }
       // Devoção: desativar efeitos temporários (duração expirada)
-      if (estado && char.subclasse === 'Juramento de Devoção' && char.recursos.paladino.subclasses?.devocao) {
+      if (estado && char.subclasse === 'Juramento da Devoção' && char.recursos.paladino.subclasses?.devocao) {
         char.recursos.paladino.subclasses.devocao.arma_sagrada_ativa = false;
         char.recursos.paladino.subclasses.devocao.resplendor_sagrado_ativo = false;
       }
@@ -971,12 +971,12 @@ export function setupEventosDescanso() {
         char.recursos.paladino.destruicao_gratuita_usada = false;
 
         // Glória: restaurar recursos de subclasse
-        if (char.subclasse === 'Juramento de Glória' && char.recursos.paladino.subclasses?.gloria) {
+        if (char.subclasse === 'Juramento da Glória' && char.recursos.paladino.subclasses?.gloria) {
           char.recursos.paladino.subclasses.gloria.defesa_gloriosa_usos_gastos = 0;
           char.recursos.paladino.subclasses.gloria.lenda_viva_usada = false;
         }
         // Vingança: restaurar recursos de subclasse
-        if (char.subclasse === 'Juramento de Vingança' && char.recursos.paladino.subclasses?.vinganca) {
+        if (char.subclasse === 'Juramento da Vingança' && char.recursos.paladino.subclasses?.vinganca) {
           char.recursos.paladino.subclasses.vinganca.anjo_vingador_usado = false;
         }
         // Anciões: restaurar recursos de subclasse
@@ -985,7 +985,7 @@ export function setupEventosDescanso() {
           char.recursos.paladino.subclasses.ancioes.campeao_ancestral_usado = false;
         }
         // Devoção: restaurar todos os recursos de subclasse
-        if (char.subclasse === 'Juramento de Devoção' && char.recursos.paladino.subclasses?.devocao) {
+        if (char.subclasse === 'Juramento da Devoção' && char.recursos.paladino.subclasses?.devocao) {
           char.recursos.paladino.subclasses.devocao.arma_sagrada_ativa = false;
           char.recursos.paladino.subclasses.devocao.resplendor_sagrado_usado = false;
           char.recursos.paladino.subclasses.devocao.resplendor_sagrado_ativo = false;

@@ -118,7 +118,13 @@ export const TESTES_VALIDOS = [
   // Passivas.
   'subclasses-recursos-usos-sem-consequencia',
   'subclasses-recursos-ativa-curto-circuito-automatico',
-  'subclasses-recursos-paladino-guarda-juramento',
+  // A chave 'subclasses-recursos-paladino-guarda-juramento' vivia aqui, mas
+  // a lacuna foi corrigida e aposentada em 2026-08-18 (Plano 1 da rodada de
+  // correção) -- as quatro guardas de hp-descanso.js passaram a comparar
+  // 'Juramento da X', o nome real de dados/classes/paladino.json. Ver o
+  // histórico correspondente em LACUNAS, mais abaixo, e o motor novo
+  // unidade/subclasse-nome-literal.test.mjs, que agora impede a
+  // reintrodução do typo em qualquer das 48 subclasses.
 ];
 
 // Achado I4: o README chama esta lista de "o backlog real de correções do
@@ -1303,43 +1309,25 @@ export const LACUNAS = [
       '\'classes-passivas-ativa-no-turno\' -- mesmo SINTOMA de exibição, mas aquela causa é sobre a lista ' +
       'de frases (`utils.js:536`), não sobre o curto-circuito de `:535`, por isso causa própria também em ' +
       'relação a ela.' },
-  {
-    talento: 'Juramento da Glória', teste: 'subclasses-recursos-paladino-guarda-juramento',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'Defesa Gloriosa (Juramento da Glória, Paladino, nível 15) -- bug de produto confirmado por ' +
-      'leitura direta de hp-descanso.js, achado desta rodada e o melhor resultado dela. O bloco de ' +
-      'restauração de Descanso Longo do Paladino (site/js/sheet/hp-descanso.js:965-994) guarda a ' +
-      'restauração de subclasse por `if (char.subclasse === \'Juramento de X\')` -- mas o nome real de ' +
-      'TODAS as 4 trilhas usa "da"/"dos", nunca "de": "Juramento da Devoção"/"Juramento da Glória"/ ' +
-      '"Juramento da Vingança"/"Juramento dos Anciões" (confirmado em dados/classes/paladino.json: ' +
-      '443,473,508,538, e é esse valor de dados/, não um texto do app, que `char.subclasse` recebe -- ' +
-      'levelup.js grava a característica pelo nome exato do JSON). Especificamente para Defesa Gloriosa: ' +
-      'hp-descanso.js:974 testa `char.subclasse === \'Juramento de Glória\'` (preposição errada, "de" em ' +
-      'vez de "da") -- essa comparação NUNCA é verdadeira para um Paladino real, então o `if` inteiro ' +
-      '(:974-977) é código morto. `defesa_gloriosa_usos_gastos` -- lido e RENDERIZADO em ' +
-      'site/js/sheet/habilidades.js:4282-4298 (botão "Usar Defesa Gloriosa", contador "disponível/máximo"), ' +
-      'INCREMENTADO ao clicar em site/js/sheet/habilidades.js:1420-1429 (`case \'gloria_defesa_gloriosa\'`, ' +
-      '`gastos + 1`) -- nunca é zerado por Descanso Longo -- o único ' +
-      'reset que o livro concede para este recurso (Classes.md:5793, "...restaura todos os usos gastos ao ' +
-      'completar um Descanso Longo") não acontece nunca. Consequência como o jogador encontra: um Paladino ' +
-      'Juramento da Glória de nível 15+ usa Defesa Gloriosa (mod. Carisma vezes por dia, mínimo 1), ' +
-      'descansa longamente, reabre a ficha -- e o contador na seção "Subclasse — Juramento da Glória" ' +
-      'continua mostrando os usos como gastos (ex. "0/2" em vez de voltar a "2/2"); o botão "Usar Defesa ' +
-      'Gloriosa" permanece desabilitado até o jogador editar o campo manualmente (fora do fluxo normal de ' +
-      'descanso) ou reiniciar a ficha. CONTRASTE: o guard irmão da mesma classe, "Juramento dos Anciões" ' +
-      '(hp-descanso.js:983, "dos" -- grafia correta, forma diferente das outras três de propósito, o livro ' +
-      'não usa preposição "de"/"da" para esta trilha), FUNCIONA -- Sentinela Imortal e Campeão Ancestral ' +
-      'restauram normalmente, confirmando que o mecanismo de guarda por nome funciona quando o nome bate. ' +
-      'O MESMO typo ("Juramento de X" por "Juramento da X") aparece em mais 3 lugares de hp-descanso.js ' +
-      '-- :582 (Devoção, Descanso Curto, campos arma_sagrada_ativa/resplendor_sagrado_ativo), :979 ' +
-      '(Vingança, Descanso Longo, anjo_vingador_usado), :988 (Devoção, Descanso Longo, ' +
-      'resplendor_sagrado_usado/arma_sagrada_ativa/resplendor_sagrado_ativo) -- afetando Resplendor ' +
-      'Sagrado (Devoção nv20), Lenda Viva (Glória nv20) e Anjo Vingador (Vingança nv20) do mesmo jeito ' +
-      '(3 das 4 trilhas do Paladino nunca restauram seus recursos de subclasse no descanso). Essas 3 não ' +
-      'têm chave própria aqui porque são `composta: true` no catálogo (não sustentam `assert.equal` ' +
-      'sozinhas -- mesma regra de citabilidade dos Grupos 2/3/5) -- a divergência delas aparece registrada ' +
-      'na mensagem do `t.skip` correspondente em subclasses-recursos.test.mjs, não escondida, só não ' +
-      'formalizada como lacuna própria.' },
+  // Defesa Gloriosa (Juramento da Glória, Paladino, nível 15) -- CORRIGIDA em
+  // 2026-08-18 (Plano 1 da rodada de correção). site/js/sheet/hp-descanso.js
+  // guardava quatro blocos de restauração do Paladino com `char.subclasse ===
+  // 'Juramento de X'` (:582 Devoção/Curto, :974 Glória/Longo, :979
+  // Vingança/Longo, :988 Devoção/Longo), mas o nome real, gravado a partir de
+  // dados/classes/paladino.json, é 'Juramento da X' -- os quatro `if` eram
+  // código morto, e 3 das 4 trilhas de Juramento nunca restauravam recurso
+  // nenhum em Descanso nenhum. Só :983 ('Juramento dos Anciões') estava
+  // escrita certa, e é o contraste que provou ser grafia, não mecanismo.
+  // Corrigidos os quatro literais. As outras 3 características atingidas pelo
+  // mesmo typo (Resplendor Sagrado, Lenda Viva, Anjo Vingador -- `composta`,
+  // sem chave própria) voltaram a restaurar junto, e a divergência sai do
+  // `t.skip` correspondente.
+  //
+  // O conserto veio com instrumento novo, não só com o remendo:
+  // unidade/subclasse-nome-literal.test.mjs confronta TODO literal
+  // `subclasse === '...'` de site/js/ (154 ocorrências) contra os 48 nomes de
+  // dados/classes/*.json. Nasceu vermelho apontando exatamente estes quatro e
+  // mais nada -- medido, não suposto. Sem lacuna remanescente nesta chave.
 ];
 
 // Busca a lacuna registrada para um par (talento, teste), se houver.

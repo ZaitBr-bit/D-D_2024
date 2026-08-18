@@ -13,13 +13,36 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.4';
+export const VERSAO_ATUAL = '2.2.5';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.5',
+    data: '2026-08-18',
+    resumo: 'O Paladino volta a recuperar os recursos da sua subclasse no '
+      + 'descanso — três das quatro trilhas de Juramento nunca recuperavam.',
+    correcoes: [
+      {
+        grupo: '🛡️ Recursos de Juramento no descanso',
+        itens: [
+          'Um Paladino de Juramento da Glória, da Devoção ou da Vingança '
+            + 'gastava os recursos da subclasse e o descanso não os '
+            + 'devolvia: o contador continuava marcando tudo como gasto e o '
+            + 'botão seguia desabilitado, por mais que você descansasse.',
+          'Afetava Defesa Gloriosa e Lenda Viva (Glória), Resplendor Sagrado '
+            + 'e Arma Sagrada (Devoção) e Anjo Vingador (Vingança). Juramento '
+            + 'dos Anciões era a única trilha que funcionava.',
+          'Agora as quatro trilhas recuperam normalmente, no Descanso Curto e '
+            + 'no Longo. Se o seu Paladino estava com recursos presos como '
+            + 'gastos, basta descansar uma vez para eles voltarem.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.4',
     data: '2026-08-18',

@@ -10,21 +10,24 @@
 // mesma cláusula de recarga -- "não pode utilizá-la novamente até
 // completar um Descanso Longo".
 //
-// Achado desta rodada (ver testes/regras/lacunas-conhecidas.mjs, chave
-// 'subclasses-recursos-paladino-guarda-juramento'): o bloco de Descanso
-// Longo do Paladino (site/js/sheet/hp-descanso.js:965-994) guarda a
-// restauração de CADA subclasse por `char.subclasse === 'Juramento de X'`
-// -- mas o nome real, gravado a partir de dados/classes/paladino.json
-// (site/js/creator/passo-classe.js:83,197; site/js/levelup.js:1236), usa
-// "da"/"dos", nunca "de": "Juramento da Glória", "Juramento dos Anciões".
-// A comparação nunca é verdadeira e o bloco de restauração é código morto
-// para TODAS as quatro trilhas -- exceto Anciões, cuja guarda (:983) foi
-// escrita com a preposição certa por acidente e por isso funciona.
+// Achado do domínio Subclasses / Recursos (2026-08-18), CORRIGIDO no Plano 1
+// da rodada de correção: o bloco de Descanso Longo do Paladino
+// (site/js/sheet/hp-descanso.js:965-994) guardava a restauração de CADA
+// subclasse por `char.subclasse === 'Juramento de X'` -- mas o nome real,
+// gravado a partir de dados/classes/paladino.json (site/js/creator/
+// passo-classe.js:83,197; site/js/levelup.js:1236), usa "da"/"dos", nunca
+// "de": "Juramento da Glória", "Juramento dos Anciões". A comparação nunca era
+// verdadeira e o bloco era código morto para TODAS as quatro trilhas -- exceto
+// Anciões, cuja guarda (:983) estava escrita com a preposição certa e por isso
+// funcionava. Os quatro literais foram corrigidos; este spec, que registrava a
+// falha, agora afirma o comportamento correto nas duas pontas.
 //
 // Este spec prova as duas pontas com o MESMO roteiro (semear -> gastar ->
-// Descanso Longo -> conferir): Glória, que fica presa gastada (guarda
-// quebrada, :974), e Anciões, como controle são -- que prova que a falha
-// de Glória é o texto errado da guarda, e não o cenário/harness em si.
+// Descanso Longo -> conferir): Glória, cuja guarda (:974) era a quebrada, e
+// Anciões, cuja guarda (:983) sempre esteve certa e serviu de controle são --
+// era o contraste entre as duas que provava ser o texto da guarda, e não o
+// cenário/harness. Com as duas verdes, o contraste vira regressão: se alguém
+// reescrever um dos literais, só a ponta afetada cai.
 //
 // Prova de navegador porque o Descanso Longo é um handler de botão da
 // ficha: nenhum teste de unidade o executa.
@@ -33,7 +36,6 @@ import { test, expect } from '@playwright/test';
 import {
   ATRIBUTOS_REGRAS, abrirFicha, assentar, clicarBotaoFicha, clicarSeletorFicha, personagemSalvo,
 } from './helpers-regras.mjs';
-import { lacuna } from '../../regras/lacunas-conhecidas.mjs';
 
 const PERICIAS_PALADINO = ['Religião', 'Persuasão'];
 
@@ -81,10 +83,7 @@ async function descansoLongo(page) {
   await assentar(page).catch(() => {});
 }
 
-test('descanso longo: Defesa Gloriosa (Juramento da Glória) volta cheia -- lacuna conhecida', async ({ context }) => {
-  const l = lacuna('Juramento da Glória', 'subclasses-recursos-paladino-guarda-juramento');
-  test.fail(Boolean(l), l?.motivo);
-
+test('descanso longo: Defesa Gloriosa (Juramento da Glória) volta cheia', async ({ context }) => {
   const { page, erros } = await abrirFicha(context, GLORIA, 'regras-gloria-dl');
 
   // 2. Contador começa cheio: 1/1 (mod CAR +1, mínimo de 1 uso).
@@ -104,9 +103,9 @@ test('descanso longo: Defesa Gloriosa (Juramento da Glória) volta cheia -- lacu
   // 4. Descanso Longo.
   await descansoLongo(page);
 
-  // 5. Isto é o que falha hoje: a guarda 'Juramento de Glória' (com "de")
-  // nunca bate com o nome real 'Juramento da Glória' (com "da"), então o
-  // bloco de restauração de subclasse nunca roda para esta trilha.
+  // 5. Era aqui que falhava: a guarda dizia 'Juramento de Glória' (com "de")
+  // e nunca batia com o nome real 'Juramento da Glória' (com "da"), então o
+  // bloco de restauração de subclasse nunca rodava para esta trilha.
   const depoisDoDescanso = await personagemSalvo(page);
   expect(depoisDoDescanso.recursos?.paladino?.subclasses?.gloria?.defesa_gloriosa_usos_gastos,
     'Defesa Gloriosa deveria voltar a 0 usos gastos depois do Descanso Longo').toBe(0);

@@ -1139,20 +1139,15 @@ test('sanity: nenhuma entrada de CAMPOS_DESCANSO com campo:null tem `ramoDedicad
     `entrada(s) com campo:null MAS ramoDedicado curado -- o loop principal trata isso como "caminho genérico nunca alcançado" (mesma razão do Paladino/red #2); confira se é intencional: ${conflitos.join('; ')}`);
 });
 
-// TASK 6 (lacunas-conhecidas.mjs) -- Defesa Gloriosa (Juramento da Glória
-// nv15) é causa NOVA e é o achado desta rodada: hp-descanso.js:974 guarda a
-// restauração de Descanso Longo com `char.subclasse === 'Juramento DE
-// Glória'`, mas o nome real (dados/classes/paladino.json:473 e todo o resto
-// do app) é 'Juramento DA Glória' -- `char.subclasse` nunca bate com a
-// guarda quebrada, o `if` é código morto, `defesa_gloriosa_usos_gastos`
-// nunca zera. Mesmo typo em mais 3 guardas (:582 Devoção/Curto, :979
-// Vingança/Longo, :988 Devoção/Longo) -- só Defesa Gloriosa é citável
-// (`base: 'custo-declarado'`, não `composta`); as outras 3 (Resplendor
-// Sagrado, Lenda Viva, Anjo Vingador) divergem só no `t.skip` (registradas
-// lá, sem chave própria -- mesma regra de citabilidade dos Grupos 2-3).
-const CAUSA_RESTAURACAO = {
-  'Juramento da Glória|15|Defesa Gloriosa': { talento: 'Juramento da Glória', teste: 'subclasses-recursos-paladino-guarda-juramento' },
-};
+// CORRIGIDO em 2026-08-18 (Plano 1 da rodada de correção): Defesa Gloriosa
+// (Juramento da Glória nv15) era a única causa de restauração registrada aqui
+// -- hp-descanso.js:974 guardava o Descanso Longo com `char.subclasse ===
+// 'Juramento DE Glória'` contra o nome real 'Juramento DA Glória'. Os quatro
+// literais foram corrigidos e a lacuna aposentada de lacunas-conhecidas.mjs;
+// este mapa fica vazio de propósito, e não removido, porque o loop principal o
+// consulta para toda entrada -- e a próxima causa de restauração que aparecer
+// entra aqui, sem precisar reconstruir o mecanismo.
+const CAUSA_RESTAURACAO = {};
 
 for (const entrada of TODAS_ENTRADAS_RECURSO) {
   const { subclasse, nivel, caracteristica } = entrada;

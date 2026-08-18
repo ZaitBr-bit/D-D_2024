@@ -202,6 +202,7 @@ depois e estão nas duas últimas linhas ou no próprio cabeçalho do arquivo.
 | `imports-nao-resolvidos.test.mjs` | Varredura de `site/js/`: nome exportado por **outro módulo do projeto** que é chamado sem estar importado (`ReferenceError` na hora em que a função rodar -- `checar_esm.mjs` não pega, porque só confere o parse). Globais publicados de propósito (`window.navegar`, `window.fecharModal`) são descobertos por varredura, não por lista fixa | 1 |
 | `gatilhos-ui-cobertos.test.mjs` | Cliquete de cobertura de tela: todo `id="btn-..."`/`data-<x>-acao="..."` declarado em `site/js/` precisa aparecer em algum spec de `testes/e2e/` -- isto é, precisa existir um teste que CLIQUE nele. A dívida histórica (**218 gatilhos**, de 260) está congelada em `../gatilhos-sem-cobertura.mjs` e a lista só encolhe: gatilho novo sem teste falha, e entrada que já ganhou teste (ou sumiu do código) também falha, pedindo a remoção. Um quarto teste barra gatilho montado por interpolação OPACA (`data-x-acao="${acao}"`), que sumiria do inventário e escaparia da regra em silêncio -- o extrator resolve ternário com os dois lados literais, mas não uma variável. Nasceu de uma melhoria entregue com teste que só afirmava "o botão aparece" -- ver GUIA-PROXIMOS-DOMINIOS.md | 4 |
 | `recursos-restaurados.test.mjs` | Varredura de `site/js/`: campo de consumo (`_usado`/`_usada`/`_gasto`/`_gastos`) que é gravado mas NUNCA mencionado em `sheet/hp-descanso.js` -- recurso que se gasta e nada devolve. Exceções legítimas (restauradas por outra via, como as do talento Dádiva da Recuperação, ou por gatilho próprio, como a Concentração Fanática, que zera ao ATIVAR a Fúria) ficam numa lista com o motivo escrito, e o motor cobra a higiene dela nos dois sentidos. Nasceu do Campeão dos Deuses do Bárbaro Fanático, cuja reserva de d12 não voltava em Descanso Longo nenhum | 3 |
+| `subclasse-nome-literal.test.mjs` | Varredura de `site/js/`: todo literal comparado com `subclasse === '...'`/`!== '...'` (154 ocorrências) precisa ser um dos **48 nomes reais** de `dados/classes/*.json`. Nasceu do typo das guardas de Juramento do Paladino (`'Juramento de X'` contra o real `'Juramento da X'`), que deixou quatro `if` de restauração como código morto -- o tipo de erro que nenhuma revisão que LÊ o código pega, porque os dois lados parecem certos isoladamente. Não confere se a guarda está no Descanso certo nem se zera o campo certo: isso continua sendo do Grupo 5 de `subclasses-recursos.test.mjs` | 3 |
 | `notas-versao-formato.test.mjs` | Toda entrada de `NOTAS_VERSAO` renderiza (via `montarNotasVersaoHtml`, extraída de `notas-versao.js` para ser confrontável sem navegador), `VERSAO_ATUAL` é a entrada do topo, e todo grupo tem título e itens. `melhorias`/`correcoes` são OPCIONAIS -- foi uma versão só de correções que derrubou o modal inteiro, escondendo também as versões antigas | 4 |
 
 Total: **2349 testes** em `unidade/` (medido em 2026-08-18, depois do Plano 4
@@ -1676,7 +1677,8 @@ Imortal na seção "Habilidades Ativas" do card "Subclasse — Juramento dos
 Anciões"; o livro a colocaria em "Habilidades Passivas".
 
 **Causa nova 3 — `subclasses-recursos-paladino-guarda-juramento`
-(`app-diverge-do-livro`, Defesa Gloriosa) — o achado mais forte da rodada.**
+(`app-diverge-do-livro`, Defesa Gloriosa) — o achado mais forte da rodada
+(✅ corrigido em 2026-08-18, Plano 1 da rodada de correção).**
 `site/js/sheet/hp-descanso.js` guarda quatro blocos de restauração de
 Descanso Longo do Paladino comparando `char.subclasse` contra **"Juramento
 de X"** (`:582`, `:974`, `:979`, `:988`) — mas o nome real, gravado a partir
@@ -1694,6 +1696,21 @@ recursos de subclasse em Descanso nenhum**. O contraste que prova que é a
 grafia, não o mecanismo: "Juramento **dos** Anciões" (`:983`) está escrito
 certo e funciona — Sentinela Imortal e Campeão Ancestral restauram
 normalmente. O spec de navegador (abaixo) reproduz isso ao vivo.
+
+✅ **Corrigido em 2026-08-18** (Plano 1 da rodada de correção,
+`docs/superpowers/plans/2026-08-18-correcao-1-guarda-juramento-paladino.md`).
+Os quatro literais de `hp-descanso.js` (`:582`, `:974`, `:979`, `:988`) passaram
+a usar `'Juramento da X'`, o nome real de `dados/classes/paladino.json`; a
+guarda de Anciões (`:983`) não mudou, porque já estava certa. As quatro trilhas
+voltam a restaurar, e as 3 características `composta` atingidas pelo mesmo typo
+(Resplendor Sagrado, Lenda Viva, Anjo Vingador) voltaram junto.
+
+O conserto veio com **instrumento novo**, não só com o remendo:
+`unidade/subclasse-nome-literal.test.mjs` confronta todo literal
+`subclasse === '...'` de `site/js/` contra os 48 nomes de `dados/classes/*.json`.
+Ele nasceu vermelho apontando exatamente estes quatro e mais nada — medido antes
+do conserto, não suposto depois. Sem esse motor, a próxima subclasse renomeada
+reintroduziria a mesma classe de bug em silêncio, em qualquer das 12 classes.
 
 ### Os limites declarados, em voz alta
 
