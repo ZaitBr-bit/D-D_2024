@@ -13,13 +13,75 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.6';
+export const VERSAO_ATUAL = '2.2.7';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.7',
+    data: '2026-08-18',
+    rotulo: 'Escolhas de subclasse',
+    resumo: 'A subida de nível passou a pedir as escolhas que a sua subclasse '
+      + 'exige, e a conceder o que ela dá de graça.',
+    melhorias: [
+      {
+        grupo: '🎯 Escolhas que a subclasse exige',
+        itens: [
+          'Doze características de subclasse pediam uma escolha no livro e o '
+            + 'app nunca perguntava nada: você terminava o nível sem aviso e '
+            + 'sem o benefício. Agora a subida de nível mostra um card para '
+            + 'cada uma, com as opções certas.',
+          'Entre elas: as 3 perícias do Colégio do Conhecimento, a ferramenta '
+            + 'e a perícia do Estudioso da Guerra, a perícia do Glamour '
+            + 'Transcendental, o Estilo de Luta Adicional do Campeão, a Presa '
+            + 'do Caçador, as Táticas Defensivas, o Companheiro Primal, o '
+            + 'Aspecto dos Selvagens e a Afinidade Elemental.',
+          'O Estilo de Luta Adicional do Campeão agora funciona de verdade: '
+            + 'antes, mesmo escolhido, ele não aplicava efeito nenhum.',
+        ],
+      },
+      {
+        grupo: '🎁 O que a subclasse dá sem perguntar',
+        itens: [
+          'Cinco características concedem algo automaticamente no livro, e o '
+            + 'app não concedia: Treinamento Marcial (Colégio da Bravura), '
+            + 'Implementos de Misericórdia, Ferramentas de Assassino, Mente de '
+            + 'Ferro (Vigilante das Sombras) e Ilusões Aprimoradas.',
+          'Agora as proficiências e o truque entram na ficha ao subir de nível, '
+            + 'sem você precisar fazer nada.',
+        ],
+      },
+    ],
+    correcoes: [
+      {
+        grupo: '📋 Habilidades na seção certa da ficha',
+        itens: [
+          'Trinta e cinco características apareciam na seção errada da ficha. '
+            + 'Ataque Extra, Maestria em Arma e Defesa sem Armadura estavam em '
+            + '"Habilidades Ativas" mesmo sem custar nada; Esquiva Sobrenatural, '
+            + 'Queda Lenta e Golpe Astuto estavam em "Passivas" mesmo custando '
+            + 'sua Reação ou dados.',
+          'Algumas ainda ganhavam um botão de uso que o livro não prevê: a '
+            + 'Fúria Implacável do Bárbaro mostrava "Usar / Esgotado" com 2 '
+            + 'usos, e a Maestria em Arma exibia selo de "recarrega no Descanso '
+            + 'Longo" — nenhuma das duas se esgota.',
+        ],
+      },
+      {
+        grupo: '🌿 Magias do Círculo da Terra',
+        itens: [
+          'Um Druida do Círculo da Terra recebia as magias dos QUATRO terrenos '
+            + 'somadas — 24 magias até o nível 9, onde o livro concede 6 — e '
+            + 'nunca era perguntado qual terreno havia escolhido.',
+          'Agora o app pergunta o terreno na subida de nível e concede só as '
+            + 'magias daquele terreno.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.6',
     data: '2026-08-18',

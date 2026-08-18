@@ -62,11 +62,7 @@ export const TESTES_VALIDOS = [
   // laço de teste (uma por característica), todas apontando para a MESMA
   // entrada em LACUNAS (mesmo padrão do Clérigo/'classes-tabela' acima: uma
   // causa, vários call sites).
-  'classes-passivas-ativa-no-turno', 'classes-passivas-recarga-troca-escolha',
-  'classes-passivas-clausula-lateral', 'classes-passivas-descanso-curto-janela',
-  'classes-passivas-acao-bonus-parte-de', 'classes-passivas-custo-verbo-rigido',
-  'classes-passivas-reacao-executar',
-  // As chaves 'classes-passivas-extras-classe-truque' (flag do bônus de
+          // As chaves 'classes-passivas-extras-classe-truque' (flag do bônus de
   // truque do Taumaturgo/Xamã sem consumidor) e
   // 'classes-passivas-vocabulario-estilo' (vocabulário de Estilo de Luta
   // divergente entre criador e ficha) viviam aqui, mas as duas lacunas
@@ -111,14 +107,12 @@ export const TESTES_VALIDOS = [
   // Passivas, mesmo tendo chave própria -- ver a nota de correção em cada
   // uma ('subclasses-recursos-ativa-curto-circuito-automatico' compartilha
   // `utils.js:535` com 'classes-passivas-recarga-troca-escolha'; a nota de
-  // conserto de 'classes-passivas-descanso-curto-janela', acima, já falava
+  // conserto de acima, já falava
   // de detectarUsosMaximos antes desta tarefa). Só
   // 'subclasses-recursos-paladino-guarda-juramento' (guarda de subclasse do
   // Paladino) é código isolado, sem sobreposição com o bloco Classes/
   // Passivas.
-  'subclasses-recursos-usos-sem-consequencia',
-  'subclasses-recursos-ativa-curto-circuito-automatico',
-  // A chave 'subclasses-recursos-paladino-guarda-juramento' vivia aqui, mas
+    // A chave 'subclasses-recursos-paladino-guarda-juramento' vivia aqui, mas
   // a lacuna foi corrigida e aposentada em 2026-08-18 (Plano 1 da rodada de
   // correção) -- as quatro guardas de hp-descanso.js passaram a comparar
   // 'Juramento da X', o nome real de dados/classes/paladino.json. Ver o
@@ -450,180 +444,36 @@ export const LACUNAS = [
   // chave de `comLacuna` funcionar -- não é uma alegação de que o bug é
   // específico daquela classe. Cada `motivo` abaixo lista TODAS as classes/
   // características realmente afetadas pela causa, por extenso.
-  { talento: 'Guerreiro', teste: 'classes-passivas-ativa-no-turno',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'ehHabilidadeAtiva (site/js/utils.js:499-511) inclui "no seu turno" na lista de frases ' +
-      'que classificam uma característica como ativa. Em 8 características de classe base o livro usa ' +
-      'essa frase para dizer QUANDO o benefício PASSIVO vale, não como ele é ativado -- todas ganham ' +
-      '"Habilidades Ativas" na ficha quando o livro nunca condiciona nenhuma delas a uma decisão ' +
-      'custeada: Ataque Extra de Bárbaro (Classes.md:125), Guardião (Classes.md:3332), Guerreiro ' +
-      '(Classes.md:3852), Monge (Classes.md:5224) e Paladino (Classes.md:5569) -- "...sempre que ' +
-      'executar a ação Atacar no seu turno", onde "você pode" é retórico (permissão de atacar duas ' +
-      'vezes, não uma escolha com custo); Dois Ataques Extras (Guerreiro nível 11, Classes.md:3866) e ' +
-      'Três Ataques Extras (Guerreiro nível 20, Classes.md:3878), mesma forma textual; Movimento ' +
-      'Acrobático (Monge nível 9, Classes.md:5242) -- "...capacidade de se mover no seu turno ao longo ' +
-      'de superfícies verticais...", "no seu turno" qualificando quando o movimento vale, não ' +
-      'ativação. Consequência medida (site/js/sheet/caracteristicas.js:37-38): estas 8 características ' +
-      'aparecem em "Habilidades Ativas" na ficha; o livro (nenhuma delas tem custo declarado) as ' +
-      'colocaria em "Habilidades Passivas". Exibição apenas -- o texto do bônus não muda, e nenhuma ' +
-      'delas tem `recarga` detectada (não entram no controle interativo das causas 2/4, abaixo).' },
-  { talento: 'Bárbaro', teste: 'classes-passivas-recarga-troca-escolha',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'detectarRecarga (site/js/utils.js:482-494) casa a substring "descanso longo" em ' +
-      'qualquer lugar do texto, sem checar se ela está presa a um LIMITE DE USO -- e ehHabilidadeAtiva ' +
-      '(utils.js:508, `if (recarga) return true`) trata qualquer recarga detectada como prova de ' +
-      '"ativa". Em 6 características de classe base a cláusula de Descanso Longo não é recarga de uso ' +
-      'limitado: é a TROCA de uma escolha permanente, regrada por Descanso Longo, e a característica ' +
-      'em si é capacidade contínua. Maestria em Arma: Bárbaro (Classes.md:97) e Guerreiro ' +
-      '(Classes.md:3816) usam a mesma frase, "Sempre que completar um Descanso Longo, você pode ' +
-      'praticar movimentos com armas e alterar uma dessas escolhas de armas"; Guardião (Classes.md:3306) ' +
-      'e Paladino (Classes.md:5521) usam uma frase parecida mas DIFERENTE, "Sempre que completar um ' +
-      'Descanso Longo, você pode alterar os tipos de armas que escolheu"; Ladino (Classes.md:4226) usa ' +
-      'a mesma frase de Guardião/Paladino, mas com "Ao completar" no lugar de "Sempre que completar". ' +
-      'Maestria de Magias do Mago (nível 18, Classes.md:4652, "Ao completar um Descanso Longo, você ' +
-      'pode estudar seu livro de magias e substituir uma dessas magias..."). Consequência medida ' +
-      '(caracteristicas.js:37-38): as 6 aparecem em "Habilidades Ativas"; o livro (nenhuma delas tem ' +
-      'Ação/Ação Bônus/Reação/recurso gasto) as colocaria em "Habilidades Passivas". ' +
-      'CORRIGIDO em 2026-08-08 (achado da revisão final da Task 8, que este motivo superafirmava antes ' +
-      'da correção): "as 6 têm `recarga` detectada e `ativa===true`" é verdade, mas isso NÃO significa ' +
-      'que as 6 caem no controle interativo -- renderFeatureItem (habilidades.js) tem um ramo DEDICADO ' +
-      'por classe para "Maestria em Arma" (ehMaestriaBarbaro :2748, ehMaestriaGuerreiro :3916, ' +
-      'ehMaestriaGuardiao :3990, ehMaestriaPaladino :4000, ehMaestriaLadino :4010) que preenche ' +
-      '`usosHtmlBody` com um botão "Definir Maestrias" (`data-config-maestrias`) ANTES de chegar na ' +
-      'condição interativa -- e essa condição (`!usosHtmlBody && ativa && recarga`, habilidades.js:4683) ' +
-      'é guardada por `!usosHtmlBody`, então nunca dispara para essas 5. Só a 6ª (Maestria de Magias do ' +
-      'Mago, que não tem ramo dedicado por não ser "Maestria em Arma") cai no fallback e recebe o botão ' +
-      '"✓ Disponível"/"✗ Usado" (`data-toggle-uso`, habilidades.js:4686); clicar nele grava ' +
-      '`char.usos_habilidades[key] = !char.usos_habilidades[key]` e chama `salvar()` ' +
-      '(habilidades.js:38-41) -- uma capacidade contínua (a Maestria de Magias nunca "se esgota") passa ' +
-      'a ter um estado de uso marcável e persistido na ficha, que o livro não prevê. Confirmado ' +
-      'executando renderFeatureItem/ehHabilidadeAtiva/detectarRecarga de verdade sobre as 6 descrições ' +
-      'brutas de dados/classes/*.json: as 5 de "Maestria em Arma" produzem `data-config-maestrias`, só a ' +
-      'do Mago produz `data-toggle-uso` (script ad hoc; a alegação anterior de que as 6 tinham sido ' +
-      '"confirmadas" chamando a função de verdade não tinha, de fato, sido verificada -- rodar o script ' +
-      'de novo mostra o resultado oposto ao que o motivo antigo descrevia para 5 das 6). Para as 5 sem o ' +
-      'toggle, sobra uma consequência real mais modesta: `recargaBadge` ("🌙 Desc. Longo", ' +
-      'habilidades.js:2727-2729, injetado no card em :4699) aparece do lado do nome da característica, ' +
-      'rotulando como "recarrega no Descanso Longo" algo que na verdade nunca se esgota -- só o selo, ' +
-      'sem estado persistido nem botão clicável. ' +
-      'AVISO (revisão independente de 2026-08-18, ver \'subclasses-recursos-ativa-curto-circuito-' +
-      'automatico\', domínio Subclasses/Recursos): o curto-circuito `if (recarga) return true` ' +
-      '(utils.js:535, citado acima como `utils.js:508` numa versão anterior do código) é a MESMA linha ' +
-      'que classifica Sentinela Imortal (subclasse) como ativa por engano na entrada irmã -- um patch em ' +
-      '`utils.js:535` que passasse a checar um verbo de decisão do jogador mesmo com `recarga` verdadeiro ' +
-      'resolveria as 6 características desta entrada E Sentinela Imortal ao mesmo tempo. As duas ' +
-      'continuam causas SEPARADAS (aqui a detecção de `detectarRecarga` está ERRADA -- lê troca de escolha ' +
-      'como recarga; lá a detecção está CERTA e só a conclusão do curto-circuito erra), mas quem for mexer ' +
-      'em `utils.js:535` precisa reconferir as duas entradas, não só uma.' },
-  { talento: 'Bárbaro', teste: 'classes-passivas-clausula-lateral',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'A frase-gatilho "você pode usar" (lista de ehHabilidadeAtiva, utils.js:499-511) casa, ' +
-      'em 6 características, uma cláusula SECUNDÁRIA do texto -- não a frase que define o benefício ' +
-      'sendo classificado. Defesa sem Armadura de Bárbaro (Classes.md:93): benefício é o cálculo de ' +
-      'CA (10+Des+Con), sem custo; a frase capturada é "Você pode usar um Escudo e ainda receber este ' +
-      'benefício" -- aviso de compatibilidade, não custo. Golpe Brutal Aprimorado (Classes.md:171 -- ' +
-      'o TÍTULO de prosa do livro chama esta característica de "Golpe Brutal Fortalecido", ' +
-      'Classes.md:169; "Aprimorado" é a forma que dados/classes/barbaro.json usa, e é a que este ' +
-      'catálogo segue por convenção com o restante da suíte, ver task-3-report.md): benefício é dano ' +
-      'numérico maior; frase capturada é "você pode usar dois efeitos diferentes de Golpe Brutal" -- ' +
-      'muda o ESCOPO de outra característica, não custo desta. Força Indomável (Classes.md:175): "você ' +
-      'pode usar esse valor no lugar do resultado total" -- piso incondicional, sem decisão real, mas ' +
-      'contém a frase literalmente. Idioma Druídico de Druida (Classes.md:2052): benefício é a magia ' +
-      'sempre preparada; frase capturada é "Você pode usar Druídico para deixar mensagens ocultas" -- ' +
-      'um USO do idioma, não ativação. Apoteose Arcana de Feiticeiro (Classes.md:2720): "você pode ' +
-      'usar uma opção de Metamagia... sem gastar Pontos de Feitiçaria" -- isenta o custo de OUTRA ' +
-      'característica, não introduz custo próprio. Defletir Energia de Monge (Classes.md:5262): "Agora ' +
-      'você pode usar sua característica Defletir Ataques contra..." -- amplia o ESCOPO de outra ' +
-      'característica, não custo desta. Consequência medida (caracteristicas.js:37-38): as 6 aparecem ' +
-      'em "Habilidades Ativas"; o livro as colocaria em "Habilidades Passivas" (nenhuma tem custo ' +
-      'próprio declarado). Exibição apenas -- nenhuma das 6 tem `recarga` detectada (não entram no ' +
-      'controle interativo das causas 2/4).' },
-  { talento: 'Mago', teste: 'classes-passivas-descanso-curto-janela',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'detectarRecarga (site/js/utils.js:482-494) casa "descanso curto" como recarga de uso ' +
-      'limitado em 2 características onde o Descanso Curto é uma JANELA/RESET sem limite de reuso, ' +
-      'não uma recarga de usos gastos. Memorizar Magia do Mago (Classes.md:4646, "Ao completar um ' +
-      'Descanso Curto, você pode... substituir uma das magias") -- o próprio catálogo nota que é ' +
-      'diferente de Recuperação Arcana (que É recarga de verdade); a troca não tem limite de reuso, só ' +
-      'a janela em que é permitida. Fúria Implacável do Bárbaro (Classes.md:153, "...Ao completar um ' +
-      'Descanso Curto ou Longo, a CD volta para 10") -- é o RESET de uma CD escalonada por uso, não ' +
-      'recarga de uma capacidade com usos limitados (a salvaguarda em si não tem limite de uso, só ' +
-      'fica mais difícil a cada acionamento). Consequência medida (caracteristicas.js:37-38): as 2 ' +
-      'aparecem em "Habilidades Ativas"; o livro as colocaria em "Habilidades Passivas". Consequência ' +
-      'INTERATIVA (não só o selo, ver nota do bloco): confirmado com renderFeatureItem/ ' +
-      'detectarUsosMaximos de verdade (task-6-report.md) que as duas divergem entre si -- Memorizar ' +
-      'Magia (usosMax null) recebe o mesmo botão "✓ Disponível"/"✗ Usado" (habilidades.js:4683/4686, ' +
-      '`data-toggle-uso`) da causa 2; Fúria Implacável NÃO recebe esse botão -- recebe um controle ' +
-      'AINDA MAIS enganoso por uma causa DIFERENTE e não relacionada a esta: detectarUsosMaximos ' +
-      '(habilidades.js:2359-2369) lê "duas vezes" em "seus Pontos de Vida mudam para um número igual a ' +
-      'duas vezes seu nível de Bárbaro" (a fórmula de PV recuperado, não uma contagem de usos) e ' +
-      'devolve usosMax=2, então a característica ganha o botão "Usar"/"✗ Esgotado" ' +
-      '(habilidades.js:4674-4682, 2 usos) de uma capacidade que na verdade não tem limite de uso ' +
-      'nenhum. Registrado aqui como observação da mesma investigação; a causa raiz é de ' +
-      'detectarUsosMaximos, não de detectarRecarga/ehHabilidadeAtiva, e não tem chave própria nesta ' +
-      'lista -- fica só documentada, para não inflar o número de causas registradas por algo fora do ' +
-      'escopo confirmado desta tarefa. ' +
-      'DOIS CALL SITES NOVOS (2026-08-18, Task 6 do domínio Subclasses/Recursos, ' +
-      'subclasses-recursos.test.mjs) -- MESMO código, MESMOS dois mecanismos já descritos acima, agora ' +
-      'confirmados também sobre características de SUBCLASSE (renderSecaoSubclasse chama as mesmas ' +
-      'detectarRecarga/ehHabilidadeAtiva, caracteristicas.js:57-80/64-65 -- achado vinculante da Task 1 ' +
-      'deste plano). (1) Mapa Estelar (Círculo das Estrelas, Druida, nível 3, detectarRecarga): o texto ' +
-      'tem DOIS parágrafos com Descanso -- o real (Raio Guia, "...restaura todos os usos gastos ao ' +
-      'completar um Descanso Longo", catálogo recarga=longo) e um TOTALMENTE ALHEIO sobre recriar o mapa ' +
-      'se perdido ("Essa cerimônia pode ser realizada durante um Descanso Curto ou Longo...") -- ' +
-      'detectarRecarga funde os dois e devolve curto_ou_longo. Consequência medida: recargaBadge ' +
-      '(habilidades.js:2760, injetado sem condição em :4765-4766, ANTES de qualquer ramo dedicado por ' +
-      'subclasse rodar -- confirmado lendo o código: o ramo de Mapa Estelar, ehEstrelasMapa ' +
-      ':3454-3462, só sobrescreve usosHtmlBody/usosHtmlSummary, nunca recargaBadge) monta "☀🌙 ' +
-      'Curto/Longo" em vez de "🌙 Desc. Longo" -- Druida Círculo das Estrelas nível 3+, card "Subclasse — ' +
-      'Círculo das Estrelas". (2) Sentinela Imortal (Juramento dos Anciões, Paladino, nível 15, ' +
-      'detectarUsosMaximos): o livro diz "...recupera um número de Pontos de Vida igual a TRÊS VEZES o ' +
-      'seu nível de Paladino..." (Classes.md:5889, fórmula de cura, não contagem de uso) -- MESMO ' +
-      'mecanismo de falso positivo do parágrafo de Fúria Implacável acima ("duas vezes" -> "três vezes"), ' +
-      'confirmado rodando detectarUsosMaximos de verdade sobre o texto real: devolve 3 contra o catálogo ' +
-      '(usos: 1). DIFERENTE de Fúria Implacável em consequência, e a correção deste motivo: Sentinela ' +
-      'Imortal tem ramo PRÓPRIO em renderFeatureItem (ehAncioesSentinelaImortal, habilidades.js: ' +
-      '4379-4394) que nunca lê usosMax/temMultiplosUsos -- usa seu campo dedicado ' +
-      '(sentinela_imortal_usada, booleano) para montar usosHtmlBody/usosHtmlSummary ANTES da checagem ' +
-      '`!usosHtmlBody && temMultiplosUsos` (:4741) rodar, então o valor errado (3) nunca chega à tela: o ' +
-      'botão renderizado é "Usar Sentinela Imortal"/"disabled" (booleano), nunca um contador "3/3". ' +
-      '**Sem consequência medida** para este call site -- mesma família dos 11 já anotados com ' +
-      '`ramoDedicado` no catálogo (Passos Feéricos e outros, ver Grupo 2 de subclasses-recursos.test.mjs), ' +
-      'só que Sentinela Imortal não tinha sido identificada como tal antes desta tarefa.' },
-  { talento: 'Bárbaro', teste: 'classes-passivas-acao-bonus-parte-de',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'ehHabilidadeAtiva (utils.js:499-511) reconhece "como ação bônus" (sem "uma") e "como uma ' +
-      'ação" (que também casa como prefixo de "como uma ação bônus", quando o texto usa essa variante) ' +
-      '-- mas não "como PARTE DA Ação Bônus" -- construção diferente para a mesma ideia (ação concedida ' +
-      'dentro de outra ação bônus já em andamento). Bote Instintivo do Bárbaro (nível 7, ' +
-      'Classes.md:133, "Como parte da Ação Bônus que você realiza para entrar em Fúria, você pode se ' +
-      'mover") tem custo real (é parte de uma Ação Bônus), mas nenhuma frase da lista de gatilhos casa ' +
-      'com "como parte da Ação Bônus". Consequência medida (caracteristicas.js:37-38): aparece em ' +
-      '"Habilidades Passivas"; o livro (a característica só existe presa a uma Ação Bônus) a colocaria ' +
-      'em "Habilidades Ativas". Exibição apenas -- é o único falso NEGATIVO isolado (as outras 5 ' +
-      'entradas de falso negativo estão nas causas 6 e 7 abaixo).' },
-  { talento: 'Ladino', teste: 'classes-passivas-custo-verbo-rigido',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'ehHabilidadeAtiva (utils.js:499-511) só reconhece custo em recurso nomeado pelo verbo ' +
-      'literal "você pode gastar" -- o livro declara o mesmo tipo de custo com pelo menos duas outras ' +
-      'formas em 3 características. Golpe Astuto do Ladino (nível 5, Classes.md:4246) e Golpes Sujos ' +
-      '(nível 14, Classes.md:4280): custo em dados nomeado por opção ("Custo: 1d6"/"2d6"/"3d6"/"6d6"), ' +
-      'texto de ativação "você pode adicionar... com um custo em dados" -- não contém "você pode ' +
-      'gastar". Toque Restaurador do Paladino (nível 14, Classes.md:5599): "Você DEVE gastar 5 Pontos ' +
-      'de Vida da reserva de cura" -- usa "deve gastar", não "pode gastar". Consequência medida ' +
-      '(caracteristicas.js:37-38): as 3 aparecem em "Habilidades Passivas"; o livro (as 3 têm custo em ' +
-      'recurso declarado) as colocaria em "Habilidades Ativas". Exibição apenas.' },
-  { talento: 'Ladino', teste: 'classes-passivas-reacao-executar',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'A lista de gatilhos de ehHabilidadeAtiva (utils.js:499-511) cobre "como uma reação" mas ' +
-      'não "executar uma reação" -- a construção mais comum no livro para Reações concedidas por ' +
-      'característica de CLASSE. Esquiva Sobrenatural do Ladino (nível 5, Classes.md:4260, "você pode ' +
-      'executar uma Reação para reduzir o dano") e Queda Lenta do Monge (nível 4, Classes.md:5220, ' +
-      '"Você pode executar uma Reação ao estar em queda para reduzir qualquer dano recebido") têm ' +
-      'custo real (gastam a Reação do turno), mas nenhuma frase da lista casa com "executar uma ' +
-      'reação". Consequência medida (caracteristicas.js:37-38): as 2 aparecem em "Habilidades ' +
-      'Passivas"; o livro (as 2 custam a Reação) as colocaria em "Habilidades Ativas". Exibição ' +
-      'apenas.' },
+  // As 7 causas de Classes/Passivas (28 características) e a causa
+  // 'subclasses-recursos-ativa-curto-circuito-automatico' (Sentinela Imortal,
+  // registrada mais abaixo) -- CORRIGIDAS em 2026-08-18 (Plano 3 da rodada de
+  // correção). As oito eram o mesmo defeito de fundo: três funções tentavam
+  // derivar fato estruturado (é ativa? recarrega? quantos usos?) procurando
+  // substrings na prosa do livro, sem noção de a qual frase a substring
+  // pertencia.
+  //
+  // `ehHabilidadeAtiva` (utils.js) deixou de perguntar "alguma frase da lista
+  // aparece em algum lugar?" e passou a perguntar "o livro declara um CUSTO?"
+  // -- economia de ação, recurso nomeado, custo em dados, ou uso que se esgota
+  // e volta num descanso. Saíram da lista de gatilhos 'no seu turno' (que
+  // qualifica QUANDO um benefício passivo vale) e 'você pode usar' (que casa
+  // cláusula secundária), e saiu o curto-circuito `if (recarga) return true`
+  // (recarga não é prova de ativação).
+  //
+  // `detectarRecarga` (utils.js) passou a exigir que a frase prenda o descanso
+  // a um USO -- antes casava "descanso" em qualquer lugar, e fundia a cerimônia
+  // de recriar o Mapa Estelar com a recarga real de Raio Guia.
+  //
+  // `detectarUsosMaximos` (sheet/habilidades.js) deixou de ler "X vezes seu
+  // nível" (multiplicador de fórmula) como contagem de usos -- era o que dava
+  // à Fúria Implacável um botão "Usar / ✗ Esgotado" com 2 usos.
+  //
+  // Medição: 28 divergências em 159 características citáveis viraram 0, e a
+  // suíte inteira (2354 testes) não ganhou nenhuma falha real -- as 30 que
+  // apareceram foram todas cobranças de remoção destas oito entradas. O
+  // desenho saiu de SEIS iterações contra esse mesmo oráculo, e cada marcador
+  // cita no código a característica real de onde saiu. Sem lacuna remanescente
+  // nessas oito chaves.
 
   // ---------- Domínio Classes/Passivas: flag/campo sem consumidor,
   // vocabulário de Estilo de Luta e bônus de truque do Taumaturgo/Xamã
@@ -735,58 +585,17 @@ export const LACUNAS = [
   // RECUSAR uma característica com mais de uma tabela de nível, em vez de somar
   // -- sem isso, o conserto de :757 teria feito a tela de nível passar a mostrar
   // 9 magias de terrenos misturados, onde antes mostrava nada.
-  { talento: 'Círculo da Terra', teste: 'subclasses-magias',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'Causa 2 de 3 desta rodada -- CORRIGIDO nesta revisão (a versão anterior deste motivo ' +
-      'citava obterMagiasDominioNivel como a função que soma as quatro tabelas de terreno; essa função ' +
-      'devolve [] para Círculo da Terra -- a rota de domínio está MORTA aqui, pelo MESMO bug da Causa 1: ' +
-      'a característica se chama "Magias DO Círculo da Terra", e o regex de nome de obterMagiasDominioNivel ' +
-      '(levelup.js:757) exige "DE". Confirmado rodando de verdade: ' +
-      'obterMagiasDominioNivel(\'Druida\',\'Círculo da Terra\',3) = [] e ' +
-      'obterTodasMagiasDominio(\'Druida\',\'Círculo da Terra\',20) = [] (0 itens). As 12/4/4/4 magias ' +
-      'medidas (nos níveis 3/5/7/9) vêm da rota "sempre preparada": ' +
-      'obterMagiasSemprePreparadasNivel(\'Druida\',\'Círculo da Terra\',3) tem 12 itens, e a escada até o ' +
-      'nível 20 termina com {"sempre": 24} e ZERO com origem \'dominio\' (script ad hoc, saída no ' +
-      'task-6-report.md, seção "Correção pós-revisão"). Por que a rota "sempre" extrai aqui e NÃO na ' +
-      'Causa 1: a guarda `texto.includes(\'sempre\')` (levelup.js:498, dentro de ' +
-      'extrairMagiasSemprePreparadasTabela) PASSA para Círculo da Terra, porque a frase de abertura do ' +
-      'livro (Classes.md:2406) começa com "**Sempre** que completar um Descanso Longo, escolha um tipo ' +
-      'de terreno..." -- tem a palavra "sempre", só que qualificando a FREQUÊNCIA da escolha (toda vez ' +
-      'que descansa), não a preparação da magia; a guarda não distingue as duas leituras. Depois de ' +
-      'passar a guarda, o laço de linhas de extrairMagiasSemprePreparadasTabela (levelup.js:503-521) ' +
-      'varre TODAS as linhas da descrição (as quatro tabelas de terreno concatenadas num único campo de ' +
-      'texto) procurando `| N | *Magia* |`, sem nenhuma noção de qual `**Terreno X**` cada linha pertence ' +
-      'nem de qual terreno o jogador escolheu -- soma as quatro ocorrências do nível pedido. Esta é a ' +
-      'causa raiz DIFERENTE da Causa 1: a extração ACONTECE (dentro da MESMA função, ' +
-      'extrairMagiasSemprePreparadasTabela), só que aqui ela extrai CERTO e não sabe filtrar pela escolha ' +
-      'do jogador -- na Causa 1 a guarda barra tudo e a função nem chega a rodar; aqui a guarda deixa ' +
-      'passar e o problema é outro (soma em vez de escolher). Livro: Classes.md:2404-2442, "Nível 3: ' +
-      'Magias do Círculo da Terra" -- Classes.md:2406 (citada acima), seguido de QUATRO tabelas ' +
-      'alternativas (Terreno Árido Classes.md:2408-2415, Polar :2417-2424, Temperado :2426-2433, Tropical ' +
-      ':2435-2442), cada uma concedendo 3 magias no nível 3 e 1 em cada um dos níveis 5/7/9 (6 magias no ' +
-      'total de UMA tabela escolhida; 24 se as quatro forem somadas nos quatro níveis -- 12+4+4+4). ' +
-      'Medido dirigindo o app de verdade nível a nível (obterMagiasSemprePreparadasNivel): nível 3, 12 ' +
-      'magias contra o teto de 3 do livro (Bolha Ácida, Mãos Flamejantes, Névoa Obscurecente, Paralisar ' +
-      'Pessoa, Passo Nebuloso, Raio Nauseante, Raio de Fogo, Raio de Gelo, Sono, Teia, Toque Chocante, ' +
-      'Turvar); nível 5, 4 contra teto 1 (Bola de Fogo, Nevasca, Nuvem Fétida, Relâmpago); nível 7, 4 ' +
-      'contra teto 1 (Malogro, Movimentação Livre, Polimorfia, Tempestade Glacial); nível 9, 4 contra ' +
-      'teto 1 (Cone de Frio, Muralha de Pedra, Passo Arbóreo, Praga de Insetos). Consequência medida ' +
-      '(CORRIGIDA -- a versão anterior citava um card de subida de nível que na verdade não mostra nada ' +
-      'para esta subclasse): o card "Magias de Domínio — Automáticas" (levelup-cards.js:77-90), ' +
-      'alimentado por magiasDominioNivel (levelup-flow.js:198-200), fica vazio (rota de domínio morta, ' +
-      'ver acima) -- a TELA de subida de nível NÃO oferece as 12 magias do nível 3, nem pede ao jogador ' +
-      'para escolher um terreno (magiasSempreNivel, a variável que teria as 12, nunca alimenta card ' +
-      'nenhum -- seu único consumidor é o Set de deduplicação em levelup-ui.js:1241-1245). O efeito real ' +
-      'aparece só depois, na FICHA: subirDeNivel (levelup.js:1303-1313, o bloco "sempre"; o bloco irmão ' +
-      'de domínio, :1291-1297, não roda porque magiasDominio vem []) grava as magias em ' +
-      'personagem.magias_preparadas com origem: \'sempre\' -- um Druida de Círculo da Terra termina o ' +
-      'nível 9 com 24 magias com essa origem por esta característica (12+4+4+4, as quatro tabelas somadas ' +
-      'nos quatro níveis de concessão), quando o livro concede no máximo 6 (3+1+1+1, uma tabela ' +
-      'escolhida), e SEM NUNCA ter sido perguntado qual terreno escolher -- confirmado dirigindo ' +
-      'escadaDeNivel de verdade e contando por origem (24 \'sempre\', 0 \'dominio\'). Corrigir isto exige ' +
-      '(a) decidir o que fazer da rota de domínio morta (mesmo bug de nome "de"/"do" da Causa 1, ou ' +
-      'aceitar que a extração continue pela rota "sempre") e (b) modelar a escolha de terreno do jogador ' +
-      '-- não é resolvido só pelo conserto da guarda da Causa 1, porque aqui a guarda já deixa passar.' },
+  // Círculo da Terra (Causa 2 do domínio Magias) -- CORRIGIDA em 2026-08-18
+  // (Plano 4 da rodada de correção), nas duas rotas. O app somava as QUATRO
+  // tabelas de terreno (12 magias no nível 3 contra o teto 3 do livro) porque
+  // nunca perguntava qual terreno o jogador escolheu. Agora pergunta: a
+  // escolha entrou em regras-subclasse-escolhas.js como linha
+  // 'subclasse_terreno', vira pendência de subida de nível com card próprio, e
+  // grava em escolhas_classe.circulo_terra_terreno. O extrator de tabela
+  // (extrairMagiasSemprePreparadasTabela) passou a RECORTAR o bloco do terreno
+  // escolhido -- e, sem escolha em mãos, devolve vazio de propósito, em vez de
+  // somar alternativas que o personagem nunca escolheu. Sem lacuna
+  // remanescente nesta chave.
 
   // Causa 3 (1 subclasse: Círculo das Estrelas) -- NOVA nesta correção
   // (CRITICAL 3 da revisão independente). Não é a Causa 1: simular o
@@ -798,26 +607,17 @@ export const LACUNAS = [
   // salva usa (site/js/pages/sheet.js:48-49), não pela subida de nível em
   // si -- por isso 'subclasses-magias-ficha', não 'subclasses-magias' (ver
   // comentário de TESTES_VALIDOS acima).
-  { talento: 'Círculo da Terra', teste: 'subclasses-magias-ficha',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'Mesma Causa 2 (ver a entrada acima -- CORRIGIDA nesta revisão), vista pela rota dos ' +
-      'acessores da ficha. site/js/pages/sheet.js:48 chama obterTodasMagiasDominio(classe, \'Círculo da ' +
-      'Terra\', nivel) (levelup.js:797-807) -- que devolve [] (confirmado rodando de verdade, 0 itens no ' +
-      'nível 20), porque soma obterMagiasDominioNivel para os níveis fixos [3,5,7,9] (levelup.js:801) e ' +
-      'essa função individual já devolve [] para esta subclasse (rota de domínio morta, ver Causa 2 ' +
-      'acima). A rota que REALMENTE traz as magias é a OUTRA chamada da mesma linha do arquivo, ' +
-      'sheet.js:49, obterTodasMagiasSemprePreparadas(classe, \'Círculo da Terra\', nivel) ' +
-      '(levelup.js:640-647), que varre 1..nivelAtual somando obterMagiasSemprePreparadasNivel -- ' +
-      'confirmado rodando de verdade: obterTodasMagiasSemprePreparadas(\'Druida\',\'Círculo da ' +
-      'Terra\',20) tem 25 itens (24 da característica de terreno, mais \'Falar com Animais\', concedida ' +
-      'pela classe base Druida no nível 1, que este acessor também varre). Consequência medida ' +
-      '(CORRIGIDA -- a versão anterior apontava para a função e para o rótulo errados): a ficha de um ' +
-      'Druida de Círculo da Terra de nível 9+ mostra as 24 magias da característica sob o rótulo "Sempre ' +
-      'Preparada" (rotuloOrigemMagia, site/js/sheet/magias.js:36-39 -- `if (magia?.origem === \'sempre\') ' +
-      'return \'Sempre Preparada\';`), NÃO sob "Domínio" -- quem for reproduzir e olhar a lista "Magias ' +
-      'de Domínio" não vai encontrar as 24; elas estão sob "Sempre Preparadas", quando o livro concede no ' +
-      'máximo 6 magias de Domínio (a tabela do terreno escolhido a cada Descanso Longo -- não uma ' +
-      'concessão fixa "sempre").' },
+  // Círculo da Terra (Causa 2 do domínio Magias) -- CORRIGIDA em 2026-08-18
+  // (Plano 4 da rodada de correção), nas duas rotas. O app somava as QUATRO
+  // tabelas de terreno (12 magias no nível 3 contra o teto 3 do livro) porque
+  // nunca perguntava qual terreno o jogador escolheu. Agora pergunta: a
+  // escolha entrou em regras-subclasse-escolhas.js como linha
+  // 'subclasse_terreno', vira pendência de subida de nível com card próprio, e
+  // grava em escolhas_classe.circulo_terra_terreno. O extrator de tabela
+  // (extrairMagiasSemprePreparadasTabela) passou a RECORTAR o bloco do terreno
+  // escolhido -- e, sem escolha em mãos, devolve vazio de propósito, em vez de
+  // somar alternativas que o personagem nunca escolheu. Sem lacuna
+  // remanescente nesta chave.
 
   // ---------- Domínio Subclasses/Escolhas (2026-08-17) ----------
   //
@@ -913,63 +713,23 @@ export const LACUNAS = [
   // (subclasses-escolhas.test.mjs); não é alegação de que o bug é
   // específico daquela subclasse. `motivo` nomeia por extenso todas as
   // características realmente afetadas.
-  { talento: 'Colégio do Conhecimento', teste: 'subclasses-escolha-ausente',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'Causa 1 de 4 desta rodada -- nenhum controle dedicado existe, em lugar nenhum do app (nem ' +
-      'levelup.js, nem a ficha, nem a camada do assistente de subida de nível), para 6 características ' +
-      'de construção de subclasse (7 entradas do catálogo, porque Estudioso da Guerra tem duas escolhas ' +
-      'de tipos diferentes na mesma característica). O app NÃO tem um ' +
-      'mecanismo genérico "esta característica de subclasse exige uma decisão do jogador neste nível" -- ' +
-      'levelup.js só reconhece 15 tipos de pendência (grep -n "tipo_pendencia:" site/js/levelup.js, ' +
-      'linhas 948-1211), e nenhum deles corresponde a estas 6. Colégio do Conhecimento (Bardo) nv3 ' +
-      '"Proficiências Bônus" (Classes.md:766 -- "Você adquire proficiência em três perícias à sua ' +
-      'escolha") e nv6 "Descobertas Mágicas" (Classes.md:770 -- "Você aprende duas magias à sua ' +
-      'escolha... Você sempre tem as magias escolhidas preparadas"): a ficha mostra um cartão ' +
-      'DECORATIVO, só texto ("Escolha 3 perícias adicionais para se tornar proficiente"/"Aprenda 2 ' +
-      'magias de qualquer lista... Sempre preparadas", site/js/sheet/habilidades.js:3087-3096 e ' +
-      ':3097-3107, atrás das flags ehConhecimentoProficienciasBonus/ehConhecimentoDescobertasMagicas, ' +
-      ':2667-2668) -- nenhum <select>, nenhum botão, nada que grave em pericias_proficientes/ ' +
-      'magias_preparadas (os dois campos são GENÉRICOS, escritos por outras origens -- talentos, ' +
-      'antecedentes -- não por esta característica). Mestre da Batalha (Guerreiro) nv3 "Estudioso da ' +
-      'Guerra" (Classes.md:4061 -- ferramenta de artesão E perícia, duas escolhas na mesma ' +
-      'característica): `grep -rn "Estudioso da Guerra" site/js/` => 0 ocorrências em todo o app (a ' +
-      'string só existe em dados/classes/guerreiro.json) -- nem decorativo, nem funcional; contraste com ' +
-      'a característica IRMÃ do mesmo nível, Superioridade em Combate, que TEM mecanismo real ' +
-      '(manobras_guerreiro) e passa nas duas direções. Andarilho Feérico (Guardião) nv3 "Glamour ' +
-      'Transcendental" (Classes.md:3480 -- perícia entre Atuação/Enganação/Persuasão): `grep -rn "Glamour ' +
-      'Transcendental" site/js/` => 0 ocorrências. Campeão (Guerreiro) nv7 "Estilo de Luta Adicional" ' +
-      '(Classes.md:3904 -- "Você adquire outro talento de Estilo de Luta à sua escolha"): mesmo padrão ' +
-      'decorativo do Bardo (habilidades.js:4013-4022, "Passiva — Talento Adicional", flag ' +
-      'ehEstiloLutaAdicional :2688). CORREÇÃO (revisão independente de 2026-08-18, IMPORTANTE 3): o ' +
-      'campo real (escolhas_classe.estilo_luta) JÁ É um array -- levelup.js:1571 e :1588 gravam ' +
-      '`personagem.escolhas_classe.estilo_luta = [opcoes.estilo_luta]` -- então nenhuma mudança de ' +
-      'schema é necessária para guardar um segundo estilo, ao contrário do que uma versão anterior deste ' +
-      'motivo afirmava ("nem a estrutura de dado suporta um segundo estilo sem mudança de schema"). O ' +
-      'bloqueio real são SETE leitores que assumem um único slot, lendo sempre o índice 0 do array: ' +
-      '`site/js/utils.js:212`, `site/js/sheet/combate.js:85`, `site/js/sheet/magias.js:281`, ' +
-      '`site/js/sheet/habilidades.js:4693`, `site/js/talentos-effects.js:44`, ' +
-      '`site/js/levelup-ui.js:1198` e `site/js/creator/passo-classe.js:25` (todos ' +
-      '`estilo_luta?.[0]`/`estilo_luta[0]` ou equivalente, confirmado por grep) -- corrigir a ' +
-      'característica exige tratar `estilo_luta` como lista nesses sete pontos, e levelup.js precisaria ' +
-      'EMPILHAR em vez de SUBSTITUIR o array em :1571/:1588; mudar o tipo do campo não resolveria nada, ' +
-      'porque o campo já é do tipo certo. Círculo da Terra (Druida) nv3 "Magias do Círculo da Terra", a ' +
-      'parte da PENDÊNCIA de escolher o terreno (Classes.md:2406 -- "Sempre que completar um Descanso ' +
-      'Longo, escolha um tipo de terreno: árido, polar, temperado ou tropical" -- diferente da entrada ' +
-      'já registrada em \'subclasses-magias\', que cobre as MAGIAS concedidas, um bug independente já ' +
-      'documentado): `grep -rn "terreno" site/js/` não acha nenhum campo de escolha de terreno (só um ' +
-      'flag não relacionado, velocista_terreno_dificil, talentos-effects.js:296); hp-descanso.js:900-903 ' +
-      'reseta recursos de OUTRA característica da mesma subclasse (Recuperação Natural, nível 6), não a ' +
-      'escolha de terreno. Consequência medida, por personagem: um Bardo Colégio do Conhecimento de ' +
-      'nível 3 vê um lembrete de texto mas precisa adicionar as 3 perícias por conta própria, sem ' +
-      'controle nem validação; um Guerreiro Mestre da Batalha de nível 3 não recebe absolutamente nenhum ' +
-      'aviso sobre a ferramenta/perícia de Estudioso da Guerra; um Guardião Andarilho Feérico de nível 3 ' +
-      'idem para a perícia; um Guerreiro Campeão de nível 7 vê só um lembrete decorativo para o segundo ' +
-      'Estilo de Luta, sem nenhum controle que grave ou exiba além do primeiro slot; um Druida Círculo ' +
-      'da Terra de nível 3 nunca é perguntado qual terreno escolher (a tela de subida de nível não tem ' +
-      'nenhum campo para isso). ' +
-      'Ver também: Cavaleiro Místico / Trapaceiro Arcano nv3 "Conjuração" pertenciam a esta causa e ' +
-      'foram reclassificadas como limitacao-observabilidade (entrada \'Cavaleiro Místico\'), porque o ' +
-      'assistente de subida de nível implementa a escolha e este motor não o enxerga.' },
+  // Colégio do Conhecimento (Causa 1: 7 entradas sem controle em lugar nenhum
+  // do app) e Assassino (Causa 4: as 5 concessões automáticas que o livro
+  // concede sem perguntar e o app nunca aplicava) -- CORRIGIDAS em 2026-08-18
+  // (Plano 4 da rodada de correção).
+  //
+  // O app não tinha mecanismo genérico para "esta característica de subclasse
+  // exige uma decisão neste nível": levelup.js reconhecia 15 tipos de
+  // pendência escritos um a um. Escrever mais 12 ramos à mão repetiria o
+  // defeito, então entrou uma TABELA declarativa,
+  // site/js/regras-subclasse-escolhas.js (17 linhas), mais um laço em
+  // subirDeNivel e um card GENÉRICO no assistente
+  // (levelup-cards.js:montarCardsEscolhaSubclasse). A próxima característica
+  // que o livro mandar escolher é uma LINHA, não um ramo.
+  //
+  // A UI não era opcional aqui, diferente dos Planos 1-3: pendência sem card
+  // TRAVA o jogador -- ele não sobe de nível e não tem onde responder.
+  // Sem lacuna remanescente nessas chaves.
   { talento: 'Cavaleiro Místico', teste: 'subclasses-escolha-ausente',
     tipo: 'limitacao-observabilidade',
     motivo: 'Causa 1-bis desta rodada -- CRITICAL 1 da revisão independente de 2026-08-18: a versão ' +
@@ -1012,105 +772,30 @@ export const LACUNAS = [
       '`subirDeNivel` puro. Por isso a Direção 1 (nenhuma pendência específica de subclasse aparece) e o ' +
       'converso (`magias_conhecidas`/`magias_preparadas` não crescem) ficam vermelhos aqui mesmo com o ' +
       'app correto -- é o motor que é cego a esta camada, não o app que está errado.' },
+  // ESTREITADA em 2026-08-18 (Plano 4 da rodada de correção). A alegação
+  // original -- "o controle existe, mas só na ficha, nunca no assistente" --
+  // valia para 7 características; 5 delas ganharam pendência de subida de
+  // nível e fecharam. Sobram DUAS, e a alegação mudou de natureza: não é mais
+  // sobre o app estar errado, é sobre o CATÁLOGO esperar pendência de nível
+  // para uma escolha que o livro põe num DESCANSO.
   { talento: 'Caçador', teste: 'subclasses-escolha-ausente',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'Causa 2 de 4 desta rodada -- DIFERENTE da Causa 1: aqui o controle EXISTE, dedicado e ' +
-      'funcional, só que só na FICHA salva, nunca no assistente de subida de nível -- fixo o dano da ' +
-      'lição do brief ("uma escolha que a ficha permite editar à mão tem consequência diferente de uma ' +
-      'que não existe em lugar nenhum"). 7 características, uma escolha cada. Trilha do Coração Selvagem ' +
-      '(Bárbaro) nv6 "Aspecto dos Selvagens" (Classes.md:267): grava em ' +
-      'char.recursos.aspecto_selvagem, site/js/sheet/classes/barbaro.js:245 ("char.recursos.aspecto_selvagem ' +
-      '= e.target.value || null"). Patrono Ínfero (Bruxo) nv10 "Resistência Ínfera" (Classes.md:1467): ' +
-      'char.recursos.bruxo.subclasses.infero.resistencia_infera_escolha, ' +
-      'site/js/sheet/habilidades.js:375. Feitiçaria Dracônica (Feiticeiro) nv6 "Afinidade Elemental" ' +
-      '(Classes.md:3080): char.recursos.feiticeiro.subclasses.draconica.afinidade_elemental, ' +
-      'habilidades.js:880. Caçador (Guardião) nv3 "Presa do Caçador" (Classes.md:3543): ' +
-      'char.recursos.guardiao.subclasses.cacador.presa_escolha, habilidades.js:428; nv7 "Táticas ' +
-      'Defensivas" (Classes.md:3551): char.recursos.guardiao.subclasses.cacador.taticas_escolha, ' +
-      'habilidades.js:432. Senhor das Feras (Guardião) nv3 "Companheiro Primal" (Classes.md:3573): ' +
-      'char.recursos.guardiao.subclasses.feras.companheiro_tipo, habilidades.js:436. Adivinhador (Mago) ' +
-      'nv10 "O Terceiro Olho" (Classes.md:5020): char.recursos.mago.subclasses.adivinhador.terceiro_olho_escolha, ' +
-      'site/js/sheet/classes/mago.js:100,110 e habilidades.js:2068-2070. RESSALVA (revisão independente ' +
-      'de 2026-08-18, IMPORTANTE 2): das sete, CINCO nascem inequivocamente no nível de aquisição -- o ' +
-      'livro concede algo "à sua escolha" separado de qualquer cadência de descanso/uso -- Aspecto dos ' +
-      'Selvagens (Classes.md:267, "Você recebe uma das seguintes opções à sua escolha"; a frase seguinte, ' +
-      '"Sempre que completar um Descanso Longo, você pode alterar sua escolha", é uma TROCA opcional ' +
-      'depois da escolha inicial, não o nascimento dela -- mesmo padrão em Presa do Caçador/Táticas ' +
-      'Defensivas, Classes.md:3543/:3551), Afinidade Elemental (Classes.md:3080, "Escolha um desses ' +
-      'tipos", sem cadência de descanso nenhuma) e Companheiro Primal (Classes.md:3573, escolha inicial ' +
-      'que "persiste até ser trocada em um Descanso Longo"). As outras DUAS são diferentes: Resistência ' +
-      'Ínfera (Classes.md:1467, "Ao completar um Descanso Curto ou Longo, escolha um tipo de dano...") e ' +
-      'O Terceiro Olho (Classes.md:5020, "Como uma Ação Bônus, escolha um dos seguintes benefícios...") ' +
-      'não têm frase de escolha inicial separada da cadência de descanso/uso -- o livro nasce a PRIMEIRA ' +
-      'escolha só no primeiro descanso/uso depois da aquisição, não no nível em si. Para essas duas, "o ' +
-      'assistente de subida de nível não pergunta NO NÍVEL" não é, por si só, uma violação de regra -- o ' +
-      'livro não manda perguntar nesse momento; um controle na ficha (onde as duas moram hoje) é ' +
-      'exatamente o lugar certo para uma escolha de cadência de descanso/uso, não uma lacuna. A causa ' +
-      'raiz abaixo (char.recursos fora da rota subirDeNivel) continua real e documentada para as sete -- ' +
-      'nenhuma delas é alcançada pelo assistente -- mas só CINCO representam uma escolha de NÍVEL que o ' +
-      'assistente deveria perguntar e não pergunta; para Resistência Ínfera/O Terceiro Olho, a ausência ' +
-      'na tela de subida de nível é esperada, e o que sobra de real é só "o controle vive só na ficha" ' +
-      '(o que já é, por si, uma limitação: um jogador que nunca abre a ficha fora do fluxo de nível não ' +
-      'encontra o controle nem quando o descanso chega). As sete têm a MESMA causa raiz técnica, ' +
-      'confirmada por grep: `char.recursos` nunca é criado por store.criarPersonagemVazio() ' +
-      '(site/js/store.js:236-317, sem a chave `recursos`) nem por nenhuma linha de site/js/levelup.js ' +
-      '(`grep -n "personagem\\.recursos" site/js/levelup.js` => 0 ocorrências) -- só o handler da FICHA ' +
-      '(cada um dos arquivos/linhas acima) cria `char.recursos = {}` sob demanda, quando o jogador já ' +
-      'está interagindo com a ficha salva, fora do fluxo de subida de nível. Consequência medida, por ' +
-      'personagem: um Bárbaro Trilha do Coração Selvagem de nível 6, um Bruxo Patrono Ínfero de nível 10, ' +
-      'um Feiticeiro Feitiçaria Dracônica de nível 6, um Guardião Caçador de nível 3 e 7, um Guardião ' +
-      'Senhor das Feras de nível 3 e um Mago Adivinhador de nível 10 terminam a tela de subida de nível ' +
-      'sem NENHUM aviso de que uma escolha da subclasse ficou pendente -- o assistente deixa concluir ' +
-      'normalmente. O jogador só encontra o controle real se souber abrir a ficha salva depois e procurar ' +
-      'o menu de Habilidades da característica certa; nada na tela de subida de nível aponta para lá.' },
-  { talento: 'Assassino', teste: 'subclasses-escolha-ausente',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'Causa 4 de 4 desta rodada -- diferente das causas acima: aqui não há ESCOLHA nenhuma do ' +
-      'jogador -- o livro concede automaticamente ("Você adquire proficiência em X", sem "à sua escolha") ' +
-      '-- e mesmo assim nenhum código em site/js/ jamais aplica a concessão, em NENHUM caminho (nem ' +
-      'subirDeNivel, nem a ficha, nem o assistente de criação). 5 características (a 5ª, Treinamento ' +
-      'Marcial, acrescentada na correção pós-revisão de 2026-08-18, CRÍTICO 1 -- ver abaixo), medidas ' +
-      'pelo converso (Grupo 6) sobre CONCESSOES_AUTOMATICAS_SUBCLASSE -- o Grupo 5 ("concessão automática ' +
-      'não vira pendência") já confirma que o app corretamente NÃO pergunta nada aqui (comportamento ' +
-      'certo, o livro não manda perguntar); o problema é que ele também não CONCEDE. Combatente da ' +
-      'Misericórdia (Monge) nv3 "Implementos de Misericórdia" (Classes.md:5330 -- "proficiência nas ' +
-      'perícias Intuição e Medicina e proficiência com o Kit de Herbalismo"): `grep -rn "Implementos de ' +
-      'Misericórdia" site/js/` => 0 ocorrências. Assassino (Ladino) nv3 "Ferramentas de Assassino" ' +
-      '(Classes.md:4389 -- ' +
-      '"um Kit de Disfarce e um Kit de Veneno, e tem proficiência com eles"): a ficha mostra um cartão ' +
-      'DECORATIVO (cabeçalho "Passiva — Proficiências", corpo "Proficiência com Kit de Disfarce e Kit de ' +
-      'Veneno.", habilidades.js:4170-4178, flag ehFerramentasAssassino :2705) -- CORREÇÃO (revisão ' +
-      'independente de 2026-08-18, MENOR 5): a versão anterior citava esse texto como uma única frase ' +
-      'entre aspas ("Passiva — Proficiências: Kit de Disfarce e Kit de Veneno") -- paráfrase, não a ' +
-      'citação literal; o cartão real tem os dois textos em `<div>`s separados, como citado acima -- ' +
-      'mesmo padrão dos três decorativos da Causa 1, texto sem ' +
-      'nenhuma gravação em proficiencias_ferramentas. Vigilante das Sombras (Guardião) nv7 "Mente de ' +
-      'Ferro" (Classes.md:3734 -- "proficiência em salvaguardas de Sabedoria"): `grep -rn "Mente de ' +
-      'Ferro" site/js/` => 0 ocorrências. Ilusionista (Mago) nv3 "Ilusões Aprimoradas" (Classes.md:5074 -- ' +
-      '"Você também conhece o truque Ilusão Menor"): `grep -rn "Ilusões Aprimoradas" site/js/` => 0 ' +
-      'ocorrências; as duas únicas ocorrências de "Ilusão Menor" em site/js/ (creator/comum.js:79, ' +
-      'sheet/migracoes.js:202) são um truque concedido por um TRAÇO DE ESPÉCIE não relacionado (Gnomo do ' +
-      'Bosque) -- confirmado lendo o código ao redor: nenhuma delas checa `subclasse === \'Ilusionista\'`. ' +
-      'Colégio da Bravura (Bardo) nv3 "Treinamento Marcial" (Classes.md:704 -- "Você adquire proficiência ' +
-      'com armas Marciais, armaduras Médias e treinamento com Escudos"): CORREÇÃO (revisão independente ' +
-      'de 2026-08-18, CRÍTICO 1) -- até esta correção esta entrada não existia na Causa 4/lista de causas ' +
-      'nenhuma; o converso ficava `t.skip` porque `campoEsperado` apontava para ' +
-      '`proficiencias_armaduras`, tratado (por engano) como raiz fora do alcance da rota subirDeNivel. O ' +
-      'campo real onde esta concessão apareceria é `proficiencias_extra` (criado por ' +
-      '`store.criarPersonagemVazio()`, site/js/store.js:255, plenamente alcançável por `subirDeNivel`); ' +
-      '`grep -rn "Treinamento Marcial" site/js/` => 0 ocorrências, e o único ponto que escreve em ' +
-      '`proficiencias_extra` (site/js/creator/wizard.js:453-460) cobre só Clérigo Protetor/Druida Protetor ' +
-      '-- nenhuma linha soma "Armas Marciais"/"Armadura Média"/"Escudo" para um Bardo Colégio da Bravura. ' +
-      'Consequência medida, por personagem: um Monge Combatente da Misericórdia de nível 3 nunca ganha ' +
-      'Intuição/Medicina nem o Kit de Herbalismo, em campo nenhum da ficha; um Ladino Assassino de nível ' +
-      '3 vê um lembrete de texto que descreve a proficiência, mas proficiencias_ferramentas nunca é ' +
-      'escrito; um Guardião Vigilante das Sombras de nível 7 nunca ganha salvaguardas_proficientes para ' +
-      'Sabedoria; um Mago Ilusionista de nível 3 nunca ganha Ilusão Menor em magias_conhecidas; um Bardo ' +
-      'Colégio da Bravura de nível 3 nunca ganha proficiência com armas Marciais, armadura Média nem ' +
-      'Escudo em `proficiencias_extra` -- fica preso a armadura Leve/armas Simples (CLASSES_INFO[\'Bardo\'], ' +
-      'site/js/dados-classes.js:21-22) pelo resto da progressão. Nos cinco casos o jogador não fez nada ' +
-      'errado nem esqueceu nenhuma escolha -- é uma regra automática do livro que o app simplesmente ' +
-      'nunca aplica.' },
+    tipo: 'limitacao-observabilidade',
+    motivo: 'Resistência Ínfera (Patrono Ínfero nv10, Classes.md:1467 -- "Ao completar um Descanso ' +
+      'Curto ou Longo, escolha um tipo de dano, exceto Energético") e O Terceiro Olho (Adivinhador ' +
+      'nv10, Classes.md:5020 -- mesma forma). O motor (Grupo 3) espera, para as 14 escolhas de ' +
+      'construção do catálogo, uma pendência de subida de NÍVEL. Cumprir isso nessas duas faria o ' +
+      'app EXIGIR no nível uma escolha que o livro só pede no descanso seguinte -- inventar regra, ' +
+      'que é o oposto do que esta suíte existe para fazer. O próprio motivo anterior desta entrada ' +
+      'já registrava a ressalva ("para 2 das 7 o livro nasce a escolha só no primeiro Descanso/uso ' +
+      'após a aquisição, não no nível em si, então a ausência na TELA DE NÍVEL não é, sozinha, ' +
+      'violação"). O que o app FAZ hoje para as duas: subirDeNivel não bloqueia, e o controle ' +
+      'dedicado da ficha (sheet/habilidades.js:375 para Resistência Ínfera; sheet/classes/mago.js:100 ' +
+      'para O Terceiro Olho) continua sendo onde a escolha é feita -- que é onde o livro a coloca. ' +
+      'A decisão está registrada em docs/PERGUNTAS-PENDENTES.txt, com o que muda se a preferência ' +
+      'for uniformidade: são ~10 linhas na tabela de regras-subclasse-escolhas.js, ao custo de o app ' +
+      'travar a subida de nível por uma escolha que o livro não pede ali. As outras 5 da alegação ' +
+      'original (Aspecto dos Selvagens, Afinidade Elemental, Presa do Caçador, Táticas Defensivas, ' +
+      'Companheiro Primal) fecharam: nascem no nível de aquisição e hoje têm pendência e card.' },
 
   // ---------- Domínio Subclasses/Recursos (2026-08-18) ----------
   //
@@ -1121,7 +806,7 @@ export const LACUNAS = [
   // 27 características de subclasse citáveis (base custo-declarado/
   // ausência-de-custo, não composta). Dez divergências: DUAS são o mesmo
   // código das causas abertas de Classes/Passivas (call sites novos na
-  // entrada 'classes-passivas-descanso-curto-janela', acima -- Mapa Estelar
+  // entrada acima -- Mapa Estelar
   // e Sentinela Imortal/detectarUsosMaximos); as outras oito caem nas três
   // chaves abaixo, na granularidade do CONSERTO (não das 8 divergências
   // individuais).
@@ -1152,85 +837,29 @@ export const LACUNAS = [
   // subclasses diferentes (Trilha do Fanático, Patrono Celestial,
   // Feitiçaria Selvagem ×2, Trapaceiro Arcano, Adivinhador) -- o `motivo`
   // nomeia as seis por extenso.
-  {
-    talento: 'Feitiçaria Selvagem', teste: 'subclasses-recursos-usos-sem-consequencia',
-    tipo: 'limitacao-observabilidade',
-    motivo: 'detectarUsosMaximos (site/js/sheet/habilidades.js:2390) só reconhece contagem FIXA em texto ' +
-      '("X vezes"/"X vez") -- para 6 características citáveis de subclasse o livro expressa o limite de ' +
-      'uso de uma forma que a heurística não reconhece (implícito num "não pode usar novamente até ' +
-      'Descanso X", sem nunca dizer "uma vez" literalmente, OU um pool descrito por adjetivo numeral, ' +
-      '"quatro d12s"), e detectarUsosMaximos devolve `null` contra um número real do catálogo. Isso é uma ' +
-      'expectativa LEGÍTIMA (o livro de fato declara um limite citável) -- mas medida contra ' +
-      'site/js/sheet/habilidades.js inteiro (grep pelo CAMPO dedicado de cada uma, não pelo nome da ' +
-      'característica), nenhuma das 6 tem consequência observável pelo jogador, por DOIS mecanismos ' +
-      'diferentes que levam à mesma tela: ' +
-      '(1) RAMO DEDICADO, que nunca lê usosMax -- Campeão dos Deuses (Trilha do Fanático nv3, Classes.md:' +
-      '299,301, "reserva de quatro d12s"; catálogo usos=4): ramo ehCampeaoDeuses ' +
-      '(habilidades.js:2801-2814) calcula o teto a partir do NÍVEL do personagem (`dadosMax = nivel >= 17 ' +
-      '? 7 : ... : 4`), nunca de detectarUsosMaximos -- mesmo mecanismo dos 11 já anotados com ' +
-      '`ramoDedicado` no catálogo (Grupo 2 de subclasses-recursos.test.mjs), só que esta 12ª ocorrência ' +
-      'não tinha sido identificada antes desta tarefa. Vingança Calcinante (Patrono Celestial nv14, ' +
-      'Classes.md:1385; catálogo usos=1): ramo ehCelestialVinganca (habilidades.js:3314+) usa o campo ' +
-      'booleano `vinganca_calcinante_usada`, nunca usosMax. Marés do Caos (Feitiçaria Selvagem nv3, ' +
-      'Classes.md:3164; catálogo usos=1): ramo ehMaresCaos (habilidades.js:3820+) usa o campo booleano ' +
-      '`mares_caos_disponivel`. Surto Controlado (Feitiçaria Selvagem nv18, Classes.md:3216; catálogo ' +
-      'usos=1): ramo ehSurtoControlado (habilidades.js:3834+) usa o campo booleano ' +
-      '`surto_controlado_usado`. O Terceiro Olho (Adivinhador nv10, Classes.md:5020; catálogo usos=1): ' +
-      'ramo ehAdivinhadorTerceiroOlho (habilidades.js:4638-4654, condicionado a `estadoMagoSub.' +
-      'terceiroOlhoAtivo`, verdadeiro para todo personagem que já tem a característica, nível 10+) usa o ' +
-      'campo `terceiroOlhoUsado`. (2) SEM ramo dedicado, mas mesmo assim sem consequência -- Ladrão de ' +
-      'Magias (Trapaceiro Arcano nv17, Classes.md:4518; catálogo usos=1): nenhum campo dedicado em ' +
-      'site/js/ inteiro (grep confirmado), cai no caminho GENÉRICO de restaurarHabilidades/renderFeatureItem ' +
-      '-- mas `temMultiplosUsos` (habilidades.js:2621, `usosMax && usosMax > 1 && recarga`) só é truthy ' +
-      'quando usosMax>1; como o valor REAL do catálogo é 1 (não >1), mesmo que detectarUsosMaximos ' +
-      'tivesse acertado, o resultado renderizado seria o MESMO ramo (`!usosHtmlBody && ativa && recarga`, ' +
-      'habilidades.js:4750, o toggle "✓ Disponível"/"✗ Usado" sem contador) que já aparece hoje com o ' +
-      'valor errado (`null`). Em nenhum dos 6 casos a correção da heurística mudaria um pixel da tela que ' +
-      'o jogador vê -- por isso `limitacao-observabilidade`, não `app-diverge-do-livro`: esta rota de ' +
-      'teste (o valor BRUTO de detectarUsosMaximos) não é o mecanismo que a ficha realmente usa para ' +
-      'nenhuma das 6.' },
-  {
-    talento: 'Juramento dos Anciões', teste: 'subclasses-recursos-ativa-curto-circuito-automatico',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'Sentinela Imortal (Juramento dos Anciões, Paladino, nível 15) -- causa NOVA, distinta das 7 ' +
-      'causas abertas de Classes/Passivas por MECANISMO, não só por sintoma. O texto (Classes.md:5889, ' +
-      '"Ao ser reduzido a 0 Pontos de Vida e não morto imediatamente, você fica com 1 Ponto de Vida e ' +
-      'recupera... Após usar essa característica, você não pode utilizá-la novamente até completar um ' +
-      'Descanso Longo.") não tem NENHUM verbo de decisão do jogador -- é uma salvaguarda automática contra ' +
-      'a morte, não algo que o jogador escolhe ativar (mesmo raciocínio já aplicado a Sentinela Imortal no ' +
-      'catálogo, testes/regras/catalogo/subclasses.mjs, `ativaBase: \'ausencia-de-custo\'`). Ainda assim, ' +
-      'ehHabilidadeAtiva (site/js/utils.js:526) devolve `true`, e a causa NÃO é a lista de frases-gatilho ' +
-      '(utils.js:536, "como uma ação"/"você pode usar"/etc. -- nenhuma casa aqui) nem uma má-detecção de ' +
-      'detectarRecarga (que acerta \'longo\' de verdade, é a recarga real da característica): é o ' +
-      'curto-circuito `if (recarga) return true` (utils.js:535), que trata QUALQUER recarga CONFIRMADA ' +
-      'como prova de decisão do jogador, sem checar se existe algum verbo de escolha no texto. ' +
-      'CORREÇÃO (revisão independente de 2026-08-18): `utils.js:535` NÃO é código exclusivo desta causa -- ' +
-      '\'classes-passivas-recarga-troca-escolha\' (acima) já nomeia a MESMA linha (lá citada como ' +
-      '"utils.js:508, if (recarga) return true"), e é por ELA, não pela lista de frases de `utils.js:536`, ' +
-      'que as 6 características daquela entrada (Maestria em Arma de Bárbaro/Guerreiro/Guardião/Paladino/ ' +
-      'Ladino, Maestria de Magias do Mago) também caem em "ativa": confirmado rodando a lista de frases ' +
-      'contra as 6 descrições reais -- nenhuma das 6 strings de `utils.js:536` casa em nenhuma delas; as 6 ' +
-      'só chegam a `true` pelo curto-circuito. O que DISTINGUE as duas causas não é o código (é o mesmo), ' +
-      'é o TIPO de erro: em \'recarga-troca-escolha\', `detectarRecarga` erra a DETECÇÃO (lê uma cláusula ' +
-      'de troca de escolha como recarga de uso limitado -- entrada errada no curto-circuito); aqui a ' +
-      'detecção está CERTA (a recarga é real) e o curto-circuito erra a CONCLUSÃO (assume, sem checar ' +
-      'verbo de decisão, que toda recarga confirmada implica ativação). Consequência de ' +
-      '\'recarga-troca-escolha\' também sobrevive a um conserto do curto-circuito de um jeito que este ' +
-      'caso não sobrevive: lá, mesmo sem o curto-circuito, o `recargaBadge` continua rotulando errado (a ' +
-      'causa raiz é a detecção, não só a conclusão); aqui, corrigir o curto-circuito (checar verbo de ' +
-      'decisão mesmo com `recarga` verdadeiro) resolveria as duas ao mesmo tempo -- Sentinela Imortal E as ' +
-      '6 de \'recarga-troca-escolha\'. AVISO para quem for consertar: um patch em `utils.js:535` precisa ' +
-      'reconferir a entrada \'classes-passivas-recarga-troca-escolha\' também, não só esta. Mantida como ' +
-      'chave própria (não call site daquela) porque a ALEGAÇÃO PRIMÁRIA de cada uma é diferente -- lá é ' +
-      'sobre `detectarRecarga` ler a cláusula errada, aqui é sobre a ausência de checagem de verbo -- mas o ' +
-      'texto acima existe para que ninguém trate as duas como independentes na hora de corrigir. ' +
-      'Consequência medida (site/js/sheet/caracteristicas.js:64-65, renderSecaoSubclasse): Sentinela ' +
-      'Imortal aparece em "Habilidades Ativas" no card "Subclasse — Juramento dos Anciões" da ficha; o ' +
-      'livro (gatilho inteiramente automático) a colocaria em "Habilidades Passivas". Mesma direção de ' +
-      'erro (app diz Ativa, livro diz Passiva) já registrada para 8 características de classe base em ' +
-      '\'classes-passivas-ativa-no-turno\' -- mesmo SINTOMA de exibição, mas aquela causa é sobre a lista ' +
-      'de frases (`utils.js:536`), não sobre o curto-circuito de `:535`, por isso causa própria também em ' +
-      'relação a ela.' },
+  // 'subclasses-recursos-usos-sem-consequencia' (6 características de 5
+  // subclasses) -- CORRIGIDA em 2026-08-18, de carona no Plano 3. Era
+  // `limitacao-observabilidade`: detectarUsosMaximos devolvia null contra um
+  // número real do catálogo, mas sem consequência de tela (5 das 6 têm ramo
+  // dedicado que nunca lê usosMax, e a 6ª tem valor real 1, abaixo do limiar
+  // de temMultiplosUsos). O conserto veio junto do da Fúria Implacável: ao
+  // parar de ler "X vezes seu nível" como contagem de usos, a função ficou
+  // devendo os DOIS jeitos que o livro usa de verdade, e os dois entraram --
+  // "uma reserva de quatro d12s" (adjetivo numeral antes do dado, Campeão dos
+  // Deuses) e o limite implícito de 1 uso declarado por frase de descanso, em
+  // qualquer ordem ou polaridade ("não pode utilizá-la novamente até",
+  // "pode usar esta característica novamente após", "antes de poder usar esta
+  // característica novamente"). Sem lacuna remanescente nesta chave.
+  // Sentinela Imortal (Juramento dos Anciões, Paladino nv15) --
+  // 'subclasses-recursos-ativa-curto-circuito-automatico' CORRIGIDA em
+  // 2026-08-18, junto com as 7 causas de Classes/Passivas (ver o registro
+  // histórico logo acima do bloco delas). Era o curto-circuito
+  // `if (recarga) return true`: a característica dispara sozinha ao jogador
+  // ser reduzido a 0 Pontos de Vida, mas tem uso limitado que recarrega em
+  // Descanso Longo, e isso bastava para classificá-la como ativa. O que a
+  // separa de Surto de Ação (que TEM custo, e também recarrega) é o verbo de
+  // decisão: o único "pode" do texto dela está em "você NÃO pode utilizá-la
+  // novamente".
   // Defesa Gloriosa (Juramento da Glória, Paladino, nível 15) -- CORRIGIDA em
   // 2026-08-18 (Plano 1 da rodada de correção). site/js/sheet/hp-descanso.js
   // guardava quatro blocos de restauração do Paladino com `char.subclasse ===

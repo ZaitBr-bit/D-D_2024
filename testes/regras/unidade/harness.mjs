@@ -84,7 +84,8 @@ export async function modulosApp() {
   // sheetEstado.definirChar().
   const [regras, efeitos, store, levelup, criador, utils, dadosClasses, db, equip,
          levelupFlow, sheetEstado, sheetMagias, sheetMigracoes, sheetGrimorio,
-         sheetMago, notasVersao, versao] = await Promise.all([
+         sheetMago, notasVersao, versao,
+         levelupCards, regrasSubclasseEscolhas] = await Promise.all([
     importar('site/js/regras-cobertura.js'),
     importar('site/js/talentos-effects.js'),
     importar('site/js/store.js'),
@@ -102,10 +103,12 @@ export async function modulosApp() {
     importar('site/js/sheet/classes/mago.js'),
     importar('site/js/notas-versao.js'),
     importar('site/js/versao.js'),
+    importar('site/js/levelup-cards.js'),
+    importar('site/js/regras-subclasse-escolhas.js'),
   ]);
   _cache = { regras, efeitos, store, levelup, criador, utils, dadosClasses, db, equip,
              levelupFlow, sheetEstado, sheetMagias, sheetMigracoes, sheetGrimorio,
-             sheetMago, notasVersao, versao };
+             sheetMago, notasVersao, versao, levelupCards, regrasSubclasseEscolhas };
   return _cache;
 }
 
@@ -236,6 +239,17 @@ export const PENDENCIAS_CONHECIDAS = [
   'escolhas_talento', 'bardo_expertise', 'guardiao_expertise',
   'estilo_luta', 'explorador_habil', 'manobras_guerreiro', 'grimorio',
   'subclasse_magias_arcana', 'academico',
+  // Os 12 tipos que regras-subclasse-escolhas.js criou (Plano 4). Escritos
+  // por extenso de proposito: a tabela nao pode ser importada no topo deste
+  // arquivo (ela puxa utils.js, que toca `window` antes de instalarStubs()
+  // rodar). A coerencia entre as duas listas e cobrada por
+  // `pendencias-subclasse-coerencia.test.mjs`, que roda DEPOIS do shim.
+  'subclasse_pericias_bonus', 'subclasse_descobertas_magicas',
+  'subclasse_estudioso_ferramenta', 'subclasse_estudioso_pericia',
+  'subclasse_glamour_pericia', 'subclasse_estilo_luta_extra',
+  'subclasse_terreno', 'subclasse_aspecto_selvagem',
+  'subclasse_afinidade_elemental', 'subclasse_presa_cacador',
+  'subclasse_taticas_defensivas', 'subclasse_companheiro_primal',
 ];
 
 // Personagem-semente de cada classe. Diferente de charBase() (fixture
@@ -482,6 +496,49 @@ async function resolverPendencia(tipo, opcoes, p, classeData, ATRIBUTOS,
     case 'academico':
       opcoes.academico_expertise = ['Arcanismo'];
       return;
+    case 'subclasse_descobertas_magicas': {
+      // Ramo dedicado porque a lista de opcoes desta linha e ASSINCRONA: o
+      // livro deixa escolher "duas magias a sua escolha" de qualquer lista
+      // (Classes.md:770), entao nao ha lista literal na tabela -- as opcoes
+      // vem do indice de magias. Reaproveita o mesmo seletor que o grimorio
+      // do Mago usa, para o teste escolher nomes de magia REAIS e nao
+      // strings inventadas que a validacao futura recusaria.
+      opcoes.subclasse_descobertas_magicas =
+        (await escolherMagiasMago(p, classeData, nivel, 2)).slice(0, 2);
+      return;
+    }
+  }
+
+  // Escolhas de subclasse (regras-subclasse-escolhas.js): o driver responde
+  // com as N primeiras opcoes VALIDAS da propria tabela -- nao um valor
+  // qualquer, e sim o mesmo conjunto que a tela oferece, para o teste medir
+  // o caminho real. Descobertas Magicas tem lista assincrona (vazia aqui), e
+  // por isso recebe nomes de magia reais do indice, resolvidos pelo chamador.
+  const tabela = _cache?.regrasSubclasseEscolhas;
+  const linhaSubclasse = tabela?.ESCOLHAS_SUBCLASSE_APP
+    // `opcoes.subclasse || p.subclasse`: no nivel 3 a subclasse esta sendo
+    // escolhida NESTA chamada e ainda nao foi gravada no personagem -- mesmo
+    // idioma de levelup.js:966.
+    .find((l) => l.tipo === tipo && l.subclasse === (opcoes.subclasse || p.subclasse) && l.nivel === nivel);
+  if (linhaSubclasse) {
+    // Escolhe opcoes que o personagem AINDA NAO TEM: responder com as N
+    // primeiras da lista faria o converso (Grupo 6) medir crescimento zero
+    // quando a semente ja e proficiente nelas -- o teste acusaria "nenhum
+    // mecanismo respondeu" por culpa do driver, nao do app.
+    const jaTem = new Set(linhaSubclasse.destino === 'pericias_proficientes'
+      ? (p.pericias_proficientes || [])
+      : linhaSubclasse.destino === 'proficiencias_ferramentas'
+        ? (p.proficiencias_ferramentas || [])
+        : []);
+    const disponiveis = tabela.opcoesDaLinha(linhaSubclasse).filter((o) => !jaTem.has(o));
+    if (disponiveis.length >= linhaSubclasse.quantidade) {
+      opcoes[linhaSubclasse.campo] = disponiveis.slice(0, linhaSubclasse.quantidade);
+      return;
+    }
+    throw new Error(
+      `resolverPendencia: a linha "${tipo}" tem lista de opcoes assincrona ou curta ` +
+      `(${disponiveis.length} para ${linhaSubclasse.quantidade} exigida(s)) -- ` +
+      `o driver precisa de um ramo dedicado para ela`);
   }
   throw new Error(`resolverPendencia sem ramo para "${tipo}" ` +
     `(classe ${p.classe}, nível ${nivel})`);

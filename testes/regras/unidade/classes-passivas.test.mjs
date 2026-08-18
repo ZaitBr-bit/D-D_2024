@@ -193,53 +193,14 @@ test('filtro de contaminação: bijeção entre CLASSIFICACAO e dados/classes/*.
 // catálogo) passaria a FALHAR -- comLacuna exige que o wrap falhe, e uma
 // asserção que passa sob wrap de lacuna dispara "Lacuna corrigida: remova
 // ...". Achado durante a primeira rodada desta tarefa (ver task-6-report.md).
-const CAUSA_DIVERGENCIA_ATIVO_PASSIVO = {
-  // Causa 1 (8 entradas) -- 'no seu turno' dispara fora de contexto de
-  // ativação: a frase qualifica QUANDO o benefício passivo vale, não como
-  // ele é ativado.
-  'Bárbaro|5|Ataque Extra': { talento: 'Guerreiro', teste: 'classes-passivas-ativa-no-turno' },
-  'Guardião|5|Ataque Extra': { talento: 'Guerreiro', teste: 'classes-passivas-ativa-no-turno' },
-  'Guerreiro|5|Ataque Extra': { talento: 'Guerreiro', teste: 'classes-passivas-ativa-no-turno' },
-  'Monge|5|Ataque Extra': { talento: 'Guerreiro', teste: 'classes-passivas-ativa-no-turno' },
-  'Paladino|5|Ataque Extra': { talento: 'Guerreiro', teste: 'classes-passivas-ativa-no-turno' },
-  'Guerreiro|11|Dois Ataques Extras': { talento: 'Guerreiro', teste: 'classes-passivas-ativa-no-turno' },
-  'Guerreiro|20|Três Ataques Extras': { talento: 'Guerreiro', teste: 'classes-passivas-ativa-no-turno' },
-  'Monge|9|Movimento Acrobático': { talento: 'Guerreiro', teste: 'classes-passivas-ativa-no-turno' },
-  // Causa 2 (6 entradas) -- detectarRecarga trata cláusula de TROCA de
-  // escolha em Descanso Longo como recarga de uso limitado.
-  'Bárbaro|1|Maestria em Arma': { talento: 'Bárbaro', teste: 'classes-passivas-recarga-troca-escolha' },
-  'Guardião|1|Maestria em Arma': { talento: 'Bárbaro', teste: 'classes-passivas-recarga-troca-escolha' },
-  'Guerreiro|1|Maestria em Arma': { talento: 'Bárbaro', teste: 'classes-passivas-recarga-troca-escolha' },
-  'Ladino|1|Maestria em Arma': { talento: 'Bárbaro', teste: 'classes-passivas-recarga-troca-escolha' },
-  'Paladino|1|Maestria em Arma': { talento: 'Bárbaro', teste: 'classes-passivas-recarga-troca-escolha' },
-  'Mago|18|Maestria de Magias': { talento: 'Bárbaro', teste: 'classes-passivas-recarga-troca-escolha' },
-  // Causa 3 (6 entradas) -- 'você pode usar' casa cláusula lateral que não
-  // é o benefício sendo classificado.
-  'Bárbaro|1|Defesa sem Armadura': { talento: 'Bárbaro', teste: 'classes-passivas-clausula-lateral' },
-  'Bárbaro|17|Golpe Brutal Aprimorado': { talento: 'Bárbaro', teste: 'classes-passivas-clausula-lateral' },
-  'Bárbaro|18|Força Indomável': { talento: 'Bárbaro', teste: 'classes-passivas-clausula-lateral' },
-  'Druida|1|Idioma Druídico': { talento: 'Bárbaro', teste: 'classes-passivas-clausula-lateral' },
-  'Feiticeiro|20|Apoteose Arcana': { talento: 'Bárbaro', teste: 'classes-passivas-clausula-lateral' },
-  'Monge|13|Defletir Energia': { talento: 'Bárbaro', teste: 'classes-passivas-clausula-lateral' },
-  // Causa 4 (2 entradas) -- detectarRecarga trata Descanso Curto como
-  // recarga de uso limitado quando é janela/reset sem limite de uso.
-  'Mago|5|Memorizar Magia': { talento: 'Mago', teste: 'classes-passivas-descanso-curto-janela' },
-  'Bárbaro|11|Fúria Implacável': { talento: 'Mago', teste: 'classes-passivas-descanso-curto-janela' },
-  // Causa 5 (1 entrada) -- ação concedida "como PARTE DE" outra ação
-  // bônus não é reconhecida (a heurística só sabe "como ação bônus", sem
-  // "uma", e "como uma ação" -- nenhuma das duas casa "como parte da").
-  'Bárbaro|7|Bote Instintivo': { talento: 'Bárbaro', teste: 'classes-passivas-acao-bonus-parte-de' },
-  // Causa 6 (3 entradas) -- custo expresso como recurso nomeado sem o
-  // verbo literal "pode gastar" (custo em dados por opção, ou "deve
-  // gastar" em vez de "pode gastar").
-  'Ladino|5|Golpe Astuto': { talento: 'Ladino', teste: 'classes-passivas-custo-verbo-rigido' },
-  'Ladino|14|Golpes Sujos': { talento: 'Ladino', teste: 'classes-passivas-custo-verbo-rigido' },
-  'Paladino|14|Toque Restaurador': { talento: 'Ladino', teste: 'classes-passivas-custo-verbo-rigido' },
-  // Causa 7 (2 entradas) -- Reação concedida com o verbo "executar" não é
-  // reconhecida (a lista de gatilhos só cobre "como uma reação").
-  'Ladino|5|Esquiva Sobrenatural': { talento: 'Ladino', teste: 'classes-passivas-reacao-executar' },
-  'Monge|4|Queda Lenta': { talento: 'Ladino', teste: 'classes-passivas-reacao-executar' },
-};
+// CORRIGIDO em 2026-08-18 (Plano 3 da rodada de correção): as 28 divergências
+// de classificação Ativa/Passiva que este mapa hospedava fecharam com a
+// reescrita de ehHabilidadeAtiva (site/js/utils.js), que passou a perguntar
+// "o livro declara um CUSTO?" em vez de "alguma frase da lista aparece em
+// algum lugar?". O mapa fica vazio de propósito, e não removido, porque o
+// laço principal o consulta para toda característica -- e a próxima
+// divergência que aparecer entra aqui, sem precisar reconstruir o mecanismo.
+const CAUSA_DIVERGENCIA_ATIVO_PASSIVO = {};
 
 // ------------------------------------------------------------
 // Varredura exaustiva: uma asserção por característica de classe base,

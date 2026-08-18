@@ -1,0 +1,34 @@
+
+================================================================
+2026-08-18 -- Plano 4 (escolhas de subclasse), decisao de desenho
+================================================================
+
+PERGUNTA: duas das 14 escolhas de construcao do catalogo nascem, no livro,
+num DESCANSO e nao no nivel de aquisicao:
+
+  - Resistencia Infera (Patrono Infero nv10), Classes.md:1467:
+    "Ao completar um Descanso Curto ou Longo, escolha um tipo de dano..."
+  - O Terceiro Olho (Adivinhador nv10), Classes.md:5020: mesma forma.
+
+O motor `subclasses-escolhas.test.mjs` (Grupo 3) espera, para as 14, uma
+pendencia de subida de nivel. Cumprir isso para essas duas faria o app
+EXIGIR no nivel uma escolha que o livro poe no descanso -- inventar regra,
+que e o oposto do que esta suite existe para fazer.
+
+MEDICAO QUE SUSTENTA: o proprio motivo da lacuna ja registrava a ressalva
+("para 2 das 7 -- Resistencia Infera, O Terceiro Olho -- o livro nasce a
+escolha so no primeiro Descanso/uso apos a aquisicao, nao no nivel em si,
+entao a ausencia na TELA DE NIVEL nao e, sozinha, violacao").
+
+O QUE FOI ESCOLHIDO: as outras 12 escolhas ganham pendencia de nivel; essas
+duas ganham apenas o CAMPO criado em char.recursos por subirDeNivel (para o
+controle da ficha existir sem depender de o jogador abrir o menu certo), sem
+bloquear a subida. A entrada de lacuna 'Cacador'/'subclasses-escolha-ausente'
+e ESTREITADA para essas duas, com o motivo reescrito: a alegacao deixa de ser
+"o controle so existe na ficha" e passa a ser "o catalogo espera pendencia de
+nivel para uma escolha que o livro poe no descanso".
+
+O QUE MUDA SE VOCE PREFERIR OUTRA COISA: se preferir uniformidade (pendencia
+para as 14), sao ~10 linhas na tabela de `regras-subclasse-escolhas.js` -- e a
+lacuna fecha inteira. O custo e o app passar a travar a subida de nivel
+pedindo uma escolha que o livro so pede no descanso seguinte.

@@ -509,19 +509,127 @@ export function mdParaHtml(texto) {
 export function detectarRecarga(descricao) {
   if (!descricao) return null;
   const d = descricao.toLowerCase();
-  if (d.includes('descanso curto ou longo') || d.includes('descanso longo ou curto'))
+  // Só valem as frases em que o Descanso está preso a um USO -- restaurar,
+  // recuperar, voltar a poder usar, esgotar. Sem esse escopo, uma cláusula
+  // alheia no mesmo texto vira recarga: o Mapa Estelar (Círculo das
+  // Estrelas) tem um parágrafo sobre recriar o mapa perdido "durante um
+  // Descanso Curto ou Longo", que se fundia com a recarga real de Raio Guia
+  // (Descanso Longo) e produzia o selo "☀🌙 Curto/Longo" no lugar de
+  // "🌙 Desc. Longo". E a Maestria em Arma, cuja cláusula de Descanso Longo
+  // é a TROCA de uma escolha permanente, ganhava selo de recarga sem nunca
+  // se esgotar.
+  const doUso = d.split(/(?<=\.)\s+/)
+    .filter((f) => f.includes('descanso') && /restaur|recuper|novamente|usos? gastos?|esgotad/.test(f))
+    .join(' ');
+  if (!doUso) return null;
+  if (doUso.includes('descanso curto ou longo') || doUso.includes('descanso longo ou curto'))
     return 'curto_ou_longo';
-  // Check for short rest recharge
-  const temCurto = d.includes('descanso curto');
-  const temLongo = d.includes('descanso longo');
+  const temCurto = doUso.includes('descanso curto');
+  const temLongo = doUso.includes('descanso longo');
   if (temCurto && temLongo) return 'curto_ou_longo';
   if (temCurto) return 'curto';
   if (temLongo) return 'longo';
   return null;
 }
 
+// Frases com que o livro declara que o benefício custa uma ECONOMIA DE
+// AÇÃO do turno. A lista é de FORMAS do livro, não de sinônimos
+// inventados: cada entrada saiu de uma característica real.
+const _FRASES_ACAO = [
+  'como uma ação', 'como ação bônus', 'como uma ação bônus',
+  'como parte da ação bônus', 'como parte de uma ação bônus',
+  'executar a ação bônus',
+  'como uma reação', 'executar uma reação', 'realizar uma reação',
+];
+
+// Custo pago em DADOS do próprio dano, forma exclusiva do Ladino
+// (Golpe Astuto "cada um com um custo em dados", Golpe Astuto Aprimorado
+// "pagando o custo do dado", Golpes Sujos "**Aturdir (Custo: 2d6)**").
+const _FRASES_CUSTO_DADOS = ['custo em dados', 'custo do dado', 'custo:'];
+
 /**
- * Detecta se uma habilidade é ativa (tem ação, reação, etc.) vs passiva.
+ * Uso que se ESGOTA e volta num descanso -- custo real, porque o jogador
+ * gasta um dos N usos. É o que separa Surto de Ação (ativa) de Maestria em
+ * Arma (passiva): a cláusula de Descanso da Maestria fala em ALTERAR uma
+ * escolha permanente, nunca em uso gasto.
+ *
+ * A checagem é por FRASE, não por ordem das palavras: o livro escreve tanto
+ * "não pode usá-la novamente até completar um Descanso Curto ou Longo"
+ * (Surto de Ação) quanto "completar um Descanso Longo antes de poder usar
+ * esta característica novamente" (Marés do Caos, Feitiçaria Selvagem). Uma
+ * regex de ordem fixa perdia a segunda forma.
+ *
+ * "usos gastos" sozinho não basta -- Inspiração Superior do Bardo diz "Ao
+ * jogar Iniciativa, recupera usos gastos de Inspiração de Bardo", que é
+ * restauração automática, não custo. Por isso a frase precisa falar também
+ * em descanso.
+ */
+function _temUsoEsgotavel(descricaoMinuscula) {
+  const frases = descricaoMinuscula.split(/(?<=\.)\s+/);
+  // A frase de esgotamento tem de falar da PRÓPRIA característica. Sem isso,
+  // Intervenção Divina Maior do Clérigo ("não pode usar Intervenção Divina
+  // novamente até completar 2d4 Descansos Longos") entraria como ativa -- mas
+  // ela só modifica o custo de OUTRA característica, não tem ativação própria.
+  const seRefereASiMesma = (f) =>
+    /\w+[áâêé]-l[ao]s?\b/.test(f)
+    || /\b(esta|essa) característica\b/.test(f)
+    || /\b(desta|dessa) forma\b/.test(f)
+    || /\b(deste|desse) modo\b/.test(f);
+  if (frases.some((f) => f.includes('novamente') && f.includes('descanso') && seRefereASiMesma(f))) return true;
+  if (frases.some((f) => /usos?\s+gastos?/.test(f) && f.includes('descanso'))) return true;
+  // "restaura a capacidade de fazê-lo" (Montaria Fiel), "recuperando a
+  // capacidade de conjurá-la" (Companheiro Dracônico) -- mesma ideia.
+  if (/(restaura|recupera|recuperando)[^.]{0,40}a capacidade/.test(descricaoMinuscula)) return true;
+  return descricaoMinuscula.includes('antes de um descanso');
+}
+
+/**
+ * Custo em recurso nomeado (espaço de magia, Pontos de Feitiçaria, Pontos
+ * de Vida da reserva). Quando o texto diz "sem gastar"/"sem consumir", o
+ * benefício da característica é justamente ser DE GRAÇA -- qualquer verbo de
+ * gasto no resto do texto descreve a alternativa, não ela. É o caso de
+ * Maestria de Magias do Mago ("pode conjurá-las... sem gastar um espaço de
+ * magia. Para conjurar... em um círculo superior, você DEVE GASTAR um espaço"),
+ * de Apoteose Arcana do Feiticeiro e de Destruição do Paladino. As que ainda
+ * assim custam algo chegam a `true` pelo uso esgotável, não por aqui.
+ */
+function _temCustoEmRecurso(descricaoMinuscula) {
+  if (/sem\s+(gastar|consumir)/.test(descricaoMinuscula)) return false;
+  return /\b(gastar|gasta|consumindo|consumir)\b/.test(descricaoMinuscula);
+}
+
+/**
+ * O texto declara uma DECISÃO do jogador? "não pode" é o oposto disso -- é
+ * o limite de uso --, então some antes da busca. É o que separa Surto de
+ * Ação do Guerreiro ("No seu turno, você pode executar uma ação adicional")
+ * de Sentinela Imortal do Paladino, cujo único "pode" está em "você não
+ * pode utilizá-la novamente": a segunda dispara sozinha ao ser reduzido a 0
+ * Pontos de Vida, sem escolha nenhuma. As duas têm uso limitado que
+ * recarrega em Descanso Longo -- só o verbo de decisão as distingue.
+ */
+function _temVerboDeDecisao(descricaoMinuscula) {
+  const semNegacao = descricaoMinuscula.replace(/n[ãa]o\s+(pode|podendo|poder)/g, ' ');
+  return /\bpode\b|\bescolh/.test(semNegacao);
+}
+
+/**
+ * Decide se uma característica é ATIVA (o jogador paga algo para usá-la)
+ * ou PASSIVA (o benefício simplesmente vale). O critério é CUSTO
+ * DECLARADO: economia de ação do turno, recurso nomeado, custo em dados,
+ * ou um uso que se esgota e volta num descanso.
+ *
+ * NÃO usa `detectarRecarga`: recarga, sozinha, não é prova de ativação.
+ * Sentinela Imortal (Paladino, Juramento dos Anciões) recarrega em Descanso
+ * Longo e mesmo assim dispara sozinha, sem decisão nenhuma do jogador -- o
+ * curto-circuito `if (recarga) return true` a classificava como ativa, e
+ * junto as seis "Maestria em Arma"/"Maestria de Magias", cuja cláusula de
+ * Descanso Longo é a TROCA de uma escolha permanente, não uso gasto.
+ *
+ * NÃO usa 'no seu turno' nem 'você pode usar' como gatilho: a primeira
+ * qualifica QUANDO um benefício passivo vale ("sempre que executar a ação
+ * Atacar no seu turno" -- Ataque Extra em cinco classes), a segunda casa
+ * cláusulas SECUNDÁRIAS ("Você pode usar um Escudo e ainda receber este
+ * benefício" -- Defesa sem Armadura), nunca a frase que define o benefício.
  */
 export function ehHabilidadeAtiva(descricao, nome) {
   if (!descricao) return false;
@@ -531,10 +639,10 @@ export function ehHabilidadeAtiva(descricao, nome) {
     if (n.includes('conjuracao') || n.includes('pacto magico') || n.includes('magia de pacto') || n.startsWith('magias d')) return false;
   }
   const d = descricao.toLowerCase();
-  const recarga = detectarRecarga(descricao);
-  if (recarga) return true;
-  const acoes = ['como uma ação', 'como ação bônus', 'como uma reação', 'você pode usar', 'você pode gastar', 'no seu turno'];
-  return acoes.some(a => d.includes(a));
+  return _FRASES_ACAO.some(f => d.includes(f))
+    || _FRASES_CUSTO_DADOS.some(f => d.includes(f))
+    || (_temUsoEsgotavel(d) && _temVerboDeDecisao(d))
+    || _temCustoEmRecurso(d);
 }
 
 /** Gera UUID v4 simples */

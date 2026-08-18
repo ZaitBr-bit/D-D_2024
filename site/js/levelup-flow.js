@@ -3,6 +3,7 @@
 // Fase 1: Contexto + Fase 2: Steps dinâmicos
 // ============================================================
 import { CLASSES_INFO, ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ESCOLAS_SUBCLASSE_MAGO } from './dados-classes.js';
+import { linhasDaSubclasseNoNivel } from './regras-subclasse-escolhas.js';
 import { getClasse, getMagiasClasse, getMagiasPorCirculo } from './db.js';
 import { getTruquesFixosSubclasse } from './regras-conjuracao-subclasse.js';
 import {
@@ -412,15 +413,25 @@ const STEP_DEFINITIONS = [
     // ("um Próximo, um Confirmar") -- inserir aqui um step visível em
     // TODO nível >= 2 de Guerreiro quebraria essa suposição para dezenas
     // de testes de talento, sem relação nenhuma com Estilo de Luta.
-    visivel: (ctx) => ctx.precisaExpertiseBardo || ctx.precisaExpertiseGuardiao ||
+    // As escolhas de SUBCLASSE (Plano 4) entram aqui de propósito: elas
+    // BLOQUEIAM a subida em subirDeNivel, então precisam de um step onde
+    // responder -- diferente das duas opcionais citadas acima, que nunca
+    // bloqueiam. A condição é estreita (12 pares subclasse/nível), não "todo
+    // nível de Guerreiro".
+    visivel: (ctx, state) => ctx.precisaExpertiseBardo || ctx.precisaExpertiseGuardiao ||
                        ctx.precisaEstiloLuta ||
-                       ctx.precisaExploradorHabil || ctx.precisaAcademico,
+                       ctx.precisaExploradorHabil || ctx.precisaAcademico ||
+                       escolhasSubclasseDoNivel(ctx, state).length > 0,
     completo: (ctx, state) => {
       if (ctx.precisaExpertiseBardo && (state.bardoExpertise || []).length !== 2) return false;
       if (ctx.precisaExpertiseGuardiao && (state.guardiaoExpertise || []).length !== 2) return false;
       if (ctx.precisaEstiloLuta && !state.estiloLuta) return false;
       if (ctx.precisaExploradorHabil && (!state.exploradorExpertise || (state.exploradorIdiomas || []).length !== 2)) return false;
       if (ctx.precisaAcademico && (state.academicoExpertise || []).length !== 1) return false;
+      for (const linha of escolhasSubclasseDoNivel(ctx, state)) {
+        const valores = (state.escolhasSubclasse || {})[linha.campo] || [];
+        if (valores.filter(Boolean).length !== linha.quantidade) return false;
+      }
       return true;
     }
   },
@@ -492,6 +503,18 @@ const STEP_DEFINITIONS = [
 ];
 
 /**
+ * Escolhas de subclasse exigidas neste nível (regras-subclasse-escolhas.js).
+ * Le a subclasse de `state.subclasse || char.subclasse`: no nível 3 ela está
+ * sendo escolhida NESTA sessão e ainda não existe no personagem salvo -- sem
+ * isso, a maioria das escolhas ficaria sem step, e a pendência de
+ * subirDeNivel travaria a subida sem o jogador ter onde responder.
+ */
+export function escolhasSubclasseDoNivel(ctx, state) {
+  const subclasse = state?.subclasse || ctx?.char?.subclasse;
+  return linhasDaSubclasseNoNivel(subclasse, ctx?.nivelNovo).filter((l) => l.tipo);
+}
+
+/**
  * Constrói a lista de steps visíveis para o contexto atual.
  * @param {Object} ctx - Contexto do buildLevelUpContext
  * @param {Object} state - Estado atual das escolhas do usuário
@@ -540,6 +563,10 @@ export function createInitialState() {
     exploradorExpertise: '',
     exploradorIdiomas: [],
     academicoExpertise: [],
+    // Escolhas de subclasse (regras-subclasse-escolhas.js): { campo: [valores] }.
+    // Uma chave por linha da tabela que vale neste nivel; o card generico
+    // preenche, collectOpcoes copia para `opcoes`.
+    escolhasSubclasse: {},
     // Magias
     truquesSelecionados: [],
     magiasSelecionadas: [],

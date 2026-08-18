@@ -1176,6 +1176,23 @@ function bindEventosEscolhasClasse(ctx, state) {
       aoMudar: (sel) => { state.estiloLuta = sel[0] || ''; },
     });
   }
+
+  // Escolhas de subclasse: cada <select> grava em state.escolhasSubclasse[campo].
+  // Quando a linha pede mais de uma opcao, os seletores compartilham o campo e
+  // o valor vai como lista, na ordem dos indices -- e o mesmo formato que a
+  // guarda de subirDeNivel espera.
+  for (const el of document.querySelectorAll('[data-subclasse-escolha]')) {
+    el.addEventListener('change', () => {
+      const campo = el.dataset.subclasseEscolha;
+      const irmaos = [...document.querySelectorAll(`[data-subclasse-escolha="${campo}"]`)];
+      if (!state.escolhasSubclasse) state.escolhasSubclasse = {};
+      state.escolhasSubclasse[campo] = irmaos.map((sel) => sel.value).filter(Boolean);
+      // Sem chamar validateAll aqui: os outros binds deste arquivo também
+      // só atualizam o state, e a validação roda uma vez em confirmarLevelUp
+      // (levelup-ui.js:1572), com ctx e state. Chamá-la sem argumentos aqui
+      // lançava TypeError dentro do listener.
+    });
+  }
 }
 
 // --- Trocas opcionais (Estilo de Luta do Guerreiro / Especialização do

@@ -121,7 +121,21 @@ Playwright) inverte a expectativa só para esse par (talento, teste):
   sem `motivo` preenchido.
 
 Por isso a lista **é o backlog real** de correções do app contra o livro — não
-uma nota de rodapé. Cada entrada é uma alegação de que o app está errado num
+uma nota de rodapé.
+
+> ✅ **O backlog zerou em 2026-08-18.** A rodada de correção (quatro planos, em
+> `docs/superpowers/plans/2026-08-18-correcao-*.md`) fechou as **29 causas** que
+> os seis domínios de identificação tinham registrado. `LACUNAS` saiu de 21 para
+> **3 entradas**, e as três são `limitacao-observabilidade` — rota de teste
+> cega, não divergência do app. Isso importa para quem ler o arquivo depois: três
+> entradas restantes **não** são três bugs abertos. Quando a próxima divergência
+> real aparecer, ela será a primeira da lista de novo.
+>
+> As três: `Aumento no Valor de Atributo` (a validação existe, por um mecanismo
+> que esta rota não confronta), `Cavaleiro Místico` (o app pergunta e grava
+> certo, numa camada que o motor de unidade não dirige) e `Caçador` (o catálogo
+> espera pendência de nível para duas escolhas que o livro põe num descanso —
+> ver `docs/PERGUNTAS-PENDENTES.txt`). Cada entrada é uma alegação de que o app está errado num
 ponto específico e citável. Uma entrada falsa (um gap que na verdade não
 existe) é **pior** que uma entrada faltando: uma lacuna ausente é só um teste
 vermelho esperando alguém investigar; uma lacuna falsa é a suíte inteira
@@ -867,6 +881,62 @@ bug).
 
 ### Heurística Ativa/Passiva — 28 divergências, 7 causas de código
 
+✅ **As 7 causas corrigidas em 2026-08-18** (Plano 3 da rodada de correção,
+`docs/superpowers/plans/2026-08-18-correcao-3-heuristicas-utils.md`), junto com
+a `subclasses-recursos-ativa-curto-circuito-automatico` da seção
+Subclasses/Recursos e, de carona, a `subclasses-recursos-usos-sem-consequencia`
+— **9 causas, 35 características, um conserto só**.
+
+As nove eram o mesmo defeito de fundo: três funções derivavam fato estruturado
+(é ativa? recarrega? quantos usos?) procurando substrings na prosa do livro, sem
+noção de a qual frase a substring pertencia. `ehHabilidadeAtiva` deixou de
+perguntar "alguma frase da lista aparece em algum lugar?" e passou a perguntar
+**"o livro declara um custo?"**; `detectarRecarga` passou a exigir que a frase
+prenda o descanso a um **uso**; `detectarUsosMaximos` deixou de ler "X vezes seu
+nível" (multiplicador de fórmula) como contagem de usos, e aprendeu os dois
+jeitos que o livro usa de verdade além de "X vezes" — a reserva numeral ("uma
+reserva de quatro d12s") e o limite implícito de 1 uso declarado por frase de
+descanso.
+
+**O desenho saiu de seis iterações contra o oráculo, não de uma leitura.** As
+duas primeiras tentativas pioraram o quadro de um jeito instrutivo, e ficam
+registradas porque a próxima rodada vai cair nas mesmas armadilhas:
+
+- Remover a recarga inteira do critério criou **16 falsos negativos novos**.
+  Várias características são ativas *porque* têm uso limitado que recarrega —
+  recarga não prova ativação, mas também não é irrelevante.
+- Uma regex de ordem fixa perdeu "completar um Descanso Longo antes de poder
+  usar esta característica novamente" (Marés do Caos), que diz exatamente o
+  mesmo que "não pode usá-la novamente até completar um Descanso" (Surto de
+  Ação), ao contrário. **A ordem das palavras varia; a checagem tem de ser por
+  frase.**
+
+**Os quatro pares que sustentam as regras.** Cada regra existe porque duas
+características **parecidas** precisam cair em lados opostos — sem o par, ela
+pareceria arbitrária:
+
+| Ativa | Passiva | O que as separa |
+|---|---|---|
+| Surto de Ação | Maestria em Arma | as duas têm cláusula de Descanso Longo; a segunda ALTERA uma escolha permanente, não gasta uso |
+| Inimigo Favorito | Inspiração Superior | as duas dizem "usos gastos"; na segunda quem restaura é a Iniciativa, automática |
+| Surto de Ação | Sentinela Imortal | as duas têm uso limitado que recarrega; a segunda dispara sozinha a 0 Pontos de Vida, sem decisão do jogador |
+| Metamagia | Maestria de Magias | as duas têm verbo de gasto; na segunda o benefício é conjurar SEM gastar, e o "deve gastar" descreve a alternativa |
+
+Cada marcador do código cita, no comentário, a característica real de onde saiu.
+Nenhum é sinônimo inventado.
+
+**Medição:** 28 divergências em 159 características citáveis viraram **0**, e a
+suíte inteira (2354 testes) não ganhou nenhuma falha real — as que apareceram
+foram todas cobranças de remoção das entradas de `lacunas-conhecidas.mjs`.
+`LACUNAS` cai de 16 para **7** entradas.
+
+**Prova de tela:** `../e2e/regras/habilidades-ativa-passiva.spec.mjs`, dois
+testes. Ataque Extra e Maestria em Arma passam a aparecer em "Habilidades
+Passivas" (com Surto de Ação como contraste, provando que a seção "Ativas" não
+secou), a Maestria perde o selo "🌙 Desc. Longo" que rotulava como recarregável
+algo que nunca se esgota, e Fúria Implacável perde o botão "Usar / ✗ Esgotado"
+de 2 usos. Com `utils.js` e `habilidades.js` revertidos, os dois testes falham.
+
 `classes-passivas.test.mjs` confronta `ehHabilidadeAtiva()`
 (`site/js/utils.js:499-511`) — a heurística por substring que decide em qual
 seção da ficha ("Habilidades Ativas"/"Habilidades Passivas") uma
@@ -1374,6 +1444,55 @@ já apontavam para a linha exata e não precisaram de correção.
 de registrar as lacunas (Task 6) — **1689/1625/64/0**, estado final.
 
 ## Achados do domínio Subclasses / Escolhas (Plano 3, 2026-08-17/18)
+
+✅ **As quatro causas corrigidas em 2026-08-18** (Plano 4 da rodada de correção,
+`docs/superpowers/plans/2026-08-18-correcao-4-escolhas-subclasse.md`), junto com
+a Causa 2 do domínio Magias (Círculo da Terra) que o Plano 2 deixou aberta de
+propósito.
+
+**O conserto foi um mecanismo, não 17 remendos.** O app não tinha como dizer
+"esta característica de subclasse exige uma decisão neste nível": `levelup.js`
+reconhecia 15 tipos de pendência escritos um a um. Escrever mais 12 ramos à mão
+repetiria o defeito, então entrou uma **tabela declarativa**,
+`site/js/regras-subclasse-escolhas.js` (17 linhas: 5 concessões automáticas +
+12 escolhas), mais **um** laço em `subirDeNivel` e **um** card genérico no
+assistente. A próxima característica que o livro mandar escolher é uma LINHA,
+não um ramo.
+
+**Aqui a tela não era prova — era corretude.** Nos Planos 1-3 o spec de
+navegador confirmava um conserto que já valia sem ele. Neste, uma pendência sem
+card **trava o jogador**: ele não sobe de nível e não tem onde responder. Por
+isso o card entrou junto, e nada foi aposentado antes das duas pontas fecharem.
+
+**Três conflitos entre oráculos, resolvidos com o livro na mão** — os três
+valem registro porque nenhum deles era erro de código:
+
+| Conflito | Como ficou |
+|---|---|
+| O catálogo esperava que o Campeão nv7 reusasse o tipo `estilo_luta`; `classes-progressao.test.mjs` afirma que esse tipo nunca dispara fora de Guardião/Paladino | Tipo próprio (`subclasse_estilo_luta_extra`). São escolhas diferentes — outra característica, outro nível — que por acaso oferecem a mesma lista. A invariante do outro motor continua verdadeira |
+| Implementos de Misericórdia declarava `quantidade: 3` contra `campoEsperado: 'pericias_proficientes'`, mas só 2 das 3 concessões são perícias — a `observacao` do próprio catálogo já dizia isso | `quantidade: 2`. Exigir 3 de um campo que só pode receber 2 deixava a entrada permanentemente vermelha, com o app concedendo as três certo |
+| O Estilo de Luta Adicional ia para um campo paralelo, e `talentos-effects.js` só lia `escolhas_classe.estilo_luta[0]` | Grava no MESMO campo (lista), e `estilosAtivos` passou a ler todas as entradas. Sem isso o jogador ganharia um estilo que aparece na ficha e não faz nada |
+
+**Duas escolhas ficaram de fora, e a lacuna foi ESTREITADA em vez de fechada.**
+Resistência Ínfera (Patrono Ínfero nv10) e O Terceiro Olho (Adivinhador nv10)
+nascem, no livro, num **descanso** — não no nível de aquisição. Cumprir a
+expectativa do motor nessas duas faria o app exigir na tela de nível uma escolha
+que o livro põe no descanso seguinte: inventar regra, que é o oposto do que esta
+suíte existe para fazer. As duas continuam registradas, agora como
+`limitacao-observabilidade` e com a alegação reescrita — não é mais "o controle
+só existe na ficha", é "o catálogo espera pendência de nível para uma escolha
+que o livro põe no descanso". A decisão está em `docs/PERGUNTAS-PENDENTES.txt`,
+com o custo da alternativa.
+
+**Círculo da Terra fechou junto.** Com o terreno escolhido e gravado, o extrator
+de tabela passou a **recortar** o bloco do terreno em vez de somar as quatro
+alternativas — 6 magias (3+1+1+1), o teto do livro, contra as 24 de antes. Sem a
+escolha em mãos ele devolve vazio de propósito.
+
+**Medição:** suíte de unidade **2356 testes, 2100 passam, 0 falham, 256 skip**;
+Playwright de regras **192**. `LACUNAS` cai de 7 para **3** entradas — e as três
+são `limitacao-observabilidade`, ou seja, **o backlog de divergências app ×
+livro zerou**.
 
 Plano 3 do mesmo domínio — o Plano 1 (acima) cobriu nível e nome das 241
 características; o Plano 2, as magias concedidas. Nenhum dos dois tocou a

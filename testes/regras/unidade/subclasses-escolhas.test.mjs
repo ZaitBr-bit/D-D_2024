@@ -298,7 +298,14 @@ const TIPO_ESPERADO = new Map([
   // checagem usa `pendenciasNoNivel` (sem o filtro de classe), não
   // `especificas` -- só assim um tipo que também é PENDENCIAS_DE_CLASSE
   // pode ser reconhecido quando reaproveitado por uma característica.
-  ['Campeão|7|Estilo de Luta Adicional', 'estilo_luta'],
+  // Corrigido em 2026-08-18 (Plano 4): a expectativa anterior era 'estilo_luta',
+  // supondo que o app reaproveitaria o tipo da escolha de CLASSE. Ele não
+  // reaproveita, e não deve: classes-progressao.test.mjs afirma -- com razão --
+  // que 'estilo_luta' nunca dispara fora de Guardião/Paladino, e essa
+  // invariante continua verdadeira. A do Campeão é outra escolha (outra
+  // característica, outro nível, outro campo) que por acaso oferece a mesma
+  // lista de opções, e por isso tem tipo próprio.
+  ['Campeão|7|Estilo de Luta Adicional', 'subclasse_estilo_luta_extra'],
 ]);
 
 // Para cada (subclasse, nível) com pelo menos uma entrada de mecanismo
@@ -383,14 +390,10 @@ function crescimentoLegitimo(subclasse, tipo, nivel) {
 // (sem lacuna) em qualquer característica fora deste mapa, incluindo as
 // que hoje passam (Superioridade em Combate, os quatro "Versado em X").
 const CAUSA_ESCOLHA_SUBCLASSE = new Map([
-  // Causa 1 -- nenhum controle dedicado existe (nem levelup.js, nem a
-  // ficha) para estas 6 características.
-  ['Colégio do Conhecimento|3|Proficiências Bônus', { talento: 'Colégio do Conhecimento', teste: 'subclasses-escolha-ausente' }],
-  ['Colégio do Conhecimento|6|Descobertas Mágicas', { talento: 'Colégio do Conhecimento', teste: 'subclasses-escolha-ausente' }],
-  ['Mestre da Batalha|3|Estudioso da Guerra', { talento: 'Colégio do Conhecimento', teste: 'subclasses-escolha-ausente' }],
-  ['Andarilho Feérico|3|Glamour Transcendental', { talento: 'Colégio do Conhecimento', teste: 'subclasses-escolha-ausente' }],
-  ['Campeão|7|Estilo de Luta Adicional', { talento: 'Colégio do Conhecimento', teste: 'subclasses-escolha-ausente' }],
-  ['Círculo da Terra|3|Magias do Círculo da Terra', { talento: 'Colégio do Conhecimento', teste: 'subclasses-escolha-ausente' }],
+  // Causa 1 -- CORRIGIDA em 2026-08-18 (Plano 4): as 6 características que
+  // não tinham controle em lugar nenhum ganharam linha em
+  // site/js/regras-subclasse-escolhas.js, pendência em subirDeNivel e card
+  // genérico no assistente. Saíram deste mapa.
   // Causa 1-bis -- CRITICAL 1 da revisão independente de 2026-08-17: as duas
   // ficaram FORA da Causa 1 nesta correção (viviam lá antes, por engano). O
   // controle EXISTE, é dedicado, obrigatório e persiste (levelup-flow.js/
@@ -404,12 +407,7 @@ const CAUSA_ESCOLHA_SUBCLASSE = new Map([
   // nem pergunta. Só a Direção 1 (Grupo 3) destas 7 chega a uma asserção
   // vermelha -- o converso (Grupo 6) já é SKIP pelo mecanismo
   // RAIZES_FORA_DA_ROTA_SUBIRDENIVEL acima, sem precisar de comLacuna.
-  ['Trilha do Coração Selvagem|6|Aspecto dos Selvagens', { talento: 'Caçador', teste: 'subclasses-escolha-ausente' }],
   ['Patrono Ínfero|10|Resistência Ínfera', { talento: 'Caçador', teste: 'subclasses-escolha-ausente' }],
-  ['Feitiçaria Dracônica|6|Afinidade Elemental', { talento: 'Caçador', teste: 'subclasses-escolha-ausente' }],
-  ['Caçador|3|Presa do Caçador', { talento: 'Caçador', teste: 'subclasses-escolha-ausente' }],
-  ['Caçador|7|Táticas Defensivas', { talento: 'Caçador', teste: 'subclasses-escolha-ausente' }],
-  ['Senhor das Feras|3|Companheiro Primal', { talento: 'Caçador', teste: 'subclasses-escolha-ausente' }],
   ['Adivinhador|10|O Terceiro Olho', { talento: 'Caçador', teste: 'subclasses-escolha-ausente' }],
   // Causa 3 -- concessões AUTOMÁTICAS (CONCESSOES_AUTOMATICAS_SUBCLASSE,
   // sem par na Direção 1) que nenhum código aplica em lugar nenhum. Só o

@@ -1292,7 +1292,13 @@ export const CONCESSOES_AUTOMATICAS_SUBCLASSE = {
       livro: 'Classes.md:704 -- "Você adquire proficiência com armas Marciais, armaduras Médias e treinamento com Escudos." -- três concessões nomeadas, nenhuma "à sua escolha".' },
   ],
   'Combatente da Misericórdia': [
-    { nivel: 3, caracteristica: 'Implementos de Misericórdia', quantidade: 3,
+    // quantidade CORRIGIDA de 3 para 2 em 2026-08-18 (Plano 4): o livro concede
+    // três coisas, mas só DUAS delas são perícias -- a terceira (Kit de
+    // Herbalismo) vai para `proficiencias_ferramentas`, como a própria
+    // `observacao` abaixo já registrava. Exigir 3 de um campo que só pode
+    // receber 2 tornava a entrada permanentemente vermelha, mesmo com o app
+    // concedendo as três corretamente.
+    { nivel: 3, caracteristica: 'Implementos de Misericórdia', quantidade: 2,
       campoEsperado: 'pericias_proficientes',
       observacao: 'A parte de perícias (Intuição, Medicina) usa `pericias_proficientes` (grep -ro "pericias_proficientes" site/js/ | wc -l => 80). A parte do Kit de Herbalismo usa `proficiencias_ferramentas` (grep -ro "proficiencias_ferramentas" site/js/ | wc -l => 23) -- campo real, mas diferente do principal listado aqui.',
       livro: 'Classes.md:5330 -- "Você adquire proficiência nas perícias Intuição e Medicina e proficiência com o Kit de Herbalismo." -- três concessões nomeadas, nenhuma escolha.' },

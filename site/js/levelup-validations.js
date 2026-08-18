@@ -19,6 +19,13 @@ function precisaManobrasAgora(ctx, state) {
 export function collectOpcoes(ctx, state) {
   const opcoes = { ignorar_xp: true };
 
+  // Escolhas de subclasse (regras-subclasse-escolhas.js): o card generico
+  // grava em state.escolhasSubclasse[campo], e a guarda de subirDeNivel le
+  // opcoes[campo] -- este bloco e a unica ponte entre os dois.
+  for (const [campo, valores] of Object.entries(state.escolhasSubclasse || {})) {
+    if (Array.isArray(valores) && valores.length) opcoes[campo] = valores;
+  }
+
   // HP
   opcoes.hp_modo = state.hpModo;
   if (state.hpModo === 'rolado') {

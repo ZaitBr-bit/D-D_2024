@@ -100,10 +100,26 @@ test('level-up: Guerreiro escolhe Mestre da Batalha e as 3 manobras do nível 3'
   await page.locator('[data-subclasse="Mestre da Batalha"]').click();
   await expect(page.locator('[data-subclasse="Mestre da Batalha"]')).toHaveClass(/selecionada/);
 
-  // Passo 2 (subclasse) -> passo 3 (manobras). O step só existe agora
+  // Passo 2 (subclasse) -> passo de manobras. Os steps só existem agora
   // porque state.subclasse acabou de virar 'Mestre da Batalha' (ver
   // comentário do cabeçalho sobre buildVisibleSteps).
+  //
+  // Desde o Plano 4 da rodada de correção, o Mestre da Batalha nível 3
+  // levanta TAMBÉM as duas escolhas de Estudioso da Guerra (Classes.md:4061 --
+  // ferramenta de artesão e perícia), num step de Escolhas de Classe que vem
+  // ANTES do de manobras. Por isso a navegação avança até o card de manobras
+  // aparecer, em vez de assumir "um Próximo" -- e o teste afirma, de passagem,
+  // que o step novo existe.
   await proximo(page);
+  const estudiosoFerramenta = page.locator('[data-subclasse-escolha="subclasse_estudioso_ferramenta"]');
+  const estudiosoPericia = page.locator('[data-subclasse-escolha="subclasse_estudioso_pericia"]');
+  if (await estudiosoFerramenta.count()) {
+    await expect(estudiosoPericia,
+      'Estudioso da Guerra embute DUAS escolhas na mesma característica').toHaveCount(1);
+    await estudiosoFerramenta.selectOption('Ferramentas de Ferreiro');
+    await estudiosoPericia.selectOption('Percepção');
+    await proximo(page);
+  }
 
   // 5. A tela passa a exigir as 3 manobras do nível 3
   // (getQuantidadeNovasManobras(3) === 3, site/js/levelup.js:471-475, e

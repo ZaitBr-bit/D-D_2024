@@ -2390,12 +2390,37 @@ export function setupEventosHabilidades() {
 export function detectarUsosMaximos(descricao) {
   if (!descricao) return null;
   const d = descricao.toLowerCase();
+  // "X vezes SEU NÍVEL" é MULTIPLICADOR de uma fórmula, não contagem de
+  // usos: "seus Pontos de Vida mudam para um número igual a duas vezes seu
+  // nível de Bárbaro" (Fúria Implacável) e "recupera um número de Pontos de
+  // Vida igual a três vezes o seu nível de Paladino" (Sentinela Imortal).
+  // Lidas como usos, davam à Fúria Implacável um botão "Usar / ✗ Esgotado"
+  // com 2 usos numa capacidade que não tem limite de uso nenhum.
+  const semMultiplicador = d.replace(/\b(uma|duas|dois|três|tres|quatro|cinco|seis|\d+)\s+vezes\s+(o\s+)?seu\s+nível/g, ' ');
   const numerosTexto = { 'uma': 1, 'duas': 2, 'dois': 2, 'três': 3, 'tres': 3, 'quatro': 4, 'cinco': 5, 'seis': 6 };
   for (const [texto, num] of Object.entries(numerosTexto)) {
-    if (d.includes(`${texto} vezes`) || d.includes(`${texto} vez`)) return num;
+    if (semMultiplicador.includes(`${texto} vezes`) || semMultiplicador.includes(`${texto} vez`)) return num;
   }
-  const match = d.match(/(\d+)\s*vezes/);
+  const match = semMultiplicador.match(/(\d+)\s*vezes/);
   if (match) return parseInt(match[1]);
+
+  // "uma reserva de quatro d12s" (Campeão dos Deuses, Trilha do Fanático):
+  // o número vem como adjetivo numeral antes do dado, nunca como "X vezes".
+  const reserva = d.match(/reserva de (um|uma|dois|duas|três|tres|quatro|cinco|seis|\d+)\s*d\d+/);
+  if (reserva) {
+    const n = numerosTexto[reserva[1]] ?? parseInt(reserva[1], 10);
+    if (n) return n;
+  }
+
+  // Limite IMPLÍCITO de 1 uso: o livro não escreve "uma vez", diz que a
+  // característica só volta num descanso. A forma varia -- "você NÃO PODE
+  // utilizá-la novamente até completar um Descanso Longo" (Sentinela
+  // Imortal), "Você PODE USAR esta característica novamente após completar um
+  // Descanso Longo" (Vingança Calcinante, Surto Controlado), "completar um
+  // Descanso Longo ANTES DE PODER USAR esta característica novamente" (Marés
+  // do Caos) -- então a checagem é por frase, sem depender de ordem nem de
+  // polaridade: basta a mesma frase falar em usar de novo e em descanso.
+  if (d.split(/(?<=\.)\s+/).some((f) => f.includes('novamente') && f.includes('descanso'))) return 1;
   return null;
 }
 

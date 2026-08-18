@@ -41,10 +41,17 @@ export function normalizarEstiloLuta(nome) {
  * (escolha de classe e talentos) em um Set canônico sem duplicações.
  */
 function getEstiloAtivo(char, nomesTalentos) {
-  const estilo = char?.escolhas_classe?.estilo_luta?.[0] || '';
-  const estiloCanon = normalizarEstiloLuta(estilo);
+  // TODAS as entradas, nao so a primeira: o Campeao ganha um Estilo de Luta
+  // ADICIONAL no nivel 7 (Classes.md:3904), que entra ao lado do primeiro em
+  // escolhas_classe.estilo_luta. Ler so [0] daria ao jogador um estilo que
+  // aparece na ficha e nao faz nada.
+  const escolhidos = char?.escolhas_classe?.estilo_luta;
+  const listaEstilos = Array.isArray(escolhidos) ? escolhidos : [escolhidos].filter(Boolean);
   const ativos = new Set();
-  if (estiloCanon) ativos.add(estiloCanon);
+  for (const e of listaEstilos) {
+    const canon = normalizarEstiloLuta(e || '');
+    if (canon) ativos.add(canon);
+  }
   // Nomes canônicos de todos os estilos de luta
   const todosEstilos = [
     'Arquearia', 'Combate com Armas de Arremesso', 'Combate com Armas Grandes',

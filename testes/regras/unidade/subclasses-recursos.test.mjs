@@ -567,13 +567,9 @@ function usosMaximosEsperado(e) {
 // BRUTO de detectarUsosMaximos) não observa nenhuma diferença que o
 // jogador veja. Ver o motivo completo em lacunas-conhecidas.mjs.
 const CAUSA_USOS_MAXIMOS = {
-  'Juramento dos Anciões|15|Sentinela Imortal': { talento: 'Mago', teste: 'classes-passivas-descanso-curto-janela' },
-  'Trilha do Fanático|3|Campeão dos Deuses': { talento: 'Feitiçaria Selvagem', teste: 'subclasses-recursos-usos-sem-consequencia' },
-  'Patrono Celestial|14|Vingança Calcinante': { talento: 'Feitiçaria Selvagem', teste: 'subclasses-recursos-usos-sem-consequencia' },
-  'Feitiçaria Selvagem|3|Marés do Caos': { talento: 'Feitiçaria Selvagem', teste: 'subclasses-recursos-usos-sem-consequencia' },
-  'Feitiçaria Selvagem|18|Surto Controlado': { talento: 'Feitiçaria Selvagem', teste: 'subclasses-recursos-usos-sem-consequencia' },
-  'Trapaceiro Arcano|17|Ladrão de Magias': { talento: 'Feitiçaria Selvagem', teste: 'subclasses-recursos-usos-sem-consequencia' },
-  'Adivinhador|10|O Terceiro Olho': { talento: 'Feitiçaria Selvagem', teste: 'subclasses-recursos-usos-sem-consequencia' },
+  // Sentinela Imortal saiu daqui em 2026-08-18 (Plano 3): detectarUsosMaximos
+  // deixou de ler "três vezes o seu nível de Paladino" (multiplicador da cura)
+  // como contagem de usos, e passou a devolver o valor do catálogo.
 };
 
 for (const entrada of TODAS_ENTRADAS_RECURSO) {
@@ -673,7 +669,9 @@ function recargaEsperada(e) {
 // isolar cláusulas) que já explica Memorizar Magia/Fúria Implacável naquela
 // entrada -- call site novo, não causa nova.
 const CAUSA_RECARGA = {
-  'Círculo das Estrelas|3|Mapa Estelar': { talento: 'Mago', teste: 'classes-passivas-descanso-curto-janela' },
+  // Mapa Estelar saiu daqui em 2026-08-18 (Plano 3): detectarRecarga passou a
+  // exigir que a frase prenda o Descanso a um USO, então o parágrafo alheio
+  // sobre recriar o mapa perdido deixou de se fundir com a recarga de Raio Guia.
 };
 
 for (const entrada of TODAS_ENTRADAS_RECURSO) {
@@ -786,7 +784,10 @@ test('sanity: das 27 entradas citáveis (usos/recarga), 22 também sustentam ati
 // TEXTO ERRADO); aqui a detecção está certa, e o defeito é o curto-circuito
 // assumir "recarrega" implica "é decisão do jogador".
 const CAUSA_ATIVA = {
-  'Juramento dos Anciões|15|Sentinela Imortal': { talento: 'Juramento dos Anciões', teste: 'subclasses-recursos-ativa-curto-circuito-automatico' },
+  // Sentinela Imortal saiu daqui em 2026-08-18 (Plano 3): o curto-circuito
+  // `if (recarga) return true` sumiu de ehHabilidadeAtiva, e o que a mantém
+  // passiva é a ausência de verbo de decisão -- o único "pode" do texto está
+  // em "você NÃO pode utilizá-la novamente".
 };
 
 for (const entrada of TODAS_ENTRADAS_RECURSO) {

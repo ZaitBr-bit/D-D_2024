@@ -8,6 +8,7 @@ import { calcMod, bonusProficiencia, mdParaHtml, semAcento, toast, abrirModal } 
 import { rotuloPericia } from './opcoes-dominio.js';
 import { obterTalentosElegiveis } from './levelup.js';
 import { calcularConjuracao, calcularSubclasseArcana } from './levelup-flow.js';
+import { linhasDaSubclasseNoNivel, opcoesDaLinha } from './regras-subclasse-escolhas.js';
 
 // ============================================================
 // CARD: Ganhos do Nível
@@ -443,7 +444,51 @@ export function renderCardEscolhasClasse(ctx, state) {
     `;
   }
 
+
+  html += montarCardsEscolhaSubclasse(ctx, state);
   return html;
+}
+
+/**
+ * Um card por escolha que uma caracteristica de SUBCLASSE exige neste nivel.
+ * Generico de proposito: a proxima caracteristica que o livro mandar escolher
+ * entra como LINHA em regras-subclasse-escolhas.js, sem card novo aqui.
+ *
+ * Le a subclasse de `state.subclasse || char.subclasse` -- no nivel 3 ela esta
+ * sendo escolhida NESTA sessao e ainda nao existe no personagem salvo; ler so
+ * o personagem deixaria a maioria das escolhas sem card, com a pendencia
+ * travando a subida sem o jogador ter onde responder.
+ */
+export function montarCardsEscolhaSubclasse(ctx, state) {
+  const subclasse = state?.subclasse || ctx.char?.subclasse;
+  const linhas = linhasDaSubclasseNoNivel(subclasse, ctx.nivelNovo).filter((l) => l.tipo);
+  if (!linhas.length) return '';
+  return linhas.map((linha) => {
+    const opcoes = opcoesDaLinha(linha);
+    const escolhidas = state?.escolhasSubclasse?.[linha.campo] || [];
+    const seletores = Array.from({ length: linha.quantidade }, (_, i) => `
+      <select class="input" data-subclasse-escolha="${linha.campo}" data-indice="${i}"
+              style="margin-bottom:6px">
+        <option value="">— escolha —</option>
+        ${opcoes.map((o) => `<option value="${escHtmlSeletor(o)}"${escolhidas[i] === o ? ' selected' : ''}>${escHtmlSeletor(o)}</option>`).join('')}
+      </select>`).join('');
+    return `
+      <div class="levelup-card">
+        <div class="levelup-card-header">${escHtmlSeletor(linha.rotulo)}</div>
+        <div class="levelup-card-body">
+          ${seletores}
+          <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">
+            Exigido pelo livro nesta subclasse (${escHtmlSeletor(linha.livro)}).
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/** Escapa texto que vai para dentro do HTML dos seletores acima. */
+function escHtmlSeletor(t) {
+  return String(t ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 // ============================================================

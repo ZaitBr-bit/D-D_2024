@@ -7,6 +7,10 @@ import { getEspacosSubclasseConjuradora, getTruquesFixosSubclasse } from './regr
 import { calcMod, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas } from './utils.js';
 import { aplicarDeltaSistema } from './ficha-edicoes.js';
 import { aplicarEfeitoTalento, validarEscolhasTalento } from './regras-cobertura.js';
+import {
+  linhasDaSubclasseNoNivel, opcoesDaLinha,
+  aplicarEscolhaSubclasse, aplicarConcessaoAutomatica,
+} from './regras-subclasse-escolhas.js';
 
 const _ATRIBUTOS_ASI_TALENTO = {
   'Força': 'forca', 'Destreza': 'destreza', 'Constituição': 'constituicao',
@@ -489,11 +493,43 @@ export function exigeAcademico(classe, nivel) {
 }
 
 /**
+ * Recorta o trecho da descricao que pertence a uma opcao nomeada em negrito
+ * ("**Terreno Polar**"), ate o proximo cabecalho em negrito do mesmo tipo.
+ * Devolve '' quando a opcao nao aparece no texto.
+ */
+function recortarBlocoDaOpcao(descricao, opcao) {
+  const linhas = descricao.split('\n');
+  const ehCabecalho = (l) => /^\*\*[^*]+\*\*\s*$/.test(l.trim());
+  const casa = (l) => ehCabecalho(l)
+    && l.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .includes(String(opcao).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''));
+  const inicio = linhas.findIndex(casa);
+  if (inicio === -1) return '';
+  let fim = linhas.length;
+  for (let i = inicio + 1; i < linhas.length; i++) {
+    if (ehCabecalho(linhas[i])) { fim = i; break; }
+  }
+  return linhas.slice(inicio, fim).join('\n');
+}
+
+/**
  * Extrai magias sempre preparadas de tabelas markdown no nível alvo.
  * Ex.: | 5 | *Passo Nebuloso* |
  */
-function extrairMagiasSemprePreparadasTabela(descricao, nivelAlvo) {
+function extrairMagiasSemprePreparadasTabela(descricao, nivelAlvo, opcaoEscolhida) {
   if (!descricao || !nivelAlvo) return [];
+  // Caracteristica com MAIS DE UMA tabela de nivel oferece tabelas
+  // ALTERNATIVAS (Magias do Circulo da Terra tem quatro, uma por terreno) e
+  // qual vale depende de uma escolha do jogador. Com a escolha em maos,
+  // recorta so a tabela dela; sem a escolha, devolve vazio -- somar as
+  // quatro entregaria 12 magias no nivel 3 onde o livro concede 3,
+  // misturando terrenos que o personagem nunca escolheu.
+  const cabecalhos = descricao.match(/\|[^|\n]*[Nn][íi]vel[^|\n]*\|/g) || [];
+  if (cabecalhos.length > 1) {
+    if (!opcaoEscolhida) return [];
+    descricao = recortarBlocoDaOpcao(descricao, opcaoEscolhida);
+    if (!descricao) return [];
+  }
   const texto = descricao.toLowerCase();
   // A palavra "sempre" NAO e o invariante da concessao -- varias frases do
   // livro concedem sem ela ("voce tem a lista de magias preparadas",
@@ -578,7 +614,7 @@ function extrairMagiasSemprePreparadasTexto(descricao) {
 /**
  * Obtém magias sempre preparadas concedidas no nível atual.
  */
-export async function obterMagiasSemprePreparadasNivel(classe, subclasse, nivel) {
+export async function obterMagiasSemprePreparadasNivel(classe, subclasse, nivel, opcaoEscolhida) {
   const classeData = await getClasse(classe);
   if (!classeData) return [];
 
@@ -609,14 +645,14 @@ export async function obterMagiasSemprePreparadasNivel(classe, subclasse, nivel)
     .filter(c => c.nivel === nivel)
     .forEach(f => {
       extrairMagiasSemprePreparadasTexto(f.descricao).forEach(n => nomes.add(n));
-      extrairMagiasSemprePreparadasTabela(f.descricao, nivel).forEach(n => nomes.add(n));
+      extrairMagiasSemprePreparadasTabela(f.descricao, nivel, opcaoEscolhida).forEach(n => nomes.add(n));
     });
 
   // Características da classe de níveis anteriores (apenas tabela, para linhas que escalam por nível)
   featsClasse
     .filter(c => c.nivel < nivel)
     .forEach(f => {
-      extrairMagiasSemprePreparadasTabela(f.descricao, nivel).forEach(n => nomes.add(n));
+      extrairMagiasSemprePreparadasTabela(f.descricao, nivel, opcaoEscolhida).forEach(n => nomes.add(n));
     });
 
   // Características da subclasse no nível
@@ -628,13 +664,13 @@ export async function obterMagiasSemprePreparadasNivel(classe, subclasse, nivel)
       .filter(c => c.nivel === nivel)
       .forEach(f => {
         extrairMagiasSemprePreparadasTexto(f.descricao).forEach(n => nomes.add(n));
-        extrairMagiasSemprePreparadasTabela(f.descricao, nivel).forEach(n => nomes.add(n));
+        extrairMagiasSemprePreparadasTabela(f.descricao, nivel, opcaoEscolhida).forEach(n => nomes.add(n));
       });
 
     featsSubclasse
       .filter(c => c.nivel < nivel)
       .forEach(f => {
-        extrairMagiasSemprePreparadasTabela(f.descricao, nivel).forEach(n => nomes.add(n));
+        extrairMagiasSemprePreparadasTabela(f.descricao, nivel, opcaoEscolhida).forEach(n => nomes.add(n));
       });
   }
 
@@ -653,10 +689,10 @@ export async function obterMagiasSemprePreparadasNivel(classe, subclasse, nivel)
 /**
  * Obtém todas as magias sempre preparadas até o nível atual.
  */
-export async function obterTodasMagiasSemprePreparadas(classe, subclasse, nivelAtual) {
+export async function obterTodasMagiasSemprePreparadas(classe, subclasse, nivelAtual, opcaoEscolhida) {
   const todas = [];
   for (let nivel = 1; nivel <= (nivelAtual || 1); nivel++) {
-    const magias = await obterMagiasSemprePreparadasNivel(classe, subclasse, nivel);
+    const magias = await obterMagiasSemprePreparadasNivel(classe, subclasse, nivel, opcaoEscolhida);
     todas.push(...magias);
   }
   return todas;
@@ -1251,6 +1287,37 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     }
   }
   
+  // Escolhas de construcao que uma caracteristica de SUBCLASSE exige neste
+  // nivel. Um laco so, alimentado por regras-subclasse-escolhas.js -- antes
+  // disso o app tinha 15 tipos de pendencia escritos um a um, nenhum deles
+  // cobrindo estas 12 caracteristicas, e o jogador terminava o nivel sem
+  // aviso nenhum e sem a regra do livro aplicada.
+  // `opcoes.subclasse || personagem.subclasse` -- mesmo idioma de :966. No
+  // nivel 3 a subclasse esta sendo escolhida NESTA chamada e so e gravada em
+  // personagem.subclasse mais abaixo (:1303); ler so o personagem faria as
+  // escolhas de nivel 3 (a maioria delas) nunca dispararem.
+  const subclasseEfetiva = opcoes.subclasse || personagem.subclasse;
+  const escolhasSubclasseNivel = linhasDaSubclasseNoNivel(subclasseEfetiva, novoNivel)
+    .filter((l) => l.tipo);
+  for (const linha of escolhasSubclasseNivel) {
+    const bruto = opcoes[linha.campo];
+    const escolhido = (Array.isArray(bruto) ? bruto : [bruto]).filter(Boolean);
+    const validas = opcoesDaLinha(linha);
+    // `validas` vem vazia quando a lista e assincrona (Descobertas Magicas,
+    // que escolhe de qualquer lista de magias): ali a validacao e so de
+    // quantidade, e isso esta declarado no README da suite.
+    const foraDaLista = validas.length > 0 && escolhido.some((v) => !validas.includes(v));
+    const repetida = new Set(escolhido).size !== escolhido.length;
+    if (escolhido.length !== linha.quantidade || foraDaLista || repetida) {
+      return {
+        sucesso: false,
+        pendente: true,
+        tipo_pendencia: linha.tipo,
+        mensagem: `${linha.rotulo}: escolha ${linha.quantidade} opcao(oes) valida(s), sem repetir.`
+      };
+    }
+  }
+
   // Aplicar mudanças ao personagem
   personagem.nivel = novoNivel;
   personagem.pv_max += hpGanho;
@@ -1323,6 +1390,20 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   // Obter características de subclasse para este nível
   const subclasseAtual = personagem.subclasse;
   const caracteristicasSubclasse = await obterCaracteristicasSubclasseNivel(personagem.classe, subclasseAtual, novoNivel);
+
+  // Concessoes automaticas de subclasse: o livro concede sem perguntar nada
+  // ("Voce adquire proficiencia em X"), e o app precisa conceder sem
+  // perguntar nada. Antes desta tabela, cinco caracteristicas do livro
+  // simplesmente nunca eram aplicadas -- nem aqui, nem na ficha, nem no
+  // assistente -- e o jogador nao tinha como saber que faltava algo.
+  for (const linha of linhasDaSubclasseNoNivel(subclasseAtual, novoNivel)) {
+    if (linha.automatica) aplicarConcessaoAutomatica(personagem, linha);
+  }
+
+  // ...e as escolhas que o jogador acabou de fazer, validadas na guarda acima.
+  for (const linha of escolhasSubclasseNivel) {
+    aplicarEscolhaSubclasse(personagem, linha, opcoes[linha.campo]);
+  }
   
   // Adicionar automaticamente magias de domínio/subclasse
   const magiasDominio = await obterMagiasDominioNivel(personagem.classe, subclasseAtual, novoNivel);
@@ -1337,7 +1418,10 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   // Excluir magias já concedidas por Domínio - a mesma magia pode aparecer em ambas as
   // listas porque o texto de "Magias de Domínio" também casa com o parser de "sempre
   // preparada"; Domínio deve ganhar (mantém origem: 'dominio', não 'sempre').
-  const magiasSempre = (await obterMagiasSemprePreparadasNivel(personagem.classe, subclasseAtual, novoNivel))
+  // O terreno escolhido (Circulo da Terra) recorta a tabela certa entre as
+  // quatro alternativas -- sem ele o extrator devolve vazio de proposito.
+  const opcaoSubclasse = personagem.escolhas_classe?.circulo_terra_terreno;
+  const magiasSempre = (await obterMagiasSemprePreparadasNivel(personagem.classe, subclasseAtual, novoNivel, opcaoSubclasse))
     .filter(magia => !magiasDominio.some(d => d.nome === magia.nome));
   if (magiasSempre.length > 0) {
     if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
