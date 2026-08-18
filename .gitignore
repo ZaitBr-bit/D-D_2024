@@ -78,3 +78,25 @@ site/.cache/
 
 # Rascunho das skills (mockups de brainstorming, ledger e pacotes de revisão)
 .superpowers/
+
+# ------------------------------------------------------------------
+# Material interno: fica no disco, fora do repositorio publico.
+# Decisao de 2026-08-17, ao abrir o repositorio para issues. A limpeza
+# do historico (estes arquivos continuam nos commits antigos) fica para
+# quando o repositorio privado existir.
+# ------------------------------------------------------------------
+
+# Planos, specs e tentativas anteriores -- processo de decisao interno.
+# `docs/ARQUITETURA.md` e `docs/DEPLOY.md` CONTINUAM versionados: sao a
+# documentacao publica do projeto, linkada pelo README.
+docs/superpowers/
+docs/historico/
+
+# Texto de regras do livro. E a referencia humana e o oraculo da suite
+# de regras (testes/regras/ le estes .md) -- quem for rodar a suite
+# precisa da pasta no disco, ela nao vem do clone.
+Informacoes Separadas/
+
+# Anotacoes de trabalho e configuracao local de ferramentas.
+situação.txt
+.mcp.json

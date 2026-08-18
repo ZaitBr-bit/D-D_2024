@@ -1,0 +1,11 @@
+# Issue em branco continua permitida: relato que não cabe em nenhum dos dois
+# formulários é melhor mal-formatado do que não relatado.
+blank_issues_enabled: true
+
+contact_links:
+  - name: 💬 Falar sem conta no GitHub (Reddit)
+    url: https://www.reddit.com/r/rpgbrasil/comments/1sgrj1j/criador_de_ficha_dd_55_2024_web_e_mobile_gratuito/
+    about: Comentário no post do projeto — para quem não tem conta no GitHub.
+  - name: ▶ Abrir o app
+    url: https://zaitbr-bit.github.io/D-D_2024/
+    about: O criador de ficha em si, para conferir a versão antes de relatar.

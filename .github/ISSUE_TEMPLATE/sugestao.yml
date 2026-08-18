@@ -1,0 +1,60 @@
+name: 💡 Sugerir uma melhoria
+description: Uma ideia, um conteúdo que falta ou algo que poderia ser mais fácil de usar.
+title: "[Ideia] "
+labels: ["melhoria"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ideias são bem-vindas. Vale desde "esse botão podia ficar mais visível"
+        até "falta tal subclasse".
+
+        Uma olhada nas
+        [issues já abertas](https://github.com/ZaitBr-bit/D-D_2024/issues)
+        evita repetir uma ideia que já está na fila.
+
+  - type: textarea
+    id: ideia
+    attributes:
+      label: O que você gostaria de ver
+      placeholder: "Poder marcar magias favoritas para elas ficarem no topo da lista."
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivo
+    attributes:
+      label: O que isso resolveria
+      description: Em que momento do jogo isso te ajudaria, ou o que hoje dá trabalho.
+      placeholder: "Na mesa eu uso sempre as mesmas 4 magias e preciso rolar a lista inteira toda vez."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: Tipo de sugestão
+      options:
+        - Conteúdo de jogo que falta (classe, subclasse, magia, item…)
+        - Regra que poderia ser calculada automaticamente
+        - Facilidade de uso / organização da tela
+        - Impressão ou PDF
+        - Outro
+    validations:
+      required: true
+
+  - type: input
+    id: livro
+    attributes:
+      label: Se for conteúdo do livro, onde ele aparece (opcional)
+      placeholder: "Capítulo de Classes, seção do Ladino"
+    validations:
+      required: false
+
+  - type: textarea
+    id: extras
+    attributes:
+      label: Print ou rascunho (opcional)
+      description: Arraste a imagem para dentro desta caixa para anexá-la.
+    validations:
+      required: false

@@ -1,0 +1,93 @@
+name: 🐛 Relatar um problema
+description: Algo no app não funciona, some, trava ou aplica uma regra errada.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por relatar! Quanto mais específico, mais rápido o conserto.
+
+        Antes de continuar, dá uma olhada nas
+        [issues já abertas](https://github.com/ZaitBr-bit/D-D_2024/issues) —
+        se alguém já relatou o mesmo, comentar lá ajuda mais do que abrir outra.
+
+  - type: input
+    id: versao
+    attributes:
+      label: Versão do app
+      description: "O número ao lado do título, no alto da tela — por exemplo 2.2.3."
+      placeholder: "2.2.3"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: onde
+    attributes:
+      label: Onde aconteceu
+      options:
+        - Tela inicial (lista de personagens)
+        - Criação de personagem
+        - Ficha do personagem
+        - Subida de nível
+        - Magias / grimório
+        - Inventário / equipamento
+        - PDF ou impressão
+        - Login / sincronização
+        - Outro / não sei dizer
+    validations:
+      required: true
+
+  - type: textarea
+    id: passos
+    attributes:
+      label: O que você fez
+      description: O caminho até o problema, na ordem. Não precisa ser técnico.
+      placeholder: |
+        1. Criei um Bárbaro nível 5
+        2. Abri a ficha
+        3. Cliquei em "Descanso Longo"
+    validations:
+      required: true
+
+  - type: textarea
+    id: esperado
+    attributes:
+      label: O que você esperava que acontecesse
+      placeholder: "A fúria deveria voltar para 3 usos."
+    validations:
+      required: true
+
+  - type: textarea
+    id: aconteceu
+    attributes:
+      label: O que aconteceu de verdade
+      placeholder: "Continuou marcando 0 usos."
+    validations:
+      required: true
+
+  - type: input
+    id: aparelho
+    attributes:
+      label: Aparelho e navegador
+      placeholder: "Android, Chrome / PC com Windows, Firefox / iPhone, Safari"
+    validations:
+      required: true
+
+  - type: textarea
+    id: extras
+    attributes:
+      label: Print da tela e personagem (opcional, mas ajuda muito)
+      description: |
+        Arraste a imagem para dentro desta caixa para anexá-la.
+        Se puder, exporte o personagem na tela inicial e anexe o arquivo também.
+    validations:
+      required: false
+
+  - type: textarea
+    id: regra
+    attributes:
+      label: É uma regra aplicada errado? (opcional)
+      description: Se for regra do livro, diga qual é e o que o livro manda fazer.
+    validations:
+      required: false
