@@ -16,7 +16,7 @@
 // ============================================================
 import { getArmaduras, getArmas, getEquipamentoAventura } from './db.js';
 import { pagarCusto, parseCusto, podePagarCusto } from './moedas.js';
-import { abrirModal, mdParaHtml, semAcento, toast } from './utils.js';
+import { abrirModal, escHtml, mdParaHtml, semAcento, toast } from './utils.js';
 import {
   atendeRequisitoForca, badgeProficiencia,
   temProficienciaArma, temProficienciaArmadura
@@ -251,7 +251,7 @@ export async function abrirSeletorItens(ctx) {
       : itens.map((it, i) => `
         <div class="inv-item ${it.prof === false ? 'item-sem-prof' : ''}" style="cursor:pointer" data-add-cat="${i}">
           <div style="flex:1">
-            <div class="inv-item-nome">${it.nome} ${it.badge}</div>
+            <div class="inv-item-nome">${escHtml(it.nome)} ${it.badge}</div>
             <div class="inv-item-detalhe">${it.detalhe}</div>
             ${it.detalhe2 ? `<div class="inv-item-detalhe" style="font-size:0.7rem;opacity:0.7">${it.detalhe2}</div>` : ''}
           </div>

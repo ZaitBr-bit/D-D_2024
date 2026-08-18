@@ -168,7 +168,7 @@ export function renderStepDetalhes(el) {
         <div class="col" style="flex:2">
           <div class="form-group">
             <label class="form-label">Nome do Personagem</label>
-            <input type="text" class="form-input" id="det-nome" value="${personagem.nome}" placeholder="Nome do seu personagem">
+            <input type="text" class="form-input" id="det-nome" value="${escHtml(personagem.nome)}" placeholder="Nome do seu personagem">
           </div>
         </div>
         <div class="col" style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
@@ -246,19 +246,19 @@ export function renderStepDetalhes(el) {
       <div class="card-header"><h3>Aparencia e Personalidade</h3></div>
       <div class="form-group">
         <label class="form-label">Aparencia</label>
-        <textarea class="form-textarea" id="det-aparencia" rows="2" placeholder="Descreva a aparencia...">${personagem.aparencia}</textarea>
+        <textarea class="form-textarea" id="det-aparencia" rows="2" placeholder="Descreva a aparencia...">${escHtml(personagem.aparencia)}</textarea>
       </div>
       <div class="row gap-1">
         <div class="col-2">
           <div class="form-group">
             <label class="form-label">Tracos de Personalidade</label>
-            <textarea class="form-textarea" id="det-personalidade" rows="2">${personagem.personalidade}</textarea>
+            <textarea class="form-textarea" id="det-personalidade" rows="2">${escHtml(personagem.personalidade)}</textarea>
           </div>
         </div>
         <div class="col-2">
           <div class="form-group">
             <label class="form-label">Ideais</label>
-            <textarea class="form-textarea" id="det-ideais" rows="2">${personagem.ideais}</textarea>
+            <textarea class="form-textarea" id="det-ideais" rows="2">${escHtml(personagem.ideais)}</textarea>
           </div>
         </div>
       </div>
@@ -266,13 +266,13 @@ export function renderStepDetalhes(el) {
         <div class="col-2">
           <div class="form-group">
             <label class="form-label">Lacos</label>
-            <textarea class="form-textarea" id="det-lacos" rows="2">${personagem.lacos}</textarea>
+            <textarea class="form-textarea" id="det-lacos" rows="2">${escHtml(personagem.lacos)}</textarea>
           </div>
         </div>
         <div class="col-2">
           <div class="form-group">
             <label class="form-label">Defeitos</label>
-            <textarea class="form-textarea" id="det-defeitos" rows="2">${personagem.defeitos}</textarea>
+            <textarea class="form-textarea" id="det-defeitos" rows="2">${escHtml(personagem.defeitos)}</textarea>
           </div>
         </div>
       </div>
@@ -281,11 +281,11 @@ export function renderStepDetalhes(el) {
     <div class="card">
       <div class="form-group">
         <label class="form-label">Historia do Personagem</label>
-        <textarea class="form-textarea" id="det-historia" rows="4" placeholder="Conte a historia do seu personagem...">${personagem.historia_personagem}</textarea>
+        <textarea class="form-textarea" id="det-historia" rows="4" placeholder="Conte a historia do seu personagem...">${escHtml(personagem.historia_personagem)}</textarea>
       </div>
       <div class="form-group">
         <label class="form-label">Notas</label>
-        <textarea class="form-textarea" id="det-notas" rows="3" placeholder="Notas livres...">${personagem.notas}</textarea>
+        <textarea class="form-textarea" id="det-notas" rows="3" placeholder="Notas livres...">${escHtml(personagem.notas)}</textarea>
       </div>
     </div>
   `;

@@ -85,7 +85,6 @@ export const GATILHOS_SEM_COBERTURA = [
   'btn-confirmar-troca-conhecida',
   'btn-confirmar-troca-maestria',
   'btn-dist-sugerida',
-  'btn-edit-detalhes',
   'btn-edit-po',
   'btn-editar-item-custom',
   'btn-enable-levelup-v2',

@@ -162,6 +162,15 @@ function lerCampoAninhado(personagem, caminhoPontilhado) {
 // nível 1, fluxo que personagemSemente não simula).
 function gravarCampoAninhado(personagem, caminhoPontilhado, valor) {
   const partes = caminhoPontilhado.split('.');
+  // Um segmento `__proto__` faria a gravacao vazar para Object.prototype e
+  // contaminar TODO objeto do processo -- inclusive os personagens dos
+  // outros testes, que rodam no mesmo `node --test`. Hoje os caminhos vem
+  // do catalogo (escritos a mao), mas o custo de fechar e uma linha, e o
+  // sintoma de nao fechar seria falha aleatoria num teste vizinho.
+  const PROIBIDOS = ['__proto__', 'constructor', 'prototype'];
+  if (partes.some((seg) => PROIBIDOS.includes(seg))) {
+    throw new Error(`caminho invalido em gravarCampoAninhado: ${caminhoPontilhado}`);
+  }
   let alvo = personagem;
   for (let i = 0; i < partes.length - 1; i++) {
     if (!alvo[partes[i]] || typeof alvo[partes[i]] !== 'object') alvo[partes[i]] = {};

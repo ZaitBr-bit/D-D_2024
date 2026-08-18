@@ -69,13 +69,27 @@ function atualizarSeloVersaoClicavel(pagina) {
 }
 
 /** Processa a rota atual do hash */
+/**
+ * Le uma chave APENAS entre as proprias do objeto.
+ *
+ * O hash da URL e texto livre do usuario, e busca em objeto literal sobe
+ * a cadeia de prototipos: `routes['toString']` devolveria a funcao
+ * herdada de Object.prototype, que o router trataria como pagina valida
+ * -- tela em branco no lugar do "Pagina nao encontrada", e o titulo do
+ * header recebendo o codigo-fonte da funcao. Coberto por
+ * `testes/e2e/regras/rota-desconhecida.spec.mjs`.
+ */
+function proprio(obj, chave) {
+  return Object.prototype.hasOwnProperty.call(obj, chave) ? obj[chave] : undefined;
+}
+
 function processarRota() {
   const hash = window.location.hash.slice(1) || 'home';
   const partes = hash.split('/');
   const pagina = partes[0];
   const param = partes.slice(1).join('/');
 
-  const render = routes[pagina];
+  const render = proprio(routes, pagina);
   const content = document.getElementById('app-content');
   const btnVoltar = document.getElementById('btn-voltar');
   const acoes = document.getElementById('header-acoes');
@@ -119,7 +133,7 @@ function processarRota() {
     'criar': 'Novo Personagem',
     'ficha': 'Ficha'
   };
-  definirTituloHeader(titulos[pagina] || 'D&D 5.5 Ficha');
+  definirTituloHeader(proprio(titulos, pagina) || 'D&D 5.5 Ficha');
   atualizarSeloVersaoClicavel(pagina);
 
   if (render) {

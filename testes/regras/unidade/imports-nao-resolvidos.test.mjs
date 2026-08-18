@@ -93,7 +93,8 @@ function nomesDisponiveis(codigo) {
   for (const m of codigo.matchAll(/import\s+([\s\S]*?)\s+from\s+/g)) {
     const clausula = m[1];
     for (const parte of clausula.replace(/[{}]/g, ',').split(',')) {
-      const nome = parte.split(/\s+as\s+/).pop().replace('*', '').trim();
+      // Global: `replace('*', '')` tirava so a PRIMEIRA ocorrencia.
+      const nome = parte.split(/\s+as\s+/).pop().replace(/\*/g, '').trim();
       if (/^[A-Za-z_$][\w$]*$/.test(nome)) nomes.add(nome);
     }
   }

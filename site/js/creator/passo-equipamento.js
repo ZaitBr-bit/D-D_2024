@@ -5,7 +5,7 @@
 import { CLASSES_INFO } from '../dados-classes.js';
 import { getClasse } from '../db.js';
 import { DENOMINACOES, ICONE_MOEDA, adicionarMoeda, removerQuantidadeMoeda } from '../moedas.js';
-import { abrirModal, fmtPeso, getCapacidadeCarga, getPesoTotalInventario, mdParaHtml, semAcento, toast } from '../utils.js';
+import { abrirModal, escHtml, fmtPeso, getCapacidadeCarga, getPesoTotalInventario, mdParaHtml, semAcento, toast } from '../utils.js';
 import { ANTECEDENTES_ESCOLHAS, KITS_EXPANSAO } from './comum.js';
 import { containerRef, dadosCache, personagem } from './wizard.js';
 import { temProficienciaArma, temProficienciaArmadura } from '../regras-equipamento.js';
@@ -529,14 +529,14 @@ function renderItemInventario(item, idx) {
     <div class="inv-item ${item.equipado ? 'inv-item-equipado' : ''}" data-idx="${idx}" draggable="true">
       <div class="inv-drag-handle" title="Arrastar para reordenar">&#9776;</div>
       <div style="flex:1;cursor:pointer" data-info-inv="${idx}" title="Ver detalhes">
-        <div class="inv-item-nome">${item.nome} ${profBadge} ${tipoBadge}</div>
+        <div class="inv-item-nome">${escHtml(item.nome)} ${profBadge} ${tipoBadge}</div>
         <div class="inv-item-detalhe">
           ${item.tipo === 'arma' ? `${item.dados?.dano || ''} | ${item.dados?.propriedades || ''}` : ''}
           ${item.tipo === 'armadura' ? `CA: ${item.dados?.ca || ''} | ${item.dados?.categoria || ''}` : ''}
           ${item.tipo === 'escudo' ? `CA: ${item.dados?.ca || ''} | Escudo` : ''}
           ${item.tipo === 'equipamento' ? `${item.dados?.custo || ''} ${item.dados?.peso ? '| ' + item.dados.peso : ''}` : ''}
-          ${item.tipo === 'customizado' ? `${item.descricao || ''}` : ''}
-          ${item.tipo === 'generico' ? `${item.descricao || ''}` : ''}
+          ${item.tipo === 'customizado' ? escHtml(item.descricao || '') : ''}
+          ${item.tipo === 'generico' ? escHtml(item.descricao || '') : ''}
         </div>
         ${descPreview}
       </div>
@@ -563,7 +563,7 @@ function setupEventosInventario(containerEl) {
       const item = personagem.inventario[idx];
       if (!item) return;
       abrirModal('Remover Item', `
-        <p>Deseja realmente remover <strong>${item.nome}</strong>${item.quantidade > 1 ? ` (x${item.quantidade})` : ''} do inventário?</p>
+        <p>Deseja realmente remover <strong>${escHtml(item.nome)}</strong>${item.quantidade > 1 ? ` (x${item.quantidade})` : ''} do inventário?</p>
       `, `
         <button class="btn btn-danger" id="btn-confirmar-rem-inv">Remover</button>
         <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
@@ -807,4 +807,4 @@ function mostrarDetalheItem(item) {
   if (!corpo.trim()) corpo = '<div style="color:var(--text-muted)">Sem informações adicionais disponíveis.</div>';
 
   abrirModal(item.nome, corpo);
-}
+}

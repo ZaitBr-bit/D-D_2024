@@ -7,7 +7,7 @@
 import { CLASSES_INFO } from '../dados-classes.js';
 import { DENOMINACOES, ICONE_MOEDA, NOMES_MOEDA, adicionarMoeda, converterParaMaior, formatarCarteira, proximaDenominacaoMaior, removerQuantidadeMoeda, taxasSaoPadrao } from '../moedas.js';
 import { carregarComprarAtivoPadrao, resetarTaxasMoeda, salvarComprarAtivoPadrao, salvarTaxasMoeda } from '../store.js';
-import { abrirModal, bonusProficiencia, calcMod, fmtMod, fmtPeso, getCapacidadeCarga, getPesoTotalInventario, mdParaHtml, semAcento, toast } from '../utils.js';
+import { abrirModal, bonusProficiencia, calcMod, escHtml, fmtMod, fmtPeso, getCapacidadeCarga, getPesoTotalInventario, mdParaHtml, semAcento, toast } from '../utils.js';
 import { abrirSeletorItens, carregarDadosEquipSheet } from '../itens-seletor.js';
 import { getEstadoFuria } from './classes/barbaro.js';
 import { getEstadoRecursosGuardiao } from './classes/guardiao.js';
@@ -276,7 +276,7 @@ function renderSheetInvItem(item, idx) {
       <div class="inv-drag-handle no-print" title="Arrastar para reordenar">&#9776;</div>
       <div style="flex:1;min-width:0;cursor:pointer" data-info-inv-sheet="${idx}" title="Ver detalhes">
         <div class="inv-item-nome">
-          ${item.nome} ${profBadge}
+          ${escHtml(item.nome)} ${profBadge}
         </div>
         ${(ataqueInfo || danoAutoInfo || vantagemInfo || estiloLutaInfo || maestriaBadge || tipoBadge || customBadges)
           ? `<div class="inv-item-badges" style="display:flex;flex-wrap:wrap;gap:3px;margin-top:2px">${ataqueInfo}${danoAutoInfo}${vantagemInfo}${estiloLutaInfo}${maestriaBadge}${tipoBadge}${customBadges}</div>`
@@ -287,8 +287,8 @@ function renderSheetInvItem(item, idx) {
           ${item.tipo === 'armadura' ? `CA: ${item.dados?.ca || ''} | ${item.dados?.categoria || ''}` : ''}
           ${item.tipo === 'escudo' ? `CA: ${item.dados?.ca || ''} | Escudo` : ''}
           ${item.tipo === 'equipamento' ? `${item.dados?.custo || ''} ${item.dados?.peso ? '| ' + item.dados.peso : ''}` : ''}
-          ${item.tipo === 'customizado' ? `${item.descricao ? (item.descricao.length > 60 ? item.descricao.substring(0, 60) + '...' : item.descricao) : ''}` : ''}
-          ${item.tipo === 'generico' ? `${item.descricao || ''}` : ''}
+          ${item.tipo === 'customizado' ? escHtml(item.descricao ? (item.descricao.length > 60 ? item.descricao.substring(0, 60) + '...' : item.descricao) : '') : ''}
+          ${item.tipo === 'generico' ? escHtml(item.descricao || '') : ''}
         </div>
         ${descPreview}
       </div>
@@ -364,7 +364,7 @@ export function setupEventosInventarioSheet() {
       const item = char.inventario[idx];
       if (!item) return;
       abrirModal('Remover Item', `
-        <p>Deseja realmente remover <strong>${item.nome}</strong>${item.quantidade > 1 ? ` (x${item.quantidade})` : ''} do inventário?</p>
+        <p>Deseja realmente remover <strong>${escHtml(item.nome)}</strong>${item.quantidade > 1 ? ` (x${item.quantidade})` : ''} do inventário?</p>
       `, `
         <button class="btn btn-danger" id="btn-confirmar-rem-inv-sheet">Remover</button>
         <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
@@ -678,7 +678,7 @@ function abrirModalEditarItemCustomizado(item, idx) {
   const d = item.dados || {};
   abrirModal('Editar Item Customizado', `
     <div class="form-group"><label class="form-label" for="ic-nome">Nome</label><input type="text" class="form-input" id="ic-nome" value="${(item.nome || '').replace(/"/g, '&quot;')}"></div>
-    <div class="form-group"><label class="form-label" for="ic-desc">Descricao</label><textarea class="form-textarea" id="ic-desc" rows="2">${item.descricao || ''}</textarea></div>
+    <div class="form-group"><label class="form-label" for="ic-desc">Descricao</label><textarea class="form-textarea" id="ic-desc" rows="2">${escHtml(item.descricao || '')}</textarea></div>
     <div class="row gap-1">
       <div class="col">
         <label class="form-label" for="ic-ca">Bonus CA</label>

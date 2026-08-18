@@ -398,7 +398,7 @@ export async function gerarHtmlImpressao() {
       const qtd = (item.quantidade ?? 1) > 1 ? ` x${item.quantidade}` : '';
       pag1 += `
         <div class="print-equip-item">
-          <span class="print-equip-name">${item.nome}${qtd}</span>
+          <span class="print-equip-name">${escHtml(item.nome)}${qtd}</span>
           <span class="print-equip-detail">${detalhe}</span>
         </div>`;
     });
@@ -728,7 +728,7 @@ export async function gerarHtmlImpressao() {
       const qtd = (item.quantidade ?? 1) > 1 ? ` (x${item.quantidade})` : '';
       pagFinal += `
         <div class="print-inv-item">
-          <span class="print-inv-name">${item.nome}${qtd}</span>
+          <span class="print-inv-name">${escHtml(item.nome)}${qtd}</span>
           <span class="print-inv-detail">${detalhe}</span>
         </div>`;
     });
@@ -752,7 +752,7 @@ export async function gerarHtmlImpressao() {
       pagFinal += `
         <div class="print-detail-field">
           <div class="print-detail-label">${c.label}</div>
-          <div class="print-detail-value">${char[c.key]}</div>
+          <div class="print-detail-value">${escHtml(char[c.key])}</div>
         </div>`;
     });
     pagFinal += `</div>`;
@@ -844,4 +844,4 @@ async function imprimirFicha() {
  */
 function isStandaloneApp() {
   return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-}
+}

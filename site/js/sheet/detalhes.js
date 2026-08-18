@@ -4,6 +4,7 @@
 // ============================================================
 import { _detalhesColapsada } from './colapso.js';
 import { char, seloEdicao } from './estado.js';
+import { escHtml } from '../utils.js';
 
 // --- Detalhes pessoais ---
 export function renderSecaoDetalhes() {
@@ -42,10 +43,10 @@ export function renderSecaoDetalhes() {
         ${campos.filter(c => char[c.key]).map(c => `
           <div style="margin-bottom:8px">
             <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;color:var(--text-muted)">${c.label}${seloEdicao(c.key)}</div>
-            <div style="font-size:0.85rem">${char[c.key]}</div>
+            <div style="font-size:0.85rem">${escHtml(char[c.key])}</div>
           </div>
         `).join('')}
       </div>
     </div>
   `;
-}
+}

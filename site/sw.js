@@ -121,6 +121,21 @@ self.addEventListener('message', (event) => {
   }
 });
 
+// Dominios que nunca entram no cache: Firebase e APIs do Google.
+const HOSTS_SEMPRE_REDE = ['googleapis.com', 'gstatic.com', 'firebaseapp.com', 'firebaseio.com'];
+
+/**
+ * Confere se o host pertence a um dos dominios acima.
+ *
+ * Casa o dominio exato ou um subdominio dele -- e NAO por substring, que
+ * era como estava antes: `hostname.includes('googleapis.com')` casa
+ * tambem `googleapis.com.exemplo.net`, um dominio de terceiro que so
+ * precisa conter o texto no meio do nome.
+ */
+function ehHostDeRede(hostname) {
+  return HOSTS_SEMPRE_REDE.some((dominio) => hostname === dominio || hostname.endsWith('.' + dominio));
+}
+
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   const url = new URL(request.url);
@@ -129,7 +144,7 @@ self.addEventListener('fetch', (event) => {
   if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
 
   // Firebase e APIs Google: sempre rede, nunca cachear
-  if (url.hostname.includes('googleapis.com') || url.hostname.includes('gstatic.com') || url.hostname.includes('firebaseapp.com') || url.hostname.includes('firebaseio.com')) {
+  if (ehHostDeRede(url.hostname)) {
     return;
   }
 

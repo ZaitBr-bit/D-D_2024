@@ -610,7 +610,7 @@ export function abrirModal(titulo, corpoHtml, acoesHtml = '', onClose = null) {
     sub.innerHTML = `
       <div class="modal-container" style="animation:slideUp 0.2s">
         <div class="modal-header" style="position:sticky;top:0;background:var(--bg-card);z-index:1">
-          <h2 style="font-size:1rem;font-weight:700">${titulo}</h2>
+          <h2 style="font-size:1rem;font-weight:700">${escHtml(titulo)}</h2>
           <button class="modal-fechar" data-fechar-sub="true">&times;</button>
         </div>
         <div class="modal-corpo" style="padding:16px">${corpoHtml}</div>
