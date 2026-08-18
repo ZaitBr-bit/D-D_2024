@@ -100,3 +100,27 @@ Informacoes Separadas/
 # Anotacoes de trabalho e configuracao local de ferramentas.
 situação.txt
 .mcp.json
+
+# ------------------------------------------------------------------
+# Material pesado ou de terceiro que nao pertence ao repositorio.
+# ------------------------------------------------------------------
+
+# Dumps de raspagem (4,9 MB). Sao dotfiles, mas `git add .` os pega.
+scripts/itens-magicos/
+
+# Arte-fonte por classe: 24 MB, e o site NAO referencia esta pasta --
+# os icones que o app usa vivem em site/img/ e somam 12 KB. Versionar
+# aqui triplicaria o repositorio por arquivos que ninguem baixa. Se um
+# dia entrarem na interface, o caminho e otimizar e por em site/img/.
+Icones-classes/
+
+# Configuracao local do assistente. Hoje so nao entra porque o ignore
+# GLOBAL desta maquina cobre um arquivo especifico -- a regra tem de
+# viver no repositorio, nao na maquina.
+.claude/
+
+# Preventivos
+*.bak
+~$*
+.venv/
+*.zip
