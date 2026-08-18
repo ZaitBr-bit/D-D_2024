@@ -231,6 +231,40 @@ function abrirNotasVersaoSeAtualizou() {
   localStorage.setItem(VERSAO_VISTA_KEY, VERSAO_ATUAL);
 }
 
+// --- Reportar problema ---
+
+/** Repositório público do projeto, onde ficam as issues. */
+const REPO_URL = 'https://github.com/ZaitBr-bit/D-D_2024';
+
+/**
+ * Monta o corpo do modal de "Reportar Problema".
+ *
+ * O canal principal é a aba de issues do GitHub: lá o relato fica público,
+ * numerado e pesquisável, e o formulário já pede o que costuma faltar
+ * (versão, aparelho, o que era esperado). O link vai com a versão atual
+ * pré-preenchida -- o campo `versao` do formulário
+ * (`.github/ISSUE_TEMPLATE/bug.yml`) casa com o parâmetro de mesmo nome,
+ * então quem clica daqui não precisa procurar o número no header.
+ *
+ * O Reddit continua como alternativa para quem não tem conta no GitHub.
+ */
+function corpoReportarProblema() {
+  const versao = encodeURIComponent(VERSAO_ATUAL || '');
+  return `
+    <p style="margin-bottom:12px">Encontrou um erro ou tem uma ideia? O melhor lugar é a página do projeto no GitHub:</p>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <a class="btn btn-accent" id="link-issue-bug" href="${REPO_URL}/issues/new?template=bug.yml&amp;versao=${versao}" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none">🐛 Relatar um problema</a>
+      <a class="btn btn-secondary" id="link-issue-sugestao" href="${REPO_URL}/issues/new?template=sugestao.yml" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none">💡 Sugerir uma melhoria</a>
+      <a class="btn btn-secondary" id="link-issues-lista" href="${REPO_URL}/issues" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none">📋 Ver o que já foi relatado</a>
+    </div>
+    <p style="margin:16px 0 8px;font-size:0.85rem;color:var(--text-muted)">Precisa de uma conta no GitHub (gratuita). Sem conta, dá para falar pelo Reddit:</p>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <a class="btn btn-secondary" href="https://www.reddit.com/r/rpgbrasil/comments/1sgrj1j/criador_de_ficha_dd_55_2024_web_e_mobile_gratuito/" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none">💬 Comentário no post</a>
+      <a class="btn btn-secondary" href="https://www.reddit.com/user/ZaitBrz/" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none">✉ Mensagem direta</a>
+    </div>
+  `;
+}
+
 // --- Inicialização ---
 function init() {
   // Carregar taxas de conversao de moeda customizadas (se houver), antes de qualquer ficha renderizar
@@ -279,17 +313,7 @@ function init() {
 
   // FAB Reportar Bug (global, disponível em todas as telas)
   document.getElementById('btn-reportar-bug')?.addEventListener('click', () => {
-    abrirModal(
-      'Reportar Problema',
-      `
-        <p style="margin-bottom:12px">Para reportar problemas ou solicitar melhorias entre em contato via Reddit:</p>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <a class="btn btn-accent" href="https://www.reddit.com/r/rpgbrasil/comments/1sgrj1j/criador_de_ficha_dd_55_2024_web_e_mobile_gratuito/" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none">💬 Comentário no post</a>
-          <a class="btn btn-secondary" href="https://www.reddit.com/user/ZaitBrz/" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none">✉ Mensagem direta</a>
-        </div>
-      `,
-      '<button class="btn btn-secondary" onclick="fecharModal()">Fechar</button>'
-    );
+    abrirModal('Reportar Problema', corpoReportarProblema(), '<button class="btn btn-secondary" onclick="fecharModal()">Fechar</button>');
   });
 
   // Selo de versão clicável (delegação): o span `.header-versao` é

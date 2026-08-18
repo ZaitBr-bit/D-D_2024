@@ -13,13 +13,60 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.3';
+export const VERSAO_ATUAL = '2.2.4';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.4',
+    data: '2026-08-18',
+    resumo: 'Relato de problemas agora pelo GitHub, e fichas recebidas de '
+      + 'outras pessoas passaram a ser tratadas com segurança.',
+    melhorias: [
+      {
+        grupo: '🐛 Relatar problema pelo GitHub',
+        itens: [
+          'O botão 🐛 do topo agora abre os formulários do projeto no '
+            + 'GitHub: um para relatar problema e outro para sugerir '
+            + 'melhoria. O formulário já pergunta o que costuma faltar '
+            + '(o que você fez, o que esperava, qual aparelho).',
+          'O link já vai com a sua versão preenchida — você não precisa '
+            + 'procurar o número no topo da tela.',
+          'Dá para ver o que já foi relatado antes de abrir um relato novo, '
+            + 'e comentar no de alguém em vez de repetir.',
+          'Quem não tem conta no GitHub continua com os contatos pelo '
+            + 'Reddit, no mesmo lugar.',
+        ],
+      },
+    ],
+    correcoes: [
+      {
+        grupo: '🔒 Fichas recebidas de outras pessoas',
+        itens: [
+          'Um personagem importado podia trazer, escondido nos campos de '
+            + 'texto — nome, aparência, notas, descrição de item, foto —, '
+            + 'conteúdo que o app interpretava como parte da própria '
+            + 'página em vez de como texto.',
+          'Agora todo campo preenchido por você (ou por quem te mandou a '
+            + 'ficha) aparece como texto, e só. Nada muda no que você vê: '
+            + 'os textos continuam iguais.',
+          'Isso vale na tela inicial, na ficha, na edição, na criação de '
+            + 'personagem e no inventário.',
+        ],
+      },
+      {
+        grupo: '🧭 Endereços inválidos',
+        itens: [
+          'Alguns endereços digitados à mão deixavam a tela em branco em '
+            + 'vez de mostrar "Página não encontrada". Agora caem na tela '
+            + 'de erro, como deveriam.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.3',
     data: '2026-08-17',

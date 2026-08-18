@@ -3,7 +3,7 @@
 **[▶ Abrir o app](https://zaitbr-bit.github.io/D-D_2024/)** &nbsp;·&nbsp;
 **[🐛 Relatar um problema](https://github.com/ZaitBr-bit/D-D_2024/issues/new?template=bug.yml)** &nbsp;·&nbsp;
 **[💡 Sugerir uma melhoria](https://github.com/ZaitBr-bit/D-D_2024/issues/new?template=sugestao.yml)** &nbsp;·&nbsp;
-versão atual **2.2.3**
+versão atual **2.2.4**
 
 Aplicativo web **gratuito e em português** para criar e usar fichas de personagem
 de **D&D 5.5 (edição de 2024)**. Roda no navegador do celular e do computador,
@@ -117,11 +117,12 @@ repositório — é preciso ter uma conta no GitHub (gratuita).
   alguém já relatou o mesmo, comentar lá ajuda mais do que abrir outra.
 
 Os dois links abrem um formulário que já pergunta o essencial — é só preencher.
-Quanto mais específico o relato, mais rápido o conserto:
+Dentro do app, o botão **🐛** leva aos mesmos formulários, já com a sua versão
+preenchida. Quanto mais específico o relato, mais rápido o conserto:
 
 | O quê | Exemplo |
 |---|---|
-| **Versão** | o número ao lado do título, no alto da tela (ex.: `2.2.3`) |
+| **Versão** | o número ao lado do título, no alto da tela (ex.: `2.2.4`) |
 | **Onde aconteceu** | criação de personagem, ficha, subida de nível, PDF… |
 | **O que você fez** | "criei um Bárbaro nível 5 e cliquei em Descanso Longo" |
 | **O que esperava** | "a fúria deveria voltar para 3 usos" |
