@@ -173,7 +173,7 @@ export function renderStepDetalhes(el) {
         </div>
         <div class="col" style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
           <div class="char-avatar" id="det-imagem-preview" style="width:56px;height:56px;font-size:1.4rem">
-            ${personagem.imagem ? `<img src="${personagem.imagem}" alt="">` : escHtml((personagem.nome || personagem.classe || '?').charAt(0).toUpperCase() || '?')}
+            ${personagem.imagem ? `<img src="${escHtml(personagem.imagem)}" alt="">` : escHtml((personagem.nome || personagem.classe || '?').charAt(0).toUpperCase() || '?')}
           </div>
           <div style="display:flex;gap:4px">
             <button type="button" class="btn btn-sm btn-secondary" id="det-imagem-btn">Foto</button>
@@ -185,11 +185,11 @@ export function renderStepDetalhes(el) {
 
       <div class="info-box success">
         <strong>Resumo:</strong>
-        ${personagem.especie} ${personagem.classe} ${personagem.subclasse ? `(${personagem.subclasse})` : ''} |
-        Antecedente: ${personagem.antecedente} |
+        ${escHtml(personagem.especie)} ${escHtml(personagem.classe)} ${personagem.subclasse ? `(${escHtml(personagem.subclasse)})` : ''} |
+        Antecedente: ${escHtml(personagem.antecedente)} |
         PV: ${pvCalc} |
-        Talento: ${personagem.talentos.join(', ') || 'Nenhum'}
-        ${(personagem.iniciado_em_magia_instancias || []).filter(im => im.lista).map(im => `<br>Iniciado em Magia (${im.lista}): Atributo ${ATRIBUTOS_NOMES[im.atributo] || im.atributo} | Truques: ${(im.truques||[]).join(', ')} | Magia: ${im.magia}`).join('')}
+        Talento: ${escHtml(personagem.talentos.join(', ')) || 'Nenhum'}
+        ${(personagem.iniciado_em_magia_instancias || []).filter(im => im.lista).map(im => `<br>Iniciado em Magia (${escHtml(im.lista)}): Atributo ${escHtml(ATRIBUTOS_NOMES[im.atributo] || im.atributo)} | Truques: ${escHtml((im.truques||[]).join(', '))} | Magia: ${escHtml(im.magia)}`).join('')}
       </div>
     </div>
 

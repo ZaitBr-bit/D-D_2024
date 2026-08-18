@@ -27,7 +27,8 @@
 // usuario" nao e correcao.
 // ============================================================
 import { test, expect } from '@playwright/test';
-import { abrirFicha, ATRIBUTOS_REGRAS } from './helpers-regras.mjs';
+import { abrirFicha, abrirSite, ATRIBUTOS_REGRAS } from './helpers-regras.mjs';
+import { semearPersonagem, assentar } from '../helpers.mjs';
 
 // `src=x` falha a carregar em qualquer navegador, entao `onerror` dispara
 // imediatamente. O texto visivel (XSS-MARCA) serve para a asserçao
@@ -115,4 +116,42 @@ test('ficha: carga que quebra atributo nao escapa do value', async ({ context })
   // Nenhum elemento pode ter ganhado o handler injetado.
   const comHandler = await page.locator('[onfocus]').count();
   expect(comHandler, 'a injecao criou um atributo onfocus no DOM').toBe(0);
+});
+
+// A FOTO tambem e campo livre. `char.imagem` guarda um data URL, mas nada
+// impede que uma ficha importada traga texto arbitrario ali -- e ele cai
+// dentro de `src="..."`, que quebra com uma aspa. Este vetor NAO estava
+// nos alertas do CodeQL nem na primeira rodada de correcoes: apareceu ao
+// procurar o que o proprio alerta #7 ainda enxergava.
+//
+// O pior dos quatro lugares e a TELA INICIAL: a lista de personagens
+// desenha o avatar de cada um. Nao e preciso nem abrir a ficha -- basta
+// importar e voltar para a home.
+const CARGA_SRC = 'x" onerror="window.__xss=(window.__xss||0)+1" data-x="';
+
+const SEMENTE_FOTO = {
+  nome: 'Retratado',
+  classe: 'Guerreiro',
+  nivel: 3,
+  atributos: ATRIBUTOS_REGRAS,
+  imagem: CARGA_SRC,
+};
+
+test('home: foto de personagem importado nao escapa do atributo src', async ({ context }) => {
+  const { page } = await abrirSite(context);
+  await semearPersonagem(page, SEMENTE_FOTO, 'regras-xss-foto');
+  await page.goto(page.url().split('#')[0] + '#home', { waitUntil: 'domcontentloaded' });
+  await assentar(page);
+
+  const { scriptRodou } = await medirInjecao(page);
+  expect(scriptRodou, 'a foto executou script na lista da tela inicial').toBeNull();
+  expect(await page.locator('[onerror]').count(), 'a injecao criou um onerror no DOM').toBe(0);
+});
+
+test('ficha: foto de personagem importado nao escapa do atributo src', async ({ context }) => {
+  const { page } = await abrirFicha(context, SEMENTE_FOTO, 'regras-xss-foto-ficha');
+
+  const { scriptRodou } = await medirInjecao(page);
+  expect(scriptRodou, 'a foto executou script ao abrir a ficha').toBeNull();
+  expect(await page.locator('[onerror]').count(), 'a injecao criou um onerror no DOM').toBe(0);
 });

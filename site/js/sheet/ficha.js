@@ -210,7 +210,7 @@ export function renderFichaCompleta() {
               ${char.nivel < 20 ? ` / ${XP_POR_NIVEL[char.nivel + 1]}` : ' (Nível Máximo)'}
             </div>
           </div>
-          ${char.imagem ? `<div class="char-avatar" style="width:64px;height:64px;font-size:1.6rem;flex-shrink:0"><img src="${char.imagem}" alt=""></div>` : ''}
+          ${char.imagem ? `<div class="char-avatar" style="width:64px;height:64px;font-size:1.6rem;flex-shrink:0"><img src="${escHtml(char.imagem)}" alt=""></div>` : ''}
         </div>
         <div class="no-print" style="display:flex;gap:4px;flex-direction:column">
           <div style="display:flex;gap:4px">

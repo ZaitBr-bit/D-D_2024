@@ -311,7 +311,7 @@ export function setupEventosEdicao() {
         <label class="form-label">Imagem</label>
         <div style="display:flex;align-items:center;gap:10px">
           <div class="char-avatar" id="edit-imagem-preview" style="width:56px;height:56px;font-size:1.4rem">
-            ${char.imagem ? `<img src="${char.imagem}" alt="">` : escHtml((char.nome || char.classe || '?').charAt(0).toUpperCase() || '?')}
+            ${char.imagem ? `<img src="${escHtml(char.imagem)}" alt="">` : escHtml((char.nome || char.classe || '?').charAt(0).toUpperCase() || '?')}
           </div>
           <button type="button" class="btn btn-sm btn-secondary" id="edit-imagem-btn">Trocar Foto</button>
           <button type="button" class="btn btn-sm btn-danger" id="edit-imagem-remover" title="Remover imagem" style="${char.imagem ? '' : 'display:none'}">&times;</button>
