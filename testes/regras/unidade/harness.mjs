@@ -498,11 +498,15 @@ async function resolverPendencia(tipo, opcoes, p, classeData, ATRIBUTOS,
 // escada usa a primeira de dados/classes/, o que deixa duas pendências
 // fora do caminho (ver Step 6 desta tarefa, no relatório).
 //
-// Falha ALTO E CLARO em quatro situações, todas as que fariam um teste
+// Falha ALTO E CLARO em cinco situações, todas as que fariam um teste
 // passar sem afirmar nada: pendência de tipo desconhecido, pendência que
 // se repete depois de resolvida (a escolha canônica não serviu), nível
-// que não sobe depois do limite de tentativas, e nível do personagem
-// diferente do esperado apesar de `sucesso: true`.
+// que não sobe depois do limite de tentativas, nível do personagem
+// diferente do esperado apesar de `sucesso: true`, e `ateNivel` fora de
+// 2..20 (MENOR 6 da revisão de 2026-08-17: sem esta checagem, `<= 1`
+// pulava o laço em silêncio e devolvia um personagem de nível 1 sem
+// avisar, e `> 20` morria bem mais abaixo com `XP_POR_NIVEL[21]`
+// `undefined`, uma mensagem que não aponta para a causa real).
 export async function escadaDeNivel(classe, aoSubir, opcoesEscada = {}) {
   const { levelup, db } = await modulosApp();
   const classeData = await db.getClasse(classe);
@@ -527,7 +531,24 @@ export async function escadaDeNivel(classe, aoSubir, opcoesEscada = {}) {
   const ATRIBUTOS = ['forca', 'destreza', 'constituicao',
                      'inteligencia', 'sabedoria', 'carisma'];
 
-  for (let nivel = 2; nivel <= 20; nivel++) {
+  // `opcoesEscada.ateNivel` para quem precisa do personagem parado num
+  // nível intermediário -- o teste converso do domínio Subclasses sobe
+  // duas escadas (uma até `e.nivel - 1`, outra até `e.nivel`) para
+  // comparar o personagem imediatamente antes e depois de UMA
+  // característica. Padrão 20 preserva o comportamento de TODOS os
+  // chamadores existentes (nenhum passa `ateNivel` hoje).
+  const ateNivel = opcoesEscada.ateNivel ?? 20;
+  // MENOR 6 (revisão de 2026-08-17): valida ANTES do laço -- um `ateNivel`
+  // fora de 2..20 é erro de quem chama, e o harness precisa recusar alto e
+  // claro, no espírito das outras quatro validações desta função (ver
+  // comentário do docblock acima).
+  if (!Number.isInteger(ateNivel) || ateNivel < 2 || ateNivel > 20) {
+    throw new Error(`escadaDeNivel: opcoesEscada.ateNivel precisa ser um ` +
+      `inteiro entre 2 e 20 (recebido ${JSON.stringify(ateNivel)}) -- <= 1 ` +
+      `pularia o laço em silêncio, > 20 morreria em XP_POR_NIVEL[${ateNivel}] ` +
+      `indefinido`);
+  }
+  for (let nivel = 2; nivel <= ateNivel; nivel++) {
     personagem.xp = levelup.XP_POR_NIVEL[nivel];
     const opcoes = {};
     const vistas = new Set();

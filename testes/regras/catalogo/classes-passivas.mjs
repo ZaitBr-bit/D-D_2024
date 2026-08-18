@@ -51,6 +51,25 @@
 // limite declarado (duas leituras razoáveis do mesmo texto ambíguo), e
 // a Task 4 não deve reportar como "app diverge do livro" sem qualificar.
 //
+// NOTA CRUZADA (achado da revisão independente de 2026-08-17): o catálogo
+// irmão `subclasses.mjs` (Plano 4, RECURSOS_SUBCLASSE) lê a MESMA frase
+// "uma vez em cada um dos seus turnos, você pode..." -- a que classifica
+// Ataque Furtivo e Golpes Abençoados/Golpe Divino como 'julgamento' aqui
+// embaixo -- como `custo-declarado` lá. Não é incoerência entre os dois
+// catálogos: cada um responde a uma pergunta diferente sobre a MESMA
+// frase. Este arquivo pergunta "há uma frase de CUSTO DE ATIVAÇÃO, para
+// decidir ativa/passiva?" -- e "uma vez por turno" sozinho não declara
+// nenhum custo de ativar, só um limite de frequência, por isso vira
+// 'julgamento' aqui. `subclasses.mjs` pergunta "o livro nomeia um LIMITE
+// (não necessariamente um CUSTO)?" -- e sua própria definição de
+// `base: 'custo-declarado'` inclui explicitamente essa terceira forma
+// ("uma Ação, um recurso nomeado, OU UM LIMITE"), então a mesma frase
+// sustenta `custo-declarado` lá. Quem ler os dois catálogos lado a lado e
+// estranhar a mesma frase virando 'julgamento' aqui e 'custo-declarado'
+// (com `recarga: 'outro'`) lá deve ler esta nota antes de reportar
+// contradição -- é leitura diferente por pergunta diferente, não erro de
+// cópia em nenhum dos dois lados.
+//
 // ------------------------------------------------------------
 // O campo `composta` -- a segunda forma de "não é uma alegação simples"
 // ------------------------------------------------------------

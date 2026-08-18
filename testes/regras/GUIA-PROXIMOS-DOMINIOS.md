@@ -865,6 +865,123 @@ número que sobra (ou que falta) é o sinal de uma das duas formas acima.
 
 ---
 
+## A lição do domínio Subclasses / Magias: a asserção certa é sobre a UNIÃO dos mecanismos -- e isso não te dá de graça saber qual deles respondeu (2026-08-17)
+
+**O que aconteceu.** O app concede magia de subclasse por dois acessores
+(`obterMagiasDominioNivel` e `obterMagiasSemprePreparadasNivel`), sustentados
+por três extratores internos que fazem o parsing de verdade -- dois
+acessores, três extratores, mesma contagem do cabeçalho de
+`subclasses-magias.test.mjs`. A ficha salva lê os dois acessores
+(`site/js/pages/sheet.js:48-49`), e o motor deste plano assere sempre sobre a
+UNIÃO dos dois, nunca sobre qual entregou, confirmado pela Task 5 (nenhuma
+das 48 subclasses divergiu ENTRE rotas). A revisão da Task 6 achou o preço
+escondido dessa escolha de desenho: **o teste, por construção, não registra
+qual dos dois mecanismos produziu (ou deixou de produzir) o resultado** -- e
+um relator que tenta reconstruir isso por LEITURA de código, sem rodar nada,
+tem uma moeda de 50% de citar o mecanismo errado. Foi o que aconteceu: o
+primeiro rascunho do `motivo` de Círculo da Terra dizia que
+`obterMagiasDominioNivel` somava as quatro tabelas de terreno -- uma leitura
+plausível (é a função com "Domínio" no nome, e a subclasse concede uma
+tabela "Magias do Domínio"), e **falsa**: essa função está MORTA para essa
+subclasse (mesmo bug de nome "do"/"de" de outra causa), e as 12/4/4/4 magias
+medidas saem inteiras da rota "sempre preparada"
+(`extrairMagiasSemprePreparadasTabela`), confirmado só depois de RODAR um
+script que imprimiu `obterMagiasDominioNivel(...) = []` e
+`obterMagiasSemprePreparadasNivel(...).length = 12` lado a lado.
+
+**Por que é útil saber -- a alegação nova, não repetida em outra lição.** O
+corolário óbvio de "a asserção é sobre a união" -- "o `motivo` tem que citar
+os dois mecanismos" -- é necessário, mas **não suficiente**: garante que o
+LEITOR saiba que há dois candidatos, não que o AUTOR tenha identificado o
+certo. A armadilha é que, quando o mecanismo errado parece mais plausível de
+memória (aqui, "Domínio" combinando com a palavra do livro), a leitura de
+código sozinha não desmente a hipótese -- as DUAS funções existem e
+PARECERIAM processar essa subclasse se você só seguir os nomes. Isto é
+diferente de "rastrear a consequência no código antes de registrar" (lição
+de Classes/Níveis, 2026-08-07, acima) e de "motivo com arquivo e linha dos
+dois lados" ("Dois vícios de relatório", acima): as duas já mandavam
+verificar antes de concluir, mas nenhuma cobre o caso em que a PRÓPRIA FORMA
+da asserção (união, por desenho) apaga o sinal de qual mecanismo agiu -- um
+`motivo` que aponta para a função errada não é só impreciso, manda quem for
+corrigir abrir o arquivo errado, mexer em código morto, e concluir "já está
+certo" sem nunca alcançar a rota que de fato entrega a magia.
+
+**Como aplicar.** Ao confrontar uma UNIÃO de mecanismos: (1) escreva o
+`motivo` citando os dois candidatos (corolário já conhecido); (2) antes de
+aceitar qual respondeu, RODE os dois contra os mesmos argumentos (script ad
+hoc basta) e cole a saída literal -- não infira pelo nome da função. As duas
+lições citadas acima já mandavam rodar antes de concluir; esta é o caso em
+que isso importa mais, porque nada no teste avisa se você citou o mecanismo
+errado -- ele passa igual, já que confere o resultado agregado, não a
+origem.
+
+---
+
+## A lição do domínio Subclasses / Escolhas: o mesmo marcador textual do livro cobre mecânicas diferentes -- classifique pelo EFEITO, não pela palavra (2026-08-17/18)
+
+**O que aconteceu.** Das 78 características DISTINTAS de subclasse que
+mencionam escolha ou proficiência, 73 usam uma frase parecida com "à sua
+escolha" -- mas só 20 (23 entradas do catálogo, porque três embutem duas
+escolhas) são escolha de CONSTRUÇÃO, que o app precisa perguntar e
+persistir. Dessas 20, 18 precisam ser exigidas NO NÍVEL de aquisição, com a
+subida de nível recusando concluir sem elas; as outras 2 (Resistência
+Ínfera, O Terceiro Olho) o próprio livro nasce a escolha só no primeiro
+Descanso/uso depois da aquisição, não no nível -- então "persistir" vale
+para as 20, mas "recusar concluir a subida sem a escolha" só é uma regra do
+livro para 18 delas (ressalva registrada em `lacunas-conhecidas.mjs`, Causa
+2 do domínio). As outras 53 são decididas na hora do uso (alvo,
+direção, tipo de dano -- 50 casos, `ESCOLHAS_EM_JOGO`) ou são puramente
+cosméticas (sabor sem efeito mecânico -- 3 casos, `ESCOLHAS_COSMETICAS`).
+Tratar as 73 como um bloco só, medindo "o app pergunta isto?" contra todas,
+teria produzido até 53 lacunas falsas -- mais que o dobro das 31 da rodada
+de Talentos -- porque a maioria da frase "à sua escolha" no livro não
+descreve uma decisão que precisa virar campo de personagem. A distinção que
+separou os dois grupos não foi sintática (achar a palavra "escolha"): foi
+perguntar se o EFEITO da escolha sobrevive além do próprio uso -- até o
+próximo Descanso é construção (Resistência Ínfera, refeita a cada Descanso
+mas persistida até o próximo); só até o fim do turno, da Fúria ou da forma
+ativa é em jogo (Baluarte de Energia, que também gasta um uso por Descanso e
+ainda assim não persiste nada). Essa pergunta exigiu ler a frase inteira de
+cada característica, não só localizar "escolha" nela -- ver catálogo,
+`catalogo/subclasses.mjs`.
+
+**Por que é útil saber.** É uma variação do erro nº 1 deste guia ("medir
+arquitetura em vez de comportamento") e da lição (b) de Classes/Trocas e
+Classes/Passivas ("quando o app inventa uma taxonomia que o livro não tem,
+separe o citável do julgamento") -- mas ao contrário das duas, aqui o
+PRÓPRIO LIVRO usa uma frase textualmente idêntica para três mecânicas
+diferentes, e é o CATÁLOGO -- não o app -- que precisa fazer a distinção
+antes de qualquer asserção existir. Nenhum teste pega essa armadilha depois
+de escrita: um catálogo que confundisse as três produziria lacunas
+plausíveis, citáveis, com `Classes.md:<linha>` real -- e ainda assim falsas,
+porque a citação prova que o livro usa a palavra "escolha", não que o app
+deva persistir aquela escolha específica.
+
+**Como aplicar.** Ao ler uma característica cujo texto contém "escolha" (ou
+equivalente) no livro, não assuma construção por padrão. Pergunte: o efeito
+da escolha sobrevive além do próprio uso, até um marco durável (Descanso,
+nível seguinte)? Só então é escolha de construção, que sustenta uma
+alegação de pendência ausente. Se o efeito se esgota no turno/na ativação em
+si, é escolha em jogo -- fora do alcance de qualquer motor que testa
+`subirDeNivel`/personagem persistido. Se a escolha não muda número nem opção
+disponível ao jogador, é cosmética -- nenhuma das duas sustenta lacuna
+nenhuma, a favor ou contra o app.
+
+(Um segundo candidato a lição foi cogitado e descartado nesta rodada: "um
+`campoEsperado` inventado transforma o motor em medidor de arquitetura" --
+sete das nove sub-chaves de `campoEsperado` foram escritas com nomes
+snake_case inventados antes de existirem no app, e seis vermelhos chegaram a
+alegar "nenhum mecanismo existe" quando o app persistia a escolha sob outro
+caminho (`char.recursos.*`). Não virou lição própria porque é o mesmo erro
+nº 1 deste guia -- "enumere todos os mecanismos, não presuma um só" -- só
+que aplicado à curadoria do catálogo em vez de ao desenho do teste; o
+antídoto usado (`campoEsperado` como dica confirmada por grep, comparação
+integral quando é `null`) já está documentado no README, seção "Achados do
+domínio Subclasses / Escolhas". Registrar as duas como lições separadas
+inflaria o guia sem ensinar nada que o erro nº 1 já não ensine.)
+
+---
+
 ## O que fazer quando o app e o livro discordam
 
 Nem toda divergência é bug do app, e a distinção muda o que se escreve:
