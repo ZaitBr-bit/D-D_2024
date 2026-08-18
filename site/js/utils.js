@@ -762,7 +762,27 @@ export function descreverCapacidadeCarga(forca, tamanho) {
   const f = parseInt(forca) || 0;
   const mult = getMultiplicadorCarga(tamanho);
   const total = f * mult;
-  return `Força ${f} × ${fmtPeso(mult)} (${tamanho || 'Médio'}) = ${fmtPeso(total)} kg`;
+  // O retorno SEMPRE vai para innerHTML (os tres chamadores, no passo de
+  // detalhes do criador). A forca ja sai saneada por parseInt, mas o
+  // tamanho vinha do valor de um <select> -- texto do DOM -- e entrava
+  // cru. Trocado por um rotulo tirado desta lista fechada: o que sai daqui
+  // e sempre uma das seis strings escritas neste arquivo, nunca o que
+  // chegou. Alerta #7 do CodeQL (js/xss-through-dom), cujo caminho
+  // terminava exatamente nesta interpolacao.
+  return `Força ${f} × ${fmtPeso(mult)} (${rotuloDeTamanho(tamanho)}) = ${fmtPeso(total)} kg`;
+}
+
+/**
+ * Devolve o nome canonico do tamanho, escolhido numa lista fechada.
+ *
+ * Qualquer coisa fora da lista vira 'Médio' -- inclusive as variacoes do
+ * livro como "Médio ou Pequeno", que aqui interessam so pelo rotulo.
+ * @param {string} tamanho - Texto de origem, possivelmente de fora do app
+ */
+export function rotuloDeTamanho(tamanho) {
+  const CANONICOS = ['Minúsculo', 'Pequeno', 'Médio', 'Grande', 'Enorme', 'Colossal'];
+  const t = String(tamanho || '').trim();
+  return CANONICOS.includes(t) ? t : 'Médio';
 }
 
 /** Peso total do inventário em kg (peso × quantidade; ignora itens com qtd <= 0). */

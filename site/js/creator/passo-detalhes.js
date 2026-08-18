@@ -151,7 +151,7 @@ export function renderStepDetalhes(el) {
       <div style="border:2px solid var(--primary);border-radius:8px;padding:10px;margin-top:4px">
         <div style="font-weight:700;font-size:0.95rem;margin-bottom:4px">${tamanhoFixo}</div>
         <div style="font-size:0.8rem;color:var(--text-muted)">
-          ${alturaFixa ? '<div>Altura: ' + alturaFixa + '</div>' : ''}
+          ${alturaFixa ? '<div>Altura: ' + escHtml(alturaFixa) + '</div>' : ''}
           <div>Espaco em combate: ${espacoCombate}</div>
           <div>Capacidade de carga: <strong>${_capFixo}</strong></div>
         </div>

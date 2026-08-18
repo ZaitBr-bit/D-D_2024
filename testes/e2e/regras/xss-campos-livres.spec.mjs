@@ -155,3 +155,33 @@ test('ficha: foto de personagem importado nao escapa do atributo src', async ({ 
   expect(scriptRodou, 'a foto executou script ao abrir a ficha').toBeNull();
   expect(await page.locator('[onerror]').count(), 'a injecao criou um onerror no DOM').toBe(0);
 });
+
+// O caminho que o CodeQL mostrou no alerta #7 terminava aqui:
+// `descreverCapacidadeCarga` monta uma frase que vai para innerHTML, e o
+// TAMANHO entrava cru nela. O tamanho sai do valor de um <select> -- texto
+// do DOM --, entao a frase carregava o que estivesse ali.
+//
+// A forca ja era saneada por parseInt; so o tamanho nao era. O teste
+// exercita a funcao direto, no navegador, porque chegar ao passo 7 do
+// criador exige percorrer o assistente inteiro, e o que importa provar e
+// da funcao, nao da tela.
+test('capacidade de carga: tamanho de origem duvidosa nao vira marcacao', async ({ context }) => {
+  const { page } = await abrirSite(context);
+
+  const frases = await page.evaluate(async () => {
+    const utils = await import(new URL('./js/utils.js', location.href).href);
+    return [
+      utils.descreverCapacidadeCarga(15, '<img src=x onerror="window.__xss=1">'),
+      utils.descreverCapacidadeCarga(15, '" onmouseover="window.__xss=1'),
+      utils.descreverCapacidadeCarga('<b>15</b>', 'Grande'),
+      utils.descreverCapacidadeCarga(15, 'Grande'),
+    ];
+  });
+
+  for (const frase of frases.slice(0, 3)) {
+    expect(frase, `a frase carregou marcacao: ${frase}`).not.toMatch(/[<>]/);
+  }
+  // O caso legitimo continua intacto -- sanear nao pode virar apagar.
+  expect(frases[3]).toContain('Grande');
+  expect(frases[3]).toContain('Força 15');
+});
