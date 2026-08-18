@@ -185,3 +185,46 @@ test('capacidade de carga: tamanho de origem duvidosa nao vira marcacao', async 
   expect(frases[3]).toContain('Grande');
   expect(frases[3]).toContain('Força 15');
 });
+
+// O caminho completo do alerta #7 (Steps 1 a 11) terminava em DOIS pontos,
+// e a primeira correcao pegou so um deles: `descreverCapacidadeCarga`. O
+// outro era o proprio `${tamanhoFixo}` no card de Tamanho da Criatura,
+// montado ANTES do template principal -- e por isso fora da varredura que
+// eu tinha feito, que comecava na linha do `el.innerHTML`.
+//
+// A fonte e a mesma dos dois: `personagem.tamanho`, gravado a partir de
+// `tamanhoSel.value` (radio marcado). Texto do DOM voltando para HTML.
+//
+// O passo 7 e renderizado aqui isoladamente, com `renderStepDetalhes(el)`
+// num container proprio: percorrer os sete passos do assistente para
+// chegar nesta tela custaria minutos e testaria o driver, nao o escape.
+test('criador: tamanho da criatura nao vira marcacao no card', async ({ context }) => {
+  const { page } = await abrirSite(context);
+
+  const resultado = await page.evaluate(async () => {
+    const wizard = await import(new URL('./js/creator/wizard.js', location.href).href);
+    const passo = await import(new URL('./js/creator/passo-detalhes.js', location.href).href);
+    const store = await import(new URL('./js/store.js', location.href).href);
+
+    const p = store.criarPersonagemVazio();
+    p.especie = 'Humano';
+    p.classe = 'Guerreiro';
+    p.tamanho = '"><img src=x onerror="window.__xss=(window.__xss||0)+1">';
+    wizard.definirPersonagem(p);
+
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    passo.renderStepDetalhes(el);
+
+    return {
+      scriptRodou: window.__xss ?? null,
+      tagsInjetadas: el.querySelectorAll('img[src="x"], [onerror]').length,
+      // o valor tem de continuar visivel como texto
+      mostraTexto: el.textContent.includes('<img src=x'),
+    };
+  });
+
+  expect(resultado.scriptRodou, 'o tamanho executou script no card').toBeNull();
+  expect(resultado.tagsInjetadas, 'a carga virou tag no card de tamanho').toBe(0);
+  expect(resultado.mostraTexto, 'o valor sumiu da tela em vez de virar texto').toBe(true);
+});

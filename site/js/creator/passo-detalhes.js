@@ -107,7 +107,7 @@ export function renderStepDetalhes(el) {
     <div class="card mb-2">
       <div class="card-header"><h3>Tamanho da Criatura</h3></div>
       <div class="info-box info" style="font-size:0.85rem">
-        A espécie <strong>${personagem.especie}</strong> permite escolher entre Médio ou Pequeno.
+        A espécie <strong>${escHtml(personagem.especie)}</strong> permite escolher entre Médio ou Pequeno.
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
         <div style="border:2px solid ${borderMedio};border-radius:8px;padding:10px;cursor:pointer;transition:border-color 0.2s" data-tamanho-card="Médio">
@@ -115,7 +115,7 @@ export function renderStepDetalhes(el) {
             <input type="radio" name="det-tamanho" value="Médio" ${personagem.tamanho === 'Médio' ? 'checked' : ''}> Médio
           </label>
           <div style="font-size:0.8rem;color:var(--text-muted)">
-            <div>Altura: ${alturaMedio}</div>
+            <div>Altura: ${escHtml(alturaMedio)}</div>
             <div>Espaco em combate: 1,5 x 1,5 m</div>
             <div>Capacidade de carga: <strong>${descreverCapacidadeCarga(_forcaCarga, 'Médio')}</strong></div>
           </div>
@@ -125,7 +125,7 @@ export function renderStepDetalhes(el) {
             <input type="radio" name="det-tamanho" value="Pequeno" ${personagem.tamanho === 'Pequeno' ? 'checked' : ''}> Pequeno
           </label>
           <div style="font-size:0.8rem;color:var(--text-muted)">
-            <div>Altura: ${alturaPequeno}</div>
+            <div>Altura: ${escHtml(alturaPequeno)}</div>
             <div>Espaco em combate: 1,5 x 1,5 m</div>
             <div>Capacidade de carga: <strong>${descreverCapacidadeCarga(_forcaCarga, 'Pequeno')}</strong></div>
           </div>
@@ -149,7 +149,7 @@ export function renderStepDetalhes(el) {
     <div class="card mb-2">
       <div class="card-header"><h3>Tamanho da Criatura</h3></div>
       <div style="border:2px solid var(--primary);border-radius:8px;padding:10px;margin-top:4px">
-        <div style="font-weight:700;font-size:0.95rem;margin-bottom:4px">${tamanhoFixo}</div>
+        <div style="font-weight:700;font-size:0.95rem;margin-bottom:4px">${escHtml(tamanhoFixo)}</div>
         <div style="font-size:0.8rem;color:var(--text-muted)">
           ${alturaFixa ? '<div>Altura: ' + escHtml(alturaFixa) + '</div>' : ''}
           <div>Espaco em combate: ${espacoCombate}</div>
@@ -364,7 +364,7 @@ export function renderStepDetalhes(el) {
     }
     personagem.imagem = dataUrl;
     const preview = document.getElementById('det-imagem-preview');
-    if (preview) preview.innerHTML = `<img src="${dataUrl}" alt="">`;
+    if (preview) preview.innerHTML = `<img src="${escHtml(dataUrl)}" alt="">`;
     const btnRemover = document.getElementById('det-imagem-remover');
     if (btnRemover) btnRemover.style.display = '';
   });
