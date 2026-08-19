@@ -217,6 +217,7 @@ depois e estão nas duas últimas linhas ou no próprio cabeçalho do arquivo.
 | `gatilhos-ui-cobertos.test.mjs` | Cliquete de cobertura de tela: todo `id="btn-..."`/`data-<x>-acao="..."` declarado em `site/js/` precisa aparecer em algum spec de `testes/e2e/` -- isto é, precisa existir um teste que CLIQUE nele. A dívida histórica (**218 gatilhos**, de 260) está congelada em `../gatilhos-sem-cobertura.mjs` e a lista só encolhe: gatilho novo sem teste falha, e entrada que já ganhou teste (ou sumiu do código) também falha, pedindo a remoção. Um quarto teste barra gatilho montado por interpolação OPACA (`data-x-acao="${acao}"`), que sumiria do inventário e escaparia da regra em silêncio -- o extrator resolve ternário com os dois lados literais, mas não uma variável. Nasceu de uma melhoria entregue com teste que só afirmava "o botão aparece" -- ver GUIA-PROXIMOS-DOMINIOS.md | 4 |
 | `recursos-restaurados.test.mjs` | Varredura de `site/js/`: campo de consumo (`_usado`/`_usada`/`_gasto`/`_gastos`) que é gravado mas NUNCA mencionado em `sheet/hp-descanso.js` -- recurso que se gasta e nada devolve. Exceções legítimas (restauradas por outra via, como as do talento Dádiva da Recuperação, ou por gatilho próprio, como a Concentração Fanática, que zera ao ATIVAR a Fúria) ficam numa lista com o motivo escrito, e o motor cobra a higiene dela nos dois sentidos. Nasceu do Campeão dos Deuses do Bárbaro Fanático, cuja reserva de d12 não voltava em Descanso Longo nenhum | 3 |
 | `subclasse-nome-literal.test.mjs` | Varredura de `site/js/`: todo literal comparado com `subclasse === '...'`/`!== '...'` (154 ocorrências) precisa ser um dos **48 nomes reais** de `dados/classes/*.json`. Nasceu do typo das guardas de Juramento do Paladino (`'Juramento de X'` contra o real `'Juramento da X'`), que deixou quatro `if` de restauração como código morto -- o tipo de erro que nenhuma revisão que LÊ o código pega, porque os dois lados parecem certos isoladamente. Não confere se a guarda está no Descanso certo nem se zera o campo certo: isso continua sendo do Grupo 5 de `subclasses-recursos.test.mjs` | 3 |
+| `especies.test.mjs` | As **10 espécies do livro** (`catalogo/especies.mjs`) × app, em quatro grupos: higiene (bijeção com `dados/origens/especies.json`, e cada uma das 49 citações conferida contra a LINHA real de `Espécies.md`); campos de cabeçalho (`getTamanho`/`getDeslocamento`, funções puras de `utils.js`, varredura exaustiva das 10); traços que só chegam num nível, confrontados sobre a **união** dos dois mecanismos de entrega (o anúncio de `obterCaracteristicasEspecieNivel` e o filtro por nível de `renderSecaoTracosEspecie`), mais a ausência antes do nível; e as 5 escolhas de linhagem, incluindo as magias de nível 3 e 5 de Linhagem Élfica e Legado Ínfero × `MAGIAS_LEGADO_ESPECIE`. **Não** valida Kenku (o livro não a tem — ver `FORA_DO_LIVRO`) nem o Deslocamento do Tiferino (o livro não o declara) | 62 (61 rodam asserção; **1 skip**, o Deslocamento do Tiferino) |
 | `notas-versao-formato.test.mjs` | Toda entrada de `NOTAS_VERSAO` renderiza (via `montarNotasVersaoHtml`, extraída de `notas-versao.js` para ser confrontável sem navegador), `VERSAO_ATUAL` é a entrada do topo, e todo grupo tem título e itens. `melhorias`/`correcoes` são OPCIONAIS -- foi uma versão só de correções que derrubou o modal inteiro, escondendo também as versões antigas | 4 |
 
 Total: **2349 testes** em `unidade/` (medido em 2026-08-18, depois do Plano 4
@@ -1998,6 +1999,92 @@ fora, e não é dívida deste domínio:
   aprender/preparar, fora do que a subclasse concede) — pertence a um futuro
   domínio Magias, não a Subclasses.
 
+## Achados do domínio Espécies (2026-08-18)
+
+Domínio 4 do mapa, feito depois de Subclasses. **10 espécies, 49 traços, 62
+testes** — e o resultado mais útil dele não são os achados, são as **três
+lacunas falsas que o pré-voo evitou**. Ficam registradas porque é isso que o
+[GUIA-PROXIMOS-DOMINIOS.md](GUIA-PROXIMOS-DOMINIOS.md) existe para transmitir.
+
+### O dado está limpo: 49 traços, zero divergências de nome
+
+Nome a nome, `dados/origens/especies.json` × `Espécies.md`, nas 10 espécies:
+**49 no livro, 49 no app, nenhuma diferença**. Os campos de cabeçalho batem em
+9 de 10 (a décima é o Tiferino, abaixo). Como no Plano 1 de Subclasses, a
+transcrição não tinha erro — o valor do domínio está no comportamento.
+
+### O único achado: o anúncio do Voo Dracônico (✅ corrigido no mesmo dia)
+
+`obterCaracteristicasEspecieNivel` (`site/js/levelup.js:728`) resolve os traços
+com nível por **ramos hard-coded por nome de espécie**: há ramo para Aasimar
+nv3 (Revelação Celestial) e Golias nv5 (Forma Grande), e **nenhum para
+Draconato**. Quem joga um Draconato sobe para o nível 5 e o assistente não
+menciona que ganhou voo.
+
+**Mas o traço CHEGA ao jogador** — e essa distinção é o achado de método deste
+domínio. A ficha filtra traços por nível com uma regex sobre a **descrição**
+(`sheet/caracteristicas.js:199-203`), e a de Voo Dracônico começa com "No nível
+5 do personagem": medido, ela casa, o traço fica escondido antes do nível 5 e
+aparece a partir dele. Registrado como `limitacao-observabilidade`, não como
+divergência do livro: o livro diz o que o personagem **ganha**, e o app entrega;
+ele não manda o app **avisar** nada.
+
+✅ **Corrigido em 2026-08-18**, logo depois de registrado. O conserto **não**
+acrescentou um terceiro `if`: trocou os dois por uma **varredura sobre o dado**,
+usando a mesma regex de nível que a ficha já aplicava. As duas telas passaram a
+concordar por construção em vez de por coincidência, e a próxima espécie com
+traço de nível funciona sem tocar em `levelup.js` — que é o que o comentário
+`// Adicione outras espécies conforme necessário`, apagado junto, vinha pedindo
+sem que ninguém fizesse.
+
+Medido antes de trocar: a regex casa em **exatamente três** traços nas 11
+espécies de `dados/` — os dois que já eram anunciados mais o que faltava, sem
+ruído. Prova de reversão feita: com `levelup.js` revertido o teste falha, com o
+conserto passa. Efeito colateral bem-vindo: o card da subida de nível passou a
+mostrar o texto do livro, em vez das duas paráfrases curtas que os `if` traziam
+escritas à mão.
+
+### Três lacunas falsas evitadas por medição
+
+1. **Nomes de linhagem élfica.** Os headings `###` do livro dizem "Altos
+   Elfos"/"Elfos Silvestres" (plural) e o app usa o singular. Parecia
+   divergência — mas a **tabela** do livro (`Espécies.md:149-152`), que é a
+   lista de opções autoritativa, usa exatamente o singular do app.
+2. **Deslocamento do Elfo Silvestre.** A linhagem aumenta o Deslocamento para
+   10,5 m e `getDeslocamento` lê só o cabeçalho da espécie (9 m). Antes de
+   registrar, busca no app inteiro: `sheet/combate.js:134` **já trata**.
+3. **A asserção do Grupo 3, na primeira versão.** Ela exigia o traço de
+   `obterCaracteristicasEspecieNivel` e acusou o Voo Dracônico como ausente —
+   medindo **arquitetura em vez de comportamento**, o erro nº 1 do guia. A
+   asserção certa é sobre a **união** dos dois mecanismos de entrega. A versão
+   errada teria registrado uma lacuna de `app-diverge-do-livro` para um traço
+   que o jogador recebe.
+
+### Duas ausências que são da FONTE, não do app
+
+- **Tiferino não tem `Deslocamento`** — nem em `Espécies.md`, nem no PHB
+  completo (conferido nos dois). O catálogo grava `null` e o motor **pula** a
+  célula, em vez de inventar um valor de livro para comparar. O app devolve
+  `9 metros` pelo padrão de `getDeslocamento`.
+- **Kenku existe no app e não no livro.** O PHB diz "Dez espécies são
+  apresentadas nesta seção" (`Livro do Jogador:8554`, repetido em `:1588`) e
+  lista as dez — Kenku não é uma delas. Ficou **fora da validação** por decisão
+  do usuário, declarada em `FORA_DO_LIVRO` com o motivo: não há texto de livro
+  para confrontar. A bijeção do Grupo 1 a **exige** em `dados/`, para "o app tem
+  uma espécie a mais" ficar visível em vez de silenciosamente tolerado.
+
+### O que este domínio não cobre
+
+As 5 escolhas de linhagem são confrontadas na **oferta** (as opções do livro
+existem no dado e na tela) e nas **magias de nível 3 e 5** (Linhagem Élfica e
+Legado Ínfero × `MAGIAS_LEGADO_ESPECIE`, mais a entrega real por
+`obterCaracteristicasEspecieNivel`). O que a escolha vira no personagem depois
+de confirmada no criador fica com o motor de unidade; o spec de navegador
+(`../e2e/regras/especie-criador.spec.mjs`) afirma só o que é de tela — que as
+espécies de `dados/` aparecem e que as três linhagens são oferecidas.
+
+---
+
 ## Mapa de domínios futuros
 
 Talentos foi o piloto. A ordem sugerida originalmente (do spec de design
@@ -2016,7 +2103,7 @@ a que foi seguida de fato, não a original:
 2. ~~Antecedentes~~ — feito (16 antecedentes; achados acima, corrigidos em 2026-08-07)
 3. ~~Regras transversais da ficha~~ — feito (achados acima; adiantado por
    densidade de função pura medida no pré-voo)
-4. **Espécies** — traços, deslocamento, magias raciais
+4. ~~Espécies~~ — **feito** (2026-08-18; 10 espécies, 49 traços, achados abaixo)
 5. ~~Classes/níveis~~ — feito (achados acima; as características de
    subclasse por nível ficaram deliberadamente fora, ver "escopo declarado
    fora" acima)

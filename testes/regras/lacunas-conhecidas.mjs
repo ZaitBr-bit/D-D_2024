@@ -119,6 +119,12 @@ export const TESTES_VALIDOS = [
   // histórico correspondente em LACUNAS, mais abaixo, e o motor novo
   // unidade/subclasse-nome-literal.test.mjs, que agora impede a
   // reintrodução do typo em qualquer das 48 subclasses.
+
+  // A chave 'especies-anuncio-traco-nivel' (domínio Espécies) vivia aqui, mas a
+  // lacuna foi corrigida e aposentada em 2026-08-18 -- os dois `if` por nome de
+  // espécie de obterCaracteristicasEspecieNivel viraram uma varredura sobre o
+  // DADO, e os três traços com nível passaram a ser anunciados. Ver o histórico
+  // correspondente em LACUNAS, mais abaixo.
 ];
 
 // Achado I4: o README chama esta lista de "o backlog real de correções do
@@ -879,6 +885,29 @@ export const LACUNAS = [
   // `subclasse === '...'` de site/js/ (154 ocorrências) contra os 48 nomes de
   // dados/classes/*.json. Nasceu vermelho apontando exatamente estes quatro e
   // mais nada -- medido, não suposto. Sem lacuna remanescente nesta chave.
+
+  // ---------- Domínio Espécies (2026-08-18) ----------
+  //
+  // Voo Dracônico (Draconato, nível 5, Espécies.md:106) -- CORRIGIDA no mesmo
+  // dia em que foi registrada. `obterCaracteristicasEspecieNivel`
+  // (site/js/levelup.js) resolvia os traços com nível por DOIS `if` escritos à
+  // mão -- Golias/Forma Grande (nv5) e Aasimar/Revelação Celestial (nv3) --
+  // seguidos do comentário "Adicione outras espécies conforme necessário". O
+  // Draconato nunca foi adicionado, e um ramo que não existe não falha: só não
+  // anuncia nada.
+  //
+  // O conserto não acrescentou um terceiro `if`: trocou os dois por uma
+  // varredura sobre o DADO, usando a MESMA regex de nível que a ficha já
+  // aplicava para esconder o traço antes da hora
+  // (sheet/caracteristicas.js:201). As duas telas passaram a concordar por
+  // construção, em vez de por coincidência, e a próxima espécie com traço de
+  // nível funciona sem tocar em levelup.js. Medido antes de trocar: a regex
+  // casa em exatamente três traços nas 11 espécies de dados/ -- os dois que já
+  // eram anunciados mais o que faltava, sem ruído.
+  //
+  // Efeito colateral bem-vindo: o card da subida de nível passou a mostrar o
+  // texto do livro em vez das duas paráfrases curtas que os `if` traziam
+  // escritas à mão. Sem lacuna remanescente nesta chave.
 ];
 
 // Busca a lacuna registrada para um par (talento, teste), se houver.

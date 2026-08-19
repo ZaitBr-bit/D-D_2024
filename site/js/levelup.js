@@ -733,20 +733,27 @@ export async function obterCaracteristicasEspecieNivel(especie, nivel, tracosEsc
 
   const caracteristicas = [];
 
-  // Golias: Forma Grande no nível 5
-  if (especie === 'Golias' && nivel === 5) {
-    caracteristicas.push({
-      nome: 'Forma Grande',
-      descricao: 'A partir do nível 5, você pode alterar seu tamanho para Grande como uma Ação Bônus.'
-    });
-  }
-
-  // Aasimar: Revelação Celestial no nível 3
-  if (especie === 'Aasimar' && nivel === 3) {
-    caracteristicas.push({
-      nome: 'Revelação Celestial',
-      descricao: 'No nível 3, você pode se transformar como uma Ação Bônus.'
-    });
+  // Traços que só passam a valer num nível: derivados do DADO, não de ramos
+  // por nome de espécie.
+  //
+  // Antes havia dois `if` escritos à mão -- um para Golias/Forma Grande (nv5),
+  // outro para Aasimar/Revelação Celestial (nv3) -- e um comentário dizendo
+  // "Adicione outras espécies conforme necessário". O Voo Dracônico do
+  // Draconato (Espécies.md:106, "No nível 5 do personagem") nunca foi
+  // adicionado, e um ramo que não existe não falha: só não anuncia nada. O
+  // jogador chegava ao nível 5 sem aviso de que ganhou voo.
+  //
+  // A regex é a MESMA que a ficha já usa para esconder o traço antes do nível
+  // (site/js/sheet/caracteristicas.js:201) -- as duas telas passam a concordar
+  // por construção, em vez de por coincidência. Medido sobre as 11 espécies de
+  // dados/: casa em exatamente três traços, os dois que já eram anunciados
+  // mais o que faltava.
+  const RE_NIVEL_DO_TRACO = /(?:a partir do |no )n[ií]vel (\d+)/i;
+  for (const traco of (especieData.tracos || [])) {
+    const m = traco.descricao?.match(RE_NIVEL_DO_TRACO);
+    if (m && Number(m[1]) === nivel) {
+      caracteristicas.push({ nome: traco.nome, descricao: traco.descricao });
+    }
   }
 
   // Tiferino (Legado Ínfero) / Elfo (Linhagem Élfica): magia automática nos níveis 3 e 5

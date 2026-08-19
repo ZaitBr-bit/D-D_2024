@@ -10,6 +10,7 @@ import { CATALOGO_TALENTOS, TIPOS_ESCOLHA } from '../catalogo/talentos.mjs';
 import { CATALOGO_ANTECEDENTES } from '../catalogo/antecedentes.mjs';
 import { PROGRESSAO } from '../catalogo/classes.mjs';
 import { CLASSE_DA_SUBCLASSE } from '../catalogo/subclasses.mjs';
+import { ESPECIES } from '../catalogo/especies.mjs';
 import { LACUNAS, TESTES_VALIDOS, TIPOS_LACUNA } from '../lacunas-conhecidas.mjs';
 import { EXCECOES_ESCOLHA_REPETIDA } from '../excecoes-escolha-repetida.mjs';
 import { lerTalentosDados, lerTitulosLivro, RAIZ } from './harness.mjs';
@@ -40,6 +41,7 @@ const nomesClasses = new Set(Object.keys(PROGRESSAO));
 // subclasses -- mesma razão das classes: o campo é o identificador genérico
 // da entidade sob teste, não um nome de talento.
 const nomesSubclasses = new Set(Object.keys(CLASSE_DA_SUBCLASSE));
+const nomesEspecies = new Set(ESPECIES.map((e) => e.nome));
 const ATRIBUTOS_VALIDOS = ['forca', 'destreza', 'constituicao', 'inteligencia', 'sabedoria', 'carisma'];
 
 test('todo talento de dados/ tem entrada no catálogo', () => {
@@ -103,12 +105,15 @@ test('lacunas conhecidas: todas com talento real, teste válido, motivo e tipo e
     // `talento` é o identificador genérico da entidade sob teste -- pode
     // ser um nome de talento (talentos.mjs), um nome de antecedente
     // (antecedentes.mjs, desde o domínio Antecedentes), um nome de classe
-    // (classes.mjs, desde o domínio Classes/Níveis) ou, desde o domínio
-    // Subclasses, um nome de subclasse (subclasses.mjs). Uma entrada só é
-    // rejeitada se não existir em NENHUMA das quatro.
+    // (classes.mjs, desde o domínio Classes/Níveis), um nome de subclasse
+    // (subclasses.mjs, desde o domínio Subclasses) ou, desde o domínio
+    // Espécies, um nome de espécie (especies.mjs). Uma entrada só é rejeitada
+    // se não existir em NENHUMA das cinco.
     assert.ok(nomesCatalogo.has(l.talento) || nomesAntecedentes.has(l.talento)
-      || nomesClasses.has(l.talento) || nomesSubclasses.has(l.talento),
-      `lacuna de entidade inexistente (nem talento, nem antecedente, nem classe, nem subclasse): ${l.talento}`);
+      || nomesClasses.has(l.talento) || nomesSubclasses.has(l.talento)
+      || nomesEspecies.has(l.talento),
+      `lacuna de entidade inexistente (nem talento, nem antecedente, nem classe, nem subclasse, ` +
+      `nem espécie): ${l.talento}`);
     assert.ok(TESTES_VALIDOS.includes(l.teste), `teste desconhecido: ${l.teste}`);
     assert.ok(l.motivo?.trim(), `lacuna sem motivo: ${l.talento}/${l.teste}`);
     // Achado I4: `tipo` distingue "o app diverge do livro" (o backlog real

@@ -13,13 +13,35 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.7';
+export const VERSAO_ATUAL = '2.2.8';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.8',
+    data: '2026-08-18',
+    rotulo: 'Traços por nível',
+    resumo: 'O Draconato passa a ser avisado quando ganha o Voo Dracônico, e '
+      + 'os traços de espécie mostram o texto do livro.',
+    correcoes: [
+      {
+        grupo: '🐉 Avisos de traço de espécie',
+        itens: [
+          'Um Draconato que chegava ao nível 5 ganhava o Voo Dracônico, mas a '
+            + 'tela de subida de nível não avisava nada — o traço só aparecia '
+            + 'para quem abrisse a ficha depois e reparasse na lista.',
+          'Agora ele é anunciado como já eram a Revelação Celestial do Aasimar '
+            + '(nível 3) e a Forma Grande do Golias (nível 5).',
+          'O aviso passou a mostrar o texto do livro. Antes, dois desses traços '
+            + 'exibiam um resumo curto escrito à mão, que dizia menos do que a '
+            + 'regra real.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.7',
     data: '2026-08-18',
