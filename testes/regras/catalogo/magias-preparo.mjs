@@ -145,7 +145,7 @@ export const EXCECOES_LISTA_ORIGEM = {
   // aspas, enxergava `['dominio']`. Era a MESMA pergunta, respondida com a lista
   // errada. Corrigida na Correção B (2026-08-19), junto com a cegueira do
   // extrator, que hoje registra os `...espalha` e tem asserção própria.
-  'sheet/migracoes.js:66': 'Migração de dado legado: classifica origens de personagens ' +
+  'sheet/migracoes.js:67': 'Migração de dado legado: classifica origens de personagens ' +
     'salvos por versões antigas do app, incluindo `telecinetico`, que nenhuma das listas ' +
     'vivas usa. Não governa o limite de nenhum personagem novo.',
 };

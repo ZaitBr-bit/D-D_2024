@@ -13,13 +13,48 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.11';
+export const VERSAO_ATUAL = '2.2.12';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.12',
+    data: '2026-08-19',
+    rotulo: 'Talentos de treinamento',
+    resumo: 'Os talentos que dão treinamento com armadura, com armas '
+      + 'Marciais e com Utensílios de Cozinheiro voltaram a dar de verdade. '
+      + 'Antes eles entravam na lista de talentos e não mudavam mais nada '
+      + 'na ficha.',
+    correcoes: [
+      {
+        grupo: '🛡️ Treinamento que o talento promete',
+        itens: [
+          'Especialista em Armaduras Leves, Médias e Pesadas passaram a '
+            + 'conceder o treinamento na ficha. Antes o talento era gravado '
+            + 'e a linha "Armaduras:" continuava igual — um Mago com o '
+            + 'talento seguia sem proficiência nenhuma, e cada peça de '
+            + 'armadura continuava marcada como "Sem Prof" no inventário.',
+          'Especialista em Armaduras Leves passou a dar também os Escudos, '
+            + 'como o livro manda. Sem eles, Mestre em Escudos ficava '
+            + 'inalcançável para toda classe que não nasce com escudo.',
+          'A escada de talentos voltou a subir: pegar Armaduras Leves agora '
+            + 'libera Armaduras Médias, que libera Pesadas. Antes ela travava '
+            + 'no primeiro degrau, porque o pré-requisito olhava um campo '
+            + 'diferente do que o talento preenchia.',
+          'Treinamento com Armas Marciais e Chef tinham o mesmo defeito e '
+            + 'foram corrigidos junto.',
+          'O Bardo do Colégio da Bravura, que já recebia treinamento com '
+            + 'armas Marciais, armadura Média e Escudos pela subclasse, '
+            + 'voltou a poder usar isso como pré-requisito de talento.',
+          'Fichas já salvas recebem o treinamento sozinhas ao abrir — não '
+            + 'precisa refazer o personagem.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.11',
     data: '2026-08-19',

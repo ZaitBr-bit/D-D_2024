@@ -83,6 +83,13 @@ export function temProficienciaArmadura(personagem, armadura) {
   // Proficiencias extras (Clerigo Protetor etc.)
   if (extras.includes('armadura pesada') && cat === 'pesada') return true;
   if (extras.includes('armadura média') && (cat === 'média' || cat === 'media')) return true;
+  // 'armadura leve' faltava aqui desde sempre. Ficou latente porque nenhum
+  // escritor de proficiencias_extra jamais empurrou "Armadura Leve" -- os
+  // dois ramos de creator/wizard.js:453-460 concedem Média/Pesada. Com
+  // Especialista em Armaduras Leves passando a conceder (2026-08-19), a
+  // ausencia vira defeito: o talento grava a proficiencia e a tela de
+  // equipamento continua marcando "Sem Prof".
+  if (extras.includes('armadura leve') && cat === 'leve') return true;
 
   return false;
 }

@@ -80,7 +80,6 @@ export function resolverPassivosTalentos(char) {
     bonusDanoUmaMao: 0,
     bonusDanoArremesso: 0,
     bonusDanoDesarmado: null,
-    proficienciasExtra: [],
     resistenciasExtra: [],
     cdTalentos: {},
     visaoVerdadeira: 0,
@@ -133,24 +132,18 @@ export function resolverPassivosTalentos(char) {
     passivos.flags.valentao_dano_garantido = true;
   }
 
-  // Treinamento com Armas Marciais: proficiência extra
-  if (nomes.has('Treinamento com Armas Marciais')) {
-    passivos.proficienciasExtra.push('Armas Marciais');
-  }
-
   // ==========================================================
   // --- Talentos Gerais: Proficiências ---
   // ==========================================================
-
-  if (nomes.has('Especialista em Armaduras Leves')) {
-    passivos.proficienciasExtra.push('Armadura Leve');
-  }
-  if (nomes.has('Especialista em Armaduras Médias')) {
-    passivos.proficienciasExtra.push('Armadura Média');
-  }
-  if (nomes.has('Especialista em Armaduras Pesadas')) {
-    passivos.proficienciasExtra.push('Armadura Pesada');
-  }
+  //
+  // NÃO voltar a resolver proficiência aqui. Até 2026-08-19 este motor
+  // empurrava 'Armadura Leve'/'Média'/'Pesada'/'Armas Marciais' para um
+  // `passivos.proficienciasExtra` que NENHUM consumidor de site/js/ lia --
+  // os quatro talentos não concediam nada a ninguém, com a suíte verde.
+  // A concessão agora é PERSISTIDA em char.proficiencias_extra por
+  // aplicarEfeitoTalento (PROFICIENCIAS_FIXAS_TALENTO, regras-cobertura.js),
+  // que é o campo que ficha, impressão e regras de equipamento já leem.
+  // Uma segunda fonte derivada aqui só voltaria a poder divergir dela.
 
   // ==========================================================
   // --- Talentos Gerais: CA ---

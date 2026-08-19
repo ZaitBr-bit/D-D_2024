@@ -192,6 +192,48 @@ export const REGRAS_TALENTOS = Object.freeze({
   'Mestre das Armas': regra(['atributo_talento', 'arma_maestria'], 'maestrias_arma')
 });
 
+/**
+ * Proficiências que o livro concede DE GRAÇA ao adquirir o talento --
+ * sem escolha nenhuma do jogador ("você obtém treinamento com...", não
+ * "escolha um..."). Por isso moram numa tabela e não em REGRAS_TALENTOS,
+ * que existe para declarar ESCOLHAS: uma entrada lá faria
+ * validarEscolhasTalento passar a cobrar o atributo do ASI embutido, que
+ * já é coberto por obterAtributosASITalento (site/js/levelup.js).
+ *
+ * `extras` vai para `proficiencias_extra` -- o campo REAL de proficiência
+ * extra por categoria de arma/armadura, lido por site/js/sheet/ficha.js:579
+ * (badges da ficha), site/js/sheet/impressao.js:233 e
+ * site/js/regras-equipamento.js:17,74 (proficiência de item). NÃO usar
+ * `proficiencias_armaduras` nem `treinamentos_armadura`: os dois são lidos
+ * por site/js/levelup.js e nunca foram escritos por linha nenhuma de
+ * site/js/ -- campos mortos para gravação.
+ *
+ * `ferramentas` vai para `proficiencias_ferramentas`, o mesmo array que
+ * Envenenador/Artifista/Habilidoso já alimentam.
+ *
+ * Antes de 2026-08-19 nada disto era gravado: o efeito existia só em
+ * resolverPassivosTalentos().proficienciasExtra (site/js/talentos-effects.js),
+ * uma saída que nenhum consumidor lia -- os cinco talentos abaixo não
+ * concediam nada a ninguém.
+ */
+export const PROFICIENCIAS_FIXAS_TALENTO = Object.freeze({
+  // Talentos.md:428 -- "Você obtém treinamento com Armadura Leve e Escudos".
+  // Os Escudos vinham sendo perdidos: sem eles, Mestre em Escudos
+  // (pré-requisito "Treinamento com Escudo", Talentos.md:580) fica
+  // inalcançável para toda classe que não nasce com escudo.
+  'Especialista em Armaduras Leves': { extras: ['Armadura Leve', 'Escudo'] },
+  // Talentos.md:438 -- "Você obtém treinamento com Armadura Média."
+  'Especialista em Armaduras Médias': { extras: ['Armadura Média'] },
+  // Talentos.md:448 -- "Você adquire treinamento com Armadura Pesada."
+  'Especialista em Armaduras Pesadas': { extras: ['Armadura Pesada'] },
+  // Talentos.md:728 -- "Você adquire proficiência com armas Marciais."
+  'Treinamento com Armas Marciais': { extras: ['Armas Marciais'] },
+  // Talentos.md §Chef -- "Você adquire proficiência com Utensílios de
+  // Cozinheiro se ainda não o tiver." O "se ainda não o tiver" é o
+  // comportamento natural de adicionarUnico, não precisa de ramo próprio.
+  'Chef': { ferramentas: ['Utensílios de Cozinheiro'] },
+});
+
 export function getRegraTalento(nome) {
   return REGRAS_TALENTOS[nome] || null;
 }
@@ -495,6 +537,21 @@ export function aplicarEfeitoTalento(char, nome, escolhas = {}) {
   const validacao = validarEscolhasTalento(char, nome, escolhas);
   if (!validacao.valido) return { sucesso: false, erro: validacao.erro };
   const atributo = atributoEscolhido;
+
+  // Concessões FIXAS de proficiência (PROFICIENCIAS_FIXAS_TALENTO, acima).
+  // Vêm antes dos ramos por nome porque não dependem de escolha nenhuma --
+  // o livro concede sem perguntar.
+  const fixas = PROFICIENCIAS_FIXAS_TALENTO[nome];
+  if (fixas) {
+    if (fixas.extras) {
+      const extras = garantirArray(char, 'proficiencias_extra');
+      for (const item of fixas.extras) adicionarUnico(extras, item);
+    }
+    if (fixas.ferramentas) {
+      const ferramentas = garantirArray(char, 'proficiencias_ferramentas');
+      for (const item of fixas.ferramentas) adicionarUnico(ferramentas, item);
+    }
+  }
 
   if (nome === 'Resiliente') {
     adicionarUnico(garantirArray(char, 'salvaguardas_proficientes'), ATRIBUTOS_SALVAGUARDA[atributo]);

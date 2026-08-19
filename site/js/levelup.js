@@ -114,8 +114,26 @@ export function talentoElegivelParaPersonagem(personagem, talento, nivel = perso
     return false;
   }
 
+  // `proficiencias_extra` é o campo REAL onde o app grava treinamento
+  // extra de armadura -- por talento (PROFICIENCIAS_FIXAS_TALENTO,
+  // regras-cobertura.js) e por concessão de subclasse
+  // (regras-subclasse-escolhas.js:52, Colégio da Bravura). Ele guarda o
+  // rótulo completo ("Armadura Média", "Escudo"), enquanto esta checagem
+  // compara contra a categoria nua ("media", "escudo"), então o prefixo
+  // "Armadura " sai antes de normalizar. "Armas Marciais" também mora
+  // nesse array e entra aqui como ruído inofensivo -- nenhum
+  // pré-requisito de armadura casa com ele.
+  //
+  // `proficiencias_armaduras` e `treinamentos_armadura` continuam sendo
+  // lidos por compatibilidade com fichas importadas, mas nenhuma linha de
+  // site/js/ jamais escreveu nos dois -- eram os únicos campos que este
+  // portão lia até 2026-08-19, e é por isso que a cadeia
+  // Leves -> Médias -> Pesadas nunca subia: o talento concedia num campo
+  // e o portão olhava outro.
   const armaduras = new Set([
     ...(info.armaduras || []),
+    ...(personagem.proficiencias_extra || [])
+      .map(p => String(p).replace(/^Armadura\s+/i, '')),
     ...(personagem.proficiencias_armaduras || []),
     ...(personagem.treinamentos_armadura || [])
   ].map(_normalizarTextoRegra));

@@ -244,6 +244,7 @@ export const CATALOGO_TALENTOS = {
     aumento_atributo: ['constituicao', 'sabedoria'],
     passivos: null,
     flags: ['chef_refeicao', 'chef_guloseimas'],
+    concede_proficiencia: { ferramentas: ['Utensílios de Cozinheiro'] }, // Talentos.md §Chef
     exemplo_valido: { atributo: 'constituicao' },
   },
   'Combatente Montado': {
@@ -333,8 +334,14 @@ export const CATALOGO_TALENTOS = {
     repetivel: false,
     escolhas: [{ tipo: 'atributo_talento', qtd: 1 }],
     aumento_atributo: ['forca', 'destreza'],
-    // resolverPassivosTalentos empurra o nome direto para proficienciasExtra
-    passivos: { proficienciasExtra: ['Armadura Leve'] },
+    // O livro concede "Armadura Leve E ESCUDOS" (Talentos.md:428). O campo
+    // é `concede_proficiencia`, não `passivos`: a concessão é PERSISTIDA em
+    // char.proficiencias_extra por aplicarEfeitoTalento, e é a rota real que
+    // unidade/talentos-proficiencia.test.mjs confronta -- `passivos` apontava
+    // para resolverPassivosTalentos().proficienciasExtra, saída sem consumidor
+    // nenhum, e por isso o talento passava verde sem conceder nada.
+    concede_proficiencia: { extras: ['Armadura Leve', 'Escudo'] },
+    passivos: null,
     exemplo_valido: { atributo: 'destreza' },
   },
   'Especialista em Armaduras Médias': {
@@ -344,7 +351,8 @@ export const CATALOGO_TALENTOS = {
     repetivel: false,
     escolhas: [{ tipo: 'atributo_talento', qtd: 1 }],
     aumento_atributo: ['forca', 'destreza'],
-    passivos: { proficienciasExtra: ['Armadura Média'] },
+    concede_proficiencia: { extras: ['Armadura Média'] },      // Talentos.md:438
+    passivos: null,
     exemplo_valido: { atributo: 'forca' },
   },
   'Especialista em Armaduras Pesadas': {
@@ -354,7 +362,8 @@ export const CATALOGO_TALENTOS = {
     repetivel: false,
     escolhas: [{ tipo: 'atributo_talento', qtd: 1 }],
     aumento_atributo: ['constituicao', 'forca'],
-    passivos: { proficienciasExtra: ['Armadura Pesada'] },
+    concede_proficiencia: { extras: ['Armadura Pesada'] },     // Talentos.md:448
+    passivos: null,
     exemplo_valido: { atributo: 'constituicao' },
   },
   'Especialista em Besta': {
@@ -650,8 +659,8 @@ export const CATALOGO_TALENTOS = {
     repetivel: false,
     escolhas: [{ tipo: 'atributo_talento', qtd: 1 }],
     aumento_atributo: ['forca', 'destreza'],
-    // resolverPassivosTalentos empurra o nome direto para proficienciasExtra
-    passivos: { proficienciasExtra: ['Armas Marciais'] },
+    concede_proficiencia: { extras: ['Armas Marciais'] },      // Talentos.md:728
+    passivos: null,
     exemplo_valido: { atributo: 'forca' },
   },
   'Velocista': {

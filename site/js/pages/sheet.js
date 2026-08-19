@@ -17,7 +17,7 @@ import { char, classeData, salvar } from '../sheet/estado.js';
 import { renderFichaCompleta } from '../sheet/ficha.js';
 import { carregarDescricoesMagias } from '../sheet/impressao.js';
 import { ehSubclasseConjuradora, getSubclasseConjuradoraConjuracao } from '../sheet/magias.js';
-import { migrarEscolhasClasseLegadas, migrarMagiasDominio, migrarMagiasLegadoEspecie, migrarMagiasSemprePreparadas, migrarNomePericiaLidarAnimais, migrarPericiaEspecie, migrarPericiasEspecie, migrarPericiasTalentos, migrarSlotsMagiaLivre, migrarTalentoVersatilHumano, migrarTruquesEspecie, migrarTruquesFixosSubclasse } from '../sheet/migracoes.js';
+import { migrarEscolhasClasseLegadas, migrarMagiasDominio, migrarMagiasLegadoEspecie, migrarMagiasSemprePreparadas, migrarNomePericiaLidarAnimais, migrarPericiaEspecie, migrarPericiasEspecie, migrarPericiasTalentos, migrarProficienciasTalentos, migrarSlotsMagiaLivre, migrarTalentoVersatilHumano, migrarTruquesEspecie, migrarTruquesFixosSubclasse } from '../sheet/migracoes.js';
 import { baixarPdfFicha } from '../sheet/pdf.js';
 import { migrarAdeptoElementalTipos, migrarIniciadoEmMagiaInstancias } from '../sheet/talentos.js';
 let _syncSubscribed = false;
@@ -64,6 +64,9 @@ export async function renderSheet(container, charId) {
   migrarPericiaEspecie();
   migrarPericiasEspecie();
   migrarPericiasTalentos();
+  // Depois de migrarPericiasTalentos: as duas leem char.talentos, mas
+  // gravam em arrays diferentes (perícias x proficiencias_extra/ferramentas).
+  migrarProficienciasTalentos();
   migrarIniciadoEmMagiaInstancias();
   migrarAdeptoElementalTipos();
 

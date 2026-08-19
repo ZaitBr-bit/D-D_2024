@@ -7,6 +7,7 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { CLASSES_INFO } from '../dados-classes.js';
+import { PROFICIENCIAS_FIXAS_TALENTO } from '../regras-cobertura.js';
 import { MAGIAS_LEGADO_ESPECIE, _concederMagiaAutomatica } from '../levelup.js';
 import { getTruquesFixosAcumulados } from '../regras-conjuracao-subclasse.js';
 import { getLimitesMagias } from '../utils.js';
@@ -310,4 +311,36 @@ export function migrarPericiasTalentos() {
     });
   });
   if (changed) salvar();
+}
+
+/**
+ * Concede retroativamente as proficiências fixas dos talentos que a ficha
+ * já tem gravados. Fichas salvas ANTES de 2026-08-19 têm o talento em
+ * char.talentos mas nunca receberam a proficiência: aplicarEfeitoTalento
+ * não tinha o ramo, e o efeito só existia numa saída derivada que ninguém
+ * lia. Aditiva e idempotente -- não remove nada e não duplica.
+ */
+export function migrarProficienciasTalentos() {
+  const nomes = new Set((char.talentos || [])
+    .map(t => (typeof t === 'string' ? t : t?.nome))
+    .filter(Boolean));
+  let mudou = false;
+  for (const [talento, concessao] of Object.entries(PROFICIENCIAS_FIXAS_TALENTO)) {
+    if (!nomes.has(talento)) continue;
+    const destinos = [
+      ['proficiencias_extra', concessao.extras],
+      ['proficiencias_ferramentas', concessao.ferramentas],
+    ];
+    for (const [campo, itens] of destinos) {
+      if (!itens) continue;
+      if (!Array.isArray(char[campo])) char[campo] = [];
+      for (const item of itens) {
+        if (!char[campo].includes(item)) {
+          char[campo].push(item);
+          mudou = true;
+        }
+      }
+    }
+  }
+  if (mudou) salvar();
 }
