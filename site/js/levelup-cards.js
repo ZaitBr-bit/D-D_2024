@@ -582,7 +582,7 @@ export function renderCardMagias(ctx, state) {
   // (levelup-ui.js, "Troca") ja era gated so por `ctx.ehConjurador`, entao
   // nao precisou mudar junto.
   const magiasAtuais = (char.magias_preparadas || []).filter(m => {
-    const origensEspeciais = ['dominio', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
+    const origensEspeciais = ['dominio', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista', 'subclasse_escolha'];
     return m.circulo > 0 && !origensEspeciais.includes(m?.origem);
   });
   if (magiasAtuais.length > 0) {
@@ -608,7 +608,7 @@ export function renderCardMagias(ctx, state) {
 
   // Troca de truque (qualquer classe conjuradora com truques de classe conhecidos)
   const truquesAtuais = (char.magias_conhecidas || []).filter(m => {
-    const origensEspeciais = ['especie', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista', 'subclasse_fixa'];
+    const origensEspeciais = ['especie', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista', 'subclasse_fixa', 'subclasse_automatica'];
     return m.circulo === 0 && !origensEspeciais.includes(m?.origem);
   });
   if (truquesAtuais.length > 0) {

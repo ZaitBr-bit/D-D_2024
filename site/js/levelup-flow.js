@@ -454,7 +454,7 @@ const STEP_DEFINITIONS = [
       // classe, mesmo em níveis sem ganho de truque/magia novo - então o step também
       // precisa ficar visível quando há pelo menos 1 truque elegível para troca (mesma
       // lista de origens especiais usada no card de troca em levelup-cards.js).
-      const origensEspeciais = ['especie', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista', 'subclasse_fixa'];
+      const origensEspeciais = ['especie', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista', 'subclasse_fixa', 'subclasse_automatica'];
       const temTruqueTrocavel = (ctx.char.magias_conhecidas || []).some(m => m.circulo === 0 && !origensEspeciais.includes(m?.origem));
       // 2026-08-13: a troca de MAGIA passou a valer para toda classe
       // conjuradora (antes so `conhecidas` -- ver levelup-cards.js). Um

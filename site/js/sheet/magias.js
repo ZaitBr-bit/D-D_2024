@@ -25,7 +25,7 @@ export function magiaContaNoLimite(magia) {
   // domínio, elas não gastam vaga do limite de preparadas.
   const origensEspeciais = ['dominio', 'sempre', 'especie_legado', 'iniciado_em_magia',
     'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista',
-    'maestria_magias', 'assinatura_magica'];
+    'maestria_magias', 'assinatura_magica', 'subclasse_escolha'];
   return !origensEspeciais.includes(magia?.origem);
 }
 

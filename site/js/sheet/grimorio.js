@@ -1285,7 +1285,7 @@ const ORIGENS_TRUQUE_NAO_TROCAVEL = [
   // no limite de truques da tabela -- por isso não entra nas listas que
   // separam truques extras nos contadores da ficha.
   'subclasse_fixa'
-];
+, 'subclasse_automatica'];
 
 /** Lista os truques de classe do personagem que podem entrar numa troca */
 export function truquesTrocaveis() {

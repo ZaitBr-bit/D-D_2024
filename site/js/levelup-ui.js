@@ -1445,7 +1445,7 @@ function bindEventosMagias(ctx, state) {
   // concentração nos dois lados, por isso busca em `listaMagiasClasse`.
   const trocaMagiaEl = document.getElementById('levelup-troca-magia');
   if (trocaMagiaEl) {
-    const origensEspeciaisMagia = ['dominio', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
+    const origensEspeciaisMagia = ['dominio', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista', 'subclasse_escolha'];
     const magiasAtuaisNomes = new Set((ctx.char.magias_preparadas || [])
       .filter(m => m.circulo > 0 && !origensEspeciaisMagia.includes(m?.origem))
       .map(m => m.nome));
@@ -1484,7 +1484,7 @@ function bindEventosMagias(ctx, state) {
   // círculo 0 e sem limite de círculo máximo.
   const trocaTruqueEl = document.getElementById('levelup-troca-truque');
   if (trocaTruqueEl) {
-    const origensEspeciaisTruque = ['especie', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
+    const origensEspeciaisTruque = ['especie', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista', 'subclasse_automatica'];
     const truquesAtuaisNomes = new Set((ctx.char.magias_conhecidas || [])
       .filter(m => m.circulo === 0 && !origensEspeciaisTruque.includes(m?.origem))
       .map(m => m.nome));
