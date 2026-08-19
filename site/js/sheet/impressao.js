@@ -42,7 +42,7 @@ export async function carregarDescricoesMagias() {
   // Magias do pacto do bruxo
   if (char.classe === 'Bruxo') {
     const estado = getEstadoRecursosBruxo();
-    if (estado?.pacto === 'Pacto do Tomo') {
+    if (estado?.pactos?.includes('Pacto do Tomo')) {
       (char.recursos?.bruxo?.livro_sombras?.truques || []).forEach(nome => {
         if (!todasMagias.find(t => t.nome === nome)) todasMagias.push({ nome, circulo: 0 });
       });
@@ -637,7 +637,7 @@ export async function gerarHtmlImpressao() {
     // Magias do Pacto do Tomo (Bruxo)
     if (char.classe === 'Bruxo') {
       const estado = getEstadoRecursosBruxo();
-      if (estado?.pacto === 'Pacto do Tomo') {
+      if (estado?.pactos?.includes('Pacto do Tomo')) {
         const truquesPacto = char.recursos?.bruxo?.livro_sombras?.truques || [];
         const rituaisPacto = char.recursos?.bruxo?.livro_sombras?.rituais || [];
 

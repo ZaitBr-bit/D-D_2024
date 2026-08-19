@@ -13,13 +13,44 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.10';
+export const VERSAO_ATUAL = '2.2.11';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.11',
+    data: '2026-08-19',
+    rotulo: 'Pactos do Bruxo',
+    resumo: 'Os três Pactos do Bruxo voltaram a ser o que a edição de 2024 diz '
+      + 'que são: invocações místicas comuns. Dá para levar mais de um, '
+      + 'limitado só pela quantidade de invocações do seu nível.',
+    correcoes: [
+      {
+        grupo: '🔮 Mais de um Pacto, como manda o livro',
+        itens: [
+          'Marcar o Pacto do Tomo desmarcava sozinho o Pacto da Lâmina que '
+            + 'você já tinha — sem aviso nenhum. Era a regra de 2014 (a '
+            + '"Dádiva de Pacto", que mandava escolher UMA) sobrevivendo no '
+            + 'app: em 2024 os três pactos são invocações como as outras, sem '
+            + 'pré-requisito e sem exclusividade entre elas.',
+          'As invocações que EXIGEM um pacto passaram a olhar tudo que você '
+            + 'escolheu. Quem tinha Pacto da Corrente e Pacto da Lâmina ao '
+            + 'mesmo tempo via a Lâmina Sedenta ser recusada com "requer Pacto '
+            + 'da Lâmina", mesmo com a Lâmina em mãos.',
+          'As dádivas dos DOIS pactos aparecem na ficha. Antes só valiam as do '
+            + 'primeiro pacto da lista: quem tinha Corrente e Tomo perdia o '
+            + 'Livro das Sombras da tela, junto com o botão de escolher os '
+            + 'truques e rituais dele.',
+          'Fichas antigas entram sozinhas no formato novo — o pacto que você '
+            + 'já tinha escolhido continua onde estava, agora contado como a '
+            + 'invocação que ele é.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.10',
     data: '2026-08-19',

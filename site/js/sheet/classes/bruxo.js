@@ -11,6 +11,21 @@ import { renderFichaCompleta } from '../ficha.js';
 import { achatarMagiasClasse, badgesMagiaRapidos } from '../magias.js';
 import { abrirModalIniciadoEmMagiaFicha, sincronizarTalentosInvocacoes } from '../talentos.js';
 
+// Os tres Pactos sao invocacoes misticas COMUNS no PHB 2024: aparecem na
+// secao "Opcoes de Invocacoes Misticas" sem pre-requisito e sem nenhuma
+// clausula de exclusividade entre elas (a caracteristica "Dadiva de Pacto"
+// de 2014, que mandava escolher uma, nao existe mais). A lista existe apenas
+// para destacar o grupo na tela e para ler os pre-requisitos que citam um
+// pacto -- nunca para limitar a escolha a um deles.
+const PACTOS = ['Pacto da Corrente', 'Pacto da Lâmina', 'Pacto do Tomo'];
+
+// Quais pactos o personagem tem, na ordem canonica acima. Substituiu o campo
+// unico `recursos.bruxo.pacto`: como os pactos sao invocacoes comuns, a fonte
+// da verdade e o proprio array de invocacoes.
+function pactosDe(invocacoes) {
+  return PACTOS.filter(p => (invocacoes || []).some(i => (typeof i === 'string' ? i : i?.nome) === p));
+}
+
 function getProgressaoBruxo() {
   if (char?.classe !== 'Bruxo' || !classeData?.tabela_caracteristicas) return null;
   const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
@@ -36,7 +51,6 @@ export function getEstadoRecursosBruxo() {
   if (!char.recursos.bruxo) {
     char.recursos.bruxo = {
       astucia_usada: false,
-      pacto: '',
       invocacoes: [],
       arcanum: {
         6: { magia: '', usado: false },
@@ -56,18 +70,16 @@ export function getEstadoRecursosBruxo() {
     return null;
   }).filter(Boolean);
 
-  // Migracao: se pacto estava definido separadamente mas nao esta nas invocacoes, incluir
-  const PACTOS_VALIDOS = ['Pacto da Corrente', 'Pacto da Lâmina', 'Pacto do Tomo'];
-  const pactoAtual = char.recursos.bruxo.pacto || '';
+  // Migracao: o campo unico `pacto` e resquicio das regras de 2014. Fichas
+  // antigas podem te-lo preenchido sem que o pacto esteja entre as invocacoes;
+  // ele e absorvido pelo array e depois removido, para que nada volte a ler um
+  // pacto unico (era isso que fazia o segundo pacto sumir da tela).
+  const pactoLegado = char.recursos.bruxo.pacto || '';
   const nomesInvocacoes = char.recursos.bruxo.invocacoes.map(i => i.nome);
-  if (pactoAtual && PACTOS_VALIDOS.includes(pactoAtual) && !nomesInvocacoes.includes(pactoAtual)) {
-    char.recursos.bruxo.invocacoes.unshift({ nome: pactoAtual });
+  if (pactoLegado && PACTOS.includes(pactoLegado) && !nomesInvocacoes.includes(pactoLegado)) {
+    char.recursos.bruxo.invocacoes.unshift({ nome: pactoLegado });
   }
-  // Derivar pacto do array de invocacoes
-  const pactoDerivado = PACTOS_VALIDOS.find(p => char.recursos.bruxo.invocacoes.some(i => i.nome === p)) || '';
-  if (pactoDerivado !== char.recursos.bruxo.pacto) {
-    char.recursos.bruxo.pacto = pactoDerivado;
-  }
+  if ('pacto' in char.recursos.bruxo) delete char.recursos.bruxo.pacto;
 
   if (!char.recursos.bruxo.arcanum) {
     char.recursos.bruxo.arcanum = {
@@ -128,7 +140,7 @@ export function getEstadoRecursosBruxo() {
 
   return {
     astuciaUsada: !!char.recursos.bruxo.astucia_usada,
-    pacto: char.recursos.bruxo.pacto || '',
+    pactos: pactosDe(char.recursos.bruxo.invocacoes),
     invocacoes: char.recursos.bruxo.invocacoes,
     invocacoesMax: progressao.invocacoesMax,
     arcanum: char.recursos.bruxo.arcanum,
@@ -236,8 +248,7 @@ export async function abrirModalRecursosBruxo() {
   const opcoes = extrairOpcoesInvocacoesBruxo();
   const nivel = char.nivel || 1;
 
-  // Separar pactos das demais invocações
-  const PACTOS = ['Pacto da Corrente', 'Pacto da Lâmina', 'Pacto do Tomo'];
+  // Separar pactos das demais invocações (só para agrupar na tela)
   const invPactos = opcoes.filter(o => PACTOS.includes(o.nome));
   const invNormais = opcoes.filter(o => !PACTOS.includes(o.nome));
 
@@ -472,13 +483,8 @@ export async function abrirModalRecursosBruxo() {
             toast(`Limite de ${estado.invocacoesMax} invocacoes atingido.`, 'error');
             return;
           }
-          // Se e pacto, remover outro pacto selecionado
-          if (PACTOS.includes(nome)) {
-            PACTOS.forEach(p => {
-              const idx = invSelecionadas.findIndex(o => o.nome === p);
-              if (idx >= 0) invSelecionadas.splice(idx, 1);
-            });
-          }
+          // Pactos entram como qualquer outra invocacao: escolher um nao
+          // desmarca outro (PHB 2024 nao limita a um pacto).
           invSelecionadas.push({ nome });
         }
         renderGrid();
@@ -568,10 +574,7 @@ export async function abrirModalRecursosBruxo() {
   document.getElementById('btn-salvar-bruxo-recursos')?.addEventListener('click', () => {
     const invFinais = invSelecionadas.map(o => ({...o}));
 
-    // Determinar pacto a partir das invocacoes selecionadas
-    const pactoSelecionado = PACTOS.find(p => invSelecionadas.some(o => o.nome === p)) || '';
-
-    char.recursos.bruxo.pacto = pactoSelecionado;
+    // Os pactos ficam no proprio array de invocacoes -- nao ha campo separado.
     char.recursos.bruxo.invocacoes = invFinais;
 
     // Salvar Arcana Mística
@@ -604,7 +607,7 @@ export async function abrirModalRecursosBruxo() {
 export function abrirModalPactoDoTomo() {
   if (char?.classe !== 'Bruxo') return;
   const estado = getEstadoRecursosBruxo();
-  if (!estado || estado.pacto !== 'Pacto do Tomo') return;
+  if (!estado || !estado.pactos.includes('Pacto do Tomo')) return;
 
   const tomoData = estado.pactoTomo || { truques: [], rituais: [] };
   const truquesSel = [...tomoData.truques]; // [{nome, classe}]
@@ -752,7 +755,7 @@ export function abrirModalPactoDoTomo() {
   });
 }
 
-// Avalia pré-requisito considerando pacto derivado do selSet (não do char salvo)
+// Avalia pré-requisito contra as invocações do selSet (não do char salvo)
 function avaliarPrerequisitoInvocacaoBruxoComSel(prerequisito, selSet) {
   if (!prerequisito) return { ok: true, motivo: '' };
   let ok = true;
@@ -768,20 +771,15 @@ function avaliarPrerequisitoInvocacaoBruxoComSel(prerequisito, selSet) {
     }
   }
 
-  // Inferir pacto a partir das invocações selecionadas
-  const PACTOS = ['Pacto da Corrente', 'Pacto da Lâmina', 'Pacto do Tomo'];
-  const pacto = PACTOS.find(p => selSet.has(p)) || '';
-  if (/Pacto da Lâmina/i.test(texto) && pacto !== 'Pacto da Lâmina') {
-    ok = false;
-    motivos.push('requer Pacto da Lâmina');
-  }
-  if (/Pacto da Corrente/i.test(texto) && pacto !== 'Pacto da Corrente') {
-    ok = false;
-    motivos.push('requer Pacto da Corrente');
-  }
-  if (/Pacto do Tomo/i.test(texto) && pacto !== 'Pacto do Tomo') {
-    ok = false;
-    motivos.push('requer Pacto do Tomo');
+  // Pacto exigido: basta TER a invocação entre as selecionadas. Antes daqui
+  // saía um pacto único (`PACTOS.find`), e quem levasse dois via a segunda
+  // dependência recusada -- com Corrente e Lâmina, Lâmina Sedenta acusava
+  // "requer Pacto da Lâmina".
+  for (const pacto of PACTOS) {
+    if (new RegExp(pacto, 'i').test(texto) && !selSet.has(pacto)) {
+      ok = false;
+      motivos.push(`requer ${pacto}`);
+    }
   }
 
   // Invocações que requerem outra invocação (ex: Lâmina Devoradora requer Lâmina Sedenta)
@@ -798,17 +796,18 @@ export function renderSecaoPactoBruxo() {
   if (char?.classe !== 'Bruxo') return '';
   const estado = getEstadoRecursosBruxo();
   if (!estado) return '';
-  const pacto = estado.pacto;
-  if (!pacto) return '';
+  // Um bloco por pacto: quem leva dois vê as dádivas dos dois.
+  const pactos = estado.pactos;
+  if (!pactos.length) return '';
 
   let html = '<details open style="margin-bottom:8px;border-left:3px solid var(--secondary);padding-left:8px">';
   html += '<summary style="font-weight:700;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--border-light);color:var(--secondary)">';
-  html += `Dadivas do Pacto - ${pacto}`;
+  html += `Dadivas do Pacto - ${pactos.join(' + ')}`;
   html += '</summary><div style="padding-top:6px">';
 
-  if (pacto === 'Pacto da Corrente') {
+  if (pactos.includes('Pacto da Corrente')) {
     html += `
-      <div class="magia-item magia-dominio" style="border-left:3px solid var(--secondary)">
+      <div class="magia-item magia-dominio" data-pacto-dadivas="Pacto da Corrente" style="border-left:3px solid var(--secondary)">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div>
             <div class="magia-nome"><span class="badge-dominio">&#9733;</span> Convocar Familiar</div>
@@ -824,9 +823,9 @@ export function renderSecaoPactoBruxo() {
       </div>`;
   }
 
-  if (pacto === 'Pacto da Lâmina') {
+  if (pactos.includes('Pacto da Lâmina')) {
     html += `
-      <div class="magia-item magia-dominio" style="border-left:3px solid var(--secondary)">
+      <div class="magia-item magia-dominio" data-pacto-dadivas="Pacto da Lâmina" style="border-left:3px solid var(--secondary)">
         <div>
           <div class="magia-nome"><span class="badge-dominio">&#9733;</span> Arma de Pacto</div>
           <div style="font-size:0.65rem;color:var(--secondary);font-weight:600;margin-top:1px">Pacto da Lamina</div>
@@ -840,7 +839,7 @@ export function renderSecaoPactoBruxo() {
       </div>`;
   }
 
-  if (pacto === 'Pacto do Tomo') {
+  if (pactos.includes('Pacto do Tomo')) {
     const tomoData = estado.pactoTomo || { truques: [], rituais: [] };
     // Circulo do slot de pacto do Bruxo (o unico circulo onde ele tem espacos)
     const circuloPacto = Object.keys(char.espacos_magia || {}).sort((a, b) => Number(b) - Number(a))[0] || '1';
@@ -854,7 +853,7 @@ export function renderSecaoPactoBruxo() {
     const temConflito = truquesConflito.length > 0 || rituaisConflito.length > 0;
 
     html += `
-      <div class="magia-item magia-dominio" style="border-left:3px solid var(--secondary)">
+      <div class="magia-item magia-dominio" data-pacto-dadivas="Pacto do Tomo" style="border-left:3px solid var(--secondary)">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div>
             <div class="magia-nome"><span class="badge-dominio">&#9733;</span> Livro das Sombras</div>

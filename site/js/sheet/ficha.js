@@ -283,7 +283,7 @@ export function renderFichaCompleta() {
             <strong>Recursos do Bruxo:</strong>
             Astúcia Mágica: ${estadoBruxo.astuciaUsada ? 'Usada' : 'Disponível'}
             &nbsp;|&nbsp; Invocações: ${estadoBruxo.invocacoes.length}/${estadoBruxo.invocacoesMax}
-            &nbsp;|&nbsp; Pacto: ${estadoBruxo.pacto || 'Não definido'}
+            &nbsp;|&nbsp; Pacto: ${estadoBruxo.pactos.length ? estadoBruxo.pactos.join(', ') : 'Não definido'}
             ${estadoBruxo.invocacoes.length > 0 ? `
               <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px">
                 ${estadoBruxo.invocacoes.map(inv => {
