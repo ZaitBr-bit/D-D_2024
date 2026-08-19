@@ -522,13 +522,20 @@ export async function mostrarFormMagiaCustom(indiceEdicao = null) {
     document.getElementById('mc-comp-outro').value = componentes.filter(valor => !['V', 'S', 'M'].includes(valor)).join(', ');
   }
 
+  // Um tempo de conjuração que diz "ou Ritual" IMPLICA a marca de Ritual, e
+  // marcá-la sozinho poupa o jogador de repetir a informação. O que a função
+  // não pode fazer é DESMARCAR: a caixa é uma escolha explícita do jogador
+  // (uma magia dele pode ser ritual com tempo "Ação"), e desmarcar apagava
+  // essa escolha em dois momentos -- ao abrir a magia gravada para editar,
+  // porque esta sincronização roda depois de preencher o formulário, e a cada
+  // troca de tempo depois de já ter marcado a caixa.
   const sincronizarRitualComTempo = () => {
     const selectTempo = document.getElementById('mc-tempo');
     const inputTempo = document.getElementById('mc-tempo-personalizado');
     const ritual = document.getElementById('mc-ritual');
     if (!selectTempo || !inputTempo || !ritual) return;
     const tempo = selectTempo.value === '__personalizado__' ? inputTempo.value : selectTempo.value;
-    ritual.checked = /\britual\b/i.test(tempo || '');
+    if (/\britual\b/i.test(tempo || '')) ritual.checked = true;
   };
   document.getElementById('mc-tempo')?.addEventListener('change', sincronizarRitualComTempo);
   document.getElementById('mc-tempo-personalizado')?.addEventListener('input', sincronizarRitualComTempo);
@@ -545,7 +552,17 @@ export async function mostrarFormMagiaCustom(indiceEdicao = null) {
         : selecionado)?.trim() || '';
     };
     const escola = valorSelecionado('mc-escola', 'mc-escola-personalizada');
-    const tempoConjuracao = valorSelecionado('mc-tempo', 'mc-tempo-personalizado');
+    const tempoBase = valorSelecionado('mc-tempo', 'mc-tempo-personalizado');
+    // O gatilho da Reação faz parte do TEMPO DE CONJURAÇÃO, no formato
+    // "Reação, <gatilho>" -- é assim que o livro escreve (PHB 2024,
+    // Magias.md) e é exatamente o formato que o caminho de EDIÇÃO deste
+    // mesmo formulário sabe reler para o campo (ver o `matchReacao` acima).
+    // Só a gravação não lia o campo: o jogador digitava o gatilho e ele
+    // morria no DOM ao salvar.
+    const gatilhoReacao = /^rea[cç][aã]o$/i.test(tempoBase)
+      ? (document.getElementById('mc-gatilho-reacao')?.value?.trim() || '')
+      : '';
+    const tempoConjuracao = gatilhoReacao ? `${tempoBase}, ${gatilhoReacao}` : tempoBase;
     if (!tempoConjuracaoMagiaValido(tempoConjuracao)) {
       toast('Informe um tempo de conjuração válido para uma magia (por exemplo: Ação, Ação Bônus, Reação, 1 minuto ou 1 hora).', 'error');
       return;

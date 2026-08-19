@@ -76,3 +76,97 @@ Tambem nao e conserto de uma linha: `mostrarTrocaMagiaConhecida` monta o lado
 
 RECOMENDADO: tratar como lacuna propria numa proxima rodada, com motivo
 escrito, em vez de emendar aqui.
+
+================================================================
+2026-08-19 -- Conjuracao "de graca" do Mago: o que era "nao esta gastando"?
+================================================================
+
+RELATO do jogador: "mesmo clicando pra usar a primeira vez de graca sem
+circulo de magia ela nao ta gastando, outro detalhe e que usando a magia
+armadura arcana com esse beneficio ela nao ta adicionando a CA".
+
+A SEGUNDA METADE era inequivoca e foi consertada: Maestria de Magias (nivel
+18) e Assinatura Magica (nivel 20) so emitiam um toast e nunca passavam pelo
+motor de efeitos, entao Armadura Arcana nao mexia na CA. Agora as duas usam
+`conjurarSemEspaco` (site/js/sheet/magias.js), a mesma rota da conjuracao
+gratuita por talento. Coberto por
+testes/e2e/regras/mago-conjuracao-sem-espaco.spec.mjs.
+
+A PRIMEIRA METADE ficou ambigua: "nao esta gastando" pode ser
+  (a) a Maestria de Magias, que por regra e a vontade e nao tem nada a
+      gastar -- comportamento correto, nada a fazer;
+  (b) a Assinatura Magica, cujo uso 1x-por-descanso o app JA marca como
+      gasto (o proprio print mostra "Bola de Fogo (usada)"), ou
+  (c) o botao "Gratis" de magia de talento (`data-conjurar-gratis`), cujo
+      caminho foi lido nesta rodada e marca `gratis_usado` corretamente.
+
+O QUE FOI FEITO: nada alem do conserto acima -- os tres caminhos foram lidos
+e nenhum deixa de debitar o que deveria. O novo spec passou a medir o uso
+gasto da Assinatura Magica, para que a duvida nao volte sem oraculo.
+
+RECOMENDADO: se o sintoma persistir, dizer QUAL botao foi clicado e o que
+deveria ter mudado na tela -- com isso vira lacuna propria, com spec.
+
+================================================================
+2026-08-19 -- Item customizado: bonus de ataque nao tem onde ser somado
+================================================================
+
+PEDIDO do jogador: "Remover limite de CA e bonus de ataque de item
+personalizado. Alem disso validar se os valores aqui sao contados
+corretamente pois o CA parece nao estar contando".
+
+O QUE FOI FEITO: os tetos (-5..+5 na CA e -5..+10 no ataque) sairam dos dois
+formularios da ficha (criar e editar item customizado), inclusive das dicas e
+dos atributos min/max dos campos. O "CA nao esta contando" era CONSEQUENCIA
+do teto: com CA 20 a validacao recusava o Salvar e o item nao era gravado. Com
+o item gravado e EQUIPADO, utils.js:218 ja somava o bonus corretamente --
+agora medido por testes/e2e/regras/item-customizado-bonus.spec.mjs (soma
+quando equipado, nao soma na mochila).
+
+ACHADO ADJACENTE, nao consertado: o `bonus_ataque` de item customizado so e
+EXIBIDO (badge do inventario, inventario.js:258, e a impressao,
+impressao.js:391). A ficha nao tem um numero de "bonus de ataque" agregado --
+o card "Ataques" conta ATAQUES POR ACAO, nao acerto -- entao nao existe hoje
+lugar onde somar esse valor, e inventar um mudaria a modelagem da ficha.
+
+PERGUNTA: o bonus de ataque do item customizado deve valer para QUAL ataque?
+Todos? So os feitos com ele (mas item customizado nao e arma)? So a arma
+equipada?
+
+RECOMENDADO: deixar exibido, como esta, ate a resposta. Quando houver, vira
+lacuna propria com spec -- inclusive porque exigiria um lugar novo na ficha
+para o numero aparecer.
+
+================================================================
+2026-08-19 -- Item customizado: "CA 20" e bonus ou CA base? -- RESPONDIDO
+================================================================
+
+O item do relato ("Armadura Negra de Hades ... /Lendaria /CA 20") foi digitado
+com 20 no campo BONUS CA, que SOMA -- e somar 20 a CA base levava um Guerreiro
+sem armadura a 32.
+
+DECISAO do dono do produto (2026-08-19): campo NOVO, "CA Base", ao lado do
+"Bonus CA". Nao foi reinterpretacao do campo antigo: o bonus sempre somou, e
+mudar a semantica dele em silencio quebraria todo item customizado ja gravado.
+
+Semantica implementada (utils.js, na conta da CA), e o motivo de cada metade:
+  - PISO, e nao substituicao cega: "esta armadura da CA 20" nunca quer dizer
+    "e piora a sua CA se ela ja for maior";
+  - NAO soma Destreza: o numero digitado E a CA, como nas armaduras Pesadas;
+  - escudo, Estilo de Luta Defensivo, bonus de itens e efeitos magicos
+    continuam somando POR CIMA, como somam sobre armadura do livro;
+  - o app NAO assume que o item e armadura: nao desliga a Defesa sem Armadura
+    do Barbaro/Monge nem liga o Defensivo. Item customizado nao tem tipo --
+    "CA 20" tanto pode ser peitoral quanto amuleto -- e o piso ja da o numero
+    certo nos dois casos.
+
+O campo existe nas DUAS telas (criador e ficha), com o mesmo nome de dado
+(`ca_base`): elas ja divergiram uma vez neste mesmo item (os tetos de bonus so
+existiam na ficha). Coberto por
+testes/e2e/regras/item-customizado-ca-base.spec.mjs (5 casos, incluindo os
+contrastes do piso e do item na mochila) e por um caso novo em
+testes/e2e/regras/itens-criador.spec.mjs.
+
+FICA EM ABERTO, se a mesa precisar: uma CA base que SOME Destreza (armadura
+Leve/Media do livro). Hoje o campo e sempre fixo. Seria um segundo campo
+(categoria) ou uma caixa "soma Destreza" -- lacuna propria, com spec.

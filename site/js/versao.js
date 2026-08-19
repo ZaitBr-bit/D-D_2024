@@ -13,13 +13,97 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.9';
+export const VERSAO_ATUAL = '2.2.10';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.10',
+    data: '2026-08-19',
+    rotulo: 'Magias personalizadas',
+    resumo: 'O gatilho da Reação e o marcador de Ritual das magias que você '
+      + 'cadastra pararam de sumir, conjurar de graça voltou a valer os '
+      + 'efeitos da magia, e o Campeão finalmente escolhe o Estilo de Luta '
+      + 'do nível 7 pela ficha.',
+    melhorias: [
+      {
+        grupo: '⚔️ Estilo de Luta Adicional (Campeão)',
+        itens: [
+          'O Campeão de nível 7 ganha outro Estilo de Luta, e agora dá para '
+            + 'escolher (e trocar) direto na ficha, no próprio cartão da '
+            + 'característica. Antes o cartão só mostrava o texto do livro: '
+            + 'quem já estava no nível 7 não tinha onde escolher.',
+          'O estilo escolhido vale de verdade: o Defensivo, por exemplo, '
+            + 'passou a somar +1 de CA mesmo quando é o estilo ADICIONAL — '
+            + 'antes só o primeiro estilo da lista contava.',
+        ],
+      },
+      {
+        grupo: '🛡️ Item personalizado: CA que o item DEFINE',
+        itens: [
+          'Campo novo "CA Base", ao lado do "Bônus CA". O bônus SOMA (+1, +2); '
+            + 'a CA base DEFINE — é o número que a armadura da sua mesa traz '
+            + 'escrito ("CA 20"). Antes só existia o campo de bônus, e digitar '
+            + '20 ali somava 20 à sua CA em vez de fixá-la.',
+          'A CA base é um piso: um item de CA base menor que a sua CA atual não '
+            + 'piora nada. E escudo, Estilo de Luta Defensivo, bônus de itens e '
+            + 'efeitos mágicos continuam somando por cima, como somam sobre '
+            + 'armadura do livro.',
+          'A CA base não soma Destreza (o número digitado é a CA, como nas '
+            + 'armaduras Pesadas), e o campo existe igual no criador e na ficha.',
+        ],
+      },
+      {
+        grupo: '🎒 Item personalizado sem teto',
+        itens: [
+          'O bônus de CA e o de ataque de item personalizado não têm mais '
+            + 'limite. Uma armadura lendária da sua mesa com CA 20 era '
+            + 'recusada inteira pelo formulário (o limite era -5 a +5), e o '
+            + 'item não chegava a ser gravado — daí a impressão de que a CA '
+            + 'não estava sendo contada.',
+          'Com o item gravado e EQUIPADO, o bônus entra na CA normalmente.',
+        ],
+      },
+    ],
+    correcoes: [
+      {
+        grupo: '✨ Magias personalizadas',
+        itens: [
+          'O gatilho da Reação sumia ao salvar: o campo aparecia, você '
+            + 'escrevia, e o texto não era gravado em lugar nenhum. Agora o '
+            + 'gatilho fica junto do tempo de conjuração ("Reação, quando..."), '
+            + 'que é o formato que a própria tela de edição já sabia ler.',
+          'O selo de Ritual não aparecia no grimório do Mago para magia que '
+            + 'você mesmo cadastrou — e o botão de conjurar como Ritual também '
+            + 'não. A tela só sabia reconhecer ritual das magias do acervo.',
+          'Abrir uma magia personalizada de Ritual para editar desmarcava '
+            + 'sozinho a caixa "Pode ser conjurada como Ritual", e salvar '
+            + 'qualquer outra alteração apagava o Ritual.',
+        ],
+      },
+      {
+        grupo: '🪄 Conjurar sem gastar espaço',
+        itens: [
+          'A Maestria de Magias (nível 18) e a Assinatura Mágica (nível 20) do '
+            + 'Mago só mostravam um aviso na tela: conjurar Armadura Arcana '
+            + 'por elas não mexia na CA. Agora passam pelo mesmo caminho da '
+            + 'conjuração normal — efeito, alvo e Concentração — sem gastar '
+            + 'espaço de magia.',
+        ],
+      },
+      {
+        grupo: '🥋 Dado de Artes Marciais do Monge',
+        itens: [
+          'A ficha mostrava "d16" no lugar de "1d6" (e "d110" no nível 11): a '
+            + 'leitura da tabela colava a quantidade nas faces do dado. O '
+            + 'número errado também aparecia na cura da Integridade Corporal.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.9',
     data: '2026-08-19',

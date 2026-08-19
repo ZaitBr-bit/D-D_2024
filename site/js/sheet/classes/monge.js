@@ -14,8 +14,12 @@ export function getProgressaoMonge() {
   if (char?.classe !== 'Monge' || !classeData?.tabela_caracteristicas) return null;
   const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
   if (!row) return null;
+  // A tabela do livro traz o dado escrito por inteiro ("1d6", "1d8", "1d10",
+  // "1d12"), e o que interessa aqui e o NUMERO DE FACES -- a ficha ja escreve
+  // o "1d" na frente. Apagar todo nao-digito colava a quantidade nas faces
+  // (1d6 -> 16, 1d10 -> 110) e a ficha exibia "d16" e "cure 1d110 + SAB".
   const dadoStr = String(row['Artes Marciais'] || '1d6');
-  const dado = parseInt(dadoStr.replace(/[^\d]/g, '')) || 6;
+  const dado = parseInt(dadoStr.match(/d\s*(\d+)/i)?.[1], 10) || 6;
   const pontos = parseInt(row['Pontos de Foco']) || 0;
   const movTexto = String(row['Movimento sem Armadura'] || '—');
   const movMatch = movTexto.match(/[\+]?\s*(\d+(?:[\.,]\d+)?)/);

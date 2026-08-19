@@ -26,8 +26,75 @@ import { char, especiesCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { numberPickerHtml, setupNumberPicker } from './hp-descanso.js';
 import { abrirModalMaestrias } from './maestrias.js';
-import { OPCOES_METAMAGIA, consumirEspacoMagiaDisponivel, recuperarEspacoMagia } from './magias.js';
+import { OPCOES_METAMAGIA, conjurarSemEspaco, consumirEspacoMagiaDisponivel, recuperarEspacoMagia } from './magias.js';
 import { normalizarEstiloLuta } from '../talentos-effects.js';
+import { aplicarEscolhaSubclasse, linhasDaSubclasseNoNivel, opcoesDaLinha } from '../regras-subclasse-escolhas.js';
+
+/**
+ * A linha de catálogo do Estilo de Luta Adicional do Campeão (nível 7).
+ * Lida do catálogo, e não repetida aqui, para que a lista de opções e o
+ * destino da gravação sejam os MESMOS que o assistente de nível usa.
+ */
+function linhaEstiloLutaExtra() {
+  return linhasDaSubclasseNoNivel('Campeão', 7)
+    .find(l => l.tipo === 'subclasse_estilo_luta_extra') || null;
+}
+
+/**
+ * O Estilo de Luta ADICIONAL do Campeão, se já escolhido.
+ *
+ * Os estilos vivem todos em `escolhas_classe.estilo_luta`: o primeiro é o da
+ * classe (Guerreiro nível 1) e o adicional entra ao lado dele -- é assim que
+ * `aplicarEscolhaSubclasse` grava e que `getEstiloAtivo` lê.
+ */
+function estiloLutaExtraDoCampeao() {
+  const lista = char?.escolhas_classe?.estilo_luta;
+  return (Array.isArray(lista) ? lista[1] : '') || '';
+}
+
+/**
+ * Modal de escolha (ou troca) do Estilo de Luta Adicional do Campeão.
+ * Não oferece o estilo que o personagem já tem pela classe: o livro dá
+ * OUTRO talento de Estilo de Luta, não o mesmo de novo.
+ */
+function abrirEscolhaEstiloLutaExtra() {
+  const linha = linhaEstiloLutaExtra();
+  if (!linha) return;
+  const lista = Array.isArray(char.escolhas_classe?.estilo_luta) ? char.escolhas_classe.estilo_luta : [];
+  const estiloDeClasse = normalizarEstiloLuta(lista[0] || '');
+  const atual = estiloLutaExtraDoCampeao();
+  const disponiveis = opcoesDaLinha(linha)
+    .filter(op => normalizarEstiloLuta(op) !== estiloDeClasse);
+
+  abrirModal('Estilo de Luta Adicional', `
+    <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">
+      Campeão nível 7: você ganha outro talento de Estilo de Luta à sua escolha.
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="estilo-extra-select">Estilo</label>
+      <select class="form-select" id="estilo-extra-select">
+        ${disponiveis.map(op => `<option value="${escHtml(op)}"${op === atual ? ' selected' : ''}>${escHtml(op)}</option>`).join('')}
+      </select>
+    </div>
+  `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-estilo-extra">Salvar</button>');
+
+  document.getElementById('btn-salvar-estilo-extra')?.addEventListener('click', () => {
+    const escolhido = document.getElementById('estilo-extra-select')?.value || '';
+    if (!escolhido) { toast('Escolha um Estilo de Luta.', 'error'); return; }
+    if (!char.escolhas_classe) char.escolhas_classe = {};
+    if (!Array.isArray(char.escolhas_classe.estilo_luta)) {
+      char.escolhas_classe.estilo_luta = [char.escolhas_classe.estilo_luta].filter(Boolean);
+    }
+    // Trocar SUBSTITUI o adicional (o Campeão ganha um, não uma coleção): o
+    // que estiver depois do estilo de classe sai antes de aplicar o novo.
+    char.escolhas_classe.estilo_luta.splice(1);
+    aplicarEscolhaSubclasse(char, linha, escolhido);
+    salvar();
+    window.fecharModal();
+    renderFichaCompleta();
+    toast(`Estilo de Luta Adicional: ${escolhido}!`, 'success');
+  });
+}
 
 // --- Habilidades (Ativas) ---
 export function setupEventosHabilidades() {
@@ -1887,9 +1954,12 @@ export function setupEventosHabilidades() {
         return;
       }
 
-      // Maestria de Magias (nível 18): à vontade no círculo mais baixo,
-      // sem gastar espaço -- não há recurso a debitar, só a confirmação de
-      // que a conjuração saiu de graça.
+      // Maestria de Magias (nível 18): à vontade no círculo mais baixo, sem
+      // gastar espaço -- não há recurso a debitar. Mas o que o livro dispensa
+      // é o ESPAÇO, e só ele: isto aqui só emitia o toast, então conjurar
+      // Armadura Arcana pela Maestria não mexia na CA (e o mesmo valia para
+      // qualquer magia com efeito mecânico). `conjurarSemEspaco` é a mesma
+      // rota da conjuração gratuita por talento.
       if (acao === 'maestria-1' || acao === 'maestria-2') {
         const nome = acao === 'maestria-1' ? estado.maestriaMagia1 : estado.maestriaMagia2;
         if (!nome) {
@@ -1897,7 +1967,7 @@ export function setupEventosHabilidades() {
           return;
         }
         const circulo = acao === 'maestria-1' ? 1 : 2;
-        toast(`${nome} conjurada no ${circulo}º círculo sem gastar espaço!`, 'success');
+        conjurarSemEspaco(nome, circulo, `${nome} conjurada no ${circulo}º círculo sem gastar espaço!`);
         return;
       }
 
@@ -1915,7 +1985,12 @@ export function setupEventosHabilidades() {
         }
         if (ehPrimeira) char.recursos.mago.assinatura_magia_1_usada = true;
         else char.recursos.mago.assinatura_magia_2_usada = true;
-        toast(`${nome} conjurada no 3º círculo sem gastar espaço!`, 'success');
+        // Gravar o uso ANTES de conjurar: a conjuração pode abrir o modal de
+        // alvo, e o `salvar()` do fim deste handler não pode ser esperado
+        // enquanto uma pergunta está na tela.
+        salvar();
+        conjurarSemEspaco(nome, 3, `${nome} conjurada no 3º círculo sem gastar espaço!`);
+        return;
       }
 
       salvar();
@@ -2318,6 +2393,14 @@ export function setupEventosHabilidades() {
       e.stopPropagation();
       e.preventDefault();
       await abrirModalMaestrias();
+    });
+  });
+
+  document.querySelectorAll('[data-escolher-estilo-luta-extra]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      abrirEscolhaEstiloLutaExtra();
     });
   });
 
@@ -4045,12 +4128,24 @@ export function renderFeatureItem(f, source) {
       </div>
     `;
   } else if (ehEstiloLutaAdicional) {
-    // Campeão nv7: Estilo de Luta Adicional — passiva
+    // Campeão nv7: Estilo de Luta Adicional.
+    //
+    // O cartão era só texto: quem já ESTAVA no nível 7 (importado, criado
+    // direto no nível, ou que subiu antes de o assistente passar a
+    // perguntar) não tinha rota nenhuma para a escolha que o livro dá
+    // (Classes.md:3904) -- "não solicita e não deixa". O botão abre a mesma
+    // lista do assistente e grava no mesmo lugar.
+    const estiloExtra = estiloLutaExtraDoCampeao();
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estiloExtra || 'a escolher'}</span>`;
     usosHtmlBody = `
       <div style="padding:4px 0 4px 16px;font-size:0.8rem">
         <div style="color:var(--accent);font-weight:600">Passiva — Talento Adicional</div>
         <div style="color:var(--text-muted);font-size:0.75rem;margin-top:2px">
           Ganhe outro talento de Estilo de Luta à sua escolha.
+        </div>
+        <div class="no-print" style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap">
+          <button class="btn btn-sm btn-accent" data-escolher-estilo-luta-extra="1">${estiloExtra ? 'Trocar Estilo' : 'Escolher Estilo'}</button>
+          <span style="font-size:0.75rem;color:var(--text-muted)">${estiloExtra || 'Nenhum escolhido'}</span>
         </div>
       </div>
     `;

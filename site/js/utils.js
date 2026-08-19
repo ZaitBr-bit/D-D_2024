@@ -203,14 +203,45 @@ export function calcCA(personagem, passivos = null) {
     }
   }
 
+  // CA BASE de item customizado: o item que DEFINE a CA.
+  //
+  // O campo "Bonus CA" SOMA, e e isso que ele sempre fez. Mas o item que a
+  // mesa inventa vem escrito como a armadura do livro vem ("Armadura Negra
+  // de Hades /Lendaria /CA 20"): um numero que SUBSTITUI a CA. Digitado no
+  // campo de bonus, virava 12 + 20 = 32.
+  //
+  // E PISO, e nao substituicao cega: "esta armadura da CA 20" nunca quer
+  // dizer "e piora a sua CA se ela ja for maior". Nao soma Destreza -- o
+  // numero digitado E a CA, como nas armaduras Pesadas. E entra AQUI, antes
+  // do escudo e do Defensivo, para que tudo o que soma sobre armadura do
+  // livro continue somando sobre esta tambem.
+  //
+  // O app nao assume que o item e armadura: nao desliga a Defesa sem
+  // Armadura do Barbaro/Monge nem liga o Defensivo. Item customizado nao tem
+  // tipo -- "CA 20" tanto pode ser peitoral quanto amuleto -- e o piso ja da
+  // o numero certo nos dois casos.
+  const caBaseCustomizado = inv
+    .filter(i => i.equipado)
+    .reduce((maior, i) => Math.max(maior, parseInt(i.dados?.ca_base) || 0), 0);
+  if (caBaseCustomizado > ca) {
+    ca = caBaseCustomizado;
+  }
+
   // Escudo: +2
   if (escudo) {
     ca += 2;
   }
 
   // Estilo de Luta: Defensivo (+1 CA enquanto usa armadura)
-  const estiloLuta = personagem.escolhas_classe?.estilo_luta?.[0] || '';
-  if (estiloLuta === 'Defensivo' && armadura) {
+  //
+  // TODAS as entradas, e nao so a primeira: o Campeao ganha um Estilo de Luta
+  // ADICIONAL no nivel 7 (Classes.md:3904), que entra ao lado do primeiro na
+  // mesma lista -- e `talentos-effects.js` (getEstiloAtivo) ja lia a lista
+  // inteira pelo mesmo motivo. Lendo so [0], escolher Defensivo como o estilo
+  // adicional dava um estilo que aparece na ficha e nao soma CA nenhuma.
+  const estilosLuta = personagem.escolhas_classe?.estilo_luta;
+  const listaEstilos = Array.isArray(estilosLuta) ? estilosLuta : [estilosLuta].filter(Boolean);
+  if (listaEstilos.includes('Defensivo') && armadura) {
     ca += 1;
   }
 

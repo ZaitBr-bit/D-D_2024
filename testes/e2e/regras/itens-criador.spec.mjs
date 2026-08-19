@@ -212,3 +212,38 @@ test('criador: com "Comprar" ativo, comprar um item desconta o custo da carteira
   const itemGravado = (emConstrucao?.inventario || []).find(i => i.nome === 'Adaga');
   expect(itemGravado?.quantidade, 'a compra tambem deveria ter adicionado a Adaga ao inventario em construcao').toBe(1);
 });
+
+// ============================================================
+// Item CUSTOMIZADO no criador: o mesmo item que a ficha cria.
+//
+// O formulário de item customizado existe nas DUAS telas (aqui e em
+// sheet/inventario.js), e elas já divergiram: os tetos de bônus de CA e de
+// ataque só existiam na ficha, e o criador nunca os teve. Quando o campo
+// "CA Base" nasceu (2026-08-19), entrou nos dois -- e este teste é o que
+// impede o criador de ficar para trás de novo.
+// ============================================================
+test('criador: item customizado grava CA Base, o mesmo campo da ficha', async ({ context }) => {
+  const { page } = await abrirSite(context, '#criar');
+  expect(await irAtePassoEquipamento(page), 'nao chegou ao passo de equipamento').toBe(true);
+
+  await clicarBotaoFicha(page, 'btn-add-custom', { esperar: '#custom-nome' });
+
+  // GUARDA CONTRA VACUIDADE: o campo precisa existir nesta tela também.
+  await expect(page.locator('#custom-ca-base'),
+    'o criador cria o mesmo tipo de item que a ficha; sem o campo aqui, um item criado no '
+    + 'wizard nasceria sem como declarar a CA que ele define')
+    .toBeVisible();
+
+  await page.fill('#custom-nome', 'Armadura Negra de Hades');
+  await page.fill('#custom-ca-base', '20');
+  await page.click('#btn-salvar-custom');
+  await assentar(page).catch(() => {});
+
+  const emConstrucao = await personagemEmCriacao(page);
+  const item = (emConstrucao?.inventario || []).find(i => i.nome === 'Armadura Negra de Hades');
+  expect(item, 'o item customizado deveria estar no personagem em construcao').toBeTruthy();
+  expect(String(item?.dados?.ca_base),
+    'a CA base tem de ser gravada com o MESMO nome de campo que a ficha usa (`ca_base`) -- '
+    + 'nome diferente aqui seria um item que a ficha depois nao sabe ler')
+    .toBe('20');
+});

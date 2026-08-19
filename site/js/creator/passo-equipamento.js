@@ -694,6 +694,12 @@ function mostrarFormCustomItem() {
       <div class="col">
         <label class="form-label">Bonus CA</label>
         <input type="number" class="form-input" id="custom-ca" value="0">
+        <div style="font-size:0.65rem;color:var(--text-muted)">soma na CA quando equipado</div>
+      </div>
+      <div class="col">
+        <label class="form-label">CA Base</label>
+        <input type="number" class="form-input" id="custom-ca-base" placeholder="—" min="0" step="1">
+        <div style="font-size:0.65rem;color:var(--text-muted)">define a CA (ex.: 20). Não soma Destreza</div>
       </div>
       <div class="col">
         <label class="form-label">Dano</label>
@@ -729,6 +735,10 @@ function mostrarFormCustomItem() {
       descricao: document.getElementById('custom-desc')?.value || '',
       dados: {
         bonus_ca: document.getElementById('custom-ca')?.value || '0',
+        // Mesmo campo, mesma semantica e mesmo nome do formulario da FICHA
+        // (sheet/inventario.js): o criador e a ficha ja divergiram uma vez
+        // neste item (os tetos de bonus so existiam num dos dois).
+        ca_base: (document.getElementById('custom-ca-base')?.value || '').trim(),
         dano: document.getElementById('custom-dano')?.value || '',
         bonus_ataque: document.getElementById('custom-ataque')?.value || '0',
         peso: (_pesoNum > 0 ? `${fmtPeso(_pesoNum)} kg` : '')

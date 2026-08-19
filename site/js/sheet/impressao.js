@@ -389,7 +389,11 @@ export async function gerarHtmlImpressao() {
       } else if (item.tipo === 'customizado') {
         const bca = parseInt(item.dados?.bonus_ca) || 0;
         const batq = parseInt(item.dados?.bonus_ataque) || 0;
+        const caBaseItem = parseInt(item.dados?.ca_base) || 0;
         const parts = [];
+        // CA que o item DEFINE vem antes do bonus que ele soma -- e o que a
+        // ficha na tela mostra, na mesma ordem (sheet/inventario.js).
+        if (caBaseItem > 0) parts.push(`CA ${caBaseItem}`);
         if (bca !== 0) parts.push(`CA ${bca > 0 ? '+' : ''}${bca}`);
         if (batq !== 0) parts.push(`Atq ${batq > 0 ? '+' : ''}${batq}`);
         if (item.dados?.dano) parts.push(item.dados.dano);

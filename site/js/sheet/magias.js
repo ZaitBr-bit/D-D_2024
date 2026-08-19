@@ -691,7 +691,14 @@ export function renderSecaoMagias() {
                 <summary class="section-divider" style="margin:4px 0 6px;cursor:pointer"><span>${circ}º Círculo (${magiasDoCirculo.length})</span></summary>
                 ${magiasDoCirculo.map(m => {
               const jaPreparada = preparadas.some(p => p.nome === m.nome);
-              const ehRitual = ehMagiaRitual(m.nome);
+              // O grimório do Mago guarda só `{nome, circulo}` -- e a magia
+              // PERSONALIZADA de círculo > 0 entra aqui junto das do acervo
+              // (grimorio.js, ao salvar). `ehMagiaRitual` só sabe do acervo,
+              // então o `ritual: true` que o jogador marcou no formulário era
+              // ignorado nesta seção: sem selo e sem botão de Ritual, embora a
+              // mesma magia mostrasse os dois na lista de Magias Customizadas.
+              const custom = magiasPersonalizadas.find(p => p.nome === m.nome);
+              const ehRitual = custom ? custom.ritual : ehMagiaRitual(m.nome);
               const circulos = Object.keys(espacos).filter(c => parseInt(c) >= m.circulo).sort((a, b) => parseInt(a) - parseInt(b));
               const temUpcast = circulos.length > 1;
               const todosEsgotados = circulos.every(c => (espacos[c]?.usados || 0) >= (espacos[c]?.total || 0));
@@ -714,7 +721,13 @@ export function renderSecaoMagias() {
                       <button class="btn btn-sm btn-secondary" data-despreparar-grimorio="${m.nome}" title="Despreparar">✕</button>
                     ` : `
                       <button class="btn btn-sm btn-accent" data-preparar-grimorio="${m.nome}" data-prep-circ="${m.circulo}">Preparar</button>
-                      ${ehRitual ? `<button class="btn btn-sm btn-secondary" data-conjurar-ritual="${m.nome}" data-conj-circ="${m.circulo}" title="Conjurar como Ritual (sem gastar espaço)">Ritual</button>` : ''}
+                      ${ehRitual ? (custom
+                        // Magia personalizada usa o handler `-custom` (por
+                        // índice): o do acervo se guarda com `ehMagiaRitual`,
+                        // que não conhece magia personalizada, e o botão não
+                        // faria nada.
+                        ? `<button class="btn btn-sm btn-secondary" data-conjurar-ritual-custom="${custom.indicePersonalizada}" title="Conjurar como Ritual (sem gastar espaço)">Ritual</button>`
+                        : `<button class="btn btn-sm btn-secondary" data-conjurar-ritual="${m.nome}" data-conj-circ="${m.circulo}" title="Conjurar como Ritual (sem gastar espaço)">Ritual</button>`) : ''}
                     `}
                     <button class="btn btn-sm btn-danger btn-icon" data-remover-grimorio="${m.nome}" title="Remover do grimório">&times;</button>
                   </div>
@@ -1498,6 +1511,82 @@ function mostrarModalAlvoMagia(nomeMagia, circ, onEscolha) {
   document.getElementById('alvo-outro')?.addEventListener('click', () => { window.fecharModal(); onEscolha('outro'); });
 }
 
+/**
+ * Rastreia concentração de magia sem mecânica própria em MAGIAS_EFEITO --
+ * a mesma vaga única que `getConcentracaoAtiva` lê.
+ */
+function rastrearConcentracaoGenerica(nome, circulo) {
+  if (!ehMagiaConcentracao(nome)) return;
+  if (!char.efeitos_magicos) char.efeitos_magicos = [];
+  char.efeitos_magicos = char.efeitos_magicos.filter(e => !e.concentracao);
+  char.efeitos_magicos.push({
+    nome, tipo: 'concentracao_generica', concentracao: true,
+    circulo: parseInt(circulo) || 0, rotulo: `Concentrando em ${nome}`,
+  });
+}
+
+/**
+ * Núcleo da conjuração que NÃO gasta espaço: aplica o efeito mecânico da
+ * magia (perguntando o alvo quando a magia aceita os dois) e registra a
+ * concentração, exatamente como a conjuração normal faz -- só sem debitar o
+ * espaço. Não confirma troca de concentração: quem chama já decidiu isso.
+ */
+function aplicarConjuracaoSemEspaco(nome, circulo, mensagem) {
+  const finalizar = () => {
+    salvar();
+    renderFichaCompleta();
+    toast(mensagem, 'success');
+  };
+  const config = MAGIAS_EFEITO[nome];
+  if (config) {
+    const precisaAlvo = config.permite_self && config.permite_outro;
+    const autoSelf = config.permite_self && !config.permite_outro;
+    if (precisaAlvo) {
+      mostrarModalAlvoMagia(nome, circulo, (alvo) => {
+        // Em outra criatura, `aplicarEfeitoMagico` não entra -- a
+        // concentração ainda precisa ser registrada aqui.
+        if (alvo === 'self') aplicarEfeitoMagico(nome, circulo);
+        else rastrearConcentracaoGenerica(nome, circulo);
+        finalizar();
+      });
+      return;
+    }
+    if (autoSelf) {
+      aplicarEfeitoMagico(nome, circulo);
+      finalizar();
+      return;
+    }
+  }
+  rastrearConcentracaoGenerica(nome, circulo);
+  finalizar();
+}
+
+/**
+ * Conjura uma magia SEM gastar espaço de magia, com tudo o que a conjuração
+ * normal faz de resto: efeito mecânico, alvo, concentração (inclusive a
+ * confirmação de troca).
+ *
+ * Existe porque o que o livro dispensa nessas características é o ESPAÇO, e
+ * só ele. A Maestria de Magias e a Assinatura Mágica do Mago
+ * (sheet/habilidades.js) apenas emitiam um toast: conjurar Armadura Arcana
+ * pela Maestria não mexia na CA, e valia para qualquer magia com efeito
+ * mecânico. Uma rota só, compartilhada, é o que impede as duas telas de
+ * responderem coisas diferentes para a mesma regra.
+ *
+ * @param {string} nome nome da magia
+ * @param {number} circulo círculo em que ela sai
+ * @param {string} mensagem texto do toast de sucesso
+ */
+export function conjurarSemEspaco(nome, circulo, mensagem) {
+  const concentracaoAtiva = getConcentracaoAtiva();
+  if (ehMagiaConcentracao(nome) && concentracaoAtiva && concentracaoAtiva !== nome) {
+    confirmarSubstituirConcentracao(concentracaoAtiva, nome,
+      () => aplicarConjuracaoSemEspaco(nome, circulo, mensagem));
+    return;
+  }
+  aplicarConjuracaoSemEspaco(nome, circulo, mensagem);
+}
+
 // Modal de selecao de opcao (tipo de dano, atributo, variante)
 function mostrarModalSelecaoMagia(nomeMagia, circ, listaOpcoes, titulo, onSelecao) {
   const html = `
@@ -1730,53 +1819,16 @@ export function setupEventosEspacosMagia() {
     renderFichaCompleta();
   }
 
-  // Rastreia concentração genérica (magias de concentração sem mecânica própria em
-  // MAGIAS_EFEITO aplicada a si mesmo) — mesmo padrão usado na conjuração normal (não-grátis)
-  function _rastrearConcentracaoGenerica(nome, circulo) {
-    if (!ehMagiaConcentracao(nome)) return;
-    if (!char.efeitos_magicos) char.efeitos_magicos = [];
-    char.efeitos_magicos = char.efeitos_magicos.filter(e => !e.concentracao);
-    char.efeitos_magicos.push({ nome, tipo: 'concentracao_generica', concentracao: true, circulo: circulo || 0, rotulo: `Concentrando em ${nome}` });
-  }
-
-  // Função auxiliar para conjuração gratuita (talentos)
+  // Função auxiliar para conjuração gratuita (talentos).
+  //
+  // Delega para `aplicarConjuracaoSemEspaco`, a mesma rota que a Maestria de
+  // Magias e a Assinatura Mágica do Mago usam: esta função tinha uma CÓPIA da
+  // aplicação de efeito/alvo/concentração, e dado derivado copiado diverge em
+  // silêncio -- foi por não existir essa rota compartilhada que os botões do
+  // Mago nasceram sem efeito nenhum.
   function _executarConjuracaoGratis(entrada, nome) {
     entrada.gratis_usado = true;
-
-    // Aplicar efeito mágico se existir
-    const config = MAGIAS_EFEITO[nome];
-    let efeitoAplicadoSelf = false;
-    if (config) {
-      const precisaAlvo = config.permite_self && config.permite_outro;
-      const autoSelf = config.permite_self && !config.permite_outro;
-
-      if (precisaAlvo) {
-        mostrarModalAlvoMagia(nome, entrada.circulo, (alvo) => {
-          if (alvo === 'self') {
-            aplicarEfeitoMagico(nome, entrada.circulo);
-          } else {
-            // Efeito aplicado em outra criatura: aplicarEfeitoMagico já cuida da
-            // concentração quando o alvo é self; quando é "outro", rastrear aqui
-            _rastrearConcentracaoGenerica(nome, entrada.circulo);
-          }
-          toast(`${nome} conjurada gratuitamente (talento)!`, 'success');
-          salvar();
-          renderFichaCompleta();
-        });
-        return;
-      }
-      if (autoSelf) { aplicarEfeitoMagico(nome, entrada.circulo); efeitoAplicadoSelf = true; }
-    }
-
-    // Concentração genérica (só quando o efeito não foi aplicado a si mesmo acima —
-    // aplicarEfeitoMagico já cuida da concentração nesse caso)
-    if (!efeitoAplicadoSelf) {
-      _rastrearConcentracaoGenerica(nome, entrada.circulo);
-    }
-
-    toast(`${nome} conjurada gratuitamente (talento)!`, 'success');
-    salvar();
-    renderFichaCompleta();
+    aplicarConjuracaoSemEspaco(nome, entrada.circulo, `${nome} conjurada gratuitamente (talento)!`);
   }
 
   // Conjurar magia gratuitamente (talentos: 1x por descanso longo)
@@ -2196,4 +2248,4 @@ export function setupEventosEspacosMagia() {
 
   // Grimório: botão de copiar magia
   document.getElementById('btn-add-grimorio')?.addEventListener('click', () => mostrarBuscaGrimorio());
-}
+}

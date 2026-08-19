@@ -255,6 +255,8 @@ function renderSheetInvItem(item, idx) {
   if (item.tipo === 'customizado') {
     const bca = parseInt(item.dados?.bonus_ca) || 0;
     const batq = parseInt(item.dados?.bonus_ataque) || 0;
+    const caBaseItem = parseInt(item.dados?.ca_base) || 0;
+    if (caBaseItem > 0) customBadges += `<span class="badge" style="font-size:0.6rem;background:#e8eaf6;color:#3949ab;border:1px solid #9fa8da">CA ${caBaseItem}</span> `;
     if (bca !== 0) customBadges += `<span class="badge" style="font-size:0.6rem;background:#e8eaf6;color:#3949ab;border:1px solid #9fa8da">CA ${bca > 0 ? '+' : ''}${bca}</span> `;
     if (batq !== 0) customBadges += `<span class="badge badge-secondary" style="font-size:0.65rem">Atq ${batq > 0 ? '+' : ''}${batq}</span> `;
     if (item.dados?.dano) customBadges += `<span class="badge" style="font-size:0.6rem;background:#fce4ec;color:#c62828;border:1px solid #ef9a9a">${item.dados.dano}</span> `;
@@ -434,8 +436,13 @@ export function setupEventosInventarioSheet() {
       <div class="row gap-1">
         <div class="col">
           <label class="form-label" for="ic-ca">Bonus CA</label>
-          <input type="number" class="form-input" id="ic-ca" placeholder="0" min="-5" max="5">
-          <div style="font-size:0.65rem;color:var(--text-muted)">-5 a +5</div>
+          <input type="number" class="form-input" id="ic-ca" placeholder="0" step="1">
+          <div style="font-size:0.65rem;color:var(--text-muted)">soma na CA quando equipado</div>
+        </div>
+        <div class="col">
+          <label class="form-label" for="ic-ca-base">CA Base</label>
+          <input type="number" class="form-input" id="ic-ca-base" placeholder="—" min="0" step="1">
+          <div style="font-size:0.65rem;color:var(--text-muted)">define a CA (ex.: 20). Não soma Destreza</div>
         </div>
         <div class="col">
           <label class="form-label" for="ic-dano">Dano</label>
@@ -444,8 +451,8 @@ export function setupEventosInventarioSheet() {
         </div>
         <div class="col">
           <label class="form-label" for="ic-atq">Bonus Atq</label>
-          <input type="number" class="form-input" id="ic-atq" placeholder="0" min="-5" max="10">
-          <div style="font-size:0.65rem;color:var(--text-muted)">-5 a +10</div>
+          <input type="number" class="form-input" id="ic-atq" placeholder="0" step="1">
+          <div style="font-size:0.65rem;color:var(--text-muted)">soma na jogada de ataque</div>
         </div>
       </div>
       <div class="form-group" style="margin-top:8px">
@@ -460,6 +467,10 @@ export function setupEventosInventarioSheet() {
       const nome = document.getElementById('ic-nome')?.value?.trim();
       const desc = document.getElementById('ic-desc')?.value?.trim() || '';
       const ca = parseInt(document.getElementById('ic-ca')?.value) || 0;
+      // Campo VAZIO grava vazio, e nao 0: "sem CA base" e diferente de "CA
+      // base zero", e so o vazio deixa o item fora da conta do piso.
+      const caBaseRaw = document.getElementById('ic-ca-base')?.value?.trim() || '';
+      const caBase = caBaseRaw === '' ? '' : String(parseInt(caBaseRaw) || 0);
       const danoVal = document.getElementById('ic-dano')?.value?.trim() || '';
       const atq = parseInt(document.getElementById('ic-atq')?.value) || 0;
       const pesoRaw = document.getElementById('ic-peso')?.value?.trim() || '';
@@ -477,15 +488,13 @@ export function setupEventosInventarioSheet() {
         }
       }
 
-      // Validar bonus CA (-5 a +5)
-      if (ca < -5 || ca > 5) {
-        erros.push('Bonus de CA deve ser entre -5 e +5.');
-      }
-
-      // Validar bonus Ataque (-5 a +10)
-      if (atq < -5 || atq > 10) {
-        erros.push('Bonus de Ataque deve ser entre -5 e +10.');
-      }
+      // SEM teto para bonus de CA e de ataque. Item customizado e o campo
+      // livre da mesa -- e o item da mesa nao cabe na faixa do item magico do
+      // livro (-5..+5 e -5..+10, o que estava aqui). Pior: a validacao barrava
+      // o item INTEIRO, entao uma armadura "CA 20" nao era gravada de forma
+      // nenhuma. O criador de personagem (creator/passo-equipamento.js) nunca
+      // teve esses limites: duas telas respondendo diferente para o mesmo
+      // campo. `parseInt` acima ja garante que so numero inteiro entra.
 
       if (erros.length > 0) {
         if (errosEl) { errosEl.style.display = 'block'; errosEl.innerHTML = erros.join('<br>'); }
@@ -500,6 +509,7 @@ export function setupEventosInventarioSheet() {
         descricao: desc,
         dados: {
           bonus_ca: String(ca),
+          ca_base: caBase,
           dano: danoVal,
           bonus_ataque: String(atq),
           peso: (pesoNum > 0 ? `${fmtPeso(pesoNum)} kg` : '')
@@ -682,8 +692,13 @@ function abrirModalEditarItemCustomizado(item, idx) {
     <div class="row gap-1">
       <div class="col">
         <label class="form-label" for="ic-ca">Bonus CA</label>
-        <input type="number" class="form-input" id="ic-ca" value="${parseInt(d.bonus_ca) || ''}" placeholder="0" min="-5" max="5">
-        <div style="font-size:0.65rem;color:var(--text-muted)">-5 a +5</div>
+        <input type="number" class="form-input" id="ic-ca" value="${parseInt(d.bonus_ca) || ''}" placeholder="0" step="1">
+        <div style="font-size:0.65rem;color:var(--text-muted)">soma na CA quando equipado</div>
+      </div>
+      <div class="col">
+        <label class="form-label" for="ic-ca-base">CA Base</label>
+        <input type="number" class="form-input" id="ic-ca-base" value="${parseInt(d.ca_base) || ''}" placeholder="—" min="0" step="1">
+        <div style="font-size:0.65rem;color:var(--text-muted)">define a CA (ex.: 20). Não soma Destreza</div>
       </div>
       <div class="col">
         <label class="form-label" for="ic-dano">Dano</label>
@@ -692,8 +707,8 @@ function abrirModalEditarItemCustomizado(item, idx) {
       </div>
       <div class="col">
         <label class="form-label" for="ic-atq">Bonus Atq</label>
-        <input type="number" class="form-input" id="ic-atq" value="${parseInt(d.bonus_ataque) || ''}" placeholder="0" min="-5" max="10">
-        <div style="font-size:0.65rem;color:var(--text-muted)">-5 a +10</div>
+        <input type="number" class="form-input" id="ic-atq" value="${parseInt(d.bonus_ataque) || ''}" placeholder="0" step="1">
+        <div style="font-size:0.65rem;color:var(--text-muted)">soma na jogada de ataque</div>
       </div>
     </div>
     <div id="ic-erros" style="display:none;color:var(--danger);font-size:0.8rem;margin-top:8px"></div>
@@ -703,6 +718,8 @@ function abrirModalEditarItemCustomizado(item, idx) {
     const nome = document.getElementById('ic-nome')?.value?.trim();
     const desc = document.getElementById('ic-desc')?.value?.trim() || '';
     const ca = parseInt(document.getElementById('ic-ca')?.value) || 0;
+    const caBaseRaw = document.getElementById('ic-ca-base')?.value?.trim() || '';
+    const caBase = caBaseRaw === '' ? '' : String(parseInt(caBaseRaw) || 0);
     const danoVal = document.getElementById('ic-dano')?.value?.trim() || '';
     const atq = parseInt(document.getElementById('ic-atq')?.value) || 0;
     const errosEl = document.getElementById('ic-erros');
@@ -713,8 +730,7 @@ function abrirModalEditarItemCustomizado(item, idx) {
       const regexDano = /^\d+d\d+(\s*[+\-]\s*\d+)?(\s+\w+)?$/i;
       if (!regexDano.test(danoVal)) erros.push('Dano deve seguir o formato de dados: 1d8, 2d6 Cortante, 1d4+2 Perfurante');
     }
-    if (ca < -5 || ca > 5) erros.push('Bonus de CA deve ser entre -5 e +5.');
-    if (atq < -5 || atq > 10) erros.push('Bonus de Ataque deve ser entre -5 e +10.');
+    // Sem teto, pelo mesmo motivo do formulario de criacao (ver la).
 
     if (erros.length > 0) {
       if (errosEl) { errosEl.style.display = 'block'; errosEl.innerHTML = erros.join('<br>'); }
@@ -725,6 +741,7 @@ function abrirModalEditarItemCustomizado(item, idx) {
     char.inventario[idx].descricao = desc;
     if (!char.inventario[idx].dados) char.inventario[idx].dados = {};
     char.inventario[idx].dados.bonus_ca = String(ca);
+    char.inventario[idx].dados.ca_base = caBase;
     char.inventario[idx].dados.dano = danoVal;
     char.inventario[idx].dados.bonus_ataque = String(atq);
     salvar();
