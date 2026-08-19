@@ -120,28 +120,20 @@ export const TESTES_VALIDOS = [
   // unidade/subclasse-nome-literal.test.mjs, que agora impede a
   // reintrodução do typo em qualquer das 48 subclasses.
 
-  // Domínio Magias / Plano 2 (2026-08-18): o círculo com que uma magia aparece
-  // na tela vem do GRUPO em que ela está listada em
-  // dados/classes/magias_<classe>.json, e não do campo `circulo` da magia --
-  // achatarMagiasClasse (site/js/sheet/magias.js:251-265) sobrescreve.
-  'magias-circulo-do-grupo',
+  // A chave 'magias-circulo-do-grupo' vivia aqui, mas a lacuna foi corrigida e
+  // aposentada em 2026-08-18 (Correção A) -- ver o histórico em LACUNAS.
 
-  // 'magias-marcador-concentracao': o campo `especial` de
-  // dados/classes/magias_<classe>.json contradiz a `duracao` da própria magia
-  // em 5 magias. Chave com classe REPRESENTATIVA ('Mago'), porque as mesmas
-  // magias aparecem na lista de várias classes -- mesmo padrão de
-  // CAUSA_DIVERGENCIA_ATIVO_PASSIVO no domínio Classes/Passivas.
-  'magias-marcador-concentracao',
+  // A chave 'magias-marcador-concentracao' vivia aqui, mas a lacuna foi
+  // corrigida e aposentada em 2026-08-18 (Correção A) -- ver o histórico em
+  // LACUNAS.
 
-  // Domínio Magias / Plano 3 (2026-08-18). Três chaves, dois eixos:
-  // 'magias-troca-ocasiao' e 'magias-troca-quantidade' confrontam a tabela
-  // "Magias Preparadas por Classe" do livro; 'magias-origens-isentas' não
-  // confronta o livro -- confronta o app consigo mesmo, porque a lista de
-  // origens isentas do limite está copiada em dez lugares de site/js/.
-  'magias-troca-ocasiao', 'magias-troca-quantidade', 'magias-origens-isentas',
+  // As três chaves do Plano 3 do domínio Magias -- 'magias-troca-ocasiao',
+  // 'magias-troca-quantidade' e 'magias-origens-isentas' -- foram corrigidas e
+  // aposentadas em 2026-08-19 (Correções B e C). Ver o histórico em LACUNAS.
 
-  // Domínio Magias / Plano 4 (2026-08-18): as regras de conjuração.
-  'magias-concentracao-mapa', 'magias-ritual-sem-rota',
+  // As duas chaves do Plano 4 do domínio Magias -- 'magias-concentracao-mapa' e
+  // 'magias-ritual-sem-rota' -- foram corrigidas e aposentadas em 2026-08-18 e
+  // 2026-08-19 (Correções A e D). Ver o histórico em LACUNAS.
 
   // A chave 'especies-anuncio-traco-nivel' (domínio Espécies) vivia aqui, mas a
   // lacuna foi corrigida e aposentada em 2026-08-18 -- os dois `if` por nome de
@@ -933,160 +925,221 @@ export const LACUNAS = [
   // escritas à mão. Sem lacuna remanescente nesta chave.
 
   // ---------- Domínio Magias / Plano 2 (2026-08-18) ----------
-  { talento: 'Druida', teste: 'magias-circulo-do-grupo',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'De Carne para Pedra é uma magia de 6º CÍRCULO (Magias.md:2296 -- "*6º Círculo, ' +
-      'Transmutação (Druida, Feiticeiro, Mago)*"), e três das quatro fontes do app concordam: ' +
-      'dados/magias/circulo_6.json (circulo: 6), dados/magias/_indice.json (circulo: 6) e ' +
-      'dados/magias/por_classe/druida.json. A QUARTA -- dados/classes/magias_druida.json, que é ' +
-      'a que as telas usam -- lista a magia dentro do grupo "5º Círculo". Confirmado lendo o ' +
-      'arquivo: a entrada é {"nome":"De Carne para Pedra","escola":"Transmutação","especial":"C"}, ' +
-      'sem campo de círculo próprio, dentro da chave "5º Círculo". ' +
-      'POR QUE ISSO CHEGA À TELA: achatarMagiasClasse (site/js/sheet/magias.js:251-265) deriva o ' +
-      'círculo do NOME DO GRUPO e SOBRESCREVE qualquer valor da magia (`obj.circulo = circulo`), ' +
-      'e é essa função que alimenta o seletor de magias. Os consumidores de getMagiasClasse são ' +
-      'creator/passo-magias.js:41, levelup-ui.js:960 e :1058, sheet/magias.js:277 e ' +
-      'sheet/classes/bruxo.js:228. ' +
-      'CONSEQUÊNCIA MEDIDA: um Druida vê "De Carne para Pedra" entre as magias de 5º círculo. ' +
-      'Um Druida de nível 9 -- que ganha espaços de 5º círculo e ainda não tem os de 6º -- pode ' +
-      'preparar uma magia de 6º círculo dois níveis antes do que o livro permite. ' +
-      'AS OUTRAS DUAS CLASSES QUE TÊM A MAGIA ESTÃO CERTAS: magias_feiticeiro.json e ' +
-      'magias_mago.json a listam no grupo "6º Círculo" -- é erro de uma entrada, não do formato. ' +
-      'Busca feita ANTES de registrar, como manda o GUIA: grep por "De Carne para Pedra" em ' +
-      'site/js/ => 0 ocorrências (nenhum ramo hard-coded a trata); em dados/, aparece nos quatro ' +
-      'arquivos de dado mais duas descrições de outras magias que a citam.' },
+  // De Carne para Pedra (Druida) -- CORRIGIDA em 2026-08-18 (Correção A do
+  // domínio Magias). A magia é de 6º círculo (Magias.md:2296) e estava listada
+  // no grupo "5º Círculo" de dados/classes/magias_druida.json, o que a fazia
+  // aparecer como opção de 5º para um Druida de nível 9 -- dois níveis antes do
+  // que o livro permite.
+  //
+  // O conserto teve DUAS metades, e as duas eram necessárias:
+  //   - achatarMagiasClasse (sheet/magias.js) parou de derivar o círculo do
+  //     NOME DO GRUPO e passou a lê-lo do acervo (dados/magias/), com o grupo
+  //     só como fallback. Sem isso o mecanismo continuaria pronto para errar na
+  //     próxima entrada mal colocada.
+  //   - a entrada foi movida para o grupo "6º Círculo". Sem isso esta lacuna --
+  //     que confronta o ARQUIVO contra o livro -- continuaria vermelha.
+  //
+  // Delta medido antes de aplicar a derivação: 1 entrada muda de círculo nas
+  // 987 do acervo por classe. Sem lacuna remanescente nesta chave.
 
-  { talento: 'Mago', teste: 'magias-marcador-concentracao',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'O campo `especial` de dados/classes/magias_<classe>.json repete, em sigla, fatos que ' +
-      'a própria magia já declara -- C para Concentração, R para Ritual, M para componente ' +
-      'material relevante. É dado DERIVADO, e em 5 pares (arquivo de classe, magia) o C contradiz a `duracao` da magia -- e é por PAR, não por magia: o mesmo nome aparece na lista de várias classes e o `especial` é escrito por arquivo, então Projeção Astral diverge no do Clérigo e está correta no do Mago. Os cinco: ' +
-      'Mover Terra tem duracao "Concentração, até 2 horas" e NÃO está marcada com C (o jogador ' +
-      'não é avisado de que a magia exige Concentração); Projeção Astral ("Até ser dissipada"), ' +
-      'Criação ("Especial"), Sugestão em Massa ("24 horas") e Piscar ("1 minuto") estão marcadas ' +
-      'com C e não exigem Concentração nenhuma. ' +
-      'QUAL DOS DOIS LADOS ESTÁ CERTO: a `duracao`. O Plano 1 deste domínio confronta os 7 campos ' +
-      'das 391 magias contra o livro e mede ZERO divergências -- `duracao` bate com o livro em ' +
-      'todas. Logo é o marcador que diverge, não a magia. ' +
-      'CONSEQUÊNCIA: o marcador é o que a tela usa para sinalizar Concentração na lista de ' +
-      'escolha de magia (getMagiasClasse -> creator/passo-magias.js:41, levelup-ui.js:960 e ' +
-      ':1058, sheet/magias.js:277). Um jogador escolhendo Mover Terra não vê o aviso de ' +
-      'Concentração; escolhendo Piscar, vê um aviso que não existe -- e Concentração é a regra ' +
-      'que decide se duas magias podem ficar ativas ao mesmo tempo. ' +
-      'O MARCADOR R NÃO DIVERGE: confrontado contra `tempo_conjuracao` nas 987 entradas, zero ' +
-      'diferenças. O marcador M ficou FORA do confronto, com limite declarado no cabeçalho do ' +
-      'motor: medidas as duas leituras possíveis, "tem componente material" dá 389 divergências e ' +
-      '"material com custo ou consumido" dá 12 (7 magias), e nenhuma regra derivável do texto ' +
-      'chega a zero -- a fronteira restante é de julgamento ("uma arma que vale 1 PP", que o ' +
-      'jogador já possui, contra "um zircão de 1.000 PO que a magia consome"), e afirmar uma ' +
-      'regra própria ali faria o oráculo medir a leitura de quem o escreveu, não o app.' },
+  // ---------- CORRIGIDA em 2026-08-18 (Correção A) ----------
+  // { talento: 'Mago', teste: 'magias-marcador-concentracao' }
+  //
+  // O campo `especial` de dados/classes/magias_<classe>.json repete, em sigla,
+  // fatos que a própria magia já declara -- C para Concentração, R para
+  // Ritual, M para material relevante. É dado DERIVADO, e o C contradizia a
+  // `duracao` em 5 pares (arquivo de classe, magia): Mover Terra no do
+  // Feiticeiro exige Concentração e não estava marcada; Projeção Astral (no do
+  // Clérigo), Criação, Sugestão em Massa (no do Feiticeiro) e Piscar (no do
+  // Mago) estavam marcadas e não exigem. Era por PAR, não por magia: o mesmo
+  // nome aparece na lista de várias classes e o `especial` é escrito por
+  // arquivo, então Projeção Astral divergia no do Clérigo e estava correta no
+  // do Mago.
+  //
+  // Qual lado estava certo: a `duracao`. O Plano 1 deste domínio confronta os
+  // 7 campos das 391 magias contra o livro e mede ZERO divergências.
+  //
+  // O conserto teve DUAS metades, e as duas eram necessárias:
+  //   - o selo de Concentração do seletor de magias passou a vir da DURAÇÃO da
+  //     magia, lida do acervo (creator/passo-magias.js, `ehConcentracao`), e
+  //     não do marcador. Sem isso o mecanismo continuaria pronto para errar no
+  //     próximo marcador mal escrito.
+  //   - os cinco marcadores foram acertados no dado. Sem isso esta lacuna --
+  //     que confronta o ARQUIVO contra a magia -- continuaria vermelha.
+  //
+  // ACHADO DE TABELA QUE NENHUMA LACUNA COBRIA, e que só apareceu ao desenhar
+  // o conserto: os dois pontos de selo comparavam `m.especial === 'C'` e
+  // `=== 'M'` por igualdade EXATA, e marcador combinado ('C, R', 'R, M',
+  // 'C, M') nunca casava. Mesmo defeito que levelup-ui.js:1004-1012 registra
+  // como já corrigido em outro lugar. Corrigida a comparação, a tela ganhou
+  // 79 selos de Concentração (28 magias distintas) e 81 de material, medidos,
+  // sem perder nenhum.
+  //
+  // O selo de material continua vindo do MARCADOR, de propósito: `M` ali
+  // significa material COM CUSTO ou consumido, e essa fronteira não é
+  // derivável do texto do componente -- medido, derivar como "tem material"
+  // marcaria 470 entradas a mais. A fronteira é de julgamento ("uma arma que
+  // vale 1 PP", que o jogador já possui, contra "um zircão de 1.000 PO que a
+  // magia consome"), e afirmar uma regra própria ali faria o oráculo medir a
+  // leitura de quem o escreveu, não o app. Só a COMPARAÇÃO mudou.
+  //
+  // O marcador R nunca divergiu: confrontado contra `tempo_conjuracao` nas 987
+  // entradas, zero diferenças -- e essa asserção segue de pé.
+
 
   // ---------- Domínio Magias / Plano 3 (2026-08-18) ----------
-  { talento: 'Bardo', teste: 'magias-troca-ocasiao',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'A tabela "Magias Preparadas por Classe" (Magias.md:19-28) fixa, por classe, QUANDO a ' +
-      'lista de preparadas pode mudar. Para Bardo (Magias.md:21), Bruxo (:22) e Feiticeiro (:25) a ' +
-      'ocasião é "Avança um nível" -- o livro não prevê troca no Descanso Longo para nenhuma das ' +
-      'três. O app oferece: hp-descanso.js:1093-1095 monta `temTrocaConhecida` a partir de ' +
-      '`tipo_conjuracao === "conhecidas"`, que é o valor das três em dados-classes.js, e o modal ' +
-      'de Descanso Longo ganha o botão "Trocar Magias" (hp-descanso.js:1150-1165). ' +
-      'MEDIDO POR EXECUÇÃO, não deduzido da tabela: as oito classes foram rodadas contra as mesmas ' +
-      'expressões de hp-descanso.js, e as três dão `temTrocaConhecida = true`. ' +
-      'CONSEQUÊNCIA: um Bardo pode remanejar a lista de preparadas a cada Descanso Longo, uma ' +
-      'flexibilidade que o livro reserva a quem tem a ocasião "Termina um Descanso Longo" ' +
-      '(Clérigo, Druida, Guardião, Mago, Paladino). ' +
-      'RESSALVA: o app TAMBÉM oferece a troca na subida de nível (card levelup-troca-magia, ' +
-      'levelup-cards.js:603), que é a ocasião certa -- então a do descanso é um caminho A MAIS, ' +
-      'não um caminho no lugar errado. Chave com classe representativa (Bardo); as três dividem ' +
-      'a mesma causa de código.' },
+  // ---------- CORRIGIDAS em 2026-08-19 (Correção C) ----------
+  // { talento: 'Bardo',    teste: 'magias-troca-ocasiao' }
+  // { talento: 'Guardião', teste: 'magias-troca-quantidade' }
+  //
+  // A tabela "Magias Preparadas por Classe" (Magias.md:19-28) fixa DUAS coisas
+  // independentes por classe: QUANDO a lista de preparadas pode mudar e
+  // QUANTAS magias mudam nessa ocasião. O app decidia as duas a partir de
+  // `tipo_conjuracao` (dados-classes.js), um campo de DOIS valores -- e a
+  // tabela tem TRÊS combinações, então duas classes ficavam sempre erradas:
+  //
+  //   - Bardo, Bruxo e Feiticeiro: o livro dá a ocasião "Avança um nível", e o
+  //     app oferecia a troca no DESCANSO LONGO. (Ressalva registrada na época:
+  //     a troca por nível o app JÁ oferecia, em levelup-cards.js -- a do
+  //     descanso era um caminho A MAIS, não um caminho no lugar errado.)
+  //   - Guardião e Paladino: o livro dá "Uma" no Descanso Longo, e o app
+  //     abria a lista COMPLETA.
+  //
+  // CONSERTO: a tabela do livro passou a ser modelada como ela é, em
+  // site/js/regras-preparo-magias.js -- um módulo folha com as duas variáveis
+  // separadas, que hp-descanso.js consulta por `trocaNoDescansoLongo(classe)`.
+  // Guerreiro e Ladino não estão na tabela (conjuram por subclasse, e a regra
+  // vem do texto dela), então continuam entrando por fora, com o
+  // comportamento que já tinham. O modal de troca de UMA passou a dizer
+  // "1 magia preparada" para conjurador preparado, em vez de "conhecida".
+  //
+  // O INSTRUMENTO MEDIA UMA CÓPIA, e por isso não teria enxergado o conserto:
+  // o motor repetia as expressões de hp-descanso.js dentro do próprio teste
+  // ("copiadas em vez de importadas porque vivem dentro de um handler de
+  // botão"), então confrontava o catálogo contra uma transcrição da lógica do
+  // app, não contra o app. Com a regra num módulo importável, o motor passou a
+  // chamar a função REAL. Provado por mutação nos dois níveis: mexer na tabela
+  // derruba o motor; reverter hp-descanso.js derruba o spec de navegador.
+  //
+  // As três combinações da tabela estão fixadas na tela por
+  // ../e2e/regras/magias-troca-descanso.spec.mjs: Guardião recebe o modal de
+  // trocar UMA, Mago o de lista completa, e Bardo não recebe troca de magia
+  // nenhuma -- este último com o modal aberto oferecendo troca de TRUQUE, para
+  // a ausência ser afirmação e não falta de tela.
 
-  { talento: 'Guardião', teste: 'magias-troca-quantidade',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'Mesma tabela do livro, outra coluna: "Número de Magias". Guardião (Magias.md:26) e ' +
-      'Paladino (Magias.md:28) trocam no Descanso Longo -- ocasião certa no app --, mas o livro ' +
-      'permite trocar UMA magia, e o app abre a troca COMPLETA. Causa: hp-descanso.js:1093 deriva ' +
-      '`temTrocaPreparadas` de `tipo_conjuracao === "preparadas"`, valor que Guardião e Paladino ' +
-      'compartilham com Clérigo, Druida e Mago -- e para esses três "Qualquer uma" é o certo. O ' +
-      'campo `tipo_conjuracao` tem dois valores e a tabela do livro tem duas variáveis ' +
-      'independentes (ocasião × quantidade), então ele não consegue expressar "Descanso Longo, ' +
-      'mas só uma". ' +
-      'CONSEQUÊNCIA: um Guardião de nível 5 refaz a lista inteira de preparadas todo Descanso ' +
-      'Longo. Chave com classe representativa (Guardião); as duas dividem a causa.' },
 
-  { talento: 'Mago', teste: 'magias-origens-isentas',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'O livro (Magias.md:41): "uma magia que você sempre tem preparada não conta no número ' +
-      'de magias dessa lista". O app implementa isso com uma lista de origens isentas -- e a lista ' +
-      'está COPIADA EM DEZ LUGARES de site/js/, sem duas iguais. Parte da diferença é legítima (a ' +
-      'lista de TRUQUE usa `especie` onde a de MAGIA usa `dominio`); duas não são, e as duas foram ' +
-      'rastreadas até a consequência: ' +
-      '(1) `maestria_magias` e `assinatura_magica` só existem em sheet/magias.js:26. Em ' +
-      'levelup-ui.js:1448, que monta o "qual magia sai?" da troca de nível, elas NÃO estão -- ' +
-      'então o Mago de nível 18/20 pode trocar fora uma magia que o livro diz que ele sempre tem. ' +
-      'E em utils.js:126 (normalizarGrimorioMago) elas são empurradas para dentro do grimório como ' +
-      'se fossem preparadas comuns. ' +
-      '(2) `subclasse_fixa` está em três das quatro listas de truque e falta em ' +
-      'levelup-ui.js:1487: Mãos Mágicas (truque fixo do Trapaceiro Arcano e do Cavaleiro Místico) ' +
-      'aparece como trocável na subida de nível, enquanto sheet/grimorio.js:1280 corretamente o ' +
-      'proíbe no Descanso Longo. ' +
-      'MESMA FORMA do "terceiro vocabulário de Estilo de Luta" já registrado neste repositório -- ' +
-      'dado derivado copiado, divergindo em silêncio --, aqui com dez cópias em vez de três. O ' +
-      'conserto é consolidar numa fonte só; enquanto isso, o motor cobra que as cópias do MESMO ' +
-      'papel sejam idênticas. ' +
-      'CORRIGIDO DE CARONA nesta rodada, porque era regressão introduzida pelo Plano 4 da rodada ' +
-      'de correção: as origens `subclasse_escolha` (Descobertas Mágicas do Colégio do ' +
-      'Conhecimento -- Classes.md:770, "Você sempre tem as magias escolhidas preparadas") e ' +
-      '`subclasse_automatica` (truque de Ilusões Aprimoradas) não estavam em lista nenhuma e ' +
-      'contavam no limite por omissão. Acrescentadas às listas do papel certo.' },
+  // ---------- CORRIGIDA em 2026-08-19 (Correção B) ----------
+  // { talento: 'Mago', teste: 'magias-origens-isentas' }
+  //
+  // O livro (Magias.md:41): "uma magia que você sempre tem preparada não conta
+  // no número de magias dessa lista". O app implementava isso com uma lista de
+  // origens isentas COPIADA EM DEZ LUGARES de site/js/, sem duas iguais. Parte
+  // da diferença era legítima (a lista de TRUQUE usa `especie` onde a de MAGIA
+  // usa `dominio`); duas não eram:
+  //   (1) `maestria_magias` e `assinatura_magica` só existiam em
+  //       sheet/magias.js. Em levelup-ui.js, que monta o "qual magia sai?" da
+  //       troca de nível, faltavam -- o Mago de nível 18/20 podia trocar fora
+  //       uma magia que o livro diz que ele sempre tem preparada.
+  //   (2) `subclasse_fixa` faltava em levelup-ui.js e estava nas outras três
+  //       listas de truque: Mãos Mágicas aparecia como trocável na subida de
+  //       nível, e era corretamente proibida no Descanso Longo.
+  //
+  // CONSERTO: as onze listas literais viraram UMA, em
+  // site/js/regras-origens-magia.js -- um módulo folha, sem imports, para que
+  // qualquer camada o consuma sem ciclo. Os oito pontos que governavam
+  // comportamento passaram a chamar `magiaContaNoLimite` / `truqueEhTrocavel`.
+  // As duas listas continuam SEPARADAS de propósito: truque de espécie tem
+  // origem `especie` onde a magia tem `dominio`, e as duas origens de truque
+  // de subclasse não têm par do lado das magias.
+  //
+  // TERCEIRA DIVERGÊNCIA, que a lacuna não conhecia e o instrumento escondia:
+  // levelup-flow.js montava a lista de MAGIA como
+  // `['dominio', ...origensEspeciais]` -- espalhando a lista de TRUQUE.
+  // Carregava origens que magia de círculo 1+ nunca tem e, pior, NÃO tinha
+  // `subclasse_escolha`, `maestria_magias` nem `assinatura_magica`: o step de
+  // magias do level-up ficava visível oferecendo troca de magia que o livro diz
+  // ser sempre preparada. O extrator do motor só colhia strings entre aspas,
+  // enxergava `['dominio']`, e a exceção declarada para aquele ponto o
+  // descrevia como "lista de um item só, usada para outra pergunta" -- leitura
+  // errada, apoiada na cegueira do instrumento. Hoje o extrator registra os
+  // `...espalha` e há asserção própria proibindo derivar uma lista da outra.
+  //
+  // O MOTOR MUDOU DE PERGUNTA JUNTO: "as cópias do mesmo papel concordam" já
+  // não pega nada com uma cópia só -- passaria por vacuidade para sempre. O
+  // eixo passou a cobrar que exista UMA fonte, e que ela seja o módulo. As duas
+  // asserções novas foram provadas vermelhas por mutação (recriar uma cópia;
+  // montar uma lista espalhando a outra).
+  //
+  // Corrigido de carona na rodada de identificação: `subclasse_escolha` e
+  // `subclasse_automatica`, criadas pelo Plano 4 da rodada de correção, não
+  // estavam em lista nenhuma e contavam no limite por omissão.
 
   // ---------- Domínio Magias / Plano 4 (2026-08-18) ----------
-  { talento: 'Mago', teste: 'magias-concentracao-mapa',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'O app decide se uma magia exige Concentração em ehMagiaConcentracao ' +
-      '(site/js/sheet/magias.js:900-906), com DUAS fontes: o mapa curado à mão MAGIAS_EFEITO ' +
-      '(:772, 50 entradas) e, só como fallback, a `duracao` da magia. O mapa tem PRECEDÊNCIA, ' +
-      'então uma entrada errada nele vence o dado certo. Cinco entradas divergem da duração da ' +
-      'própria magia: Pele-Casca (mapa diz que exige Concentração; duracao "1 hora"), Heroísmo ' +
-      '(mapa diz que NÃO exige; duracao "Concentração, até 1 minuto"), Aura Sagrada (idem, ' +
-      '"Concentração, até 1 minuto"), Aura de Pureza (idem, "Concentração, até 10 minutos") e ' +
-      'Aura de Vida (idem, "Concentração, até 10 minutos"). ' +
-      'QUAL DOS DOIS LADOS ESTÁ CERTO: a `duracao`. O Plano 1 deste domínio confronta os 7 campos ' +
-      'das 391 magias contra o livro e mede ZERO divergências -- a duração bate com o livro em ' +
-      'todas. Logo é o mapa que erra. ' +
-      'CONSEQUÊNCIA: Concentração é a regra que decide se DUAS magias podem ficar ativas ao mesmo ' +
-      'tempo -- getConcentracaoAtiva (sheet/magias.js:893) procura o efeito com a flag. Nas quatro ' +
-      'que o mapa isenta (Heroísmo, Aura Sagrada, Aura de Pureza, Aura de Vida), o jogador mantém ' +
-      'a magia ativa junto com outra de Concentração, o que o livro proíbe. Na Pele-Casca é o ' +
-      'contrário: ela ocupa a vaga de Concentração sem precisar, bloqueando outra magia. ' +
-      'MESMA FORMA dos achados dos Planos 2 e 3 deste domínio: dado derivado, curado à mão, que ' +
-      'ninguém confronta com o dado de origem.' },
+  // Pele-Casca -- CORRIGIDA em 2026-08-18 (Correção A do domínio Magias).
+  //
+  // CORREÇÃO DE UM NÚMERO PUBLICADO ERRADO: o registro original desta lacuna
+  // afirmava CINCO divergências (Pele-Casca, Heroísmo, Aura Sagrada, Aura de
+  // Pureza e Aura de Vida). Era UMA. As outras quatro eram falsos positivos do
+  // extrator do motor, que delimitava o corpo de cada entrada de MAGIAS_EFEITO
+  // com `[^}]*` e parava no primeiro `}` -- essas quatro têm objetos aninhados
+  // (`efeitos: [{ tipo: ... }]`), e o `concentracao: true` delas vem DEPOIS do
+  // aninhamento, fora do trecho capturado. O extrator passou a delimitar por
+  // contagem de chaves, e as quatro sempre estiveram certas no código.
+  //
+  // A divergência real: Pele-Casca tinha `concentracao: true` e o livro
+  // (Magias.md:5778) lhe dá duração "1 hora" -- a magia ocupava a vaga de
+  // Concentração e bloqueava outra magia sem precisar. Flag corrigida para
+  // false, e o rótulo passou de "CA mín. 17 (concentração)" para
+  // "CA mín. 17 (1 hora)".
+  //
+  // O conserto teve duas metades: além do dado, `ehMagiaConcentracao`
+  // (sheet/magias.js) inverteu a precedência -- a DURAÇÃO manda, e o mapa
+  // curado só responde por magia que o acervo não tenha. Sem lacuna
+  // remanescente nesta chave.
 
-  { talento: 'Mago', teste: 'magias-ritual-sem-rota',
-    tipo: 'app-diverge-do-livro',
-    motivo: 'Magias.md:62 -- "Certas magias possuem o marcador Ritual na descrição do Tempo de ' +
-      'Conjuração. A magia pode ser conjurada conforme as regras normais de conjuração ou como um ' +
-      'Ritual. A versão Ritual de uma magia leva 10 minutos a mais para ser conjurada, mas não ' +
-      'utiliza um espaço de magia." São 31 das 391 magias do acervo (medido por ' +
-      '`tempo_conjuracao` citando Ritual). ' +
-      'O app tem o botão que conjura sem gastar espaço -- data-conjurar-ritual-custom ' +
-      '(sheet/magias.js:134,146) --, mas o sufixo não é decorativo: ele só é montado no ' +
-      'renderizador de magia PERSONALIZADA, cujo objeto é normalizado em sheet/magias.js:58-68 ' +
-      'com `personalizada: true` e `ritual: Boolean(magia.ritual)`. O campo `ritual` NÃO existe em ' +
-      'nenhuma das 391 magias de dados/magias/ (medido: 0 de 391) -- ele vem da caixa `mc-ritual` ' +
-      'do formulário de magia personalizada (sheet/grimorio.js:518). ' +
-      'BUSCA FEITA ANTES DE REGISTRAR, como manda o GUIA: grep por ' +
-      '"conjurar-ritual|conjurarRitual|comoRitual|ritualSemEspaco" em site/js/ devolve só as ' +
-      'quatro ocorrências do caminho -custom (sheet/magias.js:134,146,1881,1890). Não há rota de ' +
-      'ritual para magia do catálogo em lugar nenhum. ' +
-      'CONSEQUÊNCIA: um Mago com Detectar Magia preparada não tem como conjurá-la como Ritual -- ' +
-      'ou gasta um espaço, ou não conjura. A opção existe apenas para magias que o próprio jogador ' +
-      'cadastrou à mão. ' +
-      'O APP JÁ SABE FAZER ISSO EM OUTROS LUGARES: db.js:129 (getMagiasRituais) e ' +
-      'sheet/classes/bruxo.js:620 derivam ritual de `tempo_conjuracao`, e sheet/magias.js:446 usa ' +
-      'a mesma derivação para ordenar. levelup-ui.js:1004-1012 traz até um comentário sobre um bug ' +
-      'DESTA MESMA FAMÍLIA já corrigido (a lista de magias rituais do talento Conjurador ' +
-      'Ritualista nascia vazia por procurar o marcador no acervo errado). É a rota da ficha que ' +
-      'ficou de fora, não um conceito ausente do app.' },
+  // ---------- CORRIGIDA em 2026-08-19 (Correção D) ----------
+  // { talento: 'Mago', teste: 'magias-ritual-sem-rota' }
+  //
+  // Magias.md:62 -- "A magia pode ser conjurada conforme as regras normais de
+  // conjuração ou como um Ritual. A versão Ritual de uma magia leva 10 minutos
+  // a mais para ser conjurada, mas não utiliza um espaço de magia." São 31 das
+  // 391 magias do acervo.
+  //
+  // O app tinha o botão de ritual só para magia PERSONALIZADA
+  // (`data-conjurar-ritual-custom`): um Mago com Detectar Magia preparada não
+  // tinha como conjurá-la como Ritual -- ou gastava um espaço, ou não
+  // conjurava.
+  //
+  // O REGISTRO ORIGINAL SAIU FORTE DEMAIS, e a culpa era do instrumento. Ele
+  // afirmava que "não há rota de ritual para magia do catálogo em lugar
+  // nenhum", apoiado num grep por `conjurar-ritual|conjurarRitual|comoRitual`.
+  // Havia MEIA rota: o botão "Ritual" do grimório do Mago, rotulado "Conjurar
+  // como Ritual (sem gastar espaço)", estava ligado ao gatilho
+  // `data-conjurar-pacto` -- o do Pacto do Bruxo --, cujo handler
+  // (sheet/habilidades.js) só emite um toast dizendo "via Pacto", sem conjurar
+  // nem registrar nada. O padrão da busca não previa que a rota certa pudesse
+  // ter o NOME errado. Mesma família do extrator de MAGIAS_EFEITO da Correção
+  // A: quando o instrumento é estreito demais, ele não deixa de acusar --
+  // acusa errado.
+  //
+  // CONSERTO: `ehMagiaRitual(nome)` deriva o marcador de `tempo_conjuracao` no
+  // acervo, num lugar só (a derivação estava escrita à mão em dois pontos de
+  // sheet/magias.js). Um gatilho `data-conjurar-ritual` novo aparece na lista
+  // de PREPARADAS, para toda classe, e o botão do grimório do Mago deixou de
+  // chamar o handler do Pacto. O handler respeita Fúria e Concentração --
+  // Concentração vale igual na versão Ritual, o que muda é o espaço.
+  //
+  // LIMITE DECLARADO: os 10 minutos a mais não são modelados. O app é ficha,
+  // não mesa, e não controla passagem de tempo em lugar nenhum. O que ele
+  // modela -- o espaço de magia -- é justamente o que o Ritual não gasta.
+  //
+  // O motor ganhou uma asserção nova, nascida do erro acima: nenhum botão
+  // rotulado "Conjurar como Ritual" pode estar ligado a um gatilho que não
+  // seja de ritual. Ela procura pelo TÍTULO que o jogador lê, não pelo nome do
+  // gatilho -- que foi o que escapou. E
+  // ../e2e/regras/magias-ritual-ficha.spec.mjs CLICA no botão e confere que os
+  // espaços de magia não mudaram, com a conjuração normal ao lado provando que
+  // o número sobe quando deve.
 ];
 
 // Busca a lacuna registrada para um par (talento, teste), se houver.

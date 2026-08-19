@@ -483,11 +483,6 @@
         "especial": "R"
       },
       {
-        "nome": "De Carne para Pedra",
-        "escola": "Transmutação",
-        "especial": "C"
-      },
-      {
         "nome": "Cone de Frio",
         "escola": "Evocação",
         "especial": "—"
@@ -568,6 +563,11 @@
         "nome": "Cura Completa",
         "escola": "Abjuração",
         "especial": "—"
+      },
+      {
+        "nome": "De Carne para Pedra",
+        "escola": "Transmutação",
+        "especial": "C"
       },
       {
         "nome": "Encontrar o Caminho",

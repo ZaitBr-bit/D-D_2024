@@ -82,7 +82,6 @@ export const GATILHOS_SEM_COBERTURA = [
   'btn-confirmar-rem-inv-sheet',
   'btn-confirmar-remover-grimorio',
   'btn-confirmar-remover-magia-custom',
-  'btn-confirmar-troca-conhecida',
   'btn-confirmar-troca-maestria',
   'btn-dist-sugerida',
   'btn-edit-po',

@@ -7,6 +7,7 @@
 // ============================================================
 import { CLASSES_INFO } from '../dados-classes.js';
 import { restaurarRecursosTalentos } from '../regras-cobertura.js';
+import { trocaNoDescansoLongo } from '../regras-preparo-magias.js';
 import { removerPersonagem } from '../store.js';
 import { abrirModal, calcMod, detectarRecarga, escHtml, getEspacosMagia, semAcento, toast } from '../utils.js';
 import { gerarTracoSinteticoEspecie } from './caracteristicas.js';
@@ -23,7 +24,7 @@ import { getEstadoRecursosMonge } from './classes/monge.js';
 import { getEstadoRecursosPaladino } from './classes/paladino.js';
 import { char, classeData, especiesCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
-import { mostrarTrocaMagiaConhecida, mostrarTrocaMagias, mostrarTrocaTruque, truquesTrocaveis } from './grimorio.js';
+import { mostrarTrocaMagiaConhecida, mostrarTrocaTruque, truquesTrocaveis } from './grimorio.js';
 import { abrirModalTrocaMaestriaDescanso } from './maestrias.js';
 import { ehSubclasseConjuradora, getConcentracaoAtiva, magiaContaNoLimite } from './magias.js';
 
@@ -661,7 +662,17 @@ export function setupEventosDescanso() {
     const bindMemorizar = () => {
       document.getElementById('btn-memorizar-magia-curto')?.addEventListener('click', () => {
         window.fecharModal();
-        mostrarTrocaMagias();
+        // Memorizar Magia troca UMA. O texto da caracteristica (Classes.md) diz
+        // "substituir uma dessas magias por outra magia de 1o circulo ou
+        // superior do seu livro de magias" -- e este botao abria a lista
+        // COMPLETA (`mostrarTrocaMagias`), deixando remontar tudo. A fonte do
+        // lado "entra" e o grimorio, que `mostrarTrocaMagiaConhecida` ja
+        // resolve para o Mago.
+        mostrarTrocaMagiaConhecida(null, {
+          titulo: 'Memorizar Magia',
+          explicacao: 'Apos um Descanso Curto, voce pode trocar <strong>1 magia preparada</strong> '
+            + 'por outra do seu livro de magias.',
+        });
       });
     };
 
@@ -1089,10 +1100,21 @@ export function setupEventosDescanso() {
     const classesMaestria = ['Bárbaro', 'Guerreiro', 'Guardião', 'Paladino', 'Ladino'];
     const temMaestria = classesMaestria.includes(char.classe);
     const ehSubConj = ehSubclasseConjuradora();
-    // Diferenciar troca completa (preparadas) vs troca unica (conhecidas/subclasse)
-    const temTrocaPreparadas = infoClasse.conjurador && infoClasse.tipo_conjuracao === 'preparadas' && !ehSubConj;
-    const temTrocaConhecida = (infoClasse.conjurador && infoClasse.tipo_conjuracao === 'conhecidas') || ehSubConj;
-    const temTrocaMagia = temTrocaPreparadas || temTrocaConhecida;
+    // A quantidade vem de regras-preparo-magias.js, que guarda a REGRA DO
+    // PRODUTO -- e ela se afasta da tabela do livro de proposito, com o
+    // afastamento declarado la. No Descanso Longo e sempre UMA magia, para
+    // toda classe conjuradora: remontar a lista inteira e da subida de nivel.
+    //
+    // Antes isto saia de `tipo_conjuracao`, um campo de dois valores, e o
+    // resultado era desigual sem que ninguem tivesse decidido assim:
+    // Clerigo/Druida/Mago abriam a lista COMPLETA e Bardo/Bruxo/Feiticeiro
+    // nao tinham troca nenhuma aqui.
+    //
+    // Guerreiro e Ladino nao sao classes conjuradoras: conjuram por
+    // subclasse, e a regra deles vem do texto da subclasse -- por isso
+    // `ehSubConj` continua entrando por fora, com o comportamento que ja
+    // tinha (tambem uma magia so).
+    const temTrocaMagia = trocaNoDescansoLongo(char.classe) === 'uma' || ehSubConj;
     // Troca de truque no Descanso Longo (2026-08-13): antes NAO era
     // oferecida a ninguem aqui -- so existia na subida de nivel
     // (levelup-cards.js). Decisao do dono do produto: vale para toda classe
@@ -1118,21 +1140,13 @@ export function setupEventosDescanso() {
         `;
       }
       if (temTrocaMagia) {
-        if (temTrocaConhecida) {
-          conteudoModal += `
-            <p style="font-size:0.9rem">Deseja trocar uma magia conhecida?</p>
-            <p style="font-size:0.8rem;color:var(--text-muted)">
-              Como ${escHtml(char.classe)}${ehSubConj ? ' (' + escHtml(char.subclasse) + ')' : ''}, você pode trocar <strong>1 magia conhecida</strong> por outra da lista de classe após um Descanso Longo.
-            </p>
-          `;
-        } else {
-          conteudoModal += `
-            <p style="font-size:0.9rem">Deseja trocar suas magias preparadas?</p>
-            <p style="font-size:0.8rem;color:var(--text-muted)">
-              Como ${escHtml(char.classe)}, você pode alterar sua lista de magias preparadas após um Descanso Longo.
-            </p>
-          `;
-        }
+        const rotuloMagia = infoClasse.tipo_conjuracao === 'preparadas' ? 'preparada' : 'conhecida';
+        conteudoModal += `
+          <p style="font-size:0.9rem">Deseja trocar uma magia ${rotuloMagia}?</p>
+          <p style="font-size:0.8rem;color:var(--text-muted)">
+            Como ${escHtml(char.classe)}${ehSubConj ? ' (' + escHtml(char.subclasse) + ')' : ''}, você pode trocar <strong>1 magia ${rotuloMagia}</strong> por outra da lista de classe após um Descanso Longo. Para remontar a lista inteira, use a subida de nível.
+          </p>
+        `;
       }
       if (temTrocaTruque) {
         conteudoModal += `
@@ -1157,13 +1171,10 @@ export function setupEventosDescanso() {
       abrirModal('Descanso Longo Concluído', conteudoModal, botoesModal);
 
       // Funcao auxiliar para abrir o modal de troca correto
-      const abrirTrocaMagias = (callbackPos) => {
-        if (temTrocaConhecida) {
-          mostrarTrocaMagiaConhecida(callbackPos);
-        } else {
-          mostrarTrocaMagias(callbackPos);
-        }
-      };
+      // Uma rota so: o Descanso Longo troca UMA magia para todo mundo.
+      // `mostrarTrocaMagiaConhecida` le `char.magias_preparadas` e serve
+      // igual a conjurador preparado -- o que muda e so o rotulo.
+      const abrirTrocaMagias = (callbackPos) => mostrarTrocaMagiaConhecida(callbackPos);
 
       // Encadeamento das trocas do Descanso Longo.
       //

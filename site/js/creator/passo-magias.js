@@ -8,6 +8,32 @@ import { abrirModal, getBonusTruquesOrdem, getEspacosMagia, getMagiaPreparadas, 
 import { obterTruquesEspecie } from './comum.js';
 import { dadosCache, personagem } from './wizard.js';
 
+/**
+ * O selo de Concentracao vem da DURACAO da magia, no acervo -- nao do
+ * marcador `especial` do arquivo de classe, que e dado derivado e ja divergiu
+ * da duracao em cinco pares (classe, magia).
+ *
+ * O selo de material continua vindo do marcador: `M` ali significa material
+ * COM CUSTO ou consumido, e essa fronteira nao e derivavel do texto do
+ * componente -- medido, derivar como "tem material" marcaria 470 entradas a
+ * mais. O que muda para ele e so a COMPARACAO.
+ */
+function ehConcentracao(magia) {
+  const doAcervo = (dadosCache.indiceMagias || []).find((x) => x.nome === magia?.nome);
+  if (doAcervo?.duracao) return /concentra/i.test(doAcervo.duracao);
+  return temMarcador(magia, 'C');
+}
+
+/**
+ * O campo `especial` vem combinado ("C, R", "R, M", "C, M"), e a comparacao
+ * por igualdade exata perdia 79 selos de Concentracao e 81 de material. E o
+ * mesmo defeito que levelup-ui.js:1004-1012 registra como ja corrigido em
+ * outro lugar -- este ponto ficou para tras.
+ */
+function temMarcador(magia, sigla) {
+  return String(magia?.especial || '').split(',').map((s) => s.trim()).includes(sigla);
+}
+
 // ============================================================
 // PASSO 6: MAGIAS
 // ============================================================
@@ -172,8 +198,8 @@ export async function renderStepMagias(el) {
                 <div class="opcao-nome" data-creator-info="${nome}" data-creator-info-circ="${circ}">${nome}${bloqueadoPorIM ? ' (já conhecido)' : ''}${bloqueadoPorEspecie ? ' (já concedido pela espécie)' : ''}</div>
                 <div class="opcao-resumo">
                   <span>${m.escola || ''}</span>
-                  ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
-                  ${m.especial === 'M' ? '<span>M$</span>' : ''}
+                  ${ehConcentracao(m) ? '<span>Conc.</span>' : ''}
+                  ${temMarcador(m, 'M') ? '<span>M$</span>' : ''}
                 </div>
               </div>`;
           }).join('')}</div>`
@@ -460,8 +486,8 @@ async function _bindInstanciaIM(container, idx, aoMudar) {
                   <div class="opcao-nome" data-im-info="${nome}" data-im-info-circ="${isTruque ? 0 : 1}">${nome}${bloqueado ? ' (já conhecido)' : ''}</div>
                   <div class="opcao-resumo">
                     <span>${m.escola || ''}</span>
-                    ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
-                    ${m.especial === 'M' ? '<span>M$</span>' : ''}
+                    ${ehConcentracao(m) ? '<span>Conc.</span>' : ''}
+                    ${temMarcador(m, 'M') ? '<span>M$</span>' : ''}
                   </div>
                 </div>`;
             }).join('')}</div>`

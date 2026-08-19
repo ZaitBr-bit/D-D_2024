@@ -9,6 +9,7 @@ import { rotuloPericia } from './opcoes-dominio.js';
 import { obterTalentosElegiveis } from './levelup.js';
 import { calcularConjuracao, calcularSubclasseArcana } from './levelup-flow.js';
 import { linhasDaSubclasseNoNivel, opcoesDaLinha } from './regras-subclasse-escolhas.js';
+import { magiaContaNoLimite, truqueEhTrocavel } from './regras-origens-magia.js';
 
 // ============================================================
 // CARD: Ganhos do Nível
@@ -582,8 +583,7 @@ export function renderCardMagias(ctx, state) {
   // (levelup-ui.js, "Troca") ja era gated so por `ctx.ehConjurador`, entao
   // nao precisou mudar junto.
   const magiasAtuais = (char.magias_preparadas || []).filter(m => {
-    const origensEspeciais = ['dominio', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista', 'subclasse_escolha'];
-    return m.circulo > 0 && !origensEspeciais.includes(m?.origem);
+    return m.circulo > 0 && magiaContaNoLimite(m);
   });
   if (magiasAtuais.length > 0) {
     // O Mago troca DENTRO do grimorio: preparar uma magia que nao esta no
@@ -595,11 +595,12 @@ export function renderCardMagias(ctx, state) {
     const rotulo = tipoConj === 'conhecidas' ? 'magia conhecida' : 'magia preparada';
     html += `
       <div class="levelup-card">
-        <div class="levelup-card-header">Trocar Magia (Opcional)</div>
+        <div class="levelup-card-header">Trocar Magias (Opcional)</div>
         <div class="levelup-card-body">
           <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
-            Troque 1 ${rotulo} por outra ${fonte}.
+            Troque quantas ${rotulo}s quiser por outras ${fonte}.
           </div>
+          <div id="levelup-trocas-magia-feitas"></div>
           <div id="levelup-troca-magia"></div>
         </div>
       </div>
@@ -608,17 +609,17 @@ export function renderCardMagias(ctx, state) {
 
   // Troca de truque (qualquer classe conjuradora com truques de classe conhecidos)
   const truquesAtuais = (char.magias_conhecidas || []).filter(m => {
-    const origensEspeciais = ['especie', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista', 'subclasse_fixa', 'subclasse_automatica'];
-    return m.circulo === 0 && !origensEspeciais.includes(m?.origem);
+    return m.circulo === 0 && truqueEhTrocavel(m);
   });
   if (truquesAtuais.length > 0) {
     html += `
       <div class="levelup-card">
-        <div class="levelup-card-header">Trocar Truque (Opcional)</div>
+        <div class="levelup-card-header">Trocar Truques (Opcional)</div>
         <div class="levelup-card-body">
           <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
-            Troque 1 truque conhecido por outro da lista de ${char.classe}.
+            Troque quantos truques quiser por outros da lista de ${char.classe}.
           </div>
+          <div id="levelup-trocas-truque-feitas"></div>
           <div id="levelup-troca-truque"></div>
         </div>
       </div>

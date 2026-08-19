@@ -59,21 +59,20 @@ function lerQuartaFonte(arquivo) {
   return saida;
 }
 
-// Causas registradas em lacunas-conhecidas.mjs, por classe.
-const CAUSA_CIRCULO_DO_GRUPO = {
-  'Druida': { talento: 'Druida', teste: 'magias-circulo-do-grupo' },
-};
+// CORRIGIDO em 2026-08-18 (Correção A): achatarMagiasClasse passou a tirar o
+// círculo do acervo, e a entrada errada do Druida foi movida para o grupo
+// certo. O mapa fica vazio de propósito -- a próxima entrada mal colocada
+// entra aqui sem precisar reconstruir o mecanismo.
+const CAUSA_CIRCULO_DO_GRUPO = {};
 
-// Os cinco pares (arquivo de classe, magia) cujo marcador `especial`
-// contradiz a `duracao` da própria magia. É por PAR, e não por magia: o mesmo
-// nome aparece na lista de várias classes, e o `especial` é escrito por
-// arquivo -- "Projeção Astral" diverge no do Clérigo e está correta no do
-// Mago. Medido arquivo a arquivo, não suposto.
-const CAUSA_MARCADOR_C = new Set([
-  'clerigo|Projeção Astral',
-  'feiticeiro|Criação', 'feiticeiro|Mover Terra', 'feiticeiro|Sugestão em Massa',
-  'mago|Piscar',
-]);
+// CORRIGIDO em 2026-08-18 (Correção A): os cinco pares (arquivo de classe,
+// magia) cujo marcador `especial` contradizia a `duracao` da própria magia
+// foram acertados no dado, e o selo da tela passou a vir da DURAÇÃO em vez do
+// marcador (creator/passo-magias.js). O conjunto fica vazio de propósito: era
+// por PAR, e não por magia -- o mesmo nome aparece na lista de várias classes
+// e o `especial` é escrito por arquivo --, então o próximo par divergente
+// entra aqui sem precisar reconstruir o mecanismo.
+const CAUSA_MARCADOR_C = new Set([]);
 
 for (const [arquivo, classe] of Object.entries(CLASSES)) {
   const quarta = lerQuartaFonte(`magias_${arquivo}.json`);
@@ -158,7 +157,7 @@ for (const [arquivo, classe] of Object.entries(CLASSES)) {
       `magias_${arquivo}.json: ${errados.join('; ')}`);
   });
 
-  test(`marcador C × duração: ${classe}`, async () => {
+  test(`marcador C × duração: ${classe}`, () => {
     const avaliar = (filtro) => {
       const errados = [];
       for (const m of quarta) {
@@ -177,12 +176,5 @@ for (const [arquivo, classe] of Object.entries(CLASSES)) {
     assert.deepEqual(avaliar((chave) => !CAUSA_MARCADOR_C.has(chave)), [],
       `o marcador 'especial' contradiz a duração da magia em magias_${arquivo}.json`);
 
-    // Os pares com causa: a asserção roda dentro de comLacuna.
-    const comCausa = quarta.filter((m) => CAUSA_MARCADOR_C.has(`${arquivo}|${m.nome}`));
-    if (!comCausa.length) return;
-    await comLacuna('Mago', 'magias-marcador-concentracao', () => {
-      assert.deepEqual(avaliar((chave) => CAUSA_MARCADOR_C.has(chave)), [],
-        `o marcador 'especial' contradiz a duração da magia em magias_${arquivo}.json`);
-    });
   });
 }

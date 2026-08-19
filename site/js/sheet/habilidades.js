@@ -18,7 +18,7 @@ import { getEstadoRecursosGuardiao } from './classes/guardiao.js';
 import { getEstadoRecursosGuerreiro } from './classes/guerreiro.js';
 import { getEstadoRecursosLadino } from './classes/ladino.js';
 import { getEstadoRecursosMago } from './classes/mago.js';
-import { abrirEscolhaMagiasFixasMago, mostrarTrocaMagias } from './grimorio.js';
+import { abrirEscolhaMagiasFixasMago, mostrarTrocaMagiaConhecida } from './grimorio.js';
 import { getEstadoRecursosMonge } from './classes/monge.js';
 import { getEstadoRecursosPaladino } from './classes/paladino.js';
 import { ataqueImprudenteAtivo, formatarMetros, getDeslocamentoFinal, parseMetros, temArmaduraPesadaEquipada } from './combate.js';
@@ -1870,11 +1870,20 @@ export function setupEventosHabilidades() {
         abrirEscolhaMagiasFixasMago('assinatura_magica');
         return;
       }
-      // Memorizar Magia (nível 5): troca 1 magia preparada por outra do
-      // livro de magias -- para o Mago, mostrarTrocaMagias já troca dentro
-      // do grimório.
+      // Memorizar Magia (nível 5): troca UMA magia preparada por outra do
+      // livro de magias. Abria a lista COMPLETA, deixando remontar tudo --
+      // o texto da característica dá uma só. O modal de troca única resolve
+      // o lado "entra" pelo grimório quando a classe é Mago.
+      //
+      // O botão do Descanso Curto (hp-descanso.js) é o outro caminho para
+      // esta mesma característica, e chama isto aqui com o mesmo texto: dois
+      // caminhos para a mesma regra não podem responder coisas diferentes.
       if (acao === 'memorizar-magia') {
-        mostrarTrocaMagias();
+        mostrarTrocaMagiaConhecida(null, {
+          titulo: 'Memorizar Magia',
+          explicacao: 'Apos um Descanso Curto, voce pode trocar <strong>1 magia preparada</strong> '
+            + 'por outra do seu livro de magias.',
+        });
         return;
       }
 

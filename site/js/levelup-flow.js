@@ -6,6 +6,7 @@ import { CLASSES_INFO, ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ESCOLAS_SUBCLASSE_MAGO }
 import { linhasDaSubclasseNoNivel } from './regras-subclasse-escolhas.js';
 import { getClasse, getMagiasClasse, getMagiasPorCirculo } from './db.js';
 import { getTruquesFixosSubclasse } from './regras-conjuracao-subclasse.js';
+import { magiaContaNoLimite, truqueEhTrocavel } from './regras-origens-magia.js';
 import {
   calcMod, bonusProficiencia, getBonusTruquesOrdem, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas
 } from './utils.js';
@@ -454,17 +455,20 @@ const STEP_DEFINITIONS = [
       // classe, mesmo em níveis sem ganho de truque/magia novo - então o step também
       // precisa ficar visível quando há pelo menos 1 truque elegível para troca (mesma
       // lista de origens especiais usada no card de troca em levelup-cards.js).
-      const origensEspeciais = ['especie', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista', 'subclasse_fixa', 'subclasse_automatica'];
-      const temTruqueTrocavel = (ctx.char.magias_conhecidas || []).some(m => m.circulo === 0 && !origensEspeciais.includes(m?.origem));
+      const temTruqueTrocavel = (ctx.char.magias_conhecidas || []).some(m => m.circulo === 0 && truqueEhTrocavel(m));
       // 2026-08-13: a troca de MAGIA passou a valer para toda classe
       // conjuradora (antes so `conhecidas` -- ver levelup-cards.js). Um
       // Clerigo/Druida/Paladino/Guardiao num nivel sem truque novo e sem
       // magia nova nao tinha nenhuma outra razao para este step aparecer,
-      // e o card de troca ficaria renderizado numa tela invisivel. Mesma
-      // lista de origens especiais do card (`dominio` entra aqui, porque
-      // magia de dominio nao e escolha do jogador e nao pode ser trocada).
-      const origensEspeciaisMagia = ['dominio', ...origensEspeciais];
-      const temMagiaTrocavel = (ctx.char.magias_preparadas || []).some(m => m.circulo > 0 && !origensEspeciaisMagia.includes(m?.origem));
+      // e o card de troca ficaria renderizado numa tela invisivel.
+      //
+      // Esta linha montava a lista de magia como `['dominio', ...origensEspeciais]`
+      // -- espalhando a lista de TRUQUE. Carregava origens que magia de
+      // círculo 1+ nunca tem (`especie`, `subclasse_fixa`, `subclasse_automatica`)
+      // e, pior, NÃO tinha `subclasse_escolha`, `maestria_magias` nem
+      // `assinatura_magica`: o step ficava visível oferecendo troca de magia
+      // que o livro diz que o personagem sempre tem preparada.
+      const temMagiaTrocavel = (ctx.char.magias_preparadas || []).some(m => m.circulo > 0 && magiaContaNoLimite(m));
       return c.truquesGanhos > 0 || (c.tipoConj === 'conhecidas' && c.magiasGanhas > 0) || c.ehMago || !!subclasseArcana || temTruqueTrocavel || temMagiaTrocavel;
     },
     completo: (ctx, state) => {
@@ -572,6 +576,16 @@ export function createInitialState() {
     magiasSelecionadas: [],
     grimorioSelecionados: [],
     subclasseMagiasSelecionados: [],
+    // Trocas JA CONFIRMADAS nesta subida de nivel. Ao avancar um nivel o
+    // jogador pode trocar QUANTAS magias e truques quiser (decisao de
+    // produto, ver regras-preparo-magias.js) -- o Descanso Longo e que fica
+    // com uma so. Cada entrada e { de, para, circulo }.
+    trocasMagia: [],
+    trocasTruque: [],
+    // O par que esta sendo montado agora, ainda nao confirmado. Vira uma
+    // entrada das listas acima quando o jogador clica "Adicionar outra
+    // troca", e tambem e aplicado sozinho se ele terminar o nivel sem
+    // clicar -- nao se perde troca por falta de um clique extra.
     trocarDe: '',
     trocarPara: '',
     trocarParaCirculo: 0,

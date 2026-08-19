@@ -17,9 +17,10 @@ import { deArmas, deEstilosLuta, deMagias, deManobras, deTalentos, motivoPreRequ
 import { collectOpcoes, validateAll } from './levelup-validations.js';
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, PERICIAS } from './dados-classes.js';
 import { getArmas, getMagiasPorCirculo, getMagiasClasse, getMagiasRituais } from './db.js';
-import { abrirModal, toast, mdParaHtml, semAcento, calcMod, getEspacosMagia } from './utils.js';
+import { abrirModal, toast, mdParaHtml, semAcento, calcMod, escHtml, getEspacosMagia } from './utils.js';
 import { subirDeNivel, obterAtributosASITalento, getLimiteASITalento, obterTalentosElegiveis } from './levelup.js';
 import { abrirGridManobras } from './manobras-ui.js';
+import { magiaContaNoLimite, truqueEhTrocavel } from './regras-origens-magia.js';
 import {
   PERICIAS_TODAS as _PERICIAS_NOMES, FERRAMENTAS_TODAS as _FERRAMENTAS_TODAS,
   FERRAMENTAS_ARTESAO as _FERRAMENTAS_ARTESAO, INSTRUMENTOS_MUSICAIS as _INSTRUMENTOS,
@@ -1443,69 +1444,159 @@ function bindEventosMagias(ctx, state) {
   // {nome,circulo,origem} salvos no personagem -- deMagias() precisa dos
   // dados completos (escola, duração) para mostrar círculo/escola/
   // concentração nos dois lados, por isso busca em `listaMagiasClasse`.
+  // ------------------------------------------------------------
+  // Trocas MULTIPLAS na subida de nivel.
+  //
+  // Ao avancar um nivel o jogador pode trocar quantas magias e truques
+  // quiser (decisao de produto, ver regras-preparo-magias.js); o Descanso
+  // Longo e que fica com uma so. O componente `montarTroca` (ui-opcoes.js)
+  // monta UM par, e e usado tambem por maestrias e manobras -- entao em vez
+  // de reescreve-lo, este bloco o reaproveita: as trocas ja confirmadas
+  // viram linhas acima dele, e um botao "Adicionar outra troca" empurra o
+  // par atual para a lista e remonta o componente vazio.
+  //
+  // O par atual NAO precisa ser confirmado pelo botao para valer: quem
+  // escolher uma troca so e terminar o nivel tem a troca aplicada do mesmo
+  // jeito (ver a aplicacao, mais abaixo). O botao existe para a SEGUNDA.
+
+  /** Desenha as trocas ja confirmadas, cada uma com um botao de desfazer. */
+  function _desenharTrocasFeitas(el, lista, rotulo, aoRemover) {
+    if (!el) return;
+    if (!lista.length) { el.innerHTML = ''; return; }
+    el.innerHTML = lista.map((t, i) => `
+      <div class="opcao-passo resolvido" style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+        <strong style="color:var(--primary)">${escHtml(t.de)}</strong>
+        <span style="color:var(--text-muted)">&rarr;</span>
+        <strong style="color:var(--primary)">${escHtml(t.para)}</strong>
+        <span class="opcao-passo-alterar" data-desfazer-troca="${i}" style="margin-left:auto">desfazer</span>
+      </div>`).join('');
+    el.querySelectorAll('[data-desfazer-troca]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        lista.splice(Number(btn.dataset.desfazerTroca), 1);
+        aoRemover();
+      });
+    });
+    el.insertAdjacentHTML('afterbegin',
+      `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:4px">${escHtml(rotulo)}</div>`);
+  }
+
+  /** Botao que empurra o par atual para a lista e limpa o componente. */
+  function _botaoAdicionarTroca(el, aoAdicionar) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn btn-sm btn-secondary';
+    btn.style.marginTop = '6px';
+    btn.textContent = '+ Adicionar outra troca';
+    btn.addEventListener('click', aoAdicionar);
+    el.appendChild(btn);
+  }
+
   const trocaMagiaEl = document.getElementById('levelup-troca-magia');
   if (trocaMagiaEl) {
-    const origensEspeciaisMagia = ['dominio', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista', 'subclasse_escolha'];
-    const magiasAtuaisNomes = new Set((ctx.char.magias_preparadas || [])
-      .filter(m => m.circulo > 0 && !origensEspeciaisMagia.includes(m?.origem))
-      .map(m => m.nome));
-    const magiasAtuaisCompletas = listaMagiasClasse.filter(m => magiasAtuaisNomes.has(m.nome));
-    // Fonte do lado "entra": o Mago so pode preparar o que esta no grimorio
-    // (mesma regra de sheet/grimorio.js/mostrarTrocaMagias no Descanso Longo
-    // e de normalizarGrimorioMago); as demais classes usam a lista da classe.
-    // Sem isto, abrir a troca para classes preparadas (2026-08-13) deixaria
-    // o Mago preparar magia que nao esta no livro dele.
-    const fonteEntra = conj.ehMago
-      ? (ctx.char.grimorio || []).map(m => ({ ...m }))
-      : listaMagiasClasse;
-    montarTroca(trocaMagiaEl, {
-      // `selecionado`: restaura a troca já escolhida antes deste bind ser
-      // refeito do zero -- ex.: "Anterior" e "Próximo" de volta a este
-      // passo. Sem isso, montarTroca (ui-opcoes.js) apagava a escolha em
-      // silêncio ao remontar (achado do revisor, Task 12 Rodada 2).
-      sai: { rotulo: 'Qual magia sai?', opcoes: deMagias(magiasAtuaisCompletas), selecionado: state.trocarDe || null },
-      entra: {
-        rotulo: 'Qual entra no lugar?', densidade: 'densa', busca: true,
-        opcoes: deMagias(
-          fonteEntra.filter(m => m.circulo > 0 && m.circulo <= maxCirculoNovo),
-          { jaTem: new Set([...jaTemMagias, ...magiasSel]) }
-        ),
-        selecionado: state.trocarPara || null,
-      },
-      aoMudar: ({ sai, entra }) => {
-        state.trocarDe = sai || '';
-        state.trocarPara = entra || '';
-        state.trocarParaCirculo = entra ? (fonteEntra.find(m => m.nome === entra)?.circulo || 0) : 0;
-      },
-    });
+    // Montado numa funcao porque precisa ser REFEITO a cada troca
+    // adicionada ou desfeita: quem ja saiu nao pode sair de novo, e quem ja
+    // entrou nao pode entrar duas vezes.
+    const montarBlocoTrocaMagia = () => {
+      const jaSairam = new Set(state.trocasMagia.map((t) => t.de));
+      const jaEntraram = new Set(state.trocasMagia.map((t) => t.para));
+
+      const magiasAtuaisNomes = new Set((ctx.char.magias_preparadas || [])
+        .filter(m => m.circulo > 0 && magiaContaNoLimite(m) && !jaSairam.has(m.nome))
+        .map(m => m.nome));
+      // As que ENTRARAM por uma troca anterior tambem podem sair numa
+      // seguinte -- o jogador mudou de ideia -- mas so depois de aplicadas.
+      // Aqui elas ainda nao estao em `magias_preparadas`, entao entram pela
+      // lista da classe.
+      const magiasAtuaisCompletas = listaMagiasClasse.filter(m => magiasAtuaisNomes.has(m.nome));
+      // Fonte do lado "entra": o Mago so pode preparar o que esta no grimorio
+      // (mesma regra de sheet/grimorio.js/mostrarTrocaMagias no Descanso Longo
+      // e de normalizarGrimorioMago); as demais classes usam a lista da classe.
+      // Sem isto, abrir a troca para classes preparadas (2026-08-13) deixaria
+      // o Mago preparar magia que nao esta no livro dele.
+      const fonteEntra = conj.ehMago
+        ? (ctx.char.grimorio || []).map(m => ({ ...m }))
+        : listaMagiasClasse;
+
+      _desenharTrocasFeitas(
+        document.getElementById('levelup-trocas-magia-feitas'),
+        state.trocasMagia, 'Trocas já feitas:', montarBlocoTrocaMagia);
+
+      montarTroca(trocaMagiaEl, {
+        // `selecionado`: restaura a troca já escolhida antes deste bind ser
+        // refeito do zero -- ex.: "Anterior" e "Próximo" de volta a este
+        // passo. Sem isso, montarTroca (ui-opcoes.js) apagava a escolha em
+        // silêncio ao remontar (achado do revisor, Task 12 Rodada 2).
+        sai: { rotulo: 'Qual magia sai?', opcoes: deMagias(magiasAtuaisCompletas), selecionado: state.trocarDe || null },
+        entra: {
+          rotulo: 'Qual entra no lugar?', densidade: 'densa', busca: true,
+          opcoes: deMagias(
+            fonteEntra.filter(m => m.circulo > 0 && m.circulo <= maxCirculoNovo),
+            { jaTem: new Set([...jaTemMagias, ...magiasSel, ...jaEntraram]) }
+          ),
+          selecionado: state.trocarPara || null,
+        },
+        aoMudar: ({ sai, entra }) => {
+          state.trocarDe = sai || '';
+          state.trocarPara = entra || '';
+          state.trocarParaCirculo = entra ? (fonteEntra.find(m => m.nome === entra)?.circulo || 0) : 0;
+          if (state.trocarDe && state.trocarPara) {
+            _botaoAdicionarTroca(trocaMagiaEl, () => {
+              state.trocasMagia.push({
+                de: state.trocarDe, para: state.trocarPara, circulo: state.trocarParaCirculo,
+              });
+              state.trocarDe = ''; state.trocarPara = ''; state.trocarParaCirculo = 0;
+              montarBlocoTrocaMagia();
+            });
+          }
+        },
+      });
+    };
+    montarBlocoTrocaMagia();
   }
 
   // Troca de truque (Task 12): mesma forma da troca de magia, restrita a
   // círculo 0 e sem limite de círculo máximo.
   const trocaTruqueEl = document.getElementById('levelup-troca-truque');
   if (trocaTruqueEl) {
-    const origensEspeciaisTruque = ['especie', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista', 'subclasse_automatica'];
-    const truquesAtuaisNomes = new Set((ctx.char.magias_conhecidas || [])
-      .filter(m => m.circulo === 0 && !origensEspeciaisTruque.includes(m?.origem))
-      .map(m => m.nome));
-    const truquesAtuaisCompletos = listaMagiasClasse.filter(m => truquesAtuaisNomes.has(m.nome));
-    montarTroca(trocaTruqueEl, {
-      // `selecionado`: mesmo motivo do `selecionado` da troca de magia,
-      // acima (achado do revisor, Task 12 Rodada 2).
-      sai: { rotulo: 'Qual truque sai?', opcoes: deMagias(truquesAtuaisCompletos), selecionado: state.truqueTrocarDe || null },
-      entra: {
-        rotulo: 'Qual entra no lugar?', densidade: 'densa', busca: true,
-        opcoes: deMagias(
-          listaMagiasClasse.filter(m => m.circulo === 0),
-          { jaTem: new Set([...jaTemTruques, ...truquesSel]) }
-        ),
-        selecionado: state.truqueTrocarPara || null,
-      },
-      aoMudar: ({ sai, entra }) => {
-        state.truqueTrocarDe = sai || '';
-        state.truqueTrocarPara = entra || '';
-      },
-    });
+    const montarBlocoTrocaTruque = () => {
+      const jaSairam = new Set(state.trocasTruque.map((t) => t.de));
+      const jaEntraram = new Set(state.trocasTruque.map((t) => t.para));
+
+      const truquesAtuaisNomes = new Set((ctx.char.magias_conhecidas || [])
+        .filter(m => m.circulo === 0 && truqueEhTrocavel(m) && !jaSairam.has(m.nome))
+        .map(m => m.nome));
+      const truquesAtuaisCompletos = listaMagiasClasse.filter(m => truquesAtuaisNomes.has(m.nome));
+
+      _desenharTrocasFeitas(
+        document.getElementById('levelup-trocas-truque-feitas'),
+        state.trocasTruque, 'Trocas já feitas:', montarBlocoTrocaTruque);
+
+      montarTroca(trocaTruqueEl, {
+        // `selecionado`: mesmo motivo do `selecionado` da troca de magia,
+        // acima (achado do revisor, Task 12 Rodada 2).
+        sai: { rotulo: 'Qual truque sai?', opcoes: deMagias(truquesAtuaisCompletos), selecionado: state.truqueTrocarDe || null },
+        entra: {
+          rotulo: 'Qual entra no lugar?', densidade: 'densa', busca: true,
+          opcoes: deMagias(
+            listaMagiasClasse.filter(m => m.circulo === 0),
+            { jaTem: new Set([...jaTemTruques, ...truquesSel, ...jaEntraram]) }
+          ),
+          selecionado: state.truqueTrocarPara || null,
+        },
+        aoMudar: ({ sai, entra }) => {
+          state.truqueTrocarDe = sai || '';
+          state.truqueTrocarPara = entra || '';
+          if (state.truqueTrocarDe && state.truqueTrocarPara) {
+            _botaoAdicionarTroca(trocaTruqueEl, () => {
+              state.trocasTruque.push({ de: state.truqueTrocarDe, para: state.truqueTrocarPara });
+              state.truqueTrocarDe = ''; state.truqueTrocarPara = '';
+              montarBlocoTrocaTruque();
+            });
+          }
+        },
+      });
+    };
+    montarBlocoTrocaTruque();
   }
 }
 
@@ -1622,10 +1713,10 @@ export async function confirmarLevelUp(ctx, state, caches) {
   let truquesAdicionados = [];
   let magiasAdicionadas = [];
   let grimorioAdicionado = [];
-  let magiaTrocadaDe = null;
-  let magiaTrocadaPara = null;
-  let truqueTrocadoDe = null;
-  let truqueTrocadoPara = null;
+  // Listas, e nao um par: a subida de nivel aceita quantas trocas o jogador
+  // quiser (decisao de produto, ver regras-preparo-magias.js).
+  const trocasMagiaAplicadas = [];
+  const trocasTruqueAplicadas = [];
   const listaMagiasClasse = ctx._listaMagiasClasse || [];
 
   // Reativo à subclasse escolhida agora: sem isto, as magias e truques
@@ -1652,25 +1743,38 @@ export async function confirmarLevelUp(ctx, state, caches) {
       }
     });
 
-    // Troca
-    if (state.trocarDe && state.trocarPara) {
-      const idx = char.magias_preparadas?.findIndex(m => m.nome === state.trocarDe);
+    // Trocas de magia. `state.trocasMagia` guarda as confirmadas pelo botao
+    // "Adicionar outra troca"; o par pendente entra no fim, se estiver
+    // completo -- quem faz UMA troca so nunca clica naquele botao, e nao
+    // pode perder a troca por causa disso.
+    const todasTrocasMagia = [
+      ...state.trocasMagia,
+      ...(state.trocarDe && state.trocarPara
+        ? [{ de: state.trocarDe, para: state.trocarPara, circulo: state.trocarParaCirculo }]
+        : []),
+    ];
+    for (const troca of todasTrocasMagia) {
+      const idx = char.magias_preparadas?.findIndex(m => m.nome === troca.de);
       if (idx !== undefined && idx !== -1) {
-        magiaTrocadaDe = state.trocarDe;
-        magiaTrocadaPara = state.trocarPara;
+        trocasMagiaAplicadas.push(troca);
         char.magias_preparadas.splice(idx, 1);
-        char.magias_preparadas.push({ nome: state.trocarPara, circulo: state.trocarParaCirculo });
+        char.magias_preparadas.push({ nome: troca.para, circulo: troca.circulo });
       }
     }
 
-    // Troca de truque
-    if (state.truqueTrocarDe && state.truqueTrocarPara) {
-      const idx = char.magias_conhecidas?.findIndex(m => m.nome === state.truqueTrocarDe);
+    // Trocas de truque -- mesma forma das de magia, acima.
+    const todasTrocasTruque = [
+      ...state.trocasTruque,
+      ...(state.truqueTrocarDe && state.truqueTrocarPara
+        ? [{ de: state.truqueTrocarDe, para: state.truqueTrocarPara }]
+        : []),
+    ];
+    for (const troca of todasTrocasTruque) {
+      const idx = char.magias_conhecidas?.findIndex(m => m.nome === troca.de);
       if (idx !== undefined && idx !== -1) {
-        truqueTrocadoDe = state.truqueTrocarDe;
-        truqueTrocadoPara = state.truqueTrocarPara;
+        trocasTruqueAplicadas.push(troca);
         char.magias_conhecidas.splice(idx, 1);
-        char.magias_conhecidas.push({ nome: state.truqueTrocarPara, circulo: 0 });
+        char.magias_conhecidas.push({ nome: troca.para, circulo: 0 });
       }
     }
   }
@@ -1685,7 +1789,7 @@ export async function confirmarLevelUp(ctx, state, caches) {
     window.fecharModalTodos?.();
 
     // Resumo
-    const resumo = montarResumoFinal(resultado, char, truquesAdicionados, magiasAdicionadas, grimorioAdicionado, magiaTrocadaDe, magiaTrocadaPara, subclasseMagiasAdicionadas, truqueTrocadoDe, truqueTrocadoPara);
+    const resumo = montarResumoFinal(resultado, char, truquesAdicionados, magiasAdicionadas, grimorioAdicionado, trocasMagiaAplicadas, subclasseMagiasAdicionadas, trocasTruqueAplicadas);
     abrirModal('Subida de Nível Concluída!', resumo, '<button class="btn btn-primary" onclick="fecharModal()">OK</button>');
     _renderFichaFn?.();
   } else {
@@ -1694,7 +1798,7 @@ export async function confirmarLevelUp(ctx, state, caches) {
   }
 }
 
-function montarResumoFinal(resultado, char, truquesAdicionados, magiasAdicionadas, grimorioAdicionado, magiaTrocadaDe, magiaTrocadaPara, subclasseMagiasAdicionadas = [], truqueTrocadoDe = null, truqueTrocadoPara = null) {
+function montarResumoFinal(resultado, char, truquesAdicionados, magiasAdicionadas, grimorioAdicionado, trocasMagia = [], subclasseMagiasAdicionadas = [], trocasTruque = []) {
   const attrNomes = { forca: 'Força', destreza: 'Destreza', constituicao: 'Constituição', inteligencia: 'Inteligência', sabedoria: 'Sabedoria', carisma: 'Carisma' };
 
   // Icones SVG inline
@@ -1734,8 +1838,10 @@ function montarResumoFinal(resultado, char, truquesAdicionados, magiasAdicionada
     const label = resultado.subclasse_escolhida ? `Magias de Subclasse (${resultado.subclasse_escolhida})` : 'Magias de Subclasse';
     itens.push(`${label}: +${subclasseMagiasAdicionadas.join(', ')}`);
   }
-  if (magiaTrocadaDe) itens.push(`Troca: ${magiaTrocadaDe} ${iconArrow} ${magiaTrocadaPara}`);
-  if (truqueTrocadoDe) itens.push(`Troca de truque: ${truqueTrocadoDe} ${iconArrow} ${truqueTrocadoPara}`);
+  // Uma linha por troca: o resumo mostrava um par so, e agora pode haver
+  // varias -- calar as demais faria o jogador confirmar o que nao viu.
+  for (const t of trocasMagia) itens.push(`Troca: ${t.de} ${iconArrow} ${t.para}`);
+  for (const t of trocasTruque) itens.push(`Troca de truque: ${t.de} ${iconArrow} ${t.para}`);
 
   // HTML Final
   return `

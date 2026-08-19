@@ -123,19 +123,28 @@ Playwright) inverte a expectativa só para esse par (talento, teste):
 Por isso a lista **é o backlog real** de correções do app contra o livro — não
 uma nota de rodapé.
 
-> ✅ **O backlog zerou em 2026-08-18.** A rodada de correção (quatro planos, em
+> ✅ **O backlog está zerado de novo, em 2026-08-19.**
+> A rodada de correção de 2026-08-18 (quatro planos, em
 > `docs/superpowers/plans/2026-08-18-correcao-*.md`) fechou as **29 causas** que
-> os seis domínios de identificação tinham registrado. `LACUNAS` saiu de 21 para
-> **3 entradas**, e as três são `limitacao-observabilidade` — rota de teste
-> cega, não divergência do app. Isso importa para quem ler o arquivo depois: três
-> entradas restantes **não** são três bugs abertos. Quando a próxima divergência
-> real aparecer, ela será a primeira da lista de novo.
+> os seis domínios de identificação tinham registrado, levando `LACUNAS` de 21
+> para 3. Depois o **domínio Magias** foi validado em quatro planos e registrou
+> **7 divergências novas**, subindo a lista para 10 — e as **Correções A, B, C e
+> D** fecharam as sete.
+>
+> Estado atual: **3 entradas**, todas `limitacao-observabilidade` — rota de teste
+> cega, não divergência do app. **Zero divergências entre app e livro.**
 >
 > As três: `Aumento no Valor de Atributo` (a validação existe, por um mecanismo
 > que esta rota não confronta), `Cavaleiro Místico` (o app pergunta e grava
 > certo, numa camada que o motor de unidade não dirige) e `Caçador` (o catálogo
 > espera pendência de nível para duas escolhas que o livro põe num descanso —
-> ver `docs/PERGUNTAS-PENDENTES.txt`). Cada entrada é uma alegação de que o app está errado num
+> ver `docs/PERGUNTAS-PENDENTES.txt`).
+>
+> Isso importa para quem ler o arquivo depois: **três entradas restantes não são
+> três bugs abertos.** Quando a próxima divergência real aparecer, ela será a
+> primeira da lista de novo.
+
+Cada entrada é uma alegação de que o app está errado num
 ponto específico e citável. Uma entrada falsa (um gap que na verdade não
 existe) é **pior** que uma entrada faltando: uma lacuna ausente é só um teste
 vermelho esperando alguém investigar; uma lacuna falsa é a suíte inteira
@@ -219,9 +228,9 @@ depois e estão nas duas últimas linhas ou no próprio cabeçalho do arquivo.
 | `subclasse-nome-literal.test.mjs` | Varredura de `site/js/`: todo literal comparado com `subclasse === '...'`/`!== '...'` (154 ocorrências) precisa ser um dos **48 nomes reais** de `dados/classes/*.json`. Nasceu do typo das guardas de Juramento do Paladino (`'Juramento de X'` contra o real `'Juramento da X'`), que deixou quatro `if` de restauração como código morto -- o tipo de erro que nenhuma revisão que LÊ o código pega, porque os dois lados parecem certos isoladamente. Não confere se a guarda está no Descanso certo nem se zera o campo certo: isso continua sendo do Grupo 5 de `subclasses-recursos.test.mjs` | 3 |
 | `especies.test.mjs` | As **10 espécies do livro** (`catalogo/especies.mjs`) × app, em quatro grupos: higiene (bijeção com `dados/origens/especies.json`, e cada uma das 49 citações conferida contra a LINHA real de `Espécies.md`); campos de cabeçalho (`getTamanho`/`getDeslocamento`, funções puras de `utils.js`, varredura exaustiva das 10); traços que só chegam num nível, confrontados sobre a **união** dos dois mecanismos de entrega (o anúncio de `obterCaracteristicasEspecieNivel` e o filtro por nível de `renderSecaoTracosEspecie`), mais a ausência antes do nível; e as 5 escolhas de linhagem, incluindo as magias de nível 3 e 5 de Linhagem Élfica e Legado Ínfero × `MAGIAS_LEGADO_ESPECIE`. **Não** valida Kenku (o livro não a tem — ver `FORA_DO_LIVRO`) nem o Deslocamento do Tiferino (o livro não o declara) | 62 (61 rodam asserção; **1 skip**, o Deslocamento do Tiferino) |
 | `magias.test.mjs` | Plano 1 do domínio Magias: as **391 magias** do livro × as **três** fontes de `dados/magias/` — os arquivos por círculo (`truques.json` + `circulo_1..9.json`, schema completo), `_indice.json` (derivado deles) e `por_classe/*.json` (a lista inversa). Confronta os 7 campos de cabeçalho (círculo, escola, classes, tempo de conjuração, alcance, componentes, duração) magia a magia, mais bijeção nas três direções. O catálogo aqui **não é transcrição à mão**: o livro tem formato rígido, então `catalogo/magias.mjs` é um LEITOR dele, e o oráculo é o próprio `Magias.md`. **Não** confronta comportamento nenhum — preparo, troca, ritual, concentração e círculo superior são os Planos 2-4 | 794 |
-| `magias-por-classe.test.mjs` | Plano 2 do domínio Magias: a **quarta** fonte de listas de magia — `dados/classes/magias_<classe>.json`, a que as TELAS usam (`getMagiasClasse`) — confrontada contra o livro em três eixos: pertencimento (987 entradas), **círculo do GRUPO** (é o grupo, não o campo da magia, que `achatarMagiasClasse` transforma no círculo exibido) e escola. Mais o marcador derivado `especial`: `R` contra `tempo_conjuracao` e `C` contra `duracao`. **Não** confronta o `M` do marcador — limite declarado no cabeçalho, com as duas leituras medidas (389 e 12 divergências) | 48 |
-| `magias-preparo.test.mjs` | Plano 3 do domínio Magias, dois eixos. (1) A tabela **"Magias Preparadas por Classe"** do livro (`Magias.md:19-28`) × o que o app oferece: o livro fixa QUANDO a lista muda e QUANTAS magias, e o app despacha por `tipo_conjuracao`, um campo de dois valores para duas variáveis independentes. Uma asserção por eixo, nas 8 classes. (2) A **coerência do app consigo mesmo**: a lista de origens isentas do limite está copiada em dez lugares de `site/js/`, e o motor varre todas, agrupa por PAPEL (lista de magia × de truque, que diferem de propósito) e exige que as do mesmo papel sejam idênticas. Mais uma guarda de que toda `origem:` escrita pelo app está classificada em alguma lista | 21 |
-| `magias-conjuracao.test.mjs` | Plano 4 do domínio Magias, que o fecha. Três eixos: **Concentração** (o mapa curado `MAGIAS_EFEITO` de `sheet/magias.js:772` × a `duracao` da magia — o mapa tem precedência em `ehMagiaConcentracao`, então um erro nele vence o dado certo), **Ritual** (as 31 magias com o marcador × a existência de uma rota de conjuração ritual em `site/js/` que não seja a de magia personalizada — asserção sobre o CÓDIGO, na mesma natureza de `gatilhos-ui-cobertos.test.mjs`) e **círculo superior** (só guarda de tamanho: 154 magias com o texto; o app não modela efeito de magia, então não há upcast a aplicar — limite declarado, não lacuna) | 6 |
+| `magias-por-classe.test.mjs` | Plano 2 do domínio Magias: a **quarta** fonte de listas de magia — `dados/classes/magias_<classe>.json`, a que as TELAS usam (`getMagiasClasse`) — confrontada contra o livro em três eixos: pertencimento (987 entradas), **círculo do GRUPO** (é o grupo, não o campo da magia, que `achatarMagiasClasse` transforma no círculo exibido) e escola. Mais o marcador derivado `especial`: `R` contra `tempo_conjuracao` e `C` contra `duracao` — as divergências dos dois eixos foram corrigidas na Correção A, e as asserções rodam sem `comLacuna`. **Não** confronta o `M` do marcador — limite declarado no cabeçalho, com as duas leituras medidas (389 e 12 divergências) | 48 |
+| `magias-preparo.test.mjs` | Plano 3 do domínio Magias, dois eixos. (1) A tabela **"Magias Preparadas por Classe"** do livro (`Magias.md:19-28`) × o que o app oferece: o livro fixa QUANDO a lista muda e QUANTAS magias, e o app despachava por `tipo_conjuracao`, um campo de dois valores para duas variáveis independentes. A Correção C (2026-08-19) modelou a tabela em `site/js/regras-preparo-magias.js`, e o motor deixou de repetir dentro de si as expressões de `hp-descanso.js` — media uma CÓPIA da lógica do app, e não teria enxergado o conserto — para chamar a função real. Uma asserção por eixo, nas 8 classes. (2) A **coerência do app consigo mesmo**: a lista de origens isentas do limite vivia copiada em onze lugares de `site/js/`, sem duas iguais. A Correção B (2026-08-19) consolidou tudo em `site/js/regras-origens-magia.js`, e o eixo mudou de pergunta junto — cobrar que "as cópias concordam" passaria por vacuidade com uma cópia só. Hoje ele exige que exista UMA lista por papel (magia × truque, que diferem de propósito), que ela more no módulo único, e que nenhuma seja montada espalhando outra (`...outraLista`) — a cegueira do extrator ao `...espalha` foi o que escondeu a terceira cópia divergente. Mais uma guarda de que toda `origem:` escrita pelo app está classificada em alguma lista | 22 |
+| `magias-conjuracao.test.mjs` | Plano 4 do domínio Magias, que o fecha. Três eixos: **Concentração** (o mapa curado `MAGIAS_EFEITO` de `sheet/magias.js:772` × a `duracao` da magia; o mapa tinha precedência em `ehMagiaConcentracao` e um erro nele vencia o dado certo — **invertido na Correção A**, a `duracao` manda e o mapa é *fallback*. O extrator delimita o corpo de cada entrada por CONTAGEM DE CHAVES: a primeira versão usava `[^}]*`, parava no primeiro `}` e acusou quatro magias com objeto aninhado de não exigirem Concentração quando o código dizia o contrário), **Ritual** (as 31 magias com o marcador × a existência de uma rota de conjuração ritual em `site/js/` que não seja a de magia personalizada — asserção sobre o CÓDIGO, na mesma natureza de `gatilhos-ui-cobertos.test.mjs`; a Correção D acrescentou a asserção irmã, de que nenhum botão rotulado "Conjurar como Ritual" esteja ligado a um gatilho de outra coisa — que é como o botão do grimório do Mago escapava, ligado ao handler do Pacto do Bruxo) e **círculo superior** (só guarda de tamanho: 154 magias com o texto; o app não modela efeito de magia, então não há upcast a aplicar — limite declarado, não lacuna) | 7 |
 | `notas-versao-formato.test.mjs` | Toda entrada de `NOTAS_VERSAO` renderiza (via `montarNotasVersaoHtml`, extraída de `notas-versao.js` para ser confrontável sem navegador), `VERSAO_ATUAL` é a entrada do topo, e todo grupo tem título e itens. `melhorias`/`correcoes` são OPCIONAIS -- foi uma versão só de correções que derrubou o modal inteiro, escondendo também as versões antigas | 4 |
 
 Total: **2349 testes** em `unidade/` (medido em 2026-08-18, depois do Plano 4
@@ -2160,7 +2169,7 @@ quatro fontes concordam entre si e com o livro (Bardo 140, Bruxo 91, Clérigo
 117, Druida 135, Feiticeiro 150, Guardião 61, Mago 242, Paladino 51). A escola
 também. Fica registrado para a próxima rodada não remedir.
 
-### Achado 1 — o círculo vem do GRUPO, e um deles está errado
+### Achado 1 — o círculo vem do GRUPO, e um deles está errado (✅ corrigido)
 
 `De Carne para Pedra` é magia de **6º círculo** (`Magias.md:2296`), e três
 fontes concordam. A quarta a lista dentro do grupo **"5º Círculo"** do Druida.
@@ -2172,7 +2181,15 @@ não tem os de 6º — vê a magia entre as de 5º círculo e pode prepará-la d
 níveis antes da hora. As outras duas classes que têm a magia (Feiticeiro, Mago)
 a listam no grupo certo: é erro de uma entrada, não do formato.
 
-### Achado 2 — o marcador `especial` contradiz a própria magia
+**Corrigido em 2026-08-18 (Correção A), nas duas metades.**
+`achatarMagiasClasse` passou a ler o círculo do **acervo** (`dados/magias/`),
+com o nome do grupo só como *fallback* — sem isso o mecanismo continuaria
+pronto para errar na próxima entrada mal colocada. E a entrada foi movida para
+o grupo `"6º Círculo"` — sem isso a lacuna, que confronta o **arquivo** contra
+o livro, continuaria vermelha. Delta medido **antes** de aplicar: **1** entrada
+muda de círculo nas 987.
+
+### Achado 2 — o marcador `especial` contradiz a própria magia (✅ corrigido)
 
 A quarta fonte traz uma sigla por magia (`C` de Concentração, `R` de Ritual,
 `M` de componente material relevante). É **dado derivado**: repete o que
@@ -2190,6 +2207,40 @@ A quarta fonte traz uma sigla por magia (`C` de Concentração, `R` de Ritual,
 Qual dos dois lados está certo não foi suposto: o Plano 1 confronta `duracao`
 contra o livro nas 391 magias com zero divergências, então é o marcador que
 erra.
+
+**Corrigido em 2026-08-18 (Correção A), nas duas metades.** O selo `Conc.` do
+seletor de magias passou a vir da **duração** da magia, lida do acervo
+(`creator/passo-magias.js`, `ehConcentracao`), e não do marcador; e os cinco
+marcadores foram acertados no dado. O `R`, que nunca divergiu, segue vindo do
+marcador e com a asserção de pé.
+
+### O achado que nenhuma lacuna cobria: 160 selos perdidos na travessia
+
+Só apareceu ao **desenhar** o conserto acima — nenhuma das sete lacunas do
+domínio o descrevia. Os dois pontos que montam os selos do seletor
+(`creator/passo-magias.js:175-176` e `:463-464`) comparavam
+`m.especial === 'C'` e `=== 'M'` por igualdade **exata**, e marcador combinado
+(`'C, R'`, `'R, M'`, `'C, M'`) nunca casava:
+
+| Selo | Entradas marcadas | Que a comparação pegava | **Perdidas** |
+|---|---|---|---|
+| Concentração | 417 | 338 | **79** |
+| Material | 177 | 96 | **81** |
+
+É o **mesmo defeito** que `levelup-ui.js:1004-1012` registra como já corrigido
+em outro lugar — a lista do Conjurador Ritualista nascia vazia por comparar
+`=== 'R'`. Sobreviveu aqui. Corrigida a comparação, a tela ganhou **79** selos
+de Concentração (28 magias distintas) e **81** de material, medidos, sem perder
+nenhum.
+
+O selo de material **continua vindo do marcador**, de propósito: derivá-lo como
+"tem componente material" marcaria **470** entradas a mais — a medição do
+limite declarado logo abaixo, confirmada. Só a **comparação** mudou.
+
+`../e2e/regras/magias-selo-concentracao.spec.mjs` prova a travessia com um
+**par**: `Detectar Magia` (marcador `"C, R"`, duração "Concentração, até 10
+minutos") tem de exibir o selo, e `Curar Ferimentos` ("Instantânea") não. Só a
+primeira afirmação passaria numa tela que carimbasse `Conc.` em toda magia.
 
 ### Limite declarado: o `M` não é confrontado
 
@@ -2303,27 +2354,53 @@ Duas divergências, as duas da **mesma família dos Planos 2 e 3**: dado derivad
 curado à mão, que ninguém confronta com o dado de origem. Os três planos de
 comportamento deste domínio acharam a mesma forma de erro três vezes.
 
-### Achado 1 — Concentração: o mapa curado vence o dado certo
+### Achado 1 — Concentração: o mapa curado vence o dado certo (✅ corrigido)
 
-`ehMagiaConcentracao` (`sheet/magias.js:900-906`) decide com duas fontes: o mapa
-`MAGIAS_EFEITO` (`:772`, 50 entradas) e, só como *fallback*, a `duracao` da
-magia. **O mapa tem precedência** — então uma entrada errada nele vence.
+`ehMagiaConcentracao` (`sheet/magias.js:900-906`) decidia com duas fontes: o
+mapa `MAGIAS_EFEITO` (`:772`, 50 entradas) e, só como *fallback*, a `duracao`
+da magia. **O mapa tinha precedência** — então uma entrada errada nele vencia o
+dado certo.
 
 | Magia | `MAGIAS_EFEITO` | `duracao` (bate com o livro) |
 |---|---|---|
 | Pele-Casca | exige Concentração | "1 hora" |
-| Heroísmo | **não** exige | "Concentração, até 1 minuto" |
-| Aura Sagrada | **não** exige | "Concentração, até 1 minuto" |
-| Aura de Pureza | **não** exige | "Concentração, até 10 minutos" |
-| Aura de Vida | **não** exige | "Concentração, até 10 minutos" |
 
 Qual lado erra não foi suposto: o Plano 1 confronta a `duracao` das 391 magias
 contra o livro com zero divergências.
 
 Concentração é a regra que decide se **duas magias ficam ativas ao mesmo tempo**
-(`getConcentracaoAtiva`, `:893`). Nas quatro que o mapa isenta, o jogador mantém
-a magia junto com outra de Concentração — o livro proíbe. Na Pele-Casca é o
-inverso: ela ocupa a vaga sem precisar, bloqueando outra magia.
+(`getConcentracaoAtiva`, `:893`). `Pele-Casca` ocupava a vaga de Concentração
+sem precisar, bloqueando outra magia.
+
+**Corrigido em 2026-08-18 (Correção A):** a precedência foi **invertida** — a
+`duracao` manda, e o mapa curado ficou como *fallback* para magia que o acervo
+não tenha (personalizada, ou de outra fonte). O mapa configura o **efeito** da
+magia (bônus, duração em rodadas, alvo); usá-lo como autoridade sobre
+Concentração fazia um erro de curadoria vencer o livro. A entrada da
+`Pele-Casca` perdeu o `concentracao: true`.
+
+#### O extrator quebrado, e as quatro divergências que não existiam
+
+Este achado foi publicado com **cinco** divergências. Quatro eram **falsas**, e
+a culpa era do motor, não do app.
+
+O extrator lê `MAGIAS_EFEITO` como texto (o mapa é um literal não exportado) e
+delimitava o corpo de cada entrada com `[^}]*` — que **para no primeiro `}`**.
+Várias entradas têm objetos aninhados (`efeitos: [{ tipo: ... }]`), e o corpo
+era cortado **antes** do `concentracao: true`. Resultado: `Heroísmo`,
+`Aura Sagrada`, `Aura de Pureza` e `Aura de Vida` foram acusadas de não exigir
+Concentração quando o código já dizia o contrário.
+
+Trocado por **contagem de chaves**, sobra **uma** divergência real — a
+`Pele-Casca`. A correção do extrator também revelou uma entrada que ele nunca
+tinha enxergado (`Escudo Quente`, a outra metade do par de `Escudo Ardente`),
+hoje declarada em `NAO_SAO_MAGIAS` com o motivo escrito.
+
+A lição é a do erro nº 1 do `GUIA-PROXIMOS-DOMINIOS.md`, numa variante:
+**um extrator que deixa de casar não acusa nada — acusa errado.** As guardas de
+tamanho pegam o extrator que casa de menos; esta falhava casando **parcialmente**
+cada entrada, e a guarda de 40 entradas passava. O que a pegou foi conferir uma
+das quatro acusadas **abrindo o código do app** antes de chamá-la de divergência.
 
 ### Achado 2 — Ritual: 31 magias, e a opção só existe para magia personalizada
 
@@ -2375,6 +2452,214 @@ nenhum em aberto:
 
 Fica fora, e **de propósito**: aplicar o upcast (o app não modela efeito de
 magia) e a conjuração em si — o app é ficha, não mesa.
+
+---
+
+## Correção A do domínio Magias (2026-08-18) — derivar da fonte, em vez de guardar derivado
+
+Os Planos 2, 3 e 4 acharam **a mesma forma de erro três vezes**: um fato que o
+acervo primário já declara, reguardado à mão em outro lugar, divergindo em
+silêncio porque ninguém confrontava as duas cópias. Esta rodada ataca a forma,
+não os sintomas — **três lacunas fechadas**, `LACUNAS` de **10 para 7**.
+
+O conserto de cada uma tem **duas metades, e as duas são necessárias**: o app
+passa a **derivar** do acervo, e o dado errado é **corrigido**. Derivar sem
+corrigir deixaria a lacuna vermelha (ela confronta o arquivo); corrigir sem
+derivar deixaria o mecanismo pronto para errar de novo.
+
+| Fato reguardado | Onde estava | Delta medido antes de derivar |
+|---|---|---|
+| **Círculo** | no *nome do grupo* de `dados/classes/magias_*.json` | **1** entrada nas 987 |
+| **Concentração** (ficha) | no mapa curado `MAGIAS_EFEITO` | 1 magia |
+| **Concentração** (seletor) | no marcador `especial` | **79** selos ganhos, 0 perdidos |
+
+### O delta foi medido antes de cada derivação, e uma medição disse "não"
+
+Derivar muda o comportamento de **todas** as 987 entradas, não só das que a
+lacuna nomeia — então cada derivação foi medida antes de ser aplicada, com um
+critério de parada escrito no plano.
+
+O selo de material `M$` **não foi derivado**, e a medição é o motivo: derivá-lo
+como "tem componente material" marcaria **470** entradas a mais. Isso confirma
+por medição o limite que o Plano 2 já havia declarado — `M` significa material
+**com custo ou consumido**, e essa fronteira é de julgamento, não de dado. Para
+ele o conserto é outro e mais estreito: **corrigir a comparação**, não a fonte.
+Aplicado, ganhou **81** selos — exatamente o previsto, e não as centenas que
+mandariam parar.
+
+### O que sobrou, e para onde foi
+
+As quatro lacunas restantes não eram desta forma de erro, e cada uma pediu uma
+rodada própria — as **Correções B, C e D**, logo abaixo, feitas em 2026-08-19.
+
+---
+
+## Correções B, C e D do domínio Magias (2026-08-19) — o backlog zera de novo
+
+Três rodadas em sequência, uma por forma de erro, que fecham as quatro lacunas
+restantes. `LACUNAS` cai de **7 para 3**, e as três são
+`limitacao-observabilidade`: **zero divergências entre app e livro**.
+
+O padrão que atravessa as três não é o dos consertos — é o dos **instrumentos**.
+Em cada uma, o motor que registrava a lacuna estava medindo a coisa errada, e
+isso só apareceu ao desenhar o conserto:
+
+| Correção | O que o instrumento fazia de errado | O que ele escondia |
+|---|---|---|
+| **B** | o extrator só colhia strings entre aspas, ignorando `...espalha` | uma **terceira** cópia divergente, montada espalhando a lista errada |
+| **C** | o motor repetia dentro de si as expressões do app | mediria uma cópia da lógica, e não teria enxergado o conserto |
+| **D** | o grep procurava pelo nome do gatilho | uma **meia rota** já existente, com o nome errado |
+
+É a mesma lição da Correção A, onde um extrator com `[^}]*` produziu quatro
+falsos positivos: **um instrumento estreito demais não deixa de acusar — acusa
+errado.** As guardas de tamanho pegam o instrumento que casa de menos; nenhuma
+das três acima casava de menos.
+
+### Correção B — uma fonte só para as origens isentas
+
+`Magias.md:41`: *"uma magia que você sempre tem preparada não conta no número de
+magias dessa lista"*. A lista de origens isentas vivia **copiada em onze
+lugares** de `site/js/`, sem duas iguais. Hoje é uma só, em
+`site/js/regras-origens-magia.js` — um módulo folha, sem imports, para que
+qualquer camada o consuma sem ciclo. Oito pontos de comportamento passaram a
+chamar `magiaContaNoLimite` / `truqueEhTrocavel`.
+
+As duas listas (magia e truque) continuam **separadas de propósito**: truque de
+espécie tem origem `especie` onde a magia tem `dominio`, e as duas origens de
+truque de subclasse não têm par do lado das magias.
+
+**A terceira divergência, que a lacuna não conhecia.** `levelup-flow.js` montava
+a lista de MAGIA como `['dominio', ...origensEspeciais]` — **espalhando a lista
+de TRUQUE**. Carregava origens que magia de círculo 1+ nunca tem e, pior, não
+tinha `subclasse_escolha`, `maestria_magias` nem `assinatura_magica`: o step de
+magias do level-up ficava visível oferecendo troca de magia que o livro diz ser
+sempre preparada. O extrator via `['dominio']` e a exceção declarada para aquele
+ponto o descrevia como *"lista de um item só, usada para outra pergunta"* —
+leitura errada, apoiada na cegueira do instrumento.
+
+**O motor mudou de pergunta junto.** "As cópias do mesmo papel concordam" não
+pega nada quando há uma cópia só — passaria por vacuidade para sempre. O eixo
+passou a cobrar que exista **uma** fonte, que ela seja o módulo, e que nenhuma
+lista seja montada espalhando outra. As duas asserções novas foram provadas
+vermelhas por mutação.
+
+**Um bug de verdade pego pela própria suíte durante o conserto:**
+`imports-nao-resolvidos.test.mjs` acusou `sheet/magias.js` de chamar
+`magiaContaNoLimite` sem importar — porque `export … from` reexporta mas **não
+liga o nome no escopo do módulo**, e aquele arquivo os chama por dentro.
+
+### Correção C — a regra de troca, e um oráculo que mudou de pergunta duas vezes
+
+Começou como "modelar a tabela do livro". O app decidia ocasião **e** quantidade
+por `tipo_conjuracao`, um campo de **dois** valores para uma tabela de **três**
+combinações, então duas classes ficavam sempre erradas. A tabela foi modelada em
+`site/js/regras-preparo-magias.js`, com as duas variáveis separadas.
+
+**O instrumento media uma cópia.** O motor repetia dentro de si as expressões de
+`hp-descanso.js` ("copiadas em vez de importadas porque vivem dentro de um
+handler de botão"), então confrontava o catálogo contra uma **transcrição da
+lógica do app**, não contra o app — e teria continuado verde depois do conserto,
+sem notar nada. Com a regra num módulo importável, passou a chamar a função real.
+
+#### E então a regra deixou de ser a do livro
+
+O dono do produto decidiu (2026-08-19) uma regra **uniforme**, que se afasta da
+tabela de propósito:
+
+| Ocasião | Regra do app | O que o livro dá |
+|---|---|---|
+| Descanso Longo | **uma** magia e **um** truque, toda classe conjuradora | "Qualquer uma" a 3 classes, "Uma" a 2, e nada a 3 |
+| Subida de nível | **quantas quiser** | "Uma" a 3 classes; nem prevê a ocasião para as outras 5 |
+
+Em ambas, o que o personagem **sempre tem preparado** fica de fora — é a
+Correção B que decide isso.
+
+Isso põe o motor num lugar desconfortável, e é o achado de método desta rodada.
+Continuar cobrando a tabela o deixaria vermelho para sempre, e alguém acabaria
+apagando o teste. Parar de cobrar deixaria a divergência invisível. A saída foi
+**cobrar as duas coisas**:
+
+1. o app faz o que foi **decidido** (`DECISAO_PRODUTO`, transcrita à mão no
+   catálogo a partir da decisão — **não** lida de `site/js/`, senão o oráculo
+   mediria a própria saída);
+2. **toda** diferença entre a decisão e o livro está declarada em
+   `AFASTAMENTOS_DO_LIVRO`, com motivo, e nenhuma declaração está obsoleta.
+
+São 14 afastamentos declarados. Um afastamento novo, que ninguém decidiu, fica
+vermelho — que é a única coisa que separa "decidimos isso" de "ninguém
+percebeu". Provado por mutação nos dois sentidos: o app fugir da decisão, e um
+afastamento perder a declaração.
+
+A capacidade nova — trocar **quantas quiser** ao subir de nível — reaproveita o
+`montarTroca` de `ui-opcoes.js` sem alterá-lo (ele é compartilhado com
+maestrias e manobras): as trocas confirmadas viram linhas com "desfazer", e um
+botão "+ Adicionar outra troca" empurra o par atual para a lista. O par pendente
+é aplicado mesmo sem o clique — quem faz **uma** troca só nunca aperta aquele
+botão, e não pode perdê-la por isso.
+
+#### Duas coisas que a uniformização arrastou junto
+
+**Uma regressão minha, na própria rodada.** Ao mover o Mago do modal de lista
+completa para o de troca única, ele passou a poder preparar magia que **não está
+no grimório** — o modal antigo tratava disso, e o novo nunca precisou, porque só
+servia a classes sem grimório (Bardo, Bruxo, Feiticeiro) e às subclasses
+conjuradoras. A fonte do lado "entra" agora é o grimório quando a classe é Mago,
+como `normalizarGrimorioMago` e o card de nível já exigiam.
+
+**A Memorizar Magia do Mago** (nível 5, Descanso Curto) diz *"substituir uma
+dessas magias"* e abria a lista inteira — dava para remontar tudo num descanso
+curto. Não é da tabela do livro (vem do texto da característica), mas é a mesma
+forma de erro, e entrou junto por decisão do dono do produto. Os **dois** pontos
+de entrada dela — o botão do Descanso Curto e o da ficha — passaram a chamar o
+mesmo modal com o mesmo texto: dois caminhos para a mesma regra não podem
+responder coisas diferentes.
+
+Com isso `mostrarTrocaMagias` (258 linhas) **ficou sem chamador e foi removida**.
+Não foi deixada como código morto de propósito: ela implementa exatamente o
+comportamento que acabou de ser retirado, e nenhum oráculo pegaria alguém
+religando-a — os testes novos cobrem a *regra* e o modal de troca única, não a
+inexistência daquele.
+
+Dois specs guardam a travessia. `magias-troca-descanso.spec.mjs` roda as três
+classes que antes se comportavam de **três** jeitos diferentes (Guardião e Mago
+abriam a lista inteira, Bardo não tinha troca) e exige que hoje façam o mesmo.
+`levelup-trocas-multiplas.spec.mjs` **clica** a segunda troca e confere as duas
+aplicadas no personagem salvo — com uma guarda que separa "a troca não foi
+aplicada" de "o nível não subiu", porque a primeira versão dele acusava a troca
+quando o assistente é que travava numa pendência de ASI.
+
+### Correção D — a rota de ritual para magia do catálogo
+
+`Magias.md:62` permite conjurar magia com marcador Ritual **sem gastar espaço**.
+São 31 das 391.
+
+**O registro original desta lacuna saiu forte demais**, e a culpa era do
+instrumento. Ele afirmava que *"não há rota de ritual para magia do catálogo em
+lugar nenhum"*, apoiado num grep por `conjurar-ritual|conjurarRitual|comoRitual`.
+Havia **meia rota**: o botão "Ritual" do grimório do Mago, rotulado *"Conjurar
+como Ritual (sem gastar espaço)"*, estava ligado ao gatilho
+`data-conjurar-pacto` — o do **Pacto do Bruxo** —, cujo handler só emite um
+toast dizendo "via Pacto", sem conjurar nem registrar nada. O padrão da busca
+não previa que a rota certa pudesse ter o **nome** errado.
+
+O conserto: `ehMagiaRitual(nome)` deriva o marcador de `tempo_conjuracao` num
+lugar só (estava escrito à mão em dois pontos), um gatilho
+`data-conjurar-ritual` aparece na lista de preparadas **para toda classe**, e o
+botão do grimório deixou de chamar o handler do Pacto. Concentração vale igual
+na versão Ritual — o que muda é o espaço.
+
+O motor ganhou uma asserção nascida do próprio erro: **nenhum botão rotulado
+"Conjurar como Ritual" pode estar ligado a um gatilho que não seja de ritual**.
+Ela procura pelo **título que o jogador lê**, não pelo nome do gatilho — que foi
+o que escapou.
+
+**Limite declarado:** os 10 minutos a mais não são modelados. O app é ficha, não
+mesa, e não controla passagem de tempo em lugar nenhum. O que ele modela — o
+espaço de magia — é justamente o que o Ritual não gasta.
+
+O spec **clica** no botão e confere que os espaços não mudaram, com a conjuração
+normal ao lado provando que o número sobe quando deve. Sem esse par, "os espaços
+não mudaram" passaria numa tela em que nenhum botão faz nada.
 
 ---
 

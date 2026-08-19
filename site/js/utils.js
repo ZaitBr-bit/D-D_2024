@@ -2,6 +2,7 @@
 // Utilitários de cálculo D&D 5.5 e helpers gerais
 // ============================================================
 import { ATRIBUTOS_KEYS, ATRIBUTO_NOME_PARA_KEY, PERICIAS, CLASSES_INFO } from './dados-classes.js';
+import { magiaContaNoLimite } from './regras-origens-magia.js';
 
 // --- Cálculos D&D ---
 
@@ -123,9 +124,8 @@ export function normalizarGrimorioMago(personagem, limitePreparadas) {
     personagem.grimorio = grimorioNormalizado;
   }
 
-  const origensEspeciais = ['dominio', 'sempre', 'especie_legado', 'iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista', 'subclasse_escolha'];
   const preparadasNormais = (Array.isArray(personagem.magias_preparadas) ? personagem.magias_preparadas : [])
-    .filter(magia => magia && typeof magia === 'object' && typeof magia.nome === 'string' && magia.nome && !origensEspeciais.includes(magia.origem) && Number(magia.circulo) > 0);
+    .filter(magia => magia && typeof magia === 'object' && typeof magia.nome === 'string' && magia.nome && magiaContaNoLimite(magia) && Number(magia.circulo) > 0);
 
   for (const magia of preparadasNormais) {
     if (!magiaMagoEstaNoGrimorio(personagem, magia.nome)) {

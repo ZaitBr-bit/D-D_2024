@@ -16,6 +16,7 @@ import { MAGIAS_FIXAS_MAGO, definirMagiasFixasMago, getEstadoRecursosMago } from
 import { char, classeData, indiceMagiasCache, magiasDominioCache, magiasSempreCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { ehSubclasseConjuradora, getSubclasseConjuradoraConjuracao, magiaContaNoLimite, magiaEhEspecial, obterMagiasDisponiveisClasseAtual, rotuloOrigemMagia } from './magias.js';
+import { truqueEhTrocavel } from '../regras-origens-magia.js';
 
 export async function mostrarBuscaMagia() {
   const info = CLASSES_INFO[char.classe] || {};
@@ -717,264 +718,20 @@ export async function mostrarBuscaGrimorio() {
   renderGrimorio();
 }
 
-/** Modal de troca de magias preparadas (usado no descanso longo para classes preparadas) */
-export async function mostrarTrocaMagias(callbackPosTroca = null) {
-  const info = CLASSES_INFO[char.classe] || {};
-  const subConj = getSubclasseConjuradoraConjuracao();
-  // Mesmo limite que a seção Magias da ficha e o modal de consulta usam --
-  // getLimitesMagias já cai para a tabela da subclasse conjuradora quando a
-  // da classe não tem colunas de magia (utils.js).
-  const maxPreparadas = getLimitesMagias(
-    classeData?.tabela_caracteristicas, char.nivel, subConj).preparadas;
-  const ehMago = char.classe === 'Mago';
-  if (ehMago && normalizarGrimorioMago(char, maxPreparadas).alterado) salvar();
+// A funcao `mostrarTrocaMagias` vivia aqui: o modal que abria a lista INTEIRA
+// de magias para remontar as preparadas de uma vez. Removida em 2026-08-19,
+// quando a regra de troca foi uniformizada (ver site/js/regras-preparo-magias.js):
+// no Descanso Longo troca-se UMA magia, para toda classe conjuradora, e
+// remontar a lista passou a ser da subida de nivel -- que faz isso com trocas
+// sucessivas, no assistente, e nao com este modal.
+//
+// Ela ficou sem nenhum chamador. Nao foi deixada como codigo morto de
+// proposito: 257 linhas que implementam exatamente o comportamento que
+// acabou de ser removido sao um convite a religar sem querer, e nenhum teste
+// pegaria isso -- os oraculos novos cobrem a REGRA e o modal de troca unica,
+// nao a existencia deste. Se a lista completa voltar a ser necessaria, ela
+// volta pelo historico do git, com a decisao registrada junto.
 
-  // Espaços de magia para determinar círculos disponíveis
-  let espacosNivel = classeData?.tabela_caracteristicas
-    ? getEspacosMagia(classeData.tabela_caracteristicas, char.nivel) : {};
-  if (subConj && Object.keys(espacosNivel).length === 0) {
-    espacosNivel = subConj.espacos || {};
-  }
-  const maxCirculo = Math.max(...Object.keys(espacosNivel).map(Number), 0);
-
-  // Buscar lista de magias disponíveis (classe ou grimório)
-  const magiasCustomizadasCirculo = (char.magias_customizadas || [])
-    .filter(m => Number(m.circulo) > 0)
-    .map(m => ({ nome: m.nome, circulo: Number(m.circulo), escola: m.escola, personalizada: true }));
-  const nomesPersonalizadasSet = new Set(magiasCustomizadasCirculo.map(m => m.nome));
-
-  let magiasDisponiveis = [];
-  if (ehMago) {
-    magiasDisponiveis = (char.grimorio || []).map(m => ({ ...m }));
-  } else {
-    const doCatalogo = (await obterMagiasDisponiveisClasseAtual()).filter(m => m.circulo > 0);
-    magiasDisponiveis = [...doCatalogo, ...magiasCustomizadasCirculo.filter(m => !doCatalogo.some(d => d.nome === m.nome && Number(d.circulo) === m.circulo))];
-  }
-
-  // Identificar magias de domínio (não removíveis)
-  const nomesDominio = new Set((char.magias_preparadas || []).filter(m => magiaEhEspecial(m)).map(m => m.nome));
-
-  // Set temporário com magias selecionadas (excluindo domínio)
-  const selecionadasSet = new Set((char.magias_preparadas || []).filter(m => magiaContaNoLimite(m)).map(m => m.nome));
-  // Mapa nome->circulo para reconstruir ao confirmar
-  const circuloMap = {};
-  magiasDisponiveis.forEach(m => { circuloMap[m.nome] = m.circulo; });
-  (char.magias_preparadas || []).forEach(m => { circuloMap[m.nome] = m.circulo; });
-
-  // Separar por círculo
-  const magiasCirculo = {};
-  for (let c = 1; c <= maxCirculo; c++) {
-    const doCirculo = magiasDisponiveis.filter(m => m.circulo === c);
-    if (doCirculo.length > 0) magiasCirculo[c] = doCirculo;
-  }
-
-  // Tabs
-  const tabs = ['selecionadas'];
-  Object.keys(magiasCirculo).forEach(c => tabs.push(c));
-  let tabAtiva = 'selecionadas';
-
-  abrirModal('Trocar Magias Preparadas', `
-    <div style="margin-bottom:8px">
-      <span class="magia-contador ${selecionadasSet.size >= maxPreparadas ? 'contador-cheio' : selecionadasSet.size > maxPreparadas ? 'contador-excedido' : ''}">
-        Preparadas: <strong id="troca-contador">${selecionadasSet.size}</strong>/${maxPreparadas}
-      </span>
-      ${nomesDominio.size > 0 ? `<span style="font-size:0.75rem;color:var(--secondary);margin-left:8px">+ ${nomesDominio.size} de Domínio</span>` : ''}
-    </div>
-    <div class="tabs" id="tabs-troca-magias" style="margin-bottom:8px;overflow-x:auto;white-space:nowrap">
-      <div class="tab active" data-tab-troca="selecionadas">Selecionadas</div>
-      ${Object.keys(magiasCirculo).map(c => `<div class="tab" data-tab-troca="${c}">${c}º Círculo</div>`).join('')}
-    </div>
-    <div class="search-box"><input type="text" id="busca-troca-magia" placeholder="Buscar magia..." class="form-input"></div>
-    <div id="resultado-troca" style="min-height:35dvh;max-height:50dvh;overflow-y:auto"></div>
-  `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-confirmar-troca">Confirmar</button>');
-
-  const resultadoEl = document.getElementById('resultado-troca');
-
-  function atualizarContadorTroca() {
-    const el = document.getElementById('troca-contador');
-    if (el) {
-      el.textContent = selecionadasSet.size;
-      el.style.color = selecionadasSet.size === maxPreparadas ? 'var(--success)' : (selecionadasSet.size > maxPreparadas ? 'var(--danger)' : 'inherit');
-    }
-  }
-
-  function renderTabTroca() {
-    const termo = semAcento(document.getElementById('busca-troca-magia')?.value || '');
-    let html = '';
-
-    if (tabAtiva === 'selecionadas') {
-      // Magias atualmente selecionadas para preparar
-      html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">Use o <strong>check</strong> para (des)marcar. Toque no <strong>nome</strong> para ver detalhes.</div>`;
-
-      if (nomesDominio.size > 0) {
-        const domMagias = magiasDisponiveis.filter(m => nomesDominio.has(m.nome));
-        const filtDom = termo.length >= 2 ? domMagias.filter(m => semAcento(m.nome).includes(termo)) : domMagias;
-        if (filtDom.length > 0 || (termo.length < 2 && nomesDominio.size > 0)) {
-          html += `<div style="font-size:0.75rem;font-weight:700;color:var(--secondary);margin:4px 0">Magias Especiais</div>`;
-          // Garantir que domínio apareca mesmo se nao esta em magiasDisponiveis
-          const domNomes = [...nomesDominio];
-          const filtDomNomes = termo.length >= 2 ? domNomes.filter(n => semAcento(n).includes(termo)) : domNomes;
-          html += `<div class="opcao-grid densa">${filtDomNomes.map(nome => `
-            <div class="opcao-card selecionada magia-dominio" style="opacity:0.7;cursor:default">
-              <span class="opcao-check"></span>
-              <div class="opcao-nome" data-troca-info="${nome}" data-troca-info-circ="${circuloMap[nome] || 1}"><span class="badge-dominio">&#9733;</span> ${nome}</div>
-              <div class="opcao-resumo"><span>Especial</span></div>
-            </div>
-          `).join('')}</div>`;
-        }
-      }
-
-      const selNomes = [...selecionadasSet];
-      const filtSel = termo.length >= 2 ? selNomes.filter(n => semAcento(n).includes(termo)) : selNomes;
-      if (filtSel.length > 0) {
-        html += `<div class="opcao-grid densa">${filtSel.map(nome => `
-          <div class="opcao-card selecionada" style="cursor:pointer" data-troca-toggle="${nome}">
-            <span class="opcao-check" data-troca-check="${nome}"></span>
-            <div class="opcao-nome" data-troca-info="${nome}" data-troca-info-circ="${circuloMap[nome] || 1}">${nome}</div>
-            <div class="opcao-resumo"><span>${circuloMap[nome] || '?'}º Círculo</span></div>
-          </div>
-        `).join('')}</div>`;
-      } else if (selecionadasSet.size === 0) {
-        html += `<div style="text-align:center;color:var(--text-muted);padding:16px">Nenhuma magia selecionada. Use as tabs de círculo para adicionar.</div>`;
-      }
-    } else {
-      // Magias de um círculo específico
-      const circ = parseInt(tabAtiva);
-      const magiasDoCirc = magiasCirculo[circ] || [];
-      const cheio = selecionadasSet.size >= maxPreparadas;
-
-      html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">Preparadas: ${selecionadasSet.size}/${maxPreparadas}${cheio ? ' <span style="color:var(--danger)">(Limite)</span>' : ''}</div>`;
-
-      let lista = [...magiasDoCirc];
-      lista.sort((a, b) => {
-        const aS = selecionadasSet.has(a.nome) ? 0 : 1;
-        const bS = selecionadasSet.has(b.nome) ? 0 : 1;
-        return aS - bS || a.nome.localeCompare(b.nome);
-      });
-      if (termo.length >= 2) lista = lista.filter(m => semAcento(m.nome).includes(termo));
-
-      html += `<div class="opcao-grid densa">${lista.map(m => {
-        const sel = selecionadasSet.has(m.nome);
-        const isDominio = nomesDominio.has(m.nome);
-        const bloqueado = cheio && !sel && !isDominio;
-        return `
-          <div class="opcao-card ${sel || isDominio ? 'selecionada' : ''} ${isDominio ? 'magia-dominio' : ''} ${bloqueado ? 'bloqueada' : ''}"
-               ${isDominio ? '' : `data-troca-toggle="${m.nome}"`}
-               style="${bloqueado ? 'opacity:0.35;' : ''}${isDominio ? 'opacity:0.7;cursor:default;' : ''}">
-            <span class="opcao-check" ${isDominio ? '' : `data-troca-check="${m.nome}"`}></span>
-            <div class="opcao-nome" data-troca-info="${m.nome}" data-troca-info-circ="${circ}">${isDominio ? '<span class="badge-dominio">&#9733;</span> ' : ''}${m.nome}</div>
-            <div class="opcao-resumo">
-              <span>${m.escola || ''}</span>
-              ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
-              ${isDominio ? '<span>Especial</span>' : ''}
-            </div>
-          </div>`;
-      }).join('')}</div>`;
-    }
-
-    resultadoEl.innerHTML = html;
-    bindEventosTroca();
-  }
-
-  function bindEventosTroca() {
-    // Toggle seleção ao clicar no check
-    resultadoEl.querySelectorAll('[data-troca-check]').forEach(chk => {
-      chk.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const nome = chk.dataset.trocaCheck;
-        if (selecionadasSet.has(nome)) {
-          selecionadasSet.delete(nome);
-        } else {
-          if (selecionadasSet.size >= maxPreparadas) {
-            toast(`Limite de ${maxPreparadas} magias! Remova uma antes.`, 'error');
-            return;
-          }
-          selecionadasSet.add(nome);
-        }
-        atualizarContadorTroca();
-        renderTabTroca();
-      });
-    });
-
-    // Info detalhes ao clicar no nome
-    resultadoEl.querySelectorAll('[data-troca-info]').forEach(el => {
-      el.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        const nome = el.dataset.trocaInfo;
-        const circ = parseInt(el.dataset.trocaInfoCirc);
-        const custom = (char.magias_customizadas || []).find(m => m.nome === nome && Number(m.circulo) === circ);
-        if (custom) {
-          abrirModal(custom.nome, `
-            <div class="magia-meta" style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:8px;font-size:0.85rem">
-              <span class="badge badge-primary">${circ === 0 ? 'Truque' : circ + 'º Círculo'}</span>
-              <span class="badge badge-secondary">${custom.escola || ''}</span>
-              <span>${custom.tempo_conjuracao || ''}</span> <span>${custom.alcance || ''}</span>
-              <span>${custom.componentes || ''}</span> <span>${custom.duracao || ''}</span>
-            </div>
-            <div class="md-content">${mdParaHtml(custom.descricao || '')}</div>
-          `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
-          return;
-        }
-        const dados = await getMagiasPorCirculo(circ);
-        const magia = dados?.magias?.find(m => m.nome === nome);
-        if (!magia) { toast('Detalhes não encontrados', 'error'); return; }
-        abrirModal(magia.nome, `
-          <div class="magia-meta" style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:8px;font-size:0.85rem">
-            <span class="badge badge-primary">${circ === 0 ? 'Truque' : circ + 'º Círculo'}</span>
-            <span class="badge badge-secondary">${magia.escola}</span>
-            <span>${magia.tempo_conjuracao}</span> <span>${magia.alcance}</span>
-            <span>${magia.componentes}</span> <span>${magia.duracao}</span>
-          </div>
-          <div class="md-content">${mdParaHtml(magia.descricao)}</div>
-          ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em círculos superiores:</strong><div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
-        `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
-      });
-    });
-  }
-
-  // Tabs
-  document.querySelectorAll('#tabs-troca-magias .tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('#tabs-troca-magias .tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      tabAtiva = tab.dataset.tabTroca;
-      document.getElementById('busca-troca-magia').value = '';
-      renderTabTroca();
-    });
-  });
-
-  // Busca
-  document.getElementById('busca-troca-magia')?.addEventListener('input', renderTabTroca);
-
-  // Confirmar troca
-  document.getElementById('btn-confirmar-troca')?.addEventListener('click', () => {
-    const novasPreparadas = [...selecionadasSet].map(nome => {
-      const base = { nome, circulo: circuloMap[nome] || 1 };
-      if (nomesPersonalizadasSet.has(nome)) base.personalizada = true;
-      return base;
-    });
-    if (novasPreparadas.length > maxPreparadas) {
-      toast(`Limite de ${maxPreparadas} magias preparadas excedido.`, 'error');
-      return;
-    }
-    if (ehMago && novasPreparadas.some(m => !magiaMagoEstaNoGrimorio(char, m.nome))) {
-      toast('Todas as magias preparadas precisam estar no grimório.', 'error');
-      return;
-    }
-    char.magias_preparadas = [
-      ...(char.magias_preparadas || []).filter(m => magiaEhEspecial(m)),
-      ...novasPreparadas
-    ];
-    salvar();
-    window.fecharModal();
-    renderFichaCompleta();
-    toast('Magias preparadas atualizadas!', 'success');
-    // Encadear próxima ação (ex.: troca de maestrias após magias)
-    if (callbackPosTroca) callbackPosTroca();
-  });
-
-  renderTabTroca();
-}
 
 /** Modal de troca de 1 magia conhecida (Descanso Longo - Bardo, Feiticeiro, Bruxo, subclasses conjuradoras) */
 /**
@@ -1108,7 +865,7 @@ export async function abrirPreenchimentoSlotMagia(tipo = 'magia') {
   renderLista();
 }
 
-export async function mostrarTrocaMagiaConhecida(callbackPosTroca = null) {
+export async function mostrarTrocaMagiaConhecida(callbackPosTroca = null, opcoes = {}) {
   const subConj = getSubclasseConjuradoraConjuracao();
 
   // Espacos de magia para determinar circulos disponiveis
@@ -1129,8 +886,21 @@ export async function mostrarTrocaMagiaConhecida(callbackPosTroca = null) {
     return;
   }
 
-  // Carregar magias disponiveis da classe
-  const magiasClasse = await obterMagiasDisponiveisClasseAtual();
+  // Fonte do lado "entra": o MAGO so pode preparar o que esta no proprio
+  // grimorio -- preparar magia fora dele contradiz normalizarGrimorioMago
+  // (utils.js), o modal de lista completa (mostrarTrocaMagias, acima) e o card
+  // de troca da subida de nivel (levelup-ui.js), que ja tratavam disso.
+  //
+  // Esta guarda nasceu de uma REGRESSAO: ate 2026-08-19 este modal so era
+  // usado por classes de magias conhecidas (Bardo, Bruxo, Feiticeiro) e pelas
+  // subclasses conjuradoras -- nenhuma tem grimorio --, entao a lista da
+  // classe bastava. Ao uniformizar a troca do Descanso Longo em UMA para todo
+  // mundo, o Mago passou por aqui e ganhou de brinde a possibilidade de
+  // preparar magia que nao esta no livro dele.
+  const ehMago = char.classe === 'Mago';
+  const magiasClasse = ehMago
+    ? (char.grimorio || []).map(m => ({ ...m }))
+    : await obterMagiasDisponiveisClasseAtual();
   const jaTemSet = new Set((char.magias_preparadas || []).map(m => m.nome));
 
   let magiaRemover = null;
@@ -1139,9 +909,18 @@ export async function mostrarTrocaMagiaConhecida(callbackPosTroca = null) {
 
   const nomeClasse = char.subclasse && ehSubclasseConjuradora() ? `${char.classe} (${char.subclasse})` : char.classe;
 
-  abrirModal('Trocar Magia Conhecida', `
+  // Titulo e explicacao sao parametrizaveis porque este modal serve a DUAS
+  // regras diferentes: a troca do Descanso Longo (uma magia, para toda classe
+  // conjuradora) e a Memorizar Magia do Mago (nivel 5, Descanso CURTO, "uma
+  // magia preparada por outra do seu livro"). O mecanismo e o mesmo -- trocar
+  // UMA --, so o texto muda.
+  const titulo = opcoes.titulo || 'Trocar Magia Conhecida';
+  const explicacao = opcoes.explicacao
+    || `Apos um Descanso Longo, voce pode trocar <strong>1 magia ${ehMago ? 'preparada' : 'conhecida'}</strong> por outra ${ehMago ? 'do seu livro de magias' : `da lista de ${nomeClasse}`}.`;
+
+  abrirModal(titulo, `
     <div class="info-box info" style="margin-bottom:12px;font-size:0.85rem">
-      Apos um Descanso Longo, voce pode trocar <strong>1 magia conhecida</strong> por outra da lista de ${nomeClasse}.
+      ${explicacao}
     </div>
 
     <div style="margin-bottom:12px">
@@ -1272,25 +1051,15 @@ export async function mostrarTrocaMagiaConhecida(callbackPosTroca = null) {
   });
 }
 
-// Truques que o jogador NAO escolheu (vieram de especie, talento ou de uma
-// caracteristica que os concede fixos) -- nao podem entrar numa troca. Mesma
-// lista usada pelo card de troca de truque do level-up (levelup-cards.js) e
-// pela visibilidade do step (levelup-flow.js): as tres precisam concordar,
-// ou um truque aparece como trocavel numa tela e nao na outra.
-const ORIGENS_TRUQUE_NAO_TROCAVEL = [
-  'especie', 'sempre', 'especie_legado', 'iniciado_em_magia',
-  'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista',
-  // Mãos Mágicas do Trapaceiro Arcano: o livro permite trocar os truques da
-  // subclasse "exceto Mãos Mágicas". Diferente das origens acima, esta CONTA
-  // no limite de truques da tabela -- por isso não entra nas listas que
-  // separam truques extras nos contadores da ficha.
-  'subclasse_fixa'
-, 'subclasse_automatica'];
+// A lista de truques não trocáveis mora em regras-origens-magia.js, a fonte
+// única das origens que o jogador não escolheu. Ela vivia copiada aqui e em
+// mais três lugares, e as quatro cópias divergiam -- o comentário que ficava
+// aqui pedia que "as três precisem concordar", e elas não concordavam.
 
 /** Lista os truques de classe do personagem que podem entrar numa troca */
 export function truquesTrocaveis() {
   return (char?.magias_conhecidas || [])
-    .filter(m => m.circulo === 0 && !ORIGENS_TRUQUE_NAO_TROCAVEL.includes(m?.origem));
+    .filter(m => m.circulo === 0 && truqueEhTrocavel(m));
 }
 
 /**

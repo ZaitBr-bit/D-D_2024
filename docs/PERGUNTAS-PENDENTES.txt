@@ -32,3 +32,47 @@ O QUE MUDA SE VOCE PREFERIR OUTRA COISA: se preferir uniformidade (pendencia
 para as 14), sao ~10 linhas na tabela de `regras-subclasse-escolhas.js` -- e a
 lacuna fecha inteira. O custo e o app passar a travar a subida de nivel
 pedindo uma escolha que o livro so pede no descanso seguinte.
+
+================================================================
+2026-08-19 -- Correcao C (tabela ocasiao x quantidade), escopo
+================================================================
+
+PERGUNTA: a tabela "Magias Preparadas por Classe" (Magias.md:19-28) da a
+Clerigo, Druida, Mago, Guardiao e Paladino a ocasiao "Termina um Descanso
+Longo" -- e so ela. O app tambem oferece a troca de magia na SUBIDA DE NIVEL
+para toda classe conjuradora (levelup-cards.js:585, decisao do dono do produto
+registrada em 2026-08-13).
+
+Isso e divergencia do livro, como era o caso inverso (Bardo/Bruxo/Feiticeiro
+recebendo no descanso uma troca que o livro so da no nivel), ou e razoavel
+porque o personagem ganha magias novas ao subir de nivel e mexer na lista ali
+e natural?
+
+O QUE FOI FEITO: nada, de proposito. A Correcao C fechou as duas lacunas
+registradas (`magias-troca-ocasiao` e `magias-troca-quantidade`), que descrevem
+a direcao oposta. Alargar para esta pergunta seria inventar escopo -- e a
+decisao de 2026-08-13 e explicita e do dono do produto.
+
+RECOMENDADO: deixar como esta. Se virar divergencia, e uma lacuna nova, com
+motivo proprio, e nao um remendo nesta rodada.
+
+================================================================
+2026-08-19 -- Memorizar Magia (Mago nivel 5), quantidade
+================================================================
+
+ACHADO, adjacente a decisao de 2026-08-19 sobre trocas: a caracteristica
+Memorizar Magia diz "trocar 1 magia preparada por outra do seu livro", e o
+botao do Descanso CURTO abre `mostrarTrocaMagias` -- o modal de LISTA
+COMPLETA. Ou seja, permite remontar a lista inteira onde o texto da
+caracteristica da uma.
+
+POR QUE NAO FOI CONSERTADO AGORA: esta fora do escopo da decisao. A decisao
+uniformizou Descanso LONGO (uma) e subida de nivel (todas); Memorizar Magia e
+Descanso CURTO, e a regra vem do texto da caracteristica, nao da tabela
+"Magias Preparadas por Classe".
+
+Tambem nao e conserto de uma linha: `mostrarTrocaMagiaConhecida` monta o lado
+"entra" a partir da lista da CLASSE, e Memorizar Magia exige o GRIMORIO.
+
+RECOMENDADO: tratar como lacuna propria numa proxima rodada, com motivo
+escrito, em vez de emendar aqui.

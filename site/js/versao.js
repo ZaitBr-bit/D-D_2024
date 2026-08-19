@@ -13,13 +13,111 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.8';
+export const VERSAO_ATUAL = '2.2.9';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.9',
+    data: '2026-08-19',
+    rotulo: 'Rituais e preparo',
+    resumo: 'Magias com o marcador Ritual agora podem ser conjuradas sem '
+      + 'gastar espaço, e trocar magia passou a valer igual para toda classe: '
+      + 'uma no descanso, quantas quiser ao subir de nível.',
+    melhorias: [
+      {
+        grupo: '📜 Conjurar como Ritual',
+        itens: [
+          'As 31 magias com o marcador Ritual ganharam o botão "Ritual" na '
+            + 'ficha, que conjura sem gastar espaço de magia. Antes isso só '
+            + 'existia para magia que você mesmo tivesse cadastrado à mão: um '
+            + 'Mago com Detectar Magia preparada tinha de gastar um espaço, ou '
+            + 'não conjurava.',
+          'O botão "Ritual" do grimório do Mago dizia "conjurar sem gastar '
+            + 'espaço" e não conjurava nada — só mostrava um aviso na tela. '
+            + 'Agora funciona de verdade.',
+          'A Concentração vale igual na versão Ritual: o que muda é só o '
+            + 'espaço de magia, que não é gasto.',
+        ],
+      },
+      {
+        grupo: '🏷️ Selos na escolha de magia',
+        itens: [
+          'Na tela de escolher magias, o selo "Conc." não aparecia em 79 '
+            + 'opções que exigem Concentração, e o selo de componente caro '
+            + 'faltava em outras 81 — sempre nas magias que têm mais de um '
+            + 'marcador, como Detectar Magia (Concentração e Ritual).',
+          'O selo de Concentração passou a vir da duração da própria magia, '
+            + 'que é o que o livro imprime.',
+        ],
+      },
+    ],
+    correcoes: [
+      {
+        grupo: '🎯 Avisos de Concentração',
+        itens: [
+          'Mover Terra exige Concentração e o app não avisava — você podia '
+            + 'manter outra magia de Concentração ativa junto, o que o livro '
+            + 'não permite.',
+          'Projeção Astral, Criação, Sugestão em Massa e Piscar apareciam '
+            + 'marcadas como Concentração sem precisarem.',
+          'Pele-Casca ocupava a vaga de Concentração ao ser conjurada, '
+            + 'bloqueando outra magia. A duração dela é "1 hora", sem '
+            + 'Concentração nenhuma.',
+        ],
+      },
+      {
+        grupo: '🔢 Magia no círculo errado',
+        itens: [
+          'De Carne para Pedra é magia de 6º círculo e aparecia entre as de 5º '
+            + 'para o Druida. Um Druida de nível 9 podia prepará-la dois '
+            + 'níveis antes da hora.',
+        ],
+      },
+      {
+        grupo: '🔒 Magias que você sempre tem preparadas',
+        itens: [
+          'Um Mago de nível 18 ou 20 podia trocar fora, na subida de nível, as '
+            + 'magias de Maestria de Magias e Assinatura Mágica — que o livro '
+            + 'diz que ele sempre tem preparadas.',
+          'Mãos Mágicas aparecia como truque trocável na subida de nível. O '
+            + 'livro deixa trocar os truques da subclasse "exceto Mãos '
+            + 'Mágicas", e o Descanso Longo já a protegia.',
+          'As magias das Descobertas Mágicas do Colégio do Conhecimento '
+            + 'estavam ocupando vagas do seu limite de preparadas. O livro diz '
+            + 'que você sempre as tem preparadas, então elas não contam.',
+          'A tela de subida de nível oferecia trocar essas magias, o que '
+            + 'nenhuma delas permite.',
+        ],
+      },
+      {
+        grupo: '🌙 Trocar magia e truque: a mesma regra para todos',
+        itens: [
+          'A troca dependia da classe de um jeito que ninguém tinha decidido: '
+            + 'Clérigo, Druida, Mago, Guardião e Paladino abriam a lista '
+            + 'INTEIRA no Descanso Longo, e Bardo, Bruxo e Feiticeiro não '
+            + 'tinham troca de magia nenhuma ali.',
+          'Agora vale o mesmo para toda classe conjuradora: no Descanso Longo '
+            + 'você troca UMA magia e UM truque.',
+          'E ao subir de nível você troca QUANTAS quiser — magias e truques. '
+            + 'Escolha uma troca, use o botão "+ Adicionar outra troca" e '
+            + 'monte quantas precisar; cada uma aparece numa lista, com um '
+            + '"desfazer". Antes o assistente aplicava uma só.',
+          'A Memorizar Magia do Mago (nível 5) dizia trocar 1 magia preparada '
+            + 'por outra do livro, e abria a lista inteira — dava para remontar '
+            + 'tudo num Descanso Curto. Agora troca uma, como o texto diz.',
+          'A janela de troca dizia "1 magia conhecida" mesmo para quem prepara '
+            + 'magias, como o Guardião e o Paladino.',
+          'Numa troca, o Mago podia acabar preparando magia que não está no '
+            + 'livro dele. Agora a lista de substitutas vem do grimório, como '
+            + 'já acontecia na subida de nível.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.8',
     data: '2026-08-18',

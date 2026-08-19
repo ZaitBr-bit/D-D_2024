@@ -19,19 +19,13 @@ import { renderFichaCompleta } from './ficha.js';
 import { abrirPreenchimentoSlotMagia, mostrarBuscaGrimorio, mostrarBuscaMagia, mostrarFormMagiaCustom } from './grimorio.js';
 import { abrirModalAdicionarTalento, abrirModalEditarIniciadoEmMagia } from './talentos.js';
 
-export function magiaContaNoLimite(magia) {
-  // 'maestria_magias' e 'assinatura_magica': o livro diz que o Mago
-  // "sempre tem essas magias preparadas" (nível 18 e 20) -- como as de
-  // domínio, elas não gastam vaga do limite de preparadas.
-  const origensEspeciais = ['dominio', 'sempre', 'especie_legado', 'iniciado_em_magia',
-    'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista',
-    'maestria_magias', 'assinatura_magica', 'subclasse_escolha'];
-  return !origensEspeciais.includes(magia?.origem);
-}
-
-export function magiaEhEspecial(magia) {
-  return !magiaContaNoLimite(magia);
-}
+// `magiaContaNoLimite` e `magiaEhEspecial` moram em regras-origens-magia.js,
+// a fonte única das origens que o jogador não escolheu. Reexportados aqui
+// porque vários módulos da ficha os importam deste arquivo desde antes da
+// consolidação -- reexportar é mais barato e menos arriscado que reescrever
+// os importadores, e não recria a cópia que a consolidação foi eliminar.
+import { magiaContaNoLimite, magiaEhEspecial } from '../regras-origens-magia.js';
+export { magiaContaNoLimite, magiaEhEspecial };
 
 export function rotuloOrigemMagia(magia) {
   if (magia?.origem === 'dominio') return 'Domínio';
@@ -261,7 +255,14 @@ export function achatarMagiasClasse(magiasClasseData) {
     }
     (magias || []).forEach(m => {
       const obj = typeof m === 'string' ? { nome: m } : { ...m };
-      obj.circulo = circulo;
+      // O círculo vem do ACERVO (dados/magias/), não do nome do grupo. O grupo
+      // é dado derivado reguardado à mão, e divergiu: De Carne para Pedra é
+      // magia de 6º círculo e estava listada no grupo "5º Círculo" do Druida,
+      // o que a fazia aparecer como opção de 5º para um Druida de nível 9 --
+      // dois níveis antes de o livro permitir. O grupo continua servindo de
+      // fallback para magia que o acervo não tenha (dado em migração).
+      const doAcervo = indiceMagiasCache?.find(x => x.nome === obj.nome);
+      obj.circulo = typeof doAcervo?.circulo === 'number' ? doAcervo.circulo : circulo;
       resultado.push(obj);
     });
   }
@@ -443,8 +444,8 @@ export function renderSecaoMagias() {
     return grupos;
   }, {});
   Object.values(grimorioPorCirculo).forEach(magias => magias.sort((a, b) => {
-    const ritualA = /ritual/i.test(indiceMagiasCache?.find(magia => magia.nome === a.nome)?.tempo_conjuracao || '');
-    const ritualB = /ritual/i.test(indiceMagiasCache?.find(magia => magia.nome === b.nome)?.tempo_conjuracao || '');
+    const ritualA = ehMagiaRitual(a.nome);
+    const ritualB = ehMagiaRitual(b.nome);
     return Number(ritualA) - Number(ritualB) || a.nome.localeCompare(b.nome, 'pt-BR');
   }));
 
@@ -593,6 +594,7 @@ export function renderSecaoMagias() {
                     ` : ''}
                     ${(m.gratis_usado === false) ? `<button class="btn btn-sm btn-accent" data-conjurar-gratis="${m.nome}">Grátis</button>` : ''}
                     <button class="btn btn-sm ${todosEsgotados ? 'btn-secondary' : 'btn-primary'}" data-conjurar="${m.nome}" data-conj-circ="${circulos[0] || m.circulo}" ${todosEsgotados ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Conjurar</button>
+                    ${ehMagiaRitual(m.nome) ? `<button class="btn btn-sm btn-secondary" data-conjurar-ritual="${m.nome}" data-conj-circ="${m.circulo}" title="Conjurar como Ritual (sem gastar espaço)">Ritual</button>` : ''}
                   </div>
                 </div>
                 <div class="magia-desc"></div>
@@ -689,8 +691,7 @@ export function renderSecaoMagias() {
                 <summary class="section-divider" style="margin:4px 0 6px;cursor:pointer"><span>${circ}º Círculo (${magiasDoCirculo.length})</span></summary>
                 ${magiasDoCirculo.map(m => {
               const jaPreparada = preparadas.some(p => p.nome === m.nome);
-              const infoMagia = indiceMagiasCache?.find(im => im.nome === m.nome);
-              const ehRitual = infoMagia?.tempo_conjuracao && /ritual/i.test(infoMagia.tempo_conjuracao);
+              const ehRitual = ehMagiaRitual(m.nome);
               const circulos = Object.keys(espacos).filter(c => parseInt(c) >= m.circulo).sort((a, b) => parseInt(a) - parseInt(b));
               const temUpcast = circulos.length > 1;
               const todosEsgotados = circulos.every(c => (espacos[c]?.usados || 0) >= (espacos[c]?.total || 0));
@@ -713,7 +714,7 @@ export function renderSecaoMagias() {
                       <button class="btn btn-sm btn-secondary" data-despreparar-grimorio="${m.nome}" title="Despreparar">✕</button>
                     ` : `
                       <button class="btn btn-sm btn-accent" data-preparar-grimorio="${m.nome}" data-prep-circ="${m.circulo}">Preparar</button>
-                      ${ehRitual ? `<button class="btn btn-sm btn-secondary" data-conjurar-pacto="${m.nome}" title="Conjurar como Ritual (sem gastar espaço)">Ritual</button>` : ''}
+                      ${ehRitual ? `<button class="btn btn-sm btn-secondary" data-conjurar-ritual="${m.nome}" data-conj-circ="${m.circulo}" title="Conjurar como Ritual (sem gastar espaço)">Ritual</button>` : ''}
                     `}
                     <button class="btn btn-sm btn-danger btn-icon" data-remover-grimorio="${m.nome}" title="Remover do grimório">&times;</button>
                   </div>
@@ -774,7 +775,10 @@ const MAGIAS_EFEITO = {
   'Armadura Arcana':  { tipo_efeito: 'base', valor: 13, concentracao: false, permite_self: true, permite_outro: true, rotulo: 'CA = 13 + Des' },
   'Escudo Arcano':    { tipo_efeito: 'bonus', valor: 5, concentracao: false, permite_self: true, permite_outro: false, rotulo: '+5 CA (1 rodada)' },
   'Escudo da Fé':     { tipo_efeito: 'bonus', valor: 2, concentracao: true, permite_self: true, permite_outro: true, rotulo: '+2 CA (concentração)' },
-  'Pele-Casca':       { tipo_efeito: 'minimo', valor: 17, concentracao: true, permite_self: true, permite_outro: true, rotulo: 'CA mín. 17 (concentração)' },
+  // Sem Concentracao: o livro (Magias.md:5778) da a Pele-Casca duracao "1 hora".
+  // A flag `concentracao: true` fazia a magia ocupar a vaga de Concentracao e
+  // bloquear outra magia sem precisar.
+  'Pele-Casca':       { tipo_efeito: 'minimo', valor: 17, concentracao: false, permite_self: true, permite_outro: true, rotulo: 'CA mín. 17 (1 hora)' },
   'Vínculo de Proteção': { tipo_efeito: null, concentracao: false, permite_self: false, permite_outro: true, rotulo: 'Apenas outro alvo' },
   'Celeridade':       { tipo_efeito: 'bonus', valor: 2, concentracao: true, permite_self: true, permite_outro: true, rotulo: '+2 CA (concentração)' },
   'Lentidão':         { tipo_efeito: null, concentracao: true, permite_self: false, permite_outro: true, rotulo: 'Apenas inimigos' },
@@ -896,12 +900,41 @@ export function getConcentracaoAtiva() {
   return ef ? ef.nome.replace(/ \(.*\)$/, '') : null;
 }
 
-// Verifica se uma magia e de concentracao (via MAGIAS_EFEITO ou indiceMagiasCache)
+// Verifica se uma magia e de concentracao.
+//
+// A DURACAO manda. MAGIAS_EFEITO configura o EFEITO da magia (bonus, duracao
+// em rodadas, alvo) e e curado a mao -- usa-lo como autoridade sobre
+// Concentracao fazia um erro de curadoria vencer o dado do livro: Heroismo,
+// Aura Sagrada, Aura de Pureza e Aura de Vida exigem Concentracao e o mapa
+// dizia que nao, deixando o jogador manter as quatro ativas junto com outra
+// magia de Concentracao; Pele-Casca era o inverso, ocupando a vaga sem
+// precisar. O acervo (dados/magias/) bate com o livro nas 391 magias --
+// conferido pelo Plano 1 do dominio Magias, zero divergencias.
+//
+// O mapa continua consultado como FALLBACK, para magia que o acervo nao
+// tenha (personalizada, ou de outra fonte).
+/**
+ * Diz se uma magia do CATÁLOGO traz o marcador Ritual, derivando de
+ * `tempo_conjuracao` no acervo -- o mesmo campo que db.js/getMagiasRituais e
+ * sheet/classes/bruxo.js já usam. São 31 das 391 magias.
+ *
+ * A derivação estava escrita à mão em dois pontos deste arquivo (a ordenação
+ * do grimório e o rótulo da linha). Ficar em um lugar só é a mesma disciplina
+ * da Correção B: dado derivado copiado diverge em silêncio.
+ *
+ * Não vale para magia PERSONALIZADA -- lá o campo `ritual` existe de verdade,
+ * porque o jogador o preenche no formulário.
+ */
+export function ehMagiaRitual(nomeMagia) {
+  const info = indiceMagiasCache?.find(m => m.nome === nomeMagia);
+  return /ritual/i.test(info?.tempo_conjuracao || '');
+}
+
 function ehMagiaConcentracao(nomeMagia) {
-  const config = MAGIAS_EFEITO[nomeMagia];
-  if (config) return !!config.concentracao;
   const info = indiceMagiasCache?.find(m => m.nome === nomeMagia);
   if (info?.duracao) return /concentra/i.test(info.duracao);
+  const config = MAGIAS_EFEITO[nomeMagia];
+  if (config) return !!config.concentracao;
   return false;
 }
 
@@ -1872,6 +1905,63 @@ export function setupEventosEspacosMagia() {
       const concentracaoAtiva = getConcentracaoAtiva();
       if (magiaPersonalizadaEhConcentracao(magia) && concentracaoAtiva && concentracaoAtiva !== magia.nome) {
         confirmarSubstituirConcentracao(concentracaoAtiva, magia.nome, executar);
+      } else {
+        executar();
+      }
+    });
+  });
+
+  // Conjuração como RITUAL para magia do CATÁLOGO.
+  //
+  // Magias.md:62 -- "A magia pode ser conjurada conforme as regras normais de
+  // conjuração ou como um Ritual. A versão Ritual de uma magia leva 10 minutos
+  // a mais para ser conjurada, mas não utiliza um espaço de magia."
+  //
+  // Esta rota não existia: o único botão de ritual era o de magia
+  // PERSONALIZADA (`-custom`, logo abaixo), e o do grimório do Mago estava
+  // ligado ao handler do Pacto do Bruxo -- que só emitia um toast dizendo
+  // "via Pacto". Um Mago com Detectar Magia preparada não tinha como
+  // conjurá-la como Ritual: ou gastava um espaço, ou não conjurava.
+  //
+  // Os 10 minutos a mais não são modelados de propósito: o app é ficha, não
+  // mesa, e não controla passagem de tempo em nenhum outro lugar. O que ele
+  // modela -- o espaço de magia -- é justamente o que o Ritual não gasta.
+  document.querySelectorAll('[data-conjurar-ritual]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const estadoFuria = getEstadoFuria();
+      if (estadoFuria?.ativa) {
+        toast('Não é possível conjurar magias enquanto a Fúria estiver ativa.', 'error');
+        return;
+      }
+
+      const nome = btn.dataset.conjurarRitual;
+      if (!nome || !ehMagiaRitual(nome)) return;
+
+      const executar = () => {
+        // Concentração vale igual na versão Ritual: o que muda é o espaço.
+        // A vaga é a mesma que `getConcentracaoAtiva` lê -- um só efeito com
+        // `concentracao: true` em `char.efeitos_magicos`.
+        if (ehMagiaConcentracao(nome)) {
+          const circulo = Number(btn.dataset.conjCirc) || 0;
+          if (!char.efeitos_magicos) char.efeitos_magicos = [];
+          char.efeitos_magicos = char.efeitos_magicos.filter(efeito => !efeito.concentracao);
+          char.efeitos_magicos.push({
+            nome,
+            tipo: 'concentracao_generica',
+            concentracao: true,
+            circulo,
+            rotulo: `Concentrando em ${nome}`,
+          });
+        }
+        salvar();
+        renderFichaCompleta();
+        toast(`${nome} conjurada como Ritual (sem gastar espaço).`, 'success');
+      };
+
+      const concAtiva = getConcentracaoAtiva();
+      if (ehMagiaConcentracao(nome) && concAtiva && concAtiva !== nome) {
+        confirmarSubstituirConcentracao(concAtiva, nome, executar);
       } else {
         executar();
       }

@@ -110,14 +110,26 @@ test('descanso curto: Mago de nível 5 recebe a opção de Memorizar Magia', asy
   await expect(page.locator('#btn-memorizar-magia-curto')).toBeVisible();
 
   // Clicar de verdade: a versão anterior deste teste parava no "o botão
-  // aparece", e um ReferenceError dentro de mostrarTrocaMagias
-  // (getMagiaPreparadas sem import) passou batido justamente por isso --
-  // o modal só quebrava no clique. Ver
-  // unidade/imports-nao-resolvidos.test.mjs, o motor que nasceu do mesmo bug.
-  await clicarBotaoFicha(page, 'btn-memorizar-magia-curto', { esperar: '#resultado-troca' });
+  // aparece", e um ReferenceError dentro do modal de troca (getMagiaPreparadas
+  // sem import) passou batido justamente por isso -- ele só quebrava no
+  // clique. Ver unidade/imports-nao-resolvidos.test.mjs, o motor que nasceu
+  // do mesmo bug.
+  await clicarBotaoFicha(page, 'btn-memorizar-magia-curto',
+    { esperar: '#btn-confirmar-troca-conhecida' });
   await assentar(page).catch(() => {});
-  await expect(page.locator('#modal-titulo')).toContainText('Trocar Magias Preparadas');
-  await expect(page.locator('#troca-contador')).toBeVisible();
+
+  // Memorizar Magia troca UMA. O texto da característica dá "uma dessas
+  // magias", e até 2026-08-19 este botão abria a lista COMPLETA -- dava para
+  // remontar a lista inteira num Descanso Curto. O modal de troca única traz
+  // `#btn-confirmar-troca-conhecida`; o de lista completa trazia
+  // `#btn-confirmar-troca` e o contador `#troca-contador`.
+  await expect(page.locator('#modal-titulo')).toContainText('Memorizar Magia');
+  await expect(page.locator('#btn-confirmar-troca-conhecida'),
+    'Memorizar Magia deveria abrir o modal de trocar UMA magia')
+    .toBeVisible();
+  await expect(page.locator('#troca-contador'),
+    'o contador é do modal de lista completa -- Memorizar Magia não remonta a lista inteira')
+    .toHaveCount(0);
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
