@@ -137,7 +137,6 @@ export const GATILHOS_SEM_COBERTURA = [
   'btn-slot-para-pf',
   'btn-sync-cloud',
   'btn-trocar-maestrias-dl',
-  'btn-trocar-magias-dl',
   'btn-usar-dv',
   'clerigo-cd-acao=centelha',
   'clerigo-cd-acao=expulsar',
