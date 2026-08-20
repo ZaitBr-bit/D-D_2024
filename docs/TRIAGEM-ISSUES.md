@@ -18,6 +18,7 @@ do repositório — oráculo vermelho, correção, versão, notas — e está re
 - [Passo 4 — Achar a causa raiz no código](#passo-4--achar-a-causa-raiz-no-código)
 - [Passo 5 — Oráculo vermelho antes da correção](#passo-5--oráculo-vermelho-antes-da-correção)
 - [Passo 6 — Corrigir](#passo-6--corrigir)
+  - [A mensagem de commit que fecha a issue](#a-mensagem-de-commit-que-fecha-a-issue)
 - [Modelo de laudo](#modelo-de-laudo)
 - [Armadilhas conhecidas](#armadilhas-conhecidas)
 
@@ -283,7 +284,71 @@ O fluxo normal do repositório, sem novidade:
 3. Suba `VERSAO_ATUAL` e a entrada no topo de `NOTAS_VERSAO`, ambos em
    `site/js/versao.js` — há teste que cobra que os dois batam.
 4. Commit e push só quando pedido, e só para `origin`.
-5. Responda a issue com o laudo abaixo e feche.
+5. Escreva a mensagem de commit no formato abaixo, que é o que **fecha a issue
+   sozinho** no push.
+
+### A mensagem de commit que fecha a issue
+
+Formato usado neste repositório (veja `d00b7b5`, que fechou a #16):
+
+```
+Pactos do Bruxo deixam de ser exclusivos; versao 2.2.11
+
+Issue #16: o app impedia levar mais de um pacto. No PHB 2024 os tres --
+Corrente, Lamina e Tomo -- sao entradas comuns de "Opcoes de Invocacoes
+Misticas", as unicas da secao SEM linha de pre-requisito (...)
+
+Closes #16
+```
+
+Três partes: **assunto** com a mudança e a versão; **corpo** abrindo com
+`Issue #N:` e a causa raiz; e a **última linha** com a palavra-chave de
+fechamento, sozinha.
+
+**O que faz o fechamento funcionar** — e onde é fácil errar:
+
+| Regra | Detalhe |
+|---|---|
+| A palavra-chave é **em inglês** | `close`/`closes`/`closed`, `fix`/`fixes`/`fixed`, `resolve`/`resolves`/`resolved`. **`Fecha`, `Corrige` e `Encerra` não funcionam** — o GitHub trata como texto comum e a issue fica aberta |
+| Uma palavra-chave **por issue** | `Closes #19, closes #20`. Escrever `Closes #19, #20` fecha só a #19 |
+| Uma linha por issue é mais seguro | duas issues, duas linhas: `Closes #19` e `Closes #20` |
+| Só vale no branch padrão | o fechamento acontece quando o commit chega em `main` |
+| `Issue #N:` no corpo **não fecha** | é só referência cruzada; quem fecha é a linha final |
+
+> Aconteceu de verdade: o commit `a454a35` (versão 2.2.13) escreveu
+> `Fecha #19:` e `Fecha #20:` achando que bastava. As duas issues continuaram
+> abertas depois do push. `Resolve` funciona por coincidência — é a mesma
+> palavra nas duas línguas —, mas não conte com isso: escreva `Closes`.
+
+**Confira depois do push**, em vez de supor:
+
+```bash
+for n in 19 20; do
+  curl -s "https://api.github.com/repos/$REPO/issues/$n" \
+    | PYTHONIOENCODING=utf-8 python -c "
+import json,sys
+d=json.load(sys.stdin); print('#%s' % d['number'], '|', d['state'], '|', d.get('state_reason'))
+"
+done
+```
+
+`closed | completed` é o que se espera. Se voltar `open`, a palavra-chave não
+pegou — feche pela API com o laudo como comentário (abaixo).
+
+### Fechar pela API quando o commit não fechou
+
+```bash
+curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" \
+  "https://api.github.com/repos/$REPO/issues/$N/comments" \
+  -d "$(PYTHONIOENCODING=utf-8 python -c "import json;print(json.dumps({'body':open('laudo.md',encoding='utf-8').read()}))")"
+
+curl -s -X PATCH -H "Authorization: token $GITHUB_TOKEN" \
+  "https://api.github.com/repos/$REPO/issues/$N" \
+  -d '{"state":"closed","state_reason":"completed"}'
+```
+
+Escrever só `state: closed` marca a issue como *not planned* em alguns
+clientes; `state_reason: completed` é o que registra "resolvida".
 
 ---
 
@@ -323,6 +388,7 @@ Três veredictos possíveis, e vale ser explícito sobre qual é:
 | `grep` nos JSON de classe | devolve 50 KB de `texto_completo` numa linha | leia o array `caracteristicas` com Python |
 | `Informacoes Separadas/` ausente | não dá para confrontar com o livro | a pasta é local e está no `.gitignore`; sem ela, pare e peça |
 | API mistura PRs com issues | um "issue" que é PR | filtre por `'pull_request' in i` |
+| `Fecha #N` na mensagem de commit | a issue **não fecha** — a palavra-chave só vale em inglês | `Closes #N`, uma linha por issue (passo 6) |
 | Texto certo na tela | a ficha exibe a regra correta e não a executa | exibir ≠ aplicar; sempre `grep` o nome em `site/js/` |
 | Capstones de nível 20 | implementados um a um, no braço | não existe mecanismo genérico; ao mexer num, confira os outros |
 | Falha de paridade após corrigir | `testes/e2e/` acusa divergência | esperado — corrigir bug faz os dois lados divergirem; não bloqueia |
