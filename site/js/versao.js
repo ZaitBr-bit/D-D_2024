@@ -13,13 +13,70 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.12';
+export const VERSAO_ATUAL = '2.2.13';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.13',
+    data: '2026-08-20',
+    rotulo: 'Nível 20, magias',
+    resumo: 'O Monge de nível 20 voltou a ganhar os +4 em Destreza e '
+      + 'Sabedoria, e quem tem magia por talento sem ser conjurador voltou '
+      + 'a ver essas magias na ficha.',
+    correcoes: [
+      {
+        grupo: '🧘 Nível 20 do Monge',
+        itens: [
+          'Corpo e Mente passou a somar os +4 em Destreza e Sabedoria, até '
+            + 'o máximo de 25. A característica aparecia na ficha com o '
+            + 'texto certo e não mexia em atributo nenhum.',
+          'Fichas que já estão no nível 20 precisam refazer a última subida '
+            + 'para receber o aumento — ele é aplicado no momento em que se '
+            + 'sobe para o nível 20.',
+        ],
+      },
+      {
+        grupo: '✨ Magias vindas de talento',
+        itens: [
+          'A seção de Magias passou a aparecer para quem não é conjurador '
+            + 'mas tem magia por outro caminho. Um Monge com Tocado Por '
+            + 'Fadas tinha a magia escolhida e Passo Nebuloso guardadas na '
+            + 'ficha, e a seção inteira não era montada — a ficha pulava de '
+            + 'Traços de Espécie direto para o Inventário.',
+          'Vale para Tocado Por Fadas, Tocado Pelas Sombras, Conjurador '
+            + 'Ritualista, Telecinético e para as magias de legado de '
+            + 'espécie. Nenhuma ficha precisa ser refeita: as magias já '
+            + 'estavam gravadas, só não apareciam.',
+        ],
+      },
+      {
+        grupo: '🪟 Botão "+ Talento" da ficha',
+        itens: [
+          'A lista de talentos deixou de ficar aberta por cima da ficha '
+            + 'depois de adicionar um talento que pede configuração '
+            + '(atributo, magia, perícia). Ela continuava lá cobrindo tudo, '
+            + 'e era preciso clicar em Cancelar para chegar à ficha que '
+            + 'acabara de mudar.',
+          'Cancelar a configuração continua devolvendo para a lista, e uma '
+            + 'escolha faltando continua mantendo a tela aberta para você '
+            + 'corrigir.',
+        ],
+      },
+      {
+        grupo: '📖 Texto das características',
+        itens: [
+          'Corpo e Mente (Monge) e Golpe de Sorte (Ladino) mostravam, '
+            + 'coladas no fim da descrição, o título "Subclasses de …" e o '
+            + 'parágrafo de abertura daquela seção do livro. Sobrou só o '
+            + 'texto da característica.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.12',
     data: '2026-08-19',

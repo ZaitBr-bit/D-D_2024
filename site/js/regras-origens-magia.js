@@ -67,6 +67,24 @@ export const ORIGENS_TRUQUE_NAO_TROCAVEL = [
   'subclasse_automatica',   // truque concedido por característica de subclasse
 ];
 
+/**
+ * Diz se o personagem tem alguma magia ou truque na ficha, venha de onde vier.
+ *
+ * Existe para o portão de renderização da seção de Magias (sheet/ficha.js).
+ * Antes da issue #20 aquele portão era uma lista de casos -- conjurador de
+ * classe, subclasse conjuradora, Iniciado em Magia, magias personalizadas --
+ * e toda origem fora dela era invisível na ficha: um Monge com Tocado Por
+ * Fadas tinha as duas magias gravadas no personagem e a seção inteira não era
+ * montada. Perguntar "tem magia?" em vez de "é conjurador de que jeito?" não
+ * tem lista para manter em dia: a próxima origem que alguém criar já nasce
+ * coberta.
+ */
+export function possuiAlgumaMagia(char) {
+  return [char?.magias_conhecidas, char?.magias_preparadas,
+          char?.magias_customizadas, char?.grimorio]
+    .some(lista => Array.isArray(lista) && lista.length > 0);
+}
+
 /** Diz se uma magia preparada gasta uma vaga do limite de preparadas. */
 export function magiaContaNoLimite(magia) {
   return !ORIGENS_MAGIA_ISENTA.includes(magia?.origem);

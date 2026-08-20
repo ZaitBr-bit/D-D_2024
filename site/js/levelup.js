@@ -413,6 +413,36 @@ export function concedeAumentoAtributo(classe, nivel) {
 }
 
 /**
+ * Capstones de atributo: as duas características de nível 20 do livro que
+ * somam valores de atributo direto na ficha, sem escolha do jogador.
+ *
+ * Não confundir com o Aumento no Valor de Atributo comum (`concedeAumentoAtributo`
+ * acima): aquele é escolhido pelo jogador e tem teto 20; estes são automáticos e
+ * têm teto 25. Usar o teto errado é o engano fácil aqui.
+ */
+export const CAPSTONES_ATRIBUTO = {
+  // "Seus valores de Força e Constituição aumentam em 4, até um máximo de 25."
+  'Bárbaro': { caracteristica: 'Campeão Primitivo', atributos: ['forca', 'constituicao'], ganho: 4 },
+  // "Seus valores de Destreza e Sabedoria aumentam em 4, até no máximo 25."
+  'Monge': { caracteristica: 'Corpo e Mente', atributos: ['destreza', 'sabedoria'], ganho: 4 }
+};
+
+/** Teto dos capstones de atributo (o ASI comum para em 20; estes vão a 25) */
+export const TETO_CAPSTONE_ATRIBUTO = 25;
+
+/**
+ * Soma `ganho` a cada atributo da lista, aparando no teto 25.
+ * Devolve o personagem para encadear; muta o objeto recebido.
+ */
+export function aplicarCapstoneAtributo(personagem, atributos, ganho) {
+  for (const atributo of atributos) {
+    const atual = personagem.atributos[atributo] || 10;
+    personagem.atributos[atributo] = Math.min(TETO_CAPSTONE_ATRIBUTO, atual + ganho);
+  }
+  return personagem;
+}
+
+/**
  * Verifica se o nível exige seleção de subclasse
  */
 export function exigeSubclasse(classe, nivel) {
@@ -1825,16 +1855,24 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     }
   }
 
-  // Campeão Primitivo (Bárbaro nível 20): FOR e CON +4 (máx 25)
-  if (personagem.classe === 'Bárbaro' && novoNivel === 20) {
-    personagem.atributos.forca = Math.min(25, (personagem.atributos.forca || 10) + 4);
-    personagem.atributos.constituicao = Math.min(25, (personagem.atributos.constituicao || 10) + 4);
-    // Recalcular PV com novo mod de CON (retroativo para todos os níveis)
-    const modConCampeao = calcMod(personagem.atributos.constituicao);
-    if (modConCampeao > modConDepois) {
-      const bonusCampeao = (modConCampeao - modConDepois) * novoNivel;
-      personagem.pv_max += bonusCampeao;
-      personagem.pv_atual += bonusCampeao;
+  // Capstones de atributo do nível 20: Campeão Primitivo (Bárbaro, FOR e CON)
+  // e Corpo e Mente (Monge, DES e SAB), ambos +4 com teto 25.
+  //
+  // Até 2026-08-20 só o do Bárbaro existia, escrito à mão aqui -- o do Monge
+  // nunca foi implementado (issue #19): a ficha exibia o texto certo da
+  // característica e nunca somava os +4. Uma tabela em vez de um `if` por
+  // classe é o que impede a próxima característica desse tipo de nascer
+  // esquecida do mesmo jeito.
+  const capstone = novoNivel === 20 ? CAPSTONES_ATRIBUTO[personagem.classe] : null;
+  if (capstone) {
+    aplicarCapstoneAtributo(personagem, capstone.atributos, capstone.ganho);
+    // Recalcular PV com novo mod de CON (retroativo para todos os níveis).
+    // Inerte quando o capstone não mexe em Constituição, como o do Monge.
+    const modConCapstone = calcMod(personagem.atributos.constituicao);
+    if (modConCapstone > modConDepois) {
+      const bonusCapstone = (modConCapstone - modConDepois) * novoNivel;
+      personagem.pv_max += bonusCapstone;
+      personagem.pv_atual += bonusCapstone;
     }
   }
 

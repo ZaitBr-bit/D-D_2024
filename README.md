@@ -322,6 +322,7 @@ um deploy foi mesmo ao ar e o que fazer quando ele falha:
 |---|---|
 | [docs/ARQUITETURA.md](docs/ARQUITETURA.md) | módulos, estado, dados, padrões de UI, cálculos |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | pipeline, versionamento, precache, diagnóstico de falhas |
+| [docs/TRIAGEM-ISSUES.md](docs/TRIAGEM-ISSUES.md) | puxar issue e anexos, confrontar com o livro, achar a causa raiz |
 | [testes/regras/README.md](testes/regras/README.md) | suíte de regras de negócio |
 | [testes/regras/GUIA-PROXIMOS-DOMINIOS.md](testes/regras/GUIA-PROXIMOS-DOMINIOS.md) | checklist antes de cobrir um domínio novo |
 | [testes/e2e/README.md](testes/e2e/README.md) | suíte de paridade, arquivo por arquivo |

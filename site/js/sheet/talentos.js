@@ -632,7 +632,19 @@ export async function abrirModalAdicionarTalento() {
     if (!char.talentos) char.talentos = [];
     char.talentos.push(nome);
     salvar();
-    window.fecharModal();
+    // `fecharModalTodos`, não `fecharModal`: o fluxo tem dois passos, e para
+    // talento com escolhas a tela "Configurar Talento" abre EMPILHADA sobre
+    // a lista "Adicionar Talento" (abrirModal vira sub-modal quando já há
+    // modal aberto). `fecharModal` remove só a camada de cima -- a lista
+    // ficava aberta por cima da ficha depois do "Talento adicionado",
+    // capturando o ponteiro, e o jogador tinha de clicar em Cancelar para
+    // chegar à ficha que acabara de mudar.
+    //
+    // O empilhamento em si é proposital e continua: cancelar a configuração
+    // devolve o jogador à lista. O que muda é só o fim feliz, que encerra o
+    // fluxo inteiro. Recusa de validação sai antes daqui, pelos `return
+    // false` acima, e por isso continua mantendo as duas telas abertas.
+    window.fecharModalTodos();
     renderFichaCompleta();
     toast(`Talento "${nome}" adicionado`, 'success');
     return true;

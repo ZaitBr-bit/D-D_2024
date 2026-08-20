@@ -471,10 +471,19 @@ def extrair_classes(linhas):
                 nivel = int(m.group(1))
                 nome_caract = m.group(2).strip()
                 
-                # Encontrar o fim desta característica
+                # Encontrar o fim desta característica: o próximo cabeçalho de
+                # QUALQUER nível de 1 a 3. Até 2026-08-20 só "### " (outra
+                # característica) e "## " (uma subclasse) fechavam a descrição
+                # -- o cabeçalho de nível 1 que abre a seção de subclasses
+                # ("# Subclasses de <Classe>") não casava com nenhum dos dois,
+                # e a ÚLTIMA característica de cada classe engolia ele mais o
+                # parágrafo de abertura da seção, indo parar na ficha do
+                # jogador. Nível 4 ("#### ") NÃO fecha de propósito: o
+                # Companheiro Primal do Guardião usa "#### *Fera do Céu*" e
+                # afins como subtítulos dentro da própria característica.
                 fim_caract = min(fim_classe, len(linhas))
                 for j in range(i + 1, min(fim_classe, len(linhas))):
-                    if linhas[j].strip().startswith("### ") or linhas[j].strip().startswith("## "):
+                    if re.match(r'#{1,3}\s+\S', linhas[j].strip()):
                         fim_caract = j
                         break
                 

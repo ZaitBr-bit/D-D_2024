@@ -8,6 +8,7 @@
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ATRIBUTO_NOME_PARA_KEY, CLASSES_INFO, PERICIAS } from '../dados-classes.js';
 import { XP_POR_NIVEL } from '../levelup.js';
 import { _renderSyncIndicadorHtml } from '../pages/sheet.js';
+import { possuiAlgumaMagia } from '../regras-origens-magia.js';
 import { resolverPassivosTalentos } from '../talentos-effects.js';
 import { bonusProficiencia, calcAtaqueMagia, calcBonusPericia, calcCA, calcCDMagia, calcMod, calcPVTotal, escHtml, fmtMod, getDeslocamento, getTamanho, semAcento } from '../utils.js';
 import { renderSecaoCaracteristicas, renderSecaoSubclasse, renderSecaoTracosEspecie } from './caracteristicas.js';
@@ -860,7 +861,19 @@ export function renderFichaCompleta() {
     ${renderSecaoTracosEspecie()}
 
     <!-- Espaços de Magia e Magias -->
-    ${(info.conjurador || ehSubclasseConjuradora() || getTruquesExtraEstiloLuta() > 0 || char.iniciado_em_magia?.lista || (char.iniciado_em_magia_instancias?.length > 0) || (char.magias_customizadas?.length > 0)) ? renderSecaoMagias() : ''}
+    <!--
+      O último termo, possuiAlgumaMagia (regras-origens-magia.js), é o que
+      cobre quem não conjura por classe nem subclasse mas tem magia por outro
+      caminho: talento (Tocado Por Fadas/Pelas Sombras, Conjurador Ritualista,
+      Telecinético), legado de espécie, magia personalizada. Antes da issue #20
+      isto era uma lista de casos e faltavam quase todos -- um Monge com Tocado
+      Por Fadas tinha as duas magias gravadas e a ficha pulava de Traços de
+      Espécie direto para Inventário, sem erro nenhum no console.
+      As condições de Iniciado em Magia continuam aqui de propósito: elas leem
+      a INSTÂNCIA do talento, que existe mesmo antes de as magias entrarem nas
+      listas do personagem.
+    -->
+    ${(info.conjurador || ehSubclasseConjuradora() || getTruquesExtraEstiloLuta() > 0 || char.iniciado_em_magia?.lista || (char.iniciado_em_magia_instancias?.length > 0) || possuiAlgumaMagia(char)) ? renderSecaoMagias() : ''}
 
     <!-- Inventário -->
     ${renderSecaoInventario()}
