@@ -9,6 +9,7 @@ import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ATRIBUTO_NOME_PARA_KEY, CLASSES_INFO, 
 import { XP_POR_NIVEL } from '../levelup.js';
 import { _renderSyncIndicadorHtml } from '../pages/sheet.js';
 import { possuiAlgumaMagia } from '../regras-origens-magia.js';
+import { ehProficienteEmSalvaguarda } from '../regras-salvaguardas.js';
 import { resolverPassivosTalentos } from '../talentos-effects.js';
 import { bonusProficiencia, calcAtaqueMagia, calcBonusPericia, calcCA, calcCDMagia, calcMod, calcPVTotal, escHtml, fmtMod, getDeslocamento, getTamanho, semAcento } from '../utils.js';
 import { renderSecaoCaracteristicas, renderSecaoSubclasse, renderSecaoTracosEspecie } from './caracteristicas.js';
@@ -562,7 +563,15 @@ export function renderFichaCompleta() {
           <div class="stat-label">Prof.</div>
           <div class="stat-value">+${prof}</div>
         </div>
-        ${info.conjurador ? `
+        <!--
+          ehSubclasseConjuradora() entra aqui porque Cavaleiro Místico e
+          Trapaceiro Arcano conjuram por tabela própria: a seção de Magias
+          logo abaixo já os aceitava, e só estas duas caixas perguntavam
+          "info.conjurador", que é falso para Guerreiro e Ladino. O valor
+          exibido depende de calcCDMagia enxergar o atributo da subclasse
+          (utils.js) -- sem isso, isto aqui mostraria "CD Magia 0".
+        -->
+        ${(info.conjurador || ehSubclasseConjuradora()) ? `
           <div class="stat-box">
             <div class="stat-label">CD Magia</div>
             <div class="stat-value">${calcCDMagia(char)}</div>
@@ -732,7 +741,12 @@ export function renderFichaCompleta() {
         ${ATRIBUTOS_KEYS.map(key => {
           const nome = ATRIBUTOS_NOMES[key];
           const mod = calcMod(char.atributos[key]);
-          const proficiente = (char.salvaguardas_proficientes || []).includes(nome);
+          // Quem é proficiente em salvaguarda mora em regras-salvaguardas.js.
+          // Aqui se lia "char.salvaguardas_proficientes" direto, e por isso a
+          // proficiência que Sobrevivente Disciplinado concede no nível 14 --
+          // exibida como texto 250 linhas acima, em ficha.js:480 -- nunca
+          // marcava salvaguarda nenhuma (issue #21).
+          const proficiente = ehProficienteEmSalvaguarda(char, nome);
           const bonus = mod + (proficiente ? prof : 0);
           const condicoes = char.condicoes || [];
           const incapacitado = condicoes.includes('Incapacitado');

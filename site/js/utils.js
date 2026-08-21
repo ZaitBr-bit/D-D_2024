@@ -3,6 +3,7 @@
 // ============================================================
 import { ATRIBUTOS_KEYS, ATRIBUTO_NOME_PARA_KEY, PERICIAS, CLASSES_INFO } from './dados-classes.js';
 import { magiaContaNoLimite } from './regras-origens-magia.js';
+import { getAtributoConjuracaoSubclasse, getConjuracaoSubclasse } from './regras-conjuracao-subclasse.js';
 
 // --- Cálculos D&D ---
 
@@ -271,11 +272,27 @@ export function calcCA(personagem, passivos = null) {
   return ca;
 }
 
+/**
+ * Nome do atributo de conjuração do personagem, ou null se ele não conjura.
+ *
+ * A classe manda quando é conjuradora. Quando não é, a subclasse pode
+ * conjurar por tabela própria (Cavaleiro Místico e Trapaceiro Arcano) --
+ * e aí o atributo vem dela. `getConjuracaoSubclasse` é consultada porque a
+ * conjuração dessas subclasses só começa no nível 3: abaixo disso não há
+ * CD a mostrar.
+ */
+function atributoConjuracaoDe(personagem) {
+  const info = CLASSES_INFO[personagem?.classe];
+  if (info?.atributo_conjuracao) return info.atributo_conjuracao;
+  if (!getConjuracaoSubclasse(personagem?.classe, personagem?.subclasse, personagem?.nivel)) return null;
+  return getAtributoConjuracaoSubclasse(personagem?.classe, personagem?.subclasse);
+}
+
 /** Calcula CD de magia */
 export function calcCDMagia(personagem) {
-  const info = CLASSES_INFO[personagem.classe];
-  if (!info || !info.atributo_conjuracao) return 0;
-  const key = ATRIBUTO_NOME_PARA_KEY[info.atributo_conjuracao];
+  const atributo = atributoConjuracaoDe(personagem);
+  if (!atributo) return 0;
+  const key = ATRIBUTO_NOME_PARA_KEY[atributo];
   const modAttr = calcMod(personagem.atributos[key]);
   let cd = 8 + bonusProficiencia(personagem.nivel) + modAttr;
 
@@ -289,9 +306,9 @@ export function calcCDMagia(personagem) {
 
 /** Calcula bônus de ataque de magia */
 export function calcAtaqueMagia(personagem) {
-  const info = CLASSES_INFO[personagem.classe];
-  if (!info || !info.atributo_conjuracao) return 0;
-  const key = ATRIBUTO_NOME_PARA_KEY[info.atributo_conjuracao];
+  const atributo = atributoConjuracaoDe(personagem);
+  if (!atributo) return 0;
+  const key = ATRIBUTO_NOME_PARA_KEY[atributo];
   const modAttr = calcMod(personagem.atributos[key]);
   return bonusProficiencia(personagem.nivel) + modAttr;
 }

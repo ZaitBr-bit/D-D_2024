@@ -13,13 +13,62 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.13';
+export const VERSAO_ATUAL = '2.2.14';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.14',
+    data: '2026-08-21',
+    rotulo: 'Truques, CD, salvaguardas',
+    resumo: 'O contador de truques parou de cobrar os truques que o livro '
+      + 'dá de graça, quem conjura pela subclasse voltou a ter CD de '
+      + 'magia na ficha, e o Monge de nível 14 finalmente ficou '
+      + 'proficiente em todas as salvaguardas.',
+    correcoes: [
+      {
+        grupo: '✨ Contador de truques',
+        itens: [
+          'O truque do talento Telecinético deixou de contar no limite de '
+            + 'truques da classe. Um Bardo de nível 4 com o talento via '
+            + '"Truques 4 / 3" em vermelho, como se tivesse escolhido '
+            + 'truque demais.',
+          'O truque que o Mago Ilusionista ganha da subclasse também parou '
+            + 'de contar — o livro diz, com todas as letras, que ele "não '
+            + 'conta para o seu número de truques conhecidos".',
+          'Mãos Mágicas do Trapaceiro Arcano continua contando, como antes: '
+            + 'o livro a inclui nos três truques da subclasse.',
+        ],
+      },
+      {
+        grupo: '🎯 CD e ataque de magia',
+        itens: [
+          'Cavaleiro Místico e Trapaceiro Arcano passaram a mostrar "CD '
+            + 'Magia" e "Atq. Magia" na ficha, na folha impressa e no PDF. '
+            + 'Os dois conjuram desde o nível 3 e as caixas simplesmente '
+            + 'não eram montadas para eles.',
+          'A conta usa Inteligência, como o livro manda para as duas '
+            + 'subclasses. Nenhuma ficha precisa ser refeita.',
+        ],
+      },
+      {
+        grupo: '🛡️ Salvaguardas do Monge',
+        itens: [
+          'Sobrevivente Disciplinado passou a conceder de fato a '
+            + 'proficiência em todas as salvaguardas no nível 14. A ficha '
+            + 'já mostrava o texto da característica, mas as salvaguardas '
+            + 'continuavam sem o bônus de proficiência — só as duas da '
+            + 'classe estavam marcadas.',
+          'Vale na ficha, na folha impressa e no PDF, e vale para as '
+            + 'fichas que já estão no nível 14 ou acima: a proficiência é '
+            + 'calculada na hora, não precisa subir de nível de novo.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.13',
     data: '2026-08-20',

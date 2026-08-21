@@ -61,6 +61,11 @@ export const ORIGENS_TRUQUE_NAO_TROCAVEL = [
   'tocado_por_fadas',
   'tocado_pelas_sombras',
   'conjurador_ritualista',
+  'telecinetico',           // Mãos Mágicas do talento Telecinético, ou o truque
+                            // substituto quando o personagem já a conhece
+                            // (regras-cobertura.js:643 e 647). Não foi escolhido
+                            // da tabela da classe, como os demais truques de
+                            // talento -- faltava aqui por descuido.
   'subclasse_fixa',         // Mãos Mágicas: o livro deixa trocar os truques da
                             // subclasse "exceto Mãos Mágicas". Diferente das
                             // demais, esta CONTA no limite de truques da tabela.
@@ -100,5 +105,26 @@ export function magiaEhEspecial(magia) {
  * (espécie, talento, ou característica que o concede fixo) não pode.
  */
 export function truqueEhTrocavel(magia) {
+  return !ORIGENS_TRUQUE_NAO_TROCAVEL.includes(magia?.origem);
+}
+
+/**
+ * Diz se um truque gasta uma vaga do limite de truques da tabela da classe.
+ *
+ * O limite é da CLASSE: truque concedido por espécie, talento ou
+ * característica de subclasse não sai desse orçamento. A exceção é
+ * `subclasse_fixa` (Mãos Mágicas do Trapaceiro Arcano), que o próprio livro
+ * inclui na conta -- "Você conhece três truques: Mãos Mágicas e dois outros
+ * truques à sua escolha". O Ilusionista tem a frase oposta e explícita ("O
+ * truque não conta para o seu número de truques conhecidos"), por isso
+ * `subclasse_automatica` fica de fora.
+ *
+ * Existe para que o critério pare de viver como lista literal dentro de
+ * sheet/magias.js. Aquela lista tinha quatro origens e esquecia
+ * `telecinetico` e `subclasse_automatica`, então o contador da ficha
+ * acusava "Truques 3 / 2" em vermelho por um truque concedido de graça.
+ */
+export function truqueContaNoLimite(magia) {
+  if (magia?.origem === 'subclasse_fixa') return true;
   return !ORIGENS_TRUQUE_NAO_TROCAVEL.includes(magia?.origem);
 }

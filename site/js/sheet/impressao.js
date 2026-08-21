@@ -10,6 +10,7 @@ import { SUBTRACOS_ESPECIE, gerarTracoSinteticoEspecie } from './caracteristicas
 import { getEstadoRecursosBruxo } from './classes/bruxo.js';
 import { forcaPrimordialAtiva, getAtaquesPorAcao, getDeslocamentoFinal, getModIniciativa } from './combate.js';
 import { char, classeData, especiesCache, indiceMagiasCache, passivosTalentosCache, talentosCache } from './estado.js';
+import { ehProficienteEmSalvaguarda } from '../regras-salvaguardas.js';
 import { ehSubclasseConjuradora, normalizarMagiaPersonalizada, rotuloOrigemMagia } from './magias.js';
 
 // ============================================================
@@ -220,7 +221,9 @@ export async function gerarHtmlImpressao() {
     <div class="print-stat-box"><div class="print-stat-label">Ataques</div><div class="print-stat-value">${ataquesPorAcao}</div></div>
     <div class="print-stat-box"><div class="print-stat-label">Proficiencia</div><div class="print-stat-value">+${prof}</div></div>
   `;
-  if (info.conjurador) {
+  // Mesmo portão da ficha (sheet/ficha.js): conjurador de subclasse
+  // também tem CD e ataque de magia.
+  if (info.conjurador || ehSubclasseConjuradora()) {
     statsHtml += `
       <div class="print-stat-box"><div class="print-stat-label">CD Magia</div><div class="print-stat-value">${calcCDMagia(char)}</div></div>
       <div class="print-stat-box"><div class="print-stat-label">Atq Magia</div><div class="print-stat-value">${fmtMod(calcAtaqueMagia(char))}</div></div>
@@ -289,7 +292,8 @@ export async function gerarHtmlImpressao() {
         ${ATRIBUTOS_KEYS.map(key => {
           const nome = ATRIBUTOS_NOMES[key];
           const mod = calcMod(char.atributos[key]);
-          const proficiente = (char.salvaguardas_proficientes || []).includes(nome);
+          // Mesma fonte única da ficha (sheet/ficha.js).
+          const proficiente = ehProficienteEmSalvaguarda(char, nome);
           const bonus = mod + (proficiente ? prof : 0);
           return `
             <div class="print-save-item">

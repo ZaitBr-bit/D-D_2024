@@ -40,11 +40,16 @@ const PROGRESSAO = {
 const SUBCLASSES = {
   'Cavaleiro Místico': {
     classe: 'Guerreiro',
+    // "Atributo de Conjuração. Inteligência é seu atributo de conjuração
+    // para suas magias de Mago." (PHB 2024, Classes.md:3968)
+    atributoConjuracao: 'Inteligência',
     truques: (nivel) => (nivel >= 10 ? 3 : 2),
     truquesFixos: {}
   },
   'Trapaceiro Arcano': {
     classe: 'Ladino',
+    // Mesma frase do livro, Classes.md:4473.
+    atributoConjuracao: 'Inteligência',
     // 3 truques até o nível 9 (Mãos Mágicas + 2), 4 a partir do nível 10.
     truques: (nivel) => (nivel >= 10 ? 4 : 3),
     truquesFixos: { 3: ['Mãos Mágicas'] }
@@ -122,4 +127,15 @@ export function getTruquesFixosAcumulados(classe, subclasse, nivel) {
     if (Number(nivelConcessao) <= nivel) nomes.push(...truques);
   }
   return nomes;
+}
+
+/**
+ * Atributo de conjuração da subclasse, no mesmo formato de
+ * `CLASSES_INFO.atributo_conjuracao` (ex.: 'Inteligência').
+ * Devolve null quando a combinação classe/subclasse não conjura.
+ */
+export function getAtributoConjuracaoSubclasse(classe, subclasse) {
+  const def = SUBCLASSES[subclasse];
+  if (!def || def.classe !== classe) return null;
+  return def.atributoConjuracao || null;
 }

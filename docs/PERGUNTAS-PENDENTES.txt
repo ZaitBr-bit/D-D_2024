@@ -170,3 +170,37 @@ testes/e2e/regras/itens-criador.spec.mjs.
 FICA EM ABERTO, se a mesa precisar: uma CA base que SOME Destreza (armadura
 Leve/Media do livro). Hoje o campo e sempre fixo. Seria um segundo campo
 (categoria) ou uma caixa "soma Destreza" -- lacuna propria, com spec.
+
+
+================================================================================
+'telecinetico' faltava em ORIGENS_TRUQUE_NAO_TROCAVEL (2026-08-21)
+================================================================================
+
+Achado ao executar o plano 2026-08-20-portoes-truques-e-cd-magia.md, Tarefa 1.
+
+O plano manda `truqueContaNoLimite` responder a partir de
+ORIGENS_TRUQUE_NAO_TROCAVEL (regras-origens-magia.js:56), e o motor de unidade
+cobra que a origem 'telecinetico' NAO conte no limite de truques. Mas
+'telecinetico' nao estava naquela lista -- estavam as outras oito (especie,
+sempre, especie_legado, iniciado_em_magia, tocado_por_fadas,
+tocado_pelas_sombras, conjurador_ritualista, subclasse_fixa,
+subclasse_automatica) e essa nao. Do jeito escrito, o passo 5 da Tarefa 1
+falharia: a funcao devolveria "conta" para o truque do talento Telecinetico,
+que e justamente um dos dois casos que a tarefa existe para consertar.
+
+DECISAO (seguindo o recomendado, sem parar o plano): acrescentar
+'telecinetico' a ORIGENS_TRUQUE_NAO_TROCAVEL, em vez de dar um ramo especial a
+truqueContaNoLimite.
+
+Motivo: a lista responde "o jogador escolheu este truque da tabela da classe?".
+O truque do Telecinetico (Maos Magicas, ou o substituto quando o personagem ja
+a conhece -- regras-cobertura.js:643 e 647) nao foi escolhido de la, exatamente
+como os de Iniciado em Magia e dos dois Tocado Por. A ausencia era descuido, e
+nao uma decisao registrada: nenhum comentario a defendia.
+
+EFEITO COLATERAL, de proposito: `truqueEhTrocavel` le a MESMA lista, entao o
+truque do Telecinetico deixa de ser oferecido nas trocas de truque da subida de
+nivel. Isso corrige um segundo defeito latente -- o app deixava trocar um truque
+que o talento concede, e a troca deveria valer so para os truques da classe.
+Se algum dia a mesa quiser o contrario, a saida NAO e tirar da lista (volta o
+bug do contador): e separar as duas perguntas em duas listas.

@@ -6,7 +6,9 @@ import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, CLASSES_INFO } from '../dados-classes.
 import { bonusProficiencia, calcAtaqueMagia, calcBonusPericia, calcCA, calcCDMagia, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcMod, calcPercepcaoPassiva, fmtMod, getDeslocamento, toast } from '../utils.js';
 import { forcaPrimordialAtiva, getDeslocamentoFinal, getModIniciativa } from './combate.js';
 import { char, especiesCache, passivosTalentosCache } from './estado.js';
+import { ehProficienteEmSalvaguarda } from '../regras-salvaguardas.js';
 import { gerarHtmlImpressao } from './impressao.js';
+import { ehSubclasseConjuradora } from './magias.js';
 
 /* ===========================================================================
    GERACAO DE PDF (pdf-lib)
@@ -68,7 +70,8 @@ function _montarDadosCartao() {
     { label: 'Prof.', value: `+${prof}` },
   ];
   if (char.pv_temp) stats.push({ label: 'PV Temp', value: `+${char.pv_temp}` });
-  if (info.conjurador) {
+  // Mesmo portão da ficha e da impressão.
+  if (info.conjurador || ehSubclasseConjuradora()) {
     stats.push({ label: 'CD Magia', value: String(calcCDMagia(char)) });
     stats.push({ label: 'Atq Magia', value: fmtMod(calcAtaqueMagia(char)) });
   }
@@ -81,7 +84,8 @@ function _montarDadosCartao() {
 
   const saves = ATRIBUTOS_KEYS.map(k => {
     const m = calcMod(char.atributos[k]);
-    const p = (char.salvaguardas_proficientes || []).includes(ATRIBUTOS_NOMES[k]);
+    // Mesma fonte única da ficha e da impressão.
+    const p = ehProficienteEmSalvaguarda(char, ATRIBUTOS_NOMES[k]);
     return { nome: ATRIBUTOS_NOMES[k], bonus: fmtMod(m + (p ? prof : 0)), prof: p };
   });
 

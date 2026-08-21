@@ -24,8 +24,8 @@ import { abrirModalAdicionarTalento, abrirModalEditarIniciadoEmMagia } from './t
 // porque vários módulos da ficha os importam deste arquivo desde antes da
 // consolidação -- reexportar é mais barato e menos arriscado que reescrever
 // os importadores, e não recria a cópia que a consolidação foi eliminar.
-import { magiaContaNoLimite, magiaEhEspecial } from '../regras-origens-magia.js';
-export { magiaContaNoLimite, magiaEhEspecial };
+import { magiaContaNoLimite, magiaEhEspecial, truqueContaNoLimite } from '../regras-origens-magia.js';
+export { magiaContaNoLimite, magiaEhEspecial, truqueContaNoLimite };
 
 export function rotuloOrigemMagia(magia) {
   if (magia?.origem === 'dominio') return 'Domínio';
@@ -393,10 +393,15 @@ export function renderSecaoMagias() {
     ...truquesPersonalizados
   ];
   const truquesEspecie = todosTruques.filter(m => m.origem === 'especie');
-  const _origensTalento = ['iniciado_em_magia', 'tocado_por_fadas', 'tocado_pelas_sombras', 'conjurador_ritualista'];
-  const truquesTalento = todosTruques.filter(m => _origensTalento.includes(m.origem));
+  // O que conta no limite de truques mora em regras-origens-magia.js, a
+  // fonte única das origens que o jogador não escolheu. Aqui existia uma
+  // lista literal de quatro origens que esquecia `telecinetico` e
+  // `subclasse_automatica` -- o contador cobrava do orçamento da classe
+  // truques que o livro concede de graça.
+  const truquesConcedidos = todosTruques.filter(m => !truqueContaNoLimite(m) && m.origem !== 'especie' && m.origem !== 'sempre');
+  const truquesTalento = truquesConcedidos;
   const truquesSempre = todosTruques.filter(m => m.origem === 'sempre');
-  const truquesClasse = todosTruques.filter(m => !m.personalizada && m.origem !== 'especie' && m.origem !== 'sempre' && !_origensTalento.includes(m.origem));
+  const truquesClasse = todosTruques.filter(m => !m.personalizada && m.origem !== 'especie' && m.origem !== 'sempre' && truqueContaNoLimite(m));
   const preparadas = char.magias_preparadas || [];
   const espacos = char.espacos_magia || {};
 
