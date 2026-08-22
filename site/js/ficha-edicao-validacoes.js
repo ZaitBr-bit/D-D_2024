@@ -21,3 +21,24 @@ export function validarListaUnica(lista, opcoesPermitidas, limite, descricao) {
   if (lista.some(item => !opcoesPermitidas.has(item))) return { ok: false, erro: `${descricao} contém opção indisponível.` };
   return { ok: true };
 }
+
+/**
+ * Valida a edicao manual livre de atributos: sem regra de metodo, apenas seis
+ * chaves com inteiros entre 1 e 20 -- o teto do livro, que o app aplica em
+ * todo lugar. O metodo usado na criacao NAO e exigido aqui, e isso e
+ * proposital: e o que destrava ficha antiga sem
+ * `configuracao_criacao.atributos.metodo`, que hoje fica presa no modal ate o
+ * jogador declarar um metodo que talvez nunca tenha usado.
+ * @param {object} proposta - Mapa chave-de-atributo -> valor total desejado.
+ * @returns {{ok: boolean, erro?: string}} Resultado da validacao.
+ */
+export function validarAtributosManuais(proposta) {
+  const valores = Object.values(proposta || {});
+  if (valores.length !== 6 || valores.some(v => !Number.isInteger(v))) {
+    return { ok: false, erro: 'Informe os seis atributos com valores inteiros.' };
+  }
+  if (valores.some(v => v < 1 || v > 20)) {
+    return { ok: false, erro: 'Cada atributo deve ficar entre 1 e 20.' };
+  }
+  return { ok: true };
+}

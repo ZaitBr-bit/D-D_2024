@@ -97,3 +97,39 @@ export function aplicarDeltaSistema(personagem, caminho, delta, teto = Infinity)
   }
   return aplicado;
 }
+
+/**
+ * Acumula o ajuste manual (edicao livre, sem regras) de atributos na entrada
+ * de grupo `atributos` de `edicoes`. Recebe o delta de cada chave -- a
+ * diferenca entre o valor digitado e o que estava na ficha antes -- e SOMA ao
+ * que ja havia, para que dois ajustes seguidos de +1 virem +2. Chave que zera
+ * sai do mapa; mapa vazio sai da entrada.
+ * @param {object} personagem - Personagem com estado de edicoes ja criado.
+ * @param {object} deltas - Mapa chave-de-atributo -> delta (pode ser negativo).
+ * @returns {object} O mapa de ajustes manuais resultante ({} quando vazio).
+ */
+export function registrarAjusteManualAtributos(personagem, deltas) {
+  const entrada = personagem?.edicoes?.campos?.atributos;
+  if (!entrada) return {};
+  const mapa = (entrada.manual && typeof entrada.manual === 'object') ? entrada.manual : {};
+  for (const [chave, delta] of Object.entries(deltas || {})) {
+    const acumulado = Number(mapa[chave] || 0) + Number(delta || 0);
+    if (acumulado === 0) delete mapa[chave];
+    else mapa[chave] = acumulado;
+  }
+  if (Object.keys(mapa).length) entrada.manual = mapa;
+  else delete entrada.manual;
+  return entrada.manual || {};
+}
+
+/**
+ * Le o mapa de ajustes manuais de atributos de um personagem. Devolve sempre
+ * um objeto -- vazio quando nao ha ajuste livre registrado --, para que quem
+ * exibe nao precise se defender de undefined.
+ * @param {object} personagem - Personagem a inspecionar.
+ * @returns {object} Mapa chave-de-atributo -> delta manual acumulado.
+ */
+export function deltaManualAtributos(personagem) {
+  const manual = personagem?.edicoes?.campos?.atributos?.manual;
+  return (manual && typeof manual === 'object') ? manual : {};
+}

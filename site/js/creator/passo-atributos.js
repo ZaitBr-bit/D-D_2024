@@ -197,8 +197,8 @@ export function renderStepAtributos(el) {
       <label class="form-check">
         <input type="radio" name="attr-mode" value="rolagem" ${dadosCache.attrMode === 'rolagem' ? 'checked' : ''}> Rolagem 4d6
       </label>
-      <label class="form-check" style="opacity:0.5;cursor:not-allowed" title="Opção desabilitada">
-        <input type="radio" name="attr-mode" value="manual" disabled> Manual
+      <label class="form-check">
+        <input type="radio" name="attr-mode" value="manual" ${dadosCache.attrMode === 'manual' ? 'checked' : ''}> Manual
       </label>
     </div>
 
@@ -224,9 +224,6 @@ export function renderStepAtributos(el) {
     </div>
     <div id="pericias-content"></div>
   `;
-
-  // Se o modo salvo era 'manual' (agora desabilitado), resetar para 'standard'
-  if (dadosCache.attrMode === 'manual') dadosCache.attrMode = 'standard';
 
   const renderAttr = () => {
     const modo = document.querySelector('[name="attr-mode"]:checked')?.value || 'standard';
@@ -585,11 +582,21 @@ function renderPointBuy(el) {
   });
 }
 
+/**
+ * Grid de entrada manual dos seis atributos: um campo numerico por atributo,
+ * para quem rolou os dados na mesa ou usa um sistema de geracao fora do app
+ * (issue #13). O teto de cada campo e 20 MENOS o bonus de antecedente daquele
+ * atributo -- o que mantem o invariante do livro (nenhum atributo passa de 20)
+ * sem herdar o piso 3, que so fazia sentido para a faixa do 4d6.
+ */
 function renderManual(el) {
   const info = CLASSES_INFO[personagem.classe];
+  // Teto por atributo: o bonus do antecedente ja esta decidido quando esta
+  // tela abre (o passo do antecedente vem antes, ver wizard.js).
+  const tetoDe = key => 20 - (personagem.bonus_antecedente[key] || 0);
 
   el.innerHTML = `
-    <div class="info-box info">Insira seus valores manualmente (ex: rolagem de dados). Mínimo: 3 | Máximo: 18</div>
+    <div class="info-box info">Insira seus valores manualmente (ex.: dados rolados na mesa). Mínimo: 1 | Máximo: 20 menos o bônus de antecedente do atributo</div>
     <div class="atributos-grid">
       ${ATRIBUTOS_KEYS.map(key => {
         const nome = ATRIBUTOS_NOMES[key];
@@ -603,7 +610,7 @@ function renderManual(el) {
           <div class="atributo-box ${ehPrimario ? 'destaque' : ''}">
             <div class="atributo-nome">${nome}${ehPrimario ? ' *' : ''}</div>
             <input type="number" class="form-input" style="text-align:center;font-size:1rem;padding:6px;font-weight:700"
-                   value="${base}" min="3" max="18" data-manual-key="${key}">
+                   value="${base}" min="1" max="${tetoDe(key)}" data-manual-key="${key}">
             ${bonus > 0 ? `<div style="font-size:0.7rem;color:var(--success)">+${bonus}</div>` : ''}
             <div class="atributo-mod">${fmtMod(mod)}</div>
             <div class="atributo-valor">${total}</div>
@@ -612,27 +619,27 @@ function renderManual(el) {
     </div>
   `;
 
+  // Grava a cada tecla dentro dos limites; o blur normaliza o que ficou fora
+  // e redesenha para o modificador e o total acompanharem.
+  const normalizar = (key, bruto) => {
+    let val = parseInt(bruto, 10);
+    if (isNaN(val)) val = 10;
+    return Math.max(1, Math.min(tetoDe(key), val));
+  };
+
   el.querySelectorAll('[data-manual-key]').forEach(inp => {
     inp.addEventListener('input', () => {
       const key = inp.dataset.manualKey;
-      let val = parseInt(inp.value);
-      // Validar limites: mínimo 3, máximo 18
-      if (isNaN(val)) val = 10;
-      if (val < 3) val = 3;
-      if (val > 18) val = 18;
+      const val = normalizar(key, inp.value);
       personagem.atributos_base[key] = val;
       personagem.atributos[key] = val + (personagem.bonus_antecedente[key] || 0);
     });
-    // Ao sair do campo, aplicar clamping visual
     inp.addEventListener('blur', () => {
       const key = inp.dataset.manualKey;
-      let val = parseInt(inp.value);
-      if (isNaN(val) || val < 3) val = 3;
-      if (val > 18) val = 18;
+      const val = normalizar(key, inp.value);
       inp.value = val;
       personagem.atributos_base[key] = val;
       personagem.atributos[key] = val + (personagem.bonus_antecedente[key] || 0);
-      // Atualizar mod e total exibidos
       renderManual(el);
     });
   });

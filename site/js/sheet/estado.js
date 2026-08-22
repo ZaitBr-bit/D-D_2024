@@ -47,6 +47,46 @@ export function seloEdicao(caminho) {
   return `<span class="badge no-print" style="font-size:0.6rem;margin-left:4px" title="Editado em ${escHtml(entrada.editadoEm)}">Editado</span>`;
 }
 
+/**
+ * Delta manual acumulado de um atributo -- a parte do total que veio de edicao
+ * livre, e nao do metodo de criacao, do antecedente ou de ganho de nivel.
+ * Devolve 0 quando aquele atributo nunca foi ajustado a mao.
+ * @param {string} key - Chave do atributo (ex.: 'destreza').
+ * @returns {number} Delta manual acumulado (pode ser negativo).
+ */
+export function deltaManualAtributo(key) {
+  const manual = char?.edicoes?.campos?.atributos?.manual;
+  return Number(manual?.[key] || 0);
+}
+
+/**
+ * Linha de marcacao do ajuste manual de um atributo, com a composicao completa
+ * no `title` -- base, bonus de antecedente, ganho de sistema (Aumento de
+ * Atributo/capstone) e a parte manual, mais a data. O ganho de sistema entra
+ * so quando diferente de zero; sem ele a composicao nao fecha com o total
+ * exibido para quem ja subiu de nivel (mesmo achado da revisao da Task 4, em
+ * sheet/edicao.js). Sai vazia quando o atributo nao foi editado a mao. Leva
+ * `no-print` de proposito: a ficha impressa mostra o resultado, nao o
+ * historico.
+ * @param {string} key - Chave do atributo (ex.: 'destreza').
+ * @returns {string} HTML da marca, ou string vazia.
+ */
+export function marcaAjusteManual(key) {
+  const delta = deltaManualAtributo(key);
+  if (!delta) return '';
+  const sinal = delta > 0 ? '+' : '';
+  const base = char?.atributos_base?.[key] ?? 0;
+  const bonus = char?.bonus_antecedente?.[key] || 0;
+  const partes = [`base ${base}`];
+  if (bonus) partes.push(`+${bonus} antecedente`);
+  const ganhoSistema = (char?.atributos?.[key] ?? 0) - base - bonus - delta;
+  if (ganhoSistema) partes.push(`${ganhoSistema > 0 ? '+' : ''}${ganhoSistema} nível`);
+  partes.push(`${sinal}${delta} manual`);
+  const editadoEm = char?.edicoes?.campos?.atributos?.editadoEm;
+  if (editadoEm) partes.push(new Date(editadoEm).toLocaleDateString('pt-BR'));
+  return `<div class="no-print" style="font-size:0.65rem;font-weight:700;color:var(--info);margin-top:2px" title="${escHtml(partes.join(' · '))}">✏️ ${sinal}${delta} manual</div>`;
+}
+
 // --- Setters -------------------------------------------------------------
 // Modulos ES nao permitem atribuir a um binding importado. Estas nove funcoes
 // sao a UNICA adicao de codigo da ficha (spec 3.1); todas sao chamadas

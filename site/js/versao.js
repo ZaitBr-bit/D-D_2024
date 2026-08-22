@@ -13,13 +13,52 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.14';
+export const VERSAO_ATUAL = '2.2.15';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.15',
+    data: '2026-08-22',
+    rotulo: 'Atributos editáveis',
+    resumo: 'O modo Manual voltou para a criação de personagem, e a ficha '
+      + 'pronta ganhou uma edição livre de atributos — com o ajuste feito à '
+      + 'mão ficando visível na própria caixa do atributo.',
+    melhorias: [
+      {
+        grupo: '✏️ Modo Manual na criação',
+        itens: [
+          'A opção "Manual" da tela de atributos voltou a funcionar. Quem '
+            + 'rola os dados na mesa, ou usa outro sistema para gerar os '
+            + 'atributos, digita os seis valores direto — sem precisar do '
+            + 'inspetor do navegador.',
+          'Cada campo aceita de 1 até 20 menos o bônus do antecedente '
+            + 'naquele atributo, de modo que o total nunca passa de 20.',
+        ],
+      },
+      {
+        grupo: '🖊️ Edição manual na ficha pronta',
+        itens: [
+          'O botão "Editar ficha" ganhou a opção "Edição manual (sem '
+            + 'regras)": digite o valor final que o atributo deve ter, entre '
+            + '1 e 20. O método usado na criação continua registrado, a um '
+            + 'toque de distância.',
+          'O que foi ajustado à mão aparece na ficha, embaixo do atributo, '
+            + 'como "✏️ +1 manual" — e o detalhe completo (base, bônus de '
+            + 'antecedente, nível e a parte manual) fica no toque sobre a '
+            + 'marca.',
+          'O ajuste manual sobrevive à subida de nível: o +1 do nível soma '
+            + 'ao total sem virar +2 de marca manual.',
+          'Editar Constituição move o PV máximo pela mesma regra do livro '
+            + 'que a subida de nível já usava, e reverter a distribuição '
+            + 'devolve os PV junto.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.14',
     data: '2026-08-21',

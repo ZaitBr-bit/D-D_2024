@@ -1000,6 +1000,40 @@ function ganhouNovoCirculoDeEspacos(tabelaCaracteristicas, nivelAnterior, novoNi
 }
 
 /**
+ * Ajusta PV maximo e atual quando o modificador de Constituicao muda.
+ *
+ * Regra retroativa do livro: cada +1 de modificador vale +1 PV por nivel ja
+ * conquistado. Vale nos DOIS sentidos -- modificador que cai subtrai a mesma
+ * conta --, para que desfazer uma edicao manual desfaca tambem o PV que ela
+ * concedeu. O PV maximo nunca fica abaixo de 1; o PV atual acompanha o delta
+ * efetivamente aplicado, sem passar do teto nem cair abaixo de 0 -- 0 PV e
+ * estado legitimo (inconsciente) e nao pode ser "corrigido" para 1.
+ *
+ * @param {object} personagem - Personagem a ajustar (usa `nivel` como multiplicador).
+ * @param {number} modAntes - Modificador de Constituicao antes da mudanca.
+ * @param {number} modDepois - Modificador de Constituicao depois da mudanca.
+ * @returns {number} Delta de PV efetivamente aplicado ao maximo (0 se nada mudou).
+ */
+export function aplicarPvRetroativoPorCon(personagem, modAntes, modDepois) {
+  if (!personagem || modDepois === modAntes) return 0;
+  const nivel = personagem.nivel || 1;
+  const maxAntes = personagem.pv_max || 1;
+  personagem.pv_max = Math.max(1, maxAntes + (modDepois - modAntes) * nivel);
+  const aplicado = personagem.pv_max - maxAntes;
+  const teto = personagem.pv_max_override || personagem.pv_max;
+  const atualAntes = personagem.pv_atual ?? 0;
+  // Piso 0, nao 1: pv_atual === 0 e estado legitimo (inconsciente/caindo),
+  // nao um erro a corrigir. Um piso de 1 ressuscitaria em silencio um
+  // personagem a 0 PV cujo modificador de Constituicao caisse (edicao
+  // manual para baixo, ou reversao de uma edicao que subiu CON). Por isso um
+  // personagem JA a 0 fica em 0 nos dois sentidos -- so cura de verdade tira
+  // alguem de 0, nunca um recalculo de atributo. Fora desse caso, o piso
+  // geral e 0 (nunca negativo) e o teto continua valendo.
+  personagem.pv_atual = atualAntes === 0 ? 0 : Math.max(0, Math.min(teto, atualAntes + aplicado));
+  return aplicado;
+}
+
+/**
  * Função principal de level-up
  * @param {Object} personagem - Objeto do personagem
  * @param {Object} opcoes - Opções para o level-up
@@ -1513,15 +1547,12 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     }
   }
 
-  // Regra retroativa de Constituição: se o modificador de CON aumentar,
-  // PV máximos aumentam em +1 por nível para cada +1 de modificador.
+  // Regra retroativa de Constituição: se o modificador de CON mudar, os PV
+  // máximos acompanham em +1 por nível para cada +1 de modificador. A conta
+  // mora em aplicarPvRetroativoPorCon porque a edição manual da ficha usa a
+  // MESMA regra, inclusive no sentido inverso ao reverter.
   const modConDepois = calcMod(personagem.atributos.constituicao);
-  let bonusConRetroativo = 0;
-  if (modConDepois > modConAntes) {
-    bonusConRetroativo = (modConDepois - modConAntes) * novoNivel;
-    personagem.pv_max += bonusConRetroativo;
-    personagem.pv_atual += bonusConRetroativo;
-  }
+  const bonusConRetroativo = aplicarPvRetroativoPorCon(personagem, modConAntes, modConDepois);
   
   // Aplicar talento (se escolhido ao invés de aumento)
   let escolhasTalentoLevelup = [];

@@ -3,10 +3,10 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, PERICIAS, POINT_BUY_CUSTOS, POINT_BUY_TOTAL, STANDARD_ARRAY } from '../dados-classes.js';
-import { validarAtributosEditados, validarListaUnica } from '../ficha-edicao-validacoes.js';
-import { aplicarEdicao, consolidarEdicoesAtributos, reverterEdicao } from '../ficha-edicoes.js';
+import { validarAtributosEditados, validarAtributosManuais, validarListaUnica } from '../ficha-edicao-validacoes.js';
+import { aplicarEdicao, consolidarEdicoesAtributos, deltaManualAtributos, registrarAjusteManualAtributos, reverterEdicao } from '../ficha-edicoes.js';
 import { abrirLevelUpCards } from '../levelup-ui.js';
-import { XP_POR_NIVEL, podeSubirDeNivel } from '../levelup.js';
+import { XP_POR_NIVEL, aplicarPvRetroativoPorCon, podeSubirDeNivel } from '../levelup.js';
 import { abrirModal, calcMod, escHtml, fmtMod, processarImagemArquivo, toast } from '../utils.js';
 import { rotuloPericia } from '../opcoes-dominio.js';
 import { campoEstaEditado, char, classeData, salvar, seloEdicao, talentosCache } from './estado.js';
@@ -62,6 +62,40 @@ function abrirModalEdicaoFicha(secaoInicial = 'atributos') {
   let imagemPendente = char.imagem || '';
   let propostaAtributos = Object.fromEntries(ATRIBUTOS_KEYS.map(key => [key, char.atributos_base?.[key] ?? char.atributos[key]]));
   const bonusAtributo = key => char.bonus_antecedente?.[key] || 0;
+
+  // Modo de edição livre: vale só enquanto o modal está aberto. Reabrir traz
+  // o modo desligado -- ninguém edita à mão por acidente.
+  let modoManual = false;
+  let propostaManual = Object.fromEntries(ATRIBUTOS_KEYS.map(key => [key, char.atributos?.[key] ?? 10]));
+
+  // Caixa de um atributo no modo livre. O campo opera sobre o TOTAL exibido na
+  // ficha (char.atributos), não sobre a base: é o número que o jogador vê e o
+  // que ele quer digitar (issue #13).
+  const caixaManual = key => {
+    const total = propostaManual[key];
+    const base = char.atributos_base?.[key] ?? 0;
+    const bonus = bonusAtributo(key);
+    const manualJaSalvo = deltaManualAtributos(char)[key] || 0;
+    const manualAcumulado = manualJaSalvo + (total - (char.atributos?.[key] ?? 0));
+    // Ganho de sistema: o que sobra do total atual da ficha depois de tirar
+    // base, bônus de antecedente e ajuste manual já salvo -- normalmente
+    // vem de Aumento de Atributo ou de capstone de nível. Sem esse termo a
+    // composição não fecha com o total exibido logo abaixo para quem já
+    // subiu de nível (achado da revisão da Task 4).
+    const ganhoSistema = (char.atributos?.[key] ?? 0) - base - bonus - manualJaSalvo;
+    const composicao = [`base ${base}`];
+    if (bonus) composicao.push(`+${bonus} antecedente`);
+    if (ganhoSistema) composicao.push(`${ganhoSistema > 0 ? '+' : ''}${ganhoSistema} nível`);
+    if (manualAcumulado) composicao.push(`${manualAcumulado > 0 ? '+' : ''}${manualAcumulado} manual`);
+    return `<div class="atributo-box" data-key="${key}">
+      <div class="atributo-nome">${ATRIBUTOS_NOMES[key]}</div>
+      <input type="number" class="form-input" style="text-align:center;font-size:1rem;padding:6px;font-weight:700"
+             min="1" max="20" data-edicao-manual-atributo="${key}" value="${total}">
+      <div style="font-size:0.65rem;color:var(--text-muted)">${composicao.join(' · ')}</div>
+      <div class="atributo-mod">${fmtMod(calcMod(total))}</div>
+      <div class="atributo-total">${total}</div>
+    </div>`;
+  };
   const caixaAtributo = (key, conteudo) => {
     const base = propostaAtributos[key];
     const bonus = bonusAtributo(key);
@@ -80,6 +114,15 @@ function abrirModalEdicaoFicha(secaoInicial = 'atributos') {
   const render = () => {
     const navegacao = `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px">${secoes.map(s => `<button class="btn btn-sm ${s === secao ? 'btn-primary' : 'btn-secondary'}" data-edicao-secao="${s}">${s[0].toUpperCase() + s.slice(1)}</button>`).join('')}</div>`;
     if (secao === 'atributos') {
+      const barraModo = `<div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+        <button class="btn btn-sm ${modoManual ? 'btn-primary' : 'btn-secondary'}" id="btn-edicao-modo-manual">${modoManual ? 'Voltar ao método da criação' : '✏️ Edição manual (sem regras)'}</button>
+      </div>`;
+      if (modoManual) {
+        return navegacao + barraModo + `
+          <div class="info-box warning" style="font-size:0.8rem;margin-bottom:10px">Edição livre: digite o valor final de cada atributo, entre 1 e 20. O ajuste feito aqui fica marcado como manual na ficha, e o método usado na criação continua registrado.</div>
+          <div class="atributos-grid atributos-grid-edicao">${ATRIBUTOS_KEYS.map(caixaManual).join('')}</div>
+          ${atributosEstaoEditados() ? '<button class="btn btn-sm btn-secondary mt-1" data-reverter-atributos>Reverter distribuição de atributos</button>' : ''}`;
+      }
       const cfg = char.configuracao_criacao?.atributos || {};
       const metodo = cfg.metodo || '';
       const selecaoPorValores = valores => {
@@ -122,7 +165,7 @@ function abrirModalEdicaoFicha(secaoInicial = 'atributos') {
         controles = selecaoPorValores(Object.values(cfg.valoresBase || propostaAtributos));
         ajudaMetodo = 'Redistribua somente os seis valores informados na criação.';
       }
-      return navegacao + `
+      return navegacao + barraModo + `
         <div class="info-box info" style="font-size:0.8rem;margin-bottom:10px">${ajudaMetodo} Ganhos de nível permanecem preservados ao reverter.</div>
         ${!metodo ? `<div class="form-group"><label class="form-label">Método usado na criação</label><select id="edicao-metodo-atributos" class="form-input"><option value="">-- Selecionar --</option><option value="standard">Conjunto Padrão</option><option value="pointbuy">Compra de Pontos</option><option value="rolagem">Rolagem 4d6</option><option value="manual">Valores Manuais</option></select></div>` : `<div class="form-group"><label class="form-label">Método usado na criação</label><select class="form-input" disabled><option>${escHtml({ standard: 'Conjunto Padrão', pointbuy: 'Compra de Pontos', rolagem: 'Rolagem 4d6', manual: 'Valores Manuais' }[metodo] || metodo)}</option></select></div>`}
         <div class="atributos-grid atributos-grid-edicao">${controles}</div>
@@ -164,63 +207,34 @@ function abrirModalEdicaoFicha(secaoInicial = 'atributos') {
   const abrir = () => {
     abrirModal('Editar ficha', `<div id="edicao-ficha-corpo">${render()}</div>`, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-edicao-ficha">Salvar</button>');
     vincular();
+    vincularBotaoSalvar();
   };
-  const vincular = () => {
-    document.querySelectorAll('[data-edicao-secao]').forEach(btn => btn.addEventListener('click', () => {
-      secao = btn.dataset.edicaoSecao;
-      const corpo = document.getElementById('edicao-ficha-corpo');
-      if (corpo) { corpo.innerHTML = render(); vincular(); }
-    }));
-    document.querySelectorAll('[data-edicao-atributo]').forEach(input => input.addEventListener('change', () => {
-      const metodo = char.configuracao_criacao?.atributos?.metodo || '';
-      if (metodo === 'standard' || metodo === 'rolagem' || metodo === 'manual') {
-        const valores = metodo === 'standard'
-          ? STANDARD_ARRAY
-          : Object.values(char.configuracao_criacao?.atributos?.rolagens || char.configuracao_criacao?.atributos?.valoresBase || propostaAtributos);
-        propostaAtributos[input.dataset.edicaoAtributo] = valores[parseInt(input.value)];
-        const corpo = document.getElementById('edicao-ficha-corpo');
-        if (corpo) { corpo.innerHTML = render(); vincular(); }
-      } else {
-        propostaAtributos[input.dataset.edicaoAtributo] = parseInt(input.value);
-      }
-    }));
-    document.querySelectorAll('[data-edicao-pointbuy]').forEach(btn => btn.addEventListener('click', () => {
-      const key = btn.dataset.edicaoPointbuy;
-      propostaAtributos[key] += parseInt(btn.dataset.dir);
-      const corpo = document.getElementById('edicao-ficha-corpo');
-      if (corpo) { corpo.innerHTML = render(); vincular(); }
-    }));
-    document.getElementById('edicao-imagem-btn')?.addEventListener('click', () => document.getElementById('edicao-imagem-input')?.click());
-    document.getElementById('edicao-imagem-input')?.addEventListener('change', async event => {
-      const arquivo = event.target.files?.[0];
-      event.target.value = '';
-      if (!arquivo) return;
-      const dataUrl = await processarImagemArquivo(arquivo, 300);
-      if (!dataUrl) { toast('Não foi possível processar essa imagem.', 'error'); return; }
-      imagemPendente = dataUrl;
-      const preview = document.getElementById('edicao-imagem-preview');
-      if (preview) preview.innerHTML = `<img src="${dataUrl}" alt="">`;
-      const remover = document.getElementById('edicao-imagem-remover');
-      if (remover) remover.style.display = '';
-    });
-    document.getElementById('edicao-imagem-remover')?.addEventListener('click', () => {
-      imagemPendente = '';
-      const preview = document.getElementById('edicao-imagem-preview');
-      if (preview) preview.textContent = (char.nome || char.classe || '?').charAt(0).toUpperCase() || '?';
-      const remover = document.getElementById('edicao-imagem-remover');
-      if (remover) remover.style.display = 'none';
-    });
-    document.querySelector('[data-reverter-atributos]')?.addEventListener('click', () => {
-      consolidarEdicoesAtributos(char);
-      const mudouBase = reverterEdicao(char, 'atributos_base');
-      const mudouTotal = reverterEdicao(char, 'atributos');
-      if (mudouBase || mudouTotal) { salvar(); window.fecharModal(); renderFichaCompleta(); toast('Distribuição de atributos restaurada.', 'success'); }
-    });
-    document.querySelectorAll('[data-reverter-campo]').forEach(btn => btn.addEventListener('click', () => {
-      if (reverterEdicao(char, btn.dataset.reverterCampo)) { salvar(); window.fecharModal(); renderFichaCompleta(); toast('Campo restaurado.', 'success'); }
-    }));
+  // O botão Salvar mora no RODAPÉ do modal, fora de #edicao-ficha-corpo, e
+  // por isso NUNCA é recriado pelos re-renders do corpo (troca de aba, cada
+  // `change` de campo no modo manual etc.). vincular() é chamada de novo a
+  // cada um desses re-renders; se o listener do Salvar morasse lá dentro,
+  // cada re-render empilharia mais um listener anônimo no mesmo nó, e um
+  // único clique rodaria o handler N vezes (achado Important 1 da revisão
+  // de 2026-08-22). Por isso ele é vinculado uma única vez, aqui, logo após
+  // abrirModal criar o botão -- e não dentro de vincular().
+  const vincularBotaoSalvar = () => {
     document.getElementById('btn-salvar-edicao-ficha')?.addEventListener('click', () => {
-      if (secao === 'atributos') {
+      if (secao === 'atributos' && modoManual) {
+        const resultado = validarAtributosManuais(propostaManual);
+        if (!resultado.ok) { toast(resultado.erro, 'error'); return; }
+        const antes = { ...char.atributos };
+        const modConAntes = calcMod(antes.constituicao ?? 10);
+        const deltas = Object.fromEntries(ATRIBUTOS_KEYS.map(k => [k, propostaManual[k] - (antes[k] ?? 0)]));
+        if (ATRIBUTOS_KEYS.some(k => deltas[k] !== 0)) {
+          consolidarEdicoesAtributos(char);
+          aplicarEdicao(char, 'atributos', { ...propostaManual });
+          registrarAjusteManualAtributos(char, deltas);
+          consolidarEdicoesAtributos(char);
+          // A cascata da ficha é calculada no render; só o PV é persistido, e
+          // por isso é o único que precisa ser movido à mão aqui.
+          aplicarPvRetroativoPorCon(char, modConAntes, calcMod(char.atributos?.constituicao ?? 10));
+        }
+      } else if (secao === 'atributos') {
         const metodo = char.configuracao_criacao?.atributos?.metodo || document.getElementById('edicao-metodo-atributos')?.value;
         if (!metodo) { toast('Informe o método de criação.', 'error'); return; }
         const proposta = { ...propostaAtributos };
@@ -264,6 +278,96 @@ function abrirModalEdicaoFicha(secaoInicial = 'atributos') {
       }
       salvar(); window.fecharModal(); window.definirTituloHeader?.(char.nome); renderFichaCompleta(); toast('Alterações salvas.', 'success');
     });
+  };
+  const vincular = () => {
+    document.querySelectorAll('[data-edicao-secao]').forEach(btn => btn.addEventListener('click', () => {
+      secao = btn.dataset.edicaoSecao;
+      const corpo = document.getElementById('edicao-ficha-corpo');
+      if (corpo) { corpo.innerHTML = render(); vincular(); }
+    }));
+    document.getElementById('btn-edicao-modo-manual')?.addEventListener('click', () => {
+      modoManual = !modoManual;
+      // Entrar no modo livre parte sempre dos totais atuais da ficha, para que
+      // um ajuste abandonado no meio não vaze para a próxima abertura.
+      if (modoManual) propostaManual = Object.fromEntries(ATRIBUTOS_KEYS.map(key => [key, char.atributos?.[key] ?? 10]));
+      const corpo = document.getElementById('edicao-ficha-corpo');
+      if (corpo) { corpo.innerHTML = render(); vincular(); }
+    });
+    document.querySelectorAll('[data-edicao-manual-atributo]').forEach(input => input.addEventListener('change', () => {
+      const key = input.dataset.edicaoManualAtributo;
+      const valor = parseInt(input.value, 10);
+      propostaManual[key] = Number.isInteger(valor)
+        ? Math.max(1, Math.min(20, valor))
+        : (char.atributos?.[key] ?? 10);
+      const corpo = document.getElementById('edicao-ficha-corpo');
+      if (corpo) { corpo.innerHTML = render(); vincular(); }
+    }));
+    document.querySelectorAll('[data-edicao-atributo]').forEach(input => input.addEventListener('change', () => {
+      const metodo = char.configuracao_criacao?.atributos?.metodo || '';
+      if (metodo === 'standard' || metodo === 'rolagem' || metodo === 'manual') {
+        const valores = metodo === 'standard'
+          ? STANDARD_ARRAY
+          : Object.values(char.configuracao_criacao?.atributos?.rolagens || char.configuracao_criacao?.atributos?.valoresBase || propostaAtributos);
+        propostaAtributos[input.dataset.edicaoAtributo] = valores[parseInt(input.value)];
+        const corpo = document.getElementById('edicao-ficha-corpo');
+        if (corpo) { corpo.innerHTML = render(); vincular(); }
+      } else {
+        propostaAtributos[input.dataset.edicaoAtributo] = parseInt(input.value);
+      }
+    }));
+    document.querySelectorAll('[data-edicao-pointbuy]').forEach(btn => btn.addEventListener('click', () => {
+      const key = btn.dataset.edicaoPointbuy;
+      propostaAtributos[key] += parseInt(btn.dataset.dir);
+      const corpo = document.getElementById('edicao-ficha-corpo');
+      if (corpo) { corpo.innerHTML = render(); vincular(); }
+    }));
+    document.getElementById('edicao-imagem-btn')?.addEventListener('click', () => document.getElementById('edicao-imagem-input')?.click());
+    document.getElementById('edicao-imagem-input')?.addEventListener('change', async event => {
+      const arquivo = event.target.files?.[0];
+      event.target.value = '';
+      if (!arquivo) return;
+      const dataUrl = await processarImagemArquivo(arquivo, 300);
+      if (!dataUrl) { toast('Não foi possível processar essa imagem.', 'error'); return; }
+      imagemPendente = dataUrl;
+      const preview = document.getElementById('edicao-imagem-preview');
+      if (preview) preview.innerHTML = `<img src="${dataUrl}" alt="">`;
+      const remover = document.getElementById('edicao-imagem-remover');
+      if (remover) remover.style.display = '';
+    });
+    document.getElementById('edicao-imagem-remover')?.addEventListener('click', () => {
+      imagemPendente = '';
+      const preview = document.getElementById('edicao-imagem-preview');
+      if (preview) preview.textContent = (char.nome || char.classe || '?').charAt(0).toUpperCase() || '?';
+      const remover = document.getElementById('edicao-imagem-remover');
+      if (remover) remover.style.display = 'none';
+    });
+    document.querySelector('[data-reverter-atributos]')?.addEventListener('click', () => {
+      // Este handler é COMPARTILHADO com a redistribuição do método com
+      // regras (selects data-edicao-atributo, ramo `else if (secao ===
+      // 'atributos')` do salvamento): reverterEdicao desfaz as duas coisas
+      // na mesma tacada. A redistribuição nunca move PV ao salvar, então
+      // aplicar o inverso sem essa guarda inventaria PV numa reversão que
+      // nunca o concedeu -- exatamente o bug de moeda fantasma que esta
+      // tarefa existe para evitar. Por isso o inverso usa só a fatia MANUAL
+      // do movimento de Constituição, lida ANTES de consolidar/reverter
+      // apagarem a entrada onde ela mora.
+      const conAtual = char.atributos?.constituicao ?? 10;
+      const deltaManualCon = deltaManualAtributos(char).constituicao || 0;
+      consolidarEdicoesAtributos(char);
+      const mudouBase = reverterEdicao(char, 'atributos_base');
+      const mudouTotal = reverterEdicao(char, 'atributos');
+      if (mudouBase || mudouTotal) {
+        if (deltaManualCon !== 0) {
+          // Sentido inverso do salvamento manual: desfazer a edição desfaz
+          // também o PV que ela concedeu.
+          aplicarPvRetroativoPorCon(char, calcMod(conAtual), calcMod(conAtual - deltaManualCon));
+        }
+        salvar(); window.fecharModal(); renderFichaCompleta(); toast('Distribuição de atributos restaurada.', 'success');
+      }
+    });
+    document.querySelectorAll('[data-reverter-campo]').forEach(btn => btn.addEventListener('click', () => {
+      if (reverterEdicao(char, btn.dataset.reverterCampo)) { salvar(); window.fecharModal(); renderFichaCompleta(); toast('Campo restaurado.', 'success'); }
+    }));
   };
   abrir();
 }

@@ -29,7 +29,7 @@ import { calcVantagemDesvantagemPericia, forcaPrimordialAtiva, getAtaquesPorAcao
 import { renderSecaoCondicoes, renderSecaoDefesas, renderSecaoSentidos, setupEventosCondicoes, setupEventosDefesas } from './condicoes.js';
 import { renderSecaoDetalhes } from './detalhes.js';
 import { setupEventosEdicao } from './edicao.js';
-import { ATRIBUTO_ESTILO, char, containerRef, definirPassivosTalentos, especiesCache, passivosTalentosCache, salvar, seloEdicao } from './estado.js';
+import { ATRIBUTO_ESTILO, char, containerRef, definirPassivosTalentos, especiesCache, marcaAjusteManual, passivosTalentosCache, salvar, seloEdicao } from './estado.js';
 import { setupEventosHabilidades } from './habilidades.js';
 import { setupEventosDescanso, setupEventosHP, sincronizarBonusPvAnao, sincronizarBonusPvDraconico, sincronizarBonusPvVigoroso } from './hp-descanso.js';
 import { getEstadoCarga, renderSecaoInventario, setupEventosInventarioSheet } from './inventario.js';
@@ -703,6 +703,7 @@ export function renderFichaCompleta() {
               <div class="atributo-nome" style="color:${attrStyle.cor || 'var(--text-muted)'}">${attrStyle.emoji || ''} ${nome}${seloEdicao(`atributos.${key}`)}</div>
               <div class="atributo-mod" style="color:${attrStyle.cor || 'var(--primary)'}">${fmtMod(mod)}</div>
               <div class="atributo-valor">${val}</div>
+              ${marcaAjusteManual(key)}
               ${isConjuracao ? '<div style="font-size:0.6rem;font-weight:700;color:var(--accent);margin-top:2px">🔮 Conjuração</div>' : ''}
             </div>`;
         }).join('')}
