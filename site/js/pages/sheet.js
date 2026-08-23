@@ -9,7 +9,8 @@ import { obterTodasMagiasDominio, obterTodasMagiasSemprePreparadas } from '../le
 import { getSyncStatus, onSyncStatusChange } from '../sync.js';
 import { resolverPassivosTalentos } from '../talentos-effects.js';
 import { abrirGridManobras } from '../manobras-ui.js';
-import { definirChar, definirContainer, definirClasseData, definirIndiceMagias, definirTalentos, definirEspecies, definirMagiasDominio, definirMagiasSempre, definirPassivosTalentos } from '../sheet/estado.js';
+import { classesDe } from '../regras-multiclasse.js';
+import { definirChar, definirContainer, definirClasseData, definirClassesData, definirIndiceMagias, definirTalentos, definirEspecies, definirMagiasDominio, definirMagiasSempre, definirPassivosTalentos } from '../sheet/estado.js';
 import { getEstadoRecursosGuerreiro } from '../sheet/classes/guerreiro.js';
 import { sincronizarMagiasFixasMago } from '../sheet/classes/mago.js';
 import { _carregarEstadoColapso } from '../sheet/colapso.js';
@@ -39,6 +40,16 @@ export async function renderSheet(container, charId) {
 
   // Carregar dados complementares
   definirClasseData(await getClasse(char.classe));
+  // Dados de TODAS as classes, para os renderizadores que precisam de
+  // contexto por classe. getClasse tem cache em memoria (db.js), entao a
+  // segunda classe custa uma requisicao na primeira abertura e zero depois.
+  // classeData acima continua sendo a classe INICIAL, e nao muda.
+  const mapaClasses = new Map();
+  for (const c of classesDe(char)) {
+    if (mapaClasses.has(c.classe)) continue;
+    mapaClasses.set(c.classe, await getClasse(c.classe));
+  }
+  definirClassesData(mapaClasses);
   const indiceData = await getIndiceMagias();
   definirIndiceMagias(indiceData?.magias || []);
   definirTalentos(await getTalentos());

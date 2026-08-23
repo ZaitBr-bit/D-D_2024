@@ -87,7 +87,8 @@ export async function modulosApp() {
          sheetMago, notasVersao, versao,
          levelupCards, regrasSubclasseEscolhas, regrasOrigensMagia,
          regrasConjuracaoSubclasse, regrasSalvaguardas, fichaEdicoes, fichaEdicaoValidacoes,
-         multiclasse, home, multiclasseConjuracao, multiclasseProgressao] = await Promise.all([
+         multiclasse, home, multiclasseConjuracao, multiclasseProgressao, contextoClasse,
+         sheetCaracteristicas, sheetFicha] = await Promise.all([
     importar('site/js/regras-cobertura.js'),
     importar('site/js/talentos-effects.js'),
     importar('site/js/store.js'),
@@ -116,13 +117,27 @@ export async function modulosApp() {
     importar('site/js/pages/home.js'),
     importar('site/js/regras-multiclasse-conjuracao.js'),
     importar('site/js/regras-multiclasse-progressao.js'),
+    importar('site/js/sheet/contexto-classe.js'),
+    // Rodada 1 de correcao da Tarefa 2: o oraculo 6 original testava so
+    // montarContextos + um filtro reimplementado dentro do proprio teste,
+    // nunca o RENDER de verdade -- nao pegava, por exemplo, `ctx.subclasse`
+    // trocado por `char.subclasse` dentro de caracteristicas.js. Este
+    // import permite chamar renderSecaoCaracteristicas()/
+    // renderSecaoSubclasse() de verdade, via sheetEstado.definirChar() e
+    // sheetEstado.definirClassesData().
+    importar('site/js/sheet/caracteristicas.js'),
+    // Correcao final do sub-projeto 3a: renderFichaCompleta() de verdade, para
+    // medir o PONTO DE CHAMADA do conserto (ficha.js chamando
+    // migrarMulticlasse() a cada render), nao so a funcao de reconciliacao
+    // isolada -- ver multiclasse-contexto.test.mjs, oraculo final.
+    importar('site/js/sheet/ficha.js'),
   ]);
   _cache = { regras, efeitos, store, levelup, criador, utils, dadosClasses, db, equip,
              levelupFlow, sheetEstado, sheetMagias, sheetMigracoes, sheetGrimorio,
              sheetMago, notasVersao, versao, levelupCards, regrasSubclasseEscolhas,
              regrasOrigensMagia, regrasConjuracaoSubclasse, regrasSalvaguardas,
              fichaEdicoes, fichaEdicaoValidacoes, multiclasse, home, multiclasseConjuracao,
-             multiclasseProgressao };
+             multiclasseProgressao, contextoClasse, sheetCaracteristicas, sheetFicha };
   return _cache;
 }
 

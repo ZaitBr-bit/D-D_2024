@@ -3,43 +3,56 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { bonusProficiencia, calcMod, detectarRecarga, ehHabilidadeAtiva, escHtml, mdParaHtml } from '../utils.js';
-import { char, classeData, especiesCache } from './estado.js';
+import { char, especiesCache } from './estado.js';
+import { contextosDeClasse } from './contexto-classe.js';
 import { detectarUsosMaximos, renderFeatureItem } from './habilidades.js';
 
-export function renderSecaoCaracteristicas() {
-  if (!classeData?.caracteristicas?.length) return '';
-  let feats = classeData.caracteristicas.filter(c => c.nivel <= char.nivel);
+/**
+ * Bloco de caracteristicas de UMA classe, filtrado pelo nivel NAQUELA
+ * classe. `mostrarNomeClasse` so entra com duas ou mais classes: com uma
+ * so, a saida tem de ficar identica a de antes da multiclasse.
+ * @param {{classe, subclasse, nivelClasse, dados}} ctx
+ * @param {boolean} mostrarNomeClasse
+ * @returns {string} HTML, ou string vazia.
+ */
+function renderCaracteristicasDeUmaClasse(ctx, mostrarNomeClasse) {
+  const dados = ctx.dados;
+  if (!dados?.caracteristicas?.length) return '';
+  let feats = dados.caracteristicas.filter(c => c.nivel <= ctx.nivelClasse);
   if (!feats.length) return '';
 
   // Filtrar features de subclasses não selecionadas (evitar duplicatas)
-  if (classeData.subclasses?.length) {
-    const outrasSubclasses = classeData.subclasses.filter(s => s.nome !== char.subclasse);
+  if (dados.subclasses?.length) {
+    const outrasSubclasses = dados.subclasses.filter(s => s.nome !== ctx.subclasse);
     const featsOutras = new Set();
     outrasSubclasses.forEach(sc => {
       (sc.caracteristicas || []).forEach(f => featsOutras.add(f.nome));
     });
     // Manter somente features que não pertencem exclusivamente a outra subclasse
     const featsSelecionada = new Set();
-    if (char.subclasse) {
-      const scAtual = classeData.subclasses.find(s => s.nome === char.subclasse);
+    if (ctx.subclasse) {
+      const scAtual = dados.subclasses.find(s => s.nome === ctx.subclasse);
       (scAtual?.caracteristicas || []).forEach(f => featsSelecionada.add(f.nome));
     }
     feats = feats.filter(f => !featsOutras.has(f.nome) || featsSelecionada.has(f.nome));
 
     // Evita duplicidade com seção de subclasse ativa
-    if (char.subclasse) {
-      const scAtual = classeData.subclasses.find(s => s.nome === char.subclasse);
-      const featsSC = new Set((scAtual?.caracteristicas || []).filter(c => c.nivel <= char.nivel).map(c => `${c.nivel}|${c.nome}`));
+    if (ctx.subclasse) {
+      const scAtual = dados.subclasses.find(s => s.nome === ctx.subclasse);
+      const featsSC = new Set((scAtual?.caracteristicas || []).filter(c => c.nivel <= ctx.nivelClasse).map(c => `${c.nivel}|${c.nome}`));
       feats = feats.filter(f => !featsSC.has(`${f.nivel}|${f.nome}`));
     }
   }
 
   const passivas = feats.filter(f => !ehHabilidadeAtiva(f.descricao, f.nome));
   const ativas = feats.filter(f => ehHabilidadeAtiva(f.descricao, f.nome));
+  const titulo = mostrarNomeClasse
+    ? `Características de Classe — ${escHtml(ctx.classe)} ${ctx.nivelClasse}`
+    : 'Características de Classe';
 
   return `
     <div class="card print-break-before">
-      <div class="card-header"><h2>Características de Classe</h2></div>
+      <div class="card-header"><h2>${titulo}</h2></div>
       ${ativas.length > 0 ? `
         <div class="section-divider"><span>Habilidades Ativas</span></div>
         ${ativas.map(f => renderFeatureItem(f, 'classe')).join('')}
@@ -52,13 +65,27 @@ export function renderSecaoCaracteristicas() {
   `;
 }
 
+/** Um bloco de caracteristicas por classe do personagem. */
+export function renderSecaoCaracteristicas() {
+  const ctxs = contextosDeClasse();
+  const mostrarNome = ctxs.length > 1;
+  return ctxs.map(ctx => renderCaracteristicasDeUmaClasse(ctx, mostrarNome)).join('');
+}
+
 // --- Subclasse ---
 
-export function renderSecaoSubclasse() {
-  if (!char.subclasse || !classeData?.subclasses?.length) return '';
-  const sc = classeData.subclasses.find(s => s.nome === char.subclasse);
+/**
+ * Secao da subclasse de UMA classe, filtrada pelo nivel NAQUELA classe.
+ * O HTML e identico ao de antes da multiclasse: com uma classe so, a
+ * saida tem de ficar byte a byte igual.
+ * @param {{classe, subclasse, nivelClasse, dados}} ctx
+ * @returns {string} HTML, ou string vazia.
+ */
+function renderSubclasseDeUmaClasse(ctx) {
+  if (!ctx.subclasse || !ctx.dados?.subclasses?.length) return '';
+  const sc = ctx.dados.subclasses.find(s => s.nome === ctx.subclasse);
   if (!sc?.caracteristicas?.length) return '';
-  const feats = sc.caracteristicas.filter(c => c.nivel <= char.nivel);
+  const feats = sc.caracteristicas.filter(c => c.nivel <= ctx.nivelClasse);
   if (!feats.length) return '';
 
   const passivas = feats.filter(f => !ehHabilidadeAtiva(f.descricao, f.nome));
@@ -66,7 +93,7 @@ export function renderSecaoSubclasse() {
 
   return `
     <div class="card print-break-before">
-      <div class="card-header"><h2>Subclasse — ${escHtml(char.subclasse)}</h2></div>
+      <div class="card-header"><h2>Subclasse — ${escHtml(ctx.subclasse)}</h2></div>
       ${ativas.length > 0 ? `
         <div class="section-divider"><span>Habilidades Ativas</span></div>
         ${ativas.map(f => renderFeatureItem(f, 'subclasse')).join('')}
@@ -77,6 +104,11 @@ export function renderSecaoSubclasse() {
       ` : ''}
     </div>
   `;
+}
+
+/** Uma secao de subclasse por classe do personagem que tenha uma. */
+export function renderSecaoSubclasse() {
+  return contextosDeClasse().map(renderSubclasseDeUmaClasse).join('');
 }
 
 // Descrições mecânicas dos sub-traços de espécies com opcoes

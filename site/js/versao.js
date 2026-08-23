@@ -13,13 +13,33 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.16';
+export const VERSAO_ATUAL = '2.2.17';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.17',
+    data: '2026-08-23',
+    rotulo: 'Características por classe',
+    resumo: 'A ficha de um personagem com mais de uma classe passa a listar '
+      + 'as características de cada classe separadamente, filtradas pelo '
+      + 'nível naquela classe.',
+    melhorias: [
+      {
+        grupo: '📚 Características de classe',
+        itens: [
+          'Quem tem mais de uma classe vê um bloco por classe, cada um com '
+            + 'as características até o nível daquela classe. Antes, a ficha '
+            + 'filtrava tudo pelo nível total e mostrava características que '
+            + 'o personagem ainda não tinha.',
+          'Para quem tem uma classe só, nada muda.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.16',
     data: '2026-08-22',

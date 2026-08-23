@@ -447,3 +447,62 @@ rolagem de 9 num d6 e quase certamente erro de digitacao, e limitar a 6 entrega
 o que o jogador quis; cair na media descarta o numero que ele digitou sem
 avisar. Mas e decisao de produto, e a troca nao pode acontecer sem ela ser
 tomada -- senao muda em silencio.
+
+================================================================================
+BLOQUEANTE do sub-projeto 5: renderFeatureItem le a classe errada (2026-08-23)
+================================================================================
+
+Achado na revisao final do sub-projeto 3a de multiclasse (contexto de classe
+com escopo). NAO e alcancavel hoje, e por isso nao foi consertado -- mas tem
+de ser consertado ANTES de o sub-projeto 5 tornar multiclasse alcancavel.
+
+O QUE ACONTECE
+
+A secao de Caracteristicas passou a renderizar um bloco por classe. Cada bloco
+chama `renderFeatureItem(f, source)`, de site/js/sheet/habilidades.js -- e
+aquela funcao le os ESPELHOS por dentro: 26 ocorrencias de char.classe, 95 de
+char.subclasse e 23 de char.nivel, todas comparacoes de identidade do tipo
+`char.classe === 'Clerigo'`.
+
+Como o espelho aponta sempre para a classe INICIAL, o bloco da segunda classe e
+renderizado com a identidade da primeira. O caso concreto:
+
+  habilidades.js:2549
+    ehCanalizarDivindadeClerigo = char.classe === 'Clerigo'
+                                  && f.nome === 'Canalizar Divindade'
+
+Num Clerigo 5/Paladino 5, isso da TRUE dentro do bloco do Paladino. O Paladino
+ganha os tres botoes do Clerigo (Centelha Divina, Expulsar Mortos-Vivos,
+Fulminar Mortos-Vivos), que nao sao dele. Pior: o handler de habilidades.js:169
+gasta char.recursos.clerigo.canalizar_divindade_usos_gastos -- clicar no
+Canalizar Divindade do Paladino gasta o pool do CLERIGO, e grava.
+
+Na ordem inversa (Paladino primeiro), o widget some dos dois e ambos caem no
+contador generico com a chave `classe_Canalizar Divindade`, identica nos dois
+blocos: dois contadores, um unico slot em char.usos_habilidades.
+
+POR QUE NAO FOI CONSERTADO AGORA
+
+Hoje o caminho e inalcancavel: o criador faz classe unica e o level-up ainda
+nao escolhe classe. So um arquivo importado a mao produz duas classes.
+
+E o conserto do lado de caracteristicas.js exigiria mutar temporariamente
+char.classe/char.subclasse durante o render -- que e (a) a reentrancia que o
+desenho do 3a rejeitou explicitamente, e (b) escrita em espelho, acusada pela
+guarda 'ninguem escreve nos espelhos fora do escritor autorizado', instalada
+pela revisao final do sub-projeto 1. A guarda funcionou: pegou a tentativa.
+
+DECISAO (2026-08-23): deixar para o sub-projeto 3b, que ja vai converter
+habilidades.js e dar a renderFeatureItem um parametro de contexto de verdade --
+a mesma mudanca de forma, sem violar a guarda.
+
+  NAO abrir excecao em ESCRITAS_PERMITIDAS para isso. Aquela lista existe para
+  documentar escritores LEGADOS e so pode encolher; usa-la para autorizar um
+  escritor NOVO inverte o proposito dela.
+
+PRE-REQUISITO DURO
+
+O sub-projeto 5 (subida de nivel com escolha de classe) e o que torna
+multiclasse alcancavel. Ele NAO pode entrar antes de o 3b dar contexto a
+renderFeatureItem -- senao o primeiro jogador a fazer Clerigo/Paladino ganha um
+botao que gasta o recurso da outra classe, e grava.

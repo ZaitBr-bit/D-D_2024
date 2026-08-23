@@ -34,6 +34,7 @@ import { setupEventosHabilidades } from './habilidades.js';
 import { setupEventosDescanso, setupEventosHP, sincronizarBonusPvAnao, sincronizarBonusPvDraconico, sincronizarBonusPvVigoroso } from './hp-descanso.js';
 import { getEstadoCarga, renderSecaoInventario, setupEventosInventarioSheet } from './inventario.js';
 import { ehSubclasseConjuradora, renderSecaoMagias, setupEventosEspacosMagia } from './magias.js';
+import { migrarMulticlasse } from './migracoes.js';
 import { abrirModalRecuperarDadivaEpica, precisaRecuperarDadivaEpica, renderSecaoTalentos } from './talentos.js';
 
 /** Salva o estado open/closed de todos os <details> no container */
@@ -137,6 +138,24 @@ function renderPainelRecursosMago(estadoMago) {
 }
 
 export function renderFichaCompleta() {
+  // Reconcilia classes[] a partir dos espelhos ANTES de qualquer leitura de
+  // classesData/contextosDeClasse.
+  //
+  // `subirDeNivel` (levelup.js:1411 e :1429) escreve SÓ nos espelhos
+  // (char.nivel, char.subclasse) -- classes[] nunca é tocado ali. Enquanto
+  // isso, a seção de Características (Tarefa 2 deste sub-projeto) passou a
+  // ler classes[] em vez do espelho. Sem reconciliar aqui, toda subida de
+  // nível deixava a ficha mostrando o estado ANTERIOR até o jogador fechar
+  // e reabrir -- um Clérigo que sobe de 4 para 5 não via Fulminar
+  // Mortos-Vivos até um F5. É a mesma família de defeito do
+  // passivosTalentosCache logo abaixo: um escritor mexe num campo, outro lê
+  // noutro momento, e o sintoma aparece longe da causa.
+  // migrarMulticlasse() é a mesma casca que renderSheet já chama na
+  // abertura (pages/sheet.js); reconciliar de novo aqui é seguro porque
+  // migrarParaMulticlasse() só grava quando há divergência real (idempotente),
+  // então um render sem subida de nível não grava nada em disco.
+  migrarMulticlasse();
+
   // Recalcula os passivos de talentos ANTES de qualquer leitura do cache.
   //
   // `passivosTalentosCache` (sheet/estado.js) era escrito num unico lugar:

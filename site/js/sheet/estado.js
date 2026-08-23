@@ -14,6 +14,10 @@ export const ATRIBUTO_ESTILO = {
 export let char = null;
 export let containerRef = null;
 export let classeData = null;
+// Dados de TODAS as classes do personagem, por nome de classe.
+// classeData continua sendo os dados da classe INICIAL, e nao muda -- 139
+// usos em 27 arquivos dependem dele. Este mapa entra ao lado.
+export let classesData = null;
 export let indiceMagiasCache = null;
 export let talentosCache = null;
 export let especiesCache = null;
@@ -100,6 +104,9 @@ export function definirContainer(valor) { containerRef = valor; }
 
 /** Define os dados da classe do personagem. Chamado so por renderSheet. */
 export function definirClasseData(valor) { classeData = valor; }
+
+/** Define os dados de todas as classes do personagem. Chamado so por renderSheet. */
+export function definirClassesData(valor) { classesData = valor; }
 
 /** Define o cache do indice de magias. Chamado so por renderSheet. */
 export function definirIndiceMagias(valor) { indiceMagiasCache = valor; }
