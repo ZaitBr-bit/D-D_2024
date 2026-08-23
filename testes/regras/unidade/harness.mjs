@@ -87,7 +87,7 @@ export async function modulosApp() {
          sheetMago, notasVersao, versao,
          levelupCards, regrasSubclasseEscolhas, regrasOrigensMagia,
          regrasConjuracaoSubclasse, regrasSalvaguardas, fichaEdicoes, fichaEdicaoValidacoes,
-         multiclasse, home] = await Promise.all([
+         multiclasse, home, multiclasseConjuracao, multiclasseProgressao] = await Promise.all([
     importar('site/js/regras-cobertura.js'),
     importar('site/js/talentos-effects.js'),
     importar('site/js/store.js'),
@@ -114,12 +114,15 @@ export async function modulosApp() {
     importar('site/js/ficha-edicao-validacoes.js'),
     importar('site/js/regras-multiclasse.js'),
     importar('site/js/pages/home.js'),
+    importar('site/js/regras-multiclasse-conjuracao.js'),
+    importar('site/js/regras-multiclasse-progressao.js'),
   ]);
   _cache = { regras, efeitos, store, levelup, criador, utils, dadosClasses, db, equip,
              levelupFlow, sheetEstado, sheetMagias, sheetMigracoes, sheetGrimorio,
              sheetMago, notasVersao, versao, levelupCards, regrasSubclasseEscolhas,
              regrasOrigensMagia, regrasConjuracaoSubclasse, regrasSalvaguardas,
-             fichaEdicoes, fichaEdicaoValidacoes, multiclasse, home };
+             fichaEdicoes, fichaEdicaoValidacoes, multiclasse, home, multiclasseConjuracao,
+             multiclasseProgressao };
   return _cache;
 }
 

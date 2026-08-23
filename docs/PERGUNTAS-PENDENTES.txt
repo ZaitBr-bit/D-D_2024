@@ -243,6 +243,20 @@ ARMADILHA JUNTO: os gates das linhas 167 e 171-174 carregam
 nivel 3 de Feiticeiro) e precisa migrar junto -- senao um Monge 5/Bardo 2 passa
 a ganhar a CA do Colegio da Danca, que ele nao tem.
 
+DECIDIDO em 2026-08-22 (sub-projeto 2 de multiclasse, revisao final): CA
+alternativa e o MAIOR VALOR por padrao, com um seletor na ficha para trocar
+quando houver duas ou mais candidatas -- exatamente o RECOMENDADO acima. A
+escolha manual fica em `char.ca_alternativa_escolhida`, guardando a classe de
+origem. Com uma candidata so, nada aparece na tela -- o caso de todo
+personagem de classe unica hoje.
+
+MOTIVO: respeita o livro:2067 ("pode se beneficiar apenas de uma de cada
+vez", a escolha e do jogador) sem obrigar a comparar formulas a cada mudanca
+de atributo. Ver docs/superpowers/specs/2026-08-22-multiclasse-motor-design.md,
+secao "Decisoes de produto tomadas aqui".
+
+IMPLEMENTACAO: sub-projeto 3.
+
 
 PERGUNTA 2 -- Maestria em Arma: soma entre classes?
 
@@ -259,6 +273,20 @@ E o tratamento que o livro da a Ataque Extra (livro:2059-2063, "as
 caracteristicas nao se acumulam"), a unica caracteristica analoga que ele
 arbitra. Se a mesa preferir somar, e uma linha de configuracao, nao uma
 mudanca de desenho.
+
+DECIDIDO em 2026-08-22 (sub-projeto 2 de multiclasse, revisao final):
+Maestria em Arma usa o MAIOR LIMITE entre as classes que concedem, nao a
+soma -- exatamente o RECOMENDADO acima. Um Barbaro 4 (3 maestrias) /
+Guerreiro 3 (3 maestrias) fica com 3, nao 6.
+
+MOTIVO: e o tratamento que o livro da a caracteristica analoga que ele de
+fato arbitra, Ataque Extra (livro:2059-2063, "as caracteristicas nao se
+acumulam"); o capitulo 2 nao arbitra Maestria em Arma, e o resultado atual
+(dependente da ordem de criacao do personagem) nao e uma resposta -- e um
+acidente. Ver docs/superpowers/specs/2026-08-22-multiclasse-motor-design.md,
+secao "Decisoes de produto tomadas aqui".
+
+IMPLEMENTACAO: sub-projeto 3.
 
 ================================================================================
 Correcao final multiclasse: conferencia manual pendente (2026-08-22)
@@ -382,3 +410,40 @@ gasto do descanso, agora sem rede nenhuma.
 Verificado: com `classes: [Clerigo 3, Guerreiro 2]` e dados_vida_usados = 2, a
 sincronizacao devolve {8:{usados:0}, 10:{usados:0}} e zera o escalar. Hoje e
 inalcancavel, porque nada cria duas classes.
+
+================================================================================
+Multiclasse: pvGanhoAoSubir x calcularHPGanhoComOpcao divergem fora da faixa
+================================================================================
+
+Pre-requisito do sub-projeto 3, achado na revisao final do sub-projeto 2
+(motor de regras puro), em 2026-08-22.
+
+As duas funcoes calculam PV ganho ao subir de nivel:
+
+  - site/js/levelup.js:341-372  -> calcularHPGanhoComOpcao, o codigo VIVO
+  - site/js/regras-multiclasse-progressao.js -> pvGanhoAoSubir, o motor novo,
+    que o sub-projeto 3 vai usar no lugar do primeiro
+
+Para toda rolagem VALIDA elas concordam. Foi medido: CON de 3 a 20, os quatro
+dados de vida do acervo (d6, d8, d10, d12), nos modos fixo e rolado -- 720
+casos, ZERO divergencias, e nenhum resultado abaixo de 1 (o minimo que o
+livro:1963 exige e que as duas aplicam).
+
+A divergencia esta FORA da faixa valida, em 276 casos medidos:
+
+  - rolagem 0, negativa, acima das faces, ou nao numerica
+  - pvGanhoAoSubir  -> limita para dentro de [1, faces]
+  - calcularHPGanhoComOpcao -> cai de volta na media fixa
+
+Nenhuma das duas esta errada; elas so escolheram tratamentos diferentes para
+entrada invalida. Mas quando o sub-projeto 3 trocar uma pela outra, o
+comportamento do app muda para quem digitar uma rolagem fora da faixa no card
+de subida de nivel.
+
+DECIDIR NO SUB-PROJETO 3, antes da troca: qual dos dois tratamentos fica.
+
+RECOMENDADO: manter o de pvGanhoAoSubir (limitar para dentro da faixa). Uma
+rolagem de 9 num d6 e quase certamente erro de digitacao, e limitar a 6 entrega
+o que o jogador quis; cair na media descarta o numero que ele digitou sem
+avisar. Mas e decisao de produto, e a troca nao pode acontecer sem ela ser
+tomada -- senao muda em silencio.
