@@ -13,13 +13,31 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.15';
+export const VERSAO_ATUAL = '2.2.16';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.16',
+    data: '2026-08-22',
+    rotulo: 'Resplendor Sagrado',
+    resumo: 'O botão que devolve o Resplendor Sagrado do Paladino do '
+      + 'Juramento da Devoção voltou a funcionar.',
+    correcoes: [
+      {
+        grupo: '🛡️ Paladino — Juramento da Devoção',
+        itens: [
+          'Restaurar o Resplendor Sagrado gastando um espaço de magia de '
+            + '5º círculo não fazia nada: o clique falhava em silêncio e o '
+            + 'espaço nunca era debitado. Agora o espaço é gasto e a '
+            + 'característica volta a ficar disponível.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.15',
     data: '2026-08-22',

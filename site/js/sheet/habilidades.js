@@ -7,7 +7,7 @@
 // exigiria reescrever a montagem do HTML. Ver spec secao 5.3.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
-import { abrirModal, bonusProficiencia, calcMod, detectarRecarga, ehHabilidadeAtiva, escHtml, fmtMod, getDeslocamento, getEspacosMagia, mdParaHtml, semAcento, toast } from '../utils.js';
+import { abrirModal, bonusProficiencia, calcMod, detectarRecarga, ehHabilidadeAtiva, escHtml, fmtMod, getDeslocamento, mdParaHtml, semAcento, toast } from '../utils.js';
 import { _abrirEscolhaAnimalFuria, getEstadoFuria, getProgressaoBarbaro } from './classes/barbaro.js';
 import { getEstadoInspiracaoBardo } from './classes/bardo.js';
 import { abrirModalPactoDoTomo, abrirModalRecursosBruxo, getEstadoRecursosBruxo, recuperarEspacosMagiaBruxo } from './classes/bruxo.js';
@@ -1594,16 +1594,18 @@ export function setupEventosHabilidades() {
 
         case 'devocao_resplendor_restaurar': {
           if (!char.recursos.paladino.subclasses.devocao) char.recursos.paladino.subclasses.devocao = {};
-          // Gastar espaço de magia de 5º círculo para restaurar
-          const slots = char.espacos_magia || {};
-          const usados5 = slots['5_usado'] || 0;
-          const max5 = (getEspacosMagia(char.classe, char.nivel || 1) || {})[5] || 0;
-          if (usados5 >= max5) {
+          // Gastar um espaço de magia de 5º círculo para restaurar.
+          // Os espaços REAIS moram em char.espacos_magia no formato
+          // { circulo: { total, usados } } -- mesma convenção de
+          // levelup.js:950. Não se consulta a tabela da classe aqui: o
+          // custo é um espaço já concedido, não um espaço teórico.
+          if (!char.espacos_magia) char.espacos_magia = {};
+          const slot5 = char.espacos_magia[5] || { total: 0, usados: 0 };
+          if (slot5.usados >= slot5.total) {
             toast('Sem espaço de magia de 5º círculo disponível.', 'error');
             return;
           }
-          if (!char.espacos_magia) char.espacos_magia = {};
-          char.espacos_magia['5_usado'] = usados5 + 1;
+          char.espacos_magia[5] = { ...slot5, usados: slot5.usados + 1 };
           char.recursos.paladino.subclasses.devocao.resplendor_sagrado_usado = false;
           toast('Resplendor Sagrado restaurado (1 espaço de 5º círculo gasto).', 'success');
           break;

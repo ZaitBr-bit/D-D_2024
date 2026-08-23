@@ -231,7 +231,6 @@ export const GATILHOS_SEM_COBERTURA = [
   'paladino-subclasse-acao=devocao_arma_sagrada_desativar',
   'paladino-subclasse-acao=devocao_resplendor_ativar',
   'paladino-subclasse-acao=devocao_resplendor_desativar',
-  'paladino-subclasse-acao=devocao_resplendor_restaurar',
   'paladino-subclasse-acao=gloria_atleta',
   'paladino-subclasse-acao=gloria_destruicao_inspiradora',
   'paladino-subclasse-acao=gloria_lenda_viva',
