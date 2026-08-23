@@ -1,43 +1,5 @@
-// Helpers dos testes de paridade entre o site original e o refatorado.
-export const ORIG = 'http://127.0.0.1:8801/site/';
+// Helpers dos testes e2e (regras do livro e modo offline).
 export const NOVO = 'http://127.0.0.1:8802/site/';
-
-/**
- * Abre uma pagina em cada site e passa a coletar erros de console e falhas de
- * carregamento. Devolve os dois "lados" com seu coletor de erros.
- */
-export async function abrirParelha(context, hash = '') {
-  const lados = [];
-  for (const [nome, base] of [['original', ORIG], ['refatorado', NOVO]]) {
-    const page = await context.newPage();
-    const erros = [];
-    page.on('console', (m) => {
-      if (m.type() === 'error') erros.push(`console: ${m.text()}`);
-    });
-    page.on('pageerror', (e) => erros.push(`pageerror: ${e.message}`));
-    page.on('requestfailed', (r) => {
-      const url = r.url();
-      // Firebase/Google podem falhar offline; nao sao o objeto do teste.
-      if (/googleapis|gstatic|firebase|google\.com/.test(url)) return;
-      erros.push(`requestfailed: ${url} (${r.failure()?.errorText})`);
-    });
-    lados.push({ nome, base, page, erros });
-  }
-  // Navega SEMPRE, inclusive com hash vazio (que e a home). Sem isso a pagina
-  // fica em about:blank e qualquer `import()` relativo dentro de evaluate()
-  // falha por nao ter URL base -- erro que so aparece no primeiro teste que
-  // semeia antes de navegar.
-  await irPara(lados, hash);
-  return lados;
-}
-
-/** Navega os dois lados para o mesmo hash e espera o app assentar. */
-export async function irPara(lados, hash) {
-  await Promise.all(lados.map(async (l) => {
-    await l.page.goto(l.base + hash, { waitUntil: 'domcontentloaded' });
-    await assentar(l.page);
-  }));
-}
 
 /** Espera o conteudo da rota aparecer e a rede acalmar. */
 export async function assentar(page) {
@@ -47,62 +9,6 @@ export async function assentar(page) {
     null, { timeout: 15_000 },
   );
   await page.waitForLoadState('networkidle').catch(() => {});
-}
-
-/**
- * HTML de `#app-content` com o que e naturalmente instavel neutralizado:
- * ids gerados, datas, e o resultado de rolagens de dado. O que sobra e a
- * estrutura, as classes CSS e os textos -- exatamente onde a tentativa
- * anterior quebrou.
- */
-export async function instantaneo(page) {
-  return page.evaluate(() => {
-    const raiz = document.getElementById('app-content');
-    if (!raiz) return '(sem #app-content)';
-    return raiz.innerHTML
-      .replace(/\b[0-9a-f]{8,}\b/gi, '<ID>')
-      .replace(/\d{4}-\d{2}-\d{2}T[\d:.]+Z?/g, '<DATA>')
-      .replace(/\d{2}\/\d{2}\/\d{4}/g, '<DATA>')
-      .replace(/\s+/g, ' ')
-      .trim();
-  });
-}
-
-/** Classes CSS distintas presentes na arvore -- pega markup trocado. */
-export async function classesUsadas(page) {
-  return page.evaluate(() => {
-    const set = new Set();
-    document.querySelectorAll('#app-content *').forEach((el) => {
-      el.classList.forEach((c) => set.add(c));
-    });
-    return [...set].sort();
-  });
-}
-
-/**
- * Posicao e tamanho dos elementos-chave. Duas paginas podem ter o mesmo HTML
- * e layouts diferentes se uma classe CSS nao existir no stylesheet -- foi
- * literalmente o bug da barra de navegacao do criador.
- */
-export async function geometria(page, seletores) {
-  return page.evaluate((sels) => {
-    const fora = {};
-    for (const s of sels) {
-      const el = document.querySelector(s);
-      if (!el) { fora[s] = null; continue; }
-      const r = el.getBoundingClientRect();
-      const cs = getComputedStyle(el);
-      fora[s] = {
-        largura: Math.round(r.width),
-        altura: Math.round(r.height),
-        position: cs.position,
-        display: cs.display,
-        bottom: cs.bottom,
-        zIndex: cs.zIndex,
-      };
-    }
-    return fora;
-  }, seletores);
 }
 
 /**
@@ -200,11 +106,6 @@ export async function confirmarModal(page, idBotao, maxTentativas = 8) {
     }
   }
   throw new Error(`modal nao fechou apos ${maxTentativas} tentativas`);
-}
-
-/** Faz a mesma acao nos dois lados. */
-export async function nosDois(lados, acao) {
-  for (const l of lados) await acao(l.page, l);
 }
 
 /**
@@ -884,72 +785,4 @@ export async function semearPersonagem(page, campos, id) {
     store.salvarPersonagem(p);
     return p.id;
   }, { campos, id });
-}
-
-/** Semeia o MESMO personagem nos dois lados e abre a ficha dele. */
-export async function abrirFichaSemeada(lados, campos, id = 'teste-fixo-1') {
-  for (const l of lados) {
-    await l.page.goto(l.base, { waitUntil: 'domcontentloaded' });
-    await semearPersonagem(l.page, campos, id);
-  }
-  await irPara(lados, '#ficha/' + id);
-}
-
-/**
- * Instantaneo da ficha inteira, incluindo o header (nome do personagem) --
- * na ficha o header muda, ao contrario do criador.
- */
-export async function instantaneoFicha(page) {
-  return page.evaluate(() => {
-    // O selo de versao aparece em DUAS formas diferentes no snapshot, e cada
-    // uma precisa da sua propria regra de normalizacao:
-    //  - no header-titulo ele entra como TEXTO PURO (textContent), porque o
-    //    span da versao e filho do proprio titulo e o textContent achata tudo;
-    //  - em qualquer outro lugar que apareca o innerHTML do span (classe
-    //    "header-versao"), ele entra como HTML, com a tag </span> logo apos
-    //    o numero.
-    // Se a normalizacao textual fosse aplicada ao snapshot inteiro (header +
-    // corpo da ficha), um "v" seguido de digitos dentro de conteudo legitimo
-    // da ficha tambem seria apagado, cegando a suite para divergencias reais.
-    // Por isso ela e aplicada SO na string do header, ancorada no fim (o selo
-    // e sempre o ultimo texto do titulo), antes de juntar com o innerHTML do
-    // conteudo -- que continua normalizado pela regra de HTML existente.
-    const headerTexto = (document.getElementById('header-titulo')?.textContent || '')
-      .replace(/\sv[\d.]+$/, ' v<VER>');
-    const partes = [
-      headerTexto,
-      document.getElementById('app-content')?.innerHTML || '',
-    ];
-    return partes.join('\n---\n')
-      .replace(/\b[0-9a-f]{8,}\b/gi, '<ID>')
-      .replace(/\d{4}-\d{2}-\d{2}T[\d:.]+Z?/g, '<DATA>')
-      .replace(/\d{2}\/\d{2}\/\d{4}/g, '<DATA>')
-      .replace(/v[\d.]+<\/span>/g, 'v<VER></span>')
-      .replace(/\s+/g, ' ')
-      .trim();
-  });
-}
-
-/**
- * Compara os dois lados e devolve um trecho legivel da primeira divergencia,
- * em vez de despejar dois blobs de 200 KB no relatorio.
- */
-export function primeiraDivergencia(a, b, contexto = 120) {
-  if (a === b) return null;
-  let i = 0;
-  while (i < a.length && i < b.length && a[i] === b[i]) i++;
-  const ini = Math.max(0, i - contexto);
-  return [
-    `divergencia na posicao ${i} (original ${a.length} chars, refatorado ${b.length})`,
-    'original ..: ...' + a.slice(ini, i + contexto),
-    'refatorado : ...' + b.slice(ini, i + contexto),
-  ].join('\n');
-}
-
-/** Junta os erros de console dos dois lados num relatorio legivel. */
-export function relatorioErros(lados) {
-  return lados
-    .filter((l) => l.erros.length)
-    .map((l) => `${l.nome}:\n  ` + l.erros.join('\n  '))
-    .join('\n');
 }

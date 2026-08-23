@@ -1,123 +1,108 @@
-# Testes de paridade
+# Testes e2e
 
-Comparam este repositório (refatorado) com o original `D-D_2024`, executando
-**as mesmas ações nos dois sites** e conferindo que o resultado é idêntico.
+Duas suítes vivem aqui, com configurações separadas.
 
-Quase nenhuma asserção escreve o valor esperado à mão. A pergunta que estes
-testes respondem não é "a tela está correta", é "a tela é a mesma da original".
-Isso importa porque a refatoração é mecânica: qualquer diferença é regressão,
-por definição.
+| Suíte | Config | O que garante |
+|---|---|---|
+| **Regras** | `regras/playwright.config.mjs` | As regras do livro, na tela. 263 casos. É a suíte que segura o comportamento do app. |
+| **Offline** | `playwright.config.mjs` | Service Worker e precache. 3 casos, 2 deles dependentes de artefato de deploy. |
 
 ## Rodar
 
 ```bash
 cd testes/e2e
-npm run instalar     # uma vez: deps + Chromium
-npm test             # a suíte inteira (~6 min, 329 testes, 4 workers)
-                     # 328 passam, 1 pulado (arrastar item)
-npx playwright test --project=offline   # só os testes de Service Worker
-npx playwright test ficha.spec.mjs      # só um arquivo
-npm run test:esm ../..                  # parse ESM de todos os módulos
+npm run instalar                                          # uma vez: deps + Chromium
+npx playwright test --config=regras/playwright.config.mjs  # regras (~5 min)
+npx playwright test --config=playwright.config.mjs         # offline
+npm run test:esm ../..                                     # parse ESM de todos os módulos
 ```
 
-Os dois servidores estáticos sobem sozinhos (portas 8801 e 8802). O original é
-procurado em `../../../D-D_2024`; para apontar noutro lugar, use
-`REPO_ORIGINAL=/caminho/para/D-D_2024`.
+Um servidor estático local sobe sozinho na porta 8802.
 
 **Isto é a única parte do projeto que usa Node.** A aplicação em `site/`
 continua sem build e sem dependência nenhuma — `node_modules/` vive só aqui e
 está no `.gitignore`.
 
-## O que cada arquivo cobre
+## A suíte de paridade foi aposentada em 2026-08-23
 
-| Arquivo | Cobertura |
-|---|---|
-| `paridade-basico.spec.mjs` | Home e passo 1 do criador: DOM, conjunto de classes CSS, geometria computada da barra de navegação, rótulos dos botões |
-| `ficha.spec.mjs` | Ficha genérica: render, classes CSS, dano/cura/PV temporário, descanso longo, geração de PDF, conjunto de seções |
-| `classes.spec.mjs` | **As 12 classes em todos os 20 níveis** (240 fichas), mais a seção de recursos de cada uma |
-| `especies.spec.mjs` | **As 11 espécies e todos os 16 antecedentes** |
-| `importacao.spec.mjs` | Exportar, importar e round-trip nos dois sentidos entre os sites |
-| `offline.spec.mjs` | Service Worker: instalação, navegação offline e cobertura de cache |
-| `criacao-completa.spec.mjs` | Criação em lockstep nas 12 classes, além do passo 3 |
-| `levelup.spec.mjs` | Transição entre níveis em 3 classes, comparando a ficha a cada subida |
-| `magias-uso.spec.mjs` | Ficha com magias preparadas nas 8 classes conjuradoras |
-| `inventario.spec.mjs` | Inventário e moedas renderizados |
+Este diretório existia para uma pergunta: *"a tela refatorada é a mesma da
+original?"*. Nove specs comparavam DOM, classes CSS e geometria contra o
+repositório `D-D_2024` pré-refatoração, rodando os dois lado a lado.
 
-### Testes pulados, e por quê
+Essa fase acabou, e o projeto já a tinha encerrado duas vezes antes:
 
-**Um** teste está marcado com `test.skip`, e o motivo está escrito no próprio
-arquivo: arrastar item no inventário. O gesto de toque sintetizado não surtiu
-efeito nem no site original, então comparar os dois lados não mediria nada.
+- **2026-08-12** (decisão D9, `docs/superpowers/specs/2026-08-12-cards-de-escolha-design.md`)
+  aposentou os testes de comparação de DOM do criador. Renomear
+  `.selection-card` para `.opcao-card` quebra a comparação de forma
+  definitiva — o repositório original não vai mudar.
+- **2026-08-18** (`b02f1e1`) aposentou o baseline dos monólitos, com o
+  argumento que vale para tudo aqui: *"verificador permanentemente vermelho
+  não verifica nada; só ensina a ignorar a saída."*
 
-Os outros dois `skip` foram removidos: a conjuração de magia estava bloqueada
-por uma fixture errada — o `grimorio` guardava strings em vez de objetos
-`{nome, circulo}`, o que fazia o render da seção de magias lançar antes de
-criar os botões de conjurar. Corrigida a fixture, os dois voltaram a rodar.
+O que restou depois dessas duas rodadas continuou comparando por snapshot
+contra o original — que parou em `5c05bc8`, de **2026-08-08**. O `main` deste
+projeto seguiu **20+ commits de feature** adiante: magias, espécies,
+subclasses, pactos do Bruxo, atributos editáveis. Medido em 2026-08-23:
+**299 falhas em 326 casos**, todas por evolução legítima, nenhuma por
+regressão.
 
-Um `skip` sem motivo escrito é omissão silenciosa — ver
-`PERGUNTAS-PARA-REVISAO.txt`.
+Atualizar a referência exigiria portar 20 commits de feature para dentro do
+monólito antigo — o que não faz sentido. Apontá-la para um snapshot do
+próprio projeto faria a suíte comparar o repositório com ele mesmo: verde que
+não mede nada.
 
-### Escopo: o que pode diferir do original
+### O que saiu
 
-A refatoração exige que nada fora de `site/js/{sheet,creator}/` e dos dois
-coordenadores mude. Duas exceções existem **de propósito**, e o motivo tem de
-continuar escrito aqui — uma exceção sem motivo vira, com o tempo, uma
-verificação que ninguém confia:
+Os 9 specs (`classes`, `criacao-completa`, `especies`, `ficha`, `importacao`,
+`inventario`, `levelup`, `magias-uso`, `paridade-basico`), o projeto
+`paridade` do config, o servidor da porta 8801, a constante `ORIG` e os 10
+helpers que só a paridade usava — `abrirParelha`, `nosDois`, `instantaneo`,
+`instantaneoFicha`, `irPara`, `geometria`, `classesUsadas`,
+`primeiraDivergencia`, `relatorioErros`, `abrirFichaSemeada`.
 
-| Arquivo | Por quê |
-|---|---|
-| `site/sw.js` | Passou a consumir `js-precache.json`. A lista manual de 12 arquivos cobria 12 de 22 módulos antes da quebra e 12 de 61 depois — de 52,4% para 18,3%. Agora são 100%. |
-| `.github/workflows/deploy.yml` | Gera `js-precache.json` varrendo `site/js/**`, espelhando o que já fazia para `dados/`. |
+Os 7 helpers que a suíte de regras usa ficaram: `assentar`, `satisfazerPasso`,
+`confirmarModal`, `lerToastErro`, `passoAtual`, `resolverModalAberto`,
+`semearPersonagem`.
 
-Tudo o mais — `dados/`, `css/`, `img/`, `index.html`, `manifest.json` e os 18
-módulos JS fora de escopo — continua byte a byte idêntico ao `D-D_2024`.
+### O que ficou, convertido
 
-### O projeto `offline`
+`offline.spec.mjs` era escrito como paridade — usava o original como controle
+—, mas o valor dele nunca foi comparativo. Ele mede o Service Worker e o
+precache, e documenta uma regressão real que pegou: o `sw.js` precacheava uma
+lista manual de 12 arquivos, o que cobria 12 de 22 módulos antes da quebra dos
+monólitos e passou a cobrir 12 de 61 depois. O arquivo já dizia que duas das
+suas asserções eram alvos **absolutos**, porque *"exigir paridade seria exigir
+que o novo fosse tão limitado quanto o antigo"*.
 
-Todos os testes bloqueiam o Service Worker de propósito, para o cache nunca
-mascarar uma regressão. `offline.spec.mjs` é a exceção e roda num projeto
-separado, serial, que o permite — porque ali o SW é o objeto do teste.
+Todas viraram absolutas. O teste de paridade do criador saiu (o laço por site
+já cobria o mesmo, de forma absoluta), e uma asserção duplicada foi removida.
 
-`classes.spec.mjs` e `especies.spec.mjs` leem as listas de `dados/`, de
-`dados-classes.js` e a tabela de níveis de `levelup.js` por `dados.mjs` —
-conteúdo novo entra na cobertura sozinho, sem ninguém lembrar de editar o
-teste. Uma classe, espécie, antecedente ou nível novo é testado no dia em que
-entra no jogo.
+### O que isso deixa descoberto
 
-**Não há amostragem.** Toda classe, todo nível, toda espécie e todo
-antecedente são cobertos, porque não existe subconjunto representativo: cada
-combinação liga características, espaços de magia, dados de vida e recursos
-diferentes, e é justamente um desses que uma extração mal feita silenciaria.
+A paridade era o único instrumento **transversal** do projeto — o único que
+olhava o app inteiro de uma vez. As suítes de regras e de unidade são
+profundas por assunto, mas não têm esse alcance.
 
-## Como os personagens são criados
+A revisão final do sub-projeto 3b de multiclasse mediu o custo disso: dos 145
+pontos convertidos em `renderFeatureItem`, apenas 7 estão presos por algum
+oráculo. Uma conversão parcial — o cenário normal de alguém esquecer uma
+linha — passa por 19 oráculos pontuais sem acender luz nenhuma.
 
-Percorrer o wizard 240 vezes seria inviável. Em vez disso, os testes
-de ficha semeiam o `localStorage` chamando a **fábrica do próprio app**:
+O substituto certo não é comparar contra um snapshot congelado, e sim um
+**oráculo de alcance sobre o código atual**: renderizar cada uma das 12
+classes como classe não inicial e comparar o hash do HTML com ela como classe
+inicial, fora os `data-classe`. Um oráculo desses pega conversão parcial em
+qualquer das 145 linhas. Está registrado em `docs/PERGUNTAS-PENDENTES.txt`
+como recomendação para o sub-projeto 3c.
 
-```js
-const store = await import('./js/store.js');
-const p = store.criarPersonagemVazio();
-Object.assign(p, { classe: 'Mago', nivel: 11, ... });
-store.salvarPersonagem(p);
-```
+## Nota sobre os testes de offline
 
-`store.js` é byte a byte idêntico nos dois sites, então os dois recebem o mesmo
-personagem e a comparação mede a **renderização**, que é o que a refatoração
-tocou.
+Dois dos três casos dependem de `site/js-precache.json`, gerado no deploy
+(`.github/workflows/deploy.yml`) varrendo `site/js/**`. Numa cópia de trabalho
+o arquivo não existe — o próprio `sw.js` trata isso como caso normal — e sem
+ele o Service Worker cacheia apenas sob demanda.
 
-## Por que esta suíte existe
-
-A refatoração anterior quebrou o layout do criador trocando `wizard-nav-fixed`
-por `wizard-nav` — uma classe que não existe no CSS. Ninguém percebeu até o
-site estar publicado.
-
-E durante *esta* refatoração, a suíte pegou um bug que nenhuma checagem
-estática viu: um comentário `/* ... */` partido entre `impressao.js` e
-`pdf.js`, que impedia o site inteiro de carregar. Cada metade continuava byte
-a byte idêntica ao original — o que estava errado era a fronteira. Ver
-`PERGUNTAS-PARA-REVISAO.txt`.
-
-Por isso `paridade-basico.spec.mjs` afirma `position: fixed` explicitamente, e
-por isso o teste de parse ESM (`checar_esm.mjs`) existe: `node --check` num
-arquivo `.js` usa detecção de tipo e não força o parser de módulo, então deixa
-esse erro passar. Copiar para `.mjs` força.
+Os dois casos se **pulam** quando o manifesto está ausente, com o motivo na
+saída. Pular é mais honesto que falhar: a falha seria por ausência de
+artefato, não por regressão, e é exatamente o vermelho permanente que este
+projeto já decidiu não tolerar.

@@ -83,7 +83,6 @@ export const GATILHOS_SEM_COBERTURA = [
   'btn-editar-item-custom',
   'btn-enable-levelup-v2',
   'btn-escolher-manobras-pendentes',
-  'btn-excluir-char',
   'btn-finalizar',
   'btn-furia-implacavel-falha',
   'btn-furia-implacavel-sucesso',

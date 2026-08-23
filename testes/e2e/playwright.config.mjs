@@ -3,18 +3,14 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
-
-// Este repositorio (o refatorado) e o original, lado a lado no disco.
-// REPO_ORIGINAL permite apontar para outro caminho sem editar o arquivo.
 const NOVO = resolve(AQUI, '..', '..');
-const ORIG = process.env.REPO_ORIGINAL || resolve(NOVO, '..', 'D-D_2024');
 
 export default defineConfig({
   testDir: '.',
   timeout: 90_000,
   expect: { timeout: 15_000 },
   // Cada teste roda em seu proprio contexto de navegador, com localStorage
-  // isolado, e os dois servidores sao estaticos -- entao paralelizar e
+  // isolado, e o servidor e estatico -- entao paralelizar e
   // seguro. Serial levava 6 minutos, e suite que ninguem roda nao vale nada.
   fullyParallel: true,
   workers: process.env.CI ? 2 : 4,
@@ -24,14 +20,6 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   projects: [
-    {
-      name: 'paridade',
-      // regras/** é outra suíte (testes de regras do livro), com config própria.
-      testIgnore: ['offline.spec.mjs', 'regras/**'],
-      // O Service Worker cachearia a versao anterior entre execucoes e
-      // mascararia regressoes; estes testes tem de ver os arquivos do disco.
-      use: { serviceWorkers: 'block' },
-    },
     {
       name: 'offline',
       testMatch: 'offline.spec.mjs',
@@ -43,12 +31,6 @@ export default defineConfig({
     },
   ],
   webServer: [
-    {
-      command: `node servidor.mjs "${ORIG.replace(/\\/g, '/')}" 8801`,
-      url: 'http://127.0.0.1:8801/site/',
-      reuseExistingServer: true,
-      timeout: 20_000,
-    },
     {
       command: `node servidor.mjs "${NOVO.replace(/\\/g, '/')}" 8802`,
       url: 'http://127.0.0.1:8802/site/',
