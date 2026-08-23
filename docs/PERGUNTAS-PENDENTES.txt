@@ -204,3 +204,181 @@ nivel. Isso corrige um segundo defeito latente -- o app deixava trocar um truque
 que o talento concede, e a troca deveria valer so para os truques da classe.
 Se algum dia a mesa quiser o contrario, a saida NAO e tirar da lista (volta o
 bug do contador): e separar as duas perguntas em duas listas.
+
+================================================================================
+Multiclasse: CA alternativa e Maestria em Arma (2026-08-22)
+================================================================================
+
+Levantadas ao desenhar o sub-projeto 1 de multiclasse (issue #15). Ver
+docs/superpowers/specs/2026-08-22-multiclasse-fundacao-design.md.
+
+As duas ficam FORA do sub-projeto 1 (que nao converte nenhuma leitura) e voltam
+como pergunta no desenho do sub-projeto 3. Registradas aqui para nao se
+perderem, com o recomendado ja escolhido.
+
+
+PERGUNTA 1 -- CA alternativa: como o jogador escolhe?
+
+O livro resolve o caso por escrito e usa o par exato do codigo
+(livro:2065-2067): "Se voce tiver varias maneiras de calcular sua Classe de
+Armadura, pode se beneficiar apenas de uma de cada vez. Por exemplo, um
+Feiticeiro/Monge com a caracteristica de Defesa Sem Armadura do Monge e a
+Resiliencia Draconica do Feiticeiro deve escolher apenas uma dessas
+caracteristicas para calcular sua Classe de Armadura."
+
+utils.js:159-178 empilha QUATRO formulas em `if` sequenciais que sobrescrevem
+`ca`. Hoje, com classe unica, so uma pode casar e nao ha conflito. Com
+multiclasse, duas casam e vence a ULTIMA linha do arquivo -- decisao silenciosa
+por ordem de codigo, num numero que o jogador nao tem como auditar.
+
+A conversao mecanica (trocar o gate por temClasse) NAO resolve: mantem o bug e
+ainda o agrava, porque passa a disparar sempre em vez de nunca.
+
+RECOMENDADO: campo `char.ca_alternativa_escolhida` guardando a classe de
+origem, e um seletor na ficha que so aparece quando houver mais de uma
+candidata. Com uma candidata so, nada muda na tela.
+
+ARMADILHA JUNTO: os gates das linhas 167 e 171-174 carregam
+`(personagem.nivel||1) >= 3` colado. Esse nivel e NA CLASSE (nivel 3 de Bardo,
+nivel 3 de Feiticeiro) e precisa migrar junto -- senao um Monge 5/Bardo 2 passa
+a ganhar a CA do Colegio da Danca, que ele nao tem.
+
+
+PERGUNTA 2 -- Maestria em Arma: soma entre classes?
+
+O capitulo 2 do livro arbitra apenas TRES caracteristicas em multiclasse:
+Ataque Extra, Classe de Armadura e Conjuracao (livro:2057). Maestria em Arma
+nao esta la, e cinco classes a concedem com contagens proprias por nivel.
+
+Ou seja: qualquer conversao aqui e DECISAO DE PRODUTO disfarcada de
+refatoracao. Hoje o resultado depende da ordem de criacao do personagem, o que
+nao e uma resposta -- e um acidente.
+
+RECOMENDADO: usar o MAIOR limite entre as classes que concedem, e nao a soma.
+E o tratamento que o livro da a Ataque Extra (livro:2059-2063, "as
+caracteristicas nao se acumulam"), a unica caracteristica analoga que ele
+arbitra. Se a mesa preferir somar, e uma linha de configuracao, nao uma
+mudanca de desenho.
+
+================================================================================
+Correcao final multiclasse: conferencia manual pendente (2026-08-22)
+================================================================================
+
+A revisao final da onda de correcao do sub-projeto 1 de multiclasse (issue
+#15) pediu uma conferencia manual que ainda nao foi feita: abrir o app, criar
+um Paladino, subir ate o nivel 4, conferir a ficha e exportar/reimportar o
+personagem.
+
+RECOMENDADO: alguem com acesso ao app rodando fazer essa conferencia antes de
+fechar o sub-projeto 1. Nenhum teste automatizado cobre esse fluxo de ponta a
+ponta pela interface.
+
+================================================================================
+impressao.js:211 le um campo que nada escreve (2026-08-22)
+================================================================================
+
+ACHADO durante a correcao final do sub-projeto 1 de multiclasse: a ficha
+impressa (site/js/sheet/impressao.js:211) le char.dados_vida_disponiveis, mas
+nenhum caminho de producao em site/js escreve esse campo. O valor cai sempre
+no fallback (char.nivel), entao a ficha impressa ignora os dados de vida ja
+gastos.
+
+DEFEITO PRE-EXISTENTE, independente de multiclasse -- nao foi introduzido por
+este sub-projeto e nao foi consertado aqui, por estar fora do escopo.
+
+RECOMENDADO: trocar a leitura para char.dados_vida_usados (o campo que o resto
+do app de fato mantem), numa tarefa propria.
+
+================================================================================
+Teste ancorado no numero de linha de migracoes.js:67 (2026-08-22)
+================================================================================
+
+ACHADO durante a correcao final do sub-projeto 1 de multiclasse:
+testes/regras/catalogo/magias-preparo.mjs:148 ancora uma excecao
+(EXCECOES_LISTA_ORIGEM) no numero de linha exato de
+site/js/sheet/migracoes.js:67 (origensForaDoLimite, dentro de
+migrarSlotsMagiaLivre). Qualquer insercao de linha ACIMA daquele ponto no
+arquivo quebra 2 testes por um motivo sem nenhuma relacao com a mudanca feita.
+
+O proprio migracoes.js ja documenta essa fragilidade num comentario perto do
+import de migrarParaMulticlasse, e o import foi deliberadamente colocado no
+fim do arquivo para nao deslocar a numeracao.
+
+RECOMENDADO: trocar a chave de EXCECOES_LISTA_ORIGEM por algo que nao dependa
+de numero de linha (ex.: nome da funcao + trecho do texto), numa tarefa
+propria.
+
+================================================================================
+Paridade e2e: caminho do site original depende do checkout (2026-08-22)
+================================================================================
+
+ACHADO durante a correcao final do sub-projeto 1 de multiclasse:
+testes/e2e/playwright.config.mjs:10 resolve o site original usado na paridade
+para o proprio repositorio quando rodado no checkout principal, e para um
+caminho inexistente quando rodado numa worktree. O original de verdade fica em
+Pessoal/DeD_2024, um repositorio irmao, e o arquivo exige a variavel de
+ambiente REPO_ORIGINAL apontando pra la para funcionar corretamente fora do
+checkout principal.
+
+RECOMENDADO: documentar REPO_ORIGINAL no README de testes/e2e, ou dar ao
+config um fallback que nao dependa de estar no checkout principal.
+
+================================================================================
+subclasse-nome-literal.test.mjs forca ordem de operandos (2026-08-22)
+================================================================================
+
+Achado ao fechar o sub-projeto 1 de multiclasse (issue #15).
+
+O motor testes/regras/unidade/subclasse-nome-literal.test.mjs varre o codigo
+procurando comparacoes com nome de subclasse escrito a mao, com o regex
+`/subclasse\s*[!=]==\s*'([^']*)'/g`. Ele existe por um bug real e continua
+valendo: pegou 'Juramento de Gloria' escrito onde o acervo diz 'Juramento DA
+Gloria'.
+
+O problema e que o regex casa o TOKEN `subclasse`, nao a expressao. Entao
+`typeof p.subclasse === 'string'` -- que nao tem relacao nenhuma com nome de
+subclasse -- e acusado como "nome de subclasse orfao", apontando o literal
+'string'.
+
+Isso mordeu de verdade: site/js/regras-multiclasse.js precisou escrever
+`'string' === typeof p.subclasse` (ordem invertida, estilo Yoda) so para nao
+disparar o falso positivo. A semantica e identica, mas hoje o Yoda daquela
+linha e a UNICA coisa segurando o teste verde, e nada no codigo explica isso a
+quem for editar.
+
+RECOMENDADO: descartar no regex os casamentos precedidos de `typeof`. E uma
+linha, e devolve a liberdade de escrever a comparacao na ordem natural.
+
+Enquanto nao for feito: se voce inverter aquele `'string' === typeof`, o teste
+quebra com uma mensagem que fala de subclasse e nao tem nada a ver com o que
+voce mudou.
+
+
+================================================================================
+Multiclasse: a semeadura de dado de vida so cobre UMA reserva (2026-08-22)
+================================================================================
+
+Pre-requisito do sub-projeto 3, registrado agora para nao se perder.
+
+Situacao no fim do sub-projeto 1 (Fundacao):
+
+  - o gasto REAL de dado de vida e gravado so no escalar
+    char.dados_vida_usados, por sheet/hp-descanso.js:304, :698 e :736;
+  - o objeto estruturado char.dados_vida so e escrito por
+    site/js/regras-multiclasse.js;
+  - `sincronizarEspelhos` semeia a reserva a partir do escalar quando os dois
+    discordam -- mas SO quando existe exatamente UMA reserva, porque com duas
+    ou mais nao ha como distribuir um numero unico entre elas.
+
+Ou seja: a rede que impede o jogador de recuperar dados de vida gastos
+funciona porque o app e de classe unica. Ela deixa de funcionar no instante em
+que a segunda classe existir com dado de vida DIFERENTE.
+
+CONSEQUENCIA PARA O SUB-PROJETO 3: migrar hp-descanso.js para gravar na
+reserva certa (char.dados_vida[faces].usados) tem de acontecer ANTES de
+habilitar a criacao de personagem multiclasse. Fazer na ordem inversa perde o
+gasto do descanso, agora sem rede nenhuma.
+
+Verificado: com `classes: [Clerigo 3, Guerreiro 2]` e dados_vida_usados = 2, a
+sincronizacao devolve {8:{usados:0}, 10:{usados:0}} e zera o escalar. Hoje e
+inalcancavel, porque nada cria duas classes.

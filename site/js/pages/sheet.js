@@ -17,7 +17,7 @@ import { char, classeData, salvar } from '../sheet/estado.js';
 import { renderFichaCompleta } from '../sheet/ficha.js';
 import { carregarDescricoesMagias } from '../sheet/impressao.js';
 import { ehSubclasseConjuradora, getSubclasseConjuradoraConjuracao } from '../sheet/magias.js';
-import { migrarEscolhasClasseLegadas, migrarMagiasDominio, migrarMagiasLegadoEspecie, migrarMagiasSemprePreparadas, migrarNomePericiaLidarAnimais, migrarPericiaEspecie, migrarPericiasEspecie, migrarPericiasTalentos, migrarProficienciasTalentos, migrarSlotsMagiaLivre, migrarTalentoVersatilHumano, migrarTruquesEspecie, migrarTruquesFixosSubclasse } from '../sheet/migracoes.js';
+import { migrarEscolhasClasseLegadas, migrarMagiasDominio, migrarMagiasLegadoEspecie, migrarMagiasSemprePreparadas, migrarMulticlasse, migrarNomePericiaLidarAnimais, migrarPericiaEspecie, migrarPericiasEspecie, migrarPericiasTalentos, migrarProficienciasTalentos, migrarSlotsMagiaLivre, migrarTalentoVersatilHumano, migrarTruquesEspecie, migrarTruquesFixosSubclasse } from '../sheet/migracoes.js';
 import { baixarPdfFicha } from '../sheet/pdf.js';
 import { migrarAdeptoElementalTipos, migrarIniciadoEmMagiaInstancias } from '../sheet/talentos.js';
 let _syncSubscribed = false;
@@ -47,6 +47,15 @@ export async function renderSheet(container, charId) {
   // Pré-carregar magias de domínio e migrar dados legados
   definirMagiasDominio(await obterTodasMagiasDominio(char.classe, char.subclasse, char.nivel));
   definirMagiasSempre(await obterTodasMagiasSemprePreparadas(char.classe, char.subclasse, char.nivel));
+  // Antes das OUTRAS migrações (não antes de tudo: as quatro leituras de
+  // char.classe/subclasse/nivel logo acima, linhas 34/41/48/49, já
+  // rodaram). Isso é inofensivo hoje porque, enquanto a ficha tiver uma
+  // única classe, os espelhos são invariantes sob migrarMulticlasse() --
+  // ela só carimba schema_versao e reconcilia classes[] a partir deles,
+  // nunca o contrário -- então nenhuma das quatro leituras acima pode
+  // divergir do valor que a migração produziria. Migrar antes das demais
+  // migrações garante que ELAS leiam valores consistentes.
+  migrarMulticlasse();
   migrarMagiasDominio();
   migrarMagiasSemprePreparadas();
   // Antes de migrarSlotsMagiaLivre: o truque concedido pela subclasse conta

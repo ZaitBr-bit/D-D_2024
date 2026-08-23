@@ -86,7 +86,8 @@ export async function modulosApp() {
          levelupFlow, sheetEstado, sheetMagias, sheetMigracoes, sheetGrimorio,
          sheetMago, notasVersao, versao,
          levelupCards, regrasSubclasseEscolhas, regrasOrigensMagia,
-         regrasConjuracaoSubclasse, regrasSalvaguardas, fichaEdicoes, fichaEdicaoValidacoes] = await Promise.all([
+         regrasConjuracaoSubclasse, regrasSalvaguardas, fichaEdicoes, fichaEdicaoValidacoes,
+         multiclasse, home] = await Promise.all([
     importar('site/js/regras-cobertura.js'),
     importar('site/js/talentos-effects.js'),
     importar('site/js/store.js'),
@@ -111,12 +112,14 @@ export async function modulosApp() {
     importar('site/js/regras-salvaguardas.js'),
     importar('site/js/ficha-edicoes.js'),
     importar('site/js/ficha-edicao-validacoes.js'),
+    importar('site/js/regras-multiclasse.js'),
+    importar('site/js/pages/home.js'),
   ]);
   _cache = { regras, efeitos, store, levelup, criador, utils, dadosClasses, db, equip,
              levelupFlow, sheetEstado, sheetMagias, sheetMigracoes, sheetGrimorio,
              sheetMago, notasVersao, versao, levelupCards, regrasSubclasseEscolhas,
              regrasOrigensMagia, regrasConjuracaoSubclasse, regrasSalvaguardas,
-             fichaEdicoes, fichaEdicaoValidacoes };
+             fichaEdicoes, fichaEdicaoValidacoes, multiclasse, home };
   return _cache;
 }
 
@@ -292,6 +295,56 @@ export async function personagemSemente(classe) {
   // níveis de erro acumulado.
   p.pv_max = TRACOS_BASICOS[classe].dadoVida + 2;
   p.pv_atual = p.pv_max;
+  return p;
+}
+
+/**
+ * Monta um personagem multiclasse direto, sem passar por subirDeNivel.
+ * É o que permite testar ficha e magias (sub-projetos 3 e 4) antes de o
+ * fluxo de subida de nível saber multiclassar (sub-projeto 5).
+ *
+ * Os atributos são 15 em tudo, de propósito: satisfazem o pré-requisito
+ * de 13+ de qualquer combinação de classes, então nenhum teste falha por
+ * um pré-requisito que ele não estava tentando medir.
+ *
+ * O dado de vida vem do CATÁLOGO (o livro), não de CLASSES_INFO -- mesma
+ * razão de personagemSemente: semear com CLASSES_INFO esconderia
+ * justamente a divergência que os motores procuram.
+ *
+ * @param {Array<{classe: string, nivel: number, subclasse?: string}>} roteiro
+ * @returns {Promise<object>} personagem pronto, com espelhos sincronizados.
+ */
+export async function personagemMulticlasse(roteiro) {
+  const { store, multiclasse } = await modulosApp();
+  const p = store.criarPersonagemVazio();
+  p.atributos = {
+    forca: 15, destreza: 15, constituicao: 14,
+    inteligencia: 15, sabedoria: 15, carisma: 15,
+  };
+  p.atributos_base = { ...p.atributos };
+  p.classes = roteiro.map((r, i) => ({
+    classe: r.classe,
+    subclasse: r.subclasse || '',
+    nivel: r.nivel,
+    ordem: i,
+  }));
+  p.schema_versao = multiclasse.SCHEMA_VERSAO_ATUAL;
+  multiclasse.sincronizarEspelhos(p);
+
+  // PV: dado cheio APENAS no 1º nível total, que pertence à classe
+  // inicial (livro:2041); todos os demais níveis usam a média, inclusive
+  // o primeiro nível de cada classe adicional.
+  const modCon = 2;
+  const inicial = roteiro[0];
+  let pv = TRACOS_BASICOS[inicial.classe].dadoVida + modCon;
+  for (const r of roteiro) {
+    const faces = TRACOS_BASICOS[r.classe].dadoVida;
+    const media = Math.floor(faces / 2) + 1;
+    const niveisNaMedia = r === inicial ? r.nivel - 1 : r.nivel;
+    pv += niveisNaMedia * (media + modCon);
+  }
+  p.pv_max = pv;
+  p.pv_atual = pv;
   return p;
 }
 

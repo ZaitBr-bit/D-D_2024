@@ -10,6 +10,29 @@ import { iniciarAuth, getUsuario, loginComGoogle, logout, onAuthChange, buscarPe
 let _containerRef = null;
 let _sincronizando = false;
 
+/**
+ * Decide qual versão de um personagem vence no merge com a nuvem.
+ * Só por atualizado_em (recência), como o app sempre fez.
+ *
+ * Uma guarda por schema_versao existiu aqui brevemente (correção final,
+ * item 3) e foi removida: ela não protegia do cenário que a justificava --
+ * salvarPersonagem() persiste o objeto inteiro, então um build antigo em
+ * cache de Service Worker preserva schema_versao: 2 e classes[], grava
+ * nivel: 6, e no merge vLocal === vCloud faria a guarda nunca disparar --,
+ * e DISPARAVA num caso que ninguém desenhou: cópia local nunca aberta
+ * (schema 1) perdia para cópia de nuvem mais ANTIGA (schema 2), mudando o
+ * comportamento em relação à recência sempre vencendo. A reconciliação de
+ * migrarParaMulticlasse (regras-multiclasse.js) torna a guarda
+ * desnecessária: uma ficha que um build antigo deixou inconsistente se
+ * conserta sozinha na próxima abertura.
+ * @returns {object} o objeto que deve ficar.
+ */
+export function _escolherNoMerge(local, cloud) {
+  const tCloud = new Date(cloud.atualizado_em || 0).getTime();
+  const tLocal = new Date(local.atualizado_em || 0).getTime();
+  return tLocal > tCloud ? local : cloud;
+}
+
 export function renderHome(container) {
   _containerRef = container;
   const personagens = listarPersonagens();
@@ -261,15 +284,10 @@ async function _sincronizarSeLogado(container, manual = false) {
         listaMergida.push(local);
         paraEnviarCloud.push(local);
       } else {
-        // Existe em ambos: usar o mais recente por atualizado_em
-        const tCloud = new Date(cloud.atualizado_em || 0).getTime();
-        const tLocal = new Date(local.atualizado_em || 0).getTime();
-        if (tLocal > tCloud) {
-          listaMergida.push(local);
-          paraEnviarCloud.push(local);
-        } else {
-          listaMergida.push(cloud);
-        }
+        // Existe em ambos: vence o mais recente por atualizado_em.
+        const vencedor = _escolherNoMerge(local, cloud);
+        listaMergida.push(vencedor);
+        if (vencedor === local) paraEnviarCloud.push(local);
       }
     }
 

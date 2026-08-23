@@ -190,15 +190,59 @@ export function migrarEdicoesLegado(p) {
 
 /**
  * Valida que um objeto tem a estrutura minima de personagem.
- * Campos exigidos: id (string nao vazia), nome (string nao vazia), nivel (numero inteiro 1-20), atributos (objeto).
+ * Campos exigidos: id (string nao vazia), nome (string nao vazia), atributos (objeto), e nivel
+ * num de dois formatos: o escalar legado `nivel` (numero inteiro 1-20) OU `classes[]` (array nao
+ * vazio de entradas cada uma com `nivel` inteiro >= 1, cuja SOMA tem de ser um inteiro entre 1 e 20).
  * @param {object} p - Objeto a validar.
  * @returns {boolean} true se o objeto e um personagem valido.
  */
-function _validarPersonagem(p) {
+export function _validarPersonagem(p) {
   if (!p || typeof p !== 'object' || Array.isArray(p)) return false;
   if (typeof p.id !== 'string' || !p.id.trim()) return false;
   if (typeof p.nome !== 'string' || !p.nome.trim()) return false;
-  if (typeof p.nivel !== 'number' || !Number.isFinite(p.nivel) || p.nivel < 1 || p.nivel > 20) return false;
+  // Nível: aceita o escalar legado OU a soma de classes[]. A validação
+  // roda no import, ANTES de qualquer migração, então precisa entender
+  // os dois formatos -- senão a ficha é descartada em silêncio.
+  const temClassesArray = Array.isArray(p.classes) && p.classes.length > 0;
+  // A soma sozinha não basta: esta função é a ÚNICA fronteira do app com
+  // dado que não veio dos nossos caminhos de produção (importarPersonagens
+  // lê um JSON escolhido pelo usuário num seletor de arquivo -- export
+  // editado à mão, arquivo de outra ferramenta, backup truncado). Duas
+  // entradas -- uma inflada e uma negativa que a compensa -- podem somar
+  // dentro de 1..20 e passar pela checagem de soma (25 + -20 = 5) mesmo
+  // sendo estrutura inválida; sem esta guarda por entrada, a ficha
+  // corrompida entra em localStorage e o sintoma só aparece bem depois,
+  // longe daqui (ex.: nivelNa devolvendo 25 e alimentando um find() que
+  // retorna undefined numa tabela de características de 20 linhas). Não
+  // precisa de teto por entrada: com toda entrada >= 1, o teto de 20 da
+  // soma abaixo já limita cada uma.
+  // `c?.nivel`, não `c.nivel`: uma entrada NÃO-OBJETO (null, undefined,
+  // string, número -- saída comum de serializador ou de arquivo editado à
+  // mão) não pode fazer `.nivel` LANÇAR. Um TypeError aqui sobe até o
+  // try/catch de importarPersonagens e aborta o import do ARQUIVO INTEIRO,
+  // inclusive as fichas boas do mesmo arquivo -- pior que a rejeição que a
+  // guarda deveria produzir. `c?.nivel` sobre uma entrada não-objeto vale
+  // `undefined`, e `Number.isInteger(undefined)` é `false`: a ficha é
+  // rejeitada, não abortada.
+  // `c?.classe`, mesma cautela do `c?.nivel` acima: entrada não-objeto não
+  // pode lançar. Toda entrada precisa de uma classe (string não vazia) --
+  // sem esta guarda, `classes:[{nivel:3, ordem:0}]` passava na validação e
+  // a migração sobrescrevia `char.classe` com `''`, apagando a identidade
+  // da ficha (achado da revisão final, mais grave que o buraco numérico
+  // acima: aquele era dano hipotético adiante, este destrói a ficha na hora).
+  if (temClassesArray && p.classes.some(
+    (c) => !Number.isInteger(c?.nivel) || c.nivel < 1
+        || typeof c?.classe !== 'string' || !c.classe.trim())) return false;
+  const nivelSomado = temClassesArray
+    ? p.classes.reduce((s, c) => s + (Number(c.nivel) || 0), 0)
+    : p.nivel;
+  // `Number.isInteger` (em vez do antigo `Number.isFinite`) fecha a
+  // assimetria com a guarda por entrada acima: o JSDoc sempre disse
+  // "numero inteiro", mas o ramo do escalar legado aceitava fracionário
+  // (ex.: 2.5). `Number.isInteger` já implica finito e numérico, então
+  // cobre sozinho o que `typeof` + `isFinite` faziam juntos.
+  if (typeof nivelSomado !== 'number' || !Number.isInteger(nivelSomado)
+      || nivelSomado < 1 || nivelSomado > 20) return false;
   if (!p.atributos || typeof p.atributos !== 'object' || Array.isArray(p.atributos)) return false;
   return true;
 }

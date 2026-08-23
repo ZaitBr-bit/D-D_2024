@@ -343,4 +343,22 @@ export function migrarProficienciasTalentos() {
     }
   }
   if (mudou) salvar();
-}
+}
+
+// Import colocado aqui (e não no bloco do topo) de propósito: inserir uma
+// linha no bloco de imports desloca a numeração de todo o arquivo abaixo,
+// e testes/regras/catalogo/magias-preparo.mjs guarda uma exceção chaveada
+// pela linha exata de `origensForaDoLimite` em migrarSlotsMagiaLivre
+// (EXCECOES_LISTA_ORIGEM['sheet/migracoes.js:67']). Mantendo o import ao
+// lado do único trecho que o usa, a numeração do resto do arquivo não muda.
+import { migrarParaMulticlasse } from '../regras-multiclasse.js';
+
+/**
+ * Migra a ficha aberta para o modelo de multiclasse.
+ * Casca fina no idioma das outras migrações (sem parâmetro, lendo o
+ * `char` global e salvando); a lógica está em regras-multiclasse.js,
+ * que é pura e testável fora do navegador.
+ */
+export function migrarMulticlasse() {
+  if (migrarParaMulticlasse(char)) salvar();
+}
