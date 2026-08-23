@@ -13,13 +13,34 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.17';
+export const VERSAO_ATUAL = '2.2.18';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.18',
+    data: '2026-08-23',
+    rotulo: 'Recursos por classe',
+    resumo: 'Num personagem com mais de uma classe, cada bloco da ficha passa '
+      + 'a mostrar os recursos e botões da sua própria classe.',
+    correcoes: [
+      {
+        grupo: '⚔️ Recursos de classe',
+        itens: [
+          'Quem tem duas classes via os botões da primeira classe repetidos no '
+            + 'bloco da segunda. Agora cada bloco mostra só o que é dele. Os '
+            + 'botões da segunda classe ainda não respondem ao clique; isso '
+            + 'vem na próxima versão.',
+          'Características que escalam por nível passam a usar o nível '
+            + 'naquela classe, não o nível total do personagem.',
+          'Para quem tem uma classe só, nada muda.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.17',
     data: '2026-08-23',

@@ -5,11 +5,17 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { calcMod } from '../../utils.js';
-import { char, classeData } from '../estado.js';
+import { char } from '../estado.js';
+import { temClasse, nivelNa } from '../../regras-multiclasse.js';
+import { dadosDe } from '../contexto-classe.js';
 
 function getProgressaoDruida() {
-  if (char?.classe !== 'Druida' || !classeData?.tabela_caracteristicas) return null;
-  const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
+  // temClasse/dadosDe/nivelNa: o portao e a leitura da tabela tem de ser
+  // da classe Druida, mesmo quando ela nao e a inicial do personagem.
+  const dados = dadosDe('Druida');
+  if (!temClasse(char, 'Druida') || !dados?.tabela_caracteristicas) return null;
+  const row = dados.tabela_caracteristicas.find(
+    r => parseInt(r['Nível']) === (nivelNa(char, 'Druida') || 1));
   if (!row) return null;
   return {
     formaSelvagemMax: parseInt(row['Forma Selvagem']) || 0
@@ -17,7 +23,7 @@ function getProgressaoDruida() {
 }
 
 export function getEstadoRecursosDruida() {
-  if (char?.classe !== 'Druida') return null;
+  if (!temClasse(char, 'Druida')) return null;
   if (!char.recursos) char.recursos = {};
   if (!char.recursos.druida) {
     char.recursos.druida = {
@@ -66,8 +72,8 @@ export function getEstadoRecursosDruida() {
     usosMax: prog.formaSelvagemMax,
     usosDisponiveis,
     ressurgimentoSlotRecuperadoHoje: !!char.recursos.druida.ressurgimento_slot_recuperado_hoje,
-    arquidruidaAtivo: (char.nivel || 1) >= 20,
-    ressurgimentoAtivo: (char.nivel || 1) >= 5,
+    arquidruidaAtivo: (nivelNa(char, 'Druida') || 1) >= 20,
+    ressurgimentoAtivo: (nivelNa(char, 'Druida') || 1) >= 5,
     // Subclasses - propriedades computadas
     passoLunarMax: modSab,
     passoLunarDisponiveis: Math.max(0, modSab - char.recursos.druida.subclasses.lua.passo_lunar_usos_gastos),

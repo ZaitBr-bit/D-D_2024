@@ -6,7 +6,9 @@
 // ============================================================
 import { getConjuracaoSubclasse } from '../../regras-conjuracao-subclasse.js';
 import { bonusProficiencia, calcMod } from '../../utils.js';
-import { char, classeData } from '../estado.js';
+import { char } from '../estado.js';
+import { temClasse, nivelNa, subclasseDe } from '../../regras-multiclasse.js';
+import { dadosDe } from '../contexto-classe.js';
 
 /**
  * Tabela de conjuração do Trapaceiro Arcano (subclasse do Ladino) para o
@@ -18,9 +20,17 @@ import { char, classeData } from '../estado.js';
  * `char.subclasse` só é gravada depois que o nível é confirmado.
  */
 export function getTrapaceiroArcanoConjuracao(opcoes = {}) {
-  const classe = opcoes.classe ?? char?.classe;
-  const subclasse = opcoes.subclasse ?? char?.subclasse;
-  const nivel = opcoes.nivel ?? char?.nivel ?? 1;
+  // Os fallbacks vinham dos espelhos (char.classe/char.subclasse), que so
+  // descrevem a classe INICIAL: um Guerreiro 5/Ladino 7 Trapaceiro Arcano
+  // nao recebia espaco de magia nenhum. O nome da classe NAO e chapado --
+  // se o personagem nao tem Ladino, `classe` fica null e
+  // getConjuracaoSubclasse devolve null (`def.classe !== classe`), que e
+  // exatamente o "nada" de antes.
+  const classe = opcoes.classe ?? (temClasse(char, 'Ladino') ? 'Ladino' : null);
+  const subclasse = opcoes.subclasse ?? subclasseDe(char, 'Ladino');
+  // nivelNa em vez de char?.nivel: e o nivel do personagem NA classe
+  // Ladino que importa aqui, nao o total.
+  const nivel = opcoes.nivel ?? nivelNa(char, 'Ladino') ?? 1;
   return getConjuracaoSubclasse(classe, subclasse === 'Trapaceiro Arcano' ? subclasse : null, nivel);
 }
 
@@ -28,17 +38,21 @@ export function getTrapaceiroArcanoConjuracao(opcoes = {}) {
 // Progressão e recursos do Ladino
 // ============================================================
 function getProgressaoLadino() {
-  if (char?.classe !== 'Ladino' || !classeData?.tabela_caracteristicas) return null;
-  const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
+  // temClasse/dadosDe/nivelNa: o portao e a leitura da tabela tem de ser
+  // da classe Ladino, mesmo quando ela nao e a inicial do personagem.
+  const dados = dadosDe('Ladino');
+  if (!temClasse(char, 'Ladino') || !dados?.tabela_caracteristicas) return null;
+  const nivelLadino = nivelNa(char, 'Ladino') || 1;
+  const row = dados.tabela_caracteristicas.find(r => parseInt(r['Nível']) === nivelLadino);
   if (!row) return null;
   const furtStr = String(row['Ataque Furtivo'] || '1d6');
   const furtMatch = furtStr.match(/(\d+)d(\d+)/);
-  const furtivoDados = furtMatch ? parseInt(furtMatch[1]) : Math.ceil((char.nivel || 1) / 2);
+  const furtivoDados = furtMatch ? parseInt(furtMatch[1]) : Math.ceil(nivelLadino / 2);
   return { furtivoDados };
 }
 
 export function getEstadoRecursosLadino() {
-  if (char?.classe !== 'Ladino') return null;
+  if (!temClasse(char, 'Ladino')) return null;
   if (!char.recursos) char.recursos = {};
   if (!char.recursos.ladino) {
     char.recursos.ladino = {
@@ -69,11 +83,14 @@ export function getEstadoRecursosLadino() {
   const r = char.recursos.ladino;
   if (typeof r.golpe_sorte_usado !== 'boolean') r.golpe_sorte_usado = false;
 
-  const nivel = char.nivel || 1;
+  const nivel = nivelNa(char, 'Ladino') || 1;
   const prog = getProgressaoLadino() || { furtivoDados: Math.ceil(nivel / 2) };
 
-  // CD Golpe Astuto: 8 + mod Des + prof
-  const cdGolpeAstuto = 8 + calcMod(char.atributos.destreza) + bonusProficiencia(nivel);
+  // CD Golpe Astuto: 8 + mod Des + prof. bonusProficiencia usa o nivel
+  // TOTAL do personagem (livro:2047), nao o nivel na classe Ladino -- por
+  // isso le char.nivel direto aqui, em vez da variavel `nivel` (que e
+  // nivelNa e alimenta os degraus de progressao do Ladino abaixo).
+  const cdGolpeAstuto = 8 + calcMod(char.atributos.destreza) + bonusProficiencia(char.nivel || 1);
 
   // Ação Ardilosa (nível 2+)
   const acaoArdilosaAtiva = nivel >= 2;
@@ -109,7 +126,10 @@ export function getEstadoRecursosLadino() {
   const golpeSorteAtivo = nivel >= 20;
 
   // --- Adaga Espiritual ---
-  const ehAdagaEspiritual = char.subclasse === 'Adaga Espiritual';
+  // subclasseDe em vez do espelho char.subclasse: o espelho aponta para a
+  // subclasse da classe INICIAL -- um Guerreiro/Ladino Adaga Espiritual
+  // perderia os dados psionicos e a CD da subclasse sem nenhum aviso.
+  const ehAdagaEspiritual = subclasseDe(char, 'Ladino') === 'Adaga Espiritual';
   let dadosPsionicosMaxL = 0, tipoDadoPsionicoL = 'd6';
   if (ehAdagaEspiritual && nivel >= 3) {
     if (nivel >= 17) { dadosPsionicosMaxL = 12; tipoDadoPsionicoL = 'd12'; }
@@ -119,8 +139,10 @@ export function getEstadoRecursosLadino() {
     else if (nivel >= 5) { dadosPsionicosMaxL = 6; tipoDadoPsionicoL = 'd8'; }
     else { dadosPsionicosMaxL = 4; tipoDadoPsionicoL = 'd6'; }
   }
-  // CD psiônica do Adaga Espiritual: 8 + mod Des + prof
-  const cdPsionicaAdaga = ehAdagaEspiritual ? 8 + calcMod(char.atributos?.destreza || 10) + bonusProficiencia(nivel) : 0;
+  // CD psiônica do Adaga Espiritual: 8 + mod Des + prof. Mesmo motivo do
+  // cdGolpeAstuto acima: bonusProficiencia usa o nivel TOTAL, le char.nivel
+  // direto em vez da variavel `nivel` (nivelNa).
+  const cdPsionicaAdaga = ehAdagaEspiritual ? 8 + calcMod(char.atributos?.destreza || 10) + bonusProficiencia(char.nivel || 1) : 0;
   const laminasAlmaAtivas = ehAdagaEspiritual && nivel >= 9;
   const veuPsiquicoAtivo = ehAdagaEspiritual && nivel >= 13;
   const rasgarMenteAtivo = ehAdagaEspiritual && nivel >= 17;

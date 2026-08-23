@@ -5,11 +5,17 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { calcMod } from '../../utils.js';
-import { char, classeData } from '../estado.js';
+import { char } from '../estado.js';
+import { temClasse, nivelNa } from '../../regras-multiclasse.js';
+import { dadosDe } from '../contexto-classe.js';
 
 function getProgressaoGuardiao() {
-  if (char?.classe !== 'Guardião' || !classeData?.tabela_caracteristicas) return null;
-  const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
+  // temClasse/dadosDe/nivelNa: o portao e a leitura da tabela tem de ser
+  // da classe Guardiao, mesmo quando ela nao e a inicial do personagem.
+  const dados = dadosDe('Guardião');
+  if (!temClasse(char, 'Guardião') || !dados?.tabela_caracteristicas) return null;
+  const row = dados.tabela_caracteristicas.find(
+    r => parseInt(r['Nível']) === (nivelNa(char, 'Guardião') || 1));
   if (!row) return null;
   return {
     inimigoFavoritoMax: parseInt(row['Inimigo Favorito']) || 0
@@ -17,7 +23,7 @@ function getProgressaoGuardiao() {
 }
 
 export function getEstadoRecursosGuardiao() {
-  if (char?.classe !== 'Guardião') return null;
+  if (!temClasse(char, 'Guardião')) return null;
   if (!char.recursos) char.recursos = {};
   if (!char.recursos.guardiao) {
     char.recursos.guardiao = {
@@ -62,7 +68,7 @@ export function getEstadoRecursosGuardiao() {
 
   const prog = getProgressaoGuardiao() || { inimigoFavoritoMax: 0 };
   const modSab = Math.max(1, calcMod(char.atributos.sabedoria));
-  const nivel = char.nivel || 1;
+  const nivel = nivelNa(char, 'Guardião') || 1;
 
   const inimigoFavoritoDisponiveis = Math.max(0, prog.inimigoFavoritoMax - r.inimigo_favorito_usos_gastos);
   const incansavelDisponiveis = Math.max(0, modSab - r.incansavel_usos_gastos);

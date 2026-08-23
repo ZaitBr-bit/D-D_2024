@@ -201,7 +201,13 @@ test('Ficha legada: Trapaceiro Arcano nível 3 sem magias recebe Mãos Mágicas 
   personagem.magias_conhecidas = [];
   personagem.magias_preparadas = [];
   sheetEstado.definirChar(personagem);
-  sheetEstado.definirClasseData(await db.getClasse('Ladino'));
+  const classeDataLadino = await db.getClasse('Ladino');
+  sheetEstado.definirClasseData(classeDataLadino);
+  // renderSheet (pages/sheet.js) sempre seta classeData E classesData
+  // juntos. Este caminho ainda nao le classesData hoje, mas os proximos
+  // sub-projetos (3c/3d/3e) vao levar mais codigo por dadosDe -- setar os
+  // dois agora evita uma falha misteriosa la na frente.
+  sheetEstado.definirClassesData(new Map([['Ladino', classeDataLadino]]));
 
   sheetMigracoes.migrarTruquesFixosSubclasse();
   sheetMigracoes.migrarSlotsMagiaLivre();

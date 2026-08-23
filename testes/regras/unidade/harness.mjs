@@ -88,7 +88,20 @@ export async function modulosApp() {
          levelupCards, regrasSubclasseEscolhas, regrasOrigensMagia,
          regrasConjuracaoSubclasse, regrasSalvaguardas, fichaEdicoes, fichaEdicaoValidacoes,
          multiclasse, home, multiclasseConjuracao, multiclasseProgressao, contextoClasse,
-         sheetCaracteristicas, sheetFicha] = await Promise.all([
+         sheetCaracteristicas, sheetFicha,
+         // As 11 classes restantes (Mago ja entra acima, como sheetMago, para o
+         // motor de subclasses conjuradoras) -- reunidas em sheetClasses logo
+         // abaixo, uma entrada por classe, para os oraculos de multiclasse-render
+         // (Tarefa 1) chamarem sheetClasses.clerigo.getProgressaoClerigo() etc.
+         // sem um import por classe em cada arquivo de teste.
+         classeBarbaro, classeBardo, classeBruxo, classeClerigo, classeDruida,
+         classeFeiticeiro, classeGuardiao, classeGuerreiro, classeLadino,
+         classeMonge, classePaladino,
+         // Tarefa 3 do sub-projeto 3b: renderFeatureItem, registrado sob a
+         // chave `sheetHabilidades` para os oraculos 9-13 de
+         // multiclasse-render.test.mjs chamarem
+         // sheetHabilidades.renderFeatureItem(f, source, ctx).
+         sheetHabilidades] = await Promise.all([
     importar('site/js/regras-cobertura.js'),
     importar('site/js/talentos-effects.js'),
     importar('site/js/store.js'),
@@ -131,13 +144,36 @@ export async function modulosApp() {
     // migrarMulticlasse() a cada render), nao so a funcao de reconciliacao
     // isolada -- ver multiclasse-contexto.test.mjs, oraculo final.
     importar('site/js/sheet/ficha.js'),
+    importar('site/js/sheet/classes/barbaro.js'),
+    importar('site/js/sheet/classes/bardo.js'),
+    importar('site/js/sheet/classes/bruxo.js'),
+    importar('site/js/sheet/classes/clerigo.js'),
+    importar('site/js/sheet/classes/druida.js'),
+    importar('site/js/sheet/classes/feiticeiro.js'),
+    importar('site/js/sheet/classes/guardiao.js'),
+    importar('site/js/sheet/classes/guerreiro.js'),
+    importar('site/js/sheet/classes/ladino.js'),
+    importar('site/js/sheet/classes/monge.js'),
+    importar('site/js/sheet/classes/paladino.js'),
+    importar('site/js/sheet/habilidades.js'),
   ]);
+  // Um modulo de classe por nome de ARQUIVO (minusculo, sem acento -- ex.:
+  // sheetClasses.clerigo, sheetClasses.paladino), e nao pelo nome que o app
+  // usa em `char.classe` ('Clérigo', 'Paladino'). Consumido pelos oraculos de
+  // multiclasse-render.test.mjs via sheetClasses.<classe>.
+  const sheetClasses = {
+    barbaro: classeBarbaro, bardo: classeBardo, bruxo: classeBruxo,
+    clerigo: classeClerigo, druida: classeDruida, feiticeiro: classeFeiticeiro,
+    guardiao: classeGuardiao, guerreiro: classeGuerreiro, ladino: classeLadino,
+    mago: sheetMago, monge: classeMonge, paladino: classePaladino,
+  };
   _cache = { regras, efeitos, store, levelup, criador, utils, dadosClasses, db, equip,
              levelupFlow, sheetEstado, sheetMagias, sheetMigracoes, sheetGrimorio,
              sheetMago, notasVersao, versao, levelupCards, regrasSubclasseEscolhas,
              regrasOrigensMagia, regrasConjuracaoSubclasse, regrasSalvaguardas,
              fichaEdicoes, fichaEdicaoValidacoes, multiclasse, home, multiclasseConjuracao,
-             multiclasseProgressao, contextoClasse, sheetCaracteristicas, sheetFicha };
+             multiclasseProgressao, contextoClasse, sheetCaracteristicas, sheetFicha,
+             sheetClasses, sheetHabilidades };
   return _cache;
 }
 

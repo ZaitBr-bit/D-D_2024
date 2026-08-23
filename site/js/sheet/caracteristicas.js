@@ -55,11 +55,11 @@ function renderCaracteristicasDeUmaClasse(ctx, mostrarNomeClasse) {
       <div class="card-header"><h2>${titulo}</h2></div>
       ${ativas.length > 0 ? `
         <div class="section-divider"><span>Habilidades Ativas</span></div>
-        ${ativas.map(f => renderFeatureItem(f, 'classe')).join('')}
+        ${ativas.map(f => renderFeatureItem(f, 'classe', ctx)).join('')}
       ` : ''}
       ${passivas.length > 0 ? `
         <div class="section-divider"><span>Habilidades Passivas</span></div>
-        ${passivas.map(f => renderFeatureItem(f, 'classe')).join('')}
+        ${passivas.map(f => renderFeatureItem(f, 'classe', ctx)).join('')}
       ` : ''}
     </div>
   `;
@@ -96,11 +96,11 @@ function renderSubclasseDeUmaClasse(ctx) {
       <div class="card-header"><h2>Subclasse — ${escHtml(ctx.subclasse)}</h2></div>
       ${ativas.length > 0 ? `
         <div class="section-divider"><span>Habilidades Ativas</span></div>
-        ${ativas.map(f => renderFeatureItem(f, 'subclasse')).join('')}
+        ${ativas.map(f => renderFeatureItem(f, 'subclasse', ctx)).join('')}
       ` : ''}
       ${passivas.length > 0 ? `
         <div class="section-divider"><span>Habilidades Passivas</span></div>
-        ${passivas.map(f => renderFeatureItem(f, 'subclasse')).join('')}
+        ${passivas.map(f => renderFeatureItem(f, 'subclasse', ctx)).join('')}
       ` : ''}
     </div>
   `;

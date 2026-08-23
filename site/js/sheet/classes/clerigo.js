@@ -5,11 +5,18 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { calcMod } from '../../utils.js';
-import { char, classeData } from '../estado.js';
+import { char } from '../estado.js';
+import { temClasse, nivelNa } from '../../regras-multiclasse.js';
+import { dadosDe } from '../contexto-classe.js';
 
 export function getProgressaoClerigo() {
-  if (char?.classe !== 'Clérigo' || !classeData?.tabela_caracteristicas) return null;
-  const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
+  // temClasse em vez de char.classe ===: o portao tem de reconhecer a classe
+  // mesmo quando ela nao e a inicial. dadosDe pega a tabela DAQUELA classe,
+  // e nivelNa o nivel NELA -- char.nivel e o total e daria a linha errada.
+  const dados = dadosDe('Clérigo');
+  if (!temClasse(char, 'Clérigo') || !dados?.tabela_caracteristicas) return null;
+  const row = dados.tabela_caracteristicas.find(
+    r => parseInt(r['Nível']) === (nivelNa(char, 'Clérigo') || 1));
   if (!row) return null;
   return {
     canalizarDivindadeMax: parseInt(row['Canalizar Divindade']) || 0
@@ -17,7 +24,7 @@ export function getProgressaoClerigo() {
 }
 
 export function getEstadoRecursosClerigo() {
-  if (char?.classe !== 'Clérigo') return null;
+  if (!temClasse(char, 'Clérigo')) return null;
   if (!char.recursos) char.recursos = {};
   if (!char.recursos.clerigo) char.recursos.clerigo = {};
 
@@ -76,7 +83,7 @@ export function getEstadoRecursosClerigo() {
 }
 
 export function getEstadoSubclassesClerigo() {
-  if (char?.classe !== 'Clérigo') return null;
+  if (!temClasse(char, 'Clérigo')) return null;
   const estado = getEstadoRecursosClerigo();
   if (!estado) return null;
 

@@ -5,14 +5,20 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { bonusProficiencia, calcMod } from '../../utils.js';
-import { char, classeData } from '../estado.js';
+import { char } from '../estado.js';
+import { temClasse, nivelNa, subclasseDe } from '../../regras-multiclasse.js';
+import { dadosDe } from '../contexto-classe.js';
 
 // ============================================================
 // Progressão e recursos do Monge
 // ============================================================
 export function getProgressaoMonge() {
-  if (char?.classe !== 'Monge' || !classeData?.tabela_caracteristicas) return null;
-  const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
+  // temClasse/dadosDe/nivelNa: o portao e a leitura da tabela tem de ser
+  // da classe Monge, mesmo quando ela nao e a inicial do personagem.
+  const dados = dadosDe('Monge');
+  if (!temClasse(char, 'Monge') || !dados?.tabela_caracteristicas) return null;
+  const row = dados.tabela_caracteristicas.find(
+    r => parseInt(r['Nível']) === (nivelNa(char, 'Monge') || 1));
   if (!row) return null;
   // A tabela do livro traz o dado escrito por inteiro ("1d6", "1d8", "1d10",
   // "1d12"), e o que interessa aqui e o NUMERO DE FACES -- a ficha ja escreve
@@ -28,7 +34,7 @@ export function getProgressaoMonge() {
 }
 
 export function getEstadoRecursosMonge() {
-  if (char?.classe !== 'Monge') return null;
+  if (!temClasse(char, 'Monge')) return null;
   if (!char.recursos) char.recursos = {};
   if (!char.recursos.monge) {
     char.recursos.monge = {
@@ -41,14 +47,17 @@ export function getEstadoRecursosMonge() {
   if (typeof r.pontos_foco_gastos !== 'number') r.pontos_foco_gastos = 0;
   if (typeof r.metabolismo_usado !== 'boolean') r.metabolismo_usado = false;
 
-  const nivel = char.nivel || 1;
+  const nivel = nivelNa(char, 'Monge') || 1;
   const prog = getProgressaoMonge() || { dado: 6, pontosMax: 0, bonusMovimento: 0 };
 
   const pontosMax = prog.pontosMax;
   const pontosAtuais = Math.max(0, pontosMax - r.pontos_foco_gastos);
 
-  // CD de Foco: 8 + prof + mod Sabedoria
-  const cdFoco = 8 + bonusProficiencia(nivel) + calcMod(char.atributos.sabedoria);
+  // CD de Foco: 8 + prof + mod Sabedoria. bonusProficiencia usa o nivel
+  // TOTAL do personagem (livro:2047), nao o nivel na classe Monge -- por
+  // isso le char.nivel direto aqui, em vez da variavel `nivel` (que e
+  // nivelNa e alimenta so os degraus de progressao do Monge abaixo).
+  const cdFoco = 8 + bonusProficiencia(char.nivel || 1) + calcMod(char.atributos.sabedoria);
 
   // Desviar Ataques (nível 3+): 1d10 + mod Des + nível
   const desviarAtivo = nivel >= 3;
@@ -72,7 +81,10 @@ export function getEstadoRecursosMonge() {
 
   // Subclasses de Monge
   if (!r.subclasses) r.subclasses = {};
-  const sub = char.subclasse || '';
+  // subclasseDe em vez do espelho char.subclasse: o espelho aponta para a
+  // subclasse da classe INICIAL -- um Guerreiro/Monge perderia os recursos
+  // da tradicao monastica sem nenhum aviso.
+  const sub = subclasseDe(char, 'Monge') || '';
   const sabMod = calcMod(char.atributos.sabedoria);
   let subData = {};
 

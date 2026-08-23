@@ -5,12 +5,18 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { abrirModal, bonusProficiencia, calcMod, toast } from '../../utils.js';
-import { char, classeData, salvar } from '../estado.js';
+import { char, salvar } from '../estado.js';
 import { renderFichaCompleta } from '../ficha.js';
+import { temClasse, nivelNa, subclasseDe } from '../../regras-multiclasse.js';
+import { dadosDe } from '../contexto-classe.js';
 
 export function getProgressaoBarbaro() {
-  if (char?.classe !== 'Bárbaro' || !classeData?.tabela_caracteristicas) return null;
-  const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
+  // temClasse/dadosDe/nivelNa: o portao e a leitura da tabela tem de ser
+  // da classe Bárbaro, mesmo quando ela nao e a inicial do personagem.
+  const dados = dadosDe('Bárbaro');
+  if (!temClasse(char, 'Bárbaro') || !dados?.tabela_caracteristicas) return null;
+  const row = dados.tabela_caracteristicas.find(
+    r => parseInt(r['Nível']) === (nivelNa(char, 'Bárbaro') || 1));
   if (!row) return null;
   return {
     furiasMax: parseInt(row['Fúrias']) || 0,
@@ -20,27 +26,31 @@ export function getProgressaoBarbaro() {
 }
 
 export function getEstadoFuria() {
-  if (char?.classe !== 'Bárbaro') return null;
+  if (!temClasse(char, 'Bárbaro')) return null;
   if (!char.recursos) char.recursos = {};
   if (typeof char.recursos.furia_ativa !== 'boolean') char.recursos.furia_ativa = false;
   if (typeof char.recursos.furia_usos_gastos !== 'number') char.recursos.furia_usos_gastos = 0;
 
   const prog = getProgressaoBarbaro() || { furiasMax: 0, danoFuria: 0, maestriasMax: 0 };
   const usosDisponiveis = Math.max(0, prog.furiasMax - char.recursos.furia_usos_gastos);
-  const nivel = char.nivel || 1;
+  const nivel = nivelNa(char, 'Bárbaro') || 1;
+  // subclasseDe em vez do espelho char.subclasse: o espelho aponta para a
+  // subclasse da classe INICIAL, entao um Guerreiro/Bárbaro leria a
+  // subclasse errada e perderia as caracteristicas da trilha em silencio.
+  const trilha = subclasseDe(char, 'Bárbaro');
 
   // Fúria Irracional: Berserker nível 6+ — Imunidade a Amedrontado e Enfeitiçado durante Fúria
-  const temFuriaIrracional = char.subclasse === 'Trilha do Berserker' && nivel >= 6;
+  const temFuriaIrracional = trilha === 'Trilha do Berserker' && nivel >= 6;
 
   // Resistências durante a Fúria
   let resistenciasFuria = ['Contundente', 'Cortante', 'Perfurante'];
   // Coração Selvagem - Urso: Resistência a todos os tipos exceto Energético, Necrótico, Psíquico, Radiante
-  if (char.subclasse === 'Trilha do Coração Selvagem' && nivel >= 3 && char.recursos.furia_animal === 'Urso') {
+  if (trilha === 'Trilha do Coração Selvagem' && nivel >= 3 && char.recursos.furia_animal === 'Urso') {
     resistenciasFuria = ['Ácido', 'Contundente', 'Cortante', 'Elétrico', 'Gélido', 'Ígneo', 'Perfurante', 'Trovejante', 'Venenoso'];
   }
 
   // Fanático nv14 - Fúria dos Deuses: Resistência adicional a Necrótico, Psíquico, Radiante
-  const furiaDeusesAtiva = char.subclasse === 'Trilha do Fanático' && nivel >= 14 && !!char.recursos.furia_deuses_ativa;
+  const furiaDeusesAtiva = trilha === 'Trilha do Fanático' && nivel >= 14 && !!char.recursos.furia_deuses_ativa;
   if (furiaDeusesAtiva) {
     ['Necrótico', 'Psíquico', 'Radiante'].forEach(t => {
       if (!resistenciasFuria.includes(t)) resistenciasFuria.push(t);
@@ -71,13 +81,13 @@ export function getEstadoFuria() {
     furiaImplacavel: nivel >= 11,
     furiaDeusesAtiva,
     animalFuria: char.recursos.furia_animal || null,
-    subclasse: char.subclasse
+    subclasse: trilha
   };
 }
 
 /** Abre modal para escolha de animal ao ativar Fúria (Coração Selvagem) */
 export function _abrirEscolhaAnimalFuria() {
-  const nivel = char.nivel || 1;
+  const nivel = nivelNa(char, 'Bárbaro') || 1;
   let opcoes = [
     { id: 'Águia', label: 'Águia', desc: 'Correr e Desengajar como Ação Bônus ao ativar e durante a Fúria.' },
     { id: 'Lobo', label: 'Lobo', desc: 'Aliados têm Vantagem em ataques contra inimigos a até 1,5m de você.' },
@@ -126,9 +136,13 @@ export function setupEventosSubclasseBarbaro() {
   document.querySelectorAll('[data-campeao-deuses]').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (char.classe !== 'Bárbaro' || char.subclasse !== 'Trilha do Fanático') return;
+      // barbaro.js:129 e diferente das outras 31 leituras deste lote: o
+      // portao combina classe E subclasse -- subclasseDe(char, 'Bárbaro')
+      // pega a subclasse DAQUELA classe, do mesmo jeito que dadosDe/nivelNa
+      // pegam a tabela e o nivel dela.
+      if (!temClasse(char, 'Bárbaro') || subclasseDe(char, 'Bárbaro') !== 'Trilha do Fanático') return;
       if (!char.recursos) char.recursos = {};
-      const nivel = char.nivel || 1;
+      const nivel = nivelNa(char, 'Bárbaro') || 1;
       const dadosMax = nivel >= 17 ? 7 : nivel >= 12 ? 6 : nivel >= 6 ? 5 : 4;
       const gastos = char.recursos.campeao_deuses_gastos || 0;
       if (gastos >= dadosMax) {
@@ -262,6 +276,8 @@ export function setupEventosSubclasseBarbaro() {
         }
         char.recursos.presenca_intimidante_usada = true;
         const modFor = calcMod(char.atributos.forca);
+        // bonusProficiencia usa o nivel TOTAL do personagem (livro:2047),
+        // nao o nivel na classe Bárbaro -- fica como char.nivel de proposito.
         const cd = 8 + bonusProficiencia(char.nivel || 1) + modFor;
         salvar();
         toast(`Presença Intimidante ativada! CD ${cd}. Criaturas escolhidas ficam Amedrontadas.`, 'success');

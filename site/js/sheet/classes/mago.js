@@ -5,6 +5,7 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { char, salvar } from '../estado.js';
+import { temClasse, nivelNa, subclasseDe } from '../../regras-multiclasse.js';
 
 // Magias que o Mago "sempre tem preparadas" por característica de classe,
 // e o círculo que cada vaga aceita (PHB 2024):
@@ -31,7 +32,7 @@ export const MAGIAS_FIXAS_MAGO = {
 // Progressão e recursos do Mago
 // ============================================================
 export function getEstadoRecursosMago() {
-  if (char?.classe !== 'Mago') return null;
+  if (!temClasse(char, 'Mago')) return null;
   if (!char.recursos) char.recursos = {};
   if (!char.recursos.mago) {
     char.recursos.mago = {
@@ -52,7 +53,7 @@ export function getEstadoRecursosMago() {
   if (!r.maestria_magias) r.maestria_magias = { c1: '', c2: '' };
   if (!r.assinaturas) r.assinaturas = { m1: '', m2: '' };
 
-  const nivel = char.nivel || 1;
+  const nivel = nivelNa(char, 'Mago') || 1;
 
   // Recuperação Arcana: recupera círculos combinados <= metade do nível (arredondado para cima), máx 5º círculo
   const recuperacaoArcanaMax = Math.ceil(nivel / 2);
@@ -70,7 +71,10 @@ export function getEstadoRecursosMago() {
 
   // Subclasses de Mago
   if (!r.subclasses) r.subclasses = {};
-  const sub = char.subclasse || '';
+  // subclasseDe em vez do espelho char.subclasse: o espelho aponta para a
+  // subclasse da classe INICIAL -- um Ladino/Mago Abjurador perderia os
+  // recursos da tradicao sem nenhum aviso.
+  const sub = subclasseDe(char, 'Mago') || '';
   let subData = {};
 
   if (sub === 'Abjurador') {
@@ -164,7 +168,7 @@ export function getEstadoRecursosMago() {
  */
 export function definirMagiasFixasMago(tipo, escolhas = {}) {
   const def = MAGIAS_FIXAS_MAGO[tipo];
-  if (!def || char?.classe !== 'Mago') return;
+  if (!def || !temClasse(char, 'Mago')) return;
   const destino = tipo === 'maestria_magias' ? char.recursos.mago.maestria_magias
     : char.recursos.mago.assinaturas;
   for (const vaga of def.vagas) {
@@ -186,10 +190,10 @@ export function definirMagiasFixasMago(tipo, escolhas = {}) {
  * personagens que já passaram do nível 18/20 antes destas telas existirem.
  */
 export function sincronizarMagiasFixasMago() {
-  if (char?.classe !== 'Mago') return false;
+  if (!temClasse(char, 'Mago')) return false;
   if (!char.recursos?.mago) return false;
   if (!Array.isArray(char.magias_preparadas)) char.magias_preparadas = [];
-  const nivel = char.nivel || 1;
+  const nivel = nivelNa(char, 'Mago') || 1;
   let alterado = false;
 
   for (const [tipo, def] of Object.entries(MAGIAS_FIXAS_MAGO)) {

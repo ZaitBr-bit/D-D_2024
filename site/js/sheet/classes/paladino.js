@@ -5,14 +5,20 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { calcMod } from '../../utils.js';
-import { char, classeData } from '../estado.js';
+import { char } from '../estado.js';
+import { temClasse, nivelNa, subclasseDe } from '../../regras-multiclasse.js';
+import { dadosDe } from '../contexto-classe.js';
 
 // ============================================================
 // Progressão e recursos do Paladino
 // ============================================================
 function getProgressaoPaladino() {
-  if (char?.classe !== 'Paladino' || !classeData?.tabela_caracteristicas) return null;
-  const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
+  // temClasse/dadosDe/nivelNa: o portao e a leitura da tabela tem de ser
+  // da classe Paladino, mesmo quando ela nao e a inicial do personagem.
+  const dados = dadosDe('Paladino');
+  if (!temClasse(char, 'Paladino') || !dados?.tabela_caracteristicas) return null;
+  const row = dados.tabela_caracteristicas.find(
+    r => parseInt(r['Nível']) === (nivelNa(char, 'Paladino') || 1));
   if (!row) return null;
   const cdStr = String(row['Canalizar Divindade'] || '—');
   const canalizarMax = parseInt(cdStr) || 0;
@@ -20,7 +26,7 @@ function getProgressaoPaladino() {
 }
 
 export function getEstadoRecursosPaladino() {
-  if (char?.classe !== 'Paladino') return null;
+  if (!temClasse(char, 'Paladino')) return null;
   if (!char.recursos) char.recursos = {};
   if (!char.recursos.paladino) {
     char.recursos.paladino = {
@@ -35,7 +41,7 @@ export function getEstadoRecursosPaladino() {
   if (typeof r.canalizar_divindade_usos_gastos !== 'number') r.canalizar_divindade_usos_gastos = 0;
   if (typeof r.destruicao_gratuita_usada !== 'boolean') r.destruicao_gratuita_usada = false;
 
-  const nivel = char.nivel || 1;
+  const nivel = nivelNa(char, 'Paladino') || 1;
   const prog = getProgressaoPaladino() || { canalizarMax: 0 };
 
   // Mãos Consagradas: reserva = 5 × nível
@@ -58,7 +64,10 @@ export function getEstadoRecursosPaladino() {
   const auraCoragemAtiva = nivel >= 10;
 
   // Aura de Devoção (Juramento da Devoção, nível 7+)
-  const auraDevocaoAtiva = char.subclasse === 'Juramento da Devoção' && nivel >= 7;
+  // subclasseDe em vez do espelho char.subclasse: o espelho aponta para a
+  // subclasse da classe INICIAL -- um Guerreiro 3/Paladino 9 com Juramento
+  // da Devoção perdia a Aura de Devoção em silencio.
+  const auraDevocaoAtiva = subclasseDe(char, 'Paladino') === 'Juramento da Devoção' && nivel >= 7;
 
   // Golpes Radiantes (nível 11+)
   const golpesRadiantesAtivo = nivel >= 11;

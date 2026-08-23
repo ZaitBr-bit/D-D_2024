@@ -77,7 +77,7 @@ const CLASSES_DADOS = lerClassesDados();
 // instalarStubs() acima; um import estático no topo deste arquivo rodaria
 // antes do stub existir e quebraria com "window is not defined".
 const combate = await import('../../../site/js/sheet/combate.js');
-const { definirChar, definirClasseData } = await import('../../../site/js/sheet/estado.js');
+const { definirChar, definirClasseData, definirClassesData } = await import('../../../site/js/sheet/estado.js');
 const { getEstadoRecursosPaladino } = await import('../../../site/js/sheet/classes/paladino.js');
 const { getEstadoRecursosGuardiao } = await import('../../../site/js/sheet/classes/guardiao.js');
 const { renderSecaoMagias } = await import('../../../site/js/sheet/magias.js');
@@ -453,6 +453,11 @@ test('getDeslocamentoFinal: Monge "Movimento sem Armadura" -- bônus por nível 
   const classeDataMonge = CLASSES_DADOS.get('Monge');
   for (let nivel = 1; nivel <= 20; nivel++) {
     definirClasseData(classeDataMonge);
+    // renderSheet (pages/sheet.js) sempre seta classeData E classesData
+    // juntos -- getProgressaoMonge le a tabela via dadosDe('Monge'), que
+    // consulta classesData, nao classeData. Sem isto o mapa fica null e o
+    // bonus de deslocamento some por inteiro.
+    definirClassesData(new Map([['Monge', classeDataMonge]]));
     definirChar({ classe: 'Monge', nivel, inventario: [], atributos: atributosBase() });
     const base = metrosIniciais(combate.getDeslocamentoFinal('9'));
     const bonusEsperado = tabela.get(nivel) || 0;

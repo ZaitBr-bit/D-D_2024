@@ -6,10 +6,12 @@
 // ============================================================
 import { getMagiasClasse, getTalentos } from '../../db.js';
 import { abrirModal, calcMod, mdParaHtml, semAcento, toast } from '../../utils.js';
-import { char, classeData, indiceMagiasCache, salvar } from '../estado.js';
+import { char, indiceMagiasCache, salvar } from '../estado.js';
 import { renderFichaCompleta } from '../ficha.js';
 import { achatarMagiasClasse, badgesMagiaRapidos } from '../magias.js';
 import { abrirModalIniciadoEmMagiaFicha, sincronizarTalentosInvocacoes } from '../talentos.js';
+import { temClasse, nivelNa } from '../../regras-multiclasse.js';
+import { dadosDe } from '../contexto-classe.js';
 
 // Os tres Pactos sao invocacoes misticas COMUNS no PHB 2024: aparecem na
 // secao "Opcoes de Invocacoes Misticas" sem pre-requisito e sem nenhuma
@@ -27,8 +29,12 @@ function pactosDe(invocacoes) {
 }
 
 function getProgressaoBruxo() {
-  if (char?.classe !== 'Bruxo' || !classeData?.tabela_caracteristicas) return null;
-  const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
+  // temClasse/dadosDe/nivelNa: o portao e a leitura da tabela tem de ser
+  // da classe Bruxo, mesmo quando ela nao e a inicial do personagem.
+  const dados = dadosDe('Bruxo');
+  if (!temClasse(char, 'Bruxo') || !dados?.tabela_caracteristicas) return null;
+  const row = dados.tabela_caracteristicas.find(
+    r => parseInt(r['Nível']) === (nivelNa(char, 'Bruxo') || 1));
   if (!row) return null;
   return {
     invocacoesMax: parseInt(row['Invocações']) || 0
@@ -36,7 +42,9 @@ function getProgressaoBruxo() {
 }
 
 function getCirculosArcanumDesbloqueados() {
-  const nivel = char?.nivel || 1;
+  // So e chamada por getEstadoRecursosBruxo (gated abaixo), entao o nivel
+  // aqui e sempre o nivel na classe Bruxo.
+  const nivel = nivelNa(char, 'Bruxo') || 1;
   const circulos = [];
   if (nivel >= 11) circulos.push(6);
   if (nivel >= 13) circulos.push(7);
@@ -46,7 +54,7 @@ function getCirculosArcanumDesbloqueados() {
 }
 
 export function getEstadoRecursosBruxo() {
-  if (char?.classe !== 'Bruxo') return null;
+  if (!temClasse(char, 'Bruxo')) return null;
   if (!char.recursos) char.recursos = {};
   if (!char.recursos.bruxo) {
     char.recursos.bruxo = {
@@ -135,7 +143,7 @@ export function getEstadoRecursosBruxo() {
   if (typeof sub.infero.sorte_tenebroso_usos_gastos !== 'number') sub.infero.sorte_tenebroso_usos_gastos = 0;
   if (typeof sub.infero.lancar_inferno_usado !== 'boolean') sub.infero.lancar_inferno_usado = false;
 
-  const nivel = char.nivel || 1;
+  const nivel = nivelNa(char, 'Bruxo') || 1;
   const modCar = Math.max(1, calcMod(char.atributos.carisma));
 
   return {
@@ -170,7 +178,7 @@ export function getEstadoRecursosBruxo() {
 }
 
 export function recuperarEspacosMagiaBruxo(parcial = false) {
-  if (char?.classe !== 'Bruxo' || !char.espacos_magia) return 0;
+  if (!temClasse(char, 'Bruxo') || !char.espacos_magia) return 0;
   const chaves = Object.keys(char.espacos_magia);
   if (chaves.length === 0) return 0;
 
@@ -184,7 +192,7 @@ export function recuperarEspacosMagiaBruxo(parcial = false) {
 
   const totalMax = chaves.reduce((acc, c) => acc + (char.espacos_magia[c]?.total || 0), 0);
   let recuperar = Math.ceil(totalMax / 2);
-  if ((char.nivel || 1) >= 20) recuperar = totalMax;
+  if ((nivelNa(char, 'Bruxo') || 1) >= 20) recuperar = totalMax;
   recuperar = Math.min(recuperar, usadosAntes);
 
   let restante = recuperar;
@@ -201,8 +209,11 @@ export function recuperarEspacosMagiaBruxo(parcial = false) {
 }
 
 function extrairOpcoesInvocacoesBruxo() {
-  if (char?.classe !== 'Bruxo') return [];
-  const texto = classeData?.texto_completo || '';
+  if (!temClasse(char, 'Bruxo')) return [];
+  // dadosDe('Bruxo') em vez de classeData: o texto que carrega a secao
+  // "## Opções de Invocações Místicas" e o do bruxo.json. Com classeData, o
+  // Bruxo nao inicial abria o modal de recursos com a lista vazia.
+  const texto = dadosDe('Bruxo')?.texto_completo || '';
   const marcadorInicio = '## Opções de Invocações Místicas';
   const inicio = texto.indexOf(marcadorInicio);
   if (inicio < 0) return [];
@@ -243,10 +254,10 @@ async function obterMagiasArcanumPorCirculo(circulo) {
 }
 
 export async function abrirModalRecursosBruxo() {
-  if (char?.classe !== 'Bruxo') return;
+  if (!temClasse(char, 'Bruxo')) return;
   const estado = getEstadoRecursosBruxo();
   const opcoes = extrairOpcoesInvocacoesBruxo();
-  const nivel = char.nivel || 1;
+  const nivel = nivelNa(char, 'Bruxo') || 1;
 
   // Separar pactos das demais invocações (só para agrupar na tela)
   const invPactos = opcoes.filter(o => PACTOS.includes(o.nome));
@@ -605,7 +616,7 @@ export async function abrirModalRecursosBruxo() {
 
 // Modal para gerenciar truques e rituais do Pacto do Tomo
 export function abrirModalPactoDoTomo() {
-  if (char?.classe !== 'Bruxo') return;
+  if (!temClasse(char, 'Bruxo')) return;
   const estado = getEstadoRecursosBruxo();
   if (!estado || !estado.pactos.includes('Pacto do Tomo')) return;
 
@@ -765,7 +776,7 @@ function avaliarPrerequisitoInvocacaoBruxoComSel(prerequisito, selSet) {
   const nivelMatch = texto.match(/Bruxo\s*N[ií]vel\s*(\d+)/i);
   if (nivelMatch) {
     const nivelMin = parseInt(nivelMatch[1]);
-    if ((char?.nivel || 1) < nivelMin) {
+    if ((nivelNa(char, 'Bruxo') || 1) < nivelMin) {
       ok = false;
       motivos.push(`requer nível ${nivelMin}`);
     }
@@ -793,7 +804,7 @@ function avaliarPrerequisitoInvocacaoBruxoComSel(prerequisito, selSet) {
 
 // Renderiza a secao de Dadivas do Pacto dentro da area de magias (somente Bruxo)
 export function renderSecaoPactoBruxo() {
-  if (char?.classe !== 'Bruxo') return '';
+  if (!temClasse(char, 'Bruxo')) return '';
   const estado = getEstadoRecursosBruxo();
   if (!estado) return '';
   // Um bloco por pacto: quem leva dois vê as dádivas dos dois.

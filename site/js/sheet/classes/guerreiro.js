@@ -6,12 +6,18 @@
 // ============================================================
 import { getConjuracaoSubclasse } from '../../regras-conjuracao-subclasse.js';
 import { bonusProficiencia, calcMod } from '../../utils.js';
-import { char, classeData } from '../estado.js';
+import { char } from '../estado.js';
+import { temClasse, nivelNa, subclasseDe } from '../../regras-multiclasse.js';
+import { dadosDe } from '../contexto-classe.js';
 
 // Progressão e recursos do Guerreiro
 export function getProgressaoGuerreiro() {
-  if (char?.classe !== 'Guerreiro' || !classeData?.tabela_caracteristicas) return null;
-  const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
+  // temClasse/dadosDe/nivelNa: o portao e a leitura da tabela tem de ser
+  // da classe Guerreiro, mesmo quando ela nao e a inicial do personagem.
+  const dados = dadosDe('Guerreiro');
+  if (!temClasse(char, 'Guerreiro') || !dados?.tabela_caracteristicas) return null;
+  const row = dados.tabela_caracteristicas.find(
+    r => parseInt(r['Nível']) === (nivelNa(char, 'Guerreiro') || 1));
   if (!row) return null;
   return {
     recuperarFolegoMax: parseInt(row['Recuperar Fôlego']) || 2,
@@ -20,7 +26,7 @@ export function getProgressaoGuerreiro() {
 }
 
 export function getEstadoRecursosGuerreiro() {
-  if (char?.classe !== 'Guerreiro') return null;
+  if (!temClasse(char, 'Guerreiro')) return null;
   if (!char.recursos) char.recursos = {};
   if (!char.recursos.guerreiro) {
     char.recursos.guerreiro = {
@@ -68,7 +74,7 @@ export function getEstadoRecursosGuerreiro() {
   if (typeof r.indomavel_usos_gastos !== 'number') r.indomavel_usos_gastos = 0;
 
   const prog = getProgressaoGuerreiro() || { recuperarFolegoMax: 2, maestriasMax: 3 };
-  const nivel = char.nivel || 1;
+  const nivel = nivelNa(char, 'Guerreiro') || 1;
 
   // Surto de Ação: 1 uso até nível 16, 2 usos a partir do nível 17
   const surtoMax = nivel >= 17 ? 2 : 1;
@@ -79,7 +85,11 @@ export function getEstadoRecursosGuerreiro() {
   else if (nivel >= 9) indomavelMax = 1;
 
   // --- Mestre da Batalha ---
-  const ehMestreBatalha = char.subclasse === 'Mestre da Batalha';
+  // subclasseDe em vez do espelho char.subclasse: o espelho aponta para a
+  // subclasse da classe INICIAL -- um Ladino/Guerreiro Mestre da Batalha
+  // perderia dados de superioridade e manobras sem nenhum aviso.
+  const subclasseGuerreiro = subclasseDe(char, 'Guerreiro');
+  const ehMestreBatalha = subclasseGuerreiro === 'Mestre da Batalha';
   let dadosSuperioridadeMax = 0, tipoDadoSuperioridade = 'd8';
   if (ehMestreBatalha && nivel >= 3) {
     // Quantidade: 4 (lv3), 5 (lv7), 6 (lv15)
@@ -90,8 +100,12 @@ export function getEstadoRecursosGuerreiro() {
     if (nivel >= 18) tipoDadoSuperioridade = 'd12';
     else if (nivel >= 10) tipoDadoSuperioridade = 'd10';
   }
+  // bonusProficiencia usa o nivel TOTAL do personagem (livro:2047), nao o
+  // nivel na classe Guerreiro -- por isso le char.nivel direto aqui, em vez
+  // da variavel `nivel` (que e nivelNa e alimenta os degraus de progressao
+  // do Guerreiro e da subclasse acima e abaixo).
   const cdSuperioridade = ehMestreBatalha
-    ? 8 + Math.max(calcMod(char.atributos?.forca || 10), calcMod(char.atributos?.destreza || 10)) + bonusProficiencia(nivel)
+    ? 8 + Math.max(calcMod(char.atributos?.forca || 10), calcMod(char.atributos?.destreza || 10)) + bonusProficiencia(char.nivel || 1)
     : 0;
   let manobrasEsperadas = 0;
   if (ehMestreBatalha && nivel >= 3) {
@@ -103,7 +117,10 @@ export function getEstadoRecursosGuerreiro() {
   const manobrasConhecidasLista = char.manobras_conhecidas || [];
   const manobrasConhecidas = manobrasConhecidasLista.length;
   const manobrasPendentes = Math.max(0, manobrasEsperadas - manobrasConhecidas);
-  const opcoesManobraTexto = classeData?.subclasses?.find(sc => sc.nome === 'Mestre da Batalha')?.opcoes_manobra || [];
+  // dadosDe('Guerreiro') em vez de classeData: as opcoes de manobra tem de
+  // vir do guerreiro.json mesmo quando o Guerreiro nao e a classe inicial --
+  // com classeData o bloco renderizava as manobras com a descricao em branco.
+  const opcoesManobraTexto = dadosDe('Guerreiro')?.subclasses?.find(sc => sc.nome === 'Mestre da Batalha')?.opcoes_manobra || [];
   const manobrasComDescricao = manobrasConhecidasLista.map(nome => {
     const op = opcoesManobraTexto.find(o => o.nome === nome);
     return { nome, descricao: op?.descricao || '' };
@@ -112,7 +129,7 @@ export function getEstadoRecursosGuerreiro() {
   const implacavelAtivo = ehMestreBatalha && nivel >= 15;
 
   // --- Combatente Psíquico ---
-  const ehCombatentePsiquico = char.subclasse === 'Combatente Psíquico';
+  const ehCombatentePsiquico = subclasseGuerreiro === 'Combatente Psíquico';
   let dadosPsionicosMaxG = 0, tipoDadoPsionicoG = 'd6';
   if (ehCombatentePsiquico && nivel >= 3) {
     if (nivel >= 17) { dadosPsionicosMaxG = 12; tipoDadoPsionicoG = 'd12'; }
@@ -180,8 +197,16 @@ export function getEstadoRecursosGuerreiro() {
  * para o nível 3 a subclasse ainda não está em `char`.
  */
 export function getCavaleiroMisticoConjuracao(opcoes = {}) {
-  const classe = opcoes.classe ?? char?.classe;
-  const subclasse = opcoes.subclasse ?? char?.subclasse;
-  const nivel = opcoes.nivel ?? char?.nivel ?? 1;
+  // Os fallbacks vinham dos espelhos (char.classe/char.subclasse), que so
+  // descrevem a classe INICIAL: um Ladino 5/Guerreiro 7 Cavaleiro Místico
+  // nao recebia espaco de magia nenhum. O nome da classe NAO e chapado --
+  // se o personagem nao tem Guerreiro, `classe` fica null e
+  // getConjuracaoSubclasse devolve null (`def.classe !== classe`), que e
+  // exatamente o "nada" de antes.
+  const classe = opcoes.classe ?? (temClasse(char, 'Guerreiro') ? 'Guerreiro' : null);
+  const subclasse = opcoes.subclasse ?? subclasseDe(char, 'Guerreiro');
+  // nivelNa em vez de char?.nivel: e o nivel do personagem NA classe
+  // Guerreiro que importa aqui, nao o total.
+  const nivel = opcoes.nivel ?? nivelNa(char, 'Guerreiro') ?? 1;
   return getConjuracaoSubclasse(classe, subclasse === 'Cavaleiro Místico' ? subclasse : null, nivel);
 }

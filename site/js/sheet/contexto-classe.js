@@ -45,3 +45,15 @@ export function montarContextos(personagem, mapaDados) {
 export function contextosDeClasse() {
   return montarContextos(char, classesData);
 }
+
+/**
+ * Dados de UMA classe do personagem, pelo nome.
+ * Devolve null explicito quando a classe nao esta carregada -- o consumidor
+ * decide, como em montarContextos. Existe para os 12 modulos de classe nao
+ * repetirem `classesData?.get(...)` doze vezes.
+ * @param {string} nomeClasse
+ * @returns {object|null}
+ */
+export function dadosDe(nomeClasse) {
+  return classesData?.get?.(nomeClasse) || null;
+}

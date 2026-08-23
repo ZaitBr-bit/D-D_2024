@@ -5,11 +5,17 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { calcMod } from '../../utils.js';
-import { char, classeData } from '../estado.js';
+import { char } from '../estado.js';
+import { temClasse, nivelNa } from '../../regras-multiclasse.js';
+import { dadosDe } from '../contexto-classe.js';
 
 function getProgressaoFeiticeiro() {
-  if (char?.classe !== 'Feiticeiro' || !classeData?.tabela_caracteristicas) return null;
-  const row = classeData.tabela_caracteristicas.find(r => parseInt(r['Nível']) === (char.nivel || 1));
+  // temClasse/dadosDe/nivelNa: o portao e a leitura da tabela tem de ser
+  // da classe Feiticeiro, mesmo quando ela nao e a inicial do personagem.
+  const dados = dadosDe('Feiticeiro');
+  if (!temClasse(char, 'Feiticeiro') || !dados?.tabela_caracteristicas) return null;
+  const row = dados.tabela_caracteristicas.find(
+    r => parseInt(r['Nível']) === (nivelNa(char, 'Feiticeiro') || 1));
   if (!row) return null;
   const pontosStr = String(row['Pontos de Feitiçaria'] || '0').trim();
   const pontosMax = pontosStr === '—' ? 0 : (parseInt(pontosStr) || 0);
@@ -17,7 +23,7 @@ function getProgressaoFeiticeiro() {
 }
 
 export function getEstadoRecursosFeiticeiro() {
-  if (char?.classe !== 'Feiticeiro') return null;
+  if (!temClasse(char, 'Feiticeiro')) return null;
   if (!char.recursos) char.recursos = {};
   if (!char.recursos.feiticeiro) {
     char.recursos.feiticeiro = {

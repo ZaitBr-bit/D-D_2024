@@ -506,3 +506,540 @@ O sub-projeto 5 (subida de nivel com escolha de classe) e o que torna
 multiclasse alcancavel. Ele NAO pode entrar antes de o 3b dar contexto a
 renderFeatureItem -- senao o primeiro jogador a fazer Clerigo/Paladino ganha um
 botao que gasta o recurso da outra classe, e grava.
+
+================================================================================
+Tarefa 1 (render por classe): getEstadoRecursosX e a fachada publica (2026-08-23)
+================================================================================
+
+Achado ao escrever os oraculos 1-4 de testes/regras/unidade/multiclasse-render.test.mjs
+(sub-projeto 3b, Tarefa 1). O spec generalizava a partir de clerigo.js que os
+12 modulos de classe "tem a mesma forma" -- verdade para os PORTOES (os tres
+defeitos da substituicao de tres partes, conferidos um a um nos 12), falso
+para a SUPERFICIE PUBLICA:
+
+  - exportam getProgressaoX: 4 classes -- barbaro, clerigo, guerreiro, monge;
+  - so exportam getEstadoRecursosX: bruxo, druida, feiticeiro, guardiao,
+    ladino, mago, paladino (7 classes; getProgressaoX existe, mas privado,
+    chamado so por dentro do proprio modulo);
+  - nome proprio, sem getProgressaoX nenhum: getEstadoFuria (barbaro, que
+    tambem exporta getProgressaoBarbaro) e getEstadoInspiracaoBardo (bardo,
+    que nao exporta nada chamado getEstadoRecursos nem getProgressao).
+
+Confirmado com Object.keys() de cada modulo importado -- ex.:
+sheet/classes/paladino.js so exporta ['getEstadoRecursosPaladino'].
+
+PRIMEIRA VERSAO (revertida): os oraculos 1 e 4 chamavam
+sheetClasses.paladino.getProgressaoPaladino() diretamente, verbatim conforme
+o brief original. Como a funcao nao e exportada, a chamada lancava TypeError
+("nao e funcao") em vez de falhar por VALOR -- os QUATRO oraculos ficavam
+vermelhos (inclusive o 4, que deveria nascer verde), e o motivo do oraculo 4
+nao tinha nada a ver com o helper porNaFicha (que ja estava correto,
+confirmado por getProgressaoClerigo() responder certo no mesmo cenario).
+
+DECISAO (2026-08-23, revisao do coordenador): a assimetria e DELIBERADA, nao
+descuido -- getEstadoRecursosX (ou o nome proprio equivalente) e a FACHADA
+publica de cada modulo, a mesma que os ~40 pontos de chamada em
+habilidades.js e hp-descanso.js usam. Exportar getProgressaoX nos sete
+modulos que o mantem privado mudaria a API publica so por conveniencia de
+teste -- abriria uma porta nova em vez de passar pela que existe. Os
+oraculos foram reescritos para medir por getEstadoRecursosClerigo() e
+getEstadoRecursosPaladino() (ja exportados, ja fachada) em vez de
+getProgressaoClerigo()/getProgressaoPaladino(). Nenhum dos 12 modulos de
+classe foi tocado.
+
+RESULTADO: os oraculos 1-3 falham por assercao de VALOR (nao TypeError), e o
+oraculo 4 -- o canario de classe unica -- passa contra a arvore atual, como
+o desenho original pretendia. Ver task-1-report.md para a saida completa.
+
+PARA A TAREFA 2: ao aplicar a substituicao de tres partes, a fachada publica
+de cada modulo (getEstadoRecursosX, ou getEstadoFuria/getEstadoInspiracaoBardo)
+e o que os testes e os pontos de chamada reais consomem -- getProgressaoX
+privado nao precisa virar publico, e nao deve, salvo decisao de produto em
+contrario.
+
+================================================================================
+Tarefa 2 (12 modulos de classe): a armadilha inversa mordeu de novo (2026-08-23)
+================================================================================
+
+Achado ao aplicar a substituicao de tres partes nos 12 modulos
+(site/js/sheet/classes/*.js). O brief avisou: leituras de char.nivel que
+alimentam bonusProficiencia sao nivel TOTAL (livro:2047) e ficam. O aviso
+citava barbaro.js:265 (Presenca Intimidante) como exemplo isolado -- mas a
+armadilha e mais larga: em TRES arquivos a mesma variavel local `nivel` e
+compartilhada entre degraus de progressao da classe (que devem virar nivelNa)
+E uma chamada a bonusProficiencia (que nao pode).
+
+ONDE:
+  - guerreiro.js: `const nivel = char.nivel || 1;` alimenta surtoMax,
+    indomavelMax (degraus do Guerreiro, converteram para nivelNa) E
+    cdSuperioridade = 8 + mod + bonusProficiencia(nivel) -- a CD de
+    salvaguarda das manobras do Mestre da Batalha.
+  - ladino.js: mesmo padrao, DUAS vezes -- cdGolpeAstuto (Golpe Astuto) e
+    cdPsionicaAdaga (Adaga Espiritual).
+  - monge.js: mesmo padrao uma vez -- cdFoco (CD de Foco/Ki).
+
+Se a conversao em lote tivesse trocado so a DECLARACAO de `nivel` para
+nivelNa (o jeito obvio de aplicar a substituicao), as quatro CDs acima
+teriam silenciosamente passado a usar o nivel NA CLASSE em vez do TOTAL --
+enfraquecendo a salvaguarda de um personagem multiclasse sem nenhum teste
+existente acusar (nenhum teste de unidade cobre essas quatro CDs com
+personagem multiclasse hoje).
+
+O QUE FOI FEITO: a declaracao de `nivel` virou nivelNa(char, 'Classe') em
+todos os tres arquivos (correto para os degraus de progressao, que SAO da
+classe). Nas quatro chamadas a bonusProficiencia, a leitura foi trocada para
+`char.nivel` DIRETO (nao a variavel `nivel`), com comentario explicando o
+motivo -- mesmo tratamento que barbaro.js:265 ja tinha. Nenhuma assinatura
+mudou; e a mesma tecnica que a Tarefa 1/desenho ja previa para os casos
+"isolados", so aplicada aos casos onde a variavel e COMPARTILHADA.
+
+RECOMENDADO para tarefas futuras (3d, que mexe em CD de magia e
+salvaguardas): ao cacar bonusProficiencia(nivel) onde `nivel` e uma variavel
+local, sempre conferir se ela tambem alimenta degraus de classe antes de
+decidir se e seguro converte-la na declaracao ou se precisa duplicar a
+leitura como aqui.
+
+================================================================================
+Tarefa 2: teste existente depende de classesData que a propria suite nao seta (2026-08-23)
+================================================================================
+
+ACHADO ao rodar a suite completa apos a substituicao de tres partes nos 12
+modulos. testes/regras/unidade/classes-passivas.test.mjs:449-463 ("Monge
+Movimento sem Armadura -- bonus por nivel") comecou a falhar: para todo
+nivel, o bonus de deslocamento voltou 0 (esperado ate +3m a partir do nivel
+2).
+
+CAUSA RAIZ: aquele teste chama so sheetEstado.definirClasseData(classeDataMonge),
+nunca sheetEstado.definirClassesData(...). getProgressaoMonge, antes da
+Tarefa 2, lia a tabela do `classeData` singular (que o teste seta). Depois
+da substituicao de tres partes ele passou a ler via dadosDe('Monge'), que
+por sua vez le `classesData?.get('Monge')` -- o MAPA por classe que a
+Tarefa 1 introduziu. Como o teste nunca chama definirClassesData, o mapa
+fica null, dadosDe devolve null, e getProgressaoMonge cai no portao
+"!dados?.tabela_caracteristicas" -- devolvendo null onde antes devolvia a
+tabela.
+
+NAO E REGRESSAO DE COMPORTAMENTO REAL: site/js/pages/sheet.js (o fluxo real
+de abrir a ficha) SEMPRE chama definirClasseData E definirClassesData juntos
+(linhas 42 e 52) -- o mapa cobre inclusive personagem de classe unica. O
+canario de classe unica (oraculo 4 de multiclasse-render.test.mjs, que MONTA
+o cenario do jeito que sheet.js monta) continua verde. O teste que quebrou e
+o UNICO, entre ~3450, que chama definirClasseData sem o par
+definirClassesData -- um atalho de setup que ja existia antes da Tarefa 2 e
+nunca tinha sido exercitado por um caminho que dependesse do mapa.
+
+POR QUE NAO FOI CONSERTADO AQUI: a Tarefa 2 e proibida de tocar qualquer
+arquivo fora de site/js/sheet/classes/*.js (12 arquivos, restricao
+explicita do brief). classes-passivas.test.mjs esta fora desse escopo.
+
+RECOMENDADO: antes de fechar o sub-projeto 3b (ou na correcao final dele),
+acrescentar, no teste de Movimento sem Armadura do Monge
+(classes-passivas.test.mjs:453-456), a chamada
+`sheetEstado.definirClassesData(new Map([['Monge', classeDataMonge]]))`
+junto de definirClasseData -- o mesmo par que multiclasse-render.test.mjs
+ja usa (porNaFicha). E so essa uma ocorrencia: os outros dois usos de
+CLASSES_DADOS.get(...) no mesmo arquivo (linhas 1023 e 1094, testes do
+Clerigo) nao exercitam getProgressaoClerigo/canalizarDivindadeMax e por
+isso nao quebraram.
+
+================================================================================
+RESOLVIDO (2026-08-23) -- o item acima, do teste de Movimento sem Armadura
+do Monge, foi consertado na propria Tarefa 2 do sub-projeto 3b. Autorizei
+o implementador a sair dos 12 arquivos so para isso. O par
+definirClassesData foi acrescentado tambem em subclasse-conjuradora.mjs
+(linha 204), preventivamente, porque 3c/3d/3e vao levar mais codigo por
+dadosDe. Rejeitei a alternativa de fazer dadosDe cair de volta em
+classeData quando classesData faltar: seria ponte de compatibilidade
+escondendo a dependencia recem-criada.
+
+================================================================================
+CD DE PRESENCA INTIMIDANTE DO BARBARO SEM ORACULO (barbaro.js:277)
+
+CONTEXTO: a Tarefa 2 do sub-projeto 3b converteu os 12 modulos de classe
+para nivel por classe. O implementador achou CINCO chamadas de
+bonusProficiencia em que a mesma variavel local `nivel` alimentava a CD de
+salvaguarda E os degraus de progressao da classe -- converter a declaracao,
+que era o movimento obvio e o que o brief mandava, teria rebaixado quatro
+CDs de nivel total para nivel de classe, em silencio. Um Ladino 3/Guerreiro
+14 teria CD com +2 em vez de +6.
+
+A revisao independente mostrou que as cinco chamadas nao tinham NENHUM
+oraculo: mutadas as cinco de uma vez, a suite inteira de ~3450 testes
+passava. A rodada de correcao escreveu o oraculo 5 de
+multiclasse-render.test.mjs, com Barbaro 3/Guerreiro 14 (total 17 -> +6;
+na classe 3 -> +2).
+
+O BURACO QUE SOBROU: das cinco, quatro caem individualmente quando
+mutadas. A de barbaro.js:277 (CD de Presenca Intimidante) NAO cai. Motivo:
+aquela CD e calculada dentro de um listener de clique e so sai como texto
+de toast() -- nao existe fachada publica do modulo que a exponha. As
+outras quatro saem por getEstadoRecursosX.
+
+POR QUE NAO FOI CONSERTADO AQUI: o unico jeito de cobri-la seria expor a
+CD por uma fachada nova, e a Tarefa 2 proibia mudar assinatura publica dos
+12 modulos -- e a estabilidade das assinaturas e justamente o que mantem
+validos os ~40 pontos de chamada em habilidades.js e hp-descanso.js, que
+a tarefa nao pode tocar. Montar um DOM completo so para dirigir o listener
+tambem estava fora do escopo.
+
+DECIDIDO: fica para o sub-projeto 3c. E 3c quem converte
+setupEventosHabilidades -- ou seja, e o sub-projeto que precisa construir a
+superficie de teste de handlers de clique de qualquer forma. Cobrir esta CD
+la e reaproveitar essa superficie, em vez de abrir uma excecao de
+assinatura publica agora. Registrado aqui para que 3c nao o perca de vista.
+
+RISCO ENQUANTO ISSO: baixo e nao regressivo. A CD esta CERTA hoje (le
+nivel total, com comentario explicando). O que falta e a rede contra a
+proxima refatoracao -- e a refatoracao perigosa e exatamente a obvia
+("converter a declaracao"), que agora derruba o oraculo 5 pelas outras
+quatro chamadas. Ou seja: uma conversao em lote e pega; so uma conversao
+cirurgica isolada nessa unica linha passaria despercebida.
+
+================================================================================
+Tarefa 3 (oraculos de renderFeatureItem): um oraculo do brief nasce VERDE, e
+o seletor de "Duplicidade" precisou de ajuste (2026-08-23)
+================================================================================
+
+Achado ao escrever os oraculos 9-13 de multiclasse-render.test.mjs (sub-
+projeto 3b, Tarefa 3; renumerados de "5-9" porque a rodada de correcao da
+Tarefa 2 ja tinha ocupado 5-8 no mesmo arquivo).
+
+1) O oraculo "armadilha inversa" (brief chama de "7", aqui vira "11": "as
+CDs de bonusProficiencia usam o nivel TOTAL") NASCE VERDE, apesar do brief
+afirmar "confirme que os cinco falham".
+
+CAUSA: a leitura que ele mede -- cdPresenca = 8 + modFor +
+bonusProficiencia(char.nivel || 1), em habilidades.js:3065, dentro do bloco
+de Presenca Intimidante do Berserker -- usa char.nivel, e char.nivel e
+escrito por regras-multiclasse.js:153 como a SOMA de todas as classes,
+SEMPRE, independente de qual e a classe inicial e independente de
+renderFeatureItem ler ou ignorar `ctx`. Ou seja: o bug que esta tarefa
+existe para expor (renderFeatureItem ignora `ctx`) nao tem efeito
+observavel NESTE ponto de leitura especifico -- a asserção nao olha para o
+que muda (motivo 1 da lista do coordenador), nao porque a asserção esteja
+mal escrita, mas porque o valor medido e invariante a `ctx` hoje.
+
+Nao ha fixture que resolva isso sem quebrar o proposito do oraculo: o bloco
+de Presenca Intimidante so renderiza com Barbaro como classe INICIAL (o
+portao ja coberto pelos oraculos 9/10) -- e com Barbaro inicial,
+char.nivel ja e o total por construcao do espelho, entao a fixture nao tem
+grau de liberdade para separar "le ctx" de "ignora ctx" nesse valor.
+
+O QUE O ORACULO 11 REALMENTE E: uma rede de regressao valida contra uma
+FUTURA conversao em massa que trocasse bonusProficiencia(char.nivel) por
+bonusProficiencia(ctx.nivelClasse) nesse bloco -- a mesma armadilha que ja
+mordeu a Tarefa 2 quatro vezes (ver entrada acima, "a armadilha inversa
+mordeu de novo"). So que ele nao serve como oraculo "nasce vermelho" para o
+contrato de ctx que a Tarefa 3 existe para fixar.
+
+O QUE FOI FEITO: nada -- o oraculo foi mantido exatamente como o brief
+manda (fixture, valores e asserções identicos), por instrução explicita da
+propria Tarefa 3 ("se um oraculo nascer verde, pare e relate em vez de
+ajustar"). Reportado em task-3-report.md.
+
+RECOMENDADO: aceitar o oraculo 11 como rede de regressao (nao como oraculo
+"nasce vermelho") -- ele ja cumpre um papel real. Um oraculo adicional que
+force vermelho para especificamente a leitura de nivel de Presenca
+Intimidante exigiria expor a CD por uma fachada testavel fora do listener
+de clique -- o mesmo trabalho ja registrado como pendente para o
+sub-projeto 3c na entrada "CD DE PRESENCA INTIMIDANTE DO BARBARO SEM
+ORACULO" (acima), pelo mesmo motivo.
+
+2) O oraculo da "Duplicidade" (brief chama de "8", aqui vira "12") tinha um
+seletor que mediria a caracteristica ERRADA. A subclasse Dominio da
+Trapaca tem DUAS caracteristicas com "Duplicidade" no nome, nesta ordem no
+catalogo: "Invocar Duplicidade" (o gatilho, sem numero de cura) antes de
+"Duplicidade Aprimorada" (nivel 17, o texto "cure PV = nivel de Clerigo"
+que o oraculo quer medir). O seletor do brief, `f.nome.includes
+('Duplicidade')` com `.find()`, pega a PRIMEIRA -- "Invocar Duplicidade" --
+cujo HTML nunca contem numero de cura nenhum. O oraculo nasceria vermelho
+pelo motivo ERRADO e continuaria vermelho MESMO DEPOIS da Tarefa 4
+consertar ctx, porque a caracteristica errada nunca emite "(N)".
+
+O QUE FOI FEITO: seletor trocado para nome exato (`f.nome === 'Duplicidade
+Aprimorada'`). Verificado manualmente (script descartavel, sem tocar
+producao) que o HTML real hoje mostra "cure PV = nivel de Clerigo (15)"
+para uma fixture de Clerigo 5/Paladino 10 -- confirma o bug do jeito que o
+brief descreve, com o seletor corrigido o oraculo nasce vermelho pelo
+motivo certo.
+
+RESULTADO FINAL: dos 5 oraculos novos, 3 nascem vermelhos (9, 12, 13) e 2
+verdes (10 -- canario intencional do par 9/10; 11 -- rede de regressao,
+nao oraculo "nasce vermelho", ver acima). Suite completa: 3463 testes /
+3203 pass / 3 fail / 257 skip.
+
+================================================================================
+CORRIGIDO (2026-08-23) -- o item acima (oraculo 11) estava MEIA analise: ele
+nao so nascia verde por nao depender de ctx, estava REALMENTE QUEBRADO
+================================================================================
+
+O coordenador mutou habilidades.js:3065 para `const cdPresenca = 999` e o
+oraculo 11 continuou verde -- nao e so "verde por invariancia a ctx", como o
+item acima concluiu; sao TRES defeitos empilhados no proprio oraculo:
+
+  1. atributo errado no valor esperado: comparava contra
+     utils.calcMod(p.atributos.carisma), mas a formula real usa
+     calcMod(char.atributos.forca) -- Forca, nao Carisma;
+  2. o fixture escondia o erro 1: Forca e Carisma eram os DOIS 15 (mod +2),
+     entao o atributo errado dava o numero certo por coincidencia -- o modo
+     de falha "o cenario escolhido e um ponto onde o certo e o errado
+     coincidem", que a propria Tarefa 3 pede para vigiar e nao foi aplicado
+     a este oraculo;
+  3. `html.includes(String(cdCerta))` sobre um numero solto ("16") casava
+     em qualquer lugar do HTML -- por isso sobreviveu a CD 999 (o 999 nao
+     aparecia, mas o "16" antigo, de outro trecho do bloco, continuava la).
+
+CONSERTADO: fixture com Forca 18 (mod +4, divergente do mod +2 de Carisma,
+fechando o esconderijo do erro 2); valores literais na asserção (8+4+6=18
+certa; 8+4+2=14 errada por nivel de classe; 8+2+6=16 errada por atributo);
+ancora na frase completa `CD ${cdPresenca} (SAB)`, nao no numero solto.
+
+TENSAO PROVADA POR MUTACAO (habilidades.js restaurado com `cp` de um
+backup a cada vez, nunca `git checkout --`):
+  - cdPresenca = 999                              -> oraculo fica VERMELHO
+  - bonusProficiencia(3) (nivel de classe, o erro que a Tarefa 4 poderia
+    cometer)                                       -> oraculo fica VERMELHO
+  - calcMod(char.atributos.carisma) (atributo errado, o erro 1 original,
+    agora sem onde se esconder)                    -> oraculo fica VERMELHO
+  - restaurado                                      -> oraculo volta a VERDE
+
+Detalhe honesto: nas tres mutacoes quem falha primeiro e a asserção
+POSITIVA ("CD 18 (SAB)" ausente) -- as duas negativas ("CD 14"/"CD 16"
+ausentes) nunca chegam a ser avaliadas nestas mutacoes especificas, porque
+so cdPresenca===18 satisfaz a positiva, que sozinha ja rejeita qualquer
+valor errado. As negativas ficam como documentacao executavel de qual erro
+produz qual numero -- nao enfraquecem o oraculo, so nao sao, tecnicamente,
+obrigatorias para estas tres mutacoes.
+
+Revisados tambem os oraculos 9/10 (ancora `data-clerigo-cd-acao`, 20
+caracteres, so ocorre dentro do bloco condicional certo -- sem risco de
+colisao) e 13 (contagem por regex de tag completa, nao includes() sobre
+valor curto -- tecnica ja diferente da que quebrou o 11). Nenhum dos dois
+foi mudado. O oraculo 12 recebeu so um reforco de ancora (frase completa
+"nível de Clérigo (N)" em vez do numero solto "(N)"), com confirmacao de
+que a frase ocorre so 1 vez no HTML com numero anexado (2 ocorrencias de
+"nível de Clérigo" no total, so 1 seguida de "(N)").
+
+RESULTADO: mesmos 3 vermelhos (9, 12, 13) e 2 verdes (10, 11) de antes --
+mas agora o oraculo 11 verde tem tensao real provada por mutacao, nao
+"verde por construcao" sem verificacao. Ver task-3-report.md, secao
+"Rodada de correcao 1/5", para a saida completa de cada mutacao.
+
+================================================================================
+Tarefa 3, rodada 2/5: os 5 oraculos prendiam so 4/144 (~3%) da Tarefa 4;
+achado sobre o tamanho real da tarefa data-classe (2026-08-23)
+================================================================================
+
+Revisao independente da rodada 1: conformidade OK, qualidade nao -- pergunta
+feita ao revisor ("que parte da Tarefa 4 pode ser feita errada sem nenhum dos
+cinco oraculos falhar?") devolveu 4 dos 144 pontos de conversao prendidos
+(~3%). Correcoes aplicadas, relatadas em detalhe em task-3-report.md, secao
+"Rodada de correcao 2/5". Duas achados vale registrar aqui tambem:
+
+1) O ORACULO 14 (Clerigo como SEGUNDA classe) e o mais valioso do arquivo.
+TODOS os fixtures anteriores (9-13) mediam a classe medida como a classe
+INICIAL do roteiro -- como os espelhos char.classe/char.subclasse sempre
+apontam para a inicial, eles CONCORDAVAM com ctx por coincidencia, deixando
+95/96 conversoes de char.subclasse e 25/26 de char.classe INVISIVEIS a este
+arquivo. Um Paladino 10/Clerigo 5 renderiza o bloco do Clerigo VAZIO hoje.
+O oraculo 14 inverte a ordem (Paladino inicial, Clerigo segunda) e nasce
+vermelho pela guarda contra vacuidade -- o bloco nao renderiza NADA, nao so
+"com o numero errado". CONSEQUENCIA PARA A TAREFA 4: qualquer implementacao
+que continue lendo os espelhos para o portao de classe/subclasse (em vez de
+ctx.classe/ctx.subclasse) falha aqui, independente do que fizer com o nivel.
+
+2) TAMANHO REAL DA TAREFA data-classe (I3): os "144 pontos" do spec contam
+LEITURAS de char.classe/char.subclasse/char.nivel a converter para ctx -- um
+eixo DIFERENTE de "quantos elementos interativos precisam ganhar
+data-classe". Contagem real em habilidades.js: 167 ocorrencias de <button>,
+20 atributos data-*-acao distintos, ZERO data-classe hoje. Depois desta
+rodada (oraculos 11/13/17 cobrindo 6 classes, ~7-8 blocos), a cobertura de
+data-classe ainda e da ordem de dezenas contra as ~167 ocorrencias de
+<button> -- maior, numericamente, que a tarefa de conversao de leituras. A
+Tarefa 4 NAO deve presumir que consertar os pontos que os oraculos medem
+cobre a superficie inteira de data-classe -- nenhum oraculo (nem antes nem
+depois desta rodada) tenta ser exaustivo nessa dimensao.
+
+RECOMENDADO para a Tarefa 4: tratar a conversao de leituras (char.classe/
+char.subclasse/char.nivel -> ctx) e a emissao de data-classe como DUAS
+tarefas de escopo diferente, com contagens proprias -- nao assumir que
+"convertida a leitura, o botao ja carrega data-classe" (sao mudancas de
+codigo INDEPENDENTES no mesmo template literal).
+
+ACHADO MENOR, tambem desta rodada: a premissa do coordenador de que trocar
+o fixture de 9/10/13 para Clerigo 3/Paladino 7 prenderia habilidades.js:3679
+(botao "Fulminar Mortos-Vivos", nivel>=5) "de graca" nao se sustentou
+sozinha -- medido contra um cenario simulado onde data-classe foi
+adicionado aos 3 botoes mas o bug de nivel continua: as DUAS assercoes
+originais do oraculo 13 (botoes>0, comClasse===botoes) PASSAM apesar do
+bug, porque nenhuma fixa a CONTAGEM certa, so a proporção. Acrescentada uma
+terceira assercao (`botoes === 2`), com o valor certo confirmado mutando
+habilidades.js:3679 (restaurado com `cp`, checksum conferido).
+
+================================================================================
+A SUITE DE PARIDADE NAO DA SINAL NENHUM HOJE (medido em 2026-08-23)
+
+Ja havia uma entrada anterior sobre REPO_ORIGINAL neste arquivo. Esta a
+substitui com numeros medidos, porque a situacao e pior do que aquela dizia.
+
+O QUE MEDI, na Tarefa 5 do sub-projeto 3b:
+
+  COM REPO_ORIGINAL apontando para C:/ControleVersaoGit/Pessoal/DeD_2024:
+    299 failed / 26 passed / 1 skipped
+
+  SEM a variavel, rodando de uma worktree:
+    ORIG resolve para <worktree>/../D-D_2024, ou seja
+    C:/ControleVersaoGit/Pessoal/worktrees/D-D_2024 -- que NAO EXISTE.
+
+CAUSA DAS 299 FALHAS, e nao e o multiclasse:
+
+  DeD_2024 (a referencia) parou em 5c05bc8, de 2026-08-08.
+  O main deste projeto tem 20+ commits desde entao, ate 34d8f2d de
+  2026-08-22 -- incluindo trabalho grande de magias, especies, subclasses,
+  pactos do Bruxo e atributos editaveis.
+
+  A referencia esta DUAS SEMANAS e ~20 commits de feature defasada. As 299
+  falhas sao o esperado. Nenhuma das 299 menciona data-classe, que e o
+  atributo novo do sub-projeto 3b.
+
+CONSEQUENCIA PARA O REGISTRO: qualquer numero de paridade citado nos
+relatorios das Tarefas 1 a 4 deste sub-projeto ("paridade 26/1 skip/0",
+"paridade 40/1 skip/0") NAO mediu paridade. Ou apontava para caminho
+inexistente, ou comparava o repositorio com ele mesmo. Nao use esses
+numeros como evidencia de nada.
+
+O QUE AINDA DA SINAL, e e o que sustenta o sub-projeto 3b:
+
+  - suite de unidade: 3469 testes, 3212 pass, 0 fail
+  - e2e de regras: 263 pass, 0 fail
+  - prova de classe unica: 1200 cenarios (12 classes x 20 niveis x todas as
+    subclasses reais + sem subclasse), ZERO diferencas depois de remover os
+    data-classe -- com verificacao de nao-vacuidade: 1180 dos 1200 diferiam
+    no HTML bruto, provando que a normalizacao nao esconde nada
+
+DECIDIDO: a paridade NAO e portao para o sub-projeto 3b. Consertar o
+instrumento e trabalho proprio, e a escolha entre "atualizar DeD_2024" e
+"aposentar a suite" e do dono do projeto, nao minha.
+
+RECOMENDADO: atualizar DeD_2024 para o commit que o projeto considerar a
+linha de base atual, ou aposentar a suite de paridade. Uma suite que falha
+299 de 326 nao e lida por ninguem, e uma suite que ninguem le nao protege
+nada. Enquanto ela ficar assim, uma regressao real entra sem ser vista.
+
+================================================================================
+ERRO MEU NO BRIEF DA TAREFA 5, achado pelo implementador
+
+O passo 4 que escrevi mandava provar que setupEventosHabilidades ficou
+intacta comparando o prefixo ate `export function renderFeatureItem`:
+
+  n = b.index(b'export function renderFeatureItem')
+  print(b[:n] == d[:d.index(b'export function renderFeatureItem')])
+
+Isso da "False" mesmo com a funcao intacta, porque as Tarefas 3 e 4
+acrescentaram um bloco JSDoc IMEDIATAMENTE ANTES de renderFeatureItem --
+entao o prefixo do arquivo novo inclui o JSDoc e o do blob nao.
+
+O implementador nao ajustou o script ate dar verde: mediu por comparacao
+direta da FAIXA de linhas 100-2483, confirmou que setupEventosHabilidades
+esta intacta, e documentou a armadilha para quem re-rodar o script literal
+do brief nao ser enganado. Foi a decisao certa.
+
+E o sexto erro meu de material achado por um implementador neste
+sub-projeto. Os outros cinco estao no ledger.
+
+================================================================================
+PRE-REQUISITO DO 3C: O DOM ENTREGUE PELO 3B ESTA MEIO CARIMBADO
+
+Achado pela revisao final de branch do 3b, medindo. Nao e defeito do 3b --
+ficha.js esta fora do escopo declarado (plano, linha 28) -- mas e informacao
+que o 3c PRECISA e que nao estava registrada em lugar nenhum.
+
+O QUE ACONTECE: dentro de renderFeatureItem o carimbo `data-classe` e
+perfeito -- medido em 198 pares de classes, 0 elementos sem carimbo, e os 30
+grupos que compartilham os mesmos atributos `data-*` ficaram todos
+desambiguados. O problema e que OS MESMOS SELETORES que os handlers do 3c
+consomem tambem sao emitidos DE FORA de renderFeatureItem, sem carimbo:
+
+  seletor                    dentro (carimbado)   fora (SEM carimbo)   onde
+  data-mago-acao                     6                    8          ficha.js
+  data-feiticeiro-acao              17                    4          ficha.js
+  data-guerreiro-acao               12                    3          ficha.js
+  data-ladino-acao                   6                    3          ficha.js
+  data-guardiao-acao                 3                    3          ficha.js
+  data-paladino-acao                 3                    3          ficha.js
+  data-monge-acao                    2                    3          ficha.js
+  data-conjurar-pacto                0                    4          classes/bruxo.js
+  data-usar-habilidade               1                    2          caracteristicas.js
+  data-toggle-uso                    1                    2          caracteristicas.js
+  +7 outros (furia-toggle, druida-*, bruxo-*, inspiracao-acao,
+   maos-curativas...)                0-1                 1-2         ficha.js
+
+EXEMPLO CONCRETO: ficha.js:100 emite
+  <button ... data-mago-acao="recuperacao-arcana">
+sem data-classe, e o handler e um unico
+  document.querySelectorAll('[data-mago-acao]')
+
+Um 3c que faca `nivelNa(char, el.dataset.classe)` recebe **undefined em 8 dos
+14 elementos** e devolve 0 EM SILENCIO. Silencio e o pior resultado possivel
+aqui: numero errado sem erro no console.
+
+O QUE O 3C TEM DE FAZER: nao usar `el.dataset.classe` cru. Ou carimba os
+painels de recursos de ficha.js e classes/bruxo.js primeiro, ou usa fallback
+explicito -- e o fallback tem de ser o nome da classe que o SELETOR ja
+codifica (data-mago-acao => 'Mago'), nao o espelho char.classe, que e
+justamente o bug que o 3b acabou de consertar no render.
+
+================================================================================
+A COBERTURA POR MUTACAO DOS 19 ORACULOS E 4,8%, e o numero foi MEDIDO
+
+A revisao final da Tarefa 3 ja tinha estimado "4 de 144, ~3%". Depois de tres
+rodadas de correcao e nove oraculos novos, a revisao final de branch mediu de
+verdade: mutou UMA A UMA as 145 leituras de ctx dentro de renderFeatureItem e
+carimbarClasse (ctx.nivelClasse->char.nivel, ctx.classe->char.classe,
+ctx.subclasse->char.subclasse), rodando os 19 oraculos a cada mutacao.
+
+  138 das 145 mutacoes SOBREVIVEM.
+  So 7 matam algum oraculo: habilidades.js:2558, :2563, :2665, :2806,
+  :3688, :3824, :4976.
+
+O DEFEITO PLAUSIVEL QUE PASSA PELOS 19 nao e exotico -- e uma CONVERSAO
+PARCIAL, o cenario normal de alguem reverter ou esquecer uma linha. Provado:
+
+  revertendo so habilidades.js:2752
+  (const ehAtaqueImprudente = ctx.classe === 'Barbaro'  ->  char.classe),
+  num Guerreiro 5/Barbaro 5 com Guerreiro inicial, o bloco do Barbaro perde
+  um botao (3 -> 2, hash do HTML muda) e os 19 oraculos ficam VERDES.
+
+POR QUE ISSO NAO BARROU O COMMIT: o codigo entregue esta CORRETO, e isso foi
+provado por outros meios -- 1200 cenarios de classe unica (Tarefa 5), 1980
+cenarios de paridade em fixtures degeneradas (revisao final), e2e de regras
+263/0. O que e fino e a REDE DE REGRESSAO, nao o codigo.
+
+POR QUE IMPORTA MESMO ASSIM: o 3c vai editar exatamente este arquivo. Uma
+reversao acidental de uma das 138 linhas desprotegidas nao acende nenhuma luz.
+
+RECOMENDADO para o 3c: antes de editar renderFeatureItem, acrescentar um
+oraculo de ALCANCE, nao de ponto -- por exemplo, renderizar o bloco de cada
+uma das 12 classes como classe NAO inicial e comparar o hash do HTML com o
+mesmo bloco como classe inicial (fora os data-classe). Um oraculo desses
+pega conversao parcial em qualquer das 145 linhas, que 19 oraculos pontuais
+nao pegam.
+
+================================================================================
+DIVIDA DO 3C JA CONHECIDA, com o tamanho medido
+
+A revisao final mediu o que sobra em setupEventosHabilidades (linhas
+100-2483), que o 3b nao podia tocar:
+
+  30 guardas do tipo `if (char.classe !== 'Clerigo') return;`
+  25 leituras de char.nivel
+
+EFEITO HOJE, medido num Paladino 5/Clerigo 5 com Paladino inicial: os 3
+botoes data-clerigo-cd-acao RENDERIZAM (certo, e o 3b) e todo clique e
+ENGOLIDO pela guarda. Botao morto, nao botao errado -- melhor que antes, mas
+nao e o que a nota de versao original prometia. A nota foi corrigida na
+2.2.18 para dizer que os botoes da segunda classe ainda nao respondem.
+
+Inalcancavel por um jogador hoje: so regras-multiclasse.js:289 cria
+classes[], sempre com UMA entrada, e subirDeNivel sempre sobe char.classe.
+So um JSON importado a mao chega la.

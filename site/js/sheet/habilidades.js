@@ -2535,7 +2535,16 @@ function detectarSubHabilidades(descricao) {
   return subs;
 }
 
-export function renderFeatureItem(f, source) {
+/**
+ * Item de uma caracteristica, no contexto de UMA classe.
+ * @param {object} f - a caracteristica
+ * @param {'classe'|'subclasse'} source
+ * @param {{classe, subclasse, nivelClasse}} ctx - o contexto da classe cujo
+ *   bloco esta sendo renderizado. Sem ele, a funcao leria os espelhos, que
+ *   apontam para a classe INICIAL, e o bloco da segunda classe receberia a
+ *   identidade da primeira.
+ */
+export function renderFeatureItem(f, source, ctx) {
   let recarga = detectarRecarga(f.descricao);
   // Features that are purely descriptive should always be passive
   const nomeNorm = semAcento(f.nome);
@@ -2546,94 +2555,94 @@ export function renderFeatureItem(f, source) {
   // Detectar usos máximos e sub-habilidades
   let usosMax = detectarUsosMaximos(f.descricao);
   const subHabilidades = detectarSubHabilidades(f.descricao);
-  const ehCanalizarDivindadeClerigo = char.classe === 'Clérigo' && f.nome === 'Canalizar Divindade';
-  const ehGolpesAbencoadosClerigo = char.classe === 'Clérigo' && f.nome === 'Golpes Abençoados';
-  const ehIntervencaoDivinaClerigo = char.classe === 'Clérigo' && f.nome === 'Intervenção Divina';
-  const ehIntervencaoDivinaMaiorClerigo = char.classe === 'Clérigo' && f.nome === 'Intervenção Divina Maior';
+  const ehCanalizarDivindadeClerigo = ctx.classe === 'Clérigo' && f.nome === 'Canalizar Divindade';
+  const ehGolpesAbencoadosClerigo = ctx.classe === 'Clérigo' && f.nome === 'Golpes Abençoados';
+  const ehIntervencaoDivinaClerigo = ctx.classe === 'Clérigo' && f.nome === 'Intervenção Divina';
+  const ehIntervencaoDivinaMaiorClerigo = ctx.classe === 'Clérigo' && f.nome === 'Intervenção Divina Maior';
 
-  const ehSubclasseClerigo = char.classe === 'Clérigo' && source === 'subclasse';
-  const ehGuerraAtaqueDirecionado = ehSubclasseClerigo && char.subclasse === 'Domínio da Guerra' && f.nome === 'Ataque Direcionado';
-  const ehGuerraSacerdote = ehSubclasseClerigo && char.subclasse === 'Domínio da Guerra' && f.nome === 'Sacerdote da Guerra';
-  const ehGuerraBencaoDeus = ehSubclasseClerigo && char.subclasse === 'Domínio da Guerra' && f.nome === 'Bênção do Deus da Guerra';
-  const ehLuzBrilho = ehSubclasseClerigo && char.subclasse === 'Domínio da Luz' && f.nome === 'Brilho do Amanhecer';
-  const ehLuzLabareda = ehSubclasseClerigo && char.subclasse === 'Domínio da Luz' && f.nome === 'Labareda Protetora';
-  const ehLuzCoroa = ehSubclasseClerigo && char.subclasse === 'Domínio da Luz' && f.nome === 'Coroa de Luz';
-  const ehTrapacaBencao = ehSubclasseClerigo && char.subclasse === 'Domínio da Trapaça' && f.nome === 'Bênção do Trapaceiro';
-  const ehTrapacaInvocar = ehSubclasseClerigo && char.subclasse === 'Domínio da Trapaça' && f.nome === 'Invocar Duplicidade';
-  const ehVidaPreservar = ehSubclasseClerigo && char.subclasse === 'Domínio da Vida' && f.nome === 'Preservar a Vida';
+  const ehSubclasseClerigo = ctx.classe === 'Clérigo' && source === 'subclasse';
+  const ehGuerraAtaqueDirecionado = ehSubclasseClerigo && ctx.subclasse === 'Domínio da Guerra' && f.nome === 'Ataque Direcionado';
+  const ehGuerraSacerdote = ehSubclasseClerigo && ctx.subclasse === 'Domínio da Guerra' && f.nome === 'Sacerdote da Guerra';
+  const ehGuerraBencaoDeus = ehSubclasseClerigo && ctx.subclasse === 'Domínio da Guerra' && f.nome === 'Bênção do Deus da Guerra';
+  const ehLuzBrilho = ehSubclasseClerigo && ctx.subclasse === 'Domínio da Luz' && f.nome === 'Brilho do Amanhecer';
+  const ehLuzLabareda = ehSubclasseClerigo && ctx.subclasse === 'Domínio da Luz' && f.nome === 'Labareda Protetora';
+  const ehLuzCoroa = ehSubclasseClerigo && ctx.subclasse === 'Domínio da Luz' && f.nome === 'Coroa de Luz';
+  const ehTrapacaBencao = ehSubclasseClerigo && ctx.subclasse === 'Domínio da Trapaça' && f.nome === 'Bênção do Trapaceiro';
+  const ehTrapacaInvocar = ehSubclasseClerigo && ctx.subclasse === 'Domínio da Trapaça' && f.nome === 'Invocar Duplicidade';
+  const ehVidaPreservar = ehSubclasseClerigo && ctx.subclasse === 'Domínio da Vida' && f.nome === 'Preservar a Vida';
 
-  const ehInimigoFavoritoGuardiao = char.classe === 'Guardião' && f.nome === 'Inimigo Favorito';
-  const ehIncansavelGuardiao = char.classe === 'Guardião' && f.nome === 'Incansável';
-  const ehVeuNaturezaGuardiao = char.classe === 'Guardião' && f.nome === 'Véu da Natureza';
-  const ehMaestriaGuardiao = char.classe === 'Guardião' && f.nome === 'Maestria em Arma';
+  const ehInimigoFavoritoGuardiao = ctx.classe === 'Guardião' && f.nome === 'Inimigo Favorito';
+  const ehIncansavelGuardiao = ctx.classe === 'Guardião' && f.nome === 'Incansável';
+  const ehVeuNaturezaGuardiao = ctx.classe === 'Guardião' && f.nome === 'Véu da Natureza';
+  const ehMaestriaGuardiao = ctx.classe === 'Guardião' && f.nome === 'Maestria em Arma';
   const estadoGuardiao = (ehInimigoFavoritoGuardiao || ehIncansavelGuardiao || ehVeuNaturezaGuardiao || ehMaestriaGuardiao) ? getEstadoRecursosGuardiao() : null;
 
   // Guardião: subclasses — detecção de features
-  const ehGuardiao = char.classe === 'Guardião';
+  const ehGuardiao = ctx.classe === 'Guardião';
   const ehSubclasseGuardiao = ehGuardiao && source === 'subclasse';
   // Andarilho Feérico
-  const ehAndarilhoReforcos = ehSubclasseGuardiao && char.subclasse === 'Andarilho Feérico' && f.nome === 'Reforços Feéricos';
-  const ehAndarilhoNebuloso = ehSubclasseGuardiao && char.subclasse === 'Andarilho Feérico' && f.nome === 'Andarilho Nebuloso';
+  const ehAndarilhoReforcos = ehSubclasseGuardiao && ctx.subclasse === 'Andarilho Feérico' && f.nome === 'Reforços Feéricos';
+  const ehAndarilhoNebuloso = ehSubclasseGuardiao && ctx.subclasse === 'Andarilho Feérico' && f.nome === 'Andarilho Nebuloso';
   // Caçador
-  const ehCacadorPresa = ehSubclasseGuardiao && char.subclasse === 'Caçador' && f.nome === 'Presa do Caçador';
-  const ehCacadorTaticas = ehSubclasseGuardiao && char.subclasse === 'Caçador' && f.nome === 'Táticas Defensivas';
+  const ehCacadorPresa = ehSubclasseGuardiao && ctx.subclasse === 'Caçador' && f.nome === 'Presa do Caçador';
+  const ehCacadorTaticas = ehSubclasseGuardiao && ctx.subclasse === 'Caçador' && f.nome === 'Táticas Defensivas';
   // Senhor das Feras
-  const ehFerasCompanheiro = ehSubclasseGuardiao && char.subclasse === 'Senhor das Feras' && f.nome === 'Companheiro Primal';
+  const ehFerasCompanheiro = ehSubclasseGuardiao && ctx.subclasse === 'Senhor das Feras' && f.nome === 'Companheiro Primal';
   // Vigilante das Sombras
-  const ehVigilanteEmboscador = ehSubclasseGuardiao && char.subclasse === 'Vigilante das Sombras' && f.nome === 'Emboscador das Sombras';
+  const ehVigilanteEmboscador = ehSubclasseGuardiao && ctx.subclasse === 'Vigilante das Sombras' && f.nome === 'Emboscador das Sombras';
   const estadoGuardiaoSub = (ehAndarilhoReforcos || ehAndarilhoNebuloso || ehCacadorPresa || ehCacadorTaticas || ehFerasCompanheiro || ehVigilanteEmboscador) ? getEstadoRecursosGuardiao() : null;
 
   // Druida: deteccao de Forma Selvagem para handler dedicado
-  const ehFormaSelvagem = char.classe === 'Druida' && f.nome === 'Forma Selvagem';
+  const ehFormaSelvagem = ctx.classe === 'Druida' && f.nome === 'Forma Selvagem';
   const estadoDruida = ehFormaSelvagem ? getEstadoRecursosDruida() : null;
 
   // Druida: subclasses — detecção de features
-  const ehDruida = char.classe === 'Druida';
+  const ehDruida = ctx.classe === 'Druida';
   const ehSubclasseDruida = ehDruida && source === 'subclasse';
   // Círculo da Lua
-  const ehLuaPassoLunar = ehSubclasseDruida && char.subclasse === 'Círculo da Lua' && f.nome === 'Passo Lunar';
+  const ehLuaPassoLunar = ehSubclasseDruida && ctx.subclasse === 'Círculo da Lua' && f.nome === 'Passo Lunar';
   // Círculo da Terra
-  const ehTerraRecuperacao = ehSubclasseDruida && char.subclasse === 'Círculo da Terra' && f.nome === 'Recuperação Natural';
+  const ehTerraRecuperacao = ehSubclasseDruida && ctx.subclasse === 'Círculo da Terra' && f.nome === 'Recuperação Natural';
   // Círculo das Estrelas
-  const ehEstrelasForma = ehSubclasseDruida && char.subclasse === 'Círculo das Estrelas' && f.nome === 'Forma Estrelada';
-  const ehEstrelasMapa = ehSubclasseDruida && char.subclasse === 'Círculo das Estrelas' && f.nome === 'Mapa Estelar';
-  const ehEstrelasPresagio = ehSubclasseDruida && char.subclasse === 'Círculo das Estrelas' && f.nome === 'Presságio Cósmico';
+  const ehEstrelasForma = ehSubclasseDruida && ctx.subclasse === 'Círculo das Estrelas' && f.nome === 'Forma Estrelada';
+  const ehEstrelasMapa = ehSubclasseDruida && ctx.subclasse === 'Círculo das Estrelas' && f.nome === 'Mapa Estelar';
+  const ehEstrelasPresagio = ehSubclasseDruida && ctx.subclasse === 'Círculo das Estrelas' && f.nome === 'Presságio Cósmico';
   const estadoDruidaSub = (ehLuaPassoLunar || ehTerraRecuperacao || ehEstrelasMapa || ehEstrelasPresagio || ehEstrelasForma) ? getEstadoRecursosDruida() : null;
 
   // Bardo: deteccao de Inspiracao de Bardo para handler dedicado
-  const ehInspiracaoBardo = char.classe === 'Bardo' && f.nome === 'Inspiração de Bardo';
+  const ehInspiracaoBardo = ctx.classe === 'Bardo' && f.nome === 'Inspiração de Bardo';
   const estadoInspiracaoBardo = ehInspiracaoBardo ? getEstadoInspiracaoBardo() : null;
 
   // Bruxo: deteccao de Astucia Magica para handler dedicado
-  const ehAstuciaBruxo = char.classe === 'Bruxo' && f.nome === 'Astúcia Mágica';
+  const ehAstuciaBruxo = ctx.classe === 'Bruxo' && f.nome === 'Astúcia Mágica';
   const estadoBruxoFeature = ehAstuciaBruxo ? getEstadoRecursosBruxo() : null;
 
   // Bruxo: subclasses — detecção de features
-  const ehBruxo = char.classe === 'Bruxo';
+  const ehBruxo = ctx.classe === 'Bruxo';
   const ehSubclasseBruxo = ehBruxo && source === 'subclasse';
   // Patrono Arquifada
-  const ehArquifadaPassos = ehSubclasseBruxo && char.subclasse === 'Patrono Arquifada' && f.nome === 'Passos Feéricos';
-  const ehArquifadaFuga = ehSubclasseBruxo && char.subclasse === 'Patrono Arquifada' && f.nome === 'Fuga em Névoa';
-  const ehArquifadaDefesas = ehSubclasseBruxo && char.subclasse === 'Patrono Arquifada' && f.nome === 'Defesas Sedutoras';
-  const ehArquifadaMagiaSedutora = ehSubclasseBruxo && char.subclasse === 'Patrono Arquifada' && f.nome === 'Magia Sedutora';
+  const ehArquifadaPassos = ehSubclasseBruxo && ctx.subclasse === 'Patrono Arquifada' && f.nome === 'Passos Feéricos';
+  const ehArquifadaFuga = ehSubclasseBruxo && ctx.subclasse === 'Patrono Arquifada' && f.nome === 'Fuga em Névoa';
+  const ehArquifadaDefesas = ehSubclasseBruxo && ctx.subclasse === 'Patrono Arquifada' && f.nome === 'Defesas Sedutoras';
+  const ehArquifadaMagiaSedutora = ehSubclasseBruxo && ctx.subclasse === 'Patrono Arquifada' && f.nome === 'Magia Sedutora';
   // Patrono Celestial
-  const ehCelestialLuz = ehSubclasseBruxo && char.subclasse === 'Patrono Celestial' && f.nome === 'Luz Medicinal';
-  const ehCelestialAlma = ehSubclasseBruxo && char.subclasse === 'Patrono Celestial' && f.nome === 'Alma Radiante';
-  const ehCelestialResiliencia = ehSubclasseBruxo && char.subclasse === 'Patrono Celestial' && f.nome === 'Resiliência Celestial';
-  const ehCelestialVinganca = ehSubclasseBruxo && char.subclasse === 'Patrono Celestial' && f.nome === 'Vingança Calcinante';
+  const ehCelestialLuz = ehSubclasseBruxo && ctx.subclasse === 'Patrono Celestial' && f.nome === 'Luz Medicinal';
+  const ehCelestialAlma = ehSubclasseBruxo && ctx.subclasse === 'Patrono Celestial' && f.nome === 'Alma Radiante';
+  const ehCelestialResiliencia = ehSubclasseBruxo && ctx.subclasse === 'Patrono Celestial' && f.nome === 'Resiliência Celestial';
+  const ehCelestialVinganca = ehSubclasseBruxo && ctx.subclasse === 'Patrono Celestial' && f.nome === 'Vingança Calcinante';
   // Patrono O Grande Antigo
-  const ehAntigoCombatente = ehSubclasseBruxo && char.subclasse === 'Patrono O Grande Antigo' && f.nome === 'Combatente Clarividente';
-  const ehAntigoDanacao = ehSubclasseBruxo && char.subclasse === 'Patrono O Grande Antigo' && f.nome === 'Danação Mística';
-  const ehAntigoEscudo = ehSubclasseBruxo && char.subclasse === 'Patrono O Grande Antigo' && f.nome === 'Escudo Mental';
+  const ehAntigoCombatente = ehSubclasseBruxo && ctx.subclasse === 'Patrono O Grande Antigo' && f.nome === 'Combatente Clarividente';
+  const ehAntigoDanacao = ehSubclasseBruxo && ctx.subclasse === 'Patrono O Grande Antigo' && f.nome === 'Danação Mística';
+  const ehAntigoEscudo = ehSubclasseBruxo && ctx.subclasse === 'Patrono O Grande Antigo' && f.nome === 'Escudo Mental';
   // Patrono Ínfero
-  const ehInferoBencao = ehSubclasseBruxo && char.subclasse === 'Patrono Ínfero' && f.nome === 'Bênção do Tenebroso';
-  const ehInferoSorte = ehSubclasseBruxo && char.subclasse === 'Patrono Ínfero' && f.nome === 'A Sorte do Próprio Tenebroso';
-  const ehInferoResistencia = ehSubclasseBruxo && char.subclasse === 'Patrono Ínfero' && f.nome === 'Resistência Ínfera';
-  const ehInferoLancar = ehSubclasseBruxo && char.subclasse === 'Patrono Ínfero' && f.nome === 'Lançar no Inferno';
+  const ehInferoBencao = ehSubclasseBruxo && ctx.subclasse === 'Patrono Ínfero' && f.nome === 'Bênção do Tenebroso';
+  const ehInferoSorte = ehSubclasseBruxo && ctx.subclasse === 'Patrono Ínfero' && f.nome === 'A Sorte do Próprio Tenebroso';
+  const ehInferoResistencia = ehSubclasseBruxo && ctx.subclasse === 'Patrono Ínfero' && f.nome === 'Resistência Ínfera';
+  const ehInferoLancar = ehSubclasseBruxo && ctx.subclasse === 'Patrono Ínfero' && f.nome === 'Lançar no Inferno';
   const estadoBruxoSub = (ehArquifadaPassos || ehArquifadaFuga || ehArquifadaDefesas || ehCelestialLuz || ehCelestialVinganca || ehAntigoCombatente || ehInferoSorte || ehInferoResistencia || ehInferoLancar) ? getEstadoRecursosBruxo() : null;
 
-  const ehFeiticeiro = char.classe === 'Feiticeiro';
-  const subclasseFeiticeiro = semAcento(char.subclasse || '');
+  const ehFeiticeiro = ctx.classe === 'Feiticeiro';
+  const subclasseFeiticeiro = semAcento(ctx.subclasse || '');
   const ehFeiticariaInata = ehFeiticeiro && f.nome === 'Feitiçaria Inata';
   const ehFonteMagia = ehFeiticeiro && f.nome === 'Fonte de Magia';
   const ehMetamagia = ehFeiticeiro && f.nome === 'Metamagia';
@@ -2653,23 +2662,23 @@ export function renderFeatureItem(f, source) {
   const estadoFeiticeiro = ehFeiticeiro ? getEstadoRecursosFeiticeiro() : null;
 
   // Guerreiro: detecção de habilidades dedicadas
-  const ehGuerreiro = char.classe === 'Guerreiro';
+  const ehGuerreiro = ctx.classe === 'Guerreiro';
   const ehRecuperarFolegoGuerreiro = ehGuerreiro && f.nome === 'Recuperar Fôlego';
   const ehSurtoAcaoGuerreiro = ehGuerreiro && f.nome === 'Surto de Ação';
   const ehIndomavelGuerreiro = ehGuerreiro && f.nome === 'Indomável';
   const ehMaestriaGuerreiro = ehGuerreiro && f.nome === 'Maestria em Arma';
   // Mestre da Batalha
-  const ehSuperioridadeCombate = ehGuerreiro && char.subclasse === 'Mestre da Batalha' && f.nome === 'Superioridade em Combate';
-  const ehConhecaInimigo = ehGuerreiro && char.subclasse === 'Mestre da Batalha' && f.nome === 'Conheça Seu Inimigo';
+  const ehSuperioridadeCombate = ehGuerreiro && ctx.subclasse === 'Mestre da Batalha' && f.nome === 'Superioridade em Combate';
+  const ehConhecaInimigo = ehGuerreiro && ctx.subclasse === 'Mestre da Batalha' && f.nome === 'Conheça Seu Inimigo';
   // Combatente Psíquico
-  const ehPoderPsionicoGuerreiro = ehGuerreiro && char.subclasse === 'Combatente Psíquico' && f.nome === 'Poder Psiônico';
-  const ehAdeptoTelecinetico = ehGuerreiro && char.subclasse === 'Combatente Psíquico' && f.nome === 'Adepto Telecinético';
-  const ehBaluarteEnergia = ehGuerreiro && char.subclasse === 'Combatente Psíquico' && f.nome === 'Baluarte de Energia';
-  const ehMestreTelecinetico = ehGuerreiro && char.subclasse === 'Combatente Psíquico' && f.nome === 'Mestre Telecinético';
+  const ehPoderPsionicoGuerreiro = ehGuerreiro && ctx.subclasse === 'Combatente Psíquico' && f.nome === 'Poder Psiônico';
+  const ehAdeptoTelecinetico = ehGuerreiro && ctx.subclasse === 'Combatente Psíquico' && f.nome === 'Adepto Telecinético';
+  const ehBaluarteEnergia = ehGuerreiro && ctx.subclasse === 'Combatente Psíquico' && f.nome === 'Baluarte de Energia';
+  const ehMestreTelecinetico = ehGuerreiro && ctx.subclasse === 'Combatente Psíquico' && f.nome === 'Mestre Telecinético';
   const estadoGuerreiro = ehGuerreiro ? getEstadoRecursosGuerreiro() : null;
 
   // Paladino: detecção de habilidades dedicadas
-  const ehPaladino = char.classe === 'Paladino';
+  const ehPaladino = ctx.classe === 'Paladino';
   const ehMaosConsagradasPaladino = ehPaladino && f.nome === 'Mãos Consagradas';
   const ehCanalizarPaladino = ehPaladino && f.nome === 'Canalizar Divindade';
   const ehDestruicaoPaladino = ehPaladino && f.nome === 'Destruição do Paladino';
@@ -2679,7 +2688,7 @@ export function renderFeatureItem(f, source) {
   const estadoPaladino = ehPaladino ? getEstadoRecursosPaladino() : null;
 
   // Monge: detecção de habilidades dedicadas
-  const ehMonge = char.classe === 'Monge';
+  const ehMonge = ctx.classe === 'Monge';
   const ehArtesMarciais = ehMonge && f.nome === 'Artes Marciais';
   const ehPontosFoco = ehMonge && f.nome === 'Foco do Monge';
   const ehDesviarAtaques = ehMonge && (f.nome === 'Defletir Ataques' || f.nome === 'Defletir Energia');
@@ -2688,29 +2697,29 @@ export function renderFeatureItem(f, source) {
   // Subclasses de Monge
   const ehSubclasseMonge = ehMonge && source === 'subclasse';
   // Mão Espalmada
-  const ehEspalmadaIntegridade = ehSubclasseMonge && char.subclasse === 'Combatente da Mão Espalmada' && f.nome === 'Integridade Corporal';
-  const ehEspalmadaPalma = ehSubclasseMonge && char.subclasse === 'Combatente da Mão Espalmada' && f.nome === 'Palma Vibrante';
+  const ehEspalmadaIntegridade = ehSubclasseMonge && ctx.subclasse === 'Combatente da Mão Espalmada' && f.nome === 'Integridade Corporal';
+  const ehEspalmadaPalma = ehSubclasseMonge && ctx.subclasse === 'Combatente da Mão Espalmada' && f.nome === 'Palma Vibrante';
   // Misericórdia
-  const ehMisericordiaTorrente = ehSubclasseMonge && char.subclasse === 'Combatente da Misericórdia' && f.nome === 'Torrente de Cura e Dolo';
-  const ehMisericordiaFinal = ehSubclasseMonge && char.subclasse === 'Combatente da Misericórdia' && f.nome === 'Mão da Misericórdia Final';
+  const ehMisericordiaTorrente = ehSubclasseMonge && ctx.subclasse === 'Combatente da Misericórdia' && f.nome === 'Torrente de Cura e Dolo';
+  const ehMisericordiaFinal = ehSubclasseMonge && ctx.subclasse === 'Combatente da Misericórdia' && f.nome === 'Mão da Misericórdia Final';
   // Elementos
-  const ehElementosSintonia = ehSubclasseMonge && char.subclasse === 'Combatente dos Elementos' && f.nome === 'Sintonia Elemental';
+  const ehElementosSintonia = ehSubclasseMonge && ctx.subclasse === 'Combatente dos Elementos' && f.nome === 'Sintonia Elemental';
   const estadoMongeSub = (ehEspalmadaIntegridade || ehEspalmadaPalma || ehMisericordiaTorrente || ehMisericordiaFinal || ehElementosSintonia) ? getEstadoRecursosMonge() : null;
 
   // Ladino: detecção de habilidades dedicadas
-  const ehLadino = char.classe === 'Ladino';
+  const ehLadino = ctx.classe === 'Ladino';
   const ehAtaqueFurtivo = ehLadino && f.nome === 'Ataque Furtivo';
   const ehGolpeSorte = ehLadino && f.nome === 'Golpe de Sorte';
   const ehMaestriaLadino = ehLadino && f.nome === 'Maestria em Arma';
   // Adaga Espiritual
-  const ehPoderPsionicoLadino = ehLadino && char.subclasse === 'Adaga Espiritual' && f.nome === 'Poder Psiônico';
-  const ehLaminasAlma = ehLadino && char.subclasse === 'Adaga Espiritual' && f.nome === 'Lâminas da Alma';
-  const ehVeuPsiquico = ehLadino && char.subclasse === 'Adaga Espiritual' && f.nome === 'Véu Psíquico';
-  const ehRasgarMente = ehLadino && char.subclasse === 'Adaga Espiritual' && f.nome === 'Rasgar Mente';
+  const ehPoderPsionicoLadino = ehLadino && ctx.subclasse === 'Adaga Espiritual' && f.nome === 'Poder Psiônico';
+  const ehLaminasAlma = ehLadino && ctx.subclasse === 'Adaga Espiritual' && f.nome === 'Lâminas da Alma';
+  const ehVeuPsiquico = ehLadino && ctx.subclasse === 'Adaga Espiritual' && f.nome === 'Véu Psíquico';
+  const ehRasgarMente = ehLadino && ctx.subclasse === 'Adaga Espiritual' && f.nome === 'Rasgar Mente';
   const estadoLadino = ehLadino ? getEstadoRecursosLadino() : null;
 
   // Mago: detecção de habilidades dedicadas
-  const ehMago = char.classe === 'Mago';
+  const ehMago = ctx.classe === 'Mago';
   const ehRecuperacaoArcana = ehMago && f.nome === 'Recuperação Arcana';
   const ehAssinaturaMagica = ehMago && f.nome === 'Assinatura Mágica';
   const ehMaestriaMagias = ehMago && f.nome === 'Maestria de Magias';
@@ -2719,18 +2728,18 @@ export function renderFeatureItem(f, source) {
   // Subclasses de Mago
   const ehSubclasseMago = ehMago && source === 'subclasse';
   // Abjurador
-  const ehAbjuradorProtecao = ehSubclasseMago && char.subclasse === 'Abjurador' && f.nome === 'Proteção Arcana';
+  const ehAbjuradorProtecao = ehSubclasseMago && ctx.subclasse === 'Abjurador' && f.nome === 'Proteção Arcana';
   // Adivinhador
-  const ehAdivinhadorProdigio = ehSubclasseMago && char.subclasse === 'Adivinhador' && f.nome === 'Prodígio';
-  const ehAdivinhadorTerceiroOlho = ehSubclasseMago && char.subclasse === 'Adivinhador' && f.nome === 'O Terceiro Olho';
+  const ehAdivinhadorProdigio = ehSubclasseMago && ctx.subclasse === 'Adivinhador' && f.nome === 'Prodígio';
+  const ehAdivinhadorTerceiroOlho = ehSubclasseMago && ctx.subclasse === 'Adivinhador' && f.nome === 'O Terceiro Olho';
   // Evocador
-  const ehEvocadorSobrecarga = ehSubclasseMago && char.subclasse === 'Evocador' && f.nome === 'Sobrecarga';
+  const ehEvocadorSobrecarga = ehSubclasseMago && ctx.subclasse === 'Evocador' && f.nome === 'Sobrecarga';
   // Ilusionista
-  const ehIlusionistaEspectrais = ehSubclasseMago && char.subclasse === 'Ilusionista' && f.nome === 'Criaturas Espectrais';
-  const ehIlusionistaAutoimagem = ehSubclasseMago && char.subclasse === 'Ilusionista' && f.nome === 'Autoimagem Ilusória';
+  const ehIlusionistaEspectrais = ehSubclasseMago && ctx.subclasse === 'Ilusionista' && f.nome === 'Criaturas Espectrais';
+  const ehIlusionistaAutoimagem = ehSubclasseMago && ctx.subclasse === 'Ilusionista' && f.nome === 'Autoimagem Ilusória';
   const estadoMagoSub = (ehAbjuradorProtecao || ehAdivinhadorProdigio || ehAdivinhadorTerceiroOlho || ehEvocadorSobrecarga || ehIlusionistaEspectrais || ehIlusionistaAutoimagem) ? getEstadoRecursosMago() : null;
 
-  if (ehLuzLabareda && (char.nivel || 1) >= 6) recarga = 'curto_ou_longo';
+  if (ehLuzLabareda && (ctx.nivelClasse || 1) >= 6) recarga = 'curto_ou_longo';
 
   if (ehCanalizarDivindadeClerigo) {
     const prog = getProgressaoClerigo();
@@ -2738,70 +2747,70 @@ export function renderFeatureItem(f, source) {
   }
 
   const temMultiplosUsos = usosMax && usosMax > 1 && recarga;
-  const ehFuriaBarbaro = char.classe === 'Bárbaro' && f.nome === 'Fúria';
-  const ehMaestriaBarbaro = char.classe === 'Bárbaro' && f.nome === 'Maestria em Arma';
-  const ehAtaqueImprudente = char.classe === 'Bárbaro' && f.nome === 'Ataque Imprudente';
+  const ehFuriaBarbaro = ctx.classe === 'Bárbaro' && f.nome === 'Fúria';
+  const ehMaestriaBarbaro = ctx.classe === 'Bárbaro' && f.nome === 'Maestria em Arma';
+  const ehAtaqueImprudente = ctx.classe === 'Bárbaro' && f.nome === 'Ataque Imprudente';
   const estadoFuria = ehFuriaBarbaro ? getEstadoFuria() : null;
 
   // Subclasses do Bárbaro
-  const ehBarbaro = char.classe === 'Bárbaro';
-  const ehCampeaoDeuses = ehBarbaro && char.subclasse === 'Trilha do Fanático' && f.nome === 'Campeão dos Deuses';
-  const ehFuriaDivina = ehBarbaro && char.subclasse === 'Trilha do Fanático' && f.nome === 'Fúria Divina';
-  const ehConcentracaoFanatica = ehBarbaro && char.subclasse === 'Trilha do Fanático' && f.nome === 'Concentração Fanática';
-  const ehFuriaDeuses = ehBarbaro && char.subclasse === 'Trilha do Fanático' && f.nome === 'Fúria dos Deuses';
-  const ehPresencaZelosa = ehBarbaro && char.subclasse === 'Trilha do Fanático' && f.nome === 'Presença Zelosa';
-  const ehFuriaSelvagens = ehBarbaro && char.subclasse === 'Trilha do Coração Selvagem' && f.nome === 'Fúria dos Selvagens';
-  const ehAspectoSelvagens = ehBarbaro && char.subclasse === 'Trilha do Coração Selvagem' && f.nome === 'Aspecto dos Selvagens';
-  const ehPoderSelvagens = ehBarbaro && char.subclasse === 'Trilha do Coração Selvagem' && f.nome === 'Poder dos Selvagens';
-  const ehVitalidadeArvore = ehBarbaro && char.subclasse === 'Trilha da Árvore do Mundo' && f.nome === 'Vitalidade da Árvore';
-  const ehPercorrerArvore = ehBarbaro && char.subclasse === 'Trilha da Árvore do Mundo' && f.nome === 'Percorrer a Árvore';
+  const ehBarbaro = ctx.classe === 'Bárbaro';
+  const ehCampeaoDeuses = ehBarbaro && ctx.subclasse === 'Trilha do Fanático' && f.nome === 'Campeão dos Deuses';
+  const ehFuriaDivina = ehBarbaro && ctx.subclasse === 'Trilha do Fanático' && f.nome === 'Fúria Divina';
+  const ehConcentracaoFanatica = ehBarbaro && ctx.subclasse === 'Trilha do Fanático' && f.nome === 'Concentração Fanática';
+  const ehFuriaDeuses = ehBarbaro && ctx.subclasse === 'Trilha do Fanático' && f.nome === 'Fúria dos Deuses';
+  const ehPresencaZelosa = ehBarbaro && ctx.subclasse === 'Trilha do Fanático' && f.nome === 'Presença Zelosa';
+  const ehFuriaSelvagens = ehBarbaro && ctx.subclasse === 'Trilha do Coração Selvagem' && f.nome === 'Fúria dos Selvagens';
+  const ehAspectoSelvagens = ehBarbaro && ctx.subclasse === 'Trilha do Coração Selvagem' && f.nome === 'Aspecto dos Selvagens';
+  const ehPoderSelvagens = ehBarbaro && ctx.subclasse === 'Trilha do Coração Selvagem' && f.nome === 'Poder dos Selvagens';
+  const ehVitalidadeArvore = ehBarbaro && ctx.subclasse === 'Trilha da Árvore do Mundo' && f.nome === 'Vitalidade da Árvore';
+  const ehPercorrerArvore = ehBarbaro && ctx.subclasse === 'Trilha da Árvore do Mundo' && f.nome === 'Percorrer a Árvore';
 
   // Bárbaro: Golpe Brutal (nível 9+) e Golpe Brutal Aprimorado (13/17)
   const ehGolpeBrutal = ehBarbaro && (f.nome === 'Golpe Brutal' || f.nome === 'Golpe Brutal Aprimorado');
 
   // Bárbaro: Berserker — detecção de features de nível alto
-  const ehBerserker = ehBarbaro && char.subclasse === 'Trilha do Berserker';
+  const ehBerserker = ehBarbaro && ctx.subclasse === 'Trilha do Berserker';
   const ehFrenesi = ehBerserker && f.nome === 'Frenesi';
   const ehFuriaIrracional = ehBerserker && f.nome === 'Fúria Irracional';
   const ehRetaliacao = ehBerserker && f.nome === 'Retaliação';
   const ehPresencaIntimidante = ehBerserker && f.nome === 'Presença Intimidante';
 
   // Bardo: detecção de habilidades de classe
-  const ehBardo = char.classe === 'Bardo';
+  const ehBardo = ctx.classe === 'Bardo';
   const ehContraEncantamento = ehBardo && f.nome === 'Contra-Encantamento';
   const ehPalavrasCriacao = ehBardo && f.nome === 'Palavras de Criação';
 
   // Bardo: subclasses — detecção de features
   const ehSubclasseBardo = ehBardo && source === 'subclasse';
   // Colégio da Bravura
-  const ehBravuraInspiracaoCombate = ehSubclasseBardo && char.subclasse === 'Colégio da Bravura' && f.nome === 'Inspiração em Combate';
-  const ehBravuraMagiaBatalha = ehSubclasseBardo && char.subclasse === 'Colégio da Bravura' && f.nome === 'Magia de Batalha';
+  const ehBravuraInspiracaoCombate = ehSubclasseBardo && ctx.subclasse === 'Colégio da Bravura' && f.nome === 'Inspiração em Combate';
+  const ehBravuraMagiaBatalha = ehSubclasseBardo && ctx.subclasse === 'Colégio da Bravura' && f.nome === 'Magia de Batalha';
   // Colégio da Dança
-  const ehDancaGingaFascinante = ehSubclasseBardo && char.subclasse === 'Colégio da Dança' && f.nome === 'Ginga Fascinante';
-  const ehDancaGingadoCoordenado = ehSubclasseBardo && char.subclasse === 'Colégio da Dança' && f.nome === 'Gingado Coordenado';
-  const ehDancaMovimentoInspirador = ehSubclasseBardo && char.subclasse === 'Colégio da Dança' && f.nome === 'Movimento Inspirador';
-  const ehDancaEvasaoLiderada = ehSubclasseBardo && char.subclasse === 'Colégio da Dança' && f.nome === 'Evasão Liderada';
+  const ehDancaGingaFascinante = ehSubclasseBardo && ctx.subclasse === 'Colégio da Dança' && f.nome === 'Ginga Fascinante';
+  const ehDancaGingadoCoordenado = ehSubclasseBardo && ctx.subclasse === 'Colégio da Dança' && f.nome === 'Gingado Coordenado';
+  const ehDancaMovimentoInspirador = ehSubclasseBardo && ctx.subclasse === 'Colégio da Dança' && f.nome === 'Movimento Inspirador';
+  const ehDancaEvasaoLiderada = ehSubclasseBardo && ctx.subclasse === 'Colégio da Dança' && f.nome === 'Evasão Liderada';
   // Colégio do Conhecimento
-  const ehConhecimentoPalavrasInterrupcao = ehSubclasseBardo && char.subclasse === 'Colégio do Conhecimento' && f.nome === 'Palavras de Interrupção';
-  const ehConhecimentoProficienciasBonus = ehSubclasseBardo && char.subclasse === 'Colégio do Conhecimento' && f.nome === 'Proficiências Bônus';
-  const ehConhecimentoDescobertasMagicas = ehSubclasseBardo && char.subclasse === 'Colégio do Conhecimento' && f.nome === 'Descobertas Mágicas';
-  const ehConhecimentoPericiaInigualavel = ehSubclasseBardo && char.subclasse === 'Colégio do Conhecimento' && f.nome === 'Perícia Inigualável';
+  const ehConhecimentoPalavrasInterrupcao = ehSubclasseBardo && ctx.subclasse === 'Colégio do Conhecimento' && f.nome === 'Palavras de Interrupção';
+  const ehConhecimentoProficienciasBonus = ehSubclasseBardo && ctx.subclasse === 'Colégio do Conhecimento' && f.nome === 'Proficiências Bônus';
+  const ehConhecimentoDescobertasMagicas = ehSubclasseBardo && ctx.subclasse === 'Colégio do Conhecimento' && f.nome === 'Descobertas Mágicas';
+  const ehConhecimentoPericiaInigualavel = ehSubclasseBardo && ctx.subclasse === 'Colégio do Conhecimento' && f.nome === 'Perícia Inigualável';
   // Colégio do Glamour
-  const ehGlamourMagiaFascinante = ehSubclasseBardo && char.subclasse === 'Colégio do Glamour' && f.nome === 'Magia Fascinante';
-  const ehGlamourMantoInspiracao = ehSubclasseBardo && char.subclasse === 'Colégio do Glamour' && f.nome === 'Manto de Inspiração';
-  const ehGlamourMantoMajestade = ehSubclasseBardo && char.subclasse === 'Colégio do Glamour' && f.nome === 'Manto de Majestade';
-  const ehGlamourMajestadeInquebravel = ehSubclasseBardo && char.subclasse === 'Colégio do Glamour' && f.nome === 'Majestade Inquebrável';
+  const ehGlamourMagiaFascinante = ehSubclasseBardo && ctx.subclasse === 'Colégio do Glamour' && f.nome === 'Magia Fascinante';
+  const ehGlamourMantoInspiracao = ehSubclasseBardo && ctx.subclasse === 'Colégio do Glamour' && f.nome === 'Manto de Inspiração';
+  const ehGlamourMantoMajestade = ehSubclasseBardo && ctx.subclasse === 'Colégio do Glamour' && f.nome === 'Manto de Majestade';
+  const ehGlamourMajestadeInquebravel = ehSubclasseBardo && ctx.subclasse === 'Colégio do Glamour' && f.nome === 'Majestade Inquebrável';
 
   // Clérigo: features de nível alto faltantes
-  const ehGuerraAvatarGuerra = ehSubclasseClerigo && char.subclasse === 'Domínio da Guerra' && f.nome === 'Avatar da Guerra';
-  const ehTrapacaDuplicidadeAprimorada = ehSubclasseClerigo && char.subclasse === 'Domínio da Trapaça' && f.nome === 'Duplicidade Aprimorada';
-  const ehVidaCurandeiroAbencoado = ehSubclasseClerigo && char.subclasse === 'Domínio da Vida' && f.nome === 'Curandeiro Abençoado';
-  const ehVidaCuraSuprema = ehSubclasseClerigo && char.subclasse === 'Domínio da Vida' && f.nome === 'Cura Suprema';
-  const ehLuzLabaredaAprimorada = ehSubclasseClerigo && char.subclasse === 'Domínio da Luz' && f.nome === 'Labareda Protetora Aprimorada';
-  const ehTrapacaTransposicao = ehSubclasseClerigo && char.subclasse === 'Domínio da Trapaça' && f.nome === 'Transposição do Trapaceiro';
+  const ehGuerraAvatarGuerra = ehSubclasseClerigo && ctx.subclasse === 'Domínio da Guerra' && f.nome === 'Avatar da Guerra';
+  const ehTrapacaDuplicidadeAprimorada = ehSubclasseClerigo && ctx.subclasse === 'Domínio da Trapaça' && f.nome === 'Duplicidade Aprimorada';
+  const ehVidaCurandeiroAbencoado = ehSubclasseClerigo && ctx.subclasse === 'Domínio da Vida' && f.nome === 'Curandeiro Abençoado';
+  const ehVidaCuraSuprema = ehSubclasseClerigo && ctx.subclasse === 'Domínio da Vida' && f.nome === 'Cura Suprema';
+  const ehLuzLabaredaAprimorada = ehSubclasseClerigo && ctx.subclasse === 'Domínio da Luz' && f.nome === 'Labareda Protetora Aprimorada';
+  const ehTrapacaTransposicao = ehSubclasseClerigo && ctx.subclasse === 'Domínio da Trapaça' && f.nome === 'Transposição do Trapaceiro';
 
   // Guerreiro: Campeão — detecção de features
-  const ehCampeao = ehGuerreiro && char.subclasse === 'Campeão';
+  const ehCampeao = ehGuerreiro && ctx.subclasse === 'Campeão';
   const ehCriticoAprimorado = ehCampeao && f.nome === 'Crítico Aprimorado';
   const ehAtletaExtraordinario = ehCampeao && f.nome === 'Atleta Extraordinário';
   const ehEstiloLutaAdicional = ehCampeao && f.nome === 'Estilo de Luta Adicional';
@@ -2812,14 +2821,14 @@ export function renderFeatureItem(f, source) {
   // Ladino: subclasses — detecção de features
   const ehSubclasseLadino = ehLadino && source === 'subclasse';
   // Ladrão
-  const ehLadrao = ehLadino && char.subclasse === 'Ladrão';
+  const ehLadrao = ehLadino && ctx.subclasse === 'Ladrão';
   const ehAndarilhoTelhados = ehSubclasseLadino && ehLadrao && f.nome === 'Andarilho de Telhados';
   const ehMaoLeve = ehSubclasseLadino && ehLadrao && f.nome === 'Mão Leve';
   const ehFurtividadeSuprema = ehSubclasseLadino && ehLadrao && f.nome === 'Furtividade Suprema';
   const ehUsarDispositivoMagico = ehSubclasseLadino && ehLadrao && f.nome === 'Usar Dispositivo Mágico';
   const ehReflexosLadrao = ehSubclasseLadino && ehLadrao && f.nome === 'Reflexos de Ladrão';
   // Assassino
-  const ehAssassino = ehLadino && char.subclasse === 'Assassino';
+  const ehAssassino = ehLadino && ctx.subclasse === 'Assassino';
   const ehAssassinar = ehSubclasseLadino && ehAssassino && f.nome === 'Assassinar';
   const ehFerramentasAssassino = ehSubclasseLadino && ehAssassino && f.nome === 'Ferramentas de Assassino';
   const ehEspecialistaInfiltracao = ehSubclasseLadino && ehAssassino && f.nome === 'Especialista em Infiltração';
@@ -2829,26 +2838,26 @@ export function renderFeatureItem(f, source) {
   // Paladino: subclasses — detecção de features
   const ehSubclassePaladino = ehPaladino && source === 'subclasse';
   // Juramento da Glória
-  const ehGloria = ehPaladino && char.subclasse === 'Juramento da Glória';
+  const ehGloria = ehPaladino && ctx.subclasse === 'Juramento da Glória';
   const ehGloriaAtletaInigualavel = ehSubclassePaladino && ehGloria && f.nome === 'Atleta Inigualável';
   const ehGloriaDestruicaoInspiradora = ehSubclassePaladino && ehGloria && f.nome === 'Destruição Inspiradora';
   const ehGloriaAuraVivacidade = ehSubclassePaladino && ehGloria && f.nome === 'Aura de Vivacidade';
   const ehGloriaDefesaGloriosa = ehSubclassePaladino && ehGloria && f.nome === 'Defesa Gloriosa';
   const ehGloriaLendaViva = ehSubclassePaladino && ehGloria && f.nome === 'Lenda Viva';
   // Juramento da Vingança
-  const ehVinganca = ehPaladino && char.subclasse === 'Juramento da Vingança';
+  const ehVinganca = ehPaladino && ctx.subclasse === 'Juramento da Vingança';
   const ehVingancaVotoInimizade = ehSubclassePaladino && ehVinganca && f.nome === 'Voto de Inimizade';
   const ehVingancaVingadorImplacavel = ehSubclassePaladino && ehVinganca && f.nome === 'Vingador Implacável';
   const ehVingancaAlmaVingativa = ehSubclassePaladino && ehVinganca && f.nome === 'Alma Vingativa';
   const ehVingancaAnjoVingador = ehSubclassePaladino && ehVinganca && f.nome === 'Anjo Vingador';
   // Juramento dos Anciões
-  const ehAncioes = ehPaladino && char.subclasse === 'Juramento dos Anciões';
+  const ehAncioes = ehPaladino && ctx.subclasse === 'Juramento dos Anciões';
   const ehAncioesIraNatureza = ehSubclassePaladino && ehAncioes && f.nome === 'A Ira da Natureza';
   const ehAncioesAuraResistencia = ehSubclassePaladino && ehAncioes && f.nome === 'Aura de Resistência';
   const ehAncioesSentinelaImortal = ehSubclassePaladino && ehAncioes && f.nome === 'Sentinela Imortal';
   const ehAncioesCampeaoAncestral = ehSubclassePaladino && ehAncioes && f.nome === 'Campeão Ancestral';
   // Juramento da Devoção
-  const ehDevocao = ehPaladino && char.subclasse === 'Juramento da Devoção';
+  const ehDevocao = ehPaladino && ctx.subclasse === 'Juramento da Devoção';
   const ehDevocaoArmaSagrada = ehSubclassePaladino && ehDevocao && f.nome === 'Arma Sagrada';
   const ehDevocaoResplendorSagrado = ehSubclassePaladino && ehDevocao && f.nome === 'Resplendor Sagrado';
 
@@ -2919,7 +2928,7 @@ export function renderFeatureItem(f, source) {
     `;
   } else if (ehCampeaoDeuses) {
     // Campeão dos Deuses (Fanático nv3): pool de d12 cura
-    const nivel = char.nivel || 1;
+    const nivel = ctx.nivelClasse || 1;
     const dadosMax = nivel >= 17 ? 7 : nivel >= 12 ? 6 : nivel >= 6 ? 5 : 4;
     if (!char.recursos) char.recursos = {};
     if (typeof char.recursos.campeao_deuses_gastos !== 'number') char.recursos.campeao_deuses_gastos = 0;
@@ -2933,7 +2942,7 @@ export function renderFeatureItem(f, source) {
     `;
   } else if (ehFuriaDivina) {
     // Fúria Divina: dano extra por turno durante Fúria
-    const nivel = char.nivel || 1;
+    const nivel = ctx.nivelClasse || 1;
     const danoExtra = `1d6+${Math.floor(nivel / 2)}`;
     const furiaAtiva = !!getEstadoFuria()?.ativa;
     usosHtmlBody = `
@@ -2990,7 +2999,7 @@ export function renderFeatureItem(f, source) {
     usosHtmlBody = `
       <div style="padding:4px 0 4px 16px;font-size:0.8rem;color:${furiaAtiva && animal ? 'var(--success)' : 'var(--text-muted)'}">
         ${furiaAtiva && animal ? `<strong>Espírito ativo:</strong> ${animal}` : 'Escolha ao ativar Fúria: Águia, Lobo ou Urso'}
-        ${(char.nivel || 1) >= 14 ? ' (+ Carneiro, Falcão, Leão)' : ''}
+        ${(ctx.nivelClasse || 1) >= 14 ? ' (+ Carneiro, Falcão, Leão)' : ''}
       </div>
     `;
   } else if (ehAspectoSelvagens) {
@@ -3014,12 +3023,12 @@ export function renderFeatureItem(f, source) {
     const danoFuria = getEstadoFuria()?.dano || 0;
     usosHtmlBody = `
       <div style="padding:4px 0 4px 16px;font-size:0.8rem;color:${furiaAtiva ? 'var(--success)' : 'var(--text-muted)'}">
-        ${furiaAtiva ? `<strong>Ativo:</strong> Surto: PVT = nível (${char.nivel})  |  Força Revigorante: ${danoFuria}d6 PVT a aliado por turno` : 'PVT ao ativar Fúria + d6 x dano da Fúria PVT a aliado/turno'}
+        ${furiaAtiva ? `<strong>Ativo:</strong> Surto: PVT = nível (${ctx.nivelClasse})  |  Força Revigorante: ${danoFuria}d6 PVT a aliado por turno` : 'PVT ao ativar Fúria + d6 x dano da Fúria PVT a aliado/turno'}
       </div>
     `;
   } else if (ehGolpeBrutal) {
     // Golpe Brutal (9) / Golpe Brutal Aprimorado (13/17)
-    const nivel = char.nivel || 1;
+    const nivel = ctx.nivelClasse || 1;
     const dadosDano = nivel >= 17 ? '2d10' : '1d10';
     const efeitosDisponiveis = ['Golpe Debilitador (-4,5m Desloc.)', 'Golpe Poderoso (empurrar 4,5m)'];
     if (nivel >= 13) {
@@ -3038,7 +3047,7 @@ export function renderFeatureItem(f, source) {
     `;
   } else if (ehFrenesi) {
     // Berserker: Frenesi (nv3) — dano extra com Ataque Imprudente durante Fúria
-    const nivel = char.nivel || 1;
+    const nivel = ctx.nivelClasse || 1;
     const bonusDanoFuria = nivel >= 16 ? 4 : nivel >= 9 ? 3 : 2;
     const furiaAtiva = !!getEstadoFuria()?.ativa;
     usosHtmlBody = `
@@ -3420,7 +3429,7 @@ export function renderFeatureItem(f, source) {
     `;
   } else if (ehCelestialResiliencia) {
     // Patrono Celestial nv10: Resiliência Celestial — passiva
-    const nivel = char.nivel || 1;
+    const nivel = ctx.nivelClasse || 1;
     const modCar = Math.max(1, calcMod(char.atributos.carisma));
     usosHtmlBody = `
       <div style="padding:4px 0 4px 16px;font-size:0.8rem">
@@ -3479,7 +3488,7 @@ export function renderFeatureItem(f, source) {
       <div style="padding:4px 0 4px 16px;font-size:0.8rem">
         <div style="color:var(--accent);font-weight:600">Passiva — PV Temporários ao Abater</div>
         <div style="color:var(--text-muted);font-size:0.75rem;margin-top:2px">
-          Ao reduzir criatura hostil a 0 PV: receba ${modCar}+${char.nivel || 1} PVT (mod CAR + nível).
+          Ao reduzir criatura hostil a 0 PV: receba ${modCar}+${ctx.nivelClasse || 1} PVT (mod CAR + nível).
         </div>
       </div>
     `;
@@ -3661,7 +3670,7 @@ export function renderFeatureItem(f, source) {
     `;
   } else if (ehVigilanteEmboscador && estadoGuardiaoSub) {
     // Vigilante das Sombras nv3: Emboscador — Golpe Terrível SAB mod/longo
-    const dano = (char.nivel || 1) >= 11 ? '2d8' : '2d6';
+    const dano = (ctx.nivelClasse || 1) >= 11 ? '2d8' : '2d6';
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoGuardiaoSub.golpeTerrivelDisponiveis}/${estadoGuardiaoSub.golpeTerrivelMax}</span>`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
@@ -3676,7 +3685,7 @@ export function renderFeatureItem(f, source) {
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
         <button class="btn btn-sm btn-primary" data-clerigo-cd-acao="centelha" ${estadoClerigo.canalizarDivindadeUsosDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Centelha Divina</button>
         <button class="btn btn-sm btn-secondary" data-clerigo-cd-acao="expulsar" ${estadoClerigo.canalizarDivindadeUsosDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Expulsar Mortos-Vivos</button>
-        ${char.nivel >= 5 ? `<button class="btn btn-sm btn-accent" data-clerigo-cd-acao="fulminar" ${estadoClerigo.canalizarDivindadeUsosDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Fulminar Mortos-Vivos</button>` : ''}
+        ${ctx.nivelClasse >= 5 ? `<button class="btn btn-sm btn-accent" data-clerigo-cd-acao="fulminar" ${estadoClerigo.canalizarDivindadeUsosDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Fulminar Mortos-Vivos</button>` : ''}
       </div>
     `;
   } else if (ehGolpesAbencoadosClerigo && estadoClerigo) {
@@ -3812,7 +3821,7 @@ export function renderFeatureItem(f, source) {
         <div style="color:var(--accent);font-weight:600">Passiva — Aprimora Invocar Duplicidade</div>
         <div style="color:var(--text-muted);font-size:0.75rem;margin-top:2px">
           Aliados também ganham Vantagem em ataques vs criatura perto da ilusão.<br>
-          Ao encerrar a duplicidade: cure PV = nível de Clérigo (${char.nivel || 1}).
+          Ao encerrar a duplicidade: cure PV = nível de Clérigo (${ctx.nivelClasse || 1}).
         </div>
       </div>
     `;
@@ -3842,7 +3851,7 @@ export function renderFeatureItem(f, source) {
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoFeiticeiro.feiticariaInataUsosDisponiveis}/${estadoFeiticeiro.feiticariaInataUsosMax}</span>`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
-        <button class="btn btn-sm ${estadoFeiticeiro.feiticariaInataAtiva ? 'btn-secondary' : 'btn-primary'}" data-feiticeiro-acao="${estadoFeiticeiro.feiticariaInataAtiva ? 'encerrar-feiticaria-inata' : 'ativar-feiticaria-inata'}" ${(estadoFeiticeiro.feiticariaInataUsosDisponiveis <= 0 && !estadoFeiticeiro.feiticariaInataAtiva && (char.nivel || 1) < 7) ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${estadoFeiticeiro.feiticariaInataAtiva ? 'Encerrar' : 'Ativar'}</button>
+        <button class="btn btn-sm ${estadoFeiticeiro.feiticariaInataAtiva ? 'btn-secondary' : 'btn-primary'}" data-feiticeiro-acao="${estadoFeiticeiro.feiticariaInataAtiva ? 'encerrar-feiticaria-inata' : 'ativar-feiticaria-inata'}" ${(estadoFeiticeiro.feiticariaInataUsosDisponiveis <= 0 && !estadoFeiticeiro.feiticariaInataAtiva && (ctx.nivelClasse || 1) < 7) ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>${estadoFeiticeiro.feiticariaInataAtiva ? 'Encerrar' : 'Ativar'}</button>
       </div>
     `;
   } else if (ehFonteMagia && estadoFeiticeiro) {
@@ -3961,7 +3970,7 @@ export function renderFeatureItem(f, source) {
   } else if (ehRecuperarFolegoGuerreiro && estadoGuerreiro) {
     // Recuperar Fôlego: botão dedicado com contador de usos
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoGuerreiro.recuperarFolegoDisponiveis}/${estadoGuerreiro.recuperarFolegoMax}</span>`;
-    const curaFormula = `1d10 + ${char.nivel || 1}`;
+    const curaFormula = `1d10 + ${ctx.nivelClasse || 1}`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
         <button class="btn btn-sm btn-primary" data-guerreiro-acao="usar-folego" ${estadoGuerreiro.recuperarFolegoDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Recuperar Folego</button>
@@ -3985,7 +3994,7 @@ export function renderFeatureItem(f, source) {
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
         <button class="btn btn-sm btn-danger" data-guerreiro-acao="usar-indomavel" ${estadoGuerreiro.indomavelDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Indomavel</button>
-        <span style="font-size:0.75rem;color:var(--text-muted)">Bonus: +${char.nivel || 1} na salvaguarda</span>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Bonus: +${ctx.nivelClasse || 1} na salvaguarda</span>
       </div>
     `;
     recarga = 'longo';
@@ -4254,7 +4263,7 @@ export function renderFeatureItem(f, source) {
     `;
   } else if (ehFurtividadeSuprema) {
     // Ladrão nv9: Furtividade Suprema — custo em dados de Ataque Furtivo
-    const dadosFurtivo = estadoLadino?.furtivoDados || Math.ceil((char.nivel || 1) / 2);
+    const dadosFurtivo = estadoLadino?.furtivoDados || Math.ceil((ctx.nivelClasse || 1) / 2);
     usosHtmlBody = `
       <div style="padding:4px 0 4px 16px;font-size:0.8rem">
         <div style="color:var(--accent);font-weight:600">Golpe Astuto: Ataque Escondido (1d6)</div>
@@ -4287,7 +4296,7 @@ export function renderFeatureItem(f, source) {
     `;
   } else if (ehAssassinar) {
     // Assassino nv3: Assassinar — passiva
-    const nivel = char.nivel || 1;
+    const nivel = ctx.nivelClasse || 1;
     usosHtmlBody = `
       <div style="padding:4px 0 4px 16px;font-size:0.8rem">
         <div style="color:var(--danger);font-weight:600">Passiva — 1a Rodada</div>
@@ -4392,7 +4401,7 @@ export function renderFeatureItem(f, source) {
   } else if (ehGloriaDestruicaoInspiradora && estadoPaladino) {
     // Glória nv3: Destruição Inspiradora — usa Canalizar Divindade após Destruição Divina
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">CD ${estadoPaladino.canalizarDisponiveis}/${estadoPaladino.canalizarMax}</span>`;
-    const nivel = char.nivel || 1;
+    const nivel = ctx.nivelClasse || 1;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
         <button class="btn btn-sm btn-primary" data-paladino-subclasse-acao="gloria_destruicao_inspiradora" ${estadoPaladino.canalizarDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Destruição Inspiradora</button>
@@ -4513,7 +4522,7 @@ export function renderFeatureItem(f, source) {
     if (!char.recursos.paladino.subclasses) char.recursos.paladino.subclasses = {};
     if (!char.recursos.paladino.subclasses.ancioes) char.recursos.paladino.subclasses.ancioes = {};
     const usada = !!char.recursos.paladino.subclasses.ancioes.sentinela_imortal_usada;
-    const nivel = char.nivel || 1;
+    const nivel = ctx.nivelClasse || 1;
     const cura = 3 * nivel;
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${usada ? 'Usada' : 'Disponível'}</span>`;
     usosHtmlBody = `
@@ -4637,7 +4646,7 @@ export function renderFeatureItem(f, source) {
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
         <button class="btn btn-sm ${ativa ? 'btn-warning' : 'btn-accent'}" data-monge-subclasse-acao="sintonia_toggle">${ativa ? 'Desativar Sintonia' : 'Ativar Sintonia (1 PF)'}</button>
-        <span style="font-size:0.75rem;color:var(--text-muted)">10 min | Ataques Elementais + Extensão 3m${(char.nivel || 1) >= 11 ? ' | Natação + Voo' : ''}</span>
+        <span style="font-size:0.75rem;color:var(--text-muted)">10 min | Ataques Elementais + Extensão 3m${(ctx.nivelClasse || 1) >= 11 ? ' | Natação + Voo' : ''}</span>
       </div>
     `;
   } else if (ehAtaqueFurtivo && estadoLadino) {
@@ -4888,7 +4897,11 @@ export function renderFeatureItem(f, source) {
     `;
   }
 
-  return `
+  // O carimbo de data-classe e aplicado no HTML pronto, de uma vez: e a unica
+  // forma de garantir que NENHUM dos ~150 elementos interativos deste bloco
+  // fique de fora (varios deles sao emitidos de dentro de strings com aspas
+  // simples, onde `${...}` nao interpola). Ver carimbarClasse abaixo.
+  return carimbarClasse(`
     <details style="margin-bottom:6px">
       <summary style="font-weight:600;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;flex-wrap:wrap;gap:2px">
         <span class="badge badge-secondary" style="margin-right:4px">Nv.${f.nivel}</span>
@@ -4906,5 +4919,60 @@ export function renderFeatureItem(f, source) {
         </div>
       ` : ''}
     </details>
-  `;
+  `, ctx);
+}
+
+/**
+ * Carimba todo elemento interativo do HTML com a classe do bloco que o emitiu.
+ *
+ * NAO e atributo morto: nada le `data-classe` neste sub-projeto (3b), mas e o
+ * 3c que passa a ler, ao converter os handlers de evento. A razao de existir
+ * sao os seletores GENERICOS dos handlers: `data-config-maestrias="1"` e
+ * emitido por CINCO ramos de classe diferentes (Barbaro, Guerreiro, Guardiao,
+ * Paladino e Ladino) e o handler faz um unico
+ * querySelectorAll('[data-config-maestrias]'), tratando todos igual. Num
+ * Barbaro/Guerreiro a ficha renderiza DOIS botoes identicos e, sem este
+ * atributo, o handler nao tem como saber de qual classe cada um e.
+ * `data-config-maestrias` e o UNICO seletor generico ambiguo hoje:
+ * `data-escolher-estilo-luta-extra` sai de um ramo so (ehEstiloLutaAdicional,
+ * do Campeao), medido nesta tarefa.
+ *
+ * A aplicacao e uniforme -- todo <button> e todo <select> -- porque distinguir
+ * "quais precisam" exigiria julgamento ponto a ponto em ~150 lugares, e errar
+ * um deles so apareceria no 3c.
+ *
+ * Seguro por construcao: a descricao da caracteristica passa por mdParaHtml,
+ * que escapa `<` antes de qualquer outra coisa, entao nenhum `<button` vindo
+ * do texto do livro chega ate aqui.
+ *
+ * A substituicao usa a forma de FUNCAO de String.replace, e nao uma string de
+ * substituicao, de proposito. `escHtml` neutraliza `& < > " '` DENTRO do nome
+ * da classe, mas uma string de substituicao ainda seria varrida DEPOIS em
+ * busca de `$&`, "$`", "$'" e `$1` -- e o que essas expansoes despejam nao
+ * passa por escape nenhum. Um `ctx.classe` valendo "X$`Y" jogava todo o HTML
+ * ANTERIOR, com aspas duplas cruas, para dentro do valor do atributo,
+ * quebrando a marcacao e permitindo injetar `data-*-acao` falsos que o
+ * handler do 3c despacharia. O caminho e alcancavel: `ctx.classe` vem de
+ * montarContextos <- classesDe (regras-multiclasse.js), que le
+ * `p.classes[].classe` do JSON importado sem validar nada. A forma de funcao
+ * nao interpreta `$`. Nao troque por uma string de substituicao. Oraculo 19
+ * de testes/regras/unidade/multiclasse-render.test.mjs.
+ *
+ * AVISO -- nao e idempotente: uma segunda passada insere um data-classe ANTES
+ * do que ja existe, e em HTML o PRIMEIRO atributo vence, entao a
+ * re-carimbagem trocaria a classe do elemento em silencio. Hoje e
+ * inalcancavel (ha um unico ponto de aplicacao, o return de
+ * renderFeatureItem), mas o 3c nao pode carimbar de novo o HTML ja pronto.
+ *
+ * @param {string} html - o HTML pronto do item
+ * @param {{classe}} ctx - o contexto da classe cujo bloco esta sendo renderizado
+ * @returns {string} o mesmo HTML, com data-classe em cada elemento interativo
+ */
+function carimbarClasse(html, ctx) {
+  // Sem `ctx?.`: o corpo de renderFeatureItem ja desreferencia `ctx.classe`
+  // sem guarda muito antes de chegar aqui, entao um ctx ausente ja teria
+  // estourado. A defesa aqui seria morta e daria a impressao falsa de que a
+  // funcao aceita ser chamada sem contexto.
+  const classe = escHtml(ctx.classe);
+  return html.replace(/<(button|select|input|textarea)\b/g, (_m, tag) => `<${tag} data-classe="${classe}"`);
 }
