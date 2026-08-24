@@ -13,13 +13,45 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.18';
+export const VERSAO_ATUAL = '2.2.19';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.19',
+    data: '2026-08-24',
+    rotulo: 'Botões por classe',
+    resumo: 'Num personagem com mais de uma classe, os botões do bloco da '
+      + 'segunda classe voltaram a responder ao clique — era a promessa que '
+      + 'a versão anterior deixou em aberto.',
+    correcoes: [
+      {
+        grupo: '⚔️ Recursos de classe',
+        itens: [
+          'A ficha já mostrava, desde a versão anterior, o botão certo em '
+            + 'cada bloco. Clicar nele não fazia nada: o app conferia o nível '
+            + 'e a proficiência sempre pela primeira classe, então o botão da '
+            + 'segunda classe recusava o uso ou usava o número errado. Agora '
+            + 'cada clique olha para a classe (e o nível naquela classe) do '
+            + 'próprio bloco.',
+          'A caixa de resumo do topo da ficha também passou a contar pelo '
+            + 'nível na classe: o aviso da Fúria Implacável anunciava um total '
+            + 'de Pontos de Vida diferente do que a janela mostrava ao clicar, '
+            + 'e os botões de Fúria Persistente, de Inspiração pela iniciativa '
+            + 'e de Restauração Feiticeira apareciam antes da hora, só para '
+            + 'não funcionar.',
+          'No modal de Maestrias em Arma, o título e o número de maestrias '
+            + 'já são os da classe certa, mas a lista de armas oferecidas '
+            + 'ainda é a da primeira classe — isso fica para uma próxima '
+            + 'versão.',
+          'Para quem tem uma classe só, nada muda.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.18',
     data: '2026-08-23',

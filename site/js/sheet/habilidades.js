@@ -28,6 +28,7 @@ import { numberPickerHtml, setupNumberPicker } from './hp-descanso.js';
 import { abrirModalMaestrias } from './maestrias.js';
 import { OPCOES_METAMAGIA, conjurarSemEspaco, consumirEspacoMagiaDisponivel, recuperarEspacoMagia } from './magias.js';
 import { normalizarEstiloLuta } from '../talentos-effects.js';
+import { nivelNa, subclasseDe, temClasse } from '../regras-multiclasse.js';
 import { aplicarEscolhaSubclasse, linhasDaSubclasseNoNivel, opcoesDaLinha } from '../regras-subclasse-escolhas.js';
 
 /**
@@ -142,6 +143,13 @@ export function setupEventosHabilidades() {
         toast('Mãos Curativas já usado. Descanse para recuperar.', 'error');
         return;
       }
+      // NIVEL TOTAL, de proposito -- NAO converter para nivelNa().
+      // Maos Curativas e traco de ESPECIE (nem existe "nivel na classe"
+      // para especie) e escala pelo Bonus de Proficiencia, que vem do
+      // nivel TOTAL de personagem, "nao do nivel de uma classe
+      // especifica" (PHB.md:2047; Especies.md:25). O espelho escalar lido
+      // abaixo JA E o nivel total: sincronizarEspelhos() o escreve como a
+      // soma dos niveis de todas as classes (regras-multiclasse.js:153).
       const pb = bonusProficiencia(char.nivel || 1);
       // Simular rolagem de PB d4s
       let total = 0;
@@ -170,7 +178,8 @@ export function setupEventosHabilidades() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Clérigo') return;
+      // temClasse: o Clerigo pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Clérigo')) return;
 
       const estado = getEstadoRecursosClerigo();
       if (!estado || estado.canalizarDivindadeUsosDisponiveis <= 0) {
@@ -180,7 +189,9 @@ export function setupEventosHabilidades() {
 
       const acao = btn.dataset.clerigoCdAcao;
       const modSab = calcMod(char.atributos.sabedoria);
-      const dadosCentelha = (char.nivel >= 18) ? '4d8' : (char.nivel >= 13) ? '3d8' : (char.nivel >= 7) ? '2d8' : '1d8';
+      // Centelha Divina escala pelos niveis DE CLERIGO (Classes.md:1580).
+      const nivelClerigo = nivelNa(char, 'Clérigo');
+      const dadosCentelha = (nivelClerigo >= 18) ? '4d8' : (nivelClerigo >= 13) ? '3d8' : (nivelClerigo >= 7) ? '2d8' : '1d8';
 
       // Consome 1 uso
       char.recursos.clerigo.canalizar_divindade_usos_gastos += 1;
@@ -202,7 +213,8 @@ export function setupEventosHabilidades() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Clérigo') return;
+      // temClasse: o Clerigo pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Clérigo')) return;
       if (!char.recursos) char.recursos = {};
       if (!char.recursos.clerigo) char.recursos.clerigo = {};
 
@@ -216,7 +228,8 @@ export function setupEventosHabilidades() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Clérigo') return;
+      // temClasse: o Clerigo pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Clérigo')) return;
       if (!char.recursos) char.recursos = {};
       if (!char.recursos.clerigo) char.recursos.clerigo = {};
 
@@ -253,7 +266,8 @@ export function setupEventosHabilidades() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Clérigo') return;
+      // temClasse: o Clerigo pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Clérigo')) return;
 
       const acao = btn.dataset.clerigoSubclasseAcao;
       const estadoClerigo = getEstadoRecursosClerigo();
@@ -340,7 +354,8 @@ export function setupEventosHabilidades() {
 
         case 'vida_preservar_vida':
           char.recursos.clerigo.canalizar_divindade_usos_gastos += 1;
-          toast(`Preservar a Vida usado (pool de ${5 * (char.nivel || 1)} PV).`, 'success');
+          // "cinco vezes seu nivel de Clerigo" (Classes.md:1953).
+          toast(`Preservar a Vida usado (pool de ${5 * nivelNa(char, 'Clérigo')} PV).`, 'success');
           break;
 
         default:
@@ -357,7 +372,8 @@ export function setupEventosHabilidades() {
     const handler = (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Bruxo') return;
+      // temClasse: o Bruxo pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Bruxo')) return;
       const estado = getEstadoRecursosBruxo();
       if (!estado) return;
       const acao = el.dataset.bruxoSubclasseAcao;
@@ -436,7 +452,8 @@ export function setupEventosHabilidades() {
     if (el.tagName === 'SELECT') {
       el.addEventListener('change', (e) => {
         e.stopPropagation();
-        if (char.classe !== 'Bruxo') return;
+        // temClasse: o Bruxo pode nao ser a classe INICIAL do personagem.
+        if (!temClasse(char, 'Bruxo')) return;
         const estado = getEstadoRecursosBruxo();
         if (!estado) return;
         char.recursos.bruxo.subclasses.infero.resistencia_infera_escolha = el.value;
@@ -454,7 +471,8 @@ export function setupEventosHabilidades() {
     const handler = (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Guardião') return;
+      // temClasse: o Guardiao pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Guardião')) return;
       const estado = getEstadoRecursosGuardiao();
       if (!estado) return;
       const acao = el.dataset.guardiaoSubclasseAcao;
@@ -476,7 +494,9 @@ export function setupEventosHabilidades() {
       if (acao === 'golpe_terrivel') {
         if (estado.golpeTerrivelDisponiveis <= 0) { toast('Sem usos de Golpe Terrível.', 'error'); return; }
         sub.vigilante.golpe_terrivel_usos_gastos += 1;
-        const dano = (char.nivel || 1) >= 11 ? '2d8' : '2d6';
+        // Torrente do Vigilante melhora o Golpe Terrivel no nivel 11 DE
+        // GUARDIAO (Classes.md:3736-3738; regra de subclasse 3324).
+        const dano = nivelNa(char, 'Guardião') >= 11 ? '2d8' : '2d6';
         toast(`Golpe Terrível! ${dano} Psíquico adicional. Restantes: ${estado.golpeTerrivelDisponiveis - 1}/${estado.golpeTerrivelMax}`, 'success');
       }
 
@@ -487,7 +507,8 @@ export function setupEventosHabilidades() {
     if (el.tagName === 'SELECT') {
       el.addEventListener('change', (e) => {
         e.stopPropagation();
-        if (char.classe !== 'Guardião') return;
+        // temClasse: o Guardiao pode nao ser a classe INICIAL do personagem.
+        if (!temClasse(char, 'Guardião')) return;
         const estado = getEstadoRecursosGuardiao();
         if (!estado) return;
         const acao = el.dataset.guardiaoSubclasseAcao;
@@ -516,7 +537,8 @@ export function setupEventosHabilidades() {
     const handler = (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Druida') return;
+      // temClasse: o Druida pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Druida')) return;
       const estado = getEstadoRecursosDruida();
       if (!estado) return;
       const acao = el.dataset.druidaSubclasseAcao;
@@ -543,7 +565,9 @@ export function setupEventosHabilidades() {
       if (acao === 'recuperacao_slots') {
         if (sub.terra.recuperacao_natural_slots_usada) { toast('Recuperação de slots já usada neste descanso longo.', 'error'); return; }
         sub.terra.recuperacao_natural_slots_usada = true;
-        const metadeNivel = Math.ceil((char.nivel || 1) / 2);
+        // "metade do seu nivel COMO DRUIDA, arredondado para cima"
+        // (Classes.md:2450, Circulo da Terra).
+        const metadeNivel = Math.ceil(nivelNa(char, 'Druida') / 2);
         toast(`Recuperação Natural — recupere até ${metadeNivel} círculos de slots (nenhum 6+). Marque manualmente nos slots.`, 'success');
       }
       // Mapa Estelar — Raio Guia grátis
@@ -567,7 +591,8 @@ export function setupEventosHabilidades() {
     if (el.tagName === 'SELECT') {
       el.addEventListener('change', (e) => {
         e.stopPropagation();
-        if (char.classe !== 'Druida') return;
+        // temClasse: o Druida pode nao ser a classe INICIAL do personagem.
+        if (!temClasse(char, 'Druida')) return;
         const estado = getEstadoRecursosDruida();
         if (!estado) return;
         const acao = el.dataset.druidaSubclasseAcao;
@@ -603,7 +628,8 @@ export function setupEventosHabilidades() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Bardo') return;
+      // temClasse: o Bardo pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Bardo')) return;
       if (!char.recursos) char.recursos = {};
       if (!char.recursos.bardo) char.recursos.bardo = {};
       if (!char.recursos.bardo.subclasses) char.recursos.bardo.subclasses = {};
@@ -702,7 +728,8 @@ export function setupEventosHabilidades() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Feiticeiro') return;
+      // temClasse: o Feiticeiro pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Feiticeiro')) return;
 
       const estado = getEstadoRecursosFeiticeiro();
       if (!estado) return;
@@ -713,7 +740,8 @@ export function setupEventosHabilidades() {
           char.recursos.feiticeiro.feiticaria_inata_usos_gastos += 1;
           char.recursos.feiticeiro.feiticaria_inata_ativa = true;
           toast('Feitiçaria Inata ativada por 1 minuto.', 'success');
-        } else if ((char.nivel || 1) >= 7 && gastarPontosFeiticaria(2)) {
+          // Feiticaria Encarnada e do nivel 7 DE FEITICEIRO (Classes.md:2708).
+        } else if (nivelNa(char, 'Feiticeiro') >= 7 && gastarPontosFeiticaria(2)) {
           char.recursos.feiticeiro.feiticaria_inata_ativa = true;
           toast('Feitiçaria Inata ativada com Feitiçaria Encarnada (-2 PF).', 'success');
         } else {
@@ -728,7 +756,8 @@ export function setupEventosHabilidades() {
       }
 
       if (acao === 'restauracao-feiticeira') {
-        if ((char.nivel || 1) < 5) {
+        // Restauracao Feiticeira e do nivel 5 DE FEITICEIRO (Classes.md:2704).
+        if (nivelNa(char, 'Feiticeiro') < 5) {
           toast('Restauração Feiticeira exige nível 5.', 'error');
           return;
         }
@@ -736,7 +765,9 @@ export function setupEventosHabilidades() {
           toast('Restauração Feiticeira já foi usada neste descanso longo.', 'error');
           return;
         }
-        const rec = Math.floor((char.nivel || 1) / 2);
+        // "metade do seu nivel DE FEITICEIRO, arredondado para baixo"
+        // (Classes.md:2706).
+        const rec = Math.floor(nivelNa(char, 'Feiticeiro') / 2);
         const recuperavel = Math.min(rec, estado.pontosMax - estado.pontosAtuais);
         if (recuperavel <= 0) {
           toast('Seus Pontos de Feitiçaria já estão no máximo.', 'info');
@@ -781,11 +812,14 @@ export function setupEventosHabilidades() {
 
       if (acao === 'converter-ponto-slot') {
         const custos = { 1: 2, 2: 3, 3: 5, 4: 6, 5: 7 };
+        // A tabela "Criando Espacos de Magia" tem coluna "Nivel Min. DE
+        // FEITICEIRO" (2/3/5/7/9 -- Classes.md:2683-2689), nao nivel total.
+        const nivelFeiticeiro = nivelNa(char, 'Feiticeiro');
         abrirModal('Criar Espaço de Magia', `
           <div class="form-group">
             <label class="form-label" for="pf-para-slot">Círculo do espaço (máx. 5º)</label>
             <select class="form-input" id="pf-para-slot">
-              ${[1, 2, 3, 4, 5].filter(c => (char.nivel || 1) >= (c === 1 ? 2 : c === 2 ? 3 : c === 3 ? 5 : c === 4 ? 7 : 9)).map(c => `<option value="${c}">${c}º círculo (custo ${custos[c]} PF)</option>`).join('')}
+              ${[1, 2, 3, 4, 5].filter(c => nivelFeiticeiro >= (c === 1 ? 2 : c === 2 ? 3 : c === 3 ? 5 : c === 4 ? 7 : 9)).map(c => `<option value="${c}">${c}º círculo (custo ${custos[c]} PF)</option>`).join('')}
             </select>
           </div>
         `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-pf-para-slot">Criar</button>');
@@ -813,7 +847,9 @@ export function setupEventosHabilidades() {
 
       if (acao === 'metamagia-config') {
         // Usa constante global OPCOES_METAMAGIA
-        const nivel = char.nivel || 1;
+        // As opcoes extras de Metamagia vem dos niveis 10 e 17 DE
+        // FEITICEIRO (Classes.md:2696), nao do nivel total.
+        const nivel = nivelNa(char, 'Feiticeiro');
         const maxMeta = (nivel >= 17 ? 6 : nivel >= 10 ? 4 : 2);
         const metasSelecionadas = new Set(estado.metamagias || []);
 
@@ -909,8 +945,11 @@ export function setupEventosHabilidades() {
 
       if (acao === 'fala-telepatica') {
         char.recursos.feiticeiro.subclasses.aberrante.telepatia_ativa = true;
-        char.recursos.feiticeiro.subclasses.aberrante.telepatia_duracao_min = char.nivel || 1;
-        toast(`Fala Telepática ativada por ${char.nivel || 1} minuto(s).`, 'success');
+        // "um numero de minutos igual ao seu nivel DE FEITICEIRO"
+        // (Classes.md:3012, Feiticaria Aberrante).
+        const minutosTelepatia = nivelNa(char, 'Feiticeiro');
+        char.recursos.feiticeiro.subclasses.aberrante.telepatia_duracao_min = minutosTelepatia;
+        toast(`Fala Telepática ativada por ${minutosTelepatia} minuto(s).`, 'success');
       }
 
       if (acao === 'revelacao-carne') {
@@ -1077,7 +1116,8 @@ export function setupEventosHabilidades() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Bardo') return;
+      // temClasse: o Bardo pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Bardo')) return;
       if (!char.recursos) char.recursos = {};
       if (typeof char.recursos.inspiracao_bardo_usos_gastos !== 'number') {
         char.recursos.inspiracao_bardo_usos_gastos = 0;
@@ -1096,7 +1136,8 @@ export function setupEventosHabilidades() {
         toast('Inspiração de Bardo consumida.', 'success');
       }
 
-      if (acao === 'iniciativa' && (char.nivel || 1) >= 18) {
+      // Inspiracao Superior e do nivel 18 DE BARDO (Classes.md:476).
+      if (acao === 'iniciativa' && nivelNa(char, 'Bardo') >= 18) {
         const usosAtuais = Math.max(0, usosMax - char.recursos.inspiracao_bardo_usos_gastos);
         const alvo = Math.min(2, usosMax);
         if (usosAtuais < alvo) {
@@ -1117,7 +1158,8 @@ export function setupEventosHabilidades() {
       e.stopPropagation();
       e.preventDefault();
 
-      if (char.classe !== 'Bruxo') return;
+      // temClasse: o Bruxo pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Bruxo')) return;
       const estado = getEstadoRecursosBruxo();
       if (!estado) return;
       if (estado.astuciaUsada) {
@@ -1142,7 +1184,8 @@ export function setupEventosHabilidades() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Bruxo') return;
+      // temClasse: o Bruxo pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Bruxo')) return;
       const circ = parseInt(btn.dataset.bruxoArcanumToggle);
       if (!circ || ![6, 7, 8, 9].includes(circ)) return;
       const estado = getEstadoRecursosBruxo();
@@ -1185,7 +1228,8 @@ export function setupEventosHabilidades() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Druida') return;
+      // temClasse: o Druida pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Druida')) return;
 
       const acao = btn.dataset.druidaFormaAcao;
       const estado = getEstadoRecursosDruida();
@@ -1212,7 +1256,8 @@ export function setupEventosHabilidades() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Druida') return;
+      // temClasse: o Druida pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Druida')) return;
 
       const estado = getEstadoRecursosDruida();
       if (!estado) return;
@@ -1247,7 +1292,10 @@ export function setupEventosHabilidades() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Druida' || (char.nivel || 1) < 5) return;
+      // Guarda COMPOSTA: as duas metades sao de multiclasse. Ressurgimento
+      // Selvagem e do nivel 5 DE DRUIDA (Classes.md:2108), e o Druida pode
+      // nao ser a classe INICIAL.
+      if (!temClasse(char, 'Druida') || nivelNa(char, 'Druida') < 5) return;
 
       const estado = getEstadoRecursosDruida();
       if (!estado) return;
@@ -1292,7 +1340,10 @@ export function setupEventosHabilidades() {
 
   document.querySelectorAll('[data-druida-iniciativa]').forEach(btn => {
     btn.addEventListener('click', () => {
-      if (char.classe !== 'Druida' || (char.nivel || 1) < 20) return;
+      // Guarda COMPOSTA: as duas metades sao de multiclasse. Arquidruida e
+      // do nivel 20 DE DRUIDA (Classes.md:2138), e o Druida pode nao ser a
+      // classe INICIAL.
+      if (!temClasse(char, 'Druida') || nivelNa(char, 'Druida') < 20) return;
       const estado = getEstadoRecursosDruida();
       if (!estado) return;
       if (estado.usosDisponiveis > 0) {
@@ -1310,7 +1361,8 @@ export function setupEventosHabilidades() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Guardião') return;
+      // temClasse: o Guardiao pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Guardião')) return;
 
       const estado = getEstadoRecursosGuardiao();
       if (!estado) return;
@@ -1377,7 +1429,8 @@ export function setupEventosHabilidades() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Paladino') return;
+      // temClasse: o Paladino pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Paladino')) return;
       const estado = getEstadoRecursosPaladino();
       if (!estado) return;
       const acao = btn.dataset.paladinoAcao;
@@ -1450,7 +1503,8 @@ export function setupEventosHabilidades() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Paladino') return;
+      // temClasse: o Paladino pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Paladino')) return;
       const estado = getEstadoRecursosPaladino();
       if (!estado) return;
       if (!char.recursos.paladino.subclasses) char.recursos.paladino.subclasses = {};
@@ -1478,7 +1532,13 @@ export function setupEventosHabilidades() {
 
         case 'gloria_destruicao_inspiradora': {
           char.recursos.paladino.canalizar_divindade_usos_gastos += 1;
-          const nivel = char.nivel || 1;
+          // Caracteristica de subclasse de Paladino escala pelo nivel DE
+          // PALADINO (Classes.md:5553, PHB.md:2055). Obs.: o degrau em 11 e
+          // os dados 1d6/2d6 NAO constam do PHB 2024 (Classes.md:5767 da
+          // "2d8 mais o seu nivel de Paladino" em PV Temporarios, sem
+          // degrau) -- divergencia de CONTEUDO registrada no relatorio da
+          // Tarefa 2; aqui so o TIPO do nivel foi corrigido.
+          const nivel = nivelNa(char, 'Paladino');
           const dReforco = nivel >= 11 ? '2d6' : '1d6';
           toast(`Destruição Inspiradora usada! Aliados atacantes causam +${dReforco} Radiante no turno extra.`, 'success');
           break;
@@ -1538,7 +1598,8 @@ export function setupEventosHabilidades() {
             toast('Sentinela Imortal já usada.', 'error');
             return;
           }
-          const nivel = char.nivel || 1;
+          // "tres vezes o seu nivel DE PALADINO" (Classes.md:5889).
+          const nivel = nivelNa(char, 'Paladino');
           const cura = 3 * nivel;
           char.recursos.paladino.subclasses.ancioes.sentinela_imortal_usada = true;
           char.pv_atual = Math.min(1, char.pv_atual) || 1;
@@ -1625,7 +1686,8 @@ export function setupEventosHabilidades() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Monge') return;
+      // temClasse: o Monge pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Monge')) return;
       const estado = getEstadoRecursosMonge();
       if (!estado) return;
       const acao = btn.dataset.mongeAcao;
@@ -1656,7 +1718,9 @@ export function setupEventosHabilidades() {
         // Restaurar todos os pontos de foco
         char.recursos.monge.pontos_foco_gastos = 0;
         char.recursos.monge.metabolismo_usado = true;
-        const cura = `${char.nivel || 1} + 1d${estado.dadoArtesMarciais}`;
+        // "PV igual ao seu nivel DE MONGE mais o dado de Artes Marciais"
+        // (Classes.md:5196).
+        const cura = `${nivelNa(char, 'Monge')} + 1d${estado.dadoArtesMarciais}`;
         toast(`Metabolismo Incomum ativado! Pontos de Foco restaurados. Cura: ${cura} PV.`, 'success');
       }
 
@@ -1670,11 +1734,14 @@ export function setupEventosHabilidades() {
     el.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Monge') return;
+      // temClasse: o Monge pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Monge')) return;
       const estado = getEstadoRecursosMonge();
       if (!estado) return;
       const acao = el.dataset.mongeSubclasseAcao;
-      const sub = char.subclasse || '';
+      // subclasseDe: o espelho escalar aponta para a subclasse da
+      // classe INICIAL, que num multiclasse nao e a do Monge.
+      const sub = subclasseDe(char, 'Monge');
 
       // Mão Espalmada
       if (sub === 'Combatente da Mão Espalmada' && char.recursos.monge.subclasses?.mao_espalmada) {
@@ -1761,7 +1828,8 @@ export function setupEventosHabilidades() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Ladino') return;
+      // temClasse: o Ladino pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Ladino')) return;
       const estado = getEstadoRecursosLadino();
       if (!estado) return;
       const acao = btn.dataset.ladinoAcao;
@@ -1848,7 +1916,8 @@ export function setupEventosHabilidades() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Mago') return;
+      // temClasse: o Mago pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Mago')) return;
       const estado = getEstadoRecursosMago();
       if (!estado) return;
       const acao = btn.dataset.magoAcao;
@@ -2005,11 +2074,14 @@ export function setupEventosHabilidades() {
     const handler = (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Mago') return;
+      // temClasse: o Mago pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Mago')) return;
       const estado = getEstadoRecursosMago();
       if (!estado) return;
       const acao = el.dataset.magoSubclasseAcao;
-      const sub = char.subclasse || '';
+      // subclasseDe: o espelho escalar aponta para a subclasse da
+      // classe INICIAL, que num multiclasse nao e a do Mago.
+      const sub = subclasseDe(char, 'Mago');
 
       // Abjurador: Proteção Arcana
       if (sub === 'Abjurador' && char.recursos.mago.subclasses?.abjurador) {
@@ -2149,7 +2221,8 @@ export function setupEventosHabilidades() {
     if (el.tagName === 'SELECT') {
       el.addEventListener('change', (e) => {
         e.stopPropagation();
-        if (char.classe !== 'Mago') return;
+        // temClasse: o Mago pode nao ser a classe INICIAL do personagem.
+        if (!temClasse(char, 'Mago')) return;
         const acao = el.dataset.magoSubclasseAcao;
         if (acao === 'terceiro_olho_escolha') {
           if (!char.recursos?.mago?.subclasses?.adivinhador) return;
@@ -2167,7 +2240,8 @@ export function setupEventosHabilidades() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (char.classe !== 'Guerreiro') return;
+      // temClasse: o Guerreiro pode nao ser a classe INICIAL do personagem.
+      if (!temClasse(char, 'Guerreiro')) return;
 
       const estado = getEstadoRecursosGuerreiro();
       if (!estado) return;
@@ -2179,7 +2253,8 @@ export function setupEventosHabilidades() {
           return;
         }
         char.recursos.guerreiro.recuperar_folego_usos_gastos += 1;
-        const cura = `1d10 + ${char.nivel || 1}`;
+        // "1d10 mais seu nivel DE GUERREIRO" (Classes.md:3822).
+        const cura = `1d10 + ${nivelNa(char, 'Guerreiro')}`;
         toast(`Recuperar Folego usado! Role ${cura} e aplique a cura.`, 'success');
       }
 
@@ -2198,7 +2273,8 @@ export function setupEventosHabilidades() {
           return;
         }
         char.recursos.guerreiro.indomavel_usos_gastos += 1;
-        toast(`Indomável usado! Rejogue a salvaguarda com bônus de +${char.nivel || 1}.`, 'success');
+        // "bonus igual ao seu nivel DE GUERREIRO" (Classes.md:3856).
+        toast(`Indomável usado! Rejogue a salvaguarda com bônus de +${nivelNa(char, 'Guerreiro')}.`, 'success');
       }
 
       // --- Mestre da Batalha ---
@@ -2363,20 +2439,29 @@ export function setupEventosHabilidades() {
         }
 
         // Coração Selvagem (nível 3+): solicitar escolha de animal
-        if (char.subclasse === 'Trilha do Coração Selvagem' && (char.nivel || 1) >= 3) {
+        // subclasseDe/nivelNa: o espelho escalar aponta para a subclasse e o
+        // nivel TOTAL da classe INICIAL -- num Guerreiro/Barbaro, nao os do
+        // Barbaro. Fúria dos Selvagens é do nível 3 DE BÁRBARO
+        // (Classes.md:255; regra de subclasse Classes.md:117). É o mesmo bug
+        // que barbaro.js:37-40 já corrigiu internamente.
+        if (subclasseDe(char, 'Bárbaro') === 'Trilha do Coração Selvagem' && nivelNa(char, 'Bárbaro') >= 3) {
           _abrirEscolhaAnimalFuria();
         }
 
         // Árvore do Mundo (nível 3+): Surto de Vitalidade — PVT = nível ao ativar
-        if (char.subclasse === 'Trilha da Árvore do Mundo' && (char.nivel || 1) >= 3) {
-          const pvtSurto = char.nivel || 1;
+        // Vitalidade da Árvore é do nível 3 DE BÁRBARO (Classes.md:195) e os
+        // PV Temporários são "iguais ao seu nível de Bárbaro" (Classes.md:201).
+        if (subclasseDe(char, 'Bárbaro') === 'Trilha da Árvore do Mundo' && nivelNa(char, 'Bárbaro') >= 3) {
+          const pvtSurto = nivelNa(char, 'Bárbaro');
           char.pv_temporario = Math.max(char.pv_temporario || 0, pvtSurto);
           toast(`Surto de Vitalidade: +${pvtSurto} PV Temporários!`, 'success');
         }
       } else {
         char.recursos.furia_ativa = false;
         // Limpar escolha de animal da Fúria ao encerrar
-        if (char.subclasse === 'Trilha do Coração Selvagem') {
+        // subclasseDe: mesmo motivo do ramo de ativacao -- a subclasse do
+        // BARBARO, nao a da classe inicial.
+        if (subclasseDe(char, 'Bárbaro') === 'Trilha do Coração Selvagem') {
           char.recursos.furia_animal = null;
         }
         // Desativar Fúria dos Deuses ao encerrar
@@ -2394,7 +2479,20 @@ export function setupEventosHabilidades() {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
       e.preventDefault();
-      await abrirModalMaestrias();
+      // Unico seletor de handler que NAO codifica a classe no proprio nome:
+      // `data-config-maestrias` sai de cinco ramos (Barbaro, Guerreiro,
+      // Guardiao, Paladino e Ladino) e aqui ha um querySelectorAll so. Num
+      // Barbaro/Guerreiro a ficha emite DOIS botoes identicos no atributo,
+      // entao a classe vem do carimbo `data-classe` que renderFeatureItem
+      // aplica em todo elemento interativo.
+      //
+      // A guarda NAO e defensiva por habito: sem ela, um carimbo que falhe
+      // deixaria `classe` undefined, o modal cairia no espelho `char.classe`
+      // (a classe INICIAL) e abriria o teto da classe errada em silencio --
+      // o botao do Guerreiro 5 daria as 3 maestrias do Barbaro 5 em vez de 4.
+      const classe = btn.dataset.classe;
+      if (!classe || !temClasse(char, classe)) return;
+      await abrirModalMaestrias(classe);
     });
   });
 
@@ -2419,7 +2517,14 @@ export function setupEventosHabilidades() {
 
   document.querySelectorAll('[data-furia-iniciativa]').forEach(btn => {
     btn.addEventListener('click', () => {
-      if (char.classe !== 'Bárbaro' || char.nivel < 15) return;
+      // Guarda COMPOSTA, e a unica da faixa que era lida SEM `|| 1`. Isso
+      // MUDA DE COMPORTAMENTO, de proposito: antes, com o nivel indefinido,
+      // `undefined < 15` dava false e o handler PROSSEGUIA (zerava as
+      // furias de quem nao tinha direito); nivelNa() devolve 0 para classe
+      // ausente, entao `0 < 15` da true e ele retorna cedo. Fúria
+      // Persistente é do nível 15 DE BÁRBARO (Classes.md:163, PHB.md:2055),
+      // e o Bárbaro pode não ser a classe INICIAL.
+      if (!temClasse(char, 'Bárbaro') || nivelNa(char, 'Bárbaro') < 15) return;
       if (!char.recursos) char.recursos = {};
       if (char.recursos.furia_persistente_usada) {
         toast('Fúria Persistente já foi usada desde o último descanso longo.', 'error');
@@ -2439,8 +2544,12 @@ export function setupEventosHabilidades() {
       const estado = getEstadoFuria();
       if (!estado?.ativa || !estado.furiaImplacavel) return;
       if (!char.recursos) char.recursos = {};
+      // A CD NAO deriva de `nivel`: e estado persistido (base 10, +5 por
+      // uso -- Classes.md:151-153), entao converter o nivel aqui nao a
+      // rebaixa. Ja os PV sao "duas vezes seu nivel DE BARBARO"
+      // (Classes.md:151), que num multiclasse nao e o nivel total.
       const cd = char.recursos.furia_implacavel_cd || 10;
-      const nivel = char.nivel || 1;
+      const nivel = nivelNa(char, 'Bárbaro');
       const pvRecuperados = nivel * 2;
 
       abrirModal('Fúria Implacável',

@@ -24,17 +24,33 @@ function bonusMaestriaTalento() {
   return passivosTalentosCache?.flags?.mestre_armas_maestria_extra ? 1 : 0;
 }
 
-export async function abrirModalMaestrias() {
+/**
+ * Abre o modal de escolha de maestrias em arma da classe informada.
+ *
+ * O parâmetro `classe` existe por causa do multiclasse: um Bárbaro/Guerreiro
+ * renderiza DOIS botões "Definir Maestrias" e cada um tem de abrir o modal da
+ * SUA classe. `char.classe` é o espelho da classe INICIAL, então decidir o
+ * teto por ele dava 3 maestrias (Bárbaro 5) também no botão do Guerreiro, que
+ * tem direito a 4 — uma vaga a menos, sem aviso nenhum. O default preserva o
+ * comportamento de quem chama sem argumento (ficha de classe única e a troca
+ * de maestria do Descanso Longo).
+ *
+ * O nível já vem certo: `getProgressaoBarbaro`/`getProgressaoGuerreiro` leem
+ * `nivelNa()` desde o sub-projeto 3b.
+ *
+ * @param {string} [classe] Classe dona do botão clicado.
+ */
+export async function abrirModalMaestrias(classe = char.classe) {
   // Classes que possuem Maestria em Arma
   const classesMaestria = ['Bárbaro', 'Guerreiro', 'Guardião', 'Paladino', 'Ladino'];
-  if (!classesMaestria.includes(char.classe)) return;
+  if (!classesMaestria.includes(classe)) return;
 
   // Obter quantidade máxima de maestrias conforme a classe
   let maestriasMax = 2; // Valor fixo para Guardião, Paladino e Ladino
-  if (char.classe === 'Bárbaro') {
+  if (classe === 'Bárbaro') {
     const prog = getProgressaoBarbaro();
     maestriasMax = prog?.maestriasMax || 2;
-  } else if (char.classe === 'Guerreiro') {
+  } else if (classe === 'Guerreiro') {
     const prog = getProgressaoGuerreiro();
     maestriasMax = prog?.maestriasMax || 3;
   }
@@ -76,7 +92,7 @@ export async function abrirModalMaestrias() {
     `;
   };
 
-  abrirModal(`Maestrias em Arma (${escHtml(char.classe)})`, `
+  abrirModal(`Maestrias em Arma (${escHtml(classe)})`, `
     <div class="search-box"><input type="text" id="maestria-busca" class="form-input" placeholder="Buscar arma..."></div>
     <div id="maestria-conteudo">${renderLista('')}</div>
     <div style="font-size:0.75rem;color:var(--text-muted);margin-top:8px">

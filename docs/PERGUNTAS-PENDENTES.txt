@@ -653,47 +653,94 @@ classeData quando classesData faltar: seria ponte de compatibilidade
 escondendo a dependencia recem-criada.
 
 ================================================================================
-CD DE PRESENCA INTIMIDANTE DO BARBARO SEM ORACULO (barbaro.js:277)
+[RESOLVIDO 2026-08-24] CD DE PRESENCA INTIMIDANTE DO BARBARO SEM ORACULO
+(barbaro.js:281)
 
-CONTEXTO: a Tarefa 2 do sub-projeto 3b converteu os 12 modulos de classe
-para nivel por classe. O implementador achou CINCO chamadas de
+PAGO EM: sub-projeto 3c (multiclasse-handlers), Tarefa 4.
+ORACULO: "Oraculo 8 -- Guerreiro 3/Barbaro 14: a CD de Presenca Intimidante
+usa o Bonus de Proficiencia do nivel TOTAL", em
+testes/e2e/regras/multiclasse-handlers.spec.mjs.
+
+A DIVIDA ERA: a Tarefa 2 do sub-projeto 3b achou CINCO chamadas de
 bonusProficiencia em que a mesma variavel local `nivel` alimentava a CD de
-salvaguarda E os degraus de progressao da classe -- converter a declaracao,
-que era o movimento obvio e o que o brief mandava, teria rebaixado quatro
-CDs de nivel total para nivel de classe, em silencio. Um Ladino 3/Guerreiro
-14 teria CD com +2 em vez de +6.
+salvaguarda E os degraus de progressao da classe. Mutadas as cinco de uma
+vez, a suite inteira de ~3450 testes passava. Das cinco, quatro passaram a
+cair individualmente pelo oraculo 5 de multiclasse-render.test.mjs (elas
+saem por getEstadoRecursosX); a de barbaro.js NAO caia, porque a CD e
+calculada dentro do listener de [data-berserker-acao] e so sai como texto
+de toast() -- nao havia fachada publica que a expusesse, e o 3b proibia
+mudar assinatura publica dos 12 modulos de classe.
 
-A revisao independente mostrou que as cinco chamadas nao tinham NENHUM
-oraculo: mutadas as cinco de uma vez, a suite inteira de ~3450 testes
-passava. A rodada de correcao escreveu o oraculo 5 de
-multiclasse-render.test.mjs, com Barbaro 3/Guerreiro 14 (total 17 -> +6;
-na classe 3 -> +2).
+COMO FOI PAGA: o proprio 3c construiu a superficie de teste de handlers de
+clique (testes/e2e/regras/multiclasse-handlers.spec.mjs). O oraculo semeia
+a ficha multiclasse, CLICA no botao e le o toast por MutationObserver --
+nenhuma fachada nova, nenhuma assinatura publica alterada, producao
+intocada.
 
-O BURACO QUE SOBROU: das cinco, quatro caem individualmente quando
-mutadas. A de barbaro.js:277 (CD de Presenca Intimidante) NAO cai. Motivo:
-aquela CD e calculada dentro de um listener de clique e so sai como texto
-de toast() -- nao existe fachada publica do modulo que a exponha. As
-outras quatro saem por getEstadoRecursosX.
+FIXTURE E POR QUE ELE: Guerreiro 3 (ordem 0) / Barbaro 14 da Trilha do
+Berserker, Forca 18.
+  - Barbaro 14 e o minimo possivel: Presenca Intimidante e caracteristica
+    de Berserker NIVEL 14, entao o "Barbaro 3/Guerreiro 14" que os briefs
+    citavam nem chega a renderizar o botao.
+  - nivel TOTAL 17 -> Bonus de Proficiencia +6; nivel NA CLASSE 14 -> +5.
+    CD certa 18, CD errada 17.
+  - Forca 18 (modificador +4) e o UNICO modificador com esse valor na
+    ficha: ATRIBUTOS_REGRAS da destreza/constituicao +2 e int/sab/car +1.
+    Sem isso o oraculo poderia passar somando o ATRIBUTO errado -- foi
+    exatamente o que aconteceu na Tarefa 3 do 3b, com Forca 15 e Carisma 15
+    empatados no mesmo modificador.
 
-POR QUE NAO FOI CONSERTADO AQUI: o unico jeito de cobri-la seria expor a
-CD por uma fachada nova, e a Tarefa 2 proibia mudar assinatura publica dos
-12 modulos -- e a estabilidade das assinaturas e justamente o que mantem
-validos os ~40 pontos de chamada em habilidades.js e hp-descanso.js, que
-a tarefa nao pode tocar. Montar um DOM completo so para dirigir o listener
-tambem estava fora do escopo.
+PROVA DE QUE MEDE: mutada a linha para bonusProficiencia(nivelNa(char,
+'Barbaro') || 1), o oraculo fica VERMELHO ("Expected: 18 / Received: 17");
+restaurada por copia do backup, volta a verde. Producao conferida por md5
+antes e depois.
 
-DECIDIDO: fica para o sub-projeto 3c. E 3c quem converte
-setupEventosHabilidades -- ou seja, e o sub-projeto que precisa construir a
-superficie de teste de handlers de clique de qualquer forma. Cobrir esta CD
-la e reaproveitar essa superficie, em vez de abrir uma excecao de
-assinatura publica agora. Registrado aqui para que 3c nao o perca de vista.
+================================================================================
+[RESOLVIDO 2026-08-24] MAOS CURATIVAS DO AASIMAR: A REDE PASSOU A EXISTIR
+(habilidades.js:153)
 
-RISCO ENQUANTO ISSO: baixo e nao regressivo. A CD esta CERTA hoje (le
-nivel total, com comentario explicando). O que falta e a rede contra a
-proxima refatoracao -- e a refatoracao perigosa e exatamente a obvia
-("converter a declaracao"), que agora derruba o oraculo 5 pelas outras
-quatro chamadas. Ou seja: uma conversao em lote e pega; so uma conversao
-cirurgica isolada nessa unica linha passaria despercebida.
+NAO HAVIA ENTRADA PROPRIA para este buraco -- esta e o registro de que ele
+existia e de que foi fechado.
+
+O BURACO ERA: a revisao da Tarefa 2 do sub-projeto 3c mutou a leitura
+preservada `bonusProficiencia(char.nivel || 1)` (dentro da guarda
+char.especie !== 'Aasimar') para nivelNa e rodou a suite INTEIRA: os
+oraculos ficaram 5/5 verdes. A unica mencao a "Maos Curativas" em testes/
+era o catalogo de especie mais a asercao de RENDER de
+multiclasse-caracteristicas.spec.mjs, que le o rotulo do botao ("Curar
+(4d4)") produzido por sheet/caracteristicas.js -- ninguem CLICAVA no botao,
+e o handler de habilidades.js recalcula o Bonus de Proficiencia por conta
+propria.
+
+A DECISAO DE NAO CONVERTER ESTA CERTA: Maos Curativas e traco de ESPECIE
+(nem existe "nivel na classe" para especie) e rola "um numero de d4s igual
+ao seu Bonus de Proficiencia" (Especies.md:25), que vem do nivel TOTAL de
+personagem, "nao do nivel de uma classe especifica" (PHB.md:2047). O que
+faltava era a rede contra alguem converte-la por analogia num lote futuro.
+
+PAGO EM: sub-projeto 3c (multiclasse-handlers), Tarefa 4.
+ORACULO: "Oraculo 9 -- Aasimar Guerreiro 5/Clerigo 4: Maos Curativas rola
+d4s pelo Bonus de Proficiencia do nivel TOTAL", em
+testes/e2e/regras/multiclasse-handlers.spec.mjs.
+
+FIXTURE E POR QUE ELE: Aasimar Guerreiro 5 (ordem 0) / Clerigo 4.
+  - MULTICLASSE obrigatoriamente: em classe unica nivelNa e nivel total
+    coincidem e a mutacao passa despercebida -- foi exatamente isso que o
+    revisor mediu.
+  - nivel TOTAL 9 -> +4 -> 4d4; nivel de Guerreiro 5 -> +3 -> 3d4; nivel de
+    Clerigo 4 -> +2 -> 2d4. Os TRES numeros sao distintos, entao nao ha
+    classe que uma conversao errada pudesse escolher e coincidir com o
+    certo. (A sugestao do brief, Guerreiro 3/Clerigo 2, deixaria as duas
+    classes empatadas em +2.)
+  - Ancorado no texto do MODAL ("4d4 = [...]") e na CONTAGEM de rolagens
+    listadas, nao no rotulo do botao: o rotulo sai de
+    sheet/caracteristicas.js, que faz a propria conta e nao seria afetado
+    por uma mutacao em habilidades.js.
+
+PROVA DE QUE MEDE: mutada a linha para bonusProficiencia(nivelNa(char,
+char.classe || '') || 1), o oraculo fica VERMELHO ("Expected: 4 /
+Received: 3"); restaurada por copia do backup, volta a verde. Producao
+conferida por md5 antes e depois.
 
 ================================================================================
 Tarefa 3 (oraculos de renderFeatureItem): um oraculo do brief nasce VERDE, e
@@ -1043,3 +1090,101 @@ nao e o que a nota de versao original prometia. A nota foi corrigida na
 Inalcancavel por um jogador hoje: so regras-multiclasse.js:289 cria
 classes[], sempre com UMA entrada, e subirDeNivel sempre sobe char.classe.
 So um JSON importado a mao chega la.
+
+================================================================================
+PRE-REQUISITO DO 3D: A LISTA DE ARMAS ELEGIVEIS AINDA VEM DO ESPELHO
+
+Achado na Tarefa 3 do sub-projeto 3c e MEDIDO pela revisao independente, que
+o encontrou maior do que o implementador relatou.
+
+O DEFEITO: duas funcoes decidem por `personagem.classe`, o espelho da classe
+INICIAL:
+
+  site/js/regras-equipamento.js:61   armasElegiveisMaestria
+  site/js/regras-equipamento.js:14   temProficienciaArma   <- este NAO estava
+                                                              no relatorio
+
+MEDIDO num Barbaro/Guerreiro e num Ladino/Guerreiro:
+
+  par (ordem 0 primeiro)   armas listadas   correto   o que o jogador ve
+  ----------------------   --------------   -------   ------------------
+  Barbaro 5 / Guerreiro 5  28 nos dois      Gue: 38   o modal do GUERREIRO
+                                                      esconde as 10 armas a
+                                                      distancia
+  Guerreiro 5 / Barbaro 5  38 nos dois      Bar: 28   o modal do BARBARO
+                                                      oferece 10 armas que o
+                                                      livro proibe
+  Ladino 5 / Guerreiro 5   19 nos dois      Gue: 38   o modal do GUERREIRO
+                                                      esconde 19 DE 38 -- 50%
+                                                      do catalogo -- e ainda
+                                                      manda escolher 4
+
+O PIOR CASO E LADINO/GUERREIRO, e e o dobro do que o relatorio dizia. Deve ser
+o FIXTURE do 3d, porque e onde o defeito e maior.
+
+Livro: Barbaro tem maestria em "armas CORPO A CORPO Simples ou Marciais"
+(Classes.md:97); Guerreiro em "armas Simples ou Marciais" (Classes.md:3818),
+sem restricao de alcance.
+
+TAMBEM DO 3D: abrirModalTrocaMaestriaDescanso (site/js/sheet/maestrias.js:128
+-148) decide por char.classe QUATRO vezes (linhas 146, 149, 157, 160) mais 2
+usos de exibicao (187, 192), e chama abrirModalMaestrias() sem argumento. A
+funcao esta byte a byte igual a 365190f -- intocada de proposito.
+
+================================================================================
+DIVIDA DE LEGIBILIDADE QUE A TAREFA 3 DO 3C CRIOU, E O RULING
+
+A Tarefa 3 fez o modal de maestrias respeitar a classe do botao clicado
+(titulo e teto). Mas a LISTA de armas continua vindo do espelho, pelo defeito
+acima. Consequencia num Barbaro/Guerreiro:
+
+  ANTES: "Maestrias em Arma (Barbaro)", teto 3, lista do Barbaro
+         -> coerentemente ERRADO
+  AGORA: "Maestrias em Arma (Guerreiro)", teto 4, lista do Barbaro
+         -> meio certo, e meio certo ENGANA MAIS: o jogador conclui que o
+            Guerreiro nao pode ter maestria em Arco Longo
+
+DECIDIDO: fica para o 3d, NAO se conserta no 3c.
+
+Motivos, na ordem em que pesam:
+
+1. NAO E REGRESSAO DE DADO. A revisao mediu o A/B contra 365190f: o numero de
+   caixas e IDENTICO nos tres pares (28 / 38 / 19). Nenhuma escolha ficou
+   indisponivel que ja nao estivesse. So titulo e teto mudaram, e ambos para
+   o CERTO.
+
+2. E INALCANCAVEL POR UM JOGADOR HOJE. Nenhum fluxo do app cria personagem
+   multiclasse -- so o sub-projeto 5 vai permitir. Ate la, so um JSON forjado
+   chega neste estado, e _validarPersonagem (store.js:234-236) filtra os
+   malformados.
+
+3. MAESTRIA E ESCOPO DECLARADO DO 3D, e consertar aqui exigiria mexer em
+   regras-equipamento.js, que e territorio do 3d e tem o seu proprio defeito
+   (temProficienciaArma). Puxar isso para o 3c seria abrir escopo no meio de
+   um sub-projeto que ja passou por revisao.
+
+CUSTO SE ERRADO: se o sub-projeto 5 entrar antes do 3d, um jogador com
+Barbaro/Guerreiro ve um modal meio certo e conclui a coisa errada sobre quais
+armas o Guerreiro pode dominar. Mitigacao: o 3d deve vir ANTES do 5. Isso ja
+era verdade por outros motivos (Ataque Extra, CA alternativa e salvaguardas
+tambem estao la), e agora tem mais um.
+
+================================================================================
+ERROS MEUS NO SPEC E NO BRIEF DO 3C, TAREFA 3
+
+1. Disse SEIS emissoes de data-config-maestrias; sao CINCO, uma por classe
+   (habilidades.js:3024, 4192, 4278, 4288, 4298). A conclusao nao muda --
+   todas dentro de renderFeatureItem, todas carimbadas. Spec corrigido.
+
+2. Sugeri ancorar o oraculo no "destino da gravacao". NAO EXISTE:
+   char.maestrias_arma e uma lista unica do personagem, nao uma por classe. O
+   implementador ancorou no teto e no titulo, medindo o teto por
+   comportamento (marca 6 caixas, conta quantas grudam).
+
+3. Meu brief mandava consertar SO o handler. A guarda sozinha seria INOCUA no
+   caso que o oraculo mede: num Barbaro/Guerreiro o personagem tem as duas
+   classes, entao temClasse passa nos DOIS botoes e nao discrimina nada. Era
+   preciso propagar a classe para abrirModalMaestrias, em maestrias.js --
+   arquivo que meu brief nao listava. O implementador saiu do escopo, relatou,
+   e estava certo. A revisao confirmou revertendo cada metade separadamente:
+   as DUAS derrubam o oraculo 7.

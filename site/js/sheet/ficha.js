@@ -8,6 +8,7 @@
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ATRIBUTO_NOME_PARA_KEY, CLASSES_INFO, PERICIAS } from '../dados-classes.js';
 import { XP_POR_NIVEL } from '../levelup.js';
 import { _renderSyncIndicadorHtml } from '../pages/sheet.js';
+import { nivelNa } from '../regras-multiclasse.js';
 import { possuiAlgumaMagia } from '../regras-origens-magia.js';
 import { ehProficienteEmSalvaguarda } from '../regras-salvaguardas.js';
 import { resolverPassivosTalentos } from '../talentos-effects.js';
@@ -272,13 +273,20 @@ export function renderFichaCompleta() {
             ${estadoFuria.ativa ? '&nbsp;|&nbsp; <span style="color:var(--warning)">Sem Magias/Concentração</span>' : ''}
             ${temArmaduraPesadaEquipada() ? '&nbsp;|&nbsp;<span style="color:var(--danger)">Armadura pesada equipada</span>' : ''}
             ${estadoFuria.temForcaIndomavel ? '&nbsp;|&nbsp; <span style="font-size:0.75rem;color:var(--accent)" title="Piso de Força: se o total do teste/salvaguarda de FOR for menor que seu valor de FOR, use o valor de FOR">Força Indomável</span>' : ''}
-            ${estadoFuria.furiaImplacavel ? `&nbsp;|&nbsp; <span style="font-size:0.75rem;color:var(--info)" title="Se reduzido a 0 PV com Fúria ativa: SG CON CD ${estadoFuria.furiaImplacavelCD}. Sucesso = PV = ${(char.nivel || 1) * 2}">Implacável CD ${estadoFuria.furiaImplacavelCD}</span>` : ''}
+            ${/* nivelNa: Fúria Implacável restaura "duas vezes seu nível de
+                  BÁRBARO" (Classes.md:151), nunca o nível total. Este tooltip
+                  precisa dizer o MESMO número que o modal do handler
+                  (habilidades.js), que já lê nivelNa. */
+              estadoFuria.furiaImplacavel ? `&nbsp;|&nbsp; <span style="font-size:0.75rem;color:var(--info)" title="Se reduzido a 0 PV com Fúria ativa: SG CON CD ${estadoFuria.furiaImplacavelCD}. Sucesso = PV = ${nivelNa(char, 'Bárbaro') * 2}">Implacável CD ${estadoFuria.furiaImplacavelCD}</span>` : ''}
           </div>
           <div class="no-print" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
             <button class="btn btn-sm ${estadoFuria.ativa ? 'btn-secondary' : 'btn-danger'}" data-furia-toggle="${estadoFuria.ativa ? 'desativar' : 'ativar'}">
               ${estadoFuria.ativa ? 'Encerrar Fúria' : 'Entrar em Fúria'}
             </button>
-            ${char.nivel >= 15 ? `<button class="btn btn-sm btn-secondary" data-furia-iniciativa="1">Rolar Iniciativa (recuperar Fúrias)</button>` : ''}
+            ${/* nivelNa: Fúria Persistente é característica de BÁRBARO 15
+                  (Classes.md:153). O handler já mede pelo nível na classe --
+                  com char.nivel (o total) o botão saía visível e inerte. */
+              nivelNa(char, 'Bárbaro') >= 15 ? `<button class="btn btn-sm btn-secondary" data-furia-iniciativa="1">Rolar Iniciativa (recuperar Fúrias)</button>` : ''}
             ${estadoFuria.furiaImplacavel && estadoFuria.ativa ? `<button class="btn btn-sm btn-info" data-furia-implacavel="1">Fúria Implacável</button>` : ''}
           </div>
         </div>
@@ -293,7 +301,10 @@ export function renderFichaCompleta() {
           </div>
           <div class="no-print" style="display:flex;gap:6px;align-items:center">
             <button class="btn btn-sm btn-accent" data-inspiracao-acao="usar" ${estadoInspiracao.usosDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Inspiração</button>
-            ${(char.nivel || 1) >= 18 ? '<button class="btn btn-sm btn-secondary" data-inspiracao-acao="iniciativa">Rolar Iniciativa (recuperar até 2)</button>' : ''}
+            ${/* nivelNa: Fonte de Inspiração pela iniciativa é característica
+                  de BARDO 18. O handler já mede pelo nível na classe -- com
+                  char.nivel (o total) o botão saía visível, inerte e mudo. */
+              nivelNa(char, 'Bardo') >= 18 ? '<button class="btn btn-sm btn-secondary" data-inspiracao-acao="iniciativa">Rolar Iniciativa (recuperar até 2)</button>' : ''}
           </div>
         </div>
       ` : ''}
@@ -393,7 +404,11 @@ export function renderFichaCompleta() {
             <button class="btn btn-sm ${estadoFeiticeiro.feiticariaInataAtiva ? 'btn-secondary' : 'btn-accent'}" data-feiticeiro-acao="${estadoFeiticeiro.feiticariaInataAtiva ? 'encerrar-feiticaria-inata' : 'ativar-feiticaria-inata'}">
               ${estadoFeiticeiro.feiticariaInataAtiva ? 'Encerrar Feitiçaria Inata' : 'Ativar Feitiçaria Inata'}
             </button>
-            ${char.nivel >= 5 ? `<button class="btn btn-sm btn-primary" data-feiticeiro-acao="restauracao-feiticeira" ${estadoFeiticeiro.restauracaoFeiticeiraUsada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Restauração Feiticeira</button>` : ''}
+            ${/* nivelNa: Restauração Feiticeira é característica de
+                  FEITICEIRO 5. O handler já recusa com toast "exige nível 5"
+                  pelo nível na classe -- com char.nivel (o total) o botão
+                  saía visível só para ser recusado ao clicar. */
+              nivelNa(char, 'Feiticeiro') >= 5 ? `<button class="btn btn-sm btn-primary" data-feiticeiro-acao="restauracao-feiticeira" ${estadoFeiticeiro.restauracaoFeiticeiraUsada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Restauração Feiticeira</button>` : ''}
             <button class="btn btn-sm btn-secondary" data-feiticeiro-acao="metamagia-config">Metamagia</button>
           </div>
           ${semAcento(char.subclasse || '') === semAcento('Feitiçaria Selvagem') && estadoFeiticeiro.subclasses.selvagem.surto_pendente_automatico ? `

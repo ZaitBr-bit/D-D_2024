@@ -45,7 +45,6 @@ export const GATILHOS_SEM_COBERTURA = [
   'bardo-subclasse-acao=glamour_majestade_inquebravel',
   'bardo-subclasse-acao=glamour_manto_inspiracao',
   'bardo-subclasse-acao=glamour_manto_majestade',
-  'berserker-acao=presenca-intimidante',
   'berserker-acao=presenca-restaurar',
   'bruxo-subclasse-acao=combatente_clarividente',
   'bruxo-subclasse-acao=combatente_clarividente_restaurar',
@@ -119,7 +118,8 @@ export const GATILHOS_SEM_COBERTURA = [
   'btn-salvar-ic',
   'btn-salvar-im-edit',
   'btn-salvar-im-ficha',
-  'btn-salvar-maestrias',
+  // 'btn-salvar-maestrias' saiu daqui na Tarefa 3 do sub-projeto 3c: o
+  // Oraculo 7 de multiclasse-handlers.spec.mjs clica nele.
   'btn-salvar-metamagia',
   'btn-salvar-taxas',
   'btn-salvar-xp',
@@ -127,7 +127,6 @@ export const GATILHOS_SEM_COBERTURA = [
   'btn-sync-cloud',
   'btn-trocar-maestrias-dl',
   'btn-usar-dv',
-  'clerigo-cd-acao=centelha',
   'clerigo-cd-acao=expulsar',
   'clerigo-cd-acao=fulminar',
   'clerigo-subclasse-acao=guerra_ataque_direcionado',
@@ -221,7 +220,6 @@ export const GATILHOS_SEM_COBERTURA = [
   'monge-subclasse-acao=palma_encerrar',
   'monge-subclasse-acao=sintonia_toggle',
   'monge-subclasse-acao=torrente_usar',
-  'paladino-acao=canalizar',
   'paladino-acao=destruicao-gratuita',
   'paladino-acao=maos-consagradas',
   'paladino-subclasse-acao=ancioes_campeao_ancestral',
