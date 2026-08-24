@@ -160,7 +160,14 @@ export function calcCA(personagem, passivos = null) {
     ca = 10 + modDes + modCon;
   }
   // Monge: Defesa sem Armadura = 10 + Des + Sab
-  if (personagem.classe === 'Monge' && !armadura) {
+  //
+  // O `!escudo` NAO e simetrico ao do Barbaro logo acima, e a diferenca e do
+  // livro: o Barbaro diz "Voce pode usar um Escudo e ainda receber este
+  // beneficio" (Classes.md:93); o Monge diz "Enquanto voce nao estiver
+  // vestindo armadura OU EMPUNHANDO UM ESCUDO" (Classes.md:5176). Sem este
+  // teste, todo Monge com escudo somava o bonus do escudo por cima da
+  // Defesa sem Armadura.
+  if (personagem.classe === 'Monge' && !armadura && !escudo) {
     ca = 10 + modDes + modSab;
   }
   // Bardo (Colégio da Dança): Defesa sem Armadura = 10 + Des + Car

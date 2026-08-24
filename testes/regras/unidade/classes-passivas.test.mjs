@@ -335,6 +335,65 @@ for (const { classe, atributoVariavel } of DEFESA_SEM_ARMADURA) {
 }
 
 // ------------------------------------------------------------
+// 1a (continuacao). calcCA -- Defesa sem Armadura COM ESCUDO EQUIPADO.
+//
+// Par em direcoes opostas, e aqui o par E a regra: o livro trata Barbaro e
+// Monge de forma DIFERENTE, e so as duas metades juntas prendem isso.
+//
+//   Barbaro (Classes.md:93): "Enquanto voce nao estiver vestindo nenhuma
+//     armadura ... Voce PODE USAR UM ESCUDO e ainda receber este beneficio."
+//   Monge (Classes.md:5176): "Enquanto voce nao estiver vestindo armadura
+//     OU EMPUNHANDO UM ESCUDO ..."
+//
+// A varredura acima usa `inventario: []`, entao nenhuma das duas metades
+// passava por aqui -- e por isso todo Monge com escudo somava o bonus do
+// escudo POR CIMA da Defesa sem Armadura, desde sempre. Defeito de classe
+// unica, achado ao mapear o sub-projeto 3d de multiclasse.
+// ------------------------------------------------------------
+const ESCUDO_EQUIPADO = { nome: 'Escudo', tipo: 'escudo', equipado: true, ca: 2 };
+
+test('calcCA: Barbaro COM escudo mantem a Defesa sem Armadura e SOMA o escudo', () => {
+  const personagem = {
+    classe: 'Bárbaro',
+    nivel: 4,
+    inventario: [ESCUDO_EQUIPADO],
+    atributos: atributosBase({ destreza: 14, constituicao: 16 }),
+  };
+  // 10 + 2 (Des 14) + 3 (Con 16) = 15, mais 2 do escudo = 17.
+  assert.equal(utils.calcCA(personagem), 17,
+    'Barbaro com escudo: o livro permite explicitamente (Classes.md:93)');
+});
+
+test('calcCA: Monge COM escudo PERDE a Defesa sem Armadura', () => {
+  const personagem = {
+    classe: 'Monge',
+    nivel: 4,
+    inventario: [ESCUDO_EQUIPADO],
+    atributos: atributosBase({ destreza: 14, sabedoria: 16 }),
+  };
+  // O valor ERRADO que o app mostrava era 17 (15 da Defesa sem Armadura mais
+  // 2 do escudo). Com a regra do livro a Defesa sem Armadura nao se aplica,
+  // entao a Sabedoria sai da conta: 10 + 2 (Des) + 2 (escudo) = 14.
+  assert.equal(utils.calcCA(personagem), 14,
+    'Monge com escudo: o livro EXCLUI o escudo (Classes.md:5176)');
+});
+
+test('calcCA: Monge SEM escudo continua com a Defesa sem Armadura', () => {
+  const personagem = {
+    classe: 'Monge',
+    nivel: 4,
+    inventario: [],
+    atributos: atributosBase({ destreza: 14, sabedoria: 16 }),
+  };
+  // Guarda contra vacuidade do teste acima: sem esta metade, um calcCA que
+  // passasse a devolver sempre 10+Des+escudo deixaria o teste do Monge com
+  // escudo verde por acaso.
+  assert.equal(utils.calcCA(personagem), 15,
+    'Monge sem escudo: 10 + 2 (Des 14) + 3 (Sab 16)');
+});
+
+
+// ------------------------------------------------------------
 // 1b. calcCA -- Estilo de Luta: Defensivo (+1 CA usando armadura Leve,
 // Média ou Pesada). Varredura: as 3 categorias de armadura do livro, mais
 // o caso sem armadura nenhuma (onde o bônus não deveria se aplicar --
