@@ -98,48 +98,224 @@ export function subclasseDe(p, nomeClasse) {
 }
 
 /**
+ * As reservas de Dado de Vida do personagem, uma por TIPO de dado.
+ *
+ * O livro (livro:2043) manda somar os dados de todas as classes,
+ * COMBINANDO os do mesmo tipo e MANTENDO SEPARADOS os de tipos
+ * diferentes: "um Guerreiro de nível 5 / Paladino de nível 5 tem dez
+ * dados d10"; "um Clérigo de nível 5 / Paladino de nível 5 terá cinco
+ * dados d8 e cinco dados d10".
+ *
+ * Deriva de classes[] a cada chamada em vez de ler p.dados_vida, porque
+ * o TOTAL é sempre função dos níveis -- só o campo `usados` é estado do
+ * jogador, e é esse que vem do armazenado. Assim uma ficha cujo
+ * p.dados_vida esteja velho (subiu de nível sem sincronizar) ainda
+ * mostra o total certo.
+ *
+ * Ordem DECRESCENTE por faces: o dado maior primeiro. Não é regra do
+ * livro -- é a ordem em que o seletor da tela apresenta, e fixá-la aqui
+ * evita que a tela dependa da ordem de iteração de um objeto.
+ *
+ * PRECEDÊNCIA escalar x estruturado, com EXATAMENTE uma reserva: a mesma
+ * regra que sincronizarEspelhos aplica ao semear a reserva a partir do
+ * escalar quando há uma reserva só (o bloco que testa
+ * `chavesReservas.length === 1`, naquela função), e pelo mesmo motivo --
+ * NÃO porque hp-descanso.js escreva `p.dados_vida_usados` fora deste
+ * arquivo hoje (desde o sub-projeto 3e ele chama
+ * gastarDadosVida()/restaurarTodosDadosVida(), abaixo, que escrevem os
+ * DOIS modelos juntos), mas porque uma ficha salva por uma versão
+ * ANTERIOR a essa conversão pode carregar um gasto que só existe no
+ * escalar, e nem toda leitura passa por sincronizarEspelhos antes
+ * (migrarParaMulticlasse retorna cedo quando a ficha já migrou e os
+ * espelhos não divergem). Uma ficha de classe única/reserva única pode
+ * chegar aqui com o escalar mais novo que o estruturado -- ler só o
+ * estruturado apagaria esse gasto em silêncio, a mesma classe de perda
+ * que esta rede existe para fechar, só que do lado da população seguindo
+ * o caminho de uma reserva só. Com DUAS OU MAIS reservas um escalar não
+ * tem como ser distribuído entre elas, então o estruturado é que manda,
+ * sem mudança de comportamento.
+ *
+ * @param {object} p Personagem.
+ * @returns {Array<{faces:number,total:number,usados:number,disponiveis:number}>}
+ */
+export function reservasDadosVida(p) {
+  const lista = classesDe(p);
+  const porFaces = new Map();
+  for (const c of lista) {
+    const faces = CLASSES_INFO[c.classe]?.dado_vida;
+    if (!faces) continue;
+    porFaces.set(faces, (porFaces.get(faces) || 0) + c.nivel);
+  }
+  const armazenadas = (p && typeof p.dados_vida === 'object' && p.dados_vida) || {};
+  // Ver o docblock acima: com uma reserva só, o escalar lidera quando
+  // presente. A guarda `!== undefined` evita tratar ausência de escalar
+  // (personagem que nunca passou por um descanso) como gasto zero "mais
+  // atualizado" que o estruturado.
+  const escalarLidera = porFaces.size === 1 && p && p.dados_vida_usados !== undefined;
+  const usadosEscalar = escalarLidera ? Math.max(0, Number(p.dados_vida_usados) || 0) : 0;
+  return [...porFaces.entries()]
+    .map(([faces, total]) => {
+      // `usados` é o único campo que é ESTADO do jogador; satura no total
+      // para o caso de a ficha ter perdido níveis desde o último gasto.
+      const usadosBase = escalarLidera ? usadosEscalar : Number(armazenadas[faces]?.usados) || 0;
+      const usados = Math.min(total, Math.max(0, usadosBase));
+      return { faces, total, usados, disponiveis: total - usados };
+    })
+    .sort((a, b) => b.faces - a.faces);
+}
+
+/**
+ * Grava um mapa de reservas (faces -> {total, usados}) no personagem,
+ * atualizando os DOIS modelos -- o estruturado (`p.dados_vida`) e as
+ * somas escalares legadas (`p.dados_vida_total`, `p.dados_vida_usados`).
+ * Ponto único de escrita para gastarDadosVida() e
+ * restaurarTodosDadosVida(), para as duas invariantes abaixo valerem
+ * para os dois sem duplicar a lógica.
+ *
+ * Guarda de reserva vazia -- a mesma guarda de sincronizarEspelhos, para
+ * o mesmo `if (!Object.keys(reservas).length)` daquela função: se `novo`
+ * chega vazio (nenhuma classe do personagem bateu com CLASSES_INFO --
+ * classe fora do catálogo, ou nome acentuado em forma Unicode diferente),
+ * não há como montar reserva nenhuma. `dados_vida_total`/`dados_vida_usados`
+ * são LIDOS pelo jogador (a ficha mostra "X/Y dados de vida"); sobrescrever
+ * com soma vazia faria a ficha mentir sobre o total e o gasto reais.
+ * Preserva os escalares pré-existentes e não toca em `p.dados_vida`.
+ *
+ * @param {object} p Personagem, mutado no lugar.
+ * @param {object} novo Mapa faces -> {total, usados}.
+ */
+function gravarReservas(p, novo) {
+  if (!Object.keys(novo).length) {
+    p.dados_vida_total = Number(p.dados_vida_total) || 0;
+    p.dados_vida_usados = Number(p.dados_vida_usados) || 0;
+    return;
+  }
+  p.dados_vida = novo;
+  p.dados_vida_total = Object.values(novo).reduce((s, r) => s + r.total, 0);
+  p.dados_vida_usados = Object.values(novo).reduce((s, r) => s + r.usados, 0);
+}
+
+/**
+ * Gasta dados de vida de UMA reserva, pelo tipo de dado.
+ *
+ * Escritor AUTORIZADO dos campos de dado de vida -- ver o docblock de
+ * sincronizarEspelhos. Antes desta função o gasto ia só para o escalar
+ * legado `p.dados_vida_usados`, e num personagem com DOIS tipos de dado
+ * ele era descartado na sincronização seguinte: a semeadura escalar ->
+ * reserva só roda com UMA reserva, porque um escalar não tem como ser
+ * distribuído entre duas. Medido: um Mago 5/Bárbaro 5 gastava 3 dados e
+ * voltava a 0 na próxima sincronização, com o gasto perdido em silêncio.
+ *
+ * Escreve os DOIS modelos, e é por isso que fecha a rede: a reserva
+ * estruturada (que sobrevive à sincronização) e o escalar legado (que os
+ * consumidores ainda não convertidos continuam lendo).
+ *
+ * Satura no disponível em vez de recusar: o chamador é uma tela, e um
+ * pedido acima do disponível é erro de entrada, não estado inválido.
+ *
+ * @param {object} p Personagem, mutado no lugar.
+ * @param {number} faces Tipo de dado (6, 8, 10, 12).
+ * @param {number} qtd Quantidade pedida.
+ * @returns {number} Quantidade EFETIVAMENTE gasta; 0 se o tipo não existe.
+ */
+export function gastarDadosVida(p, faces, qtd) {
+  if (!p || typeof p !== 'object') return 0;
+  const reservas = reservasDadosVida(p);
+  const alvo = reservas.find((r) => r.faces === Number(faces));
+  if (!alvo) return 0;
+  const gasto = Math.max(0, Math.min(alvo.disponiveis, Math.floor(Number(qtd) || 0)));
+  if (!gasto) return 0;
+
+  // Reescreve o mapa inteiro a partir das reservas derivadas: assim um
+  // p.dados_vida velho (total desatualizado) é corrigido de passagem, em
+  // vez de o gasto ser gravado sobre um total errado.
+  const novo = {};
+  for (const r of reservas) {
+    novo[r.faces] = {
+      total: r.total,
+      usados: r.faces === alvo.faces ? r.usados + gasto : r.usados,
+    };
+  }
+  gravarReservas(p, novo);
+  return gasto;
+}
+
+/**
+ * Devolve TODOS os dados de vida gastos, de todas as reservas.
+ *
+ * Regra 2024 do Descanso Longo (Regras.md:379): "Você recupera todos os
+ * Pontos de Vida perdidos e todos os Dados de Vida gastos" -- todos, não
+ * metade. Escritor AUTORIZADO, mesmo motivo de gastarDadosVida.
+ *
+ * @param {object} p Personagem, mutado no lugar.
+ */
+export function restaurarTodosDadosVida(p) {
+  if (!p || typeof p !== 'object') return;
+  const reservas = reservasDadosVida(p);
+  const novo = {};
+  for (const r of reservas) novo[r.faces] = { total: r.total, usados: 0 };
+  gravarReservas(p, novo);
+  // Regras.md:379 é INCONDICIONAL: "Você recupera... todos os Dados de
+  // Vida gastos" não depende de saber o TIPO do dado -- zerar `usados` é
+  // sempre correto depois de um Descanso Longo. `dados_vida_total`, esse
+  // sim, não pode ser recalculado sem o catálogo (é por isso que a guarda
+  // de reserva vazia de gravarReservas() existe -- ver o docblock daquela
+  // função). Aquela guarda conflacionava os dois campos e preservava
+  // `usados` junto com `total` quando nenhuma classe resolve contra
+  // CLASSES_INFO (`reservas` vazio): uma ficha nessa situação saía do
+  // Descanso Longo com os dados ainda marcados como gastos -- o código
+  // antigo (`dados_vida_usados = 0`, que não dependia de catálogo nenhum)
+  // sempre restaurava. Corrige aqui, sem mexer na guarda compartilhada de
+  // gravarReservas(): gastarDadosVida() depende dela como está.
+  if (!reservas.length) p.dados_vida_usados = 0;
+}
+
+/**
  * Reescreve os campos ESPELHO a partir de char.classes.
- * DEVERIA ser a única função autorizada a escrever char.classe,
- * char.subclasse, char.nivel, char.dados_vida, char.dados_vida_total e
- * char.dados_vida_usados -- mas essa rede AINDA NÃO EXISTE para os três
- * campos de dado de vida. Hoje há cinco escritores legados que mutam uma
- * ficha EXISTENTE, nenhum deles varrido por nenhum oráculo:
- *   - site/js/sheet/hp-descanso.js:304 e :698 -- gasto de dado de vida
- *     no descanso curto (`char.dados_vida_usados += qtd`).
- *   - site/js/sheet/hp-descanso.js:736 -- zera `dados_vida_usados` no
- *     descanso longo.
+ * É a única função autorizada a escrever char.classe, char.subclasse e
+ * char.nivel. Para os três campos de dado de vida (char.dados_vida,
+ * char.dados_vida_total, char.dados_vida_usados) os escritores
+ * autorizados são gastarDadosVida() e restaurarTodosDadosVida(), acima --
+ * o sub-projeto 3e fechou essa rede. Os três escritores legados de
+ * site/js/sheet/hp-descanso.js (o gasto de dado de vida no descanso
+ * curto, nas duas telas, e o zera-tudo do descanso longo) passaram a
+ * chamar esses dois acessores na Tarefa 3 do sub-projeto 3e, em vez de
+ * escrever o escalar direto -- não escrevem mais fora deste arquivo.
+ * Ainda restam TRÊS escritores legados, escopo do sub-projeto 5,
+ * rastreados em ESCRITAS_PERMITIDAS (multiclasse-fundacao.test.mjs):
  *   - site/js/creator/wizard.js:441 -- grava `dados_vida_total` na
  *     criação de personagem.
  *   - site/js/levelup.js:1414 -- grava `dados_vida_total` na subida de
  *     nível.
- * Um SEXTO escritor, site/js/store.js:280-281, grava
- * `dados_vida_total: 1` e `dados_vida_usados: 0` no literal de
- * criarPersonagemVazio() -- classe de risco diferente dos cinco acima
- * (é template de personagem NOVO, não mutação concorrente de ficha
- * existente), mas fica registrado aqui para quem for fechar esta rede na
- * Tarefa 9 não precisar redescobri-lo.
- * O regex de guarda da Tarefa 9 (oráculo 6) é
- * `/(char|personagem)\.(classe|subclasse|nivel)\s*=[^=]/` -- cobre só
- * `classe`, `subclasse` e `nivel`; nenhum dos três campos de dado de
- * vida está protegido.
+ *   - site/js/store.js:324-325 -- grava `dados_vida_total: 1` e
+ *     `dados_vida_usados: 0` no literal de criarPersonagemVazio() --
+ *     classe de risco diferente dos dois acima (é template de
+ *     personagem NOVO, não mutação concorrente de ficha existente).
  *
  * O ramo de reconciliação de migrarParaMulticlasse() (ficha já carimbada,
  * mas com os espelhos p.nivel/p.subclasse divergindo de classes[] --
  * ver docblock daquela função) chama sincronizarEspelhos() em TODA
  * reabertura de ficha que subiu de nível desde a última migração -- não é
- * caminho raro, é o fluxo normal do jogador (abre a ficha, migra; gasta
- * dado de vida no descanso curto, que escreve só no ESCALAR legado
- * `p.dados_vida_usados`; sobe de nível; reabre a ficha; a divergência de
- * nível dispara a reconciliação, que chama sincronizarEspelhos() de novo
- * sobre uma ficha que o descanso já mexeu). Por isso esta função NÃO PODE
- * confiar cegamente no objeto ESTRUTURADO (`p.dados_vida`) como se ele
- * fosse sempre o mais atual: se houver exatamente UMA reserva e o total de
- * `usados` dela discordar do ESCALAR legado (`p.dados_vida_usados`), o
- * escalar é que está atualizado -- só hp-descanso.js o escreve entre duas
- * chamadas a esta função -- e a reserva é semeada a partir dele (ver o
- * bloco logo abaixo do `return` de "nenhuma classe bateu"). Com DUAS OU
- * MAIS reservas um escalar único não tem como ser distribuído entre elas,
- * então o estruturado é que manda e nenhuma semeadura acontece.
+ * caminho raro: é o que acontece com qualquer ficha salva por uma versão
+ * ANTERIOR ao sub-projeto 3e que tenha um gasto de descanso curto gravado
+ * só no ESCALAR legado `p.dados_vida_usados` (de quando hp-descanso.js
+ * ainda escrevia direto nele, antes de passar a chamar
+ * gastarDadosVida()/restaurarTodosDadosVida()) seguido de uma subida de
+ * nível (que só toca o espelho `p.nivel`) antes de a ficha ser reaberta --
+ * a divergência de nível dispara a reconciliação, que chama
+ * sincronizarEspelhos() de novo sobre uma ficha cujo gasto anterior só
+ * existe no escalar. Por isso esta função NÃO PODE confiar cegamente no
+ * objeto ESTRUTURADO (`p.dados_vida`) como se ele fosse sempre o mais
+ * atual: se houver exatamente UMA reserva e o total de `usados` dela
+ * discordar do ESCALAR legado (`p.dados_vida_usados`), o escalar é que
+ * está atualizado -- NÃO porque hp-descanso.js o escreva hoje entre duas
+ * chamadas a esta função (desde o sub-projeto 3e ele chama os dois
+ * acessores acima, que escrevem os DOIS modelos juntos), mas porque a
+ * ficha carrega um gasto anterior a essa conversão -- e a reserva é
+ * semeada a partir do escalar (ver o bloco logo abaixo do `return` de
+ * "nenhuma classe bateu"). Com DUAS OU MAIS reservas um escalar único não
+ * tem como ser distribuído entre elas, então o estruturado é que manda e
+ * nenhuma semeadura acontece.
  * @param {object} p Personagem, mutado no lugar.
  */
 export function sincronizarEspelhos(p) {
@@ -176,20 +352,35 @@ export function sincronizarEspelhos(p) {
     p.dados_vida_usados = Number(p.dados_vida_usados) || 0;
     return;
   }
-  // O escalar legado (`p.dados_vida_usados`) é escrito por hp-descanso.js
-  // FORA desta função (ver docblock acima). Enquanto há UMA ÚNICA reserva,
-  // ele e o "usados" estruturado descrevem a MESMA coisa; se discordarem,
-  // é porque hp-descanso.js gravou no escalar depois da última
-  // sincronização, e o escalar é que está atualizado -- só código legado o
-  // escreve entre duas chamadas a sincronizarEspelhos(). Com uma reserva
-  // só, a atribuição é inequívoca: semeia a reserva a partir do escalar.
+  // O escalar legado (`p.dados_vida_usados`) só diverge do "usados"
+  // estruturado por causa de uma ficha salva por uma versão ANTERIOR ao
+  // sub-projeto 3e -- NÃO porque hp-descanso.js escreva o escalar fora
+  // desta função hoje. Desde o sub-projeto 3e, hp-descanso.js chama
+  // gastarDadosVida()/restaurarTodosDadosVida() (acima, neste arquivo),
+  // que atualizam os DOIS modelos juntos. Enquanto há UMA ÚNICA reserva,
+  // escalar e estruturado descrevem a MESMA coisa; se discordarem, é
+  // porque a ficha foi salva em disco por uma versão anterior a essa
+  // conversão -- com um gasto que só existe no escalar -- e ainda não
+  // passou por um descanso desde então. Com uma reserva só, a atribuição
+  // é inequívoca: semeia a reserva a partir do escalar.
+  //
+  // NÃO REMOVA esta semeadura achando-a código morto porque
+  // hp-descanso.js não escreve mais o escalar diretamente: ela é o que
+  // protege qualquer ficha gravada ANTES desta conversão de perder gasto
+  // de dado de vida em silêncio na primeira reabertura -- exatamente o
+  // Critical que a revisão da Tarefa 2 mediu, numa ficha de classe única
+  // (a população que a análise original dava como segura). Enquanto
+  // existir uma ficha salva por uma versão anterior a este sub-projeto,
+  // esta regra continua necessária, mesmo que hp-descanso.js não escreva
+  // mais o escalar.
+  //
   // A guarda `!== undefined` evita tratar um personagem que nunca passou
   // por um descanso (escalar ausente) como se tivesse um gasto zerado
   // "mais atualizado" que o estruturado.
   // Com DUAS OU MAIS reservas um escalar não tem como ser distribuído
   // entre elas, então o estruturado é que manda -- esta é a linha que
-  // muda de significado no sub-projeto 3, quando o fluxo de descanso
-  // passar a escrever direto na reserva certa.
+  // mudou de significado no sub-projeto 3e, quando o fluxo de descanso
+  // passou a escrever direto na reserva certa.
   const chavesReservas = Object.keys(reservas);
   if (chavesReservas.length === 1 && p.dados_vida_usados !== undefined) {
     const unicaChave = chavesReservas[0];

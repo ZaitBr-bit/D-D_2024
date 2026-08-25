@@ -39,6 +39,52 @@ export function calcPVTotal(dadoVida, nivel, modCon) {
 }
 
 /**
+ * PV máximo de um personagem, somando o dado de vida de CADA classe.
+ *
+ * O livro manda DUAS regras, não uma (livro:2039-2041):
+ *   1. cada classe contribui com o PRÓPRIO dado de vida -- os PV da
+ *      "nova classe" são os dela, não os da classe inicial;
+ *   2. o dado CHEIO é pago uma vez só, no nível TOTAL 1, que pertence
+ *      sempre à classe inicial. O PRIMEIRO nível de qualquer classe
+ *      ADICIONAL usa a média, como qualquer outro nível.
+ *
+ * O defeito que ela corrige: calcPVTotal recebe UM dado de vida escalar
+ * e o nível TOTAL, então um Mago 5/Bárbaro 5 dava 62 e um Bárbaro 5/Mago 5
+ * dava 95, com CON +2 -- 33 PV de diferença entre dois personagens que o
+ * livro diz serem idênticos (os dois valem 77 e 80 pela fórmula acima).
+ *
+ * A classe inicial sai da MESMA lista já materializada, e não de
+ * classeInicial(), porque classesDe() devolve objetos novos a cada
+ * chamada: comparar por identidade só funciona dentro de uma lista só.
+ *
+ * Classe fora de CLASSES_INFO não contribui, em vez de propagar NaN.
+ *
+ * @param {object} personagem Personagem; lê classes[], nunca os espelhos.
+ * @param {number} modCon Modificador de Constituição.
+ * @returns {number} PV máximo, nunca abaixo de 1.
+ */
+export function calcPVMulticlasse(personagem, modCon) {
+  const lista = classesDe(personagem);
+  if (!lista.length) return 1;
+  const inicial = lista.find((c) => c.ordem === 0) || lista[0];
+  const facesIniciais = CLASSES_INFO[inicial.classe]?.dado_vida;
+  if (!facesIniciais) return 1;
+
+  // Nível 1 do PERSONAGEM: dado cheio + modCon, uma vez só.
+  let pv = facesIniciais + modCon;
+  for (const c of lista) {
+    const faces = CLASSES_INFO[c.classe]?.dado_vida;
+    if (!faces) continue;
+    const media = Math.floor(faces / 2) + 1;
+    // A inicial já pagou o 1º nível acima; as demais pagam média em
+    // TODOS os seus níveis, inclusive o primeiro (livro:2041).
+    const niveisNaMedia = c === inicial ? c.nivel - 1 : c.nivel;
+    pv += niveisNaMedia * (media + modCon);
+  }
+  return Math.max(1, pv);
+}
+
+/**
  * Verifica se uma magia registrada pelo nome pertence ao grimório do mago.
  * @param {object} personagem
  * @param {string} nome

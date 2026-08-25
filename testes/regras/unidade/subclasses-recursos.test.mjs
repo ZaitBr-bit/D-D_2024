@@ -848,21 +848,34 @@ test('sanity: os três marcadores usados para fatiar hp-descanso.js em blocos Cu
 const BLOCO_CURTO = DESCANSO_TEXTO.slice(IDX_CURTO, IDX_LONGO);
 const BLOCO_LONGO = DESCANSO_TEXTO.slice(IDX_LONGO, IDX_EXCLUIR);
 
-// Devolve o sub-trecho de `blocoTexto` que fica sob `if (char.subclasse ===
-// '<subclasse>'` -- da ocorrência EXATA desse literal (sempre o nome do
-// CATÁLOGO, nunca lido do app) até a guarda de subclasse seguinte, ou até o
-// fim do bloco. `null` se esse nome EXATO não aparece nenhuma vez no bloco
-// -- é isto que expõe o achado CRITICAL desta tarefa: hp-descanso.js grava
+// Devolve o sub-trecho de `blocoTexto` que fica sob a guarda de subclasse
+// -- da ocorrência EXATA desse literal (sempre o nome do CATÁLOGO, nunca
+// lido do app) até a guarda de subclasse seguinte, ou até o fim do bloco.
+// `null` se esse nome EXATO não aparece nenhuma vez no bloco -- é isto que
+// expõe o achado CRITICAL desta tarefa: hp-descanso.js grava
 // 'Juramento de Devoção'/'Juramento de Glória'/'Juramento de Vingança'
 // (preposição errada) em vez do nome real ('da'/'da'/'da', ver cabeçalho) --
 // buscar pelo nome CERTO nunca encontra a guarda quebrada, e a ausência é
 // relatada como divergência real, não como coincidência textual.
+//
+// O regex aceita DUAS formas de guarda: `char.subclasse === 'X'` -- o
+// espelho da classe INICIAL -- e `subclasseDe(char, 'Classe') === 'X'` --
+// a subclasse NA classe certa. Desde a Tarefa 8 do sub-projeto 3e
+// (multiclasse), hp-descanso.js só usa a segunda forma; a primeira ficou
+// como TOLERÂNCIA do scanner, não como forma viva no arquivo hoje (medido:
+// zero ocorrências de `char.subclasse ===` em hp-descanso.js). Ela custa
+// nada e evita que o scanner quebre de novo se uma guarda regredir para o
+// espelho. O regex aceita as duas sem afrouxar a exigência do nome EXATO
+// da subclasse.
+const REGEX_GUARDA_SUBCLASSE = '(?:char\\.subclasse|subclasseDe\\(char,\\s*\'[^\']*\'\\))\\s*===\\s*\'';
 function subBlocoDaSubclasse(blocoTexto, subclasse) {
-  const marcador = `subclasse === '${subclasse}'`;
-  const inicio = blocoTexto.indexOf(marcador);
-  if (inicio === -1) return null;
-  const proxima = blocoTexto.indexOf("subclasse === '", inicio + marcador.length);
-  return blocoTexto.slice(inicio, proxima === -1 ? undefined : proxima);
+  const nomeEscapado = subclasse.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const inicio = new RegExp(REGEX_GUARDA_SUBCLASSE + nomeEscapado + "'").exec(blocoTexto);
+  if (!inicio) return null;
+  const regexQualquerGuarda = new RegExp(REGEX_GUARDA_SUBCLASSE, 'g');
+  regexQualquerGuarda.lastIndex = inicio.index + inicio[0].length;
+  const proxima = regexQualquerGuarda.exec(blocoTexto);
+  return blocoTexto.slice(inicio.index, proxima ? proxima.index : undefined);
 }
 
 // `entrada.semGuarda` -- true para as classes cujo reset de campos de

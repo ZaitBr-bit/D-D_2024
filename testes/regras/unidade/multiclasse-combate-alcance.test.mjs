@@ -64,18 +64,28 @@
 //    classe cairem abaixo do piso, ou se uma excecao declarada nao casar
 //    com nada, o teste FALHA.
 //
-// A DECISAO SOBRE `sheet/hp-descanso.js`, E POR QUE ELA E DIFERENTE
-// -----------------------------------------------------------------
-// `hp-descanso.js` e escopo do sub-projeto 3e (PV e dados de vida). Foi
-// MEDIDO antes de decidir: o arquivo tem 90 leituras de espelho, e o 3d
-// converteu UMA (o gate de Maestria em Arma do Descanso Longo). Um guarda
-// de "zero espelhos" sobre ele acusaria 89 linhas que nao sao desta tarefa
-// -- e um guarda que exige o impossivel e um guarda que alguem vai
-// desligar. Por isso ele NAO entra em ALVOS: e coberto por um teste de
-// ANCORA proprio, no fim deste arquivo, que prende exatamente a linha
-// convertida (positivo) e proibe espelho em qualquer linha de codigo que
-// fale de maestria (negativo). Quando o 3e converter o resto, promova
-// `hp-descanso.js` a ALVOS e apague o teste de ancora.
+// A DECISAO SOBRE `sheet/hp-descanso.js`, E A PROMOCAO PELO 3e
+// ---------------------------------------------------------------
+// `hp-descanso.js` era escopo do sub-projeto 3e (PV e dados de vida). Na
+// epoca deste guarda (3d), o arquivo tinha 90 leituras de espelho e o 3d
+// converteu UMA (o gate de Maestria em Arma do Descanso Longo) -- um guarda
+// de "zero espelhos" sobre ele teria acusado 89 linhas que nao eram desta
+// tarefa, e um guarda que exige o impossivel e um guarda que alguem vai
+// desligar. Por isso ele NAO entrava em ALVOS: era coberto por um teste de
+// ANCORA proprio, no fim deste arquivo, que prendia exatamente a linha
+// convertida (positivo) e proibia espelho em qualquer linha de codigo que
+// falasse de maestria (negativo).
+//
+// O 3e converteu o resto (Tarefas 1-10: formula de PV, reservas de dado de
+// vida por tipo, Resiliencia Draconica, restaurarHabilidades, os 24 blocos
+// dos dois descansos) e promoveu `hp-descanso.js` a ALVOS -- em
+// `testes/regras/unidade/multiclasse-descansos-alcance.test.mjs`, nao aqui.
+// O teste de ancora foi apagado deste arquivo; a PROPRIEDADE POSITIVA que
+// ele prendia (as duas linhas da Tarefa 5 existirem exatamente uma vez, e
+// `classesComMaestria` vir de `./maestrias.js` -- que um guarda de "zero
+// espelhos" sozinho nao prende, porque reescrever aquelas linhas com um
+// literal nao reintroduz espelho nenhum) migrou junto, num teste proprio no
+// arquivo novo ("PROPRIEDADE HERDADA DO 3d").
 // ============================================================
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -520,81 +530,4 @@ test('alcance 3d [inventário utils.js]: toda leitura fora da faixa de CA está 
       'classificação e atualize o texto). Uma declaração que não casa com nada é uma ' +
       'justificativa que ninguém está mais lendo.');
   }
-});
-
-// ============================================================
-// `site/js/sheet/hp-descanso.js`: ANCORA, nao varredura.
-//
-// O motivo esta no cabecalho deste arquivo: o 3d converteu UMA linha num
-// arquivo com 90 leituras de espelho que sao escopo do 3e. Este teste
-// prende exatamente o que a Tarefa 5 mudou:
-//   POSITIVO -- a linha convertida existe, e ha uma so;
-//   NEGATIVO -- nenhuma linha de CODIGO que fale de maestria le espelho.
-// O negativo e o que pega a reversao: a forma antiga era
-// `classesMaestria.includes(char.classe)`, que casa "maestria" e "char.classe"
-// na mesma linha.
-// ============================================================
-const HP_DESCANSO_REL = 'site/js/sheet/hp-descanso.js';
-
-/**
- * As linhas que a Tarefa 5 converteu em hp-descanso.js, cada uma exigida
- * EXATAMENTE UMA VEZ.
- *
- * São duas e não uma: a segunda (`trocaUma`) NÃO contém a palavra
- * "maestria" e escaparia da varredura negativa abaixo -- reverter só ela
- * passaria batido. Isto foi achado montando a campanha de mutação, não
- * relendo o código.
- */
-const HP_DESCANSO_LINHAS_CONVERTIDAS = [
-  'const classesDeMaestria = classesComMaestria(char);',
-  'const trocaUma = !trocaTodasNoDescanso(char);',
-];
-
-test('alcance 3d [hp-descanso]: o gate de maestria do Descanso Longo não voltou ao espelho', () => {
-  const { limpas } = lerLinhas(HP_DESCANSO_REL);
-
-  // GUARDA CONTRA VACUIDADE: o arquivo tem de estar inteiro na mao.
-  assert.ok(limpas.length >= 800,
-    `${HP_DESCANSO_REL} veio com ${limpas.length} linhas -- curto demais para ser o ` +
-    'arquivo de verdade.');
-
-  // POSITIVO: as conversões da Tarefa 5 estão lá, uma vez cada.
-  for (const esperada of HP_DESCANSO_LINHAS_CONVERTIDAS) {
-    const convertidas = limpas.filter((l) => l.trim() === esperada);
-    assert.equal(convertidas.length, 1,
-      `esperada exatamente 1 linha "${esperada}" em ${HP_DESCANSO_REL}, achadas ` +
-      `${convertidas.length}. Zero significa que o gate do Descanso Longo voltou a ` +
-      'decidir Maestria em Arma por outro caminho -- e o caminho antigo era o espelho ' +
-      'da classe INICIAL, que fazia a opção de trocar maestria SUMIR da tela de um ' +
-      'Mago 5/Guerreiro 5.');
-  }
-
-  // E a função que ela chama tem de vir de maestrias.js, a fonte única.
-  const temImport = limpas.some((l) => l.includes('classesComMaestria')
-    && l.includes('./maestrias.js'));
-  assert.ok(temImport,
-    `${HP_DESCANSO_REL} tem de importar classesComMaestria de ./maestrias.js -- a ` +
-    'lista das cinco classes mora lá. A cópia local dessa lista foi exatamente o ' +
-    'defeito que a Tarefa 5 removeu.');
-
-  // NEGATIVO: nenhuma linha de código que fale de maestria pode ler espelho.
-  const espelhos = regexEspelhos(['char']);
-  const suspeitas = [];
-  limpas.forEach((texto, i) => {
-    if (!/maestria/i.test(texto)) return;
-    espelhos.lastIndex = 0;
-    if (espelhos.test(texto)) suspeitas.push(`${HP_DESCANSO_REL}:${i + 1}  ${texto.trim()}`);
-  });
-  assert.deepEqual(suspeitas, [],
-    'linha de código sobre MAESTRIA lendo espelho em hp-descanso.js.\n\n' +
-    'A forma antiga era `classesMaestria.includes(char.classe)` -- uma cópia da ' +
-    'lista das cinco classes comparada com o espelho da classe INICIAL. Num ' +
-    'Mago 5/Guerreiro 5 a opção de trocar maestria não mostrava número errado: ela ' +
-    'simplesmente não existia na tela do Descanso Longo.\n\n' +
-    'Use classesComMaestria(char) / trocaTodasNoDescanso(char), de ' +
-    'site/js/sheet/maestrias.js.\n\n' +
-    'NOTA DE ESCOPO: hp-descanso.js tem dezenas de OUTRAS leituras de espelho, ' +
-    'legítimas de existir por enquanto -- são escopo do sub-projeto 3e (PV e dados ' +
-    'de vida). Este teste cobre só a linha que o 3d converteu, de propósito.\n\n' +
-    'Pontos encontrados:');
 });

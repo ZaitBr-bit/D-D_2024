@@ -267,8 +267,11 @@ test('dados de vida ficam em reservas por tipo de dado', async () => {
   multiclasse.sincronizarEspelhos(iguais);
   assert.deepEqual(iguais.dados_vida, { 10: { total: 10, usados: 0 } });
 
-  // O espelho de soma existe para os consumidores legados
-  // (ficha.js:646, hp-descanso.js:289, impressao.js:211).
+  // O espelho de soma (dados_vida_total) é mantido para fichas salvas por
+  // versões anteriores e para os escritores legados do fluxo de criação e
+  // subida que ainda restam (creator/wizard.js, levelup.js, store.js --
+  // escopo do sub-projeto 5). hp-descanso.js e ficha.js pararam de ler o
+  // escalar no sub-projeto 3e -- passaram a chamar reservasDadosVida().
   assert.equal(misto.dados_vida_total, 10);
   assert.equal(iguais.dados_vida_total, 10);
 });
@@ -597,15 +600,18 @@ test('migrarMulticlasse(): gasto de dado de vida sobrevive entre duas aberturas'
   sheetEstado.definirChar(p);
   sheetMigracoes.migrarMulticlasse(); // primeira abertura: migra e carimba.
 
-  // NÃO é o gasto que hp-descanso.js:304 grava -- aquele código escreve
-  // no ESCALAR legado (`char.dados_vida_usados = (char.dados_vida_usados
-  // || 0) + qtd`), e hoje nenhum código de produção em site/js/ escreve
-  // em `dados_vida[faces].usados`; o formato estruturado só existe aqui e
-  // em regras-multiclasse.js. Este `usados: 3` representa o valor que
-  // sincronizarEspelhos() JÁ teria escrito na reserva a partir daquele
-  // escalar, numa ficha que passou por um descanso curto entre duas
-  // aberturas -- é o efeito colateral que o teste verifica, não a
-  // gravação em si.
+  // Isto NÃO é o gasto que hp-descanso.js grava hoje -- desde o
+  // sub-projeto 3e ele chama gastarDadosVida()/restaurarTodosDadosVida()
+  // (regras-multiclasse.js), que escrevem os DOIS modelos. Este
+  // `usados: 3` representa uma ficha salva por uma versão ANTERIOR do
+  // app, cujo gasto foi gravado só no ESCALAR legado
+  // (`char.dados_vida_usados = (char.dados_vida_usados || 0) + qtd`) sem
+  // tocar no objeto estruturado -- caminho que continua real para
+  // qualquer ficha existente que ainda não passou por um descanso desde a
+  // conversão. O valor representa o que sincronizarEspelhos() JÁ teria
+  // escrito na reserva a partir daquele escalar, numa ficha que passou
+  // por um descanso curto entre duas aberturas -- é o efeito colateral
+  // que o teste verifica, não a gravação em si.
   p.dados_vida['10'].usados = 3;
 
   const setItemOriginal = localStorage.setItem;
@@ -951,8 +957,16 @@ test('merge de nuvem: _escolherNoMerge devolve a MESMA referência recebida, nun
 
 // Forma "char.campo = valor" / "personagem.campo = valor" -- cobre os três
 // escalares de classe/subclasse/nível e os três campos de dado de vida.
+// Também cobre atribuição composta (+=, -=, *=, /=, %=, **=, <<=, >>=, >>>=,
+// &=, |=, ^=, &&=, ||=, ??=) e incremento/decremento (++/--): a forma
+// "char.dados_vida_usados += qtd" é a refatoração mais natural da forma
+// antiga "char.dados_vida_usados = (char.dados_vida_usados || 0) + qtd", e
+// SEM este alargamento ela escapava da rede inteira -- achado da revisão
+// final do sub-projeto 3e. Medido sobre site/js/ inteiro: o alargamento não
+// pega nenhuma linha nova hoje, então ESCRITAS_PERMITIDAS não precisou
+// crescer.
 const PADRAO_ESPELHO_ATRIBUICAO =
-  /(char|personagem)\.(classe|subclasse|nivel|dados_vida|dados_vida_total|dados_vida_usados)\s*=[^=]/;
+  /(char|personagem)\.(classe|subclasse|nivel|dados_vida|dados_vida_total|dados_vida_usados)\s*(?:\+\+|--|(?:[-+*/%|&^]|\*\*|<<|>>>?|\?\?|\|\||&&)?=[^=])/;
 // Forma de literal de objeto "dados_vida_total: valor" -- só existe hoje em
 // store.js (criarPersonagemVazio), que não usa `char.`/`personagem.` como
 // prefixo por ser um TEMPLATE de personagem novo, não uma mutação de ficha
@@ -972,22 +986,13 @@ const ESCRITAS_PERMITIDAS = new Set([
   'site/js/levelup.js:1411',              // personagem.nivel = novoNivel
   'site/js/levelup.js:1429',              // personagem.subclasse = opcoes.subclasse
 
-  // Escritores legados da família de dado de vida. regras-multiclasse.js
-  // (docblock de sincronizarEspelhos) já apontava os cinco primeiros como
-  // um gap conhecido; entram aqui para ficarem VISÍVEIS e RASTREADOS, não
-  // só documentados em comentário.
-  'site/js/sheet/hp-descanso.js:304',  // gasto de dado de vida no descanso curto (1ª tela)
-  'site/js/sheet/hp-descanso.js:698',  // gasto de dado de vida no descanso curto (2ª tela)
-  'site/js/sheet/hp-descanso.js:736',  // zera dados_vida_usados no descanso longo
+  // Escritores legados da família de dado de vida que SOBRAM depois do
+  // sub-projeto 3e: todos do fluxo de CRIAÇÃO e SUBIDA, escopo do
+  // sub-projeto 5. Os três de hp-descanso.js saíram -- o gasto e o reset
+  // passaram por gastarDadosVida()/restaurarTodosDadosVida(), em
+  // regras-multiclasse.js, que está em ARQUIVOS_AUTORIZADOS (abaixo).
   'site/js/creator/wizard.js:441',     // grava dados_vida_total na criação de personagem
   'site/js/levelup.js:1414',           // grava dados_vida_total na subida de nível
-  // Sexto escritor, achado por revisão: literal de criarPersonagemVazio.
-  // Classe de risco DIFERENTE dos cinco acima -- é o TEMPLATE de um
-  // personagem novo (sem classes[] ainda), não a mutação concorrente de
-  // uma ficha existente que já pode ter classes[] e dados_vida
-  // estruturado. Ainda assim entra na lista: a regra "só escreve quem
-  // está autorizado" não abre exceção silenciosa para nenhuma classe de
-  // risco.
   'site/js/store.js:324',  // dados_vida_total: 1  (template de criação)
   'site/js/store.js:325',  // dados_vida_usados: 0 (template de criação)
 ]);
@@ -1096,12 +1101,15 @@ test('sincronizarEspelhos não perde gasto de dado de vida gravado só no escala
   multiclasse.migrarParaMulticlasse(p);
   assert.deepEqual(p.dados_vida, { 10: { total: 3, usados: 0 } });
 
-  // Imita hp-descanso.js:304 -- gasto de descanso curto escreve SÓ no
-  // escalar legado, nunca no objeto estruturado.
+  // Imita o que uma ficha salva por uma versão ANTERIOR ao sub-projeto 3e
+  // continha: gasto de descanso curto gravado SÓ no escalar legado, nunca
+  // no objeto estruturado. Desde o sub-projeto 3e hp-descanso.js escreve
+  // os DOIS modelos via gastarDadosVida(), mas uma ficha gravada antes
+  // dessa conversão continua existindo com essa divergência.
   p.dados_vida_usados += 2;
   assert.equal(p.dados_vida_usados, 2);
   assert.deepEqual(p.dados_vida, { 10: { total: 3, usados: 0 } },
-    'o gasto do descanso não toca no objeto estruturado -- só hp-descanso.js real faria isso');
+    'o gasto do descanso não toca no objeto estruturado -- só uma ficha legada, gravada antes da conversão, chegaria assim');
 
   // Imita levelup.js:1411 -- sobe de nível escrevendo só no espelho.
   p.nivel++;

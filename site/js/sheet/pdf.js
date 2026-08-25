@@ -69,7 +69,9 @@ function _montarDadosCartao() {
     { label: 'Deslocam.', value: desloc },
     { label: 'Prof.', value: `+${prof}` },
   ];
-  if (char.pv_temp) stats.push({ label: 'PV Temp', value: `+${char.pv_temp}` });
+  // pv_temporario, nao pv_temp: mesmo campo morto de impressao.js --
+  // sem escritor no repositorio, o PV Temporario nunca entrava no PDF.
+  if (char.pv_temporario) stats.push({ label: 'PV Temp', value: `+${char.pv_temporario}` });
   // Mesmo portão da ficha e da impressão.
   if (info.conjurador || ehSubclasseConjuradora()) {
     stats.push({ label: 'CD Magia', value: String(calcCDMagia(char)) });

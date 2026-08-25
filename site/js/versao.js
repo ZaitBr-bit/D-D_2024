@@ -13,13 +13,105 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.20';
+export const VERSAO_ATUAL = '2.2.21';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.21',
+    data: '2026-08-25',
+    rotulo: 'PV em multiclasse',
+    resumo: 'Pontos de Vida, Dados de Vida e os dois descansos passam a '
+      + 'somar e restaurar pela classe certa em personagens com mais de '
+      + 'uma classe — e a Resiliência Dracônica é corrigida: ela dava 2 '
+      + 'Pontos de Vida a mais do que o livro concede.',
+    melhorias: [
+      {
+        grupo: '❤️ Pontos de Vida somam cada classe',
+        itens: [
+          'A fórmula de Pontos de Vida máximos passa a somar o dado de '
+            + 'vida de CADA classe, como o livro manda, em vez de usar só '
+            + 'o dado da classe escolhida na criação para o nível total '
+            + 'inteiro — um Mago 5/Bárbaro 5 calcularia 77 Pontos de Vida '
+            + 'com a fórmula nova, contra 62 da antiga. A mudança vale a '
+            + 'partir de agora para ficha corrompida (quando o app '
+            + 'recalcula o PV do zero) e para criação e subida de nível '
+            + 'quando esse cálculo chegar; fichas já criadas continuam '
+            + 'com o valor gravado e não são recalculadas sozinhas.',
+        ],
+      },
+      {
+        grupo: '🎲 Dados de Vida por tipo',
+        itens: [
+          'Os Dados de Vida deixam de ser um número só e passam a ser '
+            + 'reservas separadas por TIPO de dado. Um Clérigo 5/Paladino '
+            + '5 vê cinco d8 e cinco d10, cada um com o próprio total — '
+            + 'antes a ficha somava tudo como um único tipo de dado.',
+          'Quando o personagem tem mais de um tipo de Dado de Vida, os '
+            + 'modais de "Usar DV" e Descanso Curto ganham um seletor para '
+            + 'escolher de qual reserva gastar. Quem tem um tipo só não vê '
+            + 'nada de novo.',
+          'O gasto de Dados de Vida deixa de se perder. Num personagem '
+            + 'com dois tipos de dado, o gasto era descartado em silêncio '
+            + 'na próxima vez que a ficha era aberta.',
+        ],
+      },
+      {
+        grupo: '🏕️ Descansos restauram a classe certa',
+        itens: [
+          'Os dois descansos passam a restaurar o recurso da classe '
+            + 'dona dele, não só da classe escolhida na criação. Um '
+            + 'Ladino 5/Monge 5 nunca recuperava os Pontos de Foco do '
+            + 'Monge, e um Mago 5/Clérigo 5 ficava com "Canalizar '
+            + 'Divindade 0/2" para sempre — os dois casos agora recarregam '
+            + 'normalmente.',
+        ],
+      },
+      {
+        grupo: '🏷️ Cabeçalho com todas as classes',
+        itens: [
+          'O cabeçalho da ficha passa a mostrar todas as classes do '
+            + 'personagem, não só a primeira: "Mago 5 / Bárbaro 5 · Nível '
+            + '10", em vez de só "Mago 10".',
+        ],
+      },
+    ],
+    correcoes: [
+      {
+        grupo: '🐉 Resiliência Dracônica',
+        itens: [
+          'A Resiliência Dracônica do Feiticeiro (subclasse Feitiçaria '
+            + 'Dracônica) dava 2 Pontos de Vida A MAIS do que o livro '
+            + 'concede. Classes.md:3074 dá +3 no nível 3 de Feiticeiro e '
+            + '+1 a cada nível de Feiticeiro depois — ou seja, +N Pontos '
+            + 'de Vida no nível N de Feiticeiro —, e o app calculava N+2. '
+            + 'TODO FEITICEIRO DRACÔNICO EXISTENTE VAI PERDER 2 PONTOS DE '
+            + 'VIDA MÁXIMOS; o ajuste acontece sozinho, sem nada para o '
+            + 'jogador fazer, na próxima vez que a ficha for aberta.',
+          'Além do valor errado, num personagem em que o Feiticeiro não '
+            + 'era a classe escolhida na criação o bônus simplesmente não '
+            + 'aparecia — e, quando era, o app usava o nível total do '
+            + 'personagem em vez do nível só de Feiticeiro.',
+        ],
+      },
+      {
+        grupo: '🖨️ Ficha impressa e PDF',
+        itens: [
+          'A ficha impressa sempre mostrava "0" de PV Temporário e '
+            + 'sempre mostrava a reserva de Dados de Vida cheia, mesmo '
+            + 'depois de gastar dados — os dois campos passam a mostrar '
+            + 'o valor real da ficha.',
+          'O PDF sempre mostrava "0" de PV Temporário, mesmo depois de '
+            + 'gastar dados — o campo passa a mostrar o valor real da '
+            + 'ficha. (O PDF nunca chegou a imprimir Dados de Vida, '
+            + 'então não tinha o segundo defeito.)',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.20',
     data: '2026-08-24',

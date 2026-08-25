@@ -170,7 +170,6 @@ export const GATILHOS_SEM_COBERTURA = [
   'feiticeiro-acao=restaurar-equilibrio',
   'feiticeiro-acao=revelacao-carne',
   'feiticeiro-acao=surto-controlado',
-  'feiticeiro-acao=surto-resolvido',
   'guardiao-acao=encerrar-marca',
   'guardiao-acao=incansavel',
   'guardiao-acao=usar-marca',

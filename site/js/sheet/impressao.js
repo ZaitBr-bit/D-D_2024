@@ -10,6 +10,7 @@ import { SUBTRACOS_ESPECIE, gerarTracoSinteticoEspecie } from './caracteristicas
 import { getEstadoRecursosBruxo } from './classes/bruxo.js';
 import { forcaPrimordialAtiva, getAtaquesPorAcao, getDeslocamentoFinal, getModIniciativa } from './combate.js';
 import { char, classeData, especiesCache, indiceMagiasCache, passivosTalentosCache, talentosCache } from './estado.js';
+import { reservasDadosVida } from '../regras-multiclasse.js';
 import { ehProficienteEmSalvaguarda } from '../regras-salvaguardas.js';
 import { ehSubclasseConjuradora, normalizarMagiaPersonalizada, rotuloOrigemMagia } from './magias.js';
 
@@ -204,11 +205,27 @@ export async function gerarHtmlImpressao() {
       </div>
       <div class="print-hp-item">
         <div class="print-hp-label">PV Temporario</div>
-        <div class="print-hp-value">${char.pv_temp ?? 0}</div>
+        ${/* pv_temporario, nao pv_temp: `char.pv_temp` NAO TEM ESCRITOR
+              NENHUM no repositorio, entao o `??` caia sempre no fallback e
+              a impressao mostrava 0 de PV Temporario sempre. O campo real
+              e `char.pv_temporario` (hp-descanso.js, ficha.js). */''}
+        <div class="print-hp-value">${char.pv_temporario ?? 0}</div>
       </div>
       <div class="print-hp-item">
         <div class="print-hp-label">Dado de Vida</div>
-        <div class="print-hp-value">${char.dados_vida_disponiveis ?? char.nivel}/${char.nivel} d${info.dado_vida || '?'}</div>
+        ${/* reservasDadosVida: `char.dados_vida_disponiveis` tambem NAO TEM
+              ESCRITOR NENHUM, entao a impressao mostrava a reserva CHEIA
+              mesmo com dados gastos -- errado ja em classe unica. E o dado
+              vinha da classe INICIAL contra o nivel TOTAL, que num
+              Mago 5/Barbaro 5 dava "10/10 d6". Uma linha por reserva
+              (livro:2043); com uma reserva so, a frase e a de sempre.
+              `<br>` (nao ' · '): .print-hp-value nao tem altura fixa nem
+              overflow escondido no CSS (app.css), entao a caixa cresce
+              para acomodar mais de uma linha -- o mesmo separador que a
+              ficha (ficha.js) usa na tela, para a impressao ficar
+              coerente com ela em vez de divergir sem necessidade. */''}
+        <div class="print-hp-value">${reservasDadosVida(char).map((r) =>
+          `${r.disponiveis}/${r.total} d${r.faces}`).join('<br>') || '0/0 d?'}</div>
       </div>
     </div>
   `;

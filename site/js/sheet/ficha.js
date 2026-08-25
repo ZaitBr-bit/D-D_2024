@@ -8,11 +8,11 @@
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ATRIBUTO_NOME_PARA_KEY, CLASSES_INFO, PERICIAS } from '../dados-classes.js';
 import { XP_POR_NIVEL } from '../levelup.js';
 import { _renderSyncIndicadorHtml } from '../pages/sheet.js';
-import { nivelNa } from '../regras-multiclasse.js';
+import { classesDe, nivelNa, reservasDadosVida, subclasseDe } from '../regras-multiclasse.js';
 import { possuiAlgumaMagia } from '../regras-origens-magia.js';
 import { ehProficienteEmSalvaguarda } from '../regras-salvaguardas.js';
 import { resolverPassivosTalentos } from '../talentos-effects.js';
-import { bonusProficiencia, calcAtaqueMagia, calcBonusPericia, calcCA, calcCDMagia, calcMod, calcPVTotal, coletarCAsAlternativas, equipamentoDeCA, escHtml, escolherCAAlternativa, fmtMod, getDeslocamento, getTamanho, semAcento } from '../utils.js';
+import { bonusProficiencia, calcAtaqueMagia, calcBonusPericia, calcCA, calcCDMagia, calcMod, calcPVMulticlasse, coletarCAsAlternativas, equipamentoDeCA, escHtml, escolherCAAlternativa, fmtMod, getDeslocamento, getTamanho, semAcento } from '../utils.js';
 import { renderSecaoCaracteristicas, renderSecaoSubclasse, renderSecaoTracosEspecie } from './caracteristicas.js';
 import { getEstadoFuria, setupEventosSubclasseBarbaro } from './classes/barbaro.js';
 import { getEstadoInspiracaoBardo } from './classes/bardo.js';
@@ -173,6 +173,16 @@ export function renderFichaCompleta() {
   definirPassivosTalentos(resolverPassivosTalentos(char));
 
   const estadoDetails = salvarEstadoDetails();
+  // `info` ainda alimenta: as proficiências de armadura/arma, o destaque
+  // do atributo primário/de conjuração na grade de atributos, e o gate
+  // que decide se a seção de Magias aparece (`info.conjurador`). A caixa
+  // "Dados de Vida" parou de lê-la na Tarefa 3 (sub-projeto 3e); o
+  // recálculo de PV (fallback quando pv_max <= 0, logo abaixo) parou de
+  // lê-la na Tarefa 4, que passou a usar calcPVMulticlasse (soma o dado
+  // de vida de CADA classe) em vez do dado da classe INICIAL sozinho --
+  // Ruling 2 da Tarefa 3: não remova esta declaração só porque um
+  // consumidor saiu dela; só a Tarefa 11, que vê o arquivo inteiro já
+  // convertido, decide entre remover e declarar exceção.
   const info = CLASSES_INFO[char.classe] || {};
   const prof = bonusProficiencia(char.nivel);
   const ca = calcCA(char, passivosTalentosCache);
@@ -212,9 +222,15 @@ export function renderFichaCompleta() {
   sincronizarBonusPvAnao();
   sincronizarBonusPvVigoroso();
 
-  // Recalcular PV max se necessário
-  if (char.pv_max <= 0 && info.dado_vida) {
-    char.pv_max = calcPVTotal(info.dado_vida, char.nivel, modCon);
+  // Recalcular PV max se necessário.
+  //
+  // calcPVMulticlasse em vez de calcPVTotal: a forma antiga recebia UM
+  // dado de vida (o da classe INICIAL) e o nivel TOTAL, entao esta rede
+  // -- que so dispara em ficha corrompida, mas quando dispara decide o PV
+  // inteiro -- dava 62 a um Mago 5/Barbaro 5 que o livro diz ter 77
+  // (livro:2039-2041).
+  if (char.pv_max <= 0) {
+    char.pv_max = calcPVMulticlasse(char, modCon);
     char.pv_atual = char.pv_max;
     salvar();
   }
@@ -238,7 +254,18 @@ export function renderFichaCompleta() {
           <div style="flex:1;min-width:0">
             <h2 style="font-size:1.3rem;margin-bottom:2px" id="char-nome-display">${escHtml(char.nome) || 'Sem Nome'}</h2>
             <div style="font-size:0.9rem;color:var(--text-muted)">
-              ${escHtml(char.especie || '')} ${escHtml(char.classe || '')} ${char.subclasse ? `(${escHtml(char.subclasse)})` : ''} &middot; Nível ${char.nivel}
+              ${/* classesDe: o cabecalho mostrava so a classe INICIAL, entao
+                    uma ficha que exibe recursos de Barbaro dizia "Mago 10" --
+                    o app se contradizendo na propria tela, mesma familia do
+                    tooltip que o 3c consertou. Com uma classe so o texto e
+                    identico ao de antes: classe unica nao pode mudar.
+                    `Nivel` continua sendo o TOTAL (livro:2037). */''}
+              ${escHtml(char.especie || '')} ${(() => {
+                const cs = classesDe(char);
+                return cs.map((c) =>
+                  `${escHtml(c.classe)}${c.subclasse ? ` (${escHtml(c.subclasse)})` : ''}${cs.length > 1 ? ` ${c.nivel}` : ''}`
+                ).join(' / ');
+              })()} &middot; Nível ${char.nivel}
             </div>
             <div style="font-size:0.8rem;color:var(--text-muted)">Antecedente: ${escHtml(char.antecedente || '–')}${char.alinhamento ? ' | Alinhamento: ' + escHtml(char.alinhamento) : ''}</div>
             <div style="font-size:0.8rem;color:var(--text-muted)">Tamanho: ${escHtml(_tamanho)}${(char.idiomas && char.idiomas.length) ? ' | Idiomas: ' + char.idiomas.map(escHtml).join(', ') : ''}</div>
@@ -366,7 +393,10 @@ export function renderFichaCompleta() {
             Forma Selvagem: ${estadoDruida.usosDisponiveis}/${estadoDruida.usosMax}
             &nbsp;|&nbsp; Estado: ${estadoDruida.formaSelvagemAtiva ? 'Ativa' : 'Inativa'}
             &nbsp;|&nbsp; Companheiro Selvagem: ${estadoDruida.companheiroSelvagemAtivo ? 'Ativo' : 'Inativo'}
-            ${(char.nivel || 1) >= 5 ? `&nbsp;|&nbsp; Ressurgimento (slot 1º): ${estadoDruida.ressurgimentoSlotRecuperadoHoje ? 'Já usado' : 'Disponível'}` : ''}
+            ${/* nivelNa: Ressurgimento é característica de DRUIDA 5 -- com char.nivel
+                  (o total) um Druida 2/Guerreiro 3 (total 5) via a linha aparecer
+                  cedo demais, antes de a subclasse existir de verdade. */
+              nivelNa(char, 'Druida') >= 5 ? `&nbsp;|&nbsp; Ressurgimento (slot 1º): ${estadoDruida.ressurgimentoSlotRecuperadoHoje ? 'Já usado' : 'Disponível'}` : ''}
           </div>
           <div class="no-print" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
             <button class="btn btn-sm ${estadoDruida.formaSelvagemAtiva ? 'btn-secondary' : 'btn-accent'}" data-druida-forma-acao="${estadoDruida.formaSelvagemAtiva ? 'encerrar' : 'ativar'}" ${(estadoDruida.usosDisponiveis <= 0 && !estadoDruida.formaSelvagemAtiva) ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>
@@ -414,8 +444,14 @@ export function renderFichaCompleta() {
             Pontos de Feitiçaria: ${estadoFeiticeiro.pontosAtuais}/${estadoFeiticeiro.pontosMax}
             &nbsp;|&nbsp; Feitiçaria Inata: ${estadoFeiticeiro.feiticariaInataUsosDisponiveis}/${estadoFeiticeiro.feiticariaInataUsosMax}
             &nbsp;|&nbsp; Estado: ${estadoFeiticeiro.feiticariaInataAtiva ? 'Ativa' : 'Inativa'}
-            ${semAcento(char.subclasse || '') === semAcento('Feitiçaria Selvagem') ? `&nbsp;|&nbsp; Marés do Caos: ${estadoFeiticeiro.subclasses.selvagem.mares_caos_disponivel ? 'Disponível' : 'Indisponível'}` : ''}
-            ${semAcento(char.subclasse || '') === semAcento('Feitiçaria Dracônica') ? `&nbsp;|&nbsp; Afinidade: ${estadoFeiticeiro.subclasses.draconica.afinidade_elemental || 'Não definida'}` : ''}
+            ${/* subclasseDe: a linha de Marés do Caos é da subclasse FEITICEIRO --
+                  char.subclasse é o espelho da classe INICIAL, então num
+                  Mago 5/Feiticeiro 5 (Feitiçaria Selvagem) ele lia "" (a do
+                  Mago) e a linha sumia inteira de dentro do painel. */
+              semAcento(subclasseDe(char, 'Feiticeiro')) === semAcento('Feitiçaria Selvagem') ? `&nbsp;|&nbsp; Marés do Caos: ${estadoFeiticeiro.subclasses.selvagem.mares_caos_disponivel ? 'Disponível' : 'Indisponível'}` : ''}
+            ${/* subclasseDe: mesma razão da linha de Marés do Caos acima, agora
+                  para a Afinidade Elemental da Feitiçaria Dracônica. */
+              semAcento(subclasseDe(char, 'Feiticeiro')) === semAcento('Feitiçaria Dracônica') ? `&nbsp;|&nbsp; Afinidade: ${estadoFeiticeiro.subclasses.draconica.afinidade_elemental || 'Não definida'}` : ''}
           </div>
           <div class="no-print" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
             <button class="btn btn-sm ${estadoFeiticeiro.feiticariaInataAtiva ? 'btn-secondary' : 'btn-accent'}" data-feiticeiro-acao="${estadoFeiticeiro.feiticariaInataAtiva ? 'encerrar-feiticaria-inata' : 'ativar-feiticaria-inata'}">
@@ -428,7 +464,13 @@ export function renderFichaCompleta() {
               nivelNa(char, 'Feiticeiro') >= 5 ? `<button class="btn btn-sm btn-primary" data-feiticeiro-acao="restauracao-feiticeira" ${estadoFeiticeiro.restauracaoFeiticeiraUsada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Restauração Feiticeira</button>` : ''}
             <button class="btn btn-sm btn-secondary" data-feiticeiro-acao="metamagia-config">Metamagia</button>
           </div>
-          ${semAcento(char.subclasse || '') === semAcento('Feitiçaria Selvagem') && estadoFeiticeiro.subclasses.selvagem.surto_pendente_automatico ? `
+          ${/* subclasseDe: o aviso de Surto pendente e o botão "Marcar resolvido"
+                são da subclasse FEITICEIRO -- com char.subclasse, num
+                Mago 5/Feiticeiro 5 (Feitiçaria Selvagem) esta guarda lia ""
+                (a do Mago) e o bloco inteiro (aviso + botão) nem era
+                emitido: não é um botão que não funciona, é um botão que
+                não existe no HTML. */
+            semAcento(subclasseDe(char, 'Feiticeiro')) === semAcento('Feitiçaria Selvagem') && estadoFeiticeiro.subclasses.selvagem.surto_pendente_automatico ? `
             <div style="width:100%;font-size:0.78rem;color:var(--warning)">
               Surto de Magia Selvagem automático pendente na próxima conjuração com espaço.
               <button class="btn btn-sm btn-secondary no-print" style="margin-left:6px" data-feiticeiro-acao="surto-resolvido">Marcar resolvido</button>
@@ -440,7 +482,13 @@ export function renderFichaCompleta() {
       ${estadoGuerreiro && (estadoGuerreiro.ehMestreBatalha || estadoGuerreiro.ehCombatentePsiquico) ? `
         <div class="info-box info" style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
           <div style="font-size:0.85rem">
-            <strong>Recursos do Guerreiro (${escHtml(char.subclasse)}):</strong>
+            <strong>Recursos do Guerreiro (${/* subclasseDe: isto é RÓTULO, não gate -- o painel
+                  já está guardado por estadoGuerreiro.ehMestreBatalha/
+                  ehCombatentePsiquico. Mas com char.subclasse, num
+                  Mago 5/Guerreiro 5 (Mestre da Batalha) ele lia "" (a do
+                  Mago) e a ficha imprimia "Recursos do Guerreiro ()" --
+                  parêntese vazio, o app se contradizendo na própria tela. */
+              escHtml(subclasseDe(char, 'Guerreiro'))}):</strong>
             ${estadoGuerreiro.ehMestreBatalha ? `
               Dados de Superioridade: ${estadoGuerreiro.dadosSuperioridadeDisponiveis}/${estadoGuerreiro.dadosSuperioridadeMax} (${estadoGuerreiro.tipoDadoSuperioridade})
               &nbsp;|&nbsp; CD: ${estadoGuerreiro.cdSuperioridade}
@@ -695,7 +743,15 @@ export function renderFichaCompleta() {
           </div>
           <div class="hp-sub-box hp-dv-box">
             <div class="hp-sub-label">Dados de Vida</div>
-            <div class="hp-sub-value">${char.nivel - (char.dados_vida_usados || 0)} / ${char.nivel} <span style="font-size:0.8em;color:var(--text-muted)">d${info.dado_vida || '?'}</span></div>
+            ${/* reservasDadosVida: o livro manda somar os dados de todas as classes,
+                  combinando os do mesmo tipo e mantendo separados os de tipos
+                  diferentes (livro:2043). char.nivel e o dado da classe INICIAL
+                  mostravam "10 / 10 d6" num Mago 5/Barbaro 5, que tem 5 d6 e 5 d12.
+                  Com UMA reserva a frase e identica a de antes -- classe unica nao
+                  pode mudar. */''}
+            <div class="hp-sub-value">${reservasDadosVida(char).map((r) =>
+              `${r.disponiveis} / ${r.total} <span style="font-size:0.8em;color:var(--text-muted)">d${r.faces}</span>`
+            ).join('<br>') || `0 / 0 <span style="font-size:0.8em;color:var(--text-muted)">d?</span>`}</div>
             <button class="btn btn-sm btn-secondary no-print" id="btn-usar-dv" style="margin-top:4px;font-size:0.72rem;padding:3px 8px">Usar DV</button>
           </div>
         </div>

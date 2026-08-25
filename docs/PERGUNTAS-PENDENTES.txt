@@ -1464,3 +1464,182 @@ de Furia Implacavel que o 3c consertou.
 FORA do conjunto declarado do 3d (que eram Ataque Extra, CA, Maestria e
 salvaguardas), e o mapa de escopo nunca a listou -- mas e regra de combate.
 Candidata natural para o 3e ou para quem fechar inventario.js.
+
+================================================================================
+TAREFA 6 (restaurarHabilidades multiclasse): CHAVE DE USO COMPARTILHADA ENTRE
+CLASSES DIFERENTES COM O MESMO NOME DE CARACTERISTICA
+
+A Tarefa 6 trocou a fonte de restaurarHabilidades (hp-descanso.js) de
+`classeData` (a classe INICIAL) para `contextosDeClasse()` (todas as
+classes do personagem), mas manteve a CHAVE de char.usos_habilidades como
+`classe_${nome}` / `subclasse_${nome}`, sem o nome da classe -- de proposito,
+porque mudar a chave apagaria o estado de uso (usos gastos) de toda ficha
+existente.
+
+MEDIDO no catalogo (dados/classes/*.json, script python ad-hoc sobre os 12
+arquivos): existem nomes de caracteristica de CLASSE (nivel base, nao
+subclasse) repetidos entre classes DIFERENTES:
+
+  'Ataque Extra'                 -> Bardo, Barbaro, Guardiao, Guerreiro, Monge, Paladino
+  'Aumento no Valor de Atributo' -> as 12 classes
+  'Canalizar Divindade'          -> Clerigo, Paladino
+  'Conjuracao'                   -> Bardo, Clerigo, Druida, Feiticeiro, Guardiao, Ladino, Mago, Paladino
+  'Defesa sem Armadura'          -> Barbaro, Monge
+  'Dadiva Epica'                 -> as 12 classes
+  'Especialista'                 -> Bardo, Guardiao, Ladino
+  'Estilo de Luta'               -> Guardiao, Guerreiro, Paladino
+  'Evasao'                       -> Ladino, Monge
+  'Maestria em Arma'             -> Barbaro, Guardiao, Guerreiro, Ladino, Paladino
+
+E entre SUBCLASSES de classes diferentes (chave `subclasse_${nome}`):
+
+  'Conjuracao'      -> Guerreiro (Cavaleiro Mistico), Ladino (Trapaceiro Arcano)
+  'Poder Psionico'  -> Guerreiro (Combatente Psiquico), Ladino (Adaga Espiritual/Combatente Psiquico)
+
+Um personagem Barbaro/Guardiao, por exemplo, teria as duas "Maestria em
+Arma" (uma por classe) escrevendo no MESMO campo
+char.usos_habilidades['classe_Maestria em Arma'] -- usar/restaurar uma
+mexeria no contador da outra.
+
+NA PRATICA, PARA A MAIORIA DESSES NOMES ISSO NAO TEM EFEITO OBSERVAVEL
+HOJE: restaurarHabilidades so escreve em usos_habilidades quando
+detectarRecarga(descricao) acha uma clausula de descanso ligada a uso
+("restaura", "recupera", "usos gastos" etc.) -- e a maioria dos nomes
+duplicados acima (Ataque Extra, Aumento no Valor de Atributo, Dadiva
+Epica, Defesa sem Armadura, Estilo de Luta, Maestria em Arma, Especialista)
+sao passivos ou escolhas permanentes, sem essa clausula, entao nunca
+escrevem na chave. 'Canalizar Divindade' e 'Conjuracao' TEM texto de
+recarga na descricao-base, mas a ficha ja rastreia os usos delas por campo
+DEDICADO (char.recursos.clerigo.canalizar_divindade_usos_gastos etc.), nao
+pelo generico usos_habilidades -- entao a colisao existe no mapa, mas
+nao ha consumidor lendo aquela chave especifica hoje (nao confirmado para
+as 12 classes uma a uma; medido so para Clerigo/Paladino, os dois casos
+que apareceram no roteiro desta tarefa). Evasao (Ladino/Monge) tambem foi
+conferida: nenhuma das duas descricoes menciona descanso -- e passiva,
+sempre ativa, sem clausula de "uso" nenhuma -- entao detectarRecarga
+devolve null para as duas e a chave nunca e escrita.
+
+O QUE ISSO SIGNIFICA: a colisao de chave e REAL e MEDIDA, mas o teto de 87
+caracteristicas de classe (RISCO do brief da Tarefa 6) inclui essas
+duplicatas -- nenhuma delas parece, pela leitura das descricoes, ser hoje
+um caso de "dois contadores genuinamente independentes disputando o mesmo
+campo com valores diferentes de gasto", porque o padrao observado e ou (a)
+sem recarga (nunca escreve) ou (b) com campo dedicado por classe (nao le o
+generico).
+
+O QUE NAO FOI FEITO: nenhum conserto. Trocar a chave para incluir o nome da
+classe (`classe_${classe}_${nome}`) resolveria de raiz, mas apagaria
+char.usos_habilidades de toda ficha existente -- decisao que a Tarefa 6
+explicitamente NAO tomou sozinha, por instrucao do brief.
+
+================================================================================
+TAREFA 11 (guarda estatico do 3e): DOIS DEFEITOS ESCAPAM DAS TRES REDES NA
+CAMPANHA DE MUTACAO -- UMA MUTACAO PARA LITERAL E UMA MUTACAO DE ESCRITA
+
+A campanha de mutacao da Tarefa 11 (12 conversoes revertidas uma a uma,
+medidas contra o guarda estatico novo, o oraculo de comportamento
+multiclasse-descansos.test.mjs e a suite de unidade inteira) fechou o
+sub-projeto 3e com a serie 3b 7/145 presos -> 3c 55/60 escapavam -> 3d 4/19
+-> 3e 2/12 escaparam das tres redes. Os dois seguem sem conserto.
+
+ACHADO 1 -- LITERAL escapa por construcao do guarda E por coincidencia do
+fixture do oraculo (hp-descanso.js:58, sincronizarBonusPvDraconico):
+
+  const esperado = ehDraconica && nivelFeiticeiro >= 3 ? nivelFeiticeiro : 0;
+
+Revertido para `? 5 : 0` (literal no lugar do valor calculado). O guarda
+estatico fica verde por desenho -- ele so proibe LEITURA de
+char.classe/subclasse/nivel, e nivelFeiticeiro ja foi lido antes (via
+nivelNa) sem mudanca nenhuma nessa linha. O oraculo de comportamento
+(Oraculo 17, multiclasse-descansos.test.mjs:663-669) TAMBEM nao pegou,
+porque OS TRES fixtures positivos do oraculo usam nivel de Feiticeiro = 5
+(as tres ordens de classe do roteiro), e o unico fixture negativo usa
+nivel 2 (esperado 0, que o literal nao afeta porque o gate >= 3 continua
+falso). Nenhum fixture testa um nivel positivo DIFERENTE de 5 -- por
+exemplo nivel 3, 4, 6 ou 10, onde a formula certa (+N no nivel N) e o
+literal 5 dariam respostas diferentes. Conserto sugerido: acrescentar ao
+Oraculo 17 um caso com nivel de Feiticeiro != 5 (ex.: nivel 4 esperado 4,
+ou nivel 10 esperado 10) -- fecha o buraco sem mexer no guarda estatico,
+que por desenho nao pode prender mutacao para literal nenhuma.
+
+ACHADO 2 -- mutacao de ESCRITA (nem literal, nem espelho de classe) escapa
+por completo (hp-descanso.js:438, dentro do handler de clique de
+#btn-usar-dv):
+
+  const qtd = gastarDadosVida(char, reserva.faces, pedido);
+
+Revertido para uma escrita direta no escalar legado
+`char.dados_vida_gastos += pedido`, sem tocar a reserva estruturada por
+tipo -- reintroduz o defeito exato que a Tarefa 2 corrigiu (gasto
+descartado silenciosamente num personagem com mais de um tipo de dado de
+vida). Passou pelas tres redes:
+  - guarda estatico: fora de escopo por desenho, nao mede escrita;
+  - multiclasse-fundacao.test.mjs (ESCRITAS_PERMITIDAS, indexada por
+    linha): tambem nao acusou -- a checagem e sobre QUAIS linhas escrevem
+    em char, nao sobre se a linha ainda chama o escritor autorizado com os
+    argumentos certos;
+  - multiclasse-descansos.test.mjs: todos os testes de gastarDadosVida
+    chamam a funcao de regras-multiclasse.js DIRETAMENTE (sem passar pelo
+    handler do botao); o unico teste que toca #btn-usar-dv confere so que
+    o clique foi REGISTRADO (setupEventosHP tem de registrar UM clique),
+    nao o que ele faz ao ser clicado.
+  - a suite e2e de regras tambem nao cobre: nenhum spec em
+    testes/e2e/regras/*.mjs referencia btn-usar-dv.
+Conserto sugerido: um teste em multiclasse-descansos.test.mjs que clique
+#btn-usar-dv de verdade (mesmo padrao de descansoCurto/descansoLongo ja
+definidos naquele arquivo) e confira reservasDadosVida(p) depois -- por
+reserva, nao so o total.
+
+Nenhum dos dois consertos foi feito por esta tarefa -- sao oraculos de
+comportamento novos, fora do escopo de "guarda estatico e promocao de
+hp-descanso.js" que a Tarefa 11 tinha. Registrado aqui para quem pegar o
+proximo sub-projeto ou uma rodada de reforco de oraculos.
+
+================================================================================
+
+CALCPVTOTAL FICOU SEM CHAMADOR NO APP
+
+O sub-projeto 3e acrescentou `calcPVMulticlasse` em `site/js/utils.js`, que
+soma o dado de vida de cada classe, e a ficha passou a usa-la em
+`site/js/sheet/ficha.js` (na rede de recalculo de PV).
+
+O plano do 3e mandou **preservar** `calcPVTotal` justificando que ela tinha
+outros chamadores, citando `site/js/creator/wizard.js:427`.
+
+**MEDIDO: aquela linha chama `calcPVNivel1`, nao `calcPVTotal`.** Depois do
+3e, `calcPVTotal` ficou **exportada e sem nenhum chamador** em `site/js/`.
+
+Nao foi removida de proposito: mexer em utilitario exportado fora do escopo
+da rodada de conserto e risco sem ganho. Fica para quem for fazer limpeza de
+exports, ou para o sub-projeto 5, que vai mexer em criacao e subida de nivel
+e pode precisar de uma das duas funcoes.
+
+Conferir antes de remover: `grep -rn "calcPVTotal" site/ testes/`.
+
+================================================================================
+
+O GUARDA ESTATICO DE FICHA.JS E CEGO PARA A DECLARACAO DE INFO
+
+O guarda `testes/regras/unidade/multiclasse-descansos-alcance.test.mjs`
+ancora a faixa de `site/js/sheet/ficha.js` por conteudo, e a faixa
+resolvida hoje vai da linha 225 ate a 1037.
+
+`const info = CLASSES_INFO[char.classe]` e declarada em `ficha.js:186`,
+**FORA** dessa faixa, e alimenta **seis** decisoes **DENTRO** dela.
+
+Ou seja: o guarda nao ve a leitura de espelho que origina aquelas seis
+decisoes. Ele mede de onde cada decisao le, mas nao de onde `info` veio.
+
+A declaracao foi preservada de proposito ao longo do 3e (ruling do
+controlador): as Tarefas 3 e 4 tiraram consumidores dela sem remove-la,
+porque nenhuma via o arquivo inteiro, e a Tarefa 11 confirmou que ainda
+restam consumidores legitimos (`info.conjurador`, `info.armaduras`,
+`info.armas`, `info.atributo_primario`, `info.atributo_conjuracao`).
+
+**Nao foi consertado** porque ampliar a faixa ancorada pode fazer emergir
+excecoes novas, e a rodada de conserto da revisao final nao e lugar de mexer
+no alcance de um guarda recem-revisado.
+
+Sugestao para a rodada de reforco: ou ampliar a faixa e declarar as excecoes
+que aparecerem, ou mover a declaracao de `info` para dentro da faixa.
+
