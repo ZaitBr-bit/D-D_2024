@@ -101,7 +101,15 @@ const MINIMO_LINHAS = 500;
 // apontando para a classe INICIAL (classe, subclasse) e para o nivel TOTAL.
 // `char.classes` (a lista de verdade) NAO casa -- `classe\b` nao encosta em
 // `classes`.
-const ESPELHOS = /(?<![\w.$])char\s*\.\s*(classe|subclasse|nivel)\b/g;
+//
+// O `\??` cobre TAMBEM o encadeamento opcional (`char?.nivel`). Ele foi
+// acrescentado pelo sub-projeto 3d (Tarefa 6), que MEDIU o buraco: reverter
+// `nivelNa(char, 'Clerigo')` (habilidades.js:258) para `(char?.nivel || 1)`
+// deixava este guarda 100% VERDE, enquanto a MESMA reversao escrita
+// `(char.nivel || 1)` era pega. Nenhuma leitura legitima da faixa usa essa
+// forma hoje (medido: zero em habilidades.js inteiro), entao fechar o buraco
+// nao custou excecao nenhuma.
+const ESPELHOS = /(?<![\w.$])char\s*\??\s*\.\s*(classe|subclasse|nivel)\b/g;
 
 /**
  * As leituras de espelho que continuam CERTAS, declaradas uma a uma com o

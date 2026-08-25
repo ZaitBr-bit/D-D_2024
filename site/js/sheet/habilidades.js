@@ -7,8 +7,8 @@
 // exigiria reescrever a montagem do HTML. Ver spec secao 5.3.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
-import { abrirModal, bonusProficiencia, calcMod, detectarRecarga, ehHabilidadeAtiva, escHtml, fmtMod, getDeslocamento, mdParaHtml, semAcento, toast } from '../utils.js';
-import { _abrirEscolhaAnimalFuria, getEstadoFuria, getProgressaoBarbaro } from './classes/barbaro.js';
+import { abrirModal, bonusProficiencia, calcMod, coletarCAsAlternativas, detectarRecarga, ehHabilidadeAtiva, equipamentoDeCA, escHtml, escolherCAAlternativa, fmtMod, getDeslocamento, mdParaHtml, semAcento, toast } from '../utils.js';
+import { _abrirEscolhaAnimalFuria, getEstadoFuria } from './classes/barbaro.js';
 import { getEstadoInspiracaoBardo } from './classes/bardo.js';
 import { abrirModalPactoDoTomo, abrirModalRecursosBruxo, getEstadoRecursosBruxo, recuperarEspacosMagiaBruxo } from './classes/bruxo.js';
 import { getEstadoRecursosClerigo, getEstadoSubclassesClerigo, getProgressaoClerigo } from './classes/clerigo.js';
@@ -25,7 +25,7 @@ import { ataqueImprudenteAtivo, formatarMetros, getDeslocamentoFinal, parseMetro
 import { char, especiesCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { numberPickerHtml, setupNumberPicker } from './hp-descanso.js';
-import { abrirModalMaestrias } from './maestrias.js';
+import { abrirModalMaestrias, tetoMaestrias } from './maestrias.js';
 import { OPCOES_METAMAGIA, conjurarSemEspaco, consumirEspacoMagiaDisponivel, recuperarEspacoMagia } from './magias.js';
 import { normalizarEstiloLuta } from '../talentos-effects.js';
 import { nivelNa, subclasseDe, temClasse } from '../regras-multiclasse.js';
@@ -94,6 +94,71 @@ function abrirEscolhaEstiloLutaExtra() {
     window.fecharModal();
     renderFichaCompleta();
     toast(`Estilo de Luta Adicional: ${escolhido}!`, 'success');
+  });
+}
+
+/**
+ * Modal de escolha da FONTE de CA alternativa (Defesa sem Armadura e
+ * parentes), para quem tem duas ou mais candidatas ao mesmo tempo.
+ *
+ * O livro (PHB:2067) permite se beneficiar de apenas UMA de cada vez, e a
+ * escolha e do jogador -- decisao registrada em
+ * docs/PERGUNTAS-PENDENTES.txt:246-257. O destino da gravacao e
+ * `char.ca_alternativa_escolhida`, que guarda a CLASSE DE ORIGEM (nao o
+ * valor): o valor muda com os atributos, a classe nao.
+ *
+ * O CONTEXTO DE EQUIPAMENTO E OBRIGATORIO. As candidatas sao recoletadas
+ * aqui, no clique, com `equipamentoDeCA(char)` -- a MESMA leitura de
+ * inventario que `calcCA` faz. Sem ele o modal ofereceria a Defesa sem
+ * Armadura do Monge a um Monge de escudo, que o livro exclui
+ * (Classes.md:5174-5176); foi exatamente esse o bug do commit 12a541b.
+ *
+ * GUARDA EXPLICITA, no molde de `data-config-maestrias`: com menos de duas
+ * candidatas nao ha escolha a fazer e o modal nem abre -- o mesmo criterio
+ * que a ficha usa para decidir se renderiza o gatilho. Se os dois
+ * divergissem, um clique em botao velho (ficha re-renderizada por outra
+ * via) abriria um modal de uma opcao so.
+ */
+function abrirEscolhaCAAlternativa() {
+  const { armadura, escudo } = equipamentoDeCA(char);
+  const candidatas = coletarCAsAlternativas(char, {
+    temArmadura: !!armadura, temEscudo: !!escudo,
+  });
+  if (candidatas.length < 2) return;
+  const ativa = escolherCAAlternativa(char, candidatas);
+  // Empate em VALOR nao e empate em EFEITO: o Barbaro e o Feiticeiro
+  // permitem Escudo, o Monge e o Bardo nao. Dizer isso na tela evita que a
+  // escolha pareca inutil quando os numeros coincidem.
+  const empatadas = candidatas.every(c => c.valor === candidatas[0].valor);
+
+  abrirModal('CA sem Armadura', `
+    <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">
+      Você tem mais de uma CA sem armadura e pode se beneficiar de apenas
+      uma de cada vez. Escolha a fonte.
+      ${empatadas ? '<br>As fontes empatam em valor: o número na ficha não muda agora, mas a escolha decide se você mantém a CA alternativa ao equipar um Escudo.' : ''}
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="ca-alternativa-select">Fonte</label>
+      <select class="form-select" id="ca-alternativa-select">
+        ${candidatas.map(c => `<option value="${escHtml(c.classe)}"${c.classe === ativa?.classe ? ' selected' : ''}>${escHtml(c.classe)} — CA ${c.valor}${c.permiteEscudo ? ' (permite Escudo)' : ' (sem Escudo)'}</option>`).join('')}
+      </select>
+    </div>
+  `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-ca-alternativa">Salvar</button>');
+
+  document.getElementById('btn-salvar-ca-alternativa')?.addEventListener('click', () => {
+    const classe = document.getElementById('ca-alternativa-select')?.value || '';
+    // Mesma guarda de `data-config-maestrias`: a classe vem do DOM, entao
+    // nao se grava nada que o personagem nao tenha. Gravar uma classe
+    // ausente faria `escolherCAAlternativa` avisar no console e cair no
+    // maior valor -- escolha do jogador perdida em silencio na tela.
+    if (!classe || !temClasse(char, classe)) {
+      toast('Escolha uma fonte de CA válida.', 'error');
+      return;
+    }
+    char.ca_alternativa_escolhida = classe;
+    salvar();
+    window.fecharModal();
+    renderFichaCompleta();
   });
 }
 
@@ -2496,6 +2561,18 @@ export function setupEventosHabilidades() {
     });
   });
 
+  // Seletor de CA alternativa: so existe no DOM quando ha DUAS ou mais
+  // candidatas (ficha.js, caixa da CA). O `querySelectorAll` nao acha nada
+  // num personagem de classe unica -- e por isso a tela dele fica
+  // identica, sem gatilho e sem listener.
+  document.querySelectorAll('[data-ca-acao="escolher-alternativa"]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      abrirEscolhaCAAlternativa();
+    });
+  });
+
   document.querySelectorAll('[data-escolher-estilo-luta-extra]').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -3016,9 +3093,13 @@ export function renderFeatureItem(f, source, ctx) {
       </div>
     `;
   } else if (ehMaestriaBarbaro) {
-    const prog = getProgressaoBarbaro() || { maestriasMax: 0 };
+    // O contador mostra o teto do PERSONAGEM (tetoMaestrias, em
+    // sheet/maestrias.js), não o da classe deste card. Os cinco cards de
+    // Maestria exibiam cinco números próprios: um Bárbaro 4/Ladino 5 via
+    // "3/3" num card e "3/2" no outro, e o teto realmente imposto era o do
+    // último botão clicado.
     const total = (char.maestrias_arma || []).length;
-    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${total}/${prog.maestriasMax}</span>`;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${total}/${tetoMaestrias()}</span>`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
         <button class="btn btn-sm btn-accent" data-config-maestrias="1">Definir Maestrias</button>
@@ -4184,9 +4265,10 @@ export function renderFeatureItem(f, source, ctx) {
     `;
     recarga = 'longo';
   } else if (ehMaestriaGuerreiro && estadoGuerreiro) {
-    // Maestria em Arma: mostra contador de maestrias
+    // Maestria em Arma: contador com o teto do PERSONAGEM -- ver o card do
+    // Bárbaro acima e tetoMaestrias() em sheet/maestrias.js.
     const total = (char.maestrias_arma || []).length;
-    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${total}/${estadoGuerreiro.maestriasMax}</span>`;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${total}/${tetoMaestrias()}</span>`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
         <button class="btn btn-sm btn-accent" data-config-maestrias="1">Definir Maestrias</button>
@@ -4270,9 +4352,10 @@ export function renderFeatureItem(f, source, ctx) {
       </div>
     `;
   } else if (ehMaestriaGuardiao) {
-    // Guardião: Maestria em Arma fixa em 2
+    // Guardião concede 2, mas o card mostra o teto do PERSONAGEM: num
+    // Guardião/Guerreiro o número é o maior dos dois -- ver tetoMaestrias().
     const total = (char.maestrias_arma || []).length;
-    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${total}/2</span>`;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${total}/${tetoMaestrias()}</span>`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
         <button class="btn btn-sm btn-accent" data-config-maestrias="1">Definir Maestrias</button>
@@ -4280,9 +4363,10 @@ export function renderFeatureItem(f, source, ctx) {
       </div>
     `;
   } else if (ehMaestriaPaladino) {
-    // Paladino: Maestria em Arma fixa em 2
+    // Paladino concede 2, mas o card mostra o teto do PERSONAGEM -- ver
+    // tetoMaestrias() em sheet/maestrias.js.
     const total = (char.maestrias_arma || []).length;
-    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${total}/2</span>`;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${total}/${tetoMaestrias()}</span>`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
         <button class="btn btn-sm btn-accent" data-config-maestrias="1">Definir Maestrias</button>
@@ -4290,9 +4374,10 @@ export function renderFeatureItem(f, source, ctx) {
       </div>
     `;
   } else if (ehMaestriaLadino) {
-    // Ladino: Maestria em Arma fixa em 2
+    // Ladino concede 2, mas o card mostra o teto do PERSONAGEM -- ver
+    // tetoMaestrias() em sheet/maestrias.js.
     const total = (char.maestrias_arma || []).length;
-    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${total}/2</span>`;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${total}/${tetoMaestrias()}</span>`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
         <button class="btn btn-sm btn-accent" data-config-maestrias="1">Definir Maestrias</button>

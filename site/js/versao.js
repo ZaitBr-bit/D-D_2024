@@ -13,13 +13,102 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.19';
+export const VERSAO_ATUAL = '2.2.20';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.20',
+    data: '2026-08-24',
+    rotulo: 'Combate em multiclasse',
+    resumo: 'Personagens com mais de uma classe passam a ter Ataque Extra, '
+      + 'Classe de Armadura, Maestria em Arma, deslocamento e iniciativa '
+      + 'calculados pela classe certa — e ganham um seletor novo para '
+      + 'escolher a CA quando há mais de uma forma de calculá-la.',
+    melhorias: [
+      {
+        grupo: '🛡️ Seletor de Classe de Armadura',
+        itens: [
+          'Quando o personagem tem mais de uma forma de calcular a CA (por '
+            + 'exemplo, Defesa sem Armadura do Monge e Resiliência '
+            + 'Dracônica do Feiticeiro), a caixa de CA da ficha ganhou um '
+            + 'seletor com o nome da classe usada. Por padrão o app usa o '
+            + 'maior valor; o seletor deixa escolher a outra classe.',
+          'Vestir um Escudo pode reduzir as opções a uma só (o Monge, por '
+            + 'exemplo, perde a Defesa sem Armadura com Escudo) — nesse '
+            + 'caso o seletor some sozinho.',
+          'Quem só tem uma forma de calcular a CA, com ou sem multiclasse, '
+            + 'não vê nada de novo.',
+        ],
+      },
+    ],
+    correcoes: [
+      {
+        grupo: '⚔️ Ataque Extra',
+        itens: [
+          'Personagens com mais de uma classe que concede Ataque Extra '
+            + '(Bárbaro, Guerreiro, Guardião, Paladino, Monge e o Bardo do '
+            + 'Colégio da Bravura) agora usam o maior número de ataques '
+            + 'entre as classes — nunca a soma. Antes, o app conferia o '
+            + 'nível total misturado com a classe inicial, e o número de '
+            + 'ataques podia sair errado para mais ou para menos, conforme '
+            + 'a ordem em que as classes foram escolhidas.',
+        ],
+      },
+      {
+        grupo: '🥋 Maestria em Arma',
+        itens: [
+          'Quem tem mais de uma classe que concede Maestria em Arma '
+            + '(Bárbaro, Guerreiro, Guardião, Paladino, Ladino) passa a '
+            + 'ter um único número de maestrias na ficha inteira — o maior '
+            + 'limite entre as classes, nunca a soma. Um Bárbaro 4 (3 '
+            + 'maestrias) com Guerreiro 3 (3 maestrias) fica com 3, não 6. '
+            + 'Antes, cada bloco da ficha mostrava o limite da sua própria '
+            + 'classe, e podiam aparecer números diferentes e '
+            + 'contraditórios na mesma tela.',
+          'O botão de trocar maestrias no Descanso Longo passa a aparecer '
+            + 'para quem tem qualquer classe que a conceda, não só a '
+            + 'primeira escolhida. Um Mago 5/Guerreiro 5 nunca via a '
+            + 'opção, porque o app só olhava a classe inicial (Mago).',
+          'A lista de armas oferecidas no modal de Maestrias continua '
+            + 'vindo só da classe inicial — esse ajuste fica para uma '
+            + 'próxima versão.',
+        ],
+      },
+      {
+        grupo: '🛡️ Salvaguardas',
+        itens: [
+          'Sobrevivente Disciplinado (Monge 14) e Sentido de Perigo '
+            + '(Bárbaro 2) passam a olhar o nível na própria classe, não o '
+            + 'nível total do personagem. Um Monge 10/Ladino 4 ganhava '
+            + 'essas proficiências antes da hora, e um Ladino 1/Monge 14 '
+            + 'não as recebia — porque o app olhava a classe escolhida na '
+            + 'criação.',
+          'Mente Escorregadia (Ladino 15) passou a marcar de fato a '
+            + 'proficiência em salvaguardas de Sabedoria e Carisma na '
+            + 'grade da ficha. A ficha já mostrava o texto da '
+            + 'característica; a grade nunca marcava nada — mesmo em '
+            + 'personagem de classe única, sem relação com multiclasse.',
+        ],
+      },
+      {
+        grupo: '🏃 Deslocamento, iniciativa e subclasses',
+        itens: [
+          'Movimento Rápido (Bárbaro), Movimento sem Armadura (Monge), '
+            + 'Errante e Aura de Vivacidade (Guardião e Paladino), '
+            + 'Instintos Primitivos e Atleta Extraordinário (vantagem em '
+            + 'Iniciativa) e características de subclasse ligadas a '
+            + 'deslocamento passam a olhar o nível e a subclasse da classe '
+            + 'certa em personagens com mais de uma classe. Antes, todas '
+            + 'essas contas usavam a classe escolhida na criação, mesmo '
+            + 'quando a característica pertencia à segunda classe.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.19',
     data: '2026-08-24',

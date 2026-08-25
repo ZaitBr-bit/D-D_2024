@@ -255,7 +255,18 @@ vez", a escolha e do jogador) sem obrigar a comparar formulas a cada mudanca
 de atributo. Ver docs/superpowers/specs/2026-08-22-multiclasse-motor-design.md,
 secao "Decisoes de produto tomadas aqui".
 
-IMPLEMENTACAO: sub-projeto 3.
+RESOLVIDO em 2026-08-24, sub-projeto 3d de multiclasse (combate),
+tarefas 3 e 4: coletarCAsAlternativas() + escolherCAAlternativa() em
+utils.js escolhem o MAIOR VALOR por padrao, e a ficha ganhou o seletor
+por classe (ficha.js + habilidades.js) para trocar quando ha duas ou
+mais candidatas -- exatamente o desenho acima.
+
+ORACULO: testes/regras/unidade/multiclasse-combate.test.mjs prova o
+motor contra HEAD em 107.520 combinacoes (tarefa 3);
+testes/e2e/regras/multiclasse-ca-seletor.spec.mjs prova o seletor na
+tela, 5 casos (tarefa 4).
+
+Nada ficou de fora desta decisao.
 
 
 PERGUNTA 2 -- Maestria em Arma: soma entre classes?
@@ -286,7 +297,20 @@ acumulam"); o capitulo 2 nao arbitra Maestria em Arma, e o resultado atual
 acidente. Ver docs/superpowers/specs/2026-08-22-multiclasse-motor-design.md,
 secao "Decisoes de produto tomadas aqui".
 
-IMPLEMENTACAO: sub-projeto 3.
+RESOLVIDO em 2026-08-24, sub-projeto 3d de multiclasse (combate),
+tarefa 5: tetoMaestrias() em site/js/sheet/maestrias.js usa o MAIOR
+LIMITE entre as classes que concedem Maestria em Arma, nunca a soma --
+exatamente o RECOMENDADO acima. Um Barbaro 4 (3 maestrias) / Guerreiro
+3 (3 maestrias) fica com 3, nao 6.
+
+ORACULO: testes/regras/unidade/multiclasse-combate.test.mjs, bloco da
+tarefa 5 (11 casos, todos em pares) + prova por mutacao (8 mutacoes,
+todas pegas).
+
+FICOU DE FORA: quais armas cada classe pode dominar continua vindo so
+da classe inicial (lista reduzida de proficiencia, livro:2051) -- o
+teto foi corrigido, a lista de opcoes nao. Fica para o proximo
+sub-projeto.
 
 ================================================================================
 Correcao final multiclasse: conferencia manual pendente (2026-08-22)
@@ -1188,3 +1212,255 @@ ERROS MEUS NO SPEC E NO BRIEF DO 3C, TAREFA 3
    arquivo que meu brief nao listava. O implementador saiu do escopo, relatou,
    e estava certo. A revisao confirmou revertendo cada metade separadamente:
    as DUAS derrubam o oraculo 7.
+
+================================================================================
+ACHADO DO 3D, TAREFA 1 (salvaguardas): SOBREVIVENTE DISCIPLINADO NAO E A UNICA
+
+O docblock de salvaguardasConcedidasPorClasse (regras-salvaguardas.js) afirma
+"Hoje ha uma so no livro: Sobrevivente Disciplinado, do Monge". E FALSO.
+
+MENTE ESCORREGADIA -- caracteristica de LADINO 15 (Classes.md:4284, e a linha
+15 da tabela em Classes.md:4197; tambem em dados/classes/ladino.json):
+"Voce adquire proficiencia em salvaguardas de Sabedoria e Carisma." Sem
+escolha do jogador -- exatamente a mesma familia de Sobrevivente Disciplinado.
+
+O app JA sabe da caracteristica: sheet/classes/ladino.js:120 calcula
+menteEscorregadiaAtiva e ficha.js:549 mostra o TEXTO "Mente Escorregadia:
+Prof. salvaguardas Sab/Car.". Mas salvaguardasConcedidasPorClasse nao a
+conhece, entao a grade de salvaguardas nunca marca Sabedoria nem Carisma --
+e a issue #21 de novo, na segunda caracteristica.
+
+POR QUE NAO CONSERTEI: a Tarefa 1 do 3d e CONVERSAO (espelho -> nivelNa), nao
+completude de caracteristicas. Acrescentar Mente Escorregadia e mudanca de
+comportamento com oraculos proprios (Ladino 15 puro, Ladino 15/X, Ladino 14/X
+como par negativo, e a interacao com Resiliente ja gravado). Cabe numa tarefa
+propria.
+
+CONTRA-VERIFICADO: Mente de Ferro (Guardiao / Vigilante das Sombras, nivel 7,
+Classes.md:3732) tambem concede salvaguarda, mas ESSA ja esta coberta --
+regras-subclasse-escolhas.js:62 a trata como escolha de subclasse. A lacuna e
+so a do Ladino.
+
+RECOMENDADO (e o que segui): registrar aqui, nao alargar a Tarefa 1, e deixar
+o docblock como esta -- corrigi-lo sem implementar deixaria um comentario
+descrevendo uma lacuna em vez de uma regra.
+
+================================================================================
+ACHADO DO 3D, TAREFA 2 (Ataque Extra): O BRIEF APONTA O ARQUIVO ERRADO
+
+O brief da Tarefa 2 diz, tres vezes, que getAtaquesPorAcao mora em
+site/js/utils.js. NAO mora. Mora em site/js/sheet/combate.js:238, e le o
+personagem do ESTADO DE MODULO (site/js/sheet/estado.js), nao de um parametro
+-- por isso o corpo sugerido no brief, que usa `char` livre, compila la e nao
+compilaria em utils.js (utils.js nao importa `char` e nem poderia: quem tem o
+estado da ficha e sheet/estado.js).
+
+CONSEQUENCIAS PARA O QUE O BRIEF AFIRMAVA:
+
+1. A analise de CICLO DE IMPORT foi feita sobre o arquivo errado. A conclusao
+   final continua valendo, mas por outro caminho: quem passa a importar
+   regras-multiclasse.js e sheet/combate.js, e regras-multiclasse.js importa
+   so dados-classes.js. Sem ciclo. (utils.js segue sem importar
+   regras-multiclasse.js -- nada mudou nele.)
+
+2. A restricao "so getAtaquesPorAcao em utils.js, calcCA e da Tarefa 3" se
+   dissolve sozinha: calcCA esta mesmo em utils.js:145, mas getAtaquesPorAcao
+   nao esta. As duas tarefas mexem em ARQUIVOS DIFERENTES e nao podem se
+   atropelar.
+
+3. Havia um oraculo pre-existente sobre esta funcao que o brief nao citava:
+   testes/regras/unidade/classes-passivas.test.mjs:530-568 varre nivel 1-20
+   das 5 classes com Ataque Extra, com char LEGADO (`{classe, nivel}`, sem
+   classes[]). Ele continua verde porque classesDe() normaliza a ficha legada
+   -- e a prova de que a conversao nao quebrou o formato antigo.
+
+RECOMENDADO (e o que segui): implementar em sheet/combate.js, que e onde a
+funcao esta, e registrar aqui em vez de parar para perguntar.
+
+================================================================================
+O GUARDA DE GATILHOS TEM PONTO CEGO: SO ENXERGA data-<x>acao=
+
+Achado na Tarefa 4 do sub-projeto 3d, e explica um silencio antigo.
+
+O motor de gatilhos-ui-cobertos.test.mjs extrai o inventario de gatilhos
+procurando `id="btn-..."` e `data-<algo>-acao="..."`. Consequencia: todo
+gatilho cujo atributo NAO termina em `-acao` escapa do inventario EM
+SILENCIO -- nao aparece na lista de cobertos nem na de sem-cobertura.
+
+Dois casos conhecidos, os dois de escolha persistente do jogador:
+
+  data-config-maestrias            (5 ramos de classe, sub-projeto 3c)
+  data-escolher-estilo-luta-extra  (Guerreiro/Campeao)
+
+Isso explica por que nenhuma das duas aparecia na lista: nao e que
+estivessem cobertas, e que o guarda nunca soube que existiam.
+
+O implementador da Tarefa 4 contornou de proposito: nomeou o gatilho novo do
+seletor de CA como `data-ca-acao="escolher-alternativa"` em vez do formato
+`data-escolher-...` dos precedentes, justamente para ENTRAR na cobranca em
+vez de escapar junto.
+
+POR QUE ISSO IMPORTA MAIS DO QUE PARECE: o guarda nasceu de um bug real de
+2026-08-16, em que um spec afirmava que o BOTAO aparecia mas nunca clicava
+nele, e o ReferenceError so apareceu para o usuario. Um gatilho invisivel ao
+inventario tem exatamente a mesma exposicao que aquele tinha -- o guarda nao
+o protege e ninguem sabe disso.
+
+RECOMENDADO: ampliar o extrator para reconhecer `data-*` de gatilho alem do
+sufixo `-acao`, ou adotar a convencao de que todo gatilho novo termina em
+`-acao` e documenta-la no cabecalho de gatilhos-sem-cobertura.mjs. A segunda
+e mais barata e ja e o que a Tarefa 4 fez na pratica.
+
+NAO CONSERTADO AQUI: e o instrumento de cobranca do projeto inteiro, nao um
+detalhe de multiclasse. Mexer nele no meio de um sub-projeto misturaria as
+naturezas -- e ampliar o extrator provavelmente faria a lista de
+sem-cobertura CRESCER de uma vez, o que colide com a regra "a lista so
+encolhe" e precisa de decisao propria.
+
+================================================================================
+O SELETOR DE CA NAO OFERECE "VOLTAR AO AUTOMATICO"
+
+Levantado pelo implementador da Tarefa 4, e ninguem tinha perguntado.
+
+A decisao de produto de 2026-08-22 diz: CA alternativa e o MAIOR VALOR por
+padrao, com seletor para trocar quando houver duas ou mais candidatas, e a
+escolha manual fica em char.ca_alternativa_escolhida.
+
+O que ela nao diz: depois que o jogador escolhe, o default do maior valor
+deixa de valer para aquele personagem PARA SEMPRE. Se ele subir de nivel e a
+outra candidata passar a ser maior, a ficha mantem a escolhida -- que e o
+comportamento correto pela decisao escrita, mas talvez nao seja o que o
+jogador espera.
+
+O modal atual nao tem opcao de limpar a escolha.
+
+RECOMENDADO: acrescentar uma opcao "Automatico (maior valor)" no seletor,
+que grava null em ca_alternativa_escolhida. Custo baixo, e devolve ao
+jogador o estado inicial sem precisar editar JSON.
+
+NAO CONSERTADO AQUI: e ampliacao da decisao de produto, nao implementacao
+dela. Fica para quem decidir o produto.
+
+================================================================================
+TRES CORRECOES AO MATERIAL DO 3D, JA APLICADAS
+
+1. getAtaquesPorAcao NAO esta em utils.js -- esta em sheet/combate.js. O
+   mapa de escopo errou e eu propaguei para o plano. Corrigido. E o mesmo
+   arquivo tinha outras 14 leituras de espelho que o mapa nao viu, porque
+   buscou pelos quatro assuntos nomeados em vez de varrer o arquivo. Virou a
+   Tarefa 2b.
+
+2. Dois nomes de caracteristica errados no brief da Tarefa 2b: o que chamei
+   de "Sentido de Perigo (iniciativa), Barbaro 7" e INSTINTOS PRIMITIVOS
+   (Classes.md:135) -- Sentido de Perigo e Barbaro 2 e da Vantagem em
+   salvaguardas de Destreza. E "Iniciativa Agil" nao existe: e a segunda
+   metade de ATLETA EXTRAORDINARIO (Classes.md:3892, Guerreiro/Campeao 3).
+   Os degraus estavam certos; so os nomes errados.
+
+3. As linhas de ficha.js citadas no brief da Tarefa 4 sairam do lugar -- o
+   stat-box da CA esta em 577-579, nao 559-563. Numero de linha em brief
+   envelhece; ancora de conteudo nao.
+
+================================================================================
+OS HELPERS DE SEMEADURA MULTICLASSE VAO TER TRES COPIAS
+
+Levantado na Tarefa 4. Os helpers de multiclasse-handlers.spec.mjs NAO sao
+`export` -- sao locais do modulo. A Tarefa 4 copiou o PADRAO, nao o codigo.
+
+Se o sub-projeto 5 tambem semear personagem multiclasse em e2e, a mesma
+funcao vai existir em tres arquivos.
+
+RECOMENDADO: subir `abrirFichaMulticlasse` e `exigirNoDom` para
+testes/e2e/regras/helpers-regras.mjs antes do sub-projeto 5, nao depois.
+
+================================================================================
+CORRECAO: O SUB-PROJETO DAS PROFICIENCIAS E MENOR DO QUE FOI REGISTRADO
+
+A revisao final do 3d achou um erro meu que muda o tamanho do trabalho
+adiado.
+
+O QUE EU REGISTREI (e o mapa de escopo do 3d dizia): que o livro manda a
+classe nao inicial conceder uma lista REDUZIDA de proficiencias, e que
+CLASSES_INFO "nao tem esse dado" -- logo o sub-projeto seria transcricao das
+12 listas "Como um Personagem Multiclasse" do livro.
+
+O QUE E VERDADE: o campo `proficiencias_multiclasse` JA EXISTE em
+site/js/dados-classes.js, para AS DOZE CLASSES, desde o commit a2dd900 (o
+sub-projeto 3a), com oraculo proprio em multiclasse-fundacao.test.mjs:142.
+
+O que falta e o CONSUMO: nenhum codigo de producao le esse campo.
+armasElegiveisMaestria e temProficienciaArma (site/js/regras-equipamento.js)
+continuam decidindo por personagem.classe, o espelho da classe inicial.
+
+CONSEQUENCIA: o sub-projeto adiado NAO e transcricao de catalogo. E ligar um
+dado que ja esta transcrito e ja tem rede. Bem menor do que a decisao de
+adiar supunha -- e o adiamento continua valendo, mas por outro motivo (nao
+misturar naturezas dentro do 3d), nao por tamanho.
+
+Pior caso medido continua o mesmo: Ladino 5/Guerreiro 5 esconde 19 das 38
+armas no modal do Guerreiro, e ainda manda escolher 4.
+
+================================================================================
+CORRECAO: O CODIGO DO BARDO (COLEGIO DA DANCA) ESTA CERTO
+
+Eu havia registrado no ledger do 3d que utils.js era "mais restritivo que o
+texto do livro" ao exigir !armadura && !escudo para a Defesa sem Armadura do
+Colegio da Danca, porque Classes.md:732 nao enuncia condicao nenhuma.
+
+A PREMISSA ESTAVA INVERTIDA. A condicao esta na linha 727, como guarda-chuva
+da caracteristica inteira:
+
+  ### Nivel 3: Ginga Fascinante
+  Enquanto voce nao estiver vestindo armadura ou empunhando um Escudo,
+  adquire os seguintes beneficios.
+
+E "Defesa sem Armadura" e um desses beneficios, listado logo abaixo. O
+codigo esta certo, e o comentario do proprio 3d em FONTES_CA_ALTERNATIVA ja
+cita a faixa correta (Classes.md:724-732).
+
+NAO HA DIVIDA AQUI. Registro so para que ninguem "conserte" o !escudo do
+Bardo achando que e excesso -- ele e a regra.
+
+Nota: eu havia escrito no ledger que isso estava "registrado em
+PERGUNTAS-PENDENTES.txt", e nao estava. Foi sorte: nada falso entrou no
+documento duravel.
+
+================================================================================
+CORRECAO: A NOTA DA PERGUNTA 1 GENERALIZOU O QUE O ORACULO MEDE
+
+A nota RESOLVIDO da PERGUNTA 1 (CA alternativa) diz que
+multiclasse-combate.test.mjs "prova o motor contra HEAD em 107.520
+combinacoes".
+
+MEDIDO pela revisao final: o arquivo NAO importa HEAD em lugar nenhum. As
+107.520 combinacoes foram uma medicao TRANSITORIA da Tarefa 3, feita com um
+roteiro descartavel que importava HEAD lado a lado -- valiosa como prova
+naquele momento, mas nao e o que ficou no repositorio.
+
+O oraculo DURAVEL e outro, e e bom: o congelamento de 2.016 combinacoes
+contra as CITACOES DO LIVRO (multiclasse-combate.test.mjs:1317). Ele nao
+mede contra HEAD; mede contra a regra. O comentario do proprio teste
+(:1271-1274) e honesto sobre isso -- foi a minha nota que generalizou.
+
+As afirmacoes da PERGUNTA 2 (Maestria) conferem todas: 11 oraculos
+contados, "maior e nao soma" medido por mutacao, e "quais armas ficou de
+fora" verificado no codigo.
+
+================================================================================
+REGRA DE COMBATE AINDA NO ESPELHO, E O APP SE CONTRADIZ
+
+site/js/sheet/inventario.js:350
+
+  char.classe === 'Barbaro' && temArmaduraPesadaEquipada()
+
+desliga a Furia ao equipar armadura pesada. Num Ladino 1/Barbaro 5 o espelho
+e 'Ladino', entao a Furia NAO e desligada -- enquanto o painel de Furia da
+ficha (ficha.js:294, ja por classe desde o sub-projeto 3b) AVISA que a
+armadura pesada esta equipada.
+
+O app avisa e nao age: contradicao na mesma tela, mesma familia do tooltip
+de Furia Implacavel que o 3c consertou.
+
+FORA do conjunto declarado do 3d (que eram Ataque Extra, CA, Maestria e
+salvaguardas), e o mapa de escopo nunca a listou -- mas e regra de combate.
+Candidata natural para o 3e ou para quem fechar inventario.js.

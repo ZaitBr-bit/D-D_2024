@@ -25,7 +25,7 @@ import { getEstadoRecursosPaladino } from './classes/paladino.js';
 import { char, classeData, especiesCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { mostrarTrocaMagiaConhecida, mostrarTrocaTruque, truquesTrocaveis } from './grimorio.js';
-import { abrirModalTrocaMaestriaDescanso } from './maestrias.js';
+import { abrirModalTrocaMaestriaDescanso, classesComMaestria, trocaTodasNoDescanso } from './maestrias.js';
 import { ehSubclasseConjuradora, getConcentracaoAtiva, magiaContaNoLimite } from './magias.js';
 
 export function sincronizarBonusPvDraconico() {
@@ -1097,8 +1097,14 @@ export function setupEventosDescanso() {
 
     // Verificar se a classe tem Maestria em Arma e/ou troca de magias
     const infoClasse = CLASSES_INFO[char.classe] || {};
-    const classesMaestria = ['Bárbaro', 'Guerreiro', 'Guardião', 'Paladino', 'Ladino'];
-    const temMaestria = classesMaestria.includes(char.classe);
+    // As classes DESTE personagem que concedem Maestria em Arma. Era
+    // `classesMaestria.includes(char.classe)`, uma cópia da lista comparada
+    // com o ESPELHO da classe inicial: num Mago 5/Guerreiro 5 a opção de
+    // trocar maestria SUMIA da tela do Descanso Longo -- não mostrava número
+    // errado, simplesmente não existia. A lista agora mora em maestrias.js,
+    // ao lado do teto que a consome.
+    const classesDeMaestria = classesComMaestria(char);
+    const temMaestria = classesDeMaestria.length > 0;
     const ehSubConj = ehSubclasseConjuradora();
     // A quantidade vem de regras-preparo-magias.js, que guarda a REGRA DO
     // PRODUTO -- e ela se afasta da tabela do livro de proposito, com o
@@ -1131,11 +1137,14 @@ export function setupEventosDescanso() {
         </div>
       `;
       if (temMaestria) {
-        const trocaUma = ['Bárbaro', 'Guerreiro'].includes(char.classe);
+        // Basta UMA classe de troca total (Guardião/Paladino/Ladino) para o
+        // personagem poder refazer tudo -- ele tem a característica dela de
+        // verdade, e as maestrias vivem num array único.
+        const trocaUma = !trocaTodasNoDescanso(char);
         conteudoModal += `
           <p style="font-size:0.9rem">Deseja trocar suas maestrias de arma?</p>
           <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">
-            Como ${escHtml(char.classe)}, você pode ${trocaUma ? 'alterar <strong>uma</strong> escolha de' : 'alterar suas escolhas de'} maestria após um Descanso Longo.
+            Como ${escHtml(classesDeMaestria.join('/'))}, você pode ${trocaUma ? 'alterar <strong>uma</strong> escolha de' : 'alterar suas escolhas de'} maestria após um Descanso Longo.
           </p>
         `;
       }

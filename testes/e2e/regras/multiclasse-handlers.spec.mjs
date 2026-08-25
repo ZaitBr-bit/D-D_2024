@@ -550,6 +550,15 @@ test('Oraculo 5 (canario, nasce verde) -- Clerigo 5 de classe unica continua gas
 // os dois valores tambem divergem (2 contra 3), mas em nenhum nivel eles
 // coincidem, entao qualquer nivel serviria; 5 mantem o fixture parecido
 // com o resto do arquivo.
+//
+// ATUALIZADO PELA TAREFA 5 DO SUB-PROJETO 3d: o teto deixou de ser POR
+// CLASSE. Desde a decisao de 2026-08-22 (docs/PERGUNTAS-PENDENTES.txt,
+// PERGUNTA 2) ele e do PERSONAGEM -- o MAIOR entre as classes que concedem,
+// nao a soma -- entao neste fixture os DOIS modais declaram 4, o teto do
+// Guerreiro 5. A divergencia de 3 contra 4 continua sendo o que da valor ao
+// fixture, mas agora do outro lado: e ela que prova que o modal do Barbaro
+// NAO usa o numero da propria classe. Quem distingue os dois botoes passou a
+// ser o TITULO do modal -- ver o Oraculo 7.
 const BARBARO5_GUERREIRO5 = [
   { classe: 'Bárbaro', subclasse: 'Trilha do Berserker', nivel: 5, ordem: 0 },
   { classe: 'Guerreiro', subclasse: 'Campeão', nivel: 5, ordem: 1 },
@@ -590,21 +599,31 @@ test('Oraculo 6 -- Barbaro 5/Guerreiro 5: existem exatamente 2 botoes de maestri
 // ============================================================
 //
 // Mata: o handler que ignora o carimbo e deixa `abrirModalMaestrias()`
-// decidir tudo por `char.classe` (maestrias.js:30-40). Hoje, num
-// Barbaro 5/Guerreiro 5, `char.classe` e 'Barbaro' e os DOIS botoes abrem
-// o modal do Barbaro, com teto 3 -- o botao do Guerreiro rouba 1 vaga de
-// maestria do personagem, em silencio.
+// decidir tudo por `char.classe`. Num Barbaro 5/Guerreiro 5 o espelho e
+// 'Barbaro', entao os DOIS botoes abririam o modal ROTULADO como Barbaro.
 //
 // Mata tambem a correcao preguicosa que so acrescenta a guarda
 // `temClasse(char, btn.dataset.classe)` sem PASSAR a classe adiante: a
-// guarda passaria nos dois botoes (o personagem tem as duas classes) e o
-// teto continuaria sendo o do Barbaro.
+// guarda passaria nos dois botoes (o personagem tem as duas classes) e os
+// dois modais continuariam se anunciando como Barbaro.
 //
-// ORDEM DAS METADES, DE PROPOSITO: o GUERREIRO (a metade quebrada hoje)
-// vem primeiro, e sem salvar. Salvando na primeira metade, o modal
-// seguinte abriria com N maestrias ja escolhidas e o teto deixaria de ser
-// observavel pela contagem de caixas que "grudam". A metade do Barbaro,
-// que fecha, e a que salva -- persistir tambem e contrato do handler.
+// O QUE MUDOU NA TAREFA 5 DO 3d: o TETO deixou de distinguir os dois botoes
+// -- ele agora e do PERSONAGEM (4, o maior entre Barbaro 5 = 3 e Guerreiro
+// 5 = 4), e nao da classe do botao. Quem distingue passou a ser o TITULO,
+// que continua saindo do parametro `classe` que o handler entrega. As duas
+// metades exigem titulos DIFERENTES e teto IGUAL, e as duas coisas juntas
+// sao o que prende o comportamento: teto igual sem titulo diferente
+// significaria o carimbo perdido; titulo diferente com tetos diferentes
+// significaria o teto agregado perdido.
+//
+// A metade do BARBARO e, ainda, um oraculo de Tarefa 5 por si: o modal do
+// Barbaro 5 tem de deixar marcar 4, nao as 3 da tabela do Barbaro.
+//
+// ORDEM DAS METADES, DE PROPOSITO: o GUERREIRO vem primeiro, e sem salvar.
+// Salvando na primeira metade, o modal seguinte abriria com N maestrias ja
+// escolhidas e o teto deixaria de ser observavel pela contagem de caixas
+// que "grudam". A metade do Barbaro, que fecha, e a que salva -- persistir
+// tambem e contrato do handler.
 test('Oraculo 7 -- Barbaro 5/Guerreiro 5: o botao de cada classe abre o modal de maestrias DAQUELA classe', async ({ context }) => {
   const id = 'regras-3c-oraculo-7';
   const { page, erros } = await abrirFichaMulticlasse(
@@ -627,7 +646,7 @@ test('Oraculo 7 -- Barbaro 5/Guerreiro 5: o botao de cada classe abre o modal de
     'o botao do Guerreiro tem de abrir o modal do GUERREIRO, nao o da classe inicial')
     .toContain('Guerreiro');
   expect(modalGuerreiro.teto,
-    'Guerreiro 5 conhece 4 maestrias (dados/classes/guerreiro.json), nao as 3 do Barbaro 5')
+    'o teto e do PERSONAGEM: 4, o maior entre Barbaro 5 (3) e Guerreiro 5 (4)')
     .toBe(4);
   expect(modalGuerreiro.caixas,
     'o modal precisa listar armas suficientes para o teto ser medido por comportamento')
@@ -639,25 +658,32 @@ test('Oraculo 7 -- Barbaro 5/Guerreiro 5: o botao de cada classe abre o modal de
 
   await fecharModalAberto(page);
 
-  // ---------- Metade do Barbaro: teto 3 (Barbaro 5) ----------
+  // ---------- Metade do Barbaro: MESMO teto 4, titulo diferente ----------
   await clicarSeletorFicha(page, '[data-config-maestrias][data-classe="Bárbaro"]',
     { esperar: '#btn-salvar-maestrias' });
 
   const modalBarbaro = await lerModalMaestrias(page);
   expect(modalBarbaro.titulo,
     'o botao do Barbaro tem de abrir o modal do BARBARO').toContain('Bárbaro');
+  expect(modalBarbaro.titulo,
+    'os dois botoes nao podem abrir o MESMO modal -- o do Barbaro nao se anuncia como Guerreiro')
+    .not.toContain('Guerreiro');
+  // Tarefa 5 do 3d: 4, nao as 3 da tabela do Barbaro. O teto e do
+  // personagem, e o botao clicado nao muda o numero.
   expect(modalBarbaro.teto,
-    'Barbaro 5 conhece 3 maestrias (dados/classes/barbaro.json)').toBe(3);
+    'o teto e o mesmo do outro botao: 4, o maior entre Barbaro 5 (3) e Guerreiro 5 (4)')
+    .toBe(4);
 
   const grudaramBarbaro = await marcarMaestrias(page, 6);
   expect(grudaramBarbaro,
-    'seis tentativas num teto de Barbaro 5 deixam 3 marcadas, nunca 4').toBe(3);
+    'seis tentativas no modal do Barbaro deixam 4 marcadas -- o teto do personagem, nao as 3 da classe')
+    .toBe(4);
 
   // O cancelamento da metade anterior nao pode ter gravado nada.
   await clicarSeletorFicha(page, '#btn-salvar-maestrias');
   const salvas = await maestriasSalvas(page, id);
   expect(salvas.length,
-    'o clique em Salvar grava exatamente as 3 maestrias do teto do Barbaro').toBe(3);
+    'o clique em Salvar grava exatamente as 4 maestrias do teto do personagem').toBe(4);
 
   expect(erros, 'nenhum erro de console').toEqual([]);
 });

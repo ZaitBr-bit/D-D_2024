@@ -101,7 +101,11 @@ export async function modulosApp() {
          // chave `sheetHabilidades` para os oraculos 9-13 de
          // multiclasse-render.test.mjs chamarem
          // sheetHabilidades.renderFeatureItem(f, source, ctx).
-         sheetHabilidades] = await Promise.all([
+         sheetHabilidades,
+         // Tarefa 5 do sub-projeto 3d: o TETO UNICO de maestrias
+         // (sheetMaestrias.tetoMaestrias / classesComMaestria) e o gate do
+         // Descanso Longo que o consome (sheetHpDescanso.setupEventosDescanso).
+         sheetMaestrias, sheetHpDescanso] = await Promise.all([
     importar('site/js/regras-cobertura.js'),
     importar('site/js/talentos-effects.js'),
     importar('site/js/store.js'),
@@ -156,6 +160,8 @@ export async function modulosApp() {
     importar('site/js/sheet/classes/monge.js'),
     importar('site/js/sheet/classes/paladino.js'),
     importar('site/js/sheet/habilidades.js'),
+    importar('site/js/sheet/maestrias.js'),
+    importar('site/js/sheet/hp-descanso.js'),
   ]);
   // Um modulo de classe por nome de ARQUIVO (minusculo, sem acento -- ex.:
   // sheetClasses.clerigo, sheetClasses.paladino), e nao pelo nome que o app
@@ -173,7 +179,7 @@ export async function modulosApp() {
              regrasOrigensMagia, regrasConjuracaoSubclasse, regrasSalvaguardas,
              fichaEdicoes, fichaEdicaoValidacoes, multiclasse, home, multiclasseConjuracao,
              multiclasseProgressao, contextoClasse, sheetCaracteristicas, sheetFicha,
-             sheetClasses, sheetHabilidades };
+             sheetClasses, sheetHabilidades, sheetMaestrias, sheetHpDescanso };
   return _cache;
 }
 

@@ -14,6 +14,10 @@
 // subirDeNivel jamais alcançaria essas fichas (issue #21).
 // ============================================================
 
+// nivelNa: o nível do personagem NAQUELA classe. Este módulo não importava
+// nada até o sub-projeto 3d -- era o único do app totalmente isolado.
+import { nivelNa } from './regras-multiclasse.js';
+
 /** Os seis atributos, no formato usado por char.salvaguardas_proficientes */
 export const TODAS_AS_SALVAGUARDAS = ['Força', 'Destreza', 'Constituição',
                                       'Inteligência', 'Sabedoria', 'Carisma'];
@@ -29,9 +33,31 @@ export const TODAS_AS_SALVAGUARDAS = ['Força', 'Destreza', 'Constituição',
  * `if` novo dentro de cada render.
  */
 function salvaguardasConcedidasPorClasse(personagem) {
-  if (personagem?.classe === 'Monge' && (personagem?.nivel || 0) >= 14) {
+  // Sobrevivente Disciplinado é característica de MONGE 14 (Classes.md:5266),
+  // e o nível que manda é o de Monge -- não o total do personagem.
+  // Os espelhos `personagem.classe` (a classe INICIAL) cruzados com
+  // `personagem.nivel` (o TOTAL) erravam nos DOIS sentidos: um
+  // Monge 10/Ladino 4 (total 14) ganhava as seis quatro níveis de Monge
+  // antes da hora, e um Ladino 1/Monge 14 (total 15) perdia as seis que
+  // conquistou, porque a classe inicial dele é Ladino.
+  // nivelNa devolve 0 para classe ausente, e 0 >= 14 é falso -- não há
+  // guarda de `temClasse` a acrescentar aqui.
+  if (nivelNa(personagem, 'Monge') >= 14) {
     return TODAS_AS_SALVAGUARDAS;
   }
+
+  // Mente Escorregadia e caracteristica de LADINO 15 (Classes.md:4284):
+  // "Voce adquire proficiencia em salvaguardas de Sabedoria e Carisma".
+  //
+  // NAO e defeito de multiclasse -- atingia todo Ladino 15 de classe unica.
+  // O app ja mostrava o TEXTO da caracteristica na ficha (via ladino.js), e a
+  // grade de salvaguardas nunca marcava nada: o app se contradizia na mesma
+  // tela. Achado ao converter Sobrevivente Disciplinado, que e da mesma
+  // familia (concessao automatica, sem escolha do jogador).
+  if (nivelNa(personagem, 'Ladino') >= 15) {
+    return ['Sabedoria', 'Carisma'];
+  }
+
   return [];
 }
 

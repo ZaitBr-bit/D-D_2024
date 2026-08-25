@@ -4,6 +4,9 @@
 import { ATRIBUTOS_KEYS, ATRIBUTO_NOME_PARA_KEY, PERICIAS, CLASSES_INFO } from './dados-classes.js';
 import { magiaContaNoLimite } from './regras-origens-magia.js';
 import { getAtributoConjuracaoSubclasse, getConjuracaoSubclasse } from './regras-conjuracao-subclasse.js';
+// Acessores de multiclasse. Não há ciclo: regras-multiclasse.js importa
+// apenas dados-classes.js, que utils.js já importa acima.
+import { classesDe, temClasse } from './regras-multiclasse.js';
 
 // --- Cálculos D&D ---
 
@@ -141,47 +144,188 @@ export function normalizarGrimorioMago(personagem, limitePreparadas) {
   return { alterado, pendentes };
 }
 
+// ============================================================
+// CA alternativa ("Defesa sem Armadura" e parentes)
+// ============================================================
+//
+// As QUATRO fontes de CA base alternativa do livro, numa TABELA -- e não
+// em quatro `if` sequenciais sobre `personagem.classe`, que era a forma
+// anterior. `personagem.classe` é o ESPELHO da classe INICIAL: num
+// personagem multiclasse no máximo um `if` casava, e a fórmula da outra
+// classe simplesmente não existia para o app. O vencedor era a ORDEM DE
+// CRIAÇÃO do personagem -- com Des+3/Con+4/Sab+1/Car+5, um
+// Bárbaro 5/Monge 5 dava 17 (certo, por acaso) e o MESMO personagem
+// criado como Monge 5/Bárbaro 5 dava 14.
+//
+// O ESCUDO NÃO É UNIFORME, e a diferença é do livro, de propósito:
+//   Bárbaro, Defesa sem Armadura (Classes.md:91-93): "Você pode usar um
+//     Escudo e ainda receber este benefício."            -> permite
+//   Monge, Defesa sem Armadura (Classes.md:5174-5176): "Enquanto você não
+//     estiver vestindo armadura OU EMPUNHANDO UM ESCUDO" -> NÃO permite
+//   Bardo/Colégio da Dança, Ginga Fascinante (Classes.md:724-732):
+//     "não estiver vestindo armadura ou empunhando um Escudo" -> NÃO permite
+//   Feiticeiro/Feitiçaria Dracônica, Resiliência Dracônica
+//     (Classes.md:3072-3076): "Enquanto não estiver vestindo armadura" --
+//     o livro NÃO cita Escudo aqui                       -> permite
+// Essa assimetria já custou um bug: o `!escudo` do Monge faltava e foi
+// corrigido no commit 12a541b, com três oráculos em
+// classes-passivas.test.mjs que continuam sendo o canário desta tabela.
+//
+// `nivelMinimo` é o nível NAQUELA CLASSE, nunca o total: um Monge 5/Bardo 2
+// não ganha a CA do Colégio da Dança, que exige 3 níveis DE BARDO.
+const FONTES_CA_ALTERNATIVA = [
+  { classe: 'Bárbaro', subclasse: null, nivelMinimo: 1,
+    atributo: 'constituicao', permiteEscudo: true, livro: 'Classes.md:91-93' },
+  { classe: 'Monge', subclasse: null, nivelMinimo: 1,
+    atributo: 'sabedoria', permiteEscudo: false, livro: 'Classes.md:5174-5176' },
+  { classe: 'Bardo', subclasse: 'Colégio da Dança', nivelMinimo: 3,
+    atributo: 'carisma', permiteEscudo: false, livro: 'Classes.md:724-732' },
+  { classe: 'Feiticeiro', subclasse: 'Feitiçaria Dracônica', nivelMinimo: 3,
+    atributo: 'carisma', permiteEscudo: true, livro: 'Classes.md:3072-3076' },
+];
+
+/**
+ * O COLETOR: devolve TODAS as CAs alternativas aplicáveis ao personagem
+ * no estado de equipamento informado, na ordem de FONTES_CA_ALTERNATIVA.
+ *
+ * Função PURA -- não lê estado de módulo, não toca no DOM, não muta o
+ * personagem. É ela que torna o seletor da ficha testável SEM TELA: o
+ * oráculo mede a LISTA, não o HTML. A ficha usa o tamanho da lista para
+ * decidir se mostra o seletor (duas ou mais candidatas) ou nada (uma só,
+ * que é o caso de todo personagem de classe única).
+ *
+ * @param {object} personagem Personagem (ficha nova ou legada -- classesDe
+ *   normaliza as duas).
+ * @param {{temArmadura?: boolean, temEscudo?: boolean}} [contexto] Estado de
+ *   equipamento. Ausente = sem armadura e sem escudo.
+ * @returns {Array<{classe: string, subclasse: string|null, valor: number,
+ *   permiteEscudo: boolean, livro: string}>} Candidatas aplicáveis.
+ */
+export function coletarCAsAlternativas(personagem, contexto = {}) {
+  if (!personagem || typeof personagem !== 'object') return [];
+  const { temArmadura = false, temEscudo = false } = contexto;
+  // As QUATRO fontes exigem "não estar vestindo armadura". Com armadura
+  // equipada nenhuma é candidata -- quem manda é o bloco de armadura de
+  // calcCA.
+  if (temArmadura) return [];
+
+  const atributos = personagem.atributos || {};
+  const modDes = calcMod(atributos.destreza);
+  const lista = classesDe(personagem);
+  const candidatas = [];
+
+  for (const fonte of FONTES_CA_ALTERNATIVA) {
+    if (temEscudo && !fonte.permiteEscudo) continue;
+    const entrada = lista.find(c => c.classe === fonte.classe);
+    if (!entrada) continue;
+    // Nível 0 não existe em D&D: uma ficha que traz a classe sem nível é
+    // lida como nível 1 -- a mesma convenção `personagem.nivel || 1` que
+    // os gates antigos usavam, preservada para não mudar o número de
+    // nenhuma ficha existente.
+    const nivelClasse = entrada.nivel || 1;
+    if (nivelClasse < fonte.nivelMinimo) continue;
+    if (fonte.subclasse && entrada.subclasse !== fonte.subclasse) continue;
+    candidatas.push({
+      classe: fonte.classe,
+      subclasse: fonte.subclasse,
+      valor: 10 + modDes + calcMod(atributos[fonte.atributo]),
+      permiteEscudo: fonte.permiteEscudo,
+      livro: fonte.livro,
+    });
+  }
+  return candidatas;
+}
+
+/**
+ * O ESCOLHEDOR: decide QUAL das candidatas do coletor vale.
+ *
+ * Regra decidida em 2026-08-22 (docs/PERGUNTAS-PENDENTES.txt:246-257,
+ * a partir de livro:2067 -- "pode se beneficiar apenas de uma de cada
+ * vez", e a escolha é do jogador): o MAIOR valor por padrão, e a escolha
+ * manual (`personagem.ca_alternativa_escolhida`, que guarda a CLASSE DE
+ * ORIGEM) vence quando aponta para uma candidata PRESENTE na lista.
+ * Empate resolve pela ordem da tabela -- determinístico, e sem efeito no
+ * número, já que o valor empatado é o mesmo.
+ *
+ * GUARDA DE COERÊNCIA: se a escolha apontar para uma classe que o
+ * personagem NÃO TEM (perdeu níveis, importou ficha editada à mão), cai
+ * no maior valor e AVISA. Nunca zera a CA alternativa em silêncio --
+ * cálculo silencioso com dado ausente é o modo de falha que este projeto
+ * mais paga para evitar. Se a classe EXISTE mas a candidata não está na
+ * lista AGORA (o Monge que equipou um escudo), o silêncio é correto: é
+ * estado normal de equipamento, não dado perdido.
+ *
+ * @param {object} personagem
+ * @param {Array<object>} candidatas Saída de coletarCAsAlternativas().
+ * @returns {object|null} A candidata vencedora, ou null se não houver nenhuma.
+ */
+export function escolherCAAlternativa(personagem, candidatas) {
+  if (!Array.isArray(candidatas) || !candidatas.length) return null;
+  const escolhida = personagem?.ca_alternativa_escolhida;
+  if (escolhida) {
+    const manual = candidatas.find(c => c.classe === escolhida);
+    if (manual) return manual;
+    if (!temClasse(personagem, escolhida)) {
+      console.warn(
+        `escolherCAAlternativa: personagem "${personagem?.nome || '(sem nome)'}" ` +
+        `tem ca_alternativa_escolhida = "${escolhida}", mas não possui essa classe. ` +
+        'Usando o maior valor entre ' +
+        `[${candidatas.map(c => `${c.classe} ${c.valor}`).join(', ')}].`);
+    }
+  }
+  return candidatas.reduce((maior, c) => (c.valor > maior.valor ? c : maior));
+}
+
+/**
+ * A ARMADURA e o ESCUDO equipados, do jeito que calcCA os enxerga.
+ *
+ * Extraído de dentro de calcCA -- sem mudar predicado nenhum -- porque a
+ * ficha PRECISA montar o mesmo `{ temArmadura, temEscudo }` para chamar
+ * `coletarCAsAlternativas()` e decidir se mostra o seletor de CA. Uma
+ * segunda cópia dos dois `find` na tela seria a receita exata do bug do
+ * commit 12a541b: um coletor chamado SEM contexto oferece a Defesa sem
+ * Armadura do Monge a um Monge de escudo, que o livro exclui
+ * (Classes.md:5174-5176). Com uma leitura só, tela e cálculo não têm como
+ * divergir.
+ *
+ * @param {object} personagem
+ * @returns {{armadura: object|undefined, escudo: object|undefined}}
+ */
+export function equipamentoDeCA(personagem) {
+  const inv = personagem?.inventario || [];
+  return {
+    armadura: inv.find(i => i.equipado && i.tipo === 'armadura' && i.nome !== 'Escudo'),
+    escudo: inv.find(i => i.equipado && (i.nome === 'Escudo' || i.tipo === 'escudo')),
+  };
+}
+
 /** Calcula CA baseado na armadura equipada */
 export function calcCA(personagem, passivos = null) {
+  // Constituição, Sabedoria e Carisma NÃO aparecem mais aqui: os três
+  // modificadores que entravam nas Defesas sem Armadura agora são lidos
+  // dentro de coletarCAsAlternativas(), a partir de FONTES_CA_ALTERNATIVA.
   const modDes = calcMod(personagem.atributos.destreza);
-  const modCon = calcMod(personagem.atributos.constituicao);
-  const modSab = calcMod(personagem.atributos.sabedoria);
-  const modCar = calcMod(personagem.atributos.carisma);
   const inv = personagem.inventario || [];
 
-  // Verificar armadura equipada
-  const armadura = inv.find(i => i.equipado && i.tipo === 'armadura' && i.nome !== 'Escudo');
-  const escudo = inv.find(i => i.equipado && (i.nome === 'Escudo' || i.tipo === 'escudo'));
+  // Verificar armadura equipada (mesma leitura que a ficha usa para o
+  // seletor de CA alternativa -- ver equipamentoDeCA, logo acima).
+  const { armadura, escudo } = equipamentoDeCA(personagem);
 
   let ca = 10 + modDes; // Sem armadura
 
-  // Bárbaro: Defesa sem Armadura = 10 + Des + Con
-  if (personagem.classe === 'Bárbaro' && !armadura) {
-    ca = 10 + modDes + modCon;
-  }
-  // Monge: Defesa sem Armadura = 10 + Des + Sab
+  // CA alternativa (Defesa sem Armadura e parentes): coletor + escolhedor.
+  // As quatro fontes, as citações do livro e a assimetria do escudo estão
+  // em FONTES_CA_ALTERNATIVA, logo acima desta função.
   //
-  // O `!escudo` NAO e simetrico ao do Barbaro logo acima, e a diferenca e do
-  // livro: o Barbaro diz "Voce pode usar um Escudo e ainda receber este
-  // beneficio" (Classes.md:93); o Monge diz "Enquanto voce nao estiver
-  // vestindo armadura OU EMPUNHANDO UM ESCUDO" (Classes.md:5176). Sem este
-  // teste, todo Monge com escudo somava o bonus do escudo por cima da
-  // Defesa sem Armadura.
-  if (personagem.classe === 'Monge' && !armadura && !escudo) {
-    ca = 10 + modDes + modSab;
-  }
-  // Bardo (Colégio da Dança): Defesa sem Armadura = 10 + Des + Car
-  if (personagem.classe === 'Bardo' && personagem.subclasse === 'Colégio da Dança' && (personagem.nivel || 1) >= 3 && !armadura && !escudo) {
-    ca = 10 + modDes + modCar;
-  }
-  // Feiticeiro (Feitiçaria Dracônica): Resiliência Dracônica = 10 + Des + Car (sem armadura)
-  if (
-    personagem.classe === 'Feiticeiro' &&
-    personagem.subclasse === 'Feitiçaria Dracônica' &&
-    (personagem.nivel || 1) >= 3 &&
-    !armadura
-  ) {
-    ca = 10 + modDes + modCar;
+  // Substituiu quatro `if` sequenciais que sobrescreviam esta mesma `ca` e
+  // liam `personagem.classe` -- o espelho da classe INICIAL. Num
+  // multiclasse no máximo um deles casava, e a fórmula da outra classe não
+  // existia para o app.
+  const caAlternativa = escolherCAAlternativa(
+    personagem,
+    coletarCAsAlternativas(personagem, { temArmadura: !!armadura, temEscudo: !!escudo }));
+  if (caAlternativa) {
+    ca = caAlternativa.valor;
   }
 
   if (armadura) {

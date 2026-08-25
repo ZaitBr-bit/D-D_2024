@@ -12,7 +12,7 @@ import { nivelNa } from '../regras-multiclasse.js';
 import { possuiAlgumaMagia } from '../regras-origens-magia.js';
 import { ehProficienteEmSalvaguarda } from '../regras-salvaguardas.js';
 import { resolverPassivosTalentos } from '../talentos-effects.js';
-import { bonusProficiencia, calcAtaqueMagia, calcBonusPericia, calcCA, calcCDMagia, calcMod, calcPVTotal, escHtml, fmtMod, getDeslocamento, getTamanho, semAcento } from '../utils.js';
+import { bonusProficiencia, calcAtaqueMagia, calcBonusPericia, calcCA, calcCDMagia, calcMod, calcPVTotal, coletarCAsAlternativas, equipamentoDeCA, escHtml, escolherCAAlternativa, fmtMod, getDeslocamento, getTamanho, semAcento } from '../utils.js';
 import { renderSecaoCaracteristicas, renderSecaoSubclasse, renderSecaoTracosEspecie } from './caracteristicas.js';
 import { getEstadoFuria, setupEventosSubclasseBarbaro } from './classes/barbaro.js';
 import { getEstadoInspiracaoBardo } from './classes/bardo.js';
@@ -176,6 +176,23 @@ export function renderFichaCompleta() {
   const info = CLASSES_INFO[char.classe] || {};
   const prof = bonusProficiencia(char.nivel);
   const ca = calcCA(char, passivosTalentosCache);
+  // CA alternativa: as candidatas e a ativa, para o seletor da caixa de CA.
+  //
+  // O contexto de equipamento e OBRIGATORIO e sai de equipamentoDeCA(), a
+  // MESMA leitura de inventario que calcCA faz. Sem ele, o coletor
+  // ofereceria a Defesa sem Armadura do Monge a um Monge de escudo -- que o
+  // livro exclui (Classes.md:5174-5176) e que calcCA ja nao conta. Tela e
+  // numero divergiriam, e o seletor mostraria uma fonte inativa.
+  const _caEquip = equipamentoDeCA(char);
+  const caCandidatas = coletarCAsAlternativas(char, {
+    temArmadura: !!_caEquip.armadura, temEscudo: !!_caEquip.escudo,
+  });
+  const caAtiva = escolherCAAlternativa(char, caCandidatas);
+  // Empate em VALOR nao e empate em EFEITO: o Barbaro permite Escudo e o
+  // Monge nao. Quando as candidatas empatam, o seletor avisa que o numero
+  // nao muda agora -- o que muda e o que acontece ao equipar um Escudo.
+  const caEmpatadas = caCandidatas.length >= 2
+    && caCandidatas.every(c => c.valor === caCandidatas[0].valor);
   const modCon = calcMod(char.atributos.constituicao);
   const iniciativa = getModIniciativa();
   const ataquesPorAcao = getAtaquesPorAcao();
@@ -560,6 +577,7 @@ export function renderFichaCompleta() {
         <div class="stat-box">
           <div class="stat-label">CA</div>
           <div class="stat-value">${ca}</div>
+          ${caCandidatas.length >= 2 && caAtiva ? `<div class="no-print" style="font-size:0.62rem;margin-top:2px"><span data-ca-acao="escolher-alternativa" style="display:inline-flex;align-items:center;gap:3px;background:var(--bg-hover, transparent);border:1px solid var(--border-light);border-radius:8px;padding:1px 6px;cursor:pointer;color:var(--text-muted)" title="${escHtml(`CA sem armadura: ${caAtiva.classe}${caEmpatadas ? '. As fontes empatam em valor -- a escolha nao muda o numero agora, mas decide o que acontece ao equipar um Escudo' : ''}. Clique para trocar a fonte.`)}">${escHtml(caAtiva.classe)} &#9662;</span></div>` : ''}
           ${(() => {
             const efs = char.efeitos_magicos || [];
             // Deduplicar por nome base (compostos geram filhos com " (Reativo)" etc.)
@@ -789,7 +807,11 @@ export function renderFichaCompleta() {
           // Fontes de vantagem em salvaguardas
           const fontsVant = [];
           if (nome === 'Força' && !!getEstadoFuria()?.ativa) fontsVant.push('Furia');
-          if (nome === 'Destreza' && char.classe === 'Bárbaro' && char.nivel >= 2 && !incapacitado) fontsVant.push('Sentido de Perigo');
+          // nivelNa: Sentido de Perigo é característica de BÁRBARO 2
+          // (Classes.md:105-107). Lia-se `char.classe` (a classe INICIAL)
+          // cruzado com `char.nivel` (o TOTAL), e por isso um Ladino 1/Bárbaro 5
+          // não via a vantagem, enquanto um Bárbaro 1/Ladino 5 (total 6) via.
+          if (nome === 'Destreza' && nivelNa(char, 'Bárbaro') >= 2 && !incapacitado) fontsVant.push('Sentido de Perigo');
           // Gnomo: Astucia de Gnomo - Vantagem em salv. INT, SAB, CAR
           if (char.especie === 'Gnomo' && ['Inteligência', 'Sabedoria', 'Carisma'].includes(nome)) fontsVant.push('Astucia de Gnomo');
           // Elfo: Ancestralidade Feerica - Vantagem em salv. contra Enfeiticado

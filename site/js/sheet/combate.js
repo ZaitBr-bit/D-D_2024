@@ -8,13 +8,16 @@
 // ============================================================
 import { PERICIAS } from '../dados-classes.js';
 import { abrirModal, calcMod, escHtml, fmtPeso, getMultiplicadorCarga, toast } from '../utils.js';
+import { nivelNa, subclasseDe } from '../regras-multiclasse.js';
 import { getEstadoFuria } from './classes/barbaro.js';
 import { getProgressaoMonge } from './classes/monge.js';
 import { char, passivosTalentosCache } from './estado.js';
 import { getEstadoCarga } from './inventario.js';
 
 export function ehBardoComSegredosMagicos() {
-  return char?.classe === 'Bardo' && (char?.nivel || 1) >= 10;
+  // Segredos Magicos e caracteristica de BARDO 10 (Classes.md:472): o
+  // nivel que manda e o de Bardo, nao o total do personagem.
+  return nivelNa(char, 'Bardo') >= 10;
 }
 
 export function temArmaduraPesadaEquipada() {
@@ -54,11 +57,22 @@ export function calcVantagemDesvantagemPericia(nomePericia) {
   }
 
   // --- Guerreiro/Campeao nivel 3+: Vantagem em Atletismo ---
-  if (nomePericia === 'Atletismo' && char.classe === 'Guerreiro' && char.subclasse === 'Campeão' && (char.nivel || 1) >= 3) {
+  // Atleta Extraordinario e caracteristica de GUERREIRO/CAMPEAO 3
+  // (Classes.md:3892): vale o nivel DE GUERREIRO e a subclasse DO
+  // GUERREIRO -- `char.subclasse` e o espelho da classe INICIAL, entao
+  // um Ladino/Guerreiro-Campeao lia a subclasse errada.
+  if (nomePericia === 'Atletismo' && subclasseDe(char, 'Guerreiro') === 'Campeão'
+      && nivelNa(char, 'Guerreiro') >= 3) {
     vantagens.push('Atleta Extraordinario');
   }
 
   // --- Golias - Forma Grande (nivel 5+, quando ativa): Vantagem em testes de Forca ---
+  // NAO CONVERTER para nivelNa(): Forma Grande e traco de ESPECIE, nao
+  // de classe, e o livro diz "a partir do nivel 5 DE PERSONAGEM"
+  // (Especies.md:212). Especie nao tem "nivel na classe": o numero que
+  // manda e o nivel TOTAL (livro:2037), e por isso `char.nivel` esta
+  // CERTO aqui. Mesma familia do `pb` de Maos Curativas do Aasimar, que
+  // o sub-projeto 3c preservou pelo mesmo motivo.
   if (pericia?.atributo === 'Força' && char.especie === 'Golias' && (char.nivel || 1) >= 5) {
     const usosFormaGrande = char.usos_habilidades?.['Forma Grande'];
     if (usosFormaGrande?.ativa) {
@@ -136,13 +150,20 @@ export function getDeslocamentoFinal(baseDeslocamento) {
     final = Math.max(final, 10.5);
   }
 
-  if (char?.classe === 'Bárbaro' && (char?.nivel || 1) >= 5 && !temArmaduraPesadaEquipada()) {
+  // Movimento Rapido e caracteristica de BARBARO 5 (Classes.md:127): o
+  // nivel que manda e o de Barbaro, nao o total do personagem.
+  if (nivelNa(char, 'Bárbaro') >= 5 && !temArmaduraPesadaEquipada()) {
     final += 3;
   }
-  if (char?.classe === 'Guardião' && (char?.nivel || 1) >= 6 && !temArmaduraPesadaEquipada()) {
+  // Errante e caracteristica de GUARDIAO 6 (Classes.md:3334): o nivel
+  // que manda e o de Guardiao, nao o total do personagem.
+  if (nivelNa(char, 'Guardião') >= 6 && !temArmaduraPesadaEquipada()) {
     final += 3;
   }
-  if (char?.classe === 'Monge' && (char?.nivel || 1) >= 2) {
+  // Movimento sem Armadura e caracteristica de MONGE 2
+  // (Classes.md:5200): o nivel que manda e o de Monge, nao o total --
+  // getProgressaoMonge() ja le a tabela por nivelNa(char, 'Monge').
+  if (nivelNa(char, 'Monge') >= 2) {
     const inv = char?.inventario || [];
     const temArmadura = inv.some(i => i.equipado && i.tipo === 'armadura' && i.nome !== 'Escudo');
     const temEscudo = inv.some(i => i.equipado && (i.nome === 'Escudo' || i.tipo === 'escudo'));
@@ -153,7 +174,11 @@ export function getDeslocamentoFinal(baseDeslocamento) {
   }
 
   // Paladino Juramento da Glória nível 7: Aura de Vivacidade (+3m para si)
-  if (char?.classe === 'Paladino' && char?.subclasse === 'Juramento da Glória' && (char?.nivel || 1) >= 7) {
+  // Aura de Vivacidade e caracteristica de PALADINO/JURAMENTO DA GLORIA 7
+  // (Classes.md:5783): valem o nivel DE PALADINO e a subclasse DO
+  // PALADINO, nao o total nem o espelho da classe inicial.
+  if (subclasseDe(char, 'Paladino') === 'Juramento da Glória'
+      && nivelNa(char, 'Paladino') >= 7) {
     final += 3;
   }
 
@@ -185,14 +210,20 @@ export function getDeslocamentoFinal(baseDeslocamento) {
   // ── Fase 2: velocidades derivadas (dependem de final) ──────────────
   const extras = new Set();
 
-  if (char?.classe === 'Guardião' && (char?.nivel || 1) >= 6 && !temArmaduraPesadaEquipada()) {
+  // Errante tambem concede Escalada e Natacao iguais ao Deslocamento --
+  // GUARDIAO 6 (Classes.md:3334), pelo nivel DE GUARDIAO.
+  if (nivelNa(char, 'Guardião') >= 6 && !temArmaduraPesadaEquipada()) {
     addExtraVelocidade(extras, 'Escalada', final);
     addExtraVelocidade(extras, 'Natação', final);
   }
 
   // Bárbaro Trilha do Coração Selvagem nível 6: Aspecto dos Selvagens
   const aspectoSelvagem = char?.recursos?.aspecto_selvagem;
-  if (char?.classe === 'Bárbaro' && char?.subclasse === 'Trilha do Coração Selvagem' && (char?.nivel || 1) >= 6) {
+  // Aspecto dos Selvagens e caracteristica de BARBARO/TRILHA DO CORACAO
+  // SELVAGEM 6 (Classes.md:265): valem o nivel DE BARBARO e a subclasse
+  // DO BARBARO, nao o total nem o espelho da classe inicial.
+  if (subclasseDe(char, 'Bárbaro') === 'Trilha do Coração Selvagem'
+      && nivelNa(char, 'Bárbaro') >= 6) {
     if (aspectoSelvagem === 'Pantera') addExtraVelocidade(extras, 'Escalada', final);
     if (aspectoSelvagem === 'Salmão') addExtraVelocidade(extras, 'Natação', final);
   }
@@ -201,20 +232,31 @@ export function getDeslocamentoFinal(baseDeslocamento) {
   const emFuria = !!char?.recursos?.furia_ativa;
   const animalFuria = char?.recursos?.furia_animal;
   const temQualquerArmaduraEquipada = (char?.inventario || []).some(i => i.equipado && i.tipo === 'armadura' && i.nome !== 'Escudo');
-  if (char?.classe === 'Bárbaro' && char?.subclasse === 'Trilha do Coração Selvagem' && (char?.nivel || 1) >= 14
+  // Poder dos Selvagens e caracteristica de BARBARO/TRILHA DO CORACAO
+  // SELVAGEM 14 (Classes.md:279): a opcao Falcao da Voo igual ao
+  // Deslocamento sem armadura. Conta pelo nivel DE BARBARO.
+  if (subclasseDe(char, 'Bárbaro') === 'Trilha do Coração Selvagem'
+      && nivelNa(char, 'Bárbaro') >= 14
       && emFuria && animalFuria === 'Falcão' && !temQualquerArmaduraEquipada) {
     addExtraVelocidade(extras, 'Voo', final);
   }
 
   // Bárbaro Trilha do Fanático nível 14: Voo (pairar) durante Fúria dos Deuses
   const furiaDeusesAtiva = !!char?.recursos?.furia_deuses_ativa;
-  if (char?.classe === 'Bárbaro' && char?.subclasse === 'Trilha do Fanático' && (char?.nivel || 1) >= 14
+  // Furia dos Deuses e caracteristica de BARBARO/TRILHA DO FANATICO 14
+  // (Classes.md:319): concede Voo com pairar. Conta pelo nivel DE
+  // BARBARO e pela subclasse DO BARBARO.
+  if (subclasseDe(char, 'Bárbaro') === 'Trilha do Fanático'
+      && nivelNa(char, 'Bárbaro') >= 14
       && emFuria && furiaDeusesAtiva) {
     addExtraVelocidade(extras, 'Voo', final, '(pairar)');
   }
 
   // Ladino Ladrão nível 3: Andarilho de Telhados (Escalada = deslocamento)
-  if (char?.classe === 'Ladino' && char?.subclasse === 'Ladrão' && (char?.nivel || 1) >= 3) {
+  // Andarilho de Telhados e caracteristica de LADINO/LADRAO 3
+  // (Classes.md:4413): valem o nivel DE LADINO e a subclasse DO LADINO,
+  // nao o total nem o espelho da classe inicial.
+  if (subclasseDe(char, 'Ladino') === 'Ladrão' && nivelNa(char, 'Ladino') >= 3) {
     addExtraVelocidade(extras, 'Escalada', final);
   }
 
@@ -235,32 +277,59 @@ export function getDeslocamentoFinal(baseDeslocamento) {
   return resultado;
 }
 
+/**
+ * Numero de ataques que o personagem faz com a acao Ataque.
+ *
+ * livro:2059-2063 -- as caracteristicas de Ataque Extra NAO se acumulam:
+ * vale a MAIOR entre as classes, e cada classe conta pelo nivel NAQUELA
+ * classe. O codigo antigo lia os ESPELHOS da classe inicial
+ * (`char.classe`, `char.subclasse`) cruzados com o nivel TOTAL
+ * (`char.nivel`), e errava nos dois sentidos: inflava (Guerreiro
+ * 4/Barbaro 1, total 5, ganhava 2 ataques sem nenhuma classe no 5) e
+ * apagava (Ladino 1/Guerreiro 11 recebia 1 em vez de 3, porque a inicial
+ * nao era Guerreiro).
+ * @returns {number} 1 a 4.
+ */
 export function getAtaquesPorAcao() {
-  const nivel = char?.nivel || 1;
-  if (char?.classe === 'Guerreiro') {
-    if (nivel >= 20) return 4;
-    if (nivel >= 11) return 3;
-    if (nivel >= 5) return 2;
+  // O Guerreiro e a unica classe com mais de um patamar: Ataque Extra no
+  // 5, Dois Ataques Extras no 11 e Tres Ataques Extras no 20.
+  const nGuerreiro = nivelNa(char, 'Guerreiro');
+  let ataques = 1;
+  if (nGuerreiro >= 20) ataques = 4;
+  else if (nGuerreiro >= 11) ataques = 3;
+  else if (nGuerreiro >= 5) ataques = 2;
+
+  // As demais fontes valem 2 e nunca somam -- por isso Math.max, nunca +=.
+  for (const classe of ['Bárbaro', 'Guardião', 'Paladino', 'Monge']) {
+    if (nivelNa(char, classe) >= 5) ataques = Math.max(ataques, 2);
   }
-  if (char?.classe === 'Bárbaro' && nivel >= 5) return 2;
-  if (char?.classe === 'Guardião' && nivel >= 5) return 2;
-  if (char?.classe === 'Paladino' && nivel >= 5) return 2;
-  if (char?.classe === 'Monge' && nivel >= 5) return 2;
-  if (char?.classe === 'Bardo' && char?.subclasse === 'Colégio da Bravura' && nivel >= 6) return 2;
-  return 1;
+  // Bardo: so o Colegio da Bravura, e a subclasse tem de ser a DO BARDO,
+  // nao o espelho `char.subclasse` (que e o da classe inicial).
+  if (subclasseDe(char, 'Bardo') === 'Colégio da Bravura'
+      && nivelNa(char, 'Bardo') >= 6) ataques = Math.max(ataques, 2);
+
+  return ataques;
 }
 
 export function getModIniciativa() {
   const base = calcMod(char.atributos.destreza);
   const passivos = passivosTalentosCache || {};
-  // Bárbaro nível 7+ (Instinto Selvagem) ou Guerreiro/Campeão nível 3+ (Atleta Extraordinário)
-  const vantagem = (char?.classe === 'Bárbaro' && (char?.nivel || 1) >= 7)
-    || (char?.classe === 'Guerreiro' && char?.subclasse === 'Campeão' && (char?.nivel || 1) >= 3);
+  // Duas fontes de Vantagem em Iniciativa, cada uma pelo nivel NA SUA
+  // classe: Instintos Primitivos, de BARBARO 7 (Classes.md:135 -- o
+  // comentario antigo o chamava de "Instinto Selvagem", nome que o livro
+  // 2024 nao usa), e Atleta Extraordinario, de GUERREIRO/CAMPEAO 3
+  // (Classes.md:3892). A subclasse tem de ser a DO GUERREIRO, nao o
+  // espelho da classe inicial.
+  const vantagem = nivelNa(char, 'Bárbaro') >= 7
+    || (subclasseDe(char, 'Guerreiro') === 'Campeão' && nivelNa(char, 'Guerreiro') >= 3);
   return { valor: base + (passivos.bonusIniciativa || 0), vantagem };
 }
 
 export function forcaPrimordialAtiva() {
-  return char?.classe === 'Bárbaro' && (char?.nivel || 1) >= 3;
+  // Conhecimento Primordial e caracteristica de BARBARO 3
+  // (Classes.md:109): durante a Furia, pericias escolhidas podem ser
+  // testadas como Forca. O nivel que manda e o de Barbaro.
+  return nivelNa(char, 'Bárbaro') >= 3;
 }
 
 export function ataqueImprudenteAtivo() {

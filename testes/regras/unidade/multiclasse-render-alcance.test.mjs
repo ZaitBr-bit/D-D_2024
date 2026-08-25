@@ -270,6 +270,39 @@ function numerosDeCd(html) {
   return [...html.matchAll(/CD:? (\d+)/g)].map((m) => Number(m[1]));
 }
 
+// As cinco classes que concedem Maestria em Arma (espelha CLASSES_MAESTRIA de
+// site/js/sheet/maestrias.js). Escrita a mao aqui de proposito: um oraculo que
+// importasse a lista do app nao notaria uma classe entrando ou saindo dela.
+const CLASSES_QUE_DAO_MAESTRIA = ['Bárbaro', 'Guerreiro', 'Guardião', 'Paladino', 'Ladino'];
+
+// O contador de Maestria em Arma no HTML: `...margin-left:auto">N/M</span>`
+// seguido, SEM outro contador no meio, do botao `data-config-maestrias`. A
+// guarda `(?!margin-left:auto)` e o que impede o casamento de atravessar a
+// caracteristica anterior e mascarar o contador errado.
+const CONTADOR_MAESTRIA = /(margin-left:auto">\d+\/)(\d+)(<\/span>(?:(?!margin-left:auto)[\s\S])*?data-config-maestrias)/;
+
+/**
+ * O teto que o card de Maestria em Arma exibe, ou null se o bloco nao tem
+ * esse card.
+ * @param {string} html
+ * @returns {number|null}
+ */
+function tetoDeMaestria(html) {
+  const m = html.match(CONTADOR_MAESTRIA);
+  return m ? Number(m[2]) : null;
+}
+
+/**
+ * Troca o TETO do contador de Maestria em Arma por um marcador, para separar
+ * "o HTML mudou" de "so o teto de maestria mudou" -- o mesmo tratamento que
+ * `semNumerosDeCd` da as CDs de nivel total.
+ * @param {string} html
+ * @returns {string}
+ */
+function semTetoDeMaestria(html) {
+  return html.replace(new RegExp(CONTADOR_MAESTRIA.source, 'g'), '$1#$3');
+}
+
 /**
  * A excecao de CD por nivel total que se aplica a (classe, subclasse,
  * nivel), ou null. `subclasse: null` na tabela vale para qualquer subclasse.
@@ -361,10 +394,52 @@ for (const classe of CLASSES) {
         const a = ligarRecursos(await personagemMulticlasse([proprio]), classe);
         const b = ligarRecursos(await personagemMulticlasse([
           proprio, { classe: par, nivel: nivelPar, subclasse: subPar }]), classe);
-        const htmlA = await blocoDaClasse(a, classe);
-        const htmlB = await blocoDaClasse(b, classe);
+        const brutoA = await blocoDaClasse(a, classe);
+        const brutoB = await blocoDaClasse(b, classe);
         const rotulo = `${classe} ${nivel} (${subclasse}) sozinho contra ` +
           `${classe} ${nivel} + ${par} ${nivelPar}`;
+
+        // A EXCECAO QUE NAO E UMA CD: o teto de Maestria em Arma.
+        //
+        // Desde a Tarefa 5 do sub-projeto 3d ele e do PERSONAGEM -- o MAIOR
+        // limite entre as classes que concedem (docs/PERGUNTAS-PENDENTES.txt,
+        // PERGUNTA 2, decidida em 2026-08-22) -- e nao da classe do card.
+        // Antes havia CINCO tetos, um por card, e o imposto de verdade era o
+        // do ultimo botao clicado. Num Guardiao 3 + Guerreiro 17 o card do
+        // Guardiao passa a dizer 6 em vez de 2, e 6 e o numero certo: o
+        // personagem tem direito a seis maestrias, guardadas num unico array.
+        //
+        // Isso NAO e uma reversao para `char.nivel`. O teto nao le o nivel
+        // TOTAL: le o nivel de cada classe NA CLASSE dela. Um Guardiao 3 +
+        // Ladino 17, de total identico, continua em 2 -- e a metade oposta
+        // que mostra que a excecao nao e uma folga para o total.
+        //
+        // O confinamento e o mesmo que as CDs recebem: so o NUMERO pode
+        // mudar, e ainda assim
+        //   (a) ele nunca ENCOLHE ao acrescentar uma classe (o maior sobre um
+        //       conjunto maior), e
+        //   (b) quando a classe-par NAO concede maestria, ele nao pode mudar
+        //       de jeito nenhum.
+        // O VALOR em si e medido em multiclasse-combate.test.mjs, no bloco da
+        // Tarefa 5 (incluindo a varredura das 5 classes nos 20 niveis).
+        const tetoA = tetoDeMaestria(brutoA);
+        const tetoB = tetoDeMaestria(brutoB);
+        if (tetoA !== null || tetoB !== null) {
+          assert.ok(tetoA !== null && tetoB !== null,
+            `${rotulo}: o card de Maestria em Arma existe de um lado so ` +
+            `(A=${tetoA}, B=${tetoB}) -- isso nao e diferenca de teto, e o card sumindo`);
+          assert.ok(tetoB >= tetoA,
+            `${rotulo}: o teto de maestria caiu de ${tetoA} para ${tetoB} ao ` +
+            `acrescentar uma classe; o MAIOR sobre um conjunto maior nunca encolhe`);
+          if (!CLASSES_QUE_DAO_MAESTRIA.includes(par)) {
+            assert.equal(tetoB, tetoA,
+              `${rotulo}: ${par} nao concede Maestria em Arma, entao o teto de ` +
+              `${classe} nao tinha como mudar`);
+          }
+        }
+
+        const htmlA = semTetoDeMaestria(brutoA);
+        const htmlB = semTetoDeMaestria(brutoB);
         const excecao = excecaoDeCd(classe, subclasse, nivel);
 
         if (!excecao) {
