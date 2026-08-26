@@ -10,7 +10,14 @@ import { restaurarRecursosTalentos } from '../regras-cobertura.js';
 import { gastarDadosVida, nivelNa, reservasDadosVida, restaurarTodosDadosVida, subclasseDe, temClasse } from '../regras-multiclasse.js';
 import { trocaNoDescansoLongo } from '../regras-preparo-magias.js';
 import { removerPersonagem } from '../store.js';
-import { abrirModal, calcMod, detectarRecarga, escHtml, getEspacosMagia, semAcento, toast } from '../utils.js';
+import { abrirModal, calcMod, detectarRecarga, escHtml, semAcento, toast } from '../utils.js';
+// restaurarEspacosDeConjuracao/restaurarEspacosDePacto (Tarefa 4, sub-
+// projeto 4, Ruling 11): o bloco do Descanso Longo que reescrevia
+// `char.espacos_magia[circulo]` direto na forma antiga passa a usar os
+// escritores autorizados -- o total volta a ser DERIVADO
+// (montarReservasDeEspacos), entao nao ha mais "total" nenhum para
+// recalcular aqui.
+import { restaurarEspacosDeConjuracao, restaurarEspacosDePacto } from './reservas-espacos.js';
 import { gerarTracoSinteticoEspecie } from './caracteristicas.js';
 import { getEstadoFuria } from './classes/barbaro.js';
 import { getEstadoRecursosBruxo, recuperarEspacosMagiaBruxo } from './classes/bruxo.js';
@@ -24,7 +31,7 @@ import { getEstadoRecursosMago } from './classes/mago.js';
 import { getEstadoRecursosMonge } from './classes/monge.js';
 import { getEstadoRecursosPaladino } from './classes/paladino.js';
 import { contextosDeClasse } from './contexto-classe.js';
-import { char, classeData, especiesCache, salvar } from './estado.js';
+import { char, especiesCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { mostrarTrocaMagiaConhecida, mostrarTrocaTruque, truquesTrocaveis } from './grimorio.js';
 import { abrirModalTrocaMaestriaDescanso, classesComMaestria, trocaTodasNoDescanso } from './maestrias.js';
@@ -673,10 +680,12 @@ export function setupEventosDescanso() {
     // Bruxo: descanso curto recupera todos os espaços de Magia de Pacto
     // temClasse: mesmo defeito do Bárbaro acima.
     if (temClasse(char, 'Bruxo')) {
-      // NAO CONVERTIDA DE PROPOSITO: recuperarEspacosMagiaBruxo() mexe em
-      // espacos de Magia de Pacto -- escopo do sub-projeto 4 (magias), nao
-      // desta tarefa (sub-projeto 3e). A Tarefa 11 declara esta linha como
-      // excecao no guarda estatico.
+      // recuperarEspacosMagiaBruxo() já foi convertida (Tarefa 4, sub-
+      // projeto 4, Ruling 11 do controlador): ela mesma faz `if
+      // (!temClasse(char, 'Bruxo')) return 0;` e lê/escreve pela fonte
+      // 'pacto' via reservasDeEspacos()/restaurarEspacosDePacto (ver
+      // sheet/classes/bruxo.js) -- não há leitura de espelho pendente
+      // nesta chamada.
       recuperarEspacosMagiaBruxo(false);
       // Subclasses: Combatente Clarividente (Grande Antigo) recarrega em curto
       // subclasseDe: subclasse NA classe Bruxo, nao o espelho.
@@ -842,11 +851,14 @@ export function setupEventosDescanso() {
     // você pode estudar seu livro de magias e substituir uma das magias
     // preparadas". Antes o Descanso Curto não oferecia nada -- a
     // característica só existia como texto na ficha.
-    // NAO CONVERTIDA DE PROPOSITO: memorizarMagia decide troca de magia
-    // preparada -- escopo do sub-projeto 4 (magias), nao desta tarefa
-    // (sub-projeto 3e). A Tarefa 11 declara esta linha como excecao no
-    // guarda estatico.
-    const memorizarMagia = char.classe === 'Mago' && (char.nivel || 1) >= 5
+    // Convertido na Tarefa 8 (sub-projeto 4): quem concede Memorizar Magia
+    // é a classe MAGO no nível 5 (Classes.md), não o nível TOTAL do
+    // personagem -- um Bardo 2/Mago 3 (total 5) NÃO tem a característica
+    // (é Mago 3), e um Bardo 2/Mago 5 (total 7) TEM, mesmo com classe
+    // inicial Bardo. nivelNa devolve 0 para quem não é Mago, então o gate
+    // fecha sozinho sem precisar de temClasse junto -- mesmo padrão do
+    // Incansável do Guardião, acima (nivelNa(char, 'Guardião') >= 10).
+    const memorizarMagia = nivelNa(char, 'Mago') >= 5
       && (char.magias_preparadas || []).some(m => m.circulo > 0 && magiaContaNoLimite(m));
     const botaoMemorizar = memorizarMagia
       ? '<button class="btn btn-secondary" id="btn-memorizar-magia-curto">Memorizar Magia</button>'
@@ -950,34 +962,25 @@ export function setupEventosDescanso() {
         char.condicoes = (char.condicoes || []).filter(c => c !== 'Exaustão');
       }
     }
-    // Restaurar espaços de magia
-    if (char.espacos_magia) {
-      Object.keys(char.espacos_magia).forEach(k => {
-        char.espacos_magia[k].usados = 0;
-      });
-    }
-    // Remover slots extras criados por Fonte de Magia e recalcular totais
+    // Restaurar espaços de magia -- Descanso Longo devolve TODOS os
+    // espaços gastos, das duas fontes: livro:2772 (regra geral de Espaços
+    // de Magia) para Conjuração, Classes.md:898 ("Descanso Curto OU
+    // Longo") para Magia de Pacto -- o Bruxo já recupera pacto no Curto
+    // (recuperarEspacosMagiaBruxo, chamada acima na função de Descanso
+    // Curto), mas o Longo tem de devolvê-lo TAMBÉM, independentemente,
+    // porque nem toda ficha passa pelo Curto antes do Longo. Convertido na
+    // Tarefa 4 (Ruling 11 do controlador): o bloco antigo reescrevia
+    // `char.espacos_magia[circulo]` direto -- na forma NOVA por fonte,
+    // isso apagava as próprias chaves 'conjuracao'/'pacto' (nenhuma delas
+    // está na tabela de círculos da classe), destruindo o campo inteiro a
+    // cada Descanso Longo.
+    restaurarEspacosDeConjuracao(char);
+    restaurarEspacosDePacto(char);
+    // Remover slots extras criados por Fonte de Magia -- sem escritor
+    // autorizado próprio neste sub-projeto (efêmeros, concedidos e limpos
+    // a cada Descanso Longo; ver ESCRITAS_PERMITIDAS,
+    // multiclasse-fundacao.test.mjs).
     char.espacos_magia_extras = {};
-    // Recalcular totais sem os extras (corrige exibição antes do próximo renderSheet)
-    // NAO CONVERTIDA DE PROPOSITO: recalculo de espacos de magia -- escopo
-    // do sub-projeto 4 (magias), nao desta tarefa (sub-projeto 3e). A porta
-    // `CLASSES_INFO[char.classe].conjurador` e `getEspacosMagia(tabela,
-    // char.nivel)` continuam lendo a classe INICIAL e o nivel TOTAL. A
-    // Tarefa 11 declara estas linhas como excecao no guarda estatico.
-    if (char.espacos_magia && classeData?.tabela_caracteristicas) {
-      const _infoClasseRest = CLASSES_INFO[char.classe];
-      if (_infoClasseRest?.conjurador) {
-        const _espacosBase = getEspacosMagia(classeData.tabela_caracteristicas, char.nivel);
-        Object.keys(char.espacos_magia).forEach(circ => {
-          if (_espacosBase[circ]) {
-            char.espacos_magia[circ].total = _espacosBase[circ].total;
-          } else {
-            // Círculo que não existe mais na tabela base — remover
-            delete char.espacos_magia[circ];
-          }
-        });
-      }
-    }
     // Limpar efeitos mágicos ativos
     char.efeitos_magicos = [];
     // Resetar conjurações gratuitas de talentos (Tocado Por Fadas, Sombras, Iniciado em Magia)
@@ -1353,10 +1356,18 @@ export function setupEventosDescanso() {
     salvar();
 
     // Verificar se a classe tem Maestria em Arma e/ou troca de magias
-    // NAO CONVERTIDA DE PROPOSITO: `infoClasse`/`.conjurador` decide a troca
-    // de magia/truque no fim do Descanso Longo -- escopo do sub-projeto 4
-    // (magias), nao desta tarefa (sub-projeto 3e). Continua lendo a classe
-    // INICIAL. A Tarefa 11 declara esta linha como excecao no guarda estatico.
+    // NAO E CONVERSAO DE LEITURA -- e troca POR CLASSE, sub-projeto proprio.
+    // `infoClasse`/`.conjurador`/`.tipo_conjuracao` decidem a troca de
+    // magia/truque no fim do Descanso Longo e continuam lendo a classe
+    // INICIAL. `trocaNoDescansoLongo` (regras-preparo-magias.js) recebe UM
+    // NOME DE CLASSE -- num personagem com DUAS classes conjuradoras (ex.:
+    // Clérigo 5/Druida 5), o livro concede a troca por classe (Classes.md:
+    // 3290 Guardião, :5511 Paladino, :4610 Mago), então o app deveria
+    // oferecer uma troca POR CLASSE, e não uma só como o código atual
+    // oferece -- funcionalidade nova (produto + UI de múltiplos modais), não
+    // conversão de leitura. Virou sub-projeto próprio (fora do sub-projeto
+    // 4, ver task-8-report.md e task-9-report.md); continua lendo a classe
+    // INICIAL até lá.
     const infoClasse = CLASSES_INFO[char.classe] || {};
     // As classes DESTE personagem que concedem Maestria em Arma. Era
     // `classesMaestria.includes(char.classe)`, uma cópia da lista comparada
@@ -1381,12 +1392,13 @@ export function setupEventosDescanso() {
     // subclasse, e a regra deles vem do texto da subclasse -- por isso
     // `ehSubConj` continua entrando por fora, com o comportamento que ja
     // tinha (tambem uma magia so).
-    // NAO CONVERTIDA DE PROPOSITO: `trocaNoDescansoLongo(char.classe)` e os
-    // rotulos "Como Classe (Subclasse), voce pode trocar..." abaixo (linhas
-    // ~1417 e ~1425) decidem a troca de magia/truque no fim do Descanso
-    // Longo -- escopo do sub-projeto 4 (magias), nao desta tarefa
-    // (sub-projeto 3e). Continuam lendo a classe/subclasse INICIAL. A
-    // Tarefa 11 declara estas linhas como excecao no guarda estatico.
+    // NAO E CONVERSAO DE LEITURA (mesmo bloco de infoClasse acima, mesmo
+    // motivo): `trocaNoDescansoLongo(char.classe)` e os rótulos "Como Classe
+    // (Subclasse), você pode trocar..." abaixo continuam lendo a
+    // classe/subclasse INICIAL. Ver comentário de `infoClasse`, logo acima,
+    // para o porquê (trocaNoDescansoLongo recebe UM nome de classe; um
+    // multiclasse com duas classes conjuradoras tem direito a uma troca por
+    // classe, pelo livro -- virou sub-projeto próprio, ver task-9-report.md).
     const temTrocaMagia = trocaNoDescansoLongo(char.classe) === 'uma' || ehSubConj;
     // Troca de truque no Descanso Longo (2026-08-13): antes NAO era
     // oferecida a ninguem aqui -- so existia na subida de nivel

@@ -13,6 +13,10 @@ import { char, classeData, especiesCache, indiceMagiasCache, passivosTalentosCac
 import { reservasDadosVida } from '../regras-multiclasse.js';
 import { ehProficienteEmSalvaguarda } from '../regras-salvaguardas.js';
 import { ehSubclasseConjuradora, normalizarMagiaPersonalizada, rotuloOrigemMagia } from './magias.js';
+// reservasDeEspacos (Tarefa 4, sub-projeto 4, Ruling 11): a caixa "Espacos
+// de Magia" da impressao lia `char.espacos_magia[circulo]` direto, na
+// forma antiga -- passa a ler pelo acessador derivado.
+import { reservasDeEspacos } from './reservas-espacos.js';
 
 // ============================================================
 // IMPRESSAO DE FICHA - Versao formatada para impressao
@@ -614,14 +618,19 @@ export async function gerarHtmlImpressao() {
   const temMagias = info.conjurador || ehSubclasseConjuradora() || (char.magias_conhecidas?.length > 0) || (char.magias_preparadas?.length > 0) || (char.magias_customizadas?.length > 0);
 
   if (temMagias) {
-    // Espacos de magia
-    const espacos = char.espacos_magia || {};
-    if (Object.keys(espacos).length > 0) {
+    // Espacos de magia -- pela reserva derivada (Tarefa 4). Cada FONTE vira
+    // uma coluna separada (uma reserva de pacto no mesmo circulo de uma de
+    // conjuracao aparece como duas colunas, nao uma so combinada) -- ao
+    // contrario da caixa de resumo em sheet/magias.js, que combina por
+    // circulo por motivo de layout (varios outros trechos dali leem a
+    // mesma variavel); a impressao nao tem essa restricao.
+    const reservasImpressao = reservasDeEspacos();
+    if (reservasImpressao.length > 0) {
       pagMagias += `<div class="print-section"><div class="print-section-title">Espacos de Magia</div>`;
       pagMagias += `<div style="display:flex;gap:4mm;flex-wrap:wrap;margin-bottom:2mm">`;
-      Object.entries(espacos).forEach(([circ, data]) => {
-        const restantes = data.total - (data.usados || 0);
-        pagMagias += `<div style="text-align:center"><div style="font-weight:700;font-size:10pt">${restantes}/${data.total}</div><div style="font-size:6.5pt;color:#666">${circ}º Círculo</div></div>`;
+      reservasImpressao.forEach(r => {
+        const rotuloFonte = r.fonte === 'pacto' ? ' (Pacto)' : '';
+        pagMagias += `<div style="text-align:center"><div style="font-weight:700;font-size:10pt">${r.disponiveis}/${r.total}</div><div style="font-size:6.5pt;color:#666">${r.circulo}º Círculo${rotuloFonte}</div></div>`;
       });
       pagMagias += `</div></div>`;
     }

@@ -30,10 +30,29 @@ const MAGO = {
   magias_preparadas: [{ nome: 'Detectar Magia', circulo: 1 }],
 };
 
-/** Lê quantos espaços de 1º círculo já foram usados, do personagem salvo. */
+/**
+ * Lê quantos espaços de 1º círculo já foram usados, do personagem salvo.
+ * A forma armazenada virou por FONTE (Tarefa 4, sub-projeto 4): `usados`
+ * mora em `espacos_magia.conjuracao[circulo]` (ou `.pacto`), não mais em
+ * `espacos_magia[circulo].usados`. Mago não tem Magia de Pacto -- a fonte
+ * é sempre 'conjuracao' aqui.
+ *
+ * O "balde" da fonte (`espacos_magia.conjuracao`) precisa EXISTIR para a
+ * leitura contar como bem-sucedida -- é o que prova que a ficha abriu e
+ * migrou de verdade. Dentro dele, a CHAVE DO CÍRCULO ausente já é o jeito
+ * canônico deste sistema de representar "nada gasto ainda" (mesma
+ * degradação que `usadosDe`, sheet/reservas-espacos.js, faz na leitura de
+ * produção -- só grava a chave quando `usados > 0`), então essa ausência
+ * vira `0`, não `null`: um Mago que nunca conjurou nada tem 0 espaços
+ * usados de verdade, e a guarda `.not.toBeNull()` do spec precisa
+ * continuar podendo falhar quando o balde da fonte não existe (leitura
+ * genuinamente quebrada), não quando o círculo simplesmente não foi
+ * tocado ainda.
+ */
 async function espacosUsados(page) {
   const p = await personagemSalvo(page);
-  return p?.espacos_magia?.['1']?.usados ?? null;
+  const conjuracao = p?.espacos_magia?.conjuracao;
+  return conjuracao ? (conjuracao['1'] ?? 0) : null;
 }
 
 /**

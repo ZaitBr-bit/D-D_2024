@@ -16,6 +16,11 @@ import { MAGIAS_FIXAS_MAGO, definirMagiasFixasMago, getEstadoRecursosMago } from
 import { char, classeData, indiceMagiasCache, magiasDominioCache, magiasSempreCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { ehSubclasseConjuradora, getSubclasseConjuradoraConjuracao, magiaContaNoLimite, magiaEhEspecial, obterMagiasDisponiveisClasseAtual, rotuloOrigemMagia } from './magias.js';
+// reservasDeEspacos (Tarefa 4, sub-projeto 4): acessador derivado que
+// substitui a leitura direta do campo antigo de espacos de magia; ver o
+// comentario de mostrarBuscaGrimorio (achado Important 2 da revisao de
+// branch).
+import { reservasDeEspacos } from './reservas-espacos.js';
 import { truqueEhTrocavel } from '../regras-origens-magia.js';
 
 export async function mostrarBuscaMagia() {
@@ -637,11 +642,19 @@ export async function mostrarFormMagiaCustom(indiceEdicao = null) {
 export async function mostrarBuscaGrimorio() {
   const indice = await getIndiceMagias();
   const magias = (indice?.magias || []).filter(m => m.circulo > 0 && (m.classes || []).includes('Mago'));
-  const espacosMago = classeData?.tabela_caracteristicas
-    ? getEspacosMagia(classeData.tabela_caracteristicas, char.nivel) : (char.espacos_magia || {});
-  const circulosPreparaveis = new Set(Object.entries(espacosMago)
-    .filter(([, espaco]) => (espaco?.total || 0) > 0)
-    .map(([circulo]) => Number(circulo)));
+  // Achado da revisao de branch (Important 2, sub-projeto 4): esta linha
+  // era o ULTIMO leitor vivo da forma ANTIGA de char.espacos_magia
+  // ({circulo: {total, usados}}) -- o ramo `: (char.espacos_magia || {})`
+  // so era alcancado quando `classeData?.tabela_caracteristicas` faltasse,
+  // o que nao acontece para nenhuma classe valida (o primeiro ramo sempre
+  // vencia). Convertido para o mesmo acessador derivado que o resto da
+  // ficha usa (reservasDeEspacos, sheet/reservas-espacos.js) -- sem
+  // fallback para a forma antiga, e sem depender de `char.nivel` (nivel
+  // TOTAL do personagem) contra a tabela da PROPRIA classe, que divergiria
+  // do nivel de conjurador correto para um Mago multiclasse.
+  const circulosPreparaveis = new Set(
+    reservasDeEspacos().filter(r => r.total > 0).map(r => r.circulo)
+  );
 
   abrirModal('Copiar Magia para o Grimório', `
     <div class="info-box warning" style="margin-bottom:8px">

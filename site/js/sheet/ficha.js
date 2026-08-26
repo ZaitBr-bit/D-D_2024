@@ -36,6 +36,12 @@ import { setupEventosDescanso, setupEventosHP, sincronizarBonusPvAnao, sincroniz
 import { getEstadoCarga, renderSecaoInventario, setupEventosInventarioSheet } from './inventario.js';
 import { ehSubclasseConjuradora, renderSecaoMagias, setupEventosEspacosMagia } from './magias.js';
 import { migrarMulticlasse } from './migracoes.js';
+// reservasDeEspacos (Tarefa 4, sub-projeto 4, Ruling 11): o botao de
+// Companheiro Selvagem do Druida (linha ~405) testava
+// `Object.keys(char.espacos_magia || {}).length` como "tem algum espaco?"
+// -- na forma antiga. Passa a testar disponibilidade de verdade pela
+// reserva derivada.
+import { reservasDeEspacos } from './reservas-espacos.js';
 import { abrirModalRecuperarDadivaEpica, precisaRecuperarDadivaEpica, renderSecaoTalentos } from './talentos.js';
 
 /** Salva o estado open/closed de todos os <details> no container */
@@ -402,7 +408,7 @@ export function renderFichaCompleta() {
             <button class="btn btn-sm ${estadoDruida.formaSelvagemAtiva ? 'btn-secondary' : 'btn-accent'}" data-druida-forma-acao="${estadoDruida.formaSelvagemAtiva ? 'encerrar' : 'ativar'}" ${(estadoDruida.usosDisponiveis <= 0 && !estadoDruida.formaSelvagemAtiva) ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>
               ${estadoDruida.formaSelvagemAtiva ? 'Encerrar Forma Selvagem' : 'Ativar Forma Selvagem'}
             </button>
-            <button class="btn btn-sm btn-secondary" data-druida-companheiro-acao="toggle" ${(estadoDruida.usosDisponiveis <= 0 && !estadoDruida.companheiroSelvagemAtivo && !Object.keys(char.espacos_magia || {}).length) ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>
+            <button class="btn btn-sm btn-secondary" data-druida-companheiro-acao="toggle" ${(estadoDruida.usosDisponiveis <= 0 && !estadoDruida.companheiroSelvagemAtivo && !reservasDeEspacos().some(r => r.disponiveis > 0)) ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>
               ${estadoDruida.companheiroSelvagemAtivo ? 'Dispensar Companheiro Selvagem' : 'Invocar Companheiro Selvagem'}
             </button>
             ${estadoDruida.ressurgimentoAtivo ? `<button class="btn btn-sm btn-primary" data-druida-ressurgimento-acao="recuperar-forma" ${estadoDruida.usosDisponiveis > 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Ressurgimento: recuperar Forma</button>` : ''}

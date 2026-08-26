@@ -186,62 +186,58 @@ const ALVOS = [
           'próprio traço fala em nível de personagem, não em nível de classe.',
       },
       {
-        linha: "const memorizarMagia = char.classe === 'Mago' && (char.nivel || 1) >= 5",
-        feature: 'Gate do botão "Memorizar Magia" no Descanso Curto',
-        motivo:
-          'NAO CONVERTIDA DE PROPOSITO, como o comentário logo acima desta linha ' +
-          'documenta: decide troca de magia preparada -- escopo do sub-projeto 4 ' +
-          '(magias), não desta tarefa (3e, PV/dados de vida/descansos). Continua ' +
-          'lendo a classe e o nível INICIAIS.',
-      },
-      {
-        linha: 'const _infoClasseRest = CLASSES_INFO[char.classe];',
-        feature: 'Recálculo de espaços de magia ao fim do Descanso Longo',
-        motivo:
-          'NAO CONVERTIDA DE PROPOSITO (mesmo comentário acima da linha, no ' +
-          'arquivo): escopo do sub-projeto 4 (magias). `CLASSES_INFO[char.classe]` ' +
-          'continua lendo a classe INICIAL.',
-      },
-      {
-        linha: 'const _espacosBase = getEspacosMagia(classeData.tabela_caracteristicas, char.nivel);',
-        feature: 'Recálculo de espaços de magia ao fim do Descanso Longo (mesmo bloco acima)',
-        motivo:
-          'NAO CONVERTIDA DE PROPOSITO: mesmo bloco e mesmo motivo da linha ' +
-          'anterior -- sub-projeto 4 (magias), continua lendo o nível TOTAL em vez ' +
-          'do nível na classe conjuradora.',
-      },
-      {
         linha: 'const infoClasse = CLASSES_INFO[char.classe] || {};',
         feature: 'Troca de magia/truque ao fim do Descanso Longo (infoClasse.conjurador, infoClasse.tipo_conjuracao)',
         motivo:
-          'NAO CONVERTIDA DE PROPOSITO, como o comentário "Verificar se a classe ' +
-          'tem Maestria em Arma e/ou troca de magias" documenta: escopo do ' +
-          'sub-projeto 4 (magias), não desta tarefa. Continua lendo a classe ' +
-          'INICIAL.',
+          'NÃO É CONVERSÃO DE LEITURA -- é troca POR CLASSE, sub-projeto próprio. ' +
+          '`infoClasse`/`.conjurador`/`.tipo_conjuracao` decidem quem tem direito à ' +
+          'troca de magia/truque no fim do Descanso Longo, e a troca em si é ' +
+          'restrita à LISTA de cada classe: Classes.md:3290 diz que o Guardião pode ' +
+          '"substituir uma magia em sua lista por outra magia de Guardião", :5511 ' +
+          'diz o mesmo para o Paladino, e o Mago troca pelo próprio livro de magias ' +
+          '(:4610, "substituindo qualquer uma das magias por outras do seu livro de ' +
+          'magias"). Um personagem com DUAS classes conjuradoras com essa ' +
+          'característica (ex.: Guardião/Paladino) tem direito a DUAS trocas, cada ' +
+          'uma restrita à lista da classe dona -- não é `nivelNa`/`temClasse` que ' +
+          'resolve isso, é um recurso por classe que ainda não existe na tela. Virou ' +
+          'sub-projeto próprio (o sub-projeto 4 NÃO o cobre); continua lendo a ' +
+          'classe INICIAL até lá.',
       },
       {
         linha: "const temTrocaMagia = trocaNoDescansoLongo(char.classe) === 'uma' || ehSubConj;",
         feature: 'Troca de magia ao fim do Descanso Longo',
         motivo:
-          'NAO CONVERTIDA DE PROPOSITO (mesmo bloco de infoClasse acima): escopo ' +
-          'do sub-projeto 4 (magias). `trocaNoDescansoLongo` continua recebendo a ' +
-          'classe INICIAL.',
+          'NÃO É CONVERSÃO DE LEITURA -- mesmo motivo do bloco de `infoClasse` ' +
+          'acima: `trocaNoDescansoLongo(char.classe)` decide POR QUAL classe a ' +
+          'troca funciona, e a troca é um recurso restrito à lista de cada classe ' +
+          'conjuradora (Classes.md:3290 Guardião, :5511 Paladino, :4610 Mago). Um ' +
+          'Guardião/Paladino multiclasse tem direito a DUAS trocas -- uma por ' +
+          'classe --, o que é funcionalidade nova (produto + UI), não uma leitura ' +
+          'errada de nível/classe. Virou sub-projeto próprio; continua lendo a ' +
+          'classe INICIAL até lá.',
       },
       {
         linha: "Como ${escHtml(char.classe)}${ehSubConj ? ' (' + escHtml(char.subclasse) + ')' : ''}, você pode trocar <strong>1 magia ${rotuloMagia}</strong> por outra da lista de classe após um Descanso Longo. Para remontar a lista inteira, use a subida de nível.",
         feature: 'Rótulo "Como Classe (Subclasse), você pode trocar..." no modal do Descanso Longo',
         motivo:
-          'NAO CONVERTIDA DE PROPOSITO: rótulo de texto da troca de magia -- ' +
-          'escopo do sub-projeto 4 (magias), não desta tarefa. Duas leituras de ' +
-          'espelho na MESMA linha (char.classe e char.subclasse); o teste de ' +
-          'exceção deste arquivo dedup por número de linha, não por ocorrência.',
+          'NÃO É CONVERSÃO DE LEITURA -- mesmo motivo do bloco de `infoClasse` ' +
+          'acima: o rótulo nomeia a classe INICIAL porque a troca em si ainda é UMA ' +
+          'só, compartilhada, em vez de uma por classe conjuradora (Classes.md:3290, ' +
+          ':5511, :4610). Corrigir só o texto sem entregar a troca por classe ' +
+          'deixaria o rótulo certo e o comportamento errado -- por isso a correção ' +
+          'espera o sub-projeto próprio da troca por classe, não este. Duas ' +
+          'leituras de espelho na MESMA linha (char.classe e char.subclasse); o ' +
+          'teste de exceção deste arquivo dedup por número de linha, não por ' +
+          'ocorrência.',
       },
       {
         linha: 'Você pode trocar <strong>1 truque</strong> por outro da lista de ${escHtml(char.classe)} após um Descanso Longo.',
         feature: 'Rótulo de troca de truque no modal do Descanso Longo',
         motivo:
-          'NAO CONVERTIDA DE PROPOSITO: mesmo motivo do rótulo de troca de magia ' +
-          'acima -- escopo do sub-projeto 4 (magias).',
+          'NÃO É CONVERSÃO DE LEITURA -- mesmo motivo do rótulo de troca de magia ' +
+          'acima: a troca de truque também é UMA só, compartilhada, em vez de uma ' +
+          'por classe conjuradora. Sub-projeto próprio da troca por classe, não ' +
+          'este.',
       },
     ],
   },

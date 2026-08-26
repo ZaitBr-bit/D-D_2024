@@ -1,10 +1,9 @@
 // ============================================================
 // Ficha de Personagem - Visualização e Edição
 // ============================================================
-import { CLASSES_INFO } from '../dados-classes.js';
 import { getPersonagem } from '../store.js';
 import { getClasse, getIndiceMagias, getTalentos, getEspecies } from '../db.js';
-import { getEspacosMagia, getMagiaPreparadas, normalizarGrimorioMago } from '../utils.js';
+import { getMagiaPreparadas, normalizarGrimorioMago } from '../utils.js';
 import { obterTodasMagiasDominio, obterTodasMagiasSemprePreparadas } from '../levelup.js';
 import { getSyncStatus, onSyncStatusChange } from '../sync.js';
 import { resolverPassivosTalentos } from '../talentos-effects.js';
@@ -17,8 +16,7 @@ import { _carregarEstadoColapso } from '../sheet/colapso.js';
 import { char, classeData, salvar } from '../sheet/estado.js';
 import { renderFichaCompleta } from '../sheet/ficha.js';
 import { carregarDescricoesMagias } from '../sheet/impressao.js';
-import { ehSubclasseConjuradora, getSubclasseConjuradoraConjuracao } from '../sheet/magias.js';
-import { migrarEscolhasClasseLegadas, migrarMagiasDominio, migrarMagiasLegadoEspecie, migrarMagiasSemprePreparadas, migrarMulticlasse, migrarNomePericiaLidarAnimais, migrarPericiaEspecie, migrarPericiasEspecie, migrarPericiasTalentos, migrarProficienciasTalentos, migrarSlotsMagiaLivre, migrarTalentoVersatilHumano, migrarTruquesEspecie, migrarTruquesFixosSubclasse } from '../sheet/migracoes.js';
+import { migrarEscolhasClasseLegadas, migrarEspacosMagia, migrarMagiasDominio, migrarMagiasLegadoEspecie, migrarMagiasSemprePreparadas, migrarMulticlasse, migrarNomePericiaLidarAnimais, migrarPericiaEspecie, migrarPericiasEspecie, migrarPericiasTalentos, migrarProficienciasTalentos, migrarSlotsMagiaLivre, migrarTalentoVersatilHumano, migrarTruquesEspecie, migrarTruquesFixosSubclasse } from '../sheet/migracoes.js';
 import { baixarPdfFicha } from '../sheet/pdf.js';
 import { migrarAdeptoElementalTipos, migrarIniciadoEmMagiaInstancias } from '../sheet/talentos.js';
 let _syncSubscribed = false;
@@ -95,69 +93,14 @@ export async function renderSheet(container, charId) {
     ? getMagiaPreparadas(classeData.tabela_caracteristicas, char.nivel) : undefined;
   if (normalizarGrimorioMago(char, limitePreparadasMago).alterado) salvar();
 
-  // Sincronizar espaços de magia de conjuradores regulares
-  const _infoClasse = CLASSES_INFO[char.classe];
-  if (_infoClasse?.conjurador && classeData?.tabela_caracteristicas) {
-    const _espacosCorretos = getEspacosMagia(classeData.tabela_caracteristicas, char.nivel);
-    if (!char.espacos_magia) char.espacos_magia = {};
-    const _extras = char.espacos_magia_extras || {};
-
-    // Atualizar totais conforme tabela da classe + slots extras de Fonte de Magia
-    Object.keys(_espacosCorretos).forEach(circ => {
-      const baseTotal = _espacosCorretos[circ].total;
-      const extraTotal = _extras[circ] || 0;
-      if (!char.espacos_magia[circ]) {
-        char.espacos_magia[circ] = { total: baseTotal + extraTotal, usados: 0 };
-      } else {
-        char.espacos_magia[circ].total = baseTotal + extraTotal;
-        if (char.espacos_magia[circ].usados > char.espacos_magia[circ].total) {
-          char.espacos_magia[circ].usados = char.espacos_magia[circ].total;
-        }
-      }
-    });
-
-    // Slots extras em círculos que não existem na tabela base
-    Object.keys(_extras).forEach(circ => {
-      if (!_espacosCorretos[circ] && _extras[circ] > 0) {
-        if (!char.espacos_magia[circ]) {
-          char.espacos_magia[circ] = { total: _extras[circ], usados: 0 };
-        } else {
-          char.espacos_magia[circ].total = _extras[circ];
-        }
-      }
-    });
-
-    // Remover círculos que não existem mais E não têm extras
-    Object.keys(char.espacos_magia).forEach(circ => {
-      if (!_espacosCorretos[circ] && !(_extras[circ] > 0)) {
-        delete char.espacos_magia[circ];
-      }
-    });
-    salvar();
-  }
-
-  // Sincronizar espaços de magia de subclasses conjuradoras (Cavaleiro Místico / Trapaceiro Arcano)
-  if (ehSubclasseConjuradora()) {
-    const conjSub = getSubclasseConjuradoraConjuracao();
-    if (conjSub) {
-      if (!char.espacos_magia) char.espacos_magia = {};
-      // Atualizar totais com base na tabela de progressão
-      Object.entries(conjSub.espacos).forEach(([circ, total]) => {
-        if (!char.espacos_magia[circ]) {
-          char.espacos_magia[circ] = { total, usados: 0 };
-        } else {
-          char.espacos_magia[circ].total = total;
-        }
-      });
-      // Remover círculos que não estão na progressão
-      Object.keys(char.espacos_magia).forEach(circ => {
-        if (!conjSub.espacos[circ]) {
-          delete char.espacos_magia[circ];
-        }
-      });
-      salvar();
-    }
-  }
+  // Os totais de espaco de magia deixaram de ser reconciliados aqui no
+  // sub-projeto 4: eles sao DERIVADOS por montarReservasDeEspacos
+  // (sheet/reservas-espacos.js), que le a tabela unificada quando ha duas
+  // ou mais classes conjuradoras e a tabela da propria classe quando ha
+  // uma so. O bloco antigo usava a tabela da classe INICIAL contra o
+  // nivel TOTAL, e APAGAVA circulos fora dela -- o que teria apagado a
+  // reserva de Magia de Pacto de um Bruxo multiclasse.
+  migrarEspacosMagia();
 
   _carregarEstadoColapso();
   renderFichaCompleta();

@@ -17,6 +17,13 @@ import { ehBardoComSegredosMagicos, getTruquesExtraEstiloLuta } from './combate.
 import { char, classeData, indiceMagiasCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { abrirPreenchimentoSlotMagia, mostrarBuscaGrimorio, mostrarBuscaMagia, mostrarFormMagiaCustom } from './grimorio.js';
+// reservasDeEspacos/gastarEspaco/recuperarUmEspaco (Tarefa 4, sub-projeto 4):
+// os pontos deste arquivo que liam/escreviam `char.espacos_magia[circulo]`
+// direto, na forma antiga, passam a ler/escrever pelo acessador derivado e
+// pelos escritores autorizados de sheet/reservas-espacos.js -- ver o
+// comentario de `espacos` (mais abaixo) para a limitacao conhecida da
+// leitura combinada por CIRCULO (sem distinguir fonte).
+import { gastarEspaco, recuperarUmEspaco, reservasDeEspacos } from './reservas-espacos.js';
 import { abrirModalAdicionarTalento, abrirModalEditarIniciadoEmMagia } from './talentos.js';
 
 // `magiaContaNoLimite` e `magiaEhEspecial` moram em regras-origens-magia.js,
@@ -26,6 +33,31 @@ import { abrirModalAdicionarTalento, abrirModalEditarIniciadoEmMagia } from './t
 // os importadores, e não recria a cópia que a consolidação foi eliminar.
 import { magiaContaNoLimite, magiaEhEspecial, truqueContaNoLimite } from '../regras-origens-magia.js';
 export { magiaContaNoLimite, magiaEhEspecial, truqueContaNoLimite };
+
+/**
+ * Escolhe a reserva de UM circulo entre as fontes disponiveis (conjuracao e
+ * pacto), com a MESMA prioridade em toda parte deste arquivo que consulta
+ * "a reserva deste circulo" sem already saber a fonte: conjuracao vence a
+ * colisao (mesma direcao do docblock de migrarEspacosDeMagia -- gasto de
+ * pacto nunca "rouba" o lugar de conjuracao). Usada tanto para RENDERIZAR
+ * (a variavel `espacos` de renderSecaoMagias) quanto para GASTAR (o botao
+ * "Conjurar" de magia preparada e a magia personalizada) -- as duas nunca
+ * podem divergir sobre qual fonte um numero de circulo resolve, ou o botao
+ * debitaria uma reserva diferente da que a tela mostrou.
+ *
+ * Devolve null quando o circulo nao existe em NENHUMA fonte -- nao {} nem
+ * um objeto com total 0 -- pelo mesmo motivo do contrato de
+ * espacosPorCirculo (regras-multiclasse-conjuracao.js): "ausente" e
+ * "esgotado" sao coisas diferentes, e confundi-las aqui faria o botao
+ * "Conjurar" achar que uma reserva existe (com 0 disponiveis) quando na
+ * verdade o circulo pedido nao e servido por fonte nenhuma.
+ * @param {number|string} circulo
+ * @returns {{fonte:'conjuracao'|'pacto', circulo:number, total:number, usados:number, disponiveis:number}|null}
+ */
+function reservaDoCirculo(circulo) {
+  const candidatas = reservasDeEspacos().filter(r => r.circulo === Number(circulo));
+  return candidatas.find(r => r.fonte === 'conjuracao') || candidatas.find(r => r.fonte === 'pacto') || null;
+}
 
 export function rotuloOrigemMagia(magia) {
   if (magia?.origem === 'dominio') return 'Domínio';
@@ -108,17 +140,33 @@ function renderLinhaMagiaPersonalizada(magia, indice, opts = {}) {
   const ritual = magia.ritual
     ? ' <span class="badge" style="font-size:0.6rem;background:var(--secondary);color:#fff">Ritual</span>'
     : '';
-  const circulosDisponiveis = Object.keys(char?.espacos_magia || {})
-    .map(Number)
-    .filter(circulo => circulo >= magia.circulo)
-    .sort((a, b) => a - b);
+  // Magia personalizada consulta TODAS as fontes -- achado da revisao do
+  // controlador: fixar 'conjuracao' fazia a magia personalizada SUMIR para
+  // um Bruxo de classe unica (cuja reserva inteira e Magia de Pacto), que e
+  // funcionalidade PERDIDA para classe unica, nao limitacao declaravel.
+  // reservaDoCirculo (acima) resolve, por circulo, a MESMA fonte que
+  // conjurarMagiaPersonalizada vai gastar (conjuracao vence a colisao) --
+  // a tela e o gasto nunca divergem sobre qual reserva um circulo resolve.
+  const todasReservasCandidatas = reservasDeEspacos();
+  const circulosCandidatos = [...new Set(todasReservasCandidatas
+    .filter(r => r.circulo >= magia.circulo)
+    .map(r => r.circulo))].sort((a, b) => a - b);
+  const reservasDisponiveis = circulosCandidatos.map(c => reservaDoCirculo(c)).filter(Boolean);
+  const circulosDisponiveis = reservasDisponiveis.map(r => r.circulo);
   const temUpcast = magia.circulo > 0 && circulosDisponiveis.length > 1;
+  // "esgotado" olha TODAS as fontes de cada circulo candidato, nao so a
+  // prioritaria (reservasDisponiveis, acima, resolve por precedencia e so
+  // serve para montar a lista de upcast) -- achado da revisao de branch
+  // (Important 3), mesmo raciocinio do docblock de `espacos` em
+  // renderSecaoMagias: sem isto, o botao desabilitava assim que a fonte
+  // prioritaria esgotava, mesmo com a outra fonte do MESMO circulo ainda
+  // com espaco.
+  const circulosComEspacoDisponivel = new Set(
+    todasReservasCandidatas.filter(r => r.disponiveis > 0).map(r => r.circulo)
+  );
   const todosEsgotados = magia.circulo > 0 && (
     circulosDisponiveis.length === 0
-    || circulosDisponiveis.every(circulo => {
-      const espaco = char.espacos_magia[circulo];
-      return (espaco?.usados || 0) >= (espaco?.total || 0);
-    })
+    || circulosDisponiveis.every(c => !circulosComEspacoDisponivel.has(c))
   );
   const controlesConjuracao = magia.circulo === 0
     ? `<button class="btn btn-sm btn-cantrip" data-lancar-magia-custom="${indice}">Lançar</button>`
@@ -174,7 +222,7 @@ function registrarConcentracaoMagiaPersonalizada(magia, circulo) {
   });
 }
 
-function conjurarMagiaPersonalizada(indice, circuloSelecionado) {
+function conjurarMagiaPersonalizada(indice, circuloSelecionado, fonte) {
   const registro = (char?.magias_customizadas || [])[indice];
   if (!registro) return false;
 
@@ -186,13 +234,23 @@ function conjurarMagiaPersonalizada(indice, circuloSelecionado) {
     return false;
   }
 
-  const espaco = char?.espacos_magia?.[circulo];
-  if (!espaco || (espaco.usados || 0) >= (espaco.total || 0)) {
+  // A fonte vem por PARAMETRO desde o RULING do controlador que estendeu o
+  // seletor "De qual reserva?" (Tarefa 7) para a magia personalizada: com
+  // as DUAS fontes disponiveis neste circulo, quem chama ja perguntou ao
+  // jogador (mostrarSeletorFonteMagia, abaixo) e passa a fonte ESCOLHIDA
+  // aqui -- a mesma logica do botao "Conjurar" de magia preparada
+  // (_executarConjuracao). O fallback (`reservaDoCirculo(circulo)?.fonte`,
+  // a MESMA prioridade da leitura em renderLinhaMagiaPersonalizada) cobre
+  // so o caso de UMA reserva so (nunca abre o seletor) e a folga de
+  // concorrencia entre o clique e aqui -- se o circulo nao existir em fonte
+  // nenhuma, o fallback tambem devolve undefined, `fonteAlvo` fica falsy e
+  // o gasto falha com a mensagem de sempre, sem gastar da fonte errada.
+  const fonteAlvo = fonte || reservaDoCirculo(circulo)?.fonte;
+  if (!fonteAlvo || !gastarEspaco(char, fonteAlvo, circulo)) {
     toast(`Sem espaços de ${circulo}º círculo!`, 'error');
     return false;
   }
 
-  espaco.usados = (espaco.usados || 0) + 1;
   registrarConcentracaoMagiaPersonalizada(magia, circulo);
   salvar();
   renderFichaCompleta();
@@ -213,26 +271,21 @@ export function ehSubclasseConjuradora(opcoes = {}) {
   return !!getSubclasseConjuradoraConjuracao(opcoes);
 }
 
+// Fonte 'conjuracao' fixa nas duas funcoes abaixo -- mesma limitacao
+// conhecida de conjurarMagiaPersonalizada (acima): nenhum recurso que as
+// chama hoje (Companheiro Selvagem / Ressurgimento Selvagem do Druida, em
+// sheet/habilidades.js) e alcancavel por um Bruxo, entao a fonte fixa nao
+// tira nada de ninguem na pratica.
 export function consumirEspacoMagiaDisponivel(circuloMinimo = 1) {
-  if (!char?.espacos_magia) return 0;
-  const circulos = Object.keys(char.espacos_magia).map(Number).filter(c => c >= circuloMinimo).sort((a, b) => a - b);
-  for (const c of circulos) {
-    const slot = char.espacos_magia[c];
-    if (!slot) continue;
-    const disponiveis = Math.max(0, (slot.total || 0) - (slot.usados || 0));
-    if (disponiveis > 0) {
-      slot.usados = (slot.usados || 0) + 1;
-      return c;
-    }
-  }
-  return 0;
+  const alvo = reservasDeEspacos()
+    .filter(r => r.fonte === 'conjuracao' && r.circulo >= circuloMinimo && r.disponiveis > 0)
+    .sort((a, b) => a.circulo - b.circulo)[0];
+  if (!alvo) return 0;
+  return gastarEspaco(char, 'conjuracao', alvo.circulo) ? alvo.circulo : 0;
 }
 
 export function recuperarEspacoMagia(circulo = 1) {
-  const slot = char?.espacos_magia?.[circulo];
-  if (!slot || (slot.usados || 0) <= 0) return false;
-  slot.usados -= 1;
-  return true;
+  return recuperarUmEspaco(char, 'conjuracao', circulo);
 }
 
 // --- Magias ---
@@ -403,7 +456,50 @@ export function renderSecaoMagias() {
   const truquesSempre = todosTruques.filter(m => m.origem === 'sempre');
   const truquesClasse = todosTruques.filter(m => !m.personalizada && m.origem !== 'especie' && m.origem !== 'sempre' && truqueContaNoLimite(m));
   const preparadas = char.magias_preparadas || [];
-  const espacos = char.espacos_magia || {};
+  // `espacos`: casca no formato ANTIGO (por CIRCULO, nao por fonte) que o
+  // resto desta funcao ja consome (resumo de espacos, o NUMERO mostrado nas
+  // secoes de Preparadas e Grimorio) -- construida a partir do acessador
+  // derivado (reservasDeEspacos, Tarefa 1) para nao duplicar a regra de
+  // total aqui, em vez de reintroduzir um reconciliador de render (essa e a
+  // Tarefa 4 que este proprio sub-projeto fechou). Usa reservaDoCirculo
+  // (acima) -- a MESMA prioridade que os botoes de "Conjurar" usam quando
+  // so ha UMA fonte com espaco -- para a tela e o gasto nunca divergirem
+  // sobre qual reserva um numero de circulo resolve nesse caso.
+  //
+  // LIMITACAO DE TELA QUE PERMANECE (nao confundir com o beco de gasto
+  // logo abaixo, que FOI corrigido): um personagem com Conjuracao E Magia
+  // de Pacto no MESMO circulo (Bruxo multiclasse) ve, aqui, so o NUMERO da
+  // reserva de conjuracao -- o pacto colidido fica invisivel neste resumo.
+  // Julgado defensavel pelo mesmo motivo do docblock de
+  // migrarEspacosDeMagia (multiclasse ainda nao existe em ficha de
+  // producao, ver regras-multiclasse-conjuracao.js:135-143).
+  //
+  // O que MUDOU (achado da revisao de branch, Important 3): uma nota
+  // anterior deste comentario declarava "LIMITACAO CONHECIDA e PERMANENTE"
+  // tambem para o GASTO -- que so seria possivel pela fonte que aparece
+  // aqui. Nao e mais verdade. `todosEsgotados` (abaixo) e o portao de
+  // `setupEventosEspacosMagia` ([data-conjurar]) passam a consultar
+  // `circulosComEspacoDisponivel` (todas as fontes, nao so a que `espacos`
+  // mostra), entao o botao "Conjurar" so desabilita quando NENHUMA fonte
+  // daquele circulo tem espaco -- e `decidirFonteEContinuar` (mais abaixo)
+  // resolve a fonte certa mesmo com a conjuracao colidida ja esgotada.
+  // Prova por mutacao no oraculo "apos esgotar a Conjuracao, o Pacto
+  // colidido continua gastavel" (multiclasse-magias.spec.mjs).
+  const espacos = {};
+  new Set(reservasDeEspacos().map(r => r.circulo)).forEach(circulo => {
+    const r = reservaDoCirculo(circulo);
+    if (r) espacos[circulo] = { total: r.total, usados: r.usados, fonte: r.fonte };
+  });
+
+  // Circulos em que PELO MENOS UMA fonte ainda tem espaco disponivel --
+  // ao contrario de `espacos` (acima), olha TODAS as fontes daquele
+  // circulo, nao so a prioritaria. Usado pelos gates "todosEsgotados"
+  // desta funcao para o botao "Conjurar" so desabilitar quando NENHUMA
+  // reserva do circulo tiver espaco (ver comentario de `espacos`, acima,
+  // para o raciocinio completo).
+  const circulosComEspacoDisponivel = new Set(
+    reservasDeEspacos().filter(r => r.disponiveis > 0).map(r => r.circulo)
+  );
 
   // Calcular limites de magias preparadas/conhecidas e truques
   // Para subclasses conjuradoras (Cavaleiro Místico / Trapaceiro Arcano), usar tabela da subclasse
@@ -544,14 +640,16 @@ export function renderSecaoMagias() {
       ${Object.keys(espacos).length > 0 ? `
         <div style="margin-bottom:12px">
           ${Object.entries(espacos).map(([circ, data]) => {
-            const _extrasCirculo = (char.espacos_magia_extras || {})[circ] || 0;
+            // Extras de Fonte de Magia so somam em 'conjuracao' -- nunca em
+            // 'pacto' (Oráculo 6, multiclasse-magias.test.mjs).
+            const _extrasCirculo = data.fonte === 'conjuracao' ? ((char.espacos_magia_extras || {})[circ] || 0) : 0;
             const _baseTotal = data.total - _extrasCirculo;
             return `
             <div class="slots-grupo">
               <label>${circ}&ordm; Círculo</label>
               <div style="display:flex;gap:4px">
                 ${Array.from({ length: data.total }, (_, i) => `
-                  <div class="slot-bolha ${i < data.usados ? 'usado' : ''} ${i >= _baseTotal ? 'slot-extra' : ''}" data-slot-circ="${circ}" data-slot-idx="${i}"></div>
+                  <div class="slot-bolha ${i < data.usados ? 'usado' : ''} ${i >= _baseTotal ? 'slot-extra' : ''}" data-slot-circ="${circ}" data-slot-fonte="${data.fonte}" data-slot-idx="${i}"></div>
                 `).join('')}
               </div>
               <span style="font-size:0.75rem;color:var(--text-muted)">
@@ -580,7 +678,10 @@ export function renderSecaoMagias() {
               const origemLabel = rotuloOrigemMagia(m);
               const circulos = Object.keys(espacos).filter(c => parseInt(c) >= m.circulo).sort((a, b) => parseInt(a) - parseInt(b));
               const temUpcast = circulos.length > 1;
-              const todosEsgotados = circulos.every(c => (espacos[c]?.usados || 0) >= (espacos[c]?.total || 0));
+              // circulosComEspacoDisponivel (nao `espacos`): ver Important 3
+              // no comentario de `espacos`, acima -- so desabilita quando
+              // NENHUMA fonte do circulo tem espaco, nao so a prioritaria.
+              const todosEsgotados = circulos.every(c => !circulosComEspacoDisponivel.has(parseInt(c)));
               return `
               <div class="magia-item preparada ${ehEspecial ? 'magia-dominio' : ''}" data-magia-nome="${m.nome}" data-magia-circ="${m.circulo}">
                 <div style="display:flex;justify-content:space-between;align-items:center">
@@ -706,7 +807,10 @@ export function renderSecaoMagias() {
               const ehRitual = custom ? custom.ritual : ehMagiaRitual(m.nome);
               const circulos = Object.keys(espacos).filter(c => parseInt(c) >= m.circulo).sort((a, b) => parseInt(a) - parseInt(b));
               const temUpcast = circulos.length > 1;
-              const todosEsgotados = circulos.every(c => (espacos[c]?.usados || 0) >= (espacos[c]?.total || 0));
+              // circulosComEspacoDisponivel (nao `espacos`): ver Important 3
+              // no comentario de `espacos`, acima -- so desabilita quando
+              // NENHUMA fonte do circulo tem espaco, nao so a prioritaria.
+              const todosEsgotados = circulos.every(c => !circulosComEspacoDisponivel.has(parseInt(c)));
               return `
               <div class="magia-item ${jaPreparada ? 'preparada' : ''} ${ehRitual && !jaPreparada ? 'magia-dominio' : ''}" data-magia-nome="${m.nome}" data-magia-circ="${m.circulo}">
                 <div style="display:flex;justify-content:space-between;align-items:center">
@@ -1636,19 +1740,116 @@ function mostrarModalCuraCondicao(nomeMagia, circ, opcoesRemover, onSelecao) {
   });
 }
 
+/**
+ * Modal "De qual reserva conjurar?" (Tarefa 7, sub-projeto 4) -- só é
+ * chamado quando o círculo pedido tem espaço disponível nas DUAS fontes
+ * (Conjuração e Magia de Pacto) ao mesmo tempo; com uma reserva só, o
+ * chamador gasta dela direto, sem abrir modal nenhum -- mesmo precedente
+ * do seletor de dado de vida (montarSeletorDeReserva, hp-descanso.js,
+ * sub-projeto 3e): o seletor só aparece com mais de uma opção.
+ *
+ * A DECISÃO DE PRODUTO: livro:2116 diz "pode usar" -- permissão, não
+ * ordem de gasto (uma varredura por termos de ordem no livro e em
+ * Classes.md não retorna nada). E a escolha não é neutra: o pacto volta
+ * no Descanso Curto (Classes.md:898) e a Conjuração só no Longo, então
+ * gastar o pacto primeiro é quase sempre a jogada ótima -- MAS há
+ * invocações que CONSOMEM espaço de pacto para outra coisa
+ * (Classes.md:1342, :1473), então o jogador pode querer guardá-lo de
+ * propósito. Uma ordem automática (ex.: "gasta pacto primeiro sempre")
+ * jogaria pelo jogador e estragaria esse recurso reservado -- por isso o
+ * app pergunta, em vez de decidir.
+ *
+ * @param {string} nome Nome da magia, só para o texto do modal.
+ * @param {number|string} circulo Círculo em que a magia sai.
+ * @param {Array<{fonte:'conjuracao'|'pacto', total:number, usados:number, disponiveis:number}>} fontes
+ *   As reservas candidatas -- o chamador já filtrou por disponiveis > 0.
+ * @param {(fonte: 'conjuracao'|'pacto') => void} onEscolher Chamado com a
+ *   fonte escolhida quando o jogador confirma.
+ */
+function mostrarSeletorFonteMagia(nome, circulo, fontes, onEscolher) {
+  const rotuloFonte = (f) => f.fonte === 'conjuracao' ? 'Conjuração' : 'Magia de Pacto';
+  const idSelect = 'select-fonte-magia';
+  const idConfirmar = 'btn-confirmar-fonte-magia';
+  const html = `
+    <div style="text-align:center;margin-bottom:12px">
+      <strong>${escHtml(nome)}</strong> (${circulo}º Círculo)<br>
+      <span style="font-size:0.8rem;color:var(--text-muted)">De qual reserva conjurar?</span>
+    </div>
+    <select id="${idSelect}" class="input" style="width:100%">
+      ${fontes.map(f => `<option value="${f.fonte}">${rotuloFonte(f)} — ${f.disponiveis} de ${f.total} disponíveis</option>`).join('')}
+    </select>
+  `;
+  abrirModal('Escolher Reserva', html,
+    '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>'
+    + `<button class="btn btn-primary" id="${idConfirmar}">Conjurar</button>`
+  );
+  document.getElementById(idConfirmar)?.addEventListener('click', () => {
+    const fonte = document.getElementById(idSelect)?.value || fontes[0].fonte;
+    window.fecharModal();
+    onEscolher(fonte);
+  });
+}
+
+/**
+ * Decide SE mostra o seletor "De qual reserva?" e chama `continuar(fonte)`
+ * com a fonte final -- compartilhado pelos DOIS botões que gastam espaço
+ * de magia (preparada, `[data-conjurar]`; personalizada,
+ * `[data-conjurar-magia-custom]`). Extraído na revisão desta tarefa: os
+ * dois handlers tinham as MESMAS oito linhas (filtrar por círculo e
+ * disponibilidade, ramificar em `length > 1`, sobrescrever a fonte
+ * escolhida, continuar) -- e este projeto já pagou pelo custo de duas
+ * cópias de seletor divergirem (sub-projeto 3e, `montarSeletorDeReserva`
+ * foi extraído pelo mesmo motivo). Pelo próprio argumento de produto
+ * desta tarefa -- a pergunta "de qual reserva sai o espaço?" é sobre
+ * CONJURAR, não sobre um tipo de magia -- os dois caminhos têm de decidir
+ * IGUAL, e um helper único é o que garante isso sem depender de disciplina
+ * de cópia-e-cola.
+ *
+ * @param {string} nome Nome da magia, só para o texto do modal.
+ * @param {number|string} circulo Círculo em que a magia sai.
+ * @param {(fonte: 'conjuracao'|'pacto') => void} continuar Chamado com a
+ *   fonte final, exatamente uma vez -- com o seletor (duas ou mais
+ *   reservas com espaço), com a ÚNICA reserva que sobrou com espaço
+ *   (`fontesDoCirculo[0]`, achado da revisão de branch, Important 3 --
+ *   antes este caso caía direto em `reservaDoCirculo`, que resolve por
+ *   PRECEDÊNCIA e não por disponibilidade, e podia devolver uma fonte já
+ *   esgotada mesmo com a outra ainda de pé), ou com o resultado de
+ *   `reservaDoCirculo` só quando NENHUMA fonte deste círculo tem espaço
+ *   (`fontesDoCirculo` vazio -- não há resposta certa, e o gate de
+ *   `setupEventosEspacosMagia` já bloqueou o clique antes de chegar aqui).
+ */
+function decidirFonteEContinuar(nome, circulo, continuar) {
+  const circuloNum = Number(circulo);
+  const fontesDoCirculo = reservasDeEspacos()
+    .filter(r => r.circulo === circuloNum && r.disponiveis > 0);
+  if (fontesDoCirculo.length > 1) {
+    mostrarSeletorFonteMagia(nome, circulo, fontesDoCirculo, continuar);
+  } else {
+    continuar((fontesDoCirculo[0] || reservaDoCirculo(circulo))?.fonte);
+  }
+}
+
 export function setupEventosEspacosMagia() {
-  // Clicar nas bolhas de espaço de magia
+  // Clicar nas bolhas de espaço de magia -- Tarefa 4 (sub-projeto 4):
+  // convertido para os escritores autorizados de sheet/reservas-espacos.js.
+  // O clique continua podendo "pular" direto para o índice clicado (gastar
+  // ou restaurar vários de uma vez, não só 1) -- por isso o laço, em vez de
+  // uma única chamada: gastarEspaco/recuperarUmEspaco só fazem 1 espaço por
+  // chamada, e não existe (nem deveria existir) um escritor de valor
+  // absoluto -- ver o docblock de recuperarUmEspaco.
   document.querySelectorAll('.slot-bolha').forEach(el => {
     el.addEventListener('click', () => {
+      const fonte = el.dataset.slotFonte;
       const circ = el.dataset.slotCirc;
       const idx = parseInt(el.dataset.slotIdx);
-      if (!char.espacos_magia[circ]) return;
-      if (idx < char.espacos_magia[circ].usados) {
-        // Restaurar este slot
-        char.espacos_magia[circ].usados = idx;
+      const reserva = reservasDeEspacos().find(r => r.fonte === fonte && r.circulo === Number(circ));
+      if (!reserva) return;
+      if (idx < reserva.usados) {
+        // Restaurar até este slot (inclusive)
+        for (let i = reserva.usados; i > idx; i--) recuperarUmEspaco(char, fonte, circ);
       } else {
-        // Gastar até este slot
-        char.espacos_magia[circ].usados = idx + 1;
+        // Gastar até este slot (inclusive)
+        for (let i = reserva.usados; i <= idx; i++) gastarEspaco(char, fonte, circ);
       }
       salvar();
       renderFichaCompleta();
@@ -1689,8 +1890,19 @@ export function setupEventosEspacosMagia() {
       const nome = btn.dataset.conjurar;
       const selectEl = btn.parentElement?.querySelector(`[data-conj-select="${nome}"]`);
       const circ = selectEl ? selectEl.value : btn.dataset.conjCirc;
-      if (!char.espacos_magia[circ]) return;
-      if (char.espacos_magia[circ].usados >= char.espacos_magia[circ].total) {
+      // CRITICAL da revisao do controlador: esta era a leitura na forma
+      // ANTIGA que fazia "Conjurar" virar no-op silencioso para qualquer
+      // conjurador de classe unica -- a forma PRINCIPAL de gastar espaco no
+      // app. O gate confere se ALGUMA fonte deste circulo tem espaco --
+      // nao mais so a prioritaria (achado da revisao de branch, Important
+      // 3): com `reservaDoCirculo` sozinho, a conjuracao esgotada bloqueava
+      // o clique mesmo com o pacto colidido ainda de pe, um beco sem saida
+      // para Bruxo/Mago no mesmo circulo. `decidirFonteEContinuar` (abaixo)
+      // resolve QUAL fonte gastar; este gate so decide SE pode prosseguir.
+      const circuloNum = Number(circ);
+      const temEspacoNesteCirculo = reservasDeEspacos()
+        .some(r => r.circulo === circuloNum && r.disponiveis > 0);
+      if (!temEspacoNesteCirculo) {
         toast(`Sem espaços de ${circ}º círculo!`, 'error');
         return;
       }
@@ -1699,6 +1911,16 @@ export function setupEventosEspacosMagia() {
       const magiaEhConc = ehMagiaConcentracao(nome);
       const concAtiva = getConcentracaoAtiva();
       const temConflitoConc = magiaEhConc && concAtiva && concAtiva !== nome;
+
+      // Tarefa 7 (sub-projeto 4): a fonte que _executarConjuracao vai
+      // gastar -- sempre definida por decidirFonteEContinuar (abaixo)
+      // antes de qualquer chamada a _executarConjuracao, direto (uma
+      // reserva so) ou depois do jogador escolher no seletor. Ligada por
+      // PARAMETRO em cada chamada de _executarConjuracao, nao por closure,
+      // porque essa funcao vive fora deste forEach e e chamada de varios
+      // pontos do fluxo (alguns atras de modais assincronos de efeito/
+      // metamagia).
+      let _fonteEscolhida;
 
       const _prosseguirConjuracao = () => {
 
@@ -1709,29 +1931,29 @@ export function setupEventosEspacosMagia() {
 
         const prosseguir = (aplicarSelf) => {
           if (!aplicarSelf) {
-            _executarConjuracao(nome, circ, btn.dataset.conjCirc, false, undefined, _metasAplicadas, _opcoesMetaConj);
+            _executarConjuracao(nome, circ, btn.dataset.conjCirc, false, undefined, _metasAplicadas, _opcoesMetaConj, _fonteEscolhida);
             return;
           }
           // Verificar modais de selecao necessarios
           if (config.selecionar_tipo) {
             mostrarModalSelecaoMagia(nome, circ, config.selecionar_tipo, 'Escolher Tipo', (tipo) => {
-              _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, { tipo_selecionado: tipo }, _metasAplicadas, _opcoesMetaConj);
+              _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, { tipo_selecionado: tipo }, _metasAplicadas, _opcoesMetaConj, _fonteEscolhida);
             });
           } else if (config.selecionar_atributo) {
             mostrarModalSelecaoMagia(nome, circ, config.selecionar_atributo, 'Escolher Atributo', (attr) => {
-              _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, { atributo_selecionado: attr }, _metasAplicadas, _opcoesMetaConj);
+              _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, { atributo_selecionado: attr }, _metasAplicadas, _opcoesMetaConj, _fonteEscolhida);
             });
           } else if (config.selecionar_variante) {
             mostrarModalSelecaoMagia(nome, circ, Object.keys(config.selecionar_variante), 'Escolher Variante', (v) => {
-              _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, { variante_selecionada: v }, _metasAplicadas, _opcoesMetaConj);
+              _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, { variante_selecionada: v }, _metasAplicadas, _opcoesMetaConj, _fonteEscolhida);
             });
           } else if (config.tipo === 'cura_condicao') {
             const lista = config.condicoes || config.efeitos || [];
             mostrarModalCuraCondicao(nome, circ, lista, (c) => {
-              _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, { condicao_removida: c }, _metasAplicadas, _opcoesMetaConj);
+              _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, { condicao_removida: c }, _metasAplicadas, _opcoesMetaConj, _fonteEscolhida);
             });
           } else {
-            _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, undefined, _metasAplicadas, _opcoesMetaConj);
+            _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, undefined, _metasAplicadas, _opcoesMetaConj, _fonteEscolhida);
           }
         };
 
@@ -1744,7 +1966,7 @@ export function setupEventosEspacosMagia() {
       }
 
       // Magia sem efeito especifico - apenas gasta slot e mostra toast
-      _executarConjuracao(nome, circ, btn.dataset.conjCirc, false, undefined, _metasAplicadas, _opcoesMetaConj);
+      _executarConjuracao(nome, circ, btn.dataset.conjCirc, false, undefined, _metasAplicadas, _opcoesMetaConj, _fonteEscolhida);
 
       }; // fim de _prosseguirConjuracao
 
@@ -1771,17 +1993,40 @@ export function setupEventosEspacosMagia() {
         _prosseguirConjuracao();
       };
 
-      // Se ha conflito de concentracao, pedir confirmacao
-      if (temConflitoConc) {
-        confirmarSubstituirConcentracao(concAtiva, nome, _iniciarConjuracaoComMetamagia);
-      } else {
-        _iniciarConjuracaoComMetamagia();
-      }
+      const _continuarAposEscolherFonte = () => {
+        // Se ha conflito de concentracao, pedir confirmacao
+        if (temConflitoConc) {
+          confirmarSubstituirConcentracao(concAtiva, nome, _iniciarConjuracaoComMetamagia);
+        } else {
+          _iniciarConjuracaoComMetamagia();
+        }
+      };
+
+      // O SELETOR DE RESERVA (Tarefa 7): decidirFonteEContinuar (acima)
+      // só abre o modal quando as DUAS fontes tem espaco disponivel NESTE
+      // circulo -- com uma reserva so, nada muda na tela e o gasto segue
+      // direto. livro:2116 da PERMISSAO ("pode usar"), nao ORDEM de gasto
+      // -- ver o docblock de mostrarSeletorFonteMagia para o raciocinio
+      // completo (por que uma ordem automatica jogaria pelo jogador).
+      decidirFonteEContinuar(nome, circ, (fonte) => {
+        _fonteEscolhida = fonte;
+        _continuarAposEscolherFonte();
+      });
     });
   });
 
-  function _executarConjuracao(nome, circ, baseCirc, aplicarEfeitoSelf, opcoes, metamagiasAplicadas, opcoesMeta) {
-    char.espacos_magia[circ].usados++;
+  function _executarConjuracao(nome, circ, baseCirc, aplicarEfeitoSelf, opcoes, metamagiasAplicadas, opcoesMeta, fonte) {
+    // A fonte vem por PARAMETRO desde a Tarefa 7 (sub-projeto 4): o
+    // seletor "De qual reserva?" (mostrarSeletorFonteMagia, acima) deixa a
+    // escolha com o jogador quando as duas tem espaco; com uma reserva so,
+    // o chamador ja resolveu `fonte` antes de abrir qualquer modal. O
+    // fallback (`reservaDoCirculo(circ)?.fonte`, a MESMA prioridade da
+    // checagem que liberou o clique) cobre so a folga entre o clique e
+    // aqui -- gastarEspaco falha e devolve false silenciosamente se a
+    // reserva pedida tiver esvaziado nesse meio-tempo (concorrencia de
+    // UI), o que e aceitavel: o botao ja checou "disponivel" antes de abrir
+    // qualquer modal.
+    gastarEspaco(char, fonte || reservaDoCirculo(circ)?.fonte, circ);
 
     if (char.classe === 'Feiticeiro' && semAcento(char.subclasse || '') === semAcento('Feitiçaria Selvagem')) {
       const estadoFeiticeiro = getEstadoRecursosFeiticeiro();
@@ -1927,14 +2172,33 @@ export function setupEventosEspacosMagia() {
       const magia = normalizarMagiaPersonalizada((char.magias_customizadas || [])[indice], indice);
       const select = btn.parentElement?.querySelector(`[data-conj-select-custom="${indice}"]`);
       const circulo = Number(select?.value || btn.dataset.conjCirc);
-      const executar = () => conjurarMagiaPersonalizada(indice, circulo);
-      const concentracaoAtiva = getConcentracaoAtiva();
 
-      if (magiaPersonalizadaEhConcentracao(magia) && concentracaoAtiva && concentracaoAtiva !== magia.nome) {
-        confirmarSubstituirConcentracao(concentracaoAtiva, magia.nome, executar);
-      } else {
-        executar();
-      }
+      // A fonte que conjurarMagiaPersonalizada vai gastar -- sempre
+      // definida por decidirFonteEContinuar (abaixo) antes de qualquer
+      // chamada a executar(), direto (uma reserva so) ou depois do
+      // jogador escolher no seletor.
+      let _fonteEscolhida;
+
+      const _prosseguirComFonte = () => {
+        const concentracaoAtiva = getConcentracaoAtiva();
+        const executar = () => conjurarMagiaPersonalizada(indice, circulo, _fonteEscolhida);
+        if (magiaPersonalizadaEhConcentracao(magia) && concentracaoAtiva && concentracaoAtiva !== magia.nome) {
+          confirmarSubstituirConcentracao(concentracaoAtiva, magia.nome, executar);
+        } else {
+          executar();
+        }
+      };
+
+      // O SELETOR DE RESERVA (Tarefa 7, estendido por RULING do
+      // controlador para a magia personalizada -- a mesma pergunta
+      // "de qual reserva sai o espaço?" vale para qualquer gasto, não só
+      // o de magia preparada): decidirFonteEContinuar é o MESMO helper
+      // que o botão "Conjurar" de magia preparada usa, para os dois
+      // caminhos nunca divergirem sobre quando perguntar.
+      decidirFonteEContinuar(magia.nome, circulo, (fonte) => {
+        _fonteEscolhida = fonte;
+        _prosseguirComFonte();
+      });
     });
   });
 

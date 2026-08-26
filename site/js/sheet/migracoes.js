@@ -362,3 +362,20 @@ import { migrarParaMulticlasse } from '../regras-multiclasse.js';
 export function migrarMulticlasse() {
   if (migrarParaMulticlasse(char)) salvar();
 }
+
+// Import colocado aqui pelo mesmo motivo do de migrarParaMulticlasse, logo
+// acima: nao deslocar a numeracao do arquivo (ver o comentario daquele
+// import) -- soma-se a ele, entao nao precisa repetir o raciocinio.
+import { migrarEspacosDeMagia } from '../regras-multiclasse-conjuracao.js';
+
+/**
+ * Migra os espacos de magia da ficha aberta para a forma por FONTE
+ * (conjuracao/pacto). Casca fina no idioma das outras migracoes (sem
+ * parametro, lendo o `char` global e salvando); a logica pura -- e o
+ * porque de so `usados` sobreviver -- esta em
+ * regras-multiclasse-conjuracao.js (migrarEspacosDeMagia), testavel fora
+ * do navegador.
+ */
+export function migrarEspacosMagia() {
+  if (migrarEspacosDeMagia(char)) salvar();
+}

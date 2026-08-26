@@ -12,6 +12,12 @@ import { achatarMagiasClasse, badgesMagiaRapidos } from '../magias.js';
 import { abrirModalIniciadoEmMagiaFicha, sincronizarTalentosInvocacoes } from '../talentos.js';
 import { temClasse, nivelNa } from '../../regras-multiclasse.js';
 import { dadosDe } from '../contexto-classe.js';
+// recuperarUmEspaco/reservasDeEspacos/restaurarEspacosDePacto (Tarefa 4,
+// sub-projeto 4, Ruling 11): os dois pontos deste arquivo que liam
+// `char.espacos_magia[circulo]` direto, na forma antiga, passam a ler pelo
+// acessador derivado -- o gasto de um Bruxo (classe única ou não) vive na
+// fonte 'pacto', nunca em chaves de círculo direto no objeto.
+import { recuperarUmEspaco, reservasDeEspacos, restaurarEspacosDePacto } from '../reservas-espacos.js';
 
 // Os tres Pactos sao invocacoes misticas COMUNS no PHB 2024: aparecem na
 // secao "Opcoes de Invocacoes Misticas" sem pre-requisito e sem nenhuma
@@ -177,31 +183,48 @@ export function getEstadoRecursosBruxo() {
   };
 }
 
+/**
+ * Devolve espacos de Magia de Pacto do Bruxo -- TODOS (`parcial=false`,
+ * Descanso Curto/Longo, Classes.md:898) ou METADE arredondada para cima
+ * (`parcial=true`, nivel 20 devolve TUDO -- a caracteristica "Reserva
+ * Mistica" nao esta neste arquivo, mas a formula e a mesma que ja existia
+ * aqui antes desta conversao).
+ *
+ * Convertido na Tarefa 4 (Ruling 11 do controlador): antes lia/escrevia
+ * `char.espacos_magia[circulo]` direto -- na forma antiga, onde o gasto do
+ * Bruxo (classe unica) vivia sob as proprias chaves de circulo. Na forma
+ * nova, esse gasto vive em `char.espacos_magia.pacto`; usar
+ * `reservasDeEspacos()`/`restaurarEspacosDePacto`/`recuperarUmEspaco`
+ * (sheet/reservas-espacos.js) le e escreve pela fonte certa em vez de
+ * assumir que TODO o campo pertence ao Bruxo (que so era verdade quando
+ * multiclasse nao existia e o campo tinha uma fonte so).
+ * @param {boolean} parcial
+ * @returns {number} quantos espacos foram devolvidos de verdade.
+ */
 export function recuperarEspacosMagiaBruxo(parcial = false) {
-  if (!temClasse(char, 'Bruxo') || !char.espacos_magia) return 0;
-  const chaves = Object.keys(char.espacos_magia);
-  if (chaves.length === 0) return 0;
+  if (!temClasse(char, 'Bruxo')) return 0;
+  const reservasPacto = reservasDeEspacos().filter(r => r.fonte === 'pacto');
+  if (reservasPacto.length === 0) return 0;
 
-  const usadosAntes = chaves.reduce((acc, c) => acc + (char.espacos_magia[c]?.usados || 0), 0);
+  const usadosAntes = reservasPacto.reduce((acc, r) => acc + r.usados, 0);
   if (usadosAntes <= 0) return 0;
 
   if (!parcial) {
-    chaves.forEach(c => { char.espacos_magia[c].usados = 0; });
+    restaurarEspacosDePacto(char);
     return usadosAntes;
   }
 
-  const totalMax = chaves.reduce((acc, c) => acc + (char.espacos_magia[c]?.total || 0), 0);
+  const totalMax = reservasPacto.reduce((acc, r) => acc + r.total, 0);
   let recuperar = Math.ceil(totalMax / 2);
   if ((nivelNa(char, 'Bruxo') || 1) >= 20) recuperar = totalMax;
   recuperar = Math.min(recuperar, usadosAntes);
 
   let restante = recuperar;
-  for (const c of chaves.sort((a, b) => Number(b) - Number(a))) {
+  for (const r of reservasPacto.sort((a, b) => b.circulo - a.circulo)) {
     if (restante <= 0) break;
-    const usados = char.espacos_magia[c]?.usados || 0;
-    if (usados <= 0) continue;
-    const reduz = Math.min(usados, restante);
-    char.espacos_magia[c].usados -= reduz;
+    if (r.usados <= 0) continue;
+    const reduz = Math.min(r.usados, restante);
+    for (let i = 0; i < reduz; i++) recuperarUmEspaco(char, 'pacto', r.circulo);
     restante -= reduz;
   }
 
@@ -852,10 +875,13 @@ export function renderSecaoPactoBruxo() {
 
   if (pactos.includes('Pacto do Tomo')) {
     const tomoData = estado.pactoTomo || { truques: [], rituais: [] };
-    // Circulo do slot de pacto do Bruxo (o unico circulo onde ele tem espacos)
-    const circuloPacto = Object.keys(char.espacos_magia || {}).sort((a, b) => Number(b) - Number(a))[0] || '1';
-    const slotPacto = char.espacos_magia?.[circuloPacto];
-    const slotEsgotado = slotPacto ? slotPacto.usados >= slotPacto.total : true;
+    // Circulo do slot de pacto do Bruxo (o unico circulo onde ele tem
+    // espacos) -- pela reserva derivada (Tarefa 4), nao mais
+    // Object.keys(char.espacos_magia), cujas chaves viraram 'conjuracao'/
+    // 'pacto' e nao numeros de circulo.
+    const reservaPacto = reservasDeEspacos().find(r => r.fonte === 'pacto');
+    const circuloPacto = reservaPacto ? String(reservaPacto.circulo) : '1';
+    const slotEsgotado = reservaPacto ? reservaPacto.disponiveis <= 0 : true;
     // Detectar conflitos: magias do Tomo que o personagem ja possui por outros meios
     const truquesConhecidos = new Set((char.magias_conhecidas || []).filter(m => m.circulo === 0).map(m => m.nome));
     const magiasPreparadas = new Set((char.magias_preparadas || []).map(m => m.nome));

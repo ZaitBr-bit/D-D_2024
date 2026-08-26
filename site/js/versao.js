@@ -13,13 +13,51 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.21';
+export const VERSAO_ATUAL = '2.2.22';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.22',
+    data: '2026-08-25',
+    rotulo: 'Magias em multiclasse',
+    resumo: 'Os espaços de magia de personagens com mais de uma classe '
+      + 'passam a seguir a regra do livro: a tabela de Conjurador '
+      + 'Multiclasse quando há duas ou mais classes que conjuram, e a '
+      + 'Magia de Pacto do Bruxo como reserva própria, que volta num '
+      + 'Descanso Curto.',
+    melhorias: [
+      {
+        grupo: '🔮 Espaços de magia pela regra de multiclasse',
+        itens: [
+          'Com DUAS ou mais classes conjuradoras, os espaços de magia '
+            + 'passam a sair da tabela de Conjurador Multiclasse, pelo '
+            + 'nível de conjurador somado das classes — um Paladino '
+            + '6/Mago 4 tem espaços de nível de conjurador 7 (metade do '
+            + 'Paladino arredondada para cima, mais o nível cheio do '
+            + 'Mago), não de nível 10.',
+          'Com UMA classe conjuradora só, os espaços voltam a sair da '
+            + 'tabela DELA, no nível DELA — um Mago 5/Bárbaro 5 tinha '
+            + 'espaços de Mago no nível 10 (o total do personagem) e '
+            + 'passa a ter de Mago no nível 5, o nível real da classe. '
+            + 'Isso REDUZ os espaços de fichas assim, porque o valor '
+            + 'antigo estava inflado.',
+          'A Magia de Pacto do Bruxo vira uma reserva separada dos '
+            + 'espaços de Conjuração normais. Ela volta ao completar um '
+            + 'Descanso CURTO, sem devolver os espaços de Conjuração — '
+            + 'que só voltam no Descanso Longo, como sempre.',
+          'Quem tem as duas reservas (por exemplo um Bruxo/Mago) ganha '
+            + 'um seletor para escolher de qual reserva sai o espaço ao '
+            + 'conjurar. Quem tem só uma reserva não vê nada de novo.',
+          'A ficha impressa e o PDF passam a mostrar os espaços de cada '
+            + 'reserva separadamente.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.21',
     data: '2026-08-25',

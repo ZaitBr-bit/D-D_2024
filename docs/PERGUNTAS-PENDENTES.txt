@@ -1643,3 +1643,204 @@ no alcance de um guarda recem-revisado.
 Sugestao para a rodada de reforco: ou ampliar a faixa e declarar as excecoes
 que aparecerem, ou mover a declaracao de `info` para dentro da faixa.
 
+
+================================================================================
+
+SUBIDA DE NIVEL AINDA GRAVA TOTAIS DE ESPACO DE MAGIA EM CHAVES NUMERICAS VESTIGIAIS
+
+`atualizarEspacosMagia` (site/js/levelup.js) e o bloco gemeo de subclasse
+conjuradora dentro de `subirDeNivel` continuam escrevendo total/usados em
+chaves NUMERICAS de circulo (`personagem.espacos_magia['1']`, `['2']` etc.)
+a cada subida de nivel.
+
+Essa escrita ficou VESTIGIAL desde o sub-projeto 4 (Tarefa 4): o acessador
+real (`montarReservasDeEspacos`, site/js/sheet/reservas-espacos.js) deriva o
+total a cada leitura de `armazenado[fonte][circulo]` -- as chaves de FONTE
+('conjuracao'/'pacto'), nunca as chaves numericas que este codigo grava. Ou
+seja, nada no caminho real do app le mais o que essas linhas escrevem.
+
+NAO FORAM REMOVIDAS de proposito (Ruling 13/15 da Tarefa 4, medido, nao
+decidido sozinho): `testes/regras/unidade/classes-progressao.test.mjs` e
+`subclasse-conjuradora.test.mjs` -- 16 pontos de assercao cobrindo toda
+classe conjuradora contra a tabela do livro, nivel a nivel -- ainda leem
+essas mesmas chaves numericas direto. Reescrever aqueles dois testes e
+superficie do sub-projeto 5 (que converte a subida de nivel inteira), nao
+desta tarefa -- o ganho de remover a escrita agora seria estetico, e o
+risco de mexer nos 16 pontos sem converter o resto do fluxo junto e real
+(medido: uma primeira tentativa de remover so o laco de limpeza de
+circulos, sem qualificar por nome de chave, quebrou classes-progressao.
+test.mjs de verdade).
+
+UM SEGUNDO VESTIGIO, mais fino: o laco que remove "circulos que nao existem
+mais no novo nivel" (nos dois blocos citados acima) continua existindo,
+porque o Bruxo e a UNICA classe cujo circulo de Magia de Pacto MUDA DE
+NUMERO ao subir (nivel 1-2 -> 1o circulo, nivel 3 -> 2o, nivel 5 -> 3o,
+medido em dados/classes/bruxo.json) -- sem essa limpeza o circulo antigo do
+Bruxo ficaria para tras, e classes-progressao.test.mjs acusaria dois
+circulos onde ele so tem um. Mas o laco agora PULA as chaves 'conjuracao' e
+'pacto' POR NOME (`if (circulo === 'conjuracao' || circulo === 'pacto')
+return;`) -- sem esse pulo, o laco apagava as proprias chaves de fonte (que
+guardam o gasto do jogador desde o sub-projeto 4) a cada subida de nivel, o
+mesmo mecanismo do defeito que a Tarefa 4 ja tinha corrigido no Descanso
+Longo.
+
+Esse "pular por nome" e um ACOPLAMENTO explicito entre site/js/levelup.js e
+o formato de armazenamento do sub-projeto 4 (as strings literais
+'conjuracao'/'pacto' aparecem dentro de um arquivo que, de resto, e
+escopo do sub-projeto 5). Ele desaparece junto quando o sub-projeto 5
+converter `atualizarEspacosMagia` para nao escrever mais chaves numericas
+nenhuma -- nesse ponto o laco de limpeza deixa de ter qualquer motivo para
+existir, fonte ou circulo.
+
+Oraculos que provam os dois vestigios sobrevivendo juntos, com prova por
+mutacao nos dois sentidos: `testes/regras/unidade/multiclasse-magias.
+test.mjs`, Oraculos 25 (gasto de conjurador de classe unica sobrevive a
+subida) e 26 (circulo obsoleto do Bruxo continua sendo limpo).
+
+Conferir antes de mexer: `grep -n "circulo === 'conjuracao'" site/js/levelup.js`.
+
+================================================================================
+TAREFA 9 (guarda estatico + campanha de mutacao do sub-projeto 4): UMA
+MUTACAO NAO-LITERAL ESCAPAVA DAS TRES REDES -- gastarEspaco IGNORAVA A FONTE
+PEDIDA QUANDO DUAS RESERVAS COLIDIAM NO MESMO CIRCULO -- FECHADA NESTA
+MESMA TAREFA COM UM ORACULO NOVO
+
+A campanha de mutacao da Tarefa 9 (doze conversoes revertidas uma a uma,
+medidas contra o guarda estatico, multiclasse-magias.test.mjs e a suite de
+unidade inteira) fechou o sub-projeto 4 com a serie 3b 7/145 presos -> 3c
+55/60 escapavam -> 3d 4/19 -> 3e 2/12 -> 4 1/12 escapava das tres redes. O
+controlador pediu para nao deixar como divida: o achado abaixo foi MEDIDO
+e FECHADO com um oraculo novo, na mesma tarefa. A serie final e 4 0/12.
+
+MUTACAO: em site/js/sheet/reservas-espacos.js, gastarEspaco (linha ~206),
+tirar o filtro de fonte da busca da reserva alvo:
+
+  ANTES: .find((r) => r.fonte === fonte && r.circulo === Number(circulo));
+  MUTADA: .find((r) => r.circulo === Number(circulo));
+
+O QUE ISSO DEVERIA QUEBRAR: um personagem com DUAS reservas no MESMO circulo
+(ex.: Bruxo 5/Mago 5 -- Magia de Pacto do Bruxo e Conjuracao do Mago colidem
+no 3o circulo, cada uma com sua propria contagem) deveria gastar da reserva
+ERRADA quando o codigo ignora `fonte` na busca.
+
+POR QUE ESCAPOU: montarReservasDeEspacos ordena as reservas por circulo e
+depois por `fonte.localeCompare`, e 'conjuracao' vem antes de 'pacto' em
+ordem alfabetica -- `find` sem o filtro de fonte sempre acha a reserva de
+CONJURACAO primeiro quando ha colisao de circulo. gastarEspaco le
+`alvo.disponiveis`/`alvo.usados` da reserva ERRADA (conjuracao) para decidir
+SE pode gastar e QUANTO gravar, mas a ESCRITA continua indo para a chave do
+parametro `fonte` pedido (`p.espacos_magia[fonte][circulo] = alvo.usados + 1`)
+-- ou seja, o numero gravado na fonte certa vem de uma contagem errada, mas
+so fica visivel quando as duas reservas colididas tem `usados` DIFERENTES no
+momento da chamada. O oraculo existente (`gasto: sai da reserva pedida, e a
+outra fica intacta`, multiclasse-magias.test.mjs) gasta uma reserva ainda
+ZERADA (as duas comecam em usados=0), entao `alvo.usados + 1` da 1 tanto
+lendo a reserva certa quanto a errada -- a mutacao muda QUAL contagem e
+lida, mas nao O VALOR final gravado, porque as duas contagens empatam em
+zero.
+
+O QUE ISSO SIGNIFICA: com as DUAS reservas no mesmo circulo e AMBAS ja tendo
+gasto anterior DIFERENTE entre si, um gasto seguinte pode ler o `usados` da
+reserva ERRADA e regravar a reserva CERTA com um numero desatualizado --
+exemplo medido a mao: gastar 1x do pacto (pacto.usados vai a 1, conjuracao
+continua 0), depois gastar 1x da conjuracao (conjuracao.usados vai a 1,
+pacto continua 1), depois gastar mais 1x do pacto -- a busca sem filtro de
+fonte acha a reserva de CONJURACAO primeiro (usados=1, a mesma coincidencia
+do pacto neste ponto), grava pacto[circulo] = 1 + 1 = 2 -- o valor final
+bate por coincidencia de novo (os dois `usados` empataram em 1 neste
+exemplo), mas nada no codigo garante esse empate: um fixture com contagens
+que NAO empatam expoe a leitura errada.
+
+O QUE FOI FEITO: acrescentado um oraculo novo, ao lado do existente (que NAO
+foi alterado -- ele mede outra coisa e ja passou por revisao):
+
+  `gasto: a fonte pedida vence mesmo com usados diferente entre as reservas
+  do mesmo circulo`, multiclasse-magias.test.mjs (fixture Bruxo 5/Mago 5).
+
+Ele gasta da Conjuracao primeiro (ela fica em usados=1, o Pacto continua em
+usados=0 -- as duas fontes chegam ao gasto decisivo com contagens
+DIFERENTES, exatamente a lacuna que o oraculo antigo nao cobria) e so
+DEPOIS pede o gasto decisivo do Pacto, conferindo a FORMA COMPLETA do
+objeto `p.espacos_magia` com `assert.deepEqual` (nao so um campo solto) nos
+dois passos.
+
+PROVA POR MUTACAO (reaplicada e confirmada nesta mesma tarefa): removido de
+novo o filtro `r.fonte === fonte &&` da busca em gastarEspaco (linha ~206),
+mutacao confirmada por grep no disco antes de medir. Resultado:
+
+  - o oraculo novo FALHOU sozinho, com o mesmo padrao previsto na analise
+    acima -- esperado `pacto: {3: 1}`, veio `pacto: {3: 2}`;
+  - a suite de unidade inteira (`npm run test:regras:unidade`) rodou com
+    exatamente 1 falha -- a do oraculo novo -- confirmando que ele e quem
+    fecha a lacuna, sem depender de nenhum outro oraculo para pegar junto;
+  - o guarda estatico (`multiclasse-descansos-alcance.test.mjs`) continuou
+    verde, como esperado -- esta mutacao nao le char.classe/subclasse/
+    nivel, entao e sintaticamente invisivel para ele por construcao (o
+    mesmo padrao das mutacoes "para literal" desta campanha).
+
+Restaurado com `cp` do backup (nunca `git checkout --`), confirmado
+byte-a-byte com `diff` e recontagem de terminadores de linha (CRLF/LF-only)
+igual a antes da mutacao. A suite de unidade rodou de novo depois da
+restauracao: `tests 3651 / pass 3394 / fail 0` (1 teste a mais que o estado
+de partida desta tarefa -- o oraculo novo -- e nenhuma falha).
+
+O historico do ACHADO acima (POR QUE ESCAPOU / O QUE ISSO SIGNIFICA) fica
+registrado como estava -- e a explicacao correta do mecanismo do defeito, so
+o desfecho mudou: de divida aberta para buraco medido e fechado.
+
+Conferir: `grep -n "a fonte pedida vence mesmo com usados diferente" testes/regras/unidade/multiclasse-magias.test.mjs`.
+================================================================================
+
+JANELA DE ROLLOUT ENTRE VERSOES DO APP PODE APAGAR GASTO DE ESPACOS DE MAGIA (E
+O MESMO RISCO EXISTE PARA DADOS DE VIDA) -- A GUARDA DE FORMA NAO PROTEGE
+
+Achado da revisao de branch do sub-projeto 4 (Important 4). O app e um PWA com
+service worker (site/sw.js) e sincronizacao por registro inteiro na nuvem
+(sync.js, merge em site/js/pages/home.js). Cenario medido, passo a passo:
+
+  1. dispositivo A, ja na versao nova, abre a ficha -- migrarEspacosDeMagia
+     roda, grava char.espacos_magia na forma NOVA ({conjuracao:{...},
+     pacto:{...}}) -- e sincroniza;
+  2. dispositivo B, ainda com a versao ANTERIOR em cache do service worker,
+     abre a MESMA ficha -- o reconciliador de render antigo (a versao velha
+     de site/js/pages/sheet.js) nao reconhece as chaves 'conjuracao'/'pacto'
+     como circulo valido, ve as duas como "lixo fora da tabela", APAGA as
+     duas chaves e regrava os totais no formato antigo -- e salva;
+  3. o merge por registro inteiro devolve o registro mais NOVO por relogio
+     (o de B) para todos os dispositivos. O gasto do jogador desaparece, sem
+     erro nenhum na tela.
+
+POR QUE A GUARDA DE FORMA NAO PROTEGE: migrarEspacosDeMagia (site/js/regras-
+multiclasse-conjuracao.js) decide se precisa migrar OLHANDO A FORMA do campo
+(existe 'conjuracao' ou 'pacto'? entao ja foi migrado). Um cliente antigo que
+reescreve o campo na forma velha produz uma forma que a guarda nunca viu antes
+-- ela nao tem como saber que aquele registro JA foi migrado uma vez e
+REGREDIU. Uma guarda de forma so enxerga o formato do dado, nunca a HISTORIA
+dele. So um CARIMBO DE VERSAO no proprio registro (ex.: um campo tipo
+schema_versao_espacos, incrementado quando o formato muda, e comparado no
+merge) sobreviveria a essa reversao -- porque o carimbo do dispositivo B
+continuaria sendo o antigo, e o merge saberia que aquele registro esta
+desatualizado mesmo tendo relogio mais novo.
+
+NAO IMPLEMENTADO nesta rodada de conserto -- carimbo de schema e decisao de
+design que atravessa mais de um sub-projeto (sync.js, o merge de
+site/js/pages/home.js, e todo migrador que decide por forma), fora do escopo
+de uma rodada de correcao pontual. Fica registrado como candidato de conserto
+para quem decidir levar isso adiante.
+
+MESMA EXPOSICAO EM DADOS DE VIDA: char.dados_vida (a reserva estruturada por
+tipo de dado, introduzida no sub-projeto 3e, reservasDadosVida em site/js/
+regras-multiclasse.js) e DERIVADO do mesmo jeito que char.espacos_magia -- o
+total vem da regra, so 'usados' e estado do jogador -- e tem o MESMO
+mecanismo de risco: um cliente antigo cujo reconciliador de descanso ainda
+escreve so no escalar char.dados_vida_usados (a forma legada) pode apagar a
+reserva estruturada por tipo do mesmo jeito, na mesma janela de rollout. Essa
+exposicao ja tinha sido levantada na revisao do sub-projeto 3e sem virar
+carimbo de schema tambem -- as duas ficam pendentes juntas. Quem pegar este
+item deveria cobrir os dois campos com o mesmo carimbo, nao so espacos de
+magia.
+
+Conferir: site/js/regras-multiclasse-conjuracao.js (migrarEspacosDeMagia),
+site/js/regras-multiclasse.js (reservasDadosVida), site/sw.js, site/js/sync.js,
+site/js/pages/home.js (merge por registro inteiro).
+

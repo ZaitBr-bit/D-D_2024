@@ -42,6 +42,25 @@ async function abrirTudo(page) {
 }
 
 /**
+ * Lê quantos espaços de 1º círculo já foram usados, do personagem salvo.
+ * A forma armazenada virou por FONTE (Tarefa 4, sub-projeto 4): `usados`
+ * mora em `espacos_magia.conjuracao[circulo]` (ou `.pacto`), não mais em
+ * `espacos_magia[circulo].usados`. Mago não tem Magia de Pacto -- a fonte
+ * é sempre 'conjuracao' aqui.
+ *
+ * O "balde" da fonte (`espacos_magia.conjuracao`) precisa EXISTIR para a
+ * leitura contar como bem-sucedida. Dentro dele, a CHAVE DO CÍRCULO
+ * ausente já é o jeito canônico deste sistema de representar "nada gasto
+ * ainda" (mesma degradação que `usadosDe`, sheet/reservas-espacos.js, faz
+ * na leitura de produção -- só grava a chave quando `usados > 0`), então
+ * essa ausência vira `0`, não `null`.
+ */
+async function espacosConjuracaoCirculo1(page) {
+  const conjuracao = (await personagemSalvo(page))?.espacos_magia?.conjuracao;
+  return conjuracao ? (conjuracao['1'] ?? 0) : null;
+}
+
+/**
  * Preenche o formulário de Magia Personalizada com os campos obrigatórios,
  * deixando escola e duração no modo "Personalizado…" para não depender de
  * qual valor o acervo oferece no dropdown.
@@ -146,7 +165,7 @@ test('grimório do Mago: magia personalizada marcada como Ritual mostra o selo R
   // spec CLICA nele. Aqui o clique também prova que o botão do grimório está
   // ligado ao handler certo: o do acervo se guarda com `ehMagiaRitual`, que
   // não conhece magia personalizada, e não faria nada.
-  const antes = (await personagemSalvo(page))?.espacos_magia?.['1']?.usados ?? null;
+  const antes = await espacosConjuracaoCirculo1(page);
   expect(antes, 'o spec precisa ler os espaços de 1º círculo antes de medir o efeito do clique')
     .not.toBeNull();
 
@@ -158,7 +177,7 @@ test('grimório do Mago: magia personalizada marcada como Ritual mostra o selo R
     .toContainText('conjurada como Ritual');
   await assentar(page).catch(() => {});
 
-  expect((await personagemSalvo(page))?.espacos_magia?.['1']?.usados,
+  expect(await espacosConjuracaoCirculo1(page),
     'a versão Ritual NÃO utiliza um espaço de magia (Magias.md:62)')
     .toBe(antes);
 

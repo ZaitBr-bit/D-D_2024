@@ -29,6 +29,15 @@ import { abrirModalMaestrias, tetoMaestrias } from './maestrias.js';
 import { OPCOES_METAMAGIA, conjurarSemEspaco, consumirEspacoMagiaDisponivel, recuperarEspacoMagia } from './magias.js';
 import { normalizarEstiloLuta } from '../talentos-effects.js';
 import { nivelNa, subclasseDe, temClasse } from '../regras-multiclasse.js';
+// gastarEspaco/recuperarUmEspaco/reservasDeEspacos (Tarefa 4, sub-projeto
+// 4, Ruling 11): os quatro pontos deste arquivo que liam/escreviam
+// `char.espacos_magia[circulo]` direto, na forma antiga (Fonte de Magia do
+// Feiticeiro, Resplendor Sagrado do Paladino, Recuperação Arcana do Mago),
+// passam a ler/escrever pelo acessador derivado e pelos escritores
+// autorizados de sheet/reservas-espacos.js. Fonte 'conjuracao' fixa nos
+// quatro -- correto pela regra, não workaround: nenhuma das três classes
+// (Feiticeiro/Paladino/Mago) tem Magia de Pacto.
+import { gastarEspaco, recuperarUmEspaco, reservasDeEspacos } from './reservas-espacos.js';
 import { aplicarEscolhaSubclasse, linhasDaSubclasseNoNivel, opcoesDaLinha } from '../regras-subclasse-escolhas.js';
 
 /**
@@ -844,20 +853,27 @@ export function setupEventosHabilidades() {
       }
 
       if (acao === 'converter-slot-ponto') {
+        // Fonte de Magia (Feiticeiro): converte um espaço PRÓPRIO dele em PF.
+        // Fonte 'conjuracao' fixa -- correto pela regra, não workaround: o
+        // Feiticeiro nunca tem Magia de Pacto (CLASSES_INFO), e mesmo num
+        // multiclasse Bruxo/Feiticeiro a Fonte de Magia só converte espaços
+        // DELE, nunca o Pacto do Bruxo. Tarefa 4 (Ruling 11): antes listava
+        // `Object.keys(char.espacos_magia)`, que na forma nova são
+        // 'conjuracao'/'pacto', não números de círculo.
         abrirModal('Converter Slot em Pontos de Feitiçaria', `
           <div class="form-group">
             <label class="form-label" for="slot-para-pf">Círculo do espaço de magia</label>
             <select class="form-input" id="slot-para-pf">
-              ${Object.keys(char.espacos_magia || {}).map(c => `<option value="${c}">${c}º círculo</option>`).join('')}
+              ${reservasDeEspacos().filter(r => r.fonte === 'conjuracao').map(r => `<option value="${r.circulo}">${r.circulo}º círculo</option>`).join('')}
             </select>
           </div>
         `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-slot-para-pf">Converter</button>');
 
         document.getElementById('btn-slot-para-pf')?.addEventListener('click', () => {
           const c = parseInt(document.getElementById('slot-para-pf')?.value) || 1;
-          const slot = char.espacos_magia?.[c];
+          const reserva = reservasDeEspacos().find(r => r.fonte === 'conjuracao' && r.circulo === c);
           const estAtual = getEstadoRecursosFeiticeiro();
-          if (!slot || (slot.usados || 0) >= (slot.total || 0)) {
+          if (!reserva || reserva.disponiveis <= 0) {
             toast(`Sem espaço de ${c}º círculo disponível.`, 'error');
             return;
           }
@@ -865,7 +881,7 @@ export function setupEventosHabilidades() {
             toast('Conversão excede o máximo de Pontos de Feitiçaria.', 'error');
             return;
           }
-          slot.usados += 1;
+          gastarEspaco(char, 'conjuracao', c);
           recuperarPontosFeiticaria(c);
           salvar();
           window.fecharModal();
@@ -896,12 +912,16 @@ export function setupEventosHabilidades() {
             toast('Pontos de Feitiçaria insuficientes.', 'error');
             return;
           }
-          // Rastrear slots extras separadamente para não serem sobrescritos pelo sync
+          // Rastrear slots extras separadamente para não serem sobrescritos pelo
+          // sync. O total NÃO precisa mais ser reescrito aqui (Tarefa 4, Ruling
+          // 11): montarReservasDeEspacos (sheet/reservas-espacos.js) já soma
+          // espacos_magia_extras[circulo] no total de 'conjuracao' a cada leitura
+          // (Oráculo 6, multiclasse-magias.test.mjs) -- escrever
+          // char.espacos_magia[c].total direto, como o código antigo fazia, além
+          // de redundante, agora LANÇARIA (a forma nova não tem mais chaves de
+          // círculo direto em char.espacos_magia).
           if (!char.espacos_magia_extras) char.espacos_magia_extras = {};
           char.espacos_magia_extras[c] = (char.espacos_magia_extras[c] || 0) + 1;
-          // Atualizar total imediatamente (o sync em renderSheet so roda no carregamento)
-          if (!char.espacos_magia[c]) char.espacos_magia[c] = { total: 0, usados: 0 };
-          char.espacos_magia[c].total += 1;
           salvar();
           window.fecharModal();
           toast(`Espaço de ${c}º círculo criado por ${custo} PF.`, 'success');
@@ -1720,18 +1740,16 @@ export function setupEventosHabilidades() {
 
         case 'devocao_resplendor_restaurar': {
           if (!char.recursos.paladino.subclasses.devocao) char.recursos.paladino.subclasses.devocao = {};
-          // Gastar um espaço de magia de 5º círculo para restaurar.
-          // Os espaços REAIS moram em char.espacos_magia no formato
-          // { circulo: { total, usados } } -- mesma convenção de
-          // levelup.js:950. Não se consulta a tabela da classe aqui: o
-          // custo é um espaço já concedido, não um espaço teórico.
-          if (!char.espacos_magia) char.espacos_magia = {};
-          const slot5 = char.espacos_magia[5] || { total: 0, usados: 0 };
-          if (slot5.usados >= slot5.total) {
+          // Gastar um espaço de magia de 5º círculo para restaurar. Fonte
+          // 'conjuracao' fixa -- correto pela regra: Paladino é conjurador
+          // 'meia' (CLASSES_INFO), nunca tem Magia de Pacto. Não se consulta
+          // a tabela da classe aqui: o custo é um espaço já concedido, não
+          // um espaço teórico. Convertido na Tarefa 4 (Ruling 11): antes
+          // lia/escrevia `char.espacos_magia[5]` direto, na forma antiga.
+          if (!gastarEspaco(char, 'conjuracao', 5)) {
             toast('Sem espaço de magia de 5º círculo disponível.', 'error');
             return;
           }
-          char.espacos_magia[5] = { ...slot5, usados: slot5.usados + 1 };
           char.recursos.paladino.subclasses.devocao.resplendor_sagrado_usado = false;
           toast('Resplendor Sagrado restaurado (1 espaço de 5º círculo gasto).', 'success');
           break;
@@ -1992,13 +2010,16 @@ export function setupEventosHabilidades() {
           toast('Recuperação Arcana já usada hoje.', 'error');
           return;
         }
-        // Abrir modal para escolher quais espaços recuperar
+        // Abrir modal para escolher quais espaços recuperar. Fonte
+        // 'conjuracao' fixa -- correto pela regra: Mago é conjurador
+        // 'pleno' (CLASSES_INFO), nunca tem Magia de Pacto. Convertido na
+        // Tarefa 4 (Ruling 11): antes lia `char.espacos_magia[c]` direto,
+        // na forma antiga.
         const maxCirculo = Math.min(5, estado.recuperacaoArcanaMax);
         let opcoesHtml = '';
         for (let c = 1; c <= maxCirculo; c++) {
-          const slot = char.espacos_magia?.[c];
-          if (!slot) continue;
-          const usados = slot.usados || 0;
+          const reserva = reservasDeEspacos().find(r => r.fonte === 'conjuracao' && r.circulo === c);
+          const usados = reserva?.usados || 0;
           if (usados <= 0) continue;
           opcoesHtml += `
             <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:0.85rem">
@@ -2049,10 +2070,12 @@ export function setupEventosHabilidades() {
             toast(`Total (${total}) excede o máximo (${estado.recuperacaoArcanaMax}).`, 'error');
             return;
           }
-          // Aplicar recuperação
+          // Aplicar recuperação -- fonte 'conjuracao' fixa (mesmo motivo
+          // acima). recuperarUmEspaco (sheet/reservas-espacos.js) só devolve
+          // 1 por chamada -- o jogador escolhe quantos de cada círculo, então
+          // repete a chamada essa quantidade de vezes.
           slots.forEach(s => {
-            const slot = char.espacos_magia?.[s.circulo];
-            if (slot) slot.usados = Math.max(0, (slot.usados || 0) - s.qtd);
+            for (let i = 0; i < s.qtd; i++) recuperarUmEspaco(char, 'conjuracao', s.circulo);
           });
           char.recursos.mago.recuperacao_arcana_usada = true;
           const detalhes = slots.map(s => `${s.qtd}x ${s.circulo}º`).join(', ');

@@ -965,8 +965,32 @@ test('merge de nuvem: _escolherNoMerge devolve a MESMA referência recebida, nun
 // final do sub-projeto 3e. Medido sobre site/js/ inteiro: o alargamento não
 // pega nenhuma linha nova hoje, então ESCRITAS_PERMITIDAS não precisou
 // crescer.
+// Alargamento da Tarefa 3 (sub-projeto 4): espacos_magia e
+// espacos_magia_extras entram na mesma alternancia -- mesmo raciocinio
+// do dado de vida (total armazenado e um segundo lugar dizendo a
+// verdade). Medido sobre site/js/ inteiro: o alargamento acha 9 linhas
+// legadas (criacao/subida de nivel e o reconciliador de render de
+// pages/sheet.js), todas em ESCRITAS_PERMITIDAS abaixo -- ver a lista
+// no relatorio da Tarefa 3.
 const PADRAO_ESPELHO_ATRIBUICAO =
-  /(char|personagem)\.(classe|subclasse|nivel|dados_vida|dados_vida_total|dados_vida_usados)\s*(?:\+\+|--|(?:[-+*/%|&^]|\*\*|<<|>>>?|\?\?|\|\||&&)?=[^=])/;
+  /(char|personagem)\.(classe|subclasse|nivel|dados_vida|dados_vida_total|dados_vida_usados|espacos_magia|espacos_magia_extras)\s*(?:\+\+|--|(?:[-+*/%|&^]|\*\*|<<|>>>?|\?\?|\|\||&&)?=[^=])/;
+// Forma INDEXADA -- "char.espacos_magia[circulo] = ..." ou
+// "char.espacos_magia[circulo].usados = ...": achado da revisão da Tarefa
+// 3 (sub-projeto 4). PADRAO_ESPELHO_ATRIBUICAO só casa atribuição do CAMPO
+// INTEIRO ("campo = valor"); mas para espacos_magia a forma indexada é a
+// NORMAL -- é como todo gasto/recuperação de espaço é escrito hoje
+// (magias.js, bruxo.js, hp-descanso.js, levelup.js, pages/sheet.js) --,
+// não uma exceção rara como seria para dados_vida. Sem este segundo
+// padrão, a asserção do guarda ("ninguém escreve nos espelhos fora do
+// escritor autorizado") era falsa na prática para espacos_magia: depois
+// que as Tarefas 4-7 converterem os pontos hoje declarados em
+// ESCRITAS_PERMITIDAS, uma regressão que reintroduza escrita indexada
+// passaria verde. Restrito à família espacos_magia/espacos_magia_extras
+// -- não há escrita indexada conhecida de classe/subclasse/nivel/dados_vida
+// hoje, e alargar sem um caso real só criaria ruído (mesmo critério do
+// PADRAO_ESPELHO_LITERAL, abaixo).
+const PADRAO_ESPELHO_INDEXADO =
+  /(char|personagem)\.(espacos_magia|espacos_magia_extras)\s*\[[^\]]*\](?:\.\w+)?\s*(?:\+\+|--|[-+*/%]?=[^=])/;
 // Forma de literal de objeto "dados_vida_total: valor" -- só existe hoje em
 // store.js (criarPersonagemVazio), que não usa `char.`/`personagem.` como
 // prefixo por ser um TEMPLATE de personagem novo, não uma mutação de ficha
@@ -976,15 +1000,15 @@ const PADRAO_ESPELHO_ATRIBUICAO =
 const PADRAO_ESPELHO_LITERAL = /^\s*(dados_vida|dados_vida_total|dados_vida_usados):\s*\S/;
 
 function ehEscritaDeEspelho(linha) {
-  return PADRAO_ESPELHO_ATRIBUICAO.test(linha) || PADRAO_ESPELHO_LITERAL.test(linha);
+  return PADRAO_ESPELHO_ATRIBUICAO.test(linha) || PADRAO_ESPELHO_INDEXADO.test(linha) || PADRAO_ESPELHO_LITERAL.test(linha);
 }
 
 const ESCRITAS_PERMITIDAS = new Set([
   'site/js/creator/passo-classe.js:197',  // personagem.subclasse = e.target.value
   'site/js/creator/passo-classe.js:263',  // personagem.subclasse = ''
   'site/js/creator/passo-classe.js:273',  // personagem.classe = nome
-  'site/js/levelup.js:1411',              // personagem.nivel = novoNivel
-  'site/js/levelup.js:1429',              // personagem.subclasse = opcoes.subclasse
+  'site/js/levelup.js:1427',              // personagem.nivel = novoNivel -- número atualizado pela Tarefa 4 (Ruling 15)
+  'site/js/levelup.js:1445',              // personagem.subclasse = opcoes.subclasse -- idem
 
   // Escritores legados da família de dado de vida que SOBRAM depois do
   // sub-projeto 3e: todos do fluxo de CRIAÇÃO e SUBIDA, escopo do
@@ -992,15 +1016,102 @@ const ESCRITAS_PERMITIDAS = new Set([
   // passaram por gastarDadosVida()/restaurarTodosDadosVida(), em
   // regras-multiclasse.js, que está em ARQUIVOS_AUTORIZADOS (abaixo).
   'site/js/creator/wizard.js:441',     // grava dados_vida_total na criação de personagem
-  'site/js/levelup.js:1414',           // grava dados_vida_total na subida de nível
+  'site/js/levelup.js:1430',           // grava dados_vida_total na subida de nível -- número atualizado pela Tarefa 4 (Ruling 15)
   'site/js/store.js:324',  // dados_vida_total: 1  (template de criação)
   'site/js/store.js:325',  // dados_vida_usados: 0 (template de criação)
+
+  // Escritores legados de espacos_magia que sobram depois da Tarefa 3
+  // (sub-projeto 4): a rede de escrita fecha para o GASTO (gastarEspaco/
+  // restaurarEspacosDePacto/restaurarEspacosDeConjuracao, em
+  // sheet/reservas-espacos.js, agora ARQUIVOS_AUTORIZADOS), mas estes
+  // pontos ainda inicializam/zeram o campo direto -- cada um e escopo de
+  // uma tarefa futura do sub-projeto 4, nao desta.
+  'site/js/creator/wizard.js:92',   // personagem.espacos_magia = {} na criação -- sub-projeto 5
+  'site/js/creator/wizard.js:447',  // idem, grava a tabela da classe inicial -- sub-projeto 5
+  'site/js/levelup.js:946',         // garante o campo antes de recalcular na subida -- sub-projeto 5
+  'site/js/levelup.js:1460',        // idem, subida de subclasse conjuradora -- sub-projeto 5 -- número atualizado pela Tarefa 4 (Ruling 15)
+  // levelup.js: recalculo de total/usados na forma antiga apos subida de
+  // nivel (dois blocos, classe base e subclasse conjuradora) -- a Tarefa 4
+  // (Ruling 13/15) mediu que essa ESCRITA ficou VESTIGIAL desde o
+  // sub-projeto 4 (o acessador deriva o total de `armazenado[fonte]
+  // [circulo]`, nunca destas chaves numericas) mas manteve-a de proposito:
+  // classes-progressao.test.mjs e subclasse-conjuradora.test.mjs (16
+  // pontos de assercao) ainda leem essas chaves direto, e reescreve-los
+  // e' risco fora do escopo desta tarefa -- ver o docblock de
+  // atualizarEspacosMagia (levelup.js) e docs/PERGUNTAS-PENDENTES.txt.
+  // O sub-projeto 5, ao converter a subida de nivel inteira, remove estas
+  // seis linhas junto.
+  'site/js/levelup.js:952',  // personagem.espacos_magia[circulo].total = ...
+  'site/js/levelup.js:955',  // personagem.espacos_magia[circulo].usados = ...
+  'site/js/levelup.js:959',  // personagem.espacos_magia[circulo] = espacos[circulo]
+  'site/js/levelup.js:1464', // idem, subclasse conjuradora -- número atualizado pela Tarefa 4 (Ruling 15)
+  'site/js/levelup.js:1466', // idem, subclasse conjuradora -- número atualizado pela Tarefa 4 (Ruling 15)
+  'site/js/levelup.js:1469', // idem, subclasse conjuradora -- número atualizado pela Tarefa 4 (Ruling 15)
+  // pages/sheet.js:100-158 era o reconciliador de render -- a Tarefa 4
+  // removeu-o (deixando migrarEspacosMagia() no lugar, em
+  // sheet/migracoes.js, ARQUIVOS_AUTORIZADOS) e as 9 entradas que
+  // declaravam suas escritas (2 literais, 7 indexadas) saíram daqui: a
+  // lista só encolhe, e escritor que não existe mais não tem o que
+  // declarar.
+  // espacos_magia_extras NÃO TEM escritor autorizado neste sub-projeto --
+  // achado da revisão da Tarefa 3 (Minor 1): rotular estas linhas como
+  // "escopo de tarefa futura" seria enganoso, porque NENHUMA tarefa do
+  // plano as remove. Ficam declaradas como exceção PERMANENTE: os extras
+  // de Fonte de Magia são efêmeros por natureza (concedidos e limpos a
+  // cada Descanso Longo), e nenhuma tarefa do sub-projeto 4 lhes dá um
+  // escritor único.
+  'site/js/sheet/hp-descanso.js:983',       // char.espacos_magia_extras = {} (limpa no Longo) -- número atualizado pela Tarefa 8 (comentários acrescentados acima deslocaram a linha)
+  'site/js/sheet/habilidades.js:923',       // if (!extras) extras = {}  (Fonte de Magia) -- número de linha atualizado pela Tarefa 4 (Ruling 11)
+  'site/js/sheet/habilidades.js:924',       // extras[c] = (extras[c] || 0) + 1  (Fonte de Magia) -- idem
+  // habilidades.js: Resplendor Sagrado (Paladino/Devoção), Fonte de Magia
+  // (Feiticeiro) e Recuperação Arcana (Mago) foram convertidos na Tarefa 4
+  // (Ruling 11 do controlador) para gastarEspaco/recuperarUmEspaco/
+  // reservasDeEspacos, fonte 'conjuracao' fixa (nenhuma das três classes
+  // tem Magia de Pacto) -- as entradas antigas (:1728, :1734, :903, :904)
+  // saíram: a lista só encolhe. A escrita redundante do TOTAL
+  // (`char.espacos_magia[c].total += 1`, antes em :904) foi REMOVIDA, não
+  // convertida -- o total agora é derivado e soma os extras sozinho.
+  // hp-descanso.js: o bloco do Descanso Longo (zerava usados de todos os
+  // círculos, e recalculava "total" marcado "NAO CONVERTIDA DE PROPOSITO")
+  // agora chama restaurarEspacosDeConjuracao(char) + restaurarEspacosDePacto(char)
+  // (Ruling 11 do controlador, Tarefa 4) -- as duas entradas antigas
+  // saíram: a lista só encolhe.
+  // classes/bruxo.js: recuperarEspacosMagiaBruxo agora usa
+  // restaurarEspacosDePacto/recuperarUmEspaco (Ruling 11 do controlador,
+  // Tarefa 4) -- as duas entradas antigas saíram: a lista só encolhe.
+  // magias.js: bolhas de espaço de magia, "Conjurar" de magia preparada e
+  // grimório, e magia personalizada -- a Tarefa 4 converteu TODOS os pontos
+  // de leitura/escrita de char.espacos_magia deste arquivo (Ruling 11 do
+  // controlador: trocar o formato exige que TODOS os leitores virem
+  // juntos, ou a tela fica quebrada e nenhum oráculo cobre -- a primeira
+  // rodada desta tarefa converteu só a caixa de resumo e o checkbox, e a
+  // revisão achou o Critical em :1724, a linha idêntica a :1645 que tinha
+  // sobrado). As entradas antigas (:1648, :1651, :1816) saíram: a lista só
+  // encolhe.
 ]);
 
 // Arquivos autorizados a escrever nos espelhos por desenho.
 const ARQUIVOS_AUTORIZADOS = new Set([
   'site/js/regras-multiclasse.js',
   'site/js/sheet/migracoes.js',
+  // Tarefa 3 (sub-projeto 4): escritor autorizado de espacos_magia em
+  // runtime -- gastarEspaco/restaurarEspacosDePacto/
+  // restaurarEspacosDeConjuracao.
+  //
+  // Nota (achado da revisão da Tarefa 3, Minor 2): estas duas entradas
+  // são hoje INERTES -- nenhuma linha destes dois arquivos bate com
+  // PADRAO_ESPELHO_ATRIBUICAO/PADRAO_ESPELHO_INDEXADO, porque os dois
+  // escrevem sempre por `p.` (o parâmetro da função pura/casca), nunca
+  // por `char.`/`personagem.` (as âncoras dos padrões). Ficam na lista
+  // por DESENHO -- são os escritores autorizados de verdade -- não como
+  // prova de cobertura: a exclusão delas do scan (arquivosJs) é o que
+  // importa aqui, não um match que nunca vai acontecer.
+  'site/js/sheet/reservas-espacos.js',
+  // Tarefa 2 (sub-projeto 4): migrarEspacosDeMagia, o escritor autorizado
+  // da migração de espacos_magia da forma antiga para a forma por fonte
+  // -- roda uma única vez na abertura da ficha, via sheet/migracoes.js.
+  // Mesma nota de inércia acima: escreve por `p.`, não `char.`/`personagem.`.
+  'site/js/regras-multiclasse-conjuracao.js',
 ]);
 
 // Varre recursivamente site/js/ coletando caminhos de arquivo .js,
@@ -1031,9 +1142,12 @@ test('ninguém escreve nos espelhos fora do escritor autorizado', () => {
     });
   }
   assert.deepEqual(achados, [],
-    'escrita direta em espelho de multiclasse (classe/subclasse/nivel) ou em campo de ' +
-    'dado de vida (dados_vida/dados_vida_total/dados_vida_usados); use sincronizarEspelhos() ' +
-    'ou acrescente a linha a ESCRITAS_PERMITIDAS com justificativa');
+    'escrita direta em espelho de multiclasse (classe/subclasse/nivel), em campo de dado ' +
+    'de vida (dados_vida/dados_vida_total/dados_vida_usados) ou em espacos_magia/' +
+    'espacos_magia_extras (forma direta ou indexada); para dado de vida use ' +
+    'sincronizarEspelhos(), para espacos_magia use gastarEspaco()/restaurarEspacosDePacto()/' +
+    'restaurarEspacosDeConjuracao() (sheet/reservas-espacos.js) -- ou acrescente a linha a ' +
+    'ESCRITAS_PERMITIDAS com justificativa');
 });
 
 // A lista de exceções só pode encolher. Se uma entrada deixou de existir

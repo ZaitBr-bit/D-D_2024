@@ -960,8 +960,24 @@ export async function atualizarEspacosMagia(personagem, classeData) {
     }
   });
   
-  // Remover círculos que não existem mais no novo nível (não deveria acontecer)
+  // Remover círculos que não existem mais no novo nível.
+  //
+  // O Bruxo é a única classe cujo círculo de Magia de Pacto MUDA DE
+  // NÚMERO ao subir (nível 1-2 -> 1º, nível 3 -> 2º, nível 5 -> 3º, e
+  // assim por diante -- medido em dados/classes/bruxo.json): sem esta
+  // limpeza o círculo antigo ficaria para trás, e
+  // classes-progressao.test.mjs (que confronta a tabela do livro nível a
+  // nível) acusaria dois círculos onde o Bruxo só tem um. Por isso o laço
+  // fica.
+  //
+  // Mas ele NÃO pode tocar 'conjuracao' e 'pacto': desde o sub-projeto 4
+  // essas duas chaves guardam o GASTO do jogador por FONTE (não são
+  // números de círculo, então `!espacos[circulo]` já as pegava como
+  // "fora da tabela") -- apagá-las apagava o gasto a cada subida de
+  // nível, o mesmo mecanismo do defeito que a Tarefa 4 já tinha corrigido
+  // no Descanso Longo (medido).
   Object.keys(personagem.espacos_magia).forEach(circulo => {
+    if (circulo === 'conjuracao' || circulo === 'pacto') return;
     if (!espacos[circulo]) {
       delete personagem.espacos_magia[circulo];
     }
@@ -1453,8 +1469,17 @@ export async function subirDeNivel(personagem, opcoes = {}) {
         personagem.espacos_magia[circulo] = espacosSubclasse[circulo];
       }
     });
-    // Remover círculos que não existem mais
+    // Remover círculos que não existem mais. Mesmo laço e mesmo motivo de
+    // atualizarEspacosMagia, acima: a progressão de subclasse conjuradora
+    // (Cavaleiro Místico/Trapaceiro Arcano) só ACRESCENTA círculo com o
+    // nível, nunca move um círculo existente -- mas o laço fica de
+    // qualquer forma, por simetria e porque não custa nada mantê-lo.
+    //
+    // Ele NÃO pode tocar 'conjuracao' e 'pacto' -- essas duas chaves
+    // guardam o GASTO do jogador por FONTE (sub-projeto 4); apagá-las
+    // apagava o gasto a cada subida de nível.
     Object.keys(personagem.espacos_magia).forEach(circulo => {
+      if (circulo === 'conjuracao' || circulo === 'pacto') return;
       if (!espacosSubclasse[circulo]) {
         delete personagem.espacos_magia[circulo];
       }

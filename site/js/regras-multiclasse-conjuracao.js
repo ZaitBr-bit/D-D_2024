@@ -4,8 +4,16 @@
 // Funcoes PURAS: recebem o personagem por parametro e nunca leem `char`
 // nem `personagem` como global.
 //
-// Este modulo NAO escreve em char.espacos_magia. Reconciliar os espacos
-// gravados na ficha e do sub-projeto 4.
+// migrarEspacosDeMagia (Tarefa 2) MUTA o `p` recebido -- escreve em
+// `p.espacos_magia` -- mas continua pura no sentido acima: nunca toca
+// `char` global, so o parametro. O ponto de chamada em producao existe
+// desde a Tarefa 4: `site/js/pages/sheet.js:103` chama `migrarEspacosMagia()`
+// (sheet/migracoes.js), que chama esta funcao, ANTES de qualquer leitor de
+// `char.espacos_magia` rodar -- junto das demais migracoes de abertura de
+// ficha. A Tarefa 4 tambem removeu os blocos legados que reescreviam
+// `char.espacos_magia` na forma antiga a cada render; sem essa remocao,
+// ligar a chamada teria apagado o gasto do jogador na primeira abertura de
+// ficha (ver task-2-report.md e task-4-report.md).
 // ============================================================
 import { CLASSES_INFO } from './dados-classes.js';
 import { SUBCLASSES_CONJURADORAS } from './regras-conjuracao-subclasse.js';
@@ -91,12 +99,15 @@ export function nivelConjurador(char) {
  * So os circulos com ao menos um espaco entram, como faz getEspacosMagia
  * -- mas so as CHAVES batem com aquela funcao. O VALOR aqui e um NUMERO
  * puro (a quantidade de espacos), nao `{ total, usados }`: esta funcao so
- * responde "quantos", ela nao inicializa gasto. Todo o resto do app grava
- * espacos de magia no formato `{ [circulo]: { total, usados } }` --
- * utils.js:393-405 (getEspacosMagia), levelup.js:950-966,
- * creator/wizard.js:447 -- e quem for gravar o resultado desta funcao em
- * `char.espacos_magia` precisa converter cada numero para
- * `{ total: numero, usados: 0 }` antes de escrever.
+ * responde "quantos", ela nao inicializa gasto. NINGUEM deve gravar este
+ * resultado em `char.espacos_magia` (Tarefa 4, sub-projeto 4): o campo
+ * guarda so `usados`, por FONTE e circulo (`{conjuracao:{...},pacto:{...}}`)
+ * -- o TOTAL nunca e armazenado, e sempre derivado a cada leitura por
+ * montarReservasDeEspacos (sheet/reservas-espacos.js), que chama esta
+ * funcao de novo quando precisa. `getEspacosMagia` (utils.js) continua
+ * devolvendo `{ total, usados }` -- e' a tabela de UMA classe so, usada por
+ * quem ainda le por classe direto (ex.: criador de personagem) -- mas essa
+ * forma nunca chega a `char.espacos_magia`.
  * @returns {{[circulo: number]: number}|null}
  */
 export function espacosPorCirculo(char) {
@@ -112,4 +123,57 @@ export function espacosPorCirculo(char) {
 export function temMagiaDePacto(char) {
   return classesDe(char).some((c) =>
     CLASSES_INFO[c.classe]?.categoria_conjuracao === 'pacto' && c.nivel >= 1);
+}
+
+/**
+ * Migra os espacos de magia gravados da forma antiga -- `{ [circulo]:
+ * { total, usados } }`, onde o TOTAL era armazenado -- para a forma nova
+ * por FONTE -- `{ conjuracao: {circulo: usados}, pacto: {circulo: usados} }`,
+ * onde so `usados` sobrevive (o total volta a ser DERIVADO da regra a
+ * cada leitura, em montarReservasDeEspacos).
+ *
+ * Para ONDE vai o `usados` antigo: um Bruxo de classe UNICA tem hoje o
+ * PACTO gravado em `espacos_magia` -- bruxo.js documenta esse campo como
+ * "o unico circulo onde ele tem espacos". Qualquer outra combinacao
+ * (nenhuma classe de pacto, ou Bruxo MULTICLASSE) e Conjuracao.
+ *
+ * LIMITACAO CONHECIDA (registrada no ledger, nao consertada aqui): um
+ * Bruxo multiclasse (`classesDe(p).length !== 1`, ex.: Bruxo 5/Mago 5) cai
+ * no ramo 'conjuracao' por inteiro -- inclusive o que era gasto de PACTO
+ * no campo antigo. A DIRECAO da perda e essa: gasto de pacto vira gasto
+ * de conjuracao (nunca o contrario). Julgado defensavel: multiclasse so
+ * existe nesta branch ainda nao mesclada, entao nenhuma ficha armazenada
+ * em producao pode ter chegado a essa combinacao -- toda ficha real que
+ * existir ate aqui tem `classesDe(p).length === 1` depois de
+ * migrarMulticlasse().
+ *
+ * A SATURACAO (usados > total) NAO acontece aqui -- ela e responsabilidade
+ * da leitura (Math.min em montarReservasDeEspacos), pelo mesmo motivo de
+ * reservasDadosVida: saturar na escrita apagaria um gasto que a regra
+ * poderia voltar a acomodar depois (o jogador sobe de nivel e o total
+ * cresce).
+ *
+ * IDEMPOTENTE: a guarda abaixo cobre nao so a forma nova "cheia" mas
+ * tambem `{ conjuracao: {}, pacto: {} }` -- o resultado desta propria
+ * funcao quando o campo antigo estava vazio -- porque um objeto vazio
+ * ainda e TRUTHY em JavaScript. Sem isso, uma segunda passagem leria
+ * `Object.entries` sobre a forma NOVA (chaves 'conjuracao'/'pacto', nao
+ * circulos) e jogaria o gasto fora.
+ *
+ * @param {object} p Personagem, mutado no lugar.
+ * @returns {boolean} true se a ficha foi alterada.
+ */
+export function migrarEspacosDeMagia(p) {
+  if (!p || typeof p !== 'object') return false;
+  const antigo = p.espacos_magia;
+  if (!antigo || typeof antigo !== 'object') return false;
+  if (antigo.conjuracao || antigo.pacto) return false; // ja migrado
+  const fonte = temMagiaDePacto(p) && classesDe(p).length === 1 ? 'pacto' : 'conjuracao';
+  const novo = { conjuracao: {}, pacto: {} };
+  for (const [circulo, valor] of Object.entries(antigo)) {
+    const usados = Number(valor?.usados) || 0;
+    if (usados > 0) novo[fonte][circulo] = usados;
+  }
+  p.espacos_magia = novo;
+  return true;
 }

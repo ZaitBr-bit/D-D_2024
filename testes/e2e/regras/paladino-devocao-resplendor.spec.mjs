@@ -68,13 +68,20 @@ test('Resplendor Sagrado: restaurar gasta um espaço de 5º círculo', async ({ 
     const lista = JSON.parse(localStorage.getItem('dnd_personagens') || '[]');
     const p = lista.find((x) => x.id === 'regras-paladino-resplendor');
     return {
-      usados5: p.espacos_magia?.[5]?.usados ?? null,
+      // A forma armazenada virou por FONTE (Tarefa 4, sub-projeto 4):
+      // `usados` mora em `espacos_magia.conjuracao[circulo]` (ou `.pacto`),
+      // não mais em `espacos_magia[circulo].usados`. Paladino não tem
+      // Magia de Pacto -- a fonte é sempre 'conjuracao' aqui. O seed
+      // acima continua escrevendo a forma ANTIGA de propósito -- é
+      // migrada de verdade pelo caminho real (migrarEspacosDeMagia,
+      // chamado por gastarEspaco) quando o botão gasta o espaço.
+      usados5: p.espacos_magia?.conjuracao?.[5] ?? null,
       chaveFantasma: p.espacos_magia?.['5_usado'] ?? null,
       resplendorUsado: p.recursos?.paladino?.subclasses?.devocao?.resplendor_sagrado_usado ?? null,
     };
   });
 
-  expect(estado.usados5, 'o espaço de 5º círculo tem de ser debitado em espacos_magia[5].usados').toBe(1);
+  expect(estado.usados5, 'o espaço de 5º círculo tem de ser debitado em espacos_magia.conjuracao[5]').toBe(1);
   expect(estado.chaveFantasma, "a chave '5_usado' não pertence ao modelo").toBeNull();
   expect(estado.resplendorUsado, 'o Resplendor Sagrado tem de voltar a estar disponível').toBe(false);
   expect(erros, 'nenhum erro de console durante o clique').toEqual([]);
