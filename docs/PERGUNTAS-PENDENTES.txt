@@ -1844,3 +1844,130 @@ Conferir: site/js/regras-multiclasse-conjuracao.js (migrarEspacosDeMagia),
 site/js/regras-multiclasse.js (reservasDadosVida), site/sw.js, site/js/sync.js,
 site/js/pages/home.js (merge por registro inteiro).
 
+================================================================================
+
+2026-08-26 -- ARREDONDAMENTO DO NIVEL DE CONJURADOR: DECIDIDO, NAO PENDENTE
+
+Registro de DECISAO, nao de duvida em aberto -- fica aqui porque a duvida e
+real e vai voltar para quem ler o livro sem o contexto.
+
+A FRASE AMBIGUA. livro:2107 manda somar "Metade dos seus niveis (arredonde
+para cima) NAS CLASSES Guardiao e Paladino". Ela e paralela a do marcador
+anterior ("Todos os seus niveis nas classes Bardo, Clerigo, Druida, Feiticeiro
+e Mago"), que e inequivocamente uma soma sobre o CONJUNTO -- o que sugere ler
+ceil((Guardiao + Paladino) / 2), uma metade so. A pagina de comunidade
+http://dnd2024.wikidot.com/class:multiclassing traz a mesma construcao em
+ingles ("Half your levels (round up) in the Paladin and Ranger classes") e nao
+desfaz a ambiguidade. O livro tambem nao tras exemplo com DOIS meio-
+conjuradores: o exemplo de livro:2114 tem um so.
+
+A DECISAO: arredonda POR CLASSE, e so entao soma. Regra oficial, nao
+preferencia -- Jeremy Crawford, 18/10/2016: "Multiclass spell slots: when
+dividing the levels of multiple classes, you divide, round down, and then add
+the results together". O 2024 trocou o SENTIDO do arredondamento dos meio-
+conjuradores (para cima), nao a ORDEM das operacoes.
+
+QUANTO MUDA. As duas leituras divergem no par minimo Guardiao 3/Paladino 3:
+por classe 2 + 2 = 4, pela soma ceil(6/2) = 3 -- um espaco de 2o circulo de
+diferenca. No marcador de um terco a diferenca vai na direcao oposta:
+Cavaleiro Mistico 5 + Trapaceiro Arcano 5 da 1 + 1 = 2 por classe contra
+floor(10/3) = 3 pela soma.
+
+POR QUE ISTO PRECISOU DE ENTRADA. A implementacao ja estava certa, mas por
+acidente feliz: NENHUM oraculo distinguia as duas leituras. A varredura de
+132 combinacoes (testes/regras/unidade/multiclasse-motor.test.mjs:40) usa
+nivel 6 nas duas classes, onde 3+3 = ceil(12/2) coincide, e o Oraculo 12 media
+a direcao do arredondamento com UM meio-conjurador so, onde as leituras nunca
+divergem. Trocar o reduce por um agrupamento-por-categoria passava a suite
+inteira em silencio. O Oraculo 12b foi escrito para prender exatamente isso, e
+a mutacao foi aplicada e medida antes de ser revertida.
+
+Conferir: site/js/regras-multiclasse-conjuracao.js (nivelConjurador),
+testes/regras/unidade/multiclasse-motor.test.mjs (Oraculo 12b).
+
+================================================================================
+
+2026-08-26 -- MAGIA PREPARADA NAO SABE DE QUE CLASSE E
+
+Achado Important 2 da revisao de conformidade com o livro
+(docs/superpowers/reviews/2026-08-26-multiclasse-conformidade-regras.md).
+Vao NAO DECLARADO ate esta rodada: nao constava da tabela "O que fica de fora"
+do design do sub-projeto 4.
+
+A REGRA. livro:2075: "Cada magia que voce prepara esta associada a uma de suas
+classes, e voce usa o atributo de conjuracao DESSA CLASSE quando conjura a
+magia."
+
+O QUE FOI CONSERTADO AGORA. A ficha, a impressao e o PDF passaram a mostrar um
+par CD/Ataque POR CLASSE conjuradora (utils.js, conjuracoesPorClasse). Um
+Clerigo 5/Mago 5 mostrava UMA CD, a de Sabedoria, e as magias de Mago saiam
+com ela -- com Sab 16 e Int 10, tres pontos acima do certo em toda conjuracao.
+Agora mostra as duas, nomeadas. O selo de atributo de conjuracao nos Atributos
+tambem passou a marcar todos os atributos envolvidos, nao so o da inicial.
+
+O QUE CONTINUA EM ABERTO. QUAL das entradas vale para uma magia ESPECIFICA. O
+modelo de dados nao guarda a classe de origem: char.magias_preparadas e
+{nome, circulo, origem?, personalizada?} e `origem` distingue dominio /
+sempre-preparada, nao classe (site/js/sheet/magias.js). Ligar magia -> classe
+exige campo novo (magias_preparadas[].classe) e migracao que carimbe a classe
+nas fichas existentes -- e a migracao tem de decidir o que fazer com uma ficha
+multiclasse ja existente, onde a informacao simplesmente nao existe (a escolha
+provavel e carimbar a classe inicial e deixar o jogador corrigir).
+
+Ate la, o jogador le a caixa da classe certa, que e o que uma ficha de papel
+tambem exige dele. O app nao rola salvaguardas nem ataques de magia sozinho,
+entao nao ha ponto onde ele escolha a CD errada por conta propria.
+
+IRMAO DESTE ITEM, mesma causa e mesmo sub-projeto: `tipo_conjuracao`
+("preparadas" x "conhecidas") ainda sai da classe INICIAL em
+site/js/sheet/magias.js:renderSecaoMagias. O livro:2073 manda determinar as
+magias preparadas "por classe individualmente, como se fosse um membro de
+classe unica dessa classe". Um Barbaro 5/Mago 1 cai no ramo "preparadas" por
+omissao -- que por acaso e o certo para o Mago; um Barbaro/Bardo nao teria a
+mesma sorte. Os LIMITES de preparo por classe ja eram escopo declarado do
+sub-projeto 5; este item e a mesma familia.
+
+Conferir: site/js/utils.js (conjuracoesPorClasse, calcCDMagia),
+site/js/sheet/ficha.js, site/js/sheet/impressao.js, site/js/sheet/pdf.js,
+site/js/sheet/magias.js (renderSecaoMagias, magias_preparadas).
+
+================================================================================
+
+2026-08-26 -- CAIXA DE ESPACOS DE MAGIA SOME QUANDO OS DADOS DE CLASSE NAO
+CARREGAM (DEGRADACAO DE RENDER, NAO DE DADO)
+
+Achado Minor 4 da mesma revisao. montarReservasDeEspacos
+(site/js/sheet/reservas-espacos.js) deriva o total da regra a cada leitura; com
+`classesData` vazio ou ainda nao carregado -- promessa em voo, falha de rede,
+cache do service worker frio -- ela devolve LISTA VAZIA e a caixa de espacos
+some da tela. Antes do sub-projeto 4, com o total armazenado no personagem, o
+valor antigo ainda aparecia.
+
+NAO HA PERDA DE DADO: `usados` continua em disco e o proximo render com os
+dados carregados mostra tudo de novo. O que incomoda e o silencio -- o jogador
+ve uma ficha sem espaco nenhum e nao ha aviso na tela nem no console.
+
+NAO CONSERTADO nesta rodada: a correcao honesta e um estado de "carregando" na
+caixa, distinto de "zero espacos", e isso atravessa todas as secoes derivadas
+da ficha, nao so esta. Fica registrado; o docblock de montarReservasDeEspacos
+agora nomeia a degradacao (o de gastarEspaco ja nomeava a mesma causa para o
+lado da ESCRITA).
+
+Conferir: site/js/sheet/reservas-espacos.js (montarReservasDeEspacos,
+gastarEspaco), site/js/sheet/estado.js (definirClassesData).
+
+================================================================================
+
+2026-08-26 -- ARMADILHA DE TRANSCRICAO NO ARQUIVO DO LIVRO
+
+Nao afeta codigo; e aviso para quem transcrever o capitulo de multiclasse
+daqui adiante. A linha 2118 de "Informacoes Separadas/D&D 5.5 - Livro do
+Jogador (2024) 5.3.7.md" --
+
+  "Um personagem com niveis de Bruxo e Paladino pode invocar um juramento de
+   forca e um patrono sobrenatural"
+
+-- e LEGENDA DE IMAGEM, nao regra, e esta no meio do bloco de Magia de Pacto.
+Quem a ler como regra vai procurar uma mecanica que nao existe. Hoje nenhum
+comentario do repositorio a cita.
+

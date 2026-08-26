@@ -1917,3 +1917,116 @@ test('congelamento: as 5 classes de maestria, ÚNICAS, nos 20 níveis (100 combi
   assert.equal(conferidas, 100,
     `a varredura conferiu ${conferidas} combinações, esperava 100`);
 });
+
+// ============================================================
+// LÂMINA SEDENTA / LÂMINA DEVORADORA (achado Minor 3 da revisão de
+// conformidade, 2026-08-26)
+//
+// livro:2063, dentro do capítulo de multiclasse: "a invocação Lâmina
+// Sedenta do Bruxo, que concede a característica Ataque Extra à sua arma
+// de pacto, não oferece ataques adicionais se você também já tiver Ataque
+// Extra". A restrição estava satisfeita POR VACUIDADE: a invocação não
+// entrava em getAtaquesPorAcao, então nunca havia o que não somar. O
+// preço era o caso simples -- um Bruxo 5 de CLASSE ÚNICA com a invocação
+// mostrava 1 ataque em vez de 2. Defeito pré-existente, não introduzido
+// pelo trabalho de multiclasse; entra aqui porque é a mesma função e a
+// mesma regra do livro.
+//
+// Classes.md:1002-1006 (Lâmina Sedenta: Bruxo 5 + Pacto da Lâmina) e
+// Classes.md:996-1000 (Lâmina Devoradora: Bruxo 12, requer Sedenta --
+// "dois ataques extras em vez de um", ou seja 3 no total).
+// ============================================================
+
+/**
+ * Monta o personagem com as invocações indicadas, publica no estado da
+ * ficha e devolve os ataques que getAtaquesPorAcao() calcula de verdade.
+ * @param {Array<{classe: string, nivel: number, subclasse?: string}>} roteiro
+ * @param {string[]} invocacoes Nomes das invocações selecionadas.
+ * @param {boolean} comoTexto Grava as invocações como STRING (forma legada
+ *   de fichas antigas) em vez de `{nome}`.
+ * @returns {Promise<number>} ataques por ação.
+ */
+async function ataquesComInvocacoes(roteiro, invocacoes, comoTexto = false) {
+  const p = await personagemMulticlasse(roteiro);
+  p.recursos = {
+    ...(p.recursos || {}),
+    bruxo: {
+      ...(p.recursos?.bruxo || {}),
+      invocacoes: invocacoes.map((n) => (comoTexto ? n : { nome: n })),
+    },
+  };
+  estadoAtaques.definirChar(p);
+  return sheetCombate.getAtaquesPorAcao();
+}
+
+test('Lâmina Sedenta dá 2 ataques a um Bruxo 5 de classe única', async () => {
+  assert.equal(
+    await ataquesComInvocacoes([{ classe: 'Bruxo', nivel: 5 }],
+      ['Pacto da Lâmina', 'Lâmina Sedenta']), 2,
+    'Bruxo 5 com Lâmina Sedenta ataca duas vezes (Classes.md:1006). O app dava 1.');
+
+  // Sem a invocação, nada muda -- o oráculo não pode estar medindo só "é Bruxo 5".
+  assert.equal(
+    await ataquesComInvocacoes([{ classe: 'Bruxo', nivel: 5 }], ['Pacto da Lâmina']), 1,
+    'Bruxo 5 SEM a invocação continua com 1 ataque');
+
+  // O nível é pré-requisito de verdade: Bruxo 4 com a invocação não conta.
+  assert.equal(
+    await ataquesComInvocacoes([{ classe: 'Bruxo', nivel: 4 }],
+      ['Pacto da Lâmina', 'Lâmina Sedenta']), 1,
+    'Lâmina Sedenta exige Bruxo 5 (Classes.md:1004)');
+
+  // Forma LEGADA: fichas antigas guardam a invocação como string pura, não
+  // como {nome}. bruxo.js normaliza na abertura, mas combate.js não pode
+  // depender dessa ordem.
+  assert.equal(
+    await ataquesComInvocacoes([{ classe: 'Bruxo', nivel: 5 }],
+      ['Pacto da Lâmina', 'Lâmina Sedenta'], true), 2,
+    'a invocação gravada como string (forma legada) também tem de contar');
+});
+
+test('Lâmina Devoradora leva a 3 ataques, e exige Lâmina Sedenta', async () => {
+  assert.equal(
+    await ataquesComInvocacoes([{ classe: 'Bruxo', nivel: 12 }],
+      ['Pacto da Lâmina', 'Lâmina Sedenta', 'Lâmina Devoradora']), 3,
+    'Bruxo 12 com as duas invocações: "dois ataques extras em vez de um" (Classes.md:1000)');
+
+  // Devoradora sozinha não vale nada -- o livro a define como upgrade DA
+  // Sedenta, e o pré-requisito é explícito.
+  assert.equal(
+    await ataquesComInvocacoes([{ classe: 'Bruxo', nivel: 12 }],
+      ['Pacto da Lâmina', 'Lâmina Devoradora']), 1,
+    'Lâmina Devoradora sem Lâmina Sedenta não concede ataque nenhum');
+
+  // Nível de Devoradora: Bruxo 11 com as duas fica em 2, não 3.
+  assert.equal(
+    await ataquesComInvocacoes([{ classe: 'Bruxo', nivel: 11 }],
+      ['Pacto da Lâmina', 'Lâmina Sedenta', 'Lâmina Devoradora']), 2,
+    'Lâmina Devoradora exige Bruxo 12 (Classes.md:998)');
+});
+
+test('Lâmina Sedenta NÃO acumula com Ataque Extra de outra classe', async () => {
+  // A regra do livro:2063 em si. Guerreiro 5 já dá 2; a invocação não pode
+  // somar um terceiro.
+  assert.equal(
+    await ataquesComInvocacoes(
+      [{ classe: 'Bruxo', nivel: 5 }, { classe: 'Guerreiro', nivel: 5, subclasse: 'Campeão' }],
+      ['Pacto da Lâmina', 'Lâmina Sedenta']), 2,
+    'Bruxo 5/Guerreiro 5: as duas fontes dão 2, e 2 é o teto -- nunca 3');
+
+  // E na direção contrária: Lâmina Devoradora (3) prevalece sobre o
+  // Ataque Extra do Guerreiro 5 (2) por Math.max, sem virar 5.
+  assert.equal(
+    await ataquesComInvocacoes(
+      [{ classe: 'Bruxo', nivel: 12 }, { classe: 'Guerreiro', nivel: 5, subclasse: 'Campeão' }],
+      ['Pacto da Lâmina', 'Lâmina Sedenta', 'Lâmina Devoradora']), 3,
+    'a MAIOR fonte manda (3), e as duas não se somam (daria 5)');
+
+  // O nível de Bruxo é o NAQUELA classe, não o total: Bruxo 2/Guerreiro 3
+  // soma 5, mas nenhuma das duas classes chegou ao patamar.
+  assert.equal(
+    await ataquesComInvocacoes(
+      [{ classe: 'Bruxo', nivel: 2 }, { classe: 'Guerreiro', nivel: 3, subclasse: 'Campeão' }],
+      ['Pacto da Lâmina', 'Lâmina Sedenta']), 1,
+    'total 5 não basta: Lâmina Sedenta conta pelo nível DE BRUXO');
+});

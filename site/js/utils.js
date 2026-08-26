@@ -71,7 +71,17 @@ export function calcPVMulticlasse(personagem, modCon) {
   if (!facesIniciais) return 1;
 
   // Nível 1 do PERSONAGEM: dado cheio + modCon, uma vez só.
-  let pv = facesIniciais + modCon;
+  //
+  // O piso de 1 é POR NÍVEL, não sobre o total: livro:1963 manda somar o
+  // ganho de cada nível "(mínimo de 1)" aos PV máximos, então um nível
+  // isolado nunca subtrai. Aplicar o piso só no fim daria número menor
+  // com Constituição muito baixa -- um Feiticeiro 5 com CON 1 (mod −5)
+  // fecharia em 1 em vez de 5. `pvGanhoAoSubir`
+  // (regras-multiclasse-progressao.js) já aplica o piso nos três ramos e
+  // levelup.js:350/:368 também; as três implementações concordam de
+  // propósito, e divergir aqui daria PV diferente conforme o caminho
+  // (recálculo x subida de nível) que produziu a ficha.
+  let pv = Math.max(1, facesIniciais + modCon);
   for (const c of lista) {
     const faces = CLASSES_INFO[c.classe]?.dado_vida;
     if (!faces) continue;
@@ -79,8 +89,11 @@ export function calcPVMulticlasse(personagem, modCon) {
     // A inicial já pagou o 1º nível acima; as demais pagam média em
     // TODOS os seus níveis, inclusive o primeiro (livro:2041).
     const niveisNaMedia = c === inicial ? c.nivel - 1 : c.nivel;
-    pv += niveisNaMedia * (media + modCon);
+    pv += niveisNaMedia * Math.max(1, media + modCon);
   }
+  // Inalcançável desde que o piso passou a ser por nível (todo termo da
+  // soma é >= 1, e o primeiro já saiu de Math.max). Fica como rede: quem
+  // mexer na soma acima não devolve PV negativo por descuido.
   return Math.max(1, pv);
 }
 
@@ -508,6 +521,70 @@ export function calcAtaqueMagia(personagem) {
   const key = ATRIBUTO_NOME_PARA_KEY[atributo];
   const modAttr = calcMod(personagem.atributos[key]);
   return bonusProficiencia(personagem.nivel) + modAttr;
+}
+
+/**
+ * Uma entrada por classe que conjura, cada uma com o SEU atributo de
+ * conjuração, a SUA CD e o SEU bônus de ataque de magia.
+ *
+ * POR QUE EXISTE. O livro:2075 é explícito: "Cada magia que você prepara
+ * está associada a uma de suas classes, e você usa o atributo de
+ * conjuração DESSA CLASSE quando conjura a magia." `calcCDMagia` e
+ * `calcAtaqueMagia` (acima) resolvem UM atributo por personagem, lendo o
+ * espelho `personagem.classe` -- a classe INICIAL. Num Clérigo 5/Mago 5
+ * isso mostra uma CD só, a de Sabedoria, e as magias de Mago saem com
+ * ela: com Sab 16 e Int 10, três pontos acima do certo, em toda
+ * conjuração. Esta função devolve as duas, para a tela mostrar as duas.
+ *
+ * O QUE ELA NÃO RESOLVE. Qual das entradas vale para uma magia
+ * ESPECÍFICA continua indeterminado no modelo de dados:
+ * `char.magias_preparadas` guarda `{nome, circulo, origem?}` e `origem`
+ * distingue domínio/sempre-preparada, não classe. Ligar magia -> classe
+ * exige campo novo (`magias_preparadas[].classe`) e migração que
+ * carimbe as fichas existentes -- sub-projeto próprio, registrado em
+ * docs/PERGUNTAS-PENDENTES.txt. Até lá o jogador lê a caixa da classe
+ * certa, que é o que uma ficha de papel também exige dele.
+ *
+ * Bônus de proficiência é do nível TOTAL nas duas colunas, por regra
+ * (livro:2047) -- o que varia entre as entradas é só o modificador de
+ * atributo, e o +1 de Feitiçaria Inata, que vale apenas nas magias de
+ * Feiticeiro.
+ *
+ * Subclasse conjuradora (Cavaleiro Místico, Trapaceiro Arcano) entra
+ * pelo nível NAQUELA classe, não pelo total: um Mago 5/Guerreiro 2 não
+ * tem conjuração de Cavaleiro Místico, que só começa no 3º nível de
+ * Guerreiro -- ler o total daria conjuração a quem não a tem.
+ *
+ * @param {object} personagem Personagem; lê classes[], nunca os espelhos.
+ * @returns {Array<{classe: string, subclasse: string|null,
+ *   atributo: string, cd: number, ataque: number}>} vazio se não conjura.
+ */
+export function conjuracoesPorClasse(personagem) {
+  const prof = bonusProficiencia(personagem?.nivel);
+  const saida = [];
+  for (const c of classesDe(personagem)) {
+    let atributo = CLASSES_INFO[c.classe]?.atributo_conjuracao || null;
+    if (!atributo && getConjuracaoSubclasse(c.classe, c.subclasse, c.nivel)) {
+      atributo = getAtributoConjuracaoSubclasse(c.classe, c.subclasse);
+    }
+    if (!atributo) continue;
+    const modAttr = calcMod(personagem?.atributos?.[ATRIBUTO_NOME_PARA_KEY[atributo]]);
+    // Feitiçaria Inata sobe a CD em +1 só das magias de FEITICEIRO
+    // (Classes.md, característica de nível 7). Antes isto era
+    // `personagem.classe === 'Feiticeiro'`, o espelho: num
+    // Feiticeiro/Mago o +1 vazava para a CD do Mago, e num
+    // Mago/Feiticeiro não chegava à do Feiticeiro.
+    const inata = c.classe === 'Feiticeiro'
+      && !!personagem?.recursos?.feiticeiro?.feiticaria_inata_ativa;
+    saida.push({
+      classe: c.classe,
+      subclasse: c.subclasse || null,
+      atributo,
+      cd: 8 + prof + modAttr + (inata ? 1 : 0),
+      ataque: prof + modAttr,
+    });
+  }
+  return saida;
 }
 
 /** Calcula Percepção Passiva */

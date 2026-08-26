@@ -8,11 +8,12 @@
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ATRIBUTO_NOME_PARA_KEY, CLASSES_INFO, PERICIAS } from '../dados-classes.js';
 import { XP_POR_NIVEL } from '../levelup.js';
 import { _renderSyncIndicadorHtml } from '../pages/sheet.js';
+import { conjuraPorAlgumaClasse } from '../regras-multiclasse-conjuracao.js';
 import { classesDe, nivelNa, reservasDadosVida, subclasseDe } from '../regras-multiclasse.js';
 import { possuiAlgumaMagia } from '../regras-origens-magia.js';
 import { ehProficienteEmSalvaguarda } from '../regras-salvaguardas.js';
 import { resolverPassivosTalentos } from '../talentos-effects.js';
-import { bonusProficiencia, calcAtaqueMagia, calcBonusPericia, calcCA, calcCDMagia, calcMod, calcPVMulticlasse, coletarCAsAlternativas, equipamentoDeCA, escHtml, escolherCAAlternativa, fmtMod, getDeslocamento, getTamanho, semAcento } from '../utils.js';
+import { bonusProficiencia, calcBonusPericia, calcCA, calcMod, calcPVMulticlasse, coletarCAsAlternativas, conjuracoesPorClasse, equipamentoDeCA, escHtml, escolherCAAlternativa, fmtMod, getDeslocamento, getTamanho, semAcento } from '../utils.js';
 import { renderSecaoCaracteristicas, renderSecaoSubclasse, renderSecaoTracosEspecie } from './caracteristicas.js';
 import { getEstadoFuria, setupEventosSubclasseBarbaro } from './classes/barbaro.js';
 import { getEstadoInspiracaoBardo } from './classes/bardo.js';
@@ -34,7 +35,7 @@ import { ATRIBUTO_ESTILO, char, containerRef, definirPassivosTalentos, especiesC
 import { setupEventosHabilidades } from './habilidades.js';
 import { setupEventosDescanso, setupEventosHP, sincronizarBonusPvAnao, sincronizarBonusPvDraconico, sincronizarBonusPvVigoroso } from './hp-descanso.js';
 import { getEstadoCarga, renderSecaoInventario, setupEventosInventarioSheet } from './inventario.js';
-import { ehSubclasseConjuradora, renderSecaoMagias, setupEventosEspacosMagia } from './magias.js';
+import { renderSecaoMagias, setupEventosEspacosMagia } from './magias.js';
 import { migrarMulticlasse } from './migracoes.js';
 // reservasDeEspacos (Tarefa 4, sub-projeto 4, Ruling 11): o botao de
 // Companheiro Selvagem do Druida (linha ~405) testava
@@ -670,23 +671,35 @@ export function renderFichaCompleta() {
           <div class="stat-value">+${prof}</div>
         </div>
         <!--
-          ehSubclasseConjuradora() entra aqui porque Cavaleiro Místico e
-          Trapaceiro Arcano conjuram por tabela própria: a seção de Magias
-          logo abaixo já os aceitava, e só estas duas caixas perguntavam
-          "info.conjurador", que é falso para Guerreiro e Ladino. O valor
-          exibido depende de calcCDMagia enxergar o atributo da subclasse
-          (utils.js) -- sem isso, isto aqui mostraria "CD Magia 0".
+          Uma caixa de CD e uma de Ataque POR CLASSE que conjura. O
+          livro:2075 manda usar "o atributo de conjuração dessa classe":
+          num Clérigo 5/Mago 5 são DUAS CDs diferentes, e mostrar só a da
+          classe inicial punha a de Sabedoria nas magias de Mago.
+
+          Com UMA classe conjuradora -- toda ficha de classe única -- sai
+          exatamente o HTML de antes, rótulo sem sufixo; o nome da classe
+          só entra quando há mais de uma e os números divergem de verdade.
+
+          conjuracoesPorClasse cobre tudo que "info.conjurador ||
+          ehSubclasseConjuradora()" cobria, Cavaleiro Místico e
+          Trapaceiro Arcano inclusive (que conjuram por tabela própria e
+          por isso davam "CD Magia 0" antes de utils.js enxergar o
+          atributo da subclasse), sem ler o espelho da classe inicial.
         -->
-        ${(info.conjurador || ehSubclasseConjuradora()) ? `
+        ${(() => {
+          const conjuracoes = conjuracoesPorClasse(char);
+          const sufixo = conjuracoes.length > 1;
+          return conjuracoes.map((c) => `
           <div class="stat-box">
-            <div class="stat-label">CD Magia</div>
-            <div class="stat-value">${calcCDMagia(char)}</div>
+            <div class="stat-label">CD Magia${sufixo ? ` (${escHtml(c.classe)})` : ''}</div>
+            <div class="stat-value">${c.cd}</div>
           </div>
           <div class="stat-box">
-            <div class="stat-label">Atq. Magia</div>
-            <div class="stat-value">${fmtMod(calcAtaqueMagia(char))}</div>
+            <div class="stat-label">Atq. Magia${sufixo ? ` (${escHtml(c.classe)})` : ''}</div>
+            <div class="stat-value">${fmtMod(c.ataque)}</div>
           </div>
-        ` : ''}
+        `).join('');
+        })()}
       </div>
 
       <!-- Proficiencias de Armas e Armaduras -->
@@ -810,7 +823,14 @@ export function renderFichaCompleta() {
           const val = char.atributos[key];
           const mod = calcMod(val);
           const isPrimario = info.atributo_primario?.includes(nome);
-          const isConjuracao = info.conjurador && info.atributo_conjuracao === nome;
+          // O selo 🔮 vale para o atributo de conjuração de QUALQUER classe
+          // do personagem (livro:2075), não só o da inicial: num Clérigo/Mago
+          // Sabedoria e Inteligência recebem o selo. Antes lia `info`, o
+          // espelho, e um Bárbaro/Mago não marcava atributo nenhum.
+          // A chamada por atributo (6 por render, cada uma varrendo no
+          // máximo 3 classes) sai mais barata que carregar a lista por fora
+          // do map e é a mudança de menor superfície.
+          const isConjuracao = conjuracoesPorClasse(char).some(c => c.atributo === nome);
           const attrStyle = ATRIBUTO_ESTILO[key] || {};
           return `
             <div class="atributo-box ${isPrimario ? 'destaque' : ''}" style="border-color:${attrStyle.cor || 'var(--border)'}">
@@ -1005,8 +1025,16 @@ export function renderFichaCompleta() {
       As condições de Iniciado em Magia continuam aqui de propósito: elas leem
       a INSTÂNCIA do talento, que existe mesmo antes de as magias entrarem nas
       listas do personagem.
+      O primeiro termo era "info.conjurador || ehSubclasseConjuradora()", e os
+      dois liam o espelho da classe INICIAL: um Bárbaro 5/Mago 1 SEM nenhuma
+      magia registrada dava falso em todos os termos e não via a seção -- que é
+      a única superfície com o botão "+ Magia", então ele ficava sem caminho
+      para registrar a primeira. possuiAlgumaMagia não o salvava justamente por
+      ele ainda não ter magia nenhuma. conjuraPorAlgumaClasse pergunta pelas
+      classes de verdade (regras-multiclasse-conjuracao.js), Magia de Pacto
+      inclusive.
     -->
-    ${(info.conjurador || ehSubclasseConjuradora() || getTruquesExtraEstiloLuta() > 0 || char.iniciado_em_magia?.lista || (char.iniciado_em_magia_instancias?.length > 0) || possuiAlgumaMagia(char)) ? renderSecaoMagias() : ''}
+    ${(conjuraPorAlgumaClasse(char) || getTruquesExtraEstiloLuta() > 0 || char.iniciado_em_magia?.lista || (char.iniciado_em_magia_instancias?.length > 0) || possuiAlgumaMagia(char)) ? renderSecaoMagias() : ''}
 
     <!-- Inventário -->
     ${renderSecaoInventario()}

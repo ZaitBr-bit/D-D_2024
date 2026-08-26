@@ -13,13 +13,85 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.22';
+export const VERSAO_ATUAL = '2.2.23';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.23',
+    data: '2026-08-26',
+    rotulo: 'Conjuração por classe',
+    resumo: 'Revisão das regras de multiclasse contra o livro. A CD e o '
+      + 'bônus de Ataque de Magia passam a ser mostrados por classe — '
+      + 'quem tem duas classes que conjuram tinha um número só, e ele '
+      + 'estava errado para uma delas. A seção de Magias volta a '
+      + 'aparecer para quem conjura por uma classe que não é a primeira.',
+    correcoes: [
+      {
+        grupo: '🔮 CD e Ataque de Magia por classe',
+        itens: [
+          'Cada classe que conjura tem o próprio atributo de conjuração, '
+            + 'e o livro manda usar o da classe DONA da magia. A ficha '
+            + 'mostrava uma CD só, a da primeira classe: um Clérigo '
+            + '5/Mago 5 com Sabedoria 16 e Inteligência 10 exibia CD 15 '
+            + 'para tudo, quando as magias de Mago valem CD 12. Agora '
+            + 'aparecem as duas caixas, cada uma com o nome da classe.',
+          'Quem tem uma classe conjuradora só continua vendo exatamente '
+            + 'o que via: "CD Magia" e "Atq. Magia", sem nome de classe.',
+          'O mesmo vale na impressão e no PDF.',
+          'Nos Atributos, o selo 🔮 passa a marcar o atributo de '
+            + 'conjuração de TODAS as classes do personagem, não só o da '
+            + 'primeira.',
+          'O +1 de CD da Feitiçaria Inata do Feiticeiro agora vale só '
+            + 'nas magias de Feiticeiro. Num Feiticeiro/Mago ele vazava '
+            + 'para as magias de Mago, e num Mago/Feiticeiro não chegava '
+            + 'a nenhuma das duas.',
+        ],
+      },
+      {
+        grupo: '📖 Seção de Magias para quem conjura pela segunda classe',
+        itens: [
+          'A seção de Magias só aparecia se a PRIMEIRA classe do '
+            + 'personagem conjurasse. Um Bárbaro 5/Mago 1 que ainda não '
+            + 'tivesse registrado nenhuma magia não via a seção — e como '
+            + 'é a única tela com o botão "+ Magia", não havia como '
+            + 'registrar a primeira. Agora a seção aparece para quem '
+            + 'conjura por qualquer uma de suas classes, Magia de Pacto '
+            + 'do Bruxo incluída.',
+          'A caixa de CD/Ataque de Magia e as páginas de magia da '
+            + 'impressão sumiam pelo mesmo motivo, e voltam junto.',
+        ],
+      },
+      {
+        grupo: '⚔️ Lâmina Sedenta do Bruxo conta nos ataques',
+        itens: [
+          'A invocação Lâmina Sedenta concede Ataque Extra com a arma de '
+            + 'pacto, mas a ficha não a contava: um Bruxo 5 com a '
+            + 'invocação mostrava 1 ataque em vez de 2. Vale também para '
+            + 'Bruxo de classe única.',
+          'A Lâmina Devoradora (Bruxo 12) leva a 3 ataques, como o livro '
+            + 'descreve.',
+          'Como manda a regra de multiclasse, a Lâmina Sedenta NÃO soma '
+            + 'com o Ataque Extra de outra classe: um Bruxo 5/Guerreiro 5 '
+            + 'tem 2 ataques, não 3.',
+        ],
+      },
+      {
+        grupo: '❤️ Pontos de Vida com Constituição muito baixa',
+        itens: [
+          'O livro garante no mínimo 1 Ponto de Vida POR NÍVEL. O '
+            + 'recálculo aplicava esse mínimo só ao total, então um '
+            + 'personagem de Constituição muito baixa terminava com 1 '
+            + 'Ponto de Vida em vez do que a regra concede — um '
+            + 'Feiticeiro 5 com Constituição 1 dava 1 e passa a dar 5. '
+            + 'Agora o recálculo e a subida de nível concordam.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.22',
     data: '2026-08-25',

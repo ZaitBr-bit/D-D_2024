@@ -94,6 +94,18 @@ function espacosDaUnicaConjuradora(personagem, mapaDados, unica) {
  * Quem mexer nesta funcao ou em migrarEspacosDeMagia depois precisa saber
  * que a forma hibrida e a UNICA excecao.
  *
+ * SEGUNDA DEGRADACAO, DE RENDER (achado da revisao de conformidade,
+ * 2026-08-26): com `mapaDados` vazio ou nao carregado -- a promessa de
+ * dados de classe ainda em voo, ou uma falha de rede -- esta funcao
+ * devolve LISTA VAZIA, e a caixa de espacos de magia simplesmente SOME
+ * da tela. Antes do 4, com o total armazenado, o valor antigo ainda
+ * aparecia. Nao ha perda de dado (o `usados` continua em disco, e o
+ * proximo render com os dados carregados o mostra de novo), mas o
+ * jogador ve uma ficha sem espacos nenhum e nao ha aviso na tela nem no
+ * console. O docblock de gastarEspaco (abaixo) ja registra a mesma causa
+ * para o `false` inesperado da ESCRITA; esta linha registra o lado da
+ * LEITURA, que estava sem registro.
+ *
  * @param {object} personagem
  * @param {Map<string, object>} mapaDados dados por nome de classe.
  * @returns {Array<{fonte:'conjuracao'|'pacto', circulo:number, total:number, usados:number, disponiveis:number}>}

@@ -1562,3 +1562,206 @@ test('descanso curto: Memorizar Magia exige Mago 5, não total 5', async () => {
   }
   assert.deepEqual(divergencias, [], 'Memorizar Magia é Mago 5, não nível total 5');
 });
+
+// ============================================================
+// RODADA DE CONFORMIDADE COM O LIVRO (2026-08-26)
+//
+// Achados Important 2 e 3 da revisão de conformidade
+// (docs/superpowers/reviews/2026-08-26-multiclasse-conformidade-regras.md):
+// o atributo de conjuração era UM por personagem, vindo do espelho da
+// classe INICIAL, e o portão da seção de Magias lia o mesmo espelho.
+// ============================================================
+
+// ORÁCULO 21 -- CD e ataque de magia SAEM DE CADA CLASSE, não da inicial.
+//
+// livro:2075: "Cada magia que você prepara está associada a uma de suas
+// classes, e você usa o atributo de conjuração DESSA CLASSE quando
+// conjura a magia." Num Clérigo/Mago são dois atributos e duas CDs.
+//
+// Os valores são LITERAIS de propósito -- repetir `8 + bonusProficiencia
+// + calcMod` aqui seria reescrever a implementação, não medi-la.
+// personagemMulticlasse fixa Inteligência 15 (+2) e Sabedoria 15 (+2), o
+// que tornaria as duas CDs IGUAIS e o oráculo cego; por isso os atributos
+// são reescritos abaixo para valores que divergem.
+test('CD e ataque de magia: um par por CLASSE conjuradora, não o da inicial', async () => {
+  const { utils } = mods;
+
+  const p = await personagemMulticlasse([
+    { classe: 'Clérigo', nivel: 5 }, { classe: 'Mago', nivel: 5 },
+  ]);
+  // Sab 16 (+3) e Int 10 (+0): três pontos de diferença, exatamente o
+  // erro que a revisão mediu nas magias de Mago de um Clérigo/Mago.
+  p.atributos = { ...p.atributos, sabedoria: 16, inteligencia: 10 };
+  assert.equal(p.classe, 'Clérigo', 'o espelho aponta para Clérigo, a inicial');
+  assert.equal(p.nivel, 10, 'nível total 10 -> bônus de proficiência +4');
+
+  const conj = utils.conjuracoesPorClasse(p);
+  assert.deepEqual(conj.map((c) => c.classe), ['Clérigo', 'Mago'],
+    'as DUAS classes conjuradoras aparecem, na ordem de aquisição');
+  assert.deepEqual(conj.map((c) => c.atributo), ['Sabedoria', 'Inteligência'],
+    'cada entrada traz o atributo DA SUA classe');
+  // 8 + 4 (PB do nível TOTAL 10, livro:2047) + 3 = 15; e 8 + 4 + 0 = 12.
+  assert.deepEqual(conj.map((c) => c.cd), [15, 12],
+    'CD por classe. Ler o espelho daria 15 para as duas, e as magias de ' +
+    'Mago sairiam 3 pontos acima do certo.');
+  assert.deepEqual(conj.map((c) => c.ataque), [7, 4],
+    'ataque de magia por classe: 4 + 3 e 4 + 0');
+
+  // O bônus de proficiência é o do nível TOTAL nas DUAS entradas -- é o
+  // que separa esta regra da de características de classe. Se alguém
+  // trocasse por nivelNa, as CDs cairiam para 8+3+3 e 8+3+0.
+  assert.ok(conj.every((c) => c.cd - 8 - (c.ataque - 4) === 4),
+    'as duas entradas usam o MESMO bônus de proficiência, o do nível total');
+});
+
+// ORÁCULO 22 -- classe inicial não-conjuradora: o beco sem saída.
+//
+// Este é o achado Important 3. Um Bárbaro 5/Mago 1 SEM nenhuma magia
+// registrada dava falso em TODOS os termos do portão -- inclusive em
+// possuiAlgumaMagia, justamente por ainda não ter magia -- e a seção de
+// Magias não era renderizada. Como ela é a única superfície com o botão
+// "+ Magia", não havia caminho nenhum para registrar a primeira.
+test('classe inicial não-conjuradora: a seção de Magias aparece e traz o "+ Magia"', async () => {
+  const { utils, multiclasseConjuracao: mc } = mods;
+
+  const barbaroMago = await personagemMulticlasse([
+    { classe: 'Bárbaro', nivel: 5 }, { classe: 'Mago', nivel: 1 },
+  ]);
+  assert.equal(barbaroMago.classe, 'Bárbaro', 'espelho na classe inicial, não-conjuradora');
+  assert.deepEqual(barbaroMago.magias_preparadas || [], [],
+    'SEM magia registrada -- é esta a combinação que o portão antigo perdia');
+
+  assert.equal(mc.conjuraPorAlgumaClasse(barbaroMago), true,
+    'conjura pelo Mago, ainda que a inicial seja Bárbaro');
+  assert.deepEqual(utils.conjuracoesPorClasse(barbaroMago).map((c) => c.classe), ['Mago'],
+    'uma entrada só: a do Mago');
+
+  const html = await migrarERenderizar(barbaroMago);
+  assert.ok(html.includes('<h2>Magias</h2>'),
+    'a seção de Magias tem de ser renderizada');
+  assert.ok(html.includes('id="btn-add-magia"'),
+    'e com o botão "+ Magia" -- sem ele o personagem não tem como registrar a primeira magia');
+  assert.ok(html.includes('CD Magia'),
+    'a caixa de CD de Magia também some quando o portão lê só o espelho');
+
+  // O contrário continua fechado: quem não conjura por classe nenhuma não
+  // ganha a seção só porque o portão ficou mais largo.
+  const barbaroPuro = await personagemMulticlasse([{ classe: 'Bárbaro', nivel: 5 }]);
+  assert.equal(mc.conjuraPorAlgumaClasse(barbaroPuro), false,
+    'Bárbaro de classe única não conjura -- o portão não pode virar sempre-verdadeiro');
+  assert.deepEqual(utils.conjuracoesPorClasse(barbaroPuro), [],
+    'e não tem CD de magia nenhuma');
+});
+
+// ORÁCULO 23 -- classe única não regride: nem no número, nem no RÓTULO.
+//
+// A troca de calcCDMagia por conjuracoesPorClasse não pode mudar nada
+// para quem tem uma classe só. Duas coisas são medidas: o VALOR (contra
+// calcCDMagia/calcAtaqueMagia, que continuam existindo e que a suíte
+// antiga já prende) e o RÓTULO -- sem sufixo de classe, porque com uma
+// conjuradora só não há o que desambiguar.
+test('classe única: CD/ataque idênticos a calcCDMagia, e rótulo sem nome de classe', async () => {
+  const { utils } = mods;
+  const divergencias = [];
+
+  const conjuradoras = [
+    ['Bardo', ''], ['Clérigo', ''], ['Druida', ''], ['Feiticeiro', ''],
+    ['Mago', ''], ['Guardião', ''], ['Paladino', ''], ['Bruxo', ''],
+    ['Guerreiro', 'Cavaleiro Místico'], ['Ladino', 'Trapaceiro Arcano'],
+  ];
+  for (const [classe, subclasse] of conjuradoras) {
+    const p = await personagemMulticlasse([{ classe, nivel: 5, subclasse }]);
+    const conj = utils.conjuracoesPorClasse(p);
+    if (conj.length !== 1) {
+      divergencias.push(`${classe}: esperava 1 entrada, veio ${conj.length}`);
+      continue;
+    }
+    if (conj[0].cd !== utils.calcCDMagia(p)) {
+      divergencias.push(`${classe}: CD ${conj[0].cd} != calcCDMagia ${utils.calcCDMagia(p)}`);
+    }
+    if (conj[0].ataque !== utils.calcAtaqueMagia(p)) {
+      divergencias.push(`${classe}: ataque ${conj[0].ataque} != calcAtaqueMagia ${utils.calcAtaqueMagia(p)}`);
+    }
+  }
+  assert.deepEqual(divergencias, [],
+    'conjuracoesPorClasse tem de concordar com calcCDMagia em TODA classe única');
+
+  // O rótulo: um Mago sozinho traz "CD Magia" sem parêntese; um
+  // Clérigo/Mago traz "CD Magia (Clérigo)" e "CD Magia (Mago)".
+  const mago = await personagemMulticlasse([{ classe: 'Mago', nivel: 5 }]);
+  const htmlMago = await migrarERenderizar(mago);
+  assert.ok(htmlMago.includes('>CD Magia<'),
+    'classe única: o rótulo continua "CD Magia", sem sufixo');
+  assert.ok(!htmlMago.includes('CD Magia (') ,
+    'classe única não pode ganhar sufixo de classe -- não há o que desambiguar');
+
+  const clerigoMago = await personagemMulticlasse([
+    { classe: 'Clérigo', nivel: 5 }, { classe: 'Mago', nivel: 5 },
+  ]);
+  const htmlDuplo = await migrarERenderizar(clerigoMago);
+  assert.ok(htmlDuplo.includes('CD Magia (Clérigo)') && htmlDuplo.includes('CD Magia (Mago)'),
+    'com duas conjuradoras, cada caixa nomeia a classe');
+  assert.ok(htmlDuplo.includes('Atq. Magia (Clérigo)') && htmlDuplo.includes('Atq. Magia (Mago)'),
+    'o mesmo vale para o ataque de magia');
+});
+
+// ORÁCULO 24 -- subclasse conjuradora entra pelo nível NAQUELA classe.
+//
+// getConjuracaoSubclasse só concede conjuração a partir do 3º nível. O
+// caminho antigo passava `personagem.nivel`, o TOTAL: um Mago 5/Guerreiro
+// 2 tem nível total 7 e ganharia conjuração de Cavaleiro Místico que não
+// possui. Aqui o nível que manda é o de Guerreiro.
+test('Cavaleiro Místico conta pelo nível de Guerreiro, não pelo total', async () => {
+  const { utils } = mods;
+
+  const cedo = await personagemMulticlasse([
+    { classe: 'Mago', nivel: 5 },
+    { classe: 'Guerreiro', nivel: 2, subclasse: 'Cavaleiro Místico' },
+  ]);
+  assert.equal(cedo.nivel, 7, 'total 7 -- é ele que enganaria a leitura antiga');
+  assert.deepEqual(utils.conjuracoesPorClasse(cedo).map((c) => c.classe), ['Mago'],
+    'Guerreiro 2 não conjura: Cavaleiro Místico só a partir do 3º nível DE GUERREIRO');
+
+  const naHora = await personagemMulticlasse([
+    { classe: 'Mago', nivel: 1 },
+    { classe: 'Guerreiro', nivel: 3, subclasse: 'Cavaleiro Místico' },
+  ]);
+  assert.deepEqual(utils.conjuracoesPorClasse(naHora).map((c) => c.classe), ['Mago', 'Guerreiro'],
+    'Guerreiro 3 conjura, mesmo com o total (4) menor que o do caso anterior');
+  assert.equal(utils.conjuracoesPorClasse(naHora)[1].atributo, 'Inteligência',
+    'o atributo do Cavaleiro Místico vem da subclasse');
+});
+
+// ORÁCULO 25 -- Feitiçaria Inata sobe a CD do FEITICEIRO, e só dele.
+//
+// O ramo antigo era `personagem.classe === 'Feiticeiro'`, o espelho: num
+// Feiticeiro/Mago o +1 vazava para a CD do Mago (que não o tem), e num
+// Mago/Feiticeiro não chegava à do Feiticeiro (que o tem). Os dois
+// sentidos são medidos, porque um `if` preso ao espelho erra nos dois.
+test('Feitiçaria Inata: +1 na CD do Feiticeiro, em qualquer ordem de aquisição', async () => {
+  const { utils } = mods;
+
+  for (const roteiro of [
+    [{ classe: 'Feiticeiro', nivel: 7 }, { classe: 'Mago', nivel: 3 }],
+    [{ classe: 'Mago', nivel: 3 }, { classe: 'Feiticeiro', nivel: 7 }],
+  ]) {
+    const p = await personagemMulticlasse(roteiro);
+    // Carisma e Inteligência iguais (15, +2), para o +1 ser a ÚNICA
+    // diferença possível entre as duas CDs.
+    p.atributos = { ...p.atributos, carisma: 15, inteligencia: 15 };
+    const rotulo = roteiro.map((r) => `${r.classe} ${r.nivel}`).join('/');
+
+    const semInata = utils.conjuracoesPorClasse(p);
+    const cdSem = Object.fromEntries(semInata.map((c) => [c.classe, c.cd]));
+    assert.equal(cdSem['Feiticeiro'], cdSem['Mago'],
+      `${rotulo}: com Feitiçaria Inata DESLIGADA as duas CDs têm de ser iguais`);
+
+    p.recursos = { ...(p.recursos || {}), feiticeiro: { feiticaria_inata_ativa: true } };
+    const comInata = utils.conjuracoesPorClasse(p);
+    const cdCom = Object.fromEntries(comInata.map((c) => [c.classe, c.cd]));
+    assert.equal(cdCom['Feiticeiro'], cdSem['Feiticeiro'] + 1,
+      `${rotulo}: a CD do Feiticeiro sobe 1 com Feitiçaria Inata ativa`);
+    assert.equal(cdCom['Mago'], cdSem['Mago'],
+      `${rotulo}: a CD do Mago NÃO pode subir -- Feitiçaria Inata é do Feiticeiro`);
+  }
+});

@@ -230,6 +230,73 @@ test('nivelConjurador respeita a direcao do arredondamento', async () => {
     'Trapaceiro Arcano 8 (floor(8/3)=2) + Mago 1 = 3 -- ceil daria 4');
 });
 
+// ORÁCULO 12b -- a ORDEM das operacoes: arredonda POR CLASSE, depois soma.
+//
+// O Oraculo 12 acima mede a DIRECAO do arredondamento, e mede com UM
+// meio-conjurador so. Com um so, "arredondar cada classe" e "arredondar a
+// soma" dao o mesmo numero SEMPRE -- as duas leituras nunca divergem, e a
+// varredura de 132 combinacoes (linha 40) usa nivel 6 nas duas classes,
+// onde 3+3 = ceil(12/2) tambem coincide. Resultado: antes deste oraculo,
+// trocar o reduce por um agrupamento-por-categoria-antes-de-arredondar
+// passava a suite INTEIRA em silencio, mudando o numero de espacos de
+// magia de qualquer ficha com dois meio-conjuradores.
+//
+// A REGRA. A frase do livro:2107 ("Metade dos seus niveis (arredonde para
+// cima) NAS CLASSES Guardiao e Paladino") e ambigua nas duas linguas --
+// http://dnd2024.wikidot.com/class:multiclassing traz a mesma construcao
+// em ingles. A regra oficial e a leitura POR CLASSE: Jeremy Crawford,
+// 18/10/2016, "Multiclass spell slots: when dividing the levels of
+// multiple classes, you divide, round down, and then add the results
+// together". O 2024 trocou o SENTIDO do arredondamento dos meios (para
+// cima), nao a ORDEM das operacoes.
+//
+// Os valores abaixo sao LITERAIS, nao recalculados com a formula da
+// implementacao -- mesmo cuidado do Oraculo 12.
+test('nivelConjurador arredonda POR CLASSE, nao sobre a soma', async () => {
+  const { multiclasseConjuracao: mc } = await modulosApp();
+
+  // O PAR MINIMO onde as duas leituras divergem. Por classe:
+  // ceil(3/2) + ceil(3/2) = 2 + 2 = 4. Pela soma: ceil(6/2) = 3.
+  const guardiaoPaladino = await personagemMulticlasse([
+    { classe: 'Guardião', nivel: 3 }, { classe: 'Paladino', nivel: 3 },
+  ]);
+  assert.equal(mc.nivelConjurador(guardiaoPaladino), 4,
+    'Guardião 3/Paladino 3 = 2 + 2 = 4. Agrupar por categoria antes de ' +
+    'arredondar daria ceil(6/2) = 3.');
+
+  // E a DIFERENCA tem de aparecer nos espacos de verdade, senao o oraculo
+  // prende so o numero intermediario e nao o que o jogador ve: nivel de
+  // conjurador 4 e a linha [4, 3] da tabela; o nivel 3 seria [4, 2]. Um
+  // espaco de 2o circulo a mais.
+  const espacos = mc.espacosPorCirculo(guardiaoPaladino);
+  assert.equal(espacos[2], 3,
+    'nível de conjurador 4 dá 3 espaços de 2º círculo; o nível 3 daria 2');
+  assert.equal(espacos[3], undefined,
+    'nenhum dos dois níveis dá espaço de 3º círculo -- fixado para o oráculo ' +
+    'não passar a impressão de que a diferença está no 3º');
+
+  // O MESMO na direcao oposta, no marcador de um terco: por classe
+  // floor(5/3) + floor(5/3) = 1 + 1 = 2. Pela soma, floor(10/3) = 3.
+  // Aqui a leitura por soma seria mais GENEROSA -- prova que a diferenca
+  // nao e um vies de arredondamento, e a ordem das operacoes.
+  const doisUmTerco = await personagemMulticlasse([
+    { classe: 'Guerreiro', nivel: 5, subclasse: 'Cavaleiro Místico' },
+    { classe: 'Ladino', nivel: 5, subclasse: 'Trapaceiro Arcano' },
+  ]);
+  assert.equal(mc.nivelConjurador(doisUmTerco), 2,
+    'Cavaleiro Místico 5 + Trapaceiro Arcano 5 = 1 + 1 = 2. Somar antes ' +
+    'daria floor(10/3) = 3.');
+
+  // Tres meio-conjuradores nao existem no livro (so ha dois), entao o caso
+  // de tres nao e testavel; mas UM meio + UM pleno tem de continuar batendo
+  // com o Oraculo 12, para o guarda nao virar uma reescrita disfarcada.
+  const meioMaisPleno = await personagemMulticlasse([
+    { classe: 'Paladino', nivel: 3 }, { classe: 'Feiticeiro', nivel: 3 },
+  ]);
+  assert.equal(mc.nivelConjurador(meioMaisPleno), 5,
+    'Paladino 3 (ceil(3/2)=2) + Feiticeiro 3 (pleno) = 5');
+});
+
 // ORÁCULO 6 -- pre-requisito confere a classe nova E as atuais, nas 132 combinacoes.
 test('pre-requisito confere a classe nova E as atuais, nas 132 combinacoes', async () => {
   const { multiclasseProgressao: mp } = await modulosApp();

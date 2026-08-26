@@ -5,14 +5,15 @@
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, CLASSES_INFO, PERICIAS } from '../dados-classes.js';
 import { getMagiasPorCirculo } from '../db.js';
 import { formatarCarteira, totalEmCobre } from '../moedas.js';
-import { bonusProficiencia, calcAtaqueMagia, calcBonusPericia, calcCA, calcCDMagia, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcMod, calcPercepcaoPassiva, escHtml, fmtMod, getDeslocamento, getTamanho, mdParaHtml, toast } from '../utils.js';
+import { bonusProficiencia, calcBonusPericia, calcCA, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcMod, calcPercepcaoPassiva, conjuracoesPorClasse, escHtml, fmtMod, getDeslocamento, getTamanho, mdParaHtml, toast } from '../utils.js';
 import { SUBTRACOS_ESPECIE, gerarTracoSinteticoEspecie } from './caracteristicas.js';
 import { getEstadoRecursosBruxo } from './classes/bruxo.js';
 import { forcaPrimordialAtiva, getAtaquesPorAcao, getDeslocamentoFinal, getModIniciativa } from './combate.js';
 import { char, classeData, especiesCache, indiceMagiasCache, passivosTalentosCache, talentosCache } from './estado.js';
+import { conjuraPorAlgumaClasse } from '../regras-multiclasse-conjuracao.js';
 import { reservasDadosVida } from '../regras-multiclasse.js';
 import { ehProficienteEmSalvaguarda } from '../regras-salvaguardas.js';
-import { ehSubclasseConjuradora, normalizarMagiaPersonalizada, rotuloOrigemMagia } from './magias.js';
+import { normalizarMagiaPersonalizada, rotuloOrigemMagia } from './magias.js';
 // reservasDeEspacos (Tarefa 4, sub-projeto 4, Ruling 11): a caixa "Espacos
 // de Magia" da impressao lia `char.espacos_magia[circulo]` direto, na
 // forma antiga -- passa a ler pelo acessador derivado.
@@ -242,13 +243,22 @@ export async function gerarHtmlImpressao() {
     <div class="print-stat-box"><div class="print-stat-label">Ataques</div><div class="print-stat-value">${ataquesPorAcao}</div></div>
     <div class="print-stat-box"><div class="print-stat-label">Proficiencia</div><div class="print-stat-value">+${prof}</div></div>
   `;
-  // Mesmo portão da ficha (sheet/ficha.js): conjurador de subclasse
-  // também tem CD e ataque de magia.
-  if (info.conjurador || ehSubclasseConjuradora()) {
-    statsHtml += `
-      <div class="print-stat-box"><div class="print-stat-label">CD Magia</div><div class="print-stat-value">${calcCDMagia(char)}</div></div>
-      <div class="print-stat-box"><div class="print-stat-label">Atq Magia</div><div class="print-stat-value">${fmtMod(calcAtaqueMagia(char))}</div></div>
+  // Mesmo portão da ficha (sheet/ficha.js): uma caixa de CD e uma de Atq
+  // por CLASSE que conjura, porque o atributo de conjuração é o da classe
+  // dona da magia (livro:2075). Conjurador de subclasse (Cavaleiro
+  // Místico, Trapaceiro Arcano) entra por conjuracoesPorClasse. Com uma
+  // classe conjuradora só, o HTML é o mesmo de antes -- o nome da classe
+  // entra no rótulo apenas quando há mais de uma.
+  {
+    const conjuracoes = conjuracoesPorClasse(char);
+    const sufixo = conjuracoes.length > 1;
+    for (const c of conjuracoes) {
+      const rotulo = sufixo ? ` (${escHtml(c.classe)})` : '';
+      statsHtml += `
+      <div class="print-stat-box"><div class="print-stat-label">CD Magia${rotulo}</div><div class="print-stat-value">${c.cd}</div></div>
+      <div class="print-stat-box"><div class="print-stat-label">Atq Magia${rotulo}</div><div class="print-stat-value">${fmtMod(c.ataque)}</div></div>
     `;
+    }
   }
   pag1 += `<div class="print-stats-row">${statsHtml}</div>`;
 
@@ -615,7 +625,11 @@ export async function gerarHtmlImpressao() {
 
   // ===================== PAGINAS DE MAGIAS =====================
   let pagMagias = '';
-  const temMagias = info.conjurador || ehSubclasseConjuradora() || (char.magias_conhecidas?.length > 0) || (char.magias_preparadas?.length > 0) || (char.magias_customizadas?.length > 0);
+  // conjuraPorAlgumaClasse no lugar de `info.conjurador ||
+  // ehSubclasseConjuradora()`: os dois liam o espelho da classe INICIAL e
+  // um Bárbaro 5/Mago 1 sem magia registrada não ganhava as páginas de
+  // magia na impressão -- nem a caixa de espaços, que ele tem por regra.
+  const temMagias = conjuraPorAlgumaClasse(char) || (char.magias_conhecidas?.length > 0) || (char.magias_preparadas?.length > 0) || (char.magias_customizadas?.length > 0);
 
   if (temMagias) {
     // Espacos de magia -- pela reserva derivada (Tarefa 4). Cada FONTE vira

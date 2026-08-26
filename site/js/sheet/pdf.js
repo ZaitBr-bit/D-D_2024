@@ -2,13 +2,12 @@
 // Geracao do PDF da ficha (cartao + blocos de detalhe)
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
-import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, CLASSES_INFO } from '../dados-classes.js';
-import { bonusProficiencia, calcAtaqueMagia, calcBonusPericia, calcCA, calcCDMagia, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcMod, calcPercepcaoPassiva, fmtMod, getDeslocamento, toast } from '../utils.js';
+import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES } from '../dados-classes.js';
+import { bonusProficiencia, calcBonusPericia, calcCA, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcMod, calcPercepcaoPassiva, conjuracoesPorClasse, fmtMod, getDeslocamento, toast } from '../utils.js';
 import { forcaPrimordialAtiva, getDeslocamentoFinal, getModIniciativa } from './combate.js';
 import { char, especiesCache, passivosTalentosCache } from './estado.js';
 import { ehProficienteEmSalvaguarda } from '../regras-salvaguardas.js';
 import { gerarHtmlImpressao } from './impressao.js';
-import { ehSubclasseConjuradora } from './magias.js';
 
 /* ===========================================================================
    GERACAO DE PDF (pdf-lib)
@@ -55,7 +54,11 @@ function _sanitizePdfText(t) {
  * do HTML de impressao (ver _extrairBlocosDetalhe).
  */
 function _montarDadosCartao() {
-  const info = CLASSES_INFO[char.classe] || {};
+  // `const info = CLASSES_INFO[char.classe]` saiu daqui: o unico consumidor
+  // era o portao "info.conjurador" das caixas de CD/Atq de Magia, que passou
+  // a perguntar a conjuracoesPorClasse (abaixo). Sem consumidor, a linha era
+  // so uma leitura do espelho da classe INICIAL esperando para ser usada por
+  // engano -- e com ela saiu o ultimo uso de CLASSES_INFO neste arquivo.
   const prof = bonusProficiencia(char.nivel);
   const ca = calcCA(char, passivosTalentosCache);
   const ini = getModIniciativa();
@@ -72,10 +75,18 @@ function _montarDadosCartao() {
   // pv_temporario, nao pv_temp: mesmo campo morto de impressao.js --
   // sem escritor no repositorio, o PV Temporario nunca entrava no PDF.
   if (char.pv_temporario) stats.push({ label: 'PV Temp', value: `+${char.pv_temporario}` });
-  // Mesmo portão da ficha e da impressão.
-  if (info.conjurador || ehSubclasseConjuradora()) {
-    stats.push({ label: 'CD Magia', value: String(calcCDMagia(char)) });
-    stats.push({ label: 'Atq Magia', value: fmtMod(calcAtaqueMagia(char)) });
+  // Mesmo portão da ficha e da impressão: um par CD/Atq por CLASSE que
+  // conjura (livro:2075). O cartão do PDF tem espaço apertado, então o
+  // nome da classe só entra quando há mais de uma conjuradora -- do
+  // contrário o rótulo fica idêntico ao de antes.
+  {
+    const conjuracoes = conjuracoesPorClasse(char);
+    const sufixo = conjuracoes.length > 1;
+    for (const c of conjuracoes) {
+      const rotulo = sufixo ? ` (${c.classe})` : '';
+      stats.push({ label: `CD Magia${rotulo}`, value: String(c.cd) });
+      stats.push({ label: `Atq Magia${rotulo}`, value: fmtMod(c.ataque) });
+    }
   }
 
   const atributos = ATRIBUTOS_KEYS.map(k => ({

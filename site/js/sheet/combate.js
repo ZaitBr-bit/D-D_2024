@@ -308,6 +308,31 @@ export function getAtaquesPorAcao() {
   if (subclasseDe(char, 'Bardo') === 'Colégio da Bravura'
       && nivelNa(char, 'Bardo') >= 6) ataques = Math.max(ataques, 2);
 
+  // Bruxo: a invocacao Lamina Sedenta (Classes.md:1002-1006, Bruxo 5 +
+  // Pacto da Lamina) concede Ataque Extra a arma de pacto, e Lamina
+  // Devoradora (Classes.md:996-1000, Bruxo 12) sobe esse mesmo Ataque
+  // Extra para DOIS ataques extras -- 3 no total, como a Dois Ataques
+  // Extras do Guerreiro. Math.max, nunca +=: o livro:2063 e explicito
+  // que a Lamina Sedenta "nao oferece ataques adicionais se voce ja
+  // tiver Ataque Extra". A restricao ja era satisfeita por vacuidade
+  // enquanto a invocacao nao entrava aqui; o que faltava era o caso
+  // simples -- um Bruxo 5 de CLASSE UNICA com a invocacao mostrava 1
+  // ataque em vez de 2.
+  //
+  // RESSALVA CONHECIDA, a mesma das outras fontes desta funcao: o numero
+  // vale para a ARMA DE PACTO, e a ficha exibe um so "Ataques" para
+  // qualquer arma. Nao ha campo de "arma equipada e a de pacto?" para
+  // consultar; exibir o teto e o mesmo criterio ja usado para Monge e
+  // Barbaro.
+  const invocacoesBruxo = (char.recursos?.bruxo?.invocacoes || [])
+    .map((i) => (typeof i === 'string' ? i : i?.nome));
+  if (invocacoesBruxo.includes('Lâmina Sedenta') && nivelNa(char, 'Bruxo') >= 5) {
+    ataques = Math.max(ataques, 2);
+    if (invocacoesBruxo.includes('Lâmina Devoradora') && nivelNa(char, 'Bruxo') >= 12) {
+      ataques = Math.max(ataques, 3);
+    }
+  }
+
   return ataques;
 }
 

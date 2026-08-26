@@ -433,8 +433,20 @@ export function badgesMagiaRapidos(nomeMagia) {
 }
 
 export function renderSecaoMagias() {
-  const info = CLASSES_INFO[char.classe];
+  // `|| {}` como em ficha.js:191, que faz a MESMA leitura: sem ele, uma
+  // classe fora do catálogo derrubava o render inteiro no `info.
+  // tipo_conjuracao` da linha seguinte, com TypeError. A inconsistência
+  // entre os dois arquivos ficou alcançável quando o portão da seção
+  // passou a abrir para quem não conjura pela classe INICIAL
+  // (conjuraPorAlgumaClasse, em ficha.js).
+  const info = CLASSES_INFO[char.classe] || {};
   const subConj = getSubclasseConjuradoraConjuracao();
+  // AINDA LÊ A CLASSE INICIAL, de propósito: "preparadas" x "conhecidas" é
+  // por classe (livro:2073, "como se fosse um membro de classe única dessa
+  // classe"), e resolver isso exige o limite de preparo por classe -- o
+  // sub-projeto 5. Um Bárbaro 5/Mago 1 cai no ramo `preparadas` por
+  // omissão, que por acaso é o certo para o Mago; um Bárbaro/Bardo não
+  // teria a mesma sorte. Registrado em docs/PERGUNTAS-PENDENTES.txt.
   const tipoConj = info.tipo_conjuracao || (subConj ? 'conhecidas' : 'preparadas');
   const magiasPersonalizadas = (char.magias_customizadas || []).map((magia, indice) => ({
     ...normalizarMagiaPersonalizada(magia, indice),

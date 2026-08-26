@@ -450,6 +450,14 @@ const UTILS_LEGITIMAS_NIVEL_TOTAL = [
   'if (prof) bonus += bonusProficiencia(personagem.nivel);',
   'if (exp) bonus += bonusProficiencia(personagem.nivel);',
   'bonus += Math.floor(bonusProficiencia(personagem.nivel) / 2);',
+  // conjuracoesPorClasse (rodada de conformidade, 2026-08-26): resolve a CD
+  // e o ataque de magia POR CLASSE conjuradora (livro:2075), mas o Bonus de
+  // Proficiencia continua sendo o do nivel TOTAL nas duas colunas -- e o
+  // mesmo livro:2047 das linhas acima. O que varia entre as entradas e so o
+  // modificador de atributo. Converter esta linha para nivelNa daria PB
+  // menor a cada classe de um multiclasse, que e exatamente o que a regra
+  // proibe.
+  'const prof = bonusProficiencia(personagem?.nivel);',
 ];
 
 const UTILS_ESPELHOS_FORA_DO_ESCOPO_3D = [

@@ -84,6 +84,99 @@ test('PV: classe fora do catálogo não propaga NaN', () => {
   assert.ok(Number.isFinite(pv) && pv >= 1, `esperado número finito >= 1, veio ${pv}`);
 });
 
+// ORÁCULO 3b -- o piso de 1 PV é POR NÍVEL, não sobre o total.
+//
+// Achado Minor 1 da revisão de conformidade (2026-08-26). livro:1963:
+// "Jogue esse dado, adicione seu modificador de Constituição ao resultado
+// e some o total (MÍNIMO DE 1) aos seus Pontos de Vida máximos" -- a
+// frase descreve UM nível, então o piso vale a cada nível. calcPVMulticlasse
+// aplicava `Math.max(1, pv)` só no fim: com Constituição muito baixa, os
+// níveis negativos comiam os positivos e o resultado desabava para 1.
+//
+// Isso NÃO era regressão do multiclasse -- calcPVTotal, o antecessor, não
+// tinha piso nenhum e devolvia número negativo. Mas divergia de
+// pvGanhoAoSubir (regras-multiclasse-progressao.js), que aplica o piso nos
+// três ramos, e de levelup.js:350/:368. Duas fichas com os MESMOS níveis
+// terminavam com PV diferente conforme o caminho que as produziu.
+//
+// Constituição 1 (mod −5) é o caso extremo legal: o valor mínimo que a
+// ficha aceita. Os literais abaixo saem da regra, não da implementação.
+test('PV: o piso de 1 vale por nível, e concorda com pvGanhoAoSubir', () => {
+  // Feiticeiro 5, d6, CON 1 (mod −5).
+  //   nível 1: max(1, 6 − 5) = 1
+  //   níveis 2-5: max(1, 4 − 5) = 1 cada  -> 4
+  // Total 5. Com o piso só no fim: 1 + 4×(−1) = −3 -> 1.
+  const feiticeiro = { classes: [{ classe: 'Feiticeiro', nivel: 5, ordem: 0 }] };
+  assert.equal(utils.calcPVMulticlasse(feiticeiro, -5), 5,
+    'Feiticeiro 5 com CON 1 tem 5 PV (1 por nível), não 1');
+
+  // Multiclasse, dados diferentes: Mago 3 (d6) / Bárbaro 2 (d12), CON 1.
+  //   nível 1 (Mago): max(1, 6 − 5) = 1
+  //   Mago 2-3:       max(1, 4 − 5) = 1 cada -> 2
+  //   Bárbaro 1-2:    max(1, 7 − 5) = 2 cada -> 4
+  // Total 7. Com o piso só no fim: 1 − 2 + 4 = 3.
+  const magoBarbaro = {
+    classes: [
+      { classe: 'Mago', nivel: 3, ordem: 0 },
+      { classe: 'Bárbaro', nivel: 2, ordem: 1 },
+    ],
+  };
+  assert.equal(utils.calcPVMulticlasse(magoBarbaro, -5), 7,
+    'o piso é aplicado por nível em CADA classe, não uma vez no total');
+
+  // Constituição normal não pode mudar: o piso não é para inflar ninguém.
+  // Mago 3/Bárbaro 2 com mod +2 -> 8 + 2×6 + 2×9 = 8 + 12 + 18... conferido
+  // pela referência do harness, não recalculado aqui.
+  const normal = { classes: magoBarbaro.classes };
+  assert.equal(utils.calcPVMulticlasse(normal, 2), 8 + 2 * 6 + 2 * 9,
+    'com CON 14 o resultado é o de sempre -- nenhum termo chega ao piso');
+});
+
+// ORÁCULO 3c -- calcPVMulticlasse concorda com a soma de pvGanhoAoSubir.
+//
+// As duas funções respondem à MESMA pergunta por caminhos diferentes:
+// calcPVMulticlasse recalcula uma ficha pronta de uma vez; pvGanhoAoSubir
+// entrega o ganho de UM nível durante a subida. Divergir entre elas
+// significa que o PV de um personagem depende de como ele foi criado --
+// e a divergência real (o piso) só aparecia com Constituição baixa, que
+// nenhum oráculo exercitava.
+test('PV: recálculo de uma vez == soma nível a nível, inclusive com CON baixa', () => {
+  const { multiclasseProgressao: mp } = mods;
+  const divergencias = [];
+
+  const roteiros = [
+    [['Mago', 3], ['Bárbaro', 2]],
+    [['Bárbaro', 5], ['Mago', 5]],
+    [['Clérigo', 1], ['Guerreiro', 1], ['Ladino', 1]],
+    [['Feiticeiro', 5]],
+  ];
+  // 1 (mod −5) é o extremo; 8 (−1) ainda produz níveis negativos em d6;
+  // 14 (+2) é o caso comum, onde nada muda.
+  for (const constituicao of [1, 8, 14]) {
+    for (const roteiro of roteiros) {
+      // Sobe nível a nível com o escritor real, acumulando o ganho.
+      const emConstrucao = { atributos: { constituicao }, classes: [] };
+      let somaPorNivel = 0;
+      for (const [classe, niveis] of roteiro) {
+        for (let i = 0; i < niveis; i++) {
+          somaPorNivel += mp.pvGanhoAoSubir(emConstrucao, classe);
+          const existente = emConstrucao.classes.find((c) => c.classe === classe);
+          if (existente) existente.nivel += 1;
+          else emConstrucao.classes.push({ classe, nivel: 1, ordem: emConstrucao.classes.length });
+        }
+      }
+      const deUmaVez = utils.calcPVMulticlasse(
+        { classes: emConstrucao.classes }, Math.floor((constituicao - 10) / 2));
+      if (deUmaVez !== somaPorNivel) {
+        const rotulo = roteiro.map(([c, n]) => `${c} ${n}`).join('/');
+        divergencias.push(`CON ${constituicao} ${rotulo}: de uma vez ${deUmaVez}, nível a nível ${somaPorNivel}`);
+      }
+    }
+  }
+  assert.deepEqual(divergencias, [],
+    'os dois caminhos de PV têm de dar o mesmo número em qualquer Constituição');
+});
+
 // ORÁCULO 4 -- as reservas batem com o exemplo LITERAL do livro.
 //
 // Os dois exemplos de livro:2043, um de cada lado da regra: Guerreiro

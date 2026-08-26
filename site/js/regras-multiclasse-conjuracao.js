@@ -79,6 +79,21 @@ export function usaTabelaUnificada(char) {
  * Nivel de conjurador combinado (livro:2104-2110): nivel inteiro dos
  * plenos, metade ARREDONDADA PARA CIMA dos meios, e um terco arredondado
  * para baixo dos de subclasse.
+ *
+ * ARREDONDA POR CLASSE, NAO SOBRE A SOMA -- decisao registrada, nao
+ * acidente. A frase do livro ("Metade dos seus niveis (arredonde para
+ * cima) NAS CLASSES Guardiao e Paladino") e ambigua em portugues e em
+ * ingles: da para ler como ceil((Guardiao + Paladino) / 2), uma metade
+ * so. A regra oficial e a leitura POR CLASSE -- Jeremy Crawford,
+ * 18/10/2016: "Multiclass spell slots: when dividing the levels of
+ * multiple classes, you divide, round down, and then add the results
+ * together". O 2024 trocou o sentido do arredondamento dos meios (para
+ * cima), nao a ordem das operacoes: divide-se, arredonda-se e SO ENTAO
+ * se soma. As duas leituras divergem no par minimo Guardiao 3/Paladino
+ * 3 (por classe = 2 + 2 = 4; pela soma = ceil(6/2) = 3), preso pelo
+ * Oraculo 12b de testes/regras/unidade/multiclasse-motor.test.mjs --
+ * antes dele NENHUM oraculo distinguia as duas leituras.
+ *
  * @returns {number} 0 quando a tabela unificada nao se aplica.
  */
 export function nivelConjurador(char) {
@@ -123,6 +138,29 @@ export function espacosPorCirculo(char) {
 export function temMagiaDePacto(char) {
   return classesDe(char).some((c) =>
     CLASSES_INFO[c.classe]?.categoria_conjuracao === 'pacto' && c.nivel >= 1);
+}
+
+/**
+ * True quando o personagem conjura por ALGUMA de suas classes -- a
+ * caracteristica Conjuracao de qualquer uma delas (inclusive as de
+ * subclasse, Cavaleiro Mistico e Trapaceiro Arcano) ou a Magia de Pacto
+ * do Bruxo.
+ *
+ * E o PORTAO DE TELA, nao um calculo de regra: quem decide "esta ficha
+ * mostra a secao de Magias / a caixa de CD de Magia?" pergunta aqui.
+ * Existe porque os portoes liam `CLASSES_INFO[char.classe].conjurador`
+ * -- o espelho da classe INICIAL. Um Barbaro 5/Mago 1 dava falso e nao
+ * via a secao de Magias; como ela e a UNICA superficie da ficha com o
+ * botao "+ Magia", o personagem ficava sem caminho nenhum para
+ * registrar a primeira magia, mesmo com montarReservasDeEspacos ja lhe
+ * concedendo os espacos corretos. Beco sem saida, nao so numero errado.
+ *
+ * Deliberadamente mais LARGO que nivelConjurador: aqui o Bruxo entra
+ * (tem magias e CD, so nao entra na tabela unificada) e nao ha piso de
+ * duas classes -- classe unica tambem conjura.
+ */
+export function conjuraPorAlgumaClasse(char) {
+  return classesConjuradoras(char).length > 0 || temMagiaDePacto(char);
 }
 
 /**
