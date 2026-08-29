@@ -1,4 +1,5 @@
 import { bonusProficiencia } from './utils.js';
+import { nivelTotal } from './regras-multiclasse.js';
 
 export const PERICIAS_TODAS = [
   'Acrobacia', 'Arcanismo', 'Atletismo', 'Atuação', 'Enganação', 'Furtividade',
@@ -288,7 +289,20 @@ function resultadoInvalido(erro) {
   return { valido: false, erro };
 }
 
-export function validarEscolhasTalento(char, nome, escolhas = {}) {
+// `nivelNovo` (opcional): o nivel EM QUE O TALENTO E ADQUIRIDO -- default
+// `char.nivel || 1` preserva o comportamento de sempre para os chamadores
+// onde o nivel atual JA e o nivel de aquisicao (ficha, criacao, testes).
+// So o assistente de subida (levelup.js/levelup-validations.js) precisa
+// passar explicitamente o nivel TOTAL NOVO: ali `char.nivel` ainda e o
+// ANTERIOR ate `sincronizarEspelhos` rodar (bem depois desta validacao,
+// dentro de subirDeNivel), entao usa-lo sub-contaria toda vez que a
+// subida cruzasse um patamar de Bonus de Proficiencia -- inalcancavel em
+// classe unica (os niveis de ASI nunca cruzam um patamar), mas alcancavel
+// em multiclasse (ASI e por nivel DE CLASSE, o nivel TOTAL pode saltar um
+// patamar). Mesma ideia que `sheet/talentos.js` ja usa para `ctx.nivelNovo`
+// em `bindEscolhasTalento` (levelup-ui.js): quem monta o contexto decide o
+// nivel certo, esta funcao nao adivinha.
+export function validarEscolhasTalento(char, nome, escolhas = {}, nivelNovo = char.nivel || 1) {
   const regraTalento = getRegraTalento(nome);
   if (!regraTalento) return { valido: true };
   const iniciado = escolhas.iniciado_em_magia || escolhas.iniciadoEmMagia;
@@ -346,7 +360,11 @@ export function validarEscolhasTalento(char, nome, escolhas = {}) {
 
   if (nome === 'Conjurador Ritualista') {
     const rituais = escolhas.rituais || escolhas.selecoes || [];
-    const quantidade = bonusProficiencia(char.nivel || 1);
+    // Quantidade = Bonus de Proficiencia do nivel de AQUISICAO do talento
+    // (`nivelNovo`, ver comentario no topo da funcao) -- NUNCA
+    // `char.nivel` direto, que durante uma subida de nivel multiclasse
+    // ainda e o nivel ANTERIOR.
+    const quantidade = bonusProficiencia(nivelNovo);
     if (!Array.isArray(rituais) || rituais.length !== quantidade ||
         new Set(rituais).size !== quantidade || rituais.some(item => !item)) {
       return resultadoInvalido(`Escolha exatamente ${quantidade} magias rituais distintas de 1º círculo.`);
@@ -741,4 +759,91 @@ export function restaurarRecursosTalentos(char, tipoDescanso) {
   if (tipoDescanso === 'curto' || tipoDescanso === 'longo') {
     if (recursos.dadiva_destino) recursos.dadiva_destino.usado = false;
   }
+}
+
+/**
+ * Mede o crescimento pendente do beneficio "Magias Rituais" do talento
+ * Conjurador Ritualista (Talentos.md:370): "Sempre que seu Bonus de
+ * Proficiencia aumentar depois disso, voce pode adicionar uma magia de
+ * 1o circulo com o marcador Ritual".
+ *
+ * E medido como INVARIANTE, nao como reacao ao evento de subida: a
+ * quantidade de magias rituais do talento tem de ser igual ao Bonus de
+ * Proficiencia do nivel TOTAL (livro:2047). Um invariante conserta
+ * tambem as fichas que ja cruzaram o patamar sem ganhar a magia -- que
+ * hoje sao todas, porque o crescimento nunca existiu. Uma reacao ao
+ * evento so valeria para subidas futuras, e quem ja e nivel 9 ficaria
+ * preso em 2 magias para sempre, sem nenhum sinal na tela.
+ *
+ * ATE ONDE ISSO VAI, sem exagerar a promessa: esta funcao so e CHAMADA
+ * dentro de uma subida de nivel (levelup.js e levelup-flow.js), entao a
+ * ficha que nao volta a subir -- um nivel 20, por exemplo -- nunca paga a
+ * divida acumulada. Registrado como pergunta aberta em
+ * docs/PERGUNTAS-PENDENTES.txt ("A DIVIDA DE MAGIAS RITUAIS DO CONJURADOR
+ * RITUALISTA SO E MEDIDA DENTRO DE UMA SUBIDA DE NIVEL"): expor a divida
+ * fora da subida e decisao de produto, nao conserto de defeito.
+ *
+ * NAO ESCREVE NADA. Quem grava e levelup.js.
+ *
+ * @param {object} char Personagem.
+ * @param {number} [nivelTotalNovo] Nivel TOTAL a considerar. Durante uma
+ *   subida passe o nivel NOVO: `char.nivel` ainda e o ANTERIOR ate
+ *   `sincronizarEspelhos` rodar, no fim de `subirDeNivel`. Fora de uma
+ *   subida, omitir usa o nivel total corrente.
+ * @returns {{temTalento: boolean, deve: number, tem: number,
+ *   faltam: number, jaEscolhidas: string[], nomesPreparados: string[]}}
+ *   `jaEscolhidas` sao SO as do talento (a contagem do invariante);
+ *   `nomesPreparados` sao TODAS as magias preparadas da ficha, de
+ *   qualquer origem -- ver o comentario dentro da funcao.
+ */
+export function ritualBonusPendente(char, nivelTotalNovo = undefined) {
+  const temTalento = (char?.talentos || []).some((item) =>
+    (typeof item === 'string' ? item : item?.nome) === 'Conjurador Ritualista');
+  if (!temTalento) {
+    return {
+      temTalento: false, deve: 0, tem: 0, faltam: 0,
+      jaEscolhidas: [], nomesPreparados: [],
+    };
+  }
+
+  const jaEscolhidas = (char?.magias_preparadas || [])
+    .filter((m) => m?.origem === 'conjurador_ritualista')
+    .map((m) => m.nome);
+
+  // TODAS as magias preparadas, de QUALQUER origem (inclusive as do
+  // proprio talento -- `jaEscolhidas` e um subconjunto deste). Quem
+  // escolhe a magia do crescimento (tela e motor) tem de recusar um nome
+  // que ja esteja preparado por outra via -- preparacao normal de
+  // Mago/Clerigo/Druida, magia de dominio, Tocado Pelas Sombras --,
+  // porque a gravacao deduplica por `nome` + `origem` e empurraria uma
+  // SEGUNDA entrada com o mesmo nome (achado Important 1 da revisao
+  // final). O estrago da entrada duplicada, num caminho SEM DESFAZER:
+  // a magia aparece duas vezes na ficha, a entrada antiga continua
+  // gastando uma vaga de preparacao que o talento daria de graca,
+  // "despreparar" (sheet/magias.js) filtra POR NOME e apaga as duas de
+  // uma vez, e a troca de magias do assistente (levelup-ui.js) casa por
+  // `nome` e pode remover justo a entrada do talento.
+  //
+  // Deduplicar por nome AQUI (em vez de na gravacao) seria o remendo
+  // errado: por `nome` apenas, escolher uma magia ja preparada por outra
+  // origem nao gravaria nada, `tem` nao subiria e a pendencia voltaria em
+  // TODA subida seguinte, para sempre.
+  const nomesPreparados = (char?.magias_preparadas || [])
+    .map((m) => m?.nome)
+    .filter((nome) => typeof nome === 'string' && nome);
+
+  const nivel = Number.isFinite(nivelTotalNovo) ? nivelTotalNovo : nivelTotal(char);
+  const deve = bonusProficiencia(nivel);
+  const tem = jaEscolhidas.length;
+  return {
+    temTalento: true,
+    deve,
+    tem,
+    // Nunca negativo: uma ficha com magias A MAIS (importada, editada a
+    // mao) nao pode virar pendencia -- nao ha o que escolher, e tirar
+    // magia do jogador nao e o que o talento manda.
+    faltam: Math.max(0, deve - tem),
+    jaEscolhidas,
+    nomesPreparados,
+  };
 }

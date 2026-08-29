@@ -421,19 +421,28 @@ export function migrarParaMulticlasse(p) {
   if (!p || typeof p !== 'object') return false;
 
   if (Array.isArray(p.classes) && p.classes.length) {
-    // Já está no formato novo. Mas enquanto o app for de classe única, o
-    // fluxo normal de subida (levelup.js:1411 e :1429) escreve SÓ nos
-    // espelhos (p.nivel, p.subclasse) -- classes[] nunca é tocado. Sem
-    // reconciliar aqui, uma ficha migrada uma vez apodrece a cada subida
-    // seguinte: os espelhos avançam e classes[0] fica parado no valor da
-    // migração. Reconcilia ANTES do retorno antecipado por schema_versao,
-    // porque com o carimbo já presente o retorno cedo é exatamente o que
-    // impedia a divergência de ser corrigida.
-    // Com DUAS OU MAIS classes, p.nivel é a SOMA de todas -- não há como
-    // saber qual classe subiu a partir do espelho, então classes[] é que
-    // manda e esta reconciliação não roda. (Esta linha vira no-op no
-    // sub-projeto 5, quando o fluxo de subida passar a escrever em
-    // classes[] diretamente também no caso multiclasse.)
+    // Já está no formato novo.
+    //
+    // ATUALIZADO NO SUB-PROJETO 5 (Tarefa 3a+3b): esta reconciliação nasceu
+    // porque o fluxo de subida escrevia SÓ nos espelhos (p.nivel,
+    // p.subclasse) e nunca tocava classes[] -- então uma ficha migrada uma
+    // vez apodrecia a cada subida seguinte, com os espelhos avançando e
+    // classes[0] parado no valor da migração. Aquele defeito ACABOU:
+    // `subirDeNivel` agora grava em classes[] e chama sincronizarEspelhos(),
+    // que deriva os espelhos daí. As duas linhas que o comentário antigo
+    // citava (levelup.js:1411 e :1429) não existem mais.
+    //
+    // A reconciliação FICA, e não por inércia: ela ainda é o que conserta
+    // as fichas de classe única gravadas ANTES do sub-projeto 5, que estão
+    // no disco de quem já usava o app com classes[] congelado no nível da
+    // migração. É uma migração de dado legado, não um remendo de um
+    // escritor divergente -- e por isso continua tendo de rodar ANTES do
+    // retorno antecipado por schema_versao (com o carimbo já presente, o
+    // retorno cedo é justamente o que impedia a correção de acontecer).
+    //
+    // Com DUAS OU MAIS classes ela não roda: p.nivel é a SOMA de todas, e
+    // não há como saber pelo espelho qual classe subiu -- ali classes[] é
+    // que manda, sempre.
     let divergiu = false;
     // Ausência de espelho não é divergência -- é ausência de informação.
     // Alcançável desde que _validarPersonagem passou a aceitar classes[]

@@ -85,3 +85,61 @@ export function pvGanhoAoSubir(char, nomeClasse, opcoes = {}) {
   }
   return Math.max(1, Math.floor(faces / 2) + 1 + modCon);
 }
+
+/**
+ * Reune, num objeto so, tudo que a subida de um nivel precisa saber -- e,
+ * acima de tudo, SEPARA OS DOIS NIVEIS que hoje sao a mesma variavel.
+ *
+ * POR QUE EXISTE. Em classe unica, "nivel na classe" e "nivel total" sao o
+ * mesmo numero, e `subirDeNivel` usa um so (`novoNivel`) para as duas
+ * coisas -- 40 vezes. Em multiclasse eles divergem, e o simbolo continua o
+ * mesmo: nenhum guarda estatico enxerga a troca de significado. Nomear os
+ * dois campos separadamente obriga cada chamador a dizer qual quer.
+ *
+ * QUAL E QUAL. Nivel NA CLASSE manda em tudo que a classe concede naquele
+ * patamar dela: caracteristicas, subclasse no 3o, Aumento no Valor de
+ * Atributo e Dadiva Epica (os dois estao na TABELA DE CLASSE do livro,
+ * Classes.md:49/53/57/61), estilo de luta, manobras, expertise, grimorio,
+ * e o dado de PV. Nivel TOTAL manda no teto de 20, no XP (livro:2037), no
+ * Bonus de Proficiencia (livro:2047) e nas caracteristicas de ESPECIE,
+ * cujo proprio texto diz "No nivel 5 DO PERSONAGEM" (Especies.md:106).
+ *
+ * OS DOIS "PRIMEIRO NIVEL" SAO CAMPOS DIFERENTES DE PROPOSITO.
+ * `ehPrimeiroNivelNaClasse` decide proficiencias reduzidas (livro:2051,
+ * sub-projeto proprio); `ehPrimeiroNivelDoPersonagem` decide o dado CHEIO
+ * de PV (livro:2041). Num personagem de nivel 1 os dois valem; no 1o nivel
+ * de uma SEGUNDA classe, so o primeiro. Confundi-los da PV errado.
+ *
+ * NAO ESCREVE NADA. Recebe o personagem por parametro, nunca le global.
+ * Classe fora do catalogo falha FECHADA (`permitido: false`, `dadoVida: 0`),
+ * como `podeEntrarEm` e `pvGanhoAoSubir` ja fazem.
+ *
+ * @param {object} personagem Estado ANTES da subida.
+ * @param {string} nomeClasse Classe em que o nivel entra.
+ * @returns {{classe: string, subclasse: string,
+ *   nivelNaClasseAnterior: number, nivelNaClasseNovo: number,
+ *   nivelTotalAnterior: number, nivelTotalNovo: number,
+ *   ehPrimeiroNivelNaClasse: boolean, ehPrimeiroNivelDoPersonagem: boolean,
+ *   dadoVida: number, permitido: boolean, faltando: Array}}
+ */
+export function contextoDeSubida(personagem, nomeClasse) {
+  const entrada = classesDe(personagem).find((c) => c.classe === nomeClasse);
+  const nivelNaClasseAnterior = nivelNa(personagem, nomeClasse);
+  const nivelTotalAnterior = nivelTotal(personagem);
+  const { permitido, faltando } = podeEntrarEm(personagem, nomeClasse);
+  return {
+    classe: nomeClasse,
+    // A subclasse DAQUELA classe, nunca o espelho `personagem.subclasse`:
+    // num Mago 5/Guerreiro 3 o espelho aponta para o Mago.
+    subclasse: entrada?.subclasse || '',
+    nivelNaClasseAnterior,
+    nivelNaClasseNovo: nivelNaClasseAnterior + 1,
+    nivelTotalAnterior,
+    nivelTotalNovo: nivelTotalAnterior + 1,
+    ehPrimeiroNivelNaClasse: nivelNaClasseAnterior === 0,
+    ehPrimeiroNivelDoPersonagem: nivelTotalAnterior === 0,
+    dadoVida: CLASSES_INFO[nomeClasse]?.dado_vida || 0,
+    permitido,
+    faltando,
+  };
+}

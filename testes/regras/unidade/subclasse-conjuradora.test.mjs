@@ -15,7 +15,34 @@
 // ============================================================
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { escadaDeNivel, modulosApp, personagemSemente } from './harness.mjs';
+import { escadaDeNivel, modulosApp, personagemMulticlasse, personagemSemente, lerClassesDados } from './harness.mjs';
+
+// Desde o sub-projeto 5 `subirDeNivel` não GRAVA mais espaço de magia:
+// `espacos_magia` guarda só o `usados` do jogador, por fonte, e o TOTAL é
+// derivado da regra a cada leitura por `montarReservasDeEspacos`
+// (sheet/reservas-espacos.js) -- o mesmo caminho que a ficha renderiza.
+// Ler `p.espacos_magia` direto aqui passaria a enxergar `{}` e o motor
+// ficaria verde sem afirmar nada.
+// `modulosApp()` PRIMEIRO, e não por estilo: ela é quem instala os stubs de
+// navegador (window/localStorage) que os módulos da ficha tocam ao carregar.
+// Importar reservas-espacos.js antes dela morre em `window is not defined`.
+const mapaDadosClasses = lerClassesDados();
+await modulosApp();
+const { montarReservasDeEspacos, gastarEspaco } =
+  await import('../../../site/js/sheet/reservas-espacos.js');
+
+/**
+ * Totais de espaço de magia por círculo, derivados da regra.
+ * @param {object} p Personagem.
+ * @returns {Object<string, number>} { círculo: total }.
+ */
+function totaisPorCirculo(p) {
+  const totais = {};
+  for (const reserva of montarReservasDeEspacos(p, mapaDadosClasses)) {
+    totais[reserva.circulo] = (totais[reserva.circulo] || 0) + reserva.total;
+  }
+  return totais;
+}
 
 // Espaços de magia por nível de Ladino, direto da tabela do livro.
 // Só os níveis em que a linha MUDA -- os demais repetem o anterior.
@@ -125,18 +152,16 @@ test('Trapaceiro Arcano: a lista de magias oferecida é a de Mago', async () => 
     'sem magias de 1º círculo o Trapaceiro Arcano não tem o que preparar');
 });
 
-test('Trapaceiro Arcano: os espaços de magia são gravados a cada nível da escada', async () => {
+test('Trapaceiro Arcano: os espaços de magia batem com a tabela a cada nível da escada', async () => {
   let esperado = {};
   await escadaDeNivel('Ladino', (p, nivel) => {
     if (ESPACOS_TRAPACEIRO[nivel]) esperado = ESPACOS_TRAPACEIRO[nivel];
     if (nivel < 3) {
-      assert.deepEqual(p.espacos_magia || {}, {},
+      assert.deepEqual(totaisPorCirculo(p), {},
         `Ladino nv${nivel} ganhou espaços de magia antes da subclasse`);
       return;
     }
-    const obtido = Object.fromEntries(
-      Object.entries(p.espacos_magia || {}).map(([c, d]) => [c, d.total]));
-    assert.deepEqual(obtido, esperado,
+    assert.deepEqual(totaisPorCirculo(p), esperado,
       `espaços de magia errados no nível ${nivel} do Trapaceiro Arcano`);
   }, { subclasse: 'Trapaceiro Arcano' });
 });
@@ -150,8 +175,23 @@ test('Trapaceiro Arcano: Mãos Mágicas é concedida junto com a Conjuração, n
   }, { subclasse: 'Trapaceiro Arcano' });
 });
 
-test('Cavaleiro Místico: dois personagens não compartilham o mesmo objeto de espaços de magia', async () => {
-  const { levelup } = await modulosApp();
+// O defeito original: `subirDeNivel` gravava em `personagem.espacos_magia`
+// o MESMO objeto devolvido por `getEspacosSubclasseConjuradora`, e dois
+// personagens da mesma subclasse passavam a compartilhar a tabela por
+// REFERÊNCIA -- gastar um espaço num vazava no outro.
+//
+// O sub-projeto 5 removeu aquela gravação (o total é derivado a cada
+// leitura), então a forma antiga do defeito é impossível por construção.
+// A PROPRIEDADE que o teste defende continua valendo e continua medida,
+// só que pelo caminho de hoje: o gasto vive em `espacos_magia.conjuracao`,
+// por personagem, e é escrito pelo escritor autorizado `gastarEspaco`.
+// Reescrever aqui em vez de apagar preserva a rede -- um dia alguém pode
+// reintroduzir estado compartilhado por outro caminho.
+test('Cavaleiro Místico: dois personagens não compartilham o gasto de espaços de magia', async () => {
+  const { levelup, sheetEstado } = await modulosApp();
+  // `gastarEspaco` resolve o mapa de dados pelo live binding de estado.js,
+  // igual à casca `reservasDeEspacos()` da ficha.
+  sheetEstado.definirClassesData(mapaDadosClasses);
 
   async function guerreiroNivel3() {
     const p = await personagemSemente('Guerreiro');
@@ -164,12 +204,17 @@ test('Cavaleiro Místico: dois personagens não compartilham o mesmo objeto de e
   }
 
   const primeiro = await guerreiroNivel3();
-  primeiro.espacos_magia[1].usados = 2;
+  assert.equal(totaisPorCirculo(primeiro)[1], 2,
+    'o Cavaleiro Místico deveria ter 2 espaços de 1º círculo no nível 3');
+  assert.ok(gastarEspaco(primeiro, 'conjuracao', 1),
+    'o gasto de um espaço de 1º círculo deveria ser aceito');
 
   const segundo = await guerreiroNivel3();
-  assert.equal(segundo.espacos_magia[1].usados, 0,
-    'o segundo personagem nasceu com os espaços já gastos do primeiro -- a tabela ' +
-    'de espaços está sendo entregue por referência, não copiada');
+  const reservaSegundo = montarReservasDeEspacos(segundo, mapaDadosClasses)
+    .find((r) => r.fonte === 'conjuracao' && r.circulo === 1);
+  assert.equal(reservaSegundo.usados, 0,
+    'o segundo personagem nasceu com os espaços já gastos do primeiro -- ' +
+    'o gasto está sendo compartilhado, não é por personagem');
 });
 
 test('Trapaceiro Arcano: Mãos Mágicas entra como truque de classe e não pode ser trocada', async () => {
@@ -217,6 +262,34 @@ test('Ficha legada: Trapaceiro Arcano nível 3 sem magias recebe Mãos Mágicas 
   // 3 truques no nível 3, um deles já concedido -> 2 vagas.
   assert.equal(personagem._slots_truque_livre, 2, 'vagas de truque em aberto erradas');
   assert.equal(personagem._slots_magia_livre, 3, 'vagas de magia conhecida em aberto erradas');
+});
+
+// Defeito medido: migrarTruquesFixosSubclasse lia char.classe/char.subclasse/
+// char.nivel -- os ESPELHOS, que só enxergam a classe INICIAL e o nível
+// TOTAL. Num Mago 5/Ladino 3 (Trapaceiro Arcano) o espelho aponta para o
+// Mago (Escola de Evocação, nível TOTAL 8): getTruquesFixosAcumulados('Mago',
+// 'Escola de Evocação', 8) devolve [] (guarda def.classe !== classe), então
+// Mãos Mágicas nunca era concedida a essa ficha. O conserto percorre
+// classesDe(char) e consulta cada classe com a SUA PRÓPRIA subclasse e
+// nível.
+test('migração de truques fixos: Mago 5/Ladino 3 (Trapaceiro Arcano) recebe Mãos Mágicas mesmo com o espelho apontando pro Mago', async () => {
+  const { sheetEstado, sheetMigracoes } = await modulosApp();
+  const personagem = await personagemMulticlasse([
+    { classe: 'Mago', nivel: 5, subclasse: 'Escola de Evocação' },
+    { classe: 'Ladino', nivel: 3, subclasse: 'Trapaceiro Arcano' },
+  ]);
+  // Confere a premissa do defeito: o espelho aponta para o Mago, não para o
+  // Ladino/Trapaceiro Arcano que de fato concede o truque fixo.
+  assert.equal(personagem.classe, 'Mago', 'premissa: espelho deveria apontar para a classe inicial');
+  assert.equal(personagem.subclasse, 'Escola de Evocação', 'premissa: espelho não vê a subclasse do Ladino');
+  assert.equal(personagem.nivel, 8, 'premissa: espelho de nível é o TOTAL, não o do Ladino');
+  personagem.magias_conhecidas = [];
+  sheetEstado.definirChar(personagem);
+
+  sheetMigracoes.migrarTruquesFixosSubclasse();
+
+  assert.ok(personagem.magias_conhecidas.some(m => m.nome === 'Mãos Mágicas'),
+    'Mãos Mágicas não foi concedida ao Ladino/Trapaceiro Arcano numa ficha multiclasse');
 });
 
 test('Limite de truques/magias da ficha: a tabela do Ladino não zera o limite da subclasse', async () => {

@@ -1092,6 +1092,13 @@ test('numérico: renderSecaoMagias() aplica de fato +1 truque para Clérigo Taum
   };
 
   definirClasseData(classeDataClerigo);
+  // renderSecaoMagias() (Tarefa 3 do sub-projeto "tela magias por classe")
+  // deriva a superfície ativa de superficiesDaFicha(char), que lê
+  // classesData (o MAPA por classe) -- não mais só classeData (o espelho
+  // da classe inicial). Sem isto, sup.tabela vinha null, maxTruques ficava
+  // 0 e o contador "X / Y" nem aparecia no HTML (mesmo ajuste já feito no
+  // teste de mostrarBuscaMagia(), logo abaixo).
+  definirClassesData(new Map([['Clérigo', classeDataClerigo]]));
   definirChar({ ...personagemBase, ordem_divina: 'Protetor' });
   const limiteSemBonus = extrairLimiteTruques(renderSecaoMagias());
 
@@ -1163,6 +1170,12 @@ test('numérico: mostrarBuscaMagia() (sheet/grimorio.js) aplica de fato +1 truqu
   };
 
   definirClasseData(classeDataClerigo);
+  // mostrarBuscaMagia() (Tarefa 2 do sub-projeto de conjuração por classe)
+  // deriva a superfície ativa de superficiesDaFicha(char), que lê
+  // classesData (o MAPA por classe) -- não mais só classeData (o espelho
+  // da classe inicial). Sem isto, sup.tabela vinha null e o teste media
+  // "à vontade" (99/99) nas duas pontas em vez do limite real do Clérigo.
+  definirClassesData(new Map([['Clérigo', classeDataClerigo]]));
   definirChar({ ...personagemBase, ordem_divina: 'Protetor' });
   const htmlSemBonus = await chamarCapturandoModal(() => mostrarBuscaMagia());
   const mSemBonus = htmlSemBonus.match(/Truques:\s*\d+\/(\d+)/);

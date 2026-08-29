@@ -41,10 +41,42 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { PROGRESSAO, ROTULOS_GATILHO, TRACOS_BASICOS } from '../catalogo/classes.mjs';
 import { MODIFICADORES_ATRIBUTO, PV_NIVEL_1, PV_NIVEL_SEGUINTE } from '../catalogo/ficha-transversal.mjs';
-import { escadaDeNivel, personagemSemente, modulosApp } from './harness.mjs';
+import { escadaDeNivel, personagemSemente, modulosApp, lerClassesDados } from './harness.mjs';
 
 const { utils } = await modulosApp();
 const CLASSES = Object.keys(PROGRESSAO);
+
+// Espaços de magia deixaram de ser GRAVADOS no personagem no sub-projeto 5:
+// `subirDeNivel` não escreve mais chaves numéricas de círculo em
+// `espacos_magia` -- esse campo passou a guardar só o `usados` do jogador,
+// por fonte ('conjuracao'/'pacto'). O TOTAL é derivado da regra a cada
+// leitura por `montarReservasDeEspacos` (sheet/reservas-espacos.js), que é
+// o mesmo caminho que a ficha usa para renderizar.
+//
+// Enquanto estas asserções liam `p.espacos_magia` direto, elas passaram a
+// enxergar `{}` para as 8 classes conjuradoras -- ou seja, teriam ficado
+// VERDES sem afirmar nada (o teste "nenhum espaço de magia diminui ao
+// subir" chegou a passar vazio antes desta conversão). Ler pelo acessador
+// derivado é o que devolve a força original à afirmação.
+const mapaDadosClasses = lerClassesDados();
+const { montarReservasDeEspacos } =
+  await import('../../../site/js/sheet/reservas-espacos.js');
+
+/**
+ * Totais de espaço de magia por círculo, DERIVADOS da regra -- a forma que
+ * as colunas 1-9 da tabela do livro usam. Soma as fontes no mesmo círculo
+ * ('conjuracao' e 'pacto'), porque o livro publica uma coluna por círculo,
+ * não uma por fonte.
+ * @param {object} p Personagem.
+ * @returns {Object<string, number>} { círculo: total }.
+ */
+function totaisPorCirculo(p) {
+  const totais = {};
+  for (const reserva of montarReservasDeEspacos(p, mapaDadosClasses)) {
+    totais[reserva.circulo] = (totais[reserva.circulo] || 0) + reserva.total;
+  }
+  return totais;
+}
 
 // ------------------------------------------------------------
 // PV esperado por nível.
@@ -186,16 +218,12 @@ for (const classe of CLASSES) {
       const pvEsperado = pvEsperadoNoNivel(classe, p.atributos.constituicao, nivel);
       assert.equal(p.pv_max, pvEsperado, `${classe} nv${nivel}: PV máximo`);
 
-      // Espaços de magia gravados no personagem = colunas 1-9 do livro.
+      // Espaços de magia DERIVADOS da regra = colunas 1-9 do livro.
       if (linha.espacos !== null) {
-        const totais = {};
-        for (const [circulo, dadosCirculo] of Object.entries(p.espacos_magia || {})) {
-          totais[circulo] = dadosCirculo.total;
-        }
-        assert.deepEqual(totais, linha.espacos,
+        assert.deepEqual(totaisPorCirculo(p), linha.espacos,
           `${classe} nv${nivel}: espaços de magia`);
       } else {
-        assert.deepEqual(p.espacos_magia ?? {}, {},
+        assert.deepEqual(totaisPorCirculo(p), {},
           `${classe} nv${nivel}: classe sem conjuração não deveria ter espaços`);
       }
     });
@@ -412,34 +440,39 @@ for (const classe of CLASSES) {
     // em vez do laço vazio: que `espacos_magia` permanece `{}` nos 20
     // níveis. Isso prova algo real (nenhuma classe não-conjuradora
     // "vaza" espaço de magia por engano), em vez de só não lançar.
+    //
+    // Conversão do sub-projeto 5: lê pelo acessador derivado
+    // (`totaisPorCirculo`, topo do arquivo), não por `p.espacos_magia` --
+    // que não guarda mais o total. Sem isso, `anterior` e `agora` seriam
+    // sempre `{}` para as 8 conjuradoras e o teste passaria sem comparar
+    // nada.
     const conjuradora = TRACOS_BASICOS[classe].conjurador;
     const ehMagiaDePacto = classe === 'Bruxo';
     let anterior = {};
     await escadaDeNivel(classe, (p) => {
+      const agoraPorCirculo = totaisPorCirculo(p);
       if (!conjuradora) {
-        assert.deepEqual(p.espacos_magia ?? {}, {},
+        assert.deepEqual(agoraPorCirculo, {},
           `${classe} nv${p.nivel}: classe não-conjuradora não deveria ganhar espaços de magia`);
         return;
       }
       if (ehMagiaDePacto) {
-        const totalAntes = Object.values(anterior)
-          .reduce((soma, d) => soma + d.total, 0);
-        const totalAgora = Object.values(p.espacos_magia || {})
-          .reduce((soma, d) => soma + d.total, 0);
+        const totalAntes = Object.values(anterior).reduce((soma, t) => soma + t, 0);
+        const totalAgora = Object.values(agoraPorCirculo).reduce((soma, t) => soma + t, 0);
         if (Object.keys(anterior).length > 0) {
           assert.ok(totalAgora >= totalAntes,
             `${classe} nv${p.nivel}: total de espaços de magia caiu de ` +
             `${totalAntes} para ${totalAgora}`);
         }
       } else {
-        for (const [circulo, dadosCirculo] of Object.entries(anterior)) {
-          const agora = p.espacos_magia?.[circulo]?.total ?? 0;
-          assert.ok(agora >= dadosCirculo.total,
+        for (const [circulo, totalAntes] of Object.entries(anterior)) {
+          const agora = agoraPorCirculo[circulo] ?? 0;
+          assert.ok(agora >= totalAntes,
             `${classe} nv${p.nivel}: círculo ${circulo} caiu de ` +
-            `${dadosCirculo.total} para ${agora}`);
+            `${totalAntes} para ${agora}`);
         }
       }
-      anterior = JSON.parse(JSON.stringify(p.espacos_magia || {}));
+      anterior = agoraPorCirculo;
     });
   });
 

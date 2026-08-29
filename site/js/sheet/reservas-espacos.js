@@ -85,12 +85,19 @@ function espacosDaUnicaConjuradora(personagem, mapaDados, unica) {
  * `if (antigo.conjuracao || antigo.pacto) return false`) conclui "ainda
  * nao migrada" e RE-MIGRA -- silenciosamente absorvendo o que estiver
  * nas chaves numericas como se fosse gasto legado real, sem lancar nem
- * avisar. E exatamente a forma que um reconciliador de subida de nivel
- * ainda nao convertido (site/js/levelup.js, `atualizarEspacosMagia` e o
- * bloco de subclasse conjuradora em `subirDeNivel`) produz ao escrever
- * chaves de circulo direto sobre uma ficha ja migrada -- por isso nenhum
- * dos oraculos desta suite pegava aquela regressao: a degradacao graciosa
+ * avisar. Era exatamente a forma que a subida de nivel ainda nao
+ * convertida (site/js/levelup.js, `atualizarEspacosMagia` e o bloco de
+ * subclasse conjuradora em `subirDeNivel`) produzia ao escrever chaves de
+ * circulo direto sobre uma ficha ja migrada -- por isso nenhum dos
+ * oraculos desta suite pegava aquela regressao: a degradacao graciosa
  * que protege todo OUTRO caso de campo ausente/vazio nao protege este.
+ * O SUB-PROJETO 5 FECHOU ESSE BURACO: as duas escritas sairam
+ * (`atualizarEspacosMagia` deixou de existir) e nada mais no app grava
+ * chave NUMERICA de circulo -- medido pelo guarda de escrita de espelho
+ * em multiclasse-fundacao.test.mjs, que hoje nao acha escrita nenhuma em
+ * levelup.js. A forma hibrida so volta por ficha importada a mao; o aviso
+ * fica porque a fragilidade de migrarEspacosDeMagia contra ela continua
+ * real.
  * Quem mexer nesta funcao ou em migrarEspacosDeMagia depois precisa saber
  * que a forma hibrida e a UNICA excecao.
  *

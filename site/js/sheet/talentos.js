@@ -35,6 +35,15 @@ export async function abrirModalRecuperarDadivaEpica() {
   }, {});
   const ctxTalento = {
     char,
+    // `nivelNovo`: aqui NÃO há subida em andamento (é recuperação de uma
+    // escolha perdida no passado) -- `char.nivel` JÁ é o nível atual do
+    // personagem, então "o nível em que o talento é adquirido" é o
+    // próprio nível atual. Sem este campo, o ramo de Conjurador Ritualista
+    // em bindEscolhasTalento (levelup-ui.js) leria `ctx.nivelNovo`
+    // indefinido e quebraria (NaN) -- esse campo existe só nos `ctx`
+    // montados por buildLevelUpContext (o assistente de subida de nível),
+    // não neste `ctx` mínimo.
+    nivelNovo: char.nivel,
     helpers: {
       obterListasIniciadoEmMagiaUsadas,
       obterTiposAdeptoElementalUsados
@@ -727,6 +736,12 @@ export async function abrirModalAdicionarTalento() {
 
     const ctxTalento = {
       char,
+      // Mesma razão do outro ctxTalento deste arquivo (recuperação de
+      // Dádiva Épica, acima): "+ Talento" da ficha não tem subida em
+      // andamento, `char.nivel` já é o nível atual, e o ramo de
+      // Conjurador Ritualista em bindEscolhasTalento (levelup-ui.js) lê
+      // `ctx.nivelNovo` sem fallback -- sem este campo aqui, quebraria.
+      nivelNovo: char.nivel,
       helpers: {
         obterTiposAdeptoElementalUsados,
         obterListasIniciadoEmMagiaUsadas

@@ -1646,58 +1646,42 @@ que aparecerem, ou mover a declaracao de `info` para dentro da faixa.
 
 ================================================================================
 
-SUBIDA DE NIVEL AINDA GRAVA TOTAIS DE ESPACO DE MAGIA EM CHAVES NUMERICAS VESTIGIAIS
+[RESOLVIDO 2026-08-26, SUB-PROJETO 5 -- Tarefa 3a+3b] SUBIDA DE NIVEL GRAVAVA
+TOTAIS DE ESPACO DE MAGIA EM CHAVES NUMERICAS VESTIGIAIS
 
-`atualizarEspacosMagia` (site/js/levelup.js) e o bloco gemeo de subclasse
-conjuradora dentro de `subirDeNivel` continuam escrevendo total/usados em
-chaves NUMERICAS de circulo (`personagem.espacos_magia['1']`, `['2']` etc.)
-a cada subida de nivel.
+RESOLVIDO. A subida de nivel nao grava mais espaco de magia nenhum:
 
-Essa escrita ficou VESTIGIAL desde o sub-projeto 4 (Tarefa 4): o acessador
-real (`montarReservasDeEspacos`, site/js/sheet/reservas-espacos.js) deriva o
-total a cada leitura de `armazenado[fonte][circulo]` -- as chaves de FONTE
-('conjuracao'/'pacto'), nunca as chaves numericas que este codigo grava. Ou
-seja, nada no caminho real do app le mais o que essas linhas escrevem.
+  - `atualizarEspacosMagia` (site/js/levelup.js) foi REMOVIDA por inteiro,
+    junto com o laco de limpeza de circulos que ela carregava;
+  - o bloco gemeo de subclasse conjuradora dentro de `subirDeNivel` perdeu
+    a gravacao e o laco -- sobrou so a concessao de TRUQUES fixos, que nao
+    e espaco de magia (Maos Magicas do Trapaceiro Arcano);
+  - o total passou a ser DERIVADO da regra a cada leitura, por
+    `montarReservasDeEspacos` (site/js/sheet/reservas-espacos.js), que ja
+    era o unico acessador real desde o sub-projeto 4.
 
-NAO FORAM REMOVIDAS de proposito (Ruling 13/15 da Tarefa 4, medido, nao
-decidido sozinho): `testes/regras/unidade/classes-progressao.test.mjs` e
-`subclasse-conjuradora.test.mjs` -- 16 pontos de assercao cobrindo toda
-classe conjuradora contra a tabela do livro, nivel a nivel -- ainda leem
-essas mesmas chaves numericas direto. Reescrever aqueles dois testes e
-superficie do sub-projeto 5 (que converte a subida de nivel inteira), nao
-desta tarefa -- o ganho de remover a escrita agora seria estetico, e o
-risco de mexer nos 16 pontos sem converter o resto do fluxo junto e real
-(medido: uma primeira tentativa de remover so o laco de limpeza de
-circulos, sem qualificar por nome de chave, quebrou classes-progressao.
-test.mjs de verdade).
+Com isso some tambem o ACOPLAMENTO que esta entrada registrava: as strings
+literais 'conjuracao'/'pacto' nao aparecem mais em site/js/levelup.js.
 
-UM SEGUNDO VESTIGIO, mais fino: o laco que remove "circulos que nao existem
-mais no novo nivel" (nos dois blocos citados acima) continua existindo,
-porque o Bruxo e a UNICA classe cujo circulo de Magia de Pacto MUDA DE
-NUMERO ao subir (nivel 1-2 -> 1o circulo, nivel 3 -> 2o, nivel 5 -> 3o,
-medido em dados/classes/bruxo.json) -- sem essa limpeza o circulo antigo do
-Bruxo ficaria para tras, e classes-progressao.test.mjs acusaria dois
-circulos onde ele so tem um. Mas o laco agora PULA as chaves 'conjuracao' e
-'pacto' POR NOME (`if (circulo === 'conjuracao' || circulo === 'pacto')
-return;`) -- sem esse pulo, o laco apagava as proprias chaves de fonte (que
-guardam o gasto do jogador desde o sub-projeto 4) a cada subida de nivel, o
-mesmo mecanismo do defeito que a Tarefa 4 ja tinha corrigido no Descanso
-Longo.
+Os 16 pontos de assercao que liam as chaves numericas direto (em
+`classes-progressao.test.mjs` e `subclasse-conjuradora.test.mjs`) foram
+reescritos para ler pelo acessador derivado -- que e o que a ficha usa para
+renderizar. Sem essa reescrita eles teriam ficado VERDES sem afirmar nada,
+enxergando `{}`. Os Oraculos 25 e 26 de `multiclasse-magias.test.mjs`
+continuam existindo e continuam medindo os mesmos dois fatos observaveis
+(o gasto do jogador sobrevive a subida; o Bruxo TROCA de circulo em vez de
+acumular), agora contra o comportamento derivado.
 
-Esse "pular por nome" e um ACOPLAMENTO explicito entre site/js/levelup.js e
-o formato de armazenamento do sub-projeto 4 (as strings literais
-'conjuracao'/'pacto' aparecem dentro de um arquivo que, de resto, e
-escopo do sub-projeto 5). Ele desaparece junto quando o sub-projeto 5
-converter `atualizarEspacosMagia` para nao escrever mais chaves numericas
-nenhuma -- nesse ponto o laco de limpeza deixa de ter qualquer motivo para
-existir, fonte ou circulo.
+Isso fecha o Minor 2 da revisao de conformidade de 2026-08-26: nada mais no
+app produz a forma HIBRIDA de `espacos_magia` (chaves de fonte ausentes com
+chaves numericas de circulo presentes). O aviso sobre essa forma continua no
+docblock de `montarReservasDeEspacos`, porque uma ficha importada a mao ainda
+pode traze-la.
 
-Oraculos que provam os dois vestigios sobrevivendo juntos, com prova por
-mutacao nos dois sentidos: `testes/regras/unidade/multiclasse-magias.
-test.mjs`, Oraculos 25 (gasto de conjurador de classe unica sobrevive a
-subida) e 26 (circulo obsoleto do Bruxo continua sendo limpo).
-
-Conferir antes de mexer: `grep -n "circulo === 'conjuracao'" site/js/levelup.js`.
+Conferido por medicao: o guarda de escrita de espelho
+(`multiclasse-fundacao.test.mjs`) nao acha NENHUMA escrita de espelho ou de
+espacos_magia em site/js/levelup.js, e as onze entradas que o arquivo tinha em
+ESCRITAS_PERMITIDAS foram removidas -- a lista so encolhe.
 
 ================================================================================
 TAREFA 9 (guarda estatico + campanha de mutacao do sub-projeto 4): UMA
@@ -1918,18 +1902,41 @@ Ate la, o jogador le a caixa da classe certa, que e o que uma ficha de papel
 tambem exige dele. O app nao rola salvaguardas nem ataques de magia sozinho,
 entao nao ha ponto onde ele escolha a CD errada por conta propria.
 
-IRMAO DESTE ITEM, mesma causa e mesmo sub-projeto: `tipo_conjuracao`
-("preparadas" x "conhecidas") ainda sai da classe INICIAL em
+[CORRIGIDO 2026-08-28, TAREFA 3 do sub-projeto "tela magias por classe"]
+IRMAO DESTE ITEM, mesma causa: `tipo_conjuracao` ("preparadas" x
+"conhecidas") saia da classe INICIAL em
 site/js/sheet/magias.js:renderSecaoMagias. O livro:2073 manda determinar as
 magias preparadas "por classe individualmente, como se fosse um membro de
-classe unica dessa classe". Um Barbaro 5/Mago 1 cai no ramo "preparadas" por
-omissao -- que por acaso e o certo para o Mago; um Barbaro/Bardo nao teria a
-mesma sorte. Os LIMITES de preparo por classe ja eram escopo declarado do
-sub-projeto 5; este item e a mesma familia.
+classe unica dessa classe". Um Barbaro 5/Mago 1 caia no ramo "preparadas" por
+omissao -- que por acaso era o certo para o Mago; um Barbaro/Bardo nao tinha
+a mesma sorte.
 
-Conferir: site/js/utils.js (conjuracoesPorClasse, calcCDMagia),
-site/js/sheet/ficha.js, site/js/sheet/impressao.js, site/js/sheet/pdf.js,
-site/js/sheet/magias.js (renderSecaoMagias, magias_preparadas).
+RESOLVIDO. renderSecaoMagias passou a ler `superficiesDaFicha(char)[0]` (a
+superficie de conjuracao ATIVA, primeira por ordem de aquisicao -- mesmo
+padrao de sheet/grimorio.js, Tarefa 2 deste sub-projeto) em vez do espelho
+char.classe. `sup.tipo` ja vem calculado por classe de verdade
+(superficiesDeConjuracao, regras-multiclasse-conjuracao.js), entao um
+Barbaro 5/Bardo 1 agora mostra "Magias Conhecidas" e os limites do Bardo, nao
+"0/0" do Barbaro. O caso que deu nome ao sub-projeto (Ladino 5/Mago 1, que
+dava 404 em classes/magias_ladino.json e "Truques: 3/0") tambem passou a
+mostrar os limites do Mago.
+
+O QUE CONTINUA EM ABERTO, mesmo raciocinio do item irmao acima: a CONTAGEM de
+"quantas estao preparadas/conhecidas" continua GLOBAL (soma de todas as
+classes), porque magias_preparadas[]/magias_conhecidas[] ainda nao tem campo
+de classe -- repartir essa contagem POR CLASSE continua fora do alcance,
+mesma divida do item acima. Decisao de produto (Tarefa 3, "o contador
+honesto"): a secao agora avisa na tela quando ha mais de uma superficie de
+conjuracao ("o total... conta o personagem inteiro; o limite mostrado e so
+de <classe>"), e suprime o alarme visual de "excedido" nesse caso (ele
+dispararia falso: um Clerigo 5/Mago 1 tem 9+4=13 preparadas contra o limite
+de UMA classe, sem violar o livro).
+
+Conferir: site/js/utils.js (conjuracoesPorClasse, calcCDMagia) -- ainda em
+aberto, nao e escopo desta tarefa --, site/js/sheet/ficha.js,
+site/js/sheet/impressao.js, site/js/sheet/pdf.js -- idem --,
+site/js/sheet/magias.js (renderSecaoMagias, superficieAtiva, o bloco "O
+CONTADOR HONESTO"), site/js/sheet/contexto-classe.js (superficiesDaFicha).
 
 ================================================================================
 
@@ -1970,4 +1977,706 @@ Jogador (2024) 5.3.7.md" --
 -- e LEGENDA DE IMAGEM, nao regra, e esta no meio do bloco de Magia de Pacto.
 Quem a ler como regra vai procurar uma mecanica que nao existe. Hoje nenhum
 comentario do repositorio a cita.
+
+================================================================================
+
+2026-08-26 -- BONUS DE PROFICIENCIA CALCULADO A MAO EM LEVELUP-UI.JS DIVERGE
+DE bonusProficiencia NOS NIVEIS 4, 8, 12, 16 E 20
+
+Achado ao fechar o sub-projeto 5 (subida de nivel com escolha de classe).
+site/js/levelup-ui.js:1171, dentro do ramo do talento Conjurador Ritualista:
+
+  const bonusProf = Math.floor((ctx.char.nivel || 1) / 4) + 2;
+
+Isso diverge de `bonusProficiencia` (site/js/utils.js:24, a fonte de
+verdade -- Math.ceil(nivel / 4) + 1) em EXATAMENTE os niveis 4, 8, 12, 16 e
+20, sempre dando 1 A MAIS que o certo. Nos demais niveis as duas formulas
+coincidem, o que esconde o defeito ate alguem medir num nivel multiplo de 4.
+
+POR QUE IMPORTA: essa conta alimenta a quantidade de magias rituais que o
+Conjurador Ritualista pode escolher, e talentos sao escolhidos justamente
+nesses niveis -- o defeito dispara no caminho principal, nao numa borda. No
+nivel 4 o app oferece 3 rituais em vez dos 2 que o Bonus de Proficiencia
+real (+2) concede.
+
+ATINGE classe unica igualmente e E ANTERIOR a este sub-projeto -- nao tem
+relacao com multiclasse. E a mesma raiz que este arquivo ja trata como bug
+em outro lugar: duas formulas escrevendo a mesma conta, uma delas errada.
+
+NAO FOI CONSERTADO AQUI de proposito: enfiar um conserto de produto (quantos
+rituais o Conjurador Ritualista realmente concede) dentro de um commit de
+multiclasse esconderia a mudanca de quem for procurar por ela.
+
+Conferir: site/js/levelup-ui.js:1171, site/js/utils.js:24
+(bonusProficiencia).
+
+================================================================================
+
+2026-08-26 -- [CORRIGIDO] responderPendencia (harness.mjs) ESCOLHIA MAGIAS
+CANDIDATAS PELO NIVEL TOTAL, NAO PELO NIVEL NA CLASSE
+
+Registrado ao fechar o sub-projeto 5 como "inocua hoje", e CORRIGIDO na onda
+de correcao da revisao final do mesmo sub-projeto. `responderPendencia`
+calculava `novoNivel = (personagem.nivel || 0) + 1` -- o nivel TOTAL -- e
+repassava esse valor para `escolherMagiasMago`, que o usa tanto para os
+espacos de magia disponiveis quanto para filtrar as candidatas do grimorio.
+
+DEIXOU DE SER INOCUA no momento em que a revisao pediu um oraculo com
+CONJURADORA como segunda classe: `subirAteNivel(barbaro5, 'Mago', 8)`
+lancava `Error: subirAteNivel: pendência não resolvida: grimorio` (medido),
+porque as candidatas saiam da tabela do Mago no nivel 6/7/8 e `subirDeNivel`
+as recusava pelo nivel 1/2/3 DE MAGO. Era ele que impedia o cenario que teria
+pego o Critical desta revisao.
+
+Passou a usar `nivelNa(personagem, nomeClasse) + 1`. Classe unica nao muda:
+as duas contagens coincidem por construcao.
+
+Conferir: testes/regras/unidade/harness.mjs (responderPendencia, `novoNivel`)
+e o Oraculo 29 de testes/regras/unidade/multiclasse-magias.test.mjs.
+
+================================================================================
+
+2026-08-26 -- TETO DE CIRCULO DO GRIMORIO/DADIVA DE ESCOLA SAI DA TABELA DO
+MAGO, NAO DA TABELA UNIFICADA DE MULTICLASSE
+
+Achado da revisao final do sub-projeto 5 (Minor 5). Em `site/js/levelup.js`
+(por volta das linhas 1388 e 1418) o teto de circulo das magias que entram no
+grimorio e da dadiva de escola da subclasse arcana sai de
+`getEspacosMagia(tabelaDoMago, nivelNaClasseNovo)` -- a tabela da PROPRIA
+classe, no nivel dela.
+
+O livro amarra a escolha a "um circulo para o qual voce tenha espacos de
+magia", e em multiclasse os espacos vem da TABELA UNIFICADA (livro:2050), que
+e mais generosa: um Mago 3/Clerigo 3 tem espacos de 2o circulo pela unificada
+e o app so oferece ate o 2o pela tabela do Mago no nivel 3 -- neste exemplo
+coincide, mas as duas divergem assim que as classes se desequilibram.
+
+A escolha atual e CONSERVADORA (nunca concede a mais que o livro) e esta
+coberta por oraculo, entao nao e perda de dado nem vantagem indevida --
+e restricao a menos do que o livro permite. Entra aqui junto com os demais
+itens de "limite por classe x limite unificado" para decisao de uma vez.
+
+Conferir: site/js/levelup.js:1388 e :1418 (circuloMaxInicial /
+circuloMaxRecorrente), site/js/sheet/reservas-espacos.js (tabela unificada).
+
+================================================================================
+
+2026-08-26 -- FIXTURE DE CARACTERIZACAO subida-classe-unica.json PASSA A SER
+DIFERENCIAVEL DEPOIS DE COMMITADO
+
+`testes/regras/unidade/fixtures/subida-classe-unica.json` e a rede de
+nao-regressao de classe unica do sub-projeto 5: 12 classes x niveis 1->20,
+campo a campo. Ate agora ficou UNTRACKED -- uma regeneracao nao podia ser
+conferida contra a anterior, porque nao havia "anterior" no git para comparar.
+
+Depois que este arquivo entrar no git (a cargo de quem fizer o commit deste
+sub-projeto), toda regeneracao futura vira revisavel por `git diff`: quem
+mudar uma regra de classe unica e rodar o gerador do snapshot vai ver
+exatamente quais niveis/classes/campos mudaram, em vez de precisar confiar
+de olho no arquivo inteiro.
+
+RECOMENDADO para quem for regenera-lo: sempre revisar o diff campo a campo
+antes de comitar a regeneracao -- um diff grande e inesperado (por exemplo,
+uma classe inteira mudando) e sinal de regressao, nao de evolucao esperada.
+
+Conferir: testes/regras/unidade/fixtures/subida-classe-unica.json.
+
+================================================================================
+
+2026-08-27 -- PERSONAGEM JA PROFICIENTE EM TODA A LISTA DE UMA CLASSE NAO
+CONSEGUE ENTRAR NELA
+
+PERGUNTA: o livro nao diz o que acontece quando a concessao de multiclasse
+nao tem nada de novo para dar. Bardo, Guardiao e Ladino sao as tres classes
+que concedem UMA pericia a escolha ao serem tomadas como classe NOVA
+(livro:2051). O app filtra as pericias que o personagem JA POSSUI -- conceder
+uma repetida gastaria a concessao em silencio -- e, quando a lista filtrada
+fica vazia, o passo "Proficiencias da Classe Nova" nao tem o que oferecer, o
+formulario fica PERMANENTEMENTE incompleto e "Confirmar" recusa a subida.
+Ou seja: o app passa a impor um pre-requisito de ENTRADA em classe que o
+livro nao impoe.
+
+MEDICAO DE ALCANCE: Guardiao oferece 8 pericias fixas (Classes.md:3246);
+Ladino, 10 (Classes.md:4172); Bardo, "uma perícia à sua escolha" -- as 18,
+na pratica inalcancavel. O caminho so e alcancavel por personagem de nivel
+alto com muitas fontes de pericia (Especializacoes, talentos, antecedente).
+
+O QUE O LIVRO DIZ, DOS DOIS LADOS. A entrada em classe nova e condicionada
+SO a atributo 13+ (livro:2033 e :2051); a lista de concessoes descreve o que
+voce GANHA, nao uma condicao de admissao. "Proficiência em uma perícia à sua
+escolha da lista de perícias de Guardião" descreve um ganho -- se nao sobrou
+nada para ganhar, voce ganha nada, e nada no capitulo 2 diz que isso impede
+o nivel.
+
+O QUE FOI ESCOLHIDO (opcao A, manter o bloqueio e explicar): a tela mostra
+uma caixa dizendo que nao ha nenhuma pericia nova para escolher, e o passo
+fica incompleto. Zero codigo novo, e e o PRECEDENTE DA CASA: Habilidoso,
+Artifista e Musico fazem exatamente a mesma coisa quando o pool de opcoes se
+esgota (levelup-ui.js:821, 888, 902, 915 -- `_avisoOpcoesInsuficientes`).
+O jogador tem saida real: o passo `escolha_classe` e o primeiro e sempre
+visivel, entao ele volta e escolhe outra classe -- nao e o app travado, e
+aquela classe indisponivel.
+
+A ALTERNATIVA COM MELHOR APOIO NO LIVRO (opcao B, deixar concluir quando a
+lista estiver COMPROVADAMENTE esgotada; a concessao queima): preserva a regra
+de que pericia repetida nao concede nada nesta edicao -- a mesma premissa que
+motiva o filtro de ja-possuidas. CUSTO: precisa relaxar TRES portoes de forma
+coordenada -- `proficienciaClasseNovaCompleta` (levelup-flow.js), o bloco do
+motor (levelup.js) e a visibilidade do passo -- e o ramo de escape tem de
+abrir APENAS com a lista comprovadamente vazia, senao vira bypass generico do
+portao num caminho SEM DESFAZER (nao existe descer de nivel). Exige um
+oraculo que prove que o escape NAO abre com a lista nao vazia.
+
+DESCARTADAS: (C) deixar escolher fora da lista quando a lista esgota --
+inventa regra E concede vantagem (uma pericia que o Guardiao nunca
+ofereceria), sem apoio no texto. (D) converter em Especializacao, como
+Analitico faz -- Analitico so faz isso porque o TEXTO DO TALENTO preve os
+dois ramos (regras-cobertura.js:429-437); o texto da multiclasse nao preve.
+
+RECOMENDADO: manter A ate que o dono do produto decida. Implementar B e
+decisao de produto, nao conserto de defeito.
+
+Conferir: site/js/levelup-cards.js (renderCardProficienciasClasseNova, as duas
+caixas de "lista esgotada"), site/js/levelup-flow.js
+(proficienciaClasseNovaCompleta e a visibilidade do passo
+`proficiencias_classe_nova`), site/js/levelup.js (bloco
+'proficiencias_classe_nova').
+
+================================================================================
+
+2026-08-27 -- A MAESTRIA EM ARMA DO BARBARO RESTRINGE O PERSONAGEM INTEIRO,
+NAO SO AS VAGAS QUE O BARBARO CONCEDE
+
+PERGUNTA: o livro diz que o Barbaro escolhe "dois tipos de armas Corpo a
+Corpo Simples ou Marciais" para Maestria em Arma, enquanto Guerreiro,
+Guardiao, Paladino e Ladino nao tem essa restricao. Num personagem que tem
+Barbaro E outra classe de maestria, de quem e a vaga?
+
+O ESTADO DO APP: nao da para saber. O app guarda UM teto unico
+(`tetoMaestrias`, decisao de 2026-08-22 registrada neste arquivo) e UM array
+compartilhado (`char.maestrias_arma`) -- nenhuma vaga tem dono. Entao
+`armasElegiveisMaestria` (regras-equipamento.js) toma a decisao sozinha:
+desde 2026-08-27 ela restringe a Corpo a Corpo sempre que o personagem TEM
+Barbaro, seja ele a classe inicial ou nao.
+
+O QUE MUDOU EM 2026-08-27 E POR QUE: a funcao comparava `personagem?.classe
+=== 'Barbaro'` -- o ESPELHO da classe INICIAL. Era a ultima leitura de
+espelho da cadeia de maestrias (todo o resto de sheet/maestrias.js ja usava
+`temClasse`/`nivelNa`) e produzia resposta dependente da ORDEM: um
+Mago 5/Barbaro 1 escapava do filtro e o modal oferecia Arco Longo a um
+personagem cuja unica fonte de Maestria e o Barbaro. Trocada por
+`temClasse(personagem, 'Barbaro')`, a mesma decisao que `classesComMaestria`
+toma -- as duas tem de concordar.
+
+O QUE A TROCA NAO RESOLVE: um Barbaro 5/Guerreiro 5 agora perde as armas a
+distancia que o Guerreiro concederia. A escolha e CONSERVADORA (nunca concede
+nada que o livro nao de) e determinista (nao depende mais da ordem de
+aquisicao, que era o defeito), mas nao e a regra do livro -- e a regra do
+livro nao existe para este caso.
+
+AS OPCOES, SE ALGUEM QUISER DECIDIR: (A) manter o conservador de hoje;
+(B) restringir so quando o Barbaro for a UNICA classe de maestria do
+personagem -- defensavel, mas concede ao Barbaro/Guerreiro uma maestria a
+distancia que o texto do Barbaro nega; (C) dar dono a cada vaga, guardando a
+classe junto da maestria -- e o unico caminho fiel ao texto e o mais caro:
+muda o formato de `char.maestrias_arma`, exige migracao e mexe no modal.
+
+Conferir: site/js/regras-equipamento.js (armasElegiveisMaestria),
+site/js/sheet/maestrias.js (CLASSES_MAESTRIA, classesComMaestria,
+tetoMaestrias), testes/regras/unidade/maestria-armas.test.mjs.
+
+================================================================================
+
+2026-08-27 -- INSTRUMENTOS_MUSICAIS EXISTE DUAS VEZES, E O CRIADOR E O
+ASSISTENTE DE NIVEL LEEM COPIAS DIFERENTES
+
+PERGUNTA: a lista de Instrumentos Musicais esta duplicada -- uma copia em
+site/js/regras-cobertura.js e outra em site/js/creator/comum.js. Hoje as duas
+sao IDENTICAS (conferido). A duplicacao e pre-existente e nao foi criada pelo
+sub-projeto de proficiencias de classe nova.
+
+O QUE MUDOU DE RISCO: esse sub-projeto amarrou o MOTOR (levelup.js) e a TELA
+do assistente (levelup-cards.js) a copia de regras-cobertura.js -- o que
+REDUZIU o risco entre esses dois, que agora nao podem divergir. Mas o criador
+de personagem (creator/wizard.js:590, creator/comum.js:105) continua na OUTRA
+copia. Consequencia de segunda ordem: se alguem acrescentar um instrumento a
+UMA delas, o criador e o assistente passam a oferecer listas diferentes -- e
+o motor recusaria, no Confirmar, um instrumento que a tela do criador
+ofereceu, com uma mensagem que nomeia o instrumento mas nao explica por que
+ele sumiu.
+
+CONSERTO BARATO, QUANDO ALGUEM ENCOSTAR NISSO: ou um teste de igualdade entre
+os dois arrays (3 linhas), ou a remocao da duplicata, com o criador passando
+a importar de regras-cobertura.js.
+
+Conferir: site/js/regras-cobertura.js (INSTRUMENTOS_MUSICAIS),
+site/js/creator/comum.js:105, site/js/creator/wizard.js:590.
+
+================================================================================
+
+2026-08-27 -- FERRAMENTA E INSTRUMENTO CONCEDIDOS NAO APARECEM EM LUGAR NENHUM
+DA FICHA NEM DA IMPRESSAO
+
+PERGUNTA: `proficiencias_ferramentas` e `proficiencias_instrumentos` nao sao
+renderizados nem por sheet/ficha.js nem por sheet/impressao.js (grep: zero
+ocorrencias nos dois). A lacuna de exibicao e PRE-EXISTENTE -- as ferramentas
+concedidas pelo Antecedente ja sofrem dela.
+
+O QUE MUDOU: o assistente de nivel passou a BLOQUEAR a subida ate o jogador
+escolher um Instrumento Musical (Bardo como classe nova) ou ate a pericia ser
+escolhida. Este e o primeiro lugar do app que TRAVA um fluxo por uma escolha
+nesse campo -- e o resultado da escolha e invisivel para sempre. O jogador
+responde uma pergunta obrigatoria e nunca ve a resposta.
+
+CLASSIFICADO COMO MENOR na revisao por ser pre-existente e nao mecanico (nada
+de errado e calculado a partir disso). E PROMOVIVEL a defeito de produto se o
+dono achar que uma pergunta obrigatoria sem resposta visivel e defeito.
+
+CONSERTO: um grupo novo na secao de proficiencias das duas telas, no mesmo
+formato das badges de armadura/arma que ja existem la -- e a mesma ressalva
+de sempre vale: a normalizacao tem de morar num lugar so, nao em duas copias.
+
+Conferir: site/js/sheet/ficha.js e site/js/sheet/impressao.js (bloco de
+Proficiencias de Armaduras e Armas), site/js/levelup-cards.js
+(renderCardProficienciasClasseNova).
+
+================================================================================
+
+2026-08-27 -- A DIVIDA DE MAGIAS RITUAIS DO CONJURADOR RITUALISTA SO E MEDIDA
+DENTRO DE UMA SUBIDA DE NIVEL
+
+PERGUNTA: o talento Conjurador Ritualista diz, em Talentos.md:370, "Sempre que
+seu Bônus de Proficiência aumentar depois disso, você pode adicionar uma magia
+de 1º círculo com o marcador Ritual às magias sempre preparadas com esta
+característica". O app modelou isso como INVARIANTE: a quantidade de entradas
+de `magias_preparadas` com `origem: 'conjurador_ritualista'` tem de ser igual
+ao Bonus de Proficiencia do nivel TOTAL (livro:2047), que sobe nos niveis 5,
+9, 13 e 17. Onde a ficha deve COBRAR essa divida de quem nao vai subir de
+nivel de novo?
+
+O ESTADO DO APP: `ritualBonusPendente` (regras-cobertura.js) tem exatamente
+dois consumidores, e os dois vivem na subida de nivel -- o portao de
+`subirDeNivel` (levelup.js) e o contexto do assistente
+(`buildLevelUpContext`, levelup-flow.js). Nenhuma tela da ficha chama a
+funcao. Ou seja: o invariante e medido so no instante em que o personagem
+sobe, e em nenhum outro.
+
+O CASO ALCANCAVEL, medido pela revisao final da branch: um personagem de
+nivel 20 com o talento e 2 magias rituais devolve
+`{temTalento: true, deve: 6, tem: 2, faltam: 4}` -- quatro magias devidas e
+NENHUMA subida futura onde cobra-las. O mesmo vale, na pratica, para qualquer
+ficha que simplesmente pare de subir, e para toda ficha que ja cruzou um
+patamar antes de o crescimento existir e nao voltar a subir. Nao e regressao:
+antes deste trabalho a divida era invisivel para todo mundo. Mas o plano deste
+sub-projeto justificou a escolha do invariante afirmando que "um invariante
+conserta tambem as fichas que ja cruzaram o patamar -- que hoje sao todas", e
+essa afirmacao vale so para as que voltarem a subir de nivel. A metade nao
+entregue e esta.
+
+O QUE ACONTECE HOJE, do ponto de vista do jogador: nada. A ficha lista as
+magias que ele TEM (cada uma com o selo "Conjurador Ritualista",
+rotuloOrigemMagia em sheet/magias.js) e em lugar nenhum compara essa
+quantidade com o Bonus de Proficiencia. A divida so aparece se e quando
+houver uma proxima subida -- ai o assistente cobra todas de uma vez, no passo
+"Magias Rituais (Bônus de Proficiência)".
+
+AS OPCOES, SE ALGUEM QUISER DECIDIR:
+
+(A) Aceitar e documentar a limitacao -- o estado de hoje, com esta entrada
+    como registro. CUSTO: zero de codigo; o jogador de nivel 20 fica sem as
+    magias a que o livro lhe da direito e sem saber disso.
+
+(B) EXIBIR a divida na ficha, sem cobrar: um aviso onde a ficha ja fala do
+    talento, no formato "o talento concede 6 e a ficha tem 2". CUSTO: e uma
+    decisao de produto sobre ONDE e QUANDO avisar -- em que tela aparece, se
+    aparece ao ABRIR uma ficha antiga, e o que ele interrompe. Um aviso que
+    nasce em toda ficha antiga com o talento e barulho; um que nunca aparece
+    nao resolve nada. (O card de sheet/talentos.js e o da AQUISICAO, aberto
+    pelo "+ Talento" -- ele nao fica na tela depois, entao nao serve sozinho
+    como lugar do aviso.)
+
+(C) DEIXAR ESCOLHER pela ficha: o card do talento abre o mesmo seletor de
+    rituais que o assistente usa e grava a magia escolhida. CUSTO: cria um
+    SEGUNDO escritor de `magias_preparadas` com `origem:
+    'conjurador_ritualista'` -- hoje sao dois (a aquisicao do talento e o
+    crescimento, ambos em levelup.js) e os dois passam pelo mesmo portao. O
+    seletor teria de reusar `getMagiasRituais(1)` e o mesmo criterio de
+    recusa do motor (nome ja preparado por QUALQUER origem, ver o Important 1
+    da revisao final), ou a ficha volta a gravar entrada duplicada num
+    caminho SEM DESFAZER.
+
+(D) MIGRACAO AUTOMATICA, concedendo as magias faltantes ao abrir a ficha, no
+    molde de `migrarMagiasLegadoEspecie` (sheet/migracoes.js). DESACONSELHADA
+    pela propria revisao: qual magia ritual entra e escolha do JOGADOR, e o
+    migrador teria de escolher por ele.
+
+NAO DECIDIDO AQUI. A escolha entre B, C e D e de produto: define em que tela
+o app passa a cobrar, o que ele interrompe e o que acontece ao abrir uma
+ficha antiga -- nenhuma dessas tres perguntas tem resposta no livro.
+
+Conferir: site/js/regras-cobertura.js (ritualBonusPendente e o comentario
+do invariante), site/js/levelup.js (bloco "CRESCIMENTO DO CONJURADOR
+RITUALISTA" e o portao `ritual_bonus_proficiencia`), site/js/levelup-flow.js
+(ritualBonus no contexto e ritualBonusProficienciaCompleto),
+site/js/sheet/magias.js (rotuloOrigemMagia, o selo do talento),
+testes/regras/unidade/conjurador-ritualista-crescimento.test.mjs.
+
+================================================================================
+
+2026-08-27 -- A ESCOLHA DE MAGIA RITUAL NA AQUISICAO DO CONJURADOR
+RITUALISTA PODE SER DESCARTADA EM SILENCIO
+
+PERGUNTA: no bloco de aquisicao do talento Conjurador Ritualista dentro de
+`aplicarEfeitoTalento` (site/js/regras-cobertura.js:683-691), cada magia
+escolhida pelo jogador e gravada com `adicionarUnico(preparadas, { nome:
+magia, circulo: 1, origem: 'conjurador_ritualista' }, atual => atual?.nome
+=== magia)`. `adicionarUnico` (regras-cobertura.js:515-517) e `if
+(!lista.some(comparar)) lista.push(item);` -- um predicado que compara SO
+`nome`, sem olhar `origem`. Se o jogador escolhe, na aquisicao, uma magia
+ritual que ja esta preparada por QUALQUER outra origem -- preparacao normal
+de Mago/Clerigo/Druida, magia de dominio, o talento Tocado Pelas Sombras --,
+a entrada existente satisfaz o predicado, o push e pulado em silencio, e
+NENHUMA entrada com `origem: 'conjurador_ritualista'` chega a existir. A
+origem da entrada antiga fica intacta e a escolha do jogador desaparece sem
+erro e sem compensacao.
+
+ALCANCE: qualquer Mago, Clerigo ou Druida que tome este talento e candidato
+direto -- ha 11 magias de 1o circulo com o marcador Ritual (conferido em
+dados/magias/circulo_1.json, campo `tempo_conjuracao`), e e plausivel que
+uma dessas 11 ja esteja preparada normalmente antes de o personagem tomar o
+talento.
+
+O QUE O JOGADOR VE: nada no momento. O passo de aquisicao fecha como se a
+escolha tivesse sido gravada; a ficha nao ganha a entrada nova nem mostra
+erro nenhum.
+
+AUTOCORRECAO PARCIAL E SEU LIMITE: `ritualBonusPendente`
+(regras-cobertura.js:799-849) conta `jaEscolhidas` filtrando por `origem
+=== 'conjurador_ritualista'` (linhas 809-811); a magia descartada nunca
+entrou com essa origem, entao nao entra na contagem e `faltam` fica maior
+do que deveria -- a divida so e cobrada de novo no proximo patamar de Bonus
+de Proficiencia, e so SE houver um proximo patamar. A entrada anterior deste
+arquivo (2026-08-27, sobre a divida do crescimento so ser medida dentro de
+uma subida de nivel) ja registra esse mesmo limite para o caminho de
+crescimento, e ele vale aqui do mesmo jeito: personagem que nao sobe de
+nivel de novo -- todo personagem de nivel 20 incluido -- nunca ve a divida
+cobrada, e nada avisa o jogador entre a aquisicao e essa cobranca eventual.
+
+CONTRASTE COM O CRESCIMENTO, CONSERTADO NESTA BRANCH: o caminho de
+crescimento (a mesma mecanica, nas subidas seguintes) tinha o defeito
+espelhado -- em vez de descartar a escolha em silencio, gravava uma SEGUNDA
+entrada duplicada quando o jogador escolhia um nome ja preparado por outra
+origem (achado Important 1 da revisao final desta branch). Esse caminho foi
+fechado expondo `nomesPreparados` (regras-cobertura.js:831-833 -- TODAS as
+magias preparadas, de qualquer origem) para a oferta, o guard e o predicado
+compartilhado consultarem antes de gravar (levelup.js:1599,
+levelup-cards.js:1012-1018, levelup-flow.js:543). A aquisicao foi
+deliberadamente deixada de fora por estar fora do escopo revisado -- o
+defeito e o MESMO mecanismo, um passo antes, em codigo que este sub-projeto
+nao tocou.
+
+AS OPCOES, SE ALGUEM QUISER DECIDIR (nao decidido aqui):
+
+(A) Comparar por nome E origem no predicado da aquisicao, o jeito mais
+    barato -- mas reproduz a MESMA duplicata que o crescimento tinha antes
+    do conserto: duas entradas com o mesmo nome, vaga de preparacao
+    duplicada, "despreparar" (sheet/magias.js) apagando as duas de uma vez
+    por casar so por nome.
+
+(B) Reusar `nomesPreparados` na aquisicao, do jeito que o crescimento ja
+    faz, e RECUSAR a escolha na tela quando o nome ja estiver preparado por
+    outra origem -- mais fiel ao padrao ja fechado, mas exige que a tela de
+    aquisicao saiba oferecer so os nomes livres e decidir o que fazer se a
+    lista de 11 rituais tiver menos nomes livres do que o Bonus de
+    Proficiencia do personagem exige.
+
+(C) Converter a entrada existente para `origem: 'conjurador_ritualista'` em
+    vez de pular o push -- preserva a vaga unica de preparacao, mas MUDA a
+    origem de uma magia que o jogador preparou por outro motivo, com efeito
+    colateral em qualquer lugar da ficha que trate origens diferentes de
+    forma diferente (rotulo, contagem de vaga, elegibilidade de troca).
+
+Conferir: site/js/regras-cobertura.js (aplicarEfeitoTalento, bloco
+'Conjurador Ritualista', linhas 683-691; adicionarUnico, linhas 515-517;
+ritualBonusPendente, linhas 799-849), site/js/levelup.js:2043 (chamada de
+aplicarEfeitoTalento na aquisicao) e o bloco de crescimento ja consertado
+que consulta nomesPreparados, site/js/levelup-cards.js:1012-1018,
+site/js/levelup-flow.js:543, dados/magias/circulo_1.json.
+
+================================================================================
+
+2026-08-29 -- NORMALIZAR GRIMORIO DO MAGO COPIA PARA O GRIMORIO MAGIA
+PREPARADA QUE PODE SER DE OUTRA CLASSE
+
+Achado Important 3 da revisao final do sub-projeto "tela de magias por
+classe". A decisao de NAO converter esta funcao foi tomada durante a Tarefa 3
+e prometeu virar entrada aqui; a entrada nunca foi escrita, e este e o
+registro que faltava. Nada disto foi consertado -- e defeito ANTERIOR ao
+sub-projeto, e o conserto depende de decisao que nao e de implementacao.
+
+O MECANISMO. `normalizarGrimorioMago` (site/js/utils.js) termina com um laco
+que ACRESCENTA: para toda entrada de `personagem.magias_preparadas` com
+circulo > 0 que passe em `magiaContaNoLimite`, se o nome ainda nao estiver no
+grimorio, ela e empurrada para dentro de `personagem.grimorio`. O laco nao
+olha classe nenhuma -- e nao tem como olhar: `magias_preparadas[]` e
+`{nome, circulo, origem?, personalizada?}` e nao guarda de que classe a magia
+e (a divida registrada na entrada "MAGIA PREPARADA NAO SABE DE QUE CLASSE E",
+2026-08-26). O ponto de chamada e a ABERTURA DA FICHA
+(site/js/pages/sheet.js:128, `if (normalizarGrimorioMago(char, ...).alterado)
+salvar()`), entao o resultado e GRAVADO em disco, nao so mostrado.
+
+AS DUAS DIRECOES. O portao da funcao e `personagem.classe !== 'Mago'` -- o
+espelho da classe INICIAL:
+
+  - A DIRECAO EVITADA (por isso a funcao nao foi convertida): trocar o portao
+    por `temClasse(personagem, 'Mago')`, a conversao mecanica que o resto do
+    sub-projeto aplicou, faria um Clerigo 5/Mago 1 passar a rodar o laco -- e
+    as 9 magias preparadas do CLERIGO seriam copiadas para o grimorio do
+    Mago. Corrupcao de ficha, nao conversao de leitura. A medicao esta certa
+    e a decisao de nao converter tambem.
+
+  - A DIRECAO QUE JA ACONTECE, e que a decisao nao registrou: com o portao
+    do jeito que esta, um MAGO 5/CLERIGO 3 (Mago como classe inicial) JA
+    passa, e a cada abertura de ficha as preparadas do Clerigo sao gravadas
+    no `char.grimorio` do Mago. E a mesma corrupcao que a decisao recusou, so
+    que para o outro personagem, e ela e anterior ao sub-projeto.
+
+O LADO ASSIMETRICO QUE A REVISAO APONTOU, e o que mudou em volta:
+
+  - os dois portoes de preparar magia (site/js/sheet/grimorio.js e
+    site/js/sheet/magias.js) usam como PROXY HONESTO "preparadas que estao no
+    grimorio" para contar quantas o Mago preparou, e o comentario deles
+    documenta esta copia como se fosse invariante benigno ("ja copia tudo
+    nesse caso"), e nao como o defeito que a propria decisao diz que e. O
+    proxy continua correto onde se aplica -- mas o motivo pelo qual ele
+    funciona no Mago inicial multiclasse E o defeito;
+  - a Tarefa 3 passou a exibir o painel do Grimorio para todo
+    `temClasse(char, 'Mago')`, com um limite calculado so do Mago
+    (`maxPreparadasGrimorio`, site/js/sheet/magias.js). Num Mago 5/Clerigo 3
+    esse painel agora LISTA, sob o rotulo "Livro de Magias" e sob o limite do
+    Mago, magias que sao do Clerigo. Antes o painel existia igual, mas o
+    sub-projeto tornou a assimetria visivel numa tela a mais.
+
+O QUE O JOGADOR VE: o grimorio cresce sozinho com magias que ele nunca
+copiou para o livro. Nada e apagado -- o laco so acrescenta -- entao o dano e
+lista suja e contagem do painel do grimorio inflada, nao perda de dado.
+
+AS OPCOES, SE ALGUEM QUISER DECIDIR (nao decidido aqui):
+
+(A) DEIXAR COMO ESTA, com o defeito registrado. CUSTO: zero de codigo; toda
+    ficha de Mago-inicial multiclasse continua acumulando magia de outra
+    classe no grimorio a cada abertura, e o painel "Livro de Magias" continua
+    mostrando magia de Clerigo sob o limite do Mago.
+
+(B) PORTAO DEFENSIVO JA, sem esperar o campo de classe: nao rodar o laco de
+    acrescimo quando `superficiesDeConjuracao(personagem).length > 1`.
+    Conservador por construcao -- deixa de ACRESCENTAR em vez de acrescentar
+    errado, e nao apaga nada do que ja foi gravado. CUSTO: um Mago
+    multiclasse deixa de receber o auto-reparo que o laco existe para dar (a
+    magia preparada que sumiu do grimorio nao volta sozinha), e grimorios ja
+    sujos continuam sujos. ZERO efeito para classe unica, que e onde o laco
+    de fato serve.
+
+(C) CONVERTER DE VERDADE: portao por `temClasse` e laco que so copia a magia
+    DAQUELA classe. CUSTO: exige `magias_preparadas[].classe` -- o campo que
+    nao existe -- e a migracao que carimbe a classe nas fichas ja gravadas,
+    com a mesma pergunta sem resposta que a entrada de 2026-08-26 ja levanta
+    (o que carimbar numa ficha multiclasse antiga, onde a informacao nunca
+    existiu). E o unico caminho que conserta as DUAS direcoes.
+
+NAO DECIDIDO AQUI. A escolha entre A, B e C decide o que acontece com ficha
+ja gravada e quando o auto-reparo do grimorio para de valer -- nenhuma das
+duas perguntas tem resposta no livro.
+
+Conferir: site/js/utils.js (normalizarGrimorioMago, o laco final e o
+docblock), site/js/pages/sheet.js:128 (o ponto de chamada que grava),
+site/js/sheet/magias.js (maxPreparadasGrimorio e o painel do Grimorio),
+site/js/sheet/grimorio.js (o comentario do proxy honesto no portao de
+preparar), e a entrada "MAGIA PREPARADA NAO SABE DE QUE CLASSE E"
+(2026-08-26) neste mesmo arquivo.
+
+================================================================================
+
+[RESOLVIDO 2026-08-29] O MODAL "GERENCIAR MAGIAS" CONTAVA TRUQUE POR REGRA
+PROPRIA, E BLOQUEAVA DE MENTIRA EM PERSONAGEM DE CLASSE UNICA
+
+Achado Important 1 da revisao final do sub-projeto "tela de magias por
+classe". CONSERTADO na onda de correcao do mesmo dia -- ver "COMO FOI
+RESOLVIDO", no fim desta entrada.
+
+CORRECAO DE UM REGISTRO ERRADO: a primeira versao desta entrada, escrita
+horas antes na mesma onda, afirmava que a correcao ficaria pendente de uma
+decisao de produto ("truque PERSONALIZADO gasta o orcamento da classe?").
+Essa alegacao era FALSA e foi apagada. O codigo ja responde a pergunta: o
+filtro da ficha comeca por `!m.personalizada`, que EXCLUI as personalizadas
+do numero comparado com o limite, e a marca `personalizada` so e posta por
+`normalizarMagiaPersonalizada` sobre `magias_customizadas` -- entrada de
+`magias_conhecidas` nunca a recebe. Nao havia pergunta em aberto, e a entrada
+antiga teria feito o proximo leitor acreditar que havia. Fica o registro do
+erro, e nao so a versao corrigida, porque este arquivo e o unico registro que
+sobrevive as sessoes.
+
+DEFEITO ANTERIOR AO SUB-PROJETO, MEDIDO: as expressoes de contagem de truque
+de site/js/sheet/grimorio.js sao IDENTICAS as de HEAD (conferido com
+`git show HEAD:site/js/sheet/grimorio.js`); o sub-projeto so acrescentou a
+elas a guarda de superficie (`&& umaSuperficieSo`). A divergencia entre as
+duas telas ja existia; o que mudou foi ela ter ficado visivel, porque agora o
+LIMITE vem da superficie ativa.
+
+A DIVERGENCIA. Duas regras para a mesma pergunta ("quantos truques gastam o
+orcamento da tabela da classe?"):
+
+  - a SECAO Magias da ficha (site/js/sheet/magias.js) usa
+    `truqueContaNoLimite` (site/js/regras-origens-magia.js), a fonte unica
+    das origens que o jogador nao escolheu -- ela exclui as dez origens de
+    ORIGENS_TRUQUE_NAO_TROCAVEL (iniciado_em_magia, tocado_por_fadas,
+    tocado_pelas_sombras, conjurador_ritualista, telecinetico, sempre,
+    subclasse_automatica, especie, especie_legado) e inclui de proposito
+    `subclasse_fixa`;
+  - o MODAL "Gerenciar Magias" (site/js/sheet/grimorio.js) usava um filtro
+    literal, `m.circulo === 0 && m.origem !== 'especie'` -- excluia UMA
+    origem --, escrito a mao em CINCO pontos: o contador do topo, o contador
+    da aba de truques, a decisao "a grade esta cheia?", o PORTAO que recusa o
+    clique e o refresh de `atualizarContadores` (que reescreve o contador do
+    topo a cada clique).
+
+O QUE A DIVERGENCIA ERA, EXATAMENTE: o modal cobrava do orcamento da classe
+truques que a ficha, corretamente, nao cobra -- os de origem 'sempre' e todos
+os que `truqueContaNoLimite` dispensa. As duas telas nao tinham nenhuma outra
+diferenca de contagem: as comparacoes `m.origem !== 'especie'` e
+`m.origem !== 'sempre'` do filtro da ficha sao REDUNDANTES (as duas origens
+ja estao em ORIGENS_TRUQUE_NAO_TROCAVEL), e `!m.personalizada` nao muda nada
+sobre `magias_conhecidas`, que e o unico array que o modal le.
+
+CONSEQUENCIA, medida por leitura num MAGO 5 DE CLASSE UNICA com o talento
+Iniciado em Magia (3 truques da tabela + 1 do talento, limite 4):
+
+  - secao da ficha: "Truques 3 / 4", mais a caixa separada "Truques
+    (Talento) 1". Certo.
+  - modal: "Truques: 4/4", pintado como cheio, a grade inteira opaca e
+    marcada bloqueada, e o clique no quarto truque DE CLASSE responde
+    "Limite de 4 truques atingido". O jogador e impedido de escolher um
+    truque a que tem direito.
+
+A guarda de superficie nao protege: com UMA superficie ela deixa o bloqueio
+ativo, e e justamente esse o caso errado. E a mesma classe de defeito que
+regras-origens-magia.js foi criado para extinguir ("esta lista vivia COPIADA
+EM DEZ LUGARES, e nao havia duas iguais"), ainda viva dentro do arquivo que
+este sub-projeto converteu.
+
+NAO ERA "MUDAR O QUE A MAIORIA VE", que foi a leitura errada da primeira
+versao desta entrada: era fazer o modal CONCORDAR COM A FICHA, que ja estava
+certa. As duas telas se contradiziam sobre os mesmos dois numeros, e essa
+contradicao e a propria tese do sub-projeto.
+
+COMO FOI RESOLVIDO (2026-08-29, onda de correcao da revisao final): o filtro
+literal saiu dos cinco pontos e deu lugar a uma funcao unica no proprio
+modal, `truquesQueContamNoLimite()` (site/js/sheet/grimorio.js), que e
+`(char.magias_conhecidas || []).filter(m => m.circulo === 0 &&
+truqueContaNoLimite(m))` -- o MESMO conjunto que `truquesClasse` produz na
+ficha. `truqueContaNoLimite` ja era exportada por
+site/js/regras-origens-magia.js, de onde grimorio.js ja importava
+`truqueEhTrocavel`: nenhuma fronteira de modulo foi movida, e a guarda
+textual de `getBonusTruquesOrdem` (classes-passivas.test.mjs) nao foi
+afetada.
+
+Os CINCO pontos foram convertidos, nao os dois mais obvios. Converter so o
+contador do topo e o portao deixaria o modal se contradizendo sozinho: o
+refresh de `atualizarContadores` reescreveria o contador com o numero antigo
+no primeiro clique, e a aba de truques continuaria pintando a grade inteira
+como bloqueada enquanto o portao ja deixava passar.
+
+`truquesEsp` continua sendo so os de ESPECIE, de proposito: ele alimenta a
+secao "Truques de Especie" da grade e a deduplicacao da lista de classe --
+perguntas de EXIBICAO, nao de orcamento.
+
+MEDIDO DEPOIS DO CONSERTO: no Mago 5 puro com Iniciado em Magia, ficha e
+modal mostram os dois "3 / 4", e o clique no quarto truque de classe grava em
+vez de recusar. Nenhuma divergencia residual entre as duas contagens.
+
+ORACULO: "Oraculo 4g", em
+testes/regras/unidade/multiclasse-magias-grimorio.test.mjs. Ele confronta as
+DUAS TELAS ENTRE SI (renderSecaoMagias x mostrarBuscaMagia), nao contra um
+numero escrito a mao -- se alguem mudar a regra de contagem de um dos lados,
+ele cai, qualquer que seja o numero novo; o par contra a tabela real do Mago
+fica como sanity, para as duas telas nao passarem estando igualmente erradas.
+Mede tambem o PORTAO, por clique simulado.
+
+PROVA DE QUE MEDE: (1) reposto o filtro literal dentro da funcao nova, o
+oraculo fica VERMELHO com "Ficha: 3, modal: 4" -- o sintoma exato do achado;
+(2) reposto o filtro literal SO no portao, com os contadores ja certos, ele
+fica vermelho na assercao do clique ("4 !== 5": o truque nao foi gravado).
+Restaurado nas duas vezes, md5 do arquivo de producao conferido antes e
+depois.
+
+FICA DE FORA, e nao e defeito: o sufixo "(+N especie)" do contador da aba de
+truques continua contando so especie, entao num personagem com truque de
+TALENTO os numeros da linha nao somam visualmente o total de entradas. A
+ficha resolve isso com caixas separadas ("Truques (Talento)"); replicar essa
+decomposicao no modal e mudanca de tela, nao de contagem, e nao foi feita.
+
+Conferir: site/js/sheet/grimorio.js (`truquesQueContamNoLimite` e os cinco
+pontos de chamada em `mostrarBuscaMagia`), site/js/sheet/magias.js
+(`truquesClasse`, em renderSecaoMagias), site/js/regras-origens-magia.js
+(o cabecalho e `truqueContaNoLimite`),
+testes/regras/unidade/multiclasse-magias-grimorio.test.mjs (Oraculo 4g, e o
+4d para o caso multiclasse).
+
+================================================================================
+
+2026-08-29 -- CONJURADOR MULTICLASSE NAO RECEBE SINAL NENHUM QUANDO ESTOURA
+DE VERDADE O LIMITE DE UMA CLASSE
+
+Segunda metade do achado Important 2 da mesma revisao. A primeira metade FOI
+consertada nesta onda (o modal passou a nomear a classe ativa e a repetir o
+aviso do contador honesto que a secao Magias ja dava). Esta nao: e decisao de
+produto sobre criar um alarme NOVO.
+
+O ESTADO DE HOJE, por decisao registrada na Tarefa 3: com mais de uma
+superficie de conjuracao, o alarme visual `contador-excedido` e suprimido nos
+dois lados (secao e modal), porque a CONTAGEM e global e o LIMITE e de uma
+classe so -- um Clerigo 5/Mago 1 tem 9 + 4 = 13 preparadas contra o limite de
+9 do Clerigo sem violar o livro, e o alarme dispararia falso. Os portoes de
+preparar tambem nao bloqueiam nesse caso, pelo mesmo motivo. O efeito
+somado: um jogador que de fato estoure o limite de uma classe nao recebe
+sinal nenhum -- nem bloqueio, nem alarme, so um numero cru e a frase dizendo
+que o numero mistura classes.
+
+O LIMIAR QUE A REVISAO PROPOS, e que nao pode dar falso positivo:
+`numPreparadas > soma dos limites de TODAS as superficies`. Acima disso o
+personagem violou o livro com certeza, qualquer que seja o rateio entre as
+classes.
+
+AS OPCOES, SE ALGUEM QUISER DECIDIR (nao decidido aqui):
+
+(A) ACEITAR O LIMIAR e devolver `contador-excedido` acima dele, nos dois
+    lados. CUSTO: poucas linhas, mas cria um alarme que hoje nao existe, e
+    exige decidir se ele tambem volta a BLOQUEAR (nao deveria: bloquear
+    produz beco sem saida permanente, que foi a razao de desligar o bloqueio)
+    e o que o texto do alarme diz, ja que ele nao sabe QUAL classe estourou.
+
+(B) NAO FAZER NADA: o app nao arbitra regra sozinho e o jogador ja ve os dois
+    numeros e o aviso de que a contagem e global. CUSTO: zero de codigo; quem
+    estourar de verdade nunca e avisado.
+
+(C) ESPERAR `magias_preparadas[].classe`: com o campo, contagem e limite
+    passam a ser da mesma classe e o alarme volta a ser o de sempre, exato.
+    CUSTO: o campo e a migracao, os mesmos da entrada "MAGIA PREPARADA NAO
+    SABE DE QUE CLASSE E" (2026-08-26).
+
+ADJACENTE, mesma familia, tambem em aberto: `contador-cheio` (o marcador
+NEUTRO, na igualdade) diverge hoje entre as duas telas -- a secao pinta mesmo
+com varias superficies, por decisao declarada, e o modal exige uma superficie
+so. Com Clerigo 5/Mago 1 e exatamente 9 preparadas, a ficha pinta e o modal
+nao, sobre os MESMOS dois numeros. Qualquer resposta as opcoes acima deveria
+escolher UM dos dois comportamentos e aplicar aos dois lados.
+
+NAO DECIDIDO AQUI.
+
+Conferir: site/js/sheet/magias.js (os contadores de truques e de preparadas,
+e o bloco de comentario "O CONTADOR HONESTO"), site/js/sheet/grimorio.js
+(`umaSuperficieSo`, `avisoSuperficieAtiva` e os contadores do modal),
+testes/regras/unidade/multiclasse-magias-secao.test.mjs (Oraculos 4 e 4b) e
+testes/regras/unidade/multiclasse-magias-grimorio.test.mjs (Oraculos 4d, 4e e
+4f).
 

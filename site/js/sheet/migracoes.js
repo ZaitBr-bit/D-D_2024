@@ -10,9 +10,15 @@ import { CLASSES_INFO } from '../dados-classes.js';
 import { PROFICIENCIAS_FIXAS_TALENTO } from '../regras-cobertura.js';
 import { MAGIAS_LEGADO_ESPECIE, _concederMagiaAutomatica } from '../levelup.js';
 import { getTruquesFixosAcumulados } from '../regras-conjuracao-subclasse.js';
+import { classesDe } from '../regras-multiclasse.js';
 import { getLimitesMagias } from '../utils.js';
-import { char, classeData, indiceMagiasCache, magiasDominioCache, magiasSempreCache, salvar } from './estado.js';
+import { char, indiceMagiasCache, magiasDominioCache, magiasSempreCache, salvar } from './estado.js';
 import { getSubclasseConjuradoraConjuracao, magiaContaNoLimite } from './magias.js';
+// superficiesDaFicha (Tarefa 3, sub-projeto "tela magias por classe"):
+// substitui a leitura de char.classe/classeData/char.nivel (a classe
+// INICIAL e o nível TOTAL, os espelhos) por classes[] de verdade em
+// migrarSlotsMagiaLivre, abaixo -- ver o comentário dela para o porquê.
+import { superficiesDaFicha } from './contexto-classe.js';
 
 /** Migra magias de domínio legadas adicionando origem: 'dominio' */
 export function migrarMagiasDominio() {
@@ -35,12 +41,32 @@ export function migrarMagiasDominio() {
  * antes de a migração registrar os slots liberados.
  */
 export function migrarSlotsMagiaLivre() {
-  const info = CLASSES_INFO[char.classe];
-  const subConj = getSubclasseConjuradoraConjuracao();
+  // sup: a PRIMEIRA superfície de conjuração de char.classes[] (mesmo
+  // conceito de superficieAtiva() em sheet/grimorio.js e sheet/magias.js) --
+  // nunca os espelhos char.classe/classeData/char.nivel. ANTES desta
+  // conversão (Tarefa 3), um Guerreiro/Bardo (Guerreiro na ordem 0, sem
+  // Conjuração) lia `CLASSES_INFO[char.classe]` do Guerreiro, `tipoConj`
+  // caía em 'preparadas' por omissão e a função retornava sem NUNCA checar
+  // o déficit de magias conhecidas do Bardo -- a migração inteira ficava
+  // muda para esse personagem. Com `sup`, a primeira superfície QUE
+  // CONJURA é o Bardo, e a checagem passa a rodar para ele.
+  //
+  // `sup.nivelClasse` (não char.nivel, o TOTAL) também corrige uma segunda
+  // divergência: antes, um Bardo 5/Guerreiro 3 (total 8) confrontava a
+  // tabela do Bardo no nível 8, inflando o déficit calculado acima do que
+  // o livro concede a um Bardo de nível 5. Sem risco de perda: esta função
+  // só ELEVA `char._slots_..._livre` quando o déficit calculado supera o
+  // valor já gravado (`deficit > (char._slots_..._livre || 0)`, abaixo) --
+  // nunca abaixa um valor que uma passagem anterior (mesmo com a conta
+  // antiga, mais generosa) já tenha gravado.
+  const sup = superficiesDaFicha(char)[0] || null;
+  if (!sup) return; // nenhuma superfície de conjuração -- nada para checar
+  const info = CLASSES_INFO[sup.classe];
+  const subConj = getSubclasseConjuradoraConjuracao({ classe: sup.classe, subclasse: sup.subclasse, nivel: sup.nivelClasse });
   const tipoConj = info?.tipo_conjuracao || (subConj ? 'conhecidas' : 'preparadas');
   if (tipoConj !== 'conhecidas') return; // só Feiticeiro-like conta magias conhecidas fixas
 
-  const tabela = classeData?.tabela_caracteristicas;
+  const tabela = sup.tabela;
   if (!tabela) return;
 
   // getLimitesMagias cai para a tabela da subclasse quando a da classe não
@@ -48,7 +74,7 @@ export function migrarSlotsMagiaLivre() {
   // Cavaleiro Místico era lido como 0 e a vaga nunca era oferecida -- foi o
   // que deixou sem saída os personagens que subiram para o nível 3 antes da
   // correção do fluxo de subida (que não pedia truque nem magia nenhuma).
-  const limites = getLimitesMagias(tabela, char.nivel, subConj);
+  const limites = getLimitesMagias(tabela, sup.nivelClasse, subConj);
   let alterado = false;
 
   if (limites.preparadas > 0) {
@@ -82,9 +108,19 @@ export function migrarSlotsMagiaLivre() {
  * Concede os truques que a subclasse dá de graça (Mãos Mágicas do
  * Trapaceiro Arcano) a fichas que subiram de nível antes de o fluxo de
  * subida passar a concedê-los.
+ *
+ * Percorre TODAS as classes do personagem (classesDe), consultando cada
+ * uma com a SUA PRÓPRIA subclasse e o SEU PRÓPRIO nível -- nunca os
+ * espelhos `char.classe`/`char.subclasse`/`char.nivel`, que só enxergam a
+ * classe INICIAL e o nível TOTAL. Num Mago 5/Ladino 3 (Trapaceiro Arcano) o
+ * espelho aponta para o Mago; ler só o espelho nunca concederia Mãos
+ * Mágicas. `getTruquesFixosAcumulados` já se recusa a cruzar classe de uma
+ * entrada com subclasse de outra (guarda `def.classe !== classe`), então
+ * consultar cada entrada com seu próprio par preserva essa propriedade.
  */
 export function migrarTruquesFixosSubclasse() {
-  const fixos = getTruquesFixosAcumulados(char.classe, char.subclasse, char.nivel || 1);
+  const fixos = classesDe(char)
+    .flatMap((c) => getTruquesFixosAcumulados(c.classe, c.subclasse, c.nivel || 1));
   if (fixos.length === 0) return;
   if (!char.magias_conhecidas) char.magias_conhecidas = [];
   let alterado = false;
@@ -349,8 +385,14 @@ export function migrarProficienciasTalentos() {
 // linha no bloco de imports desloca a numeração de todo o arquivo abaixo,
 // e testes/regras/catalogo/magias-preparo.mjs guarda uma exceção chaveada
 // pela linha exata de `origensForaDoLimite` em migrarSlotsMagiaLivre
-// (EXCECOES_LISTA_ORIGEM['sheet/migracoes.js:67']). Mantendo o import ao
-// lado do único trecho que o usa, a numeração do resto do arquivo não muda.
+// (EXCECOES_LISTA_ORIGEM['sheet/migracoes.js:93'] -- linha 93 desde a
+// Tarefa 3, que já deslocou este trecho ao converter migrarSlotsMagiaLivre
+// para ler classes[] via superficiesDaFicha; o import de
+// superficiesDaFicha foi ao bloco do topo mesmo assim, porque o
+// deslocamento de `origensForaDoLimite` já vinha do corpo da função
+// convertida, não do import). Mantendo este import ao lado do único trecho
+// que o usa, a numeração do resto do arquivo não muda de novo por causa
+// dele.
 import { migrarParaMulticlasse } from '../regras-multiclasse.js';
 
 /**

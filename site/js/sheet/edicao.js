@@ -9,7 +9,7 @@ import { abrirLevelUpCards } from '../levelup-ui.js';
 import { XP_POR_NIVEL, aplicarPvRetroativoPorCon, podeSubirDeNivel } from '../levelup.js';
 import { abrirModal, calcMod, escHtml, fmtMod, processarImagemArquivo, toast } from '../utils.js';
 import { rotuloPericia } from '../opcoes-dominio.js';
-import { campoEstaEditado, char, classeData, salvar, seloEdicao, talentosCache } from './estado.js';
+import { campoEstaEditado, char, salvar, seloEdicao, talentosCache } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { achatarMagiasClasse, ehSubclasseConjuradora, getSubclasseConjuradoraConjuracao, magiaContaNoLimite, obterMagiasDisponiveisClasseAtual } from './magias.js';
 import { obterListasIniciadoEmMagiaUsadas, obterTiposAdeptoElementalUsados } from './talentos.js';
@@ -374,6 +374,23 @@ function abrirModalEdicaoFicha(secaoInicial = 'atributos') {
 
 export function setupEventosEdicao() {
   document.getElementById('btn-editar-ficha')?.addEventListener('click', () => abrirModalEdicaoFicha());
+
+  // Botao discreto do selo "pre-requisito dispensado" (cabecalho da ficha,
+  // fora do modal de edicao -- por isso tem listener proprio: o listener de
+  // `[data-reverter-campo]', mais abaixo, so e ligado quando o modal de
+  // edicao abre). Reusa o mesmo `reverterEdicao` generico que os botoes
+  // `data-reverter-campo` usam -- mesmo idioma, chave nova
+  // (`prerequisitoDispensado.<Classe>`, sheet/estado.js:seloPrerequisitoDispensado).
+  // Requerido de novo a cada renderFichaCompleta, entao sempre pega o botao
+  // recem-criado (o innerHTML antigo, com seu botao antigo, ja foi descartado).
+  document.querySelectorAll('[data-reverter-prerequisito]').forEach(btn => btn.addEventListener('click', () => {
+    const classe = btn.dataset.reverterPrerequisito;
+    if (reverterEdicao(char, `prerequisitoDispensado.${classe}`)) {
+      salvar();
+      renderFichaCompleta();
+      toast('Marca de pré-requisito dispensado removida.', 'success');
+    }
+  }));
   // Editar detalhes pessoais
   document.getElementById('btn-edit-detalhes')?.addEventListener('click', () => {
     const campos = [
@@ -584,7 +601,7 @@ async function abrirModalLevelUp() {
   };
   const caches = { talentosCache };
   try {
-    await abrirLevelUpCards(char, classeData, helpers, caches, salvar, renderFichaCompleta);
+    await abrirLevelUpCards(char, helpers, caches, salvar, renderFichaCompleta);
   } catch (err) {
     console.error('Falha ao abrir fluxo de level up V2:', err);
     toast('Não foi possível abrir o fluxo de level up. Tente novamente.', 'error');

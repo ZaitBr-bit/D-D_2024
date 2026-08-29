@@ -16,7 +16,7 @@
 // ============================================================
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { modulosApp, personagemMulticlasse, lerClassesDados, escadaDeNivel } from './harness.mjs';
+import { modulosApp, personagemMulticlasse, lerClassesDados, escadaDeNivel, subirAteNivel } from './harness.mjs';
 
 // reservas-espacos.js não tem entrada em modulosApp() (não é consumido por
 // nenhum motor existente) -- importa direto. utils.js, que ele importa,
@@ -525,8 +525,12 @@ async function prepararEstadoDaFicha(p, container) {
   estado.definirIndiceMagias(indiceMagias?.magias || []);
   estado.definirTalentos(await db.getTalentos());
   estado.definirEspecies(await db.getEspecies());
-  estado.definirMagiasDominio(await levelup.obterTodasMagiasDominio(p.classe, p.subclasse, p.nivel));
-  estado.definirMagiasSempre(await levelup.obterTodasMagiasSemprePreparadas(p.classe, p.subclasse, p.nivel));
+  // Pela MESMA função que pages/sheet.js usa (por classe, no nível dela).
+  // Montar os caches aqui pelos espelhos reproduziria dentro do teste o
+  // defeito que o Oráculo 26 existe para prender.
+  const magiasAutomaticas = await levelup.obterMagiasAutomaticasDoPersonagem(p);
+  estado.definirMagiasDominio(magiasAutomaticas.dominio);
+  estado.definirMagiasSempre(magiasAutomaticas.sempre);
 }
 
 /**
@@ -1120,10 +1124,21 @@ test('recuperarUmEspaco: gasta 2, recupera 1, e o piso é 0 (com false no piso)'
 });
 
 // ============================================================
-// Oráculos 25-26: exigidos pelo RULING 15 do controlador. O laço de
-// "remover círculos que não existem mais" em levelup.js (dois lugares:
-// `atualizarEspacosMagia` e o gêmeo de subclasse conjuradora dentro de
-// `subirDeNivel`) tem DOIS trabalhos, medidos separadamente pela revisão:
+// Oráculos 25-26: exigidos pelo RULING 15 do controlador.
+//
+// ATUALIZAÇÃO (sub-projeto 5): o laço descrito abaixo NÃO EXISTE MAIS --
+// `subirDeNivel` parou de gravar espaço de magia, `atualizarEspacosMagia`
+// foi removida, e o total passou a ser derivado da regra a cada leitura.
+// Os dois oráculos continuam valendo e continuam medindo os MESMOS dois
+// fatos observáveis (o gasto do jogador sobrevive à subida; o Bruxo troca
+// de círculo em vez de acumular) -- só que agora contra o comportamento
+// derivado, que é quem responde por eles. Ler o campo direto passaria a
+// enxergar `{}` e os dois ficariam verdes sem afirmar nada.
+//
+// O que o laço fazia, e por que os dois oráculos existem:
+// o laço de "remover círculos que não existem mais" em levelup.js (dois
+// lugares: `atualizarEspacosMagia` e o gêmeo de subclasse conjuradora
+// dentro de `subirDeNivel`) tinha DOIS trabalhos, medidos separadamente:
 // (1) apagar o círculo de Magia de Pacto que o Bruxo deixou para trás ao
 // subir (ele MUDA de número: 1º nos níveis 1-2, 2º no nível 3, 3º no
 // nível 5 -- medido em dados/classes/bruxo.json); (2) o trabalho
@@ -1178,30 +1193,37 @@ test('subida de nível: o gasto de um Mago 5 de classe única sobrevive à subid
   assert.equal(gastou, true, 'controle: o gasto de fato foi inserido no nível 5');
 });
 
-// ORÁCULO 26 -- o círculo obsoleto do Bruxo continua sendo limpo:
-// nível 2→3, o círculo 1º some e o 2º aparece no lugar.
+// ORÁCULO 26 -- o Bruxo tem UM círculo de pacto por vez, e ele SOBE com o
+// nível: no 2→3 o 1º círculo dá lugar ao 2º.
 //
-// Este é o espelho do Oráculo 25: prova o OUTRO trabalho do mesmo laço.
-// A ficha de `escadaDeNivel` nunca passa por `migrarEspacosDeMagia`
-// (nada no fluxo de subida de nível a chama), então `p.espacos_magia`
-// continua na forma ANTIGA (chaves numéricas de círculo) do início ao
-// fim -- exatamente a forma que classes-progressao.test.mjs também mede,
-// e que este oráculo reproduz sem reimplementar a regra: lê o campo
-// direto, como aquele motor já faz.
-test('subida de nível: Bruxo 2→3 limpa o círculo obsoleto (1º some, 2º aparece)', async () => {
+// Antes do sub-projeto 5 isso era trabalho de um LAÇO DE LIMPEZA em
+// `subirDeNivel`, que apagava a chave numérica do círculo obsoleto depois
+// de gravar a nova -- e este oráculo lia `p.espacos_magia` direto para
+// medi-lo. O laço saiu junto com toda a gravação de espaços: o total passou
+// a ser DERIVADO da regra a cada leitura, e um círculo que o Bruxo não tem
+// mais simplesmente não é produzido -- não há o que limpar.
+//
+// A propriedade do LIVRO continua idêntica e continua medida; só o caminho
+// mudou, de campo gravado para reserva derivada. Ler o campo direto aqui
+// enxergaria `{}` nos dois níveis e o oráculo passaria sem afirmar nada.
+test('subida de nível: Bruxo 2→3 troca o círculo de pacto (1º sai, 2º entra)', async () => {
+  const circulosDePacto = (p) => new Set(
+    reservasDe(p).filter((r) => r.fonte === 'pacto').map((r) => r.circulo));
   let viuNivel2 = false;
   await escadaDeNivel('Bruxo', (p, nivel) => {
     if (nivel === 2) {
-      assert.ok(p.espacos_magia?.['1'], 'nível 2: o Bruxo tem espaços no 1º círculo');
-      assert.equal(p.espacos_magia?.['2'], undefined, 'nível 2: ainda não tem 2º círculo');
+      const circulos = circulosDePacto(p);
+      assert.ok(circulos.has(1), 'nível 2: o Bruxo tem espaços no 1º círculo');
+      assert.ok(!circulos.has(2), 'nível 2: ainda não tem 2º círculo');
       viuNivel2 = true;
     }
     if (nivel === 3) {
       assert.ok(viuNivel2, 'pré-condição: o nível 2 foi medido antes do 3');
-      assert.equal(p.espacos_magia?.['1'], undefined,
-        'nível 3: o 1º círculo (obsoleto -- o Bruxo só tem UM círculo de ' +
-        'pacto por vez) foi removido pelo laço de limpeza');
-      assert.ok(p.espacos_magia?.['2'], 'nível 3: o 2º círculo (novo) existe');
+      const circulos = circulosDePacto(p);
+      assert.ok(!circulos.has(1),
+        'nível 3: o 1º círculo é obsoleto -- o Bruxo só tem UM círculo de ' +
+        'pacto por vez, e a reserva derivada não deveria mais produzi-lo');
+      assert.ok(circulos.has(2), 'nível 3: o 2º círculo (novo) existe');
     }
   }, { ateNivel: 3 });
 });
@@ -1764,4 +1786,226 @@ test('Feitiçaria Inata: +1 na CD do Feiticeiro, em qualquer ordem de aquisiçã
     assert.equal(cdCom['Mago'], cdSem['Mago'],
       `${rotulo}: a CD do Mago NÃO pode subir -- Feitiçaria Inata é do Feiticeiro`);
   }
+});
+
+// ============================================================
+// Oráculos 26-29: a revisão final do sub-projeto 5.
+//
+// O buraco que deixou o Critical passar por onze tarefas foi de CENÁRIO,
+// não de motor: todo cenário de multiclasse escrito no sub-projeto usou
+// Guerreiro ou Bárbaro -- NÃO conjuradores -- como segunda classe. O que
+// a campanha de mutação mediu foi a DECISÃO DE NÍVEL dentro de
+// subirDeNivel/buildLevelUpContext; nada mediu o que a ficha faz com o
+// personagem DEPOIS de ele existir. Estes quatro oráculos entram por esse
+// buraco: segunda classe CONJURADORA, e a cadeia de ABERTURA da ficha.
+// ============================================================
+
+// ORÁCULO 26 -- O CRITICAL: reabrir a ficha não pode apagar a magia
+// sempre preparada concedida pela subclasse da SEGUNDA classe.
+//
+// `subirDeNivel` grava a magia em `magias_preparadas` com
+// `origem: 'sempre'`. Na abertura seguinte da ficha,
+// `migrarMagiasSemprePreparadas` REMOVE toda entrada 'sempre' ausente de
+// `magiasSempreCache` e chama salvar() -- a exclusão é PERSISTIDA. Com o
+// cache montado pelos espelhos (classe INICIAL, nível TOTAL), o cache de
+// um Mago 5/Paladino 3 não conhecia NENHUMA magia de Paladino: a
+// 'Destruição Divina' do Juramento da Devoção sumia em silêncio.
+//
+// O personagem é produzido pela cadeia REAL (subirAteNivel ->
+// subirDeNivel), não montado à mão -- montá-lo à mão pularia justamente o
+// produtor cuja saída o higienizador apaga.
+//
+// O DISCRIMINADOR é a asserção do cache pelo espelho (`[]`): sem ela,
+// este oráculo passaria também numa implementação que só tivesse deixado
+// de higienizar. Os nomes são LITERAIS, medidos nesta árvore.
+test('reabrir a ficha PRESERVA a magia sempre preparada da segunda classe', async () => {
+  const { levelup, sheetMigracoes } = mods;
+
+  const p = await personagemMulticlasse([{ classe: 'Mago', nivel: 5, subclasse: 'Evocador' }]);
+  await subirAteNivel(p, 'Paladino', 8);
+
+  assert.deepEqual(p.classes.map((c) => `${c.classe} ${c.nivel} ${c.subclasse}`),
+    ['Mago 5 Evocador', 'Paladino 3 Juramento da Devoção'],
+    'o cenário é Mago 5/Paladino 3 -- se a ordem das subclasses em dados/ mudar, ' +
+    'este oráculo falha aqui em vez de medir outra coisa em silêncio');
+  assert.equal(p.classe, 'Mago', 'o espelho de classe aponta para a INICIAL');
+  assert.equal(p.nivel, 8, 'o espelho de nível é o TOTAL');
+
+  const sempreDe = (x) => (x.magias_preparadas || [])
+    .filter((m) => m.origem === 'sempre').map((m) => m.nome);
+  assert.deepEqual(sempreDe(p), ['Destruição Divina'],
+    'a subida concedeu a magia sempre preparada do Juramento da Devoção');
+
+  // DISCRIMINADOR: era exatamente isto que apagava o dado.
+  const cachePeloEspelho = await levelup.obterTodasMagiasSemprePreparadas(
+    p.classe, p.subclasse, p.nivel);
+  assert.deepEqual(cachePeloEspelho.map((m) => m.nome), [],
+    'o cache montado pelos espelhos (Mago/Evocador/8) não conhece NENHUMA magia ' +
+    'sempre preparada -- é ele que fazia a higienização apagar a do Paladino');
+
+  // A cadeia de ABERTURA da ficha, com as funções reais.
+  const container = criarContainerStub();
+  await prepararEstadoDaFicha(p, container);
+  sheetMigracoes.migrarMagiasDominio();
+  sheetMigracoes.migrarMagiasSemprePreparadas();
+
+  assert.deepEqual(sempreDe(p), ['Destruição Divina'],
+    'depois de reabrir a ficha, a magia sempre preparada da SEGUNDA classe continua lá');
+});
+
+// ORÁCULO 27 -- a face inversa do mesmo defeito: classe INICIAL
+// conjuradora lida no nível TOTAL concede DEMAIS.
+//
+// Paladino 5/Mago 4 tem nível total 9. O cache antigo pedia as magias
+// sempre preparadas do Paladino no nível 9 -- e o Juramento da Devoção
+// abre 'Dissipar Magia' e 'Sinal de Esperança' exatamente no 9º nível DE
+// PALADINO, que este personagem não tem. Marcadas como "sempre", elas
+// liberariam vagas de preparação a mais.
+//
+// Listas LITERAIS, medidas nesta árvore, nos dois lados.
+test('classe inicial conjuradora: o cache sai do nível NA CLASSE, não do total', async () => {
+  const { levelup } = mods;
+
+  const p = await personagemMulticlasse([
+    { classe: 'Paladino', nivel: 5, subclasse: 'Juramento da Devoção' },
+    { classe: 'Mago', nivel: 4, subclasse: 'Evocador' },
+  ]);
+  assert.equal(p.nivel, 9, 'total 9 -- é ele que enganava a leitura antiga');
+
+  const peloEspelho = (await levelup.obterTodasMagiasSemprePreparadas(
+    p.classe, p.subclasse, p.nivel)).map((m) => m.nome);
+  assert.deepEqual(peloEspelho, [
+    'Destruição Divina', 'Escudo da Fé', 'Proteção Contra o Bem e o Mal',
+    'Convocar Montaria', 'Auxílio', 'Zona da Verdade',
+    'Dissipar Magia', 'Sinal de Esperança',
+  ], 'a leitura antiga entrega o Paladino do nível 9 -- duas magias a mais');
+
+  const porClasse = (await levelup.obterMagiasAutomaticasDoPersonagem(p)).sempre
+    .map((m) => m.nome);
+  assert.deepEqual(porClasse, [
+    'Destruição Divina', 'Escudo da Fé', 'Proteção Contra o Bem e o Mal',
+    'Convocar Montaria', 'Auxílio', 'Zona da Verdade',
+  ], 'por classe, o Paladino entra no nível 5 DELE: sem as duas magias do 9º');
+});
+
+// ORÁCULO 28 -- CANÁRIO de não-regressão de CLASSE ÚNICA.
+//
+// Para uma classe só, nível-na-classe é o nível total e a classe inicial
+// é a única classe: os dois caminhos TÊM de coincidir, campo a campo.
+// Sem este oráculo, uma implementação que quebrasse a ficha de classe
+// única (a esmagadora maioria das fichas reais) passaria pelos 26-27.
+test('classe única: o cache por classe é idêntico ao cache pelo espelho', async () => {
+  const { levelup } = mods;
+
+  for (const roteiro of [
+    [{ classe: 'Clérigo', nivel: 9, subclasse: 'Domínio da Vida' }],
+    [{ classe: 'Paladino', nivel: 9, subclasse: 'Juramento da Devoção' }],
+    [{ classe: 'Mago', nivel: 9, subclasse: 'Evocador' }],
+    [{ classe: 'Druida', nivel: 9, subclasse: 'Círculo da Terra' }],
+    [{ classe: 'Bardo', nivel: 9, subclasse: 'Colégio da Dança' }],
+  ]) {
+    const p = await personagemMulticlasse(roteiro);
+    const rotulo = `${roteiro[0].classe} ${roteiro[0].nivel}`;
+    const espelhoDominio = await levelup.obterTodasMagiasDominio(p.classe, p.subclasse, p.nivel);
+    const espelhoSempre = await levelup.obterTodasMagiasSemprePreparadas(p.classe, p.subclasse, p.nivel);
+    const auto = await levelup.obterMagiasAutomaticasDoPersonagem(p);
+    assert.deepEqual(auto.dominio, espelhoDominio,
+      `${rotulo}: o cache de domínio de classe única não pode mudar`);
+    assert.deepEqual(auto.sempre, espelhoSempre,
+      `${rotulo}: o cache de sempre preparadas de classe única não pode mudar`);
+  }
+});
+
+// ORÁCULO 29 -- o IMPORTANT 1: depois de uma subida que ABRE uma classe
+// nova, o mapa `classesData` da abertura da ficha não a contém, e a
+// re-renderização mostra ZERO espaço de magia quando a classe nova é a
+// única conjuradora.
+//
+// O primeiro `deepEqual` mede o DEFEITO (reserva vazia com o mapa da
+// abertura) e é o que discrimina: sem ele, o oráculo passaria numa
+// implementação em que o mapa nunca esteve incompleto. O segundo mede o
+// conserto -- `garantirDadosDeClasses` completa o mapa que já está em
+// `classesData`, sem montar outro.
+//
+// 2 espaços de 1º círculo é a tabela unificada para 1 nível de conjurador
+// pleno (livro:2050), literal.
+test('depois de abrir classe nova, garantirDadosDeClasses devolve os espaços à ficha', async () => {
+  const { sheetEstado: estado, contextoClasse, db } = mods;
+
+  const p = await personagemMulticlasse([
+    { classe: 'Bárbaro', nivel: 5, subclasse: 'Trilha do Berserker' },
+  ]);
+  // O mapa COMO A ABERTURA DA FICHA o deixou: só Bárbaro.
+  const mapaDaAbertura = new Map([['Bárbaro', await db.getClasse('Bárbaro')]]);
+  estado.definirChar(p);
+  estado.definirClassesData(mapaDaAbertura);
+
+  await subirAteNivel(p, 'Mago', 6); // abre Mago 1
+
+  assert.deepEqual(p.classes.map((c) => `${c.classe} ${c.nivel}`), ['Bárbaro 5', 'Mago 1'],
+    'a subida abriu a classe conjuradora nova');
+  assert.deepEqual(montarReservasDeEspacos(p, mapaDaAbertura), [],
+    'com o mapa da abertura -- o que a ficha re-renderizava --, a reserva é VAZIA: ' +
+    'getEspacosMagia(undefined, 1) devolve {} e o Mago recém-aberto não aparece');
+
+  await contextoClasse.garantirDadosDeClasses(p);
+
+  assert.ok(estado.classesData.get('Mago'),
+    'garantirDadosDeClasses completou o MESMO mapa com a classe nova');
+  assert.deepEqual(montarReservasDeEspacos(p, estado.classesData), [
+    { fonte: 'conjuracao', circulo: 1, total: 2, usados: 0, disponiveis: 2 },
+  ], 'com o mapa completo, o Mago 1 traz os 2 espaços de 1º círculo da tabela unificada');
+});
+
+// ============================================================
+// ORÁCULO 34 -- correção de rodada da Tarefa 3 (sub-projeto "tela magias
+// por classe"): o portão de "Preparar" do painel do grimório
+// (sheet/magias.js, [data-preparar-grimorio]) virou bloqueio PERMANENTE
+// para qualquer personagem com outra classe conjuradora.
+//
+// O DEFEITO, MEDIDO PELA REVISÃO: o portão comparava uma contagem GLOBAL
+// (`char.magias_preparadas` inteiro, filtrado só por `magiaContaNoLimite`
+// -- TODAS as classes, porque não há campo que diga de quem é cada
+// entrada) contra o limite de UMA classe (o Mago, via
+// `nivelETabelaDoMago()`). Um Clérigo 5/Mago 1 com as 9 preparadas do
+// Clérigo já feitas nunca conseguia preparar NENHUMA magia do grimório do
+// Mago: `9 >= 4` (o limite do Mago 1) é verdadeiro em todo clique, sempre.
+//
+// A CORREÇÃO: contar só as preparadas que TAMBÉM estão em `char.grimorio`
+// (proxy honesto -- magia de círculo do Mago tem de estar lá) quando há
+// mais de uma superfície de conjuração; com só uma superfície, o bloqueio
+// original continua valendo (não há ambiguidade de classe nesse caso).
+//
+// Clique de VERDADE via setupEventosEspacosMagia() -- mesmo padrão dos
+// Oráculos 19-24, acima -- não uma reimplementação da regra dentro do
+// teste.
+// ============================================================
+test('grimório: "Preparar" não trava permanentemente quando outra classe já tem várias preparadas (Clérigo 5/Mago 1)', async () => {
+  const { sheetMagias } = mods;
+  const p = await personagemMulticlasse([{ classe: 'Clérigo', nivel: 5 }, { classe: 'Mago', nivel: 1 }]);
+  // 9 "preparadas do Clérigo" -- nenhuma no grimório do Mago, todas contam
+  // no limite (magiaContaNoLimite: sem origem especial). O número em si
+  // não importa além de "maior que o limite do Mago 1" (4, medido em
+  // dados/classes/mago.json) -- 9 é o limite real de um Clérigo 5, só para
+  // o cenário ficar realista.
+  p.magias_preparadas = Array.from({ length: 9 }, (_, i) => ({ nome: `Magia de Clérigo ${i + 1}`, circulo: 1 }));
+  p.grimorio = [{ nome: 'Armadura Arcana', circulo: 1 }]; // a única magia do Mago, ainda não preparada
+  const container = criarContainerStub();
+  await prepararEstadoDaFicha(p, container);
+
+  const btn = botaoFalso({ prepararGrimorio: 'Armadura Arcana', prepCirc: '1' });
+  const restaurar = instalarDocumentoPorSeletor({ '[data-preparar-grimorio]': [btn] });
+  try {
+    sheetMagias.setupEventosEspacosMagia();
+    assert.equal(typeof btn.handlers.click, 'function',
+      'setupEventosEspacosMagia tem de registrar UM clique em [data-preparar-grimorio]');
+    btn.handlers.click({ stopPropagation() {} });
+  } finally {
+    restaurar();
+  }
+
+  assert.ok((p.magias_preparadas || []).some((m) => m.nome === 'Armadura Arcana'),
+    '"Armadura Arcana" (a única magia do grimório do Mago) deveria ter sido preparada pelo clique -- ' +
+    'se o portão ainda comparar a contagem GLOBAL (9, do Clérigo) contra o limite do Mago (4), o clique ' +
+    `não faz nada e magias_preparadas continua sem ela: ${JSON.stringify(p.magias_preparadas)}`);
 });

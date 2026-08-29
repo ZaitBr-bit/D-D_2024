@@ -2,11 +2,15 @@
 // Sistema de Level-Up D&D 2024
 // ============================================================
 import { CLASSES_INFO, ESCOLAS_SUBCLASSE_MAGO } from './dados-classes.js';
-import { getClasse, getEspecies, getIndiceMagias, getTalentos } from './db.js';
-import { getEspacosSubclasseConjuradora, getTruquesFixosSubclasse } from './regras-conjuracao-subclasse.js';
+import { getClasse, getEspecies, getIndiceMagias, getTalentos, getMagiasRituais } from './db.js';
+import { getTruquesFixosSubclasse } from './regras-conjuracao-subclasse.js';
 import { calcMod, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas } from './utils.js';
-import { aplicarDeltaSistema } from './ficha-edicoes.js';
-import { aplicarEfeitoTalento, validarEscolhasTalento } from './regras-cobertura.js';
+import { aplicarDeltaSistema, garantirEstadoEdicoes } from './ficha-edicoes.js';
+import { aplicarEfeitoTalento, validarEscolhasTalento, INSTRUMENTOS_MUSICAIS, ritualBonusPendente } from './regras-cobertura.js';
+import { contextoDeSubida, pvGanhoAoSubir } from './regras-multiclasse-progressao.js';
+import { classesDe, migrarParaMulticlasse, sincronizarEspelhos } from './regras-multiclasse.js';
+import { conjuraPorAlgumaClasse } from './regras-multiclasse-conjuracao.js';
+import { armadurasDoPersonagem, concessoesAoEntrarEm } from './regras-multiclasse-proficiencias.js';
 import {
   linhasDaSubclasseNoNivel, opcoesDaLinha,
   aplicarEscolhaSubclasse, aplicarConcessaoAutomatica,
@@ -93,11 +97,16 @@ function _atributosAtendemPrerequisito(personagem, prerequisito) {
   return citados.some(valor => Number.isFinite(valor) && valor >= 13);
 }
 
+/**
+ * True quando o personagem conjura por ALGUMA classe -- usado na
+ * elegibilidade de talentos que exigem "a caracteristica Conjuracao".
+ * Lia o espelho da classe INICIAL e os quatro ramos escritos a mao; um
+ * Barbaro 5/Mago 1 dava falso e perdia talentos a que tem direito.
+ */
 function _personagemTemConjuracao(personagem) {
-  if (CLASSES_INFO[personagem?.classe]?.conjurador) return true;
-  if (personagem?.classe === 'Guerreiro' && personagem?.subclasse === 'Cavaleiro Místico') return true;
-  if (personagem?.classe === 'Ladino' && personagem?.subclasse === 'Trapaceiro Arcano') return true;
-  return personagem?.caracteristica_conjuracao === true || personagem?.magia_de_pacto === true;
+  return conjuraPorAlgumaClasse(personagem)
+    || personagem?.caracteristica_conjuracao === true
+    || personagem?.magia_de_pacto === true;
 }
 
 export function talentoElegivelParaPersonagem(personagem, talento, nivel = personagem?.nivel || 1, opcoes = {}) {
@@ -108,7 +117,6 @@ export function talentoElegivelParaPersonagem(personagem, talento, nivel = perso
   if (nivel < minimo) return false;
   if (!_atributosAtendemPrerequisito(personagem, prerequisito)) return false;
 
-  const info = CLASSES_INFO[personagem.classe] || {};
   const exigeConjuracao = /caracteristica (?:de )?conjuracao/.test(texto) || texto.includes('magia de pacto');
   if (exigeConjuracao && !_personagemTemConjuracao(personagem)) {
     return false;
@@ -131,7 +139,10 @@ export function talentoElegivelParaPersonagem(personagem, talento, nivel = perso
   // Leves -> Médias -> Pesadas nunca subia: o talento concedia num campo
   // e o portão olhava outro.
   const armaduras = new Set([
-    ...(info.armaduras || []),
+    // UNIAO das classes, nao o espelho: um Mago 5/Guerreiro 1 tem direito
+    // a pedir talento que exige "treinamento com armadura pesada" pelo
+    // Guerreiro, e ate aqui o portao so olhava o Mago (livro:2051).
+    ...armadurasDoPersonagem(personagem),
     ...(personagem.proficiencias_extra || [])
       .map(p => String(p).replace(/^Armadura\s+/i, '')),
     ...(personagem.proficiencias_armaduras || []),
@@ -209,7 +220,22 @@ export function talentoPermitidoNaRecuperacaoDadiva(talento) {
 }
 
 export function registrarDadivaEpicaLegada(personagem, opcoes, dadosTalentos) {
-  if (!exigeDadivaEpica(personagem?.classe, 19) || Number(personagem?.nivel) < 19) {
+  // `exigeDadivaEpica(classe, 19)` com o literal 19 so testa PERTENCIMENTO
+  // a CLASSES_COM_DADIVA_EPICA -- o segundo argumento sempre bate o
+  // `nivel === 19` da propria funcao, entao o nivel NUNCA entra nesta
+  // checagem; quem barra por nivel e o `Number(personagem?.nivel) < 19`
+  // logo abaixo (nivel TOTAL, correto: mesmo gate que
+  // `precisaRecuperarDadivaEpica`, sheet/talentos.js:19-23, usa como
+  // `>= 19`). CLASSES_COM_DADIVA_EPICA lista as 12 classes do jogo, entao
+  // esta checagem e trivialmente verdadeira para qualquer personagem com
+  // classe valida -- ler so o espelho `personagem.classe` (a classe
+  // INICIAL) nunca mudou a resposta. Trocado por `classesDe` mesmo assim,
+  // so para tirar a leitura de espelho do arquivo (evita precisar de
+  // excecao declarada no guarda estatico de alcance); o literal 19 fica
+  // como estava, para o comportamento continuar byte a byte o mesmo.
+  const temClasseComDadivaEpica = classesDe(personagem)
+    .some(c => exigeDadivaEpica(c.classe, 19));
+  if (!temClasseComDadivaEpica || Number(personagem?.nivel) < 19) {
     return { sucesso: false, erro: 'O personagem não possui a escolha de Dádiva Épica de nível 19.' };
   }
   if (personagem?.escolhas_classe?.dadiva_epica_nivel_19) {
@@ -348,28 +374,6 @@ export function calcularHPGanho(classe, modCon) {
   const hpFixo = Math.floor(dadoVida / 2) + 1 + modCon;
   
   return Math.max(1, hpFixo); // Mínimo de 1 HP
-}
-
-/**
- * Calcula HP ganho ao subir de nível (fixo ou rolagem)
- * @param {string} classe - Nome da classe
- * @param {number} modCon - Modificador de Constituição
- * @param {Object} opcoes - Opções de cálculo ({ hp_modo: 'fixo'|'rolado', hp_rolado: number })
- * @returns {number} HP ganho
- */
-export function calcularHPGanhoComOpcao(classe, modCon, opcoes = {}) {
-  const info = CLASSES_INFO[classe];
-  if (!info || !info.dado_vida) return 0;
-
-  const modo = opcoes.hp_modo === 'rolado' ? 'rolado' : 'fixo';
-  if (modo === 'rolado') {
-    const rolado = parseInt(opcoes.hp_rolado);
-    if (!Number.isNaN(rolado) && rolado >= 1 && rolado <= info.dado_vida) {
-      return Math.max(1, rolado + modCon);
-    }
-  }
-
-  return calcularHPGanho(classe, modCon);
 }
 
 /**
@@ -935,54 +939,48 @@ export async function obterTodasMagiasDominio(classe, subclasse, nivelAtual) {
 }
 
 /**
- * Atualiza os espaços de magia do personagem baseado no novo nível
+ * Monta os caches de magias automáticas (domínio e sempre preparadas) de
+ * TODAS as classes do personagem, cada uma no nível DELA.
+ *
+ * Existe porque esses dois caches não são só exibição: `magiasSempreCache`
+ * é o crivo de `migrarMagiasSemprePreparadas` (sheet/migracoes.js), que
+ * REMOVE de `char.magias_preparadas` toda entrada `origem: 'sempre'`
+ * ausente dele e persiste a remoção. Montá-lo pelos ESPELHOS
+ * (`char.classe`/`char.subclasse`/`char.nivel`, que apontam sempre para a
+ * classe INICIAL e para o nível TOTAL) apagava, na reabertura da ficha,
+ * toda magia sempre preparada concedida por uma segunda classe -- e, no
+ * sentido inverso, marcava como "sempre" magias do nível TOTAL quando a
+ * classe inicial era a conjuradora. Por classe e no nível da classe, os
+ * dois lados fecham.
+ *
+ * `opcaoEscolhida` (o terreno do Círculo da Terra) é repassada porque é o
+ * mesmo argumento que o PRODUTOR usa ao conceder (subirDeNivel, no bloco
+ * de magias sempre preparadas): cache e produtor precisam enxergar a
+ * mesma lista, senão a higienização volta a apagar o que a subida deu.
+ *
+ * @param {object} personagem Personagem (usa classes[], com fallback de espelho em classesDe).
+ * @returns {Promise<{dominio: Array, sempre: Array}>} listas de { nome, circulo } acumuladas.
  */
-export async function atualizarEspacosMagia(personagem, classeData) {
-  if (!classeData || !classeData.tabela_caracteristicas) return;
-  
-  const espacos = getEspacosMagia(classeData.tabela_caracteristicas, personagem.nivel);
-  
-  // Garantir que espacos_magia exista
-  if (!personagem.espacos_magia) personagem.espacos_magia = {};
-  
-  // Preservar espaços usados se já existirem, caso contrário resetar
-  Object.keys(espacos).forEach(circulo => {
-    if (personagem.espacos_magia[circulo]) {
-      // Atualizar apenas o total, manter os usados
-      personagem.espacos_magia[circulo].total = espacos[circulo].total;
-      // Se usados for maior que o novo total, ajustar
-      if (personagem.espacos_magia[circulo].usados > espacos[circulo].total) {
-        personagem.espacos_magia[circulo].usados = espacos[circulo].total;
-      }
-    } else {
-      // Novo círculo
-      personagem.espacos_magia[circulo] = espacos[circulo];
-    }
-  });
-  
-  // Remover círculos que não existem mais no novo nível.
-  //
-  // O Bruxo é a única classe cujo círculo de Magia de Pacto MUDA DE
-  // NÚMERO ao subir (nível 1-2 -> 1º, nível 3 -> 2º, nível 5 -> 3º, e
-  // assim por diante -- medido em dados/classes/bruxo.json): sem esta
-  // limpeza o círculo antigo ficaria para trás, e
-  // classes-progressao.test.mjs (que confronta a tabela do livro nível a
-  // nível) acusaria dois círculos onde o Bruxo só tem um. Por isso o laço
-  // fica.
-  //
-  // Mas ele NÃO pode tocar 'conjuracao' e 'pacto': desde o sub-projeto 4
-  // essas duas chaves guardam o GASTO do jogador por FONTE (não são
-  // números de círculo, então `!espacos[circulo]` já as pegava como
-  // "fora da tabela") -- apagá-las apagava o gasto a cada subida de
-  // nível, o mesmo mecanismo do defeito que a Tarefa 4 já tinha corrigido
-  // no Descanso Longo (medido).
-  Object.keys(personagem.espacos_magia).forEach(circulo => {
-    if (circulo === 'conjuracao' || circulo === 'pacto') return;
-    if (!espacos[circulo]) {
-      delete personagem.espacos_magia[circulo];
-    }
-  });
+export async function obterMagiasAutomaticasDoPersonagem(personagem) {
+  const dominio = [];
+  const sempre = [];
+  const opcaoSubclasse = personagem?.escolhas_classe?.circulo_terra_terreno;
+  for (const c of classesDe(personagem)) {
+    dominio.push(...await obterTodasMagiasDominio(c.classe, c.subclasse, c.nivel));
+    sempre.push(...await obterTodasMagiasSemprePreparadas(c.classe, c.subclasse, c.nivel, opcaoSubclasse));
+  }
+  return { dominio, sempre };
 }
+
+// ESPACOS DE MAGIA NAO SAO MAIS GRAVADOS AQUI. Desde o sub-projeto 4 o
+// TOTAL e derivado da regra a cada leitura por montarReservasDeEspacos
+// (sheet/reservas-espacos.js); `char.espacos_magia` guarda so `usados`,
+// por fonte e circulo. `atualizarEspacosMagia` escrevia chaves NUMERICAS
+// de circulo -- a forma antiga -- e era a unica coisa que ainda produzia
+// a forma hibrida que o docblock daquele arquivo nomeia como o unico caso
+// desprotegido. O laco que movia o circulo de pacto do Bruxo (1 -> 2 -> 3)
+// saiu junto: a reserva derivada ja responde o circulo certo pelo nivel de
+// Bruxo.
 
 /**
  * Adiciona uma magia concedida automaticamente (domínio/sempre-preparada) a uma lista.
@@ -1050,66 +1048,227 @@ export function aplicarPvRetroativoPorCon(personagem, modAntes, modDepois) {
 }
 
 /**
+ * Traduz as opcoes de PV da TELA de level-up para o vocabulario que
+ * `pvGanhoAoSubir` (regras-multiclasse-progressao.js) entende.
+ *
+ * Sao dois vocabularios diferentes, e essa e a unica ponte entre eles: a UI
+ * grava `hp_modo: 'rolado'` + `hp_rolado` (levelup-validations.js:30-32),
+ * enquanto a funcao de regra le apenas `opcoes.rolado`. Repassar `opcoes`
+ * cru faria `rolado` chegar `undefined` e o modo "rolar" morreria EM
+ * SILENCIO -- o jogador pediria a rolagem e receberia sempre a media. A
+ * caracterizacao nao pegaria: a escada de teste nunca rola.
+ *
+ * Valor nao numerico ou fora de [1, faces] e DESCARTADO, caindo na media --
+ * e o que a subida sempre fez, antes do sub-projeto 5, pela funcao de PV
+ * que ela usava (removida na Tarefa 3b, quando ficou sem chamador).
+ * Repassar o valor cru seria pior que inutil: `pvGanhoAoSubir` PRENDE o
+ * valor no intervalo, e um "99" digitado a mao viraria dado cheio em vez
+ * de media.
+ *
+ * @param {Object} opcoes Opcoes da subida, no formato da tela.
+ * @param {number} faces Faces do dado de vida da classe que sobe.
+ * @returns {{rolado?: number}} Opcoes no formato de pvGanhoAoSubir.
+ */
+function opcoesPvDaSubida(opcoes, faces) {
+  if (opcoes.hp_modo !== 'rolado') return {};
+  const rolado = parseInt(opcoes.hp_rolado);
+  if (Number.isNaN(rolado) || rolado < 1 || rolado > faces) return {};
+  return { rolado };
+}
+
+/**
+ * Monta a mensagem da pendencia 'ritual_bonus_proficiencia' (crescimento
+ * do Conjurador Ritualista, Talentos.md:370).
+ *
+ * RAMIFICA DE PROPOSITO. O portao e um INVARIANTE (contagem de magias do
+ * talento x Bonus de Proficiencia do nivel TOTAL), entao ele dispara em
+ * DOIS casos diferentes, e a mensagem antiga afirmava o primeiro nos dois
+ * (achado Important 2 da revisao final -- a tela contava ao jogador uma
+ * regra que nao tinha acontecido):
+ *
+ *   1. o Bonus de Proficiencia subiu NESTA subida (niveis 5, 9, 13 e 17
+ *      do total, livro:2047) -- e o evento que o talento descreve;
+ *   2. a ficha ja estava em DIVIDA antes desta subida (cruzou um patamar
+ *      quando o crescimento ainda nao existia, ou perdeu uma magia para
+ *      outra tela) e o Bonus de Proficiencia nao mudou aqui.
+ *
+ * @param {{deve: number, tem: number, faltam: number}} pendente Saida de
+ *   `ritualBonusPendente` para o nivel TOTAL NOVO.
+ * @param {number} nivelTotalAnterior Nivel TOTAL de ANTES desta subida --
+ *   e a comparacao dele com `pendente.deve` que separa os dois casos.
+ * @returns {string} Mensagem verdadeira nos dois casos.
+ */
+function montarMensagemRitualBonus(pendente, nivelTotalAnterior) {
+  const quantas = pendente.faltam === 1
+    ? '1 magia ritual de 1º círculo'
+    : `${pendente.faltam} magias rituais de 1º círculo distintas`;
+  const subiuAgora = pendente.deve > bonusProficiencia(nivelTotalAnterior);
+  return subiuAgora
+    ? `Seu Bônus de Proficiência subiu para +${pendente.deve}: escolha ${quantas} para o Conjurador Ritualista.`
+    : `O Conjurador Ritualista mantém ${pendente.deve} magias rituais de 1º círculo sempre preparadas ` +
+      `(Bônus de Proficiência +${pendente.deve}) e sua ficha tem ${pendente.tem}: escolha ${quantas}.`;
+}
+
+/**
  * Função principal de level-up
  * @param {Object} personagem - Objeto do personagem
  * @param {Object} opcoes - Opções para o level-up
  * @returns {Object} Resultado do level-up com informações sobre o que mudou
  */
 export async function subirDeNivel(personagem, opcoes = {}) {
-  const nivelAnterior = personagem.nivel || 1;
-  const novoNivel = nivelAnterior + 1;
-  
-  if (novoNivel > 20) {
+  // A classe em que o nivel entra. Sem `opcoes.classe`, e a classe INICIAL
+  // -- o comportamento de antes do sub-projeto 5, preservado para todo
+  // chamador que ainda nao passa a escolha (testes e2e existentes, e o
+  // proprio wizard ate a Tarefa 6).
+  const classeQueSobe = opcoes.classe || personagem.classe;
+  // NORMALIZA A FICHA LEGADA ANTES DE LER QUALQUER NIVEL.
+  //
+  // `classes[]` e a fonte da verdade dos dois niveis, e quase sempre ja
+  // existe: migrarMulticlasse() roda na abertura da ficha (pages/sheet.js).
+  // Mas nao e garantido -- `store.criarPersonagemVazio()` monta so os
+  // espelhos, e `subirDeNivel` tambem e chamada direto, sem passar pela
+  // ficha (toda a suite de regras faz isso).
+  //
+  // Tem de vir ANTES de `contextoDeSubida`, nao so antes da gravacao: os
+  // dois leem o mesmo estado por caminhos diferentes, e o migrador repara
+  // um `nivel` ausente ou 0 com o piso de 1 (`Number(p.nivel) || 1`)
+  // enquanto `nivelTotal()` leria 0. Migrando depois, uma ficha com
+  // `nivel: 0` era relatada como indo ao nivel 1 e terminava no 2 --
+  // o resumo e o personagem discordavam.
+  //
+  // Delega ao MIGRADOR, o unico caminho de criacao autorizado (idempotente,
+  // e ainda preserva o gasto legado de dado de vida). Montar o array a mao
+  // aqui abriria um SEGUNDO caminho de criacao, que divergiria dele em
+  // silencio.
+  //
+  // E o migrador PODE RECUSAR: ele devolve false sem criar nada quando nao
+  // ha de onde migrar, isto e, quando o espelho `p.classe` esta vazio
+  // (regras-multiclasse.js) -- exatamente o que `store.criarPersonagemVazio()`
+  // produz (`classe: ''`). Uma ficha assim com `opcoes.classe` preenchida
+  // passa pela checagem de `getClasse` (a classe pedida existe no catalogo)
+  // e so morreria la embaixo, num TypeError de `classes.find`. Entao
+  // FALHA FECHADA aqui, com erro nomeado -- mesma direcao de erro que
+  // `podeEntrarEm` e `pvGanhoAoSubir` (regras-multiclasse-progressao.js) ja
+  // adotam para entrada que nao da para honrar. Hoje o caminho e alcancavel
+  // por `harness.subirAteNivel` (sempre passa `opcoes.classe`) e passa a ser
+  // alcancavel pela UI na Tarefa 6.
+  if (!Array.isArray(personagem.classes) || personagem.classes.length === 0) {
+    migrarParaMulticlasse(personagem);
+  }
+  if (!Array.isArray(personagem.classes) || personagem.classes.length === 0) {
+    return { sucesso: false, erro: 'Personagem sem classe: nao ha em que classe entrar o nivel' };
+  }
+  // OS DOIS NIVEIS, separados de proposito. `nivelNaClasse*` manda em tudo
+  // que a CLASSE concede naquele patamar dela (caracteristicas, subclasse
+  // no 3o, Aumento no Valor de Atributo, Dadiva Epica, estilo de luta,
+  // manobras, expertise, grimorio). `nivelTotal*` manda no que o livro
+  // amarra ao PERSONAGEM inteiro: teto de 20 e XP (livro:2037), Bonus de
+  // Proficiencia (livro:2047) e caracteristicas de ESPECIE, cujo texto diz
+  // "No nivel 5 DO PERSONAGEM" (Especies.md:106). Em classe unica os dois
+  // sao o mesmo numero -- por isso cada uso abaixo foi decidido um a um, e
+  // nenhum guarda automatico pega uma troca errada entre eles.
+  const sub = contextoDeSubida(personagem, classeQueSobe);
+  const nivelTotalAnterior = sub.nivelTotalAnterior;
+  const nivelTotalNovo = sub.nivelTotalNovo;
+  const nivelNaClasseAnterior = sub.nivelNaClasseAnterior;
+  const nivelNaClasseNovo = sub.nivelNaClasseNovo;
+
+  if (nivelTotalNovo > 20) {
     return { sucesso: false, erro: 'Nível máximo já alcançado (20)' };
   }
-  
+
   if (!opcoes.ignorar_xp && !podeSubirDeNivel(personagem)) {
-    const xpNecessario = XP_POR_NIVEL[novoNivel];
+    const xpNecessario = XP_POR_NIVEL[nivelTotalNovo];
     const xpAtual = personagem.xp || 0;
     return {
       sucesso: false,
       erro: `XP insuficiente. Necessário: ${xpNecessario}, Atual: ${xpAtual}`
     };
   }
-  
-  // Carregar dados da classe
-  const classeData = await getClasse(personagem.classe);
+
+  // Pre-requisito de multiclasse (livro:2033): 13+ no atributo primario da
+  // classe NOVA e de todas as atuais. `sub.permitido` (contextoDeSubida,
+  // que delega a podeEntrarEm) ja vem sempre true para uma classe que o
+  // personagem JA TEM -- o pre-requisito e so para se qualificar a uma
+  // classe nova. O app bloqueia por padrao, mas o dono do produto decidiu
+  // um escape explicito: `opcoes.dispensar_prerequisito`, porque muitas
+  // mesas dispensam essa regra. Sem ele, recusa como pendencia -- mesmo
+  // formato dos outros `tipo_pendencia`, para a tela poder responder com a
+  // escolha do jogador (o botao "usar mesmo assim", levelup-cards.js).
+  if (!sub.permitido && !opcoes.dispensar_prerequisito) {
+    return {
+      sucesso: false,
+      pendente: true,
+      tipo_pendencia: 'prerequisito_classe',
+      mensagem: `Pré-requisito de multiclasse não atendido para ${sub.classe}.`,
+      faltando: sub.faltando,
+    };
+  }
+
+  // Carregar dados da classe QUE SOBE -- nao o espelho `personagem.classe`,
+  // que num multiclasse aponta sempre para a classe inicial.
+  const classeData = await getClasse(sub.classe);
   if (!classeData) {
     return { sucesso: false, erro: 'Dados da classe não encontrados' };
   }
-  
-  // Calcular ganho de HP
+
+  // Calcular ganho de PV pelo dado da CLASSE QUE SOBE.
+  //
+  // ORDEM OBRIGATORIA: `pvGanhoAoSubir` le o estado ANTERIOR a insercao em
+  // `classes[]` -- e `nivelTotal(char) === 0` que ela usa para reconhecer o
+  // 1o nivel do personagem e conceder o dado CHEIO (livro:2041). Esta linha
+  // roda MUITO antes do bloco de aplicacao, entao a ordem esta garantida;
+  // nao mova o calculo para perto da gravacao.
+  //
+  // `modConAntes` continua sendo calculado aqui porque alimenta
+  // `aplicarPvRetroativoPorCon` mais abaixo -- `pvGanhoAoSubir` deriva o
+  // seu proprio modificador do personagem.
   const modConAntes = calcMod(personagem.atributos.constituicao);
-  const hpGanho = calcularHPGanhoComOpcao(personagem.classe, modConAntes, opcoes);
-  
+  const hpGanho = pvGanhoAoSubir(personagem, sub.classe, opcoesPvDaSubida(opcoes, sub.dadoVida));
+
   // Obter características do novo nível
-  const caracteristicas = await obterCaracteristicasNivel(personagem.classe, novoNivel);
-  const caracteristicasEspecie = await obterCaracteristicasEspecieNivel(personagem.especie, novoNivel, personagem.tracos_escolhidos);
-  
+  const caracteristicas = await obterCaracteristicasNivel(sub.classe, nivelNaClasseNovo);
+  const caracteristicasEspecie = await obterCaracteristicasEspecieNivel(personagem.especie, nivelTotalNovo, personagem.tracos_escolhidos);
+
   // Verificar se precisa escolher subclasse
-  const precisaSubclasse = exigeSubclasse(personagem.classe, novoNivel) && !personagem.subclasse;
-  
+  const precisaSubclasse = exigeSubclasse(sub.classe, nivelNaClasseNovo) && !sub.subclasse;
+
   // Verificar se ganha aumento de atributo
-  const ganhaAumentoAtributo = concedeAumentoAtributo(personagem.classe, novoNivel);
-  const requerDadivaEpica = exigeDadivaEpica(personagem.classe, novoNivel);
-  const exigeEspecializacao = exigeEspecializacaoBardo(personagem.classe, novoNivel);
-  const exigeEspecializacaoGuardiaoNivel = exigeEspecializacaoGuardiao(personagem.classe, novoNivel);
-  const exigeEstiloLutaNivel = exigeEstiloLuta(personagem.classe, novoNivel);
-  const exigeTrocaEstiloLutaGuerreiroNivel = exigeTrocaEstiloLutaGuerreiro(personagem.classe, novoNivel);
-  const exigeEspecializacaoLadinoNivel = exigeEspecializacaoLadino(personagem.classe, novoNivel);
-  const exigeExploradorHabilNivel = exigeExploradorHabil(personagem.classe, novoNivel);
-  const exigeAcademicoNivel = exigeAcademico(personagem.classe, novoNivel);
-  const exigeGrimorioMago = personagem.classe === 'Mago' && novoNivel > 1;
-  const subclasseEfetivaManobras = opcoes.subclasse || personagem.subclasse;
-  const exigeManobrasNivel = exigeManobrasGuerreiro(personagem.classe, subclasseEfetivaManobras, novoNivel);
+  const ganhaAumentoAtributo = concedeAumentoAtributo(sub.classe, nivelNaClasseNovo);
+  const requerDadivaEpica = exigeDadivaEpica(sub.classe, nivelNaClasseNovo);
+  const exigeEspecializacao = exigeEspecializacaoBardo(sub.classe, nivelNaClasseNovo);
+  const exigeEspecializacaoGuardiaoNivel = exigeEspecializacaoGuardiao(sub.classe, nivelNaClasseNovo);
+  const exigeEstiloLutaNivel = exigeEstiloLuta(sub.classe, nivelNaClasseNovo);
+  const exigeTrocaEstiloLutaGuerreiroNivel = exigeTrocaEstiloLutaGuerreiro(sub.classe, nivelNaClasseNovo);
+  const exigeEspecializacaoLadinoNivel = exigeEspecializacaoLadino(sub.classe, nivelNaClasseNovo);
+  const exigeExploradorHabilNivel = exigeExploradorHabil(sub.classe, nivelNaClasseNovo);
+  const exigeAcademicoNivel = exigeAcademico(sub.classe, nivelNaClasseNovo);
+  // RESÍDUO CORRIGIDO: exigia `nivelNaClasseNovo > 1`, então nunca disparava
+  // no 1º nível DE MAGO -- e esse nível só chega aqui por multiclasse (a
+  // criação nunca passa por subirDeNivel). O livro (Classes.md:4552-4556,
+  // "Como um Personagem Multiclasse" do Mago) manda conceder as
+  // características de nível 1 de Mago, e o Livro de Magias é uma delas
+  // (Conjuração) -- negar a pendência deixava char.grimorio vazio para
+  // sempre num Mago entrado por multiclasse. Em classe única nada muda:
+  // subirDeNivel só é chamado a partir do 2º nível NA CLASSE (o 1º vem da
+  // criação), então nivelNaClasseNovo nunca é 1 nesse caminho.
+  const exigeGrimorioMago = sub.classe === 'Mago';
+  // Quantidade de magias novas do Grimório neste nível: SEIS no 1º nível
+  // de Mago (Classes.md, característica Conjuração -- "Ele começa com seis
+  // magias de mago 1º círculo à sua escolha"), DUAS nos níveis seguintes
+  // (crescimento normal, valor medido de antes desta correção). Mesmo
+  // número que o criador já usa (creator/passo-magias.js:78).
+  const grimorioQtd = nivelNaClasseNovo === 1 ? 6 : 2;
+  const subclasseEfetivaManobras = opcoes.subclasse || sub.subclasse;
+  const exigeManobrasNivel = exigeManobrasGuerreiro(sub.classe, subclasseEfetivaManobras, nivelNaClasseNovo);
   let magiasGrimorioSelecionadas = [];
   // Versado em [Escola] (subclasse do Mago): magias grátis de escola no grimório.
-  const escolaSubclasseArcana = personagem.classe === 'Mago' && Object.prototype.hasOwnProperty.call(ESCOLAS_SUBCLASSE_MAGO, subclasseEfetivaManobras)
+  const escolaSubclasseArcana = sub.classe === 'Mago' && Object.prototype.hasOwnProperty.call(ESCOLAS_SUBCLASSE_MAGO, subclasseEfetivaManobras)
     ? ESCOLAS_SUBCLASSE_MAGO[subclasseEfetivaManobras] : null;
   let qtdMagiasSubclasseArcana = 0;
   if (escolaSubclasseArcana) {
-    const ganhouNovoCirculoNivel = ganhouNovoCirculoDeEspacos(classeData.tabela_caracteristicas, nivelAnterior, novoNivel);
-    if (novoNivel === 3) {
+    const ganhouNovoCirculoNivel = ganhouNovoCirculoDeEspacos(classeData.tabela_caracteristicas, nivelNaClasseAnterior, nivelNaClasseNovo);
+    if (nivelNaClasseNovo === 3) {
       qtdMagiasSubclasseArcana += 2; // bônus inicial de entrada na subclasse (já cobre o 2º círculo do próprio nível 3)
     } else if (ganhouNovoCirculoNivel) {
       qtdMagiasSubclasseArcana += 1; // bônus recorrente, apenas nos níveis seguintes que desbloqueiam novo círculo
@@ -1151,7 +1310,8 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   if (ganhaAumentoAtributo && opcoes.talento) {
     talentoData = encontrarTalentoPorNome(await getTalentos(), opcoes.talento);
     if (!talentoData) return { sucesso: false, erro: 'Talento selecionado não encontrado.' };
-    if (!talentoElegivelParaPersonagem(personagem, talentoData, novoNivel)) {
+    // Pre-requisito de talento e do PERSONAGEM ("nivel 4+"), nao da classe.
+    if (!talentoElegivelParaPersonagem(personagem, talentoData, nivelTotalNovo)) {
       return { sucesso: false, erro: 'O personagem não atende aos pré-requisitos do talento selecionado.' };
     }
 
@@ -1187,10 +1347,16 @@ export async function subirDeNivel(personagem, opcoes = {}) {
       }
     }
 
+    // `nivelTotalNovo` explicito: aqui `personagem.nivel` ainda e o TOTAL
+    // ANTERIOR (sincronizarEspelhos so roda mais abaixo, dentro desta
+    // mesma funcao) -- sem isto, Conjurador Ritualista contaria pelo
+    // Bonus de Proficiencia de ANTES da subida sempre que ela cruzar um
+    // patamar (so alcancavel em multiclasse: ASI e por nivel DE CLASSE).
     const validacaoCobertura = validarEscolhasTalento(
       personagem,
       opcoes.talento,
-      montarEscolhasCoberturaTalento(opcoes)
+      montarEscolhasCoberturaTalento(opcoes),
+      nivelTotalNovo
     );
     if (!validacaoCobertura.valido) {
       return {
@@ -1281,7 +1447,7 @@ export async function subirDeNivel(personagem, opcoes = {}) {
 
   // Validar Manobras do Mestre da Batalha (níveis 3, 7, 10, 15)
   if (exigeManobrasNivel) {
-    const qtdNova = getQuantidadeNovasManobras(novoNivel);
+    const qtdNova = getQuantidadeNovasManobras(nivelNaClasseNovo);
     const novasManobras = Array.isArray(opcoes.manobras_novas) ? opcoes.manobras_novas : [];
     const manobraTrocarDe = opcoes.manobra_trocar_de || null;
     const manobraTrocarPara = opcoes.manobra_trocar_para || null;
@@ -1304,17 +1470,168 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     }
   }
 
+  // PROFICIENCIAS DE CLASSE NOVA (livro:2051). So no PRIMEIRO nivel
+  // naquela classe -- `ehPrimeiroNivelNaClasse`, e nunca
+  // `ehPrimeiroNivelDoPersonagem`: os dois campos existem separados
+  // exatamente por isto (regras-multiclasse-progressao.js:107).
+  //
+  // A classe INICIAL nao passa por aqui: as pericias dela vem do criador,
+  // completas. Este bloco so ve classes adquiridas depois.
+  const concessoesNovas = sub.ehPrimeiroNivelNaClasse && !sub.ehPrimeiroNivelDoPersonagem
+    ? concessoesAoEntrarEm(sub.classe)
+    : null;
+  if (concessoesNovas) {
+    if (concessoesNovas.pericias > 0) {
+      const escolhida = opcoes.pericia_classe_nova;
+      const jaTem = (personagem.pericias_proficientes || []).includes(escolhida);
+      // MENSAGEM POR MOTIVO, nao uma so para os tres. Mandar "escolha 1
+      // pericia nova" para quem foi recusado por JA POSSUIR a pericia manda
+      // o chamador fazer algo que a tela nem oferece (o select filtra as
+      // ja-possuidas). Mesmo padrao que regras-cobertura.js ja usa para
+      // Habilidoso/Artifista/Musico, que sofrem do mesmo problema.
+      if (jaTem) {
+        return {
+          sucesso: false,
+          pendente: true,
+          tipo_pendencia: 'proficiencias_classe_nova',
+          mensagem: `Escolha uma perícia de ${sub.classe} em que ainda não tenha proficiência.`,
+        };
+      }
+      if (escolhida && !concessoesNovas.opcoesPericia.includes(escolhida)) {
+        return {
+          sucesso: false,
+          pendente: true,
+          tipo_pendencia: 'proficiencias_classe_nova',
+          mensagem: `"${escolhida}" não está na lista de perícias que ${sub.classe} concede em multiclasse.`,
+        };
+      }
+      if (!escolhida) {
+        return {
+          sucesso: false,
+          pendente: true,
+          tipo_pendencia: 'proficiencias_classe_nova',
+          mensagem: `Escolha 1 perícia nova concedida por ${sub.classe}.`,
+        };
+      }
+    }
+    if (concessoesNovas.instrumentos > 0) {
+      const instrumento = opcoes.instrumento_classe_nova;
+      const jaTemInstrumento = (personagem.proficiencias_instrumentos || []).includes(instrumento);
+      // MINOR 2 da revisao: faltava conferir o instrumento contra uma
+      // lista valida -- a pericia ja e conferida contra
+      // `concessoesNovas.opcoesPericia` alguns paragrafos acima, mas o
+      // instrumento so checava presenca e "ja tem". Sem isto, quem chama
+      // o motor direto (sem passar pela tela) gravava qualquer string em
+      // `proficiencias_instrumentos`.
+      // Tres motivos, tres mensagens -- ver o comentario da pericia acima.
+      if (jaTemInstrumento) {
+        return {
+          sucesso: false,
+          pendente: true,
+          tipo_pendencia: 'proficiencias_classe_nova',
+          mensagem: `Escolha um Instrumento Musical em que ainda não tenha proficiência para ${sub.classe}.`,
+        };
+      }
+      if (instrumento && !INSTRUMENTOS_MUSICAIS.includes(instrumento)) {
+        return {
+          sucesso: false,
+          pendente: true,
+          tipo_pendencia: 'proficiencias_classe_nova',
+          mensagem: `"${instrumento}" não é um Instrumento Musical do livro.`,
+        };
+      }
+      if (!instrumento) {
+        return {
+          sucesso: false,
+          pendente: true,
+          tipo_pendencia: 'proficiencias_classe_nova',
+          mensagem: `Escolha 1 Instrumento Musical concedido por ${sub.classe}.`,
+        };
+      }
+    }
+  }
+
+  // CRESCIMENTO DO CONJURADOR RITUALISTA (Talentos.md:370).
+  //
+  // `sub.nivelTotalNovo` e obrigatorio aqui: `personagem.nivel` ainda e o
+  // nivel ANTERIOR neste ponto (sincronizarEspelhos so roda no fim desta
+  // funcao), entao medir pelo espelho perderia exatamente a subida que
+  // cruza o patamar -- o unico caso que interessa.
+  const ritualPendente = ritualBonusPendente(personagem, sub.nivelTotalNovo);
+  // HOISTED para fora do `if` -- achado da revisao (fix round 2): a
+  // gravacao (mais abaixo) tem de consumir EXATAMENTE o que este guard
+  // aprovou, nunca reler `opcoes.rituais_bonus_proficiencia` bruto de
+  // novo. Mesmo padrao que `magiasGrimorioSelecionadas` (declarada bem
+  // acima, atribuida so depois de validar, consumida na gravacao) --
+  // sem essa reutilizacao, um array com nomes validos MAIS entradas
+  // vazias/nao-string passava pela contagem do guard (que filtra e
+  // conta so os `faltam` validos) mas a gravacao, lendo o array cru de
+  // novo, gravava tambem a entrada vazia -- permanente e silencioso,
+  // numa ficha sem "descer de nivel".
+  let magiasRitualBonusSelecionadas = [];
+  if (ritualPendente.faltam > 0) {
+    // Normaliza ANTES de qualquer outra checagem -- achado de revisao:
+    // `new Set(escolhidas)`/`.some(...)` rodavam antes do proprio
+    // `Array.isArray`, entao um valor nao-array truthy (string, numero,
+    // objeto) lancava TypeError em vez de devolver a pendencia. Mesmo
+    // padrao de normalizacao que o bloco de grimorio usa logo abaixo
+    // (`selecionadas`), inclusive descartando entradas vazias/nao-string
+    // no mesmo passo -- substitui o antigo `.some((m) => !m)`.
+    const escolhidas = Array.isArray(opcoes.rituais_bonus_proficiencia)
+      ? opcoes.rituais_bonus_proficiencia.filter((nome) => typeof nome === 'string' && nome)
+      : [];
+    const distintas = new Set(escolhidas);
+    // Recusa qualquer nome JA PREPARADO na ficha, de qualquer origem --
+    // `nomesPreparados`, nao `jaEscolhidas` (achado Important 1 da
+    // revisao final). Com `jaEscolhidas` (so as do proprio talento), uma
+    // magia ritual ja preparada por outra via -- preparacao normal de
+    // Mago/Clerigo/Druida, magia de dominio, Tocado Pelas Sombras --
+    // passava por aqui e a gravacao logo abaixo, que deduplica por
+    // `nome` + `origem`, empurrava uma SEGUNDA entrada com o mesmo nome:
+    // ficha com a magia repetida, vaga de preparacao gasta numa magia que
+    // o talento da de graca, "despreparar" apagando as duas de uma vez e
+    // a troca de magias do assistente (levelup-ui.js, casa por `nome`)
+    // podendo remover justo a entrada do talento -- tudo permanente, numa
+    // ficha sem "descer de nivel". Ver o comentario de `nomesPreparados`
+    // em regras-cobertura.js para por que o conserto e a OFERTA e nao a
+    // deduplicacao da gravacao. Sobra folga: 11 rituais de 1o circulo no
+    // acervo contra um `deve` maximo de 6.
+    const repetindoPreparada = escolhidas.some((m) => ritualPendente.nomesPreparados.includes(m));
+    // As magias validas sao as que o TALENTO PODE conceder (Talentos.md:370):
+    // 1o circulo, com o marcador Ritual. `getMagiasRituais(1)` e a MESMA
+    // fonte que a tela de escolha usa para montar as opcoes -- nunca
+    // reimplementar o filtro aqui, ou tela e motor podem divergir sobre o
+    // que e valido (db.js:126 documenta que nao existe campo `ritual`
+    // booleano no acervo; so `tempo_conjuracao` contendo "ritual" marca a
+    // magia). Sem esta checagem, `subirDeNivel` aceitava qualquer string --
+    // inclusive uma magia de outro circulo ou sem Ritual nenhum -- e a
+    // gravacao entrava como sempre-preparada para sempre, sem sinal
+    // nenhum ao jogador (nao ha "descer de nivel" nesta ficha).
+    const rituaisValidos = new Set((await getMagiasRituais(1)).map((m) => m.nome));
+    const todasValidas = escolhidas.every((nome) => rituaisValidos.has(nome));
+    if (escolhidas.length !== ritualPendente.faltam ||
+        distintas.size !== ritualPendente.faltam || repetindoPreparada || !todasValidas) {
+      return {
+        sucesso: false,
+        pendente: true,
+        tipo_pendencia: 'ritual_bonus_proficiencia',
+        mensagem: montarMensagemRitualBonus(ritualPendente, nivelTotalAnterior),
+      };
+    }
+    magiasRitualBonusSelecionadas = escolhidas;
+  }
+
   // Validar Acadêmico (Mago nível 2: 1 expertise em perícia acadêmica já proficiente)
   // Validar novas magias do grimório antes de alterar o personagem.
   if (exigeGrimorioMago) {
     const selecionadas = Array.isArray(opcoes.grimorio_selecionados)
       ? opcoes.grimorio_selecionados.filter(nome => typeof nome === 'string' && nome)
       : [];
-    const espacosNovoNivel = getEspacosMagia(classeData.tabela_caracteristicas, novoNivel);
+    const espacosNovoNivel = getEspacosMagia(classeData.tabela_caracteristicas, nivelNaClasseNovo);
     const nomesNoGrimorio = new Set((personagem.grimorio || []).map(magia => magia?.nome));
     const indice = await getIndiceMagias();
     const magiasPorNome = new Map((indice?.magias || []).map(magia => [magia.nome, magia]));
-    const escolhasValidas = selecionadas.length === 2 && new Set(selecionadas).size === 2 &&
+    const escolhasValidas = selecionadas.length === grimorioQtd && new Set(selecionadas).size === grimorioQtd &&
       selecionadas.every(nome => {
         const magia = magiasPorNome.get(nome);
         return magia && Array.isArray(magia.classes) && magia.classes.includes('Mago') &&
@@ -1326,7 +1643,7 @@ export async function subirDeNivel(personagem, opcoes = {}) {
         sucesso: false,
         pendente: true,
         tipo_pendencia: 'grimorio',
-        mensagem: 'Selecione 2 magias novas de Mago para o Grimório em círculos para os quais você possui espaços'
+        mensagem: `Selecione ${grimorioQtd} magias novas de Mago para o Grimório em círculos para os quais você possui espaços`
       };
     }
     magiasGrimorioSelecionadas = selecionadas.map(nome => {
@@ -1340,7 +1657,7 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     const selecionadas = Array.isArray(opcoes.subclasse_magias_selecionadas)
       ? opcoes.subclasse_magias_selecionadas.filter(nome => typeof nome === 'string' && nome)
       : [];
-    const espacosNovoNivel = getEspacosMagia(classeData.tabela_caracteristicas, novoNivel);
+    const espacosNovoNivel = getEspacosMagia(classeData.tabela_caracteristicas, nivelNaClasseNovo);
     const circuloMaxInicial = 2;
     const circuloMaxRecorrente = Math.max(...Object.keys(espacosNovoNivel)
       .filter(c => (espacosNovoNivel[c]?.total || 0) > 0).map(Number), 0);
@@ -1357,8 +1674,8 @@ export async function subirDeNivel(personagem, opcoes = {}) {
         // No nível 3 com bônus duplo (inicial + recorrente), o círculo máximo permitido
         // é o maior entre os dois limites (2 do bônus inicial, ou o círculo com espaços
         // do bônus recorrente, o que for maior nesse nível).
-        const circuloMaxPermitido = Math.max(circuloMaxInicial, circuloMaxRecorrente >= 1 && novoNivel === 3 ? circuloMaxRecorrente : 0);
-        return magia.circulo <= (novoNivel === 3 ? circuloMaxPermitido : circuloMaxRecorrente) &&
+        const circuloMaxPermitido = Math.max(circuloMaxInicial, circuloMaxRecorrente >= 1 && nivelNaClasseNovo === 3 ? circuloMaxRecorrente : 0);
+        return magia.circulo <= (nivelNaClasseNovo === 3 ? circuloMaxPermitido : circuloMaxRecorrente) &&
           (espacosNovoNivel[magia.circulo]?.total || 0) > 0;
       });
     if (!escolhasValidasArcana) {
@@ -1397,12 +1714,14 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   // disso o app tinha 15 tipos de pendencia escritos um a um, nenhum deles
   // cobrindo estas 12 caracteristicas, e o jogador terminava o nivel sem
   // aviso nenhum e sem a regra do livro aplicada.
-  // `opcoes.subclasse || personagem.subclasse` -- mesmo idioma de :966. No
-  // nivel 3 a subclasse esta sendo escolhida NESTA chamada e so e gravada em
-  // personagem.subclasse mais abaixo (:1303); ler so o personagem faria as
+  // `opcoes.subclasse || sub.subclasse` -- mesmo idioma do bloco de
+  // Manobras, acima. No nivel 3 a subclasse esta sendo escolhida NESTA
+  // chamada e so e gravada mais abaixo; ler so o estado anterior faria as
   // escolhas de nivel 3 (a maioria delas) nunca dispararem.
-  const subclasseEfetiva = opcoes.subclasse || personagem.subclasse;
-  const escolhasSubclasseNivel = linhasDaSubclasseNoNivel(subclasseEfetiva, novoNivel)
+  // `sub.subclasse` e a subclasse DAQUELA classe, nao o espelho: num
+  // Mago 5/Guerreiro 3 o espelho aponta para o Mago.
+  const subclasseEfetiva = opcoes.subclasse || sub.subclasse;
+  const escolhasSubclasseNivel = linhasDaSubclasseNoNivel(subclasseEfetiva, nivelNaClasseNovo)
     .filter((l) => l.tipo);
   for (const linha of escolhasSubclasseNivel) {
     const bruto = opcoes[linha.campo];
@@ -1423,94 +1742,174 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     }
   }
 
-  // Aplicar mudanças ao personagem
-  personagem.nivel = novoNivel;
-  personagem.pv_max += hpGanho;
-  personagem.pv_atual += hpGanho; // Também aumenta PV atual (cura ao subir de nível)
-  personagem.dados_vida_total = novoNivel;
-  
-  // Atualizar bônus de proficiência (se mudou)
-  const bonusAnterior = bonusProficiencia(nivelAnterior);
-  const bonusNovo = bonusProficiencia(novoNivel);
-  const bonusMudou = bonusNovo !== bonusAnterior;
-  
-  // Atualizar espaços de magia se for conjurador
-  const info = CLASSES_INFO[personagem.classe];
-  if (info && info.conjurador) {
-    await atualizarEspacosMagia(personagem, classeData);
-  }
-
-  // Aplicar escolha de subclasse
-  if (precisaSubclasse && opcoes.subclasse) {
-    personagem.subclasse = opcoes.subclasse;
-  }
-
-  // Subclasses conjuradoras (Cavaleiro Místico, Trapaceiro Arcano):
-  // espaços de magia e truques concedidos pela característica.
+  // Aplicar mudanças ao personagem.
   //
-  // Este bloco tem de vir DEPOIS da gravação da subclasse acima: as duas
-  // subclasses começam a conjurar no nível 3, o MESMO em que são
-  // escolhidas, e enquanto ele rodava antes `personagem.subclasse` ainda
-  // estava vazia -- nenhum dos dois recebia espaço de magia ao virar
-  // conjurador (o Cavaleiro Místico só ganhava no nível 4, e o Trapaceiro
-  // Arcano nunca, porque a condição citava só o Cavaleiro).
-  const espacosSubclasse = getEspacosSubclasseConjuradora(
-    personagem.classe, personagem.subclasse, novoNivel);
-  if (Object.keys(espacosSubclasse).length > 0) {
-    if (!personagem.espacos_magia) personagem.espacos_magia = {};
-    Object.keys(espacosSubclasse).forEach(circulo => {
-      const total = espacosSubclasse[circulo].total;
-      if (personagem.espacos_magia[circulo]) {
-        personagem.espacos_magia[circulo].total = total;
-        if (personagem.espacos_magia[circulo].usados > total) {
-          personagem.espacos_magia[circulo].usados = total;
-        }
-      } else {
-        personagem.espacos_magia[circulo] = espacosSubclasse[circulo];
-      }
-    });
-    // Remover círculos que não existem mais. Mesmo laço e mesmo motivo de
-    // atualizarEspacosMagia, acima: a progressão de subclasse conjuradora
-    // (Cavaleiro Místico/Trapaceiro Arcano) só ACRESCENTA círculo com o
-    // nível, nunca move um círculo existente -- mas o laço fica de
-    // qualquer forma, por simetria e porque não custa nada mantê-lo.
-    //
-    // Ele NÃO pode tocar 'conjuracao' e 'pacto' -- essas duas chaves
-    // guardam o GASTO do jogador por FONTE (sub-projeto 4); apagá-las
-    // apagava o gasto a cada subida de nível.
-    Object.keys(personagem.espacos_magia).forEach(circulo => {
-      if (circulo === 'conjuracao' || circulo === 'pacto') return;
-      if (!espacosSubclasse[circulo]) {
-        delete personagem.espacos_magia[circulo];
-      }
-    });
+  // A subida grava em `classes[]`, a FONTE DA VERDADE -- nunca mais no
+  // espelho `personagem.nivel`. O array ja foi garantido no topo da funcao
+  // (normalizacao da ficha legada, via migrador).
+  let entradaDaClasse = personagem.classes.find((c) => c.classe === sub.classe);
+  if (entradaDaClasse) {
+    entradaDaClasse.nivel += 1;
+  } else {
+    entradaDaClasse = {
+      classe: sub.classe, subclasse: '', nivel: 1, ordem: personagem.classes.length,
+    };
+    personagem.classes.push(entradaDaClasse);
 
-    // Truques concedidos pela subclasse (Mãos Mágicas do Trapaceiro
-    // Arcano): entram como truque de classe normal, porque contam no
-    // limite da tabela da subclasse. A tela de seleção já desconta esses
-    // truques da quantidade que pede ao jogador (levelup-flow.js).
-    const truquesFixos = getTruquesFixosSubclasse(
-      personagem.classe, personagem.subclasse, novoNivel);
-    if (truquesFixos.length > 0) {
-      if (!personagem.magias_conhecidas) personagem.magias_conhecidas = [];
-      for (const nome of truquesFixos) {
-        if (!personagem.magias_conhecidas.some(m => m.nome === nome)) {
-          personagem.magias_conhecidas.push({ nome, circulo: 0, origem: 'subclasse_fixa' });
+    // Proficiencias reduzidas da classe nova (livro:2051).
+    //
+    // ARMADURA E ARMA NAO ENTRAM AQUI DE PROPOSITO: sao DERIVADAS de
+    // `classes[]` por regras-multiclasse-proficiencias.js a cada leitura.
+    // Grava-las tambem criaria uma segunda fonte da verdade para a mesma
+    // regra -- o bug raiz que o cabecalho de regras-equipamento.js
+    // registra. O que se grava aqui e so o que NAO da para derivar:
+    // escolhas do jogador e ferramentas fixas.
+    //
+    // MINOR 1 da revisao: reusa `concessoesNovas` (calculado la em cima,
+    // junto da pendencia) em vez de rederivar `concessoesAoEntrarEm(sub.classe)`.
+    // Antes deste conserto os dois calculos podiam divergir -- a pendencia
+    // rodava so com `ehPrimeiroNivelNaClasse && !ehPrimeiroNivelDoPersonagem`,
+    // mas a escrita rodava sempre que a classe fosse nova em `classes[]`,
+    // sem checar esse mesmo gate. Reusar a MESMA variavel fecha essa
+    // divergencia: se a pendencia nao validou nada (bloco pulado), a
+    // escrita tambem nao roda.
+    if (concessoesNovas) {
+      for (const ferramenta of concessoesNovas.ferramentas) {
+        if (!Array.isArray(personagem.proficiencias_ferramentas)) personagem.proficiencias_ferramentas = [];
+        if (!personagem.proficiencias_ferramentas.includes(ferramenta)) {
+          personagem.proficiencias_ferramentas.push(ferramenta);
+        }
+      }
+      if (concessoesNovas.pericias > 0 && opcoes.pericia_classe_nova) {
+        if (!Array.isArray(personagem.pericias_proficientes)) personagem.pericias_proficientes = [];
+        if (!personagem.pericias_proficientes.includes(opcoes.pericia_classe_nova)) {
+          personagem.pericias_proficientes.push(opcoes.pericia_classe_nova);
+        }
+      }
+      if (concessoesNovas.instrumentos > 0 && opcoes.instrumento_classe_nova) {
+        if (!Array.isArray(personagem.proficiencias_instrumentos)) personagem.proficiencias_instrumentos = [];
+        if (!personagem.proficiencias_instrumentos.includes(opcoes.instrumento_classe_nova)) {
+          personagem.proficiencias_instrumentos.push(opcoes.instrumento_classe_nova);
         }
       }
     }
   }
 
+  // Pre-requisito dispensado: fica registrado no personagem. Reusa o
+  // registro generico de edicoes (char.edicoes, versionado, ja atravessa
+  // sync e import) em vez de campo novo -- um campo novo entraria na
+  // mesma janela de rollout que docs/PERGUNTAS-PENDENTES.txt ja registra
+  // como pendencia aberta para espacos_magia e dados_vida.
+  //
+  // A CHAVE NAO PODE COMECAR COM "classes." -- `char.classes` e um ARRAY,
+  // a fonte da verdade, e `reverterEdicao` (ficha-edicoes.js) escreve na
+  // marca generica com `escreverCaminho`, que faz `atual[chave] ??= {}`
+  // em cada segmento do caminho pontuado. Uma chave `classes.Paladino...`
+  // faria esse `reduce` criar uma propriedade NOMEADA ("Paladino") sobre o
+  // array -- Array.isArray continua true, mas char.classes ganharia uma
+  // chave que nao e indice, corrompendo a fonte da verdade em memoria (nao
+  // sobrevive a um JSON.stringify, mas ate recarregar a ficha ja e
+  // suficiente para causar estrago). `prerequisitoDispensado.<Classe>` nao
+  // aponta para nenhum campo real do personagem, entao o mesmo `reduce` so
+  // cria um objeto inerte e novo -- inofensivo mesmo se `reverterEdicao`
+  // for chamado com esta chave.
+  //
+  // O formato da entrada tambem segue o mesmo contrato de `aplicarEdicao`
+  // (`original`, `editadoEm`): sem `original` uma entrada desta marca nao
+  // se distingue de uma entrada corrompida por outro caminho -- aqui o
+  // valor "original" e sempre `null` porque nao ha campo anterior a
+  // restaurar, so a AUSENCIA da marca.
+  //
+  // A MARCA E PERMANENTE E NAO E REAVALIADA: se o jogador depois subir o
+  // atributo que faltava para 13+, o selo continua -- ele registra que
+  // AQUELE NIVEL foi adquirido sem o pre-requisito, um fato historico, nao
+  // o estado atual da ficha. Reavaliar exigiria saber em que nivel cada
+  // classe entrou, informacao que `classes[]` nao guarda, e produziria um
+  // selo que aparece e some sozinho, pior que nenhum (ver
+  // sheet/estado.js:seloPrerequisitoDispensado). Quem quiser remove: um
+  // botao discreto ao lado do selo, na ficha (nao na impressao), que chama
+  // o mesmo `reverterEdicao` generico que limpa qualquer entrada de
+  // char.edicoes (sheet/edicao.js).
+  if (opcoes.dispensar_prerequisito && !sub.permitido) {
+    const edicoes = garantirEstadoEdicoes(personagem);
+    edicoes.campos[`prerequisitoDispensado.${sub.classe}`] = {
+      original: null, editadoEm: new Date().toISOString(), faltando: sub.faltando, origem: 'manual',
+    };
+  }
+
+  // A subclasse escolhida NESTE nivel entra na entrada DAQUELA classe, nao
+  // no espelho: um Mago 5/Guerreiro 3 escolhe a subclasse de GUERREIRO, e
+  // sobrescrever `personagem.subclasse` apagaria a do Mago.
+  // `sincronizarEspelhos`, logo abaixo, reflete no espelho quando -- e so
+  // quando -- esta e a classe inicial.
+  if (precisaSubclasse && opcoes.subclasse) {
+    entradaDaClasse.subclasse = opcoes.subclasse;
+  }
+
+  // Recomputa `nivel`, `classe`, `subclasse` e as reservas de dado de vida
+  // por TIPO, preservando o `usados` do jogador. `dados_vida_total` saiu
+  // daqui: passa a ser derivado das reservas por esta mesma funcao.
+  sincronizarEspelhos(personagem);
+
+  personagem.pv_max += hpGanho;
+  personagem.pv_atual += hpGanho; // Também aumenta PV atual (cura ao subir de nível)
+
+  // Atualizar bônus de proficiência (se mudou). O Bonus de Proficiencia sai
+  // do nivel TOTAL do personagem, nunca do nivel na classe (livro:2047).
+  const bonusAnterior = bonusProficiencia(nivelTotalAnterior);
+  const bonusNovo = bonusProficiencia(nivelTotalNovo);
+  const bonusMudou = bonusNovo !== bonusAnterior;
+
+  // A subclasse DA CLASSE QUE SOBE, ja com a escolha gravada logo acima --
+  // nao o espelho `personagem.subclasse`, que num Mago 5/Guerreiro 3 aponta
+  // para o Mago. Tudo daqui para baixo (truques fixos de subclasse,
+  // caracteristicas de subclasse, magias de dominio e sempre preparadas)
+  // le esta variavel, e a condicao e a MESMA da gravacao acima.
+  const subclasseAtual = (precisaSubclasse && opcoes.subclasse) ? opcoes.subclasse : sub.subclasse;
+
+  // ESPACOS DE MAGIA DE SUBCLASSE CONJURADORA (Cavaleiro Mistico,
+  // Trapaceiro Arcano) NAO SAO MAIS GRAVADOS AQUI -- o total e derivado da
+  // regra a cada leitura por montarReservasDeEspacos (sheet/reservas-espacos.js).
+  // Saiu junto o laco que apagava circulos "que nao existem mais": nada
+  // grava mais chave NUMERICA de circulo, entao nao ha o que limpar.
+  //
+  // Os TRUQUES fixos continuam: nao sao espaco de magia, e sim concessao da
+  // caracteristica (Maos Magicas do Trapaceiro Arcano). Entram como truque
+  // de classe normal, porque contam no limite da tabela da subclasse -- a
+  // tela de selecao ja desconta esses truques da quantidade que pede ao
+  // jogador (levelup-flow.js).
+  //
+  // A guarda `getEspacosSubclasseConjuradora(...).length > 0` que embrulhava
+  // esta concessao saiu com o resto do bloco: `getTruquesFixosSubclasse` ja
+  // devolve lista vazia sozinha quando nao ha o que conceder. Conferido por
+  // medicao sobre as 13 classes x 2 subclasses conjuradoras x 20 niveis --
+  // nao existe combinacao com truque fixo e sem espaco, logo a remocao da
+  // guarda nao muda comportamento em nenhum ponto alcancavel.
+  //
+  // Continua vindo DEPOIS da gravacao da subclasse, acima: as duas
+  // subclasses comecam a conjurar no nivel 3, o MESMO em que sao
+  // escolhidas, e ler o estado anterior faria o Trapaceiro Arcano nunca
+  // receber Maos Magicas.
+  const truquesFixos = getTruquesFixosSubclasse(
+    sub.classe, subclasseAtual, nivelNaClasseNovo);
+  if (truquesFixos.length > 0) {
+    if (!personagem.magias_conhecidas) personagem.magias_conhecidas = [];
+    for (const nome of truquesFixos) {
+      if (!personagem.magias_conhecidas.some(m => m.nome === nome)) {
+        personagem.magias_conhecidas.push({ nome, circulo: 0, origem: 'subclasse_fixa' });
+      }
+    }
+  }
+
   // Obter características de subclasse para este nível
-  const subclasseAtual = personagem.subclasse;
-  const caracteristicasSubclasse = await obterCaracteristicasSubclasseNivel(personagem.classe, subclasseAtual, novoNivel);
+  const caracteristicasSubclasse = await obterCaracteristicasSubclasseNivel(sub.classe, subclasseAtual, nivelNaClasseNovo);
 
   // Concessoes automaticas de subclasse: o livro concede sem perguntar nada
   // ("Voce adquire proficiencia em X"), e o app precisa conceder sem
   // perguntar nada. Antes desta tabela, cinco caracteristicas do livro
   // simplesmente nunca eram aplicadas -- nem aqui, nem na ficha, nem no
   // assistente -- e o jogador nao tinha como saber que faltava algo.
-  for (const linha of linhasDaSubclasseNoNivel(subclasseAtual, novoNivel)) {
+  for (const linha of linhasDaSubclasseNoNivel(subclasseAtual, nivelNaClasseNovo)) {
     if (linha.automatica) aplicarConcessaoAutomatica(personagem, linha);
   }
 
@@ -1520,7 +1919,7 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   }
   
   // Adicionar automaticamente magias de domínio/subclasse
-  const magiasDominio = await obterMagiasDominioNivel(personagem.classe, subclasseAtual, novoNivel);
+  const magiasDominio = await obterMagiasDominioNivel(sub.classe, subclasseAtual, nivelNaClasseNovo);
   if (magiasDominio.length > 0) {
     if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
     for (const magia of magiasDominio) {
@@ -1535,7 +1934,7 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   // O terreno escolhido (Circulo da Terra) recorta a tabela certa entre as
   // quatro alternativas -- sem ele o extrator devolve vazio de proposito.
   const opcaoSubclasse = personagem.escolhas_classe?.circulo_terra_terreno;
-  const magiasSempre = (await obterMagiasSemprePreparadasNivel(personagem.classe, subclasseAtual, novoNivel, opcaoSubclasse))
+  const magiasSempre = (await obterMagiasSemprePreparadasNivel(sub.classe, subclasseAtual, nivelNaClasseNovo, opcaoSubclasse))
     .filter(magia => !magiasDominio.some(d => d.nome === magia.nome));
   if (magiasSempre.length > 0) {
     if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
@@ -1600,7 +1999,11 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     // não "restaurar" a cópia hardcoded removida abaixo.
     if (Array.isArray(opcoes.escolhas_talento_levelup) && opcoes.escolhas_talento_levelup.length > 0) {
       if (!personagem.escolhas_talento) personagem.escolhas_talento = {};
-      const chave = `levelup_${novoNivel}`;
+      // Chave do EVENTO de subida, exibida como "Nivel N" na ficha
+      // (sheet/talentos.js) -- nivel do personagem, nao da classe: e o que
+      // a identifica sem colidir quando duas classes concedem ASI no
+      // mesmo nivel DELAS.
+      const chave = `levelup_${nivelTotalNovo}`;
       personagem.escolhas_talento[chave] = opcoes.escolhas_talento_levelup;
       escolhasTalentoLevelup = opcoes.escolhas_talento_levelup;
 
@@ -1611,7 +2014,8 @@ export async function subirDeNivel(personagem, opcoes = {}) {
 
     // Aplicar bonus de PV do Vigoroso (dobro do nivel ao obter)
     if (opcoes.talento === 'Vigoroso') {
-      const bonusVigoroso = novoNivel * 2;
+      // Vigoroso: "o dobro do seu nivel DE PERSONAGEM" -- total, nao classe.
+      const bonusVigoroso = nivelTotalNovo * 2;
       personagem.pv_max = (personagem.pv_max || 0) + bonusVigoroso;
       personagem.pv_atual = Math.min(personagem.pv_atual + bonusVigoroso, personagem.pv_max);
       personagem.bonus_pv_vigoroso_aplicado = bonusVigoroso;
@@ -1770,6 +2174,37 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     }
   }
 
+  // CRESCIMENTO DO CONJURADOR RITUALISTA -- fora do bloco de aquisicao do
+  // talento acima (que so roda quando `opcoes.talento` e escolhido NESTE
+  // nivel): o crescimento se aplica em QUALQUER subida que cruze um
+  // patamar de Bonus de Proficiencia, mesmo em niveis sem ASI/talento.
+  //
+  // As magias do CRESCIMENTO entram com a mesma origem das da aquisicao:
+  // e o mesmo beneficio do mesmo talento, e a contagem de
+  // `ritualBonusPendente` depende de as duas levas ficarem indistintas.
+  //
+  // Consome `magiasRitualBonusSelecionadas` (hoisted acima do guard),
+  // NUNCA `opcoes.rituais_bonus_proficiencia` de novo -- achado da
+  // revisao (fix round 2): reler a opcao crua aqui deixava a gravacao
+  // aceitar entradas que o guard tinha filtrado fora (vazias/nao-string),
+  // porque o guard validava so uma COPIA filtrada, nao o array que a
+  // gravacao consumia. Mesmo padrao de `magiasGrimorioSelecionadas`.
+  //
+  // A deduplicacao por `nome` + `origem` abaixo continua, mas depois do
+  // Important 1 ela e so REFORCO: o guard ja recusa qualquer nome
+  // presente em `nomesPreparados` (qualquer origem), entao nenhuma
+  // entrada com esse nome pode existir quando a gravacao chega aqui.
+  if (ritualPendente.faltam > 0) {
+    if (!Array.isArray(personagem.magias_preparadas)) personagem.magias_preparadas = [];
+    for (const nome of magiasRitualBonusSelecionadas) {
+      const jaEsta = personagem.magias_preparadas.some((m) => m?.nome === nome
+        && m?.origem === 'conjurador_ritualista');
+      if (!jaEsta) {
+        personagem.magias_preparadas.push({ nome, circulo: 1, origem: 'conjurador_ritualista' });
+      }
+    }
+  }
+
   // Aplicar Especialização do Bardo (2 escolhas nos níveis 2 e 9)
   let expertiseBardoAplicada = [];
   if (exigeEspecializacao) {
@@ -1919,14 +2354,17 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   // característica e nunca somava os +4. Uma tabela em vez de um `if` por
   // classe é o que impede a próxima característica desse tipo de nascer
   // esquecida do mesmo jeito.
-  const capstone = novoNivel === 20 ? CAPSTONES_ATRIBUTO[personagem.classe] : null;
+  // O capstone e o nivel 20 DA CLASSE (esta na tabela de classe do livro);
+  // ja o recalculo de PV abaixo e retroativo a TODOS os niveis do
+  // personagem, e por isso multiplica pelo nivel total.
+  const capstone = nivelNaClasseNovo === 20 ? CAPSTONES_ATRIBUTO[sub.classe] : null;
   if (capstone) {
     aplicarCapstoneAtributo(personagem, capstone.atributos, capstone.ganho);
     // Recalcular PV com novo mod de CON (retroativo para todos os níveis).
     // Inerte quando o capstone não mexe em Constituição, como o do Monge.
     const modConCapstone = calcMod(personagem.atributos.constituicao);
     if (modConCapstone > modConDepois) {
-      const bonusCapstone = (modConCapstone - modConDepois) * novoNivel;
+      const bonusCapstone = (modConCapstone - modConDepois) * nivelTotalNovo;
       personagem.pv_max += bonusCapstone;
       personagem.pv_atual += bonusCapstone;
     }
@@ -1946,8 +2384,8 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   // Retornar resumo do level-up
   return {
     sucesso: true,
-    nivel_anterior: nivelAnterior,
-    nivel_novo: novoNivel,
+    nivel_anterior: nivelTotalAnterior,
+    nivel_novo: nivelTotalNovo,
     hp_ganho: hpGanho,
     hp_modo: opcoes.hp_modo === 'rolado' ? 'rolado' : 'fixo',
     hp_rolado: opcoes.hp_modo === 'rolado' ? (parseInt(opcoes.hp_rolado) || null) : null,

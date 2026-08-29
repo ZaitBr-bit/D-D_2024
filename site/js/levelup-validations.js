@@ -4,10 +4,29 @@
 // ============================================================
 import { exigeManobrasGuerreiro } from './levelup.js';
 import { validarEscolhasTalento } from './regras-cobertura.js';
-import { calcularConjuracao, calcularSubclasseArcana } from './levelup-flow.js';
+import {
+  calcularConjuracao, calcularSubclasseArcana,
+  proficienciaClasseNovaCompleta, ritualBonusProficienciaCompleto
+} from './levelup-flow.js';
 
+/**
+ * Se ESTE nivel concede manobras novas (Mestre da Batalha).
+ *
+ * Os tres argumentos sao da CLASSE QUE SOBE, e tem de ser exatamente os
+ * mesmos que o step 'manobras_guerreiro' (levelup-flow.js) usa para
+ * decidir se o card aparece -- senao a tela e o motor discordam. Lendo os
+ * espelhos (`char.classe`, `char.subclasse`) e o nivel TOTAL, um Mago 5
+ * que sobe para Guerreiro 3/Mestre da Batalha VIA o card de manobras,
+ * escolhia as 3, e `collectOpcoes` descartava `manobras_novas` porque
+ * `char.classe` dizia "Mago": `subirDeNivel` recusava a subida por
+ * pendencia de manobra e `validateAll` pulava a propria checagem pelo
+ * mesmo motivo -- recusa MUDA, com o card preenchido na tela. O espelho
+ * invertido (Guerreiro 6 entrando numa segunda classe no total 7) mandava
+ * `manobras_novas: []` num nivel que nao concede nenhuma.
+ */
 function precisaManobrasAgora(ctx, state) {
-  return exigeManobrasGuerreiro(ctx.char.classe, state.subclasse || ctx.char.subclasse, ctx.nivelNovo);
+  return exigeManobrasGuerreiro(
+    ctx.classeQueSobe, state.subclasse || ctx.sub?.subclasse, ctx.nivelNaClasseNovo);
 }
 
 /**
@@ -17,7 +36,19 @@ function precisaManobrasAgora(ctx, state) {
  * @returns {Object} opcoes compatíveis com levelup.js
  */
 export function collectOpcoes(ctx, state) {
-  const opcoes = { ignorar_xp: true };
+  // A classe em que o nivel entra. Sem isto, subirDeNivel cai no default
+  // (a classe INICIAL do personagem, ver levelup.js) e o nivel seria
+  // gravado numa classe diferente da que a tela mostrou -- o defeito mais
+  // caro possivel aqui, invisivel enquanto as duas coincidirem (ate a
+  // Tarefa 7, o seletor, introduzir a assimetria).
+  const opcoes = { ignorar_xp: true, classe: state.classeQueSobe };
+
+  // Dispensa do pre-requisito de multiclasse (livro:2033), ligada pelo
+  // botao "usar mesmo assim" de uma classe travada -- ver
+  // bindEventosDispensaPrerequisito (levelup-ui.js). So entra em `opcoes`
+  // quando true: `subirDeNivel` so olha esta chave quando a classe esta
+  // de fato travada, entao omiti-la no caso comum e inocuo.
+  if (state.dispensarPrerequisito) opcoes.dispensar_prerequisito = true;
 
   // Escolhas de subclasse (regras-subclasse-escolhas.js): o card generico
   // grava em state.escolhasSubclasse[campo], e a guarda de subirDeNivel le
@@ -97,6 +128,25 @@ export function collectOpcoes(ctx, state) {
     }
   }
 
+  // Proficiências da Classe Nova (Bardo/Guardião/Ladino, livro:2051) --
+  // os nomes das chaves têm de bater EXATAMENTE com o que subirDeNivel lê
+  // (opcoes.pericia_classe_nova / opcoes.instrumento_classe_nova, ver
+  // levelup.js): sem isso a tela mostra a escolha certa e o motor recusa
+  // a subida do mesmo jeito, por não achar a chave.
+  opcoes.pericia_classe_nova = state.periciaClasseNova || undefined;
+  opcoes.instrumento_classe_nova = state.instrumentoClasseNova || undefined;
+
+  // Magias Rituais do Bônus de Proficiência (Conjurador Ritualista,
+  // Talentos.md:370) -- o nome da chave tem de bater EXATAMENTE com o que
+  // subirDeNivel lê (opcoes.rituais_bonus_proficiencia, levelup.js), senão
+  // a tela mostra a escolha certa e o motor recusa a subida do mesmo jeito,
+  // por não achar a chave. Diferente das duas linhas acima, aqui o valor É
+  // SEMPRE um array (nunca `undefined`): `state.rituaisBonusSelecionados`
+  // nasce `[]` em createInitialState e nenhuma troca de classe o apaga
+  // (mesmo motivo de periciaClasseNova/instrumentoClasseNova) -- `[]` já é
+  // o valor certo para "nada escolhido ainda".
+  opcoes.rituais_bonus_proficiencia = state.rituaisBonusSelecionados || [];
+
   return opcoes;
 }
 
@@ -139,6 +189,9 @@ export function validateAll(ctx, state) {
       }
     }
     if (state.asiModo === 'talento' && state.talento) {
+      // `ctx.nivelNovo` explicito: mesma razao do chamador em levelup.js
+      // (subirDeNivel) -- `ctx.char.nivel` ainda e o TOTAL ANTERIOR, e
+      // esta validacao roda ANTES de sincronizarEspelhos.
       const validacaoTalento = validarEscolhasTalento(ctx.char, state.talento, {
         atributo: state.talentoASI || state.resilienteAtributo || state.iniciadoEmMagia?.atributo,
         talento_asi: state.talentoASI,
@@ -147,7 +200,7 @@ export function validateAll(ctx, state) {
         rituais: state.talento === 'Conjurador Ritualista' ? state.escolhasTalento : undefined,
         energias: state.dadivaResistenciaEnergia,
         iniciado_em_magia: state.iniciadoEmMagia
-      });
+      }, ctx.nivelNovo);
       if (!validacaoTalento.valido) return validacaoTalento.erro;
     }
   }
@@ -190,6 +243,35 @@ export function validateAll(ctx, state) {
       return 'Escolha a manobra substituta ou desmarque a troca.';
   }
 
+  // Proficiências da Classe Nova (Bardo/Guardião/Ladino, livro:2051):
+  // mesma checagem amigável que os outros requirements acima têm -- sem
+  // ela, clicar "Confirmar" sem escolher chegaria em subirDeNivel e só
+  // apareceria a mensagem genérica do motor (levelup.js), um passo depois.
+  // Delega em proficienciaClasseNovaCompleta (levelup-flow.js), a MESMA
+  // função que o step 'completo' usa -- NÃO reimplementar a comparação
+  // aqui: hand-copiar as duas metades da mesma regra foi exatamente o que
+  // deixou completo/validateAll divergirem do motor (achado da revisão
+  // da Tarefa 4, rodada 1) — uma escolha que sobrevivia a uma troca de
+  // classe passava aqui e só o motor recusava, sem nenhum campo marcado.
+  if (ctx.concessoesClasseNova && !proficienciaClasseNovaCompleta(ctx, state)) {
+    return `Escolha as proficiências concedidas por ${ctx.classeQueSobe} ` +
+      '(perícia e/ou Instrumento Musical, no passo "Proficiências da Classe Nova").';
+  }
+
+  // Magias Rituais do Bônus de Proficiência (Conjurador Ritualista,
+  // Talentos.md:370): mesma checagem amigável dos requirements acima --
+  // sem ela, clicar "Confirmar" sem escolher chegaria em subirDeNivel e só
+  // apareceria a mensagem genérica do motor, sem nomear o passo. Delega em
+  // ritualBonusProficienciaCompleto (levelup-flow.js), a MESMA função que o
+  // step 'completo' usa -- NÃO reimplementar a comparação aqui (ver o
+  // cabeçalho dela para o porquê).
+  if ((ctx.ritualBonus?.faltam || 0) > 0 && !ritualBonusProficienciaCompleto(ctx, state)) {
+    return ctx.ritualBonus.faltam === 1
+      ? 'Escolha 1 magia ritual de 1º círculo para o Conjurador Ritualista (passo "Magias Rituais (Bônus de Proficiência)").'
+      : `Escolha ${ctx.ritualBonus.faltam} magias rituais de 1º círculo distintas para o Conjurador Ritualista ` +
+        '(passo "Magias Rituais (Bônus de Proficiência)").';
+  }
+
   // Reativo à subclasse escolhida nesta sessão (ver calcularConjuracao):
   // sem isso, um Cavaleiro Místico/Trapaceiro Arcano recém-escolhido
   // confirmaria o nível sem nenhuma cobrança de truque ou magia.
@@ -204,12 +286,14 @@ export function validateAll(ctx, state) {
       const selecionadas = state.grimorioSelecionados || [];
       const nomesNoGrimorio = new Set((ctx.char.grimorio || []).map(m => m?.nome));
       const magiasPorNome = new Map((ctx._listaMagiasClasse || []).map(m => [m.nome, m]));
-      const escolhasValidas = selecionadas.length === 2 && new Set(selecionadas).size === 2 &&
+      // `c.grimorioQtd`: 6 no 1º nível de Mago (multiclasse), 2 nos
+      // seguintes -- ver calcularConjuracao (levelup-flow.js).
+      const escolhasValidas = selecionadas.length === c.grimorioQtd && new Set(selecionadas).size === c.grimorioQtd &&
         selecionadas.every(nome => {
           const magia = magiasPorNome.get(nome);
           return magia && magia.circulo > 0 && magia.circulo <= c.maxCirculoNovo && !nomesNoGrimorio.has(nome);
         });
-      if (!escolhasValidas) return 'Selecione 2 magias novas de círculos para os quais você possui espaços no Grimório.';
+      if (!escolhasValidas) return `Selecione ${c.grimorioQtd} magias novas de círculos para os quais você possui espaços no Grimório.`;
     }
     const subclasseArcana = calcularSubclasseArcana(ctx, state);
     if (subclasseArcana) {

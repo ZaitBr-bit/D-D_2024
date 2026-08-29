@@ -9,6 +9,7 @@ import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ATRIBUTO_NOME_PARA_KEY, CLASSES_INFO, 
 import { XP_POR_NIVEL } from '../levelup.js';
 import { _renderSyncIndicadorHtml } from '../pages/sheet.js';
 import { conjuraPorAlgumaClasse } from '../regras-multiclasse-conjuracao.js';
+import { armadurasDoPersonagem, armasDoPersonagem } from '../regras-multiclasse-proficiencias.js';
 import { classesDe, nivelNa, reservasDadosVida, subclasseDe } from '../regras-multiclasse.js';
 import { possuiAlgumaMagia } from '../regras-origens-magia.js';
 import { ehProficienteEmSalvaguarda } from '../regras-salvaguardas.js';
@@ -31,7 +32,7 @@ import { calcVantagemDesvantagemPericia, forcaPrimordialAtiva, getAtaquesPorAcao
 import { renderSecaoCondicoes, renderSecaoDefesas, renderSecaoSentidos, setupEventosCondicoes, setupEventosDefesas } from './condicoes.js';
 import { renderSecaoDetalhes } from './detalhes.js';
 import { setupEventosEdicao } from './edicao.js';
-import { ATRIBUTO_ESTILO, char, containerRef, definirPassivosTalentos, especiesCache, marcaAjusteManual, passivosTalentosCache, salvar, seloEdicao } from './estado.js';
+import { ATRIBUTO_ESTILO, char, containerRef, definirPassivosTalentos, especiesCache, marcaAjusteManual, passivosTalentosCache, salvar, seloEdicao, seloPrerequisitoDispensado } from './estado.js';
 import { setupEventosHabilidades } from './habilidades.js';
 import { setupEventosDescanso, setupEventosHP, sincronizarBonusPvAnao, sincronizarBonusPvDraconico, sincronizarBonusPvVigoroso } from './hp-descanso.js';
 import { getEstadoCarga, renderSecaoInventario, setupEventosInventarioSheet } from './inventario.js';
@@ -270,7 +271,7 @@ export function renderFichaCompleta() {
               ${escHtml(char.especie || '')} ${(() => {
                 const cs = classesDe(char);
                 return cs.map((c) =>
-                  `${escHtml(c.classe)}${c.subclasse ? ` (${escHtml(c.subclasse)})` : ''}${cs.length > 1 ? ` ${c.nivel}` : ''}`
+                  `${escHtml(c.classe)}${c.subclasse ? ` (${escHtml(c.subclasse)})` : ''}${cs.length > 1 ? ` ${c.nivel}` : ''}${seloPrerequisitoDispensado(c.classe, { comBotaoRemover: true })}`
                 ).join(' / ');
               })()} &middot; Nível ${char.nivel}
             </div>
@@ -706,8 +707,11 @@ export function renderFichaCompleta() {
       ${(() => {
         // Mesclar proficiencias base da classe com extras (subclasse, talentos, etc.)
         const extras = (char.proficiencias_extra || []).map(p => p.toLowerCase());
-        const armadurasProf = [...info.armaduras];
-        const armasProf = [...info.armas];
+        // Uniao das classes (livro:2051). Era `info.armaduras`, o espelho
+        // da classe inicial: num Mago 5/Guerreiro 1 a ficha listava
+        // "Nenhuma" em armaduras com o Guerreiro na mesma pagina.
+        const armadurasProf = armadurasDoPersonagem(char);
+        const armasProf = armasDoPersonagem(char);
         const armadurasExtras = [];
         const armasExtras = [];
         // Mapear proficiencias extras para categorias

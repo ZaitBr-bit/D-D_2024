@@ -16,7 +16,7 @@
 // ficha (ver task-2-report.md e task-4-report.md).
 // ============================================================
 import { CLASSES_INFO } from './dados-classes.js';
-import { SUBCLASSES_CONJURADORAS } from './regras-conjuracao-subclasse.js';
+import { getAtributoConjuracaoSubclasse, getConjuracaoSubclasse, SUBCLASSES_CONJURADORAS } from './regras-conjuracao-subclasse.js';
 import { classesDe } from './regras-multiclasse.js';
 
 // Indice = nivel de conjurador (1..20). Cada valor e [1o..9o circulo].
@@ -161,6 +161,89 @@ export function temMagiaDePacto(char) {
  */
 export function conjuraPorAlgumaClasse(char) {
   return classesConjuradoras(char).length > 0 || temMagiaDePacto(char);
+}
+
+/**
+ * Superficies de conjuracao do personagem: uma entrada por classe (ou
+ * subclasse) que tem a caracteristica Conjuracao ou conjura por tabela de
+ * subclasse (Cavaleiro Mistico, Trapaceiro Arcano), na ordem de aquisicao
+ * (`ordem`, classe inicial primeiro -- mesma ordem que montarContextos usa).
+ *
+ * Existe porque a tela de Magias hoje decide TUDO pela classe INICIAL
+ * (`char.classe`/`char.subclasse`): um Ladino 5/Mago 1 nunca ve as magias
+ * do Mago -- nao existe `classes/magias_ladino.json`, entao a lista vem
+ * vazia, e a tabela do Ladino nao tem colunas de magia, entao o limite
+ * mostra 0/0. Esta funcao responde "quais superficies de conjuracao este
+ * personagem tem", uma por classe, para quem monta a tela parar de
+ * perguntar so pela classe inicial.
+ *
+ * NAO e' `conjuracoesPorClasse` (utils.js) reescrita: aquela devolve
+ * CD/ataque por classe, sem nivel nem tabela -- responde "qual a CD/ataque
+ * daquela classe". Esta responde "o que aquela superficie precisa para
+ * montar a tela" (de que arquivo vem a lista de magias, se tem grimorio,
+ * tipo preparadas/conhecidas, tabela de caracteristicas). A BASE de quais
+ * classes conjuram e' a MESMA de `conjuracoesPorClasse` (iterar classesDe +
+ * `CLASSES_INFO.atributo_conjuracao` + `getConjuracaoSubclasse`), de
+ * proposito: `classesConjuradoras` (acima neste arquivo) exclui
+ * `categoria === 'pacto'` por decisao de projeto documentada la (o Bruxo
+ * tem Magia de Pacto, reserva separada da tabela unificada de espacos) --
+ * usa-la aqui esconderia a superficie de conjuracao do Bruxo da TELA, que
+ * precisa mostrar as magias dele mesmo ele nao entrando na tabela
+ * unificada.
+ *
+ * DECISAO REGISTRADA, NAO ESQUECIMENTO: o LIMITE e' por classe (`tabela` +
+ * `nivelClasse`), mas a CONTAGEM de preparadas e' GLOBAL -- porque
+ * `magias_preparadas[]` nao tem campo de classe, entao nao ha como saber
+ * quantas das magias preparadas pertencem a esta superficie especifica,
+ * so o limite que ela permite. Ligar magia -> classe exige campo novo no
+ * personagem e migracao das fichas existentes (sub-projeto proprio,
+ * registrado em docs/PERGUNTAS-PENDENTES.txt); ate la, cada superficie
+ * devolve so o limite dela, e quem monta a tela decide como confrontar a
+ * contagem global contra limites por classe.
+ *
+ * @param {object} personagem Personagem; le classes[], nunca os espelhos
+ *   (`char.classe`/`char.subclasse`/`char.nivel`).
+ * @param {Map<string, object>|null} [mapaDados] Mapa nome-de-classe -> JSON
+ *   da classe (o `classesData` da ficha). Sem ele, `tabela` vem `null` e o
+ *   resto da funcao continua funcionando -- opcional so para a funcao
+ *   continuar PURA e testavel fora do navegador.
+ * @returns {Array<{classe: string, subclasse: string, nivelClasse: number,
+ *   ordem: number, listaMagias: string, usaGrimorio: boolean,
+ *   tipo: 'preparadas'|'conhecidas', tabela: object|null}>}
+ */
+export function superficiesDeConjuracao(personagem, mapaDados = null) {
+  const saida = [];
+  for (const c of classesDe(personagem)) {
+    const info = CLASSES_INFO[c.classe] || {};
+    const subclasseConjuradora = !!getConjuracaoSubclasse(c.classe, c.subclasse, c.nivel);
+    const atributo = info.atributo_conjuracao
+      || (subclasseConjuradora ? getAtributoConjuracaoSubclasse(c.classe, c.subclasse) : null);
+    if (!atributo) continue; // classe sem Conjuracao e sem subclasse conjuradora ativa
+
+    // Mesma expressao ja usada em sheet/grimorio.js:29, sheet/magias.js:466
+    // e sheet/migracoes.js:41 -- reproduzida literalmente, nao reinventada.
+    const tipo = info.tipo_conjuracao || (subclasseConjuradora ? 'conhecidas' : 'preparadas');
+
+    // Cavaleiro Mistico e Trapaceiro Arcano preparam/conhecem da lista de
+    // Mago ("suas magias sao magias de Mago", Classes.md:3968 e 4473) --
+    // mas NAO tem grimorio: so a propria classe Mago guarda magias num
+    // grimorio fisico. listaMagias e usaGrimorio respondem perguntas
+    // diferentes de proposito.
+    const listaMagias = subclasseConjuradora ? 'Mago' : c.classe;
+    const usaGrimorio = c.classe === 'Mago';
+
+    saida.push({
+      classe: c.classe,
+      subclasse: c.subclasse || '',
+      nivelClasse: c.nivel,
+      ordem: c.ordem,
+      listaMagias,
+      usaGrimorio,
+      tipo,
+      tabela: mapaDados?.get?.(c.classe)?.tabela_caracteristicas || null,
+    });
+  }
+  return saida.sort((a, b) => a.ordem - b.ordem);
 }
 
 /**

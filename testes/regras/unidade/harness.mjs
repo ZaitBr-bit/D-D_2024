@@ -88,7 +88,7 @@ export async function modulosApp() {
          levelupCards, regrasSubclasseEscolhas, regrasOrigensMagia,
          regrasConjuracaoSubclasse, regrasSalvaguardas, fichaEdicoes, fichaEdicaoValidacoes,
          multiclasse, home, multiclasseConjuracao, multiclasseProgressao, contextoClasse,
-         sheetCaracteristicas, sheetFicha,
+         sheetCaracteristicas, sheetFicha, proficiencias,
          // As 11 classes restantes (Mago ja entra acima, como sheetMago, para o
          // motor de subclasses conjuradoras) -- reunidas em sheetClasses logo
          // abaixo, uma entrada por classe, para os oraculos de multiclasse-render
@@ -148,6 +148,12 @@ export async function modulosApp() {
     // migrarMulticlasse() a cada render), nao so a funcao de reconciliacao
     // isolada -- ver multiclasse-contexto.test.mjs, oraculo final.
     importar('site/js/sheet/ficha.js'),
+    // Tarefa 1 do subprojeto de proficiencias por classe nova: modulo puro
+    // que junta armadura/arma/pericia/ferramenta/instrumento por classe,
+    // lendo `classes[]` em vez do espelho `char.classe`. Consumido pelos
+    // oraculos de multiclasse-proficiencias.test.mjs via
+    // `proficiencias.concessoesDaClasse` etc.
+    importar('site/js/regras-multiclasse-proficiencias.js'),
     importar('site/js/sheet/classes/barbaro.js'),
     importar('site/js/sheet/classes/bardo.js'),
     importar('site/js/sheet/classes/bruxo.js'),
@@ -179,7 +185,7 @@ export async function modulosApp() {
              regrasOrigensMagia, regrasConjuracaoSubclasse, regrasSalvaguardas,
              fichaEdicoes, fichaEdicaoValidacoes, multiclasse, home, multiclasseConjuracao,
              multiclasseProgressao, contextoClasse, sheetCaracteristicas, sheetFicha,
-             sheetClasses, sheetHabilidades, sheetMaestrias, sheetHpDescanso };
+             proficiencias, sheetClasses, sheetHabilidades, sheetMaestrias, sheetHpDescanso };
   return _cache;
 }
 
@@ -788,4 +794,331 @@ export async function escadaDeNivel(classe, aoSubir, opcoesEscada = {}) {
     await aoSubir(personagem, nivel, [...vistas]);
   }
   return personagem;
+}
+
+// ============================================================
+// `subirAteNivel()`: auxiliar determinístico da Tarefa 2 do sub-projeto 5
+// (.superpowers/sdd/2026-08-26-multiclasse-subida-nivel/task-2-brief.md).
+// Diferente de `escadaDeNivel()` (acima), que já sabe a lista fechada de
+// pendências e falha alto para qualquer tipo fora dela, este auxiliar é o
+// que as Tarefas 3a/3b/3c/5/7/10 vão reaproveitar para subir um
+// personagem MULTICLASSE -- por isso já passa `opcoes.classe`, mesmo que
+// `subirDeNivel` ainda ignore esse campo hoje (só passa a honrá-lo na
+// Tarefa 3a). Para classe única isso é inócuo.
+// ============================================================
+
+// ACHADO (Step 3 desta tarefa): o brief original sugeria
+// `opcoes.talento = 'Dádiva da Sorte'` para 'dadiva_epica', mas esse
+// talento NÃO existe em dados/talentos/talentos.json -- conferido com
+// grep, e o mesmo achado já está documentado no comentário de
+// `resolverPendencia` (função irmã, acima, escrita numa tarefa anterior):
+// os únicos "Dádiva do X" são Ataque Irresistível, Destino e Espírito da
+// Noite, nenhum "Dádiva da Sorte". Usar o nome inexistente faria
+// `subirDeNivel` devolver `{ sucesso:false, erro: 'Talento selecionado
+// não encontrado.' }` -- um ERRO, não uma pendência -- e `subirAteNivel`
+// lançaria imediatamente no nível 19 das 12 classes. A correção
+// reaproveita o mesmo talento genérico de ASI ('Aumento no Valor de
+// Atributo', Repetível) que já resolve 'aumento_atributo': definir só
+// `opcoes.talento` já silencia 'dadiva_epica', e a subida seguinte
+// devolve 'talento_asi' pedindo a distribuição, que o ramo abaixo trata.
+//
+// Preenche UMA resposta em `opcoes` para a pendencia recebida, sempre com
+// a primeira opcao valida. Lanca para tipo desconhecido: e essa excecao
+// que revela, por medicao, quais pendencias existem de verdade -- a lista
+// escrita de cabeca sempre sai incompleta.
+//
+// Assincrona: os ramos de magia (grimorio/subclasse arcana) e de perícias
+// (Especialização/Explorador Hábil) precisam de `dadosClasses`/`utils`,
+// obtidos via modulosApp() -- memoizada, então chamá-la aqui não recarrega
+// nada. Reaproveita escolherMagiasMago/proximasPericias (definidas acima,
+// já usadas por escadaDeNivel) em vez de reimplementar os mesmos filtros.
+
+// Pool determinístico de magias de 1º círculo com o marcador Ritual
+// (conferidas em dados/magias/circulo_1.json, campo tempo_conjuracao) para
+// responder à pendência 'ritual_bonus_proficiencia' do Conjurador
+// Ritualista. Onze nomes bastam com folga: o Bônus de Proficiência sobe no
+// máximo 4 vezes numa carreira inteira (níveis 5, 9, 13, 17 -- livro:2047),
+// e a característica de aquisição soma no máximo mais 6 (o próprio Bônus
+// de Proficiência do nível em que o talento é escolhido).
+const RITUAIS_1_CIRCULO = [
+  'Alarme', 'Compreender Idiomas', 'Convocar Familiar', 'Detectar Magia',
+  'Detectar Veneno e Doença', 'Disco Flutuante de Tenser', 'Escrita Ilusória',
+  'Falar com Animais', 'Identificar', 'Purificar Alimentos e Bebidas',
+  'Servo Invisível',
+];
+
+async function responderPendencia(opcoes, tipo, personagem, classeData, nomeClasse) {
+  // Pendências chegam ANTES de o nível avançar (subirDeNivel só grava o
+  // novo nível depois que todas as pendências do nível são resolvidas) --
+  // por isso o nível que a resposta precisa considerar é sempre
+  // nivel_atual + 1.
+  //
+  // NA CLASSE, não TOTAL. `personagem.nivel` é o ESPELHO do nível total;
+  // tudo que este auxiliar decide (quais magias cabem no grimório, qual
+  // linha de ESCOLHAS_SUBCLASSE_APP dispara, quantas magias a dádiva de
+  // escola concede) é regra de nível NA CLASSE que sobe -- a mesma
+  // separação que `contextoDeSubida` faz no motor. MEDIDO: com o total,
+  // `subirAteNivel(barbaro5, 'Mago', 6)` escolhia magias de 3º círculo
+  // (tabela do Mago no nível 6) para um Mago 1, `subirDeNivel` recusava, e
+  // o auxiliar lançava "pendência não resolvida: grimorio" -- exatamente o
+  // que impedia qualquer cenário com CONJURADORA como segunda classe (o
+  // buraco de cobertura por onde o Critical desta revisão passou).
+  // Para classe única, nivelNa === personagem.nivel: nada se move.
+  const { multiclasse } = await modulosApp();
+  const classeQueSobe = nomeClasse || personagem.classe;
+  const novoNivel = multiclasse.nivelNa(personagem, classeQueSobe) + 1;
+
+  switch (tipo) {
+    case 'subclasse':
+      opcoes.subclasse = (classeData?.subclasses || [])
+        .filter((sc) => !sc.nome.toLowerCase().startsWith('subclasses de'))[0]?.nome;
+      return;
+    case 'aumento_atributo':
+      opcoes.talento = 'Aumento no Valor de Atributo';
+      opcoes.aumentos_atributo = { constituicao: 2 };
+      return;
+    case 'dadiva_epica':
+      // Ver ACHADO acima: reaproveita o talento genérico de ASI -- não é o
+      // que o brief sugeria de cabeça, mas o que a mensagem de erro medida
+      // exige.
+      opcoes.talento = 'Aumento no Valor de Atributo';
+      return;
+    case 'talento_asi': {
+      // A resposta fixa de 'aumento_atributo' (sempre +2 em Constituição)
+      // esbarra no teto de 20 depois de algumas subidas -- esta pendência
+      // pede OUTRA distribuição. Primeiro atributo (ordem fixa) que ainda
+      // comporta +2 sem estourar 20; Constituição sobra como último
+      // recurso porque costuma ser o primeiro a saturar.
+      const ATRIBUTOS = ['forca', 'destreza', 'constituicao', 'inteligencia', 'sabedoria', 'carisma'];
+      const atributo = ATRIBUTOS.find((a) => (personagem.atributos?.[a] ?? 10) <= 18) || 'constituicao';
+      opcoes.talento = 'Aumento no Valor de Atributo';
+      opcoes.aumentos_atributo = { [atributo]: 2 };
+      return;
+    }
+    case 'estilo_luta':
+      opcoes.estilo_luta = 'Defensivo';
+      return;
+    case 'explorador_habil': {
+      const { dadosClasses } = await modulosApp();
+      opcoes.explorador_expertise = proximasPericias(personagem, 1, dadosClasses)[0];
+      // levelup.js só concede os 2 idiomas de Explorador Hábil SE eles
+      // vierem em `opcoes` (mesmo achado documentado em resolverPendencia).
+      opcoes.explorador_idiomas = ['Anão', 'Élfico'];
+      return;
+    }
+    case 'bardo_expertise': {
+      const { dadosClasses } = await modulosApp();
+      opcoes.bardo_expertise = proximasPericias(personagem, 2, dadosClasses);
+      return;
+    }
+    case 'guardiao_expertise': {
+      const { dadosClasses } = await modulosApp();
+      opcoes.guardiao_expertise = proximasPericias(personagem, 2, dadosClasses);
+      return;
+    }
+    case 'academico':
+      // Acadêmico exige proficiência PRÉVIA na perícia escolhida
+      // (levelup.js) -- o personagem sintético de personagemInicialDeClasse
+      // não parte com nenhuma, então concede Arcanismo aqui (a perícia de
+      // assinatura do Mago) antes de responder à pendência.
+      if (!personagem.pericias_proficientes) personagem.pericias_proficientes = [];
+      if (!personagem.pericias_proficientes.includes('Arcanismo')) {
+        personagem.pericias_proficientes.push('Arcanismo');
+      }
+      opcoes.academico_expertise = ['Arcanismo'];
+      return;
+    case 'ritual_bonus_proficiencia': {
+      // Crescimento do Conjurador Ritualista (Talentos.md:370). Reusa
+      // ritualBonusPendente -- a MESMA função que subirDeNivel chama --
+      // para saber quantas magias faltam e quais já foram escolhidas; o
+      // `+1` repete a conta de nivelTotalNovo que contextoDeSubida fez
+      // para gerar esta pendência (nivelTotal(personagem) + 1), porque o
+      // espelho `personagem.nivel` ainda não avançou neste ponto.
+      const { regras } = await modulosApp();
+      const pendente = regras.ritualBonusPendente(personagem, multiclasse.nivelTotal(personagem) + 1);
+      // `nomesPreparados` (TODAS as preparadas, de qualquer origem), nao
+      // `jaEscolhidas` (so as do talento): desde o Important 1 da revisao
+      // final, o guard do motor recusa um nome ja preparado por outra via
+      // -- responder com um deles esgotaria as 12 tentativas de
+      // subirAteNivel com um erro que nao aponta para a causa.
+      const jaTem = new Set(pendente.nomesPreparados);
+      const escolha = RITUAIS_1_CIRCULO.filter((m) => !jaTem.has(m)).slice(0, pendente.faltam);
+      if (escolha.length !== pendente.faltam) {
+        throw new Error(`responderPendencia: RITUAIS_1_CIRCULO esgotado para o ` +
+          `Conjurador Ritualista (faltam ${pendente.faltam}, disponíveis ${escolha.length})`);
+      }
+      opcoes.rituais_bonus_proficiencia = escolha;
+      return;
+    }
+    case 'proficiencias_classe_nova': {
+      // Proficiencias reduzidas ao entrar numa classe NOVA (livro:2051,
+      // sub-projeto proprio de multiclasse-proficiencias). Sem este caso,
+      // QUALQUER escada que entrasse em Bardo/Guardiao/Ladino como
+      // classe ADICIONAL esgotava as 12 tentativas de subirAteNivel e
+      // lancava -- so nao aparecia porque nenhuma escada multiclasse da
+      // suite entrava numa dessas tres classes (achado da revisao do
+      // Task 3). Responde com a primeira opcao ainda nao possuida, mesmo
+      // padrao de `proximasPericias` acima.
+      const { proficiencias, regras } = await modulosApp();
+      const concessoes = proficiencias.concessoesAoEntrarEm(nomeClasse);
+      if (concessoes.pericias > 0) {
+        const jaTem = new Set(personagem.pericias_proficientes || []);
+        const escolha = concessoes.opcoesPericia.find((per) => !jaTem.has(per));
+        if (!escolha) {
+          throw new Error(`responderPendencia: nenhuma pericia livre em ` +
+            `opcoesPericia de ${nomeClasse} -- personagem ja proficiente em todas`);
+        }
+        opcoes.pericia_classe_nova = escolha;
+      }
+      if (concessoes.instrumentos > 0) {
+        // `regras` = regras-cobertura.js, fonte unica de INSTRUMENTOS_MUSICAIS
+        // (mesma constante que levelup.js agora valida a escolha contra).
+        const jaTemInstrumento = new Set(personagem.proficiencias_instrumentos || []);
+        const instrumento = regras.INSTRUMENTOS_MUSICAIS.find((i) => !jaTemInstrumento.has(i));
+        if (!instrumento) {
+          throw new Error('responderPendencia: nenhum instrumento livre em INSTRUMENTOS_MUSICAIS');
+        }
+        opcoes.instrumento_classe_nova = instrumento;
+      }
+      return;
+    }
+    case 'grimorio': {
+      // Livro (Classes.md, característica Conjuração do Mago): SEIS magias
+      // de 1º círculo no nível 1 de Mago -- criação ou multiclasse --, DUAS
+      // nos níveis seguintes. `novoNivel` aqui é o NA CLASSE (comentário
+      // acima), então só é 1 quando Mago entra como classe nova (residuo-1
+      // desta tarefa; mesmo número de levelup.js/grimorioQtd).
+      const qtdGrimorio = novoNivel === 1 ? 6 : 2;
+      opcoes.grimorio_selecionados = await escolherMagiasMago(personagem, classeData, novoNivel, qtdGrimorio);
+      return;
+    }
+    case 'subclasse_magias_arcana': {
+      const { dadosClasses } = await modulosApp();
+      const subclasseAtual = opcoes.subclasse || personagem.subclasse;
+      const escola = dadosClasses.ESCOLAS_SUBCLASSE_MAGO[subclasseAtual];
+      // Quantidade fixa pela regra do livro (levelup.js:
+      // qtdMagiasSubclasseArcana): 2 no bônus de entrada na subclasse
+      // (nível 3), 1 em cada bônus recorrente depois disso -- a pendência
+      // só aparece quando a quantidade é > 0, então fora do nível 3 ela só
+      // pode ser 1.
+      const quantidade = novoNivel === 3 ? 2 : 1;
+      opcoes.subclasse_magias_selecionadas = await escolherMagiasMago(
+        personagem, classeData, novoNivel, quantidade,
+        { escola, excluirNomes: opcoes.grimorio_selecionados || [] });
+      return;
+    }
+    case 'prerequisito_classe':
+      // Este driver NUNCA dispensa um pre-requisito de multiclasse (livro:2033)
+      // em silencio. Uma escolha canonica generica aqui (sempre marcar
+      // `dispensar_prerequisito`) contaminaria toda a rede de nao-regressao
+      // que as tarefas deste sub-projeto ja usam -- um teste que semear um
+      // personagem sem o 13+ certo passaria a subir de nivel do mesmo jeito,
+      // sem ninguem decidir isso de proposito. Quem precisar caracterizar o
+      // caminho da dispensa monta a chamada com `opcoes.dispensar_prerequisito`
+      // fora deste auxiliar (ver multiclasse-subida.test.mjs).
+      throw new Error(
+        `responderPendencia: pré-requisito de multiclasse não atendido para ` +
+        `${personagem.classe} nível ${personagem.nivel} -- este driver nunca dispensa ` +
+        `pré-requisito automaticamente; monte a chamada com ` +
+        `opcoes.dispensar_prerequisito explicitamente.`);
+  }
+
+  // Escolhas de subclasse vindas da tabela declarativa
+  // (regras-subclasse-escolhas.js): responde com as N primeiras opções
+  // VÁLIDAS que o personagem ainda não tem -- mesmo mecanismo do fallback
+  // genérico de `resolverPendencia`, acima.
+  const { regrasSubclasseEscolhas } = await modulosApp();
+  const subclasseAtual = opcoes.subclasse || personagem.subclasse;
+  const linha = regrasSubclasseEscolhas.ESCOLHAS_SUBCLASSE_APP
+    .find((l) => l.tipo === tipo && l.subclasse === subclasseAtual && l.nivel === novoNivel);
+  if (linha) {
+    const jaTem = new Set(linha.destino === 'pericias_proficientes'
+      ? (personagem.pericias_proficientes || [])
+      : linha.destino === 'proficiencias_ferramentas'
+        ? (personagem.proficiencias_ferramentas || [])
+        : []);
+    const disponiveis = regrasSubclasseEscolhas.opcoesDaLinha(linha).filter((o) => !jaTem.has(o));
+    if (disponiveis.length >= linha.quantidade) {
+      opcoes[linha.campo] = disponiveis.slice(0, linha.quantidade);
+      return;
+    }
+  }
+
+  throw new Error(
+    `responderPendencia: tipo "${tipo}" sem tratamento (classe ${personagem.classe}, ` +
+    `nível ${personagem.nivel}). Acrescente o ramo -- não silencie.`);
+}
+
+/**
+ * Sobe `personagem` ate `nivelAlvo` na classe indicada, respondendo cada
+ * pendencia com a PRIMEIRA opcao valida -- deterministico de proposito:
+ * o mesmo roteiro tem de produzir sempre o mesmo personagem, senao o
+ * snapshot de caracterizacao acusa diferenca que nao e regressao.
+ *
+ * Nao reimplementa regra nenhuma: chama `subirDeNivel` de verdade e so
+ * preenche o que ela pedir. Lanca -- nunca engole -- quando a pendencia e
+ * de um tipo que este auxiliar nao conhece: um `return` silencioso ali
+ * congelaria um personagem parado no meio da escada e todo oraculo
+ * construido sobre ele mediria a coisa errada.
+ *
+ * @param {object} personagem Mutado no lugar.
+ * @param {string} nomeClasse Classe em que os niveis entram.
+ * @param {number} nivelAlvo Nivel TOTAL a alcancar.
+ * @returns {Promise<object>} o proprio personagem, ja no nivel alvo.
+ */
+export async function subirAteNivel(personagem, nomeClasse, nivelAlvo) {
+  const { levelup, db } = await modulosApp();
+  const classeData = await db.getClasse(nomeClasse);
+  let guarda = 0;
+  while ((personagem.nivel || 0) < nivelAlvo) {
+    if (++guarda > 100) {
+      throw new Error(`subirAteNivel: ${nomeClasse} travou no nível ${personagem.nivel}`);
+    }
+    const opcoes = { ignorar_xp: true, classe: nomeClasse };
+    // Ate 12 rodadas por nivel: cada `pendente` acrescenta UMA resposta e
+    // tenta de novo. Doze e o teto de pendencias que um nivel pode
+    // acumular hoje (subclasse + ASI + estilo + manobras + expertise +
+    // truques + magias + grimorio + subclasse arcana + escolhas de
+    // subclasse); estourar significa pendencia nova sem tratamento aqui.
+    for (let tentativa = 0; tentativa < 12; tentativa++) {
+      const r = await levelup.subirDeNivel(personagem, opcoes);
+      if (r.sucesso) break;
+      if (!r.pendente) throw new Error(`subirAteNivel: ${nomeClasse} nível ${personagem.nivel}: ${r.erro}`);
+      await responderPendencia(opcoes, r.tipo_pendencia, personagem, classeData, nomeClasse);
+      if (tentativa === 11) {
+        throw new Error(`subirAteNivel: pendência não resolvida: ${r.tipo_pendencia}`);
+      }
+    }
+  }
+  return personagem;
+}
+
+/**
+ * Personagem de nivel 1 numa classe, com atributos fixos. Semente
+ * COMPARTILHADA entre o gerador do snapshot de caracterizacao e o teste
+ * que o confere: se cada um montasse o seu, a primeira diferenca de
+ * semente viraria "regressao" e ninguem acharia a causa.
+ * Atributos em 15 para nenhum pre-requisito de talento barrar a escada.
+ * @param {string} classe Nome da classe inicial.
+ * @returns {Promise<object>} personagem de nivel 1.
+ */
+export async function personagemInicialDeClasse(classe) {
+  return personagemMulticlasse([{ classe, nivel: 1 }]);
+}
+
+/** Reduz o personagem aos campos que a subida de nivel altera. */
+export function fotoDaSubida(p) {
+  return {
+    nivel: p.nivel, classe: p.classe, subclasse: p.subclasse,
+    classes: p.classes, pv_max: p.pv_max,
+    dados_vida: p.dados_vida, dados_vida_total: p.dados_vida_total,
+    espacos_magia: p.espacos_magia, atributos: p.atributos,
+    pericias_proficientes: p.pericias_proficientes,
+    pericias_expertise: p.pericias_expertise,
+    escolhas_classe: p.escolhas_classe, talentos: p.talentos,
+    manobras_conhecidas: p.manobras_conhecidas,
+    magias_conhecidas: p.magias_conhecidas,
+    magias_preparadas: p.magias_preparadas,
+    grimorio: p.grimorio,
+  };
 }

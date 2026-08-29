@@ -2,16 +2,17 @@
 // Versao da ficha formatada para impressao
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
-import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, CLASSES_INFO, PERICIAS } from '../dados-classes.js';
+import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, PERICIAS } from '../dados-classes.js';
 import { getMagiasPorCirculo } from '../db.js';
 import { formatarCarteira, totalEmCobre } from '../moedas.js';
 import { bonusProficiencia, calcBonusPericia, calcCA, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcMod, calcPercepcaoPassiva, conjuracoesPorClasse, escHtml, fmtMod, getDeslocamento, getTamanho, mdParaHtml, toast } from '../utils.js';
 import { SUBTRACOS_ESPECIE, gerarTracoSinteticoEspecie } from './caracteristicas.js';
 import { getEstadoRecursosBruxo } from './classes/bruxo.js';
 import { forcaPrimordialAtiva, getAtaquesPorAcao, getDeslocamentoFinal, getModIniciativa } from './combate.js';
-import { char, classeData, especiesCache, indiceMagiasCache, passivosTalentosCache, talentosCache } from './estado.js';
+import { char, classeData, especiesCache, indiceMagiasCache, passivosTalentosCache, seloPrerequisitoDispensado, talentosCache } from './estado.js';
 import { conjuraPorAlgumaClasse } from '../regras-multiclasse-conjuracao.js';
-import { reservasDadosVida } from '../regras-multiclasse.js';
+import { armadurasDoPersonagem, armasDoPersonagem } from '../regras-multiclasse-proficiencias.js';
+import { classesDe, reservasDadosVida } from '../regras-multiclasse.js';
 import { ehProficienteEmSalvaguarda } from '../regras-salvaguardas.js';
 import { normalizarMagiaPersonalizada, rotuloOrigemMagia } from './magias.js';
 // reservasDeEspacos (Tarefa 4, sub-projeto 4, Ruling 11): a caixa "Espacos
@@ -155,7 +156,6 @@ function htmlMagiaPersonalizadaImpressao(registro) {
  * Gera o HTML completo de impressao da ficha.
  */
 export async function gerarHtmlImpressao() {
-  const info = CLASSES_INFO[char.classe] || {};
   const prof = bonusProficiencia(char.nivel);
   const ca = calcCA(char, passivosTalentosCache);
   const modCon = calcMod(char.atributos.constituicao);
@@ -186,7 +186,23 @@ export async function gerarHtmlImpressao() {
       <div class="print-char-identidade">
         <div class="print-char-name">${escHtml(char.nome) || 'Sem Nome'}</div>
         <div class="print-char-sub">
-          ${escHtml(char.especie || '')} ${escHtml(char.classe || '')} ${char.subclasse ? `(${escHtml(char.subclasse)})` : ''} &mdash; Nivel ${char.nivel}
+          ${escHtml(char.especie || '')} ${(() => {
+            // classesDe: mesma leitura que o cabecalho da ficha
+            // (ficha.js:270-274) ja faz -- classe unica imprime igual a
+            // antes (`cs.length > 1` esconde o nivel por classe), e
+            // multiclasse passa a listar TODAS as classes, com o selo de
+            // pre-requisito dispensado por classe. Antes desta correcao a
+            // impressao so lia o espelho `char.classe` (a classe INICIAL),
+            // que nunca carrega a marca -- o pre-requisito de livro:2033 so
+            // trava classe NOVA, e a inicial nunca passa por `subirDeNivel`
+            // (vem do assistente de criacao). O selo so pode aparecer numa
+            // classe SEGUNDA-ou-posterior, exatamente a que o espelho nao
+            // enxerga.
+            const cs = classesDe(char);
+            return cs.map((c) =>
+              `${escHtml(c.classe)}${c.subclasse ? ` (${escHtml(c.subclasse)})` : ''}${cs.length > 1 ? ` ${c.nivel}` : ''}${seloPrerequisitoDispensado(c.classe)}`
+            ).join(' / ');
+          })()} &mdash; Nivel ${char.nivel}
           ${char.antecedente ? ` | Antecedente: ${escHtml(char.antecedente)}` : ''}
           ${char.alinhamento ? ` | ${escHtml(char.alinhamento)}` : ''}
         </div>
@@ -265,8 +281,11 @@ export async function gerarHtmlImpressao() {
   // --- Proficiencias de Armaduras e Armas ---
   {
     const extras = (char.proficiencias_extra || []).map(p => p.toLowerCase());
-    const armadurasProf = [...(info.armaduras || [])];
-    const armasProf = [...(info.armas || [])];
+    // Uniao das classes (livro:2051). Era `info.armaduras`, o espelho
+    // da classe inicial: num Mago 5/Guerreiro 1 a ficha listava
+    // "Nenhuma" em armaduras com o Guerreiro na mesma pagina.
+    const armadurasProf = armadurasDoPersonagem(char);
+    const armasProf = armasDoPersonagem(char);
     const armadurasExtras = [];
     const armasExtras = [];
     for (const extra of extras) {

@@ -99,12 +99,22 @@ export function calcPVMulticlasse(personagem, modCon) {
 
 /**
  * Verifica se uma magia registrada pelo nome pertence ao grimório do mago.
+ *
+ * `temClasse` em vez de `personagem?.classe !== 'Mago'`: aquele era o
+ * espelho da classe INICIAL, e um Ladino 5/Mago 1 (Mago NÃO é a classe
+ * inicial) sempre devolvia false aqui -- o portão do grimório (sheet/
+ * grimorio.js, "Essa magia não está registrada no grimório") nunca
+ * disparava para ele, e ele podia preparar qualquer magia de círculo da
+ * lista de Mago sem ela estar no livro. `temClasse` lê `classes[]` (a
+ * fonte da verdade) e cai para o mesmo espelho quando `classes[]` não
+ * existe (ficha legada de classe única) -- mesmo resultado de antes nesse
+ * caso, correto também no multiclasse.
  * @param {object} personagem
  * @param {string} nome
  * @returns {boolean}
  */
 export function magiaMagoEstaNoGrimorio(personagem, nome) {
-  if (personagem?.classe !== 'Mago' || typeof nome !== 'string') return false;
+  if (!temClasse(personagem, 'Mago') || typeof nome !== 'string') return false;
   return Array.isArray(personagem.grimorio) && personagem.grimorio.some(m => m?.nome === nome);
 }
 
@@ -133,6 +143,18 @@ export function nomesMagiaCirculo1Conhecidas(personagem) {
  * Normaliza o grimório de personagens Magos legados sem inventar magias.
  * Magias preparadas normais de 1º círculo ou superior também devem constar
  * no grimório; magias concedidas por outra origem não contam para essa regra.
+ *
+ * NÃO CONVERTIDA para multiclasse (Tarefa 3, sub-projeto "tela magias por
+ * classe" -- decisão tomada, não esquecimento). O portão `personagem.classe
+ * !== 'Mago'` lê o ESPELHO de propósito: ela empurra para dentro de
+ * `personagem.grimorio` toda magia de `magias_preparadas` com círculo > 0
+ * que passe em `magiaContaNoLimite` (linhas abaixo), e `magias_preparadas[]`
+ * NÃO TEM campo de classe -- é exatamente o campo que o dono do produto
+ * adiou (docs/PERGUNTAS-PENDENTES.txt, "MAGIA PREPARADA NAO SABE DE QUE
+ * CLASSE E"). Trocar o portão por `temClasse(personagem, 'Mago')` faria um
+ * Clérigo 5/Mago 1 copiar as magias PREPARADAS DO CLÉRIGO para dentro do
+ * grimório do Mago -- corrupção de ficha, não conversão de leitura. Só é
+ * seguro reabrir isto depois que `magias_preparadas[].classe` existir.
  *
  * @param {object} personagem
  * @param {number} [limitePreparadas]
@@ -705,13 +727,25 @@ export function getTruquesConhecidos(tabelaCaracteristicas, nivel) {
  * Aceita tanto o objeto do criador (`personagem`) quanto o da ficha (`char`)
  * -- os dois gravam a ordem escolhida do mesmo jeito, direto no campo
  * (ordem_divina/ordem_primal) ou em escolhas_classe.
+ *
+ * `nomeClasse` (Tarefa 3, sub-projeto "tela magias por classe"): a classe a
+ * CONFRONTAR contra Clérigo/Druida, separada de `personagem` para os dois
+ * chamadores da FICHA (sheet/grimorio.js, sheet/magias.js) poderem passar a
+ * classe da SUPERFÍCIE de conjuração ativa (`sup.classe`) em vez do espelho
+ * `personagem.classe` -- um Ladino 5/Clérigo 1 Taumaturgo não ganha o bônus
+ * se a checagem só souber perguntar pela classe INICIAL. Sem argumento,
+ * cai em `personagem?.classe` -- o mesmo comportamento de antes, exatamente
+ * o que os dois chamadores do criador (creator/passo-magias.js,
+ * creator/wizard.js, personagem de UMA classe só) e o de levelup-flow.js
+ * (documentadamente um no-op ali, ordem_divina/ordem_primal não muda dentro
+ * de uma mesma subida) continuam recebendo.
  */
-export function getBonusTruquesOrdem(personagem) {
+export function getBonusTruquesOrdem(personagem, nomeClasse = personagem?.classe) {
   if (!personagem) return 0;
   const ordemDivina = personagem.ordem_divina || personagem.escolhas_classe?.ordem_divina?.[0] || '';
-  if (personagem.classe === 'Clérigo' && ordemDivina === 'Taumaturgo') return 1;
+  if (nomeClasse === 'Clérigo' && ordemDivina === 'Taumaturgo') return 1;
   const ordemPrimal = personagem.ordem_primal || personagem.escolhas_classe?.ordem_primal?.[0] || '';
-  if (personagem.classe === 'Druida' && ordemPrimal === 'Xamã') return 1;
+  if (nomeClasse === 'Druida' && ordemPrimal === 'Xamã') return 1;
   return 0;
 }
 

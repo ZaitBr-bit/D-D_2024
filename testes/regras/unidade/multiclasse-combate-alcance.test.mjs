@@ -461,10 +461,14 @@ const UTILS_LEGITIMAS_NIVEL_TOTAL = [
 ];
 
 const UTILS_ESPELHOS_FORA_DO_ESCOPO_3D = [
-  // Grimorio do Mago: `personagem.classe !== 'Mago'` e o espelho da classe
-  // INICIAL -- um Clerigo 1/Mago 5 tem grimorio e o app nao o enxerga.
-  // Escopo de um sub-projeto de MAGIAS, nao do 3d (combate).
-  "if (personagem?.classe !== 'Mago' || typeof nome !== 'string') return false;",
+  // Grimorio do Mago: `personagem.classe !== 'Mago'` era o espelho da classe
+  // INICIAL -- um Clerigo 1/Mago 5 tinha grimorio e o app nao o enxergava.
+  // CONVERTIDO no sub-projeto de conjuracao por classe (Tarefa 2,
+  // magiaMagoEstaNoGrimorio agora usa temClasse) -- a linha abaixo saiu
+  // desta lista porque `magiaMagoEstaNoGrimorio` nao lê mais `personagem`
+  // como espelho. `nomesMagiaCirculo1Conhecidas`, a linha seguinte, continua
+  // fora do escopo desta tarefa (ela decide "1º círculo já conhecido",
+  // não o grimório em si) e permanece classificada abaixo.
   "if (personagem?.classe === 'Mago') {",
   "if (!personagem || typeof personagem !== 'object' || personagem.classe !== 'Mago') {",
   // Atributo de conjuracao: le classe, subclasse e nivel do espelho de uma
@@ -482,11 +486,24 @@ const UTILS_ESPELHOS_FORA_DO_ESCOPO_3D = [
   // escopo do 3d.
   "if (personagem.classe === 'Bardo' && (personagem.nivel || 1) >= 2 && !prof && !exp) {",
   // Ordem Divina (Clerigo/Taumaturgo) e Ordem Primal (Druida/Xama): bonus
-  // de pericia e de truques, os dois presos ao espelho da classe inicial.
+  // de pericia, preso ao espelho da classe inicial (calcBonusPericia). O
+  // bonus de TRUQUES da mesma dupla (getBonusTruquesOrdem) saiu desta lista
+  // na Tarefa 3 -- ver o comentário logo abaixo.
   "personagem.classe === 'Clérigo' &&",
   "personagem.classe === 'Druida' &&",
-  "if (personagem.classe === 'Clérigo' && ordemDivina === 'Taumaturgo') return 1;",
-  "if (personagem.classe === 'Druida' && ordemPrimal === 'Xamã') return 1;",
+  // getBonusTruquesOrdem (Tarefa 3, sub-projeto "tela magias por classe"):
+  // o DEFAULT do segundo parâmetro, NO-OP por desenho -- não é um defeito
+  // adiado como os itens acima desta lista, mas não é nível TOTAL de
+  // propósito (a outra lista) também, então entra aqui pela classificação
+  // mais próxima. Os dois chamadores da FICHA (sheet/grimorio.js,
+  // sheet/magias.js) agora passam `nomeClasse` explicitamente
+  // (`sup?.classe`, a superfície de conjuração ativa); o default só serve
+  // quem NÃO foi convertido -- o criador (creator/passo-magias.js,
+  // creator/wizard.js), onde `personagem.classe` é a classe certa por
+  // construção (personagem de uma classe só), e levelup-flow.js:100-101,
+  // onde é documentadamente um no-op (ordem_divina/ordem_primal não muda
+  // dentro de uma mesma chamada de subirDeNivel).
+  'export function getBonusTruquesOrdem(personagem, nomeClasse = personagem?.classe) {',
 ];
 
 test('alcance 3d [inventário utils.js]: toda leitura fora da faixa de CA está classificada', () => {

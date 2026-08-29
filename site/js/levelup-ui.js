@@ -8,19 +8,23 @@ import {
   proximoStep, stepAnterior, todosStepsCompletos, calcularSubclasseArcana
 } from './levelup-flow.js';
 import {
-  renderCardGanhosNivel, renderCardSubclasse, renderCardASI,
-  renderCardEscolhasClasse, renderCardMagias, renderCardManobrasGuerreiro, renderCardRevisao,
-  OPCOES_ESTILO_LUTA_BASE
+  renderCardEscolhaClasse, renderCardGanhosNivel, renderCardSubclasse, renderCardASI,
+  renderCardEscolhasClasse, renderCardMagias, renderCardManobrasGuerreiro,
+  renderCardProficienciasClasseNova, renderCardRitualBonus, renderCardRevisao,
+  OPCOES_ESTILO_LUTA_BASE, motivoBloqueio
 } from './levelup-cards.js';
 import { montarSeletor, montarTroca } from './ui-opcoes.js';
 import { deArmas, deEstilosLuta, deMagias, deManobras, deTalentos, motivoPreRequisito, rotuloPericia } from './opcoes-dominio.js';
 import { collectOpcoes, validateAll } from './levelup-validations.js';
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, PERICIAS } from './dados-classes.js';
-import { getArmas, getMagiasPorCirculo, getMagiasClasse, getMagiasRituais } from './db.js';
-import { abrirModal, toast, mdParaHtml, semAcento, calcMod, escHtml, getEspacosMagia } from './utils.js';
+import { getArmas, getClasse, getMagiasPorCirculo, getMagiasClasse, getMagiasRituais } from './db.js';
+import { abrirModal, fecharModal, toast, mdParaHtml, semAcento, calcMod, escHtml, getEspacosMagia, bonusProficiencia } from './utils.js';
 import { subirDeNivel, obterAtributosASITalento, getLimiteASITalento, obterTalentosElegiveis } from './levelup.js';
 import { abrirGridManobras } from './manobras-ui.js';
 import { magiaContaNoLimite, truqueEhTrocavel } from './regras-origens-magia.js';
+import { classeInicial, subclasseDe } from './regras-multiclasse.js';
+import { podeEntrarEm } from './regras-multiclasse-progressao.js';
+import { garantirDadosDeClasses } from './sheet/contexto-classe.js';
 import {
   PERICIAS_TODAS as _PERICIAS_NOMES, FERRAMENTAS_TODAS as _FERRAMENTAS_TODAS,
   FERRAMENTAS_ARTESAO as _FERRAMENTAS_ARTESAO, INSTRUMENTOS_MUSICAIS as _INSTRUMENTOS,
@@ -46,14 +50,18 @@ let _levelUpModalPrincipalAberto = false;
 
 /**
  * Abre o modal de level up em formato de cards.
+ *
+ * Os dados da classe (`classeData`) não vêm por parâmetro: são carregados
+ * aqui a partir da classe em que o nível entra, e RECARREGADOS toda vez que
+ * o jogador troca essa escolha no step 'escolha_classe' (ver
+ * `trocarClasseQueSobe`).
  * @param {Object} char - Personagem
- * @param {Object} classeData - Dados da classe carregados
  * @param {Object} helpers - Funções do sheet.js
  * @param {Object} caches - { talentosCache }
  * @param {Function} salvarFn - Função salvar()
  * @param {Function} renderFichaFn - Função renderFichaCompleta()
  */
-export async function abrirLevelUpCards(char, classeData, helpers, caches, salvarFn, renderFichaFn) {
+export async function abrirLevelUpCards(char, helpers, caches, salvarFn, renderFichaFn) {
   if (_levelUpFluxoAtivo) return;
 
   _levelUpFluxoAtivo = true;
@@ -62,8 +70,20 @@ export async function abrirLevelUpCards(char, classeData, helpers, caches, salva
   _renderFichaFn = renderFichaFn;
 
   try {
-    const ctx = await buildLevelUpContext(char, classeData, helpers);
-    const state = createInitialState();
+    const state = createInitialState(char);
+    // Com DUAS ou mais classes, `state.classeQueSobe` nasce vazio de
+    // propósito (createInitialState) -- mas o contexto precisa de alguma
+    // classe para ser montado. Ele nasce PROVISÓRIO sobre a classe INICIAL
+    // e é reconstruído assim que o jogador escolhe (trocarClasseQueSobe).
+    // Nada desse contexto provisório chega ao jogador: o step
+    // 'escolha_classe' é o primeiro, nasce incompleto, e "Próximo" fica
+    // desabilitado (renderModal) até haver escolha.
+    const classeBase = state.classeQueSobe || classeInicial(char)?.classe || char.classe;
+    // classeData tem de ser o dado DA classe usada no contexto -- ver o aviso
+    // no JSDoc de buildLevelUpContext. Carregar os dois a partir da mesma
+    // variável é o que garante que não desencontrem.
+    const classeData = await getClasse(classeBase);
+    const ctx = await buildLevelUpContext(char, classeData, helpers, classeBase);
     if (ctx.exigeDadivaEpica) state.asiModo = 'talento';
 
     // Carregar lista de magias disponíveis para uso interno. Quem só vira
@@ -109,6 +129,9 @@ function renderModal(ctx, state, caches) {
   // Conteúdo do step atual
   let conteudo = '';
   switch (step.id) {
+    case 'escolha_classe':
+      conteudo = renderCardEscolhaClasse(ctx, state);
+      break;
     case 'ganhos_nivel':
       conteudo = renderCardGanhosNivel(ctx, state);
       break;
@@ -126,6 +149,12 @@ function renderModal(ctx, state, caches) {
       break;
     case 'manobras_guerreiro':
       conteudo = renderCardManobrasGuerreiro(ctx, state);
+      break;
+    case 'proficiencias_classe_nova':
+      conteudo = renderCardProficienciasClasseNova(ctx, state);
+      break;
+    case 'ritual_bonus_proficiencia':
+      conteudo = renderCardRitualBonus(ctx, state);
       break;
     case 'revisao_confirmacao':
       conteudo = renderCardRevisao(ctx, state, steps);
@@ -145,7 +174,15 @@ function renderModal(ctx, state, caches) {
   if (ehUltimo) {
     acoes += `<button class="btn btn-accent" id="btn-confirmar-levelup">Confirmar Nível ${ctx.nivelNovo}</button>`;
   } else {
-    acoes += '<button class="btn btn-accent" id="btn-step-proximo">Próximo</button>';
+    // "Próximo" só nasce desabilitado no step da CLASSE. Nos demais ele
+    // NUNCA valida nada, de propósito (ver o cabeçalho de
+    // talentos-levelup.spec.mjs): quem quiser ver as telas seguintes e
+    // voltar depois pode, e a Revisão é que lista as pendências. Aqui é
+    // diferente -- seguir sem classe escolhida montaria TODAS as telas
+    // seguintes sobre o contexto provisório (ver abrirLevelUpCards), e não
+    // existe descer de nível para desfazer.
+    const travado = step.id === 'escolha_classe' && !step._completo;
+    acoes += `<button class="btn btn-accent" id="btn-step-proximo"${travado ? ' disabled' : ''}>Próximo</button>`;
   }
 
   renderizarModalPrincipal(titulo, corpoHtml, acoes);
@@ -190,12 +227,36 @@ function renderizarModalPrincipal(titulo, corpoHtml, acoesHtml) {
  * Mago depois da escolha, que acontece depois de o contexto ser montado.
  */
 async function irParaStep(ctx, state, caches, indice) {
+  // Sem classe escolhida não se sai do step 0 ('escolha_classe', sempre o
+  // primeiro visível). O botão "Próximo" já nasce desabilitado nesse caso
+  // (renderModal); esta guarda cobre o OUTRO caminho de navegação -- o
+  // clique direto num número da barra de progresso, que pularia a escolha
+  // e montaria a tela sobre o contexto provisório de abrirLevelUpCards.
+  if (!state.classeQueSobe && indice > 0) return;
   state.stepAtual = indice;
   if (ctx.ehConjurador || ehConjuradorAtivo(ctx, state)) {
     try {
       await carregarMagiasDisponiveis(ctx, state);
     } catch (err) {
       console.error('Falha ao carregar a lista de magias do nível:', err);
+    }
+  }
+  // Lista do step 'ritual_bonus_proficiencia' -- mesma fonte que a
+  // aquisição do talento já usa (getMagiasRituais, db.js:126). NÃO varrer
+  // `magias/circulo_N.json` procurando `m.ritual`: aquele acervo não
+  // carrega marcador nenhum, e foi essa varredura que deixou a lista vazia
+  // na aquisição (ver o comentário do bloco 'Conjurador Ritualista' em
+  // bindEscolhasTalento, mais abaixo). Guardado por
+  // `!ctx.magiasRituaisDisponiveis` -- carrega uma vez só por contexto, e
+  // este ctx é o mesmo objeto em toda navegação dentro da MESMA classe
+  // escolhida (só troca de referência ao trocar a classe que sobe, em
+  // trocarClasseQueSobe, que preserva `stepAtual` no step 'escolha_classe'
+  // e por isso nunca renderiza este step sem passar por aqui de novo).
+  if ((ctx.ritualBonus?.faltam || 0) > 0 && !ctx.magiasRituaisDisponiveis) {
+    try {
+      ctx.magiasRituaisDisponiveis = await getMagiasRituais(1);
+    } catch (err) {
+      console.error('Falha ao carregar a lista de magias rituais do Conjurador Ritualista:', err);
     }
   }
   renderModal(ctx, state, caches);
@@ -372,6 +433,31 @@ function salvarStateDoDOM(ctx, state, step) {
       // escolha.
       break;
     }
+    case 'proficiencias_classe_nova': {
+      // Os dois selects são NATIVOS e continuam no DOM enquanto o step
+      // fica aberto -- mesmo padrão de 'escolha_subclasse' logo acima.
+      // `bindEventosProficienciasClasseNova` também escreve em state a
+      // cada `change` (reforço), mas ler aqui de novo garante o valor
+      // mesmo que o jogador nunca dispare o evento (ex.: autofill).
+      const pericia = document.getElementById('select-pericia-classe-nova');
+      if (pericia) state.periciaClasseNova = pericia.value || '';
+      const instrumento = document.getElementById('select-instrumento-classe-nova');
+      if (instrumento) state.instrumentoClasseNova = instrumento.value || '';
+      break;
+    }
+    case 'ritual_bonus_proficiencia': {
+      // Reforço, mesmo padrão de 'proficiencias_classe_nova' logo acima --
+      // os checkboxes são NATIVOS e continuam no DOM enquanto o step fica
+      // aberto. `bindEventosRitualBonusProficiencia` já escreve em state a
+      // cada 'change'; ler aqui de novo garante o valor mesmo que o evento
+      // nunca dispare.
+      const container = document.getElementById('levelup-ritual-bonus');
+      if (container) {
+        state.rituaisBonusSelecionados = [...document.querySelectorAll('#levelup-ritual-bonus input[name="ritual-bonus"]:checked')]
+          .map((el) => el.value);
+      }
+      break;
+    }
     case 'revisao_confirmacao': {
       // Troca de Estilo de Luta do Guerreiro e Especialização do Ladino
       // nível 6 (site/js/levelup-cards.js:renderCardTrocasOpcionais) vivem
@@ -399,14 +485,147 @@ function salvarStateDoDOM(ctx, state, step) {
 
 function bindEventosStep(ctx, state, step, caches) {
   switch (step.id) {
+    case 'escolha_classe': bindEventosEscolhaClasse(ctx, state, caches); break;
     case 'ganhos_nivel': bindEventosHP(ctx, state); break;
     case 'escolha_subclasse': bindEventosSubclasse(ctx, state); break;
     case 'aumento_atributo': bindEventosASI(ctx, state, caches); break;
     case 'escolhas_classe': bindEventosEscolhasClasse(ctx, state); break;
     case 'selecao_magias': bindEventosMagias(ctx, state); break;
     case 'manobras_guerreiro': bindEventosManobrasGuerreiro(ctx, state); break;
+    case 'proficiencias_classe_nova': bindEventosProficienciasClasseNova(ctx, state); break;
+    case 'ritual_bonus_proficiencia': bindEventosRitualBonusProficiencia(ctx, state); break;
     case 'revisao_confirmacao': bindEventosTrocasOpcionais(ctx, state); break;
   }
+}
+
+// --- Classe do nível (step 'escolha_classe') ---
+
+/**
+ * Liga os rádios "em qual classe você sobe?".
+ * @param {Object} ctx - Contexto atual (pode ser o provisório de abrirLevelUpCards)
+ * @param {Object} state - Estado das escolhas
+ * @param {Object} caches - { talentosCache }
+ */
+function bindEventosEscolhaClasse(ctx, state, caches) {
+  document.querySelectorAll('input[name="classe-que-sobe"]').forEach((radio) => {
+    radio.addEventListener('change', async () => {
+      const nome = radio.dataset.classe;
+      if (!nome || nome === state.classeQueSobe) return;
+      try {
+        await trocarClasseQueSobe(ctx, state, caches, nome);
+      } catch (err) {
+        console.error('Falha ao trocar a classe em que o nível entra:', err);
+        toast('Não foi possível carregar essa classe.', 'error');
+        // O `state` fica intacto (trocarClasseQueSobe só o escreve depois
+        // de o contexto novo ter sido montado), mas o rádio JÁ mudou no
+        // DOM: sem re-renderizar, a tela mostraria marcada uma classe que
+        // NÃO foi adotada. Em classe única "Próximo" segue habilitado, e
+        // daria para confirmar um nível de Mago com Bárbaro aparecendo
+        // marcado -- e não existe descer de nível. Re-renderiza com o
+        // contexto ANTIGO, que é o que o estado ainda descreve.
+        renderModal(ctx, state, caches);
+      }
+    });
+  });
+
+  bindEventosDispensaPrerequisito(ctx, state, caches);
+}
+
+/**
+ * Liga o botao "usar mesmo assim" de cada classe travada pelo pre-requisito
+ * de multiclasse (livro:2033). Abre uma confirmacao que NOMEIA o que falta
+ * (mesmo texto do card, via `motivoBloqueio`) e avisa que a ficha fica
+ * marcada permanentemente -- so ao confirmar e que a classe travada e
+ * adotada como `classeQueSobe` e `state.dispensarPrerequisito` vira true.
+ *
+ * `state.dispensarPrerequisito` E ESCRITO DEPOIS de `trocarClasseQueSobe`
+ * de proposito: aquela funcao reconstroi o estado inteiro a partir de
+ * `createInitialState` (zerando escolhas da classe anterior), e escrever
+ * antes seria apagado no mesmo instante.
+ * @param {Object} ctx - Contexto atual do assistente
+ * @param {Object} state - Estado das escolhas, mutado no lugar
+ * @param {Object} caches - { talentosCache }
+ */
+function bindEventosDispensaPrerequisito(ctx, state, caches) {
+  document.querySelectorAll('#levelup-escolha-classe [data-dispensar]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const nome = btn.dataset.dispensar;
+      if (!nome) return;
+      const { faltando } = podeEntrarEm(ctx.char, nome);
+      const motivo = motivoBloqueio(faltando);
+      abrirModal(
+        'Dispensar pré-requisito de multiclasse?',
+        `<p>${escHtml(nome)} exige ${escHtml(motivo)} pelo livro, e este personagem não atende.</p>
+         <p>Muitas mesas dispensam esse pré-requisito. Se você confirmar, o nível entra em
+         <strong>${escHtml(nome)}</strong> mesmo assim -- e a ficha fica <strong>marcada
+         permanentemente</strong> como tendo usado essa dispensa, mesmo que o atributo suba depois.</p>`,
+        `<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
+         <button class="btn btn-accent" id="btn-confirmar-dispensa-prerequisito">Usar mesmo assim</button>`
+      );
+      document.getElementById('btn-confirmar-dispensa-prerequisito')?.addEventListener('click', async () => {
+        fecharModal();
+        try {
+          const novoCtx = await trocarClasseQueSobe(ctx, state, caches, nome);
+          state.dispensarPrerequisito = true;
+          // Segundo render, com a marca ja escrita: e ele que troca o
+          // cadeado pelo aviso "pre-requisito dispensado" no card da
+          // classe (renderCardEscolhaClasse). O primeiro render, dentro de
+          // trocarClasseQueSobe, roda ANTES da linha acima -- ver o
+          // docblock desta funcao para o porque dessa ordem.
+          renderModal(novoCtx, state, caches);
+        } catch (err) {
+          console.error('Falha ao trocar a classe em que o nível entra:', err);
+          toast('Não foi possível carregar essa classe.', 'error');
+          renderModal(ctx, state, caches);
+        }
+      });
+    });
+  });
+}
+
+/**
+ * Grava a classe em que o nível entra e RECONSTRÓI o contexto sobre ela.
+ *
+ * O contexto inteiro é refeito, não remendado: `hpGanhoFixo`, as
+ * características do nível, as subclasses disponíveis, o bloco de
+ * conjuração e os caches internos de magia (`_magiasCache`,
+ * `_listaMagiasClasse`) são TODOS da classe que sobe. Mantê-los de uma
+ * classe anterior mostraria o dado de vida e as magias da classe errada.
+ * Mesmo mecanismo que `irParaStep` já usa para recarregar magias depois da
+ * escolha de subclasse.
+ *
+ * As escolhas já feitas são zeradas de propósito: subclasse, ASI/talento,
+ * expertise, estilo de luta, manobras e magias são todos DA CLASSE -- levar
+ * a escolha de uma para a outra gravaria no personagem algo que a nova
+ * classe não concede. `stepAtual` é preservado em vez de voltar a 0: hoje
+ * ele já É 0 (o card da classe só existe no primeiro step), mas zerá-lo
+ * aqui seria um efeito colateral escondido se o seletor um dia aparecer em
+ * outro lugar -- trocar de classe não é o mesmo que navegar.
+ *
+ * @param {Object} ctx - Contexto atual (só se aproveita `char` e `helpers`)
+ * @param {Object} state - Estado das escolhas, mutado no lugar
+ * @param {Object} caches - { talentosCache }
+ * @param {string} nome - Classe escolhida
+ * @returns {Promise<Object>} o contexto RECONSTRUIDO -- quem precisa
+ *   renderizar de novo depois de mexer no `state` (a dispensa de
+ *   pre-requisito) tem de usar ESTE, nunca o `ctx` antigo.
+ */
+async function trocarClasseQueSobe(ctx, state, caches, nome) {
+  const char = ctx.char;
+  const classeData = await getClasse(nome);
+  const novoCtx = await buildLevelUpContext(char, classeData, ctx.helpers, nome);
+  const stepAtual = state.stepAtual;
+  Object.assign(state, createInitialState(char), { classeQueSobe: nome, stepAtual });
+  if (novoCtx.exigeDadivaEpica) state.asiModo = 'talento';
+  if (novoCtx.ehConjurador) {
+    try {
+      await carregarMagiasDisponiveis(novoCtx, state);
+    } catch (err) {
+      console.error('Falha ao carregar a lista de magias da classe escolhida:', err);
+    }
+  }
+  renderModal(novoCtx, state, caches);
+  return novoCtx;
 }
 
 // --- HP ---
@@ -1012,7 +1231,31 @@ export function bindEscolhasTalento(nome, talentoData, ctx, state = {}) {
   // `getMagiasRituais` (db.js), que ainda cobre os marcadores combinados
   // ('R, M', 'C, R') que a comparação `=== 'R'` perdia. São 11 magias.
   if (nome === 'Conjurador Ritualista') {
-    const bonusProf = Math.floor((ctx.char.nivel || 1) / 4) + 2;
+    // Quantidade de magias rituais = Bonus de Proficiencia (livro,
+    // beneficio "Magias Rituais", Talentos.md:372) do nivel em que o
+    // talento e adquirido -- NUNCA o nivel de antes de adquirir. No
+    // assistente de subida, isso e o nivel TOTAL NOVO (`ctx.nivelNovo`,
+    // calculado em buildLevelUpContext a partir de `sub.nivelTotalNovo`);
+    // usar o nivel ANTERIOR (`ctx.char.nivel`, que so e atualizado por
+    // `sincronizarEspelhos` dentro de `subirDeNivel`, no confirmar --
+    // bem depois desta tela) sub-contaria toda vez que a subida cruzar
+    // um patamar de Bonus de Proficiencia. Em classe unica isso e
+    // inalcancavel (os niveis de ASI -- 4/6/8/10/12/14/16/19 -- nunca tem
+    // o nivel ANTERIOR cruzando um patamar), mas em multiclasse acontece:
+    // ASI e por nivel DE CLASSE, e um Guerreiro 5/Mago 3 subindo o Mago
+    // para 4 cruza o nivel TOTAL 8->9 (Bonus de Proficiencia 3->4).
+    //
+    // SEM FALLBACK DE PROPOSITO: um `ctx.bonusNovo ?? bonusProficiencia
+    // (ctx.char.nivel)` pareceria mais defensivo, mas devolveria
+    // SILENCIOSAMENTE o bonus ANTERIOR -- o numero errado que este ramo
+    // existe para evitar -- se `ctx.nivelNovo` algum dia faltasse. Em vez
+    // disso, todo chamador de bindEscolhasTalento GARANTE `ctx.nivelNovo`:
+    // o assistente de subida via buildLevelUpContext (levelup-flow.js), e
+    // os outros dois -- "+ Talento" da ficha e recuperacao de Dadiva
+    // Epica perdida (sheet/talentos.js) -- preenchem explicitamente
+    // `nivelNovo: char.nivel` no ctx minimo que montam, porque ali nao ha
+    // subida em andamento e o nivel atual JA e o nivel de aquisicao.
+    const bonusProf = bonusProficiencia(ctx.nivelNovo);
     getMagiasRituais(1).then(rituais => {
       const container = document.getElementById('levelup-rituais-container');
       if (!container) return;
@@ -1164,11 +1407,17 @@ function bindEventosEscolhasClasse(ctx, state) {
   // Escolha de Estilo de Luta (Task 10): card em vez do grid de radios
   // antigo. Guardião e Paladino ganham uma opção extra de dádiva de
   // conjuração (Combatente Druídico/Abençoado) além das 10 base.
+  //
+  // `ctx.classeQueSobe`, nunca o espelho `ctx.char.classe`: antes do
+  // seletor da Tarefa 7 as duas sempre coincidiam, mas agora um Mago 5 que
+  // entra em Guardião lia a classe INICIAL (Mago) e nunca ganhava a opção
+  // do Druídico no Guardião 2 -- defeito em silêncio, criado por este
+  // próprio sub-projeto ao tornar a classe que sobe escolhível.
   const escolhaEl = document.getElementById('lvlup-estilo-luta-escolha');
   if (escolhaEl) {
     const opcoesBase = [...OPCOES_ESTILO_LUTA_BASE];
-    if (ctx.char.classe === 'Guardião') opcoesBase.push({ nome: 'Combatente Druídico', descricao: 'Aprende 2 truques de Druida (Sabedoria)' });
-    if (ctx.char.classe === 'Paladino') opcoesBase.push({ nome: 'Combatente Abençoado', descricao: 'Aprende 2 truques de Clérigo (Carisma)' });
+    if (ctx.classeQueSobe === 'Guardião') opcoesBase.push({ nome: 'Combatente Druídico', descricao: 'Aprende 2 truques de Druida (Sabedoria)' });
+    if (ctx.classeQueSobe === 'Paladino') opcoesBase.push({ nome: 'Combatente Abençoado', descricao: 'Aprende 2 truques de Clérigo (Carisma)' });
     montarSeletor(escolhaEl, {
       opcoes: deEstilosLuta(opcoesBase),
       densidade: 'ampla',
@@ -1416,7 +1665,9 @@ function bindEventosMagias(ctx, state) {
   if (conj.ehMago) {
     document.getElementById('btn-lvlup-grimorio')?.addEventListener('click', () => {
       const jaTemSet = new Set([...jaTemGrimorio, ...subclasseArcanaSel]);
-      abrirGridSelecao('Grimório: +2 Magias', 2, grimorioSel, 'magia', jaTemSet, 'lvlup-grimorio-resumo', 'lvlup-grimorio-badges');
+      // `conj.grimorioQtd`: 6 no 1º nível de Mago (multiclasse), 2 nos
+      // seguintes -- ver calcularConjuracao (levelup-flow.js).
+      abrirGridSelecao(`Grimório: +${conj.grimorioQtd} Magia${conj.grimorioQtd === 1 ? '' : 's'}`, conj.grimorioQtd, grimorioSel, 'magia', jaTemSet, 'lvlup-grimorio-resumo', 'lvlup-grimorio-badges');
     });
   }
   const subclasseArcana = calcularSubclasseArcana(ctx, state);
@@ -1657,6 +1908,55 @@ function bindEventosManobrasGuerreiro(ctx, state) {
   }
 }
 
+// --- Proficiências da Classe Nova (Bardo/Guardião/Ladino, livro:2051) ---
+
+/**
+ * Liga os dois seletores do step 'proficiencias_classe_nova' diretamente
+ * no state. Os selects são nativos e continuam existindo entre renders
+ * (diferente de escolhas_classe/selecao_magias, que viraram cards e por
+ * isso só são lidos via callback de montarSeletor/montarTroca) -- por
+ * isso o valor também é lido de novo em salvarStateDoDOM (mesmo padrão de
+ * 'escolha_subclasse'), e escrever aqui é reforço, não a única via.
+ */
+function bindEventosProficienciasClasseNova(ctx, state) {
+  document.getElementById('select-pericia-classe-nova')?.addEventListener('change', (ev) => {
+    state.periciaClasseNova = ev.target.value || '';
+  });
+  document.getElementById('select-instrumento-classe-nova')?.addEventListener('change', (ev) => {
+    state.instrumentoClasseNova = ev.target.value || '';
+  });
+}
+
+// --- Magias Rituais do Bônus de Proficiência (Conjurador Ritualista) ---
+
+/**
+ * Liga os checkboxes do step 'ritual_bonus_proficiencia' (Talentos.md:370).
+ * Cada marcação regrava a lista inteira em `state.rituaisBonusSelecionados`.
+ * Passar do limite (`ctx.ritualBonus.faltam`) desmarca a PRÓPRIA caixa em
+ * vez de aceitar em silêncio -- o motor recusaria depois, com a tela já
+ * fechada (mesmo guard de `ritual_bonus_proficiencia` em levelup.js).
+ *
+ * Não chama nenhum "atualizar botões de navegação": "Próximo" nunca valida
+ * nada fora do step 'escolha_classe' (ver o comentário ao lado de
+ * `#btn-step-proximo` em renderModal) -- é o "Confirmar" da Revisão, via
+ * validateAll, que recusa nomeando este step quando a escolha falta.
+ */
+function bindEventosRitualBonusProficiencia(ctx, state) {
+  const contador = document.getElementById('levelup-ritual-bonus-count');
+  document.querySelectorAll('#levelup-ritual-bonus input[name="ritual-bonus"]').forEach((el) => {
+    el.addEventListener('change', () => {
+      const marcadas = [...document.querySelectorAll('#levelup-ritual-bonus input[name="ritual-bonus"]:checked')]
+        .map((i) => i.value);
+      if (marcadas.length > (ctx.ritualBonus?.faltam || 0)) {
+        el.checked = false;
+        return;
+      }
+      state.rituaisBonusSelecionados = marcadas;
+      if (contador) contador.textContent = String(marcadas.length);
+    });
+  });
+}
+
 // ============================================================
 // CONFIRMAÇÃO / SUBMISSÃO
 // ============================================================
@@ -1789,8 +2089,16 @@ export async function confirmarLevelUp(ctx, state, caches) {
     window.fecharModalTodos?.();
 
     // Resumo
-    const resumo = montarResumoFinal(resultado, char, truquesAdicionados, magiasAdicionadas, grimorioAdicionado, trocasMagiaAplicadas, subclasseMagiasAdicionadas, trocasTruqueAplicadas);
+    const resumo = montarResumoFinal(resultado, char, ctx.classeQueSobe, truquesAdicionados, magiasAdicionadas, grimorioAdicionado, trocasMagiaAplicadas, subclasseMagiasAdicionadas, trocasTruqueAplicadas);
     abrirModal('Subida de Nível Concluída!', resumo, '<button class="btn btn-primary" onclick="fecharModal()">OK</button>');
+    // ANTES de re-renderizar: a subida pode ter ABERTO uma classe nova, e
+    // o mapa `classesData` foi montado na abertura da ficha, sem ela. Sem
+    // esta linha a tela imediatamente posterior a acao principal deste
+    // sub-projeto mostra a classe nova sem espacos de magia, sem
+    // caracteristicas e sem subclasse -- e conserta sozinha num F5, que e
+    // o que fazia isso passar despercebido. Ver garantirDadosDeClasses
+    // (sheet/contexto-classe.js).
+    await garantirDadosDeClasses(char);
     _renderFichaFn?.();
   } else {
     state.confirmando = false;
@@ -1798,7 +2106,7 @@ export async function confirmarLevelUp(ctx, state, caches) {
   }
 }
 
-function montarResumoFinal(resultado, char, truquesAdicionados, magiasAdicionadas, grimorioAdicionado, trocasMagia = [], subclasseMagiasAdicionadas = [], trocasTruque = []) {
+function montarResumoFinal(resultado, char, classeQueSobe, truquesAdicionados, magiasAdicionadas, grimorioAdicionado, trocasMagia = [], subclasseMagiasAdicionadas = [], trocasTruque = []) {
   const attrNomes = { forca: 'Força', destreza: 'Destreza', constituicao: 'Constituição', inteligencia: 'Inteligência', sabedoria: 'Sabedoria', carisma: 'Carisma' };
 
   // Icones SVG inline
@@ -1819,7 +2127,14 @@ function montarResumoFinal(resultado, char, truquesAdicionados, magiasAdicionada
     itens.push(t);
   }
 
-  (resultado.caracteristicas_subclasse || []).forEach(f => itens.push(`<strong>[${char.subclasse}]</strong> ${f.nome}`));
+  // `subclasseDe(char, classeQueSobe)`, nunca o espelho `char.subclasse`: a
+  // lista ao lado (`resultado.caracteristicas_subclasse`) já é da classe
+  // QUE SUBIU, gravada em `char.classes` por `subirDeNivel` (que já rodou
+  // quando este resumo é montado); ler o espelho rotulava com a subclasse
+  // da classe INICIAL, mesma família do defeito de impressão fechado na
+  // Tarefa 8 deste sub-projeto.
+  const subclasseDaClasseQueSobe = subclasseDe(char, classeQueSobe);
+  (resultado.caracteristicas_subclasse || []).forEach(f => itens.push(`<strong>[${subclasseDaClasseQueSobe}]</strong> ${f.nome}`));
   if ((resultado.magias_dominio_adicionadas || []).length > 0) itens.push(`Magias de domínio: ${resultado.magias_dominio_adicionadas.map(m => m.nome).join(', ')}`);
   if ((resultado.magias_sempre_adicionadas || []).length > 0) itens.push(`Magias sempre preparadas: ${resultado.magias_sempre_adicionadas.map(m => m.nome).join(', ')}`);
   if ((resultado.expertise_bardo_aplicada || []).length > 0) itens.push(`Especialização Bardo: ${resultado.expertise_bardo_aplicada.join(', ')}`);

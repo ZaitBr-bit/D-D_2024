@@ -55,7 +55,12 @@ test('level-up: Ladino que escolhe Trapaceiro Arcano recebe a tela de magias e o
   await expect(page.locator('#grid-magias [data-grid-nome="Ilusão Menor"]')).toBeVisible();
 });
 
-test('level-up: os espaços de magia do Trapaceiro Arcano ficam gravados ao confirmar o nível', async ({ context }) => {
+// Desde o sub-projeto 5 a subida NÃO grava mais espaço de magia: o total é
+// derivado da regra a cada leitura (montarReservasDeEspacos), e o que fica
+// gravado é o nível na classe, em `classes[]`. Este teste passou a afirmar
+// as duas coisas -- o que a subida gravou, e o que a ficha deriva disso --
+// em vez de ler as chaves numéricas de círculo, que não existem mais.
+test('level-up: o Trapaceiro Arcano sai do nível 3 com a subclasse gravada e os espaços derivados', async ({ context }) => {
   const { page } = await abrirFicha(context, LADINO_NIVEL_2, 'regras-trapaceiro-2');
   expect(await abrirModalLevelUp(page)).toBe(true);
 
@@ -76,6 +81,23 @@ test('level-up: os espaços de magia do Trapaceiro Arcano ficam gravados ao conf
 
   const salvo = await personagemSalvo(page);
   expect(salvo.nivel).toBe(3);
-  expect(salvo.espacos_magia['1'].total).toBe(2);
+  const entradaLadino = salvo.classes.find(c => c.classe === 'Ladino');
+  expect(entradaLadino.nivel).toBe(3);
+  expect(entradaLadino.subclasse).toBe('Trapaceiro Arcano');
   expect(salvo.magias_conhecidas.map(m => m.nome)).toContain('Mãos Mágicas');
+
+  // E o que a FICHA deriva desse estado: 2 espaços de 1º círculo, pelo
+  // mesmo acessador que a tela de magias usa para renderizar.
+  const reservas = await page.evaluate(async () => {
+    const store = await import(new URL('./js/store.js', location.href).href);
+    const db = await import(new URL('./js/db.js', location.href).href);
+    const reservasEspacos = await import(
+      new URL('./js/sheet/reservas-espacos.js', location.href).href);
+    const personagem = store.listarPersonagens()[0];
+    const mapaDados = new Map([['Ladino', await db.getClasse('Ladino')]]);
+    return reservasEspacos.montarReservasDeEspacos(personagem, mapaDados);
+  });
+  const primeiroCirculo = reservas.find(r => r.circulo === 1);
+  expect(primeiroCirculo.total).toBe(2);
+  expect(primeiroCirculo.usados).toBe(0);
 });

@@ -27,9 +27,39 @@ const { equip } = await modulosApp();
 const ARMAS = JSON.parse(readFileSync(
   resolve(RAIZ, 'dados/equipamento/armas.json'), 'utf-8')).armas;
 
+/**
+ * Personagem de CLASSE ÚNICA no formato canônico (`classes[]` é a fonte da
+ * verdade; `classe`/`nivel` são espelhos). Nasce em nível 5 porque
+ * `temClasse` exige nível > 0 -- um `{ classe: 'Bárbaro' }` cru, sem
+ * `classes[]` nem nível, normaliza para nível 0 e o portão do Bárbaro em
+ * `armasElegiveisMaestria` não dispararia.
+ * @param {string} classe Nome da classe.
+ * @returns {object} personagem mínimo.
+ */
+function personagemDe(classe) {
+  return {
+    classe, subclasse: '', nivel: 5,
+    classes: [{ classe, subclasse: '', nivel: 5, ordem: 0 }],
+  };
+}
+
+/**
+ * Personagem multiclasse mínimo, na ORDEM informada (a primeira entrada é a
+ * classe INICIAL, ordem 0 -- a que o espelho `personagem.classe` reflete).
+ * @param {Array<[string, number]>} pares [classe, nível], na ordem de aquisição.
+ * @returns {object} personagem mínimo.
+ */
+function personagemMulti(pares) {
+  return {
+    classe: pares[0][0], subclasse: '',
+    nivel: pares.reduce((s, [, n]) => s + n, 0),
+    classes: pares.map(([classe, nivel], ordem) => ({ classe, subclasse: '', nivel, ordem })),
+  };
+}
+
 /** Nomes das armas elegíveis para maestria, para a classe informada. */
 function elegiveis(classe) {
-  return equip.armasElegiveisMaestria({ classe }, ARMAS).map(a => a.nome);
+  return equip.armasElegiveisMaestria(personagemDe(classe), ARMAS).map(a => a.nome);
 }
 
 test('o arquivo de armas guarda `propriedades` como string -- quem consumir tem de tratar assim', () => {
@@ -69,12 +99,41 @@ test('Guerreiro: maestria em qualquer Simples ou Marcial, inclusive à distânci
   assert.ok(lista.includes('Arco Longo'));
 });
 
+// ============================================================
+// IMPORTANTE 2 da revisão final (2026-08-27): o portão do Bárbaro lia
+// `personagem?.classe === 'Bárbaro'` -- o ESPELHO da classe INICIAL. Era a
+// última leitura de espelho da cadeia de maestrias (o resto de
+// sheet/maestrias.js já usava `temClasse`/`nivelNa`) e morava justamente no
+// arquivo que a guarda de alcance declarava "convertido por inteiro".
+//
+// Estes dois oráculos são o par: a MESMA dupla de classes nas DUAS ordens
+// tem de dar o MESMO resultado. É isso que uma leitura de espelho não
+// consegue fazer -- ela responde pela ordem, não pelas classes.
+// ============================================================
+test('Mago 5/Bárbaro 1: o portão do Bárbaro vale mesmo com o espelho apontando para o Mago', () => {
+  const p = personagemMulti([['Mago', 5], ['Bárbaro', 1]]);
+  const lista = equip.armasElegiveisMaestria(p, ARMAS).map(a => a.nome);
+  assert.ok(lista.includes('Machado Grande'),
+    'o Bárbaro concede armas Marciais como classe nova -- as corpo a corpo têm de entrar');
+  assert.ok(!lista.includes('Arco Longo'),
+    'a única fonte de Maestria deste personagem é o Bárbaro, e o livro a restringe a Corpo a Corpo; ' +
+    'com o espelho apontando para o Mago o filtro não disparava e o modal oferecia Arco Longo');
+});
+
+test('Bárbaro 5/Mago 1: a mesma dupla na ordem trocada dá o mesmo resultado', () => {
+  const p = personagemMulti([['Bárbaro', 5], ['Mago', 1]]);
+  const lista = equip.armasElegiveisMaestria(p, ARMAS).map(a => a.nome);
+  assert.ok(lista.includes('Machado Grande'));
+  assert.ok(!lista.includes('Arco Longo'),
+    'inverter a ordem não pode mudar a regra -- se mudar, alguém voltou a ler a classe INICIAL');
+});
+
 test('Maestria em Arma: proficiência extra de subclasse entra na lista', () => {
   // Clérigo Protetor recebe "Armas Marciais"; o mesmo campo que a
   // proficiência usa vale para a maestria (mesma função).
-  const semExtra = equip.armasElegiveisMaestria({ classe: 'Ladino' }, ARMAS).map(a => a.nome);
+  const semExtra = equip.armasElegiveisMaestria(personagemDe('Ladino'), ARMAS).map(a => a.nome);
   const comExtra = equip.armasElegiveisMaestria(
-    { classe: 'Ladino', proficiencias_extra: ['Armas Marciais'] }, ARMAS).map(a => a.nome);
+    { ...personagemDe('Ladino'), proficiencias_extra: ['Armas Marciais'] }, ARMAS).map(a => a.nome);
   assert.ok(!semExtra.includes('Espada Longa'));
   assert.ok(comExtra.includes('Espada Longa'),
     'a proficiência extra não chegou à lista de maestrias');

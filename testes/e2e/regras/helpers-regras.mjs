@@ -93,8 +93,24 @@ export function sementeParaTalento(entrada, nome) {
  * Um timeout generoso (20s) mais uma segunda tentativa de clique cobre o
  * pior caso sob carga. Toda spec que abre o level-up deve chamar ESTA
  * função (ou algo que a chame), nunca reimplementar o clique.
+ *
+ * PASSA O STEP "Classe do Nível" POR PADRÃO. Esse step (sub-projeto 5,
+ * Tarefa 7) é o novo PRIMEIRO passo do assistente: ele pergunta em qual
+ * classe o nível entra. Num personagem de CLASSE ÚNICA a resposta já vem
+ * marcada e o passo é só um "Próximo" -- as telas seguintes, e a ordem
+ * delas, são exatamente as de antes. Toda spec deste diretório que dirige
+ * o assistente contando cliques em "Próximo" foi escrita contra um modal
+ * que ABRIA em "Ganhos do Nível"; avançar aqui, num lugar só, preserva
+ * essa contagem em todas elas em vez de espalhar um clique extra por
+ * cada uma (e de deixar os comentários "passo 3 -> passo 4" mentindo).
+ * Quem QUER medir o seletor de classe (multiclasse-subida.spec.mjs) passa
+ * `{ pularEscolhaDeClasse: false }`.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {{pularEscolhaDeClasse?: boolean}} opcoes
+ * @returns {Promise<boolean>} true se o modal abriu
  */
-export async function abrirModalLevelUp(page) {
+export async function abrirModalLevelUp(page, { pularEscolhaDeClasse = true } = {}) {
   const clicarLevelup = () => page.evaluate(() => {
     localStorage.setItem('feature.levelup.flow.v2', '1');
     document.getElementById('btn-levelup')?.click();
@@ -107,6 +123,29 @@ export async function abrirModalLevelUp(page) {
     abriu = await page.waitForSelector('#modal-overlay', { state: 'visible', timeout: 20_000 })
       .then(() => true, () => false);
   }
+  if (!abriu || !pularEscolhaDeClasse) return abriu;
+  // Só avança se o step da classe estiver mesmo na tela E "Próximo"
+  // habilitado -- num personagem multiclasse nada vem marcado e o botão
+  // nasce desabilitado, então o passo NÃO é pulado (o teste vê a tela como
+  // o jogador veria). Este helper NUNCA atravessa um portão insatisfeito.
+  //
+  // O PREÇO DESTE `if`, explicitado: quando o card não está na tela, a
+  // função volta em silêncio. Se o step 'escolha_classe' parar de
+  // renderizar por regressão, as ~13 specs que dirigem o assistente por
+  // aqui continuam TODAS verdes, porque nenhuma delas afirma nada sobre
+  // esse step -- elas voltariam a medir o modal de antes, sem sinal
+  // nenhum. A única rede contra isso é o cenário 1 de
+  // `multiclasse-subida.spec.mjs` ("classe única: o step ... já vem com a
+  // classe marcada"), que abre com `{ pularEscolhaDeClasse: false }` e
+  // exige o card no DOM. Se aquele cenário for apagado ou enfraquecido,
+  // ninguém mais guarda a existência do step.
+  const card = page.locator('#levelup-escolha-classe');
+  if (!await card.count()) return abriu;
+  const proximo = page.locator('#btn-step-proximo');
+  if (!await proximo.isEnabled().catch(() => false)) return abriu;
+  await proximo.click();
+  await card.waitFor({ state: 'detached', timeout: 10_000 }).catch(() => {});
+  await assentar(page).catch(() => {});
   return abriu;
 }
 

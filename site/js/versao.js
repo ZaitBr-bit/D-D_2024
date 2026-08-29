@@ -13,13 +13,168 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.23';
+export const VERSAO_ATUAL = '2.2.25';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.25',
+    data: '2026-08-29',
+    rotulo: 'Magias por classe',
+    resumo: 'A tela de Magias passa a olhar a classe certa. Quem tem uma '
+      + 'segunda classe que conjura via a lista, os truques e o limite de '
+      + 'preparo da classe INICIAL — e um Ladino que virou Mago não via '
+      + 'nada. Entram também as proficiências reduzidas ao abrir classe '
+      + 'nova e o crescimento do talento Conjurador Ritualista.',
+    melhorias: [
+      {
+        grupo: '📖 Tela de Magias por classe',
+        itens: [
+          'A lista de magias, os truques e o limite de preparo agora saem '
+            + 'da classe que conjura, no nível DELA. Antes saíam da classe '
+            + 'inicial no nível TOTAL: um Ladino 5/Mago 1 abria "Gerenciar '
+            + 'Magias" e via a tela vazia, com 0 de limite.',
+          'Quem tem DUAS classes que conjuram ganhou um seletor na seção '
+            + 'de Magias para alternar entre elas. A tela inteira acompanha '
+            + 'a escolha, inclusive o modal. Com uma classe só nada muda.',
+          'O contador de preparadas continua sendo do personagem inteiro, '
+            + 'porque a magia ainda não guarda de que classe é. Isso agora '
+            + 'está ESCRITO na tela, ao lado do número, em vez de o número '
+            + 'parecer ser de uma classe só.',
+        ],
+      },
+      {
+        grupo: '🛡️ Proficiências ao abrir uma classe nova',
+        itens: [
+          'Entrar numa classe diferente da inicial passa a conceder o '
+            + 'subconjunto de proficiências que o livro define para '
+            + 'multiclasse — e não mais nada, que era o que acontecia. '
+            + 'Bardo, Guardião e Ladino pedem a escolha de perícia na '
+            + 'própria tela de subida.',
+          'Armadura e arma passaram a ser calculadas a partir de todas as '
+            + 'classes do personagem. Fichas que já eram multiclasse se '
+            + 'corrigem sozinhas ao abrir, sem migração.',
+        ],
+      },
+      {
+        grupo: '🔮 Conjurador Ritualista que cresce',
+        itens: [
+          'O talento diz que, sempre que o Bônus de Proficiência aumenta, '
+            + 'o personagem escolhe mais uma magia ritual. Isso nunca tinha '
+            + 'sido implementado: agora a subida de nível pergunta nos '
+            + 'níveis 5, 9, 13 e 17, e quem já passou desses níveis é '
+            + 'perguntado na próxima subida, recuperando o atraso.',
+        ],
+      },
+    ],
+    correcoes: [
+      {
+        grupo: '🚫 Bloqueios que não abriam',
+        itens: [
+          'O modal recusava adicionar magia e truque comparando o total do '
+            + 'personagem inteiro com o limite de uma classe só. Num '
+            + 'Clérigo 5/Mago 1 isso nunca liberava. As opções também '
+            + 'apareciam pintadas de indisponíveis enquanto o clique '
+            + 'funcionava.',
+          'O modal cobrava truques de talento contra o orçamento da classe, '
+            + 'enquanto a ficha não cobrava — as duas telas mostravam '
+            + 'números diferentes para o mesmo personagem, inclusive em '
+            + 'classe única. Agora usam a mesma regra.',
+        ],
+      },
+      {
+        grupo: '📚 Grimório do Mago em multiclasse',
+        itens: [
+          'O grimório sumia inteiro quando o Mago não era a classe '
+            + 'inicial, e a trava que exige a magia estar no livro não '
+            + 'valia para esse personagem.',
+        ],
+      },
+    ],
+  },
+  {
+    versao: '2.2.24',
+    data: '2026-08-26',
+    rotulo: 'Escolha de classe',
+    resumo: 'A subida de nível ganha a multiclasse de verdade: dá para '
+      + 'escolher a classe a cada nível novo, com o pré-requisito de '
+      + 'atributo do livro entrando em cena e a ficha impressa mostrando '
+      + 'todas as classes do personagem.',
+    melhorias: [
+      {
+        grupo: '⬆️ Classe escolhida ao subir de nível',
+        itens: [
+          'A tela de subida de nível ganhou um seletor de classe. Quem já '
+            + 'tem mais de uma classe, ou está abrindo uma nova, escolhe '
+            + 'ali — os Pontos de Vida do nível saem do dado da classe '
+            + 'escolhida, e as características que aparecem são as '
+            + 'daquela classe, no nível que ela está alcançando.',
+          'A subclasse passa a ser perguntada no 3º nível DAQUELA classe, '
+            + 'não no nível total do personagem — um Guerreiro 5/Mago 3 '
+            + 'escolhe a subclasse de Mago no terceiro nível de Mago, como '
+            + 'o livro manda.',
+        ],
+      },
+      {
+        grupo: '🔒 Pré-requisito de atributo para classe nova',
+        itens: [
+          'O livro exige 13 ou mais no atributo principal para abrir uma '
+            + 'classe nova. Quando o personagem não alcança, a subida de '
+            + 'nível avisa e barra, com a opção de dispensar a regra para '
+            + 'quem joga numa mesa que não a usa.',
+          'Dispensar o pré-requisito deixa uma marca visível na ficha e '
+            + 'na impressão, para lembrar depois que aquela classe entrou '
+            + 'fora da exigência do livro.',
+        ],
+      },
+      {
+        grupo: '🖨️ Impressão com todas as classes',
+        itens: [
+          'A ficha impressa e o PDF passam a mostrar todas as classes do '
+            + 'personagem no cabeçalho — "Mago 5 / Bárbaro 1" — em vez de '
+            + 'só a primeira.',
+        ],
+      },
+    ],
+    correcoes: [
+      {
+        grupo: '🔮 Magias sempre preparadas da segunda classe',
+        itens: [
+          'Ao reabrir a ficha, as magias que a segunda classe deixa '
+            + 'sempre preparadas eram apagadas — o Juramento de um '
+            + 'Paladino num Mago/Paladino, por exemplo. A ficha só '
+            + 'conhecia as magias automáticas da PRIMEIRA classe, e '
+            + 'limpava as demais achando que estavam sobrando. Agora cada '
+            + 'classe é consultada no nível DELA.',
+          'Pelo mesmo motivo, e no sentido contrário, quem tinha a '
+            + 'primeira classe conjuradora recebia magias de níveis que '
+            + 'ainda não alcançou: um Paladino 5/Mago 4 era tratado como '
+            + 'Paladino 9.',
+        ],
+      },
+      {
+        grupo: '✨ A classe recém-aberta aparece na hora',
+        itens: [
+          'Logo depois de abrir uma classe nova, a ficha mostrava a '
+            + 'classe sem espaços de magia, sem características e sem '
+            + 'subclasse até a página ser recarregada. Agora os dados da '
+            + 'classe nova entram antes de a ficha ser redesenhada.',
+        ],
+      },
+      {
+        grupo: '💾 Formato de armazenamento',
+        itens: [
+          'Os níveis por classe, os dados de vida e os espaços de magia '
+            + 'passaram a ser guardados por classe no arquivo do '
+            + 'personagem. Fichas antigas são convertidas sozinhas ao '
+            + 'abrir, e nada muda na tela.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.23',
     data: '2026-08-26',

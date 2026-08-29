@@ -52,6 +52,56 @@ export function seloEdicao(caminho) {
 }
 
 /**
+ * Selo de pre-requisito de multiclasse dispensado, para uma classe.
+ * Devolve string vazia quando aquela classe entrou pela regra normal.
+ *
+ * A marca e PERMANENTE e nao e reavaliada: se o jogador depois subir o
+ * Carisma para 13, o selo continua. Ele registra que AQUELE NIVEL foi
+ * adquirido sem o pre-requisito -- fato historico, nao estado atual.
+ * Reavaliar exigiria saber em que nivel cada classe entrou, informacao
+ * que `classes[]` nao guarda, e produziria um selo que aparece e some
+ * sozinho -- pior que nenhum.
+ *
+ * A CHAVE em `char.edicoes.campos` e `prerequisitoDispensado.<Classe>`, de
+ * proposito SEM o prefixo "classes." -- essa chave e tambem o caminho que
+ * `reverterEdicao` (ficha-edicoes.js) usaria para escrever de volta no
+ * personagem, e `classes.<Classe>...` apontaria para dentro do ARRAY
+ * `char.classes` (a fonte da verdade), corrompendo-o com uma propriedade
+ * nao-indice. `prerequisitoDispensado.<Classe>` nao aponta para nenhum
+ * campo real do personagem, entao reverter so cria um objeto inerte e
+ * novo.
+ *
+ * REMOCAO: `{ comBotaoRemover: true }` acrescenta um botao discreto
+ * (`data-reverter-prerequisito`, sheet/edicao.js) que chama o mesmo
+ * `reverterEdicao` generico que limpa qualquer entrada de char.edicoes.
+ * Quem chama passando esta opcao e responsavel por NAO usa-la na
+ * impressao -- ver o parametro abaixo.
+ *
+ * Sem `no-print` no selo em si, ao contrario de seloEdicao: este selo TEM
+ * de sair na impressao, porque e a unica marca de que a ficha se afasta
+ * do livro. O BOTAO de remocao, quando presente, e que leva `no-print`.
+ * @param {string} classe Nome da classe.
+ * @param {{comBotaoRemover?: boolean}} [opcoes] `comBotaoRemover`: acrescenta
+ *   o botao de remocao (uso na ficha; a impressao nunca deve passar `true`).
+ * @returns {string} HTML do selo (e do botao, se pedido), ou ''.
+ */
+export function seloPrerequisitoDispensado(classe, { comBotaoRemover = false } = {}) {
+  const entrada = char?.edicoes?.campos?.[`prerequisitoDispensado.${classe}`];
+  if (!entrada) return '';
+  const faltou = (entrada.faltando || [])
+    .filter((f) => f.atributo)
+    .map((f) => `${f.atributo} ${f.valor}`)
+    .join(', ');
+  const badge = `<span class="badge" style="font-size:0.6rem;margin-left:4px" ` +
+    `title="Pré-requisito de multiclasse dispensado (${escHtml(faltou)})">⚠️ pré-requisito dispensado</span>`;
+  if (!comBotaoRemover) return badge;
+  const botao = `<button type="button" class="no-print" data-reverter-prerequisito="${escHtml(classe)}" ` +
+    `title="Remover marca de pré-requisito dispensado" ` +
+    `style="border:none;background:none;cursor:pointer;font-size:0.65rem;margin-left:2px;padding:0;color:var(--text-muted)">✕</button>`;
+  return badge + botao;
+}
+
+/**
  * Delta manual acumulado de um atributo -- a parte do total que veio de edicao
  * livre, e nao do metodo de criacao, do antecedente ou de ganho de nivel.
  * Devolve 0 quando aquele atributo nunca foi ajustado a mao.

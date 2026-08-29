@@ -1007,46 +1007,38 @@ const ESCRITAS_PERMITIDAS = new Set([
   'site/js/creator/passo-classe.js:197',  // personagem.subclasse = e.target.value
   'site/js/creator/passo-classe.js:263',  // personagem.subclasse = ''
   'site/js/creator/passo-classe.js:273',  // personagem.classe = nome
-  'site/js/levelup.js:1427',              // personagem.nivel = novoNivel -- número atualizado pela Tarefa 4 (Ruling 15)
-  'site/js/levelup.js:1445',              // personagem.subclasse = opcoes.subclasse -- idem
+
+  // levelup.js SAIU INTEIRO desta lista no sub-projeto 5 (Tarefa 3a+3b).
+  // Eram ONZE entradas: `personagem.nivel`, `personagem.subclasse`,
+  // `dados_vida_total` e as oito de `espacos_magia` (quatro em
+  // `atualizarEspacosMagia`, quatro no bloco de subclasse conjuradora).
+  // Nenhuma foi reapontada -- todas deixaram de existir:
+  //   - a subida grava em `classes[]` e chama `sincronizarEspelhos()`,
+  //     que é o escritor autorizado dos espelhos e do dado de vida;
+  //   - `atualizarEspacosMagia` foi REMOVIDA, e com ela o laço que movia
+  //     o círculo de pacto do Bruxo; o total de espaços passou a ser
+  //     derivado da regra a cada leitura (montarReservasDeEspacos).
+  // Medido: os regexes deste guarda não encontram NENHUMA escrita de
+  // espelho em site/js/levelup.js. Isso fecha o Minor 2 da revisão de
+  // conformidade de 2026-08-26 -- nada mais no app produz a forma híbrida
+  // de `espacos_magia`.
 
   // Escritores legados da família de dado de vida que SOBRAM depois do
-  // sub-projeto 3e: todos do fluxo de CRIAÇÃO e SUBIDA, escopo do
-  // sub-projeto 5. Os três de hp-descanso.js saíram -- o gasto e o reset
-  // passaram por gastarDadosVida()/restaurarTodosDadosVida(), em
-  // regras-multiclasse.js, que está em ARQUIVOS_AUTORIZADOS (abaixo).
+  // sub-projeto 3e: agora só o fluxo de CRIAÇÃO. Os três de hp-descanso.js
+  // saíram no 3e (gasto e reset passaram por gastarDadosVida()/
+  // restaurarTodosDadosVida(), em regras-multiclasse.js, que está em
+  // ARQUIVOS_AUTORIZADOS); o da subida de nível saiu no sub-projeto 5.
   'site/js/creator/wizard.js:441',     // grava dados_vida_total na criação de personagem
-  'site/js/levelup.js:1430',           // grava dados_vida_total na subida de nível -- número atualizado pela Tarefa 4 (Ruling 15)
   'site/js/store.js:324',  // dados_vida_total: 1  (template de criação)
   'site/js/store.js:325',  // dados_vida_usados: 0 (template de criação)
 
   // Escritores legados de espacos_magia que sobram depois da Tarefa 3
   // (sub-projeto 4): a rede de escrita fecha para o GASTO (gastarEspaco/
   // restaurarEspacosDePacto/restaurarEspacosDeConjuracao, em
-  // sheet/reservas-espacos.js, agora ARQUIVOS_AUTORIZADOS), mas estes
-  // pontos ainda inicializam/zeram o campo direto -- cada um e escopo de
-  // uma tarefa futura do sub-projeto 4, nao desta.
+  // sheet/reservas-espacos.js, agora ARQUIVOS_AUTORIZADOS). Sobra só a
+  // CRIAÇÃO, que ainda inicializa o campo direto.
   'site/js/creator/wizard.js:92',   // personagem.espacos_magia = {} na criação -- sub-projeto 5
   'site/js/creator/wizard.js:447',  // idem, grava a tabela da classe inicial -- sub-projeto 5
-  'site/js/levelup.js:946',         // garante o campo antes de recalcular na subida -- sub-projeto 5
-  'site/js/levelup.js:1460',        // idem, subida de subclasse conjuradora -- sub-projeto 5 -- número atualizado pela Tarefa 4 (Ruling 15)
-  // levelup.js: recalculo de total/usados na forma antiga apos subida de
-  // nivel (dois blocos, classe base e subclasse conjuradora) -- a Tarefa 4
-  // (Ruling 13/15) mediu que essa ESCRITA ficou VESTIGIAL desde o
-  // sub-projeto 4 (o acessador deriva o total de `armazenado[fonte]
-  // [circulo]`, nunca destas chaves numericas) mas manteve-a de proposito:
-  // classes-progressao.test.mjs e subclasse-conjuradora.test.mjs (16
-  // pontos de assercao) ainda leem essas chaves direto, e reescreve-los
-  // e' risco fora do escopo desta tarefa -- ver o docblock de
-  // atualizarEspacosMagia (levelup.js) e docs/PERGUNTAS-PENDENTES.txt.
-  // O sub-projeto 5, ao converter a subida de nivel inteira, remove estas
-  // seis linhas junto.
-  'site/js/levelup.js:952',  // personagem.espacos_magia[circulo].total = ...
-  'site/js/levelup.js:955',  // personagem.espacos_magia[circulo].usados = ...
-  'site/js/levelup.js:959',  // personagem.espacos_magia[circulo] = espacos[circulo]
-  'site/js/levelup.js:1464', // idem, subclasse conjuradora -- número atualizado pela Tarefa 4 (Ruling 15)
-  'site/js/levelup.js:1466', // idem, subclasse conjuradora -- número atualizado pela Tarefa 4 (Ruling 15)
-  'site/js/levelup.js:1469', // idem, subclasse conjuradora -- número atualizado pela Tarefa 4 (Ruling 15)
   // pages/sheet.js:100-158 era o reconciliador de render -- a Tarefa 4
   // removeu-o (deixando migrarEspacosMagia() no lugar, em
   // sheet/migracoes.js, ARQUIVOS_AUTORIZADOS) e as 9 entradas que

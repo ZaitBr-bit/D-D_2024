@@ -4,16 +4,20 @@
 import { getPersonagem } from '../store.js';
 import { getClasse, getIndiceMagias, getTalentos, getEspecies } from '../db.js';
 import { getMagiaPreparadas, normalizarGrimorioMago } from '../utils.js';
-import { obterTodasMagiasDominio, obterTodasMagiasSemprePreparadas } from '../levelup.js';
+import { obterMagiasAutomaticasDoPersonagem } from '../levelup.js';
 import { getSyncStatus, onSyncStatusChange } from '../sync.js';
 import { resolverPassivosTalentos } from '../talentos-effects.js';
 import { abrirGridManobras } from '../manobras-ui.js';
-import { classesDe } from '../regras-multiclasse.js';
-import { definirChar, definirContainer, definirClasseData, definirClassesData, definirIndiceMagias, definirTalentos, definirEspecies, definirMagiasDominio, definirMagiasSempre, definirPassivosTalentos } from '../sheet/estado.js';
+import { definirChar, definirContainer, definirClasseData, definirIndiceMagias, definirTalentos, definirEspecies, definirMagiasDominio, definirMagiasSempre, definirPassivosTalentos } from '../sheet/estado.js';
+import { garantirDadosDeClasses, resetarSuperficieSelecionada } from '../sheet/contexto-classe.js';
 import { getEstadoRecursosGuerreiro } from '../sheet/classes/guerreiro.js';
 import { sincronizarMagiasFixasMago } from '../sheet/classes/mago.js';
 import { _carregarEstadoColapso } from '../sheet/colapso.js';
 import { char, classeData, salvar } from '../sheet/estado.js';
+// nivelNa (Tarefa 3, sub-projeto "tela magias por classe"): ver o
+// comentário de `limitePreparadasMago`, abaixo -- o nível NA classe Mago,
+// nunca o espelho `char.nivel` (o TOTAL).
+import { nivelNa } from '../regras-multiclasse.js';
 import { renderFichaCompleta } from '../sheet/ficha.js';
 import { carregarDescricoesMagias } from '../sheet/impressao.js';
 import { migrarEscolhasClasseLegadas, migrarEspacosMagia, migrarMagiasDominio, migrarMagiasLegadoEspecie, migrarMagiasSemprePreparadas, migrarMulticlasse, migrarNomePericiaLidarAnimais, migrarPericiaEspecie, migrarPericiasEspecie, migrarPericiasTalentos, migrarProficienciasTalentos, migrarSlotsMagiaLivre, migrarTalentoVersatilHumano, migrarTruquesEspecie, migrarTruquesFixosSubclasse } from '../sheet/migracoes.js';
@@ -24,6 +28,12 @@ let _syncSubscribed = false;
 export async function renderSheet(container, charId) {
   definirContainer(container);
   definirChar(getPersonagem(charId));
+  // Seletor de superficie de conjuracao (Tarefa 4, sub-projeto "tela
+  // magias por classe"): a escolha e uma variavel de MODULO
+  // (contexto-classe.js), nao presa a este personagem -- sem resetar
+  // aqui, abrir um SEGUNDO personagem que por coincidencia tem uma classe
+  // do mesmo nome herdaria a classe escolhida no personagem anterior.
+  resetarSuperficieSelecionada();
   if (!char) {
     container.innerHTML = '<div class="empty-state"><h2>Personagem nao encontrado</h2><button class="btn btn-primary" onclick="navegar(\'home\')">Voltar</button></div>';
     return;
@@ -42,28 +52,43 @@ export async function renderSheet(container, charId) {
   // contexto por classe. getClasse tem cache em memoria (db.js), entao a
   // segunda classe custa uma requisicao na primeira abertura e zero depois.
   // classeData acima continua sendo a classe INICIAL, e nao muda.
-  const mapaClasses = new Map();
-  for (const c of classesDe(char)) {
-    if (mapaClasses.has(c.classe)) continue;
-    mapaClasses.set(c.classe, await getClasse(c.classe));
-  }
-  definirClassesData(mapaClasses);
+  //
+  // `doZero: true` -- o mapa e NOVO a cada abertura. A mesma funcao e
+  // chamada por levelup-ui.js depois de uma subida, mas la ela COMPLETA o
+  // mapa (a classe recem-aberta); aqui herdar o mapa deixaria as classes
+  // do personagem anterior visiveis neste.
+  await garantirDadosDeClasses(char, true);
   const indiceData = await getIndiceMagias();
   definirIndiceMagias(indiceData?.magias || []);
   definirTalentos(await getTalentos());
   definirEspecies(await getEspecies());
 
-  // Pré-carregar magias de domínio e migrar dados legados
-  definirMagiasDominio(await obterTodasMagiasDominio(char.classe, char.subclasse, char.nivel));
-  definirMagiasSempre(await obterTodasMagiasSemprePreparadas(char.classe, char.subclasse, char.nivel));
-  // Antes das OUTRAS migrações (não antes de tudo: as quatro leituras de
-  // char.classe/subclasse/nivel logo acima, linhas 34/41/48/49, já
-  // rodaram). Isso é inofensivo hoje porque, enquanto a ficha tiver uma
-  // única classe, os espelhos são invariantes sob migrarMulticlasse() --
-  // ela só carimba schema_versao e reconcilia classes[] a partir deles,
-  // nunca o contrário -- então nenhuma das quatro leituras acima pode
-  // divergir do valor que a migração produziria. Migrar antes das demais
-  // migrações garante que ELAS leiam valores consistentes.
+  // Pré-carregar magias de domínio/sempre preparadas de TODAS as classes,
+  // cada uma no nível DELA. Montar esses dois caches pelos espelhos (que
+  // apontam para a classe INICIAL e para o nível TOTAL) era
+  // perda de dado, não só exibição incompleta: migrarMagiasSemprePreparadas,
+  // logo abaixo, REMOVE de char.magias_preparadas toda entrada
+  // `origem: 'sempre'` ausente do cache e chama salvar() -- então a magia
+  // sempre preparada que a subclasse de uma SEGUNDA classe concedeu (o
+  // juramento de um Paladino 3 num Mago 5/Paladino 3, por exemplo)
+  // desaparecia da ficha na reabertura seguinte, em silêncio e persistida.
+  // A face inversa era ler a classe inicial no nível TOTAL: um Paladino
+  // 5/Mago 3 recebia o cache do Paladino nível 8 e marcava como "sempre"
+  // magias a que ainda não tem direito.
+  const magiasAutomaticas = await obterMagiasAutomaticasDoPersonagem(char);
+  definirMagiasDominio(magiasAutomaticas.dominio);
+  definirMagiasSempre(magiasAutomaticas.sempre);
+  // Antes das OUTRAS migrações (não antes de tudo: as leituras de
+  // char.classe/subclasse/nivel logo acima já rodaram -- hoje sobra a de
+  // `getClasse(char.classe)` para `classeData`, porque `classeData` É a
+  // classe inicial por definição; as duas linhas de cache acima deixaram
+  // de ler espelho quando passaram a percorrer classesDe(char)). Isso é
+  // inofensivo porque, enquanto a ficha tiver uma única classe, os
+  // espelhos são invariantes sob migrarMulticlasse() -- ela só carimba
+  // schema_versao e reconcilia classes[] a partir deles, nunca o
+  // contrário -- e `classesDe` já faz o mesmo fallback de espelho que a
+  // migração faria. Migrar antes das demais migrações garante que ELAS
+  // leiam valores consistentes.
   migrarMulticlasse();
   migrarMagiasDominio();
   migrarMagiasSemprePreparadas();
@@ -89,8 +114,17 @@ export async function renderSheet(container, charId) {
   migrarAdeptoElementalTipos();
 
   // Migrar fichas legadas: magias preparadas normais já existentes pertencem ao grimório.
+  // `normalizarGrimorioMago` só age quando `char.classe === 'Mago'` (o
+  // espelho aponta para Mago, ver o comentário dela em utils.js) -- então
+  // `classeData` aqui É a tabela do Mago sempre que este cálculo importa.
+  // O nível não podia seguir o mesmo raciocínio: `char.nivel` é o TOTAL do
+  // personagem, não o nível NA classe Mago -- um Mago 5/Ladino 3 confrontava
+  // a tabela do Mago no nível 8 e inflava `limitePreparadas` (hoje só
+  // alimenta `pendentes`, que nenhum chamador lê, mas a conta ficava errada
+  // mesmo assim). `nivelNa` corrige sem mudar nada para classe única (as
+  // duas contagens coincidem por construção).
   const limitePreparadasMago = classeData?.tabela_caracteristicas
-    ? getMagiaPreparadas(classeData.tabela_caracteristicas, char.nivel) : undefined;
+    ? getMagiaPreparadas(classeData.tabela_caracteristicas, nivelNa(char, 'Mago')) : undefined;
   if (normalizarGrimorioMago(char, limitePreparadasMago).alterado) salvar();
 
   // Os totais de espaco de magia deixaram de ser reconciliados aqui no

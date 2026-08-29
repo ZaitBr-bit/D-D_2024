@@ -112,10 +112,11 @@ async function prepararEstadoDaFicha(p, container) {
   sheetEstado.definirIndiceMagias(indiceMagias?.magias || []);
   sheetEstado.definirTalentos(await db.getTalentos());
   sheetEstado.definirEspecies(await db.getEspecies());
-  sheetEstado.definirMagiasDominio(
-    await levelup.obterTodasMagiasDominio(p.classe, p.subclasse, p.nivel));
-  sheetEstado.definirMagiasSempre(
-    await levelup.obterTodasMagiasSemprePreparadas(p.classe, p.subclasse, p.nivel));
+  // Pela MESMA função que pages/sheet.js usa (por classe, no nível dela),
+  // e não pelos espelhos -- ver multiclasse-magias.test.mjs, Oráculo 26.
+  const magiasAutomaticas = await levelup.obterMagiasAutomaticasDoPersonagem(p);
+  sheetEstado.definirMagiasDominio(magiasAutomaticas.dominio);
+  sheetEstado.definirMagiasSempre(magiasAutomaticas.sempre);
 }
 
 async function renderizarFicha(p) {

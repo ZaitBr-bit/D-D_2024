@@ -2146,6 +2146,23 @@ tr:hover td { background: #faf8f4; }
   border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
+/* Seletor "Em qual classe você sobe?" (levelup-cards.js:renderCardEscolhaClasse).
+   Reusa .levelup-check-label como base da linha; aqui só o que é próprio
+   dele: os dois grupos ("SUAS CLASSES" / "NOVA CLASSE") e o estado
+   TRAVADO -- a classe cujo pré-requisito de atributo (livro:2033) o
+   personagem não atende. A opção travada continua legível de propósito:
+   ela precisa dizer POR QUE está travada, senão o jogador não sabe o que
+   mudar. */
+.levelup-grupo { margin-bottom: 12px; }
+.levelup-grupo:last-child { margin-bottom: 0; }
+.levelup-grupo h4 {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
+  color: var(--text-muted); margin-bottom: 6px;
+}
+.levelup-opcao { margin-bottom: 6px; flex-wrap: wrap; }
+.levelup-opcao-travada { cursor: not-allowed; opacity: 0.7; }
+.levelup-motivo { font-size: 0.78rem; color: var(--danger); margin-left: auto; }
+
 /* Grid de atributos */
 .atributos-grid {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;

@@ -14,9 +14,18 @@ import { getCavaleiroMisticoConjuracao } from './classes/guerreiro.js';
 import { getTrapaceiroArcanoConjuracao } from './classes/ladino.js';
 import { _truquesColapsados } from './colapso.js';
 import { ehBardoComSegredosMagicos, getTruquesExtraEstiloLuta } from './combate.js';
-import { char, classeData, indiceMagiasCache, salvar } from './estado.js';
+import { char, indiceMagiasCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { abrirPreenchimentoSlotMagia, mostrarBuscaGrimorio, mostrarBuscaMagia, mostrarFormMagiaCustom } from './grimorio.js';
+// superficiesDaFicha/dadosDe (Tarefa 3, sub-projeto "tela magias por
+// classe"): substituem a leitura de char.classe/char.subclasse/char.nivel
+// (a classe INICIAL, o espelho) e de `classeData` (os dados dela) por
+// classes[] de verdade -- ver o comentário de superficieAtiva(), abaixo.
+// definirSuperficieSelecionada/superficieAtivaDaFicha (Tarefa 4): o
+// seletor de classe (`tabs-superficie-magia`, em renderSecaoMagias) e o
+// estado compartilhado que ele escreve.
+import { dadosDe, definirSuperficieSelecionada, superficiesDaFicha, superficieAtivaDaFicha } from './contexto-classe.js';
+import { nivelNa, temClasse } from '../regras-multiclasse.js';
 // reservasDeEspacos/gastarEspaco/recuperarUmEspaco (Tarefa 4, sub-projeto 4):
 // os pontos deste arquivo que liam/escreviam `char.espacos_magia[circulo]`
 // direto, na forma antiga, passam a ler/escrever pelo acessador derivado e
@@ -33,6 +42,54 @@ import { abrirModalAdicionarTalento, abrirModalEditarIniciadoEmMagia } from './t
 // os importadores, e não recria a cópia que a consolidação foi eliminar.
 import { magiaContaNoLimite, magiaEhEspecial, truqueContaNoLimite } from '../regras-origens-magia.js';
 export { magiaContaNoLimite, magiaEhEspecial, truqueContaNoLimite };
+
+/**
+ * Superfície de conjuração ATIVA desta seção da ficha: mesma definição (e
+ * mesmo motivo) do `superficieAtiva()` de sheet/grimorio.js -- a escolhida
+ * no seletor de classe (`superficieAtivaDaFicha`, sheet/contexto-classe.js),
+ * que por padrão é a PRIMEIRA de `superficiesDaFicha(char)`, a classe
+ * inicial quando ela conjura, a única em personagem de classe única. `null`
+ * quando o personagem não tem NENHUMA superfície de conjuração por classe
+ * (ex.: Bárbaro puro com Iniciado em Magia -- a seção Magias ainda abre
+ * para ele, por talento/espécie/personalizada, mas não há classe nenhuma
+ * de onde pedir lista/limite).
+ *
+ * `renderSecaoMagias` e as demais funções deste arquivo que precisam saber
+ * "de que classe" chamam isto UMA VEZ, no topo, e derivam tudo dali --
+ * nunca de char.classe/char.subclasse/char.nivel direto. Mesma disciplina
+ * de sheet/grimorio.js -- é o que tornou a Tarefa 4 (seletor de classe)
+ * uma mudança de UMA variável em vez de reescrever cada função.
+ */
+function superficieAtiva() {
+  return superficieAtivaDaFicha(char);
+}
+
+/**
+ * Tabela de conjuração da subclasse (Cavaleiro Místico / Trapaceiro
+ * Arcano) para a superfície informada, ou `null` quando ela não se aplica
+ * (classe plena/meia conjuradora, ou sem superfície nenhuma). Mesma lógica
+ * de sheet/grimorio.js -- duplicada aqui de propósito: função pura de 3
+ * linhas, e importar do outro módulo criaria acoplamento sem ganho (ela
+ * não é exportada de lá).
+ */
+function subConjDaSuperficie(sup) {
+  if (!sup) return null;
+  return getSubclasseConjuradoraConjuracao({ classe: sup.classe, subclasse: sup.subclasse, nivel: sup.nivelClasse });
+}
+
+/**
+ * Nível e tabela de características do Mago do personagem -- SEMPRE da
+ * classe Mago, nunca da superfície "ativa" (`superficieAtiva()`) que o
+ * resto desta seção usa para os contadores do topo. O grimório é exclusivo
+ * do Mago (livro:2079), independente de qual classe é a inicial ou a
+ * "ativa" por ordem de aquisição: um Clérigo 5/Mago 1 tem de ver o limite
+ * de preparo DO MAGO no painel do grimório, mesmo com os contadores do
+ * topo desta mesma seção mostrando o do Clérigo (a superfície ativa).
+ * @returns {{nivel: number, tabela: object|null}}
+ */
+function nivelETabelaDoMago() {
+  return { nivel: nivelNa(char, 'Mago'), tabela: dadosDe('Mago')?.tabela_caracteristicas || null };
+}
 
 /**
  * Escolhe a reserva de UM circulo entre as fontes disponiveis (conjuracao e
@@ -322,9 +379,30 @@ export function achatarMagiasClasse(magiasClasseData) {
   return resultado;
 }
 
+/**
+ * Lista de magias que uma classe oferece ao personagem.
+ *
+ * @param {Object} opcoes
+ * @param {string} [opcoes.classe] - Classe cuja lista se quer. Sem ela, a
+ *   da SUPERFÍCIE de conjuração ATIVA (`superficieAtiva()`, acima -- a
+ *   primeira de `superficiesDaFicha`, a classe inicial quando ela conjura).
+ *   ATÉ A TAREFA 3 (sub-projeto "tela magias por classe") o fallback lia o
+ *   espelho `char.classe` direto, e esta mesma seção da ficha
+ *   (`renderSecaoMagias`) dependia desse fallback -- um Ladino 5/Mago 1
+ *   pedia a lista de Ladino (`classes/magias_ladino.json`, que não existe:
+ *   404) mesmo com a superfície de conjuração sendo a do Mago. Quem SOBE DE
+ *   NÍVEL sempre passou a classe explicitamente
+ *   (`carregarMagiasDisponiveis`, levelup-flow.js): num Mago 5 que entra em
+ *   Clérigo 1, o nível já era lido na classe certa (`nivelNaClasseNovo`) mas a
+ *   LISTA vinha do espelho -- o jogador escolhia magias de Mago numa tela
+ *   rotulada "da lista de Clérigo", e elas eram gravadas no nível de Clérigo.
+ * @param {string} [opcoes.subclasse] - Subclasse a considerar (Cavaleiro
+ *   Místico / Trapaceiro Arcano usam a lista do Mago).
+ * @param {number} [opcoes.nivel] - Nível NA CLASSE, para a checagem acima.
+ */
 export async function obterMagiasDisponiveisClasseAtual(opcoes = {}) {
   // Subclasses conjuradoras (Cavaleiro Místico e Trapaceiro Arcano) usam a lista de magias do Mago
-  let classeParaMagias = char.classe;
+  let classeParaMagias = opcoes.classe || superficieAtiva()?.classe;
   if (ehSubclasseConjuradora(opcoes)) {
     classeParaMagias = 'Mago';
   }
@@ -433,21 +511,32 @@ export function badgesMagiaRapidos(nomeMagia) {
 }
 
 export function renderSecaoMagias() {
-  // `|| {}` como em ficha.js:191, que faz a MESMA leitura: sem ele, uma
-  // classe fora do catálogo derrubava o render inteiro no `info.
-  // tipo_conjuracao` da linha seguinte, com TypeError. A inconsistência
-  // entre os dois arquivos ficou alcançável quando o portão da seção
-  // passou a abrir para quem não conjura pela classe INICIAL
-  // (conjuraPorAlgumaClasse, em ficha.js).
-  const info = CLASSES_INFO[char.classe] || {};
-  const subConj = getSubclasseConjuradoraConjuracao();
-  // AINDA LÊ A CLASSE INICIAL, de propósito: "preparadas" x "conhecidas" é
-  // por classe (livro:2073, "como se fosse um membro de classe única dessa
-  // classe"), e resolver isso exige o limite de preparo por classe -- o
-  // sub-projeto 5. Um Bárbaro 5/Mago 1 cai no ramo `preparadas` por
-  // omissão, que por acaso é o certo para o Mago; um Bárbaro/Bardo não
-  // teria a mesma sorte. Registrado em docs/PERGUNTAS-PENDENTES.txt.
-  const tipoConj = info.tipo_conjuracao || (subConj ? 'conhecidas' : 'preparadas');
+  // sup: a superfície de conjuração ATIVA desta seção -- ver
+  // superficieAtiva() (topo do arquivo). Tarefa 3 (sub-projeto "tela
+  // magias por classe"): substitui a leitura dos espelhos
+  // char.classe/char.subclasse/char.nivel daqui para baixo. `null` quando
+  // o personagem não tem NENHUMA superfície de conjuração (Bárbaro puro
+  // com Iniciado em Magia, por exemplo) -- os `?.` abaixo degradam para o
+  // mesmo "sem classe" de antes nesse caso.
+  const sup = superficieAtiva();
+  const superficies = superficiesDaFicha(char);
+  const subConj = subConjDaSuperficie(sup);
+  // Corrige o defeito registrado em docs/PERGUNTAS-PENDENTES.txt ("MAGIA
+  // PREPARADA NAO SABE DE QUE CLASSE E" / "IRMAO DESTE ITEM"): antes, um
+  // Bárbaro 5/Bardo 1 lia `CLASSES_INFO[char.classe].tipo_conjuracao` do
+  // Bárbaro (nenhum) e caía em 'preparadas' por omissão -- errado para o
+  // Bardo, que é 'conhecidas'. `sup.tipo` já vem calculado pela MESMA
+  // fórmula, mas por `superficiesDeConjuracao`
+  // (regras-multiclasse-conjuracao.js), com a classe da SUPERFÍCIE (aqui,
+  // o Bardo, primeira que efetivamente conjura), não a INICIAL. `sup ? ... :
+  // (subConj ? ...)` cobre só a subclasse conjuradora sem superfície de
+  // classe (Cavaleiro Místico/Trapaceiro Arcano puro, hoje inalcançável
+  // fora deste ramo -- mesma guarda que sheet/grimorio.js usa). O que
+  // continua fora do alcance desta tarefa é repartir POR CLASSE a contagem
+  // de "quantas estão preparadas" -- isso exige `magias_preparadas[].classe`,
+  // que não existe (mesma dívida); ver "O contador honesto" no contador de
+  // preparadas, abaixo.
+  const tipoConj = sup ? sup.tipo : (subConj ? 'conhecidas' : 'preparadas');
   const magiasPersonalizadas = (char.magias_customizadas || []).map((magia, indice) => ({
     ...normalizarMagiaPersonalizada(magia, indice),
     indicePersonalizada: indice
@@ -518,15 +607,23 @@ export function renderSecaoMagias() {
   // getLimitesMagias já cai para a tabela da subclasse quando a tabela da
   // classe não tem colunas de magia (Guerreiro/Ladino) -- mesma função que
   // o modal de consulta usa, para os dois não divergirem (ver utils.js).
-  const _limites = getLimitesMagias(classeData?.tabela_caracteristicas, char.nivel, subConj);
+  // `sup?.tabela`/`sup?.nivelClasse` (Tarefa 3): antes, `classeData` e
+  // `char.nivel` eram a tabela da classe INICIAL confrontada com o nível
+  // TOTAL -- o caso reportado (Ladino 5/Mago 1): sem coluna de magia no
+  // Ladino, `getLimitesMagias` caía para a tabela da subclasse (nenhuma
+  // aqui) e devolvia 0/0, mesmo com a superfície de conjuração ativa
+  // (Mago) tendo limite de verdade.
+  const _limites = getLimitesMagias(sup?.tabela, sup?.nivelClasse ?? 0, subConj);
   let maxPreparadas = _limites.preparadas;
   let maxTruques = _limites.truques;
   // Truques extras de Combatente Druídico / Abençoado
   maxTruques += getTruquesExtraEstiloLuta();
   // Truques extras do Clérigo Taumaturgo / Druida Xamã (utils.js, mesma
   // função que o criador usa -- antes só o criador somava esse bônus, e a
-  // ficha calculava o limite sem ele)
-  maxTruques += getBonusTruquesOrdem(char);
+  // ficha calculava o limite sem ele). `sup?.classe` (Tarefa 3): sem isso a
+  // checagem caía no espelho `char.classe` e um Ladino 5/Clérigo 1
+  // Taumaturgo nunca via o +1 truque.
+  maxTruques += getBonusTruquesOrdem(char, sup?.classe);
 
   // Contar magias preparadas excluindo as especiais (não contam no limite)
   const preparadasNormais = preparadas.filter(m => magiaContaNoLimite(m));
@@ -547,8 +644,20 @@ export function renderSecaoMagias() {
     preparadasPorCirculo[circ].push(item);
   });
 
-  // Verificar se é Mago (para grimório)
-  const ehMago = char.classe === 'Mago';
+  // Verificar se é Mago (para grimório). `temClasse`, não o espelho
+  // `char.classe === 'Mago'`: o grimório existe para o personagem que TEM
+  // a classe Mago em qualquer ordem, não só quando ela é a inicial -- um
+  // Clérigo 5/Mago 1 tem grimório de Mago igual a um Mago 5/Clérigo 1.
+  const ehMago = temClasse(char, 'Mago');
+  // Limite de preparo DO GRIMÓRIO -- sempre da classe Mago (nivelETabelaDoMago,
+  // topo do arquivo), NUNCA de `maxPreparadas` (acima): `maxPreparadas` é o
+  // limite da superfície ATIVA, que só por acaso é a do Mago quando ele é a
+  // classe inicial/única. Num Clérigo 5/Mago 1, `maxPreparadas` mostra o
+  // limite do Clérigo (9) nos contadores do topo, mas o painel do grimório,
+  // abaixo, precisa do limite do MAGO (1) -- os dois painéis não podem
+  // divergir sobre "quantas o Mago pode preparar".
+  const { nivel: _nivelMago, tabela: _tabelaMago } = nivelETabelaDoMago();
+  const maxPreparadasGrimorio = _tabelaMago ? getMagiaPreparadas(_tabelaMago, _nivelMago) : 99;
   const grimorio = char.grimorio || [];
   const grimorioPorCirculo = grimorio.reduce((grupos, magia) => {
     const circulo = Number(magia.circulo);
@@ -602,10 +711,72 @@ export function renderSecaoMagias() {
         </div>
       ` : ''}
 
+      <!--
+        O CONTADOR HONESTO (Tarefa 3, decisao do dono do produto): a
+        CONTAGEM de truques/preparadas abaixo (truquesClasse.length,
+        numPreparadas) e do PERSONAGEM INTEIRO -- soma de char.magias_
+        conhecidas/preparadas de TODAS as classes, porque nenhuma entrada
+        ai carrega de que classe ela e (mesma divida do docblock de
+        normalizarGrimorioMago, utils.js). O LIMITE mostrado (maxTruques/
+        maxPreparadas) e SO da superficie ativa (sup, a primeira por
+        ordem de aquisicao). Repartir a contagem por classe exige o campo
+        que nao existe; ate la, os dois numeros continuam expostos, e o
+        aviso abaixo diz o que cada um e -- em vez de fingir que o segundo
+        limita o primeiro por inteiro.
+
+        Consequencia medida: um Clerigo 5/Mago 1 tem 9 preparadas de
+        Clerigo + 4 de Mago = 13 no contador, contra o limite de UMA classe
+        (9, do Clerigo -- a superficie ativa). 13 > 9 pareceria "excedido",
+        mas nenhuma das duas classes violou o livro. Por isso a classe CSS
+        contador-excedido (alarme visual) fica suprimida com mais de uma
+        superficie -- ela dispara falso aqui, e o dono do produto pediu
+        visibilidade, nao alarme falso. contador-cheio (neutro) continua:
+        nao e alarmante, e a coincidencia exata com o limite de uma classe
+        ainda e informacao util.
+      -->
+      <!--
+        SELETOR DE SUPERFICIE DE CONJURACAO (Tarefa 4). So aparece com MAIS
+        DE UMA superficie -- o MESMO criterio de conjuracoesPorClasse em
+        sheet/ficha.js (CD/Ataque por classe): com uma classe so (a maioria
+        dos personagens), a tela fica identica a antes do seletor existir.
+        Clicar chama definirSuperficieSelecionada (contexto-classe.js) e
+        re-renderiza a ficha inteira -- a MESMA variavel que
+        sheet/grimorio.js le em superficieAtiva(), entao "+ Magia" abre
+        para a classe escolhida aqui sem precisar de seletor proprio dentro
+        do modal.
+
+        DECISAO REGISTRADA: o modal "Gerenciar Magias" NAO ganhou um
+        seletor proprio, de proposito. Ele tem busca digitada
+        (#busca-magia-add) e aba ativa (tabAtiva, Preparadas/Truques/
+        Circulo) -- estado local que hoje reinicia limpo TODA vez que o
+        modal abre (tabAtiva comeca em 'preparadas', busca vazia). Um
+        seletor dentro do modal levantaria a pergunta "o que fazer com esse
+        estado ao trocar de classe no meio da sessao" -- e a resposta mais
+        segura (limpar os dois) e EXATAMENTE o que ja acontece hoje sempre
+        que o modal e reaberto. Pela expectativa do jogador: trocar de
+        classe e comecar uma tarefa NOVA ("o que ja esta preparado do
+        Mago?"), nao continuar a mesma busca da classe anterior -- um termo
+        digitado para achar uma magia de Clerigo e ruido para a lista do
+        Mago, e ficar na aba "1o Circulo" arriscaria mostrar um circulo que
+        a OUTRA classe nem tem ainda. Colocar o seletor aqui fora, onde o
+        estado nao existe para vazar, entrega esse reinicio de graca -- sem
+        precisar decidir "o que preservar" dentro do modal so para depois
+        jogar tudo fora mesmo.
+      -->
+      ${superficies.length > 1 ? `
+        <div class="tabs no-print" id="tabs-superficie-magia" style="margin-bottom:8px;overflow-x:auto;white-space:nowrap">
+          ${superficies.map(s => `<div class="tab ${s.classe === sup?.classe ? 'active' : ''}" data-tab-superficie="${escHtml(s.classe)}">${escHtml(s.classe)} ${s.nivelClasse}</div>`).join('')}
+        </div>
+      ` : ''}
+      ${superficies.length > 1 ? `
+        <div class="info-box info" style="margin-bottom:8px;font-size:0.78rem">
+          Truques e ${labelMagias.toLowerCase()} contam o personagem inteiro (todas as classes); o limite mostrado é só da classe selecionada acima.
+        </div>
+      ` : ''}
       <!-- Contador de magias preparadas/conhecidas e truques -->
       <div class="magia-contadores" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
         ${maxTruques > 0 ? `
-          <div class="magia-contador ${truquesClasse.length > maxTruques ? 'contador-excedido' : truquesClasse.length === maxTruques ? 'contador-cheio' : ''}">
+          <div class="magia-contador ${truquesClasse.length > maxTruques && superficies.length <= 1 ? 'contador-excedido' : truquesClasse.length === maxTruques ? 'contador-cheio' : ''}">
             <span class="contador-label">Truques</span>
             <span class="contador-valor">${truquesClasse.length} / ${maxTruques}</span>
           </div>
@@ -629,7 +800,7 @@ export function renderSecaoMagias() {
           </div>
         ` : ''}
         ${maxPreparadas > 0 ? `
-          <div class="magia-contador ${numPreparadas > maxPreparadas ? 'contador-excedido' : numPreparadas === maxPreparadas ? 'contador-cheio' : ''}">
+          <div class="magia-contador ${numPreparadas > maxPreparadas && superficies.length <= 1 ? 'contador-excedido' : numPreparadas === maxPreparadas ? 'contador-cheio' : ''}">
             <span class="contador-label">${labelMagias}</span>
             <span class="contador-valor">${numPreparadas} / ${maxPreparadas}</span>
           </div>
@@ -799,7 +970,7 @@ export function renderSecaoMagias() {
             Grimório (${grimorio.length} magias)
           </summary>
           <div style="padding-top:4px;font-size:0.8rem;color:var(--text-muted);margin-bottom:6px">
-            Livro de Magias. Prepare magias a partir daqui (limite: ${maxPreparadas}). Magias com marcador Ritual podem ser conjuradas sem preparar.
+            Livro de Magias. Prepare magias a partir daqui (limite: ${maxPreparadasGrimorio}). Magias com marcador Ritual podem ser conjuradas sem preparar.
           </div>
           <div style="padding-top:4px">
             ${Object.keys(grimorioPorCirculo).sort((a, b) => Number(a) - Number(b)).map(circ => {
@@ -1577,7 +1748,13 @@ function aplicarEfeitoMagico(nomeMagia, circ, opcoes) {
       } else if (ef.tipo === 'pv_temp_por_turno') {
         let valor = 0;
         if (ef.valor === 'mod_conj') {
-          const infoClasse = CLASSES_INFO[char.classe];
+          // superficieAtiva() (Tarefa 3), não o espelho char.classe: esta
+          // magia (Heroísmo) não sabe de que classe do conjurador ela foi
+          // preparada -- mesma dívida documentada em normalizarGrimorioMago
+          // (utils.js) e no "contador honesto" de renderSecaoMagias. Sem
+          // esse dado, a superfície ATIVA (a primeira por ordem de
+          // aquisição) é o mesmo proxy que o resto da seção usa.
+          const infoClasse = CLASSES_INFO[superficieAtiva()?.classe];
           if (infoClasse?.atributo_conjuracao) { const key = ATRIBUTO_NOME_PARA_KEY[infoClasse.atributo_conjuracao]; valor = calcMod(char.atributos[key]); }
         }
         valor = Math.max(1, valor);
@@ -1842,6 +2019,18 @@ function decidirFonteEContinuar(nome, circulo, continuar) {
 }
 
 export function setupEventosEspacosMagia() {
+  // Seletor de superficie de conjuracao (Tarefa 4, sub-projeto "tela
+  // magias por classe") -- ver o comentario de `tabs-superficie-magia` em
+  // renderSecaoMagias. Clicar so grava a escolha e re-renderiza; toda a
+  // logica de "qual classe" continua em superficieAtiva()/
+  // superficieAtivaDaFicha, nunca duplicada aqui.
+  document.querySelectorAll('[data-tab-superficie]').forEach(tab => {
+    tab.addEventListener('click', () => {
+      definirSuperficieSelecionada(tab.dataset.tabSuperficie);
+      renderFichaCompleta();
+    });
+  });
+
   // Clicar nas bolhas de espaço de magia -- Tarefa 4 (sub-projeto 4):
   // convertido para os escritores autorizados de sheet/reservas-espacos.js.
   // O clique continua podendo "pular" direto para o índice clicado (gastar
@@ -2455,7 +2644,10 @@ export function setupEventosEspacosMagia() {
           return;
         }
         const nome = String(atual.nome || 'Magia personalizada');
-        if (char.classe === 'Mago' && Array.isArray(char.grimorio)) {
+        // temClasse (Tarefa 3), não o espelho char.classe: mesma correção
+        // de `ehMago` acima -- um Clérigo 5/Mago 1 também precisa que a
+        // remoção de uma magia personalizada tire a entrada do grimório.
+        if (temClasse(char, 'Mago') && Array.isArray(char.grimorio)) {
           const idxGrimorio = char.grimorio.findIndex(m => m?.nome === atual.nome);
           if (idxGrimorio >= 0) char.grimorio.splice(idxGrimorio, 1);
         }
@@ -2477,11 +2669,45 @@ export function setupEventosEspacosMagia() {
       const circ = parseInt(btn.dataset.prepCirc);
       if (char.magias_preparadas.find(m => m.nome === nome)) return;
 
-      // Validar limite de magias preparadas
-      const tabela = classeData?.tabela_caracteristicas;
-      const maxPrep = tabela ? getMagiaPreparadas(tabela, char.nivel) : 99;
-      const preparadasNormais = (char.magias_preparadas || []).filter(m => magiaContaNoLimite(m));
-      if (preparadasNormais.length >= maxPrep) {
+      // Validar limite de magias preparadas. O grimório é sempre do Mago
+      // (nivelETabelaDoMago, topo do arquivo) -- nunca a tabela/nível da
+      // classe INICIAL (`classeData`/`char.nivel`, os espelhos): num
+      // Clérigo 5/Mago 1 esse par apontava para o Clérigo e o nível TOTAL,
+      // travando (ou liberando) o botão pelo limite errado.
+      const { nivel: _nivelMago, tabela: _tabelaMago } = nivelETabelaDoMago();
+      const maxPrep = _tabelaMago ? getMagiaPreparadas(_tabelaMago, _nivelMago) : 99;
+      // ACHADO IMPORTANT da revisão da Tarefa 3: a CONTAGEM tinha o mesmo
+      // problema que o LIMITE tinha antes desta tarefa, só do outro lado.
+      // `char.magias_preparadas` é GLOBAL (todas as classes, sem campo que
+      // diga de quem é cada entrada) -- confrontá-la crua contra o limite
+      // do Mago travava o botão PERMANENTEMENTE para qualquer personagem
+      // com outra classe conjuradora: Clérigo 5/Mago 1 tem 9 preparadas do
+      // Clérigo, o limite do Mago 1 é 4, e `9 >= 4` nunca deixava de ser
+      // verdade -- "Preparar" nunca funcionava.
+      //
+      // PROXY HONESTO: magia de círculo preparada PELO MAGO tem de estar
+      // no grimório dele (magiaMagoEstaNoGrimorio/normalizarGrimorioMago é
+      // regra do livro), e a magia de outra classe não entra lá -- exceto
+      // quando o Mago é a classe INICIAL, caso em que
+      // normalizarGrimorioMago (decisão registrada, não convertida nesta
+      // tarefa) já copia toda `magias_preparadas` de círculo>0 para o
+      // grimório, inclusive a de outra classe conjuradora. Contar só as
+      // preparadas que TAMBÉM estão no grimório isola o Mago sem precisar
+      // do campo de classe que não existe, no caso comum (Mago não é a
+      // classe inicial).
+      const preparadasDoMago = (char.magias_preparadas || [])
+        .filter(m => magiaContaNoLimite(m))
+        .filter(m => (char.grimorio || []).some(g => g?.nome === m.nome));
+      // Onde o proxy acima não se aplica (Mago como classe inicial JUNTO
+      // de outra classe que também conjura -- `superficies.length > 1`),
+      // NÃO bloqueia: mesma decisão já tomada para o alarme visual
+      // (contador-excedido, no bloco de contadores acima) -- bloquear com
+      // base numa contagem incerta é pior que deixar passar, porque o
+      // jogador já vê o aviso do contador honesto na tela. Com UMA
+      // superfície só, ela É o Mago (ehMago já garantiu isso), e o proxy
+      // sempre bate com a contagem crua.
+      const podeBloquear = superficiesDaFicha(char).length <= 1;
+      if (podeBloquear && preparadasDoMago.length >= maxPrep) {
         toast(`Limite de magias preparadas atingido (${maxPrep}). Desprepare uma magia primeiro.`, 'error');
         return;
       }
@@ -2490,7 +2716,7 @@ export function setupEventosEspacosMagia() {
       char.magias_preparadas.push({ nome, circulo: circ, ...(ehCustomizadaCirculo ? { personalizada: true } : {}) });
       salvar();
       renderFichaCompleta();
-      toast(`${nome} preparada a partir do grimório (${preparadasNormais.length + 1}/${maxPrep})`, 'success');
+      toast(`${nome} preparada a partir do grimório (${preparadasDoMago.length + 1}/${maxPrep})`, 'success');
     });
   });
 

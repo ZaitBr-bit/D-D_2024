@@ -7,29 +7,33 @@
 // em sheet/condicoes.js (lendo `char`). Duas fontes da verdade para a
 // mesma regra e o bug raiz; nao restaurar nenhuma das copias.
 // ============================================================
-import { CLASSES_INFO } from './dados-classes.js';
+import { armadurasDoPersonagem, armasDoPersonagem } from './regras-multiclasse-proficiencias.js';
+import { temClasse } from './regras-multiclasse.js';
 
 /** Verifica se o personagem tem proficiencia com uma arma especifica */
 export function temProficienciaArma(personagem, arma) {
-  const info = CLASSES_INFO[personagem?.classe];
-  if (!info) return false;
+  // As categorias vem da UNIAO das classes da ficha (livro:2051), nao do
+  // espelho `personagem.classe`. Num Mago 5/Guerreiro 1 o espelho aponta
+  // para o Mago e o Guerreiro nao concedia arma nenhuma.
+  const armasClasse = armasDoPersonagem(personagem);
+  if (!armasClasse.length && !(personagem?.proficiencias_extra || []).length) return false;
   const cat = (arma?.categoria || '').toLowerCase();
   const extras = (personagem?.proficiencias_extra || []).map(p => p.toLowerCase());
 
   // Proficiencia completa na categoria
-  if (info.armas.includes('Marcial') && cat.includes('marciai')) return true;
-  if (info.armas.includes('Simples') && cat.includes('simples')) return true;
+  if (armasClasse.includes('Marcial') && cat.includes('marciai')) return true;
+  if (armasClasse.includes('Simples') && cat.includes('simples')) return true;
 
   // Proficiencias extras (ex.: Clerigo Protetor recebe "Armas Marciais")
   if (extras.includes('armas marciais') && cat.includes('marciai')) return true;
   if (extras.includes('armas simples') && cat.includes('simples')) return true;
 
   // Ladino: Marcial com Acuidade
-  if (info.armas.some(a => a.includes('Acuidade'))) {
+  if (armasClasse.some(a => a.includes('Acuidade'))) {
     if (cat.includes('marciai') && (arma?.propriedades || '').toLowerCase().includes('acuidade')) return true;
   }
   // Monge: Marcial com Leve
-  if (info.armas.some(a => a.includes('Leve'))) {
+  if (armasClasse.some(a => a.includes('Leve'))) {
     if (cat.includes('marciai') && (arma?.propriedades || '').toLowerCase().includes('leve')) return true;
   }
 
@@ -52,13 +56,31 @@ export function temProficienciaArma(personagem, arma) {
  * Única exceção de classe: o Bárbaro diz "armas Corpo a Corpo Simples ou
  * Marciais" -- as à distância ficam de fora mesmo com proficiência.
  *
- * @param {Object} personagem - Personagem (classe e proficiencias_extra)
+ * O PORTAO DO BARBARO LE `classes[]`, NAO O ESPELHO. Ate 2026-08-27 esta
+ * era a ultima leitura de `personagem?.classe` da cadeia de maestrias --
+ * o resto de sheet/maestrias.js (classesComMaestria, trocaTodasNoDescanso,
+ * maestriasDaClasse, tetoMaestrias) ja usava `temClasse`/`nivelNa`. Como
+ * `personagem.classe` e o espelho da classe INICIAL, um Mago 5/Bárbaro 1
+ * escapava do filtro e o modal oferecia Arco Longo a um personagem cuja
+ * unica fonte de Maestria e o Bárbaro. `temClasse` e a MESMA decisao que
+ * `classesComMaestria` toma -- as duas tem de concordar, senao a tela abre
+ * um modal com uma lista que a regra nao sustenta.
+ *
+ * LACUNA CONHECIDA, REGISTRADA EM docs/PERGUNTAS-PENDENTES.txt (2026-08-27):
+ * a restricao do livro e da Maestria DO BARBARO, nao do personagem inteiro.
+ * Num Bárbaro/Guerreiro o app tem UM teto e UM array compartilhado
+ * (`char.maestrias_arma`), entao nao ha como atribuir uma vaga a uma classe
+ * -- e a leitura conservadora (restringir sempre que houver Bárbaro) e a
+ * unica que nao concede nada que o livro nao de. Decidir o contrario e
+ * decisao de produto, nao de conserto de espelho.
+ *
+ * @param {Object} personagem - Personagem (classes[] e proficiencias_extra)
  * @param {Array} armas - Lista de armas de dados/equipamento/armas.json
  */
 export function armasElegiveisMaestria(personagem, armas = []) {
   return armas.filter(arma => {
     if (!temProficienciaArma(personagem, arma)) return false;
-    if (personagem?.classe === 'Bárbaro') {
+    if (temClasse(personagem, 'Bárbaro')) {
       return (arma?.categoria || '').toLowerCase().includes('corpo a corpo');
     }
     return true;
@@ -67,18 +89,18 @@ export function armasElegiveisMaestria(personagem, armas = []) {
 
 /** Verifica se o personagem tem proficiencia com uma armadura especifica */
 export function temProficienciaArmadura(personagem, armadura) {
-  const info = CLASSES_INFO[personagem?.classe];
-  if (!info) return false;
+  // Mesma uniao de temProficienciaArma -- ver comentario la.
+  const armadurasClasse = armadurasDoPersonagem(personagem);
   const cat = (armadura?.categoria || '').toLowerCase();
   const nome = (armadura?.nome || '').toLowerCase();
   const extras = (personagem?.proficiencias_extra || []).map(p => p.toLowerCase());
 
   // Escudo e tratado a parte das categorias de armadura
-  if (nome === 'escudo') return info.armaduras.includes('Escudo') || extras.includes('escudo');
+  if (nome === 'escudo') return armadurasClasse.includes('Escudo') || extras.includes('escudo');
 
-  if (info.armaduras.includes('Pesada') && cat === 'pesada') return true;
-  if (info.armaduras.includes('Média') && (cat === 'média' || cat === 'media')) return true;
-  if (info.armaduras.includes('Leve') && cat === 'leve') return true;
+  if (armadurasClasse.includes('Pesada') && cat === 'pesada') return true;
+  if (armadurasClasse.includes('Média') && (cat === 'média' || cat === 'media')) return true;
+  if (armadurasClasse.includes('Leve') && cat === 'leve') return true;
 
   // Proficiencias extras (Clerigo Protetor etc.)
   if (extras.includes('armadura pesada') && cat === 'pesada') return true;
