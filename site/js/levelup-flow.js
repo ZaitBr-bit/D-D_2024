@@ -14,7 +14,10 @@ import { concessoesAoEntrarEm } from './regras-multiclasse-proficiencias.js';
 import { INSTRUMENTOS_MUSICAIS, ritualBonusPendente } from './regras-cobertura.js';
 import { getClasse, getMagiasClasse, getMagiasPorCirculo } from './db.js';
 import { getTruquesFixosSubclasse } from './regras-conjuracao-subclasse.js';
-import { magiaContaNoLimite, truqueEhTrocavel } from './regras-origens-magia.js';
+import { truqueEhTrocavel } from './regras-origens-magia.js';
+// preparadasPorClasse (Item 1 da revisão final do sub-projeto "magia sabe a
+// classe"): ver uso perto de `temMagiaTrocavel`, no step 'selecao_magias'.
+import { preparadasPorClasse } from './regras-magia-classe.js';
 import {
   calcMod, bonusProficiencia, getBonusTruquesOrdem, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas
 } from './utils.js';
@@ -680,7 +683,21 @@ const STEP_DEFINITIONS = [
       // e, pior, NÃO tinha `subclasse_escolha`, `maestria_magias` nem
       // `assinatura_magica`: o step ficava visível oferecendo troca de magia
       // que o livro diz que o personagem sempre tem preparada.
-      const temMagiaTrocavel = (ctx.char.magias_preparadas || []).some(m => m.circulo > 0 && magiaContaNoLimite(m));
+      //
+      // preparadasPorClasse (Item 1 da revisão final do sub-projeto "magia
+      // sabe a classe"): este cálculo contava `magiaContaNoLimite` sobre o
+      // personagem INTEIRO, enquanto o card que este step exibe
+      // (renderCardMagias, levelup-cards.js) já filtra as candidatas por
+      // `classeQueSobe`. Num Feiticeiro 5/Mago 1 com as preparadas todas
+      // carimbadas da OUTRA classe, o step aparecia (visível) e o card por
+      // trás dele não tinha "Trocar Magias" para oferecer -- o mesmo beco
+      // sem saída já consertado em sheet/hp-descanso.js (Achado 3 da
+      // rodada 1 da Tarefa 4). `desta ∪ semClasse` é a MESMA expressão que
+      // levelup-cards.js usa; `ctx.classeQueSobe` (não o espelho
+      // `char.classe`) porque é a classe em que o nível ENTRA.
+      const candidatasTrocaNivel = preparadasPorClasse(ctx.char, ctx.classeQueSobe);
+      const temMagiaTrocavel = [...candidatasTrocaNivel.desta, ...candidatasTrocaNivel.semClasse]
+        .some(m => m.circulo > 0);
       return c.truquesGanhos > 0 || (c.tipoConj === 'conhecidas' && c.magiasGanhas > 0) || c.ehMago || !!subclasseArcana || temTruqueTrocavel || temMagiaTrocavel;
     },
     completo: (ctx, state) => {

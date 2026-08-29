@@ -185,60 +185,20 @@ const ALVOS = [
           'Mesmo motivo da Tenacidade Anã acima: traço de ESPÉCIE, e o texto do ' +
           'próprio traço fala em nível de personagem, não em nível de classe.',
       },
-      {
-        linha: 'const infoClasse = CLASSES_INFO[char.classe] || {};',
-        feature: 'Troca de magia/truque ao fim do Descanso Longo (infoClasse.conjurador, infoClasse.tipo_conjuracao)',
-        motivo:
-          'NÃO É CONVERSÃO DE LEITURA -- é troca POR CLASSE, sub-projeto próprio. ' +
-          '`infoClasse`/`.conjurador`/`.tipo_conjuracao` decidem quem tem direito à ' +
-          'troca de magia/truque no fim do Descanso Longo, e a troca em si é ' +
-          'restrita à LISTA de cada classe: Classes.md:3290 diz que o Guardião pode ' +
-          '"substituir uma magia em sua lista por outra magia de Guardião", :5511 ' +
-          'diz o mesmo para o Paladino, e o Mago troca pelo próprio livro de magias ' +
-          '(:4610, "substituindo qualquer uma das magias por outras do seu livro de ' +
-          'magias"). Um personagem com DUAS classes conjuradoras com essa ' +
-          'característica (ex.: Guardião/Paladino) tem direito a DUAS trocas, cada ' +
-          'uma restrita à lista da classe dona -- não é `nivelNa`/`temClasse` que ' +
-          'resolve isso, é um recurso por classe que ainda não existe na tela. Virou ' +
-          'sub-projeto próprio (o sub-projeto 4 NÃO o cobre); continua lendo a ' +
-          'classe INICIAL até lá.',
-      },
-      {
-        linha: "const temTrocaMagia = trocaNoDescansoLongo(char.classe) === 'uma' || ehSubConj;",
-        feature: 'Troca de magia ao fim do Descanso Longo',
-        motivo:
-          'NÃO É CONVERSÃO DE LEITURA -- mesmo motivo do bloco de `infoClasse` ' +
-          'acima: `trocaNoDescansoLongo(char.classe)` decide POR QUAL classe a ' +
-          'troca funciona, e a troca é um recurso restrito à lista de cada classe ' +
-          'conjuradora (Classes.md:3290 Guardião, :5511 Paladino, :4610 Mago). Um ' +
-          'Guardião/Paladino multiclasse tem direito a DUAS trocas -- uma por ' +
-          'classe --, o que é funcionalidade nova (produto + UI), não uma leitura ' +
-          'errada de nível/classe. Virou sub-projeto próprio; continua lendo a ' +
-          'classe INICIAL até lá.',
-      },
-      {
-        linha: "Como ${escHtml(char.classe)}${ehSubConj ? ' (' + escHtml(char.subclasse) + ')' : ''}, você pode trocar <strong>1 magia ${rotuloMagia}</strong> por outra da lista de classe após um Descanso Longo. Para remontar a lista inteira, use a subida de nível.",
-        feature: 'Rótulo "Como Classe (Subclasse), você pode trocar..." no modal do Descanso Longo',
-        motivo:
-          'NÃO É CONVERSÃO DE LEITURA -- mesmo motivo do bloco de `infoClasse` ' +
-          'acima: o rótulo nomeia a classe INICIAL porque a troca em si ainda é UMA ' +
-          'só, compartilhada, em vez de uma por classe conjuradora (Classes.md:3290, ' +
-          ':5511, :4610). Corrigir só o texto sem entregar a troca por classe ' +
-          'deixaria o rótulo certo e o comportamento errado -- por isso a correção ' +
-          'espera o sub-projeto próprio da troca por classe, não este. Duas ' +
-          'leituras de espelho na MESMA linha (char.classe e char.subclasse); o ' +
-          'teste de exceção deste arquivo dedup por número de linha, não por ' +
-          'ocorrência.',
-      },
-      {
-        linha: 'Você pode trocar <strong>1 truque</strong> por outro da lista de ${escHtml(char.classe)} após um Descanso Longo.',
-        feature: 'Rótulo de troca de truque no modal do Descanso Longo',
-        motivo:
-          'NÃO É CONVERSÃO DE LEITURA -- mesmo motivo do rótulo de troca de magia ' +
-          'acima: a troca de truque também é UMA só, compartilhada, em vez de uma ' +
-          'por classe conjuradora. Sub-projeto próprio da troca por classe, não ' +
-          'este.',
-      },
+      // As QUATRO exceções que existiam aqui (infoClasse = CLASSES_INFO
+      // [char.classe], temTrocaMagia com trocaNoDescansoLongo(char.classe),
+      // e os dois rótulos "Como ${char.classe}..."/"...lista de ${char.
+      // classe}") foram REMOVIDAS pela Tarefa 3 do sub-projeto
+      // 2026-08-29-troca-por-classe-descanso -- exatamente o "sub-projeto
+      // próprio da troca por classe" que os motivos delas apontavam. As
+      // quatro linhas declaradas não existem mais tal e qual: a decisão de
+      // magia/truque agora vem de `trocasDoDescansoLongo(char,
+      // superficiesDaFicha(char))` (por SUPERFÍCIE, não pelo espelho), e os
+      // dois rótulos usam a `classe`/`subclasse` da ENTRADA (ou, no rótulo
+      // de truque, `superficieAtivaDaFicha(char)?.classe`) -- nenhum dos
+      // dois lê mais `char.classe`/`char.subclasse`. Não sobrou exceção
+      // para repor: a leitura de espelho que elas perdoavam foi removida,
+      // não deslocada para outra linha.
     ],
   },
   {

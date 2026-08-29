@@ -70,7 +70,10 @@ export const GATILHOS_SEM_COBERTURA = [
   'btn-bastiao-lei',
   'btn-campeao-curar',
   'btn-confirmar-excluir',
-  'btn-confirmar-preencher',
+  // 'btn-confirmar-preencher' saiu daqui na Tarefa 5 do sub-projeto
+  // 2026-08-29-magia-sabe-a-classe (rodada 2 de revisao): o cenario 7 de
+  // magia-classe.spec.mjs clica nele para confirmar o preenchimento da
+  // vaga de magia livre (abrirPreenchimentoSlotMagia, sheet/grimorio.js).
   'btn-confirmar-recuperar-dadiva',
   'btn-confirmar-rem-inv',
   'btn-confirmar-rem-inv-sheet',
@@ -96,12 +99,12 @@ export const GATILHOS_SEM_COBERTURA = [
   'btn-maos-confirmar',
   'btn-maos-envenenado',
   'btn-pf-para-slot',
-  'btn-preencher-slot-magia',
+  // 'btn-preencher-slot-magia' saiu daqui pelo mesmo motivo de
+  // 'btn-confirmar-preencher', acima -- o mesmo cenario 7 clica nos dois
+  // botoes, na mesma sequencia (abrir o preenchimento, depois confirmar).
   'btn-preencher-slot-truque',
   'btn-protecao-dano-ok',
   'btn-protecao-rest-ok',
-  'btn-pular-troca-conhecida',
-  'btn-pular-troca-truque',
   'btn-qtd-item-menos',
   'btn-recarregar-especies',
   'btn-recuperar-confirmar',

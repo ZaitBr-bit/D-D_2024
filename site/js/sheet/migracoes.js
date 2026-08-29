@@ -421,3 +421,99 @@ import { migrarEspacosDeMagia } from '../regras-multiclasse-conjuracao.js';
 export function migrarEspacosMagia() {
   if (migrarEspacosDeMagia(char)) salvar();
 }
+
+// Imports colocados aqui pelo mesmo motivo dos dois acima (nao deslocar a
+// numeracao do arquivo -- ver o comentario de migrarParaMulticlasse): esta
+// e a ULTIMA migracao do arquivo, entao os imports dela tambem entram no
+// fim, ao lado do unico trecho que os usa.
+import { classeDaMagiaPreparada, nomesDaListaDeMagias } from '../regras-magia-classe.js';
+import { superficiesDeConjuracao } from '../regras-multiclasse-conjuracao.js';
+import { getMagiasClasse } from '../db.js';
+import { classesData } from './estado.js';
+
+/**
+ * Migra `magias_preparadas[]` de fichas gravadas ANTES de o campo `classe`
+ * existir (Tarefas 1 e 2 deste sub-projeto), carimbando cada entrada com a
+ * classe dona -- quando isso pode ser afirmado sem chutar.
+ *
+ * O campo e OPCIONAL de proposito, nunca um palpite: medido sobre os 8
+ * arquivos dados/classes/magias_*.json, so 24,6% das 391 magias distintas
+ * existem numa UNICA classe, e as duplas mais jogadas sao as piores
+ * (Feiticeiro/Mago compartilham 95% da lista menor, Bruxo/Mago 89%,
+ * Bardo/Mago 74%). Um carimbo errado e pior que nenhum: o app passaria a
+ * exibir limite por classe com confianca e errado, e some a possibilidade
+ * de saber que nao se sabe. O criterio inteiro mora em
+ * `classeDaMagiaPreparada` (regras-magia-classe.js) -- esta funcao so
+ * alimenta ela com os dados certos (personagem e, quando ha multiclasse,
+ * `listasPorClasse`) e grava exatamente o que ela devolver, nunca
+ * reimplementando nem "melhorando" a regra.
+ *
+ * PRIMEIRA MIGRACAO ASSINCRONA do arquivo: todas as outras decidem so com
+ * o que ja esta em memoria (char e os caches montados na abertura da
+ * ficha); esta, no caso multiclasse, precisa das listas de magias de cada
+ * classe (dados/classes/magias_<classe>.json), que vem de disco via
+ * getMagiasClasse -- e so quando ha DUAS OU MAIS superficies de
+ * conjuracao, porque classe unica nunca consulta lista nenhuma
+ * (classeDaMagiaPreparada responde pela superficie unica direto, RULING
+ * R-B do brief da Tarefa 1) e classe unica e a maioria esmagadora das
+ * fichas. O inicializador que chama esta funcao (pages/sheet.js) ja e
+ * async, entao o `await` aqui nao muda a forma de quem a chama.
+ *
+ * Idempotente e nunca sobrescreve: uma entrada que ja tem `classe` (string
+ * nao vazia) e pulada sem ser reavaliada, e uma segunda passagem nao altera
+ * nada. Roda em TODA abertura de ficha -- por isso a saida barata, logo no
+ * inicio, evita ate montar `listasPorClasse` quando nao ha nada para fazer.
+ *
+ * @returns {Promise<boolean>} true se carimbou alguma entrada.
+ */
+export async function migrarMagiaClasse() {
+  const preparadas = char.magias_preparadas;
+  if (!preparadas?.length) return false;
+
+  // Saida barata: se toda entrada ja tem `classe` (string nao vazia) ou e
+  // isenta (magiaContaNoLimite falso -- dominio, sempre, talento etc., que
+  // nunca saem do orcamento de uma classe), nao ha nada para fazer. Confere
+  // ANTES de tocar em disco: esta migracao roda a cada abertura de ficha, e
+  // nao pode custar 8 leituras de JSON para nao fazer nada na maioria delas.
+  const faltaCarimbar = (m) =>
+    magiaContaNoLimite(m) && !(typeof m.classe === 'string' && m.classe.trim() !== '');
+  if (!preparadas.some(faltaCarimbar)) return false;
+
+  const superficies = superficiesDeConjuracao(char, classesData);
+  // Classe unica NAO carrega lista nenhuma: classeDaMagiaPreparada resolve
+  // pela superficie unica sem consultar listasPorClasse (RULING R-B), e
+  // classe unica e o caso comum. So multiclasse (duas ou mais superficies)
+  // justifica o custo de ir a disco.
+  let listasPorClasse = null;
+  if (superficies.length >= 2) {
+    listasPorClasse = new Map();
+    // A CHAVE e o nome da LISTA (`listaMagias` da superficie), nao o nome
+    // da classe -- Cavaleiro Mistico e Trapaceiro Arcano tem `classe`
+    // 'Guerreiro'/'Ladino' mas preparam da lista 'Mago'. Set para nao
+    // buscar a mesma lista duas vezes quando duas superficies a
+    // compartilham.
+    for (const nomeLista of new Set(superficies.map((s) => s.listaMagias))) {
+      const json = await getMagiasClasse(nomeLista);
+      // json nulo (arquivo inexistente) simplesmente nao entra no mapa --
+      // as magias dessa superficie ficam sem carimbo, que e correto: nao
+      // sabemos.
+      if (json) listasPorClasse.set(nomeLista, nomesDaListaDeMagias(json));
+    }
+  }
+
+  let alterado = false;
+  for (const magia of preparadas) {
+    // Nunca sobrescreve um carimbo que ja existe.
+    if (typeof magia.classe === 'string' && magia.classe.trim() !== '') continue;
+    const classe = classeDaMagiaPreparada(char, magia, { mapaDados: classesData, listasPorClasse });
+    // Nunca grava valor vazio: so grava quando classeDaMagiaPreparada
+    // devolve uma string (nunca null/''/undefined) -- senao a entrada fica
+    // exatamente como estava, sem a chave.
+    if (classe) {
+      magia.classe = classe;
+      alterado = true;
+    }
+  }
+  if (alterado) salvar();
+  return alterado;
+}

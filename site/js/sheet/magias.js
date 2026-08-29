@@ -34,6 +34,11 @@ import { nivelNa, temClasse } from '../regras-multiclasse.js';
 // leitura combinada por CIRCULO (sem distinguir fonte).
 import { gastarEspaco, recuperarUmEspaco, reservasDeEspacos } from './reservas-espacos.js';
 import { abrirModalAdicionarTalento, abrirModalEditarIniciadoEmMagia } from './talentos.js';
+// preparadasPorClasse (Tarefa 4 do sub-projeto "magia sabe a classe"):
+// fonte única dos três baldes desta/deOutra/semClasse -- ver o comentário
+// de renderSecaoMagias, abaixo, para o "contador honesto" que esta função
+// substitui.
+import { preparadasPorClasse } from '../regras-magia-classe.js';
 
 // `magiaContaNoLimite` e `magiaEhEspecial` moram em regras-origens-magia.js,
 // a fonte única das origens que o jogador não escolheu. Reexportados aqui
@@ -531,11 +536,14 @@ export function renderSecaoMagias() {
   // o Bardo, primeira que efetivamente conjura), não a INICIAL. `sup ? ... :
   // (subConj ? ...)` cobre só a subclasse conjuradora sem superfície de
   // classe (Cavaleiro Místico/Trapaceiro Arcano puro, hoje inalcançável
-  // fora deste ramo -- mesma guarda que sheet/grimorio.js usa). O que
-  // continua fora do alcance desta tarefa é repartir POR CLASSE a contagem
-  // de "quantas estão preparadas" -- isso exige `magias_preparadas[].classe`,
-  // que não existe (mesma dívida); ver "O contador honesto" no contador de
-  // preparadas, abaixo.
+  // fora deste ramo -- mesma guarda que sheet/grimorio.js usa). Repartir
+  // POR CLASSE a contagem de "quantas estão preparadas" -- que dependia de
+  // `magias_preparadas[].classe`, inexistente quando este comentário foi
+  // escrito -- é a Tarefa 4 do sub-projeto "magia sabe a classe"; ver o
+  // comentário de `preparadasPorClasse` no contador de preparadas, abaixo,
+  // para o que mudou e o que continua fora do alcance (o campo é opcional
+  // e o estado misto é permanente, então a contagem por classe nunca fica
+  // 100% certa em toda ficha).
   const tipoConj = sup ? sup.tipo : (subConj ? 'conhecidas' : 'preparadas');
   const magiasPersonalizadas = (char.magias_customizadas || []).map((magia, indice) => ({
     ...normalizarMagiaPersonalizada(magia, indice),
@@ -625,10 +633,15 @@ export function renderSecaoMagias() {
   // Taumaturgo nunca via o +1 truque.
   maxTruques += getBonusTruquesOrdem(char, sup?.classe);
 
-  // Contar magias preparadas excluindo as especiais (não contam no limite)
-  const preparadasNormais = preparadas.filter(m => magiaContaNoLimite(m));
+  // Contar magias preparadas excluindo as especiais (não contam no limite).
+  // preparadasPorClasse (Tarefa 4): `numPreparadas` deixa de ser a soma de
+  // TODAS as classes e passa a ser só `desta` -- as preparadas CARIMBADAS
+  // com a classe da superfície ativa. Ver "O CONTADOR HONESTO", no bloco de
+  // render abaixo, para o antes/depois e para `numSemClasse`.
+  const classificacaoPreparadas = preparadasPorClasse(char, sup?.classe);
   const preparadasEspeciais = preparadas.filter(m => magiaEhEspecial(m));
-  const numPreparadas = preparadasNormais.length;
+  const numPreparadas = classificacaoPreparadas.desta.length;
+  const numSemClasse = classificacaoPreparadas.semClasse.length;
 
   // Label dinâmico baseado no tipo de conjuração
   const labelMagias = tipoConj === 'conhecidas' ? 'Magias Conhecidas' : 'Magias Preparadas';
@@ -712,27 +725,38 @@ export function renderSecaoMagias() {
       ` : ''}
 
       <!--
-        O CONTADOR HONESTO (Tarefa 3, decisao do dono do produto): a
-        CONTAGEM de truques/preparadas abaixo (truquesClasse.length,
-        numPreparadas) e do PERSONAGEM INTEIRO -- soma de char.magias_
-        conhecidas/preparadas de TODAS as classes, porque nenhuma entrada
-        ai carrega de que classe ela e (mesma divida do docblock de
-        normalizarGrimorioMago, utils.js). O LIMITE mostrado (maxTruques/
-        maxPreparadas) e SO da superficie ativa (sup, a primeira por
-        ordem de aquisicao). Repartir a contagem por classe exige o campo
-        que nao existe; ate la, os dois numeros continuam expostos, e o
-        aviso abaixo diz o que cada um e -- em vez de fingir que o segundo
-        limita o primeiro por inteiro.
+        O CONTADOR HONESTO (Tarefa 3, decisao do dono do produto; revisado
+        na Tarefa 4 do sub-projeto 2026-08-29-magia-sabe-a-classe).
 
-        Consequencia medida: um Clerigo 5/Mago 1 tem 9 preparadas de
-        Clerigo + 4 de Mago = 13 no contador, contra o limite de UMA classe
-        (9, do Clerigo -- a superficie ativa). 13 > 9 pareceria "excedido",
-        mas nenhuma das duas classes violou o livro. Por isso a classe CSS
-        contador-excedido (alarme visual) fica suprimida com mais de uma
-        superficie -- ela dispara falso aqui, e o dono do produto pediu
-        visibilidade, nao alarme falso. contador-cheio (neutro) continua:
-        nao e alarmante, e a coincidencia exata com o limite de uma classe
-        ainda e informacao util.
+        NOTA: nenhum backtick neste comentario, de proposito -- ele vive
+        dentro do template literal que monta este HTML inteiro, e um
+        backtick aqui fecharia a string do JS.
+
+        TRUQUES (truquesClasse.length) continuam FORA do escopo daquela
+        tarefa 4: magias_conhecidas[] nao ganhou campo de classe, entao a
+        contagem de truques ainda e do PERSONAGEM INTEIRO (soma de todas as
+        classes) contra o limite de UMA classe (maxTruques, a superficie
+        ativa) -- por isso contador-excedido de truques continua suprimido
+        com mais de uma superficie (superficies.length <= 1), a mesma
+        guarda de sempre.
+
+        PREPARADAS (numPreparadas) mudou: magias_preparadas[].classe existe
+        desde as Tarefas 2 e 3 (gravadores e migracao), entao numPreparadas
+        agora e 'desta' -- so as preparadas CARIMBADAS com a classe da
+        superficie ativa (preparadasPorClasse, regras-magia-classe.js). O
+        ESTADO MISTO E PERMANENTE, porem: a migracao so carimba o
+        inequivoco, e magia isenta (dominio/talento/especie/'sempre') nunca
+        recebe carimbo -- por isso numSemClasse (classificacaoPreparadas.
+        semClasse.length) tem um badge proprio logo ao lado do contador de
+        preparadas, sempre que for maior que zero: a incerteza fica VISIVEL
+        em vez de escondida atras de um numero que parece completo. Contra
+        essa contagem por classe, contador-cheio/contador-excedido de
+        preparadas nao dependem mais de superficies.length <= 1 -- dependem
+        de numSemClasse === 0 (a contagem so pode alarmar quando e CERTA).
+
+        Para classe unica (a maioria dos personagens), a migracao carimba
+        TUDO -- numSemClasse e sempre 0 e numPreparadas e identico ao de
+        antes: nada muda na tela para eles.
       -->
       <!--
         SELETOR DE SUPERFICIE DE CONJURACAO (Tarefa 4). So aparece com MAIS
@@ -768,9 +792,20 @@ export function renderSecaoMagias() {
           ${superficies.map(s => `<div class="tab ${s.classe === sup?.classe ? 'active' : ''}" data-tab-superficie="${escHtml(s.classe)}">${escHtml(s.classe)} ${s.nivelClasse}</div>`).join('')}
         </div>
       ` : ''}
+      <!--
+        Achado 1 da rodada 1 de correção da Tarefa 4 (revisão independente):
+        esta caixa dizia que TRUQUES E PREPARADAS contam o personagem
+        inteiro -- verdade antes da Tarefa 4, falso para preparadas depois
+        dela (numPreparadas virou por classe, ver "O CONTADOR HONESTO"
+        acima). O texto agora descreve as duas contagens separadas: truques
+        continua PERSONAGEM INTEIRO (sem campo de classe, fora de escopo);
+        preparadas conta só a classe selecionada, e cita o indicador "sem
+        classe" para quem tiver alguma preparada ainda não carimbada.
+      -->
       ${superficies.length > 1 ? `
         <div class="info-box info" style="margin-bottom:8px;font-size:0.78rem">
-          Truques e ${labelMagias.toLowerCase()} contam o personagem inteiro (todas as classes); o limite mostrado é só da classe selecionada acima.
+          Truques contam o personagem inteiro (todas as classes) contra o limite da classe selecionada acima.
+          Já ${labelMagias.toLowerCase()} contam só as desta classe -- a lista abaixo mostra as de todas as classes, cada entrada com o rótulo da sua classe (ou "sem classe" nas fichas ainda não migradas, que também não entram nesta contagem).
         </div>
       ` : ''}
       <!-- Contador de magias preparadas/conhecidas e truques -->
@@ -800,9 +835,15 @@ export function renderSecaoMagias() {
           </div>
         ` : ''}
         ${maxPreparadas > 0 ? `
-          <div class="magia-contador ${numPreparadas > maxPreparadas && superficies.length <= 1 ? 'contador-excedido' : numPreparadas === maxPreparadas ? 'contador-cheio' : ''}">
+          <div class="magia-contador ${numPreparadas > maxPreparadas && numSemClasse === 0 ? 'contador-excedido' : numPreparadas === maxPreparadas && numSemClasse === 0 ? 'contador-cheio' : ''}">
             <span class="contador-label">${labelMagias}</span>
             <span class="contador-valor">${numPreparadas} / ${maxPreparadas}</span>
+          </div>
+        ` : ''}
+        ${numSemClasse > 0 ? `
+          <div class="magia-contador contador-dominio" title="Magias de fichas antigas cuja classe não pôde ser determinada sem chute -- não entram na contagem de ${labelMagias.toLowerCase()} nem no bloqueio de limite.">
+            <span class="contador-label">${labelMagias} (sem classe)</span>
+            <span class="contador-valor">+${numSemClasse}</span>
           </div>
         ` : ''}
         ${preparadasEspeciais.length > 0 ? `
@@ -847,7 +888,21 @@ export function renderSecaoMagias() {
       <!-- Dádivas do Pacto (Bruxo) -->
       ${renderSecaoPactoBruxo()}
 
-      <!-- Magias Preparadas por Círculo -->
+      <!--
+        Achado 2 da rodada 1 de correção da Tarefa 4 (revisão independente):
+        o contador do topo (numPreparadas) virou por CLASSE, mas esta lista
+        de cartões continua mostrando as preparadas de TODAS as classes --
+        ela dirige a CONJURAÇÃO de verdade (botão "Conjurar", upcast por
+        select, "Ritual"), então filtrá-la pela classe ativa esconderia a
+        capacidade de conjurar a magia de OUTRA classe, um efeito colateral
+        pior que a mentira que este achado aponta. A escolha (das duas que
+        o achado ofereceu) foi rotular cada cartão com a classe da entrada
+        -- não esconder a lista nem fingir que ela e o contador respondem
+        a mesma pergunta sem dizer isso. Ver o rótulo de classe dentro do
+        .map logo abaixo (só aparece com mais de uma superfície -- classe
+        única não muda em nada) e o aviso reescrito acima ("Já
+        ${labelMagias.toLowerCase()} contam só as desta classe...").
+      -->
       ${Object.keys(preparadasPorCirculo).sort((a, b) => parseInt(a) - parseInt(b)).map(circ => {
         const magias = preparadasPorCirculo[circ];
         return `
@@ -874,6 +929,7 @@ export function renderSecaoMagias() {
                     </div>
                     ${badgesMagiaRapidos(m.nome)}
                     ${ehEspecial ? `<div style="font-size:0.65rem;color:var(--secondary);font-weight:600;margin-top:1px">${origemLabel}</div>` : ''}
+                    ${(!ehEspecial && superficies.length > 1) ? `<div style="font-size:0.65rem;color:var(--text-muted);margin-top:1px" title="Classe desta magia preparada">${m.classe ? escHtml(m.classe) : 'Sem classe conhecida'}</div>` : ''}
                   </div>
                   <div class="no-print" style="display:flex;align-items:center;gap:4px">
                     ${temUpcast ? `
@@ -2677,43 +2733,38 @@ export function setupEventosEspacosMagia() {
       const { nivel: _nivelMago, tabela: _tabelaMago } = nivelETabelaDoMago();
       const maxPrep = _tabelaMago ? getMagiaPreparadas(_tabelaMago, _nivelMago) : 99;
       // ACHADO IMPORTANT da revisão da Tarefa 3: a CONTAGEM tinha o mesmo
-      // problema que o LIMITE tinha antes desta tarefa, só do outro lado.
-      // `char.magias_preparadas` é GLOBAL (todas as classes, sem campo que
-      // diga de quem é cada entrada) -- confrontá-la crua contra o limite
-      // do Mago travava o botão PERMANENTEMENTE para qualquer personagem
-      // com outra classe conjuradora: Clérigo 5/Mago 1 tem 9 preparadas do
-      // Clérigo, o limite do Mago 1 é 4, e `9 >= 4` nunca deixava de ser
-      // verdade -- "Preparar" nunca funcionava.
+      // problema que o LIMITE tinha antes daquela tarefa, só do outro lado.
+      // `char.magias_preparadas` era GLOBAL (todas as classes, sem campo
+      // que dissesse de quem era cada entrada) -- confrontá-la crua contra
+      // o limite do Mago travava o botão PERMANENTEMENTE para qualquer
+      // personagem com outra classe conjuradora: Clérigo 5/Mago 1 tinha 9
+      // preparadas do Clérigo, o limite do Mago 1 é 4, e `9 >= 4` nunca
+      // deixava de ser verdade -- "Preparar" nunca funcionava.
       //
-      // PROXY HONESTO: magia de círculo preparada PELO MAGO tem de estar
-      // no grimório dele (magiaMagoEstaNoGrimorio/normalizarGrimorioMago é
-      // regra do livro), e a magia de outra classe não entra lá -- exceto
-      // quando o Mago é a classe INICIAL, caso em que
-      // normalizarGrimorioMago (decisão registrada, não convertida nesta
-      // tarefa) já copia toda `magias_preparadas` de círculo>0 para o
-      // grimório, inclusive a de outra classe conjuradora. Contar só as
-      // preparadas que TAMBÉM estão no grimório isola o Mago sem precisar
-      // do campo de classe que não existe, no caso comum (Mago não é a
-      // classe inicial).
-      const preparadasDoMago = (char.magias_preparadas || [])
-        .filter(m => magiaContaNoLimite(m))
-        .filter(m => (char.grimorio || []).some(g => g?.nome === m.nome));
-      // Onde o proxy acima não se aplica (Mago como classe inicial JUNTO
-      // de outra classe que também conjura -- `superficies.length > 1`),
-      // NÃO bloqueia: mesma decisão já tomada para o alarme visual
-      // (contador-excedido, no bloco de contadores acima) -- bloquear com
-      // base numa contagem incerta é pior que deixar passar, porque o
-      // jogador já vê o aviso do contador honesto na tela. Com UMA
-      // superfície só, ela É o Mago (ehMago já garantiu isso), e o proxy
-      // sempre bate com a contagem crua.
-      const podeBloquear = superficiesDaFicha(char).length <= 1;
-      if (podeBloquear && preparadasDoMago.length >= maxPrep) {
+      // Tarefa 4 do sub-projeto "magia sabe a classe": o proxy antigo
+      // (contar só as preparadas que TAMBÉM estão no grimório, e só
+      // bloquear com uma superfície só) dá lugar à medida DIRETA --
+      // `preparadasPorClasse(char, 'Mago')` ('Mago' literal pelo mesmo
+      // motivo do `char.magias_preparadas.push` logo abaixo). Regra do
+      // BLOQUEIO: só recusa com contagem CERTA (`semClasse.length === 0`)
+      // -- havendo magia sem classe, a contagem é incerta e o botão deixa
+      // passar (o contador "+N sem classe" já avisa o jogador na tela).
+      const classificacaoMago = preparadasPorClasse(char, 'Mago');
+      const preparadasDoMago = classificacaoMago.desta;
+      if (preparadasDoMago.length >= maxPrep && classificacaoMago.semClasse.length === 0) {
         toast(`Limite de magias preparadas atingido (${maxPrep}). Desprepare uma magia primeiro.`, 'error');
         return;
       }
 
       const ehCustomizadaCirculo = (char.magias_customizadas || []).some(m => m?.nome === nome && Number(m.circulo) > 0);
-      char.magias_preparadas.push({ nome, circulo: circ, ...(ehCustomizadaCirculo ? { personalizada: true } : {}) });
+      // 'Mago' literal, nao superficieAtiva()?.classe: este painel de
+      // grimorio e renderizado por `ehMago = temClasse(char, 'Mago')`
+      // (linha 651), independente de qual classe esta selecionada no
+      // seletor da ficha -- um Clerigo 5/Mago 1 com o Clerigo como
+      // superficie ativa ainda ve e usa este botao. A magia que sai do
+      // grimorio e sempre do Mago, e usar a superficie ativa carimbaria a
+      // classe ERRADA sempre que o seletor nao estiver no Mago.
+      char.magias_preparadas.push({ nome, circulo: circ, classe: 'Mago', ...(ehCustomizadaCirculo ? { personalizada: true } : {}) });
       salvar();
       renderFichaCompleta();
       toast(`${nome} preparada a partir do grimório (${preparadasDoMago.length + 1}/${maxPrep})`, 'success');

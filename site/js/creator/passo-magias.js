@@ -287,7 +287,10 @@ export async function renderStepMagias(el) {
         const idx = personagem.magias_preparadas.findIndex(m => m.nome === nome);
         if (idx >= 0) personagem.magias_preparadas.splice(idx, 1);
         else if (personagem.magias_preparadas.length >= numPreparadas) toast(`Máximo de ${numPreparadas} magias preparadas`, 'error');
-        else personagem.magias_preparadas.push({ nome, circulo: Number(card.dataset.magoPreparadaCirc) });
+        // personagem.classe: no criador o personagem tem exatamente UMA
+        // classe (a inicial, nivel 1) -- e o unico lugar deste sub-projeto
+        // onde ler o espelho char.classe e correto.
+        else personagem.magias_preparadas.push({ nome, circulo: Number(card.dataset.magoPreparadaCirc), ...(personagem.classe ? { classe: personagem.classe } : {}) });
         renderPreparadasMago();
         atualizarContadoresMagia(numTruques, numPreparadas, magoNivel1, limiteGrimorio);
       }));
@@ -595,7 +598,8 @@ function toggleMagia(nome, circulo, isTruque, maxTruques, maxPreparadas, magoNiv
       personagem.magias_preparadas.splice(idx, 1);
     } else {
       if (personagem.magias_preparadas.length >= maxPreparadas) { toast(`Máximo de ${maxPreparadas} ${labelMagias}`, 'error'); return; }
-      personagem.magias_preparadas.push({ nome, circulo });
+      // personagem.classe: mesmo caso do site acima -- classe inicial e unica no criador.
+      personagem.magias_preparadas.push({ nome, circulo, ...(personagem.classe ? { classe: personagem.classe } : {}) });
     }
   }
 }

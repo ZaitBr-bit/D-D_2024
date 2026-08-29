@@ -5,10 +5,15 @@
 // de recursos por descanso curto e longo, que toca todas as classes.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
-import { CLASSES_INFO } from '../dados-classes.js';
 import { restaurarRecursosTalentos } from '../regras-cobertura.js';
 import { gastarDadosVida, nivelNa, reservasDadosVida, restaurarTodosDadosVida, subclasseDe, temClasse } from '../regras-multiclasse.js';
-import { trocaNoDescansoLongo } from '../regras-preparo-magias.js';
+import { trocasDoDescansoLongo } from '../regras-preparo-magias.js';
+// SUBCLASSES_CONJURADORAS: a MESMA constante que trocasDoDescansoLongo usa
+// por dentro (regras-preparo-magias.js) para saber se uma subclasse
+// conjura pela característica dela (Cavaleiro Místico/Trapaceiro Arcano) --
+// reaproveitada aqui só para decidir se o rótulo do Descanso Longo mostra
+// "(Subclasse)" ao lado da classe, igual ao comportamento de sempre.
+import { SUBCLASSES_CONJURADORAS } from '../regras-conjuracao-subclasse.js';
 import { removerPersonagem } from '../store.js';
 import { abrirModal, calcMod, detectarRecarga, escHtml, semAcento, toast } from '../utils.js';
 // restaurarEspacosDeConjuracao/restaurarEspacosDePacto (Tarefa 4, sub-
@@ -30,12 +35,19 @@ import { getEstadoRecursosLadino } from './classes/ladino.js';
 import { getEstadoRecursosMago } from './classes/mago.js';
 import { getEstadoRecursosMonge } from './classes/monge.js';
 import { getEstadoRecursosPaladino } from './classes/paladino.js';
-import { contextosDeClasse } from './contexto-classe.js';
+import { contextosDeClasse, superficieAtivaDaFicha, superficiesDaFicha } from './contexto-classe.js';
 import { char, especiesCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { mostrarTrocaMagiaConhecida, mostrarTrocaTruque, truquesTrocaveis } from './grimorio.js';
 import { abrirModalTrocaMaestriaDescanso, classesComMaestria, trocaTodasNoDescanso } from './maestrias.js';
-import { ehSubclasseConjuradora, getConcentracaoAtiva, magiaContaNoLimite } from './magias.js';
+import { getConcentracaoAtiva } from './magias.js';
+// preparadasPorClasse (rodada 1 de correcao da Tarefa 4 do sub-projeto
+// "magia sabe a classe" -- achado 3): os dois portoes "ha magia para
+// trocar?" abaixo (Memorizar Magia do Descanso Curto e a troca do
+// Descanso Longo) tem de concordar com a lista que mostrarTrocaMagiaConhecida
+// (grimorio.js) vai montar quando abrir -- ver os comentarios junto de cada
+// uso.
+import { preparadasPorClasse } from '../regras-magia-classe.js';
 
 /**
  * Sincroniza o bonus de PV da Resiliencia Draconica (Feiticeiro).
@@ -858,8 +870,27 @@ export function setupEventosDescanso() {
     // inicial Bardo. nivelNa devolve 0 para quem não é Mago, então o gate
     // fecha sozinho sem precisar de temClasse junto -- mesmo padrão do
     // Incansável do Guardião, acima (nivelNa(char, 'Guardião') >= 10).
+    //
+    // Achado 3 da rodada 1 de correção da Tarefa 4 (sub-projeto "magia sabe
+    // a classe"): este gate checava QUALQUER magia_preparada do PERSONAGEM
+    // INTEIRO, mas o botão abre `mostrarTrocaMagiaConhecida` (grimorio.js),
+    // que já resolve as candidatas por `desta ∪ semClasse` da superfície
+    // ATIVA (superficieAtiva(), lida ali de dentro). Num Clérigo 5/Mago 1
+    // com o Clérigo como superfície ativa (o padrão -- ninguém trocou de
+    // aba), o gate antigo achava as 9 preparadas do Clérigo e mostrava
+    // "Memorizar Magia"; o clique abria o modal com a lista de candidatas
+    // VAZIA (o Mago não tem preparada própria), um beco sem saída -- o
+    // portão dizia "sim" e o fluxo não tinha nada para oferecer. O gate
+    // agora usa a MESMA superfície e a MESMA fonte (preparadasPorClasse)
+    // que o modal vai usar, então os dois só podem concordar. Não resolve
+    // (nem é o escopo deste conserto) se Memorizar Magia DEVERIA sempre
+    // olhar o Mago independente da aba selecionada -- é a mesma família dos
+    // desvios de `char.classe`/`trocaNoDescansoLongo` já registrados acima
+    // e virada sub-projeto próprio; aqui só fecha o beco sem saída.
+    const supAtivaCurto = superficieAtivaDaFicha(char);
+    const candidatasMemorizar = preparadasPorClasse(char, supAtivaCurto?.classe);
     const memorizarMagia = nivelNa(char, 'Mago') >= 5
-      && (char.magias_preparadas || []).some(m => m.circulo > 0 && magiaContaNoLimite(m));
+      && [...candidatasMemorizar.desta, ...candidatasMemorizar.semClasse].some(m => m.circulo > 0);
     const botaoMemorizar = memorizarMagia
       ? '<button class="btn btn-secondary" id="btn-memorizar-magia-curto">Memorizar Magia</button>'
       : '';
@@ -1355,20 +1386,7 @@ export function setupEventosDescanso() {
 
     salvar();
 
-    // Verificar se a classe tem Maestria em Arma e/ou troca de magias
-    // NAO E CONVERSAO DE LEITURA -- e troca POR CLASSE, sub-projeto proprio.
-    // `infoClasse`/`.conjurador`/`.tipo_conjuracao` decidem a troca de
-    // magia/truque no fim do Descanso Longo e continuam lendo a classe
-    // INICIAL. `trocaNoDescansoLongo` (regras-preparo-magias.js) recebe UM
-    // NOME DE CLASSE -- num personagem com DUAS classes conjuradoras (ex.:
-    // Clérigo 5/Druida 5), o livro concede a troca por classe (Classes.md:
-    // 3290 Guardião, :5511 Paladino, :4610 Mago), então o app deveria
-    // oferecer uma troca POR CLASSE, e não uma só como o código atual
-    // oferece -- funcionalidade nova (produto + UI de múltiplos modais), não
-    // conversão de leitura. Virou sub-projeto próprio (fora do sub-projeto
-    // 4, ver task-8-report.md e task-9-report.md); continua lendo a classe
-    // INICIAL até lá.
-    const infoClasse = CLASSES_INFO[char.classe] || {};
+    // Verificar se a classe tem Maestria em Arma e/ou troca de magias/truques
     // As classes DESTE personagem que concedem Maestria em Arma. Era
     // `classesMaestria.includes(char.classe)`, uma cópia da lista comparada
     // com o ESPELHO da classe inicial: num Mago 5/Guerreiro 5 a opção de
@@ -1377,36 +1395,81 @@ export function setupEventosDescanso() {
     // ao lado do teto que a consome.
     const classesDeMaestria = classesComMaestria(char);
     const temMaestria = classesDeMaestria.length > 0;
-    const ehSubConj = ehSubclasseConjuradora();
-    // A quantidade vem de regras-preparo-magias.js, que guarda a REGRA DO
-    // PRODUTO -- e ela se afasta da tabela do livro de proposito, com o
-    // afastamento declarado la. No Descanso Longo e sempre UMA magia, para
-    // toda classe conjuradora: remontar a lista inteira e da subida de nivel.
+
+    // Troca de MAGIA e de TRUQUE do Descanso Longo, POR CLASSE CONJURADORA
+    // (Tarefa 3 do sub-projeto 2026-08-29-troca-por-classe-descanso).
     //
-    // Antes isto saia de `tipo_conjuracao`, um campo de dois valores, e o
-    // resultado era desigual sem que ninguem tivesse decidido assim:
-    // Clerigo/Druida/Mago abriam a lista COMPLETA e Bardo/Bruxo/Feiticeiro
-    // nao tinham troca nenhuma aqui.
+    // ATÉ AQUI este bloco decidia com `trocaNoDescansoLongo(char.classe)`,
+    // o ESPELHO da classe INICIAL -- pelo livro, um Clérigo 5/Druida 5 tem
+    // direito a UMA troca de magia por classe conjuradora (Classes.md:3290
+    // Guardião, :5511 Paladino, :4610 Mago), e o app só oferecia uma, da
+    // classe que por acaso veio primeiro. `trocasDoDescansoLongo`
+    // (regras-preparo-magias.js, Tarefa 1) devolve uma entrada por
+    // SUPERFÍCIE DE CONJURAÇÃO, já na ordem em que o jogador pegou as
+    // classes (por `ordem`) -- inclusive para Cavaleiro Místico/Trapaceiro
+    // Arcano (subclasses conjuradoras de Guerreiro/Ladino, que antes
+    // dependiam de `ehSubClasseConjuradora()` lido à parte, sem nenhum
+    // `char.classe`). ELA RESPONDE SÓ O DIREITO -- quem decide se HÁ
+    // candidata é este arquivo, com `preparadasPorClasse`, logo abaixo.
+    const superficiesLongo = superficiesDaFicha(char);
+    const trocasLongo = trocasDoDescansoLongo(char, superficiesLongo);
+    // ehSuperficieUnica: personagem com UMA SÓ classe conjuradora no total
+    // (independente de candidata) -- é a condição certa de "classe única",
+    // NÃO `passosMagia.length === 1` (achado Important 1 da rodada 1 de
+    // correção desta tarefa). `passosMagia` pode chegar a UM elemento
+    // também num multiclasse onde só uma classe tem candidata sobrando
+    // (Oráculo 4) -- nesse caso `opcoes.classe` continua obrigatório (a
+    // superfície ATIVA por padrão pode ser a OUTRA classe, sem candidata
+    // nenhuma). Só quando há uma ÚNICA superfície no personagem inteiro é
+    // que omitir `opcoes.classe` é seguro E preserva o texto de sempre:
+    // com uma só superfície, `superficieDaTroca`/`superficieAtivaDaFicha`
+    // não têm outra classe para escolher errado.
+    const ehSuperficieUnica = superficiesLongo.length === 1;
+
+    // Portão de cada passo de troca de MAGIA: só entra na cadeia quem TEM o
+    // direito (`podeTrocarMagia`) E alguma CANDIDATA de verdade a sair --
+    // exatamente `desta ∪ semClasse` com `circulo > 0`, o mesmo critério que
+    // `mostrarTrocaMagiaConhecida` (grimorio.js) usa por dentro para montar
+    // a lista de "Magia a remover". Portão e lista têm de concordar: um
+    // portão que libere onde a lista chega vazia abre um beco sem saída já
+    // consertado três vezes nesta branch (generaliza o antigo
+    // `temMagiaParaTrocar`, de UMA classe para N).
     //
-    // Guerreiro e Ladino nao sao classes conjuradoras: conjuram por
-    // subclasse, e a regra deles vem do texto da subclasse -- por isso
-    // `ehSubConj` continua entrando por fora, com o comportamento que ja
-    // tinha (tambem uma magia so).
-    // NAO E CONVERSAO DE LEITURA (mesmo bloco de infoClasse acima, mesmo
-    // motivo): `trocaNoDescansoLongo(char.classe)` e os rótulos "Como Classe
-    // (Subclasse), você pode trocar..." abaixo continuam lendo a
-    // classe/subclasse INICIAL. Ver comentário de `infoClasse`, logo acima,
-    // para o porquê (trocaNoDescansoLongo recebe UM nome de classe; um
-    // multiclasse com duas classes conjuradoras tem direito a uma troca por
-    // classe, pelo livro -- virou sub-projeto próprio, ver task-9-report.md).
-    const temTrocaMagia = trocaNoDescansoLongo(char.classe) === 'uma' || ehSubConj;
-    // Troca de truque no Descanso Longo (2026-08-13): antes NAO era
-    // oferecida a ninguem aqui -- so existia na subida de nivel
-    // (levelup-cards.js). Decisao do dono do produto: vale para toda classe
-    // conjuradora, nas duas ocasioes. Depende de haver truque de classe
-    // trocavel (truquesTrocaveis, grimorio.js) -- um Paladino sem
-    // Combatente Abencoado, por exemplo, nao tem nenhum e nao ve a opcao.
-    const temTrocaTruque = (infoClasse.conjurador || ehSubConj) && truquesTrocaveis().length > 0;
+    // RISCO NOMEADO -- magia SEM carimbo de classe (`semClasse`) é
+    // candidata de TODAS as classes conjuradoras, porque genuinamente não
+    // se sabe de quem ela é (o estado misto é permanente, ver docblock de
+    // `preparadasPorClasse`, regras-magia-classe.js). Num Clérigo/Druida
+    // com só magias sem carimbo, os dois passos oferecerão as MESMAS
+    // candidatas, e o jogador poderia escolher a mesma magia para sair em
+    // cada um dos dois passos. DECISÃO (Tarefa 3): deixar acontecer -- o
+    // DIREITO a duas trocas existe (é a CLASSE que muda entre os passos,
+    // não a lista de candidatas), e qual magia sai de qual passo é escolha
+    // do jogador, não deste código. Impedir a repetição exigiria a cadeia
+    // lembrar o que um passo anterior escolheu ANTES do jogador confirmar
+    // -- mas a cadeia é sequencial pelo callback de fechamento do modal
+    // (`prox`), sem estado compartilhado entre passos, e inventar esse
+    // estado só para o caso raro de fichas sem carimbo nenhum não parecia
+    // valer a complexidade extra.
+    const passosMagia = trocasLongo.filter((entrada) => {
+      if (!entrada.podeTrocarMagia) return false;
+      const candidatas = preparadasPorClasse(char, entrada.classe);
+      return [...candidatas.desta, ...candidatas.semClasse].some((m) => m.circulo > 0);
+    });
+    const temTrocaMagia = passosMagia.length > 0;
+
+    // Troca de TRUQUE: continua UMA por personagem, não uma por classe --
+    // decisão já tomada (task-3-brief.md, item 3), não rediscutida aqui.
+    // `char.magias_conhecidas[]` (os truques) NÃO tem o campo `classe` que
+    // o sub-projeto anterior ("magia sabe a classe") carimbou só em
+    // `magias_preparadas[]` -- sem esse dado não há como saber de qual
+    // classe é cada truque conhecido, e oferecer uma troca por classe
+    // mostraria as MESMAS candidatas em dois modais, cada um dizendo ser de
+    // uma classe diferente: o defeito oposto, e pior. A ELEGIBILIDADE
+    // generaliza para N classes (alguma entrada tem `podeTrocarTruque`, em
+    // vez do espelho `char.classe`/`infoClasse.conjurador`); a troca em si
+    // continua sendo uma só, como hoje.
+    const temTrocaTruque = trocasLongo.some((entrada) => entrada.podeTrocarTruque)
+      && truquesTrocaveis().length > 0;
 
     if (temMaestria || temTrocaMagia || temTrocaTruque) {
       // Montar conteudo do modal conforme opcoes disponiveis
@@ -1428,19 +1491,60 @@ export function setupEventosDescanso() {
         `;
       }
       if (temTrocaMagia) {
-        const rotuloMagia = infoClasse.tipo_conjuracao === 'preparadas' ? 'preparada' : 'conhecida';
-        conteudoModal += `
-          <p style="font-size:0.9rem">Deseja trocar uma magia ${rotuloMagia}?</p>
-          <p style="font-size:0.8rem;color:var(--text-muted)">
-            Como ${escHtml(char.classe)}${ehSubConj ? ' (' + escHtml(char.subclasse) + ')' : ''}, você pode trocar <strong>1 magia ${rotuloMagia}</strong> por outra da lista de classe após um Descanso Longo. Para remontar a lista inteira, use a subida de nível.
-          </p>
-        `;
+        if (passosMagia.length === 1) {
+          // Superfície única: texto IDÊNTICO ao de antes desta tarefa (byte
+          // a byte) -- não-regressão da maioria dos personagens, que nunca
+          // veem uma segunda classe conjuradora. `unico.classe`/
+          // `.subclasse`/`.rotuloMagia` vêm da ENTRADA (trocasDoDescansoLongo),
+          // não do espelho `char.classe`/`char.subclasse` -- para um
+          // personagem de classe única as duas fontes sempre concordam; a
+          // diferença só aparece (corretamente) quando a classe que conjura
+          // não é a INICIAL (ex.: Bárbaro 5/Mago 1 -- o espelho diria
+          // "Bárbaro", o certo é "Mago").
+          const [unico] = passosMagia;
+          const subConjUnico = SUBCLASSES_CONJURADORAS.includes(unico.subclasse);
+          conteudoModal += `
+            <p style="font-size:0.9rem">Deseja trocar uma magia ${unico.rotuloMagia}?</p>
+            <p style="font-size:0.8rem;color:var(--text-muted)">
+              Como ${escHtml(unico.classe)}${subConjUnico ? ' (' + escHtml(unico.subclasse) + ')' : ''}, você pode trocar <strong>1 magia ${unico.rotuloMagia}</strong> por outra da lista de classe após um Descanso Longo. Para remontar a lista inteira, use a subida de nível.
+            </p>
+          `;
+        } else {
+          // Duas ou mais classes conjuradoras: uma linha por classe, para o
+          // jogador ver de antemão QUANTAS trocas o botão único "Trocar
+          // Magias" vai encadear, e de qual classe cada uma é -- a cadeia
+          // em si (PASSOS, abaixo) é quem garante que todas acontecem.
+          conteudoModal += `
+            <p style="font-size:0.9rem">Deseja trocar suas magias?</p>
+            <p style="font-size:0.8rem;color:var(--text-muted)">
+              Você tem <strong>${passosMagia.length} trocas de magia disponíveis</strong>, uma por classe conjuradora, após um Descanso Longo:
+            </p>
+            <ul style="font-size:0.8rem;color:var(--text-muted);margin:4px 0 0 18px;padding:0">
+              ${passosMagia.map((p) => `<li>${escHtml(p.classe)}: 1 magia ${p.rotuloMagia}</li>`).join('')}
+            </ul>
+          `;
+        }
       }
       if (temTrocaTruque) {
+        // Fonte da classe no rótulo: a MESMA que `mostrarTrocaTruque` vai
+        // resolver de fato quando o botão abrir -- sem `opcoes.classe`
+        // (a troca de truque continua UMA só, ver comentário de
+        // `temTrocaTruque` acima), ela cai na superfície ATIVA
+        // (`superficieAtivaDaFicha`, contexto-classe.js), NUNCA no espelho
+        // `char.classe` -- que é sempre a classe INICIAL e não muda com o
+        // seletor de aba da ficha. Para classe única as duas fontes sempre
+        // concordam (rótulo idêntico ao de antes desta tarefa); num
+        // multiclasse o rótulo passa a nomear a classe que a lista de
+        // verdade vai usar. Sem fallback para `char.classe`: `temTrocaTruque`
+        // só é true com `superficiesLongo` não vazio (alguma entrada tem
+        // `podeTrocarTruque`), então `superficieAtivaDaFicha(char)` --que
+        // cai na primeira superfície quando nada foi selecionado-- nunca
+        // devolve null neste ponto.
+        const classeTruque = superficieAtivaDaFicha(char).classe;
         conteudoModal += `
           <p style="font-size:0.9rem">Deseja trocar um truque?</p>
           <p style="font-size:0.8rem;color:var(--text-muted)">
-            Você pode trocar <strong>1 truque</strong> por outro da lista de ${escHtml(char.classe)} após um Descanso Longo.
+            Você pode trocar <strong>1 truque</strong> por outro da lista de ${escHtml(classeTruque)} após um Descanso Longo.
           </p>
         `;
       }
@@ -1458,25 +1562,57 @@ export function setupEventosDescanso() {
 
       abrirModal('Descanso Longo Concluído', conteudoModal, botoesModal);
 
-      // Funcao auxiliar para abrir o modal de troca correto
-      // Uma rota so: o Descanso Longo troca UMA magia para todo mundo.
-      // `mostrarTrocaMagiaConhecida` le `char.magias_preparadas` e serve
-      // igual a conjurador preparado -- o que muda e so o rotulo.
-      const abrirTrocaMagias = (callbackPos) => mostrarTrocaMagiaConhecida(callbackPos);
-
       // Encadeamento das trocas do Descanso Longo.
       //
       // Eram duas opcoes (maestria e magia) encadeadas na mao, uma chamando
       // a outra pelo callback. Com a terceira (truque, 2026-08-13) o
       // encadeamento par-a-par viraria seis combinacoes escritas a mao --
       // e a que faltasse sumiria em silencio. Aqui a ordem e fixa
-      // (maestria -> magia -> truque) e cada botao roda dali para a frente:
-      // quem clica "Trocar Magias" ainda recebe a troca de truque depois.
+      // (maestria -> magia(s) -> truque) e cada botao roda dali para a
+      // frente: quem clica "Trocar Magias" ainda recebe a troca de truque
+      // depois.
+      //
+      // TAREFA 3 (sub-projeto 2026-08-29-troca-por-classe-descanso): o
+      // passo unico `'magia'` virou UM PASSO POR CLASSE de `passosMagia`,
+      // na MESMA ordem (por `ordem`, a ordem em que o jogador pegou as
+      // classes) -- e cada um abre `mostrarTrocaMagiaConhecida`, com
+      // `opcoes.classe` da propria entrada QUANDO HA MAIS DE UMA
+      // superficie de conjuracao no personagem (ve-se abaixo, no `abrir`
+      // de cada passo: `ehSuperficieUnica` chama SEM `opcoes.classe`, para
+      // preservar o texto de sempre da maioria dos personagens). Com
+      // `opcoes.classe`, o modal resolve a superficie dela e nomeia a
+      // classe no titulo (grimorio.js), em vez da rota unica de antes
+      // (`abrirTrocaMagias`, sem classe nenhuma). A chave de cada passo
+      // usa o NOME DA CLASSE (`magia-${classe}`) -- unica por construcao,
+      // ja que `trocasDoDescansoLongo` devolve no maximo uma entrada por
+      // classe.
       const PASSOS = [
         { chave: 'maestria', ativo: temMaestria, abrir: (prox) => abrirModalTrocaMaestriaDescanso(prox) },
-        { chave: 'magia', ativo: temTrocaMagia, abrir: (prox) => abrirTrocaMagias(prox) },
+        ...passosMagia.map((entrada) => ({
+          chave: `magia-${entrada.classe}`,
+          ativo: true,
+          // Com UMA superfície só no personagem inteiro (`ehSuperficieUnica`),
+          // chama SEM `opcoes.classe` -- exatamente a chamada de antes desta
+          // tarefa (`mostrarTrocaMagiaConhecida(callbackPos)`), então título
+          // E explicação do sub-modal saem IDÊNTICOS aos de sempre (achado
+          // Important 1 da rodada 1: a condição errada, `passosMagia.length
+          // === 1`, também disparava para um multiclasse reduzido a um
+          // passo só, regredindo o texto para a maioria esmagadora dos
+          // personagens -- que são de classe única). Com mais de uma
+          // superfície, `opcoes.classe` é obrigatório mesmo com um só
+          // passo (Oráculo 4): a superfície ATIVA por padrão pode ser
+          // OUTRA classe, sem candidata nenhuma.
+          abrir: (prox) => ehSuperficieUnica
+            ? mostrarTrocaMagiaConhecida(prox)
+            : mostrarTrocaMagiaConhecida(prox, { classe: entrada.classe }),
+        })),
         { chave: 'truque', ativo: temTrocaTruque, abrir: (prox) => mostrarTrocaTruque(prox) },
       ].filter(p => p.ativo);
+      // Chave do PRIMEIRO passo de magia -- e onde o botao unico "Trocar
+      // Magias" inicia a cadeia (item 5 do brief: um botao so, nunca um
+      // por classe). `null` quando temTrocaMagia e falso; o botao nem
+      // existe nesse caso (ver botoesModal acima), entao nunca e lido.
+      const primeiraChaveMagia = passosMagia.length > 0 ? `magia-${passosMagia[0].classe}` : null;
 
       /**
        * Monta a cadeia de modais a partir de `chave` (inclusive) e a inicia.
@@ -1503,7 +1639,7 @@ export function setupEventosDescanso() {
       });
       document.getElementById('btn-trocar-magias-dl')?.addEventListener('click', () => {
         window.fecharModal();
-        iniciarTrocasAPartirDe('magia');
+        iniciarTrocasAPartirDe(primeiraChaveMagia);
       });
       document.getElementById('btn-trocar-truque-dl')?.addEventListener('click', () => {
         window.fecharModal();

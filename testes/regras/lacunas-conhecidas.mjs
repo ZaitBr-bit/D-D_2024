@@ -1010,8 +1010,24 @@ export const LACUNAS = [
   // separadas, que hp-descanso.js consulta por `trocaNoDescansoLongo(classe)`.
   // Guerreiro e Ladino não estão na tabela (conjuram por subclasse, e a regra
   // vem do texto dela), então continuam entrando por fora, com o
-  // comportamento que já tinham. O modal de troca de UMA passou a dizer
-  // "1 magia preparada" para conjurador preparado, em vez de "conhecida".
+  // comportamento que já tinham.
+  //
+  // REGISTRO CORRIGIDO (revisão final, 2026-08-29, sub-projeto
+  // "troca-por-classe-descanso"): a frase anterior desta entrada afirmava
+  // que o modal de troca de UMA "passou a dizer '1 magia preparada' para
+  // conjurador preparado, em vez de 'conhecida'". Isso NUNCA foi verdade
+  // além do Mago -- a palavra vem de `ehMago = !!sup?.usaGrimorio`
+  // (site/js/sheet/grimorio.js), não de `tipo_conjuracao`/`rotuloMagia`, e
+  // `usaGrimorio` só é `true` para o Mago (regras-multiclasse-conjuracao.js:
+  // `c.classe === 'Mago'`). Clérigo, Druida, Guardião e Paladino -- os
+  // outros quatro conjuradores PREPARADOS que este conserto também tocou --
+  // caem no mesmo ramo "conhecida" que Bardo/Bruxo/Feiticeiro, desde o
+  // mesmo commit (git log -S confirma uma origem única, 2026-08-19). Um
+  // registro falso é pior que nenhum: foi ele que deixou o defeito passar
+  // dez dias sem ser notado aqui. O defeito em si é PRÉ-EXISTENTE, atinge
+  // classe única também, e é tarefa própria -- não foi corrigido nesta
+  // rodada (ver testes/e2e/regras/troca-descanso-por-classe.spec.mjs,
+  // comentário do cenário 5, para o registro completo do mecanismo).
   //
   // O INSTRUMENTO MEDIA UMA CÓPIA, e por isso não teria enxergado o conserto:
   // o motor repetia as expressões de hp-descanso.js dentro do próprio teste

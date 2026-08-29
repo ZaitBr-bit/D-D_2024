@@ -1052,9 +1052,9 @@ const ESCRITAS_PERMITIDAS = new Set([
   // de Fonte de Magia são efêmeros por natureza (concedidos e limpos a
   // cada Descanso Longo), e nenhuma tarefa do sub-projeto 4 lhes dá um
   // escritor único.
-  'site/js/sheet/hp-descanso.js:983',       // char.espacos_magia_extras = {} (limpa no Longo) -- número atualizado pela Tarefa 8 (comentários acrescentados acima deslocaram a linha)
-  'site/js/sheet/habilidades.js:923',       // if (!extras) extras = {}  (Fonte de Magia) -- número de linha atualizado pela Tarefa 4 (Ruling 11)
-  'site/js/sheet/habilidades.js:924',       // extras[c] = (extras[c] || 0) + 1  (Fonte de Magia) -- idem
+  'site/js/sheet/hp-descanso.js:1014',      // char.espacos_magia_extras = {} (limpa no Longo) -- número atualizado pela Tarefa 3 do sub-projeto 2026-08-29-troca-por-classe-descanso (imports novos no topo do arquivo deslocaram a linha; era 1009)
+  'site/js/sheet/habilidades.js:933',       // if (!extras) extras = {}  (Fonte de Magia) -- número de linha reapontado pela rodada 1 de correção da Tarefa 6 (import de superficieAtivaDaFicha e comentário do portão de Memorizar Magia acrescentados acima)
+  'site/js/sheet/habilidades.js:934',       // extras[c] = (extras[c] || 0) + 1  (Fonte de Magia) -- idem
   // habilidades.js: Resplendor Sagrado (Paladino/Devoção), Fonte de Magia
   // (Feiticeiro) e Recuperação Arcana (Mago) foram convertidos na Tarefa 4
   // (Ruling 11 do controlador) para gastarEspaco/recuperarUmEspaco/

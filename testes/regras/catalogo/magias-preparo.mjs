@@ -46,6 +46,30 @@ export const TROCA_POR_CLASSE = [
  *   - Descanso Longo: toda classe conjuradora troca UMA magia e UM truque.
  *   - Subida de nível: troca QUANTAS quiser, magias e truques.
  *   - Nas duas, o que o personagem sempre tem preparado fica de fora.
+ *
+ * O sujeito de cada linha abaixo é a CLASSE, não o personagem: um
+ * personagem com duas classes conjuradoras (ex.: Clérigo 5/Druida 5) aplica
+ * esta linha duas vezes, uma por classe -- duas trocas de MAGIA, não uma só.
+ * Isto não é uma decisão nova; é a mesma tabela, lida por classe, para cada
+ * classe que o personagem tem (`site/js/regras-preparo-magias.js:
+ * trocasDoDescansoLongo`).
+ *
+ * ISTO VALE SÓ PARA MAGIA. A troca de TRUQUE continua sendo UMA por
+ * PERSONAGEM, não uma por classe -- mesmo quando ele tem duas ou mais
+ * classes conjuradoras que concedem truque. O motivo é a ausência do campo
+ * `classe` em `char.magias_conhecidas[]` (os truques): sem ele, dois modais
+ * de troca (um por classe) mostrariam as MESMAS candidatas, cada um dizendo
+ * ser de uma classe diferente -- o defeito oposto ao que a troca por classe
+ * existe para consertar. A limitação está documentada no docblock de
+ * `mostrarTrocaTruque` (site/js/sheet/grimorio.js) e a dívida em
+ * docs/PERGUNTAS-PENDENTES.txt. Este catálogo NÃO tem um eixo de "truque" ao
+ * lado de `descansoLongo`/`nivel` -- decisão registrada no relatório da
+ * Tarefa 5 (.superpowers/sdd/2026-08-29-troca-por-classe-descanso/
+ * task-5-report.md): o afastamento aqui não é "quantas trocas por classe"
+ * (isso continua "uma", igual à magia) e sim "aplicado por classe ou por
+ * personagem", uma pergunta de COMPOSIÇÃO entre classes que a chave
+ * `<classe>|<eixo>` de `AFASTAMENTOS_DO_LIVRO` não consegue expressar sem
+ * estrutura nova.
  */
 export const DECISAO_PRODUTO = [
   { classe: 'Bardo', descansoLongo: 'uma', nivel: 'todas' },

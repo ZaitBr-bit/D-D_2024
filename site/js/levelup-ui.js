@@ -21,7 +21,11 @@ import { getArmas, getClasse, getMagiasPorCirculo, getMagiasClasse, getMagiasRit
 import { abrirModal, fecharModal, toast, mdParaHtml, semAcento, calcMod, escHtml, getEspacosMagia, bonusProficiencia } from './utils.js';
 import { subirDeNivel, obterAtributosASITalento, getLimiteASITalento, obterTalentosElegiveis } from './levelup.js';
 import { abrirGridManobras } from './manobras-ui.js';
-import { magiaContaNoLimite, truqueEhTrocavel } from './regras-origens-magia.js';
+import { truqueEhTrocavel } from './regras-origens-magia.js';
+// preparadasPorClasse (Tarefa 4 do sub-projeto "magia sabe a classe"): ver
+// o comentário de `magiasAtuaisNomes`, abaixo, para o achado que esta
+// tarefa corrige.
+import { preparadasPorClasse } from './regras-magia-classe.js';
 import { classeInicial, subclasseDe } from './regras-multiclasse.js';
 import { podeEntrarEm } from './regras-multiclasse-progressao.js';
 import { garantirDadosDeClasses } from './sheet/contexto-classe.js';
@@ -1751,9 +1755,26 @@ function bindEventosMagias(ctx, state) {
       const jaSairam = new Set(state.trocasMagia.map((t) => t.de));
       const jaEntraram = new Set(state.trocasMagia.map((t) => t.para));
 
-      const magiasAtuaisNomes = new Set((ctx.char.magias_preparadas || [])
-        .filter(m => m.circulo > 0 && magiaContaNoLimite(m) && !jaSairam.has(m.nome))
-        .map(m => m.nome));
+      // preparadasPorClasse (Tarefa 4 do sub-projeto "magia sabe a classe"):
+      // as candidatas a SAIR são `desta` ∪ `semClasse` de `ctx.classeQueSobe`
+      // -- NUNCA `deOutra`. ACHADO roteado da revisão da Tarefa 2 (mesmo
+      // sub-projeto): antes, este bloco filtrava só por `magiaContaNoLimite`,
+      // sem olhar de que classe cada preparada era -- num Feiticeiro/Mago,
+      // que compartilham 95% da lista menor, o jogador podia "trocar" uma
+      // magia que pertence ao orçamento do Clérigo (outra classe do mesmo
+      // personagem) e a troca gravava a substituta como Mago (`ctx.
+      // classeQueSobe`, linha da aplicação abaixo), movendo uma magia de um
+      // orçamento para o outro em silêncio -- e agora carimbando essa
+      // mentira no campo novo. `semClasse` entra porque a incerteza (ficha
+      // ainda não migrada, ou migração que não pôde decidir) não pode virar
+      // bloqueio de uma troca válida -- mesma regra do BLOQUEIO que os
+      // contadores da ficha usam (sheet/grimorio.js, sheet/magias.js).
+      const { desta: candidatasDesta, semClasse: candidatasSemClasse } =
+        preparadasPorClasse(ctx.char, ctx.classeQueSobe);
+      const magiasAtuaisNomes = new Set(
+        [...candidatasDesta, ...candidatasSemClasse]
+          .filter(m => m.circulo > 0 && !jaSairam.has(m.nome))
+          .map(m => m.nome));
       // As que ENTRARAM por uma troca anterior tambem podem sair numa
       // seguinte -- o jogador mudou de ideia -- mas so depois de aplicadas.
       // Aqui elas ainda nao estao em `magias_preparadas`, entao entram pela
@@ -2038,7 +2059,10 @@ export async function confirmarLevelUp(ctx, state, caches) {
       const m = listaMagiasClasse.find(x => x.nome === nome);
       if (m && !char.magias_preparadas?.find(x => x.nome === nome)) {
         if (!char.magias_preparadas) char.magias_preparadas = [];
-        char.magias_preparadas.push({ nome, circulo: m.circulo });
+        // ctx.classeQueSobe, nunca o espelho char.classe: a magia aprendida
+        // aqui e da classe em que o nivel esta entrando, que num multiclasse
+        // pode nao ser a classe inicial do personagem.
+        char.magias_preparadas.push({ nome, circulo: m.circulo, ...(ctx.classeQueSobe ? { classe: ctx.classeQueSobe } : {}) });
         magiasAdicionadas.push(nome);
       }
     });
@@ -2058,7 +2082,9 @@ export async function confirmarLevelUp(ctx, state, caches) {
       if (idx !== undefined && idx !== -1) {
         trocasMagiaAplicadas.push(troca);
         char.magias_preparadas.splice(idx, 1);
-        char.magias_preparadas.push({ nome: troca.para, circulo: troca.circulo });
+        // ctx.classeQueSobe: a magia que entra na troca e da MESMA classe da
+        // que saiu, e as duas sao da classe que esta subindo neste momento.
+        char.magias_preparadas.push({ nome: troca.para, circulo: troca.circulo, ...(ctx.classeQueSobe ? { classe: ctx.classeQueSobe } : {}) });
       }
     }
 

@@ -88,7 +88,7 @@ export async function modulosApp() {
          levelupCards, regrasSubclasseEscolhas, regrasOrigensMagia,
          regrasConjuracaoSubclasse, regrasSalvaguardas, fichaEdicoes, fichaEdicaoValidacoes,
          multiclasse, home, multiclasseConjuracao, multiclasseProgressao, contextoClasse,
-         sheetCaracteristicas, sheetFicha, proficiencias,
+         sheetCaracteristicas, sheetFicha, proficiencias, magiaClasse, regrasPreparoMagias,
          // As 11 classes restantes (Mago ja entra acima, como sheetMago, para o
          // motor de subclasses conjuradoras) -- reunidas em sheetClasses logo
          // abaixo, uma entrada por classe, para os oraculos de multiclasse-render
@@ -154,6 +154,17 @@ export async function modulosApp() {
     // oraculos de multiclasse-proficiencias.test.mjs via
     // `proficiencias.concessoesDaClasse` etc.
     importar('site/js/regras-multiclasse-proficiencias.js'),
+    // Tarefa 1 do sub-projeto 2026-08-29-magia-sabe-a-classe: a peca pura
+    // "de que classe e esta magia preparada?", consumida pelos oraculos de
+    // magia-classe.test.mjs via magiaClasse.classeDaMagiaPreparada() e
+    // magiaClasse.nomesDaListaDeMagias().
+    importar('site/js/regras-magia-classe.js'),
+    // Tarefa 1 do sub-projeto 2026-08-29-troca-por-classe-descanso: a peca
+    // pura "quais trocas de magia/truque este personagem tem direito no
+    // Descanso Longo?", consumida pelos oraculos de
+    // troca-descanso-por-classe.test.mjs via
+    // regrasPreparoMagias.trocasDoDescansoLongo(personagem, superficies).
+    importar('site/js/regras-preparo-magias.js'),
     importar('site/js/sheet/classes/barbaro.js'),
     importar('site/js/sheet/classes/bardo.js'),
     importar('site/js/sheet/classes/bruxo.js'),
@@ -185,7 +196,8 @@ export async function modulosApp() {
              regrasOrigensMagia, regrasConjuracaoSubclasse, regrasSalvaguardas,
              fichaEdicoes, fichaEdicaoValidacoes, multiclasse, home, multiclasseConjuracao,
              multiclasseProgressao, contextoClasse, sheetCaracteristicas, sheetFicha,
-             proficiencias, sheetClasses, sheetHabilidades, sheetMaestrias, sheetHpDescanso };
+             proficiencias, magiaClasse, regrasPreparoMagias, sheetClasses, sheetHabilidades,
+             sheetMaestrias, sheetHpDescanso };
   return _cache;
 }
 

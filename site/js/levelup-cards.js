@@ -9,7 +9,10 @@ import { rotuloPericia } from './opcoes-dominio.js';
 import { obterTalentosElegiveis } from './levelup.js';
 import { calcularConjuracao, calcularSubclasseArcana, escolhasSubclasseDoNivel } from './levelup-flow.js';
 import { opcoesDaLinha } from './regras-subclasse-escolhas.js';
-import { magiaContaNoLimite, truqueEhTrocavel } from './regras-origens-magia.js';
+import { truqueEhTrocavel } from './regras-origens-magia.js';
+// preparadasPorClasse (Item 1 da revisão final do sub-projeto "magia sabe a
+// classe"): ver uso perto de `magiasAtuais`, em renderCardMagias.
+import { preparadasPorClasse } from './regras-magia-classe.js';
 import { classesDe } from './regras-multiclasse.js';
 import { podeEntrarEm } from './regras-multiclasse-progressao.js';
 // INSTRUMENTOS_MUSICAIS vem de regras-cobertura.js, NUNCA de
@@ -695,9 +698,21 @@ export function renderCardMagias(ctx, state) {
   // ao subir de nivel quanto no Descanso Longo. O bloco que APLICA a troca
   // (levelup-ui.js, "Troca") ja era gated so por `ctx.ehConjurador`, entao
   // nao precisou mudar junto.
-  const magiasAtuais = (char.magias_preparadas || []).filter(m => {
-    return m.circulo > 0 && magiaContaNoLimite(m);
-  });
+  // preparadasPorClasse (Item 1 da revisão final do sub-projeto "magia sabe
+  // a classe"): este portão contava `magiaContaNoLimite` sobre o
+  // personagem INTEIRO, enquanto a lista que o próprio card monta (bloco
+  // "Trocar Magias (Opcional)" acima, aplicado por
+  // levelup-ui.js/montarBlocoTrocaMagia) já filtra por `classeQueSobe`. Num
+  // Feiticeiro 5/Mago 1 (95% de lista em comum) com as preparadas todas
+  // carimbadas da OUTRA classe, este portão dizia "sim" e o seletor "Qual
+  // magia sai?" abria com zero candidatas -- o mesmo beco sem saída já
+  // consertado em sheet/hp-descanso.js (Achado 3 da rodada 1 da Tarefa 4).
+  // `desta ∪ semClasse` é a MESMA expressão de montarBlocoTrocaMagia;
+  // `classeQueSobe` (não o espelho `char.classe`) porque é a classe em que
+  // o nível ENTRA -- mesmo raciocínio do comentário no topo desta função.
+  const candidatasTrocaNivel = preparadasPorClasse(char, classeQueSobe);
+  const magiasAtuais = [...candidatasTrocaNivel.desta, ...candidatasTrocaNivel.semClasse]
+    .filter(m => m.circulo > 0);
   if (magiasAtuais.length > 0) {
     // O Mago troca DENTRO do grimorio: preparar uma magia que nao esta no
     // livro contradiz normalizarGrimorioMago (utils.js) e o proprio modal

@@ -148,14 +148,39 @@ export function nomesMagiaCirculo1Conhecidas(personagem) {
  * classe" -- decisão tomada, não esquecimento). O portão `personagem.classe
  * !== 'Mago'` lê o ESPELHO de propósito: ela empurra para dentro de
  * `personagem.grimorio` toda magia de `magias_preparadas` com círculo > 0
- * que passe em `magiaContaNoLimite` (linhas abaixo), e `magias_preparadas[]`
- * NÃO TEM campo de classe -- é exatamente o campo que o dono do produto
- * adiou (docs/PERGUNTAS-PENDENTES.txt, "MAGIA PREPARADA NAO SABE DE QUE
- * CLASSE E"). Trocar o portão por `temClasse(personagem, 'Mago')` faria um
- * Clérigo 5/Mago 1 copiar as magias PREPARADAS DO CLÉRIGO para dentro do
- * grimório do Mago -- corrupção de ficha, não conversão de leitura. Só é
- * seguro reabrir isto depois que `magias_preparadas[].classe` existir.
+ * que passe em `magiaContaNoLimite` (linhas abaixo). Trocar o portão por
+ * `temClasse(personagem, 'Mago')` faria um Clérigo 5/Mago 1 copiar as
+ * magias PREPARADAS DO CLÉRIGO para dentro do grimório do Mago --
+ * corrupção de ficha, não conversão de leitura.
  *
+ * ATUALIZAÇÃO (sub-projeto "magia sabe a classe", que fechou o adiamento de
+ * docs/PERGUNTAS-PENDENTES.txt "MAGIA PREPARADA NAO SABE DE QUE CLASSE E"):
+ * `magias_preparadas[].classe` agora EXISTE, mas isso NÃO destrava o portão
+ * acima. O campo é OPCIONAL -- ausente ou string não vazia, nunca chute --
+ * e a migração só carimba o que dá para saber com certeza (RULING R-B, classe
+ * única; ou lista de magias bater com exatamente uma classe do multiclasse).
+ * O estado misto (parte carimbada, parte sem carimbo) é PERMANENTE por
+ * decisão de projeto, não uma fase de transição: magia personalizada, lista
+ * ausente do app, ou multiclasse ambíguo (ex.: Feiticeiro/Mago, que
+ * compartilham 95% da lista menor) nunca recebem carimbo. Para essas
+ * entradas sem `classe`, o perigo de empurrar a magia errada para o
+ * grimório é IDÊNTICO ao de antes do campo existir.
+ *
+ * Ou seja: o campo novo resolve o problema só pela METADE. CONVERTER ESTE
+ * PORTÃO MECANICAMENTE (`personagem.classe !== 'Mago'` ->
+ * `!temClasse(personagem, 'Mago')`, sem tocar no laço de empurrar) CONTINUA
+ * SENDO CORRUPÇÃO DE FICHA: um Clérigo 5/Mago 1 ainda teria as preparadas
+ * SEM carimbo (e as carimbadas `'Clérigo'`) copiadas para o grimório do
+ * Mago. Não destrave isto por causa desta atualização.
+ *
+ * Um destravamento seguro existe, mas exige as DUAS metades juntas, não só
+ * o portão: (1) `temClasse(personagem, 'Mago')` no portão, E (2) o laço de
+ * empurrar filtrando por `magia.classe === 'Mago'` (nunca `semClasse`, nunca
+ * `deOutra`) -- exatamente `preparadasPorClasse(personagem, 'Mago').desta`,
+ * de `regras-magia-classe.js`. Fica registrado aqui como possibilidade para
+ * um sub-projeto futuro, não como pedido de mudança desta função.
+ *
+
  * @param {object} personagem
  * @param {number} [limitePreparadas]
  * @returns {{alterado: boolean, pendentes: number}}
@@ -558,14 +583,13 @@ export function calcAtaqueMagia(personagem) {
  * ela: com Sab 16 e Int 10, três pontos acima do certo, em toda
  * conjuração. Esta função devolve as duas, para a tela mostrar as duas.
  *
- * O QUE ELA NÃO RESOLVE. Qual das entradas vale para uma magia
- * ESPECÍFICA continua indeterminado no modelo de dados:
- * `char.magias_preparadas` guarda `{nome, circulo, origem?}` e `origem`
- * distingue domínio/sempre-preparada, não classe. Ligar magia -> classe
- * exige campo novo (`magias_preparadas[].classe`) e migração que
- * carimbe as fichas existentes -- sub-projeto próprio, registrado em
- * docs/PERGUNTAS-PENDENTES.txt. Até lá o jogador lê a caixa da classe
- * certa, que é o que uma ficha de papel também exige dele.
+ * O QUE ELA NÃO RESOLVE SOZINHA. Qual das entradas vale para uma magia
+ * ESPECÍFICA: o sub-projeto "magia sabe a classe" (docs/PERGUNTAS-PENDENTES.txt)
+ * acrescentou `magias_preparadas[].classe` e resolve isso para toda entrada
+ * CARIMBADA (via `preparadasPorClasse`, regras-magia-classe.js); para as
+ * entradas sem carimbo -- estado permanente, não fase de transição -- a
+ * pergunta continua indeterminada, e o jogador lê a caixa da classe certa,
+ * que é o que uma ficha de papel também exige dele.
  *
  * Bônus de proficiência é do nível TOTAL nas duas colunas, por regra
  * (livro:2047) -- o que varia entre as entradas é só o modificador de

@@ -13,13 +13,80 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.25';
+export const VERSAO_ATUAL = '2.2.27';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '2.2.27',
+    data: '2026-08-29',
+    rotulo: 'Trocas por classe',
+    resumo: 'A troca de magia do Descanso Longo passa a valer por classe '
+      + 'conjuradora. Quem tem duas ou mais classes que conjuram ganha uma '
+      + 'troca de magia de CADA uma, em modais separados que dizem de qual '
+      + 'classe é cada troca.',
+    melhorias: [
+      {
+        grupo: '🔄 Troca por classe no Descanso Longo',
+        itens: [
+          'Um personagem com duas ou mais classes conjuradoras (ex.: '
+            + 'Clérigo 5/Druida 5) passa a poder trocar uma magia de CADA '
+            + 'classe ao terminar um Descanso Longo, não mais só uma para '
+            + 'o personagem inteiro. Cada modal da cadeia diz de qual '
+            + 'classe é aquela troca.',
+          'A troca de truque continua sendo uma só por personagem, mesmo '
+            + 'com duas ou mais classes conjuradoras -- a ficha ainda não '
+            + 'guarda de qual classe é cada truque conhecido.',
+        ],
+      },
+    ],
+  },
+  {
+    versao: '2.2.26',
+    data: '2026-08-29',
+    rotulo: 'Contador por classe',
+    resumo: 'A magia preparada passa a saber de que classe é. O contador da '
+      + 'classe ativa deixa de somar as magias das outras, fichas antigas '
+      + 'são carimbadas sozinhas no que dá para saber com certeza, e o que '
+      + 'for ambíguo num multiclasse fica marcado "sem classe" em vez de '
+      + 'receber um palpite.',
+    melhorias: [
+      {
+        grupo: '🏷️ Magia preparada sabe a classe',
+        itens: [
+          'Cada magia preparada pode agora guardar de qual classe ela é. '
+            + 'Fichas antigas são carimbadas automaticamente ao abrir, sempre '
+            + 'que dá para saber com certeza; quando não dá (magia '
+            + 'personalizada, ou multiclasse com listas parecidas, como '
+            + 'Feiticeiro/Mago), a magia fica marcada "sem classe" em vez de '
+            + 'ganhar um chute.',
+          'O contador de preparadas da classe ativa passa a contar só as '
+            + 'magias DELA. Um Clérigo 5/Mago 1 via o limite do Clérigo somado '
+            + 'às magias do Mago; agora os dois números não se misturam.',
+        ],
+      },
+    ],
+    correcoes: [
+      {
+        grupo: '🚪 Fluxos que abriam vazios',
+        itens: [
+          'O card "Trocar Magias" da subida de nível e o botão "Trocar '
+            + 'Magia Preparada" do Mago (nível 5) podiam aparecer sem ter '
+            + 'nenhuma magia para oferecer: contavam a ficha inteira, '
+            + 'enquanto a lista por trás já filtrava pela classe certa. Os '
+            + 'dois lados passam a concordar.',
+          'O aviso "sem classe" do modal de gerenciar magias congelava o '
+            + 'número depois de adicionar ou remover a última magia sem '
+            + 'carimbo. Agora acompanha a mudança.',
+          'O alarme de "limite excedido" do modal de gerenciar magias nunca '
+            + 'aparecia -- uma checagem cobria a outra por engano. Corrigido.',
+        ],
+      },
+    ],
+  },
   {
     versao: '2.2.25',
     data: '2026-08-29',

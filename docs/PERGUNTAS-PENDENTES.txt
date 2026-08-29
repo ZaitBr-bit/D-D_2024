@@ -1889,18 +1889,44 @@ com ela -- com Sab 16 e Int 10, tres pontos acima do certo em toda conjuracao.
 Agora mostra as duas, nomeadas. O selo de atributo de conjuracao nos Atributos
 tambem passou a marcar todos os atributos envolvidos, nao so o da inicial.
 
-O QUE CONTINUA EM ABERTO. QUAL das entradas vale para uma magia ESPECIFICA. O
-modelo de dados nao guarda a classe de origem: char.magias_preparadas e
+[CORRIGIDO 2026-08-29, sub-projeto "magia sabe a classe"]
+QUAL das entradas vale para uma magia ESPECIFICA -- estava em aberto porque o
+modelo de dados nao guardava a classe de origem: char.magias_preparadas era
 {nome, circulo, origem?, personalizada?} e `origem` distingue dominio /
-sempre-preparada, nao classe (site/js/sheet/magias.js). Ligar magia -> classe
-exige campo novo (magias_preparadas[].classe) e migracao que carimbe a classe
-nas fichas existentes -- e a migracao tem de decidir o que fazer com uma ficha
-multiclasse ja existente, onde a informacao simplesmente nao existe (a escolha
-provavel e carimbar a classe inicial e deixar o jogador corrigir).
+sempre-preparada, nao classe.
 
-Ate la, o jogador le a caixa da classe certa, que e o que uma ficha de papel
-tambem exige dele. O app nao rola salvaguardas nem ataques de magia sozinho,
-entao nao ha ponto onde ele escolha a CD errada por conta propria.
+A PROPOSTA ORIGINAL DESTA ENTRADA FOI DESCARTADA. O paragrafo acima cogitava
+"carimbar a classe inicial e deixar o jogador corrigir" -- um CHUTE. A
+medicao feita antes de decidir mostrou que chutar erraria com frequencia: dos
+8 arquivos dados/classes/magias_*.json (391 magias distintas), so 24,6%
+aparecem numa UNICA classe, e as duplas de multiclasse que mais importam sao
+justamente as piores: Feiticeiro/Mago compartilham 95% da lista menor,
+Bruxo/Mago 89%, Bardo/Mago 74%, Clerigo/Paladino 69%. Carimbar a classe
+inicial erraria a maioria dessas magias num multiclasse, e dado errado e pior
+que dado ausente -- o app passaria a exibir limite por classe com confianca e
+errado.
+
+O QUE FOI DE FATO CONSTRUIDO: `magias_preparadas[].classe`, campo OPCIONAL
+("sem chute" -- a chave ou esta ausente, ou e uma string nao vazia, nunca
+`null`/`''`). A migracao carimba so o que da para saber com certeza (classe
+unica; ou, em multiclasse, quando a magia aparece na lista de exatamente uma
+das classes conjuradoras do personagem) e deixa sem carimbo o que for
+ambiguo. Esse estado misto -- parte carimbada, parte nao -- e PERMANENTE por
+decisao de projeto, nao uma fase de transicao: uma magia personalizada, uma
+lista que o app nao tem, ou um multiclasse genuinamente ambiguo nunca vao
+ganhar carimbo. `preparadasPorClasse` (site/js/regras-magia-classe.js) e a
+fonte unica que classifica cada magia preparada em tres respostas -- desta
+classe, de outra classe, ou "nao sei" -- e todo leitor da ficha usa essa
+mesma funcao em vez de decidir sozinho.
+
+O jogador continua livre para ler a caixa da classe certa nas entradas sem
+carimbo, que e o que uma ficha de papel tambem exige dele. O app nao rola
+salvaguardas nem ataques de magia sozinho, entao nao ha ponto onde ele
+escolha a CD errada por conta propria.
+
+Conferir: site/js/regras-magia-classe.js (classeDaMagiaPreparada,
+preparadasPorClasse), site/js/sheet/migracoes.js (migrarMagiaClasse),
+testes/regras/unidade/magia-classe*.test.mjs.
 
 [CORRIGIDO 2026-08-28, TAREFA 3 do sub-projeto "tela magias por classe"]
 IRMAO DESTE ITEM, mesma causa: `tipo_conjuracao` ("preparadas" x
@@ -2679,4 +2705,76 @@ e o bloco de comentario "O CONTADOR HONESTO"), site/js/sheet/grimorio.js
 testes/regras/unidade/multiclasse-magias-secao.test.mjs (Oraculos 4 e 4b) e
 testes/regras/unidade/multiclasse-magias-grimorio.test.mjs (Oraculos 4d, 4e e
 4f).
+
+================================================================================
+
+2026-08-29 -- TROCA DE TRUQUE NO DESCANSO LONGO CONTINUA UMA POR PERSONAGEM,
+NAO UMA POR CLASSE
+
+Divida deixada pelo sub-projeto "a troca do Descanso Longo e POR CLASSE"
+(2026-08-29-troca-por-classe-descanso). O RULING 3 do ledger daquele
+sub-projeto ja prometia esta entrada; ela nao tinha sido escrita ate a
+revisao final apontar a falta (achado Important 1, item "consertar agora"
+CA-3).
+
+A troca de MAGIA no Descanso Longo passou a ser uma por classe conjuradora:
+um Clerigo 5/Druida 5 encadeia dois modais e troca uma magia de cada
+classe. A troca de TRUQUE NAO acompanhou -- continua sendo uma so, para o
+personagem inteiro, mesmo com duas ou mais classes conjuradoras que
+concedem truque.
+
+CAMPO QUE FALTA: `classe` em `char.magias_conhecidas[]` (os truques). Cada
+entrada de magias_conhecidas hoje e {nome, circulo, origem?}, sem
+informacao nenhuma de qual classe concedeu o truque.
+
+POR QUE A AUSENCIA IMPEDE A TROCA POR CLASSE: sem o carimbo, dois modais de
+troca de truque (um por classe) ofereceriam exatamente as MESMAS
+candidatas, cada um dizendo ser de uma classe diferente -- o defeito
+OPOSTO ao que a troca por classe existe para consertar, e pior (informacao
+errada, nao so ausente). `truquesTrocaveis()` (site/js/sheet/grimorio.js)
+filtra so por `circulo === 0` e `truqueEhTrocavel`, sem nenhuma referencia
+a classe, porque nao ha dado nenhum para filtrar por.
+
+CUSTO PARA O JOGADOR, medido: um Clerigo 5/Druida 5 troca 1 truque por
+Descanso Longo, em vez dos 2 (um de cada classe) que a leitura "por
+classe" da regra, generalizada da magia para o truque, preveria. O
+defeito erra para MENOS, nunca para mais -- o jogador nunca ve uma troca a
+que nao tem direito, so deixa de ver uma a que teria.
+
+DECLARADO NO CODIGO, e a descricao bate com a realidade: o comentario de
+`temTrocaTruque` (site/js/sheet/hp-descanso.js) e o docblock de
+`mostrarTrocaTruque` (site/js/sheet/grimorio.js, "LIMITACAO MEDIDA,
+permanente"). O catalogo de decisao de produto
+(testes/regras/catalogo/magias-preparo.mjs, paragrafo de DECISAO_PRODUTO)
+tambem foi corrigido nesta rodada para descrever isto -- ate a revisao
+final apontar, ele afirmava o CONTRARIO (duas trocas de truque num
+multiclasse).
+
+O CONSERTO E O IRMAO EXATO do sub-projeto "magia sabe a classe"
+(2026-08-29), que carimbou `magias_preparadas[].classe` com a mesma
+disciplina de "sem chute" (ver a entrada acima, "MAGIA PREPARADA NAO SABE
+DE QUE CLASSE E"): migracao que carimba so o que da para saber com
+certeza, campo opcional, estado misto permanente por decisao de projeto.
+Carimbar `magias_conhecidas[]` esta FORA do escopo desta entrada -- ela so
+registra a divida, nao a paga.
+
+NAO CONSERTADO NESTA RODADA: acrescentar um eixo de "truque" ao
+catalogo/motor de magias-preparo.mjs (ao lado de `descansoLongo`/`nivel`
+em DECISAO_PRODUTO) foi considerado e descartado -- justificativa completa
+no relatorio da Tarefa 5
+(.superpowers/sdd/2026-08-29-troca-por-classe-descanso/task-5-report.md).
+Resumo: o afastamento aqui nao e "quantas trocas por classe" (isso
+continua "uma", igual a magia, e um eixo espelhado nao pegaria o problema
+real) -- e "aplicado por classe ou por personagem", uma pergunta de
+COMPOSICAO entre as classes do personagem que a chave `<classe>|<eixo>` de
+AFASTAMENTOS_DO_LIVRO nao consegue expressar sem estrutura nova. Registrar
+a divida por escrito, aqui e no catalogo, foi julgado mais barato do que
+essa estrutura nova, ate o campo `classe` existir de verdade em
+magias_conhecidas[].
+
+Conferir: site/js/sheet/hp-descanso.js (`temTrocaTruque`),
+site/js/sheet/grimorio.js (`mostrarTrocaTruque`, `truquesTrocaveis`),
+testes/regras/catalogo/magias-preparo.mjs (paragrafo de DECISAO_PRODUTO),
+e a entrada "MAGIA PREPARADA NAO SABE DE QUE CLASSE E" (2026-08-26) neste
+mesmo arquivo.
 

@@ -20,7 +20,7 @@ import { char, classeData, salvar } from '../sheet/estado.js';
 import { nivelNa } from '../regras-multiclasse.js';
 import { renderFichaCompleta } from '../sheet/ficha.js';
 import { carregarDescricoesMagias } from '../sheet/impressao.js';
-import { migrarEscolhasClasseLegadas, migrarEspacosMagia, migrarMagiasDominio, migrarMagiasLegadoEspecie, migrarMagiasSemprePreparadas, migrarMulticlasse, migrarNomePericiaLidarAnimais, migrarPericiaEspecie, migrarPericiasEspecie, migrarPericiasTalentos, migrarProficienciasTalentos, migrarSlotsMagiaLivre, migrarTalentoVersatilHumano, migrarTruquesEspecie, migrarTruquesFixosSubclasse } from '../sheet/migracoes.js';
+import { migrarEscolhasClasseLegadas, migrarEspacosMagia, migrarMagiaClasse, migrarMagiasDominio, migrarMagiasLegadoEspecie, migrarMagiasSemprePreparadas, migrarMulticlasse, migrarNomePericiaLidarAnimais, migrarPericiaEspecie, migrarPericiasEspecie, migrarPericiasTalentos, migrarProficienciasTalentos, migrarSlotsMagiaLivre, migrarTalentoVersatilHumano, migrarTruquesEspecie, migrarTruquesFixosSubclasse } from '../sheet/migracoes.js';
 import { baixarPdfFicha } from '../sheet/pdf.js';
 import { migrarAdeptoElementalTipos, migrarIniciadoEmMagiaInstancias } from '../sheet/talentos.js';
 let _syncSubscribed = false;
@@ -101,6 +101,20 @@ export async function renderSheet(container, charId) {
   migrarSlotsMagiaLivre();
   migrarTruquesEspecie();
   migrarMagiasLegadoEspecie();
+  // Depois de TODA migração que atribui `origem` a entradas de
+  // magias_preparadas (Tarefa 3, sub-projeto "magia sabe a classe"): esta é
+  // a última delas na ordem acima -- migrarMagiasDominio ('dominio'),
+  // migrarMagiasSemprePreparadas ('sempre'), sincronizarMagiasFixasMago
+  // ('maestria_magias'/'assinatura_magica', linha ~100) e
+  // migrarMagiasLegadoEspecie ('especie_legado', logo acima) mutam entradas
+  // JÁ EXISTENTES que ainda não tinham origem. Uma magia de domínio cuja
+  // origem ainda não tivesse sido atribuída pareceria uma magia normal de
+  // classe para classeDaMagiaPreparada, e seria carimbada -- exatamente o
+  // que a regra "sem chute" proíbe, e de forma permanente, porque esta
+  // migração nunca sobrescreve um carimbo já gravado. Também depois de
+  // migrarMulticlasse() (linha ~92): sem classes[] reconciliado,
+  // superficiesDeConjuracao não enxerga as classes do personagem.
+  await migrarMagiaClasse();
   migrarEscolhasClasseLegadas();
   migrarNomePericiaLidarAnimais();
   migrarTalentoVersatilHumano();

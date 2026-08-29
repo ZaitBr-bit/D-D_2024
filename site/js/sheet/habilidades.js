@@ -29,6 +29,16 @@ import { abrirModalMaestrias, tetoMaestrias } from './maestrias.js';
 import { OPCOES_METAMAGIA, conjurarSemEspaco, consumirEspacoMagiaDisponivel, recuperarEspacoMagia } from './magias.js';
 import { normalizarEstiloLuta } from '../talentos-effects.js';
 import { nivelNa, subclasseDe, temClasse } from '../regras-multiclasse.js';
+// preparadasPorClasse (Item 1/Minor "consertar agora" 1 da revisão final do
+// sub-projeto "magia sabe a classe"): terceiro caminho para o modal de troca
+// de Memorizar Magia (ver uso perto de `ehMemorizarMagia`, abaixo).
+import { preparadasPorClasse } from '../regras-magia-classe.js';
+// superficieAtivaDaFicha: rodada 1 de correção desta mesma tarefa -- o
+// portão de Memorizar Magia tem de perguntar pela MESMA classe que
+// `mostrarTrocaMagiaConhecida` (grimorio.js) resolve de fato, que é a
+// superfície ATIVA da ficha (`superficieAtiva()` daquele arquivo é so um
+// wrapper de `superficieAtivaDaFicha(char)`), nunca `ctx.classe`.
+import { superficieAtivaDaFicha } from './contexto-classe.js';
 // gastarEspaco/recuperarUmEspaco/reservasDeEspacos (Tarefa 4, sub-projeto
 // 4, Ruling 11): os quatro pontos deste arquivo que liam/escreviam
 // `char.espacos_magia[circulo]` direto, na forma antiga (Fonte de Magia do
@@ -2104,6 +2114,13 @@ export function setupEventosHabilidades() {
       // O botão do Descanso Curto (hp-descanso.js) é o outro caminho para
       // esta mesma característica, e chama isto aqui com o mesmo texto: dois
       // caminhos para a mesma regra não podem responder coisas diferentes.
+      // O TERCEIRO caminho é este botão aqui (data-mago-acao="memorizar-magia"),
+      // e o portão que garante que só aparece quando há preparada da
+      // superfície ATIVA para trocar (temMagiaParaMemorizar, mesma fonte
+      // que mostrarTrocaMagiaConhecida usa de fato -- superficieAtivaDaFicha,
+      // não a classe da característica) fica em renderFeatureItem, perto de
+      // `ehMemorizarMagia` -- este handler só executa a ação, nunca é
+      // alcançado sem o botão ter sido renderizado.
       if (acao === 'memorizar-magia') {
         mostrarTrocaMagiaConhecida(null, {
           titulo: 'Memorizar Magia',
@@ -2934,6 +2951,35 @@ export function renderFeatureItem(f, source, ctx) {
   const ehMaestriaMagias = ehMago && f.nome === 'Maestria de Magias';
   const ehMemorizarMagia = ehMago && f.nome === 'Memorizar Magia';
   const estadoMago = ehMago ? getEstadoRecursosMago() : null;
+  // Minor "consertar agora" 1 da revisão final (sub-projeto "magia sabe a
+  // classe"): terceiro caminho para `mostrarTrocaMagiaConhecida`
+  // (setupEventosHabilidades, ação 'memorizar-magia', mais abaixo), ao lado
+  // dos dois portões de hp-descanso.js já convertidos no Achado 3 da rodada
+  // 1 da Tarefa 4 -- este botão nunca ganhou o mesmo critério. Antes,
+  // aparecia sempre que a característica existisse, sem checar se sobra
+  // preparada para trocar; num Clérigo 5/Mago 1 com as preparadas todas
+  // carimbadas Clérigo, o botão aparecia e o modal abria vazio.
+  //
+  // CORREÇÃO (rodada 1 de correção desta tarefa): a primeira versão deste
+  // conserto usava `ctx.classe` (a classe DONA da característica, sempre
+  // 'Mago' aqui) -- errado, porque `mostrarTrocaMagiaConhecida`
+  // (grimorio.js) NÃO monta as candidatas pela classe da característica:
+  // ela lê `superficieAtiva()`, que é só um wrapper de
+  // `superficieAtivaDaFicha(char)` -- a superfície ATIVA da ficha (a aba
+  // selecionada), que num Clérigo 5/Mago 1 com o Clérigo ativo é 'Clérigo',
+  // não 'Mago'. Com `ctx.classe` o portão e o modal podiam divergir de
+  // novo: o mesmo beco sem saída que este item deveria fechar continuava
+  // aberto. Trocado para `superficieAtivaDaFicha(char)?.classe` -- a MESMA
+  // fonte que o modal usa de fato, e o mesmo padrão já usado nos dois
+  // portões irmãos de hp-descanso.js (Achado 3 da rodada 1 da Tarefa 4).
+  // Com uma única superfície de conjuração (a maioria dos personagens),
+  // `superficieAtivaDaFicha` devolve essa única superfície -- comportamento
+  // idêntico ao de antes deste sub-projeto.
+  const supAtivaMemorizar = ehMemorizarMagia ? superficieAtivaDaFicha(char) : null;
+  const candidatasMemorizarMagia = ehMemorizarMagia
+    ? preparadasPorClasse(char, supAtivaMemorizar?.classe) : null;
+  const temMagiaParaMemorizar = !!candidatasMemorizarMagia &&
+    [...candidatasMemorizarMagia.desta, ...candidatasMemorizarMagia.semClasse].some(m => m.circulo > 0);
   // Subclasses de Mago
   const ehSubclasseMago = ehMago && source === 'subclasse';
   // Abjurador
@@ -4931,7 +4977,7 @@ export function renderFeatureItem(f, source, ctx) {
       </div>
     `;
     recarga = 'nenhuma';
-  } else if (ehMemorizarMagia && estadoMago && estadoMago.memorizarMagiaAtivo) {
+  } else if (ehMemorizarMagia && estadoMago && estadoMago.memorizarMagiaAtivo && temMagiaParaMemorizar) {
     usosHtmlSummary = '<span style="font-size:0.7rem;font-weight:600;margin-left:auto">Descanso Curto</span>';
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">

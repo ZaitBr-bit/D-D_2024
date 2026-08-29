@@ -191,15 +191,21 @@ export function conjuraPorAlgumaClasse(char) {
  * precisa mostrar as magias dele mesmo ele nao entrando na tabela
  * unificada.
  *
- * DECISAO REGISTRADA, NAO ESQUECIMENTO: o LIMITE e' por classe (`tabela` +
- * `nivelClasse`), mas a CONTAGEM de preparadas e' GLOBAL -- porque
- * `magias_preparadas[]` nao tem campo de classe, entao nao ha como saber
- * quantas das magias preparadas pertencem a esta superficie especifica,
- * so o limite que ela permite. Ligar magia -> classe exige campo novo no
- * personagem e migracao das fichas existentes (sub-projeto proprio,
- * registrado em docs/PERGUNTAS-PENDENTES.txt); ate la, cada superficie
- * devolve so o limite dela, e quem monta a tela decide como confrontar a
- * contagem global contra limites por classe.
+ * DIVISAO DE RESPONSABILIDADE, NAO LACUNA: esta funcao devolve so o LIMITE
+ * de cada superficie (`tabela` + `nivelClasse`); ela NAO conta quantas
+ * preparadas pertencem a cada uma. Quem responde isso e
+ * `preparadasPorClasse` (regras-magia-classe.js), sobre o campo
+ * `magias_preparadas[].classe` -- que passou a existir no sub-projeto
+ * "magia sabe a classe" (2026-08-29) e ate entao nao existia, motivo pelo
+ * qual a contagem aqui era global.
+ *
+ * O campo e OPCIONAL de proposito e o estado misto e PERMANENTE: das 391
+ * magias medidas em dados/classes/magias_*.json so 24,6% existem numa
+ * classe so (Feiticeiro e Mago compartilham 95% da lista menor), entao a
+ * migracao carimba apenas o inequivoco e nunca chuta. Quem confronta
+ * contagem com limite tem de responder TRES coisas -- desta classe, de
+ * outra classe, sem classe --, e e por isso que `preparadasPorClasse`
+ * devolve tres baldes em vez de um numero.
  *
  * @param {object} personagem Personagem; le classes[], nunca os espelhos
  *   (`char.classe`/`char.subclasse`/`char.nivel`).
