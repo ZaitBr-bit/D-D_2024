@@ -13,7 +13,7 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '2.2.27';
+export const VERSAO_ATUAL = '3.0.0';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
@@ -21,587 +21,127 @@ export const VERSAO_ATUAL = '2.2.27';
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
   {
-    versao: '2.2.27',
+    versao: '3.0.0',
     data: '2026-08-29',
-    rotulo: 'Trocas por classe',
-    resumo: 'A troca de magia do Descanso Longo passa a valer por classe '
-      + 'conjuradora. Quem tem duas ou mais classes que conjuram ganha uma '
-      + 'troca de magia de CADA uma, em modais separados que dizem de qual '
-      + 'classe é cada troca.',
+    rotulo: 'Multiclasse',
+    resumo: 'Chegou a multiclasse: dá para levar um personagem por mais de uma '
+      + 'classe, e a ficha inteira calcula pela classe certa em cada caso — '
+      + 'combate, Pontos de Vida, descansos, magias, proficiências e subida de '
+      + 'nível. É um recurso grande e novo, que toca quase toda tela do app: '
+      + 'conte com ajustes nas próximas versões, e avise pelo botão 🐛 quando '
+      + 'algo não bater com o livro.',
     melhorias: [
       {
-        grupo: '🔄 Troca por classe no Descanso Longo',
+        grupo: '🧬 Uma segunda classe',
         itens: [
-          'Um personagem com duas ou mais classes conjuradoras (ex.: '
-            + 'Clérigo 5/Druida 5) passa a poder trocar uma magia de CADA '
-            + 'classe ao terminar um Descanso Longo, não mais só uma para '
-            + 'o personagem inteiro. Cada modal da cadeia diz de qual '
-            + 'classe é aquela troca.',
-          'A troca de truque continua sendo uma só por personagem, mesmo '
-            + 'com duas ou mais classes conjuradoras -- a ficha ainda não '
-            + 'guarda de qual classe é cada truque conhecido.',
+          'Ao subir de nível, escolha em qual classe o nível entra. O app '
+            + 'aplica o pré-requisito de atributo que o livro exige para abrir '
+            + 'uma classe nova.',
+          'A ficha, o resumo e a versão impressa mostram todas as classes do '
+            + 'personagem, com o nível de cada uma.',
+          'Características, subclasse e recursos seguem o nível NA CLASSE. O '
+            + 'bônus de proficiência, os pontos de experiência e o teto de '
+            + 'nível 20 seguem o nível TOTAL, como manda o livro.',
         ],
       },
-    ],
-  },
-  {
-    versao: '2.2.26',
-    data: '2026-08-29',
-    rotulo: 'Contador por classe',
-    resumo: 'A magia preparada passa a saber de que classe é. O contador da '
-      + 'classe ativa deixa de somar as magias das outras, fichas antigas '
-      + 'são carimbadas sozinhas no que dá para saber com certeza, e o que '
-      + 'for ambíguo num multiclasse fica marcado "sem classe" em vez de '
-      + 'receber um palpite.',
-    melhorias: [
       {
-        grupo: '🏷️ Magia preparada sabe a classe',
+        grupo: '⚔️ Combate, defesas e deslocamento',
         itens: [
-          'Cada magia preparada pode agora guardar de qual classe ela é. '
-            + 'Fichas antigas são carimbadas automaticamente ao abrir, sempre '
-            + 'que dá para saber com certeza; quando não dá (magia '
-            + 'personalizada, ou multiclasse com listas parecidas, como '
-            + 'Feiticeiro/Mago), a magia fica marcada "sem classe" em vez de '
-            + 'ganhar um chute.',
-          'O contador de preparadas da classe ativa passa a contar só as '
-            + 'magias DELA. Um Clérigo 5/Mago 1 via o limite do Clérigo somado '
-            + 'às magias do Mago; agora os dois números não se misturam.',
+          'Ataque Extra, Classe de Armadura, Maestria em Arma, deslocamento e '
+            + 'iniciativa saem da classe certa.',
+          'Quando mais de uma classe oferece uma forma de calcular a Classe de '
+            + 'Armadura, um seletor deixa escolher qual usar.',
+        ],
+      },
+      {
+        grupo: '❤️ Pontos de Vida e descansos',
+        itens: [
+          'Os Pontos de Vida e os Dados de Vida somam pelo dado de cada '
+            + 'classe, com o valor cheio do primeiro nível na classe inicial.',
+          'O Descanso Curto e o Descanso Longo restauram os recursos pela '
+            + 'classe a que cada um pertence.',
+        ],
+      },
+      {
+        grupo: '✨ Magias',
+        itens: [
+          'Os espaços de magia seguem a tabela de Conjurador Multiclasse '
+            + 'quando duas ou mais classes conjuram. A Magia de Pacto do Bruxo '
+            + 'continua sendo reserva própria, que volta num Descanso Curto.',
+          'A CD e o bônus de Ataque de Magia aparecem por classe, cada um com '
+            + 'o atributo de conjuração da sua.',
+          'A tela de Magias traz a lista, os truques e o limite de preparo de '
+            + 'cada classe que conjura, com um seletor para alternar entre '
+            + 'elas.',
+          'Cada magia preparada sabe de qual classe é, e o contador de '
+            + 'preparadas é o da classe ativa.',
+          'A troca de magia do Descanso Longo vale por classe conjuradora, em '
+            + 'modais separados que dizem de qual classe é cada troca.',
+        ],
+      },
+      {
+        grupo: '🎓 Proficiências',
+        itens: [
+          'Entrar numa classe nova concede o subconjunto reduzido de '
+            + 'proficiências que o livro dá ao multiclasse, não o conjunto '
+            + 'completo da classe inicial.',
+          'O talento Conjurador Ritualista cresce junto com o personagem.',
+        ],
+      },
+      {
+        grupo: '🚧 O que ainda falta',
+        itens: [
+          'A troca de truque do Descanso Longo é uma só por personagem, mesmo '
+            + 'com duas classes que conjuram: a ficha ainda não guarda de qual '
+            + 'classe é cada truque conhecido.',
+          'A lista de armas oferecida no modal de Maestria em Arma vem só da '
+            + 'primeira classe do personagem.',
+          'A ficha em PDF ainda não acompanha tudo que a multiclasse traz, e '
+            + 'vai receber ajustes nas próximas versões.',
+          'Multiclasse é um recurso novo e amplo. Se algo não bater com o '
+            + 'livro, use o botão 🐛 para avisar — é o que faz a próxima '
+            + 'versão sair melhor.',
         ],
       },
     ],
     correcoes: [
       {
-        grupo: '🚪 Fluxos que abriam vazios',
-        itens: [
-          'O card "Trocar Magias" da subida de nível e o botão "Trocar '
-            + 'Magia Preparada" do Mago (nível 5) podiam aparecer sem ter '
-            + 'nenhuma magia para oferecer: contavam a ficha inteira, '
-            + 'enquanto a lista por trás já filtrava pela classe certa. Os '
-            + 'dois lados passam a concordar.',
-          'O aviso "sem classe" do modal de gerenciar magias congelava o '
-            + 'número depois de adicionar ou remover a última magia sem '
-            + 'carimbo. Agora acompanha a mudança.',
-          'O alarme de "limite excedido" do modal de gerenciar magias nunca '
-            + 'aparecia -- uma checagem cobria a outra por engano. Corrigido.',
-        ],
-      },
-    ],
-  },
-  {
-    versao: '2.2.25',
-    data: '2026-08-29',
-    rotulo: 'Magias por classe',
-    resumo: 'A tela de Magias passa a olhar a classe certa. Quem tem uma '
-      + 'segunda classe que conjura via a lista, os truques e o limite de '
-      + 'preparo da classe INICIAL — e um Ladino que virou Mago não via '
-      + 'nada. Entram também as proficiências reduzidas ao abrir classe '
-      + 'nova e o crescimento do talento Conjurador Ritualista.',
-    melhorias: [
-      {
-        grupo: '📖 Tela de Magias por classe',
-        itens: [
-          'A lista de magias, os truques e o limite de preparo agora saem '
-            + 'da classe que conjura, no nível DELA. Antes saíam da classe '
-            + 'inicial no nível TOTAL: um Ladino 5/Mago 1 abria "Gerenciar '
-            + 'Magias" e via a tela vazia, com 0 de limite.',
-          'Quem tem DUAS classes que conjuram ganhou um seletor na seção '
-            + 'de Magias para alternar entre elas. A tela inteira acompanha '
-            + 'a escolha, inclusive o modal. Com uma classe só nada muda.',
-          'O contador de preparadas continua sendo do personagem inteiro, '
-            + 'porque a magia ainda não guarda de que classe é. Isso agora '
-            + 'está ESCRITO na tela, ao lado do número, em vez de o número '
-            + 'parecer ser de uma classe só.',
-        ],
-      },
-      {
-        grupo: '🛡️ Proficiências ao abrir uma classe nova',
-        itens: [
-          'Entrar numa classe diferente da inicial passa a conceder o '
-            + 'subconjunto de proficiências que o livro define para '
-            + 'multiclasse — e não mais nada, que era o que acontecia. '
-            + 'Bardo, Guardião e Ladino pedem a escolha de perícia na '
-            + 'própria tela de subida.',
-          'Armadura e arma passaram a ser calculadas a partir de todas as '
-            + 'classes do personagem. Fichas que já eram multiclasse se '
-            + 'corrigem sozinhas ao abrir, sem migração.',
-        ],
-      },
-      {
-        grupo: '🔮 Conjurador Ritualista que cresce',
-        itens: [
-          'O talento diz que, sempre que o Bônus de Proficiência aumenta, '
-            + 'o personagem escolhe mais uma magia ritual. Isso nunca tinha '
-            + 'sido implementado: agora a subida de nível pergunta nos '
-            + 'níveis 5, 9, 13 e 17, e quem já passou desses níveis é '
-            + 'perguntado na próxima subida, recuperando o atraso.',
-        ],
-      },
-    ],
-    correcoes: [
-      {
-        grupo: '🚫 Bloqueios que não abriam',
-        itens: [
-          'O modal recusava adicionar magia e truque comparando o total do '
-            + 'personagem inteiro com o limite de uma classe só. Num '
-            + 'Clérigo 5/Mago 1 isso nunca liberava. As opções também '
-            + 'apareciam pintadas de indisponíveis enquanto o clique '
-            + 'funcionava.',
-          'O modal cobrava truques de talento contra o orçamento da classe, '
-            + 'enquanto a ficha não cobrava — as duas telas mostravam '
-            + 'números diferentes para o mesmo personagem, inclusive em '
-            + 'classe única. Agora usam a mesma regra.',
-        ],
-      },
-      {
-        grupo: '📚 Grimório do Mago em multiclasse',
-        itens: [
-          'O grimório sumia inteiro quando o Mago não era a classe '
-            + 'inicial, e a trava que exige a magia estar no livro não '
-            + 'valia para esse personagem.',
-        ],
-      },
-    ],
-  },
-  {
-    versao: '2.2.24',
-    data: '2026-08-26',
-    rotulo: 'Escolha de classe',
-    resumo: 'A subida de nível ganha a multiclasse de verdade: dá para '
-      + 'escolher a classe a cada nível novo, com o pré-requisito de '
-      + 'atributo do livro entrando em cena e a ficha impressa mostrando '
-      + 'todas as classes do personagem.',
-    melhorias: [
-      {
-        grupo: '⬆️ Classe escolhida ao subir de nível',
-        itens: [
-          'A tela de subida de nível ganhou um seletor de classe. Quem já '
-            + 'tem mais de uma classe, ou está abrindo uma nova, escolhe '
-            + 'ali — os Pontos de Vida do nível saem do dado da classe '
-            + 'escolhida, e as características que aparecem são as '
-            + 'daquela classe, no nível que ela está alcançando.',
-          'A subclasse passa a ser perguntada no 3º nível DAQUELA classe, '
-            + 'não no nível total do personagem — um Guerreiro 5/Mago 3 '
-            + 'escolhe a subclasse de Mago no terceiro nível de Mago, como '
-            + 'o livro manda.',
-        ],
-      },
-      {
-        grupo: '🔒 Pré-requisito de atributo para classe nova',
-        itens: [
-          'O livro exige 13 ou mais no atributo principal para abrir uma '
-            + 'classe nova. Quando o personagem não alcança, a subida de '
-            + 'nível avisa e barra, com a opção de dispensar a regra para '
-            + 'quem joga numa mesa que não a usa.',
-          'Dispensar o pré-requisito deixa uma marca visível na ficha e '
-            + 'na impressão, para lembrar depois que aquela classe entrou '
-            + 'fora da exigência do livro.',
-        ],
-      },
-      {
-        grupo: '🖨️ Impressão com todas as classes',
-        itens: [
-          'A ficha impressa e o PDF passam a mostrar todas as classes do '
-            + 'personagem no cabeçalho — "Mago 5 / Bárbaro 1" — em vez de '
-            + 'só a primeira.',
-        ],
-      },
-    ],
-    correcoes: [
-      {
-        grupo: '🔮 Magias sempre preparadas da segunda classe',
-        itens: [
-          'Ao reabrir a ficha, as magias que a segunda classe deixa '
-            + 'sempre preparadas eram apagadas — o Juramento de um '
-            + 'Paladino num Mago/Paladino, por exemplo. A ficha só '
-            + 'conhecia as magias automáticas da PRIMEIRA classe, e '
-            + 'limpava as demais achando que estavam sobrando. Agora cada '
-            + 'classe é consultada no nível DELA.',
-          'Pelo mesmo motivo, e no sentido contrário, quem tinha a '
-            + 'primeira classe conjuradora recebia magias de níveis que '
-            + 'ainda não alcançou: um Paladino 5/Mago 4 era tratado como '
-            + 'Paladino 9.',
-        ],
-      },
-      {
-        grupo: '✨ A classe recém-aberta aparece na hora',
-        itens: [
-          'Logo depois de abrir uma classe nova, a ficha mostrava a '
-            + 'classe sem espaços de magia, sem características e sem '
-            + 'subclasse até a página ser recarregada. Agora os dados da '
-            + 'classe nova entram antes de a ficha ser redesenhada.',
-        ],
-      },
-      {
-        grupo: '💾 Formato de armazenamento',
-        itens: [
-          'Os níveis por classe, os dados de vida e os espaços de magia '
-            + 'passaram a ser guardados por classe no arquivo do '
-            + 'personagem. Fichas antigas são convertidas sozinhas ao '
-            + 'abrir, e nada muda na tela.',
-        ],
-      },
-    ],
-  },
-  {
-    versao: '2.2.23',
-    data: '2026-08-26',
-    rotulo: 'Conjuração por classe',
-    resumo: 'Revisão das regras de multiclasse contra o livro. A CD e o '
-      + 'bônus de Ataque de Magia passam a ser mostrados por classe — '
-      + 'quem tem duas classes que conjuram tinha um número só, e ele '
-      + 'estava errado para uma delas. A seção de Magias volta a '
-      + 'aparecer para quem conjura por uma classe que não é a primeira.',
-    correcoes: [
-      {
-        grupo: '🔮 CD e Ataque de Magia por classe',
-        itens: [
-          'Cada classe que conjura tem o próprio atributo de conjuração, '
-            + 'e o livro manda usar o da classe DONA da magia. A ficha '
-            + 'mostrava uma CD só, a da primeira classe: um Clérigo '
-            + '5/Mago 5 com Sabedoria 16 e Inteligência 10 exibia CD 15 '
-            + 'para tudo, quando as magias de Mago valem CD 12. Agora '
-            + 'aparecem as duas caixas, cada uma com o nome da classe.',
-          'Quem tem uma classe conjuradora só continua vendo exatamente '
-            + 'o que via: "CD Magia" e "Atq. Magia", sem nome de classe.',
-          'O mesmo vale na impressão e no PDF.',
-          'Nos Atributos, o selo 🔮 passa a marcar o atributo de '
-            + 'conjuração de TODAS as classes do personagem, não só o da '
-            + 'primeira.',
-          'O +1 de CD da Feitiçaria Inata do Feiticeiro agora vale só '
-            + 'nas magias de Feiticeiro. Num Feiticeiro/Mago ele vazava '
-            + 'para as magias de Mago, e num Mago/Feiticeiro não chegava '
-            + 'a nenhuma das duas.',
-        ],
-      },
-      {
-        grupo: '📖 Seção de Magias para quem conjura pela segunda classe',
-        itens: [
-          'A seção de Magias só aparecia se a PRIMEIRA classe do '
-            + 'personagem conjurasse. Um Bárbaro 5/Mago 1 que ainda não '
-            + 'tivesse registrado nenhuma magia não via a seção — e como '
-            + 'é a única tela com o botão "+ Magia", não havia como '
-            + 'registrar a primeira. Agora a seção aparece para quem '
-            + 'conjura por qualquer uma de suas classes, Magia de Pacto '
-            + 'do Bruxo incluída.',
-          'A caixa de CD/Ataque de Magia e as páginas de magia da '
-            + 'impressão sumiam pelo mesmo motivo, e voltam junto.',
-        ],
-      },
-      {
-        grupo: '⚔️ Lâmina Sedenta do Bruxo conta nos ataques',
-        itens: [
-          'A invocação Lâmina Sedenta concede Ataque Extra com a arma de '
-            + 'pacto, mas a ficha não a contava: um Bruxo 5 com a '
-            + 'invocação mostrava 1 ataque em vez de 2. Vale também para '
-            + 'Bruxo de classe única.',
-          'A Lâmina Devoradora (Bruxo 12) leva a 3 ataques, como o livro '
-            + 'descreve.',
-          'Como manda a regra de multiclasse, a Lâmina Sedenta NÃO soma '
-            + 'com o Ataque Extra de outra classe: um Bruxo 5/Guerreiro 5 '
-            + 'tem 2 ataques, não 3.',
-        ],
-      },
-      {
-        grupo: '❤️ Pontos de Vida com Constituição muito baixa',
-        itens: [
-          'O livro garante no mínimo 1 Ponto de Vida POR NÍVEL. O '
-            + 'recálculo aplicava esse mínimo só ao total, então um '
-            + 'personagem de Constituição muito baixa terminava com 1 '
-            + 'Ponto de Vida em vez do que a regra concede — um '
-            + 'Feiticeiro 5 com Constituição 1 dava 1 e passa a dar 5. '
-            + 'Agora o recálculo e a subida de nível concordam.',
-        ],
-      },
-    ],
-  },
-  {
-    versao: '2.2.22',
-    data: '2026-08-25',
-    rotulo: 'Magias em multiclasse',
-    resumo: 'Os espaços de magia de personagens com mais de uma classe '
-      + 'passam a seguir a regra do livro: a tabela de Conjurador '
-      + 'Multiclasse quando há duas ou mais classes que conjuram, e a '
-      + 'Magia de Pacto do Bruxo como reserva própria, que volta num '
-      + 'Descanso Curto.',
-    melhorias: [
-      {
-        grupo: '🔮 Espaços de magia pela regra de multiclasse',
-        itens: [
-          'Com DUAS ou mais classes conjuradoras, os espaços de magia '
-            + 'passam a sair da tabela de Conjurador Multiclasse, pelo '
-            + 'nível de conjurador somado das classes — um Paladino '
-            + '6/Mago 4 tem espaços de nível de conjurador 7 (metade do '
-            + 'Paladino arredondada para cima, mais o nível cheio do '
-            + 'Mago), não de nível 10.',
-          'Com UMA classe conjuradora só, os espaços voltam a sair da '
-            + 'tabela DELA, no nível DELA — um Mago 5/Bárbaro 5 tinha '
-            + 'espaços de Mago no nível 10 (o total do personagem) e '
-            + 'passa a ter de Mago no nível 5, o nível real da classe. '
-            + 'Isso REDUZ os espaços de fichas assim, porque o valor '
-            + 'antigo estava inflado.',
-          'A Magia de Pacto do Bruxo vira uma reserva separada dos '
-            + 'espaços de Conjuração normais. Ela volta ao completar um '
-            + 'Descanso CURTO, sem devolver os espaços de Conjuração — '
-            + 'que só voltam no Descanso Longo, como sempre.',
-          'Quem tem as duas reservas (por exemplo um Bruxo/Mago) ganha '
-            + 'um seletor para escolher de qual reserva sai o espaço ao '
-            + 'conjurar. Quem tem só uma reserva não vê nada de novo.',
-          'A ficha impressa e o PDF passam a mostrar os espaços de cada '
-            + 'reserva separadamente.',
-        ],
-      },
-    ],
-  },
-  {
-    versao: '2.2.21',
-    data: '2026-08-25',
-    rotulo: 'PV em multiclasse',
-    resumo: 'Pontos de Vida, Dados de Vida e os dois descansos passam a '
-      + 'somar e restaurar pela classe certa em personagens com mais de '
-      + 'uma classe — e a Resiliência Dracônica é corrigida: ela dava 2 '
-      + 'Pontos de Vida a mais do que o livro concede.',
-    melhorias: [
-      {
-        grupo: '❤️ Pontos de Vida somam cada classe',
-        itens: [
-          'A fórmula de Pontos de Vida máximos passa a somar o dado de '
-            + 'vida de CADA classe, como o livro manda, em vez de usar só '
-            + 'o dado da classe escolhida na criação para o nível total '
-            + 'inteiro — um Mago 5/Bárbaro 5 calcularia 77 Pontos de Vida '
-            + 'com a fórmula nova, contra 62 da antiga. A mudança vale a '
-            + 'partir de agora para ficha corrompida (quando o app '
-            + 'recalcula o PV do zero) e para criação e subida de nível '
-            + 'quando esse cálculo chegar; fichas já criadas continuam '
-            + 'com o valor gravado e não são recalculadas sozinhas.',
-        ],
-      },
-      {
-        grupo: '🎲 Dados de Vida por tipo',
-        itens: [
-          'Os Dados de Vida deixam de ser um número só e passam a ser '
-            + 'reservas separadas por TIPO de dado. Um Clérigo 5/Paladino '
-            + '5 vê cinco d8 e cinco d10, cada um com o próprio total — '
-            + 'antes a ficha somava tudo como um único tipo de dado.',
-          'Quando o personagem tem mais de um tipo de Dado de Vida, os '
-            + 'modais de "Usar DV" e Descanso Curto ganham um seletor para '
-            + 'escolher de qual reserva gastar. Quem tem um tipo só não vê '
-            + 'nada de novo.',
-          'O gasto de Dados de Vida deixa de se perder. Num personagem '
-            + 'com dois tipos de dado, o gasto era descartado em silêncio '
-            + 'na próxima vez que a ficha era aberta.',
-        ],
-      },
-      {
-        grupo: '🏕️ Descansos restauram a classe certa',
-        itens: [
-          'Os dois descansos passam a restaurar o recurso da classe '
-            + 'dona dele, não só da classe escolhida na criação. Um '
-            + 'Ladino 5/Monge 5 nunca recuperava os Pontos de Foco do '
-            + 'Monge, e um Mago 5/Clérigo 5 ficava com "Canalizar '
-            + 'Divindade 0/2" para sempre — os dois casos agora recarregam '
-            + 'normalmente.',
-        ],
-      },
-      {
-        grupo: '🏷️ Cabeçalho com todas as classes',
-        itens: [
-          'O cabeçalho da ficha passa a mostrar todas as classes do '
-            + 'personagem, não só a primeira: "Mago 5 / Bárbaro 5 · Nível '
-            + '10", em vez de só "Mago 10".',
-        ],
-      },
-    ],
-    correcoes: [
-      {
-        grupo: '🐉 Resiliência Dracônica',
+        grupo: '❤️ Pontos de Vida',
         itens: [
           'A Resiliência Dracônica do Feiticeiro (subclasse Feitiçaria '
-            + 'Dracônica) dava 2 Pontos de Vida A MAIS do que o livro '
-            + 'concede. Classes.md:3074 dá +3 no nível 3 de Feiticeiro e '
-            + '+1 a cada nível de Feiticeiro depois — ou seja, +N Pontos '
-            + 'de Vida no nível N de Feiticeiro —, e o app calculava N+2. '
-            + 'TODO FEITICEIRO DRACÔNICO EXISTENTE VAI PERDER 2 PONTOS DE '
-            + 'VIDA MÁXIMOS; o ajuste acontece sozinho, sem nada para o '
-            + 'jogador fazer, na próxima vez que a ficha for aberta.',
-          'Além do valor errado, num personagem em que o Feiticeiro não '
-            + 'era a classe escolhida na criação o bônus simplesmente não '
-            + 'aparecia — e, quando era, o app usava o nível total do '
-            + 'personagem em vez do nível só de Feiticeiro.',
+            + 'Dracônica) dava 2 Pontos de Vida A MAIS do que o livro concede: '
+            + 'ela vale +N no nível N de Feiticeiro, e o app calculava N+2. '
+            + 'TODO FEITICEIRO DRACÔNICO EXISTENTE VAI PERDER 2 PONTOS DE VIDA '
+            + 'MÁXIMOS; o ajuste acontece sozinho ao abrir a ficha, sem nada '
+            + 'para o jogador fazer.',
+          'O livro garante no mínimo 1 Ponto de Vida POR NÍVEL, e o recálculo '
+            + 'aplicava esse mínimo só ao total. Um personagem de Constituição '
+            + 'muito baixa terminava com 1 Ponto de Vida em vez do que a regra '
+            + 'concede — um Feiticeiro 5 com Constituição 1 dava 1 e passa a '
+            + 'dar 5.',
+        ],
+      },
+      {
+        grupo: '⚔️ Ataques e salvaguardas',
+        itens: [
+          'A invocação Lâmina Sedenta do Bruxo concede Ataque Extra com a arma '
+            + 'de pacto, e a ficha não a contava: um Bruxo 5 com a invocação '
+            + 'mostrava 1 ataque em vez de 2. A Lâmina Devoradora (Bruxo 12) '
+            + 'leva a 3 ataques, como o livro descreve.',
+          'Mente Escorregadia (Ladino 15) passa a marcar de fato a '
+            + 'proficiência em salvaguardas de Sabedoria e Carisma na grade da '
+            + 'ficha. O texto da característica já aparecia; a grade nunca '
+            + 'marcava nada.',
         ],
       },
       {
         grupo: '🖨️ Ficha impressa e PDF',
         itens: [
-          'A ficha impressa sempre mostrava "0" de PV Temporário e '
-            + 'sempre mostrava a reserva de Dados de Vida cheia, mesmo '
-            + 'depois de gastar dados — os dois campos passam a mostrar '
-            + 'o valor real da ficha.',
-          'O PDF sempre mostrava "0" de PV Temporário, mesmo depois de '
-            + 'gastar dados — o campo passa a mostrar o valor real da '
-            + 'ficha. (O PDF nunca chegou a imprimir Dados de Vida, '
-            + 'então não tinha o segundo defeito.)',
-        ],
-      },
-    ],
-  },
-  {
-    versao: '2.2.20',
-    data: '2026-08-24',
-    rotulo: 'Combate em multiclasse',
-    resumo: 'Personagens com mais de uma classe passam a ter Ataque Extra, '
-      + 'Classe de Armadura, Maestria em Arma, deslocamento e iniciativa '
-      + 'calculados pela classe certa — e ganham um seletor novo para '
-      + 'escolher a CA quando há mais de uma forma de calculá-la.',
-    melhorias: [
-      {
-        grupo: '🛡️ Seletor de Classe de Armadura',
-        itens: [
-          'Quando o personagem tem mais de uma forma de calcular a CA (por '
-            + 'exemplo, Defesa sem Armadura do Monge e Resiliência '
-            + 'Dracônica do Feiticeiro), a caixa de CA da ficha ganhou um '
-            + 'seletor com o nome da classe usada. Por padrão o app usa o '
-            + 'maior valor; o seletor deixa escolher a outra classe.',
-          'Vestir um Escudo pode reduzir as opções a uma só (o Monge, por '
-            + 'exemplo, perde a Defesa sem Armadura com Escudo) — nesse '
-            + 'caso o seletor some sozinho.',
-          'Quem só tem uma forma de calcular a CA, com ou sem multiclasse, '
-            + 'não vê nada de novo.',
-        ],
-      },
-    ],
-    correcoes: [
-      {
-        grupo: '⚔️ Ataque Extra',
-        itens: [
-          'Personagens com mais de uma classe que concede Ataque Extra '
-            + '(Bárbaro, Guerreiro, Guardião, Paladino, Monge e o Bardo do '
-            + 'Colégio da Bravura) agora usam o maior número de ataques '
-            + 'entre as classes — nunca a soma. Antes, o app conferia o '
-            + 'nível total misturado com a classe inicial, e o número de '
-            + 'ataques podia sair errado para mais ou para menos, conforme '
-            + 'a ordem em que as classes foram escolhidas.',
-        ],
-      },
-      {
-        grupo: '🥋 Maestria em Arma',
-        itens: [
-          'Quem tem mais de uma classe que concede Maestria em Arma '
-            + '(Bárbaro, Guerreiro, Guardião, Paladino, Ladino) passa a '
-            + 'ter um único número de maestrias na ficha inteira — o maior '
-            + 'limite entre as classes, nunca a soma. Um Bárbaro 4 (3 '
-            + 'maestrias) com Guerreiro 3 (3 maestrias) fica com 3, não 6. '
-            + 'Antes, cada bloco da ficha mostrava o limite da sua própria '
-            + 'classe, e podiam aparecer números diferentes e '
-            + 'contraditórios na mesma tela.',
-          'O botão de trocar maestrias no Descanso Longo passa a aparecer '
-            + 'para quem tem qualquer classe que a conceda, não só a '
-            + 'primeira escolhida. Um Mago 5/Guerreiro 5 nunca via a '
-            + 'opção, porque o app só olhava a classe inicial (Mago).',
-          'A lista de armas oferecidas no modal de Maestrias continua '
-            + 'vindo só da classe inicial — esse ajuste fica para uma '
-            + 'próxima versão.',
-        ],
-      },
-      {
-        grupo: '🛡️ Salvaguardas',
-        itens: [
-          'Sobrevivente Disciplinado (Monge 14) e Sentido de Perigo '
-            + '(Bárbaro 2) passam a olhar o nível na própria classe, não o '
-            + 'nível total do personagem. Um Monge 10/Ladino 4 ganhava '
-            + 'essas proficiências antes da hora, e um Ladino 1/Monge 14 '
-            + 'não as recebia — porque o app olhava a classe escolhida na '
-            + 'criação.',
-          'Mente Escorregadia (Ladino 15) passou a marcar de fato a '
-            + 'proficiência em salvaguardas de Sabedoria e Carisma na '
-            + 'grade da ficha. A ficha já mostrava o texto da '
-            + 'característica; a grade nunca marcava nada — mesmo em '
-            + 'personagem de classe única, sem relação com multiclasse.',
-        ],
-      },
-      {
-        grupo: '🏃 Deslocamento, iniciativa e subclasses',
-        itens: [
-          'Movimento Rápido (Bárbaro), Movimento sem Armadura (Monge), '
-            + 'Errante e Aura de Vivacidade (Guardião e Paladino), '
-            + 'Instintos Primitivos e Atleta Extraordinário (vantagem em '
-            + 'Iniciativa) e características de subclasse ligadas a '
-            + 'deslocamento passam a olhar o nível e a subclasse da classe '
-            + 'certa em personagens com mais de uma classe. Antes, todas '
-            + 'essas contas usavam a classe escolhida na criação, mesmo '
-            + 'quando a característica pertencia à segunda classe.',
-        ],
-      },
-    ],
-  },
-  {
-    versao: '2.2.19',
-    data: '2026-08-24',
-    rotulo: 'Botões por classe',
-    resumo: 'Num personagem com mais de uma classe, os botões do bloco da '
-      + 'segunda classe voltaram a responder ao clique — era a promessa que '
-      + 'a versão anterior deixou em aberto.',
-    correcoes: [
-      {
-        grupo: '⚔️ Recursos de classe',
-        itens: [
-          'A ficha já mostrava, desde a versão anterior, o botão certo em '
-            + 'cada bloco. Clicar nele não fazia nada: o app conferia o nível '
-            + 'e a proficiência sempre pela primeira classe, então o botão da '
-            + 'segunda classe recusava o uso ou usava o número errado. Agora '
-            + 'cada clique olha para a classe (e o nível naquela classe) do '
-            + 'próprio bloco.',
-          'A caixa de resumo do topo da ficha também passou a contar pelo '
-            + 'nível na classe: o aviso da Fúria Implacável anunciava um total '
-            + 'de Pontos de Vida diferente do que a janela mostrava ao clicar, '
-            + 'e os botões de Fúria Persistente, de Inspiração pela iniciativa '
-            + 'e de Restauração Feiticeira apareciam antes da hora, só para '
-            + 'não funcionar.',
-          'No modal de Maestrias em Arma, o título e o número de maestrias '
-            + 'já são os da classe certa, mas a lista de armas oferecidas '
-            + 'ainda é a da primeira classe — isso fica para uma próxima '
-            + 'versão.',
-          'Para quem tem uma classe só, nada muda.',
-        ],
-      },
-    ],
-  },
-  {
-    versao: '2.2.18',
-    data: '2026-08-23',
-    rotulo: 'Recursos por classe',
-    resumo: 'Num personagem com mais de uma classe, cada bloco da ficha passa '
-      + 'a mostrar os recursos e botões da sua própria classe.',
-    correcoes: [
-      {
-        grupo: '⚔️ Recursos de classe',
-        itens: [
-          'Quem tem duas classes via os botões da primeira classe repetidos no '
-            + 'bloco da segunda. Agora cada bloco mostra só o que é dele. Os '
-            + 'botões da segunda classe ainda não respondem ao clique; isso '
-            + 'vem na próxima versão.',
-          'Características que escalam por nível passam a usar o nível '
-            + 'naquela classe, não o nível total do personagem.',
-          'Para quem tem uma classe só, nada muda.',
-        ],
-      },
-    ],
-  },
-  {
-    versao: '2.2.17',
-    data: '2026-08-23',
-    rotulo: 'Características por classe',
-    resumo: 'A ficha de um personagem com mais de uma classe passa a listar '
-      + 'as características de cada classe separadamente, filtradas pelo '
-      + 'nível naquela classe.',
-    melhorias: [
-      {
-        grupo: '📚 Características de classe',
-        itens: [
-          'Quem tem mais de uma classe vê um bloco por classe, cada um com '
-            + 'as características até o nível daquela classe. Antes, a ficha '
-            + 'filtrava tudo pelo nível total e mostrava características que '
-            + 'o personagem ainda não tinha.',
-          'Para quem tem uma classe só, nada muda.',
+          'A ficha impressa sempre mostrava "0" de PV Temporário e sempre '
+            + 'mostrava a reserva de Dados de Vida cheia, mesmo depois de '
+            + 'gastar dados. Os dois campos passam a mostrar o valor real.',
+          'O PDF sempre mostrava "0" de PV Temporário pelo mesmo motivo, e '
+            + 'passa a mostrar o valor real.',
         ],
       },
     ],
