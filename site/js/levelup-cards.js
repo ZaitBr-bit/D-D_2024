@@ -399,7 +399,8 @@ export function renderCardTrocasOpcionais(ctx, state) {
 export function renderCardEscolhasClasse(ctx, state) {
   const {
     char, precisaExpertiseBardo, precisaExpertiseGuardiao, precisaEstiloLuta,
-    precisaExploradorHabil, precisaAcademico
+    precisaExploradorHabil, precisaAcademico,
+    precisaConhecimentoPrimordial, opcoesConhecimentoPrimordial
   } = ctx;
   let html = '';
 
@@ -544,6 +545,40 @@ export function renderCardEscolhasClasse(ctx, state) {
           </div>
           <div class="levelup-counter">
             Selecionada: <span id="levelup-academico-count" style="font-weight:700">${state.academicoExpertise.length}</span>/1
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Conhecimento Primordial (Bárbaro nv3, Classes.md:109 -- issue #45).
+  //
+  // Diferente do Acadêmico logo acima, que dá ESPECIALIZAÇÃO numa perícia
+  // que o personagem já tem: aqui é proficiência NOVA, então a lista
+  // elegível é a do nível 1 do Bárbaro MENOS as que ele já tem. Ela vem
+  // pronta em `ctx.opcoesConhecimentoPrimordial`, montada pela mesma
+  // função que `subirDeNivel` usa para validar -- se esta tela filtrasse
+  // por conta própria, as duas poderiam divergir em silêncio.
+  //
+  // Radio, não checkbox: é uma perícia só, e o radio já impede a segunda
+  // marca sem depender de `limitarCheckboxes`.
+  if (precisaConhecimentoPrimordial) {
+    const elegiveisCp = opcoesConhecimentoPrimordial || [];
+    html += `
+      <div class="levelup-card">
+        <div class="levelup-card-header">Conhecimento Primordial</div>
+        <div class="levelup-card-body">
+          <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
+            Selecione 1 perícia da lista do Bárbaro para ganhar proficiência.
+          </div>
+          <div id="levelup-conhecimento-primordial" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px">
+            ${elegiveisCp.map(p => `
+              <label class="form-check levelup-check-label">
+                <input type="radio" name="conhecimento_primordial_pericia" value="${p}"
+                  data-conhecimento-primordial="${p}"
+                  ${state.conhecimentoPrimordialPericia === p ? 'checked' : ''}> ${rotuloPericia(p)}
+              </label>
+            `).join('')}
           </div>
         </div>
       </div>
@@ -1153,6 +1188,7 @@ export function renderCardRevisao(ctx, state, steps) {
   if (state.bardoExpertise.length > 0) html += `<li><strong>Especialização Bardo:</strong> ${state.bardoExpertise.join(', ')}</li>`;
   if (state.guardiaoExpertise.length > 0) html += `<li><strong>Especialista Guardião:</strong> ${state.guardiaoExpertise.join(', ')}</li>`;
   if (state.estiloLuta) html += `<li><strong>Estilo de Luta:</strong> ${state.estiloLuta}</li>`;
+  if (state.conhecimentoPrimordialPericia) html += `<li><strong>Conhecimento Primordial:</strong> ${state.conhecimentoPrimordialPericia}</li>`;
   if (state.estiloLutaTrocarDe && state.estiloLutaTrocarPara) html += `<li><strong>Troca de Estilo de Luta:</strong> ${state.estiloLutaTrocarDe} &rarr; ${state.estiloLutaTrocarPara}</li>`;
   if ((state.ladinoExpertise || []).length > 0) html += `<li><strong>Especialização Ladino:</strong> ${state.ladinoExpertise.join(', ')}</li>`;
   if (state.exploradorExpertise) html += `<li><strong>Explorador Hábil:</strong> ${state.exploradorExpertise}, Idiomas: ${state.exploradorIdiomas.join(', ')}</li>`;

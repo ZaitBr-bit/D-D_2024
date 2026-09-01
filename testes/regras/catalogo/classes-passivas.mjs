@@ -144,8 +144,17 @@ export const CLASSIFICACAO = {
     // melhor que o modificador padrão da perícia naquele teste
     // específico. A classificação segue a parte sem frase para citar
     // (julgamento vence ausencia-de-custo na força da evidência).
+    // AS DUAS METADES, nomeadas. O `motivo` daqui citava só a segunda
+    // ("teste de Força durante a Fúria"), e a regra de `composta` (acima)
+    // diz que uma entrada composta não sustenta lacuna sozinha -- somadas,
+    // as duas coisas fizeram este catálogo passar por cima da issue #45,
+    // em que a PRIMEIRA metade (a perícia extra) nunca fora implementada.
+    // A classificação continua certa: nenhuma das metades é ativação.
+    // Quem mede o efeito mecânico é
+    // testes/regras/unidade/barbaro-conhecimento-primordial.test.mjs --
+    // este catálogo classifica, não executa.
     { nivel: 3, nome: 'Conhecimento Primordial', ativa: false, base: 'julgamento', composta: true, livro: 'Classes.md:113',
-      motivo: 'enquanto sua Fúria estiver ativa, você pode canalizar poder primitivo... pode realizá-lo como um teste de Força, mesmo que normalmente utilize outro atributo' },
+      motivo: 'metade 1: você adquire proficiência em outra perícia à sua escolha da lista de perícias disponíveis para Bárbaros no nível 1 (concessão permanente); metade 2: enquanto sua Fúria estiver ativa, você pode canalizar poder primitivo... pode realizá-lo como um teste de Força, mesmo que normalmente utilize outro atributo' },
     { nivel: 3, nome: 'Subclasse de Bárbaro', ativa: false, base: 'ausencia-de-custo', livro: 'Classes.md:117',
       motivo: 'Você adquire uma subclasse de Bárbaro à sua escolha (escolha permanente, não uma ativação)' },
     { nivel: 4, nome: 'Aumento no Valor de Atributo', ativa: false, base: 'ausencia-de-custo', livro: 'Classes.md:121',

@@ -545,6 +545,54 @@ export function exigeAcademico(classe, nivel) {
 }
 
 /**
+ * Verifica se o nível exige a perícia extra de Conhecimento Primordial
+ * (Bárbaro nv3, Classes.md:109).
+ *
+ * A característica tem DUAS metades. A segunda ("enquanto sua Fúria
+ * estiver ativa... pode realizá-lo como um teste de Força") já existia em
+ * `forcaPrimordialAtiva` (sheet/combate.js). A PRIMEIRA -- "Você adquire
+ * proficiência em outra perícia à sua escolha da lista de perícias
+ * disponíveis para Bárbaros no nível 1" -- nunca foi implementada: a
+ * subida ANUNCIAVA a característica no resumo e não concedia nada
+ * (issue #45). Exibir não é aplicar.
+ *
+ * Diferente de `exigeAcademico`/`exigeExploradorHabil`, que concedem
+ * ESPECIALIZAÇÃO: aqui é proficiência NOVA, então o molde é o de
+ * `pericia_classe_nova` (mais abaixo neste arquivo).
+ *
+ * O nível é o NA CLASSE, não o total: um Ladino 5/Bárbaro 3 ganha a
+ * perícia igual, e um Bárbaro 2/Mago 1 (total 3) não ganha nada.
+ */
+export function exigeConhecimentoPrimordial(classe, nivel) {
+  return classe === 'Bárbaro' && nivel === 3;
+}
+
+/**
+ * Perícias que o Conhecimento Primordial pode conceder: a lista de nível 1
+ * do Bárbaro, menos as que o personagem já tem.
+ *
+ * A lista sai de `tracos_basicos["Proficiência em Perícias"]` do JSON da
+ * classe -- o mesmo campo que o criador lê para as duas perícias iniciais
+ * --, e não de uma cópia à mão aqui: foi lista de regra copiada à mão que
+ * já produziu divergência silenciosa neste repositório mais de uma vez.
+ *
+ * @param {object} classeData JSON de dados/classes/barbaro.json.
+ * @param {object} personagem Personagem (lê `pericias_proficientes`).
+ * @returns {string[]} Perícias elegíveis, na ordem do livro.
+ */
+export function opcoesPericiaConhecimentoPrimordial(classeData, personagem) {
+  const bruto = classeData?.tracos_basicos?.['Proficiência em Perícias'] || '';
+  // "*Escolha 2:* Atletismo, Intimidação, ... ou Sobrevivência"
+  const semPrefixo = bruto.replace(/^.*?:\s*/s, '').replace(/\*/g, '');
+  const jaTem = new Set(personagem?.pericias_proficientes || []);
+  return semPrefixo
+    .split(/,| ou /)
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .filter((p) => !jaTem.has(p));
+}
+
+/**
  * Recorta o trecho da descricao que pertence a uma opcao nomeada em negrito
  * ("**Terreno Polar**"), ate o proximo cabecalho em negrito do mesmo tipo.
  * Devolve '' quando a opcao nao aparece no texto.
@@ -1268,6 +1316,7 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   const exigeEspecializacaoLadinoNivel = exigeEspecializacaoLadino(sub.classe, nivelNaClasseNovo);
   const exigeExploradorHabilNivel = exigeExploradorHabil(sub.classe, nivelNaClasseNovo);
   const exigeAcademicoNivel = exigeAcademico(sub.classe, nivelNaClasseNovo);
+  const exigeConhecimentoPrimordialNivel = exigeConhecimentoPrimordial(sub.classe, nivelNaClasseNovo);
   // RESÍDUO CORRIGIDO: exigia `nivelNaClasseNovo > 1`, então nunca disparava
   // no 1º nível DE MAGO -- e esse nível só chega aqui por multiclasse (a
   // criação nunca passa por subirDeNivel). O livro (Classes.md:4552-4556,
@@ -1730,6 +1779,26 @@ export async function subirDeNivel(personagem, opcoes = {}) {
         pendente: true,
         tipo_pendencia: 'academico',
         mensagem: 'Escolha 1 perícia elegível e já proficiente para Acadêmico do Mago'
+      };
+    }
+  }
+
+  // Conhecimento Primordial (Bárbaro nv3, Classes.md:109): 1 perícia NOVA
+  // da lista de nível 1 do Bárbaro. Diferente do Acadêmico, que pede uma
+  // perícia em que o personagem JÁ é proficiente (expertise), aqui a
+  // perícia tem de ser uma que ele AINDA NÃO tem -- por isso a validação é
+  // o espelho da de cima. Issue #45: até aqui a característica era só
+  // anunciada no resumo e não concedia nada.
+  if (exigeConhecimentoPrimordialNivel) {
+    const elegiveis = opcoesPericiaConhecimentoPrimordial(classeData, personagem);
+    const pericia = opcoes.conhecimento_primordial_pericia;
+    if (!pericia || !elegiveis.includes(pericia)) {
+      return {
+        sucesso: false,
+        pendente: true,
+        tipo_pendencia: 'conhecimento_primordial',
+        opcoes_pericia: elegiveis,
+        mensagem: 'Escolha 1 perícia da lista do Bárbaro para Conhecimento Primordial'
       };
     }
   }
@@ -2458,6 +2527,19 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     }
   }
 
+  // Aplicar Conhecimento Primordial (Bárbaro nv3): proficiência NOVA.
+  // Mesmo molde de `pericia_classe_nova` (acima): guarda de idempotência
+  // no `includes`, para uma segunda passada não duplicar a entrada.
+  let conhecimentoPrimordialAplicado = null;
+  if (exigeConhecimentoPrimordialNivel) {
+    if (!Array.isArray(personagem.pericias_proficientes)) personagem.pericias_proficientes = [];
+    const pericia = opcoes.conhecimento_primordial_pericia;
+    if (pericia && !personagem.pericias_proficientes.includes(pericia)) {
+      personagem.pericias_proficientes.push(pericia);
+      conhecimentoPrimordialAplicado = pericia;
+    }
+  }
+
   // Capstones de atributo do nível 20: Campeão Primitivo (Bárbaro, FOR e CON)
   // e Corpo e Mente (Monge, DES e SAB), ambos +4 com teto 25.
   //
@@ -2523,6 +2605,7 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     estilo_luta_troca_aplicada: estiloLutaTrocaAplicada,
     explorador_habil_aplicado: exploradorHabilAplicado,
     academico_aplicado: academicoAplicado,
+    conhecimento_primordial_aplicado: conhecimentoPrimordialAplicado,
     grimorio_adicionado: magiasGrimorioSelecionadas,
     subclasse_magias_adicionadas: magiasSubclasseArcanaSelecionadas,
     manobras_novas_aplicadas: manobrasNovasAplicadas,

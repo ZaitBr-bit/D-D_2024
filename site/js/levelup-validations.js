@@ -114,6 +114,9 @@ export function collectOpcoes(ctx, state) {
     opcoes.explorador_idiomas = state.exploradorIdiomas;
   }
   if (ctx.precisaAcademico) opcoes.academico_expertise = state.academicoExpertise;
+  if (ctx.precisaConhecimentoPrimordial) {
+    opcoes.conhecimento_primordial_pericia = state.conhecimentoPrimordialPericia;
+  }
   if (calcularConjuracao(ctx, state)?.ehMago) opcoes.grimorio_selecionados = state.grimorioSelecionados || [];
   const subclasseArcana = calcularSubclasseArcana(ctx, state);
   if (subclasseArcana) opcoes.subclasse_magias_selecionadas = state.subclasseMagiasSelecionados || [];
@@ -233,6 +236,17 @@ export function validateAll(ctx, state) {
         !(ctx.char.pericias_proficientes || []).includes(pericia) ||
         (ctx.char.pericias_expertise || []).includes(pericia)) {
       return 'Selecione 1 perícia acadêmica elegível em que você já é proficiente para Acadêmico.';
+    }
+  }
+  // Conhecimento Primordial (Bárbaro nv3, issue #45). Espelho do Acadêmico,
+  // com a condição INVERTIDA na proficiência: aqui a perícia tem de ser uma
+  // que o personagem AINDA NÃO tem -- é concessão nova, não especialização.
+  // A lista elegível vem de `ctx.opcoesConhecimentoPrimordial`, montada por
+  // buildLevelUpContext com a mesma função que subirDeNivel valida.
+  if (ctx.precisaConhecimentoPrimordial) {
+    const pericia = state.conhecimentoPrimordialPericia;
+    if (!pericia || !(ctx.opcoesConhecimentoPrimordial || []).includes(pericia)) {
+      return 'Selecione 1 perícia da lista do Bárbaro para Conhecimento Primordial.';
     }
   }
 

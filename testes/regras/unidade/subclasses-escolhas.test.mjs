@@ -252,6 +252,13 @@ const PENDENCIAS_DE_CLASSE = new Set([
   'dadiva_proficiencia_pericia', 'dadiva_resistencia_energia', 'escolhas_talento',
   'bardo_expertise', 'guardiao_expertise', 'estilo_luta', 'explorador_habil',
   'grimorio', 'academico',
+  // Conhecimento Primordial (Bárbaro nv3, issue #45) é característica da
+  // CLASSE, não de subclasse -- ela só cai no mesmo nível 3 em que a
+  // subclasse é escolhida. Sem esta entrada, as quatro Trilhas do Bárbaro
+  // acusavam "o app pede escolha que o livro não exige", quando o livro
+  // exige, sim: "proficiência em outra perícia À SUA ESCOLHA"
+  // (Classes.md:109). É a subclasse que não tem nada com isso.
+  'conhecimento_primordial',
 ]);
 
 // Tipo de pendência esperado, para as entradas de ESCOLHAS_SUBCLASSE cujo

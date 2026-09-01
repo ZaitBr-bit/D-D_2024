@@ -24,7 +24,7 @@ import {
 import {
   concedeAumentoAtributo, exigeDadivaEpica, exigeSubclasse,
   exigeEspecializacaoBardo, exigeEspecializacaoGuardiao, exigeEspecializacaoLadino,
-  exigeEstiloLuta, exigeTrocaEstiloLutaGuerreiro, exigeExploradorHabil, exigeAcademico,
+  exigeEstiloLuta, exigeTrocaEstiloLutaGuerreiro, exigeExploradorHabil, exigeAcademico, exigeConhecimentoPrimordial, opcoesPericiaConhecimentoPrimordial,
   exigeManobrasGuerreiro, getQuantidadeNovasManobras,
   obterCaracteristicasNivel, obterCaracteristicasEspecieNivel,
   obterCaracteristicasSubclasseNivel, obterMagiasDominioNivel,
@@ -257,6 +257,12 @@ export async function buildLevelUpContext(char, classeData, helpers = {}, nomeCl
   const precisaExpertiseLadino = exigeEspecializacaoLadino(sub.classe, nivelNaClasseNovo);
   const precisaExploradorHabil = exigeExploradorHabil(sub.classe, nivelNaClasseNovo);
   const precisaAcademico = exigeAcademico(sub.classe, nivelNaClasseNovo);
+  // Conhecimento Primordial (Bárbaro nv3, Classes.md:109): perícia NOVA da
+  // lista de nível 1 do Bárbaro. Nível NA CLASSE, como todo o resto deste
+  // bloco. As opções já vêm filtradas pelo que o personagem tem (issue #45).
+  const precisaConhecimentoPrimordial = exigeConhecimentoPrimordial(sub.classe, nivelNaClasseNovo);
+  const opcoesConhecimentoPrimordial = precisaConhecimentoPrimordial
+    ? opcoesPericiaConhecimentoPrimordial(classeData, char) : [];
   // Concessoes da classe NOVA, ja resolvidas (livro:2051). `null` quando o
   // nivel nao abre classe nova -- e o que faz o step 'proficiencias_classe_nova'
   // sumir. O MESMO gate de `subirDeNivel` (levelup.js): `ehPrimeiroNivelNaClasse`
@@ -318,6 +324,7 @@ export async function buildLevelUpContext(char, classeData, helpers = {}, nomeCl
   if (precisaEstiloLuta) requirements.push({ tipo: 'estilo_luta', label: 'Escolher Estilo de Luta' });
   if (precisaExploradorHabil) requirements.push({ tipo: 'explorador_habil', label: 'Explorador Hábil (1 perícia + 2 idiomas)' });
   if (precisaAcademico) requirements.push({ tipo: 'academico', label: 'Acadêmico do Mago (1 perícia)' });
+  if (precisaConhecimentoPrimordial) requirements.push({ tipo: 'conhecimento_primordial', label: 'Conhecimento Primordial (1 perícia)' });
   if (ehConjurador && conjuracao) {
     if (conjuracao.truquesGanhos > 0) requirements.push({ tipo: 'truques', label: `Selecionar ${conjuracao.truquesGanhos} truque(s)` });
     if (tipoConj === 'conhecidas' && conjuracao.magiasGanhas > 0) requirements.push({ tipo: 'magias_conhecidas', label: `Selecionar ${conjuracao.magiasGanhas} magia(s)` });
@@ -365,6 +372,8 @@ export async function buildLevelUpContext(char, classeData, helpers = {}, nomeCl
     precisaExpertiseLadino,
     precisaExploradorHabil,
     precisaAcademico,
+    precisaConhecimentoPrimordial,
+    opcoesConhecimentoPrimordial,
     concessoesClasseNova,
     manobrasGuerreiro,
     caracteristicas,
@@ -637,6 +646,7 @@ const STEP_DEFINITIONS = [
     visivel: (ctx, state) => ctx.precisaExpertiseBardo || ctx.precisaExpertiseGuardiao ||
                        ctx.precisaEstiloLuta ||
                        ctx.precisaExploradorHabil || ctx.precisaAcademico ||
+                       ctx.precisaConhecimentoPrimordial ||
                        escolhasSubclasseDoNivel(ctx, state).length > 0,
     completo: (ctx, state) => {
       if (ctx.precisaExpertiseBardo && (state.bardoExpertise || []).length !== 2) return false;
@@ -644,6 +654,7 @@ const STEP_DEFINITIONS = [
       if (ctx.precisaEstiloLuta && !state.estiloLuta) return false;
       if (ctx.precisaExploradorHabil && (!state.exploradorExpertise || (state.exploradorIdiomas || []).length !== 2)) return false;
       if (ctx.precisaAcademico && (state.academicoExpertise || []).length !== 1) return false;
+      if (ctx.precisaConhecimentoPrimordial && !state.conhecimentoPrimordialPericia) return false;
       for (const linha of escolhasSubclasseDoNivel(ctx, state)) {
         const valores = (state.escolhasSubclasse || {})[linha.campo] || [];
         if (valores.filter(Boolean).length !== linha.quantidade) return false;
@@ -933,6 +944,7 @@ export function createInitialState(char) {
     exploradorExpertise: '',
     exploradorIdiomas: [],
     academicoExpertise: [],
+    conhecimentoPrimordialPericia: '',
     // Escolhas de subclasse (regras-subclasse-escolhas.js): { campo: [valores] }.
     // Uma chave por linha da tabela que vale neste nivel; o card generico
     // preenche, collectOpcoes copia para `opcoes`.

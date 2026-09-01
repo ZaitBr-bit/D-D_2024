@@ -328,6 +328,13 @@ export const PENDENCIAS_CONHECIDAS = [
   'escolhas_talento', 'bardo_expertise', 'guardiao_expertise',
   'estilo_luta', 'explorador_habil', 'manobras_guerreiro', 'grimorio',
   'subclasse_magias_arcana', 'academico',
+  // Conhecimento Primordial (Bárbaro nv3, issue #45): a perícia extra que
+  // a característica concede. A escolha canônica está em
+  // `resolverPendencia`, e sai de `opcoesPericiaConhecimentoPrimordial`
+  // (a mesma função do app) para nunca escolher uma que o personagem já
+  // tem -- com nome fixo, a pendência reapareceria e a escada morreria em
+  // "a escolha canônica não foi aceita".
+  'conhecimento_primordial',
   // Os 12 tipos que regras-subclasse-escolhas.js criou (Plano 4). Escritos
   // por extenso de proposito: a tabela nao pode ser importada no topo deste
   // arquivo (ela puxa utils.js, que toca `window` antes de instalarStubs()
@@ -641,6 +648,17 @@ async function resolverPendencia(tipo, opcoes, p, classeData, ATRIBUTOS,
     case 'academico':
       opcoes.academico_expertise = ['Arcanismo'];
       return;
+    case 'conhecimento_primordial': {
+      // Conhecimento Primordial (Bárbaro nv3, issue #45): 1 perícia NOVA
+      // da lista de nível 1 do Bárbaro. Ao contrário de 'academico', a
+      // perícia tem de ser uma que o personagem AINDA NÃO tem -- por isso
+      // a resposta sai da MESMA função que o app usa para montar as
+      // opções, e não de um nome fixo aqui: com um nome fixo, uma fixture
+      // que já tivesse aquela perícia entraria em laço.
+      opcoes.conhecimento_primordial_pericia =
+        levelup.opcoesPericiaConhecimentoPrimordial(classeData, p)[0];
+      return;
+    }
     case 'subclasse_descobertas_magicas': {
       // Ramo dedicado porque a lista de opcoes desta linha e ASSINCRONA: o
       // livro deixa escolher "duas magias a sua escolha" de qualquer lista
@@ -976,6 +994,14 @@ async function responderPendencia(opcoes, tipo, personagem, classeData, nomeClas
       }
       opcoes.academico_expertise = ['Arcanismo'];
       return;
+    case 'conhecimento_primordial': {
+      // Ver o gêmeo em resolverPendencia, acima: a perícia sai da mesma
+      // função que o app usa (issue #45), nunca de um nome fixo.
+      const { levelup: _lv } = await modulosApp();
+      opcoes.conhecimento_primordial_pericia =
+        _lv.opcoesPericiaConhecimentoPrimordial(classeData, personagem)[0];
+      return;
+    }
     case 'ritual_bonus_proficiencia': {
       // Crescimento do Conjurador Ritualista (Talentos.md:370). Reusa
       // ritualBonusPendente -- a MESMA função que subirDeNivel chama --

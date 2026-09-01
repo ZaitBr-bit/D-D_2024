@@ -423,6 +423,9 @@ function salvarStateDoDOM(ctx, state, step) {
       state.exploradorExpertise = document.querySelector('input[name="explorador_expertise"]:checked')?.value || '';
       state.exploradorIdiomas = [...document.querySelectorAll('[data-explorador-idioma]:checked')].map(el => el.dataset.exploradorIdioma);
       state.academicoExpertise = [...document.querySelectorAll('[data-academico-expertise]:checked')].map(el => el.dataset.academicoExpertise);
+      // Conhecimento Primordial: radio, uma perícia só (issue #45).
+      state.conhecimentoPrimordialPericia =
+        document.querySelector('input[name="conhecimento_primordial_pericia"]:checked')?.value || '';
       break;
     }
     case 'selecao_magias': {
@@ -2326,6 +2329,7 @@ function montarResumoFinal(resultado, char, classeQueSobe, truquesAdicionados, m
   if (resultado.explorador_habil_aplicado?.expertise) itens.push(`Explorador Hábil: ${resultado.explorador_habil_aplicado.expertise}`);
   if ((resultado.explorador_habil_aplicado?.idiomas || []).length > 0) itens.push(`Idiomas: ${resultado.explorador_habil_aplicado.idiomas.join(', ')}`);
   if ((resultado.academico_aplicado || []).length > 0) itens.push(`Acadêmico: ${resultado.academico_aplicado.join(', ')}`);
+  if (resultado.conhecimento_primordial_aplicado) itens.push(`Conhecimento Primordial: ${resultado.conhecimento_primordial_aplicado}`);
   
   if (truquesAdicionados.length > 0) itens.push(`Truques: +${truquesAdicionados.join(', ')}`);
   if (magiasAdicionadas.length > 0) itens.push(`Magias: +${magiasAdicionadas.join(', ')}`);
