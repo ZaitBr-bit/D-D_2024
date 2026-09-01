@@ -13,13 +13,112 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.0.1';
+export const VERSAO_ATUAL = '3.0.2';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.0.2',
+    data: '2026-09-01',
+    rotulo: 'Classes e multiclasse',
+    resumo: 'Sete correções: as que a multiclasse trouxe à tona, o Bruxo e o '
+      + 'Bárbaro. A tela inicial mostra todas as suas classes; os Espaços de '
+      + 'Magia de Pacto aparecem ao lado dos de Conjuração; o limite de '
+      + 'truques volta a valer em multiclasse (ATENÇÃO, muda o seu contador — '
+      + 'veja abaixo); as invocações que concedem magia passam a aplicar o '
+      + 'efeito de verdade, as passivas dizem o que dão, e o Bárbaro nível 3 '
+      + 'finalmente escolhe a perícia do Conhecimento Primordial.',
+    correcoes: [
+      {
+        grupo: '🏠 Tela inicial — todas as classes',
+        itens: [
+          'O cartão da tela inicial mostrava só a PRIMEIRA classe, ao lado do '
+            + 'nível total. Um Mago 5/Bruxo 3 aparecia como "Mago" e "Nv. 8", '
+            + 'que se lê como um Mago de nível 8 — não era uma informação '
+            + 'incompleta, era uma informação errada. Agora sai '
+            + '"Mago (Evocação) 5 / Bruxo 3", com o nível de cada uma.',
+          'O dado de vida do cartão também vinha só da primeira classe. Quem '
+            + 'tem d6 e d8 via só o d6; agora vê os dois.',
+        ],
+      },
+      {
+        grupo: '🕯️ Bruxo — Espaços de Pacto na tela',
+        itens: [
+          'Os Espaços de Magia de Pacto sumiam da tela quando o mesmo círculo '
+            + 'também era servido pela Conjuração de outra classe. Num Mago '
+            + '5/Bruxo 3 os 2 espaços de pacto do 2º círculo não apareciam em '
+            + 'lugar nenhum — embora existissem e pudessem ser gastos. Agora '
+            + 'as duas reservas aparecem, e a de pacto se identifica: ela '
+            + 'volta no Descanso Curto, a outra não.',
+          'A ficha inteira do Bruxo sumia quando ele não era a sua PRIMEIRA '
+            + 'classe: as marcas de invocação nos truques, os espaços de pacto '
+            + 'e o Livro das Sombras na impressão. Tudo isso volta a aparecer '
+            + 'para quem pegou Bruxo como segunda classe.',
+        ],
+      },
+      {
+        grupo: '✨ Bruxo — Invocações Místicas',
+        itens: [
+          'Conjurar pela invocação só mostrava um aviso na tela: usar Armadura '
+            + 'Arcana por "Armadura de Sombras" não mexia na sua CA. Agora a '
+            + 'conjuração acontece de verdade — alvo, efeito e concentração —, '
+            + 'sem gastar espaço, que é o que o livro dispensa.',
+          'Três magias de invocação estavam grafadas sem acento e não batiam '
+            + 'com o catálogo: Levitação (Passo Ascendente) aparecia como 1º '
+            + 'círculo em vez de 2º, e Respirar na Água (Presente das '
+            + 'Profundezas) como 1º em vez de 3º. Corrigido.',
+          'As invocações puramente passivas não diziam o que davam. Mente '
+            + 'Mística (Vantagem em salvaguardas de Constituição para manter a '
+            + 'Concentração), Visão da Bruxa, Visão Diabólica e Presente das '
+            + 'Profundezas agora mostram o benefício no bloco de Recursos do '
+            + 'Bruxo.',
+        ],
+      },
+      {
+        grupo: '🪓 Bárbaro — Conhecimento Primordial',
+        itens: [
+          'No nível 3 o Bárbaro ganha proficiência em mais uma perícia da '
+            + 'lista dele, à escolha do jogador. O app anunciava a '
+            + 'característica no resumo da subida e não fazia nada com ela: '
+            + 'nem oferecia a escolha, nem concedia a perícia. Agora a '
+            + 'subida ao nível 3 pede a perícia, e ela entra na ficha.',
+          'A lista oferecida já exclui as perícias que você tem — Atletismo, '
+            + 'Intimidação, Lidar com Animais, Natureza, Percepção e '
+            + 'Sobrevivência, menos as suas.',
+          'A outra metade da característica (usar Força no lugar do atributo '
+            + 'normal em certas perícias durante a Fúria) já funcionava e não '
+            + 'mudou.',
+          'Se o seu Bárbaro já passou do nível 3 antes desta versão, a '
+            + 'perícia não aparece sozinha: ela é escolha sua, e o app não '
+            + 'escolhe por você. Dá para marcá-la na edição da ficha.',
+        ],
+      },
+      {
+        grupo: '🔢 Limite de truques em multiclasse',
+        itens: [
+          'Com duas classes conjuradoras o limite de truques simplesmente não '
+            + 'valia: dava para marcar quantos quisesse (medimos 16 truques '
+            + 'num limite de 4). Isso acontecia porque o app não sabia de qual '
+            + 'classe era cada truque, e preferiu não travar a travar errado.',
+          'ATENÇÃO, muda o seu contador: agora cada truque que você adicionar '
+            + 'fica marcado com a classe pela qual você o pegou, e o contador '
+            + 'passa a ser por classe. Nos truques que você JÁ tinha não há '
+            + 'essa marca — em ficha multiclasse eles aparecem como '
+            + '"+N sem classe" ao lado do contador, não somem e nada é '
+            + 'apagado. Enquanto houver truque sem marca o app não bloqueia '
+            + 'nada: ele prefere mostrar a dúvida a chutar de quem é o truque. '
+            + 'Para acertar a conta, tire e ponha de novo o truque pela aba da '
+            + 'classe certa.',
+          'Quem tem uma classe só não muda em nada: sem duas classes não há '
+            + 'dúvida possível, e o truque continua contando como sempre '
+            + 'contou — inclusive o personalizado.',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.0.1',
     data: '2026-09-01',
