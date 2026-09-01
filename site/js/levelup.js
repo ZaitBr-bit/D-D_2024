@@ -2152,27 +2152,79 @@ export async function subirDeNivel(personagem, opcoes = {}) {
       }
     }
 
+    // ATENÇÃO, MANTENEDOR: este bloco (e o de Conjurador Ritualista logo
+    // abaixo) é um ESPELHO da mesma regra que `aplicarEfeitoTalento`
+    // (regras-cobertura.js) já aplica -- não é a fonte da verdade.
+    //
+    // Rastreamento de chamada feito na revisão da issue #31 (rodada 1):
+    // dentro desta mesma função, `aplicarEfeitoTalento` roda algumas linhas
+    // acima (ver `resultadoCoberturaTalento`), DENTRO DO MESMO
+    // `if (ganhaAumentoAtributo && opcoes.talento) { ... }` que envolve os
+    // dois blocos abaixo, sem nenhum `return` entre um e outro nesse
+    // caminho, e lendo o MESMO dado (`opcoes.escolhas_talento_levelup?.[0]`,
+    // via `montarEscolhasCoberturaTalento`). Ou seja: quando estes blocos
+    // rodam, a promoção da magia/ritual já preparado pela classe já
+    // aconteceu -- eles só encontram a entrada já corrigida e não fazem
+    // nada. HOJE, portanto, os dois blocos são INERTES: não existe caminho
+    // conhecido do app em que removê-los mudaria o resultado, e por isso
+    // NENHUM teste consegue nascer vermelho por causa só deles (ver
+    // task-4-report.md, rodada 1 -- não force um teste aqui, ele vai
+    // nascer verde e não estará medindo nada).
+    //
+    // Mesmo assim os dois ficam CORRIGIDOS com o mesmo padrão find-ou-
+    // promove de `aplicarEfeitoTalento` (em vez de deletados ou deixados
+    // com o bug), como defesa: se um dia a ordem das duas chamadas mudar
+    // (ou aplicarEfeitoTalento parar de rodar aqui), o bug de #31 -- a
+    // magia ESCOLHIDA pelo jogador não ficar sempre preparada/grátis
+    // quando já preparada por outra via -- não reaparece em silêncio.
+    // Consolidar as duas cópias (apagar o espelho, chamar só
+    // aplicarEfeitoTalento) é decisão estrutural, com tarefa e oráculo
+    // próprios -- não esta rodada.
+
     // Aplicar Tocado Por Fadas / Tocado Pelas Sombras (magia escolhida + magia parceira)
     if (opcoes.talento_tipo_escolha === 'tocado_fadas' || opcoes.talento_tipo_escolha === 'tocado_sombras') {
       const nomeMagia = opcoes.escolhas_talento_levelup?.[0];
       if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
       const origem = opcoes.talento_tipo_escolha === 'tocado_fadas' ? 'tocado_por_fadas' : 'tocado_pelas_sombras';
+      // As duas magias ficam sempre preparadas e com uso gratis (mesma regra
+      // do livro para as duas). Se a magia ja estiver preparada (ex.:
+      // concedida pela classe), promove a entrada existente em vez de pular
+      // -- o `if (... && !find(...))` anterior pulava, deixando a entrada
+      // sem origem/gratis_usado (issue #31).
       // Magia escolhida (1º círculo)
-      if (nomeMagia && !personagem.magias_preparadas.find(m => m.nome === nomeMagia)) {
-        personagem.magias_preparadas.push({ nome: nomeMagia, circulo: 1, origem, gratis_usado: false });
+      if (nomeMagia) {
+        const existente = personagem.magias_preparadas.find(m => m.nome === nomeMagia);
+        if (existente) {
+          existente.origem = origem;
+          existente.gratis_usado = false;
+        } else {
+          personagem.magias_preparadas.push({ nome: nomeMagia, circulo: 1, origem, gratis_usado: false });
+        }
       }
       // Magia parceira sempre-preparada (2º círculo): Passo Nebuloso para Fadas, Invisibilidade para Sombras
       const nomeParceiro = opcoes.talento_tipo_escolha === 'tocado_fadas' ? 'Passo Nebuloso' : 'Invisibilidade';
-      if (!personagem.magias_preparadas.find(m => m.nome === nomeParceiro)) {
+      const existenteParceiro = personagem.magias_preparadas.find(m => m.nome === nomeParceiro);
+      if (existenteParceiro) {
+        existenteParceiro.origem = origem;
+        existenteParceiro.gratis_usado = false;
+      } else {
         personagem.magias_preparadas.push({ nome: nomeParceiro, circulo: 2, origem, gratis_usado: false });
       }
     }
 
-    // Aplicar Conjurador Ritualista (magias rituais)
+    // Aplicar Conjurador Ritualista (magias rituais) -- espelho de
+    // aplicarEfeitoTalento, mesmo caso do bloco de Tocado acima (ver o
+    // comentário grande logo antes dele: hoje inerte, corrigido por
+    // defesa, sem oráculo dedicado possível).
     if (opcoes.talento_tipo_escolha === 'conjurador_ritualista') {
       if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
       for (const nomeMagia of (opcoes.escolhas_talento_levelup || [])) {
-        if (!personagem.magias_preparadas.find(m => m.nome === nomeMagia)) {
+        // Promove a entrada existente (ritual ja preparado pela classe) em
+        // vez de pular -- mesmo furo do bloco de Tocado (issue #31).
+        const existente = personagem.magias_preparadas.find(m => m.nome === nomeMagia);
+        if (existente) {
+          existente.origem = 'conjurador_ritualista';
+        } else {
           personagem.magias_preparadas.push({ nome: nomeMagia, circulo: 1, origem: 'conjurador_ritualista' });
         }
       }

@@ -673,18 +673,40 @@ export function aplicarEfeitoTalento(char, nome, escolhas = {}) {
     const parceira = nome === 'Tocado Por Fadas' ? 'Passo Nebuloso' : 'Invisibilidade';
     const escolhida = escolhas.magia || valor(escolhas, 'magia_1_circulo', 0);
     const preparadas = garantirArray(char, 'magias_preparadas');
+    // "Você tem essa magia e Invisibilidade/Passo Nebuloso sempre preparadas,
+    // podendo conjurá-las sem gastar espaço de magia" (Talentos.md §Magia
+    // Sombria/§Magia Feérica) -- as DUAS entram com o mesmo tratamento. Se a
+    // magia ja estiver preparada (ex.: concedida pela classe), promove a
+    // entrada existente em vez de pular: adicionarUnico pularia e deixaria a
+    // entrada sem origem/gratis_usado, fazendo-a contar no limite de
+    // preparadas e nunca mostrar o botao "Gratis" -- mesmo padrao de
+    // Iniciado em Magia, logo abaixo.
     for (const [magia, circulo] of [[escolhida, 1], [parceira, 2]]) {
-      adicionarUnico(preparadas, { nome: magia, circulo, origem, gratis_usado: false },
-        atual => atual?.nome === magia);
+      const existente = preparadas.find(m => m?.nome === magia);
+      if (existente) {
+        existente.origem = origem;
+        existente.gratis_usado = false;
+      } else {
+        preparadas.push({ nome: magia, circulo, origem, gratis_usado: false });
+      }
     }
     parametrosTalento(char, origem).atributo = atributo;
   }
 
   if (nome === 'Conjurador Ritualista') {
     const preparadas = garantirArray(char, 'magias_preparadas');
+    // Mesmo furo do bloco de Tocado Por Fadas/Pelas Sombras acima: promove a
+    // entrada existente (ritual ja preparado pela classe) em vez de pular,
+    // para que ela ganhe `origem: 'conjurador_ritualista'` e saia do limite
+    // de preparadas (Talentos.md §Conjurador Ritualista: "Você tem essas
+    // magias sempre preparadas").
     for (const magia of (escolhas.rituais || escolhas.selecoes || [])) {
-      adicionarUnico(preparadas, { nome: magia, circulo: 1, origem: 'conjurador_ritualista' },
-        atual => atual?.nome === magia);
+      const existente = preparadas.find(m => m?.nome === magia);
+      if (existente) {
+        existente.origem = 'conjurador_ritualista';
+      } else {
+        preparadas.push({ nome: magia, circulo: 1, origem: 'conjurador_ritualista' });
+      }
     }
     parametrosTalento(char, 'conjurador_ritualista').atributo = atributo;
     recursoTalento(char, 'conjurador_ritualista', { ritual_rapido_usado: false });
