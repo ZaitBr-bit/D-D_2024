@@ -99,6 +99,13 @@ export const NOTAS_VERSAO = [
             + 'criada, pulando o custo de copiar (50 PO e 2h por círculo) '
             + 'que toda outra magia paga. Agora ela precisa ser copiada como '
             + 'as demais, pelo botão "+ Copiar Magia para Grimório".',
+          'ATENÇÃO, muda o seu contador: truque customizado passa a gastar '
+            + 'vaga do limite de truques da classe, como a magia customizada '
+            + 'de círculo já gastava vaga das preparadas. Antes o truque era '
+            + 'de graça e a magia não, sem razão para a diferença. Se você já '
+            + 'tem truque customizado, o contador sobe e pode ficar vermelho, '
+            + 'acima do limite — nada é apagado, e nenhum truque some; você '
+            + 'só não pega mais um da classe até acertar a conta.',
         ],
       },
       {
