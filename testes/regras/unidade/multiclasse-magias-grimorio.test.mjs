@@ -905,27 +905,34 @@ function criarDomDeFormMagiaCustom() {
 }
 
 // ============================================================
-// ORÁCULO 5 -- rodada de correção 1/5: `mostrarFormMagiaCustom`
-// (grimorio.js) decidia se registrava a magia de círculo criada no
-// grimório por `char.classe === 'Mago'` (o espelho da classe INICIAL),
-// UMA linha acima de `magiaMagoEstaNoGrimorio(char, ...)` -- convertida
-// para `temClasse` nesta mesma tarefa. Duas linhas vizinhas respondendo
-// "este personagem é Mago?" de formas diferentes: para um Ladino 5/Mago 1,
-// `char.classe === 'Mago'` é `false`, então o bloco inteiro era pulado e a
-// magia de círculo criada NUNCA entrava em `char.grimorio`. Como
-// `mostrarBuscaMagia` monta a grade de círculos só a partir do grimório
-// para quem `ehMago` (ver Oráculo 4), a magia criada não aparecia lá --
-// beco sem saída, alcançável só depois desta tarefa (antes o modal inteiro
-// estava quebrado para esse personagem).
+// ORÁCULO 5 -- rodada de correção 1/5 (histórico, PRESERVADO): quando este
+// oráculo nasceu, `mostrarFormMagiaCustom` (grimorio.js) decidia se
+// registrava a magia de círculo criada no grimório por `char.classe ===
+// 'Mago'` (o espelho da classe INICIAL), UMA linha acima de
+// `magiaMagoEstaNoGrimorio(char, ...)` -- convertida para `temClasse`
+// naquela tarefa. Duas linhas vizinhas respondendo "este personagem é
+// Mago?" de formas diferentes: para um Ladino 5/Mago 1, `char.classe ===
+// 'Mago'` é `false`, então o bloco inteiro era pulado e a magia de círculo
+// criada NUNCA entrava em `char.grimorio`. Como `mostrarBuscaMagia` montava
+// a grade de círculos só a partir do grimório para quem `ehMago` (ver
+// Oráculo 4), a magia criada não aparecia lá -- beco sem saída, alcançável
+// só depois daquela tarefa (antes o modal inteiro estava quebrado para
+// esse personagem). A correção de então foi `temClasse(char, 'Mago')`.
 //
-// A correção é `temClasse(char, 'Mago')` -- a mesma pergunta que a linha
-// vizinha já faz. Note que aqui é `temClasse`, não `superficieAtiva()?.
-// usaGrimorio`: o grimório é propriedade do PERSONAGEM (ele "tem" um
-// grimório porque tem níveis de Mago), não da superfície que a tela está
-// mostrando no momento -- a mesma distinção que fez `magiaMagoEstaNoGrimorio`
-// usar `temClasse` e não `superficieAtiva()`.
+// REVISADO pela issue #42 (Tarefa 7, sub-projeto
+// 2026-08-31-bugs-abertos-github): o bloco inteiro que a correção acima
+// destravou empurrava a magia recém-criada direto para `char.grimorio`,
+// pulando o custo de cópia (50 PO / 2h por círculo) que toda outra magia
+// do grimório paga -- um contorno deliberado (comentário original do
+// código), sem razão de existir depois da Tarefa 6 daquele mesmo
+// sub-projeto (#27/#33): com `mostrarBuscaMagia` lendo
+// `char.magias_customizadas` direto e o portão do grimório isento para
+// magia personalizada, a magia criada TEM caminho para ser preparada sem
+// nunca ter entrado no grimório -- o beco que este oráculo media não existe
+// mais. `temClasse(char, 'Mago')` continua correto e não muda; o que muda é
+// a asserção: criar a magia não pode mais, sozinho, colocá-la no grimório.
 // ============================================================
-test('Oráculo 5: Ladino 5/Mago 1 -- magia de círculo criada em "Magia Personalizada" entra no grimório', async () => {
+test('Oráculo 5 (issue #42): Ladino 5/Mago 1 -- magia de círculo criada em "Magia Personalizada" NÃO entra sozinha no grimório', async () => {
   const NOME_MAGIA = 'Lâmina Improvisada de Teste';
   const p = await personagemMulticlasse([{ classe: 'Ladino', nivel: 5 }, { classe: 'Mago', nivel: 1 }]);
   sheetEstado.definirChar(p);
@@ -960,11 +967,91 @@ test('Oráculo 5: Ladino 5/Mago 1 -- magia de círculo criada em "Magia Personal
   assert.ok((p.magias_customizadas || []).some((m) => m.nome === NOME_MAGIA),
     `"${NOME_MAGIA}" deveria ter sido salva em magias_customizadas -- validação do formulário recusou? ` +
     `magias_customizadas: ${JSON.stringify(p.magias_customizadas)}`);
-  assert.ok((p.grimorio || []).some((m) => m?.nome === NOME_MAGIA),
-    `"${NOME_MAGIA}" (círculo 1, personagem com Mago) deveria ter entrado em char.grimorio -- se não ` +
-    `entrou, o bloco "if (temClasse(char, 'Mago') && ...)" não disparou para este personagem ` +
-    `multiclasse. magias_customizadas: ${JSON.stringify(p.magias_customizadas)}, grimorio: ` +
+  assert.ok(!(p.grimorio || []).some((m) => m?.nome === NOME_MAGIA),
+    `"${NOME_MAGIA}" (círculo 1, personagem com Mago) NÃO deveria ter entrado em char.grimorio ao ser ` +
+    `criada -- isso pulava o custo de cópia (50 PO / 2h por círculo) que toda outra magia do grimório ` +
+    `paga (issue #42). Copiar exige passar pelo botão "+ Copiar Magia para Grimório" ` +
+    `(mostrarBuscaGrimorio). magias_customizadas: ${JSON.stringify(p.magias_customizadas)}, grimorio: ` +
     `${JSON.stringify(p.grimorio)}`);
+});
+
+// ============================================================
+// ORÁCULO 5b (issue #42, rodada 1 de correção -- achado CRITICAL do
+// revisor): o Oráculo 5 mede só o instante da CRIAÇÃO, com o personagem em
+// memória. O revisor achou uma SEGUNDA porta para o mesmo registro de
+// graça, mais adiante no ciclo de vida: `normalizarGrimorioMago` (utils.js)
+// empurra para `personagem.grimorio` TODA magia preparada de círculo > 0
+// que conte no limite (`magiaContaNoLimite`) de um personagem `classe ===
+// 'Mago'` -- e uma entrada preparada personalizada NÃO tem `origem`, então
+// conta. Essa função roda dentro de `store.listarPersonagens()` (chamada
+// por TODO load de ficha e por TODO `salvarPersonagem`), persistindo o
+// resultado de volta no localStorage.
+//
+// O caminho completo do defeito: (1) criar a magia -- corretamente FORA do
+// grimório, Oráculo 5 acima; (2) preparar pela grade "+ Magia" -- permitido
+// de graça pela isenção `!ehPersonalizada` que a Tarefa 6 pôs no portão do
+// grimório (grimorio.js); (3) qualquer recarregamento da ficha, ou mesmo só
+// abrir a lista de personagens -- `normalizarGrimorioMago` via
+// `magiaContaNoLimite` não distingue "escolhida da lista da classe" de
+// "personalizada", então empurra a preparada personalizada para o grimório,
+// sem cobrar PO nenhum.
+//
+// Este oráculo não precisa de multiclasse (o próprio revisor reproduziu com
+// um Mago puro) -- usa `store` e `utils`, já expostos por `modulosApp()`,
+// e mede o ciclo completo pedido pelo revisor: criar -> preparar -> SALVAR
+// -> RECARREGAR (uma segunda leitura de `store.listarPersonagens()`, o
+// mesmo efeito de reabrir a ficha ou revisitar a lista de personagens) ->
+// só então conferir o grimório. Também confere o que fica GRAVADO em
+// localStorage, não só o que a função devolve em memória -- é
+// `store.listarPersonagens()` quem persiste de volta quando `alterado`.
+// ============================================================
+test('Oráculo 5b (issue #42, revisão 1): magia personalizada preparada NÃO é registrada de graça no grimório ao recarregar', async () => {
+  const { store } = await modulosApp();
+  const NOME_MAGIA = 'Lufada Arcana de Nimb';
+  const chaveOriginal = localStorage.getItem('dnd_personagens');
+  localStorage.setItem('dnd_personagens', '[]');
+  try {
+    const personagem = {
+      id: 'regras-t7-r1-oraculo5b',
+      nome: 'Teste Oráculo 5b',
+      classe: 'Mago', nivel: 5,
+      atributos: { forca: 10, destreza: 10, constituicao: 10, inteligencia: 16, sabedoria: 10, carisma: 10 },
+      magias_customizadas: [{
+        nome: NOME_MAGIA, circulo: 1, escola: 'Evocação', tempo_conjuracao: 'Ação',
+        alcance: '9 metros', componentes: 'V, S', duracao: 'Instantânea',
+        descricao: '', dano: '', ritual: false,
+      }],
+      // Preparada pela grade "+ Magia" -- o MESMO carimbo que
+      // sheet/grimorio.js grava ao preparar uma personalizada
+      // (`personalizada: true`), sem nunca ter passado pelo grimório.
+      magias_preparadas: [{ nome: NOME_MAGIA, circulo: 1, classe: 'Mago', personalizada: true }],
+      grimorio: [], // nunca copiada -- correto, Oráculo 5 acima
+      moedas: { pl: 0, po: 200, pe: 0, pp: 0, pc: 0 },
+    };
+    store.salvarPersonagem(personagem);
+
+    // "Recarregar": uma SEGUNDA chamada a listarPersonagens() é exatamente
+    // o efeito de reabrir a página (store.js roda normalizarGrimorioMago em
+    // todo load e persiste de volta se `alterado`).
+    const relido = store.listarPersonagens().find((p) => p.id === personagem.id);
+    assert.ok(relido, 'o personagem salvo precisa estar na lista relida -- sem isso a asserção abaixo não mede nada');
+    assert.ok(!(relido.grimorio || []).some((m) => m?.nome === NOME_MAGIA),
+      `"${NOME_MAGIA}" foi preparada mas NUNCA copiada -- normalizarGrimorioMago (utils.js) não pode ` +
+      `registrá-la de graça no grimório só por estar preparada (issue #42, achado CRITICAL da revisão ` +
+      `1). grimorio após recarregar: ${JSON.stringify(relido.grimorio)}`);
+    assert.equal((relido.moedas || {}).po, 200, 'nenhum PO pode ter sido cobrado -- ninguém copiou nada');
+
+    // O registro de graça também não pode ter sido GRAVADO em localStorage
+    // por trás das costas do jogador -- só o que está em memória não basta.
+    const persistido = JSON.parse(localStorage.getItem('dnd_personagens'))
+      .find((p) => p.id === personagem.id);
+    assert.ok(!(persistido?.grimorio || []).some((m) => m?.nome === NOME_MAGIA),
+      `o localStorage não pode conter "${NOME_MAGIA}" no grimório -- persistido: ` +
+      `${JSON.stringify(persistido?.grimorio)}`);
+  } finally {
+    if (chaveOriginal === null) localStorage.removeItem('dnd_personagens');
+    else localStorage.setItem('dnd_personagens', chaveOriginal);
+  }
 });
 
 // ============================================================

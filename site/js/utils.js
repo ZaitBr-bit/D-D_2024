@@ -180,7 +180,23 @@ export function nomesMagiaCirculo1Conhecidas(personagem) {
  * de `regras-magia-classe.js`. Fica registrado aqui como possibilidade para
  * um sub-projeto futuro, não como pedido de mudança desta função.
  *
-
+ * MAGIA PERSONALIZADA NÃO ENTRA POR AQUI (issue #42, achado da revisão da
+ * Tarefa 7): esta função existe para migrar ficha LEGADA -- "magia
+ * preparada normal já pertence ao grimório" -- mas magia personalizada
+ * preparada (`magias_preparadas[].personalizada === true`, carimbo que
+ * `sheet/grimorio.js` e `sheet/magias.js` sempre gravam ao preparar uma)
+ * CONTA no limite de preparadas (`magiaContaNoLimite`, que não distingue
+ * origem "personalizada" de origem "escolhida da lista da classe" -- as
+ * duas são escolha do jogador) mas não pode ser tratada como "normal" AQUI:
+ * ela nunca foi copiada, e copiar custa 50 PO / 2h por círculo -- o mesmo
+ * preço que esta função pulava para toda magia customizada RECÉM-CRIADA
+ * antes da Tarefa 7 corrigir `mostrarFormMagiaCustom`. Sem excluir
+ * `personalizada` daqui, o mesmo defeito voltava por esta porta: criar a
+ * magia (correto, fora do grimório), preparar pela grade ("+ Magia", isenta
+ * do portão do grimório desde a Tarefa 6) e só reabrir a ficha bastava para
+ * `listarPersonagens()` (store.js) ou o load da ficha (pages/sheet.js)
+ * chamarem esta função e empurrar a magia para o grimório de graça.
+ *
  * @param {object} personagem
  * @param {number} [limitePreparadas]
  * @returns {{alterado: boolean, pendentes: number}}
@@ -238,6 +254,13 @@ export function normalizarGrimorioMago(personagem, limitePreparadas) {
     .filter(magia => magia && typeof magia === 'object' && typeof magia.nome === 'string' && magia.nome && magiaContaNoLimite(magia) && Number(magia.circulo) > 0);
 
   for (const magia of preparadasNormais) {
+    // issue #42: pula magia PERSONALIZADA -- ela conta no limite de
+    // preparadas (por isso continua em `preparadasNormais`, usada também
+    // para `pendentes` abaixo), mas não é "magia normal já pertencente ao
+    // grimório" -- ela nunca foi copiada, e empurrá-la aqui é o mesmo
+    // registro de graça que a Tarefa 7 fechou na criação. Ver o docblock
+    // desta função para o caminho completo do defeito.
+    if (magia.personalizada) continue;
     if (!magiaMagoEstaNoGrimorio(personagem, magia.nome)) {
       personagem.grimorio.push({ ...magia });
       alterado = true;

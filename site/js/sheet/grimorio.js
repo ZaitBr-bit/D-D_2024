@@ -26,7 +26,7 @@ import { truqueContaNoLimite, truqueEhTrocavel } from '../regras-origens-magia.j
 // char.nivel (a classe INICIAL, o espelho) por classes[] de verdade -- ver
 // o comentario de superficieAtiva() abaixo.
 import { superficiesDaFicha, superficieAtivaDaFicha } from './contexto-classe.js';
-import { nivelNa, temClasse } from '../regras-multiclasse.js';
+import { nivelNa } from '../regras-multiclasse.js';
 // preparadasPorClasse (Tarefa 4, sub-projeto "magia sabe a classe"): fonte
 // unica dos tres baldes (desta/deOutra/semClasse) que este arquivo usava a
 // reimplementar contando char.magias_preparadas cru contra o limite de UMA
@@ -320,7 +320,7 @@ export async function mostrarBuscaMagia() {
     .map(m => ({ ...m, circulo: Number(m.circulo), personalizada: true }));
 
   // Nomes que estão no GRIMÓRIO -- a única fonte que pode entregar a mesma
-  // magia personalizada duas vezes (ver `ehCopiaDoDesvio`, logo abaixo).
+  // magia personalizada duas vezes (ver `ehCopiaJaNoGrimorio`, logo abaixo).
   const nomesDoGrimorio = new Set(
     (Array.isArray(char.grimorio) ? char.grimorio : []).map(m => m?.nome)
   );
@@ -332,10 +332,14 @@ export async function mostrarBuscaMagia() {
     const personalizadasDoCirc = personalizadasDeCirculo.filter(m => m.circulo === c);
     const nomesPersonalizados = new Set(personalizadasDoCirc.map(m => m.nome));
     // DEDUP ESTREITO, e o estreitamento é o ponto. Para o Mago a MESMA magia
-    // chega por dois caminhos -- o desvio da gravação do formulário a empurra
-    // para `char.grimorio`, de onde a grade do Mago é montada, e agora
-    // também pela fusão acima --, e sem remover uma delas o jogador veria o
-    // cartão DUPLICADO.
+    // pode chegar por dois caminhos -- o jogador criou a personalizada (fusão
+    // acima) E pagou para copiá-la para `char.grimorio` (issue #42:
+    // mostrarBuscaGrimorio agora lista a magia personalizada como copiável,
+    // de onde a grade do Mago também é montada) --, e sem remover uma delas
+    // o jogador veria o cartão DUPLICADO. Antes da #42 este mesmo dedup já
+    // existia para cobrir o CONTORNO que empurrava a personalizada sozinha
+    // para o grimório; o contorno saiu, mas o dedup continua necessário
+    // porque a cópia LEGÍTIMA produz o mesmo par duplicado.
     //
     // O que NÃO pode acontecer é este dedup valer para todo mundo: um
     // Clérigo pode criar a SUA "Bênção" personalizada, e "Bênção" também é
@@ -350,11 +354,11 @@ export async function mostrarBuscaMagia() {
     // grimório (`nomesDoGrimorio`), de um personagem com grimório
     // (`ehMago`), e que tem uma personalizada do MESMO círculo com o mesmo
     // nome. Fora do Mago nada é removido, e a lista da classe fica intacta.
-    const ehCopiaDoDesvio = (m) => ehMago
+    const ehCopiaJaNoGrimorio = (m) => ehMago
       && nomesPersonalizados.has(m.nome)
       && nomesDoGrimorio.has(m.nome);
     const doCirculo = [
-      ...magiasClasse.filter(m => m.circulo === c && !ehCopiaDoDesvio(m)),
+      ...magiasClasse.filter(m => m.circulo === c && !ehCopiaJaNoGrimorio(m)),
       ...personalizadasDoCirc
     ];
     if (doCirculo.length > 0) magiasCirculo[c] = doCirculo;
@@ -796,11 +800,12 @@ export async function mostrarBuscaMagia() {
               .some(m => m?.nome === nome && Number(m?.circulo) === circ);
           // O portão do grimório não vale para magia personalizada: ela não
           // sai do acervo e não é "registrada" em livro nenhum -- o jogador
-          // a inventou. Exigir presença no grimório aqui deixaria o Mago
-          // dependente do desvio que empurra a magia criada para
-          // `char.grimorio` (mostrarFormMagiaCustom), e esse desvio é assunto
-          // de outra issue: o caminho normal de preparo não pode depender
-          // dele para funcionar.
+          // a inventou. Isento AQUI, e não só em mostrarFormMagiaCustom
+          // (issue #42): o caminho normal de preparo não pode depender de a
+          // magia customizada ter sido empurrada para `char.grimorio` --
+          // esse empurrão automático foi removido de lá, e a magia
+          // personalizada só entra no grimório se o jogador pagar a cópia,
+          // pelo botão "+ Copiar Magia para Grimório" (mostrarBuscaGrimorio).
           if (ehMago && !ehPersonalizada && !magiaMagoEstaNoGrimorio(char, nome)) {
             toast('Essa magia não está registrada no grimório.', 'error');
             return;
@@ -1185,23 +1190,84 @@ export async function mostrarFormMagiaCustom(indiceEdicao = null) {
     if (magiaExistente) char.magias_customizadas[indiceEdicao] = magiaSalva;
     else char.magias_customizadas.push(magiaSalva);
     const identidadeMudou = Boolean(magiaExistente) && (nomeAnterior !== magiaSalva.nome || circuloAnterior !== magiaSalva.circulo);
-    // temClasse (classes[], a fonte da verdade), não char.classe (o espelho
-    // da classe INICIAL): a linha 664 logo abaixo já pergunta "este
-    // personagem é Mago?" via magiaMagoEstaNoGrimorio (convertida para
-    // temClasse nesta mesma tarefa) -- com char.classe aqui, um Ladino
-    // 5/Mago 1 pulava este bloco inteiro, a magia de círculo criada nunca
-    // entrava em char.grimorio, e como ehMago (mostrarBuscaMagia) já é
-    // true para ele, a grade de círculos só lista o que está no grimório
-    // -- a magia criada ficava sem caminho nenhum para ser preparada.
-    if (temClasse(char, 'Mago') && (!magiaExistente || identidadeMudou)) {
-      if (nomeAnterior && Array.isArray(char.grimorio)) {
-        const idxAntigo = char.grimorio.findIndex(m => m?.nome === nomeAnterior);
-        if (idxAntigo >= 0) char.grimorio.splice(idxAntigo, 1);
+    // Issue #42: o contorno que empurrava a magia recém-criada direto para
+    // char.grimorio -- pulando o custo de cópia (50 PO / 2h por círculo)
+    // que toda outra magia do grimório paga -- foi removido daqui. Ele
+    // nasceu para escapar do MESMO beco que as issues #27/#33 descrevem:
+    // antes da Tarefa 6 daquele sub-projeto, a grade de círculos do Mago só
+    // listava o que estava em char.grimorio, e a magia customizada não
+    // tinha NENHUM caminho para ser preparada. Com mostrarBuscaMagia lendo
+    // char.magias_customizadas direto (Tarefa 6) e o portão do grimório
+    // isento para magia personalizada (a checagem `!ehPersonalizada`, mais
+    // abaixo neste arquivo, dentro de mostrarBuscaMagia), o beco não existe
+    // mais -- a magia customizada segue o caminho normal: nasce FORA do
+    // grimório, e só entra nele se o jogador pagar a cópia pelo botão "+
+    // Copiar Magia para Grimório" (mostrarBuscaGrimorio, logo abaixo, que
+    // agora também lista a magia personalizada como copiável).
+    //
+    // O que continua aqui: se essa magia JÁ estava no grimório por cópia
+    // legítima (o jogador pagou por ela antes de vir editar), a edição não
+    // pode deixar uma entrada órfã presa no nome/círculo antigo -- ela
+    // acompanha a identidade nova, ou sai do grimório se a edição tirou a
+    // magia de círculo (virou truque).
+    //
+    // ACHADO da revisão (issue #42, rodada 1): `char.grimorio` guarda só
+    // `{nome, circulo}` -- a mesma limitação estrutural "uma vaga por nome"
+    // que `ehCopiaJaNoGrimorio` documenta lá em cima (mostrarBuscaMagia).
+    // Buscar a entrada antiga sem checar DE QUEM ela é corre o risco de
+    // casar com a magia ERRADA.
+    //
+    // RODADA 1 perguntava "existe magia do ACERVO com este NOME?" e
+    // recusava mexer se sim. ERRADO (achado da rodada 2): essa é uma
+    // pergunta de EXISTÊNCIA DE NOME, não de POSSE DA ENTRADA -- ela
+    // recusava até quando a entrada do grimório É da personalizada de
+    // verdade (paga por 50 PO, pelo botão "+ Copiar Magia para Grimório",
+    // que este mesmo sub-projeto abriu para magia personalizada, em
+    // mostrarBuscaGrimorio, abaixo). Repro: Mago cria "Bola de Fogo"
+    // personalizada de 1º círculo, paga a cópia (grimório vira
+    // `[{nome:'Bola de Fogo', circulo:1}]`), renomeia para "Chama Azul" --
+    // a rodada 1 recusava mexer (existe "Bola de Fogo" no acervo, só que
+    // de OUTRO círculo), deixando a entrada PAGA órfã sob o nome morto, e
+    // um toast de sucesso ("atualizada!") mentindo que deu tudo certo.
+    //
+    // RODADA 2: a pergunta certa é de POSSE, e o melhor sinal disponível
+    // sem reestruturar `char.grimorio` (fora do escopo desta tarefa) é
+    // NOME + CÍRCULO juntos, não nome sozinho. Toda sincronização
+    // bem-sucedida deste bloco deixa o círculo gravado no grimório IGUAL
+    // ao círculo então-atual da personalizada -- então uma entrada com o
+    // NOME antigo E o CÍRCULO antigo (`circuloAnterior`, já calculado
+    // acima) só pode ser desta personalizada, A MENOS que o acervo tenha
+    // uma magia com o MESMO nome E o MESMO círculo (colisão dupla: rara,
+    // mas possível -- o jogador escolheu de propósito nome e círculo
+    // iguais aos do livro). Só nesse caso nome+círculo não bastam para
+    // decidir, e a saída não é adivinhar: é DIZER ao jogador que não deu
+    // para confirmar sozinho (toast de aviso, `grimorioAmbiguo` abaixo --
+    // nunca um "atualizada!" silencioso escondendo a dúvida).
+    //
+    // Índice do acervo indisponível (`getIndiceMagias()` falhou e não há
+    // cache -- MINOR da rodada 2, mesma predicada) conta como "não
+    // consigo confirmar que NÃO é do acervo", não como "não é do acervo":
+    // falha FECHADA (avisa o jogador), nunca aberta (sincroniza sem
+    // checar).
+    let grimorioAmbiguo = false;
+    if (identidadeMudou && nomeAnterior && Array.isArray(char.grimorio)) {
+      const idxProvavel = char.grimorio
+        .findIndex(m => m?.nome === nomeAnterior && Number(m?.circulo) === circuloAnterior);
+      if (idxProvavel >= 0) {
+        const indiceConfiavel = magiasIndice.length > 0;
+        const podeSerTambemDoAcervo = !indiceConfiavel || magiasIndice
+          .some(m => m?.nome === nomeAnterior && Number(m?.circulo) === circuloAnterior && (m.classes || []).includes('Mago'));
+        if (podeSerTambemDoAcervo) {
+          grimorioAmbiguo = true;
+        } else if (magiaSalva.circulo > 0) {
+          char.grimorio[idxProvavel] = { nome: magiaSalva.nome, circulo: magiaSalva.circulo };
+        } else {
+          char.grimorio.splice(idxProvavel, 1);
+        }
       }
-      if (magiaSalva.circulo > 0 && !magiaMagoEstaNoGrimorio(char, magiaSalva.nome)) {
-        if (!char.grimorio) char.grimorio = [];
-        char.grimorio.push({ nome: magiaSalva.nome, circulo: magiaSalva.circulo });
-      }
+      // Sem candidato com nome E círculo batendo: ou a magia nunca foi
+      // copiada (nada a sincronizar, correto), ou só existe uma entrada do
+      // acervo de OUTRO círculo (não mexe -- entrada paga intacta).
     }
     if (magiaExistente && nomeAnterior) {
       const idxPrep = (char.magias_preparadas || []).findIndex(m => m?.personalizada && m.nome === nomeAnterior);
@@ -1216,14 +1282,38 @@ export async function mostrarFormMagiaCustom(indiceEdicao = null) {
     salvar();
     window.fecharModal();
     renderFichaCompleta();
-    toast(`${nome} ${magiaExistente ? 'atualizada' : 'adicionada'}!`, 'success');
+    // `grimorioAmbiguo` (issue #42, rodada 2): quando o bloco acima não
+    // consegue confirmar se a entrada do grimório com o nome antigo é
+    // desta personalizada ou de uma homônima do acervo, ele não mexe em
+    // nada -- e o jogador precisa SABER disso, não ler "atualizada!" como
+    // se o grimório tivesse acompanhado o rename. Tela mentindo por
+    // silêncio é exatamente o que esta rodada existe para evitar.
+    toast(
+      `${nome} ${magiaExistente ? 'atualizada' : 'adicionada'}!` + (grimorioAmbiguo
+        ? ' Não deu para confirmar se a entrada do grimório com o nome antigo era desta magia ou de uma homônima do acervo -- confira o Grimório manualmente.'
+        : ''),
+      grimorioAmbiguo ? 'warning' : 'success'
+    );
   });
 }
 
 /** Busca de magia para copiar no Grimório do Mago */
 export async function mostrarBuscaGrimorio() {
   const indice = await getIndiceMagias();
-  const magias = (indice?.magias || []).filter(m => m.circulo > 0 && (m.classes || []).includes('Mago'));
+  const magiasDoAcervo = (indice?.magias || []).filter(m => m.circulo > 0 && (m.classes || []).includes('Mago'));
+  // Magias PERSONALIZADAS de círculo (issue #42): com o contorno que as
+  // empurrava sozinhas para char.grimorio removido (mostrarFormMagiaCustom,
+  // acima), a magia customizada só chega ao grimório por AQUI -- por isso
+  // ela precisa entrar na lista de copiáveis, pagando o mesmo custo (50 PO
+  // / 2h por círculo) que qualquer magia do acervo. Sem `classes[]` -- o
+  // formulário de criação não pede essa informação, magia personalizada é
+  // escolha do jogador, não concessão de uma classe do livro -- não há
+  // filtro de classe a aplicar aqui: toda magia customizada de círculo do
+  // personagem entra.
+  const personalizadas = (char.magias_customizadas || [])
+    .filter(m => Number(m?.circulo) > 0)
+    .map(m => ({ ...m, circulo: Number(m.circulo) }));
+  const magias = [...magiasDoAcervo, ...personalizadas];
   // Achado da revisao de branch (Important 2, sub-projeto 4): esta linha
   // era o ULTIMO leitor vivo da forma ANTIGA de char.espacos_magia
   // ({circulo: {total, usados}}) -- o ramo `: (char.espacos_magia || {})`
@@ -1280,12 +1370,17 @@ export async function mostrarBuscaGrimorio() {
         ${magiasDoCirculo.map(m => {
       const custo = m.circulo * 50;
       const temPO = podePagar(char.moedas, custo * VALOR_EM_COBRE.po);
+      // escHtml em nome/escola (issue #42): a lista agora mistura o acervo
+      // (JSON confiável) com magia PERSONALIZADA (texto livre do jogador,
+      // vindo de char.magias_customizadas) -- sem escapar, um nome com `"`
+      // quebraria o atributo `data-grim-nome` e um nome/escola com `<`
+      // entraria como HTML.
       return `
-      <div class="magia-item" style="cursor:pointer${!temPO ? ';opacity:0.5' : ''}" data-grim-nome="${m.nome}" data-grim-circ="${m.circulo}" data-grim-custo="${custo}">
-        <div class="magia-nome">${m.nome}</div>
+      <div class="magia-item" style="cursor:pointer${!temPO ? ';opacity:0.5' : ''}" data-grim-nome="${escHtml(m.nome)}" data-grim-circ="${m.circulo}" data-grim-custo="${custo}">
+        <div class="magia-nome">${escHtml(m.nome)}</div>
         <div class="magia-meta">
           <span>${m.circulo}º Círculo</span>
-          <span>${m.escola}</span>
+          <span>${escHtml(m.escola)}</span>
           <span style="font-weight:600;color:${temPO ? 'var(--success)' : 'var(--danger)'}">Custo: ${custo} PO</span>
         </div>
       </div>`;

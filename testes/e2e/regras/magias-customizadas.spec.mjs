@@ -301,3 +301,271 @@ test('grimório do Mago: clicar na magia personalizada abre a descrição (issue
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
+
+// ============================================================
+// Issue #42 -- o mesmo contorno que empurrava a magia recém-CRIADA para
+// char.grimorio (testado em testes/e2e/regras/grimorio-mago.spec.mjs)
+// disparava também ao EDITAR: renomear (ou trocar o círculo de) uma magia
+// personalizada que nunca foi copiada legitimamente ainda assim a fazia
+// aparecer no grimório, pulando o custo de cópia da mesma forma. Este
+// teste cobre essa segunda porta do mesmo defeito -- ela vive no MESMO
+// bloco (`if (identidadeMudou && ...)`, grimorio.js) que a criação, mas é
+// um caminho de código diferente (`magiaExistente` true, `indiceEdicao`
+// não-nulo), então precisa do próprio clique para não ficar sem cobertura.
+// ============================================================
+test('grimório do Mago: renomear magia personalizada que NUNCA foi copiada não a registra no grimório de graça (issue #42)', async ({ context }) => {
+  const NOME_ANTIGO = 'Facho de Nimb';
+  const NOME_NOVO = 'Facho de Nimb Aprimorado';
+  const { page, erros } = await abrirFicha(context, {
+    ...MAGO,
+    magias_customizadas: [{
+      nome: NOME_ANTIGO, circulo: 1, escola: 'Evocação',
+      tempo_conjuracao: 'Ação', alcance: '9 metros', componentes: 'V, S',
+      duracao: 'Instantânea', descricao: '', dano: '', ritual: false,
+    }],
+    // Grimório vazio de propósito: esta magia nunca foi copiada. A
+    // asserção abaixo é o que fica VERMELHO sem a correção da issue #42.
+  }, 'regras-magia-custom-grimorio-renomear-sem-copia');
+  await assentar(page).catch(() => {});
+  await abrirTudo(page);
+
+  await clicarSeletorFicha(page, '[data-editar-magia-custom]', { esperar: '#mc-nome' });
+  await page.fill('#mc-nome', NOME_NOVO);
+  await page.click('#btn-salvar-mc');
+  await expect(page.locator('#toast-container'),
+    'a edição precisa ter sido gravada antes de medir o que sobrou dela')
+    .toContainText('atualizada');
+  await assentar(page).catch(() => {});
+
+  const salvo = await personagemSalvo(page);
+  expect((salvo?.magias_customizadas || []).some((m) => m.nome === NOME_NOVO),
+    'o novo nome precisa ter sido gravado em magias_customizadas -- sem isso a asserção do '
+    + 'grimório não mede a edição de verdade')
+    .toBe(true);
+  expect((salvo?.grimorio || []).some((m) => m?.nome === NOME_NOVO || m?.nome === NOME_ANTIGO),
+    'renomear uma magia personalizada que nunca foi copiada não pode fazê-la aparecer no '
+    + 'grimório -- copiar continua sendo uma ação à parte, que custa 50 PO / 2h por círculo')
+    .toBe(false);
+
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});
+
+// O contraste do teste acima -- e uma checagem de coerência, não de
+// regressão: mesmo antes da correção da #42, este caso específico (a magia
+// JÁ estava no grimório por cópia legítima) já limpava a entrada antiga e
+// gravava a nova -- é o comportamento que o achado da issue #42 pediu para
+// PRESERVAR ao remover o empurrão automático (site/js/sheet/grimorio.js,
+// mostrarFormMagiaCustom: "Decida o que fazer com essa limpeza... Não
+// deixe entrada órfã"). Sem este teste, um conserto apressado que
+// removesse a limpeza inteira (e não só o empurrão indevido) passaria sem
+// aviso -- é o cenário que o relatório desta tarefa pede para verificar:
+// uma ficha com a magia JÁ no grimório continua correta depois da mudança.
+test('grimório do Mago: renomear magia personalizada JÁ copiada mantém o grimório coerente, sem entrada órfã (issue #42)', async ({ context }) => {
+  const NOME_ANTIGO = 'Facho de Nimb';
+  const NOME_NOVO = 'Facho de Nimb Aprimorado';
+  const { page, erros } = await abrirFicha(context, {
+    ...MAGO,
+    magias_customizadas: [{
+      nome: NOME_ANTIGO, circulo: 1, escola: 'Evocação',
+      tempo_conjuracao: 'Ação', alcance: '9 metros', componentes: 'V, S',
+      duracao: 'Instantânea', descricao: '', dano: '', ritual: false,
+    }],
+    // Desta vez a magia JÁ está no grimório -- simula uma cópia legítima
+    // paga antes desta edição (o mesmo estado que uma ficha real, em
+    // produção, tem hoje).
+    grimorio: [{ nome: NOME_ANTIGO, circulo: 1 }],
+  }, 'regras-magia-custom-grimorio-renomear-com-copia');
+  await assentar(page).catch(() => {});
+  await abrirTudo(page);
+
+  await clicarSeletorFicha(page, '[data-editar-magia-custom]', { esperar: '#mc-nome' });
+  await page.fill('#mc-nome', NOME_NOVO);
+  await page.click('#btn-salvar-mc');
+  await expect(page.locator('#toast-container'),
+    'a edição precisa ter sido gravada antes de medir o que sobrou dela')
+    .toContainText('atualizada');
+  await assentar(page).catch(() => {});
+
+  const salvo = await personagemSalvo(page);
+  const grimorio = salvo?.grimorio || [];
+  expect(grimorio.some((m) => m?.nome === NOME_ANTIGO),
+    'renomear não pode deixar uma entrada órfã no grimório presa no nome antigo')
+    .toBe(false);
+  expect(grimorio.some((m) => m?.nome === NOME_NOVO && m.circulo === 1),
+    'a magia já estava no grimório por cópia legítima -- a entrada precisa acompanhar o nome novo, '
+    + 'não desaparecer nem duplicar')
+    .toBe(true);
+  expect(grimorio.length, 'nem órfã sobrando, nem duplicata: continua uma entrada só')
+    .toBe(1);
+
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});
+
+// ============================================================
+// Issue #42, achado IMPORTANT 2 da revisão: os dois testes de rename acima
+// usam nomes inventados, que nunca colidem com o acervo -- e por isso não
+// alcançam este defeito. `char.grimorio` só guarda `{nome, circulo}` (a
+// mesma limitação estrutural "uma vaga por nome" documentada em
+// grimorio.js:372-390), e o `idxAntigo` que sincroniza o grimório ao
+// renomear achava a entrada antiga só por NOME, em TODO o grimório, sem
+// checar de quem ela era.
+//
+// Repro: o Mago tem "Bola de Fogo" do ACERVO paga no grimório (150 PO).
+// Ele cria uma magia PERSONALIZADA com o MESMO nome "Bola de Fogo" (o
+// formulário não recusa nome duplicado) e nunca a copia. Ao renomear a
+// personalizada para "Chama Azul", a busca por nome achava a entrada PAGA
+// do acervo -- não a da personalizada, que nunca existiu no grimório -- e
+// sobrescrevia essa entrada paga com o nome/círculo da personalizada:
+// destrói uma cópia paga E registra a outra de graça, as duas coisas que
+// o bloco de sincronia existe para evitar.
+// ============================================================
+test('grimório do Mago: renomear magia personalizada homônima do acervo não destrói a entrada paga nem registra de graça (issue #42)', async ({ context }) => {
+  const NOME_COLISAO = 'Bola de Fogo'; // magia real do acervo, 3º círculo de Mago
+  const NOME_NOVO = 'Chama Azul de Nimb';
+  const { page, erros } = await abrirFicha(context, {
+    ...MAGO,
+    magias_customizadas: [{
+      // Círculo DIFERENTE do acervo (1º, não 3º) para o resultado do
+      // conserto ficar inequívoco: se a entrada paga sobreviver, ela
+      // continua com círculo 3; se a personalizada tivesse sido registrada
+      // de graça, apareceria com círculo 1.
+      nome: NOME_COLISAO, circulo: 1, escola: 'Evocação',
+      tempo_conjuracao: 'Ação', alcance: '9 metros', componentes: 'V, S',
+      duracao: 'Instantânea', descricao: '', dano: '', ritual: false,
+    }],
+    // A entrada PAGA é do ACERVO (3º círculo) -- a personalizada nunca foi
+    // copiada, nunca teve entrada própria.
+    grimorio: [{ nome: NOME_COLISAO, circulo: 3 }],
+  }, 'regras-magia-custom-grimorio-renomear-homonima');
+  await assentar(page).catch(() => {});
+  await abrirTudo(page);
+
+  await clicarSeletorFicha(page, '[data-editar-magia-custom]', { esperar: '#mc-nome' });
+  await page.fill('#mc-nome', NOME_NOVO);
+  await page.click('#btn-salvar-mc');
+  await expect(page.locator('#toast-container'),
+    'a edição precisa ter sido gravada antes de medir o que sobrou dela')
+    .toContainText('atualizada');
+  await assentar(page).catch(() => {});
+
+  const salvo = await personagemSalvo(page);
+  const grimorio = salvo?.grimorio || [];
+  expect(grimorio.some((m) => m?.nome === NOME_COLISAO && m.circulo === 3),
+    'a cópia PAGA de "Bola de Fogo" (acervo, 3º círculo, 150 PO) não pode ser destruída só porque uma '
+    + 'magia personalizada homônima foi renomeada')
+    .toBe(true);
+  expect(grimorio.some((m) => m?.nome === NOME_NOVO),
+    'a magia personalizada nunca foi copiada -- renomeá-la não pode registrá-la de graça no grimório')
+    .toBe(false);
+  expect(grimorio.length, 'nem a entrada paga some, nem uma nova entrada de graça aparece')
+    .toBe(1);
+
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});
+
+// ============================================================
+// Issue #42, achado da rodada 2 (quebra nova introduzida pelo conserto da
+// rodada 1): `nomeEhDoAcervoMago` perguntava "existe magia do ACERVO com
+// este NOME?" -- existência de nome, não posse da entrada -- e por isso
+// recusava mexer até quando a entrada do grimório É da personalizada de
+// verdade, paga por 50 PO. Este é o CONTRASTE do teste de homônima acima:
+// lá a entrada paga era do ACERVO e a personalizada nunca foi copiada; aqui
+// a entrada paga É da personalizada (ela mesma pagou a cópia, pelo botão
+// "+ Copiar Magia para Grimório" -- ver grimorio-mago.spec.mjs), com um
+// círculo DIFERENTE do da magia real de mesmo nome no acervo -- exatamente
+// o repro que a rodada 2 apontou: sem este teste, um conserto que voltasse
+// a recusar por nome sozinho passaria batido de novo.
+// ============================================================
+test('grimório do Mago: renomear magia personalizada PAGA e homônima do acervo atualiza a entrada certa, sem deixar órfã (issue #42)', async ({ context }) => {
+  const NOME_COLISAO = 'Bola de Fogo'; // magia real do acervo, mas 3º círculo -- a personalizada é 1º
+  const NOME_NOVO = 'Chama Azul de Nimb';
+  const { page, erros } = await abrirFicha(context, {
+    ...MAGO,
+    magias_customizadas: [{
+      nome: NOME_COLISAO, circulo: 1, escola: 'Evocação',
+      tempo_conjuracao: 'Ação', alcance: '9 metros', componentes: 'V, S',
+      duracao: 'Instantânea', descricao: '', dano: '', ritual: false,
+    }],
+    // A entrada paga É da personalizada (1º círculo -- nenhuma "Bola de
+    // Fogo" do acervo é 1º círculo, então esta entrada só pode ser dela).
+    grimorio: [{ nome: NOME_COLISAO, circulo: 1 }],
+  }, 'regras-magia-custom-grimorio-renomear-homonima-paga');
+  await assentar(page).catch(() => {});
+  await abrirTudo(page);
+
+  await clicarSeletorFicha(page, '[data-editar-magia-custom]', { esperar: '#mc-nome' });
+  await page.fill('#mc-nome', NOME_NOVO);
+  await page.click('#btn-salvar-mc');
+  await expect(page.locator('#toast-container'),
+    'renomear uma cópia paga, sem ambiguidade nenhuma (círculo não bate com o do acervo), tem de '
+    + 'confirmar sucesso sem ressalva')
+    .toContainText('atualizada');
+  await assentar(page).catch(() => {});
+
+  const salvo = await personagemSalvo(page);
+  const grimorio = salvo?.grimorio || [];
+  expect(grimorio.some((m) => m?.nome === NOME_COLISAO),
+    'a entrada com o nome antigo não pode sobrar -- ela é desta personalizada, e tem de acompanhar '
+    + 'o rename, não ficar órfã sob o nome morto')
+    .toBe(false);
+  expect(grimorio.some((m) => m?.nome === NOME_NOVO && m.circulo === 1),
+    'a cópia paga precisa aparecer com o nome novo e o círculo (1º) preservado')
+    .toBe(true);
+  expect(grimorio.length, 'nem órfã sobrando, nem duplicata: continua uma entrada só')
+    .toBe(1);
+
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});
+
+// ============================================================
+// Issue #42, achado da rodada 2 ("o oráculo tem de cobrir o ramo de
+// recusa"): quando nome E círculo do grimório batem com a personalizada
+// sendo renomeada E TAMBÉM com uma magia real do acervo (colisão dupla --
+// o jogador escolheu de propósito o mesmo nome e o mesmo círculo do
+// livro), o código genuinamente não tem como saber de quem é a entrada.
+// A saída não é adivinhar (arriscando destruir uma cópia paga do acervo OU
+// deixar uma personalizada registrada de graça) -- é avisar o jogador em
+// vez de um "atualizada!" silencioso.
+// ============================================================
+test('grimório do Mago: renomear personalizada com nome E círculo idênticos ao acervo avisa em vez de adivinhar (issue #42)', async ({ context }) => {
+  const NOME_COLISAO = 'Bola de Fogo'; // magia real do acervo, 3º círculo
+  const NOME_NOVO = 'Chama Azul de Nimb';
+  const { page, erros } = await abrirFicha(context, {
+    ...MAGO,
+    magias_customizadas: [{
+      // MESMO círculo do acervo (3º) -- a colisão dupla que torna a
+      // entrada do grimório genuinamente ambígua.
+      nome: NOME_COLISAO, circulo: 3, escola: 'Evocação',
+      tempo_conjuracao: 'Ação', alcance: '9 metros', componentes: 'V, S',
+      duracao: 'Instantânea', descricao: '', dano: '', ritual: false,
+    }],
+    grimorio: [{ nome: NOME_COLISAO, circulo: 3 }],
+  }, 'regras-magia-custom-grimorio-renomear-ambigua');
+  await assentar(page).catch(() => {});
+  await abrirTudo(page);
+
+  await clicarSeletorFicha(page, '[data-editar-magia-custom]', { esperar: '#mc-nome' });
+  await page.fill('#mc-nome', NOME_NOVO);
+  await page.click('#btn-salvar-mc');
+
+  // GUARDA CONTRA VACUIDADE + a asserção central deste teste: o toast não
+  // pode dizer só "atualizada!" -- a tela mentiria sobre o grimório não ter
+  // sido tocado. Precisa nomear a incerteza.
+  const toastFinal = page.locator('#toast-container');
+  await expect(toastFinal, 'a edição precisa ter sido gravada antes de medir o aviso')
+    .toContainText('atualizada');
+  await expect(toastFinal,
+    'quando nome E círculo batem com o acervo E com a personalizada ao mesmo tempo, o código não '
+    + 'pode confirmar de quem é a entrada -- o jogador precisa ser avisado, não ler um sucesso liso')
+    .toContainText('grimório');
+  await assentar(page).catch(() => {});
+
+  const salvo = await personagemSalvo(page);
+  const grimorio = salvo?.grimorio || [];
+  expect(grimorio,
+    'ambíguo, o bloco de sincronia não pode mexer em NADA -- nem atualizar, nem remover: a entrada '
+    + 'original continua exatamente como estava')
+    .toEqual([{ nome: NOME_COLISAO, circulo: 3 }]);
+
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});
