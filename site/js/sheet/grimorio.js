@@ -301,12 +301,144 @@ export async function mostrarBuscaMagia() {
   const jaPreparadas = new Set((char.magias_preparadas || []).map(m => m.nome));
   const jaConhecidas = new Set((char.magias_conhecidas || []).map(m => m.nome));
 
+  // Magias PERSONALIZADAS de círculo 1+ (issues #27 e #33). Esta grade era
+  // montada só a partir da lista da classe e, para o Mago, do grimório --
+  // `char.magias_customizadas` nunca era lido aqui. Sem cartão na grade não
+  // existia clique nenhum capaz de fazer a magia virar `magias_preparadas`:
+  // ela ficava para sempre na seção "Magias Customizadas" da ficha, marcada
+  // "Não preparada", com editar e remover e nada mais. Truque personalizado
+  // não sofria disso porque truque não passa por preparo (sheet/magias.js
+  // funde `truquesPersonalizados` direto em `todosTruques`) -- foi o próprio
+  // jogador quem notou que "como truque vai direto".
+  //
+  // NÃO é origem isenta: magia personalizada é escolha do jogador, não
+  // concessão do livro, então ela CONTA no limite de preparadas como
+  // qualquer outra (por isso não entra em ORIGENS_MAGIA_ISENTA, e por isso
+  // a entrada gravada leva o carimbo de classe da superfície ativa).
+  const personalizadasDeCirculo = (char.magias_customizadas || [])
+    .filter(m => Number(m?.circulo) > 0)
+    .map(m => ({ ...m, circulo: Number(m.circulo), personalizada: true }));
+
+  // Nomes que estão no GRIMÓRIO -- a única fonte que pode entregar a mesma
+  // magia personalizada duas vezes (ver `ehCopiaDoDesvio`, logo abaixo).
+  const nomesDoGrimorio = new Set(
+    (Array.isArray(char.grimorio) ? char.grimorio : []).map(m => m?.nome)
+  );
+
   // Separar por círculo
   const truquesClasse = magiasClasse.filter(m => m.circulo === 0);
   const magiasCirculo = {};
   for (let c = 1; c <= maxCirculo; c++) {
-    const doCirculo = magiasClasse.filter(m => m.circulo === c);
+    const personalizadasDoCirc = personalizadasDeCirculo.filter(m => m.circulo === c);
+    const nomesPersonalizados = new Set(personalizadasDoCirc.map(m => m.nome));
+    // DEDUP ESTREITO, e o estreitamento é o ponto. Para o Mago a MESMA magia
+    // chega por dois caminhos -- o desvio da gravação do formulário a empurra
+    // para `char.grimorio`, de onde a grade do Mago é montada, e agora
+    // também pela fusão acima --, e sem remover uma delas o jogador veria o
+    // cartão DUPLICADO.
+    //
+    // O que NÃO pode acontecer é este dedup valer para todo mundo: um
+    // Clérigo pode criar a SUA "Bênção" personalizada, e "Bênção" também é
+    // magia de 1º círculo do acervo. Homônimas não são a mesma magia. Um
+    // filtro só por nome apagaria a magia do LIVRO da grade -- o jogador
+    // perderia o caminho para prepará-la, e se ela já estivesse preparada o
+    // clique no cartão que sobrou removeria a entrada dela (o handler casa
+    // por nome). Regressão exatamente na população que estas issues existem
+    // para atender: o conjurador não-Mago.
+    //
+    // Por isso as três condições juntas: só some a entrada que veio do
+    // grimório (`nomesDoGrimorio`), de um personagem com grimório
+    // (`ehMago`), e que tem uma personalizada do MESMO círculo com o mesmo
+    // nome. Fora do Mago nada é removido, e a lista da classe fica intacta.
+    const ehCopiaDoDesvio = (m) => ehMago
+      && nomesPersonalizados.has(m.nome)
+      && nomesDoGrimorio.has(m.nome);
+    const doCirculo = [
+      ...magiasClasse.filter(m => m.circulo === c && !ehCopiaDoDesvio(m)),
+      ...personalizadasDoCirc
+    ];
     if (doCirculo.length > 0) magiasCirculo[c] = doCirculo;
+  }
+
+  // ------------------------------------------------------------------
+  // HOMÔNIMAS: quando a grade mostra DOIS cartões com o mesmo nome
+  // ------------------------------------------------------------------
+  // Antes destas issues, magia personalizada de círculo não tinha cartão
+  // nenhum, então esta disputa NÃO existia -- ela é criada pela fusão acima,
+  // e é esta função que tem de lidar com ela. O caso: um Clérigo cria a SUA
+  // "Bênção", e "Bênção" também é magia de 1º círculo do acervo. Homônimas
+  // não são a mesma magia, e as duas têm cartão.
+  //
+  // `magias_preparadas[]` é indexada por NOME no aplicativo inteiro (o
+  // Descanso Longo, a troca de nível e o despreparo da ficha todos casam
+  // assim), então DUAS homônimas preparadas ao mesmo tempo é um estado que o
+  // resto do app não sabe representar -- `sheet/magias.js` chega a
+  // despreparar com `filter(m => m.nome !== nome)`, que levaria as duas
+  // juntas. Trocar essa chave é mudança estrutural, fora do alcance destas
+  // issues. A limitação FICA: uma vaga por nome.
+  //
+  // O que não pode ficar é o comportamento silencioso. Estes dois nomes
+  // resolvem isso sem trocar a chave: a grade passa a dizer a VERDADE sobre
+  // qual das duas está preparada, e o clique na outra passa a EXPLICAR em
+  // vez de apagar a preparação alheia.
+  const cartoesDaGrade = Object.values(magiasCirculo).flat();
+  const nomesEmDisputa = new Set(
+    cartoesDaGrade
+      .filter(m => m.personalizada
+        && cartoesDaGrade.some(outro => !outro.personalizada && outro.nome === m.nome))
+      .map(m => m.nome)
+  );
+
+  /**
+   * Diz se uma entrada de `magias_preparadas[]` é a magia DESTE cartão.
+   *
+   * O nome sozinho não responde, porque duas magias diferentes podem se
+   * chamar igual (a do acervo e a que o jogador inventou). Só que exigir a
+   * marca `personalizada` SEMPRE também erra: ficha antiga tem magia
+   * personalizada preparada sem marca nenhuma (antes destas issues o Mago já
+   * preparava a dele pela grade, porque ela chegava lá pelo grimório, e o
+   * gravador de então não marcava nada), e a regra estrita deixaria essa
+   * magia presa -- cartão apagado e clique recusado, sem jeito de despreparar.
+   *
+   * Por isso a marca só é cobrada quando a entrada é AMBÍGUA, e ambiguidade
+   * tem três fontes -- as duas últimas vindo do DADO, não da tela:
+   *
+   *  1. `nomesEmDisputa` -- esta grade mostra dois cartões com este nome.
+   *     Pega a colisão de classe única (o Clérigo que cria a sua "Bênção").
+   *  2. `entrada.classe` diferente da superfície ATIVA -- a entrada é
+   *     provadamente de outra classe. Sem isto, um Clérigo X/Mago Y com
+   *     "Mísseis Mágicos" preparado no Mago e uma personalizada de mesmo
+   *     nome via, na aba do CLÉRIGO, um cartão só (o dele, porque a magia
+   *     não está na lista de Clérigo): `nomesEmDisputa` não enxergava
+   *     colisão nenhuma, o cartão nascia aceso pela entrada do Mago e o
+   *     clique fazia `splice` nela, com o toast "removida" -- a destruição
+   *     silenciosa de novo, só que por outra porta. A grade de UMA
+   *     superfície não tem como ver o cartão que só a outra desenha; a
+   *     entrada, sim, diz de quem é.
+   *  3. `magiaEhEspecial(entrada)` -- a entrada veio de origem isenta
+   *     (domínio, Iniciado em Magia, espécie...). Não é magia escolhida na
+   *     lista de nenhuma classe, então não é a magia deste cartão. Sem isto,
+   *     a personalizada homônima de uma concedida aparecia como preparada e
+   *     "Especial", e `isDominio` ainda lhe tirava o check -- a magia do
+   *     jogador ficava sem caminho para ser preparada.
+   *
+   * Entrada SEM `classe` continua não sendo ambígua por este critério: "não
+   * sei de quem é" não é "é de outra" (mesma disciplina de `semClasse` em
+   * regras-magia-classe.js). É o que preserva a permissão da ficha antiga,
+   * cujas entradas são da própria superfície e sem carimbo.
+   *
+   * @param {object} entrada Entrada de `char.magias_preparadas[]`.
+   * @param {string} nomeCartao Nome exibido no cartão clicado/renderizado.
+   * @param {boolean} ehCartaoPersonalizado Se o cartão é o da magia do jogador.
+   * @returns {boolean}
+   */
+  function entradaEhDoCartao(entrada, nomeCartao, ehCartaoPersonalizado) {
+    if (entrada?.nome !== nomeCartao) return false;
+    const classeDaEntrada = typeof entrada.classe === 'string' ? entrada.classe.trim() : '';
+    const deOutraClasse = classeDaEntrada !== '' && classeDaEntrada !== sup?.classe;
+    const ambigua = nomesEmDisputa.has(nomeCartao) || deOutraClasse || magiaEhEspecial(entrada);
+    if (!ambigua) return true;
+    return Boolean(entrada.personalizada) === ehCartaoPersonalizado;
   }
 
   // Minor 3 da Tarefa 4 (achado "consertar agora" da revisão final): o
@@ -376,10 +508,17 @@ export async function mostrarBuscaMagia() {
       }
 
       if (filtradas.length > 0) {
+        // escHtml no NOME (issues #27/#33): esta lista passou a receber magia
+        // PERSONALIZADA -- nome é texto livre que o jogador digita, e o
+        // formulário só exige que não seja vazio. Sem escapar, uma aspa dupla
+        // fecha o atributo antes da hora (o `data-remover-check` chega
+        // truncado ao clique, e a magia certa não é achada) e uma tag chega
+        // viva à tela. O navegador decodifica a entidade ao ler o atributo,
+        // então `el.dataset.removerCheck` continua devolvendo o nome exato.
         html += `<div class="opcao-grid densa">${filtradas.map(m => `
           <div class="opcao-card selecionada">
-            <span class="opcao-check" ${somenteConsulta ? '' : `data-remover-check="${m.nome}" style="cursor:pointer"`}></span>
-            <div class="opcao-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="${m.circulo}" style="cursor:pointer">${m.nome}</div>
+            <span class="opcao-check" ${somenteConsulta ? '' : `data-remover-check="${escHtml(m.nome)}" style="cursor:pointer"`}></span>
+            <div class="opcao-nome" data-detalhe-magia="${escHtml(m.nome)}" data-detalhe-circ="${m.circulo}" style="cursor:pointer">${escHtml(m.nome)}</div>
             <div class="opcao-resumo">
               <span>${m.circulo || 0}º Circulo</span>
             </div>
@@ -445,7 +584,14 @@ export async function mostrarBuscaMagia() {
       // Magias de um círculo específico — grid
       const circ = parseInt(tabAtiva);
       const magiasDoCirc = magiasCirculo[circ] || [];
-      const selecionadasSet = new Set((char.magias_preparadas || []).filter(m => m.circulo === circ).map(m => m.nome));
+      // `preparadasDoCirc` + `entradaEhDoCartao` no lugar do Set de NOMES que
+      // vivia aqui: com uma homônima preparada, o Set acendia o check nos
+      // DOIS cartões, e a grade afirmava que a magia do jogador estava
+      // preparada quando quem estava era a do livro. Sem homônima o
+      // resultado é idêntico ao do Set (o nome basta), então nada muda para
+      // quem não tem magia personalizada.
+      const preparadasDoCirc = (char.magias_preparadas || []).filter(m => m.circulo === circ);
+      const estaPreparada = (m) => preparadasDoCirc.some(p => entradaEhDoCartao(p, m.nome, !!m.personalizada));
       const numAtual = classificacaoAtiva.desta.length;
       // Regra do BLOQUEIO (Tarefa 4): só é "cheio" com contagem CERTA --
       // sem nenhuma magia sem classe. Havendo `semClasse`, a grade não
@@ -458,25 +604,41 @@ export async function mostrarBuscaMagia() {
 
       let lista = [...magiasDoCirc];
       lista.sort((a, b) => {
-        const aSel = selecionadasSet.has(a.nome) ? 0 : 1;
-        const bSel = selecionadasSet.has(b.nome) ? 0 : 1;
+        const aSel = estaPreparada(a) ? 0 : 1;
+        const bSel = estaPreparada(b) ? 0 : 1;
         return aSel - bSel || a.nome.localeCompare(b.nome);
       });
       if (termo.length >= 2) lista = lista.filter(m => semAcento(m.nome).includes(termo));
 
       html += `<div class="opcao-grid densa">${lista.map(m => {
-        const sel = selecionadasSet.has(m.nome);
-        const isDominio = (char.magias_preparadas || []).find(p => p.nome === m.nome && magiaEhEspecial(p));
+        const sel = estaPreparada(m);
+        // `entradaEhDoCartao` também aqui, pela mesma razão: se a homônima
+        // do acervo for magia de domínio, casar só por nome pintaria o
+        // cartão do JOGADOR de domínio -- e cartão de domínio não tem check,
+        // ou seja, a magia dele ficaria sem caminho para ser preparada.
+        const isDominio = (char.magias_preparadas || [])
+          .find(p => magiaEhEspecial(p) && entradaEhDoCartao(p, m.nome, !!m.personalizada));
         const bloqueado = cheio && !sel && !isDominio;
+        // escHtml no nome E NA ESCOLA: ver o comentário gêmeo na aba de
+        // preparadas, acima. Esta grade passou a listar magia PERSONALIZADA
+        // (issues #27/#33), e a fusão entrega o registro INTEIRO -- os dois
+        // campos que este cartão interpola são texto livre digitado pelo
+        // jogador. `escola` engana porque o formulário parece oferecer só um
+        // select fechado: ele tem a opção "Personalizado…", que lê
+        // `#mc-escola-personalizada`, um input de texto sem validação.
         return `
           <div class="opcao-card ${sel ? 'selecionada' : ''} ${isDominio ? 'magia-dominio' : ''} ${bloqueado ? 'bloqueada' : ''}"
                style="${bloqueado ? 'opacity:0.35;' : ''}${isDominio ? 'opacity:0.7;' : ''}">
-            <span class="opcao-check" ${isDominio || somenteConsulta ? '' : `data-circ-check="${m.nome}" data-circ-check-val="${circ}" style="cursor:pointer"`}></span>
-            <div class="opcao-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="${circ}" style="cursor:pointer">${isDominio ? '<span class="badge-dominio">&#9733;</span> ' : ''}${m.nome}</div>
+            <span class="opcao-check" ${isDominio || somenteConsulta ? '' : `data-circ-check="${escHtml(m.nome)}" data-circ-check-val="${circ}"${m.personalizada ? ' data-circ-personalizada="1"' : ''} style="cursor:pointer"`}></span>
+            <div class="opcao-nome" data-detalhe-magia="${escHtml(m.nome)}" data-detalhe-circ="${circ}" style="cursor:pointer">${isDominio ? '<span class="badge-dominio">&#9733;</span> ' : ''}${escHtml(m.nome)}</div>
             <div class="opcao-resumo">
-              <span>${m.escola || ''}</span>
+              <span>${escHtml(m.escola || '')}</span>
               ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
               ${isDominio ? '<span>Especial</span>' : ''}
+              <!-- Numa grade em que todo o resto veio da lista da classe, o
+                   jogador precisa reconhecer a magia que ele mesmo inventou
+                   -- é o mesmo papel do selo "Personalizada" da ficha. -->
+              ${m.personalizada ? '<span>Personalizada</span>' : ''}
             </div>
           </div>`;
       }).join('')}</div>`;
@@ -550,7 +712,42 @@ export async function mostrarBuscaMagia() {
         e.stopPropagation();
         const nome = el.dataset.circCheck;
         const circ = parseInt(el.dataset.circCheckVal);
-        const idx = char.magias_preparadas.findIndex(m => m.nome === nome);
+        // QUAL cartão foi clicado -- ver o comentário do gravador, abaixo.
+        // Precisa ser lido AQUI, antes do ramo de remoção, e não só no de
+        // adição: era exatamente essa assimetria que fazia o clique no
+        // cartão da homônima cair em "remover" e apagar a preparação da
+        // outra magia.
+        const ehCartaoPersonalizado = el.dataset.circPersonalizada === '1';
+        const idx = char.magias_preparadas
+          .findIndex(m => entradaEhDoCartao(m, nome, ehCartaoPersonalizado));
+        if (idx < 0 && char.magias_preparadas.some(m => m?.nome === nome)) {
+          // Chegar aqui significa: existe entrada com este nome, mas ela é da
+          // OUTRA magia homônima (só a disputa faz `entradaEhDoCartao`
+          // recusar um nome igual). Antes, este clique caía no ramo de
+          // remoção e apagava a preparação alheia em SILÊNCIO, com um toast
+          // dizendo "removida" -- o jogador achava que estava preparando a
+          // dele e saía com a outra desfeita.
+          //
+          // A limitação (uma vaga por nome, porque `magias_preparadas[]` é
+          // indexada por nome no app inteiro) continua existindo; o que muda
+          // é ela ser DITA, no momento em que morde, em vez de agir por
+          // baixo. Recusar é a única saída honesta enquanto a chave for o
+          // nome: preparar as duas gravaria um estado que outras telas
+          // desfazem errado (`sheet/magias.js` despreparar com
+          // `filter(m => m.nome !== nome)` levaria as duas de uma vez).
+          // O recado nomeia QUAL das outras está ocupando a vaga -- sem isso
+          // o jogador da ficha multiclasse lê "já está preparada" olhando
+          // para uma aba onde a magia não aparece, e não tem como adivinhar
+          // que ela está preparada na outra classe.
+          const outra = char.magias_preparadas.find(m => m?.nome === nome);
+          const classeDaOutra = typeof outra?.classe === 'string' ? outra.classe.trim() : '';
+          const qual = outra?.personalizada ? 'a sua magia personalizada'
+            : magiaEhEspecial(outra) ? `uma magia concedida -- ${rotuloOrigemMagia(outra)}`
+              : classeDaOutra && classeDaOutra !== sup?.classe ? `a magia de ${classeDaOutra}`
+                : 'a magia da classe';
+          toast(`"${nome}" já está preparada (${qual}). Magias preparadas são identificadas pelo nome: desprepare a outra antes.`, 'error');
+          return;
+        }
         if (idx >= 0) {
           // Remover
           char.magias_preparadas.splice(idx, 1);
@@ -580,13 +777,47 @@ export async function mostrarBuscaMagia() {
             toast(`Limite de ${maxPrep} magias atingido. Remova uma antes de adicionar.`, 'error');
             return;
           }
-          if (ehMago && !magiaMagoEstaNoGrimorio(char, nome)) {
+          // QUAL cartão foi clicado -- não "existe alguma personalizada com
+          // este nome?". A diferença importa quando as duas coisas existem:
+          // um Clérigo com a sua própria "Bênção" personalizada tem DOIS
+          // cartões de 1º círculo chamados "Bênção" (o do acervo e o dele), e
+          // a ficha sozinha não sabe dizer em qual deles o jogador clicou.
+          // Só o cartão sabe, e por isso a marca viaja nele. Perguntar à
+          // ficha por nome+círculo (a forma que `ehCustomizadaCirculo` usa em
+          // sheet/magias.js, onde não há essa ambiguidade) carimbaria a magia
+          // do LIVRO como personalizada, e a seção Preparadas passaria a
+          // mostrar a magia do jogador no lugar da que ele escolheu.
+          //
+          // A ficha ainda CONFIRMA o que o cartão diz: HTML é o que o render
+          // acabou de escrever, mas quem grava em `magias_preparadas` não
+          // aceita uma marca sem lastro em `magias_customizadas`.
+          const ehPersonalizada = ehCartaoPersonalizado
+            && (char.magias_customizadas || [])
+              .some(m => m?.nome === nome && Number(m?.circulo) === circ);
+          // O portão do grimório não vale para magia personalizada: ela não
+          // sai do acervo e não é "registrada" em livro nenhum -- o jogador
+          // a inventou. Exigir presença no grimório aqui deixaria o Mago
+          // dependente do desvio que empurra a magia criada para
+          // `char.grimorio` (mostrarFormMagiaCustom), e esse desvio é assunto
+          // de outra issue: o caminho normal de preparo não pode depender
+          // dele para funcionar.
+          if (ehMago && !ehPersonalizada && !magiaMagoEstaNoGrimorio(char, nome)) {
             toast('Essa magia não está registrada no grimório.', 'error');
             return;
           }
           // sup?.classe: a mesma superficie que decidiu QUAL lista de magias
           // este modal mostrou -- a magia escolhida e necessariamente dela.
-          char.magias_preparadas.push({ nome, circulo: circ, ...(sup?.classe ? { classe: sup.classe } : {}) });
+          char.magias_preparadas.push({
+            nome, circulo: circ,
+            ...(sup?.classe ? { classe: sup.classe } : {}),
+            // `personalizada: true` é o que a seção Preparadas da ficha usa
+            // para resolver a magia por nome+círculo em
+            // `char.magias_customizadas` e renderizar a linha personalizada
+            // (descrição, tags e o botão de Conjurar próprio dela). Sem a
+            // marca, a linha cairia no caminho das magias do acervo, que não
+            // conhece esta magia.
+            ...(ehPersonalizada ? { personalizada: true } : {})
+          });
           salvar();
           toast(`${nome} adicionada`, 'success');
         }
@@ -602,21 +833,42 @@ export async function mostrarBuscaMagia() {
         const nome = btn.dataset.detalheMagia;
         const circ = parseInt(btn.dataset.detalheCirc);
         const dados = await getMagiasPorCirculo(circ);
-        const magia = dados?.magias?.find(m => m.nome === nome);
+        // A personalizada é o PLANO B, não o A: magia do acervo continua
+        // vindo do acervo. Ela precisa existir aqui porque a grade de
+        // círculos passou a listar `char.magias_customizadas` (issues
+        // #27/#33) e magia personalizada não está em arquivo nenhum de
+        // dados/ -- sem este plano B, clicar no nome do cartão recém-criado
+        // responderia com o toast vermelho "Detalhes não encontrados". Mesma
+        // forma da issue #39, que já tinha mordido o painel do Grimório.
+        const magia = dados?.magias?.find(m => m.nome === nome)
+          || (char.magias_customizadas || []).find(m => m?.nome === nome && Number(m?.circulo) === circ);
         if (!magia) { toast('Detalhes não encontrados', 'error'); return; }
-        // Abrir sub-modal com detalhes
+        // Abrir sub-modal com detalhes. escHtml nos metadados: com o plano B
+        // acima, eles podem vir de uma magia PERSONALIZADA, e ali escola,
+        // tempo, alcance, componentes e duração são texto livre digitado
+        // pelo jogador (os selects do formulário têm a opção
+        // "Personalizado…"). É o mesmo tratamento que a linha da magia
+        // personalizada na ficha já dá a estes cinco campos
+        // (renderDetalhesMagiaPersonalizada, sheet/magias.js). A descrição
+        // continua passando por mdParaHtml, que já escapa antes de formatar.
+        //
+        // `classes` também é escapado: o formulário não tem esse campo, mas
+        // uma FICHA IMPORTADA traz o que quiser dentro de
+        // `magias_customizadas[]`, e o plano B acima entrega esse registro
+        // inteiro a este template. Mesmo motivo de `circulo_superior` estar
+        // seguro sem esforço (mdParaHtml escapa antes de formatar).
         const detalhesHtml = `
           <div class="magia-meta" style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:8px;font-size:0.85rem">
             <span class="badge badge-primary">${circ === 0 ? 'Truque' : circ + 'º Círculo'}</span>
-            <span class="badge badge-secondary">${magia.escola}</span>
-            <span>${magia.tempo_conjuracao}</span>
-            <span>${magia.alcance}</span>
-            <span>${magia.componentes}</span>
-            <span>${magia.duracao}</span>
+            <span class="badge badge-secondary">${escHtml(magia.escola)}</span>
+            <span>${escHtml(magia.tempo_conjuracao)}</span>
+            <span>${escHtml(magia.alcance)}</span>
+            <span>${escHtml(magia.componentes)}</span>
+            <span>${escHtml(magia.duracao)}</span>
           </div>
           <div class="md-content">${mdParaHtml(magia.descricao)}</div>
           ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em círculos superiores:</strong><div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
-          ${(magia.classes || []).length > 0 ? `<div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px">Classes: ${magia.classes.join(', ')}</div>` : ''}
+          ${(magia.classes || []).length > 0 ? `<div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px">Classes: ${magia.classes.map(escHtml).join(', ')}</div>` : ''}
         `;
         abrirModal(magia.nome, detalhesHtml, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
       });
