@@ -275,6 +275,34 @@ export async function irAtePassoAntecedente(page) {
   return page.locator('[data-antecedente]').count() > 0;
 }
 
+// ---------- Navegação compartilhada do passo de Equipamento ----------
+
+/**
+ * Avança o wizard do passo 1 (classe) até o passo de equipamento, com a
+ * `classe` pedida escolhida.
+ *
+ * Mesma lição 7 do helper acima -- e a mesma razão concreta: esta função
+ * nasceu copiada dentro de um spec e a cópia divergia justamente no
+ * `confirmarModal('popup-confirmar-classe')`. Sem ele o popup fica aberto,
+ * o driver genérico o resolve escolhendo a PRIMEIRA opção da tela, e o
+ * teste acaba medindo o pacote inicial do Bárbaro achando que mediu o do
+ * Ladino. Aconteceu de verdade na Tarefa 9.
+ *
+ * Devolve `true` quando os cards de opção do equipamento inicial da classe
+ * estão na tela.
+ */
+export async function irAtePassoEquipamento(page, classe) {
+  await page.waitForSelector(`[data-classe="${classe}"]`, { state: 'visible', timeout: 20_000 });
+  await page.click(`[data-classe="${classe}"]`);
+  await confirmarModal(page, 'popup-confirmar-classe').catch(() => {});
+  for (let i = 0; i < 10; i++) {
+    if (await page.locator('[data-equip-tipo="classe"]').count()) return true;
+    if (!await satisfazerPasso(page)) break;
+    await assentar(page).catch(() => {});
+  }
+  return (await page.locator('[data-equip-tipo="classe"]').count()) > 0;
+}
+
 // Lê o personagem salvo (o único) direto do store do app.
 export async function personagemSalvo(page) {
   return page.evaluate(async () => {

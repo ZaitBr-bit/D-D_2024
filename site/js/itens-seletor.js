@@ -14,7 +14,7 @@
 // desfez, e importar store.js impediria o criador de usar uma preferencia
 // de sessao em vez do localStorage.
 // ============================================================
-import { getArmaduras, getArmas, getEquipamentoAventura } from './db.js';
+import { getArmaduras, getArmas, getEquipamentoAventura, getFerramentas } from './db.js';
 import { pagarCusto, parseCusto, podePagarCusto } from './moedas.js';
 import { abrirModal, escHtml, mdParaHtml, semAcento, toast } from './utils.js';
 import {
@@ -25,12 +25,20 @@ import {
 /** Cache local dos dados de equipamento */
 let _cacheEquipSheet = null;
 
-/** Carrega (com cache) armas, armaduras e equipamento de aventura/munição usados pelo seletor e pelo popup de detalhe de item da ficha */
+/** Carrega (com cache) armas, armaduras, equipamento de aventura/munição e ferramentas usados pelo seletor e pelo popup de detalhe de item da ficha */
 export async function carregarDadosEquipSheet() {
   if (_cacheEquipSheet) return _cacheEquipSheet;
-  const [armasData, armadurasData, equipData] = await Promise.all([
-    getArmas(), getArmaduras(), getEquipamentoAventura()
+  const [armasData, armadurasData, equipData, ferramentasData] = await Promise.all([
+    getArmas(), getArmaduras(), getEquipamentoAventura(), getFerramentas()
   ]);
+  // `ferramentas` entrou aqui pela issue #43: o peso das ferramentas
+  // ("Ferramentas de Ladrao", 0,5 kg) so existe nesse arquivo, e sem ele o
+  // pacote inicial do Ladino resolvia o nome contra nenhuma lista e caia no
+  // ramo generico, sem peso. E DADO, nao CATEGORIA: `abrirSeletorItens`
+  // (abaixo) continua com as mesmas cinco categorias -- por a ferramenta na
+  // loja e outra decisao, fora do escopo da issue.
+  const tabelaFerramentas = (ferramentasData?.tabelas || [])
+    .find(t => (t.cabecalhos || []).includes('Ferramenta'));
   _cacheEquipSheet = {
     armas: armasData?.armas || [],
     propriedadesArmas: armasData?.propriedades || [],
@@ -41,7 +49,20 @@ export async function carregarDadosEquipSheet() {
       custo: m.custo || '',
       peso: m.peso || '',
       descricao: `Quantidade: ${m.quantidade || '—'} | Armazenamento: ${m.armazenamento || '—'}`
-    }))
+    })),
+    ferramentas: (tabelaFerramentas?.dados || []).map(f => ({
+      nome: f.Ferramenta || '',
+      custo: f.Custo || '',
+      peso: f.Peso || '',
+      atributo: f.Atributo || ''
+    })),
+    // Variantes nomeadas de "Foco Arcano" e "Foco Druidico". Na tabela
+    // principal os dois pesam "Varia" (= 0 kg na balanca); o peso de
+    // verdade e por FORMA (Cajado 2 kg, Orbe 1,5 kg...), numa tabela
+    // propria dentro da descricao. Sem elas, "Foco Arcano (Cajado)" --
+    // citado por escrito na issue #43 -- casava com a entrada generica e
+    // continuava pesando zero.
+    focos: equipData?.focos || []
   };
   return _cacheEquipSheet;
 }

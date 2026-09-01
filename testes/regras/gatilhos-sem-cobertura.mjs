@@ -82,7 +82,8 @@ export const GATILHOS_SEM_COBERTURA = [
   'btn-confirmar-troca-maestria',
   'btn-dist-sugerida',
   'btn-edit-po',
-  'btn-editar-item-custom',
+  // 'btn-editar-item-custom' saiu daqui na Tarefa 9 (issue #43):
+  // item-customizado-peso.spec.mjs clica nele para editar o peso.
   'btn-enable-levelup-v2',
   'btn-escolher-manobras-pendentes',
   'btn-finalizar',
@@ -124,7 +125,8 @@ export const GATILHOS_SEM_COBERTURA = [
   'btn-salvar-defesas',
   'btn-salvar-detalhes',
   'btn-salvar-edit',
-  'btn-salvar-ic',
+  // 'btn-salvar-ic' saiu daqui na Tarefa 9 (issue #43):
+  // item-customizado-peso.spec.mjs clica nele para gravar o peso novo.
   'btn-salvar-im-edit',
   'btn-salvar-im-ficha',
   // 'btn-salvar-maestrias' saiu daqui na Tarefa 3 do sub-projeto 3c: o

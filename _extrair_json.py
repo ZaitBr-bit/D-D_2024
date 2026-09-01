@@ -1041,6 +1041,60 @@ def extrair_armaduras(linhas):
             return
 
 
+# Cabecalho de um item na secao "# Equipamento de Aventura", no mesmo
+# formato dos blocos de ferramenta: "#### Foco Arcano (Varia)".
+RE_ITEM_AVENTURA = re.compile(r'^####\s+(.+?)\s*\(([^()]*)\)\s*$')
+
+
+def parse_focos_md(linhas, inicio, fim):
+    """Extrai as VARIANTES nomeadas de um item cujo peso na tabela e "Varia".
+
+    "Foco Arcano" e "Foco Druidico" entram na tabela principal com peso e
+    custo "Varia" -- o peso de verdade esta numa tabela PROPRIA dentro da
+    descricao de cada um ("| Foco | Peso | Custo |"), uma linha por forma
+    (Cajado 2 kg, Orbe 1,5 kg, Cristal 0,5 kg...). `extrair_equipamento_aventura`
+    so aproveitava tabelas com cabecalho "Item", entao essas duas eram
+    parseadas e jogadas fora, e "Foco Arcano (Cajado)" do pacote do Mago
+    entrava na ficha pesando zero (issue #43).
+
+    A categoria de cada variante e o item do cabecalho "####" que abre a
+    descricao onde a tabela mora.
+    """
+    focos = []
+    categoria = ""
+    i = inicio
+    while i < fim:
+        cabecalho = RE_ITEM_AVENTURA.match(linhas[i].strip())
+        if cabecalho:
+            categoria = cabecalho.group(1).strip()
+            i += 1
+            continue
+        atual = linhas[i].strip()
+        if atual.startswith("|") and categoria:
+            cabecalhos = [c.strip().replace("**", "").strip()
+                          for c in atual.split("|") if c.strip()]
+            if cabecalhos[:1] != ["Foco"]:
+                i += 1
+                continue
+            i += 1
+            if i < fim and re.match(r'\|[\s\-:]+\|', linhas[i].strip()):
+                i += 1
+            while i < fim and linhas[i].strip().startswith("|"):
+                valores = [limpar_texto(c.strip())
+                           for c in linhas[i].strip().split("|") if c.strip()]
+                if len(valores) >= 3:
+                    focos.append({
+                        "nome": valores[0],
+                        "categoria": categoria,
+                        "peso": valores[1],
+                        "custo": valores[2],
+                    })
+                i += 1
+            continue
+        i += 1
+    return focos
+
+
 def extrair_equipamento_aventura(linhas):
     """Extrai itens de equipamento de aventura."""
     print("Processando equipamento de aventura...")
@@ -1097,20 +1151,68 @@ def extrair_equipamento_aventura(linhas):
                 if m and not stripped.startswith("|"):
                     descricoes[m.group(1).strip()] = m.group(2).strip()
             
+            # Variantes de Foco Arcano / Foco Druidico: o peso delas nao
+            # esta na tabela principal (la o peso e "Varia").
+            focos = parse_focos_md(linhas, i, fim_equip)
+
             salvar_json("equipamento/equipamento_aventura.json", {
                 "total_itens": len(itens),
                 "itens": itens,
                 "municao": municao,
+                "focos": focos,
                 "descricoes": descricoes
             })
-            print(f"  {len(itens)} itens de aventura + {len(municao)} tipos de munição extraídos")
+            print(f"  {len(itens)} itens de aventura + {len(municao)} tipos de munição "
+                  f"+ {len(focos)} variantes de foco extraídos")
             return
+
+
+# Cabeçalho de uma ferramenta na seção "# Ferramentas": o nome seguido do
+# custo entre parênteses (ex.: "#### Ferramentas de Ladrão (25 PO)").
+RE_FERRAMENTA = re.compile(r'^####\s+(.+?)\s*\(([^()]*)\)\s*$')
+
+
+def parse_ferramentas_md(linhas, inicio, fim):
+    """Extrai as ferramentas da seção "# Ferramentas" do livro.
+
+    Essa seção não tem NENHUMA tabela markdown: cada ferramenta é um
+    cabeçalho "#### Nome (custo)" seguido de linhas "**Atributo:**" e
+    "**Peso:**". Enquanto o extrator só procurava tabelas, o peso das
+    ferramentas existia apenas na prosa de `texto_completo` e nenhuma tela
+    conseguia lê-lo -- "Ferramentas de Ladrão" entrava no inventário do
+    Ladino sem os 0,5 kg do livro (issue #43).
+    """
+    ferramentas = []
+    for i in range(inicio, fim):
+        m = RE_FERRAMENTA.match(linhas[i].strip())
+        if not m:
+            continue
+        peso = ""
+        atributo = ""
+        # Os campos da ferramenta vão daqui até o próximo cabeçalho.
+        for j in range(i + 1, fim):
+            atual = linhas[j].strip()
+            if atual.startswith("#"):
+                break
+            m_peso = re.match(r'^\*\*Peso:\*\*\s*(.+)$', atual)
+            if m_peso:
+                peso = m_peso.group(1).strip()
+            m_atributo = re.match(r'^\*\*Atributo:\*\*\s*(.+)$', atual)
+            if m_atributo:
+                atributo = m_atributo.group(1).strip()
+        ferramentas.append({
+            "Ferramenta": m.group(1).strip(),
+            "Custo": m.group(2).strip(),
+            "Peso": peso,
+            "Atributo": atributo,
+        })
+    return ferramentas
 
 
 def extrair_ferramentas(linhas):
     """Extrai ferramentas."""
     print("Processando ferramentas...")
-    
+
     for i, l in enumerate(linhas):
         if l.strip() == "# Ferramentas":
             # Encontrar fim
@@ -1119,18 +1221,27 @@ def extrair_ferramentas(linhas):
                 if linhas[j].strip() == "# Equipamento de Aventura":
                     fim = j
                     break
-            
+
             # Parsear todas as tabelas de ferramentas
             tabelas = parse_todas_tabelas_md(linhas, i, fim)
-            
+
+            # A seção não tem tabela markdown: as ferramentas em si vêm dos
+            # cabeçalhos "#### Nome (custo)" e entram como mais uma tabela.
+            ferramentas = parse_ferramentas_md(linhas, i, fim)
+            if ferramentas:
+                tabelas.append({
+                    "cabecalhos": ["Ferramenta", "Custo", "Peso", "Atributo"],
+                    "dados": ferramentas,
+                })
+
             # Também extrair textos descritivos
             texto = "".join(linhas[i:fim]).strip()
-            
+
             salvar_json("equipamento/ferramentas.json", {
                 "tabelas": tabelas,
                 "texto_completo": texto
             })
-            print("  Ferramentas extraídas")
+            print(f"  Ferramentas extraídas ({len(ferramentas)} com custo, peso e atributo)")
             return
 
 

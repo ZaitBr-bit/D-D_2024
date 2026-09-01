@@ -7,7 +7,7 @@
 import { CLASSES_INFO } from '../dados-classes.js';
 import { DENOMINACOES, ICONE_MOEDA, NOMES_MOEDA, adicionarMoeda, converterParaMaior, formatarCarteira, proximaDenominacaoMaior, removerQuantidadeMoeda, taxasSaoPadrao } from '../moedas.js';
 import { carregarComprarAtivoPadrao, resetarTaxasMoeda, salvarComprarAtivoPadrao, salvarTaxasMoeda } from '../store.js';
-import { abrirModal, bonusProficiencia, calcMod, escHtml, fmtMod, fmtPeso, getCapacidadeCarga, getPesoTotalInventario, mdParaHtml, semAcento, toast } from '../utils.js';
+import { abrirModal, bonusProficiencia, calcMod, escHtml, fmtMod, fmtPeso, getCapacidadeCarga, getPesoTotalInventario, mdParaHtml, parsePeso, semAcento, toast } from '../utils.js';
 import { abrirSeletorItens, carregarDadosEquipSheet } from '../itens-seletor.js';
 import { getEstadoFuria } from './classes/barbaro.js';
 import { getEstadoRecursosGuardiao } from './classes/guardiao.js';
@@ -711,6 +711,11 @@ function abrirModalEditarItemCustomizado(item, idx) {
         <div style="font-size:0.65rem;color:var(--text-muted)">soma na jogada de ataque</div>
       </div>
     </div>
+    <div class="form-group" style="margin-top:8px">
+      <label class="form-label" for="ic-peso">Peso (opcional)</label>
+      <input type="number" class="form-input" id="ic-peso" value="${parsePeso(d.peso) || ''}" placeholder="0" min="0" step="0.1" style="max-width:140px">
+      <div style="font-size:0.65rem;color:var(--text-muted)">em kg (ex: 0,5)</div>
+    </div>
     <div id="ic-erros" style="display:none;color:var(--danger);font-size:0.8rem;margin-top:8px"></div>
   `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-ic">Salvar</button>');
 
@@ -722,6 +727,10 @@ function abrirModalEditarItemCustomizado(item, idx) {
     const caBase = caBaseRaw === '' ? '' : String(parseInt(caBaseRaw) || 0);
     const danoVal = document.getElementById('ic-dano')?.value?.trim() || '';
     const atq = parseInt(document.getElementById('ic-atq')?.value) || 0;
+    // Mesma leitura do formulario de criacao (ver acima): campo vazio grava
+    // peso vazio, e a virgula digitada vira ponto antes do parseFloat.
+    const pesoRaw = document.getElementById('ic-peso')?.value?.trim() || '';
+    const pesoNum = pesoRaw ? parseFloat(pesoRaw.replace(',', '.')) : 0;
     const errosEl = document.getElementById('ic-erros');
     const erros = [];
 
@@ -744,6 +753,7 @@ function abrirModalEditarItemCustomizado(item, idx) {
     char.inventario[idx].dados.ca_base = caBase;
     char.inventario[idx].dados.dano = danoVal;
     char.inventario[idx].dados.bonus_ataque = String(atq);
+    char.inventario[idx].dados.peso = pesoNum > 0 ? `${fmtPeso(pesoNum)} kg` : '';
     salvar();
     window.fecharModal();
     renderFichaCompleta();

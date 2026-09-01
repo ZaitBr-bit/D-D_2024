@@ -24,7 +24,10 @@ let _comprarAtivoCriador = false;
 // ============================================================
 
 // Função para parsear opções de equipamento (A, B, C, etc)
-function parseEquipamentoOpcoes(texto) {
+// Exportada para o oráculo `equipamento-inicial-acervo.test.mjs` varrer o
+// pacote inicial de todas as classes e antecedentes com o MESMO parser que
+// o criador usa.
+export function parseEquipamentoOpcoes(texto) {
   if (!texto) return null;
   // Formato: "Escolha A ou B: (A) item1, item2, 10 PO; ou (B) 50 PO"
   // Ou: "Escolha A, B ou C: (A) ...; (B) ...; ou (C) ..."
@@ -63,32 +66,214 @@ function parseEquipamentoOpcoes(texto) {
   return opcoes.length > 0 ? opcoes : null;
 }
 
-// Função para adicionar itens de equipamento ao inventário
-function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
-  // Limpar itens anteriores dessa origem
-  personagem.inventario = personagem.inventario.filter(item =>
-    !(item.origemTipo === tipoOrigem && item.origemNome === nomeOrigem)
-  );
+// Instrumentos oferecidos no dropdown do PASSO DA CLASSE (Bardo).
+//
+// EXPORTADA porque era uma const local dentro de renderStepEquipamento e,
+// por isso, invisivel para a varredura de equipamento-inicial-acervo.test.mjs
+// -- que media as outras duas listas de instrumento do app
+// (INSTRUMENTOS_MUSICAIS e ANTECEDENTES_ESCOLHAS['Artista']) e nao esta.
+// As TRES divergem entre si e do livro: esta nao usa acento nenhum
+// ('Alaude', 'Oboe') e escreve 'Flauta de Pa' onde o livro traz 'Flauta de
+// Pan' e o antecedente traz 'Flauta de Pã'. Nenhum instrumento tem entrada
+// propria no acervo (o livro so os lista na prosa "**Variantes:**"), entao
+// hoje todos caem no ramo generico -- divida declarada no oraculo.
+export const INSTRUMENTOS_PASSO_CLASSE = [
+  'Alaude', 'Corne', 'Flauta', 'Flauta de Pa', 'Gaita de Foles',
+  'Harpa', 'Lira', 'Oboe', 'Tambor', 'Violino'
+];
 
-  if (opcao.apenasOuro) {
-    // Opção de apenas dinheiro - adicionar à carteira
-    personagem.moedas = adicionarMoeda(personagem.moedas, opcao.moedaTipo, opcao.moedaQtd);
-    return;
+// Conectivos que a camada do LIVRO usa e a do DADO omite: o pacote inicial
+// do antecedente diz "Roupas de Viagem", a tabela de Equipamento de
+// Aventura grava "Roupas, Viagem" (convencao de indice, substantivo
+// primeiro). "e"/"ou" NAO entram nesta lista: sao parte do nome em
+// "Roldana e Polias" e "Estojo, Mapa ou Pergaminho".
+const CONECTIVOS_NOME_ITEM = new Set(['de', 'da', 'do', 'das', 'dos']);
+
+/** Reduz uma palavra ao singular (ex: "Roupas" -> "roupa", "Grilhões" -> "grilhao") */
+function singularizarPalavra(palavra) {
+  if (/oes$/.test(palavra)) return palavra.replace(/oes$/, 'ao');
+  if (/s$/.test(palavra)) return palavra.replace(/s$/, '');
+  return palavra;
+}
+
+/**
+ * Chave de casamento de um nome de item entre a camada do livro (pacote
+ * inicial de classes e antecedentes) e a do dado (o acervo).
+ *
+ * Aplicada aos DOIS lados, ela absorve as tres divergencias de escrita que
+ * existem entre as camadas -- acento, a virgula da convencao de indice e o
+ * conectivo, e o plural. TODAS as palavras restantes continuam na chave, de
+ * proposito: e isso que impede "Roupas Finas" de casar com "Roupas de
+ * Viagem" ou "Balde de Ferro" com "Balde". Reduzir o nome ao primeiro
+ * substantivo casaria itens diferentes, que e um defeito pior que o que
+ * esta funcao conserta (issue #43).
+ */
+function chaveNomeItem(nome) {
+  return semAcento(String(nome || ''))
+    .replace(/[,;.]/g, ' ')
+    .split(/\s+/)
+    .filter(palavra => palavra && !CONECTIVOS_NOME_ITEM.has(palavra))
+    .map(singularizarPalavra)
+    .filter(Boolean)
+    .join(' ');
+}
+
+/** Remove o qualificador entre parenteses no fim do nome ("Foco Arcano (orbe)" -> "Foco Arcano") */
+function semQualificador(nome) {
+  return String(nome || '').replace(/\s*\([^()]*\)\s*$/, '').trim();
+}
+
+/**
+ * Resolve "Categoria (Forma)" para a VARIANTE nomeada da categoria.
+ *
+ * "Foco Arcano" e "Foco Druidico" entram na tabela de equipamento com peso
+ * "Varia" -- que `parsePeso` le como 0 kg. O peso de verdade e por forma,
+ * numa tabela propria do livro: Cajado 2 kg, Orbe 1,5 kg, Cristal 0,5 kg,
+ * Ramo de visco "—". Os pacotes de classe pedem a forma por extenso ("Foco
+ * Arcano (Cajado)" no Mago, "(orbe)" no Bruxo, "(cristal)" no Feiticeiro),
+ * entao da para entregar a variante certa em vez da entrada generica.
+ * Sem isto, "foco arcano cajado" -- citado por escrito na issue #43 --
+ * continuaria pesando zero mesmo depois do conserto do casamento.
+ *
+ * A forma casa por chave exata ou, se nao houver, por PREFIXO com resultado
+ * UNICO dentro da propria categoria -- o livro chama o cajado druidico de
+ * "Cajado de madeira (tambem um Bastao)" e a Druida pede so "Cajado". O
+ * prefixo so e aceito quando uma unica variante da categoria comeca por
+ * ele; com duas, nao ha como saber qual, e nenhuma e devolvida.
+ */
+function acharVarianteDeFoco(focos, nomeItem) {
+  if (!Array.isArray(focos) || focos.length === 0) return null;
+  const comQualificador = String(nomeItem || '').match(/^(.+?)\s*\(([^()]+)\)\s*$/);
+  if (!comQualificador) return null;
+  const chaveCategoria = chaveNomeItem(comQualificador[1]);
+  const chaveForma = chaveNomeItem(comQualificador[2]);
+  if (!chaveCategoria || !chaveForma) return null;
+
+  const daCategoria = focos.filter(f => chaveNomeItem(f.categoria) === chaveCategoria);
+  if (daCategoria.length === 0) return null;
+
+  // O nome da variante tambem pode trazer parenteses ("Cajado (tambem um
+  // Bastao)") -- o que interessa e a parte antes deles.
+  const chaveDe = (f) => chaveNomeItem(semQualificador(f.nome));
+  const exata = daCategoria.find(f => chaveDe(f) === chaveForma);
+  if (exata) return exata;
+
+  const porPrefixo = daCategoria.filter(f => chaveDe(f).startsWith(`${chaveForma} `));
+  return porPrefixo.length === 1 ? porPrefixo[0] : null;
+}
+
+/** Todas as chaves de nome do acervo inteiro, para guardar a regra de apelido abaixo */
+function chavesDoAcervo(acervo) {
+  const chaves = new Set();
+  for (const lista of [acervo.armas, acervo.armaduras, acervo.equipAvent,
+                       acervo.municao, acervo.ferramentas, acervo.focos]) {
+    for (const entrada of lista || []) chaves.add(chaveNomeItem(entrada?.nome || ''));
   }
+  return chaves;
+}
+
+/**
+ * Indice de APELIDOS da convencao de virgula do acervo.
+ *
+ * A tabela de Equipamento de Aventura guarda "Roupas, Fantasia"
+ * (substantivo primeiro, para ordenar por "Roupas"), mas o LIVRO chama o
+ * mesmo item de "Fantasia" -- e assim ele aparece no pacote do Charlatao e
+ * do Artista. O apelido e o nome sem o primeiro substantivo.
+ *
+ * DOIS guardas, porque a regra e a mais perigosa das tres -- e a unica que
+ * DESCARTA uma palavra, enquanto `chaveNomeItem` preserva todas:
+ *   1. um apelido que JA E o nome de outro item do acervo nao vale.
+ *      "Balas, Funda" apelidaria "funda", que e a arma Funda. Hoje a ordem
+ *      das buscas ja evitaria o estrago sozinha (armas e consultada antes
+ *      da lista de equipamento/municao, e "Funda" casa exato la), mas essa
+ *      protecao e acidental: some se alguem trocar a ordem, ou se um
+ *      componente de KITS_EXPANSAO passar a chamar "Funda" -- o ramo de
+ *      kit consulta `equipAvent` direto, sem passar por armas. O guarda
+ *      torna a regra segura independente da ordem;
+ *   2. um apelido disputado por duas entradas nao vale para nenhuma.
+ */
+function indiceApelidos(lista, chavesProibidas) {
+  const apelidos = new Map();
+  const disputados = new Set();
+  for (const entrada of lista) {
+    const nome = entrada?.nome || '';
+    if (!nome.includes(',')) continue;
+    const palavras = chaveNomeItem(nome).split(' ');
+    if (palavras.length < 2) continue;
+    const apelido = palavras.slice(1).join(' ');
+    if (!apelido || chavesProibidas.has(apelido)) continue;
+    if (apelidos.has(apelido)) { disputados.add(apelido); continue; }
+    apelidos.set(apelido, entrada);
+  }
+  for (const apelido of disputados) apelidos.delete(apelido);
+  return apelidos;
+}
+
+/**
+ * Acha na lista do acervo a entrada cujo nome casa com `nome` (ou com um
+ * dos nomes `alternativos`).
+ *
+ * Tres tentativas, da mais exigente para a mais frouxa, e a ordem importa:
+ *   1. o nome COMPLETO -- senao "Cantil (cheio)", que existe assim no
+ *      acervo, perderia o proprio par para a tentativa 2;
+ *   2. sem o qualificador entre parenteses ("Foco Arcano (orbe)");
+ *   3. o apelido da convencao de virgula ("Fantasia" -> "Roupas,
+ *      Fantasia"), so quando `chavesProibidas` e informado.
+ */
+function acharPorNome(lista, nome, alternativas = [], chavesProibidas = null) {
+  if (!Array.isArray(lista) || lista.length === 0) return null;
+  const candidatos = [nome, ...alternativas].filter(Boolean);
+  const tentativas = [
+    candidatos,
+    candidatos.map(semQualificador).filter((n, i) => n && n !== candidatos[i])
+  ];
+  for (const grupo of tentativas) {
+    if (grupo.length === 0) continue;
+    const chaves = new Set(grupo.map(chaveNomeItem));
+    const achado = lista.find(e => chaves.has(chaveNomeItem(e.nome || '')));
+    if (achado) return achado;
+  }
+  if (chavesProibidas) {
+    const apelidos = indiceApelidos(lista, chavesProibidas);
+    if (apelidos.size > 0) {
+      for (const candidato of candidatos) {
+        const achado = apelidos.get(chaveNomeItem(candidato));
+        if (achado) return achado;
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Monta as entradas de inventário de uma opção de equipamento inicial.
+ *
+ * PURA de propósito: não toca `personagem`, `dadosCache` nem o DOM. O
+ * acervo e as escolhas já resolvidas do jogador entram por parâmetro, e é
+ * isso que permite ao oráculo `equipamento-inicial-acervo.test.mjs` varrer
+ * o pacote inicial das 12 classes e de todos os antecedentes chamando a
+ * MESMA função que o criador chama -- em vez de reimplementar o casamento
+ * dentro do teste, que só provaria que o teste concorda consigo mesmo.
+ *
+ * `acervo`: { armas, armaduras, equipAvent, municao, ferramentas }.
+ * `escolhas`: { instrumento, escolhasAntecedente }.
+ */
+export function montarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem, acervo = {}, escolhas = {}) {
+  const montados = [];
+  if (!opcao || opcao.apenasOuro) return montados;
+
+  // Calculado uma vez: guarda a regra de apelido de `acharPorNome` contra
+  // entregar um item quando o apelido e o nome real de OUTRO item.
+  const chavesProibidas = chavesDoAcervo(acervo);
 
   // Processar cada item da opção
-  for (let itemStr of opcao.itens) {
+  for (let itemStr of opcao.itens || []) {
     // Resolver itens com "à sua escolha" - substituir por escolha do jogador se disponivel
     if (/à sua escolha/i.test(itemStr)) {
       // Para instrumentos musicais, usar o instrumento escolhido (do antecedente Artista ou escolha da classe)
       if (/instrumento musical/i.test(itemStr)) {
-        const instrEscolhido = personagem.instrumento_classe_escolhido || personagem.instrumento_escolhido;
-        if (instrEscolhido) {
-          itemStr = instrEscolhido;
-        } else {
-          // Fallback: adicionar como "Instrumento Musical" generico
-          itemStr = 'Instrumento Musical';
-        }
+        // Sem escolha feita, cai no "Instrumento Musical" generico do acervo
+        itemStr = escolhas.instrumento || 'Instrumento Musical';
       } else {
         // Outros itens "à sua escolha" - remover sufixo
         itemStr = itemStr.replace(/\s*à sua escolha/i, '').trim();
@@ -102,7 +287,7 @@ function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
       // virar item genérico no inventário. Só o pacote do ANTECEDENTE usa esse
       // marcador -- tipoOrigem é 'antecedente' nesse caso.
       const antEscolha = tipoOrigem === 'antecedente' ? ANTECEDENTES_ESCOLHAS[nomeOrigem] : null;
-      const escolhida = antEscolha ? personagem.escolhas_antecedente?.[antEscolha.campo] : null;
+      const escolhida = antEscolha ? escolhas.escolhasAntecedente?.[antEscolha.campo] : null;
       itemStr = escolhida || itemStr.replace(/\s*\((?:a mesma|o mesmo)\s+que\s+acima\)/i, '').trim();
     }
 
@@ -117,11 +302,9 @@ function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
     const kitConteudo = KITS_EXPANSAO[nomeItem];
     if (kitConteudo) {
       for (const comp of kitConteudo) {
-        const equipComp = dadosCache.equipAvent?.find(e =>
-          semAcento(e.nome).toLowerCase() === semAcento(comp.nome).toLowerCase()
-        );
+        const equipComp = acharPorNome(acervo.equipAvent, comp.nome, [], chavesProibidas);
         if (equipComp) {
-          personagem.inventario.push({
+          montados.push({
             nome: equipComp.nome,
             tipo: 'equipamento',
             quantidade: comp.qtd,
@@ -132,7 +315,7 @@ function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
           });
         } else {
           // Fallback: item nao encontrado no banco, adicionar como generico
-          personagem.inventario.push({
+          montados.push({
             nome: comp.nome,
             tipo: 'generico',
             quantidade: comp.qtd,
@@ -146,19 +329,27 @@ function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
       continue;
     }
 
-    // Singularizar nome para busca (ex: "Adagas" -> "Adaga", "Flechas" -> "Flecha")
-    const nomeSingular = nomeItem
-      .replace(/([ãõ])es$/i, '$1o')  // ex: não usado aqui, mas seguro
-      .replace(/ões$/i, 'ão')
-      .replace(/s$/i, '');
+    // Variante nomeada de foco ("Foco Arcano (Cajado)"): tem de ser tentada
+    // ANTES das buscas por nome, senao `semQualificador` casaria com a
+    // entrada generica "Foco Arcano" e o item voltaria a pesar "Varia".
+    const foco = acharVarianteDeFoco(acervo.focos, nomeItem);
+    if (foco) {
+      montados.push({
+        nome: `${foco.categoria} (${semQualificador(foco.nome)})`,
+        tipo: 'equipamento',
+        quantidade,
+        equipado: false,
+        dados: { custo: foco.custo, peso: foco.peso, tipo_uso: '', descricao: '' },
+        origemTipo: tipoOrigem,
+        origemNome: nomeOrigem
+      });
+      continue;
+    }
 
-    // Tentar encontrar nos dados de armas (tenta plural original e depois singular)
-    const arma = dadosCache.armas?.find(a => {
-      const nomeArma = semAcento(a.nome).toLowerCase();
-      return nomeArma === semAcento(nomeItem).toLowerCase() || nomeArma === semAcento(nomeSingular).toLowerCase();
-    });
+    // Tentar encontrar nos dados de armas
+    const arma = acharPorNome(acervo.armas, nomeItem, [], chavesProibidas);
     if (arma) {
-      personagem.inventario.push({
+      montados.push({
         nome: arma.nome,
         tipo: 'arma',
         quantidade,
@@ -170,18 +361,11 @@ function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
       continue;
     }
 
-    // Tentar encontrar nas armaduras (tenta plural, singular e sem prefixo "Armadura de")
-    const nomeItemSemPrefixo = nomeItem.replace(/^Armadura de /i, '');
-    const nomeSingularSemPrefixo = nomeSingular.replace(/^Armadura de /i, '');
-    const armadura = dadosCache.armaduras?.find(a => {
-      const nomeArm = semAcento(a.nome).toLowerCase();
-      return nomeArm === semAcento(nomeItem).toLowerCase()
-        || nomeArm === semAcento(nomeSingular).toLowerCase()
-        || nomeArm === semAcento(nomeItemSemPrefixo).toLowerCase()
-        || nomeArm === semAcento(nomeSingularSemPrefixo).toLowerCase();
-    });
+    // Tentar encontrar nas armaduras (o acervo grava "Couro"; o pacote da
+    // classe diz "Armadura de Couro" -- daí o nome alternativo sem prefixo)
+    const armadura = acharPorNome(acervo.armaduras, nomeItem, [nomeItem.replace(/^Armadura de /i, '')], chavesProibidas);
     if (armadura) {
-      personagem.inventario.push({
+      montados.push({
         nome: armadura.nome,
         tipo: 'armadura',
         quantidade,
@@ -193,18 +377,21 @@ function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
       continue;
     }
 
-    // Tentar encontrar em equipamento de aventura E na municao (tenta plural e singular).
+    // Tentar encontrar em equipamento de aventura, na municao E nas ferramentas.
     // `municao` e lista SEPARADA de proposito -- fundi-las faria a categoria
     // "Equipamento" do seletor listar as flechas duas vezes --, mas para
     // resolver o nome do pacote inicial as duas valem igual: "20 Flechas" do
-    // Guardiao e do Ladino so casa na de municao.
-    const baseItens = [...(dadosCache.equipAvent || []), ...(dadosCache.municao || [])];
-    const equip = baseItens.find(e => {
-      const nomeEquip = semAcento(e.nome).toLowerCase();
-      return nomeEquip === semAcento(nomeItem).toLowerCase() || nomeEquip === semAcento(nomeSingular).toLowerCase();
-    });
+    // Guardiao e do Ladino so casa na de municao. `ferramentas` entrou pelo
+    // mesmo motivo (issue #43): "Ferramentas de Ladrao" do pacote do Ladino so
+    // tem peso na tabela de ferramentas.
+    const baseItens = [
+      ...(acervo.equipAvent || []),
+      ...(acervo.municao || []),
+      ...(acervo.ferramentas || [])
+    ];
+    const equip = acharPorNome(baseItens, nomeItem, [], chavesProibidas);
     if (equip) {
-      personagem.inventario.push({
+      montados.push({
         nome: equip.nome,
         tipo: 'equipamento',
         quantidade,
@@ -217,7 +404,7 @@ function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
     }
 
     // Item não encontrado - adicionar como item genérico
-    personagem.inventario.push({
+    montados.push({
       nome: nomeItem,
       tipo: 'generico',
       quantidade,
@@ -227,6 +414,29 @@ function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
       origemNome: nomeOrigem
     });
   }
+
+  return montados;
+}
+
+// Função para adicionar itens de equipamento ao inventário
+function adicionarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem) {
+  // Limpar itens anteriores dessa origem
+  personagem.inventario = personagem.inventario.filter(item =>
+    !(item.origemTipo === tipoOrigem && item.origemNome === nomeOrigem)
+  );
+
+  if (opcao.apenasOuro) {
+    // Opção de apenas dinheiro - adicionar à carteira
+    personagem.moedas = adicionarMoeda(personagem.moedas, opcao.moedaTipo, opcao.moedaQtd);
+    return;
+  }
+
+  personagem.inventario.push(
+    ...montarItensEquipamentoInicial(opcao, tipoOrigem, nomeOrigem, dadosCache, {
+      instrumento: personagem.instrumento_classe_escolhido || personagem.instrumento_escolhido,
+      escolhasAntecedente: personagem.escolhas_antecedente
+    })
+  );
 
   // Adicionar moeda da opção (se houver)
   if (opcao.moedaQtd > 0 && !opcao.apenasOuro) {
@@ -258,6 +468,13 @@ export async function renderStepEquipamento(el) {
   dadosCache.armaduras = dadosEquip.armaduras;
   dadosCache.equipAvent = dadosEquip.equipAvent;
   dadosCache.municao = dadosEquip.municao;
+  // Ferramentas: a unica lista com o peso de "Ferramentas de Ladrao",
+  // "Kit de Herbalismo" e afins (issue #43). Sem ela na cache, esses itens
+  // do pacote inicial entram no inventario sem peso nenhum.
+  dadosCache.ferramentas = dadosEquip.ferramentas;
+  // Variantes de foco: sem elas na cache, "Foco Arcano (Cajado)" do pacote
+  // do Mago casa com a entrada generica e volta a pesar "Varia" (0 kg).
+  dadosCache.focos = dadosEquip.focos;
   // propriedadesArmas continua sendo cacheada aqui (fora do bloco do brief):
   // mostrarDetalheItem (abaixo) le dadosCache.propriedadesArmas de forma
   // sincrona para mostrar a descricao das propriedades da arma no popup de
@@ -303,7 +520,6 @@ export async function renderStepEquipamento(el) {
 
   // Verificar se o equipamento da classe requer escolha de instrumento musical
   const classeTemInstrumento = /instrumento musical à sua escolha/i.test(equipClasse);
-  const instrumentosDisponiveis = ['Alaude', 'Corne', 'Flauta', 'Flauta de Pa', 'Gaita de Foles', 'Harpa', 'Lira', 'Oboe', 'Tambor', 'Violino'];
 
   el.innerHTML = `
     <h3 style="margin-bottom:12px">Equipamento</h3>
@@ -323,7 +539,7 @@ export async function renderStepEquipamento(el) {
       <div style="padding:4px 0">
         <select class="form-input" id="select-instrumento-classe" style="max-width:280px">
           <option value="">-- Escolha um instrumento --</option>
-          ${instrumentosDisponiveis.map(i => `<option value="${i}" ${personagem.instrumento_classe_escolhido === i ? 'selected' : ''}>${i}</option>`).join('')}
+          ${INSTRUMENTOS_PASSO_CLASSE.map(i => `<option value="${i}" ${personagem.instrumento_classe_escolhido === i ? 'selected' : ''}>${i}</option>`).join('')}
         </select>
       </div>
     </div>` : ''}

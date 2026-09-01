@@ -4,23 +4,19 @@
 // criador e nao dava para gastar o ouro inicial.
 // ============================================================
 import { test, expect } from '@playwright/test';
-import { assentar, clicarBotaoFicha, abrirSite, satisfazerPasso, personagemEmCriacao } from './helpers-regras.mjs';
+import { assentar, clicarBotaoFicha, abrirSite, irAtePassoEquipamento, personagemEmCriacao } from './helpers-regras.mjs';
 
+// A copia local de `irAtePassoEquipamento` que vivia aqui foi para
+// helpers-regras.mjs na Tarefa 9 (licao 7 do guia: helper de navegacao vive
+// la, importado). A copia daqui nao confirmava o
+// `popup-confirmar-classe` -- deixava o driver generico resolve-lo --, que
+// e exatamente o tipo de divergencia entre copias que a licao proibe.
 /** Leva o wizard ate o passo de equipamento, escolhendo Guardiao */
-async function irAtePassoEquipamento(page) {
-  await page.click('[data-classe="Guardião"]');
-  await page.waitForTimeout(300);
-  for (let i = 0; i < 10; i++) {
-    if (await page.locator('#btn-add-item').count()) return true;
-    if (!await satisfazerPasso(page)) break;
-    await assentar(page).catch(() => {});
-  }
-  return (await page.locator('#btn-add-item').count()) > 0;
-}
+const irAtePassoEquipamentoGuardiao = (page) => irAtePassoEquipamento(page, 'Guardião');
 
 test('criador: + Item abre o modal unificado, com a categoria Municao', async ({ context }) => {
   const { page } = await abrirSite(context, '#criar');
-  expect(await irAtePassoEquipamento(page), 'nao chegou ao passo de equipamento').toBe(true);
+  expect(await irAtePassoEquipamentoGuardiao(page), 'nao chegou ao passo de equipamento').toBe(true);
 
   // Os botoes por tipo nao existem mais.
   await expect(page.locator('#btn-add-arma')).toHaveCount(0);
@@ -65,7 +61,7 @@ test('criador: + Item abre o modal unificado, com a categoria Municao', async ({
 // verdes -- so este prova a ligacao ponta a ponta.
 test('criador: adicionar um item pelo modal grava no personagem em construcao e a lista do passo re-renderiza', async ({ context }) => {
   const { page } = await abrirSite(context, '#criar');
-  expect(await irAtePassoEquipamento(page), 'nao chegou ao passo de equipamento').toBe(true);
+  expect(await irAtePassoEquipamentoGuardiao(page), 'nao chegou ao passo de equipamento').toBe(true);
 
   await clicarBotaoFicha(page, 'btn-add-item', { esperar: '#lista-inv-cat' });
 
@@ -101,7 +97,7 @@ test('criador: adicionar um item pelo modal grava no personagem em construcao e 
 // pagina, mas nasce desligada a cada carga nova) ficavam sem cobertura.
 test('criador: o toggle Comprar nasce desligado a cada carga da pagina, mas sobrevive entre reaberturas do modal', async ({ context }) => {
   const { page } = await abrirSite(context, '#criar');
-  expect(await irAtePassoEquipamento(page), 'nao chegou ao passo de equipamento').toBe(true);
+  expect(await irAtePassoEquipamentoGuardiao(page), 'nao chegou ao passo de equipamento').toBe(true);
 
   // 1a abertura: nasce desligado.
   await clicarBotaoFicha(page, 'btn-add-item', { esperar: '#lista-inv-cat' });
@@ -124,7 +120,7 @@ test('criador: o toggle Comprar nasce desligado a cada carga da pagina, mas sobr
   // _comprarAtivoCriador em creator/passo-equipamento.js).
   await page.reload({ waitUntil: 'domcontentloaded' });
   await assentar(page);
-  expect(await irAtePassoEquipamento(page), 'nao chegou ao passo de equipamento depois do reload').toBe(true);
+  expect(await irAtePassoEquipamentoGuardiao(page), 'nao chegou ao passo de equipamento depois do reload').toBe(true);
 
   await clicarBotaoFicha(page, 'btn-add-item', { esperar: '#lista-inv-cat' });
   await expect(page.locator('#toggle-comprar-item'),
@@ -141,7 +137,7 @@ test('criador: o toggle Comprar nasce desligado a cada carga da pagina, mas sobr
 // Guardiao (e do Ladino) pesavam ZERO na carga.
 test('criador: as 20 Flechas do pacote do Guardiao entram COM peso', async ({ context }) => {
   const { page } = await abrirSite(context, '#criar');
-  expect(await irAtePassoEquipamento(page), 'nao chegou ao passo de equipamento').toBe(true);
+  expect(await irAtePassoEquipamentoGuardiao(page), 'nao chegou ao passo de equipamento').toBe(true);
 
   // Escolher a opcao (A) do pacote de CLASSE, que inclui "20 Flechas".
   // O card e marcado com data-equip-tipo (valores: 'classe' | 'antecedente')
@@ -172,7 +168,7 @@ test('criador: as 20 Flechas do pacote do Guardiao entram COM peso', async ({ co
 // zeraria a carteira, sem nenhum teste vermelho.
 test('criador: com "Comprar" ativo, comprar um item desconta o custo da carteira do personagem em construcao', async ({ context }) => {
   const { page } = await abrirSite(context, '#criar');
-  expect(await irAtePassoEquipamento(page), 'nao chegou ao passo de equipamento').toBe(true);
+  expect(await irAtePassoEquipamentoGuardiao(page), 'nao chegou ao passo de equipamento').toBe(true);
 
   // Semeia um saldo conhecido, direto no objeto vivo do wizard -- o mesmo
   // que ctx.personagem referencia dentro de abrirSeletorItens e que
@@ -224,7 +220,7 @@ test('criador: com "Comprar" ativo, comprar um item desconta o custo da carteira
 // ============================================================
 test('criador: item customizado grava CA Base, o mesmo campo da ficha', async ({ context }) => {
   const { page } = await abrirSite(context, '#criar');
-  expect(await irAtePassoEquipamento(page), 'nao chegou ao passo de equipamento').toBe(true);
+  expect(await irAtePassoEquipamentoGuardiao(page), 'nao chegou ao passo de equipamento').toBe(true);
 
   await clicarBotaoFicha(page, 'btn-add-custom', { esperar: '#custom-nome' });
 
