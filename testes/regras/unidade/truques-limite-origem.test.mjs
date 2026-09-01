@@ -34,6 +34,7 @@ const CASOS = [
   { origem: 'conjurador_ritualista', conta: false, porque: 'talento Conjurador Ritualista' },
   { origem: 'telecinetico',          conta: false, porque: 'talento Telecinético (Mãos Mágicas ou o substituto)' },
   { origem: 'subclasse_automatica',  conta: false, porque: 'Ilusionista: "O truque não conta para o seu número de truques conhecidos"' },
+  { origem: 'subclasse_escolha',     conta: false, porque: 'Descobertas Mágicas (Colégio do Conhecimento nv6): as 2 magias/truques à escolha são um ganho da subclasse, além da tabela da classe' },
   { origem: 'subclasse_fixa',        conta: true,  porque: 'Trapaceiro Arcano: Mãos Mágicas é um dos três truques da tabela' },
 ];
 

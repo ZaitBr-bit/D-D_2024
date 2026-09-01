@@ -17,6 +17,12 @@
 // Arcano, os quatro "Versado em ..." do Mago).
 // ============================================================
 import { PERICIAS_TODAS, FERRAMENTAS_ARTESAO } from './regras-cobertura.js';
+// getMagiasClasse: a MESMA função que o fluxo de Iniciado em Magia e o
+// truque substituto do Telecinético já usam para ler `lista_magias` de uma
+// classe. As Descobertas Mágicas (Colégio do Conhecimento nv6) escolhem das
+// listas de Clérigo, Druida e Mago, que só existem em dados/classes/ --
+// por isso esta tabela, que é de regra, precisa de um carregador.
+import { getMagiasClasse } from './db.js';
 
 // Nomes canônicos dos dez Estilos de Luta (Classes.md:3798-3810). Ficam AQUI,
 // na camada de regra, e não em levelup-cards.js: aquele módulo toca `window`
@@ -141,14 +147,21 @@ export function linhasDaSubclasseNoNivel(subclasse, nivel) {
 }
 
 /**
- * Resolve a lista de opções de uma linha. `opcoes` literal tem precedência;
- * `fonteOpcoes` nomeia uma lista que já existe no app, para não duplicar
- * dado que outra parte já mantém.
+ * Resolve a lista SÍNCRONA de opções de uma linha. `opcoes` literal tem
+ * precedência; `fonteOpcoes` nomeia uma lista que já existe no app, para não
+ * duplicar dado que outra parte já mantém.
  *
- * 'magias-qualquer' devolve lista vazia de propósito: as opções vêm do
- * índice de magias, carregado de forma assíncrona por quem monta a tela --
- * a validação de `subirDeNivel` para essa linha é só de quantidade, e isso
- * está declarado no README da suíte, não escondido.
+ * Devolve `[]` para as fontes que só existem em arquivo de dados
+ * ('magias-qualquer'): essas têm RESOLVEDOR assíncrono declarado em
+ * RESOLVEDORES_OPCOES, logo abaixo, e quem monta a tela chama
+ * `opcoesDaLinhaAsync`. LIMITE CONHECIDO, dito aqui em voz alta: como a
+ * guarda de `subirDeNivel` consulta ESTA função, a validação dessas linhas
+ * continua sendo só de quantidade -- ela não confere se a magia escolhida
+ * está mesmo nas três listas do livro. Quem oferece a lista certa é a tela.
+ *
+ * Uma lista vazia AQUI sem resolvedor lá é o defeito da issue #44 -- seletor
+ * que nasce só com "— escolha —" e trava a subida de nível. É exatamente o
+ * que `testes/regras/unidade/escolha-subclasse-viva.test.mjs` proíbe.
  */
 export function opcoesDaLinha(linha) {
   if (Array.isArray(linha.opcoes)) return linha.opcoes;
@@ -158,6 +171,117 @@ export function opcoesDaLinha(linha) {
     case 'estilos-luta': return ESTILOS_LUTA_CANONICOS;
     default: return [];
   }
+}
+
+// As três listas de classe de onde saem as Descobertas Mágicas
+// (Classes.md:770): "Essas magias podem vir da lista de magias de Clérigo,
+// Druida ou Mago, ou uma combinação dessas listas". O relator da issue #44
+// falou em "clérigo ou mago"; o livro inclui Druida, e é o livro que manda.
+const CLASSES_DESCOBERTAS_MAGICAS = ['Clérigo', 'Druida', 'Mago'];
+
+/**
+ * Círculo numérico a partir da chave de grupo de `lista_magias`
+ * (dados/classes/magias_<classe>.json): 'Truques' vira 0, '3º Círculo' vira 3.
+ * A chave é a ÚNICA fonte do círculo nesses arquivos -- as entradas trazem
+ * só nome, escola e o marcador `especial`.
+ */
+function circuloDoGrupo(chave) {
+  const numero = /^(\d+)/.exec(String(chave));
+  return numero ? Number(numero[1]) : 0;
+}
+
+/**
+ * Opções das Descobertas Mágicas: as magias das listas de Clérigo, Druida e
+ * Mago que o Bardo pode escolher no nível em que ganha a característica.
+ *
+ * Regra do livro (Classes.md:770): "A magia escolhida deve ser um truque ou
+ * uma magia para a qual você tenha espaços de magia disponíveis, conforme
+ * mostrado na tabela Características de Bardo" -- daí o truque passar sempre
+ * e a magia de círculo passar só até `circuloMaximo`.
+ *
+ * `circuloMaximo` sem valor devolve a lista COMPLETA de propósito: o teto é
+ * um dado da tela (o `maxCirculoNovo` que `calcularConjuracao` já calcula
+ * para todo o assistente), não desta camada, e inventar um padrão numérico
+ * aqui esconderia um chamador que esqueceu de passá-lo. Quem monta o seletor
+ * sempre passa o teto real, e o spec e2e
+ * (bardo-conhecimento-descobertas.spec.mjs) mede isso na tela.
+ *
+ * `jaTem` exclui o que o personagem já possui. NÃO é refinamento cosmético:
+ * a gravação deduplica por nome, então oferecer uma magia repetida faz o
+ * jogador gastar UMA DAS DUAS Descobertas sem receber nada -- escolhe duas e
+ * ganha uma, sem erro e sem aviso. É o mesmo princípio que
+ * `testes/regras/unidade/escolha-morta.test.mjs` persegue do lado dos
+ * talentos. Acontece de verdade em multiclasse com Clérigo/Druida/Mago
+ * (listas sobrepostas), com o talento Iniciado em Magia e com magia de
+ * domínio. Quem monta o conjunto é a tela, no mesmo formato `jaTem: Set` que
+ * o resto de levelup-ui.js já usa.
+ *
+ * @param {{circuloMaximo?: number, jaTem?: Set<string>}} contexto
+ * @returns {Promise<Array<{nome: string, circulo: number}>>} sem repetidas,
+ *   ordenadas por círculo e depois por nome.
+ */
+async function resolverDescobertasMagicas({ circuloMaximo = Infinity, jaTem = new Set() } = {}) {
+  const porNome = new Map();
+  for (const classe of CLASSES_DESCOBERTAS_MAGICAS) {
+    const dados = await getMagiasClasse(classe);
+    for (const [grupo, lista] of Object.entries(dados?.lista_magias || {})) {
+      const circulo = circuloDoGrupo(grupo);
+      if (circulo > circuloMaximo) continue;
+      for (const magia of lista || []) {
+        // As entradas podem vir como string pura ou objeto -- mesma
+        // normalização do fluxo de Iniciado em Magia (levelup-ui.js).
+        const nome = typeof magia === 'string' ? magia : magia?.nome;
+        if (!nome || jaTem.has(nome)) continue;
+        // Uma magia em duas das três listas (Curar Ferimentos, por exemplo)
+        // não pode aparecer duas vezes no mesmo seletor.
+        if (!porNome.has(nome)) porNome.set(nome, { nome, circulo });
+      }
+    }
+  }
+  return [...porNome.values()]
+    .sort((a, b) => a.circulo - b.circulo || a.nome.localeCompare(b.nome, 'pt-BR'));
+}
+
+// Fontes de opção que só existem em arquivo de dados, e por isso resolvem
+// ASSÍNCRONO. Registrar aqui, e não espalhar um `if` por tela, é o que deixa
+// o oráculo genérico perguntar "esta linha tem quem preencha o seletor?" sem
+// conhecer característica nenhuma pelo nome.
+const RESOLVEDORES_OPCOES = {
+  'magias-qualquer': resolverDescobertasMagicas,
+};
+
+/**
+ * Resolvedor assíncrono declarado por uma linha, ou `null` quando as opções
+ * dela já saem prontas de `opcoesDaLinha`.
+ */
+export function resolvedorDaLinha(linha) {
+  if (Array.isArray(linha?.opcoes)) return null;
+  return RESOLVEDORES_OPCOES[linha?.fonteOpcoes] || null;
+}
+
+/**
+ * Opções de uma linha de fonte ASSÍNCRONA, no formato `{ nome, circulo }`.
+ * Quem monta a tela chama esta função só para as linhas com resolvedor; as
+ * demais continuam sendo renderizadas direto de `opcoesDaLinha`, no HTML,
+ * sem espera nenhuma.
+ *
+ * RECUSA linha sem resolvedor, em vez de cair num fallback síncrono: aquele
+ * fallback era inalcançável (todo chamador confirma `resolvedorDaLinha`
+ * antes) e, se um dia fosse alcançado, devolveria uma lista pela via errada
+ * sem ninguém notar. Aqui um `undefined` mudo é justamente o que traz a
+ * issue #44 de volta -- seletor vazio, sem explicação.
+ *
+ * @param {object} linha Linha de ESCOLHAS_SUBCLASSE_APP.
+ * @param {object} [contexto] Repassado ao resolvedor (ex.: `circuloMaximo`).
+ */
+export async function opcoesDaLinhaAsync(linha, contexto = {}) {
+  const resolvedor = resolvedorDaLinha(linha);
+  if (!resolvedor) {
+    throw new Error(`opcoesDaLinhaAsync: a linha "${linha?.rotulo || linha?.tipo}" não tem ` +
+      'resolvedor assíncrono (fonteOpcoes: ' + JSON.stringify(linha?.fonteOpcoes) + ') -- ' +
+      'as opções dela saem de opcoesDaLinha, na montagem do HTML.');
+  }
+  return resolvedor(contexto);
 }
 
 /** Le um valor num caminho pontilhado, sem criar nada. */
@@ -188,8 +312,17 @@ function acrescentarNaLista(personagem, campo, valores) {
  * Aplica a escolha do jogador ao personagem. `valores` chega como lista ou
  * valor único; a função aceita os dois para o chamador não precisar saber a
  * quantidade da linha.
+ *
+ * @param {object} personagem Mutado no lugar.
+ * @param {object} linha Linha de ESCOLHAS_SUBCLASSE_APP.
+ * @param {string|string[]} valores O que o jogador escolheu.
+ * @param {{circulos?: Object<string, number>}} [contexto] `circulos` é o
+ *   mapa "nome da magia -> círculo real", montado por quem chama a partir do
+ *   índice de magias (levelup.js). Só o destino `magias_preparadas` o usa --
+ *   e é ele que decide entre `magias_preparadas` e `magias_conhecidas`, já
+ *   que o livro deixa escolher truque (ver o comentário no corpo).
  */
-export function aplicarEscolhaSubclasse(personagem, linha, valores) {
+export function aplicarEscolhaSubclasse(personagem, linha, valores, contexto = {}) {
   const lista = (Array.isArray(valores) ? valores : [valores]).filter(Boolean);
   if (!lista.length) return;
   if (linha.destino === 'pericias_proficientes' || linha.destino === 'proficiencias_ferramentas') {
@@ -197,10 +330,35 @@ export function aplicarEscolhaSubclasse(personagem, linha, valores) {
     return;
   }
   if (linha.destino === 'magias_preparadas') {
-    if (!Array.isArray(personagem.magias_preparadas)) personagem.magias_preparadas = [];
     for (const nome of lista) {
-      if (!personagem.magias_preparadas.some((m) => m.nome === nome)) {
-        personagem.magias_preparadas.push({ nome, circulo: 1, origem: 'subclasse_escolha' });
+      // Círculo REAL, e não um valor fixo: as Descobertas Mágicas escolhem
+      // "um truque OU uma magia" (Classes.md:770), então não há círculo
+      // único a supor. O 1 continua como último recurso para um nome que o
+      // índice não conhece (magia personalizada), o mesmo padrão de
+      // obterMagiasDominioNivel.
+      const circulo = contexto.circulos?.[nome] ?? 1;
+      // TRUQUE VAI PARA `magias_conhecidas`, não para as preparadas.
+      //
+      // No app, truque de círculo 0 mora em `magias_conhecidas` -- é de lá
+      // que a seção de Truques da ficha lê (sheet/magias.js:553), e é assim
+      // que TODAS as outras origens de truque gravam (`subclasse_automatica`
+      // do Ilusionista, `telecinetico`, `especie`). Gravá-lo entre as
+      // preparadas não é só arrumação: `sheet/magias.js:652` agrupa por
+      // `m.circulo || 1` e jogaria o truque no grupo "1º Círculo", e o
+      // filtro `Object.keys(espacos).filter(c => parseInt(c) >= m.circulo)`
+      // casa TODOS os círculos quando o círculo é 0 -- o cartão sairia com
+      // seletor de upcast e um botão "Conjurar" que GASTA espaço de magia
+      // para lançar um truque. Este era o único ponto do app que escrevia
+      // `circulo: 0` em `magias_preparadas`; a cadeia inteira só existia
+      // por causa dele.
+      //
+      // Que o truque não gaste vaga do limite de truques da classe é decidido
+      // por ORIGENS_TRUQUE_NAO_TROCAVEL (regras-origens-magia.js), onde
+      // `subclasse_escolha` está declarada.
+      const campo = circulo === 0 ? 'magias_conhecidas' : 'magias_preparadas';
+      if (!Array.isArray(personagem[campo])) personagem[campo] = [];
+      if (!personagem[campo].some((m) => m.nome === nome)) {
+        personagem[campo].push({ nome, circulo, origem: 'subclasse_escolha' });
       }
     }
     return;

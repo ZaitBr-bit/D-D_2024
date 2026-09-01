@@ -8,7 +8,7 @@ import { calcMod, bonusProficiencia, escHtml, mdParaHtml, semAcento, toast, abri
 import { rotuloPericia } from './opcoes-dominio.js';
 import { obterTalentosElegiveis } from './levelup.js';
 import { calcularConjuracao, calcularSubclasseArcana, escolhasSubclasseDoNivel } from './levelup-flow.js';
-import { opcoesDaLinha } from './regras-subclasse-escolhas.js';
+import { opcoesDaLinha, resolvedorDaLinha } from './regras-subclasse-escolhas.js';
 import { truqueEhTrocavel } from './regras-origens-magia.js';
 // preparadasPorClasse (Item 1 da revisão final do sub-projeto "magia sabe a
 // classe"): ver uso perto de `magiasAtuais`, em renderCardMagias.
@@ -577,19 +577,45 @@ export function montarCardsEscolhaSubclasse(ctx, state) {
   const linhas = escolhasSubclasseDoNivel(ctx, state);
   if (!linhas.length) return '';
   return linhas.map((linha) => {
-    const opcoes = opcoesDaLinha(linha);
+    // Linha com fonte ASSINCRONA (Descobertas Magicas, cujas opcoes sao as
+    // listas de magia de Clerigo/Druida/Mago): o HTML nasce com um marcador
+    // "Carregando..." e bindEventosEscolhasClasse (levelup-ui.js) popula os
+    // seletores quando a promessa resolve -- mesmo desenho de
+    // bindEscolhasTalento (Tocado Por Fadas). Antes da issue #44 esta linha
+    // caia no ramo sincrono, `opcoesDaLinha` devolvia [], e o seletor ficava
+    // para sempre so com "— escolha —": pendencia sem resposta possivel,
+    // ficha travada no nivel 5.
+    const assincrona = !!resolvedorDaLinha(linha);
+    const opcoes = assincrona ? [] : opcoesDaLinha(linha);
     const escolhidas = state?.escolhasSubclasse?.[linha.campo] || [];
-    const seletores = Array.from({ length: linha.quantidade }, (_, i) => `
+    const seletores = Array.from({ length: linha.quantidade }, (_, i) => {
+      // Enquanto a lista nao chega, o seletor ao menos mostra o que ja foi
+      // escolhido -- voltar ao passo nao pode parecer que a escolha sumiu.
+      const opcoesDoSeletor = assincrona
+        ? (escolhidas[i] ? [escolhidas[i]] : [])
+        : opcoes;
+      return `
       <select class="input" data-subclasse-escolha="${linha.campo}" data-indice="${i}"
               style="margin-bottom:6px">
-        <option value="">— escolha —</option>
-        ${opcoes.map((o) => `<option value="${escHtmlSeletor(o)}"${escolhidas[i] === o ? ' selected' : ''}>${escHtmlSeletor(o)}</option>`).join('')}
-      </select>`).join('');
+        <option value="">${assincrona ? 'Carregando…' : '— escolha —'}</option>
+        ${opcoesDoSeletor.map((o) => `<option value="${escHtmlSeletor(o)}"${escolhidas[i] === o ? ' selected' : ''}>${escHtmlSeletor(o)}</option>`).join('')}
+      </select>`;
+    }).join('');
+    // Lugar do aviso de falha de carregamento, preenchido por
+    // popularEscolhasSubclasseAssincronas (levelup-ui.js) quando a lista
+    // volta VAZIA. Nasce oculto e só na linha assíncrona -- é a única que
+    // pode falhar em carregar. Ver o comentário daquela função para o
+    // porquê de a falha ser silenciosa por baixo.
+    const aviso = assincrona
+      ? `<div data-subclasse-escolha-aviso="${linha.campo}"
+              style="display:none;font-size:0.8rem;color:var(--danger);margin-top:4px"></div>`
+      : '';
     return `
       <div class="levelup-card">
         <div class="levelup-card-header">${escHtmlSeletor(linha.rotulo)}</div>
         <div class="levelup-card-body">
           ${seletores}
+          ${aviso}
           <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">
             Exigido pelo livro nesta subclasse (${escHtmlSeletor(linha.livro)}).
           </div>

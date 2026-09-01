@@ -70,6 +70,14 @@ export const ORIGENS_TRUQUE_NAO_TROCAVEL = [
                             // subclasse "exceto Mãos Mágicas". Diferente das
                             // demais, esta CONTA no limite de truques da tabela.
   'subclasse_automatica',   // truque concedido por característica de subclasse
+  'subclasse_escolha',      // Descobertas Mágicas (Classes.md:770): o livro deixa
+                            // escolher "um truque ou uma magia", e o truque escolhido
+                            // é um GANHO da subclasse -- não sai do orçamento de
+                            // truques da tabela da classe, e não entra na troca comum
+                            // (a substituição que o livro permite é a da própria
+                            // característica, ao ganhar nível de Bardo). Está também
+                            // em ORIGENS_MAGIA_ISENTA, acima: a mesma escolha pode
+                            // cair dos dois lados, conforme o círculo.
 ];
 
 /**

@@ -94,7 +94,10 @@ export const GATILHOS_SEM_COBERTURA = [
   'btn-limpar-rolagem',
   'btn-login-google',
   'btn-logout',
-  'btn-lvlup-magias',
+  // 'btn-lvlup-magias' saiu daqui em 2026-08-31 (issue #44): o spec
+  // testes/e2e/regras/bardo-conhecimento-descobertas.spec.mjs CLICA nele
+  // para satisfazer o passo de magias do Bardo nível 6 e escolhe uma magia
+  // no grid que ele abre.
   'btn-lvlup-subclasse-arcana',
   'btn-maos-confirmar',
   'btn-maos-envenenado',

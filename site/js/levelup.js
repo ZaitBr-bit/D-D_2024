@@ -920,6 +920,31 @@ export async function obterMagiasDominioNivel(classe, subclasse, nivel) {
 }
 
 /**
+ * Mapa "nome da magia -> circulo real", lido do indice de magias.
+ *
+ * Existe para as escolhas de subclasse que gravam em `magias_preparadas`
+ * (Descobertas Magicas): a tabela de regra, sendo sincrona, nao tem como
+ * descobrir sozinha se o jogador escolheu um truque ou uma magia de 3o
+ * circulo. Nome ausente do indice fica FORA do mapa de proposito -- quem
+ * grava decide o que fazer com a falta (hoje, o mesmo `1` de sempre), em vez
+ * de receber um zero silencioso que viraria "truque".
+ *
+ * @param {string[]} nomes
+ * @returns {Promise<Object<string, number>>}
+ */
+async function _circulosDoIndice(nomes) {
+  if (!nomes.length) return {};
+  const indice = await getIndiceMagias();
+  const indiceMagias = indice?.magias || [];
+  const mapa = {};
+  for (const nome of nomes) {
+    const magiaIdx = indiceMagias.find(m => m.nome === nome);
+    if (magiaIdx && typeof magiaIdx.circulo === 'number') mapa[nome] = magiaIdx.circulo;
+  }
+  return mapa;
+}
+
+/**
  * Obtém TODAS as magias de domínio/subclasse para todos os níveis até o nível atual
  * @param {string} classe
  * @param {string} subclasse
@@ -1727,9 +1752,11 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     const bruto = opcoes[linha.campo];
     const escolhido = (Array.isArray(bruto) ? bruto : [bruto]).filter(Boolean);
     const validas = opcoesDaLinha(linha);
-    // `validas` vem vazia quando a lista e assincrona (Descobertas Magicas,
-    // que escolhe de qualquer lista de magias): ali a validacao e so de
-    // quantidade, e isso esta declarado no README da suite.
+    // `validas` vem vazia quando a lista e ASSINCRONA -- Descobertas
+    // Magicas, cujas opcoes sao as listas de magia de Clerigo/Druida/Mago,
+    // resolvidas por `opcoesDaLinhaAsync` (regras-subclasse-escolhas.js).
+    // LIMITE CONHECIDO: para essas linhas a validacao aqui e so de
+    // quantidade e distincao; quem oferece a lista certa e a tela.
     const foraDaLista = validas.length > 0 && escolhido.some((v) => !validas.includes(v));
     const repetida = new Set(escolhido).size !== escolhido.length;
     if (escolhido.length !== linha.quantidade || foraDaLista || repetida) {
@@ -1914,8 +1941,20 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   }
 
   // ...e as escolhas que o jogador acabou de fazer, validadas na guarda acima.
+  //
+  // As linhas que gravam em `magias_preparadas` (Descobertas Magicas, do
+  // Colegio do Conhecimento) precisam do CIRCULO de cada magia escolhida --
+  // o livro deixa escolher "um truque ou uma magia" (Classes.md:770), entao
+  // nao ha circulo unico a supor. O circulo real vem do indice de magias,
+  // pela mesma via ja usada por obterMagiasDominioNivel e pelas magias de
+  // legado de especie, algumas centenas de linhas acima.
+  const nomesParaCirculo = escolhasSubclasseNivel
+    .filter((l) => l.destino === 'magias_preparadas')
+    .flatMap((l) => (Array.isArray(opcoes[l.campo]) ? opcoes[l.campo] : [opcoes[l.campo]]))
+    .filter(Boolean);
+  const circulos = await _circulosDoIndice(nomesParaCirculo);
   for (const linha of escolhasSubclasseNivel) {
-    aplicarEscolhaSubclasse(personagem, linha, opcoes[linha.campo]);
+    aplicarEscolhaSubclasse(personagem, linha, opcoes[linha.campo], { circulos });
   }
   
   // Adicionar automaticamente magias de domínio/subclasse

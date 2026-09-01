@@ -4,9 +4,12 @@
 // ============================================================
 import {
   buildLevelUpContext, buildVisibleSteps, createInitialState, calcularConjuracao,
-  carregarMagiasDisponiveis, ehConjuradorAtivo,
+  carregarMagiasDisponiveis, ehConjuradorAtivo, escolhasSubclasseDoNivel,
   proximoStep, stepAnterior, todosStepsCompletos, calcularSubclasseArcana
 } from './levelup-flow.js';
+// Fonte assincrona de opcoes de uma escolha de subclasse (Descobertas
+// Magicas): ver o bloco no fim de bindEventosEscolhasClasse.
+import { resolvedorDaLinha, opcoesDaLinhaAsync } from './regras-subclasse-escolhas.js';
 import {
   renderCardEscolhaClasse, renderCardGanhosNivel, renderCardSubclasse, renderCardASI,
   renderCardEscolhasClasse, renderCardMagias, renderCardManobrasGuerreiro,
@@ -1445,6 +1448,111 @@ function bindEventosEscolhasClasse(ctx, state) {
       // só atualizam o state, e a validação roda uma vez em confirmarLevelUp
       // (levelup-ui.js:1572), com ctx e state. Chamá-la sem argumentos aqui
       // lançava TypeError dentro do listener.
+    });
+  }
+
+  popularEscolhasSubclasseAssincronas(ctx, state);
+}
+
+/** Rótulo de uma opção de magia num <select>: o nome e o círculo dela. */
+function rotuloOpcaoMagia(opcao) {
+  if (typeof opcao.circulo !== 'number') return opcao.nome;
+  return `${opcao.nome} (${opcao.circulo === 0 ? 'Truque' : `${opcao.circulo}º Círculo`})`;
+}
+
+/**
+ * Popula os <select> das escolhas de subclasse cuja lista de opções só
+ * existe em arquivo de dados -- hoje, as Descobertas Mágicas do Colégio do
+ * Conhecimento (Classes.md:770), que escolhem das listas de Clérigo, Druida
+ * e Mago.
+ *
+ * O HTML desses seletores nasce com "Carregando…"
+ * (levelup-cards.js:montarCardsEscolhaSubclasse) e a lista chega aqui por
+ * promessa -- mesmo desenho de `bindEscolhasTalento` (Tocado Por Fadas).
+ * Antes da issue #44 este carregamento simplesmente não existia: a tabela de
+ * regra declarava a fonte assíncrona, ninguém a lia, e o jogador ficava
+ * preso no nível 5 diante de dois seletores vazios.
+ *
+ * O teto de círculo NÃO é inventado aqui: é o `maxCirculoNovo` que
+ * `calcularConjuracao` calcula para todo o assistente (o mesmo que limita o
+ * grid de seleção de magias), como o livro exige -- "uma magia para a qual
+ * você tenha espaços de magia disponíveis".
+ *
+ * LISTA VAZIA É FALHA, E PRECISA APARECER. `db.js:fetchJSON` engole o erro
+ * de rede e devolve `null`, então `getMagiasClasse` NUNCA rejeita: um
+ * `magias_*.json` ausente ou quebrado não chega no `.catch`, chega como
+ * lista de zero opções. Sem o aviso abaixo isso reproduz o sintoma EXATO da
+ * issue #44 -- dois seletores mudos, o jogador travado no nível 5 -- com o
+ * agravante de não haver nada na tela explicando. Por isso a lista vazia
+ * escreve na tela, e não só no console.
+ */
+function popularEscolhasSubclasseAssincronas(ctx, state) {
+  const linhas = escolhasSubclasseDoNivel(ctx, state).filter((l) => resolvedorDaLinha(l));
+  if (!linhas.length) return;
+  const circuloMaximo = calcularConjuracao(ctx, state)?.maxCirculoNovo || 0;
+
+  // O que o personagem JÁ TEM não pode ser oferecido: a gravação deduplica
+  // por nome, então escolher uma repetida gasta uma das duas Descobertas sem
+  // conceder nada (escolha morta). As MESMAS quatro fontes que
+  // `bindEventosMagias` usa para `jaTemTruques`/`jaTemMagias`, reunidas num
+  // conjunto só porque aqui um mesmo seletor oferece truque E magia --
+  // `magias_conhecidas` (onde moram os truques, inclusive o que esta
+  // característica grava) e `magias_preparadas`, mais o que o próprio nível
+  // já concede por domínio ou por "sempre preparada".
+  const jaTem = new Set([
+    ...(ctx.char?.magias_conhecidas || []).map((m) => m.nome),
+    ...(ctx.char?.magias_preparadas || []).map((m) => m.nome),
+    ...(ctx.magiasDominioNivel || []).map((m) => m.nome),
+    ...(ctx.magiasSempreNivel || []).map((m) => m.nome),
+  ]);
+
+  /** Escreve o aviso de falha no card da linha e deixa o seletor dizendo o mesmo. */
+  const mostrarFalha = (linha, seletores) => {
+    const aviso = document.querySelector(`[data-subclasse-escolha-aviso="${linha.campo}"]`);
+    if (aviso) {
+      aviso.textContent = 'Não foi possível carregar a lista de magias. ' +
+        'Recarregue a página e, se continuar, avise pelo botão de reportar problema.';
+      aviso.style.display = 'block';
+    }
+    for (const seletor of seletores) {
+      seletor.innerHTML = '<option value="">Não foi possível carregar</option>';
+      seletor.value = '';
+    }
+    if (!state.escolhasSubclasse) state.escolhasSubclasse = {};
+    state.escolhasSubclasse[linha.campo] = [];
+  };
+
+  for (const linha of linhas) {
+    opcoesDaLinhaAsync(linha, { circuloMaximo, jaTem }).then((opcoes) => {
+      const seletores = [...document.querySelectorAll(`[data-subclasse-escolha="${linha.campo}"]`)];
+      if (!seletores.length) return; // o jogador já saiu deste passo
+      if (!opcoes.length) {
+        console.error(`"${linha.rotulo}": a lista de opções voltou vazia.`);
+        mostrarFalha(linha, seletores);
+        return;
+      }
+      const escolhidas = state.escolhasSubclasse?.[linha.campo] || [];
+      const html = '<option value="">— escolha —</option>' + opcoes
+        .map((o) => `<option value="${escHtml(o.nome)}">${escHtml(rotuloOpcaoMagia(o))}</option>`)
+        .join('');
+      seletores.forEach((seletor, i) => {
+        seletor.innerHTML = html;
+        seletor.value = escolhidas[i] || '';
+      });
+      // Reescreve o state a partir do DOM, com a MESMA expressão do listener
+      // de `change` acima: se uma escolha anterior não estiver mais na lista,
+      // o <select> volta sozinho para "— escolha —", e o state precisa
+      // acompanhar. Tela e state discordando é a escolha sumindo sem aviso.
+      if (!state.escolhasSubclasse) state.escolhasSubclasse = {};
+      state.escolhasSubclasse[linha.campo] = seletores.map((s) => s.value).filter(Boolean);
+    }).catch((err) => {
+      // Alcançável só por erro de programação (ver `opcoesDaLinhaAsync`), já
+      // que o carregamento em si não rejeita -- mas cai no MESMO aviso: uma
+      // falha que só existisse no console é a que este bloco existe para
+      // acabar.
+      console.error(`Falha ao carregar as opções de "${linha.rotulo}":`, err);
+      mostrarFalha(linha,
+        [...document.querySelectorAll(`[data-subclasse-escolha="${linha.campo}"]`)]);
     });
   }
 }

@@ -130,6 +130,11 @@ export function rotuloOrigemMagia(magia) {
   if (magia?.origem === 'tocado_pelas_sombras') return 'Tocado Pelas Sombras';
   if (magia?.origem === 'conjurador_ritualista') return 'Conjurador Ritualista';
   if (magia?.origem === 'subclasse_fixa') return 'Subclasse';
+  // Descobertas Mágicas (Colégio do Conhecimento nv6): sem este rótulo o
+  // cartão do truque/magia escolhido saía com a linha de origem em branco --
+  // e essa origem só passou a existir na ficha quando a escolha passou a ser
+  // possível (issue #44).
+  if (magia?.origem === 'subclasse_escolha') return 'Subclasse';
   if (magia?.origem === 'maestria_magias') return 'Maestria de Magias';
   if (magia?.origem === 'assinatura_magica') return 'Assinatura Mágica';
   return '';
