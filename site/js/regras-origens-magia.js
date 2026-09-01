@@ -136,3 +136,56 @@ export function truqueContaNoLimite(magia) {
   if (magia?.origem === 'subclasse_fixa') return true;
   return !ORIGENS_TRUQUE_NAO_TROCAVEL.includes(magia?.origem);
 }
+
+/**
+ * Os truques do personagem que gastam vaga do limite de truques da tabela
+ * da classe -- a resposta a "quanto do orçamento já foi gasto?".
+ *
+ * Varre as DUAS listas onde truque mora: `magias_conhecidas` (truque do
+ * livro, escolhido da tabela ou concedido por espécie/talento/subclasse) e
+ * `magias_customizadas` (truque que o próprio jogador inventou no
+ * formulário "Magia Personalizada"). Cada entrada passa por
+ * `truqueContaNoLimite` (acima), que é quem sabe quais origens o livro
+ * concede de graça.
+ *
+ * TRUQUE PERSONALIZADO CONTA. Decisão do dono do produto, registrada em
+ * docs/PERGUNTAS-PENDENTES.txt ("MAGIA CUSTOMIZADA DEVE GASTAR VAGA DO
+ * ORCAMENTO DA CLASSE?"): vaga é vaga, venha de onde vier -- a mesma
+ * resposta que a magia de círculo personalizada sempre teve. Até essa
+ * decisão o app respondia as duas coisas ao mesmo tempo: um Bardo criava
+ * um truque homebrew de graça e pagava vaga por uma magia homebrew de 1º
+ * círculo, sem razão escrita para a diferença.
+ *
+ * POR QUE UMA FUNÇÃO, e não o filtro escrito nas duas telas: o predicado
+ * `truqueContaNoLimite` SEMPRE devolveu `true` para o truque
+ * personalizado -- ele não tem `origem` de concessão, e nada em
+ * ORIGENS_TRUQUE_NAO_TROCAVEL o alcança. Quem o excluía eram os dois
+ * CHAMADORES, cada um por um caminho diferente: a seção Magias da ficha
+ * (sheet/magias.js) filtrava `!m.personalizada`, e o modal "+ Magia"
+ * (sheet/grimorio.js) lia só `magias_conhecidas`, onde o truque
+ * personalizado nunca mora. Duas telas, duas exclusões, nenhuma escrita
+ * como regra. Essas mesmas duas telas já haviam divergido em silêncio por
+ * contagem copiada à mão -- um Mago 5 com Iniciado em Magia via "Truques
+ * 3 / 4" na ficha e "Truques: 4/4" no modal, com o clique no quarto
+ * truque DE CLASSE recusado. Uma função só é o que impede a terceira
+ * divergência.
+ *
+ * CÍRCULO, e por que os dois filtros não são iguais: em
+ * `magias_conhecidas` o campo é sempre numérico, e `=== 0` é o que as
+ * telas sempre usaram. Em `magias_customizadas` ele pode ser string
+ * (ficha antiga), por isso o `Number(...) || 0` -- o MESMO saneamento de
+ * `normalizarMagiaPersonalizada` (sheet/magias.js), e o complemento exato
+ * de `personalizadasDeCirculoDaFicha` (sheet/grimorio.js), que separa as
+ * de círculo 1+ com `Number(...) > 0`.
+ *
+ * @param {object} personagem Ficha (`char`, ou qualquer personagem).
+ * @returns {Array<object>} As entradas que gastam vaga, na ordem
+ *   "livro primeiro, personalizados depois". São os objetos da própria
+ *   ficha, não cópias.
+ */
+export function truquesQueContamNoLimite(personagem) {
+  const doLivro = (personagem?.magias_conhecidas || []).filter(m => m?.circulo === 0);
+  const personalizados = (personagem?.magias_customizadas || [])
+    .filter(m => (Number(m?.circulo) || 0) === 0);
+  return [...doLivro, ...personalizados].filter(truqueContaNoLimite);
+}

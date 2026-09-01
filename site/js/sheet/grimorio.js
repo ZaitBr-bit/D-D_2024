@@ -20,7 +20,22 @@ import { getSubclasseConjuradoraConjuracao, magiaEhEspecial, obterMagiasDisponiv
 // comentario de mostrarBuscaGrimorio (achado Important 2 da revisao de
 // branch).
 import { reservasDeEspacos } from './reservas-espacos.js';
-import { truqueContaNoLimite, truqueEhTrocavel } from '../regras-origens-magia.js';
+// truquesQueContamNoLimite: "quanto do orçamento de truques da classe já
+// foi gasto?" -- a MESMA função que a seção Magias da ficha
+// (sheet/magias.js) chama, com a MESMA ficha, e não a regra própria que
+// este modal mantinha. O docblock inteiro (o defeito medido, a decisão de
+// produto sobre o truque personalizado, o porquê do filtro de círculo)
+// mora com ela, em regras-origens-magia.js.
+//
+// A regra vivia escrita em CINCO lugares só deste arquivo -- contador do
+// topo, contador da aba de truques, a decisão "a grade está cheia?", o
+// portão que recusa o clique e o refresh de `atualizarContadores` -- e foi
+// a cópia à mão que já deixou este modal e a ficha divergirem em silêncio,
+// duas vezes seguidas.
+// `truqueContaNoLimite` (o predicado por entrada) saiu daqui junto com a
+// versão local: a única leitura que este arquivo fazia dele era a contagem,
+// e ela agora é `truquesQueContamNoLimite`.
+import { truqueEhTrocavel, truquesQueContamNoLimite } from '../regras-origens-magia.js';
 // superficiesDaFicha/superficieAtivaDaFicha (Tarefas 2 e 4 deste
 // sub-projeto): substituem a leitura de char.classe/char.subclasse/
 // char.nivel (a classe INICIAL, o espelho) por classes[] de verdade -- ver
@@ -193,49 +208,6 @@ function espacosDaSuperficie(sup, subConj) {
 }
 
 /**
- * Truques do personagem que gastam o orçamento de truques da TABELA DA
- * CLASSE -- o MESMO conjunto que a seção Magias da ficha conta
- * (`truquesClasse`, sheet/magias.js), e não a regra própria que este modal
- * mantinha.
- *
- * O QUE ESTAVA ERRADO (achado Important 1 da revisão final do sub-projeto
- * "tela de magias por classe"): o modal filtrava `m.circulo === 0 &&
- * m.origem !== 'especie'` -- excluía UMA origem. A ficha usa
- * `truqueContaNoLimite` (regras-origens-magia.js), que dispensa as dez
- * origens de ORIGENS_TRUQUE_NAO_TROCAVEL (iniciado_em_magia,
- * tocado_por_fadas, tocado_pelas_sombras, conjurador_ritualista,
- * telecinetico, sempre, subclasse_automatica, especie, especie_legado) e
- * mantém `subclasse_fixa`, que o livro manda contar. Resultado medido: um
- * Mago 5 de classe única com o talento Iniciado em Magia via "Truques 3 / 4"
- * na ficha e "Truques: 4/4" no modal, com a grade bloqueada e o clique no
- * quarto truque DE CLASSE recusado -- as duas telas se contradiziam, e a do
- * modal impedia uma escolha a que o jogador tem direito. Defeito ANTERIOR a
- * este sub-projeto (as expressões são idênticas às de HEAD; o sub-projeto só
- * lhes acrescentou a guarda de superfície), tornado visível porque o limite
- * agora vem da superfície ativa.
- *
- * POR QUE ESTE PREDICADO É EXATAMENTE O DA FICHA, e não "parecido": lá o
- * filtro é `!m.personalizada && m.origem !== 'especie' && m.origem !==
- * 'sempre' && truqueContaNoLimite(m)`. As duas comparações de origem são
- * REDUNDANTES -- 'especie' e 'sempre' já estão em
- * ORIGENS_TRUQUE_NAO_TROCAVEL, então `truqueContaNoLimite` já as recusa. E
- * `!m.personalizada` só remove entradas de `magias_customizadas` (a marca é
- * posta por `normalizarMagiaPersonalizada`, e só sobre aquele array), que
- * nunca entram em `magias_conhecidas`. Sobre `magias_conhecidas`, os dois
- * predicados produzem o MESMO conjunto.
- *
- * Existe como função para o modal parar de ter a regra escrita em CINCO
- * lugares (contador do topo, contador da aba de truques, a decisão "a grade
- * está cheia?", o portão que recusa o clique e o refresh de
- * `atualizarContadores`) -- foi a cópia à mão que deixou as duas telas
- * divergirem em silêncio, exatamente a forma de defeito que
- * regras-origens-magia.js foi criado para extinguir.
- */
-function truquesQueContamNoLimite() {
-  return (char.magias_conhecidas || []).filter(m => m.circulo === 0 && truqueContaNoLimite(m));
-}
-
-/**
  * Aviso do topo do modal, mostrado SÓ quando o personagem tem mais de uma
  * superfície de conjuração. Faz duas coisas que o modal não fazia (achado
  * Important 2 da revisão final do sub-projeto "tela de magias por classe"):
@@ -336,7 +308,8 @@ export async function mostrarBuscaMagia() {
    *
    * Uma função em vez da condição repetida nos dois lugares: foi a cópia à
    * mão de regras deste modal que já deixou duas telas divergirem em
-   * silêncio (ver `truquesQueContamNoLimite`, acima).
+   * silêncio (ver `truquesQueContamNoLimite`, regras-origens-magia.js, e o
+   * comentário do import dela no topo deste arquivo).
    *
    * @param {boolean} ehPersonalizada Se o cartão/entrada é da magia do jogador.
    * @returns {boolean}
@@ -561,8 +534,8 @@ export async function mostrarBuscaMagia() {
     }</div>` : ''}
     <div id="gm-aviso-superficie">${avisoSuperficieAtiva(superficies, sup, labelMg, classificacaoAtiva.semClasse.length)}</div>
     <div style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:6px;font-size:0.78rem">
-      <span class="magia-contador ${truquesQueContamNoLimite().length >= maxTruq && umaSuperficieSo ? 'contador-cheio' : ''}" id="gm-contador-truques">
-        Truques: ${truquesQueContamNoLimite().length}/${maxTruq}
+      <span class="magia-contador ${truquesQueContamNoLimite(char).length >= maxTruq && umaSuperficieSo ? 'contador-cheio' : ''}" id="gm-contador-truques">
+        Truques: ${truquesQueContamNoLimite(char).length}/${maxTruq}
       </span>
       <span class="magia-contador ${classificacaoAtiva.desta.length > maxPrep && classificacaoAtiva.semClasse.length === 0 ? 'contador-excedido' : classificacaoAtiva.desta.length === maxPrep && classificacaoAtiva.semClasse.length === 0 ? 'contador-cheio' : ''}" id="gm-contador-preparadas">
         ${labelMg}s: ${classificacaoAtiva.desta.length}/${maxPrep}
@@ -662,9 +635,9 @@ export async function mostrarBuscaMagia() {
       // `truquesEsp` continua sendo só os de ESPÉCIE: ele alimenta a seção
       // "Truques de Espécie" da grade e a deduplicação da lista de classe,
       // que são perguntas de EXIBIÇÃO, não de orçamento. Quem responde
-      // "quanto do limite já foi gasto?" é truquesQueContamNoLimite().
+      // "quanto do limite já foi gasto?" é truquesQueContamNoLimite(char).
       const truquesEsp = truquesAtuais.filter(m => m.origem === 'especie');
-      const numTruq = truquesQueContamNoLimite().length;
+      const numTruq = truquesQueContamNoLimite(char).length;
       html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">Truques: ${numTruq}/${maxTruq}${truquesEsp.length > 0 ? ` (+${truquesEsp.length} espécie)` : ''}</div>`;
 
       const selecionadosSet = new Set(truquesAtuais.map(m => m.nome));
@@ -846,7 +819,7 @@ export async function mostrarBuscaMagia() {
           // conjuração, não bloqueia -- bloquear com base numa contagem
           // incerta é pior que deixar passar, e o jogador já vê o
           // contador honesto na tela.
-          const numAtual = truquesQueContamNoLimite().length;
+          const numAtual = truquesQueContamNoLimite(char).length;
           if (umaSuperficieSo && numAtual >= maxTruq) { toast(`Limite de ${maxTruq} truques atingido`, 'error'); return; }
           char.magias_conhecidas.push({ nome, circulo: 0 });
           salvar();
@@ -1039,7 +1012,7 @@ export async function mostrarBuscaMagia() {
 
     // Atualizar contador de truques no topo do modal
     // Excluir truques de espécie do contador de classe
-    const numTruques = truquesQueContamNoLimite().length;
+    const numTruques = truquesQueContamNoLimite(char).length;
     const contTruques = document.getElementById('gm-contador-truques');
     if (contTruques) {
       contTruques.textContent = `Truques: ${numTruques}/${maxTruq}`;

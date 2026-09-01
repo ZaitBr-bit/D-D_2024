@@ -45,7 +45,7 @@ import { preparadasPorClasse } from '../regras-magia-classe.js';
 // porque vários módulos da ficha os importam deste arquivo desde antes da
 // consolidação -- reexportar é mais barato e menos arriscado que reescrever
 // os importadores, e não recria a cópia que a consolidação foi eliminar.
-import { magiaContaNoLimite, magiaEhEspecial, truqueContaNoLimite } from '../regras-origens-magia.js';
+import { magiaContaNoLimite, magiaEhEspecial, truqueContaNoLimite, truquesQueContamNoLimite } from '../regras-origens-magia.js';
 export { magiaContaNoLimite, magiaEhEspecial, truqueContaNoLimite };
 
 /**
@@ -568,7 +568,27 @@ export function renderSecaoMagias() {
   const truquesConcedidos = todosTruques.filter(m => !truqueContaNoLimite(m) && m.origem !== 'especie' && m.origem !== 'sempre');
   const truquesTalento = truquesConcedidos;
   const truquesSempre = todosTruques.filter(m => m.origem === 'sempre');
-  const truquesClasse = todosTruques.filter(m => !m.personalizada && m.origem !== 'especie' && m.origem !== 'sempre' && truqueContaNoLimite(m));
+  // DUAS PERGUNTAS DIFERENTES, DOIS CONJUNTOS -- não faça um servir aos dois.
+  //
+  //  - `truquesNoLimite` responde "quanto do orçamento da classe já foi
+  //    gasto?". Vem da fonte única (regras-origens-magia.js), que lê
+  //    `magias_conhecidas` E `magias_customizadas`: truque personalizado
+  //    CONTA, como a magia de círculo personalizada sempre contou (decisão
+  //    do dono do produto, docs/PERGUNTAS-PENDENTES.txt). É a MESMA função
+  //    que o modal "+ Magia" (sheet/grimorio.js) chama, para as duas telas
+  //    não poderem discordar sobre o número.
+  //
+  //  - `truquesClasseDoAcervo` responde "o que eu desenho neste bloco?".
+  //    Só truque do LIVRO: a linha sai com `data-magia-nome`, e o handler
+  //    genérico busca a descrição em `getMagiasPorCirculo` -- o acervo de
+  //    dados/, onde a magia que o jogador inventou não está. O truque
+  //    personalizado já é desenhado logo abaixo, por
+  //    `renderLinhaMagiaPersonalizada` (com `data-magia-custom-index`, o
+  //    handler que lê `char.magias_customizadas`). Juntar os dois aqui o
+  //    mostraria DUAS vezes, e a segunda cópia abriria a descrição vazia --
+  //    a forma exata da issue #39.
+  const truquesNoLimite = truquesQueContamNoLimite(char);
+  const truquesClasseDoAcervo = todosTruques.filter(m => !m.personalizada && m.origem !== 'especie' && m.origem !== 'sempre' && truqueContaNoLimite(m));
   const preparadas = char.magias_preparadas || [];
   // `espacos`: casca no formato ANTIGO (por CIRCULO, nao por fonte) que o
   // resto desta funcao ja consome (resumo de espacos, o NUMERO mostrado nas
@@ -737,7 +757,7 @@ export function renderSecaoMagias() {
         dentro do template literal que monta este HTML inteiro, e um
         backtick aqui fecharia a string do JS.
 
-        TRUQUES (truquesClasse.length) continuam FORA do escopo daquela
+        TRUQUES (truquesNoLimite.length) continuam FORA do escopo daquela
         tarefa 4: magias_conhecidas[] nao ganhou campo de classe, entao a
         contagem de truques ainda e do PERSONAGEM INTEIRO (soma de todas as
         classes) contra o limite de UMA classe (maxTruques, a superficie
@@ -816,9 +836,9 @@ export function renderSecaoMagias() {
       <!-- Contador de magias preparadas/conhecidas e truques -->
       <div class="magia-contadores" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
         ${maxTruques > 0 ? `
-          <div class="magia-contador ${truquesClasse.length > maxTruques && superficies.length <= 1 ? 'contador-excedido' : truquesClasse.length === maxTruques ? 'contador-cheio' : ''}">
+          <div class="magia-contador ${truquesNoLimite.length > maxTruques && superficies.length <= 1 ? 'contador-excedido' : truquesNoLimite.length === maxTruques ? 'contador-cheio' : ''}">
             <span class="contador-label">Truques</span>
-            <span class="contador-valor">${truquesClasse.length} / ${maxTruques}</span>
+            <span class="contador-valor">${truquesNoLimite.length} / ${maxTruques}</span>
           </div>
         ` : ''}
         ${truquesEspecie.length > 0 ? `
@@ -959,7 +979,7 @@ export function renderSecaoMagias() {
       ${todosTruques.length > 0 ? `
         <details id="details-truques"${_truquesColapsados ? '' : ' open'} style="margin-bottom:8px">
           <summary style="font-weight:700;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--border-light)">
-            Truques (${truquesClasse.length}${maxTruques ? ' / ' + maxTruques : ''}${truquesEspecie.length > 0 ? ` + ${truquesEspecie.length} espécie` : ''}${truquesTalento.length > 0 ? ` + ${truquesTalento.length} talento` : ''}${truquesSempre.length > 0 ? ` + ${truquesSempre.length} subclasse` : ''})
+            Truques (${truquesNoLimite.length}${maxTruques ? ' / ' + maxTruques : ''}${truquesEspecie.length > 0 ? ` + ${truquesEspecie.length} espécie` : ''}${truquesTalento.length > 0 ? ` + ${truquesTalento.length} talento` : ''}${truquesSempre.length > 0 ? ` + ${truquesSempre.length} subclasse` : ''})
           </summary>
           <div style="padding-top:4px">
             ${truquesEspecie.slice().sort((a, b) => prioridadeConjuracao(a.nome) - prioridadeConjuracao(b.nome)).map(m => `
@@ -1001,7 +1021,7 @@ export function renderSecaoMagias() {
                 <div class="magia-desc"></div>
               </div>
             `).join('')}
-            ${truquesClasse.slice().sort((a, b) => prioridadeConjuracao(a.nome) - prioridadeConjuracao(b.nome)).map(m => {
+            ${truquesClasseDoAcervo.slice().sort((a, b) => prioridadeConjuracao(a.nome) - prioridadeConjuracao(b.nome)).map(m => {
               const mods = truquesModificadosMapa[m.nome] || [];
               const modHtml = mods.length > 0
                 ? `<div style="font-size:0.6rem;color:var(--accent);font-weight:600;margin-top:1px">${mods.map(mod => `${mod.invocacao}: ${mod.efeito}`).join(' | ')}</div>`
