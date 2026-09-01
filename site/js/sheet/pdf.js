@@ -6,6 +6,7 @@ import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES } from '../dados-classes.js';
 import { bonusProficiencia, calcBonusPericia, calcCA, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcMod, calcPercepcaoPassiva, conjuracoesPorClasse, fmtMod, getDeslocamento, toast } from '../utils.js';
 import { forcaPrimordialAtiva, getDeslocamentoFinal, getModIniciativa } from './combate.js';
 import { char, especiesCache, passivosTalentosCache } from './estado.js';
+import { classesDe } from '../regras-multiclasse.js';
 import { ehProficienteEmSalvaguarda } from '../regras-salvaguardas.js';
 import { gerarHtmlImpressao } from './impressao.js';
 
@@ -45,6 +46,37 @@ function _sanitizePdfText(t) {
     else out += '?';
   }
   return out;
+}
+
+/**
+ * Monta o subtitulo do cabecalho do cartao do PDF: especie + classes + nivel
+ * TOTAL + antecedente + alinhamento. As classes vem de `classesDe(c)`
+ * (regras-multiclasse.js), a fonte da verdade -- NAO dos campos ESPELHO
+ * `c.classe`/`c.subclasse`, que apontam sempre para a classe INICIAL
+ * (ordem 0) e nao mudam quando o personagem multiclassa. Mesmo defeito, e
+ * mesma correcao, ja aplicados em ficha.js:270-274 (cabecalho da ficha) e
+ * impressao.js:186-206 (impressao).
+ *
+ * Nivel por classe (`cs.length > 1`) so aparece havendo mais de uma classe --
+ * com classe unica o texto sai identico ao formato anterior (que nunca
+ * mostrava nivel por classe, so o total). O selo de pre-requisito dispensado
+ * (estado.js:seloPrerequisitoDispensado) vira um marcador de texto simples
+ * aqui, em vez do badge HTML da tela/impressao: o PDF desenha string plana
+ * com pdf-lib, sanitizada para Latin-1 (ver _sanitizePdfText), sem HTML.
+ * @param {object} c Personagem.
+ * @returns {string} Subtitulo do cartao do PDF.
+ */
+export function montarSubtituloCartaoPdf(c) {
+  const cs = classesDe(c);
+  const classes = cs.map((cl) => {
+    const subclasse = cl.subclasse ? ` (${cl.subclasse})` : '';
+    const nivel = cs.length > 1 ? ` ${cl.nivel}` : '';
+    const dispensado = c?.edicoes?.campos?.[`prerequisitoDispensado.${cl.classe}`]
+      ? ' (pré-requisito dispensado)' : '';
+    return `${cl.classe}${subclasse}${nivel}${dispensado}`;
+  }).join(' / ');
+  return `${c.especie || ''} ${classes} — Nível ${c.nivel}` +
+    `${c.antecedente ? ` | ${c.antecedente}` : ''}${c.alinhamento ? ` | ${c.alinhamento}` : ''}`;
 }
 
 /**
@@ -127,7 +159,7 @@ function _montarDadosCartao() {
 
   return {
     nome: char.nome || 'Sem Nome',
-    sub: `${char.especie || ''} ${char.classe || ''}${char.subclasse ? ` (${char.subclasse})` : ''} — Nível ${char.nivel}${char.antecedente ? ` | ${char.antecedente}` : ''}${char.alinhamento ? ` | ${char.alinhamento}` : ''}`,
+    sub: montarSubtituloCartaoPdf(char),
     // Data URL gravado pelo "Trocar foto" da edicao (sempre JPEG, ver
     // processarImagemArquivo em utils.js). Vai embutido no PDF.
     imagem: typeof char.imagem === 'string' && char.imagem.trim() ? char.imagem : '',
