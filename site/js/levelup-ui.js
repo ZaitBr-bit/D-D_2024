@@ -636,24 +636,59 @@ async function trocarClasseQueSobe(ctx, state, caches, nome) {
 }
 
 // --- HP ---
+/**
+ * Liga os eventos do card de PV (modo fixo/rolado e o campo do valor
+ * rolado). As responsabilidades são separadas de propósito (issue #34):
+ * reescrever o campo a cada tecla do evento `input` fazia o valor voltar a
+ * "1" no instante em que o jogador apagava tudo para digitar outro número
+ * -- só sobravam "1" e "1 seguido de um dígito" (que, num d10, o clamp
+ * sempre resolvia para 10). Por isso:
+ *   - `input` (a cada tecla) só atualiza a PRÉVIA, aceitando o campo vazio
+ *     como estado transitório -- nunca reescreve `hpRoladoInput.value`;
+ *   - `change`/`blur` (quando o jogador termina de digitar) fazem o clamp
+ *     e reescrevem o campo com o valor final.
+ * `state.hpRolado` continua vindo de `salvarStateDoDOM` (mais abaixo neste
+ * arquivo), que lê e limita o valor do campo de novo -- por isso permanece
+ * coerente independente do que aconteça aqui.
+ */
 function bindEventosHP(ctx, state) {
   const { info, modCon } = ctx;
   const hpRoladoInput = document.getElementById('levelup-hp-rolado');
   const hpPreviaRolado = document.getElementById('levelup-hp-previa-rolado');
 
-  function atualizar() {
+  /**
+   * Lê o campo e devolve o valor rolado já limitado a [1, dado_vida].
+   * @returns {number|null} null quando o campo está vazio/inválido --
+   *   estado transitório, não um valor a gravar.
+   */
+  function lerRolado() {
+    const bruto = parseInt(hpRoladoInput.value);
+    if (Number.isNaN(bruto)) return null;
+    return Math.max(1, Math.min(info.dado_vida, bruto));
+  }
+
+  /** Atualiza a prévia ("= +N PV") e o disabled, sem tocar no campo. */
+  function atualizarPrevia() {
     const modo = document.querySelector('input[name="levelup-hp-modo"]:checked')?.value || 'fixo';
     if (hpRoladoInput) hpRoladoInput.disabled = modo !== 'rolado';
     if (hpRoladoInput && hpPreviaRolado) {
-      const rolado = Math.max(1, Math.min(info.dado_vida, parseInt(hpRoladoInput.value) || 1));
-      hpRoladoInput.value = String(rolado);
+      const rolado = lerRolado() ?? 1; // campo vazio: prévia mostra o mínimo
       hpPreviaRolado.textContent = `= +${Math.max(1, rolado + modCon)} PV`;
     }
   }
 
-  document.querySelectorAll('input[name="levelup-hp-modo"]').forEach(r => r.addEventListener('change', atualizar));
-  hpRoladoInput?.addEventListener('input', atualizar);
-  atualizar();
+  /** Limita e reescreve o campo -- só quando o jogador termina de digitar. */
+  function fixarValor() {
+    if (!hpRoladoInput) return;
+    hpRoladoInput.value = String(lerRolado() ?? 1);
+    atualizarPrevia();
+  }
+
+  document.querySelectorAll('input[name="levelup-hp-modo"]').forEach(r => r.addEventListener('change', fixarValor));
+  hpRoladoInput?.addEventListener('input', atualizarPrevia);
+  hpRoladoInput?.addEventListener('change', fixarValor);
+  hpRoladoInput?.addEventListener('blur', fixarValor);
+  fixarValor();
 }
 
 // --- Subclasse ---
