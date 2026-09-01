@@ -1055,8 +1055,19 @@ export function renderSecaoMagias() {
               // no comentario de `espacos`, acima -- so desabilita quando
               // NENHUMA fonte do circulo tem espaco, nao so a prioritaria.
               const todosEsgotados = circulos.every(c => !circulosComEspacoDisponivel.has(parseInt(c)));
+              // issue #39: a magia PERSONALIZADA de círculo > 0 também passa por
+              // aqui (mesmo comentário de `custom`, acima). Com `data-magia-nome`
+              // o clique caía no handler genérico, que busca a descrição em
+              // `getMagiasPorCirculo` -- o acervo do livro, onde ela não está.
+              // `custom` (resolvido acima para o selo de Ritual) já é o objeto
+              // certo: emitir `data-magia-custom-index` faz o clique cair no
+              // handler que lê `char.magias_customizadas` (o mesmo que a seção
+              // Preparadas usa) em vez de reescrever a busca de descrição aqui.
+              const atributoMagia = custom
+                ? `data-magia-custom-index="${custom.indicePersonalizada}"`
+                : `data-magia-nome="${m.nome}"`;
               return `
-              <div class="magia-item ${jaPreparada ? 'preparada' : ''} ${ehRitual && !jaPreparada ? 'magia-dominio' : ''}" data-magia-nome="${m.nome}" data-magia-circ="${m.circulo}">
+              <div class="magia-item ${jaPreparada ? 'preparada' : ''} ${ehRitual && !jaPreparada ? 'magia-dominio' : ''}" ${atributoMagia} data-magia-circ="${m.circulo}">
                 <div style="display:flex;justify-content:space-between;align-items:center">
                   <div style="opacity:${jaPreparada || ehRitual ? '1' : '0.7'}">
                     <div class="magia-nome">${m.nome} ${jaPreparada ? '<span class="badge badge-success" style="font-size:0.6rem">Preparada</span>' : ''}${ehRitual ? ' <span class="badge" style="font-size:0.6rem;background:var(--secondary);color:#fff">Ritual</span>' : ''}</div>

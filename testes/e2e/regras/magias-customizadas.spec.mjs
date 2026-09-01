@@ -151,7 +151,7 @@ test('grimório do Mago: magia personalizada marcada como Ritual mostra o selo R
 
   // GUARDA CONTRA VACUIDADE: a linha precisa existir no Grimório antes de
   // qualquer afirmação sobre o selo dela.
-  const linha = page.locator('[data-details-id="grimorio-mago"] [data-magia-nome="Selo de Nimb"]');
+  const linha = page.locator('[data-details-id="grimorio-mago"] .magia-item', { hasText: 'Selo de Nimb' });
   await expect(linha,
     'a magia personalizada de círculo > 0 do Mago vive no grimório -- sem a linha, nada a medir')
     .toHaveCount(1);
@@ -241,11 +241,63 @@ test('grimório do Mago: magia personalizada SEM Ritual não ganha o selo -- o c
   await assentar(page).catch(() => {});
   await abrirTudo(page);
 
-  const linha = page.locator('[data-details-id="grimorio-mago"] [data-magia-nome="Selo Mundano"]');
+  const linha = page.locator('[data-details-id="grimorio-mago"] .magia-item', { hasText: 'Selo Mundano' });
   await expect(linha, 'a linha precisa existir para o contraste medir alguma coisa').toHaveCount(1);
   await expect(linha,
     'magia personalizada sem o marcador Ritual não pode ganhar o selo')
     .not.toContainText('Ritual');
+
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});
+
+test('grimório do Mago: clicar na magia personalizada abre a descrição (issue #39)', async ({ context }) => {
+  // Causa raiz: o Grimório renderizava a magia personalizada com
+  // `data-magia-nome` -- o mesmo atributo de uma magia do acervo --, então o
+  // clique caía no handler genérico (site/js/sheet/magias.js, perto da linha
+  // 2585), que busca a descrição em `getMagiasPorCirculo(circ)`. A magia
+  // personalizada não está lá: `magia` fica `undefined`, o handler ainda
+  // marca a linha como "expandida" (então nada parece quebrado à primeira
+  // vista), mas `.magia-desc` fica vazio e sem altura -- na prática, nada
+  // abre. Na seção Preparadas a MESMA magia sai com `data-magia-custom-index`
+  // e usa o handler certo (perto da linha 2617), que lê
+  // `char.magias_customizadas` -- ali funciona. Este teste clica na linha
+  // do Grimório e exige a descrição visível, igual já acontece com uma
+  // magia do acervo.
+  const DESCRICAO = 'Névoa arcana revela armadilhas ocultas num raio de 3 metros.';
+  const { page, erros } = await abrirFicha(context, {
+    ...MAGO,
+    magias_customizadas: [{
+      nome: 'Névoa de Nimb', circulo: 1, escola: 'Adivinhação',
+      tempo_conjuracao: 'Ação', alcance: '9 metros', componentes: 'V, S',
+      duracao: '1 minuto', descricao: DESCRICAO, dano: '', ritual: false,
+    }],
+    grimorio: [{ nome: 'Névoa de Nimb', circulo: 1 }],
+  }, 'regras-magia-custom-grimorio-desc');
+  await assentar(page).catch(() => {});
+  await abrirTudo(page);
+
+  // GUARDA CONTRA VACUIDADE: a linha precisa existir no Grimório antes de
+  // qualquer afirmação sobre o clique nela.
+  const linha = page.locator('[data-details-id="grimorio-mago"] .magia-item', { hasText: 'Névoa de Nimb' });
+  await expect(linha,
+    'a magia personalizada de círculo > 0 do Mago vive no grimório -- sem a linha, nada a medir')
+    .toHaveCount(1);
+
+  const descricao = linha.locator('.magia-desc');
+  await expect(descricao, 'a descrição não pode estar visível antes do clique').toBeHidden();
+
+  // Clica no nome, fora da área dos botões (Preparar/Remover) -- o handler
+  // de expandir ignora clique que caia em cima de um <button>/<select>.
+  await linha.locator('.magia-nome').click();
+
+  await expect(descricao,
+    'clicar na magia personalizada do Grimório tem de abrir a descrição, igual já '
+    + 'acontece com uma magia do acervo')
+    .toBeVisible();
+  await expect(descricao,
+    'a descrição exibida tem de ser a da magia personalizada (lida de '
+    + 'char.magias_customizadas), não ficar vazia')
+    .toContainText(DESCRICAO);
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
