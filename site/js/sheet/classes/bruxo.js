@@ -159,6 +159,10 @@ export function getEstadoRecursosBruxo() {
     invocacoesMax: progressao.invocacoesMax,
     arcanum: char.recursos.bruxo.arcanum,
     circulosArcanum,
+    // Beneficios passivos das invocacoes escolhidas (Mente Mistica, Visao
+    // da Bruxa, Visao Diabolica, Presente das Profundezas). Lista vazia
+    // quando nenhuma passiva foi escolhida -- a tela nao inventa bloco.
+    invocacoesPassivas: extrairInvocacoesPassivasBruxo(char.recursos.bruxo.invocacoes),
     mestreMisticoAtivo: nivel >= 20,
     pactoTomo: char.recursos.bruxo.pacto_tomo,
     nivel,
@@ -848,7 +852,7 @@ export function renderSecaoPactoBruxo() {
             <div style="font-size:0.7rem;color:var(--text-muted)">Conjuracao | Acao | 1 hora | 9 metros</div>
             <div style="font-size:0.65rem;color:var(--secondary);font-weight:600;margin-top:1px">Pacto da Corrente (sem gastar espaco de magia)</div>
           </div>
-          <button class="btn btn-sm btn-primary" data-conjurar-pacto="Convocar Familiar">Conjurar</button>
+          <button class="btn btn-sm btn-primary" data-conjurar-pacto="Convocar Familiar" data-conjurar-pacto-circ="1">Conjurar</button>
         </div>
         <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px">
           Formas especiais: Cobra Peconhenta, Diabrete, Esfinge Maravilhosa, Esqueleto, Pseudodragao, Quasit, Slaad Girino, Sprite.
@@ -920,7 +924,7 @@ export function renderSecaoPactoBruxo() {
                     <div class="magia-nome" style="font-size:0.8rem">${t.nome} <span style="font-size:0.6rem;color:var(--text-muted)">(${t.classe || '?'})</span>${conflito ? ' <span style="font-size:0.6rem;color:var(--danger);font-weight:700">Duplicado</span>' : ''}</div>
                     ${t.nome ? badgesMagiaRapidos(t.nome) : ''}
                   </div>
-                  <button class="btn btn-sm btn-primary no-print" data-conjurar-pacto="${t.nome}" style="font-size:0.7rem;flex-shrink:0">Conjurar</button>
+                  <button class="btn btn-sm btn-primary no-print" data-conjurar-pacto="${t.nome}" data-conjurar-pacto-circ="0" style="font-size:0.7rem;flex-shrink:0">Conjurar</button>
                 </div>
                 <div class="magia-desc" style="margin-top:4px;font-size:0.78rem;color:var(--text-muted)"></div>
               </div>`;
@@ -941,7 +945,7 @@ export function renderSecaoPactoBruxo() {
                   </div>
                   <div class="no-print" style="display:flex;gap:4px;flex-shrink:0">
                     <button class="btn btn-sm ${slotEsgotado ? 'btn-secondary' : 'btn-primary'}" data-conjurar="${r.nome}" data-conj-circ="${circuloPacto}" style="font-size:0.7rem" ${slotEsgotado ? 'disabled style="font-size:0.7rem;opacity:0.5;cursor:not-allowed"' : ''}>Conjurar (${circuloPacto}o)</button>
-                    <button class="btn btn-sm btn-secondary" data-conjurar-pacto="${r.nome}" style="font-size:0.7rem">Ritual</button>
+                    <button class="btn btn-sm btn-secondary" data-conjurar-pacto="${r.nome}" data-conjurar-pacto-circ="1" style="font-size:0.7rem">Ritual</button>
                   </div>
                 </div>
                 <div class="magia-desc" style="margin-top:4px;font-size:0.78rem;color:var(--text-muted)"></div>
@@ -1018,7 +1022,7 @@ export function renderSecaoPactoBruxo() {
               ${inv.magia ? badgesMagiaRapidos(inv.magia) : ''}
               <div style="font-size:0.6rem;color:var(--text-muted)">${inv.invocacao} (sem gastar espaco)</div>
             </div>
-            <button class="btn btn-sm btn-primary no-print" data-conjurar-pacto="${inv.magia}" style="font-size:0.7rem;flex-shrink:0">Conjurar</button>
+            <button class="btn btn-sm btn-primary no-print" data-conjurar-pacto="${inv.magia}" data-conjurar-pacto-circ="${circ}" style="font-size:0.7rem;flex-shrink:0">Conjurar</button>
           </div>
           <div class="magia-desc" style="margin-top:4px;font-size:0.78rem;color:var(--text-muted)"></div>
         </div>`;
@@ -1030,18 +1034,76 @@ export function renderSecaoPactoBruxo() {
   return html;
 }
 
+/**
+ * Invocacoes Misticas PURAMENTE PASSIVAS: sem escolha, sem acao, sem
+ * recurso a gastar -- o beneficio simplesmente vale o tempo todo.
+ *
+ * Ate este conserto NAO EXISTIA mecanismo de invocacao-vira-bonus. A unica
+ * invocacao com efeito ligado era "Licoes dos Grandes Antigos" (concede
+ * talento, sheet/talentos.js) e as duas Laminas (sheet/combate.js); todo o
+ * resto era texto exibido. Mente Mistica e o caso do relato: ela nao
+ * concede magia nenhuma, concede Vantagem -- e o jogador nao tinha onde
+ * ler isso.
+ *
+ * SO AS PASSIVAS ENTRAM AQUI. As que concedem MAGIA vivem em
+ * MAPA_INVOCACOES_MAGIA (abaixo) e ja tem botao proprio de conjurar; as
+ * que exigem escolha (Explosao Agonizante, Lanca Mistica) marcam o truque
+ * na secao Magias; as que dao acao (Olhar de Duas Mentes, Punicao Mistica)
+ * sao texto de caracteristica. Misturar as quatro familias numa lista so
+ * faria a tela prometer o que o app nao faz.
+ *
+ * "Presente das Profundezas" aparece nas DUAS listas de proposito: o livro
+ * lhe da uma parte passiva (respirar sob a agua e Deslocamento de Natacao)
+ * e uma magia (Respirar na Agua). Sao dois beneficios, nao um repetido.
+ *
+ * A chave e comparada por `semAcento`, como MAPA_INVOCACOES_MAGIA.
+ */
+const INVOCACOES_PASSIVAS = {
+  'Mente Mistica': 'Vantagem em salvaguardas de Constituição para manter a Concentração.',
+  'Visao da Bruxa': 'Visão Verdadeira com alcance de 9 metros.',
+  'Visao Diabolica': 'Enxerga normalmente em Meia-luz e Escuridão (mágicas ou não) até 36 metros.',
+  'Presente das Profundezas': 'Respira debaixo d’água e tem Deslocamento de Natação igual ao seu Deslocamento.',
+};
+
+/**
+ * Beneficios passivos das invocacoes que o personagem escolheu.
+ *
+ * @param {Array<string|{nome: string}>} invocacoesSelecionadas
+ * @returns {Array<{invocacao: string, efeito: string}>} Uma entrada por
+ *   invocacao passiva presente, na ordem em que o jogador as escolheu.
+ */
+function extrairInvocacoesPassivasBruxo(invocacoesSelecionadas) {
+  const resultado = [];
+  for (const inv of invocacoesSelecionadas || []) {
+    const nomeInv = typeof inv === 'string' ? inv : inv?.nome;
+    if (!nomeInv) continue;
+    const invNorm = semAcento(nomeInv);
+    for (const [nomeMap, efeito] of Object.entries(INVOCACOES_PASSIVAS)) {
+      if (semAcento(nomeMap) === invNorm) resultado.push({ invocacao: nomeInv, efeito });
+    }
+  }
+  return resultado;
+}
+
 // Extrai invocacoes que concedem magias sem gastar espaco de magia
 function extrairInvocacoesMagicasBruxo(invocacoesSelecionadas) {
   // Mapa de invocacoes que concedem magias conhecidas (nome_invocacao -> magia_concedida)
+  // A CHAVE (nome da invocacao) e comparada por `semAcento`, entao pode
+  // continuar sem acento. O VALOR, nao: ele e o nome usado para achar a
+  // magia no catalogo (`indiceMagiasCache.find(m => m.nome === ...)`, logo
+  // abaixo) e para conjurar de verdade. Tres valores estavam sem acento e
+  // nao existiam no catalogo -- a busca falhava calada e o circulo caia no
+  // fallback 1, entao Levitacao (2o) e Respirar na Agua (3o) apareciam como
+  // 1o circulo. Os nomes abaixo sao os do catalogo, caractere por caractere.
   const MAPA_INVOCACOES_MAGIA = {
     'Armadura de Sombras': 'Armadura Arcana',
-    'Mascara das Muitas Faces': 'Disfarcar-se',
+    'Mascara das Muitas Faces': 'Disfarçar-se',
     'Visoes Nebulosas': 'Imagem Silenciosa',
     'Salto Sobrenatural': 'Salto',
-    'Passo Ascendente': 'Levitacao',
+    'Passo Ascendente': 'Levitação',
     'Mestre das Infindaveis Formas': 'Alterar-se',
     'Uno com as Sombras': 'Invisibilidade',
-    'Presente das Profundezas': 'Respirar na Agua',
+    'Presente das Profundezas': 'Respirar na Água',
     'Visoes de Reinos Distantes': 'Olho Arcano',
     'Lamento das Sepulturas': 'Falar com Mortos',
     'Vigor Infero': 'Vitalidade Vazia'

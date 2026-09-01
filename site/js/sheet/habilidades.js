@@ -1309,13 +1309,30 @@ export function setupEventosHabilidades() {
     });
   });
 
-  // Conjurar magias de Pacto (sem gastar espaco)
+  // Conjurar magias de Pacto e de Invocacao Mistica (sem gastar espaco).
+  //
+  // Isto aqui so emitia um toast: conjurar Armadura Arcana pela invocacao
+  // "Armadura de Sombras" nao mexia na CA, e o mesmo valia para qualquer
+  // magia com efeito mecanico. E o MESMO defeito que a Maestria de Magias
+  // do Mago tinha, e `conjurarSemEspaco` (sheet/magias.js) e a rota que ja
+  // o corrigiu la -- o que o livro dispensa nessas caracteristicas e o
+  // ESPACO, e so ele; alvo, concentracao e efeito continuam valendo.
+  //
+  // O circulo vem do proprio botao (`data-conjurar-pacto-circ`), gravado
+  // por quem monta a secao (sheet/classes/bruxo.js), que e quem sabe se
+  // aquela linha e truque (0), ritual do Livro das Sombras (1) ou a magia
+  // que a invocacao concede (o circulo real, lido do catalogo).
   document.querySelectorAll('[data-conjurar-pacto]').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
       const nomeMagia = btn.dataset.conjurarPacto;
-      toast(`${nomeMagia} conjurada (via Pacto, sem gastar espaco).`, 'success');
+      const circulo = parseInt(btn.dataset.conjurarPactoCirc, 10);
+      conjurarSemEspaco(
+        nomeMagia,
+        Number.isFinite(circulo) ? circulo : 1,
+        `${nomeMagia} conjurada (via Pacto, sem gastar espaço).`,
+      );
     });
   });
 

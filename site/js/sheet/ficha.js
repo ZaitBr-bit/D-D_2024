@@ -377,6 +377,13 @@ export function renderFichaCompleta() {
                 }).join('')}
               </div>
             ` : ''}
+            ${estadoBruxo.invocacoesPassivas?.length > 0 ? `
+              <div id="bruxo-invocacoes-passivas" style="font-size:0.75rem;color:var(--text-muted);margin-top:4px">
+                ${estadoBruxo.invocacoesPassivas.map(p =>
+                  `<div><strong>${escHtml(p.invocacao)}:</strong> ${escHtml(p.efeito)}</div>`
+                ).join('')}
+              </div>
+            ` : ''}
           </div>
           <div class="no-print" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
             <button class="btn btn-sm btn-accent" data-bruxo-astucia-acao="usar" ${estadoBruxo.astuciaUsada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Astúcia Mágica</button>
