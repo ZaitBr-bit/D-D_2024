@@ -702,9 +702,14 @@ async function responderLinhaDeSubclasse(opcoes, tipo, p, nivelNaClasse) {
         : []);
   // Lista ASSINCRONA (truques de Mago, magias das tres listas do livro): as
   // opcoes vem de dados/classes/, e `opcoesDaLinha` devolve [] de proposito.
-  const disponiveis = tabela.resolvedorDaLinha(linha)
-    ? (await tabela.opcoesDaLinhaAsync(linha, { jaTem })).map((o) => o.nome)
-    : tabela.opcoesDaLinha(linha).filter((o) => !jaTem.has(o));
+  // Resolvedor sem `circuloMaximo` (este driver nao calcula um) cai no
+  // padrao Infinity de resolverDescobertasMagicas e, ordenado por circulo,
+  // as N primeiras opcoes virariam truques -- destino errado para uma linha
+  // que grava em magias_preparadas. Falha alto em vez de medir isso em
+  // silencio: precisa de ramo dedicado, como 'subclasse_descobertas_magicas'
+  // em resolverPendencia, acima.
+  if (tabela.resolvedorDaLinha(linha)) throw new Error(`responderLinhaDeSubclasse: a linha "${tipo}" tem resolvedor assincrono e precisa de um circuloMaximo que este driver nao calcula -- adicione um ramo dedicado em vez de cair aqui sem teto.`);
+  const disponiveis = tabela.opcoesDaLinha(linha).filter((o) => !jaTem.has(o));
   if (disponiveis.length < linha.quantidade) {
     throw new Error(
       `responderLinhaDeSubclasse: a linha "${tipo}" ofereceu ${disponiveis.length} ` +

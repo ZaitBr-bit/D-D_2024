@@ -794,7 +794,7 @@ export function escolhasSubclasseDoNivel(ctx, state) {
  * quem faz UMA troca só nunca clica naquele botão, e não pode perder a troca
  * por causa disso.
  */
-export function todasTrocasTruque(state) {
+function todasTrocasTruque(state) {
   return [
     ...(state?.trocasTruque || []),
     ...(state?.truqueTrocarDe && state?.truqueTrocarPara

@@ -22,7 +22,7 @@ export const VERSAO_ATUAL = '3.0.1';
 export const NOTAS_VERSAO = [
   {
     versao: '3.0.1',
-    data: '2026-08-31',
+    data: '2026-09-01',
     rotulo: 'Correções da comunidade',
     resumo: 'Nove correções pontuais, uma para cada problema relatado no GitHub '
       + 'desde a 3.0.0: o Bardo do Colégio do Conhecimento volta a subir de '
@@ -81,8 +81,18 @@ export const NOTAS_VERSAO = [
             + 'Agora abre nos dois lugares.',
           'Uma magia customizada de 1º círculo ou superior não aparecia '
             + 'entre as preparáveis: ficava numa lista separada, sem botão '
-            + 'de Preparar e sem Lançar. Agora ela entra na grade normal e '
-            + 'pode ser preparada, no Descanso Longo e na subida de nível.',
+            + 'de Preparar e sem Lançar. Agora ela entra na grade do modal '
+            + '"+ Magia" e pode ser preparada por lá — vale para Clérigo, '
+            + 'Druida, Guardião, Mago e Paladino. Bardo, Bruxo, Feiticeiro e '
+            + 'toda subclasse conjuradora usam magias conhecidas, não '
+            + 'preparadas, e ainda não têm onde preparar a customizada; a '
+            + 'troca do Descanso Longo e a troca da subida de nível também '
+            + 'ainda não leem magia customizada.',
+          'Uma magia customizada com o mesmo nome de uma magia da lista da '
+            + 'classe não pode ficar preparada ao mesmo tempo que a '
+            + 'homônima — magias preparadas são identificadas pelo nome em '
+            + 'toda a ficha, e marcar uma com a outra já preparada mostra um '
+            + 'aviso dizendo quem ocupa a vaga, em vez de preparar as duas.',
           'Magia customizada do Mago ia direto para o grimório ao ser '
             + 'criada, pulando o custo de copiar (50 PO e 2h por círculo) '
             + 'que toda outra magia paga. Agora ela precisa ser copiada como '

@@ -25,9 +25,13 @@
 // O CLÉRIGO é a semente do cenário principal de propósito: é classe de
 // PREPARADAS e NÃO-Mago, exatamente o alcance da issue #27 (o print do
 // relato é de um personagem não-Mago). Para o Mago existia um desvio na
-// gravação do formulário (a magia é empurrada para `char.grimorio`), que
-// é assunto de outra issue -- aqui ele só aparece como fonte de DUPLICATA
-// na grade, e o segundo cenário guarda contra isso.
+// gravação do formulário, que empurrava a magia direto para
+// `char.grimorio` sem pagar o custo de cópia -- consertado à parte pela
+// issue #42 ("Magia customizada do Mago precisa ser copiada para o
+// grimorio"). O segundo cenário não depende mais desse desvio: ele semeia
+// `grimorio` à mão para cobrir o Mago que tem a mesma magia nos dois
+// lugares (por exemplo, depois de copiá-la com "+ Copiar Magia para
+// Grimório"), e guarda contra a fusão duplicando o cartão.
 // ============================================================
 import { test, expect } from '@playwright/test';
 import { ATRIBUTOS_REGRAS, abrirFicha, assentar, personagemSalvo } from './helpers-regras.mjs';
@@ -203,12 +207,15 @@ test('Clérigo: magia personalizada de 1º círculo pode ser preparada pelo moda
 });
 
 test('Mago: a magia personalizada aparece UMA vez na grade e é gravada como personalizada', async ({ context }) => {
-  // O Mago recebe a mesma magia por dois caminhos: o desvio da gravação do
-  // formulário (que a empurra para `char.grimorio`, de onde a grade do Mago
-  // é montada) e a fusão nova de `magias_customizadas`. Duas fontes, um
-  // cartão só -- e o cartão que vence precisa ser o PERSONALIZADO, senão a
-  // entrada gravada sai sem `personalizada: true` e a seção Preparadas tenta
-  // buscar a descrição no acervo, onde a magia não existe.
+  // O desvio que empurrava a magia customizada direto para `char.grimorio`
+  // ao criá-la foi fechado pela issue #42 -- hoje ela só chega lá por cópia
+  // explícita ("+ Copiar Magia para Grimório"). Este cenário semeia
+  // `grimorio` à mão para simular esse Mago: a mesma magia nos dois
+  // lugares, o grimório (de onde a grade do Mago é montada) e a fusão nova
+  // de `magias_customizadas`. Duas fontes, um cartão só -- e o cartão que
+  // vence precisa ser o PERSONALIZADO, senão a entrada gravada sai sem
+  // `personalizada: true` e a seção Preparadas tenta buscar a descrição no
+  // acervo, onde a magia não existe.
   const { page, erros } = await abrirFicha(context, {
     ...MAGO,
     magias_customizadas: [magiaCustom()],
