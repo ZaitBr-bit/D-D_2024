@@ -98,7 +98,10 @@ export const GATILHOS_SEM_COBERTURA = [
   // testes/e2e/regras/bardo-conhecimento-descobertas.spec.mjs CLICA nele
   // para satisfazer o passo de magias do Bardo nível 6 e escolhe uma magia
   // no grid que ele abre.
-  'btn-lvlup-subclasse-arcana',
+  // 'btn-lvlup-subclasse-arcana' saiu daqui em 2026-09-01 (issue #30): o spec
+  // testes/e2e/regras/ilusionista-truque-substituto.spec.mjs CLICA nele para
+  // satisfazer o "Versado em Ilusão" do Mago nível 3 e escolhe as duas
+  // magias no grid que ele abre.
   'btn-maos-confirmar',
   'btn-maos-envenenado',
   'btn-pf-para-slot',

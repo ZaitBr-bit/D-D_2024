@@ -75,8 +75,28 @@ export const ESCOLHAS_SUBCLASSE_APP = [
     automatica: { salvaguardas: ['Sabedoria'] } },
   { subclasse: 'Ilusionista', nivel: 3, caracteristica: 'Ilusões Aprimoradas',
     livro: 'Classes.md:5074',
-    // "Você também conhece o truque *Ilusão Menor*."
-    automatica: { truques: ['Ilusão Menor'] } },
+    // "Você também conhece o truque *Ilusão Menor*. Se já o conhece, você
+    // aprende um truque de Mago diferente à sua escolha. O truque não conta
+    // para o seu número de truques conhecidos."
+    automatica: { truques: ['Ilusão Menor'] },
+    // A SEGUNDA frase da regra, que o app nunca implementou (issue #30):
+    // quem chegava ao nível 3 já conhecendo Ilusão Menor -- por Iniciado em
+    // Magia, por espécie (Gnomo do Bosque), ou por tê-la escolhido como
+    // truque de classe -- não ganhava truque nenhum, e a subclasse não
+    // gravava nada. O segundo sintoma saía do mesmo silêncio: trocar depois
+    // a Ilusão Menor do talento por outra deixava o personagem sem ela por
+    // completo, porque só aquela fonte a mantinha.
+    //
+    // `substituto` não é uma linha solta na tabela: é o OUTRO ramo DESTA
+    // característica, e `linhasDaSubclasseNoNivel` troca um pelo outro
+    // conforme o personagem. Como linha própria ela apareceria para todo
+    // Ilusionista, cobrando uma escolha que o livro só pede a quem já
+    // conhece o truque.
+    substituto: {
+      tipo: 'subclasse_truque_substituto', campo: 'subclasse_truque_substituto',
+      quantidade: 1, fonteOpcoes: 'truques-mago', destino: 'truque_de_subclasse',
+      rotulo: 'Ilusões Aprimoradas — truque de Mago substituto',
+    } },
 
   // ---------- Escolhas de construção: o livro manda o jogador escolher ----------
   { subclasse: 'Colégio do Conhecimento', nivel: 3, caracteristica: 'Proficiências Bônus',
@@ -140,10 +160,61 @@ export const ESCOLHAS_SUBCLASSE_APP = [
     rotulo: 'Companheiro Primal' },
 ];
 
-/** Linhas que valem para (subclasse, nível). Vazio quando não há nenhuma. */
-export function linhasDaSubclasseNoNivel(subclasse, nivel) {
+/**
+ * Os truques que o personagem já conhece, por NOME.
+ *
+ * Só `magias_conhecidas`: é onde TODO truque do app mora, venha de espécie,
+ * de talento, de classe ou de subclasse (ver o comentário de
+ * `aplicarEscolhaSubclasse` sobre por que truque nunca entra em
+ * `magias_preparadas`). Existe exportada para que quem chama
+ * `linhasDaSubclasseNoNivel` não escreva a própria extração e acabe
+ * perguntando a pergunta errada -- a de `origem`, por exemplo, que erraria
+ * o truque escolhido na criação, que não tem origem nenhuma.
+ */
+export function truquesConhecidosDe(personagem) {
+  return new Set((personagem?.magias_conhecidas || []).map((m) => m?.nome).filter(Boolean));
+}
+
+/**
+ * A linha, trocada pelo ramo SUBSTITUTO quando a concessão automática dela
+ * já não tem o que conceder a este personagem.
+ *
+ * Hoje só o Ilusionista (Classes.md:5074) tem os dois ramos: "Você também
+ * conhece o truque Ilusão Menor. SE JÁ O CONHECE, você aprende um truque de
+ * Mago diferente à sua escolha". Quando o truque já está lá, o ramo
+ * automático viraria um `push` que a deduplicação por nome descarta -- ou
+ * seja, silêncio -- e é esse silêncio que a linha substituta ocupa.
+ */
+function ramoDaLinha(linha, truquesConhecidos) {
+  if (!linha.substituto || !truquesConhecidos) return linha;
+  const concedidos = linha.automatica?.truques || [];
+  if (!concedidos.length || !concedidos.every((t) => truquesConhecidos.has(t))) return linha;
+  // `automatica` sai junto: o ramo substituto é uma ESCOLHA, e deixar os
+  // dois na mesma linha faria a subida conceder e perguntar ao mesmo tempo.
+  const { automatica, substituto, ...comum } = linha;
+  return { ...comum, ...substituto };
+}
+
+/**
+ * Linhas que valem para (subclasse, nível). Vazio quando não há nenhuma.
+ *
+ * `truquesConhecidos` (Set de nomes, de `truquesConhecidosDe`) é o que
+ * decide entre os dois ramos de uma característica que o livro condiciona
+ * ao que o personagem JÁ SABE -- hoje só as Ilusões Aprimoradas. Sem ele a
+ * função devolve o ramo automático, que é o comportamento de sempre e o
+ * certo para quem não tem personagem em mãos (sheet/habilidades.js, que só
+ * quer a lista de opções do Estilo de Luta do Campeão).
+ *
+ * QUEM SOBE DE NÍVEL PRECISA PASSÁ-LO, e passar o MESMO conjunto na tela e
+ * no motor: a tela que mostrasse a escolha sem o motor cobrá-la a jogaria
+ * fora em silêncio, e o motor que a cobrasse sem a tela mostrá-la travaria
+ * a subida numa pendência sem controle na página.
+ */
+export function linhasDaSubclasseNoNivel(subclasse, nivel, truquesConhecidos = null) {
   if (!subclasse) return [];
-  return ESCOLHAS_SUBCLASSE_APP.filter((l) => l.subclasse === subclasse && l.nivel === nivel);
+  return ESCOLHAS_SUBCLASSE_APP
+    .filter((l) => l.subclasse === subclasse && l.nivel === nivel)
+    .map((l) => ramoDaLinha(l, truquesConhecidos));
 }
 
 /**
@@ -242,12 +313,45 @@ async function resolverDescobertasMagicas({ circuloMaximo = Infinity, jaTem = ne
     .sort((a, b) => a.circulo - b.circulo || a.nome.localeCompare(b.nome, 'pt-BR'));
 }
 
+/**
+ * Opções do truque substituto do Ilusionista: os TRUQUES da lista de Mago
+ * que o personagem ainda não conhece.
+ *
+ * Regra do livro (Classes.md:5074): "você aprende um truque de Mago
+ * DIFERENTE à sua escolha" -- daí a lista ser a de Mago e o filtro `jaTem`
+ * ser da regra, não cosmético. Sem ele o seletor ofereceria a própria
+ * Ilusão Menor, e escolhê-la gastaria a característica inteira sem conceder
+ * nada (a gravação deduplica por nome) -- a mesma escolha morta que
+ * `escolha-morta.test.mjs` persegue do lado dos talentos.
+ *
+ * Mesma fonte que o truque substituto do Telecinético e o fluxo de Iniciado
+ * em Magia já leem (`getMagiasClasse('Mago').lista_magias.Truques`), e não
+ * uma lista copiada para cá.
+ *
+ * @param {{jaTem?: Set<string>}} contexto
+ * @returns {Promise<Array<{nome: string, circulo: number}>>} ordenadas por nome.
+ */
+async function resolverTruquesMago({ jaTem = new Set() } = {}) {
+  const dados = await getMagiasClasse('Mago');
+  const porNome = new Map();
+  for (const magia of dados?.lista_magias?.['Truques'] || []) {
+    // As entradas podem vir como string pura ou objeto -- mesma
+    // normalização do fluxo de Iniciado em Magia (levelup-ui.js).
+    const nome = typeof magia === 'string' ? magia : magia?.nome;
+    // `circulo: 0` é forçado porque a lista por classe não traz o campo: é o
+    // balde 'Truques' que diz o círculo, e quem monta o seletor precisa dele.
+    if (nome && !jaTem.has(nome) && !porNome.has(nome)) porNome.set(nome, { nome, circulo: 0 });
+  }
+  return [...porNome.values()].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+}
+
 // Fontes de opção que só existem em arquivo de dados, e por isso resolvem
 // ASSÍNCRONO. Registrar aqui, e não espalhar um `if` por tela, é o que deixa
 // o oráculo genérico perguntar "esta linha tem quem preencha o seletor?" sem
 // conhecer característica nenhuma pelo nome.
 const RESOLVEDORES_OPCOES = {
   'magias-qualquer': resolverDescobertasMagicas,
+  'truques-mago': resolverTruquesMago,
 };
 
 /**
@@ -300,6 +404,24 @@ function gravarEmCaminho(personagem, caminho, valor) {
   alvo[partes[partes.length - 1]] = valor;
 }
 
+/**
+ * Grava um truque concedido por característica de subclasse.
+ *
+ * Uma função só para os DOIS ramos das Ilusões Aprimoradas (o automático e o
+ * substituto) porque o truque é o mesmo ganho da mesma característica: a
+ * origem tem de ser a mesma nos dois, e escrevê-la duas vezes é como as
+ * dez cópias de lista de origem que regras-origens-magia.js existe para
+ * acabar. `subclasse_automatica` é a origem que `truqueContaNoLimite`
+ * (regras-origens-magia.js) isenta do orçamento de truques da classe --
+ * "O truque não conta para o seu número de truques conhecidos"
+ * (Classes.md:5074), com todas as letras.
+ */
+function concederTruqueDeSubclasse(personagem, nome) {
+  if (!Array.isArray(personagem.magias_conhecidas)) personagem.magias_conhecidas = [];
+  if (personagem.magias_conhecidas.some((m) => m.nome === nome)) return;
+  personagem.magias_conhecidas.push({ nome, circulo: 0, origem: 'subclasse_automatica' });
+}
+
 /** Acrescenta a uma lista do personagem sem duplicar. */
 function acrescentarNaLista(personagem, campo, valores) {
   if (!Array.isArray(personagem[campo])) personagem[campo] = [];
@@ -327,6 +449,16 @@ export function aplicarEscolhaSubclasse(personagem, linha, valores, contexto = {
   if (!lista.length) return;
   if (linha.destino === 'pericias_proficientes' || linha.destino === 'proficiencias_ferramentas') {
     acrescentarNaLista(personagem, linha.destino, lista);
+    return;
+  }
+  // Truque concedido pela característica -- o ramo substituto do
+  // Ilusionista. Destino PRÓPRIO, e não `magias_preparadas`: aquele ramo
+  // decide o campo pelo círculo e grava `origem: 'subclasse_escolha'`, que é
+  // a das Descobertas Mágicas; aqui o truque é o mesmo ganho da concessão
+  // automática desta mesma característica, então passa pela mesma gravação
+  // que ela (`concederTruqueDeSubclasse`) e sai com a mesma origem.
+  if (linha.destino === 'truque_de_subclasse') {
+    for (const nome of lista) concederTruqueDeSubclasse(personagem, nome);
     return;
   }
   if (linha.destino === 'magias_preparadas') {
@@ -390,11 +522,6 @@ export function aplicarConcessaoAutomatica(personagem, linha) {
   if (a.salvaguardas) acrescentarNaLista(personagem, 'salvaguardas_proficientes', a.salvaguardas);
   if (a.extras) acrescentarNaLista(personagem, 'proficiencias_extra', a.extras);
   if (a.truques) {
-    if (!Array.isArray(personagem.magias_conhecidas)) personagem.magias_conhecidas = [];
-    for (const nome of a.truques) {
-      if (!personagem.magias_conhecidas.some((m) => m.nome === nome)) {
-        personagem.magias_conhecidas.push({ nome, circulo: 0, origem: 'subclasse_automatica' });
-      }
-    }
+    for (const nome of a.truques) concederTruqueDeSubclasse(personagem, nome);
   }
 }

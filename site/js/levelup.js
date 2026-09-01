@@ -12,7 +12,7 @@ import { classesDe, migrarParaMulticlasse, sincronizarEspelhos } from './regras-
 import { conjuraPorAlgumaClasse } from './regras-multiclasse-conjuracao.js';
 import { armadurasDoPersonagem, concessoesAoEntrarEm } from './regras-multiclasse-proficiencias.js';
 import {
-  linhasDaSubclasseNoNivel, opcoesDaLinha,
+  linhasDaSubclasseNoNivel, opcoesDaLinha, truquesConhecidosDe,
   aplicarEscolhaSubclasse, aplicarConcessaoAutomatica,
 } from './regras-subclasse-escolhas.js';
 
@@ -1746,8 +1746,15 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   // `sub.subclasse` e a subclasse DAQUELA classe, nao o espelho: num
   // Mago 5/Guerreiro 3 o espelho aponta para o Mago.
   const subclasseEfetiva = opcoes.subclasse || sub.subclasse;
-  const escolhasSubclasseNivel = linhasDaSubclasseNoNivel(subclasseEfetiva, nivelNaClasseNovo)
-    .filter((l) => l.tipo);
+  // Os truques que o personagem tem AGORA, antes desta subida escrever
+  // qualquer coisa nele. Uma caracteristica pode ter dois ramos conforme o
+  // personagem ja conhecer ou nao o truque que ela concede (Ilusoes
+  // Aprimoradas, Classes.md:5074), e a GUARDA e a APLICACAO tem de escolher
+  // o mesmo ramo: tirar duas fotos em momentos diferentes desta funcao faria
+  // a guarda cobrar uma escolha que a aplicacao ignora, ou o contrario.
+  const truquesAntesDaSubida = truquesConhecidosDe(personagem);
+  const escolhasSubclasseNivel = linhasDaSubclasseNoNivel(subclasseEfetiva, nivelNaClasseNovo,
+    truquesAntesDaSubida).filter((l) => l.tipo);
   for (const linha of escolhasSubclasseNivel) {
     const bruto = opcoes[linha.campo];
     const escolhido = (Array.isArray(bruto) ? bruto : [bruto]).filter(Boolean);
@@ -1759,7 +1766,15 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     // quantidade e distincao; quem oferece a lista certa e a tela.
     const foraDaLista = validas.length > 0 && escolhido.some((v) => !validas.includes(v));
     const repetida = new Set(escolhido).size !== escolhido.length;
-    if (escolhido.length !== linha.quantidade || foraDaLista || repetida) {
+    // "um truque de Mago DIFERENTE a sua escolha" (Classes.md:5074): um
+    // truque que o personagem JA conhece nao concede nada -- a gravacao
+    // deduplica por nome -- e a caracteristica inteira se perderia em
+    // silencio, que e a issue #30 por outra porta. A tela nao oferece esses
+    // nomes (o resolvedor os filtra); esta guarda fecha a mesma porta para
+    // quem chama o motor direto, sem tela nenhuma.
+    const jaConhecido = linha.destino === 'truque_de_subclasse' &&
+      escolhido.some((v) => truquesAntesDaSubida.has(v));
+    if (escolhido.length !== linha.quantidade || foraDaLista || repetida || jaConhecido) {
       return {
         sucesso: false,
         pendente: true,
@@ -1936,7 +1951,13 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   // perguntar nada. Antes desta tabela, cinco caracteristicas do livro
   // simplesmente nunca eram aplicadas -- nem aqui, nem na ficha, nem no
   // assistente -- e o jogador nao tinha como saber que faltava algo.
-  for (const linha of linhasDaSubclasseNoNivel(subclasseAtual, nivelNaClasseNovo)) {
+  // `truquesAntesDaSubida` e a MESMA foto que a guarda usou, algumas centenas
+  // de linhas acima: e ela que decide entre os dois ramos das Ilusoes
+  // Aprimoradas (conceder Ilusao Menor, ou o truque substituto que o jogador
+  // escolheu). Tirar outra foto aqui leria um personagem que esta funcao ja
+  // comecou a mudar, e o ramo poderia sair diferente do que foi validado.
+  for (const linha of linhasDaSubclasseNoNivel(subclasseAtual, nivelNaClasseNovo,
+                                               truquesAntesDaSubida)) {
     if (linha.automatica) aplicarConcessaoAutomatica(personagem, linha);
   }
 

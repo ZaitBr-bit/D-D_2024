@@ -339,6 +339,12 @@ export const PENDENCIAS_CONHECIDAS = [
   'subclasse_terreno', 'subclasse_aspecto_selvagem',
   'subclasse_afinidade_elemental', 'subclasse_presa_cacador',
   'subclasse_taticas_defensivas', 'subclasse_companheiro_primal',
+  // O 13o: o ramo SUBSTITUTO das Ilusoes Aprimoradas (Classes.md:5074),
+  // que so aparece para o Ilusionista que ja conhece Ilusao Menor. Nenhuma
+  // escada da suite semeia esse truque, entao ele nunca dispara aqui -- mas
+  // uma escada nova que semeie (um Gnomo do Bosque, por exemplo) precisa
+  // encontrar o driver preparado, e nao um erro de "pendencia desconhecida".
+  'subclasse_truque_substituto',
 ];
 
 // Personagem-semente de cada classe. Diferente de charBase() (fixture
@@ -653,34 +659,60 @@ async function resolverPendencia(tipo, opcoes, p, classeData, ATRIBUTOS,
   // qualquer, e sim o mesmo conjunto que a tela oferece, para o teste medir
   // o caminho real. Descobertas Magicas tem lista assincrona (vazia aqui), e
   // por isso recebe nomes de magia reais do indice, resolvidos pelo chamador.
-  const tabela = _cache?.regrasSubclasseEscolhas;
-  const linhaSubclasse = tabela?.ESCOLHAS_SUBCLASSE_APP
-    // `opcoes.subclasse || p.subclasse`: no nivel 3 a subclasse esta sendo
-    // escolhida NESTA chamada e ainda nao foi gravada no personagem -- mesmo
-    // idioma de levelup.js:966.
-    .find((l) => l.tipo === tipo && l.subclasse === (opcoes.subclasse || p.subclasse) && l.nivel === nivel);
-  if (linhaSubclasse) {
-    // Escolhe opcoes que o personagem AINDA NAO TEM: responder com as N
-    // primeiras da lista faria o converso (Grupo 6) medir crescimento zero
-    // quando a semente ja e proficiente nelas -- o teste acusaria "nenhum
-    // mecanismo respondeu" por culpa do driver, nao do app.
-    const jaTem = new Set(linhaSubclasse.destino === 'pericias_proficientes'
-      ? (p.pericias_proficientes || [])
-      : linhaSubclasse.destino === 'proficiencias_ferramentas'
-        ? (p.proficiencias_ferramentas || [])
-        : []);
-    const disponiveis = tabela.opcoesDaLinha(linhaSubclasse).filter((o) => !jaTem.has(o));
-    if (disponiveis.length >= linhaSubclasse.quantidade) {
-      opcoes[linhaSubclasse.campo] = disponiveis.slice(0, linhaSubclasse.quantidade);
-      return;
-    }
-    throw new Error(
-      `resolverPendencia: a linha "${tipo}" tem lista de opcoes assincrona ou curta ` +
-      `(${disponiveis.length} para ${linhaSubclasse.quantidade} exigida(s)) -- ` +
-      `o driver precisa de um ramo dedicado para ela`);
-  }
+  if (await responderLinhaDeSubclasse(opcoes, tipo, p, nivel)) return;
   throw new Error(`resolverPendencia sem ramo para "${tipo}" ` +
     `(classe ${p.classe}, nível ${nivel})`);
+}
+
+/**
+ * Responde uma pendencia que veio de uma linha de ESCOLHAS_SUBCLASSE_APP,
+ * com as N primeiras opcoes VALIDAS que o personagem ainda nao tem -- nao um
+ * valor qualquer, e sim o mesmo conjunto que a tela oferece, para o teste
+ * medir o caminho real. Devolve `false` quando o tipo nao e de linha de
+ * subclasse, para o chamador seguir com o proprio erro.
+ *
+ * Existe como funcao unica porque os DOIS drivers de subida (escadaDeNivel e
+ * subirAteNivel) precisam da mesma resposta: quando as duas copias
+ * divergiam, um cenario passava por um caminho e travava pelo outro.
+ */
+async function responderLinhaDeSubclasse(opcoes, tipo, p, nivelNaClasse) {
+  const tabela = _cache?.regrasSubclasseEscolhas;
+  if (!tabela) return false;
+  // `opcoes.subclasse || p.subclasse`: no nivel 3 a subclasse esta sendo
+  // escolhida NESTA chamada e ainda nao foi gravada no personagem -- mesmo
+  // idioma de levelup.js:966. Os truques conhecidos entram porque uma linha
+  // pode ter dois ramos conforme o personagem ja conheca o truque que ela
+  // concede (Ilusoes Aprimoradas, Classes.md:5074) -- sem eles o driver
+  // procuraria o ramo automatico e nunca acharia o `tipo` do substituto.
+  const linha = tabela.linhasDaSubclasseNoNivel(
+    opcoes.subclasse || p.subclasse, nivelNaClasse, tabela.truquesConhecidosDe(p))
+    .find((l) => l.tipo === tipo);
+  if (!linha) return false;
+
+  // Escolhe opcoes que o personagem AINDA NAO TEM: responder com as N
+  // primeiras da lista faria o converso (Grupo 6) medir crescimento zero
+  // quando a semente ja e proficiente nelas -- o teste acusaria "nenhum
+  // mecanismo respondeu" por culpa do driver, nao do app.
+  const jaTem = new Set(linha.destino === 'pericias_proficientes'
+    ? (p.pericias_proficientes || [])
+    : linha.destino === 'proficiencias_ferramentas'
+      ? (p.proficiencias_ferramentas || [])
+      : linha.destino === 'truque_de_subclasse'
+        ? tabela.truquesConhecidosDe(p)
+        : []);
+  // Lista ASSINCRONA (truques de Mago, magias das tres listas do livro): as
+  // opcoes vem de dados/classes/, e `opcoesDaLinha` devolve [] de proposito.
+  const disponiveis = tabela.resolvedorDaLinha(linha)
+    ? (await tabela.opcoesDaLinhaAsync(linha, { jaTem })).map((o) => o.nome)
+    : tabela.opcoesDaLinha(linha).filter((o) => !jaTem.has(o));
+  if (disponiveis.length < linha.quantidade) {
+    throw new Error(
+      `responderLinhaDeSubclasse: a linha "${tipo}" ofereceu ${disponiveis.length} ` +
+      `opcao(oes) para ${linha.quantidade} exigida(s) -- o driver precisa de um ` +
+      `ramo dedicado para ela`);
+  }
+  opcoes[linha.campo] = disponiveis.slice(0, linha.quantidade);
+  return true;
 }
 
 // Sobe um personagem da classe do nível 1 ao 20 chamando subirDeNivel de
@@ -1039,22 +1071,8 @@ async function responderPendencia(opcoes, tipo, personagem, classeData, nomeClas
   // (regras-subclasse-escolhas.js): responde com as N primeiras opções
   // VÁLIDAS que o personagem ainda não tem -- mesmo mecanismo do fallback
   // genérico de `resolverPendencia`, acima.
-  const { regrasSubclasseEscolhas } = await modulosApp();
-  const subclasseAtual = opcoes.subclasse || personagem.subclasse;
-  const linha = regrasSubclasseEscolhas.ESCOLHAS_SUBCLASSE_APP
-    .find((l) => l.tipo === tipo && l.subclasse === subclasseAtual && l.nivel === novoNivel);
-  if (linha) {
-    const jaTem = new Set(linha.destino === 'pericias_proficientes'
-      ? (personagem.pericias_proficientes || [])
-      : linha.destino === 'proficiencias_ferramentas'
-        ? (personagem.proficiencias_ferramentas || [])
-        : []);
-    const disponiveis = regrasSubclasseEscolhas.opcoesDaLinha(linha).filter((o) => !jaTem.has(o));
-    if (disponiveis.length >= linha.quantidade) {
-      opcoes[linha.campo] = disponiveis.slice(0, linha.quantidade);
-      return;
-    }
-  }
+  await modulosApp();
+  if (await responderLinhaDeSubclasse(opcoes, tipo, personagem, novoNivel)) return;
 
   throw new Error(
     `responderPendencia: tipo "${tipo}" sem tratamento (classe ${personagem.classe}, ` +

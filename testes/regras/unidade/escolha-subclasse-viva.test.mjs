@@ -57,8 +57,32 @@ function nomeDaOpcao(opcao) {
   return typeof opcao === 'string' ? opcao : opcao?.nome;
 }
 
+/**
+ * Toda linha que exige escolha, INCLUSIVE o ramo SUBSTITUTO de uma
+ * característica de dois ramos.
+ *
+ * As Ilusões Aprimoradas (Classes.md:5074) concedem Ilusão Menor a quem não
+ * a conhece e pedem um truque de Mago a quem já a conhece. O segundo ramo
+ * mora dentro da linha (`substituto`), então varrer só a lista crua o
+ * deixaria de fora -- e um seletor vazio ALI travaria a subida do mesmo
+ * jeito que a issue #44 travou a do Bardo. O ramo é pedido à PRÓPRIA tabela
+ * (com o conjunto de truques que o dispara), não montado à mão aqui: assim
+ * o motor mede a linha que o app realmente usa.
+ */
+function linhasComEscolha() {
+  const linhas = [...tabela.ESCOLHAS_SUBCLASSE_APP];
+  for (const base of tabela.ESCOLHAS_SUBCLASSE_APP) {
+    if (!base.substituto) continue;
+    linhas.push(...tabela
+      .linhasDaSubclasseNoNivel(base.subclasse, base.nivel,
+        new Set(base.automatica?.truques || []))
+      .filter((l) => l.caracteristica === base.caracteristica));
+  }
+  return linhas.filter((l) => l.tipo);
+}
+
 // ---------- Motor genérico: toda linha que exige escolha ----------
-for (const linha of tabela.ESCOLHAS_SUBCLASSE_APP.filter((l) => l.tipo)) {
+for (const linha of linhasComEscolha()) {
   test(`escolha viva: ${linha.subclasse} nv${linha.nivel} — ${linha.caracteristica} (${linha.tipo})`, async () => {
     const sincronas = tabela.opcoesDaLinha(linha);
     if (sincronas.length > 0) {

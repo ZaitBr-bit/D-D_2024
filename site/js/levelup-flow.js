@@ -3,7 +3,7 @@
 // Fase 1: Contexto + Fase 2: Steps dinâmicos
 // ============================================================
 import { CLASSES_INFO, ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ESCOLAS_SUBCLASSE_MAGO } from './dados-classes.js';
-import { linhasDaSubclasseNoNivel } from './regras-subclasse-escolhas.js';
+import { linhasDaSubclasseNoNivel, truquesConhecidosDe } from './regras-subclasse-escolhas.js';
 import { contextoDeSubida } from './regras-multiclasse-progressao.js';
 import { classesDe } from './regras-multiclasse.js';
 import { concessoesAoEntrarEm } from './regras-multiclasse-proficiencias.js';
@@ -784,7 +784,90 @@ const STEP_DEFINITIONS = [
  */
 export function escolhasSubclasseDoNivel(ctx, state) {
   const subclasse = state?.subclasse || ctx?.sub?.subclasse;
-  return linhasDaSubclasseNoNivel(subclasse, ctx?.nivelNaClasseNovo).filter((l) => l.tipo);
+  return linhasDaSubclasseNoNivel(subclasse, ctx?.nivelNaClasseNovo,
+    truquesAoConfirmar(ctx, state)).filter((l) => l.tipo);
+}
+
+/**
+ * As trocas de truque desta sessão, numa lista só: as já confirmadas pelo
+ * botão "Adicionar outra troca" mais o par pendente, se estiver completo --
+ * quem faz UMA troca só nunca clica naquele botão, e não pode perder a troca
+ * por causa disso.
+ */
+export function todasTrocasTruque(state) {
+  return [
+    ...(state?.trocasTruque || []),
+    ...(state?.truqueTrocarDe && state?.truqueTrocarPara
+      ? [{ de: state.truqueTrocarDe, para: state.truqueTrocarPara }] : []),
+  ];
+}
+
+/**
+ * O que ESTA sessão do assistente vai escrever em `char.magias_conhecidas`
+ * antes de `subirDeNivel` ser chamado, e o conjunto de truques que sai disso.
+ *
+ * FONTE ÚNICA, e é esse o ponto. `confirmarLevelUp` (levelup-ui.js) empurra
+ * truques escolhidos e trocas de truque para o personagem ANTES de chamar o
+ * motor: a tela lê o personagem de antes, o motor o de depois. Para uma
+ * característica condicionada ao que o personagem já sabe (Ilusões
+ * Aprimoradas, Classes.md:5074) isso basta para os dois discordarem -- e a
+ * discordância é uma confirmação RECUSADA por uma pendência que não tem
+ * nenhum controle na página.
+ *
+ * Esta função existe para manter os dois de acordo, então ela não pode ser
+ * uma SEGUNDA leitura da mesma regra: quem APLICA os empurrões
+ * (`confirmarLevelUp`) consome `ganhos` e `trocas` daqui, e quem PREVÊ o
+ * personagem (`escolhasSubclasseDoNivel`,
+ * `popularEscolhasSubclasseAssincronas`) consome `conhecidos`. Uma expressão
+ * só, dos dois lados. Duas cópias da mesma lista divergindo em silêncio é a
+ * história que o cabeçalho de `regras-origens-magia.js` conta.
+ *
+ * As três guardas do empurrão vivem AQUI, e só aqui:
+ *   1. nada acontece se a classe -- já com a subclasse escolhida nesta
+ *      sessão -- não conjura (`ehConjuradorAtivo`);
+ *   2. só entra truque que exista na lista da classe que sobe
+ *      (`ctx._listaMagiasClasse`) e que o personagem ainda não tenha;
+ *   3. só se aplica a troca cujo `de` esteja MESMO entre os truques do
+ *      personagem naquele momento -- e a troca que não se aplica não traz o
+ *      `para` junto.
+ *
+ * A troca conta pelos DOIS lados porque o caminho inverso existe do mesmo
+ * jeito: trocar a Ilusão Menor FORA (possível quando ela é truque de classe,
+ * sem origem especial) devolve o motor ao ramo automático, e a tela que
+ * ainda mostrasse o seletor cobraria uma escolha que ninguém iria gravar.
+ *
+ * @returns {{ganhos: string[], trocas: Array<{de: string, para: string}>,
+ *            conhecidos: Set<string>}}
+ */
+export function truquesDaSessao(ctx, state) {
+  const conhecidos = truquesConhecidosDe(ctx?.char);
+  const ganhos = [];
+  const trocas = [];
+  if (!ehConjuradorAtivo(ctx, state)) return { ganhos, trocas, conhecidos };
+  const daClasseQueSobe = new Set((ctx?._listaMagiasClasse || []).map((m) => m?.nome));
+  for (const nome of state?.truquesSelecionados || []) {
+    if (!daClasseQueSobe.has(nome) || conhecidos.has(nome)) continue;
+    ganhos.push(nome);
+    conhecidos.add(nome);
+  }
+  // `conhecidos` já vem com os ganhos acima, e é atualizado a cada troca --
+  // a mesma leitura incremental que `confirmarLevelUp` faz sobre o array
+  // vivo, onde uma troca enxerga o resultado da anterior.
+  for (const troca of todasTrocasTruque(state)) {
+    if (!troca?.de || !conhecidos.has(troca.de)) continue;
+    trocas.push(troca);
+    conhecidos.delete(troca.de);
+    if (troca.para) conhecidos.add(troca.para);
+  }
+  return { ganhos, trocas, conhecidos };
+}
+
+/**
+ * Os truques que o personagem terá quando `subirDeNivel` for chamado.
+ * Atalho de leitura sobre `truquesDaSessao` -- ver o cabeçalho dela.
+ */
+export function truquesAoConfirmar(ctx, state) {
+  return truquesDaSessao(ctx, state).conhecidos;
 }
 
 /**

@@ -5,7 +5,8 @@
 import {
   buildLevelUpContext, buildVisibleSteps, createInitialState, calcularConjuracao,
   carregarMagiasDisponiveis, ehConjuradorAtivo, escolhasSubclasseDoNivel,
-  proximoStep, stepAnterior, todosStepsCompletos, calcularSubclasseArcana
+  proximoStep, stepAnterior, todosStepsCompletos, calcularSubclasseArcana,
+  truquesAoConfirmar, truquesDaSessao
 } from './levelup-flow.js';
 // Fonte assincrona de opcoes de uma escolha de subclasse (Descobertas
 // Magicas): ver o bloco no fim de bindEventosEscolhasClasse.
@@ -1534,8 +1535,16 @@ function popularEscolhasSubclasseAssincronas(ctx, state) {
   // `magias_conhecidas` (onde moram os truques, inclusive o que esta
   // característica grava) e `magias_preparadas`, mais o que o próprio nível
   // já concede por domínio ou por "sempre preparada".
+  //
+  // `truquesAoConfirmar` no lugar de `char.magias_conhecidas` cru: aquela
+  // lista é o personagem de ANTES, e os truques escolhidos/trocados nesta
+  // mesma sessão só entram nela na hora de confirmar (levelup-ui.js:
+  // confirmarLevelUp). Sem isso o truque substituto do Ilusionista
+  // (Classes.md:5074) ofereceria a própria Ilusão Menor a quem acabou de
+  // trocar um truque por ela nesta subida -- escolha morta, exatamente o que
+  // este filtro existe para impedir.
   const jaTem = new Set([
-    ...(ctx.char?.magias_conhecidas || []).map((m) => m.nome),
+    ...truquesAoConfirmar(ctx, state),
     ...(ctx.char?.magias_preparadas || []).map((m) => m.nome),
     ...(ctx.magiasDominioNivel || []).map((m) => m.nome),
     ...(ctx.magiasSempreNivel || []).map((m) => m.nome),
@@ -2183,20 +2192,39 @@ export async function confirmarLevelUp(ctx, state, caches) {
   const trocasTruqueAplicadas = [];
   const listaMagiasClasse = ctx._listaMagiasClasse || [];
 
-  // Reativo à subclasse escolhida agora: sem isto, as magias e truques
-  // escolhidos por quem vira conjurador neste nível eram descartados em
-  // silêncio na hora de confirmar.
-  if (ehConjuradorAtivo(ctx, state)) {
-    // Truques
-    state.truquesSelecionados.forEach(nome => {
-      const m = listaMagiasClasse.find(x => x.nome === nome);
-      if (m && !char.magias_conhecidas?.find(x => x.nome === nome)) {
-        if (!char.magias_conhecidas) char.magias_conhecidas = [];
-        char.magias_conhecidas.push({ nome, circulo: 0 });
-        truquesAdicionados.push(nome);
-      }
-    });
+  // TRUQUES: quem decide QUAIS entram e QUAIS trocas se aplicam é
+  // `truquesDaSessao` (levelup-flow.js) -- a MESMA função que a tela consulta
+  // para saber o personagem que o motor vai ver (`escolhasSubclasseDoNivel`,
+  // `popularEscolhasSubclasseAssincronas`). Duas expressões independentes
+  // para a mesma pergunta, com guardas diferentes, é exatamente a
+  // divergência que aquela função existe para evitar -- e a que
+  // regras-origens-magia.js documenta como "a lista que vivia copiada em dez
+  // lugares, e não havia duas iguais".
+  //
+  // As três guardas que este bloco tinha (conjurador ativo, truque presente
+  // na lista da classe que sobe, `de` da troca presente no personagem)
+  // mudaram de lugar, não sumiram: vivem lá dentro, e `ganhos`/`trocas` já
+  // chegam aqui filtrados por elas -- por isso este bloco não precisa mais
+  // do `if (ehConjuradorAtivo(...))` em volta, e as MAGIAS, que continuam com
+  // regras próprias, seguem dentro do `if` logo abaixo.
+  const sessaoTruques = truquesDaSessao(ctx, state);
+  for (const nome of sessaoTruques.ganhos) {
+    if (!char.magias_conhecidas) char.magias_conhecidas = [];
+    char.magias_conhecidas.push({ nome, circulo: 0 });
+    truquesAdicionados.push(nome);
+  }
+  for (const troca of sessaoTruques.trocas) {
+    const idx = char.magias_conhecidas?.findIndex(m => m.nome === troca.de);
+    if (idx === undefined || idx === -1) continue;
+    trocasTruqueAplicadas.push(troca);
+    char.magias_conhecidas.splice(idx, 1);
+    char.magias_conhecidas.push({ nome: troca.para, circulo: 0 });
+  }
 
+  // Reativo à subclasse escolhida agora: sem isto, as magias escolhidas por
+  // quem vira conjurador neste nível eram descartadas em silêncio na hora de
+  // confirmar.
+  if (ehConjuradorAtivo(ctx, state)) {
     // Magias conhecidas
     state.magiasSelecionadas.forEach(nome => {
       const m = listaMagiasClasse.find(x => x.nome === nome);
@@ -2228,22 +2256,6 @@ export async function confirmarLevelUp(ctx, state, caches) {
         // ctx.classeQueSobe: a magia que entra na troca e da MESMA classe da
         // que saiu, e as duas sao da classe que esta subindo neste momento.
         char.magias_preparadas.push({ nome: troca.para, circulo: troca.circulo, ...(ctx.classeQueSobe ? { classe: ctx.classeQueSobe } : {}) });
-      }
-    }
-
-    // Trocas de truque -- mesma forma das de magia, acima.
-    const todasTrocasTruque = [
-      ...state.trocasTruque,
-      ...(state.truqueTrocarDe && state.truqueTrocarPara
-        ? [{ de: state.truqueTrocarDe, para: state.truqueTrocarPara }]
-        : []),
-    ];
-    for (const troca of todasTrocasTruque) {
-      const idx = char.magias_conhecidas?.findIndex(m => m.nome === troca.de);
-      if (idx !== undefined && idx !== -1) {
-        trocasTruqueAplicadas.push(troca);
-        char.magias_conhecidas.splice(idx, 1);
-        char.magias_conhecidas.push({ nome: troca.para, circulo: 0 });
       }
     }
   }
