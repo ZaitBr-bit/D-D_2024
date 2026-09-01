@@ -5,6 +5,7 @@ import { listarPersonagens, removerPersonagem, duplicarPersonagem, exportarTodos
 import { enfileirarSync, obterIdsPendentesRemocao } from '../sync.js';
 import { toast, abrirModal, fmtData, escHtml } from '../utils.js';
 import { CLASSES_INFO } from '../dados-classes.js';
+import { classesDe } from '../regras-multiclasse.js';
 import { iniciarAuth, getUsuario, loginComGoogle, logout, onAuthChange, buscarPersonagensCloud } from '../auth.js';
 
 let _containerRef = null;
@@ -345,10 +346,54 @@ function setupImportar(container) {
   }
 }
 
+/**
+ * Monta o texto de classes do cartão da home: "Mago (Evocação) 5 / Bruxo 3".
+ *
+ * Lê `classesDe`, NUNCA o espelho `p.classe`. `sincronizarEspelhos`
+ * (regras-multiclasse.js) define esse espelho como a classe INICIAL e
+ * `p.nivel` como o nível TOTAL -- então o cartão não ficava incompleto,
+ * ficava FALSO: um Mago 5/Bruxo 3 aparecia como "Mago" ao lado de "Nv. 8",
+ * que se lê como um Mago de nível 8.
+ *
+ * Terceira instância da mesma forma; as duas primeiras já estão corrigidas
+ * e têm o mesmo formato: sheet/impressao.js (cabeçalho da impressão) e
+ * sheet/pdf.js (`montarSubtituloCartaoPdf`). Com UMA classe só o nível por
+ * classe fica escondido -- ele já aparece no selo "Nv. N" ao lado, e
+ * repeti-lo mudaria a tela de quem não é multiclasse.
+ *
+ * @param {object} p Personagem.
+ * @returns {string} HTML já escapado, ou '' quando não há classe nenhuma.
+ */
+function montarTextoClassesCartao(p) {
+  const cs = classesDe(p);
+  if (!cs.length) return '';
+  return cs.map((c) =>
+    `${escHtml(c.classe)}${c.subclasse ? ` (${escHtml(c.subclasse)})` : ''}${cs.length > 1 ? ` ${escHtml(c.nivel)}` : ''}`
+  ).join(' / ');
+}
+
+/**
+ * Dados de vida DISTINTOS de todas as classes do personagem ("d6/d8").
+ *
+ * O livro mantém as reservas separadas quando as classes têm dados
+ * diferentes (livro:2043, mesma regra que `sincronizarEspelhos` aplica em
+ * `p.dados_vida`). Mostrar só o da classe inicial escondia metade da
+ * reserva. Classe fora de CLASSES_INFO é ignorada, sem inventar dado.
+ *
+ * @param {object} p Personagem.
+ * @returns {string} Ex.: "d6/d8", ou '' se nenhuma classe tem dado conhecido.
+ */
+function montarDadosVidaCartao(p) {
+  const faces = classesDe(p)
+    .map((c) => CLASSES_INFO[c.classe]?.dado_vida)
+    .filter((d) => Number.isFinite(d));
+  return [...new Set(faces)].sort((a, b) => a - b).map((d) => `d${d}`).join('/');
+}
+
 function renderCharCard(p) {
   const inicial = (p.nome || p.classe || '?')[0].toUpperCase();
-  const info = CLASSES_INFO[p.classe];
-  const dadoVida = info ? `d${info.dado_vida}` : '';
+  const textoClasses = montarTextoClassesCartao(p);
+  const dadoVida = montarDadosVidaCartao(p);
 
   return `
     <div class="card char-card" data-id="${escHtml(p.id)}">
@@ -356,8 +401,7 @@ function renderCharCard(p) {
       <div class="char-info">
         <div class="char-nome">${escHtml(p.nome) || 'Sem nome'}</div>
         <div class="char-detalhe">
-          ${escHtml(p.especie || '')} ${escHtml(p.classe || '')}
-          ${p.subclasse ? `(${escHtml(p.subclasse)})` : ''}
+          ${escHtml(p.especie || '')} ${textoClasses}
           ${dadoVida ? `&middot; ${dadoVida}` : ''}
         </div>
       </div>
