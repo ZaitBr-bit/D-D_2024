@@ -13,13 +13,106 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.0.0';
+export const VERSAO_ATUAL = '3.0.1';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.0.1',
+    data: '2026-08-31',
+    rotulo: 'Correções da comunidade',
+    resumo: 'Nove correções pontuais, uma para cada problema relatado no GitHub '
+      + 'desde a 3.0.0: o Bardo do Colégio do Conhecimento volta a subir de '
+      + 'nível, a rolagem de Pontos de Vida aceita qualquer valor do dado, o '
+      + 'PDF mostra todas as classes do multiclasse, a magia sempre preparada '
+      + 'que vem de talento passa a valer de verdade, magia customizada ganha '
+      + 'os mesmos caminhos que as demais (descrição, preparo e cópia para o '
+      + 'grimório), o Ilusionista que já sabe Ilusão Menor escolhe outro '
+      + 'truque, e o peso de ferramentas e itens volta a ser contado certo.',
+    correcoes: [
+      {
+        grupo: '🎓 Bardo — Descobertas Mágicas',
+        itens: [
+          'O Bardo do Colégio do Conhecimento não conseguia passar do nível '
+            + '5: o card de Descobertas Mágicas pedia duas magias e nascia com '
+            + 'os dois seletores vazios, sem nada para marcar, e a subida de '
+            + 'nível ficava travada esperando uma escolha que não existia. '
+            + 'Agora ele oferece magias de Clérigo, Druida e Mago do círculo '
+            + 'disponível, e a subida segue normalmente.',
+        ],
+      },
+      {
+        grupo: '❤️ Pontos de Vida',
+        itens: [
+          'O campo de rolagem de Pontos de Vida da subida de nível só '
+            + 'aceitava os valores 1 e 10 — qualquer outro número digitado '
+            + 'era reescrito sozinho, sempre para um desses dois, no meio da '
+            + 'digitação. Agora o campo aceita o valor real que caiu no dado.',
+        ],
+      },
+      {
+        grupo: '🖨️ Ficha impressa e PDF',
+        itens: [
+          'O PDF de um personagem multiclasse mostrava só a classe inicial '
+            + 'no cabeçalho, como se as outras classes não existissem. Agora '
+            + 'ele lista todas as classes do personagem, com o nível de cada '
+            + 'uma — como a ficha e a impressão pelo navegador já faziam.',
+        ],
+      },
+      {
+        grupo: '✨ Magia sempre preparada por talento',
+        itens: [
+          'A magia de 1º círculo escolhida pelo Tocado Pelas Sombras ou pelo '
+            + 'Tocado Por Fadas não ficava sempre preparada nem ganhava o uso '
+            + 'grátis quando o personagem já tinha aquela magia preparada por '
+            + 'outro caminho — só a magia fixa do talento (Invisibilidade) '
+            + 'recebia o tratamento certo. Agora a magia escolhida também '
+            + 'fica sempre preparada e com uso grátis, como o livro descreve.',
+        ],
+      },
+      {
+        grupo: '📖 Magias personalizadas',
+        itens: [
+          'Clicar numa magia customizada dentro do Grimório do Mago não '
+            + 'abria a descrição — só funcionava na seção de Preparadas. '
+            + 'Agora abre nos dois lugares.',
+          'Uma magia customizada de 1º círculo ou superior não aparecia '
+            + 'entre as preparáveis: ficava numa lista separada, sem botão '
+            + 'de Preparar e sem Lançar. Agora ela entra na grade normal e '
+            + 'pode ser preparada, no Descanso Longo e na subida de nível.',
+          'Magia customizada do Mago ia direto para o grimório ao ser '
+            + 'criada, pulando o custo de copiar (50 PO e 2h por círculo) '
+            + 'que toda outra magia paga. Agora ela precisa ser copiada como '
+            + 'as demais, pelo botão "+ Copiar Magia para Grimório".',
+        ],
+      },
+      {
+        grupo: '🧙 Mago Ilusionista',
+        itens: [
+          'Quem já conhecia Ilusão Menor — por talento, traço de espécie ou '
+            + 'classe anterior — e escolhia a subclasse Ilusionista não '
+            + 'ganhava truque nenhum no lugar, como o livro manda. Agora o '
+            + 'Ilusionista escolhe outro truque de Mago quando já conhece '
+            + 'Ilusão Menor. Vale para subidas de nível novas: personagem '
+            + 'que já passou do nível 3 não recebe o truque substituto '
+            + 'sozinho.',
+        ],
+      },
+      {
+        grupo: '🎒 Peso de itens',
+        itens: [
+          'Ferramentas, foco arcano, foco druídico e vários itens do '
+            + 'equipamento inicial (como Roupas de Viagem) apareciam sem '
+            + 'peso nenhum, e o peso de um item personalizado não podia mais '
+            + 'ser alterado pelo botão Editar depois de criado. Agora o peso '
+            + 'vem certo do livro, e o campo também aparece na edição.',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.0.0',
     data: '2026-08-29',
