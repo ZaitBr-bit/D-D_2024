@@ -35,7 +35,7 @@ import { reservasDeEspacos } from './reservas-espacos.js';
 // `truqueContaNoLimite` (o predicado por entrada) saiu daqui junto com a
 // versão local: a única leitura que este arquivo fazia dele era a contagem,
 // e ela agora é `truquesQueContamNoLimite`.
-import { truqueEhTrocavel, truquesQueContamNoLimite } from '../regras-origens-magia.js';
+import { truqueEhTrocavel } from '../regras-origens-magia.js';
 // superficiesDaFicha/superficieAtivaDaFicha (Tarefas 2 e 4 deste
 // sub-projeto): substituem a leitura de char.classe/char.subclasse/
 // char.nivel (a classe INICIAL, o espelho) por classes[] de verdade -- ver
@@ -47,7 +47,7 @@ import { nivelNa } from '../regras-multiclasse.js';
 // reimplementar contando char.magias_preparadas cru contra o limite de UMA
 // superficie -- ver o comentario de mostrarBuscaMagia, abaixo, para o antes
 // e depois.
-import { preparadasPorClasse } from '../regras-magia-classe.js';
+import { preparadasPorClasse, truquesPorClasse } from '../regras-magia-classe.js';
 
 /**
  * As magias PERSONALIZADAS de círculo 1+ da ficha, no formato de cartão que
@@ -269,12 +269,18 @@ export async function mostrarBuscaMagia() {
   // não pode mentir), por outro meio. Guarda única, reaproveitada em
   // TODO lugar desta função que decide "está cheio?" -- contador de
   // TRUQUES no topo, opacidade da grade de truques, e o refresh de
-  // atualizarContadores() para truques. `magias_conhecidas[]` (truques)
-  // continua sem campo de classe -- fora do escopo desta tarefa -- por
-  // isso o proxy `umaSuperficieSo` permanece a única medida disponível
-  // aqui.
+  // atualizarContadores() para truques.
+  //
+  // O PROXY MORREU. Enquanto `magias_conhecidas[]` não tinha campo de
+  // classe, `umaSuperficieSo` era a única medida disponível para truque --
+  // e ela desligava a trava inteira em multiclasse, deixando adicionar
+  // truque sem limite nenhum (medido: 16 com limite 4). A gravação passou
+  // a carimbar `classe` na entrada, então os três lugares acima usam agora
+  // `classificacaoTruques` (`truquesPorClasse`, regras-magia-classe.js),
+  // que é medida direta. A variável saiu daqui junto com o último uso: não
+  // há mais nenhuma decisão desta função que dependa de "quantas
+  // superfícies existem" em vez de "de quem é este truque".
   const superficies = superficiesDaFicha(char);
-  const umaSuperficieSo = superficies.length <= 1;
   // preparadasPorClasse (Tarefa 4): substitui, para PREPARADAS, o mesmo
   // proxy `umaSuperficieSo` por uma medida DIRETA -- `desta`/`deOutra`/
   // `semClasse` de magias_preparadas[].classe (Tarefas 2 e 3). `let`
@@ -284,6 +290,16 @@ export async function mostrarBuscaMagia() {
   // leem (renderTab, os handlers de clique) enxergam o valor atual porque
   // todos vivem no mesmo escopo léxico desta função.
   let classificacaoAtiva = preparadasPorClasse(char, sup?.classe);
+  // truquesPorClasse: o MESMO movimento, agora para TRUQUES. Até aqui o
+  // portão de truque era o último a ainda usar o proxy `umaSuperficieSo`,
+  // e o comentário dele dizia "AQUI NÃO EXISTE PROXY HONESTO -- truque não
+  // entra no grimório, então não há como separar por classe com o dado
+  // disponível hoje". O dado passou a existir: a gravação carimba
+  // `classe` na entrada (ver o handler de `data-truque-check`), do mesmo
+  // jeito que a magia de círculo já carimbava. Com contagem certa o portão
+  // volta a valer sempre; com ficha antiga (sem carimbo) a incerteza fica
+  // visível e não vira bloqueio -- mesma regra das preparadas.
+  let classificacaoTruques = truquesPorClasse(char, sup?.classe);
   // Classes "conhecidas" (Bardo, Bruxo, Feiticeiro) e subclasses conjuradoras: somente consulta
   const somenteConsulta = tipoConj === 'conhecidas';
 
@@ -534,8 +550,11 @@ export async function mostrarBuscaMagia() {
     }</div>` : ''}
     <div id="gm-aviso-superficie">${avisoSuperficieAtiva(superficies, sup, labelMg, classificacaoAtiva.semClasse.length)}</div>
     <div style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:6px;font-size:0.78rem">
-      <span class="magia-contador ${truquesQueContamNoLimite(char).length >= maxTruq && umaSuperficieSo ? 'contador-cheio' : ''}" id="gm-contador-truques">
-        Truques: ${truquesQueContamNoLimite(char).length}/${maxTruq}
+      <span class="magia-contador ${classificacaoTruques.desta.length >= maxTruq && classificacaoTruques.semClasse.length === 0 ? 'contador-cheio' : ''}" id="gm-contador-truques">
+        Truques: ${classificacaoTruques.desta.length}/${maxTruq}
+      </span>
+      <span class="magia-contador contador-dominio" id="gm-contador-truques-sem-classe" title="Truques de fichas antigas (ou personalizados) cuja classe não pôde ser determinada sem chute -- não entram nesta contagem nem no bloqueio de limite." ${classificacaoTruques.semClasse.length > 0 ? '' : 'hidden'}>
+        +${classificacaoTruques.semClasse.length} truque(s) sem classe
       </span>
       <span class="magia-contador ${classificacaoAtiva.desta.length > maxPrep && classificacaoAtiva.semClasse.length === 0 ? 'contador-excedido' : classificacaoAtiva.desta.length === maxPrep && classificacaoAtiva.semClasse.length === 0 ? 'contador-cheio' : ''}" id="gm-contador-preparadas">
         ${labelMg}s: ${classificacaoAtiva.desta.length}/${maxPrep}
@@ -635,9 +654,12 @@ export async function mostrarBuscaMagia() {
       // `truquesEsp` continua sendo só os de ESPÉCIE: ele alimenta a seção
       // "Truques de Espécie" da grade e a deduplicação da lista de classe,
       // que são perguntas de EXIBIÇÃO, não de orçamento. Quem responde
-      // "quanto do limite já foi gasto?" é truquesQueContamNoLimite(char).
+      // "quanto do limite já foi gasto?" é classificacaoTruques.desta
+      // (truquesPorClasse, regras-magia-classe.js).
       const truquesEsp = truquesAtuais.filter(m => m.origem === 'especie');
-      const numTruq = truquesQueContamNoLimite(char).length;
+      // Mesma medida do portao de gravacao: `desta` (carimbados com a
+      // classe da superficie ativa), nao a soma global.
+      const numTruq = classificacaoTruques.desta.length;
       html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">Truques: ${numTruq}/${maxTruq}${truquesEsp.length > 0 ? ` (+${truquesEsp.length} espécie)` : ''}</div>`;
 
       const selecionadosSet = new Set(truquesAtuais.map(m => m.nome));
@@ -666,7 +688,10 @@ export async function mostrarBuscaMagia() {
       // Filtrar truques de espécie da lista de classe (evitar duplicatas)
       lista = lista.filter(m => !truquesEspSet.has(m.nome));
       if (termo.length >= 2) lista = lista.filter(m => semAcento(m.nome).includes(termo));
-      const cheioTruq = numTruq >= maxTruq && umaSuperficieSo;
+      // Grisalha os cartoes so quando a contagem e CERTA -- havendo
+      // truque sem carimbo a grade nao bloqueia por incerteza, mesma
+      // decisao do portao de "Adicionar" e da grade de preparadas.
+      const cheioTruq = numTruq >= maxTruq && classificacaoTruques.semClasse.length === 0;
 
       html += `<div class="opcao-grid densa">${lista.map(m => {
         const sel = selecionadosSet.has(m.nome);
@@ -803,25 +828,32 @@ export async function mostrarBuscaMagia() {
           salvar();
           toast(`${nome} removido`, 'success');
         } else {
-          // ACHADO IMPORTANT da revisão da Tarefa 3 (terceira instância da
-          // mesma forma que os dois portões de preparadas/círculo já
-          // corrigidos nesta rodada): `numAtual` é GLOBAL
-          // (char.magias_conhecidas de TODAS as classes, sem campo que
-          // diga de quem é cada truque) confrontado contra `maxTruq`, o
-          // limite de UMA superfície só (a ativa). Num Clérigo 5/Mago 1 os
-          // truques do Clérigo consomem o orçamento do Mago, e "Adicionar"
-          // trava para sempre.
+          // O portão de truque era o ÚLTIMO a usar o proxy
+          // `umaSuperficieSo`, e o comentário anterior daqui dizia "AQUI
+          // NÃO EXISTE PROXY HONESTO -- truque não entra no grimório,
+          // então não há como separar por classe com o dado disponível
+          // hoje". Isso era verdade enquanto a gravação não carimbava
+          // nada. Com o proxy, `umaSuperficieSo` falso DESLIGAVA a trava
+          // inteira: um Mago 5/Clérigo 5 adicionava 16 truques com limite
+          // 4 (medido), que é o relato "não respeita limite".
           //
-          // AQUI NÃO EXISTE PROXY HONESTO -- truque não entra no grimório
-          // (diferente de magia de círculo do Mago), então não há como
-          // separar por classe com o dado disponível hoje. Mesma guarda
-          // dos outros dois portões: com mais de uma superfície de
-          // conjuração, não bloqueia -- bloquear com base numa contagem
-          // incerta é pior que deixar passar, e o jogador já vê o
-          // contador honesto na tela.
-          const numAtual = truquesQueContamNoLimite(char).length;
-          if (umaSuperficieSo && numAtual >= maxTruq) { toast(`Limite de ${maxTruq} truques atingido`, 'error'); return; }
-          char.magias_conhecidas.push({ nome, circulo: 0 });
+          // Agora a medida é DIRETA, a mesma dos outros dois portões:
+          // `desta` são os truques carimbados com a classe da superfície
+          // ativa, e o bloqueio só age quando a contagem é CERTA
+          // (`semClasse` vazio). Ficha antiga e truque personalizado não
+          // têm carimbo: a incerteza aparece no contador "+N sem classe" e
+          // não vira bloqueio errado.
+          const numAtual = classificacaoTruques.desta.length;
+          if (numAtual >= maxTruq && classificacaoTruques.semClasse.length === 0) {
+            toast(`Limite de ${maxTruq} truques atingido`, 'error');
+            return;
+          }
+          // `sup?.classe`: o carimbo que torna a contagem acima possível --
+          // mesmo campo, mesmo formato e mesmo motivo do gravador de
+          // magias_preparadas[].classe. Sem superfície ativa (Bárbaro puro
+          // com Iniciado em Magia) não há classe a carimbar, e a entrada
+          // sai sem o campo, como antes.
+          char.magias_conhecidas.push({ nome, circulo: 0, ...(sup?.classe ? { classe: sup.classe } : {}) });
           salvar();
           toast(`${nome} adicionado`, 'success');
         }
@@ -1009,14 +1041,31 @@ export async function mostrarBuscaMagia() {
     // `push`): reatribuir o `let` de fora já é visto por renderTab e pelos
     // handlers de clique, que vivem no mesmo escopo léxico.
     classificacaoAtiva = preparadasPorClasse(char, sup?.classe);
+    // Mesmo motivo da linha acima: os fechamentos (renderTab, handlers de
+    // clique) leem esta variável do escopo léxico, então reatribuir aqui
+    // já é visto por todos.
+    classificacaoTruques = truquesPorClasse(char, sup?.classe);
 
-    // Atualizar contador de truques no topo do modal
-    // Excluir truques de espécie do contador de classe
-    const numTruques = truquesQueContamNoLimite(char).length;
+    // Contador de truques: `desta` (os carimbados com a classe da
+    // superfície ativa), não mais a soma global de todas as classes.
+    const numTruques = classificacaoTruques.desta.length;
+    const truquesIncertos = classificacaoTruques.semClasse.length;
     const contTruques = document.getElementById('gm-contador-truques');
     if (contTruques) {
       contTruques.textContent = `Truques: ${numTruques}/${maxTruq}`;
-      contTruques.className = `magia-contador ${numTruques >= maxTruq && umaSuperficieSo ? 'contador-cheio' : ''}`;
+      contTruques.className = `magia-contador ${numTruques >= maxTruq && truquesIncertos === 0 ? 'contador-cheio' : ''}`;
+    }
+
+    // "+N truque(s) sem classe" -- a incerteza tem de ficar VISÍVEL, pelo
+    // mesmo motivo do indicador irmão das preparadas: sem ele o contador
+    // mentiria por omissão, dizendo que o orçamento está livre quando o
+    // app apenas não sabe de quem são aqueles truques. O elemento já vem
+    // no HTML inicial (só `hidden` muda aqui), como todos os outros
+    // contadores deste arquivo.
+    const contTruquesSemClasse = document.getElementById('gm-contador-truques-sem-classe');
+    if (contTruquesSemClasse) {
+      contTruquesSemClasse.textContent = `+${truquesIncertos} truque(s) sem classe`;
+      contTruquesSemClasse.hidden = truquesIncertos === 0;
     }
 
     // Atualizar contador de preparadas no topo do modal

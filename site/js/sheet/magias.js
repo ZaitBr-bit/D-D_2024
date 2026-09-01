@@ -14,7 +14,7 @@ import { getCavaleiroMisticoConjuracao } from './classes/guerreiro.js';
 import { getTrapaceiroArcanoConjuracao } from './classes/ladino.js';
 import { _truquesColapsados } from './colapso.js';
 import { ehBardoComSegredosMagicos, getTruquesExtraEstiloLuta } from './combate.js';
-import { char, indiceMagiasCache, salvar } from './estado.js';
+import { char, classesData, indiceMagiasCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { abrirPreenchimentoSlotMagia, mostrarBuscaGrimorio, mostrarBuscaMagia, mostrarFormMagiaCustom } from './grimorio.js';
 // superficiesDaFicha/dadosDe (Tarefa 3, sub-projeto "tela magias por
@@ -38,14 +38,14 @@ import { abrirModalAdicionarTalento, abrirModalEditarIniciadoEmMagia } from './t
 // fonte única dos três baldes desta/deOutra/semClasse -- ver o comentário
 // de renderSecaoMagias, abaixo, para o "contador honesto" que esta função
 // substitui.
-import { preparadasPorClasse } from '../regras-magia-classe.js';
+import { preparadasPorClasse, truquesPorClasse } from '../regras-magia-classe.js';
 
 // `magiaContaNoLimite` e `magiaEhEspecial` moram em regras-origens-magia.js,
 // a fonte única das origens que o jogador não escolheu. Reexportados aqui
 // porque vários módulos da ficha os importam deste arquivo desde antes da
 // consolidação -- reexportar é mais barato e menos arriscado que reescrever
 // os importadores, e não recria a cópia que a consolidação foi eliminar.
-import { magiaContaNoLimite, magiaEhEspecial, truqueContaNoLimite, truquesQueContamNoLimite } from '../regras-origens-magia.js';
+import { magiaContaNoLimite, magiaEhEspecial, truqueContaNoLimite } from '../regras-origens-magia.js';
 export { magiaContaNoLimite, magiaEhEspecial, truqueContaNoLimite };
 
 /**
@@ -570,13 +570,20 @@ export function renderSecaoMagias() {
   const truquesSempre = todosTruques.filter(m => m.origem === 'sempre');
   // DUAS PERGUNTAS DIFERENTES, DOIS CONJUNTOS -- não faça um servir aos dois.
   //
-  //  - `truquesNoLimite` responde "quanto do orçamento da classe já foi
-  //    gasto?". Vem da fonte única (regras-origens-magia.js), que lê
+  //  - `truquesNoLimite` responde "quanto do orçamento DESTA classe já foi
+  //    gasto?". A base vem da fonte única (regras-origens-magia.js), que lê
   //    `magias_conhecidas` E `magias_customizadas`: truque personalizado
   //    CONTA, como a magia de círculo personalizada sempre contou (decisão
-  //    do dono do produto, docs/PERGUNTAS-PENDENTES.txt). É a MESMA função
-  //    que o modal "+ Magia" (sheet/grimorio.js) chama, para as duas telas
-  //    não poderem discordar sobre o número.
+  //    do dono do produto). `truquesPorClasse` separa esses truques em três
+  //    baldes por classe -- é a MESMA função que o modal "+ Magia"
+  //    (sheet/grimorio.js) chama, para as duas telas não poderem discordar
+  //    sobre o número.
+  //
+  //    Passou a ser POR CLASSE porque a soma global era o que quebrava o
+  //    limite em multiclasse: os truques do Clérigo gastavam o orçamento do
+  //    Mago, e a saída da época foi desligar a trava (medido: 16 truques
+  //    com limite 4). Com UMA superfície só nada muda -- RULING R-B: sem
+  //    ambiguidade possível, o truque sem carimbo é dela.
   //
   //  - `truquesClasseDoAcervo` responde "o que eu desenho neste bloco?".
   //    Só truque do LIVRO: a linha sai com `data-magia-nome`, e o handler
@@ -587,7 +594,9 @@ export function renderSecaoMagias() {
   //    handler que lê `char.magias_customizadas`). Juntar os dois aqui o
   //    mostraria DUAS vezes, e a segunda cópia abriria a descrição vazia --
   //    a forma exata da issue #39.
-  const truquesNoLimite = truquesQueContamNoLimite(char);
+  const classificacaoTruques = truquesPorClasse(char, sup?.classe, classesData);
+  const truquesNoLimite = classificacaoTruques.desta;
+  const truquesSemClasse = classificacaoTruques.semClasse;
   const truquesClasseDoAcervo = todosTruques.filter(m => !m.personalizada && m.origem !== 'especie' && m.origem !== 'sempre' && truqueContaNoLimite(m));
   const preparadas = char.magias_preparadas || [];
   // `espacos`: casca no formato ANTIGO (por CIRCULO, nao por fonte) que o
@@ -711,7 +720,9 @@ export function renderSecaoMagias() {
 
   // Mapa de truques modificados por invocacoes do Bruxo (para indicacao visual)
   const truquesModificadosMapa = {};
-  if (char?.classe === 'Bruxo' && char.recursos?.bruxo?.invocacoes) {
+  // temClasse, nao o espelho `char.classe` (que e a classe INICIAL): num
+  // Mago 5/Bruxo 3 as marcas de invocacao nos truques sumiam da tela.
+  if (temClasse(char, 'Bruxo') && char.recursos?.bruxo?.invocacoes) {
     const INV_TRUQUE_LABELS = {
       'Explosão Agonizante': '+Carisma ao dano',
       'Explosão Repulsiva': 'Empurra 3m',
@@ -836,9 +847,15 @@ export function renderSecaoMagias() {
       <!-- Contador de magias preparadas/conhecidas e truques -->
       <div class="magia-contadores" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
         ${maxTruques > 0 ? `
-          <div class="magia-contador ${truquesNoLimite.length > maxTruques && superficies.length <= 1 ? 'contador-excedido' : truquesNoLimite.length === maxTruques ? 'contador-cheio' : ''}">
+          <div class="magia-contador ${truquesNoLimite.length > maxTruques && truquesSemClasse.length === 0 ? 'contador-excedido' : truquesNoLimite.length === maxTruques && truquesSemClasse.length === 0 ? 'contador-cheio' : ''}">
             <span class="contador-label">Truques</span>
             <span class="contador-valor">${truquesNoLimite.length} / ${maxTruques}</span>
+          </div>
+        ` : ''}
+        ${truquesSemClasse.length > 0 ? `
+          <div class="magia-contador contador-dominio" id="ficha-contador-truques-sem-classe" title="Truques de fichas antigas (ou personalizados) cuja classe nao pode ser determinada sem chute -- nao entram nesta contagem nem no bloqueio de limite.">
+            <span class="contador-label">Truques (sem classe)</span>
+            <span class="contador-valor">+${truquesSemClasse.length}</span>
           </div>
         ` : ''}
         ${truquesEspecie.length > 0 ? `
@@ -886,16 +903,36 @@ export function renderSecaoMagias() {
       </div>
 
       <!-- Espaços de magia -->
-      ${Object.keys(espacos).length > 0 ? `
+      ${(() => {
+        // RESUMO POR RESERVA, nao por circulo. Ate aqui esta lista lia
+        // `espacos` -- o mapa por CIRCULO, montado com um `new Set(...)`
+        // que jogava a fonte fora e deixava a Conjuracao vencer a colisao.
+        // Num Mago 5/Bruxo 3 os 2 espacos de Pacto do 2o circulo nao
+        // apareciam em lugar nenhum, embora o modelo os tivesse e o botao
+        // "Conjurar" ja soubesse gasta-los: o comentario de `espacos`
+        // chamava isso de "LIMITACAO DE TELA QUE PERMANECE", defensavel
+        // enquanto "multiclasse ainda nao existe em ficha de producao".
+        // Multiclasse subiu na 3.0.0, e a premissa caiu junto.
+        //
+        // `espacos` CONTINUA existindo, sem mudanca: ele responde outra
+        // pergunta ("que circulos existem?", para as listas de upcast mais
+        // abaixo), e essa resposta por circulo esta certa.
+        const _reservas = reservasDeEspacos().filter(r => r.total > 0);
+        return _reservas.length > 0 ? `
         <div style="margin-bottom:12px">
-          ${Object.entries(espacos).map(([circ, data]) => {
+          ${_reservas.map((data) => {
+            const circ = data.circulo;
             // Extras de Fonte de Magia so somam em 'conjuracao' -- nunca em
             // 'pacto' (Oráculo 6, multiclasse-magias.test.mjs).
             const _extrasCirculo = data.fonte === 'conjuracao' ? ((char.espacos_magia_extras || {})[circ] || 0) : 0;
             const _baseTotal = data.total - _extrasCirculo;
+            // A reserva de Pacto se NOMEIA: ela volta no Descanso Curto
+            // (Classes.md:898) e a de Conjuracao nao, entao duas linhas
+            // "2o Circulo" identicas seriam pior que esconder uma.
+            const _rotuloFonte = data.fonte === 'pacto' ? ' (Pacto)' : '';
             return `
             <div class="slots-grupo">
-              <label>${circ}&ordm; Círculo</label>
+              <label>${circ}&ordm; Círculo${_rotuloFonte}</label>
               <div style="display:flex;gap:4px">
                 ${Array.from({ length: data.total }, (_, i) => `
                   <div class="slot-bolha ${i < data.usados ? 'usado' : ''} ${i >= _baseTotal ? 'slot-extra' : ''}" data-slot-circ="${circ}" data-slot-fonte="${data.fonte}" data-slot-idx="${i}"></div>
@@ -908,7 +945,8 @@ export function renderSecaoMagias() {
             </div>`;
           }).join('')}
         </div>
-      ` : ''}
+      ` : '';
+      })()}
 
       <!-- Dádivas do Pacto (Bruxo) -->
       ${renderSecaoPactoBruxo()}
@@ -979,7 +1017,7 @@ export function renderSecaoMagias() {
       ${todosTruques.length > 0 ? `
         <details id="details-truques"${_truquesColapsados ? '' : ' open'} style="margin-bottom:8px">
           <summary style="font-weight:700;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--border-light)">
-            Truques (${truquesNoLimite.length}${maxTruques ? ' / ' + maxTruques : ''}${truquesEspecie.length > 0 ? ` + ${truquesEspecie.length} espécie` : ''}${truquesTalento.length > 0 ? ` + ${truquesTalento.length} talento` : ''}${truquesSempre.length > 0 ? ` + ${truquesSempre.length} subclasse` : ''})
+            Truques (${truquesNoLimite.length}${maxTruques ? ' / ' + maxTruques : ''}${truquesSemClasse.length > 0 ? ` + ${truquesSemClasse.length} sem classe` : ''}${truquesEspecie.length > 0 ? ` + ${truquesEspecie.length} espécie` : ''}${truquesTalento.length > 0 ? ` + ${truquesTalento.length} talento` : ''}${truquesSempre.length > 0 ? ` + ${truquesSempre.length} subclasse` : ''})
           </summary>
           <div style="padding-top:4px">
             ${truquesEspecie.slice().sort((a, b) => prioridadeConjuracao(a.nome) - prioridadeConjuracao(b.nome)).map(m => `

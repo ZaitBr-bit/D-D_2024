@@ -368,12 +368,36 @@ test('multiclasse (Clérigo 5/Mago 1): o truque personalizado conta nas duas tel
       + 'senão o cenário não é o de multiclasse')
       .toBeVisible({ timeout: 10_000 });
 
+    // O QUE MUDOU AQUI, e por quê. Este oráculo afirmava `ficha.atual === 3`
+    // -- "a contagem de truques é do personagem inteiro". Essa contagem
+    // global era exatamente o defeito relatado depois ("Mago e clérigo,
+    // deixando selecionar quantos truques quiser"): os truques de uma
+    // classe gastavam o orçamento da outra, e a saída da época foi
+    // DESLIGAR a trava em multiclasse -- 16 truques com limite 4, medido.
+    //
+    // O que continua valendo, e o que este teste protege: (1) as duas
+    // telas nunca discordam do número, e (2) o truque personalizado não é
+    // de graça. O que mudou é ONDE ele aparece: com DUAS superfícies e
+    // nenhum carimbo de classe, o app não sabe de quem é o truque, então
+    // ele entra como INCERTEZA VISÍVEL em vez de ser cobrado em silêncio
+    // do orçamento da classe ativa. Com uma superfície só (o teste irmão,
+    // acima) nada mudou: sem ambiguidade possível, o truque é dela e conta.
     const ficha = await contadorTruquesFicha(page);
     expect(ficha, 'não achei o contador "Truques N / M" na seção Magias da ficha').not.toBeNull();
     expect(ficha.atual,
-      'a contagem de truques é do personagem inteiro e inclui o personalizado, com uma ou com '
-      + 'várias classes')
-      .toBe(3);
+      'nenhum dos três truques está carimbado com uma classe, e o personagem tem duas superfícies '
+      + '-- nenhum deles pode ser cobrado do orçamento do Clérigo por chute')
+      .toBe(0);
+
+    // A incerteza tem de estar NA TELA: sem isto o contador mentiria por
+    // omissão, dizendo "0 gastos" como se o orçamento estivesse livre.
+    const semClasseFicha = page.locator('#ficha-contador-truques-sem-classe');
+    await expect(semClasseFicha,
+      'os truques sem classe têm de aparecer na ficha, não sumir da conta')
+      .toBeVisible();
+    await expect(semClasseFicha,
+      'são três truques sem carimbo: dois do livro e o personalizado')
+      .toContainText('3');
 
     await abrirGerenciarMagias(page);
 
@@ -383,6 +407,45 @@ test('multiclasse (Clérigo 5/Mago 1): o truque personalizado conta nas duas tel
       .toBe(ficha.atual);
     expect(modal.limite, 'o modal e a ficha têm de mostrar o MESMO limite (o da superfície ativa)')
       .toBe(ficha.limite);
+    await expect(page.locator('#gm-contador-truques-sem-classe'),
+      'o modal tem de mostrar a MESMA incerteza que a ficha')
+      .toContainText('3');
+
+    expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+  });
+
+test('multiclasse: o truque CARIMBADO com a classe ativa conta no orçamento dela',
+  async ({ context }) => {
+    // O complemento do teste acima: com carimbo não há incerteza nenhuma, e
+    // o truque volta a ser cobrado -- inclusive o personalizado continua
+    // fora de qualquer isenção, ele só não tem como ser atribuído sozinho.
+    const { page, erros } = await abrirFicha(context, {
+      classe: 'Clérigo', subclasse: '', nivel: 6, xp: 14000,
+      especie: 'Humano', atributos: ATRIBUTOS_REGRAS,
+      pericias_proficientes: ['Religião', 'Intuição'],
+      classes: [
+        { classe: 'Clérigo', subclasse: '', nivel: 5, ordem: 0 },
+        { classe: 'Mago', subclasse: '', nivel: 1, ordem: 1 },
+      ],
+      schema_versao: 2,
+      magias_conhecidas: [
+        { nome: 'Chama Sagrada', circulo: 0, classe: 'Clérigo' },
+        { nome: 'Luz', circulo: 0, classe: 'Clérigo' },
+        { nome: 'Raio de Gelo', circulo: 0, classe: 'Mago' },
+      ],
+    }, 'regras-truque-carimbado-multiclasse');
+
+    await expect(page.locator('#tabs-superficie-magia'),
+      'o cenário precisa ser mesmo o de multiclasse').toBeVisible({ timeout: 10_000 });
+
+    const ficha = await contadorTruquesFicha(page);
+    expect(ficha, 'não achei o contador "Truques N / M" na seção Magias da ficha').not.toBeNull();
+    expect(ficha.atual,
+      'a superfície ativa é a do Clérigo: só os dois truques dele contam, e o do Mago não')
+      .toBe(2);
+    await expect(page.locator('#ficha-contador-truques-sem-classe'),
+      'com tudo carimbado não há incerteza para mostrar')
+      .toHaveCount(0);
 
     expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
   });

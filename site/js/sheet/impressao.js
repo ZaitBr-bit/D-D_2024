@@ -12,7 +12,7 @@ import { forcaPrimordialAtiva, getAtaquesPorAcao, getDeslocamentoFinal, getModIn
 import { char, classeData, especiesCache, indiceMagiasCache, passivosTalentosCache, seloPrerequisitoDispensado, talentosCache } from './estado.js';
 import { conjuraPorAlgumaClasse } from '../regras-multiclasse-conjuracao.js';
 import { armadurasDoPersonagem, armasDoPersonagem } from '../regras-multiclasse-proficiencias.js';
-import { classesDe, reservasDadosVida } from '../regras-multiclasse.js';
+import { classesDe, reservasDadosVida, temClasse } from '../regras-multiclasse.js';
 import { ehProficienteEmSalvaguarda } from '../regras-salvaguardas.js';
 import { normalizarMagiaPersonalizada, rotuloOrigemMagia } from './magias.js';
 // reservasDeEspacos (Tarefa 4, sub-projeto 4, Ruling 11): a caixa "Espacos
@@ -48,7 +48,9 @@ export async function carregarDescricoesMagias() {
     }
   });
   // Magias do pacto do bruxo
-  if (char.classe === 'Bruxo') {
+  // temClasse, nao o espelho `char.classe`: ele vale a classe INICIAL,
+  // entao um Mago 5/Bruxo 3 perdia este bloco da folha inteira.
+  if (temClasse(char, 'Bruxo')) {
     const estado = getEstadoRecursosBruxo();
     if (estado?.pactos?.includes('Pacto do Tomo')) {
       (char.recursos?.bruxo?.livro_sombras?.truques || []).forEach(nome => {
@@ -669,7 +671,9 @@ export async function gerarHtmlImpressao() {
     }
 
     // Bruxo: slots de pacto
-    if (char.classe === 'Bruxo') {
+    // temClasse, nao o espelho `char.classe`: ele vale a classe INICIAL,
+    // entao um Mago 5/Bruxo 3 perdia este bloco da folha inteira.
+    if (temClasse(char, 'Bruxo')) {
       const estadoBruxo = getEstadoRecursosBruxo();
       if (estadoBruxo) {
         const slotsBruxo = estadoBruxo.slotsTotal || 0;
@@ -698,7 +702,9 @@ export async function gerarHtmlImpressao() {
     }
 
     // Magias do Pacto do Tomo (Bruxo)
-    if (char.classe === 'Bruxo') {
+    // temClasse, nao o espelho `char.classe`: ele vale a classe INICIAL,
+    // entao um Mago 5/Bruxo 3 perdia este bloco da folha inteira.
+    if (temClasse(char, 'Bruxo')) {
       const estado = getEstadoRecursosBruxo();
       if (estado?.pactos?.includes('Pacto do Tomo')) {
         const truquesPacto = char.recursos?.bruxo?.livro_sombras?.truques || [];

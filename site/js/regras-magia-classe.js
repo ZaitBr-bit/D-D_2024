@@ -25,7 +25,7 @@
 // importa este modulo direto do disco em Node, e este arquivo nao grava
 // nada em ficha nenhuma nem muda tela nenhuma.
 // ============================================================
-import { magiaContaNoLimite } from './regras-origens-magia.js';
+import { magiaContaNoLimite, truquesQueContamNoLimite } from './regras-origens-magia.js';
 import { superficiesDeConjuracao } from './regras-multiclasse-conjuracao.js';
 
 /**
@@ -181,6 +181,71 @@ export function preparadasPorClasse(personagem, nomeClasse) {
       resultado.desta.push(magia);
     } else {
       resultado.deOutra.push(magia);
+    }
+  }
+  return resultado;
+}
+
+/**
+ * O mesmo de `preparadasPorClasse`, para TRUQUES.
+ *
+ * POR QUE EXISTE: o modal "+ Magia" (sheet/grimorio.js) confrontava uma
+ * contagem GLOBAL de truques (`magias_conhecidas` de todas as classes)
+ * contra o limite de UMA superfície só. Num Mago 5/Clérigo 5 os truques do
+ * Clérigo comiam o orçamento do Mago, e a saída adotada na época foi
+ * DESLIGAR o portão quando havia mais de uma superfície -- o que deixava
+ * adicionar truque sem limite nenhum (medido: 16 truques com limite 4).
+ * Com o carimbo `classe` na entrada, a contagem deixa de ser incerta e o
+ * portão volta a valer, sem o proxy `umaSuperficieSo`.
+ *
+ * Reusa `truquesQueContamNoLimite` em vez de refiltrar: é ela que decide
+ * QUEM gasta vaga (círculo 0, sem origem de concessão, truque
+ * personalizado incluído) e ela junta as duas moradas do truque --
+ * `magias_conhecidas` e `magias_customizadas`. Aqui só se responde de QUEM
+ * é cada um dos que já contam.
+ *
+ * SEM CARIMBO NÃO É SEMPRE INCERTO -- RULING R-B, o mesmo que
+ * `classeDaMagiaPreparada` (acima) já aplica: com EXATAMENTE UMA
+ * superfície de conjuração não há ambiguidade possível. Se o personagem
+ * só conjura por uma classe, todo truque que conta no limite é daquela
+ * classe, mesmo sem carimbo -- ficha antiga, ou truque personalizado, que
+ * nunca tem `classe` (ver `normalizarMagiaPersonalizada`,
+ * sheet/magias.js). Sem esta regra, o truque personalizado voltaria a ser
+ * DE GRAÇA num Mago de classe única, revertendo em silêncio a decisão do
+ * dono do produto de que "vaga é vaga, venha de onde vier".
+ *
+ * `semClasse` fica reservado ao caso em que a dúvida é real: DUAS ou mais
+ * superfícies e uma entrada sem carimbo. Aí a incerteza aparece na tela e
+ * não vira bloqueio -- mesma regra das preparadas.
+ *
+ * PURA: sem DOM, sem `fetch`, sem estado global.
+ *
+ * @param {object} personagem Personagem inteiro; `magias_conhecidas[]` e
+ *   `magias_customizadas[]` são lidos (por `truquesQueContamNoLimite`),
+ *   além de `classes[]` (por `superficiesDeConjuracao`).
+ * @param {string} nomeClasse Classe cujo orçamento está sendo medido.
+ * @param {Map<string, object>|null} [mapaDados] O `classesData` da ficha,
+ *   repassado tal e qual para `superficiesDeConjuracao`. Opcional: esta
+ *   função só usa a CONTAGEM de superfícies e o campo `classe` de cada
+ *   uma, nenhum dos quais depende de `mapaDados`.
+ * @returns {{desta: Array, deOutra: Array, semClasse: Array}} As entradas
+ *   originais (não cópias), cada uma em exatamente um balde.
+ */
+export function truquesPorClasse(personagem, nomeClasse, mapaDados = null) {
+  const resultado = { desta: [], deOutra: [], semClasse: [] };
+  const superficies = superficiesDeConjuracao(personagem, mapaDados);
+  // RULING R-B: uma superfície só -> o não carimbado é dela, sem chute.
+  const classeUnica = superficies.length === 1 ? superficies[0].classe : null;
+
+  for (const truque of truquesQueContamNoLimite(personagem)) {
+    const carimbo = typeof truque?.classe === 'string' ? truque.classe.trim() : '';
+    const classe = carimbo || classeUnica || '';
+    if (classe === '') {
+      resultado.semClasse.push(truque);
+    } else if (classe === nomeClasse) {
+      resultado.desta.push(truque);
+    } else {
+      resultado.deOutra.push(truque);
     }
   }
   return resultado;
