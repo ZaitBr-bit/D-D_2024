@@ -1,37 +1,42 @@
 // ============================================================
-// Issues #27 e #33: magia PERSONALIZADA de círculo 1+ não tinha como ser
-// preparada.
+// Issue #46: a magia PERSONALIZADA de círculo 1+ saiu da ESCOLHA.
 //
-// O jogador criava a magia pelo formulário "Magia Personalizada", ela era
-// gravada em `char.magias_customizadas` -- e parava ali. A seção
-// "Magias Customizadas" da ficha mostrava a linha marcada "Não preparada",
-// com editar e remover, sem "Conjurar". O caminho normal de preparo (o
-// modal "+ Magia" -> aba do círculo -> marcar) montava a grade de círculos
-// SÓ a partir da lista da classe (`obterMagiasDisponiveisClasseAtual`) e,
-// para o Mago, de `char.grimorio`: `char.magias_customizadas` nunca era
-// lido ali. Sem cartão na grade, não existia clique nenhum que fizesse a
-// magia virar `magias_preparadas`.
+// O QUE ESTE ARQUIVO MEDIA ANTES (issues #27 e #33). O jogador criava a
+// magia pelo formulário "Magia Personalizada", ela era gravada em
+// `char.magias_customizadas` -- e parava ali. A seção "Magias Customizadas"
+// da ficha mostrava a linha marcada "Não preparada", com editar e remover,
+// sem "Conjurar". O caminho normal de preparo (o modal "Preparar Magias" -> aba do
+// círculo -> marcar) montava a grade SÓ a partir da lista da classe e, para
+// o Mago, de `char.grimorio`: `char.magias_customizadas` nunca era lido ali.
+// Sem cartão na grade não existia clique nenhum capaz de fazer a magia
+// virar `magias_preparadas`. As #27/#33 puseram esse cartão na grade.
 //
-// Truque personalizado não sofria disso porque truque não passa por
-// preparo -- `sheet/magias.js` funde `truquesPersonalizados` direto em
-// `todosTruques`. Foi o próprio jogador quem notou ("como truque vai
-// direto").
+// O QUE A #46 MUDOU. O destino daquele caminho virou o ponto de partida: a
+// customizada de círculo é SEMPRE preparada, derivada de
+// `char.magias_customizadas`, e a ficha a desenha na seção Preparadas sem
+// clique nenhum. Com isso o cartão da grade deixou de ter função -- pior,
+// passou a ser um jeito de gravar uma SEGUNDA cópia da mesma magia em
+// `magias_preparadas` (medido na revisão da Tarefa 4: a ficha desenhava a
+// linha duas vezes, a segunda com `data-magia-custom-index="undefined"`, com
+// Editar e Remover mortos). O modal voltou a ser só o lugar de ESCOLHER da
+// lista da classe.
 //
-// Os testes CLICAM na aba do círculo e no cartão da magia (memória do
-// projeto: gatilho de tela só está entregue com um spec que clica nele) e
-// leem o personagem SALVO -- é a gravação em `magias_preparadas` que
-// nunca acontecia, e só a leitura do store mede isso.
+// A AFIRMAÇÃO QUE ESTES CENÁRIOS PRESERVAM não é "o clique de preparar
+// funciona" -- é "a magia é CONJURÁVEL", que agora vale sem clique nenhum.
+// Perder isso devolveria as #27/#33 em silêncio.
+//
+// E CADA CENÁRIO CARREGA O GUARDA CONTRA O EXCESSO. "A customizada não
+// aparece na grade" passaria por uma grade vazia, ou por um corte que
+// tivesse levado a magia da classe junto -- que é a regressão exatamente na
+// população que as #27/#33 existem para atender. Por isso todo cenário que
+// mede a SAÍDA da customizada afirma também que a magia da classe continua
+// sendo oferecida e clicável.
 //
 // O CLÉRIGO é a semente do cenário principal de propósito: é classe de
 // PREPARADAS e NÃO-Mago, exatamente o alcance da issue #27 (o print do
-// relato é de um personagem não-Mago). Para o Mago existia um desvio na
-// gravação do formulário, que empurrava a magia direto para
-// `char.grimorio` sem pagar o custo de cópia -- consertado à parte pela
-// issue #42 ("Magia customizada do Mago precisa ser copiada para o
-// grimorio"). O segundo cenário não depende mais desse desvio: ele semeia
-// `grimorio` à mão para cobrir o Mago que tem a mesma magia nos dois
-// lugares (por exemplo, depois de copiá-la com "+ Copiar Magia para
-// Grimório"), e guarda contra a fusão duplicando o cartão.
+// relato é de um personagem não-Mago). Os cenários leem o personagem SALVO,
+// e não só o DOM: é a AUSÊNCIA de gravação em `magias_preparadas` que esta
+// mudança produz, e só a leitura do store mede isso.
 // ============================================================
 import { test, expect } from '@playwright/test';
 import { ATRIBUTOS_REGRAS, abrirFicha, assentar, personagemSalvo } from './helpers-regras.mjs';
@@ -49,13 +54,15 @@ const MAGO = {
 };
 
 const NOME_MAGIA = 'Bênção de Nimb';
-// Segunda personalizada, que fica SEM preparar do começo ao fim: é o
-// contraste que impede a última afirmação do primeiro cenário de passar por
-// vacuidade. Com uma só, preparar a magia esvazia a seção "Magias
-// Customizadas" inteira e "não contém mais a magia" seria verdade sobre uma
-// seção que nem existe -- e passaria também numa regressão que apagasse a
-// seção por completo.
+// Segunda personalizada, de 2º círculo: o contraste que impede as
+// afirmações sobre a linha do 1º círculo de passarem por vacuidade -- com
+// uma só, "aparece uma vez" valeria também numa ficha que só sabe desenhar
+// uma linha.
 const NOME_MAGIA_2 = 'Selo de Nimb';
+// Magia de 1º círculo do Clérigo no ACERVO (dados/magias/circulo_1.json).
+// É o GUARDA CONTRA O EXCESSO de todo cenário: ela tem de continuar com
+// cartão e com check clicável na grade.
+const MAGIA_CLASSE = 'Bênção';
 
 // Carga e medição na forma que xss-campos-livres.spec.mjs já estabeleceu
 // neste diretório: `src=x` falha a carregar em qualquer navegador, então o
@@ -90,7 +97,8 @@ async function abrirTudo(page) {
 }
 
 /**
- * Abre o modal "Gerenciar Magias" (botão "+ Magia") e espera a grade
+ * Abre o modal "Preparar Magias" (o botão de mesmo nome da seção
+ * Magias) e espera a grade
  * existir -- `mostrarBuscaMagia` é async (carrega a lista de magias da
  * classe antes de montar o HTML), então esperar o elemento cobre essa
  * corrida em vez de um timeout fixo. Mesma forma que magia-classe.spec.mjs
@@ -103,6 +111,15 @@ async function abrirGerenciarMagias(page) {
   await assentar(page).catch(() => {});
 }
 
+/** Troca para a aba do círculo pedido dentro do modal "Preparar Magias". */
+async function abrirAbaCirculo(page, circulo) {
+  const aba = page.locator(`#tabs-gerenciar-magias [data-tab-mg="${circulo}"]`);
+  await expect(aba, `a aba do ${circulo}º círculo precisa existir para haver grade a medir`)
+    .toHaveCount(1);
+  await aba.click();
+  await assentar(page).catch(() => {});
+}
+
 /** Fecha o modal e deixa a ficha re-renderizada, para medir a seção Preparadas. */
 async function fecharModalERenderizar(page) {
   await page.evaluate(() => window.fecharModal?.());
@@ -110,7 +127,13 @@ async function fecharModalERenderizar(page) {
   await abrirTudo(page);
 }
 
-test('Clérigo: magia personalizada de 1º círculo pode ser preparada pelo modal "+ Magia"', async ({ context }) => {
+/** As entradas de `magias_preparadas` que carregam a marca `personalizada`. */
+async function preparadasMarcadas(page) {
+  const p = await personagemSalvo(page);
+  return (p?.magias_preparadas || []).filter((m) => m?.personalizada);
+}
+
+test('Clérigo: a customizada não tem cartão na grade do modal, e é conjurável na ficha assim mesmo', async ({ context }) => {
   const { page, erros } = await abrirFicha(context, {
     ...CLERIGO,
     magias_customizadas: [magiaCustom(), magiaCustom(NOME_MAGIA_2, 2)],
@@ -118,153 +141,204 @@ test('Clérigo: magia personalizada de 1º círculo pode ser preparada pelo moda
   await assentar(page).catch(() => {});
   await abrirTudo(page);
 
-  // GUARDA CONTRA VACUIDADE 1: hoje a magia vive na seção separada
-  // "Magias Customizadas", marcada "Não preparada". Sem essa linha na tela
-  // não haveria defeito nenhum a medir.
-  const secaoCustom = page.locator('[data-details-id="magias-customizadas-circulo"]');
-  await expect(secaoCustom,
-    'a magia personalizada de círculo 1 precisa começar na seção "Magias Customizadas" -- '
-    + 'é de lá que ela tem de sair ao ser preparada')
-    .toContainText(NOME_MAGIA);
-  await expect(secaoCustom,
-    'antes de preparar, a linha é a do relato: "Não preparada", sem Conjurar')
-    .toContainText('Não preparada');
+  // A CAPACIDADE PRESERVADA, medida ANTES de qualquer clique: sem preparo
+  // nenhum a magia já vive na seção do 1º círculo, com Conjurar. É o que as
+  // issues #27/#33 pediam, agora incondicional.
+  const linha = page.locator('[data-details-id="magias-circulo-1"] .magia-personalizada',
+    { hasText: NOME_MAGIA });
+  await expect(linha,
+    'a customizada de 1º círculo tem de aparecer UMA vez na seção Preparadas, sem clique '
+    + 'nenhum de preparo -- e uma vez só: duas linhas seriam a mesma magia entrando pela '
+    + 'derivação E por uma entrada gravada em magias_preparadas')
+    .toHaveCount(1);
+  await expect(linha.locator('[data-conjurar-magia-custom]'),
+    'a linha precisa ter o botão de Conjurar -- é a capacidade que as issues #27/#33 relatam '
+    + 'como ausente, e que a #46 tornou incondicional')
+    .toHaveCount(1);
+  await expect(page.locator('[data-details-id="magias-circulo-2"] .magia-personalizada',
+    { hasText: NOME_MAGIA_2 }),
+  'a segunda personalizada tem de estar desenhada no círculo DELA -- sem esse contraste, '
+  + '"aparece uma vez" valeria também numa ficha que só sabe desenhar uma linha')
+    .toHaveCount(1);
 
   await abrirGerenciarMagias(page);
+  await abrirAbaCirculo(page, 1);
 
-  // GUARDA CONTRA VACUIDADE 2: a aba do 1º círculo precisa existir para o
-  // clique abaixo significar alguma coisa (Clérigo 3 tem espaços de 1º e 2º).
-  const aba = page.locator('#tabs-gerenciar-magias [data-tab-mg="1"]');
-  await expect(aba, 'o Clérigo 3 tem espaços de 1º círculo -- a aba precisa existir').toHaveCount(1);
-  await aba.click();
-  await assentar(page).catch(() => {});
-
-  // A AÇÃO CENTRAL: o cartão da magia personalizada tem de estar na grade
-  // do 1º círculo, com o check clicável. É exatamente isto que não existia.
-  const cartao = page.locator(`#resultado-magias [data-circ-check="${NOME_MAGIA}"]`);
-  await expect(cartao,
-    'a magia personalizada de 1º círculo precisa aparecer na grade do círculo dela, junto '
-    + 'das magias da classe -- sem cartão não há caminho nenhum para prepará-la (issues #27/#33)')
+  // GUARDA CONTRA O EXCESSO, e ele vem PRIMEIRO: a grade tem de estar
+  // montada e a magia da CLASSE tem de continuar com cartão e com check.
+  // Sem isto, "a customizada não está na grade" passaria por uma grade
+  // vazia -- ou por um corte que levou a lista da classe junto.
+  const cartaoDaClasse = page.locator(`#resultado-magias [data-circ-check="${MAGIA_CLASSE}"]`);
+  await expect(cartaoDaClasse,
+    `"${MAGIA_CLASSE}" é magia de 1º círculo do Clérigo: o modal continua sendo o lugar de `
+    + 'escolher da lista da classe, e o check dela continua clicável')
     .toBeVisible({ timeout: 10_000 });
 
-  // O cartão precisa se identificar: numa grade em que todo o resto veio da
-  // lista da classe, o jogador tem de conseguir ver qual magia é invenção
-  // dele -- o mesmo que a ficha já faz com o selo "Personalizada".
+  // A REGRA NOVA: a magia do jogador não é escolha, então não tem cartão.
+  await expect(page.locator(`#resultado-magias [data-circ-check="${NOME_MAGIA}"]`),
+    'a customizada é SEMPRE preparada -- um cartão para "preparar" o que já está preparado só '
+    + 'grava uma segunda cópia da mesma magia em magias_preparadas')
+    .toHaveCount(0);
   await expect(page.locator('#resultado-magias .opcao-card', { hasText: NOME_MAGIA }),
-    'o cartão da magia personalizada tem de se identificar como tal na grade do círculo')
-    .toContainText('Personalizada');
+    'e ela não pode aparecer nem como cartão sem check: a grade é a lista da classe')
+    .toHaveCount(0);
 
-  await cartao.click();
+  // O clique na magia da CLASSE continua gravando -- e gravando SEM marca.
+  await cartaoDaClasse.click();
   await assentar(page).catch(() => {});
-
   await expect.poll(async () => {
     const p = await personagemSalvo(page);
-    return (p?.magias_preparadas || []).find((m) => m?.nome === NOME_MAGIA) || null;
+    return (p?.magias_preparadas || []).find((m) => m?.nome === MAGIA_CLASSE) || null;
   }, {
-    message: 'marcar a magia personalizada na grade tem de gravá-la em magias_preparadas[]',
+    message: 'marcar a magia da classe na grade tem de continuar gravando em magias_preparadas[]',
   }).not.toBeNull();
 
-  const preparada = (await personagemSalvo(page)).magias_preparadas.find((m) => m.nome === NOME_MAGIA);
-  expect(preparada.circulo,
-    'a entrada gravada tem de manter o círculo da magia')
-    .toBe(1);
-  expect(preparada.personalizada,
-    'a entrada precisa carregar `personalizada: true` -- é a marca que a seção Preparadas usa '
-    + 'para achar a magia em magias_customizadas[] e renderizar a linha personalizada (com '
-    + 'descrição, tags e o botão de Conjurar próprio dela)')
-    .toBe(true);
+  const preparada = (await personagemSalvo(page)).magias_preparadas
+    .find((m) => m.nome === MAGIA_CLASSE);
   expect(preparada.classe,
-    'preparada pela superfície do Clérigo, a entrada sai carimbada com essa classe -- é assim '
-    + 'que ela conta no limite de preparadas da classe (magia personalizada é escolha do '
-    + 'jogador, não concessão: não é origem isenta)')
+    'preparada pela superfície do Clérigo, a entrada sai carimbada com essa classe')
     .toBe('Clérigo');
+  expect(preparada.personalizada,
+    'este modal só grava magia da lista da classe: nenhuma entrada pode sair com a marca '
+    + '`personalizada` -- é ela que faz a ficha desenhar a magia duas vezes')
+    .toBeUndefined();
 
   await fecharModalERenderizar(page);
 
-  // O outro lado do conserto: preparada, a magia passa a viver na seção
-  // Preparadas do círculo dela, com Conjurar -- e SAI da seção "Magias
-  // Customizadas" sozinha (aquela seção filtra por "não está preparada").
-  const linhaPreparada = page.locator('[data-details-id="magias-circulo-1"] .magia-personalizada',
-    { hasText: NOME_MAGIA });
-  await expect(linhaPreparada,
-    'depois de preparada, a magia personalizada tem de aparecer na seção Preparadas do 1º círculo')
+  // DEPOIS DE MEXER NO MODAL a customizada continua desenhada UMA vez. É
+  // aqui que a duplicata medida na revisão da Tarefa 4 apareceria.
+  await expect(page.locator('[data-details-id="magias-circulo-1"] .magia-personalizada',
+    { hasText: NOME_MAGIA }),
+  'abrir o modal e preparar uma magia da classe não pode fazer a customizada duplicar')
     .toHaveCount(1);
-  await expect(linhaPreparada.locator('[data-conjurar-magia-custom]'),
-    'a linha preparada precisa ter o botão de Conjurar -- é a capacidade que as issues #27/#33 '
-    + 'relatam como ausente')
-    .toHaveCount(1);
-
-  const secaoDepois = page.locator('[data-details-id="magias-customizadas-circulo"]');
-  await expect(secaoDepois,
-    'a segunda personalizada continua sem preparo -- a seção tem de sobreviver, senão a '
-    + 'afirmação seguinte não distingue "a magia saiu" de "a seção inteira sumiu"')
-    .toContainText(NOME_MAGIA_2);
-  await expect(secaoDepois,
-    'preparada, a magia não pode continuar listada como "Magias Customizadas" não preparada')
-    .not.toContainText(NOME_MAGIA);
+  expect(await preparadasMarcadas(page),
+    'nenhum caminho deste modal pode gravar `personalizada: true` em magias_preparadas')
+    .toEqual([]);
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
 
-test('Mago: a magia personalizada aparece UMA vez na grade e é gravada como personalizada', async ({ context }) => {
-  // O desvio que empurrava a magia customizada direto para `char.grimorio`
-  // ao criá-la foi fechado pela issue #42 -- hoje ela só chega lá por cópia
-  // explícita ("+ Copiar Magia para Grimório"). Este cenário semeia
-  // `grimorio` à mão para simular esse Mago: a mesma magia nos dois
-  // lugares, o grimório (de onde a grade do Mago é montada) e a fusão nova
-  // de `magias_customizadas`. Duas fontes, um cartão só -- e o cartão que
-  // vence precisa ser o PERSONALIZADO, senão a entrada gravada sai sem
-  // `personalizada: true` e a seção Preparadas tenta buscar a descrição no
-  // acervo, onde a magia não existe.
+test('Clérigo: o check da aba "Preparadas Atuais" continua despreparando a magia da classe', async ({ context }) => {
+  // POR QUE ESTE CENÁRIO EXISTE. `data-remover-check` é o gatilho que
+  // desprepara pela aba "Preparadas Atuais", e os únicos cliques nele em
+  // toda a suíte estavam nos dois specs que a issue #46 reescreveu -- e
+  // eram sobre a magia PERSONALIZADA, que saiu desta aba com razão. A magia
+  // da CLASSE continua usando exatamente o mesmo caminho, e ficou sem
+  // ninguém clicando: medido, forçar o gate a nunca emitir o atributo
+  // deixava a suíte de regras INTEIRA verde.
+  //
+  // `gatilhos-ui-cobertos.test.mjs` não alcança este gatilho -- o motor
+  // dele varre `id="btn-..."` e `data-*-acao`, e este não é nenhum dos
+  // dois. Sem o cenário abaixo, uma edição futura que derrube o atributo ou
+  // o `findIndex` do handler passa despercebida.
+  //
+  // LÊ O STORE, não só o DOM: é a gravação que o gatilho existe para fazer.
   const { page, erros } = await abrirFicha(context, {
-    ...MAGO,
+    ...CLERIGO,
     magias_customizadas: [magiaCustom()],
-    grimorio: [{ nome: NOME_MAGIA, circulo: 1 }],
-  }, 'regras-magia-custom-preparar-mago');
+    magias_preparadas: [{ nome: MAGIA_CLASSE, circulo: 1, classe: 'Clérigo' }],
+  }, 'regras-magia-custom-preparar-desmarcar');
   await assentar(page).catch(() => {});
 
   await abrirGerenciarMagias(page);
-  await page.locator('#tabs-gerenciar-magias [data-tab-mg="1"]').click();
-  await assentar(page).catch(() => {});
 
-  const cartao = page.locator(`#resultado-magias [data-circ-check="${NOME_MAGIA}"]`);
-  await expect(cartao,
-    'a magia personalizada do Mago tem de aparecer EXATAMENTE uma vez na grade do 1º círculo '
-    + '-- uma pelo grimório (desvio da gravação) e outra pela fusão nova seria duplicata')
-    .toHaveCount(1);
-  await cartao.click();
+  // A aba "Preparadas Atuais" já abre ativa. GUARDA CONTRA VACUIDADE: o
+  // gatilho precisa existir, senão o clique abaixo não mede nada.
+  const check = page.locator(`#resultado-magias [data-remover-check="${MAGIA_CLASSE}"]`);
+  await expect(check,
+    'a magia da classe preparada precisa aparecer na aba com o check de desmarcar')
+    .toBeVisible({ timeout: 10_000 });
+  await expect(page.locator(`#resultado-magias [data-remover-check="${NOME_MAGIA}"]`),
+    'e a customizada não, porque ela não é entrada de magias_preparadas desde a issue #46')
+    .toHaveCount(0);
+
+  await check.click();
   await assentar(page).catch(() => {});
 
   await expect.poll(async () => {
     const p = await personagemSalvo(page);
-    return (p?.magias_preparadas || []).filter((m) => m?.nome === NOME_MAGIA).length;
+    return (p?.magias_preparadas || []).some((m) => m?.nome === MAGIA_CLASSE);
   }, {
-    message: 'a magia precisa ter sido gravada uma única vez em magias_preparadas[]',
-  }).toBe(1);
+    message: 'clicar no check tem de tirar a entrada de magias_preparadas[] do personagem salvo',
+  }).toBe(false);
 
-  const preparada = (await personagemSalvo(page)).magias_preparadas.find((m) => m.nome === NOME_MAGIA);
-  expect(preparada.personalizada,
-    'mesmo chegando à grade também pelo grimório, a magia É personalizada -- a entrada gravada '
-    + 'tem de dizer isso, ou a seção Preparadas procura a descrição no acervo e não acha nada')
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});
+
+test('Mago: nem pela cópia no grimório a customizada volta à grade do modal', async ({ context }) => {
+  // O Mago é o caso em que a customizada tinha uma segunda porta: a cópia
+  // paga para `char.grimorio` (issue #42), de onde a grade dele é montada.
+  // A issue #46 fechou as duas -- a busca de cópia não a oferece mais
+  // (grimorio-mago.spec.mjs) e `migrarCopiasCustomizadasDoGrimorio` limpa a
+  // cópia que já existia. Este cenário semeia essa ficha antiga.
+  //
+  // "Mísseis Mágicos" no grimório é o GUARDA CONTRA VACUIDADE: sem ela a
+  // grade do 1º círculo do Mago ficaria vazia depois da limpeza, e "a
+  // customizada não está lá" não distinguiria a regra de uma tela em branco.
+  const { page, erros } = await abrirFicha(context, {
+    ...MAGO,
+    magias_customizadas: [magiaCustom()],
+    grimorio: [{ nome: NOME_MAGIA, circulo: 1 }, { nome: 'Mísseis Mágicos', circulo: 1 }],
+  }, 'regras-magia-custom-preparar-mago');
+  await assentar(page).catch(() => {});
+  await abrirTudo(page);
+
+  // A CAPACIDADE PRESERVADA: conjurável, sem preparo e sem cópia paga.
+  const linha = page.locator('[data-details-id="magias-circulo-1"] .magia-personalizada',
+    { hasText: NOME_MAGIA });
+  await expect(linha, 'a customizada do Mago também é sempre preparada').toHaveCount(1);
+  await expect(linha.locator('[data-conjurar-magia-custom]'),
+    'e conjurável a partir da própria linha').toHaveCount(1);
+
+  await abrirGerenciarMagias(page);
+  await abrirAbaCirculo(page, 1);
+
+  const cartaoDoLivro = page.locator('#resultado-magias [data-circ-check="Mísseis Mágicos"]');
+  await expect(cartaoDoLivro,
+    'GUARDA CONTRA O EXCESSO: a magia do LIVRO continua na grade do Mago, com check -- a grade '
+    + 'dele é o grimório, e ela não pode ter sido esvaziada junto')
+    .toBeVisible({ timeout: 10_000 });
+
+  await expect(page.locator('#resultado-magias .opcao-card', { hasText: NOME_MAGIA }),
+    'a customizada não pode ter cartão nem chegando pelo grimório: a cópia paga foi removida '
+    + 'pela migração da #46, porque comprá-la não comprava mais nada')
+    .toHaveCount(0);
+
+  await cartaoDoLivro.click();
+  await assentar(page).catch(() => {});
+
+  const salvo = await personagemSalvo(page);
+  expect((salvo.grimorio || []).map((m) => m.nome),
+    'o grimório fica só com a magia do livro -- a cópia da customizada saiu na migração')
+    .toEqual(['Mísseis Mágicos']);
+  expect(salvo.magias_preparadas.filter((m) => m.personalizada),
+    'e o clique na magia do livro não grava marca nenhuma de personalizada')
+    .toEqual([]);
+  expect(salvo.magias_preparadas.some((m) => m.nome === 'Mísseis Mágicos'),
+    'o preparo pelo grimório continua funcionando -- sem isto, "nada foi gravado" passaria '
+    + 'por um modal quebrado')
     .toBe(true);
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
 
-test('grade de círculos: NENHUM campo da magia personalizada vira HTML', async ({ context }) => {
-  // Mesma disciplina (e a mesma carga) de xss-campos-livres.spec.mjs,
-  // aplicada aos campos que este conserto passou a levar para dentro do
-  // modal. O modelo de ameaça é o daquele arquivo: fichas CIRCULAM (o README
-  // ensina a exportar e passar adiante, o formulário de bug pede o arquivo
-  // exportado em anexo), então ficha de terceiro é entrada não confiável.
+test('NENHUM campo da magia personalizada vira HTML na ficha', async ({ context }) => {
+  // Mesma disciplina (e a mesma carga) de xss-campos-livres.spec.mjs. O
+  // modelo de ameaça é o daquele arquivo: fichas CIRCULAM (o README ensina a
+  // exportar e passar adiante, o formulário de bug pede o arquivo exportado
+  // em anexo), então ficha de terceiro é entrada não confiável.
   //
-  // A carga vai em TODO campo, não só no nome: a primeira versão deste
+  // O DESTINO MUDOU COM A #46, a exigência não. Antes os campos livres da
+  // magia do jogador chegavam ao modal "Preparar Magias" (grade, sub-modal de
+  // detalhes e aba "Preparadas Atuais"); a customizada saiu de lá e passou a
+  // ser desenhada na seção Preparadas da ficha, com o painel de descrição
+  // dela. É esse o par de superfícies medido aqui.
+  //
+  // A carga vai em TODO campo, não só no nome: uma versão anterior deste
   // cenário só envenenava `nome` e por isso nascia verde por cima de
-  // `escola`, que chega ao mesmo `innerHTML` duas linhas abaixo. Um oráculo
-  // que só cobre o campo de que o autor se lembrou não mede o que ele acha
-  // que mede. `classes` e `circulo_superior` não existem no formulário --
-  // só uma ficha importada os traz --, e é justamente por isso que estão
-  // aqui: eles chegam ao sub-modal de detalhes.
+  // `escola`, que chega ao mesmo `innerHTML` duas linhas abaixo. `classes` e
+  // `circulo_superior` não existem no formulário -- só uma ficha importada
+  // os traz --, e é justamente por isso que estão aqui.
   const MAGIA_ENVENENADA = {
     nome: `Bencao ${CARGA}`,
     circulo: 1,
@@ -284,6 +358,7 @@ test('grade de círculos: NENHUM campo da magia personalizada vira HTML', async 
     magias_customizadas: [MAGIA_ENVENENADA],
   }, 'regras-magia-custom-preparar-escape');
   await assentar(page).catch(() => {});
+  await abrirTudo(page);
 
   /** Afirma os dois indicadores de injeção de uma vez, com o lugar no recado. */
   const exigirLimpo = async (onde) => {
@@ -292,296 +367,207 @@ test('grade de círculos: NENHUM campo da magia personalizada vira HTML', async 
     expect(tagsInjetadas, `a carga virou tag <img> de verdade no DOM em ${onde}`).toBe(0);
   };
 
-  await exigirLimpo('a ficha, antes de abrir o modal');
+  await exigirLimpo('a ficha');
 
-  // Lê os nomes que os gatilhos da grade guardam, já decodificados pelo
-  // navegador -- é o valor que o manipulador de clique vai enxergar em
-  // `el.dataset`, não o texto cru do HTML.
-  const nomesDoGatilho = (atributo) => page.evaluate((attr) => Array.from(
-    document.querySelectorAll(`#resultado-magias [${attr}]`),
-  ).map((el) => el.getAttribute(attr)), atributo);
-
-  await abrirGerenciarMagias(page);
-  await page.locator('#tabs-gerenciar-magias [data-tab-mg="1"]').click();
-  await assentar(page).catch(() => {});
-
-  await exigirLimpo('a grade de círculos');
-  // GUARDA CONTRA VACUIDADE 1: o gatilho precisa existir COM o nome íntegro
-  // -- a aspa dupla dentro da carga fecha o atributo antes da hora se o nome
-  // não for escapado, e aí o `data-circ-check` chega TRUNCADO ao clique (a
-  // magia certa deixa de ser encontrada). Sem esta afirmação, "não injetou"
-  // seria verdade por acidente, sobre um cartão já quebrado de outro jeito.
-  expect(await nomesDoGatilho('data-circ-check'),
-    'o cartão precisa existir e guardar o nome INTEIRO no atributo do gatilho')
-    .toContain(MAGIA_ENVENENADA.nome);
-  // GUARDA CONTRA VACUIDADE 2: escapar não pode virar apagar. O texto tem de
-  // continuar na tela, como texto -- e `escola` é o campo que faltava.
-  // O cartão é localizado pelo SELO, não pelo texto da carga -- procurá-lo
-  // pela própria carga tornaria a afirmação circular.
-  await expect(page.locator('#resultado-magias .opcao-card', { hasText: 'Personalizada' }),
-    'o nome e a escola têm de continuar visíveis no cartão, só que como texto')
-    .toContainText('XSS-MARCA');
-
-  // O sub-modal de detalhes é o segundo destino: ele recebe escola, tempo,
-  // alcance, componentes, duração, descrição, `classes` e `circulo_superior`.
-  await page.locator('#resultado-magias .opcao-card', { hasText: 'Personalizada' })
-    .locator('[data-detalhe-magia]').click();
-  await expect(page.locator('.sub-modal-overlay'),
-    'o sub-modal de detalhes precisa abrir para haver o que medir nele')
-    .toContainText('XSS-MARCA');
-  await exigirLimpo('o sub-modal de detalhes');
-  await page.evaluate(() => window.fecharModal?.());
-  await assentar(page).catch(() => {});
-
-  // O clique é por JS casando o `dataset` decodificado: um seletor CSS com a
-  // aspa dupla da carga dentro não é sequer sintaxe válida -- e é exatamente
-  // o `dataset` que o manipulador de clique do produto lê.
-  const clicou = await page.evaluate((alvo) => {
-    const el = Array.from(document.querySelectorAll('#resultado-magias [data-circ-check]'))
-      .find((e) => e.dataset.circCheck === alvo);
-    if (!el) return false;
-    el.click();
-    return true;
-  }, MAGIA_ENVENENADA.nome);
-  expect(clicou, 'o gatilho da magia personalizada tem de ser encontrável pelo nome exato').toBe(true);
-  await assentar(page).catch(() => {});
-
-  // A aba "Preparadas Atuais" é o terceiro destino, e só passa a receber
-  // magia personalizada por causa deste conserto.
-  await page.locator('#tabs-gerenciar-magias [data-tab-mg="preparadas"]').click();
-  await assentar(page).catch(() => {});
-  await exigirLimpo('a aba "Preparadas Atuais"');
-  expect(await nomesDoGatilho('data-remover-check'),
-    'a magia precisa aparecer inteira na aba de preparadas para haver o que medir -- e é o '
-    + 'clique nesse gatilho que a remove depois')
-    .toContain(MAGIA_ENVENENADA.nome);
-
-  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
-});
-
-test('grade de círculos: clicar no nome da magia personalizada abre a descrição dela', async ({ context }) => {
-  // Consequência direta do cartão novo, não achado avulso: o nome do cartão
-  // é um gatilho de clique (`data-detalhe-magia`) que busca a magia no
-  // ACERVO (`getMagiasPorCirculo`). Magia personalizada não está lá -- sem
-  // esta guarda, o cartão que a correção acabou de colocar na grade responde
-  // ao clique com o toast vermelho "Detalhes não encontrados". A mesma forma
-  // da issue #39, que já tinha mordido o painel do Grimório.
-  // O escape dos metadados deste sub-modal é medido pelo cenário da carga,
-  // acima. Aqui a pergunta é só uma: a descrição ABRE?
-  const { page, erros } = await abrirFicha(context, {
-    ...CLERIGO,
-    magias_customizadas: [magiaCustom()],
-  }, 'regras-magia-custom-preparar-detalhe');
-  await assentar(page).catch(() => {});
-
-  await abrirGerenciarMagias(page);
-  await page.locator('#tabs-gerenciar-magias [data-tab-mg="1"]').click();
-  await assentar(page).catch(() => {});
-
-  const nome = page.locator(`#resultado-magias [data-detalhe-magia="${NOME_MAGIA}"]`);
-  await expect(nome, 'o cartão da magia personalizada precisa existir para haver clique a medir')
+  // GUARDA CONTRA VACUIDADE 1: a linha precisa existir, e existir com o
+  // texto na tela -- escapar não pode virar apagar.
+  const linha = page.locator('[data-details-id="magias-circulo-1"] .magia-personalizada');
+  await expect(linha, 'a customizada envenenada tem de estar desenhada -- sem linha, nada a medir')
     .toHaveCount(1);
-  await nome.click();
+  await expect(linha,
+    'o nome e as tags têm de continuar visíveis, só que como TEXTO')
+    .toContainText('XSS-MARCA');
 
-  await expect(page.locator('.sub-modal-overlay'),
-    'clicar no nome tem de abrir o sub-modal de detalhes da magia personalizada, lido da ficha '
-    + '-- não o toast de erro de quem só sabe procurar no acervo')
-    .toContainText(magiaCustom().descricao);
+  // GUARDA CONTRA VACUIDADE 2: o gatilho da linha é o ÍNDICE em
+  // `magias_customizadas`, e é ele que leva o clique ao handler certo. Um
+  // índice ausente (ou `undefined`) deixaria os botões mortos e a medição
+  // seguinte sem sentido.
+  expect(await linha.getAttribute('data-magia-custom-index'),
+    'a linha precisa carregar o índice da magia em magias_customizadas')
+    .toBe('0');
 
-  await expect(page.locator('#toast-container'),
-    'nenhum toast de "Detalhes não encontrados" pode aparecer')
-    .not.toContainText('Detalhes não encontrados');
+  // O painel de descrição é o segundo destino: ele recebe escola, tempo,
+  // alcance, componentes, duração, descrição e dano.
+  const descricao = linha.locator('.magia-desc');
+  await expect(descricao, 'a descrição não pode estar visível antes do clique').toBeHidden();
+  await linha.locator('.magia-nome').click();
+  await expect(descricao,
+    'clicar na linha tem de abrir a descrição lida de char.magias_customizadas')
+    .toBeVisible();
+  await expect(descricao, 'e o texto envenenado aparece nela como texto').toContainText('XSS-MARCA');
+  await exigirLimpo('o painel de descrição da linha personalizada');
+
+  // E o modal continua limpo -- porque a customizada não chega mais nele.
+  await abrirGerenciarMagias(page);
+  await abrirAbaCirculo(page, 1);
+  await expect(page.locator(`#resultado-magias [data-circ-check="${MAGIA_CLASSE}"]`),
+    'GUARDA CONTRA O EXCESSO: a grade da classe continua montada')
+    .toHaveCount(1);
+  await expect(page.locator('#resultado-magias'),
+    'nenhum campo da magia personalizada pode chegar ao modal: ela saiu da grade, da aba de '
+    + 'preparadas e da lista de troca')
+    .not.toContainText('XSS-MARCA');
+  await exigirLimpo('o modal "Preparar Magias"');
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
 
-test('Clérigo com personalizada HOMÔNIMA de uma magia da classe: as duas continuam na grade', async ({ context }) => {
-  // O contraste do cenário do Mago: lá a mesma magia chega por dois caminhos
-  // e tem de virar UM cartão; aqui são DUAS magias diferentes que por acaso
-  // têm o mesmo nome, e as duas têm de ficar.
-  //
+test('personalizada HOMÔNIMA de uma magia da classe: a grade mostra só a do livro, e as duas convivem na ficha', async ({ context }) => {
   // "Bênção" é magia de 1º círculo do Clérigo no acervo. Nada impede o
   // jogador de criar a SUA "Bênção" personalizada -- o formulário só exige
-  // nome não vazio. Um dedup por nome que valesse para todo mundo apagaria a
-  // magia do LIVRO da grade, e o jogador perderia o caminho para prepará-la:
-  // regressão exatamente na população que esta tarefa existe para atender (o
-  // conjurador não-Mago). Por isso o dedup só vale contra a cópia que o
-  // desvio da gravação deixa em `char.grimorio`, do Mago.
+  // nome não vazio. Homônimas não são a mesma magia.
+  //
+  // Antes da #46 as duas tinham cartão na grade, e o app precisava de uma
+  // maquinaria inteira para saber em qual delas o jogador tinha clicado
+  // (`nomesEmDisputa`, `data-circ-personalizada`). Com a customizada fora da
+  // grade, a disputa acabou: o único cartão é o da magia do LIVRO, e a magia
+  // do jogador vive na ficha, sempre preparada. As duas continuam existindo
+  // -- é isso que este cenário guarda.
   const { page, erros } = await abrirFicha(context, {
     ...CLERIGO,
-    magias_customizadas: [magiaCustom('Bênção', 1)],
+    magias_customizadas: [magiaCustom(MAGIA_CLASSE, 1)],
   }, 'regras-magia-custom-preparar-homonima');
   await assentar(page).catch(() => {});
 
   await abrirGerenciarMagias(page);
-  await page.locator('#tabs-gerenciar-magias [data-tab-mg="1"]').click();
-  await assentar(page).catch(() => {});
+  await abrirAbaCirculo(page, 1);
 
-  const cartoes = page.locator('#resultado-magias .opcao-card', { hasText: 'Bênção' });
+  const cartoes = page.locator('#resultado-magias .opcao-card', { hasText: MAGIA_CLASSE });
   await expect(cartoes,
-    'a "Bênção" do livro e a "Bênção" do jogador são magias DIFERENTES: as duas têm de ter '
-    + 'cartão na grade do 1º círculo')
-    .toHaveCount(2);
-
-  const daClasse = cartoes.filter({ hasNotText: 'Personalizada' });
-  const doJogador = cartoes.filter({ hasText: 'Personalizada' });
-  await expect(doJogador,
-    'exatamente um dos dois cartões é o personalizado -- é o selo que deixa o jogador '
-    + 'distinguir um do outro numa grade em que os dois se chamam igual')
+    'na grade sobra UM cartão com esse nome: o da magia do livro. O do jogador saiu com a #46, '
+    + 'e o do livro não pode ter ido junto -- perder o caminho para prepará-la seria regressão '
+    + 'na população que as #27/#33 existem para atender')
     .toHaveCount(1);
-  await expect(daClasse, 'e o outro é o do acervo, sem selo').toHaveCount(1);
 
-  // A AÇÃO: preparar pela magia do LIVRO. Ela tem de entrar como magia do
-  // livro -- sem `personalizada` --, senão a seção Preparadas da ficha
-  // resolve o nome em `magias_customizadas` e mostra a magia do JOGADOR no
-  // lugar da que ele acabou de escolher.
-  await daClasse.locator('[data-circ-check]').click();
+  await cartoes.locator('[data-circ-check]').click();
   await assentar(page).catch(() => {});
 
   await expect.poll(async () => {
     const p = await personagemSalvo(page);
-    return (p?.magias_preparadas || []).find((m) => m?.nome === 'Bênção') || null;
+    return (p?.magias_preparadas || []).filter((m) => m?.nome === MAGIA_CLASSE).length;
   }, {
-    message: 'preparar pelo cartão da magia do livro tem de gravar a magia em magias_preparadas',
-  }).not.toBeNull();
+    message: 'preparar pelo cartão da magia do livro tem de gravar UMA entrada',
+  }).toBe(1);
 
-  const preparada = (await personagemSalvo(page)).magias_preparadas.find((m) => m.nome === 'Bênção');
+  const preparada = (await personagemSalvo(page)).magias_preparadas
+    .find((m) => m.nome === MAGIA_CLASSE);
   expect(preparada.personalizada,
-    'o cartão clicado foi o do ACERVO: a entrada não pode sair marcada como personalizada só '
-    + 'porque existe uma magia do jogador com o mesmo nome -- quem responde "qual cartão foi '
-    + 'clicado?" é o cartão, não a ficha')
+    'o cartão clicado é o do ACERVO: a entrada não pode sair marcada como personalizada só '
+    + 'porque existe uma magia do jogador com o mesmo nome -- com a marca, a ficha desenharia '
+    + 'a magia do jogador no lugar da que ele escolheu')
     .toBeUndefined();
 
-  // E a magia do jogador continua na grade, disponível.
-  await expect(doJogador,
-    'preparar a magia do livro não pode fazer a personalizada homônima sumir da grade')
-    .toHaveCount(1);
-
-  // A TELA NÃO PODE MENTIR. `selecionadasSet` era montado só por NOME: com a
-  // do livro preparada, o check acendia nos DOIS cartões, e a grade afirmava
-  // que a magia do jogador estava preparada quando não estava.
-  await expect(daClasse,
-    'o cartão preparado é o do livro -- é nele, e só nele, que o check acende')
+  // E o cartão preparado é o do livro, aceso: a tela não pode mentir sobre
+  // qual das duas está preparada.
+  await expect(cartoes, 'o cartão do livro fica marcado depois do clique')
     .toHaveClass(/selecionada/);
-  await expect(doJogador,
-    'a magia do jogador NÃO está preparada: o cartão dela não pode aparecer marcado só '
-    + 'porque existe uma homônima preparada')
-    .not.toHaveClass(/selecionada/);
 
-  // O CLIQUE NO SEGUNDO CARTÃO -- o caminho que destruía a preparação do
-  // livro em silêncio. `findIndex(m => m.nome === nome)` casava por nome, ia
-  // para o ramo de REMOÇÃO e apagava a entrada do livro, com toast
-  // "Bênção removida", enquanto o jogador achava que estava preparando a
-  // dele. Sem este clique o cenário não mede nada.
-  await doJogador.locator('[data-circ-check]').click();
-  await assentar(page).catch(() => {});
+  await fecharModalERenderizar(page);
 
-  await expect(page.locator('#toast-container'),
-    'o app precisa DIZER por que não deu -- a limitação (uma vaga por nome) tem de aparecer '
-    + 'para o jogador, não agir em silêncio')
-    .toContainText('já está preparada');
-  await expect(page.locator('#toast-container'),
-    'e o que não pode acontecer de jeito nenhum é a tentativa ser lida como "despreparar a '
-    + 'do livro"')
-    .not.toContainText('removida');
-
-  const depois = (await personagemSalvo(page)).magias_preparadas.filter((m) => m.nome === 'Bênção');
-  expect(depois.length,
-    'a preparação do livro tem de sobreviver ao clique no cartão da homônima -- destruí-la em '
-    + 'silêncio era o pior dos danos')
-    .toBe(1);
-  expect(depois[0].personalizada,
-    'e a que sobrou tem de continuar sendo a do LIVRO, não trocada pela do jogador')
-    .toBeUndefined();
-
-  // E o caminho normal continua funcionando: clicar no cartão preparado
-  // desprepara. Sem esta afirmação, "não removeu" passaria também numa
-  // regressão que tivesse quebrado o despreparo inteiro.
-  await daClasse.locator('[data-circ-check]').click();
-  await assentar(page).catch(() => {});
-  await expect.poll(async () => {
-    const p = await personagemSalvo(page);
-    return (p?.magias_preparadas || []).some((m) => m?.nome === 'Bênção');
-  }, {
-    message: 'clicar no cartão da magia preparada tem de desprepará-la, como sempre fez',
-  }).toBe(false);
+  // A FICHA MOSTRA AS DUAS. Uma linha do livro (handler do acervo) e uma
+  // linha personalizada (handler que lê char.magias_customizadas).
+  const bloco1 = page.locator('[data-details-id="magias-circulo-1"]');
+  await expect(bloco1.locator(`.magia-item[data-magia-nome="${MAGIA_CLASSE}"]`),
+    'a magia do livro, preparada agora, sai com data-magia-nome')
+    .toHaveCount(1);
+  await expect(bloco1.locator('.magia-personalizada[data-magia-custom-index]'),
+    'e a homônima do jogador continua desenhada ao lado dela, sempre preparada -- as duas são '
+    + 'magias diferentes, e nenhuma pode apagar a outra')
+    .toHaveCount(1);
+  await expect(bloco1.locator('.magia-personalizada [data-conjurar-magia-custom]'),
+    'a do jogador continua conjurável').toHaveCount(1);
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
 
-test('homônimas em círculos DIFERENTES: o clique não alcança a entrada da outra', async ({ context }) => {
-  // A variante entre círculos do mesmo defeito: o ramo de remoção não é
-  // escopado por círculo, então a personalizada de 2º círculo resolvia para
-  // a entrada da magia da classe preparada no 1º -- duas abas diferentes
-  // disputando a MESMA entrada única.
+test('homônimas em círculos DIFERENTES: cada uma na seção do seu círculo, nenhuma some', async ({ context }) => {
+  // A variante entre círculos. `magias_preparadas[]` é indexada por NOME no
+  // app inteiro, e o handler de despreparo casa por nome: antes da #46, o
+  // cartão da personalizada de 2º círculo resolvia para a entrada da magia
+  // da classe preparada no 1º -- duas abas disputando a MESMA entrada. Sem
+  // o cartão a disputa não existe, e o que fica a medir é que a fusão do
+  // render não confunde os dois círculos.
   const { page, erros } = await abrirFicha(context, {
     ...CLERIGO,
-    magias_customizadas: [magiaCustom('Bênção', 2)],
-    magias_preparadas: [{ nome: 'Bênção', circulo: 1, classe: 'Clérigo' }],
+    magias_customizadas: [magiaCustom(MAGIA_CLASSE, 2)],
+    magias_preparadas: [{ nome: MAGIA_CLASSE, circulo: 1, classe: 'Clérigo' }],
   }, 'regras-magia-custom-preparar-homonima-circulos');
   await assentar(page).catch(() => {});
+  await abrirTudo(page);
+
+  await expect(page.locator(`[data-details-id="magias-circulo-1"] .magia-item[data-magia-nome="${MAGIA_CLASSE}"]`),
+    'a magia da classe preparada no 1º círculo continua desenhada no 1º')
+    .toHaveCount(1);
+  await expect(page.locator('[data-details-id="magias-circulo-1"] .magia-personalizada'),
+    'e nenhuma linha personalizada aparece no 1º círculo -- a do jogador é de 2º')
+    .toHaveCount(0);
+  await expect(page.locator('[data-details-id="magias-circulo-2"] .magia-personalizada',
+    { hasText: MAGIA_CLASSE }),
+  'a personalizada de 2º círculo é desenhada no círculo DELA, sempre preparada')
+    .toHaveCount(1);
 
   await abrirGerenciarMagias(page);
-  await page.locator('#tabs-gerenciar-magias [data-tab-mg="2"]').click();
-  await assentar(page).catch(() => {});
+  await abrirAbaCirculo(page, 2);
+  await expect(page.locator('#resultado-magias .opcao-card').first(),
+    'GUARDA CONTRA O EXCESSO: a aba do 2º círculo continua montando a lista da classe')
+    .toBeVisible();
+  await expect(page.locator('#resultado-magias .opcao-card', { hasText: MAGIA_CLASSE }),
+    'e o cartão do jogador não está lá: "Bênção" não é magia de 2º círculo do Clérigo, então '
+    + 'nenhum cartão com esse nome pode aparecer nesta aba')
+    .toHaveCount(0);
 
-  const doJogador = page.locator('#resultado-magias .opcao-card', { hasText: 'Bênção' })
-    .filter({ hasText: 'Personalizada' });
-  // GUARDA CONTRA VACUIDADE: o cartão de 2º círculo precisa existir.
-  await expect(doJogador, 'a personalizada de 2º círculo precisa ter cartão na aba do 2º círculo')
-    .toHaveCount(1);
-  await expect(doJogador,
-    'a entrada preparada é de 1º círculo e é a da classe: o cartão de 2º círculo do jogador '
-    + 'não pode nascer marcado')
-    .not.toHaveClass(/selecionada/);
-
-  await doJogador.locator('[data-circ-check]').click();
-  await assentar(page).catch(() => {});
-
-  const depois = (await personagemSalvo(page)).magias_preparadas.filter((m) => m.nome === 'Bênção');
-  expect(depois.length,
-    'clicar na personalizada de 2º círculo não pode apagar a magia da classe preparada no 1º')
-    .toBe(1);
-  expect(depois[0].circulo,
-    'e a que sobrou tem de ser a de 1º círculo, intacta')
-    .toBe(1);
+  const depois = (await personagemSalvo(page)).magias_preparadas
+    .filter((m) => m.nome === MAGIA_CLASSE);
+  expect(depois.length, 'a entrada da classe continua intacta').toBe(1);
+  expect(depois[0].circulo, 'e continua sendo a de 1º círculo').toBe(1);
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
 
-test('ficha antiga: personalizada preparada SEM a marca ainda casa com o cartão dela', async ({ context }) => {
-  // O outro lado da desambiguação: ela não pode ser estrita a ponto de
-  // deixar de reconhecer o que já está gravado. Antes desta tarefa o Mago
-  // conseguia preparar a personalizada pela grade (ela chegava lá pelo
-  // grimório) e a entrada saía SEM `personalizada` -- fichas assim existem.
-  // Sem homônima na grade, o nome basta e tem de bastar.
+test('ficha das issues #27/#33: a entrada preparada da customizada sai, e a magia aparece UMA vez', async ({ context }) => {
+  // A ficha que as #27/#33 produziram: o jogador clicou em "Preparar" na
+  // grade e a entrada foi gravada em `magias_preparadas` com
+  // `personalizada: true`. Com a customizada agora DERIVADA de
+  // `magias_customizadas`, essa entrada é uma segunda cópia da mesma magia
+  // -- e é `migrarMagiasCustomizadasSemprePreparadas` (sheet/migracoes.js)
+  // que a remove, a cada abertura de ficha.
+  //
+  // Medido pela TELA e pelo STORE: a migração tem teste de unidade próprio,
+  // mas nada media o efeito dela na ficha, que é onde o jogador veria a
+  // linha duplicada.
   const { page, erros } = await abrirFicha(context, {
-    ...MAGO,
+    ...CLERIGO,
     magias_customizadas: [magiaCustom()],
-    grimorio: [{ nome: NOME_MAGIA, circulo: 1 }],
-    magias_preparadas: [{ nome: NOME_MAGIA, circulo: 1, classe: 'Mago' }],
+    magias_preparadas: [
+      { nome: NOME_MAGIA, circulo: 1, classe: 'Clérigo', personalizada: true },
+      { nome: MAGIA_CLASSE, circulo: 1, classe: 'Clérigo' },
+    ],
   }, 'regras-magia-custom-preparar-legado');
   await assentar(page).catch(() => {});
+  await abrirTudo(page);
 
-  await abrirGerenciarMagias(page);
-  await page.locator('#tabs-gerenciar-magias [data-tab-mg="1"]').click();
-  await assentar(page).catch(() => {});
+  const bloco1 = page.locator('[data-details-id="magias-circulo-1"]');
+  await expect(bloco1.locator('.magia-item', { hasText: NOME_MAGIA }),
+    'a magia do jogador tem de aparecer UMA vez -- a entrada antiga e a derivação são a mesma '
+    + 'magia, e desenhar as duas põe na tela uma linha com índice inválido, sem Editar nem '
+    + 'Remover')
+    .toHaveCount(1);
+  await expect(bloco1.locator('.magia-personalizada[data-magia-custom-index]', { hasText: NOME_MAGIA }),
+    'e a que fica é a DERIVADA, com o índice que leva o clique ao handler de '
+    + 'char.magias_customizadas')
+    .toHaveCount(1);
+  await expect(bloco1.locator(`.magia-item[data-magia-nome="${MAGIA_CLASSE}"]`),
+    'GUARDA CONTRA O EXCESSO: a magia da classe preparada na mesma ficha continua desenhada -- '
+    + 'a migração não pode levar entrada que não é da customizada')
+    .toHaveCount(1);
 
-  const cartao = page.locator('#resultado-magias .opcao-card', { hasText: NOME_MAGIA });
-  await expect(cartao,
-    'a entrada gravada é essa magia, ainda que sem a marca: o cartão tem de aparecer marcado')
-    .toHaveClass(/selecionada/);
-
-  await cartao.locator('[data-circ-check]').click();
-  await assentar(page).catch(() => {});
-
-  await expect.poll(async () => {
-    const p = await personagemSalvo(page);
-    return (p?.magias_preparadas || []).some((m) => m?.nome === NOME_MAGIA);
-  }, {
-    message: 'e o clique tem de desprepará-la -- uma desambiguação estrita demais deixaria a '
-      + 'magia presa, sem jeito de tirar pela grade',
-  }).toBe(false);
+  const salvo = await personagemSalvo(page);
+  expect(salvo.magias_preparadas.map((m) => m.nome),
+    'a entrada marcada sai de magias_preparadas; a da classe fica')
+    .toEqual([MAGIA_CLASSE]);
+  expect(await preparadasMarcadas(page),
+    'e não sobra nenhuma marca `personalizada` no personagem salvo')
+    .toEqual([]);
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
@@ -601,16 +587,15 @@ const MULTICLASSE = {
   schema_versao: 2,
 };
 
-test('multiclasse: a homônima preparada em OUTRA classe não é apagada pelo cartão desta', async ({ context }) => {
+test('multiclasse: a customizada não tem cartão em superfície nenhuma, e a preparada da outra classe fica intacta', async ({ context }) => {
   // O residual que só o multiclasse revela. "Mísseis Mágicos" é magia de 1º
-  // círculo do MAGO e não existe na lista do Clérigo -- então, na aba do
-  // Clérigo, o único cartão com esse nome é o da magia personalizada. As duas
-  // homônimas nunca aparecem na MESMA grade, e um conjunto de disputa
-  // derivado dos cartões renderizados não enxerga colisão nenhuma: o cartão
-  // do jogador nascia aceso pela entrada do Mago, e o clique fazia `splice`
-  // nela com o toast "removida".
+  // círculo do MAGO e não existe na lista do Clérigo. Antes da #46, na aba
+  // do Clérigo o único cartão com esse nome era o da personalizada -- ele
+  // nascia aceso pela entrada do MAGO e o clique fazia `splice` nela, com o
+  // toast "removida". A entrada do Mago era destruída em silêncio.
   //
-  // Quem sabe de quem é a entrada é o DADO (`classe: 'Mago'`), não a tela.
+  // Sem cartão nenhum, o caminho para essa destruição fechou. O que este
+  // cenário guarda é que ele fechou sem levar a lista do Clérigo junto.
   const { page, erros } = await abrirFicha(context, {
     ...MULTICLASSE,
     magias_customizadas: [magiaCustom('Mísseis Mágicos', 1)],
@@ -619,9 +604,7 @@ test('multiclasse: a homônima preparada em OUTRA classe não é apagada pelo ca
   await assentar(page).catch(() => {});
 
   // A superfície ativa tem de ser a do CLÉRIGO -- é a aba onde a magia do
-  // Mago não aparece, e é aí que o defeito mora. Clérigo é a classe inicial,
-  // então já é a ativa; a afirmação existe para o cenário não passar a medir
-  // a aba errada em silêncio se esse padrão mudar.
+  // Mago não aparece, e é aí que o defeito morava.
   await expect(page.locator('#tabs-superficie-magia'),
     'o personagem precisa ter as duas superfícies de conjuração para o cenário existir')
     .toBeVisible({ timeout: 10_000 });
@@ -630,96 +613,81 @@ test('multiclasse: a homônima preparada em OUTRA classe não é apagada pelo ca
     .toHaveCount(1);
 
   await abrirGerenciarMagias(page);
-  await page.locator('#tabs-gerenciar-magias [data-tab-mg="1"]').click();
-  await assentar(page).catch(() => {});
+  await abrirAbaCirculo(page, 1);
 
-  const cartao = page.locator('#resultado-magias .opcao-card', { hasText: 'Mísseis Mágicos' });
-  // GUARDA CONTRA VACUIDADE: exatamente UM cartão, e é o personalizado -- se
-  // houvesse dois, o cenário estaria medindo a colisão da MESMA grade, que os
-  // outros cenários já cobrem, e não este residual.
-  await expect(cartao, 'na aba do Clérigo há um único cartão com esse nome').toHaveCount(1);
-  await expect(cartao, 'e ele é o da magia personalizada').toContainText('Personalizada');
+  await expect(page.locator(`#resultado-magias [data-circ-check="${MAGIA_CLASSE}"]`),
+    'GUARDA CONTRA O EXCESSO: a lista de 1º círculo do Clérigo continua na grade, com check')
+    .toHaveCount(1);
+  await expect(page.locator('#resultado-magias .opcao-card', { hasText: 'Mísseis Mágicos' }),
+    'e não há cartão nenhum com o nome da customizada na aba do Clérigo -- sem cartão, não há '
+    + 'clique capaz de alcançar a entrada preparada no Mago')
+    .toHaveCount(0);
 
-  await expect(cartao,
-    'a entrada preparada é a do MAGO: o cartão da personalizada, na aba do Clérigo, não pode '
-    + 'nascer aceso por uma entrada que não é dele')
-    .not.toHaveClass(/selecionada/);
-
-  await cartao.locator('[data-circ-check]').click();
+  await page.evaluate(() => window.fecharModal?.());
   await assentar(page).catch(() => {});
 
   const depois = (await personagemSalvo(page)).magias_preparadas
     .filter((m) => m.nome === 'Mísseis Mágicos');
-  expect(depois.length,
-    'a preparação do Mago tem de sobreviver ao clique no cartão da personalizada homônima')
-    .toBe(1);
-  expect(depois[0].classe,
-    'e continuar sendo a entrada do Mago, intacta')
-    .toBe('Mago');
+  expect(depois.length, 'a preparação do Mago sobrevive').toBe(1);
+  expect(depois[0].classe, 'e continua sendo a entrada do Mago, intacta').toBe('Mago');
+  expect(depois[0].personalizada,
+    'sem ganhar marca nenhuma: a customizada homônima é OUTRA magia')
+    .toBeUndefined();
 
-  await expect(page.locator('#toast-container'),
-    'e o app tem de DIZER onde a vaga está ocupada -- numa aba em que a magia sequer aparece, '
-    + 'o jogador não tem como adivinhar que ela está preparada na outra classe')
-    .toContainText('já está preparada');
-  await expect(page.locator('#toast-container'),
-    'o recado precisa nomear a classe que está ocupando a vaga')
-    .toContainText('Mago');
-  await expect(page.locator('#toast-container'),
-    'e nada de ler a tentativa como "despreparar"')
-    .not.toContainText('removida');
+  await abrirTudo(page);
+  await expect(page.locator('[data-details-id="magias-circulo-1"] .magia-personalizada',
+    { hasText: 'Mísseis Mágicos' }),
+  'e a magia do jogador continua conjurável na ficha, ao lado da homônima do Mago')
+    .toHaveCount(1);
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
 
-test('origem isenta: a personalizada homônima de uma magia CONCEDIDA não herda o estado dela', async ({ context }) => {
-  // A variante que para na mentira antes de chegar ao splice, e que é o
-  // personagem da própria issue #27 (não-Mago, com magias de Iniciado em
-  // Magia). A entrada concedida não foi escolhida na lista de classe nenhuma
-  // -- não é a magia deste cartão. Sem tratá-la como ambígua, `isDominio`
-  // casava por nome, o cartão do jogador saía marcado como preparado e
-  // "Especial", e o check era removido junto: a magia dele ficava SEM
-  // caminho para ser preparada, que é exatamente o defeito destas issues,
-  // reintroduzido por outro caminho.
+test('origem isenta: a magia CONCEDIDA homônima continua intacta, e a customizada continua conjurável', async ({ context }) => {
+  // O personagem da própria issue #27 (não-Mago, com magias de Iniciado em
+  // Magia). A entrada concedida não foi escolhida na lista de classe
+  // nenhuma. Antes da #46, `isDominio` casava por nome, o cartão do jogador
+  // saía marcado como preparado e "Especial", e o check era removido junto:
+  // a magia dele ficava SEM caminho para ser preparada -- o defeito destas
+  // issues, reintroduzido por outra porta.
+  //
+  // Com a customizada fora da grade não há cartão para herdar estado nenhum,
+  // e a capacidade que estava em risco (ela ser conjurável) é incondicional.
   const { page, erros } = await abrirFicha(context, {
     ...CLERIGO,
     magias_customizadas: [magiaCustom('Escudo Arcano', 1)],
     magias_preparadas: [{ nome: 'Escudo Arcano', circulo: 1, origem: 'iniciado_em_magia' }],
   }, 'regras-magia-custom-preparar-isenta');
   await assentar(page).catch(() => {});
+  await abrirTudo(page);
 
-  await abrirGerenciarMagias(page);
-  await page.locator('#tabs-gerenciar-magias [data-tab-mg="1"]').click();
-  await assentar(page).catch(() => {});
-
-  const cartao = page.locator('#resultado-magias .opcao-card', { hasText: 'Escudo Arcano' });
-  await expect(cartao, 'o cartão da personalizada precisa existir').toHaveCount(1);
-  await expect(cartao, 'e ser o da magia personalizada').toContainText('Personalizada');
-
-  await expect(cartao,
-    'a magia concedida é OUTRA magia: o cartão do jogador não pode nascer marcado por ela')
-    .not.toHaveClass(/selecionada/);
-  await expect(cartao,
-    'nem herdar o rótulo de magia especial da concedida')
-    .not.toContainText('Especial');
-
-  // E o check tem de estar lá: era ele que `isDominio` removia, deixando a
-  // magia do jogador sem caminho nenhum -- o defeito original de volta.
-  await expect(cartao.locator('[data-circ-check]'),
-    'o cartão do jogador precisa manter o check -- sem ele a magia dele volta a não ter '
-    + 'caminho para ser preparada, que é o defeito que estas issues consertam')
+  const linha = page.locator('[data-details-id="magias-circulo-1"] .magia-personalizada',
+    { hasText: 'Escudo Arcano' });
+  await expect(linha,
+    'a magia do jogador é sempre preparada, mesmo com uma concedida homônima na ficha')
+    .toHaveCount(1);
+  await expect(linha.locator('[data-conjurar-magia-custom]'),
+    'e conjurável -- era exatamente esta capacidade que a herança de estado da concedida tirava')
     .toHaveCount(1);
 
-  await cartao.locator('[data-circ-check]').click();
+  await abrirGerenciarMagias(page);
+  await abrirAbaCirculo(page, 1);
+
+  await expect(page.locator(`#resultado-magias [data-circ-check="${MAGIA_CLASSE}"]`),
+    'GUARDA CONTRA O EXCESSO: a lista da classe continua com check na grade')
+    .toHaveCount(1);
+  await expect(page.locator('#resultado-magias .opcao-card', { hasText: 'Escudo Arcano' }),
+    '"Escudo Arcano" não é magia de Clérigo: sem o cartão da customizada, nenhum cartão com '
+    + 'esse nome aparece na grade')
+    .toHaveCount(0);
+
+  await page.evaluate(() => window.fecharModal?.());
   await assentar(page).catch(() => {});
 
   const depois = (await personagemSalvo(page)).magias_preparadas
     .filter((m) => m.nome === 'Escudo Arcano');
-  expect(depois.length,
-    'a magia concedida não pode ser destruída pelo clique na homônima do jogador')
-    .toBe(1);
-  expect(depois[0].origem,
-    'e continua sendo a concedida, intacta')
-    .toBe('iniciado_em_magia');
+  expect(depois.length, 'a magia concedida não pode ser destruída').toBe(1);
+  expect(depois[0].origem, 'e continua sendo a concedida, intacta').toBe('iniciado_em_magia');
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });

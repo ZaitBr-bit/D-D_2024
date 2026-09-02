@@ -1,11 +1,11 @@
 // ============================================================
 // Oráculos da Tarefa 2 (sub-projeto "tela de magias por classe"):
-// conversão do modal "Gerenciar Magias" (site/js/sheet/grimorio.js) para
+// conversão do modal "Preparar Magias" (site/js/sheet/grimorio.js) para
 // decidir pela SUPERFÍCIE DE CONJURAÇÃO ATIVA -- a primeira de
 // superficiesDaFicha(char) -- em vez de char.classe/char.subclasse/
 // char.nivel (a classe INICIAL, o espelho; o nível TOTAL).
 //
-// O DEFEITO RELATADO: um Ladino 5/Mago 1 abria "Gerenciar Magias" e via
+// O DEFEITO RELATADO: um Ladino 5/Mago 1 abria "Preparar Magias" e via
 // "Truques: 3/0", "Preparadas: 0/0", nenhuma aba de círculo, e o console
 // acusava "Erro ao carregar classes/magias_ladino.json: Erro 404"
 // (magias.js:347, chamado sem argumento por grimorio.js:62) -- o modal
@@ -34,7 +34,7 @@ import { modulosApp, personagemMulticlasse, lerClassesDados } from './harness.mj
 const mods = await modulosApp();
 // `sheetMagias` entra aqui para o Oráculo 4g: ele é o ÚNICO deste arquivo
 // que confronta as DUAS telas entre si (a seção Magias da ficha e o modal
-// "Gerenciar Magias"), em vez de medir o modal contra um valor esperado.
+// "Preparar Magias"), em vez de medir o modal contra um valor esperado.
 const { sheetEstado, sheetGrimorio, sheetMagias, contextoClasse, utils, db } = mods;
 
 // Mapa nome-de-classe -> JSON completo (leitura direta do disco, não pelo
@@ -681,10 +681,10 @@ test('Oráculo 4d: Clérigo 5/Mago 1 -- a grade de truques e o contador do topo 
 // modal repetia os MESMOS números da ficha (contagem do personagem
 // inteiro contra o limite de UMA classe) sem o aviso que a ficha dá, e
 // nenhum elemento dele nomeava a classe ativa: o título é sempre
-// "Gerenciar Magias". Como o seletor de superfície mora na SEÇÃO Magias
+// "Preparar Magias". Como o seletor de superfície mora na SEÇÃO Magias
 // (decisão registrada -- ver o comentário de `tabs-superficie-magia` em
-// sheet/magias.js), quem abre o modal pelo "+ Magia" sem ter olhado a aba
-// não tinha como saber de que classe era o limite mostrado.
+// sheet/magias.js), quem abre o modal pelo botão da seção Magias sem ter
+// olhado a aba não tinha como saber de que classe era o limite mostrado.
 //
 // O par de testes é deliberado: o 4e prova que o aviso APARECE com duas
 // superfícies, o 4f prova que ele NÃO aparece com uma -- a restrição dura
@@ -709,8 +709,8 @@ test('Oráculo 4e: Clérigo 5/Mago 1 -- o modal nomeia a classe ativa e repete o
   // palavra solta passaria por motivo incidental.
   assert.match(html, /Classe selecionada: <strong>Clérigo 5<\/strong>/,
     'o modal precisa NOMEAR a classe ativa (a superfície do seletor da ficha) -- sem isso o jogador que ' +
-    'abre pelo "+ Magia" não tem como saber de que classe é o limite mostrado, porque o título é sempre ' +
-    '"Gerenciar Magias".');
+    'abre pelo botão da seção Magias não tem como saber de que classe é o limite mostrado, porque o título é ' +
+    'sempre "Preparar Magias".');
   assert.match(html, /contam o personagem inteiro/,
     'com duas superfícies, o modal precisa repetir o aviso do contador honesto que a seção Magias já dá -- ' +
     'os quatro números dele são a contagem do personagem INTEIRO contra o limite de UMA classe.');
@@ -988,7 +988,7 @@ test('Oráculo 5 (issue #42): Ladino 5/Mago 1 -- magia de círculo criada em "Ma
 // resultado de volta no localStorage.
 //
 // O caminho completo do defeito: (1) criar a magia -- corretamente FORA do
-// grimório, Oráculo 5 acima; (2) preparar pela grade "+ Magia" -- permitido
+// grimório, Oráculo 5 acima; (2) preparar pela grade "Preparar Magias" -- permitido
 // de graça pela isenção `!ehPersonalizada` que a Tarefa 6 pôs no portão do
 // grimório (grimorio.js); (3) qualquer recarregamento da ficha, ou mesmo só
 // abrir a lista de personagens -- `normalizarGrimorioMago` via
@@ -1021,9 +1021,23 @@ test('Oráculo 5b (issue #42, revisão 1): magia personalizada preparada NÃO é
         alcance: '9 metros', componentes: 'V, S', duracao: 'Instantânea',
         descricao: '', dano: '', ritual: false,
       }],
-      // Preparada pela grade "+ Magia" -- o MESMO carimbo que
-      // sheet/grimorio.js grava ao preparar uma personalizada
-      // (`personalizada: true`), sem nunca ter passado pelo grimório.
+      // Estado de FICHA ANTIGA, não de gravação atual: desde a issue #46
+      // NENHUM gravador do app escreve `personalizada` em
+      // `magias_preparadas` (o único `personalizada: true` que resta em
+      // site/js/ é `normalizarMagiaPersonalizada`, em sheet/magias.js, que
+      // é normalizador de RENDER e não toca no dado salvo). Esta entrada
+      // reproduz o que fichas pré-#46 gravaram ao clicar "Preparar" numa
+      // personalizada, sem nunca terem passado pelo grimório.
+      //
+      // O ORÁCULO CONTINUA MEDINDO O RESULTADO CERTO, por um caminho novo:
+      // `normalizarGrimorioMago` (utils.js) filtra as preparadas por
+      // `magiaContaNoLimite`, e desde a #46 esse predicado devolve `false`
+      // para a marca `personalizada` -- a entrada nem chega ao laço que
+      // empurra para o grimório. O `if (magia.personalizada) continue;`
+      // dentro do laço virou a segunda linha de defesa, mantida de
+      // propósito para o caso de alguém reverter o predicado. Este teste
+      // afirma o efeito ("não é registrada de graça"), então segue válido
+      // com qualquer uma das duas ativa.
       magias_preparadas: [{ nome: NOME_MAGIA, circulo: 1, classe: 'Mago', personalizada: true }],
       grimorio: [], // nunca copiada -- correto, Oráculo 5 acima
       moedas: { pl: 0, po: 200, pe: 0, pp: 0, pc: 0 },
@@ -1104,7 +1118,7 @@ test('Oráculo 5b (issue #42, revisão 1): magia personalizada preparada NÃO é
  * #preencher-slot-nome, #btn-confirmar-preencher) e #toast-container (a
  * trava recusa com um toast, sem montar o picker). Elemento PRÓPRIO, não
  * reaproveitado de criarDomDeModalComCliques (Oráculos 1-4d, o modal
- * "Gerenciar Magias") nem de criarDomDeFormMagiaCustom (Oráculo 5, o
+ * "Preparar Magias") nem de criarDomDeFormMagiaCustom (Oráculo 5, o
  * formulário) -- estender qualquer um deles arriscaria os oráculos já
  * revisados por um ganho que só este teste usa.
  */

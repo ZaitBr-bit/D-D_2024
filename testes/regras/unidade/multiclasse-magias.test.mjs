@@ -1642,8 +1642,8 @@ test('CD e ataque de magia: um par por CLASSE conjuradora, não o da inicial', a
 // registrada dava falso em TODOS os termos do portão -- inclusive em
 // possuiAlgumaMagia, justamente por ainda não ter magia -- e a seção de
 // Magias não era renderizada. Como ela é a única superfície com o botão
-// "+ Magia", não havia caminho nenhum para registrar a primeira.
-test('classe inicial não-conjuradora: a seção de Magias aparece e traz o "+ Magia"', async () => {
+// "Preparar Magias", não havia caminho nenhum para registrar a primeira.
+test('classe inicial não-conjuradora: a seção de Magias aparece e traz o "Preparar Magias"', async () => {
   const { utils, multiclasseConjuracao: mc } = mods;
 
   const barbaroMago = await personagemMulticlasse([
@@ -1662,7 +1662,7 @@ test('classe inicial não-conjuradora: a seção de Magias aparece e traz o "+ M
   assert.ok(html.includes('<h2>Magias</h2>'),
     'a seção de Magias tem de ser renderizada');
   assert.ok(html.includes('id="btn-add-magia"'),
-    'e com o botão "+ Magia" -- sem ele o personagem não tem como registrar a primeira magia');
+    'e com o botão "Preparar Magias" -- sem ele o personagem não tem como registrar a primeira magia');
   assert.ok(html.includes('CD Magia'),
     'a caixa de CD de Magia também some quando o portão lê só o espelho');
 

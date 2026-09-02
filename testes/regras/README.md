@@ -856,7 +856,7 @@ revisão (N1), detalhada a seguir).
 do achado I1 original cobria só `renderSecaoMagias()` (`sheet/magias.js`),
 não `mostrarBuscaMagia()` (`sheet/grimorio.js`) — o SEGUNDO arquivo com
 comportamento observável do mesmo bônus (contador "Truques: X/Y" da tela
-"Gerenciar Magias" e o bloqueio de troca por limite excedido). Confirmado por
+"Preparar Magias" e o bloqueio de troca por limite excedido). Confirmado por
 mutação: inserir `0 *` na chamada de `getBonusTruquesOrdem` dentro de
 `grimorio.js` deixava a suíte INTEIRA verde (1287/1223/0/64) — nenhuma das
 outras 1287 asserções via a regressão. Corrigido com um segundo teste

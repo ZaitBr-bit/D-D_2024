@@ -13,13 +13,101 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.0.2';
+export const VERSAO_ATUAL = '3.0.3';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.0.3',
+    data: '2026-09-02',
+    rotulo: 'Magias personalizadas',
+    resumo: 'Uma MUDANÇA DE REGRA, não só um conserto: o truque e a magia que '
+      + 'você mesmo cria deixam de gastar vaga do limite e passam a estar '
+      + 'sempre prontos, sem preparo nenhum. ATENÇÃO, muda o seu contador — '
+      + 'quem já tinha uma delas vai ver o número CAIR sozinho na primeira '
+      + 'abertura da ficha; nada foi apagado, e nenhuma magia sumiu. Veja '
+      + 'abaixo o que isso muda em cada tela.',
+    correcoes: [
+      {
+        grupo: '🪄 O que você inventa não custa vaga',
+        itens: [
+          'ATENÇÃO, muda o seu contador: truque e magia personalizados não '
+            + 'gastam mais vaga do limite. Isto REVERTE uma decisão que veio '
+            + 'em duas etapas: a 3.0.1 fez o truque personalizado passar a '
+            + 'cobrar vaga, como a magia de círculo já cobrava, e a 3.0.2 '
+            + 'reafirmou a cobrança ao arrumar o limite em multiclasse ("o '
+            + 'truque continua contando como sempre contou — inclusive o '
+            + 'personalizado"). Se você rolar até aquelas duas notas, é esta '
+            + 'aqui que vale. O relato que trouxe a volta foi de uma ficha '
+            + 'acusando "truques demais" por um truque que o próprio jogador '
+            + 'inventou. Um Clérigo com dois truques do livro e um '
+            + 'personalizado sai de "3 / 3" para "2 / 3 + 1 personalizado": o '
+            + 'truque continua na ficha, só parou de custar vaga.',
+          'As duas continuam à vista no contador, para o número que caiu não '
+            + 'se ler como magia perdida: a seção de Magias mostra "Truques '
+            + 'Personalizados" e "Personalizadas" ao lado do limite, com '
+            + 'quantas ficaram fora da conta.',
+          'Para quem CONHECE magias — Bardo, Bruxo, Feiticeiro e as '
+            + 'subclasses conjuradoras — quem tinha uma personalizada '
+            + 'preparada vai ver mais uma coisa na primeira abertura: a ficha '
+            + 'oferece escolher uma magia nova. Você passou a contar uma '
+            + 'magia a menos, então sobrou uma vaga da tabela da sua classe. '
+            + 'A vaga é de verdade, não é engano do app: era a personalizada '
+            + 'que a ocupava, e ela não ocupa mais. Preencha quando quiser — '
+            + 'a sua magia continua na ficha e continua conjurável do mesmo '
+            + 'jeito.',
+          'Elas também estão SEMPRE prontas. O truque personalizado já era '
+            + 'assim; a magia personalizada de 1º círculo ou superior '
+            + 'precisava ser preparada, e agora não precisa mais — ela '
+            + 'aparece direto no círculo dela, entre as Preparadas, com o '
+            + 'botão de Conjurar e sem clique nenhum. O estado "Não '
+            + 'preparada" deixou de existir para magia que você inventou.',
+          'Como elas não ocupam vaga nem passam por preparo, saíram da lista '
+            + 'de escolha do modal de preparar magias e da troca de magia do '
+            + 'Descanso Longo. Para Bardo, Bruxo, Feiticeiro e as subclasses '
+            + 'conjuradoras isso pesa mais: eles têm UMA troca por Descanso '
+            + 'Longo, e oferecer a personalizada ali fazia você gastá-la para '
+            + 'trazer o que já tinha, perdendo uma magia da classe em troca '
+            + 'de nada.',
+          'O botão "+ Magia" da seção Magias virou "Preparar Magias" (o modal '
+            + 'que ele abre se chamava "Gerenciar Magias"). Os dois nomes '
+            + 'antigos prometiam cadastrar magia ali dentro, e a magia que '
+            + 'você inventa não passa mais por lá. Para quem PREPARA magia, o '
+            + 'botão abre a tela de preparar, e preparar é tudo o que ela faz '
+            + 'agora. Para quem CONHECE magia — Bardo, Bruxo, Feiticeiro e as '
+            + 'subclasses conjuradoras — ele abre "Consultar Magias", que é '
+            + 'tela de leitura: a lista dessas classes continua sendo '
+            + 'definida na subida de nível e trocada no Descanso Longo. Criar '
+            + 'a sua continua no botão ao lado, "Magia Personalizada".',
+        ],
+      },
+      {
+        grupo: '🧙 Mago — a cópia no grimório',
+        itens: [
+          'A magia personalizada que você tinha COPIADO para o grimório (o '
+            + 'caminho de 50 PO e 2 horas por círculo, que a 3.0.1 passou a '
+            + 'exigir) foi removida de lá. Aquela cópia existia para poder '
+            + 'preparar a magia pelo grimório; com ela sempre pronta, a '
+            + 'página não compra mais nada e ainda desenhava a mesma magia '
+            + 'duas vezes, com um Preparar que não fazia efeito. A magia '
+            + 'continua na ficha e continua conjurável.',
+          'Os PO e as horas gastos naquela cópia NÃO são devolvidos: foram '
+            + 'gastos na mesa, e o app não desfaz o que já aconteceu na sua '
+            + 'sessão.',
+          'Uma ressalva de segurança: se a sua magia personalizada tem o '
+            + 'MESMO nome e o mesmo círculo de uma magia do livro, a página '
+            + 'FICA no grimório. O grimório não guarda de qual das duas é a '
+            + 'página, e apagar pelo nome removeria a cópia legítima da magia '
+            + 'do livro, que você pagou para ter. Nesse caso a linha continua '
+            + 'lá como magia do livro, e o "×" dela remove à mão se você '
+            + 'quiser.',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.0.2',
     data: '2026-09-01',

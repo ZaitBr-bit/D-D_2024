@@ -151,7 +151,7 @@ export function temMagiaDePacto(char) {
  * Existe porque os portoes liam `CLASSES_INFO[char.classe].conjurador`
  * -- o espelho da classe INICIAL. Um Barbaro 5/Mago 1 dava falso e nao
  * via a secao de Magias; como ela e a UNICA superficie da ficha com o
- * botao "+ Magia", o personagem ficava sem caminho nenhum para
+ * botao "Preparar Magias", o personagem ficava sem caminho nenhum para
  * registrar a primeira magia, mesmo com montarReservasDeEspacos ja lhe
  * concedendo os espacos corretos. Beco sem saida, nao so numero errado.
  *

@@ -45,7 +45,7 @@ async function fichaMagoClerigo(context, extras, id) {
   return lado.page;
 }
 
-/** Abre "Gerenciar Magias" e vai para a aba de truques. */
+/** Abre "Preparar Magias" e vai para a aba de truques. */
 async function abrirAbaTruques(page) {
   await page.click('#btn-add-magia');
   await page.waitForSelector('#resultado-magias', { state: 'visible', timeout: 20_000 });

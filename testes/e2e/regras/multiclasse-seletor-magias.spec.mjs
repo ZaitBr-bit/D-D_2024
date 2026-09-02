@@ -5,13 +5,13 @@
 //
 // T1 criou `superficiesDeConjuracao` (regras-multiclasse-conjuracao.js) e
 // `superficiesDaFicha` (sheet/contexto-classe.js). T2 converteu o modal
-// "Gerenciar Magias" (sheet/grimorio.js) e T3 converteu a seção Magias da
+// "Preparar Magias" (sheet/grimorio.js) e T3 converteu a seção Magias da
 // ficha (sheet/magias.js) para lerem de lá -- mas as três só foram
 // verificadas por unidade e por leitura, nunca com um navegador de
 // verdade. Nenhum spec desta suíte jamais clicou em #btn-add-magia.
 //
 // O defeito original (issue relatada): um Orc Ladino 5/Mago 1 abria
-// "Gerenciar Magias" e via `404 classes/magias_ladino.json`, seguido de
+// "Preparar Magias" e via `404 classes/magias_ladino.json`, seguido de
 // "Truques: 3/0" e "Preparadas: 0/0" -- porque tudo lia o espelho
 // char.classe (Ladino, a classe inicial, sem conjuração nenhuma) em vez de
 // procurar entre classes[] a classe que REALMENTE conjura (Mago).
@@ -20,7 +20,7 @@
 // superfície de conjuração, uma aba por classe aparece na seção Magias da
 // ficha (`#tabs-superficie-magia`) e escolhe qual delas
 // `superficieAtivaDaFicha` (sheet/contexto-classe.js) devolve -- a MESMA
-// variável que o modal "Gerenciar Magias" lê. Com uma classe só (a maioria
+// variável que o modal "Preparar Magias" lê. Com uma classe só (a maioria
 // dos personagens) o seletor não aparece e nada muda -- é o cenário 2,
 // abaixo, o canário disso.
 //
@@ -45,7 +45,7 @@ import { ATRIBUTOS_REGRAS, NOVO, abrirFicha, assentar, clicarSeletorFicha } from
 import { semearPersonagem } from '../helpers.mjs';
 
 /**
- * Abre o modal "Gerenciar Magias" (botão "+ Magia" da seção Magias) e
+ * Abre o modal "Preparar Magias" (o botão de mesmo nome da seção Magias) e
  * espera a grade de resultados existir -- `mostrarBuscaMagia` é async
  * (carrega a lista de magias da classe antes de montar o HTML), então
  * esperar o elemento (em vez de um timeout fixo) é o que cobre essa
@@ -58,7 +58,7 @@ async function abrirGerenciarMagias(page) {
 }
 
 /**
- * Lê "N / M" de um dos contadores do TOPO do modal "Gerenciar Magias"
+ * Lê "N / M" de um dos contadores do TOPO do modal "Preparar Magias"
  * (#gm-contador-truques ou #gm-contador-preparadas) e devolve os dois
  * números. `null` se o contador não existir ou não tiver o formato
  * esperado -- os chamadores sempre leem isto de dentro de `expect.poll`,
@@ -126,7 +126,7 @@ const LADINO_5_MAGO_1 = [
 const MAGO_1_TRUQUES = 3;
 const MAGO_1_PREPARADAS = 4;
 
-test('Orc Ladino 5/Mago 1: "Gerenciar Magias" mostra as magias e os números do Mago, sem 404 nem erro de console',
+test('Orc Ladino 5/Mago 1: "Preparar Magias" mostra as magias e os números do Mago, sem 404 nem erro de console',
   async ({ context }) => {
     const { page, erros } = await abrirFicha(context, {
       classe: 'Ladino', subclasse: '', nivel: 6, xp: 14000,
@@ -210,7 +210,7 @@ test('Mago 5 puro: o seletor de classe não aparece e a tela se comporta como se
 
     await abrirGerenciarMagias(page);
     await esperarLimiteModal(page, 'gm-contador-truques', 4,
-      'o modal "Gerenciar Magias" de um Mago de classe única deveria mostrar o MESMO limite de ' +
+      'o modal "Preparar Magias" de um Mago de classe única deveria mostrar o MESMO limite de ' +
       'truques que a seção da ficha (4)');
 
     expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
@@ -283,14 +283,14 @@ test('Clérigo 5/Mago 1: o seletor aparece, começa no Clérigo, e trocar para M
       `depois de trocar para o Mago, o limite de preparadas deveria mudar para o dele ` +
       `(${MAGO_1_PREPARADAS})`);
 
-    // "+ Magia" agora abre para o MAGO, não mais o Clérigo -- prova que o
+    // "Preparar Magias" agora abre para o MAGO, não mais o Clérigo -- prova que o
     // seletor da ficha e o modal leem a MESMA superfície ativa
     // (superficieAtivaDaFicha compartilhada), e que a LISTA de magias
     // (não só os números) também trocou.
     await abrirGerenciarMagias(page);
     await page.locator('[data-tab-mg="truques"]').click();
     await expect(page.locator('#resultado-magias'),
-      'depois de trocar para o Mago na ficha, "Gerenciar Magias" deveria oferecer truques de ' +
+      'depois de trocar para o Mago na ficha, "Preparar Magias" deveria oferecer truques de ' +
       'Mago ("Raio de Gelo"), não mais os de Clérigo')
       .toContainText('Raio de Gelo');
     await expect(page.locator('#resultado-magias'),
@@ -298,7 +298,7 @@ test('Clérigo 5/Mago 1: o seletor aparece, começa no Clérigo, e trocar para M
       .not.toContainText('Chama Sagrada');
 
     await esperarLimiteModal(page, 'gm-contador-truques', MAGO_1_TRUQUES,
-      'o modal "Gerenciar Magias", aberto depois da troca, deveria mostrar o limite de truques ' +
+      'o modal "Preparar Magias", aberto depois da troca, deveria mostrar o limite de truques ' +
       'do Mago');
 
     expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
@@ -364,14 +364,14 @@ test('Mago 5/Clérigo 3: trocar para o Clérigo mostra o número CERTO dele, nã
     await abrirGerenciarMagias(page);
     await page.locator('[data-tab-mg="truques"]').click();
     await expect(page.locator('#resultado-magias'),
-      '"Gerenciar Magias", depois da troca para Clérigo, deveria oferecer "Chama Sagrada"')
+      '"Preparar Magias", depois da troca para Clérigo, deveria oferecer "Chama Sagrada"')
       .toContainText('Chama Sagrada');
     await expect(page.locator('#resultado-magias'),
       '"Raio de Gelo" é truque de Mago -- não deveria aparecer com o Clérigo como superfície ativa')
       .not.toContainText('Raio de Gelo');
 
     await esperarLimiteModal(page, 'gm-contador-preparadas', CLERIGO_3_PREPARADAS,
-      'o modal "Gerenciar Magias", depois da troca, deveria mostrar o limite de preparadas do ' +
+      'o modal "Preparar Magias", depois da troca, deveria mostrar o limite de preparadas do ' +
       'Clérigo');
 
     expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);

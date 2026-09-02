@@ -1039,7 +1039,7 @@ export function renderFichaCompleta() {
       O primeiro termo era "info.conjurador || ehSubclasseConjuradora()", e os
       dois liam o espelho da classe INICIAL: um Bárbaro 5/Mago 1 SEM nenhuma
       magia registrada dava falso em todos os termos e não via a seção -- que é
-      a única superfície com o botão "+ Magia", então ele ficava sem caminho
+      a única superfície com o botão "Preparar Magias", então ele ficava sem caminho
       para registrar a primeira. possuiAlgumaMagia não o salvava justamente por
       ele ainda não ter magia nenhuma. conjuraPorAlgumaClasse pergunta pelas
       classes de verdade (regras-multiclasse-conjuracao.js), Magia de Pacto

@@ -20,7 +20,7 @@ import { char, classeData, salvar } from '../sheet/estado.js';
 import { nivelNa } from '../regras-multiclasse.js';
 import { renderFichaCompleta } from '../sheet/ficha.js';
 import { carregarDescricoesMagias } from '../sheet/impressao.js';
-import { migrarEscolhasClasseLegadas, migrarEspacosMagia, migrarMagiaClasse, migrarMagiasDominio, migrarMagiasLegadoEspecie, migrarMagiasSemprePreparadas, migrarMulticlasse, migrarNomePericiaLidarAnimais, migrarPericiaEspecie, migrarPericiasEspecie, migrarPericiasTalentos, migrarProficienciasTalentos, migrarSlotsMagiaLivre, migrarTalentoVersatilHumano, migrarTruquesEspecie, migrarTruquesFixosSubclasse } from '../sheet/migracoes.js';
+import { migrarCopiasCustomizadasDoGrimorio, migrarEscolhasClasseLegadas, migrarEspacosMagia, migrarMagiaClasse, migrarMagiasCustomizadasSemprePreparadas, migrarMagiasDominio, migrarMagiasLegadoEspecie, migrarMagiasSemprePreparadas, migrarMulticlasse, migrarNomePericiaLidarAnimais, migrarPericiaEspecie, migrarPericiasEspecie, migrarPericiasTalentos, migrarProficienciasTalentos, migrarSlotsMagiaLivre, migrarTalentoVersatilHumano, migrarTruquesEspecie, migrarTruquesFixosSubclasse } from '../sheet/migracoes.js';
 import { baixarPdfFicha } from '../sheet/pdf.js';
 import { migrarAdeptoElementalTipos, migrarIniciadoEmMagiaInstancias } from '../sheet/talentos.js';
 let _syncSubscribed = false;
@@ -95,6 +95,20 @@ export async function renderSheet(container, charId) {
   // Antes de migrarSlotsMagiaLivre: o truque concedido pela subclasse conta
   // no limite, e contá-lo depois ofereceria uma vaga livre a mais.
   migrarTruquesFixosSubclasse();
+  // Issue #46, ANTES da chamada de `normalizarGrimorioMago` (mais abaixo,
+  // nesta mesma função): aquela função varre `magias_preparadas` para
+  // empurrar magia "normal" ao grimório do Mago. Deixar a entrada
+  // personalizada viva até lá dependeria do `continue` explícito dela para
+  // não registrar a magia de graça -- limpar aqui remove a dependência
+  // inteira. Também antes de `migrarMagiaClasse` (abaixo), que carimbaria
+  // classe numa entrada prestes a sair.
+  // Referências por NOME e não por número de linha, de propósito: as duas
+  // chamadas já se deslocaram uma vez por causa desta inserção.
+  migrarMagiasCustomizadasSemprePreparadas();
+  // Sincrona: a ressalva da homonima le o acervo de indiceMagiasCache, ja
+  // populado por `definirIndiceMagias` (no carregamento do indice, acima),
+  // sem I/O proprio.
+  migrarCopiasCustomizadasDoGrimorio();
   // Mago nível 18/20: mantém as magias de Maestria de Magias e Assinatura
   // Mágica sempre preparadas (e tira as que deixaram de ser escolhidas).
   if (sincronizarMagiasFixasMago()) salvar();

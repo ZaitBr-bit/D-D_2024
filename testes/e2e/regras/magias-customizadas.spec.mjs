@@ -11,14 +11,24 @@
 //      (grimorio.js:512-513) -- mas o caminho de SALVAR nunca lia o
 //      campo. O gatilho digitado morria no DOM.
 //
-//   2. SELO DE RITUAL SOME NO GRIMÓRIO. O Mago que cria uma magia
-//      personalizada de círculo > 0 ganha a magia no `char.grimorio`
-//      (grimorio.js), mas a linha do Grimório deriva o marcador Ritual
-//      de `ehMagiaRitual(nome)`, que só consulta o ACERVO -- magia
+//   2. SELO DE RITUAL SOME. O Mago que criava uma magia personalizada de
+//      círculo > 0 ganhava a magia no `char.grimorio` (grimorio.js), e a
+//      linha do Grimório derivava o marcador Ritual de
+//      `ehMagiaRitual(nome)`, que só consulta o ACERVO -- magia
 //      personalizada não está lá, e o campo `ritual: true` que o
 //      jogador marcou era ignorado nessa seção.
 //
-// Os dois testes CLICAM na tela (memória do projeto: botão novo só está
+// ONDE A ISSUE #46 ENTRA. A magia customizada de círculo 1+ passou a ser
+// SEMPRE preparada e derivada de `char.magias_customizadas`, e saiu do
+// grimório do Mago: a busca de cópia não a oferece mais e
+// `migrarCopiasCustomizadasDoGrimorio` (sheet/migracoes.js) remove a cópia
+// paga que fichas antigas têm. Os cenários que mediam a customizada DENTRO
+// da seção Grimório passaram a medir a mesma capacidade (selo de Ritual,
+// descrição que abre, renomear que funciona) no endereço novo -- a linha da
+// seção Preparadas --, e cada um afirma junto que ela NÃO está mais no
+// grimório e que a magia do acervo que está lá continua intacta.
+//
+// Os testes CLICAM na tela (memória do projeto: botão novo só está
 // entregue com spec que clica nele) e leem o personagem SALVO, não o
 // DOM do formulário -- é a gravação que o jogador acusou de perder o
 // dado, e só a leitura do store mede isso.
@@ -136,7 +146,30 @@ test('magia personalizada de Reação: ao reabrir para editar, o gatilho volta n
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
 
-test('grimório do Mago: magia personalizada marcada como Ritual mostra o selo Ritual', async ({ context }) => {
+// ============================================================
+// Issue #46: a magia customizada SAIU do grimório do Mago.
+//
+// Este cenário e os quatro seguintes mediam a customizada DENTRO da seção
+// Grimório, que era onde ela morava para o Mago -- primeiro pelo contorno
+// que a empurrava para lá ao criá-la, depois (issue #42) pela cópia paga de
+// 50 PO/círculo. A #46 tornou a customizada SEMPRE preparada e derivada de
+// `char.magias_customizadas`: a cópia deixou de comprar qualquer coisa e só
+// desenharia a mesma magia numa segunda linha, com Preparar/Despreparar
+// sem efeito. Por isso ela saiu da busca de cópia (grimorio-mago.spec.mjs)
+// e a cópia existente é removida por `migrarCopiasCustomizadasDoGrimorio`
+// (sheet/migracoes.js) na abertura da ficha.
+//
+// A CAPACIDADE MEDIDA CONTINUA A MESMA -- o selo Ritual do jogador tem de
+// aparecer, e o botão Ritual tem de conjurar sem gastar espaço --, só que
+// na linha da seção Preparadas, que é onde a magia passou a viver. O que
+// muda é o ENDEREÇO.
+//
+// "Mísseis Mágicos" no grimório é o GUARDA CONTRA VACUIDADE de todos eles:
+// sem outra magia lá, a seção Grimório sumiria depois da limpeza e "a
+// customizada não está no grimório" não distinguiria a regra nova de uma
+// seção que deixou de ser desenhada.
+// ============================================================
+test('issue #46: a customizada Ritual sai do grimório e mantém selo e botão Ritual na ficha', async ({ context }) => {
   const { page, erros } = await abrirFicha(context, {
     ...MAGO,
     magias_customizadas: [{
@@ -144,33 +177,45 @@ test('grimório do Mago: magia personalizada marcada como Ritual mostra o selo R
       tempo_conjuracao: 'Ação', alcance: 'Pessoal', componentes: 'V',
       duracao: 'Instantânea', descricao: '', dano: '', ritual: true,
     }],
-    grimorio: [{ nome: 'Selo de Nimb', circulo: 1 }],
+    grimorio: [{ nome: 'Selo de Nimb', circulo: 1 }, { nome: 'Mísseis Mágicos', circulo: 1 }],
   }, 'regras-magia-custom-ritual');
   await assentar(page).catch(() => {});
   await abrirTudo(page);
 
-  // GUARDA CONTRA VACUIDADE: a linha precisa existir no Grimório antes de
-  // qualquer afirmação sobre o selo dela.
-  const linha = page.locator('[data-details-id="grimorio-mago"] .magia-item', { hasText: 'Selo de Nimb' });
-  await expect(linha,
-    'a magia personalizada de círculo > 0 do Mago vive no grimório -- sem a linha, nada a medir')
+  // GUARDA CONTRA VACUIDADE: a seção Grimório continua existindo, com a
+  // magia do LIVRO -- a limpeza não pode ter levado o grimório inteiro.
+  await expect(page.locator('[data-details-id="grimorio-mago"] .magia-item', { hasText: 'Mísseis Mágicos' }),
+    'a magia do acervo comprada para o grimório continua lá')
     .toHaveCount(1);
+  await expect(page.locator('[data-details-id="grimorio-mago"] .magia-item', { hasText: 'Selo de Nimb' }),
+    'a customizada não é mais magia de grimório: copiá-la não compra nada, e a linha só '
+    + 'duplicaria a magia que a seção Preparadas já desenha')
+    .toHaveCount(0);
+  expect((await personagemSalvo(page)).grimorio.map((m) => m.nome),
+    'e a cópia sai do dado também, não só da tela')
+    .toEqual(['Mísseis Mágicos']);
 
+  // A CAPACIDADE, no endereço novo: a linha da seção Preparadas.
+  const linha = page.locator('[data-details-id="magias-circulo-1"] .magia-personalizada',
+    { hasText: 'Selo de Nimb' });
+  await expect(linha,
+    'sem preparo nenhum, a customizada é desenhada no círculo dela -- sem a linha, nada a medir')
+    .toHaveCount(1);
   await expect(linha,
     'o jogador marcou "Pode ser conjurada como Ritual" no formulário; o selo Ritual tem de '
-    + 'aparecer no grimório como aparece para magia do acervo')
+    + 'aparecer como aparece para magia do acervo')
     .toContainText('Ritual');
 
   // O selo vem acompanhado do botão -- e botão só está entregue quando um
-  // spec CLICA nele. Aqui o clique também prova que o botão do grimório está
-  // ligado ao handler certo: o do acervo se guarda com `ehMagiaRitual`, que
-  // não conhece magia personalizada, e não faria nada.
+  // spec CLICA nele. O clique também prova que a linha está ligada ao
+  // handler certo: o do acervo se guarda com `ehMagiaRitual`, que não
+  // conhece magia personalizada, e não faria nada.
   const antes = await espacosConjuracaoCirculo1(page);
   expect(antes, 'o spec precisa ler os espaços de 1º círculo antes de medir o efeito do clique')
     .not.toBeNull();
 
   await clicarSeletorFicha(page,
-    '[data-details-id="grimorio-mago"] [data-conjurar-ritual-custom]',
+    '[data-details-id="magias-circulo-1"] [data-conjurar-ritual-custom]',
     { esperar: '#toast-container' });
   await expect(page.locator('#toast-container'),
     'a conjuração ritual precisa ter acontecido antes de medir os espaços')
@@ -226,9 +271,9 @@ test('editar magia personalizada de Ritual: a marca de Ritual sobrevive à ediç
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
 
-test('grimório do Mago: magia personalizada SEM Ritual não ganha o selo -- o contraste', async ({ context }) => {
+test('a customizada SEM Ritual não ganha o selo na ficha -- o contraste', async ({ context }) => {
   // Sem este contraste, "aparece Ritual" passaria numa tela que carimba
-  // Ritual em toda linha do grimório.
+  // Ritual em toda linha personalizada.
   const { page, erros } = await abrirFicha(context, {
     ...MAGO,
     magias_customizadas: [{
@@ -236,33 +281,51 @@ test('grimório do Mago: magia personalizada SEM Ritual não ganha o selo -- o c
       tempo_conjuracao: 'Ação', alcance: 'Pessoal', componentes: 'V',
       duracao: 'Instantânea', descricao: '', dano: '', ritual: false,
     }],
-    grimorio: [{ nome: 'Selo Mundano', circulo: 1 }],
+    grimorio: [{ nome: 'Selo Mundano', circulo: 1 }, { nome: 'Mísseis Mágicos', circulo: 1 }],
   }, 'regras-magia-custom-sem-ritual');
   await assentar(page).catch(() => {});
   await abrirTudo(page);
 
-  const linha = page.locator('[data-details-id="grimorio-mago"] .magia-item', { hasText: 'Selo Mundano' });
+  const linha = page.locator('[data-details-id="magias-circulo-1"] .magia-personalizada',
+    { hasText: 'Selo Mundano' });
   await expect(linha, 'a linha precisa existir para o contraste medir alguma coisa').toHaveCount(1);
   await expect(linha,
     'magia personalizada sem o marcador Ritual não pode ganhar o selo')
     .not.toContainText('Ritual');
+  await expect(linha.locator('[data-conjurar-ritual-custom]'),
+    'nem o botão de conjurar como Ritual')
+    .toHaveCount(0);
+  await expect(linha.locator('[data-conjurar-magia-custom]'),
+    'mas o Conjurar normal continua lá -- o contraste é sobre o Ritual, não sobre a magia sumir')
+    .toHaveCount(1);
+
+  // GUARDA CONTRA VACUIDADE do lado do grimório (issue #46): a seção
+  // continua desenhada, sem a customizada.
+  await expect(page.locator('[data-details-id="grimorio-mago"] .magia-item', { hasText: 'Mísseis Mágicos' }),
+    'a magia do acervo continua no grimório')
+    .toHaveCount(1);
+  await expect(page.locator('[data-details-id="grimorio-mago"] .magia-item', { hasText: 'Selo Mundano' }),
+    'e a customizada não está mais lá')
+    .toHaveCount(0);
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
 
-test('grimório do Mago: clicar na magia personalizada abre a descrição (issue #39)', async ({ context }) => {
-  // Causa raiz: o Grimório renderizava a magia personalizada com
-  // `data-magia-nome` -- o mesmo atributo de uma magia do acervo --, então o
-  // clique caía no handler genérico (site/js/sheet/magias.js, perto da linha
-  // 2585), que busca a descrição em `getMagiasPorCirculo(circ)`. A magia
-  // personalizada não está lá: `magia` fica `undefined`, o handler ainda
-  // marca a linha como "expandida" (então nada parece quebrado à primeira
-  // vista), mas `.magia-desc` fica vazio e sem altura -- na prática, nada
-  // abre. Na seção Preparadas a MESMA magia sai com `data-magia-custom-index`
-  // e usa o handler certo (perto da linha 2617), que lê
-  // `char.magias_customizadas` -- ali funciona. Este teste clica na linha
-  // do Grimório e exige a descrição visível, igual já acontece com uma
-  // magia do acervo.
+test('clicar na magia personalizada abre a descrição dela, no endereço novo (issue #39)', async ({ context }) => {
+  // Causa raiz da issue #39: o Grimório renderizava a magia personalizada
+  // com `data-magia-nome` -- o mesmo atributo de uma magia do acervo --,
+  // então o clique caía no handler genérico (site/js/sheet/magias.js), que
+  // busca a descrição em `getMagiasPorCirculo(circ)`. A magia personalizada
+  // não está lá: `magia` fica `undefined`, o handler ainda marca a linha
+  // como "expandida" (nada parece quebrado à primeira vista), mas
+  // `.magia-desc` fica vazio e sem altura -- na prática, nada abre.
+  //
+  // Issue #46: a customizada saiu do Grimório, então a linha que existia
+  // para errar não existe mais. A capacidade medida é a mesma -- ler a
+  // descrição da magia que o jogador inventou --, agora na linha da seção
+  // Preparadas, que sempre usou o handler certo (`data-magia-custom-index`,
+  // que lê `char.magias_customizadas`). O par de asserções abaixo é o
+  // oráculo da #39 no endereço novo: o atributo CERTO e a descrição ABERTA.
   const DESCRICAO = 'Névoa arcana revela armadilhas ocultas num raio de 3 metros.';
   const { page, erros } = await abrirFicha(context, {
     ...MAGO,
@@ -271,28 +334,41 @@ test('grimório do Mago: clicar na magia personalizada abre a descrição (issue
       tempo_conjuracao: 'Ação', alcance: '9 metros', componentes: 'V, S',
       duracao: '1 minuto', descricao: DESCRICAO, dano: '', ritual: false,
     }],
-    grimorio: [{ nome: 'Névoa de Nimb', circulo: 1 }],
+    grimorio: [{ nome: 'Névoa de Nimb', circulo: 1 }, { nome: 'Mísseis Mágicos', circulo: 1 }],
   }, 'regras-magia-custom-grimorio-desc');
   await assentar(page).catch(() => {});
   await abrirTudo(page);
 
-  // GUARDA CONTRA VACUIDADE: a linha precisa existir no Grimório antes de
-  // qualquer afirmação sobre o clique nela.
-  const linha = page.locator('[data-details-id="grimorio-mago"] .magia-item', { hasText: 'Névoa de Nimb' });
-  await expect(linha,
-    'a magia personalizada de círculo > 0 do Mago vive no grimório -- sem a linha, nada a medir')
+  // GUARDA CONTRA VACUIDADE, dos dois lados: a seção Grimório continua
+  // desenhada (com a magia do livro) e a customizada não está nela.
+  await expect(page.locator('[data-details-id="grimorio-mago"] .magia-item', { hasText: 'Mísseis Mágicos' }),
+    'a magia do acervo continua no grimório -- sem ela, "a customizada saiu" passaria por uma '
+    + 'seção que deixou de existir')
     .toHaveCount(1);
+  await expect(page.locator('[data-details-id="grimorio-mago"] .magia-item', { hasText: 'Névoa de Nimb' }),
+    'a customizada não é magia de grimório desde a issue #46')
+    .toHaveCount(0);
+
+  const linha = page.locator('[data-details-id="magias-circulo-1"] .magia-personalizada',
+    { hasText: 'Névoa de Nimb' });
+  await expect(linha,
+    'ela é sempre preparada: a linha vive na seção do 1º círculo -- sem a linha, nada a medir')
+    .toHaveCount(1);
+  await expect(linha,
+    'e sai com `data-magia-custom-index` -- é esse atributo que leva o clique ao handler que '
+    + 'lê char.magias_customizadas, em vez do handler do acervo que não conhece a magia (#39)')
+    .toHaveAttribute('data-magia-custom-index', '0');
 
   const descricao = linha.locator('.magia-desc');
   await expect(descricao, 'a descrição não pode estar visível antes do clique').toBeHidden();
 
-  // Clica no nome, fora da área dos botões (Preparar/Remover) -- o handler
-  // de expandir ignora clique que caia em cima de um <button>/<select>.
+  // Clica no nome, fora da área dos botões -- o handler de expandir ignora
+  // clique que caia em cima de um <button>/<select>.
   await linha.locator('.magia-nome').click();
 
   await expect(descricao,
-    'clicar na magia personalizada do Grimório tem de abrir a descrição, igual já '
-    + 'acontece com uma magia do acervo')
+    'clicar na magia personalizada tem de abrir a descrição, igual já acontece com uma magia '
+    + 'do acervo')
     .toBeVisible();
   await expect(descricao,
     'a descrição exibida tem de ser a da magia personalizada (lida de '
@@ -350,17 +426,18 @@ test('grimório do Mago: renomear magia personalizada que NUNCA foi copiada não
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
 
-// O contraste do teste acima -- e uma checagem de coerência, não de
-// regressão: mesmo antes da correção da #42, este caso específico (a magia
-// JÁ estava no grimório por cópia legítima) já limpava a entrada antiga e
-// gravava a nova -- é o comportamento que o achado da issue #42 pediu para
-// PRESERVAR ao remover o empurrão automático (site/js/sheet/grimorio.js,
-// mostrarFormMagiaCustom: "Decida o que fazer com essa limpeza... Não
-// deixe entrada órfã"). Sem este teste, um conserto apressado que
-// removesse a limpeza inteira (e não só o empurrão indevido) passaria sem
-// aviso -- é o cenário que o relatório desta tarefa pede para verificar:
-// uma ficha com a magia JÁ no grimório continua correta depois da mudança.
-test('grimório do Mago: renomear magia personalizada JÁ copiada mantém o grimório coerente, sem entrada órfã (issue #42)', async ({ context }) => {
+// O contraste do teste acima. Ele media a coerência do grimório ao renomear
+// uma customizada JÁ copiada -- estado que a issue #42 criou e que a #46
+// desfez: `migrarCopiasCustomizadasDoGrimorio` remove essa cópia na
+// abertura da ficha, porque ela não compra mais nada.
+//
+// A CAPACIDADE PRESERVADA é RENOMEAR: o jogador continua tendo de poder
+// mudar o nome da magia que inventou, e a linha renomeada continua tendo de
+// aparecer -- só que na seção Preparadas, não no grimório. E o grimório
+// continua não podendo ficar com órfã nem ganhar entrada de graça: as duas
+// afirmações da #42 valem igual, agora sobre um grimório do qual a cópia
+// acabou de sair.
+test('renomear a customizada continua funcionando -- e o grimório não fica com órfã nem ganha entrada (issues #42 e #46)', async ({ context }) => {
   const NOME_ANTIGO = 'Facho de Nimb';
   const NOME_NOVO = 'Facho de Nimb Aprimorado';
   const { page, erros } = await abrirFicha(context, {
@@ -370,10 +447,10 @@ test('grimório do Mago: renomear magia personalizada JÁ copiada mantém o grim
       tempo_conjuracao: 'Ação', alcance: '9 metros', componentes: 'V, S',
       duracao: 'Instantânea', descricao: '', dano: '', ritual: false,
     }],
-    // Desta vez a magia JÁ está no grimório -- simula uma cópia legítima
-    // paga antes desta edição (o mesmo estado que uma ficha real, em
-    // produção, tem hoje).
-    grimorio: [{ nome: NOME_ANTIGO, circulo: 1 }],
+    // A ficha antiga da issue #42: a magia JÁ estava no grimório por cópia
+    // paga. "Mísseis Mágicos" é o guarda contra vacuidade -- o grimório não
+    // pode ficar vazio, ou "a órfã não existe" valeria sobre o nada.
+    grimorio: [{ nome: NOME_ANTIGO, circulo: 1 }, { nome: 'Mísseis Mágicos', circulo: 1 }],
   }, 'regras-magia-custom-grimorio-renomear-com-copia');
   await assentar(page).catch(() => {});
   await abrirTudo(page);
@@ -387,16 +464,30 @@ test('grimório do Mago: renomear magia personalizada JÁ copiada mantém o grim
   await assentar(page).catch(() => {});
 
   const salvo = await personagemSalvo(page);
+  expect((salvo?.magias_customizadas || []).map((m) => m.nome),
+    'A CAPACIDADE: renomear continua gravando o nome novo em magias_customizadas')
+    .toEqual([NOME_NOVO]);
+
   const grimorio = salvo?.grimorio || [];
   expect(grimorio.some((m) => m?.nome === NOME_ANTIGO),
-    'renomear não pode deixar uma entrada órfã no grimório presa no nome antigo')
+    'a cópia da customizada saiu na migração da #46: não pode ter ficado órfã sob o nome morto')
     .toBe(false);
-  expect(grimorio.some((m) => m?.nome === NOME_NOVO && m.circulo === 1),
-    'a magia já estava no grimório por cópia legítima -- a entrada precisa acompanhar o nome novo, '
-    + 'não desaparecer nem duplicar')
-    .toBe(true);
-  expect(grimorio.length, 'nem órfã sobrando, nem duplicata: continua uma entrada só')
-    .toBe(1);
+  expect(grimorio.some((m) => m?.nome === NOME_NOVO),
+    'e renomear não pode registrá-la de novo no grimório -- ela não é mais magia de grimório')
+    .toBe(false);
+  expect(grimorio.map((m) => m.nome),
+    'a magia do ACERVO comprada continua no grimório, intacta -- a limpeza é só da customizada')
+    .toEqual(['Mísseis Mágicos']);
+
+  // E a linha renomeada aparece onde a magia passou a viver.
+  const linha = page.locator('[data-details-id="magias-circulo-1"] .magia-personalizada',
+    { hasText: NOME_NOVO });
+  await expect(linha,
+    'a linha renomeada tem de aparecer na seção Preparadas do círculo dela, conjurável')
+    .toHaveCount(1);
+  await expect(linha.locator('[data-conjurar-magia-custom]'),
+    'com o botão de Conjurar -- renomear não pode custar a capacidade')
+    .toHaveCount(1);
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
@@ -464,20 +555,34 @@ test('grimório do Mago: renomear magia personalizada homônima do acervo não d
 });
 
 // ============================================================
-// Issue #42, achado da rodada 2 (quebra nova introduzida pelo conserto da
-// rodada 1): `nomeEhDoAcervoMago` perguntava "existe magia do ACERVO com
-// este NOME?" -- existência de nome, não posse da entrada -- e por isso
-// recusava mexer até quando a entrada do grimório É da personalizada de
-// verdade, paga por 50 PO. Este é o CONTRASTE do teste de homônima acima:
-// lá a entrada paga era do ACERVO e a personalizada nunca foi copiada; aqui
-// a entrada paga É da personalizada (ela mesma pagou a cópia, pelo botão
-// "+ Copiar Magia para Grimório" -- ver grimorio-mago.spec.mjs), com um
-// círculo DIFERENTE do da magia real de mesmo nome no acervo -- exatamente
-// o repro que a rodada 2 apontou: sem este teste, um conserto que voltasse
-// a recusar por nome sozinho passaria batido de novo.
+// A MIRA DA LIMPEZA da issue #46, no caso em que ela é mais fácil de errar:
+// a customizada leva um nome que EXISTE no acervo, só que em outro círculo.
+// O jogador criou a SUA "Bola de Fogo" de 1º círculo (a do livro é de 3º) e
+// tinha pago a cópia dela para o grimório.
+//
+// `migrarCopiasCustomizadasDoGrimorio` (sheet/migracoes.js) precisa remover
+// essa entrada, e a decisão é por nome E CÍRCULO contra o acervo: o acervo
+// não tem "Bola de Fogo" de 1º círculo, então a entrada só pode ser a cópia
+// da customizada. Uma limpeza que perguntasse "existe magia do acervo com
+// este NOME?" preservaria a entrada -- e o Mago ficaria com a linha
+// duplicada que a #46 existe para eliminar.
+//
+// O CONTRASTE já está no arquivo, nos dois cenários vizinhos: quando o
+// círculo da entrada BATE com o do acervo (a entrada é do livro, ou a
+// origem é genuinamente ambígua), ela fica.
+//
+// POR QUE NÃO SE SEMEIA "as duas homônimas no grimório": `char.grimorio` é
+// deduplicado por NOME em `normalizarGrimorioMago` (site/js/utils.js),
+// chamada já na leitura do store -- duas entradas com o mesmo nome viram
+// uma só antes de qualquer migração rodar. A vaga por nome é a limitação
+// estrutural que os cenários vizinhos documentam.
+//
+// "Mísseis Mágicos" é o GUARDA CONTRA VACUIDADE: sem ela o grimório ficaria
+// vazio, e "a cópia saiu" não distinguiria a mira certa de uma limpeza que
+// levou tudo.
 // ============================================================
-test('grimório do Mago: renomear magia personalizada PAGA e homônima do acervo atualiza a entrada certa, sem deixar órfã (issue #42)', async ({ context }) => {
-  const NOME_COLISAO = 'Bola de Fogo'; // magia real do acervo, mas 3º círculo -- a personalizada é 1º
+test('a limpeza do grimório acerta a cópia da customizada homônima de uma magia de OUTRO círculo (issues #42 e #46)', async ({ context }) => {
+  const NOME_COLISAO = 'Bola de Fogo'; // magia real do acervo, 3º círculo
   const NOME_NOVO = 'Chama Azul de Nimb';
   const { page, erros } = await abrirFicha(context, {
     ...MAGO,
@@ -486,33 +591,40 @@ test('grimório do Mago: renomear magia personalizada PAGA e homônima do acervo
       tempo_conjuracao: 'Ação', alcance: '9 metros', componentes: 'V, S',
       duracao: 'Instantânea', descricao: '', dano: '', ritual: false,
     }],
-    // A entrada paga É da personalizada (1º círculo -- nenhuma "Bola de
-    // Fogo" do acervo é 1º círculo, então esta entrada só pode ser dela).
-    grimorio: [{ nome: NOME_COLISAO, circulo: 1 }],
+    // A entrada de 1º círculo só pode ser a cópia paga da personalizada:
+    // nenhuma "Bola de Fogo" do acervo é de 1º círculo.
+    grimorio: [{ nome: NOME_COLISAO, circulo: 1 }, { nome: 'Mísseis Mágicos', circulo: 1 }],
   }, 'regras-magia-custom-grimorio-renomear-homonima-paga');
   await assentar(page).catch(() => {});
   await abrirTudo(page);
+
+  // A MIRA DA LIMPEZA, antes de qualquer edição.
+  expect((await personagemSalvo(page)).grimorio,
+    'sai a cópia da customizada -- e sai apesar de "Bola de Fogo" existir no acervo, porque a '
+    + 'decisão é por nome E CÍRCULO. A magia do livro comprada continua no grimório')
+    .toEqual([{ nome: 'Mísseis Mágicos', circulo: 1 }]);
 
   await clicarSeletorFicha(page, '[data-editar-magia-custom]', { esperar: '#mc-nome' });
   await page.fill('#mc-nome', NOME_NOVO);
   await page.click('#btn-salvar-mc');
   await expect(page.locator('#toast-container'),
-    'renomear uma cópia paga, sem ambiguidade nenhuma (círculo não bate com o do acervo), tem de '
-    + 'confirmar sucesso sem ressalva')
+    'a edição precisa ter sido gravada antes de medir o que sobrou dela')
     .toContainText('atualizada');
   await assentar(page).catch(() => {});
 
   const salvo = await personagemSalvo(page);
-  const grimorio = salvo?.grimorio || [];
-  expect(grimorio.some((m) => m?.nome === NOME_COLISAO),
-    'a entrada com o nome antigo não pode sobrar -- ela é desta personalizada, e tem de acompanhar '
-    + 'o rename, não ficar órfã sob o nome morto')
-    .toBe(false);
-  expect(grimorio.some((m) => m?.nome === NOME_NOVO && m.circulo === 1),
-    'a cópia paga precisa aparecer com o nome novo e o círculo (1º) preservado')
-    .toBe(true);
-  expect(grimorio.length, 'nem órfã sobrando, nem duplicata: continua uma entrada só')
-    .toBe(1);
+  expect((salvo?.magias_customizadas || []).map((m) => m.nome),
+    'A CAPACIDADE: renomear a customizada homônima continua funcionando')
+    .toEqual([NOME_NOVO]);
+  expect(salvo?.grimorio,
+    'e o grimório não muda com o rename: nem a entrada do livro é tocada, nem o nome novo '
+    + 'aparece -- a customizada não é magia de grimório desde a #46')
+    .toEqual([{ nome: 'Mísseis Mágicos', circulo: 1 }]);
+
+  await expect(page.locator('[data-details-id="magias-circulo-1"] .magia-personalizada',
+    { hasText: NOME_NOVO }),
+  'e a linha renomeada aparece na seção Preparadas, conjurável como sempre')
+    .toHaveCount(1);
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });

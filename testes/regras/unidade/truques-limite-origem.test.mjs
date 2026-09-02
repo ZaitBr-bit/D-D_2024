@@ -64,16 +64,20 @@ test('toda origem não-trocável fica fora do limite, exceto subclasse_fixa', ()
 //
 // O predicado acima responde por UMA entrada. A pergunta que as duas telas
 // fazem é outra: "quanto do orçamento de truques da classe este personagem
-// já gastou?". Ela precisa varrer as DUAS listas onde truque mora --
-// `magias_conhecidas` (truque do livro) e `magias_customizadas` (truque
-// que o próprio jogador inventou no formulário "Magia Personalizada").
+// já gastou?". Desde a issue #46 ela varre UMA lista só --
+// `magias_conhecidas` (truque do livro). `magias_customizadas` (truque que
+// o próprio jogador inventou no formulário "Magia Personalizada") saiu da
+// conta.
 //
-// TRUQUE PERSONALIZADO CONTA. Decisão do dono do produto, registrada em
-// docs/PERGUNTAS-PENDENTES.txt ("MAGIA CUSTOMIZADA DEVE GASTAR VAGA DO
-// ORCAMENTO DA CLASSE?"): vaga é vaga, venha de onde vier -- a mesma
-// resposta que a magia de círculo personalizada sempre teve. Antes desta
-// decisão o app respondia as duas coisas ao mesmo tempo, sem razão escrita
-// para a diferença.
+// TRUQUE PERSONALIZADO NÃO CONTA -- issue #46, decisão do dono do produto
+// de 2026-09-02, que REVERTE a decisão anterior. A regra antiga ("vaga é
+// vaga, venha de onde vier", registrada em docs/PERGUNTAS-PENDENTES.txt sob
+// "MAGIA CUSTOMIZADA DEVE GASTAR VAGA DO ORCAMENTO DA CLASSE?") existia
+// para acabar com uma incoerência real: o app cobrava vaga da magia
+// homebrew de círculo e dava o truque homebrew de graça, sem razão escrita
+// para a diferença. A #46 mantém a coerência e inverte o lado: as duas saem
+// de graça, e as duas nascem preparadas. O jogador que reportou via a ficha
+// acusar "truques demais" por um truque que ele mesmo inventou.
 //
 // POR QUE O PREDICADO SOZINHO NÃO PEGAVA ISTO: `truqueContaNoLimite`
 // SEMPRE devolveu `true` para o truque personalizado (ele não tem `origem`
@@ -88,7 +92,7 @@ test('toda origem não-trocável fica fora do limite, exceto subclasse_fixa', ()
 /** Um truque escolhido da tabela da classe: sem `origem`, como o app grava. */
 const truqueDeClasse = (nome) => ({ nome, circulo: 0 });
 
-test('personagem com truque personalizado: ele gasta vaga do orçamento da classe (+1)', () => {
+test('personagem com truque personalizado: ele NÃO gasta vaga do orçamento da classe', () => {
   const personagem = {
     magias_conhecidas: [truqueDeClasse('Luz'), truqueDeClasse('Prestidigitação')],
     magias_customizadas: [{ nome: 'Fagulha de Nimb', circulo: 0, escola: 'Evocação' }],
@@ -96,46 +100,49 @@ test('personagem com truque personalizado: ele gasta vaga do orçamento da class
 
   const contam = regrasOrigensMagia.truquesQueContamNoLimite(personagem);
 
-  assert.equal(contam.length, 3,
-    'dois truques do livro + um truque personalizado = 3 vagas gastas. Se vier 2, o truque que o '
-    + 'jogador inventou continua saindo de graça, enquanto a magia de círculo personalizada dele '
-    + 'paga vaga -- as duas respostas para a mesma pergunta que esta decisão veio extinguir.');
-  assert.ok(contam.some(m => m.nome === 'Fagulha de Nimb'),
-    'a contagem tem de incluir a ENTRADA do truque personalizado, não só bater de número por acaso');
+  assert.equal(contam.length, 2,
+    'só os dois truques do LIVRO gastam vaga. Se vier 3, o truque que o jogador inventou '
+    + 'voltou a cobrar do orçamento da classe -- a issue #46, em que a ficha acusava '
+    + '"truques demais" por um truque homebrew.');
+  assert.ok(!contam.some(m => m.nome === 'Fagulha de Nimb'),
+    'a entrada do truque personalizado não pode aparecer na contagem, nem "por acaso" '
+    + 'com o número certo');
 });
 
-test('contraste: magia personalizada de CÍRCULO não entra no orçamento de truques', () => {
-  // Sem este contraste, "somar magias_customizadas inteiro" passaria no
-  // teste acima e cobraria do orçamento de TRUQUES uma magia de 1º círculo.
+test('contraste: magia personalizada de CÍRCULO também não entra no orçamento de truques', () => {
+  // Este contraste vale por outro motivo desde a #46: antes ele impedia
+  // "somar magias_customizadas inteiro"; agora impede que alguém reintroduza
+  // a leitura de magias_customizadas por outro caminho.
   const personagem = {
     magias_conhecidas: [truqueDeClasse('Luz'), truqueDeClasse('Prestidigitação')],
     magias_customizadas: [{ nome: 'Névoa de Nimb', circulo: 1, escola: 'Adivinhação' }],
   };
 
   assert.equal(regrasOrigensMagia.truquesQueContamNoLimite(personagem).length, 2,
-    'magia personalizada de círculo 1+ gasta vaga do limite de PREPARADAS (magiaContaNoLimite), '
-    + 'nunca do limite de truques');
+    'nem truque nem magia personalizada saem de orçamento nenhum (issue #46)');
 });
 
-test('ficha antiga: truque personalizado com círculo gravado como string ("0") também conta', () => {
+test('ficha antiga: truque personalizado com círculo "0" (string) também fica fora', () => {
   // O formulário de Magia Personalizada gravava o círculo como string em
-  // ficha antiga -- é o motivo de `normalizarMagiaPersonalizada`
-  // (sheet/magias.js) e `personalizadasDeCirculoDaFicha` (sheet/grimorio.js)
-  // sanearem com `Number(...)`. Uma comparação `=== 0` crua deixaria a
-  // ficha antiga de fora do orçamento, em silêncio.
+  // ficha antiga. Antes da #46 este teste existia para provar que o
+  // saneamento `Number(...)` alcançava a ficha antiga. Depois da #46 não há
+  // leitor de `magias_customizadas` aqui, então nenhum formato de círculo
+  // pode fazer o truque personalizado reaparecer na conta -- é isto que o
+  // teste passa a guardar.
   const personagem = {
     magias_conhecidas: [truqueDeClasse('Luz')],
     magias_customizadas: [{ nome: 'Fagulha de Nimb', circulo: '0' }],
   };
 
-  assert.equal(regrasOrigensMagia.truquesQueContamNoLimite(personagem).length, 2,
-    'círculo "0" (string, ficha antiga) é truque -- tem de gastar vaga igual ao numérico');
+  assert.equal(regrasOrigensMagia.truquesQueContamNoLimite(personagem).length, 1,
+    'só "Luz". Círculo "0" em string não pode ser porta de volta para a regra antiga');
 });
 
 test('o critério de origem continua valendo: truque de espécie fora, Mãos Mágicas do Trapaceiro Arcano dentro', () => {
-  // A decisão do dono do produto alinhou o truque PERSONALIZADO à magia
-  // personalizada. Ela não mexeu em nenhuma das origens concedidas -- este
-  // oráculo é o que impede a mudança de virar "conta tudo".
+  // A issue #46 alinhou o truque PERSONALIZADO à magia personalizada pelo
+  // lado da isenção. Ela não mexeu em nenhuma das origens concedidas do
+  // livro -- este oráculo é o que impede a reversão de virar "não conta
+  // nada", do mesmo jeito que antes impedia o "conta tudo".
   const personagem = {
     magias_conhecidas: [
       truqueDeClasse('Luz'),
@@ -148,9 +155,10 @@ test('o critério de origem continua valendo: truque de espécie fora, Mãos Má
 
   const nomes = regrasOrigensMagia.truquesQueContamNoLimite(personagem).map(m => m.nome).sort();
 
-  assert.deepEqual(nomes, ['Fagulha de Nimb', 'Luz', 'Mãos Mágicas'],
-    'só o truque escolhido da tabela, o de subclasse_fixa (que o livro manda contar) e o '
-    + 'personalizado gastam vaga -- espécie e subclasse_automatica continuam de fora');
+  assert.deepEqual(nomes, ['Luz', 'Mãos Mágicas'],
+    'só o truque escolhido da tabela e o de subclasse_fixa (que o livro manda contar) '
+    + 'gastam vaga -- espécie, subclasse_automatica e o PERSONALIZADO (issue #46) '
+    + 'continuam de fora');
 });
 
 test('magias de círculo de magias_conhecidas não entram na contagem de truques', () => {
@@ -168,4 +176,30 @@ test('magias de círculo de magias_conhecidas não entram na contagem de truques
 test('personagem sem nenhuma das duas listas devolve vazio, sem lançar', () => {
   assert.deepEqual(regrasOrigensMagia.truquesQueContamNoLimite({}), []);
   assert.deepEqual(regrasOrigensMagia.truquesQueContamNoLimite(null), []);
+});
+
+// ============================================================
+// A MAGIA de círculo personalizada, issue #46.
+//
+// `magiaContaNoLimite` é o portão de TRÊS leitores ao mesmo tempo
+// (preparadasPorClasse, normalizarGrimorioMago, migrarSlotsMagiaLivre), e é
+// por ele que a customizada de círculo sai do "6/6". Medir o predicado aqui
+// é o que impede a regra de voltar por um deles.
+// ============================================================
+
+test('magia personalizada de círculo não conta no limite de preparadas', () => {
+  assert.equal(regrasOrigensMagia.magiaContaNoLimite({ nome: 'Névoa de Nimb', circulo: 1, personalizada: true }), false,
+    'a marca `personalizada` é o que a isenta -- ela não tem `origem` de concessão, '
+    + 'então sem esta regra ela cai no ramo genérico e volta a gastar vaga');
+});
+
+test('a isenção é só da marca: magia do livro com o mesmo nome continua contando', () => {
+  assert.equal(regrasOrigensMagia.magiaContaNoLimite({ nome: 'Névoa de Nimb', circulo: 1 }), true,
+    'homônima do acervo não é a magia do jogador -- sem esta guarda a isenção viraria '
+    + '"toda magia é isenta" no dia em que alguém trocar a marca por uma busca por nome');
+});
+
+test('a isenção não engole as origens do livro que já contavam', () => {
+  assert.equal(regrasOrigensMagia.magiaContaNoLimite({ nome: 'Bola de Fogo', circulo: 3 }), true);
+  assert.equal(regrasOrigensMagia.magiaContaNoLimite({ nome: 'Bênção', circulo: 1, origem: 'dominio' }), false);
 });

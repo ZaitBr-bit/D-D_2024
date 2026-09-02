@@ -18,7 +18,7 @@ import { abrirFicha, assentar, clicarBotaoFicha, ATRIBUTOS_REGRAS } from './help
  * A caixa do contador de truques da SEÇÃO Magias da ficha -- o primeiro
  * `.magia-contador` de `.magia-contadores`.
  *
- * `.magia-contadores` escopa à FICHA: o modal "Gerenciar Magias" também
+ * `.magia-contadores` escopa à FICHA: o modal "Preparar Magias" também
  * usa a classe `.magia-contador`, e os cenários mais abaixo o abrem.
  */
 function caixaContadorTruques(page) {
@@ -48,7 +48,7 @@ async function classesContador(page) {
  * ficha, achado pelo RÓTULO exato e dentro de `.magia-contadores` -- as
  * duas coisas que `contadorTruques` (acima, o helper histórico deste
  * arquivo) não faz. `.magia-contador` sozinho também casa os contadores do
- * MODAL "Gerenciar Magias", que os cenários abaixo abrem: com o modal
+ * MODAL "Preparar Magias", que os cenários abaixo abrem: com o modal
  * aberto, um `.first()` sobre a página inteira deixaria de ser uma
  * afirmação sobre a ficha. `null` quando a caixa não existe.
  */
@@ -64,7 +64,7 @@ async function contadorTruquesFicha(page) {
   });
 }
 
-/** `{ atual, limite }` do contador de truques do topo do modal "Gerenciar Magias". */
+/** `{ atual, limite }` do contador de truques do topo do modal "Preparar Magias". */
 async function contadorTruquesModal(page) {
   const texto = await page.locator('#gm-contador-truques').textContent().catch(() => null);
   const m = texto?.match(/(\d+)\s*\/\s*(\d+)/);
@@ -72,7 +72,7 @@ async function contadorTruquesModal(page) {
 }
 
 /**
- * Abre o modal "Gerenciar Magias" pelo botão "+ Magia" e espera a grade
+ * Abre o modal "Preparar Magias" pelo botão de mesmo nome e espera a grade
  * existir -- `mostrarBuscaMagia` é assíncrona (carrega a lista da classe
  * antes de montar o HTML), então esperar o elemento, e não um timeout
  * fixo, é o que cobre essa corrida. `clicarBotaoFicha` (helpers-regras.mjs)
@@ -162,23 +162,75 @@ test('ficha: Mãos Mágicas do Trapaceiro Arcano CONTINUA contando no limite',
       'Mãos Mágicas do Trapaceiro Arcano saiu da conta dos três truques').toBe('3 / 3');
   });
 
+test('ficha: acima do limite o contador de truques fica vermelho (contador-excedido)',
+  async ({ context }) => {
+    // A AFIRMAÇÃO POSITIVA DO ALARME, e por que ela precisa existir: todos
+    // os outros cenários deste arquivo dizem `not.toContain('contador-excedido')`
+    // -- eles provam que o alarme não dispara à toa, e nenhum prova que ele
+    // dispara. Só com negativas, apagar o ramo que aplica a classe em
+    // `sheet/magias.js` deixaria a suíte inteira verde, e as próprias
+    // negativas passariam a valer por vacuidade. Este é o oráculo que
+    // quebra se o alarme sumir.
+    //
+    // SÓ TRUQUES DO LIVRO, nenhum personalizado, de propósito: a issue #46
+    // tirou o truque personalizado do orçamento da classe, e as tarefas
+    // seguintes ainda mexem no render e na magia personalizada. Um oráculo
+    // do ALARME não pode depender de nenhum dos dois -- quatro truques da
+    // tabela contra o limite de 3 do Mago nível 3 estouram por aritmética
+    // simples, e isso não muda mais.
+    const { page, erros } = await abrirFicha(context, {
+      classe: 'Mago',
+      nivel: 3,
+      xp: 900,
+      atributos: ATRIBUTOS_REGRAS,
+      pericias_proficientes: ['Arcanismo', 'História'],
+      magias_conhecidas: [
+        { nome: 'Luz', circulo: 0 },
+        { nome: 'Prestidigitação', circulo: 0 },
+        { nome: 'Raio de Gelo', circulo: 0 },
+        { nome: 'Mensagem', circulo: 0 },
+      ],
+    }, 'regras-contador-excedido-livro');
+
+    // GUARDA CONTRA VACUIDADE: sem a seção de Magias não há contador para
+    // medir, e a leitura devolveria `null` por corrida, não por regra.
+    await expect(page.locator('#btn-add-magia'),
+      'a seção de Magias não foi montada -- sem ela não há contador para medir')
+      .toBeVisible({ timeout: 10_000 });
+
+    expect(await contadorTruques(page),
+      'quatro truques da tabela contra o limite de 3 do Mago nível 3')
+      .toBe('4 / 3');
+
+    expect(await classesContador(page),
+      'acima do limite o contador TEM de ganhar a classe contador-excedido -- é o vermelho '
+      + 'que o jogador vê, e é o estado que os demais cenários deste arquivo só sabem negar')
+      .toContain('contador-excedido');
+
+    expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+  });
+
 // ============================================================
-// TRUQUE PERSONALIZADO GASTA VAGA DO ORÇAMENTO DA CLASSE.
+// TRUQUE PERSONALIZADO NÃO GASTA VAGA DO ORÇAMENTO DA CLASSE -- issue #46.
 //
-// Decisão do dono do produto, registrada em docs/PERGUNTAS-PENDENTES.txt
-// ("MAGIA CUSTOMIZADA DEVE GASTAR VAGA DO ORCAMENTO DA CLASSE?"): o app
-// respondia a MESMA pergunta de dois jeitos -- a magia de círculo
-// personalizada sempre contou no limite de preparadas, e o truque
-// personalizado saía de graça. Alinha o truque à magia.
+// Decisão do dono do produto de 2026-09-02, que REVERTE a decisão anterior
+// (registrada em docs/PERGUNTAS-PENDENTES.txt sob "MAGIA CUSTOMIZADA DEVE
+// GASTAR VAGA DO ORCAMENTO DA CLASSE?"). A regra antiga -- "vaga é vaga,
+// venha de onde vier" -- existia para acabar com uma incoerência real: o
+// app cobrava vaga da magia homebrew de círculo e dava o truque homebrew
+// de graça, sem razão escrita para a diferença. A #46 mantém a coerência e
+// inverte o lado: as duas saem de graça, e as duas nascem preparadas. O
+// jogador que reportou via a ficha acusar "truques demais" por um truque
+// que ele mesmo inventou.
 //
 // POR QUE ESTES ORÁCULOS SÃO DE TELA, e não só de unidade: o motor
 // (`truquesQueContamNoLimite`, medido por unidade em
-// testes/regras/unidade/truques-limite-origem.test.mjs) sempre soube
-// responder -- eram os dois CHAMADORES que excluíam o truque
-// personalizado, cada um do seu jeito, e as duas telas
-// já divergiram em silêncio por regra de contagem copiada à mão (ver o
-// Oráculo 4g de testes/regras/unidade/multiclasse-magias-grimorio.test.mjs).
-// Por isso cada cenário abaixo lê a ficha E abre o modal "+ Magia".
+// testes/regras/unidade/truques-limite-origem.test.mjs) responde por si,
+// mas quem o jogador vê é o CONTADOR -- e as duas telas que o desenham (a
+// seção Magias da ficha e o modal "Preparar Magias") já divergiram em silêncio por
+// regra de contagem copiada à mão (ver o Oráculo 4g de
+// testes/regras/unidade/multiclasse-magias-grimorio.test.mjs). Por isso
+// cada cenário abaixo lê a ficha E abre o modal "Preparar Magias".
 // ============================================================
 
 // dados/classes/mago.json, nível 3: Truques "3". Medido do arquivo.
@@ -198,9 +250,10 @@ const MAGO_3 = {
   pericias_proficientes: ['Arcanismo', 'História'],
 };
 
-test('ficha e "+ Magia": o truque personalizado gasta vaga, e as duas telas mostram o MESMO número',
+test('ficha e "Preparar Magias": o truque personalizado NÃO gasta vaga, e as duas telas mostram o MESMO número',
   async ({ context }) => {
-    // Dois truques do livro + um personalizado = as três vagas do Mago 3.
+    // Dois truques do livro + um personalizado = duas das três vagas do
+    // Mago 3. A terceira continua livre: o personalizado não sai daqui.
     const { page, erros } = await abrirFicha(context, {
       ...MAGO_3,
       magias_conhecidas: [
@@ -208,7 +261,7 @@ test('ficha e "+ Magia": o truque personalizado gasta vaga, e as duas telas most
         { nome: 'Prestidigitação', circulo: 0 },
       ],
       magias_customizadas: [TRUQUE_PERSONALIZADO],
-    }, 'regras-truque-custom-conta');
+    }, 'regras-truque-custom-nao-conta');
 
     // GUARDA CONTRA VACUIDADE: sem a seção de Magias (e sem o botão que
     // abre o modal) não há duas telas para confrontar.
@@ -219,9 +272,9 @@ test('ficha e "+ Magia": o truque personalizado gasta vaga, e as duas telas most
     const ficha = await contadorTruquesFicha(page);
     expect(ficha, 'não achei o contador "Truques N / M" na seção Magias da ficha').not.toBeNull();
     expect(ficha.atual,
-      'o truque que o jogador inventou tem de gastar vaga do orçamento da classe, como a magia de '
-      + 'círculo personalizada dele já gasta. Se vier 2, o truque personalizado continua de graça.')
-      .toBe(3);
+      'o truque que o jogador inventou não pode gastar vaga do orçamento da classe (issue #46). '
+      + 'Se vier 3, o personalizado voltou a ser cobrado.')
+      .toBe(2);
     expect(ficha.limite, 'o limite deveria ser o do Mago nível 3').toBe(MAGO_3_TRUQUES);
 
     await abrirGerenciarMagias(page);
@@ -229,8 +282,8 @@ test('ficha e "+ Magia": o truque personalizado gasta vaga, e as duas telas most
     const modal = await contadorTruquesModal(page);
     expect(modal, 'não achei o contador de truques (#gm-contador-truques) no modal').not.toBeNull();
     expect(modal.atual,
-      'o modal "+ Magia" tem de contar o truque personalizado igual à ficha -- ele lia SÓ '
-      + 'char.magias_conhecidas, onde o truque personalizado nunca mora')
+      'o modal "Preparar Magias" tem de mostrar o MESMO número que a ficha -- as duas telas já '
+      + 'divergiram por contagem copiada à mão')
       .toBe(ficha.atual);
     expect(modal.limite, 'o modal e a ficha têm de mostrar o MESMO limite').toBe(ficha.limite);
 
@@ -296,12 +349,8 @@ test('ficha: o truque personalizado aparece UMA vez só na seção de Truques, e
     expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
   });
 
-test('ficha: com o orçamento já cheio, o truque personalizado leva o contador ACIMA do limite, em vermelho',
+test('issue #46: 3 truques do livro + 1 personalizado NÃO estoura o limite do Mago 3',
   async ({ context }) => {
-    // A CONSEQUÊNCIA QUE É PARA ACONTECER, e não para ser suavizada: quem
-    // já tinha um truque personalizado passa a contar um a mais e pode
-    // aparecer acima do limite. Nada é removido da ficha -- o jogador só
-    // vê que está acima, e não pega mais um truque da classe até resolver.
     const { page, erros } = await abrirFicha(context, {
       ...MAGO_3,
       magias_conhecidas: [
@@ -310,35 +359,24 @@ test('ficha: com o orçamento já cheio, o truque personalizado leva o contador 
         { nome: 'Raio de Gelo', circulo: 0 },
       ],
       magias_customizadas: [TRUQUE_PERSONALIZADO],
-    }, 'regras-truque-custom-excedido');
+    }, 'regras-issue46-truque-nao-estoura');
 
-    // GUARDA CONTRA VACUIDADE: a seção de Magias precisa ter sido montada
-    // antes de qualquer leitura do contador -- lida cedo demais, ela
-    // devolve `null` e a asserção falharia por corrida, não por regra.
     await expect(page.locator('#btn-add-magia'),
-      'a seção de Magias não foi montada -- sem ela não há contador para medir')
-      .toBeVisible({ timeout: 10_000 });
+      'sem a seção de Magias não há contador para medir').toBeVisible();
 
-    const ficha = await contadorTruquesFicha(page);
-    expect(ficha, 'não achei o contador "Truques N / M" na seção Magias da ficha').not.toBeNull();
-    expect(ficha.atual,
-      'três truques do livro + um personalizado = 4 vagas gastas contra o limite de 3')
-      .toBe(MAGO_3_TRUQUES + 1);
-    expect(ficha.classes,
-      'acima do limite o contador tem de ficar vermelho (contador-excedido) -- é o estado que o '
-      + 'app já tem para isto, e a decisão do dono do produto é que ele apareça')
-      .toContain('contador-excedido');
+    expect(await contadorTruques(page),
+      'o truque que o jogador inventou não pode entrar no orçamento da classe (issue #46)')
+      .toBe(`${MAGO_3_TRUQUES} / ${MAGO_3_TRUQUES}`);
 
-    // E nada foi apagado da ficha por causa da mudança de regra.
-    const truques = page.locator('#details-truques');
-    await expect(truques.locator('.magia-item'),
-      'nenhum truque pode sumir da ficha: 3 do livro + 1 personalizado continuam desenhados')
-      .toHaveCount(4);
+    const classes = await classesContador(page);
+    expect(classes,
+      'com 3 de 3 o contador fica "cheio", nunca "excedido" -- era o aviso de '
+      + '"truques demais" do relato').not.toContain('contador-excedido');
 
-    expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+    expect(erros, 'nenhum erro de console').toEqual([]);
   });
 
-test('multiclasse (Clérigo 5/Mago 1): o truque personalizado conta nas duas telas também com mais de uma superfície',
+test('multiclasse (Clérigo 5/Mago 1): as duas telas concordam, e o personalizado fica fora da conta',
   async ({ context }) => {
     // Com DUAS superfícies de conjuração a tela muda de forma: o seletor
     // de classe aparece e as guardas `superficies.length <= 1` /
@@ -375,18 +413,20 @@ test('multiclasse (Clérigo 5/Mago 1): o truque personalizado conta nas duas tel
     // classe gastavam o orçamento da outra, e a saída da época foi
     // DESLIGAR a trava em multiclasse -- 16 truques com limite 4, medido.
     //
-    // O que continua valendo, e o que este teste protege: (1) as duas
-    // telas nunca discordam do número, e (2) o truque personalizado não é
-    // de graça. O que mudou é ONDE ele aparece: com DUAS superfícies e
-    // nenhum carimbo de classe, o app não sabe de quem é o truque, então
-    // ele entra como INCERTEZA VISÍVEL em vez de ser cobrado em silêncio
-    // do orçamento da classe ativa. Com uma superfície só (o teste irmão,
-    // acima) nada mudou: sem ambiguidade possível, o truque é dela e conta.
+    // O que este teste protege, e continua valendo: as duas telas nunca
+    // discordam do número. Os truques do LIVRO sem carimbo, com DUAS
+    // superfícies, não podem ser cobrados do orçamento da classe ativa por
+    // chute -- eles entram como INCERTEZA VISÍVEL.
+    //
+    // O truque PERSONALIZADO, desde a issue #46, não está nem numa conta
+    // nem na outra: ele saiu do orçamento da classe, então não aparece nem
+    // no contador nem na incerteza. Por isso o "sem classe" mostra 2 (os
+    // dois do livro), e não 3.
     const ficha = await contadorTruquesFicha(page);
     expect(ficha, 'não achei o contador "Truques N / M" na seção Magias da ficha').not.toBeNull();
     expect(ficha.atual,
-      'nenhum dos três truques está carimbado com uma classe, e o personagem tem duas superfícies '
-      + '-- nenhum deles pode ser cobrado do orçamento do Clérigo por chute')
+      'nenhum dos truques do livro está carimbado com uma classe, e o personagem tem duas '
+      + 'superfícies -- nenhum deles pode ser cobrado do orçamento do Clérigo por chute')
       .toBe(0);
 
     // A incerteza tem de estar NA TELA: sem isto o contador mentiria por
@@ -396,20 +436,21 @@ test('multiclasse (Clérigo 5/Mago 1): o truque personalizado conta nas duas tel
       'os truques sem classe têm de aparecer na ficha, não sumir da conta')
       .toBeVisible();
     await expect(semClasseFicha,
-      'são três truques sem carimbo: dois do livro e o personalizado')
-      .toContainText('3');
+      'são dois truques do livro sem carimbo. O personalizado não entra aqui: desde a issue #46 '
+      + 'ele não sai de orçamento nenhum, então não há incerteza sobre ele')
+      .toContainText('2');
 
     await abrirGerenciarMagias(page);
 
     const modal = await contadorTruquesModal(page);
     expect(modal, 'não achei o contador de truques (#gm-contador-truques) no modal').not.toBeNull();
-    expect(modal.atual, 'o modal "+ Magia" tem de mostrar o MESMO número de truques gastos que a ficha')
+    expect(modal.atual, 'o modal "Preparar Magias" tem de mostrar o MESMO número de truques gastos que a ficha')
       .toBe(ficha.atual);
     expect(modal.limite, 'o modal e a ficha têm de mostrar o MESMO limite (o da superfície ativa)')
       .toBe(ficha.limite);
     await expect(page.locator('#gm-contador-truques-sem-classe'),
       'o modal tem de mostrar a MESMA incerteza que a ficha')
-      .toContainText('3');
+      .toContainText('2');
 
     expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
   });
@@ -417,8 +458,9 @@ test('multiclasse (Clérigo 5/Mago 1): o truque personalizado conta nas duas tel
 test('multiclasse: o truque CARIMBADO com a classe ativa conta no orçamento dela',
   async ({ context }) => {
     // O complemento do teste acima: com carimbo não há incerteza nenhuma, e
-    // o truque volta a ser cobrado -- inclusive o personalizado continua
-    // fora de qualquer isenção, ele só não tem como ser atribuído sozinho.
+    // o truque do LIVRO volta a ser cobrado do orçamento da sua classe. O
+    // personalizado não aparece neste cenário porque, desde a issue #46,
+    // ele não entra em orçamento nenhum -- carimbado ou não.
     const { page, erros } = await abrirFicha(context, {
       classe: 'Clérigo', subclasse: '', nivel: 6, xp: 14000,
       especie: 'Humano', atributos: ATRIBUTOS_REGRAS,

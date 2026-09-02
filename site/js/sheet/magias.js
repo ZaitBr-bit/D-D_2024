@@ -174,8 +174,29 @@ function renderDetalhesMagiaPersonalizada(magia) {
   `;
 }
 
-function renderLinhaMagiaPersonalizada(magia, indice, opts = {}) {
-  const { naoPreparada = false } = opts;
+/**
+ * Desenha a linha de UMA magia personalizada na ficha -- nome, tags de
+ * escola/tempo/duração/alcance, os controles de conjuração e os botões de
+ * editar/remover. Serve tanto o truque personalizado (círculo 0, botão
+ * "Lançar") quanto a magia de círculo 1+ (seletor de upcast, "Conjurar" e,
+ * se for ritual, "Ritual"). A linha sai com `data-magia-custom-index`, e é
+ * esse atributo que leva o clique ao handler que lê
+ * `char.magias_customizadas` -- não ao handler do acervo de `dados/`, onde
+ * a magia que o jogador inventou não existe (issue #39).
+ *
+ * Issue #46: o terceiro parâmetro `opts.naoPreparada` foi removido. Ele
+ * existia para o acordeão "Magias Customizadas", que desenhava a magia de
+ * círculo ainda não preparada com o rótulo "Não preparada" no lugar dos
+ * controles de conjuração. A customizada de círculo passou a ser SEMPRE
+ * preparada, o acordeão saiu junto, e o estado "não preparada" deixou de
+ * existir para magia personalizada -- restaram os dois ramos reais
+ * (círculo 0 e círculo 1+).
+ *
+ * @param {object} magia Magia já normalizada por `normalizarMagiaPersonalizada`.
+ * @param {number} indice Índice dela em `char.magias_customizadas`.
+ * @returns {string} HTML da linha.
+ */
+function renderLinhaMagiaPersonalizada(magia, indice) {
   const tags = [];
   if (magia.escola) tags.push(`<span class="magia-tag tag-escola">${escHtml(magia.escola)}</span>`);
   if (magia.tempo_conjuracao) {
@@ -237,12 +258,7 @@ function renderLinhaMagiaPersonalizada(magia, indice, opts = {}) {
   );
   const controlesConjuracao = magia.circulo === 0
     ? `<button class="btn btn-sm btn-cantrip" data-lancar-magia-custom="${indice}">Lançar</button>`
-    : naoPreparada
-      ? `
-        <span style="font-size:0.65rem;color:var(--text-muted);font-style:italic">Não preparada</span>
-        ${magia.ritual ? `<button class="btn btn-sm btn-secondary" data-conjurar-ritual-custom="${indice}" title="Conjurar como Ritual (sem gastar espaço)">Ritual</button>` : ''}
-      `
-      : `
+    : `
       ${temUpcast ? `
         <select class="form-input" data-conj-select-custom="${indice}" style="width:auto;padding:2px 4px;font-size:0.75rem">
           ${circulosDisponiveis.map(circulo => `<option value="${circulo}"${circulo === magia.circulo ? ' selected' : ''}>${circulo}º</option>`).join('')}
@@ -572,12 +588,20 @@ export function renderSecaoMagias() {
   //
   //  - `truquesNoLimite` responde "quanto do orçamento DESTA classe já foi
   //    gasto?". A base vem da fonte única (regras-origens-magia.js), que lê
-  //    `magias_conhecidas` E `magias_customizadas`: truque personalizado
-  //    CONTA, como a magia de círculo personalizada sempre contou (decisão
-  //    do dono do produto). `truquesPorClasse` separa esses truques em três
-  //    baldes por classe -- é a MESMA função que o modal "+ Magia"
-  //    (sheet/grimorio.js) chama, para as duas telas não poderem discordar
-  //    sobre o número.
+  //    SÓ `magias_conhecidas`: truque personalizado NÃO conta (issue #46,
+  //    decisão do dono do produto de 2026-09-02, que REVERTEU a decisão
+  //    anterior -- o docblock de `truquesQueContamNoLimite` carrega o
+  //    histórico das duas). Este parágrafo afirmava o contrário, palavra
+  //    por palavra, até a #46. `truquesPorClasse` separa esses truques em
+  //    três baldes por classe -- é a MESMA função que o modal "Preparar
+  //    Magias" (sheet/grimorio.js) chama, para as duas telas não poderem
+  //    discordar sobre o número.
+  //
+  //    O personalizado não some da tela por ficar fora daqui: ele aparece
+  //    à parte, no chip "Truques Personalizados" e no "+ N personalizado"
+  //    do resumo desta seção (os dois montados de `truquesPersonalizados`,
+  //    logo abaixo). Sem esses dois sinais, o contador caindo sozinho na
+  //    primeira abertura da ficha se leria como truque perdido.
   //
   //    Passou a ser POR CLASSE porque a soma global era o que quebrava o
   //    limite em multiclasse: os truques do Clérigo gastavam o orçamento do
@@ -680,15 +704,25 @@ export function renderSecaoMagias() {
   // Label dinâmico baseado no tipo de conjuração
   const labelMagias = tipoConj === 'conhecidas' ? 'Magias Conhecidas' : 'Magias Preparadas';
 
-  // Agrupar magias preparadas por círculo
+  // Agrupar magias preparadas por círculo.
+  //
+  // Issue #46: a magia customizada de círculo 1+ entra AQUI, derivada de
+  // `char.magias_customizadas` -- ela é sempre preparada, e esta é a mesma
+  // fusão que a folha impressa (sheet/impressao.js) já fazia. Antes desta
+  // issue ela só chegava por `magias_preparadas`, depois de um clique em
+  // "Preparar", e o `find` abaixo trocava a entrada gravada pelo objeto
+  // completo. A migração `migrarMagiasCustomizadasSemprePreparadas`
+  // (sheet/migracoes.js) esvaziou esse caminho: nenhuma entrada de
+  // `magias_preparadas` tem mais a marca `personalizada`.
   const preparadasPorCirculo = {};
   preparadas.forEach(m => {
     const circ = m.circulo || 1;
     if (!preparadasPorCirculo[circ]) preparadasPorCirculo[circ] = [];
-    const item = m.personalizada
-      ? (magiasPersonalizadas.find(mp => mp.nome === m.nome && mp.circulo === circ) || m)
-      : m;
-    preparadasPorCirculo[circ].push(item);
+    preparadasPorCirculo[circ].push(m);
+  });
+  magiasPersonalizadas.filter(m => m.circulo > 0).forEach(m => {
+    if (!preparadasPorCirculo[m.circulo]) preparadasPorCirculo[m.circulo] = [];
+    preparadasPorCirculo[m.circulo].push(m);
   });
 
   // Verificar se é Mago (para grimório). `temClasse`, não o espelho
@@ -743,7 +777,7 @@ export function renderSecaoMagias() {
       <div class="card-header">
         <h2>Magias</h2>
         <div class="no-print" style="display:flex;gap:4px">
-          <button class="btn btn-sm btn-accent" id="btn-add-magia">+ Magia</button>
+          <button class="btn btn-sm btn-accent" id="btn-add-magia">Preparar Magias</button>
           <button class="btn btn-sm btn-secondary" id="btn-add-magia-custom">Magia Personalizada</button>
         </div>
       </div>
@@ -801,11 +835,11 @@ export function renderSecaoMagias() {
         dos personagens), a tela fica identica a antes do seletor existir.
         Clicar chama definirSuperficieSelecionada (contexto-classe.js) e
         re-renderiza a ficha inteira -- a MESMA variavel que
-        sheet/grimorio.js le em superficieAtiva(), entao "+ Magia" abre
+        sheet/grimorio.js le em superficieAtiva(), entao "Preparar Magias" abre
         para a classe escolhida aqui sem precisar de seletor proprio dentro
         do modal.
 
-        DECISAO REGISTRADA: o modal "Gerenciar Magias" NAO ganhou um
+        DECISAO REGISTRADA: o modal "Preparar Magias" NAO ganhou um
         seletor proprio, de proposito. Ele tem busca digitada
         (#busca-magia-add) e aba ativa (tabAtiva, Preparadas/Truques/
         Circulo) -- estado local que hoje reinicia limpo TODA vez que o
@@ -876,6 +910,12 @@ export function renderSecaoMagias() {
             <span class="contador-valor">${truquesSempre.length}</span>
           </div>
         ` : ''}
+        ${truquesPersonalizados.length > 0 ? `
+          <div class="magia-contador contador-dominio" title="Truques que você mesmo criou: não gastam vaga do limite de truques da classe e estão sempre prontos para uso.">
+            <span class="contador-label">Truques Personalizados</span>
+            <span class="contador-valor">${truquesPersonalizados.length}</span>
+          </div>
+        ` : ''}
         ${maxPreparadas > 0 ? `
           <div class="magia-contador ${numPreparadas > maxPreparadas && numSemClasse === 0 ? 'contador-excedido' : numPreparadas === maxPreparadas && numSemClasse === 0 ? 'contador-cheio' : ''}">
             <span class="contador-label">${labelMagias}</span>
@@ -886,6 +926,12 @@ export function renderSecaoMagias() {
           <div class="magia-contador contador-dominio" title="Magias de fichas antigas cuja classe não pôde ser determinada sem chute -- não entram na contagem de ${labelMagias.toLowerCase()} nem no bloqueio de limite.">
             <span class="contador-label">${labelMagias} (sem classe)</span>
             <span class="contador-valor">+${numSemClasse}</span>
+          </div>
+        ` : ''}
+        ${magiasPersonalizadas.filter(m => m.circulo > 0).length > 0 ? `
+          <div class="magia-contador contador-dominio" title="Magias que você mesmo criou: não gastam vaga do limite de preparadas e estão sempre preparadas (conjurá-las continua gastando espaço de magia).">
+            <span class="contador-label">Personalizadas</span>
+            <span class="contador-valor">${magiasPersonalizadas.filter(m => m.circulo > 0).length}</span>
           </div>
         ` : ''}
         ${preparadasEspeciais.length > 0 ? `
@@ -1017,7 +1063,7 @@ export function renderSecaoMagias() {
       ${todosTruques.length > 0 ? `
         <details id="details-truques"${_truquesColapsados ? '' : ' open'} style="margin-bottom:8px">
           <summary style="font-weight:700;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--border-light)">
-            Truques (${truquesNoLimite.length}${maxTruques ? ' / ' + maxTruques : ''}${truquesSemClasse.length > 0 ? ` + ${truquesSemClasse.length} sem classe` : ''}${truquesEspecie.length > 0 ? ` + ${truquesEspecie.length} espécie` : ''}${truquesTalento.length > 0 ? ` + ${truquesTalento.length} talento` : ''}${truquesSempre.length > 0 ? ` + ${truquesSempre.length} subclasse` : ''})
+            Truques (${truquesNoLimite.length}${maxTruques ? ' / ' + maxTruques : ''}${truquesSemClasse.length > 0 ? ` + ${truquesSemClasse.length} sem classe` : ''}${truquesEspecie.length > 0 ? ` + ${truquesEspecie.length} espécie` : ''}${truquesTalento.length > 0 ? ` + ${truquesTalento.length} talento` : ''}${truquesSempre.length > 0 ? ` + ${truquesSempre.length} subclasse` : ''}${truquesPersonalizados.length > 0 ? ` + ${truquesPersonalizados.length} personalizado` : ''})
           </summary>
           <div style="padding-top:4px">
             ${truquesEspecie.slice().sort((a, b) => prioridadeConjuracao(a.nome) - prioridadeConjuracao(b.nome)).map(m => `
@@ -1172,20 +1218,20 @@ export function renderSecaoMagias() {
         </div>
       ` : ''}
 
-      <!-- Magias Customizadas (círculo > 0) não preparadas: garante local visível para editar/remover -->
-      ${(() => {
-        const naoPreparadas = magiasPersonalizadas.filter(m => m.circulo > 0 && !preparadas.some(p => p.nome === m.nome));
-        return naoPreparadas.length > 0 ? `
-        <details data-details-id="magias-customizadas-circulo" style="margin-bottom:8px">
-          <summary style="font-weight:700;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--border-light);color:var(--accent)">
-            Magias Customizadas (${naoPreparadas.length})
-          </summary>
-          <div style="padding-top:4px">
-            ${naoPreparadas.slice().sort((a, b) => a.circulo - b.circulo || a.nome.localeCompare(b.nome, 'pt-BR')).map(m => renderLinhaMagiaPersonalizada(m, m.indicePersonalizada, { naoPreparada: true })).join('')}
-          </div>
-        </details>
-      ` : '';
-      })()}
+      <!--
+        Issue #46: aqui ficava o acordeao "Magias Customizadas", o local
+        visivel para editar/remover a customizada de circulo que ainda nao
+        tinha sido preparada. Ele deixou de ter funcao: a customizada de
+        circulo 1+ e SEMPRE preparada, entao ela ja e desenhada no bloco do
+        circulo dela (ver a montagem de preparadasPorCirculo, acima), com
+        editar e remover na mesma linha. O filtro que o alimentava
+        (magiasPersonalizadas de circulo fora de magias_preparadas) nunca
+        mais acharia nada, e mante-lo so arriscaria desenhar a mesma magia
+        DUAS vezes.
+
+        ATENCAO: este comentario mora DENTRO do template literal do render.
+        Nada de crase aqui -- ela fecha a string e quebra a ficha inteira.
+      -->
     </div>
   `;
 }
@@ -2830,7 +2876,23 @@ export function setupEventosEspacosMagia() {
         return;
       }
 
-      const ehCustomizadaCirculo = (char.magias_customizadas || []).some(m => m?.nome === nome && Number(m.circulo) > 0);
+      // SEM marca `personalizada` (issue #46): este painel do Grimorio
+      // prepara SEMPRE magia do livro. A magia customizada de circulo 1+
+      // passou a ser sempre preparada e DERIVADA de
+      // `char.magias_customizadas` -- ela nao passa por preparo nenhum, e
+      // depois da limpeza do grimorio nada em `char.grimorio` e magia
+      // customizada. A unica excecao e a homonima ambigua, que o plano
+      // decidiu renderizar como magia do LIVRO. Logo este gravador nunca
+      // tem motivo para carimbar `personalizada`.
+      //
+      // O carimbo antigo (`ehCustomizadaCirculo`) casava so por NOME contra
+      // `magias_customizadas`: nao conferia o circulo e nao sabia em qual
+      // cartao o jogador clicou. Um Mago com a sua propria "Bola de Fogo"
+      // customizada de 3o circulo E a "Bola de Fogo" do livro no grimorio
+      // gravava a magia do ACERVO marcada como se fosse a dele -- e a
+      // migracao `migrarMagiasCustomizadasSemprePreparadas` (migracoes.js),
+      // que confia na marca, APAGARIA essa entrada na abertura seguinte da
+      // ficha. Sem a marca, aquela migracao nao alcanca magia do livro.
       // 'Mago' literal, nao superficieAtiva()?.classe: este painel de
       // grimorio e renderizado por `ehMago = temClasse(char, 'Mago')`
       // (linha 651), independente de qual classe esta selecionada no
@@ -2838,7 +2900,7 @@ export function setupEventosEspacosMagia() {
       // superficie ativa ainda ve e usa este botao. A magia que sai do
       // grimorio e sempre do Mago, e usar a superficie ativa carimbaria a
       // classe ERRADA sempre que o seletor nao estiver no Mago.
-      char.magias_preparadas.push({ nome, circulo: circ, classe: 'Mago', ...(ehCustomizadaCirculo ? { personalizada: true } : {}) });
+      char.magias_preparadas.push({ nome, circulo: circ, classe: 'Mago' });
       salvar();
       renderFichaCompleta();
       toast(`${nome} preparada a partir do grimório (${preparadasDoMago.length + 1}/${maxPrep})`, 'success');

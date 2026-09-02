@@ -189,7 +189,7 @@ export function preparadasPorClasse(personagem, nomeClasse) {
 /**
  * O mesmo de `preparadasPorClasse`, para TRUQUES.
  *
- * POR QUE EXISTE: o modal "+ Magia" (sheet/grimorio.js) confrontava uma
+ * POR QUE EXISTE: o modal "Preparar Magias" (sheet/grimorio.js) confrontava uma
  * contagem GLOBAL de truques (`magias_conhecidas` de todas as classes)
  * contra o limite de UMA superfície só. Num Mago 5/Clérigo 5 os truques do
  * Clérigo comiam o orçamento do Mago, e a saída adotada na época foi
@@ -199,20 +199,36 @@ export function preparadasPorClasse(personagem, nomeClasse) {
  * portão volta a valer, sem o proxy `umaSuperficieSo`.
  *
  * Reusa `truquesQueContamNoLimite` em vez de refiltrar: é ela que decide
- * QUEM gasta vaga (círculo 0, sem origem de concessão, truque
- * personalizado incluído) e ela junta as duas moradas do truque --
- * `magias_conhecidas` e `magias_customizadas`. Aqui só se responde de QUEM
- * é cada um dos que já contam.
+ * QUEM gasta vaga (círculo 0 de `magias_conhecidas`, sem origem de
+ * concessão). Aqui só se responde de QUEM é cada um dos que já contam.
+ *
+ * O TRUQUE PERSONALIZADO NÃO CHEGA AQUI desde a issue #46: ele saiu de
+ * `truquesQueContamNoLimite` junto com a leitura de `magias_customizadas`,
+ * porque a decisão do dono do produto de 2026-09-02 reverteu o "vaga é
+ * vaga, venha de onde vier" -- truque e magia customizados não ocupam vaga
+ * e estão sempre preparados. Logo ele não cai em nenhum dos três baldes:
+ * nem cobrado, nem contado como incerteza.
  *
  * SEM CARIMBO NÃO É SEMPRE INCERTO -- RULING R-B, o mesmo que
  * `classeDaMagiaPreparada` (acima) já aplica: com EXATAMENTE UMA
  * superfície de conjuração não há ambiguidade possível. Se o personagem
  * só conjura por uma classe, todo truque que conta no limite é daquela
- * classe, mesmo sem carimbo -- ficha antiga, ou truque personalizado, que
- * nunca tem `classe` (ver `normalizarMagiaPersonalizada`,
- * sheet/magias.js). Sem esta regra, o truque personalizado voltaria a ser
- * DE GRAÇA num Mago de classe única, revertendo em silêncio a decisão do
- * dono do produto de que "vaga é vaga, venha de onde vier".
+ * classe, mesmo sem carimbo. Sem esta regra eles cairiam em `semClasse` e
+ * sairiam de graça do orçamento da única classe que o personagem tem.
+ *
+ * R-B NÃO É FAXINA DE LEGADO -- não remova a regra achando que só a ficha
+ * antiga depende dela. Truque sem carimbo `classe` é gravado HOJE, por
+ * código VIVO: o push de truque fixo de subclasse no level-up
+ * (`levelup.js`) e a migração `migrarTruquesFixosSubclasse`
+ * (`sheet/migracoes.js`) empurram em `magias_conhecidas` a entrada
+ * `{ nome, circulo: 0, origem: 'subclasse_fixa' }`, SEM `classe` -- e
+ * `truqueContaNoLimite` devolve `true` para essa origem de propósito (o
+ * livro manda Mãos Mágicas contar no número de truques conhecidos).
+ * `migrarMagiaClasse` não conserta isso depois: ela carimba
+ * `magias_preparadas` e nunca `magias_conhecidas`. Ou seja, um Ladino 3
+ * Trapaceiro Arcano RECÉM-CRIADO tem "Mãos Mágicas" nesse estado, de forma
+ * permanente. Sem R-B o contador dele passaria a dizer
+ * "2 / 3 + 1 sem classe" -- num personagem novo, não numa ficha antiga.
  *
  * `semClasse` fica reservado ao caso em que a dúvida é real: DUAS ou mais
  * superfícies e uma entrada sem carimbo. Aí a incerteza aparece na tela e
@@ -220,9 +236,9 @@ export function preparadasPorClasse(personagem, nomeClasse) {
  *
  * PURA: sem DOM, sem `fetch`, sem estado global.
  *
- * @param {object} personagem Personagem inteiro; `magias_conhecidas[]` e
- *   `magias_customizadas[]` são lidos (por `truquesQueContamNoLimite`),
- *   além de `classes[]` (por `superficiesDeConjuracao`).
+ * @param {object} personagem Personagem inteiro; `magias_conhecidas[]` é
+ *   lido (por `truquesQueContamNoLimite`), além de `classes[]` (por
+ *   `superficiesDeConjuracao`).
  * @param {string} nomeClasse Classe cujo orçamento está sendo medido.
  * @param {Map<string, object>|null} [mapaDados] O `classesData` da ficha,
  *   repassado tal e qual para `superficiesDeConjuracao`. Opcional: esta

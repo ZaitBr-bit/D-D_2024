@@ -259,11 +259,28 @@ test('CONTROLE -- Mago 10 de classe única: conjurar no 3º círculo não mostra
 // preparada (`[data-conjurar]`) pelo de magia personalizada
 // (`[data-conjurar-magia-custom]`).
 //
-// A magia personalizada só ganha o botão "Conjurar" quando TAMBÉM está
-// em `magias_preparadas` (casando por nome+círculo, com
-// `personalizada: true`) -- sem isso, `renderLinhaMagiaPersonalizada`
-// mostra só "Não preparada", sem nenhum botão de conjurar. Por isso o
-// fixture semeia os dois campos.
+// POR QUE ESTES TRÊS CENÁRIOS PASSAM HOJE (issue #46): a magia
+// personalizada é SEMPRE preparada e o botão "Conjurar" vem da FUSÃO DE
+// RENDER -- `sheet/magias.js` funde `magias_customizadas` de círculo 1+
+// direto para `preparadasPorCirculo`, e `renderLinhaMagiaPersonalizada`
+// desenha os controles de conjuração sem consultar `magias_preparadas`.
+// Basta o fixture semear `magias_customizadas`.
+//
+// A ENTRADA SEMEADA EM `magias_preparadas` É INERTE E PODE SAIR: ela tem
+// marca `personalizada` e lastro na customizada de mesmo nome+círculo,
+// então `migrarMagiasCustomizadasSemprePreparadas` (sheet/migracoes.js) a
+// APAGA na carga da ficha, antes do primeiro render. Sobrou do estado
+// anterior à #46, quando o render tinha um ramo `naoPreparada` (removido)
+// que exigia os dois campos. Não é ela que faz os testes passarem.
+//
+// NÃO ENFRAQUEÇA ESTES TRÊS -- eles são os ÚNICOS oráculos do repositório
+// que provam que a magia customizada CONTINUA GASTANDO ESPAÇO DE MAGIA ao
+// conjurar (`conjurarMagiaPersonalizada` -> `gastarEspaco`), uma das
+// quatro decisões de produto da #46: sempre preparada e fora do orçamento
+// de vagas, mas NÃO de graça na hora de conjurar. Removida a chamada de
+// `gastarEspaco`, são estes três que caem. Trocar a asserção de reserva
+// por uma verificação de DOM, ou apagar um dos três, deixa essa decisão
+// sem nenhum pino.
 // ============================================================
 const MAGIA_PERSONALIZADA_3_CIRCULO = { nome: 'Toque Sombrio Multiclasse', circulo: 3 };
 const BOTAO_CONJURAR_CUSTOM = '[data-conjurar-magia-custom="0"]';

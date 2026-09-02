@@ -51,7 +51,8 @@ import {
 // já vivem em helpers-regras.mjs.
 
 /**
- * Abre o modal "Gerenciar Magias" (botão "+ Magia") e espera a grade
+ * Abre o modal "Preparar Magias" (o botão de mesmo nome da seção
+ * Magias) e espera a grade
  * existir -- `mostrarBuscaMagia` é async (carrega a lista de magias da
  * classe antes de montar o HTML), então esperar o elemento cobre essa
  * corrida em vez de um timeout fixo.
@@ -431,9 +432,9 @@ test('incerteza avisa, não bloqueia: adicionar magia não pode ser recusada com
 // de clique ([data-circ-check], dentro de mostrarBuscaMagia) e nunca tinham
 // sido exercitados por um clique de verdade num navegador -- só por leitura
 // de código e por uma guarda textual do teste de unidade. Este cenário abre
-// "Gerenciar Magias" com a superfície do MAGO ativa, clica para preparar uma
+// "Preparar Magias" com a superfície do MAGO ativa, clica para preparar uma
 // magia nova, e lê o personagem SALVO.
-test('o gravador carimba de verdade: adicionar magia pelo modal "Gerenciar Magias" grava classe: "Mago"', async ({ context }) => {
+test('o gravador carimba de verdade: adicionar magia pelo modal "Preparar Magias" grava classe: "Mago"', async ({ context }) => {
   const { page, erros } = await abrirFicha(context, {
     classe: 'Clérigo', subclasse: '', nivel: 6, xp: 14000,
     especie: 'Humano', atributos: ATRIBUTOS_REGRAS,
@@ -465,7 +466,7 @@ test('o gravador carimba de verdade: adicionar magia pelo modal "Gerenciar Magia
     const p = await personagemSalvo(page);
     return p?.magias_preparadas?.find((m) => m.nome === 'Alarme')?.classe ?? null;
   }, {
-    message: 'com a superfície do Mago ativa, a magia adicionada pelo modal "Gerenciar Magias" ' +
+    message: 'com a superfície do Mago ativa, a magia adicionada pelo modal "Preparar Magias" ' +
       'precisa sair gravada com classe: "Mago" -- sem isso o gravador está mudo diante de um ' +
       'clique de verdade, mesmo passando nas leituras estáticas que a Tarefa 2 tinha',
   }).toBe('Mago');

@@ -1115,7 +1115,7 @@ test('numérico: renderSecaoMagias() aplica de fato +1 truque para Clérigo Taum
 // Achado N1 da re-revisão: o teste numérico acima só chama `renderSecaoMagias()`
 // (sheet/magias.js). O comentário logo abaixo (IMPORTANTE, revisão pós-Task-7)
 // já nomeia DOIS arquivos com comportamento observável -- sheet/magias.js E
-// sheet/grimorio.js (o contador "Truques: X/Y" do modal "Gerenciar Magias" e
+// sheet/grimorio.js (o contador "Truques: X/Y" do modal "Preparar Magias" e
 // o bloqueio de troca) -- mas só o primeiro tinha prova numérica. Confirmado
 // ao vivo pelo revisor: `maxTruq += 0 * getBonusTruquesOrdem(char)` em
 // grimorio.js:41 deixa a SUÍTE INTEIRA verde (1287/1223/0), porque nada
@@ -1190,7 +1190,7 @@ test('numérico: mostrarBuscaMagia() (sheet/grimorio.js) aplica de fato +1 truqu
 
   assert.equal(limiteComBonus, limiteSemBonus + 1,
     `Clérigo Taumaturgo (Classes.md:1568) deveria ter +1 truque no limite mostrado pelo modal ` +
-    `"Gerenciar Magias" (sheet/grimorio.js) em relação a Protetor -- Protetor: ${limiteSemBonus}, ` +
+    `"Preparar Magias" (sheet/grimorio.js) em relação a Protetor -- Protetor: ${limiteSemBonus}, ` +
     `Taumaturgo: ${limiteComBonus}. Se os dois números baterem, o bônus de sheet/grimorio.js foi ` +
     `neutralizado (ex.: multiplicado por 0) sem que nenhuma outra asserção deste arquivo percebesse.`);
 });
