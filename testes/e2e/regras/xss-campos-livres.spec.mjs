@@ -96,6 +96,37 @@ test('ficha: nome e descricao de item personalizado nao viram HTML', async ({ co
   expect(tagsInjetadas, 'a carga do item virou tag <img> no DOM').toBe(0);
 });
 
+// O detalhe de um item EQUIPADO ia para o HTML de impressao sem escape --
+// gemeo exato do furo ja fechado no bloco da Mochila. `descricao` e
+// `dados.dano` de um item customizado sao texto livre; equipar o item com
+// essa carga e abrir "Imprimir" bastava para o script rodar na sessao de
+// quem abrisse a ficha.
+test('impressao: descricao de item EQUIPADO nao vira HTML', async ({ context }) => {
+  const { page } = await abrirFicha(context, {
+    nome: 'Portador Equipado',
+    classe: 'Guerreiro',
+    nivel: 3,
+    atributos: ATRIBUTOS_REGRAS,
+    inventario: [{
+      nome: `Amuleto ${CARGA}`,
+      tipo: 'customizado',
+      quantidade: 1,
+      equipado: true,
+      descricao: CARGA,
+      dados: { bonus_ca: 0, dano: '', bonus_ataque: 0 },
+    }],
+  }, 'regras-xss-item-equipado');
+
+  const html = await page.evaluate(async () => {
+    const mod = await import(new URL('./js/sheet/impressao.js', location.href).href);
+    return mod.gerarHtmlImpressao();
+  });
+
+  expect(html, 'a carga do item equipado foi ao HTML de impressao sem escape')
+    .not.toContain('<img src=x');
+  expect(html).toContain('XSS-MARCA');
+});
+
 test('ficha: carga que quebra atributo nao escapa do value', async ({ context }) => {
   const { page } = await abrirFicha(context, {
     nome: `Heroi ${CARGA_ATRIBUTO}`,

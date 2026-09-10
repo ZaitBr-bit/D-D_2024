@@ -7,7 +7,7 @@
 import { CLASSES_INFO } from '../dados-classes.js';
 import { DENOMINACOES, ICONE_MOEDA, NOMES_MOEDA, adicionarMoeda, converterParaMaior, formatarCarteira, proximaDenominacaoMaior, removerQuantidadeMoeda, taxasSaoPadrao } from '../moedas.js';
 import { carregarComprarAtivoPadrao, resetarTaxasMoeda, salvarComprarAtivoPadrao, salvarTaxasMoeda } from '../store.js';
-import { abrirModal, bonusProficiencia, calcMod, escHtml, fmtMod, fmtPeso, getCapacidadeCarga, getPesoTotalInventario, mdParaHtml, parsePeso, semAcento, toast } from '../utils.js';
+import { abrirModal, bonusProficiencia, calcMod, escHtml, fmtMod, fmtPeso, getCapacidadeCarga, getPesoTotalInventario, mdParaHtml, semAcento, toast } from '../utils.js';
 import { abrirSeletorItens, carregarDadosEquipSheet } from '../itens-seletor.js';
 import { getEstadoFuria } from './classes/barbaro.js';
 import { getEstadoRecursosGuardiao } from './classes/guardiao.js';
@@ -16,6 +16,8 @@ import { ataqueImprudenteAtivo, temArmaduraPesadaEquipada } from './combate.js';
 import { sheetBadgeProf, sheetTemProfArma, sheetTemProfArmadura } from './condicoes.js';
 import { char, passivosTalentosCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
+import { htmlFormularioItemCustomizado, lerFormularioItemCustomizado } from './item-customizado-form.js';
+import { TETO_SINTONIZACAO, itensSintonizados, podeSintonizar } from '../regras-sintonizacao.js';
 
 // --- Inventário na ficha ---
 /** Estado de carga do personagem: peso atual, capacidade e flag de sobrecarga. */
@@ -26,6 +28,20 @@ export function getEstadoCarga() {
   const capacidade = getCapacidadeCarga(forca, tamanho);
   const sobrecarregado = capacidade > 0 && pesoAtual > capacidade;
   return { pesoAtual, capacidade, sobrecarregado };
+}
+
+/**
+ * HTML do contador "Sintonizados: X / 3" do cabecalho do inventario. Vazio
+ * quando nenhum item pede sintonizacao -- a caixa some da tela nesse caso.
+ * Extraida para `reRenderSheetInv` remendar o mesmo texto sem refazer a
+ * ficha inteira (o contador ficava desatualizado apos remover um item
+ * sintonizado, issue #57).
+ */
+function htmlContadorSintonizados() {
+  const temAlgumQuePede = itensSintonizados(char).length > 0
+    || (char.inventario || []).some(i => i?.dados?.requer_sintonizacao);
+  if (!temAlgumQuePede) return '';
+  return `<span style="font-size:0.75rem;color:var(--text-muted);margin-left:10px">Sintonizados: <strong>${itensSintonizados(char).length}</strong> / ${TETO_SINTONIZACAO}</span>`;
 }
 
 export function renderSecaoInventario() {
@@ -64,6 +80,7 @@ export function renderSecaoInventario() {
           <input type="checkbox" id="cfg-sobrecarga" ${char?.config?.sobrecarga_afeta_deslocamento ? 'checked' : ''}>
           Sobrecarga afeta deslocamento
         </label>
+        <span id="sheet-sintonizados-valor">${htmlContadorSintonizados()}</span>
       </div>
       <div id="sheet-inventario">
         ${inv.length === 0
@@ -260,6 +277,15 @@ function renderSheetInvItem(item, idx) {
     if (bca !== 0) customBadges += `<span class="badge" style="font-size:0.6rem;background:#e8eaf6;color:#3949ab;border:1px solid #9fa8da">CA ${bca > 0 ? '+' : ''}${bca}</span> `;
     if (batq !== 0) customBadges += `<span class="badge badge-secondary" style="font-size:0.65rem">Atq ${batq > 0 ? '+' : ''}${batq}</span> `;
     if (item.dados?.dano) customBadges += `<span class="badge" style="font-size:0.6rem;background:#fce4ec;color:#c62828;border:1px solid #ef9a9a">${item.dados.dano}</span> `;
+    if (item.dados?.raridade) {
+      customBadges += `<span class="badge" style="font-size:0.6rem;background:#f3e5f5;color:#6a1b9a;border:1px solid #ce93d8">${escHtml(item.dados.raridade)}</span> `;
+    }
+    if (item.dados?.requer_sintonizacao) {
+      customBadges += `<span class="badge" style="font-size:0.6rem;background:#e0f2f1;color:#00695c;border:1px solid #80cbc4">Sintonizacao</span> `;
+    }
+    if (item.dados?.preco) {
+      customBadges += `<span class="badge badge-secondary" style="font-size:0.6rem">${escHtml(item.dados.preco)}</span> `;
+    }
   }
 
   // Badge de maestria com a arma
@@ -295,6 +321,12 @@ function renderSheetInvItem(item, idx) {
         ${descPreview}
       </div>
       <div class="inv-item-acoes no-print" style="align-items:center">
+        ${item.dados?.requer_sintonizacao ? `
+          <label class="inv-sintonia" title="${podeSintonizar(char, idx) ? 'Sintonizar com este item' : `Limite de ${TETO_SINTONIZACAO} itens sintonizados atingido`}"
+                 style="display:flex;align-items:center;gap:3px;font-size:0.65rem;${podeSintonizar(char, idx) ? '' : 'opacity:0.45;cursor:not-allowed'}">
+            <input type="checkbox" data-sintonizar="${idx}" ${item.sintonizado ? 'checked' : ''} ${podeSintonizar(char, idx) ? '' : 'disabled'}>
+            Sint.
+          </label>` : ''}
         <div class="inv-qty-control" style="display:flex;align-items:center;gap:2px">
           <button class="btn btn-sm btn-icon" data-qty-minus="${idx}" style="font-size:0.7rem;padding:1px 5px">−</button>
           <span style="min-width:20px;text-align:center;font-size:0.8rem;font-weight:700" data-qty-display="${idx}">${item.quantidade ?? 1}</span>
@@ -405,6 +437,25 @@ export function setupEventosInventarioSheet() {
     });
   });
 
+  // Sintonizacao: o teto de tres mora em regras-sintonizacao.js, e o render
+  // seguinte e quem acinzenta as caixas que sobraram -- por isso o
+  // renderFichaCompleta() aqui, e nao so o `salvar()`.
+  document.querySelectorAll('[data-sintonizar]').forEach((caixa) => {
+    caixa.addEventListener('change', () => {
+      const idx = parseInt(caixa.dataset.sintonizar);
+      const item = char.inventario[idx];
+      if (!item) return;
+      if (!item.sintonizado && !podeSintonizar(char, idx)) {
+        caixa.checked = false;
+        toast(`Voce ja esta sintonizado com ${TETO_SINTONIZACAO} itens.`, 'error');
+        return;
+      }
+      item.sintonizado = caixa.checked;
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
   // Ver detalhes do item ao clicar
   document.querySelectorAll('[data-info-inv-sheet]').forEach(el => {
     el.addEventListener('click', (e) => {
@@ -430,95 +481,22 @@ export function setupEventosInventarioSheet() {
   // Item customizado
   const btnAddCustom = document.getElementById('btn-add-inv-custom');
   if (btnAddCustom) btnAddCustom.onclick = () => {
-    abrirModal('Item Customizado', `
-      <div class="form-group"><label class="form-label" for="ic-nome">Nome</label><input type="text" class="form-input" id="ic-nome"></div>
-      <div class="form-group"><label class="form-label" for="ic-desc">Descricao</label><textarea class="form-textarea" id="ic-desc" rows="2"></textarea></div>
-      <div class="row gap-1">
-        <div class="col">
-          <label class="form-label" for="ic-ca">Bonus CA</label>
-          <input type="number" class="form-input" id="ic-ca" placeholder="0" step="1">
-          <div style="font-size:0.65rem;color:var(--text-muted)">soma na CA quando equipado</div>
-        </div>
-        <div class="col">
-          <label class="form-label" for="ic-ca-base">CA Base</label>
-          <input type="number" class="form-input" id="ic-ca-base" placeholder="—" min="0" step="1">
-          <div style="font-size:0.65rem;color:var(--text-muted)">define a CA (ex.: 20). Não soma Destreza</div>
-        </div>
-        <div class="col">
-          <label class="form-label" for="ic-dano">Dano</label>
-          <input type="text" class="form-input" id="ic-dano" placeholder="1d8 Cortante">
-          <div style="font-size:0.65rem;color:var(--text-muted)">Ex: 2d6 Cortante</div>
-        </div>
-        <div class="col">
-          <label class="form-label" for="ic-atq">Bonus Atq</label>
-          <input type="number" class="form-input" id="ic-atq" placeholder="0" step="1">
-          <div style="font-size:0.65rem;color:var(--text-muted)">soma na jogada de ataque</div>
-        </div>
-      </div>
-      <div class="form-group" style="margin-top:8px">
-        <label class="form-label" for="ic-peso">Peso (opcional)</label>
-        <input type="number" class="form-input" id="ic-peso" placeholder="0" min="0" step="0.1" style="max-width:140px">
-        <div style="font-size:0.65rem;color:var(--text-muted)">em kg (ex: 0,5)</div>
-      </div>
-      <div id="ic-erros" style="display:none;color:var(--danger);font-size:0.8rem;margin-top:8px"></div>
-    `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-add-ic">Adicionar</button>');
+    abrirModal('Item Customizado', htmlFormularioItemCustomizado(),
+      '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-add-ic">Adicionar</button>');
 
     document.getElementById('btn-add-ic')?.addEventListener('click', () => {
-      const nome = document.getElementById('ic-nome')?.value?.trim();
-      const desc = document.getElementById('ic-desc')?.value?.trim() || '';
-      const ca = parseInt(document.getElementById('ic-ca')?.value) || 0;
-      // Campo VAZIO grava vazio, e nao 0: "sem CA base" e diferente de "CA
-      // base zero", e so o vazio deixa o item fora da conta do piso.
-      const caBaseRaw = document.getElementById('ic-ca-base')?.value?.trim() || '';
-      const caBase = caBaseRaw === '' ? '' : String(parseInt(caBaseRaw) || 0);
-      const danoVal = document.getElementById('ic-dano')?.value?.trim() || '';
-      const atq = parseInt(document.getElementById('ic-atq')?.value) || 0;
-      const pesoRaw = document.getElementById('ic-peso')?.value?.trim() || '';
-      const pesoNum = pesoRaw ? parseFloat(pesoRaw.replace(',', '.')) : 0;
-      const errosEl = document.getElementById('ic-erros');
-      const erros = [];
-
-      if (!nome) erros.push('Informe um nome para o item.');
-
-      // Validar dano no formato de dados (ex: 1d6, 2d8 Cortante, 1d4+2 Perfurante)
-      if (danoVal) {
-        const regexDano = /^\d+d\d+(\s*[+\-]\s*\d+)?(\s+\w+)?$/i;
-        if (!regexDano.test(danoVal)) {
-          erros.push('Dano deve seguir o formato de dados: 1d8, 2d6 Cortante, 1d4+2 Perfurante');
-        }
-      }
-
-      // SEM teto para bonus de CA e de ataque. Item customizado e o campo
-      // livre da mesa -- e o item da mesa nao cabe na faixa do item magico do
-      // livro (-5..+5 e -5..+10, o que estava aqui). Pior: a validacao barrava
-      // o item INTEIRO, entao uma armadura "CA 20" nao era gravada de forma
-      // nenhuma. O criador de personagem (creator/passo-equipamento.js) nunca
-      // teve esses limites: duas telas respondendo diferente para o mesmo
-      // campo. `parseInt` acima ja garante que so numero inteiro entra.
-
-      if (erros.length > 0) {
-        if (errosEl) { errosEl.style.display = 'block'; errosEl.innerHTML = erros.join('<br>'); }
-        return;
-      }
-
+      const { ok, valores } = lerFormularioItemCustomizado();
+      if (!ok) return;
       char.inventario.push({
-        nome,
         tipo: 'customizado',
         quantidade: 1,
         equipado: false,
-        descricao: desc,
-        dados: {
-          bonus_ca: String(ca),
-          ca_base: caBase,
-          dano: danoVal,
-          bonus_ataque: String(atq),
-          peso: (pesoNum > 0 ? `${fmtPeso(pesoNum)} kg` : '')
-        }
+        ...valores,
       });
       salvar();
       window.fecharModal();
       renderFichaCompleta();
-      toast(`${nome} adicionado!`, 'success');
+      toast(`${valores.nome} adicionado!`, 'success');
     });
   };
 
@@ -685,79 +663,30 @@ export function setupEventosInventarioSheet() {
 
 /** Abre modal para editar um item customizado existente no inventário */
 function abrirModalEditarItemCustomizado(item, idx) {
-  const d = item.dados || {};
-  abrirModal('Editar Item Customizado', `
-    <div class="form-group"><label class="form-label" for="ic-nome">Nome</label><input type="text" class="form-input" id="ic-nome" value="${(item.nome || '').replace(/"/g, '&quot;')}"></div>
-    <div class="form-group"><label class="form-label" for="ic-desc">Descricao</label><textarea class="form-textarea" id="ic-desc" rows="2">${escHtml(item.descricao || '')}</textarea></div>
-    <div class="row gap-1">
-      <div class="col">
-        <label class="form-label" for="ic-ca">Bonus CA</label>
-        <input type="number" class="form-input" id="ic-ca" value="${parseInt(d.bonus_ca) || ''}" placeholder="0" step="1">
-        <div style="font-size:0.65rem;color:var(--text-muted)">soma na CA quando equipado</div>
-      </div>
-      <div class="col">
-        <label class="form-label" for="ic-ca-base">CA Base</label>
-        <input type="number" class="form-input" id="ic-ca-base" value="${parseInt(d.ca_base) || ''}" placeholder="—" min="0" step="1">
-        <div style="font-size:0.65rem;color:var(--text-muted)">define a CA (ex.: 20). Não soma Destreza</div>
-      </div>
-      <div class="col">
-        <label class="form-label" for="ic-dano">Dano</label>
-        <input type="text" class="form-input" id="ic-dano" value="${(d.dano || '').replace(/"/g, '&quot;')}" placeholder="1d8 Cortante">
-        <div style="font-size:0.65rem;color:var(--text-muted)">Ex: 2d6 Cortante</div>
-      </div>
-      <div class="col">
-        <label class="form-label" for="ic-atq">Bonus Atq</label>
-        <input type="number" class="form-input" id="ic-atq" value="${parseInt(d.bonus_ataque) || ''}" placeholder="0" step="1">
-        <div style="font-size:0.65rem;color:var(--text-muted)">soma na jogada de ataque</div>
-      </div>
-    </div>
-    <div class="form-group" style="margin-top:8px">
-      <label class="form-label" for="ic-peso">Peso (opcional)</label>
-      <input type="number" class="form-input" id="ic-peso" value="${parsePeso(d.peso) || ''}" placeholder="0" min="0" step="0.1" style="max-width:140px">
-      <div style="font-size:0.65rem;color:var(--text-muted)">em kg (ex: 0,5)</div>
-    </div>
-    <div id="ic-erros" style="display:none;color:var(--danger);font-size:0.8rem;margin-top:8px"></div>
-  `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-ic">Salvar</button>');
+  abrirModal('Editar Item Customizado', htmlFormularioItemCustomizado(item),
+    '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-ic">Salvar</button>');
 
   document.getElementById('btn-salvar-ic')?.addEventListener('click', () => {
-    const nome = document.getElementById('ic-nome')?.value?.trim();
-    const desc = document.getElementById('ic-desc')?.value?.trim() || '';
-    const ca = parseInt(document.getElementById('ic-ca')?.value) || 0;
-    const caBaseRaw = document.getElementById('ic-ca-base')?.value?.trim() || '';
-    const caBase = caBaseRaw === '' ? '' : String(parseInt(caBaseRaw) || 0);
-    const danoVal = document.getElementById('ic-dano')?.value?.trim() || '';
-    const atq = parseInt(document.getElementById('ic-atq')?.value) || 0;
-    // Mesma leitura do formulario de criacao (ver acima): campo vazio grava
-    // peso vazio, e a virgula digitada vira ponto antes do parseFloat.
-    const pesoRaw = document.getElementById('ic-peso')?.value?.trim() || '';
-    const pesoNum = pesoRaw ? parseFloat(pesoRaw.replace(',', '.')) : 0;
-    const errosEl = document.getElementById('ic-erros');
-    const erros = [];
-
-    if (!nome) erros.push('Informe um nome para o item.');
-    if (danoVal) {
-      const regexDano = /^\d+d\d+(\s*[+\-]\s*\d+)?(\s+\w+)?$/i;
-      if (!regexDano.test(danoVal)) erros.push('Dano deve seguir o formato de dados: 1d8, 2d6 Cortante, 1d4+2 Perfurante');
+    const { ok, valores } = lerFormularioItemCustomizado();
+    if (!ok) return;
+    const alvo = char.inventario[idx];
+    alvo.nome = valores.nome;
+    alvo.descricao = valores.descricao;
+    // Merge, nao substituicao: `dados` pode carregar chaves que o
+    // formulario nao edita, e trocar o objeto inteiro as perderia.
+    alvo.dados = { ...(alvo.dados || {}), ...valores.dados };
+    // Desmarcar "Requer Sintonizacao" nesta edicao libera a vaga: sem isto
+    // `sintonizado: true` ficava gravado sem caixa na tela para desmarcar,
+    // e o item prendia o teto para sempre (issue #57). Grava `false` em vez
+    // de apagar a chave -- o item FOI tocado agora, entao o valor deixa de
+    // ser o "nunca tocado" que a Global Constraint protege.
+    if (!alvo.dados.requer_sintonizacao && alvo.sintonizado) {
+      alvo.sintonizado = false;
     }
-    // Sem teto, pelo mesmo motivo do formulario de criacao (ver la).
-
-    if (erros.length > 0) {
-      if (errosEl) { errosEl.style.display = 'block'; errosEl.innerHTML = erros.join('<br>'); }
-      return;
-    }
-
-    char.inventario[idx].nome = nome;
-    char.inventario[idx].descricao = desc;
-    if (!char.inventario[idx].dados) char.inventario[idx].dados = {};
-    char.inventario[idx].dados.bonus_ca = String(ca);
-    char.inventario[idx].dados.ca_base = caBase;
-    char.inventario[idx].dados.dano = danoVal;
-    char.inventario[idx].dados.bonus_ataque = String(atq);
-    char.inventario[idx].dados.peso = pesoNum > 0 ? `${fmtPeso(pesoNum)} kg` : '';
     salvar();
     window.fecharModal();
     renderFichaCompleta();
-    toast(`${nome} atualizado!`, 'success');
+    toast(`${valores.nome} atualizado!`, 'success');
   });
 }
 
@@ -793,6 +722,12 @@ function reRenderSheetInv() {
     pesoEl.innerHTML = `Peso: <strong>${fmtPeso(_carga.pesoAtual)}</strong> / ${fmtPeso(_carga.capacidade)} kg`
       + (_mostrarSobrecarga ? ' <span style="font-weight:700;margin-left:4px">&#9888; Sobrecarregado</span>' : '');
   }
+
+  // Atualizar o contador "Sintonizados: X / 3" (mesmo motivo do peso: fica
+  // fora de #sheet-inventario e ficava velho ate outra acao forcar um
+  // renderFichaCompleta).
+  const sintonizadosEl = document.getElementById('sheet-sintonizados-valor');
+  if (sintonizadosEl) sintonizadosEl.innerHTML = htmlContadorSintonizados();
 
   // Re-bind eventos
   setupEventosInventarioSheet();

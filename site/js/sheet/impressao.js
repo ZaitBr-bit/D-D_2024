@@ -25,6 +25,53 @@ import { reservasDeEspacos } from './reservas-espacos.js';
 // ============================================================
 
 /**
+ * Separa os dados de um item de inventario em Efeito (o que ele FAZ na
+ * mesa: dano, propriedades, CA, bonus de ataque) e Detalhe (custo, peso, e
+ * para item customizado tambem raridade, sintonizacao e preco). Usada
+ * tanto na secao Equipamento quanto na Mochila -- as duas tinham a mesma
+ * separacao implementada em paralelo, uma delas incompleta e sem escape
+ * (issue #57).
+ * @param {object} item Item do inventario.
+ * @returns {{efeito: string, detalhe: string}}
+ */
+function _montarEfeitoDetalheItem(item) {
+  let efeito = '';
+  let detalhe = '';
+  if (item.tipo === 'arma') {
+    efeito = [item.dados?.dano, item.dados?.propriedades].filter(Boolean).join(' | ');
+    detalhe = [item.dados?.custo, item.dados?.peso].filter(Boolean).join(' | ');
+  } else if (item.tipo === 'armadura') {
+    efeito = `CA: ${item.dados?.ca || '?'}${item.dados?.categoria ? ' | ' + item.dados.categoria : ''}`;
+    detalhe = [item.dados?.custo, item.dados?.peso].filter(Boolean).join(' | ');
+  } else if (item.tipo === 'escudo') {
+    efeito = `CA: ${item.dados?.ca || '?'}`;
+    detalhe = [item.dados?.custo, item.dados?.peso].filter(Boolean).join(' | ');
+  } else if (item.tipo === 'customizado') {
+    const bca = parseInt(item.dados?.bonus_ca) || 0;
+    const batq = parseInt(item.dados?.bonus_ataque) || 0;
+    // CA que o item DEFINE vem antes do bonus que ele soma -- e o que a
+    // ficha na tela mostra, na mesma ordem (sheet/inventario.js).
+    efeito = [
+      item.dados?.ca_base ? `CA Base ${item.dados.ca_base}` : '',
+      bca !== 0 ? `CA ${bca > 0 ? '+' : ''}${bca}` : '',
+      batq !== 0 ? `Atq ${batq > 0 ? '+' : ''}${batq}` : '',
+      item.dados?.dano || '',
+      item.descricao || '',
+    ].filter(Boolean).join(' | ');
+    detalhe = [
+      item.dados?.raridade || '',
+      item.dados?.requer_sintonizacao ? 'Requer Sintonizacao' : '',
+      item.dados?.preco || '',
+      item.dados?.peso || '',
+    ].filter(Boolean).join(' | ');
+  } else {
+    efeito = item.descricao || '';
+    detalhe = [item.dados?.custo, item.dados?.peso].filter(Boolean).join(' | ');
+  }
+  return { efeito, detalhe };
+}
+
+/**
  * Pre-carrega descricoes de todas as magias do personagem
  * para uso no HTML de impressao.
  */
@@ -433,33 +480,16 @@ export async function gerarHtmlImpressao() {
   if (equipados.length > 0) {
     pag1 += `<div class="print-section"><div class="print-section-title">Equipamento</div><div class="print-equip-list">`;
     equipados.forEach(item => {
-      let detalhe = '';
-      if (item.tipo === 'arma') {
-        const props = item.dados?.propriedades || '';
-        const dano = item.dados?.dano || '';
-        detalhe = [dano, props].filter(Boolean).join(' | ');
-      } else if (item.tipo === 'armadura') {
-        detalhe = `CA: ${item.dados?.ca || '?'} | ${item.dados?.categoria || ''}`;
-      } else if (item.tipo === 'escudo') {
-        detalhe = `CA: ${item.dados?.ca || '?'}`;
-      } else if (item.tipo === 'customizado') {
-        const bca = parseInt(item.dados?.bonus_ca) || 0;
-        const batq = parseInt(item.dados?.bonus_ataque) || 0;
-        const caBaseItem = parseInt(item.dados?.ca_base) || 0;
-        const parts = [];
-        // CA que o item DEFINE vem antes do bonus que ele soma -- e o que a
-        // ficha na tela mostra, na mesma ordem (sheet/inventario.js).
-        if (caBaseItem > 0) parts.push(`CA ${caBaseItem}`);
-        if (bca !== 0) parts.push(`CA ${bca > 0 ? '+' : ''}${bca}`);
-        if (batq !== 0) parts.push(`Atq ${batq > 0 ? '+' : ''}${batq}`);
-        if (item.dados?.dano) parts.push(item.dados.dano);
-        detalhe = parts.join(' | ') || (item.descricao || '');
-      }
-      const qtd = (item.quantidade ?? 1) > 1 ? ` x${item.quantidade}` : '';
+      // Mesma estrutura de tres partes da Mochila (Nome, Efeitos, Detalhes):
+      // o equipado tinha caminho proprio, so com nome e um "detalhe" unico
+      // sem escape, e por isso nunca chegava dividido ao PDF (issue #57).
+      const { efeito, detalhe } = _montarEfeitoDetalheItem(item);
+      const qtd = (item.quantidade ?? 1) > 1 ? ` (x${item.quantidade})` : '';
       pag1 += `
         <div class="print-equip-item">
           <span class="print-equip-name">${escHtml(item.nome)}${qtd}</span>
-          <span class="print-equip-detail">${detalhe}</span>
+          ${efeito ? `<span class="print-equip-effect">${escHtml(efeito)}</span>` : ''}
+          ${detalhe ? `<span class="print-equip-detail">${escHtml(detalhe)}</span>` : ''}
         </div>`;
     });
     pag1 += `</div></div>`;
@@ -788,21 +818,19 @@ export async function gerarHtmlImpressao() {
   if (naoEquipados.length > 0 || totalEmCobre(char.moedas) > 0) {
     pagFinal += `<div class="print-section"><div class="print-section-title">Inventario (Mochila)</div>`;
     if (totalEmCobre(char.moedas) > 0) {
-      pagFinal += `<div style="font-size:8.5pt;font-weight:700;margin-bottom:1mm">Moedas: ${formatarCarteira(char.moedas)}</div>`;
+      pagFinal += `<div class="print-inv-moedas" style="font-size:8.5pt;font-weight:700;margin-bottom:1mm">Moedas: ${formatarCarteira(char.moedas)}</div>`;
     }
     naoEquipados.forEach(item => {
-      let detalhe = '';
-      if (item.tipo === 'arma') detalhe = [item.dados?.dano, item.dados?.propriedades].filter(Boolean).join(' | ');
-      else if (item.tipo === 'armadura') detalhe = `CA: ${item.dados?.ca || '?'} | ${item.dados?.categoria || ''}`;
-      else if (item.tipo === 'escudo') detalhe = `CA: ${item.dados?.ca || '?'}`;
-      else if (item.tipo === 'equipamento') detalhe = [item.dados?.custo, item.dados?.peso].filter(Boolean).join(' | ');
-      else if (item.tipo === 'customizado') detalhe = item.descricao || '';
-      else detalhe = item.descricao || '';
+      // Efeito e o que o item FAZ na mesa (dano, propriedades, CA); detalhe
+      // e o que ele custa e pesa. Vinham concatenados numa string so, e o
+      // PDF nao tinha como separar as duas colunas do pedido (issue #57).
+      const { efeito, detalhe } = _montarEfeitoDetalheItem(item);
       const qtd = (item.quantidade ?? 1) > 1 ? ` (x${item.quantidade})` : '';
       pagFinal += `
         <div class="print-inv-item">
           <span class="print-inv-name">${escHtml(item.nome)}${qtd}</span>
-          <span class="print-inv-detail">${detalhe}</span>
+          ${efeito ? `<span class="print-inv-effect">${escHtml(efeito)}</span>` : ''}
+          ${detalhe ? `<span class="print-inv-detail">${escHtml(detalhe)}</span>` : ''}
         </div>`;
     });
     pagFinal += `</div>`;

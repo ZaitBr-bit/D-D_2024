@@ -675,6 +675,16 @@ export function calcInvestigacaoPassiva(personagem) {
   return 10 + calcBonusPericia(personagem, 'Investigação');
 }
 
+// Conhecimento Primordial (Barbaro 3, Classes.md): durante a Furia estas
+// cinco pericias podem ser testadas como Forca. As CINCO, nao so a
+// escolhida no nivel 3 -- a caracteristica concede uma pericia nova E a
+// troca de atributo, e a troca vale para a lista inteira.
+// Lida em dois lugares: aqui, para o modificador, e em
+// combate.js/calcVantagemDesvantagemPericia, para o selo de Vantagem.
+export const PERICIAS_CONHECIMENTO_PRIMORDIAL = [
+  'Acrobacia', 'Furtividade', 'Intimidação', 'Percepção', 'Sobrevivência',
+];
+
 /** Calcula bônus de uma perícia */
 export function calcBonusPericia(personagem, nomePericia, opcoes = {}) {
   const pericia = PERICIAS.find(p => p.nome === nomePericia);
@@ -682,9 +692,9 @@ export function calcBonusPericia(personagem, nomePericia, opcoes = {}) {
 
   const emFuria = !!opcoes.emFuria;
   const forcaPrimordialAtiva = !!opcoes.forcaPrimordialAtiva;
-  const periciasConhecimentoPrimordial = ['Acrobacia', 'Furtividade', 'Intimidação', 'Percepção', 'Sobrevivência'];
 
-  const usarForcaPrimordial = emFuria && forcaPrimordialAtiva && periciasConhecimentoPrimordial.includes(nomePericia);
+  const usarForcaPrimordial = emFuria && forcaPrimordialAtiva
+    && PERICIAS_CONHECIMENTO_PRIMORDIAL.includes(nomePericia);
   const key = usarForcaPrimordial ? 'forca' : ATRIBUTO_NOME_PARA_KEY[pericia.atributo];
   const mod = calcMod(personagem.atributos[key]);
   const prof = (personagem.pericias_proficientes || []).includes(nomePericia);
@@ -851,10 +861,21 @@ export function getTamanho(especieTexto) {
 
 // --- Renderizador simples de Markdown ---
 
-/** Formata notação de dados (ex: 3d6, 2D8) como 🎲3d6🎲 */
-export function formatarDados(texto) {
-  if (!texto) return texto;
-  return texto.replace(/(\d+)[dD](\d+)/g, '🎲$1d$2🎲');
+// Marcador que mdParaHtml poe em volta de toda expressao de dado (1d6 ->
+// 🎲1d6🎲) para o CSS destacar na tela. Fora do HTML ele nao serve para
+// nada, e a fonte Helvetica do PDF nao codifica emoji: sem remover, o
+// sanitizador do PDF troca cada um por '?' (issue #55).
+export const MARCADOR_DADO = '🎲';
+
+/**
+ * Remove os marcadores de dado de um texto ja montado por mdParaHtml.
+ * Usado por quem consome o texto fora do HTML da tela -- hoje, o PDF.
+ * @param {string} texto
+ * @returns {string} o mesmo texto sem nenhum MARCADOR_DADO.
+ */
+export function removerMarcadoresDado(texto) {
+  if (texto == null) return '';
+  return String(texto).split(MARCADOR_DADO).join('');
 }
 
 /** Converte markdown básico para HTML */
@@ -864,7 +885,7 @@ export function mdParaHtml(texto) {
     // Escapar HTML
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     // Formatar dados (🎲XdY🎲) antes de outras transformações
-    .replace(/(\d+)[dD](\d+)/g, '🎲$1d$2🎲')
+    .replace(/(\d+)[dD](\d+)/g, `${MARCADOR_DADO}$1d$2${MARCADOR_DADO}`)
     // Headers
     .replace(/^#### (.+)$/gm, '<h4>$1</h4>')
     .replace(/^### (.+)$/gm, '<h3>$1</h3>')

@@ -899,7 +899,10 @@ export function renderFichaCompleta() {
 
           // Fontes de vantagem em salvaguardas
           const fontsVant = [];
-          if (nome === 'Força' && !!getEstadoFuria()?.ativa) fontsVant.push('Furia');
+          // Acentuado para casar com o selo de PERICIA (combate.js): a mesma
+          // fonte aparecia como "Fúria" nas pericias e "Furia" nas
+          // salvaguardas, na mesma ficha.
+          if (nome === 'Força' && !!getEstadoFuria()?.ativa) fontsVant.push('Fúria');
           // nivelNa: Sentido de Perigo é característica de BÁRBARO 2
           // (Classes.md:105-107). Lia-se `char.classe` (a classe INICIAL)
           // cruzado com `char.nivel` (o TOTAL), e por isso um Ladino 1/Bárbaro 5

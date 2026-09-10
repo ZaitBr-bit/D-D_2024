@@ -118,10 +118,26 @@ export function tetoMaestrias() {
  * maestria nenhuma e o modal voltava sem abrir.
  *
  * @param {string} [classe] Classe dona do botão clicado -- só rotula o modal.
+ * @param {object} [opcoes]
+ * @param {Function|null} [opcoes.aoFechar] Roda UMA vez quando o jogador
+ *   sai do modal -- salvando ou cancelando. E o que encadeia o proximo
+ *   passo do Descanso Longo: sem ele, quem chamava disparava o proximo
+ *   modal na hora, por cima deste (issue #51).
  */
-export async function abrirModalMaestrias(classe = char.classe) {
+export async function abrirModalMaestrias(classe = char.classe, opcoes = {}) {
   // Só as cinco classes que concedem Maestria em Arma abrem este modal.
   if (!CLASSES_MAESTRIA.includes(classe)) return;
+
+  // Uma vez so: o onClose de abrirModal() roda em TODA saida do modal --
+  // Salvar, Cancelar, X do cabecalho e clique fora -- e se auto-limpa apos
+  // disparar, entao o guarda so evita a segunda chamada quando o handler de
+  // Salvar/Cancelar tambem invoca fechar() explicitamente.
+  let jaFechou = false;
+  const fechar = () => {
+    if (jaFechou) return;
+    jaFechou = true;
+    if (opcoes.aoFechar) opcoes.aoFechar();
+  };
 
   // O teto é do PERSONAGEM, não do botão clicado.
   const maestriasMax = tetoMaestrias();
@@ -168,7 +184,7 @@ export async function abrirModalMaestrias(classe = char.classe) {
     <div style="font-size:0.75rem;color:var(--text-muted);margin-top:8px">
       Regra: você conhece ${maestriasMax} maestria(s) neste nível.
     </div>
-  `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-maestrias">Salvar</button>');
+  `, '<button class="btn btn-secondary" id="btn-cancelar-maestrias">Cancelar</button><button class="btn btn-primary" id="btn-salvar-maestrias">Salvar</button>', fechar);
 
   const bindLista = () => {
     document.querySelectorAll('[data-maestria-nome]').forEach(cb => {
@@ -203,8 +219,17 @@ export async function abrirModalMaestrias(classe = char.classe) {
   document.getElementById('btn-salvar-maestrias')?.addEventListener('click', () => {
     char.maestrias_arma = [...selecionadas].sort((a, b) => a.localeCompare(b));
     salvar();
-    window.fecharModal();
+    // Renderiza ANTES de fechar: fecharModal() dispara o onClose (aqui,
+    // `fechar`) de forma sincrona, e o proximo passo da cadeia do Descanso
+    // Longo (troca de magia/truque) precisa achar a ficha ja atualizada.
     renderFichaCompleta();
+    window.fecharModal();
+  });
+
+  document.getElementById('btn-cancelar-maestrias')?.addEventListener('click', () => {
+    // O onClose passado a abrirModal() (`fechar`) ja dispara dentro de
+    // fecharModal(); nao ha nada a fazer aqui alem de fechar.
+    window.fecharModal();
   });
 }
 
@@ -223,9 +248,12 @@ export async function abrirModalTrocaMaestriaDescanso(callbackPosTroca = null) {
   // multiclasse basta UMA delas para o personagem ter essa liberdade.
   // `comMaestria[0]` em vez de nenhum argumento: sem ele o modal completo
   // cairia de novo no espelho `char.classe` e não abriria.
+  //
+  // O callback vai por `aoFechar`, NAO depois do await: abrirModalMaestrias
+  // so monta o modal e retorna na hora, entao chamar o proximo passo aqui
+  // abria a troca de magia POR CIMA da de maestria (issue #51).
   if (trocaTodasNoDescanso(char)) {
-    await abrirModalMaestrias(comMaestria[0]);
-    if (callbackPosTroca) callbackPosTroca();
+    await abrirModalMaestrias(comMaestria[0], { aoFechar: callbackPosTroca });
     return;
   }
 
@@ -233,8 +261,10 @@ export async function abrirModalTrocaMaestriaDescanso(callbackPosTroca = null) {
   // troca é 1-por-1 e não altera a quantidade total.
   const atuais = char.maestrias_arma || [];
   if (atuais.length === 0) {
-    // Sem maestrias definidas, abrir modal completo
-    await abrirModalMaestrias(comMaestria[0]);
+    // Sem maestrias definidas, abrir modal completo. Tambem encadeia: este
+    // ramo retornava sem chamar o callback, e quem caia nele perdia em
+    // silencio as trocas de magia e truque seguintes (issue #51).
+    await abrirModalMaestrias(comMaestria[0], { aoFechar: callbackPosTroca });
     return;
   }
 
@@ -248,6 +278,16 @@ export async function abrirModalTrocaMaestriaDescanso(callbackPosTroca = null) {
   let armaTrocar = '';
   let armaSubstituta = '';
 
+  // Mesmo guarda idempotente do modal completo (abrirModalMaestrias): o
+  // onClose de abrirModal() cobre X e clique fora, alem de Cancelar e
+  // Confirmar chamarem fechar() de forma explicita.
+  let jaFechou = false;
+  const fechar = () => {
+    if (jaFechou) return;
+    jaFechou = true;
+    if (callbackPosTroca) callbackPosTroca();
+  };
+
   // Troca de maestria: as duas pontas são armas, e o que decide a escolha
   // (dano, propriedades, qual maestria a arma concede) só existia no JSON.
   const renderConteudo = () => `
@@ -258,8 +298,15 @@ export async function abrirModalTrocaMaestriaDescanso(callbackPosTroca = null) {
   `;
 
   abrirModal(`Trocar Maestria (${escHtml(rotuloClasses)})`, renderConteudo(),
-    '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>'
-    + '<button class="btn btn-primary" id="btn-confirmar-troca-maestria">Trocar</button>');
+    '<button class="btn btn-secondary" id="btn-cancelar-troca-maestria">Cancelar</button>'
+    + '<button class="btn btn-primary" id="btn-confirmar-troca-maestria">Trocar</button>', fechar);
+
+  // Cancelar tambem segue a cadeia do Descanso Longo: quem desiste da
+  // maestria continua tendo direito as trocas de magia e truque. O onClose
+  // passado a abrirModal() (`fechar`) ja dispara dentro de fecharModal().
+  document.getElementById('btn-cancelar-troca-maestria')?.addEventListener('click', () => {
+    window.fecharModal();
+  });
 
   const descricoesMaestria = new Map(
     (dados.propriedadesArmas || []).map(p => [p.nome, p.descricao]));
@@ -286,10 +333,11 @@ export async function abrirModalTrocaMaestriaDescanso(callbackPosTroca = null) {
     novaLista.push(armaSubstituta);
     char.maestrias_arma = novaLista.sort((a, b) => a.localeCompare(b));
     salvar();
+    // Renderiza ANTES de fechar: fecharModal() dispara o onClose (`fechar`)
+    // de forma sincrona, e a proxima acao encadeada (ex.: troca de magias)
+    // precisa achar a ficha ja atualizada.
+    renderFichaCompleta();
     window.fecharModal();
     toast(`Maestria trocada: ${armaTrocar} → ${armaSubstituta}`, 'success');
-    renderFichaCompleta();
-    // Encadear próxima ação (ex.: troca de magias após maestria)
-    if (callbackPosTroca) callbackPosTroca();
   });
 }

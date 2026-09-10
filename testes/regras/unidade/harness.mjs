@@ -105,7 +105,17 @@ export async function modulosApp() {
          // Tarefa 5 do sub-projeto 3d: o TETO UNICO de maestrias
          // (sheetMaestrias.tetoMaestrias / classesComMaestria) e o gate do
          // Descanso Longo que o consome (sheetHpDescanso.setupEventosDescanso).
-         sheetMaestrias, sheetHpDescanso] = await Promise.all([
+         sheetMaestrias, sheetHpDescanso,
+         // Issue #48: o selo de Vantagem/Desvantagem das pericias mora em
+         // calcVantagemDesvantagemPericia, e ele le o `char` de estado.js --
+         // que definirChar() ja povoa.
+         sheetCombate,
+         // Issue #57: a parte pura do formulario de item customizado.
+         itemCustomForm,
+         // Issue #57 (Tarefa 3): a regra pura do teto de tres itens
+         // sintonizados, consumida pelos oraculos de sintonizacao.test.mjs
+         // via sintonizacao.TETO_SINTONIZACAO / itensSintonizados / podeSintonizar.
+         sintonizacao] = await Promise.all([
     importar('site/js/regras-cobertura.js'),
     importar('site/js/talentos-effects.js'),
     importar('site/js/store.js'),
@@ -179,6 +189,9 @@ export async function modulosApp() {
     importar('site/js/sheet/habilidades.js'),
     importar('site/js/sheet/maestrias.js'),
     importar('site/js/sheet/hp-descanso.js'),
+    importar('site/js/sheet/combate.js'),
+    importar('site/js/sheet/item-customizado-form.js'),
+    importar('site/js/regras-sintonizacao.js'),
   ]);
   // Um modulo de classe por nome de ARQUIVO (minusculo, sem acento -- ex.:
   // sheetClasses.clerigo, sheetClasses.paladino), e nao pelo nome que o app
@@ -197,7 +210,7 @@ export async function modulosApp() {
              fichaEdicoes, fichaEdicaoValidacoes, multiclasse, home, multiclasseConjuracao,
              multiclasseProgressao, contextoClasse, sheetCaracteristicas, sheetFicha,
              proficiencias, magiaClasse, regrasPreparoMagias, sheetClasses, sheetHabilidades,
-             sheetMaestrias, sheetHpDescanso };
+             sheetMaestrias, sheetHpDescanso, sheetCombate, itemCustomForm, sintonizacao };
   return _cache;
 }
 

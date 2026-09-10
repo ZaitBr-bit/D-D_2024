@@ -7,7 +7,7 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { PERICIAS } from '../dados-classes.js';
-import { abrirModal, calcMod, escHtml, fmtPeso, getMultiplicadorCarga, toast } from '../utils.js';
+import { abrirModal, calcMod, escHtml, fmtPeso, getMultiplicadorCarga, PERICIAS_CONHECIMENTO_PRIMORDIAL, toast } from '../utils.js';
 import { nivelNa, subclasseDe } from '../regras-multiclasse.js';
 import { getEstadoFuria } from './classes/barbaro.js';
 import { getProgressaoMonge } from './classes/monge.js';
@@ -50,10 +50,19 @@ export function calcVantagemDesvantagemPericia(nomePericia) {
   }
 
   // --- Barbaro em Furia: Vantagem em testes de Forca ---
+  // Inclui as pericias do Conhecimento Primordial (Barbaro 3): o livro
+  // deixa realiza-las COMO teste de Forca durante a Furia, e a Furia da
+  // Vantagem em teste de Forca -- logo o selo tem de aparecer nelas.
+  // calcBonusPericia ja trocava o modificador; aqui a condicao lia o
+  // atributo ESTATICO da tabela (Furtividade = Destreza) e o selo sumia
+  // (issue #48).
   const pericia = PERICIAS.find(p => p.nome === nomePericia);
   const emFuria = !!getEstadoFuria()?.ativa;
   if (emFuria && pericia?.atributo === 'Força') {
-    vantagens.push('Furia');
+    vantagens.push('Fúria');
+  } else if (emFuria && forcaPrimordialAtiva()
+             && PERICIAS_CONHECIMENTO_PRIMORDIAL.includes(nomePericia)) {
+    vantagens.push('Fúria (Conhecimento Primordial)');
   }
 
   // --- Guerreiro/Campeao nivel 3+: Vantagem em Atletismo ---

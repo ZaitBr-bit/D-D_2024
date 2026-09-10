@@ -1544,21 +1544,18 @@ tr:hover td { background: #faf8f4; }
   }
 
   /* --- Itens equipados na impressao --- */
+  /* Mesma estrutura em blocos da Mochila (Nome, Efeitos, Detalhes): o
+     equipado usava uma unica linha flex com um "detalhe" so, que nunca
+     chegava dividido ao PDF (issue #57). As regras de nome/efeito/detalhe
+     ficam agrupadas com as da Mochila logo abaixo para nao duplicar valor. */
   .print-equip-list {
     font-size: 8pt;
   }
   .print-equip-item {
-    display: flex;
-    justify-content: space-between;
+    display: block;
     padding: 1mm 0;
     border-bottom: 0.5px dotted #ccc;
-  }
-  .print-equip-name {
-    font-weight: 600;
-  }
-  .print-equip-detail {
-    color: #555;
-    font-size: 7.5pt;
+    page-break-inside: avoid;
   }
 
   /* --- Layout multi-colunas para magias, tracos e features curtas --- */
@@ -1646,21 +1643,20 @@ tr:hover td { background: #faf8f4; }
   }
 
   /* --- Inventario na impressao --- */
+  /* Nome, efeito e detalhe, um por linha: em linha unica o item ficava
+     ilegivel no papel e no PDF (issue #57). */
   .print-inv-item {
-    display: flex;
-    justify-content: space-between;
+    display: block;
     padding: 1mm 0;
     border-bottom: 0.5px dotted #ccc;
     font-size: 8pt;
     page-break-inside: avoid;
   }
-  .print-inv-name { font-weight: 600; }
-  .print-inv-detail { color: #555; font-size: 7.5pt; }
-  .print-inv-qty {
-    font-weight: 700;
-    min-width: 20px;
-    text-align: right;
-  }
+  /* Regras compartilhadas com .print-equip-* (Equipamento usa a mesma
+     separacao Nome/Efeitos/Detalhes -- ver comentario acima). */
+  .print-inv-name, .print-equip-name { display: block; font-weight: 700; }
+  .print-inv-effect, .print-equip-effect { display: block; color: #333; font-size: 7.5pt; }
+  .print-inv-detail, .print-equip-detail { display: block; color: #555; font-size: 7.5pt; }
 
   /* --- Detalhes pessoais na impressao --- */
   .print-detail-field {

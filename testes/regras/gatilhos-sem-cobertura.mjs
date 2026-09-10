@@ -75,11 +75,21 @@ export const GATILHOS_SEM_COBERTURA = [
   // magia-classe.spec.mjs clica nele para confirmar o preenchimento da
   // vaga de magia livre (abrirPreenchimentoSlotMagia, sheet/grimorio.js).
   'btn-confirmar-recuperar-dadiva',
-  'btn-confirmar-rem-inv',
-  'btn-confirmar-rem-inv-sheet',
+  // 'btn-confirmar-rem-inv' e 'btn-confirmar-rem-inv-sheet' sairam daqui na
+  // onda de fix da issue #57 (sintonizacao-teto.spec.mjs): o novo teste do
+  // contador de sintonizados clica em '#btn-confirmar-rem-inv-sheet' para
+  // remover um item, e a verificacao deste motor e por substring -- o
+  // texto do segundo id contem o primeiro, entao os dois saem cobertos
+  // juntos.
+  //
+  // 'btn-confirmar-rem-inv' continua SEM clique proprio. Devolver a entrada
+  // a lista nao e opcao: o teste "a lista de gatilhos sem cobertura so
+  // encolhe" (gatilhos-ui-cobertos.test.mjs) reprova entrada que o motor
+  // considere coberta, e o motor casa por substring. Consertar isso pede
+  // mudar `temCobertura` para casar o id com fronteira ('#id' ou id entre
+  // aspas), o que esta fora do escopo desta entrega.
   'btn-confirmar-remover-grimorio',
   'btn-confirmar-remover-magia-custom',
-  'btn-confirmar-troca-maestria',
   'btn-dist-sugerida',
   'btn-edit-po',
   // 'btn-editar-item-custom' saiu daqui na Tarefa 9 (issue #43):
@@ -136,7 +146,6 @@ export const GATILHOS_SEM_COBERTURA = [
   'btn-salvar-xp',
   'btn-slot-para-pf',
   'btn-sync-cloud',
-  'btn-trocar-maestrias-dl',
   'btn-usar-dv',
   'clerigo-cd-acao=expulsar',
   'clerigo-cd-acao=fulminar',

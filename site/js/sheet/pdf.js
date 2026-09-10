@@ -3,7 +3,7 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES } from '../dados-classes.js';
-import { bonusProficiencia, calcBonusPericia, calcCA, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcMod, calcPercepcaoPassiva, conjuracoesPorClasse, fmtMod, getDeslocamento, toast } from '../utils.js';
+import { bonusProficiencia, calcBonusPericia, calcCA, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcMod, calcPercepcaoPassiva, conjuracoesPorClasse, fmtMod, getDeslocamento, removerMarcadoresDado, toast } from '../utils.js';
 import { forcaPrimordialAtiva, getDeslocamentoFinal, getModIniciativa } from './combate.js';
 import { char, especiesCache, passivosTalentosCache } from './estado.js';
 import { classesDe } from '../regras-multiclasse.js';
@@ -39,8 +39,11 @@ function carregarPdfLib() {
 const _PDF_UNICODE_OK = new Set(['–', '—', '‘', '’', '“', '”', '…', '•', '€', '™']);
 function _sanitizePdfText(t) {
   if (t == null) return '';
+  // O marcador de dado sai ANTES do fallback abaixo: ele e decoracao de
+  // tela e a fonte Helvetica nao o codifica -- sem esta linha cada um
+  // virava '?' em volta do dado (issue #55).
   let out = '';
-  for (const ch of String(t)) {
+  for (const ch of removerMarcadoresDado(String(t))) {
     const cp = ch.codePointAt(0);
     if (cp <= 0xFF || _PDF_UNICODE_OK.has(ch)) out += ch;
     else out += '?';
@@ -173,9 +176,12 @@ function _montarDadosCartao() {
  * reaproveitando gerarHtmlImpressao() em vez de reimplementar a logica. Pula as
  * secoes de pagina 1 que ja vao no resumo.
  */
-function _extrairBlocosDetalhe(html) {
+export function extrairBlocosDetalhe(html) {
   const doc = new DOMParser().parseFromString(html, 'text/html');
-  const pular = new Set(['Atributos', 'Salvaguardas', 'Pericias', 'Perícias', 'Sentidos Passivos', 'Defesas', 'Equipamento']);
+  // 'Equipamento' saiu do conjunto: a secao passou a ter Nome/Efeitos/Detalhes
+  // por item (issue #57) e agora flui nas paginas de detalhe como a Mochila.
+  // O cartao da pagina 1 continua com o resumo em lista de nomes (_montarDadosCartao).
+  const pular = new Set(['Atributos', 'Salvaguardas', 'Pericias', 'Perícias', 'Sentidos Passivos', 'Defesas']);
   const blocos = [];
   const limpar = s => (s || '').replace(/\s+/g, ' ').trim();
 
@@ -204,6 +210,34 @@ function _extrairBlocosDetalhe(html) {
         if (meta) blocos.push({ t: 'meta', text: meta });
         if (desc) blocos.push({ t: 'p', text: desc });
       });
+    } else if (sec.querySelectorAll('.print-inv-item, .print-equip-item').length) {
+      // Um bloco por item: nome em negrito, efeito e detalhe em paragrafos
+      // proprios. Sem este ramo a secao caia no `else` generico abaixo e a
+      // mochila inteira virava UM paragrafo (issue #57). Equipamento usa a
+      // mesma estrutura com classes `print-equip-*` -- `[class$="-name"]` e
+      // afins casam o sufixo em qualquer prefixo, sem repetir o corpo do
+      // ramo para cada uma das duas variantes.
+      const moedas = limpar(sec.querySelector('.print-inv-moedas')?.textContent);
+      if (moedas && moedas.startsWith('Moedas')) blocos.push({ t: 'meta', text: moedas });
+      sec.querySelectorAll('.print-inv-item, .print-equip-item').forEach(it => {
+        const nome = limpar(it.querySelector('[class$="-name"]')?.textContent);
+        const efeito = limpar(it.querySelector('[class$="-effect"]')?.textContent);
+        const detalhe = limpar(it.querySelector('[class$="-detail"]')?.textContent);
+        if (nome) blocos.push({ t: 'name', text: nome });
+        if (efeito) blocos.push({ t: 'p', text: efeito });
+        if (detalhe) blocos.push({ t: 'meta', text: detalhe });
+      });
+    } else if (sec.querySelectorAll('.print-detail-field').length) {
+      // Um bloco por campo, e as quebras de linha do jogador viram
+      // paragrafos: `limpar` colapsa \n em espaco, entao Historia e Notas
+      // chegavam ao PDF como um paragrafo de dezenas de linhas (issue #57).
+      sec.querySelectorAll('.print-detail-field').forEach(campo => {
+        const rotulo = limpar(campo.querySelector('.print-detail-label')?.textContent);
+        if (rotulo) blocos.push({ t: 'name', text: rotulo });
+        const valor = campo.querySelector('.print-detail-value')?.textContent || '';
+        valor.split('\n').map(l => limpar(l)).filter(Boolean)
+          .forEach(l => blocos.push({ t: 'p', text: l }));
+      });
     } else {
       const clone = sec.cloneNode(true);
       clone.querySelector('.print-section-title')?.remove();
@@ -213,7 +247,6 @@ function _extrairBlocosDetalhe(html) {
   });
   return blocos;
 }
-
 /** Quebra texto em linhas que cabem em maxW, medindo com a fonte. */
 function _quebrarLinhas(text, font, size, maxW) {
   const linhas = [];
@@ -452,7 +485,7 @@ async function _renderizarPdf(PDFLib, dados, detalhes) {
 async function gerarPdfFicha() {
   const PDFLib = await carregarPdfLib();
   const dados = _montarDadosCartao();
-  const detalhes = _extrairBlocosDetalhe(await gerarHtmlImpressao());
+  const detalhes = extrairBlocosDetalhe(await gerarHtmlImpressao());
   return _renderizarPdf(PDFLib, dados, detalhes);
 }
 

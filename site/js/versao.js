@@ -13,13 +13,72 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.0.3';
+export const VERSAO_ATUAL = '3.0.4';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.0.4',
+    data: '2026-09-09',
+    rotulo: 'Consertos e melhorias',
+    resumo: 'Três consertos antigos — os "?" ao redor dos dados no PDF, '
+      + '"Trocar Maestrias" abrindo por cima da troca de magia no Descanso '
+      + 'Longo, e a Fúria sem o selo de Vantagem nas perícias do Conhecimento '
+      + 'Primordial — e um conjunto de melhorias: no PDF, a mochila e os '
+      + 'detalhes do personagem saem organizados em blocos; e o item que você '
+      + 'mesmo cria pode ter raridade, preço e sintonização, com o limite de '
+      + 'três sintonizados na ficha.',
+    correcoes: [
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'PDF: as expressões de dado (1d6, 2d8) apareciam cercadas de "?" em '
+            + 'magias, talentos e características. O marcador que destaca o '
+            + 'dado na tela não é codificável pela fonte do PDF, e agora sai '
+            + 'do texto antes de gerar o arquivo. (#55)',
+          'Descanso Longo: em Guardião, Paladino e Ladino — as classes que '
+            + 'refazem todas as maestrias — clicar em "Trocar Maestrias" abria '
+            + 'a troca de magia por cima do modal de maestria. Agora a cadeia '
+            + 'só avança depois que você sai da tela de maestria, salvando ou '
+            + 'cancelando. Em Bárbaro e Guerreiro, que trocam uma maestria por '
+            + 'vez, quem não tinha maestria nenhuma definida também deixa de '
+            + 'perder em silêncio as trocas de magia e truque seguintes. (#51)',
+          'Bárbaro: durante a Fúria, Acrobacia, Furtividade, Intimidação, '
+            + 'Percepção e Sobrevivência já usavam o modificador de Força '
+            + 'pelo Conhecimento Primordial, mas não exibiam o selo "V" de '
+            + 'Vantagem. Agora exibem, com a bolha explicando "Fúria '
+            + '(Conhecimento Primordial)". (#48)',
+        ],
+      },
+    ],
+    melhorias: [
+      {
+        grupo: '✨ Melhorias',
+        itens: [
+          'PDF: cada item da mochila sai em Nome, Efeitos (dano, propriedades, '
+            + 'CA, bônus) e Detalhes (custo, peso, raridade e sintonização), '
+            + 'um bloco por item — em vez de a mochila inteira sair em um '
+            + 'parágrafo só. Os equipamentos ganham o mesmo tratamento. (#57)',
+          'PDF: Aparência, Personalidade, Ideais, Laços, Defeitos, História e '
+            + 'Notas saem cada um em seu bloco, com as quebras de linha que '
+            + 'você digitou preservadas — em vez de virarem um parágrafo único '
+            + 'de dezenas de linhas. (#57)',
+          'Item customizado: ao criar ou editar o seu, agora dá para marcar '
+            + 'raridade (de Comum a Artefato, ou nenhuma para item não '
+            + 'mágico), preço em texto livre ("150 PO", "de graça") e "requer '
+            + 'sintonização" — os três aparecem como etiquetas no item. (#57)',
+          'Sintonização: o item que pede sintonização ganha uma caixa na '
+            + 'ficha, e o cabeçalho do inventário mostra "Sintonizados: X / '
+            + '3". Ao chegar em três, as caixas dos outros itens ficam cinzas '
+            + 'e não deixam marcar; desmarcar um libera as outras de novo. '
+            + '(#57)',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.0.3',
     data: '2026-09-02',

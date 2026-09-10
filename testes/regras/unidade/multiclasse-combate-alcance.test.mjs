@@ -234,7 +234,7 @@ const ALVOS = [
     pisoPorClasse: 5,
     excecoes: [
       {
-        linha: 'export async function abrirModalMaestrias(classe = char.classe) {',
+        linha: 'export async function abrirModalMaestrias(classe = char.classe, opcoes = {}) {',
         feature: 'abrirModalMaestrias -- valor PADRÃO do parâmetro `classe`',
         motivo:
           'NÃO é uma leitura de regra: é o default de um parâmetro que só ROTULA o ' +
