@@ -108,11 +108,18 @@ function radioClasse(page, nome) {
   return page.locator(`#levelup-escolha-classe input[name="classe-que-sobe"][data-classe="${nome}"]`);
 }
 
-/** Avança "Próximo" até o card "Trocar Magias" aparecer (mesma forma de levelup-trocas-multiplas.spec.mjs). */
+/**
+ * Avança "Próximo" até o card "Trocar Magias" aparecer (mesma forma de
+ * levelup-trocas-multiplas.spec.mjs), e expande o <details> (issue #90:
+ * o card nasce minimizado) com um clique real no <summary>.
+ */
 async function irAteCardDeTroca(page) {
   const card = page.locator('#levelup-troca-magia');
   for (let i = 0; i < 10; i++) {
-    if (await card.count()) return card;
+    if (await card.count()) {
+      await page.locator('details:has(#levelup-troca-magia) > summary').click();
+      return card;
+    }
     const proximo = page.locator('#btn-step-proximo');
     if (await proximo.count()) await proximo.click();
     await page.waitForTimeout(500);

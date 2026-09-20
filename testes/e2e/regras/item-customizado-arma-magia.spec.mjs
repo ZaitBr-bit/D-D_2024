@@ -45,7 +45,13 @@ test('item customizado com categoria de arma: Atq/Dano/Maestria calculados como 
   // Marcial de catálogo com Acuidade já usa (inventario.js).
   await expect(page.locator('text=/Atq \\+4/')).toBeVisible();
   await expect(page.locator('text=Dano 1d8+2 Cortante')).toBeVisible();
-  await expect(page.locator('text=Maestria: Trespassar')).toBeVisible();
+
+  // Issue #96: a badge de maestria passou a ser CONDICIONAL (mesmo gate
+  // por `char.maestrias_arma` que a arma de catálogo já usava) -- sem
+  // escolher a maestria de verdade no modal "Definir Maestrias", a badge
+  // não pode aparecer. O fluxo completo (escolher no modal → badge
+  // aparecer) está coberto em maestria-arma-customizada.spec.mjs.
+  await expect(page.locator('text=Maestria: Trespassar')).toHaveCount(0);
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });

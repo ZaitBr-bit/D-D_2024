@@ -5,7 +5,7 @@
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, PERICIAS } from '../dados-classes.js';
 import { getMagiasPorCirculo } from '../db.js';
 import { formatarCarteira, totalEmCobre } from '../moedas.js';
-import { bonusProficiencia, calcBonusPericia, calcCA, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcMod, calcPercepcaoPassiva, conjuracoesPorClasse, escHtml, fmtMod, getDeslocamento, getTamanho, mdParaHtml, toast } from '../utils.js';
+import { bonusProficiencia, calcBonusPericia, calcCA, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcMod, calcPercepcaoPassiva, conjuracoesPorClasse, escHtml, fmtMod, getDeslocamento, getTamanho, mdParaHtml, rotuloCirculoSuperiorHtml, toast } from '../utils.js';
 import { SUBTRACOS_ESPECIE, gerarTracoSinteticoEspecie } from './caracteristicas.js';
 import { getEstadoRecursosBruxo } from './classes/bruxo.js';
 import { forcaPrimordialAtiva, getAtaquesPorAcao, getDeslocamentoFinal, getModIniciativa } from './combate.js';
@@ -163,7 +163,7 @@ function htmlMagiaImpressao(nome, circulo, cacheMagias, origemExtra) {
       .filter(Boolean).join(' | ');
     desc = mdParaHtml(magia.descricao || '');
     if (magia.circulo_superior) {
-      upcast = `<div class="print-spell-upcast"><strong>Circulos superiores:</strong> ${mdParaHtml(magia.circulo_superior)}</div>`;
+      upcast = `<div class="print-spell-upcast">${rotuloCirculoSuperiorHtml(circulo)} ${mdParaHtml(magia.circulo_superior)}</div>`;
     }
   } else if (infoIdx) {
     meta = [infoIdx.escola, infoIdx.tempo_conjuracao, infoIdx.alcance, infoIdx.duracao]

@@ -6,7 +6,7 @@
 // ============================================================
 import { ATRIBUTO_NOME_PARA_KEY, CLASSES_INFO } from '../dados-classes.js';
 import { getMagiasClasse, getMagiasPorCirculo } from '../db.js';
-import { abrirModal, bonusProficiencia, calcMod, escHtml, getBonusTruquesOrdem, getLimitesMagias, getMagiaPreparadas, mdParaHtml, semAcento, toast } from '../utils.js';
+import { abrirModal, bonusProficiencia, calcMod, escHtml, getBonusTruquesOrdem, getLimitesMagias, getMagiaPreparadas, mdParaHtml, rotuloCirculoSuperiorHtml, semAcento, toast } from '../utils.js';
 import { getEstadoFuria } from './classes/barbaro.js';
 import { renderSecaoPactoBruxo } from './classes/bruxo.js';
 import { gastarPontosFeiticaria, getEstadoRecursosFeiticeiro } from './classes/feiticeiro.js';
@@ -2997,7 +2997,7 @@ export function setupEventosEspacosMagia() {
               <span>${magia.duracao}</span>
             </div>
             <div class="md-content">${mdParaHtml(magia.descricao)}</div>
-            ${magia.circulo_superior ? `<div class="info-box info" style="margin-top:4px"><strong>Circulos superiores:</strong><div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
+            ${magia.circulo_superior ? `<div class="info-box info" style="margin-top:4px">${rotuloCirculoSuperiorHtml(circ)}<div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
           `;
         }
       }

@@ -22,7 +22,7 @@ import { deArmas, deEstilosLuta, deMagias, deManobras, deTalentos, motivoPreRequ
 import { collectOpcoes, validateAll } from './levelup-validations.js';
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, PERICIAS } from './dados-classes.js';
 import { getArmas, getClasse, getMagiasPorCirculo, getMagiasClasse, getMagiasRituais } from './db.js';
-import { abrirModal, fecharModal, toast, mdParaHtml, semAcento, calcMod, escHtml, getEspacosMagia, bonusProficiencia } from './utils.js';
+import { abrirModal, fecharModal, toast, mdParaHtml, rotuloCirculoSuperiorHtml, semAcento, calcMod, escHtml, getEspacosMagia, bonusProficiencia } from './utils.js';
 import { subirDeNivel, obterAtributosASITalento, getLimiteASITalento, obterTalentosElegiveis } from './levelup.js';
 import { abrirGridManobras } from './manobras-ui.js';
 import { truqueEhTrocavel } from './regras-origens-magia.js';
@@ -1806,7 +1806,7 @@ function bindEventosMagias(ctx, state) {
               <span>${magia.componentes}</span> <span>${magia.duracao}</span>
             </div>
             <div class="md-content">${mdParaHtml(magia.descricao)}</div>
-            ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em círculos superiores:</strong><div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
+            ${magia.circulo_superior ? `<div class="info-box info mt-1">${rotuloCirculoSuperiorHtml(circ)}<div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
           `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
         });
       });

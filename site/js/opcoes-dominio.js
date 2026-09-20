@@ -8,7 +8,7 @@
 // ============================================================
 import { PERICIAS } from './dados-classes.js';
 import { talentoElegivelParaPersonagem } from './levelup.js';
-import { escHtml, mdParaHtml } from './utils.js';
+import { escHtml, mdParaHtml, rotuloCirculoSuperiorHtml } from './utils.js';
 
 /**
  * Monta o carregador do detalhe de uma magia, para o card abrir sob demanda.
@@ -39,7 +39,7 @@ function _carregadorDetalheMagia(nome, circulo) {
       <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:0.85rem;margin-bottom:8px">${meta}</div>
       <div class="md-content">${mdParaHtml(magia.descricao || '')}</div>
       ${magia.circulo_superior
-        ? `<div class="info-box info mt-1"><strong>Em círculos superiores:</strong> ${escHtml(magia.circulo_superior)}</div>`
+        ? `<div class="info-box info mt-1">${rotuloCirculoSuperiorHtml(circulo)} ${escHtml(magia.circulo_superior)}</div>`
         : ''}
       ${magia.classes?.length
         ? `<div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px">Classes: ${escHtml(magia.classes.join(', '))}</div>`

@@ -5,7 +5,7 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { abrirModal, escHtml, semAcento, toast } from '../utils.js';
-import { armasElegiveisMaestria } from '../regras-equipamento.js';
+import { armasCustomizadasDoInventario, armasElegiveisMaestria } from '../regras-equipamento.js';
 import { deArmas } from '../opcoes-dominio.js';
 import { montarTroca } from '../ui-opcoes.js';
 import { temClasse } from '../regras-multiclasse.js';
@@ -148,7 +148,10 @@ export async function abrirModalMaestrias(classe = char.classe, opcoes = {}) {
   // livro amarra as duas). A cópia que existia aqui lia
   // `arma.propriedades` como lista -- o dado é string, e o modal do Ladino
   // quebrava com TypeError antes de abrir.
-  const armas = armasElegiveisMaestria(char, dados?.armas || [])
+  // Issue #96: arma customizada com categoria (issue #82) entra na MESMA
+  // lista de escolha que a arma de catálogo, se o personagem tiver
+  // proficiência com a categoria dela.
+  const armas = armasElegiveisMaestria(char, [...(dados?.armas || []), ...armasCustomizadasDoInventario(char)])
     .map(a => a.nome)
     .sort((a, b) => a.localeCompare(b));
 
@@ -269,7 +272,7 @@ export async function abrirModalTrocaMaestriaDescanso(callbackPosTroca = null) {
   }
 
   const dados = await carregarDadosEquipSheet();
-  const todasArmas = dados?.armas || [];
+  const todasArmas = [...(dados?.armas || []), ...armasCustomizadasDoInventario(char)];
   // Filtrar armas disponiveis conforme classe -- mantém os objetos completos
   // (nao só o nome): deArmas precisa de dano/propriedades/maestria de cada uma.
   const armasDisponiveis = armasElegiveisMaestria(char, todasArmas)

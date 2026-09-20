@@ -905,6 +905,21 @@ export function removerMarcadoresDado(texto) {
   return String(texto).split(MARCADOR_DADO).join('');
 }
 
+/**
+ * Rótulo em negrito (HTML pronto, ou string vazia) que antecede a
+ * descrição de upcast de uma magia/truque -- issue #97: o texto do campo
+ * `circulo_superior` de um TRUQUE (círculo 0, dados/magias/truques.json)
+ * já começa com "Aprimoramento de Truque.", então o rótulo fixo "Em
+ * círculos superiores" que a tela desenhava antes dele ficava
+ * contraditório (truque não tem círculo pra upar). Vazio pra truque; só
+ * magia de círculo 1+ ganha o rótulo.
+ * @param {number} circulo
+ * @returns {string}
+ */
+export function rotuloCirculoSuperiorHtml(circulo) {
+  return circulo === 0 ? '' : '<strong>Em círculos superiores:</strong>';
+}
+
 /** Converte markdown básico para HTML */
 export function mdParaHtml(texto) {
   if (!texto) return '';

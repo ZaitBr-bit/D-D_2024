@@ -303,21 +303,21 @@ function renderSheetInvItem(item, idx) {
     }
   }
 
-  // Badge de maestria com a arma
+  // Badge de maestria com a arma. Issue #96: a arma customizada mostrava a
+  // badge incondicionalmente (sem checar `char.maestrias_arma`) -- parecia
+  // que a maestria estava valendo de verdade mesmo sem o personagem tê-la
+  // escolhido. Corrigido junto da issue #82/#37 (`armasCustomizadasDoInventario`,
+  // regras-equipamento.js): a arma customizada com categoria agora ENTRA de
+  // verdade na lista de escolha do modal de maestria (sheet/maestrias.js),
+  // então o mesmo gate de `char.maestrias_arma` que a arma de catálogo usa
+  // volta a fazer sentido pra ela também -- catálogo e customizado usam
+  // exatamente a mesma condição agora.
   let maestriaBadge = '';
-  if (item.tipo === 'arma' && item.dados?.maestria) {
+  if ((item.tipo === 'arma' || ehArmaCustom) && item.dados?.maestria) {
     const temMaestria = (char.maestrias_arma || []).some(m => m === item.nome);
     if (temMaestria) {
       maestriaBadge = `<span class="badge" style="font-size:0.6rem;background:#fff8e1;color:#e65100;border:1px solid #ffcc80;font-weight:700">Maestria: ${item.dados.maestria}</span>`;
     }
-  } else if (ehArmaCustom && item.dados?.maestria) {
-    // Item customizado nunca entra na lista de escolha de maestria do
-    // personagem (o modal só oferece armas de dados/equipamento/armas.json,
-    // sheet/maestrias.js) -- gatear pelo mesmo `char.maestrias_arma` do
-    // catálogo deixaria este campo sempre inerte. A badge aqui é
-    // informativa (a maestria que a arma customizada TEM), não uma vaga
-    // escolhida do personagem.
-    maestriaBadge = `<span class="badge" style="font-size:0.6rem;background:#fff8e1;color:#e65100;border:1px solid #ffcc80;font-weight:700">Maestria: ${item.dados.maestria}</span>`;
   }
 
   const isZeroQtd = (item.quantidade ?? 1) <= 0;
@@ -904,6 +904,48 @@ function setupSheetDragDrop() {
 // mostrarDetalheItemSheet, abaixo, tambem chama a funcao localmente.
 export { carregarDadosEquipSheet };
 
+/**
+ * HTML das seções "Propriedades" (uma por `<details>`, com descrição do
+ * glossário) e "Maestria: X" (com descrição) do modal de detalhe de uma
+ * arma -- extraído pra ser reusado pela arma customizada com categoria
+ * (issue #82) também, issue #96: antes só a arma de CATÁLOGO ganhava essas
+ * descrições formatadas; a customizada mostrava só o nome cru da
+ * propriedade/maestria, sem explicação nenhuma.
+ * @param {{propriedades?: string, maestria?: string}} d `item.dados`
+ * @param {Array<{nome: string, descricao: string}>} propsDescs Glossário (dados.propriedadesArmas)
+ * @returns {string}
+ */
+function htmlPropriedadesEMaestria(d, propsDescs) {
+  let html = '';
+  if (!d.propriedades) return html;
+  const propsNomes = d.propriedades.split(',').map(p => p.trim().replace(/\s*\(.*\)/, ''));
+  const propsComDesc = propsNomes
+    .map(nome => {
+      const prop = propsDescs.find(p => semAcento(p.nome).toLowerCase() === semAcento(nome).toLowerCase());
+      return prop ? { nome: prop.nome, descricao: prop.descricao } : null;
+    })
+    .filter(Boolean);
+
+  if (propsComDesc.length > 0) {
+    html += `<div class="section-divider mt-1"><span>Propriedades</span></div>`;
+    html += propsComDesc.map(p => `
+      <details style="margin-bottom:4px">
+        <summary style="font-weight:600;cursor:pointer;font-size:0.85rem">${p.nome}</summary>
+        <div class="md-content" style="padding:4px 0;font-size:0.8rem">${mdParaHtml(p.descricao)}</div>
+      </details>
+    `).join('');
+  }
+
+  if (d.maestria) {
+    const maestriaDesc = propsDescs.find(p => semAcento(p.nome).toLowerCase() === semAcento(d.maestria).toLowerCase());
+    if (maestriaDesc) {
+      html += `<div class="section-divider mt-1"><span>Maestria: ${d.maestria}</span></div>`;
+      html += `<div class="md-content" style="font-size:0.8rem">${mdParaHtml(maestriaDesc.descricao)}</div>`;
+    }
+  }
+  return html;
+}
+
 /** Mostra popup com detalhes completos de um item do inventário */
 async function mostrarDetalheItemSheet(item) {
   if (!item) return;
@@ -921,34 +963,7 @@ async function mostrarDetalheItemSheet(item) {
     if (d.maestria) corpo += `<div style="font-size:0.85rem;margin-bottom:6px"><strong>Maestria:</strong> ${d.maestria}</div>`;
     if (d.custo || d.peso) corpo += `<div style="font-size:0.85rem;margin-bottom:6px"><strong>Custo:</strong> ${d.custo || '—'} | <strong>Peso:</strong> ${d.peso || '—'}</div>`;
 
-    // Descrições das propriedades
-    if (d.propriedades) {
-      const propsNomes = d.propriedades.split(',').map(p => p.trim().replace(/\s*\(.*\)/, ''));
-      const propsComDesc = propsNomes
-        .map(nome => {
-          const prop = propsDescs.find(p => semAcento(p.nome).toLowerCase() === semAcento(nome).toLowerCase());
-          return prop ? { nome: prop.nome, descricao: prop.descricao } : null;
-        })
-        .filter(Boolean);
-
-      if (propsComDesc.length > 0) {
-        corpo += `<div class="section-divider mt-1"><span>Propriedades</span></div>`;
-        corpo += propsComDesc.map(p => `
-          <details style="margin-bottom:4px">
-            <summary style="font-weight:600;cursor:pointer;font-size:0.85rem">${p.nome}</summary>
-            <div class="md-content" style="padding:4px 0;font-size:0.8rem">${mdParaHtml(p.descricao)}</div>
-          </details>
-        `).join('');
-      }
-
-      if (d.maestria) {
-        const maestriaDesc = propsDescs.find(p => semAcento(p.nome).toLowerCase() === semAcento(d.maestria).toLowerCase());
-        if (maestriaDesc) {
-          corpo += `<div class="section-divider mt-1"><span>Maestria: ${d.maestria}</span></div>`;
-          corpo += `<div class="md-content" style="font-size:0.8rem">${mdParaHtml(maestriaDesc.descricao)}</div>`;
-        }
-      }
-    }
+    corpo += htmlPropriedadesEMaestria(d, propsDescs);
   } else if (item.tipo === 'armadura' || item.tipo === 'escudo') {
     const d = item.dados || {};
     corpo += `<div style="font-size:0.85rem;margin-bottom:6px">`;
@@ -972,6 +987,14 @@ async function mostrarDetalheItemSheet(item) {
       if (dano) corpo += `<strong>Dano:</strong> ${dano}<br>`;
       if (bonusAtq) corpo += `<strong>Bonus Ataque:</strong> ${bonusAtq > 0 ? '+' : ''}${bonusAtq}`;
       corpo += `</div>`;
+    }
+
+    // Arma customizada com categoria (issue #82): mesma formatação de
+    // Propriedades/Maestria da arma de catálogo, em vez de só o nome cru
+    // (issue #96, item a).
+    if (d.categoria) {
+      corpo += `<div style="font-size:0.85rem;margin-bottom:6px"><strong>Categoria:</strong> ${d.categoria}</div>`;
+      corpo += htmlPropriedadesEMaestria(d, propsDescs);
     }
 
     if (item.descricao) {

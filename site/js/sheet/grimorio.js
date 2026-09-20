@@ -7,7 +7,7 @@
 // ============================================================
 import { getIndiceMagias, getMagiasPorCirculo } from '../db.js';
 import { VALOR_EM_COBRE, formatarCarteira, podePagar, retirarValor } from '../moedas.js';
-import { abrirModal, escHtml, getBonusTruquesOrdem, getEspacosMagia, getLimitesMagias, magiaMagoEstaNoGrimorio, mdParaHtml, semAcento, toast } from '../utils.js';
+import { abrirModal, escHtml, getBonusTruquesOrdem, getEspacosMagia, getLimitesMagias, magiaMagoEstaNoGrimorio, mdParaHtml, rotuloCirculoSuperiorHtml, semAcento, toast } from '../utils.js';
 import { montarSeletor } from '../ui-opcoes.js';
 import { deMagias } from '../opcoes-dominio.js';
 import { getTruquesExtraEstiloLuta } from './combate.js';
@@ -989,7 +989,7 @@ export async function mostrarBuscaMagia() {
             <span>${escHtml(magia.duracao)}</span>
           </div>
           <div class="md-content">${mdParaHtml(magia.descricao)}</div>
-          ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em círculos superiores:</strong><div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
+          ${magia.circulo_superior ? `<div class="info-box info mt-1">${rotuloCirculoSuperiorHtml(circ)}<div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
           ${(magia.classes || []).length > 0 ? `<div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px">Classes: ${magia.classes.map(escHtml).join(', ')}</div>` : ''}
         `;
         abrirModal(magia.nome, detalhesHtml, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
@@ -1978,7 +1978,7 @@ export async function abrirPreenchimentoSlotMagia(tipo = 'magia') {
             <span>${magia.componentes}</span> <span>${magia.duracao}</span>
           </div>
           <div class="md-content">${mdParaHtml(magia.descricao)}</div>
-          ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em circulos superiores:</strong><div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
+          ${magia.circulo_superior ? `<div class="info-box info mt-1">${rotuloCirculoSuperiorHtml(circ)}<div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
         `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
       });
     });
@@ -2229,7 +2229,7 @@ export async function mostrarTrocaMagiaConhecida(callbackPosTroca = null, opcoes
             <span>${escHtml(magia.componentes)}</span> <span>${escHtml(magia.duracao)}</span>
           </div>
           <div class="md-content">${mdParaHtml(magia.descricao)}</div>
-          ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em circulos superiores:</strong><div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
+          ${magia.circulo_superior ? `<div class="info-box info mt-1">${rotuloCirculoSuperiorHtml(circ)}<div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
         `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
       });
     });

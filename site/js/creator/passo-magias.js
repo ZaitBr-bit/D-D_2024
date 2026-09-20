@@ -4,7 +4,7 @@
 // ============================================================
 import { ATRIBUTOS_NOMES, CLASSES_INFO } from '../dados-classes.js';
 import { getClasse, getIndiceMagias, getMagiasClasse } from '../db.js';
-import { abrirModal, getBonusTruquesOrdem, getEspacosMagia, getMagiaPreparadas, getTruquesConhecidos, mdParaHtml, nomesMagiaCirculo1Conhecidas, semAcento, toast } from '../utils.js';
+import { abrirModal, getBonusTruquesOrdem, getEspacosMagia, getMagiaPreparadas, getTruquesConhecidos, mdParaHtml, nomesMagiaCirculo1Conhecidas, rotuloCirculoSuperiorHtml, semAcento, toast } from '../utils.js';
 import { obterTruquesEspecie } from './comum.js';
 import { dadosCache, personagem } from './wizard.js';
 
@@ -631,7 +631,7 @@ async function mostrarDetalheMagia(nome, circulo) {
       <span>${magia.duracao}</span>
     </div>
     <div class="md-content">${mdParaHtml(magia.descricao)}</div>
-    ${magia.circulo_superior ? `<div class="info-box info mt-1"><strong>Em círculos superiores:</strong> ${magia.circulo_superior}</div>` : ''}
+    ${magia.circulo_superior ? `<div class="info-box info mt-1">${rotuloCirculoSuperiorHtml(circulo)} ${magia.circulo_superior}</div>` : ''}
     <div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px">Classes: ${(magia.classes || []).join(', ')}</div>
   `);
 }

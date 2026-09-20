@@ -87,6 +87,33 @@ export function armasElegiveisMaestria(personagem, armas = []) {
   });
 }
 
+/**
+ * Armas customizadas do INVENTÁRIO do personagem que têm categoria de
+ * arma preenchida (issue #82) -- forma compatível com `armasElegiveisMaestria`
+ * acima ({nome, categoria, propriedades}), pra entrar na MESMA regra de
+ * proficiência que decide quem pode escolher maestria com uma arma de
+ * catálogo. Issue #96: sem isso, `sheet/inventario.js` mostrava a badge
+ * "Maestria: X" de um item customizado incondicionalmente (nunca dava
+ * pra escolher aquela arma no modal de maestria, então o gate normal por
+ * `char.maestrias_arma` deixaria o campo sempre inerte) -- agora a arma
+ * customizada entra de verdade na lista de escolha, e o gate condicional
+ * volta a fazer sentido.
+ *
+ * @param {Object} personagem - Personagem (lê `inventario`)
+ * @returns {Array<{nome: string, categoria: string, propriedades: string}>}
+ */
+export function armasCustomizadasDoInventario(personagem) {
+  return (personagem?.inventario || [])
+    .filter((item) => item?.tipo === 'customizado' && item?.dados?.categoria)
+    .map((item) => ({
+      nome: item.nome,
+      categoria: item.dados.categoria,
+      propriedades: item.dados.propriedades || '',
+      dano: item.dados.dano || '',
+      maestria: item.dados.maestria || '',
+    }));
+}
+
 /** Verifica se o personagem tem proficiencia com uma armadura especifica */
 export function temProficienciaArmadura(personagem, armadura) {
   // Mesma uniao de temProficienciaArma -- ver comentario la.

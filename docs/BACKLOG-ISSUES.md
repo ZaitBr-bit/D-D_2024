@@ -12,8 +12,14 @@
 > #82, #92 foram corrigidas e fechadas pelo commit `2e334ee` (`Closes #N`,
 > versão 3.0.10) — removidas desta lista (issue fechada não fica aqui, ver
 > nota no rodapé). Uma issue nova entrou desde a triagem da manhã: **#95**.
-> Depois disso, #84, #90 e #77 também foram corrigidas (versão 3.0.11, sem
-> commit ainda) — ver notas de manutenção.
+> Depois disso, #84, #90 e #77 também foram corrigidas e fechadas pelo
+> commit `3006455` (versão 3.0.11) — ver notas de manutenção.
+>
+> **Revalidação de 2026-09-20 (à noite)**: seis issues novas — **#96 a
+> #101**. #96 e #97 foram corrigidas na hora (versão 3.0.12, sem commit
+> ainda) — ver notas de manutenção. #100 e #101 continuam sendo follow-up
+> direto da correção do #82/#37; #98 é do mesmo cluster geral "magia/
+> truque personalizado", mas pedido novo, não follow-up de #75/#92.
 
 ---
 
@@ -21,7 +27,7 @@
 
 ### Baixa
 
-_(nenhuma nesta faixa no momento — #85/#86/#87 fechadas, ver notas de manutenção)_
+_(nenhuma nesta faixa no momento — #97 fechada, ver notas de manutenção)_
 
 ### Média
 
@@ -38,15 +44,17 @@ _(nenhuma nesta faixa no momento — #85/#86/#87 fechadas, ver notas de manuten�
 
 ### Baixa
 
-_(nenhuma nesta faixa no momento — #84/#90 fechadas, ver notas de manutenção)_
+- [ ] **#99** (NOVA, 2026-09-20, não investigada) — Textos antigos gravados sem acento/Ç ("descricao", "PRECO" etc., prints anexados na issue). Provável dado/rótulo legado de quando o campo não aceitava esses caracteres — precisa achar se é rótulo fixo na UI (troca de 1 linha por lugar) ou dado gravado no personagem (migração). Não investigado.
 
 ### Baixa–Média
 
-_(nenhuma nesta faixa no momento — #77 fechada, ver notas de manutenção)_
+- [ ] **#98** (NOVA, 2026-09-20, não investigada) — Pede um campo de "Círculo Superior" (texto livre) no formulário de magia personalizada, pro jogador descrever o efeito de upcast da própria magia — hoje o formulário não tem esse campo, então a magia personalizada nunca mostra a caixa "Em círculos superiores" que a magia do livro mostra (ver render em `sheet/grimorio.js`/`sheet/magias.js`, campo `circulo_superior`). Mesmo cluster de "magia/truque personalizado" das issues #68/#71/#73/#74/#75/#92 (todas fechadas) — cabe na mesma área de trabalho.
 
 ### Média
 
 - [ ] **#22** — Modo escuro. Nenhum `prefers-color-scheme`/`data-theme` hoje; exige tokenizar cores em CSS custom properties.
+- [ ] **#100** (NOVA, 2026-09-20, não investigada) — Pede mais categorias pro item personalizado além de arma (Armadura, Consumível, Munição, Equipamento, Item Mágico, Ferramenta), e trocar o rótulo "Não é arma" por um estilo mais parecido com o de Raridade (vazio = sem categoria). Extensão direta do #82/#37 (que só adicionou categoria de ARMA ao formulário) — mesma área, mesmo padrão de select.
+- [ ] **#101** (NOVA, 2026-09-20, não investigada) — Pede reorganizar o formulário de item personalizado em seções colapsáveis (Nome/Descrição, Categoria+Propriedades+Maestria, Atributos, Raridade+Sintonização, Preço) — hoje tudo aparece junto, sem separação visual. Ficou mais denso depois do #82/#37 (que acrescentou 5 campos novos ao formulário) — o pedido provavelmente é uma reação direta a isso.
 
 ### Média–Alta
 
@@ -87,15 +95,20 @@ _(nenhuma nesta faixa no momento — #77 fechada, ver notas de manutenção)_
   - **Fora desta rodada, de propósito**: Companheiro Dracônico (Feiticeiro 18) — a magia (Invocar Dragão) não é concedida automaticamente, o bônus de uso grátis só existe SE o jogador já a escolheu por outro caminho; teria de ser um mecanismo novo (detectar se já conhece, marcar retroativo), não os dois já construídos. Terceiro Olho (Mago 10) — é um efeito temporário ESCOLHIDO por Ação Bônus (3 opções, só 1 é magia), não uma conjuração; não tem onde pendurar um botão "Grátis" de magia. Intervenção Divina (Clérigo) e Recuperação Natural (Druida) ficaram fora por decisão do dono do produto — "conjure qualquer magia que você já conheça" pede um seletor que não existe hoje.
   - Cobertura: 4257 testes de unidade (0 falhas), 456 specs e2e (0 falhas, 1 flake sob paralelismo confirmado — passa consistente isolado). 3 bugs reais de dupla-contabilidade encontrados e corrigidos em revisão ANTES do commit (Manto de Majestade, colisão de nome "Passo Nebuloso" com o talento Tocado Por Fadas, Destruição do Paladino) — nenhum chegou a ser publicado.
 - **Fechadas na versão 3.0.8** (commit `ea43e7d`, 2026-09-18): #81, #67, #78, #62 (corrigidas com teste); #79 e #66 (investigadas, não reproduziram — fechadas com teste de regressão, sem alteração de produção). Histórico do que cada uma era fica só no commit e no GitHub a partir daqui; esta lista não guarda issue fechada.
-- **Cluster "magia/truque personalizado"**: #68, #71, #73, #74 fechados na 3.0.7; #78 fechado na 3.0.8; #75/#92 fechados na 3.0.10. #77 continua aberto, mesma área.
+- **Cluster "magia/truque personalizado"**: #68, #71, #73, #74 fechados na 3.0.7; #78 fechado na 3.0.8; #75/#92 fechados na 3.0.10; #77 fechado na 3.0.11. #98 (círculo superior em magia personalizada) é o membro novo do cluster, ainda aberto.
 - **#59/#61**: mesmo cluster de multiclasse Clérigo que trouxe a #62 (já fechada). Investigadas a fundo em 2026-09-18 — ver os itens acima para o porquê de nenhuma das duas ser um bugfix de 1 linha.
 - **Triagem de #82–#94 em 2026-09-20**: as 5 marcadas bug (#85, #86, #87, #89, #91) foram todas CONFIRMADAS com causa raiz no código — nenhuma virou "não reproduz" ou "não é bug". Duas (#91, e o #76 antes dela) compartilham o mesmo padrão: característica com escolha entre sub-opções, card genérico não oferece seletor. #89 foi confirmada por teste isolado (harness de unidade), sem precisar reproduzir em navegador. As 7 melhorias (#82-#84, #90, #92-#94) tiveram o pedido conferido contra o código (não é "bug", não tem causa raiz a achar) — duas boas candidatas a consolidar com issues já na lista (#82→#37, #92→#75).
 - **Fechadas na versão 3.0.10** (commit `2e334ee`, 2026-09-20): #85, #86, #87, #89, #91, #37, #82, #75, #92 — todas corrigidas com TDD (RED confirmado antes de cada GREEN) e e2e com clique real para toda mudança visível. Item customizado com categoria de arma decidiu mostrar a maestria como badge INFORMATIVO, não gated por `char.maestrias_arma` — esse array só aceita nomes de armas do catálogo (o modal de escolha de maestria, `sheet/maestrias.js`, nunca ofereceria um item customizado), gatear do mesmo jeito deixaria o campo sempre inerte. Regressão completa: 4279 testes de unidade (1 falha pré-existente e não relacionada, `druida-forma-acao=encerrar` em `gatilhos-ui-cobertos.test.mjs`, já presente antes desta rodada — não investigada, fora do escopo destas 9 issues), e2e sem falhas nas suítes tocadas (item-customizado, magia-personalizada, aasimar, modal-rodape, pv-max-override, vigoroso-levelup, edicao-manual-atributos, multiclasse-caracteristicas/handlers). `iniciar_servidor.ps1` ficou modificado no repo desde antes desta rodada, sem relação com nenhuma destas issues — não commitado de propósito.
-- **Fechadas na versão 3.0.11 (sem commit ainda), 2026-09-20**: #84, #90, #77 — as três "mais tranquilas" que sobraram depois da rodada anterior.
+- **Fechadas na versão 3.0.11** (commit `3006455`, 2026-09-20): #84, #90, #77 — as três "mais tranquilas" que sobraram depois da rodada anterior.
   - **#84**: renomeou só o texto do botão (`inventario.js`), sem lógica nova.
   - **#90**: os dois cards "Trocar Magias/Truques (Opcional)" do assistente de level-up (`levelup-cards.js`) viraram `<details>` sem `open` — nascem minimizados, clique real no `<summary>` revela o conteúdo. Dois specs e2e pré-existentes (`levelup-trocas-multiplas.spec.mjs`, `trocas-conjurador.spec.mjs`) precisaram de um clique de expansão a mais para continuar achando `.opcao-card` visível.
   - **#77**: reverteu PARCIALMENTE a decisão da #46 em `mostrarBuscaGrimorio` (`sheet/grimorio.js`) — a #46 excluiu TODA magia personalizada da lista paga de cópia, mas só tinha em mente a personalizada "sempre preparada" (nunca sai do grimório de verdade). A personalizada "ocupa vaga" (`sempre_preparada:false`, issue #71) PODE sair do grimório, e agora que sai, volta a aparecer na lista paga (50 PO/círculo), com uma badge "Personalizada" para não confundir com o acervo. A personalizada "sempre preparada" continua de fora (teste de contraste específico para isso). O caminho de volta GRÁTIS que já existia (re-marcar "sempre preparada" no formulário de edição) não foi removido — a issue pediu só para adicionar o caminho pago em `mostrarBuscaGrimorio`, não para fechar o outro; ver se o dono do produto quer essa segunda parte numa rodada futura.
   - Regressão: unidade sem novas falhas (mesma 1 pré-existente de sempre); e2e 61/61 nas suítes tocadas (levelup, troca, grimório, magia-customizada, item-customizado).
+- **Fechadas na versão 3.0.12 (sem commit ainda), 2026-09-20**: #97, #96.
+  - **#97**: `rotuloCirculoSuperiorHtml(circulo)` (utils.js, função pura, nova) decide o rótulo — vazio pra truque (círculo 0), "Em círculos superiores:" pra magia de círculo 1+. Substituído em OITO pontos que renderizavam `magia.circulo_superior` com o rótulo fixo hardcoded: `sheet/grimorio.js` (3×), `sheet/impressao.js`, `sheet/magias.js`, `levelup-ui.js`, `opcoes-dominio.js`, `creator/passo-magias.js` (achado ao conferir de novo depois do relatório de exploração inicial, que só tinha listado sete).
+  - **#96**: dois pedidos na mesma issue. (a) o modal de detalhe de item do inventário (`mostrarDetalheItemSheet`) ganhou uma função extraída, `htmlPropriedadesEMaestria`, que já existia só pro bloco de arma de CATÁLOGO — agora reusada também pro bloco de item CUSTOMIZADO com categoria, então a arma personalizada mostra a descrição de cada propriedade e da maestria, formatada, igual a uma arma do livro. (b) a badge "Maestria: X" de uma arma customizada voltou a ser CONDICIONAL, gated por `char.maestrias_arma` (mesma regra da arma de catálogo, revertendo a decisão "informativa incondicional" tomada na correção do #82) — e pra essa condição fazer sentido de verdade, `armasCustomizadasDoInventario` (`regras-equipamento.js`, função pura, nova) faz a arma customizada com categoria ENTRAR na lista de escolha do modal "Definir Maestrias" (`sheet/maestrias.js`, dois call sites: o modal completo e a troca por Descanso Longo), filtrada pela MESMA regra de proficiência (`armasElegiveisMaestria`) que já decide isso pra arma de catálogo.
+  - Achado durante a regressão: dois specs e2e pré-existentes quebraram por motivos NÃO relacionados a #96/#97, mas a rodadas anteriores do mesmo dia — `item-customizado-arma-magia.spec.mjs` (issue #96 mudou a regra da badge; atualizado pra refletir) e `magia-classe.spec.mjs` (issue #90, cedo mais hoje, não tinha pego esse terceiro lugar que checa `#levelup-troca-magia`; corrigido com o mesmo clique de expansão dos outros dois).
+  - Regressão: unidade sem novas falhas (mesma 1 pré-existente de sempre, 4287 testes); e2e sem falhas nas suítes tocadas (maestria, grimório, magia-customizada, magia-classe, multiclasse-handlers, impressão, item-customizado, truque, pdf, criador).
 - Ao fechar uma issue por commit, o formato de mensagem e o `Closes #N` estão documentados em [`TRIAGEM-ISSUES.md`](TRIAGEM-ISSUES.md#a-mensagem-de-commit-que-fecha-a-issue).
 - Esta lista não inclui issues fechadas nem Pull Requests. Para atualizar do zero, repita a consulta:
   ```bash

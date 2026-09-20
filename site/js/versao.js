@@ -13,13 +13,52 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.0.11';
+export const VERSAO_ATUAL = '3.0.12';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.0.12',
+    data: '2026-09-20',
+    rotulo: 'Truque e maestria',
+    resumo: 'Descrição de Aprimoramento de Truque não mostra mais o rótulo '
+      + 'de upcast de magia normal, e a badge de maestria de arma '
+      + 'personalizada só aparece depois de escolhida de verdade no modal '
+      + '"Definir Maestrias" -- a arma personalizada com categoria agora '
+      + 'entra nessa lista. O detalhe de uma arma personalizada também '
+      + 'ganhou a descrição formatada de propriedade e maestria, como uma '
+      + 'arma do livro.',
+    correcoes: [
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'A descrição de "Aprimoramento de Truque" vinha com o rótulo '
+            + 'fixo "Em círculos superiores" na frente -- o mesmo rótulo '
+            + 'de upcast que magia de círculo 1+ usa, contraditório pra '
+            + 'truque, que não sobe de círculo. (#97)',
+        ],
+      },
+    ],
+    melhorias: [
+      {
+        grupo: '✨ Melhorias',
+        itens: [
+          'Arma personalizada com categoria (issue #82) agora entra na '
+            + 'lista de escolha do modal "Definir Maestrias" -- a badge '
+            + '"Maestria: X" deixou de aparecer incondicionalmente e só '
+            + 'aparece depois de escolhida de verdade, igual a uma arma '
+            + 'de catálogo. (#96)',
+          'O detalhe de uma arma personalizada (clique no item, no '
+            + 'inventário) passou a mostrar a descrição de cada '
+            + 'propriedade e da maestria, formatada como a de uma arma '
+            + 'do livro. (#96)',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.0.11',
     data: '2026-09-20',
