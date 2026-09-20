@@ -161,23 +161,15 @@ const ALVOS = [
                     'temClasse(char,', 'nivelNa(char,', 'subclasseDe(char,'],
     pisoPorClasse: 50,
     excecoes: [
-      {
-        linha: 'const esperado = ehAnao ? (char.nivel || 1) : 0;',
-        feature: 'Tenacidade Anã (sincronizarBonusPvAnao)',
-        motivo:
-          'Traço de ESPÉCIE, correto por regra: Especies.md:61 diz que os PV ' +
-          'máximos "aumentam em 1 sempre que você atinge um nível de personagem" ' +
-          '-- é o nível TOTAL que manda, não o nível numa classe. Mesma família da ' +
-          'exceção de Forma Grande (Goliás) que o guarda do 3d preservou.',
-      },
-      {
-        linha: 'const esperado = temVigoroso ? (char.nivel || 1) * 2 : 0;',
-        feature: 'Talento Vigoroso (sincronizarBonusPvVigoroso)',
-        motivo:
-          'Talento, não característica de classe: Talentos.md:230 concede PV ' +
-          'máximos "igual ao dobro do seu nível de personagem" -- de novo o nível ' +
-          'TOTAL, por regra, não o nível numa classe.',
-      },
+      // As exceções de Tenacidade Anã e Talento Vigoroso que existiam aqui
+      // saíram na issue #89: as duas fórmulas migraram para
+      // `sincronizarBonusPvNivel` (levelup.js), pura, para poder rodar
+      // também dentro de `subirDeNivel` -- sem isso, o bônus só convergia
+      // no próximo RENDER da ficha, deixando o PV desatualizado durante a
+      // subida (ver o docblock de `sincronizarBonusPvNivel`). O raciocínio
+      // de "nível TOTAL, não por classe" continua válido nas duas, só que
+      // no arquivo novo -- fora do escopo deste alcance (`rel` aponta só
+      // para hp-descanso.js).
       {
         linha: 'const tracosSinteticos = gerarTracoSinteticoEspecie(char.especie, char.tracos_escolhidos, char.nivel) || [];',
         feature: 'Traços sintéticos de espécie em restaurarHabilidades (Tiferino, Elfo etc.)',

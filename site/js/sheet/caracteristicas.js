@@ -307,6 +307,16 @@ function renderTracoEspecie(traco, herdaAncestralidade = false, ehSubRevelacao =
   const ehVigorImplacavel = char.especie === 'Orc' && traco.nome === 'Vigor Implacável';
   const ehAtaqueSopro = char.especie === 'Draconato' && traco.nome === 'Ataque de Sopro';
   const ehMaosCurativas = char.especie === 'Aasimar' && traco.nome === 'Mãos Curativas';
+  // Issue #91: Revelação Celestial concede UMA transformação por Descanso
+  // Longo, à ESCOLHA entre 3 formas (Asas Celestiais/Manto Necrótico/
+  // Transfiguração Radiante) -- cada forma é um traço PRÓPRIO no catálogo
+  // (renderSecaoTracosEspecie marca as 3 como `ehSubRevelacao`, "ativas,
+  // uso controlado pelo pai"), mas o PAI nunca teve o seletor de verdade:
+  // caía no toggle genérico (`data-toggle-uso`), um booleano sem onde
+  // guardar QUAL forma foi escolhida -- o efeito mecânico de nenhuma das
+  // três (ex.: deslocamento de voo de Asas Celestiais, combate.js) tinha
+  // como ser aplicado.
+  const ehRevelacaoCelestial = char.especie === 'Aasimar' && traco.nome === 'Revelação Celestial';
 
   let usosMax = detectarUsosMaximos(traco.descricao) || (recarga ? bonusProficiencia(char.nivel) : null);
 
@@ -383,6 +393,31 @@ function renderTracoEspecie(traco, herdaAncestralidade = false, ehSubRevelacao =
         <span style="font-size:0.75rem;color:var(--text-muted)">Ao cair a 0 PV: fica com 1 PV.</span>
       </div>
     `;
+  } else if (ehRevelacaoCelestial) {
+    // Revelação Celestial: escolhe UMA forma, 1x/Descanso Longo, dura até
+    // ser encerrada ("nenhuma ação necessária") ou até o Descanso Longo.
+    const OPCOES_REVELACAO = [
+      { valor: 'asas', nome: 'Asas Celestiais' },
+      { valor: 'manto', nome: 'Manto Necrótico' },
+      { valor: 'transfiguracao', nome: 'Transfiguração Radiante' },
+    ];
+    const formaAtiva = char.recursos?.aasimar_revelacao_ativa || '';
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${
+      formaAtiva ? 'Transformado' : (usado ? 'Usada' : 'Disponível')
+    }</span>`;
+    usosHtmlBody = formaAtiva
+      ? `<div class="no-print" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:4px 0 4px 16px">
+          <span style="font-size:0.8rem;font-weight:600;color:var(--accent)">Transformado: ${escHtml(OPCOES_REVELACAO.find(o => o.valor === formaAtiva)?.nome || '')}</span>
+          <button class="btn btn-sm" style="padding:2px 8px;font-size:0.7rem" data-revelacao-encerrar="1">Encerrar transformação</button>
+        </div>`
+      : `<div class="no-print" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:4px 0 4px 16px">
+          <select id="revelacao-celestial-escolha" class="form-input" style="width:auto;padding:2px 4px;font-size:0.75rem" ${usado ? 'disabled' : ''}>
+            ${OPCOES_REVELACAO.map(o => `<option value="${o.valor}">${escHtml(o.nome)}</option>`).join('')}
+          </select>
+          <button class="btn btn-sm" style="padding:2px 8px;font-size:0.7rem;${usado ? 'opacity:0.5' : ''}" data-revelacao-transformar="1" ${usado ? 'disabled' : ''}>
+            ${usado ? '✗ Usada' : 'Transformar'}
+          </button>
+        </div>`;
   } else if (temMultiplosUsos) {
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${usosMax - usosAtual}/${usosMax}</span>`;
     usosHtmlBody = `

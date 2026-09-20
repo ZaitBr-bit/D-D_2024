@@ -83,24 +83,67 @@ test('ficha: a composição do modo manual declara o ganho de nível e soma o to
   expect(soma, `os termos de "${composicao}" deveriam somar o total exibido (17)`).toBe(17);
 });
 
-test('ficha: o modo manual grampeia (não recusa) o valor digitado acima de 20', async ({ context }) => {
+test('ficha: o modo manual grampeia (não recusa) o valor digitado acima de 30', async ({ context }) => {
   const { page } = await abrirEdicaoManual(context, 'regras-edicao-manual-2');
 
   // O `max` do input impede a digitação em navegador; o `change` do módulo
-  // GRAMPEIA o valor em 20 -- não há recusa nem toast, o campo é corrigido
-  // silenciosamente. A força da semente é 12, então o grampeio em 20 tem de
-  // se refletir também no delta manual gravado (+8), prova de que o 20
+  // GRAMPEIA o valor em 30 -- não há recusa nem toast, o campo é corrigido
+  // silenciosamente. A força da semente é 12, então o grampeio em 30 tem de
+  // se refletir também no delta manual gravado (+18), prova de que o 30
   // salvo veio desse grampeio e não de outro caminho.
-  await page.fill('[data-edicao-manual-atributo="forca"]', '25');
+  await page.fill('[data-edicao-manual-atributo="forca"]', '35');
   await page.locator('[data-edicao-manual-atributo="forca"]').dispatchEvent('change');
   await assentar(page).catch(() => {});
   await page.click('#btn-salvar-edicao-ficha');
   await page.waitForTimeout(400);
 
   const salvo = await personagemSalvo(page);
-  expect(salvo?.atributos?.forca, 'o teto de 20 tem de segurar mesmo no modo sem regras').toBe(20);
+  expect(salvo?.atributos?.forca, 'o teto de 30 (issue #85) tem de segurar mesmo no modo sem regras').toBe(30);
   expect(salvo?.edicoes?.campos?.atributos?.manual?.forca,
-    'o delta manual gravado deveria refletir o valor grampeado (12 -> 20), não os 25 digitados').toBe(8);
+    'o delta manual gravado deveria refletir o valor grampeado (12 -> 30), não os 35 digitados').toBe(18);
+});
+
+// Issue #85: um Bárbaro de nível 20 com Campeão Primitivo (Força/
+// Constituição "até um máximo de 25", Classes.md) tinha o campo de Força
+// pré-preenchido com 22 -- acima do teto antigo de 20 -- e a validação
+// (`validarAtributosManuais`) recusava a proposta INTEIRA por causa desse
+// campo, mesmo editando só Constituição. O usuário não conseguia salvar
+// NENHUM ajuste manual. Este spec reproduz exatamente o relato.
+test('ficha: Bárbaro com Força 22 (Campeão Primitivo) consegue editar outro atributo (issue #85)', async ({ context }) => {
+  const semente = {
+    classe: 'Bárbaro', nivel: 20, antecedente: 'Soldado',
+    bonus_antecedente: {},
+    atributos_base: { forca: 10, destreza: 11, constituicao: 14, inteligencia: 10, sabedoria: 10, carisma: 10 },
+    atributos: { forca: 22, destreza: 11, constituicao: 16, inteligencia: 10, sabedoria: 10, carisma: 10 },
+    configuracao_criacao: { atributos: { metodo: 'manual', valoresBase: { forca: 10, destreza: 11, constituicao: 14, inteligencia: 10, sabedoria: 10, carisma: 10 } } },
+    pericias_proficientes: ['Atletismo'],
+    pv_max: 225, pv_atual: 225,
+  };
+  const { page, erros } = await abrirFicha(context, semente, 'regras-edicao-manual-forca-22');
+  await page.click('#btn-editar-ficha');
+  await page.waitForSelector('#modal-overlay', { state: 'visible' });
+  await page.click('#btn-edicao-modo-manual');
+  await assentar(page).catch(() => {});
+
+  expect(await page.inputValue('[data-edicao-manual-atributo="forca"]'),
+    'o campo abre com o total já acima de 20, como a característica de classe concede').toBe('22');
+
+  await page.fill('[data-edicao-manual-atributo="constituicao"]', '17');
+  await page.locator('[data-edicao-manual-atributo="constituicao"]').dispatchEvent('change');
+  await assentar(page).catch(() => {});
+  await page.click('#btn-salvar-edicao-ficha');
+  await page.waitForTimeout(400);
+
+  expect(await lerToastErro(page),
+    'com o teto em 30, Força 22 não pode mais bloquear a edição de outro atributo').toBe(null);
+  expect(await page.locator('#modal-overlay').isVisible(),
+    'o modal deveria fechar após um ajuste válido').toBe(false);
+
+  const salvo = await personagemSalvo(page);
+  expect(salvo?.atributos?.constituicao, 'a Constituição deveria ter sido salva em 17').toBe(17);
+  expect(salvo?.atributos?.forca, 'a Força não tocada continua 22').toBe(22);
+
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
 
 test('ficha: o método da criação continua acessível ao lado do modo manual', async ({ context }) => {

@@ -572,6 +572,23 @@ function atributoConjuracaoDe(personagem) {
   return getAtributoConjuracaoSubclasse(personagem?.classe, personagem?.subclasse);
 }
 
+/**
+ * Soma os bônus de ataque/CD de magia de itens customizados EQUIPADOS (e
+ * SINTONIZADOS, quando o item exige sintonização) -- issue #37: o
+ * formulário do item customizado já tinha os campos, mas nada aqui os
+ * lia, então o bônus nunca entrava em jogada nenhuma.
+ */
+function bonusMagiaDeItens(personagem) {
+  let ataque = 0, cd = 0;
+  for (const item of personagem?.inventario || []) {
+    if (item?.tipo !== 'customizado' || !item.equipado) continue;
+    if (item.dados?.requer_sintonizacao && !item.sintonizado) continue;
+    ataque += parseInt(item.dados?.bonus_ataque_magia) || 0;
+    cd += parseInt(item.dados?.bonus_cd_magia) || 0;
+  }
+  return { ataque, cd };
+}
+
 /** Calcula CD de magia */
 export function calcCDMagia(personagem) {
   const atributo = atributoConjuracaoDe(personagem);
@@ -585,7 +602,7 @@ export function calcCDMagia(personagem) {
     cd += 1;
   }
 
-  return cd;
+  return cd + bonusMagiaDeItens(personagem).cd;
 }
 
 /** Calcula bônus de ataque de magia */
@@ -594,7 +611,7 @@ export function calcAtaqueMagia(personagem) {
   if (!atributo) return 0;
   const key = ATRIBUTO_NOME_PARA_KEY[atributo];
   const modAttr = calcMod(personagem.atributos[key]);
-  return bonusProficiencia(personagem.nivel) + modAttr;
+  return bonusProficiencia(personagem.nivel) + modAttr + bonusMagiaDeItens(personagem).ataque;
 }
 
 /**
@@ -634,6 +651,7 @@ export function calcAtaqueMagia(personagem) {
  */
 export function conjuracoesPorClasse(personagem) {
   const prof = bonusProficiencia(personagem?.nivel);
+  const itemBonus = bonusMagiaDeItens(personagem);
   const saida = [];
   for (const c of classesDe(personagem)) {
     let atributo = CLASSES_INFO[c.classe]?.atributo_conjuracao || null;
@@ -653,8 +671,8 @@ export function conjuracoesPorClasse(personagem) {
       classe: c.classe,
       subclasse: c.subclasse || null,
       atributo,
-      cd: 8 + prof + modAttr + (inata ? 1 : 0),
-      ataque: prof + modAttr,
+      cd: 8 + prof + modAttr + (inata ? 1 : 0) + itemBonus.cd,
+      ataque: prof + modAttr + itemBonus.ataque,
     });
   }
   return saida;
@@ -1143,14 +1161,23 @@ export function abrirModal(titulo, corpoHtml, acoesHtml = '', onClose = null) {
     sub.id = `sub-modal-overlay-${_subModalCount}`;
     sub.style.display = 'flex';
     sub.style.zIndex = 200 + _subModalCount;
+    // z-index:3, não 1 -- issue #87 (Configurar Talento, sub-modal do
+    // seletor de arma de Mestre das Armas). `.opcao-check` (app.css) tem
+    // `z-index: 2`; o cabeçalho/rodapé do modal PRINCIPAL já leva `z-index:
+    // 3` (app.css, .modal-header/.modal-acoes) exatamente por causa dessa
+    // disputa de pilha (comentário de app.css:996, bug relatado em
+    // 2026-08-13) -- mas este clone inline do sub-modal nunca recebeu o
+    // mesmo ajuste, e ficou com `z-index:1`, MENOR que o do círculo. O
+    // círculo do último card visível vencia a pilha e aparecia solto sobre
+    // os botões Cancelar/Adicionar.
     sub.innerHTML = `
       <div class="modal-container" style="animation:slideUp 0.2s">
-        <div class="modal-header" style="position:sticky;top:0;background:var(--bg-card);z-index:1">
+        <div class="modal-header" style="position:sticky;top:0;background:var(--bg-card);z-index:3">
           <h2 style="font-size:1rem;font-weight:700">${escHtml(titulo)}</h2>
           <button class="modal-fechar" data-fechar-sub="true">&times;</button>
         </div>
         <div class="modal-corpo" style="padding:16px">${corpoHtml}</div>
-        ${acoesHtml ? `<div class="modal-acoes" style="padding:12px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--border-light);position:sticky;bottom:0;background:var(--bg-card);z-index:1">${acoesHtml}</div>` : ''}
+        ${acoesHtml ? `<div class="modal-acoes" style="padding:12px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--border-light);position:sticky;bottom:0;background:var(--bg-card);z-index:3">${acoesHtml}</div>` : ''}
       </div>
     `;
     document.body.appendChild(sub);

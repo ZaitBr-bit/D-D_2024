@@ -65,7 +65,6 @@ export const GATILHOS_SEM_COBERTURA = [
   'btn-aplicar-dv',
   'btn-aplicar-dv-curto',
   'btn-aplicar-incansavel',
-  'btn-aplicar-pv-max',
   'btn-bastiao-lei',
   'btn-campeao-curar',
   'btn-confirmar-excluir',

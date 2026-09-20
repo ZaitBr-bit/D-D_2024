@@ -34,7 +34,7 @@ import { renderSecaoDetalhes } from './detalhes.js';
 import { setupEventosEdicao } from './edicao.js';
 import { ATRIBUTO_ESTILO, char, containerRef, definirPassivosTalentos, especiesCache, marcaAjusteManual, passivosTalentosCache, salvar, seloEdicao, seloPrerequisitoDispensado } from './estado.js';
 import { setupEventosHabilidades } from './habilidades.js';
-import { setupEventosDescanso, setupEventosHP, sincronizarBonusPvAnao, sincronizarBonusPvDraconico, sincronizarBonusPvVigoroso } from './hp-descanso.js';
+import { setupEventosDescanso, setupEventosHP, sincronizarBonusPvNiveis } from './hp-descanso.js';
 import { getEstadoCarga, renderSecaoInventario, setupEventosInventarioSheet } from './inventario.js';
 import { renderSecaoMagias, setupEventosEspacosMagia } from './magias.js';
 import { migrarMulticlasse } from './migracoes.js';
@@ -226,9 +226,7 @@ export function renderFichaCompleta() {
   const estadoLadino = getEstadoRecursosLadino();
   const estadoMago = getEstadoRecursosMago();
 
-  sincronizarBonusPvDraconico();
-  sincronizarBonusPvAnao();
-  sincronizarBonusPvVigoroso();
+  sincronizarBonusPvNiveis();
 
   // Recalcular PV max se necessário.
   //

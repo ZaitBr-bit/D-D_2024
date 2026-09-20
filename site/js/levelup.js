@@ -4,11 +4,11 @@
 import { CLASSES_INFO, ESCOLAS_SUBCLASSE_MAGO } from './dados-classes.js';
 import { getClasse, getEspecies, getIndiceMagias, getTalentos, getMagiasRituais } from './db.js';
 import { getTruquesFixosSubclasse } from './regras-conjuracao-subclasse.js';
-import { calcMod, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas } from './utils.js';
+import { calcMod, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, semAcento } from './utils.js';
 import { aplicarDeltaSistema, garantirEstadoEdicoes } from './ficha-edicoes.js';
 import { aplicarEfeitoTalento, validarEscolhasTalento, INSTRUMENTOS_MUSICAIS, ritualBonusPendente } from './regras-cobertura.js';
 import { contextoDeSubida, pvGanhoAoSubir } from './regras-multiclasse-progressao.js';
-import { classesDe, migrarParaMulticlasse, sincronizarEspelhos } from './regras-multiclasse.js';
+import { classesDe, migrarParaMulticlasse, nivelNa, sincronizarEspelhos, subclasseDe, temClasse } from './regras-multiclasse.js';
 import { conjuraPorAlgumaClasse } from './regras-multiclasse-conjuracao.js';
 import { armadurasDoPersonagem, concessoesAoEntrarEm } from './regras-multiclasse-proficiencias.js';
 import {
@@ -1190,6 +1190,92 @@ export function aplicarPvRetroativoPorCon(personagem, modAntes, modDepois) {
   // geral e 0 (nunca negativo) e o teto continua valendo.
   personagem.pv_atual = atualAntes === 0 ? 0 : Math.max(0, Math.min(teto, atualAntes + aplicado));
   return aplicado;
+}
+
+/**
+ * Aplica (ou corrige) num único golpe o delta de UM bônus de PV que
+ * escala com o nível -- Tenacidade Anã, Companheiro Dracônico e o talento
+ * Vigoroso são as três formas que hoje existem, e as três seguem a mesma
+ * forma: "esperado" pelo nível atual menos o que já foi "aplicado" da
+ * última vez, com o resultado gravado de volta no campo `aplicado` para a
+ * PRÓXIMA chamada comparar contra. Extraído de sheet/hp-descanso.js
+ * (issue #89) para poder rodar aqui, no motor -- ver o comentário de
+ * `sincronizarBonusPvNivel`, abaixo, para o porquê.
+ * @param {object} personagem
+ * @param {number} esperado - o total que este bônus deveria valer AGORA.
+ * @param {number} aplicado - o total que ele valia da última sincronização.
+ * @param {(novoAplicado: number) => void} gravarAplicado - grava o novo
+ *   "aplicado" de volta no personagem (cada bônus mora num campo diferente).
+ */
+function aplicarDeltaBonusPvEscalavel(personagem, esperado, aplicado, gravarAplicado) {
+  if (esperado === aplicado) return;
+  const diff = esperado - aplicado;
+  personagem.pv_max = Math.max(1, (personagem.pv_max || 1) + diff);
+  const teto = personagem.pv_max_override || personagem.pv_max;
+  personagem.pv_atual = Math.max(0, Math.min(teto, (personagem.pv_atual || 0) + diff));
+  gravarAplicado(esperado);
+}
+
+/**
+ * Sincroniza os TRÊS bônus de PV que escalam com o nível (Tenacidade Anã,
+ * Companheiro Dracônico, talento Vigoroso) para o valor que o nível ATUAL
+ * do personagem exige.
+ *
+ * Issue #89: as fórmulas em si já estavam certas (a regra do livro do
+ * Vigoroso -- "dobro do nível ao obter, +2 por nível depois" -- é
+ * matematicamente idêntica a "sempre 2×nível atual", para qualquer nível
+ * de aquisição), mas a única chamada que existia
+ * (sheet/hp-descanso.js:sincronizarBonusPv{Anao,Draconico,Vigoroso}) só
+ * rodava no RENDER da ficha (sheet/ficha.js), nunca dentro do motor de
+ * subida de nível -- um Bárbaro pegando Vigoroso no nível 4 e outro no
+ * nível 16 terminavam nível 20 com PV MÁXIMO diferente até a ficha ser
+ * reaberta. Chamando esta função no fim de `subirDeNivel` (abaixo), o PV
+ * já converge DURANTE a subida, sem depender de um render acontecer depois.
+ *
+ * Continua PURA (só personagem, sem `char`/`salvar()`) para poder rodar
+ * tanto aqui quanto em sheet/hp-descanso.js, que vira um wrapper fino
+ * sobre esta função -- uma cópia a menos da mesma fórmula.
+ * @param {object} personagem
+ */
+export function sincronizarBonusPvNivel(personagem) {
+  if (!personagem) return;
+
+  // Tenacidade Anã: +1 PV por nível (Espécies.md).
+  const ehAnao = personagem.especie === 'Anão';
+  aplicarDeltaBonusPvEscalavel(
+    personagem,
+    ehAnao ? (personagem.nivel || 1) : 0,
+    personagem.bonus_pv_anao_aplicado || 0,
+    (v) => { personagem.bonus_pv_anao_aplicado = v; }
+  );
+
+  // Companheiro Dracônico (Feiticeiro/Feitiçaria Dracônica, nível 3+):
+  // +1 PV por nível DE FEITICEIRO, a partir do nível 3 (Classes.md:3074).
+  if (temClasse(personagem, 'Feiticeiro')) {
+    const ehDraconica = semAcento(subclasseDe(personagem, 'Feiticeiro')) === semAcento('Feitiçaria Dracônica');
+    const nivelFeiticeiro = nivelNa(personagem, 'Feiticeiro');
+    if (!personagem.recursos) personagem.recursos = {};
+    if (!personagem.recursos.feiticeiro) personagem.recursos.feiticeiro = {};
+    if (!personagem.recursos.feiticeiro.subclasses) personagem.recursos.feiticeiro.subclasses = {};
+    if (!personagem.recursos.feiticeiro.subclasses.draconica) personagem.recursos.feiticeiro.subclasses.draconica = {};
+    const dr = personagem.recursos.feiticeiro.subclasses.draconica;
+    aplicarDeltaBonusPvEscalavel(
+      personagem,
+      ehDraconica && nivelFeiticeiro >= 3 ? nivelFeiticeiro : 0,
+      dr.bonus_pv_aplicado || 0,
+      (v) => { dr.bonus_pv_aplicado = v; }
+    );
+  }
+
+  // Vigoroso: dobro do nível ao obter, +2 por nível depois -- equivalente
+  // a "sempre 2×nível atual" (Talentos.md).
+  const temVigoroso = (personagem.talentos || []).some((t) => (typeof t === 'string' ? t : t.nome) === 'Vigoroso');
+  aplicarDeltaBonusPvEscalavel(
+    personagem,
+    temVigoroso ? (personagem.nivel || 1) * 2 : 0,
+    personagem.bonus_pv_vigoroso_aplicado || 0,
+    (v) => { personagem.bonus_pv_vigoroso_aplicado = v; }
+  );
 }
 
 /**
@@ -2646,6 +2732,14 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     if (!Array.isArray(personagem.grimorio)) personagem.grimorio = [];
     personagem.grimorio.push(...magiasSubclasseArcanaSelecionadas);
   }
+
+  // Issue #89: converge os bônus de PV que escalam com o nível (Anão,
+  // Dracônico, Vigoroso) para o nível que este level-up acabou de
+  // alcançar -- sem isto, o total só corrigia no próximo RENDER da ficha
+  // (sheet/ficha.js), deixando o PV mostrado desatualizado até lá (ou
+  // errado para sempre, se nada renderizasse a ficha entre uma subida e a
+  // seguinte).
+  sincronizarBonusPvNivel(personagem);
 
   // Retornar resumo do level-up
   return {

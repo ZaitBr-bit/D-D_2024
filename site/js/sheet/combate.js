@@ -261,6 +261,16 @@ export function getDeslocamentoFinal(baseDeslocamento) {
     addExtraVelocidade(extras, 'Voo', final, '(pairar)');
   }
 
+  // Aasimar: Revelação Celestial (Asas Celestiais) nível 3 -- issue #91.
+  // Espécies.md/Revelação Celestial: "Deslocamento de Voo igual ao seu
+  // Deslocamento", enquanto a transformação Asas Celestiais estiver
+  // ativa. Mesmo padrão de Voo (Falcão) do Bárbaro/Coração Selvagem,
+  // acima -- `final` já é o deslocamento base com todos os ajustes de
+  // valor aplicados (Fase 1 desta função).
+  if (char?.especie === 'Aasimar' && char?.recursos?.aasimar_revelacao_ativa === 'asas') {
+    addExtraVelocidade(extras, 'Voo', final);
+  }
+
   // Ladino Ladrão nível 3: Andarilho de Telhados (Escalada = deslocamento)
   // Andarilho de Telhados e caracteristica de LADINO/LADRAO 3
   // (Classes.md:4413): valem o nivel DE LADINO e a subclasse DO LADINO,

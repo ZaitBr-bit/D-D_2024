@@ -24,21 +24,30 @@ export function validarListaUnica(lista, opcoesPermitidas, limite, descricao) {
 
 /**
  * Valida a edicao manual livre de atributos: sem regra de metodo, apenas seis
- * chaves com inteiros entre 1 e 20 -- o teto do livro, que o app aplica em
- * todo lugar. O metodo usado na criacao NAO e exigido aqui, e isso e
- * proposital: e o que destrava ficha antiga sem
- * `configuracao_criacao.atributos.metodo`, que hoje fica presa no modal ate o
- * jogador declarar um metodo que talvez nunca tenha usado.
+ * chaves com inteiros entre 1 e `TETO_ATRIBUTO_MANUAL`. O metodo usado na
+ * criacao NAO e exigido aqui, e isso e proposital: e o que destrava ficha
+ * antiga sem `configuracao_criacao.atributos.metodo`, que hoje fica presa no
+ * modal ate o jogador declarar um metodo que talvez nunca tenha usado.
+ *
+ * Issue #85: o teto ERA 20 (o limite comum de ASI/talento) e rejeitava a
+ * proposta INTEIRA sempre que qualquer atributo já estivesse acima disso por
+ * bonus de caracteristica de classe legitimo -- Campeao Primitivo (Barbaro
+ * nivel 20, Classes.md) soma Forca/Constituicao "ate um maximo de 25", e o
+ * campo de edicao livre pre-preenche o valor FINAL (ja com esse bonus). Um
+ * Barbaro de nivel 20 com Forca 22 nao conseguia salvar NENHUM ajuste. 30 da
+ * folga sobre o maior valor do livro (25) sem abrir mao de teto nenhum.
  * @param {object} proposta - Mapa chave-de-atributo -> valor total desejado.
  * @returns {{ok: boolean, erro?: string}} Resultado da validacao.
  */
+export const TETO_ATRIBUTO_MANUAL = 30;
+
 export function validarAtributosManuais(proposta) {
   const valores = Object.values(proposta || {});
   if (valores.length !== 6 || valores.some(v => !Number.isInteger(v))) {
     return { ok: false, erro: 'Informe os seis atributos com valores inteiros.' };
   }
-  if (valores.some(v => v < 1 || v > 20)) {
-    return { ok: false, erro: 'Cada atributo deve ficar entre 1 e 20.' };
+  if (valores.some(v => v < 1 || v > TETO_ATRIBUTO_MANUAL)) {
+    return { ok: false, erro: `Cada atributo deve ficar entre 1 e ${TETO_ATRIBUTO_MANUAL}.` };
   }
   return { ok: true };
 }

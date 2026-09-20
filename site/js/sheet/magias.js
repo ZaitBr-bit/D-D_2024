@@ -896,6 +896,15 @@ export function renderSecaoMagias() {
     if (!preparadasPorCirculo[circ]) preparadasPorCirculo[circ] = [];
     preparadasPorCirculo[circ].push(m);
   });
+  // Issues #75/#92: mesmo agrupamento por círculo de preparadasPorCirculo
+  // acima, para a seção "não preparadas" parar de ser uma lista única
+  // ordenada só por nome.
+  const naoPreparadasPorCirculo = {};
+  magiasPersonalizadasNaoPreparadas.forEach(m => {
+    const circ = m.circulo || 1;
+    if (!naoPreparadasPorCirculo[circ]) naoPreparadasPorCirculo[circ] = [];
+    naoPreparadasPorCirculo[circ].push(m);
+  });
 
   // Verificar se é Mago (para grimório). `temClasse`, não o espelho
   // `char.classe === 'Mago'`: o grimório existe para o personagem que TEM
@@ -1172,13 +1181,24 @@ export function renderSecaoMagias() {
       <!-- Issue #71: personalizadas "ocupa vaga" ainda não preparadas --
            fora da lista de Preparadas, com Editar/Remover preservados. -->
       ${magiasPersonalizadasNaoPreparadas.length > 0 ? `
-        <details data-details-id="magias-personalizadas-nao-preparadas" style="margin-bottom:8px" open>
+        <details data-details-id="magias-personalizadas-nao-preparadas" style="margin-bottom:8px">
           <summary style="font-weight:700;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--border-light);color:var(--text-muted)">
             Personalizadas não preparadas (${magiasPersonalizadasNaoPreparadas.length})
           </summary>
           <div style="padding-top:4px">
             <div style="font-size:0.75rem;color:var(--text-muted);padding:2px 0 6px">Ocupam vaga quando você as preparar em "Preparar Magias" -- até lá, não contam no limite.</div>
-            ${magiasPersonalizadasNaoPreparadas.slice().sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR')).map(m => renderLinhaMagiaPersonalizada(m, m.indicePersonalizada)).join('')}
+            ${Object.keys(naoPreparadasPorCirculo).sort((a, b) => parseInt(a) - parseInt(b)).map(circ => {
+              const magias = naoPreparadasPorCirculo[circ];
+              return `
+              <details data-details-id="magias-personalizadas-nao-preparadas-circulo-${circ}" style="margin-bottom:6px;margin-left:8px">
+                <summary style="font-weight:600;cursor:pointer;padding:4px 0;border-bottom:1px solid var(--border-light);font-size:0.85rem">
+                  ${circ}º Círculo (${magias.length})
+                </summary>
+                <div style="padding-top:4px">
+                  ${magias.slice().sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR')).map(m => renderLinhaMagiaPersonalizada(m, m.indicePersonalizada)).join('')}
+                </div>
+              </details>`;
+            }).join('')}
           </div>
         </details>
       ` : ''}

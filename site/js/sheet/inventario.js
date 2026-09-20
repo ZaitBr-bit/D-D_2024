@@ -134,9 +134,15 @@ function renderSheetInvLista(equipados, naoEquipados, zerados) {
 
 /** Renderiza um item do inventário na ficha */
 function renderSheetInvItem(item, idx) {
+  // Item customizado com categoria de arma preenchida entra no MESMO
+  // cálculo de proficiência/ataque/dano que uma arma de catálogo (issue
+  // #82) -- o bloco abaixo já lê tudo de `item.dados`, então basta o
+  // catálogo E o customizado caírem na mesma condição.
+  const ehArmaCustom = item.tipo === 'customizado' && !!item.dados?.categoria;
+
   // Badge de proficiência
   let profBadge = '';
-  if (item.tipo === 'arma' && item.dados?.categoria) {
+  if ((item.tipo === 'arma' || ehArmaCustom) && item.dados?.categoria) {
     profBadge = sheetBadgeProf(sheetTemProfArma({ categoria: item.dados.categoria, propriedades: item.dados.propriedades || '' }));
   }
   if ((item.tipo === 'armadura' || item.tipo === 'escudo') && item.dados?.categoria) {
@@ -156,7 +162,7 @@ function renderSheetInvItem(item, idx) {
   let vantagemInfo = '';
   let estiloLutaInfo = '';
   let danoExibicao = item.dados?.dano || '';
-  if (item.tipo === 'arma' && item.dados) {
+  if ((item.tipo === 'arma' || ehArmaCustom) && item.dados) {
     const info = CLASSES_INFO[char.classe];
     const prof = bonusProficiencia(char.nivel);
     const props = (item.dados.propriedades || '').toLowerCase();
@@ -273,10 +279,19 @@ function renderSheetInvItem(item, idx) {
     const bca = parseInt(item.dados?.bonus_ca) || 0;
     const batq = parseInt(item.dados?.bonus_ataque) || 0;
     const caBaseItem = parseInt(item.dados?.ca_base) || 0;
+    const batqMagia = parseInt(item.dados?.bonus_ataque_magia) || 0;
+    const bcdMagia = parseInt(item.dados?.bonus_cd_magia) || 0;
     if (caBaseItem > 0) customBadges += `<span class="badge" style="font-size:0.6rem;background:#e8eaf6;color:#3949ab;border:1px solid #9fa8da">CA ${caBaseItem}</span> `;
     if (bca !== 0) customBadges += `<span class="badge" style="font-size:0.6rem;background:#e8eaf6;color:#3949ab;border:1px solid #9fa8da">CA ${bca > 0 ? '+' : ''}${bca}</span> `;
-    if (batq !== 0) customBadges += `<span class="badge badge-secondary" style="font-size:0.65rem">Atq ${batq > 0 ? '+' : ''}${batq}</span> `;
-    if (item.dados?.dano) customBadges += `<span class="badge" style="font-size:0.6rem;background:#fce4ec;color:#c62828;border:1px solid #ef9a9a">${item.dados.dano}</span> `;
+    // Arma customizada já mostra Atq/Dano calculado (ataqueInfo/danoAutoInfo,
+    // com Força/Destreza e proficiência) -- repetir o bônus bruto aqui
+    // duplicaria a informação numa segunda badge com número diferente.
+    if (!ehArmaCustom) {
+      if (batq !== 0) customBadges += `<span class="badge badge-secondary" style="font-size:0.65rem">Atq ${batq > 0 ? '+' : ''}${batq}</span> `;
+      if (item.dados?.dano) customBadges += `<span class="badge" style="font-size:0.6rem;background:#fce4ec;color:#c62828;border:1px solid #ef9a9a">${item.dados.dano}</span> `;
+    }
+    if (batqMagia !== 0) customBadges += `<span class="badge badge-secondary" style="font-size:0.65rem">Atq Magia ${batqMagia > 0 ? '+' : ''}${batqMagia}</span> `;
+    if (bcdMagia !== 0) customBadges += `<span class="badge badge-secondary" style="font-size:0.65rem">CD Magia ${bcdMagia > 0 ? '+' : ''}${bcdMagia}</span> `;
     if (item.dados?.raridade) {
       customBadges += `<span class="badge" style="font-size:0.6rem;background:#f3e5f5;color:#6a1b9a;border:1px solid #ce93d8">${escHtml(item.dados.raridade)}</span> `;
     }
@@ -295,6 +310,14 @@ function renderSheetInvItem(item, idx) {
     if (temMaestria) {
       maestriaBadge = `<span class="badge" style="font-size:0.6rem;background:#fff8e1;color:#e65100;border:1px solid #ffcc80;font-weight:700">Maestria: ${item.dados.maestria}</span>`;
     }
+  } else if (ehArmaCustom && item.dados?.maestria) {
+    // Item customizado nunca entra na lista de escolha de maestria do
+    // personagem (o modal só oferece armas de dados/equipamento/armas.json,
+    // sheet/maestrias.js) -- gatear pelo mesmo `char.maestrias_arma` do
+    // catálogo deixaria este campo sempre inerte. A badge aqui é
+    // informativa (a maestria que a arma customizada TEM), não uma vaga
+    // escolhida do personagem.
+    maestriaBadge = `<span class="badge" style="font-size:0.6rem;background:#fff8e1;color:#e65100;border:1px solid #ffcc80;font-weight:700">Maestria: ${item.dados.maestria}</span>`;
   }
 
   const isZeroQtd = (item.quantidade ?? 1) <= 0;
@@ -315,7 +338,7 @@ function renderSheetInvItem(item, idx) {
           ${item.tipo === 'armadura' ? `CA: ${item.dados?.ca || ''} | ${item.dados?.categoria || ''}` : ''}
           ${item.tipo === 'escudo' ? `CA: ${item.dados?.ca || ''} | Escudo` : ''}
           ${item.tipo === 'equipamento' ? `${item.dados?.custo || ''} ${item.dados?.peso ? '| ' + item.dados.peso : ''}` : ''}
-          ${item.tipo === 'customizado' ? escHtml(item.descricao ? (item.descricao.length > 60 ? item.descricao.substring(0, 60) + '...' : item.descricao) : '') : ''}
+          ${ehArmaCustom ? `${danoExibicao} | ${item.dados?.propriedades || ''}` : (item.tipo === 'customizado' ? escHtml(item.descricao ? (item.descricao.length > 60 ? item.descricao.substring(0, 60) + '...' : item.descricao) : '') : '')}
           ${item.tipo === 'generico' ? escHtml(item.descricao || '') : ''}
         </div>
         ${descPreview}

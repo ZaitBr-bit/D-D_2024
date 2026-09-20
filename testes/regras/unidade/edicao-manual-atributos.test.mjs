@@ -79,11 +79,25 @@ test('ganho do sistema preserva o delta manual', async () => {
     'aplicarDeltaSistema deveria ter deslocado o original junto');
 });
 
-test('validação livre aceita 1 a 20 e recusa fora disso', () => {
+// Issue #85: o teto de 20 rejeitava a proposta INTEIRA sempre que qualquer
+// atributo já estivesse acima disso por bônus de característica de classe
+// legítimo -- ex. Campeão Primitivo (Bárbaro nível 20, Classes.md) soma +4
+// a Força e Constituição "até um máximo de 25". A "Edição livre" pré-
+// preenche o valor FINAL (já com esse bônus) em cada campo, então um
+// Bárbaro de nível 20 com Força 22 não conseguia salvar NENHUM ajuste --
+// a validação recusava a proposta inteira por causa de um campo que o
+// jogador nem tocou. 30 dá folga sobre o maior valor do livro (25) para
+// itens/talentos futuros, sem abrir mão de um teto -- o rótulo do botão
+// já diz "sem regras", mas um número digitável sem limite nenhum
+// convidaria erro de digitação (200 em vez de 20) a virar ficha salva.
+test('validação livre aceita 1 a 30 e recusa fora disso', () => {
   const seis = v => ({ forca: 10, destreza: v, constituicao: 10, inteligencia: 10, sabedoria: 10, carisma: 10 });
   assert.equal(fichaEdicaoValidacoes.validarAtributosManuais(seis(20)).ok, true);
+  assert.equal(fichaEdicaoValidacoes.validarAtributosManuais(seis(25)).ok, true,
+    'Campeão Primitivo (Bárbaro nv.20) chega a 25 -- precisa continuar editável');
+  assert.equal(fichaEdicaoValidacoes.validarAtributosManuais(seis(30)).ok, true);
   assert.equal(fichaEdicaoValidacoes.validarAtributosManuais(seis(1)).ok, true);
-  assert.equal(fichaEdicaoValidacoes.validarAtributosManuais(seis(21)).ok, false);
+  assert.equal(fichaEdicaoValidacoes.validarAtributosManuais(seis(31)).ok, false);
   assert.equal(fichaEdicaoValidacoes.validarAtributosManuais(seis(0)).ok, false);
   assert.equal(fichaEdicaoValidacoes.validarAtributosManuais(seis(16.5)).ok, false);
   assert.equal(fichaEdicaoValidacoes.validarAtributosManuais({ forca: 10 }).ok, false,

@@ -3,7 +3,7 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, IDIOMAS_COMUNS, IDIOMAS_RAROS, PERICIAS, POINT_BUY_CUSTOS, POINT_BUY_TOTAL, STANDARD_ARRAY } from '../dados-classes.js';
-import { validarAtributosEditados, validarAtributosManuais, validarListaUnica } from '../ficha-edicao-validacoes.js';
+import { TETO_ATRIBUTO_MANUAL, validarAtributosEditados, validarAtributosManuais, validarListaUnica } from '../ficha-edicao-validacoes.js';
 import { aplicarEdicao, consolidarEdicoesAtributos, deltaManualAtributos, registrarAjusteManualAtributos, reverterEdicao } from '../ficha-edicoes.js';
 import { abrirLevelUpCards } from '../levelup-ui.js';
 import { XP_POR_NIVEL, aplicarPvRetroativoPorCon, podeSubirDeNivel } from '../levelup.js';
@@ -101,7 +101,7 @@ export function abrirModalEdicaoFicha(secaoInicial = 'atributos') {
     return `<div class="atributo-box" data-key="${key}">
       <div class="atributo-nome">${ATRIBUTOS_NOMES[key]}</div>
       <input type="number" class="form-input" style="text-align:center;font-size:1rem;padding:6px;font-weight:700"
-             min="1" max="20" data-edicao-manual-atributo="${key}" value="${total}">
+             min="1" max="${TETO_ATRIBUTO_MANUAL}" data-edicao-manual-atributo="${key}" value="${total}">
       <div style="font-size:0.65rem;color:var(--text-muted)">${composicao.join(' · ')}</div>
       <div class="atributo-mod">${fmtMod(calcMod(total))}</div>
       <div class="atributo-total">${total}</div>
@@ -130,7 +130,7 @@ export function abrirModalEdicaoFicha(secaoInicial = 'atributos') {
       </div>`;
       if (modoManual) {
         return navegacao + barraModo + `
-          <div class="info-box warning" style="font-size:0.8rem;margin-bottom:10px">Edição livre: digite o valor final de cada atributo, entre 1 e 20. O ajuste feito aqui fica marcado como manual na ficha, e o método usado na criação continua registrado.</div>
+          <div class="info-box warning" style="font-size:0.8rem;margin-bottom:10px">Edição livre: digite o valor final de cada atributo, entre 1 e ${TETO_ATRIBUTO_MANUAL}. O ajuste feito aqui fica marcado como manual na ficha, e o método usado na criação continua registrado.</div>
           <div class="atributos-grid atributos-grid-edicao">${ATRIBUTOS_KEYS.map(caixaManual).join('')}</div>
           ${atributosEstaoEditados() ? '<button class="btn btn-sm btn-secondary mt-1" data-reverter-atributos>Reverter distribuição de atributos</button>' : ''}`;
       }
@@ -337,7 +337,7 @@ export function abrirModalEdicaoFicha(secaoInicial = 'atributos') {
       const key = input.dataset.edicaoManualAtributo;
       const valor = parseInt(input.value, 10);
       propostaManual[key] = Number.isInteger(valor)
-        ? Math.max(1, Math.min(20, valor))
+        ? Math.max(1, Math.min(TETO_ATRIBUTO_MANUAL, valor))
         : (char.atributos?.[key] ?? 10);
       const corpo = document.getElementById('edicao-ficha-corpo');
       if (corpo) { corpo.innerHTML = render(); vincular(); }

@@ -8,6 +8,7 @@
 import { restaurarRecursosTalentos } from '../regras-cobertura.js';
 import { gastarDadosVida, nivelNa, reservasDadosVida, restaurarTodosDadosVida, subclasseDe, temClasse } from '../regras-multiclasse.js';
 import { trocasDoDescansoLongo } from '../regras-preparo-magias.js';
+import { sincronizarBonusPvNivel } from '../levelup.js';
 // SUBCLASSES_CONJURADORAS: a MESMA constante que trocasDoDescansoLongo usa
 // por dentro (regras-preparo-magias.js) para saber se uma subclasse
 // conjura pela característica dela (Cavaleiro Místico/Trapaceiro Arcano) --
@@ -50,71 +51,41 @@ import { getConcentracaoAtiva } from './magias.js';
 import { preparadasPorClasse } from '../regras-magia-classe.js';
 
 /**
- * Sincroniza o bonus de PV da Resiliencia Draconica (Feiticeiro).
+ * Sincroniza os TRÊS bônus de PV que escalam com o nível (Tenacidade Anã,
+ * Resiliência Dracônica do Feiticeiro, talento Vigoroso).
  *
- * DUAS correcoes num lugar so, e as duas sao do livro:
+ * Issue #89: a fórmula de cada um já morou aqui, um bloco por bônus, cada
+ * um repetindo a mesma conta ("esperado pelo nível atual menos o que já
+ * foi aplicado, delta no PV"). A conta em si estava certa; o problema era
+ * que só RODAVA aqui, no render da ficha (chamada em sheet/ficha.js) --
+ * nunca dentro do motor de subida de nível (levelup.js:subirDeNivel).
+ * Um Bárbaro pegando Vigoroso no nível 4 e outro no nível 16 terminavam o
+ * nível 20 com PV MÁXIMO diferente até a ficha ser reaberta (ou errado
+ * para sempre, se nada a reabrisse entre uma subida e outra). A fórmula
+ * migrou para `sincronizarBonusPvNivel` (levelup.js), pura (só
+ * `personagem`, sem `char`/`salvar()`), para poder rodar tanto ali quanto
+ * aqui -- esta função virou um wrapper fino sobre ela.
  *
- * 1. FONTE. `char.classe`/`char.subclasse`/`char.nivel` sao espelhos da
- *    classe INICIAL, entao num Mago 5/Feiticeiro 5 (Draconica) o bonus
- *    SUMIA inteiro (a subclasse do Mago e ""), e num Feiticeiro
- *    5/Mago 5 valia 12 (o nivel TOTAL). O que manda e o nivel NA CLASSE.
- *
- * 2. FORMULA. Classes.md:3074 diz "aumentam em 3, e aumentam em 1 sempre
- *    que voce atinge outro nivel de Feiticeiro" -- ou seja +3 no nivel 3
- *    e +1 por nivel depois, que da +N no nivel N. O app calculava N+2.
- *    Isso e divergencia de CLASSE UNICA, anterior a multiclasse; corrigir
- *    junto evita escrever a formula errada com uma fonte nova. Feiticeiros
- *    Draconicos existentes perdem 2 PV -- esta na nota de versao 2.2.21, e
- *    bonus_pv_aplicado reconcilia sozinho no proximo render.
+ * As três funções antigas (uma por bônus) continuam exportadas com o MESMO
+ * nome -- código e teste que já as chamavam continuam funcionando -- mas
+ * as três agora convergem OS TRÊS bônus de uma vez (idempotente: rodar de
+ * novo com nada para corrigir não faz nada). `char.recursos.feiticeiro`
+ * (gate de `sincronizarBonusPvNivel` para o bônus Dracônico) é inicializado
+ * lá dentro se ainda não existir -- não depende mais de
+ * `getEstadoRecursosFeiticeiro()` ter rodado antes.
  */
-export function sincronizarBonusPvDraconico() {
-  if (!temClasse(char, 'Feiticeiro')) return;
-  const estado = getEstadoRecursosFeiticeiro();
-  if (!estado) return;
-
-  const ehDraconica = semAcento(subclasseDe(char, 'Feiticeiro')) === semAcento('Feitiçaria Dracônica');
-  const nivelFeiticeiro = nivelNa(char, 'Feiticeiro');
-  const esperado = ehDraconica && nivelFeiticeiro >= 3 ? nivelFeiticeiro : 0;
-  const aplicado = char.recursos.feiticeiro.subclasses.draconica.bonus_pv_aplicado || 0;
-
-  if (esperado === aplicado) return;
-
-  const diff = esperado - aplicado;
-  char.pv_max = Math.max(1, (char.pv_max || 1) + diff);
-  char.pv_atual = Math.max(0, Math.min((char.pv_max_override || char.pv_max), (char.pv_atual || 0) + diff));
-  char.recursos.feiticeiro.subclasses.draconica.bonus_pv_aplicado = esperado;
+export function sincronizarBonusPvNiveis() {
+  sincronizarBonusPvNivel(char);
   salvar();
 }
 
-/** Sincroniza bonus de PV da Tenacidade Anã (+1 por nivel) */
-export function sincronizarBonusPvAnao() {
-  const ehAnao = char?.especie === 'Anão';
-  const esperado = ehAnao ? (char.nivel || 1) : 0;
-  const aplicado = char.bonus_pv_anao_aplicado || 0;
-
-  if (esperado === aplicado) return;
-
-  const diff = esperado - aplicado;
-  char.pv_max = Math.max(1, (char.pv_max || 1) + diff);
-  char.pv_atual = Math.max(0, Math.min((char.pv_max_override || char.pv_max), (char.pv_atual || 0) + diff));
-  char.bonus_pv_anao_aplicado = esperado;
-  salvar();
-}
-
-/** Sincroniza bonus de PV do talento Vigoroso (+2 por nivel) */
-export function sincronizarBonusPvVigoroso() {
-  const temVigoroso = (char.talentos || []).some(t => (typeof t === 'string' ? t : t.nome) === 'Vigoroso');
-  const esperado = temVigoroso ? (char.nivel || 1) * 2 : 0;
-  const aplicado = char.bonus_pv_vigoroso_aplicado || 0;
-
-  if (esperado === aplicado) return;
-
-  const diff = esperado - aplicado;
-  char.pv_max = Math.max(1, (char.pv_max || 1) + diff);
-  char.pv_atual = Math.max(0, Math.min((char.pv_max_override || char.pv_max), (char.pv_atual || 0) + diff));
-  char.bonus_pv_vigoroso_aplicado = esperado;
-  salvar();
-}
+// As três funções abaixo existiam uma por bônus (chamadas em sheet/ficha.js
+// e em teste de unidade, ver docblock acima) -- mantidas com o mesmo nome
+// para não quebrar quem já as chama, mas as três agora só apontam para a
+// convergência única. Preferir `sincronizarBonusPvNiveis` em código novo.
+export const sincronizarBonusPvDraconico = sincronizarBonusPvNiveis;
+export const sincronizarBonusPvAnao = sincronizarBonusPvNiveis;
+export const sincronizarBonusPvVigoroso = sincronizarBonusPvNiveis;
 
 // --- HP e Dados de Vida ---
 
@@ -166,18 +137,40 @@ export function setupNumberPicker(id) {
   const max = parseInt(input.dataset.max) || 999;
   const valor = parseInt(input.value) || min;
 
-  // Posicionar no valor inicial
+  // Posicionar no valor inicial (clampado ao último item RENDERIZADO --
+  // a lista só tem itens até `min+49`, por performance, ver
+  // numberPickerHtml). Cosmético: só decide o que fica destacado, nunca a
+  // fonte real do valor.
   const idxInicial = Math.min(Math.max(0, valor - min), items.length - 1);
   requestAnimationFrame(() => {
     list.scrollTop = idxInicial * itemHeight;
     atualizarDestaque(idxInicial);
   });
 
+  // Issue #86: o listener de 'scroll' abaixo reescrevia `input.value` (a
+  // fonte real do valor) a partir do ÍNDICE DO ITEM exibido -- e um evento
+  // 'scroll' nativo dispara tanto por um gesto de verdade do usuário
+  // quanto pelo `list.scrollTop = ...` PROGRAMÁTICO logo acima (e por
+  // qualquer scroll espúrio de layout/snap do navegador). Um valor real
+  // fora do alcance renderizado (ex. PV atual 225, lista só vai até 50)
+  // ficava sobrescrito por 50 -- ou, sem posicionamento nenhum, por 1 (o
+  // primeiro item) por causa de um scroll de 1px que o próprio navegador
+  // dispara ao montar a lista, antes de qualquer clique. `interagiu` só
+  // vira `true` num gesto de ARRASTE de verdade (pointerdown/touchstart no
+  // próprio picker) -- é o único jeito de distinguir "o usuário mexeu
+  // nisto" de "o navegador reposicionou sozinho", sem depender de contar
+  // frames (medido: dois rAF de atraso ainda perdia a corrida contra o rAF
+  // que o próprio listener de 'scroll' agenda).
+  let interagiu = false;
+  list.addEventListener('pointerdown', () => { interagiu = true; }, { once: true });
+  list.addEventListener('touchstart', () => { interagiu = true; }, { once: true, passive: true });
+
   // Atualizar ao scrollar
   let scrollRaf;
   list.addEventListener('scroll', () => {
     cancelAnimationFrame(scrollRaf);
     scrollRaf = requestAnimationFrame(() => {
+      if (!interagiu) return;
       const idx = Math.round(list.scrollTop / itemHeight);
       const clampedIdx = Math.max(0, Math.min(idx, items.length - 1));
       const val = Math.min(max, Math.max(min, min + clampedIdx));
@@ -1025,6 +1018,15 @@ export function setupEventosDescanso() {
     // Restaurar todas as habilidades
     restaurarHabilidades('longo');
     restaurarRecursosTalentos(char, 'longo');
+
+    // Aasimar: Revelação Celestial (issue #91) -- a transformação dura no
+    // máximo 1 minuto ("ou até você a encerrar"), então o Descanso Longo
+    // (8h) sempre a encerra, além de restaurar o uso (já coberto pelo
+    // reset genérico de `restaurarHabilidades` acima, que lê a mesma
+    // cláusula "Descanso Longo" da descrição do traço).
+    if (char.especie === 'Aasimar' && char.recursos) {
+      char.recursos.aasimar_revelacao_ativa = '';
+    }
 
     // Bárbaro: descanso longo restaura todos os usos e encerra Fúria
     // temClasse: char.classe e a classe INICIAL -- um Mago 5/Barbaro 5

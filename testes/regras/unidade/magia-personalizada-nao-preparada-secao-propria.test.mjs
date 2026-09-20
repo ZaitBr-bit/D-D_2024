@@ -38,13 +38,27 @@ function clerigoNivel5({ preparadas = [], customizadas = [] } = {}) {
   };
 }
 
-/** Recorta o HTML de um bloco <details data-details-id="ID">...</details>, sem parser de verdade. */
+/**
+ * Recorta o HTML de um bloco <details data-details-id="ID">...</details>,
+ * sem parser de verdade -- mas contando profundidade de <details>/</details>
+ * aninhados (issues #75/#92: "não preparadas" passou a aninhar um
+ * <details> por círculo DENTRO do <details> da seção), para não parar no
+ * primeiro fechamento, que seria de um bloco filho, não do procurado.
+ */
 function blocoDetails(html, id) {
   const abre = `data-details-id="${id}"`;
-  const inicio = html.indexOf(abre);
-  if (inicio < 0) return null;
-  const fim = html.indexOf('</details>', inicio);
-  return html.slice(inicio, fim);
+  const posAtributo = html.indexOf(abre);
+  if (posAtributo < 0) return null;
+  const tagInicio = html.lastIndexOf('<details', posAtributo);
+  const TAGS = /<details|<\/details>/g;
+  TAGS.lastIndex = tagInicio;
+  let profundidade = 0;
+  let m;
+  while ((m = TAGS.exec(html))) {
+    profundidade += m[0] === '<details' ? 1 : -1;
+    if (profundidade === 0) return html.slice(tagInicio, TAGS.lastIndex);
+  }
+  return null;
 }
 
 test('personalizada "ocupa vaga" sem entrada gravada NÃO aparece dentro do bloco magias-circulo-N', () => {

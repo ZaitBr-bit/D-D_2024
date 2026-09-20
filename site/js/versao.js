@@ -13,13 +13,72 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.0.9';
+export const VERSAO_ATUAL = '3.0.10';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.0.10',
+    data: '2026-09-20',
+    rotulo: 'Item com bônus',
+    resumo: 'Cinco correções (teto de atributo da Edição livre, scroll do '
+      + 'PV Max, sub-modal por cima do rodapé, PV do talento Vigoroso '
+      + 'atualizado na hora, e seletor de forma da Revelação Celestial do '
+      + 'Aasimar) e duas melhorias: item personalizado agora pode ser uma '
+      + 'arma de verdade (categoria/propriedades/maestria) e conceder '
+      + 'bônus de ataque/CD de magia, e a lista de magias personalizadas '
+      + 'não preparadas passa a nascer minimizada e organizada por círculo.',
+    correcoes: [
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'Edição livre de atributos: o teto de validação ficava em 20, '
+            + 'mesmo quando a própria tela pré-preenche o valor FINAL do '
+            + 'atributo — um Bárbaro com Campeão Primitivo (Força/'
+            + 'Constituição até 25, capstone de nível 20) não conseguia '
+            + 'salvar edição nenhuma. Teto subiu para 30. (#85)',
+          'Modais com lista de rolagem numérica (ex.: "PV Max"): o valor '
+            + 'inicial acima do que o picker renderiza (min+49) era '
+            + 'sobrescrito por engano ao abrir o modal, silenciosamente. '
+            + 'Agora só um toque de verdade no picker altera o valor. (#86)',
+          'Sub-modal "Configurar Talento" (ex.: escolher arma de Mestre '
+            + 'das Armas): o círculo de seleção do último card vazava por '
+            + 'cima dos botões fixos do rodapé. (#87)',
+          'Talento Vigoroso: o PV máximo só recalculava no PRÓXIMO render '
+            + 'da ficha, não na hora da subida de nível — a própria modal '
+            + '"Subida de Nível Concluída" podia mostrar um total '
+            + 'desatualizado antes de fechar. (#89)',
+          'Revelação Celestial (Aasimar nível 3): a característica-mãe '
+            + 'caía no toggle genérico, sem seletor para escolher entre '
+            + 'Asas Celestiais/Manto Necrótico/Transfiguração Radiante — '
+            + 'nenhuma das três aplicava efeito mecânico nenhum. Agora tem '
+            + 'seletor de forma, e Asas Celestiais concede o deslocamento '
+            + 'de voo. (#91)',
+        ],
+      },
+    ],
+    melhorias: [
+      {
+        grupo: '✨ Item personalizado com bônus mecânico',
+        itens: [
+          'Item personalizado ganhou categoria de arma (simples/marcial), '
+            + 'propriedades e maestria — com isso, entra no MESMO cálculo '
+            + 'de proficiência/ataque/dano que uma arma de catálogo, em '
+            + 'vez de só mostrar o bônus bruto digitado. (#82, #37)',
+          'Item personalizado ganhou bônus de ataque de magia e de CD de '
+            + 'magia, que somam nos números da ficha quando o item está '
+            + 'equipado (e sintonizado, se exigir sintonização). (#37)',
+          'A lista de magias personalizadas não preparadas passa a '
+            + 'agrupar por círculo, com um botão de minimizar por círculo '
+            + '(mesmo padrão visual da lista de Preparadas), e a seção '
+            + 'inteira nasce minimizada por padrão. (#75, #92)',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.0.9',
     data: '2026-09-20',

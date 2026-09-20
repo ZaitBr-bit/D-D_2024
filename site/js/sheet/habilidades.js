@@ -259,6 +259,46 @@ export function setupEventosHabilidades() {
     });
   });
 
+  // Aasimar: Revelação Celestial -- issue #91. Escolhe UMA forma (select
+  // ao lado do botão), marca o uso (1x/Descanso Longo, mesmo `char.
+  // usos_habilidades` genérico que o resto do card usa -- reaproveita o
+  // reset automático já existente em restaurarHabilidades) e grava QUAL
+  // forma está ativa em `char.recursos.aasimar_revelacao_ativa`, que é o
+  // que combate.js (deslocamento de voo de Asas Celestiais) e futuras
+  // formas mecânicas leem.
+  document.querySelectorAll('[data-revelacao-transformar]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (char.especie !== 'Aasimar') return;
+      const key = 'especie_Revelação Celestial';
+      if (!char.usos_habilidades) char.usos_habilidades = {};
+      if (char.usos_habilidades[key]) {
+        toast('Revelação Celestial já usada. Descanse para recuperar.', 'error');
+        return;
+      }
+      const forma = document.getElementById('revelacao-celestial-escolha')?.value;
+      if (!forma) return;
+      char.usos_habilidades[key] = true;
+      if (!char.recursos) char.recursos = {};
+      char.recursos.aasimar_revelacao_ativa = forma;
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+  document.querySelectorAll('[data-revelacao-encerrar]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (char.especie !== 'Aasimar') return;
+      // Encerrar antes do tempo NÃO devolve o uso -- o livro só restaura
+      // no Descanso Longo, igual a qualquer outra transformação de 1x/dia.
+      if (char.recursos) char.recursos.aasimar_revelacao_ativa = '';
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
   // Recursos específicos do Clérigo
   document.querySelectorAll('[data-clerigo-cd-acao]').forEach(btn => {
     btn.addEventListener('click', (e) => {

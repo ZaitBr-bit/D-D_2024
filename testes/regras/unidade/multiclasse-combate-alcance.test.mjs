@@ -446,7 +446,10 @@ const UTILS_LEGITIMAS_NIVEL_TOTAL = [
   // linhas leem `personagem.nivel` porque e exatamente o total que elas
   // querem; converter qualquer uma delas seria introduzir um defeito.
   'let cd = 8 + bonusProficiencia(personagem.nivel) + modAttr;',
-  'return bonusProficiencia(personagem.nivel) + modAttr;',
+  // Issue #37/#82: a linha ganhou o bonus de item customizado equipado
+  // (bonusMagiaDeItens) no mesmo `return` -- o `personagem.nivel` que
+  // importa pra esta lista continua o mesmo, so o texto da linha mudou.
+  'return bonusProficiencia(personagem.nivel) + modAttr + bonusMagiaDeItens(personagem).ataque;',
   'if (prof) bonus += bonusProficiencia(personagem.nivel);',
   'if (exp) bonus += bonusProficiencia(personagem.nivel);',
   'bonus += Math.floor(bonusProficiencia(personagem.nivel) / 2);',

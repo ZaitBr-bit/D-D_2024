@@ -17,6 +17,21 @@ const REGEX_DANO = /^\d+d\d+(\s*[+\-]\s*\d+)?(\s+\w+)?$/i;
 // corda no inventario.
 export const RARIDADES = ['Comum', 'Incomum', 'Rara', 'Muito Rara', 'Lendária', 'Artefato'];
 
+// Categorias de arma reconhecidas pelo motor de proficiência/ataque
+// (regras-equipamento.js/sheet/inventario.js) -- os mesmos quatro valores
+// do catálogo (dados/equipamento/armas.json), para o item customizado
+// entrar no MESMO cálculo de proficiência/modificador que a arma de
+// catálogo usa, sem duplicar a regra (issue #82).
+export const CATEGORIAS_ARMA = [
+  'Armas Simples Corpo a Corpo', 'Armas Simples à Distância',
+  'Armas Marciais Corpo a Corpo', 'Armas Marciais à Distância',
+];
+
+// As maestrias de arma do catálogo (dados/equipamento/armas.json) --
+// mesma lista, para o campo do item customizado oferecer só nomes que
+// existem no livro.
+export const MAESTRIAS_ARMA = ['Afligir', 'Derrubar', 'Drenar', 'Empurrar', 'Garantido', 'Lentidão', 'Trespassar', 'Ágil'];
+
 /**
  * Valida os campos que tem regra, sem tocar no DOM.
  * @param {{nome?: string, dano?: string}} bruto
@@ -75,6 +90,40 @@ export function htmlFormularioItemCustomizado(item = null) {
       </div>
     </div>
     <div class="form-group" style="margin-top:8px">
+      <label class="form-label" for="ic-categoria">Categoria de arma (opcional)</label>
+      <select class="form-input" id="ic-categoria">
+        <option value=""${!d.categoria ? ' selected' : ''}>— não é arma —</option>
+        ${CATEGORIAS_ARMA.map(c => `<option value="${c}"${d.categoria === c ? ' selected' : ''}>${c}</option>`).join('')}
+      </select>
+      <div style="font-size:0.65rem;color:var(--text-muted)">define proficiência e o modificador de ataque (Força/Destreza), como uma arma de catálogo</div>
+    </div>
+    <div class="row gap-1" style="margin-top:8px">
+      <div class="col">
+        <label class="form-label" for="ic-propriedades">Propriedades (opcional)</label>
+        <input type="text" class="form-input" id="ic-propriedades" value="${attr(d.propriedades || '')}" placeholder="Acuidade, Leve">
+        <div style="font-size:0.65rem;color:var(--text-muted)">Ex: Acuidade, Distância, Leve, Pesada, Duas Mãos, Versátil</div>
+      </div>
+      <div class="col">
+        <label class="form-label" for="ic-maestria">Maestria (opcional)</label>
+        <select class="form-input" id="ic-maestria">
+          <option value=""${!d.maestria ? ' selected' : ''}>—</option>
+          ${MAESTRIAS_ARMA.map(m => `<option value="${m}"${d.maestria === m ? ' selected' : ''}>${m}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="row gap-1" style="margin-top:8px">
+      <div class="col">
+        <label class="form-label" for="ic-atq-magia">Bônus Ataque de Magia</label>
+        <input type="number" class="form-input" id="ic-atq-magia" value="${num(d.bonus_ataque_magia)}" placeholder="0" step="1">
+        <div style="font-size:0.65rem;color:var(--text-muted)">soma na jogada de ataque de magia quando equipado (e sintonizado, se exigir)</div>
+      </div>
+      <div class="col">
+        <label class="form-label" for="ic-cd-magia">Bônus CD de Magia</label>
+        <input type="number" class="form-input" id="ic-cd-magia" value="${num(d.bonus_cd_magia)}" placeholder="0" step="1">
+        <div style="font-size:0.65rem;color:var(--text-muted)">soma na CD de magia quando equipado (e sintonizado, se exigir)</div>
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:8px">
       <label class="form-label" for="ic-peso">Peso (opcional)</label>
       <input type="number" class="form-input" id="ic-peso" value="${parsePeso(d.peso) || ''}" placeholder="0" min="0" step="0.1" style="max-width:140px">
       <div style="font-size:0.65rem;color:var(--text-muted)">em kg (ex: 0,5)</div>
@@ -117,6 +166,11 @@ export function lerFormularioItemCustomizado() {
   const dano = val('ic-dano');
   const ca = parseInt(document.getElementById('ic-ca')?.value) || 0;
   const atq = parseInt(document.getElementById('ic-atq')?.value) || 0;
+  const categoria = val('ic-categoria');
+  const propriedades = val('ic-propriedades');
+  const maestria = val('ic-maestria');
+  const atqMagia = parseInt(document.getElementById('ic-atq-magia')?.value) || 0;
+  const cdMagia = parseInt(document.getElementById('ic-cd-magia')?.value) || 0;
   // Campo VAZIO grava vazio, e nao 0: "sem CA base" e diferente de "CA base
   // zero", e so o vazio deixa o item fora da conta do piso.
   const caBaseRaw = val('ic-ca-base');
@@ -143,6 +197,11 @@ export function lerFormularioItemCustomizado() {
         ca_base: caBase,
         dano,
         bonus_ataque: String(atq),
+        categoria,
+        propriedades,
+        maestria,
+        bonus_ataque_magia: String(atqMagia),
+        bonus_cd_magia: String(cdMagia),
         peso: pesoNum > 0 ? `${fmtPeso(pesoNum)} kg` : '',
         raridade: val('ic-raridade'),
         preco: val('ic-preco'),
