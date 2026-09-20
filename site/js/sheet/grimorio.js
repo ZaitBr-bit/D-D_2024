@@ -1715,13 +1715,20 @@ export async function mostrarFormMagiaCustom(indiceEdicao = null) {
 export async function mostrarBuscaGrimorio() {
   const indice = await getIndiceMagias();
   const magiasDoAcervo = (indice?.magias || []).filter(m => m.circulo > 0 && (m.classes || []).includes('Mago'));
-  // Issue #46: a magia customizada saiu daqui. Ela é SEMPRE preparada e
-  // derivada de `char.magias_customizadas`; copiá-la para o grimório por
-  // 50 PO/círculo não compra mais nada, e deixaria duas linhas da mesma
-  // magia na ficha. A #42, que a trouxe para cá, resolvia o problema de a
-  // customizada não ter caminho até "preparada" -- caminho que deixou de
-  // ser necessário.
-  const magias = magiasDoAcervo;
+  // Issue #46 tirou a magia personalizada SEMPRE preparada (sempre_preparada
+  // !== false) daqui -- ela nunca sai do grimório, então oferecê-la pra
+  // comprar de novo não faz sentido nenhum e duplicaria a linha na ficha.
+  // Issue #77 (revertendo parte da #46, para o caso que a #46 não previu):
+  // a personalizada "ocupa vaga" (`sempre_preparada === false`, issue #71)
+  // PODE sair do grimório de verdade (removida pela grade normal, ou pelo
+  // "x" das preparadas) -- e antes disso não tinha caminho de volta nenhum
+  // além do toggle GRÁTIS do formulário de edição. Modelo da 3.0.1: sai do
+  // grimório, precisa pagar 50 PO/círculo pra copiar de novo, igual a
+  // qualquer magia do acervo.
+  const magiasPersonalizadasOcupaVaga = (char.magias_customizadas || [])
+    .filter(m => m.circulo > 0 && m.sempre_preparada === false)
+    .map(m => ({ nome: m.nome, circulo: m.circulo, escola: m.escola || '', personalizada: true }));
+  const magias = [...magiasDoAcervo, ...magiasPersonalizadasOcupaVaga];
   // Achado da revisao de branch (Important 2, sub-projeto 4): esta linha
   // era o ULTIMO leitor vivo da forma ANTIGA de char.espacos_magia
   // ({circulo: {total, usados}}) -- o ramo `: (char.espacos_magia || {})`
@@ -1785,7 +1792,7 @@ export async function mostrarBuscaGrimorio() {
       // entraria como HTML.
       return `
       <div class="magia-item" style="cursor:pointer${!temPO ? ';opacity:0.5' : ''}" data-grim-nome="${escHtml(m.nome)}" data-grim-circ="${m.circulo}" data-grim-custo="${custo}">
-        <div class="magia-nome">${escHtml(m.nome)}</div>
+        <div class="magia-nome">${escHtml(m.nome)}${m.personalizada ? ' <span class="badge badge-secondary" style="font-size:0.6rem">Personalizada</span>' : ''}</div>
         <div class="magia-meta">
           <span>${m.circulo}º Círculo</span>
           <span>${escHtml(m.escola)}</span>

@@ -782,9 +782,15 @@ export function renderCardMagias(ctx, state) {
     // em levelup-ui.js; aqui so muda o texto.
     const fonte = ehMago ? 'do seu grimório' : `da lista de ${classeQueSobe}`;
     const rotulo = tipoConj === 'conhecidas' ? 'magia conhecida' : 'magia preparada';
+    // Issue #90: nasce minimizado (sem `open`) -- poluição visual no
+    // assistente de level-up, mesmo padrão de "opcional, colapsado por
+    // padrão" já usado na ficha (sheet/magias.js). Os divs internos
+    // (`#levelup-troca-magia` etc.) continuam no DOM mesmo fechado -- só
+    // ficam visualmente ocultos -- e `levelup-ui.js` preenche eles do
+    // mesmo jeito.
     html += `
-      <div class="levelup-card">
-        <div class="levelup-card-header">Trocar Magias (Opcional)</div>
+      <details class="levelup-card">
+        <summary class="levelup-card-header" style="cursor:pointer">Trocar Magias (Opcional)</summary>
         <div class="levelup-card-body">
           <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
             Troque quantas ${rotulo}s quiser por outras ${fonte}.
@@ -792,7 +798,7 @@ export function renderCardMagias(ctx, state) {
           <div id="levelup-trocas-magia-feitas"></div>
           <div id="levelup-troca-magia"></div>
         </div>
-      </div>
+      </details>
     `;
   }
 
@@ -802,8 +808,8 @@ export function renderCardMagias(ctx, state) {
   });
   if (truquesAtuais.length > 0) {
     html += `
-      <div class="levelup-card">
-        <div class="levelup-card-header">Trocar Truques (Opcional)</div>
+      <details class="levelup-card">
+        <summary class="levelup-card-header" style="cursor:pointer">Trocar Truques (Opcional)</summary>
         <div class="levelup-card-body">
           <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
             Troque quantos truques quiser por outros da lista de ${classeQueSobe}.
@@ -811,7 +817,7 @@ export function renderCardMagias(ctx, state) {
           <div id="levelup-trocas-truque-feitas"></div>
           <div id="levelup-troca-truque"></div>
         </div>
-      </div>
+      </details>
     `;
   }
 

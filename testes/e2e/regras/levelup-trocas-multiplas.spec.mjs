@@ -42,11 +42,19 @@ const CLERIGO = {
   ],
 };
 
-/** Avança o assistente até o card de troca de magia aparecer. */
+/**
+ * Avança o assistente até o card de troca de magia aparecer, e expande
+ * o <details> (issue #90: o card nasce minimizado) com um clique real
+ * no <summary>, senão os cliques em `.opcao-card` dentro dele não
+ * conseguem mirar um elemento visível.
+ */
 async function irAteCardDeTroca(page) {
   const card = page.locator('#levelup-troca-magia');
   for (let i = 0; i < 10; i++) {
-    if (await card.count()) return card;
+    if (await card.count()) {
+      await page.locator('details:has(#levelup-troca-magia) > summary').click();
+      return card;
+    }
     const proximo = page.locator('#btn-step-proximo');
     if (await proximo.count()) await proximo.click();
     await page.waitForTimeout(500);

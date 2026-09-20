@@ -122,6 +122,10 @@ test('level-up: classe preparada também recebe o card de trocar magia', async (
     await page.waitForTimeout(500);
   }
 
+  // Issue #90: o card nasce dentro de um <details> minimizado -- clique
+  // real no <summary> para revelar o conteúdo antes de medir visibilidade.
+  await page.locator('details:has(#levelup-troca-magia) > summary').click();
+
   await expect(cardTroca,
     'o card de troca de magia não apareceu para uma classe preparada (Clérigo)')
     .toBeVisible({ timeout: 5000 });

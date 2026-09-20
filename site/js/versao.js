@@ -13,13 +13,42 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.0.10';
+export const VERSAO_ATUAL = '3.0.11';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.0.11',
+    data: '2026-09-20',
+    rotulo: 'Grimório e rótulos',
+    resumo: 'Botão de item personalizado com rótulo claro, opções de troca '
+      + 'de truque/magia no level-up nascendo minimizadas, e magia '
+      + 'personalizada "ocupa vaga" do Mago volta a ter caminho pago de '
+      + 'cópia para o grimório quando sai dele.',
+    melhorias: [
+      {
+        grupo: '✨ Melhorias',
+        itens: [
+          'O botão "+ Custom" do inventário passou a dizer "+ Item '
+            + 'Personalizado" — rótulo mais claro, sem mudar o que o botão '
+            + 'faz. (#84)',
+          'As opções de "Trocar Magias"/"Trocar Truques" do assistente de '
+            + 'level-up nascem minimizadas por padrão — antes ficavam '
+            + 'sempre abertas, mesmo quando o jogador não ia trocar nada. '
+            + '(#90)',
+          'Mago: magia personalizada que "ocupa vaga" (não é sempre '
+            + 'preparada) e caiu do grimório volta a aparecer na lista paga '
+            + 'de "Copiar Magia para o Grimório" (50 PO/círculo, modelo da '
+            + '3.0.1) — antes só voltava pelo toggle grátis do formulário '
+            + 'de edição. A personalizada "sempre preparada" (nunca sai do '
+            + 'grimório) continua fora dessa lista. (#77)',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.0.10',
     data: '2026-09-20',
