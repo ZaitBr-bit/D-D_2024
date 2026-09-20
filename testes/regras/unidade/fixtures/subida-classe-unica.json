@@ -2254,7 +2254,8 @@
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         }
       ],
       "grimorio": []
@@ -2355,7 +2356,8 @@
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         }
       ],
       "grimorio": []
@@ -2456,7 +2458,8 @@
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         }
       ],
       "grimorio": []
@@ -2558,7 +2561,8 @@
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         }
       ],
       "grimorio": []
@@ -2660,7 +2664,8 @@
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         }
       ],
       "grimorio": []
@@ -2762,7 +2767,8 @@
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         }
       ],
       "grimorio": []
@@ -2864,7 +2870,8 @@
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         }
       ],
       "grimorio": []
@@ -2967,7 +2974,8 @@
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         }
       ],
       "grimorio": []
@@ -3070,7 +3078,8 @@
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         }
       ],
       "grimorio": []
@@ -3173,7 +3182,8 @@
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         }
       ],
       "grimorio": []
@@ -3279,7 +3289,8 @@
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         }
       ],
       "grimorio": []
@@ -3385,7 +3396,8 @@
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         }
       ],
       "grimorio": []
@@ -14539,7 +14551,8 @@
         {
           "nome": "Destruição Divina",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         }
       ],
       "grimorio": []
@@ -14586,7 +14599,8 @@
         {
           "nome": "Destruição Divina",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Escudo da Fé",
@@ -14645,7 +14659,8 @@
         {
           "nome": "Destruição Divina",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Escudo da Fé",
@@ -14704,7 +14719,8 @@
         {
           "nome": "Destruição Divina",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Escudo da Fé",
@@ -14729,7 +14745,8 @@
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         }
       ],
       "grimorio": []
@@ -14778,7 +14795,8 @@
         {
           "nome": "Destruição Divina",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Escudo da Fé",
@@ -14803,7 +14821,8 @@
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         }
       ],
       "grimorio": []
@@ -14852,7 +14871,8 @@
         {
           "nome": "Destruição Divina",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Escudo da Fé",
@@ -14877,7 +14897,8 @@
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         }
       ],
       "grimorio": []
@@ -14927,7 +14948,8 @@
         {
           "nome": "Destruição Divina",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Escudo da Fé",
@@ -14952,7 +14974,8 @@
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         }
       ],
       "grimorio": []
@@ -15002,7 +15025,8 @@
         {
           "nome": "Destruição Divina",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Escudo da Fé",
@@ -15027,7 +15051,8 @@
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Dissipar Magia",
@@ -15087,7 +15112,8 @@
         {
           "nome": "Destruição Divina",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Escudo da Fé",
@@ -15112,7 +15138,8 @@
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Dissipar Magia",
@@ -15172,7 +15199,8 @@
         {
           "nome": "Destruição Divina",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Escudo da Fé",
@@ -15197,7 +15225,8 @@
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Dissipar Magia",
@@ -15258,7 +15287,8 @@
         {
           "nome": "Destruição Divina",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Escudo da Fé",
@@ -15283,7 +15313,8 @@
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Dissipar Magia",
@@ -15344,7 +15375,8 @@
         {
           "nome": "Destruição Divina",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Escudo da Fé",
@@ -15369,7 +15401,8 @@
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Dissipar Magia",
@@ -15440,7 +15473,8 @@
         {
           "nome": "Destruição Divina",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Escudo da Fé",
@@ -15465,7 +15499,8 @@
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Dissipar Magia",
@@ -15536,7 +15571,8 @@
         {
           "nome": "Destruição Divina",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Escudo da Fé",
@@ -15561,7 +15597,8 @@
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Dissipar Magia",
@@ -15633,7 +15670,8 @@
         {
           "nome": "Destruição Divina",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Escudo da Fé",
@@ -15658,7 +15696,8 @@
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Dissipar Magia",
@@ -15730,7 +15769,8 @@
         {
           "nome": "Destruição Divina",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Escudo da Fé",
@@ -15755,7 +15795,8 @@
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Dissipar Magia",
@@ -15837,7 +15878,8 @@
         {
           "nome": "Destruição Divina",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Escudo da Fé",
@@ -15862,7 +15904,8 @@
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Dissipar Magia",
@@ -15946,7 +15989,8 @@
         {
           "nome": "Destruição Divina",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Escudo da Fé",
@@ -15971,7 +16015,8 @@
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Dissipar Magia",
@@ -16055,7 +16100,8 @@
         {
           "nome": "Destruição Divina",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Escudo da Fé",
@@ -16080,7 +16126,8 @@
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "gratis_usado": false
         },
         {
           "nome": "Dissipar Magia",

@@ -712,6 +712,52 @@ function extrairMagiasSemprePreparadasTexto(descricao) {
 }
 
 /**
+ * Diz se a característica, além de conceder a magia sempre preparada, TAMBÉM
+ * concede uma conjuração sem gastar espaço de magia (issue #76). É uma
+ * segunda cláusula na MESMA característica que `extrairMagiasSemprePreparadasTexto`
+ * já lê para o nome -- ex.: "Você sempre tem a magia *Destruição Divina*
+ * preparada. Além disso, você pode conjurá-la sem gastar um espaço de
+ * magia... antes de completar um Descanso Longo" (Destruição do Paladino).
+ * Sem esta segunda cláusula a magia concedida nunca ganha `gratis_usado`, e
+ * o botão "Grátis" da lista principal (sheet/magias.js, issue #68) não
+ * aparece.
+ *
+ * SÓ PARA 1 USO. `gratis_usado` é um booleano -- usado/não usado -- e não
+ * tem onde guardar uma CONTAGEM. Inimigo Favorito do Guardião ("você pode
+ * conjurá-la DUAS vezes... o número aumenta por nível") e Andarilho
+ * Nebuloso/Mapa Estelar ("um número de vezes igual ao seu modificador de
+ * [atributo], mínimo de uma vez") concedem MAIS de um uso -- marcá-los aqui
+ * marcaria só o primeiro uso como existente e esconderia os demais, uma
+ * regressão silenciosa pior que a característica continuar sem botão. Por
+ * isso a exclusão vem ANTES do casamento positivo, não depois.
+ *
+ * Criaturas Espectrais (Ilusionista) e Manto de Majestade (Bardo/Glamour)
+ * tinham bookkeeping DEDICADO próprio (botões em habilidades.js,
+ * `char.recursos.<classe>.*`) que foi MIGRADO para este mecanismo -- ver
+ * o histórico do arquivo se precisar da versão com os dois excluídos.
+ * `FEATURES_COM_CONTROLE_PROPRIO_DE_USO_GRATIS` fica vazio como o LUGAR
+ * certo para a próxima característica que precisar da mesma exclusão
+ * temporária (feature nova com botão dedicado ainda não migrado).
+ */
+const FEATURES_COM_CONTROLE_PROPRIO_DE_USO_GRATIS = [];
+
+/** Ver o docblock de `featureConcedeUsoGratisSemEspaco`. Exportada para
+ *  sheet/habilidades.js suprimir o toggle GENÉRICO (`data-toggle-uso`) do
+ *  card de características para as mesmas magias -- sem isso, o card
+ *  mostra um "✓ Disponível"/"✗ Usado" próprio, com bookkeeping em
+ *  `char.usos_habilidades`, desincronizado do `gratis_usado` real que o
+ *  botão "Grátis" da lista de Magias usa (mesma família de bug do
+ *  Ilusionista/Bardo, mas sem "conjurar" nada -- só uma UI mentindo). */
+export function featureConcedeUsoGratisSemEspaco(descricao, nomeFeature) {
+  if (!descricao) return false;
+  if (FEATURES_COM_CONTROLE_PROPRIO_DE_USO_GRATIS.includes(nomeFeature)) return false;
+  if (/(duas|tr[êe]s|quatro|cinco) vezes|número de vezes|modificador de \w+.{0,20}m[íi]nimo/i.test(descricao)) {
+    return false;
+  }
+  return /sem gastar (?:um )?espaço de magia/i.test(descricao);
+}
+
+/**
  * Obtém magias sempre preparadas concedidas no nível atual.
  */
 export async function obterMagiasSemprePreparadasNivel(classe, subclasse, nivel, opcaoEscolhida) {
@@ -719,6 +765,12 @@ export async function obterMagiasSemprePreparadasNivel(classe, subclasse, nivel,
   if (!classeData) return [];
 
   const nomes = new Set();
+  // Nomes cuja característica de origem TAMBÉM concede conjuração sem
+  // gastar espaço de magia (ver featureConcedeUsoGratisSemEspaco, acima).
+  // Só é preenchido pelas características do NÍVEL ATUAL -- a cláusula
+  // pertence à característica que acabou de ser concedida, não à leitura
+  // de tabela que reconstrói nomes de níveis passados.
+  const nomesGratisSemEspaco = new Set();
 
   // Montar mapa: nome de feature -> conjunto de subclasses que a possuem
   // Usado para excluir features de classe que pertencem a OUTRAS subclasses
@@ -744,7 +796,11 @@ export async function obterMagiasSemprePreparadasNivel(classe, subclasse, nivel,
   featsClasse
     .filter(c => c.nivel === nivel)
     .forEach(f => {
-      extrairMagiasSemprePreparadasTexto(f.descricao).forEach(n => nomes.add(n));
+      const nomesTexto = extrairMagiasSemprePreparadasTexto(f.descricao);
+      nomesTexto.forEach(n => nomes.add(n));
+      if (featureConcedeUsoGratisSemEspaco(f.descricao, f.nome)) {
+        nomesTexto.forEach(n => nomesGratisSemEspaco.add(n));
+      }
       extrairMagiasSemprePreparadasTabela(f.descricao, nivel, opcaoEscolhida).forEach(n => nomes.add(n));
     });
 
@@ -763,7 +819,11 @@ export async function obterMagiasSemprePreparadasNivel(classe, subclasse, nivel,
     featsSubclasse
       .filter(c => c.nivel === nivel)
       .forEach(f => {
-        extrairMagiasSemprePreparadasTexto(f.descricao).forEach(n => nomes.add(n));
+        const nomesTexto = extrairMagiasSemprePreparadasTexto(f.descricao);
+        nomesTexto.forEach(n => nomes.add(n));
+        if (featureConcedeUsoGratisSemEspaco(f.descricao, f.nome)) {
+          nomesTexto.forEach(n => nomesGratisSemEspaco.add(n));
+        }
         extrairMagiasSemprePreparadasTabela(f.descricao, nivel, opcaoEscolhida).forEach(n => nomes.add(n));
       });
 
@@ -781,7 +841,11 @@ export async function obterMagiasSemprePreparadasNivel(classe, subclasse, nivel,
   return [...nomes]
     .map(nome => {
       const m = idx.find(x => x.nome === nome);
-      return m ? { nome, circulo: (m.circulo ?? 1) } : null;
+      if (!m) return null;
+      return {
+        nome, circulo: (m.circulo ?? 1),
+        ...(nomesGratisSemEspaco.has(nome) ? { gratisSemEspaco: true } : {}),
+      };
     })
     .filter(Boolean);
 }
@@ -1060,14 +1124,22 @@ export async function obterMagiasAutomaticasDoPersonagem(personagem) {
  * Se a magia já existe na lista (ex.: escolhida manualmente antes da característica
  * que a concede automaticamente existir), promove a entrada existente em vez de
  * ignorá-la - senão ela fica presa contando no limite normal de magias preparadas.
+ *
+ * `magia.gratisSemEspaco` (issue #76, ver featureConcedeUsoGratisSemEspaco) é
+ * transiente: some daqui para dentro como `gratis_usado: false`, o campo que
+ * sheet/magias.js já lê para desenhar o botão "Grátis" (issue #68). Gravar o
+ * nome `gratisSemEspaco` na ficha seria um campo morto -- nenhum leitor o
+ * reconhece depois deste ponto.
  */
 export function _concederMagiaAutomatica(lista, magia, origem) {
-  const existente = lista.find(m => m.nome === magia.nome);
+  const { gratisSemEspaco, ...dadosMagia } = magia;
+  const existente = lista.find(m => m.nome === dadosMagia.nome);
   if (existente) {
     existente.origem = origem;
-    existente.circulo = magia.circulo;
+    existente.circulo = dadosMagia.circulo;
+    if (gratisSemEspaco) existente.gratis_usado = false;
   } else {
-    lista.push({ ...magia, origem });
+    lista.push({ ...dadosMagia, origem, ...(gratisSemEspaco ? { gratis_usado: false } : {}) });
   }
 }
 

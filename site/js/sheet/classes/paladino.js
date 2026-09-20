@@ -31,15 +31,13 @@ export function getEstadoRecursosPaladino() {
   if (!char.recursos.paladino) {
     char.recursos.paladino = {
       maos_consagradas_gastos: 0,
-      canalizar_divindade_usos_gastos: 0,
-      destruicao_gratuita_usada: false
+      canalizar_divindade_usos_gastos: 0
     };
   }
 
   const r = char.recursos.paladino;
   if (typeof r.maos_consagradas_gastos !== 'number') r.maos_consagradas_gastos = 0;
   if (typeof r.canalizar_divindade_usos_gastos !== 'number') r.canalizar_divindade_usos_gastos = 0;
-  if (typeof r.destruicao_gratuita_usada !== 'boolean') r.destruicao_gratuita_usada = false;
 
   const nivel = nivelNa(char, 'Paladino') || 1;
   const prog = getProgressaoPaladino() || { canalizarMax: 0 };
@@ -51,9 +49,6 @@ export function getEstadoRecursosPaladino() {
   // Canalizar Divindade (nível 3+)
   const canalizarMax = prog.canalizarMax;
   const canalizarDisponiveis = Math.max(0, canalizarMax - r.canalizar_divindade_usos_gastos);
-
-  // Destruição gratuita (nível 2+, 1x/descanso longo)
-  const destruicaoGratuitaAtiva = nivel >= 2;
 
   // Aura de Proteção (nível 6+)
   const modCar = Math.max(1, calcMod(char.atributos.carisma));
@@ -83,8 +78,6 @@ export function getEstadoRecursosPaladino() {
     canalizarMax,
     canalizarDisponiveis,
     canalizarGastos: r.canalizar_divindade_usos_gastos,
-    destruicaoGratuitaAtiva,
-    destruicaoGratuitaUsada: r.destruicao_gratuita_usada,
     auraProtecaoAtiva,
     auraRaio,
     bonusAura: modCar,

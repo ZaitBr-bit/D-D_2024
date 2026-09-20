@@ -127,16 +127,14 @@ export function getEstadoRecursosMago() {
   }
 
   if (sub === 'Ilusionista') {
+    // Criaturas Espectrais migrou para o botão "Grátis" da lista de Magias
+    // (issue #76, `char.magias_preparadas[].gratis_usado`) -- não tem mais
+    // bookkeeping próprio aqui.
     if (!r.subclasses.ilusionista) r.subclasses.ilusionista = {};
     const s = r.subclasses.ilusionista;
-    if (typeof s.feerica_usada !== 'boolean') s.feerica_usada = false;
-    if (typeof s.fera_usada !== 'boolean') s.fera_usada = false;
     if (typeof s.autoimagem_usada !== 'boolean') s.autoimagem_usada = false;
     subData = {
-      feericaUsada: s.feerica_usada,
-      feraUsada: s.fera_usada,
       autoimagemUsada: s.autoimagem_usada,
-      criaturasEspectraisAtiva: nivel >= 6,
       autoimagemAtiva: nivel >= 10
     };
   }

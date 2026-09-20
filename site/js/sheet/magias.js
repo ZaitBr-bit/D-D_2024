@@ -17,6 +17,7 @@ import { getTrapaceiroArcanoConjuracao } from './classes/ladino.js';
 // gravada por sincronizarMagiasFixasMago (classes/mago.js) quando a magia
 // escolhida e uma personalizada (issue #49).
 import { MAGIAS_FIXAS_MAGO, magiaFixaMagoGratisDisponivel, marcarAssinaturaMagicaUsada } from './classes/mago.js';
+import { consumirUsoRecursoDedicadoGratis, magiaRecursoDedicadoGratisDisponivel } from '../regras-usos-gratis-magia.js';
 import { _truquesColapsados } from './colapso.js';
 import { ehBardoComSegredosMagicos, getTruquesExtraEstiloLuta } from './combate.js';
 import { char, classesData, indiceMagiasCache, salvar } from './estado.js';
@@ -1214,8 +1215,23 @@ export function renderSecaoMagias() {
               // cima. `magiaFixaMagoGratisDisponivel` devolve null para
               // qualquer outra origem, e nesse caso cai no mecanismo
               // genérico (`gratis_usado`, talentos como Iniciado em Magia).
+              //
+              // Issue #76 (Fase C): mesmo padrão para o Guardião (Inimigo
+              // Favorito/Andarilho Feérico) -- essas concedem uso MÚLTIPLO
+              // ou escalado por atributo, que `gratis_usado` (booleano) não
+              // representa. `magiaRecursoDedicadoGratisDisponivel` lê o MESMO
+              // `char.recursos.guardiao.*` que o painel de recursos usa, em
+              // vez de duplicar a contagem aqui.
+              //
+              // OR com `gratis_usado`, não substituição: a mesma magia pode
+              // ter DOIS recursos grátis no mesmo personagem (Andarilho
+              // Feérico com Tocado Por Fadas, os dois concedendo Passo
+              // Nebuloso). O recurso dedicado é gasto primeiro
+              // (_executarConjuracaoGratis); esgotado, o botão continua
+              // pelo `gratis_usado` do talento.
               const gratisFixa = magiaFixaMagoGratisDisponivel(m.nome);
-              const gratisDisponivel = gratisFixa !== null ? gratisFixa : m.gratis_usado === false;
+              const gratisDisponivel = gratisFixa !== null ? gratisFixa
+                : (magiaRecursoDedicadoGratisDisponivel(m.nome) === true || m.gratis_usado === false);
               const circulos = Object.keys(espacos).filter(c => parseInt(c) >= m.circulo).sort((a, b) => parseInt(a) - parseInt(b));
               const temUpcast = circulos.length > 1;
               // circulosComEspacoDisponivel (nao `espacos`): ver Important 3
@@ -2665,8 +2681,30 @@ export function setupEventosEspacosMagia() {
       aplicarConjuracaoSemEspaco(nome, entrada.circulo, `${nome} conjurada gratuitamente (${origemFixa})!`);
       return;
     }
+    // Issue #76: Inimigo Favorito/Andarilho Feérico (Guardião) e Mapa
+    // Estelar (Druida) gastam o MESMO contador que o painel de recursos
+    // lê -- nunca `entrada.gratis_usado`, que ficaria como um segundo
+    // estado ignorado pelo painel (o bug já encontrado no Ilusionista
+    // nesta issue).
+    if (consumirUsoRecursoDedicadoGratis(nome)) {
+      aplicarConjuracaoSemEspaco(nome, entrada.circulo, `${nome} conjurada gratuitamente (recurso de classe)!`);
+      return;
+    }
     entrada.gratis_usado = true;
-    aplicarConjuracaoSemEspaco(nome, entrada.circulo, `${nome} conjurada gratuitamente (talento)!`);
+    // Issue #76: `origem: 'sempre'` cobre TANTO talento (Iniciado em Magia)
+    // QUANTO característica de classe/subclasse (Contatar Patrono,
+    // Destruição do Paladino, Manto de Majestade, Criaturas Espectrais...)
+    // -- rotular tudo como "(talento)" era impreciso para essas. A nota
+    // extra (ex. "PV pela metade") preserva o aviso que os botões antigos
+    // dedicados desses dois davam, migrados para este único caminho.
+    const NOTA_EXTRA_POR_MAGIA = {
+      'Convocar Feérico': ' PV pela metade.',
+      'Invocar Fera': ' PV pela metade.',
+      'Comando': ' Aparência sobrenatural por 1 minuto (Manto de Majestade).',
+    };
+    const rotulo = entrada.origem === 'sempre' ? 'característica' : 'talento';
+    aplicarConjuracaoSemEspaco(nome, entrada.circulo,
+      `${nome} conjurada gratuitamente (${rotulo})!${NOTA_EXTRA_POR_MAGIA[nome] || ''}`);
   }
 
   // Conjurar magia gratuitamente (talentos: 1x por descanso longo; Maestria
@@ -2683,8 +2721,12 @@ export function setupEventosEspacosMagia() {
 
       const nome = btn.dataset.conjurarGratis;
       const gratisFixa = magiaFixaMagoGratisDisponivel(nome);
+      // Mesmo OR de gratisDisponivel na renderização, acima: um Andarilho
+      // Feérico com Tocado Por Fadas tem dois recursos para "Passo
+      // Nebuloso" -- achar a entrada só pelo recurso do Guardião perderia o
+      // clique quando ele esgota mas o `gratis_usado` do talento continua.
       const entrada = char.magias_preparadas.find(m => m.nome === nome
-        && (gratisFixa !== null ? gratisFixa : m.gratis_usado === false));
+        && (gratisFixa !== null ? gratisFixa : (magiaRecursoDedicadoGratisDisponivel(nome) === true || m.gratis_usado === false)));
       if (!entrada) return;
 
       // Verificar conflito de concentração

@@ -8,6 +8,8 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { abrirModal, bonusProficiencia, calcMod, coletarCAsAlternativas, detectarRecarga, ehHabilidadeAtiva, equipamentoDeCA, escHtml, escolherCAAlternativa, fmtMod, getDeslocamento, mdParaHtml, semAcento, toast } from '../utils.js';
+import { featureConcedeUsoGratisSemEspaco } from '../levelup.js';
+import { featureTemUsoGratisPorRecursoDedicado } from '../regras-usos-gratis-magia.js';
 import { _abrirEscolhaAnimalFuria, getEstadoFuria } from './classes/barbaro.js';
 import { getEstadoInspiracaoBardo } from './classes/bardo.js';
 import { abrirModalPactoDoTomo, abrirModalRecursosBruxo, getEstadoRecursosBruxo, recuperarEspacosMagiaBruxo } from './classes/bruxo.js';
@@ -654,12 +656,9 @@ export function setupEventosHabilidades() {
         const metadeNivel = Math.ceil(nivelNa(char, 'Druida') / 2);
         toast(`Recuperação Natural — recupere até ${metadeNivel} círculos de slots (nenhum 6+). Marque manualmente nos slots.`, 'success');
       }
-      // Mapa Estelar — Raio Guia grátis
-      if (acao === 'mapa_estelar') {
-        if (estado.mapaEstelarDisponiveis <= 0) { toast('Sem usos grátis de Raio Guia.', 'error'); return; }
-        sub.estrelas.mapa_estelar_usos_gastos += 1;
-        toast(`Raio Guia conjurado sem slot! Restantes: ${estado.mapaEstelarDisponiveis - 1}/${estado.mapaEstelarMax}`, 'success');
-      }
+      // Mapa Estelar migrou para o botão "Grátis" da lista de Magias
+      // (issue #76) -- conjura de verdade, em vez de só marcar um contador
+      // aqui.
       // Presságio Cósmico — usar reação
       if (acao === 'pressagio_usar') {
         if (estado.pressagioDisponiveis <= 0) { toast('Sem usos de Presságio Cósmico.', 'error'); return; }
@@ -780,15 +779,6 @@ export function setupEventosHabilidades() {
           toast('Magia Fascinante restaurada (1 uso de Inspiração gasto).', 'success');
           break;
         }
-
-        case 'glamour_manto_majestade':
-          if (glamour.manto_majestade_usado) {
-            toast('Manto de Majestade já usado.', 'error');
-            return;
-          }
-          glamour.manto_majestade_usado = true;
-          toast('Manto de Majestade ativado por 1 minuto! Comando como Ação Bônus.', 'success');
-          break;
 
         case 'glamour_majestade_inquebravel':
           if (glamour.majestade_inquebravel_usada) {
@@ -1596,15 +1586,6 @@ export function setupEventosHabilidades() {
         toast('Canalizar Divindade usado! Sentido Divino ou opção de subclasse ativado.', 'success');
       }
 
-      if (acao === 'destruicao-gratuita') {
-        if (estado.destruicaoGratuitaUsada) {
-          toast('Destruição gratuita já usada neste descanso.', 'error');
-          return;
-        }
-        char.recursos.paladino.destruicao_gratuita_usada = true;
-        toast('Destruição Divina conjurada sem gastar espaço de magia!', 'success');
-      }
-
       salvar();
       renderFichaCompleta();
     });
@@ -2312,19 +2293,11 @@ export function setupEventosHabilidades() {
         }
       }
 
-      // Ilusionista: Criaturas Espectrais e Autoimagem Ilusória
+      // Ilusionista: Autoimagem Ilusória (Criaturas Espectrais migrou para o
+      // botão "Grátis" da lista de Magias, issue #76 -- conjura de verdade
+      // via aplicarConjuracaoSemEspaco, em vez de só marcar uma flag aqui)
       if (sub === 'Ilusionista' && char.recursos.mago.subclasses?.ilusionista) {
         const s = char.recursos.mago.subclasses.ilusionista;
-        if (acao === 'espectrais_feerica') {
-          if (s.feerica_usada) { toast('Convocar Feérico grátis já usado.', 'error'); return; }
-          s.feerica_usada = true;
-          toast('Convocar Feérico conjurado gratuitamente! PV pela metade.', 'success');
-        }
-        if (acao === 'espectrais_fera') {
-          if (s.fera_usada) { toast('Invocar Fera grátis já usado.', 'error'); return; }
-          s.fera_usada = true;
-          toast('Invocar Fera conjurado gratuitamente! PV pela metade.', 'success');
-        }
         if (acao === 'autoimagem_usar') {
           if (s.autoimagem_usada) { toast('Autoimagem Ilusória já usada.', 'error'); return; }
           s.autoimagem_usada = true;
@@ -2779,6 +2752,34 @@ function detectarSubHabilidades(descricao) {
 }
 
 /**
+ * Lê o estado de uso de uma habilidade em `char.usos_habilidades[key]` --
+ * booleano (1 uso) ou numérico (múltiplos usos, migrado de booleano na
+ * primeira leitura). Devolve `{usosAtual, usado}`; não persiste nada além
+ * da migração booleano->número, que já mutava `char.usos_habilidades`
+ * antes desta extração (issue #76, Fase A: a mesma lógica vivia copiada em
+ * habilidades.js e sheet/caracteristicas.js -- terceiro leitor a mais
+ * teria sido a terceira cópia, não a primeira).
+ *
+ * @param {string} key Chave em `char.usos_habilidades` (ex.: "classe_Fúria").
+ * @param {number|null} usosMax Máximo de usos, ou null/1 para 1 uso (toggle).
+ * @param {boolean} temMultiplosUsos `usosMax && usosMax > 1 && recarga`.
+ */
+export function lerUsoHabilidade(key, usosMax, temMultiplosUsos) {
+  if (!char.usos_habilidades) char.usos_habilidades = {};
+  let usosAtual = 0;
+  if (temMultiplosUsos) {
+    if (typeof char.usos_habilidades[key] === 'number') {
+      usosAtual = char.usos_habilidades[key];
+    } else if (char.usos_habilidades[key] === true) {
+      usosAtual = usosMax; // Migrar de boolean para número
+      char.usos_habilidades[key] = usosMax;
+    }
+  }
+  const usado = temMultiplosUsos ? usosAtual >= usosMax : (char.usos_habilidades[key] || false);
+  return { usosAtual, usado };
+}
+
+/**
  * Item de uma caracteristica, no contexto de UMA classe.
  * @param {object} f - a caracteristica
  * @param {'classe'|'subclasse'} source
@@ -2798,6 +2799,17 @@ export function renderFeatureItem(f, source, ctx) {
   // Detectar usos máximos e sub-habilidades
   let usosMax = detectarUsosMaximos(f.descricao);
   const subHabilidades = detectarSubHabilidades(f.descricao);
+  // Issue #76: características cuja magia concedida já tem uso grátis
+  // controlado pela lista de Magias (booleano `gratis_usado` OU contador
+  // de recurso dedicado, regras-usos-gratis-magia.js) não podem TAMBÉM
+  // ganhar o toggle/contador genérico abaixo (`data-toggle-uso`/
+  // `data-usar-habilidade`, `char.usos_habilidades`) -- seria uma segunda
+  // UI, com bookkeeping PRÓPRIO, mostrando um estado que a lista de Magias
+  // nem lê. Não conjura nada (ao contrário do bug já corrigido do
+  // Ilusionista/Paladino/Bardo), mas ainda assim mostra "Disponível"
+  // depois de já ter sido gasto na lista.
+  const gratisJaControladoPelaListaDeMagias = featureConcedeUsoGratisSemEspaco(f.descricao, f.nome)
+    || featureTemUsoGratisPorRecursoDedicado(f.nome);
   const ehCanalizarDivindadeClerigo = ctx.classe === 'Clérigo' && f.nome === 'Canalizar Divindade';
   const ehGolpesAbencoadosClerigo = ctx.classe === 'Clérigo' && f.nome === 'Golpes Abençoados';
   const ehIntervencaoDivinaClerigo = ctx.classe === 'Clérigo' && f.nome === 'Intervenção Divina';
@@ -2846,11 +2858,11 @@ export function renderFeatureItem(f, source, ctx) {
   const ehLuaPassoLunar = ehSubclasseDruida && ctx.subclasse === 'Círculo da Lua' && f.nome === 'Passo Lunar';
   // Círculo da Terra
   const ehTerraRecuperacao = ehSubclasseDruida && ctx.subclasse === 'Círculo da Terra' && f.nome === 'Recuperação Natural';
-  // Círculo das Estrelas
+  // Círculo das Estrelas (Mapa Estelar migrou para o botão "Grátis" da
+  // lista de Magias -- issue #76 -- e não tem mais botão próprio aqui)
   const ehEstrelasForma = ehSubclasseDruida && ctx.subclasse === 'Círculo das Estrelas' && f.nome === 'Forma Estrelada';
-  const ehEstrelasMapa = ehSubclasseDruida && ctx.subclasse === 'Círculo das Estrelas' && f.nome === 'Mapa Estelar';
   const ehEstrelasPresagio = ehSubclasseDruida && ctx.subclasse === 'Círculo das Estrelas' && f.nome === 'Presságio Cósmico';
-  const estadoDruidaSub = (ehLuaPassoLunar || ehTerraRecuperacao || ehEstrelasMapa || ehEstrelasPresagio || ehEstrelasForma) ? getEstadoRecursosDruida() : null;
+  const estadoDruidaSub = (ehLuaPassoLunar || ehTerraRecuperacao || ehEstrelasPresagio || ehEstrelasForma) ? getEstadoRecursosDruida() : null;
 
   // Bardo: deteccao de Inspiracao de Bardo para handler dedicado
   const ehInspiracaoBardo = ctx.classe === 'Bardo' && f.nome === 'Inspiração de Bardo';
@@ -2924,7 +2936,6 @@ export function renderFeatureItem(f, source, ctx) {
   const ehPaladino = ctx.classe === 'Paladino';
   const ehMaosConsagradasPaladino = ehPaladino && f.nome === 'Mãos Consagradas';
   const ehCanalizarPaladino = ehPaladino && f.nome === 'Canalizar Divindade';
-  const ehDestruicaoPaladino = ehPaladino && f.nome === 'Destruição do Paladino';
   const ehAuraProtecaoPaladino = ehPaladino && f.nome === 'Aura de Proteção';
   const ehGolpesRadiantesPaladino = ehPaladino && f.nome === 'Golpes Radiantes';
   const ehMaestriaPaladino = ehPaladino && f.nome === 'Maestria em Arma';
@@ -3006,10 +3017,10 @@ export function renderFeatureItem(f, source, ctx) {
   const ehAdivinhadorTerceiroOlho = ehSubclasseMago && ctx.subclasse === 'Adivinhador' && f.nome === 'O Terceiro Olho';
   // Evocador
   const ehEvocadorSobrecarga = ehSubclasseMago && ctx.subclasse === 'Evocador' && f.nome === 'Sobrecarga';
-  // Ilusionista
-  const ehIlusionistaEspectrais = ehSubclasseMago && ctx.subclasse === 'Ilusionista' && f.nome === 'Criaturas Espectrais';
+  // Ilusionista (Criaturas Espectrais migrou para o botão "Grátis" da lista
+  // de Magias -- issue #76 -- e não usa mais estadoMagoSub aqui)
   const ehIlusionistaAutoimagem = ehSubclasseMago && ctx.subclasse === 'Ilusionista' && f.nome === 'Autoimagem Ilusória';
-  const estadoMagoSub = (ehAbjuradorProtecao || ehAdivinhadorProdigio || ehAdivinhadorTerceiroOlho || ehEvocadorSobrecarga || ehIlusionistaEspectrais || ehIlusionistaAutoimagem) ? getEstadoRecursosMago() : null;
+  const estadoMagoSub = (ehAbjuradorProtecao || ehAdivinhadorProdigio || ehAdivinhadorTerceiroOlho || ehEvocadorSobrecarga || ehIlusionistaAutoimagem) ? getEstadoRecursosMago() : null;
 
   if (ehLuzLabareda && (ctx.nivelClasse || 1) >= 6) recarga = 'curto_ou_longo';
 
@@ -3070,7 +3081,8 @@ export function renderFeatureItem(f, source, ctx) {
   // Colégio do Glamour
   const ehGlamourMagiaFascinante = ehSubclasseBardo && ctx.subclasse === 'Colégio do Glamour' && f.nome === 'Magia Fascinante';
   const ehGlamourMantoInspiracao = ehSubclasseBardo && ctx.subclasse === 'Colégio do Glamour' && f.nome === 'Manto de Inspiração';
-  const ehGlamourMantoMajestade = ehSubclasseBardo && ctx.subclasse === 'Colégio do Glamour' && f.nome === 'Manto de Majestade';
+  // Manto de Majestade migrou para o botão "Grátis" da lista de Magias
+  // (issue #76) -- não tem mais bookkeeping/botão próprio aqui.
   const ehGlamourMajestadeInquebravel = ehSubclasseBardo && ctx.subclasse === 'Colégio do Glamour' && f.nome === 'Majestade Inquebrável';
 
   // Clérigo: features de nível alto faltantes
@@ -3134,16 +3146,7 @@ export function renderFeatureItem(f, source, ctx) {
   const ehDevocaoResplendorSagrado = ehSubclassePaladino && ehDevocao && f.nome === 'Resplendor Sagrado';
 
   // Para habilidades com múltiplos usos, usar contador
-  let usosAtual = 0;
-  if (temMultiplosUsos) {
-    if (typeof char.usos_habilidades[key] === 'number') {
-      usosAtual = char.usos_habilidades[key];
-    } else if (char.usos_habilidades[key] === true) {
-      usosAtual = usosMax; // Migrar de boolean para número
-      char.usos_habilidades[key] = usosMax;
-    }
-  }
-  const usado = temMultiplosUsos ? usosAtual >= usosMax : (char.usos_habilidades[key] || false);
+  const { usosAtual, usado } = lerUsoHabilidade(key, usosMax, temMultiplosUsos);
   const estadoClerigo = (ehCanalizarDivindadeClerigo || ehIntervencaoDivinaClerigo || ehIntervencaoDivinaMaiorClerigo || ehGolpesAbencoadosClerigo
     || ehGuerraBencaoDeus || ehLuzBrilho || ehVidaPreservar
     || ehGuerraAtaqueDirecionado || ehTrapacaInvocar)
@@ -3552,21 +3555,6 @@ export function renderFeatureItem(f, source, ctx) {
         <span style="font-size:0.75rem;color:var(--text-muted)">${modCar} criaturas: ${2 * dadoInsp} PVT + mover sem provocar</span>
       </div>
     `;
-  } else if (ehGlamourMantoMajestade) {
-    // Glamour: Manto de Majestade (nv6) — 1x/longo
-    if (!char.recursos) char.recursos = {};
-    if (!char.recursos.bardo) char.recursos.bardo = { subclasses: { glamour: {} } };
-    if (!char.recursos.bardo.subclasses) char.recursos.bardo.subclasses = { glamour: {} };
-    if (!char.recursos.bardo.subclasses.glamour) char.recursos.bardo.subclasses.glamour = {};
-    const usado = !!char.recursos.bardo.subclasses.glamour.manto_majestade_usado;
-    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${usado ? 'Usado' : 'Disponível'}</span>`;
-    usosHtmlBody = `
-      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
-        <button class="btn btn-sm ${usado ? 'btn-secondary' : 'btn-accent'}" data-bardo-subclasse-acao="glamour_manto_majestade" ${usado ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Ativar Manto de Majestade</button>
-        <span style="font-size:0.75rem;color:var(--text-muted)">Ação Bônus: Comando sem espaço + aura 1 min</span>
-      </div>
-    `;
-    recarga = 'longo';
   } else if (ehGlamourMajestadeInquebravel) {
     // Glamour: Majestade Inquebrável (nv14) — 1x/curto ou longo
     if (!char.recursos) char.recursos = {};
@@ -3855,16 +3843,6 @@ export function renderFeatureItem(f, source, ctx) {
         <span style="font-size:0.75rem;color:var(--text-muted)">Gasta 1 uso de Forma Selvagem</span>
       </div>
     `;
-  } else if (ehEstrelasMapa && estadoDruidaSub) {
-    // Círculo das Estrelas nv3: Mapa Estelar — SAB mod Raio Guia grátis/longo
-    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoDruidaSub.mapaEstelarDisponiveis}/${estadoDruidaSub.mapaEstelarMax}</span>`;
-    usosHtmlBody = `
-      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
-        <button class="btn btn-sm btn-accent" data-druida-subclasse-acao="mapa_estelar" ${estadoDruidaSub.mapaEstelarDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Conjurar Raio Guia (grátis)</button>
-        <span style="font-size:0.75rem;color:var(--text-muted)">Raio Guia sem gastar espaço de magia</span>
-      </div>
-    `;
-    recarga = 'longo';
   } else if (ehEstrelasPresagio && estadoDruidaSub) {
     // Círculo das Estrelas nv6: Presságio Cósmico — SAB mod reações/longo + tipo par/ímpar
     const tipo = estadoDruidaSub.pressagioTipo;
@@ -4649,15 +4627,6 @@ export function renderFeatureItem(f, source, ctx) {
       </div>
     `;
     recarga = 'curto_ou_longo';
-  } else if (ehDestruicaoPaladino && estadoPaladino) {
-    usosHtmlSummary = estadoPaladino.destruicaoGratuitaAtiva ? `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoPaladino.destruicaoGratuitaUsada ? 'Usada' : 'Disponível'}</span>` : '';
-    usosHtmlBody = estadoPaladino.destruicaoGratuitaAtiva ? `
-      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
-        <button class="btn btn-sm btn-primary" data-paladino-acao="destruicao-gratuita" ${estadoPaladino.destruicaoGratuitaUsada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Destruição Gratuita (sem espaço)</button>
-        <span style="font-size:0.75rem;color:var(--text-muted)">1x por Descanso Longo</span>
-      </div>
-    ` : '';
-    recarga = 'longo';
   } else if (ehAuraProtecaoPaladino && estadoPaladino && estadoPaladino.auraProtecaoAtiva) {
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">+${estadoPaladino.bonusAura} (${estadoPaladino.auraRaio}m)</span>`;
     usosHtmlBody = `
@@ -5083,15 +5052,6 @@ export function renderFeatureItem(f, source, ctx) {
         </span>
       </div>
     `;
-  } else if (ehIlusionistaEspectrais && estadoMagoSub && estadoMagoSub.criaturasEspectraisAtiva) {
-    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${!estadoMagoSub.feericaUsada || !estadoMagoSub.feraUsada ? 'Disponível' : 'Usadas'}</span>`;
-    usosHtmlBody = `
-      <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
-        <button class="btn btn-sm ${estadoMagoSub.feericaUsada ? 'btn-secondary' : 'btn-accent'}" data-mago-subclasse-acao="espectrais_feerica" ${estadoMagoSub.feericaUsada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Convocar Feérico (Grátis)</button>
-        <button class="btn btn-sm ${estadoMagoSub.feraUsada ? 'btn-secondary' : 'btn-accent'}" data-mago-subclasse-acao="espectrais_fera" ${estadoMagoSub.feraUsada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Invocar Fera (Grátis)</button>
-        <span style="font-size:0.75rem;color:var(--text-muted)">PV pela metade | Descanso Longo</span>
-      </div>
-    `;
   } else if (ehIlusionistaAutoimagem && estadoMagoSub && estadoMagoSub.autoimagemAtiva) {
     const usado = estadoMagoSub.autoimagemUsada;
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${usado ? 'Usada' : 'Disponível'}</span>`;
@@ -5158,7 +5118,9 @@ export function renderFeatureItem(f, source, ctx) {
     }
   }
 
-  if (!usosHtmlBody && temMultiplosUsos) {
+  if (gratisJaControladoPelaListaDeMagias) {
+    usosHtmlSummary = `<span style="font-size:0.7rem;color:var(--text-muted)" title="Controlado pelo botão &quot;Grátis&quot; na lista de Magias">Ver Magias</span>`;
+  } else if (!usosHtmlBody && temMultiplosUsos) {
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${usosMax - usosAtual}/${usosMax}</span>`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:4px;padding:4px 0 4px 16px">

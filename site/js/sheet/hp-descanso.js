@@ -1061,7 +1061,6 @@ export function setupEventosDescanso() {
       // subclasseDe: subclasse NA classe Bardo, nao o espelho.
       if (subclasseDe(char, 'Bardo') === 'Colégio do Glamour' && char.recursos.bardo?.subclasses?.glamour) {
         char.recursos.bardo.subclasses.glamour.magia_fascinante_usada = false;
-        char.recursos.bardo.subclasses.glamour.manto_majestade_usado = false;
         char.recursos.bardo.subclasses.glamour.majestade_inquebravel_usada = false;
       }
     }
@@ -1254,7 +1253,6 @@ export function setupEventosDescanso() {
       if (estado) {
         char.recursos.paladino.maos_consagradas_gastos = 0;
         char.recursos.paladino.canalizar_divindade_usos_gastos = 0;
-        char.recursos.paladino.destruicao_gratuita_usada = false;
 
         // Glória: restaurar recursos de subclasse
         // subclasseDe: subclasse NA classe Paladino, nao o espelho.
@@ -1369,10 +1367,10 @@ export function setupEventosDescanso() {
           if (subclasseDe(char, 'Mago') === 'Evocador' && char.recursos.mago.subclasses.evocador) {
             char.recursos.mago.subclasses.evocador.sobrecarga_usos = 0;
           }
-          // Ilusionista: Criaturas Espectrais + Autoimagem restauram
+          // Ilusionista: Autoimagem restaura (Criaturas Espectrais migrou
+          // para gratis_usado -- restaurado pelo reset genérico de
+          // magias_preparadas em outro ponto do Descanso Longo)
           if (subclasseDe(char, 'Mago') === 'Ilusionista' && char.recursos.mago.subclasses.ilusionista) {
-            char.recursos.mago.subclasses.ilusionista.feerica_usada = false;
-            char.recursos.mago.subclasses.ilusionista.fera_usada = false;
             char.recursos.mago.subclasses.ilusionista.autoimagem_usada = false;
           }
         }

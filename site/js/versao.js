@@ -13,13 +13,47 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.0.8';
+export const VERSAO_ATUAL = '3.0.9';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.0.9',
+    data: '2026-09-20',
+    rotulo: 'Mais botões Grátis',
+    resumo: 'Magias concedidas por Contatar Patrono, Destruição do '
+      + 'Paladino, Montaria Fiel, Inimigo Favorito, Reforços Feéricos, '
+      + 'Andarilho Nebuloso e Mapa Estelar ganham o botão "Grátis" na '
+      + 'lista de Magias; Criaturas Espectrais (Ilusionista) e Manto de '
+      + 'Majestade (Bardo) migram do botão próprio no painel de '
+      + 'Características para o mesmo botão único.',
+    correcoes: [
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'Truques/magias concedidos por características de classe ou '
+            + 'subclasse com uso grátis limitado (Contatar Patrono do '
+            + 'Bruxo, Destruição do Paladino, Montaria Fiel, Inimigo '
+            + 'Favorito e Reforços Feéricos/Andarilho Nebuloso do '
+            + 'Guardião, Mapa Estelar da Druida do Círculo das Estrelas) '
+            + 'não tinham o botão "Grátis" na lista principal de Magias — '
+            + 'agora têm, com contagem certa mesmo quando o uso é '
+            + 'múltiplo ou escala pelo modificador de um atributo. (#76)',
+          'Criaturas Espectrais (Ilusionista), Manto de Majestade (Bardo '
+            + 'do Colégio do Glamour) e Destruição do Paladino tinham um '
+            + 'botão PRÓPRIO no card de Características de Classe que só '
+            + 'avisava "conjurado gratuitamente" sem conjurar de verdade '
+            + 'nem concordar com o botão "Grátis" da lista de Magias — dava '
+            + 'para clicar os dois e conjurar de graça mais vezes do que o '
+            + 'livro permite. Os botões antigos foram removidos; o '
+            + 'controle agora vive só na lista de Magias. (#76)',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.0.8',
     data: '2026-09-18',

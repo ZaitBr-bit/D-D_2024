@@ -138,6 +138,15 @@ export function migrarMagiasSemprePreparadas() {
   let alterado = false;
   let slotsLiberados = 0;
   const nomesSempre = new Set((magiasSempreCache || []).map(m => m.nome));
+  // Issue #76: nomes cuja característica TAMBÉM concede conjuração sem
+  // gastar espaço de magia (Contatar Patrono, Destruição do Paladino...).
+  // `subirDeNivel` já grava `gratis_usado:false` ao conceder a magia
+  // (levelup.js:_concederMagiaAutomatica); esta função cobre a ficha
+  // ANTIGA, que ganhou a entrada 'sempre' antes desta correção existir e
+  // nunca vai passar por `subirDeNivel` de novo -- sem isto, só personagem
+  // NOVO ganharia o botão "Grátis".
+  const nomesGratisSemEspaco = new Set(
+    (magiasSempreCache || []).filter(m => m.gratisSemEspaco).map(m => m.nome));
 
   // Higienização: remove magias marcadas como "sempre" que não estão mais
   // na lista real de magias sempre preparadas (corrige parsing antigo/errado)
@@ -152,6 +161,10 @@ export function migrarMagiasSemprePreparadas() {
     if (nomesSempre.has(m.nome) && m.origem !== 'dominio' && m.origem !== 'sempre' && m.origem !== 'especie_legado') {
       m.origem = 'sempre';
       slotsLiberados++;
+      alterado = true;
+    }
+    if (m.origem === 'sempre' && nomesGratisSemEspaco.has(m.nome) && m.gratis_usado === undefined) {
+      m.gratis_usado = false;
       alterado = true;
     }
   });

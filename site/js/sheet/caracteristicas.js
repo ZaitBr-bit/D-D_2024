@@ -5,7 +5,7 @@
 import { bonusProficiencia, calcMod, detectarRecarga, ehHabilidadeAtiva, escHtml, mdParaHtml } from '../utils.js';
 import { char, especiesCache } from './estado.js';
 import { contextosDeClasse } from './contexto-classe.js';
-import { detectarUsosMaximos, renderFeatureItem } from './habilidades.js';
+import { detectarUsosMaximos, lerUsoHabilidade, renderFeatureItem } from './habilidades.js';
 
 /**
  * Bloco de caracteristicas de UMA classe, filtrado pelo nivel NAQUELA
@@ -316,16 +316,7 @@ function renderTracoEspecie(traco, herdaAncestralidade = false, ehSubRevelacao =
 
   const temMultiplosUsos = usosMax && usosMax > 1 && recarga;
 
-  let usosAtual = 0;
-  if (temMultiplosUsos) {
-    if (typeof char.usos_habilidades[key] === 'number') {
-      usosAtual = char.usos_habilidades[key];
-    } else if (char.usos_habilidades[key] === true) {
-      usosAtual = usosMax;
-      char.usos_habilidades[key] = usosMax;
-    }
-  }
-  const usado = temMultiplosUsos ? usosAtual >= usosMax : (char.usos_habilidades[key] || false);
+  const { usosAtual, usado } = lerUsoHabilidade(key, usosMax, temMultiplosUsos);
 
   const recargaBadge = recarga
     ? `<span class="badge" style="font-size:0.65rem;margin-left:4px;background:${recarga === 'longo' ? 'var(--info)' : recarga === 'curto' ? 'var(--success)' : 'var(--warning)'};color:#fff">${recarga === 'longo' ? '🌙 Desc. Longo' : recarga === 'curto' ? '☀ Desc. Curto' : '☀🌙 Curto/Longo'}</span>`

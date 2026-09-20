@@ -119,7 +119,13 @@ export async function modulosApp() {
          // Issue #58: setupEventosEdicao() liga o botao #btn-editar-ficha,
          // que abre o modal com a nova secao "idiomas" -- consumido pelos
          // oraculos de edicao-idiomas.test.mjs.
-         sheetEdicao] = await Promise.all([
+         sheetEdicao,
+         // Issue #76 (Fase C): o adaptador de uso gratis de magia por
+         // recurso dedicado (Inimigo Favorito/Andarilho Feerico do
+         // Guardiao), consumido via
+         // regrasUsosGratisMagia.magiaRecursoDedicadoGratisDisponivel/
+         // consumirUsoRecursoDedicadoGratis.
+         regrasUsosGratisMagia] = await Promise.all([
     importar('site/js/regras-cobertura.js'),
     importar('site/js/talentos-effects.js'),
     importar('site/js/store.js'),
@@ -197,6 +203,7 @@ export async function modulosApp() {
     importar('site/js/sheet/item-customizado-form.js'),
     importar('site/js/regras-sintonizacao.js'),
     importar('site/js/sheet/edicao.js'),
+    importar('site/js/regras-usos-gratis-magia.js'),
   ]);
   // Um modulo de classe por nome de ARQUIVO (minusculo, sem acento -- ex.:
   // sheetClasses.clerigo, sheetClasses.paladino), e nao pelo nome que o app
@@ -215,7 +222,8 @@ export async function modulosApp() {
              fichaEdicoes, fichaEdicaoValidacoes, multiclasse, home, multiclasseConjuracao,
              multiclasseProgressao, contextoClasse, sheetCaracteristicas, sheetFicha,
              proficiencias, magiaClasse, regrasPreparoMagias, sheetClasses, sheetHabilidades,
-             sheetMaestrias, sheetHpDescanso, sheetCombate, itemCustomForm, sintonizacao, sheetEdicao };
+             sheetMaestrias, sheetHpDescanso, sheetCombate, itemCustomForm, sintonizacao, sheetEdicao,
+             regrasUsosGratisMagia };
   return _cache;
 }
 

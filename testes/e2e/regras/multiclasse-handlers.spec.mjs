@@ -291,7 +291,6 @@ const RECURSOS_SEMEADOS = {
   paladino: {
     maos_consagradas_gastos: 0,
     canalizar_divindade_usos_gastos: 1,
-    destruicao_gratuita_usada: false,
   },
 };
 
