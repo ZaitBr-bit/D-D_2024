@@ -11,6 +11,7 @@ import { contextoDeSubida, pvGanhoAoSubir } from './regras-multiclasse-progressa
 import { classesDe, migrarParaMulticlasse, nivelNa, sincronizarEspelhos, subclasseDe, temClasse } from './regras-multiclasse.js';
 import { conjuraPorAlgumaClasse } from './regras-multiclasse-conjuracao.js';
 import { armadurasDoPersonagem, concessoesAoEntrarEm } from './regras-multiclasse-proficiencias.js';
+import { ORDEM_CLASSE } from './regras-ordem-classe.js';
 import {
   linhasDaSubclasseNoNivel, opcoesDaLinha, truquesConhecidosDe,
   aplicarEscolhaSubclasse, aplicarConcessaoAutomatica,
@@ -1783,6 +1784,36 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     }
   }
 
+  // ORDEM DIVINA (Clérigo) / ORDEM PRIMAL (Druida), issue #59. MESMO gate
+  // de `concessoesNovas` acima -- irmão, não aninhado dentro dele, porque
+  // Ordem Divina/Primal não vem de `concessoesAoEntrarEm` (essa função
+  // resolve proficiências reduzidas de multiclasse; Ordem é uma escolha à
+  // parte, que o criador já pedia para a classe INICIAL). `ORDEM_CLASSE`
+  // só tem entrada para Clérigo/Druida -- as outras nove classes caem no
+  // `if` como `undefined` e pulam o bloco inteiro.
+  const ordemPendente = sub.ehPrimeiroNivelNaClasse && !sub.ehPrimeiroNivelDoPersonagem
+    ? ORDEM_CLASSE[sub.classe] || null
+    : null;
+  if (ordemPendente) {
+    const escolha = opcoes.ordem_classe_nova;
+    if (!escolha) {
+      return {
+        sucesso: false,
+        pendente: true,
+        tipo_pendencia: 'ordem_classe_nova',
+        mensagem: `Escolha ${ordemPendente.titulo} (${sub.classe}).`,
+      };
+    }
+    if (!ordemPendente.opcoes.some((op) => op.nome === escolha)) {
+      return {
+        sucesso: false,
+        pendente: true,
+        tipo_pendencia: 'ordem_classe_nova',
+        mensagem: `"${escolha}" não é uma opção válida de ${ordemPendente.titulo}.`,
+      };
+    }
+  }
+
   // CRESCIMENTO DO CONJURADOR RITUALISTA (Talentos.md:370).
   //
   // `sub.nivelTotalNovo` e obrigatorio aqui: `personagem.nivel` ainda e o
@@ -2059,6 +2090,40 @@ export async function subirDeNivel(personagem, opcoes = {}) {
         if (!Array.isArray(personagem.proficiencias_instrumentos)) personagem.proficiencias_instrumentos = [];
         if (!personagem.proficiencias_instrumentos.includes(opcoes.instrumento_classe_nova)) {
           personagem.proficiencias_instrumentos.push(opcoes.instrumento_classe_nova);
+        }
+      }
+    }
+
+    // Ordem Divina (Clérigo) / Ordem Primal (Druida), issue #59. Reusa
+    // `ordemPendente` (calculado lá em cima, junto da pendência) -- mesmo
+    // motivo do "MINOR 1" logo acima: se a pendência não validou nada, a
+    // escrita também não roda.
+    if (ordemPendente) {
+      const chave = ordemPendente === ORDEM_CLASSE['Clérigo'] ? 'ordem_divina' : 'ordem_primal';
+      if (!personagem.escolhas_classe) personagem.escolhas_classe = {};
+      personagem.escolhas_classe[chave] = [opcoes.ordem_classe_nova];
+
+      // Proteção de "Protetor": armas Marciais + armadura (Pesada pro
+      // Clérigo, Média pra Druida) -- MESMO texto literal que
+      // creator/wizard.js grava na criação, para bater com o que
+      // temProficienciaArma/temProficienciaArmadura (regras-equipamento.js)
+      // já sabem ler em `proficiencias_extra`. Arma/armadura de PROFICIÊNCIA
+      // DE CLASSE não entram aqui de propósito (comentário "ARMADURA E ARMA
+      // NAO ENTRAM AQUI" acima) -- isto é diferente: é o bônus da ORDEM, que
+      // o livro concede por cima da proficiência normal da classe, e sempre
+      // foi gravado como proficiência EXTRA, nunca derivado de `classes[]`.
+      const opcaoEscolhida = ordemPendente.opcoes.find((op) => op.nome === opcoes.ordem_classe_nova);
+      if (opcaoEscolhida?.efeito?.armas?.includes('Marcial')) {
+        if (!Array.isArray(personagem.proficiencias_extra)) personagem.proficiencias_extra = [];
+        if (!personagem.proficiencias_extra.includes('Armas Marciais')) {
+          personagem.proficiencias_extra.push('Armas Marciais');
+        }
+      }
+      for (const categoriaArmadura of opcaoEscolhida?.efeito?.armaduras || []) {
+        const rotulo = `Armadura ${categoriaArmadura}`;
+        if (!Array.isArray(personagem.proficiencias_extra)) personagem.proficiencias_extra = [];
+        if (!personagem.proficiencias_extra.includes(rotulo)) {
+          personagem.proficiencias_extra.push(rotulo);
         }
       }
     }

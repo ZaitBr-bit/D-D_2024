@@ -8,6 +8,7 @@
 import { CLASSES_INFO, PERICIAS } from '../dados-classes.js';
 import { mdParaHtml } from '../utils.js';
 import { rotuloPericia } from '../opcoes-dominio.js';
+import { ORDEM_CLASSE } from '../regras-ordem-classe.js';
 import { dadosCache, personagem } from './wizard.js';
 
 // Espécies que exigem seleção entre traços/linhagens
@@ -433,27 +434,16 @@ export const NIVEL_SUBCLASSE = {
 // mapaEstilos como camada de compatibilidade (NÃO REMOVER: apagar aquele
 // mapa faz fichas antigas pararem de reconhecer o estilo escolhido).
 export const CLASSES_ESCOLHAS = {
+  // Ordem Divina/Primal vêm de regras-ordem-classe.js (issue #59): o motor
+  // de subida de nível (levelup-flow.js) precisa da MESMA definição pra
+  // oferecer a escolha quando Clérigo/Druida entram como classe NOVA num
+  // multiclasse -- ver o cabeçalho daquele módulo para o porquê de não
+  // importar CLASSES_ESCOLHAS inteiro de dentro da ficha.
   'Clérigo': {
-    ordem_divina: {
-      titulo: 'Ordem Divina',
-      descricao: 'Escolha seu papel sagrado. Isso afeta suas proficiências e habilidades.',
-      maxEscolhas: 1,
-      opcoes: [
-        { nome: 'Protetor', descricao: 'Proficiência com armas Marciais e Armadura Pesada', efeito: { armaduras: ['Pesada'], armas: ['Marcial'] } },
-        { nome: 'Taumaturgo', descricao: '+1 truque de Clérigo e bônus em Arcanismo/Religião', efeito: { truques_extra: 1 } }
-      ]
-    }
+    ordem_divina: ORDEM_CLASSE['Clérigo']
   },
   'Druida': {
-    ordem_primal: {
-      titulo: 'Ordem Primal',
-      descricao: 'Escolha sua ordem primal. Isso afeta proficiências e conjuração.',
-      maxEscolhas: 1,
-      opcoes: [
-        { nome: 'Protetor', descricao: 'Proficiência com armas Marciais e Armadura Média', efeito: { armaduras: ['Média'], armas: ['Marcial'] } },
-        { nome: 'Xamã', descricao: '+1 truque de Druida e bônus em Arcanismo/Natureza', efeito: { truques_extra: 1 } }
-      ]
-    }
+    ordem_primal: ORDEM_CLASSE['Druida']
   },
   'Guerreiro': {
     estilo_luta: {

@@ -6,7 +6,7 @@ import { exigeManobrasGuerreiro } from './levelup.js';
 import { validarEscolhasTalento } from './regras-cobertura.js';
 import {
   calcularConjuracao, calcularSubclasseArcana,
-  proficienciaClasseNovaCompleta, ritualBonusProficienciaCompleto
+  proficienciaClasseNovaCompleta, ordemClasseNovaCompleta, ritualBonusProficienciaCompleto
 } from './levelup-flow.js';
 
 /**
@@ -139,6 +139,11 @@ export function collectOpcoes(ctx, state) {
   opcoes.pericia_classe_nova = state.periciaClasseNova || undefined;
   opcoes.instrumento_classe_nova = state.instrumentoClasseNova || undefined;
 
+  // Ordem Divina/Primal ao entrar em Clérigo/Druida (issue #59) -- mesma
+  // regra de nome de chave EXATO que os dois campos acima: subirDeNivel
+  // (levelup.js) lê `opcoes.ordem_classe_nova`.
+  opcoes.ordem_classe_nova = state.ordemClasseNovaEscolhida || undefined;
+
   // Magias Rituais do Bônus de Proficiência (Conjurador Ritualista,
   // Talentos.md:370) -- o nome da chave tem de bater EXATAMENTE com o que
   // subirDeNivel lê (opcoes.rituais_bonus_proficiencia, levelup.js), senão
@@ -270,6 +275,13 @@ export function validateAll(ctx, state) {
   if (ctx.concessoesClasseNova && !proficienciaClasseNovaCompleta(ctx, state)) {
     return `Escolha as proficiências concedidas por ${ctx.classeQueSobe} ` +
       '(perícia e/ou Instrumento Musical, no passo "Proficiências da Classe Nova").';
+  }
+
+  // Ordem Divina/Primal ao entrar em Clérigo/Druida (issue #59): mesmo
+  // padrão de checagem amigável acima, delegando em ordemClasseNovaCompleta
+  // (levelup-flow.js) -- a MESMA função que o step 'completo' usa.
+  if (ctx.ordemClasseNovaPendente && !ordemClasseNovaCompleta(ctx, state)) {
+    return `Escolha ${ctx.ordemClasseNovaPendente.titulo} (passo "${ctx.ordemClasseNovaPendente.titulo}").`;
   }
 
   // Magias Rituais do Bônus de Proficiência (Conjurador Ritualista,

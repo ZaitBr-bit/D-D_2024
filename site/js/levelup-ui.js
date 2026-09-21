@@ -14,13 +14,13 @@ import { resolvedorDaLinha, opcoesDaLinhaAsync } from './regras-subclasse-escolh
 import {
   renderCardEscolhaClasse, renderCardGanhosNivel, renderCardSubclasse, renderCardASI,
   renderCardEscolhasClasse, renderCardMagias, renderCardManobrasGuerreiro,
-  renderCardProficienciasClasseNova, renderCardRitualBonus, renderCardRevisao,
+  renderCardProficienciasClasseNova, renderCardOrdemClasseNova, renderCardRitualBonus, renderCardRevisao,
   OPCOES_ESTILO_LUTA_BASE, motivoBloqueio
 } from './levelup-cards.js';
 import { montarSeletor, montarTroca } from './ui-opcoes.js';
 import { deArmas, deEstilosLuta, deMagias, deManobras, deTalentos, motivoPreRequisito, rotuloPericia } from './opcoes-dominio.js';
 import { collectOpcoes, validateAll } from './levelup-validations.js';
-import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, PERICIAS } from './dados-classes.js';
+import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, CLASSES_INFO, PERICIAS } from './dados-classes.js';
 import { getArmas, getClasse, getMagiasPorCirculo, getMagiasClasse, getMagiasRituais } from './db.js';
 import { abrirModal, fecharModal, toast, mdParaHtml, rotuloCirculoSuperiorHtml, semAcento, calcMod, escHtml, getEspacosMagia, bonusProficiencia } from './utils.js';
 import { subirDeNivel, obterAtributosASITalento, getLimiteASITalento, obterTalentosElegiveis } from './levelup.js';
@@ -32,7 +32,11 @@ import { truqueEhTrocavel } from './regras-origens-magia.js';
 import { preparadasPorClasse } from './regras-magia-classe.js';
 import { classeInicial, subclasseDe } from './regras-multiclasse.js';
 import { podeEntrarEm } from './regras-multiclasse-progressao.js';
-import { garantirDadosDeClasses } from './sheet/contexto-classe.js';
+import { garantirDadosDeClasses, definirSuperficieSelecionada } from './sheet/contexto-classe.js';
+// mostrarBuscaMagia (issue #59): a mesma função por trás do botão
+// "Preparar Magias" da ficha (sheet/magias.js:btn-add-magia) -- reusada
+// para abrir automaticamente ao entrar numa classe preparadora nova.
+import { mostrarBuscaMagia } from './sheet/grimorio.js';
 import {
   PERICIAS_TODAS as _PERICIAS_NOMES, FERRAMENTAS_TODAS as _FERRAMENTAS_TODAS,
   FERRAMENTAS_ARTESAO as _FERRAMENTAS_ARTESAO, INSTRUMENTOS_MUSICAIS as _INSTRUMENTOS,
@@ -160,6 +164,9 @@ function renderModal(ctx, state, caches) {
       break;
     case 'proficiencias_classe_nova':
       conteudo = renderCardProficienciasClasseNova(ctx, state);
+      break;
+    case 'ordem_classe_nova':
+      conteudo = renderCardOrdemClasseNova(ctx, state);
       break;
     case 'ritual_bonus_proficiencia':
       conteudo = renderCardRitualBonus(ctx, state);
@@ -456,6 +463,12 @@ function salvarStateDoDOM(ctx, state, step) {
       if (instrumento) state.instrumentoClasseNova = instrumento.value || '';
       break;
     }
+    case 'ordem_classe_nova': {
+      // Mesmo reforço de 'proficiencias_classe_nova' acima (issue #59).
+      const ordem = document.getElementById('select-ordem-classe-nova');
+      if (ordem) state.ordemClasseNovaEscolhida = ordem.value || '';
+      break;
+    }
     case 'ritual_bonus_proficiencia': {
       // Reforço, mesmo padrão de 'proficiencias_classe_nova' logo acima --
       // os checkboxes são NATIVOS e continuam no DOM enquanto o step fica
@@ -504,6 +517,7 @@ function bindEventosStep(ctx, state, step, caches) {
     case 'selecao_magias': bindEventosMagias(ctx, state); break;
     case 'manobras_guerreiro': bindEventosManobrasGuerreiro(ctx, state); break;
     case 'proficiencias_classe_nova': bindEventosProficienciasClasseNova(ctx, state); break;
+    case 'ordem_classe_nova': bindEventosOrdemClasseNova(ctx, state); break;
     case 'ritual_bonus_proficiencia': bindEventosRitualBonusProficiencia(ctx, state); break;
     case 'revisao_confirmacao': bindEventosTrocasOpcionais(ctx, state); break;
   }
@@ -2109,6 +2123,18 @@ function bindEventosProficienciasClasseNova(ctx, state) {
   });
 }
 
+// --- Ordem Divina/Primal ao entrar em Clérigo/Druida (issue #59) ---
+
+/**
+ * Liga o seletor do step 'ordem_classe_nova' ao state -- mesmo padrão de
+ * bindEventosProficienciasClasseNova acima.
+ */
+function bindEventosOrdemClasseNova(ctx, state) {
+  document.getElementById('select-ordem-classe-nova')?.addEventListener('change', (ev) => {
+    state.ordemClasseNovaEscolhida = ev.target.value || '';
+  });
+}
+
 // --- Magias Rituais do Bônus de Proficiência (Conjurador Ritualista) ---
 
 /**
@@ -2280,7 +2306,29 @@ export async function confirmarLevelUp(ctx, state, caches) {
 
     // Resumo
     const resumo = montarResumoFinal(resultado, char, ctx.classeQueSobe, truquesAdicionados, magiasAdicionadas, grimorioAdicionado, trocasMagiaAplicadas, subclasseMagiasAdicionadas, trocasTruqueAplicadas);
-    abrirModal('Subida de Nível Concluída!', resumo, '<button class="btn btn-primary" onclick="fecharModal()">OK</button>');
+    // Issue #59: ao entrar numa classe conjuradora PREPARADORA (Clérigo/
+    // Druida/Paladino/Guardião) pela primeira vez via multiclasse, o
+    // jogador nunca escolhe magias preparadas durante o assistente (isso é
+    // intencional, igual a classe única -- ver o step 'selecao_magias',
+    // levelup-flow.js, que só cobre conjuradores 'conhecidas'). Sem
+    // nenhum aviso, o personagem ficava com a superfície de conjuração
+    // nova e zero magias preparadas até o jogador lembrar de ir na ficha.
+    // `ctx.sub`/`ctx.classeQueSobe` são calculados na ABERTURA da sessão e
+    // não mudam com `subirDeNivel` -- por isso podem ser lidos aqui,
+    // depois da subida, com o mesmo valor de antes dela.
+    const classeVirouPreparadoraNova = ctx.sub.ehPrimeiroNivelNaClasse
+      && !ctx.sub.ehPrimeiroNivelDoPersonagem
+      && CLASSES_INFO[ctx.classeQueSobe]?.tipo_conjuracao === 'preparadas';
+    abrirModal('Subida de Nível Concluída!', resumo, '<button class="btn btn-primary" onclick="fecharModal()">OK</button>', () => {
+      if (classeVirouPreparadoraNova) {
+        // Efeito colateral aceito de propósito: muda a aba de conjuração
+        // ativa da ficha para a classe recém-entrada -- abrir "Preparar
+        // Magias" mirando outra classe sem mudar a aba seria inconsistente
+        // com o resto da tela (sheet/contexto-classe.js).
+        definirSuperficieSelecionada(ctx.classeQueSobe);
+        mostrarBuscaMagia();
+      }
+    });
     // ANTES de re-renderizar: a subida pode ter ABERTO uma classe nova, e
     // o mapa `classesData` foi montado na abertura da ficha, sem ela. Sem
     // esta linha a tela imediatamente posterior a acao principal deste

@@ -13,13 +13,54 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.0.12';
+export const VERSAO_ATUAL = '3.0.13';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.0.13',
+    data: '2026-09-20',
+    rotulo: 'Ordem Divina multiclasse',
+    resumo: 'Multiclasse Clérigo/Druida passa a pedir a escolha de Ordem '
+      + 'Divina/Primal ao entrar na classe, igual o criador sempre pediu. '
+      + 'Além disso, entrar numa classe conjuradora preparadora nova '
+      + '(Clérigo, Druida, Paladino ou Guardião) abre "Preparar Magias" '
+      + 'automaticamente ao fechar o resumo da subida.',
+    correcoes: [
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'Entrar em Clérigo ou Druida pela primeira vez num multiclasse '
+            + 'nunca pedia a escolha de Ordem Divina/Ordem Primal (Protetor/'
+            + 'Taumaturgo, Protetor/Xamã) — o criador sempre pediu isso para '
+            + 'quem começa nessas classes, mas o assistente de subida de '
+            + 'nível nunca oferecia a mesma escolha. Sem ela, o personagem '
+            + 'ficava sem a proficiência do Protetor e sem o truque extra do '
+            + 'Taumaturgo/Xamã. (#59)',
+          'Como consequência da correção acima, o cálculo de truques '
+            + 'ganhos no assistente agora soma corretamente o bônus do '
+            + 'Taumaturgo/Xamã quando a Ordem é escolhida na MESMA subida '
+            + 'que a classe entra — antes esse bônus só valia quando a '
+            + 'Ordem já vinha da criação. (#59)',
+        ],
+      },
+    ],
+    melhorias: [
+      {
+        grupo: '✨ Melhorias',
+        itens: [
+          'Ao fechar o resumo de uma subida que trouxe uma classe '
+            + 'conjuradora PREPARADORA nova (Clérigo, Druida, Paladino ou '
+            + 'Guardião), o modal "Preparar Magias" abre sozinho, mirando a '
+            + 'classe que acabou de entrar — antes o jogador tinha de '
+            + 'lembrar de ir na ficha manualmente. (#59)',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.0.12',
     data: '2026-09-20',

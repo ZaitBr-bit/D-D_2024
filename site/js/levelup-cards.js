@@ -1038,6 +1038,45 @@ export function renderCardProficienciasClasseNova(ctx, state) {
 }
 
 // ============================================================
+// CARD: Ordem Divina/Primal (step 'ordem_classe_nova', issue #59)
+// ============================================================
+
+/**
+ * Mesma casca visual de renderCardProficienciasClasseNova (acima) -- issue
+ * #59: entrar em Clérigo/Druida como classe NOVA via multiclasse nunca
+ * oferecia esta escolha, que o criador (CLASSES_ESCOLHAS) já pede desde
+ * sempre para quem começa nessas classes.
+ */
+export function renderCardOrdemClasseNova(ctx, state) {
+  const o = ctx.ordemClasseNovaPendente;
+  if (!o) return '';
+  const { classeQueSobe } = ctx;
+
+  return `
+    <div class="levelup-card">
+      <div class="levelup-card-header">${escHtml(o.titulo)}</div>
+      <div class="levelup-card-body">
+        <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:10px">
+          ${escHtml(o.descricao)}
+        </div>
+        <div style="margin-bottom:10px">
+          <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:4px">${escHtml(o.titulo)} (escolha 1)</label>
+          <select class="input" id="select-ordem-classe-nova">
+            <option value="">— escolha —</option>
+            ${o.opcoes.map((op) => `<option value="${escHtml(op.nome)}"${state.ordemClasseNovaEscolhida === op.nome ? ' selected' : ''}>${escHtml(op.nome)}</option>`).join('')}
+          </select>
+        </div>
+        ${o.opcoes.map((op) => `
+          <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:2px">
+            <strong>${escHtml(op.nome)}:</strong> ${escHtml(op.descricao)}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
 // CARD: Magias Rituais do Bônus de Proficiência (step 'ritual_bonus_proficiencia')
 // ============================================================
 

@@ -7,6 +7,7 @@ import { linhasDaSubclasseNoNivel, truquesConhecidosDe } from './regras-subclass
 import { contextoDeSubida } from './regras-multiclasse-progressao.js';
 import { classesDe } from './regras-multiclasse.js';
 import { concessoesAoEntrarEm } from './regras-multiclasse-proficiencias.js';
+import { ORDEM_CLASSE } from './regras-ordem-classe.js';
 // INSTRUMENTOS_MUSICAIS vem de regras-cobertura.js, a MESMA copia que
 // levelup.js valida (Ruling 8 da Tarefa 4) -- proficienciaClasseNovaCompleta
 // (abaixo) confere o instrumento escolhido contra ela, para o predicado
@@ -49,9 +50,14 @@ import {
  * @param {Object} helpers - Funções da ficha (getSubclasseConjuradoraConjuracao)
  * @param {Object} sub - contextoDeSubida da classe que sobe (regras-multiclasse-progressao.js)
  * @param {string|null} subclasseEfetiva - Subclasse a considerar
+ * @param {string|null} [ordemClasseNovaEscolhida] - Issue #59: Ordem Divina/
+ *   Primal escolhida NESTA sessão do assistente, ainda não gravada em
+ *   `char` (`state.ordemClasseNovaEscolhida`). Só importa quando a classe
+ *   é NOVA (`sub.ehPrimeiroNivelNaClasse && !ehPrimeiroNivelDoPersonagem`)
+ *   -- ver o comentário do bônus de truques abaixo para o porquê.
  * @returns {{ehConjurador:boolean, tipoConj:string, conjuracao:Object|null}}
  */
-function montarConjuracao(char, classeData, info, helpers, sub, subclasseEfetiva) {
+function montarConjuracao(char, classeData, info, helpers, sub, subclasseEfetiva, ordemClasseNovaEscolhida) {
   // TUDO neste bloco é lido pelo nível NA CLASSE, nunca pelo total: cada
   // número aqui sai da tabela da CLASSE que sobe (truques, magias
   // preparadas, espaços) ou da tabela da SUBCLASSE dela. Um Mago 5/
@@ -85,23 +91,32 @@ function montarConjuracao(char, classeData, info, helpers, sub, subclasseEfetiva
   }
 
   // Truques extras do Clérigo Taumaturgo / Druida Xamã (utils.js, mesma
-  // função que o criador/ficha usam). NO-OP HOJE para o único valor que
-  // este bloco expõe a quem consome: os 3 leitores reais
-  // (levelup-cards.js:renderCardMagias, levelup-ui.js:setupEventListeners,
-  // levelup-validations.js:validateAll) leem só `conjuracao.truquesGanhos`
-  // (a DIFERENÇA truquesNovo-truquesAtual, algumas linhas abaixo) --
-  // ordem_divina/ordem_primal não muda dentro de uma mesma chamada de
-  // subirDeNivel (foi escolhida na criação, nível 1), então o bônus é
-  // IDÊNTICO nos dois lados e se cancela na subtração:
-  // (novo+1)-(atual+1) === novo-atual. Mantido mesmo sendo no-op, por
-  // defesa: truquesAtual/truquesNovo são expostos BRUTOS em `conjuracao`
-  // (objeto retornado logo abaixo) e nada impede um consumidor futuro de
-  // ler um dos dois direto (ex.: um card que mostrasse "Truques: X → Y"
-  // em vez de só o delta) -- sem o bônus aqui, esse consumidor hipotético
-  // exibiria o valor sem o +1. 0 para subclasses conjuradoras (não são
-  // Clérigo/Druida), então soma sem risco nos dois ramos acima.
-  truquesAtual += getBonusTruquesOrdem(char);
-  truquesNovo += getBonusTruquesOrdem(char);
+  // função que o criador/ficha usam). Era NO-OP quando ordem_divina/
+  // ordem_primal só podia ter sido escolhida na criação (nível 1, nunca
+  // dentro da MESMA chamada de subirDeNivel) -- o bônus saía idêntico nos
+  // dois lados e se cancelava na subtração: (novo+1)-(atual+1) === novo-atual.
+  //
+  // Issue #59 quebrou essa premissa: ao entrar em Clérigo/Druida como
+  // classe NOVA, a Ordem é escolhida NESTA MESMA subida (step
+  // 'ordem_classe_nova') -- antes da subida o personagem não tinha ordem
+  // NENHUMA (bônus 0 em truquesAtual, de propósito), e depois tem a que
+  // acabou de escolher (bônus em truquesNovo). Os dois lados NÃO cancelam
+  // mais. `ordemClasseNovaEscolhida` é a escolha PENDENTE desta sessão
+  // (ainda não gravada em `char`) -- só o lado Novo simula um personagem
+  // com ela já escrita; truquesAtual nunca recebe essa simulação.
+  // `sub.classe` (a classe QUE SOBE), não o default de getBonusTruquesOrdem
+  // (`personagem?.classe`, o espelho da classe INICIAL) -- um Guerreiro/
+  // Clérigo(Taumaturgo) que sobe em GUERREIRO não pode herdar o bônus de
+  // truque do Clérigo, e um personagem cuja classe inicial tem Ordem mas
+  // está subindo noutra classe (ex.: Clérigo Taumaturgo/Druida subindo em
+  // Druida) precisa checar a ORDEM PRIMAL da Druida, não a Divina do
+  // espelho. Mesmo cuidado que o docblock de getBonusTruquesOrdem já pede
+  // aos dois chamadores da ficha (sup.classe).
+  truquesAtual += getBonusTruquesOrdem(char, sub.classe);
+  const charComOrdemPendente = ordemClasseNovaEscolhida
+    ? { ...char, escolhas_classe: { ...(char.escolhas_classe || {}), [ORDEM_CLASSE[sub.classe]?.chave]: [ordemClasseNovaEscolhida] } }
+    : char;
+  truquesNovo += getBonusTruquesOrdem(charComOrdemPendente, sub.classe);
 
   // Truques que a subclasse CONCEDE neste nível (Mãos Mágicas do Trapaceiro
   // Arcano) não são escolha do jogador: saem da conta de "novos truques",
@@ -272,6 +287,14 @@ export async function buildLevelUpContext(char, classeData, helpers = {}, nomeCl
   const concessoesClasseNova = sub.ehPrimeiroNivelNaClasse && !sub.ehPrimeiroNivelDoPersonagem
     ? concessoesAoEntrarEm(classeQueSobe)
     : null;
+  // Ordem Divina (Clérigo) / Ordem Primal (Druida), issue #59 -- MESMO gate
+  // de `concessoesClasseNova` acima (só no primeiro nível NAQUELA classe,
+  // nunca no primeiro nível do personagem: a classe inicial já escolheu no
+  // criador). `null` quando a classe que sobe não tem Ordem (todas as
+  // outras) ou quando não é entrada nova.
+  const ordemClasseNovaPendente = sub.ehPrimeiroNivelNaClasse && !sub.ehPrimeiroNivelDoPersonagem
+    ? ORDEM_CLASSE[classeQueSobe] || null
+    : null;
   let manobrasGuerreiro = null;
   if (sub.classe === 'Guerreiro') {
     const opcoesDisponiveis = classeData?.subclasses
@@ -375,6 +398,7 @@ export async function buildLevelUpContext(char, classeData, helpers = {}, nomeCl
     precisaConhecimentoPrimordial,
     opcoesConhecimentoPrimordial,
     concessoesClasseNova,
+    ordemClasseNovaPendente,
     manobrasGuerreiro,
     caracteristicas,
     caracteristicasEspecie,
@@ -417,12 +441,17 @@ export async function buildLevelUpContext(char, classeData, helpers = {}, nomeCl
  */
 export function calcularConjuracao(ctx, state) {
   const subclasseEfetiva = state?.subclasse || ctx.sub?.subclasse || null;
+  // Issue #59: a escolha de Ordem Divina/Primal PENDENTE (ainda não
+  // gravada em ctx.char) entra na chave do cache -- sem isso, trocar a
+  // escolha no meio da sessão (Taumaturgo -> Protetor) serviria de volta
+  // o resultado cacheado da primeira escolha.
+  const ordemEscolhida = state?.ordemClasseNovaEscolhida || null;
   if (!ctx._conjuracaoCache) ctx._conjuracaoCache = new Map();
-  const chave = subclasseEfetiva || '';
+  const chave = `${subclasseEfetiva || ''}|${ordemEscolhida || ''}`;
   if (!ctx._conjuracaoCache.has(chave)) {
     ctx._conjuracaoCache.set(chave, montarConjuracao(
       ctx.char, ctx.classeData, ctx.info, ctx.helpers || {},
-      ctx.sub, subclasseEfetiva));
+      ctx.sub, subclasseEfetiva, ordemEscolhida));
   }
   return ctx._conjuracaoCache.get(chave).conjuracao;
 }
@@ -517,6 +546,22 @@ export function proficienciaClasseNovaCompleta(ctx, state) {
     if (!instrumento || !INSTRUMENTOS_MUSICAIS.includes(instrumento) || jaTemInstrumento) return false;
   }
   return true;
+}
+
+/**
+ * A escolha de Ordem Divina/Primal (state.ordemClasseNovaEscolhida) é
+ * válida para o contexto atual -- mesmo molde de
+ * `proficienciaClasseNovaCompleta` acima (issue #59): UM SÓ LUGAR DE
+ * PROPÓSITO, reusado pelo step 'ordem_classe_nova' e por validateAll
+ * (levelup-validations.js) e pela validação-espelho em subirDeNivel
+ * (levelup.js), em vez de cada um reimplementar "está entre as opções
+ * válidas de ORDEM_CLASSE[classeQueSobe]".
+ */
+export function ordemClasseNovaCompleta(ctx, state) {
+  const o = ctx.ordemClasseNovaPendente;
+  if (!o) return true;
+  const escolha = state.ordemClasseNovaEscolhida;
+  return !!escolha && o.opcoes.some((op) => op.nome === escolha);
 }
 
 /**
@@ -756,6 +801,18 @@ const STEP_DEFINITIONS = [
     // Delega em proficienciaClasseNovaCompleta (acima) -- ver o cabecalho
     // dela para o porque de NAO reimplementar a checagem aqui.
     completo: (ctx, state) => proficienciaClasseNovaCompleta(ctx, state)
+  },
+  {
+    id: 'ordem_classe_nova',
+    titulo: 'Ordem Divina/Primal',
+    tipo: 'escolha',
+    obrigatorio: true,
+    // Issue #59: MESMO gate de 'proficiencias_classe_nova' acima -- só no
+    // primeiro nível NAQUELA classe, nunca no primeiro nível do
+    // personagem. Só Clérigo/Druida têm Ordem (ORDEM_CLASSE), então o
+    // step fica invisível para as outras nove classes.
+    visivel: (ctx) => Boolean(ctx.ordemClasseNovaPendente),
+    completo: (ctx, state) => ordemClasseNovaCompleta(ctx, state)
   },
   {
     id: 'ritual_bonus_proficiencia',
