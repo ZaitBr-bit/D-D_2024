@@ -20,7 +20,7 @@ import {
 import { montarSeletor, montarTroca } from './ui-opcoes.js';
 import { deArmas, deEstilosLuta, deMagias, deManobras, deTalentos, motivoPreRequisito, rotuloPericia } from './opcoes-dominio.js';
 import { collectOpcoes, validateAll } from './levelup-validations.js';
-import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, CLASSES_INFO, PERICIAS } from './dados-classes.js';
+import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, PERICIAS } from './dados-classes.js';
 import { getArmas, getClasse, getMagiasPorCirculo, getMagiasClasse, getMagiasRituais } from './db.js';
 import { abrirModal, fecharModal, toast, mdParaHtml, rotuloCirculoSuperiorHtml, semAcento, calcMod, escHtml, getEspacosMagia, bonusProficiencia } from './utils.js';
 import { subirDeNivel, obterAtributosASITalento, getLimiteASITalento, obterTalentosElegiveis } from './levelup.js';
@@ -2306,21 +2306,25 @@ export async function confirmarLevelUp(ctx, state, caches) {
 
     // Resumo
     const resumo = montarResumoFinal(resultado, char, ctx.classeQueSobe, truquesAdicionados, magiasAdicionadas, grimorioAdicionado, trocasMagiaAplicadas, subclasseMagiasAdicionadas, trocasTruqueAplicadas);
-    // Issue #59: ao entrar numa classe conjuradora PREPARADORA (Clérigo/
-    // Druida/Paladino/Guardião) pela primeira vez via multiclasse, o
-    // jogador nunca escolhe magias preparadas durante o assistente (isso é
-    // intencional, igual a classe única -- ver o step 'selecao_magias',
+    // Issue #59: uma classe conjuradora PREPARADORA (Clérigo/Druida/
+    // Paladino/Guardião) nunca escolhe magias preparadas durante o
+    // assistente (isso é intencional -- ver o step 'selecao_magias',
     // levelup-flow.js, que só cobre conjuradores 'conhecidas'). Sem
-    // nenhum aviso, o personagem ficava com a superfície de conjuração
-    // nova e zero magias preparadas até o jogador lembrar de ir na ficha.
-    // `ctx.sub`/`ctx.classeQueSobe` são calculados na ABERTURA da sessão e
-    // não mudam com `subirDeNivel` -- por isso podem ser lidos aqui,
-    // depois da subida, com o mesmo valor de antes dela.
-    const classeVirouPreparadoraNova = ctx.sub.ehPrimeiroNivelNaClasse
-      && !ctx.sub.ehPrimeiroNivelDoPersonagem
-      && CLASSES_INFO[ctx.classeQueSobe]?.tipo_conjuracao === 'preparadas';
+    // nenhum aviso, o personagem ficava com vagas de magia preparada
+    // NOVAS (entrando numa classe preparadora pela primeira vez via
+    // multiclasse, OU só subindo de nível numa que já tinha) e zero
+    // magias preparadas até o jogador lembrar de ir na ficha. Achado do
+    // relato de um usuário depois do primeiro lançamento desta correção
+    // (ela só cobria a entrada NOVA, não a subida normal de nível):
+    // `magiasNovo > magiasAtual` cobre os dois casos com a MESMA condição
+    // que já decide o resto da tela de magia (calcularConjuracao,
+    // levelup-flow.js) -- em vez de reimplementar "é entrada nova?" aqui.
+    const conjuracaoDaSubida = calcularConjuracao(ctx, state);
+    const classeGanhouPreparoNovo = !!conjuracaoDaSubida
+      && conjuracaoDaSubida.tipoConj === 'preparadas'
+      && conjuracaoDaSubida.magiasNovo > conjuracaoDaSubida.magiasAtual;
     abrirModal('Subida de Nível Concluída!', resumo, '<button class="btn btn-primary" onclick="fecharModal()">OK</button>', () => {
-      if (classeVirouPreparadoraNova) {
+      if (classeGanhouPreparoNovo) {
         // Efeito colateral aceito de propósito: muda a aba de conjuração
         // ativa da ficha para a classe recém-entrada -- abrir "Preparar
         // Magias" mirando outra classe sem mudar a aba seria inconsistente

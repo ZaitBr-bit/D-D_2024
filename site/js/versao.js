@@ -13,13 +13,34 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.0.13';
+export const VERSAO_ATUAL = '3.0.14';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.0.14',
+    data: '2026-09-20',
+    rotulo: 'Preparar Magias sempre',
+    resumo: 'O modal "Preparar Magias" agora abre sozinho ao fechar '
+      + 'qualquer subida de nível que dê vagas de magia preparada novas '
+      + 'para uma classe preparadora (Clérigo/Druida/Paladino/Guardião) '
+      + '-- não só ao entrar na classe pela primeira vez.',
+    correcoes: [
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'A correção da 3.0.13 só abria "Preparar Magias" automaticamente '
+            + 'quando a classe entrava NOVA via multiclasse -- uma subida '
+            + 'de nível comum (mesma classe, inclusive classe única, ex.: '
+            + 'Clérigo indo do nível 1 para o 2) não abria o modal, mesmo '
+            + 'ganhando vagas de magia preparada novas. (#59)',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.0.13',
     data: '2026-09-20',
