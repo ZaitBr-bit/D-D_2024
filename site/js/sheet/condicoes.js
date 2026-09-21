@@ -9,6 +9,7 @@ import { getEstadoRecursosPaladino } from './classes/paladino.js';
 import { char, especiesCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { getConcentracaoAtiva } from './magias.js';
+import { quebrarConcentracaoAtiva } from './hp-descanso.js';
 import { temProficienciaArma, temProficienciaArmadura, badgeProficiencia } from '../regras-equipamento.js';
 
 // --- Proficiência de armas/armaduras na ficha ---
@@ -184,6 +185,16 @@ export function renderSecaoDefesas() {
     if (!resistenciasTotais.includes(r)) resistenciasTotais.push(r);
   });
 
+  // Petrificado (issue #94, Fase 3): "Voce tem Resistencia a todo dano" --
+  // glossario de condicoes (condicoes.js, CONDICOES_DESCRICAO). Mesmo
+  // padrao das resistencias temporarias da Furia, acima: uma flag ativa
+  // adiciona os TIPOS_DANO inteiros, com badge de origem proprio.
+  const petrificado = (char.condicoes || []).includes('Petrificado');
+  const resistenciasPetrificadoAtivas = petrificado ? TIPOS_DANO : [];
+  resistenciasPetrificadoAtivas.forEach(r => {
+    if (!resistenciasTotais.includes(r)) resistenciasTotais.push(r);
+  });
+
   // Resistencias e imunidades temporarias de efeitos magicos
   const efeitosMag = char.efeitos_magicos || [];
   const resistenciasMagicas = [];
@@ -198,6 +209,13 @@ export function renderSecaoDefesas() {
     }
   });
   resistenciasMagicas.forEach(r => { if (!resistenciasTotais.includes(r)) resistenciasTotais.push(r); });
+
+  // Petrificado tambem da "Imunidade a Envenenado" (glossario) -- mesma
+  // lista de imunidades temporarias que efeitos magicos ja usam, so que
+  // com o badge "(Petrificado)" em vez de "(Magia)".
+  if (petrificado && !imunidadesMagicas.some(i => i.startsWith('Envenenado'))) {
+    imunidadesMagicas.push('Envenenado (Petrificado)');
+  }
 
   const temDefesa = resistenciasTotais.length > 0 || vulnerabilidades.length > 0 || imunidades.length > 0 || imunidadesMagicas.length > 0;
 
@@ -224,20 +242,20 @@ export function renderSecaoDefesas() {
   if (resistenciasTotais.length > 0) {
     const fixas = resistencias;
     const temporariasFuria = resistenciasFuriaAtivas.filter(r => !fixas.includes(r));
-    const temporariasMagia = resistenciasMagicas.filter(r => !fixas.includes(r) && !temporariasFuria.includes(r));
-    let textoRes = '';
-    if (fixas.length > 0) textoRes += fixas.join(', ');
+    const temporariasPetrificado = resistenciasPetrificadoAtivas.filter(r => !fixas.includes(r) && !temporariasFuria.includes(r));
+    const temporariasMagia = resistenciasMagicas.filter(r => !fixas.includes(r) && !temporariasFuria.includes(r) && !temporariasPetrificado.includes(r));
+    const partes = [];
+    if (fixas.length > 0) partes.push(fixas.join(', '));
     if (temporariasFuria.length > 0) {
-      if (textoRes) textoRes += ', ';
-      textoRes += temporariasFuria.map(r => `<span style="color:var(--danger);font-weight:600" title="Fúria ativa">${r} (Fúria)</span>`).join(', ');
+      partes.push(temporariasFuria.map(r => `<span style="color:var(--danger);font-weight:600" title="Fúria ativa">${r} (Fúria)</span>`).join(', '));
+    }
+    if (temporariasPetrificado.length > 0) {
+      partes.push(temporariasPetrificado.map(r => `<span style="color:var(--text-muted);font-weight:600" title="Petrificado">${r} (Petrificado)</span>`).join(', '));
     }
     if (temporariasMagia.length > 0) {
-      if (textoRes) textoRes += ', ';
-      textoRes += temporariasMagia.map(r => `<span style="color:var(--accent);font-weight:600" title="Efeito mágico">${r} (Magia)</span>`).join(', ');
+      partes.push(temporariasMagia.map(r => `<span style="color:var(--accent);font-weight:600" title="Efeito mágico">${r} (Magia)</span>`).join(', '));
     }
-    if (fixas.length === 0 && temporariasFuria.length > 0 && temporariasMagia.length === 0) {
-      textoRes = temporariasFuria.map(r => `<span style="color:var(--danger);font-weight:600" title="Fúria ativa">${r} (Fúria)</span>`).join(', ');
-    }
+    const textoRes = partes.join(', ');
     html += `<div style="margin-bottom:4px"><span style="font-size:0.75rem;font-weight:700;color:var(--info)">Resistencias:</span> <span style="font-size:0.8rem">${textoRes}</span></div>`;
   }
   if (vulnerabilidades.length > 0) {
@@ -413,6 +431,11 @@ export function setupEventosCondicoes() {
         return;
       }
 
+      // Incapacitado interrompe Concentracao (glossario de condicoes) --
+      // quebra automatica so quando a condicao e NOVA nesta gravacao, nao
+      // a cada vez que o gerenciador e salvo com ela ja marcada.
+      const incapacitadoNovo = novas.includes('Incapacitado') && !condicoesAtuais.has('Incapacitado');
+
       char.condicoes = novas;
       // Se Exaustao foi removida, zerar nivel
       if (!novas.includes('Exaustão') && char.exaustao > 0) {
@@ -422,9 +445,14 @@ export function setupEventosCondicoes() {
       if (novas.includes('Exaustão') && (!char.exaustao || char.exaustao <= 0)) {
         char.exaustao = 1;
       }
+
+      let concQuebrada = null;
+      if (incapacitadoNovo) concQuebrada = quebrarConcentracaoAtiva();
+
       salvar();
       window.fecharModal();
       renderFichaCompleta();
+      if (concQuebrada) toast(`Concentração em ${concQuebrada} interrompida: Incapacitado.`, 'info');
     });
   });
 

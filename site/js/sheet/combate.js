@@ -101,6 +101,76 @@ export function calcVantagemDesvantagemPericia(nomePericia) {
 }
 
 /**
+ * Calcula as fontes de Desvantagem em jogadas de ATAQUE do próprio
+ * personagem, vindas de condições (issue #94, Fase 6). Retorna
+ * { vantagens: string[], desvantagens: string[] } -- vantagens fica
+ * sempre vazio aqui (nenhuma condição dá Vantagem no SEU ataque; Vantagem
+ * de arma/talento como Ataque Imprudente e Caçador Preciso já é calculada
+ * em sheet/inventario.js e combinada com este resultado lá).
+ * Todas as seis fontes abaixo são lidas do MESMO texto que já aparece no
+ * glossário (condicoes.js, CONDICOES_DESCRICAO), sem a ressalva por alvo
+ * que o livro faz em Amedrontado ("linha de visão da fonte do medo") e
+ * Imobilizado ("exceto contra o imobilizador") -- a ficha não rastreia
+ * alvo/atacante específico, e calcVantagemDesvantagemPericia já ignora a
+ * mesma ressalva de Amedrontado por esse motivo; aplicar Desvantagem
+ * incondicional aqui é a mesma simplificação, não uma nova.
+ */
+export function calcVantagemDesvantagemAtaque() {
+  const vantagens = [];
+  const desvantagens = [];
+  const condicoes = char.condicoes || [];
+  for (const c of ['Amedrontado', 'Envenenado', 'Caído', 'Contido', 'Imobilizado', 'Cego']) {
+    if (condicoes.includes(c)) desvantagens.push(c);
+  }
+  return { vantagens, desvantagens };
+}
+
+/**
+ * Calcula vantagem/desvantagem/falha automática para uma salvaguarda
+ * específica (issue #94, Fase 2). Extraída do bloco inline que existia em
+ * ficha.js -- mesmo padrão de calcVantagemDesvantagemPericia, reusável por
+ * impressão/pdf.
+ * Retorna { vantagens: string[], desvantagens: string[],
+ *           falhaAutomatica: boolean, fontesFalha: string[] }.
+ * Falha automática de For/Des (Atordoado/Inconsciente/Paralisado/
+ * Petrificado) é a UNICA regra do livro escrita como trava fixa por
+ * atributo -- diferente de Cego/Surdo em pericia, cujo texto ("testes que
+ * dependam de visao/audicao") depende do teste concreto, nao da pericia
+ * inteira, e por isso fica fora deste calculo (decisao consciente, nao
+ * lacuna).
+ */
+export function calcVantagemDesvantagemSalvaguarda(nomeAtributo) {
+  const vantagens = [];
+  const desvantagens = [];
+  const condicoes = char.condicoes || [];
+  const incapacitado = condicoes.includes('Incapacitado');
+
+  if (nomeAtributo === 'Força' && !!getEstadoFuria()?.ativa) vantagens.push('Fúria');
+  // Sentido de Perigo e caracteristica de BARBARO 2 (Classes.md:105-107):
+  // nao se aplica se o personagem estiver Incapacitado (o livro exige
+  // poder ver o atacante).
+  if (nomeAtributo === 'Destreza' && nivelNa(char, 'Bárbaro') >= 2 && !incapacitado) vantagens.push('Sentido de Perigo');
+  if (char.especie === 'Gnomo' && ['Inteligência', 'Sabedoria', 'Carisma'].includes(nomeAtributo)) vantagens.push('Astucia de Gnomo');
+  if (char.especie === 'Elfo' && condicoes.includes('Enfeitiçado')) vantagens.push('Ancestralidade Feerica');
+  if (char.especie === 'Anão' && condicoes.includes('Envenenado')) vantagens.push('Resistencia a Toxinas');
+  if (char.especie === 'Pequenino' && condicoes.includes('Amedrontado')) vantagens.push('Corajoso');
+
+  if (nomeAtributo === 'Destreza' && condicoes.includes('Contido')) desvantagens.push('Contido');
+
+  // Falha automatica: Atordoado/Inconsciente/Paralisado/Petrificado, so
+  // para salvaguardas de Forca e Destreza (glossario de condicoes,
+  // condicoes.js).
+  const fontesFalha = [];
+  if (['Força', 'Destreza'].includes(nomeAtributo)) {
+    for (const c of ['Atordoado', 'Inconsciente', 'Paralisado', 'Petrificado']) {
+      if (condicoes.includes(c)) fontesFalha.push(c);
+    }
+  }
+
+  return { vantagens, desvantagens, falhaAutomatica: fontesFalha.length > 0, fontesFalha };
+}
+
+/**
  * Retorna quantidade de truques extras concedidos pelo Estilo de Luta
  * (Combatente Druídico = +2 truques de Druida, Combatente Abençoado = +2 truques de Clérigo)
  */
@@ -214,6 +284,20 @@ export function getDeslocamentoFinal(baseDeslocamento) {
     if (_carga.sobrecarregado) {
       final = Math.min(final, 1.5);
     }
+  }
+
+  // Condições que zeram o Deslocamento e impedem que ele aumente (issue
+  // #94, Fase 1): Contido, Imobilizado, Paralisado, Petrificado e
+  // Inconsciente -- cada uma diz isso no glossário (condicoes.js,
+  // CONDICOES_DESCRICAO). Zera DEPOIS de todo bônus de valor base (Fase 1
+  // acima) de propósito: nenhum bônus de talento/classe/exaustão importa
+  // quando o Deslocamento já está travado em 0. Antes da Fase 2 (Voo/
+  // Escalada/Natação derivadas de `final`) para essas velocidades extras
+  // também ficarem em 0 -- não faz sentido escalar ou voar com o
+  // Deslocamento zerado por nenhuma dessas condições.
+  const _condicoesZeramDeslocamento = ['Contido', 'Imobilizado', 'Paralisado', 'Petrificado', 'Inconsciente'];
+  if ((char?.condicoes || []).some(c => _condicoesZeramDeslocamento.includes(c))) {
+    final = 0;
   }
 
   // ── Fase 2: velocidades derivadas (dependem de final) ──────────────
@@ -364,8 +448,14 @@ export function getModIniciativa() {
   // 2024 nao usa), e Atleta Extraordinario, de GUERREIRO/CAMPEAO 3
   // (Classes.md:3892). A subclasse tem de ser a DO GUERREIRO, nao o
   // espelho da classe inicial.
+  // Invisivel da Vantagem na Iniciativa (glossario de condicoes,
+  // condicoes.js) -- issue #94, Fase 5. "Desvantagem se surpreso"
+  // (Incapacitado) fica fora: a ficha nao modela o estado de "surpreso"
+  // no inicio do combate, e checar "esta Incapacitado" a qualquer momento
+  // seria uma regra diferente e mais ampla do que a do livro.
   const vantagem = nivelNa(char, 'Bárbaro') >= 7
-    || (subclasseDe(char, 'Guerreiro') === 'Campeão' && nivelNa(char, 'Guerreiro') >= 3);
+    || (subclasseDe(char, 'Guerreiro') === 'Campeão' && nivelNa(char, 'Guerreiro') >= 3)
+    || (char.condicoes || []).includes('Invisível');
   return { valor: base + (passivos.bonusIniciativa || 0), vantagem };
 }
 

@@ -28,7 +28,7 @@ import { getEstadoRecursosMago } from './classes/mago.js';
 import { getEstadoRecursosMonge } from './classes/monge.js';
 import { getEstadoRecursosPaladino } from './classes/paladino.js';
 import { setupEventosDetalhesColapso, setupEventosTruquesColapso } from './colapso.js';
-import { calcVantagemDesvantagemPericia, forcaPrimordialAtiva, getAtaquesPorAcao, getDeslocamentoFinal, getModIniciativa, getTruquesExtraEstiloLuta, setupEventosVantagemDesvantagem, temArmaduraPesadaEquipada } from './combate.js';
+import { calcVantagemDesvantagemPericia, calcVantagemDesvantagemSalvaguarda, forcaPrimordialAtiva, getAtaquesPorAcao, getDeslocamentoFinal, getModIniciativa, getTruquesExtraEstiloLuta, setupEventosVantagemDesvantagem, temArmaduraPesadaEquipada } from './combate.js';
 import { renderSecaoCondicoes, renderSecaoDefesas, renderSecaoSentidos, setupEventosCondicoes, setupEventosDefesas } from './condicoes.js';
 import { renderSecaoDetalhes } from './detalhes.js';
 import { setupEventosEdicao } from './edicao.js';
@@ -890,42 +890,19 @@ export function renderFichaCompleta() {
           // marcava salvaguarda nenhuma (issue #21).
           const proficiente = ehProficienteEmSalvaguarda(char, nome);
           const bonus = mod + (proficiente ? prof : 0);
-          const condicoes = char.condicoes || [];
-          const incapacitado = condicoes.includes('Incapacitado');
 
-          // Fontes de vantagem em salvaguardas
-          const fontsVant = [];
-          // Acentuado para casar com o selo de PERICIA (combate.js): a mesma
-          // fonte aparecia como "Fúria" nas pericias e "Furia" nas
-          // salvaguardas, na mesma ficha.
-          if (nome === 'Força' && !!getEstadoFuria()?.ativa) fontsVant.push('Fúria');
-          // nivelNa: Sentido de Perigo é característica de BÁRBARO 2
-          // (Classes.md:105-107). Lia-se `char.classe` (a classe INICIAL)
-          // cruzado com `char.nivel` (o TOTAL), e por isso um Ladino 1/Bárbaro 5
-          // não via a vantagem, enquanto um Bárbaro 1/Ladino 5 (total 6) via.
-          if (nome === 'Destreza' && nivelNa(char, 'Bárbaro') >= 2 && !incapacitado) fontsVant.push('Sentido de Perigo');
-          // Gnomo: Astucia de Gnomo - Vantagem em salv. INT, SAB, CAR
-          if (char.especie === 'Gnomo' && ['Inteligência', 'Sabedoria', 'Carisma'].includes(nome)) fontsVant.push('Astucia de Gnomo');
-          // Elfo: Ancestralidade Feerica - Vantagem em salv. contra Enfeiticado
-          if (char.especie === 'Elfo' && condicoes.includes('Enfeitiçado')) fontsVant.push('Ancestralidade Feerica');
-          // Anao: Resistencia a Toxinas - Vantagem em salv. contra Envenenado
-          if (char.especie === 'Anão' && condicoes.includes('Envenenado')) fontsVant.push('Resistencia a Toxinas');
-          // Pequenino: Corajoso - Vantagem em salv. contra Amedrontado
-          if (char.especie === 'Pequenino' && condicoes.includes('Amedrontado')) fontsVant.push('Corajoso');
-
-          // Fontes de desvantagem em salvaguardas
-          const fontsDesv = [];
-          if (nome === 'Destreza' && condicoes.includes('Contido')) fontsDesv.push('Contido');
-
-          const temVant = fontsVant.length > 0;
-          const temDesv = fontsDesv.length > 0;
+          const vd = calcVantagemDesvantagemSalvaguarda(nome);
+          const temVant = vd.vantagens.length > 0;
+          const temDesv = vd.desvantagens.length > 0;
           let indicadorSalv = '';
-          if (temVant && temDesv) {
-            indicadorSalv = `<span class="pericia-vd-badge neutro" data-vd-info="Vantagem (${fontsVant.join(', ')}) e Desvantagem (${fontsDesv.join(', ')}) se anulam">—</span>`;
+          if (vd.falhaAutomatica) {
+            indicadorSalv = `<span class="pericia-vd-badge falha-automatica" data-vd-info="Falha automática: ${vd.fontesFalha.join(', ')}">F</span>`;
+          } else if (temVant && temDesv) {
+            indicadorSalv = `<span class="pericia-vd-badge neutro" data-vd-info="Vantagem (${vd.vantagens.join(', ')}) e Desvantagem (${vd.desvantagens.join(', ')}) se anulam">—</span>`;
           } else if (temVant) {
-            indicadorSalv = `<span class="pericia-vd-badge vantagem" data-vd-info="Vantagem: ${fontsVant.join(', ')}">V</span>`;
+            indicadorSalv = `<span class="pericia-vd-badge vantagem" data-vd-info="Vantagem: ${vd.vantagens.join(', ')}">V</span>`;
           } else if (temDesv) {
-            indicadorSalv = `<span class="pericia-vd-badge desvantagem" data-vd-info="Desvantagem: ${fontsDesv.join(', ')}">D</span>`;
+            indicadorSalv = `<span class="pericia-vd-badge desvantagem" data-vd-info="Desvantagem: ${vd.desvantagens.join(', ')}">D</span>`;
           }
           return `
             <div class="salva-item ${proficiente ? 'proficiente' : ''}">

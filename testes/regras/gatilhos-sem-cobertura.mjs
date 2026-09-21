@@ -97,7 +97,9 @@ export const GATILHOS_SEM_COBERTURA = [
   'btn-furia-implacavel-falha',
   'btn-furia-implacavel-sucesso',
   'btn-gastar-metamagia',
-  'btn-gerenciar-condicoes',
+  // 'btn-gerenciar-condicoes' saiu daqui na Fase 1 da issue #94: o spec
+  // testes/e2e/regras/condicao-deslocamento.spec.mjs CLICA nele para abrir
+  // o gerenciador de condições.
   'btn-gerenciar-defesas',
   'btn-limpar-rolagem',
   'btn-login-google',
@@ -128,7 +130,8 @@ export const GATILHOS_SEM_COBERTURA = [
   'btn-revelacao-carne',
   'btn-rolar-todos',
   'btn-salvar-afinidade',
-  'btn-salvar-condicoes',
+  // 'btn-salvar-condicoes' saiu daqui na Fase 1 da issue #94: o mesmo spec
+  // clica nele para confirmar a condição marcada.
   'btn-salvar-defesas',
   'btn-salvar-detalhes',
   'btn-salvar-edit',

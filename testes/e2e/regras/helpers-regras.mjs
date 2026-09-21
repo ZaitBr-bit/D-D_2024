@@ -233,6 +233,19 @@ export async function clicarSeletorFicha(page, seletor, { esperar = null } = {})
   }
 }
 
+/**
+ * Marca uma condição no gerenciador de condições da ficha (clique real):
+ * abre o modal ("Gerenciar"), clica no card da condição, salva. Usado
+ * pelos specs da issue #94 (efeitos mecânicos das condições).
+ */
+export async function marcarCondicao(page, nome) {
+  await page.locator('#btn-gerenciar-condicoes').click();
+  await page.waitForSelector('#modal-overlay', { state: 'visible' });
+  await page.locator(`[data-condicao-toggle="${nome}"]`).click();
+  await page.locator('#btn-salvar-condicoes').click();
+  await assentar(page).catch(() => {});
+}
+
 // Abre o site coletando erros de console/página — qualquer erro
 // derruba o teste no final (mesma disciplina da paridade).
 export async function abrirSite(context, hash = '') {

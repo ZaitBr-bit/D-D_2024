@@ -13,13 +13,46 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.0.14';
+export const VERSAO_ATUAL = '3.0.15';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.0.15',
+    data: '2026-09-21',
+    rotulo: 'Condições com efeito',
+    resumo: 'As 14 condições (Amedrontado, Atordoado, Caído, Cego, Contido, '
+      + 'Enfeitiçado, Envenenado, Exaustão, Imobilizado, Incapacitado, '
+      + 'Inconsciente, Invisível, Paralisado, Petrificado, Surdo) já tinham o '
+      + 'texto certo do livro -- agora passam a mudar de verdade Deslocamento, '
+      + 'salvaguardas, resistências, Concentração, Iniciativa e jogadas de '
+      + 'ataque, conforme a condição marcada na ficha.',
+    correcoes: [
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'Contido, Imobilizado, Paralisado, Petrificado e Inconsciente '
+            + 'zeram o Deslocamento (e Voo/Escalada/Natação junto) -- antes '
+            + 'não mudavam nada. (#94)',
+          'Atordoado, Inconsciente, Paralisado e Petrificado forçam falha '
+            + 'automática em salvaguardas de Força e Destreza, com badge '
+            + 'próprio. (#94)',
+          'Petrificado dá Resistência a todo dano e Imunidade a Envenenado '
+            + 'na seção de Defesas. (#94)',
+          'Marcar Incapacitado quebra a Concentração ativa sozinho, sem '
+            + 'precisar clicar em "Quebrar" manualmente. (#94)',
+          'Invisível dá Vantagem na Iniciativa. (#94)',
+          'Amedrontado, Envenenado, Caído, Contido, Imobilizado e Cego dão '
+            + 'Desvantagem nas jogadas de ataque, mostrada na arma equipada '
+            + '(combinada com Ataque Imprudente/Caçador Preciso, quando '
+            + 'ativos). (#94)',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.0.14',
     data: '2026-09-20',

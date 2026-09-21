@@ -87,6 +87,32 @@ export const sincronizarBonusPvDraconico = sincronizarBonusPvNiveis;
 export const sincronizarBonusPvAnao = sincronizarBonusPvNiveis;
 export const sincronizarBonusPvVigoroso = sincronizarBonusPvNiveis;
 
+/**
+ * Quebra a concentração ativa, se houver: reverte o bônus de PV máximo
+ * temporário (se algum efeito concentrado dava um) e remove todos os
+ * efeitos mágicos marcados como concentração. Extraída do botão manual
+ * "Quebrar" para ser reusada pela quebra automática por Incapacitado
+ * (issue #94, Fase 4 -- "Concentração interrompida" é efeito do
+ * glossário da condição, condicoes.js). Não salva nem re-renderiza: quem
+ * chama decide isso, porque o botão manual e a quebra automática mostram
+ * toasts diferentes.
+ * @returns {string|null} nome do efeito quebrado, ou null se não havia concentração ativa.
+ */
+export function quebrarConcentracaoAtiva() {
+  const concAtiva = getConcentracaoAtiva();
+  if (!concAtiva) return null;
+  const efsPVMax = (char.efeitos_magicos || []).filter(e => e.concentracao && e.tipo === 'bonus_pv_max');
+  for (const ef of efsPVMax) {
+    if (char.pv_max_override) {
+      char.pv_max_override -= ef.valor || 0;
+      if (char.pv_max_override <= char.pv_max) delete char.pv_max_override;
+      char.pv_atual = Math.min(char.pv_atual, char.pv_max_override || char.pv_max);
+    }
+  }
+  char.efeitos_magicos = (char.efeitos_magicos || []).filter(e => !e.concentracao);
+  return concAtiva;
+}
+
 // --- HP e Dados de Vida ---
 
 /** Gera HTML para seletor numérico com rolagem (estilo alarme iPhone) */
@@ -582,18 +608,8 @@ export function setupEventosDescanso() {
   // Quebrar concentracao manualmente
   document.querySelectorAll('[data-quebrar-concentracao]').forEach(el => {
     el.addEventListener('click', () => {
-      const concAtiva = getConcentracaoAtiva();
+      const concAtiva = quebrarConcentracaoAtiva();
       if (!concAtiva) return;
-      // Reverter bonus de PV maximo se necessario
-      const efsPVMax = (char.efeitos_magicos || []).filter(e => e.concentracao && e.tipo === 'bonus_pv_max');
-      for (const ef of efsPVMax) {
-        if (char.pv_max_override) {
-          char.pv_max_override -= ef.valor || 0;
-          if (char.pv_max_override <= char.pv_max) delete char.pv_max_override;
-          char.pv_atual = Math.min(char.pv_atual, char.pv_max_override || char.pv_max);
-        }
-      }
-      char.efeitos_magicos = (char.efeitos_magicos || []).filter(e => !e.concentracao);
       salvar();
       renderFichaCompleta();
       toast(`Concentração em ${concAtiva} encerrada.`, 'info');

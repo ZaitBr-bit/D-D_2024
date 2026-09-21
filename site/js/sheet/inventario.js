@@ -12,7 +12,7 @@ import { abrirSeletorItens, carregarDadosEquipSheet } from '../itens-seletor.js'
 import { getEstadoFuria } from './classes/barbaro.js';
 import { getEstadoRecursosGuardiao } from './classes/guardiao.js';
 import { _salvarEstadoColapso, _secoesInvColapsadas } from './colapso.js';
-import { ataqueImprudenteAtivo, temArmaduraPesadaEquipada } from './combate.js';
+import { ataqueImprudenteAtivo, calcVantagemDesvantagemAtaque, temArmaduraPesadaEquipada } from './combate.js';
 import { sheetBadgeProf, sheetTemProfArma, sheetTemProfArmadura } from './condicoes.js';
 import { char, passivosTalentosCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
@@ -192,12 +192,23 @@ function renderSheetInvItem(item, idx) {
     if (isDistancia) bonusAtqTalento += _passivos.bonusAtaqueDistancia || 0;
     const bonusAtqFinal = bonusAtq + bonusAtqTalento;
     ataqueInfo = `<span class="badge badge-secondary" style="font-size:0.65rem">Atq ${fmtMod(bonusAtqFinal)}</span>`;
-    if (ataqueImprudenteAtivo() && usaForcaNoAtaque) {
-      vantagemInfo = '<span class="badge" style="font-size:0.6rem;background:#fff3cd;color:#8a6d3b;border:1px solid #ffeeba">Vantagem (Imprudente)</span>';
-    }
+    // Vantagem/Desvantagem no ataque: fontes de talento/classe (Imprudente,
+    // Caçador Preciso) combinadas com as fontes de CONDIÇÃO (issue #94,
+    // Fase 6) -- mesmo padrão de anular V com D que calcVantagemDesvantagemPericia
+    // já usa, para não mostrar "Vantagem" escondendo uma Desvantagem ativa.
+    const fontesVantAtq = [];
+    if (ataqueImprudenteAtivo() && usaForcaNoAtaque) fontesVantAtq.push('Imprudente');
     const estadoGuardiao = getEstadoRecursosGuardiao();
-    if (estadoGuardiao?.cacadorPrecisoAtivo && estadoGuardiao?.marcaPredadorAtiva) {
-      vantagemInfo = '<span class="badge" style="font-size:0.6rem;background:#e3f2fd;color:#0d47a1;border:1px solid #90caf9">Vantagem (Caçador Preciso)</span>';
+    if (estadoGuardiao?.cacadorPrecisoAtivo && estadoGuardiao?.marcaPredadorAtiva) fontesVantAtq.push('Caçador Preciso');
+    const vdCondicoesAtq = calcVantagemDesvantagemAtaque();
+    const temVantAtq = fontesVantAtq.length > 0;
+    const temDesvAtq = vdCondicoesAtq.desvantagens.length > 0;
+    if (temVantAtq && temDesvAtq) {
+      vantagemInfo = `<span class="badge" style="font-size:0.6rem;background:var(--text-muted);color:#fff" title="Vantagem (${fontesVantAtq.join(', ')}) e Desvantagem (${vdCondicoesAtq.desvantagens.join(', ')}) se anulam">Vantagem e Desvantagem se anulam</span>`;
+    } else if (temVantAtq) {
+      vantagemInfo = `<span class="badge" style="font-size:0.6rem;background:#fff3cd;color:#8a6d3b;border:1px solid #ffeeba">Vantagem (${fontesVantAtq.join(', ')})</span>`;
+    } else if (temDesvAtq) {
+      vantagemInfo = `<span class="badge" style="font-size:0.6rem;background:#f8d7da;color:#842029;border:1px solid #f5c2c7">Desvantagem (${vdCondicoesAtq.desvantagens.join(', ')})</span>`;
     }
 
     // Estilo de Luta: Combate com Armas Grandes / Combate com Duas Armas
