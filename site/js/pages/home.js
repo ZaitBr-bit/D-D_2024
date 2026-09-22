@@ -3,7 +3,7 @@
 // ============================================================
 import { listarPersonagens, removerPersonagem, duplicarPersonagem, exportarTodos, exportarPersonagem, importarPersonagens, atualizarListaLocal, backupPersonagensLocais, restaurarPersonagensLocais } from '../store.js';
 import { enfileirarSync, obterIdsPendentesRemocao } from '../sync.js';
-import { toast, abrirModal, fmtData, escHtml } from '../utils.js';
+import { toast, abrirModal, fmtData, escHtml, baixarArquivo } from '../utils.js';
 import { CLASSES_INFO } from '../dados-classes.js';
 import { classesDe } from '../regras-multiclasse.js';
 import { iniciarAuth, getUsuario, loginComGoogle, logout, onAuthChange, buscarPersonagensCloud } from '../auth.js';
@@ -153,12 +153,7 @@ function _renderConteudo(container, personagens, usuario) {
         return;
       }
       const blob = new Blob([json], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `dnd_personagem_${(p?.nome || 'sem_nome').replace(/[^\w\-]+/g, '_')}_${Date.now()}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
+      baixarArquivo(blob, `dnd_personagem_${(p?.nome || 'sem_nome').replace(/[^\w\-]+/g, '_')}_${Date.now()}.json`);
       toast(`${p?.nome || 'Personagem'} exportado!`, 'success');
     });
   });
@@ -189,12 +184,7 @@ function _renderConteudo(container, personagens, usuario) {
     btnExportar.addEventListener('click', () => {
       const json = exportarTodos();
       const blob = new Blob([json], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `dnd_personagens_${Date.now()}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
+      baixarArquivo(blob, `dnd_personagens_${Date.now()}.json`);
       toast('Exportados com sucesso!', 'success');
     });
   }

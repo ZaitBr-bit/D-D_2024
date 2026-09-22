@@ -13,13 +13,31 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.0.15';
+export const VERSAO_ATUAL = '3.0.16';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.0.16',
+    data: '2026-09-22',
+    rotulo: 'Exportar no celular',
+    resumo: '"Exportar Todos" e o exportar de um personagem só passam a '
+      + 'entregar o arquivo do mesmo jeito que o PDF da ficha, que já '
+      + 'funcionava em mais navegadores de celular.',
+    correcoes: [
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'Exportar personagens podia não baixar nada em navegador de '
+            + 'celular (relato no Opera GX, Android): o arquivo era '
+            + 'descartado antes de o navegador terminar de lê-lo. (#114)',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.0.15',
     data: '2026-09-21',

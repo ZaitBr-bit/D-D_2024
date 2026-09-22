@@ -1132,6 +1132,28 @@ export function fmtData(iso) {
   return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
+/**
+ * Entrega um Blob como arquivo baixado, via `<a download>`. Usado pelo PDF
+ * da ficha e pelos dois exports da home.
+ *
+ * A âncora entra no documento antes do clique e o revoke da URL fica para
+ * 60 s depois: o download de blob é assíncrono, e navegador móvel que só lê
+ * o blob depois do fim da tarefa descarta o arquivo em silêncio se a URL já
+ * foi revogada ou se a âncora nunca esteve no documento (issue #114). O
+ * Chromium desktop tolera as duas coisas, então o defeito não aparece nele.
+ */
+export function baixarArquivo(blob, nome) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = nome;
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+
 /** Mostra toast de notificação */
 export function toast(msg, tipo = '') {
   const container = document.getElementById('toast-container');

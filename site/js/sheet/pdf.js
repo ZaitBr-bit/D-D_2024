@@ -3,7 +3,7 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES } from '../dados-classes.js';
-import { bonusProficiencia, calcBonusPericia, calcCA, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcMod, calcPercepcaoPassiva, conjuracoesPorClasse, fmtMod, getDeslocamento, removerMarcadoresDado, toast } from '../utils.js';
+import { baixarArquivo, bonusProficiencia, calcBonusPericia, calcCA, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcMod, calcPercepcaoPassiva, conjuracoesPorClasse, fmtMod, getDeslocamento, removerMarcadoresDado, toast } from '../utils.js';
 import { forcaPrimordialAtiva, getDeslocamentoFinal, getModIniciativa } from './combate.js';
 import { char, especiesCache, passivosTalentosCache } from './estado.js';
 import { classesDe } from '../regras-multiclasse.js';
@@ -499,16 +499,8 @@ export async function baixarPdfFicha() {
   try {
     const bytes = await gerarPdfFicha();
     const blob = new Blob([bytes], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
     const nome = `Ficha ${char.nome || 'personagem'}.pdf`.replace(/[\\/:*?"<>|]/g, '-');
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = nome;
-    a.rel = 'noopener';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    baixarArquivo(blob, nome);
   } catch (err) {
     console.error('Erro ao gerar PDF:', err);
     toast('Erro ao gerar PDF', 'danger');
