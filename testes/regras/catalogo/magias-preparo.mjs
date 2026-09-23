@@ -176,4 +176,14 @@ export const EXCECOES_LISTA_ORIGEM = {
   'sheet/migracoes.js:93': 'Migração de dado legado: classifica origens de personagens ' +
     'salvos por versões antigas do app, incluindo `telecinetico`, que nenhuma das listas ' +
     'vivas usa. Não governa o limite de nenhum personagem novo.',
+  // Linha 294 (era 295 antes da revisão final #105/#61 -- os docblocks de
+  // truquesPorClasse e ORIGENS_CONCEDIDAS_POR_TABELA ganharam linhas para
+  // corrigir dois fatos que ficaram desatualizados, achado Minor m1,
+  // deslocando o resto do arquivo em 1 linha).
+  'regras-magia-classe.js:294': 'ORIGENS_CONCEDIDAS_POR_TABELA (issues #105/#61): lista das ' +
+    'origens de CONCESSÃO com classe dona descobrível pelas tabelas de subclasse (domínio, ' +
+    'sempre preparada, truque fixo de subclasse), usada por classeDaMagiaConcedida e por ' +
+    'migrarMagiaClasse para carimbar `classe` na entrada. Contém `dominio` por coincidência de ' +
+    'valor, não por responder a mesma pergunta: não decide se a origem é isenta do limite de ' +
+    'magias preparadas.',
 };

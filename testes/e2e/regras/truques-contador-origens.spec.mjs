@@ -392,8 +392,14 @@ test('multiclasse (Clérigo 5/Mago 1): as duas telas concordam, e o personalizad
         { classe: 'Mago', subclasse: '', nivel: 1, ordem: 1 },
       ],
       schema_versao: 2,
+      // "Chama Sagrada" (a semente antiga) só existe na lista do Clérigo --
+      // a migração `migrarMagiaClasse` (Tarefa 3) carimba sozinha, na
+      // abertura da ficha, qualquer truque que exista numa lista só, então
+      // deixou de ficar "sem classe". A incerteza real exige truques nas
+      // DUAS listas: "Badalar Fúnebre" e "Luz" (medido em dados/classes/
+      // magias_clerigo.json e magias_mago.json, 2026-09-22).
       magias_conhecidas: [
-        { nome: 'Chama Sagrada', circulo: 0 },
+        { nome: 'Badalar Fúnebre', circulo: 0 },
         { nome: 'Luz', circulo: 0 },
       ],
       magias_customizadas: [TRUQUE_PERSONALIZADO],

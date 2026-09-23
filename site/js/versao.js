@@ -13,13 +13,37 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.0.16';
+export const VERSAO_ATUAL = '3.0.17';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.0.17',
+    data: '2026-09-22',
+    rotulo: 'Magias por classe',
+    resumo: 'No multiclasse, cada classe conta e mostra só os próprios truques '
+      + 'e magias em "Preparar Magias", e as magias concedidas pela subclasse '
+      + 'de uma classe não aparecem mais na outra.',
+    correcoes: [
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'Truques de uma classe sumiam da contagem ao entrar numa segunda '
+            + 'classe conjuradora, liberando escolher truques a mais; agora cada '
+            + 'classe mostra os próprios, o truque da outra aparece travado e o '
+            + 'excedente fica marcado em vermelho. (#105)',
+          'Truque ou magia de ficha antiga sem classe definida aparece num '
+            + 'aviso "Classe não definida" para o jogador escolher a classe. (#105)',
+          'Magias de domínio/subclasse de uma classe não se misturam mais no '
+            + '"Preparar Magias" da outra; magias de talento e espécie ficam em '
+            + '"Outras origens". (#61)',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.0.16',
     data: '2026-09-22',

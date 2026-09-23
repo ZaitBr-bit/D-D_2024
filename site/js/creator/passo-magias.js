@@ -580,7 +580,7 @@ function toggleMagia(nome, circulo, isTruque, maxTruques, maxPreparadas, magoNiv
     } else {
       const truquesAtual = personagem.magias_conhecidas.filter(m => m.circulo === 0).length;
       if (truquesAtual >= maxTruques) { toast(`Máximo de ${maxTruques} truques`, 'error'); return; }
-      personagem.magias_conhecidas.push({ nome, circulo });
+      personagem.magias_conhecidas.push({ nome, circulo, ...(personagem.classe ? { classe: personagem.classe } : {}) });
     }
   } else if (magoNivel1) {
     if (!Array.isArray(personagem.grimorio)) personagem.grimorio = [];

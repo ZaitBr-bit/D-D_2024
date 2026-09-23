@@ -5,7 +5,7 @@
 // de espaco livre.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
-import { getIndiceMagias, getMagiasPorCirculo } from '../db.js';
+import { getIndiceMagias, getMagiasClasse, getMagiasPorCirculo } from '../db.js';
 import { VALOR_EM_COBRE, formatarCarteira, podePagar, retirarValor } from '../moedas.js';
 import { abrirModal, escHtml, getBonusTruquesOrdem, getEspacosMagia, getLimitesMagias, magiaMagoEstaNoGrimorio, mdParaHtml, rotuloCirculoSuperiorHtml, semAcento, toast } from '../utils.js';
 import { montarSeletor } from '../ui-opcoes.js';
@@ -35,7 +35,7 @@ import { reservasDeEspacos } from './reservas-espacos.js';
 // `truqueContaNoLimite` (o predicado por entrada) saiu daqui junto com a
 // versão local: a única leitura que este arquivo fazia dele era a contagem,
 // e ela agora é `truquesQueContamNoLimite`.
-import { truqueEhTrocavel } from '../regras-origens-magia.js';
+import { magiaContaNoLimite, truqueEhTrocavel } from '../regras-origens-magia.js';
 // superficiesDaFicha/superficieAtivaDaFicha (Tarefas 2 e 4 deste
 // sub-projeto): substituem a leitura de char.classe/char.subclasse/
 // char.nivel (a classe INICIAL, o espelho) por classes[] de verdade -- ver
@@ -47,7 +47,7 @@ import { nivelNa } from '../regras-multiclasse.js';
 // reimplementar contando char.magias_preparadas cru contra o limite de UMA
 // superficie -- ver o comentario de mostrarBuscaMagia, abaixo, para o antes
 // e depois.
-import { preparadasPorClasse, truquesPorClasse } from '../regras-magia-classe.js';
+import { classesCandidatas, nomesDaListaDeMagias, preparadasPorClasse, truquesPorClasse } from '../regras-magia-classe.js';
 
 // Issue #46: aqui vivia `personalizadasDeCirculoDaFicha`, a lista de
 // `char.magias_customizadas` de círculo 1+ no formato de cartão. As duas
@@ -278,6 +278,41 @@ export async function mostrarBuscaMagia() {
   // volta a valer sempre; com ficha antiga (sem carimbo) a incerteza fica
   // visível e não vira bloqueio -- mesma regra das preparadas.
   let classificacaoTruques = truquesPorClasse(char, sup?.classe);
+  // Issue #105: entradas que contam no limite e não têm classe num
+  // multiclasse. Viram o bloco "Classe não definida" e ficam fora das
+  // grades de todas as classes até o jogador responder.
+  const multiclasseConjurador = superficies.length > 1;
+  const listasPorClasse = new Map();
+  if (multiclasseConjurador) {
+    for (const nomeLista of new Set(superficies.map((s) => s.listaMagias))) {
+      const json = await getMagiasClasse(nomeLista);
+      if (json) listasPorClasse.set(nomeLista, nomesDaListaDeMagias(json));
+    }
+  }
+  /** Lista das entradas sem classe definida (truques e preparadas), com as classes oferecidas. */
+  function ambiguosPendentes() {
+    if (!multiclasseConjurador) return [];
+    const truques = classificacaoTruques.semClasse.map((m) => ({ entrada: m, lista: 'conhecidas' }));
+    const preparadas = classificacaoAtiva.semClasse.map((m) => ({ entrada: m, lista: 'preparadas' }));
+    return [...truques, ...preparadas].map((x) => ({
+      ...x, classes: classesCandidatas(char, x.entrada.nome, listasPorClasse),
+    }));
+  }
+  /** HTML do bloco "Classe não definida"; string vazia quando não há ambíguos. */
+  function htmlBlocoSemClasse() {
+    const pendentes = ambiguosPendentes();
+    if (pendentes.length === 0) return '';
+    return `<div id="gm-bloco-sem-classe" class="info-box aviso gm-bloco-sem-classe">
+      <div style="font-weight:700;margin-bottom:4px">Classe não definida</div>
+      <div style="font-size:0.78rem;margin-bottom:6px">Escolha de qual classe é cada uma. Até lá ela não conta no limite de nenhuma.</div>
+      ${pendentes.map((p) => `
+        <div class="gm-linha-sem-classe">
+          <span>${escHtml(p.entrada.nome)}${p.lista === 'conhecidas' ? ' (truque)' : ''}</span>
+          ${p.classes.map((c) => `<button type="button" class="btn btn-sm btn-secondary"
+            data-definir-classe-magia="${escHtml(p.entrada.nome)}" data-classe="${escHtml(c)}" data-lista="${p.lista}">${escHtml(c)}</button>`).join('')}
+        </div>`).join('')}
+    </div>`;
+  }
   // Classes "conhecidas" (Bardo, Bruxo, Feiticeiro) e subclasses conjuradoras: somente consulta
   const somenteConsulta = tipoConj === 'conhecidas';
 
@@ -463,7 +498,23 @@ export async function mostrarBuscaMagia() {
     if (entrada?.nome !== nomeCartao) return false;
     const classeDaEntrada = typeof entrada.classe === 'string' ? entrada.classe.trim() : '';
     const deOutraClasse = classeDaEntrada !== '' && classeDaEntrada !== sup?.classe;
+    // Issue #105 (achado do review, rodada 1): em multiclasse, entrada
+    // carimbada com OUTRA classe NUNCA é o cartão desta grade. Antes desta
+    // guarda, `deOutraClasse` caía no ramo "ambígua" abaixo, que devolve
+    // `Boolean(entrada.personalizada) === ehCartaoPersonalizado` -- desde a
+    // issue #46 as duas metades são sempre `false` (nenhum cartão daqui é
+    // personalizado), e `false === false` é `true`. Ou seja: o cartão
+    // "Detectar Magia" da grade do CLÉRIGO acendia para uma entrada
+    // carimbada `Mago`, e o clique caía no handler de REMOÇÃO e apagava a
+    // preparada do Mago em silêncio. Classe única nunca aciona isto:
+    // `multiclasseConjurador` é o mesmo predicado que já guarda a leitura
+    // de `classificacaoAtiva`/`classificacaoTruques` no resto da função.
+    if (deOutraClasse && multiclasseConjurador) return false;
     const ambigua = deOutraClasse || magiaEhEspecial(entrada);
+    // Issue #105: sem classe num multiclasse é "não sei de quem é" -- não
+    // acende check nem é removível por grade de classe nenhuma; o jogador
+    // resolve no bloco "Classe não definida".
+    if (classeDaEntrada === '' && multiclasseConjurador && magiaContaNoLimite(entrada)) return false;
     if (!ambigua) return true;
     return Boolean(entrada.personalizada) === ehCartaoPersonalizado;
   }
@@ -478,12 +529,26 @@ export async function mostrarBuscaMagia() {
   // tela só passou a copiar a mesma ordem, para as duas concordarem na
   // regra de alarme. Mesmo conserto em atualizarContadores(), abaixo, que
   // recalcula esta mesma classe a cada mudança.
+  /** Texto do contador de truques da classe ativa, com o aviso de excedente. */
+  function textoContadorTruques() {
+    const n = classificacaoTruques.desta.length;
+    return `Truques: ${n}/${maxTruq}${n > maxTruq && classificacaoTruques.semClasse.length === 0 ? ' (acima do limite)' : ''}`;
+  }
+  /** Classe CSS do contador de truques: excedido antes de cheio (mesma ordem do de preparadas). */
+  function classeContadorTruques() {
+    const n = classificacaoTruques.desta.length;
+    if (classificacaoTruques.semClasse.length > 0) return '';
+    if (n > maxTruq) return 'contador-excedido';
+    return n === maxTruq ? 'contador-cheio' : '';
+  }
+
   abrirModal(somenteConsulta ? 'Consultar Magias' : 'Preparar Magias', `
     ${somenteConsulta ? `<div class="info-box info" style="margin-bottom:8px;font-size:0.85rem">Magias conhecidas sao definidas na <strong>subida de nivel</strong>. Use o <strong>Descanso Longo</strong> para trocar 1 magia.</div>` : ''}
     <div id="gm-aviso-superficie">${avisoSuperficieAtiva(superficies, sup, labelMg, classificacaoAtiva.semClasse.length)}</div>
+    <div id="gm-bloco-sem-classe-wrap">${htmlBlocoSemClasse()}</div>
     <div style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:6px;font-size:0.78rem">
-      <span class="magia-contador ${classificacaoTruques.desta.length >= maxTruq && classificacaoTruques.semClasse.length === 0 ? 'contador-cheio' : ''}" id="gm-contador-truques">
-        Truques: ${classificacaoTruques.desta.length}/${maxTruq}
+      <span class="magia-contador ${classeContadorTruques()}" id="gm-contador-truques">
+        ${textoContadorTruques()}
       </span>
       <span class="magia-contador contador-dominio" id="gm-contador-truques-sem-classe" title="Truques de fichas antigas (ou personalizados) cuja classe não pôde ser determinada sem chute -- não entram nesta contagem nem no bloqueio de limite." ${classificacaoTruques.semClasse.length > 0 ? '' : 'hidden'}>
         +${classificacaoTruques.semClasse.length} truque(s) sem classe
@@ -506,6 +571,7 @@ export async function mostrarBuscaMagia() {
 
   const resultadoEl = document.getElementById('resultado-magias');
   let tabAtiva = 'preparadas';
+  bindBlocoSemClasse();
 
   function renderTab() {
     const termo = semAcento(document.getElementById('busca-magia-add')?.value || '');
@@ -519,13 +585,34 @@ export async function mostrarBuscaMagia() {
       // mesmo defeito que o achado da Tarefa 2 corrigiu em levelup-ui.js.
       // Para classe única `deOutra` é sempre vazio -- nada muda para a
       // maioria dos personagens.
-      const especiais = (char.magias_preparadas || []).filter(m => magiaEhEspecial(m));
-      const normais = [...classificacaoAtiva.desta, ...classificacaoAtiva.semClasse];
+      const todasEspeciais = (char.magias_preparadas || []).filter(m => magiaEhEspecial(m));
+      // Issue #61: com mais de uma classe conjuradora, especial com classe
+      // aparece só no modal dela; sem classe (talento, espécie, concessão
+      // não identificada) vai para "Outras origens", visível em todas.
+      // Classe única mantém uma seção só.
+      const especiais = multiclasseConjurador ? todasEspeciais.filter(m => m.classe === sup?.classe) : todasEspeciais;
+      const outrasOrigens = multiclasseConjurador ? todasEspeciais.filter(m => !m.classe) : [];
+      // Issue #105 (achado do review, rodada 1 -- Review Focus 1): a lista
+      // só deixa de incluir `semClasse` em MULTICLASSE, onde a entrada
+      // ambígua tem para onde ir (o bloco "Classe não definida"). Classe
+      // única nunca tem esse bloco (`ambiguosPendentes` devolve vazio) e
+      // `preparadasPorClasse` NÃO aplica a RULING R-B para preparadas (ao
+      // contrário de `truquesPorClasse`) -- uma preparada sem carimbo de
+      // ficha antiga cairia sempre em `semClasse`, mesmo com uma única
+      // classe. Sem este `multiclasseConjurador`, essa preparada
+      // desaparecia da aba "Preparadas Atuais" sem aviso nenhum.
+      const normais = multiclasseConjurador
+        ? [...classificacaoAtiva.desta]
+        : [...classificacaoAtiva.desta, ...classificacaoAtiva.semClasse];
       const filtradas = termo.length >= 2 ? normais.filter(m => semAcento(m.nome).includes(termo)) : normais;
       const filtradasDom = termo.length >= 2 ? especiais.filter(m => semAcento(m.nome).includes(termo)) : especiais;
 
       html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">${labelMg}s: ${classificacaoAtiva.desta.length}/${maxPrep}${classificacaoAtiva.semClasse.length > 0 ? ` <span title="Magias de fichas antigas cuja classe não pôde ser determinada sem chute.">+${classificacaoAtiva.semClasse.length} sem classe</span>` : ''}${somenteConsulta ? '' : ' | Use o <strong>check</strong> para (des)marcar'}</div>`;
 
+      // Issue #61: bloco isolado num id próprio -- o modal do Mago não pode
+      // conter texto do domínio do Clérigo, nem vice-versa. Emitido sempre
+      // (mesmo vazio) porque o spec usa `not.toContainText` nele.
+      html += '<div id="gm-especiais-classe">';
       if (filtradasDom.length > 0) {
         // escHtml no NOME, pelo MESMO motivo do bloco irmão logo abaixo (o
         // das issues #27/#33) e por um gatilho novo: até a issue #46 esta
@@ -546,6 +633,23 @@ export async function mostrarBuscaMagia() {
             <div class="opcao-resumo"><span>${rotuloOrigemMagia(m)}</span></div>
           </div>
         `).join('')}</div>`;
+      }
+      html += '</div>';
+
+      // Issue #61: origem sem classe identificável (talento, espécie,
+      // concessão que `classeDaMagiaConcedida` não resolveu) fica visível em
+      // TODAS as classes -- não é do domínio de nenhuma para escondê-la.
+      const outrasFiltradas = termo.length >= 2 ? outrasOrigens.filter(m => semAcento(m.nome).includes(termo)) : outrasOrigens;
+      if (outrasFiltradas.length > 0) {
+        html += `<div id="gm-outras-origens">
+          <div style="font-size:0.75rem;font-weight:700;color:var(--secondary);margin:8px 0 4px">Outras origens</div>
+          <div class="opcao-grid densa">${outrasFiltradas.map(m => `
+            <div class="opcao-card selecionada magia-dominio" style="opacity:0.7;cursor:default">
+              <span class="opcao-check"></span>
+              <div class="opcao-nome" data-detalhe-magia="${escHtml(m.nome)}" data-detalhe-circ="${escHtml(String(m.circulo))}" style="cursor:pointer"><span class="badge-dominio">&#9733;</span> ${escHtml(m.nome)}</div>
+              <div class="opcao-resumo"><span>${rotuloOrigemMagia(m)}</span></div>
+            </div>`).join('')}</div>
+        </div>`;
       }
 
       if (filtradas.length > 0) {
@@ -597,13 +701,34 @@ export async function mostrarBuscaMagia() {
       // (nada mais o concede de volta). `truqueEhTrocavel` é a fonte única
       // das origens que o jogador não escolheu (regras-origens-magia.js);
       // aqui ela cobre exatamente o que esta grade tem de travar.
-      const truquesConcedidos = truquesAtuais.filter(m => m.origem !== 'especie' && !truqueEhTrocavel(m));
+      const truquesConcedidos = truquesAtuais.filter(m => m.origem !== 'especie' && !truqueEhTrocavel(m)
+        && (!multiclasseConjurador || !m.classe || m.classe === sup?.classe));
       // Mesma medida do portao de gravacao: `desta` (carimbados com a
       // classe da superficie ativa), nao a soma global.
       const numTruq = classificacaoTruques.desta.length;
-      html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">Truques: ${numTruq}/${maxTruq}${truquesEsp.length > 0 ? ` (+${truquesEsp.length} espécie)` : ''}${truquesConcedidos.length > 0 ? ` (+${truquesConcedidos.length} concedido)` : ''}</div>`;
+      html += `<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">${textoContadorTruques()}${truquesEsp.length > 0 ? ` (+${truquesEsp.length} espécie)` : ''}${truquesConcedidos.length > 0 ? ` (+${truquesConcedidos.length} concedido)` : ''}</div>`;
 
-      const selecionadosSet = new Set(truquesAtuais.map(m => m.nome));
+      // Issue #105: marcado = truque DESTA classe. Truque de outra classe
+      // com o mesmo nome aparece travado; sem classe, só no bloco de cima.
+      const selecionadosSet = new Set(classificacaoTruques.desta.map(m => m.nome));
+      // Issue #105 (achado do review, rodada 1): `classificacaoTruques.deOutra`
+      // só tem truques que CONTAM no limite (truquesQueContamNoLimite) --
+      // um truque CONCEDIDO de outra classe (origem que o jogador não
+      // escolheu, ex. Chama Sagrada do Clérigo aparecendo na lista do
+      // Paladino) não entra em `deOutra`, e `truquesConcedidos` (acima) o
+      // exclui de propósito quando é de outra classe. Sem entrar também
+      // aqui, o nome sobrava na grade de classe como cartão LIVRE, com
+      // check que clicava e não fazia nada (a guarda `truqueEhTrocavel` do
+      // handler recusa em silêncio). Juntar as duas fontes garante que ele
+      // trave como qualquer outro homônimo de outra classe.
+      const outrosConcedidos = multiclasseConjurador
+        ? truquesAtuais.filter(m => m.origem !== 'especie' && !truqueEhTrocavel(m) && m.classe && m.classe !== sup?.classe)
+        : [];
+      const classePorNomeOutra = new Map([
+        ...classificacaoTruques.deOutra.map(m => [m.nome, m.classe]),
+        ...outrosConcedidos.map(m => [m.nome, m.classe]),
+      ]);
+      const semClasseSet = new Set(classificacaoTruques.semClasse.map(m => m.nome));
       const truquesEspSet = new Set(truquesEsp.map(m => m.nome));
       const truquesConcedidosSet = new Set(truquesConcedidos.map(m => m.nome));
 
@@ -646,6 +771,16 @@ export async function mostrarBuscaMagia() {
       // Filtrar truques de espécie e de concessão da lista de classe
       // (evitar duplicatas -- os dois já saíram nas seções travadas acima).
       lista = lista.filter(m => !truquesEspSet.has(m.nome) && !truquesConcedidosSet.has(m.nome));
+      // Issue #105: truque ambíguo (sem classe) só aparece no bloco "Classe
+      // não definida", nunca na grade -- exceto se por acaso já houver
+      // entrada carimbada com este nome (homônimo), aí o cartão da classe
+      // marcada continua aqui. Só filtra em MULTICLASSE (achado do review,
+      // rodada 1, Review Focus 1): `truquesPorClasse` já aplica a RULING
+      // R-B para classe única (RULING R-B: sem carimbo e uma superfície só
+      // -> a classe é a única que existe, sem chute), então `semClasseSet`
+      // já vem sempre vazio nesse caso -- o guard é só para não depender
+      // desse detalhe de implementação continuar valendo.
+      lista = lista.filter(m => !multiclasseConjurador || !semClasseSet.has(m.nome) || selecionadosSet.has(m.nome));
       if (termo.length >= 2) lista = lista.filter(m => semAcento(m.nome).includes(termo));
       // Grisalha os cartoes so quando a contagem e CERTA -- havendo
       // truque sem carimbo a grade nao bloqueia por incerteza, mesma
@@ -653,6 +788,15 @@ export async function mostrarBuscaMagia() {
       const cheioTruq = numTruq >= maxTruq && classificacaoTruques.semClasse.length === 0;
 
       html += `<div class="opcao-grid densa">${lista.map(m => {
+        const outra = classePorNomeOutra.get(m.nome);
+        if (outra && !selecionadosSet.has(m.nome)) {
+          return `
+          <div class="opcao-card bloqueada" data-truque-travado="${escHtml(m.nome)}" style="opacity:0.5;cursor:default">
+            <span class="opcao-check"></span>
+            <div class="opcao-nome" data-detalhe-magia="${escHtml(m.nome)}" data-detalhe-circ="0" style="cursor:pointer">${escHtml(m.nome)}</div>
+            <div class="opcao-resumo"><span>Conhecido pelo ${escHtml(outra)}</span></div>
+          </div>`;
+        }
         const sel = selecionadosSet.has(m.nome);
         const bloqueado = cheioTruq && !sel;
         return `
@@ -682,6 +826,18 @@ export async function mostrarBuscaMagia() {
       // jogador e continuam valendo para a magia do livro.
       const preparadasDoCirc = (char.magias_preparadas || []).filter(m => m.circulo === circ);
       const estaPreparada = (m) => preparadasDoCirc.some(p => entradaEhDoCartao(p, m.nome, false));
+      // Issue #105 (achado do review, rodada 1): igual ao mapa irmão da aba
+      // Truques -- uma preparada carimbada com OUTRA classe (ex.: "Detectar
+      // Magia" carimbada Mago) não é mais "do cartão" (`entradaEhDoCartao`,
+      // acima), então sem isto o cartão do Clérigo apareceria LIVRE, com
+      // check, na grade do círculo dela. O nome vira cartão travado, como
+      // o truque de outra classe.
+      const classePorNomeOutraPrep = multiclasseConjurador
+        ? new Map(preparadasDoCirc
+            .map(m => ({ m, c: typeof m.classe === 'string' ? m.classe.trim() : '' }))
+            .filter(({ c }) => c !== '' && c !== sup?.classe)
+            .map(({ m, c }) => [m.nome, c]))
+        : new Map();
       const numAtual = classificacaoAtiva.desta.length;
       // Regra do BLOQUEIO (Tarefa 4): só é "cheio" com contagem CERTA --
       // sem nenhuma magia sem classe. Havendo `semClasse`, a grade não
@@ -702,6 +858,19 @@ export async function mostrarBuscaMagia() {
 
       html += `<div class="opcao-grid densa">${lista.map(m => {
         const sel = estaPreparada(m);
+        // Issue #105 (achado do review, rodada 1): mesmo padrão do truque
+        // travado -- se já existe entrada com este nome carimbada com OUTRA
+        // classe E não há uma entrada carimbada com a classe ativa (`sel`
+        // continuaria falso), o cartão trava em vez de ficar livre.
+        const outraPrep = classePorNomeOutraPrep.get(m.nome);
+        if (outraPrep && !sel) {
+          return `
+          <div class="opcao-card bloqueada" data-magia-travada="${escHtml(m.nome)}" style="opacity:0.5;cursor:default">
+            <span class="opcao-check"></span>
+            <div class="opcao-nome" data-detalhe-magia="${escHtml(m.nome)}" data-detalhe-circ="${circ}" style="cursor:pointer">${escHtml(m.nome)}</div>
+            <div class="opcao-resumo"><span>Preparada pelo ${escHtml(outraPrep)}</span></div>
+          </div>`;
+        }
         // `entradaEhDoCartao` também aqui, pela mesma razão do bloco acima --
         // e com o mesmo terceiro argumento `false`: uma entrada de origem
         // isenta (domínio, Iniciado em Magia) casada só por nome pintaria de
@@ -781,9 +950,12 @@ export async function mostrarBuscaMagia() {
         // origens que o jogador não escolheu -- a mesma que já trava a
         // grade acima (truquesConcedidos) e o modal de troca do Descanso
         // Longo (truquesTrocaveis, mais abaixo neste arquivo).
-        const entradaExistente = (char.magias_conhecidas || []).find(m => m.nome === nome);
+        // Issue #105: a entrada deste cartão é a DESTA classe (dado legado
+        // pode ter o mesmo truque carimbado em duas classes).
+        const entradaExistente = classificacaoTruques.desta.find(m => m.nome === nome)
+          || (char.magias_conhecidas || []).find(m => m.nome === nome && !truqueEhTrocavel(m));
         if (entradaExistente && !truqueEhTrocavel(entradaExistente)) return;
-        const idx = (char.magias_conhecidas || []).findIndex(m => m.nome === nome);
+        const idx = entradaExistente ? char.magias_conhecidas.indexOf(entradaExistente) : -1;
         if (idx >= 0) {
           char.magias_conhecidas.splice(idx, 1);
           salvar();
@@ -835,8 +1007,8 @@ export async function mostrarBuscaMagia() {
         const idx = char.magias_preparadas
           .findIndex(m => entradaEhDoCartao(m, nome, false));
         if (idx < 0 && char.magias_preparadas.some(m => m?.nome === nome)) {
-          // ESTE RAMO É INALCANÇÁVEL HOJE -- não o leia como uma proteção
-          // viva (issue #46, medido).
+          // ESTE RAMO VOLTOU A SER ALCANÇÁVEL (achado do review da Tarefa 4,
+          // rodada 1) -- não é mais código morto, releia antes de tocar.
           //
           // Ele nasceu para o caso em que existia entrada com este nome mas
           // ela era de OUTRA magia: as issues #27/#33 punham a magia
@@ -846,30 +1018,39 @@ export async function mostrarBuscaMagia() {
           // alheia em SILÊNCIO, com um toast dizendo "removida" -- o jogador
           // achava que estava preparando esta e saía com a outra desfeita.
           //
-          // Por que morreu: a #46 tirou a customizada da grade, e com ela o
-          // único desempate que `entradaEhDoCartao` ainda exercia (ver o
-          // docblock dela). A função passou a equivaler a comparar o nome,
-          // então `idx < 0` já significa "nenhum nome bate" -- e o `some` do
-          // MESMO nome, logo ao lado, é falso junto. As duas metades desta
-          // condição não podem ser verdadeiras ao mesmo tempo.
+          // A issue #46 tirou a customizada da grade e, com ela, o único
+          // desempate que `entradaEhDoCartao` ainda exercia -- este ramo
+          // ficou inalcançável por um tempo (medido e documentado nesta
+          // mesma revisão de código, antes da Tarefa 4). A Tarefa 4 (issue
+          // #105) devolveu DOIS desempates novos a `entradaEhDoCartao`, e
+          // com eles este ramo volta a ser alcançável, agora por caminhos
+          // diferentes dos originais:
           //
-          // Varredura medida dos estados em que uma entrada divide o nome com
-          // um cartão desta grade: entrada de outra classe cai em REMOVER
-          // (toast "removida"); entrada de origem isenta não tem
-          // `data-circ-check` nenhum (o portão `isDominio` do render o tira);
-          // entrada com a marca `personalizada` não sobrevive à migração
-          // `migrarMagiasCustomizadasSemprePreparadas`. Nenhum caminho chega
-          // aqui, e nenhum teste da suíte cobre este toast.
-          //
-          // FICA porque a limitação que ele explica continua real -- uma vaga
-          // por nome, já que `magias_preparadas[]` é indexada por nome no app
-          // inteiro (`sheet/magias.js` despreparar com
-          // `filter(m => m.nome !== nome)` levaria duas homônimas de uma vez)
-          // --, e porque ele volta a valer sozinho no dia em que
-          // `entradaEhDoCartao` tornar a discriminar. Quem for simplificar
-          // aquela função leva este ramo junto.
+          //  - ENTRADA CARIMBADA DE OUTRA CLASSE: fica travada como cartão
+          //    (`data-magia-travada`, sem `data-circ-check`) no render acima
+          //    -- então na prática este ramo não é MAIS atingido por essa
+          //    via; o clique nunca chega a acontecer porque o cartão não é
+          //    clicável. Mantido aqui como cinto e suspensório: se algum dia
+          //    o render mudar e voltar a desenhar `data-circ-check` para
+          //    esse caso, o toast abaixo (`classeDaOutra`) ainda soa certo.
+          //  - ENTRADA SEM CLASSE NUM MULTICLASSE (ambígua, issue #105): o
+          //    cartão do círculo NÃO É filtrado da grade (ao contrário da
+          //    aba Truques, que tira o ambíguo com `semClasseSet`) --
+          //    continua livre, com check, porque `estaPreparada` (usa
+          //    `entradaEhDoCartao`) devolve `false` para ela. O clique bate
+          //    aqui de verdade: `idx < 0` (não é do cartão) e `some` (existe
+          //    entrada com este nome) são as duas verdadeiras ao mesmo
+          //    tempo. O ramo `semClasseAmbigua` abaixo cobre este caso,
+          //    apontando para o bloco "Classe não definida" em vez do texto
+          //    genérico "a magia da classe" (que soaria como se já houvesse
+          //    dono).
           const outra = char.magias_preparadas.find(m => m?.nome === nome);
           const classeDaOutra = typeof outra?.classe === 'string' ? outra.classe.trim() : '';
+          const semClasseAmbigua = classeDaOutra === '' && multiclasseConjurador && magiaContaNoLimite(outra);
+          if (semClasseAmbigua) {
+            toast(`"${nome}" está sem classe definida. Resolva no bloco "Classe não definida", no topo do modal.`, 'error');
+            return;
+          }
           // O ramo "a sua magia personalizada" saiu com a issue #46: depois
           // da migração `migrarMagiasCustomizadasSemprePreparadas`
           // (sheet/migracoes.js), nenhuma entrada de `magias_preparadas`
@@ -1014,8 +1195,8 @@ export async function mostrarBuscaMagia() {
     const truquesIncertos = classificacaoTruques.semClasse.length;
     const contTruques = document.getElementById('gm-contador-truques');
     if (contTruques) {
-      contTruques.textContent = `Truques: ${numTruques}/${maxTruq}`;
-      contTruques.className = `magia-contador ${numTruques >= maxTruq && truquesIncertos === 0 ? 'contador-cheio' : ''}`;
+      contTruques.textContent = textoContadorTruques();
+      contTruques.className = `magia-contador ${classeContadorTruques()}`;
     }
 
     // "+N truque(s) sem classe" -- a incerteza tem de ficar VISÍVEL, pelo
@@ -1069,6 +1250,34 @@ export async function mostrarBuscaMagia() {
     if (avisoEl) {
       avisoEl.innerHTML = avisoSuperficieAtiva(superficies, sup, labelMg, classificacaoAtiva.semClasse.length);
     }
+
+    const wrapSemClasse = document.getElementById('gm-bloco-sem-classe-wrap');
+    if (wrapSemClasse) {
+      wrapSemClasse.innerHTML = htmlBlocoSemClasse();
+      bindBlocoSemClasse();
+    }
+  }
+
+  /**
+   * Liga os botões do bloco "Classe não definida": grava `classe` na
+   * primeira entrada sem classe com aquele nome na lista indicada, salva e
+   * redesenha contadores e aba.
+   */
+  function bindBlocoSemClasse() {
+    document.querySelectorAll('[data-definir-classe-magia]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const nome = btn.dataset.definirClasseMagia;
+        const lista = btn.dataset.lista === 'conhecidas' ? char.magias_conhecidas : char.magias_preparadas;
+        const pendentes = btn.dataset.lista === 'conhecidas' ? classificacaoTruques.semClasse : classificacaoAtiva.semClasse;
+        const entrada = (lista || []).find((m) => m.nome === nome && pendentes.includes(m));
+        if (!entrada) return;
+        entrada.classe = btn.dataset.classe;
+        salvar();
+        toast(`${nome}: ${btn.dataset.classe}`, 'success');
+        atualizarContadores();
+        renderTab();
+      });
+    });
   }
 
   // Tabs
@@ -1990,7 +2199,7 @@ export async function abrirPreenchimentoSlotMagia(tipo = 'magia') {
     if (!magiaSelecionada) return;
     if (ehTruque) {
       if (!char.magias_conhecidas) char.magias_conhecidas = [];
-      char.magias_conhecidas.push({ nome: magiaSelecionada, circulo: 0 });
+      char.magias_conhecidas.push({ nome: magiaSelecionada, circulo: 0, ...(sup?.classe ? { classe: sup.classe } : {}) });
       char._slots_truque_livre = Math.max(0, (char._slots_truque_livre || 1) - 1);
       if (char._slots_truque_livre === 0) delete char._slots_truque_livre;
     } else {
@@ -2333,20 +2542,26 @@ export function truquesTrocaveis() {
  *   -- mesma regra de `mostrarTrocaMagiaConhecida`, acima. Sem
  *   `opcoes.classe`, o comportamento é IDÊNTICO ao de antes desta tarefa.
  *
- *   LIMITAÇÃO MEDIDA, permanente (não é lacuna a fechar depois): só a
- *   lista de ENTRADA (quais truques podem entrar) segue `opcoes.classe`
- *   -- ela já vinha de `obterMagiasDisponiveisClasseAtual({ classe:
- *   sup.classe, ... })`, e `sup`, abaixo, passa a ser a superfície
- *   resolvida por `opcoes.classe`. A lista de SAÍDA (`truquesTrocaveis()`,
- *   logo abaixo) é sempre a do personagem INTEIRO -- NUNCA filtrada por
- *   classe nenhuma, nem por `opcoes.classe` nem pela superfície ativa --
- *   porque `char.magias_conhecidas[]` não tem campo `classe`, diferente
- *   de `magias_preparadas[]` (carimbado pelo sub-projeto anterior, "magia
- *   sabe a classe", que deixou os truques de fora por decisão
- *   registrada). Não dá para inferir a classe de um truque pelo NOME sem
- *   chutar: as listas de classe se sobrepõem demais (Feiticeiro e Mago
- *   compartilham 95% da lista menor) -- um filtro por nome acertaria por
- *   acaso e erraria em silêncio, então nenhum foi adicionado.
+ *   FATO ATUAL (corrigido na revisão final #105/#61, achado Important 1):
+ *   tanto a lista de ENTRADA quanto a de SAÍDA seguem a classe da troca.
+ *   `sup` é a superfície resolvida por `opcoes.classe` (ou a ativa, sem
+ *   ele) -- a entrada já vinha de `obterMagiasDisponiveisClasseAtual({
+ *   classe: sup.classe, ... })`. A SAÍDA (`truquesPorClasse(char,
+ *   sup.classe).desta` + `.semClasse`, calculada logo abaixo) agora exclui
+ *   os truques de OUTRA classe: antes deste conserto ela era
+ *   `truquesTrocaveis()` sem filtro nenhum, e um truque de outra classe
+ *   entrava na troca e saía carimbado com a classe errada
+ *   (`magias_conhecidas[]` ganhou o campo `classe` no mesmo sub-projeto
+ *   #105/#61 que corrigiu este achado -- o comentário antigo, que dizia o
+ *   contrário, ficou desatualizado). `semClasse` entra na SAÍDA junto com
+ *   `desta` para não travar a troca de um truque legado sem carimbo (ficha
+ *   ainda não migrada, ou migração que não resolveu a classe) -- ele some
+ *   da lista quando o jogador tem só 1 superfície de conjuração (R-B,
+ *   regras-magia-classe.js, resolve sem carimbo nenhum). Não dá para
+ *   inferir a classe de um truque pelo NOME sem chutar: as listas de
+ *   classe se sobrepõem demais (Feiticeiro e Mago compartilham 95% da
+ *   lista menor) -- por isso o carimbo `classe`, não o nome, decide o
+ *   balde.
  *
  *   ACHADO IMPORTANT 1 da rodada 1 de revisão desta tarefa: os DADOS
  *   COMPLETOS de exibição de cada truque atual (escola, duração -- só
@@ -2368,12 +2583,27 @@ export function truquesTrocaveis() {
  *   QUALQUER lista onde o nome apareça, o mesmo dado de jogo que toda
  *   lista descreveria igual, para enriquecer a exibição de um truque que
  *   o personagem JÁ SABE que tem -- nunca decide quem entra na lista de
- *   SAÍDA, que continua sendo `truquesAtuais` inteiro, sem filtro nenhum.
+ *   SAÍDA. Essa busca continua útil mesmo com o filtro por classe da
+ *   revisão final (acima): um truque de `semClasse` pode não ter dado
+ *   completo na lista da própria `sup` (a lista de outra classe onde ele
+ *   está carimbado é que o descreve), e a união evita que ele apareça sem
+ *   escola/duração no seletor "remover".
  */
 export async function mostrarTrocaTruque(callbackPosTroca = null, opcoes = {}) {
-  // Lista de SAIDA sem filtro de classe -- ver a LIMITACAO MEDIDA no
-  // docblock acima.
-  const truquesAtuais = truquesTrocaveis();
+  const sup = superficieDaTroca(char, opcoes.classe);
+  // Lista de SAIDA filtrada pela classe da troca (achado Important 1 da
+  // revisao final #105/#61) -- ver docblock acima. `truquesPorClasse` ja
+  // aplica R-B (classe unica sem carimbo cai nela mesma) e devolve
+  // `semClasse` so quando ha ambiguidade real (2+ superficies, entrada sem
+  // carimbo); somamos os dois baldes para nao travar a troca de um truque
+  // legado sem carimbo. Sem `sup` (personagem sem superficie de conjuracao
+  // nenhuma), cai no comportamento antigo (lista inteira) -- caso que o
+  // portao de "Nenhum truque" logo abaixo ja teria barrado de qualquer jeito
+  // se de fato nao houvesse truque trocavel algum.
+  const classificacaoTruques = sup ? truquesPorClasse(char, sup.classe) : null;
+  const truquesAtuais = classificacaoTruques
+    ? [...classificacaoTruques.desta, ...classificacaoTruques.semClasse]
+    : truquesTrocaveis();
   if (truquesAtuais.length === 0) {
     toast('Nenhum truque de classe para trocar', 'error');
     if (callbackPosTroca) callbackPosTroca();
@@ -2381,7 +2611,6 @@ export async function mostrarTrocaTruque(callbackPosTroca = null, opcoes = {}) {
     return;
   }
 
-  const sup = superficieDaTroca(char, opcoes.classe);
   const subConj = subConjDaSuperficie(sup);
   const magiasClasse = sup
     ? await obterMagiasDisponiveisClasseAtual({ classe: sup.classe, subclasse: sup.subclasse, nivel: sup.nivelClasse })
@@ -2489,12 +2718,20 @@ export async function mostrarTrocaTruque(callbackPosTroca = null, opcoes = {}) {
     if (!truqueRemover || !truqueAdicionar) return;
     const idx = char.magias_conhecidas.findIndex(m => m.nome === truqueRemover);
     if (idx >= 0) {
-      // Preserva a `origem` do truque que sai: o substituto ocupa a MESMA
-      // vaga, entao herda de onde ela veio (undefined = truque de classe).
-      const origem = char.magias_conhecidas[idx]?.origem;
+      // Preserva `origem` do truque que sai (undefined = truque sem essa
+      // informacao), mas `classe` vem da CLASSE DA TROCA (`sup.classe`), nao
+      // da entrada removida -- achado Important 1 da revisao final #105/#61:
+      // com a SAIDA agora filtrada por classe (acima), o truque que sai ja e'
+      // da classe da troca OU e' `semClasse` (sem carimbo); herdar o carimbo
+      // dele geraria o mesmo carimbo de novo (caso comum) ou deixaria o
+      // substituto sem classe (caso `semClasse`, que carimbar aqui resolve
+      // em vez de propagar a ambiguidade). Sem `sup` (ficha sem superficie de
+      // conjuracao), omite o carimbo -- mesmo comportamento de antes.
+      const { origem } = char.magias_conhecidas[idx] || {};
       char.magias_conhecidas.splice(idx, 1);
       const novo = { nome: truqueAdicionar, circulo: 0 };
       if (origem) novo.origem = origem;
+      if (sup?.classe) novo.classe = sup.classe;
       char.magias_conhecidas.push(novo);
       salvar();
       toast(`Trocou ${truqueRemover} por ${truqueAdicionar}`, 'success');

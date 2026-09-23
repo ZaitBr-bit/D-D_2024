@@ -117,16 +117,18 @@ export function migrarSlotsMagiaLivre() {
  * Mágicas. `getTruquesFixosAcumulados` já se recusa a cruzar classe de uma
  * entrada com subclasse de outra (guarda `def.classe !== classe`), então
  * consultar cada entrada com seu próprio par preserva essa propriedade.
+ *
+ * Cada truque sai carimbado com a classe que o concede (issue #105).
  */
 export function migrarTruquesFixosSubclasse() {
-  const fixos = classesDe(char)
-    .flatMap((c) => getTruquesFixosAcumulados(c.classe, c.subclasse, c.nivel || 1));
+  const fixos = classesDe(char).flatMap((c) =>
+    getTruquesFixosAcumulados(c.classe, c.subclasse, c.nivel || 1).map((nome) => ({ nome, classe: c.classe })));
   if (fixos.length === 0) return;
   if (!char.magias_conhecidas) char.magias_conhecidas = [];
   let alterado = false;
-  for (const nome of fixos) {
+  for (const { nome, classe } of fixos) {
     if (!char.magias_conhecidas.some(m => m.nome === nome)) {
-      char.magias_conhecidas.push({ nome, circulo: 0, origem: 'subclasse_fixa' });
+      char.magias_conhecidas.push({ nome, circulo: 0, origem: 'subclasse_fixa', classe });
       alterado = true;
     }
   }
@@ -439,14 +441,20 @@ export function migrarEspacosMagia() {
 // numeracao do arquivo -- ver o comentario de migrarParaMulticlasse): esta
 // e a ULTIMA migracao do arquivo, entao os imports dela tambem entram no
 // fim, ao lado do unico trecho que os usa.
-import { classeDaMagiaPreparada, nomesDaListaDeMagias } from '../regras-magia-classe.js';
+import {
+  classeDaMagiaConcedida, classeDaMagiaPreparada, classeDoTruque, ehConcedidaDeClasse, nomesDaListaDeMagias,
+} from '../regras-magia-classe.js';
+import { truqueContaNoLimite } from '../regras-origens-magia.js';
+import { obterConcessoesPorClasse } from '../levelup.js';
 import { superficiesDeConjuracao } from '../regras-multiclasse-conjuracao.js';
 import { getMagiasClasse } from '../db.js';
 import { classesData } from './estado.js';
 
 /**
- * Migra `magias_preparadas[]` de fichas gravadas ANTES de o campo `classe`
- * existir (Tarefas 1 e 2 deste sub-projeto), carimbando cada entrada com a
+ * Migra `magias_preparadas[]` e os truques de `magias_conhecidas[]` (que
+ * contam no limite da classe) de fichas gravadas ANTES de o campo `classe`
+ * existir (Tarefas 1 e 2 deste sub-projeto, mais Issues #105/#61 para
+ * truques e concessoes de classe/subclasse), carimbando cada entrada com a
  * classe dona -- quando isso pode ser afirmado sem chutar.
  *
  * O campo e OPCIONAL de proposito, nunca um palpite: medido sobre os 8
@@ -477,20 +485,23 @@ import { classesData } from './estado.js';
  * nada. Roda em TODA abertura de ficha -- por isso a saida barata, logo no
  * inicio, evita ate montar `listasPorClasse` quando nao ha nada para fazer.
  *
+ * Issues #105/#61: varre tambem os truques de `magias_conhecidas` que
+ * contam no limite (classeDoTruque) e as concessoes de classe das duas
+ * listas (classeDaMagiaConcedida, com o Map de obterConcessoesPorClasse,
+ * montado so quando ha concessao pendente). Concessao e decidida pela
+ * tabela da subclasse ANTES da lista de magias: Maos Magicas do Trapaceiro
+ * Arcano esta na lista do Mago, mas quem a concede e o Ladino.
+ *
  * @returns {Promise<boolean>} true se carimbou alguma entrada.
  */
 export async function migrarMagiaClasse() {
-  const preparadas = char.magias_preparadas;
-  if (!preparadas?.length) return false;
-
-  // Saida barata: se toda entrada ja tem `classe` (string nao vazia) ou e
-  // isenta (magiaContaNoLimite falso -- dominio, sempre, talento etc., que
-  // nunca saem do orcamento de uma classe), nao ha nada para fazer. Confere
-  // ANTES de tocar em disco: esta migracao roda a cada abertura de ficha, e
-  // nao pode custar 8 leituras de JSON para nao fazer nada na maioria delas.
-  const faltaCarimbar = (m) =>
-    magiaContaNoLimite(m) && !(typeof m.classe === 'string' && m.classe.trim() !== '');
-  if (!preparadas.some(faltaCarimbar)) return false;
+  const temCarimbo = (m) => typeof m?.classe === 'string' && m.classe.trim() !== '';
+  const pendentesPrep = (char.magias_preparadas || [])
+    .filter((m) => !temCarimbo(m) && (magiaContaNoLimite(m) || ehConcedidaDeClasse(m)));
+  const pendentesTruq = (char.magias_conhecidas || [])
+    .filter((m) => m?.circulo === 0 && !temCarimbo(m) && (truqueContaNoLimite(m) || ehConcedidaDeClasse(m)));
+  // Saida barata: nada pendente, nenhuma leitura de disco.
+  if (pendentesPrep.length === 0 && pendentesTruq.length === 0) return false;
 
   const superficies = superficiesDeConjuracao(char, classesData);
   // Classe unica NAO carrega lista nenhuma: classeDaMagiaPreparada resolve
@@ -514,18 +525,27 @@ export async function migrarMagiaClasse() {
     }
   }
 
+  // Concessoes so sao montadas quando ha concessao pendente: cada classe
+  // custa a leitura do JSON da classe.
+  const concessoesPorClasse = [...pendentesPrep, ...pendentesTruq].some(ehConcedidaDeClasse)
+    ? await obterConcessoesPorClasse(char)
+    : null;
+
   let alterado = false;
-  for (const magia of preparadas) {
-    // Nunca sobrescreve um carimbo que ja existe.
-    if (typeof magia.classe === 'string' && magia.classe.trim() !== '') continue;
-    const classe = classeDaMagiaPreparada(char, magia, { mapaDados: classesData, listasPorClasse });
-    // Nunca grava valor vazio: so grava quando classeDaMagiaPreparada
-    // devolve uma string (nunca null/''/undefined) -- senao a entrada fica
-    // exatamente como estava, sem a chave.
-    if (classe) {
-      magia.classe = classe;
-      alterado = true;
-    }
+  // Grava so string nao vazia; null deixa a entrada sem a chave.
+  const carimbar = (m, classe) => {
+    if (classe) { m.classe = classe; alterado = true; }
+  };
+  const opcoes = { mapaDados: classesData, listasPorClasse };
+  for (const m of pendentesPrep) {
+    carimbar(m, ehConcedidaDeClasse(m)
+      ? classeDaMagiaConcedida(char, m, concessoesPorClasse)
+      : classeDaMagiaPreparada(char, m, opcoes));
+  }
+  for (const m of pendentesTruq) {
+    carimbar(m, ehConcedidaDeClasse(m)
+      ? classeDaMagiaConcedida(char, m, concessoesPorClasse)
+      : classeDoTruque(char, m, opcoes));
   }
   if (alterado) salvar();
   return alterado;

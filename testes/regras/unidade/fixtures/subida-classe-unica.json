@@ -1660,12 +1660,14 @@
         {
           "nome": "Palavra de Poder: Matar",
           "circulo": 9,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Bardo"
         },
         {
           "nome": "Palavra de Poder: Salvar",
           "circulo": 9,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Bardo"
         }
       ],
       "grimorio": []
@@ -1747,27 +1749,32 @@
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Fogo das Fadas",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Força Espectral",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Sono",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         }
       ],
       "grimorio": []
@@ -1812,27 +1819,32 @@
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Fogo das Fadas",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Força Espectral",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Sono",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         }
       ],
       "grimorio": []
@@ -1877,37 +1889,44 @@
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Fogo das Fadas",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Força Espectral",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Sono",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Crescimento de Plantas",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Piscar",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         }
       ],
       "grimorio": []
@@ -1952,37 +1971,44 @@
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Fogo das Fadas",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Força Espectral",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Sono",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Crescimento de Plantas",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Piscar",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         }
       ],
       "grimorio": []
@@ -2027,47 +2053,56 @@
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Fogo das Fadas",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Força Espectral",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Sono",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Crescimento de Plantas",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Piscar",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Fera",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Invisibilidade Maior",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         }
       ],
       "grimorio": []
@@ -2113,47 +2148,56 @@
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Fogo das Fadas",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Força Espectral",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Sono",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Crescimento de Plantas",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Piscar",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Fera",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Invisibilidade Maior",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         }
       ],
       "grimorio": []
@@ -2199,63 +2243,75 @@
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Fogo das Fadas",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Força Espectral",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Sono",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Crescimento de Plantas",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Piscar",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Fera",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Invisibilidade Maior",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Pessoa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Similaridade",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Bruxo"
         }
       ],
       "grimorio": []
@@ -2301,63 +2357,75 @@
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Fogo das Fadas",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Força Espectral",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Sono",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Crescimento de Plantas",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Piscar",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Fera",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Invisibilidade Maior",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Pessoa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Similaridade",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Bruxo"
         }
       ],
       "grimorio": []
@@ -2403,63 +2471,75 @@
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Fogo das Fadas",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Força Espectral",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Sono",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Crescimento de Plantas",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Piscar",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Fera",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Invisibilidade Maior",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Pessoa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Similaridade",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Bruxo"
         }
       ],
       "grimorio": []
@@ -2506,63 +2586,75 @@
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Fogo das Fadas",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Força Espectral",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Sono",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Crescimento de Plantas",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Piscar",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Fera",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Invisibilidade Maior",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Pessoa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Similaridade",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Bruxo"
         }
       ],
       "grimorio": []
@@ -2609,63 +2701,75 @@
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Fogo das Fadas",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Força Espectral",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Sono",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Crescimento de Plantas",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Piscar",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Fera",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Invisibilidade Maior",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Pessoa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Similaridade",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Bruxo"
         }
       ],
       "grimorio": []
@@ -2712,63 +2816,75 @@
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Fogo das Fadas",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Força Espectral",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Sono",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Crescimento de Plantas",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Piscar",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Fera",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Invisibilidade Maior",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Pessoa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Similaridade",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Bruxo"
         }
       ],
       "grimorio": []
@@ -2815,63 +2931,75 @@
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Fogo das Fadas",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Força Espectral",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Sono",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Crescimento de Plantas",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Piscar",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Fera",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Invisibilidade Maior",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Pessoa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Similaridade",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Bruxo"
         }
       ],
       "grimorio": []
@@ -2919,63 +3047,75 @@
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Fogo das Fadas",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Força Espectral",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Sono",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Crescimento de Plantas",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Piscar",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Fera",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Invisibilidade Maior",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Pessoa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Similaridade",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Bruxo"
         }
       ],
       "grimorio": []
@@ -3023,63 +3163,75 @@
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Fogo das Fadas",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Força Espectral",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Sono",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Crescimento de Plantas",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Piscar",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Fera",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Invisibilidade Maior",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Pessoa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Similaridade",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Bruxo"
         }
       ],
       "grimorio": []
@@ -3127,63 +3279,75 @@
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Fogo das Fadas",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Força Espectral",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Sono",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Crescimento de Plantas",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Piscar",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Fera",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Invisibilidade Maior",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Pessoa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Similaridade",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Bruxo"
         }
       ],
       "grimorio": []
@@ -3234,63 +3398,75 @@
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Fogo das Fadas",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Força Espectral",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Sono",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Crescimento de Plantas",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Piscar",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Fera",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Invisibilidade Maior",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Pessoa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Similaridade",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Bruxo"
         }
       ],
       "grimorio": []
@@ -3341,63 +3517,75 @@
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Fogo das Fadas",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Força Espectral",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Sono",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Crescimento de Plantas",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Piscar",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Fera",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Invisibilidade Maior",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Dominar Pessoa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Similaridade",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Bruxo"
         },
         {
           "nome": "Contato Extraplanar",
           "circulo": 5,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Bruxo"
         }
       ],
       "grimorio": []
@@ -3479,22 +3667,26 @@
         {
           "nome": "Arma Espiritual",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Arma Mágica",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Raio Guia",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         }
       ],
       "grimorio": []
@@ -3539,22 +3731,26 @@
         {
           "nome": "Arma Espiritual",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Arma Mágica",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Raio Guia",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         }
       ],
       "grimorio": []
@@ -3599,32 +3795,38 @@
         {
           "nome": "Arma Espiritual",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Arma Mágica",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Raio Guia",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Guardiões Espirituais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Manto do Cruzado",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         }
       ],
       "grimorio": []
@@ -3669,32 +3871,38 @@
         {
           "nome": "Arma Espiritual",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Arma Mágica",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Raio Guia",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Guardiões Espirituais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Manto do Cruzado",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         }
       ],
       "grimorio": []
@@ -3739,42 +3947,50 @@
         {
           "nome": "Arma Espiritual",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Arma Mágica",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Raio Guia",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Guardiões Espirituais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Manto do Cruzado",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo Ardente",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Movimentação Livre",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         }
       ],
       "grimorio": []
@@ -3820,42 +4036,50 @@
         {
           "nome": "Arma Espiritual",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Arma Mágica",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Raio Guia",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Guardiões Espirituais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Manto do Cruzado",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo Ardente",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Movimentação Livre",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         }
       ],
       "grimorio": []
@@ -3901,52 +4125,62 @@
         {
           "nome": "Arma Espiritual",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Arma Mágica",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Raio Guia",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Guardiões Espirituais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Manto do Cruzado",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo Ardente",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Movimentação Livre",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Golpe de Arço",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Paralisar Monstro",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         }
       ],
       "grimorio": []
@@ -3992,52 +4226,62 @@
         {
           "nome": "Arma Espiritual",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Arma Mágica",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Raio Guia",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Guardiões Espirituais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Manto do Cruzado",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo Ardente",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Movimentação Livre",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Golpe de Arço",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Paralisar Monstro",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         }
       ],
       "grimorio": []
@@ -4083,52 +4327,62 @@
         {
           "nome": "Arma Espiritual",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Arma Mágica",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Raio Guia",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Guardiões Espirituais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Manto do Cruzado",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo Ardente",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Movimentação Livre",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Golpe de Arço",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Paralisar Monstro",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         }
       ],
       "grimorio": []
@@ -4175,52 +4429,62 @@
         {
           "nome": "Arma Espiritual",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Arma Mágica",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Raio Guia",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Guardiões Espirituais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Manto do Cruzado",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo Ardente",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Movimentação Livre",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Golpe de Arço",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Paralisar Monstro",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         }
       ],
       "grimorio": []
@@ -4267,52 +4531,62 @@
         {
           "nome": "Arma Espiritual",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Arma Mágica",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Raio Guia",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Guardiões Espirituais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Manto do Cruzado",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo Ardente",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Movimentação Livre",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Golpe de Arço",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Paralisar Monstro",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         }
       ],
       "grimorio": []
@@ -4359,52 +4633,62 @@
         {
           "nome": "Arma Espiritual",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Arma Mágica",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Raio Guia",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Guardiões Espirituais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Manto do Cruzado",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo Ardente",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Movimentação Livre",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Golpe de Arço",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Paralisar Monstro",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         }
       ],
       "grimorio": []
@@ -4451,52 +4735,62 @@
         {
           "nome": "Arma Espiritual",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Arma Mágica",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Raio Guia",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Guardiões Espirituais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Manto do Cruzado",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo Ardente",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Movimentação Livre",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Golpe de Arço",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Paralisar Monstro",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         }
       ],
       "grimorio": []
@@ -4544,52 +4838,62 @@
         {
           "nome": "Arma Espiritual",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Arma Mágica",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Raio Guia",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Guardiões Espirituais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Manto do Cruzado",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo Ardente",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Movimentação Livre",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Golpe de Arço",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Paralisar Monstro",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         }
       ],
       "grimorio": []
@@ -4637,52 +4941,62 @@
         {
           "nome": "Arma Espiritual",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Arma Mágica",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Raio Guia",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Guardiões Espirituais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Manto do Cruzado",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo Ardente",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Movimentação Livre",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Golpe de Arço",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Paralisar Monstro",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         }
       ],
       "grimorio": []
@@ -4730,52 +5044,62 @@
         {
           "nome": "Arma Espiritual",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Arma Mágica",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Raio Guia",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Guardiões Espirituais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Manto do Cruzado",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo Ardente",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Movimentação Livre",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Golpe de Arço",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Paralisar Monstro",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         }
       ],
       "grimorio": []
@@ -4826,52 +5150,62 @@
         {
           "nome": "Arma Espiritual",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Arma Mágica",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Raio Guia",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Guardiões Espirituais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Manto do Cruzado",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo Ardente",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Movimentação Livre",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Golpe de Arço",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Paralisar Monstro",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         }
       ],
       "grimorio": []
@@ -4922,52 +5256,62 @@
         {
           "nome": "Arma Espiritual",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Arma Mágica",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Raio Guia",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Guardiões Espirituais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Manto do Cruzado",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Escudo Ardente",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Movimentação Livre",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Golpe de Arço",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         },
         {
           "nome": "Paralisar Monstro",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Clérigo"
         }
       ],
       "grimorio": []
@@ -5049,17 +5393,20 @@
         {
           "nome": "Curar Ferimentos",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fagulha Estelar",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Raio Lunar",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         }
       ],
       "grimorio": []
@@ -5104,17 +5451,20 @@
         {
           "nome": "Curar Ferimentos",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fagulha Estelar",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Raio Lunar",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         }
       ],
       "grimorio": []
@@ -5159,22 +5509,26 @@
         {
           "nome": "Curar Ferimentos",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fagulha Estelar",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Raio Lunar",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Invocar Animais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         }
       ],
       "grimorio": []
@@ -5219,22 +5573,26 @@
         {
           "nome": "Curar Ferimentos",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fagulha Estelar",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Raio Lunar",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Invocar Animais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         }
       ],
       "grimorio": []
@@ -5279,27 +5637,32 @@
         {
           "nome": "Curar Ferimentos",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fagulha Estelar",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Raio Lunar",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Invocar Animais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fonte do Luar",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         }
       ],
       "grimorio": []
@@ -5345,27 +5708,32 @@
         {
           "nome": "Curar Ferimentos",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fagulha Estelar",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Raio Lunar",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Invocar Animais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fonte do Luar",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         }
       ],
       "grimorio": []
@@ -5411,32 +5779,38 @@
         {
           "nome": "Curar Ferimentos",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fagulha Estelar",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Raio Lunar",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Invocar Animais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fonte do Luar",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Curar Ferimentos em Massa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         }
       ],
       "grimorio": []
@@ -5482,32 +5856,38 @@
         {
           "nome": "Curar Ferimentos",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fagulha Estelar",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Raio Lunar",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Invocar Animais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fonte do Luar",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Curar Ferimentos em Massa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         }
       ],
       "grimorio": []
@@ -5553,32 +5933,38 @@
         {
           "nome": "Curar Ferimentos",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fagulha Estelar",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Raio Lunar",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Invocar Animais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fonte do Luar",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Curar Ferimentos em Massa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         }
       ],
       "grimorio": []
@@ -5625,32 +6011,38 @@
         {
           "nome": "Curar Ferimentos",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fagulha Estelar",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Raio Lunar",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Invocar Animais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fonte do Luar",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Curar Ferimentos em Massa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         }
       ],
       "grimorio": []
@@ -5697,32 +6089,38 @@
         {
           "nome": "Curar Ferimentos",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fagulha Estelar",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Raio Lunar",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Invocar Animais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fonte do Luar",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Curar Ferimentos em Massa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         }
       ],
       "grimorio": []
@@ -5769,32 +6167,38 @@
         {
           "nome": "Curar Ferimentos",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fagulha Estelar",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Raio Lunar",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Invocar Animais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fonte do Luar",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Curar Ferimentos em Massa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         }
       ],
       "grimorio": []
@@ -5841,32 +6245,38 @@
         {
           "nome": "Curar Ferimentos",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fagulha Estelar",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Raio Lunar",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Invocar Animais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fonte do Luar",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Curar Ferimentos em Massa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         }
       ],
       "grimorio": []
@@ -5914,32 +6324,38 @@
         {
           "nome": "Curar Ferimentos",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fagulha Estelar",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Raio Lunar",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Invocar Animais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fonte do Luar",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Curar Ferimentos em Massa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         }
       ],
       "grimorio": []
@@ -5987,32 +6403,38 @@
         {
           "nome": "Curar Ferimentos",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fagulha Estelar",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Raio Lunar",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Invocar Animais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fonte do Luar",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Curar Ferimentos em Massa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         }
       ],
       "grimorio": []
@@ -6060,32 +6482,38 @@
         {
           "nome": "Curar Ferimentos",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fagulha Estelar",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Raio Lunar",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Invocar Animais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fonte do Luar",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Curar Ferimentos em Massa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         }
       ],
       "grimorio": []
@@ -6136,32 +6564,38 @@
         {
           "nome": "Curar Ferimentos",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fagulha Estelar",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Raio Lunar",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Invocar Animais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fonte do Luar",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Curar Ferimentos em Massa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         }
       ],
       "grimorio": []
@@ -6212,32 +6646,38 @@
         {
           "nome": "Curar Ferimentos",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fagulha Estelar",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Raio Lunar",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Invocar Animais",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Fonte do Luar",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         },
         {
           "nome": "Curar Ferimentos em Massa",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Druida"
         }
       ],
       "grimorio": []
@@ -6318,29 +6758,34 @@
         {
           "nome": "Talho Mental",
           "circulo": 0,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "magias_preparadas": [
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Braços de Hadar",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Detectar Pensamentos",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Sussurros Dissonantes",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "grimorio": []
@@ -6384,29 +6829,34 @@
         {
           "nome": "Talho Mental",
           "circulo": 0,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "magias_preparadas": [
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Braços de Hadar",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Detectar Pensamentos",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Sussurros Dissonantes",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "grimorio": []
@@ -6450,39 +6900,46 @@
         {
           "nome": "Talho Mental",
           "circulo": 0,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "magias_preparadas": [
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Braços de Hadar",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Detectar Pensamentos",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Sussurros Dissonantes",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Fome de Hadar",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Remeter",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "grimorio": []
@@ -6526,39 +6983,46 @@
         {
           "nome": "Talho Mental",
           "circulo": 0,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "magias_preparadas": [
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Braços de Hadar",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Detectar Pensamentos",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Sussurros Dissonantes",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Fome de Hadar",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Remeter",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "grimorio": []
@@ -6602,49 +7066,58 @@
         {
           "nome": "Talho Mental",
           "circulo": 0,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "magias_preparadas": [
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Braços de Hadar",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Detectar Pensamentos",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Sussurros Dissonantes",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Fome de Hadar",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Remeter",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Invocar Aberração",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Tentáculos Negros de Evard",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "grimorio": []
@@ -6689,49 +7162,58 @@
         {
           "nome": "Talho Mental",
           "circulo": 0,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "magias_preparadas": [
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Braços de Hadar",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Detectar Pensamentos",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Sussurros Dissonantes",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Fome de Hadar",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Remeter",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Invocar Aberração",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Tentáculos Negros de Evard",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "grimorio": []
@@ -6776,59 +7258,70 @@
         {
           "nome": "Talho Mental",
           "circulo": 0,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "magias_preparadas": [
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Braços de Hadar",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Detectar Pensamentos",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Sussurros Dissonantes",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Fome de Hadar",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Remeter",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Invocar Aberração",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Tentáculos Negros de Evard",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Ligação Telepática de Rary",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Telecinese",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "grimorio": []
@@ -6873,59 +7366,70 @@
         {
           "nome": "Talho Mental",
           "circulo": 0,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "magias_preparadas": [
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Braços de Hadar",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Detectar Pensamentos",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Sussurros Dissonantes",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Fome de Hadar",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Remeter",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Invocar Aberração",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Tentáculos Negros de Evard",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Ligação Telepática de Rary",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Telecinese",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "grimorio": []
@@ -6970,59 +7474,70 @@
         {
           "nome": "Talho Mental",
           "circulo": 0,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "magias_preparadas": [
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Braços de Hadar",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Detectar Pensamentos",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Sussurros Dissonantes",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Fome de Hadar",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Remeter",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Invocar Aberração",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Tentáculos Negros de Evard",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Ligação Telepática de Rary",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Telecinese",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "grimorio": []
@@ -7068,59 +7583,70 @@
         {
           "nome": "Talho Mental",
           "circulo": 0,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "magias_preparadas": [
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Braços de Hadar",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Detectar Pensamentos",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Sussurros Dissonantes",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Fome de Hadar",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Remeter",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Invocar Aberração",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Tentáculos Negros de Evard",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Ligação Telepática de Rary",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Telecinese",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "grimorio": []
@@ -7166,59 +7692,70 @@
         {
           "nome": "Talho Mental",
           "circulo": 0,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "magias_preparadas": [
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Braços de Hadar",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Detectar Pensamentos",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Sussurros Dissonantes",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Fome de Hadar",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Remeter",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Invocar Aberração",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Tentáculos Negros de Evard",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Ligação Telepática de Rary",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Telecinese",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "grimorio": []
@@ -7264,59 +7801,70 @@
         {
           "nome": "Talho Mental",
           "circulo": 0,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "magias_preparadas": [
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Braços de Hadar",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Detectar Pensamentos",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Sussurros Dissonantes",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Fome de Hadar",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Remeter",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Invocar Aberração",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Tentáculos Negros de Evard",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Ligação Telepática de Rary",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Telecinese",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "grimorio": []
@@ -7362,59 +7910,70 @@
         {
           "nome": "Talho Mental",
           "circulo": 0,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "magias_preparadas": [
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Braços de Hadar",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Detectar Pensamentos",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Sussurros Dissonantes",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Fome de Hadar",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Remeter",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Invocar Aberração",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Tentáculos Negros de Evard",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Ligação Telepática de Rary",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Telecinese",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "grimorio": []
@@ -7461,59 +8020,70 @@
         {
           "nome": "Talho Mental",
           "circulo": 0,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "magias_preparadas": [
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Braços de Hadar",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Detectar Pensamentos",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Sussurros Dissonantes",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Fome de Hadar",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Remeter",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Invocar Aberração",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Tentáculos Negros de Evard",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Ligação Telepática de Rary",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Telecinese",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "grimorio": []
@@ -7560,59 +8130,70 @@
         {
           "nome": "Talho Mental",
           "circulo": 0,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "magias_preparadas": [
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Braços de Hadar",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Detectar Pensamentos",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Sussurros Dissonantes",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Fome de Hadar",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Remeter",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Invocar Aberração",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Tentáculos Negros de Evard",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Ligação Telepática de Rary",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Telecinese",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "grimorio": []
@@ -7659,59 +8240,70 @@
         {
           "nome": "Talho Mental",
           "circulo": 0,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "magias_preparadas": [
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Braços de Hadar",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Detectar Pensamentos",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Sussurros Dissonantes",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Fome de Hadar",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Remeter",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Invocar Aberração",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Tentáculos Negros de Evard",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Ligação Telepática de Rary",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Telecinese",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "grimorio": []
@@ -7761,59 +8353,70 @@
         {
           "nome": "Talho Mental",
           "circulo": 0,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "magias_preparadas": [
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Braços de Hadar",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Detectar Pensamentos",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Sussurros Dissonantes",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Fome de Hadar",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Remeter",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Invocar Aberração",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Tentáculos Negros de Evard",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Ligação Telepática de Rary",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Telecinese",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "grimorio": []
@@ -7863,59 +8466,70 @@
         {
           "nome": "Talho Mental",
           "circulo": 0,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "magias_preparadas": [
         {
           "nome": "Acalmar Emoções",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Braços de Hadar",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Detectar Pensamentos",
           "circulo": 2,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Sussurros Dissonantes",
           "circulo": 1,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Fome de Hadar",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Remeter",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Invocar Aberração",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Tentáculos Negros de Evard",
           "circulo": 4,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Ligação Telepática de Rary",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         },
         {
           "nome": "Telecinese",
           "circulo": 5,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Feiticeiro"
         }
       ],
       "grimorio": []
@@ -8011,7 +8625,8 @@
         {
           "nome": "Enfeitiçar Pessoa",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         }
       ],
       "grimorio": []
@@ -8064,7 +8679,8 @@
         {
           "nome": "Enfeitiçar Pessoa",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         }
       ],
       "grimorio": []
@@ -8117,12 +8733,14 @@
         {
           "nome": "Enfeitiçar Pessoa",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         }
       ],
       "grimorio": []
@@ -8175,12 +8793,14 @@
         {
           "nome": "Enfeitiçar Pessoa",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         }
       ],
       "grimorio": []
@@ -8233,12 +8853,14 @@
         {
           "nome": "Enfeitiçar Pessoa",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         }
       ],
       "grimorio": []
@@ -8292,12 +8914,14 @@
         {
           "nome": "Enfeitiçar Pessoa",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         }
       ],
       "grimorio": []
@@ -8353,17 +8977,20 @@
         {
           "nome": "Enfeitiçar Pessoa",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Convocar Feérico",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         }
       ],
       "grimorio": []
@@ -8419,17 +9046,20 @@
         {
           "nome": "Enfeitiçar Pessoa",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Convocar Feérico",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         }
       ],
       "grimorio": []
@@ -8485,17 +9115,20 @@
         {
           "nome": "Enfeitiçar Pessoa",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Convocar Feérico",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         }
       ],
       "grimorio": []
@@ -8552,17 +9185,20 @@
         {
           "nome": "Enfeitiçar Pessoa",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Convocar Feérico",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         }
       ],
       "grimorio": []
@@ -8619,22 +9255,26 @@
         {
           "nome": "Enfeitiçar Pessoa",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Convocar Feérico",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Porta Dimensional",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         }
       ],
       "grimorio": []
@@ -8691,22 +9331,26 @@
         {
           "nome": "Enfeitiçar Pessoa",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Convocar Feérico",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Porta Dimensional",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         }
       ],
       "grimorio": []
@@ -8763,22 +9407,26 @@
         {
           "nome": "Enfeitiçar Pessoa",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Convocar Feérico",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Porta Dimensional",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         }
       ],
       "grimorio": []
@@ -8836,22 +9484,26 @@
         {
           "nome": "Enfeitiçar Pessoa",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Convocar Feérico",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Porta Dimensional",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         }
       ],
       "grimorio": []
@@ -8909,27 +9561,32 @@
         {
           "nome": "Enfeitiçar Pessoa",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Convocar Feérico",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Porta Dimensional",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Despistar",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         }
       ],
       "grimorio": []
@@ -8987,27 +9644,32 @@
         {
           "nome": "Enfeitiçar Pessoa",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Convocar Feérico",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Porta Dimensional",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Despistar",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         }
       ],
       "grimorio": []
@@ -9067,27 +9729,32 @@
         {
           "nome": "Enfeitiçar Pessoa",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Convocar Feérico",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Porta Dimensional",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Despistar",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         }
       ],
       "grimorio": []
@@ -9147,27 +9814,32 @@
         {
           "nome": "Enfeitiçar Pessoa",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Passo Nebuloso",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Convocar Feérico",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Porta Dimensional",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         },
         {
           "nome": "Despistar",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Guardião"
         }
       ],
       "grimorio": []
@@ -11580,12 +12252,14 @@
         {
           "nome": "Contramagia",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Mago"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Mago"
         }
       ],
       "grimorio": [
@@ -11728,12 +12402,14 @@
         {
           "nome": "Contramagia",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Mago"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Mago"
         }
       ],
       "grimorio": [
@@ -11889,12 +12565,14 @@
         {
           "nome": "Contramagia",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Mago"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Mago"
         }
       ],
       "grimorio": [
@@ -12058,12 +12736,14 @@
         {
           "nome": "Contramagia",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Mago"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Mago"
         }
       ],
       "grimorio": [
@@ -12239,12 +12919,14 @@
         {
           "nome": "Contramagia",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Mago"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Mago"
         }
       ],
       "grimorio": [
@@ -12428,12 +13110,14 @@
         {
           "nome": "Contramagia",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Mago"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Mago"
         }
       ],
       "grimorio": [
@@ -12630,12 +13314,14 @@
         {
           "nome": "Contramagia",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Mago"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Mago"
         }
       ],
       "grimorio": [
@@ -12840,12 +13526,14 @@
         {
           "nome": "Contramagia",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Mago"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Mago"
         }
       ],
       "grimorio": [
@@ -13062,12 +13750,14 @@
         {
           "nome": "Contramagia",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Mago"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Mago"
         }
       ],
       "grimorio": [
@@ -13295,12 +13985,14 @@
         {
           "nome": "Contramagia",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Mago"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Mago"
         }
       ],
       "grimorio": [
@@ -13536,12 +14228,14 @@
         {
           "nome": "Contramagia",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Mago"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "sempre"
+          "origem": "sempre",
+          "classe": "Mago"
         }
       ],
       "grimorio": [
@@ -14552,7 +15246,8 @@
           "nome": "Destruição Divina",
           "circulo": 1,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         }
       ],
       "grimorio": []
@@ -14600,17 +15295,20 @@
           "nome": "Destruição Divina",
           "circulo": 1,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Proteção Contra o Bem e o Mal",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         }
       ],
       "grimorio": []
@@ -14660,17 +15358,20 @@
           "nome": "Destruição Divina",
           "circulo": 1,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Proteção Contra o Bem e o Mal",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         }
       ],
       "grimorio": []
@@ -14720,33 +15421,39 @@
           "nome": "Destruição Divina",
           "circulo": 1,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Proteção Contra o Bem e o Mal",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Auxílio",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Zona da Verdade",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         }
       ],
       "grimorio": []
@@ -14796,33 +15503,39 @@
           "nome": "Destruição Divina",
           "circulo": 1,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Proteção Contra o Bem e o Mal",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Auxílio",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Zona da Verdade",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         }
       ],
       "grimorio": []
@@ -14872,33 +15585,39 @@
           "nome": "Destruição Divina",
           "circulo": 1,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Proteção Contra o Bem e o Mal",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Auxílio",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Zona da Verdade",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         }
       ],
       "grimorio": []
@@ -14949,33 +15668,39 @@
           "nome": "Destruição Divina",
           "circulo": 1,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Proteção Contra o Bem e o Mal",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Auxílio",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Zona da Verdade",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         }
       ],
       "grimorio": []
@@ -15026,43 +15751,51 @@
           "nome": "Destruição Divina",
           "circulo": 1,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Proteção Contra o Bem e o Mal",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Auxílio",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Zona da Verdade",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Sinal de Esperança",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         }
       ],
       "grimorio": []
@@ -15113,43 +15846,51 @@
           "nome": "Destruição Divina",
           "circulo": 1,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Proteção Contra o Bem e o Mal",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Auxílio",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Zona da Verdade",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Sinal de Esperança",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         }
       ],
       "grimorio": []
@@ -15200,43 +15941,51 @@
           "nome": "Destruição Divina",
           "circulo": 1,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Proteção Contra o Bem e o Mal",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Auxílio",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Zona da Verdade",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Sinal de Esperança",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         }
       ],
       "grimorio": []
@@ -15288,43 +16037,51 @@
           "nome": "Destruição Divina",
           "circulo": 1,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Proteção Contra o Bem e o Mal",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Auxílio",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Zona da Verdade",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Sinal de Esperança",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         }
       ],
       "grimorio": []
@@ -15376,53 +16133,63 @@
           "nome": "Destruição Divina",
           "circulo": 1,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Proteção Contra o Bem e o Mal",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Auxílio",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Zona da Verdade",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Sinal de Esperança",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Defensor da Fé",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Movimentação Livre",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         }
       ],
       "grimorio": []
@@ -15474,53 +16241,63 @@
           "nome": "Destruição Divina",
           "circulo": 1,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Proteção Contra o Bem e o Mal",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Auxílio",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Zona da Verdade",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Sinal de Esperança",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Defensor da Fé",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Movimentação Livre",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         }
       ],
       "grimorio": []
@@ -15572,53 +16349,63 @@
           "nome": "Destruição Divina",
           "circulo": 1,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Proteção Contra o Bem e o Mal",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Auxílio",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Zona da Verdade",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Sinal de Esperança",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Defensor da Fé",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Movimentação Livre",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         }
       ],
       "grimorio": []
@@ -15671,53 +16458,63 @@
           "nome": "Destruição Divina",
           "circulo": 1,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Proteção Contra o Bem e o Mal",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Auxílio",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Zona da Verdade",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Sinal de Esperança",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Defensor da Fé",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Movimentação Livre",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         }
       ],
       "grimorio": []
@@ -15770,63 +16567,75 @@
           "nome": "Destruição Divina",
           "circulo": 1,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Proteção Contra o Bem e o Mal",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Auxílio",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Zona da Verdade",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Sinal de Esperança",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Defensor da Fé",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Movimentação Livre",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Coluna de Chamas",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Comunhão",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         }
       ],
       "grimorio": []
@@ -15879,63 +16688,75 @@
           "nome": "Destruição Divina",
           "circulo": 1,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Proteção Contra o Bem e o Mal",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Auxílio",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Zona da Verdade",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Sinal de Esperança",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Defensor da Fé",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Movimentação Livre",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Coluna de Chamas",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Comunhão",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         }
       ],
       "grimorio": []
@@ -15990,63 +16811,75 @@
           "nome": "Destruição Divina",
           "circulo": 1,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Proteção Contra o Bem e o Mal",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Auxílio",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Zona da Verdade",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Sinal de Esperança",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Defensor da Fé",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Movimentação Livre",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Coluna de Chamas",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Comunhão",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         }
       ],
       "grimorio": []
@@ -16101,63 +16934,75 @@
           "nome": "Destruição Divina",
           "circulo": 1,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Escudo da Fé",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Proteção Contra o Bem e o Mal",
           "circulo": 1,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Auxílio",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Zona da Verdade",
           "circulo": 2,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Convocar Montaria",
           "circulo": 2,
           "origem": "sempre",
-          "gratis_usado": false
+          "gratis_usado": false,
+          "classe": "Paladino"
         },
         {
           "nome": "Dissipar Magia",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Sinal de Esperança",
           "circulo": 3,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Defensor da Fé",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Movimentação Livre",
           "circulo": 4,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Coluna de Chamas",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         },
         {
           "nome": "Comunhão",
           "circulo": 5,
-          "origem": "dominio"
+          "origem": "dominio",
+          "classe": "Paladino"
         }
       ],
       "grimorio": []

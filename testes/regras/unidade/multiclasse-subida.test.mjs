@@ -503,7 +503,7 @@ test('subida: truque fixo de subclasse (Trapaceiro Arcano, nível 3 NA CLASSE = 
     { ignorar_xp: true, classe: 'Ladino', subclasse: 'Trapaceiro Arcano' });
   assert.equal(r.sucesso, true);
   assert.deepEqual(p.magias_conhecidas,
-    [{ nome: 'Mãos Mágicas', circulo: 0, origem: 'subclasse_fixa' }]);
+    [{ nome: 'Mãos Mágicas', circulo: 0, origem: 'subclasse_fixa', classe: 'Ladino' }]);
   // r.caracteristicas (FL01, obterCaracteristicasNivel): texto da tabela
   // BASE do Ladino no nível 3 -- "Subclasse Ladino" é o próprio nome que o
   // livro dá à linha de entrada na subclasse.

@@ -129,10 +129,17 @@ test('multiclasse: o orcamento do Clerigo nao e gasto pelos truques do Mago', as
 
 test('ficha antiga: truque sem carimbo aparece como incerteza, e nao vira bloqueio', async ({ context }) => {
   // Sem `classe` -- a forma que toda ficha gravada antes deste conserto tem.
+  // "Raio de Gelo"/"Mãos Flamejantes" (a semente antiga deste teste) só
+  // existem na lista do Mago -- a migração `migrarMagiaClasse` (Tarefa 3)
+  // carimba os dois sozinha na abertura da ficha, porque não são ambíguos
+  // de verdade. A incerteza real exige um truque que exista nas DUAS
+  // listas: "Badalar Fúnebre" e "Luz" (medido em dados/classes/
+  // magias_mago.json e magias_clerigo.json, 2026-09-22) -- só esses a
+  // migração deixa sem carimbo.
   const page = await fichaMagoClerigo(context, {
     magias_conhecidas: [
-      { nome: 'Raio de Gelo', circulo: 0 },
-      { nome: 'Mãos Flamejantes', circulo: 0 },
+      { nome: 'Badalar Fúnebre', circulo: 0 },
+      { nome: 'Luz', circulo: 0 },
     ],
   }, 'truq-mc-4');
   await abrirAbaTruques(page);

@@ -415,11 +415,14 @@ function gravarEmCaminho(personagem, caminho, valor) {
  * (regras-origens-magia.js) isenta do orçamento de truques da classe --
  * "O truque não conta para o seu número de truques conhecidos"
  * (Classes.md:5074), com todas as letras.
+ *
+ * `classe` (issue #61): classe dona da subclasse que concede; ausente
+ * quando quem chama não a informa.
  */
-function concederTruqueDeSubclasse(personagem, nome) {
+function concederTruqueDeSubclasse(personagem, nome, classe = null) {
   if (!Array.isArray(personagem.magias_conhecidas)) personagem.magias_conhecidas = [];
   if (personagem.magias_conhecidas.some((m) => m.nome === nome)) return;
-  personagem.magias_conhecidas.push({ nome, circulo: 0, origem: 'subclasse_automatica' });
+  personagem.magias_conhecidas.push({ nome, circulo: 0, origem: 'subclasse_automatica', ...(classe ? { classe } : {}) });
 }
 
 /** Acrescenta a uma lista do personagem sem duplicar. */
@@ -438,11 +441,13 @@ function acrescentarNaLista(personagem, campo, valores) {
  * @param {object} personagem Mutado no lugar.
  * @param {object} linha Linha de ESCOLHAS_SUBCLASSE_APP.
  * @param {string|string[]} valores O que o jogador escolheu.
- * @param {{circulos?: Object<string, number>}} [contexto] `circulos` é o
- *   mapa "nome da magia -> círculo real", montado por quem chama a partir do
- *   índice de magias (levelup.js). Só o destino `magias_preparadas` o usa --
- *   e é ele que decide entre `magias_preparadas` e `magias_conhecidas`, já
- *   que o livro deixa escolher truque (ver o comentário no corpo).
+ * @param {{circulos?: Object<string, number>, classe?: string}} [contexto]
+ *   `circulos` é o mapa "nome da magia -> círculo real", montado por quem
+ *   chama a partir do índice de magias (levelup.js). Só o destino
+ *   `magias_preparadas` o usa -- e é ele que decide entre `magias_preparadas`
+ *   e `magias_conhecidas`, já que o livro deixa escolher truque (ver o
+ *   comentário no corpo). `classe` (issue #61) carimba a classe dona da
+ *   subclasse que concede a escolha.
  */
 export function aplicarEscolhaSubclasse(personagem, linha, valores, contexto = {}) {
   const lista = (Array.isArray(valores) ? valores : [valores]).filter(Boolean);
@@ -458,7 +463,7 @@ export function aplicarEscolhaSubclasse(personagem, linha, valores, contexto = {
   // automática desta mesma característica, então passa pela mesma gravação
   // que ela (`concederTruqueDeSubclasse`) e sai com a mesma origem.
   if (linha.destino === 'truque_de_subclasse') {
-    for (const nome of lista) concederTruqueDeSubclasse(personagem, nome);
+    for (const nome of lista) concederTruqueDeSubclasse(personagem, nome, contexto.classe);
     return;
   }
   if (linha.destino === 'magias_preparadas') {
@@ -490,7 +495,7 @@ export function aplicarEscolhaSubclasse(personagem, linha, valores, contexto = {
       const campo = circulo === 0 ? 'magias_conhecidas' : 'magias_preparadas';
       if (!Array.isArray(personagem[campo])) personagem[campo] = [];
       if (!personagem[campo].some((m) => m.nome === nome)) {
-        personagem[campo].push({ nome, circulo, origem: 'subclasse_escolha' });
+        personagem[campo].push({ nome, circulo, origem: 'subclasse_escolha', ...(contexto.classe ? { classe: contexto.classe } : {}) });
       }
     }
     return;
@@ -513,8 +518,10 @@ export function aplicarEscolhaSubclasse(personagem, linha, valores, contexto = {
 /**
  * Aplica uma concessão automática -- o livro concede sem perguntar nada, e o
  * app precisa conceder sem perguntar nada.
+ *
+ * `contexto.classe` carimba o truque concedido (issue #61).
  */
-export function aplicarConcessaoAutomatica(personagem, linha) {
+export function aplicarConcessaoAutomatica(personagem, linha, contexto = {}) {
   const a = linha.automatica;
   if (!a) return;
   if (a.pericias) acrescentarNaLista(personagem, 'pericias_proficientes', a.pericias);
@@ -522,6 +529,6 @@ export function aplicarConcessaoAutomatica(personagem, linha) {
   if (a.salvaguardas) acrescentarNaLista(personagem, 'salvaguardas_proficientes', a.salvaguardas);
   if (a.extras) acrescentarNaLista(personagem, 'proficiencias_extra', a.extras);
   if (a.truques) {
-    for (const nome of a.truques) concederTruqueDeSubclasse(personagem, nome);
+    for (const nome of a.truques) concederTruqueDeSubclasse(personagem, nome, contexto.classe);
   }
 }

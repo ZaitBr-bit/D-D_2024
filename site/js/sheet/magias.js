@@ -1266,7 +1266,7 @@ export function renderSecaoMagias() {
                       ${ehEspecial ? `<span class="badge-dominio">&#9733;</span> ` : ''}${m.nome}
                     </div>
                     ${badgesMagiaRapidos(m.nome)}
-                    ${ehEspecial ? `<div style="font-size:0.65rem;color:var(--secondary);font-weight:600;margin-top:1px">${origemLabel}</div>` : ''}
+                    ${ehEspecial ? `<div style="font-size:0.65rem;color:var(--secondary);font-weight:600;margin-top:1px">${origemLabel}${superficies.length > 1 && m.classe ? ` · ${escHtml(m.classe)}` : ''}</div>` : ''}
                     ${(!ehEspecial && superficies.length > 1) ? `<div style="font-size:0.65rem;color:var(--text-muted);margin-top:1px" title="Classe desta magia preparada">${m.classe ? escHtml(m.classe) : 'Sem classe conhecida'}</div>` : ''}
                   </div>
                   <div class="no-print" style="display:flex;align-items:center;gap:4px">

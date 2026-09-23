@@ -9,10 +9,9 @@ import { rotuloPericia } from './opcoes-dominio.js';
 import { obterTalentosElegiveis } from './levelup.js';
 import { calcularConjuracao, calcularSubclasseArcana, escolhasSubclasseDoNivel } from './levelup-flow.js';
 import { opcoesDaLinha, resolvedorDaLinha } from './regras-subclasse-escolhas.js';
-import { truqueEhTrocavel } from './regras-origens-magia.js';
 // preparadasPorClasse (Item 1 da revisão final do sub-projeto "magia sabe a
 // classe"): ver uso perto de `magiasAtuais`, em renderCardMagias.
-import { preparadasPorClasse } from './regras-magia-classe.js';
+import { preparadasPorClasse, truquesPorClasse } from './regras-magia-classe.js';
 import { classesDe } from './regras-multiclasse.js';
 import { podeEntrarEm } from './regras-multiclasse-progressao.js';
 // INSTRUMENTOS_MUSICAIS vem de regras-cobertura.js, NUNCA de
@@ -802,10 +801,17 @@ export function renderCardMagias(ctx, state) {
     `;
   }
 
-  // Troca de truque (qualquer classe conjuradora com truques de classe conhecidos)
-  const truquesAtuais = (char.magias_conhecidas || []).filter(m => {
-    return m.circulo === 0 && truqueEhTrocavel(m);
-  });
+  // Troca de truque (qualquer classe conjuradora com truques de classe
+  // conhecidos) -- filtrado por `classeQueSobe`, mesmo raciocinio de
+  // `candidatasTrocaNivel` acima (achado Important 1 da revisao final
+  // #105/#61): antes deste conserto o portao contava
+  // `char.magias_conhecidas` inteiro, sem olhar de quem e' cada truque, e
+  // um personagem multiclasse com todos os truques carimbados da OUTRA
+  // classe abria o card sem candidata nenhuma para o seletor "sai".
+  // `desta ∪ semClasse` e' a mesma uniao de baldes usada ali; `truqueEhTrocavel`
+  // ja vem embutido em `truquesPorClasse` (via `truquesQueContamNoLimite`).
+  const classificacaoTruquesNivel = truquesPorClasse(char, classeQueSobe);
+  const truquesAtuais = [...classificacaoTruquesNivel.desta, ...classificacaoTruquesNivel.semClasse];
   if (truquesAtuais.length > 0) {
     html += `
       <details class="levelup-card">

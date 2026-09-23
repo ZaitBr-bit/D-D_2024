@@ -901,6 +901,10 @@ tr:hover td { background: #faf8f4; }
 .magia-contador.contador-excedido { background: #ffebee; border-color: var(--danger); color: var(--danger); }
 .magia-contador.contador-dominio { background: #fff8e1; border-color: var(--secondary); color: #8d6e00; }
 
+/* Issue #105: bloco "Classe não definida" do modal Preparar Magias. */
+.gm-bloco-sem-classe { margin-bottom: 8px; }
+.gm-linha-sem-classe { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 4px 0; }
+
 /* Magias de domínio (sempre preparadas) */
 .magia-dominio { border-left: 3px solid var(--secondary); }
 .badge-dominio { color: var(--secondary); font-size: 0.8rem; margin-right: 4px; }

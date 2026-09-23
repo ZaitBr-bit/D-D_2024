@@ -25,8 +25,9 @@
 // importa este modulo direto do disco em Node, e este arquivo nao grava
 // nada em ficha nenhuma nem muda tela nenhuma.
 // ============================================================
-import { magiaContaNoLimite, truquesQueContamNoLimite } from './regras-origens-magia.js';
+import { magiaContaNoLimite, truqueContaNoLimite, truquesQueContamNoLimite } from './regras-origens-magia.js';
 import { superficiesDeConjuracao } from './regras-multiclasse-conjuracao.js';
+import { classesDe } from './regras-multiclasse.js';
 
 /**
  * Devolve um Set com TODOS os nomes de magia do JSON de
@@ -107,19 +108,24 @@ export function nomesDaListaDeMagias(jsonDaClasse) {
  */
 export function classeDaMagiaPreparada(personagem, magia, opcoes = {}) {
   const { mapaDados = null, listasPorClasse = null } = opcoes;
-
   if (typeof magia?.nome !== 'string' || magia.nome.trim() === '') return null;
   if (!magiaContaNoLimite(magia)) return null;
+  return classePelasSuperficies(personagem, magia.nome, mapaDados, listasPorClasse);
+}
 
+/**
+ * Núcleo comum de classeDaMagiaPreparada e classeDoTruque: passos 3 a 5 da
+ * ordem documentada em classeDaMagiaPreparada. Não olha origem nem círculo;
+ * quem chama já descartou o que não conta no limite.
+ */
+function classePelasSuperficies(personagem, nome, mapaDados, listasPorClasse) {
   const superficies = superficiesDeConjuracao(personagem, mapaDados);
   if (superficies.length === 0) return null;
   if (superficies.length === 1) return superficies[0].classe;
-
   if (!listasPorClasse) return null;
   const classesQueBatem = new Set();
   for (const superficie of superficies) {
-    const lista = listasPorClasse.get(superficie.listaMagias);
-    if (lista?.has(magia.nome)) classesQueBatem.add(superficie.classe);
+    if (listasPorClasse.get(superficie.listaMagias)?.has(nome)) classesQueBatem.add(superficie.classe);
   }
   return classesQueBatem.size === 1 ? [...classesQueBatem][0] : null;
 }
@@ -216,19 +222,18 @@ export function preparadasPorClasse(personagem, nomeClasse) {
  * classe, mesmo sem carimbo. Sem esta regra eles cairiam em `semClasse` e
  * sairiam de graça do orçamento da única classe que o personagem tem.
  *
- * R-B NÃO É FAXINA DE LEGADO -- não remova a regra achando que só a ficha
- * antiga depende dela. Truque sem carimbo `classe` é gravado HOJE, por
- * código VIVO: o push de truque fixo de subclasse no level-up
- * (`levelup.js`) e a migração `migrarTruquesFixosSubclasse`
- * (`sheet/migracoes.js`) empurram em `magias_conhecidas` a entrada
- * `{ nome, circulo: 0, origem: 'subclasse_fixa' }`, SEM `classe` -- e
- * `truqueContaNoLimite` devolve `true` para essa origem de propósito (o
- * livro manda Mãos Mágicas contar no número de truques conhecidos).
- * `migrarMagiaClasse` não conserta isso depois: ela carimba
- * `magias_preparadas` e nunca `magias_conhecidas`. Ou seja, um Ladino 3
- * Trapaceiro Arcano RECÉM-CRIADO tem "Mãos Mágicas" nesse estado, de forma
- * permanente. Sem R-B o contador dele passaria a dizer
- * "2 / 3 + 1 sem classe" -- num personagem novo, não numa ficha antiga.
+ * R-B NÃO É SÓ FAXINA DE LEGADO -- FATO ATUAL (corrigido na revisão final
+ * #105/#61, achado Minor m1): o push de truque fixo de subclasse no
+ * level-up (`levelup.js`) e a migração `migrarTruquesFixosSubclasse`
+ * (`sheet/migracoes.js`) hoje CARIMBAM `classe` (`sub.classe`) nessa
+ * entrada, e `migrarMagiaClasse` também varre `magias_conhecidas` (não só
+ * `magias_preparadas`) -- as duas afirmações que este comentário fazia
+ * antes (truque fixo SEM `classe`, `migrarMagiaClasse` NUNCA carimbando
+ * truque) ficaram falsas com essa entrega. R-B continua necessária mesmo
+ * assim: uma ficha ainda não migrada, ou uma migração que não pôde decidir
+ * (classe fora do catálogo, JSON ausente), ainda grava/deixa a entrada sem
+ * `classe` -- e com superfície única não há ambiguidade possível nesse
+ * caso, então a regra segue valendo para ele.
  *
  * `semClasse` fica reservado ao caso em que a dúvida é real: DUAS ou mais
  * superfícies e uma entrada sem carimbo. Aí a incerteza aparece na tela e
@@ -265,4 +270,68 @@ export function truquesPorClasse(personagem, nomeClasse, mapaDados = null) {
     }
   }
   return resultado;
+}
+
+/**
+ * Issue #105: classe dona de um TRUQUE de `magias_conhecidas`, com a mesma
+ * ordem de decisão de classeDaMagiaPreparada. Truque que não conta no limite
+ * de truques da classe (espécie, talento etc.) devolve null: não pertence ao
+ * orçamento de classe nenhuma. Entrada de círculo diferente de 0 devolve null.
+ */
+export function classeDoTruque(personagem, truque, opcoes = {}) {
+  const { mapaDados = null, listasPorClasse = null } = opcoes;
+  if (typeof truque?.nome !== 'string' || truque.nome.trim() === '') return null;
+  if (truque.circulo !== 0) return null;
+  if (!truqueContaNoLimite(truque)) return null;
+  return classePelasSuperficies(personagem, truque.nome, mapaDados, listasPorClasse);
+}
+
+/**
+ * Origens de concessão cuja classe dona é descoberta pelas tabelas da
+ * subclasse do personagem (magias de domínio, sempre preparadas e truque
+ * fixo de subclasse).
+ */
+export const ORIGENS_CONCEDIDAS_POR_TABELA = ['dominio', 'sempre', 'subclasse_fixa'];
+
+/** Origens que só uma classe concede: Maestria de Magias e Assinatura Mágica são do Mago. */
+export const ORIGEM_DE_CLASSE_FIXA = { maestria_magias: 'Mago', assinatura_magica: 'Mago' };
+
+/** Diz se a entrada é uma concessão de classe/subclasse (e portanto tem classe dona). */
+export function ehConcedidaDeClasse(magia) {
+  return ORIGENS_CONCEDIDAS_POR_TABELA.includes(magia?.origem)
+    || Object.prototype.hasOwnProperty.call(ORIGEM_DE_CLASSE_FIXA, magia?.origem);
+}
+
+/**
+ * Issue #61: classe dona de uma magia/truque CONCEDIDO por classe ou
+ * subclasse. `concessoesPorClasse` é o Map<classe, Set<nome>> das concessões
+ * de cada classe do personagem até o nível dele nela (ver
+ * obterConcessoesPorClasse em levelup.js). Exatamente uma classe concede o
+ * nome -> essa classe; zero ou várias -> null. Origem que não é de classe
+ * (talento, espécie...) -> null sempre.
+ */
+export function classeDaMagiaConcedida(personagem, magia, concessoesPorClasse = null) {
+  if (typeof magia?.nome !== 'string' || magia.nome.trim() === '') return null;
+  const classesDoPersonagem = classesDe(personagem).map((c) => c.classe);
+  const fixa = ORIGEM_DE_CLASSE_FIXA[magia.origem];
+  if (fixa) return classesDoPersonagem.includes(fixa) ? fixa : null;
+  if (!ORIGENS_CONCEDIDAS_POR_TABELA.includes(magia.origem)) return null;
+  if (!concessoesPorClasse) return null;
+  const donas = classesDoPersonagem.filter((c) => concessoesPorClasse.get(c)?.has(magia.nome));
+  return donas.length === 1 ? donas[0] : null;
+}
+
+/**
+ * Classes oferecidas ao jogador no bloco "Classe não definida" do modal
+ * Preparar Magias: as classes conjuradoras cuja lista contém o nome, na
+ * ordem das superfícies. Nenhuma lista contém -> todas as classes
+ * conjuradoras (magia fora das listas que o app conhece).
+ */
+export function classesCandidatas(personagem, nome, listasPorClasse, mapaDados = null) {
+  const superficies = superficiesDeConjuracao(personagem, mapaDados);
+  const todas = [...new Set(superficies.map((s) => s.classe))];
+  const batem = [...new Set(superficies
+    .filter((s) => listasPorClasse?.get(s.listaMagias)?.has(nome))
+    .map((s) => s.classe))];
+  return batem.length > 0 ? batem : todas;
 }

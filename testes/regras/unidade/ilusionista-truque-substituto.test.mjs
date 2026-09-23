@@ -287,7 +287,7 @@ for (const fonte of FONTES_DO_TRUQUE) {
       `${TRUQUE_DA_CARACTERISTICA} intacta`);
 
     const gravado = depois.find((m) => m.nome === escolhido);
-    assert.deepEqual(gravado, { nome: escolhido, circulo: 0, origem: 'subclasse_automatica' },
+    assert.deepEqual(gravado, { nome: escolhido, circulo: 0, origem: 'subclasse_automatica', classe: 'Mago' },
       'o truque substituto é um ganho da subclasse -- a origem é o que o isenta do ' +
       'limite de truques da tabela do Mago');
 
@@ -349,7 +349,7 @@ test('nível 3: o Ilusionista que NÃO conhece Ilusão Menor continua ganhando-a
     [...antes, TRUQUE_DA_CARACTERISTICA].sort(),
     'a primeira frase da regra continua valendo: o truque é concedido sem perguntar');
   assert.deepEqual(truques(personagem).find((m) => m.nome === TRUQUE_DA_CARACTERISTICA),
-    { nome: TRUQUE_DA_CARACTERISTICA, circulo: 0, origem: 'subclasse_automatica' });
+    { nome: TRUQUE_DA_CARACTERISTICA, circulo: 0, origem: 'subclasse_automatica', classe: 'Mago' });
 });
 
 // ---------- A tela e o motor têm de enxergar o MESMO personagem ----------

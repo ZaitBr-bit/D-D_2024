@@ -3,7 +3,7 @@
 // ============================================================
 import { CLASSES_INFO, ESCOLAS_SUBCLASSE_MAGO } from './dados-classes.js';
 import { getClasse, getEspecies, getIndiceMagias, getTalentos, getMagiasRituais } from './db.js';
-import { getTruquesFixosSubclasse } from './regras-conjuracao-subclasse.js';
+import { getTruquesFixosSubclasse, getTruquesFixosAcumulados } from './regras-conjuracao-subclasse.js';
 import { calcMod, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, semAcento } from './utils.js';
 import { aplicarDeltaSistema, garantirEstadoEdicoes } from './ficha-edicoes.js';
 import { aplicarEfeitoTalento, validarEscolhasTalento, INSTRUMENTOS_MUSICAIS, ritualBonusPendente } from './regras-cobertura.js';
@@ -1110,6 +1110,28 @@ export async function obterMagiasAutomaticasDoPersonagem(personagem) {
   return { dominio, sempre };
 }
 
+/**
+ * Issue #61: concessões de CADA classe do personagem, até o nível dele
+ * nela, como Map<classe, Set<nome>> -- magias de domínio, sempre preparadas
+ * e truques fixos de subclasse. Alimenta classeDaMagiaConcedida
+ * (regras-magia-classe.js) na migração, que precisa saber qual classe
+ * concedeu cada entrada. Usa os mesmos extratores que a subida de nível usa
+ * ao conceder, com o terreno do Círculo da Terra repassado pelo mesmo motivo
+ * de obterMagiasAutomaticasDoPersonagem.
+ */
+export async function obterConcessoesPorClasse(personagem) {
+  const mapa = new Map();
+  const opcaoSubclasse = personagem?.escolhas_classe?.circulo_terra_terreno;
+  for (const c of classesDe(personagem)) {
+    const nomes = new Set();
+    for (const m of await obterTodasMagiasDominio(c.classe, c.subclasse, c.nivel)) nomes.add(m.nome);
+    for (const m of await obterTodasMagiasSemprePreparadas(c.classe, c.subclasse, c.nivel, opcaoSubclasse)) nomes.add(m.nome);
+    for (const nome of getTruquesFixosAcumulados(c.classe, c.subclasse, c.nivel || 1)) nomes.add(nome);
+    mapa.set(c.classe, nomes);
+  }
+  return mapa;
+}
+
 // ESPACOS DE MAGIA NAO SAO MAIS GRAVADOS AQUI. Desde o sub-projeto 4 o
 // TOTAL e derivado da regra a cada leitura por montarReservasDeEspacos
 // (sheet/reservas-espacos.js); `char.espacos_magia` guarda so `usados`,
@@ -1131,16 +1153,20 @@ export async function obterMagiasAutomaticasDoPersonagem(personagem) {
  * sheet/magias.js já lê para desenhar o botão "Grátis" (issue #68). Gravar o
  * nome `gratisSemEspaco` na ficha seria um campo morto -- nenhum leitor o
  * reconhece depois deste ponto.
+ *
+ * `classe` (issues #105/#61): classe dona da concessão; ausente para origem
+ * de espécie. Nunca sobrescreve uma `classe` já gravada.
  */
-export function _concederMagiaAutomatica(lista, magia, origem) {
+export function _concederMagiaAutomatica(lista, magia, origem, classe = null) {
   const { gratisSemEspaco, ...dadosMagia } = magia;
   const existente = lista.find(m => m.nome === dadosMagia.nome);
   if (existente) {
     existente.origem = origem;
     existente.circulo = dadosMagia.circulo;
     if (gratisSemEspaco) existente.gratis_usado = false;
+    if (classe && !(typeof existente.classe === 'string' && existente.classe.trim() !== '')) existente.classe = classe;
   } else {
-    lista.push({ ...dadosMagia, origem, ...(gratisSemEspaco ? { gratis_usado: false } : {}) });
+    lista.push({ ...dadosMagia, origem, ...(gratisSemEspaco ? { gratis_usado: false } : {}), ...(classe ? { classe } : {}) });
   }
 }
 
@@ -2230,7 +2256,7 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     if (!personagem.magias_conhecidas) personagem.magias_conhecidas = [];
     for (const nome of truquesFixos) {
       if (!personagem.magias_conhecidas.some(m => m.nome === nome)) {
-        personagem.magias_conhecidas.push({ nome, circulo: 0, origem: 'subclasse_fixa' });
+        personagem.magias_conhecidas.push({ nome, circulo: 0, origem: 'subclasse_fixa', classe: sub.classe });
       }
     }
   }
@@ -2250,7 +2276,7 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   // comecou a mudar, e o ramo poderia sair diferente do que foi validado.
   for (const linha of linhasDaSubclasseNoNivel(subclasseAtual, nivelNaClasseNovo,
                                                truquesAntesDaSubida)) {
-    if (linha.automatica) aplicarConcessaoAutomatica(personagem, linha);
+    if (linha.automatica) aplicarConcessaoAutomatica(personagem, linha, { classe: sub.classe });
   }
 
   // ...e as escolhas que o jogador acabou de fazer, validadas na guarda acima.
@@ -2267,7 +2293,7 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     .filter(Boolean);
   const circulos = await _circulosDoIndice(nomesParaCirculo);
   for (const linha of escolhasSubclasseNivel) {
-    aplicarEscolhaSubclasse(personagem, linha, opcoes[linha.campo], { circulos });
+    aplicarEscolhaSubclasse(personagem, linha, opcoes[linha.campo], { circulos, classe: sub.classe });
   }
   
   // Adicionar automaticamente magias de domínio/subclasse
@@ -2275,7 +2301,7 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   if (magiasDominio.length > 0) {
     if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
     for (const magia of magiasDominio) {
-      _concederMagiaAutomatica(personagem.magias_preparadas, magia, 'dominio');
+      _concederMagiaAutomatica(personagem.magias_preparadas, magia, 'dominio', sub.classe);
     }
   }
 
@@ -2293,9 +2319,9 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     if (!personagem.magias_conhecidas) personagem.magias_conhecidas = [];
     for (const magia of magiasSempre) {
       if (magia.circulo === 0) {
-        _concederMagiaAutomatica(personagem.magias_conhecidas, magia, 'sempre');
+        _concederMagiaAutomatica(personagem.magias_conhecidas, magia, 'sempre', sub.classe);
       } else {
-        _concederMagiaAutomatica(personagem.magias_preparadas, magia, 'sempre');
+        _concederMagiaAutomatica(personagem.magias_preparadas, magia, 'sempre', sub.classe);
       }
     }
   }

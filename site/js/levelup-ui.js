@@ -25,11 +25,10 @@ import { getArmas, getClasse, getMagiasPorCirculo, getMagiasClasse, getMagiasRit
 import { abrirModal, fecharModal, toast, mdParaHtml, rotuloCirculoSuperiorHtml, semAcento, calcMod, escHtml, getEspacosMagia, bonusProficiencia } from './utils.js';
 import { subirDeNivel, obterAtributosASITalento, getLimiteASITalento, obterTalentosElegiveis } from './levelup.js';
 import { abrirGridManobras } from './manobras-ui.js';
-import { truqueEhTrocavel } from './regras-origens-magia.js';
 // preparadasPorClasse (Tarefa 4 do sub-projeto "magia sabe a classe"): ver
 // o comentário de `magiasAtuaisNomes`, abaixo, para o achado que esta
 // tarefa corrige.
-import { preparadasPorClasse } from './regras-magia-classe.js';
+import { preparadasPorClasse, truquesPorClasse } from './regras-magia-classe.js';
 import { classeInicial, subclasseDe } from './regras-multiclasse.js';
 import { podeEntrarEm } from './regras-multiclasse-progressao.js';
 import { garantirDadosDeClasses, definirSuperficieSelecionada } from './sheet/contexto-classe.js';
@@ -2009,9 +2008,21 @@ function bindEventosMagias(ctx, state) {
       const jaSairam = new Set(state.trocasTruque.map((t) => t.de));
       const jaEntraram = new Set(state.trocasTruque.map((t) => t.para));
 
-      const truquesAtuaisNomes = new Set((ctx.char.magias_conhecidas || [])
-        .filter(m => m.circulo === 0 && truqueEhTrocavel(m) && !jaSairam.has(m.nome))
-        .map(m => m.nome));
+      // truquesPorClasse (achado Important 1 da revisao final #105/#61):
+      // as candidatas a SAIR sao `desta` ∪ `semClasse` de `ctx.classeQueSobe`
+      // -- NUNCA `deOutra` -- mesmo raciocinio de `preparadasPorClasse` na
+      // troca de magia, acima. Antes deste conserto o filtro lia
+      // `ctx.char.magias_conhecidas` inteiro sem olhar de quem e' cada
+      // truque: num multiclasse, um truque de OUTRA classe podia "sair" e a
+      // substituta gravava `ctx.classeQueSobe` (linha da aplicacao em
+      // confirmarLevelUp), movendo o truque de um orcamento de classe para
+      // o outro em silencio.
+      const { desta: truquesDesta, semClasse: truquesSemClasse } =
+        truquesPorClasse(ctx.char, ctx.classeQueSobe);
+      const truquesAtuaisNomes = new Set(
+        [...truquesDesta, ...truquesSemClasse]
+          .filter(m => !jaSairam.has(m.nome))
+          .map(m => m.nome));
       const truquesAtuaisCompletos = listaMagiasClasse.filter(m => truquesAtuaisNomes.has(m.nome));
 
       _desenharTrocasFeitas(
@@ -2245,7 +2256,7 @@ export async function confirmarLevelUp(ctx, state, caches) {
   const sessaoTruques = truquesDaSessao(ctx, state);
   for (const nome of sessaoTruques.ganhos) {
     if (!char.magias_conhecidas) char.magias_conhecidas = [];
-    char.magias_conhecidas.push({ nome, circulo: 0 });
+    char.magias_conhecidas.push({ nome, circulo: 0, ...(ctx.classeQueSobe ? { classe: ctx.classeQueSobe } : {}) });
     truquesAdicionados.push(nome);
   }
   for (const troca of sessaoTruques.trocas) {
@@ -2253,7 +2264,7 @@ export async function confirmarLevelUp(ctx, state, caches) {
     if (idx === undefined || idx === -1) continue;
     trocasTruqueAplicadas.push(troca);
     char.magias_conhecidas.splice(idx, 1);
-    char.magias_conhecidas.push({ nome: troca.para, circulo: 0 });
+    char.magias_conhecidas.push({ nome: troca.para, circulo: 0, ...(ctx.classeQueSobe ? { classe: ctx.classeQueSobe } : {}) });
   }
 
   // Reativo à subclasse escolhida agora: sem isto, as magias escolhidas por

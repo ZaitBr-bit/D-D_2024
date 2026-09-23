@@ -15,10 +15,9 @@ import { ORDEM_CLASSE } from './regras-ordem-classe.js';
 import { INSTRUMENTOS_MUSICAIS, ritualBonusPendente } from './regras-cobertura.js';
 import { getClasse, getMagiasClasse, getMagiasPorCirculo } from './db.js';
 import { getTruquesFixosSubclasse } from './regras-conjuracao-subclasse.js';
-import { truqueEhTrocavel } from './regras-origens-magia.js';
 // preparadasPorClasse (Item 1 da revisão final do sub-projeto "magia sabe a
 // classe"): ver uso perto de `temMagiaTrocavel`, no step 'selecao_magias'.
-import { preparadasPorClasse } from './regras-magia-classe.js';
+import { preparadasPorClasse, truquesPorClasse } from './regras-magia-classe.js';
 import {
   calcMod, bonusProficiencia, getBonusTruquesOrdem, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas
 } from './utils.js';
@@ -726,7 +725,15 @@ const STEP_DEFINITIONS = [
       // classe, mesmo em níveis sem ganho de truque/magia novo - então o step também
       // precisa ficar visível quando há pelo menos 1 truque elegível para troca (mesma
       // lista de origens especiais usada no card de troca em levelup-cards.js).
-      const temTruqueTrocavel = (ctx.char.magias_conhecidas || []).some(m => m.circulo === 0 && truqueEhTrocavel(m));
+      // truquesPorClasse (achado Important 1 da revisao final #105/#61):
+      // mesmo raciocinio de `candidatasTrocaNivel`, abaixo, para magia --
+      // `desta` ∪ `semClasse` de `ctx.classeQueSobe`, nunca `deOutra`. Antes
+      // deste conserto a checagem contava `magias_conhecidas` inteiro sem
+      // olhar de quem e' cada truque: um Feiticeiro/Mago com todos os
+      // truques carimbados da OUTRA classe deixava este step visivel sem
+      // candidata nenhuma para o card de troca oferecer.
+      const truquesTrocaNivel = truquesPorClasse(ctx.char, ctx.classeQueSobe);
+      const temTruqueTrocavel = [...truquesTrocaNivel.desta, ...truquesTrocaNivel.semClasse].length > 0;
       // 2026-08-13: a troca de MAGIA passou a valer para toda classe
       // conjuradora (antes so `conhecidas` -- ver levelup-cards.js). Um
       // Clerigo/Druida/Paladino/Guardiao num nivel sem truque novo e sem
