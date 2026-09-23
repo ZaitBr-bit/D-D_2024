@@ -799,10 +799,21 @@ export async function mostrarBuscaMagia() {
         }
         const sel = selecionadosSet.has(m.nome);
         const bloqueado = cheioTruq && !sel;
+        // Issue #105 (achado de campo, 2026-09-23): caster "conhecidas"
+        // (somenteConsulta) nunca marca/desmarca truque aqui -- é escolha do
+        // assistente de subida. Mas o excedente de truques (dado legado,
+        // gravado antes do carimbo de classe existir) também acontece numa
+        // classe assim, e sem check nenhum o jogador não tinha NENHUM
+        // caminho nesta tela para tirar o excedente. Deixa remover (nunca
+        // adicionar) o cartão selecionado enquanto a classe está de fato
+        // acima do limite; fora disso, `somenteConsulta` continua sem check.
+        const excedenteRemovivel = somenteConsulta && sel
+          && numTruq > maxTruq && classificacaoTruques.semClasse.length === 0;
+        const clicavel = !somenteConsulta || excedenteRemovivel;
         return `
           <div class="opcao-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'bloqueada' : ''}"
-               ${somenteConsulta ? '' : `data-toggle-truque="${m.nome}"`} style="${bloqueado ? 'opacity:0.35;' : ''}">
-            <span class="opcao-check" ${somenteConsulta ? '' : `data-truque-check="${m.nome}" style="cursor:pointer"`}></span>
+               ${clicavel ? `data-toggle-truque="${m.nome}"` : ''} style="${bloqueado ? 'opacity:0.35;' : ''}">
+            <span class="opcao-check" ${clicavel ? `data-truque-check="${m.nome}" style="cursor:pointer"` : ''}></span>
             <div class="opcao-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="0" style="cursor:pointer">${m.nome}</div>
             <div class="opcao-resumo">
               <span>${m.escola || ''}</span>

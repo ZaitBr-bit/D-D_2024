@@ -302,3 +302,61 @@ test('#61: na lista da ficha, a magia de domínio mostra a origem e a classe don
   await expect(cartao).toContainText('Clérigo');
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
+
+// ============================================================
+// Achado de campo (2026-09-23, ficha real do usuário): Bardo 3/Bruxo 1.
+// Bruxo é caster "conhecidas" (tipo_conjuracao, dados-classes.js) -- o
+// modal abre como "Consultar Magias" e a grade de truques nunca renderiza
+// `data-truque-check` (é `somenteConsulta ? '' : data-truque-check...`),
+// porque truque de caster "conhecidas" é escolhido no assistente de
+// subida, não marcado aqui. Mas o excedente de truques (issue #105,
+// decisão "sinalizar e bloquear novos, remover pelo check") também pode
+// acontecer numa classe assim -- e sem check nenhum, o jogador não tinha
+// NENHUM caminho nesta tela para tirar o excedente: "não consigo nem
+// selecionar nem desmarcar". Nomes medidos em dados/classes/magias_bruxo.json
+// e magias_bardo.json (2026-09-23): "Golpe Certeiro" só no Bardo; "Badalar
+// Fúnebre", "Proteção Contra Lâminas" e "Toque Necrótico" só no Bruxo.
+// ============================================================
+test('#105: caster "conhecidas" acima do limite de truques ainda deixa remover o excedente pelo check', async ({ context }) => {
+  const { page, erros } = await abrirFicha(context, {
+    classe: 'Bardo', subclasse: '', nivel: 4, xp: 2700,
+    especie: 'Humano', atributos: ATRIBUTOS_REGRAS, pericias_proficientes: ['Atuação', 'Persuasão'],
+    classes: [
+      { classe: 'Bardo', subclasse: '', nivel: 3, ordem: 0 },
+      { classe: 'Bruxo', subclasse: '', nivel: 1, ordem: 1 },
+    ],
+    schema_versao: 2,
+    // Já pós-migração (classe carimbada) -- este caso isola o bug da UI,
+    // não a migração (já coberta pelos outros specs deste arquivo).
+    magias_conhecidas: [
+      { nome: 'Golpe Certeiro', circulo: 0, classe: 'Bardo' },
+      { nome: 'Badalar Fúnebre', circulo: 0, classe: 'Bruxo' },
+      { nome: 'Proteção Contra Lâminas', circulo: 0, classe: 'Bruxo' },
+      { nome: 'Toque Necrótico', circulo: 0, classe: 'Bruxo' },
+    ],
+  }, 'regras-105-excedente-consulta');
+
+  await ativarClasse(page, 'Bruxo');
+  await abrirPreparar(page);
+  await expect(page.locator('#modal-titulo'), 'Bruxo é "conhecidas" -- o modal abre em modo consulta').toHaveText('Consultar Magias');
+  await expect(page.locator('#gm-contador-truques')).toHaveText(/Truques: 3\/2 \(acima do limite\)/);
+
+  await page.locator('[data-tab-mg="truques"]').click();
+  await assentar(page).catch(() => {});
+
+  const excedente = page.locator('[data-truque-check="Badalar Fúnebre"]');
+  await expect(excedente, 'o excedente de um caster "conhecidas" precisa continuar removível pelo check').toBeVisible();
+  await excedente.click();
+  await assentar(page).catch(() => {});
+
+  await expect(page.locator('#gm-contador-truques')).toHaveText(/Truques: 2\/2/);
+  await expect.poll(async () => (await personagemSalvo(page))?.magias_conhecidas?.some((m) => m.nome === 'Badalar Fúnebre'))
+    .toBe(false);
+
+  // Voltou ao limite: a classe volta a ser consulta pura, sem check nenhum
+  // -- o escape só existe enquanto a classe está de fato acima do limite.
+  await expect(page.locator('[data-truque-check="Proteção Contra Lâminas"]'),
+    'fora do excedente, caster "conhecidas" continua sem check nenhum').toHaveCount(0);
+
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});
