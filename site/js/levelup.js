@@ -2353,8 +2353,8 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   // máximos acompanham em +1 por nível para cada +1 de modificador. A conta
   // mora em aplicarPvRetroativoPorCon porque a edição manual da ficha usa a
   // MESMA regra, inclusive no sentido inverso ao reverter.
-  const modConDepois = calcMod(personagem.atributos.constituicao);
-  const bonusConRetroativo = aplicarPvRetroativoPorCon(personagem, modConAntes, modConDepois);
+  let modConDepois = calcMod(personagem.atributos.constituicao);
+  let bonusConRetroativo = aplicarPvRetroativoPorCon(personagem, modConAntes, modConDepois);
   
   // Aplicar talento (se escolhido ao invés de aumento)
   let escolhasTalentoLevelup = [];
@@ -2416,6 +2416,13 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     if (talentoData) {
       const resultadoASI = aplicarASITalento(personagem, talentoData, opcoes.talento_asi);
       if (!resultadoASI.sucesso) return { sucesso: false, erro: resultadoASI.erro };
+
+      // O +1 embutido do talento pode mudar o modificador de CON depois do
+      // retroativo acima; o delta restante entra aqui e `modConDepois` passa a
+      // ser a base do capstone, que não recontará o que já foi aplicado.
+      const modConPosTalento = calcMod(personagem.atributos.constituicao);
+      bonusConRetroativo += aplicarPvRetroativoPorCon(personagem, modConDepois, modConPosTalento);
+      modConDepois = modConPosTalento;
     }
 
     const resultadoCoberturaTalento = aplicarEfeitoTalento(

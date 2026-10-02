@@ -197,9 +197,15 @@ export function podePagarCusto(moedas, custoStr) {
   return podePagar(moedas, c.cobre);
 }
 
-/** Paga uma string de custo (ex: "50 PO"), convertendo moedas automaticamente se necessario */
+/**
+ * Paga uma string de custo (ex: "50 PO"). Se a pilha da denominacao do preco
+ * cobre o valor, so ela e decrementada (demais denominacoes intactas); so
+ * converte moedas quando a pilha nao cobre (ver removerQuantidadeMoeda).
+ * Custo de quantidade zero e aceito sem alterar a carteira.
+ */
 export function pagarCusto(moedas, custoStr) {
   const c = parseCusto(custoStr);
   if (!c) return { sucesso: false, moedas: normalizarCarteira(moedas) };
-  return retirarValor(moedas, c.cobre);
+  if (c.qtd <= 0) return { sucesso: true, moedas: normalizarCarteira(moedas) };
+  return removerQuantidadeMoeda(moedas, c.tipo, c.qtd);
 }

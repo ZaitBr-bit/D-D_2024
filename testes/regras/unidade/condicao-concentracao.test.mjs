@@ -54,3 +54,24 @@ test('quebrarConcentracaoAtiva reverte o bônus de PV máximo temporário do efe
   assert.ok(!('pv_max_override' in p), 'o override tem de sumir quando cai de volta ao pv_max normal');
   assert.equal(p.pv_atual, 10, 'o PV atual tem de ser recortado para o novo teto');
 });
+
+// Issue #116 -- Atordoado, Inconsciente, Paralisado e Petrificado incluem
+// Incapacitado (glossário de condições), então contam como incapacitado.
+const regrasCondicoes = await import('../../../site/js/regras-condicoes.js');
+
+test('estaIncapacitado vale para Incapacitado e para as 4 condições que o incluem', () => {
+  for (const c of ['Incapacitado', 'Atordoado', 'Inconsciente', 'Paralisado', 'Petrificado']) {
+    assert.equal(regrasCondicoes.estaIncapacitado([c]), true, c);
+  }
+});
+
+test('estaIncapacitado é falso para Caído, Envenenado e lista vazia/ausente', () => {
+  assert.equal(regrasCondicoes.estaIncapacitado(['Caído', 'Envenenado']), false);
+  assert.equal(regrasCondicoes.estaIncapacitado([]), false);
+  assert.equal(regrasCondicoes.estaIncapacitado(undefined), false);
+});
+
+test('condicaoIncapacitante devolve a primeira condição marcada que implica Incapacitado', () => {
+  assert.equal(regrasCondicoes.condicaoIncapacitante(['Caído', 'Paralisado']), 'Paralisado');
+  assert.equal(regrasCondicoes.condicaoIncapacitante(['Caído']), null);
+});

@@ -308,6 +308,32 @@ test('ficha: com "Comprar" ativo, adicionar um item desconta o custo da carteira
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
 
+// Issue #121: com PO suficiente na carteira, a compra decrementa só a pilha
+// de PO; as demais denominações (aqui 30 PP) não são redistribuídas.
+test('ficha: comprar item com preço em PO e PO suficiente não mexe nas PP da carteira', async ({ context }) => {
+  const { page, erros } = await abrirFicha(context, {
+    ...SEMENTE_BASE,
+    moedas: { pl: 0, po: 5, pe: 0, pp: 30, pc: 0 },
+  }, 'regras-itens-seletor-121');
+
+  await clicarBotaoFicha(page, 'btn-add-inv', { esperar: '#lista-inv-cat' });
+  await page.locator('#toggle-comprar-item').check();
+  await page.locator('#lista-inv-cat .inv-item', { hasText: 'Adaga' }).click();
+
+  const btnConfirmar = page.locator('#btn-confirmar-add-item');
+  await expect(btnConfirmar).toContainText('Comprar');
+  await expect(page.locator('#badge-custo-item')).toContainText('2 PO');
+  await btnConfirmar.click();
+  await expect(page.locator('.toast, [class*="toast"]').last()).toContainText('Adaga');
+
+  const salvo = await personagemSalvo(page);
+  expect(salvo?.moedas, 'só as PO deveriam cair (5 -> 3); as 30 PP ficam intactas').toEqual({
+    pl: 0, po: 3, pe: 0, pp: 30, pc: 0,
+  });
+
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});
+
 // BLOQUEANTE 1 da revisão final de branch inteira: os botões das duas linhas
 // de filtro (armas e armaduras) nasciam com a classe `filtro-arma-item`, que
 // NENHUMA regra de app.css estiliza (o CSS espera `filtro-arma` e

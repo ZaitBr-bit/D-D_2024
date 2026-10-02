@@ -1023,6 +1023,10 @@ tr:hover td { background: #faf8f4; }
    O cabeçalho subiu junto, pelo mesmo motivo e na mesma ponta. */
 .modal-acoes {
   padding: 12px 16px; display: flex; gap: 8px; justify-content: flex-end;
+  /* Quebra de linha: os `.btn` têm `flex-shrink: 0` e `nowrap`; com três
+     botões em tela estreita (Descanso Longo de Mago, 360 px) o excedente
+     vazava pela esquerda, área sem rolagem, e cortava o primeiro botão. */
+  flex-wrap: wrap;
   border-top: 1px solid var(--border-light);
   position: sticky; bottom: 0; background: var(--bg-card); z-index: 3;
 }

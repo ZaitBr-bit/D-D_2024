@@ -13,13 +13,46 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.0.17';
+export const VERSAO_ATUAL = '3.0.18';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.0.18',
+    data: '2026-10-02',
+    rotulo: 'Pequenas correções',
+    resumo: 'Comprar na loja não converte mais as moedas quando há o '
+      + 'suficiente da denominação do preço, condições '
+      + 'incapacitantes quebram a concentração, o talento com Constituição '
+      + 'dá o PV retroativo e os botões dos modais cabem na tela do celular.',
+    correcoes: [
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'Comprar um item na loja da ficha convertia a carteira inteira para '
+            + 'cima mesmo havendo moedas suficientes da denominação do preço; '
+            + 'agora só as moedas do preço são retiradas e as demais '
+            + 'denominações ficam como estavam. (#121)',
+          'Atordoado, Inconsciente, Paralisado e Petrificado agora quebram a '
+            + 'concentração ao serem marcados, como o Incapacitado que '
+            + 'implicam; o Sentido de Perigo do Bárbaro também deixa de valer '
+            + 'nessas condições. (#116)',
+          'Talento com aumento de Constituição na subida de nível (como '
+            + 'Resistente) não dava o PV retroativo do novo modificador; '
+            + 'agora dá +1 PV por nível para cada +1 de modificador. Fichas '
+            + 'que subiram de nível com esse talento antes desta versão '
+            + 'continuam com o PV antigo: a diferença (1 PV por nível para '
+            + 'cada +1 de modificador que faltou) não é corrigida sozinha. (#115)',
+          'Em tela estreita (celular), o rodapé de botões dos modais quebra '
+            + 'linha em vez de vazar pela esquerda; no Descanso Longo do Mago '
+            + 'o botão "Manter Tudo" ficava cortado. (#117)',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.0.17',
     data: '2026-09-22',

@@ -9,6 +9,7 @@
 import { PERICIAS } from '../dados-classes.js';
 import { abrirModal, calcMod, escHtml, fmtPeso, getMultiplicadorCarga, PERICIAS_CONHECIMENTO_PRIMORDIAL, toast } from '../utils.js';
 import { nivelNa, subclasseDe } from '../regras-multiclasse.js';
+import { estaIncapacitado } from '../regras-condicoes.js';
 import { getEstadoFuria } from './classes/barbaro.js';
 import { getProgressaoMonge } from './classes/monge.js';
 import { char, passivosTalentosCache } from './estado.js';
@@ -143,7 +144,7 @@ export function calcVantagemDesvantagemSalvaguarda(nomeAtributo) {
   const vantagens = [];
   const desvantagens = [];
   const condicoes = char.condicoes || [];
-  const incapacitado = condicoes.includes('Incapacitado');
+  const incapacitado = estaIncapacitado(condicoes);
 
   if (nomeAtributo === 'Força' && !!getEstadoFuria()?.ativa) vantagens.push('Fúria');
   // Sentido de Perigo e caracteristica de BARBARO 2 (Classes.md:105-107):

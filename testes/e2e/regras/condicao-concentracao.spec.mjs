@@ -44,3 +44,36 @@ test('Contraste: Amedrontado marcado não quebra a Concentração ativa', async 
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
+
+// Issue #116 -- Paralisado inclui Incapacitado (glossário de condições):
+// marcar pelo gerenciador quebra a Concentração, mesmo sem marcar
+// "Incapacitado" literalmente.
+test('Paralisado marcado no gerenciador de condições quebra a Concentração ativa', async ({ context }) => {
+  const id = 'regras-issue116-concentracao-paralisado';
+  const { page, erros } = await abrirFicha(context, GUERREIRO_5_CONCENTRANDO, id);
+
+  await expect(page.locator('text=Concentrando:')).toBeVisible();
+
+  await marcarCondicao(page, 'Paralisado');
+
+  await expect(page.locator('text=Concentrando:'),
+    'Paralisado inclui Incapacitado -- a faixa de "Concentrando" tem de sumir')
+    .toBeHidden();
+
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});
+
+test('Contraste: Caído marcado não quebra a Concentração ativa', async ({ context }) => {
+  const id = 'regras-issue116-concentracao-caido';
+  const { page, erros } = await abrirFicha(context, GUERREIRO_5_CONCENTRANDO, id);
+
+  await expect(page.locator('text=Concentrando:')).toBeVisible();
+
+  await marcarCondicao(page, 'Caído');
+
+  await expect(page.locator('text=Concentrando:'),
+    'Caído não interrompe Concentração -- a faixa tem de continuar visível')
+    .toBeVisible();
+
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});

@@ -10,6 +10,7 @@ import { char, especiesCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { getConcentracaoAtiva } from './magias.js';
 import { quebrarConcentracaoAtiva } from './hp-descanso.js';
+import { estaIncapacitado, condicaoIncapacitante } from '../regras-condicoes.js';
 import { temProficienciaArma, temProficienciaArmadura, badgeProficiencia } from '../regras-equipamento.js';
 
 // --- Proficiência de armas/armaduras na ficha ---
@@ -431,10 +432,13 @@ export function setupEventosCondicoes() {
         return;
       }
 
-      // Incapacitado interrompe Concentracao (glossario de condicoes) --
-      // quebra automatica so quando a condicao e NOVA nesta gravacao, nao
-      // a cada vez que o gerenciador e salvo com ela ja marcada.
-      const incapacitadoNovo = novas.includes('Incapacitado') && !condicoesAtuais.has('Incapacitado');
+      // Incapacitado interrompe Concentracao (glossario de condicoes), e
+      // Atordoado/Inconsciente/Paralisado/Petrificado o incluem -- quebra
+      // automatica so na transicao "nao incapacitado" -> "incapacitado",
+      // nao a cada vez que o gerenciador e salvo com a condicao ja marcada
+      // nem ao trocar uma condicao incapacitante por outra.
+      const incapacitadoNovo = !estaIncapacitado([...condicoesAtuais]) && estaIncapacitado(novas);
+      const motivoIncapacitado = condicaoIncapacitante(novas);
 
       char.condicoes = novas;
       // Se Exaustao foi removida, zerar nivel
@@ -452,7 +456,7 @@ export function setupEventosCondicoes() {
       salvar();
       window.fecharModal();
       renderFichaCompleta();
-      if (concQuebrada) toast(`Concentração em ${concQuebrada} interrompida: Incapacitado.`, 'info');
+      if (concQuebrada) toast(`Concentração em ${concQuebrada} interrompida: ${motivoIncapacitado}.`, 'info');
     });
   });
 
