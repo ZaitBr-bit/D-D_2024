@@ -6,7 +6,8 @@ import { enfileirarSync, obterIdsPendentesRemocao } from '../sync.js';
 import { toast, abrirModal, fmtData, escHtml, baixarArquivo } from '../utils.js';
 import { CLASSES_INFO } from '../dados-classes.js';
 import { classesDe } from '../regras-multiclasse.js';
-import { iniciarAuth, getUsuario, loginComGoogle, logout, onAuthChange, buscarPersonagensCloud } from '../auth.js';
+import { iniciarAuth, getUsuario, loginComGoogle, logout, onAuthChange, buscarEstadoCloud } from '../auth.js';
+import { reconciliar, escolherNoMerge } from '../sync-merge.js';
 
 let _containerRef = null;
 let _sincronizando = false;
@@ -29,9 +30,7 @@ let _sincronizando = false;
  * @returns {object} o objeto que deve ficar.
  */
 export function _escolherNoMerge(local, cloud) {
-  const tCloud = new Date(cloud.atualizado_em || 0).getTime();
-  const tLocal = new Date(local.atualizado_em || 0).getTime();
-  return tLocal > tCloud ? local : cloud;
+  return escolherNoMerge(local, cloud);
 }
 
 export function renderHome(container) {
@@ -165,7 +164,7 @@ function _renderConteudo(container, personagens, usuario) {
       const p = personagens.find(x => x.id === id);
       abrirModal(
         'Excluir Personagem',
-        `<p>Tem certeza que deseja excluir <strong>${escHtml(p?.nome) || 'este personagem'}</strong>?</p><p style="color:var(--danger);font-size:0.85rem;margin-top:8px;">Esta acao nao pode ser desfeita.</p>`,
+        `<p>Tem certeza que deseja excluir <strong>${escHtml(p?.nome) || 'este personagem'}</strong>?</p><p style="color:var(--danger);font-size:0.85rem;margin-top:8px;">Esta ação não pode ser desfeita.</p>`,
         `<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
          <button class="btn btn-danger" id="btn-confirmar-excluir">Excluir</button>`
       );
@@ -247,40 +246,15 @@ async function _sincronizarSeLogado(container, manual = false) {
   try {
     if (manual) toast('Sincronizando...', 'info');
     backupPersonagensLocais();
-    const listaCloud = await buscarPersonagensCloud();
+    // Documentos da nuvem incluem lápides de exclusão (sync-merge.js).
+    const nuvem = await buscarEstadoCloud();
     const listaLocal = listarPersonagens();
-
-    // Merge por atualizado_em: vence a versão mais recente de cada personagem
-    const mapaCloud = new Map(listaCloud.map(p => [p.id, p]));
     const mapaLocal = new Map(listaLocal.map(p => [p.id, p]));
-    const todosIds = new Set([...mapaCloud.keys(), ...mapaLocal.keys()]);
-    // IDs com remoção pendente neste dispositivo (deletados offline)
-    const idsPendentesRemocao = obterIdsPendentesRemocao();
-
-    const listaMergida = [];
-    const paraEnviarCloud = [];
-
-    for (const id of todosIds) {
-      const cloud = mapaCloud.get(id);
-      const local = mapaLocal.get(id);
-
-      if (!local) {
-        // Existe só na nuvem: verificar se foi deletado offline neste dispositivo
-        if (!idsPendentesRemocao.has(id)) {
-          listaMergida.push(cloud);
-        }
-        // Se há remoção pendente, não readicionar — a fila de sync enviará a remoção à nuvem
-      } else if (!cloud) {
-        // Existe só localmente: manter e enfileirar para a nuvem
-        listaMergida.push(local);
-        paraEnviarCloud.push(local);
-      } else {
-        // Existe em ambos: vence o mais recente por atualizado_em.
-        const vencedor = _escolherNoMerge(local, cloud);
-        listaMergida.push(vencedor);
-        if (vencedor === local) paraEnviarCloud.push(local);
-      }
-    }
+    const { lista: listaMergida, paraEnviarCloud } = reconciliar({
+      locais: listaLocal,
+      nuvem,
+      idsPendentesRemocao: obterIdsPendentesRemocao(),
+    });
 
     atualizarListaLocal(listaMergida);
 
@@ -307,6 +281,15 @@ async function _sincronizarSeLogado(container, manual = false) {
   } finally {
     _sincronizando = false;
   }
+}
+
+/**
+ * Re-sincroniza a lista quando o app volta ao primeiro plano estando na home
+ * (PWA que ficou em segundo plano com a lista desatualizada).
+ */
+export function sincronizarHomeAoVoltar() {
+  const hash = location.hash.replace(/^#/, '');
+  if (_containerRef && (hash === '' || hash === 'home')) _sincronizarSeLogado(_containerRef);
 }
 
 function setupImportar(container) {

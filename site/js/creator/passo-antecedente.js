@@ -29,7 +29,7 @@ export function renderStepAntecedente(el) {
 
   el.innerHTML = `
     <h3 style="margin-bottom:12px">Escolha seu Antecedente</h3>
-    <div class="info-box info">O antecedente define suas pericias, ferramentas, talento de origem e distribuicao de atributos.</div>
+    <div class="info-box info">O antecedente define suas perícias, ferramentas, talento de origem e distribuição de atributos.</div>
     <div class="opcao-grid ampla" id="grid-antecedentes">
       ${antecedentes.map(a => `
         <div class="opcao-card ${personagem.antecedente === a.nome ? 'selecionada' : ''}" data-antecedente="${a.nome}">
@@ -167,7 +167,7 @@ function abrirPopupAntecedente(nome) {
   const corpoHtml = `
     <p style="font-size:0.85rem;margin-bottom:12px;font-style:italic">${ant.descricao || ''}</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.85rem">
-      <div><strong>Pericias:</strong> ${pericias.join(', ')}</div>
+      <div><strong>Perícias:</strong> ${pericias.join(', ')}</div>
       <div><strong>Ferramentas:</strong> ${ant.ferramentas}</div>
       <div><strong>Talento:</strong> ${talentoNome}</div>
       <div><strong>Atributos:</strong> ${atributosDisponiveis.join(', ')}</div>
@@ -226,7 +226,7 @@ function abrirPopupAntecedente(nome) {
         return;
       }
       if (new Set(vals).size < vals.length) {
-        toast('Nao repita opcoes nas escolhas do talento', 'error');
+        toast('Não repita opções nas escolhas do talento', 'error');
         return;
       }
       if (!personagem.escolhas_talento) personagem.escolhas_talento = {};

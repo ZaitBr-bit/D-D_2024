@@ -309,14 +309,14 @@ export async function abrirModalRecursosBruxo() {
 
   // Agrupar invocacoes por categoria de nivel
   const grupos = [
-    { label: 'Pacto (Invocacao de Nivel 1)', items: invPactos },
-    { label: 'Sem pre-requisito de nivel', items: invNormais.filter(o => nivelPrereqInv(o) === 0) },
-    { label: 'Nivel 2+', items: invNormais.filter(o => { const n = nivelPrereqInv(o); return n >= 2 && n < 5; }) },
-    { label: 'Nivel 5+', items: invNormais.filter(o => { const n = nivelPrereqInv(o); return n >= 5 && n < 7; }) },
-    { label: 'Nivel 7+', items: invNormais.filter(o => { const n = nivelPrereqInv(o); return n >= 7 && n < 9; }) },
-    { label: 'Nivel 9+', items: invNormais.filter(o => { const n = nivelPrereqInv(o); return n >= 9 && n < 12; }) },
-    { label: 'Nivel 12+', items: invNormais.filter(o => { const n = nivelPrereqInv(o); return n >= 12 && n < 15; }) },
-    { label: 'Nivel 15+', items: invNormais.filter(o => nivelPrereqInv(o) >= 15) }
+    { label: 'Pacto (Invocação de Nível 1)', items: invPactos },
+    { label: 'Sem pré-requisito de nível', items: invNormais.filter(o => nivelPrereqInv(o) === 0) },
+    { label: 'Nível 2+', items: invNormais.filter(o => { const n = nivelPrereqInv(o); return n >= 2 && n < 5; }) },
+    { label: 'Nível 5+', items: invNormais.filter(o => { const n = nivelPrereqInv(o); return n >= 5 && n < 7; }) },
+    { label: 'Nível 7+', items: invNormais.filter(o => { const n = nivelPrereqInv(o); return n >= 7 && n < 9; }) },
+    { label: 'Nível 9+', items: invNormais.filter(o => { const n = nivelPrereqInv(o); return n >= 9 && n < 12; }) },
+    { label: 'Nível 12+', items: invNormais.filter(o => { const n = nivelPrereqInv(o); return n >= 12 && n < 15; }) },
+    { label: 'Nível 15+', items: invNormais.filter(o => nivelPrereqInv(o) >= 15) }
   ].filter(g => g.items.length > 0);
 
   // Contar ocorrencias de cada invocacao no array de objetos {nome, truque?}
@@ -466,7 +466,7 @@ export async function abrirModalRecursosBruxo() {
 
   abrirModal('Recursos do Bruxo', `
     <div class="section-divider"><span>Invocaçoes Misticas</span></div>
-    <div class="search-box" style="margin-bottom:8px"><input type="text" id="busca-inv-bruxo" placeholder="Buscar invocacao..." class="form-input"></div>
+    <div class="search-box" style="margin-bottom:8px"><input type="text" id="busca-inv-bruxo" placeholder="Buscar invocação..." class="form-input"></div>
     <div id="bruxo-inv-grid" style="max-height:55vh;overflow-y:auto"></div>
     ${arcanumHtml}
   `,
@@ -514,11 +514,11 @@ export async function abrirModalRecursosBruxo() {
           // Validar pre-requisito
           const validacao = avaliarPrerequisitoInvocacaoBruxoComSel(opcao.prerequisito, new Set(nomesDoArr(invSelecionadas)));
           if (!validacao.ok) {
-            toast(`Pre-requisito nao atendido: ${validacao.motivo}`, 'error');
+            toast(`Pré-requisito não atendido: ${validacao.motivo}`, 'error');
             return;
           }
           if (invSelecionadas.length >= estado.invocacoesMax) {
-            toast(`Limite de ${estado.invocacoesMax} invocacoes atingido.`, 'error');
+            toast(`Limite de ${estado.invocacoesMax} invocações atingido.`, 'error');
             return;
           }
           // Pactos entram como qualquer outra invocacao: escolher um nao
@@ -545,7 +545,7 @@ export async function abrirModalRecursosBruxo() {
           addBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             if (invSelecionadas.length >= estado.invocacoesMax) {
-              toast(`Limite de ${estado.invocacoesMax} invocacoes atingido.`, 'error');
+              toast(`Limite de ${estado.invocacoesMax} invocações atingido.`, 'error');
               return;
             }
             invSelecionadas.push({ nome });
@@ -849,8 +849,8 @@ export function renderSecaoPactoBruxo() {
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div>
             <div class="magia-nome"><span class="badge-dominio">&#9733;</span> Convocar Familiar</div>
-            <div style="font-size:0.7rem;color:var(--text-muted)">Conjuracao | Acao | 1 hora | 9 metros</div>
-            <div style="font-size:0.65rem;color:var(--secondary);font-weight:600;margin-top:1px">Pacto da Corrente (sem gastar espaco de magia)</div>
+            <div style="font-size:0.7rem;color:var(--text-muted)">Conjuração | Ação | 1 hora | 9 metros</div>
+            <div style="font-size:0.65rem;color:var(--secondary);font-weight:600;margin-top:1px">Pacto da Corrente (sem gastar espaço de magia)</div>
           </div>
           <button class="btn btn-sm btn-primary" data-conjurar-pacto="Convocar Familiar" data-conjurar-pacto-circ="1">Conjurar</button>
         </div>
@@ -869,7 +869,7 @@ export function renderSecaoPactoBruxo() {
           <div style="font-size:0.65rem;color:var(--secondary);font-weight:600;margin-top:1px">Pacto da Lamina</div>
         </div>
         <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px">
-          <strong>Acao Bonus:</strong> Conjurar arma Corpo a Corpo (Simples ou Marcial) ou vincular-se a uma arma magica.
+          <strong>Ação Bônus:</strong> Conjurar arma Corpo a Corpo (Simples ou Marcial) ou vincular-se a uma arma mágica.
           <br>Usa modificador de Carisma para ataque e dano (em vez de Forca/Destreza).
           <br>Pode causar dano Necrotico, Psiquico ou Radiante (ou o tipo normal).
           <br>Pode usar a arma como Foco de Conjuracao.
@@ -973,7 +973,7 @@ export function renderSecaoPactoBruxo() {
   }
   if (truquesModificados.length > 0) {
     html += '<div style="margin-top:8px">';
-    html += '<div style="font-size:0.7rem;font-weight:700;color:var(--secondary);margin-bottom:4px">Truques Modificados por Invocacoes:</div>';
+    html += '<div style="font-size:0.7rem;font-weight:700;color:var(--secondary);margin-bottom:4px">Truques Modificados por Invocações:</div>';
     for (const tm of truquesModificados) {
       html += `
         <div class="magia-item" style="margin:2px 0;padding:4px 8px;border-left:3px solid ${tm.cor}">
@@ -995,7 +995,7 @@ export function renderSecaoPactoBruxo() {
   }
   if (talentosViaInvocacao.length > 0) {
     html += '<div style="margin-top:8px">';
-    html += '<div style="font-size:0.7rem;font-weight:700;color:var(--secondary);margin-bottom:4px">Talentos via Invocacoes:</div>';
+    html += '<div style="font-size:0.7rem;font-weight:700;color:var(--secondary);margin-bottom:4px">Talentos via Invocações:</div>';
     for (const ti of talentosViaInvocacao) {
       html += `
         <div class="magia-item" style="margin:2px 0;padding:4px 8px;border-left:3px solid var(--accent)">
@@ -1010,7 +1010,7 @@ export function renderSecaoPactoBruxo() {
   const invocacoesComMagia = extrairInvocacoesMagicasBruxo(estado.invocacoes);
   if (invocacoesComMagia.length > 0) {
     html += '<div style="margin-top:8px">';
-    html += '<div style="font-size:0.7rem;font-weight:700;color:var(--secondary);margin-bottom:4px">Magias via Invocacoes:</div>';
+    html += '<div style="font-size:0.7rem;font-weight:700;color:var(--secondary);margin-bottom:4px">Magias via Invocações:</div>';
     for (const inv of invocacoesComMagia) {
       const infoMagia = indiceMagiasCache?.find(m => m.nome === inv.magia);
       const circ = infoMagia?.circulo ?? 1;

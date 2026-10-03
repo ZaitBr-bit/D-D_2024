@@ -256,11 +256,16 @@ export function renderSecaoTracosEspecie() {
   // ordenada por nível.
   const tracosOrdenados = [...tracosMostrar].sort((a, b) => nivelDoTraco(a) - nivelDoTraco(b));
 
+  // As três formas da Revelação Celestial são opções do traço-pai: aparecem
+  // dentro do card dele (renderTracoEspecie), não como cards próprios.
+  const subtracosRevelacao = tracosOrdenados.filter(t => TRACOS_REVELACAO_CELESTIAL.includes(t.nome));
+  const tracosCards = tracosOrdenados.filter(t => !TRACOS_REVELACAO_CELESTIAL.includes(t.nome));
+
   return `
     <div class="card print-break-before">
       <div class="card-header"><h2>Traços de Espécie — ${escHtml(char.especie)}</h2></div>
-      ${tracosOrdenados.map(t => renderTracoEspecie(t,
-        TRACOS_HERDAM_ANCESTRALIDADE.includes(t.nome), TRACOS_REVELACAO_CELESTIAL.includes(t.nome))).join('')}
+      ${tracosCards.map(t => renderTracoEspecie(t,
+        TRACOS_HERDAM_ANCESTRALIDADE.includes(t.nome), false, subtracosRevelacao)).join('')}
     </div>
   `;
 }
@@ -284,7 +289,7 @@ function nivelDoTraco(t) {
   return 1;
 }
 
-function renderTracoEspecie(traco, herdaAncestralidade = false, ehSubRevelacao = false) {
+function renderTracoEspecie(traco, herdaAncestralidade = false, ehSubRevelacao = false, subtracos = []) {
   let recarga = detectarRecarga(traco.descricao);
   let ativa = ehHabilidadeAtiva(traco.descricao);
 
@@ -440,7 +445,7 @@ function renderTracoEspecie(traco, herdaAncestralidade = false, ehSubRevelacao =
   // Informacoes de escolhas vinculadas ao traco
   let infoEscolhaTraco = '';
   if ((traco.nome === 'Hábil' || traco.nome === 'Sentidos Aguçados') && char.pericia_especie) {
-    infoEscolhaTraco = `<div class="info-box info" style="font-size:0.8rem;margin-top:6px"><strong>Pericia escolhida:</strong> ${escHtml(char.pericia_especie || '')}</div>`;
+    infoEscolhaTraco = `<div class="info-box info" style="font-size:0.8rem;margin-top:6px"><strong>Perícia escolhida:</strong> ${escHtml(char.pericia_especie || '')}</div>`;
   }
   if (traco.nome === 'Memória Kenku' && char.pericias_especie?.length) {
     const todasProf = (char.pericias_proficientes || []).slice().sort((a, b) => a.localeCompare(b));
@@ -458,10 +463,16 @@ function renderTracoEspecie(traco, herdaAncestralidade = false, ehSubRevelacao =
     let detalheVersatil = `<strong>Talento escolhido:</strong> ${escHtml(char.talento_versatil || '')}`;
     const escolhasVersatil = char.escolhas_talento?.versatil;
     if (escolhasVersatil?.length > 0) {
-      detalheVersatil += `<br><strong>Proficiencias:</strong> ${escolhasVersatil.join(', ')}`;
+      detalheVersatil += `<br><strong>Proficiências:</strong> ${escolhasVersatil.join(', ')}`;
     }
     infoEscolhaTraco = `<div class="info-box info" style="font-size:0.8rem;margin-top:6px">${detalheVersatil}</div>`;
   }
+
+  // Revelação Celestial: a descrição de cada forma dentro do card do pai.
+  const formasHtml = (ehRevelacaoCelestial && subtracos.length)
+    ? `<div style="padding:4px 0 4px 16px;font-size:0.82rem">${subtracos.map(s =>
+        `<div style="margin-top:6px"><strong>${escHtml(s.nome)}.</strong> ${mdParaHtml(s.descricao)}</div>`).join('')}</div>`
+    : '';
 
   return `
     <details style="margin-bottom:6px">
@@ -475,6 +486,7 @@ function renderTracoEspecie(traco, herdaAncestralidade = false, ehSubRevelacao =
       ${usosHtmlBody}
       <div class="md-content" style="padding:6px 0 6px 16px;font-size:0.85rem">${mdParaHtml(traco.descricao)}</div>
       ${infoEscolhaTraco}
+      ${formasHtml}
     </details>
   `;
 }

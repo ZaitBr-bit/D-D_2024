@@ -25,8 +25,17 @@ export let magiasDominioCache = null;
 export let magiasSempreCache = null;
 export let passivosTalentosCache = null;
 
+let _abrindoFicha = false;
+
+/** Liga o modo "abrindo ficha": as gravações das migrações não carimbam nem enviam à nuvem. */
+export function iniciarAberturaFicha() { _abrindoFicha = true; }
+
+/** Desliga o modo "abrindo ficha"; gravações seguintes voltam a carimbar e sincronizar. */
+export function concluirAberturaFicha() { _abrindoFicha = false; }
+
+/** Persiste a ficha aberta (preserva o carimbo enquanto a ficha está abrindo). */
 export function salvar() {
-  salvarPersonagem(char);
+  salvarPersonagem(char, { preservarCarimbo: _abrindoFicha });
 }
 
 export function campoEstaEditado(caminho) {

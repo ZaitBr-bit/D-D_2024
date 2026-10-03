@@ -1,7 +1,7 @@
 // ============================================================
 // App principal - Router SPA e inicialização
 // ============================================================
-import { renderHome } from './pages/home.js';
+import { renderHome, sincronizarHomeAoVoltar } from './pages/home.js';
 import { renderCreator } from './pages/creator.js';
 import { renderSheet } from './pages/sheet.js';
 import { inicializarSync } from './sync.js';
@@ -139,7 +139,7 @@ function processarRota() {
   if (render) {
     render(content, param);
   } else {
-    content.innerHTML = '<div class="empty-state"><h2>Pagina nao encontrada</h2><button class="btn btn-primary" onclick="navegar(\'home\')">Voltar ao inicio</button></div>';
+    content.innerHTML = '<div class="empty-state"><h2>Página não encontrada</h2><button class="btn btn-primary" onclick="navegar(\'home\')">Voltar ao inicio</button></div>';
   }
 }
 
@@ -334,6 +334,11 @@ function init() {
 
   // Listener de rota
   window.addEventListener('hashchange', processarRota);
+
+  // Voltou ao primeiro plano: reconcilia a lista com a nuvem se estiver na home.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') sincronizarHomeAoVoltar();
+  });
 
   // Rota inicial
   processarRota();

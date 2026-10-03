@@ -158,10 +158,10 @@ function abrirPopupEspecie(nome) {
       return `<option value="${p.nome}" ${sel}>${p.nome} (${p.atributo})</option>`;
     }).join('');
     periciaEspecieHtml = `
-      <div class="section-divider"><span>Habil — Pericia Extra</span></div>
-      <div class="info-box info" style="font-size:0.85rem">O traco Habil concede proficiencia em uma pericia a sua escolha.</div>
+      <div class="section-divider"><span>Hábil — Perícia Extra</span></div>
+      <div class="info-box info" style="font-size:0.85rem">O traço Hábil concede proficiência em uma perícia a sua escolha.</div>
       <select id="select-pericia-especie" style="width:100%;padding:8px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:0.9rem;margin:8px 0">
-        <option value="">-- Escolha uma pericia --</option>
+        <option value="">-- Escolha uma perícia --</option>
         ${opcsPericia}
       </select>
     `;
@@ -172,10 +172,10 @@ function abrirPopupEspecie(nome) {
       return `<option value="${p}" ${sel}>${rotuloPericia(p)}</option>`;
     }).join('');
     periciaEspecieHtml = `
-      <div class="section-divider"><span>Sentidos Aguçados — Pericia</span></div>
-      <div class="info-box info" style="font-size:0.85rem">Voce tem proficiencia na pericia Intuição, Percepção ou Sobrevivência.</div>
+      <div class="section-divider"><span>Sentidos Aguçados — Perícia</span></div>
+      <div class="info-box info" style="font-size:0.85rem">Você tem proficiência na perícia Intuição, Percepção ou Sobrevivência.</div>
       <select id="select-pericia-especie" style="width:100%;padding:8px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:0.9rem;margin:8px 0">
-        <option value="">-- Escolha uma pericia --</option>
+        <option value="">-- Escolha uma perícia --</option>
         ${opcsElfo}
       </select>
     `;
@@ -218,8 +218,8 @@ function abrirPopupEspecie(nome) {
   let versatilHtml = '';
   if (nome === 'Humano') {
     versatilHtml = `
-      <div class="section-divider"><span>Versatil — Talento de Origem</span></div>
-      <div class="info-box info" style="font-size:0.85rem">O traco Versatil concede um talento de Origem extra. Escolha abaixo:</div>
+      <div class="section-divider"><span>Versátil — Talento de Origem</span></div>
+      <div class="info-box info" style="font-size:0.85rem">O traço Versátil concede um talento de Origem extra. Escolha abaixo:</div>
       <div id="versatil-talento-lista"></div>
       <div id="versatil-talento-detalhe"></div>
     `;
@@ -403,7 +403,7 @@ function abrirPopupEspecie(nome) {
       const selectPericia = document.getElementById('select-pericia-especie');
       if (!selectPericia?.value) {
         const traco = nome === 'Humano' ? 'Habil' : 'Sentidos Aguçados';
-        toast(`Selecione a pericia de ${traco}`, 'error');
+        toast(`Selecione a perícia de ${traco}`, 'error');
         return;
       }
       personagem.pericia_especie = selectPericia.value;
@@ -435,7 +435,7 @@ function abrirPopupEspecie(nome) {
       // duplicata que esta validação existe para impedir.
       const talentoVersatil = talentoVersatilEscolhido;
       if (!talentoVersatil) {
-        toast('Selecione um Talento de Origem (Versatil)', 'error');
+        toast('Selecione um Talento de Origem (Versátil)', 'error');
         return;
       }
       // Verificar conflito: mesmo talento não-repetível já escolhido no antecedente
@@ -460,7 +460,7 @@ function abrirPopupEspecie(nome) {
         }
         // Verificar duplicatas
         if (new Set(vals).size < vals.length) {
-          toast('Nao repita opcoes nas escolhas do talento', 'error');
+          toast('Não repita opções nas escolhas do talento', 'error');
           return;
         }
         escolhasVersatil = vals;

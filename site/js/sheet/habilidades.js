@@ -988,7 +988,7 @@ export function setupEventosHabilidades() {
             const cheio = selSet.size >= maxMeta && !sel;
             return `
               <div class="opcao-card ${sel ? 'selecionada' : ''}"
-                   data-meta-info="${o.nome}" title="Ver descricao" style="${cheio ? 'opacity:0.35;' : ''}cursor:pointer;">
+                   data-meta-info="${o.nome}" title="Ver descrição" style="${cheio ? 'opacity:0.35;' : ''}cursor:pointer;">
                 <span class="opcao-check" data-meta-toggle="${o.nome}" title="${sel ? 'Remover selecao' : 'Selecionar'}"></span>
                 <div class="opcao-nome">${o.nome}</div>
                 <div class="opcao-resumo">
@@ -3636,7 +3636,7 @@ export function renderFeatureItem(f, source, ctx) {
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
         <button class="btn btn-sm btn-secondary" data-guardiao-acao="veu" ${estadoGuardiao.veuNaturezaDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Veu da Natureza</button>
-        <span style="font-size:0.75rem;color:var(--text-muted)">Invisivel ate o final do proximo turno</span>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Invisível ate o final do próximo turno</span>
       </div>
     `;
   } else if (ehFormaSelvagem && estadoDruida) {
@@ -3663,7 +3663,7 @@ export function renderFeatureItem(f, source, ctx) {
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoBruxoFeature.astuciaUsada ? 'Usada' : 'Disponivel'}</span>`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
-        <button class="btn btn-sm btn-accent" data-bruxo-astucia-acao="usar" ${estadoBruxoFeature.astuciaUsada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Astucia Magica</button>
+        <button class="btn btn-sm btn-accent" data-bruxo-astúcia-ação="usar" ${estadoBruxoFeature.astuciaUsada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Astúcia Mágica</button>
         <span style="font-size:0.75rem;color:var(--text-muted)">Recupera no Descanso Longo</span>
       </div>
     `;
@@ -4277,8 +4277,8 @@ export function renderFeatureItem(f, source, ctx) {
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoGuerreiro.surtoDisponiveis}/${estadoGuerreiro.surtoMax}</span>`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
-        <button class="btn btn-sm btn-accent" data-guerreiro-acao="usar-surto" ${estadoGuerreiro.surtoDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Surto de Acao</button>
-        <span style="font-size:0.75rem;color:var(--text-muted)">1 acao adicional (exceto Usar Magia)</span>
+        <button class="btn btn-sm btn-accent" data-guerreiro-ação="usar-surto" ${estadoGuerreiro.surtoDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Surto de Ação</button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">1 ação adicional (exceto Usar Magia)</span>
       </div>
     `;
     recarga = 'curto_ou_longo';

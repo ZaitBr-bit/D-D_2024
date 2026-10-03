@@ -55,3 +55,33 @@ test('Revelação Celestial: clicar em Transformar escolhe Asas Celestiais, grav
 
   expect(erros, 'nenhum erro de console').toEqual([]);
 });
+
+// Issue #106 -- as três formas são opções do traço-pai: aparecem dentro do
+// card da Revelação Celestial, não como cards soltos.
+test('as três formas aparecem DENTRO do card da Revelação Celestial, não como cards soltos', async ({ context }) => {
+  const { page } = await abrirFicha(context, {
+    classe: 'Guerreiro', nivel: 3, xp: 900, especie: 'Aasimar',
+    atributos: ATRIBUTOS_REGRAS, schema_versao: 2,
+  }, 'regras-issue-106');
+  await assentar(page).catch(() => {});
+
+  for (const forma of ['Asas Celestiais', 'Manto Necrótico', 'Transfiguração Radiante']) {
+    await expect(page.locator('details > summary', { hasText: forma }),
+      `${forma} não pode ter card próprio`).toHaveCount(0);
+  }
+  const card = page.locator('details', { has: page.locator('summary', { hasText: 'Revelação Celestial' }) });
+  await card.locator('summary').first().click();
+  await expect(card.first()).toContainText('Duas asas espectrais');
+  await expect(card.first()).toContainText('Seus olhos se tornam');
+  await expect(card.first()).toContainText('Luz abrasadora');
+});
+
+test('Aasimar de nível 2 não mostra a Revelação Celestial nem as formas', async ({ context }) => {
+  const { page } = await abrirFicha(context, {
+    classe: 'Guerreiro', nivel: 2, xp: 300, especie: 'Aasimar',
+    atributos: ATRIBUTOS_REGRAS, schema_versao: 2,
+  }, 'regras-issue-106-n2');
+  await assentar(page).catch(() => {});
+  await expect(page.locator('summary', { hasText: 'Revelação Celestial' })).toHaveCount(0);
+  await expect(page.locator('summary', { hasText: 'Asas Celestiais' })).toHaveCount(0);
+});

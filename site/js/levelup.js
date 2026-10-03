@@ -1414,7 +1414,7 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     migrarParaMulticlasse(personagem);
   }
   if (!Array.isArray(personagem.classes) || personagem.classes.length === 0) {
-    return { sucesso: false, erro: 'Personagem sem classe: nao ha em que classe entrar o nivel' };
+    return { sucesso: false, erro: 'Personagem sem classe: não ha em que classe entrar o nível' };
   }
   // OS DOIS NIVEIS, separados de proposito. `nivelNaClasse*` manda em tudo
   // que a CLASSE concede naquele patamar dela (caracteristicas, subclasse

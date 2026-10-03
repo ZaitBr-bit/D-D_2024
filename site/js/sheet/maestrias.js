@@ -5,7 +5,8 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { abrirModal, escHtml, semAcento, toast } from '../utils.js';
-import { armasCustomizadasDoInventario, armasElegiveisMaestria } from '../regras-equipamento.js';
+import { armasCustomizadasDoInventario, armasElegiveisMaestria, temProficienciaArma } from '../regras-equipamento.js';
+import { normalizarTalentos } from '../talentos-effects.js';
 import { deArmas } from '../opcoes-dominio.js';
 import { montarTroca } from '../ui-opcoes.js';
 import { temClasse } from '../regras-multiclasse.js';
@@ -44,6 +45,16 @@ const CLASSES_TROCA_TOTAL = ['Guardião', 'Paladino', 'Ladino'];
  */
 export function classesComMaestria(p = char) {
   return CLASSES_MAESTRIA.filter((nome) => temClasse(p, nome));
+}
+
+/**
+ * True se o personagem tem o talento Mestre das Armas (nome em string ou em
+ * objeto `{ nome }`, os dois formatos de `char.talentos`).
+ * @param {object} [p] Personagem; por padrão o da ficha aberta.
+ * @returns {boolean}
+ */
+export function temMestreDasArmas(p = char) {
+  return [...normalizarTalentos(p?.talentos)].includes('Mestre das Armas');
 }
 
 /**
@@ -221,6 +232,10 @@ export async function abrirModalMaestrias(classe = char.classe, opcoes = {}) {
 
   document.getElementById('btn-salvar-maestrias')?.addEventListener('click', () => {
     char.maestrias_arma = [...selecionadas].sort((a, b) => a.localeCompare(b));
+    // A vaga do talento só vale enquanto a arma continua na lista.
+    if (char.maestria_talento && !char.maestrias_arma.includes(char.maestria_talento)) {
+      delete char.maestria_talento;
+    }
     salvar();
     // Renderiza ANTES de fechar: fecharModal() dispara o onClose (aqui,
     // `fechar`) de forma sincrona, e o proximo passo da cadeia do Descanso
@@ -343,4 +358,76 @@ export async function abrirModalTrocaMaestriaDescanso(callbackPosTroca = null) {
     window.fecharModal();
     toast(`Maestria trocada: ${armaTrocar} → ${armaSubstituta}`, 'success');
   });
-}
+}
+/**
+ * Abre o modal de troca da arma do talento Mestre das Armas (uma por
+ * Descanso Longo). Troca só a vaga do talento: as maestrias de classe em
+ * `char.maestrias_arma` ficam como estão. A arma que sai é `char.maestria_talento`;
+ * em ficha antiga sem esse campo, qualquer maestria atual pode sair. A arma
+ * que entra exige só proficiência (o talento não restringe a corpo a corpo).
+ * @param {Function|null} [callbackPosTroca] Roda uma vez ao sair do modal.
+ */
+export async function abrirModalTrocaMaestriaTalento(callbackPosTroca = null) {
+  const atuais = char.maestrias_arma || [];
+  if (!temMestreDasArmas(char) || atuais.length === 0) {
+    if (callbackPosTroca) callbackPosTroca();
+    return;
+  }
+  const dados = await carregarDadosEquipSheet();
+  const todasArmas = [...(dados?.armas || []), ...armasCustomizadasDoInventario(char)];
+  const doTalento = char.maestria_talento && atuais.includes(char.maestria_talento)
+    ? [char.maestria_talento] : atuais;
+  const armasDisponiveis = todasArmas
+    .filter(a => temProficienciaArma(char, a))
+    .sort((a, b) => a.nome.localeCompare(b.nome));
+
+  let armaTrocar = '';
+  let armaSubstituta = '';
+  let jaFechou = false;
+  const fechar = () => {
+    if (jaFechou) return;
+    jaFechou = true;
+    if (callbackPosTroca) callbackPosTroca();
+  };
+
+  abrirModal('Trocar Arma do Talento (Mestre das Armas)', `
+    <p style="font-size:0.85rem;margin-bottom:12px">
+      Como Mestre das Armas, você pode trocar o tipo de arma do talento por outro elegível a cada Descanso Longo.
+    </p>
+    <div id="maestria-talento-troca"></div>
+  `, '<button class="btn btn-secondary" id="btn-cancelar-troca-maestria-talento">Cancelar</button>'
+    + '<button class="btn btn-primary" id="btn-confirmar-troca-maestria-talento">Trocar</button>', fechar);
+
+  document.getElementById('btn-cancelar-troca-maestria-talento')?.addEventListener('click', () => {
+    window.fecharModal();
+  });
+
+  const descricoesMaestria = new Map(
+    (dados.propriedadesArmas || []).map(p => [p.nome, p.descricao]));
+  montarTroca(document.getElementById('maestria-talento-troca'), {
+    sai: {
+      rotulo: 'Qual arma deseja remover?',
+      opcoes: deArmas(todasArmas.filter(a => doTalento.includes(a.nome)), { descricoesMaestria }),
+    },
+    entra: {
+      rotulo: 'Qual arma adicionar no lugar?',
+      busca: true,
+      opcoes: deArmas(armasDisponiveis, { jaTem: new Set(atuais), descricoesMaestria }),
+    },
+    aoMudar: ({ sai, entra }) => { armaTrocar = sai; armaSubstituta = entra; },
+  });
+
+  document.getElementById('btn-confirmar-troca-maestria-talento')?.addEventListener('click', () => {
+    if (!armaTrocar || !armaSubstituta) {
+      toast('Selecione a arma a remover e a arma substituta.', 'error');
+      return;
+    }
+    char.maestrias_arma = [...atuais.filter(n => n !== armaTrocar), armaSubstituta]
+      .sort((a, b) => a.localeCompare(b));
+    char.maestria_talento = armaSubstituta;
+    salvar();
+    renderFichaCompleta();
+    window.fecharModal();
+    toast(`Arma do talento trocada: ${armaTrocar} → ${armaSubstituta}`, 'success');
+  });
+}

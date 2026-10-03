@@ -513,7 +513,7 @@ export function setupEventosEdicao() {
       </div>
       <div class="row gap-1">
         <div class="col">
-          <label class="form-label">Nivel</label>
+          <label class="form-label">Nível</label>
           <div style="font-size:1rem;font-weight:700;padding:6px;background:var(--surface-variant);border-radius:4px">${char.nivel}</div>
           <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px">Use Subir de Nível para alterar</div>
         </div>

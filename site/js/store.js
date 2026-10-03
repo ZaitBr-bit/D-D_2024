@@ -75,15 +75,46 @@ export function getPersonagem(id) {
   return listarPersonagens().find(p => p.id === id) || null;
 }
 
-/** Salva ou atualiza um personagem */
-export function salvarPersonagem(personagem) {
+/**
+ * Serializa o personagem sem o carimbo de recência, para comparar conteúdo.
+ * @param {object} p
+ * @returns {string}
+ */
+function _conteudoSemCarimbo(p) {
+  return JSON.stringify({ ...p, atualizado_em: null });
+}
+
+/**
+ * Salva ou atualiza um personagem.
+ * - Conteúdo idêntico ao guardado: não grava, não carimba e não envia à nuvem
+ *   (restaura o carimbo guardado no objeto em memória).
+ * - `opcoes.preservarCarimbo`: grava o conteúdo mas mantém o `atualizado_em`
+ *   guardado e não envia à nuvem (migrações da abertura da ficha).
+ * - Caso contrário: carimba `atualizado_em` e enfileira o envio.
+ * @param {object} personagem
+ * @param {{preservarCarimbo?: boolean}} [opcoes]
+ * @returns {object} o próprio personagem
+ */
+export function salvarPersonagem(personagem, opcoes = {}) {
   const lista = listarPersonagens();
   const idx = lista.findIndex(p => p.id === personagem.id);
-  personagem.atualizado_em = new Date().toISOString();
 
   if (idx >= 0) {
+    const guardado = lista[idx];
+    if (_conteudoSemCarimbo(guardado) === _conteudoSemCarimbo(personagem)) {
+      personagem.atualizado_em = guardado.atualizado_em;
+      return personagem;
+    }
+    if (opcoes.preservarCarimbo) {
+      personagem.atualizado_em = guardado.atualizado_em;
+      lista[idx] = personagem;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
+      return personagem;
+    }
+    personagem.atualizado_em = new Date().toISOString();
     lista[idx] = personagem;
   } else {
+    personagem.atualizado_em = new Date().toISOString();
     if (!personagem.id) personagem.id = gerarId();
     if (!personagem.criado_em) personagem.criado_em = new Date().toISOString();
     lista.push(personagem);
@@ -139,6 +170,17 @@ export function exportarPersonagem(id) {
 /** Substitui toda a lista local (usado apos sincronizacao com nuvem) */
 export function atualizarListaLocal(lista) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
+}
+
+/**
+ * Troca (ou remove, com `p === null`) o personagem local de um id por uma
+ * versão vinda da nuvem. Não carimba `atualizado_em` e não enfileira envio:
+ * o que veio da nuvem já está lá.
+ */
+export function substituirPersonagemLocal(p, id) {
+  const resto = listarPersonagens().filter(x => x.id !== id);
+  if (p) resto.push(p);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(resto));
 }
 
 /**

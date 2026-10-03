@@ -350,6 +350,9 @@ export const ATRIBUTOS_NOMES = {
 };
 
 // Array base para atributos (nome da chave em JS)
+/** Classes que conjuram magias de lista própria (as que uma magia personalizada pode ter como "classe com acesso"). */
+export const CLASSES_CONJURADORAS = ['Bardo', 'Bruxo', 'Clérigo', 'Druida', 'Feiticeiro', 'Guardião', 'Mago', 'Paladino'];
+
 export const ATRIBUTOS_KEYS = ["forca", "destreza", "constituicao", "inteligencia", "sabedoria", "carisma"];
 
 // Mapeamento de nomes de atributos para chaves

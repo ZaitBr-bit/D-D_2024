@@ -671,7 +671,7 @@ export async function renderStepEquipamento(el) {
       if (wizContent) {
         renderStepEquipamento(wizContent).catch((err) => {
           console.error('Falha ao atualizar o passo de equipamento apos adicionar item:', err);
-          toast('Item adicionado, mas a lista do passo nao atualizou -- recarregue a pagina.', 'error');
+          toast('Item adicionado, mas a lista do passo não atualizou -- recarregue a página.', 'error');
         });
       }
     },
@@ -903,12 +903,12 @@ function mostrarFormCustomItem() {
       <input type="text" class="form-input" id="custom-nome" placeholder="Ex: Espada do Destino">
     </div>
     <div class="form-group">
-      <label class="form-label">Descricao</label>
-      <textarea class="form-textarea" id="custom-desc" placeholder="Descricao do item..."></textarea>
+      <label class="form-label">Descrição</label>
+      <textarea class="form-textarea" id="custom-desc" placeholder="Descrição do item..."></textarea>
     </div>
     <div class="row gap-1">
       <div class="col">
-        <label class="form-label">Bonus CA</label>
+        <label class="form-label">Bônus CA</label>
         <input type="number" class="form-input" id="custom-ca" value="0">
         <div style="font-size:0.65rem;color:var(--text-muted)">soma na CA quando equipado</div>
       </div>
@@ -922,7 +922,7 @@ function mostrarFormCustomItem() {
         <input type="text" class="form-input" id="custom-dano" placeholder="Ex: 1d8+2 Cortante">
       </div>
       <div class="col">
-        <label class="form-label">Bonus Ataque</label>
+        <label class="form-label">Bônus Ataque</label>
         <input type="number" class="form-input" id="custom-ataque" value="0">
       </div>
     </div>

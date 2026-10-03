@@ -254,7 +254,7 @@ export function renderEscolhasTalentoHtml(talentoNome, contexto, extrasJaTem = [
       .filter(p => !jaTem.has(p) && !reservadas.has(p));
     const ferramentasList = FERRAMENTAS_TODAS.filter(f => !jaTem.has(f));
     let html = `<div class="section-divider" style="margin-top:8px"><span>Escolhas — Habilidoso</span></div>`;
-    html += `<div class="info-box info" style="font-size:0.8rem">Escolha 3 pericias ou ferramentas para adquirir proficiencia.</div>`;
+    html += `<div class="info-box info" style="font-size:0.8rem">Escolha 3 perícias ou ferramentas para adquirir proficiência.</div>`;
     html += _avisoOpcoesInsuficientes(periciasList.length + ferramentasList.length, 3);
     for (let i = 0; i < 3; i++) {
       const valorAtual = escolhasAtuais[i] || '';
@@ -276,7 +276,7 @@ export function renderEscolhasTalentoHtml(talentoNome, contexto, extrasJaTem = [
   if (talentoNome === 'Artifista') {
     const ferramentasList = FERRAMENTAS_ARTESAO.filter(f => !jaTem.has(f));
     let html = `<div class="section-divider" style="margin-top:8px"><span>Escolhas — Artifista</span></div>`;
-    html += `<div class="info-box info" style="font-size:0.8rem">Escolha 3 Ferramentas de Artesao para adquirir proficiencia.</div>`;
+    html += `<div class="info-box info" style="font-size:0.8rem">Escolha 3 Ferramentas de Artesão para adquirir proficiência.</div>`;
     html += _avisoOpcoesInsuficientes(ferramentasList.length, 3);
     for (let i = 0; i < 3; i++) {
       const valorAtual = escolhasAtuais[i] || '';
@@ -293,7 +293,7 @@ export function renderEscolhasTalentoHtml(talentoNome, contexto, extrasJaTem = [
   if (talentoNome === 'Músico') {
     const instrumentosList = INSTRUMENTOS_MUSICAIS.filter(inst => !jaTem.has(inst));
     let html = `<div class="section-divider" style="margin-top:8px"><span>Escolhas — Musico</span></div>`;
-    html += `<div class="info-box info" style="font-size:0.8rem">Escolha 3 Instrumentos Musicais para adquirir proficiencia.</div>`;
+    html += `<div class="info-box info" style="font-size:0.8rem">Escolha 3 Instrumentos Musicais para adquirir proficiência.</div>`;
     html += _avisoOpcoesInsuficientes(instrumentosList.length, 3);
     for (let i = 0; i < 3; i++) {
       const valorAtual = escolhasAtuais[i] || '';

@@ -307,7 +307,7 @@ function renderSheetInvItem(item, idx) {
       customBadges += `<span class="badge" style="font-size:0.6rem;background:#f3e5f5;color:#6a1b9a;border:1px solid #ce93d8">${escHtml(item.dados.raridade)}</span> `;
     }
     if (item.dados?.requer_sintonizacao) {
-      customBadges += `<span class="badge" style="font-size:0.6rem;background:#e0f2f1;color:#00695c;border:1px solid #80cbc4">Sintonizacao</span> `;
+      customBadges += `<span class="badge" style="font-size:0.6rem;background:#e0f2f1;color:#00695c;border:1px solid #80cbc4">Sintonização</span> `;
     }
     if (item.dados?.preco) {
       customBadges += `<span class="badge badge-secondary" style="font-size:0.6rem">${escHtml(item.dados.preco)}</span> `;
@@ -481,7 +481,7 @@ export function setupEventosInventarioSheet() {
       if (!item) return;
       if (!item.sintonizado && !podeSintonizar(char, idx)) {
         caixa.checked = false;
-        toast(`Voce ja esta sintonizado com ${TETO_SINTONIZACAO} itens.`, 'error');
+        toast(`Você já está sintonizado com ${TETO_SINTONIZACAO} itens.`, 'error');
         return;
       }
       item.sintonizado = caixa.checked;
@@ -994,9 +994,9 @@ async function mostrarDetalheItemSheet(item) {
 
     if (bonusCa || dano || bonusAtq) {
       corpo += `<div style="font-size:0.85rem;margin-bottom:6px">`;
-      if (bonusCa) corpo += `<strong>Bonus CA:</strong> ${bonusCa > 0 ? '+' : ''}${bonusCa}<br>`;
+      if (bonusCa) corpo += `<strong>Bônus CA:</strong> ${bonusCa > 0 ? '+' : ''}${bonusCa}<br>`;
       if (dano) corpo += `<strong>Dano:</strong> ${dano}<br>`;
-      if (bonusAtq) corpo += `<strong>Bonus Ataque:</strong> ${bonusAtq > 0 ? '+' : ''}${bonusAtq}`;
+      if (bonusAtq) corpo += `<strong>Bônus Ataque:</strong> ${bonusAtq > 0 ? '+' : ''}${bonusAtq}`;
       corpo += `</div>`;
     }
 

@@ -1029,8 +1029,8 @@ const ESCRITAS_PERMITIDAS = new Set([
   // restaurarTodosDadosVida(), em regras-multiclasse.js, que está em
   // ARQUIVOS_AUTORIZADOS); o da subida de nível saiu no sub-projeto 5.
   'site/js/creator/wizard.js:441',     // grava dados_vida_total na criação de personagem
-  'site/js/store.js:324',  // dados_vida_total: 1  (template de criação)
-  'site/js/store.js:325',  // dados_vida_usados: 0 (template de criação)
+  'site/js/store.js:366',  // dados_vida_total: 1  (template de criação)
+  'site/js/store.js:367',  // dados_vida_usados: 0 (template de criação)
 
   // Escritores legados de espacos_magia que sobram depois da Tarefa 3
   // (sub-projeto 4): a rede de escrita fecha para o GASTO (gastarEspaco/

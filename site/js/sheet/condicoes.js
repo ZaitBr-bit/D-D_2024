@@ -160,14 +160,14 @@ export function renderSecaoCondicoes() {
         </div>
         ${condicoes.includes('Exaustão') ? `
           <div style="display:flex;align-items:center;gap:8px;margin-top:4px;font-size:0.8rem">
-            <span style="color:var(--danger);font-weight:600">Nivel de Exaustao:</span>
+            <span style="color:var(--danger);font-weight:600">Nível de Exaustão:</span>
             <button class="btn btn-sm btn-icon no-print" data-exaustao-ajuste="-1" style="padding:1px 6px;font-size:0.8rem">-</button>
             <span style="font-weight:700;min-width:20px;text-align:center">${char.exaustao || 0}</span>
             <button class="btn btn-sm btn-icon no-print" data-exaustao-ajuste="1" style="padding:1px 6px;font-size:0.8rem">+</button>
             <span style="font-size:0.7rem;color:var(--text-muted)">(-${(char.exaustao || 0) * 2} em d20 e CD)</span>
           </div>
         ` : ''}
-      ` : `${(condicoesMagia.length + efeitosUnicos.length + imunidadesMagia.length) === 0 ? '<div style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:8px">Nenhuma condicao ativa</div>' : ''}`}
+      ` : `${(condicoesMagia.length + efeitosUnicos.length + imunidadesMagia.length) === 0 ? '<div style="color:var(--text-muted);font-size:0.85rem;text-align:center;padding:8px">Nenhuma condição ativa</div>' : ''}`}
     </div>
   `;
 }
@@ -308,20 +308,20 @@ export function renderSecaoSentidos() {
       <div class="salvaguardas-grid" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr))">
         <div class="salva-item" style="justify-content:center;gap:8px">
           <span class="pericia-bonus">${percepcao}</span>
-          <span class="pericia-nome">Percepcao</span>
+          <span class="pericia-nome">Percepção</span>
         </div>
         <div class="salva-item" style="justify-content:center;gap:8px">
           <span class="pericia-bonus">${intuicao}</span>
-          <span class="pericia-nome">Intuicao</span>
+          <span class="pericia-nome">Intuição</span>
         </div>
         <div class="salva-item" style="justify-content:center;gap:8px">
           <span class="pericia-bonus">${investigacao}</span>
-          <span class="pericia-nome">Investigacao</span>
+          <span class="pericia-nome">Investigação</span>
         </div>
         ${visaoEscuro ? `
         <div class="salva-item" style="justify-content:center;gap:8px">
           <span class="pericia-bonus">${visaoEscuro}</span>
-          <span class="pericia-nome">Visao no Escuro</span>
+          <span class="pericia-nome">Visão no Escuro</span>
         </div>
         ` : ''}
         ${sentidoExtra ? `
@@ -385,7 +385,7 @@ export function setupEventosCondicoes() {
         }).join('')}
       </div>
       <div id="condicao-desc-area" style="font-size:0.8rem;color:var(--text);margin-top:8px;padding:8px 10px;border-radius:6px;background:var(--bg-card);border:1px solid var(--border-light);min-height:20px;display:none"></div>
-      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:8px;text-align:center">Clique para ativar/desativar. Segure para ver descricao.</div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:8px;text-align:center">Clique para ativar/desativar. Segure para ver descrição.</div>
     `;
 
     abrirModal('Gerenciar Condicoes', html,

@@ -4,7 +4,7 @@
 // ============================================================
 import { ATRIBUTOS_NOMES, CLASSES_INFO } from '../dados-classes.js';
 import { getClasse, getIndiceMagias, getMagiasClasse } from '../db.js';
-import { abrirModal, getBonusTruquesOrdem, getEspacosMagia, getMagiaPreparadas, getTruquesConhecidos, mdParaHtml, nomesMagiaCirculo1Conhecidas, rotuloCirculoSuperiorHtml, semAcento, toast } from '../utils.js';
+import { abrirModal, getBonusTruquesOrdem, getEspacosMagia, getMagiaPreparadas, getTruquesConhecidos, mdParaHtml, nomesMagiaCirculo1Conhecidas, circuloSuperiorHtml, classesDaMagiaHtml, semAcento, toast } from '../utils.js';
 import { obterTruquesEspecie } from './comum.js';
 import { dadosCache, personagem } from './wizard.js';
 
@@ -385,7 +385,7 @@ async function _renderIniciadoEmMagia(container, aoMudar) {
           ${listasFixas[idx] ? `<div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px">Lista fixa (concedida pelo antecedente)</div>` : ''}
         </div>
         <div style="flex:1;min-width:150px">
-          <label class="form-label">Atributo de conjuracao</label>
+          <label class="form-label">Atributo de conjuração</label>
           <select class="form-input" id="im-atributo-${idx}">
             <option value="">Selecione...</option>
             ${atributosDisponiveis.map(a => `<option value="${a}" ${im.atributo === a ? 'selected' : ''}>${ATRIBUTOS_NOMES[a] || a}</option>`).join('')}
@@ -393,7 +393,7 @@ async function _renderIniciadoEmMagia(container, aoMudar) {
         </div>
       </div>
       <div id="im-contadores-${idx}" style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
-        Truques: <strong>${im.truques.length}/2</strong> | Magia 1o circulo: <strong>${im.magia ? '1' : '0'}/1</strong>
+        Truques: <strong>${im.truques.length}/2</strong> | Magia 1o círculo: <strong>${im.magia ? '1' : '0'}/1</strong>
       </div>
       <div id="im-magias-area-${idx}"></div>
     </div>
@@ -440,7 +440,7 @@ async function _bindInstanciaIM(container, idx, aoMudar) {
   const atualizarContadoresIM = () => {
     const cEl = document.getElementById(`im-contadores-${idx}`);
     if (cEl) {
-      cEl.innerHTML = `Truques: <strong>${im.truques.length}/2</strong> | Magia 1o circulo: <strong>${im.magia ? '1' : '0'}/1</strong>`;
+      cEl.innerHTML = `Truques: <strong>${im.truques.length}/2</strong> | Magia 1º círculo: <strong>${im.magia ? '1' : '0'}/1</strong>`;
     }
   };
 
@@ -473,7 +473,7 @@ async function _bindInstanciaIM(container, idx, aoMudar) {
 
       listaEl.innerHTML = `
         <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">
-          ${isTruque ? `Truques: ${im.truques.length}/2` : `Magia 1o circulo: ${im.magia ? '1' : '0'}/1`}
+          ${isTruque ? `Truques: ${im.truques.length}/2` : `Magia 1º círculo: ${im.magia ? '1' : '0'}/1`}
           | ${magias.length} disponíveis
         </div>
         ${magias.length === 0
@@ -631,7 +631,7 @@ async function mostrarDetalheMagia(nome, circulo) {
       <span>${magia.duracao}</span>
     </div>
     <div class="md-content">${mdParaHtml(magia.descricao)}</div>
-    ${magia.circulo_superior ? `<div class="info-box info mt-1">${rotuloCirculoSuperiorHtml(circulo)} ${magia.circulo_superior}</div>` : ''}
-    <div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px">Classes: ${(magia.classes || []).join(', ')}</div>
+    ${magia.circulo_superior ? `<div class="info-box info mt-1">${circuloSuperiorHtml(magia.circulo_superior, circulo)}</div>` : ''}
+    ${classesDaMagiaHtml(magia.classes)}
   `);
 }

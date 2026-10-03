@@ -644,6 +644,9 @@ export function aplicarEfeitoTalento(char, nome, escolhas = {}) {
   if (nome === 'Mestre das Armas') {
     const arma = valor(escolhas, 'arma', 0);
     adicionarUnico(garantirArray(char, 'maestrias_arma'), arma);
+    // Vaga própria do talento: o Descanso Longo troca só esta arma
+    // (sheet/maestrias.js, abrirModalTrocaMaestriaTalento).
+    if (arma) char.maestria_talento = arma;
   }
 
   if (nome === 'Envenenador') {

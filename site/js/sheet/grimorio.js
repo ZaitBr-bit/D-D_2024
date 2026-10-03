@@ -7,7 +7,7 @@
 // ============================================================
 import { getIndiceMagias, getMagiasClasse, getMagiasPorCirculo } from '../db.js';
 import { VALOR_EM_COBRE, formatarCarteira, podePagar, retirarValor } from '../moedas.js';
-import { abrirModal, escHtml, getBonusTruquesOrdem, getEspacosMagia, getLimitesMagias, magiaMagoEstaNoGrimorio, mdParaHtml, rotuloCirculoSuperiorHtml, semAcento, toast } from '../utils.js';
+import { abrirModal, escHtml, getBonusTruquesOrdem, getEspacosMagia, getLimitesMagias, magiaMagoEstaNoGrimorio, mdParaHtml, circuloSuperiorHtml, classesDaMagiaHtml, semAcento, toast } from '../utils.js';
 import { montarSeletor } from '../ui-opcoes.js';
 import { deMagias } from '../opcoes-dominio.js';
 import { getTruquesExtraEstiloLuta } from './combate.js';
@@ -41,6 +41,7 @@ import { magiaContaNoLimite, truqueEhTrocavel } from '../regras-origens-magia.js
 // char.nivel (a classe INICIAL, o espelho) por classes[] de verdade -- ver
 // o comentario de superficieAtiva() abaixo.
 import { superficiesDaFicha, superficieAtivaDaFicha } from './contexto-classe.js';
+import { CLASSES_CONJURADORAS } from '../dados-classes.js';
 import { nivelNa } from '../regras-multiclasse.js';
 // preparadasPorClasse (Tarefa 4, sub-projeto "magia sabe a classe"): fonte
 // unica dos tres baldes (desta/deOutra/semClasse) que este arquivo usava a
@@ -90,6 +91,32 @@ import { classesCandidatas, nomesDaListaDeMagias, preparadasPorClasse, truquesPo
 function magiaPersonalizadaDaFicha(personagem, nome, circulo) {
   return (personagem?.magias_customizadas || [])
     .find(m => m?.nome === nome && Number(m?.circulo) === Number(circulo));
+}
+
+/**
+ * Magias personalizadas "ocupa vaga" (`sempre_preparada === false`) de
+ * círculo 1+ que cabem na grade "Preparar Magias" de uma classe preparadora
+ * de lista completa. Descarta o que o personagem ainda não conjura
+ * (círculo acima de `maxCirculo`) e a homônima de magia que a lista da
+ * classe já traz (o cartão do livro prevalece; sem duplicar).
+ * @param {object} personagem Ficha (lê `magias_customizadas`).
+ * @param {number} maxCirculo Maior círculo conjurável da superfície ativa.
+ * @param {string[]} nomesDaLista Nomes já presentes na lista da classe.
+ * @param {string|null} [classeAtiva] Classe da superfície ativa; com ela, respeita o campo `classes` da magia (vazio = todas).
+ * @returns {Array<{nome: string, circulo: number, escola: string, personalizada: true}>}
+ */
+export function personalizadasOcupaVagaParaGrade(personagem, maxCirculo, nomesDaLista = [], classeAtiva = null) {
+  const jaNaLista = new Set(nomesDaLista);
+  return (personagem?.magias_customizadas || [])
+    .filter(m => m?.sempre_preparada === false
+      && Number(m?.circulo) >= 1 && Number(m?.circulo) <= maxCirculo
+      && !jaNaLista.has(m?.nome)
+      // Issue #123: com `classes` marcadas, só entra na grade dessas classes.
+      && (!classeAtiva || !Array.isArray(m.classes) || m.classes.length === 0 || m.classes.includes(classeAtiva)))
+    .map(m => ({
+      nome: m.nome, circulo: Number(m.circulo), escola: m.escola || '', personalizada: true,
+      fonte: typeof m.fonte === 'string' ? m.fonte.trim().slice(0, 40) : '',
+    }));
 }
 
 /**
@@ -372,7 +399,12 @@ export async function mostrarBuscaMagia() {
           ...registrada
         }))
       ]
-    : magiasClasseClasse;
+    : tipoConj === 'preparadas'
+      ? [
+          ...magiasClasseClasse,
+          ...personalizadasOcupaVagaParaGrade(char, maxCirculo, magiasClasseClasse.map(m => m.nome), sup?.classe),
+        ]
+      : magiasClasseClasse;
 
   // Magias já possuídas
   const jaPreparadas = new Set((char.magias_preparadas || []).map(m => m.nome));
@@ -543,7 +575,7 @@ export async function mostrarBuscaMagia() {
   }
 
   abrirModal(somenteConsulta ? 'Consultar Magias' : 'Preparar Magias', `
-    ${somenteConsulta ? `<div class="info-box info" style="margin-bottom:8px;font-size:0.85rem">Magias conhecidas sao definidas na <strong>subida de nivel</strong>. Use o <strong>Descanso Longo</strong> para trocar 1 magia.</div>` : ''}
+    ${somenteConsulta ? `<div class="info-box info" style="margin-bottom:8px;font-size:0.85rem">Magias conhecidas são definidas na <strong>subida de nível</strong>. Use o <strong>Descanso Longo</strong> para trocar 1 magia.</div>` : ''}
     <div id="gm-aviso-superficie">${avisoSuperficieAtiva(superficies, sup, labelMg, classificacaoAtiva.semClasse.length)}</div>
     <div id="gm-bloco-sem-classe-wrap">${htmlBlocoSemClasse()}</div>
     <div style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:6px;font-size:0.78rem">
@@ -865,7 +897,7 @@ export async function mostrarBuscaMagia() {
         const bSel = estaPreparada(b) ? 0 : 1;
         return aSel - bSel || a.nome.localeCompare(b.nome);
       });
-      if (termo.length >= 2) lista = lista.filter(m => semAcento(m.nome).includes(termo));
+      if (termo.length >= 2) lista = lista.filter(m => (semAcento(m.nome).includes(termo) || (m.fonte && semAcento(m.fonte).includes(termo))));
 
       html += `<div class="opcao-grid densa">${lista.map(m => {
         const sel = estaPreparada(m);
@@ -910,7 +942,7 @@ export async function mostrarBuscaMagia() {
           <div class="opcao-card ${sel ? 'selecionada' : ''} ${isDominio ? 'magia-dominio' : ''} ${bloqueado ? 'bloqueada' : ''}"
                style="${bloqueado ? 'opacity:0.35;' : ''}${isDominio ? 'opacity:0.7;' : ''}">
             <span class="opcao-check" ${!isDominio && !somenteConsulta ? `data-circ-check="${escHtml(m.nome)}" data-circ-check-val="${circ}" style="cursor:pointer"` : ''}></span>
-            <div class="opcao-nome" data-detalhe-magia="${escHtml(m.nome)}" data-detalhe-circ="${circ}" style="cursor:pointer">${isDominio ? '<span class="badge-dominio">&#9733;</span> ' : ''}${escHtml(m.nome)}</div>
+            <div class="opcao-nome" data-detalhe-magia="${escHtml(m.nome)}" data-detalhe-circ="${circ}" style="cursor:pointer">${isDominio ? '<span class="badge-dominio">&#9733;</span> ' : ''}${escHtml(m.nome)}${m.personalizada ? ' <span class="badge badge-secondary" style="font-size:0.6rem">Personalizada</span>' : ''}${m.personalizada && m.fonte ? ` <span class="badge badge-primary" style="font-size:0.6rem">${escHtml(m.fonte)}</span>` : ''}</div>
             <div class="opcao-resumo">
               <span>${escHtml(m.escola || '')}</span>
               ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
@@ -1181,8 +1213,8 @@ export async function mostrarBuscaMagia() {
             <span>${escHtml(magia.duracao)}</span>
           </div>
           <div class="md-content">${mdParaHtml(magia.descricao)}</div>
-          ${magia.circulo_superior ? `<div class="info-box info mt-1">${rotuloCirculoSuperiorHtml(circ)}<div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
-          ${(magia.classes || []).length > 0 ? `<div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px">Classes: ${magia.classes.map(escHtml).join(', ')}</div>` : ''}
+          ${magia.circulo_superior ? `<div class="info-box info mt-1"><div class="md-content">${circuloSuperiorHtml(magia.circulo_superior, circ)}</div></div>` : ''}
+          ${classesDaMagiaHtml(magia.classes)}
         `;
         abrirModal(magia.nome, detalhesHtml, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
       });
@@ -1424,7 +1456,7 @@ export async function mostrarFormMagiaCustom(indiceEdicao = null) {
     </div>
     <div class="row gap-1">
       <div class="col">
-        <label class="form-label" for="mc-circulo">Circulo</label>
+        <label class="form-label" for="mc-circulo">Círculo</label>
         <select class="form-select" id="mc-circulo">
           <option value="0">Truque</option>
           ${[1,2,3,4,5,6,7,8,9].map(i => `<option value="${i}">${i}o Circulo</option>`).join('')}
@@ -1480,12 +1512,28 @@ export async function mostrarFormMagiaCustom(indiceEdicao = null) {
       <div id="mc-sempre-preparada-explicacao" style="font-size:0.7rem;color:var(--text-muted)"></div>
     </div>
     <div class="form-group">
-      <label class="form-label" for="mc-desc">Descricao</label>
-      <textarea class="form-textarea" id="mc-desc" rows="4" placeholder="Descricao da magia..."></textarea>
+      <label class="form-label" for="mc-desc">Descrição</label>
+      <textarea class="form-textarea" id="mc-desc" rows="4" placeholder="Descrição da magia..."></textarea>
     </div>
     <div class="form-group">
       <label class="form-label" for="mc-dano">Dano / Efeito</label>
       <input type="text" class="form-input" id="mc-dano" placeholder="Ex: 3d6 fogo">
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="mc-circulo-superior">Círculo superior (opcional)</label>
+      <textarea class="form-textarea" id="mc-circulo-superior" rows="2" placeholder="Ex.: O dano aumenta em 1d6 para cada círculo acima do 1º."></textarea>
+      <div style="font-size:0.7rem;color:var(--text-muted)">Aparece na descrição como "Usando um Espaço de Magia de Círculo Superior." (truque: escreva a frase completa).</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="mc-fonte">Fonte (livro, opcional)</label>
+      <input type="text" class="form-input" id="mc-fonte" maxlength="40" placeholder="Ex.: Xanathar, Homebrew">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Classes com acesso (opcional)</label>
+      <div id="mc-classes" style="display:flex;gap:10px;flex-wrap:wrap">
+        ${CLASSES_CONJURADORAS.map(c => `<label><input type="checkbox" data-mc-classe="${c}"> ${c}</label>`).join('')}
+      </div>
+      <div style="font-size:0.7rem;color:var(--text-muted)">Nenhuma marcada = todas as classes. Marque para a magia aparecer só nas listas dessas classes.</div>
     </div>
   `, `<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-mc">${magiaExistente ? 'Salvar Alterações' : 'Adicionar'}</button>`);
 
@@ -1561,11 +1609,25 @@ export async function mostrarFormMagiaCustom(indiceEdicao = null) {
     document.getElementById('mc-alcance').value = magiaExistente.alcance || '';
     document.getElementById('mc-desc').value = magiaExistente.descricao || '';
     document.getElementById('mc-dano').value = magiaExistente.dano || '';
+    document.getElementById('mc-circulo-superior').value = typeof magiaExistente.circulo_superior === 'string' ? magiaExistente.circulo_superior : '';
+    document.getElementById('mc-fonte').value = typeof magiaExistente.fonte === 'string' ? magiaExistente.fonte : '';
+    const classesExistentes = Array.isArray(magiaExistente.classes) ? magiaExistente.classes : [];
+    document.querySelectorAll('[data-mc-classe]').forEach(cb => { cb.checked = classesExistentes.includes(cb.dataset.mcClasse); });
     document.getElementById('mc-ritual').checked = Boolean(magiaExistente.ritual);
     document.getElementById('mc-sempre-preparada').checked = magiaExistente.sempre_preparada !== false;
     const componentes = String(magiaExistente.componentes || '').split(',').map(valor => valor.trim());
     ['V', 'S', 'M'].forEach(letra => { document.getElementById(`mc-comp-${letra.toLowerCase()}`).checked = componentes.includes(letra); });
     document.getElementById('mc-comp-outro').value = componentes.filter(valor => !['V', 'S', 'M'].includes(valor)).join(', ');
+  }
+
+  // Issue #123: magia nova num personagem multiclasse já nasce com as classes
+  // conjuradoras dele marcadas (o jogador desmarca o que não quiser); com uma
+  // classe só, nenhuma marcada = todas.
+  if (!magiaExistente) {
+    const classesDoPersonagem = new Set(superficiesDaFicha(char).map(s => s.classe));
+    if (classesDoPersonagem.size >= 2) {
+      document.querySelectorAll('[data-mc-classe]').forEach(cb => { cb.checked = classesDoPersonagem.has(cb.dataset.mcClasse); });
+    }
   }
 
   // Um tempo de conjuração que diz "ou Ritual" IMPLICA a marca de Ritual, e
@@ -1637,6 +1699,9 @@ export async function mostrarFormMagiaCustom(indiceEdicao = null) {
     const circuloSalvo = parseInt(document.getElementById('mc-circulo')?.value) || 0;
     const semprePreparadaMarcada = document.getElementById('mc-sempre-preparada')?.checked !== false;
     if (!char.magias_customizadas) char.magias_customizadas = [];
+    const circuloSuperior = document.getElementById('mc-circulo-superior')?.value?.trim() || '';
+    const fonte = document.getElementById('mc-fonte')?.value?.trim().slice(0, 40) || '';
+    const classesMarcadas = [...document.querySelectorAll('[data-mc-classe]:checked')].map(cb => cb.dataset.mcClasse);
     const magiaSalva = {
       nome,
       circulo: circuloSalvo,
@@ -1655,6 +1720,10 @@ export async function mostrarFormMagiaCustom(indiceEdicao = null) {
       // Comentario do usuario na issue #74: truque (circulo 0) passou a
       // valer tambem -- antes so magia de circulo 1+ entrava aqui.
       ...(!semprePreparadaMarcada ? { sempre_preparada: false } : {}),
+      // Issues #98/#111/#123: campos opcionais, gravados só quando preenchidos.
+      ...(circuloSuperior ? { circulo_superior: circuloSuperior } : {}),
+      ...(fonte ? { fonte } : {}),
+      ...(classesMarcadas.length ? { classes: classesMarcadas } : {}),
     };
     const nomeAnterior = magiaExistente?.nome;
     const circuloAnterior = magiaExistente ? (Number(magiaExistente.circulo) || 0) : null;
@@ -1671,8 +1740,13 @@ export async function mostrarFormMagiaCustom(indiceEdicao = null) {
     // entra na mesma regra -- "ocupa vaga" agora tambem se aplica a ele,
     // sempre gravando direto em magias_conhecidas (truque nao tem
     // grimorio nem preparo separado, para NENHUMA classe -- nem o Mago).
-    const ocupaVaga = !semprePreparadaMarcada;
     const sup = superficieAtiva();
+    // Issue #123: com `classes` marcadas, a magia só é injetada na lista da
+    // superfície ativa se a classe dela estiver entre as marcadas; senão
+    // fica disponível apenas nas grades das classes marcadas.
+    const classeDaSuperficieAutorizada = classesMarcadas.length === 0
+      || Boolean(sup?.classe && classesMarcadas.includes(sup.classe));
+    const ocupaVaga = !semprePreparadaMarcada && classeDaSuperficieAutorizada;
     const ehMagoAgora = !!sup?.usaGrimorio;
     const ehTruqueSalvo = circuloSalvo === 0;
 
@@ -1947,7 +2021,8 @@ export async function mostrarBuscaGrimorio() {
   // qualquer magia do acervo.
   const magiasPersonalizadasOcupaVaga = (char.magias_customizadas || [])
     .filter(m => m.circulo > 0 && m.sempre_preparada === false)
-    .map(m => ({ nome: m.nome, circulo: m.circulo, escola: m.escola || '', personalizada: true }));
+    .map(m => ({ nome: m.nome, circulo: m.circulo, escola: m.escola || '', personalizada: true,
+      fonte: typeof m.fonte === 'string' ? m.fonte.trim().slice(0, 40) : '' }));
   const magias = [...magiasDoAcervo, ...magiasPersonalizadasOcupaVaga];
   // Achado da revisao de branch (Important 2, sub-projeto 4): esta linha
   // era o ULTIMO leitor vivo da forma ANTIGA de char.espacos_magia
@@ -1979,7 +2054,7 @@ export async function mostrarBuscaGrimorio() {
     const termo = semAcento(document.getElementById('busca-grimorio')?.value || '');
     const jaNoGrimorio = new Set((char.grimorio || []).map(m => m.nome));
     let lista = magias.filter(m => !jaNoGrimorio.has(m.nome) && circulosPreparaveis.has(m.circulo));
-    if (termo.length >= 2) lista = lista.filter(m => semAcento(m.nome).includes(termo));
+    if (termo.length >= 2) lista = lista.filter(m => (semAcento(m.nome).includes(termo) || (m.fonte && semAcento(m.fonte).includes(termo))));
     lista = lista.sort((a, b) => a.circulo - b.circulo || a.nome.localeCompare(b.nome, 'pt-BR'));
 
     if (lista.length === 0) {
@@ -2012,7 +2087,7 @@ export async function mostrarBuscaGrimorio() {
       // entraria como HTML.
       return `
       <div class="magia-item" style="cursor:pointer${!temPO ? ';opacity:0.5' : ''}" data-grim-nome="${escHtml(m.nome)}" data-grim-circ="${m.circulo}" data-grim-custo="${custo}">
-        <div class="magia-nome">${escHtml(m.nome)}${m.personalizada ? ' <span class="badge badge-secondary" style="font-size:0.6rem">Personalizada</span>' : ''}</div>
+        <div class="magia-nome">${escHtml(m.nome)}${m.personalizada ? ' <span class="badge badge-secondary" style="font-size:0.6rem">Personalizada</span>' : ''}${m.personalizada && m.fonte ? ` <span class="badge badge-primary" style="font-size:0.6rem">${escHtml(m.fonte)}</span>` : ''}</div>
         <div class="magia-meta">
           <span>${m.circulo}º Círculo</span>
           <span>${escHtml(m.escola)}</span>
@@ -2198,7 +2273,8 @@ export async function abrirPreenchimentoSlotMagia(tipo = 'magia') {
             <span>${magia.componentes}</span> <span>${magia.duracao}</span>
           </div>
           <div class="md-content">${mdParaHtml(magia.descricao)}</div>
-          ${magia.circulo_superior ? `<div class="info-box info mt-1">${rotuloCirculoSuperiorHtml(circ)}<div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
+          ${magia.circulo_superior ? `<div class="info-box info mt-1"><div class="md-content">${circuloSuperiorHtml(magia.circulo_superior, circ)}</div></div>` : ''}
+          ${classesDaMagiaHtml(magia.classes)}
         `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
       });
     });
@@ -2338,7 +2414,7 @@ export async function mostrarTrocaMagiaConhecida(callbackPosTroca = null, opcoes
   // dentro do map de PASSOS), que usa o padrao nos DOIS ramos --
   // com `opcoes.classe` (multiclasse) e sem ele (classe unica).
   const explicacaoPadrao = opcoes.classe
-    ? `<strong>${escHtml(nomeClasse)}:</strong> apos um Descanso Longo, voce pode trocar <strong>1 magia ${ehMago ? 'preparada' : 'conhecida'}</strong> por outra ${ehMago ? 'do seu livro de magias' : `da lista de ${nomeClasse}`}.`
+    ? `<strong>${escHtml(nomeClasse)}:</strong> após um Descanso Longo, você pode trocar <strong>1 magia ${ehMago ? 'preparada' : 'conhecida'}</strong> por outra ${ehMago ? 'do seu livro de magias' : `da lista de ${nomeClasse}`}.`
     : `Apos um Descanso Longo, voce pode trocar <strong>1 magia ${ehMago ? 'preparada' : 'conhecida'}</strong> por outra ${ehMago ? 'do seu livro de magias' : `da lista de ${nomeClasse}`}.`;
   const titulo = opcoes.titulo || (opcoes.classe ? `Trocar Magia Conhecida — ${nomeClasse}` : 'Trocar Magia Conhecida');
   const explicacao = opcoes.explicacao || explicacaoPadrao;
@@ -2362,7 +2438,7 @@ export async function mostrarTrocaMagiaConhecida(callbackPosTroca = null, opcoes
       </div>
     </div>
   `, `<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
-     <button class="btn btn-secondary" id="btn-pular-troca-conhecida">Nao Trocar</button>
+     <button class="btn btn-secondary" id="btn-pular-troca-conhecida">Não Trocar</button>
      <button class="btn btn-primary" id="btn-confirmar-troca-conhecida" disabled>Confirmar Troca</button>`);
 
   const containerAdicionar = document.getElementById('troca-conhecida-adicionar-container');
@@ -2449,7 +2525,8 @@ export async function mostrarTrocaMagiaConhecida(callbackPosTroca = null, opcoes
             <span>${escHtml(magia.componentes)}</span> <span>${escHtml(magia.duracao)}</span>
           </div>
           <div class="md-content">${mdParaHtml(magia.descricao)}</div>
-          ${magia.circulo_superior ? `<div class="info-box info mt-1">${rotuloCirculoSuperiorHtml(circ)}<div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
+          ${magia.circulo_superior ? `<div class="info-box info mt-1"><div class="md-content">${circuloSuperiorHtml(magia.circulo_superior, circ)}</div></div>` : ''}
+          ${classesDaMagiaHtml(magia.classes)}
         `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
       });
     });
@@ -2678,7 +2755,7 @@ export async function mostrarTrocaTruque(callbackPosTroca = null, opcoes = {}) {
       <div id="troca-truque-adicionar-lista"></div>
     </div>
   `, `<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
-     <button class="btn btn-secondary" id="btn-pular-troca-truque">Nao Trocar</button>
+     <button class="btn btn-secondary" id="btn-pular-troca-truque">Não Trocar</button>
      <button class="btn btn-primary" id="btn-confirmar-troca-truque" disabled>Confirmar Troca</button>`);
 
   const containerAdicionar = document.getElementById('troca-truque-adicionar-container');

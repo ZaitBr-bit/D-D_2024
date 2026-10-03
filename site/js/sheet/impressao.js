@@ -5,7 +5,7 @@
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, PERICIAS } from '../dados-classes.js';
 import { getMagiasPorCirculo } from '../db.js';
 import { formatarCarteira, totalEmCobre } from '../moedas.js';
-import { bonusProficiencia, calcBonusPericia, calcCA, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcMod, calcPercepcaoPassiva, conjuracoesPorClasse, escHtml, fmtMod, getDeslocamento, getTamanho, mdParaHtml, rotuloCirculoSuperiorHtml, toast } from '../utils.js';
+import { bonusProficiencia, calcBonusPericia, calcCA, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcMod, calcPercepcaoPassiva, conjuracoesPorClasse, escHtml, fmtMod, getDeslocamento, getTamanho, mdParaHtml, circuloSuperiorHtml, toast } from '../utils.js';
 import { SUBTRACOS_ESPECIE, gerarTracoSinteticoEspecie } from './caracteristicas.js';
 import { getEstadoRecursosBruxo } from './classes/bruxo.js';
 import { forcaPrimordialAtiva, getAtaquesPorAcao, getDeslocamentoFinal, getModIniciativa } from './combate.js';
@@ -163,7 +163,7 @@ function htmlMagiaImpressao(nome, circulo, cacheMagias, origemExtra) {
       .filter(Boolean).join(' | ');
     desc = mdParaHtml(magia.descricao || '');
     if (magia.circulo_superior) {
-      upcast = `<div class="print-spell-upcast">${rotuloCirculoSuperiorHtml(circulo)} ${mdParaHtml(magia.circulo_superior)}</div>`;
+      upcast = `<div class="print-spell-upcast">${circuloSuperiorHtml(magia.circulo_superior, circulo)}</div>`;
     }
   } else if (infoIdx) {
     meta = [infoIdx.escola, infoIdx.tempo_conjuracao, infoIdx.alcance, infoIdx.duracao]
@@ -311,7 +311,7 @@ export async function gerarHtmlImpressao() {
     <div class="print-stat-box"><div class="print-stat-label">Iniciativa</div><div class="print-stat-value">${fmtMod(iniciativa.valor)}</div></div>
     <div class="print-stat-box"><div class="print-stat-label">Deslocamento</div><div class="print-stat-value">${_deslocamento}</div></div>
     <div class="print-stat-box"><div class="print-stat-label">Ataques</div><div class="print-stat-value">${ataquesPorAcao}</div></div>
-    <div class="print-stat-box"><div class="print-stat-label">Proficiencia</div><div class="print-stat-value">+${prof}</div></div>
+    <div class="print-stat-box"><div class="print-stat-label">Proficiência</div><div class="print-stat-value">+${prof}</div></div>
   `;
   // Mesmo portão da ficha (sheet/ficha.js): uma caixa de CD e uma de Atq
   // por CLASSE que conjura, porque o atributo de conjuração é o da classe
@@ -430,10 +430,10 @@ export async function gerarHtmlImpressao() {
     <div class="print-section">
       <div class="print-section-title">Sentidos Passivos</div>
       <div class="print-senses-grid">
-        <div class="print-sense-item"><div class="print-sense-value">${percepcao}</div><div class="print-sense-label">Percepcao</div></div>
-        <div class="print-sense-item"><div class="print-sense-value">${intuicao}</div><div class="print-sense-label">Intuicao</div></div>
-        <div class="print-sense-item"><div class="print-sense-value">${investigacao}</div><div class="print-sense-label">Investigacao</div></div>
-        ${visaoEscuro ? `<div class="print-sense-item"><div class="print-sense-value">${visaoEscuro}</div><div class="print-sense-label">Visao no Escuro</div></div>` : ''}
+        <div class="print-sense-item"><div class="print-sense-value">${percepcao}</div><div class="print-sense-label">Percepção</div></div>
+        <div class="print-sense-item"><div class="print-sense-value">${intuicao}</div><div class="print-sense-label">Intuição</div></div>
+        <div class="print-sense-item"><div class="print-sense-value">${investigacao}</div><div class="print-sense-label">Investigação</div></div>
+        ${visaoEscuro ? `<div class="print-sense-item"><div class="print-sense-value">${visaoEscuro}</div><div class="print-sense-label">Visão no Escuro</div></div>` : ''}
       </div>
     </div>
   `;
@@ -454,7 +454,7 @@ export async function gerarHtmlImpressao() {
   const ordemAtributos = ['Forca', 'Destreza', 'Constituicao', 'Inteligencia', 'Sabedoria', 'Carisma'];
   pag1 += `
     <div class="print-section">
-      <div class="print-section-title">Pericias</div>
+      <div class="print-section-title">Perícias</div>
       <div class="print-skills-grid">
         ${['Percepção','Intuição','Investigação','Religião','História','Prestidigitação','Furtividade','Persuasão','Atletismo','Medicina','Acrobacia','Enganação','Arcanismo','Sobrevivência','Natureza','Atuação','Intimidação','Lidar com Animais'].map(nome => {
           const p = PERICIAS.find(x => x.nome === nome);
@@ -582,7 +582,7 @@ export async function gerarHtmlImpressao() {
     }
 
     if (feats.length > 0) {
-      pag2 += `<div class="print-section"><div class="print-section-title">Caracteristicas de Classe</div>`;
+      pag2 += `<div class="print-section"><div class="print-section-title">Características de Classe</div>`;
       feats.forEach(f => {
         // Para Ordem Divina/Primal, exibir somente a opcao selecionada
         let descPrint = f.descricao || '';
@@ -696,7 +696,7 @@ export async function gerarHtmlImpressao() {
     // mesma variavel); a impressao nao tem essa restricao.
     const reservasImpressao = reservasDeEspacos();
     if (reservasImpressao.length > 0) {
-      pagMagias += `<div class="print-section"><div class="print-section-title">Espacos de Magia</div>`;
+      pagMagias += `<div class="print-section"><div class="print-section-title">Espaços de Magia</div>`;
       pagMagias += `<div style="display:flex;gap:4mm;flex-wrap:wrap;margin-bottom:2mm">`;
       reservasImpressao.forEach(r => {
         const rotuloFonte = r.fonte === 'pacto' ? ' (Pacto)' : '';

@@ -1,9 +1,11 @@
 // ============================================================
 // Ficha de Personagem - Visualização e Edição
 // ============================================================
-import { getPersonagem } from '../store.js';
+import { getPersonagem, substituirPersonagemLocal } from '../store.js';
+import { buscarPersonagemCloud, getUsuario } from '../auth.js';
+import { decidirAoAbrir } from '../sync-merge.js';
 import { getClasse, getIndiceMagias, getTalentos, getEspecies } from '../db.js';
-import { getMagiaPreparadas, normalizarGrimorioMago } from '../utils.js';
+import { getMagiaPreparadas, normalizarGrimorioMago, toast } from '../utils.js';
 import { obterMagiasAutomaticasDoPersonagem } from '../levelup.js';
 import { getSyncStatus, onSyncStatusChange } from '../sync.js';
 import { resolverPassivosTalentos } from '../talentos-effects.js';
@@ -13,7 +15,7 @@ import { garantirDadosDeClasses, resetarSuperficieSelecionada } from '../sheet/c
 import { getEstadoRecursosGuerreiro } from '../sheet/classes/guerreiro.js';
 import { sincronizarMagiasFixasMago } from '../sheet/classes/mago.js';
 import { _carregarEstadoColapso } from '../sheet/colapso.js';
-import { char, classeData, salvar } from '../sheet/estado.js';
+import { char, classeData, salvar, iniciarAberturaFicha, concluirAberturaFicha } from '../sheet/estado.js';
 // nivelNa (Tarefa 3, sub-projeto "tela magias por classe"): ver o
 // comentário de `limitePreparadasMago`, abaixo -- o nível NA classe Mago,
 // nunca o espelho `char.nivel` (o TOTAL).
@@ -25,8 +27,38 @@ import { baixarPdfFicha } from '../sheet/pdf.js';
 import { migrarAdeptoElementalTipos, migrarIniciadoEmMagiaInstancias } from '../sheet/talentos.js';
 let _syncSubscribed = false;
 
+const LIMITE_PULL_NUVEM_MS = 2500;
+
+/**
+ * Se há login e rede, confere a versão da nuvem deste personagem antes de
+ * abrir a ficha: usa a da nuvem se for mais nova, remove a local se foi
+ * excluída em outro aparelho. Falha de rede ou demora acima do limite
+ * mantém a cópia local (a ficha abre normalmente).
+ */
+async function _atualizarDaNuvemAntesDeAbrir(charId) {
+  const local = getPersonagem(charId);
+  if (!local || !getUsuario() || !navigator.onLine) return;
+  try {
+    const docNuvem = await Promise.race([
+      buscarPersonagemCloud(charId),
+      new Promise(resolver => setTimeout(() => resolver(undefined), LIMITE_PULL_NUVEM_MS)),
+    ]);
+    if (docNuvem === undefined) return;
+    const decisao = decidirAoAbrir(local, docNuvem);
+    if (decisao === 'usar-nuvem') {
+      substituirPersonagemLocal(docNuvem, charId);
+    } else if (decisao === 'remover') {
+      substituirPersonagemLocal(null, charId);
+      toast('Este personagem foi excluído em outro aparelho.', 'info');
+    }
+  } catch (err) {
+    console.warn('Não foi possível conferir a nuvem antes de abrir a ficha:', err?.message);
+  }
+}
+
 export async function renderSheet(container, charId) {
   definirContainer(container);
+  await _atualizarDaNuvemAntesDeAbrir(charId);
   definirChar(getPersonagem(charId));
   // Seletor de superficie de conjuracao (Tarefa 4, sub-projeto "tela
   // magias por classe"): a escolha e uma variavel de MODULO
@@ -35,7 +67,7 @@ export async function renderSheet(container, charId) {
   // do mesmo nome herdaria a classe escolhida no personagem anterior.
   resetarSuperficieSelecionada();
   if (!char) {
-    container.innerHTML = '<div class="empty-state"><h2>Personagem nao encontrado</h2><button class="btn btn-primary" onclick="navegar(\'home\')">Voltar</button></div>';
+    container.innerHTML = '<div class="empty-state"><h2>Personagem não encontrado</h2><button class="btn btn-primary" onclick="navegar(\'home\')">Voltar</button></div>';
     return;
   }
 
@@ -89,83 +121,90 @@ export async function renderSheet(container, charId) {
   // contrário -- e `classesDe` já faz o mesmo fallback de espelho que a
   // migração faria. Migrar antes das demais migrações garante que ELAS
   // leiam valores consistentes.
-  migrarMulticlasse();
-  migrarMagiasDominio();
-  migrarMagiasSemprePreparadas();
-  // Antes de migrarSlotsMagiaLivre: o truque concedido pela subclasse conta
-  // no limite, e contá-lo depois ofereceria uma vaga livre a mais.
-  migrarTruquesFixosSubclasse();
-  // Issue #46, ANTES da chamada de `normalizarGrimorioMago` (mais abaixo,
-  // nesta mesma função): aquela função varre `magias_preparadas` para
-  // empurrar magia "normal" ao grimório do Mago. Deixar a entrada
-  // personalizada viva até lá dependeria do `continue` explícito dela para
-  // não registrar a magia de graça -- limpar aqui remove a dependência
-  // inteira. Também antes de `migrarMagiaClasse` (abaixo), que carimbaria
-  // classe numa entrada prestes a sair.
-  // Referências por NOME e não por número de linha, de propósito: as duas
-  // chamadas já se deslocaram uma vez por causa desta inserção.
-  migrarMagiasCustomizadasSemprePreparadas();
-  // Sincrona: a ressalva da homonima le o acervo de indiceMagiasCache, ja
-  // populado por `definirIndiceMagias` (no carregamento do indice, acima),
-  // sem I/O proprio.
-  migrarCopiasCustomizadasDoGrimorio();
-  // Mago nível 18/20: mantém as magias de Maestria de Magias e Assinatura
-  // Mágica sempre preparadas (e tira as que deixaram de ser escolhidas).
-  if (sincronizarMagiasFixasMago()) salvar();
-  migrarSlotsMagiaLivre();
-  migrarTruquesEspecie();
-  migrarMagiasLegadoEspecie();
-  // Depois de TODA migração que atribui `origem` a entradas de
-  // magias_preparadas (Tarefa 3, sub-projeto "magia sabe a classe"): esta é
-  // a última delas na ordem acima -- migrarMagiasDominio ('dominio'),
-  // migrarMagiasSemprePreparadas ('sempre'), sincronizarMagiasFixasMago
-  // ('maestria_magias'/'assinatura_magica', linha ~100) e
-  // migrarMagiasLegadoEspecie ('especie_legado', logo acima) mutam entradas
-  // JÁ EXISTENTES que ainda não tinham origem. Uma magia de domínio cuja
-  // origem ainda não tivesse sido atribuída pareceria uma magia normal de
-  // classe para classeDaMagiaPreparada, e seria carimbada -- exatamente o
-  // que a regra "sem chute" proíbe, e de forma permanente, porque esta
-  // migração nunca sobrescreve um carimbo já gravado. Também depois de
-  // migrarMulticlasse() (linha ~92): sem classes[] reconciliado,
-  // superficiesDeConjuracao não enxerga as classes do personagem.
-  await migrarMagiaClasse();
-  migrarEscolhasClasseLegadas();
-  migrarNomePericiaLidarAnimais();
-  migrarTalentoVersatilHumano();
-  migrarPericiaEspecie();
-  migrarPericiasEspecie();
-  migrarPericiasTalentos();
-  // Depois de migrarPericiasTalentos: as duas leem char.talentos, mas
-  // gravam em arrays diferentes (perícias x proficiencias_extra/ferramentas).
-  migrarProficienciasTalentos();
-  migrarIniciadoEmMagiaInstancias();
-  migrarAdeptoElementalTipos();
+  // Migrações da abertura gravam sem carimbar nem enviar à nuvem: abrir a
+  // ficha não pode virar "a versão mais nova" no merge entre aparelhos.
+  iniciarAberturaFicha();
+  try {
+    migrarMulticlasse();
+    migrarMagiasDominio();
+    migrarMagiasSemprePreparadas();
+    // Antes de migrarSlotsMagiaLivre: o truque concedido pela subclasse conta
+    // no limite, e contá-lo depois ofereceria uma vaga livre a mais.
+    migrarTruquesFixosSubclasse();
+    // Issue #46, ANTES da chamada de `normalizarGrimorioMago` (mais abaixo,
+    // nesta mesma função): aquela função varre `magias_preparadas` para
+    // empurrar magia "normal" ao grimório do Mago. Deixar a entrada
+    // personalizada viva até lá dependeria do `continue` explícito dela para
+    // não registrar a magia de graça -- limpar aqui remove a dependência
+    // inteira. Também antes de `migrarMagiaClasse` (abaixo), que carimbaria
+    // classe numa entrada prestes a sair.
+    // Referências por NOME e não por número de linha, de propósito: as duas
+    // chamadas já se deslocaram uma vez por causa desta inserção.
+    migrarMagiasCustomizadasSemprePreparadas();
+    // Sincrona: a ressalva da homonima le o acervo de indiceMagiasCache, ja
+    // populado por `definirIndiceMagias` (no carregamento do indice, acima),
+    // sem I/O proprio.
+    migrarCopiasCustomizadasDoGrimorio();
+    // Mago nível 18/20: mantém as magias de Maestria de Magias e Assinatura
+    // Mágica sempre preparadas (e tira as que deixaram de ser escolhidas).
+    if (sincronizarMagiasFixasMago()) salvar();
+    migrarSlotsMagiaLivre();
+    migrarTruquesEspecie();
+    migrarMagiasLegadoEspecie();
+    // Depois de TODA migração que atribui `origem` a entradas de
+    // magias_preparadas (Tarefa 3, sub-projeto "magia sabe a classe"): esta é
+    // a última delas na ordem acima -- migrarMagiasDominio ('dominio'),
+    // migrarMagiasSemprePreparadas ('sempre'), sincronizarMagiasFixasMago
+    // ('maestria_magias'/'assinatura_magica', linha ~100) e
+    // migrarMagiasLegadoEspecie ('especie_legado', logo acima) mutam entradas
+    // JÁ EXISTENTES que ainda não tinham origem. Uma magia de domínio cuja
+    // origem ainda não tivesse sido atribuída pareceria uma magia normal de
+    // classe para classeDaMagiaPreparada, e seria carimbada -- exatamente o
+    // que a regra "sem chute" proíbe, e de forma permanente, porque esta
+    // migração nunca sobrescreve um carimbo já gravado. Também depois de
+    // migrarMulticlasse() (linha ~92): sem classes[] reconciliado,
+    // superficiesDeConjuracao não enxerga as classes do personagem.
+    await migrarMagiaClasse();
+    migrarEscolhasClasseLegadas();
+    migrarNomePericiaLidarAnimais();
+    migrarTalentoVersatilHumano();
+    migrarPericiaEspecie();
+    migrarPericiasEspecie();
+    migrarPericiasTalentos();
+    // Depois de migrarPericiasTalentos: as duas leem char.talentos, mas
+    // gravam em arrays diferentes (perícias x proficiencias_extra/ferramentas).
+    migrarProficienciasTalentos();
+    migrarIniciadoEmMagiaInstancias();
+    migrarAdeptoElementalTipos();
 
-  // Migrar fichas legadas: magias preparadas normais já existentes pertencem ao grimório.
-  // `normalizarGrimorioMago` só age quando `char.classe === 'Mago'` (o
-  // espelho aponta para Mago, ver o comentário dela em utils.js) -- então
-  // `classeData` aqui É a tabela do Mago sempre que este cálculo importa.
-  // O nível não podia seguir o mesmo raciocínio: `char.nivel` é o TOTAL do
-  // personagem, não o nível NA classe Mago -- um Mago 5/Ladino 3 confrontava
-  // a tabela do Mago no nível 8 e inflava `limitePreparadas` (hoje só
-  // alimenta `pendentes`, que nenhum chamador lê, mas a conta ficava errada
-  // mesmo assim). `nivelNa` corrige sem mudar nada para classe única (as
-  // duas contagens coincidem por construção).
-  const limitePreparadasMago = classeData?.tabela_caracteristicas
-    ? getMagiaPreparadas(classeData.tabela_caracteristicas, nivelNa(char, 'Mago')) : undefined;
-  if (normalizarGrimorioMago(char, limitePreparadasMago).alterado) salvar();
+    // Migrar fichas legadas: magias preparadas normais já existentes pertencem ao grimório.
+    // `normalizarGrimorioMago` só age quando `char.classe === 'Mago'` (o
+    // espelho aponta para Mago, ver o comentário dela em utils.js) -- então
+    // `classeData` aqui É a tabela do Mago sempre que este cálculo importa.
+    // O nível não podia seguir o mesmo raciocínio: `char.nivel` é o TOTAL do
+    // personagem, não o nível NA classe Mago -- um Mago 5/Ladino 3 confrontava
+    // a tabela do Mago no nível 8 e inflava `limitePreparadas` (hoje só
+    // alimenta `pendentes`, que nenhum chamador lê, mas a conta ficava errada
+    // mesmo assim). `nivelNa` corrige sem mudar nada para classe única (as
+    // duas contagens coincidem por construção).
+    const limitePreparadasMago = classeData?.tabela_caracteristicas
+      ? getMagiaPreparadas(classeData.tabela_caracteristicas, nivelNa(char, 'Mago')) : undefined;
+    if (normalizarGrimorioMago(char, limitePreparadasMago).alterado) salvar();
 
-  // Os totais de espaco de magia deixaram de ser reconciliados aqui no
-  // sub-projeto 4: eles sao DERIVADOS por montarReservasDeEspacos
-  // (sheet/reservas-espacos.js), que le a tabela unificada quando ha duas
-  // ou mais classes conjuradoras e a tabela da propria classe quando ha
-  // uma so. O bloco antigo usava a tabela da classe INICIAL contra o
-  // nivel TOTAL, e APAGAVA circulos fora dela -- o que teria apagado a
-  // reserva de Magia de Pacto de um Bruxo multiclasse.
-  migrarEspacosMagia();
+    // Os totais de espaco de magia deixaram de ser reconciliados aqui no
+    // sub-projeto 4: eles sao DERIVADOS por montarReservasDeEspacos
+    // (sheet/reservas-espacos.js), que le a tabela unificada quando ha duas
+    // ou mais classes conjuradoras e a tabela da propria classe quando ha
+    // uma so. O bloco antigo usava a tabela da classe INICIAL contra o
+    // nivel TOTAL, e APAGAVA circulos fora dela -- o que teria apagado a
+    // reserva de Magia de Pacto de um Bruxo multiclasse.
+    migrarEspacosMagia();
 
-  _carregarEstadoColapso();
-  renderFichaCompleta();
+    _carregarEstadoColapso();
+    renderFichaCompleta();
+  } finally {
+    concluirAberturaFicha();
+  }
 
   // Registrar atualização do indicador de sync (somente uma vez por sessão)
   if (!_syncSubscribed) {

@@ -926,7 +926,7 @@ export function renderFichaCompleta() {
 
     <!-- Pericias em ordem customizada -->
     <div class="card">
-      <div class="card-header"><h2>Pericias</h2></div>
+      <div class="card-header"><h2>Perícias</h2></div>
       <div class="pericias-lista-custom">
         ${(() => {
           // Ordem customizada de exibicao das pericias

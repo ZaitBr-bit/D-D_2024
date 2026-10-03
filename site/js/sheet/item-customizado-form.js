@@ -66,10 +66,10 @@ export function htmlFormularioItemCustomizado(item = null) {
   const num = (v) => (parseInt(v) || '') === '' ? '' : String(parseInt(v));
   return `
     <div class="form-group"><label class="form-label" for="ic-nome">Nome</label><input type="text" class="form-input" id="ic-nome" value="${attr(item?.nome || '')}"></div>
-    <div class="form-group"><label class="form-label" for="ic-desc">Descricao</label><textarea class="form-textarea" id="ic-desc" rows="2">${escHtml(item?.descricao || '')}</textarea></div>
+    <div class="form-group"><label class="form-label" for="ic-desc">Descrição</label><textarea class="form-textarea" id="ic-desc" rows="2">${escHtml(item?.descricao || '')}</textarea></div>
     <div class="row gap-1">
       <div class="col">
-        <label class="form-label" for="ic-ca">Bonus CA</label>
+        <label class="form-label" for="ic-ca">Bônus CA</label>
         <input type="number" class="form-input" id="ic-ca" value="${num(d.bonus_ca)}" placeholder="0" step="1">
         <div style="font-size:0.65rem;color:var(--text-muted)">soma na CA quando equipado</div>
       </div>
@@ -84,7 +84,7 @@ export function htmlFormularioItemCustomizado(item = null) {
         <div style="font-size:0.65rem;color:var(--text-muted)">Ex: 2d6 Cortante</div>
       </div>
       <div class="col">
-        <label class="form-label" for="ic-atq">Bonus Atq</label>
+        <label class="form-label" for="ic-atq">Bônus Atq</label>
         <input type="number" class="form-input" id="ic-atq" value="${num(d.bonus_ataque)}" placeholder="0" step="1">
         <div style="font-size:0.65rem;color:var(--text-muted)">soma na jogada de ataque</div>
       </div>
@@ -135,10 +135,10 @@ export function htmlFormularioItemCustomizado(item = null) {
           <option value=""${!d.raridade ? ' selected' : ''}>—</option>
           ${RARIDADES.map(r => `<option value="${r}"${d.raridade === r ? ' selected' : ''}>${r}</option>`).join('')}
         </select>
-        <div style="font-size:0.65rem;color:var(--text-muted)">vazio = item nao magico</div>
+        <div style="font-size:0.65rem;color:var(--text-muted)">vazio = item não mágico</div>
       </div>
       <div class="col">
-        <label class="form-label" for="ic-preco">Preco</label>
+        <label class="form-label" for="ic-preco">Preço</label>
         <input type="text" class="form-input" id="ic-preco" value="${attr(d.preco || '')}" placeholder="150 PO">
         <div style="font-size:0.65rem;color:var(--text-muted)">texto livre (ex.: 150 PO)</div>
       </div>
@@ -148,7 +148,7 @@ export function htmlFormularioItemCustomizado(item = null) {
         <input type="checkbox" id="ic-sintonizacao"${d.requer_sintonizacao ? ' checked' : ''}>
         Requer Sintonizacao
       </label>
-      <div style="font-size:0.65rem;color:var(--text-muted)">voce pode estar sintonizado a no maximo 3 itens</div>
+      <div style="font-size:0.65rem;color:var(--text-muted)">você pode estar sintonizado a no máximo 3 itens</div>
     </div>
     <div id="ic-erros" style="display:none;color:var(--danger);font-size:0.8rem;margin-top:8px"></div>
   `;

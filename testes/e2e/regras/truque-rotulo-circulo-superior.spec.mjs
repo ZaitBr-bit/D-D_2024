@@ -37,3 +37,25 @@ test('ficha: descrição de truque (Chama Sagrada) não mostra "Em círculos sup
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
+
+test('ficha: magia de círculo 1+ mostra a frase do PHB 2024 uma vez, e não o rótulo antigo (issue #102)', async ({ context }) => {
+  const { page, erros } = await abrirFicha(context, {
+    classe: 'Mago', nivel: 5, xp: 6500, atributos: ATRIBUTOS_REGRAS,
+    classes: [{ classe: 'Mago', subclasse: '', nivel: 5, ordem: 0 }],
+    magias_preparadas: [{ nome: 'Mísseis Mágicos', circulo: 1 }],
+    grimorio: [{ nome: 'Mísseis Mágicos', circulo: 1 }],
+    schema_versao: 2,
+  }, 'regras-issue102-rotulo');
+  await assentar(page).catch(() => {});
+
+  await page.locator('summary', { hasText: /1º Círculo/ }).first().click().catch(() => {});
+  const linha = page.locator('.magia-item[data-magia-nome="Mísseis Mágicos"]').first();
+  await linha.locator('.magia-nome').click();
+  const descricao = linha.locator('.magia-desc');
+  await expect(descricao).toBeVisible();
+
+  await expect(descricao.locator('strong', { hasText: 'Usando um Espaço de Magia de Círculo Superior.' })).toHaveCount(1);
+  await expect(descricao).not.toContainText('Em círculos superiores');
+  expect((await descricao.innerText()).match(/Usando um Espaço de Magia de Círculo Superior/g)).toHaveLength(1);
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});

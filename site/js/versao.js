@@ -13,13 +13,70 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.0.18';
+export const VERSAO_ATUAL = '3.0.20';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.0.20',
+    data: '2026-10-03',
+    rotulo: 'Magias e textos',
+    resumo: 'Rótulo de upcast do livro, classes com acesso na descrição das '
+      + 'magias, novos campos na magia personalizada, Revelação Celestial '
+      + 'com as três formas no próprio card e textos com acento.',
+    melhorias: [
+      {
+        grupo: '✨ Melhorias',
+        itens: [
+          'O bloco de upcast das magias agora abre com "Usando um Espaço de '
+            + 'Magia de Círculo Superior." em negrito, como o PHB 2024, no '
+            + 'lugar do antigo "Em círculos superiores". (#102)',
+          'A descrição da magia mostra as classes com acesso a ela também na '
+            + 'seção Magias da ficha, nas trocas do Descanso Longo e na subida '
+            + 'de nível. (#118)',
+          'Magia personalizada ganhou os campos "Círculo superior" (descreve o '
+            + 'upcast), "Fonte (livro)" (badge e busca) e "Classes com acesso" '
+            + '(a magia aparece só nas listas das classes marcadas; em '
+            + 'multiclasse o formulário já vem com as suas classes). (#98, #111, #123)',
+          'Aasimar: as três formas da Revelação Celestial agora ficam dentro '
+            + 'do card da própria Revelação Celestial, em vez de cards soltos. (#106)',
+          'Rótulos da ficha e dos formulários que estavam sem acento e Ç '
+            + '(Percepção, Intuição, Descrição, Bônus CA, Preço e outros) '
+            + 'foram corrigidos. (#99)',
+          'O Grimório do Mago abre com os círculos recolhidos. (#110)',
+        ],
+      },
+    ],
+  },
+  {
+    versao: '3.0.19',
+    data: '2026-10-03',
+    rotulo: 'Sincronização e correções',
+    resumo: 'Abrir a ficha não sobrescreve mais o que foi editado em outro '
+      + 'aparelho, personagem excluído deixa de reaparecer, o Mestre das '
+      + 'Armas troca a arma no Descanso Longo e a magia personalizada que '
+      + 'ocupa vaga aparece em Preparar Magias.',
+    correcoes: [
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'Sincronização: só abrir a ficha marcava o personagem como o mais '
+            + 'recente e podia apagar alterações feitas em outro aparelho; '
+            + 'agora só edição de verdade conta. A ficha também confere a '
+            + 'nuvem antes de abrir, e personagem excluído em um aparelho não '
+            + 'volta a aparecer no outro. (#122)',
+          'Mestre das Armas: o Descanso Longo agora oferece trocar a arma do '
+            + 'talento, mesmo para quem não tem Maestria em Arma pela classe. (#119)',
+          'Magia personalizada que ocupa vaga agora aparece em Preparar '
+            + 'Magias de Clérigo, Druida, Paladino e Guardião, com a marca '
+            + '"Personalizada". (#124)',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.0.18',
     data: '2026-10-02',

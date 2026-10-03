@@ -25,7 +25,7 @@ export function renderDistribuicaoInline() {
 
   distEl.innerHTML = `
     <div class="card">
-      <div class="section-divider"><span>Distribuicao de Atributos</span></div>
+      <div class="section-divider"><span>Distribuição de Atributos</span></div>
       <div class="info-box info">Distribua +2 e +1 entre os atributos listados, ou +1/+1/+1.</div>
       <div style="display:flex;gap:8px;margin-bottom:12px">
         <label class="form-check">

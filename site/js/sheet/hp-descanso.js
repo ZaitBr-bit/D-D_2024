@@ -40,7 +40,7 @@ import { contextosDeClasse, superficieAtivaDaFicha, superficiesDaFicha } from '.
 import { char, especiesCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { mostrarTrocaMagiaConhecida, mostrarTrocaTruque, truquesTrocaveis } from './grimorio.js';
-import { abrirModalTrocaMaestriaDescanso, classesComMaestria, trocaTodasNoDescanso } from './maestrias.js';
+import { abrirModalTrocaMaestriaDescanso, abrirModalTrocaMaestriaTalento, classesComMaestria, temMestreDasArmas, trocaTodasNoDescanso } from './maestrias.js';
 import { getConcentracaoAtiva } from './magias.js';
 // preparadasPorClasse (rodada 1 de correcao da Tarefa 4 do sub-projeto
 // "magia sabe a classe" -- achado 3): os dois portoes "ha magia para
@@ -1411,6 +1411,7 @@ export function setupEventosDescanso() {
     // ao lado do teto que a consome.
     const classesDeMaestria = classesComMaestria(char);
     const temMaestria = classesDeMaestria.length > 0;
+    const temTrocaTalento = temMestreDasArmas(char) && (char.maestrias_arma || []).length > 0;
 
     // Troca de MAGIA e de TRUQUE do Descanso Longo, POR CLASSE CONJURADORA
     // (Tarefa 3 do sub-projeto 2026-08-29-troca-por-classe-descanso).
@@ -1487,7 +1488,7 @@ export function setupEventosDescanso() {
     const temTrocaTruque = trocasLongo.some((entrada) => entrada.podeTrocarTruque)
       && truquesTrocaveis().length > 0;
 
-    if (temMaestria || temTrocaMagia || temTrocaTruque) {
+    if (temMaestria || temTrocaTalento || temTrocaMagia || temTrocaTruque) {
       // Montar conteudo do modal conforme opcoes disponiveis
       let conteudoModal = `
         <div class="info-box success" style="margin-bottom:12px">
@@ -1503,6 +1504,14 @@ export function setupEventosDescanso() {
           <p style="font-size:0.9rem">Deseja trocar suas maestrias de arma?</p>
           <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">
             Como ${escHtml(classesDeMaestria.join('/'))}, você pode ${trocaUma ? 'alterar <strong>uma</strong> escolha de' : 'alterar suas escolhas de'} maestria após um Descanso Longo.
+          </p>
+        `;
+      }
+      if (temTrocaTalento) {
+        conteudoModal += `
+          <p style="font-size:0.9rem">Deseja trocar a arma do talento Mestre das Armas?</p>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">
+            Você pode trocar o tipo de arma do talento por outro elegível após um Descanso Longo.
           </p>
         `;
       }
@@ -1569,6 +1578,9 @@ export function setupEventosDescanso() {
       if (temMaestria) {
         botoesModal += '<button class="btn btn-accent" id="btn-trocar-maestrias-dl">Trocar Maestrias</button>';
       }
+      if (temTrocaTalento) {
+        botoesModal += '<button class="btn btn-accent" id="btn-trocar-maestria-talento-dl">Trocar Arma do Talento</button>';
+      }
       if (temTrocaMagia) {
         botoesModal += '<button class="btn btn-primary" id="btn-trocar-magias-dl">Trocar Magias</button>';
       }
@@ -1604,6 +1616,7 @@ export function setupEventosDescanso() {
       // classe.
       const PASSOS = [
         { chave: 'maestria', ativo: temMaestria, abrir: (prox) => abrirModalTrocaMaestriaDescanso(prox) },
+        { chave: 'maestria-talento', ativo: temTrocaTalento, abrir: (prox) => abrirModalTrocaMaestriaTalento(prox) },
         ...passosMagia.map((entrada) => ({
           chave: `magia-${entrada.classe}`,
           ativo: true,
@@ -1652,6 +1665,10 @@ export function setupEventosDescanso() {
       document.getElementById('btn-trocar-maestrias-dl')?.addEventListener('click', () => {
         window.fecharModal();
         iniciarTrocasAPartirDe('maestria');
+      });
+      document.getElementById('btn-trocar-maestria-talento-dl')?.addEventListener('click', () => {
+        window.fecharModal();
+        iniciarTrocasAPartirDe('maestria-talento');
       });
       document.getElementById('btn-trocar-magias-dl')?.addEventListener('click', () => {
         window.fecharModal();

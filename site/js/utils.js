@@ -906,18 +906,39 @@ export function removerMarcadoresDado(texto) {
 }
 
 /**
- * Rótulo em negrito (HTML pronto, ou string vazia) que antecede a
- * descrição de upcast de uma magia/truque -- issue #97: o texto do campo
- * `circulo_superior` de um TRUQUE (círculo 0, dados/magias/truques.json)
- * já começa com "Aprimoramento de Truque.", então o rótulo fixo "Em
- * círculos superiores" que a tela desenhava antes dele ficava
- * contraditório (truque não tem círculo pra upar). Vazio pra truque; só
- * magia de círculo 1+ ganha o rótulo.
- * @param {number} circulo
- * @returns {string}
+ * Linha "Classes: ..." do detalhe de uma magia (as classes com acesso a ela,
+ * como o livro mostra). Vazia quando `classes` não é uma lista com itens.
+ * @param {string[]} classes
+ * @returns {string} HTML da linha, ou vazio.
  */
-export function rotuloCirculoSuperiorHtml(circulo) {
-  return circulo === 0 ? '' : '<strong>Em círculos superiores:</strong>';
+export function classesDaMagiaHtml(classes) {
+  if (!Array.isArray(classes) || classes.length === 0) return '';
+  const nomes = classes.map(c => escHtml(String(c))).join(', ');
+  return `<div style="font-size:0.8rem;color:var(--text-muted);margin-top:8px">Classes: ${nomes}</div>`;
+}
+
+/** Frase do PHB 2024 que abre a descrição de upcast de uma magia de círculo 1+. */
+const ROTULO_CIRCULO_SUPERIOR = 'Usando um Espaço de Magia de Círculo Superior.';
+
+/**
+ * HTML do bloco de upcast de uma magia, no padrão do PHB 2024: a frase
+ * "Usando um Espaço de Magia de Círculo Superior." em negrito, depois a
+ * descrição. O catálogo já traz a frase no início do texto; a magia
+ * personalizada não, então ela é acrescentada. Truque (círculo 0) não tem
+ * círculo para subir: mostra só o texto ("Aprimoramento de Truque. ...").
+ * @param {string} texto Campo `circulo_superior` da magia.
+ * @param {number} circulo Círculo da magia.
+ * @returns {string} HTML interno do bloco (vazio sem texto).
+ */
+export function circuloSuperiorHtml(texto, circulo) {
+  const t = typeof texto === 'string' ? texto.trim() : '';
+  if (!t) return '';
+  if (circulo === 0) return mdParaHtml(t);
+  const resto = t.startsWith(ROTULO_CIRCULO_SUPERIOR) ? t.slice(ROTULO_CIRCULO_SUPERIOR.length).trim() : t;
+  const corpo = mdParaHtml(resto);
+  const rotulo = `<strong>${ROTULO_CIRCULO_SUPERIOR}</strong> `;
+  // Dentro do primeiro parágrafo, para o rótulo e a descrição ficarem na mesma linha.
+  return corpo.startsWith('<p>') ? `<p>${rotulo}${corpo.slice(3)}` : rotulo + corpo;
 }
 
 /** Converte markdown básico para HTML */

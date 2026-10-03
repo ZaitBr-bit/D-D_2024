@@ -4,9 +4,9 @@
 // Tambem cobre as magias personalizadas do jogador.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
-import { ATRIBUTO_NOME_PARA_KEY, CLASSES_INFO } from '../dados-classes.js';
+import { ATRIBUTO_NOME_PARA_KEY, CLASSES_CONJURADORAS, CLASSES_INFO } from '../dados-classes.js';
 import { getMagiasClasse, getMagiasPorCirculo } from '../db.js';
-import { abrirModal, bonusProficiencia, calcMod, escHtml, getBonusTruquesOrdem, getLimitesMagias, getMagiaPreparadas, mdParaHtml, rotuloCirculoSuperiorHtml, semAcento, toast } from '../utils.js';
+import { abrirModal, bonusProficiencia, calcMod, escHtml, getBonusTruquesOrdem, getLimitesMagias, getMagiaPreparadas, mdParaHtml, circuloSuperiorHtml, classesDaMagiaHtml, semAcento, toast } from '../utils.js';
 import { getEstadoFuria } from './classes/barbaro.js';
 import { renderSecaoPactoBruxo } from './classes/bruxo.js';
 import { gastarPontosFeiticaria, getEstadoRecursosFeiticeiro } from './classes/feiticeiro.js';
@@ -162,6 +162,12 @@ export function normalizarMagiaPersonalizada(m, indice) {
     descricao: String(magia.descricao || ''),
     dano: String(magia.dano || ''),
     ritual: Boolean(magia.ritual),
+    // Issues #98/#111/#123: campos opcionais; ausente ou inválido = "".
+    circulo_superior: typeof magia.circulo_superior === 'string' ? magia.circulo_superior : '',
+    fonte: typeof magia.fonte === 'string' ? magia.fonte.trim().slice(0, 40) : '',
+    classes: Array.isArray(magia.classes)
+      ? [...new Set(magia.classes.filter(c => CLASSES_CONJURADORAS.includes(c)))]
+      : [],
     personalizada: true,
     origem: 'Personalizada'
   };
@@ -278,16 +284,21 @@ export function fundirTruquesComPersonalizados(conhecidos, personalizadas) {
   return linhas;
 }
 
-function renderDetalhesMagiaPersonalizada(magia) {
+export function renderDetalhesMagiaPersonalizada(magia) {
   const meta = [magia.escola, magia.tempo_conjuracao, magia.alcance, magia.componentes, magia.duracao]
     .filter(Boolean)
     .map(escHtml)
     .join(' | ');
   const dano = magia.dano ? `<div style="margin-top:6px"><strong>Dano / efeito:</strong> ${mdParaHtml(magia.dano)}</div>` : '';
+  const upcast = magia.circulo_superior
+    ? `<div class="info-box info" style="margin-top:6px"><div class="md-content">${circuloSuperiorHtml(magia.circulo_superior, magia.circulo)}</div></div>`
+    : '';
   return `
     ${meta ? `<div class="magia-meta" style="margin-bottom:4px">${meta}</div>` : ''}
     ${magia.descricao ? `<div class="md-content">${mdParaHtml(magia.descricao)}</div>` : ''}
     ${dano}
+    ${upcast}
+    ${classesDaMagiaHtml(magia.classes)}
   `;
 }
 
@@ -416,7 +427,7 @@ function renderLinhaMagiaPersonalizada(magia, indice) {
     <div class="magia-item magia-personalizada${rotuloOrigem ? ' magia-dominio' : ''}" data-magia-custom-index="${indice}" data-magia-circ="${magia.circulo}">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div>
-          <div class="magia-nome">${rotuloOrigem ? '<span class="badge-dominio">&#9733;</span> ' : ''}${escHtml(magia.nome)} <span class="badge badge-secondary" style="font-size:0.6rem">Personalizada</span>${ritual}</div>
+          <div class="magia-nome">${rotuloOrigem ? '<span class="badge-dominio">&#9733;</span> ' : ''}${escHtml(magia.nome)} <span class="badge badge-secondary" style="font-size:0.6rem">Personalizada</span>${magia.fonte ? ` <span class="badge badge-primary" style="font-size:0.6rem">${escHtml(magia.fonte)}</span>` : ''}${ritual}</div>
           <div class="magia-meta"><span>${magia.circulo === 0 ? 'Truque' : `${magia.circulo}º Círculo`}</span></div>
           ${rotuloOrigem ? `<div style="font-size:0.65rem;color:var(--secondary);font-weight:600;margin-top:1px">${escHtml(rotuloOrigem)}</div>` : ''}
           ${magia.naoPreparada ? '<div style="font-size:0.65rem;color:var(--text-muted);font-style:italic">Não preparada</div>' : ''}
@@ -1068,7 +1079,7 @@ export function renderSecaoMagias() {
           </div>
         ` : ''}
         ${truquesSemClasse.length > 0 ? `
-          <div class="magia-contador contador-dominio" id="ficha-contador-truques-sem-classe" title="Truques de fichas antigas (ou personalizados) cuja classe nao pode ser determinada sem chute -- nao entram nesta contagem nem no bloqueio de limite.">
+          <div class="magia-contador contador-dominio" id="ficha-contador-truques-sem-classe" title="Truques de fichas antigas (ou personalizados) cuja classe não pode ser determinada sem chute -- não entram nesta contagem nem no bloqueio de limite.">
             <span class="contador-label">Truques (sem classe)</span>
             <span class="contador-valor">+${truquesSemClasse.length}</span>
           </div>
@@ -1370,7 +1381,7 @@ export function renderSecaoMagias() {
             ${Object.keys(grimorioPorCirculo).sort((a, b) => Number(a) - Number(b)).map(circ => {
               const magiasDoCirculo = grimorioPorCirculo[circ];
               return `
-              <details data-details-id="grimorio-mago-circulo-${circ}" open style="margin-bottom:10px">
+              <details data-details-id="grimorio-mago-circulo-${circ}" style="margin-bottom:10px">
                 <summary class="section-divider" style="margin:4px 0 6px;cursor:pointer"><span>${circ}º Círculo (${magiasDoCirculo.length})</span></summary>
                 ${magiasDoCirculo.map(m => {
               const jaPreparada = preparadas.some(p => p.nome === m.nome);
@@ -2997,7 +3008,8 @@ export function setupEventosEspacosMagia() {
               <span>${magia.duracao}</span>
             </div>
             <div class="md-content">${mdParaHtml(magia.descricao)}</div>
-            ${magia.circulo_superior ? `<div class="info-box info" style="margin-top:4px">${rotuloCirculoSuperiorHtml(circ)}<div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
+            ${magia.circulo_superior ? `<div class="info-box info" style="margin-top:4px"><div class="md-content">${circuloSuperiorHtml(magia.circulo_superior, circ)}</div></div>` : ''}
+            ${classesDaMagiaHtml(magia.classes)}
           `;
         }
       }

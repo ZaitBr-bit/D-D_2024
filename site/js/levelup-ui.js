@@ -22,7 +22,7 @@ import { deArmas, deEstilosLuta, deMagias, deManobras, deTalentos, motivoPreRequ
 import { collectOpcoes, validateAll } from './levelup-validations.js';
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, PERICIAS } from './dados-classes.js';
 import { getArmas, getClasse, getMagiasPorCirculo, getMagiasClasse, getMagiasRituais } from './db.js';
-import { abrirModal, fecharModal, toast, mdParaHtml, rotuloCirculoSuperiorHtml, semAcento, calcMod, escHtml, getEspacosMagia, bonusProficiencia } from './utils.js';
+import { abrirModal, fecharModal, toast, mdParaHtml, circuloSuperiorHtml, classesDaMagiaHtml, semAcento, calcMod, escHtml, getEspacosMagia, bonusProficiencia } from './utils.js';
 import { subirDeNivel, obterAtributosASITalento, getLimiteASITalento, obterTalentosElegiveis } from './levelup.js';
 import { abrirGridManobras } from './manobras-ui.js';
 // preparadasPorClasse (Tarefa 4 do sub-projeto "magia sabe a classe"): ver
@@ -1819,7 +1819,8 @@ function bindEventosMagias(ctx, state) {
               <span>${magia.componentes}</span> <span>${magia.duracao}</span>
             </div>
             <div class="md-content">${mdParaHtml(magia.descricao)}</div>
-            ${magia.circulo_superior ? `<div class="info-box info mt-1">${rotuloCirculoSuperiorHtml(circ)}<div class="md-content">${mdParaHtml(magia.circulo_superior)}</div></div>` : ''}
+            ${magia.circulo_superior ? `<div class="info-box info mt-1"><div class="md-content">${circuloSuperiorHtml(magia.circulo_superior, circ)}</div></div>` : ''}
+            ${classesDaMagiaHtml(magia.classes)}
           `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
         });
       });

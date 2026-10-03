@@ -116,7 +116,7 @@ export function renderStepDetalhes(el) {
           </label>
           <div style="font-size:0.8rem;color:var(--text-muted)">
             <div>Altura: ${escHtml(alturaMedio)}</div>
-            <div>Espaco em combate: 1,5 x 1,5 m</div>
+            <div>Espaço em combate: 1,5 x 1,5 m</div>
             <div>Capacidade de carga: <strong>${descreverCapacidadeCarga(_forcaCarga, 'Médio')}</strong></div>
           </div>
         </div>
@@ -126,7 +126,7 @@ export function renderStepDetalhes(el) {
           </label>
           <div style="font-size:0.8rem;color:var(--text-muted)">
             <div>Altura: ${escHtml(alturaPequeno)}</div>
-            <div>Espaco em combate: 1,5 x 1,5 m</div>
+            <div>Espaço em combate: 1,5 x 1,5 m</div>
             <div>Capacidade de carga: <strong>${descreverCapacidadeCarga(_forcaCarga, 'Pequeno')}</strong></div>
           </div>
         </div>
@@ -251,7 +251,7 @@ export function renderStepDetalhes(el) {
       <div class="row gap-1">
         <div class="col-2">
           <div class="form-group">
-            <label class="form-label">Tracos de Personalidade</label>
+            <label class="form-label">Traços de Personalidade</label>
             <textarea class="form-textarea" id="det-personalidade" rows="2">${escHtml(personagem.personalidade)}</textarea>
           </div>
         </div>

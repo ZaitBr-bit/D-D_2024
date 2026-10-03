@@ -129,26 +129,46 @@ export async function salvarPersonagemCloud(personagem) {
   await setDoc(docRef, dados);
 }
 
-/** Remove um personagem do Firestore */
+/**
+ * Registra a exclusão de um personagem na nuvem como lápide no mesmo
+ * documento (não apaga o documento): outros aparelhos que ainda têm a cópia
+ * local passam a saber que ele foi excluído, em vez de recriá-lo.
+ */
 export async function removerPersonagemCloud(id) {
   if (!_db || !_usuario) return;
-  const { doc, deleteDoc } = await _getFirestoreModules();
+  const { doc, setDoc } = await _getFirestoreModules();
   const docRef = doc(_db, _colecaoPath(), id);
-  await deleteDoc(docRef);
+  const agora = new Date().toISOString();
+  await setDoc(docRef, { id, removido: true, removido_em: agora, atualizado_em: agora });
 }
 
 /**
- * Busca personagens da nuvem (Firestore).
- * Retorna apenas os personagens do usuario logado, sem merge com locais.
+ * Busca todos os documentos de personagens da nuvem, lápides incluídas.
+ * Usado pela reconciliação (sync-merge.js).
+ */
+export async function buscarEstadoCloud() {
+  if (!_db || !_usuario) return [];
+  const lista = await listarPersonagensCloud();
+  // Remover metadado _docId do Firestore
+  return lista.map(({ _docId, ...sem }) => sem);
+}
+
+/**
+ * Busca o documento de UM personagem na nuvem (personagem ou lápide).
+ * @param {string} id
+ * @returns {Promise<object|null>} null se não existe, não há login ou o Firebase não está disponível.
+ */
+export async function buscarPersonagemCloud(id) {
+  if (!_db || !_usuario) return null;
+  const { doc, getDoc } = await _getFirestoreModules();
+  const snap = await getDoc(doc(_db, _colecaoPath(), id));
+  return snap.exists() ? snap.data() : null;
+}
+
+/**
+ * Busca personagens da nuvem (Firestore), sem as lápides de exclusão.
  * Os personagens locais sao tratados separadamente (backup/restore).
  */
 export async function buscarPersonagensCloud() {
-  if (!_db || !_usuario) return [];
-
-  const listaCloud = await listarPersonagensCloud();
-  // Remover metadado _docId do Firestore
-  return listaCloud.map(p => {
-    const { _docId, ...sem } = p;
-    return sem;
-  });
+  return (await buscarEstadoCloud()).filter(p => p.removido !== true);
 }
