@@ -11,14 +11,22 @@ import { VERSAO_ATUAL } from './versao.js';
 import { abrirNotasVersao } from './notas-versao.js';
 
 // --- Router baseado em hash ---
-// Map, e não objeto literal: o hash da URL é texto livre do usuário e a busca
-// em objeto sobe a cadeia de protótipos (`#toString` devolveria a função
-// herdada de Object.prototype). `Map.get` só enxerga as chaves registradas.
-const routes = new Map([
-  ['home', renderHome],
-  ['criar', renderCreator],
-  ['ficha', renderSheet],
-]);
+/**
+ * Resolve a página do hash para a função que a desenha, ou null.
+ * Lista fixa (`switch`), sem busca dinâmica: o hash da URL é texto livre do
+ * usuário e uma busca por nome chamaria o que vier (ex.: `#toString` sobe a
+ * cadeia de protótipos até Object.prototype).
+ * @param {string} pagina Primeira parte do hash.
+ * @returns {Function|null}
+ */
+function resolverRota(pagina) {
+  switch (pagina) {
+    case 'home': return renderHome;
+    case 'criar': return renderCreator;
+    case 'ficha': return renderSheet;
+    default: return null;
+  }
+}
 
 /** Navegar para uma rota */
 export function navegar(rota) {
@@ -73,7 +81,7 @@ function atualizarSeloVersaoClicavel(pagina) {
 
 /** Processa a rota atual do hash */
 /*
- * As tabelas de rotas e de títulos são Map (ver `routes` acima): rota
+ * Rota e título vêm de lista fixa (`resolverRota` e o Map de títulos): rota
  * desconhecida cai em "Página não encontrada", inclusive nomes herdados de
  * Object.prototype como `#toString`. Coberto por
  * `testes/e2e/regras/rota-desconhecida.spec.mjs` (alerta CodeQL
@@ -85,7 +93,7 @@ function processarRota() {
   const pagina = partes[0];
   const param = partes.slice(1).join('/');
 
-  const render = routes.get(pagina);
+  const render = resolverRota(pagina);
   const content = document.getElementById('app-content');
   const btnVoltar = document.getElementById('btn-voltar');
   const acoes = document.getElementById('header-acoes');
