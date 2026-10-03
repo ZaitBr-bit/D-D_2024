@@ -7,7 +7,7 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { PERICIAS } from '../dados-classes.js';
-import { abrirModal, calcMod, escHtml, fmtPeso, getMultiplicadorCarga, PERICIAS_CONHECIMENTO_PRIMORDIAL, toast } from '../utils.js';
+import { abrirModal, calcMod, escHtml, fmtPeso, getMultiplicadorCarga, PERICIAS_CONHECIMENTO_PRIMORDIAL, somaModificadoresManuais, toast } from '../utils.js';
 import { nivelNa, subclasseDe } from '../regras-multiclasse.js';
 import { estaIncapacitado } from '../regras-condicoes.js';
 import { getEstadoFuria } from './classes/barbaro.js';
@@ -372,6 +372,9 @@ export function getDeslocamentoFinal(baseDeslocamento) {
         addExtraVelocidade(extras, 'Escalada', final); // escalada = igual ao deslocamento final (ef.valor_metros ignorado intencionalmente)
       } else if (ef.tipo_velocidade === 'levitacao' && ef.valor_metros) {
         addExtraVelocidade(extras, 'Levitação', ef.valor_metros);
+      } else if (ef.tipo_velocidade === 'natacao' && ef.valor_metros) {
+        // Natação concedida por modificador manual (issue #83).
+        addExtraVelocidade(extras, 'Natação', ef.valor_metros);
       }
     }
   }
@@ -457,7 +460,7 @@ export function getModIniciativa() {
   const vantagem = nivelNa(char, 'Bárbaro') >= 7
     || (subclasseDe(char, 'Guerreiro') === 'Campeão' && nivelNa(char, 'Guerreiro') >= 3)
     || (char.condicoes || []).includes('Invisível');
-  return { valor: base + (passivos.bonusIniciativa || 0), vantagem };
+  return { valor: base + (passivos.bonusIniciativa || 0) + somaModificadoresManuais(char, 'iniciativa'), vantagem };
 }
 
 export function forcaPrimordialAtiva() {

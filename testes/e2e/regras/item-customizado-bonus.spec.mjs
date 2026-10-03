@@ -15,7 +15,7 @@
 // de um item equipado entra na CA da ficha).
 // ============================================================
 import { test, expect } from '@playwright/test';
-import { ATRIBUTOS_REGRAS, abrirFicha, assentar, personagemSalvo } from './helpers-regras.mjs';
+import { ATRIBUTOS_REGRAS, abrirFicha, assentar, personagemSalvo, abrirSecoesItemCustom } from './helpers-regras.mjs';
 
 // Guerreiro sem armadura: CA = 10 + Destreza (14 → +2) = 12.
 const CA_BASE = 12;
@@ -42,6 +42,7 @@ test('item customizado: bônus de CA acima de +5 pode ser salvo', async ({ conte
 
   await page.click('#btn-add-inv-custom');
   await page.waitForSelector('#ic-nome', { state: 'visible', timeout: 20_000 });
+  await abrirSecoesItemCustom(page);
 
   await page.fill('#ic-nome', 'Armadura Negra de Hades');
   await page.fill('#ic-ca', String(BONUS_CA));

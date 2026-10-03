@@ -66,7 +66,7 @@
 > Ordem sugerida: **#115** (P1, PV errado), **#122** (P1, investigar perda de
 > dados), depois #121, #116 e #119 (P2, correções pequenas e certas).
 >
-> #115, #116, #117 e #121 foram corrigidas na 3.0.18, e #119, #122 e #124 na 3.0.19 — ver notas de manutenção. As melhorias #99, #102, #110, #118, #123, #98, #106 e #111 foram entregues na 3.0.20.
+> #115, #116, #117 e #121 foram corrigidas na 3.0.18, e #119, #122 e #124 na 3.0.19 — ver notas de manutenção. As melhorias #99, #102, #110, #118, #123, #98, #106 e #111 foram entregues na 3.0.20, e #120, #100, #104, #101, #80 e #83 na 3.0.21.
 
 ---
 
@@ -98,18 +98,12 @@ _(nenhuma nesta faixa no momento — ver notas de manutenção)_
 
 ### Média
 
-- [ ] **#120** (NOVA, 2026-09-30, **P3**, conteúdo do livro) — Faltam ferramentas na loja e quase todos os itens estão sem descrição (PHB p. 219–229). Medição rápida dos dados: `ferramentas.json` é só uma tabela (nome, custo, peso, atributo) mais `texto_completo`, sem descrição por item; em `equipamento_aventura.json` a grande maioria dos itens está sem `descricao` (cerca de 70 de 82 na contagem feita, refazer a contagem antes de planejar); armas e armaduras não têm `descricao` por natureza (a regra vem das propriedades). Trabalho é de **dados**, não de código: transcrever a descrição de cada item do capítulo de equipamento. Conferir antes quais ferramentas realmente faltam no catálogo (a issue só mostra prints). Dividir em duas entregas: (1) descrições do equipamento de aventura, (2) ferramentas faltantes com descrição e uso.
 - [ ] **#22** — Modo escuro. Nenhum `prefers-color-scheme`/`data-theme` hoje; exige tokenizar cores em CSS custom properties.
-- [ ] **#100** (NOVA, 2026-09-20, não investigada) — Pede mais categorias pro item personalizado além de arma (Armadura, Consumível, Munição, Equipamento, Item Mágico, Ferramenta), e trocar o rótulo "Não é arma" por um estilo mais parecido com o de Raridade (vazio = sem categoria). Extensão direta do #82/#37 (que só adicionou categoria de ARMA ao formulário) — mesma área, mesmo padrão de select.
-- [ ] **#101** (NOVA, 2026-09-20, não investigada) — Pede reorganizar o formulário de item personalizado em seções colapsáveis (Nome/Descrição, Categoria+Propriedades+Maestria, Atributos, Raridade+Sintonização, Preço) — hoje tudo aparece junto, sem separação visual. Ficou mais denso depois do #82/#37 (que acrescentou 5 campos novos ao formulário) — o pedido provavelmente é uma reação direta a isso.
-- [ ] **#104** (NOVA, 2026-09-21, **P3**) — Propriedades do item personalizado: trocar o campo de texto livre por botão "Adicionar Propriedade" com a lista padrão (Versátil, Duas Mãos, Leve…) e opção de propriedade personalizada com nome + descrição. Investigado: hoje `item.dados.propriedades` é uma string separada por vírgula, e `htmlPropriedadesEMaestria` (`sheet/inventario.js`) busca a descrição de cada nome no glossário `dados.propriedadesArmas` — propriedade personalizada precisa de lugar para guardar a própria descrição (mudança de formato com compatibilidade para a string antiga). Mesmo formulário de #100/#101 — as três pedem a mesma rodada.
 - [ ] **#103** (NOVA, 2026-09-21, **P3**) — Pergaminho Mágico: (a) só existem "Pergaminho Mágico (Truque)" e "(1º Círculo)" no catálogo (`dados/equipamento/equipamento_aventura.json`); (b) não dá para escolher qual magia está no pergaminho. Investigado: (a) é fiel ao PHB 2024 — o capítulo de equipamento só lista esses dois; os de 2º a 9º círculo são itens mágicos do Guia do Mestre, fora do escopo atual. (b) é melhoria real: seletor de magia (filtrado pelo círculo do pergaminho) gravado na instância do item + exibição no detalhe. Fazer só (b), e responder (a) na issue.
 - [ ] **#107** (NOVA, 2026-09-21, **P3**) — Aba de registro de campanha: missões realizadas, histórico de XP (comentário acrescenta criaturas encontradas). Investigado: hoje só existe `char.xp` numérico (editado em `sheet/edicao.js`), sem histórico. Seção nova de diário com entradas datadas; o log de XP pode alimentar `char.xp`.
 
 ### Média–Alta
 
-- [ ] **#80** — Linhas customizadas no inventário (além de Equipados/Mochila/Esgotados), com opção de a linha contar ou não no peso, e mover itens entre linhas. Modelo de dados novo (contêiner nomeado) + UI de mover item.
-- [ ] **#83** — Modificar recursos temporariamente (CA, iniciativa, deslocamento etc.), inclusive quando o efeito vem de OUTRO personagem (ex.: Armadura Arcana lançada por um aliado). Conferido: `char.efeitos_magicos` (`sheet/combate.js`, `sheet/condicoes.js`, `sheet/hp-descanso.js`) já existe e já tem pelo menos um tipo não-concentração implementado (`tipo: 'bonus_pv_max'`, hp-descanso.js:567-603) — a infra é menos nova do que parecia; falta estender os `tipo`s (CA, iniciativa, deslocamento) e a UI para atribuir um efeito a um alvo/fonte.
 - [ ] **#93** — Sentidos passivos (Visão no Escuro, Visão às Cegas, Sismoconsciência, Visão Verdadeira) concedidos por magia/traço/item não aparecem na ficha. Conferido: não existe NENHUM campo `sentidos_passivos`/tratamento equivalente em `sheet/ficha.js`/`sheet/combate.js` hoje — gap real, não regressão. Precisa mapear cada fonte que concede sentido e escrever no bloco de sentidos da ficha, com prioridade entre fontes (ex.: dois "Visão no Escuro" de alcances diferentes).
 
 ### Alta
@@ -137,6 +131,14 @@ _(nenhuma nesta faixa no momento — ver notas de manutenção)_
 
 ## Notas de manutenção
 
+- **Entregues na versão 3.0.21 (2026-10-03)**: #120, #100, #104, #101, #80, #83 — oráculo vermelho antes de cada uma.
+  - **#120**: `equipamento_aventura.json` tinha 12 de 82 itens com descrição e `ferramentas.json` só a tabela. `scripts/extrair_descricoes_equipamento.py` preenche as descrições (só onde estavam vazias) e os `detalhes` (Usar Objeto, Fabricação, Variantes) a partir de `Equipamento.md`; a loja ganhou a categoria Ferramentas (`montarFerramentasLoja`, uma entrada por variante de Instrumento Musical e Kit de Jogos). Testes: `equipamento-descricoes.test.mjs`, `loja-ferramentas.spec.mjs`.
+  - **#100**: categorias que não são arma ficam em `dados.tipo_item` (`TIPOS_ITEM`), separadas de `dados.categoria`, que continua só de arma (decide proficiência/ataque). Testes: `item-customizado-form.test.mjs`, `item-customizado-categoria.spec.mjs`.
+  - **#104**: propriedades como chips (lista do livro + personalizada com nome/descrição); `dados.propriedades` segue string, `dados.propriedades_personalizadas` guarda as descrições. Testes: `item-customizado-propriedades.test.mjs` e `.spec.mjs`.
+  - **#101**: Categoria, Atributos e Raridade/sintonização em `<details class="ic-secao">` (criação recolhida; edição abre a seção com dado; erro de dano abre Atributos). Nome, Descrição e Preço ficam fora. Helper de teste `abrirSecoesItemCustom`. Teste: `item-customizado-secoes.spec.mjs`.
+  - **#80**: `char.inventario_locais[]` (`{id, nome, conta_peso}`) + `item.local`; seção por local, seletor "mover para" por item, editar/remover (itens voltam à Mochila); `getPesoTotalInventario(inventario, locais)` ignora local com `conta_peso:false`. O "peso da própria linha" do pedido é o do item-bolsa, que continua contando. Testes: `inventario-locais.test.mjs` e `.spec.mjs`.
+  - **#83**: modal "Modificadores" no card de Condições; entradas manuais em `efeitos_magicos` (`modificador_manual` para CA, iniciativa, ataque e CD de magia; `tipo:'deslocamento'` para deslocamento, voo, natação e escalada), todas `temporario:true` (saem no Descanso Longo). Fora do escopo: bônus no ataque com arma e CA base de aliado. Testes: `modificadores-manuais.test.mjs` e `.spec.mjs`.
+  - Texto: a guarda `ui-textos-acentuados.test.mjs` passou a olhar também texto antes de `${...}` e achou mais rótulos sem acento (Condições, Espécie, Nível...), corrigidos.
 - **Entregues na versão 3.0.20 (2026-10-03)**: melhorias #102, #110, #118, #106, #99, #98, #111, #123 — oráculo vermelho antes de cada uma.
   - **#102**: o catálogo já traz "Usando um Espaço de Magia de Círculo Superior." no início do `circulo_superior` (134 magias), então trocar só o rótulo duplicaria a frase. `circuloSuperiorHtml(texto, circulo)` (`utils.js`) monta o bloco inteiro: frase do livro em negrito e depois a descrição (acrescenta a frase quando a magia personalizada não a tem; truque mantém "Aprimoramento de Truque."); substituiu `rotuloCirculoSuperiorHtml` nos 8 pontos de exibição. `dados/` não mudou.
   - **#110**: `open` fixo nos `<details data-details-id="grimorio-mago-circulo-N">` de `sheet/magias.js`. Spec: `grimorio-mago-recolhido.spec.mjs`.

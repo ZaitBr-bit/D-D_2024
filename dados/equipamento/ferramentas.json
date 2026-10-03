@@ -12,151 +12,248 @@
           "Ferramenta": "Ferramentas de Carpinteiro",
           "Custo": "8 PO",
           "Peso": "3 kg",
-          "Atributo": "Força"
+          "Atributo": "Força",
+          "detalhes": {
+            "usar_objeto": "Selar ou abrir uma porta ou recipiente (CD 20)",
+            "fabricacao": "Aríete Portável, Baliza, Barril, Baú, Cajado, Clava, Clava Grande, Escada, Tocha"
+          }
         },
         {
           "Ferramenta": "Ferramentas de Cartógrafo",
           "Custo": "15 PO",
           "Peso": "3 kg",
-          "Atributo": "Sabedoria"
+          "Atributo": "Sabedoria",
+          "detalhes": {
+            "usar_objeto": "Elaborar o mapa de uma pequena área (CD 15)",
+            "fabricacao": "Mapa"
+          }
         },
         {
           "Ferramenta": "Ferramentas de Coureiro",
           "Custo": "5 PO",
           "Peso": "2,5 kg",
-          "Atributo": "Destreza"
+          "Atributo": "Destreza",
+          "detalhes": {
+            "usar_objeto": "Moldar a estética de um item de couro (CD 10)",
+            "fabricacao": "Algibeira, Aljava, Armadura de Couro, Armadura de Couro Batido, Cantil, Chicote, Estojo de Mapa ou Pergaminho, Estojo de Virotes de Besta, Funda, Gibão de Peles, Mochila, Pergaminho"
+          }
         },
         {
           "Ferramenta": "Ferramentas de Entalhador",
           "Custo": "1 PO",
           "Peso": "2,5 kg",
-          "Atributo": "Destreza"
+          "Atributo": "Destreza",
+          "detalhes": {
+            "usar_objeto": "Entalhar um padrão em madeira (CD 10)",
+            "fabricacao": "Armas à Distância (exceto Funda, Mosquete e Pistola), Cajado, Caneta Tinteiro, Clava, Clava Grande, Dardos, Flechas, Foco Arcano, Foco Druídico, Virotes"
+          }
         },
         {
           "Ferramenta": "Ferramentas de Ferreiro",
           "Custo": "20 PO",
           "Peso": "4 kg",
-          "Atributo": "Força"
+          "Atributo": "Força",
+          "detalhes": {
+            "usar_objeto": "Forçar a abertura de uma porta ou recipiente (CD 20)",
+            "fabricacao": "qualquer arma Corpo a Corpo (exceto Cajado, Chicote, Clava, Clava Grande), armadura Média (exceto Gibão de Peles), armadura Pesada, Arpéu e Gancho, Balas de Arma de Fogo, Balas de Funda, Balde, Corrente, Esferas de Metal, Estacas de Ferro, Estrepes, Panela de Ferro, Pé de Cabra"
+          }
         },
         {
           "Ferramenta": "Ferramentas de Funileiro",
           "Custo": "50 PO",
           "Peso": "5 kg",
-          "Atributo": "Destreza"
+          "Atributo": "Destreza",
+          "detalhes": {
+            "usar_objeto": "Monte um item Minúsculo composto de sucata, que se desfaz em 1 minuto (CD 20)",
+            "fabricacao": "Apito Sinalizador, Armadilha de Caça, Cadeado ou Fechadura, Caixa para Fogo, Espelho, Grilhões, Lanterna Coberta, Lanterna Foca-Facho, Mosquete, Pá, Pistola, Pote, Sino"
+          }
         },
         {
           "Ferramenta": "Ferramentas de Joalheiro",
           "Custo": "25 PO",
           "Peso": "1 kg",
-          "Atributo": "Inteligência"
+          "Atributo": "Inteligência",
+          "detalhes": {
+            "usar_objeto": "Discernir o valor de uma gema (CD 15)",
+            "fabricacao": "Foco Arcano, Símbolo Sagrado"
+          }
         },
         {
           "Ferramenta": "Ferramentas de Oleiro",
           "Custo": "10 PO",
           "Peso": "1,5 kg",
-          "Atributo": "Inteligência"
+          "Atributo": "Inteligência",
+          "detalhes": {
+            "usar_objeto": "Discernir como um objeto de cerâmica foi manuseado nas últimas 24 horas (CD 15)",
+            "fabricacao": "Jarro, Lâmpada"
+          }
         },
         {
           "Ferramenta": "Ferramentas de Pedreiro",
           "Custo": "10 PO",
           "Peso": "4 kg",
-          "Atributo": "Força"
+          "Atributo": "Força",
+          "detalhes": {
+            "usar_objeto": "Cinzelar um símbolo ou buraco na pedra (CD 10)",
+            "fabricacao": "Roldana e Polias"
+          }
         },
         {
           "Ferramenta": "Ferramentas de Sapateiro",
           "Custo": "5 PO",
           "Peso": "2,5 kg",
-          "Atributo": "Destreza"
+          "Atributo": "Destreza",
+          "detalhes": {
+            "usar_objeto": "Modificar calçado para conceder Vantagem no próximo teste de Destreza (Acrobacia) do usuário (CD 10)",
+            "fabricacao": "Kit de Escalada"
+          }
         },
         {
           "Ferramenta": "Ferramentas de Tecelão",
           "Custo": "1 PO",
           "Peso": "2,5 kg",
-          "Atributo": "Destreza"
+          "Atributo": "Destreza",
+          "detalhes": {
+            "usar_objeto": "Reparar um rasgo em uma roupa (CD 10) ou costurar um ornamento Minúsculo (CD 10)",
+            "fabricacao": "Armadura Acolchoada, Cesta, Cobertor, Saco de Dormir, Roupas Finas, Rede, Túnica, Corda, Saca, Cordão, Tenda, Roupas de Viagem"
+          }
         },
         {
           "Ferramenta": "Ferramentas de Vidreiro",
           "Custo": "30 PO",
           "Peso": "2,5 kg",
-          "Atributo": "Inteligência"
+          "Atributo": "Inteligência",
+          "detalhes": {
+            "usar_objeto": "Discernir como um objeto de vidro foi manuseado nas últimas 24 horas (CD 15)",
+            "fabricacao": "Frasco, Jarro, Luneta, Lupa"
+          }
         },
         {
           "Ferramenta": "Suprimentos de Alquimista",
           "Custo": "50 PO",
           "Peso": "4 kg",
-          "Atributo": "Inteligência"
+          "Atributo": "Inteligência",
+          "detalhes": {
+            "usar_objeto": "Identificar uma substância (CD 15) ou iniciar um incêndio (CD 15)",
+            "fabricacao": "Ácido, Bolsa de Componentes, Fogo Alquímico, Óleo, Papel, Perfume"
+          }
         },
         {
           "Ferramenta": "Suprimentos de Calígrafo",
           "Custo": "10 PO",
           "Peso": "2,5 kg",
-          "Atributo": "Destreza"
+          "Atributo": "Destreza",
+          "detalhes": {
+            "usar_objeto": "Escrever texto com uma caligrafia que protege contra falsificação (CD 15)",
+            "fabricacao": "*Pergaminho Mágico*, Tinta"
+          }
         },
         {
           "Ferramenta": "Suprimentos de Cervejeiro",
           "Custo": "20 PO",
           "Peso": "4,5 kg",
-          "Atributo": "Inteligência"
+          "Atributo": "Inteligência",
+          "detalhes": {
+            "usar_objeto": "Detectar bebida envenenada (CD 15) ou identificar álcool (CD 10)",
+            "fabricacao": "Antitoxina"
+          }
         },
         {
           "Ferramenta": "Suprimentos de Pintor",
           "Custo": "10 PO",
           "Peso": "2,5 kg",
-          "Atributo": "Sabedoria"
+          "Atributo": "Sabedoria",
+          "detalhes": {
+            "usar_objeto": "Fazer uma pintura reconhecível de algo que você viu (CD 10)",
+            "fabricacao": "Foco Druídico, Símbolo Sagrado"
+          }
         },
         {
           "Ferramenta": "Utensílios de Cozinheiro",
           "Custo": "1 PO",
           "Peso": "4 kg",
-          "Atributo": "Sabedoria"
+          "Atributo": "Sabedoria",
+          "detalhes": {
+            "usar_objeto": "Melhorar o sabor dos alimentos (CD 10) ou detectar alimentos estragados ou envenenados (CD 15)",
+            "fabricacao": "Rações"
+          }
         },
         {
           "Ferramenta": "Ferramentas de Ladrão",
           "Custo": "25 PO",
           "Peso": "0,5 kg",
-          "Atributo": "Destreza"
+          "Atributo": "Destreza",
+          "detalhes": {
+            "usar_objeto": "Abrir uma fechadura (CD 15) ou desarmar uma armadilha (CD 15)"
+          }
         },
         {
           "Ferramenta": "Ferramentas de Navegador",
           "Custo": "25 PO",
           "Peso": "1 kg",
-          "Atributo": "Sabedoria"
+          "Atributo": "Sabedoria",
+          "detalhes": {
+            "usar_objeto": "Traçar uma rota (CD 10) ou determinar a posição observando as estrelas (CD 15)"
+          }
         },
         {
           "Ferramenta": "Instrumento Musical",
           "Custo": "Varia",
           "Peso": "Varia",
-          "Atributo": "Carisma"
+          "Atributo": "Carisma",
+          "detalhes": {
+            "usar_objeto": "Tocar uma música conhecida (CD 10) ou improvisar uma música (CD 15)",
+            "variantes": "Alaúde (35 PO, 1 kg), Flauta (2 PO, 0,5 kg), Flauta de Pan (12 PO, 1 kg), Gaita de Foles (30 PO, 3 kg), Lira (30 PO, 1 kg), Oboé (2 PO, 0,5 kg), Tambor (6 PO, 1,5 kg), Trombeta (3 PO, 1 kg), Violino (30 PO, 0,5 kg), Xilofone (25 PO, 5 kg)"
+          }
         },
         {
           "Ferramenta": "Kit de Disfarce",
           "Custo": "25 PO",
           "Peso": "1,5 kg",
-          "Atributo": "Carisma"
+          "Atributo": "Carisma",
+          "detalhes": {
+            "usar_objeto": "Aplicar maquiagem (CD 10)",
+            "fabricacao": "Fantasia"
+          }
         },
         {
           "Ferramenta": "Kit de Falsificação",
           "Custo": "15 PO",
           "Peso": "2,5 kg",
-          "Atributo": "Destreza"
+          "Atributo": "Destreza",
+          "detalhes": {
+            "usar_objeto": "Imitar 10 ou menos palavras escritas de outra pessoa (CD 15) ou duplicar um selo de cera (CD 20)"
+          }
         },
         {
           "Ferramenta": "Kit de Herbalismo",
           "Custo": "5 PO",
           "Peso": "1,5 kg",
-          "Atributo": "Inteligência"
+          "Atributo": "Inteligência",
+          "detalhes": {
+            "usar_objeto": "Identificar uma planta (CD 10)",
+            "fabricacao": "Antitoxina, Kit de Curandeiro, Poção de Cura, Vela"
+          }
         },
         {
           "Ferramenta": "Kit de Jogos",
           "Custo": "Varia",
           "Peso": "—",
-          "Atributo": "Sabedoria"
+          "Atributo": "Sabedoria",
+          "detalhes": {
+            "usar_objeto": "Discernir se alguém está trapaceando (CD 10) ou ganhar o jogo (CD 20)",
+            "variantes": "Dados (1 PP), Xadrez-do-Dragão (1 PO), Baralho (5 PP), Conjunto do Jogo dos Três Dragões (1 PO)"
+          }
         },
         {
           "Ferramenta": "Kit de Veneno",
           "Custo": "50 PO",
           "Peso": "1 kg",
-          "Atributo": "Inteligência"
+          "Atributo": "Inteligência",
+          "detalhes": {
+            "usar_objeto": "Detectar um objeto envenenado (CD 10)",
+            "fabricacao": "Veneno Básico"
+          }
         }
       ]
     }

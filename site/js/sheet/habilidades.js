@@ -3654,7 +3654,7 @@ export function renderFeatureItem(f, source, ctx) {
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoInspiracaoBardo.usosDisponiveis}/${estadoInspiracaoBardo.usosMax}</span>`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
-        <button class="btn btn-sm btn-accent" data-inspiracao-acao="usar" ${estadoInspiracaoBardo.usosDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Inspiracao (d${estadoInspiracaoBardo.dado})</button>
+        <button class="btn btn-sm btn-accent" data-inspiração-ação="usar" ${estadoInspiracaoBardo.usosDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Inspiração (d${estadoInspiracaoBardo.dado})</button>
         <span style="font-size:0.75rem;color:var(--text-muted)">Recupera ${estadoInspiracaoBardo.recuperaCurto ? 'Descanso Curto' : 'Descanso Longo'}</span>
       </div>
     `;
@@ -4288,7 +4288,7 @@ export function renderFeatureItem(f, source, ctx) {
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
         <button class="btn btn-sm btn-danger" data-guerreiro-acao="usar-indomavel" ${estadoGuerreiro.indomavelDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Indomavel</button>
-        <span style="font-size:0.75rem;color:var(--text-muted)">Bonus: +${ctx.nivelClasse || 1} na salvaguarda</span>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Bônus: +${ctx.nivelClasse || 1} na salvaguarda</span>
       </div>
     `;
     recarga = 'longo';

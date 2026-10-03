@@ -385,7 +385,7 @@ function renderTracoEspecie(traco, herdaAncestralidade = false, ehSubRevelacao =
         <button class="btn btn-sm" style="padding:2px 8px;font-size:0.7rem;${usado ? 'opacity:0.5' : ''}" data-maos-curativas="1">
           ${usado ? '✗ Usado' : 'Curar (' + pb + 'd4)'}
         </button>
-        <span style="font-size:0.75rem;color:var(--text-muted)">Toque | Acao Usar Magia | ${pb}d4 PV</span>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Toque | Ação Usar Magia | ${pb}d4 PV</span>
       </div>
     `;
   } else if (ehVigorImplacavel) {

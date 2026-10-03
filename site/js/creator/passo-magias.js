@@ -393,7 +393,7 @@ async function _renderIniciadoEmMagia(container, aoMudar) {
         </div>
       </div>
       <div id="im-contadores-${idx}" style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px">
-        Truques: <strong>${im.truques.length}/2</strong> | Magia 1o círculo: <strong>${im.magia ? '1' : '0'}/1</strong>
+        Truques: <strong>${im.truques.length}/2</strong> | Magia 1º círculo: <strong>${im.magia ? '1' : '0'}/1</strong>
       </div>
       <div id="im-magias-area-${idx}"></div>
     </div>
@@ -456,7 +456,7 @@ async function _bindInstanciaIM(container, idx, aoMudar) {
     area.innerHTML = `
       <div class="tabs" id="tabs-im-${idx}">
         <div class="tab active" data-im-tab="truques">Truques (${truquesDisp.length})</div>
-        <div class="tab" data-im-tab="c1">1o Circulo (${c1Disp.length})</div>
+        <div class="tab" data-im-tab="c1">1o Círculo (${c1Disp.length})</div>
       </div>
       <div class="search-box"><input type="text" id="busca-im-${idx}" placeholder="Buscar magia..." class="form-input"></div>
       <div id="im-lista-magias-${idx}"></div>

@@ -25,7 +25,8 @@
     {
       "nome": "Aljava",
       "peso": "0,5 kg",
-      "custo": "1 PO"
+      "custo": "1 PO",
+      "descricao": "Uma Aljava armazena até 20 Flechas."
     },
     {
       "nome": "Antitoxina",
@@ -37,137 +38,164 @@
     {
       "nome": "Apito Sinalizador",
       "peso": "—",
-      "custo": "5 PC"
+      "custo": "5 PC",
+      "descricao": "Quando soprado como uma ação Usar Objeto, um Apito Sinalizador produz um som que pode ser ouvido a até 180 metros de distância."
     },
     {
       "nome": "Aríete Portável",
       "peso": "16,5 kg",
-      "custo": "4 PO"
+      "custo": "4 PO",
+      "descricao": "Você pode usar um Aríete Portável para arrombar portas. Ao fazer isso, você recebe um bônus de +4 no teste de Força. Outro personagem pode ajudá-lo a usar o Aríete, concedendo-lhe Vantagem nesse teste."
     },
     {
       "nome": "Armadilha de Caça",
       "peso": "12,5 kg",
-      "custo": "5 PO"
+      "custo": "5 PO",
+      "descricao": "Como uma ação Usar Objeto, você pode armar uma Armadilha de Caça, que é um anel de aço dentado que se fecha quando uma criatura pisa em uma placa de pressão no centro. A armadilha é presa em uma corrente pesada a um objeto imóvel, como uma árvore ou um espigão cravado no chão. Uma criatura que pisa no prato deve ser bem-sucedida em uma salvaguarda de Destreza CD 13 ou sofre 1d4 de dano Perfurante e tem o Deslocamento reduzido a 0 até o início de seu próximo turno. Depois disso, até que a criatura se liberte da armadilha, o movimento dela é limitado pelo comprimento da corrente (normalmente 1 metro). Uma criatura pode executar uma ação para realizar um teste de Força (Atletismo) CD 13, libertando-se ou libertando outra criatura ao alcance dela em caso de sucesso. Cada falha causa 1 ponto de dano Perfurante à criatura presa."
     },
     {
       "nome": "Arpéu",
       "peso": "2 kg",
-      "custo": "2 PO"
+      "custo": "2 PO",
+      "descricao": "Como uma ação Usar Objeto, você pode arremessar um Arpéu em um corrimão, uma borda ou outra superfície na qual pode ser ancorado, a até 15 metros de você, e o arpéu se ancora se você for bem-sucedido em um teste de Destreza (Acrobacia) CD 13. Se você amarrar uma corda no gancho, poderá escalá-la."
     },
     {
       "nome": "Balde",
       "peso": "1 kg",
-      "custo": "5 PC"
+      "custo": "5 PC",
+      "descricao": "Um Balde armazena até 0,3 metro cúbico de conteúdo."
     },
     {
       "nome": "Baliza",
       "peso": "3,5 kg",
-      "custo": "5 PC"
+      "custo": "5 PC",
+      "descricao": "Uma Baliza tem 3 metros de comprimento. Você pode usá-la para tocar algo a até 3 metros de distância. Se precisar realizar um teste de Força (Atletismo) como parte de um Salto em Altura ou Salto em Distância, você pode utilizar a Baliza para se impulsionar, recebendo Vantagem no teste."
     },
     {
       "nome": "Barril",
       "peso": "35 kg",
-      "custo": "2 PO"
+      "custo": "2 PO",
+      "descricao": "Um Barril armazena até 160 litros de líquido ou até 0,16 metro cúbico de produtos secos."
     },
     {
       "nome": "Baú",
       "peso": "12,5 kg",
-      "custo": "5 PO"
+      "custo": "5 PO",
+      "descricao": "Um Baú armazena até 0,35 metros cúbicos (ou 350 litros) de conteúdo."
     },
     {
       "nome": "Bolsa de Componentes",
       "peso": "1 kg",
-      "custo": "25 PO"
+      "custo": "25 PO",
+      "descricao": "Uma Bolsa de Componentes é à prova d'água e cheia de compartimentos que contêm todos os componentes Materiais sem custo de suas magias."
     },
     {
       "nome": "Cadeado",
       "peso": "0,5 kg",
-      "custo": "10 PO"
+      "custo": "10 PO",
+      "descricao": "Um Cadeado vem com uma chave. Sem a chave, uma criatura pode usar Ferramentas de Ladrão para abrir este Cadeado com um teste bem-sucedido de Destreza (Prestidigitação) CD 15."
     },
     {
       "nome": "Caixa para Fogo",
       "peso": "0,5 kg",
-      "custo": "5 PP"
+      "custo": "5 PP",
+      "descricao": "Uma Caixa para Fogo é um pequeno recipiente contendo pedra de sílex, aço contra fogo e material muito seco e altamente inflamável (geralmente pano seco embebido em óleo leve) usado para acender um fogo. Usá-lo para acender uma Lâmpada, Lanterna, Tocha ou Vela — ou qualquer outra coisa com combustível exposto — requer uma Ação Bônus. Acender qualquer outro fogo leva 1 minuto."
     },
     {
       "nome": "Caneta Tinteiro",
       "peso": "—",
-      "custo": "2 PC"
+      "custo": "2 PC",
+      "descricao": "Usando Tinta, uma Caneta Tinteiro é usada para escrever ou desenhar."
     },
     {
       "nome": "Cantil (cheio)",
       "peso": "2,5 kg",
-      "custo": "2 PP"
+      "custo": "2 PP",
+      "descricao": "Um Cantil comporta até 2 litros. Se você não beber água suficiente, corre o risco de desidratação (veja o glossário de regras)."
     },
     {
       "nome": "Cesta",
       "peso": "1 kg",
-      "custo": "4 PP"
+      "custo": "4 PP",
+      "descricao": "Uma Cesta armazena até 20 quilos dentro de 60 centímetros cúbicos."
     },
     {
       "nome": "Cobertor",
       "peso": "1,5 kg",
-      "custo": "5 PP"
+      "custo": "5 PP",
+      "descricao": "Enquanto estiver envolto em um cobertor, você tem Vantagem em salvaguardas contra frio extremo (veja o *Livro do Mestre*)."
     },
     {
       "nome": "Corda",
       "peso": "2,5 kg",
-      "custo": "1 PO"
+      "custo": "1 PO",
+      "descricao": "Como uma ação Usar Objeto, você pode dar um nó em uma Corda se for bem-sucedido em um teste de Destreza (Prestidigitação) CD 10. Um teste bem-sucedido de Força (Atletismo) CD 20 pode romper a Corda.\n\nVocê pode amarrar uma criatura involuntária com a Corda somente se a criatura tem a condição Contido, Imobilizado ou Incapacitado. Se as pernas da criatura estiverem amarradas, a criatura tem a condição Contido até escapar. Escapar da Corda requer que a criatura realize um teste bem-sucedido de Destreza (Acrobacia) CD 15 como uma ação."
     },
     {
       "nome": "Cordão",
       "peso": "—",
-      "custo": "1 PP"
+      "custo": "1 PP",
+      "descricao": "Um cordão tem 3 metros de comprimento. Você pode dar um nó nele como uma ação Usar Objeto."
     },
     {
       "nome": "Corrente",
       "peso": "5 kg",
-      "custo": "5 PO"
+      "custo": "5 PO",
+      "descricao": "Como uma ação Usar Objeto, você pode enrolar uma Corrente em torno de uma criatura involuntária a até 1,5 metro de você, e ela tem a condição Contido, Imobilizado ou Incapacitado se você for bem-sucedido em um teste de Força (Atletismo) CD 13. Se as pernas da criatura estiverem amarradas, a criatura tem a condição Contido até escapar. Escapar da Corrente requer que a criatura realize um teste bem-sucedido de Destreza (Acrobacia) CD 18 como uma ação. Estourar a Corrente requer um teste bem-sucedido de Força (Atletismo) CD 20 como uma ação."
     },
     {
       "nome": "Escada",
       "peso": "12,5 kg",
-      "custo": "1 PP"
+      "custo": "1 PP",
+      "descricao": "Uma Escada tem 3 metros de altura. Você deve escalar para subir ou descer."
     },
     {
       "nome": "Esferas de Metal",
       "peso": "1 kg (saco)",
-      "custo": "1 PO"
+      "custo": "1 PO",
+      "descricao": "Como uma ação Usar Objeto, você pode derramar Esferas de Metal de sua algibeira. Elas se espalham para cobrir uma área nivelada quadrada de 3 metros de lados a até 3 metros de você. Uma criatura que entra nesta área pela primeira vez em um turno deve ser bem-sucedida em uma salvaguarda de Destreza CD 10 ou tem a condição Caído. Leva 10 minutos para recolher as Esferas de Metal."
     },
     {
       "nome": "Espelho",
       "peso": "250 g",
-      "custo": "5 PO"
+      "custo": "5 PO",
+      "descricao": "Um espelho de aço portátil é prático tanto para uso pessoal quanto para espiar ao redor de cantos e refletir luz como sinal."
     },
     {
       "nome": "Estacas de Ferro",
       "peso": "2,5 kg",
-      "custo": "1 PO"
+      "custo": "1 PO",
+      "descricao": "Estacas de Ferro vêm em pacotes de dez. Como uma ação Usar Objeto, você pode usar um objeto contundente, como um Martelo Leve, para martelar uma Estaca em madeira, terra ou um material semelhante. Você pode fazer isso para fechar uma porta, amarrar uma corda ou corrente na Estaca."
     },
     {
       "nome": "Estojo, Mapa ou Pergaminho",
       "peso": "0,5 kg",
-      "custo": "1 PO"
+      "custo": "1 PO",
+      "descricao": "Um Estojo de Mapa ou Pergaminho armazena até 10 folhas de papel ou 5 folhas de pergaminho."
     },
     {
       "nome": "Estojo, Virote de Besta",
       "peso": "0,5 kg",
-      "custo": "1 PO"
+      "custo": "1 PO",
+      "descricao": "Um Estojo de Virotes de Besta armazena até 20 Virotes."
     },
     {
       "nome": "Estrepes",
       "peso": "1 kg (saco)",
-      "custo": "1 PO"
+      "custo": "1 PO",
+      "descricao": "Como uma ação Usar Objeto, você pode espalhar Estrepes de sua bolsa para cobrir uma área quadrada de 1,5 metro de lados a até 1,5 metro de você. Uma criatura que entra nesta área pela primeira vez em um turno deve ser bem-sucedida em uma salvaguarda de Destreza CD 15 ou sofre 1 ponto de dano Perfurante e tem o Deslocamento reduzido a 0 até o início do próximo turno dela. Leva 10 minutos para recolher os Estrepes."
     },
     {
       "nome": "Foco Arcano",
       "peso": "Varia",
-      "custo": "Varia"
+      "custo": "Varia",
+      "descricao": "Um Foco Arcano assume uma das formas na tabela Foco Arcano e é adornado ou esculpido para canalizar magia arcana. Um Bruxo, Feiticeiro ou Mago pode usar tal item como um Foco de Conjuração.\n\n**Focos Arcanos**"
     },
     {
       "nome": "Foco Druídico",
       "peso": "Varia",
-      "custo": "Varia"
+      "custo": "Varia",
+      "descricao": "Um Foco Druídico assume uma das formas apresentadas na tabela Foco Druídico e é esculpido, amarrado com fita ou pintado para canalizar magia primitiva. Um Druida ou Guardião pode usar um objeto como um Foco de Conjuração.\n\n**Focos Druídicos**"
     },
     {
       "nome": "Fogo Alquímico",
@@ -179,87 +207,104 @@
     {
       "nome": "Frasco",
       "peso": "—",
-      "custo": "1 PO"
+      "custo": "1 PO",
+      "descricao": "Um Frasco armazena até 150 mililitros."
     },
     {
       "nome": "Garrafa de Vidro (1 litro)",
       "peso": "1 kg",
-      "custo": "2 PO"
+      "custo": "2 PO",
+      "descricao": "Uma Garrafa de Vidro armazena até 1 litro."
     },
     {
       "nome": "Grilhões",
       "peso": "3 kg",
-      "custo": "2 PO"
+      "custo": "2 PO",
+      "descricao": "Como uma ação Usar Objeto, você pode usar Grilhões para prender uma criatura Pequena ou Média involuntária a até 1,5 metro de você que tem a condição Contido, Imobilizado ou Incapacitado, se você for bem-sucedido em um teste de Destreza (Prestidigitação) CD 13. Enquanto presa, uma criatura tem Desvantagem em jogadas de ataque, e a criatura está Contida se os grilhões estiverem presos a uma corrente ou gancho fixo no lugar. Escapar dos grilhões requer um teste bem-sucedido de Destreza (Prestidigitação) CD 20 como uma ação. Estourá-los requer um teste bem-sucedido de Força (Atletismo) CD 25 como uma ação.\n\nUm conjunto de Grilhões vem com uma chave. Sem a chave, uma criatura pode usar Ferramentas de Ladrão para abrir os Grilhões com um teste bem-sucedido de Destreza (Prestidigitação) CD 15."
     },
     {
       "nome": "Jarro (4 litros)",
       "peso": "2 kg",
-      "custo": "2 PC"
+      "custo": "2 PC",
+      "descricao": "Um Jarro armazena até 4 litros."
     },
     {
       "nome": "Kit de Artista",
       "peso": "29 kg",
-      "custo": "40 PO"
+      "custo": "40 PO",
+      "descricao": "Um Kit de Artista contém os seguintes itens: Caixa para Fogo, Cantil, Espelho, 3 Fantasias, Lanterna Foca-Facho, Mochila, 8 potes de Óleo, 9 dias de Rações, Saco de Dormir, Sino."
     },
     {
       "nome": "Kit de Assaltante",
       "peso": "21 kg",
-      "custo": "16 PO"
+      "custo": "16 PO",
+      "descricao": "Um Kit de Assaltante contém os seguintes itens: Caixa para Fogo, Cantil, Corda, Esferas de Metal, Lanterna Coberta, Mochila, 7 potes de Óleo, Pé de Cabra, 5 dias de Rações, Sino e 10 Velas."
     },
     {
       "nome": "Kit de Aventureiro",
       "peso": "27,5 kg",
-      "custo": "10 PO"
+      "custo": "10 PO",
+      "descricao": "Um Kit de Aventureiro contém os seguintes itens: Caixa para Fogo, Cantil, Corda, Mochila, 2 potes de Óleo, 10 dias de Rações, Saco de Dormir, 10 Tochas."
     },
     {
       "nome": "Kit de Curandeiro",
       "peso": "1,5 kg",
-      "custo": "5 PO"
+      "custo": "5 PO",
+      "descricao": "Um Kit de Curandeiro tem dez usos. Como uma ação Usar Objeto, você pode gastar um dos usos para estabilizar uma criatura Inconsciente que tenha 0 Pontos de Vida sem precisar realizar um teste de Sabedoria (Medicina)."
     },
     {
       "nome": "Kit de Diplomata",
       "peso": "19,5 kg",
-      "custo": "39 PO"
+      "custo": "39 PO",
+      "descricao": "Um Kit de Diplomata contém os seguintes itens: Baú, Caixa para Fogo, 5 Canetas Tinteiro, 2 Estojos de Mapa ou Pergaminho, Lâmpada, 4 potes de Óleo, Perfume, 5 folhas de Papel, 5 folhas de Pergaminho, Roupas Finas, Tinta."
     },
     {
       "nome": "Kit de Erudito",
       "peso": "11 kg",
-      "custo": "40 PO"
+      "custo": "40 PO",
+      "descricao": "Um Kit de Erudito contém os seguintes itens: Caixa para Fogo, Caneta Tinteiro, Lâmpada, Livro, Mochila, 10 potes de Óleo, 10 folhas de Pergaminho, Tinta."
     },
     {
       "nome": "Kit de Escalada",
       "peso": "6 kg",
-      "custo": "25 PO"
+      "custo": "25 PO",
+      "descricao": "Um Kit de Escalada inclui arnês, luvas, pítons e ponteiras de bota. Como uma ação Usar Objeto, você pode usar o Kit de Escalada para se ancorar; quando o fizer, você não pode cair a mais de 7,5 metros do ponto de ancoragem e não pode se mover a mais de 7,5 metros de lá sem desfazer a âncora como uma Ação Bônus."
     },
     {
       "nome": "Kit de Explorador de Masmorras",
       "peso": "27,5 kg",
-      "custo": "12 PO"
+      "custo": "12 PO",
+      "descricao": "Um Kit de Explorador de Masmorras contém os seguintes itens: Caixa para Fogo, Cantil, Corda, Estrepes, Mochila, 2 potes de Óleo, Pé de Cabra, 10 dias de Rações, 10 Tochas."
     },
     {
       "nome": "Kit de Sacerdote",
       "peso": "14,5 kg",
-      "custo": "33 PO"
+      "custo": "33 PO",
+      "descricao": "Um Kit de Sacerdote contém os seguintes itens: Água Benta, Caixa para Fogo, Cobertor, Lâmpada, Mochila, 7 dias de Rações, Túnica."
     },
     {
       "nome": "Lâmpada",
       "peso": "0,5 kg",
-      "custo": "5 PP"
+      "custo": "5 PP",
+      "descricao": "Uma Lâmpada usa Óleo para combustão para emitir Luz Plena em um raio de 4,5 metros e Meia-luz por mais 9 metros."
     },
     {
       "nome": "Lanterna Coberta",
       "peso": "1 kg",
-      "custo": "5 PO"
+      "custo": "5 PO",
+      "descricao": "Uma Lanterna Coberta usa Óleo para combustão para emitir Luz Plena em um raio de 9 metros e Meia-luz por mais 9 metros. Como uma Ação Bônus, você pode baixar o capuz, reduzindo a luz para Meia-luz em um raio de 1,5 metro, ou levantá-lo novamente."
     },
     {
       "nome": "Lanterna Foca-facho",
       "peso": "1 kg",
-      "custo": "10 PO"
+      "custo": "10 PO",
+      "descricao": "Uma Lanterna Foca-Facho usa Óleo como combustão para emitir Luz Plena em um Cone de 18 metros e Meia-luz por mais 18 metros."
     },
     {
       "nome": "Livro",
       "peso": "2,5 kg",
-      "custo": "25 PO"
+      "custo": "25 PO",
+      "descricao": "Um livro contém texto de ficção ou não-ficção. Se você consultar um livro de não-ficção especializado em um determinado tema, você obtém um bônus de +5 em testes de Inteligência (Arcanismo, História, Natureza ou Religião) que você fizer sobre esse tema."
     },
     {
       "nome": "Luneta",
@@ -271,12 +316,14 @@
     {
       "nome": "Lupa",
       "peso": "—",
-      "custo": "100 PO"
+      "custo": "100 PO",
+      "descricao": "Uma Lupa concede Vantagem em qualquer teste de atributo realizado para avaliar ou inspecionar um item altamente detalhado. Acender uma fogueira com uma Lupa requer luz tão brilhante quanto a luz do sol para ser focado, lenha para acender e cerca de 5 minutos para o fogo acender."
     },
     {
       "nome": "Mapa",
       "peso": "—",
-      "custo": "1 PO"
+      "custo": "1 PO",
+      "descricao": "Se consultar um mapa detalhado, você obtém um bônus de +5 em testes de Sabedoria (Sobrevivência) que realizar para encontrar um caminho no lugar representado nele."
     },
     {
       "nome": "Mochila",
@@ -288,7 +335,8 @@
     {
       "nome": "Munição",
       "peso": "Varia",
-      "custo": "Varia"
+      "custo": "Varia",
+      "descricao": "Munição é exigida por uma arma que tenha a propriedade Munição. A descrição de uma arma detalha o tipo de munição usada pela arma. A tabela Munição lista os diferentes tipos e a quantidade que você recebe ao comprá-las. A tabela também lista o item que normalmente é usado para comportar cada tipo; o armazenamento deve ser comprado separadamente."
     },
     {
       "nome": "Óleo",
@@ -300,37 +348,44 @@
     {
       "nome": "Pá",
       "peso": "2,5 kg",
-      "custo": "2 PO"
+      "custo": "2 PO",
+      "descricao": "Trabalhando por 1 hora, você pode usar uma Pá para cavar um buraco de 1,5 metro de cada lado no solo ou material semelhante."
     },
     {
       "nome": "Papel",
       "peso": "—",
-      "custo": "2 PP"
+      "custo": "2 PP",
+      "descricao": "Uma folha de papel pode comportar cerca de 250 palavras escritas à mão."
     },
     {
       "nome": "Pé de Cabra",
       "peso": "2,5 kg",
-      "custo": "2 PO"
+      "custo": "2 PO",
+      "descricao": "Usar um Pé de Cabra concede a você Vantagem em testes de Força, onde a alavancagem do Pé de Cabra pode ser aplicada."
     },
     {
       "nome": "Perfume",
       "peso": "—",
-      "custo": "5 PO"
+      "custo": "5 PO",
+      "descricao": "O perfume vem em um frasco de 120 mililitros. Por 1 hora após aplicar o Perfume em si, você tem Vantagem em testes de Carisma (Persuasão) realizados ao executar a ação Influenciar em um Humanoide Indiferente a até 1,5 metro de você."
     },
     {
       "nome": "Pergaminho",
       "peso": "—",
-      "custo": "1 PP"
+      "custo": "1 PP",
+      "descricao": "Uma folha de pergaminho pode comportar cerca de 250 palavras escritas à mão."
     },
     {
       "nome": "Pergaminho Mágico (1º Círculo)",
       "peso": "—",
-      "custo": "50 PO"
+      "custo": "50 PO",
+      "descricao": "Um *Pergaminho Mágico* (Truque) ou *Pergaminho Mágico* (1º Círculo) é um item mágico que contém as palavras de um truque ou magia de 1º círculo, respectivamente, determinado pelo criador do pergaminho. Se a magia estiver na lista de magias da sua classe, você pode ler o pergaminho e conjurar a magia usando seu tempo de conjuração normal e sem fornecer nenhum componente Material.\n\nSe a magia exigir uma salvaguarda ou jogada de ataque, a CD para evitar magia é 13 e o bônus de ataque é +5. O pergaminho se desintegra quando a conjuração é concluída."
     },
     {
       "nome": "Pergaminho Mágico (Truque)",
       "peso": "—",
-      "custo": "30 PO"
+      "custo": "30 PO",
+      "descricao": "Um *Pergaminho Mágico* (Truque) ou *Pergaminho Mágico* (1º Círculo) é um item mágico que contém as palavras de um truque ou magia de 1º círculo, respectivamente, determinado pelo criador do pergaminho. Se a magia estiver na lista de magias da sua classe, você pode ler o pergaminho e conjurar a magia usando seu tempo de conjuração normal e sem fornecer nenhum componente Material.\n\nSe a magia exigir uma salvaguarda ou jogada de ataque, a CD para evitar magia é 13 e o bônus de ataque é +5. O pergaminho se desintegra quando a conjuração é concluída."
     },
     {
       "nome": "Poção de Cura",
@@ -349,67 +404,80 @@
     {
       "nome": "Pote, Ferro",
       "peso": "5 kg",
-      "custo": "2 PO"
+      "custo": "2 PO",
+      "descricao": "Um Pote de Ferro comporta até 4 litros."
     },
     {
       "nome": "Rações",
       "peso": "1 kg",
-      "custo": "5 PP"
+      "custo": "5 PP",
+      "descricao": "As rações consistem em alimentos prontos para viagem, incluindo biscoito duro, carne seca, frutas secas e nozes. Veja \"Desnutrição\" no glossário de regras para os riscos de não comer."
     },
     {
       "nome": "Rede",
       "peso": "1,5 kg",
-      "custo": "1 PO"
+      "custo": "1 PO",
+      "descricao": "Ao executar a ação Atacar, você pode substituir um de seus ataques pelo arremesso de uma Rede. Escolha uma criatura à sua vista a até 4,5 metros de distância. O alvo deve ser bem-sucedido em uma salvaguarda de Destreza (CD 8 mais seu modificador de Destreza e seu Bônus de Proficiência) ou tem a condição Contido até escapar. O alvo é bem-sucedido automaticamente se for de tamanho Enorme ou maior.\n\nPara escapar, o alvo ou uma criatura a até 1,5 metro dele deve executar uma ação para realizar um teste de Força (Atletismo) CD 10, libertando a criatura Contida em caso de sucesso. Destruir a Rede (CA 10; 5 PV; imunidade a dano de Contundente, Psíquico e Venenoso) também liberta o alvo, encerrando a condição."
     },
     {
       "nome": "Roldana e Polias",
       "peso": "2,5 kg",
-      "custo": "1 PO"
+      "custo": "1 PO",
+      "descricao": "Roldana e Polias permitem içar até quatro vezes o peso que você normalmente pode levantar."
     },
     {
       "nome": "Roupas, Fantasia",
       "peso": "2 kg",
-      "custo": "5 PO"
+      "custo": "5 PO",
+      "descricao": "Enquanto estiver usando uma Fantasia, você tem Vantagem em qualquer teste de atributo que realize para se passar pela pessoa ou tipo de pessoa que a Fantasia representa."
     },
     {
       "nome": "Roupas, Finas",
       "peso": "3 kg",
-      "custo": "15 PO"
+      "custo": "15 PO",
+      "descricao": "Roupas Finas são feitas de tecidos caros e adornadas com detalhes habilmente trabalhados. Alguns eventos e locais admitem apenas pessoas vestindo essas roupas."
     },
     {
       "nome": "Roupas, Viagem",
       "peso": "2 kg",
-      "custo": "2 PO"
+      "custo": "2 PO",
+      "descricao": "Roupas de Viagem são roupas resistentes projetadas para viagens em vários ambientes."
     },
     {
       "nome": "Saca",
       "peso": "250 g",
-      "custo": "1 PC"
+      "custo": "1 PC",
+      "descricao": "Uma Saca armazena até 15 kg dentro de 30 centímetros cúbicos."
     },
     {
       "nome": "Saco de Dormir",
       "peso": "3,5 kg",
-      "custo": "1 PO"
+      "custo": "1 PO",
+      "descricao": "Um Saco de Dormir acomoda uma criatura Pequena ou Média. Enquanto estiver em um Saco de Dormir, você é automaticamente bem-sucedido em salvaguardas contra frio extremo (veja o *Livro do Mestre*)."
     },
     {
       "nome": "Símbolo Sagrado",
       "peso": "Varia",
-      "custo": "Varia"
+      "custo": "Varia",
+      "descricao": "Um Símbolo Sagrado assume uma das formas na tabela Símbolo Sagrado e é adornado ou pintado para canalizar magia divina. Um Clérigo ou Paladino pode usar um Símbolo Sagrado como um Foco de Conjuração.\n\nA tabela indica se um Símbolo Sagrado precisa ser segurado, usado ou exibido em tecido (como um tabardo ou um emblema) ou um Escudo.\n\n**Símbolos Sagrados**"
     },
     {
       "nome": "Sino",
       "peso": "—",
-      "custo": "1 PO"
+      "custo": "1 PO",
+      "descricao": "Quando tocado como uma ação Usar Objeto, um Sino produz um som que pode ser ouvido a até 18 metros de distância."
     },
     {
       "nome": "Tenda",
       "peso": "10 kg",
-      "custo": "2 PO"
+      "custo": "2 PO",
+      "descricao": "Uma Tenda acomoda para dormir até duas criaturas Pequenas ou Médias."
     },
     {
       "nome": "Tinta",
       "peso": "—",
-      "custo": "10 PO"
+      "custo": "10 PO",
+      "descricao": "A tinta vem em uma garrafa de 30 mililitros, que fornece tinta suficiente para escrever cerca de 500 páginas."
     },
     {
       "nome": "Tocha",
@@ -421,12 +489,14 @@
     {
       "nome": "Túnica",
       "peso": "2 kg",
-      "custo": "1 PO"
+      "custo": "1 PO",
+      "descricao": "Uma Túnica tem significado vocacional ou cerimonial. Alguns eventos e locais admitem apenas pessoas vestindo uma Túnica com certas cores ou símbolos."
     },
     {
       "nome": "Vela",
       "peso": "—",
-      "custo": "1 PC"
+      "custo": "1 PC",
+      "descricao": "Por 1 hora, uma Vela acesa emite Luz Plena em um raio de 1,5 metro e Meia-luz por mais 1,5 metro."
     },
     {
       "nome": "Veneno Básico",

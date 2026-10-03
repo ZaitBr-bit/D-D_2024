@@ -553,6 +553,9 @@ export function calcCA(personagem, passivos = null) {
   // Bônus genérico de CA de talentos
   ca += passivos?.bonusCA || 0;
 
+  // Modificadores temporários manuais (issue #83): buffs de aliados/itens.
+  ca += somaModificadoresManuais(personagem, 'ca');
+
   return ca;
 }
 
@@ -573,6 +576,20 @@ function atributoConjuracaoDe(personagem) {
 }
 
 /**
+ * Soma dos modificadores manuais (`tipo: 'modificador_manual'` em
+ * `efeitos_magicos`, issue #83) de um alvo: 'ca', 'iniciativa',
+ * 'ataque_magia' ou 'cd_magia'.
+ * @param {object} personagem
+ * @param {string} alvo
+ * @returns {number}
+ */
+export function somaModificadoresManuais(personagem, alvo) {
+  return (personagem?.efeitos_magicos || [])
+    .filter(e => e?.tipo === 'modificador_manual' && e.alvo === alvo)
+    .reduce((soma, e) => soma + (Number(e.valor) || 0), 0);
+}
+
+/**
  * Soma os bônus de ataque/CD de magia de itens customizados EQUIPADOS (e
  * SINTONIZADOS, quando o item exige sintonização) -- issue #37: o
  * formulário do item customizado já tinha os campos, mas nada aqui os
@@ -586,6 +603,9 @@ function bonusMagiaDeItens(personagem) {
     ataque += parseInt(item.dados?.bonus_ataque_magia) || 0;
     cd += parseInt(item.dados?.bonus_cd_magia) || 0;
   }
+  // Modificadores temporários manuais (issue #83).
+  ataque += somaModificadoresManuais(personagem, 'ataque_magia');
+  cd += somaModificadoresManuais(personagem, 'cd_magia');
   return { ataque, cd };
 }
 
@@ -1406,12 +1426,31 @@ export function rotuloDeTamanho(tamanho) {
   return CANONICOS.includes(t) ? t : 'Médio';
 }
 
-/** Peso total do inventário em kg (peso × quantidade; ignora itens com qtd <= 0). */
-export function getPesoTotalInventario(inventario) {
+/**
+ * Local customizado (`char.inventario_locais`) em que o item está guardado,
+ * ou null (sem `local`, ou id que não existe mais: o item volta à Mochila).
+ * @param {object} item Item do inventário.
+ * @param {Array<{id: string, nome: string, conta_peso: boolean}>} [locais]
+ * @returns {object|null}
+ */
+export function localDoItem(item, locais = []) {
+  if (!item?.local || !Array.isArray(locais)) return null;
+  return locais.find(l => l?.id === item.local) || null;
+}
+
+/**
+ * Peso total do inventário em kg (peso × quantidade; ignora itens com qtd <= 0).
+ * Item guardado num local customizado com `conta_peso: false` (ex.: Bolsa de
+ * Armazenamento) não entra na soma; sem `locais`, o cálculo é o de sempre.
+ * @param {Array<object>} inventario
+ * @param {Array<object>} [locais] `char.inventario_locais`
+ */
+export function getPesoTotalInventario(inventario, locais = []) {
   if (!Array.isArray(inventario)) return 0;
   return inventario.reduce((total, item) => {
     const qtd = item.quantidade ?? 1;
     if (qtd <= 0) return total;
+    if (localDoItem(item, locais)?.conta_peso === false) return total;
     const peso = parsePeso(item.dados?.peso ?? item.peso);
     return total + peso * qtd;
   }, 0);

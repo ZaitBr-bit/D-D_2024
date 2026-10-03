@@ -13,13 +13,47 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.0.20';
+export const VERSAO_ATUAL = '3.0.21';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.0.21',
+    data: '2026-10-03',
+    rotulo: 'Itens e inventário',
+    resumo: 'Descrições e ferramentas na loja, formulário de item personalizado '
+      + 'com categorias, propriedades e seções, locais customizados no '
+      + 'inventário e modificadores temporários.',
+    melhorias: [
+      {
+        grupo: '✨ Melhorias',
+        itens: [
+          'A loja ganhou a categoria Ferramentas (instrumentos musicais e '
+            + 'kits de jogos aparecem por variante, com o preço e o peso dela) '
+            + 'e os itens do Equipamento de Aventura agora trazem a descrição '
+            + 'do livro. (#120)',
+          'Item personalizado: novas categorias (Armadura, Consumível, '
+            + 'Munição, Equipamento, Item Mágico e Ferramenta) no lugar de '
+            + '"não é arma". (#100)',
+          'Item personalizado: as propriedades agora são escolhidas por botão, '
+            + 'a partir da lista do livro, ou criadas com nome e descrição '
+            + 'próprios. (#104)',
+          'Item personalizado: o formulário ficou compacto, com as seções '
+            + 'Categoria, Atributos e Raridade recolhíveis; na edição abre a '
+            + 'seção que já tem dado. (#101)',
+          'Inventário: crie locais para guardar itens (ex.: Bolsa de '
+            + 'Armazenamento), escolha se contam no peso e mova itens entre '
+            + 'a Mochila e os locais. (#80)',
+          'Novo botão Modificadores no card de Condições: registre buffs '
+            + 'temporários de aliados ou itens (CA, iniciativa, deslocamento, '
+            + 'voo, natação, ataque e CD de magia); saem no Descanso Longo. (#83)',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.0.20',
     data: '2026-10-03',

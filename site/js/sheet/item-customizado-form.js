@@ -27,10 +27,46 @@ export const CATEGORIAS_ARMA = [
   'Armas Marciais Corpo a Corpo', 'Armas Marciais à Distância',
 ];
 
+// Categorias de item que NÃO são arma (issue #100). Ficam em `dados.tipo_item`,
+// separadas de `dados.categoria`: esta última decide proficiência e ataque
+// de arma, e não pode receber valor que não seja de arma.
+export const TIPOS_ITEM = ['Armadura', 'Consumível', 'Munição', 'Equipamento', 'Item Mágico', 'Ferramenta'];
+
+/**
+ * Separa o valor do select de categoria nos dois campos gravados no item:
+ * categoria de arma -> `categoria`; tipo de item -> `tipo_item`; qualquer
+ * outro valor (inclusive vazio) -> ambos vazios.
+ * @param {string} valor
+ * @returns {{categoria: string, tipo_item: string}}
+ */
+export function separarCategoria(valor) {
+  if (CATEGORIAS_ARMA.includes(valor)) return { categoria: valor, tipo_item: '' };
+  if (TIPOS_ITEM.includes(valor)) return { categoria: '', tipo_item: valor };
+  return { categoria: '', tipo_item: '' };
+}
+
 // As maestrias de arma do catálogo (dados/equipamento/armas.json) --
 // mesma lista, para o campo do item customizado oferecer só nomes que
 // existem no livro.
 export const MAESTRIAS_ARMA = ['Afligir', 'Derrubar', 'Drenar', 'Empurrar', 'Garantido', 'Lentidão', 'Trespassar', 'Ágil'];
+
+/** As dez propriedades de arma do livro (Equipamento.md, "Propriedades"). */
+export const PROPRIEDADES_ARMA = ['Acuidade', 'Alcance', 'Arremesso', 'Duas Mãos', 'Extensão', 'Leve', 'Munição', 'Pesada', 'Recarga', 'Versátil'];
+
+/**
+ * Descrição de uma propriedade: a personalizada do item vence; depois o
+ * glossário do livro (ignora "(alcance 6/18)" no nome). Vazio se nenhuma.
+ * @param {string} nome
+ * @param {Array<{nome: string, descricao: string}>} [personalizadas] `dados.propriedades_personalizadas`
+ * @param {Array<{nome: string, descricao: string}>} [glossario] `dados.propriedadesArmas`
+ * @returns {string}
+ */
+export function descricaoDePropriedade(nome, personalizadas = [], glossario = []) {
+  const base = String(nome || '').replace(/\s*\(.*\)/, '').trim();
+  const custom = (personalizadas || []).find(p => p?.nome === base);
+  if (custom?.descricao) return custom.descricao;
+  return (glossario || []).find(p => p?.nome === base)?.descricao || '';
+}
 
 /**
  * Valida os campos que tem regra, sem tocar no DOM.
@@ -55,6 +91,23 @@ export function validarItemCustomizado(bruto) {
 // `lerFormularioItemCustomizado`, na leitura de ic-ca e ic-atq.
 
 /**
+ * Quais seções do formulário já têm dado (issue #101): a edição abre só
+ * essas; a criação (item vazio) nasce toda recolhida.
+ * @param {object} d `item.dados`
+ * @returns {{categoria: boolean, atributos: boolean, raridade: boolean}}
+ */
+export function secoesComValor(d = {}) {
+  const numero = (v) => (parseInt(v) || 0) !== 0;
+  const texto = (v) => String(v ?? '').trim() !== '';
+  return {
+    categoria: texto(d.categoria) || texto(d.tipo_item) || texto(d.propriedades) || texto(d.maestria),
+    atributos: numero(d.bonus_ca) || texto(d.ca_base) || texto(d.dano) || numero(d.bonus_ataque)
+      || numero(d.bonus_ataque_magia) || numero(d.bonus_cd_magia) || texto(d.peso),
+    raridade: texto(d.raridade) || Boolean(d.requer_sintonizacao),
+  };
+}
+
+/**
  * HTML dos campos do formulario. Sem item, vem vazio (criacao); com item,
  * vem preenchido (edicao).
  * @param {object|null} [item] Item do inventario a editar.
@@ -64,72 +117,110 @@ export function htmlFormularioItemCustomizado(item = null) {
   const d = item?.dados || {};
   const attr = (v) => String(v ?? '').replace(/"/g, '&quot;');
   const num = (v) => (parseInt(v) || '') === '' ? '' : String(parseInt(v));
+  // Chips das propriedades: a string "A, B" de `d.propriedades` (formato
+  // antigo, continua valendo) + a descrição das personalizadas.
+  const personalizadas = Array.isArray(d.propriedades_personalizadas) ? d.propriedades_personalizadas : [];
+  const chips = String(d.propriedades || '').split(',').map(p => p.trim()).filter(Boolean).map(nome => {
+    const custom = personalizadas.find(p => p?.nome === nome);
+    return `<span class="badge badge-secondary" data-ic-prop data-nome="${escHtml(nome)}"${custom?.descricao ? ` data-desc="${escHtml(custom.descricao)}"` : ''}>${escHtml(nome)} <button type="button" class="btn-icon" data-ic-prop-remover title="Remover" style="border:none;background:none;cursor:pointer">&times;</button></span>`;
+  }).join('');
+  // Issue #101: seções recolhíveis. Na criação nascem fechadas; na edição,
+  // abre a que já tem dado (secoesComValor).
+  const aberta = secoesComValor(d);
+  const abre = (id) => (aberta[id] ? ' open' : '');
   return `
     <div class="form-group"><label class="form-label" for="ic-nome">Nome</label><input type="text" class="form-input" id="ic-nome" value="${attr(item?.nome || '')}"></div>
     <div class="form-group"><label class="form-label" for="ic-desc">Descrição</label><textarea class="form-textarea" id="ic-desc" rows="2">${escHtml(item?.descricao || '')}</textarea></div>
-    <div class="row gap-1">
-      <div class="col">
-        <label class="form-label" for="ic-ca">Bônus CA</label>
-        <input type="number" class="form-input" id="ic-ca" value="${num(d.bonus_ca)}" placeholder="0" step="1">
-        <div style="font-size:0.65rem;color:var(--text-muted)">soma na CA quando equipado</div>
-      </div>
-      <div class="col">
-        <label class="form-label" for="ic-ca-base">CA Base</label>
-        <input type="number" class="form-input" id="ic-ca-base" value="${num(d.ca_base)}" placeholder="—" min="0" step="1">
-        <div style="font-size:0.65rem;color:var(--text-muted)">define a CA (ex.: 20). Não soma Destreza</div>
-      </div>
-      <div class="col">
-        <label class="form-label" for="ic-dano">Dano</label>
-        <input type="text" class="form-input" id="ic-dano" value="${attr(d.dano || '')}" placeholder="1d8 Cortante">
-        <div style="font-size:0.65rem;color:var(--text-muted)">Ex: 2d6 Cortante</div>
-      </div>
-      <div class="col">
-        <label class="form-label" for="ic-atq">Bônus Atq</label>
-        <input type="number" class="form-input" id="ic-atq" value="${num(d.bonus_ataque)}" placeholder="0" step="1">
-        <div style="font-size:0.65rem;color:var(--text-muted)">soma na jogada de ataque</div>
-      </div>
-    </div>
-    <div class="form-group" style="margin-top:8px">
-      <label class="form-label" for="ic-categoria">Categoria de arma (opcional)</label>
-      <select class="form-input" id="ic-categoria">
-        <option value=""${!d.categoria ? ' selected' : ''}>— não é arma —</option>
-        ${CATEGORIAS_ARMA.map(c => `<option value="${c}"${d.categoria === c ? ' selected' : ''}>${c}</option>`).join('')}
-      </select>
-      <div style="font-size:0.65rem;color:var(--text-muted)">define proficiência e o modificador de ataque (Força/Destreza), como uma arma de catálogo</div>
-    </div>
-    <div class="row gap-1" style="margin-top:8px">
-      <div class="col">
-        <label class="form-label" for="ic-propriedades">Propriedades (opcional)</label>
-        <input type="text" class="form-input" id="ic-propriedades" value="${attr(d.propriedades || '')}" placeholder="Acuidade, Leve">
-        <div style="font-size:0.65rem;color:var(--text-muted)">Ex: Acuidade, Distância, Leve, Pesada, Duas Mãos, Versátil</div>
-      </div>
-      <div class="col">
-        <label class="form-label" for="ic-maestria">Maestria (opcional)</label>
-        <select class="form-input" id="ic-maestria">
-          <option value=""${!d.maestria ? ' selected' : ''}>—</option>
-          ${MAESTRIAS_ARMA.map(m => `<option value="${m}"${d.maestria === m ? ' selected' : ''}>${m}</option>`).join('')}
+
+    <details class="ic-secao" data-ic-secao="categoria"${abre('categoria')}>
+      <summary>Categoria</summary>
+      <div class="form-group">
+        <label class="form-label" for="ic-categoria">Categoria (opcional)</label>
+        <select class="form-input" id="ic-categoria">
+          <option value=""${!d.categoria && !d.tipo_item ? ' selected' : ''}>—</option>
+          <optgroup label="Arma">
+            ${CATEGORIAS_ARMA.map(c => `<option value="${c}"${d.categoria === c ? ' selected' : ''}>${c}</option>`).join('')}
+          </optgroup>
+          <optgroup label="Outros">
+            ${TIPOS_ITEM.map(t => `<option value="${t}"${d.tipo_item === t ? ' selected' : ''}>${t}</option>`).join('')}
+          </optgroup>
         </select>
+        <div style="font-size:0.65rem;color:var(--text-muted)">categoria de arma define proficiência e o modificador de ataque (Força/Destreza), como uma arma de catálogo</div>
       </div>
-    </div>
-    <div class="row gap-1" style="margin-top:8px">
-      <div class="col">
-        <label class="form-label" for="ic-atq-magia">Bônus Ataque de Magia</label>
-        <input type="number" class="form-input" id="ic-atq-magia" value="${num(d.bonus_ataque_magia)}" placeholder="0" step="1">
-        <div style="font-size:0.65rem;color:var(--text-muted)">soma na jogada de ataque de magia quando equipado (e sintonizado, se exigir)</div>
+      <div class="row gap-1">
+        <div class="col">
+          <label class="form-label">Propriedades (opcional)</label>
+          <input type="hidden" id="ic-propriedades" value="${escHtml(d.propriedades || '')}">
+          <div id="ic-props-lista" style="display:flex;gap:6px;flex-wrap:wrap;margin:4px 0">${chips}</div>
+          <button type="button" class="btn btn-sm btn-secondary" id="ic-prop-add">+ Adicionar propriedade</button>
+          <div id="ic-prop-painel" style="display:none;margin-top:6px">
+            <select class="form-input" id="ic-prop-select">
+              ${PROPRIEDADES_ARMA.map(p => `<option value="${p}">${p}</option>`).join('')}
+              <option value="__personalizada__">Personalizada…</option>
+            </select>
+            <div id="ic-prop-custom" style="display:none;margin-top:6px">
+              <input type="text" class="form-input" id="ic-prop-nome" placeholder="Nome da propriedade">
+              <textarea class="form-textarea" id="ic-prop-desc" rows="2" placeholder="Descrição da propriedade" style="margin-top:6px"></textarea>
+            </div>
+            <button type="button" class="btn btn-sm btn-primary" id="ic-prop-confirmar" style="margin-top:6px">Adicionar</button>
+          </div>
+        </div>
+        <div class="col">
+          <label class="form-label" for="ic-maestria">Maestria (opcional)</label>
+          <select class="form-input" id="ic-maestria">
+            <option value=""${!d.maestria ? ' selected' : ''}>—</option>
+            ${MAESTRIAS_ARMA.map(m => `<option value="${m}"${d.maestria === m ? ' selected' : ''}>${m}</option>`).join('')}
+          </select>
+        </div>
       </div>
-      <div class="col">
-        <label class="form-label" for="ic-cd-magia">Bônus CD de Magia</label>
-        <input type="number" class="form-input" id="ic-cd-magia" value="${num(d.bonus_cd_magia)}" placeholder="0" step="1">
-        <div style="font-size:0.65rem;color:var(--text-muted)">soma na CD de magia quando equipado (e sintonizado, se exigir)</div>
+    </details>
+
+    <details class="ic-secao" data-ic-secao="atributos"${abre('atributos')}>
+      <summary>Atributos</summary>
+      <div class="row gap-1">
+        <div class="col">
+          <label class="form-label" for="ic-ca">Bônus CA</label>
+          <input type="number" class="form-input" id="ic-ca" value="${num(d.bonus_ca)}" placeholder="0" step="1">
+          <div style="font-size:0.65rem;color:var(--text-muted)">soma na CA quando equipado</div>
+        </div>
+        <div class="col">
+          <label class="form-label" for="ic-ca-base">CA Base</label>
+          <input type="number" class="form-input" id="ic-ca-base" value="${num(d.ca_base)}" placeholder="—" min="0" step="1">
+          <div style="font-size:0.65rem;color:var(--text-muted)">define a CA (ex.: 20). Não soma Destreza</div>
+        </div>
+        <div class="col">
+          <label class="form-label" for="ic-dano">Dano</label>
+          <input type="text" class="form-input" id="ic-dano" value="${attr(d.dano || '')}" placeholder="1d8 Cortante">
+          <div style="font-size:0.65rem;color:var(--text-muted)">Ex: 2d6 Cortante</div>
+        </div>
+        <div class="col">
+          <label class="form-label" for="ic-atq">Bônus Atq</label>
+          <input type="number" class="form-input" id="ic-atq" value="${num(d.bonus_ataque)}" placeholder="0" step="1">
+          <div style="font-size:0.65rem;color:var(--text-muted)">soma na jogada de ataque</div>
+        </div>
       </div>
-    </div>
-    <div class="form-group" style="margin-top:8px">
-      <label class="form-label" for="ic-peso">Peso (opcional)</label>
-      <input type="number" class="form-input" id="ic-peso" value="${parsePeso(d.peso) || ''}" placeholder="0" min="0" step="0.1" style="max-width:140px">
-      <div style="font-size:0.65rem;color:var(--text-muted)">em kg (ex: 0,5)</div>
-    </div>
-    <div class="row gap-1" style="margin-top:8px">
-      <div class="col">
+      <div class="row gap-1" style="margin-top:8px">
+        <div class="col">
+          <label class="form-label" for="ic-atq-magia">Bônus Ataque de Magia</label>
+          <input type="number" class="form-input" id="ic-atq-magia" value="${num(d.bonus_ataque_magia)}" placeholder="0" step="1">
+          <div style="font-size:0.65rem;color:var(--text-muted)">soma na jogada de ataque de magia quando equipado (e sintonizado, se exigir)</div>
+        </div>
+        <div class="col">
+          <label class="form-label" for="ic-cd-magia">Bônus CD de Magia</label>
+          <input type="number" class="form-input" id="ic-cd-magia" value="${num(d.bonus_cd_magia)}" placeholder="0" step="1">
+          <div style="font-size:0.65rem;color:var(--text-muted)">soma na CD de magia quando equipado (e sintonizado, se exigir)</div>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:8px">
+        <label class="form-label" for="ic-peso">Peso (opcional)</label>
+        <input type="number" class="form-input" id="ic-peso" value="${parsePeso(d.peso) || ''}" placeholder="0" min="0" step="0.1" style="max-width:140px">
+        <div style="font-size:0.65rem;color:var(--text-muted)">em kg (ex: 0,5)</div>
+      </div>
+    </details>
+
+    <details class="ic-secao" data-ic-secao="raridade"${abre('raridade')}>
+      <summary>Raridade e sintonização</summary>
+      <div class="form-group">
         <label class="form-label" for="ic-raridade">Raridade</label>
         <select class="form-input" id="ic-raridade">
           <option value=""${!d.raridade ? ' selected' : ''}>—</option>
@@ -137,21 +228,111 @@ export function htmlFormularioItemCustomizado(item = null) {
         </select>
         <div style="font-size:0.65rem;color:var(--text-muted)">vazio = item não mágico</div>
       </div>
-      <div class="col">
-        <label class="form-label" for="ic-preco">Preço</label>
-        <input type="text" class="form-input" id="ic-preco" value="${attr(d.preco || '')}" placeholder="150 PO">
-        <div style="font-size:0.65rem;color:var(--text-muted)">texto livre (ex.: 150 PO)</div>
+      <div class="form-group">
+        <label class="form-label" style="display:flex;align-items:center;gap:6px;cursor:pointer">
+          <input type="checkbox" id="ic-sintonizacao"${d.requer_sintonizacao ? ' checked' : ''}>
+          Requer sintonização
+        </label>
+        <div style="font-size:0.65rem;color:var(--text-muted)">você pode estar sintonizado a no máximo 3 itens</div>
       </div>
-    </div>
+    </details>
+
     <div class="form-group" style="margin-top:8px">
-      <label class="form-label" style="display:flex;align-items:center;gap:6px;cursor:pointer">
-        <input type="checkbox" id="ic-sintonizacao"${d.requer_sintonizacao ? ' checked' : ''}>
-        Requer Sintonizacao
-      </label>
-      <div style="font-size:0.65rem;color:var(--text-muted)">você pode estar sintonizado a no máximo 3 itens</div>
+      <label class="form-label" for="ic-preco">Preço</label>
+      <input type="text" class="form-input" id="ic-preco" value="${attr(d.preco || '')}" placeholder="150 PO">
+      <div style="font-size:0.65rem;color:var(--text-muted)">texto livre (ex.: 150 PO)</div>
     </div>
     <div id="ic-erros" style="display:none;color:var(--danger);font-size:0.8rem;margin-top:8px"></div>
   `;
+}
+
+/**
+ * Lê os chips de propriedade do formulário aberto: a string "A, B" (todos os
+ * nomes) e a lista das personalizadas (as que carregam descrição).
+ * @returns {{propriedades: string, propriedades_personalizadas: Array<{nome: string, descricao: string}>}}
+ */
+export function lerPropriedadesDoFormulario() {
+  const chips = [...document.querySelectorAll('#ic-props-lista [data-ic-prop]')];
+  return {
+    propriedades: chips.map(c => c.dataset.nome).join(', '),
+    propriedades_personalizadas: chips
+      .filter(c => c.dataset.desc)
+      .map(c => ({ nome: c.dataset.nome, descricao: c.dataset.desc })),
+  };
+}
+
+/** Cria o elemento-chip de uma propriedade (nome e, se personalizada, descrição). */
+function criarChipPropriedade(nome, descricao = '') {
+  const chip = document.createElement('span');
+  chip.className = 'badge badge-secondary';
+  chip.setAttribute('data-ic-prop', '');
+  chip.dataset.nome = nome;
+  if (descricao) chip.dataset.desc = descricao;
+  chip.append(`${nome} `);
+  const x = document.createElement('button');
+  x.type = 'button';
+  x.className = 'btn-icon';
+  x.setAttribute('data-ic-prop-remover', '');
+  x.title = 'Remover';
+  x.style.cssText = 'border:none;background:none;cursor:pointer';
+  x.innerHTML = '&times;';
+  chip.append(x);
+  return chip;
+}
+
+/**
+ * Liga os controles de propriedade do formulário aberto (botão
+ * "+ Adicionar propriedade", seletor padrão/personalizada, remoção de chip).
+ * Chamar logo depois de abrir o modal.
+ */
+export function ligarEventosFormularioItemCustomizado() {
+  const lista = document.getElementById('ic-props-lista');
+  const painel = document.getElementById('ic-prop-painel');
+  const select = document.getElementById('ic-prop-select');
+  const custom = document.getElementById('ic-prop-custom');
+  const erro = (msg) => {
+    const el = document.getElementById('ic-erros');
+    if (!el) return;
+    el.style.display = msg ? 'block' : 'none';
+    el.textContent = msg || '';
+  };
+  const sincronizarOculto = () => {
+    const oculto = document.getElementById('ic-propriedades');
+    if (oculto) oculto.value = lerPropriedadesDoFormulario().propriedades;
+  };
+  document.getElementById('ic-prop-add')?.addEventListener('click', () => {
+    if (painel) painel.style.display = painel.style.display === 'none' ? 'block' : 'none';
+  });
+  select?.addEventListener('change', () => {
+    if (custom) custom.style.display = select.value === '__personalizada__' ? 'block' : 'none';
+  });
+  document.getElementById('ic-prop-confirmar')?.addEventListener('click', () => {
+    const ehCustom = select?.value === '__personalizada__';
+    const nome = ehCustom ? (document.getElementById('ic-prop-nome')?.value || '').trim() : select?.value;
+    const descricao = ehCustom ? (document.getElementById('ic-prop-desc')?.value || '').trim() : '';
+    if (!nome) { erro('Informe o nome da propriedade.'); return; }
+    if ([...document.querySelectorAll('#ic-props-lista [data-ic-prop]')].some(c => c.dataset.nome === nome)) {
+      erro(`A propriedade "${nome}" já foi adicionada.`);
+      return;
+    }
+    erro('');
+    lista?.append(criarChipPropriedade(nome, descricao));
+    if (ehCustom) {
+      document.getElementById('ic-prop-nome').value = '';
+      document.getElementById('ic-prop-desc').value = '';
+    }
+    // Fecha o painel e volta o seletor ao padrão: o próximo "+ Adicionar" abre limpo.
+    if (painel) painel.style.display = 'none';
+    if (select) select.selectedIndex = 0;
+    if (custom) custom.style.display = 'none';
+    sincronizarOculto();
+  });
+  lista?.addEventListener('click', (e) => {
+    const x = e.target.closest('[data-ic-prop-remover]');
+    if (!x) return;
+    x.closest('[data-ic-prop]')?.remove();
+    sincronizarOculto();
+  });
 }
 
 /**
@@ -166,8 +347,8 @@ export function lerFormularioItemCustomizado() {
   const dano = val('ic-dano');
   const ca = parseInt(document.getElementById('ic-ca')?.value) || 0;
   const atq = parseInt(document.getElementById('ic-atq')?.value) || 0;
-  const categoria = val('ic-categoria');
-  const propriedades = val('ic-propriedades');
+  const { categoria, tipo_item } = separarCategoria(val('ic-categoria'));
+  const { propriedades, propriedades_personalizadas } = lerPropriedadesDoFormulario();
   const maestria = val('ic-maestria');
   const atqMagia = parseInt(document.getElementById('ic-atq-magia')?.value) || 0;
   const cdMagia = parseInt(document.getElementById('ic-cd-magia')?.value) || 0;
@@ -182,6 +363,8 @@ export function lerFormularioItemCustomizado() {
   const errosEl = document.getElementById('ic-erros');
   if (erros.length > 0) {
     if (errosEl) { errosEl.style.display = 'block'; errosEl.innerHTML = erros.join('<br>'); }
+    // O erro pode estar num campo de seção recolhida: abre a seção Atributos (onde fica o Dano).
+    document.querySelector('[data-ic-secao="atributos"]')?.setAttribute('open', '');
     return { ok: false, erros, valores: null };
   }
   if (errosEl) errosEl.style.display = 'none';
@@ -198,7 +381,10 @@ export function lerFormularioItemCustomizado() {
         dano,
         bonus_ataque: String(atq),
         categoria,
+        tipo_item,
         propriedades,
+        // Sempre grava (inclusive []): a edição faz merge e precisa poder apagar.
+        propriedades_personalizadas,
         maestria,
         bonus_ataque_magia: String(atqMagia),
         bonus_cd_magia: String(cdMagia),

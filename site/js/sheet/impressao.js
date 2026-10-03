@@ -597,7 +597,7 @@ export async function gerarHtmlImpressao() {
         }
         pag2 += `
           <div class="print-feature">
-            <div class="print-feature-name">${f.nome} <span style="font-weight:400;font-size:7pt;color:#666">(Nivel ${f.nivel})</span></div>
+            <div class="print-feature-name">${f.nome} <span style="font-weight:400;font-size:7pt;color:#666">(Nível ${f.nivel})</span></div>
             ${descPrint ? `<div class="print-feature-desc"><div class="md-content">${mdParaHtml(descPrint)}</div></div>` : ''}
           </div>`;
       });
@@ -614,7 +614,7 @@ export async function gerarHtmlImpressao() {
       feats.forEach(f => {
         pag2 += `
           <div class="print-feature">
-            <div class="print-feature-name">${f.nome} <span style="font-weight:400;font-size:7pt;color:#666">(Nivel ${f.nivel})</span></div>
+            <div class="print-feature-name">${f.nome} <span style="font-weight:400;font-size:7pt;color:#666">(Nível ${f.nivel})</span></div>
             ${f.descricao ? `<div class="print-feature-desc"><div class="md-content">${mdParaHtml(f.descricao)}</div></div>` : ''}
           </div>`;
       });
@@ -667,7 +667,7 @@ export async function gerarHtmlImpressao() {
     });
 
     if (tracosMostrar.length > 0) {
-      pag2 += `<div class="print-section"><div class="print-section-title">Tracos de Especie &mdash; ${escHtml(char.especie)}</div><div class="print-multi-col">`;
+      pag2 += `<div class="print-section"><div class="print-section-title">Traços de Espécie &mdash; ${escHtml(char.especie)}</div><div class="print-multi-col">`;
       tracosMostrar.forEach(t => {
         pag2 += `
           <div class="print-feature">

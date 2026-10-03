@@ -27,11 +27,11 @@ export async function renderStepEspecie(el) {
 
     if (!Array.isArray(especies) || especies.length === 0) {
       el.innerHTML = `
-        <h3 style="margin-bottom:12px">Escolha sua Especie</h3>
+        <h3 style="margin-bottom:12px">Escolha sua Espécie</h3>
         <div class="info-box warning">
           Nao foi possivel carregar as especies agora. Tente recarregar a lista.
         </div>
-        <button class="btn btn-primary" id="btn-recarregar-especies">Recarregar especies</button>
+        <button class="btn btn-primary" id="btn-recarregar-especies">Recarregar espécies</button>
       `;
 
       document.getElementById('btn-recarregar-especies')?.addEventListener('click', async () => {
@@ -58,7 +58,7 @@ export async function renderStepEspecie(el) {
   }
 
   el.innerHTML = `
-    <h3 style="margin-bottom:12px">Escolha sua Especie</h3>
+    <h3 style="margin-bottom:12px">Escolha sua Espécie</h3>
     <div class="opcao-grid ampla" id="grid-especies">
       ${especies.map(e => `
         <div class="opcao-card ${personagem.especie === e.nome ? 'selecionada' : ''}" data-especie="${e.nome}">
@@ -82,7 +82,7 @@ export async function renderStepEspecie(el) {
   } catch (err) {
     console.error('Erro em renderStepEspecie:', err);
     el.innerHTML = `
-      <h3 style="margin-bottom:12px">Escolha sua Especie</h3>
+      <h3 style="margin-bottom:12px">Escolha sua Espécie</h3>
       <div class="info-box warning">Erro ao carregar: ${err.message}</div>
     `;
   }

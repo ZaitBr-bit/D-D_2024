@@ -25,6 +25,38 @@ import {
 /** Cache local dos dados de equipamento */
 let _cacheEquipSheet = null;
 
+/**
+ * Monta a lista de ferramentas da loja a partir da tabela do livro.
+ * Ferramenta comum vira um item; Instrumento Musical e Kit de Jogos (custo
+ * "Varia") viram um item por variante, com o custo e o peso dela. A
+ * descrição reúne Atributo, Usar Objeto e Fabricação.
+ * @param {Array<object>} tabela `ferramentas.json` -> tabelas[0].dados
+ * @returns {Array<{nome: string, custo: string, peso: string, descricao: string}>}
+ */
+export function montarFerramentasLoja(tabela = []) {
+  const saida = [];
+  for (const f of tabela) {
+    const det = f.detalhes || {};
+    const descricao = [
+      f.Atributo ? `**Atributo:** ${f.Atributo}` : '',
+      det.usar_objeto ? `**Usar Objeto:** ${det.usar_objeto}` : '',
+      det.fabricacao ? `**Fabricação:** ${det.fabricacao}` : '',
+    ].filter(Boolean).join('\n\n');
+    if (det.variantes) {
+      // "Alaúde (35 PO, 1 kg), Flauta (2 PO, 0,5 kg)" / "Dados (1 PP), Baralho (5 PP)"
+      for (const v of det.variantes.split(/\),\s*/)) {
+        const m = v.replace(/\)$/, '').match(/^(.+?) \((.+)$/);
+        if (!m) continue;
+        const [custo, peso] = m[2].split(',').map(x => x.trim());
+        saida.push({ nome: `${f.Ferramenta} (${m[1].trim()})`, custo: custo || '', peso: peso || '', descricao });
+      }
+    } else {
+      saida.push({ nome: f.Ferramenta, custo: f.Custo || '', peso: f.Peso || '', descricao });
+    }
+  }
+  return saida;
+}
+
 /** Carrega (com cache) armas, armaduras, equipamento de aventura/munição e ferramentas usados pelo seletor e pelo popup de detalhe de item da ficha */
 export async function carregarDadosEquipSheet() {
   if (_cacheEquipSheet) return _cacheEquipSheet;
@@ -56,6 +88,8 @@ export async function carregarDadosEquipSheet() {
       peso: f.Peso || '',
       atributo: f.Atributo || ''
     })),
+    // Issue #120: ferramentas à venda (uma por variante quando o custo varia).
+    ferramentasLoja: montarFerramentasLoja(tabelaFerramentas?.dados || []),
     // Variantes nomeadas de "Foco Arcano" e "Foco Druidico". Na tabela
     // principal os dois pesam "Varia" (= 0 kg na balanca); o peso de
     // verdade e por FORMA (Cajado 2 kg, Orbe 1,5 kg...), numa tabela
@@ -85,7 +119,8 @@ export async function abrirSeletorItens(ctx) {
     { id: 'armaduras', label: 'Armaduras', icon: '&#128737;' },
     { id: 'consumiveis', label: 'Consumiveis', icon: '&#9878;' },
     { id: 'municao', label: 'Municao', icon: '&#10148;' },
-    { id: 'equipamento', label: 'Equipamento', icon: '&#128188;' }
+    { id: 'equipamento', label: 'Equipamento', icon: '&#128188;' },
+    { id: 'ferramentas', label: 'Ferramentas', icon: '&#128295;' }
   ];
 
   const html = `
@@ -220,6 +255,16 @@ export async function abrirSeletorItens(ctx) {
           nome: i.nome,
           detalhe: `${i.custo} | ${i.peso || '\u2014'}`,
           badge: '', badgeCat: '',
+          dados: i,
+          tipo: 'equipamento'
+        }));
+        break;
+      case 'ferramentas':
+        itens = (dados.ferramentasLoja || []).map(i => ({
+          nome: i.nome,
+          detalhe: `${i.custo || '—'} | ${i.peso || '—'}`,
+          badge: '<span class="badge" style="font-size:0.6rem;background:#e3f2fd;color:#1565c0">Ferramenta</span>',
+          badgeCat: '',
           dados: i,
           tipo: 'equipamento'
         }));

@@ -337,3 +337,17 @@ export async function personagemEmCriacao(page) {
     return wizard.personagem;
   });
 }
+
+/**
+ * Abre todas as seções recolhidas do formulário de item personalizado
+ * (clique real no summary). A criação nasce com as seções fechadas (issue
+ * #101) e `fill` em campo de seção fechada não funciona.
+ */
+export async function abrirSecoesItemCustom(page) {
+  const secoes = page.locator('details.ic-secao');
+  const n = await secoes.count();
+  for (let i = 0; i < n; i++) {
+    const s = secoes.nth(i);
+    if (!(await s.evaluate(el => el.open))) await s.locator('> summary').click();
+  }
+}

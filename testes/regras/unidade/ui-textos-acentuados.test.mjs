@@ -23,7 +23,7 @@ const PALAVRAS = [
   'possivel', 'invalido', 'obrigatorio', 'ultimo', 'proximo', 'codigo', 'atualizacao',
   'sincronizacao', 'circulo', 'circulos', 'disponivel', 'indisponivel',
   'nivel', 'niveis', 'pericia', 'pericias', 'traco', 'tracos', 'artesao', 'invisivel', 'astucia',
-  'forca', 'constituicao', 'inteligencia', 'pre-requisito', 'invocacoes', 'sintonizacao', 'agil', 'bonus', 'habil', 'versatil', 'distribuicao',
+  'forca', 'constituicao', 'inteligencia', 'pre-requisito', 'invocacoes', 'sintonizacao', 'agil', 'bonus', 'habil', 'versatil', 'distribuicao', 'especie', 'especies',
 ];
 const RE_PALAVRA = new RegExp(`\\b(${PALAVRAS.join('|')})\\b`, 'i');
 
@@ -32,6 +32,7 @@ const EXCECOES = [];
 
 const CONTEXTOS = [
   />([^<>{}`]*?)</g,
+  />([^<>{}`]+)\$\{/g,   // texto antes de uma interpolação: <h2>Condicoes${...}</h2>
   /(?:title|placeholder|aria-label|alt)="([^"]+)"/g,
   /toast\(\s*[`'"]([^`'"]+)/g,
   /\b(?:label|rotulo|titulo|texto|msg|erro|dica)\s*:\s*[`'"]([^`'"]+)/g,

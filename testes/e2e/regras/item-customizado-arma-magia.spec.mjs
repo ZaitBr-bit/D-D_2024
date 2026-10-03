@@ -6,7 +6,7 @@
 // formulario nao tinha onde anotar nenhum dos dois.
 // ============================================================
 import { test, expect } from '@playwright/test';
-import { ATRIBUTOS_REGRAS, abrirFicha, assentar, personagemSalvo } from './helpers-regras.mjs';
+import { ATRIBUTOS_REGRAS, abrirFicha, assentar, personagemSalvo, abrirSecoesItemCustom } from './helpers-regras.mjs';
 
 // Forca 15 (+2) e Destreza 14 (+2): empatados de proposito, para o teste
 // nao depender de qual o motor escolheu em Acuidade.
@@ -21,11 +21,17 @@ test('item customizado com categoria de arma: Atq/Dano/Maestria calculados como 
 
   await page.click('#btn-add-inv-custom');
   await page.waitForSelector('#ic-nome', { state: 'visible', timeout: 20_000 });
+  await abrirSecoesItemCustom(page);
 
   await page.fill('#ic-nome', 'Espada Ancestral do Zait');
   await page.fill('#ic-dano', '1d8 Cortante');
   await page.selectOption('#ic-categoria', 'Armas Marciais Corpo a Corpo');
-  await page.fill('#ic-propriedades', 'Acuidade, Leve');
+  // Issue #104: propriedades pelo botão "+ Adicionar propriedade" (antes era texto livre).
+  for (const propriedade of ['Acuidade', 'Leve']) {
+    await page.click('#ic-prop-add');
+    await page.selectOption('#ic-prop-select', propriedade);
+    await page.click('#ic-prop-confirmar');
+  }
   await page.selectOption('#ic-maestria', 'Trespassar');
   await page.click('#btn-add-ic');
 
@@ -62,6 +68,7 @@ test('item customizado SEM categoria de arma continua mostrando o bônus bruto d
 
   await page.click('#btn-add-inv-custom');
   await page.waitForSelector('#ic-nome', { state: 'visible', timeout: 20_000 });
+  await abrirSecoesItemCustom(page);
 
   await page.fill('#ic-nome', 'Anel de Ataque Estranho');
   await page.fill('#ic-atq', '7');
@@ -90,6 +97,7 @@ test('item customizado com bônus de magia EQUIPADO: CD Magia e Atq. Magia da fi
 
   await page.click('#btn-add-inv-custom');
   await page.waitForSelector('#ic-nome', { state: 'visible', timeout: 20_000 });
+  await abrirSecoesItemCustom(page);
   await page.fill('#ic-nome', 'Cajado do Zait');
   await page.fill('#ic-cd-magia', '1');
   await page.fill('#ic-atq-magia', '2');

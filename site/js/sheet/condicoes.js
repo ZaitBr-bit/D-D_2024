@@ -10,6 +10,7 @@ import { char, especiesCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { getConcentracaoAtiva } from './magias.js';
 import { quebrarConcentracaoAtiva } from './hp-descanso.js';
+import { abrirModalModificadores } from './modificadores.js';
 import { estaIncapacitado, condicaoIncapacitante } from '../regras-condicoes.js';
 import { temProficienciaArma, temProficienciaArmadura, badgeProficiencia } from '../regras-equipamento.js';
 
@@ -97,7 +98,7 @@ export function renderSecaoCondicoes() {
   const efMag = char.efeitos_magicos || [];
   const imunidadesMagia = efMag.filter(e => e.tipo === 'imunidade_condicao').map(e => ({ condicao: e.condicao, fonte: e.nome.replace(/ \(.*\)$/, '') }));
   const condicoesMagia = efMag.filter(e => e.tipo === 'condicao').map(e => ({ condicao: e.condicao, fonte: e.nome, rotulo: e.rotulo }));
-  const efeitosAtivos = efMag.filter(e => ['penalidade_ataque_contra_mim', 'protecao_bem_e_mal', 'buff_d20', 'buff_arma', 'deslocamento', 'bonus_pericia', 'reflexos', 'dano_reativo', 'pv_temp_por_turno', 'buff_save_condicao', 'vantagem_sg_condicoes', 'desv_ataques_contra_mim', 'protecao_pv_max', 'penalidade_d20'].includes(e.tipo));
+  const efeitosAtivos = efMag.filter(e => ['penalidade_ataque_contra_mim', 'protecao_bem_e_mal', 'buff_d20', 'buff_arma', 'deslocamento', 'bonus_pericia', 'reflexos', 'dano_reativo', 'pv_temp_por_turno', 'buff_save_condicao', 'vantagem_sg_condicoes', 'desv_ataques_contra_mim', 'protecao_pv_max', 'penalidade_d20', 'modificador_manual'].includes(e.tipo));
   // Deduplicar por nome base
   const efeitosVistos = new Set();
   const efeitosUnicos = efeitosAtivos.filter(e => { const base = e.nome.replace(/ \(.*\)$/, ''); if (efeitosVistos.has(base)) return false; efeitosVistos.add(base); return true; });
@@ -105,8 +106,11 @@ export function renderSecaoCondicoes() {
   return `
     <div class="card" style="${temCondicao ? 'border-color:var(--warning)' : ''}">
       <div class="card-header">
-        <h2>Condicoes${temCondicao ? ` (${condicoes.length})` : ''}</h2>
-        <button class="btn btn-sm btn-secondary no-print" id="btn-gerenciar-condicoes">Gerenciar</button>
+        <h2>Condições${temCondicao ? ` (${condicoes.length})` : ''}</h2>
+        <span class="no-print" style="display:flex;gap:4px">
+          <button class="btn btn-sm btn-secondary" id="btn-modificadores" title="Buffs temporários de aliados ou itens (CA, iniciativa, deslocamento, magia)">Modificadores</button>
+          <button class="btn btn-sm btn-secondary" id="btn-gerenciar-condicoes">Gerenciar</button>
+        </span>
       </div>
       ${(() => {
         const concAtiva = getConcentracaoAtiva();
@@ -347,6 +351,8 @@ export function setupEventosCondicoes() {
         '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
     });
   });
+
+  document.getElementById('btn-modificadores')?.addEventListener('click', () => abrirModalModificadores());
 
   document.getElementById('btn-gerenciar-condicoes')?.addEventListener('click', () => {
     const condicoesAtuais = new Set(char.condicoes || []);

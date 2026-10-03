@@ -23,7 +23,7 @@
 //     piso já dá o número certo nos dois casos.
 // ============================================================
 import { test, expect } from '@playwright/test';
-import { ATRIBUTOS_REGRAS, abrirFicha, assentar, personagemSalvo } from './helpers-regras.mjs';
+import { ATRIBUTOS_REGRAS, abrirFicha, assentar, personagemSalvo, abrirSecoesItemCustom } from './helpers-regras.mjs';
 
 // Guerreiro sem armadura: CA = 10 + Destreza (14 → +2) = 12.
 const CA_SEM_NADA = 12;
@@ -58,6 +58,7 @@ test('item customizado: o campo CA Base é gravado pelo formulário da ficha', a
 
   await page.click('#btn-add-inv-custom');
   await page.waitForSelector('#ic-nome', { state: 'visible', timeout: 20_000 });
+  await abrirSecoesItemCustom(page);
 
   // GUARDA CONTRA VACUIDADE: o campo tem de existir na tela antes de
   // qualquer afirmação sobre o que ele grava.

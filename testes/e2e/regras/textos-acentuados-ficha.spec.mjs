@@ -3,7 +3,7 @@
 // acento e Ç (antes: "Percepcao", "Condicoes", "Descricao", "Bonus CA"...).
 // ============================================================
 import { test, expect } from '@playwright/test';
-import { abrirFicha, assentar, clicarSeletorFicha, ATRIBUTOS_REGRAS } from './helpers-regras.mjs';
+import { abrirFicha, assentar, clicarSeletorFicha, ATRIBUTOS_REGRAS, abrirSecoesItemCustom } from './helpers-regras.mjs';
 
 const GUERREIRO_5 = {
   nome: 'Aldo', especie: 'Anão', classe: 'Guerreiro', subclasse: '',
@@ -28,6 +28,7 @@ test('formulário de item personalizado: Descrição, Bônus CA e Preço com ace
   const { page } = await abrirFicha(context, GUERREIRO_5, 'regras-issue-99-b');
   await assentar(page).catch(() => {});
   await clicarSeletorFicha(page, '#btn-add-inv-custom', { esperar: '#ic-desc' });
+  await abrirSecoesItemCustom(page);
   const corpo = await page.locator('#modal-corpo').innerText();
   const norm = corpo.toLowerCase();
   expect(norm).toContain('descrição');

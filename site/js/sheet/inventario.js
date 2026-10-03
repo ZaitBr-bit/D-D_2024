@@ -7,7 +7,7 @@
 import { CLASSES_INFO } from '../dados-classes.js';
 import { DENOMINACOES, ICONE_MOEDA, NOMES_MOEDA, adicionarMoeda, converterParaMaior, formatarCarteira, proximaDenominacaoMaior, removerQuantidadeMoeda, taxasSaoPadrao } from '../moedas.js';
 import { carregarComprarAtivoPadrao, resetarTaxasMoeda, salvarComprarAtivoPadrao, salvarTaxasMoeda } from '../store.js';
-import { abrirModal, bonusProficiencia, calcMod, escHtml, fmtMod, fmtPeso, getCapacidadeCarga, getPesoTotalInventario, mdParaHtml, semAcento, toast } from '../utils.js';
+import { abrirModal, bonusProficiencia, calcMod, escHtml, fmtMod, fmtPeso, gerarId, getCapacidadeCarga, getPesoTotalInventario, localDoItem, mdParaHtml, semAcento, toast } from '../utils.js';
 import { abrirSeletorItens, carregarDadosEquipSheet } from '../itens-seletor.js';
 import { getEstadoFuria } from './classes/barbaro.js';
 import { getEstadoRecursosGuardiao } from './classes/guardiao.js';
@@ -16,7 +16,7 @@ import { ataqueImprudenteAtivo, calcVantagemDesvantagemAtaque, temArmaduraPesada
 import { sheetBadgeProf, sheetTemProfArma, sheetTemProfArmadura } from './condicoes.js';
 import { char, passivosTalentosCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
-import { htmlFormularioItemCustomizado, lerFormularioItemCustomizado } from './item-customizado-form.js';
+import { descricaoDePropriedade, htmlFormularioItemCustomizado, lerFormularioItemCustomizado, ligarEventosFormularioItemCustomizado } from './item-customizado-form.js';
 import { TETO_SINTONIZACAO, itensSintonizados, podeSintonizar } from '../regras-sintonizacao.js';
 
 // --- Inventário na ficha ---
@@ -24,7 +24,7 @@ import { TETO_SINTONIZACAO, itensSintonizados, podeSintonizar } from '../regras-
 export function getEstadoCarga() {
   const forca = char?.atributos?.forca || 0;
   const tamanho = char?.tamanho || 'Médio';
-  const pesoAtual = getPesoTotalInventario(char?.inventario || []);
+  const pesoAtual = getPesoTotalInventario(char?.inventario || [], char?.inventario_locais || []);
   const capacidade = getCapacidadeCarga(forca, tamanho);
   const sobrecarregado = capacidade > 0 && pesoAtual > capacidade;
   return { pesoAtual, capacidade, sobrecarregado };
@@ -51,15 +51,8 @@ export function renderSecaoInventario() {
   const _mostrarSobrecarga = _carga.sobrecarregado && !!char?.config?.sobrecarga_afeta_deslocamento;
   const _corCarga = _mostrarSobrecarga ? 'var(--danger)' : 'var(--text-muted)';
 
-  // Separar equipados, não equipados, e zerados
-  const equipados = [];
-  const naoEquipados = [];
-  const zerados = [];
-  inv.forEach((item, idx) => {
-    if ((item.quantidade ?? 1) <= 0) zerados.push(idx);
-    else if (item.equipado) equipados.push(idx);
-    else naoEquipados.push(idx);
-  });
+  // Separar equipados, não equipados, zerados e os locais customizados
+  const { equipados, naoEquipados, zerados, porLocal } = dividirInventario(inv, char.inventario_locais || []);
 
   return `
     <div class="card">
@@ -69,6 +62,7 @@ export function renderSecaoInventario() {
           <span style="font-weight:700;color:var(--secondary);font-size:0.9rem;cursor:pointer" id="btn-edit-po" title="Editar Carteira">${formatarCarteira(char.moedas)}</span>
           <button class="btn btn-sm btn-accent" id="btn-add-inv">+ Item</button>
           <button class="btn btn-sm btn-secondary" id="btn-add-inv-custom">+ Item Personalizado</button>
+          <button class="btn btn-sm btn-secondary" id="btn-add-inv-local" title="Criar um local para guardar itens (ex.: Bolsa de Armazenamento)">+ Local</button>
         </div>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-light);margin-bottom:6px">
@@ -85,15 +79,37 @@ export function renderSecaoInventario() {
       <div id="sheet-inventario">
         ${inv.length === 0
           ? '<div style="color:var(--text-muted);text-align:center;padding:12px;font-size:0.85rem">Inventario vazio</div>'
-          : renderSheetInvLista(equipados, naoEquipados, zerados)
+          : renderSheetInvLista(equipados, naoEquipados, zerados, porLocal)
         }
       </div>
     </div>
   `;
 }
 
+/**
+ * Divide o inventário em seções: esgotados (quantidade 0), itens guardados em
+ * cada local customizado, equipados e mochila. Devolve índices do array.
+ * @param {Array<object>} inv `char.inventario`
+ * @param {Array<object>} locais `char.inventario_locais`
+ * @returns {{equipados: number[], naoEquipados: number[], zerados: number[], porLocal: Object<string, number[]>}}
+ */
+function dividirInventario(inv, locais) {
+  const equipados = [];
+  const naoEquipados = [];
+  const zerados = [];
+  const porLocal = {};
+  inv.forEach((item, idx) => {
+    if ((item.quantidade ?? 1) <= 0) { zerados.push(idx); return; }
+    const local = localDoItem(item, locais);
+    if (local) { (porLocal[local.id] ||= []).push(idx); return; }
+    if (item.equipado) equipados.push(idx);
+    else naoEquipados.push(idx);
+  });
+  return { equipados, naoEquipados, zerados, porLocal };
+}
+
 /** Renderiza a lista do inventário separada por seções */
-function renderSheetInvLista(equipados, naoEquipados, zerados) {
+function renderSheetInvLista(equipados, naoEquipados, zerados, porLocal = {}) {
   let html = '';
 
   if (equipados.length > 0) {
@@ -115,6 +131,25 @@ function renderSheetInvLista(equipados, naoEquipados, zerados) {
     </div>`;
     html += `<div class="inv-secao-body${colapsada ? ' inv-secao-body-oculto' : ''}" data-inv-secao-body="mochila">`;
     html += naoEquipados.map(idx => renderSheetInvItem(char.inventario[idx], idx)).join('');
+    html += '</div>';
+  }
+
+  // Locais customizados (issue #80): uma seção por local, inclusive vazia.
+  for (const local of (char.inventario_locais || [])) {
+    const idxs = porLocal?.[local.id] || [];
+    const chave = `local_${local.id}`;
+    if (!(chave in _secoesInvColapsadas)) _secoesInvColapsadas[chave] = false;
+    const colapsada = _secoesInvColapsadas[chave];
+    html += `<div class="inv-secao-titulo${colapsada ? ' inv-secao-colapsada' : ''}" data-inv-secao="${escHtml(chave)}">
+      <span>${escHtml(local.nome)} (${idxs.length})${local.conta_peso === false ? ' <small>— não conta no peso</small>' : ''}</span>
+      <span class="no-print">
+        <button type="button" class="btn btn-sm btn-icon" data-inv-local-editar="${escHtml(local.id)}" title="Editar local">&#9998;</button>
+        <button type="button" class="btn btn-sm btn-icon" data-inv-local-remover="${escHtml(local.id)}" title="Remover local">&times;</button>
+        <span class="inv-secao-chevron">&#9660;</span>
+      </span>
+    </div>`;
+    html += `<div class="inv-secao-body${colapsada ? ' inv-secao-body-oculto' : ''}" data-inv-secao-body="${escHtml(chave)}">`;
+    html += idxs.map(idx => renderSheetInvItem(char.inventario[idx], idx)).join('');
     html += '</div>';
   }
 
@@ -292,6 +327,7 @@ function renderSheetInvItem(item, idx) {
     const caBaseItem = parseInt(item.dados?.ca_base) || 0;
     const batqMagia = parseInt(item.dados?.bonus_ataque_magia) || 0;
     const bcdMagia = parseInt(item.dados?.bonus_cd_magia) || 0;
+    if (item.dados?.tipo_item) customBadges += `<span class="badge" style="font-size:0.6rem;background:#e3f2fd;color:#1565c0;border:1px solid #90caf9">${escHtml(item.dados.tipo_item)}</span> `;
     if (caBaseItem > 0) customBadges += `<span class="badge" style="font-size:0.6rem;background:#e8eaf6;color:#3949ab;border:1px solid #9fa8da">CA ${caBaseItem}</span> `;
     if (bca !== 0) customBadges += `<span class="badge" style="font-size:0.6rem;background:#e8eaf6;color:#3949ab;border:1px solid #9fa8da">CA ${bca > 0 ? '+' : ''}${bca}</span> `;
     // Arma customizada já mostra Atq/Dano calculado (ataqueInfo/danoAutoInfo,
@@ -333,6 +369,14 @@ function renderSheetInvItem(item, idx) {
 
   const isZeroQtd = (item.quantidade ?? 1) <= 0;
 
+  // Mover para um local customizado (só aparece quando existe ao menos um).
+  const locaisInv = char.inventario_locais || [];
+  const seletorMover = locaisInv.length === 0 ? '' : `
+        <select class="form-input no-print" data-mover-inv="${idx}" title="Mover para (mover para um local desequipa o item)" style="width:auto;padding:1px 2px;font-size:0.7rem">
+          <option value="">Mochila</option>
+          ${locaisInv.map(l => `<option value="${escHtml(l.id)}"${item.local === l.id ? ' selected' : ''}>${escHtml(l.nome)}</option>`).join('')}
+        </select>`;
+
   return `
     <div class="inv-item ${item.equipado ? 'inv-item-equipado' : ''} ${isZeroQtd ? 'inv-item-zerado' : ''}" data-idx="${idx}">
       <div class="inv-drag-handle no-print" title="Arrastar para reordenar">&#9776;</div>
@@ -366,6 +410,7 @@ function renderSheetInvItem(item, idx) {
           <span style="min-width:20px;text-align:center;font-size:0.8rem;font-weight:700" data-qty-display="${idx}">${item.quantidade ?? 1}</span>
           <button class="btn btn-sm btn-icon" data-qty-plus="${idx}" style="font-size:0.7rem;padding:1px 5px">+</button>
         </div>
+        ${seletorMover}
         <label class="form-check inv-equip-label" title="Equipar/Desequipar">
           <input type="checkbox" data-sheet-equip="${idx}" ${item.equipado ? 'checked' : ''}> Eq.
         </label>
@@ -373,6 +418,94 @@ function renderSheetInvItem(item, idx) {
       </div>
     </div>
   `;
+}
+
+/** Abre o modal de criar (sem `local`) ou editar um local customizado do inventário. */
+function abrirModalLocalInventario(local = null) {
+  abrirModal(local ? 'Editar Local' : 'Novo Local', `
+    <div class="form-group">
+      <label class="form-label" for="il-nome">Nome</label>
+      <input type="text" class="form-input" id="il-nome" value="${escHtml(local?.nome || '')}" placeholder="Ex.: Bolsa de Armazenamento">
+    </div>
+    <label class="form-check" style="display:flex;align-items:center;gap:6px;cursor:pointer">
+      <input type="checkbox" id="il-conta-peso"${!local || local.conta_peso !== false ? ' checked' : ''}>
+      Os itens deste local contam no peso carregado
+    </label>
+    <div id="il-erro" style="display:none;color:var(--danger);font-size:0.8rem;margin-top:8px"></div>
+  `, '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-inv-local">Salvar</button>');
+
+  document.getElementById('btn-salvar-inv-local')?.addEventListener('click', () => {
+    const nome = (document.getElementById('il-nome')?.value || '').trim();
+    if (!nome) {
+      const erro = document.getElementById('il-erro');
+      if (erro) { erro.style.display = 'block'; erro.textContent = 'Informe um nome para o local.'; }
+      return;
+    }
+    const contaPeso = !!document.getElementById('il-conta-peso')?.checked;
+    if (!Array.isArray(char.inventario_locais)) char.inventario_locais = [];
+    if (local) {
+      local.nome = nome;
+      local.conta_peso = contaPeso;
+    } else {
+      char.inventario_locais.push({ id: gerarId(), nome, conta_peso: contaPeso });
+    }
+    salvar();
+    window.fecharModal();
+    renderFichaCompleta();
+  });
+}
+
+/**
+ * Liga os controles dos locais customizados: botão "+ Local", editar,
+ * remover (os itens voltam à Mochila) e o seletor "mover para" de cada item.
+ */
+function ligarEventosLocaisInventario() {
+  const btnNovo = document.getElementById('btn-add-inv-local');
+  if (btnNovo) btnNovo.onclick = () => abrirModalLocalInventario();
+
+  document.querySelectorAll('[data-inv-local-editar]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const local = (char.inventario_locais || []).find(l => l.id === btn.dataset.invLocalEditar);
+      if (local) abrirModalLocalInventario(local);
+    });
+  });
+
+  document.querySelectorAll('[data-inv-local-remover]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.invLocalRemover;
+      const local = (char.inventario_locais || []).find(l => l.id === id);
+      if (!local) return;
+      abrirModal('Remover Local',
+        `<p>Remover o local <strong>${escHtml(local.nome)}</strong>?</p><p style="font-size:0.85rem;color:var(--text-muted)">Os itens guardados nele voltam para a Mochila.</p>`,
+        '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-danger" id="btn-confirmar-remover-local">Remover</button>');
+      document.getElementById('btn-confirmar-remover-local')?.addEventListener('click', () => {
+        char.inventario_locais = (char.inventario_locais || []).filter(l => l.id !== id);
+        (char.inventario || []).forEach(item => { if (item.local === id) delete item.local; });
+        salvar();
+        window.fecharModal();
+        renderFichaCompleta();
+      });
+    });
+  });
+
+  document.querySelectorAll('[data-mover-inv]').forEach(sel => {
+    sel.addEventListener('change', () => {
+      const item = char.inventario[parseInt(sel.dataset.moverInv)];
+      if (!item) return;
+      if (sel.value) {
+        item.local = sel.value;
+        // Item guardado não fica equipado nem sintonizado.
+        item.equipado = false;
+        item.sintonizado = false;
+      } else {
+        delete item.local;
+      }
+      salvar();
+      renderFichaCompleta();
+    });
+  });
 }
 
 export function setupEventosInventarioSheet() {
@@ -406,12 +539,16 @@ export function setupEventosInventarioSheet() {
     });
   });
 
+  ligarEventosLocaisInventario();
+
   // Equipar/desequipar — re-renderiza a ficha completa para atualizar CA e stats
   document.querySelectorAll('[data-sheet-equip]').forEach(cb => {
     cb.addEventListener('change', () => {
       const idx = parseInt(cb.dataset.sheetEquip);
       if (char.inventario[idx]) {
         char.inventario[idx].equipado = cb.checked;
+        // Item equipado não fica guardado num local (issue #80).
+        if (cb.checked) delete char.inventario[idx].local;
 
         if (char.classe === 'Bárbaro' && temArmaduraPesadaEquipada()) {
           if (!char.recursos) char.recursos = {};
@@ -517,6 +654,7 @@ export function setupEventosInventarioSheet() {
   if (btnAddCustom) btnAddCustom.onclick = () => {
     abrirModal('Item Customizado', htmlFormularioItemCustomizado(),
       '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-add-ic">Adicionar</button>');
+    ligarEventosFormularioItemCustomizado();
 
     document.getElementById('btn-add-ic')?.addEventListener('click', () => {
       const { ok, valores } = lerFormularioItemCustomizado();
@@ -699,6 +837,7 @@ export function setupEventosInventarioSheet() {
 function abrirModalEditarItemCustomizado(item, idx) {
   abrirModal('Editar Item Customizado', htmlFormularioItemCustomizado(item),
     '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-ic">Salvar</button>');
+  ligarEventosFormularioItemCustomizado();
 
   document.getElementById('btn-salvar-ic')?.addEventListener('click', () => {
     const { ok, valores } = lerFormularioItemCustomizado();
@@ -734,18 +873,11 @@ function reRenderSheetInv() {
   if (!invEl) { renderFichaCompleta(); return; }
 
   const inv = char.inventario || [];
-  const equipados = [];
-  const naoEquipados = [];
-  const zerados = [];
-  inv.forEach((item, idx) => {
-    if ((item.quantidade ?? 1) <= 0) zerados.push(idx);
-    else if (item.equipado) equipados.push(idx);
-    else naoEquipados.push(idx);
-  });
+  const { equipados, naoEquipados, zerados, porLocal } = dividirInventario(inv, char.inventario_locais || []);
 
   invEl.innerHTML = inv.length === 0
     ? '<div style="color:var(--text-muted);text-align:center;padding:12px;font-size:0.85rem">Inventario vazio</div>'
-    : renderSheetInvLista(equipados, naoEquipados, zerados);
+    : renderSheetInvLista(equipados, naoEquipados, zerados, porLocal);
 
   // Atualizar barra de peso atual (fica fora de #sheet-inventario)
   const pesoEl = document.getElementById('sheet-peso-valor');
@@ -932,6 +1064,9 @@ function htmlPropriedadesEMaestria(d, propsDescs) {
   const propsNomes = d.propriedades.split(',').map(p => p.trim().replace(/\s*\(.*\)/, ''));
   const propsComDesc = propsNomes
     .map(nome => {
+      // Issue #104: a descrição da propriedade personalizada vem do item.
+      const propria = descricaoDePropriedade(nome, d.propriedades_personalizadas, []);
+      if (propria) return { nome, descricao: propria };
       const prop = propsDescs.find(p => semAcento(p.nome).toLowerCase() === semAcento(nome).toLowerCase());
       return prop ? { nome: prop.nome, descricao: prop.descricao } : null;
     })
@@ -1006,6 +1141,9 @@ async function mostrarDetalheItemSheet(item) {
     if (d.categoria) {
       corpo += `<div style="font-size:0.85rem;margin-bottom:6px"><strong>Categoria:</strong> ${d.categoria}</div>`;
       corpo += htmlPropriedadesEMaestria(d, propsDescs);
+    } else if (d.tipo_item) {
+      // Issue #100: categoria que não é arma (Armadura, Consumível...).
+      corpo += `<div style="font-size:0.85rem;margin-bottom:6px"><strong>Categoria:</strong> ${escHtml(d.tipo_item)}</div>`;
     }
 
     if (item.descricao) {

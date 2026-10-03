@@ -79,3 +79,53 @@ test('o formulario preenchido reflete raridade, preco e sintonizacao do item', (
   assert.ok(html.includes('3500 PO'), 'o preco tem de vir preenchido');
   assert.ok(/id="ic-sintonizacao"[^>]*checked/.test(html), 'a sintonizacao tem de vir marcada');
 });
+
+// --- Issue #100: categorias que nao sao arma ---
+test('separarCategoria: arma vai para categoria, tipo novo para tipo_item, resto vazio', () => {
+  const { separarCategoria, TIPOS_ITEM } = itemCustomForm;
+  assert.deepEqual(separarCategoria('Armas Marciais Corpo a Corpo'), { categoria: 'Armas Marciais Corpo a Corpo', tipo_item: '' });
+  for (const t of TIPOS_ITEM) assert.deepEqual(separarCategoria(t), { categoria: '', tipo_item: t });
+  assert.deepEqual(separarCategoria(''), { categoria: '', tipo_item: '' });
+  assert.deepEqual(separarCategoria('Qualquer coisa'), { categoria: '', tipo_item: '' });
+});
+
+test('o formulário oferece os tipos novos e o rótulo "—" no lugar de "não é arma"', () => {
+  const html = itemCustomForm.htmlFormularioItemCustomizado();
+  for (const t of itemCustomForm.TIPOS_ITEM) assert.match(html, new RegExp(`<option value="${t}"`));
+  assert.doesNotMatch(html, /não é arma/);
+});
+
+test('editar item com tipo_item seleciona o tipo; com categoria de arma seleciona a arma', () => {
+  const html = (d) => itemCustomForm.htmlFormularioItemCustomizado({ nome: 'x', dados: d });
+  assert.match(html({ tipo_item: 'Ferramenta' }), /<option value="Ferramenta" selected>/);
+  assert.match(html({ categoria: 'Armas Simples à Distância' }), /<option value="Armas Simples à Distância" selected>/);
+});
+
+// --- Issue #101: formulario em secoes recolhiveis ---
+test('secoesComValor: criação (item vazio) -> tudo recolhido; edição abre só a seção com dado', () => {
+  const { secoesComValor } = itemCustomForm;
+  assert.deepEqual(secoesComValor({}), { categoria: false, atributos: false, raridade: false });
+  assert.deepEqual(secoesComValor({ tipo_item: 'Ferramenta' }), { categoria: true, atributos: false, raridade: false });
+  assert.deepEqual(secoesComValor({ propriedades: 'Leve' }), { categoria: true, atributos: false, raridade: false });
+  assert.deepEqual(secoesComValor({ bonus_ca: '2' }), { categoria: false, atributos: true, raridade: false });
+  assert.deepEqual(secoesComValor({ bonus_ca: '0', bonus_ataque: '0', peso: '' }), { categoria: false, atributos: false, raridade: false });
+  assert.deepEqual(secoesComValor({ peso: '2 kg' }), { categoria: false, atributos: true, raridade: false });
+  assert.deepEqual(secoesComValor({ requer_sintonizacao: true }), { categoria: false, atributos: false, raridade: true });
+  assert.deepEqual(secoesComValor({ raridade: 'Rara' }), { categoria: false, atributos: false, raridade: true });
+});
+
+test('o formulário vem em seções <details> e mantém todos os ids', () => {
+  const html = itemCustomForm.htmlFormularioItemCustomizado();
+  assert.equal((html.match(/<details class="ic-secao"/g) || []).length, 3);
+  assert.doesNotMatch(html, /<details class="ic-secao"[^>]* open/, 'criação nasce recolhida');
+  for (const id of ['ic-nome', 'ic-desc', 'ic-ca', 'ic-ca-base', 'ic-dano', 'ic-atq', 'ic-categoria', 'ic-propriedades',
+    'ic-maestria', 'ic-atq-magia', 'ic-cd-magia', 'ic-peso', 'ic-raridade', 'ic-preco', 'ic-sintonizacao']) {
+    assert.match(html, new RegExp(`id="${id}"`), `${id} sumiu`);
+  }
+});
+
+test('edição abre a seção que tem dado', () => {
+  const html = itemCustomForm.htmlFormularioItemCustomizado({ nome: 'x', dados: { bonus_ca: '2' } });
+  assert.match(html, /<details class="ic-secao" data-ic-secao="atributos" open>/);
+  assert.match(html, /<details class="ic-secao" data-ic-secao="categoria">/);
+});

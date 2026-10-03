@@ -29,8 +29,8 @@ for (const rota of ROTAS) {
 
     await expect(
       page.locator('#app-content'),
-      `#${rota} deveria mostrar "Pagina nao encontrada"`
-    ).toContainText('Pagina nao encontrada');
+      `#${rota} deveria mostrar "Página não encontrada"`
+    ).toContainText('Página não encontrada');
 
     // O titulo cai no padrao, e nao no codigo-fonte de uma funcao herdada.
     const titulo = await page.locator('#header-titulo').textContent();

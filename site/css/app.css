@@ -1093,6 +1093,10 @@ tr:hover td { background: #faf8f4; }
   content: ''; flex: 1; height: 2px; background: var(--border-light);
 }
 
+.ic-secao { border: 1px solid var(--border-light); border-radius: var(--radius); margin: 8px 0; padding: 0 10px; }
+.ic-secao[open] { padding-bottom: 10px; }
+.ic-secao > summary { cursor: pointer; font-weight: 700; font-size: 0.85rem; padding: 8px 0; color: var(--primary); }
+
 /* --- Markdown renderizado --- */
 .md-content { font-size: 0.9rem; line-height: 1.6; }
 .md-content p { margin-bottom: 8px; }

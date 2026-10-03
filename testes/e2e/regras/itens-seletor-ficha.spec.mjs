@@ -19,7 +19,7 @@ import { abrirFicha, personagemSalvo, clicarBotaoFicha } from './helpers-regras.
 
 const SEMENTE_BASE = { classe: 'Guerreiro', nivel: 1 };
 
-test('ficha: modal "Adicionar Item" abre, lista as 5 categorias e a busca filtra', async ({ context }) => {
+test('ficha: modal "Adicionar Item" abre, lista as 6 categorias e a busca filtra', async ({ context }) => {
   const { page, erros } = await abrirFicha(context, SEMENTE_BASE, 'regras-itens-seletor-1');
 
   // Abrir pelo botão da ficha -- getElementById(...)?.click() puro é
@@ -28,10 +28,10 @@ test('ficha: modal "Adicionar Item" abre, lista as 5 categorias e a busca filtra
 
   // As 5 categorias do brief, na ordem certa.
   const filtros = page.locator('.filtro-inv-cat[data-cat]');
-  await expect(filtros).toHaveCount(5);
-  const categoriasEsperadas = ['armas', 'armaduras', 'consumiveis', 'municao', 'equipamento'];
+  await expect(filtros).toHaveCount(6);
+  const categoriasEsperadas = ['armas', 'armaduras', 'consumiveis', 'municao', 'equipamento', 'ferramentas'];
   const categoriasNoDOM = await filtros.evaluateAll(els => els.map(el => el.dataset.cat));
-  expect(categoriasNoDOM, 'categorias do filtro devem bater com as 5 do brief, na mesma ordem').toEqual(categoriasEsperadas);
+  expect(categoriasNoDOM, 'categorias do filtro devem bater com as 6 do brief (a 6ª, Ferramentas, é da issue #120), na mesma ordem').toEqual(categoriasEsperadas);
 
   // Toggle "Comprar" existe e começa desmarcado (preferência global só
   // fica marcada se salva antes -- contexto novo do teste, sem gravação prévia).

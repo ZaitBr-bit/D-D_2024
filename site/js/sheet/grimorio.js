@@ -773,7 +773,7 @@ export async function mostrarBuscaMagia() {
           <div class="opcao-card selecionada magia-dominio" style="opacity:0.7;cursor:default">
             <span class="opcao-check"></span>
             <div class="opcao-nome" data-detalhe-magia="${m.nome}" data-detalhe-circ="0" style="cursor:pointer"><span class="badge-dominio">&#9733;</span> ${m.nome}</div>
-            <div class="opcao-resumo"><span>Especie</span></div>
+            <div class="opcao-resumo"><span>Espécie</span></div>
           </div>
         `).join('')}</div>`;
       }

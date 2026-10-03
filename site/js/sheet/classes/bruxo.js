@@ -714,7 +714,7 @@ export function abrirModalPactoDoTomo() {
       </div>
       <div class="opcao-grid densa" id="tomo-truques-grid" style="max-height:25vh;overflow-y:auto">${renderTruquesGrid(filtroTruque)}</div>
 
-      <div class="section-divider"><span>Rituais de 1o Circulo (${rituaisSel.length}/2)</span></div>
+      <div class="section-divider"><span>Rituais de 1o Círculo (${rituaisSel.length}/2)</span></div>
       <div style="margin-bottom:6px">
         <select class="form-select" id="tomo-filtro-classe-ritual" style="font-size:0.75rem;padding:3px 6px">
           <option value="">Todas as classes</option>
