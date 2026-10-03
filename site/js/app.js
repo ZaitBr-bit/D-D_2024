@@ -11,11 +11,14 @@ import { VERSAO_ATUAL } from './versao.js';
 import { abrirNotasVersao } from './notas-versao.js';
 
 // --- Router baseado em hash ---
-const routes = {
-  'home': renderHome,
-  'criar': renderCreator,
-  'ficha': renderSheet
-};
+// Map, e não objeto literal: o hash da URL é texto livre do usuário e a busca
+// em objeto sobe a cadeia de protótipos (`#toString` devolveria a função
+// herdada de Object.prototype). `Map.get` só enxerga as chaves registradas.
+const routes = new Map([
+  ['home', renderHome],
+  ['criar', renderCreator],
+  ['ficha', renderSheet],
+]);
 
 /** Navegar para uma rota */
 export function navegar(rota) {
@@ -69,27 +72,20 @@ function atualizarSeloVersaoClicavel(pagina) {
 }
 
 /** Processa a rota atual do hash */
-/**
- * Le uma chave APENAS entre as proprias do objeto.
- *
- * O hash da URL e texto livre do usuario, e busca em objeto literal sobe
- * a cadeia de prototipos: `routes['toString']` devolveria a funcao
- * herdada de Object.prototype, que o router trataria como pagina valida
- * -- tela em branco no lugar do "Pagina nao encontrada", e o titulo do
- * header recebendo o codigo-fonte da funcao. Coberto por
- * `testes/e2e/regras/rota-desconhecida.spec.mjs`.
+/*
+ * As tabelas de rotas e de títulos são Map (ver `routes` acima): rota
+ * desconhecida cai em "Página não encontrada", inclusive nomes herdados de
+ * Object.prototype como `#toString`. Coberto por
+ * `testes/e2e/regras/rota-desconhecida.spec.mjs` (alerta CodeQL
+ * js/unvalidated-dynamic-method-call).
  */
-function proprio(obj, chave) {
-  return Object.prototype.hasOwnProperty.call(obj, chave) ? obj[chave] : undefined;
-}
-
 function processarRota() {
   const hash = window.location.hash.slice(1) || 'home';
   const partes = hash.split('/');
   const pagina = partes[0];
   const param = partes.slice(1).join('/');
 
-  const render = proprio(routes, pagina);
+  const render = routes.get(pagina);
   const content = document.getElementById('app-content');
   const btnVoltar = document.getElementById('btn-voltar');
   const acoes = document.getElementById('header-acoes');
@@ -128,12 +124,12 @@ function processarRota() {
   }
 
   // Definir título padrão
-  const titulos = {
-    'home': 'D&D 5.5 Ficha',
-    'criar': 'Novo Personagem',
-    'ficha': 'Ficha'
-  };
-  definirTituloHeader(proprio(titulos, pagina) || 'D&D 5.5 Ficha');
+  const titulos = new Map([
+    ['home', 'D&D 5.5 Ficha'],
+    ['criar', 'Novo Personagem'],
+    ['ficha', 'Ficha'],
+  ]);
+  definirTituloHeader(titulos.get(pagina) || 'D&D 5.5 Ficha');
   atualizarSeloVersaoClicavel(pagina);
 
   if (render) {
