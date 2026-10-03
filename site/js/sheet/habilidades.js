@@ -5146,13 +5146,17 @@ export function renderFeatureItem(f, source, ctx) {
     const _chaveOrdem = f.nome === 'Ordem Divina' ? 'ordem_divina' : 'ordem_primal';
     const _ordemEscolhida = char[_chaveOrdem] || char.escolhas_classe?.[_chaveOrdem]?.[0] || '';
     if (_ordemEscolhida) {
-      const _regexOpcao = new RegExp(`\\*\\*${_ordemEscolhida}\\.\\*\\*\\s*(.+?)(?=\\n\\*\\*|$)`, 's');
+      // A ordem vem do select do app ou de uma ficha importada: o nome entra
+      // escapado na RegExp (um "(" lançava SyntaxError e derrubava a ficha) e
+      // escapado no HTML (alerta CodeQL js/xss-through-dom).
+      const _ordemRegex = String(_ordemEscolhida).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const _regexOpcao = new RegExp(`\\*\\*${_ordemRegex}\\.\\*\\*\\s*(.+?)(?=\\n\\*\\*|$)`, 's');
       const _matchOpcao = f.descricao.match(_regexOpcao);
       const _descOpcao = _matchOpcao ? _matchOpcao[1].trim() : '';
       usosHtmlBody = `
         <div style="display:flex;align-items:center;gap:8px;padding:4px 0 4px 16px;flex-wrap:wrap">
-          <span class="badge badge-accent" style="font-size:0.8rem">${_ordemEscolhida}</span>
-          <span style="font-size:0.8rem">${_descOpcao}</span>
+          <span class="badge badge-accent" style="font-size:0.8rem">${escHtml(_ordemEscolhida)}</span>
+          <span style="font-size:0.8rem">${escHtml(_descOpcao)}</span>
         </div>
       `;
     }

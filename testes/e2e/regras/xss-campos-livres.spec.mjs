@@ -259,3 +259,40 @@ test('criador: tamanho da criatura nao vira marcacao no card', async ({ context 
   expect(resultado.tagsInjetadas, 'a carga virou tag no card de tamanho').toBe(0);
   expect(resultado.mostraTexto, 'o valor sumiu da tela em vez de virar texto').toBe(true);
 });
+
+// Alerta CodeQL js/xss-through-dom: a Ordem Divina/Primal escolhida
+// (`char.ordem_divina`, vinda do select do app OU de uma ficha importada)
+// era interpolada sem escape no card da caracteristica, e tambem entrava
+// numa RegExp sem escapar (valor com "(" derrubava a renderizacao da ficha).
+test('ficha: Ordem Divina importada nao vira HTML nem derruba a ficha', async ({ context }) => {
+  const { page, erros } = await abrirFicha(context, {
+    nome: 'Clerigo Importado',
+    classe: 'Clérigo',
+    nivel: 3,
+    atributos: ATRIBUTOS_REGRAS,
+    ordem_divina: CARGA,
+    classes: [{ classe: 'Clérigo', subclasse: '', nivel: 3, ordem: 0 }],
+    schema_versao: 2,
+  }, 'regras-xss-ordem-divina');
+
+  const { scriptRodou, tagsInjetadas } = await medirInjecao(page);
+  expect(scriptRodou, 'a Ordem Divina executou script ao abrir a ficha').toBeNull();
+  expect(tagsInjetadas, 'a carga virou tag <img> de verdade no DOM').toBe(0);
+  const texto = await page.evaluate(() => document.getElementById('app-content')?.textContent || '');
+  expect(texto, 'escapar nao pode virar apagar').toContain('XSS-MARCA');
+  expect(erros, `erros de console/pagina: ${erros.join('; ')}`).toEqual([]);
+});
+
+test('ficha: Ordem Divina com caractere de regex ("(") nao derruba a renderizacao', async ({ context }) => {
+  const { page, erros } = await abrirFicha(context, {
+    nome: 'Clerigo Regex',
+    classe: 'Clérigo',
+    nivel: 3,
+    atributos: ATRIBUTOS_REGRAS,
+    ordem_divina: 'Protetor (',
+    classes: [{ classe: 'Clérigo', subclasse: '', nivel: 3, ordem: 0 }],
+    schema_versao: 2,
+  }, 'regras-xss-ordem-regex');
+  await expect(page.locator('#char-nome-display')).toContainText('Clerigo Regex');
+  expect(erros, `erros de console/pagina: ${erros.join('; ')}`).toEqual([]);
+});
