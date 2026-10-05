@@ -69,6 +69,20 @@ export function trocaNoDescansoLongo(classe) {
 }
 
 /**
+ * Aviso exibido na troca de truque do Descanso Longo para quem não é Mago.
+ * Pelo Livro do Jogador (Classes.md, Mago: "Truques"), só o Mago troca truque
+ * ao completar um Descanso Longo; as demais classes trocam ao subir de nível.
+ * O app oferece a troca a todas por regra da casa (2026-08-13). Texto puro,
+ * sem HTML; quem exibe escapa. Devolve '' para o Mago.
+ * @param {string} classe Classe da superfície da troca.
+ * @returns {string}
+ */
+export function avisoTrocaTruqueForaDoLivro(classe) {
+  if (classe === 'Mago') return '';
+  return 'Pelo livro, só o Mago troca truque no Descanso Longo; as outras classes trocam ao subir de nível. Esta troca é uma opção do app.';
+}
+
+/**
  * O que a classe pode trocar ao avançar um nível: `'todas'` para toda classe
  * conjuradora. Mesma convenção de retorno.
  */

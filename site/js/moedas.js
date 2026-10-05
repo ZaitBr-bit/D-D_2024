@@ -173,6 +173,33 @@ export function converterParaMaior(moedas, tipo) {
   return { sucesso: true, moedas: m };
 }
 
+/**
+ * Denominacao logo abaixo de `tipo` e quantas moedas dela formam 1 de `tipo`,
+ * pelas taxas atuais (ex: pl -> {tipoDestino:'po', taxa:10}).
+ * Retorna null para `pc` (a menor) ou tipo desconhecido.
+ */
+export function proximaDenominacaoMenor(tipo) {
+  const idx = DENOMINACOES_ASC.indexOf(tipo);
+  if (idx <= 0) return null;
+  const tipoDestino = DENOMINACOES_ASC[idx - 1];
+  return { tipoDestino, taxa: VALOR_EM_COBRE[tipo] / VALOR_EM_COBRE[tipoDestino] };
+}
+
+/**
+ * Converte toda a pilha de `tipo` na denominacao logo abaixo (ex: 3 PL com
+ * taxa 10 -> +30 PO). Espelho de converterParaMaior: nao mexe nas demais
+ * denominacoes e preserva o valor total. Falha se a pilha for 0 ou `tipo`
+ * for a menor denominacao.
+ */
+export function converterParaMenor(moedas, tipo) {
+  const m = normalizarCarteira(moedas);
+  const prox = proximaDenominacaoMenor(tipo);
+  if (!prox || m[tipo] <= 0) return { sucesso: false, moedas: m };
+  m[prox.tipoDestino] += m[tipo] * prox.taxa;
+  m[tipo] = 0;
+  return { sucesso: true, moedas: m };
+}
+
 /** Formata a carteira como texto legivel, so denominacoes com saldo > 0 (ordem PL->PC) */
 export function formatarCarteira(moedas) {
   const m = normalizarCarteira(moedas);
@@ -208,4 +235,27 @@ export function pagarCusto(moedas, custoStr) {
   if (!c) return { sucesso: false, moedas: normalizarCarteira(moedas) };
   if (c.qtd <= 0) return { sucesso: true, moedas: normalizarCarteira(moedas) };
   return removerQuantidadeMoeda(moedas, c.tipo, c.qtd);
+}
+
+/**
+ * Interpreta o preço que o jogador digita ao adicionar um item (campo de
+ * quantidade + moeda). Vazio ou 0 = sem cobrança. Inteiro > 0 vira a string de
+ * custo no formato de parseCusto ("50 PO"). Negativo, decimal, texto ou moeda
+ * inválida devolvem ok:false com a mensagem para o toast. Não guarda nada.
+ * @param {string|null|undefined} qtdTexto Conteúdo do campo numérico.
+ * @param {string} tipo Denominação escolhida (pl, po, pe, pp, pc).
+ * @returns {{ok: boolean, custo: string|null, erro: string}}
+ */
+export function interpretarPrecoInformado(qtdTexto, tipo) {
+  const texto = String(qtdTexto ?? '').trim();
+  if (texto === '') return { ok: true, custo: null, erro: '' };
+  if (!/^\d+$/.test(texto)) {
+    return { ok: false, custo: null, erro: 'Informe um valor inteiro maior ou igual a zero.' };
+  }
+  const qtd = parseInt(texto, 10);
+  if (qtd === 0) return { ok: true, custo: null, erro: '' };
+  if (!DENOMINACOES.includes(tipo)) {
+    return { ok: false, custo: null, erro: 'Escolha a moeda do preço.' };
+  }
+  return { ok: true, custo: `${qtd} ${tipo.toUpperCase()}`, erro: '' };
 }

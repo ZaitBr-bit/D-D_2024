@@ -32,6 +32,9 @@ export const CATEGORIAS_ARMA = [
 // de arma, e não pode receber valor que não seja de arma.
 export const TIPOS_ITEM = ['Armadura', 'Consumível', 'Munição', 'Equipamento', 'Item Mágico', 'Ferramenta'];
 
+// Tipos de armadura do livro; `Escudo` entra aqui porque a proficiência dele é separada (regras-equipamento.js).
+export const TIPOS_ARMADURA = ['Leve', 'Média', 'Pesada', 'Escudo'];
+
 /**
  * Separa o valor do select de categoria nos dois campos gravados no item:
  * categoria de arma -> `categoria`; tipo de item -> `tipo_item`; qualquer
@@ -146,6 +149,25 @@ export function htmlFormularioItemCustomizado(item = null) {
           </optgroup>
         </select>
         <div style="font-size:0.65rem;color:var(--text-muted)">categoria de arma define proficiência e o modificador de ataque (Força/Destreza), como uma arma de catálogo</div>
+      </div>
+      <div id="ic-armadura-campos" style="display:${d.tipo_item === 'Armadura' ? 'block' : 'none'};margin-bottom:8px">
+        <div class="row gap-1">
+          <div class="col">
+            <label class="form-label" for="ic-tipo-armadura">Tipo de armadura</label>
+            <select class="form-input" id="ic-tipo-armadura">
+              <option value=""${!d.tipo_armadura ? ' selected' : ''}>—</option>
+              ${TIPOS_ARMADURA.map(t => `<option value="${t}"${d.tipo_armadura === t ? ' selected' : ''}>${t}</option>`).join('')}
+            </select>
+            <div style="font-size:0.65rem;color:var(--text-muted)">define se a ficha mostra a proficiência</div>
+          </div>
+          <div class="col">
+            <label class="form-label" for="ic-req-forca">Requisito de Força</label>
+            <input type="number" class="form-input" id="ic-req-forca" min="0" step="1" value="${parseInt(String(d.requisito_forca || '').replace(/\D/g, '')) || ''}" placeholder="—">
+          </div>
+        </div>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-top:6px">
+          <input type="checkbox" id="ic-desv-furtividade"${d.furtividade === 'Desvantagem' ? ' checked' : ''}> Desvantagem em Furtividade
+        </label>
       </div>
       <div class="row gap-1">
         <div class="col">
@@ -286,6 +308,12 @@ function criarChipPropriedade(nome, descricao = '') {
  * Chamar logo depois de abrir o modal.
  */
 export function ligarEventosFormularioItemCustomizado() {
+  // Campos de armadura só aparecem quando a categoria é Armadura.
+  const selCategoria = document.getElementById('ic-categoria');
+  const camposArmadura = document.getElementById('ic-armadura-campos');
+  selCategoria?.addEventListener('change', () => {
+    if (camposArmadura) camposArmadura.style.display = selCategoria.value === 'Armadura' ? 'block' : 'none';
+  });
   const lista = document.getElementById('ic-props-lista');
   const painel = document.getElementById('ic-prop-painel');
   const select = document.getElementById('ic-prop-select');
@@ -358,6 +386,9 @@ export function lerFormularioItemCustomizado() {
   const caBase = caBaseRaw === '' ? '' : String(parseInt(caBaseRaw) || 0);
   const pesoRaw = val('ic-peso');
   const pesoNum = pesoRaw ? parseFloat(pesoRaw.replace(',', '.')) : 0;
+  // Campos de armadura valem só com a categoria Armadura; outra categoria grava vazio (a edição precisa poder limpar).
+  const ehArmadura = tipo_item === 'Armadura';
+  const reqForca = parseInt(document.getElementById('ic-req-forca')?.value) || 0;
 
   const erros = validarItemCustomizado({ nome, dano });
   const errosEl = document.getElementById('ic-erros');
@@ -382,6 +413,9 @@ export function lerFormularioItemCustomizado() {
         bonus_ataque: String(atq),
         categoria,
         tipo_item,
+        tipo_armadura: ehArmadura ? val('ic-tipo-armadura') : '',
+        requisito_forca: ehArmadura && reqForca > 0 ? `For ${reqForca}` : '',
+        furtividade: ehArmadura && document.getElementById('ic-desv-furtividade')?.checked ? 'Desvantagem' : '',
         propriedades,
         // Sempre grava (inclusive []): a edição faz merge e precisa poder apagar.
         propriedades_personalizadas,

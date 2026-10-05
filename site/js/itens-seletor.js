@@ -15,7 +15,11 @@
 // de sessao em vez do localStorage.
 // ============================================================
 import { getArmaduras, getArmas, getEquipamentoAventura, getFerramentas, getItensMagicos } from './db.js';
-import { aplicarSeVigente, criarGuardaRequisicao, renderCategoriaMagicos } from './itens-magicos-ui.js';
+import {
+  abrirItemMagico, aplicarSeVigente, criarGuardaRequisicao, htmlLinhaItemMagico, renderCategoriaMagicos
+} from './itens-magicos-ui.js';
+import { filtrarAcervo } from './itens-magicos-catalogo.js';
+import { ajustarOverlayAoTeclado } from './modal-teclado.js';
 import { pagarCusto, parseCusto, podePagarCusto } from './moedas.js';
 import { abrirModal, escHtml, mdParaHtml, semAcento, toast } from './utils.js';
 import {
@@ -25,6 +29,16 @@ import {
 
 /** Cache local dos dados de equipamento */
 let _cacheEquipSheet = null;
+
+/** Categorias da loja, na ordem em que a busca em "Todos" as percorre. */
+const CATEGORIAS_DA_LOJA = ['armas', 'armaduras', 'consumiveis', 'municao', 'equipamento', 'ferramentas'];
+/** Rótulo da categoria de origem mostrado nos resultados da busca em "Todos". */
+const ROTULO_CATEGORIA = {
+  armas: 'Armas', armaduras: 'Armaduras', consumiveis: 'Consumíveis',
+  municao: 'Munição', equipamento: 'Equipamento', ferramentas: 'Ferramentas',
+};
+/** Máximo de linhas renderizadas por busca em "Todos". */
+const LIMITE_RESULTADOS_TODOS = 80;
 
 /**
  * Monta a lista de ferramentas da loja a partir da tabela do livro.
@@ -111,11 +125,20 @@ export async function abrirSeletorItens(ctx) {
 
   const consumiveis = dados.equipAvent.filter(i => ITENS_CONSUMIVEIS.some(c => i.nome.includes(c)));
   const municao = dados.municao || [];
+  // Na ficha (`ctx.permitirMagicos`) o Pergaminho Mágico só existe em Itens
+  // Mágicos (issue #103): a escolha da magia mora lá. O criador não tem essa
+  // categoria e continua listando o pergaminho em Equipamento. O registro
+  // segue em equipamento_aventura.json porque a variante do acervo o usa
+  // (`livro_jogador`); só a listagem da ficha o esconde.
+  const ehPergaminhoMagico = (i) => !!ctx.permitirMagicos && i.nome.startsWith('Pergaminho Mágico');
   const outrosEquip = dados.equipAvent.filter(i =>
-    !ITENS_CONSUMIVEIS.some(c => i.nome.includes(c))
+    !ITENS_CONSUMIVEIS.some(c => i.nome.includes(c)) && !ehPergaminhoMagico(i)
   );
 
   const categorias = [
+    // "Todos" não lista nada sem busca (evita renderizar o catálogo inteiro);
+    // com texto, varre todas as categorias ignorando os filtros delas.
+    { id: 'todos', label: 'Todos', icon: '&#128269;' },
     { id: 'armas', label: 'Armas', icon: '&#9876;' },
     { id: 'armaduras', label: 'Armaduras', icon: '&#128737;' },
     { id: 'consumiveis', label: 'Consumiveis', icon: '&#9878;' },
@@ -132,20 +155,23 @@ export async function abrirSeletorItens(ctx) {
   const guardaBuscaMagicos = criarGuardaRequisicao();
 
   const html = `
-    <div class="search-box"><input type="text" id="busca-inv-cat" placeholder="Buscar item..." class="form-input"></div>
-    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
-      ${categorias.map(c => `
-        <button class="btn btn-sm btn-outline filtro-inv-cat ${c.id === 'armas' ? 'active' : ''}" data-cat="${c.id}">
-          <span>${c.icon}</span> ${c.label}
-        </button>
-      `).join('')}
-    </div>
-    <div id="lista-inv-cat" style="min-height:35dvh;max-height:50dvh;overflow-y:auto"></div>
+    <div class="search-box"><input type="text" id="busca-inv-cat" placeholder="Buscar item..." class="form-input" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"></div>
+    <select class="form-input filtro-tipo-compacto faixa-recolhivel" id="sel-inv-cat" aria-label="Categoria">
+      ${categorias.map(c => `<option value="${c.id}"${c.id === 'armas' ? ' selected' : ''}>${c.label}</option>`).join('')}
+    </select>
+    <div id="lista-inv-cat"></div>
   `;
 
+  // Layout próprio do seletor (altura fixa, só a lista rola) e ajuste ao
+  // teclado virtual; ambos são desfeitos ao fechar o modal.
+  let desligarTeclado = () => {};
   abrirModal('Adicionar Item', html, '', () => {
     document.getElementById('toggle-comprar-item')?.closest('label')?.remove();
+    document.getElementById('modal-container')?.classList.remove('seletor-itens');
+    desligarTeclado();
   });
+  document.getElementById('modal-container')?.classList.add('seletor-itens');
+  desligarTeclado = ajustarOverlayAoTeclado(document.getElementById('modal-overlay'));
 
   let catAtual = 'armas';
   let comprarAtivo = ctx.lerComprarAtivo();
@@ -177,8 +203,15 @@ export async function abrirSeletorItens(ctx) {
     });
   }
 
-  /** Renderiza a lista de itens da categoria escolhida em #lista-inv-cat, aplicando o filtro de busca, e liga o clique de cada item ao popup de detalhe/confirmação */
-  function renderCategoria(cat, filtroTexto) {
+  /**
+   * Renderiza a lista de itens da categoria escolhida em #lista-inv-cat,
+   * aplicando o filtro de busca, e liga o clique de cada item ao popup de
+   * detalhe/confirmação.
+   * @param {string} cat id da categoria ('todos' inclusive)
+   * @param {string} filtroTexto busca já normalizada por semAcento
+   * @param {Array<object>} [magicosTodos] só para 'todos': itens do acervo que casam a busca (undefined = ainda não carregados)
+   */
+  function renderCategoria(cat, filtroTexto, magicosTodos) {
     const listaEl = document.getElementById('lista-inv-cat');
     if (!listaEl) return;
 
@@ -204,105 +237,134 @@ export async function abrirSeletorItens(ctx) {
       }, avisoErro);
       return;
     }
+    // Todos sem texto: não lista nada, o catálogo inteiro não é renderizado.
+    if (cat === 'todos' && !filtroTexto) {
+      guardaBuscaMagicos.nova();
+      listaEl.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:16px">Digite para buscar em todos os itens</div>';
+      return;
+    }
+    // Todos com texto, na ficha: o acervo de itens mágicos entra na busca e
+    // chega de forma assíncrona; a lista só renderiza quando ele chega (ou falha).
+    if (cat === 'todos' && ctx.permitirMagicos && magicosTodos === undefined) {
+      aplicarSeVigente(guardaBuscaMagicos, getItensMagicos(), acervo => {
+        if (catAtual !== 'todos') return;
+        renderCategoria('todos', filtroTexto, acervo?.itens ? filtrarAcervo(acervo.itens, { texto: filtroTexto }) : []);
+      }, () => {
+        if (catAtual === 'todos') renderCategoria('todos', filtroTexto, []);
+      });
+      return;
+    }
     // Outra categoria invalida qualquer busca de itens mágicos ainda em andamento.
     guardaBuscaMagicos.nova();
 
+    // "Todos" percorre as categorias da loja e ignora os filtros de arma e
+    // armadura; as demais categorias renderizam só a própria.
+    const ehTodos = cat === 'todos';
+    const fArma = ehTodos ? 'todas' : filtroArma;
+    const fArmadura = ehTodos ? 'todas' : filtroArmadura;
+    const acumulado = [];
     let itens = [];
-    switch (cat) {
-      case 'armas':
-        itens = dados.armas.map(a => {
-          const prof = temProficienciaArma(ctx.personagem, a);
-          // Verificar se o personagem tem maestria com esta arma
-          const temMaestriaArma = (ctx.personagem.maestrias_arma || []).includes(a.nome);
-          const maestriaBadgeAdd = temMaestriaArma && a.maestria
-            ? `<span class="badge" style="font-size:0.6rem;background:#fff8e1;color:#e65100;border:1px solid #ffcc80;font-weight:700">Maestria: ${a.maestria}</span>`
-            : '';
-          return {
-            nome: a.nome,
-            detalhe: `${a.dano} | ${a.propriedades || '\u2014'}`,
-            detalhe2: `Maestria: ${a.maestria || '\u2014'} | ${a.custo} | ${a.peso || '\u2014'}`,
-            badge: badgeProficiencia(prof) + (maestriaBadgeAdd ? ' ' + maestriaBadgeAdd : ''),
-            badgeCat: `<span class="badge badge-secondary">${a.categoria?.includes('Dist') ? 'Dist\u00e2ncia' : 'Corpo'}</span>`,
-            prof,
-            dados: a,
-            tipo: 'arma'
-          };
-        });
-        // Proficientes primeiro
-        itens.sort((a, b) => (a.prof ? 0 : 1) - (b.prof ? 0 : 1));
-        if (filtroArma === 'proficiente') itens = itens.filter(i => i.prof);
-        else if (filtroArma === 'simples') itens = itens.filter(i => (i.dados.categoria || '').includes('Simples'));
-        else if (filtroArma === 'marcial') itens = itens.filter(i => (i.dados.categoria || '').includes('Marciai'));
-        break;
-      case 'armaduras':
-        itens = dados.armaduras.map(a => {
-          const prof = temProficienciaArmadura(ctx.personagem, a);
-          const extras = [];
-          if (a.requisito_forca && a.requisito_forca !== '\u2014') extras.push(`For: ${a.requisito_forca}`);
-          if (a.furtividade && a.furtividade !== '\u2014') extras.push(`Furt.: ${a.furtividade}`);
-          const reqOk = atendeRequisitoForca(ctx.personagem, a);
-          const avisoForca = reqOk ? '' : ' <span class="badge badge-warn">For. insuficiente</span>';
-          return {
-            nome: a.nome,
-            detalhe: `CA: ${a.ca}${extras.length ? ' | ' + extras.join(' | ') : ''}`,
-            detalhe2: `${a.custo} | ${a.peso || '\u2014'}`,
-            badge: badgeProficiencia(prof) + avisoForca,
-            badgeCat: `<span class="badge badge-secondary">${a.categoria}</span>`,
-            prof,
-            dados: a,
-            tipo: a.nome === 'Escudo' ? 'escudo' : 'armadura'
-          };
-        });
-        itens.sort((a, b) => (a.prof ? 0 : 1) - (b.prof ? 0 : 1));
-        if (filtroArmadura === 'proficiente') itens = itens.filter(i => i.prof);
-        else if (filtroArmadura === 'leve') itens = itens.filter(i => semAcento(i.dados.categoria || '').toLowerCase() === 'leve');
-        else if (filtroArmadura === 'media') itens = itens.filter(i => semAcento(i.dados.categoria || '').toLowerCase() === 'media');
-        else if (filtroArmadura === 'pesada') itens = itens.filter(i => semAcento(i.dados.categoria || '').toLowerCase() === 'pesada');
-        // Escudo (categoria "Escudo" no JSON) nao bate com leve/media/pesada
-        // -- os tres filtros de peso o excluem sozinhos, sem caso especial.
-        // Ele so aparece em "todas" e "proficiente" (se o personagem tiver
-        // proficiencia em escudos), que e o comportamento razoavel.
-        break;
-      case 'consumiveis':
-        itens = consumiveis.map(i => ({
-          nome: i.nome,
-          detalhe: `${i.custo} | ${i.peso || '\u2014'}`,
-          detalhe2: i.descricao ? (i.descricao.length > 80 ? i.descricao.substring(0, 80) + '…' : i.descricao) : '',
-          badge: '<span class="badge" style="font-size:0.6rem;background:#e8f5e9;color:#2e7d32">Consumível</span>',
-          badgeCat: '',
-          dados: i,
-          tipo: 'equipamento'
-        }));
-        break;
-      case 'municao':
-        itens = municao.map(i => ({
-          nome: i.nome,
-          detalhe: `${i.custo} | ${i.peso || '\u2014'}`,
-          badge: '', badgeCat: '',
-          dados: i,
-          tipo: 'equipamento'
-        }));
-        break;
-      case 'equipamento':
-        itens = outrosEquip.map(i => ({
-          nome: i.nome,
-          detalhe: `${i.custo} | ${i.peso || '\u2014'}`,
-          badge: '', badgeCat: '',
-          dados: i,
-          tipo: 'equipamento'
-        }));
-        break;
-      case 'ferramentas':
-        itens = (dados.ferramentasLoja || []).map(i => ({
-          nome: i.nome,
-          detalhe: `${i.custo || '—'} | ${i.peso || '—'}`,
-          badge: '<span class="badge" style="font-size:0.6rem;background:#e3f2fd;color:#1565c0">Ferramenta</span>',
-          badgeCat: '',
-          dados: i,
-          tipo: 'equipamento'
-        }));
-        break;
+    for (const catItem of (ehTodos ? CATEGORIAS_DA_LOJA : [cat])) {
+      itens = [];
+      switch (catItem) {
+        case 'armas':
+          itens = dados.armas.map(a => {
+            const prof = temProficienciaArma(ctx.personagem, a);
+            // Verificar se o personagem tem maestria com esta arma
+            const temMaestriaArma = (ctx.personagem.maestrias_arma || []).includes(a.nome);
+            const maestriaBadgeAdd = temMaestriaArma && a.maestria
+              ? `<span class="badge" style="font-size:0.6rem;background:#fff8e1;color:#e65100;border:1px solid #ffcc80;font-weight:700">Maestria: ${a.maestria}</span>`
+              : '';
+            return {
+              nome: a.nome,
+              detalhe: `${a.dano} | ${a.propriedades || '\u2014'}`,
+              detalhe2: `Maestria: ${a.maestria || '\u2014'} | ${a.custo} | ${a.peso || '\u2014'}`,
+              badge: badgeProficiencia(prof) + (maestriaBadgeAdd ? ' ' + maestriaBadgeAdd : ''),
+              badgeCat: `<span class="badge badge-secondary">${a.categoria?.includes('Dist') ? 'Dist\u00e2ncia' : 'Corpo'}</span>`,
+              prof,
+              dados: a,
+              tipo: 'arma'
+            };
+          });
+          // Proficientes primeiro
+          itens.sort((a, b) => (a.prof ? 0 : 1) - (b.prof ? 0 : 1));
+          if (fArma === 'proficiente') itens = itens.filter(i => i.prof);
+          else if (fArma === 'simples') itens = itens.filter(i => (i.dados.categoria || '').includes('Simples'));
+          else if (fArma === 'marcial') itens = itens.filter(i => (i.dados.categoria || '').includes('Marciai'));
+          break;
+        case 'armaduras':
+          itens = dados.armaduras.map(a => {
+            const prof = temProficienciaArmadura(ctx.personagem, a);
+            const extras = [];
+            if (a.requisito_forca && a.requisito_forca !== '\u2014') extras.push(`For: ${a.requisito_forca}`);
+            if (a.furtividade && a.furtividade !== '\u2014') extras.push(`Furt.: ${a.furtividade}`);
+            const reqOk = atendeRequisitoForca(ctx.personagem, a);
+            const avisoForca = reqOk ? '' : ' <span class="badge badge-warn">For. insuficiente</span>';
+            return {
+              nome: a.nome,
+              detalhe: `CA: ${a.ca}${extras.length ? ' | ' + extras.join(' | ') : ''}`,
+              detalhe2: `${a.custo} | ${a.peso || '\u2014'}`,
+              badge: badgeProficiencia(prof) + avisoForca,
+              badgeCat: `<span class="badge badge-secondary">${a.categoria}</span>`,
+              prof,
+              dados: a,
+              tipo: a.nome === 'Escudo' ? 'escudo' : 'armadura'
+            };
+          });
+          itens.sort((a, b) => (a.prof ? 0 : 1) - (b.prof ? 0 : 1));
+          if (fArmadura === 'proficiente') itens = itens.filter(i => i.prof);
+          else if (fArmadura === 'leve') itens = itens.filter(i => semAcento(i.dados.categoria || '').toLowerCase() === 'leve');
+          else if (fArmadura === 'media') itens = itens.filter(i => semAcento(i.dados.categoria || '').toLowerCase() === 'media');
+          else if (fArmadura === 'pesada') itens = itens.filter(i => semAcento(i.dados.categoria || '').toLowerCase() === 'pesada');
+          // Escudo (categoria "Escudo" no JSON) nao bate com leve/media/pesada
+          // -- os tres filtros de peso o excluem sozinhos, sem caso especial.
+          // Ele so aparece em "todas" e "proficiente" (se o personagem tiver
+          // proficiencia em escudos), que e o comportamento razoavel.
+          break;
+        case 'consumiveis':
+          itens = consumiveis.map(i => ({
+            nome: i.nome,
+            detalhe: `${i.custo} | ${i.peso || '\u2014'}`,
+            detalhe2: i.descricao ? (i.descricao.length > 80 ? i.descricao.substring(0, 80) + '…' : i.descricao) : '',
+            badge: '<span class="badge" style="font-size:0.6rem;background:#e8f5e9;color:#2e7d32">Consumível</span>',
+            badgeCat: '',
+            dados: i,
+            tipo: 'equipamento'
+          }));
+          break;
+        case 'municao':
+          itens = municao.map(i => ({
+            nome: i.nome,
+            detalhe: `${i.custo} | ${i.peso || '\u2014'}`,
+            badge: '', badgeCat: '',
+            dados: i,
+            tipo: 'equipamento'
+          }));
+          break;
+        case 'equipamento':
+          itens = outrosEquip.map(i => ({
+            nome: i.nome,
+            detalhe: `${i.custo} | ${i.peso || '\u2014'}`,
+            badge: '', badgeCat: '',
+            dados: i,
+            tipo: 'equipamento'
+          }));
+          break;
+        case 'ferramentas':
+          itens = (dados.ferramentasLoja || []).map(i => ({
+            nome: i.nome,
+            detalhe: `${i.custo || '—'} | ${i.peso || '—'}`,
+            badge: '<span class="badge" style="font-size:0.6rem;background:#e3f2fd;color:#1565c0">Ferramenta</span>',
+            badgeCat: '',
+            dados: i,
+            tipo: 'equipamento'
+          }));
+          break;
+      }
+      // Na busca em Todos cada item leva o nome da categoria de origem.
+      acumulado.push(...itens.map(i => (ehTodos ? { ...i, catRotulo: ROTULO_CATEGORIA[catItem] } : i)));
     }
+    itens = acumulado;
 
     // Filtrar por texto: nome + os dois campos de detalhe (dano/propriedades/
     // maestria/custo/peso, conforme a categoria) + o badge de categoria
@@ -332,31 +394,52 @@ export async function abrirSeletorItens(ctx) {
     // linha e a unificacao original perdeu a capacidade). Nas demais
     // categorias, nenhuma linha, como antes.
     const filtrosLinhaHtml = cat === 'armas' ? `
-      <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
+      <div class="faixa-chips faixa-recolhivel">
         ${[['todas', 'Todas'], ['proficiente', 'Proficientes'], ['simples', 'Simples'], ['marcial', 'Marcial']]
           .map(([id, rotulo]) => `
             <button class="btn btn-sm btn-outline filtro-arma ${filtroArma === id ? 'active' : ''}" data-filtro-arma="${id}">${rotulo}</button>
           `).join('')}
       </div>` : cat === 'armaduras' ? `
-      <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
+      <div class="faixa-chips faixa-recolhivel">
         ${[['todas', 'Todas'], ['proficiente', 'Proficientes'], ['leve', 'Leve'], ['media', 'Média'], ['pesada', 'Pesada']]
           .map(([id, rotulo]) => `
             <button class="btn btn-sm btn-outline filtro-armadura ${filtroArmadura === id ? 'active' : ''}" data-filtro-armadura="${id}">${rotulo}</button>
           `).join('')}
       </div>` : '';
 
-    listaEl.innerHTML = filtrosLinhaHtml + (itens.length === 0
+    // Em Todos a lista é limitada (itens da loja primeiro, depois mágicos):
+    // uma busca curta casa centenas de itens e travaria o celular.
+    const magicosEncontrados = ehTodos ? (magicosTodos || []) : [];
+    const totalEncontrado = itens.length + magicosEncontrados.length;
+    const magicosVisiveis = [];
+    if (ehTodos) {
+      itens = itens.slice(0, LIMITE_RESULTADOS_TODOS);
+      magicosVisiveis.push(...magicosEncontrados.slice(0, LIMITE_RESULTADOS_TODOS - itens.length));
+    }
+    const avisoLimite = ehTodos && totalEncontrado > LIMITE_RESULTADOS_TODOS
+      ? `<div style="color:var(--text-muted);text-align:center;padding:12px;font-size:0.8rem">Mostrando ${LIMITE_RESULTADOS_TODOS} de ${totalEncontrado} resultados — refine a busca para ver os demais.</div>`
+      : '';
+
+    listaEl.innerHTML = filtrosLinhaHtml + (itens.length === 0 && magicosVisiveis.length === 0
       ? '<div style="color:var(--text-muted);text-align:center;padding:16px">Nenhum item encontrado</div>'
       : itens.map((it, i) => `
         <div class="inv-item ${it.prof === false ? 'item-sem-prof' : ''}" style="cursor:pointer" data-add-cat="${i}">
           <div style="flex:1">
-            <div class="inv-item-nome">${escHtml(it.nome)} ${it.badge}</div>
+            <div class="inv-item-nome">${escHtml(it.nome)} ${it.badge}${it.catRotulo ? ` <span style="font-size:0.65rem;font-weight:400;color:var(--text-muted)">${it.catRotulo}</span>` : ''}</div>
             <div class="inv-item-detalhe">${it.detalhe}</div>
             ${it.detalhe2 ? `<div class="inv-item-detalhe" style="font-size:0.7rem;opacity:0.7">${it.detalhe2}</div>` : ''}
           </div>
           ${it.badgeCat || ''}
         </div>
-      `).join(''));
+      `).join('') + magicosVisiveis.map((it, i) => htmlLinhaItemMagico(it, i)).join('') + avisoLimite);
+
+    // Itens mágicos da busca em Todos: mesmo modal de detalhe da categoria Itens Mágicos.
+    listaEl.querySelectorAll('[data-item-magico]').forEach(el => el.addEventListener('click', () => {
+      abrirItemMagico(magicosVisiveis[parseInt(el.dataset.itemMagico)], {
+        catalogos: { armas: dados.armas, armaduras: dados.armaduras },
+        equipamentoPHB: dados.equipAvent, personagem: ctx.personagem, aoAdicionar: ctx.aoAdicionar,
+      });
+    }));
 
     // Religar os cliques dos filtros de arma/armadura: a lista e remontada a
     // cada render, entao os listeners precisam ser refeitos junto. Atributos
@@ -520,19 +603,19 @@ export async function abrirSeletorItens(ctx) {
   renderCategoria(catAtual, '');
 
   // Eventos de troca de categoria
-  document.querySelectorAll('.filtro-inv-cat').forEach(btn => {
-    btn.addEventListener('click', () => {
-      catAtual = btn.dataset.cat;
-      document.querySelectorAll('.filtro-inv-cat').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const termo = semAcento(document.getElementById('busca-inv-cat')?.value || '');
-      renderCategoria(catAtual, termo);
-    });
+  document.getElementById('sel-inv-cat')?.addEventListener('change', (e) => {
+    catAtual = e.target.value;
+    const termo = semAcento(document.getElementById('busca-inv-cat')?.value || '');
+    renderCategoria(catAtual, termo);
   });
 
   // Busca por texto
   document.getElementById('busca-inv-cat')?.addEventListener('input', (e) => {
     const termo = semAcento(e.target.value);
     renderCategoria(catAtual, termo);
+  });
+  // Enter ("Buscar" no teclado do celular) fecha o teclado e devolve as faixas de chips.
+  document.getElementById('busca-inv-cat')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') e.target.blur();
   });
 }

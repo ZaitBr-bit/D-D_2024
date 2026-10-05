@@ -13,13 +13,45 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.1.0';
+export const VERSAO_ATUAL = '3.1.1';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.1.1',
+    data: '2026-10-05',
+    rotulo: 'Pergaminho e carteira',
+    resumo: 'Pergaminho Mágico com a magia escolhida, preço informado ao '
+      + 'adicionar item mágico, conversão de moedas para baixo e armadura '
+      + 'personalizada completa.',
+    melhorias: [
+      {
+        grupo: '✨ Melhorias',
+        itens: [
+          'Pergaminho Mágico agora só existe em Itens Mágicos: escolha o '
+            + 'círculo e a magia (ou deixe "Em branco") numa grade de cards. '
+            + 'Tocar no card mostra os detalhes da magia e o círculo '
+            + 'seleciona. A magia pode ser trocada depois, no detalhe do '
+            + 'item; o pergaminho conjura sem equipar e some depois de usado. (#103)',
+          'Itens mágicos: campo "Preço" no modal de adicionar. Com valor '
+            + 'informado, o dinheiro é descontado sempre, com ou sem "Comprar" '
+            + 'marcado; o valor não fica guardado.',
+          'Carteira: novo botão ↓ para converter moedas para a denominação '
+            + 'abaixo (platina em ouro, por exemplo), com o layout refeito '
+            + 'para caber no celular. (#133)',
+          'Item personalizado: armadura com tipo (leve, média, pesada ou '
+            + 'escudo), requisito de Força e desvantagem em Furtividade; o '
+            + 'detalhe mostra CA, requisito, custo e peso e a ficha mostra a '
+            + 'proficiência. (#134)',
+          'Troca de truque no Descanso Longo: o texto avisa que, pelo livro, '
+            + 'só o Mago troca truque nessa hora. (#128)',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.1.0',
     data: '2026-10-05',

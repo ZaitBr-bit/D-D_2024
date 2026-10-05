@@ -132,7 +132,7 @@ test('(g) Poção de Cura comum e Pergaminho (Truque) reaproveitam o registro do
   assert.equal(p1.nome, 'Poção de Cura');
   assert.deepEqual(p1.dados, PHB.find((r) => r.nome === 'Poção de Cura'));
   const perg = porId('pergaminho-magico');
-  const p2 = C.montarItemInventario({ item: perg, variante: variante(perg, 'pergaminho-magico-truque'), equipamentoPHB: PHB });
+  const p2 = C.montarItemInventario({ item: perg, variante: variante(perg, 'pergaminho-magico-truque'), equipamentoPHB: PHB, magia: null });
   assert.equal(p2.tipo, 'equipamento');
   assert.equal(p2.nome, 'Pergaminho Mágico (Truque)');
 });
@@ -157,7 +157,8 @@ test('(c) nenhum item de inventário montado usa o tipo do acervo', () => {
     const vars = item.variantes.length ? item.variantes : [null];
     const base = item.base ? C.opcoesDeBase(item.base, CATALOGOS)[0] : null;
     for (const v of vars) {
-      const inv = C.montarItemInventario({ item, variante: v, base, equipamentoPHB: PHB });
+      // magia: null = Pergaminho Mágico "Em branco" (a etapa da magia é obrigatória nele); ignorado nos demais itens.
+      const inv = C.montarItemInventario({ item, variante: v, base, equipamentoPHB: PHB, magia: null });
       assert.ok(inv, `${item.id}/${v?.id} não montou`);
       tiposInventario.add(inv.tipo);
     }

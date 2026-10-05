@@ -18,6 +18,8 @@ export function magiasDoItem(item) {
 export function opcoesDeCusto(magia) {
   const base = magia.circulo_base ?? 0;
   const c = magia.custo;
+  // Pergaminho: consome o item; não gasta carga nem uso.
+  if (c === 'consome') return [{ consome: true, cargas: 0, circulo: base }];
   if (c === 'livre') return [{ cargas: 0, circulo: base }];
   if (c?.uso !== undefined) return [{ uso: c.uso, circulo: c.circulo ?? base }];
   if (c?.cargas_max !== undefined) {
@@ -28,9 +30,18 @@ export function opcoesDeCusto(magia) {
   return [{ cargas: c.cargas, circulo: c.circulo ?? base }];
 }
 
-/** Se a opção pode ser paga agora; `motivo` é a dica do botão desabilitado. */
-export function situacaoConjuracao(item, opcao) {
+/**
+ * Se a opção pode ser paga agora; `motivo` é a dica do botão desabilitado.
+ * Com `personagem` informado, o pergaminho (custo 'consome') precisa ainda
+ * estar no inventário dele.
+ */
+export function situacaoConjuracao(item, opcao, personagem = null) {
   if (item?.destruido) return { ok: false, motivo: 'Item destruído' };
+  // Pergaminho (custo 'consome') não exige item equipado nem sintonizado.
+  if (opcao.consome) {
+    if (personagem && !(personagem.inventario || []).includes(item)) return { ok: false, motivo: 'Pergaminho já usado' };
+    return { ok: true, motivo: '' };
+  }
   if (!item?.equipado) return { ok: false, motivo: 'Equipe o item' };
   if (!itemAtivo(item)) return { ok: false, motivo: 'Sintonize o item' };
   // Leitura sem `garantirEstadoRecursos`: consultar a situação não cria nem altera o estado.
@@ -56,6 +67,20 @@ export function pagarConjuracao(item, opcao) {
   return { ok: true, ultimaCarga };
 }
 
+/**
+ * Consome uma unidade do pergaminho depois da conjuração: tira 1 da
+ * quantidade ou remove o item do inventário quando era a última. Devolve
+ * false quando o item não está no inventário (nada é alterado).
+ */
+export function consumirPergaminho(personagem, item) {
+  const inventario = personagem?.inventario || [];
+  const idx = inventario.indexOf(item);
+  if (idx < 0) return false;
+  if ((item.quantidade || 1) > 1) item.quantidade -= 1;
+  else inventario.splice(idx, 1);
+  return true;
+}
+
 /** Linhas do bloco "Magias de Itens": itens não destruídos com magias, na ordem do inventário. */
 export function magiasDeItens(personagem) {
   const out = [];
@@ -63,7 +88,7 @@ export function magiasDeItens(personagem) {
     if (!item || item.destruido) return;
     magiasDoItem(item).forEach((magia, k) => {
       const opcoes = opcoesDeCusto(magia);
-      out.push({ idx, item, k, magia, opcoes, situacao: situacaoConjuracao(item, opcoes[0]) });
+      out.push({ idx, item, k, magia, opcoes, situacao: situacaoConjuracao(item, opcoes[0], personagem) });
     });
   });
   return out;
@@ -78,6 +103,7 @@ const ROTULO_RECUPERA_USO = { amanhecer: 'amanhecer', descanso_longo: 'descanso 
  */
 export function rotuloCusto(magia, item = null) {
   const c = magia.custo;
+  if (c === 'consome') return 'consome o pergaminho';
   if (c === 'livre') return 'livre';
   if (c?.uso !== undefined) {
     const jaTemCirculo = /\d+º círculo/.test(c.uso);

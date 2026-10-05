@@ -12,6 +12,7 @@ import { condicaoSatisfeita, itemAtivo } from './regras-itens-magicos.js';
 import { atributoEfetivo, fonteAtributoItem, temBaseDoMartelo } from './regras-atributos.js';
 import { PASSIVOS_VERSAO, estadoInicialRecursos } from './regras-recursos-itens.js';
 import { ROTULO_MODO, ROTULO_SENTIDO } from './regras-passivos-itens.js';
+import { circuloDoPergaminho, magiaDoPergaminho, nomeDoPergaminho } from './regras-pergaminho.js';
 
 export const RARIDADES_ORDEM = ['Comum', 'Incomum', 'Rara', 'Muito Rara', 'Lendária', 'Artefato'];
 export const TIPOS_ACERVO = ['Anel', 'Arma', 'Armadura', 'Bastão', 'Cajado', 'Item Maravilhoso', 'Pergaminho', 'Poção', 'Varinha'];
@@ -99,14 +100,30 @@ function camposMagicos(item, variante) {
  * uma escolha obrigatória (variante, se o item tem variantes; base, se tem
  * `base`). `equipamentoPHB` é a lista `itens` de equipamento_aventura.json.
  */
-export function montarItemInventario({ item, variante = null, base = null, equipamentoPHB = [] }) {
+export function montarItemInventario({ item, variante = null, base = null, equipamentoPHB = [], magia = undefined }) {
   if (!item) return null;
   if ((item.variantes || []).length && !variante) return null;
   if (item.base && !base) return null;
+  // Pergaminho Mágico: a etapa da magia é obrigatória. `undefined` = não feita;
+  // `null` = "Em branco"; objeto = magia do círculo da variante (issue #103).
+  const ehPergaminho = item.id === 'pergaminho-magico';
+  const circuloPergaminho = ehPergaminho ? circuloDoPergaminho(variante) : null;
+  if (ehPergaminho) {
+    if (circuloPergaminho === null || magia === undefined) return null;
+    if (magia !== null && Number(magia.circulo) !== circuloPergaminho) return null;
+  }
+  // Aplica nome com a magia, círculo guardado e `dados.magias` ao item do pergaminho; outros itens passam intactos.
+  const comMagiaDoPergaminho = (novo) => (ehPergaminho
+    ? {
+        ...novo,
+        nome: nomeDoPergaminho(novo.nome, magia),
+        dados: { ...novo.dados, pergaminho: { circulo: circuloPergaminho, nome_base: novo.nome }, magias: magia ? [magiaDoPergaminho(magia)] : [] },
+      }
+    : novo);
   const ref = variante ? variante.livro_jogador : item.livro_jogador;
   if (ref) {
     const registro = equipamentoPHB.find(r => r.nome === ref.nome);
-    if (registro) return { nome: registro.nome, tipo: 'equipamento', quantidade: 1, equipado: false, descricao: '', dados: { ...registro } };
+    if (registro) return comMagiaDoPergaminho({ nome: registro.nome, tipo: 'equipamento', quantidade: 1, equipado: false, descricao: '', dados: { ...registro } });
   }
   const nome = (variante || item).nome;
   const magicos = camposMagicos(item, variante);
@@ -120,7 +137,7 @@ export function montarItemInventario({ item, variante = null, base = null, equip
     const semPenalidades = item.base.sem_penalidades === true && tipo === 'armadura' ? { furtividade: '—', requisito_forca: '—' } : {};
     return { nome: nomeFinal, tipo, quantidade: 1, equipado: false, descricao, dados: { ...base, nome_base: base.nome, ...semPenalidades, ...magicos }, ...estado };
   }
-  return { nome, tipo: 'magico', quantidade: 1, equipado: false, descricao: '', dados: { tipo_item: item.dados_ficha?.tipo_item || 'Item Mágico', ...magicos }, ...estado };
+  return comMagiaDoPergaminho({ nome, tipo: 'magico', quantidade: 1, equipado: false, descricao: '', dados: { tipo_item: item.dados_ficha?.tipo_item || 'Item Mágico', ...magicos }, ...estado });
 }
 
 /**

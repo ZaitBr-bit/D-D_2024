@@ -134,3 +134,19 @@ test('magiasDoItem: lista vazia sem magias', () => {
   assert.deepEqual(magiasDoItem({ dados: {} }), []);
   assert.deepEqual(magiasDoItem(null), []);
 });
+
+test('situacaoConjuracao: pergaminho (consome) exige estar no inventário quando o personagem é informado', () => {
+  const perg = { nome: 'Pergaminho', equipado: false, dados: {} };
+  const opcao = { consome: true, cargas: 0, circulo: 1 };
+  assert.deepEqual(situacaoConjuracao(perg, opcao), { ok: true, motivo: '' });
+  assert.deepEqual(situacaoConjuracao(perg, opcao, { inventario: [perg] }), { ok: true, motivo: '' });
+  assert.deepEqual(situacaoConjuracao(perg, opcao, { inventario: [] }), { ok: false, motivo: 'Pergaminho já usado' });
+  assert.deepEqual(situacaoConjuracao({ ...perg }, opcao, { inventario: [perg] }), { ok: false, motivo: 'Pergaminho já usado' });
+});
+
+test('consumirPergaminho fora do inventário devolve false e não altera nada', async () => {
+  const { consumirPergaminho } = await import('../../../site/js/regras-magias-itens.js');
+  const perg = { nome: 'Pergaminho', quantidade: 2 };
+  assert.equal(consumirPergaminho({ inventario: [] }, perg), false);
+  assert.equal(perg.quantidade, 2);
+});

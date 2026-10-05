@@ -43,6 +43,7 @@ import { magiaContaNoLimite, truqueEhTrocavel } from '../regras-origens-magia.js
 import { superficiesDaFicha, superficieAtivaDaFicha } from './contexto-classe.js';
 import { CLASSES_CONJURADORAS } from '../dados-classes.js';
 import { nivelNa } from '../regras-multiclasse.js';
+import { avisoTrocaTruqueForaDoLivro } from '../regras-preparo-magias.js';
 // preparadasPorClasse (Tarefa 4, sub-projeto "magia sabe a classe"): fonte
 // unica dos tres baldes (desta/deOutra/semClasse) que este arquivo usava a
 // reimplementar contando char.magias_preparadas cru contra o limite de UMA
@@ -2774,9 +2775,11 @@ export async function mostrarTrocaTruque(callbackPosTroca = null, opcoes = {}) {
   const titulo = opcoes.classe ? `Trocar Truque — ${nomeClasse}` : 'Trocar Truque';
 
   const sair = saidaUnicaDaTroca(callbackPosTroca);
+  const avisoLivro = avisoTrocaTruqueForaDoLivro(sup?.classe || char.classe);
   abrirModal(titulo, `
     <div class="info-box info" style="margin-bottom:12px;font-size:0.85rem">
       Apos um Descanso Longo, voce pode trocar <strong>1 truque</strong> por outro da lista de ${escHtml(nomeClasse)}.
+      ${avisoLivro ? `<div class="aviso-regra-livro" style="margin-top:6px;font-size:0.75rem;font-style:italic">${escHtml(avisoLivro)}</div>` : ''}
     </div>
 
     <div style="margin-bottom:12px">

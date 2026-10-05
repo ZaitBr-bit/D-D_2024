@@ -9,7 +9,7 @@ import { atributoEfetivo } from '../regras-atributos.js';
 import { aplicarDescansoRecursos, aplicarRecuperacaoInformada, itensComRecuperacaoPendente } from '../regras-recursos-itens.js';
 import { restaurarRecursosTalentos } from '../regras-cobertura.js';
 import { gastarDadosVida, nivelNa, reservasDadosVida, restaurarTodosDadosVida, subclasseDe, temClasse } from '../regras-multiclasse.js';
-import { trocasDoDescansoLongo } from '../regras-preparo-magias.js';
+import { trocasDoDescansoLongo, avisoTrocaTruqueForaDoLivro } from '../regras-preparo-magias.js';
 import { sincronizarBonusPvNivel } from '../levelup.js';
 // SUBCLASSES_CONJURADORAS: a MESMA constante que trocasDoDescansoLongo usa
 // por dentro (regras-preparo-magias.js) para saber se uma subclasse
@@ -1573,11 +1573,13 @@ export function setupEventosDescanso() {
         // cai na primeira superfície quando nada foi selecionado-- nunca
         // devolve null neste ponto.
         const classeTruque = superficieAtivaDaFicha(char).classe;
+        const avisoLivro = avisoTrocaTruqueForaDoLivro(classeTruque);
         conteudoModal += `
           <p style="font-size:0.9rem">Deseja trocar um truque?</p>
           <p style="font-size:0.8rem;color:var(--text-muted)">
             Você pode trocar <strong>1 truque</strong> por outro da lista de ${escHtml(classeTruque)} após um Descanso Longo.
           </p>
+          ${avisoLivro ? `<p class="aviso-regra-livro" style="font-size:0.75rem;color:var(--text-muted);font-style:italic">${escHtml(avisoLivro)}</p>` : ''}
         `;
       }
 

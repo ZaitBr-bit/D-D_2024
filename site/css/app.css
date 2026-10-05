@@ -860,9 +860,41 @@ tr:hover td { background: #faf8f4; }
 .item-sem-prof:hover { opacity: 1; }
 
 /* Filtros de arma/armadura */
-.filtro-arma.active, .filtro-armadura.active, .filtro-inv-cat.active {
+.filtro-arma.active, .filtro-armadura.active, .filtro-inv-cat.active, .filtro-raridade.active {
   background: var(--primary); color: #fff; border-color: var(--primary);
 }
+
+/* --- Seletor de itens (modal "Adicionar Item") ---
+   O modal tem altura fixa e só a lista de resultados rola; busca e chips
+   ficam no topo. Os chips ficam numa linha rolável na horizontal, em vez de
+   quebrar em várias linhas e empurrar a lista para baixo. */
+.modal-container.seletor-itens {
+  display: flex; flex-direction: column;
+  height: min(85dvh, 720px); overflow: hidden;
+}
+.seletor-itens .modal-corpo {
+  display: flex; flex-direction: column;
+  flex: 1 1 auto; min-height: 0; padding: 10px 16px 0;
+}
+.seletor-itens .search-box { flex: none; margin-bottom: 8px; }
+.seletor-itens #lista-inv-cat { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+.faixa-chips {
+  display: flex; flex-wrap: wrap; gap: 6px; flex: none;
+  margin-bottom: 8px;
+}
+.faixa-chips .btn { white-space: nowrap; }
+.seletor-itens .filtro-tipo-compacto { padding: 6px 10px; font-size: 0.8rem; margin-bottom: 8px; }
+/* Teclado virtual aberto: o overlay passa a ocupar só a área visível
+   (medida por visualViewport em modal-teclado.js), o modal ocupa o overlay
+   inteiro e as faixas de chips recolhem para sobrar espaço aos resultados. */
+.modal-overlay.teclado-aberto {
+  inset: auto; left: 0; right: 0;
+  top: var(--vv-topo, 0px); height: var(--vv-altura, 100%);
+}
+.modal-overlay.teclado-aberto .modal-container.seletor-itens {
+  height: 100%; max-height: 100%; border-radius: 0; padding-bottom: 0;
+}
+.modal-overlay.teclado-aberto .faixa-recolhivel { display: none; }
 
 /* --- Magias --- */
 /* Tags de identificação rápida de magia na ficha */

@@ -6,6 +6,9 @@
 // personagem e os callbacks chegam por parâmetro.
 // ============================================================
 import { abrirModal, escHtml, mdParaHtml, toast } from './utils.js';
+import { DENOMINACOES, ICONE_MOEDA, interpretarPrecoInformado, pagarCusto, podePagarCusto } from './moedas.js';
+import { circuloDoPergaminho } from './regras-pergaminho.js';
+import { carregarMagiasIndicePergaminho, htmlSeletorMagiaPergaminho, ligarSeletorMagiaPergaminho, magiaSelecionadaPergaminho } from './pergaminho-ui.js';
 import {
   filtrarAcervo, opcoesDeBase, montarItemInventario,
   RARIDADES_ORDEM, TIPOS_ACERVO, raridadesDoItem,
@@ -59,24 +62,19 @@ export function renderCategoriaMagicos(listaEl, ctx) {
   const filtroRaridade = estado.raridade;
   const filtroTipo = estado.tipo;
   const itens = filtrarAcervo(ctx.acervo, { texto: ctx.texto, raridade: filtroRaridade, tipo: filtroTipo });
+  // As faixas de raridade e tipo recolhem com o teclado aberto (app.css, .faixa-recolhivel).
   listaEl.innerHTML = `
-    <div style="display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap">
+    <div class="faixa-chips faixa-recolhivel">
       ${[['', 'Todas'], ...RARIDADES_ORDEM.map(r => [r, r])].map(([id, rotulo]) => `
-        <button class="btn btn-sm btn-outline ${filtroRaridade === id ? 'active' : ''}" data-filtro-raridade="${escHtml(id)}">${escHtml(rotulo)}</button>`).join('')}
+        <button class="btn btn-sm btn-outline filtro-raridade ${filtroRaridade === id ? 'active' : ''}" data-filtro-raridade="${escHtml(id)}">${escHtml(rotulo)}</button>`).join('')}
     </div>
-    <select class="form-input" id="filtro-tipo-magico" style="margin-bottom:8px">
+    <select class="form-input filtro-tipo-compacto faixa-recolhivel" id="filtro-tipo-magico">
       <option value="">Todos os tipos</option>
       ${TIPOS_ACERVO.map(t => `<option value="${escHtml(t)}"${filtroTipo === t ? ' selected' : ''}>${escHtml(t)}</option>`).join('')}
     </select>
     ${itens.length === 0
       ? '<div style="color:var(--text-muted);text-align:center;padding:16px">Nenhum item encontrado</div>'
-      : itens.map((it, i) => `
-        <div class="inv-item" style="cursor:pointer" data-item-magico="${i}">
-          <div style="flex:1">
-            <div class="inv-item-nome">${escHtml(it.nome)}${it.requer_sintonizacao ? ' <span class="badge" style="font-size:0.6rem;background:#e0f2f1;color:#00695c">Sintonização</span>' : ''}</div>
-            <div class="inv-item-detalhe">${escHtml(it.tipo)} | ${escHtml(raridadesDoItem(it).join(', '))}</div>
-          </div>
-        </div>`).join('')}`;
+      : itens.map((it, i) => htmlLinhaItemMagico(it, i)).join('')}`;
   listaEl.querySelectorAll('[data-filtro-raridade]').forEach(btn => btn.addEventListener('click', () => {
     estado.raridade = btn.dataset.filtroRaridade;
     renderCategoriaMagicos(listaEl, ctx);
@@ -91,14 +89,42 @@ export function renderCategoriaMagicos(listaEl, ctx) {
 }
 
 /**
+ * Linha de um item do acervo numa lista (categoria Itens Mágicos ou busca em
+ * Todos). `indice` vai em `data-item-magico` e aponta para a lista de quem chama.
+ */
+export function htmlLinhaItemMagico(it, indice) {
+  return `
+        <div class="inv-item" style="cursor:pointer" data-item-magico="${indice}">
+          <div style="flex:1">
+            <div class="inv-item-nome">${escHtml(it.nome)}${it.requer_sintonizacao ? ' <span class="badge" style="font-size:0.6rem;background:#e0f2f1;color:#00695c">Sintonização</span>' : ''}</div>
+            <div class="inv-item-detalhe">${escHtml(it.tipo)} | ${escHtml(raridadesDoItem(it).join(', '))}</div>
+          </div>
+        </div>`;
+}
+
+// Verdadeiro enquanto abrirItemMagico aguarda o índice de magias (evita modais empilhados).
+let abrindoItemMagico = false;
+
+/**
  * Modal de um item mágico: descrição, escolha da variante (quando há) e da
  * arma/armadura-base (quando há), e o botão de adicionar. Sem a escolha
  * obrigatória, avisa e não grava nada.
  */
-export function abrirItemMagico(item, ctx) {
-  if (!item) return;
+export async function abrirItemMagico(item, ctx) {
+  if (!item || abrindoItemMagico) return;
   const variantes = item.variantes || [];
   const opcoes = item.base ? opcoesDeBase(item.base, ctx.catalogos) : [];
+  // Pergaminho Mágico: a grade mostra só as magias do círculo da variante marcada.
+  const ehPergaminho = item.id === 'pergaminho-magico';
+  // Trava durante o await do índice: um segundo clique na linha não empilha outro modal
+  // (ids duplicados fariam o handler agir sobre o modal errado e cobrar em dobro).
+  abrindoItemMagico = true;
+  let magiasIndice = [];
+  try {
+    if (ehPergaminho) magiasIndice = await carregarMagiasIndicePergaminho();
+  } finally {
+    abrindoItemMagico = false;
+  }
   const corpo = `
     ${htmlCorpoItemMagico({ linha_tipo: item.linha_tipo, descricao_magica: item.descricao, tabelas: item.tabelas })}
     ${variantes.length ? `
@@ -107,29 +133,84 @@ export function abrirItemMagico(item, ctx) {
         <label style="display:flex;gap:6px;align-items:center;font-size:0.85rem">
           <input type="radio" name="variante-magica" value="${escHtml(v.id)}"> ${escHtml(v.nome)} <span style="color:var(--text-muted)">(${escHtml(v.raridade)})</span>
         </label>`).join('')}` : ''}
+    ${ehPergaminho ? `
+      <div id="bloco-magia-pergaminho" style="margin-top:10px;display:none">
+        <div style="font-weight:700;font-size:0.85rem">Magia do pergaminho</div>
+        <div id="pergaminho-cards-raiz"></div>
+        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px">"Em branco" deixa o pergaminho sem magia; dá para escolher depois, no detalhe do item. O pergaminho só funciona se a magia estiver na lista de magias de quem o lê.</div>
+      </div>` : ''}
     ${opcoes.length ? `
       <div style="margin-top:10px;font-weight:700;font-size:0.85rem">${item.base.tipo === 'arma' ? 'Arma-base' : 'Armadura-base'}</div>
       <select class="form-input" id="base-item-magico">
         ${opcoes.length > 1 ? '<option value="">Escolha...</option>' : ''}
         ${opcoes.map(a => `<option value="${escHtml(a.nome)}">${escHtml(a.nome)}</option>`).join('')}
       </select>` : ''}
-    <div style="margin-top:8px;font-size:0.75rem;color:var(--text-muted)">Item mágico entra sem custo.</div>`;
+    <div style="margin-top:8px;font-size:0.75rem;color:var(--text-muted)">Item mágico entra sem custo, a menos que você informe um preço.</div>`;
+  const opcoesMoeda = DENOMINACOES
+    .map(t => `<option value="${t}"${t === 'po' ? ' selected' : ''}>${ICONE_MOEDA[t]} ${t.toUpperCase()}</option>`).join('');
   abrirModal(item.nome, corpo,
-    `<button class="btn btn-secondary" onclick="fecharModal()">Voltar</button>
+    `<div id="bloco-preco-item-magico" style="display:flex;align-items:center;gap:6px;margin-right:auto">
+       <label for="preco-item-magico-qtd" style="font-size:0.75rem;white-space:nowrap">Preço</label>
+       <input type="number" class="form-input" id="preco-item-magico-qtd" min="0" step="1" placeholder="0" style="width:80px">
+       <select class="form-input" id="preco-item-magico-moeda" style="width:auto">${opcoesMoeda}</select>
+     </div>
+     <button class="btn btn-secondary" onclick="fecharModal()">Voltar</button>
      <button class="btn btn-primary" id="btn-confirmar-item-magico">Adicionar ao Inventário</button>`);
+  if (ehPergaminho) {
+    const bloco = document.getElementById('bloco-magia-pergaminho');
+    const raizCards = document.getElementById('pergaminho-cards-raiz');
+    document.querySelectorAll('input[name="variante-magica"]').forEach(radio => radio.addEventListener('change', () => {
+      const circulo = circuloDoPergaminho(variantes.find(v => v.id === radio.value));
+      raizCards.innerHTML = htmlSeletorMagiaPergaminho(magiasIndice.filter(m => Number(m.circulo) === circulo), '');
+      ligarSeletorMagiaPergaminho(raizCards);
+      bloco.style.display = 'block';
+    }));
+  }
+  // Impede que um segundo clique de confirmação, já aceito o primeiro, adicione e cobre de novo.
+  let confirmado = false;
   document.getElementById('btn-confirmar-item-magico')?.addEventListener('click', () => {
+    if (confirmado) return;
     const idVariante = document.querySelector('input[name="variante-magica"]:checked')?.value;
     const variante = variantes.find(v => v.id === idVariante) || null;
     const nomeBase = document.getElementById('base-item-magico')?.value;
     const base = opcoes.find(a => a.nome === nomeBase) || null;
     if (variantes.length && !variante) { toast('Escolha a variante do item.', 'error'); return; }
     if (item.base && !base) { toast(`Escolha a ${item.base.tipo === 'arma' ? 'arma' : 'armadura'}-base.`, 'error'); return; }
-    const novo = montarItemInventario({ item, variante, base, equipamentoPHB: ctx.equipamentoPHB });
+    // Pergaminho: `null` = "Em branco"; para os demais itens `magia` fica undefined e é ignorada.
+    const magia = ehPergaminho ? magiaSelecionadaPergaminho(document.getElementById('pergaminho-cards-raiz')) : undefined;
+    const novo = montarItemInventario({ item, variante, base, equipamentoPHB: ctx.equipamentoPHB, magia });
     if (!novo) { toast('Não foi possível montar o item.', 'error'); return; }
+    // Preço informado só para esta adição: não é gravado em lugar nenhum, e
+    // vale com o flag "Comprar" marcado ou não (este modal não lê o flag).
+    // Em input type=number, texto malformado ("1-", "e") devolve value '' e badInput=true;
+    // sem esta checagem seria lido como campo vazio e o item entraria sem cobrança.
+    const campoPreco = document.getElementById('preco-item-magico-qtd');
+    if (campoPreco?.validity?.badInput) { toast('Informe um valor inteiro maior ou igual a zero.', 'error'); return; }
+    const preco = interpretarPrecoInformado(
+      campoPreco?.value,
+      document.getElementById('preco-item-magico-moeda')?.value,
+    );
+    if (!preco.ok) { toast(preco.erro, 'error'); return; }
+    let sufixoPreco = '';
+    if (preco.custo) {
+      if (!podePagarCusto(ctx.personagem.moedas, preco.custo)) {
+        toast(`Saldo insuficiente para pagar ${preco.custo} por ${novo.nome}!`, 'error');
+        return;
+      }
+      const pagamento = pagarCusto(ctx.personagem.moedas, preco.custo);
+      // Guarda defensiva: podePagarCusto já passou, mas sem sucesso não grava moedas nem adiciona o item.
+      if (!pagamento.sucesso) {
+        toast(`Não foi possível pagar ${preco.custo} por ${novo.nome}.`, 'error');
+        return;
+      }
+      ctx.personagem.moedas = pagamento.moedas;
+      sufixoPreco = ` por ${preco.custo}`;
+    }
+    confirmado = true;
     adicionarAoInventario(ctx.personagem, novo);
     window.fecharModal();
     ctx.aoAdicionar();
-    toast(`${novo.nome} adicionado!`, 'success');
+    toast(`${novo.nome} adicionado${sufixoPreco}!`, 'success');
   });
 }
 

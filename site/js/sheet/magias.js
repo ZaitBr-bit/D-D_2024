@@ -7,7 +7,7 @@
 import { atributoEfetivo } from '../regras-atributos.js';
 import { ATRIBUTO_NOME_PARA_KEY, CLASSES_CONJURADORAS, CLASSES_INFO } from '../dados-classes.js';
 import { getMagiasClasse, getMagiasPorCirculo } from '../db.js';
-import { magiasDeItens, opcoesDeCusto, pagarConjuracao, rotuloConjuracao, rotuloCusto, situacaoConjuracao } from '../regras-magias-itens.js';
+import { consumirPergaminho, magiasDeItens, opcoesDeCusto, pagarConjuracao, rotuloConjuracao, rotuloCusto, situacaoConjuracao } from '../regras-magias-itens.js';
 import { perguntarUltimaCarga } from './ultima-carga.js';
 import { abrirModal, bonusProficiencia, calcAtaqueMagia, calcCDMagia, calcMod, escHtml, getBonusTruquesOrdem, getLimitesMagias, getMagiaPreparadas, mdParaHtml, circuloSuperiorHtml, classesDaMagiaHtml, semAcento, toast } from '../utils.js';
 import { getEstadoFuria } from './classes/barbaro.js';
@@ -2392,7 +2392,8 @@ export function conjurarSemEspaco(nome, circulo, mensagem, aoConcluir = null, po
 function conjurarMagiaDeItem(item, magia, opcao) {
   const avisoSemCusto = () => toast(`Não foi possível gastar o custo de ${item.nome}`, 'error');
   const podeAplicar = () => {
-    if (situacaoConjuracao(item, opcao).ok) return true;
+    // Passa `char`: pergaminho que saiu do inventário durante os modais não conjura.
+    if (situacaoConjuracao(item, opcao, char).ok) return true;
     avisoSemCusto();
     return false;
   };
@@ -2400,6 +2401,16 @@ function conjurarMagiaDeItem(item, magia, opcao) {
     const { ok, ultimaCarga } = pagarConjuracao(item, opcao);
     if (!ok) {
       // Sem pagamento não há conjuração: remove a concentração que o efeito registrou.
+      char.efeitos_magicos = (char.efeitos_magicos || []).filter(e => !(e.concentracao && (e.nome === magia.nome || e.nome === `${magia.nome} (Desv.)` || e.nome === `${magia.nome} (PV Máx)`)));
+      salvar();
+      renderFichaCompleta();
+      avisoSemCusto();
+      return;
+    }
+    // Pergaminho: só depois da conjuração confirmada o item se desfaz. Se o
+    // consumo falhar (item fora do inventário), a conjuração é tratada como
+    // não aplicada: desfaz a concentração registrada e avisa em erro, sem toast de sucesso.
+    if (opcao.consome && !consumirPergaminho(char, item)) {
       char.efeitos_magicos = (char.efeitos_magicos || []).filter(e => !(e.concentracao && (e.nome === magia.nome || e.nome === `${magia.nome} (Desv.)` || e.nome === `${magia.nome} (PV Máx)`)));
       salvar();
       renderFichaCompleta();

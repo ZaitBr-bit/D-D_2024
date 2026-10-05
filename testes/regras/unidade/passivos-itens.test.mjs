@@ -259,7 +259,7 @@ test('3.8 acervo real: nenhuma variante muda de efeitos com o critério unificad
     for (const v of it.variantes || []) {
       variantes++;
       const esperado = v.efeitos ?? it.efeitos ?? [];
-      const montado = montarItemInventario({ item: it, variante: v, base: it.base ? { nome: 'Base', dano: '1d6', ca: 11, categoria: 'Leve' } : null });
+      const montado = montarItemInventario({ item: it, variante: v, base: it.base ? { nome: 'Base', dano: '1d6', ca: 11, categoria: 'Leve' } : null, magia: null });
       assert.deepEqual(montado.dados.efeitos, esperado, v.id);
     }
   }

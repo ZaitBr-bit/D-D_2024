@@ -6,7 +6,7 @@
 // ============================================================
 import { atributoEfetivo } from '../regras-atributos.js';
 import { CLASSES_INFO } from '../dados-classes.js';
-import { DENOMINACOES, ICONE_MOEDA, NOMES_MOEDA, adicionarMoeda, converterParaMaior, formatarCarteira, proximaDenominacaoMaior, removerQuantidadeMoeda, taxasSaoPadrao } from '../moedas.js';
+import { DENOMINACOES, ICONE_MOEDA, NOMES_MOEDA, adicionarMoeda, converterParaMaior, converterParaMenor, formatarCarteira, proximaDenominacaoMaior, proximaDenominacaoMenor, removerQuantidadeMoeda, taxasSaoPadrao } from '../moedas.js';
 import { carregarComprarAtivoPadrao, resetarTaxasMoeda, salvarComprarAtivoPadrao, salvarTaxasMoeda } from '../store.js';
 import { abrirModal, bonusProficiencia, calcMod, escHtml, fmtMod, fmtPeso, gerarId, getCapacidadeCarga, getPesoTotalInventario, localDoItem, mdParaHtml, semAcento, toast } from '../utils.js';
 import { abrirSeletorItens, carregarDadosEquipSheet } from '../itens-seletor.js';
@@ -26,6 +26,8 @@ import { htmlCorpoItemMagico } from '../itens-magicos-ui.js';
 import { TETO_SINTONIZACAO, itensSintonizados, podeSintonizar } from '../regras-sintonizacao.js';
 import { PASSIVOS_VERSAO, alternarUso, ajustarCarga, aplicarContadorManual, contadorEhManual, garantirEstadoRecursos, gastarCarga, itensComRecuperacaoPendente, limparPendenciasObsoletas, marcarDestruido, preencherRecursosDoAcervo, recursosDoFormulario, recursosDoItem, removerContadorManual, restaurarItem } from '../regras-recursos-itens.js';
 import { getItensMagicos } from '../db.js';
+import { aplicarMagiaNoPergaminho, circuloDoItemPergaminho } from '../regras-pergaminho.js';
+import { carregarMagiasIndicePergaminho, htmlSeletorMagiaPergaminho, ligarSeletorMagiaPergaminho, magiaSelecionadaPergaminho } from '../pergaminho-ui.js';
 import { opcoesDeEscolha } from '../regras-passivos-itens.js';
 import { aplicarAumentoPermanente, aumentoPermanenteDoItem } from '../regras-aumento-atributo.js';
 import { atendeRequisito, lerRequisito } from '../regras-sintonizacao-restrita.js';
@@ -99,9 +101,9 @@ export function renderSecaoInventario() {
         <h2>Inventario</h2>
         <div class="no-print" style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
           <span style="font-weight:700;color:var(--secondary);font-size:0.9rem;cursor:pointer" id="btn-edit-po" title="Editar Carteira">${formatarCarteira(char.moedas)}</span>
-          <button class="btn btn-sm btn-accent" id="btn-add-inv">+ Item</button>
+          <button class="btn btn-sm btn-accent" id="btn-add-inv">Loja</button>
           <button class="btn btn-sm btn-secondary" id="btn-add-inv-custom">+ Item Personalizado</button>
-          <button class="btn btn-sm btn-secondary" id="btn-add-inv-local" title="Criar um local para guardar itens (ex.: Bolsa de Armazenamento)">+ Local</button>
+          <button class="btn btn-sm btn-secondary" id="btn-add-inv-local" title="Criar um local para guardar itens (ex.: Bolsa de Armazenamento)">Novo Espaço</button>
         </div>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-light);margin-bottom:6px">
@@ -223,12 +225,21 @@ function renderSheetInvItem(item, idx) {
   if ((item.tipo === 'armadura' || item.tipo === 'escudo') && item.dados?.categoria) {
     profBadge = sheetBadgeProf(sheetTemProfArmadura({ categoria: item.dados.categoria, nome: nomeBaseDoItem(item) }));
   }
+  // Armadura personalizada com tipo (issue #134): mesma regra de proficiência da de catálogo.
+  if (item.tipo === 'customizado' && item.dados?.tipo_item === 'Armadura' && item.dados?.tipo_armadura) {
+    const ehEscudo = item.dados.tipo_armadura === 'Escudo';
+    profBadge = sheetBadgeProf(sheetTemProfArmadura({ categoria: ehEscudo ? 'Escudo' : item.dados.tipo_armadura, nome: ehEscudo ? 'Escudo' : item.nome }));
+  }
 
   // Badge de tipo de uso (consumível, equipamento, etc.)
   let tipoBadge = '';
   const tipoUso = item.dados?.tipo_uso || '';
   if (tipoUso === 'consumivel') {
     tipoBadge = '<span class="badge" style="font-size:0.6rem;background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7">Consumível</span>';
+  }
+  // Pergaminho Mágico sem magia definida (issue #103).
+  if (circuloDoItemPergaminho(item) !== null && !item.dados?.magias?.length) {
+    tipoBadge += ' <span class="badge badge-secondary" style="font-size:0.6rem">Em branco</span>';
   }
 
   // Calcular bônus de ataque para armas
@@ -964,14 +975,29 @@ export function setupEventosInventarioSheet() {
       const podeConverter = prox && (char.moedas[tipo] || 0) >= prox.taxa;
       const labelConv = prox ? `↑ ${prox.tipoDestino.toUpperCase()}` : '↑';
       const tituloConv = prox ? `Converter ${prox.taxa} ${tipo.toUpperCase()} em 1 ${prox.tipoDestino.toUpperCase()}` : '';
+      // Conversao para baixo: nao existe para PC (a menor); fica invisivel sem moeda na pilha.
+      const baixo = proximaDenominacaoMenor(tipo);
+      const podeConverterBaixo = baixo && (char.moedas[tipo] || 0) > 0;
+      // Cada denominacao ocupa duas linhas para caber em celular sem cortar o nome:
+      // 1) nome com o saldo logo ao lado e, a direita, os botoes de conversao (so os aplicaveis); 2) campo, "+" e "-" em colunas fixas.
+      const estiloConv = 'height:32px;min-width:0;padding:0 8px;font-size:0.8rem';
+      const botaoCima = podeConverter
+        ? `<button class="btn btn-secondary btn-sm" data-moeda-conv="${tipo}" style="${estiloConv}" title="${tituloConv}">${labelConv}</button>` : '';
+      const botaoBaixo = podeConverterBaixo
+        ? `<button class="btn btn-secondary btn-sm" data-moeda-conv-baixo="${tipo}" style="${estiloConv}" title="Converter todas as ${tipo.toUpperCase()} (${char.moedas[tipo] || 0}) em ${(char.moedas[tipo] || 0) * baixo.taxa} ${baixo.tipoDestino.toUpperCase()}">↓ ${baixo.tipoDestino.toUpperCase()}</button>` : '';
       return `
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
-          <span style="width:150px;font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${NOMES_MOEDA[tipo]} (${tipo.toUpperCase()})">${ICONE_MOEDA[tipo]} ${NOMES_MOEDA[tipo]}</span>
-          <span style="min-width:60px;text-align:right;font-weight:700">${char.moedas[tipo] || 0}</span>
-          <input type="number" class="form-input" id="edit-moeda-${tipo}" min="0" placeholder="0" style="width:90px;box-sizing:border-box">
-          <button class="btn btn-success btn-sm" data-moeda-add="${tipo}" style="height:36px">+</button>
-          <button class="btn btn-danger btn-sm" data-moeda-sub="${tipo}" style="height:36px">-</button>
-          <button class="btn btn-secondary btn-sm" data-moeda-conv="${tipo}" style="height:36px;min-width:52px${podeConverter ? '' : ';visibility:hidden'}" title="${tituloConv}" ${podeConverter ? '' : 'tabindex="-1"'}>${labelConv}</button>
+        <div style="margin-bottom:10px">
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px">
+            <span style="font-size:0.85rem" title="${NOMES_MOEDA[tipo]} (${tipo.toUpperCase()})">${ICONE_MOEDA[tipo]} ${NOMES_MOEDA[tipo]}:</span>
+            <span style="font-weight:700;font-size:1rem" title="Saldo de ${NOMES_MOEDA[tipo]}">${char.moedas[tipo] || 0}</span>
+            <span style="flex:1 1 0"></span>
+            ${botaoCima}${botaoBaixo}
+          </div>
+          <div style="display:grid;grid-template-columns:minmax(60px,1fr) 44px 44px;gap:6px;align-items:center">
+            <input type="number" class="form-input" id="edit-moeda-${tipo}" min="0" placeholder="0" style="width:100%;min-width:0;box-sizing:border-box">
+            <button class="btn btn-success btn-sm" data-moeda-add="${tipo}" style="height:36px;min-width:0;padding:0">+</button>
+            <button class="btn btn-danger btn-sm" data-moeda-sub="${tipo}" style="height:36px;min-width:0;padding:0">-</button>
+          </div>
         </div>
       `;
     }).join('');
@@ -1096,6 +1122,18 @@ export function setupEventosInventarioSheet() {
         btn.addEventListener('click', () => {
           const tipo = btn.dataset.moedaConv;
           const resultado = converterParaMaior(char.moedas, tipo);
+          if (!resultado.sucesso) return;
+          char.moedas = resultado.moedas;
+          salvar();
+          renderFichaCompleta();
+          atualizarModalCarteira();
+          toast('Moedas convertidas!', 'success');
+        });
+      });
+
+      document.querySelectorAll('[data-moeda-conv-baixo]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const resultado = converterParaMenor(char.moedas, btn.dataset.moedaConvBaixo);
           if (!resultado.sucesso) return;
           char.moedas = resultado.moedas;
           salvar();
@@ -1332,6 +1370,26 @@ function setupSheetDragDrop() {
 export { carregarDadosEquipSheet };
 
 /**
+ * Resumo das informações de um item personalizado no detalhe (issue #134):
+ * tipo de armadura, CA base, requisito de Força, Furtividade, custo e peso.
+ * Só mostra as linhas que têm valor; item antigo sem os campos novos devolve
+ * só o que existe (ou ''). Texto livre vai por escHtml.
+ * @param {object} d `item.dados`
+ * @returns {string}
+ */
+export function htmlResumoItemCustomizado(d = {}) {
+  const linhas = [];
+  const linha = (rotulo, valor) => { if (valor) linhas.push(`<strong>${rotulo}:</strong> ${escHtml(String(valor))}`); };
+  if (d.tipo_item === 'Armadura') linha('Tipo de armadura', d.tipo_armadura);
+  if (String(d.ca_base ?? '') !== '') linha('CA base', d.ca_base);
+  linha('Requisito de Força', d.requisito_forca);
+  linha('Furtividade', d.furtividade);
+  linha('Custo', d.preco);
+  linha('Peso', d.peso);
+  return linhas.length ? `<div style="font-size:0.85rem;margin-bottom:6px">${linhas.join('<br>')}</div>` : '';
+}
+
+/**
  * HTML das seções "Propriedades" (uma por `<details>`, com descrição do
  * glossário) e "Maestria: X" (com descrição) do modal de detalhe de uma
  * arma -- extraído pra ser reusado pela arma customizada com categoria
@@ -1529,6 +1587,7 @@ export function htmlDetalheItem(item, propsDescs = []) {
       // Issue #100: categoria que não é arma (Armadura, Consumível...).
       corpo += `<div style="font-size:0.85rem;margin-bottom:6px"><strong>Categoria:</strong> ${escHtml(d.tipo_item)}</div>`;
     }
+    corpo += htmlResumoItemCustomizado(d);
     // Issue #135: a propriedade vale para qualquer item personalizado, não só
     // para o de categoria de arma.
     corpo += htmlPropriedadesEMaestria(d, propsDescs);
@@ -1566,6 +1625,15 @@ export function htmlDetalheItem(item, propsDescs = []) {
     const atual = item.escolhas?.resistencia || '';
     corpo += `<div class="form-group no-print" style="margin-top:10px"><label class="form-label" for="sel-escolha-resistencia">Tipo de resistência</label>
       <select class="form-input" id="sel-escolha-resistencia"><option value="">— escolher —</option>${opcoesResistencia.map(o => `<option value="${escHtml(o)}"${o === atual ? ' selected' : ''}>${escHtml(o)}</option>`).join('')}</select></div>`;
+  }
+
+  // Pergaminho Mágico (issue #103): magia atual e botão para escolher/trocar.
+  const circuloPergaminho = circuloDoItemPergaminho(item);
+  if (circuloPergaminho !== null && !item.destruido) {
+    const atual = item.dados?.magias?.[0]?.nome || '';
+    corpo += `<div class="no-print" style="margin-top:10px"><div class="section-divider mt-1"><span>Magia do pergaminho</span></div>
+      <div style="font-size:0.85rem;margin-bottom:6px">${atual ? escHtml(atual) : 'Em branco (sem magia definida)'}</div>
+      <button class="btn btn-sm btn-secondary" id="btn-pergaminho-magia">${atual ? 'Trocar magia' : 'Escolher magia'}</button></div>`;
   }
 
   // Aumento permanente de atributo (Manuais, Tomos, Livros): botão ou aviso de aplicado.
@@ -1625,6 +1693,32 @@ async function mostrarDetalheItemSheet(item) {
   }
   ligarContador();
   ligarAumentoPermanente(item);
+  // Pergaminho Mágico: abre a grade com a magia atual marcada e grava a troca.
+  // `abrindoTroca` trava cliques repetidos durante o await do índice: sem ele
+  // o modal empilharia duas vezes (ids duplicados) e a troca valeria duas vezes.
+  let abrindoTroca = false;
+  document.getElementById('btn-pergaminho-magia')?.addEventListener('click', async () => {
+    if (abrindoTroca) return;
+    abrindoTroca = true;
+    const circulo = circuloDoItemPergaminho(item);
+    let magias;
+    try {
+      magias = (await carregarMagiasIndicePergaminho()).filter(m => Number(m.circulo) === circulo);
+    } finally {
+      abrindoTroca = false;
+    }
+    abrirModal('Magia do Pergaminho', `<div id="pergaminho-cards-raiz">${htmlSeletorMagiaPergaminho(magias, item.dados?.magias?.[0]?.nome || '')}</div>
+      ${(item.quantidade || 1) > 1 ? '<div style="font-size:0.75rem;color:var(--text-muted);margin-top:6px">Há mais de um pergaminho: a troca vale para um só.</div>' : ''}`,
+      '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-confirmar-pergaminho-magia">Confirmar</button>');
+    const raiz = document.getElementById('pergaminho-cards-raiz');
+    ligarSeletorMagiaPergaminho(raiz);
+    document.getElementById('btn-confirmar-pergaminho-magia')?.addEventListener('click', () => {
+      if (!aplicarMagiaNoPergaminho(char, item, magiaSelecionadaPergaminho(raiz))) { toast('Não foi possível trocar a magia.', 'error'); return; }
+      salvar();
+      window.fecharModalTodos();
+      renderFichaCompleta();
+    });
+  });
   // Grava a escolha de resistência, recalcula a ficha e fecha o modal.
   document.getElementById('sel-escolha-resistencia')?.addEventListener('change', (e) => {
     const escolhas = { ...(item.escolhas || {}) };
