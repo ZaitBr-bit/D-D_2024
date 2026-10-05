@@ -400,6 +400,10 @@ tr:hover td { background: #faf8f4; }
    vez so (nenhum dos tres faz efeito fora de flex/grid), entao a linha de
    `justify-content: flex-start` da Rodada 1 virou redundante e saiu daqui. */
 .opcao-grid.densa .opcao-card .opcao-nome { font-size: 0.85rem; display: block; }
+/* Nome filho direto do card: reserva a área do .opcao-check (absoluto, 28 px
+   no canto superior direito) e quebra a palavra comprida, em vez de passar
+   por baixo do círculo e ser cortado pelo overflow do card (issue #130). */
+.opcao-grid.densa .opcao-card > .opcao-nome { padding-right: 24px; overflow-wrap: anywhere; }
 .opcao-card .opcao-tags {
   font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.04em;
   color: var(--text-muted); font-weight: 700; white-space: nowrap;

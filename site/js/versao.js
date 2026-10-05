@@ -138,6 +138,29 @@ export const NOTAS_VERSAO = [
     ],
   },
   {
+    versao: '3.0.22',
+    data: '2026-10-05',
+    rotulo: 'Magias e itens',
+    resumo: 'Reação na magia personalizada, selo Personalizada no Mago, nomes '
+      + 'longos de magia e propriedades em itens personalizados.',
+    correcoes: [
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'Magia personalizada: o tempo de conjuração Reação com gatilho '
+            + 'longo (por exemplo, citando uma arma) deixou de ser recusado. (#138)',
+          'Preparar Magias do Mago: a magia personalizada agora mostra o '
+            + 'selo Personalizada, a escola e a fonte, como nas outras '
+            + 'classes. (#131)',
+          'Nomes de magia compridos não ficam mais cortados pelo botão de '
+            + 'selecionar. (#130)',
+          'Item personalizado: a propriedade criada aparece no detalhe de '
+            + 'qualquer item, não só de armas. (#135)',
+        ],
+      },
+    ],
+  },
+  {
     versao: '3.0.21',
     data: '2026-10-03',
     rotulo: 'Itens e inventário',

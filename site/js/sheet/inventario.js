@@ -1360,7 +1360,7 @@ function htmlPropriedadesEMaestria(d, propsDescs) {
     html += `<div class="section-divider mt-1"><span>Propriedades</span></div>`;
     html += propsComDesc.map(p => `
       <details style="margin-bottom:4px">
-        <summary style="font-weight:600;cursor:pointer;font-size:0.85rem">${p.nome}</summary>
+        <summary style="font-weight:600;cursor:pointer;font-size:0.85rem">${escHtml(p.nome)}</summary>
         <div class="md-content" style="padding:4px 0;font-size:0.8rem">${mdParaHtml(p.descricao)}</div>
       </details>
     `).join('');
@@ -1525,11 +1525,13 @@ export function htmlDetalheItem(item, propsDescs = []) {
     // (issue #96, item a).
     if (d.categoria) {
       corpo += `<div style="font-size:0.85rem;margin-bottom:6px"><strong>Categoria:</strong> ${d.categoria}</div>`;
-      corpo += htmlPropriedadesEMaestria(d, propsDescs);
     } else if (d.tipo_item) {
       // Issue #100: categoria que não é arma (Armadura, Consumível...).
       corpo += `<div style="font-size:0.85rem;margin-bottom:6px"><strong>Categoria:</strong> ${escHtml(d.tipo_item)}</div>`;
     }
+    // Issue #135: a propriedade vale para qualquer item personalizado, não só
+    // para o de categoria de arma.
+    corpo += htmlPropriedadesEMaestria(d, propsDescs);
 
     if (item.descricao) {
       corpo += `<div class="md-content" style="margin-top:6px;font-size:0.85rem">${mdParaHtml(item.descricao)}</div>`;

@@ -394,10 +394,22 @@ export async function mostrarBuscaMagia() {
   const magiasClasse = ehMago
     ? [
         ...magiasClasseClasse.filter(m => m.circulo === 0),
-        ...(Array.isArray(char.grimorio) ? char.grimorio : []).map(registrada => ({
-          ...(magiasClasseClasse.find(m => m.nome === registrada?.nome) || {}),
-          ...registrada
-        }))
+        ...(Array.isArray(char.grimorio) ? char.grimorio : []).map(registrada => {
+          const doAcervo = magiasClasseClasse.find(m => m.nome === registrada?.nome);
+          // Issue #131: o grimório guarda só {nome, circulo}; a magia que não
+          // é do acervo e tem registro em `magias_customizadas` ganha o selo,
+          // a escola e a fonte, como nas grades das outras classes.
+          const personalizada = doAcervo ? null : magiaPersonalizadaDaFicha(char, registrada?.nome, registrada?.circulo);
+          return {
+            ...(doAcervo || {}),
+            ...(personalizada ? {
+              personalizada: true,
+              escola: personalizada.escola || '',
+              fonte: typeof personalizada.fonte === 'string' ? personalizada.fonte.trim().slice(0, 40) : '',
+            } : {}),
+            ...registrada
+          };
+        })
       ]
     : tipoConj === 'preparadas'
       ? [
@@ -1425,8 +1437,11 @@ export async function mostrarFormMagiaCustom(indiceEdicao = null) {
     // O cache carregado pela ficha ainda permite criar a magia sem bloquear a tela.
   }
   const magiasIndice = indice?.magias || indiceMagiasCache || [];
+  // Valida só o trecho antes da primeira vírgula: o gatilho da Reação
+  // ("Reação, quando uma criatura faz um ataque com uma arma") vem depois dela
+  // e pode citar "arma" ou "ataque desarmado", que a lista negra abaixo recusa.
   const tempoConjuracaoMagiaValido = (valor) => {
-    const tempo = String(valor || '').trim();
+    const tempo = String(valor || '').split(',')[0].trim();
     if (!tempo || /^(ama\s+ação|ama\s+acao)$/i.test(tempo)) return false;
     if (/crescimento excessivo|fertiliza[cç][aã]o|arma|ataque desarmado/i.test(tempo)) return false;
     return /^(?:a[cç][aã]o(?:\s+ou\s+ritual)?|a[cç][aã]o\s+b[oô]nus|1\s+a[cç][aã]o(?:\s+ou\s+ritual)?|rea[cç][aã]o(?:\b|\s+ou\s+ritual)|\d+\s+(?:minuto|minutos|hora|horas|dia|dias)(?:\s+ou\s+ritual)?)(?:\s|,|$)/i.test(tempo);

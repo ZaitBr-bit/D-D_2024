@@ -74,6 +74,13 @@
 > A **3.1.0 (itens mágicos)** foi uma melhoria do dono do produto, **sem issue
 > própria**; ela toca duas issues antigas: **#103** (parte (a) respondida) e
 > **#93** (parte dos sentidos por item entregue) — ver as entradas.
+>
+> **Triagem e correção de 2026-10-05 (tarde)**: backlog conferido na API (33
+> abertas, lista batendo uma a uma; #126 ganhou dois comentários, sugerindo
+> compartilhar magias/itens personalizados entre fichas da conta). Dos cinco
+> bugs novos, quatro tinham causa raiz no código e foram corrigidos com oráculo
+> vermelho antes (#130, #131, #135, #138); #129 não reproduziu. Sem commit e sem
+> `versao.js` ainda (o dono diz a versão).
 
 ---
 
@@ -98,13 +105,13 @@ _(nenhuma nesta faixa no momento — ver notas de manutenção)_
 Abertas na 3.0.21 (ou 3.0.x); **nenhuma foi investigada contra o código** — o
 que segue é o resumo do que o autor descreve, a confirmar na triagem.
 
-**Bugs**
+**Bugs** — triados em 2026-10-05; #130, #131, #135 e #138 corrigidos (aguardam commit e versão), #129 não reproduzido.
 
-- [ ] **#129** — Mago que adquire o talento Mestre das Armas perde o botão de trocar/preparar magias no Descanso Longo e fica só com "Trocar truque" e "Trocar maestria". Provável ligação com a vaga própria de maestria do talento (#119, 3.0.19) e com o encadeamento do modal de trocas.
-- [ ] **#130** — Magia de nome grande aparece cortada pelo botão de selecionar (Magias / grimório). Layout da linha da magia.
-- [ ] **#131** — Magia personalizada de Mago não mostra o selo "Personalizada" ao preparar, como nas outras classes. Mesmo cluster "magia personalizada" (#124/#46).
-- [ ] **#135** — Propriedade personalizada só aparece em itens que são armas; o autor tentou criar uma num item mágico. Formulário de item personalizado da 3.0.21 (#104). Verificar também a interação com a categoria Itens Mágicos da 3.1.0.
-- [ ] **#138** — Magia personalizada: o tempo de conjuração "Reação" é recusado ("selecione um tempo válido"). Validação do formulário de magia.
+- [ ] **#129** — Mago que adquire o talento Mestre das Armas perde o botão de trocar/preparar magias no Descanso Longo. **Não reproduzido**: Mago 5 com o talento e magias preparadas mostra os três botões (`mago-mestre-das-armas-descanso.spec.mjs`). O botão só some quando a ficha não tem nenhuma magia preparada de círculo 1+ (o portão de `hp-descanso.js` exige uma candidata a sair); nada no fluxo do talento esvazia `magias_preparadas`. Falta perguntar ao autor se o Mago dele tinha magias preparadas; ver `PERGUNTAS-PENDENTES.txt`.
+- [x] **#130** — Nome de magia grande cortado pelo check. Causa: `.opcao-check` é absoluto (28 px) e o nome, filho direto do card denso, passava por baixo dele. `app.css`: `padding-right: 24px` e `overflow-wrap: anywhere` em `.opcao-grid.densa .opcao-card > .opcao-nome`. Teste: `grimorio-mago-personalizada-badge-e-nome-longo.spec.mjs`.
+- [x] **#131** — Selo "Personalizada" no Mago. Causa: a grade do Mago é montada de `char.grimorio` (`{nome, circulo}`), sem a marca `personalizada`. `mostrarBuscaMagia` (`grimorio.js`) agora cruza a entrada sem par no acervo com `magias_customizadas` e acrescenta selo, escola e fonte. Mesmo spec do #130.
+- [x] **#135** — Propriedade personalizada fora de arma. Causa: `htmlDetalheItem` (`inventario.js`) só chamava `htmlPropriedadesEMaestria` dentro de `if (d.categoria)`. Agora vale para todo item personalizado (o nome da propriedade também passou por `escHtml`). Teste: `item-customizado-propriedade-nao-arma.spec.mjs`.
+- [x] **#138** — Reação recusada. Causa: o gatilho digitado ("...ataque com uma arma") passava pela lista negra `arma|ataque desarmado` de `tempoConjuracaoMagiaValido` (`grimorio.js`), feita para filtrar o índice. A validação agora olha só o trecho antes da primeira vírgula. Teste: `magia-personalizada-reacao-gatilho.spec.mjs`.
 
 **Melhorias**
 
@@ -163,6 +170,8 @@ _(nenhuma nesta faixa no momento — ver notas de manutenção)_
 ---
 
 ## Notas de manutenção
+
+- **Corrigidas em 2026-10-05, aguardando commit/versão**: #130, #131, #135, #138 (bugs abertos na 3.0.21). Causas e testes nas entradas da seção "Novas, sem triagem". Regressão: 208 e2e nas suítes de grimório, magia, item customizado, descanso, trocas e inventário (0 falhas); unidade 5065 testes, 1 falha antiga (`gatilhos-ui-cobertos`). #129 segue aberta, não reproduzida.
 
 - **Entregue na versão 3.1.0 (2026-10-05)** — melhoria do dono do produto, **sem issue**: itens mágicos do Livro do Mestre (capítulo 7). 350 itens traduzidos e catalogados (`dados/livro-do-mestre/capitulo7/`, extração e curadoria em `scripts/livro-do-mestre/`); na ficha: categoria Itens Mágicos no Adicionar Item, bônus automáticos (CA, salvaguardas, ataque/CD de magia, ataque/dano de arma), atributo em jogo (Cinturão de Força do Gigante, Amuleto da Saúde, Pedras Ioun, aumentos permanentes de Manuais/Tomos/Livros), cargas e usos com recuperação no Descanso Longo, magias conjuradas pelo item, resistências/imunidades/deslocamento/sentidos/vantagens passivos e aviso de sintonização restrita. Dez planos de implementação (em `docs/superpowers/plans/`, não versionados). Corrigidos no caminho, sem issue: PV com o Amuleto da Saúde ao editar Constituição/reverter/ASI/talento/dádiva, rótulo "(Rolado: N)" do level-up, Exaustão nos Deslocamentos especiais fixos, Visão às Cegas do Guardião multiclasse e itens duplicados em Deslocamento/Condições. **Limitações de modelo conhecidas** (itens que exigem vocabulário novo: voo condicional do Manto do Morcego, imunidade à magia Mísseis Mágicos do Broche Protetor, Visão no Escuro a 30 cm dos Olhos de Visão Minuciosa, aliados em auras, restrições de uso das magias de itens, Túnica das Estrelas, Cubo de Invocação, Lâmina e Pedra da Boa Sorte, Cabras de Marfim, Elmo do Brilho) estão em `scripts/livro-do-mestre/GUIA-MECANICA.md`. Tocam as issues abertas **#103** (parte (a) respondida) e **#93** (sentidos por item entregues), registradas nas entradas delas.
 
