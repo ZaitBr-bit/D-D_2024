@@ -1,7 +1,10 @@
 // ============================================================
 // Utilitários de cálculo D&D 5.5 e helpers gerais
 // ============================================================
-import { ATRIBUTOS_KEYS, ATRIBUTO_NOME_PARA_KEY, PERICIAS, CLASSES_INFO } from './dados-classes.js';
+import { atributoEfetivo, atributosEfetivos } from './regras-atributos.js';
+import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ATRIBUTO_NOME_PARA_KEY, PERICIAS, CLASSES_INFO } from './dados-classes.js';
+import { ehProficienteEmSalvaguarda } from './regras-salvaguardas.js';
+import { equipamentoDeCA, maiorEfeito, somaEfeitos } from './regras-itens-magicos.js';
 import { magiaContaNoLimite } from './regras-origens-magia.js';
 import { getAtributoConjuracaoSubclasse, getConjuracaoSubclasse } from './regras-conjuracao-subclasse.js';
 // Acessores de multiclasse. Não há ciclo: regras-multiclasse.js importa
@@ -342,8 +345,8 @@ export function coletarCAsAlternativas(personagem, contexto = {}) {
   // calcCA.
   if (temArmadura) return [];
 
-  const atributos = personagem.atributos || {};
-  const modDes = calcMod(atributos.destreza);
+  const efetivos = atributosEfetivos(personagem);
+  const modDes = calcMod(efetivos.destreza);
   const lista = classesDe(personagem);
   const candidatas = [];
 
@@ -361,7 +364,7 @@ export function coletarCAsAlternativas(personagem, contexto = {}) {
     candidatas.push({
       classe: fonte.classe,
       subclasse: fonte.subclasse,
-      valor: 10 + modDes + calcMod(atributos[fonte.atributo]),
+      valor: 10 + modDes + calcMod(efetivos[fonte.atributo]),
       permiteEscudo: fonte.permiteEscudo,
       livro: fonte.livro,
     });
@@ -409,37 +412,18 @@ export function escolherCAAlternativa(personagem, candidatas) {
   return candidatas.reduce((maior, c) => (c.valor > maior.valor ? c : maior));
 }
 
-/**
- * A ARMADURA e o ESCUDO equipados, do jeito que calcCA os enxerga.
- *
- * Extraído de dentro de calcCA -- sem mudar predicado nenhum -- porque a
- * ficha PRECISA montar o mesmo `{ temArmadura, temEscudo }` para chamar
- * `coletarCAsAlternativas()` e decidir se mostra o seletor de CA. Uma
- * segunda cópia dos dois `find` na tela seria a receita exata do bug do
- * commit 12a541b: um coletor chamado SEM contexto oferece a Defesa sem
- * Armadura do Monge a um Monge de escudo, que o livro exclui
- * (Classes.md:5174-5176). Com uma leitura só, tela e cálculo não têm como
- * divergir.
- *
- * @param {object} personagem
- * @returns {{armadura: object|undefined, escudo: object|undefined}}
- */
-export function equipamentoDeCA(personagem) {
-  const inv = personagem?.inventario || [];
-  return {
-    armadura: inv.find(i => i.equipado && i.tipo === 'armadura' && i.nome !== 'Escudo'),
-    escudo: inv.find(i => i.equipado && (i.nome === 'Escudo' || i.tipo === 'escudo')),
-  };
-}
+// Armadura e escudo equipados, como calcCA os enxerga: a regra mora em
+// regras-itens-magicos.js, e a ficha usa esta mesma leitura para decidir o
+// seletor de CA alternativa (coletarCAsAlternativas), sem segunda cópia dos
+// predicados. O nome continua exportado daqui para quem importava de utils.js.
+export { equipamentoDeCA };
 
 /** Calcula CA baseado na armadura equipada */
 export function calcCA(personagem, passivos = null) {
   // Constituição, Sabedoria e Carisma NÃO aparecem mais aqui: os três
   // modificadores que entravam nas Defesas sem Armadura agora são lidos
   // dentro de coletarCAsAlternativas(), a partir de FONTES_CA_ALTERNATIVA.
-  const modDes = calcMod(personagem.atributos.destreza);
-  const inv = personagem.inventario || [];
-
+  const modDes = calcMod(atributoEfetivo(personagem, 'destreza'));
   // Verificar armadura equipada (mesma leitura que a ficha usa para o
   // seletor de CA alternativa -- ver equipamentoDeCA, logo acima).
   const { armadura, escudo } = equipamentoDeCA(personagem);
@@ -488,7 +472,7 @@ export function calcCA(personagem, passivos = null) {
     }
   }
 
-  // CA BASE de item customizado: o item que DEFINE a CA.
+  // CA BASE de item: o item que DEFINE a CA.
   //
   // O campo "Bonus CA" SOMA, e e isso que ele sempre fez. Mas o item que a
   // mesa inventa vem escrito como a armadura do livro vem ("Armadura Negra
@@ -503,13 +487,12 @@ export function calcCA(personagem, passivos = null) {
   //
   // O app nao assume que o item e armadura: nao desliga a Defesa sem
   // Armadura do Barbaro/Monge nem liga o Defensivo. Item customizado nao tem
-  // tipo -- "CA 20" tanto pode ser peitoral quanto amuleto -- e o piso ja da
-  // o numero certo nos dois casos.
-  const caBaseCustomizado = inv
-    .filter(i => i.equipado)
-    .reduce((maior, i) => Math.max(maior, parseInt(i.dados?.ca_base) || 0), 0);
-  if (caBaseCustomizado > ca) {
-    ca = caBaseCustomizado;
+  // tipo de armadura -- "CA 20" tanto pode ser peitoral quanto amuleto -- e o
+  // piso ja da o numero certo nos dois casos.
+  // Fontes: item customizado (adaptador) e item do acervo; vale o maior.
+  const caBaseItens = maiorEfeito(personagem, 'ca_base');
+  if (caBaseItens > ca) {
+    ca = caBaseItens;
   }
 
   // Escudo: +2
@@ -530,10 +513,9 @@ export function calcCA(personagem, passivos = null) {
     ca += 1;
   }
 
-  // Bônus de CA de itens customizados
-  inv.filter(i => i.equipado && i.dados?.bonus_ca).forEach(i => {
-    ca += parseInt(i.dados.bonus_ca) || 0;
-  });
+  // Bônus de CA de itens (acervo e customizado), equipados, sintonizados
+  // quando exigem e com a condição satisfeita (regras-itens-magicos.js).
+  ca += somaEfeitos(personagem, 'ca');
 
   // Efeitos mágicos ativos que afetam CA
   const efeitos = personagem.efeitos_magicos || [];
@@ -590,23 +572,28 @@ export function somaModificadoresManuais(personagem, alvo) {
 }
 
 /**
- * Soma os bônus de ataque/CD de magia de itens customizados EQUIPADOS (e
- * SINTONIZADOS, quando o item exige sintonização) -- issue #37: o
- * formulário do item customizado já tinha os campos, mas nada aqui os
- * lia, então o bônus nunca entrava em jogada nenhuma.
+ * Soma os bônus de ataque/CD de magia de itens (acervo e customizado),
+ * equipados e sintonizados quando exigem (regras-itens-magicos.js), mais
+ * os modificadores temporários manuais (issue #83).
  */
 function bonusMagiaDeItens(personagem) {
-  let ataque = 0, cd = 0;
-  for (const item of personagem?.inventario || []) {
-    if (item?.tipo !== 'customizado' || !item.equipado) continue;
-    if (item.dados?.requer_sintonizacao && !item.sintonizado) continue;
-    ataque += parseInt(item.dados?.bonus_ataque_magia) || 0;
-    cd += parseInt(item.dados?.bonus_cd_magia) || 0;
-  }
-  // Modificadores temporários manuais (issue #83).
-  ataque += somaModificadoresManuais(personagem, 'ataque_magia');
-  cd += somaModificadoresManuais(personagem, 'cd_magia');
+  const ataque = somaEfeitos(personagem, 'ataque_magia') + somaModificadoresManuais(personagem, 'ataque_magia');
+  const cd = somaEfeitos(personagem, 'cd_magia') + somaModificadoresManuais(personagem, 'cd_magia');
   return { ataque, cd };
+}
+
+/**
+ * Bônus de uma salvaguarda: modificador do atributo, proficiência quando
+ * proficiente (regras-salvaguardas.js) e efeitos "salvaguarda" de itens.
+ * Ficha, impressão e PDF usam esta mesma conta.
+ * @param {object} personagem
+ * @param {string} chave chave do atributo ('forca', 'destreza', ...)
+ * @returns {number}
+ */
+export function calcSalvaguarda(personagem, chave) {
+  const mod = calcMod(atributoEfetivo(personagem, chave));
+  const proficiente = ehProficienteEmSalvaguarda(personagem, ATRIBUTOS_NOMES[chave]);
+  return mod + (proficiente ? bonusProficiencia(personagem.nivel) : 0) + somaEfeitos(personagem, 'salvaguarda');
 }
 
 /** Calcula CD de magia */
@@ -614,7 +601,7 @@ export function calcCDMagia(personagem) {
   const atributo = atributoConjuracaoDe(personagem);
   if (!atributo) return 0;
   const key = ATRIBUTO_NOME_PARA_KEY[atributo];
-  const modAttr = calcMod(personagem.atributos[key]);
+  const modAttr = calcMod(atributoEfetivo(personagem, key));
   let cd = 8 + bonusProficiencia(personagem.nivel) + modAttr;
 
   // Feiticeiro: Feitiçaria Inata ativa aumenta CD em +1
@@ -630,7 +617,7 @@ export function calcAtaqueMagia(personagem) {
   const atributo = atributoConjuracaoDe(personagem);
   if (!atributo) return 0;
   const key = ATRIBUTO_NOME_PARA_KEY[atributo];
-  const modAttr = calcMod(personagem.atributos[key]);
+  const modAttr = calcMod(atributoEfetivo(personagem, key));
   return bonusProficiencia(personagem.nivel) + modAttr + bonusMagiaDeItens(personagem).ataque;
 }
 
@@ -679,7 +666,7 @@ export function conjuracoesPorClasse(personagem) {
       atributo = getAtributoConjuracaoSubclasse(c.classe, c.subclasse);
     }
     if (!atributo) continue;
-    const modAttr = calcMod(personagem?.atributos?.[ATRIBUTO_NOME_PARA_KEY[atributo]]);
+    const modAttr = calcMod(atributoEfetivo(personagem, ATRIBUTO_NOME_PARA_KEY[atributo]));
     // Feitiçaria Inata sobe a CD em +1 só das magias de FEITICEIRO
     // (Classes.md, característica de nível 7). Antes isto era
     // `personagem.classe === 'Feiticeiro'`, o espelho: num
@@ -700,7 +687,7 @@ export function conjuracoesPorClasse(personagem) {
 
 /** Calcula Percepção Passiva */
 export function calcPercepcaoPassiva(personagem) {
-  const modSab = calcMod(personagem.atributos.sabedoria);
+  const modSab = calcMod(atributoEfetivo(personagem, 'sabedoria'));
   const prof = (personagem.pericias_proficientes || []).includes('Percepção');
   const exp = (personagem.pericias_expertise || []).includes('Percepção');
   let bonus = modSab;
@@ -743,7 +730,7 @@ export function calcBonusPericia(personagem, nomePericia, opcoes = {}) {
   const usarForcaPrimordial = emFuria && forcaPrimordialAtiva
     && PERICIAS_CONHECIMENTO_PRIMORDIAL.includes(nomePericia);
   const key = usarForcaPrimordial ? 'forca' : ATRIBUTO_NOME_PARA_KEY[pericia.atributo];
-  const mod = calcMod(personagem.atributos[key]);
+  const mod = calcMod(atributoEfetivo(personagem, key));
   const prof = (personagem.pericias_proficientes || []).includes(nomePericia);
   const exp = (personagem.pericias_expertise || []).includes(nomePericia);
   let bonus = mod;
@@ -760,7 +747,7 @@ export function calcBonusPericia(personagem, nomePericia, opcoes = {}) {
     personagem.ordem_divina === 'Taumaturgo' &&
     (nomePericia === 'Arcanismo' || nomePericia === 'Religião')
   ) {
-    bonus += Math.max(1, calcMod(personagem.atributos.sabedoria));
+    bonus += Math.max(1, calcMod(atributoEfetivo(personagem, 'sabedoria')));
   }
 
   // Druida (Ordem Primal: Xamã) - bônus em Arcanismo e Natureza
@@ -770,7 +757,7 @@ export function calcBonusPericia(personagem, nomePericia, opcoes = {}) {
     ordemPrimal === 'Xamã' &&
     (nomePericia === 'Arcanismo' || nomePericia === 'Natureza')
   ) {
-    bonus += Math.max(1, calcMod(personagem.atributos.sabedoria));
+    bonus += Math.max(1, calcMod(atributoEfetivo(personagem, 'sabedoria')));
   }
 
   // Efeitos magicos: bonus numerico de pericia (ex: Passo Sem Rastro +10 Furtividade)

@@ -1,0 +1,285 @@
+{
+  "lote": "04",
+  "itens": {
+    "defensora": {
+      "base": {
+        "tipo": "arma",
+        "categorias": [
+          "Armas Simples Corpo a Corpo",
+          "Armas Marciais Corpo a Corpo"
+        ]
+      },
+      "efeitos": [
+        {
+          "alvo": "ataque_arma",
+          "valor": 3
+        },
+        {
+          "alvo": "dano_arma",
+          "valor": 3
+        }
+      ]
+    },
+    "armadura-demoniaca": {
+      "base": {
+        "tipo": "armadura",
+        "categorias": [
+          "Leve",
+          "Média",
+          "Pesada"
+        ]
+      },
+      "efeitos": [
+        {
+          "alvo": "ca",
+          "valor": 1
+        }
+      ]
+    },
+    "loriga-de-escamas-de-dragao": {
+      "base": {
+        "tipo": "armadura",
+        "opcoes": [
+          "Loriga de Escamas"
+        ]
+      },
+      "efeitos": [
+        {
+          "alvo": "ca",
+          "valor": 1
+        },
+        { "alvo": "resistencia", "escolha": ["Ácido", "Elétrico", "Ígneo", "Venenoso", "Gélido"] },
+        { "alvo": "vantagem", "em": "salvaguarda", "contexto": "contra as armas de sopro de Dragões" }
+      ],
+      "recursos": {
+        "usos": [
+          {
+            "nome": "Discernir dragão mais próximo",
+            "max": 1,
+            "recupera": "amanhecer"
+          }
+        ]
+      }
+    },
+    "matadora-de-dragoes": {
+      "base": {
+        "tipo": "arma",
+        "categorias": [
+          "Armas Simples Corpo a Corpo",
+          "Armas Simples à Distância",
+          "Armas Marciais Corpo a Corpo",
+          "Armas Marciais à Distância"
+        ]
+      },
+      "efeitos": [
+        {
+          "alvo": "ataque_arma",
+          "valor": 1
+        },
+        {
+          "alvo": "dano_arma",
+          "valor": 1
+        }
+      ]
+    },
+    "armadura-de-placas-ana": {
+      "base": {
+        "tipo": "armadura",
+        "opcoes": [
+          "Armadura de Placas Parcial",
+          "Armadura de Placas"
+        ]
+      },
+      "efeitos": [
+        {
+          "alvo": "ca",
+          "valor": 2
+        }
+      ]
+    },
+    "arremessador-anao": {
+      "base": {
+        "tipo": "arma",
+        "opcoes": [
+          "Martelo de Guerra"
+        ]
+      },
+      "efeitos": [
+        {
+          "alvo": "ataque_arma",
+          "valor": 3
+        },
+        {
+          "alvo": "dano_arma",
+          "valor": 3
+        }
+      ]
+    },
+    "cota-de-malha-do-efreeti": {
+      "base": {
+        "tipo": "armadura",
+        "opcoes": [
+          "Cota de Malha",
+          "Cota de Malha Parcial"
+        ]
+      },
+      "efeitos": [
+        {
+          "alvo": "ca",
+          "valor": 3
+        },
+        { "alvo": "imunidade", "tipo_dano": "Ígneo" }
+      ]
+    },
+    "cota-de-malha-elfica": {
+      "base": {
+        "tipo": "armadura",
+        "opcoes": [
+          "Cota de Malha",
+          "Cota de Malha Parcial"
+        ]
+      },
+      "efeitos": [
+        {
+          "alvo": "ca",
+          "valor": 1
+        }
+      ]
+    },
+    "arco-de-energia": {
+      "base": {
+        "tipo": "arma",
+        "opcoes": [
+          "Arco Longo",
+          "Arco Curto"
+        ]
+      },
+      "efeitos": [
+        {
+          "alvo": "ataque_arma",
+          "valor": 1
+        },
+        {
+          "alvo": "dano_arma",
+          "valor": 1
+        }
+      ]
+    },
+    "armadura-encantada": {
+      "base": {
+        "tipo": "armadura",
+        "categorias": [
+          "Leve",
+          "Média",
+          "Pesada"
+        ]
+      },
+      "efeitos": [],
+      "recursos": {
+        "cargas": {
+          "max": 6,
+          "recupera": "1d6",
+          "ultima_carga": null
+        }
+      }
+    },
+    "arma-encantada": {
+      "base": {
+        "tipo": "arma",
+        "categorias": [
+          "Armas Simples Corpo a Corpo",
+          "Armas Simples à Distância",
+          "Armas Marciais Corpo a Corpo",
+          "Armas Marciais à Distância"
+        ]
+      },
+      "efeitos": [],
+      "recursos": {
+        "cargas": {
+          "max": 6,
+          "recupera": "1d6",
+          "ultima_carga": null
+        }
+      }
+    },
+    "demonomicon-de-iggwilv": { "efeitos": [], "recursos": { "cargas": { "max": 8, "recupera": "1d8", "ultima_carga": null }, "usos": [ { "nome": "Contenção", "max": 1, "recupera": "amanhecer" } ] }, "magias": [ { "nome": "Círculo Mágico", "custo": { "cargas": 1 }, "conjuracao": { "cd": 20 } }, { "nome": "Receptáculo Arcano", "custo": { "cargas": 3 }, "conjuracao": { "cd": 20 } }, { "nome": "Aliado Extraplanar", "custo": { "cargas": 3 }, "conjuracao": { "cd": 20 } }, { "nome": "Âncora Planar", "custo": { "cargas": 2 }, "conjuracao": { "cd": 20 } }, { "nome": "Transição Planar", "custo": { "cargas": 3 }, "conjuracao": { "cd": 20 } }, { "nome": "Invocar Ínfero", "custo": { "cargas": 3 }, "conjuracao": { "cd": 20 } }, { "nome": "Gargalhada Nefasta de Tasha", "custo": { "cargas": 0 }, "conjuracao": { "cd": 20 } } ] },
+    "globo-flutuante": {
+      "efeitos": [],
+      "recursos": {
+        "usos": [
+          {
+            "nome": "Luz do Dia",
+            "max": 1,
+            "recupera": "amanhecer"
+          }
+        ]
+      }
+    },
+    "cajado-encantado": {
+      "efeitos": [],
+      "recursos": {
+        "cargas": {
+          "max": 6,
+          "recupera": "1d6",
+          "ultima_carga": {
+            "efeito_com_1": "outro",
+            "texto": "Se você gastar a última carga do cajado, jogue 1d20. Com 1, o cajado perde suas propriedades e se torna um Cajado não mágico."
+          }
+        }
+      }
+    }
+  },
+  "sem_efeito_automatico": [
+    "grilhoes-dimensionais",
+    "elmo-do-pavor",
+    "po-do-desaparecimento",
+    "po-da-secura",
+    "po-de-espirrar-e-engasgar",
+    "corneta-auditiva",
+    "garrafa-do-efreeti",
+    "gema-elemental",
+    "elixir-da-saude",
+    "livro-de-magias-duradouro",
+    "armadura-encantada-truque",
+    "armadura-encantada-1-circulo",
+    "armadura-encantada-2-circulo",
+    "armadura-encantada-3-circulo",
+    "armadura-encantada-4-circulo",
+    "armadura-encantada-5-circulo",
+    "armadura-encantada-6-circulo",
+    "armadura-encantada-7-circulo",
+    "armadura-encantada-8-circulo",
+    "cajado-encantado-truque",
+    "cajado-encantado-1-circulo",
+    "cajado-encantado-2-circulo",
+    "cajado-encantado-3-circulo",
+    "cajado-encantado-4-circulo",
+    "cajado-encantado-5-circulo",
+    "cajado-encantado-6-circulo",
+    "cajado-encantado-7-circulo",
+    "cajado-encantado-8-circulo",
+    "arma-encantada-truque",
+    "arma-encantada-1-circulo",
+    "arma-encantada-2-circulo",
+    "arma-encantada-3-circulo",
+    "arma-encantada-4-circulo",
+    "arma-encantada-5-circulo",
+    "arma-encantada-6-circulo",
+    "arma-encantada-7-circulo",
+    "arma-encantada-8-circulo"
+  ],
+  "sem_magias": {
+    "armadura-encantada": "magia vinculada definida na criação do item (não nomeada no texto); as variantes por círculo herdam",
+    "arma-encantada": "magia vinculada definida na criação do item (não nomeada no texto); as variantes por círculo herdam",
+    "cajado-encantado": "magia vinculada definida na criação do item (não nomeada no texto); as variantes por círculo herdam",
+    "garrafa-do-efreeti": "o Desejo é conjurado pelo efreeti, não pelo item"
+  },
+  "pendencias": [
+    "defensora: registrado o padrão +3 ataque/+3 dano; a transferência opcional de parte do bônus para a CA (até o início do próximo turno) é escolha por turno e fica na descrição.",
+    "armadura-demoniaca: o +1 nas jogadas de ataque e de dano dos Ataques Desarmados não tem alvo no vocabulário (ataque_arma/dano_arma exigem base arma); só o +1 na CA foi registrado.",
+    "cajado-encantado: o texto não diz que o cajado funciona como arma; sem base. CD para Evitar e Bônus de Ataque da tabela são da magia vinculada (conjurada por carga), não do portador; variantes sem efeito.",
+    "armadura-encantada / arma-encantada: CD e bônus de ataque da tabela valem só para a magia vinculada conjurada por carga; não são cd_magia/ataque_magia do personagem. Pai com base e efeitos vazios; variantes sem efeito.",
+    "grilhoes-dimensionais: teste de Força (Atletismo) da criatura presa a cada 30 dias; recuperação em horas/dias/outra mecânica, não representável; contador manual.",
+    "demonomicon-de-iggwilv: Transição Planar só vale \"para o Abismo\"; a restrição fica na descrição. Enredamento (Círculo Mágico e Âncora Planar no 9º círculo) altera a conjuração do personagem, não é magia do item."
+  ]
+}

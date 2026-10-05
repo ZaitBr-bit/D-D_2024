@@ -450,6 +450,9 @@ const UTILS_LEGITIMAS_NIVEL_TOTAL = [
   // (bonusMagiaDeItens) no mesmo `return` -- o `personagem.nivel` que
   // importa pra esta lista continua o mesmo, so o texto da linha mudou.
   'return bonusProficiencia(personagem.nivel) + modAttr + bonusMagiaDeItens(personagem).ataque;',
+  // Itens mágicos (Task 4): calcSalvaguarda recebe a conta que ficha,
+  // impressão e PDF faziam; o bônus de proficiência é o nível total.
+  "return mod + (proficiente ? bonusProficiencia(personagem.nivel) : 0) + somaEfeitos(personagem, 'salvaguarda');",
   'if (prof) bonus += bonusProficiencia(personagem.nivel);',
   'if (exp) bonus += bonusProficiencia(personagem.nivel);',
   'bonus += Math.floor(bonusProficiencia(personagem.nivel) / 2);',

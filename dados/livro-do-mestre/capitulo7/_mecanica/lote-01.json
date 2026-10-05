@@ -1,0 +1,58 @@
+{
+  "lote": "01",
+  "itens": {
+    "armadura-de-adamantina": { "base": { "tipo": "armadura", "categorias": ["Média", "Pesada"], "excluir": ["Gibão de Peles"] }, "efeitos": [] },
+    "arma-de-adamantina": { "base": { "tipo": "arma", "categorias": ["Armas Simples Corpo a Corpo", "Armas Marciais Corpo a Corpo"] }, "efeitos": [] },
+    "amuleto-da-saude": { "efeitos": [ { "alvo": "atributo", "atributo": "constituicao", "minimo": 19 } ] },
+    "escudo-animado": { "base": { "tipo": "escudo" }, "efeitos": [] },
+    "armadura-mais-1-mais-2-ou-mais-3": { "base": { "tipo": "armadura", "categorias": ["Leve", "Média", "Pesada"] }, "efeitos": [] },
+    "armadura-mais-1": { "efeitos": [ { "alvo": "ca", "valor": 1 } ] },
+    "armadura-mais-2": { "efeitos": [ { "alvo": "ca", "valor": 2 } ] },
+    "armadura-mais-3": { "efeitos": [ { "alvo": "ca", "valor": 3 } ] },
+    "armadura-reluzente": { "base": { "tipo": "armadura", "categorias": ["Leve", "Média", "Pesada"] }, "efeitos": [] },
+    "armadura-da-invulnerabilidade": { "base": { "tipo": "armadura", "opcoes": ["Armadura de Placas"] }, "efeitos": [ { "alvo": "resistencia", "tipo_dano": "Contundente" }, { "alvo": "resistencia", "tipo_dano": "Perfurante" }, { "alvo": "resistencia", "tipo_dano": "Cortante" } ], "recursos": { "usos": [ { "nome": "Carapaça Metálica", "max": 1, "recupera": "amanhecer" } ] } },
+    "armadura-de-resistencia": { "base": { "tipo": "armadura", "categorias": ["Leve", "Média", "Pesada"] }, "efeitos": [ { "alvo": "resistencia", "escolha": ["Ácido", "Gélido", "Ígneo", "Energético", "Elétrico", "Necrótico", "Venenoso", "Psíquico", "Radiante", "Trovejante"] } ] },
+    "armadura-de-vulnerabilidade": { "base": { "tipo": "armadura", "categorias": ["Leve", "Média", "Pesada"] }, "efeitos": [ { "alvo": "resistencia", "escolha": ["Contundente", "Perfurante", "Cortante"] } ] },
+    "escudo-apanha-flechas": { "base": { "tipo": "escudo" }, "efeitos": [] },
+    "machado-dos-senhores-anoes": { "base": { "tipo": "arma", "opcoes": ["Machado de Batalha"] }, "efeitos": [ { "alvo": "ataque_arma", "valor": 3 }, { "alvo": "dano_arma", "valor": 3 }, { "alvo": "sentido", "sentido": "visao_no_escuro", "metros": 18, "soma_se_tiver": 18 }, { "alvo": "imunidade", "tipo_dano": "Venenoso" }, { "alvo": "resistencia", "tipo_dano": "Ígneo" }, { "alvo": "atributo_bonus", "atributo": "constituicao", "valor": 2, "maximo": 20 } ], "recursos": { "usos": [ { "nome": "Conjurar Elemental da Terra", "max": 1, "recupera": "amanhecer" } ] } },
+    "bolsa-de-truques": { "efeitos": [], "recursos": { "usos": [ { "nome": "Objetos felpudos", "max": 3, "recupera": "amanhecer" } ] } }
+  },
+  "sem_efeito_automatico": [
+    "jarro-alquimico",
+    "municao-mais-1-mais-2-ou-mais-3",
+    "municao-mais-1",
+    "municao-mais-2",
+    "municao-mais-3",
+    "municao-assassina",
+    "amuleto-a-prova-de-deteccao-e-localizacao",
+    "aparato-de-kwalish",
+    "vassoura-dancante-de-baba-yaga",
+    "bolsa-de-feijoes",
+    "bolsa-gulosa",
+    "bolsa-devoradora",
+    "bolsa-de-truques-cinza",
+    "bolsa-de-truques-ferrugem",
+    "bolsa-de-truques-castanha",
+    "conta-de-forca",
+    "amuleto-dos-planos"
+  ],
+  "sem_cargas": {},
+  "sem_passivos": {
+    "aparato-de-kwalish": "atributo do objeto: Imunidade a dano Venenoso e Psíquico do aparato"
+  },
+  "sem_magias": {
+    "armadura-de-vulnerabilidade": "Identificar e Remover Maldição são citadas como condição da maldição; o item não as conjura",
+    "amuleto-dos-planos": "Transição Planar só é conjurada se o teste de Inteligência (Arcanismo) CD 15 passar; teste não representado",
+    "machado-dos-senhores-anoes": "Teleporte (Viajar pelas Profundezas) só volta após 3 dias; limite não representado"
+  },
+  "pendencias": [
+    "armadura-de-vulnerabilidade: a maldição (Vulnerabilidade a dois dos três tipos de dano) não é modelada; só a Resistência (escolha entre Contundente, Perfurante e Cortante) foi curada.",
+    "arma-de-adamantina: subtipo 'Qualquer Munição ou Arma Corpo a Corpo'; base registrada só com as categorias corpo a corpo, porque munição não é automatizada. A versão munição do item não tem base na ficha.",
+    "escudo-apanha-flechas: '+2 de bônus na Classe de Armadura contra jogadas de ataque à distância' é bônus condicional ao tipo de ataque; fica fora dos efeitos (só a base escudo).",
+    "machado-dos-senhores-anoes: «Viajar pelas Profundezas» (Teleporte) só volta «até que se passem 3 dias»; recupera não admite dias, fica fora dos usos.",
+    "jarro-alquimico: limite por líquido «até o próximo amanhecer» depende do líquido nomeado (quantidade em litros), não é uso contável; sem recursos.",
+    "bolsa-gulosa: «uma vez por dia» é comportamento do item (engole o conteúdo, decisão do Mestre), não uso do personagem; sem recursos.",
+    "bolsa-de-truques: recursos no item-pai (3 objetos felpudos por amanhecer); as variantes cinza/ferrugem/castanha herdam.",
+    "amuleto-dos-planos: Transição Planar só é conjurada se o teste de Inteligência (Arcanismo) CD 15 passar; a CD 15 é do teste, não da magia (conjuracao null). Custo \"livre\": o item não tem usos nem cargas."
+  ]
+}

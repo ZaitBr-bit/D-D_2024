@@ -4,6 +4,7 @@
 // Consultado pela ficha, pelos descansos e pelas habilidades ativas.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
+import { atributoEfetivo } from '../../regras-atributos.js';
 import { calcMod } from '../../utils.js';
 import { char } from '../estado.js';
 import { temClasse, nivelNa } from '../../regras-multiclasse.js';
@@ -63,7 +64,7 @@ export function getEstadoRecursosDruida() {
 
   const prog = getProgressaoDruida() || { formaSelvagemMax: 0 };
   const usosDisponiveis = Math.max(0, prog.formaSelvagemMax - char.recursos.druida.forma_selvagem_usos_gastos);
-  const modSab = Math.max(1, calcMod(char.atributos?.sabedoria || 10));
+  const modSab = Math.max(1, calcMod(atributoEfetivo(char, 'sabedoria') || 10));
 
   return {
     formaSelvagemAtiva: !!char.recursos.druida.forma_selvagem_ativa,

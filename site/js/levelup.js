@@ -12,6 +12,7 @@ import { classesDe, migrarParaMulticlasse, nivelNa, sincronizarEspelhos, subclas
 import { conjuraPorAlgumaClasse } from './regras-multiclasse-conjuracao.js';
 import { armadurasDoPersonagem, concessoesAoEntrarEm } from './regras-multiclasse-proficiencias.js';
 import { ORDEM_CLASSE } from './regras-ordem-classe.js';
+import { atributoEfetivo } from './regras-atributos.js';
 import {
   linhasDaSubclasseNoNivel, opcoesDaLinha, truquesConhecidosDe,
   aplicarEscolhaSubclasse, aplicarConcessaoAutomatica,
@@ -274,14 +275,17 @@ export function registrarDadivaEpicaLegada(personagem, opcoes, dadosTalentos) {
     }
   }
 
-  if (talento.nome === 'Aumento no Valor de Atributo') {
-    for (const [atributo, valor] of Object.entries(opcoes.aumentos_atributo)) {
-      aplicarDeltaSistema(personagem, `atributos.${atributo}`, valor, 20);
+  // O ajuste de PV pela Constituição acompanha o aumento de atributo da dádiva.
+  const resultadoAumento = comAjustePvPorCon(personagem, () => {
+    if (talento.nome === 'Aumento no Valor de Atributo') {
+      for (const [atributo, valor] of Object.entries(opcoes.aumentos_atributo)) {
+        aplicarDeltaSistema(personagem, `atributos.${atributo}`, valor, 20);
+      }
+      return { sucesso: true };
     }
-  } else {
-    const resultadoASI = aplicarASITalento(personagem, talento, opcoes.talento_asi);
-    if (!resultadoASI.sucesso) return resultadoASI;
-  }
+    return aplicarASITalento(personagem, talento, opcoes.talento_asi);
+  });
+  if (!resultadoAumento.sucesso) return resultadoAumento;
 
   if (talento.nome === 'Dádiva da Fortitude') {
     personagem.pv_max = (personagem.pv_max || 0) + 40;
@@ -442,7 +446,8 @@ export const TETO_CAPSTONE_ATRIBUTO = 25;
 export function aplicarCapstoneAtributo(personagem, atributos, ganho) {
   for (const atributo of atributos) {
     const atual = personagem.atributos[atributo] || 10;
-    personagem.atributos[atributo] = Math.min(TETO_CAPSTONE_ATRIBUTO, atual + ganho);
+    // Valor já acima do teto (item, edição manual) não é reduzido.
+    personagem.atributos[atributo] = Math.max(atual, Math.min(TETO_CAPSTONE_ATRIBUTO, atual + ganho));
   }
   return personagem;
 }
@@ -1198,15 +1203,26 @@ function ganhouNovoCirculoDeEspacos(tabelaCaracteristicas, nivelAnterior, novoNi
  * @param {object} personagem - Personagem a ajustar (usa `nivel` como multiplicador).
  * @param {number} modAntes - Modificador de Constituicao antes da mudanca.
  * @param {number} modDepois - Modificador de Constituicao depois da mudanca.
+ * @param {{antes: number, depois: number}} [emJogo] - Modificador de Constituicao
+ *   EM JOGO (atributoEfetivo) antes e depois da mudanca. Quando informado, o PV
+ *   atual acompanha so a variacao desse modificador: item que fixa a Constituicao
+ *   (Amuleto da Saude) absorve a mudanca da base e o PV atual nao muda. O maximo
+ *   continua acompanhando a base; sincronizarBonusPvNivel acerta o bonus do item.
  * @returns {number} Delta de PV efetivamente aplicado ao maximo (0 se nada mudou).
  */
-export function aplicarPvRetroativoPorCon(personagem, modAntes, modDepois) {
+export function aplicarPvRetroativoPorCon(personagem, modAntes, modDepois, emJogo = null) {
   if (!personagem || modDepois === modAntes) return 0;
   const nivel = personagem.nivel || 1;
   const maxAntes = personagem.pv_max || 1;
   personagem.pv_max = Math.max(1, maxAntes + (modDepois - modAntes) * nivel);
   const aplicado = personagem.pv_max - maxAntes;
-  const teto = personagem.pv_max_override || personagem.pv_max;
+  // Parcela do delta do maximo que o item de Constituicao absorve (0 sem item).
+  const absorvidoPorItem = emJogo
+    ? ((modDepois - modAntes) - (emJogo.depois - emJogo.antes)) * nivel
+    : 0;
+  // Teto FINAL: sincronizarBonusPvNivel devolve ao maximo o que o item absorve; limitar ao maximo
+  // intermediario (so a base) derrubaria o PV atual por um corte que o acerto seguinte desfaz.
+  const teto = (personagem.pv_max_override || personagem.pv_max) - absorvidoPorItem;
   const atualAntes = personagem.pv_atual ?? 0;
   // Piso 0, nao 1: pv_atual === 0 e estado legitimo (inconsciente/caindo),
   // nao um erro a corrigir. Um piso de 1 ressuscitaria em silencio um
@@ -1215,8 +1231,54 @@ export function aplicarPvRetroativoPorCon(personagem, modAntes, modDepois) {
   // personagem JA a 0 fica em 0 nos dois sentidos -- so cura de verdade tira
   // alguem de 0, nunca um recalculo de atributo. Fora desse caso, o piso
   // geral e 0 (nunca negativo) e o teto continua valendo.
-  personagem.pv_atual = atualAntes === 0 ? 0 : Math.max(0, Math.min(teto, atualAntes + aplicado));
+  const aplicadoAtual = aplicado - absorvidoPorItem;
+  personagem.pv_atual = atualAntes === 0 ? 0 : Math.max(0, Math.min(teto, atualAntes + aplicadoAtual));
   return aplicado;
+}
+
+/**
+ * Ganho de PV que a tela de resultado da subida de nível mostra.
+ * Sem item que fixa a Constituição, vale o ganho da subida nos dois campos.
+ * Com item (hp_ganho_item_con diferente de 0), o bônus de PV do item muda junto da Constituição-base:
+ * mostra a variação real do máximo e do PV atual medida pela subida.
+ * @param {object} resultado - Retorno de subirDeNivel.
+ * @returns {{maximo: number, atual: number, porItem: boolean}}
+ */
+export function ganhoPvDoResultado(resultado) {
+  const ganho = Number(resultado?.hp_ganho) || 0;
+  const item = Number(resultado?.hp_ganho_item_con) || 0;
+  if (!item) return { maximo: ganho, atual: ganho, porItem: false };
+  const maximo = Number.isFinite(resultado.pv_max_delta) ? resultado.pv_max_delta : ganho + (Number(resultado.bonus_con_retroativo) || 0) + item;
+  const atual = Number.isFinite(resultado.pv_atual_delta) ? resultado.pv_atual_delta : ganho;
+  return { maximo, atual, porItem: true };
+}
+
+/**
+ * Modificador de Constituicao EM JOGO (valor efetivo, com item que fixa ou
+ * aumenta o atributo). Serve de `emJogo` de aplicarPvRetroativoPorCon.
+ */
+export function modConEmJogo(personagem) {
+  return calcMod(Number(atributoEfetivo(personagem, 'constituicao')) || 10);
+}
+
+/**
+ * Executa `aplicar` (que altera atributos-base) e ajusta o PV pela mudança do
+ * modificador de Constituição, no mesmo padrão do ASI do level-up: o máximo
+ * acompanha a base e o PV atual acompanha só o modificador em jogo (Amuleto
+ * da Saúde absorve a mudança). Sem alteração do modificador, não mexe no PV.
+ * @param {object} personagem
+ * @param {() => *} aplicar - Aplica o aumento de atributo; o retorno é repassado.
+ * @returns {*} Retorno de `aplicar`.
+ */
+export function comAjustePvPorCon(personagem, aplicar) {
+  const modAntes = calcMod(Number(personagem?.atributos?.constituicao) || 10);
+  const modJogoAntes = modConEmJogo(personagem);
+  const retorno = aplicar();
+  if (personagem?.pv_max > 0) {
+    aplicarPvRetroativoPorCon(personagem, modAntes, calcMod(Number(personagem.atributos?.constituicao) || 10),
+      { antes: modJogoAntes, depois: modConEmJogo(personagem) });
+  }
+  return retorno;
 }
 
 /**
@@ -1244,8 +1306,9 @@ function aplicarDeltaBonusPvEscalavel(personagem, esperado, aplicado, gravarApli
 }
 
 /**
- * Sincroniza os TRÊS bônus de PV que escalam com o nível (Tenacidade Anã,
- * Companheiro Dracônico, talento Vigoroso) para o valor que o nível ATUAL
+ * Sincroniza os QUATRO bônus de PV que escalam com o nível (Tenacidade Anã,
+ * Companheiro Dracônico, talento Vigoroso e item que define Constituição,
+ * como o Amuleto da Saúde) para o valor que o nível ATUAL
  * do personagem exige.
  *
  * Issue #89: as fórmulas em si já estavam certas (a regra do livro do
@@ -1303,6 +1366,42 @@ export function sincronizarBonusPvNivel(personagem) {
     personagem.bonus_pv_vigoroso_aplicado || 0,
     (v) => { personagem.bonus_pv_vigoroso_aplicado = v; }
   );
+
+  // Item que define Constituição (Amuleto da Saúde): a diferença de
+  // modificador entre o efetivo e o base vale em cada nível enquanto o item
+  // está ativo, e sai inteira quando ele deixa de valer.
+  const conBase = Number(personagem.atributos?.constituicao) || 10;
+  const conEfetiva = Number(atributoEfetivo(personagem, 'constituicao')) || 10;
+  aplicarBonusPvItemConstituicao(
+    personagem,
+    Math.max(0, calcMod(conEfetiva) - calcMod(conBase)) * (personagem.nivel || 1)
+  );
+}
+
+/**
+ * Aplica o delta do bônus de PV de item que define Constituição. Ao subir,
+ * só o máximo cresce (PV atual não muda, equipar não cura nem revive); ao
+ * descer, o máximo cai e o PV atual é limitado ao novo teto. O máximo
+ * temporário (`pv_max_override`, absoluto) acompanha o mesmo delta e é
+ * removido quando deixa de superar o máximo. Grava o total aplicado em
+ * `bonus_pv_itens_con_aplicado`.
+ * @param {object} personagem
+ * @param {number} esperado - total que o bônus deve valer agora.
+ */
+function aplicarBonusPvItemConstituicao(personagem, esperado) {
+  const aplicado = personagem.bonus_pv_itens_con_aplicado || 0;
+  if (esperado === aplicado) return;
+  const diff = esperado - aplicado;
+  personagem.pv_max = Math.max(1, (personagem.pv_max || 1) + diff);
+  if (personagem.pv_max_override) {
+    personagem.pv_max_override += diff;
+    if (personagem.pv_max_override <= personagem.pv_max) delete personagem.pv_max_override;
+  }
+  if (diff < 0) {
+    const teto = personagem.pv_max_override || personagem.pv_max;
+    personagem.pv_atual = Math.min(personagem.pv_atual || 0, teto);
+  }
+  personagem.bonus_pv_itens_con_aplicado = esperado;
 }
 
 /**
@@ -1482,6 +1581,10 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   // `aplicarPvRetroativoPorCon` mais abaixo -- `pvGanhoAoSubir` deriva o
   // seu proprio modificador do personagem.
   const modConAntes = calcMod(personagem.atributos.constituicao);
+  const modJogoAntes = modConEmJogo(personagem);
+  const bonusItemConAntes = personagem.bonus_pv_itens_con_aplicado || 0;
+  const pvMaxAntesDaSubida = personagem.pv_max;
+  const pvAtualAntesDaSubida = personagem.pv_atual;
   const hpGanho = pvGanhoAoSubir(personagem, sub.classe, opcoesPvDaSubida(opcoes, sub.dadoVida));
 
   // Obter características do novo nível
@@ -2354,7 +2457,8 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   // mora em aplicarPvRetroativoPorCon porque a edição manual da ficha usa a
   // MESMA regra, inclusive no sentido inverso ao reverter.
   let modConDepois = calcMod(personagem.atributos.constituicao);
-  let bonusConRetroativo = aplicarPvRetroativoPorCon(personagem, modConAntes, modConDepois);
+  let modJogoDepois = modConEmJogo(personagem);
+  let bonusConRetroativo = aplicarPvRetroativoPorCon(personagem, modConAntes, modConDepois, { antes: modJogoAntes, depois: modJogoDepois });
   
   // Aplicar talento (se escolhido ao invés de aumento)
   let escolhasTalentoLevelup = [];
@@ -2421,8 +2525,10 @@ export async function subirDeNivel(personagem, opcoes = {}) {
       // retroativo acima; o delta restante entra aqui e `modConDepois` passa a
       // ser a base do capstone, que não recontará o que já foi aplicado.
       const modConPosTalento = calcMod(personagem.atributos.constituicao);
-      bonusConRetroativo += aplicarPvRetroativoPorCon(personagem, modConDepois, modConPosTalento);
+      const modJogoPosTalento = modConEmJogo(personagem);
+      bonusConRetroativo += aplicarPvRetroativoPorCon(personagem, modConDepois, modConPosTalento, { antes: modJogoDepois, depois: modJogoPosTalento });
       modConDepois = modConPosTalento;
+      modJogoDepois = modJogoPosTalento;
     }
 
     const resultadoCoberturaTalento = aplicarEfeitoTalento(
@@ -2815,8 +2921,10 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     const modConCapstone = calcMod(personagem.atributos.constituicao);
     if (modConCapstone > modConDepois) {
       const bonusCapstone = (modConCapstone - modConDepois) * nivelTotalNovo;
+      // O PV atual só sobe pela variação do modificador em jogo (item que fixa a Constituição absorve o resto).
+      const bonusCapstoneAtual = Math.max(0, modConEmJogo(personagem) - modJogoDepois) * nivelTotalNovo;
       personagem.pv_max += bonusCapstone;
-      personagem.pv_atual += bonusCapstone;
+      personagem.pv_atual += bonusCapstoneAtual;
     }
   }
 
@@ -2845,6 +2953,11 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     nivel_anterior: nivelTotalAnterior,
     nivel_novo: nivelTotalNovo,
     hp_ganho: hpGanho,
+    // Quanto o bônus de PV do item que define a Constituição (Amuleto) subiu neste nível: entra só no máximo, não no PV atual.
+    hp_ganho_item_con: (personagem.bonus_pv_itens_con_aplicado || 0) - bonusItemConAntes,
+    // Variação real de PV máximo e atual entre o início e o fim da subida (alimenta ganhoPvDoResultado).
+    pv_max_delta: personagem.pv_max - pvMaxAntesDaSubida,
+    pv_atual_delta: personagem.pv_atual - pvAtualAntesDaSubida,
     hp_modo: opcoes.hp_modo === 'rolado' ? 'rolado' : 'fixo',
     hp_rolado: opcoes.hp_modo === 'rolado' ? (parseInt(opcoes.hp_rolado) || null) : null,
     bonus_con_retroativo: bonusConRetroativo,

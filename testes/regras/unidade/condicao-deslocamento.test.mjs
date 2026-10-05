@@ -41,13 +41,13 @@ test('Contraste: Amedrontado (não zera Deslocamento) mantém o valor base', asy
     'Amedrontado não está na lista do livro que zera Deslocamento');
 });
 
-test('Petrificado zera também a velocidade de Voo derivada (Aasimar, Asas Celestiais ativas)', async () => {
+test('Petrificado zera também a velocidade de Voo derivada (some do texto) (Aasimar, Asas Celestiais ativas)', async () => {
   const resultado = await deslocamentoComCondicoes(['Petrificado'], (p) => {
     p.especie = 'Aasimar';
     p.recursos = { ...(p.recursos || {}), aasimar_revelacao_ativa: 'asas' };
   });
-  assert.equal(resultado, '0 metros (Voo 0m)',
-    'a Fase 2 (velocidades derivadas) usa `final` já zerado pela condição -- Voo também tem de zerar');
+  assert.equal(resultado, '0 metros',
+    'com o Deslocamento zerado pela condição nenhuma velocidade extra (Voo) é exibida');
 });
 
 test('Contraste: sem Petrificado, Asas Celestiais dão Voo igual ao Deslocamento (9m)', async () => {

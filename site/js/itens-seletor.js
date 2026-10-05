@@ -14,7 +14,8 @@
 // desfez, e importar store.js impediria o criador de usar uma preferencia
 // de sessao em vez do localStorage.
 // ============================================================
-import { getArmaduras, getArmas, getEquipamentoAventura, getFerramentas } from './db.js';
+import { getArmaduras, getArmas, getEquipamentoAventura, getFerramentas, getItensMagicos } from './db.js';
+import { aplicarSeVigente, criarGuardaRequisicao, renderCategoriaMagicos } from './itens-magicos-ui.js';
 import { pagarCusto, parseCusto, podePagarCusto } from './moedas.js';
 import { abrirModal, escHtml, mdParaHtml, semAcento, toast } from './utils.js';
 import {
@@ -122,6 +123,13 @@ export async function abrirSeletorItens(ctx) {
     { id: 'equipamento', label: 'Equipamento', icon: '&#128188;' },
     { id: 'ferramentas', label: 'Ferramentas', icon: '&#128295;' }
   ];
+  // Itens Mágicos só onde a UI completa de inventário existe (a ficha, via
+  // ctx.permitirMagicos); o criador mantém as seis categorias originais.
+  if (ctx.permitirMagicos) categorias.push({ id: 'magicos', label: 'Itens Mágicos', icon: '&#10024;' });
+  // Filtros de raridade/tipo de Itens Mágicos: valem só nesta abertura do modal.
+  const estadoMagicos = { raridade: '', tipo: '' };
+  // Token das buscas de Itens Mágicos: respostas atrasadas são ignoradas.
+  const guardaBuscaMagicos = criarGuardaRequisicao();
 
   const html = `
     <div class="search-box"><input type="text" id="busca-inv-cat" placeholder="Buscar item..." class="form-input"></div>
@@ -173,6 +181,31 @@ export async function abrirSeletorItens(ctx) {
   function renderCategoria(cat, filtroTexto) {
     const listaEl = document.getElementById('lista-inv-cat');
     if (!listaEl) return;
+
+    // Itens mágicos do acervo do Livro do Mestre: lista e modal próprios
+    // (itens-magicos-ui.js), sem compra e com variante/base.
+    if (cat === 'magicos') {
+      // "Carregando…" só quando a lista de itens mágicos ainda não está na
+      // tela; ao digitar, a lista anterior fica até chegar o novo resultado.
+      if (!listaEl.querySelector('#filtro-tipo-magico')) {
+        listaEl.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:16px">Carregando…</div>';
+      }
+      const avisoErro = () => {
+        if (catAtual === 'magicos') listaEl.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:16px">Não foi possível carregar os itens mágicos</div>';
+      };
+      aplicarSeVigente(guardaBuscaMagicos, getItensMagicos(), acervo => {
+        if (catAtual !== 'magicos') return;
+        if (!acervo?.itens) { avisoErro(); return; }
+        renderCategoriaMagicos(listaEl, {
+          texto: filtroTexto, acervo: acervo.itens, estado: estadoMagicos,
+          catalogos: { armas: dados.armas, armaduras: dados.armaduras },
+          equipamentoPHB: dados.equipAvent, personagem: ctx.personagem, aoAdicionar: ctx.aoAdicionar,
+        });
+      }, avisoErro);
+      return;
+    }
+    // Outra categoria invalida qualquer busca de itens mágicos ainda em andamento.
+    guardaBuscaMagicos.nova();
 
     let itens = [];
     switch (cat) {

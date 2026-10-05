@@ -1,0 +1,60 @@
+{
+  "lote": "09",
+  "itens": {
+    "cajado-do-acrobata": {"base":{"tipo":"arma","opcoes":["Cajado"]},"efeitos":[{"alvo":"ataque_arma","valor":2},{"alvo":"dano_arma","valor":2},{"alvo":"vantagem","em":"pericia","pericia":"Acrobacia","contexto":"Somente nas Formas de Cajado ou de Vara de 3 Metros"}],"recursos":{"usos":[{"nome":"Deflexão de Ataques","max":1,"recupera":"descanso_curto"}]}},
+    "anel-de-protecao": {"efeitos":[{"alvo":"ca","valor":1},{"alvo":"salvaguarda","valor":1}]},
+    "tunica-das-estrelas": {"efeitos":[{"alvo":"salvaguarda","valor":1}]},
+    "tunica-dos-arquimagos": {"efeitos":[{"alvo":"cd_magia","valor":2},{"alvo":"ataque_magia","valor":2},{"alvo":"vantagem","em":"salvaguarda","contexto":"contra magias e outros efeitos mágicos"}]},
+    "anel-de-influencia-animal": {"efeitos":[],"recursos":{"cargas":{"max":3,"recupera":"1d3","ultima_carga":null}},"magias":[{"nome":"Amizade Animal","custo":{"cargas":1},"conjuracao":{"cd":13}},{"nome":"Medo","custo":{"cargas":1},"conjuracao":{"cd":13}},{"nome":"Falar com Animais","custo":{"cargas":1},"conjuracao":{"cd":13}}]},
+    "anel-de-comando-elemental": {"efeitos":[],"recursos":{"cargas":{"max":5,"recupera":"1d4+1","ultima_carga":null}}},
+    "anel-de-evasao": {"efeitos":[],"recursos":{"cargas":{"max":3,"recupera":"1d3","ultima_carga":null}}},
+    "anel-de-estrelas-cadentes": {"efeitos":[],"recursos":{"cargas":{"max":6,"recupera":"1d6","ultima_carga":null}},"magias":[{"nome":"Luzes Dançantes","custo":"livre","conjuracao":null},{"nome":"Luz","custo":"livre","conjuracao":null},{"nome":"Fogo das Fadas","custo":{"cargas":1},"conjuracao":null}]},
+    "anel-do-carneiro": {"efeitos":[],"recursos":{"cargas":{"max":3,"recupera":"1d3","ultima_carga":null}}},
+    "anel-dos-tres-desejos": {"efeitos":[],"recursos":{"cargas":{"max":3,"recupera":null,"ultima_carga":{"efeito_com_1":"outro","texto":"O anel deixa de ser mágico quando você usa a última carga."}}},"magias":[{"nome":"Desejo","custo":{"cargas":1},"conjuracao":null}]},
+    "moeda-rival": {"efeitos":[],"recursos":{"cargas":{"max":1,"recupera":"todas","ultima_carga":null}}},
+    "tunica-das-cores-cintilantes": {"efeitos":[],"recursos":{"cargas":{"max":3,"recupera":"1d3","ultima_carga":null}}},
+    "anel-de-comando-elemental-ar": {"efeitos":[{"alvo":"resistencia","tipo_dano":"Elétrico"},{"alvo":"deslocamento","modo":"voo","igual_deslocamento":true,"pairar":true}],"magias":[{"nome":"Corrente de Relâmpagos","custo":{"cargas":3},"conjuracao":{"cd":18}},{"nome":"Queda Suave","custo":{"cargas":0},"conjuracao":{"cd":18}},{"nome":"Lufada de Vento","custo":{"cargas":2},"conjuracao":{"cd":18}},{"nome":"Muralha de Vento","custo":{"cargas":1},"conjuracao":{"cd":18}}]},
+    "anel-de-comando-elemental-terra": {"efeitos":[{"alvo":"resistencia","tipo_dano":"Ácido"}],"magias":[{"nome":"Terremoto","custo":{"cargas":5},"conjuracao":{"cd":18}},{"nome":"Moldar Rochas","custo":{"cargas":2},"conjuracao":{"cd":18}},{"nome":"Pele-Rocha","custo":{"cargas":3},"conjuracao":{"cd":18}},{"nome":"Muralha de Pedra","custo":{"cargas":3},"conjuracao":{"cd":18}}]},
+    "anel-de-comando-elemental-fogo": {"efeitos":[{"alvo":"imunidade","tipo_dano":"Ígneo"}],"magias":[{"nome":"Mãos Flamejantes","custo":{"cargas":1},"conjuracao":{"cd":18}},{"nome":"Bola de Fogo","custo":{"cargas":2},"conjuracao":{"cd":18}},{"nome":"Tempestade de Fogo","custo":{"cargas":4},"conjuracao":{"cd":18}},{"nome":"Muralha de Fogo","custo":{"cargas":3},"conjuracao":{"cd":18}}]},
+    "anel-de-comando-elemental-agua": {"efeitos":[{"alvo":"deslocamento","modo":"natacao","metros":18}],"magias":[{"nome":"Criar ou Destruir Água","custo":{"cargas":1},"conjuracao":{"cd":18}},{"nome":"Tempestade Glacial","custo":{"cargas":2},"conjuracao":{"cd":18}},{"nome":"Tsunami","custo":{"cargas":5},"conjuracao":{"cd":18}},{"nome":"Muralha de Gelo","custo":{"cargas":3},"conjuracao":{"cd":18}},{"nome":"Caminhar Sobre as Águas","custo":{"cargas":2},"conjuracao":{"cd":18}}]},
+    "anel-de-salto": {"efeitos":[],"magias":[{"nome":"Salto","custo":"livre","conjuracao":null}]},
+    "anel-de-telecinese": {"efeitos":[],"magias":[{"nome":"Telecinese","custo":"livre","conjuracao":null}]},
+    "anel-de-caminhar-sobre-as-aguas": {"efeitos":[],"magias":[{"nome":"Caminhar Sobre as Águas","custo":"livre","conjuracao":null}]},
+    "anel-de-resistencia": {"efeitos":[{"alvo":"resistencia","escolha":["Ácido","Gélido","Ígneo","Energético","Elétrico","Necrótico","Venenoso","Psíquico","Radiante","Trovejante"]}]},
+    "anel-de-refletir-magias": {"efeitos":[{"alvo":"vantagem","em":"salvaguarda","contexto":"contra magias"}]},
+    "anel-de-natacao": {"efeitos":[{"alvo":"deslocamento","modo":"natacao","metros":12}]},
+    "tunica-de-olhos": {"efeitos":[{"alvo":"vantagem","em":"pericia","pericia":"Percepção","contexto":"que dependam da visão"},{"alvo":"sentido","sentido":"visao_no_escuro","metros":36},{"alvo":"sentido","sentido":"visao_verdadeira","metros":36}]}
+  },
+  "sem_efeito_automatico": [
+    "aljava-de-ehlonna",
+    "anel-de-invocacao-de-djinni",
+    "anel-de-queda-suave",
+    "anel-de-acao-livre",
+    "anel-de-invisibilidade",
+    "anel-de-protecao-mental",
+    "anel-de-regeneracao",
+    "anel-de-armazenar-magias",
+    "anel-de-calor",
+    "anel-de-visao-de-raio-x",
+    "tunica-de-itens-uteis"
+  ],
+  "sem_magias": {
+    "anel-de-comando-elemental": "as magias ficam em cada variante (plano elemental)",
+    "tunica-de-olhos": "Luz e Luz do Dia só citadas como inconveniente; o item não as conjura",
+    "tunica-das-estrelas": "Mísseis Mágicos gasta uma das 6 estrelas, que voltam 1d6 ao anoitecer; recuperação ao anoitecer não representada"
+  },
+  "pendencias": [
+    "tunica-dos-arquimagos: 'sua Classe de Armadura base é 15 mais seu modificador de Destreza' (sem armadura) não virou ca_base, porque ca_base define a CA sem somar Destreza; entram só cd_magia 2 e ataque_magia 2. A CA 15 + Destreza fica na descrição.",
+    "cajado-do-acrobata: o +5 na CA de 'Deflexão de Ataques' é Reação contra um ataque, fica fora; só o +2 de ataque e dano entra.",
+    "anel-de-invocacao-de-djinni: 'não pode ser invocado novamente por 24 horas' é recarga em horas, fora de amanhecer/descanso; sem usos.",
+    "anel-de-visao-de-raio-x: usar de novo antes de Descanso Longo exige salvaguarda, não bloqueia o uso; sem usos.",
+    "tunica-das-estrelas: mantida sem recursos de propósito: as 6 estrelas reaparecem (1d6) ao anoitecer, não ao amanhecer, e o máximo está escrito por extenso ('Seis'), que o validador só aceitaria por acaso a partir de '1d6'.",
+    "anel-de-estrelas-cadentes: Luzes Dançantes e Luz não gastam carga (a frase delas não cita carga); custo \"livre\". Esferas de Relâmpago e Estrelas Cadentes não são magias.",
+    "anel-de-influencia-animal: Medo afeta apenas Feras; restrição na descrição.",
+    "anel-de-salto: só pode ter a si mesmo como alvo; restrição na descrição.",
+    "cajado-do-acrobata: a Vantagem em Acrobacia vale só nas formas de Cajado ou de Vara de 3 Metros; curada com esse trecho como contexto (a ficha não distingue a forma ativa)."
+  ],
+  "sem_passivos": {
+    "anel-de-comando-elemental": "Vantagem em jogadas de ataque contra Elementais; os passivos por plano elemental estão curados nas variantes"
+  }
+}

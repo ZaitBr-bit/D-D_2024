@@ -4,6 +4,7 @@
 // Consultado pela ficha, pelos descansos e pelas habilidades ativas.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
+import { atributoEfetivo } from '../../regras-atributos.js';
 import { getConjuracaoSubclasse } from '../../regras-conjuracao-subclasse.js';
 import { bonusProficiencia, calcMod } from '../../utils.js';
 import { char } from '../estado.js';
@@ -105,7 +106,7 @@ export function getEstadoRecursosGuerreiro() {
   // da variavel `nivel` (que e nivelNa e alimenta os degraus de progressao
   // do Guerreiro e da subclasse acima e abaixo).
   const cdSuperioridade = ehMestreBatalha
-    ? 8 + Math.max(calcMod(char.atributos?.forca || 10), calcMod(char.atributos?.destreza || 10)) + bonusProficiencia(char.nivel || 1)
+    ? 8 + Math.max(calcMod(atributoEfetivo(char, 'forca') || 10), calcMod(atributoEfetivo(char, 'destreza') || 10)) + bonusProficiencia(char.nivel || 1)
     : 0;
   let manobrasEsperadas = 0;
   if (ehMestreBatalha && nivel >= 3) {

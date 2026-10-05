@@ -4,6 +4,7 @@
 // Consultado pela ficha, pelos descansos e pelas habilidades ativas.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
+import { atributoEfetivo } from '../../regras-atributos.js';
 import { getConjuracaoSubclasse } from '../../regras-conjuracao-subclasse.js';
 import { bonusProficiencia, calcMod } from '../../utils.js';
 import { char } from '../estado.js';
@@ -90,7 +91,7 @@ export function getEstadoRecursosLadino() {
   // TOTAL do personagem (livro:2047), nao o nivel na classe Ladino -- por
   // isso le char.nivel direto aqui, em vez da variavel `nivel` (que e
   // nivelNa e alimenta os degraus de progressao do Ladino abaixo).
-  const cdGolpeAstuto = 8 + calcMod(char.atributos.destreza) + bonusProficiencia(char.nivel || 1);
+  const cdGolpeAstuto = 8 + calcMod(atributoEfetivo(char, 'destreza')) + bonusProficiencia(char.nivel || 1);
 
   // Ação Ardilosa (nível 2+)
   const acaoArdilosaAtiva = nivel >= 2;
@@ -142,7 +143,7 @@ export function getEstadoRecursosLadino() {
   // CD psiônica do Adaga Espiritual: 8 + mod Des + prof. Mesmo motivo do
   // cdGolpeAstuto acima: bonusProficiencia usa o nivel TOTAL, le char.nivel
   // direto em vez da variavel `nivel` (nivelNa).
-  const cdPsionicaAdaga = ehAdagaEspiritual ? 8 + calcMod(char.atributos?.destreza || 10) + bonusProficiencia(char.nivel || 1) : 0;
+  const cdPsionicaAdaga = ehAdagaEspiritual ? 8 + calcMod(atributoEfetivo(char, 'destreza') || 10) + bonusProficiencia(char.nivel || 1) : 0;
   const laminasAlmaAtivas = ehAdagaEspiritual && nivel >= 9;
   const veuPsiquicoAtivo = ehAdagaEspiritual && nivel >= 13;
   const rasgarMenteAtivo = ehAdagaEspiritual && nivel >= 17;

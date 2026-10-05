@@ -1,0 +1,226 @@
+{
+  "lote": "05",
+  "itens": {
+    "machado-do-carrasco": {
+      "base": {
+        "tipo": "arma",
+        "opcoes": [
+          "Machado de Batalha",
+          "Machado Grande",
+          "Alabarda",
+          "Machadinha"
+        ]
+      },
+      "efeitos": [
+        {
+          "alvo": "ataque_arma",
+          "valor": 1
+        },
+        {
+          "alvo": "dano_arma",
+          "valor": 1
+        }
+      ]
+    },
+    "mao-de-vecna": { "efeitos": [ { "alvo": "atributo", "atributo": "forca", "minimo": 20 } ], "recursos": { "cargas": { "max": 8, "recupera": "1d4+4", "ultima_carga": null } }, "magias": [ { "nome": "Dedo da Morte", "custo": { "cargas": 5 }, "conjuracao": { "cd": 18 } }, { "nome": "Sono", "custo": { "cargas": 1 }, "conjuracao": { "cd": 18 } }, { "nome": "Lentidão", "custo": { "cargas": 2 }, "conjuracao": { "cd": 18 } }, { "nome": "Teleporte", "custo": { "cargas": 3 }, "conjuracao": { "cd": 18 } } ] },
+    "lingua-flamejante": {
+      "base": {
+        "tipo": "arma",
+        "categorias": [
+          "Armas Simples Corpo a Corpo",
+          "Armas Marciais Corpo a Corpo"
+        ]
+      },
+      "efeitos": []
+    },
+    "marca-gelida": {
+      "base": {
+        "tipo": "arma",
+        "opcoes": [
+          "Glaive",
+          "Espada Grande",
+          "Espada Longa",
+          "Rapieira",
+          "Cimitarra",
+          "Espada Curta"
+        ]
+      },
+      "efeitos": [ { "alvo": "resistencia", "tipo_dano": "Ígneo" } ]
+    },
+    "manoplas-de-poder-do-ogro": {
+      "efeitos": [
+        {
+          "alvo": "atributo",
+          "atributo": "forca",
+          "minimo": 19
+        }
+      ]
+    },
+    "matadora-de-gigantes": {
+      "base": {
+        "tipo": "arma",
+        "categorias": [
+          "Armas Simples Corpo a Corpo",
+          "Armas Simples à Distância",
+          "Armas Marciais Corpo a Corpo",
+          "Armas Marciais à Distância"
+        ]
+      },
+      "efeitos": [
+        {
+          "alvo": "ataque_arma",
+          "valor": 1
+        },
+        {
+          "alvo": "dano_arma",
+          "valor": 1
+        }
+      ]
+    },
+    "couro-batido-ilusorio": {
+      "base": {
+        "tipo": "armadura",
+        "opcoes": [
+          "Couro Batido"
+        ]
+      },
+      "efeitos": [
+        {
+          "alvo": "ca",
+          "valor": 1
+        }
+      ]
+    },
+    "martelo-dos-trovoes": {
+      "base": {
+        "tipo": "arma",
+        "opcoes": [
+          "Malho",
+          "Martelo de Guerra"
+        ]
+      },
+      "efeitos": [
+        {
+          "alvo": "ataque_arma",
+          "valor": 1
+        },
+        {
+          "alvo": "dano_arma",
+          "valor": 1
+        },
+        { "alvo": "atributo_minimo_bonus", "atributo": "forca", "valor": 4, "maximo": 30 }
+      ],
+      "recursos": {
+        "cargas": {
+          "max": 5,
+          "recupera": "1d4+1",
+          "ultima_carga": null
+        }
+      }
+    },
+    "olho-e-mao-de-vecna": {
+      "efeitos": [],
+      "recursos": {
+        "cargas": {
+          "max": 8,
+          "recupera": "1d4+4",
+          "ultima_carga": null
+        }
+      }
+    },
+    "olho-de-vecna": { "efeitos": [ { "alvo": "sentido", "sentido": "visao_verdadeira", "metros": 72 } ],"recursos": { "cargas": { "max": 8, "recupera": "1d4+4", "ultima_carga": null } }, "magias": [ { "nome": "Clarividência", "custo": { "cargas": 2 }, "conjuracao": { "cd": 18 } }, { "nome": "Coroa da Loucura", "custo": { "cargas": 1 }, "conjuracao": { "cd": 18 } }, { "nome": "Desintegrar", "custo": { "cargas": 4 }, "conjuracao": { "cd": 18 } }, { "nome": "Dominar Monstro", "custo": { "cargas": 5 }, "conjuracao": { "cd": 18 } }, { "nome": "Mau Olhado", "custo": { "cargas": 4 }, "conjuracao": { "cd": 18 } } ] },
+    "olhos-do-encantamento": { "efeitos": [], "recursos": { "cargas": { "max": 3, "recupera": "todas", "ultima_carga": null } }, "magias": [ { "nome": "Enfeitiçar Pessoa", "custo": { "cargas": 1, "cargas_max": 3 }, "conjuracao": { "cd": 13 } } ] },
+    "gema-do-brilho": {
+      "efeitos": [],
+      "recursos": {
+        "cargas": {
+          "max": 50,
+          "recupera": null,
+          "ultima_carga": null
+        }
+      }
+    },
+    "gema-da-visao": {
+      "efeitos": [],
+      "recursos": {
+        "cargas": {
+          "max": 3,
+          "recupera": "1d3",
+          "ultima_carga": null
+        }
+      }
+    },
+    "olho-de-bruxa": { "efeitos": [], "recursos": { "cargas": { "max": 3, "recupera": "todas", "ultima_carga": null } }, "magias": [ { "nome": "Visão no Escuro", "custo": { "cargas": 1 }, "conjuracao": null }, { "nome": "Ver o Invisível", "custo": { "cargas": 1 }, "conjuracao": null } ] },
+    "estatueta-de-poder-maravilhoso-cabras-de-marfim": {
+      "efeitos": [],
+      "recursos": {
+        "cargas": {
+          "max": 24,
+          "recupera": null,
+          "ultima_carga": null
+        }
+      }
+    },
+    "olhos-de-visao-minuciosa": { "efeitos": [ { "alvo": "vantagem", "em": "pericia", "pericia": "Investigação", "contexto": "feitos para examinar algo dentro desse alcance" } ] },
+    "olhos-de-aguia": { "efeitos": [ { "alvo": "vantagem", "em": "pericia", "pericia": "Percepção", "contexto": "que dependam da visão" } ] },
+    "luvas-de-natacao-e-escalada": { "efeitos": [ { "alvo": "deslocamento", "modo": "escalada", "igual_deslocamento": true }, { "alvo": "deslocamento", "modo": "natacao", "igual_deslocamento": true } ] },
+    "oculos-da-noite": { "efeitos": [ { "alvo": "sentido", "sentido": "visao_no_escuro", "metros": 18, "soma_se_tiver": 18 } ] },
+    "chapeu-de-muitas-magias": {
+      "efeitos": [],
+      "recursos": {
+        "usos": [
+          {
+            "nome": "Magia Desconhecida",
+            "max": 1,
+            "recupera": "descanso_curto"
+          }
+        ]
+      }
+    },
+    "chapeu-do-disfarce": { "efeitos": [], "magias": [ { "nome": "Disfarçar-se", "custo": "livre", "conjuracao": null } ] }
+  },
+  "sem_efeito_automatico": [
+    "olho-postico",
+    "garrafa-sempre-fumegante",
+    "estatueta-de-poder-maravilhoso",
+    "estatueta-de-poder-maravilhoso-grifo-de-bronze",
+    "estatueta-de-poder-maravilhoso-mosca-de-ebano",
+    "estatueta-de-poder-maravilhoso-leoes-dourados",
+    "estatueta-de-poder-maravilhoso-elefante-de-marmore",
+    "estatueta-de-poder-maravilhoso-corcel-de-obsidiana",
+    "estatueta-de-poder-maravilhoso-cao-de-onix",
+    "estatueta-de-poder-maravilhoso-coruja-serpentina",
+    "barco-dobravel",
+    "luvas-apanha-projeteis",
+    "luvas-do-ladrao",
+    "estatueta-de-poder-maravilhoso-corvo-de-prata"
+  ],
+  "sem_passivos": {
+    "olho-e-mao-de-vecna": "Sentido de Perigo e Imunidade a Veneno exigem sintonização com o Olho e a Mão juntos; a Visão Verdadeira do Olho está curada na variante olho-de-vecna",
+    "gema-da-visao": "efeito ativado por ação e carga, dura 10 minutos",
+    "estatueta-de-poder-maravilhoso": "atributos da criatura criada pela estatueta (Deslocamento, Visão no Escuro, Visão às Cegas), ativada por ação"
+  },
+  "sem_magias": {
+    "olho-e-mao-de-vecna": "as magias do Olho e da Mão ficam em cada variante (tabelas e custos diferentes)",
+    "estatueta-de-poder-maravilhoso": "só a variante corvo de prata conjura magia (Mensageiro Animal)",
+    "chapeu-de-muitas-magias": "magia desconhecida, escolhida pelo jogador na hora (lista de Mago) ou sorteada na tabela de efeitos",
+    "estatueta-de-poder-maravilhoso-corvo-de-prata": "Mensageiro Animal só na forma de corvo, com 2 dias entre usos; restrição não representada"
+  },
+  "pendencias": [
+    "olho-e-mao-de-vecna: pai sem efeito porque os efeitos diferem por variante; 'Sua Força se torna 20' foi para a variante mao-de-vecna (o texto vale para a mão, não para o olho). Mudança de alinhamento, Imunidade a Veneno e regeneração ficam na descrição.",
+    "martelo-dos-trovoes: 'Poder dos Gigantes' (+4 no valor de Força concedido por Cinturão de Força do Gigante ou Manoplas de Poder do Ogro, até 30) depende de outro item sintonizado; curado como atributo_minimo_bonus forca 4 até 30 (o item-base é resolvido pela ficha).",
+    "estatueta-de-poder-maravilhoso-cabras-de-marfim: os chifres da Cabra do Terror viram Lança de Montaria +1 e Espada Longa +2 temporárias (ação Usar Magia, somem quando a cabra reverte); não automatizado.",
+    "luvas-de-natacao-e-escalada / luvas-do-ladrao: +5 em teste específico (Atletismo para escalar/nadar; Prestidigitação) está fora dos alvos fechados.",
+    "chapeu-de-muitas-magias: 'usa a CD para evitar suas magias e o seu bônus de ataque mágico' não é bônus numérico; sem efeito.",
+    "estatueta-de-poder-maravilhoso-cabras-de-marfim: só a Cabra da Viagem tem as 24 cargas e elas voltam 7 dias após esgotarem (não ao amanhecer), recuperação não representável; a Cabra do Terror (15 dias) e a Cabra da Labuta (30 dias) não têm contador.",
+    "marca-gelida: propriedade não usável novamente por 1 hora; recuperação em horas/dias/outra mecânica, não representável; contador manual.",
+    "mao-de-vecna: a mão conjura Sugestão no próprio portador a cada conjuração (consequência, sem custo nem escolha); fica fora das magias. Desejo (olho e mão sintonizados juntos, uma vez por 30 dias) fica fora: depende dos dois itens e a recuperação em dias não é representável.",
+    "estatueta-de-poder-maravilhoso-corvo-de-prata: Mensageiro Animal só vale na forma de corvo; a restrição e o intervalo de 2 dias entre usos ficam na descrição (custo livre).",
+    "olhos-de-visao-minuciosa: Visão no Escuro dentro de 30 centímetros não cabe em sentido (metros inteiros >= 1); só a Vantagem em Investigação foi curada.",
+    "olho-e-mao-de-vecna: Vantagem em Iniciativa e Imunidade a Veneno só valem com Olho e Mão sintonizados juntos; fora do passivo curado.",
+    "olhos-do-encantamento: Enfeitiçar Pessoa modelada como faixa de 1 a 3 cargas (círculo sobe 1 por carga adicional), sem entrada por círculo."
+  ],
+  "sem_cargas": {
+    "estatueta-de-poder-maravilhoso": "cargas só na Cabra da Viagem (variante cabras-de-marfim); as demais estatuetas não têm contador"
+  }
+}

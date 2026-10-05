@@ -7,6 +7,7 @@
 // exigiria reescrever a montagem do HTML. Ver spec secao 5.3.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
+import { atributoEfetivo } from '../regras-atributos.js';
 import { abrirModal, bonusProficiencia, calcMod, coletarCAsAlternativas, detectarRecarga, ehHabilidadeAtiva, equipamentoDeCA, escHtml, escolherCAAlternativa, fmtMod, getDeslocamento, mdParaHtml, semAcento, toast } from '../utils.js';
 import { featureConcedeUsoGratisSemEspaco } from '../levelup.js';
 import { featureTemUsoGratisPorRecursoDedicado } from '../regras-usos-gratis-magia.js';
@@ -314,7 +315,7 @@ export function setupEventosHabilidades() {
       }
 
       const acao = btn.dataset.clerigoCdAcao;
-      const modSab = calcMod(char.atributos.sabedoria);
+      const modSab = calcMod(atributoEfetivo(char, 'sabedoria'));
       // Centelha Divina escala pelos niveis DE CLERIGO (Classes.md:1580).
       const nivelClerigo = nivelNa(char, 'Clérigo');
       const dadosCentelha = (nivelClerigo >= 18) ? '4d8' : (nivelClerigo >= 13) ? '3d8' : (nivelClerigo >= 7) ? '2d8' : '1d8';
@@ -541,7 +542,7 @@ export function setupEventosHabilidades() {
       if (acao === 'vinganca_calcinante') {
         if (sub.celestial.vinganca_calcinante_usada) { toast('Vingança Calcinante já usada.', 'error'); return; }
         sub.celestial.vinganca_calcinante_usada = true;
-        const modCar = Math.max(1, calcMod(char.atributos.carisma));
+        const modCar = Math.max(1, calcMod(atributoEfetivo(char, 'carisma')));
         toast(`Vingança Calcinante! 2d8+${modCar} dano Radiante em criaturas a 9m.`, 'success');
       }
       // Combatente Clarividente
@@ -1148,7 +1149,7 @@ export function setupEventosHabilidades() {
 
       if (acao === 'restaurar-equilibrio') {
         const mec = char.recursos.feiticeiro.subclasses.mecanica;
-        const max = Math.max(1, calcMod(char.atributos.carisma));
+        const max = Math.max(1, calcMod(atributoEfetivo(char, 'carisma')));
         if ((mec.restaurar_equilibrio_usos_gastos || 0) >= max) {
           toast('Sem usos de Restaurar Equilíbrio.', 'error');
           return;
@@ -1249,7 +1250,7 @@ export function setupEventosHabilidades() {
       }
 
       const acao = btn.dataset.inspiracaoAcao;
-      const modCar = calcMod(char.atributos.carisma);
+      const modCar = calcMod(atributoEfetivo(char, 'carisma'));
       const usosMax = Math.max(1, modCar);
 
       if (acao === 'usar') {
@@ -1533,13 +1534,13 @@ export function setupEventosHabilidades() {
         }
         abrirModal('Incansável',
           numberPickerHtml('input-guardiao-incansavel', 1, 1, 8, 'Resultado do d8') +
-          `<div style="font-size:0.8rem;color:var(--text-muted);margin-top:6px;text-align:center">PV temporário = d8 + Sabedoria (${fmtMod(calcMod(char.atributos.sabedoria))})</div>`,
+          `<div style="font-size:0.8rem;color:var(--text-muted);margin-top:6px;text-align:center">PV temporário = d8 + Sabedoria (${fmtMod(calcMod(atributoEfetivo(char, 'sabedoria')))})</div>`,
           '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-aplicar-incansavel">Aplicar</button>'
         );
         setupNumberPicker('input-guardiao-incansavel');
         document.getElementById('btn-aplicar-incansavel')?.addEventListener('click', () => {
           const d8 = parseInt(document.getElementById('input-guardiao-incansavel-val')?.value) || 1;
-          const temp = Math.max(1, d8 + calcMod(char.atributos.sabedoria));
+          const temp = Math.max(1, d8 + calcMod(atributoEfetivo(char, 'sabedoria')));
           char.pv_temporario = Math.max(char.pv_temporario || 0, temp);
           char.recursos.guardiao.incansavel_usos_gastos += 1;
           salvar();
@@ -1679,7 +1680,7 @@ export function setupEventosHabilidades() {
 
         case 'gloria_defesa_gloriosa': {
           if (!char.recursos.paladino.subclasses.gloria) char.recursos.paladino.subclasses.gloria = {};
-          const modCar = calcMod(char.atributos.carisma);
+          const modCar = calcMod(atributoEfetivo(char, 'carisma'));
           const maxUsos = Math.max(1, modCar);
           const gastos = char.recursos.paladino.subclasses.gloria.defesa_gloriosa_usos_gastos || 0;
           if (gastos >= maxUsos) {
@@ -2449,7 +2450,7 @@ export function setupEventosHabilidades() {
           return;
         }
         char.recursos.guerreiro.subclasses.combatente_psiquico.dados_psionicos_gastos += 1;
-        const modInt = calcMod(char.atributos?.inteligencia || 10);
+        const modInt = calcMod(atributoEfetivo(char, 'inteligencia') || 10);
         toast(`Golpe Psiônico! Role 1${estado.tipoDadoPsionicoG}+${modInt} dano Energético extra.`, 'success');
       }
 
@@ -2459,7 +2460,7 @@ export function setupEventosHabilidades() {
           return;
         }
         char.recursos.guerreiro.subclasses.combatente_psiquico.dados_psionicos_gastos += 1;
-        const modInt = calcMod(char.atributos?.inteligencia || 10);
+        const modInt = calcMod(atributoEfetivo(char, 'inteligencia') || 10);
         toast(`Vínculo Protetivo! Role 1${estado.tipoDadoPsionicoG}+${modInt} para reduzir o dano (Reação).`, 'success');
       }
 
@@ -2504,7 +2505,7 @@ export function setupEventosHabilidades() {
           toast('Baluarte de Energia recuperado gastando 1 dado!', 'success');
         } else {
           char.recursos.guerreiro.subclasses.combatente_psiquico.baluarte_usado = true;
-          const modInt = calcMod(char.atributos?.inteligencia || 10);
+          const modInt = calcMod(atributoEfetivo(char, 'inteligencia') || 10);
           toast(`Baluarte de Energia ativado! Até ${Math.max(1, modInt)} criaturas ganham Cobertura Parcial por 1 min.`, 'success');
         }
       }
@@ -3389,7 +3390,7 @@ export function renderFeatureItem(f, source, ctx) {
     if (!char.recursos) char.recursos = {};
     const usada = !!char.recursos.presenca_intimidante_usada;
     const nivel = char.nivel || 1;
-    const modFor = calcMod(char.atributos.forca);
+    const modFor = calcMod(atributoEfetivo(char, 'forca'));
     const cdPresenca = 8 + modFor + bonusProficiencia(nivel);
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${usada ? 'Usada' : 'Disponível'}</span>`;
     usosHtmlBody = `
@@ -3472,8 +3473,8 @@ export function renderFeatureItem(f, source, ctx) {
     `;
   } else if (ehDancaGingaFascinante) {
     // Dança: Ginga Fascinante (nv3) — exibir CA alternativa
-    const modDes = calcMod(char.atributos.destreza);
-    const modCar = calcMod(char.atributos.carisma);
+    const modDes = calcMod(atributoEfetivo(char, 'destreza'));
+    const modCar = calcMod(atributoEfetivo(char, 'carisma'));
     const caGinga = 10 + modDes + modCar;
     const dadoInsp = getEstadoInspiracaoBardo()?.dado || 6;
     usosHtmlBody = `
@@ -3572,7 +3573,7 @@ export function renderFeatureItem(f, source, ctx) {
     if (!char.recursos.bardo.subclasses.glamour) char.recursos.bardo.subclasses.glamour = {};
     const usada = !!char.recursos.bardo.subclasses.glamour.magia_fascinante_usada;
     const nivel = char.nivel || 1;
-    const cdFeitico = 8 + calcMod(char.atributos.carisma) + bonusProficiencia(nivel);
+    const cdFeitico = 8 + calcMod(atributoEfetivo(char, 'carisma')) + bonusProficiencia(nivel);
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${usada ? 'Usada' : 'Disponível'}</span>`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
@@ -3586,7 +3587,7 @@ export function renderFeatureItem(f, source, ctx) {
     // Glamour: Manto de Inspiração (nv3) — gasta Inspiração de Bardo
     const estadoInsp = getEstadoInspiracaoBardo();
     const dadoInsp = estadoInsp?.dado || 6;
-    const modCar = Math.max(1, calcMod(char.atributos.carisma));
+    const modCar = Math.max(1, calcMod(atributoEfetivo(char, 'carisma')));
     const semInsp = !estadoInsp || estadoInsp.usosDisponiveis <= 0;
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">Insp. ${estadoInsp?.usosDisponiveis || 0}/${estadoInsp?.usosMax || 0}</span>`;
     usosHtmlBody = `
@@ -3721,7 +3722,7 @@ export function renderFeatureItem(f, source, ctx) {
     recarga = 'longo';
   } else if (ehCelestialAlma) {
     // Patrono Celestial nv6: Alma Radiante — passiva
-    const modCar = Math.max(1, calcMod(char.atributos.carisma));
+    const modCar = Math.max(1, calcMod(atributoEfetivo(char, 'carisma')));
     usosHtmlBody = `
       <div style="padding:4px 0 4px 16px;font-size:0.8rem">
         <div style="color:var(--accent);font-weight:600">Passiva — Resistência + Dano Extra</div>
@@ -3734,7 +3735,7 @@ export function renderFeatureItem(f, source, ctx) {
   } else if (ehCelestialResiliencia) {
     // Patrono Celestial nv10: Resiliência Celestial — passiva
     const nivel = ctx.nivelClasse || 1;
-    const modCar = Math.max(1, calcMod(char.atributos.carisma));
+    const modCar = Math.max(1, calcMod(atributoEfetivo(char, 'carisma')));
     usosHtmlBody = `
       <div style="padding:4px 0 4px 16px;font-size:0.8rem">
         <div style="color:var(--accent);font-weight:600">Passiva — PV Temporários</div>
@@ -3787,7 +3788,7 @@ export function renderFeatureItem(f, source, ctx) {
     `;
   } else if (ehInferoBencao) {
     // Patrono Ínfero nv3: Bênção do Tenebroso — passiva
-    const modCar = Math.max(1, calcMod(char.atributos.carisma));
+    const modCar = Math.max(1, calcMod(atributoEfetivo(char, 'carisma')));
     usosHtmlBody = `
       <div style="padding:4px 0 4px 16px;font-size:0.8rem">
         <div style="color:var(--accent);font-weight:600">Passiva — PV Temporários ao Abater</div>
@@ -4131,7 +4132,7 @@ export function renderFeatureItem(f, source, ctx) {
     `;
   } else if (ehLuzLabaredaAprimorada) {
     // Luz nv6: Labareda Protetora Aprimorada — aprimora Labareda
-    const modSab = Math.max(1, calcMod(char.atributos.sabedoria));
+    const modSab = Math.max(1, calcMod(atributoEfetivo(char, 'sabedoria')));
     usosHtmlBody = `
       <div style="padding:4px 0 4px 16px;font-size:0.8rem">
         <div style="color:var(--accent);font-weight:600">Passiva — Aprimora Labareda Protetora</div>
@@ -4422,7 +4423,7 @@ export function renderFeatureItem(f, source, ctx) {
     `;
   } else if (ehSobrevivente) {
     // Campeão nv18: Sobrevivente — duas passivas
-    const modCon = calcMod(char.atributos.constituicao);
+    const modCon = calcMod(atributoEfetivo(char, 'constituicao'));
     const curaInicio = 5 + modCon;
     usosHtmlBody = `
       <div style="padding:4px 0 4px 16px;font-size:0.8rem">
@@ -4638,7 +4639,7 @@ export function renderFeatureItem(f, source, ctx) {
   } else if (ehGolpeMortal) {
     // Assassino nv17: Golpe Mortal — passiva 1a rodada
     const nivel = char.nivel || 1;
-    const modDes = calcMod(char.atributos.destreza);
+    const modDes = calcMod(atributoEfetivo(char, 'destreza'));
     const cdGolpeMortal = 8 + modDes + bonusProficiencia(nivel);
     usosHtmlBody = `
       <div style="padding:4px 0 4px 16px;font-size:0.8rem">
@@ -4715,7 +4716,7 @@ export function renderFeatureItem(f, source, ctx) {
     if (!char.recursos.paladino.subclasses.gloria) char.recursos.paladino.subclasses.gloria = {};
     const rg = char.recursos.paladino.subclasses.gloria;
     if (typeof rg.defesa_gloriosa_usos_gastos !== 'number') rg.defesa_gloriosa_usos_gastos = 0;
-    const modCar = Math.max(1, calcMod(char.atributos.carisma));
+    const modCar = Math.max(1, calcMod(atributoEfetivo(char, 'carisma')));
     const dispDefesa = Math.max(0, modCar - rg.defesa_gloriosa_usos_gastos);
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${dispDefesa}/${modCar}</span>`;
     usosHtmlBody = `

@@ -4,6 +4,7 @@
 // Consultado pela ficha, pelos descansos e pelas habilidades ativas.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
+import { atributoEfetivo } from '../../regras-atributos.js';
 import { calcMod } from '../../utils.js';
 import { char } from '../estado.js';
 import { temClasse, nivelNa } from '../../regras-multiclasse.js';
@@ -27,7 +28,7 @@ export function getEstadoInspiracaoBardo() {
   if (!char.recursos) char.recursos = {};
   if (typeof char.recursos.inspiracao_bardo_usos_gastos !== 'number') char.recursos.inspiracao_bardo_usos_gastos = 0;
 
-  const modCar = calcMod(char.atributos.carisma);
+  const modCar = calcMod(atributoEfetivo(char, 'carisma'));
   const usosMax = Math.max(1, modCar);
   const usosDisponiveis = Math.max(0, usosMax - char.recursos.inspiracao_bardo_usos_gastos);
   const recuperaCurto = (nivelNa(char, 'Bardo') || 1) >= 5;

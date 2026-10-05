@@ -6,6 +6,7 @@
 // onclick inline -- por isso continuam como globais.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
+import { atributoEfetivo } from '../regras-atributos.js';
 import { PERICIAS } from '../dados-classes.js';
 import { abrirModal, calcMod, escHtml, fmtPeso, getMultiplicadorCarga, PERICIAS_CONHECIMENTO_PRIMORDIAL, somaModificadoresManuais, toast } from '../utils.js';
 import { nivelNa, subclasseDe } from '../regras-multiclasse.js';
@@ -14,6 +15,7 @@ import { getEstadoFuria } from './classes/barbaro.js';
 import { getProgressaoMonge } from './classes/monge.js';
 import { char, passivosTalentosCache } from './estado.js';
 import { getEstadoCarga } from './inventario.js';
+import { deslocamentoMinimoDeItens, ROTULO_MODO, vantagensDeItens, velocidadesDeItens } from '../regras-passivos-itens.js';
 
 export function ehBardoComSegredosMagicos() {
   // Segredos Magicos e caracteristica de BARDO 10 (Classes.md:472): o
@@ -98,7 +100,15 @@ export function calcVantagemDesvantagemPericia(nomePericia) {
     }
   });
 
-  return { vantagens, desvantagens };
+  // --- Itens mágicos (4C): sem contexto entram como Vantagem; com contexto
+  // viram nota informativa e ficam fora do cálculo de V/D. ---
+  const notas = [];
+  for (const v of vantagensDeItens(char).pericias.filter(x => x.pericia === nomePericia)) {
+    if (v.contexto) notas.push(`${v.origem}: Vantagem ${v.contexto}`);
+    else vantagens.push(v.origem);
+  }
+
+  return { vantagens, desvantagens, notas };
 }
 
 /**
@@ -168,7 +178,14 @@ export function calcVantagemDesvantagemSalvaguarda(nomeAtributo) {
     }
   }
 
-  return { vantagens, desvantagens, falhaAutomatica: fontesFalha.length > 0, fontesFalha };
+  // Itens mágicos (4C): sem contexto contam como Vantagem; com contexto viram nota.
+  const notas = [];
+  for (const v of vantagensDeItens(char).salvaguardas.filter(x => !x.atributo || x.atributo === nomeAtributo)) {
+    if (v.contexto) notas.push(`${v.origem}: Vantagem ${v.contexto}`);
+    else vantagens.push(v.origem);
+  }
+
+  return { vantagens, desvantagens, falhaAutomatica: fontesFalha.length > 0, fontesFalha, notas };
 }
 
 /**
@@ -191,13 +208,31 @@ export function formatarMetros(valor) {
   return String(valor).replace('.', ',');
 }
 
-function addExtraVelocidade(extrasSet, tipo, metros, sufixo = '') {
-  extrasSet.add(`${tipo} ${formatarMetros(metros)}m${sufixo ? ` ${sufixo}` : ''}`);
+/**
+ * Registra uma velocidade extra por modo (Voo, Escalada, Natação...). Mais de
+ * uma fonte para o mesmo modo (classe, magia, item) fica numa só entrada: vale
+ * o maior valor e o "(pairar)" quando qualquer fonte o tiver. Valor zero ou
+ * negativo não é registrado.
+ */
+function addExtraVelocidade(extrasMap, tipo, metros, pairar = false) {
+  if (!(metros > 0)) return;
+  const atual = extrasMap.get(tipo);
+  if (!atual) {
+    extrasMap.set(tipo, { metros, pairar: !!pairar });
+    return;
+  }
+  atual.metros = Math.max(atual.metros, metros);
+  atual.pairar = atual.pairar || !!pairar;
+}
+
+/** Texto de uma velocidade extra registrada por addExtraVelocidade. */
+function textoExtraVelocidade(tipo, { metros, pairar }) {
+  return `${tipo} ${formatarMetros(metros)}m${pairar ? ' (pairar)' : ''}`;
 }
 
 // Popup com o cálculo real da capacidade de carga (clique no peso do inventário).
 window.mostrarCalculoCarga = function () {
-  const forca = char?.atributos?.forca || 0;
+  const forca = atributoEfetivo(char, 'forca') || 0;
   const tamanho = char?.tamanho || 'Médio';
   const mult = getMultiplicadorCarga(tamanho);
   const _c = getEstadoCarga();
@@ -229,6 +264,8 @@ export function getDeslocamentoFinal(baseDeslocamento) {
   if (char?.especie === 'Elfo' && (char?.tracos_escolhidos || []).includes('Elfo Silvestre')) {
     final = Math.max(final, 10.5);
   }
+  // Deslocamento mínimo dado por item mágico ativo (4C): vale o maior.
+  final = Math.max(final, deslocamentoMinimoDeItens(char));
 
   // Movimento Rapido e caracteristica de BARBARO 5 (Classes.md:127): o
   // nivel que manda e o de Barbaro, nao o total do personagem.
@@ -302,7 +339,9 @@ export function getDeslocamentoFinal(baseDeslocamento) {
   }
 
   // ── Fase 2: velocidades derivadas (dependem de final) ──────────────
-  const extras = new Set();
+  // Por modo: valor maior e pairar; com o Deslocamento em 0 nenhuma entra
+  // (classe, magia e item recebem o mesmo tratamento).
+  const extras = new Map();
 
   // Errante tambem concede Escalada e Natacao iguais ao Deslocamento --
   // GUARDIAO 6 (Classes.md:3334), pelo nivel DE GUARDIAO.
@@ -343,7 +382,7 @@ export function getDeslocamentoFinal(baseDeslocamento) {
   if (subclasseDe(char, 'Bárbaro') === 'Trilha do Fanático'
       && nivelNa(char, 'Bárbaro') >= 14
       && emFuria && furiaDeusesAtiva) {
-    addExtraVelocidade(extras, 'Voo', final, '(pairar)');
+    addExtraVelocidade(extras, 'Voo', final, true);
   }
 
   // Aasimar: Revelação Celestial (Asas Celestiais) nível 3 -- issue #91.
@@ -364,23 +403,37 @@ export function getDeslocamentoFinal(baseDeslocamento) {
     addExtraVelocidade(extras, 'Escalada', final);
   }
 
+  // Exaustão: o glossário reduz o Deslocamento em 1,5 m × nível. As velocidades
+  // extras de valor FIXO (item, efeito mágico) sofrem a mesma redução, com
+  // mínimo 0 (velocidade que chega a 0 não é registrada). As "iguais ao
+  // Deslocamento" já acompanham o `final`.
+  const reducaoExaustao = char?.exaustao > 0 ? 1.5 * char.exaustao : 0;
+  const fixaComExaustao = (metros) => Math.max(0, metros - reducaoExaustao);
+
   for (const ef of efMag) {
     if (ef.tipo === 'deslocamento') {
       if (ef.tipo_velocidade === 'voo' && ef.valor_metros) {
-        addExtraVelocidade(extras, 'Voo', ef.valor_metros);
+        addExtraVelocidade(extras, 'Voo', fixaComExaustao(ef.valor_metros));
       } else if (ef.tipo_velocidade === 'escalada') {
         addExtraVelocidade(extras, 'Escalada', final); // escalada = igual ao deslocamento final (ef.valor_metros ignorado intencionalmente)
       } else if (ef.tipo_velocidade === 'levitacao' && ef.valor_metros) {
-        addExtraVelocidade(extras, 'Levitação', ef.valor_metros);
+        addExtraVelocidade(extras, 'Levitação', fixaComExaustao(ef.valor_metros));
       } else if (ef.tipo_velocidade === 'natacao' && ef.valor_metros) {
         // Natação concedida por modificador manual (issue #83).
-        addExtraVelocidade(extras, 'Natação', ef.valor_metros);
+        addExtraVelocidade(extras, 'Natação', fixaComExaustao(ef.valor_metros));
       }
     }
   }
 
+  // Velocidades de itens mágicos ativos (4C): fixas em metros ou iguais ao
+  // Deslocamento; entram no mesmo mapa por modo das demais fontes.
+  for (const v of velocidadesDeItens(char)) {
+    addExtraVelocidade(extras, ROTULO_MODO[v.modo], v.igual ? final : fixaComExaustao(v.metros), v.pairar);
+  }
+
   let resultado = `${formatarMetros(final)} metros`;
-  if (extras.size > 0) resultado += ` (${[...extras].join(', ')})`;
+  // Deslocamento 0: nenhuma velocidade extra é exibida.
+  if (final > 0 && extras.size > 0) resultado += ` (${[...extras].map(([tipo, v]) => textoExtraVelocidade(tipo, v)).join(', ')})`;
   return resultado;
 }
 
@@ -444,7 +497,7 @@ export function getAtaquesPorAcao() {
 }
 
 export function getModIniciativa() {
-  const base = calcMod(char.atributos.destreza);
+  const base = calcMod(atributoEfetivo(char, 'destreza'));
   const passivos = passivosTalentosCache || {};
   // Duas fontes de Vantagem em Iniciativa, cada uma pelo nivel NA SUA
   // classe: Instintos Primitivos, de BARBARO 7 (Classes.md:135 -- o
@@ -457,10 +510,18 @@ export function getModIniciativa() {
   // (Incapacitado) fica fora: a ficha nao modela o estado de "surpreso"
   // no inicio do combate, e checar "esta Incapacitado" a qualquer momento
   // seria uma regra diferente e mais ampla do que a do livro.
-  const vantagem = nivelNa(char, 'Bárbaro') >= 7
-    || (subclasseDe(char, 'Guerreiro') === 'Campeão' && nivelNa(char, 'Guerreiro') >= 3)
-    || (char.condicoes || []).includes('Invisível');
-  return { valor: base + (passivos.bonusIniciativa || 0) + somaModificadoresManuais(char, 'iniciativa'), vantagem };
+  // Itens mágicos (4C) também dão Vantagem. `fontesVantagem` lista todas as
+  // fontes, sem repetir: Instintos Primitivos, Atleta Extraordinário,
+  // Invisível e os itens.
+  const fontesVantagem = [];
+  if (nivelNa(char, 'Bárbaro') >= 7) fontesVantagem.push('Instintos Primitivos');
+  if (subclasseDe(char, 'Guerreiro') === 'Campeão' && nivelNa(char, 'Guerreiro') >= 3) fontesVantagem.push('Atleta Extraordinário');
+  if ((char.condicoes || []).includes('Invisível')) fontesVantagem.push('Invisível');
+  for (const origem of vantagensDeItens(char).iniciativa) {
+    if (!fontesVantagem.includes(origem)) fontesVantagem.push(origem);
+  }
+  const vantagem = fontesVantagem.length > 0;
+  return { valor: base + (passivos.bonusIniciativa || 0) + somaModificadoresManuais(char, 'iniciativa'), vantagem, fontesVantagem };
 }
 
 export function forcaPrimordialAtiva() {

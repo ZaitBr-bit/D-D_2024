@@ -40,10 +40,16 @@ jobs:
           python3 - <<'PY'
           import os, json
           urls = []
-          for root, _, files in os.walk('_dist/dados'):
+          for root, dirs, files in os.walk('_dist/dados'):
+              # De dados/livro-do-mestre o site le so o acervo de itens magicos;
+              # regras, tesouros, tabelas aleatorias e as fontes (_lotes, _mecanica)
+              # ficam fora do precache.
+              dirs[:] = [d for d in dirs if d not in ('_lotes', '_mecanica')]
               for f in files:
                   if f.endswith('.json'):
                       p = os.path.join(root, f).replace('_dist/dados', '../dados').replace(os.sep, '/')
+                      if '/livro-do-mestre/' in p and not p.endswith('/livro-do-mestre/capitulo7/itens_magicos.json'):
+                          continue
                       urls.append(p)
           with open('_dist/site/dados-precache.json', 'w', encoding='utf-8') as fh:
               json.dump(sorted(urls), fh, ensure_ascii=False)

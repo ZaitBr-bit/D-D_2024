@@ -1,0 +1,4308 @@
+{
+  "fonte": "Livro do Mestre (2024), capítulo 7: Tesouros",
+  "total_tabelas": 20,
+  "tabelas": [
+    {
+      "tema": "Arcano",
+      "tema_en": "Arcana",
+      "raridade": "Comum",
+      "dado": "1d100",
+      "entradas": [
+        {
+          "min": 1,
+          "max": 2,
+          "item_id": "conta-de-nutricao",
+          "variantes": [],
+          "texto": "Conta de Nutrição"
+        },
+        {
+          "min": 3,
+          "max": 4,
+          "item_id": "conta-refrescante",
+          "variantes": [],
+          "texto": "Conta Refrescante"
+        },
+        {
+          "min": 5,
+          "max": 7,
+          "item_id": "vela-das-profundezas",
+          "variantes": [],
+          "texto": "Vela das Profundezas"
+        },
+        {
+          "min": 8,
+          "max": 10,
+          "item_id": "manto-ondulante",
+          "variantes": [],
+          "texto": "Manto Ondulante"
+        },
+        {
+          "min": 11,
+          "max": 13,
+          "item_id": "manto-de-muitos-estilos",
+          "variantes": [],
+          "texto": "Manto de Muitos Estilos"
+        },
+        {
+          "min": 14,
+          "max": 15,
+          "item_id": "roupas-autorreparadoras",
+          "variantes": [],
+          "texto": "Roupas Autorreparadoras"
+        },
+        {
+          "min": 16,
+          "max": 17,
+          "item_id": "amuleto-do-fragmento-sombrio",
+          "variantes": [],
+          "texto": "Amuleto do Fragmento Sombrio"
+        },
+        {
+          "min": 18,
+          "max": 19,
+          "item_id": "livro-de-magias-duradouro",
+          "variantes": [],
+          "texto": "Livro de Magias Duradouro"
+        },
+        {
+          "min": 20,
+          "max": 21,
+          "item_id": "olho-postico",
+          "variantes": [],
+          "texto": "Olho Postiço"
+        },
+        {
+          "min": 22,
+          "max": 24,
+          "item_id": "chapeu-de-pragas",
+          "variantes": [],
+          "texto": "Chapéu de Pragas"
+        },
+        {
+          "min": 25,
+          "max": 27,
+          "item_id": "chapeu-de-mago",
+          "variantes": [],
+          "texto": "Chapéu de Mago"
+        },
+        {
+          "min": 28,
+          "max": 29,
+          "item_id": "bolsa-de-temperos-pratica-de-heward",
+          "variantes": [],
+          "texto": "Bolsa de Temperos Prática de Heward"
+        },
+        {
+          "min": 30,
+          "max": 31,
+          "item_id": "trompa-do-alarme-silencioso",
+          "variantes": [],
+          "texto": "Trompa do Alarme Silencioso"
+        },
+        {
+          "min": 32,
+          "max": 33,
+          "item_id": "instrumento-das-ilusoes",
+          "variantes": [],
+          "texto": "Instrumento das Ilusões"
+        },
+        {
+          "min": 34,
+          "max": 35,
+          "item_id": "instrumento-da-escrita",
+          "variantes": [],
+          "texto": "Instrumento da Escrita"
+        },
+        {
+          "min": 36,
+          "max": 37,
+          "item_id": "cadeado-ardiloso",
+          "variantes": [],
+          "texto": "Cadeado Ardiloso"
+        },
+        {
+          "min": 38,
+          "max": 40,
+          "item_id": "chave-misteriosa",
+          "variantes": [],
+          "texto": "Chave Misteriosa"
+        },
+        {
+          "min": 41,
+          "max": 42,
+          "item_id": "orbe-da-direcao",
+          "variantes": [],
+          "texto": "Orbe da Direção"
+        },
+        {
+          "min": 43,
+          "max": 44,
+          "item_id": "orbe-do-tempo",
+          "variantes": [],
+          "texto": "Orbe do Tempo"
+        },
+        {
+          "min": 45,
+          "max": 46,
+          "item_id": "perfume-do-enfeiticamento",
+          "variantes": [],
+          "texto": "Perfume do Enfeitiçamento"
+        },
+        {
+          "min": 47,
+          "max": 49,
+          "item_id": "cachimbo-dos-monstros-de-fumaca",
+          "variantes": [],
+          "texto": "Cachimbo dos Monstros de Fumaça"
+        },
+        {
+          "min": 50,
+          "max": 52,
+          "item_id": "pocao-de-escalada",
+          "variantes": [],
+          "texto": "Poção de Escalada"
+        },
+        {
+          "min": 53,
+          "max": 55,
+          "item_id": "pocao-de-compreensao",
+          "variantes": [],
+          "texto": "Poção de Compreensão"
+        },
+        {
+          "min": 56,
+          "max": 58,
+          "item_id": "vaso-do-despertar",
+          "variantes": [],
+          "texto": "Vaso do Despertar"
+        },
+        {
+          "min": 59,
+          "max": 60,
+          "item_id": "membro-protetico",
+          "variantes": [],
+          "texto": "Membro Protético"
+        },
+        {
+          "min": 61,
+          "max": 64,
+          "item_id": "moeda-rival",
+          "variantes": [],
+          "texto": "Moeda Rival"
+        },
+        {
+          "min": 65,
+          "max": 66,
+          "item_id": "corda-remendavel",
+          "variantes": [],
+          "texto": "Corda Remendável"
+        },
+        {
+          "min": 67,
+          "max": 68,
+          "item_id": "rubi-do-mago-de-guerra",
+          "variantes": [],
+          "texto": "Rubi do Mago de Guerra"
+        },
+        {
+          "min": 69,
+          "max": 82,
+          "item_id": "pergaminho-magico",
+          "variantes": [
+            "pergaminho-magico-truque",
+            "pergaminho-magico-1-circulo"
+          ],
+          "texto": "Pergaminho Mágico (Truque ou magia de 1º Círculo)"
+        },
+        {
+          "min": 83,
+          "max": 84,
+          "item_id": "cajado-do-adorno",
+          "variantes": [],
+          "texto": "Cajado do Adorno"
+        },
+        {
+          "min": 85,
+          "max": 86,
+          "item_id": "cajado-de-pios-de-passaros",
+          "variantes": [],
+          "texto": "Cajado de Pios de Pássaros"
+        },
+        {
+          "min": 87,
+          "max": 89,
+          "item_id": "cajado-das-flores",
+          "variantes": [],
+          "texto": "Cajado das Flores"
+        },
+        {
+          "min": 90,
+          "max": 92,
+          "item_id": "boneca-falante",
+          "variantes": [],
+          "texto": "Boneca Falante"
+        },
+        {
+          "min": 93,
+          "max": 94,
+          "item_id": "caneca-da-sobriedade",
+          "variantes": [],
+          "texto": "Caneca da Sobriedade"
+        },
+        {
+          "min": 95,
+          "max": 97,
+          "item_id": "varinha-da-regencia",
+          "variantes": [],
+          "texto": "Varinha da Regência"
+        },
+        {
+          "min": 98,
+          "max": 100,
+          "item_id": "varinha-de-pirotecnia",
+          "variantes": [],
+          "texto": "Varinha de Pirotecnia"
+        }
+      ]
+    },
+    {
+      "tema": "Arcano",
+      "tema_en": "Arcana",
+      "raridade": "Incomum",
+      "dado": "1d100",
+      "entradas": [
+        {
+          "min": 1,
+          "max": 1,
+          "item_id": "amuleto-a-prova-de-deteccao-e-localizacao",
+          "variantes": [],
+          "texto": "Amuleto à Prova de Detecção e Localização"
+        },
+        {
+          "min": 2,
+          "max": 2,
+          "item_id": "vassoura-dancante-de-baba-yaga",
+          "variantes": [],
+          "texto": "Vassoura Dançante de Baba Yaga"
+        },
+        {
+          "min": 3,
+          "max": 5,
+          "item_id": "bolsa-devoradora",
+          "variantes": [],
+          "texto": "Bolsa Devoradora"
+        },
+        {
+          "min": 6,
+          "max": 7,
+          "item_id": "bolsa-de-truques",
+          "variantes": [],
+          "texto": "Bolsa de Truques"
+        },
+        {
+          "min": 8,
+          "max": 8,
+          "item_id": "broche-protetor",
+          "variantes": [],
+          "texto": "Broche Protetor"
+        },
+        {
+          "min": 9,
+          "max": 9,
+          "item_id": "vassoura-voadora",
+          "variantes": [],
+          "texto": "Vassoura Voadora"
+        },
+        {
+          "min": 10,
+          "max": 10,
+          "item_id": "gorro-de-respiracao-aquatica",
+          "variantes": [],
+          "texto": "Gorro de Respiração Aquática"
+        },
+        {
+          "min": 11,
+          "max": 11,
+          "item_id": "diadema-da-explosao",
+          "variantes": [],
+          "texto": "Diadema da Explosão"
+        },
+        {
+          "min": 12,
+          "max": 13,
+          "item_id": "manto-de-protecao",
+          "variantes": [],
+          "texto": "Manto de Proteção"
+        },
+        {
+          "min": 14,
+          "max": 14,
+          "item_id": "manto-da-arraia-jamanta",
+          "variantes": [],
+          "texto": "Manto da Arraia-Jamanta"
+        },
+        {
+          "min": 15,
+          "max": 15,
+          "item_id": "decantador-de-agua-infinita",
+          "variantes": [],
+          "texto": "Decantador de Água Infinita"
+        },
+        {
+          "min": 16,
+          "max": 16,
+          "item_id": "baralho-de-ilusoes",
+          "variantes": [],
+          "texto": "Baralho de Ilusões"
+        },
+        {
+          "min": 17,
+          "max": 18,
+          "item_id": "globo-flutuante",
+          "variantes": [],
+          "texto": "Globo Flutuante"
+        },
+        {
+          "min": 19,
+          "max": 20,
+          "item_id": "po-do-desaparecimento",
+          "variantes": [],
+          "texto": "Pó do Desaparecimento"
+        },
+        {
+          "min": 21,
+          "max": 21,
+          "item_id": "po-da-secura",
+          "variantes": [],
+          "texto": "Pó da Secura"
+        },
+        {
+          "min": 22,
+          "max": 22,
+          "item_id": "po-de-espirrar-e-engasgar",
+          "variantes": [],
+          "texto": "Pó de Espirrar e Engasgar"
+        },
+        {
+          "min": 23,
+          "max": 24,
+          "item_id": "gema-elemental",
+          "variantes": [],
+          "texto": "Gema Elemental"
+        },
+        {
+          "min": 25,
+          "max": 25,
+          "item_id": "cajado-encantado",
+          "variantes": [
+            "cajado-encantado-truque",
+            "cajado-encantado-1-circulo"
+          ],
+          "texto": "Cajado Encantado (Truque ou magia de 1º Círculo)"
+        },
+        {
+          "min": 26,
+          "max": 26,
+          "item_id": "garrafa-sempre-fumegante",
+          "variantes": [],
+          "texto": "Garrafa Sempre Fumegante"
+        },
+        {
+          "min": 27,
+          "max": 27,
+          "item_id": "olhos-do-encantamento",
+          "variantes": [],
+          "texto": "Olhos do Encantamento"
+        },
+        {
+          "min": 28,
+          "max": 28,
+          "item_id": "olhos-de-visao-minuciosa",
+          "variantes": [],
+          "texto": "Olhos de Visão Minuciosa"
+        },
+        {
+          "min": 29,
+          "max": 30,
+          "item_id": "estatueta-de-poder-maravilhoso",
+          "variantes": [
+            "estatueta-de-poder-maravilhoso-corvo-de-prata"
+          ],
+          "texto": "Estatueta de Poder Maravilhoso (corvo de prata)"
+        },
+        {
+          "min": 31,
+          "max": 31,
+          "item_id": "gema-do-brilho",
+          "variantes": [],
+          "texto": "Gema do Brilho"
+        },
+        {
+          "min": 32,
+          "max": 32,
+          "item_id": "olho-de-bruxa",
+          "variantes": [],
+          "texto": "Olho de Bruxa"
+        },
+        {
+          "min": 33,
+          "max": 33,
+          "item_id": "chapeu-do-disfarce",
+          "variantes": [],
+          "texto": "Chapéu do Disfarce"
+        },
+        {
+          "min": 34,
+          "max": 34,
+          "item_id": "tiara-do-intelecto",
+          "variantes": [],
+          "texto": "Tiara do Intelecto"
+        },
+        {
+          "min": 35,
+          "max": 35,
+          "item_id": "elmo-de-compreender-idiomas",
+          "variantes": [],
+          "texto": "Elmo de Compreender Idiomas"
+        },
+        {
+          "min": 36,
+          "max": 36,
+          "item_id": "elmo-da-telepatia",
+          "variantes": [],
+          "texto": "Elmo da Telepatia"
+        },
+        {
+          "min": 37,
+          "max": 37,
+          "item_id": "bastao-imovel",
+          "variantes": [],
+          "texto": "Bastão Imóvel"
+        },
+        {
+          "min": 38,
+          "max": 38,
+          "item_id": "lanterna-reveladora",
+          "variantes": [],
+          "texto": "Lanterna Reveladora"
+        },
+        {
+          "min": 39,
+          "max": 39,
+          "item_id": "medalhao-dos-pensamentos",
+          "variantes": [],
+          "texto": "Medalhão dos Pensamentos"
+        },
+        {
+          "min": 40,
+          "max": 40,
+          "item_id": "armadura-de-mitral",
+          "variantes": [],
+          "texto": "Armadura de Mitral"
+        },
+        {
+          "min": 41,
+          "max": 42,
+          "item_id": "colar-de-adaptacao",
+          "variantes": [],
+          "texto": "Colar de Adaptação"
+        },
+        {
+          "min": 43,
+          "max": 43,
+          "item_id": "oleo-escorregadio",
+          "variantes": [],
+          "texto": "Óleo Escorregadio"
+        },
+        {
+          "min": 44,
+          "max": 44,
+          "item_id": "perola-do-poder",
+          "variantes": [],
+          "texto": "Pérola do Poder"
+        },
+        {
+          "min": 45,
+          "max": 45,
+          "item_id": "periapto-da-saude",
+          "variantes": [],
+          "texto": "Periapto da Saúde"
+        },
+        {
+          "min": 46,
+          "max": 47,
+          "item_id": "filtro-do-amor",
+          "variantes": [],
+          "texto": "Filtro do Amor"
+        },
+        {
+          "min": 48,
+          "max": 49,
+          "item_id": "pocao-de-amizade-animal",
+          "variantes": [],
+          "texto": "Poção de Amizade Animal"
+        },
+        {
+          "min": 50,
+          "max": 51,
+          "item_id": "pocao-de-sopro-de-fogo",
+          "variantes": [],
+          "texto": "Poção de Sopro de Fogo"
+        },
+        {
+          "min": 52,
+          "max": 53,
+          "item_id": "pocao-de-forca-do-gigante",
+          "variantes": [
+            "pocao-de-forca-do-gigante-das-colinas"
+          ],
+          "texto": "Poção de Força do Gigante (das colinas)"
+        },
+        {
+          "min": 54,
+          "max": 55,
+          "item_id": "pocao-de-crescimento",
+          "variantes": [],
+          "texto": "Poção de Crescimento"
+        },
+        {
+          "min": 56,
+          "max": 57,
+          "item_id": "pocao-de-veneno",
+          "variantes": [],
+          "texto": "Poção de Veneno"
+        },
+        {
+          "min": 58,
+          "max": 59,
+          "item_id": "pocao-de-resistencia",
+          "variantes": [],
+          "texto": "Poção de Resistência"
+        },
+        {
+          "min": 60,
+          "max": 61,
+          "item_id": "pocao-de-respiracao-aquatica",
+          "variantes": [],
+          "texto": "Poção de Respiração Aquática"
+        },
+        {
+          "min": 62,
+          "max": 62,
+          "item_id": "pena-simbolica-de-quaal",
+          "variantes": [
+            "pena-simbolica-de-quaal-ancora",
+            "pena-simbolica-de-quaal-leque",
+            "pena-simbolica-de-quaal-arvore"
+          ],
+          "texto": "Pena Simbólica de Quaal (âncora, leque ou árvore)"
+        },
+        {
+          "min": 63,
+          "max": 63,
+          "item_id": "anel-de-protecao-mental",
+          "variantes": [],
+          "texto": "Anel de Proteção Mental"
+        },
+        {
+          "min": 64,
+          "max": 65,
+          "item_id": "tunica-de-itens-uteis",
+          "variantes": [],
+          "texto": "Túnica de Itens Úteis"
+        },
+        {
+          "min": 66,
+          "max": 67,
+          "item_id": "bastao-do-guardiao-do-pacto",
+          "variantes": [
+            "bastao-do-guardiao-do-pacto-mais-1"
+          ],
+          "texto": "Bastão do Guardião do Pacto +1"
+        },
+        {
+          "min": 68,
+          "max": 69,
+          "item_id": "corda-de-escalada",
+          "variantes": [],
+          "texto": "Corda de Escalada"
+        },
+        {
+          "min": 70,
+          "max": 70,
+          "item_id": "sela-do-cavaleiro",
+          "variantes": [],
+          "texto": "Sela do Cavaleiro"
+        },
+        {
+          "min": 71,
+          "max": 72,
+          "item_id": "pedras-de-mensagem",
+          "variantes": [],
+          "texto": "Pedras de Mensagem"
+        },
+        {
+          "min": 73,
+          "max": 74,
+          "item_id": "sapatilhas-de-escalada-aracnidea",
+          "variantes": [],
+          "texto": "Sapatilhas de Escalada Aracnídea"
+        },
+        {
+          "min": 75,
+          "max": 82,
+          "item_id": "pergaminho-magico",
+          "variantes": [
+            "pergaminho-magico-2-circulo",
+            "pergaminho-magico-3-circulo"
+          ],
+          "texto": "Pergaminho Mágico (magia de 2º ou 3º Círculo)"
+        },
+        {
+          "min": 83,
+          "max": 83,
+          "item_id": "cajado-da-vibora",
+          "variantes": [],
+          "texto": "Cajado da Víbora"
+        },
+        {
+          "min": 84,
+          "max": 84,
+          "item_id": "cajado-da-piton",
+          "variantes": [],
+          "texto": "Cajado da Píton"
+        },
+        {
+          "min": 85,
+          "max": 88,
+          "item_id": "varinha-de-deteccao-de-magia",
+          "variantes": [],
+          "texto": "Varinha de Detecção de Magia"
+        },
+        {
+          "min": 89,
+          "max": 91,
+          "item_id": "varinha-de-misseis-magicos",
+          "variantes": [],
+          "texto": "Varinha de Mísseis Mágicos"
+        },
+        {
+          "min": 92,
+          "max": 93,
+          "item_id": "varinha-dos-segredos",
+          "variantes": [],
+          "texto": "Varinha dos Segredos"
+        },
+        {
+          "min": 94,
+          "max": 95,
+          "item_id": "varinha-do-mago-de-guerra-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "varinha-do-mago-de-guerra-mais-1"
+          ],
+          "texto": "Varinha do Mago de Guerra +1"
+        },
+        {
+          "min": 96,
+          "max": 97,
+          "item_id": "varinha-da-teia",
+          "variantes": [],
+          "texto": "Varinha da Teia"
+        },
+        {
+          "min": 98,
+          "max": 99,
+          "item_id": "leque-do-vento",
+          "variantes": [],
+          "texto": "Leque do Vento"
+        },
+        {
+          "min": 100,
+          "max": 100,
+          "item_id": "botas-aladas",
+          "variantes": [],
+          "texto": "Botas Aladas"
+        }
+      ]
+    },
+    {
+      "tema": "Arcano",
+      "tema_en": "Arcana",
+      "raridade": "Rara",
+      "dado": "1d100",
+      "entradas": [
+        {
+          "min": 1,
+          "max": 1,
+          "item_id": "bolsa-de-feijoes",
+          "variantes": [],
+          "texto": "Bolsa de Feijões"
+        },
+        {
+          "min": 2,
+          "max": 3,
+          "item_id": "conta-de-forca",
+          "variantes": [],
+          "texto": "Conta de Força"
+        },
+        {
+          "min": 4,
+          "max": 4,
+          "item_id": "tigela-de-comando-de-elementais-da-agua",
+          "variantes": [],
+          "texto": "Tigela de Comando de Elementais da Água"
+        },
+        {
+          "min": 5,
+          "max": 6,
+          "item_id": "bracadeiras-de-defesa",
+          "variantes": [],
+          "texto": "Braçadeiras de Defesa"
+        },
+        {
+          "min": 7,
+          "max": 7,
+          "item_id": "braseiro-de-comando-de-elementais-do-fogo",
+          "variantes": [],
+          "texto": "Braseiro de Comando de Elementais do Fogo"
+        },
+        {
+          "min": 8,
+          "max": 9,
+          "item_id": "capa-do-saltimbanco",
+          "variantes": [],
+          "texto": "Capa do Saltimbanco"
+        },
+        {
+          "min": 10,
+          "max": 10,
+          "item_id": "incensario-de-controle-de-elementais-do-ar",
+          "variantes": [],
+          "texto": "Incensário de Controle de Elementais do Ar"
+        },
+        {
+          "min": 11,
+          "max": 12,
+          "item_id": "carrilhao-da-abertura",
+          "variantes": [],
+          "texto": "Carrilhão da Abertura"
+        },
+        {
+          "min": 13,
+          "max": 14,
+          "item_id": "manto-de-deslocamento",
+          "variantes": [],
+          "texto": "Manto de Deslocamento"
+        },
+        {
+          "min": 15,
+          "max": 16,
+          "item_id": "manto-do-morcego",
+          "variantes": [],
+          "texto": "Manto do Morcego"
+        },
+        {
+          "min": 17,
+          "max": 17,
+          "item_id": "cubo-de-forca",
+          "variantes": [],
+          "texto": "Cubo de Força"
+        },
+        {
+          "min": 18,
+          "max": 18,
+          "item_id": "cubo-de-invocacao",
+          "variantes": [],
+          "texto": "Cubo de Invocação"
+        },
+        {
+          "min": 19,
+          "max": 19,
+          "item_id": "fortaleza-instantanea-de-daern",
+          "variantes": [],
+          "texto": "Fortaleza Instantânea de Daern"
+        },
+        {
+          "min": 20,
+          "max": 21,
+          "item_id": "cajado-encantado",
+          "variantes": [
+            "cajado-encantado-2-circulo",
+            "cajado-encantado-3-circulo"
+          ],
+          "texto": "Cajado Encantado (magia de 2º ou 3º Círculo)"
+        },
+        {
+          "min": 22,
+          "max": 23,
+          "item_id": "estatueta-de-poder-maravilhoso",
+          "variantes": [
+            "estatueta-de-poder-maravilhoso-grifo-de-bronze",
+            "estatueta-de-poder-maravilhoso-mosca-de-ebano",
+            "estatueta-de-poder-maravilhoso-leoes-dourados",
+            "estatueta-de-poder-maravilhoso-cabras-de-marfim",
+            "estatueta-de-poder-maravilhoso-elefante-de-marmore",
+            "estatueta-de-poder-maravilhoso-cao-de-onix",
+            "estatueta-de-poder-maravilhoso-coruja-serpentina"
+          ],
+          "texto": "Estatueta de Poder Maravilhoso (grifo de bronze, mosca de ébano, leões dourados, cabras de marfim, elefante de mármore, cão de ônix ou coruja serpentina)"
+        },
+        {
+          "min": 24,
+          "max": 25,
+          "item_id": "barco-dobravel",
+          "variantes": [],
+          "texto": "Barco Dobrável"
+        },
+        {
+          "min": 26,
+          "max": 27,
+          "item_id": "gema-da-visao",
+          "variantes": [],
+          "texto": "Gema da Visão"
+        },
+        {
+          "min": 28,
+          "max": 28,
+          "item_id": "elmo-do-teleporte",
+          "variantes": [],
+          "texto": "Elmo do Teleporte"
+        },
+        {
+          "min": 29,
+          "max": 30,
+          "item_id": "mochila-pratica-de-heward",
+          "variantes": [],
+          "texto": "Mochila Prática de Heward"
+        },
+        {
+          "min": 31,
+          "max": 32,
+          "item_id": "ferraduras-da-velocidade",
+          "variantes": [],
+          "texto": "Ferraduras da Velocidade"
+        },
+        {
+          "min": 33,
+          "max": 34,
+          "item_id": "pedra-ioun",
+          "variantes": [
+            "pedra-ioun-reserva"
+          ],
+          "texto": "Pedra Ioun (reserva)"
+        },
+        {
+          "min": 35,
+          "max": 35,
+          "item_id": "faixas-de-ferro-de-bilarro",
+          "variantes": [],
+          "texto": "Faixas de Ferro de Bilarro"
+        },
+        {
+          "min": 36,
+          "max": 36,
+          "item_id": "manto-de-resistencia-a-magias",
+          "variantes": [],
+          "texto": "Manto de Resistência a Magias"
+        },
+        {
+          "min": 37,
+          "max": 38,
+          "item_id": "colar-de-bolas-de-fogo",
+          "variantes": [],
+          "texto": "Colar de Bolas de Fogo"
+        },
+        {
+          "min": 39,
+          "max": 39,
+          "item_id": "oleo-de-etereidade",
+          "variantes": [],
+          "texto": "Óleo de Etereidade"
+        },
+        {
+          "min": 40,
+          "max": 40,
+          "item_id": "buraco-portatil",
+          "variantes": [],
+          "texto": "Buraco Portátil"
+        },
+        {
+          "min": 41,
+          "max": 42,
+          "item_id": "pocao-de-clarividencia",
+          "variantes": [],
+          "texto": "Poção de Clarividência"
+        },
+        {
+          "min": 43,
+          "max": 44,
+          "item_id": "pocao-de-diminuicao",
+          "variantes": [],
+          "texto": "Poção de Diminuição"
+        },
+        {
+          "min": 45,
+          "max": 46,
+          "item_id": "pocao-de-forma-gasosa",
+          "variantes": [],
+          "texto": "Poção de Forma Gasosa"
+        },
+        {
+          "min": 47,
+          "max": 47,
+          "item_id": "pocao-de-forca-do-gigante",
+          "variantes": [
+            "pocao-de-forca-do-gigante-do-fogo"
+          ],
+          "texto": "Poção de Força do Gigante (do fogo)"
+        },
+        {
+          "min": 48,
+          "max": 49,
+          "item_id": "pocao-de-forca-do-gigante",
+          "variantes": [
+            "pocao-de-forca-do-gigante-do-gelo-ou-das-pedras"
+          ],
+          "texto": "Poção de Força do Gigante (do gelo ou das pedras)"
+        },
+        {
+          "min": 50,
+          "max": 51,
+          "item_id": "pocao-de-heroismo",
+          "variantes": [],
+          "texto": "Poção de Heroísmo"
+        },
+        {
+          "min": 52,
+          "max": 53,
+          "item_id": "pocao-de-invisibilidade",
+          "variantes": [],
+          "texto": "Poção de Invisibilidade"
+        },
+        {
+          "min": 54,
+          "max": 55,
+          "item_id": "pocao-de-invulnerabilidade",
+          "variantes": [],
+          "texto": "Poção de Invulnerabilidade"
+        },
+        {
+          "min": 56,
+          "max": 57,
+          "item_id": "pocao-de-leitura-da-mente",
+          "variantes": [],
+          "texto": "Poção de Leitura da Mente"
+        },
+        {
+          "min": 58,
+          "max": 59,
+          "item_id": "pena-simbolica-de-quaal",
+          "variantes": [
+            "pena-simbolica-de-quaal-passaro",
+            "pena-simbolica-de-quaal-barco-cisne",
+            "pena-simbolica-de-quaal-chicote"
+          ],
+          "texto": "Pena Simbólica de Quaal (pássaro, barco-cisne ou chicote)"
+        },
+        {
+          "min": 60,
+          "max": 61,
+          "item_id": "anel-de-queda-suave",
+          "variantes": [],
+          "texto": "Anel de Queda Suave"
+        },
+        {
+          "min": 62,
+          "max": 62,
+          "item_id": "anel-de-armazenar-magias",
+          "variantes": [],
+          "texto": "Anel de Armazenar Magias"
+        },
+        {
+          "min": 63,
+          "max": 63,
+          "item_id": "anel-de-visao-de-raio-x",
+          "variantes": [],
+          "texto": "Anel de Visão de Raio X"
+        },
+        {
+          "min": 64,
+          "max": 65,
+          "item_id": "tunica-de-olhos",
+          "variantes": [],
+          "texto": "Túnica de Olhos"
+        },
+        {
+          "min": 66,
+          "max": 66,
+          "item_id": "bastao-do-dominio",
+          "variantes": [],
+          "texto": "Bastão do Domínio"
+        },
+        {
+          "min": 67,
+          "max": 68,
+          "item_id": "bastao-do-guardiao-do-pacto",
+          "variantes": [
+            "bastao-do-guardiao-do-pacto-mais-2"
+          ],
+          "texto": "Bastão do Guardião do Pacto +2"
+        },
+        {
+          "min": 69,
+          "max": 70,
+          "item_id": "pergaminho-de-protecao",
+          "variantes": [],
+          "texto": "Pergaminho de Proteção"
+        },
+        {
+          "min": 71,
+          "max": 75,
+          "item_id": "pergaminho-magico",
+          "variantes": [
+            "pergaminho-magico-4-circulo",
+            "pergaminho-magico-5-circulo"
+          ],
+          "texto": "Pergaminho Mágico (magia de 4º ou 5º Círculo)"
+        },
+        {
+          "min": 76,
+          "max": 77,
+          "item_id": "cajado-do-encantamento",
+          "variantes": [],
+          "texto": "Cajado do Encantamento"
+        },
+        {
+          "min": 78,
+          "max": 79,
+          "item_id": "cajado-do-enxame-de-insetos",
+          "variantes": [],
+          "texto": "Cajado do Enxame de Insetos"
+        },
+        {
+          "min": 80,
+          "max": 81,
+          "item_id": "cajado-do-definhamento",
+          "variantes": [],
+          "texto": "Cajado do Definhamento"
+        },
+        {
+          "min": 82,
+          "max": 82,
+          "item_id": "pedra-de-controlar-elementais-da-terra",
+          "variantes": [],
+          "texto": "Pedra de Controlar Elementais da Terra"
+        },
+        {
+          "min": 83,
+          "max": 84,
+          "item_id": "varinha-da-imobilizacao",
+          "variantes": [],
+          "texto": "Varinha da Imobilização"
+        },
+        {
+          "min": 85,
+          "max": 86,
+          "item_id": "varinha-do-medo",
+          "variantes": [],
+          "texto": "Varinha do Medo"
+        },
+        {
+          "min": 87,
+          "max": 90,
+          "item_id": "varinha-de-bolas-de-fogo",
+          "variantes": [],
+          "texto": "Varinha de Bolas de Fogo"
+        },
+        {
+          "min": 91,
+          "max": 94,
+          "item_id": "varinha-de-relampagos",
+          "variantes": [],
+          "texto": "Varinha de Relâmpagos"
+        },
+        {
+          "min": 95,
+          "max": 96,
+          "item_id": "varinha-do-mago-de-guerra-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "varinha-do-mago-de-guerra-mais-2"
+          ],
+          "texto": "Varinha do Mago de Guerra +2"
+        },
+        {
+          "min": 97,
+          "max": 98,
+          "item_id": "varinha-das-maravilhas",
+          "variantes": [],
+          "texto": "Varinha das Maravilhas"
+        },
+        {
+          "min": 99,
+          "max": 100,
+          "item_id": "asas-do-voo",
+          "variantes": [],
+          "texto": "Asas do Voo"
+        }
+      ]
+    },
+    {
+      "tema": "Arcano",
+      "tema_en": "Arcana",
+      "raridade": "Muito Rara",
+      "dado": "1d100",
+      "entradas": [
+        {
+          "min": 1,
+          "max": 2,
+          "item_id": "amuleto-dos-planos",
+          "variantes": [],
+          "texto": "Amuleto dos Planos"
+        },
+        {
+          "min": 3,
+          "max": 4,
+          "item_id": "bolsa-gulosa",
+          "variantes": [],
+          "texto": "Bolsa Gulosa"
+        },
+        {
+          "min": 5,
+          "max": 6,
+          "item_id": "tapete-voador",
+          "variantes": [],
+          "texto": "Tapete Voador"
+        },
+        {
+          "min": 7,
+          "max": 8,
+          "item_id": "caldeirao-do-renascimento",
+          "variantes": [],
+          "texto": "Caldeirão do Renascimento"
+        },
+        {
+          "min": 9,
+          "max": 10,
+          "item_id": "manto-aracnideo",
+          "variantes": [],
+          "texto": "Manto Aracnídeo"
+        },
+        {
+          "min": 11,
+          "max": 12,
+          "item_id": "bola-de-cristal",
+          "variantes": [],
+          "texto": "Bola de Cristal"
+        },
+        {
+          "min": 13,
+          "max": 13,
+          "item_id": "espada-dancante",
+          "variantes": [],
+          "texto": "Espada Dançante"
+        },
+        {
+          "min": 14,
+          "max": 14,
+          "item_id": "garrafa-do-efreeti",
+          "variantes": [],
+          "texto": "Garrafa do Efreeti"
+        },
+        {
+          "min": 15,
+          "max": 16,
+          "item_id": "cajado-encantado",
+          "variantes": [
+            "cajado-encantado-4-circulo",
+            "cajado-encantado-5-circulo"
+          ],
+          "texto": "Cajado Encantado (magia de 4º ou 5º Círculo)"
+        },
+        {
+          "min": 17,
+          "max": 18,
+          "item_id": "estatueta-de-poder-maravilhoso",
+          "variantes": [
+            "estatueta-de-poder-maravilhoso-corcel-de-obsidiana"
+          ],
+          "texto": "Estatueta de Poder Maravilhoso (corcel de obsidiana)"
+        },
+        {
+          "min": 19,
+          "max": 20,
+          "item_id": "chapeu-de-muitas-magias",
+          "variantes": [],
+          "texto": "Chapéu de Muitas Magias"
+        },
+        {
+          "min": 21,
+          "max": 22,
+          "item_id": "elmo-do-brilho",
+          "variantes": [],
+          "texto": "Elmo do Brilho"
+        },
+        {
+          "min": 23,
+          "max": 24,
+          "item_id": "ferraduras-do-zefiro",
+          "variantes": [],
+          "texto": "Ferraduras do Zéfiro"
+        },
+        {
+          "min": 25,
+          "max": 26,
+          "item_id": "pedra-ioun",
+          "variantes": [
+            "pedra-ioun-absorcao",
+            "pedra-ioun-fortitude",
+            "pedra-ioun-intelecto",
+            "pedra-ioun-lideranca"
+          ],
+          "texto": "Pedra Ioun (absorção, fortitude, intelecto ou liderança)"
+        },
+        {
+          "min": 27,
+          "max": 28,
+          "item_id": "manual-dos-golens",
+          "variantes": [
+            "manual-dos-golens-barro",
+            "manual-dos-golens-carne",
+            "manual-dos-golens-ferro",
+            "manual-dos-golens-pedra"
+          ],
+          "texto": "Manual dos Golens (barro, carne, ferro ou pedra)"
+        },
+        {
+          "min": 29,
+          "max": 29,
+          "item_id": "espelho-aprisionador-de-vidas",
+          "variantes": [],
+          "texto": "Espelho Aprisionador de Vidas"
+        },
+        {
+          "min": 30,
+          "max": 31,
+          "item_id": "pigmentos-maravilhosos-de-nolzur",
+          "variantes": [],
+          "texto": "Pigmentos Maravilhosos de Nolzur"
+        },
+        {
+          "min": 32,
+          "max": 34,
+          "item_id": "oleo-de-afiacao",
+          "variantes": [],
+          "texto": "Óleo de Afiação"
+        },
+        {
+          "min": 35,
+          "max": 38,
+          "item_id": "pocao-de-voo",
+          "variantes": [],
+          "texto": "Poção de Voo"
+        },
+        {
+          "min": 39,
+          "max": 42,
+          "item_id": "pocao-de-forca-do-gigante",
+          "variantes": [
+            "pocao-de-forca-do-gigante-das-nuvens"
+          ],
+          "texto": "Poção de Força do Gigante (das nuvens)"
+        },
+        {
+          "min": 43,
+          "max": 46,
+          "item_id": "pocao-de-invisibilidade-maior",
+          "variantes": [],
+          "texto": "Poção de Invisibilidade Maior"
+        },
+        {
+          "min": 47,
+          "max": 49,
+          "item_id": "pocao-de-longevidade",
+          "variantes": [],
+          "texto": "Poção de Longevidade"
+        },
+        {
+          "min": 50,
+          "max": 53,
+          "item_id": "pocao-de-velocidade",
+          "variantes": [],
+          "texto": "Poção de Velocidade"
+        },
+        {
+          "min": 54,
+          "max": 57,
+          "item_id": "pocao-de-vitalidade",
+          "variantes": [],
+          "texto": "Poção de Vitalidade"
+        },
+        {
+          "min": 58,
+          "max": 59,
+          "item_id": "anel-de-regeneracao",
+          "variantes": [],
+          "texto": "Anel de Regeneração"
+        },
+        {
+          "min": 60,
+          "max": 61,
+          "item_id": "anel-de-estrelas-cadentes",
+          "variantes": [],
+          "texto": "Anel de Estrelas Cadentes"
+        },
+        {
+          "min": 62,
+          "max": 63,
+          "item_id": "anel-de-telecinese",
+          "variantes": [],
+          "texto": "Anel de Telecinese"
+        },
+        {
+          "min": 64,
+          "max": 65,
+          "item_id": "tunica-das-cores-cintilantes",
+          "variantes": [],
+          "texto": "Túnica das Cores Cintilantes"
+        },
+        {
+          "min": 66,
+          "max": 67,
+          "item_id": "tunica-das-estrelas",
+          "variantes": [],
+          "texto": "Túnica das Estrelas"
+        },
+        {
+          "min": 68,
+          "max": 69,
+          "item_id": "bastao-de-absorcao",
+          "variantes": [],
+          "texto": "Bastão de Absorção"
+        },
+        {
+          "min": 70,
+          "max": 71,
+          "item_id": "bastao-da-seguranca",
+          "variantes": [],
+          "texto": "Bastão da Segurança"
+        },
+        {
+          "min": 72,
+          "max": 73,
+          "item_id": "bastao-do-guardiao-do-pacto",
+          "variantes": [
+            "bastao-do-guardiao-do-pacto-mais-3"
+          ],
+          "texto": "Bastão do Guardião do Pacto +3"
+        },
+        {
+          "min": 74,
+          "max": 85,
+          "item_id": "pergaminho-magico",
+          "variantes": [
+            "pergaminho-magico-6-circulo",
+            "pergaminho-magico-7-circulo",
+            "pergaminho-magico-8-circulo"
+          ],
+          "texto": "Pergaminho Mágico (magia de 6º, 7º ou 8º Círculo)"
+        },
+        {
+          "min": 86,
+          "max": 87,
+          "item_id": "cajado-do-fogo",
+          "variantes": [],
+          "texto": "Cajado do Fogo"
+        },
+        {
+          "min": 88,
+          "max": 89,
+          "item_id": "cajado-do-gelo",
+          "variantes": [],
+          "texto": "Cajado do Gelo"
+        },
+        {
+          "min": 90,
+          "max": 90,
+          "item_id": "cajado-do-poder",
+          "variantes": [],
+          "texto": "Cajado do Poder"
+        },
+        {
+          "min": 91,
+          "max": 92,
+          "item_id": "cajado-do-trovao-e-relampago",
+          "variantes": [],
+          "texto": "Cajado do Trovão e Relâmpago"
+        },
+        {
+          "min": 93,
+          "max": 94,
+          "item_id": "tomo-do-pensamento-claro",
+          "variantes": [],
+          "texto": "Tomo do Pensamento Claro"
+        },
+        {
+          "min": 95,
+          "max": 97,
+          "item_id": "varinha-da-polimorfia",
+          "variantes": [],
+          "texto": "Varinha da Polimorfia"
+        },
+        {
+          "min": 98,
+          "max": 100,
+          "item_id": "varinha-do-mago-de-guerra-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "varinha-do-mago-de-guerra-mais-3"
+          ],
+          "texto": "Varinha do Mago de Guerra +3"
+        }
+      ]
+    },
+    {
+      "tema": "Arcano",
+      "tema_en": "Arcana",
+      "raridade": "Lendária",
+      "dado": "1d100",
+      "entradas": [
+        {
+          "min": 1,
+          "max": 4,
+          "item_id": "aparato-de-kwalish",
+          "variantes": [],
+          "texto": "Aparato de Kwalish"
+        },
+        {
+          "min": 5,
+          "max": 8,
+          "item_id": "manto-da-invisibilidade",
+          "variantes": [],
+          "texto": "Manto da Invisibilidade"
+        },
+        {
+          "min": 9,
+          "max": 12,
+          "item_id": "bola-de-cristal-de-leitura-mental",
+          "variantes": [],
+          "texto": "Bola de Cristal de Leitura Mental"
+        },
+        {
+          "min": 13,
+          "max": 16,
+          "item_id": "bola-de-cristal-de-telepatia",
+          "variantes": [],
+          "texto": "Bola de Cristal de Telepatia"
+        },
+        {
+          "min": 17,
+          "max": 20,
+          "item_id": "bola-de-cristal-da-visao-verdadeira",
+          "variantes": [],
+          "texto": "Bola de Cristal da Visão Verdadeira"
+        },
+        {
+          "min": 21,
+          "max": 22,
+          "item_id": "portal-cubico",
+          "variantes": [],
+          "texto": "Portal Cúbico"
+        },
+        {
+          "min": 23,
+          "max": 23,
+          "item_id": "baralho-das-muitas-coisas",
+          "variantes": [],
+          "texto": "Baralho das Muitas Coisas"
+        },
+        {
+          "min": 24,
+          "max": 27,
+          "item_id": "cajado-encantado",
+          "variantes": [
+            "cajado-encantado-6-circulo",
+            "cajado-encantado-7-circulo",
+            "cajado-encantado-8-circulo"
+          ],
+          "texto": "Cajado Encantado (magia de 6º, 7º ou 8º Círculo)"
+        },
+        {
+          "min": 28,
+          "max": 31,
+          "item_id": "pedra-ioun",
+          "variantes": [
+            "pedra-ioun-absorcao-maior",
+            "pedra-ioun-maestria",
+            "pedra-ioun-regeneracao"
+          ],
+          "texto": "Pedra Ioun (absorção maior, maestria ou regeneração)"
+        },
+        {
+          "min": 32,
+          "max": 33,
+          "item_id": "frasco-de-ferro",
+          "variantes": [],
+          "texto": "Frasco de Ferro"
+        },
+        {
+          "min": 34,
+          "max": 41,
+          "item_id": "pocao-de-forca-do-gigante",
+          "variantes": [
+            "pocao-de-forca-do-gigante-das-tempestades"
+          ],
+          "texto": "Poção de Força do Gigante (das tempestades)"
+        },
+        {
+          "min": 42,
+          "max": 45,
+          "item_id": "anel-de-invocacao-de-djinni",
+          "variantes": [],
+          "texto": "Anel de Invocação de Djinni"
+        },
+        {
+          "min": 46,
+          "max": 49,
+          "item_id": "anel-de-comando-elemental",
+          "variantes": [
+            "anel-de-comando-elemental-ar",
+            "anel-de-comando-elemental-terra",
+            "anel-de-comando-elemental-fogo",
+            "anel-de-comando-elemental-agua"
+          ],
+          "texto": "Anel de Comando Elemental (ar, terra, fogo ou água)"
+        },
+        {
+          "min": 50,
+          "max": 53,
+          "item_id": "anel-de-invisibilidade",
+          "variantes": [],
+          "texto": "Anel de Invisibilidade"
+        },
+        {
+          "min": 54,
+          "max": 57,
+          "item_id": "anel-de-refletir-magias",
+          "variantes": [],
+          "texto": "Anel de Refletir Magias"
+        },
+        {
+          "min": 58,
+          "max": 58,
+          "item_id": "anel-dos-tres-desejos",
+          "variantes": [],
+          "texto": "Anel dos Três Desejos"
+        },
+        {
+          "min": 59,
+          "max": 59,
+          "item_id": "tunica-dos-arquimagos",
+          "variantes": [],
+          "texto": "Túnica dos Arquimagos"
+        },
+        {
+          "min": 60,
+          "max": 61,
+          "item_id": "pergaminho-de-invocacao-de-tita",
+          "variantes": [],
+          "texto": "Pergaminho de Invocação de Titã"
+        },
+        {
+          "min": 62,
+          "max": 65,
+          "item_id": "cola-soberana",
+          "variantes": [],
+          "texto": "Cola Soberana"
+        },
+        {
+          "min": 66,
+          "max": 83,
+          "item_id": "pergaminho-magico",
+          "variantes": [
+            "pergaminho-magico-9-circulo"
+          ],
+          "texto": "Pergaminho Mágico (magia de 9º Círculo)"
+        },
+        {
+          "min": 84,
+          "max": 84,
+          "item_id": "esfera-da-aniquilacao",
+          "variantes": [],
+          "texto": "Esfera da Aniquilação"
+        },
+        {
+          "min": 85,
+          "max": 85,
+          "item_id": "cajado-dos-magos",
+          "variantes": [],
+          "texto": "Cajado dos Magos"
+        },
+        {
+          "min": 86,
+          "max": 88,
+          "item_id": "talisma-da-esfera",
+          "variantes": [],
+          "texto": "Talismã da Esfera"
+        },
+        {
+          "min": 89,
+          "max": 92,
+          "item_id": "tomo-da-lingua-silenciada",
+          "variantes": [],
+          "texto": "Tomo da Língua Silenciada"
+        },
+        {
+          "min": 93,
+          "max": 96,
+          "item_id": "solvente-universal",
+          "variantes": [],
+          "texto": "Solvente Universal"
+        },
+        {
+          "min": 97,
+          "max": 100,
+          "item_id": "poco-dos-muitos-mundos",
+          "variantes": [],
+          "texto": "Poço dos Muitos Mundos"
+        }
+      ]
+    },
+    {
+      "tema": "Armamentos",
+      "tema_en": "Armaments",
+      "raridade": "Comum",
+      "dado": "1d100",
+      "entradas": [
+        {
+          "min": 1,
+          "max": 10,
+          "item_id": "armadura-reluzente",
+          "variantes": [],
+          "texto": "Armadura Reluzente"
+        },
+        {
+          "min": 11,
+          "max": 20,
+          "item_id": "armadura-de-remocao-rapida",
+          "variantes": [],
+          "texto": "Armadura de Remoção Rápida"
+        },
+        {
+          "min": 21,
+          "max": 30,
+          "item_id": "elmo-do-pavor",
+          "variantes": [],
+          "texto": "Elmo do Pavor"
+        },
+        {
+          "min": 31,
+          "max": 40,
+          "item_id": "espada-tocada-pela-lua",
+          "variantes": [],
+          "texto": "Espada Tocada pela Lua"
+        },
+        {
+          "min": 41,
+          "max": 50,
+          "item_id": "escudo-de-expressao",
+          "variantes": [],
+          "texto": "Escudo de Expressão"
+        },
+        {
+          "min": 51,
+          "max": 60,
+          "item_id": "arma-prateada",
+          "variantes": [],
+          "texto": "Arma Prateada"
+        },
+        {
+          "min": 61,
+          "max": 70,
+          "item_id": "armadura-fumegante",
+          "variantes": [],
+          "texto": "Armadura Fumegante"
+        },
+        {
+          "min": 71,
+          "max": 80,
+          "item_id": "garra-silvestre",
+          "variantes": [],
+          "texto": "Garra Silvestre"
+        },
+        {
+          "min": 81,
+          "max": 90,
+          "item_id": "bengala-do-veterano",
+          "variantes": [],
+          "texto": "Bengala do Veterano"
+        },
+        {
+          "min": 91,
+          "max": 100,
+          "item_id": "municao-derrubadora",
+          "variantes": [],
+          "texto": "Munição Derrubadora"
+        }
+      ]
+    },
+    {
+      "tema": "Armamentos",
+      "tema_en": "Armaments",
+      "raridade": "Incomum",
+      "dado": "1d100",
+      "entradas": [
+        {
+          "min": 1,
+          "max": 4,
+          "item_id": "armadura-de-adamantina",
+          "variantes": [],
+          "texto": "Armadura de Adamantina"
+        },
+        {
+          "min": 5,
+          "max": 8,
+          "item_id": "arma-de-adamantina",
+          "variantes": [],
+          "texto": "Arma de Adamantina"
+        },
+        {
+          "min": 9,
+          "max": 13,
+          "item_id": "municao-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "municao-mais-1"
+          ],
+          "texto": "Munição +1"
+        },
+        {
+          "min": 14,
+          "max": 18,
+          "item_id": "bracadeiras-de-arquearia",
+          "variantes": [],
+          "texto": "Braçadeiras de Arquearia"
+        },
+        {
+          "min": 19,
+          "max": 23,
+          "item_id": "armadura-encantada",
+          "variantes": [
+            "armadura-encantada-truque",
+            "armadura-encantada-1-circulo"
+          ],
+          "texto": "Armadura Encantada (Truque ou magia de 1º Círculo)"
+        },
+        {
+          "min": 24,
+          "max": 28,
+          "item_id": "arma-encantada",
+          "variantes": [
+            "arma-encantada-truque",
+            "arma-encantada-1-circulo"
+          ],
+          "texto": "Arma Encantada (Truque ou magia de 1º Círculo)"
+        },
+        {
+          "min": 29,
+          "max": 33,
+          "item_id": "manoplas-de-poder-do-ogro",
+          "variantes": [],
+          "texto": "Manoplas de Poder do Ogro"
+        },
+        {
+          "min": 34,
+          "max": 38,
+          "item_id": "azagaia-do-relampago",
+          "variantes": [],
+          "texto": "Azagaia do Relâmpago"
+        },
+        {
+          "min": 39,
+          "max": 43,
+          "item_id": "armadura-do-marinheiro",
+          "variantes": [],
+          "texto": "Armadura do Marinheiro"
+        },
+        {
+          "min": 44,
+          "max": 48,
+          "item_id": "armadura-de-mitral",
+          "variantes": [],
+          "texto": "Armadura de Mitral"
+        },
+        {
+          "min": 49,
+          "max": 53,
+          "item_id": "pocao-de-forca-do-gigante",
+          "variantes": [
+            "pocao-de-forca-do-gigante-das-colinas"
+          ],
+          "texto": "Poção de Força do Gigante (das colinas)"
+        },
+        {
+          "min": 54,
+          "max": 58,
+          "item_id": "pocao-de-pugilismo",
+          "variantes": [],
+          "texto": "Poção de Pugilismo"
+        },
+        {
+          "min": 59,
+          "max": 62,
+          "item_id": "aljava-de-ehlonna",
+          "variantes": [],
+          "texto": "Aljava de Ehlonna"
+        },
+        {
+          "min": 63,
+          "max": 66,
+          "item_id": "sela-do-cavaleiro",
+          "variantes": [],
+          "texto": "Sela do Cavaleiro"
+        },
+        {
+          "min": 67,
+          "max": 71,
+          "item_id": "escudo-sentinela",
+          "variantes": [],
+          "texto": "Escudo Sentinela"
+        },
+        {
+          "min": 72,
+          "max": 76,
+          "item_id": "escudo-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "escudo-mais-1"
+          ],
+          "texto": "Escudo +1"
+        },
+        {
+          "min": 77,
+          "max": 81,
+          "item_id": "espada-da-vinganca",
+          "variantes": [],
+          "texto": "Espada da Vingança"
+        },
+        {
+          "min": 82,
+          "max": 85,
+          "item_id": "tridente-do-comando-de-peixes",
+          "variantes": [],
+          "texto": "Tridente do Comando de Peixes"
+        },
+        {
+          "min": 86,
+          "max": 90,
+          "item_id": "arma-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "arma-mais-1"
+          ],
+          "texto": "Arma +1"
+        },
+        {
+          "min": 91,
+          "max": 95,
+          "item_id": "arma-de-alerta",
+          "variantes": [],
+          "texto": "Arma de Alerta"
+        },
+        {
+          "min": 96,
+          "max": 100,
+          "item_id": "faixas-do-poder-desarmado",
+          "variantes": [
+            "faixas-do-poder-desarmado-mais-1"
+          ],
+          "texto": "Faixas do Poder Desarmado +1"
+        }
+      ]
+    },
+    {
+      "tema": "Armamentos",
+      "tema_en": "Armaments",
+      "raridade": "Rara",
+      "dado": "1d100",
+      "entradas": [
+        {
+          "min": 1,
+          "max": 3,
+          "item_id": "municao-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "municao-mais-2"
+          ],
+          "texto": "Munição +2"
+        },
+        {
+          "min": 4,
+          "max": 7,
+          "item_id": "armadura-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "armadura-mais-1"
+          ],
+          "texto": "Armadura +1"
+        },
+        {
+          "min": 8,
+          "max": 10,
+          "item_id": "armadura-de-resistencia",
+          "variantes": [],
+          "texto": "Armadura de Resistência"
+        },
+        {
+          "min": 11,
+          "max": 13,
+          "item_id": "armadura-de-vulnerabilidade",
+          "variantes": [],
+          "texto": "Armadura de Vulnerabilidade"
+        },
+        {
+          "min": 14,
+          "max": 15,
+          "item_id": "escudo-apanha-flechas",
+          "variantes": [],
+          "texto": "Escudo Apanha-Flechas"
+        },
+        {
+          "min": 16,
+          "max": 18,
+          "item_id": "cinturao-de-forca-do-gigante",
+          "variantes": [
+            "cinturao-de-forca-do-gigante-das-colinas"
+          ],
+          "texto": "Cinturão de Força do Gigante (das colinas)"
+        },
+        {
+          "min": 19,
+          "max": 20,
+          "item_id": "machado-do-berserker",
+          "variantes": [],
+          "texto": "Machado do Berserker"
+        },
+        {
+          "min": 21,
+          "max": 22,
+          "item_id": "fortaleza-instantanea-de-daern",
+          "variantes": [],
+          "texto": "Fortaleza Instantânea de Daern"
+        },
+        {
+          "min": 23,
+          "max": 25,
+          "item_id": "adaga-do-veneno",
+          "variantes": [],
+          "texto": "Adaga do Veneno"
+        },
+        {
+          "min": 26,
+          "max": 28,
+          "item_id": "matadora-de-dragoes",
+          "variantes": [],
+          "texto": "Matadora de Dragões"
+        },
+        {
+          "min": 29,
+          "max": 31,
+          "item_id": "cota-de-malha-elfica",
+          "variantes": [],
+          "texto": "Cota de Malha Élfica"
+        },
+        {
+          "min": 32,
+          "max": 34,
+          "item_id": "armadura-encantada",
+          "variantes": [
+            "armadura-encantada-2-circulo",
+            "armadura-encantada-3-circulo"
+          ],
+          "texto": "Armadura Encantada (magia de 2º ou 3º Círculo)"
+        },
+        {
+          "min": 35,
+          "max": 37,
+          "item_id": "arma-encantada",
+          "variantes": [
+            "arma-encantada-2-circulo",
+            "arma-encantada-3-circulo"
+          ],
+          "texto": "Arma Encantada (magia de 2º ou 3º Círculo)"
+        },
+        {
+          "min": 38,
+          "max": 40,
+          "item_id": "lingua-flamejante",
+          "variantes": [],
+          "texto": "Língua Flamejante"
+        },
+        {
+          "min": 41,
+          "max": 43,
+          "item_id": "matadora-de-gigantes",
+          "variantes": [],
+          "texto": "Matadora de Gigantes"
+        },
+        {
+          "min": 44,
+          "max": 46,
+          "item_id": "trompa-explosiva",
+          "variantes": [],
+          "texto": "Trompa Explosiva"
+        },
+        {
+          "min": 47,
+          "max": 48,
+          "item_id": "trompa-de-valhalla",
+          "variantes": [
+            "trompa-de-valhalla-latao",
+            "trompa-de-valhalla-prata"
+          ],
+          "texto": "Trompa de Valhalla (latão ou prata)"
+        },
+        {
+          "min": 49,
+          "max": 51,
+          "item_id": "pedra-ioun",
+          "variantes": [
+            "pedra-ioun-protecao"
+          ],
+          "texto": "Pedra Ioun (proteção)"
+        },
+        {
+          "min": 52,
+          "max": 54,
+          "item_id": "maca-da-ruptura",
+          "variantes": [],
+          "texto": "Maça da Ruptura"
+        },
+        {
+          "min": 55,
+          "max": 57,
+          "item_id": "maca-da-destruicao",
+          "variantes": [],
+          "texto": "Maça da Destruição"
+        },
+        {
+          "min": 58,
+          "max": 60,
+          "item_id": "maca-do-terror",
+          "variantes": [],
+          "texto": "Maça do Terror"
+        },
+        {
+          "min": 61,
+          "max": 63,
+          "item_id": "pocao-de-forca-do-gigante",
+          "variantes": [
+            "pocao-de-forca-do-gigante-do-fogo"
+          ],
+          "texto": "Poção de Força do Gigante (do fogo)"
+        },
+        {
+          "min": 64,
+          "max": 66,
+          "item_id": "pocao-de-forca-do-gigante",
+          "variantes": [
+            "pocao-de-forca-do-gigante-do-gelo-ou-das-pedras"
+          ],
+          "texto": "Poção de Força do Gigante (do gelo ou das pedras)"
+        },
+        {
+          "min": 67,
+          "max": 69,
+          "item_id": "pocao-de-heroismo",
+          "variantes": [],
+          "texto": "Poção de Heroísmo"
+        },
+        {
+          "min": 70,
+          "max": 72,
+          "item_id": "pocao-de-invulnerabilidade",
+          "variantes": [],
+          "texto": "Poção de Invulnerabilidade"
+        },
+        {
+          "min": 73,
+          "max": 75,
+          "item_id": "anel-de-protecao",
+          "variantes": [],
+          "texto": "Anel de Proteção"
+        },
+        {
+          "min": 76,
+          "max": 78,
+          "item_id": "anel-do-carneiro",
+          "variantes": [],
+          "texto": "Anel do Carneiro"
+        },
+        {
+          "min": 79,
+          "max": 81,
+          "item_id": "escudo-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "escudo-mais-2"
+          ],
+          "texto": "Escudo +2"
+        },
+        {
+          "min": 82,
+          "max": 84,
+          "item_id": "escudo-de-atracao-de-projeteis",
+          "variantes": [],
+          "texto": "Escudo de Atração de Projéteis"
+        },
+        {
+          "min": 85,
+          "max": 86,
+          "item_id": "lamina-solar",
+          "variantes": [],
+          "texto": "Lâmina Solar"
+        },
+        {
+          "min": 87,
+          "max": 88,
+          "item_id": "espada-do-roubo-de-vida",
+          "variantes": [],
+          "texto": "Espada do Roubo de Vida"
+        },
+        {
+          "min": 89,
+          "max": 90,
+          "item_id": "espada-do-ferimento",
+          "variantes": [],
+          "texto": "Espada do Ferimento"
+        },
+        {
+          "min": 91,
+          "max": 92,
+          "item_id": "bastao-tentacular",
+          "variantes": [],
+          "texto": "Bastão Tentacular"
+        },
+        {
+          "min": 93,
+          "max": 94,
+          "item_id": "arma-cruel",
+          "variantes": [],
+          "texto": "Arma Cruel"
+        },
+        {
+          "min": 95,
+          "max": 97,
+          "item_id": "arma-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "arma-mais-2"
+          ],
+          "texto": "Arma +2"
+        },
+        {
+          "min": 98,
+          "max": 100,
+          "item_id": "faixas-do-poder-desarmado",
+          "variantes": [
+            "faixas-do-poder-desarmado-mais-2"
+          ],
+          "texto": "Faixas do Poder Desarmado +2"
+        }
+      ]
+    },
+    {
+      "tema": "Armamentos",
+      "tema_en": "Armaments",
+      "raridade": "Muito Rara",
+      "dado": "1d100",
+      "entradas": [
+        {
+          "min": 1,
+          "max": 3,
+          "item_id": "municao-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "municao-mais-3"
+          ],
+          "texto": "Munição +3"
+        },
+        {
+          "min": 4,
+          "max": 6,
+          "item_id": "municao-assassina",
+          "variantes": [],
+          "texto": "Munição Assassina"
+        },
+        {
+          "min": 7,
+          "max": 9,
+          "item_id": "escudo-animado",
+          "variantes": [],
+          "texto": "Escudo Animado"
+        },
+        {
+          "min": 10,
+          "max": 12,
+          "item_id": "armadura-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "armadura-mais-2"
+          ],
+          "texto": "Armadura +2"
+        },
+        {
+          "min": 13,
+          "max": 14,
+          "item_id": "cinturao-de-forca-do-gigante",
+          "variantes": [
+            "cinturao-de-forca-do-gigante-do-fogo"
+          ],
+          "texto": "Cinturão de Força do Gigante (do fogo)"
+        },
+        {
+          "min": 15,
+          "max": 17,
+          "item_id": "cinturao-de-forca-do-gigante",
+          "variantes": [
+            "cinturao-de-forca-do-gigante-do-gelo-ou-das-pedras"
+          ],
+          "texto": "Cinturão de Força do Gigante (do gelo ou das pedras)"
+        },
+        {
+          "min": 18,
+          "max": 19,
+          "item_id": "espada-dancante",
+          "variantes": [],
+          "texto": "Espada Dançante"
+        },
+        {
+          "min": 20,
+          "max": 22,
+          "item_id": "armadura-demoniaca",
+          "variantes": [],
+          "texto": "Armadura Demoníaca"
+        },
+        {
+          "min": 23,
+          "max": 25,
+          "item_id": "loriga-de-escamas-de-dragao",
+          "variantes": [],
+          "texto": "Loriga de Escamas de Dragão"
+        },
+        {
+          "min": 26,
+          "max": 28,
+          "item_id": "armadura-de-placas-ana",
+          "variantes": [],
+          "texto": "Armadura de Placas Anã"
+        },
+        {
+          "min": 29,
+          "max": 31,
+          "item_id": "arremessador-anao",
+          "variantes": [],
+          "texto": "Arremessador Anão"
+        },
+        {
+          "min": 32,
+          "max": 34,
+          "item_id": "arco-de-energia",
+          "variantes": [],
+          "texto": "Arco de Energia"
+        },
+        {
+          "min": 35,
+          "max": 37,
+          "item_id": "armadura-encantada",
+          "variantes": [
+            "armadura-encantada-4-circulo",
+            "armadura-encantada-5-circulo"
+          ],
+          "texto": "Armadura Encantada (magia de 4º ou 5º Círculo)"
+        },
+        {
+          "min": 38,
+          "max": 40,
+          "item_id": "arma-encantada",
+          "variantes": [
+            "arma-encantada-4-circulo",
+            "arma-encantada-5-circulo"
+          ],
+          "texto": "Arma Encantada (magia de 4º ou 5º Círculo)"
+        },
+        {
+          "min": 41,
+          "max": 43,
+          "item_id": "machado-do-carrasco",
+          "variantes": [],
+          "texto": "Machado do Carrasco"
+        },
+        {
+          "min": 44,
+          "max": 46,
+          "item_id": "marca-gelida",
+          "variantes": [],
+          "texto": "Marca Gélida"
+        },
+        {
+          "min": 47,
+          "max": 49,
+          "item_id": "trompa-de-valhalla",
+          "variantes": [
+            "trompa-de-valhalla-bronze"
+          ],
+          "texto": "Trompa de Valhalla (bronze)"
+        },
+        {
+          "min": 50,
+          "max": 52,
+          "item_id": "pedra-ioun",
+          "variantes": [
+            "pedra-ioun-forca"
+          ],
+          "texto": "Pedra Ioun (força)"
+        },
+        {
+          "min": 53,
+          "max": 55,
+          "item_id": "alaude-da-pancada-trovejante",
+          "variantes": [],
+          "texto": "Alaúde da Pancada Trovejante"
+        },
+        {
+          "min": 56,
+          "max": 58,
+          "item_id": "manual-do-exercicio-proveitoso",
+          "variantes": [],
+          "texto": "Manual do Exercício Proveitoso"
+        },
+        {
+          "min": 59,
+          "max": 61,
+          "item_id": "ladra-de-nove-vidas",
+          "variantes": [],
+          "texto": "Ladra de Nove Vidas"
+        },
+        {
+          "min": 62,
+          "max": 64,
+          "item_id": "arco-do-juramento",
+          "variantes": [],
+          "texto": "Arco do Juramento"
+        },
+        {
+          "min": 65,
+          "max": 68,
+          "item_id": "oleo-de-afiacao",
+          "variantes": [],
+          "texto": "Óleo de Afiação"
+        },
+        {
+          "min": 69,
+          "max": 72,
+          "item_id": "pocao-de-forca-do-gigante",
+          "variantes": [
+            "pocao-de-forca-do-gigante-das-nuvens"
+          ],
+          "texto": "Poção de Força do Gigante (das nuvens)"
+        },
+        {
+          "min": 73,
+          "max": 75,
+          "item_id": "cajado-do-acrobata",
+          "variantes": [],
+          "texto": "Cajado do Acrobata"
+        },
+        {
+          "min": 76,
+          "max": 78,
+          "item_id": "cimitarra-da-velocidade",
+          "variantes": [],
+          "texto": "Cimitarra da Velocidade"
+        },
+        {
+          "min": 79,
+          "max": 82,
+          "item_id": "escudo-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "escudo-mais-3"
+          ],
+          "texto": "Escudo +3"
+        },
+        {
+          "min": 83,
+          "max": 85,
+          "item_id": "escudo-do-cavaleiro",
+          "variantes": [],
+          "texto": "Escudo do Cavaleiro"
+        },
+        {
+          "min": 86,
+          "max": 88,
+          "item_id": "escudo-guarda-magia",
+          "variantes": [],
+          "texto": "Escudo Guarda-Magia"
+        },
+        {
+          "min": 89,
+          "max": 91,
+          "item_id": "espada-afiada",
+          "variantes": [],
+          "texto": "Espada Afiada"
+        },
+        {
+          "min": 92,
+          "max": 94,
+          "item_id": "clava-grande-trovejante",
+          "variantes": [],
+          "texto": "Clava Grande Trovejante"
+        },
+        {
+          "min": 95,
+          "max": 97,
+          "item_id": "arma-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "arma-mais-3"
+          ],
+          "texto": "Arma +3"
+        },
+        {
+          "min": 98,
+          "max": 100,
+          "item_id": "faixas-do-poder-desarmado",
+          "variantes": [
+            "faixas-do-poder-desarmado-mais-3"
+          ],
+          "texto": "Faixas do Poder Desarmado +3"
+        }
+      ]
+    },
+    {
+      "tema": "Armamentos",
+      "tema_en": "Armaments",
+      "raridade": "Lendária",
+      "dado": "1d100",
+      "entradas": [
+        {
+          "min": 1,
+          "max": 6,
+          "item_id": "armadura-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "armadura-mais-3"
+          ],
+          "texto": "Armadura +3"
+        },
+        {
+          "min": 7,
+          "max": 12,
+          "item_id": "armadura-da-invulnerabilidade",
+          "variantes": [],
+          "texto": "Armadura da Invulnerabilidade"
+        },
+        {
+          "min": 13,
+          "max": 18,
+          "item_id": "cinturao-de-forca-do-gigante",
+          "variantes": [
+            "cinturao-de-forca-do-gigante-das-nuvens"
+          ],
+          "texto": "Cinturão de Força do Gigante (das nuvens)"
+        },
+        {
+          "min": 19,
+          "max": 21,
+          "item_id": "cinturao-de-forca-do-gigante",
+          "variantes": [
+            "cinturao-de-forca-do-gigante-das-tempestades"
+          ],
+          "texto": "Cinturão de Força do Gigante (das tempestades)"
+        },
+        {
+          "min": 22,
+          "max": 27,
+          "item_id": "defensora",
+          "variantes": [],
+          "texto": "Defensora"
+        },
+        {
+          "min": 28,
+          "max": 33,
+          "item_id": "cota-de-malha-do-efreeti",
+          "variantes": [],
+          "texto": "Cota de Malha do Efreeti"
+        },
+        {
+          "min": 34,
+          "max": 39,
+          "item_id": "armadura-encantada",
+          "variantes": [
+            "armadura-encantada-6-circulo",
+            "armadura-encantada-7-circulo",
+            "armadura-encantada-8-circulo"
+          ],
+          "texto": "Armadura Encantada (magia de 6º, 7º ou 8º Círculo)"
+        },
+        {
+          "min": 40,
+          "max": 45,
+          "item_id": "arma-encantada",
+          "variantes": [
+            "arma-encantada-6-circulo",
+            "arma-encantada-7-circulo",
+            "arma-encantada-8-circulo"
+          ],
+          "texto": "Arma Encantada (magia de 6º, 7º ou 8º Círculo)"
+        },
+        {
+          "min": 46,
+          "max": 51,
+          "item_id": "martelo-dos-trovoes",
+          "variantes": [],
+          "texto": "Martelo dos Trovões"
+        },
+        {
+          "min": 52,
+          "max": 56,
+          "item_id": "vingador-sagrado",
+          "variantes": [],
+          "texto": "Vingador Sagrado"
+        },
+        {
+          "min": 57,
+          "max": 62,
+          "item_id": "trompa-de-valhalla",
+          "variantes": [
+            "trompa-de-valhalla-ferro"
+          ],
+          "texto": "Trompa de Valhalla (ferro)"
+        },
+        {
+          "min": 63,
+          "max": 68,
+          "item_id": "lamina-da-sorte",
+          "variantes": [],
+          "texto": "Lâmina da Sorte"
+        },
+        {
+          "min": 69,
+          "max": 72,
+          "item_id": "lamina-lunar",
+          "variantes": [],
+          "texto": "Lâmina Lunar"
+        },
+        {
+          "min": 73,
+          "max": 78,
+          "item_id": "armadura-de-placas-da-etereidade",
+          "variantes": [],
+          "texto": "Armadura de Placas da Etereidade"
+        },
+        {
+          "min": 79,
+          "max": 87,
+          "item_id": "pocao-de-forca-do-gigante",
+          "variantes": [
+            "pocao-de-forca-do-gigante-das-tempestades"
+          ],
+          "texto": "Poção de Força do Gigante (das tempestades)"
+        },
+        {
+          "min": 88,
+          "max": 90,
+          "item_id": "bastao-do-poder-senhorial",
+          "variantes": [],
+          "texto": "Bastão do Poder Senhorial"
+        },
+        {
+          "min": 91,
+          "max": 95,
+          "item_id": "espada-da-resposta",
+          "variantes": [],
+          "texto": "Espada da Resposta"
+        },
+        {
+          "min": 96,
+          "max": 100,
+          "item_id": "espada-vorpal",
+          "variantes": [],
+          "texto": "Espada Vorpal"
+        }
+      ]
+    },
+    {
+      "tema": "Implementos",
+      "tema_en": "Implements",
+      "raridade": "Comum",
+      "dado": "1d100",
+      "entradas": [
+        {
+          "min": 1,
+          "max": 2,
+          "item_id": "conta-de-nutricao",
+          "variantes": [],
+          "texto": "Conta de Nutrição"
+        },
+        {
+          "min": 3,
+          "max": 4,
+          "item_id": "conta-refrescante",
+          "variantes": [],
+          "texto": "Conta Refrescante"
+        },
+        {
+          "min": 5,
+          "max": 6,
+          "item_id": "botas-de-rastros-falsos",
+          "variantes": [],
+          "texto": "Botas de Rastros Falsos"
+        },
+        {
+          "min": 7,
+          "max": 8,
+          "item_id": "vela-das-profundezas",
+          "variantes": [],
+          "texto": "Vela das Profundezas"
+        },
+        {
+          "min": 9,
+          "max": 10,
+          "item_id": "dado-do-charlatao",
+          "variantes": [],
+          "texto": "Dado do Charlatão"
+        },
+        {
+          "min": 11,
+          "max": 13,
+          "item_id": "manto-de-muitos-estilos",
+          "variantes": [],
+          "texto": "Manto de Muitos Estilos"
+        },
+        {
+          "min": 14,
+          "max": 15,
+          "item_id": "amuleto-mecanico",
+          "variantes": [],
+          "texto": "Amuleto Mecânico"
+        },
+        {
+          "min": 16,
+          "max": 17,
+          "item_id": "corneta-auditiva",
+          "variantes": [],
+          "texto": "Corneta Auditiva"
+        },
+        {
+          "min": 18,
+          "max": 19,
+          "item_id": "olho-postico",
+          "variantes": [],
+          "texto": "Olho Postiço"
+        },
+        {
+          "min": 20,
+          "max": 21,
+          "item_id": "bolsa-de-temperos-pratica-de-heward",
+          "variantes": [],
+          "texto": "Bolsa de Temperos Prática de Heward"
+        },
+        {
+          "min": 22,
+          "max": 23,
+          "item_id": "trompa-do-alarme-silencioso",
+          "variantes": [],
+          "texto": "Trompa do Alarme Silencioso"
+        },
+        {
+          "min": 24,
+          "max": 25,
+          "item_id": "instrumento-das-ilusoes",
+          "variantes": [],
+          "texto": "Instrumento das Ilusões"
+        },
+        {
+          "min": 26,
+          "max": 27,
+          "item_id": "instrumento-da-escrita",
+          "variantes": [],
+          "texto": "Instrumento da Escrita"
+        },
+        {
+          "min": 28,
+          "max": 29,
+          "item_id": "cadeado-ardiloso",
+          "variantes": [],
+          "texto": "Cadeado Ardiloso"
+        },
+        {
+          "min": 30,
+          "max": 32,
+          "item_id": "espada-tocada-pela-lua",
+          "variantes": [],
+          "texto": "Espada Tocada pela Lua"
+        },
+        {
+          "min": 33,
+          "max": 34,
+          "item_id": "chave-misteriosa",
+          "variantes": [],
+          "texto": "Chave Misteriosa"
+        },
+        {
+          "min": 35,
+          "max": 36,
+          "item_id": "orbe-da-direcao",
+          "variantes": [],
+          "texto": "Orbe da Direção"
+        },
+        {
+          "min": 37,
+          "max": 38,
+          "item_id": "orbe-do-tempo",
+          "variantes": [],
+          "texto": "Orbe do Tempo"
+        },
+        {
+          "min": 39,
+          "max": 40,
+          "item_id": "perfume-do-enfeiticamento",
+          "variantes": [],
+          "texto": "Perfume do Enfeitiçamento"
+        },
+        {
+          "min": 41,
+          "max": 42,
+          "item_id": "cachimbo-dos-monstros-de-fumaca",
+          "variantes": [],
+          "texto": "Cachimbo dos Monstros de Fumaça"
+        },
+        {
+          "min": 43,
+          "max": 44,
+          "item_id": "baliza-de-pesca",
+          "variantes": [],
+          "texto": "Baliza de Pesca"
+        },
+        {
+          "min": 45,
+          "max": 46,
+          "item_id": "baliza-retratil",
+          "variantes": [],
+          "texto": "Baliza Retrátil"
+        },
+        {
+          "min": 47,
+          "max": 52,
+          "item_id": "pocao-de-escalada",
+          "variantes": [],
+          "texto": "Poção de Escalada"
+        },
+        {
+          "min": 53,
+          "max": 58,
+          "item_id": "pocao-de-compreensao",
+          "variantes": [],
+          "texto": "Poção de Compreensão"
+        },
+        {
+          "min": 59,
+          "max": 74,
+          "item_id": "pocoes-de-cura",
+          "variantes": [
+            "pocao-de-cura"
+          ],
+          "texto": "Poção de Cura"
+        },
+        {
+          "min": 75,
+          "max": 76,
+          "item_id": "membro-protetico",
+          "variantes": [],
+          "texto": "Membro Protético"
+        },
+        {
+          "min": 77,
+          "max": 78,
+          "item_id": "corda-remendavel",
+          "variantes": [],
+          "texto": "Corda Remendável"
+        },
+        {
+          "min": 79,
+          "max": 80,
+          "item_id": "cajado-de-pios-de-passaros",
+          "variantes": [],
+          "texto": "Cajado de Pios de Pássaros"
+        },
+        {
+          "min": 81,
+          "max": 82,
+          "item_id": "garra-silvestre",
+          "variantes": [],
+          "texto": "Garra Silvestre"
+        },
+        {
+          "min": 83,
+          "max": 84,
+          "item_id": "boneca-falante",
+          "variantes": [],
+          "texto": "Boneca Falante"
+        },
+        {
+          "min": 85,
+          "max": 86,
+          "item_id": "caneca-da-sobriedade",
+          "variantes": [],
+          "texto": "Caneca da Sobriedade"
+        },
+        {
+          "min": 87,
+          "max": 90,
+          "item_id": "bengala-do-veterano",
+          "variantes": [],
+          "texto": "Bengala do Veterano"
+        },
+        {
+          "min": 91,
+          "max": 93,
+          "item_id": "municao-derrubadora",
+          "variantes": [],
+          "texto": "Munição Derrubadora"
+        },
+        {
+          "min": 94,
+          "max": 96,
+          "item_id": "varinha-da-regencia",
+          "variantes": [],
+          "texto": "Varinha da Regência"
+        },
+        {
+          "min": 97,
+          "max": 100,
+          "item_id": "varinha-de-pirotecnia",
+          "variantes": [],
+          "texto": "Varinha de Pirotecnia"
+        }
+      ]
+    },
+    {
+      "tema": "Implementos",
+      "tema_en": "Implements",
+      "raridade": "Incomum",
+      "dado": "1d100",
+      "entradas": [
+        {
+          "min": 1,
+          "max": 2,
+          "item_id": "jarro-alquimico",
+          "variantes": [],
+          "texto": "Jarro Alquímico"
+        },
+        {
+          "min": 3,
+          "max": 6,
+          "item_id": "municao-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "municao-mais-1"
+          ],
+          "texto": "Munição +1"
+        },
+        {
+          "min": 7,
+          "max": 10,
+          "item_id": "bolsa-devoradora",
+          "variantes": [],
+          "texto": "Bolsa Devoradora"
+        },
+        {
+          "min": 11,
+          "max": 12,
+          "item_id": "botas-elficas",
+          "variantes": [],
+          "texto": "Botas Élficas"
+        },
+        {
+          "min": 13,
+          "max": 14,
+          "item_id": "botas-de-caminhar-e-saltar",
+          "variantes": [],
+          "texto": "Botas de Caminhar e Saltar"
+        },
+        {
+          "min": 15,
+          "max": 16,
+          "item_id": "botas-das-terras-invernais",
+          "variantes": [],
+          "texto": "Botas das Terras Invernais"
+        },
+        {
+          "min": 17,
+          "max": 18,
+          "item_id": "vassoura-voadora",
+          "variantes": [],
+          "texto": "Vassoura Voadora"
+        },
+        {
+          "min": 19,
+          "max": 20,
+          "item_id": "gorro-de-respiracao-aquatica",
+          "variantes": [],
+          "texto": "Gorro de Respiração Aquática"
+        },
+        {
+          "min": 21,
+          "max": 22,
+          "item_id": "manto-elfico",
+          "variantes": [],
+          "texto": "Manto Élfico"
+        },
+        {
+          "min": 23,
+          "max": 24,
+          "item_id": "manto-de-protecao",
+          "variantes": [],
+          "texto": "Manto de Proteção"
+        },
+        {
+          "min": 25,
+          "max": 26,
+          "item_id": "manto-da-arraia-jamanta",
+          "variantes": [],
+          "texto": "Manto da Arraia-Jamanta"
+        },
+        {
+          "min": 27,
+          "max": 27,
+          "item_id": "decantador-de-agua-infinita",
+          "variantes": [],
+          "texto": "Decantador de Água Infinita"
+        },
+        {
+          "min": 28,
+          "max": 30,
+          "item_id": "globo-flutuante",
+          "variantes": [],
+          "texto": "Globo Flutuante"
+        },
+        {
+          "min": 31,
+          "max": 32,
+          "item_id": "po-do-desaparecimento",
+          "variantes": [],
+          "texto": "Pó do Desaparecimento"
+        },
+        {
+          "min": 33,
+          "max": 34,
+          "item_id": "po-da-secura",
+          "variantes": [],
+          "texto": "Pó da Secura"
+        },
+        {
+          "min": 35,
+          "max": 36,
+          "item_id": "po-de-espirrar-e-engasgar",
+          "variantes": [],
+          "texto": "Pó de Espirrar e Engasgar"
+        },
+        {
+          "min": 37,
+          "max": 38,
+          "item_id": "arma-encantada",
+          "variantes": [
+            "arma-encantada-truque",
+            "arma-encantada-1-circulo"
+          ],
+          "texto": "Arma Encantada (Truque ou magia de 1º Círculo)"
+        },
+        {
+          "min": 39,
+          "max": 40,
+          "item_id": "olhos-de-visao-minuciosa",
+          "variantes": [],
+          "texto": "Olhos de Visão Minuciosa"
+        },
+        {
+          "min": 41,
+          "max": 42,
+          "item_id": "olhos-de-aguia",
+          "variantes": [],
+          "texto": "Olhos de Águia"
+        },
+        {
+          "min": 43,
+          "max": 44,
+          "item_id": "luvas-apanha-projeteis",
+          "variantes": [],
+          "texto": "Luvas Apanha-Projéteis"
+        },
+        {
+          "min": 45,
+          "max": 46,
+          "item_id": "luvas-de-natacao-e-escalada",
+          "variantes": [],
+          "texto": "Luvas de Natação e Escalada"
+        },
+        {
+          "min": 47,
+          "max": 48,
+          "item_id": "luvas-do-ladrao",
+          "variantes": [],
+          "texto": "Luvas do Ladrão"
+        },
+        {
+          "min": 49,
+          "max": 50,
+          "item_id": "oculos-da-noite",
+          "variantes": [],
+          "texto": "Óculos da Noite"
+        },
+        {
+          "min": 51,
+          "max": 51,
+          "item_id": "olho-de-bruxa",
+          "variantes": [],
+          "texto": "Olho de Bruxa"
+        },
+        {
+          "min": 52,
+          "max": 54,
+          "item_id": "elmo-de-compreender-idiomas",
+          "variantes": [],
+          "texto": "Elmo de Compreender Idiomas"
+        },
+        {
+          "min": 55,
+          "max": 55,
+          "item_id": "bastao-imovel",
+          "variantes": [],
+          "texto": "Bastão Imóvel"
+        },
+        {
+          "min": 56,
+          "max": 57,
+          "item_id": "instrumento-dos-bardos",
+          "variantes": [
+            "instrumento-dos-bardos-alaude-de-doss",
+            "instrumento-dos-bardos-bandurra-de-fochlucan",
+            "instrumento-dos-bardos-citara-de-mac-fuirmidh"
+          ],
+          "texto": "Instrumento dos Bardos (alaúde de Doss, bandurra de Fochlucan ou cítara de Mac-Fuirmidh)"
+        },
+        {
+          "min": 58,
+          "max": 59,
+          "item_id": "lanterna-reveladora",
+          "variantes": [],
+          "texto": "Lanterna Reveladora"
+        },
+        {
+          "min": 60,
+          "max": 61,
+          "item_id": "manto-da-natureza",
+          "variantes": [],
+          "texto": "Manto da Natureza"
+        },
+        {
+          "min": 62,
+          "max": 63,
+          "item_id": "oleo-escorregadio",
+          "variantes": [],
+          "texto": "Óleo Escorregadio"
+        },
+        {
+          "min": 64,
+          "max": 65,
+          "item_id": "flauta-assombrosa",
+          "variantes": [],
+          "texto": "Flauta Assombrosa"
+        },
+        {
+          "min": 66,
+          "max": 67,
+          "item_id": "flauta-dos-esgotos",
+          "variantes": [],
+          "texto": "Flauta dos Esgotos"
+        },
+        {
+          "min": 68,
+          "max": 71,
+          "item_id": "pocao-de-crescimento",
+          "variantes": [],
+          "texto": "Poção de Crescimento"
+        },
+        {
+          "min": 72,
+          "max": 80,
+          "item_id": "pocoes-de-cura",
+          "variantes": [
+            "pocao-de-cura-maior"
+          ],
+          "texto": "Poção de Cura (maior)"
+        },
+        {
+          "min": 81,
+          "max": 84,
+          "item_id": "pocao-de-respiracao-aquatica",
+          "variantes": [],
+          "texto": "Poção de Respiração Aquática"
+        },
+        {
+          "min": 85,
+          "max": 86,
+          "item_id": "pena-simbolica-de-quaal",
+          "variantes": [
+            "pena-simbolica-de-quaal-ancora",
+            "pena-simbolica-de-quaal-leque",
+            "pena-simbolica-de-quaal-arvore"
+          ],
+          "texto": "Pena Simbólica de Quaal (âncora, leque ou árvore)"
+        },
+        {
+          "min": 87,
+          "max": 88,
+          "item_id": "anel-de-salto",
+          "variantes": [],
+          "texto": "Anel de Salto"
+        },
+        {
+          "min": 89,
+          "max": 90,
+          "item_id": "anel-de-natacao",
+          "variantes": [],
+          "texto": "Anel de Natação"
+        },
+        {
+          "min": 91,
+          "max": 92,
+          "item_id": "anel-de-calor",
+          "variantes": [],
+          "texto": "Anel de Calor"
+        },
+        {
+          "min": 93,
+          "max": 94,
+          "item_id": "tunica-de-itens-uteis",
+          "variantes": [],
+          "texto": "Túnica de Itens Úteis"
+        },
+        {
+          "min": 95,
+          "max": 96,
+          "item_id": "corda-de-escalada",
+          "variantes": [],
+          "texto": "Corda de Escalada"
+        },
+        {
+          "min": 97,
+          "max": 98,
+          "item_id": "pedra-da-boa-sorte",
+          "variantes": [],
+          "texto": "Pedra da Boa Sorte"
+        },
+        {
+          "min": 99,
+          "max": 100,
+          "item_id": "varinha-dos-segredos",
+          "variantes": [],
+          "texto": "Varinha dos Segredos"
+        }
+      ]
+    },
+    {
+      "tema": "Implementos",
+      "tema_en": "Implements",
+      "raridade": "Rara",
+      "dado": "1d100",
+      "entradas": [
+        {
+          "min": 1,
+          "max": 4,
+          "item_id": "municao-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "municao-mais-2"
+          ],
+          "texto": "Munição +2"
+        },
+        {
+          "min": 5,
+          "max": 8,
+          "item_id": "bolsa-de-feijoes",
+          "variantes": [],
+          "texto": "Bolsa de Feijões"
+        },
+        {
+          "min": 9,
+          "max": 12,
+          "item_id": "cinturao-dos-anoes",
+          "variantes": [],
+          "texto": "Cinturão dos Anões"
+        },
+        {
+          "min": 13,
+          "max": 16,
+          "item_id": "botas-de-levitacao",
+          "variantes": [],
+          "texto": "Botas de Levitação"
+        },
+        {
+          "min": 17,
+          "max": 20,
+          "item_id": "botas-de-velocidade",
+          "variantes": [],
+          "texto": "Botas de Velocidade"
+        },
+        {
+          "min": 21,
+          "max": 24,
+          "item_id": "carrilhao-da-abertura",
+          "variantes": [],
+          "texto": "Carrilhão da Abertura"
+        },
+        {
+          "min": 25,
+          "max": 28,
+          "item_id": "grilhoes-dimensionais",
+          "variantes": [],
+          "texto": "Grilhões Dimensionais"
+        },
+        {
+          "min": 29,
+          "max": 32,
+          "item_id": "arma-encantada",
+          "variantes": [
+            "arma-encantada-2-circulo",
+            "arma-encantada-3-circulo"
+          ],
+          "texto": "Arma Encantada (magia de 2º ou 3º Círculo)"
+        },
+        {
+          "min": 33,
+          "max": 36,
+          "item_id": "barco-dobravel",
+          "variantes": [],
+          "texto": "Barco Dobrável"
+        },
+        {
+          "min": 37,
+          "max": 40,
+          "item_id": "couro-batido-ilusorio",
+          "variantes": [],
+          "texto": "Couro Batido Ilusório"
+        },
+        {
+          "min": 41,
+          "max": 44,
+          "item_id": "mochila-pratica-de-heward",
+          "variantes": [],
+          "texto": "Mochila Prática de Heward"
+        },
+        {
+          "min": 45,
+          "max": 48,
+          "item_id": "ferraduras-da-velocidade",
+          "variantes": [],
+          "texto": "Ferraduras da Velocidade"
+        },
+        {
+          "min": 49,
+          "max": 52,
+          "item_id": "instrumento-dos-bardos",
+          "variantes": [
+            "instrumento-dos-bardos-bandolim-de-canaith",
+            "instrumento-dos-bardos-lira-de-cli"
+          ],
+          "texto": "Instrumento dos Bardos (bandolim de Canaith ou lira de Cli)"
+        },
+        {
+          "min": 53,
+          "max": 56,
+          "item_id": "pedra-ioun",
+          "variantes": [
+            "pedra-ioun-alerta"
+          ],
+          "texto": "Pedra Ioun (alerta)"
+        },
+        {
+          "min": 57,
+          "max": 60,
+          "item_id": "buraco-portatil",
+          "variantes": [],
+          "texto": "Buraco Portátil"
+        },
+        {
+          "min": 61,
+          "max": 64,
+          "item_id": "pocao-de-diminuicao",
+          "variantes": [],
+          "texto": "Poção de Diminuição"
+        },
+        {
+          "min": 65,
+          "max": 68,
+          "item_id": "pocao-de-forma-gasosa",
+          "variantes": [],
+          "texto": "Poção de Forma Gasosa"
+        },
+        {
+          "min": 69,
+          "max": 76,
+          "item_id": "pocoes-de-cura",
+          "variantes": [
+            "pocao-de-cura-superior"
+          ],
+          "texto": "Poção de Cura (superior)"
+        },
+        {
+          "min": 77,
+          "max": 80,
+          "item_id": "pena-simbolica-de-quaal",
+          "variantes": [
+            "pena-simbolica-de-quaal-passaro",
+            "pena-simbolica-de-quaal-barco-cisne",
+            "pena-simbolica-de-quaal-chicote"
+          ],
+          "texto": "Pena Simbólica de Quaal (pássaro, barco-cisne ou chicote)"
+        },
+        {
+          "min": 81,
+          "max": 84,
+          "item_id": "anel-de-evasao",
+          "variantes": [],
+          "texto": "Anel de Evasão"
+        },
+        {
+          "min": 85,
+          "max": 88,
+          "item_id": "anel-de-acao-livre",
+          "variantes": [],
+          "texto": "Anel de Ação Livre"
+        },
+        {
+          "min": 89,
+          "max": 92,
+          "item_id": "corda-do-enredamento",
+          "variantes": [],
+          "texto": "Corda do Enredamento"
+        },
+        {
+          "min": 93,
+          "max": 96,
+          "item_id": "cajado-da-cura",
+          "variantes": [],
+          "texto": "Cajado da Cura"
+        },
+        {
+          "min": 97,
+          "max": 100,
+          "item_id": "varinha-de-deteccao-de-inimigos",
+          "variantes": [],
+          "texto": "Varinha de Detecção de Inimigos"
+        }
+      ]
+    },
+    {
+      "tema": "Implementos",
+      "tema_en": "Implements",
+      "raridade": "Muito Rara",
+      "dado": "1d100",
+      "entradas": [
+        {
+          "min": 1,
+          "max": 7,
+          "item_id": "municao-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "municao-mais-3"
+          ],
+          "texto": "Munição +3"
+        },
+        {
+          "min": 8,
+          "max": 14,
+          "item_id": "bolsa-gulosa",
+          "variantes": [],
+          "texto": "Bolsa Gulosa"
+        },
+        {
+          "min": 15,
+          "max": 21,
+          "item_id": "tapete-voador",
+          "variantes": [],
+          "texto": "Tapete Voador"
+        },
+        {
+          "min": 22,
+          "max": 28,
+          "item_id": "arma-encantada",
+          "variantes": [
+            "arma-encantada-4-circulo",
+            "arma-encantada-5-circulo"
+          ],
+          "texto": "Arma Encantada (magia de 4º ou 5º Círculo)"
+        },
+        {
+          "min": 29,
+          "max": 35,
+          "item_id": "ferraduras-do-zefiro",
+          "variantes": [],
+          "texto": "Ferraduras do Zéfiro"
+        },
+        {
+          "min": 36,
+          "max": 42,
+          "item_id": "instrumento-dos-bardos",
+          "variantes": [
+            "instrumento-dos-bardos-harpa-de-anstruth"
+          ],
+          "texto": "Instrumento dos Bardos (harpa de Anstruth)"
+        },
+        {
+          "min": 43,
+          "max": 49,
+          "item_id": "pedra-ioun",
+          "variantes": [
+            "pedra-ioun-agilidade"
+          ],
+          "texto": "Pedra Ioun (agilidade)"
+        },
+        {
+          "min": 50,
+          "max": 56,
+          "item_id": "alaude-da-pancada-trovejante",
+          "variantes": [],
+          "texto": "Alaúde da Pancada Trovejante"
+        },
+        {
+          "min": 57,
+          "max": 63,
+          "item_id": "manual-da-rapidez-de-acao",
+          "variantes": [],
+          "texto": "Manual da Rapidez de Ação"
+        },
+        {
+          "min": 64,
+          "max": 70,
+          "item_id": "pigmentos-maravilhosos-de-nolzur",
+          "variantes": [],
+          "texto": "Pigmentos Maravilhosos de Nolzur"
+        },
+        {
+          "min": 71,
+          "max": 77,
+          "item_id": "pocao-de-voo",
+          "variantes": [],
+          "texto": "Poção de Voo"
+        },
+        {
+          "min": 78,
+          "max": 86,
+          "item_id": "pocoes-de-cura",
+          "variantes": [
+            "pocao-de-cura-suprema"
+          ],
+          "texto": "Poção de Cura (suprema)"
+        },
+        {
+          "min": 87,
+          "max": 93,
+          "item_id": "pocao-de-velocidade",
+          "variantes": [],
+          "texto": "Poção de Velocidade"
+        },
+        {
+          "min": 94,
+          "max": 100,
+          "item_id": "tomo-da-lideranca-e-influencia",
+          "variantes": [],
+          "texto": "Tomo da Liderança e Influência"
+        }
+      ]
+    },
+    {
+      "tema": "Implementos",
+      "tema_en": "Implements",
+      "raridade": "Lendária",
+      "dado": "1d100",
+      "entradas": [
+        {
+          "min": 1,
+          "max": 17,
+          "item_id": "arma-encantada",
+          "variantes": [
+            "arma-encantada-6-circulo",
+            "arma-encantada-7-circulo",
+            "arma-encantada-8-circulo"
+          ],
+          "texto": "Arma Encantada (magia de 6º, 7º ou 8º Círculo)"
+        },
+        {
+          "min": 18,
+          "max": 34,
+          "item_id": "instrumento-dos-bardos",
+          "variantes": [
+            "instrumento-dos-bardos-harpa-de-ollamh"
+          ],
+          "texto": "Instrumento dos Bardos (harpa de Ollamh)"
+        },
+        {
+          "min": 35,
+          "max": 54,
+          "item_id": "cola-soberana",
+          "variantes": [],
+          "texto": "Cola Soberana"
+        },
+        {
+          "min": 55,
+          "max": 70,
+          "item_id": "esfera-da-aniquilacao",
+          "variantes": [],
+          "texto": "Esfera da Aniquilação"
+        },
+        {
+          "min": 71,
+          "max": 83,
+          "item_id": "talisma-da-esfera",
+          "variantes": [],
+          "texto": "Talismã da Esfera"
+        },
+        {
+          "min": 84,
+          "max": 100,
+          "item_id": "solvente-universal",
+          "variantes": [],
+          "texto": "Solvente Universal"
+        }
+      ]
+    },
+    {
+      "tema": "Relíquias",
+      "tema_en": "Relics",
+      "raridade": "Comum",
+      "dado": "1d100",
+      "entradas": [
+        {
+          "min": 1,
+          "max": 8,
+          "item_id": "corneta-auditiva",
+          "variantes": [],
+          "texto": "Corneta Auditiva"
+        },
+        {
+          "min": 9,
+          "max": 28,
+          "item_id": "pocoes-de-cura",
+          "variantes": [
+            "pocao-de-cura"
+          ],
+          "texto": "Poção de Cura"
+        },
+        {
+          "min": 29,
+          "max": 36,
+          "item_id": "vaso-do-despertar",
+          "variantes": [],
+          "texto": "Vaso do Despertar"
+        },
+        {
+          "min": 37,
+          "max": 44,
+          "item_id": "rubi-do-mago-de-guerra",
+          "variantes": [],
+          "texto": "Rubi do Mago de Guerra"
+        },
+        {
+          "min": 45,
+          "max": 52,
+          "item_id": "escudo-de-expressao",
+          "variantes": [],
+          "texto": "Escudo de Expressão"
+        },
+        {
+          "min": 53,
+          "max": 60,
+          "item_id": "armadura-fumegante",
+          "variantes": [],
+          "texto": "Armadura Fumegante"
+        },
+        {
+          "min": 61,
+          "max": 80,
+          "item_id": "pergaminho-magico",
+          "variantes": [
+            "pergaminho-magico-truque",
+            "pergaminho-magico-1-circulo"
+          ],
+          "texto": "Pergaminho Mágico (Truque ou magia de 1º Círculo)"
+        },
+        {
+          "min": 81,
+          "max": 90,
+          "item_id": "cajado-do-adorno",
+          "variantes": [],
+          "texto": "Cajado do Adorno"
+        },
+        {
+          "min": 91,
+          "max": 100,
+          "item_id": "cajado-das-flores",
+          "variantes": [],
+          "texto": "Cajado das Flores"
+        }
+      ]
+    },
+    {
+      "tema": "Relíquias",
+      "tema_en": "Relics",
+      "raridade": "Incomum",
+      "dado": "1d100",
+      "entradas": [
+        {
+          "min": 1,
+          "max": 5,
+          "item_id": "cajado-encantado",
+          "variantes": [
+            "cajado-encantado-truque",
+            "cajado-encantado-1-circulo"
+          ],
+          "texto": "Cajado Encantado (Truque ou magia de 1º Círculo)"
+        },
+        {
+          "min": 6,
+          "max": 10,
+          "item_id": "unguento-de-keoghtom",
+          "variantes": [],
+          "texto": "Unguento de Keoghtom"
+        },
+        {
+          "min": 11,
+          "max": 15,
+          "item_id": "armadura-do-marinheiro",
+          "variantes": [],
+          "texto": "Armadura do Marinheiro"
+        },
+        {
+          "min": 16,
+          "max": 20,
+          "item_id": "manto-da-natureza",
+          "variantes": [],
+          "texto": "Manto da Natureza"
+        },
+        {
+          "min": 21,
+          "max": 25,
+          "item_id": "perola-do-poder",
+          "variantes": [],
+          "texto": "Pérola do Poder"
+        },
+        {
+          "min": 26,
+          "max": 30,
+          "item_id": "periapto-da-saude",
+          "variantes": [],
+          "texto": "Periapto da Saúde"
+        },
+        {
+          "min": 31,
+          "max": 35,
+          "item_id": "periapto-do-fechamento-de-ferimentos",
+          "variantes": [],
+          "texto": "Periapto do Fechamento de Ferimentos"
+        },
+        {
+          "min": 36,
+          "max": 40,
+          "item_id": "pocao-de-amizade-animal",
+          "variantes": [],
+          "texto": "Poção de Amizade Animal"
+        },
+        {
+          "min": 41,
+          "max": 55,
+          "item_id": "pocoes-de-cura",
+          "variantes": [
+            "pocao-de-cura-maior"
+          ],
+          "texto": "Poção de Cura (maior)"
+        },
+        {
+          "min": 56,
+          "max": 60,
+          "item_id": "pocao-de-resistencia",
+          "variantes": [],
+          "texto": "Poção de Resistência"
+        },
+        {
+          "min": 61,
+          "max": 65,
+          "item_id": "anel-de-caminhar-sobre-as-aguas",
+          "variantes": [],
+          "texto": "Anel de Caminhar Sobre as Águas"
+        },
+        {
+          "min": 66,
+          "max": 70,
+          "item_id": "pedras-de-mensagem",
+          "variantes": [],
+          "texto": "Pedras de Mensagem"
+        },
+        {
+          "min": 71,
+          "max": 80,
+          "item_id": "pergaminho-magico",
+          "variantes": [
+            "pergaminho-magico-2-circulo",
+            "pergaminho-magico-3-circulo"
+          ],
+          "texto": "Pergaminho Mágico (magia de 2º ou 3º Círculo)"
+        },
+        {
+          "min": 81,
+          "max": 85,
+          "item_id": "cajado-da-vibora",
+          "variantes": [],
+          "texto": "Cajado da Víbora"
+        },
+        {
+          "min": 86,
+          "max": 90,
+          "item_id": "cajado-da-piton",
+          "variantes": [],
+          "texto": "Cajado da Píton"
+        },
+        {
+          "min": 91,
+          "max": 95,
+          "item_id": "varinha-de-deteccao-de-magia",
+          "variantes": [],
+          "texto": "Varinha de Detecção de Magia"
+        },
+        {
+          "min": 96,
+          "max": 100,
+          "item_id": "varinha-do-mago-de-guerra-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "varinha-do-mago-de-guerra-mais-1"
+          ],
+          "texto": "Varinha do Mago de Guerra +1"
+        }
+      ]
+    },
+    {
+      "tema": "Relíquias",
+      "tema_en": "Relics",
+      "raridade": "Rara",
+      "dado": "1d100",
+      "entradas": [
+        {
+          "min": 1,
+          "max": 3,
+          "item_id": "amuleto-da-saude",
+          "variantes": [],
+          "texto": "Amuleto da Saúde"
+        },
+        {
+          "min": 4,
+          "max": 7,
+          "item_id": "armadura-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "armadura-mais-1"
+          ],
+          "texto": "Armadura +1"
+        },
+        {
+          "min": 8,
+          "max": 9,
+          "item_id": "tigela-de-comando-de-elementais-da-agua",
+          "variantes": [],
+          "texto": "Tigela de Comando de Elementais da Água"
+        },
+        {
+          "min": 10,
+          "max": 11,
+          "item_id": "braseiro-de-comando-de-elementais-do-fogo",
+          "variantes": [],
+          "texto": "Braseiro de Comando de Elementais do Fogo"
+        },
+        {
+          "min": 12,
+          "max": 13,
+          "item_id": "incensario-de-controle-de-elementais-do-ar",
+          "variantes": [],
+          "texto": "Incensário de Controle de Elementais do Ar"
+        },
+        {
+          "min": 14,
+          "max": 16,
+          "item_id": "elixir-da-saude",
+          "variantes": [],
+          "texto": "Elixir da Saúde"
+        },
+        {
+          "min": 17,
+          "max": 19,
+          "item_id": "cajado-encantado",
+          "variantes": [
+            "cajado-encantado-2-circulo",
+            "cajado-encantado-3-circulo"
+          ],
+          "texto": "Cajado Encantado (magia de 2º ou 3º Círculo)"
+        },
+        {
+          "min": 20,
+          "max": 22,
+          "item_id": "trompa-explosiva",
+          "variantes": [],
+          "texto": "Trompa Explosiva"
+        },
+        {
+          "min": 23,
+          "max": 25,
+          "item_id": "trompa-de-valhalla",
+          "variantes": [
+            "trompa-de-valhalla-latao",
+            "trompa-de-valhalla-prata"
+          ],
+          "texto": "Trompa de Valhalla (latão ou prata)"
+        },
+        {
+          "min": 26,
+          "max": 28,
+          "item_id": "pedra-ioun",
+          "variantes": [
+            "pedra-ioun-reserva",
+            "pedra-ioun-sustento"
+          ],
+          "texto": "Pedra Ioun (reserva ou sustento)"
+        },
+        {
+          "min": 29,
+          "max": 31,
+          "item_id": "maca-da-ruptura",
+          "variantes": [],
+          "texto": "Maça da Ruptura"
+        },
+        {
+          "min": 32,
+          "max": 34,
+          "item_id": "maca-da-destruicao",
+          "variantes": [],
+          "texto": "Maça da Destruição"
+        },
+        {
+          "min": 35,
+          "max": 37,
+          "item_id": "maca-do-terror",
+          "variantes": [],
+          "texto": "Maça do Terror"
+        },
+        {
+          "min": 38,
+          "max": 40,
+          "item_id": "colar-de-contas-de-oracao",
+          "variantes": [],
+          "texto": "Colar de Contas de Oração"
+        },
+        {
+          "min": 41,
+          "max": 43,
+          "item_id": "periapto-a-prova-de-veneno",
+          "variantes": [],
+          "texto": "Periapto à Prova de Veneno"
+        },
+        {
+          "min": 44,
+          "max": 51,
+          "item_id": "pocoes-de-cura",
+          "variantes": [
+            "pocao-de-cura-superior"
+          ],
+          "texto": "Poção de Cura (superior)"
+        },
+        {
+          "min": 52,
+          "max": 54,
+          "item_id": "anel-de-influencia-animal",
+          "variantes": [],
+          "texto": "Anel de Influência Animal"
+        },
+        {
+          "min": 55,
+          "max": 58,
+          "item_id": "anel-de-resistencia",
+          "variantes": [],
+          "texto": "Anel de Resistência"
+        },
+        {
+          "min": 59,
+          "max": 61,
+          "item_id": "anel-de-armazenar-magias",
+          "variantes": [],
+          "texto": "Anel de Armazenar Magias"
+        },
+        {
+          "min": 62,
+          "max": 65,
+          "item_id": "pergaminho-de-protecao",
+          "variantes": [],
+          "texto": "Pergaminho de Proteção"
+        },
+        {
+          "min": 66,
+          "max": 73,
+          "item_id": "pergaminho-magico",
+          "variantes": [
+            "pergaminho-magico-4-circulo",
+            "pergaminho-magico-5-circulo"
+          ],
+          "texto": "Pergaminho Mágico (magia de 4º ou 5º Círculo)"
+        },
+        {
+          "min": 74,
+          "max": 76,
+          "item_id": "cajado-do-encantamento",
+          "variantes": [],
+          "texto": "Cajado do Encantamento"
+        },
+        {
+          "min": 77,
+          "max": 79,
+          "item_id": "cajado-da-cura",
+          "variantes": [],
+          "texto": "Cajado da Cura"
+        },
+        {
+          "min": 80,
+          "max": 82,
+          "item_id": "cajado-do-enxame-de-insetos",
+          "variantes": [],
+          "texto": "Cajado do Enxame de Insetos"
+        },
+        {
+          "min": 83,
+          "max": 85,
+          "item_id": "cajado-das-florestas",
+          "variantes": [],
+          "texto": "Cajado das Florestas"
+        },
+        {
+          "min": 86,
+          "max": 88,
+          "item_id": "cajado-do-definhamento",
+          "variantes": [],
+          "texto": "Cajado do Definhamento"
+        },
+        {
+          "min": 89,
+          "max": 90,
+          "item_id": "pedra-de-controlar-elementais-da-terra",
+          "variantes": [],
+          "texto": "Pedra de Controlar Elementais da Terra"
+        },
+        {
+          "min": 91,
+          "max": 93,
+          "item_id": "bastao-tentacular",
+          "variantes": [],
+          "texto": "Bastão Tentacular"
+        },
+        {
+          "min": 94,
+          "max": 96,
+          "item_id": "varinha-da-paralisia",
+          "variantes": [],
+          "texto": "Varinha da Paralisia"
+        },
+        {
+          "min": 97,
+          "max": 100,
+          "item_id": "varinha-do-mago-de-guerra-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "varinha-do-mago-de-guerra-mais-2"
+          ],
+          "texto": "Varinha do Mago de Guerra +2"
+        }
+      ]
+    },
+    {
+      "tema": "Relíquias",
+      "tema_en": "Relics",
+      "raridade": "Muito Rara",
+      "dado": "1d100",
+      "entradas": [
+        {
+          "min": 1,
+          "max": 5,
+          "item_id": "armadura-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "armadura-mais-2"
+          ],
+          "texto": "Armadura +2"
+        },
+        {
+          "min": 6,
+          "max": 10,
+          "item_id": "vela-da-invocacao",
+          "variantes": [],
+          "texto": "Vela da Invocação"
+        },
+        {
+          "min": 11,
+          "max": 15,
+          "item_id": "caldeirao-do-renascimento",
+          "variantes": [],
+          "texto": "Caldeirão do Renascimento"
+        },
+        {
+          "min": 16,
+          "max": 20,
+          "item_id": "cajado-encantado",
+          "variantes": [
+            "cajado-encantado-4-circulo",
+            "cajado-encantado-5-circulo"
+          ],
+          "texto": "Cajado Encantado (magia de 4º ou 5º Círculo)"
+        },
+        {
+          "min": 21,
+          "max": 25,
+          "item_id": "trompa-de-valhalla",
+          "variantes": [
+            "trompa-de-valhalla-bronze"
+          ],
+          "texto": "Trompa de Valhalla (bronze)"
+        },
+        {
+          "min": 26,
+          "max": 30,
+          "item_id": "pedra-ioun",
+          "variantes": [
+            "pedra-ioun-intuicao"
+          ],
+          "texto": "Pedra Ioun (intuição)"
+        },
+        {
+          "min": 31,
+          "max": 35,
+          "item_id": "manual-da-saude-corporal",
+          "variantes": [],
+          "texto": "Manual da Saúde Corporal"
+        },
+        {
+          "min": 36,
+          "max": 43,
+          "item_id": "pocoes-de-cura",
+          "variantes": [
+            "pocao-de-cura-suprema"
+          ],
+          "texto": "Poção de Cura (suprema)"
+        },
+        {
+          "min": 44,
+          "max": 50,
+          "item_id": "pocao-de-vitalidade",
+          "variantes": [],
+          "texto": "Poção de Vitalidade"
+        },
+        {
+          "min": 51,
+          "max": 55,
+          "item_id": "bastao-do-alerta",
+          "variantes": [],
+          "texto": "Bastão do Alerta"
+        },
+        {
+          "min": 56,
+          "max": 65,
+          "item_id": "pergaminho-magico",
+          "variantes": [
+            "pergaminho-magico-6-circulo",
+            "pergaminho-magico-7-circulo",
+            "pergaminho-magico-8-circulo"
+          ],
+          "texto": "Pergaminho Mágico (magia de 6º, 7º ou 8º Círculo)"
+        },
+        {
+          "min": 66,
+          "max": 70,
+          "item_id": "tabuleiro-espiritual",
+          "variantes": [],
+          "texto": "Tabuleiro Espiritual"
+        },
+        {
+          "min": 71,
+          "max": 75,
+          "item_id": "cajado-do-fogo",
+          "variantes": [],
+          "texto": "Cajado do Fogo"
+        },
+        {
+          "min": 76,
+          "max": 80,
+          "item_id": "cajado-do-gelo",
+          "variantes": [],
+          "texto": "Cajado do Gelo"
+        },
+        {
+          "min": 81,
+          "max": 85,
+          "item_id": "cajado-do-impacto",
+          "variantes": [],
+          "texto": "Cajado do Impacto"
+        },
+        {
+          "min": 86,
+          "max": 90,
+          "item_id": "cajado-do-trovao-e-relampago",
+          "variantes": [],
+          "texto": "Cajado do Trovão e Relâmpago"
+        },
+        {
+          "min": 91,
+          "max": 95,
+          "item_id": "tomo-da-compreensao",
+          "variantes": [],
+          "texto": "Tomo da Compreensão"
+        },
+        {
+          "min": 96,
+          "max": 100,
+          "item_id": "varinha-do-mago-de-guerra-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "varinha-do-mago-de-guerra-mais-3"
+          ],
+          "texto": "Varinha do Mago de Guerra +3"
+        }
+      ]
+    },
+    {
+      "tema": "Relíquias",
+      "tema_en": "Relics",
+      "raridade": "Lendária",
+      "dado": "1d100",
+      "entradas": [
+        {
+          "min": 1,
+          "max": 8,
+          "item_id": "armadura-da-invulnerabilidade",
+          "variantes": [],
+          "texto": "Armadura da Invulnerabilidade"
+        },
+        {
+          "min": 9,
+          "max": 18,
+          "item_id": "armadura-mais-1-mais-2-ou-mais-3",
+          "variantes": [
+            "armadura-mais-3"
+          ],
+          "texto": "Armadura +3"
+        },
+        {
+          "min": 19,
+          "max": 27,
+          "item_id": "cajado-encantado",
+          "variantes": [
+            "cajado-encantado-6-circulo",
+            "cajado-encantado-7-circulo",
+            "cajado-encantado-8-circulo"
+          ],
+          "texto": "Cajado Encantado (magia de 6º, 7º ou 8º Círculo)"
+        },
+        {
+          "min": 28,
+          "max": 36,
+          "item_id": "vingador-sagrado",
+          "variantes": [],
+          "texto": "Vingador Sagrado"
+        },
+        {
+          "min": 37,
+          "max": 45,
+          "item_id": "trompa-de-valhalla",
+          "variantes": [
+            "trompa-de-valhalla-ferro"
+          ],
+          "texto": "Trompa de Valhalla (ferro)"
+        },
+        {
+          "min": 46,
+          "max": 54,
+          "item_id": "bastao-da-ressurreicao",
+          "variantes": [],
+          "texto": "Bastão da Ressurreição"
+        },
+        {
+          "min": 55,
+          "max": 63,
+          "item_id": "escaravelho-de-protecao",
+          "variantes": [],
+          "texto": "Escaravelho de Proteção"
+        },
+        {
+          "min": 64,
+          "max": 72,
+          "item_id": "pergaminho-de-invocacao-de-tita",
+          "variantes": [],
+          "texto": "Pergaminho de Invocação de Titã"
+        },
+        {
+          "min": 73,
+          "max": 80,
+          "item_id": "pergaminho-magico",
+          "variantes": [
+            "pergaminho-magico-9-circulo"
+          ],
+          "texto": "Pergaminho Mágico (magia de 9º Círculo)"
+        },
+        {
+          "min": 81,
+          "max": 90,
+          "item_id": "talisma-do-bem-puro",
+          "variantes": [],
+          "texto": "Talismã do Bem Puro"
+        },
+        {
+          "min": 91,
+          "max": 100,
+          "item_id": "talisma-do-mal-supremo",
+          "variantes": [],
+          "texto": "Talismã do Mal Supremo"
+        }
+      ]
+    }
+  ],
+  "itens_fora_das_tabelas": [
+    {
+      "item_id": "machado-dos-senhores-anoes",
+      "motivo": "Artefato: as tabelas aleatórias não sorteiam Artefatos."
+    },
+    {
+      "item_id": "navalha-negra",
+      "motivo": "Artefato: as tabelas aleatórias não sorteiam Artefatos."
+    },
+    {
+      "item_id": "livro-dos-feitos-exaltados",
+      "motivo": "Artefato: as tabelas aleatórias não sorteiam Artefatos."
+    },
+    {
+      "item_id": "livro-da-escuridao-vil",
+      "motivo": "Artefato: as tabelas aleatórias não sorteiam Artefatos."
+    },
+    {
+      "item_id": "demonomicon-de-iggwilv",
+      "motivo": "Artefato: as tabelas aleatórias não sorteiam Artefatos."
+    },
+    {
+      "item_id": "olho-e-mao-de-vecna",
+      "motivo": "Artefato: as tabelas aleatórias não sorteiam Artefatos."
+    },
+    {
+      "item_id": "orbe-dos-dragoes",
+      "motivo": "Artefato: as tabelas aleatórias não sorteiam Artefatos."
+    },
+    {
+      "item_id": "espada-de-kas",
+      "motivo": "Artefato: as tabelas aleatórias não sorteiam Artefatos."
+    },
+    {
+      "item_id": "varinha-de-orcus",
+      "motivo": "Artefato: as tabelas aleatórias não sorteiam Artefatos."
+    },
+    {
+      "item_id": "onda",
+      "motivo": "Artefato: as tabelas aleatórias não sorteiam Artefatos."
+    },
+    {
+      "item_id": "esmagador",
+      "motivo": "Artefato: as tabelas aleatórias não sorteiam Artefatos."
+    }
+  ]
+}

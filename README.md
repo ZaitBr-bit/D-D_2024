@@ -214,12 +214,13 @@ D-D_2024/
 │   ├── classes/             # <classe>.json, magias_<classe>.json
 │   ├── origens/             # especies.json, antecedentes.json
 │   ├── talentos/  equipamento/  magias/  apendices/
-│   └── capitulo*.json, _metadados.json, controle/
+│   ├── capitulo*.json, _metadados.json, controle/
+│   └── livro-do-mestre/     # Livro do Mestre (2024), traduzido; hoje só o cap. 7 (Tesouros). Separado do Livro do Jogador; o site lê o acervo de itens mágicos (capitulo7/itens_magicos.json)
 ├── Informacoes Separadas/   # regras em Markdown, referência humana — LOCAL, não versionada
 ├── testes/
 │   ├── e2e/                 # Playwright: paridade + specs de regra em regras/
 │   └── regras/              # regras de negócio confrontadas com o livro
-├── scripts/                 # verificar_extracao.py, excecoes/
+├── scripts/                 # verificar_extracao.py, excecoes/, livro-do-mestre/ (capitulo7.mjs: verificar/montar)
 └── docs/
     ├── ARQUITETURA.md       # aprofundamento técnico
     └── DEPLOY.md            # pipeline de publicação e diagnóstico

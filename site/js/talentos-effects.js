@@ -2,6 +2,7 @@
 // Motor de efeitos passivos de talentos
 // Centraliza resolução de bônus e flags derivados de talentos
 // ============================================================
+import { atributoEfetivo } from './regras-atributos.js';
 import { bonusProficiencia } from './utils.js';
 
 /**
@@ -197,7 +198,7 @@ export function resolverPassivosTalentos(char) {
     passivos.flags.envenenador_potente = true;
     passivos.flags.envenenador_preparar = true;
     const atributo = char?.talentos_parametros?.envenenador?.atributo;
-    const valor = Number(char?.atributos?.[atributo]);
+    const valor = Number(atributoEfetivo(char, atributo));
     if (Number.isFinite(valor)) {
       passivos.cdTalentos.envenenador = 8 + Math.floor((valor - 10) / 2) + bonusProficiencia(char.nivel || 1);
     }
@@ -341,7 +342,7 @@ export function resolverPassivosTalentos(char) {
     passivos.flags.telecinetico_menor = true;
     passivos.flags.telecinetico_empurrao = true;
     const atributo = char?.talentos_parametros?.telecinetico?.atributo;
-    const valor = Number(char?.atributos?.[atributo]);
+    const valor = Number(atributoEfetivo(char, atributo));
     if (Number.isFinite(valor)) {
       passivos.cdTalentos.telecinetico = 8 + Math.floor((valor - 10) / 2) + bonusProficiencia(char.nivel || 1);
     }

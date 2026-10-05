@@ -4,6 +4,7 @@
 // Consultado pela ficha, pelos descansos e pelas habilidades ativas.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
+import { atributoEfetivo } from '../../regras-atributos.js';
 import { abrirModal, bonusProficiencia, calcMod, toast } from '../../utils.js';
 import { char, salvar } from '../estado.js';
 import { renderFichaCompleta } from '../ficha.js';
@@ -275,7 +276,7 @@ export function setupEventosSubclasseBarbaro() {
           return;
         }
         char.recursos.presenca_intimidante_usada = true;
-        const modFor = calcMod(char.atributos.forca);
+        const modFor = calcMod(atributoEfetivo(char, 'forca'));
         // bonusProficiencia usa o nivel TOTAL do personagem (livro:2047),
         // nao o nivel na classe Bárbaro -- fica como char.nivel de proposito.
         const cd = 8 + bonusProficiencia(char.nivel || 1) + modFor;

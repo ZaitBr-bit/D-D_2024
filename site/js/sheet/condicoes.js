@@ -2,7 +2,8 @@
 // Condicoes, defesas, sentidos e proficiencias
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
-import { abrirModal, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcPercepcaoPassiva, toast } from '../utils.js';
+import { defesasDeItens, ROTULO_SENTIDO, sentidosDeItens, TIPOS_DANO } from '../regras-passivos-itens.js';
+import { abrirModal, calcIntuicaoPassiva, escHtml, calcInvestigacaoPassiva, calcPercepcaoPassiva, toast } from '../utils.js';
 import { getEstadoFuria } from './classes/barbaro.js';
 import { getEstadoRecursosGuardiao } from './classes/guardiao.js';
 import { getEstadoRecursosPaladino } from './classes/paladino.js';
@@ -73,13 +74,6 @@ const CONDICOES_DESCRICAO = {
   'Surdo': 'Nao pode ouvir. Falha automatica em testes que dependam de audicao.'
 };
 
-// --- Tipos de dano do D&D ---
-const TIPOS_DANO = [
-  'Ácido', 'Contundente', 'Cortante', 'Elétrico', 'Energético',
-  'Gélido', 'Ígneo', 'Necrótico', 'Perfurante', 'Psíquico',
-  'Radiante', 'Trovejante', 'Venenoso'
-];
-
 /** Renderiza secao de condicoes ativas */
 export function renderSecaoCondicoes() {
   const condicoes = char.condicoes || [];
@@ -94,9 +88,19 @@ export function renderSecaoCondicoes() {
   const auraCoragemImune = _epCondicoes?.auraCoragemAtiva && !furiaIrracionalAtiva;
   const auraDevocaoImune = _epCondicoes?.auraDevocaoAtiva && !furiaIrracionalAtiva;
 
+  // Condições já cobertas pelos selos de Fúria Irracional e Auras: magia e item não repetem.
+  const condicoesDeFuriaEAuras = new Set();
+  if (furiaIrracionalAtiva) { condicoesDeFuriaEAuras.add('Amedrontado'); condicoesDeFuriaEAuras.add('Enfeitiçado'); }
+  if (_epCondicoes?.auraCoragemAtiva) condicoesDeFuriaEAuras.add('Amedrontado');
+  if (_epCondicoes?.auraDevocaoAtiva) condicoesDeFuriaEAuras.add('Enfeitiçado');
+
   // Imunidades e efeitos de magias ativas
   const efMag = char.efeitos_magicos || [];
-  const imunidadesMagia = efMag.filter(e => e.tipo === 'imunidade_condicao').map(e => ({ condicao: e.condicao, fonte: e.nome.replace(/ \(.*\)$/, '') }));
+  // Uma por condição; ordem de precedência: Fúria/Auras, magia, item (a primeira fonte vale).
+  const imunidadesMagia = efMag.filter(e => e.tipo === 'imunidade_condicao').map(e => ({ condicao: e.condicao, fonte: e.nome.replace(/ \(.*\)$/, '') }))
+    .concat(defesasDeItens(char).imunidadesCondicao.map(i => ({ condicao: i.condicao, fonte: i.origem })))
+    .filter(im => !condicoesDeFuriaEAuras.has(im.condicao))
+    .filter((im, idx, lista) => lista.findIndex(x => x.condicao === im.condicao) === idx);
   const condicoesMagia = efMag.filter(e => e.tipo === 'condicao').map(e => ({ condicao: e.condicao, fonte: e.nome, rotulo: e.rotulo }));
   const efeitosAtivos = efMag.filter(e => ['penalidade_ataque_contra_mim', 'protecao_bem_e_mal', 'buff_d20', 'buff_arma', 'deslocamento', 'bonus_pericia', 'reflexos', 'dano_reativo', 'pv_temp_por_turno', 'buff_save_condicao', 'vantagem_sg_condicoes', 'desv_ataques_contra_mim', 'protecao_pv_max', 'penalidade_d20', 'modificador_manual'].includes(e.tipo));
   // Deduplicar por nome base
@@ -141,7 +145,7 @@ export function renderSecaoCondicoes() {
       ` : ''}
       ${imunidadesMagia.length > 0 ? `
         <div style="display:flex;flex-wrap:wrap;gap:6px;padding:4px 0;margin-bottom:4px">
-          ${imunidadesMagia.map(im => `<span class="badge" style="font-size:0.7rem;padding:3px 7px;background:var(--success);color:#fff">Imune: ${im.condicao} (${im.fonte})</span>`).join('')}
+          ${imunidadesMagia.map(im => `<span class="badge" style="font-size:0.7rem;padding:3px 7px;background:var(--success);color:#fff">Imune: ${escHtml(im.condicao)} (${escHtml(im.fonte)})</span>`).join('')}
         </div>
       ` : ''}
       ${condicoesMagia.length > 0 ? `
@@ -222,7 +226,14 @@ export function renderSecaoDefesas() {
     imunidadesMagicas.push('Envenenado (Petrificado)');
   }
 
-  const temDefesa = resistenciasTotais.length > 0 || vulnerabilidades.length > 0 || imunidades.length > 0 || imunidadesMagicas.length > 0;
+  // Defesas de itens mágicos ativos (4C): tipos já listados por outra fonte não se repetem.
+  const dItens = defesasDeItens(char);
+  const resistenciasItem = dItens.resistencias.filter(r => !resistenciasTotais.includes(r.tipo));
+  resistenciasItem.forEach(r => resistenciasTotais.push(r.tipo));
+  const imunidadesItem = dItens.imunidades.filter(i => !imunidades.includes(i.tipo));
+
+  const temDefesa = resistenciasTotais.length > 0 || vulnerabilidades.length > 0 || imunidades.length > 0 || imunidadesMagicas.length > 0
+    || dItens.imunidades.length > 0 || dItens.escolhasPendentes.length > 0;
 
   if (!temDefesa) {
     return `
@@ -258,7 +269,11 @@ export function renderSecaoDefesas() {
       partes.push(temporariasPetrificado.map(r => `<span style="color:var(--text-muted);font-weight:600" title="Petrificado">${r} (Petrificado)</span>`).join(', '));
     }
     if (temporariasMagia.length > 0) {
-      partes.push(temporariasMagia.map(r => `<span style="color:var(--accent);font-weight:600" title="Efeito mágico">${r} (Magia)</span>`).join(', '));
+      partes.push(temporariasMagia.map(r => `<span style="color:var(--accent);font-weight:600" title="Efeito mágico">${escHtml(r)} (Magia)</span>`).join(', '));
+    }
+    const itensSemRepetir = resistenciasItem.filter(r => !fixas.includes(r.tipo) && !temporariasFuria.includes(r.tipo) && !temporariasPetrificado.includes(r.tipo) && !temporariasMagia.includes(r.tipo));
+    if (itensSemRepetir.length > 0) {
+      partes.push(itensSemRepetir.map(r => `<span style="color:var(--accent);font-weight:600" title="${escHtml(r.origem)}">${escHtml(r.tipo)} (Item)</span>`).join(', '));
     }
     const textoRes = partes.join(', ');
     html += `<div style="margin-bottom:4px"><span style="font-size:0.75rem;font-weight:700;color:var(--info)">Resistencias:</span> <span style="font-size:0.8rem">${textoRes}</span></div>`;
@@ -266,13 +281,38 @@ export function renderSecaoDefesas() {
   if (vulnerabilidades.length > 0) {
     html += `<div style="margin-bottom:4px"><span style="font-size:0.75rem;font-weight:700;color:var(--danger)">Vulnerabilidades:</span> <span style="font-size:0.8rem">${vulnerabilidades.join(', ')}</span></div>`;
   }
-  if (imunidades.length > 0 || imunidadesMagicas.length > 0) {
-    const todasImunidades = [...imunidades.map(i => i), ...imunidadesMagicas.map(i => `<span style="color:var(--accent);font-weight:600">${i}</span>`)];
+  if (imunidades.length > 0 || imunidadesMagicas.length > 0 || imunidadesItem.length > 0) {
+    const todasImunidades = [
+      ...imunidades.map(i => i),
+      ...imunidadesMagicas.map(i => `<span style="color:var(--accent);font-weight:600">${escHtml(i)}</span>`),
+      ...imunidadesItem.map(i => `<span style="color:var(--accent);font-weight:600" title="${escHtml(i.origem)}">${escHtml(i.tipo)} (Item)</span>`),
+    ];
     html += `<div style="margin-bottom:4px"><span style="font-size:0.75rem;font-weight:700;color:var(--success)">Imunidades:</span> <span style="font-size:0.8rem">${todasImunidades.join(', ')}</span></div>`;
+  }
+  for (const p of dItens.escolhasPendentes) {
+    html += `<div class="info-box warning" style="font-size:0.8rem">Escolha o tipo de resistência em <strong>${escHtml(p.origem)}</strong> (no detalhe do item).</div>`;
   }
 
   html += '</div>';
   return html;
+}
+
+/**
+ * Alcance da Visão no Escuro da espécie, em metros (0 sem a característica).
+ * Lê o traço "Visão no Escuro" ("alcance de N"; sem número, 18); Drow vale 36.
+ */
+export function visaoNoEscuroDaEspecie(personagem, cacheEspecies) {
+  let metros = 0;
+  const esp = cacheEspecies?.especies?.find(e => e.nome === personagem?.especie);
+  if (esp?.tracos) {
+    const tracoVE = esp.tracos.find(t => t.nome === 'Visão no Escuro' || t.nome === 'Visao no Escuro');
+    if (tracoVE) {
+      const m = tracoVE.descricao?.match(/alcance de (\d+)/i);
+      metros = m ? Number(m[1]) : 18;
+    }
+    if ((personagem.tracos_escolhidos || []).includes('Drow')) metros = 36;
+  }
+  return metros;
 }
 
 /** Renderiza secao de sentidos passivos */
@@ -281,30 +321,25 @@ export function renderSecaoSentidos() {
   const intuicao = calcIntuicaoPassiva(char);
   const investigacao = calcInvestigacaoPassiva(char);
 
-  // Verificar visao no escuro pela especie
-  let visaoEscuro = '';
-  if (especiesCache?.especies) {
-    const esp = especiesCache.especies.find(e => e.nome === char.especie);
-    if (esp?.tracos) {
-      const tracoVE = esp.tracos.find(t => t.nome === 'Visão no Escuro');
-      if (tracoVE) {
-        const matchAlcance = tracoVE.descricao?.match(/alcance de (\d+)/i);
-        visaoEscuro = matchAlcance ? `${matchAlcance[1]} m` : '18 m';
-      }
-      // Drow tem visao no escuro superior (36m) via linhagem
-      const tracosEscolhidos = char.tracos_escolhidos || [];
-      if (tracosEscolhidos.includes('Drow')) {
-        visaoEscuro = '36 m';
-      }
-    }
-  }
+  // Visão no Escuro: a de item (4C) quando supera a da espécie.
+  const base = visaoNoEscuroDaEspecie(char, especiesCache);
+  const sentidosItem = sentidosDeItens(char, base);
+  const veItem = sentidosItem.find(s => s.sentido === 'visao_no_escuro');
+  const visaoEscuro = veItem ? `${veItem.metros} m` : (base > 0 ? `${base} m` : '');
+  const origemVE = veItem ? veItem.origem : '';
 
   // Guardiao nivel 18+: Sentidos Selvagens (Visao as Cegas 9m)
   let sentidoExtra = '';
-  const estadoG = char.classe === 'Guardião' ? getEstadoRecursosGuardiao() : null;
+  // getEstadoRecursosGuardiao devolve null sem nível de Guardião (qualquer classe, não só a inicial).
+  const estadoG = getEstadoRecursosGuardiao();
   if (estadoG?.sentidosSelvagensAtivo) {
-    sentidoExtra = 'Visao as Cegas 9 m';
+    sentidoExtra = '9 m';
   }
+  // Visão às Cegas do Guardião e de item: exibe só a maior (empate fica com o Guardião).
+  const cegasItem = sentidosItem.find(s => s.sentido === 'visao_as_cegas');
+  if (cegasItem && sentidoExtra && cegasItem.metros > 9) sentidoExtra = '';
+  const sentidosItemExtras = sentidosItem.filter(s => s.sentido !== 'visao_no_escuro'
+    && !(s.sentido === 'visao_as_cegas' && sentidoExtra && s.metros <= 9));
 
   return `
     <div class="card">
@@ -323,17 +358,23 @@ export function renderSecaoSentidos() {
           <span class="pericia-nome">Investigação</span>
         </div>
         ${visaoEscuro ? `
-        <div class="salva-item" style="justify-content:center;gap:8px">
+        <div class="salva-item" style="justify-content:center;gap:8px"${origemVE ? ` title="${escHtml(origemVE)}"` : ''}>
           <span class="pericia-bonus">${visaoEscuro}</span>
           <span class="pericia-nome">Visão no Escuro</span>
         </div>
         ` : ''}
         ${sentidoExtra ? `
         <div class="salva-item" style="justify-content:center;gap:8px">
-          <span class="pericia-bonus">${sentidoExtra.replace(/\D+$/, '').trim()}</span>
-          <span class="pericia-nome">${sentidoExtra.includes('Cegas') ? 'Visao as Cegas' : sentidoExtra}</span>
+          <span class="pericia-bonus">${sentidoExtra}</span>
+          <span class="pericia-nome">Visão às Cegas</span>
         </div>
         ` : ''}
+        ${sentidosItemExtras.map(s => `
+        <div class="salva-item" style="justify-content:center;gap:8px" title="${escHtml(s.origem)}">
+          <span class="pericia-bonus">${escHtml(String(s.metros))} m</span>
+          <span class="pericia-nome">${ROTULO_SENTIDO[s.sentido]}</span>
+        </div>
+        `).join('')}
       </div>
     </div>
   `;
@@ -547,4 +588,4 @@ export function setupEventosDefesas() {
       renderFichaCompleta();
     });
   });
-}
+}

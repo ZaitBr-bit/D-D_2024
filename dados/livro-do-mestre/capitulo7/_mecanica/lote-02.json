@@ -1,0 +1,70 @@
+{
+  "lote": "02",
+  "itens": {
+    "cinturao-de-forca-do-gigante-das-colinas": { "efeitos": [ { "alvo": "atributo", "atributo": "forca", "minimo": 21 } ] },
+    "cinturao-de-forca-do-gigante-do-gelo-ou-das-pedras": { "efeitos": [ { "alvo": "atributo", "atributo": "forca", "minimo": 23 } ] },
+    "cinturao-de-forca-do-gigante-do-fogo": { "efeitos": [ { "alvo": "atributo", "atributo": "forca", "minimo": 25 } ] },
+    "cinturao-de-forca-do-gigante-das-nuvens": { "efeitos": [ { "alvo": "atributo", "atributo": "forca", "minimo": 27 } ] },
+    "cinturao-de-forca-do-gigante-das-tempestades": { "efeitos": [ { "alvo": "atributo", "atributo": "forca", "minimo": 29 } ] },
+    "machado-do-berserker": {
+      "base": { "tipo": "arma", "opcoes": ["Machado de Batalha", "Machado Grande", "Alabarda"] },
+      "efeitos": [ { "alvo": "ataque_arma", "valor": 1 }, { "alvo": "dano_arma", "valor": 1 } ]
+    },
+    "navalha-negra": { "base": { "tipo": "arma", "opcoes": ["Espada Grande"] }, "efeitos": [ { "alvo": "ataque_arma", "valor": 3 }, { "alvo": "dano_arma", "valor": 3 }, { "alvo": "imunidade_condicao", "condicao": "Enfeitiçado" }, { "alvo": "imunidade_condicao", "condicao": "Amedrontado" }, { "alvo": "sentido", "sentido": "visao_as_cegas", "metros": 9 } ], "recursos": { "usos": [ { "nome": "Celeridade", "max": 1, "recupera": "amanhecer" } ] }, "magias": [ { "nome": "Celeridade", "custo": { "uso": "Celeridade" }, "conjuracao": null } ] },
+    "bracadeiras-de-defesa": { "efeitos": [ { "alvo": "ca", "valor": 2, "condicao": "sem_armadura_nem_escudo" } ] },
+    "livro-da-escuridao-vil": { "efeitos": [ { "alvo": "imunidade_condicao", "condicao": "Exaustão" } ], "aumento_permanente": { "atributo": "escolha", "valor": 2, "maximo": 24, "reducao": { "valor": 2, "minimo": 3 } }, "recursos": { "usos": [ { "nome": "Animar Mortos", "max": 1, "recupera": "amanhecer" }, { "nome": "Círculo da Morte", "max": 1, "recupera": "amanhecer" }, { "nome": "Dominar Monstro", "max": 1, "recupera": "amanhecer" }, { "nome": "Dedo da Morte", "max": 1, "recupera": "amanhecer" } ] }, "magias": [ { "nome": "Animar Mortos", "custo": { "uso": "Animar Mortos" }, "conjuracao": { "cd": 18 } }, { "nome": "Círculo da Morte", "custo": { "uso": "Círculo da Morte" }, "conjuracao": { "cd": 18 } }, { "nome": "Dominar Monstro", "custo": { "uso": "Dominar Monstro" }, "conjuracao": { "cd": 18 } }, { "nome": "Dedo da Morte", "custo": { "uso": "Dedo da Morte" }, "conjuracao": { "cd": 18 } } ] },
+    "botas-de-velocidade": { "efeitos": [], "recursos": { "cargas": { "max": 10, "recupera": "todas", "ultima_carga": null } } },
+    "tigela-de-comando-de-elementais-da-agua": { "efeitos": [], "recursos": { "usos": [ { "nome": "Invocar Elemental da Água", "max": 1, "recupera": "amanhecer" } ] } },
+    "braseiro-de-comando-de-elementais-do-fogo": { "efeitos": [], "recursos": { "usos": [ { "nome": "Invocar Elemental do Fogo", "max": 1, "recupera": "amanhecer" } ] } },
+    "capa-do-saltimbanco": { "efeitos": [], "recursos": { "usos": [ { "nome": "Porta Dimensional", "max": 1, "recupera": "amanhecer" } ] }, "magias": [ { "nome": "Porta Dimensional", "custo": { "uso": "Porta Dimensional" }, "conjuracao": null } ] },
+    "cinturao-dos-anoes": { "efeitos": [
+      { "alvo": "vantagem", "em": "pericia", "pericia": "Persuasão", "contexto": "feitos para interagir com anões e duergar" },
+      { "alvo": "sentido", "sentido": "visao_no_escuro", "metros": 18 },
+      { "alvo": "resistencia", "tipo_dano": "Venenoso" },
+      { "alvo": "vantagem", "em": "salvaguarda", "contexto": "para evitar ou encerrar a condição Envenenado" },
+      { "alvo": "atributo_bonus", "atributo": "constituicao", "valor": 2, "maximo": 20 }
+    ] },
+    "livro-dos-feitos-exaltados": { "efeitos": [
+      { "alvo": "imunidade_condicao", "condicao": "Enfeitiçado" },
+      { "alvo": "imunidade_condicao", "condicao": "Amedrontado" },
+      { "alvo": "resistencia", "tipo_dano": "Psíquico" },
+      { "alvo": "vantagem", "em": "pericia", "pericia": "Persuasão", "contexto": "Enquanto presente, a auréola" }
+    ], "aumento_permanente": { "atributo": "sabedoria", "valor": 2, "maximo": 24 } },
+    "botas-elficas": { "efeitos": [ { "alvo": "vantagem", "em": "pericia", "pericia": "Furtividade" } ] },
+    "botas-de-caminhar-e-saltar": { "efeitos": [ { "alvo": "deslocamento_minimo", "metros": 9 } ] },
+    "botas-das-terras-invernais": { "efeitos": [ { "alvo": "resistencia", "tipo_dano": "Gélido" } ] },
+    "broche-protetor": { "efeitos": [ { "alvo": "resistencia", "tipo_dano": "Energético" } ] },
+    "botas-de-levitacao": { "efeitos": [], "magias": [ { "nome": "Levitação", "custo": "livre", "conjuracao": null } ] }
+  },
+  "sem_cargas": {
+    "botas-de-caminhar-e-saltar": "carga = capacidade de carga, não é contador"
+  },
+  "sem_efeito_automatico": [
+    "conta-de-nutricao",
+    "conta-refrescante",
+    "cinturao-de-forca-do-gigante",
+    "botas-de-rastros-falsos",
+    "bracadeiras-de-arquearia",
+    "vassoura-voadora",
+    "vela-das-profundezas",
+    "gorro-de-respiracao-aquatica",
+    "tapete-voador",
+    "vela-da-invocacao"
+  ],
+  "sem_passivos": {
+    "vassoura-voadora": "atributo do objeto: Deslocamento de Voo da vassoura, ativada por ação Usar Magia",
+    "vela-da-invocacao": "temporária: Vantagem em Testes de D20 só enquanto a vela está acesa e dentro da Meia-luz"
+  },
+  "sem_magias": {
+    "vela-da-invocacao": "Portal só ao acender a vela pela primeira vez e destrói a vela; destruição não representada"
+  },
+  "pendencias": [
+    "botas-de-velocidade: o limite é 10 minutos de uso no total, recuperado no Descanso Longo; a unidade do contador é minutos.",
+    "bracadeiras-de-arquearia: '+2 de bônus nas jogadas de dano feitas com essas armas' (Arco Longo e Arco Curto) vale para outra arma, não para o próprio item (sem base); dano_arma exige base arma no item. Ficou sem efeito automático.",
+    "machado-do-berserker: o aumento de Pontos de Vida máximos (1 por nível) não tem alvo no vocabulário; só ataque/dano +1 foram automatizados.",
+    "cinturao-dos-anoes: Visão no Escuro, Resistência a Venenoso e Vantagem contra Envenenado valem só se o portador não for anão nem duergar; curados sem a condição de espécie (para anão/duergar o efeito é redundante). O aumento de Constituição vale para qualquer portador.",
+    "livro-dos-feitos-exaltados: a Vantagem em Persuasão da Auréola vale só enquanto a auréola está manifestada (Ação Bônus); curada com o contexto \"Enquanto presente, a auréola\" e não é condicionada ao tempo de estudo (a ficha não modela o estudo). A Luz Plena e a Desvantagem de ataque contra Ínferos e Mortos-Vivos não têm alvo no vocabulário.",
+    "broche-protetor: a Imunidade ao dano da magia Mísseis Mágicos não é tipo de dano; só a Resistência a Energético foi curada.",
+    "vela-da-invocacao: Portal só pode ser conjurada ao acender a vela pela primeira vez e destrói a vela; custo \"livre\" e a restrição fica na descrição."
+  ]
+}

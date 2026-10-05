@@ -185,3 +185,14 @@ test('PV atual maior que 0 nunca é empurrado abaixo de 0 (só personagens JÁ a
   assert.equal(p.pv_max, 1, 'o piso de 1 PV máximo segura');
   assert.equal(p.pv_atual, 0, 'pv_atual não pode ficar negativo, mesmo partindo de um valor positivo');
 });
+
+// Edição por regras: atributo que já passa de 20 (Manual, capstone) pode ser mantido.
+test('atributosAcimaDoTeto: só recusa o atributo que passa de 20 por causa da edição', () => {
+  const { atributosAcimaDoTeto } = fichaEdicaoValidacoes;
+  const atuais = { forca: 22, destreza: 14, constituicao: 14, inteligencia: 10, sabedoria: 10, carisma: 10 };
+  assert.deepEqual(atributosAcimaDoTeto(atuais, { ...atuais }), [], 'manter Força 22 não é recusado');
+  assert.deepEqual(atributosAcimaDoTeto(atuais, { ...atuais, forca: 21, destreza: 16 }), [], 'baixar o que está acima do teto é permitido');
+  assert.deepEqual(atributosAcimaDoTeto(atuais, { ...atuais, forca: 23 }), ['forca'], 'subir acima do valor atual é recusado');
+  assert.deepEqual(atributosAcimaDoTeto(atuais, { ...atuais, destreza: 21 }), ['destreza'], 'outro atributo passando de 20 é recusado');
+  assert.deepEqual(atributosAcimaDoTeto(atuais, { ...atuais, destreza: 20 }), [], '20 exato é permitido');
+});

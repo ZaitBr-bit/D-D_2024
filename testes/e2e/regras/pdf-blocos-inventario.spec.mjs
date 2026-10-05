@@ -123,3 +123,28 @@ test('a secao Equipamento continua abrindo com o titulo', async ({ context }) =>
   expect(blocos[0].t).toBe('h2');
   expect(blocos[0].text).toBe('Equipamento');
 });
+
+// Magias de Itens: uma linha compacta por magia ("Magia: item | custo | CD"),
+// sem o par nome/efeito em blocos separados da Mochila.
+const HTML_MAGIAS_ITENS = `
+  <div class="print-section">
+    <div class="print-section-title">Magias de Itens</div>
+    <div class="print-inv-item print-item-magia">
+      <span class="print-inv-name">Teia</span>
+      <span class="print-inv-effect">Manto Aracnídeo | uso: Teia (1/amanhecer) | CD 13</span>
+    </div>
+    <div class="print-inv-item print-item-magia">
+      <span class="print-inv-name">Raio Ardente</span>
+      <span class="print-inv-effect">Diadema da Explosão | uso: Raio Ardente (1/amanhecer) | +5</span>
+    </div>
+  </div>`;
+
+test('Magias de Itens vira uma linha compacta por magia, com o titulo', async ({ context }) => {
+  const { page } = await abrirSite(context);
+  const blocos = await extrairBlocos(page, HTML_MAGIAS_ITENS);
+  expect(blocos.map(b => [b.t, b.text])).toEqual([
+    ['h2', 'Magias de Itens'],
+    ['p', 'Teia: Manto Aracnídeo | uso: Teia (1/amanhecer) | CD 13'],
+    ['p', 'Raio Ardente: Diadema da Explosão | uso: Raio Ardente (1/amanhecer) | +5'],
+  ]);
+});

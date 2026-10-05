@@ -1,0 +1,1425 @@
+{
+  "fonte": "camada OCR do PDF, gerada por pdf_capitulo7.py oraculo",
+  "faixa_pdf": [
+    217,
+    335
+  ],
+  "paginas": {
+    "217": {
+      "linhas_tipo": [],
+      "dados": [],
+      "cds": []
+    },
+    "218": {
+      "linhas_tipo": [],
+      "dados": [],
+      "cds": []
+    },
+    "219": {
+      "linhas_tipo": [],
+      "dados": [],
+      "cds": []
+    },
+    "220": {
+      "linhas_tipo": [],
+      "dados": [],
+      "cds": []
+    },
+    "221": {
+      "linhas_tipo": [],
+      "dados": [],
+      "cds": []
+    },
+    "222": {
+      "linhas_tipo": [],
+      "dados": [],
+      "cds": []
+    },
+    "223": {
+      "linhas_tipo": [],
+      "dados": [],
+      "cds": []
+    },
+    "224": {
+      "linhas_tipo": [],
+      "dados": [],
+      "cds": []
+    },
+    "225": {
+      "linhas_tipo": [],
+      "dados": [],
+      "cds": []
+    },
+    "226": {
+      "linhas_tipo": [],
+      "dados": [],
+      "cds": []
+    },
+    "227": {
+      "linhas_tipo": [],
+      "dados": [],
+      "cds": []
+    },
+    "228": {
+      "linhas_tipo": [],
+      "dados": [
+        "1d100",
+        "1d6"
+      ],
+      "cds": []
+    },
+    "229": {
+      "linhas_tipo": [],
+      "dados": [
+        "1d100"
+      ],
+      "cds": [
+        10
+      ]
+    },
+    "230": {
+      "linhas_tipo": [],
+      "dados": [
+        "1d4",
+        "4d6"
+      ],
+      "cds": []
+    },
+    "231": {
+      "linhas_tipo": [
+        "Wondrous Item, Uncommon"
+      ],
+      "dados": [],
+      "cds": [
+        12
+      ]
+    },
+    "232": {
+      "linhas_tipo": [
+        "Weapon (Any Ammunition), Uncommon (1), Rare (+2),",
+        "Weapon (Any Ammunition), Very Rare",
+        "Wondrous Item, Rare (Requires Attunement)",
+        "Wondrous Item, Uncommon (Requires Attunement)"
+      ],
+      "dados": [
+        "1d100",
+        "6d10"
+      ],
+      "cds": [
+        17
+      ]
+    },
+    "233": {
+      "linhas_tipo": [
+        "Wondrous Item, Very Rare (Requires Attunement)",
+        "Armor (Shield), Very Rare (Requires Attunement)",
+        "Wondrous Item, Legendary"
+      ],
+      "dados": [
+        "1d100"
+      ],
+      "cds": [
+        15,
+        20
+      ]
+    },
+    "234": {
+      "linhas_tipo": [
+        "Armor (Any Light, Medium, or Heavy), Rare (+), Very",
+        "Armor (Any Light, Medium, or Heavy), Common",
+        "Armor (Plate Armor), Legendary (Requires Attunement)"
+      ],
+      "dados": [
+        "2d6"
+      ],
+      "cds": [
+        15
+      ]
+    },
+    "235": {
+      "linhas_tipo": [
+        "Armor (Any Light, Medium, or Heavy), Rare (Requires",
+        "Armor (Any Light, Medium, or Heavy), Rare (Requires",
+        "Armor (Shield), Rare (Requires Attunement)",
+        "Weapon (Battleaxe), Artifact (Requires Attunement)"
+      ],
+      "dados": [
+        "1d10"
+      ],
+      "cds": []
+    },
+    "236": {
+      "linhas_tipo": [
+        "Wondrous Item, Uncommon (Requires Attunement)"
+      ],
+      "dados": [
+        "1d8"
+      ],
+      "cds": []
+    },
+    "237": {
+      "linhas_tipo": [
+        "Wondrous Item, Rare"
+      ],
+      "dados": [
+        "10d6",
+        "1d10",
+        "1d100",
+        "1d4",
+        "3d4"
+      ],
+      "cds": [
+        15,
+        20
+      ]
+    },
+    "238": {
+      "linhas_tipo": [
+        "Wondrous Item, Very Rare",
+        "Wondrous Item, Uncommon",
+        "Wondrous Item, Uncommon",
+        "Wondrous Item, Rare"
+      ],
+      "dados": [
+        "1d4",
+        "1d8"
+      ],
+      "cds": [
+        15,
+        20
+      ]
+    },
+    "239": {
+      "linhas_tipo": [
+        "Wondrous Item, Common",
+        "Wondrous Item, Common",
+        "Wondrous Item, Rare (Requires Attunement)"
+      ],
+      "dados": [
+        "5d4"
+      ],
+      "cds": [
+        15
+      ]
+    },
+    "240": {
+      "linhas_tipo": [
+        "Wondrous Item, Rarity Varies (Requires Attunement)",
+        "Weapon (Battleaxe, Greataxe, or Halberd), Rare",
+        "Weapon (Greatsword), Artifact (Requires Attunement)"
+      ],
+      "dados": [],
+      "cds": [
+        15
+      ]
+    },
+    "241": {
+      "linhas_tipo": [
+        "Wondrous Item, Artifact (Requires Attunement)"
+      ],
+      "dados": [
+        "1d10",
+        "24d6"
+      ],
+      "cds": []
+    },
+    "242": {
+      "linhas_tipo": [
+        "Wondrous Item, Artifact (Requires Attunement)"
+      ],
+      "dados": [],
+      "cds": []
+    },
+    "243": {
+      "linhas_tipo": [
+        "Wondrous Item, Uncommon",
+        "Wondrous Item, Common (Requires Attunement)",
+        "Wondrous Item, Rare (Requires Attunement)"
+      ],
+      "dados": [
+        "1d10",
+        "1d100",
+        "1d12"
+      ],
+      "cds": [
+        17,
+        18
+      ]
+    },
+    "244": {
+      "linhas_tipo": [
+        "Wondrous Item, Rare (Requires Attunement)",
+        "Wondrous Item, Uncommon (Requires Attunement)",
+        "Wondrous Item, Uncommon (Requires Attunement)",
+        "Wondrous Item, Rare",
+        "Wondrous Item, Uncommon (Requires Attunement)"
+      ],
+      "dados": [],
+      "cds": []
+    },
+    "245": {
+      "linhas_tipo": [
+        "Wondrous Item, Rare (Requires Attunement)",
+        "Wondrous Item, Rare",
+        "Wondrous Item, Uncommon (Requires Attunement)",
+        "Wondrous Item, Uncommon (Requires Attunement)",
+        "Wondrous Item, Very Rare (Requires Attunement)"
+      ],
+      "dados": [],
+      "cds": []
+    },
+    "246": {
+      "linhas_tipo": [
+        "Wondrous Item, Common",
+        "Wondrous Item, Rare",
+        "Wondrous Item, Uncommon",
+        "Wondrous Item, Very Rare"
+      ],
+      "dados": [],
+      "cds": []
+    },
+    "247": {
+      "linhas_tipo": [
+        "Armor (Any Light, Medium, or Heavy), Common",
+        "Wondrous Item, Very Rare (Requires Attunement bya",
+        "Wondrous Item, Rare",
+        "Wondrous Item, Common (Requires Attunement)"
+      ],
+      "dados": [
+        "1d100"
+      ],
+      "cds": []
+    },
+    "248": {
+      "linhas_tipo": [
+        "Wondrous Item, Rare",
+        "Wondrous Item, Uncommon",
+        "Wondrous Item, Very Rare (Requires Attunement)",
+        "Wondrous Item, Common",
+        "Wondrous Item, Rare (Requires Attunement)",
+        "Wondrous Item, Uncommon (Requires Attunement)",
+        "Wondrous Item, Legendary (Requires Attunement)"
+      ],
+      "dados": [],
+      "cds": [
+        13
+      ]
+    },
+    "249": {
+      "linhas_tipo": [
+        "Wondrous Item, Common",
+        "Wondrous Item, Uncommon (Requires Attunement)",
+        "Wondrous Item, Rare (Requires Attunement)",
+        "Wondrous Item, Uncommon (Requires Attunement)",
+        "Wondrous Item, Common",
+        "Wondrous Item, Common",
+        "Wondrous Item, Very Rare (Requires Attunement)"
+      ],
+      "dados": [],
+      "cds": [
+        17
+      ]
+    },
+    "250": {
+      "linhas_tipo": [
+        "Wondrous Item, Legendary (Requires Attunement)",
+        "Wondrous Item, Legendary (Requires Attunement)",
+        "Wondrous Item, Legendary (Requires Attunement)",
+        "Wondrous Item, Rare (Requires Attunement)"
+      ],
+      "dados": [],
+      "cds": [
+        17
+      ]
+    },
+    "251": {
+      "linhas_tipo": [
+        "Wondrous Item, Rare",
+        "Wondrous Item, Legendary",
+        "Wondrous Item, Rare (Requires Attunement)"
+      ],
+      "dados": [
+        "1d6"
+      ],
+      "cds": [
+        17
+      ]
+    },
+    "252": {
+      "linhas_tipo": [
+        "Weapon (Dagger), Rare",
+        "Wondrous Item, Common (Requires Attunement bya"
+      ],
+      "dados": [
+        "2d10"
+      ],
+      "cds": [
+        10,
+        15
+      ]
+    },
+    "253": {
+      "linhas_tipo": [
+        "Wondrous Item, Uncommon",
+        "Wondrous Item, Uncommon"
+      ],
+      "dados": [
+        "1d100",
+        "1d4"
+      ],
+      "cds": [
+        13,
+        15
+      ]
+    },
+    "254": {
+      "linhas_tipo": [
+        "Wondrous Item, Legendary"
+      ],
+      "dados": [],
+      "cds": []
+    },
+    "255": {
+      "linhas_tipo": [],
+      "dados": [
+        "1d4"
+      ],
+      "cds": []
+    },
+    "256": {
+      "linhas_tipo": [
+        "Weapon (Any Melee Weapon), Legendary (Requires",
+        "Armor (Any Light, Medium, or Heavy), Very Rare",
+        "Wondrous Item, Artifact (Requires Attunement)"
+      ],
+      "dados": [
+        "1d10",
+        "1d8"
+      ],
+      "cds": []
+    },
+    "257": {
+      "linhas_tipo": [],
+      "dados": [
+        "1d4",
+        "1d8"
+      ],
+      "cds": [
+        20
+      ]
+    },
+    "258": {
+      "linhas_tipo": [
+        "Wondrous Item, Rare",
+        "Armor (Scale Mail), Very Rare (Requires Attunement)",
+        "Weapon (Any Simple or Martial), Rare",
+        "Wondrous Item, Common",
+        "Wondrous Item, Uncommon"
+      ],
+      "dados": [],
+      "cds": [
+        30
+      ]
+    },
+    "259": {
+      "linhas_tipo": [
+        "Wondrous Item, Uncommon",
+        "Wondrous Item, Uncommon",
+        "Wondrous Item, Uncommon",
+        "Armor (Half Plate or Plate Armor), Very Rare"
+      ],
+      "dados": [
+        "10d6",
+        "1d6",
+        "2d4"
+      ],
+      "cds": [
+        13,
+        15
+      ]
+    },
+    "260": {
+      "linhas_tipo": [
+        "Weapon (Warhammer), Very Rare (Requires",
+        "Wondrous Item, Common",
+        "Wondrous Item, Very Rare"
+      ],
+      "dados": [
+        "1d10",
+        "1d8"
+      ],
+      "cds": []
+    },
+    "261": {
+      "linhas_tipo": [
+        "Wondrous Item, Uncommon",
+        "Potion, Rare",
+        "Armor (Chain Mail or Chain Shirt), Rare",
+        "Wondrous Item, Common",
+        "Weapon (Longbow or Shorthow), Very Rare (Requires"
+      ],
+      "dados": [],
+      "cds": [
+        15
+      ]
+    },
+    "262": {
+      "linhas_tipo": [
+        "Armor (Any Light, Medium, or Heavy), Rarity Varies",
+        "Staff, Rarity Varies (Requires Attunement bya",
+        "Weapon (Any Simple or Martial), Rarity Varies"
+      ],
+      "dados": [
+        "1d6"
+      ],
+      "cds": []
+    },
+    "263": {
+      "linhas_tipo": [
+        "Wondrous Item, Common",
+        "Wondrous Item, Uncommon",
+        "Wondrous Item, Artifact (Requires Attunement)"
+      ],
+      "dados": [
+        "1d4",
+        "2d6"
+      ],
+      "cds": [
+        18
+      ]
+    },
+    "264": {
+      "linhas_tipo": [],
+      "dados": [
+        "1d10",
+        "1d4"
+      ],
+      "cds": [
+        18
+      ]
+    },
+    "265": {
+      "linhas_tipo": [
+        "Wondrous Item, Uncommon (Requires Attunement)",
+        "Wondrous Item, Uncommon",
+        "Wondrous Item, Uncommon",
+        "Wondrous Item, Rarity Varies"
+      ],
+      "dados": [
+        "3d10"
+      ],
+      "cds": [
+        13
+      ]
+    },
+    "266": {
+      "linhas_tipo": [],
+      "dados": [],
+      "cds": [
+        15
+      ]
+    },
+    "267": {
+      "linhas_tipo": [
+        "Weapon (Any Melee Weapon), Rare (Requires",
+        "Wondrous Item, Rare"
+      ],
+      "dados": [
+        "1d6",
+        "2d6"
+      ],
+      "cds": []
+    },
+    "268": {
+      "linhas_tipo": [
+        "Wondrous Item, Uncommon (Requires Attunement)",
+        "Wondrous Item, Uncommon",
+        "Wondrous Item, Rare (Requires Attunement)",
+        "Weapon (Any Simple or Martial), Rare",
+        "Armor (Studded Leather Armor), Rare"
+      ],
+      "dados": [
+        "1d3"
+      ],
+      "cds": [
+        15
+      ]
+    },
+    "269": {
+      "linhas_tipo": [
+        "Wondrous Item, Uncommon (Requires Attunement)",
+        "Wondrous Item, Uncommon (Requires Attunement)",
+        "Wondrous Item, Uncommon",
+        "Wondrous item, Uncommon",
+        "Wondrous Item, Uncommon",
+        "Weapon (Maul or Warhammer), Legendary (Requires"
+      ],
+      "dados": [
+        "1d10"
+      ],
+      "cds": []
+    },
+    "270": {
+      "linhas_tipo": [
+        "Wondrous Item, Uncommon (Requires Attunement)",
+        "Wondrous Item, Very Rare (Requires Attunement bya"
+      ],
+      "dados": [
+        "1d4"
+      ],
+      "cds": [
+        10,
+        17
+      ]
+    },
+    "271": {
+      "linhas_tipo": [
+        "Wondrous Item, Common",
+        "Wondrous Item, Common (Requires Attunement bya"
+      ],
+      "dados": [
+        "1d4",
+        "1d6"
+      ],
+      "cds": [
+        10
+      ]
+    },
+    "272": {
+      "linhas_tipo": [
+        "Wondrous Item, Uncommon (Requires Attunement)",
+        "Wondrous Item, Very Rare (Requires Attunement)",
+        "Wondrous Item, Uncommon",
+        "Wondrous Item, Uncommon (Requires Attunement)",
+        "Wondrous Item, Rare (Requires Attunement)"
+      ],
+      "dados": [
+        "1d10",
+        "1d6",
+        "2d10",
+        "4d10"
+      ],
+      "cds": [
+        13,
+        17,
+        18
+      ]
+    },
+    "273": {
+      "linhas_tipo": [
+        "Wondrous Item, Rare",
+        "Wondrous Item, Common",
+        "Weapon (Any Simple or Martial), Legendary (Requires"
+      ],
+      "dados": [
+        "1d6"
+      ],
+      "cds": []
+    },
+    "274": {
+      "linhas_tipo": [
+        "Wondrous Item, Rare",
+        "Wondrous Item, Common",
+        "Wondrous Item, Rare (Silver or Brass), Very Rare",
+        "Wondrous Item, Very Rare",
+        "Wondrous Item, Rare",
+        "Rod, Uncommon"
+      ],
+      "dados": [
+        "10d6",
+        "10d8"
+      ],
+      "cds": [
+        15,
+        30
+      ]
+    },
+    "275": {
+      "linhas_tipo": [
+        "Wondrous Item, Common",
+        "Wondrous Item, Common"
+      ],
+      "dados": [],
+      "cds": []
+    },
+    "276": {
+      "linhas_tipo": [
+        "Wondrous Item, Rarity Varies (Requires Attunement"
+      ],
+      "dados": [],
+      "cds": [
+        15
+      ]
+    },
+    "277": {
+      "linhas_tipo": [
+        "Wondrous Item, Rarity Varies (Requires Attunement)"
+      ],
+      "dados": [
+        "1d3",
+        "1d4"
+      ],
+      "cds": []
+    },
+    "278": {
+      "linhas_tipo": [
+        "Wondrous Item, Rare",
+        "Wondrous Item, Legendary"
+      ],
+      "dados": [
+        "1d100"
+      ],
+      "cds": [
+        17,
+        20
+      ]
+    },
+    "279": {
+      "linhas_tipo": [
+        "Weapon (Javelin), Uncommon",
+        "Wondrous Item, Uncommon",
+        "Wondrous Item, Uncommon",
+        "Wondrous Item, Common",
+        "Weapon (Club), Very Rare"
+      ],
+      "dados": [
+        "1d3",
+        "1d4",
+        "2d8",
+        "4d6"
+      ],
+      "cds": [
+        13
+      ]
+    },
+    "280": {
+      "linhas_tipo": [
+        "Weapon (Mace), Rare (Requires Attunement)",
+        "Weapon (Mace), Rare",
+        "Weapon (Mace). Rare (Requires Attunement)",
+        "Wondrous Item, Rare (Requires Attunement)"
+      ],
+      "dados": [
+        "2d6"
+      ],
+      "cds": [
+        15
+      ]
+    },
+    "281": {
+      "linhas_tipo": [
+        "Wondrous Item, Very Rare",
+        "Wondrous Item, Very Rare",
+        "Wondrous Item, Very Rare"
+      ],
+      "dados": [
+        "1d20"
+      ],
+      "cds": []
+    },
+    "282": {
+      "linhas_tipo": [
+        "Wondrous Item, Very Rare",
+        "Armor (Any Light, Medium, or Heavy), Uncommon",
+        "Wondrous Item, Uncommon (Requires Attunement)",
+        "Wondrous Item, Very Rare"
+      ],
+      "dados": [],
+      "cds": [
+        13,
+        15
+      ]
+    },
+    "283": {
+      "linhas_tipo": [],
+      "dados": [],
+      "cds": []
+    },
+    "284": {
+      "linhas_tipo": [
+        "Wondrous Item, Common",
+        "Wondrous Item, Uncommon (Requires Attunement bya",
+        "Wondrous Item, Uncommon (Requires Attunement)",
+        "Wondrous Item, Rare"
+      ],
+      "dados": [
+        "1d100",
+        "1d6",
+        "3d6"
+      ],
+      "cds": [
+        15
+      ]
+    },
+    "285": {
+      "linhas_tipo": [
+        "Wondrous Item, Rare (Requires Attunement by a Cleric,",
+        "Weapon (Any Simple or Martial), Very Rare (Requires",
+        "Wondrous Item, Very Rare"
+      ],
+      "dados": [
+        "1d4",
+        "1d8"
+      ],
+      "cds": [
+        15
+      ]
+    },
+    "286": {
+      "linhas_tipo": [
+        "Weapon (Longbow or Shortbow), Very Rare (Requires",
+        "Potion, Rare",
+        "Potion, Very Rare"
+      ],
+      "dados": [
+        "3d6"
+      ],
+      "cds": []
+    },
+    "287": {
+      "linhas_tipo": [
+        "Potion, Uncommon",
+        "Wondrous Item, Common",
+        "Wondrous Item, Artifact (Requires Attunement)"
+      ],
+      "dados": [],
+      "cds": []
+    },
+    "288": {
+      "linhas_tipo": [
+        "Wondrous Item, Common",
+        "Wondrous Item, Uncommon (Requires Attunement bya",
+        "Wondrous Item, Common",
+        "Wondrous Item, Uncommon (Requires Attunement)",
+        "Wondrous Item, Rare (Requires Attunement)",
+        "Wondrous Item, Uncommon (Requires Attunement)"
+      ],
+      "dados": [
+        "1d4",
+        "2d4"
+      ],
+      "cds": [
+        15,
+        18
+      ]
+    },
+    "289": {
+      "linhas_tipo": [
+        "Potion, Uncommon",
+        "Wondrous Item, Common",
+        "Wondrous Item, Uncommon",
+        "Wondrous Item, Uncommon (Requires Attunement)"
+      ],
+      "dados": [
+        "1d3"
+      ],
+      "cds": [
+        15
+      ]
+    },
+    "290": {
+      "linhas_tipo": [
+        "Armor (Half Plate Armor or Plate Armor), Legendary",
+        "Wondrous Item, Common",
+        "Wondrous Item, Common",
+        "Wondrous Item, Rare"
+      ],
+      "dados": [],
+      "cds": []
+    },
+    "291": {
+      "linhas_tipo": [
+        "Potion, Uncommon",
+        "Potion, Rare",
+        "Potion, Common",
+        "Potion, Common",
+        "Potion, Rare",
+        "Potion, Uncommon",
+        "Potion, Very Rare",
+        "Potion, Rare"
+      ],
+      "dados": [
+        "1d4",
+        "4d6"
+      ],
+      "cds": [
+        1,
+        10,
+        13
+      ]
+    },
+    "292": {
+      "linhas_tipo": [
+        "Potion, Rarity Varies",
+        "Potion of Giant Strength (hill) 21 Uncommon’",
+        "Potion of Giant Strength (frost 23.-Rare",
+        "Potion of Giant Strength (fire) 25-Rare",
+        "Potion of Giant Strength (cloud) 27 Very Rare",
+        "Potion of Giant Strength (storm) 29 Legendary",
+        "Potion, Very Rare",
+        "Potion, Rare",
+        "Potion, Rare",
+        "Potion, Rare",
+        "Potion, Uncommon",
+        "Potion of Healing 2d4+2 Common",
+        "Potion of Healing Ada +4 Uncommon",
+        "Potion of Healing 8d4+8 Rare",
+        "Potion, Very Rare",
+        "Potion, Rare",
+        "Potion, Uncommon"
+      ],
+      "dados": [
+        "1d6",
+        "2d4",
+        "8d4"
+      ],
+      "cds": [
+        13
+      ]
+    },
+    "293": {
+      "linhas_tipo": [
+        "Potion, Uncommon",
+        "Potion, Uncommon",
+        "Potion, Very Rare",
+        "Potion, Very Rare",
+        "Potion, Uncommon",
+        "Wondrous Item, Common"
+      ],
+      "dados": [
+        "1d10",
+        "1d6",
+        "4d6"
+      ],
+      "cds": [
+        13
+      ]
+    },
+    "294": {
+      "linhas_tipo": [
+        "Wondrous Item, Common",
+        "Wondrous Item, Rarity Varies"
+      ],
+      "dados": [],
+      "cds": []
+    },
+    "295": {
+      "linhas_tipo": [
+        "Weapon (Quarterstaff), Very Rare (Requires",
+        "Wondrous Item, Uncommon"
+      ],
+      "dados": [
+        "1d100",
+        "1d6"
+      ],
+      "cds": []
+    },
+    "296": {
+      "linhas_tipo": [
+        "Ring, Rare",
+        "Ring, Legendary (Requires Attunement)",
+        "Ring, Legendary (Requires Attunement)"
+      ],
+      "dados": [
+        "1d4"
+      ],
+      "cds": [
+        13,
+        18
+      ]
+    },
+    "297": {
+      "linhas_tipo": [
+        "Ring, Rare (Requires Attunement)",
+        "Ring, Rare (Requires Attunement)",
+        "Ring, Rare (Requires Attunement)",
+        "Ring, Legendary (Requires Attunement)",
+        "Ring, Uncommon (Requires Attunement)",
+        "Ring, Uncommon (Requires Attunement)"
+      ],
+      "dados": [
+        "1d3"
+      ],
+      "cds": []
+    },
+    "298": {
+      "linhas_tipo": [
+        "Ring, Rare (Requires Attunement)",
+        "Ring, Very Rare (Requires Attunement)",
+        "Ring, Rare",
+        "Ring, Very Rare (Requires Attunement)"
+      ],
+      "dados": [
+        "1d10",
+        "1d6"
+      ],
+      "cds": []
+    },
+    "299": {
+      "linhas_tipo": [
+        "Ring, Rare (Requires Attunement)",
+        "Ring, Legendary (Requires Attunement)",
+        "Ring, Uncommon",
+        "Ring, Very Rare (Requires Attunement)"
+      ],
+      "dados": [
+        "1d6",
+        "2d4",
+        "2d6",
+        "4d12",
+        "5d4"
+      ],
+      "cds": [
+        15
+      ]
+    },
+    "300": {
+      "linhas_tipo": [
+        "Ring, Rare (Requires Attunement)",
+        "Ring, Legendary",
+        "Ring, Uncommon (Requires Attunement)",
+        "Ring, Uncommon",
+        "Ring, Rare (Requires Attunement)",
+        "Wondrous Item, Common"
+      ],
+      "dados": [
+        "1d3",
+        "2d10",
+        "2d8"
+      ],
+      "cds": [
+        15
+      ]
+    },
+    "301": {
+      "linhas_tipo": [
+        "Wondrous Item, Rare (Requires Attunement)",
+        "Wondrous Item, Very Rare (Requires Attunement)",
+        "Wondrous Item, Very Rare (Requires Attunement)"
+      ],
+      "dados": [
+        "1d3",
+        "1d4",
+        "1d6",
+        "2d4"
+      ],
+      "cds": [
+        11,
+        13,
+        15
+      ]
+    },
+    "302": {
+      "linhas_tipo": [
+        "Wondrous Item, Legendary (Requires Attunement",
+        "Wondrous Item, Uncommon"
+      ],
+      "dados": [
+        "4d4"
+      ],
+      "cds": []
+    },
+    "303": {
+      "linhas_tipo": [
+        "Rod, Very Rare (Requires Attunement)",
+        "Rod, Very Rare (Requires Attunement)"
+      ],
+      "dados": [],
+      "cds": []
+    },
+    "304": {
+      "linhas_tipo": [
+        "Rod, Legendary (Requires Attunement)"
+      ],
+      "dados": [
+        "2d6",
+        "4d6"
+      ],
+      "cds": [
+        17
+      ]
+    },
+    "305": {
+      "linhas_tipo": [
+        "Rod, Legendary (Requires Attunement)",
+        "Rod, Rare (Requires Attunement)",
+        "Rod, Very Rare",
+        "Rod, Uncommon (+1), Rare (+2), or Very Rare (+5)",
+        "Wondrous Item, Uncommon",
+        "Wondrous Item, Rare"
+      ],
+      "dados": [],
+      "cds": [
+        15
+      ]
+    },
+    "306": {
+      "linhas_tipo": [
+        "Wondrous Item, Common",
+        "Wondrous Item, Common (Requires Attunement bya",
+        "Wondrous Item, Uncommon",
+        "Wondrous Item, Legendary (Requires Attunement)",
+        "Weapon (Scimitar), Very Rare (Requires Attunement)",
+        "Scroll, Rare"
+      ],
+      "dados": [
+        "1d100"
+      ],
+      "cds": [
+        15
+      ]
+    },
+    "307": {
+      "linhas_tipo": [
+        "Scroll, Legendary",
+        "Wondrous Item, Uncommon",
+        "Armor (Shield), Uncommon",
+        "Armor (Shield), Uncommon (+1), Rare (+2), or Very Rare",
+        "Armor (Shield), Common"
+      ],
+      "dados": [],
+      "cds": [
+        15
+      ]
+    },
+    "308": {
+      "linhas_tipo": [
+        "Armor (Shield), Rare (Requires Attunement)",
+        "Weapon (Any Simple or Martial), Common",
+        "Wondrous Item, Uncommon (Requires Attunement)"
+      ],
+      "dados": [
+        "2d6"
+      ],
+      "cds": []
+    },
+    "309": {
+      "linhas_tipo": [
+        "Wondrous Item, Legendary",
+        "Scroll, Rarity Varies"
+      ],
+      "dados": [
+        "1d6"
+      ],
+      "cds": []
+    },
+    "310": {
+      "linhas_tipo": [
+        "Wondrous Item, Legendary",
+        "Wondrous Item, Very Rare",
+        "Staff, Common"
+      ],
+      "dados": [
+        "8d10"
+      ],
+      "cds": [
+        19,
+        25
+      ]
+    },
+    "311": {
+      "linhas_tipo": [
+        "Staff, Common",
+        "Staff, Rare (Requires Attunement by a Bard, Cleric,",
+        "Staff, Very Rare (Requires Attunement"
+      ],
+      "dados": [
+        "1d20",
+        "1d6",
+        "1d8"
+      ],
+      "cds": []
+    },
+    "312": {
+      "linhas_tipo": [
+        "Staff, Common",
+        "Staff, Very Rare (Requires Attunement bya Druid,",
+        "Staff, Rare (Requires Attunement by a Bard, Cleric, or",
+        "Staff, Very Rare (Requires Attunement by a Sorcerer,"
+      ],
+      "dados": [
+        "1d6",
+        "1d8"
+      ],
+      "cds": [
+        17
+      ]
+    },
+    "313": {
+      "linhas_tipo": [
+        "Staff, Very Rare (Requires Attunement)",
+        "Staff, Rare (Requires Attunement by a Bard, Cleric,",
+        "Staff, Uncommon (Requires Attunement)"
+      ],
+      "dados": [
+        "1d6",
+        "3d6"
+      ],
+      "cds": []
+    },
+    "314": {
+      "linhas_tipo": [
+        "Staff, Legendary (Requires Attunement by a Sorcerer,"
+      ],
+      "dados": [],
+      "cds": []
+    },
+    "315": {
+      "linhas_tipo": [
+        "Staff, Uncommon (Requires Attunement)",
+        "Staff, Rare (Requires Attunement by a Druid)",
+        "Staff, Very Rare (Requires Attunement)"
+      ],
+      "dados": [
+        "1d12",
+        "2d6"
+      ],
+      "cds": [
+        17
+      ]
+    },
+    "316": {
+      "linhas_tipo": [
+        "Staff; Rare (Requires Attunement)",
+        "Wondrous Item, Rare",
+        "Wondrous Item, Uncommon (Requires Attunement)",
+        "Weapon (Longsword), Rare (Requires Attunement)"
+      ],
+      "dados": [
+        "1d8"
+      ],
+      "cds": [
+        15,
+        17
+      ]
+    },
+    "317": {
+      "linhas_tipo": [
+        "Weapon (Longsword), Legendary (Requires Attunement)",
+        "Weapon (Longsword), Artifact (Requires Attunement)"
+      ],
+      "dados": [
+        "1d10"
+      ],
+      "cds": [
+        15,
+        18
+      ]
+    },
+    "318": {
+      "linhas_tipo": [
+        "Wondrous Item, Legendary (Requires Attunement bya"
+      ],
+      "dados": [
+        "4d6",
+        "8d6"
+      ],
+      "cds": [
+        15,
+        18,
+        20
+      ]
+    },
+    "319": {
+      "linhas_tipo": [
+        "Wondrous Item, Legendary (Requires Attunement)",
+        "Wondrous Item, Legendary (Requires Attunement)",
+        "Wondrous Item, Common (Requires Attunement)",
+        "Wondrous Item, Common"
+      ],
+      "dados": [],
+      "cds": [
+        20
+      ]
+    },
+    "320": {
+      "linhas_tipo": [
+        "Rod, Rare (Requires Attunement)",
+        "Weapon (Greatclub), Very Rare (Requires Attunement)"
+      ],
+      "dados": [
+        "1d6",
+        "1d8"
+      ],
+      "cds": [
+        15,
+        20
+      ]
+    },
+    "321": {
+      "linhas_tipo": [
+        "Wondrous Item, Very Rare",
+        "Wondrous Item, Very Rare",
+        "Wondrous Item, Legendary (Requires Attunement by a",
+        "Wondrous Item, Very Rare",
+        "Weapon (Trident), Uncommon (Requires Attunement)"
+      ],
+      "dados": [],
+      "cds": [
+        15
+      ]
+    },
+    "322": {
+      "linhas_tipo": [
+        "Wondrous Item, Legendary",
+        "Wondrous Item, Common",
+        "Weapon (Any Simple or Martial), Rare",
+        "Weapon (Any Ammunition), Common",
+        "Wand, Rare (Requires Attunement)"
+      ],
+      "dados": [],
+      "cds": [
+        10,
+        17
+      ]
+    },
+    "323": {
+      "linhas_tipo": [
+        "Wand, Common",
+        "Wand, Rare (Requires Attunement)",
+        "Wand, Rare (Requires Attunement)",
+        "Wand, Rare (Requires Attunement by a Spellcaster)"
+      ],
+      "dados": [
+        "1d20",
+        "1d6"
+      ],
+      "cds": [
+        15
+      ]
+    },
+    "324": {
+      "linhas_tipo": [
+        "Wand, Rare (Requires Attunement by a Spellcaster)",
+        "Wand, Uncommon",
+        "Wand, Uncommon",
+        "Wand, Artifact (Requires Attunement)"
+      ],
+      "dados": [
+        "10d6",
+        "1d3",
+        "1d6",
+        "2d12"
+      ],
+      "cds": [
+        15,
+        17
+      ]
+    },
+    "325": {
+      "linhas_tipo": [
+        "Wand, Rare (Requires Attunement by a Spellcaster)",
+        "Wand, Very Rare (Requires Attunement by a Spellcaster)",
+        "Wand, Common"
+      ],
+      "dados": [
+        "1d20",
+        "1d4",
+        "1d6"
+      ],
+      "cds": [
+        15,
+        18
+      ]
+    },
+    "326": {
+      "linhas_tipo": [
+        "Wand, Uncommon",
+        "Wand, Uncommon (+1), Rare (+2), or Very Rare (+3)",
+        "Wand, Uncommon (Requires Attunement by a",
+        "Wand, Rare (Requires Attunement)"
+      ],
+      "dados": [
+        "1d6"
+      ],
+      "cds": [
+        13
+      ]
+    },
+    "327": {
+      "linhas_tipo": [
+        "Weapon (Trident), Artifact (Requires Attunement)"
+      ],
+      "dados": [
+        "1d100",
+        "1d4"
+      ],
+      "cds": [
+        15
+      ]
+    },
+    "328": {
+      "linhas_tipo": [
+        "Weapon (Any Simple or Martial), Uncommon (+1), Rare",
+        "Weapon (Any Simple or Martial), Uncommon (Requires",
+        "Wondrous Item, Legendary",
+        "Weapon (Warhammer), Artifact (Requires Attunement"
+      ],
+      "dados": [
+        "1d3",
+        "1d8",
+        "4d8"
+      ],
+      "cds": [
+        20
+      ]
+    },
+    "329": {
+      "linhas_tipo": [
+        "Wondrous Item, Uncommon",
+        "Wondrous Item, Uncommon (Requires Attunement)",
+        "Wondrous Item, Rare (Requires Attunement)",
+        "Wondrous Item, Uncommon (+l), Rare (+2), or Very Rare"
+      ],
+      "dados": [
+        "1d12",
+        "1d4"
+      ],
+      "cds": [
+        13
+      ]
+    },
+    "330": {
+      "linhas_tipo": [],
+      "dados": [
+        "1d4"
+      ],
+      "cds": []
+    },
+    "331": {
+      "linhas_tipo": [],
+      "dados": [
+        "1d100"
+      ],
+      "cds": []
+    },
+    "332": {
+      "linhas_tipo": [],
+      "dados": [
+        "1d100"
+      ],
+      "cds": []
+    },
+    "333": {
+      "linhas_tipo": [],
+      "dados": [
+        "1d100"
+      ],
+      "cds": []
+    },
+    "334": {
+      "linhas_tipo": [],
+      "dados": [
+        "1d100"
+      ],
+      "cds": []
+    },
+    "335": {
+      "linhas_tipo": [],
+      "dados": [
+        "1d100"
+      ],
+      "cds": []
+    }
+  }
+}

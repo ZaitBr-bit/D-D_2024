@@ -23,7 +23,7 @@ import { collectOpcoes, validateAll } from './levelup-validations.js';
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, PERICIAS } from './dados-classes.js';
 import { getArmas, getClasse, getMagiasPorCirculo, getMagiasClasse, getMagiasRituais } from './db.js';
 import { abrirModal, fecharModal, toast, mdParaHtml, circuloSuperiorHtml, classesDaMagiaHtml, semAcento, calcMod, escHtml, getEspacosMagia, bonusProficiencia } from './utils.js';
-import { subirDeNivel, obterAtributosASITalento, getLimiteASITalento, obterTalentosElegiveis } from './levelup.js';
+import { subirDeNivel, ganhoPvDoResultado, obterAtributosASITalento, getLimiteASITalento, obterTalentosElegiveis } from './levelup.js';
 import { abrirGridManobras } from './manobras-ui.js';
 // preparadasPorClasse (Tarefa 4 do sub-projeto "magia sabe a classe"): ver
 // o comentário de `magiasAtuaisNomes`, abaixo, para o achado que esta
@@ -2181,6 +2181,11 @@ function bindEventosRitualBonusProficiencia(ctx, state) {
 // CONFIRMAÇÃO / SUBMISSÃO
 // ============================================================
 
+/** Rótulo do modo de PV do resultado do level-up: "(Rolado: N)" ou "(Valor Fixo)" (o motor devolve `hp_modo`). */
+export function rotuloModoHp(resultado) {
+  return resultado?.hp_modo === 'rolado' ? `(Rolado: ${resultado.hp_rolado})` : '(Valor Fixo)';
+}
+
 export async function confirmarLevelUp(ctx, state, caches) {
   if (state.confirmando) return;
   const erro = validateAll(ctx, state);
@@ -2413,6 +2418,8 @@ function montarResumoFinal(resultado, char, classeQueSobe, truquesAdicionados, m
   for (const t of trocasMagia) itens.push(`Troca: ${t.de} ${iconArrow} ${t.para}`);
   for (const t of trocasTruque) itens.push(`Troca de truque: ${t.de} ${iconArrow} ${t.para}`);
 
+  const ganhoPv = ganhoPvDoResultado(resultado);
+
   // HTML Final
   return `
     <div style="text-align:center; padding: 0 8px;">
@@ -2427,11 +2434,12 @@ function montarResumoFinal(resultado, char, classeQueSobe, truquesAdicionados, m
       <!-- Card de HP -->
       <div style="background:var(--bg-input); border-radius:var(--radius); padding:12px; margin-bottom:20px; border:1px solid var(--border-light); display:inline-block; min-width:200px">
         <div style="color:var(--success); font-weight:bold; font-size:1.1rem; margin-bottom:4px">
-          +${resultado.hp_ganho} HP
+          +${ganhoPv.maximo} HP
         </div>
         <div style="font-size:0.9rem; color:var(--text-muted)">
-          ${resultado.hp_mode === 'rolado' ? `(Rolado: ${resultado.hp_rolado})` : '(Valor Fixo)'}
+          ${rotuloModoHp(resultado)}
           ${resultado.bonus_con_retroativo > 0 ? `<br><small>+${resultado.bonus_con_retroativo} (CON Retroativo)</small>` : ''}
+          ${ganhoPv.porItem ? `<br><small>máximo +${ganhoPv.maximo}, PV atual +${ganhoPv.atual} (item de Constituição)</small>` : ''}
         </div>
         <div style="margin-top:8px; border-top:1px solid var(--border); paddingTop:4px; font-weight:600; color:var(--text)">
           ${iconHeart} Total: ${char.pv_max} PV

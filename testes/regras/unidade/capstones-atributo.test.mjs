@@ -136,3 +136,14 @@ test('capstone de atributo respeita o teto 25, não o teto 20 do ASI comum', asy
   assert.equal(personagem.atributos.destreza, 20,
     'atributo fora da lista não pode ser tocado');
 });
+
+// Valor já acima do teto (Manual, edição manual) nunca é reduzido pelo capstone.
+test('capstone de atributo não reduz valor que já passa de 25', async () => {
+  const { levelup } = await modulosApp();
+  const personagem = {
+    atributos: { forca: 27, destreza: 20, constituicao: 25, inteligencia: 10, sabedoria: 10, carisma: 10 },
+  };
+  levelup.aplicarCapstoneAtributo(personagem, ['forca', 'constituicao'], 4);
+  assert.equal(personagem.atributos.forca, 27, '27 não cai para 25');
+  assert.equal(personagem.atributos.constituicao, 25, 'no teto exato continua 25');
+});

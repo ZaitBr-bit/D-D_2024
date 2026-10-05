@@ -7,6 +7,7 @@
 // em sheet/condicoes.js (lendo `char`). Duas fontes da verdade para a
 // mesma regra e o bug raiz; nao restaurar nenhuma das copias.
 // ============================================================
+import { atributoEfetivo } from './regras-atributos.js';
 import { armadurasDoPersonagem, armasDoPersonagem } from './regras-multiclasse-proficiencias.js';
 import { temClasse } from './regras-multiclasse.js';
 
@@ -161,7 +162,7 @@ export function atendeRequisitoForca(personagem, armadura) {
   // creator/passo-equipamento.js: personagem sem `atributos` conta como
   // Forca 10, o valor padrao de D&D. Trocar por 0 mudaria a semantica --
   // esta task preserva comportamento, so move o personagem para parametro.
-  return (personagem?.atributos?.forca || 10) >= parseInt(match[1], 10);
+  return (atributoEfetivo(personagem, 'forca') || 10) >= parseInt(match[1], 10);
 }
 
 /** Badge compacta de proficiencia, usada nas listas de item */

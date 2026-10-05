@@ -1,6 +1,6 @@
 # Backlog de Issues — ZaitBr-bit/D-D_2024
 
-> Revalidado em 2026-10-02, a partir da API do GitHub (issues abertas, sem PRs).
+> Revalidado em 2026-10-05, a partir da API do GitHub (issues abertas, sem PRs).
 > Ordenado por **tipo** (Bug / Melhoria) e depois por **complexidade**. Ticket
 > aqui é a issue do GitHub — ver [`TRIAGEM-ISSUES.md`](TRIAGEM-ISSUES.md) para
 > o procedimento de investigar e corrigir.
@@ -67,6 +67,13 @@
 > dados), depois #121, #116 e #119 (P2, correções pequenas e certas).
 >
 > #115, #116, #117 e #121 foram corrigidas na 3.0.18, e #119, #122 e #124 na 3.0.19 — ver notas de manutenção. As melhorias #99, #102, #110, #118, #123, #98, #106 e #111 foram entregues na 3.0.20, e #120, #100, #104, #101, #80 e #83 na 3.0.21.
+>
+> **Revalidação de 2026-10-05**: 33 issues abertas (contagem conferida na API).
+> Entraram **#125 a #138** (menos #132, que não está aberta), todas abertas na
+> 3.0.21 e **ainda sem triagem** — ver a seção "Novas, sem triagem" abaixo.
+> A **3.1.0 (itens mágicos)** foi uma melhoria do dono do produto, **sem issue
+> própria**; ela toca duas issues antigas: **#103** (parte (a) respondida) e
+> **#93** (parte dos sentidos por item entregue) — ver as entradas.
 
 ---
 
@@ -86,6 +93,32 @@ _(nenhuma nesta faixa no momento — ver notas de manutenção)_
 
 ---
 
+## 🆕 Novas, sem triagem (2026-10-05)
+
+Abertas na 3.0.21 (ou 3.0.x); **nenhuma foi investigada contra o código** — o
+que segue é o resumo do que o autor descreve, a confirmar na triagem.
+
+**Bugs**
+
+- [ ] **#129** — Mago que adquire o talento Mestre das Armas perde o botão de trocar/preparar magias no Descanso Longo e fica só com "Trocar truque" e "Trocar maestria". Provável ligação com a vaga própria de maestria do talento (#119, 3.0.19) e com o encadeamento do modal de trocas.
+- [ ] **#130** — Magia de nome grande aparece cortada pelo botão de selecionar (Magias / grimório). Layout da linha da magia.
+- [ ] **#131** — Magia personalizada de Mago não mostra o selo "Personalizada" ao preparar, como nas outras classes. Mesmo cluster "magia personalizada" (#124/#46).
+- [ ] **#135** — Propriedade personalizada só aparece em itens que são armas; o autor tentou criar uma num item mágico. Formulário de item personalizado da 3.0.21 (#104). Verificar também a interação com a categoria Itens Mágicos da 3.1.0.
+- [ ] **#138** — Magia personalizada: o tempo de conjuração "Reação" é recusado ("selecione um tempo válido"). Validação do formulário de magia.
+
+**Melhorias**
+
+- [ ] **#125** — Comprar item personalizado (descontar moedas ao adicionar, como na loja).
+- [ ] **#126** — Passar magias e itens de uma ficha para outra (hoje é um a um).
+- [ ] **#127** — Campo "Conjuração como magia de Círculo" nas magias personalizadas e formulário de magia mais compacto (como o de item).
+- [ ] **#128** — Deixar claro que só o Mago troca de truque no Descanso Longo (o texto sugere que qualquer conjurador troca).
+- [ ] **#133** — Converter moedas também "para baixo" (platina → ouro).
+- [ ] **#134** — Item personalizado: tipo de armadura (leve/média/pesada) para a proficiência aparecer, e mostrar CA, requisito, desvantagem, custo e peso na descrição.
+- [ ] **#136** — Modo escuro/noturno. **Duplicata de #22** (mesmo pedido): consolidar.
+- [ ] **#137** — Pastas/grupos de fichas na página inicial.
+
+---
+
 ## ✨ Melhorias
 
 ### Baixa
@@ -99,12 +132,12 @@ _(nenhuma nesta faixa no momento — ver notas de manutenção)_
 ### Média
 
 - [ ] **#22** — Modo escuro. Nenhum `prefers-color-scheme`/`data-theme` hoje; exige tokenizar cores em CSS custom properties.
-- [ ] **#103** (NOVA, 2026-09-21, **P3**) — Pergaminho Mágico: (a) só existem "Pergaminho Mágico (Truque)" e "(1º Círculo)" no catálogo (`dados/equipamento/equipamento_aventura.json`); (b) não dá para escolher qual magia está no pergaminho. Investigado: (a) é fiel ao PHB 2024 — o capítulo de equipamento só lista esses dois; os de 2º a 9º círculo são itens mágicos do Guia do Mestre, fora do escopo atual. (b) é melhoria real: seletor de magia (filtrado pelo círculo do pergaminho) gravado na instância do item + exibição no detalhe. Fazer só (b), e responder (a) na issue.
+- [ ] **#103** (NOVA, 2026-09-21, **P3**) — **Atualização 2026-10-05 (3.1.0): a parte (a) está respondida.** A categoria Itens Mágicos traz o *Pergaminho Mágico* do Guia do Mestre com as 10 variantes (Truque e 1º a 9º círculo); só falta responder na issue. **A parte (b) segue aberta**: o item entra no inventário sem magia (`magias: null` no acervo) e não há seletor. A infraestrutura nova ajuda: o bloco Magias de Itens (3.1.0) já sabe listar e conjurar uma magia gravada no item, então o seletor pode gravar `dados.magias` na instância (círculo da variante como teto). Texto original: Pergaminho Mágico: (a) só existem "Pergaminho Mágico (Truque)" e "(1º Círculo)" no catálogo (`dados/equipamento/equipamento_aventura.json`); (b) não dá para escolher qual magia está no pergaminho. Investigado: (a) é fiel ao PHB 2024 — o capítulo de equipamento só lista esses dois; os de 2º a 9º círculo são itens mágicos do Guia do Mestre, fora do escopo atual. (b) é melhoria real: seletor de magia (filtrado pelo círculo do pergaminho) gravado na instância do item + exibição no detalhe. Fazer só (b), e responder (a) na issue.
 - [ ] **#107** (NOVA, 2026-09-21, **P3**) — Aba de registro de campanha: missões realizadas, histórico de XP (comentário acrescenta criaturas encontradas). Investigado: hoje só existe `char.xp` numérico (editado em `sheet/edicao.js`), sem histórico. Seção nova de diário com entradas datadas; o log de XP pode alimentar `char.xp`.
 
 ### Média–Alta
 
-- [ ] **#93** — Sentidos passivos (Visão no Escuro, Visão às Cegas, Sismoconsciência, Visão Verdadeira) concedidos por magia/traço/item não aparecem na ficha. Conferido: não existe NENHUM campo `sentidos_passivos`/tratamento equivalente em `sheet/ficha.js`/`sheet/combate.js` hoje — gap real, não regressão. Precisa mapear cada fonte que concede sentido e escrever no bloco de sentidos da ficha, com prioridade entre fontes (ex.: dois "Visão no Escuro" de alcances diferentes).
+- [ ] **#93** — **Atualização 2026-10-05 (3.1.0): parcial.** Os sentidos concedidos por **item** (Visão no Escuro, Visão Verdadeira, Visão às Cegas; Óculos da Noite somam à base da espécie; o maior vale entre fontes) agora aparecem em Sentidos, na impressão e no PDF. **Seguem faltando** os concedidos por **magia** e por **traço/subclasse**, a Sismoconsciência (Sentido Sísmico) e o Guardião 18 só entra pela classe. Texto original: Sentidos passivos (Visão no Escuro, Visão às Cegas, Sismoconsciência, Visão Verdadeira) concedidos por magia/traço/item não aparecem na ficha. Conferido: não existe NENHUM campo `sentidos_passivos`/tratamento equivalente em `sheet/ficha.js`/`sheet/combate.js` hoje — gap real, não regressão. Precisa mapear cada fonte que concede sentido e escrever no bloco de sentidos da ficha, com prioridade entre fontes (ex.: dois "Visão no Escuro" de alcances diferentes).
 
 ### Alta
 
@@ -130,6 +163,8 @@ _(nenhuma nesta faixa no momento — ver notas de manutenção)_
 ---
 
 ## Notas de manutenção
+
+- **Entregue na versão 3.1.0 (2026-10-05)** — melhoria do dono do produto, **sem issue**: itens mágicos do Livro do Mestre (capítulo 7). 350 itens traduzidos e catalogados (`dados/livro-do-mestre/capitulo7/`, extração e curadoria em `scripts/livro-do-mestre/`); na ficha: categoria Itens Mágicos no Adicionar Item, bônus automáticos (CA, salvaguardas, ataque/CD de magia, ataque/dano de arma), atributo em jogo (Cinturão de Força do Gigante, Amuleto da Saúde, Pedras Ioun, aumentos permanentes de Manuais/Tomos/Livros), cargas e usos com recuperação no Descanso Longo, magias conjuradas pelo item, resistências/imunidades/deslocamento/sentidos/vantagens passivos e aviso de sintonização restrita. Dez planos de implementação (em `docs/superpowers/plans/`, não versionados). Corrigidos no caminho, sem issue: PV com o Amuleto da Saúde ao editar Constituição/reverter/ASI/talento/dádiva, rótulo "(Rolado: N)" do level-up, Exaustão nos Deslocamentos especiais fixos, Visão às Cegas do Guardião multiclasse e itens duplicados em Deslocamento/Condições. **Limitações de modelo conhecidas** (itens que exigem vocabulário novo: voo condicional do Manto do Morcego, imunidade à magia Mísseis Mágicos do Broche Protetor, Visão no Escuro a 30 cm dos Olhos de Visão Minuciosa, aliados em auras, restrições de uso das magias de itens, Túnica das Estrelas, Cubo de Invocação, Lâmina e Pedra da Boa Sorte, Cabras de Marfim, Elmo do Brilho) estão em `scripts/livro-do-mestre/GUIA-MECANICA.md`. Tocam as issues abertas **#103** (parte (a) respondida) e **#93** (sentidos por item entregues), registradas nas entradas delas.
 
 - **Entregues na versão 3.0.21 (2026-10-03)**: #120, #100, #104, #101, #80, #83 — oráculo vermelho antes de cada uma.
   - **#120**: `equipamento_aventura.json` tinha 12 de 82 itens com descrição e `ferramentas.json` só a tabela. `scripts/extrair_descricoes_equipamento.py` preenche as descrições (só onde estavam vazias) e os `detalhes` (Usar Objeto, Fabricação, Variantes) a partir de `Equipamento.md`; a loja ganhou a categoria Ferramentas (`montarFerramentasLoja`, uma entrada por variante de Instrumento Musical e Kit de Jogos). Testes: `equipamento-descricoes.test.mjs`, `loja-ferramentas.spec.mjs`.

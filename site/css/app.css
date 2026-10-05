@@ -699,6 +699,13 @@ tr:hover td { background: #faf8f4; }
   color: #fff;
   font-size: 0.7rem;
 }
+/* Vantagem condicional de item mágico: selo discreto, não entra no cálculo de V/D. */
+.pericia-vd-badge.vantagem-nota {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--text-muted);
+  margin-left: 2px;
+}
 .pericia-vd-badge.falha-automatica {
   background: #000;
   color: #fff;

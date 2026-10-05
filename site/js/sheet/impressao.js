@@ -2,13 +2,20 @@
 // Versao da ficha formatada para impressao
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
+import { atributoEfetivo } from '../regras-atributos.js';
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, PERICIAS } from '../dados-classes.js';
 import { getMagiasPorCirculo } from '../db.js';
 import { formatarCarteira, totalEmCobre } from '../moedas.js';
-import { bonusProficiencia, calcBonusPericia, calcCA, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcMod, calcPercepcaoPassiva, conjuracoesPorClasse, escHtml, fmtMod, getDeslocamento, getTamanho, mdParaHtml, circuloSuperiorHtml, toast } from '../utils.js';
+import { selosDeEfeitos } from '../itens-magicos-catalogo.js';
+import { efeitosDaArma, itemAtivo } from '../regras-itens-magicos.js';
+import { magiasDeItens, rotuloConjuracao, rotuloCusto } from '../regras-magias-itens.js';
+import { rotuloRecursosImpressao } from '../regras-recursos-itens.js';
+import { bonusProficiencia, calcAtaqueMagia, calcCDMagia, calcBonusPericia, calcCA, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcMod, calcPercepcaoPassiva, calcSalvaguarda, conjuracoesPorClasse, escHtml, fmtMod, getDeslocamento, getTamanho, mdParaHtml, circuloSuperiorHtml, toast } from '../utils.js';
 import { SUBTRACOS_ESPECIE, gerarTracoSinteticoEspecie } from './caracteristicas.js';
 import { getEstadoRecursosBruxo } from './classes/bruxo.js';
 import { forcaPrimordialAtiva, getAtaquesPorAcao, getDeslocamentoFinal, getModIniciativa } from './combate.js';
+import { visaoNoEscuroDaEspecie } from './condicoes.js';
+import { defesasDeItens, ROTULO_SENTIDO, sentidosDeItens } from '../regras-passivos-itens.js';
 import { char, classeData, especiesCache, indiceMagiasCache, passivosTalentosCache, seloPrerequisitoDispensado, talentosCache } from './estado.js';
 import { conjuraPorAlgumaClasse } from '../regras-multiclasse-conjuracao.js';
 import { armadurasDoPersonagem, armasDoPersonagem } from '../regras-multiclasse-proficiencias.js';
@@ -69,11 +76,74 @@ function _montarEfeitoDetalheItem(item) {
       item.dados?.preco || '',
       item.dados?.peso || '',
     ].filter(Boolean).join(' | ');
+  } else if (item.tipo === 'magico') {
+    // Item mágico do acervo: os efeitos declarados (mesmo texto dos selos da
+    // ficha) e a linha de tipo do livro.
+    efeito = [..._textosDeEfeitosAtivos(item), item.dados?.linha_tipo || '']
+      .filter(Boolean).join(' | ');
+    detalhe = [item.dados?.raridade || '', item.dados?.requer_sintonizacao ? 'Requer Sintonizacao' : ''].filter(Boolean).join(' | ');
   } else {
     efeito = item.descricao || '';
     detalhe = [item.dados?.custo, item.dados?.peso].filter(Boolean).join(' | ');
   }
+  // Arma/armadura/escudo mágicos: raridade e sintonização antes do detalhe da base.
+  if (item.tipo !== 'magico' && item.dados?.magico_id) {
+    // O efeito da base não traz o +N: soma os selos de efeito e o bônus de Atq/Dano da arma.
+    const extras = _textosDeEfeitosAtivos(item);
+    // Arma guardada na mochila não soma Atq/Dano: o bônus só vale equipada.
+    if (item.tipo === 'arma' && item.equipado) {
+      const bonus = efeitosDaArma(item);
+      if (bonus.ataque || bonus.dano) {
+        const fmt = (n) => `${n > 0 ? '+' : ''}${n}`;
+        // Só as partes diferentes de zero entram no texto.
+        if (bonus.ataque === bonus.dano) extras.push(`${fmt(bonus.ataque)} Atq/Dano`);
+        else extras.push([bonus.ataque ? `${fmt(bonus.ataque)} Atq` : '', bonus.dano ? `${fmt(bonus.dano)} Dano` : ''].filter(Boolean).join(' / '));
+      }
+    }
+    efeito = [efeito, ...extras].filter(Boolean).join(' | ');
+    detalhe = [item.dados.raridade || '', item.dados.requer_sintonizacao ? 'Requer Sintonizacao' : '', detalhe].filter(Boolean).join(' | ');
+  }
+  // Cargas e usos do item (texto próprio da impressão; os chips da tela são no-print).
+  efeito = [efeito, rotuloRecursosImpressao(item)].filter(Boolean).join(' | ');
   return { efeito, detalhe };
+}
+
+/**
+ * Textos dos efeitos do item que valem em jogo agora (equipado e, quando
+ * exigido, sintonizado). Efeito inativo (guardado, sem sintonização, com
+ * condição não satisfeita ou "sem efeito") não é impresso.
+ * @param {object} item Item do inventário.
+ * @returns {string[]}
+ */
+function _textosDeEfeitosAtivos(item) {
+  return selosDeEfeitos(item, char, { visaoNoEscuroBase: visaoNoEscuroDaEspecie(char, especiesCache) })
+    .filter(s => s.ativo).map(s => s.texto);
+}
+
+/** Nome do item na impressão, com "(destruído)" quando o item foi destruído. */
+function _nomeItemImpressao(item) {
+  return item.destruido ? `${item.nome} (destruído)` : item.nome;
+}
+
+/**
+ * Seção "Magias de Itens" da folha impressa: uma linha por magia de item
+ * ativo (equipado e sintonizado quando exigido), com item, custo e CD/ataque.
+ * Sem botões. Vazio quando nenhum item ativo tem magias.
+ * @returns {string} HTML da seção.
+ */
+function _htmlMagiasDeItensImpressao() {
+  const linhas = magiasDeItens(char).filter(l => itemAtivo(l.item));
+  if (!linhas.length) return '';
+  const conj = { cd: calcCDMagia(char), ataque: calcAtaqueMagia(char) };
+  return `<div class="print-section"><div class="print-section-title">Magias de Itens</div>
+    ${linhas.map(({ item, magia }) => {
+    const rc = rotuloConjuracao(magia, conj);
+    return `<div class="print-inv-item print-item-magia">
+          <span class="print-inv-name">${escHtml(magia.nome)}</span>
+          <span class="print-inv-effect">${escHtml([item.nome, rotuloCusto(magia, item), rc.texto].filter(Boolean).join(' | '))}</span>
+        </div>`;
+  }).join('')}
+  </div>`;
 }
 
 /**
@@ -212,7 +282,6 @@ function htmlMagiaPersonalizadaImpressao(registro) {
 export async function gerarHtmlImpressao() {
   const prof = bonusProficiencia(char.nivel);
   const ca = calcCA(char, passivosTalentosCache);
-  const modCon = calcMod(char.atributos.constituicao);
   const iniciativa = getModIniciativa();
   const ataquesPorAcao = getAtaquesPorAcao();
 
@@ -375,7 +444,7 @@ export async function gerarHtmlImpressao() {
       <div class="print-attr-grid">
         ${ATRIBUTOS_KEYS.map(key => {
           const nome = ATRIBUTOS_NOMES[key];
-          const val = char.atributos[key];
+          const val = atributoEfetivo(char, key);
           const mod = calcMod(val);
           return `
             <div class="print-attr-box">
@@ -395,10 +464,9 @@ export async function gerarHtmlImpressao() {
       <div class="print-saves-grid">
         ${ATRIBUTOS_KEYS.map(key => {
           const nome = ATRIBUTOS_NOMES[key];
-          const mod = calcMod(char.atributos[key]);
           // Mesma fonte única da ficha (sheet/ficha.js).
           const proficiente = ehProficienteEmSalvaguarda(char, nome);
-          const bonus = mod + (proficiente ? prof : 0);
+          const bonus = calcSalvaguarda(char, key);
           return `
             <div class="print-save-item">
               <div class="print-save-prof ${proficiente ? 'ativo' : ''}"></div>
@@ -414,18 +482,11 @@ export async function gerarHtmlImpressao() {
   const percepcao = calcPercepcaoPassiva(char);
   const intuicao = calcIntuicaoPassiva(char);
   const investigacao = calcInvestigacaoPassiva(char);
-  let visaoEscuro = '';
-  if (especiesCache?.especies) {
-    const esp = especiesCache.especies.find(e => e.nome === char.especie);
-    if (esp?.tracos) {
-      const tracoVE = esp.tracos.find(t => t.nome === 'Visao no Escuro' || t.nome === 'Visão no Escuro');
-      if (tracoVE) {
-        const matchAlc = tracoVE.descricao?.match(/alcance de (\d+)/i);
-        visaoEscuro = matchAlc ? `${matchAlc[1]} m` : '18 m';
-      }
-      if ((char.tracos_escolhidos || []).includes('Drow')) visaoEscuro = '36 m';
-    }
-  }
+  const baseVE = visaoNoEscuroDaEspecie(char, especiesCache);
+  const sentidosItem = sentidosDeItens(char, baseVE);
+  const veItem = sentidosItem.find(x => x.sentido === 'visao_no_escuro');
+  const visaoEscuro = veItem ? `${veItem.metros} m` : (baseVE > 0 ? `${baseVE} m` : '');
+  const sentidosItemExtras = sentidosItem.filter(x => x.sentido !== 'visao_no_escuro');
   pag1 += `
     <div class="print-section">
       <div class="print-section-title">Sentidos Passivos</div>
@@ -434,19 +495,24 @@ export async function gerarHtmlImpressao() {
         <div class="print-sense-item"><div class="print-sense-value">${intuicao}</div><div class="print-sense-label">Intuição</div></div>
         <div class="print-sense-item"><div class="print-sense-value">${investigacao}</div><div class="print-sense-label">Investigação</div></div>
         ${visaoEscuro ? `<div class="print-sense-item"><div class="print-sense-value">${visaoEscuro}</div><div class="print-sense-label">Visão no Escuro</div></div>` : ''}
+        ${sentidosItemExtras.map(x => `<div class="print-sense-item"><div class="print-sense-value">${escHtml(String(x.metros))} m</div><div class="print-sense-label">${ROTULO_SENTIDO[x.sentido]}</div></div>`).join('')}
       </div>
     </div>
   `;
 
   // --- Defesas ---
+  const dItens = defesasDeItens(char);
   const resistencias = [...(char.resistencias || [])];
   const vulnerabilidades = char.vulnerabilidades || [];
   const imunidades = char.imunidades || [];
-  if (resistencias.length > 0 || vulnerabilidades.length > 0 || imunidades.length > 0) {
+  // Defesas de itens mágicos ativos (4C): sem repetir tipo já listado.
+  const resistenciasItem = dItens.resistencias.filter(r => !resistencias.includes(r.tipo));
+  const imunidadesItem = dItens.imunidades.filter(i => !imunidades.includes(i.tipo));
+  if (resistencias.length > 0 || vulnerabilidades.length > 0 || imunidades.length > 0 || resistenciasItem.length > 0 || imunidadesItem.length > 0) {
     pag1 += `<div class="print-section"><div class="print-section-title">Defesas</div><div class="print-defenses">`;
-    if (resistencias.length > 0) pag1 += `<div><strong>Resistencias:</strong> ${resistencias.join(', ')}</div>`;
+    if (resistencias.length > 0 || resistenciasItem.length > 0) pag1 += `<div><strong>Resistencias:</strong> ${[...resistencias, ...resistenciasItem.map(r => `${escHtml(r.tipo)} (Item)`)].join(', ')}</div>`;
     if (vulnerabilidades.length > 0) pag1 += `<div><strong>Vulnerabilidades:</strong> ${vulnerabilidades.join(', ')}</div>`;
-    if (imunidades.length > 0) pag1 += `<div><strong>Imunidades:</strong> ${imunidades.join(', ')}</div>`;
+    if (imunidades.length > 0 || imunidadesItem.length > 0) pag1 += `<div><strong>Imunidades:</strong> ${[...imunidades, ...imunidadesItem.map(i => `${escHtml(i.tipo)} (Item)`)].join(', ')}</div>`;
     pag1 += `</div></div>`;
   }
 
@@ -492,7 +558,7 @@ export async function gerarHtmlImpressao() {
       const qtd = (item.quantidade ?? 1) > 1 ? ` (x${item.quantidade})` : '';
       pag1 += `
         <div class="print-equip-item">
-          <span class="print-equip-name">${escHtml(item.nome)}${qtd}</span>
+          <span class="print-equip-name">${escHtml(_nomeItemImpressao(item))}${qtd}</span>
           ${efeito ? `<span class="print-equip-effect">${escHtml(efeito)}</span>` : ''}
           ${detalhe ? `<span class="print-equip-detail">${escHtml(detalhe)}</span>` : ''}
         </div>`;
@@ -829,6 +895,9 @@ export async function gerarHtmlImpressao() {
     }
   }
 
+  // Magias conjuradas por itens ativos: valem para qualquer personagem, conjurador ou não.
+  pagMagias += _htmlMagiasDeItensImpressao();
+
   // ===================== ULTIMAS PAGINAS (Inventario + Detalhes) =====================
   let pagFinal = '';
 
@@ -847,7 +916,7 @@ export async function gerarHtmlImpressao() {
       const qtd = (item.quantidade ?? 1) > 1 ? ` (x${item.quantidade})` : '';
       pagFinal += `
         <div class="print-inv-item">
-          <span class="print-inv-name">${escHtml(item.nome)}${qtd}</span>
+          <span class="print-inv-name">${escHtml(_nomeItemImpressao(item))}${qtd}</span>
           ${efeito ? `<span class="print-inv-effect">${escHtml(efeito)}</span>` : ''}
           ${detalhe ? `<span class="print-inv-detail">${escHtml(detalhe)}</span>` : ''}
         </div>`;

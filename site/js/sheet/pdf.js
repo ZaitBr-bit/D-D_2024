@@ -3,11 +3,14 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES } from '../dados-classes.js';
-import { baixarArquivo, bonusProficiencia, calcBonusPericia, calcCA, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcMod, calcPercepcaoPassiva, conjuracoesPorClasse, fmtMod, getDeslocamento, removerMarcadoresDado, toast } from '../utils.js';
+import { baixarArquivo, bonusProficiencia, calcBonusPericia, calcCA, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcMod, calcPercepcaoPassiva, calcSalvaguarda, conjuracoesPorClasse, fmtMod, getDeslocamento, removerMarcadoresDado, toast } from '../utils.js';
 import { forcaPrimordialAtiva, getDeslocamentoFinal, getModIniciativa } from './combate.js';
 import { char, especiesCache, passivosTalentosCache } from './estado.js';
 import { classesDe } from '../regras-multiclasse.js';
+import { atributoEfetivo } from '../regras-atributos.js';
 import { ehProficienteEmSalvaguarda } from '../regras-salvaguardas.js';
+import { defesasDeItens, ROTULO_SENTIDO, sentidosDeItens } from '../regras-passivos-itens.js';
+import { visaoNoEscuroDaEspecie } from './condicoes.js';
 import { gerarHtmlImpressao } from './impressao.js';
 
 /* ===========================================================================
@@ -83,6 +86,26 @@ export function montarSubtituloCartaoPdf(c) {
 }
 
 /**
+ * Sentidos de alcance do personagem como textos do cartão do PDF (ex.:
+ * "Visão no Escuro 18 m"), pelas mesmas funções da tela: Visão no Escuro da
+ * espécie ou a de item quando a supera (visaoNoEscuroDaEspecie /
+ * sentidosDeItens) e os demais sentidos de itens ativos.
+ * @param {object} personagem Personagem.
+ * @param {object} cacheEspecies Cache de espécies (`{ especies: [...] }`).
+ * @returns {string[]} Textos "Sentido N m"; vazio sem nenhum sentido.
+ */
+export function sentidosDeAlcanceParaPdf(personagem, cacheEspecies) {
+  const baseVE = visaoNoEscuroDaEspecie(personagem, cacheEspecies);
+  const sentidosItem = sentidosDeItens(personagem, baseVE);
+  const veItem = sentidosItem.find(s => s.sentido === 'visao_no_escuro');
+  const metrosVE = veItem ? veItem.metros : baseVE;
+  const out = [];
+  if (metrosVE > 0) out.push(`${ROTULO_SENTIDO.visao_no_escuro} ${metrosVE} m`);
+  for (const s of sentidosItem.filter(x => x.sentido !== 'visao_no_escuro')) out.push(`${ROTULO_SENTIDO[s.sentido]} ${s.metros} m`);
+  return out;
+}
+
+/**
  * Reune os dados da ficha num objeto estruturado para o cartao desenhado do PDF
  * (cabecalho, stats de combate, atributos, salvaguardas, pericias, sentidos,
  * defesas, equipado). Talentos/caracteristicas/magias com descricao vem depois,
@@ -126,15 +149,14 @@ function _montarDadosCartao() {
 
   const atributos = ATRIBUTOS_KEYS.map(k => ({
     nome: ATRIBUTOS_NOMES[k],
-    mod: fmtMod(calcMod(char.atributos[k])),
-    val: String(char.atributos[k]),
+    mod: fmtMod(calcMod(atributoEfetivo(char, k))),
+    val: String(atributoEfetivo(char, k)),
   }));
 
   const saves = ATRIBUTOS_KEYS.map(k => {
-    const m = calcMod(char.atributos[k]);
-    // Mesma fonte única da ficha e da impressão.
+    // Mesma conta da ficha e da impressão (utils.js calcSalvaguarda).
     const p = ehProficienteEmSalvaguarda(char, ATRIBUTOS_NOMES[k]);
-    return { nome: ATRIBUTOS_NOMES[k], bonus: fmtMod(m + (p ? prof : 0)), prof: p };
+    return { nome: ATRIBUTOS_NOMES[k], bonus: fmtMod(calcSalvaguarda(char, k)), prof: p };
   });
 
   const listaBase = ['Percepção','Intuição','Investigação','Religião','História','Prestidigitação','Furtividade','Persuasão','Atletismo','Medicina','Acrobacia','Enganação','Arcanismo','Sobrevivência','Natureza','Atuação','Intimidação','Lidar com Animais'];
@@ -149,12 +171,18 @@ function _montarDadosCartao() {
     ['Percepção', calcPercepcaoPassiva(char)],
     ['Intuição', calcIntuicaoPassiva(char)],
     ['Investigação', calcInvestigacaoPassiva(char)],
-  ].map(([n, v]) => `${n} ${v}`);
+  ].map(([n, v]) => `${n} ${v}`).concat(sentidosDeAlcanceParaPdf(char, especiesCache));
 
+  // Defesas de itens mágicos ativos (4C): só o tipo, sem repetir os fixos.
+  const dItens = defesasDeItens(char);
+  const resistPdf = [...(char.resistencias || [])];
+  dItens.resistencias.forEach(r => { if (!resistPdf.includes(r.tipo)) resistPdf.push(r.tipo); });
+  const imunPdf = [...(char.imunidades || [])];
+  dItens.imunidades.forEach(i => { if (!imunPdf.includes(i.tipo)) imunPdf.push(i.tipo); });
   const defesas = [];
-  if ((char.resistencias || []).length) defesas.push(`Resist.: ${char.resistencias.join(', ')}`);
+  if (resistPdf.length) defesas.push(`Resist.: ${resistPdf.join(', ')}`);
   if ((char.vulnerabilidades || []).length) defesas.push(`Vulner.: ${char.vulnerabilidades.join(', ')}`);
-  if ((char.imunidades || []).length) defesas.push(`Imun.: ${char.imunidades.join(', ')}`);
+  if (imunPdf.length) defesas.push(`Imun.: ${imunPdf.join(', ')}`);
 
   const inv = char.inventario || [];
   const equipado = inv.filter(i => i.equipado && (i.quantidade ?? 1) > 0)
@@ -209,6 +237,14 @@ export function extrairBlocosDetalhe(html) {
         if (nome) blocos.push({ t: 'name', text: nome });
         if (meta) blocos.push({ t: 'meta', text: meta });
         if (desc) blocos.push({ t: 'p', text: desc });
+      });
+    } else if (sec.querySelectorAll('.print-item-magia').length) {
+      // Magias de Itens: uma linha compacta por magia ("Magia: item | custo | CD").
+      sec.querySelectorAll('.print-item-magia').forEach(it => {
+        const nome = limpar(it.querySelector('[class$="-name"]')?.textContent);
+        const efeito = limpar(it.querySelector('[class$="-effect"]')?.textContent);
+        const linha = [nome, efeito].filter(Boolean).join(': ');
+        if (linha) blocos.push({ t: 'p', text: linha });
       });
     } else if (sec.querySelectorAll('.print-inv-item, .print-equip-item').length) {
       // Um bloco por item: nome em negrito, efeito e detalhe em paragrafos
@@ -423,9 +459,9 @@ function _desenharCartao(ctx, dados) {
 
   // Sentidos passivos
   _pdfSecHead(ctx, 'Sentidos Passivos');
-  ctx.ensure(14);
-  _pdfTxt(ctx, dados.sentidos.join('    '), ctx.M + 2, ctx.y - 10, ctx.font, 8.5, C.ink);
-  ctx.y -= 16;
+  // Quebra em mais de uma linha quando os sentidos excedem a largura útil.
+  _pdfWrap(ctx, dados.sentidos.join(' | '), 8.5, C.ink);
+  ctx.y -= 4;
 
   // Defesas (se houver)
   if (dados.defesas.length) {
@@ -480,6 +516,11 @@ async function _renderizarPdf(PDFLib, dados, detalhes) {
   if (detalhes && detalhes.length) { ctx.y -= 6; _fluirBlocos(ctx, detalhes); }
 
   return doc.save();
+}
+
+/** Dados do cartão do PDF da ficha atual (exposto para teste; o PDF usa os mesmos dados). */
+export function montarDadosCartaoPdf() {
+  return _montarDadosCartao();
 }
 
 async function gerarPdfFicha() {

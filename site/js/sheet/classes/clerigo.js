@@ -4,6 +4,7 @@
 // Consultado pela ficha, pelos descansos e pelas habilidades ativas.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
+import { atributoEfetivo } from '../../regras-atributos.js';
 import { calcMod } from '../../utils.js';
 import { char } from '../estado.js';
 import { temClasse, nivelNa } from '../../regras-multiclasse.js';
@@ -87,7 +88,7 @@ export function getEstadoSubclassesClerigo() {
   const estado = getEstadoRecursosClerigo();
   if (!estado) return null;
 
-  const modSab = Math.max(1, calcMod(char.atributos.sabedoria));
+  const modSab = Math.max(1, calcMod(atributoEfetivo(char, 'sabedoria')));
   const sub = char.recursos.clerigo.subclasses;
 
   const sacerdoteMax = modSab;

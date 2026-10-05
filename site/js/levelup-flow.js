@@ -8,6 +8,7 @@ import { contextoDeSubida } from './regras-multiclasse-progressao.js';
 import { classesDe } from './regras-multiclasse.js';
 import { concessoesAoEntrarEm } from './regras-multiclasse-proficiencias.js';
 import { ORDEM_CLASSE } from './regras-ordem-classe.js';
+import { atributoEfetivo } from './regras-atributos.js';
 // INSTRUMENTOS_MUSICAIS vem de regras-cobertura.js, a MESMA copia que
 // levelup.js valida (Ruling 8 da Tarefa 4) -- proficienciaClasseNovaCompleta
 // (abaixo) confere o instrumento escolhido contra ela, para o predicado
@@ -247,7 +248,8 @@ export async function buildLevelUpContext(char, classeData, helpers = {}, nomeCl
     throw new Error(
       `Classe fora do catálogo: "${classeQueSobe}" não tem dado de vida em CLASSES_INFO`);
   }
-  const modCon = calcMod(char.atributos.constituicao);
+  // Modificador de Constituição em jogo: com item que fixa a Constituição (Amuleto da Saúde) o máximo sobe por ele.
+  const modCon = calcMod(Number(atributoEfetivo(char, 'constituicao')) || 10);
   // Dado de vida da CLASSE QUE SOBE (`info` é dela), não o da classe
   // inicial: um Mago 5 que sobe Guerreiro rola d10.
   const hpGanhoFixo = Math.max(1, Math.floor(info.dado_vida / 2) + 1 + modCon);

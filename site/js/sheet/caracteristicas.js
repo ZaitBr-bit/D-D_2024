@@ -2,6 +2,7 @@
 // Caracteristicas de classe, subclasse e tracos de especie
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
+import { atributoEfetivo } from '../regras-atributos.js';
 import { bonusProficiencia, calcMod, detectarRecarga, ehHabilidadeAtiva, escHtml, mdParaHtml } from '../utils.js';
 import { char, especiesCache } from './estado.js';
 import { contextosDeClasse } from './contexto-classe.js';
@@ -363,7 +364,7 @@ function renderTracoEspecie(traco, herdaAncestralidade = false, ehSubRevelacao =
     };
     const dragao = (char.tracos_escolhidos || [])[0] || '';
     const tipoDano = herancaMap[dragao] || '???';
-    const cdSopro = 8 + calcMod(char.atributos?.constituicao || 10) + bonusProficiencia(nivel);
+    const cdSopro = 8 + calcMod(atributoEfetivo(char, 'constituicao') || 10) + bonusProficiencia(nivel);
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${usosMax - usosAtual}/${usosMax}</span>`;
     usosHtmlBody = `
       <div class="no-print" style="padding:4px 0 4px 16px;display:flex;flex-direction:column;gap:4px">
@@ -455,7 +456,7 @@ function renderTracoEspecie(traco, herdaAncestralidade = false, ehSubRevelacao =
     </div>`;
   }
   if (traco.nome === 'Mimetismo' && char.especie === 'Kenku') {
-    const cdMimetismo = 8 + bonusProficiencia(char.nivel) + calcMod(char.atributos?.carisma || 10);
+    const cdMimetismo = 8 + bonusProficiencia(char.nivel) + calcMod(atributoEfetivo(char, 'carisma') || 10);
     infoEscolhaTraco = `<div class="info-box info" style="font-size:0.8rem;margin-top:6px"><strong>CD do Mimetismo:</strong> ${cdMimetismo} (8 + Bônus Prof. + mod. Carisma)</div>`;
   }
   if (traco.nome === 'Versátil' && char.talento_versatil) {

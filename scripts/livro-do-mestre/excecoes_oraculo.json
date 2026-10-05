@@ -1,0 +1,74 @@
+{
+  "_leia": "Divergência OCR x acervo conferida NA IMAGEM da página. tipo: {pagina_pdf: {acervo, ocr, motivo}}; dados: {'pagina:XdY': motivo}; cd: {'pagina:N': motivo}.",
+  "tipo": {
+    "231": {
+      "acervo": 3,
+      "ocr": 1,
+      "motivo": "Imagem: Adamantine Armor e Adamantine Weapon têm a raridade 'Uncommon' quebrada na linha seguinte; o OCR leu 'Armor (Any Medium or Heavy, Except' / 'Uncommon' e 'Weapon (Any Ammunition or Melee Weapon),' / 'Uncommon', que o RE_TIPO (raridade na mesma linha) não casa. Só 'Wondrous Item, Uncommon' (Alchemy Jug) foi contado."
+    },
+    "252": {
+      "acervo": 3,
+      "ocr": 2,
+      "motivo": "Imagem: a linha de tipo de Dancing Sword quebra a raridade para a linha seguinte; o OCR só contou Dagger of Venom e Dark Shard Amulet."
+    },
+    "261": {
+      "acervo": 6,
+      "ocr": 5,
+      "motivo": "Imagem: 6 cabeçalhos (Efreeti Chain, Elemental Gem, Elixir of Health, Elven Chain, Enduring Spellbook, Energy Bow); o OCR leu a linha de Efreeti Chain com um caractere lixo antes de 'Armor (Chain Mail or Chain Shirt), Legendary (Requires' e não a contou."
+    },
+    "263": {
+      "acervo": 4,
+      "ocr": 3,
+      "motivo": "Imagem: a linha de tipo do Executioner's Axe quebra a raridade para a linha seguinte ('Weapon (Battleaxe, Greataxe, Halberd, or Handaxe),' / 'Very Rare'); o OCR não conta essa linha."
+    },
+    "267": {
+      "acervo": 3,
+      "ocr": 2,
+      "motivo": "Imagem: a linha de tipo do Frost Brand ocupa três linhas ('Weapon (Glaive, Greatsword, Longsword, Rapier,' / 'Scimitar, or Shortsword), Very Rare (Requires' / 'Attunement)'); o OCR só conta Flame Tongue e Folding Boat."
+    },
+    "279": {
+      "acervo": 6,
+      "ocr": 5,
+      "motivo": "Imagem: a linha de tipo da Luck Blade quebra em três linhas ('Weapon (Glaive, Greatsword, Longsword, Rapier,' / 'Scimitar, Sickle, or Shortsword), Legendary (Requires' / 'Attunement)'); o OCR não contou essa linha."
+    },
+    "283": {
+      "acervo": 2,
+      "ocr": 0,
+      "motivo": "Imagem: na Mithral Armor, 'Uncommon' quebra para a linha seguinte ('Armor (Any Medium or Heavy, Except Hide Armor),' / 'Uncommon'); a Moonblade ocupa três linhas ('Weapon (Greatsword, Longsword, Rapier, Scimitar, or' / 'Shortsword), Legendary (Requires Attunement by a' / 'Creature of the Weapon's Choice)'). O OCR não contou nenhuma das duas."
+    },
+    "284": {
+      "acervo": 5,
+      "ocr": 4,
+      "motivo": "Imagem: a linha de tipo da Moon-Touched Sword quebra antes da raridade ('Weapon (Glaive, Greatsword, Longsword, Rapier,' / 'Scimitar, or Shortsword), Common'); o OCR não a contou."
+    },
+    "292": {
+      "acervo": 10,
+      "ocr": 17,
+      "motivo": "OCR contou como linha de tipo 5 linhas da tabela de Potion of Giant Strength e 3 da de Potion of Healing e não pegou a linha de tipo de Potion of Poison; a imagem tem 10 cabeçalhos"
+    },
+    "308": {
+      "acervo": 4,
+      "ocr": 3,
+      "motivo": "Imagem: 4 cabeçalhos (Shield of Missile Attraction, Shield of the Cavalier, Silvered Weapon, Slippers of Spider Climbing); o OCR não captou a linha 'Armor (Shield), Very Rare (Requires Attunement)' de Shield of the Cavalier."
+    },
+    "309": {
+      "acervo": 4,
+      "ocr": 2,
+      "motivo": "Imagem: 4 cabeçalhos (Smoldering Armor, Sovereign Glue, Spellguard Shield, Spell Scroll); o OCR não captou 'Armor (Any Heavy, Medium, or Light), Common' nem 'Armor (Shield), Very Rare (Requires Attunement)'."
+    },
+    "318": {
+      "acervo": 6,
+      "ocr": 1,
+      "motivo": "Imagem: as linhas de tipo das cinco armas da página quebram em 2-3 linhas e o OCR não as contou; só achou a do Talisman of Pure Good"
+    },
+    "322": {
+      "acervo": 6,
+      "ocr": 5,
+      "motivo": "Imagem: a linha de tipo da Vorpal Sword quebra a raridade para a linha seguinte e o OCR não a contou"
+    }
+  },
+  "dados": {},
+  "cd": {
+    "291:1": "OCR leu 'DC 1 Dexterity' em Potion of Fire Breath; a imagem tem DC 13"
+  }
+}

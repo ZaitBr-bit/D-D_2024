@@ -8,7 +8,7 @@
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES } from '../dados-classes.js';
 import { getMagiasClasse, getTalentos } from '../db.js';
 import { bindEscolhasTalento, renderEscolhasTalento } from '../levelup-ui.js';
-import { aplicarASITalento, exigeDadivaEpica, obterAtributosASITalento, obterTalentosElegiveis, registrarDadivaEpicaLegada, talentoPermitidoNaRecuperacaoDadiva, validarDistribuicaoASI } from '../levelup.js';
+import { aplicarASITalento, comAjustePvPorCon, exigeDadivaEpica, obterAtributosASITalento, obterTalentosElegiveis, registrarDadivaEpicaLegada, talentoPermitidoNaRecuperacaoDadiva, validarDistribuicaoASI } from '../levelup.js';
 import { aplicarEfeitoTalento, getRegraTalento, obterEscolhasObrigatoriasTalento, validarEscolhasTalento } from '../regras-cobertura.js';
 import { aplicarDeltaSistema } from '../ficha-edicoes.js';
 import { abrirModal, escHtml, mdParaHtml, nomesMagiaCirculo1Conhecidas, semAcento, toast } from '../utils.js';
@@ -606,6 +606,45 @@ export async function abrirModalEditarIniciadoEmMagia(ordinal) {
   });
 }
 
+/**
+ * Aplica um talento adicionado manualmente: aumento de atributo (com o PV
+ * acompanhando o modificador de Constituição, como no ASI do level-up),
+ * efeito do talento e registro em `talentos`. Se o aumento ou o efeito
+ * falhar, restaura atributos, PV, `edicoes` e `talentos` ao estado anterior.
+ * @returns {{sucesso: boolean, erro?: string}}
+ */
+export function aplicarTalentoNaFicha(personagem, { nome, talento, atributoASI, escolhas, aumentosAtributo }) {
+  const snapshot = {
+    atributos: structuredClone(personagem.atributos),
+    pv_max: personagem.pv_max,
+    pv_atual: personagem.pv_atual,
+    edicoes: structuredClone(personagem.edicoes),
+    talentos: structuredClone(personagem.talentos)
+  };
+  const restaurar = () => {
+    for (const [campo, valor] of Object.entries(snapshot)) {
+      if (valor === undefined) delete personagem[campo];
+      else personagem[campo] = valor;
+    }
+  };
+  const resultadoAumento = comAjustePvPorCon(personagem, () => {
+    if (nome === 'Aumento no Valor de Atributo') {
+      for (const [atributo, valor] of Object.entries(aumentosAtributo)) {
+        aplicarDeltaSistema(personagem, `atributos.${atributo}`, valor, 20);
+      }
+    } else if (atributoASI) {
+      return aplicarASITalento(personagem, talento, atributoASI);
+    }
+    return { sucesso: true };
+  });
+  if (!resultadoAumento.sucesso) { restaurar(); return resultadoAumento; }
+  const resultadoEfeito = aplicarEfeitoTalento(personagem, nome, escolhas);
+  if (!resultadoEfeito.sucesso) { restaurar(); return resultadoEfeito; }
+  if (!personagem.talentos) personagem.talentos = [];
+  personagem.talentos.push(nome);
+  return { sucesso: true };
+}
+
 /** Modal para adicionar um talento manualmente à ficha */
 export async function abrirModalAdicionarTalento() {
   const data = talentosCache || await getTalentos();
@@ -641,21 +680,8 @@ export async function abrirModalAdicionarTalento() {
       toast(validacao.erro, 'error');
       return false;
     }
-    if (nome === 'Aumento no Valor de Atributo') {
-      for (const [atributo, valor] of Object.entries(aumentosAtributo)) {
-        aplicarDeltaSistema(char, `atributos.${atributo}`, valor, 20);
-      }
-    } else if (atributoASI) {
-      const resultadoASI = aplicarASITalento(char, talento, atributoASI);
-      if (!resultadoASI.sucesso) { toast(resultadoASI.erro, 'error'); return false; }
-    }
-    const resultadoEfeito = aplicarEfeitoTalento(char, nome, escolhasCompletas);
-    if (!resultadoEfeito.sucesso) {
-      toast(resultadoEfeito.erro, 'error');
-      return false;
-    }
-    if (!char.talentos) char.talentos = [];
-    char.talentos.push(nome);
+    const aplicado = aplicarTalentoNaFicha(char, { nome, talento, atributoASI, escolhas: escolhasCompletas, aumentosAtributo });
+    if (!aplicado.sucesso) { toast(aplicado.erro, 'error'); return false; }
     salvar();
     // `fecharModalTodos`, não `fecharModal`: o fluxo tem dois passos, e para
     // talento com escolhas a tela "Configurar Talento" abre EMPILHADA sobre

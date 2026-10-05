@@ -1,0 +1,66 @@
+{
+  "lote": "07",
+  "itens": {
+    "azagaia-do-relampago": {"base":{"tipo":"arma","opcoes":["Azagaia"]},"efeitos":[],"recursos":{"usos":[{"nome":"Relâmpago","max":1,"recupera":"amanhecer"}]}},
+    "lamina-da-sorte": {"base":{"tipo":"arma","opcoes":["Glaive","Espada Grande","Espada Longa","Rapieira","Cimitarra","Foice","Espada Curta"]},"efeitos":[{"alvo":"ataque_arma","valor":1},{"alvo":"dano_arma","valor":1},{"alvo":"salvaguarda","valor":1}],"recursos":{"usos":[{"nome":"Sorte","max":1,"recupera":"amanhecer"},{"nome":"Desejo","max":1,"recupera":"amanhecer"}]}},
+    "alaude-da-pancada-trovejante": {"base":{"tipo":"arma","opcoes":["Clava"]},"efeitos":[]},
+    "maca-da-ruptura": {"base":{"tipo":"arma","opcoes":["Maça"]},"efeitos":[]},
+    "maca-da-destruicao": {"base":{"tipo":"arma","opcoes":["Maça"]},"efeitos":[{"alvo":"ataque_arma","valor":1},{"alvo":"dano_arma","valor":1}]},
+    "maca-do-terror": {"base":{"tipo":"arma","opcoes":["Maça"]},"efeitos":[],"recursos":{"cargas":{"max":3,"recupera":"1d3","ultima_carga":null}}},
+    "armadura-do-marinheiro": {"base":{"tipo":"armadura","categorias":["Leve","Média","Pesada"]},"efeitos":[{"alvo":"deslocamento","modo":"natacao","igual_deslocamento":true}],"recursos":{"usos":[{"nome":"Cura debaixo d'água","max":1,"recupera":"amanhecer"}]}},
+    "armadura-de-mitral": {"base":{"tipo":"armadura","categorias":["Média","Pesada"],"excluir":["Gibão de Peles"],"sem_penalidades":true},"efeitos":[]},
+    "lamina-lunar": {"base":{"tipo":"arma","opcoes":["Espada Grande","Espada Longa","Rapieira","Cimitarra","Espada Curta"]},"efeitos":[]},
+    "espada-tocada-pela-lua": {"base":{"tipo":"arma","opcoes":["Glaive","Espada Grande","Espada Longa","Rapieira","Cimitarra","Espada Curta"]},"efeitos":[]},
+    "ladra-de-nove-vidas": {"base":{"tipo":"arma","categorias":["Armas Simples Corpo a Corpo","Armas Simples à Distância","Armas Marciais Corpo a Corpo","Armas Marciais à Distância"]},"efeitos":[{"alvo":"ataque_arma","valor":2},{"alvo":"dano_arma","valor":2}]},
+    "arco-do-juramento": {"base":{"tipo":"arma","opcoes":["Arco Longo","Arco Curto"]},"efeitos":[]},
+    "medalhao-dos-pensamentos": {"efeitos":[],"recursos":{"cargas":{"max":5,"recupera":"1d4","ultima_carga":null}},"magias":[{"nome":"Detectar Pensamentos","custo":{"cargas":1},"conjuracao":{"cd":13}}]},
+    "manto-de-resistencia-a-magias": {"efeitos":[{"alvo":"vantagem","em":"salvaguarda","contexto":"contra magias"}]},
+    "colar-de-adaptacao": {"efeitos":[{"alvo":"vantagem","em":"salvaguarda","contexto":"para evitar ou encerrar a condição Envenenado"}]},
+    "manual-da-saude-corporal": {"efeitos":[],"aumento_permanente":{"atributo":"constituicao","valor":2,"maximo":30}},
+    "manual-do-exercicio-proveitoso": {"efeitos":[],"aumento_permanente":{"atributo":"forca","valor":2,"maximo":30}},
+    "manual-da-rapidez-de-acao": {"efeitos":[],"aumento_permanente":{"atributo":"destreza","valor":2,"maximo":30}}
+  },
+  "sem_efeito_automatico": [
+    "unguento-de-keoghtom",
+    "lanterna-reveladora",
+    "cadeado-ardiloso",
+    "manual-dos-golens",
+    "manual-dos-golens-barro",
+    "manual-dos-golens-carne",
+    "manual-dos-golens-ferro",
+    "manual-dos-golens-pedra",
+    "espelho-aprisionador-de-vidas",
+    "chave-misteriosa",
+    "manto-da-natureza",
+    "colar-de-bolas-de-fogo",
+    "colar-de-contas-de-oracao",
+    "pigmentos-maravilhosos-de-nolzur",
+    "oleo-de-etereidade",
+    "oleo-de-afiacao"
+  ],
+  "sem_cargas": {
+    "lamina-da-sorte": "máximo em dado",
+    "ladra-de-nove-vidas": "máximo em dado"
+  },
+  "sem_magias": {
+    "lamina-lunar": "Remover Maldição e Anel de Armazenar Magias são só citados; o item não os conjura",
+    "colar-de-contas-de-oracao": "a magia de cada conta depende do tipo, definido pelo Mestre ou sorteado, e o número de contas varia",
+    "lamina-da-sorte": "cargas de valor aleatório (1d3), não modeladas",
+    "colar-de-bolas-de-fogo": "contas de quantidade aleatória (1d6+3), consumidas"
+  },
+  "pendencias": [
+    "lamina-lunar: a primeira runa concede +1 de ataque e dano, mas cada runa adicional pode aumentar o bônus até +3 (tabela Propriedades da Lâmina Lunar); o bônus real varia por exemplar, então ficou só a base, sem efeito numérico.",
+    "maca-da-destruicao: o +3 contra Constructo é bônus contra alvo específico e ficou fora; entrou só o +1 geral de ataque e dano.",
+    "oleo-de-afiacao: consumível que transforma uma arma em Arma +3; o bônus pertence à arma revestida, não ao óleo, então ficou sem efeito.",
+    "colar-de-contas-de-oracao: cada conta mágica não pode ser reutilizada até o próximo amanhecer, mas o número de contas é variável (1d4 + 2) e cada tipo tem sua magia; sem usos estruturados.",
+    "lamina-lunar: o uso Lampejo (Descanso Curto ou Longo) só existe se a propriedade 86–95 for sorteada em uma runa adicional, o que a maioria dos exemplares não tem; sem recursos no registro. A lâmina que tiver a propriedade usa o contador manual.",
+    "arco-do-juramento: inimigo jurado dura até a morte ou 7 dias, sem uso limitado por amanhecer/descanso; sem recursos.",
+    "lamina-da-sorte: o uso Desejo volta todo amanhecer mesmo sem cargas (a arma perde a propriedade sem cargas); o registro só o modela como uso diário.",
+    "lamina-da-sorte: Desejo está em sem_magias (não entra em magias) e permanece como uso \"Desejo\" (amanhecer) em recursos.",
+    "lamina-da-sorte: Desejo usa o uso \"Desejo\" (amanhecer); o texto também limita por 1d3 cargas (máximo em dado, sem_cargas) e a arma perde a propriedade sem cargas; o contador manual cobre isso."
+  ],
+  "sem_passivos": {
+    "arco-do-juramento": "vantagem em jogada de ataque contra o inimigo jurado (não é teste, salvaguarda nem iniciativa)",
+    "espelho-aprisionador-de-vidas": "atributo do objeto: Imunidade e Vulnerabilidade a dano do espelho"
+  }
+}

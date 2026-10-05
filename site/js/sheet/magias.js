@@ -4,9 +4,12 @@
 // Tambem cobre as magias personalizadas do jogador.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
+import { atributoEfetivo } from '../regras-atributos.js';
 import { ATRIBUTO_NOME_PARA_KEY, CLASSES_CONJURADORAS, CLASSES_INFO } from '../dados-classes.js';
 import { getMagiasClasse, getMagiasPorCirculo } from '../db.js';
-import { abrirModal, bonusProficiencia, calcMod, escHtml, getBonusTruquesOrdem, getLimitesMagias, getMagiaPreparadas, mdParaHtml, circuloSuperiorHtml, classesDaMagiaHtml, semAcento, toast } from '../utils.js';
+import { magiasDeItens, opcoesDeCusto, pagarConjuracao, rotuloConjuracao, rotuloCusto, situacaoConjuracao } from '../regras-magias-itens.js';
+import { perguntarUltimaCarga } from './ultima-carga.js';
+import { abrirModal, bonusProficiencia, calcAtaqueMagia, calcCDMagia, calcMod, escHtml, getBonusTruquesOrdem, getLimitesMagias, getMagiaPreparadas, mdParaHtml, circuloSuperiorHtml, classesDaMagiaHtml, semAcento, toast } from '../utils.js';
 import { getEstadoFuria } from './classes/barbaro.js';
 import { renderSecaoPactoBruxo } from './classes/bruxo.js';
 import { gastarPontosFeiticaria, getEstadoRecursosFeiticeiro } from './classes/feiticeiro.js';
@@ -964,22 +967,28 @@ export function renderSecaoMagias() {
     }
   }
 
+  // Personagem que não conjura por classe e só tem as magias de itens: a seção
+  // existe para o bloco "Magias de Itens", sem preparo nem magia personalizada nem avisos de vaga.
+  const soMagiasDeItens = !sup && !subConj && superficies.length === 0
+    && (char.magias_conhecidas || []).length === 0 && (char.magias_preparadas || []).length === 0
+    && magiasPersonalizadas.length === 0 && (char.grimorio || []).length === 0;
+
   return `
     <div class="card print-break-before">
       <div class="card-header">
         <h2>Magias</h2>
-        <div class="no-print" style="display:flex;gap:4px">
+        ${soMagiasDeItens ? '' : `<div class="no-print" style="display:flex;gap:4px">
           <button class="btn btn-sm btn-accent" id="btn-add-magia">Preparar Magias</button>
           <button class="btn btn-sm btn-secondary" id="btn-add-magia-custom">Magia Personalizada</button>
-        </div>
+        </div>`}
       </div>
-      ${(char._slots_truque_livre || 0) > 0 && tipoConj === 'conhecidas' ? `
+      ${(char._slots_truque_livre || 0) > 0 && tipoConj === 'conhecidas' && !soMagiasDeItens ? `
         <div class="info-box warning no-print" style="margin:0 0 8px;font-size:0.85rem;display:flex;align-items:center;justify-content:space-between;gap:8px">
           <span>Você tem <strong>${char._slots_truque_livre}</strong> vaga(s) de truque em aberto para o seu nível.</span>
           <button class="btn btn-sm btn-primary" id="btn-preencher-slot-truque">Escolher</button>
         </div>
       ` : ''}
-      ${(char._slots_magia_livre || 0) > 0 && tipoConj === 'conhecidas' ? `
+      ${(char._slots_magia_livre || 0) > 0 && tipoConj === 'conhecidas' && !soMagiasDeItens ? `
         <div class="info-box warning no-print" style="margin:0 0 8px;font-size:0.85rem;display:flex;align-items:center;justify-content:space-between;gap:8px">
           <span>Você tem <strong>${char._slots_magia_livre}</strong> vaga(s) de magia conhecida em aberto para o seu nível.</span>
           <button class="btn btn-sm btn-primary" id="btn-preencher-slot-magia">Escolher</button>
@@ -1472,8 +1481,39 @@ export function renderSecaoMagias() {
         ATENCAO: este comentario mora DENTRO do template literal do render.
         Nada de crase aqui -- ela fecha a string e quebra a ficha inteira.
       -->
+      ${htmlMagiasDeItens()}
     </div>
   `;
+}
+
+/**
+ * Bloco "Magias de Itens" da seção Magias: uma linha por magia de item não
+ * destruído, com custo, CD/ataque e o botão Conjurar (desabilitado com a dica
+ * quando o item não está pronto). A linha usa `data-magia-nome`/`data-magia-circ`
+ * para reaproveitar o detalhe expansível das magias do livro.
+ */
+function htmlMagiasDeItens() {
+  const linhas = magiasDeItens(char);
+  if (!linhas.length) return '';
+  const conj = { cd: calcCDMagia(char), ataque: calcAtaqueMagia(char) };
+  return `
+    <div class="magias-de-itens" style="margin-top:12px">
+      <h3 style="font-size:0.95rem;margin:0 0 6px">Magias de Itens</h3>
+      ${linhas.map(({ idx, item, k, magia, situacao }) => {
+        const rc = rotuloConjuracao(magia, conj);
+        return `
+        <div class="magia-item" data-magia-nome="${escHtml(magia.nome)}" data-magia-circ="${magia.circulo_base ?? 0}">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <strong>${escHtml(magia.nome)}</strong>
+            <span style="font-size:0.8rem;color:var(--text-muted)">${escHtml(item.nome)} · ${escHtml(rotuloCusto(magia, item))}</span>
+            ${rc.texto ? `<span style="font-size:0.8rem" title="${escHtml(rc.title)}">${escHtml(rc.texto)}</span>` : ''}
+            <button class="btn btn-sm btn-primary no-print" data-conjurar-item="${idx}" data-conjurar-magia="${k}"
+              ${situacao.ok ? '' : `disabled title="${escHtml(situacao.motivo)}"`}>Conjurar</button>
+          </div>
+          <div class="magia-desc"></div>
+        </div>`;
+      }).join('')}
+    </div>`;
 }
 
 // Mapa unificado de magias com efeitos mecanicos quando conjuradas
@@ -1855,7 +1895,7 @@ function _aplicarEfeitoMetamagia(metaNome, nomeMagia, circ) {
       break;
     }
     case 'Magia Cautelosa': {
-      const modCar = Math.max(1, calcMod(char.atributos.carisma));
+      const modCar = Math.max(1, calcMod(atributoEfetivo(char, 'carisma')));
       char.efeitos_magicos.push({
         nome: `${nomeMagia} (Cautelosa)`,
         tipo: 'metamagia_info',
@@ -1911,7 +1951,7 @@ function _aplicarEfeitoMetamagia(metaNome, nomeMagia, circ) {
       break;
     }
     case 'Magia Potencializada': {
-      const modCar = Math.max(1, calcMod(char.atributos.carisma));
+      const modCar = Math.max(1, calcMod(atributoEfetivo(char, 'carisma')));
       char.efeitos_magicos.push({
         nome: `${nomeMagia} (Potencializada)`,
         tipo: 'metamagia_info',
@@ -2171,7 +2211,7 @@ function aplicarEfeitoMagico(nomeMagia, circ, opcoes) {
           // esse dado, a superfície ATIVA (a primeira por ordem de
           // aquisição) é o mesmo proxy que o resto da seção usa.
           const infoClasse = CLASSES_INFO[superficieAtiva()?.classe];
-          if (infoClasse?.atributo_conjuracao) { const key = ATRIBUTO_NOME_PARA_KEY[infoClasse.atributo_conjuracao]; valor = calcMod(char.atributos[key]); }
+          if (infoClasse?.atributo_conjuracao) { const key = ATRIBUTO_NOME_PARA_KEY[infoClasse.atributo_conjuracao]; valor = calcMod(atributoEfetivo(char, key)); }
         }
         valor = Math.max(1, valor);
         char.efeitos_magicos.push({ nome: nomeMagia, tipo: 'pv_temp_por_turno', valor: valor, concentracao: concentracao, circulo: circuloNum, rotulo: `+${valor} PV Temp/turno` });
@@ -2240,14 +2280,46 @@ function rastrearConcentracaoGenerica(nome, circulo) {
 }
 
 /**
+ * Aplica o efeito em si pedindo antes a seleção que a magia exige (tipo,
+ * atributo, variante ou condição a remover), na mesma ordem do fluxo normal
+ * de conjuração. `concluir` só roda depois da escolha; fechar o modal sem
+ * escolher não aplica o efeito nem chama `concluir`.
+ */
+function aplicarEfeitoSelfComSelecao(nome, circulo, config, concluir, podeAplicar = null) {
+  const aplicar = (opcoes) => {
+    if (podeAplicar && !podeAplicar()) return;
+    aplicarEfeitoMagico(nome, circulo, opcoes);
+    concluir();
+  };
+  if (config.selecionar_tipo) {
+    mostrarModalSelecaoMagia(nome, circulo, config.selecionar_tipo, 'Escolher Tipo', (tipo) => aplicar({ tipo_selecionado: tipo }));
+  } else if (config.selecionar_atributo) {
+    mostrarModalSelecaoMagia(nome, circulo, config.selecionar_atributo, 'Escolher Atributo', (attr) => aplicar({ atributo_selecionado: attr }));
+  } else if (config.selecionar_variante) {
+    mostrarModalSelecaoMagia(nome, circulo, Object.keys(config.selecionar_variante), 'Escolher Variante', (v) => aplicar({ variante_selecionada: v }));
+  } else if (config.tipo === 'cura_condicao') {
+    mostrarModalCuraCondicao(nome, circulo, config.condicoes || config.efeitos || [], (c) => aplicar({ condicao_removida: c }));
+  } else {
+    aplicar(undefined);
+  }
+}
+
+/**
  * Núcleo da conjuração que NÃO gasta espaço: aplica o efeito mecânico da
  * magia (perguntando o alvo quando a magia aceita os dois) e registra a
  * concentração, exatamente como a conjuração normal faz -- só sem debitar o
  * espaço. Não confirma troca de concentração: quem chama já decidiu isso.
+ *
+ * `aoConcluir` (opcional) assume o fim da conjuração: salva o personagem, é
+ * chamada em lugar do render e do toast padrão e deve renderizar a ficha uma
+ * vez. `podeAplicar` (opcional) roda imediatamente antes de o efeito ser
+ * aplicado; devolver false aborta sem efeito, sem concentração e sem toast
+ * (quem devolve false é quem avisa o jogador).
  */
-function aplicarConjuracaoSemEspaco(nome, circulo, mensagem) {
+function aplicarConjuracaoSemEspaco(nome, circulo, mensagem, aoConcluir = null, podeAplicar = null) {
   const finalizar = () => {
     salvar();
+    if (aoConcluir) { aoConcluir(); return; }
     renderFichaCompleta();
     toast(mensagem, 'success');
   };
@@ -2259,18 +2331,22 @@ function aplicarConjuracaoSemEspaco(nome, circulo, mensagem) {
       mostrarModalAlvoMagia(nome, circulo, (alvo) => {
         // Em outra criatura, `aplicarEfeitoMagico` não entra -- a
         // concentração ainda precisa ser registrada aqui.
-        if (alvo === 'self') aplicarEfeitoMagico(nome, circulo);
-        else rastrearConcentracaoGenerica(nome, circulo);
-        finalizar();
+        if (alvo === 'self') {
+          aplicarEfeitoSelfComSelecao(nome, circulo, config, finalizar, podeAplicar);
+        } else {
+          if (podeAplicar && !podeAplicar()) return;
+          rastrearConcentracaoGenerica(nome, circulo);
+          finalizar();
+        }
       });
       return;
     }
     if (autoSelf) {
-      aplicarEfeitoMagico(nome, circulo);
-      finalizar();
+      aplicarEfeitoSelfComSelecao(nome, circulo, config, finalizar, podeAplicar);
       return;
     }
   }
+  if (podeAplicar && !podeAplicar()) return;
   rastrearConcentracaoGenerica(nome, circulo);
   finalizar();
 }
@@ -2290,15 +2366,51 @@ function aplicarConjuracaoSemEspaco(nome, circulo, mensagem) {
  * @param {string} nome nome da magia
  * @param {number} circulo círculo em que ela sai
  * @param {string} mensagem texto do toast de sucesso
+ * @param {Function|null} [aoConcluir] assume o fim da conjuração (render e
+ *   aviso) quando ela se completa; cancelar a troca de concentração não a
+ *   chama. Sem ela, a ficha é renderizada e `mensagem` aparece em toast.
+ * @param {Function|null} [podeAplicar] confirmação imediatamente antes do
+ *   efeito; false aborta a conjuração (ver `aplicarConjuracaoSemEspaco`)
  */
-export function conjurarSemEspaco(nome, circulo, mensagem) {
+export function conjurarSemEspaco(nome, circulo, mensagem, aoConcluir = null, podeAplicar = null) {
   const concentracaoAtiva = getConcentracaoAtiva();
   if (ehMagiaConcentracao(nome) && concentracaoAtiva && concentracaoAtiva !== nome) {
     confirmarSubstituirConcentracao(concentracaoAtiva, nome,
-      () => aplicarConjuracaoSemEspaco(nome, circulo, mensagem));
+      () => aplicarConjuracaoSemEspaco(nome, circulo, mensagem, aoConcluir, podeAplicar));
     return;
   }
-  aplicarConjuracaoSemEspaco(nome, circulo, mensagem);
+  aplicarConjuracaoSemEspaco(nome, circulo, mensagem, aoConcluir, podeAplicar);
+}
+
+/**
+ * Conjura a magia do item sem espaço. O custo é conferido imediatamente antes
+ * do efeito (o item pode ter perdido a carga durante os modais de escolha);
+ * confirmada a conjuração, paga, renderiza uma vez, avisa e pergunta a última
+ * carga. Se o pagamento ainda assim falhar, desfaz a concentração registrada
+ * e avisa em erro.
+ */
+function conjurarMagiaDeItem(item, magia, opcao) {
+  const avisoSemCusto = () => toast(`Não foi possível gastar o custo de ${item.nome}`, 'error');
+  const podeAplicar = () => {
+    if (situacaoConjuracao(item, opcao).ok) return true;
+    avisoSemCusto();
+    return false;
+  };
+  conjurarSemEspaco(magia.nome, opcao.circulo, `${magia.nome} conjurada com ${item.nome}`, () => {
+    const { ok, ultimaCarga } = pagarConjuracao(item, opcao);
+    if (!ok) {
+      // Sem pagamento não há conjuração: remove a concentração que o efeito registrou.
+      char.efeitos_magicos = (char.efeitos_magicos || []).filter(e => !(e.concentracao && (e.nome === magia.nome || e.nome === `${magia.nome} (Desv.)` || e.nome === `${magia.nome} (PV Máx)`)));
+      salvar();
+      renderFichaCompleta();
+      avisoSemCusto();
+      return;
+    }
+    salvar();
+    renderFichaCompleta();
+    toast(`${magia.nome} conjurada com ${item.nome}`, 'success');
+    if (ultimaCarga) perguntarUltimaCarga(item, ultimaCarga);
+  }, podeAplicar);
 }
 
 // Modal de selecao de opcao (tipo de dano, atributo, variante)
@@ -2435,6 +2547,30 @@ function decidirFonteEContinuar(nome, circulo, continuar) {
 }
 
 export function setupEventosEspacosMagia() {
+  // Conjurar magia de item: escolhe o gasto quando há faixa, conjura sem espaço e paga depois de confirmada.
+  document.querySelectorAll('[data-conjurar-item]').forEach(btn => btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const item = char.inventario[parseInt(btn.dataset.conjurarItem)];
+    const magia = item?.dados?.magias?.[parseInt(btn.dataset.conjurarMagia)];
+    if (!magia) return;
+    const opcoes = opcoesDeCusto(magia);
+    if (opcoes.length === 1) { conjurarMagiaDeItem(item, magia, opcoes[0]); return; }
+    // A primeira opção habilitada vem selecionada.
+    const primeiraOk = opcoes.findIndex(o => situacaoConjuracao(item, o).ok);
+    // Título sem escHtml: o modal principal grava via textContent e o sub-modal já escapa.
+    abrirModal(`Conjurar ${magia.nome}`, `
+      <label class="form-label" for="sel-custo-item-magia">Cargas a gastar</label>
+      <select class="form-input" id="sel-custo-item-magia">
+        ${opcoes.map((o, i) => `<option value="${i}" ${i === primeiraOk ? 'selected' : ''} ${situacaoConjuracao(item, o).ok ? '' : 'disabled'}>${o.cargas} carga${o.cargas === 1 ? '' : 's'} — ${o.circulo}º círculo</option>`).join('')}
+      </select>`,
+      '<button class="btn btn-primary" id="btn-conjurar-item-confirmar">Conjurar</button>');
+    document.getElementById('btn-conjurar-item-confirmar')?.addEventListener('click', () => {
+      const o = opcoes[parseInt(document.getElementById('sel-custo-item-magia').value)];
+      window.fecharModal();
+      if (o && situacaoConjuracao(item, o).ok) conjurarMagiaDeItem(item, magia, o);
+    });
+  }));
+
   // Seletor de superficie de conjuracao (Tarefa 4, sub-projeto "tela
   // magias por classe") -- ver o comentario de `tabs-superficie-magia` em
   // renderSecaoMagias. Clicar so grava a escolha e re-renderiza; toda a

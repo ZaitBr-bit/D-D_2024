@@ -51,3 +51,16 @@ export function validarAtributosManuais(proposta) {
   }
   return { ok: true };
 }
+
+/**
+ * Atributos que a edição por regras deixaria acima do teto de 20. Um atributo
+ * que já está acima de 20 (Manual, capstone) pode ser mantido ou reduzido;
+ * só passa de 20 por causa da edição quem fica acima do valor atual.
+ * @param {object} atuais - Mapa chave -> valor total atual da ficha.
+ * @param {object} propostos - Mapa chave -> valor total proposto.
+ * @param {number} [teto=20]
+ * @returns {string[]} Chaves que ultrapassam o teto por causa da edição.
+ */
+export function atributosAcimaDoTeto(atuais, propostos, teto = 20) {
+  return Object.keys(propostos || {}).filter(k => propostos[k] > Math.max(teto, Number(atuais?.[k]) || 0));
+}

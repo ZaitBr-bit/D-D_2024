@@ -1,0 +1,185 @@
+{
+  "lote": "03",
+  "itens": {
+    "armadura-de-remocao-rapida": {
+      "base": {
+        "tipo": "armadura",
+        "categorias": [
+          "Leve",
+          "Média",
+          "Pesada"
+        ]
+      },
+      "efeitos": []
+    },
+    "manto-de-protecao": {
+      "efeitos": [
+        {
+          "alvo": "ca",
+          "valor": 1
+        },
+        {
+          "alvo": "salvaguarda",
+          "valor": 1
+        }
+      ]
+    },
+    "adaga-do-veneno": {
+      "base": {
+        "tipo": "arma",
+        "opcoes": [
+          "Adaga"
+        ]
+      },
+      "efeitos": [
+        {
+          "alvo": "ataque_arma",
+          "valor": 1
+        },
+        {
+          "alvo": "dano_arma",
+          "valor": 1
+        }
+      ],
+      "recursos": {
+        "usos": [
+          {
+            "nome": "Veneno na lâmina",
+            "max": 1,
+            "recupera": "amanhecer"
+          }
+        ]
+      }
+    },
+    "espada-dancante": {
+      "base": {
+        "tipo": "arma",
+        "opcoes": [
+          "Espada Grande",
+          "Espada Longa",
+          "Rapieira",
+          "Cimitarra",
+          "Espada Curta"
+        ]
+      },
+      "efeitos": []
+    },
+    "manto-da-invisibilidade": {
+      "efeitos": [],
+      "recursos": {
+        "cargas": {
+          "max": 3,
+          "recupera": "1d3",
+          "ultima_carga": null
+        }
+      }
+    },
+    "cubo-de-forca": { "efeitos": [], "recursos": { "cargas": { "max": 10, "recupera": "1d6", "ultima_carga": null } }, "magias": [ { "nome": "Armadura Arcana", "custo": { "cargas": 1 }, "conjuracao": { "cd": 17 } }, { "nome": "Escudo Arcano", "custo": { "cargas": 1 }, "conjuracao": { "cd": 17 } }, { "nome": "Pequeno Refúgio de Leomund", "custo": { "cargas": 3 }, "conjuracao": { "cd": 17 } }, { "nome": "Santuário Particular de Mordenkainen", "custo": { "cargas": 4 }, "conjuracao": { "cd": 17 } }, { "nome": "Esfera Resiliente de Otiluke", "custo": { "cargas": 4 }, "conjuracao": { "cd": 17 } }, { "nome": "Muralha de Energia", "custo": { "cargas": 5 }, "conjuracao": { "cd": 17 } } ] },
+    "portal-cubico": { "efeitos": [], "recursos": { "cargas": { "max": 3, "recupera": "1d3", "ultima_carga": null } }, "magias": [ { "nome": "Portal", "custo": { "cargas": 1 }, "conjuracao": null }, { "nome": "Transição Planar", "custo": { "cargas": 1 }, "conjuracao": null } ] },
+    "incensario-de-controle-de-elementais-do-ar": {
+      "efeitos": [],
+      "recursos": {
+        "usos": [
+          {
+            "nome": "Invocar Elemental do Ar",
+            "max": 1,
+            "recupera": "amanhecer"
+          }
+        ]
+      }
+    },
+    "diadema-da-explosao": { "efeitos": [], "recursos": { "usos": [ { "nome": "Raio Ardente", "max": 1, "recupera": "amanhecer" } ] }, "magias": [ { "nome": "Raio Ardente", "custo": { "uso": "Raio Ardente" }, "conjuracao": { "ataque": 5 } } ] },
+    "manto-aracnideo": { "efeitos": [ { "alvo": "resistencia", "tipo_dano": "Venenoso" }, { "alvo": "deslocamento", "modo": "escalada", "igual_deslocamento": true } ],"recursos": { "usos": [ { "nome": "Teia", "max": 1, "recupera": "amanhecer" } ] }, "magias": [ { "nome": "Teia", "custo": { "uso": "Teia" }, "conjuracao": { "cd": 13 } } ] },
+    "manto-do-morcego": { "efeitos": [ { "alvo": "vantagem", "em": "pericia", "pericia": "Furtividade" } ],"recursos": { "usos": [ { "nome": "Polimorfia (Morcego)", "max": 1, "recupera": "amanhecer" } ] }, "magias": [ { "nome": "Polimorfia", "custo": { "uso": "Polimorfia (Morcego)" }, "conjuracao": null } ] },
+    "amuleto-mecanico": {
+      "efeitos": [],
+      "recursos": {
+        "usos": [
+          {
+            "nome": "Obter 10 na jogada de ataque",
+            "max": 1,
+            "recupera": "amanhecer"
+          }
+        ]
+      }
+    },
+    "bola-de-cristal-de-telepatia": { "efeitos": [], "recursos": { "usos": [ { "nome": "Sugestão", "max": 1, "recupera": "amanhecer" } ] }, "magias": [ { "nome": "Vidência", "custo": "livre", "conjuracao": { "cd": 17 } }, { "nome": "Sugestão", "custo": { "uso": "Sugestão" }, "conjuracao": { "cd": 17 } } ] },
+    "cubo-de-invocacao": {
+      "efeitos": [],
+      "recursos": {
+        "usos": [
+          {
+            "nome": "Invocar criatura",
+            "max": 1,
+            "recupera": "amanhecer"
+          }
+        ]
+      }
+    },
+    "amuleto-do-fragmento-sombrio": {
+      "efeitos": [],
+      "recursos": {
+        "usos": [
+          {
+            "nome": "Magia Desconhecida",
+            "max": 1,
+            "recupera": "descanso_longo"
+          }
+        ]
+      }
+    },
+    "carrilhao-da-abertura": {
+      "efeitos": [],
+      "recursos": {
+        "cargas": {
+          "max": 10,
+          "recupera": null,
+          "ultima_carga": null
+        }
+      }
+    },
+    "manto-elfico": { "efeitos": [ { "alvo": "vantagem", "em": "pericia", "pericia": "Furtividade" } ] },
+    "manto-da-arraia-jamanta": { "efeitos": [ { "alvo": "deslocamento", "modo": "natacao", "metros": 18 } ] },
+    "bola-de-cristal": { "efeitos": [], "magias": [ { "nome": "Vidência", "custo": "livre", "conjuracao": { "cd": 17 } } ] },
+    "bola-de-cristal-de-leitura-mental": { "efeitos": [], "magias": [ { "nome": "Vidência", "custo": "livre", "conjuracao": { "cd": 17 } }, { "nome": "Detectar Pensamentos", "custo": "livre", "conjuracao": { "cd": 17 } } ] },
+    "bola-de-cristal-da-visao-verdadeira": { "efeitos": [], "magias": [ { "nome": "Vidência", "custo": "livre", "conjuracao": { "cd": 17 } } ] }
+  },
+  "sem_efeito_automatico": [
+    "caldeirao-do-renascimento",
+    "dado-do-charlatao",
+    "manto-ondulante",
+    "manto-de-deslocamento",
+    "manto-de-muitos-estilos",
+    "roupas-autorreparadoras",
+    "fortaleza-instantanea-de-daern",
+    "decantador-de-agua-infinita",
+    "baralho-de-ilusoes",
+    "baralho-das-muitas-coisas"
+  ],
+  "sem_aumento": {
+    "baralho-das-muitas-coisas": "efeito imediato de carta sacada"
+  },
+  "sem_magias": {
+    "amuleto-do-fragmento-sombrio": "Magia Desconhecida: truque de Bruxo que o personagem não conhece, escolhido na hora e condicionado a teste de Inteligência (Arcanismo) CD 10",
+    "caldeirao-do-renascimento": "Vidência é só componente do foco e Reviver os Mortos é efeito \"como se por\" a magia; o item não as conjura",
+    "carrilhao-da-abertura": "custo de 1 uso entre 10 sem número \"1\" no texto; o validador não aceita cargas:1 nem livre (ver pendências)",
+    "cubo-de-invocacao": "magia sorteada na tabela (1d6) a cada uso, conjurada no 5º círculo",
+    "fortaleza-instantanea-de-daern": "Arrombar e Desejo são citadas como imunidade e reparo; o item não as conjura",
+    "baralho-das-muitas-coisas": "Desejo vem da carta Lua, sacada ao acaso; o item não conjura magia por escolha"
+  },
+  "sem_passivos": {
+    "fortaleza-instantanea-de-daern": "atributo do objeto: Imunidade e Resistência a dano da torre",
+    "bola-de-cristal-da-visao-verdadeira": "Visão Verdadeira centrada no sensor da magia, não no portador",
+    "baralho-das-muitas-coisas": "temporária e pontual: Vantagem em Testes de D20 / Salvaguardas contra Morte vem de cartas sacadas"
+  },
+  "pendencias": [
+    "manto-do-morcego: o Deslocamento de Voo só vale em Meia-luz ou Escuridão segurando as bordas do manto (condicional); só a Vantagem em Furtividade foi curada.",
+    "baralho-das-muitas-coisas: a carta Euríale impõe −2 nas salvaguardas, mas é maldição sobre o personagem (não efeito de item equipado) e depende do saque; Equilíbrio/Estrela/Enigma alteram atributos de forma permanente, que o jogador ajusta na ficha. Sem efeito automático.",
+    "diadema-da-explosao: o +5 para acertar é do Raio Ardente conjurado pelo diadema (ativação 1x por dia), não da magia do personagem. Sem efeito automático.",
+    "caldeirao-do-renascimento: 'Reviver os Mortos' não pode ser usado de novo por 7 dias (recuperação em dias, fora de amanhecer/descanso); sem uso curado.",
+    "carrilhao-da-abertura: 'O carrilhão pode ser usado 10 vezes. Depois da décima vez, ele racha e se torna inútil.' Registrado como cargas max 10 sem recuperação; ultima_carga null porque o texto não tem regra de 'última carga'.",
+    "carrilhao-da-abertura: conjura Arrombar gastando 1 dos 10 usos (recursos.cargas max 10), mas o texto não traz o número \"1\" nem \"0 carga\"/\"sem gastar\"; o validador recusa cargas:1 e livre. Sem magias até o validador aceitar custo implícito de 1 carga.",
+    "cubo-de-invocacao: as seis magias de invocação (Invocar Aberração, Fera, Constructo, Dragão, Convocar Elemental, Convocar Feérico) saem de rolagem 1d6 e são conjuradas no 5º círculo (CD 17, +9); custo uso não combina com circulo, então ficou em sem_magias.",
+    "bola-de-cristal-de-telepatia: o uso \"Sugestão\" cobre só a magia Sugestão; Vidência e a telepatia não têm custo (livre)."
+  ]
+}

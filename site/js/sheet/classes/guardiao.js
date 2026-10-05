@@ -4,6 +4,7 @@
 // Consultado pela ficha, pelos descansos e pelas habilidades ativas.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
+import { atributoEfetivo } from '../../regras-atributos.js';
 import { calcMod } from '../../utils.js';
 import { char } from '../estado.js';
 import { temClasse, nivelNa } from '../../regras-multiclasse.js';
@@ -67,7 +68,7 @@ export function getEstadoRecursosGuardiao() {
   if (typeof r.subclasses.vigilante.golpe_terrivel_usos_gastos !== 'number') r.subclasses.vigilante.golpe_terrivel_usos_gastos = 0;
 
   const prog = getProgressaoGuardiao() || { inimigoFavoritoMax: 0 };
-  const modSab = Math.max(1, calcMod(char.atributos.sabedoria));
+  const modSab = Math.max(1, calcMod(atributoEfetivo(char, 'sabedoria')));
   const nivel = nivelNa(char, 'Guardião') || 1;
 
   const inimigoFavoritoDisponiveis = Math.max(0, prog.inimigoFavoritoMax - r.inimigo_favorito_usos_gastos);

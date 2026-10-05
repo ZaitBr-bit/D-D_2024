@@ -4,6 +4,7 @@
 // Consultado pela ficha, pelos descansos e pelas habilidades ativas.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
+import { atributoEfetivo } from '../../regras-atributos.js';
 import { calcMod } from '../../utils.js';
 import { char } from '../estado.js';
 import { temClasse, nivelNa } from '../../regras-multiclasse.js';
@@ -78,7 +79,7 @@ export function getEstadoRecursosFeiticeiro() {
   const pontosAtuais = Math.max(0, prog.pontosMax - r.pontos_feiticaria_gastos);
   const usosInataMax = 2;
   const usosInataDisponiveis = Math.max(0, usosInataMax - r.feiticaria_inata_usos_gastos);
-  const modCar = Math.max(1, calcMod(char.atributos.carisma));
+  const modCar = Math.max(1, calcMod(atributoEfetivo(char, 'carisma')));
 
   return {
     pontosMax: prog.pontosMax,

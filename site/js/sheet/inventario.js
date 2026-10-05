@@ -4,6 +4,7 @@
 // Lista, arrasta-e-solta, seletores de item e itens personalizados.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
+import { atributoEfetivo } from '../regras-atributos.js';
 import { CLASSES_INFO } from '../dados-classes.js';
 import { DENOMINACOES, ICONE_MOEDA, NOMES_MOEDA, adicionarMoeda, converterParaMaior, formatarCarteira, proximaDenominacaoMaior, removerQuantidadeMoeda, taxasSaoPadrao } from '../moedas.js';
 import { carregarComprarAtivoPadrao, resetarTaxasMoeda, salvarComprarAtivoPadrao, salvarTaxasMoeda } from '../store.js';
@@ -13,16 +14,28 @@ import { getEstadoFuria } from './classes/barbaro.js';
 import { getEstadoRecursosGuardiao } from './classes/guardiao.js';
 import { _salvarEstadoColapso, _secoesInvColapsadas } from './colapso.js';
 import { ataqueImprudenteAtivo, calcVantagemDesvantagemAtaque, temArmaduraPesadaEquipada } from './combate.js';
-import { sheetBadgeProf, sheetTemProfArma, sheetTemProfArmadura } from './condicoes.js';
-import { char, passivosTalentosCache, salvar } from './estado.js';
+import { sheetBadgeProf, sheetTemProfArma, sheetTemProfArmadura, visaoNoEscuroDaEspecie } from './condicoes.js';
+import { char, especiesCache, passivosTalentosCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { descricaoDePropriedade, htmlFormularioItemCustomizado, lerFormularioItemCustomizado, ligarEventosFormularioItemCustomizado } from './item-customizado-form.js';
+import { efeitosDaArma, itemAtivo } from '../regras-itens-magicos.js';
+import { EFEITO_RECUPERAR_ESPACO, espacosRecuperaveis, mensagemSemEspaco, restaurarEspacoPorItem } from '../regras-espacos-itens.js';
+import { recuperarUmEspaco, reservasDeEspacos } from './reservas-espacos.js';
+import { nomeBaseDoItem, selosDeEfeitos } from '../itens-magicos-catalogo.js';
+import { htmlCorpoItemMagico } from '../itens-magicos-ui.js';
 import { TETO_SINTONIZACAO, itensSintonizados, podeSintonizar } from '../regras-sintonizacao.js';
+import { PASSIVOS_VERSAO, alternarUso, ajustarCarga, aplicarContadorManual, contadorEhManual, garantirEstadoRecursos, gastarCarga, itensComRecuperacaoPendente, limparPendenciasObsoletas, marcarDestruido, preencherRecursosDoAcervo, recursosDoFormulario, recursosDoItem, removerContadorManual, restaurarItem } from '../regras-recursos-itens.js';
+import { getItensMagicos } from '../db.js';
+import { opcoesDeEscolha } from '../regras-passivos-itens.js';
+import { aplicarAumentoPermanente, aumentoPermanenteDoItem } from '../regras-aumento-atributo.js';
+import { atendeRequisito, lerRequisito } from '../regras-sintonizacao-restrita.js';
+import { abrirModalRecuperacao, sincronizarBonusPvNiveis } from './hp-descanso.js';
+import { perguntarUltimaCarga } from './ultima-carga.js';
 
 // --- Inventário na ficha ---
 /** Estado de carga do personagem: peso atual, capacidade e flag de sobrecarga. */
 export function getEstadoCarga() {
-  const forca = char?.atributos?.forca || 0;
+  const forca = atributoEfetivo(char, 'forca') || 0;
   const tamanho = char?.tamanho || 'Médio';
   const pesoAtual = getPesoTotalInventario(char?.inventario || [], char?.inventario_locais || []);
   const capacidade = getCapacidadeCarga(forca, tamanho);
@@ -42,6 +55,32 @@ function htmlContadorSintonizados() {
     || (char.inventario || []).some(i => i?.dados?.requer_sintonizacao);
   if (!temAlgumQuePede) return '';
   return `<span style="font-size:0.75rem;color:var(--text-muted);margin-left:10px">Sintonizados: <strong>${itensSintonizados(char).length}</strong> / ${TETO_SINTONIZACAO}</span>`;
+}
+
+/**
+ * Texto do requisito de sintonização do item quando o personagem não o
+ * atende (ex.: "por um Mago"); string vazia quando atende, não há requisito
+ * ou o texto não é verificável.
+ */
+function requisitoNaoAtendido(item) {
+  const texto = String(item?.dados?.requisito_sintonizacao || '').trim();
+  if (!texto) return '';
+  return atendeRequisito(char, lerRequisito(texto)) ? '' : texto;
+}
+
+/** HTML do botão do amanhecer com a contagem de itens pendentes; vazio quando não há pendência. */
+export function htmlBotaoRecuperarItens() {
+  limparPendenciasObsoletas(char);
+  const n = itensComRecuperacaoPendente(char).length;
+  return n ? `<div style="padding:4px 0"><button class="btn btn-sm btn-accent" id="btn-recuperar-itens">Amanhecer: informar recuperação (${n})</button></div>` : '';
+}
+
+/** Atualiza o botão do amanhecer (fora de #sheet-inventario) e liga o clique sem empilhar listeners. */
+export function atualizarBotaoRecuperarItens() {
+  const el = document.getElementById('sheet-recuperar-itens');
+  if (el) el.innerHTML = htmlBotaoRecuperarItens();
+  const btn = document.getElementById('btn-recuperar-itens');
+  if (btn) btn.onclick = () => abrirModalRecuperacao();
 }
 
 export function renderSecaoInventario() {
@@ -76,6 +115,7 @@ export function renderSecaoInventario() {
         </label>
         <span id="sheet-sintonizados-valor">${htmlContadorSintonizados()}</span>
       </div>
+      <div id="sheet-recuperar-itens" class="no-print">${htmlBotaoRecuperarItens()}</div>
       <div id="sheet-inventario">
         ${inv.length === 0
           ? '<div style="color:var(--text-muted);text-align:center;padding:12px;font-size:0.85rem">Inventario vazio</div>'
@@ -181,7 +221,7 @@ function renderSheetInvItem(item, idx) {
     profBadge = sheetBadgeProf(sheetTemProfArma({ categoria: item.dados.categoria, propriedades: item.dados.propriedades || '' }));
   }
   if ((item.tipo === 'armadura' || item.tipo === 'escudo') && item.dados?.categoria) {
-    profBadge = sheetBadgeProf(sheetTemProfArmadura({ categoria: item.dados.categoria, nome: item.nome }));
+    profBadge = sheetBadgeProf(sheetTemProfArmadura({ categoria: item.dados.categoria, nome: nomeBaseDoItem(item) }));
   }
 
   // Badge de tipo de uso (consumível, equipamento, etc.)
@@ -208,19 +248,22 @@ function renderSheetInvItem(item, idx) {
     let modAtq;
     let usaForcaNoAtaque = false;
     if (isAcuidade) {
-      const modFor = calcMod(char.atributos.forca);
-      const modDes = calcMod(char.atributos.destreza);
+      const modFor = calcMod(atributoEfetivo(char, 'forca'));
+      const modDes = calcMod(atributoEfetivo(char, 'destreza'));
       usaForcaNoAtaque = modFor >= modDes;
       modAtq = Math.max(modFor, modDes);
     } else if (isDistancia) {
-      modAtq = calcMod(char.atributos.destreza);
+      modAtq = calcMod(atributoEfetivo(char, 'destreza'));
     } else {
-      modAtq = calcMod(char.atributos.forca);
+      modAtq = calcMod(atributoEfetivo(char, 'forca'));
       usaForcaNoAtaque = true;
     }
 
     const temProf = sheetTemProfArma({ categoria: item.dados.categoria, propriedades: item.dados.propriedades || '' });
-    const bonusAtq = modAtq + (temProf ? prof : 0);
+    // Bônus mágico da própria arma (acervo ou customizado), sintonizada
+    // quando exige (regras-itens-magicos.js): entra no ataque e no dano.
+    const magiaArma = efeitosDaArma(item);
+    const bonusAtq = modAtq + (temProf ? prof : 0) + magiaArma.ataque;
     // Bônus de ataque de talentos
     let bonusAtqTalento = 0;
     const _passivos = passivosTalentosCache || {};
@@ -289,7 +332,7 @@ function renderSheetInvItem(item, idx) {
       const sufixo = matchDano[3] || '';
       const estadoFuria = getEstadoFuria();
       const bonusFuria = estadoFuria?.ativa && usaForcaNoAtaque ? (estadoFuria.dano || 0) : 0;
-      const bonusTotalDano = modAtq + bonusFuria;
+      const bonusTotalDano = modAtq + bonusFuria + magiaArma.dano;
       // Bônus de dano de talentos
       let bonusDanoTalento = 0;
       const ehArremesso = props.includes('arremesso');
@@ -300,7 +343,7 @@ function renderSheetInvItem(item, idx) {
 
       if (modExistente) {
         const modBase = parseInt(String(modExistente).replace(/\s+/g, '')) || 0;
-        const modFinal = modBase + bonusFuria + bonusDanoTalento;
+        const modFinal = modBase + bonusFuria + bonusDanoTalento + magiaArma.dano;
         const sinal = modFinal >= 0 ? `+${modFinal}` : `${modFinal}`;
         danoExibicao = `${dado}${sinal}${sufixo}`.replace(/\s+/g, ' ').trim();
       } else if (bonusTotalDanoFinal !== 0) {
@@ -350,6 +393,38 @@ function renderSheetInvItem(item, idx) {
     }
   }
 
+  // Item mágico do acervo (tipo 'magico' ou arma/armadura/escudo com
+  // magico_id): raridade, sintonização e os efeitos com o estado de cada um.
+  let magicoBadges = '';
+  if (item.dados?.magico_id) {
+    if (item.dados.raridade) magicoBadges += `<span class="badge" style="font-size:0.6rem;background:#f3e5f5;color:#6a1b9a;border:1px solid #ce93d8">${escHtml(item.dados.raridade)}</span> `;
+    if (item.dados.requer_sintonizacao) magicoBadges += `<span class="badge" style="font-size:0.6rem;background:#e0f2f1;color:#00695c;border:1px solid #80cbc4">Sintonização</span> `;
+    for (const s of selosDeEfeitos(item, char, { visaoNoEscuroBase: visaoNoEscuroDaEspecie(char, especiesCache) })) {
+      magicoBadges += `<span class="badge badge-secondary" data-selo-efeito="${s.ativo ? 'ativo' : 'inativo'}" title="${escHtml(s.motivo)}" style="font-size:0.6rem${s.ativo ? '' : ';opacity:0.5'}">${escHtml(s.texto)}</span> `;
+    }
+  }
+
+  // Cargas e usos do item (4A): contador com − e +, chips de uso; apagado,
+  // sem bloquear, quando o item exige sintonização e não está sintonizado.
+  let recursosHtml = '';
+  const _rec = recursosDoItem(item);
+  if (_rec && !item.destruido) {
+    const est = garantirEstadoRecursos(item);
+    const semSint = item.dados?.requer_sintonizacao && item.sintonizado !== true;
+    const opac = semSint ? ';opacity:0.5' : '';
+    const dica = semSint ? ' title="requer sintonização para usar"' : '';
+    if (_rec.cargas) {
+      recursosHtml += `<span class="inv-cargas no-print"${dica} style="display:inline-flex;align-items:center;gap:3px${opac}">
+        <button class="btn btn-sm btn-icon" data-cargas-menos="${idx}">−</button>
+        <span data-cargas-valor="${idx}">⚡ ${est.cargas}/${_rec.cargas.max}</span>
+        <button class="btn btn-sm btn-icon" data-cargas-mais="${idx}">+</button></span> `;
+    }
+    for (const u of _rec.usos || []) {
+      const gastos = est.usos[u.nome] || 0;
+      recursosHtml += `<span class="badge badge-secondary no-print" data-uso-item="${idx}" data-uso-nome="${escHtml(u.nome)}"${dica} style="cursor:pointer${opac}${gastos >= u.max ? ';text-decoration:line-through' : ''}">${escHtml(u.nome)} ${u.max - gastos}/${u.max}</span> `;
+    }
+  }
+
   // Badge de maestria com a arma. Issue #96: a arma customizada mostrava a
   // badge incondicionalmente (sem checar `char.maestrias_arma`) -- parecia
   // que a maestria estava valendo de verdade mesmo sem o personagem tê-la
@@ -361,13 +436,15 @@ function renderSheetInvItem(item, idx) {
   // exatamente a mesma condição agora.
   let maestriaBadge = '';
   if ((item.tipo === 'arma' || ehArmaCustom) && item.dados?.maestria) {
-    const temMaestria = (char.maestrias_arma || []).some(m => m === item.nome);
+    const temMaestria = (char.maestrias_arma || []).some(m => m === nomeBaseDoItem(item));
     if (temMaestria) {
       maestriaBadge = `<span class="badge" style="font-size:0.6rem;background:#fff8e1;color:#e65100;border:1px solid #ffcc80;font-weight:700">Maestria: ${item.dados.maestria}</span>`;
     }
   }
 
   const isZeroQtd = (item.quantidade ?? 1) <= 0;
+  // Requisito de sintonização não atendido, calculado uma vez por linha.
+  const requisitoFaltando = item.dados?.requer_sintonizacao && !item.destruido ? requisitoNaoAtendido(item) : '';
 
   // Mover para um local customizado (só aparece quando existe ao menos um).
   const locaisInv = char.inventario_locais || [];
@@ -378,14 +455,14 @@ function renderSheetInvItem(item, idx) {
         </select>`;
 
   return `
-    <div class="inv-item ${item.equipado ? 'inv-item-equipado' : ''} ${isZeroQtd ? 'inv-item-zerado' : ''}" data-idx="${idx}">
+    <div class="inv-item ${item.equipado ? 'inv-item-equipado' : ''} ${isZeroQtd ? 'inv-item-zerado' : ''}${item.destruido ? ' inv-item-destruido' : ''}" data-idx="${idx}">
       <div class="inv-drag-handle no-print" title="Arrastar para reordenar">&#9776;</div>
       <div style="flex:1;min-width:0;cursor:pointer" data-info-inv-sheet="${idx}" title="Ver detalhes">
-        <div class="inv-item-nome">
-          ${escHtml(item.nome)} ${profBadge}
+        <div class="inv-item-nome"${item.destruido ? ' style="text-decoration:line-through;opacity:0.6"' : ''}>
+          ${escHtml(item.nome)} ${profBadge}${item.destruido ? ' <span class="badge">Destruído</span>' : ''}
         </div>
-        ${(ataqueInfo || danoAutoInfo || vantagemInfo || estiloLutaInfo || maestriaBadge || tipoBadge || customBadges)
-          ? `<div class="inv-item-badges" style="display:flex;flex-wrap:wrap;gap:3px;margin-top:2px">${ataqueInfo}${danoAutoInfo}${vantagemInfo}${estiloLutaInfo}${maestriaBadge}${tipoBadge}${customBadges}</div>`
+        ${(ataqueInfo || danoAutoInfo || vantagemInfo || estiloLutaInfo || maestriaBadge || tipoBadge || customBadges || magicoBadges || recursosHtml)
+          ? `<div class="inv-item-badges" style="display:flex;flex-wrap:wrap;gap:3px;margin-top:2px">${ataqueInfo}${danoAutoInfo}${vantagemInfo}${estiloLutaInfo}${maestriaBadge}${tipoBadge}${customBadges}${magicoBadges}${recursosHtml}</div>`
           : ''
         }
         <div class="inv-item-detalhe">
@@ -393,27 +470,32 @@ function renderSheetInvItem(item, idx) {
           ${item.tipo === 'armadura' ? `CA: ${item.dados?.ca || ''} | ${item.dados?.categoria || ''}` : ''}
           ${item.tipo === 'escudo' ? `CA: ${item.dados?.ca || ''} | Escudo` : ''}
           ${item.tipo === 'equipamento' ? `${item.dados?.custo || ''} ${item.dados?.peso ? '| ' + item.dados.peso : ''}` : ''}
+          ${item.tipo === 'magico' ? escHtml(item.dados?.linha_tipo || '') : ''}
           ${ehArmaCustom ? `${danoExibicao} | ${item.dados?.propriedades || ''}` : (item.tipo === 'customizado' ? escHtml(item.descricao ? (item.descricao.length > 60 ? item.descricao.substring(0, 60) + '...' : item.descricao) : '') : '')}
           ${item.tipo === 'generico' ? escHtml(item.descricao || '') : ''}
         </div>
         ${descPreview}
       </div>
       <div class="inv-item-acoes no-print" style="align-items:center">
-        ${item.dados?.requer_sintonizacao ? `
+        ${item.destruido ? `<button class="btn btn-sm" data-restaurar-item="${idx}">Restaurar</button>` : ''}
+        ${item.dados?.requer_sintonizacao && !item.destruido ? `
           <label class="inv-sintonia" title="${podeSintonizar(char, idx) ? 'Sintonizar com este item' : `Limite de ${TETO_SINTONIZACAO} itens sintonizados atingido`}"
                  style="display:flex;align-items:center;gap:3px;font-size:0.65rem;${podeSintonizar(char, idx) ? '' : 'opacity:0.45;cursor:not-allowed'}">
             <input type="checkbox" data-sintonizar="${idx}" ${item.sintonizado ? 'checked' : ''} ${podeSintonizar(char, idx) ? '' : 'disabled'}>
             Sint.
           </label>` : ''}
+        ${requisitoFaltando
+          ? `<span class="inv-sintonia-requisito" title="${escHtml('Requer sintonização ' + requisitoFaltando)}" style="font-size:0.6rem;color:var(--danger)">requer: ${escHtml(requisitoFaltando)}</span>`
+          : ''}
         <div class="inv-qty-control" style="display:flex;align-items:center;gap:2px">
           <button class="btn btn-sm btn-icon" data-qty-minus="${idx}" style="font-size:0.7rem;padding:1px 5px">−</button>
           <span style="min-width:20px;text-align:center;font-size:0.8rem;font-weight:700" data-qty-display="${idx}">${item.quantidade ?? 1}</span>
           <button class="btn btn-sm btn-icon" data-qty-plus="${idx}" style="font-size:0.7rem;padding:1px 5px">+</button>
         </div>
         ${seletorMover}
-        <label class="form-check inv-equip-label" title="Equipar/Desequipar">
+        ${item.destruido ? '' : `<label class="form-check inv-equip-label" title="Equipar/Desequipar">
           <input type="checkbox" data-sheet-equip="${idx}" ${item.equipado ? 'checked' : ''}> Eq.
-        </label>
+        </label>`}
         <button class="btn btn-sm btn-danger btn-icon" data-sheet-rem-inv="${idx}">&times;</button>
       </div>
     </div>
@@ -508,6 +590,184 @@ function ligarEventosLocaisInventario() {
   });
 }
 
+/**
+ * Uso de item que recupera espaço de magia (Pérola do Poder): valida o item e
+ * os espaços gastos e abre o modal para escolher qual restaurar. Sem item ativo
+ * ou sem espaço gasto elegível, só avisa e não grava nada; o uso só é gasto
+ * quando a opção é escolhida e o espaço restaurado. Cancelar não grava.
+ */
+function usarItemQueRecuperaEspaco(item, uso) {
+  if (!itemAtivo(item)) {
+    toast(`Equipe e sintonize ${item.nome} para usar`, 'error');
+    return;
+  }
+  const opcoes = espacosRecuperaveis(reservasDeEspacos(), uso.circulo_max);
+  if (!opcoes.length) {
+    toast(mensagemSemEspaco(uso.circulo_max), 'error');
+    return;
+  }
+  const botoes = opcoes.map(o => `<button class="btn btn-secondary btn-espaco-opcao" data-espaco-fonte="${escHtml(o.fonte)}" data-espaco-circulo="${o.circulo}" style="display:block;width:100%;margin-bottom:6px;text-align:left">${escHtml(o.rotulo)}</button>`).join('');
+  abrirModal('Recuperar espaço de magia',
+    `<p>Escolha o espaço de magia gasto que <strong>${escHtml(item.nome)}</strong> vai restaurar.</p>${botoes}`,
+    '<button class="btn btn-secondary" id="btn-espaco-cancelar">Cancelar</button>');
+  document.getElementById('btn-espaco-cancelar')?.addEventListener('click', () => window.fecharModal());
+  document.querySelectorAll('.btn-espaco-opcao').forEach(btn => btn.addEventListener('click', () => {
+    // Desabilita todas as opções no primeiro clique: clique duplo não restaura nem gasta duas vezes.
+    const opcoesDoModal = document.querySelectorAll('.btn-espaco-opcao');
+    if (btn.disabled) return;
+    opcoesDoModal.forEach(b => { b.disabled = true; });
+    const resultado = restaurarEspacoPorItem(char, item, uso.nome,
+      { fonte: btn.dataset.espacoFonte, circulo: Number(btn.dataset.espacoCirculo) },
+      { reservas: reservasDeEspacos(), recuperar: recuperarUmEspaco });
+    window.fecharModal();
+    if (!resultado.ok) {
+      toast(resultado.erro, 'error');
+      return;
+    }
+    salvar();
+    renderFichaCompleta();
+    toast(`Espaço de ${resultado.circulo}º círculo recuperado`);
+  }));
+}
+
+/**
+ * Liga os controles de cargas e usos dos itens: − e + do contador (com a
+ * pergunta da última carga), chips de uso, restaurar item destruído, botão do
+ * amanhecer e o preenchimento único de recursos em itens mágicos antigos.
+ */
+function ligarEventosRecursosInventario() {
+  // − gasta (e pergunta a regra da última carga na passagem de 1 para 0); + devolve uma.
+  document.querySelectorAll('[data-cargas-menos]').forEach(btn => btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const item = char.inventario[parseInt(btn.dataset.cargasMenos)];
+    if (!item) return;
+    const { ultimaCarga } = gastarCarga(item);
+    salvar();
+    renderFichaCompleta();
+    perguntarUltimaCarga(item, ultimaCarga);
+  }));
+  document.querySelectorAll('[data-cargas-mais]').forEach(btn => btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const item = char.inventario[parseInt(btn.dataset.cargasMais)];
+    if (!item) return;
+    ajustarCarga(item, +1);
+    salvar();
+    renderFichaCompleta();
+  }));
+  // Usos: o chip alterna gasto/disponível; uso com efeito de recuperar espaço de magia, ao ser gasto, pergunta qual espaço restaurar.
+  document.querySelectorAll('[data-uso-item]').forEach(chip => chip.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const item = char.inventario[parseInt(chip.dataset.usoItem)];
+    if (!item) return;
+    const uso = (recursosDoItem(item)?.usos || []).find(u => u.nome === chip.dataset.usoNome);
+    const estado = garantirEstadoRecursos(item);
+    if (uso?.efeito === EFEITO_RECUPERAR_ESPACO && (estado?.usos?.[uso.nome] || 0) < uso.max) {
+      usarItemQueRecuperaEspaco(item, uso);
+      return;
+    }
+    alternarUso(item, chip.dataset.usoNome);
+    salvar();
+    renderFichaCompleta();
+  }));
+  // Restaurar item destruído por clique errado.
+  document.querySelectorAll('[data-restaurar-item]').forEach(btn => btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const item = char.inventario[parseInt(btn.dataset.restaurarItem)];
+    if (!item) return;
+    restaurarItem(item);
+    salvar();
+    renderFichaCompleta();
+  }));
+  atualizarBotaoRecuperarItens();
+
+  // Itens mágicos adicionados antes da 4A: recursos do acervo, uma vez.
+  if ((char.inventario || []).some(i => i?.dados?.magico_id && (!('recursos' in i.dados) || !('magias' in i.dados) || !(i.dados.passivos_versao >= PASSIVOS_VERSAO) || !('requisito_sintonizacao' in i.dados) || !('aumento_permanente' in i.dados)))) {
+    getItensMagicos().then(acervo => {
+      if (acervo && preencherRecursosDoAcervo(char, acervo) > 0) {
+        salvar();
+        renderFichaCompleta();
+      }
+    }).catch(() => {});
+  }
+}
+
+/**
+ * Valores do formulário de contador manual a partir de `dados.recursos`
+ * existente (edição); null quando o item não tem contador.
+ */
+function valoresDoContador(item) {
+  const rec = recursosDoItem(item);
+  if (!rec) return null;
+  if (rec.cargas) {
+    const r = rec.cargas.recupera;
+    return { tipo: 'cargas', nome: '', max: rec.cargas.max, recupera: r === 'todas' ? 'todas' : (typeof r === 'string' ? 'amanhecer' : 'nenhum'), dado: typeof r === 'string' && r !== 'todas' ? r : '' };
+  }
+  const uso = rec.usos?.[0];
+  if (!uso) return null;
+  return { tipo: 'uso', nome: uso.nome, max: uso.max, recupera: uso.recupera, dado: '' };
+}
+
+/**
+ * Troca o corpo do modal de detalhe pelo formulário de contador manual
+ * (cargas ou uso) e grava `item.dados.recursos` ao salvar. Com contador já
+ * existente, o formulário abre preenchido e preserva o gasto até o novo máximo.
+ */
+function abrirFormularioContadorManual(item) {
+  const inicial = valoresDoContador(item);
+  const corpoEl = document.getElementById('modal-corpo');
+  const acoesEl = document.getElementById('modal-acoes');
+  if (!corpoEl || !acoesEl) return;
+  corpoEl.innerHTML = `
+    <div class="form-group"><label class="form-label" for="contador-tipo">Tipo</label>
+      <select class="form-input" id="contador-tipo"><option value="cargas">Cargas</option><option value="uso">Uso</option></select></div>
+    <div class="form-group" id="contador-nome-grupo" style="display:none"><label class="form-label" for="contador-nome">Nome do uso</label>
+      <input type="text" class="form-input" id="contador-nome" maxlength="60"></div>
+    <div class="form-group"><label class="form-label" for="contador-max">Máximo</label>
+      <input type="number" class="form-input" id="contador-max" min="1" step="1" value="1"></div>
+    <div class="form-group"><label class="form-label" for="contador-recupera">Recuperação</label>
+      <select class="form-input" id="contador-recupera"></select></div>
+    <div class="form-group" id="contador-dado-grupo"><label class="form-label" for="contador-dado">Dado da recuperação (opcional, ex.: 1d6+1)</label>
+      <input type="text" class="form-input" id="contador-dado" maxlength="12"></div>`;
+  acoesEl.innerHTML = '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-contador">Salvar</button>';
+  const tipoEl = document.getElementById('contador-tipo');
+  // Opções de recuperação válidas para o tipo escolhido (cargas ou uso).
+  const OPCOES = {
+    cargas: [['amanhecer', 'Ao Descanso Longo, com dado'], ['todas', 'Todas no Descanso Longo'], ['nenhum', 'Não recupera']],
+    uso: [['amanhecer', 'Ao amanhecer'], ['descanso_longo', 'No Descanso Longo'], ['descanso_curto', 'No Descanso Curto']],
+  };
+  const aplicarTipo = () => {
+    const ehUso = tipoEl.value === 'uso';
+    document.getElementById('contador-nome-grupo').style.display = ehUso ? '' : 'none';
+    document.getElementById('contador-dado-grupo').style.display = ehUso ? 'none' : '';
+    document.getElementById('contador-recupera').innerHTML = OPCOES[tipoEl.value].map(([v, t]) => `<option value="${v}">${t}</option>`).join('');
+  };
+  tipoEl.addEventListener('change', aplicarTipo);
+  if (inicial) {
+    tipoEl.value = inicial.tipo;
+    aplicarTipo();
+    document.getElementById('contador-nome').value = inicial.nome;
+    document.getElementById('contador-max').value = inicial.max;
+    document.getElementById('contador-recupera').value = inicial.recupera;
+    document.getElementById('contador-dado').value = inicial.dado;
+  } else {
+    aplicarTipo();
+  }
+  document.getElementById('btn-salvar-contador').addEventListener('click', () => {
+    const r = recursosDoFormulario({
+      tipo: tipoEl.value,
+      nome: document.getElementById('contador-nome').value,
+      max: document.getElementById('contador-max').value,
+      recupera: document.getElementById('contador-recupera').value,
+      dado: document.getElementById('contador-dado').value,
+    });
+    if (!r.ok) { toast(r.erro, 'error'); return; }
+    aplicarContadorManual(item, r.recursos, !!inicial);
+    salvar();
+    window.fecharModal();
+    renderFichaCompleta();
+  });
+}
+
 export function setupEventosInventarioSheet() {
   // Toggle de sobrecarga (fora do container da lista)
   const cfgSobrecarga = document.getElementById('cfg-sobrecarga');
@@ -540,6 +800,7 @@ export function setupEventosInventarioSheet() {
   });
 
   ligarEventosLocaisInventario();
+  ligarEventosRecursosInventario();
 
   // Equipar/desequipar — re-renderiza a ficha completa para atualizar CA e stats
   document.querySelectorAll('[data-sheet-equip]').forEach(cb => {
@@ -575,10 +836,14 @@ export function setupEventosInventarioSheet() {
         <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
       `);
       document.getElementById('btn-confirmar-rem-inv-sheet')?.addEventListener('click', () => {
+        // Item com magias ou equipado altera blocos fora de #sheet-inventario
+        // (Magias de Itens, CA e demais stats): exige a ficha inteira.
+        const afetaFora = !!item.equipado || !!item.dados?.magias?.length;
         char.inventario.splice(idx, 1);
         salvar();
         fecharModal();
-        reRenderSheetInv();
+        if (afetaFora) renderFichaCompleta();
+        else reRenderSheetInv();
       });
     });
   });
@@ -621,6 +886,24 @@ export function setupEventosInventarioSheet() {
         toast(`Você já está sintonizado com ${TETO_SINTONIZACAO} itens.`, 'error');
         return;
       }
+      // Ao marcar: requisito de classe/espécie não atendido pede confirmação.
+      if (caixa.checked) {
+        const faltando = requisitoNaoAtendido(item);
+        if (faltando) {
+          caixa.checked = false;
+          abrirModal('Requisito de sintonização',
+            `<p>Este item requer sintonização ${escHtml(faltando)}.</p>`,
+            '<button class="btn btn-secondary" id="btn-sintonizar-cancelar">Cancelar</button><button class="btn btn-primary" id="btn-sintonizar-mesmo-assim">Sintonizar mesmo assim</button>');
+          document.getElementById('btn-sintonizar-cancelar')?.addEventListener('click', () => window.fecharModal());
+          document.getElementById('btn-sintonizar-mesmo-assim')?.addEventListener('click', () => {
+            item.sintonizado = true;
+            window.fecharModal();
+            salvar();
+            renderFichaCompleta();
+          });
+          return;
+        }
+      }
       item.sintonizado = caixa.checked;
       salvar();
       renderFichaCompleta();
@@ -644,6 +927,7 @@ export function setupEventosInventarioSheet() {
   const btnAddInv = document.getElementById('btn-add-inv');
   if (btnAddInv) btnAddInv.onclick = () => abrirSeletorItens({
     personagem: char,
+    permitirMagicos: true,
     lerComprarAtivo: carregarComprarAtivoPadrao,
     salvarComprarAtivo: salvarComprarAtivoPadrao,
     aoAdicionar: () => { salvar(); renderFichaCompleta(); },
@@ -895,7 +1179,7 @@ function reRenderSheetInv() {
   const sintonizadosEl = document.getElementById('sheet-sintonizados-valor');
   if (sintonizadosEl) sintonizadosEl.innerHTML = htmlContadorSintonizados();
 
-  // Re-bind eventos
+  // Re-bind eventos (também atualiza o botão do amanhecer)
   setupEventosInventarioSheet();
 }
 
@@ -1092,11 +1376,112 @@ function htmlPropriedadesEMaestria(d, propsDescs) {
   return html;
 }
 
-/** Mostra popup com detalhes completos de um item do inventário */
-async function mostrarDetalheItemSheet(item) {
-  if (!item) return;
-  const dados = await carregarDadosEquipSheet();
-  const propsDescs = dados.propriedadesArmas || [];
+const NOMES_ATRIBUTO_AUMENTO = { forca: 'Força', destreza: 'Destreza', constituicao: 'Constituição', inteligencia: 'Inteligência', sabedoria: 'Sabedoria', carisma: 'Carisma' };
+
+/** Texto do aumento permanente do item, ex.: "Força +2, até 30" (com redução: "e outro −2, até o mínimo de 3"). */
+function textoAumentoPermanente(aum) {
+  const alvo = aum.atributo === 'escolha' ? 'Um atributo à sua escolha' : (NOMES_ATRIBUTO_AUMENTO[aum.atributo] || aum.atributo);
+  const red = aum.reducao ? ` e outro −${aum.reducao.valor}, até o mínimo de ${aum.reducao.minimo}` : '';
+  return `${alvo} +${aum.valor}, até ${aum.maximo}${red}`;
+}
+
+/** HTML das opções dos seis atributos para os seletores do aumento permanente. */
+function opcoesAtributosAumento() {
+  return '<option value="">— escolher —</option>' + Object.entries(NOMES_ATRIBUTO_AUMENTO)
+    .map(([chave, nome]) => `<option value="${chave}">${nome}</option>`).join('');
+}
+
+/**
+ * HTML do bloco "Aumento permanente" do detalhe do item: botão enquanto o
+ * aumento está pendente, "Aumento aplicado." depois de aplicado; vazio para
+ * item sem aumento.
+ */
+function htmlAumentoPermanente(item) {
+  if (!item?.dados?.aumento_permanente) return '';
+  if (item.aumento_aplicado) return '<div class="section-divider mt-1"><span>Aumento permanente</span></div><div style="font-size:0.85rem">Aumento aplicado.</div>';
+  const aum = aumentoPermanenteDoItem(item);
+  if (!aum) return '';
+  // Item que exige sintonização só pode ser estudado sintonizado.
+  const semSintonia = !!item.dados?.requer_sintonizacao && item.sintonizado !== true;
+  return `<div id="bloco-aumento-permanente" class="no-print" style="margin-top:10px"><div class="section-divider mt-1"><span>Aumento permanente</span></div>
+    <div style="font-size:0.85rem;margin-bottom:6px">${escHtml(textoAumentoPermanente(aum))}</div>
+    ${semSintonia ? '<div id="dica-aumento-sintonia" style="font-size:0.8rem;color:var(--text-muted);margin-bottom:6px">Sintonize o item para estudar.</div>' : ''}
+    <button class="btn btn-sm btn-accent" id="btn-aplicar-aumento-permanente"${semSintonia ? ' disabled' : ''}>Aplicar aumento</button></div>`;
+}
+
+/**
+ * Liga o botão do aumento permanente no modal de detalhe. Sem escolha, o
+ * clique aplica direto; com escolha, troca o bloco pelos seletores e aplica
+ * ao confirmar. Em caso de sucesso sincroniza o PV, salva, avisa, fecha o
+ * modal e refaz a ficha; em erro avisa e não grava.
+ */
+function ligarAumentoPermanente(item) {
+  const btn = document.getElementById('btn-aplicar-aumento-permanente');
+  const aum = aumentoPermanenteDoItem(item);
+  if (!btn || !aum) return;
+  const aplicar = (opcoes, botao) => {
+    botao.disabled = true;
+    const r = aplicarAumentoPermanente(char, item, opcoes);
+    if (!r.ok) {
+      toast(r.erro, 'error');
+      botao.disabled = false;
+      return;
+    }
+    sincronizarBonusPvNiveis();
+    salvar();
+    // atributo-base: o aviso informa o valor-base gravado pelo aumento permanente
+    const partes = [`${NOMES_ATRIBUTO_AUMENTO[r.aumento.atributo]} aumentou para ${char.atributos[r.aumento.atributo]}`];
+    // atributo-base: idem, valor-base após a redução
+    if (r.reducao) {
+      partes.push(r.reducao.aplicado === 0
+        ? `${NOMES_ATRIBUTO_AUMENTO[r.reducao.atributo]} já estava no mínimo`
+        // atributo-base: valor-base após a redução
+        : `${NOMES_ATRIBUTO_AUMENTO[r.reducao.atributo]} reduziu para ${char.atributos[r.reducao.atributo]}`);
+    }
+    toast(partes.join('; '), 'success');
+    window.fecharModal();
+    renderFichaCompleta();
+  };
+  btn.addEventListener('click', () => {
+    if (aum.atributo !== 'escolha') {
+      aplicar({}, btn);
+      return;
+    }
+    const bloco = document.getElementById('bloco-aumento-permanente');
+    if (!bloco) return;
+    bloco.innerHTML = `<div class="section-divider mt-1"><span>Aumento permanente</span></div>
+      <div style="font-size:0.85rem;margin-bottom:6px">${escHtml(textoAumentoPermanente(aum))}</div>
+      <div class="form-group"><label class="form-label" for="sel-aumento-atributo">Atributo que aumenta</label>
+        <select class="form-input" id="sel-aumento-atributo">${opcoesAtributosAumento()}</select></div>
+      ${aum.reducao ? `<div class="form-group"><label class="form-label" for="sel-reducao-atributo">Atributo que diminui</label>
+        <select class="form-input" id="sel-reducao-atributo">${opcoesAtributosAumento()}</select></div>` : ''}
+      <button class="btn btn-sm btn-accent" id="btn-confirmar-aumento-permanente">Confirmar</button>`;
+    // Atributo escolhido para aumentar não pode ser o reduzido: a opção fica desabilitada.
+    const selAumento = document.getElementById('sel-aumento-atributo');
+    const selReducao = document.getElementById('sel-reducao-atributo');
+    selAumento?.addEventListener('change', () => {
+      if (!selReducao) return;
+      for (const op of selReducao.options) op.disabled = op.value !== '' && op.value === selAumento.value;
+      if (selReducao.value === selAumento.value) selReducao.value = '';
+    });
+    const confirmar = document.getElementById('btn-confirmar-aumento-permanente');
+    confirmar.addEventListener('click', () => aplicar({
+      atributo: document.getElementById('sel-aumento-atributo')?.value,
+      reduzir: document.getElementById('sel-reducao-atributo')?.value,
+    }, confirmar));
+  });
+}
+
+/**
+ * Monta o HTML do corpo do modal de detalhe de um item do inventário:
+ * descrição, tabelas, raridade, requisito, bloco de aumento permanente,
+ * botões do contador manual e de destruir. Função pura (sem DOM nem
+ * gravação); os botões são ligados depois por mostrarDetalheItemSheet.
+ * @param {object} item Item do inventário.
+ * @param {Array<{nome: string, descricao: string}>} propsDescs Glossário de propriedades de arma.
+ * @returns {string}
+ */
+export function htmlDetalheItem(item, propsDescs = []) {
   let corpo = '';
 
   if (item.tipo === 'arma') {
@@ -1149,6 +1534,8 @@ async function mostrarDetalheItemSheet(item) {
     if (item.descricao) {
       corpo += `<div class="md-content" style="margin-top:6px;font-size:0.85rem">${mdParaHtml(item.descricao)}</div>`;
     }
+  } else if (item.tipo === 'magico') {
+    corpo += htmlCorpoItemMagico(item.dados || {});
   } else {
     const d = item.dados || {};
     if (d.tipo_uso) {
@@ -1166,7 +1553,60 @@ async function mostrarDetalheItemSheet(item) {
     }
   }
 
+  // Arma/armadura/escudo mágicos: bloco mágico depois do detalhe da base.
+  if (item.tipo !== 'magico' && item.dados?.magico_id) corpo += htmlCorpoItemMagico(item.dados);
+
   if (!corpo.trim()) corpo = '<div style="color:var(--text-muted)">Sem informações adicionais disponíveis.</div>';
+
+  // Item com resistência a escolher (4C): seletor do tipo de dano.
+  const opcoesResistencia = opcoesDeEscolha(item);
+  if (opcoesResistencia) {
+    const atual = item.escolhas?.resistencia || '';
+    corpo += `<div class="form-group no-print" style="margin-top:10px"><label class="form-label" for="sel-escolha-resistencia">Tipo de resistência</label>
+      <select class="form-input" id="sel-escolha-resistencia"><option value="">— escolher —</option>${opcoesResistencia.map(o => `<option value="${escHtml(o)}"${o === atual ? ' selected' : ''}>${escHtml(o)}</option>`).join('')}</select></div>`;
+  }
+
+  // Aumento permanente de atributo (Manuais, Tomos, Livros): botão ou aviso de aplicado.
+  corpo += htmlAumentoPermanente(item);
+
+  // Item sem recursos e não destruído: permite criar um contador manual.
+  const aceitaContador = !recursosDoItem(item) && !item.destruido;
+  if (aceitaContador) corpo += '<div class="no-print" style="margin-top:10px"><button class="btn btn-sm btn-secondary" id="btn-adicionar-contador">+ Contador de cargas/usos</button></div>';
+  // Contador manual: editar (formulário preenchido) e remover; recursos do acervo nunca são removíveis.
+  const manual = contadorEhManual(item) && !item.destruido;
+  if (manual) {
+    corpo += `<div class="no-print" style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn btn-sm btn-secondary" id="btn-editar-contador">Editar contador</button>
+      <button class="btn btn-sm btn-danger" id="btn-remover-contador">Remover contador</button></div>`;
+  }
+  // Item mágico com recursos (cargas ou usos): marcar destruído à mão (Escaravelho de Proteção, Talismãs).
+  const podeMarcarDestruido = !item.destruido && !!recursosDoItem(item) && (item.tipo === 'magico' || !!item.dados?.magico_id);
+  if (podeMarcarDestruido) corpo += '<div class="no-print" style="margin-top:10px"><button class="btn btn-sm btn-danger" id="btn-marcar-destruido">Marcar como destruído</button></div>';
+  return corpo;
+}
+
+/** Mostra popup com detalhes completos de um item do inventário */
+async function mostrarDetalheItemSheet(item) {
+  if (!item) return;
+  const dados = await carregarDadosEquipSheet();
+  const corpo = htmlDetalheItem(item, dados.propriedadesArmas || []);
+  /** Liga os botões do contador (adicionar, editar, remover) e de marcar destruído no detalhe aberto. */
+  const ligarContador = () => {
+    document.getElementById('btn-adicionar-contador')?.addEventListener('click', () => abrirFormularioContadorManual(item));
+    document.getElementById('btn-editar-contador')?.addEventListener('click', () => abrirFormularioContadorManual(item));
+    document.getElementById('btn-remover-contador')?.addEventListener('click', () => {
+      if (!removerContadorManual(item)) return;
+      salvar();
+      window.fecharModal();
+      renderFichaCompleta();
+    });
+    document.getElementById('btn-marcar-destruido')?.addEventListener('click', () => {
+      marcarDestruido(item);
+      salvar();
+      window.fecharModal();
+      renderFichaCompleta();
+    });
+  };
 
   if (item.tipo === 'customizado') {
     const _idxItem = char.inventario.indexOf(item);
@@ -1181,5 +1621,17 @@ async function mostrarDetalheItemSheet(item) {
   } else {
     abrirModal(item.nome, corpo);
   }
+  ligarContador();
+  ligarAumentoPermanente(item);
+  // Grava a escolha de resistência, recalcula a ficha e fecha o modal.
+  document.getElementById('sel-escolha-resistencia')?.addEventListener('change', (e) => {
+    const escolhas = { ...(item.escolhas || {}) };
+    if (e.target.value) escolhas.resistencia = e.target.value;
+    else delete escolhas.resistencia;
+    item.escolhas = escolhas;
+    salvar();
+    renderFichaCompleta();
+    window.fecharModal();
+  });
 }
 

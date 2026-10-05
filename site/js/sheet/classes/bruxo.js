@@ -4,6 +4,7 @@
 // Consultado pela ficha, pelos descansos e pelas habilidades ativas.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
+import { atributoEfetivo } from '../../regras-atributos.js';
 import { getMagiasClasse, getTalentos } from '../../db.js';
 import { abrirModal, calcMod, mdParaHtml, semAcento, toast } from '../../utils.js';
 import { char, indiceMagiasCache, salvar } from '../estado.js';
@@ -150,7 +151,7 @@ export function getEstadoRecursosBruxo() {
   if (typeof sub.infero.lancar_inferno_usado !== 'boolean') sub.infero.lancar_inferno_usado = false;
 
   const nivel = nivelNa(char, 'Bruxo') || 1;
-  const modCar = Math.max(1, calcMod(char.atributos.carisma));
+  const modCar = Math.max(1, calcMod(atributoEfetivo(char, 'carisma')));
 
   return {
     astuciaUsada: !!char.recursos.bruxo.astucia_usada,

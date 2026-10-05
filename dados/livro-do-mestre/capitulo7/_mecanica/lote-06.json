@@ -1,0 +1,193 @@
+{
+  "lote": "06",
+  "itens": {
+    "tiara-do-intelecto": {
+      "efeitos": [
+        {
+          "alvo": "atributo",
+          "atributo": "inteligencia",
+          "minimo": 19
+        }
+      ]
+    },
+    "vingador-sagrado": {
+      "base": {
+        "tipo": "arma",
+        "categorias": [
+          "Armas Simples Corpo a Corpo",
+          "Armas Simples à Distância",
+          "Armas Marciais Corpo a Corpo",
+          "Armas Marciais à Distância"
+        ]
+      },
+      "efeitos": [
+        {
+          "alvo": "ataque_arma",
+          "valor": 3
+        },
+        {
+          "alvo": "dano_arma",
+          "valor": 3
+        },
+        { "alvo": "vantagem", "em": "salvaguarda", "contexto": "contra magias e outros efeitos mágicos" }
+      ]
+    },
+    "pedra-ioun-alerta": { "efeitos": [ { "alvo": "vantagem", "em": "iniciativa" }, { "alvo": "vantagem", "em": "pericia", "pericia": "Percepção" } ] },
+    "pedra-ioun-agilidade": { "efeitos": [ { "alvo": "atributo_bonus", "atributo": "destreza", "valor": 2, "maximo": 20 } ] },
+    "pedra-ioun-fortitude": { "efeitos": [ { "alvo": "atributo_bonus", "atributo": "constituicao", "valor": 2, "maximo": 20 } ] },
+    "pedra-ioun-intuicao": { "efeitos": [ { "alvo": "atributo_bonus", "atributo": "sabedoria", "valor": 2, "maximo": 20 } ] },
+    "pedra-ioun-intelecto": { "efeitos": [ { "alvo": "atributo_bonus", "atributo": "inteligencia", "valor": 2, "maximo": 20 } ] },
+    "pedra-ioun-lideranca": { "efeitos": [ { "alvo": "atributo_bonus", "atributo": "carisma", "valor": 2, "maximo": 20 } ] },
+    "pedra-ioun-forca": { "efeitos": [ { "alvo": "atributo_bonus", "atributo": "forca", "valor": 2, "maximo": 20 } ] },
+    "pedra-ioun-protecao": {
+      "efeitos": [
+        {
+          "alvo": "ca",
+          "valor": 1
+        }
+      ]
+    },
+    "chapeu-de-pragas": {
+      "efeitos": [],
+      "recursos": {
+        "cargas": {
+          "max": 3,
+          "recupera": "todas",
+          "ultima_carga": null
+        }
+      }
+    },
+    "elmo-do-teleporte": { "efeitos": [], "recursos": { "cargas": { "max": 3, "recupera": "1d3", "ultima_carga": null } }, "magias": [ { "nome": "Teleporte", "custo": { "cargas": 1 }, "conjuracao": null } ] },
+    "bolsa-de-temperos-pratica-de-heward": {
+      "efeitos": [],
+      "recursos": {
+        "cargas": {
+          "max": 10,
+          "recupera": "1d6+4",
+          "ultima_carga": null
+        }
+      }
+    },
+    "trompa-do-alarme-silencioso": {
+      "efeitos": [],
+      "recursos": {
+        "cargas": {
+          "max": 4,
+          "recupera": "1d4",
+          "ultima_carga": null
+        }
+      }
+    },
+    "instrumento-da-escrita": {
+      "efeitos": [],
+      "recursos": {
+        "cargas": {
+          "max": 3,
+          "recupera": "todas",
+          "ultima_carga": null
+        }
+      }
+    },
+    "chapeu-de-mago": {
+      "efeitos": [],
+      "recursos": {
+        "usos": [
+          {
+            "nome": "Magia Desconhecida",
+            "max": 1,
+            "recupera": "descanso_longo"
+          }
+        ]
+      }
+    },
+    "elmo-da-telepatia": { "efeitos": [], "recursos": { "usos": [ { "nome": "Detectar Pensamentos", "max": 1, "recupera": "amanhecer" }, { "nome": "Sugestão", "max": 1, "recupera": "amanhecer" } ] }, "magias": [ { "nome": "Detectar Pensamentos", "custo": { "uso": "Detectar Pensamentos" }, "conjuracao": { "cd": 13 } }, { "nome": "Sugestão", "custo": { "uso": "Sugestão" }, "conjuracao": { "cd": 13 } } ] },
+    "faixas-de-ferro-de-bilarro": {
+      "efeitos": [],
+      "recursos": {
+        "usos": [
+          {
+            "nome": "Faixas de Ferro",
+            "max": 1,
+            "recupera": "amanhecer"
+          }
+        ]
+      }
+    },
+    "instrumento-dos-bardos-harpa-de-anstruth": { "efeitos": [], "recursos": { "usos": [ { "nome": "Voo", "max": 1, "recupera": "amanhecer" }, { "nome": "Invisibilidade", "max": 1, "recupera": "amanhecer" }, { "nome": "Levitação", "max": 1, "recupera": "amanhecer" }, { "nome": "Proteção Contra o Bem e o Mal", "max": 1, "recupera": "amanhecer" }, { "nome": "Curar Ferimentos (5º círculo)", "max": 1, "recupera": "amanhecer" }, { "nome": "Tempestade Glacial", "max": 1, "recupera": "amanhecer" }, { "nome": "Muralha de Espinhos", "max": 1, "recupera": "amanhecer" } ] }, "magias": [ { "nome": "Voo", "custo": { "uso": "Voo" }, "conjuracao": "sua" }, { "nome": "Invisibilidade", "custo": { "uso": "Invisibilidade" }, "conjuracao": "sua" }, { "nome": "Levitação", "custo": { "uso": "Levitação" }, "conjuracao": "sua" }, { "nome": "Proteção Contra o Bem e o Mal", "custo": { "uso": "Proteção Contra o Bem e o Mal" }, "conjuracao": "sua" }, { "nome": "Curar Ferimentos", "custo": { "uso": "Curar Ferimentos (5º círculo)", "circulo": 5 }, "conjuracao": "sua" }, { "nome": "Tempestade Glacial", "custo": { "uso": "Tempestade Glacial" }, "conjuracao": "sua" }, { "nome": "Muralha de Espinhos", "custo": { "uso": "Muralha de Espinhos" }, "conjuracao": "sua" } ] },
+    "instrumento-dos-bardos-bandolim-de-canaith": { "efeitos": [], "recursos": { "usos": [ { "nome": "Voo", "max": 1, "recupera": "amanhecer" }, { "nome": "Invisibilidade", "max": 1, "recupera": "amanhecer" }, { "nome": "Levitação", "max": 1, "recupera": "amanhecer" }, { "nome": "Proteção Contra o Bem e o Mal", "max": 1, "recupera": "amanhecer" }, { "nome": "Curar Ferimentos (3º círculo)", "max": 1, "recupera": "amanhecer" }, { "nome": "Dissipar Magia", "max": 1, "recupera": "amanhecer" }, { "nome": "Proteção Contra Energia (somente dano Elétrico)", "max": 1, "recupera": "amanhecer" } ] }, "magias": [ { "nome": "Voo", "custo": { "uso": "Voo" }, "conjuracao": "sua" }, { "nome": "Invisibilidade", "custo": { "uso": "Invisibilidade" }, "conjuracao": "sua" }, { "nome": "Levitação", "custo": { "uso": "Levitação" }, "conjuracao": "sua" }, { "nome": "Proteção Contra o Bem e o Mal", "custo": { "uso": "Proteção Contra o Bem e o Mal" }, "conjuracao": "sua" }, { "nome": "Curar Ferimentos", "custo": { "uso": "Curar Ferimentos (3º círculo)", "circulo": 3 }, "conjuracao": "sua" }, { "nome": "Dissipar Magia", "custo": { "uso": "Dissipar Magia" }, "conjuracao": "sua" }, { "nome": "Proteção Contra Energia", "custo": { "uso": "Proteção Contra Energia (somente dano Elétrico)" }, "conjuracao": "sua" } ] },
+    "instrumento-dos-bardos-lira-de-cli": { "efeitos": [], "recursos": { "usos": [ { "nome": "Voo", "max": 1, "recupera": "amanhecer" }, { "nome": "Invisibilidade", "max": 1, "recupera": "amanhecer" }, { "nome": "Levitação", "max": 1, "recupera": "amanhecer" }, { "nome": "Proteção Contra o Bem e o Mal", "max": 1, "recupera": "amanhecer" }, { "nome": "Moldar Rochas", "max": 1, "recupera": "amanhecer" }, { "nome": "Muralha de Fogo", "max": 1, "recupera": "amanhecer" }, { "nome": "Muralha de Vento", "max": 1, "recupera": "amanhecer" } ] }, "magias": [ { "nome": "Voo", "custo": { "uso": "Voo" }, "conjuracao": "sua" }, { "nome": "Invisibilidade", "custo": { "uso": "Invisibilidade" }, "conjuracao": "sua" }, { "nome": "Levitação", "custo": { "uso": "Levitação" }, "conjuracao": "sua" }, { "nome": "Proteção Contra o Bem e o Mal", "custo": { "uso": "Proteção Contra o Bem e o Mal" }, "conjuracao": "sua" }, { "nome": "Moldar Rochas", "custo": { "uso": "Moldar Rochas" }, "conjuracao": "sua" }, { "nome": "Muralha de Fogo", "custo": { "uso": "Muralha de Fogo" }, "conjuracao": "sua" }, { "nome": "Muralha de Vento", "custo": { "uso": "Muralha de Vento" }, "conjuracao": "sua" } ] },
+    "instrumento-dos-bardos-alaude-de-doss": { "efeitos": [], "recursos": { "usos": [ { "nome": "Voo", "max": 1, "recupera": "amanhecer" }, { "nome": "Invisibilidade", "max": 1, "recupera": "amanhecer" }, { "nome": "Levitação", "max": 1, "recupera": "amanhecer" }, { "nome": "Proteção Contra o Bem e o Mal", "max": 1, "recupera": "amanhecer" }, { "nome": "Amizade Animal", "max": 1, "recupera": "amanhecer" }, { "nome": "Proteção Contra Energia (somente dano Ígneo)", "max": 1, "recupera": "amanhecer" }, { "nome": "Proteção Contra Veneno", "max": 1, "recupera": "amanhecer" } ] }, "magias": [ { "nome": "Voo", "custo": { "uso": "Voo" }, "conjuracao": "sua" }, { "nome": "Invisibilidade", "custo": { "uso": "Invisibilidade" }, "conjuracao": "sua" }, { "nome": "Levitação", "custo": { "uso": "Levitação" }, "conjuracao": "sua" }, { "nome": "Proteção Contra o Bem e o Mal", "custo": { "uso": "Proteção Contra o Bem e o Mal" }, "conjuracao": "sua" }, { "nome": "Amizade Animal", "custo": { "uso": "Amizade Animal" }, "conjuracao": "sua" }, { "nome": "Proteção Contra Energia", "custo": { "uso": "Proteção Contra Energia (somente dano Ígneo)" }, "conjuracao": "sua" }, { "nome": "Proteção Contra Veneno", "custo": { "uso": "Proteção Contra Veneno" }, "conjuracao": "sua" } ] },
+    "instrumento-dos-bardos-bandurra-de-fochlucan": { "efeitos": [], "recursos": { "usos": [ { "nome": "Voo", "max": 1, "recupera": "amanhecer" }, { "nome": "Invisibilidade", "max": 1, "recupera": "amanhecer" }, { "nome": "Levitação", "max": 1, "recupera": "amanhecer" }, { "nome": "Proteção Contra o Bem e o Mal", "max": 1, "recupera": "amanhecer" }, { "nome": "Emaranhar", "max": 1, "recupera": "amanhecer" }, { "nome": "Fogo das Fadas", "max": 1, "recupera": "amanhecer" }, { "nome": "Bordão Místico", "max": 1, "recupera": "amanhecer" }, { "nome": "Falar com Animais", "max": 1, "recupera": "amanhecer" } ] }, "magias": [ { "nome": "Voo", "custo": { "uso": "Voo" }, "conjuracao": "sua" }, { "nome": "Invisibilidade", "custo": { "uso": "Invisibilidade" }, "conjuracao": "sua" }, { "nome": "Levitação", "custo": { "uso": "Levitação" }, "conjuracao": "sua" }, { "nome": "Proteção Contra o Bem e o Mal", "custo": { "uso": "Proteção Contra o Bem e o Mal" }, "conjuracao": "sua" }, { "nome": "Emaranhar", "custo": { "uso": "Emaranhar" }, "conjuracao": "sua" }, { "nome": "Fogo das Fadas", "custo": { "uso": "Fogo das Fadas" }, "conjuracao": "sua" }, { "nome": "Bordão Místico", "custo": { "uso": "Bordão Místico" }, "conjuracao": "sua" }, { "nome": "Falar com Animais", "custo": { "uso": "Falar com Animais" }, "conjuracao": "sua" } ] },
+    "instrumento-dos-bardos-citara-de-mac-fuirmidh": { "efeitos": [], "recursos": { "usos": [ { "nome": "Voo", "max": 1, "recupera": "amanhecer" }, { "nome": "Invisibilidade", "max": 1, "recupera": "amanhecer" }, { "nome": "Levitação", "max": 1, "recupera": "amanhecer" }, { "nome": "Proteção Contra o Bem e o Mal", "max": 1, "recupera": "amanhecer" }, { "nome": "Pele-Casca", "max": 1, "recupera": "amanhecer" }, { "nome": "Curar Ferimentos", "max": 1, "recupera": "amanhecer" }, { "nome": "Névoa Obscurecente", "max": 1, "recupera": "amanhecer" } ] }, "magias": [ { "nome": "Voo", "custo": { "uso": "Voo" }, "conjuracao": "sua" }, { "nome": "Invisibilidade", "custo": { "uso": "Invisibilidade" }, "conjuracao": "sua" }, { "nome": "Levitação", "custo": { "uso": "Levitação" }, "conjuracao": "sua" }, { "nome": "Proteção Contra o Bem e o Mal", "custo": { "uso": "Proteção Contra o Bem e o Mal" }, "conjuracao": "sua" }, { "nome": "Pele-Casca", "custo": { "uso": "Pele-Casca" }, "conjuracao": "sua" }, { "nome": "Curar Ferimentos", "custo": { "uso": "Curar Ferimentos" }, "conjuracao": "sua" }, { "nome": "Névoa Obscurecente", "custo": { "uso": "Névoa Obscurecente" }, "conjuracao": "sua" } ] },
+    "instrumento-dos-bardos-harpa-de-ollamh": { "efeitos": [], "recursos": { "usos": [ { "nome": "Voo", "max": 1, "recupera": "amanhecer" }, { "nome": "Invisibilidade", "max": 1, "recupera": "amanhecer" }, { "nome": "Levitação", "max": 1, "recupera": "amanhecer" }, { "nome": "Proteção Contra o Bem e o Mal", "max": 1, "recupera": "amanhecer" }, { "nome": "Confusão", "max": 1, "recupera": "amanhecer" }, { "nome": "Controlar o Clima", "max": 1, "recupera": "amanhecer" }, { "nome": "Tempestade de Fogo", "max": 1, "recupera": "amanhecer" } ] }, "magias": [ { "nome": "Voo", "custo": { "uso": "Voo" }, "conjuracao": "sua" }, { "nome": "Invisibilidade", "custo": { "uso": "Invisibilidade" }, "conjuracao": "sua" }, { "nome": "Levitação", "custo": { "uso": "Levitação" }, "conjuracao": "sua" }, { "nome": "Proteção Contra o Bem e o Mal", "custo": { "uso": "Proteção Contra o Bem e o Mal" }, "conjuracao": "sua" }, { "nome": "Confusão", "custo": { "uso": "Confusão" }, "conjuracao": "sua" }, { "nome": "Controlar o Clima", "custo": { "uso": "Controlar o Clima" }, "conjuracao": "sua" }, { "nome": "Tempestade de Fogo", "custo": { "uso": "Tempestade de Fogo" }, "conjuracao": "sua" } ] },
+    "pedra-ioun-absorcao": {
+      "efeitos": [],
+      "recursos": {
+        "cargas": {
+          "max": 20,
+          "recupera": null,
+          "ultima_carga": null
+        }
+      }
+    },
+    "pedra-ioun-absorcao-maior": {
+      "efeitos": [],
+      "recursos": {
+        "cargas": {
+          "max": 20,
+          "recupera": null,
+          "ultima_carga": null
+        }
+      }
+    },
+    "elmo-de-compreender-idiomas": { "efeitos": [], "magias": [ { "nome": "Compreender Idiomas", "custo": "livre", "conjuracao": null } ] }
+  },
+  "sem_efeito_automatico": [
+    "elmo-do-brilho",
+    "mochila-pratica-de-heward",
+    "trompa-explosiva",
+    "trompa-de-valhalla",
+    "trompa-de-valhalla-prata",
+    "trompa-de-valhalla-latao",
+    "trompa-de-valhalla-bronze",
+    "trompa-de-valhalla-ferro",
+    "ferraduras-do-zefiro",
+    "ferraduras-da-velocidade",
+    "bastao-imovel",
+    "instrumento-das-ilusoes",
+    "instrumento-dos-bardos",
+    "pedra-ioun",
+    "pedra-ioun-maestria",
+    "pedra-ioun-regeneracao",
+    "pedra-ioun-reserva",
+    "pedra-ioun-sustento",
+    "frasco-de-ferro"
+  ],
+  "sem_magias": {
+    "chapeu-de-mago": "Magia Desconhecida: truque de Mago que o personagem não conhece, escolhido na hora e condicionado a teste de Inteligência (Arcanismo) CD 10",
+    "elmo-do-brilho": "custo em gemas do elmo (cada magia destrói uma gema do tipo indicado); sem contador de gemas",
+    "instrumento-da-escrita": "Dissipar Magia é citada como forma de apagar a mensagem; o item não a conjura",
+    "instrumento-dos-bardos": "as magias ficam em cada variante (instrumento)"
+  },
+  "sem_aumento": {
+    "pedra-ioun": "aumento só nas variantes de atributo"
+  },
+  "sem_passivos": {
+    "elmo-do-brilho": "condicional: Resistência a dano Ígneo só enquanto o elmo tiver pelo menos um rubi",
+    "trompa-de-valhalla": "atributo dos espíritos guerreiros invocados (Imunidade a condições é dos espíritos)",
+    "pedra-ioun": "passivos só na variante Alerta (curados nela); as demais pedras não têm passivo de defesa, deslocamento, sentido ou vantagem",
+    "frasco-de-ferro": "Vantagem na salvaguarda é da criatura alvo, não do portador"
+  },
+  "pendencias": [
+    "pedra-ioun-agilidade, pedra-ioun-fortitude, pedra-ioun-intuicao, pedra-ioun-intelecto, pedra-ioun-lideranca, pedra-ioun-forca: 'aumenta em 2, até um máximo de 20' enquanto orbita curado como atributo_bonus (Destreza, Constituição, Sabedoria, Inteligência, Carisma, Força). O pai pedra-ioun fica em sem_aumento: o aumento está só nessas variantes.",
+    "pedra-ioun-maestria: 'Seu Bônus de Proficiência aumenta em 1' — bônus de proficiência não é alvo do vocabulário fechado. Ficou sem efeito.",
+    "vingador-sagrado: o 2d10 Radiante contra Ínferos/Mortos-Vivos fica na descrição; foram curados o +3 de ataque e dano e a Vantagem em salvaguardas do portador.",
+    "instrumento-dos-bardos: cada variante tem um uso por magia (comuns + próprias da tabela), que volta ao amanhecer; o pai não tem usos porque as magias variam por instrumento.",
+    "pedra-ioun-absorcao, pedra-ioun-absorcao-maior: a unidade do contador é círculos de magia cancelados (20), sem recuperação; a pedra se esgota depois disso.",
+    "trompa-de-valhalla: não pode ser usada novamente por 7 dias; recuperação em horas/dias/outra mecânica, não representável; contador manual.",
+    "elmo-do-brilho: Luz do Dia, Bola de Fogo, Rajada Prismática e Muralha de Fogo consomem uma gema do elmo (opala, opala de fogo, diamante, rubi); quantidade de gemas é dado (1d10, 2d10, ...), sem contador representável.",
+    "elmo-de-compreender-idiomas: sem cargas nem usos; custo livre.",
+    "vingador-sagrado: a Vantagem em salvaguardas contra magias e outros efeitos mágicos vale para você e aliados na Emanação; curada só para o portador (contexto literal), aliados não automatizados.",
+    "elmo-do-brilho: Resistência a dano Ígneo depende de o elmo ter pelo menos um rubi; o alvo resistencia não aceita contexto (só vantagem aceita), por isso fica em sem_passivos."
+  ]
+}

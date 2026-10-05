@@ -85,6 +85,11 @@ export async function getFerramentas() {
   return fetchJSON('equipamento/ferramentas.json');
 }
 
+/** Carrega o acervo de itens mágicos do Livro do Mestre (capítulo 7) */
+export async function getItensMagicos() {
+  return fetchJSON('livro-do-mestre/capitulo7/itens_magicos.json');
+}
+
 // --- Magias ---
 
 /** Carrega índice de todas as magias (resumido) */

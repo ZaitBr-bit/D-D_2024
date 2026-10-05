@@ -4,6 +4,7 @@
 // Consultado pela ficha, pelos descansos e pelas habilidades ativas.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
+import { atributoEfetivo } from '../../regras-atributos.js';
 import { bonusProficiencia, calcMod } from '../../utils.js';
 import { char } from '../estado.js';
 import { temClasse, nivelNa, subclasseDe } from '../../regras-multiclasse.js';
@@ -57,11 +58,11 @@ export function getEstadoRecursosMonge() {
   // TOTAL do personagem (livro:2047), nao o nivel na classe Monge -- por
   // isso le char.nivel direto aqui, em vez da variavel `nivel` (que e
   // nivelNa e alimenta so os degraus de progressao do Monge abaixo).
-  const cdFoco = 8 + bonusProficiencia(char.nivel || 1) + calcMod(char.atributos.sabedoria);
+  const cdFoco = 8 + bonusProficiencia(char.nivel || 1) + calcMod(atributoEfetivo(char, 'sabedoria'));
 
   // Desviar Ataques (nível 3+): 1d10 + mod Des + nível
   const desviarAtivo = nivel >= 3;
-  const desviarReducao = `1d10 + ${calcMod(char.atributos.destreza)} + ${nivel}`;
+  const desviarReducao = `1d10 + ${calcMod(atributoEfetivo(char, 'destreza'))} + ${nivel}`;
 
   // Queda Lenta (nível 4+): reduz 5 × nível
   const quedaLentaAtiva = nivel >= 4;
@@ -85,7 +86,7 @@ export function getEstadoRecursosMonge() {
   // subclasse da classe INICIAL -- um Guerreiro/Monge perderia os recursos
   // da tradicao monastica sem nenhum aviso.
   const sub = subclasseDe(char, 'Monge') || '';
-  const sabMod = calcMod(char.atributos.sabedoria);
+  const sabMod = calcMod(atributoEfetivo(char, 'sabedoria'));
   let subData = {};
 
   if (sub === 'Combatente da Mão Espalmada') {

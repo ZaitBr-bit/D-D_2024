@@ -1,0 +1,537 @@
+{
+  "lote": "01",
+  "tipo": "itens",
+  "paginas_pdf": [231, 238],
+  "itens": [
+    {
+      "nome": "Armadura de Adamantina",
+      "nome_en": "Adamantine Armor",
+      "pagina_pdf": 231,
+      "pagina_pdf_fim": 231,
+      "tipo": "Armadura",
+      "subtipo": "Qualquer Armadura Média ou Pesada, exceto Gibão de Peles",
+      "raridade": "Incomum",
+      "requer_sintonizacao": false,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Armadura (Qualquer Armadura Média ou Pesada, exceto Gibão de Peles), Incomum",
+      "amaldicoado": false,
+      "descricao": "Esta armadura é reforçada com adamantina, uma das substâncias mais duras que existem. Enquanto você a estiver usando, qualquer Acerto Crítico contra você se torna um acerto normal.",
+      "tabelas": [],
+      "variantes": []
+    },
+    {
+      "nome": "Arma de Adamantina",
+      "nome_en": "Adamantine Weapon",
+      "pagina_pdf": 231,
+      "pagina_pdf_fim": 231,
+      "tipo": "Arma",
+      "subtipo": "Qualquer Munição ou Arma Corpo a Corpo",
+      "raridade": "Incomum",
+      "requer_sintonizacao": false,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Arma (Qualquer Munição ou Arma Corpo a Corpo), Incomum",
+      "amaldicoado": false,
+      "descricao": "Esta arma ou peça de munição é feita de adamantina, uma das substâncias mais duras que existem. Sempre que esta arma ou peça de munição atinge um objeto, o acerto é um Acerto Crítico.",
+      "tabelas": [],
+      "variantes": []
+    },
+    {
+      "nome": "Jarro Alquímico",
+      "nome_en": "Alchemy Jug",
+      "pagina_pdf": 231,
+      "pagina_pdf_fim": 232,
+      "tipo": "Item Maravilhoso",
+      "subtipo": "",
+      "raridade": "Incomum",
+      "requer_sintonizacao": false,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Item Maravilhoso, Incomum",
+      "amaldicoado": false,
+      "descricao": "Este jarro de cerâmica parece ser capaz de conter 4 litros de líquido e pesa 6 kg, esteja cheio ou vazio. O jarro faz barulho de líquido quando é sacudido, mesmo que esteja vazio.\n\nVocê pode executar uma ação Usar Magia e nomear um líquido da tabela Líquidos do Jarro Alquímico para fazer o jarro produzir o líquido escolhido. Depois, você pode desarrolhar o jarro com uma ação Usar Objeto e despejar esse líquido, até 8 litros por minuto. A quantidade máxima de líquido que o jarro pode produzir depende do líquido que você nomeou.\n\nDepois que o jarro começa a produzir um líquido, ele não pode produzir um líquido diferente, nem mais de um líquido que já tenha atingido seu máximo, até o próximo amanhecer.",
+      "tabelas": [
+        {
+          "titulo": "Líquidos do Jarro Alquímico",
+          "cabecalhos": ["Líquido", "Quantidade Máx."],
+          "dados": [
+            ["Ácido", "240 ml"],
+            ["Veneno Básico", "120 ml"],
+            ["Cerveja", "16 litros"],
+            ["Mel", "4 litros"],
+            ["Maionese", "8 litros"],
+            ["Óleo", "1 litro"],
+            ["Vinagre", "8 litros"],
+            ["Água doce", "32 litros"],
+            ["Água salgada", "48 litros"],
+            ["Vinho", "4 litros"]
+          ]
+        }
+      ],
+      "variantes": []
+    },
+    {
+      "nome": "Munição +1, +2 ou +3",
+      "nome_en": "Ammunition, +1, +2, or +3",
+      "pagina_pdf": 232,
+      "pagina_pdf_fim": 232,
+      "tipo": "Arma",
+      "subtipo": "Qualquer Munição",
+      "raridade": "Varia",
+      "requer_sintonizacao": false,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Arma (Qualquer Munição), Incomum (+1), Rara (+2) ou Muito Rara (+3)",
+      "amaldicoado": false,
+      "descricao": "Você tem um bônus nas jogadas de ataque e de dano feitas com esta peça de munição mágica. O bônus é determinado pela raridade da munição. Depois que atinge um alvo, a munição deixa de ser mágica.\n\nEsta munição costuma ser encontrada ou vendida em quantidades de dez ou vinte peças. Dez peças desta munição equivalem em valor a uma poção da mesma raridade.",
+      "tabelas": [],
+      "variantes": [
+        { "nome": "Munição +1", "nome_en": "Ammunition +1", "raridade": "Incomum" },
+        { "nome": "Munição +2", "nome_en": "Ammunition +2", "raridade": "Rara" },
+        { "nome": "Munição +3", "nome_en": "Ammunition +3", "raridade": "Muito Rara" }
+      ]
+    },
+    {
+      "nome": "Munição Assassina",
+      "nome_en": "Ammunition of Slaying",
+      "pagina_pdf": 232,
+      "pagina_pdf_fim": 232,
+      "tipo": "Arma",
+      "subtipo": "Qualquer Munição",
+      "raridade": "Muito Rara",
+      "requer_sintonizacao": false,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Arma (Qualquer Munição), Muito Rara",
+      "amaldicoado": false,
+      "descricao": "Esta munição mágica é feita para matar criaturas de um tipo específico, que o Mestre escolhe ou determina aleatoriamente jogando na tabela abaixo. Se uma criatura desse tipo sofrer dano da munição, a criatura realiza uma salvaguarda de Constituição CD 17, sofrendo 6d10 de dano Energético adicional se falhar ou metade desse dano adicional em caso de sucesso.\n\nDepois de causar seu dano adicional a uma criatura, a munição deixa de ser mágica.",
+      "tabelas": [
+        {
+          "titulo": "",
+          "cabecalhos": ["1d100", "Tipo de Criatura"],
+          "dados": [
+            ["01–10", "Aberrações"],
+            ["11–15", "Feras"],
+            ["16–20", "Celestiais"],
+            ["21–25", "Constructos"],
+            ["26–35", "Dragões"],
+            ["36–45", "Elementais"],
+            ["46–50", "Humanoides"],
+            ["51–60", "Feéricos"],
+            ["61–70", "Ínferos"],
+            ["71–75", "Gigantes"],
+            ["76–80", "Monstruosidades"],
+            ["81–85", "Gosmas"],
+            ["86–90", "Plantas"],
+            ["91–00", "Mortos-Vivos"]
+          ]
+        }
+      ],
+      "variantes": []
+    },
+    {
+      "nome": "Amuleto da Saúde",
+      "nome_en": "Amulet of Health",
+      "pagina_pdf": 232,
+      "pagina_pdf_fim": 232,
+      "tipo": "Item Maravilhoso",
+      "subtipo": "",
+      "raridade": "Rara",
+      "requer_sintonizacao": true,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Item Maravilhoso, Raro (Requer Sintonização)",
+      "amaldicoado": false,
+      "descricao": "Sua Constituição é 19 enquanto você usa este amuleto. Ele não tem efeito sobre você se sua Constituição já for 19 ou maior sem ele.",
+      "tabelas": [],
+      "variantes": []
+    },
+    {
+      "nome": "Amuleto à Prova de Detecção e Localização",
+      "nome_en": "Amulet of Proof against Detection and Location",
+      "pagina_pdf": 232,
+      "pagina_pdf_fim": 232,
+      "tipo": "Item Maravilhoso",
+      "subtipo": "",
+      "raridade": "Incomum",
+      "requer_sintonizacao": true,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Item Maravilhoso, Incomum (Requer Sintonização)",
+      "amaldicoado": false,
+      "descricao": "Enquanto usa este amuleto, você não pode ser alvo de magias de Adivinhação nem ser percebido por meio de sensores mágicos de vidência, a menos que você permita.",
+      "tabelas": [],
+      "variantes": []
+    },
+    {
+      "nome": "Amuleto dos Planos",
+      "nome_en": "Amulet of the Planes",
+      "pagina_pdf": 233,
+      "pagina_pdf_fim": 233,
+      "tipo": "Item Maravilhoso",
+      "subtipo": "",
+      "raridade": "Muito Rara",
+      "requer_sintonizacao": true,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Item Maravilhoso, Muito Raro (Requer Sintonização)",
+      "amaldicoado": false,
+      "descricao": "Enquanto usa este amuleto, você pode executar uma ação Usar Magia para nomear um local que você conheça em outro plano de existência. Então, faça um teste de Inteligência (Arcanismo) CD 15. Se for bem-sucedido, você conjura *Transição Planar*. Se falhar, você e cada criatura e objeto a até 4,5 metros de você viajam para um destino aleatório determinado jogando 1d100 e consultando a tabela a seguir.",
+      "tabelas": [
+        {
+          "titulo": "",
+          "cabecalhos": ["1d100", "Destino"],
+          "dados": [
+            ["01–60", "Local aleatório no plano que você nomeou"],
+            ["61–70", "Local aleatório em um Plano Interno determinado jogando 1d6: com **1**, o Plano Elemental do Ar; com **2**, o Plano Elemental da Terra; com **3**, o Plano Elemental do Fogo; com **4**, o Plano Elemental da Água; com **5**, a Faéria; com **6**, o Sombral"],
+            ["71–80", "Local aleatório em um Plano Externo determinado jogando 1d8: com **1**, Arbórea; com **2**, Arcádia; com **3**, as Terras Ferais; com **4**, Bitopia; com **5**, Elísio; com **6**, Mecânos; com **7**, Monte Celéstia; com **8**, Ysgard"],
+            ["81–90", "Local aleatório em um Plano Externo determinado jogando 1d8: com **1**, o Abismo; com **2**, Aqueronte; com **3**, Cárceri; com **4**, Gehenna; com **5**, Hades; com **6**, Limbo; com **7**, os Nove Infernos; com **8**, Pandemônio"],
+            ["91–00", "Local aleatório no Plano Astral"]
+          ]
+        }
+      ],
+      "variantes": []
+    },
+    {
+      "nome": "Escudo Animado",
+      "nome_en": "Animated Shield",
+      "pagina_pdf": 233,
+      "pagina_pdf_fim": 233,
+      "tipo": "Armadura",
+      "subtipo": "Escudo",
+      "raridade": "Muito Rara",
+      "requer_sintonizacao": true,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Armadura (Escudo), Muito Rara (Requer Sintonização)",
+      "amaldicoado": false,
+      "descricao": "Enquanto segura este Escudo, você pode executar uma Ação Bônus para fazê-lo ganhar vida. O Escudo salta no ar e paira no seu espaço para protegê-lo como se você o estivesse empunhando, deixando suas mãos livres. O Escudo permanece animado por 1 minuto, até que você execute uma Ação Bônus para encerrar este efeito, ou até que você morra ou tenha a condição Incapacitado, momento em que o Escudo cai no chão ou na sua mão, se você tiver uma livre.",
+      "tabelas": [],
+      "variantes": []
+    },
+    {
+      "nome": "Aparato de Kwalish",
+      "nome_en": "Apparatus of Kwalish",
+      "pagina_pdf": 233,
+      "pagina_pdf_fim": 234,
+      "tipo": "Item Maravilhoso",
+      "subtipo": "",
+      "raridade": "Lendária",
+      "requer_sintonizacao": false,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Item Maravilhoso, Lendário",
+      "amaldicoado": false,
+      "descricao": "À primeira vista, este item parece ser um barril de ferro lacrado que pesa 250 kg. O barril tem uma trava escondida, que pode ser encontrada com um teste de Inteligência (Investigação) CD 20 bem-sucedido. Soltar a trava destranca uma escotilha em uma das extremidades do barril, permitindo que duas criaturas Médias ou menores rastejem para dentro. Dez alavancas estão dispostas em fileira na extremidade oposta, cada uma em posição neutra, podendo ser movidas para cima ou para baixo. Quando certas alavancas são usadas, o aparato se transforma até lembrar uma lagosta gigante.\n\nO *Aparato de Kwalish* é um objeto Grande com as seguintes estatísticas: CA 20; PV 200; Deslocamento 9 m, Natação 9 m (ou 0 m para ambos se as pernas não estiverem estendidas); Imunidade a dano Venenoso e Psíquico.\n\nPara ser usado como veículo, o aparato requer um piloto. Enquanto a escotilha do aparato estiver fechada, o compartimento é hermético e estanque. O compartimento contém ar suficiente para 10 horas de respiração, divididas pelo número de criaturas que respiram em seu interior.\n\nO aparato flutua na água. Ele também pode submergir até uma profundidade de 270 metros. Abaixo disso, o veículo sofre 2d6 de dano Contundente a cada minuto devido à pressão.\n\nUma criatura no compartimento pode executar uma ação Usar Objeto para mover até duas das alavancas do aparato para cima ou para baixo. Após cada uso, a alavanca volta à sua posição neutra. Cada alavanca, da esquerda para a direita, funciona como mostrado na tabela Alavancas do Aparato de Kwalish.",
+      "tabelas": [
+        {
+          "titulo": "Alavancas do Aparato de Kwalish",
+          "cabecalhos": ["Alavanca", "Para Cima", "Para Baixo"],
+          "dados": [
+            ["1", "As pernas se estendem, permitindo que o aparato ande e nade.", "As pernas se retraem, reduzindo o Deslocamento e o Deslocamento de Natação do aparato a 0 e impedindo-o de se beneficiar de bônus de deslocamento."],
+            ["2", "A veneziana da janela frontal se abre.", "A veneziana da janela frontal se fecha."],
+            ["3", "As venezianas das janelas laterais se abrem (duas de cada lado).", "As venezianas das janelas laterais se fecham (duas de cada lado)."],
+            ["4", "Duas garras se estendem da parte frontal do aparato.", "As garras se retraem."],
+            ["5", "Cada garra estendida realiza o seguinte ataque corpo a corpo: +8 para acertar, alcance 1,5 m. Acerto: 7 (2d6) de dano Contundente.", "Cada garra estendida realiza o seguinte ataque corpo a corpo: +8 para acertar, alcance 1,5 m. Acerto: o alvo tem a condição Imobilizado (CD 15 para escapar)."],
+            ["6", "O aparato anda ou nada para a frente, desde que suas pernas estejam estendidas.", "O aparato anda ou nada para trás, desde que suas pernas estejam estendidas."],
+            ["7", "O aparato gira 90 graus no sentido anti-horário, desde que suas pernas estejam estendidas.", "O aparato gira 90 graus no sentido horário, desde que suas pernas estejam estendidas."],
+            ["8", "Acessórios semelhantes a olhos emitem Luz Plena em um raio de 9 metros e Meia-luz por mais 9 metros.", "A luz se apaga."],
+            ["9", "O aparato afunda até 6 metros se estiver em um líquido.", "O aparato sobe até 6 metros se estiver em um líquido."],
+            ["10", "A escotilha traseira se destrava e se abre.", "A escotilha traseira se fecha e se lacra."]
+          ]
+        }
+      ],
+      "variantes": []
+    },
+    {
+      "nome": "Armadura +1, +2 ou +3",
+      "nome_en": "Armor, +1, +2, or +3",
+      "pagina_pdf": 234,
+      "pagina_pdf_fim": 234,
+      "tipo": "Armadura",
+      "subtipo": "Qualquer Armadura Leve, Média ou Pesada",
+      "raridade": "Varia",
+      "requer_sintonizacao": false,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Armadura (Qualquer Armadura Leve, Média ou Pesada), Rara (+1), Muito Rara (+2) ou Lendária (+3)",
+      "amaldicoado": false,
+      "descricao": "Você tem um bônus na Classe de Armadura enquanto usa esta armadura. O bônus é determinado pela raridade dela.",
+      "tabelas": [],
+      "variantes": [
+        { "nome": "Armadura +1", "nome_en": "Armor +1", "raridade": "Rara" },
+        { "nome": "Armadura +2", "nome_en": "Armor +2", "raridade": "Muito Rara" },
+        { "nome": "Armadura +3", "nome_en": "Armor +3", "raridade": "Lendária" }
+      ]
+    },
+    {
+      "nome": "Armadura Reluzente",
+      "nome_en": "Armor of Gleaming",
+      "pagina_pdf": 234,
+      "pagina_pdf_fim": 234,
+      "tipo": "Armadura",
+      "subtipo": "Qualquer Armadura Leve, Média ou Pesada",
+      "raridade": "Comum",
+      "requer_sintonizacao": false,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Armadura (Qualquer Armadura Leve, Média ou Pesada), Comum",
+      "amaldicoado": false,
+      "descricao": "Esta armadura nunca fica suja.",
+      "tabelas": [],
+      "variantes": []
+    },
+    {
+      "nome": "Armadura da Invulnerabilidade",
+      "nome_en": "Armor of Invulnerability",
+      "pagina_pdf": 234,
+      "pagina_pdf_fim": 235,
+      "tipo": "Armadura",
+      "subtipo": "Armadura de Placas",
+      "raridade": "Lendária",
+      "requer_sintonizacao": true,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Armadura (Armadura de Placas), Lendária (Requer Sintonização)",
+      "amaldicoado": false,
+      "descricao": "Você tem Resistência a dano Contundente, Perfurante e Cortante enquanto usa esta armadura.\n\n***Carapaça Metálica.*** Você pode executar uma ação Usar Magia para conceder a si mesmo Imunidade a dano Contundente, Perfurante e Cortante por 10 minutos ou até que não esteja mais usando a armadura. Depois que esta propriedade é usada, ela não pode ser usada novamente até o próximo amanhecer.",
+      "tabelas": [],
+      "variantes": []
+    },
+    {
+      "nome": "Armadura de Resistência",
+      "nome_en": "Armor of Resistance",
+      "pagina_pdf": 235,
+      "pagina_pdf_fim": 235,
+      "tipo": "Armadura",
+      "subtipo": "Qualquer Armadura Leve, Média ou Pesada",
+      "raridade": "Rara",
+      "requer_sintonizacao": true,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Armadura (Qualquer Armadura Leve, Média ou Pesada), Rara (Requer Sintonização)",
+      "amaldicoado": false,
+      "descricao": "Você tem Resistência a um tipo de dano enquanto usa esta armadura. O Mestre escolhe o tipo ou o determina aleatoriamente jogando na tabela a seguir.",
+      "tabelas": [
+        {
+          "titulo": "",
+          "cabecalhos": ["1d10", "Tipo de Dano"],
+          "dados": [
+            ["1", "Ácido"],
+            ["2", "Gélido"],
+            ["3", "Ígneo"],
+            ["4", "Energético"],
+            ["5", "Elétrico"],
+            ["6", "Necrótico"],
+            ["7", "Venenoso"],
+            ["8", "Psíquico"],
+            ["9", "Radiante"],
+            ["10", "Trovejante"]
+          ]
+        }
+      ],
+      "variantes": []
+    },
+    {
+      "nome": "Armadura de Vulnerabilidade",
+      "nome_en": "Armor of Vulnerability",
+      "pagina_pdf": 235,
+      "pagina_pdf_fim": 235,
+      "tipo": "Armadura",
+      "subtipo": "Qualquer Armadura Leve, Média ou Pesada",
+      "raridade": "Rara",
+      "requer_sintonizacao": true,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Armadura (Qualquer Armadura Leve, Média ou Pesada), Rara (Requer Sintonização)",
+      "amaldicoado": true,
+      "descricao": "Enquanto usa esta armadura, você tem Resistência a um dos seguintes tipos de dano: Contundente, Perfurante ou Cortante. O Mestre escolhe o tipo ou o determina aleatoriamente.\n\n***Maldição.*** Esta armadura é amaldiçoada, fato que só é revelado quando a magia *Identificar* é conjurada sobre a armadura ou quando você se sintoniza com ela. Sintonizar-se com a armadura amaldiçoa você até que você seja alvo de uma magia *Remover Maldição* ou de magia semelhante; remover a armadura não encerra a maldição. Enquanto estiver amaldiçoado, você tem Vulnerabilidade a dois dos três tipos de dano associados à armadura (não àquele ao qual ela concede Resistência).",
+      "tabelas": [],
+      "variantes": []
+    },
+    {
+      "nome": "Escudo Apanha-Flechas",
+      "nome_en": "Arrow-Catching Shield",
+      "pagina_pdf": 235,
+      "pagina_pdf_fim": 235,
+      "tipo": "Armadura",
+      "subtipo": "Escudo",
+      "raridade": "Rara",
+      "requer_sintonizacao": true,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Armadura (Escudo), Rara (Requer Sintonização)",
+      "amaldicoado": false,
+      "descricao": "Você recebe +2 de bônus na Classe de Armadura contra jogadas de ataque à distância enquanto empunha este Escudo. Esse bônus se soma ao bônus normal do Escudo na CA.\n\nSempre que um atacante fizer uma jogada de ataque à distância contra um alvo a até 1,5 metro de você, você pode executar uma Reação para se tornar o alvo do ataque no lugar dele.",
+      "tabelas": [],
+      "variantes": []
+    },
+    {
+      "nome": "Machado dos Senhores Anões",
+      "nome_en": "Axe of the Dwarvish Lords",
+      "pagina_pdf": 235,
+      "pagina_pdf_fim": 236,
+      "tipo": "Arma",
+      "subtipo": "Machado de Batalha",
+      "raridade": "Artefato",
+      "requer_sintonizacao": true,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Arma (Machado de Batalha), Artefato (Requer Sintonização)",
+      "amaldicoado": false,
+      "descricao": "Um jovem príncipe anão partiu para forjar uma arma que seria considerada um símbolo de união entre seu povo. Aventurando-se nas profundezas sob as montanhas, mais fundo do que qualquer anão jamais havia escavado, o príncipe chegou ao coração ardente de um grande vulcão. Com a ajuda de Moradin, um deus da criação, ele primeiro fabricou quatro ferramentas poderosas: a Picareta de Metal Estelar, a Forja do Coração da Terra, a Bigorna das Canções e o Martelo Modelador. Com essas ferramentas, ele forjou o *Machado dos Senhores Anões*.\n\nArmado com o Artefato, o príncipe trouxe paz aos clãs anões, pondo fim a rancores e respondendo a afrontas. Os clãs se tornaram aliados, rechaçaram seus inimigos e desfrutaram de uma era de prosperidade. Esse jovem anão é lembrado como o Primeiro Rei. Quando envelheceu, ele passou a arma, que havia se tornado seu símbolo de autoridade, ao seu herdeiro. Os herdeiros legítimos passaram o machado adiante por muitas gerações.\n\nMais tarde, em uma era marcada por traição e maldade, o machado foi perdido em uma sangrenta guerra civil fomentada pela cobiça por seu poder e pelo status que ele conferia. Séculos depois, os anões ainda procuram o machado, e muitos aventureiros fizeram carreira perseguindo rumores e saqueando antigos cofres para encontrá-lo.\n\n***Arma Mágica.*** O *Machado dos Senhores Anões* é uma arma mágica que concede +3 de bônus nas jogadas de ataque e de dano feitas com ela.\n\nQuando você ataca uma criatura com o machado e tira 20 no d20 da jogada de ataque, o machado causa 20 de dano Cortante adicional.\n\nO machado tem a propriedade Arremesso, com alcance normal de 6 metros e alcance máximo de 18 metros. Quando você acerta um ataque à distância usando esta arma, ela causa 1d8 de dano Energético adicional, ou 2d8 de dano Energético adicional se o alvo for uma criatura do tipo Gigante. Imediatamente após acertar ou errar, a arma voa de volta para a sua mão.\n\n***Bênçãos de Moradin.*** Enquanto estiver sintonizado com o machado, você recebe os seguintes benefícios:\n\n- **Visão no Escuro.** Você ganha Visão no Escuro com alcance de 18 metros. Se você já tiver Visão no Escuro, o alcance dela aumenta em 18 metros.\n- **Fortitude da Pedra.** Sua Constituição aumenta em 2, até um máximo de 20.\n- **Dádivas do Criador.** Você tem proficiência com Suprimentos de Cervejeiro, Ferramentas de Pedreiro e Ferramentas de Ferreiro.\n- **Um com a Forja.** Você tem Imunidade a dano Venenoso e Resistência a dano Ígneo.\n- **Fender.** Quando você atinge um objeto com o machado, o objeto sofre a quantidade máxima de dano possível.\n\n***Conjurar Elemental da Terra.*** Enquanto segura o machado, você pode executar uma ação Usar Magia para invocar um **Elemental da Terra**. Ele aparece em um espaço desocupado à sua escolha a até 9 metros de você, entende seus idiomas, obedece aos seus comandos e age imediatamente após você na sua contagem de Iniciativa. O elemental desaparece após 24 horas, quando morre ou quando você o dispensa com uma Ação Bônus. Você não pode usar esta propriedade novamente até o próximo amanhecer.\n\n***Propriedades Aleatórias.*** O machado tem as seguintes propriedades aleatórias (veja “Artefatos” neste capítulo):\n\n- 2 propriedades benéficas menores\n- 1 propriedade benéfica maior\n- 2 propriedades prejudiciais menores\n\n***Viajar pelas Profundezas.*** Você pode executar uma ação Usar Magia para tocar o machado em uma peça fixa de cantaria anã e conjurar *Teleporte* a partir do machado. Se o destino pretendido for subterrâneo, não há chance de acidente nem de chegar a algum lugar inesperado. Você não pode usar esta propriedade novamente até que se passem 3 dias.\n\n***Destruindo o Machado.*** A única maneira de destruir o machado é derretê-lo na Forja do Coração da Terra, onde ele foi criado. Ele precisa permanecer na forja ardente por 50 anos antes de finalmente sucumbir ao fogo e ser consumido.",
+      "tabelas": [],
+      "variantes": []
+    },
+    {
+      "nome": "Vassoura Dançante de Baba Yaga",
+      "nome_en": "Baba Yaga's Dancing Broom",
+      "pagina_pdf": 236,
+      "pagina_pdf_fim": 236,
+      "tipo": "Item Maravilhoso",
+      "subtipo": "",
+      "raridade": "Incomum",
+      "requer_sintonizacao": true,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Item Maravilhoso, Incomum (Requer Sintonização)",
+      "amaldicoado": false,
+      "descricao": "A arquifada Baba Yaga fabricou muitas destas vassouras mágicas. Não há duas exatamente iguais. Enquanto segura a vassoura, você pode executar uma ação Usar Magia para transformá-la em uma **Vassoura Animada** sob o seu controle. A vassoura então se move para um espaço desocupado o mais próximo possível de você. A vassoura age imediatamente após você na sua contagem de Iniciativa e permanece animada até que você execute uma Ação Bônus e use uma palavra de comando para torná-la inanimada.\n\nNo seu turno, você pode comandar mentalmente a vassoura animada se ela estiver a até 9 metros de você e você não tiver a condição Incapacitado (nenhuma ação necessária). Você decide qual ação a vassoura executa e para onde ela se move durante o próximo turno dela, ou pode dar a ela um comando geral, como atacar seus inimigos ou guardar um local.\n\nSe a vassoura for reduzida a 0 Pontos de Vida, ela se despedaça e é destruída. Se a vassoura reverter à sua forma inanimada antes de perder todos os seus Pontos de Vida, ela recupera todos eles.",
+      "tabelas": [],
+      "variantes": []
+    },
+    {
+      "nome": "Bolsa de Feijões",
+      "nome_en": "Bag of Beans",
+      "pagina_pdf": 237,
+      "pagina_pdf_fim": 237,
+      "tipo": "Item Maravilhoso",
+      "subtipo": "",
+      "raridade": "Rara",
+      "requer_sintonizacao": false,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Item Maravilhoso, Raro",
+      "amaldicoado": false,
+      "descricao": "Esta pesada bolsa de tecido contém 3d4 feijões secos quando encontrada. A bolsa pesa 0,25 kg, independentemente de quantos feijões contenha, e se torna um item não mágico quando não contém mais nenhum feijão.\n\nSe você despejar um ou mais feijões para fora da bolsa, eles explodem em uma Esfera de 3 metros de raio centrada neles. Todos os feijões despejados são destruídos na explosão, e cada criatura na Esfera, incluindo você, realiza uma salvaguarda de Destreza CD 15, sofrendo 5d4 de dano Energético se falhar ou metade desse dano em caso de sucesso.\n\nSe você retirar um feijão da bolsa, plantá-lo em terra ou areia e depois regá-lo, o feijão desaparece enquanto produz um efeito 1 minuto depois, a partir do solo onde foi plantado. O Mestre pode escolher um efeito da tabela a seguir ou determiná-lo aleatoriamente.",
+      "tabelas": [
+        {
+          "titulo": "",
+          "cabecalhos": ["1d100", "Efeito"],
+          "dados": [
+            ["01", "Brotam 5d4 cogumelos venenosos. Se uma criatura comer um cogumelo, jogue um dado qualquer. Com um resultado ímpar, quem comeu precisa ser bem-sucedido em uma salvaguarda de Constituição CD 15 ou sofrerá 5d6 de dano Venenoso e terá a condição Envenenado por 1 hora. Com um resultado par, quem comeu ganha 5d6 Pontos de Vida Temporários por 1 hora."],
+            ["02–10", "Um gêiser irrompe e jorra água, cerveja, maionese, chá, vinagre, vinho ou óleo (à escolha do Mestre) a 9 metros de altura por 1d4 minutos."],
+            ["11–20", "Brota um **Ente**. Jogue um dado qualquer. Com um resultado ímpar, o ente é Caótico e Mau. Com um resultado par, o ente é Caótico e Bom."],
+            ["21–30", "Uma estátua de pedra animada, mas imóvel, com a sua aparência se ergue e faz ameaças verbais contra você. Se você a deixar e outros se aproximarem, ela descreve você como o mais hediondo dos vilões e instrui os recém-chegados a encontrar e atacar você. Se você estiver no mesmo plano de existência que a estátua, ela sabe onde você está. A estátua se torna inanimada após 24 horas."],
+            ["31–40", "Uma fogueira de chamas verdes surge e queima por 24 horas ou até ser extinta."],
+            ["41–50", "Brotam três **Fungos Guinchadores**."],
+            ["51–60", "1d4 + 4 sapos rosa-choque rastejam para fora. Sempre que um sapo é tocado, ele se transforma em um monstro Grande ou menor à escolha do Mestre, que age de acordo com seu alinhamento e sua natureza. O monstro permanece por 1 minuto e então desaparece em uma nuvem de fumaça rosa-choque."],
+            ["61–70", "Um **Bulette** faminto escava até a superfície e ataca."],
+            ["71–80", "Uma árvore frutífera cresce. Ela tem 1d10 + 20 frutos, 1d8 dos quais funcionam como poções determinadas aleatoriamente. A árvore desaparece após 1 hora. Os frutos colhidos permanecem, mantendo qualquer magia por 30 dias."],
+            ["81–90", "Surge um ninho de 1d4 + 3 ovos com as cores do arco-íris. Qualquer criatura que coma um ovo realiza uma salvaguarda de Constituição CD 20. Se for bem-sucedida, a criatura aumenta permanentemente em 1 seu menor valor de atributo, escolhendo aleatoriamente entre valores igualmente baixos. Se falhar, a criatura sofre 10d6 de dano Energético de uma explosão interna."],
+            ["91–95", "Uma pirâmide com base quadrada de 18 metros de lado irrompe do solo. Dentro dela há uma câmara funerária contendo uma **Múmia**, um **Senhor das Múmias** ou algum outro Morto-Vivo à escolha do Mestre. O sarcófago contém um tesouro à escolha do Mestre."],
+            ["96–00", "Um pé de feijão gigante brota, crescendo até uma altura à escolha do Mestre. O topo leva aonde o Mestre escolher, como a uma vista magnífica, ao castelo de um gigante das nuvens ou a outro plano de existência."]
+          ]
+        }
+      ],
+      "variantes": []
+    },
+    {
+      "nome": "Bolsa Gulosa",
+      "nome_en": "Bag of Devouring",
+      "pagina_pdf": 238,
+      "pagina_pdf_fim": 238,
+      "tipo": "Item Maravilhoso",
+      "subtipo": "",
+      "raridade": "Muito Rara",
+      "requer_sintonizacao": false,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Item Maravilhoso, Muito Raro",
+      "amaldicoado": false,
+      "descricao": "Esta bolsa se parece com uma *Bolsa Devoradora*, mas é um orifício de alimentação de uma gigantesca criatura extradimensional. Virar a bolsa do avesso fecha o orifício.\n\nA criatura extradimensional ligada à bolsa pode sentir tudo o que é colocado dentro dela. Matéria animal ou vegetal colocada inteiramente na bolsa é devorada e perdida para sempre. Quando parte de uma criatura viva é colocada na bolsa, como acontece quando alguém enfia a mão nela, há 50% de chance de a criatura ser puxada para dentro da bolsa. Uma criatura dentro da bolsa pode executar uma ação para tentar escapar, conseguindo com um teste de Força (Atletismo) CD 15 bem-sucedido. Outra criatura pode executar uma ação para enfiar a mão na bolsa e puxar uma criatura para fora, conseguindo com um teste de Força (Atletismo) CD 20 bem-sucedido, desde que quem puxa não seja puxado para dentro da bolsa primeiro. Qualquer criatura que comece seu turno dentro da bolsa é devorada, e seu corpo, destruído.\n\nObjetos inanimados podem ser guardados na bolsa, que comporta 27 litros desse tipo de material. No entanto, uma vez por dia, a bolsa engole todos os objetos em seu interior e os cospe em outro plano de existência. O Mestre determina o momento e o plano.\n\nSe a bolsa for perfurada ou rasgada, ela é destruída, e tudo o que estiver contido nela é transportado para um local aleatório no Plano Astral.",
+      "tabelas": [],
+      "variantes": []
+    },
+    {
+      "nome": "Bolsa Devoradora",
+      "nome_en": "Bag of Holding",
+      "pagina_pdf": 238,
+      "pagina_pdf_fim": 238,
+      "tipo": "Item Maravilhoso",
+      "subtipo": "",
+      "raridade": "Incomum",
+      "requer_sintonizacao": false,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Item Maravilhoso, Incomum",
+      "amaldicoado": false,
+      "descricao": "Esta bolsa tem um espaço interno consideravelmente maior que suas dimensões externas — aproximadamente 0,6 metro de lado e 1,2 metro de profundidade por dentro. A bolsa pode conter até 250 kg, sem exceder um volume de 1,7 metro cúbico. A bolsa pesa 2,5 kg, independentemente do seu conteúdo. Retirar um item da bolsa requer uma ação Usar Objeto.\n\nSe a bolsa for sobrecarregada, perfurada ou rasgada, ela é destruída, e seu conteúdo é espalhado pelo Plano Astral. Se a bolsa for virada do avesso, seu conteúdo se derrama ileso, mas a bolsa precisa ser desvirada antes de poder ser usada novamente. A bolsa contém ar suficiente para 10 minutos de respiração, divididos pelo número de criaturas que respiram em seu interior.\n\nColocar uma *Bolsa Devoradora* dentro de um espaço extradimensional criado por uma *Mochila Prática de Heward*, um *Buraco Portátil* ou item semelhante destrói instantaneamente ambos os itens e abre um portal para o Plano Astral. O portal se origina onde um item foi colocado dentro do outro. Qualquer criatura em uma Esfera de 3 metros de raio centrada no portal é sugada por ele para um local aleatório no Plano Astral. O portal então se fecha. O portal é de mão única e não pode ser reaberto.",
+      "tabelas": [],
+      "variantes": []
+    },
+    {
+      "nome": "Bolsa de Truques",
+      "nome_en": "Bag of Tricks",
+      "pagina_pdf": 238,
+      "pagina_pdf_fim": 238,
+      "tipo": "Item Maravilhoso",
+      "subtipo": "",
+      "raridade": "Incomum",
+      "requer_sintonizacao": false,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Item Maravilhoso, Incomum",
+      "amaldicoado": false,
+      "descricao": "Esta bolsa feita de tecido cinza, ferrugem ou castanho parece vazia. Enfiar a mão na bolsa, no entanto, revela a presença de um objeto pequeno e felpudo.\n\nVocê pode executar uma ação Usar Magia para tirar o objeto felpudo da bolsa e arremessá-lo a até 6 metros. Quando o objeto cai, ele se transforma em uma criatura que você determina jogando na tabela que corresponde à cor da bolsa. Veja o *Livro dos Monstros* para o bloco de estatísticas da criatura. A criatura desaparece no próximo amanhecer ou quando é reduzida a 0 Pontos de Vida.\n\nA criatura é Amigável a você e a seus aliados e age imediatamente após você na sua contagem de Iniciativa. Você pode executar uma Ação Bônus para comandar como a criatura se move e qual ação ela executa no próximo turno dela, como atacar um inimigo. Na ausência de tais ordens, a criatura age de maneira adequada à sua natureza.\n\nDepois que três objetos felpudos forem tirados da bolsa, a bolsa não pode ser usada novamente até o próximo amanhecer.",
+      "tabelas": [
+        {
+          "titulo": "Bolsa de Truques Cinza",
+          "cabecalhos": ["1d8", "Criatura"],
+          "dados": [
+            ["1", "Doninha"],
+            ["2", "Rato Gigante"],
+            ["3", "Texugo"],
+            ["4", "Javali"],
+            ["5", "Pantera"],
+            ["6", "Texugo Gigante"],
+            ["7", "Lobo Atroz"],
+            ["8", "Alce Gigante"]
+          ]
+        },
+        {
+          "titulo": "Bolsa de Truques Ferrugem",
+          "cabecalhos": ["1d8", "Criatura"],
+          "dados": [
+            ["1", "Rato"],
+            ["2", "Coruja"],
+            ["3", "Mastim"],
+            ["4", "Cabra"],
+            ["5", "Cabra Gigante"],
+            ["6", "Javali Gigante"],
+            ["7", "Leão"],
+            ["8", "Urso Pardo"]
+          ]
+        },
+        {
+          "titulo": "Bolsa de Truques Castanha",
+          "cabecalhos": ["1d8", "Criatura"],
+          "dados": [
+            ["1", "Chacal"],
+            ["2", "Gorila"],
+            ["3", "Babuíno"],
+            ["4", "Bico-de-Machado"],
+            ["5", "Urso Negro"],
+            ["6", "Doninha Gigante"],
+            ["7", "Hiena Gigante"],
+            ["8", "Tigre"]
+          ]
+        }
+      ],
+      "variantes": [
+        { "nome": "Bolsa de Truques (cinza)", "nome_en": "Bag of Tricks (gray)", "raridade": "Incomum" },
+        { "nome": "Bolsa de Truques (ferrugem)", "nome_en": "Bag of Tricks (rust)", "raridade": "Incomum" },
+        { "nome": "Bolsa de Truques (castanha)", "nome_en": "Bag of Tricks (tan)", "raridade": "Incomum" }
+      ]
+    },
+    {
+      "nome": "Conta de Força",
+      "nome_en": "Bead of Force",
+      "pagina_pdf": 238,
+      "pagina_pdf_fim": 239,
+      "tipo": "Item Maravilhoso",
+      "subtipo": "",
+      "raridade": "Rara",
+      "requer_sintonizacao": false,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Item Maravilhoso, Raro",
+      "amaldicoado": false,
+      "descricao": "Esta pequena esfera preta mede 1,9 centímetro de diâmetro e pesa 30 gramas. Normalmente, 1d4 + 4 exemplares de *Conta de Força* são encontrados juntos.\n\nVocê pode executar uma ação Usar Magia para arremessar a conta a até 18 metros. A conta explode em uma Esfera de 3 metros de raio ao impactar e é destruída. Cada criatura na Esfera precisa ser bem-sucedida em uma salvaguarda de Destreza CD 15 ou sofrerá 5d4 de dano Energético. Uma esfera de energia transparente então envolve a área por 1 minuto. Qualquer criatura que tenha falhado na salvaguarda e esteja completamente dentro da área fica presa dentro dessa esfera. Criaturas que foram bem-sucedidas na salvaguarda ou que estão parcialmente dentro da área são empurradas para longe do centro da esfera até não estarem mais dentro dela. Somente ar respirável pode atravessar a parede da esfera. Nenhum ataque ou outro efeito pode atravessá-la.\n\nUma criatura encerrada na esfera pode executar uma ação Usar Objeto para empurrar a parede da esfera, movendo a esfera até metade do Deslocamento da criatura. A esfera pode ser erguida, e sua magia faz com que ela pese apenas 0,5 kg, independentemente do peso das criaturas em seu interior.",
+      "tabelas": [],
+      "variantes": []
+    }
+  ],
+  "pendencias": [
+    "Itálico de item de outro lote: *Mochila Prática de Heward* (Heward's Handy Haversack), pág. PDF 238, descrição de Bolsa Devoradora.",
+    "Itálico de item de outro lote: *Buraco Portátil* (Portable Hole), pág. PDF 238, descrição de Bolsa Devoradora."
+  ]
+}

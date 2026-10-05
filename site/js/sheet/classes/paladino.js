@@ -4,6 +4,7 @@
 // Consultado pela ficha, pelos descansos e pelas habilidades ativas.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
+import { atributoEfetivo } from '../../regras-atributos.js';
 import { calcMod } from '../../utils.js';
 import { char } from '../estado.js';
 import { temClasse, nivelNa, subclasseDe } from '../../regras-multiclasse.js';
@@ -51,7 +52,7 @@ export function getEstadoRecursosPaladino() {
   const canalizarDisponiveis = Math.max(0, canalizarMax - r.canalizar_divindade_usos_gastos);
 
   // Aura de Proteção (nível 6+)
-  const modCar = Math.max(1, calcMod(char.atributos.carisma));
+  const modCar = Math.max(1, calcMod(atributoEfetivo(char, 'carisma')));
   const auraProtecaoAtiva = nivel >= 6;
   const auraRaio = nivel >= 18 ? 9 : 3;
 

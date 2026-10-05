@@ -1,0 +1,3081 @@
+{
+  "lote": "00",
+  "tipo": "regras",
+  "paginas_pdf": [
+    217,
+    231
+  ],
+  "secoes": [
+    {
+      "titulo": "Tesouros",
+      "titulo_en": "Treasure",
+      "nivel": 1,
+      "pagina_pdf": 217,
+      "pagina_pdf_fim": 217,
+      "texto": "Os aventureiros lutam por muitas coisas, entre elas glória, conhecimento e justiça. Muitos aventureiros também buscam algo mais tangível: tesouros. Este capítulo apresenta os tesouros em todas as suas formas, das moedas aos itens mágicos.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Temas de Tesouro",
+      "titulo_en": "Treasure Themes",
+      "nivel": 1,
+      "pagina_pdf": 217,
+      "pagina_pdf_fim": 217,
+      "texto": "Os monstros têm preferências de tesouro, como explica o *Livro dos Monstros*. Essas preferências são expressas como temas, que ajudam você a determinar quais tesouros são encontrados nos tesouros acumulados dos monstros, como resume a tabela Temas de Tesouro.\n\nPara conselhos sobre como incluir tesouros em uma aventura, veja \"Recompensas de Aventura\" no capítulo 4.\n\nPara determinar aleatoriamente um item mágico encontrado como tesouro, use as tabelas no fim deste capítulo.",
+      "tabelas": [
+        {
+          "titulo": "Temas de Tesouro",
+          "cabecalhos": [
+            "Tema",
+            "Tesouro Apropriado"
+          ],
+          "dados": [
+            [
+              "Arcano",
+              "Gemas mais itens mágicos de natureza mística ou esotérica"
+            ],
+            [
+              "Armamentos",
+              "Moedas ou barras comerciais mais itens mágicos úteis em batalha"
+            ],
+            [
+              "Implementos",
+              "Moedas, barras comerciais ou mercadorias mais itens mágicos voltados à utilidade"
+            ],
+            [
+              "Relíquias",
+              "Obras de arte mais itens mágicos com origens ou propósitos religiosos"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Moedas",
+      "titulo_en": "Coins",
+      "nivel": 1,
+      "pagina_pdf": 217,
+      "pagina_pdf_fim": 217,
+      "texto": "O tipo mais básico de tesouro é o dinheiro, incluindo Peças de Cobre (PC), Peças de Prata (PP), Peças de Electrum (PE), Peças de Ouro (PO) e Peças de Platina (PL). Veja o *Livro do Jogador* para o valor relativo entre elas. Cinquenta moedas de qualquer tipo pesam 0,5 kg.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Barras Comerciais",
+      "titulo_en": "Trade Bars",
+      "nivel": 1,
+      "pagina_pdf": 217,
+      "pagina_pdf_fim": 217,
+      "texto": "Como grandes quantidades de moedas podem ser difíceis de transportar e de contabilizar, muitos mercadores preferem usar barras comerciais — lingotes de metais preciosos e ligas (geralmente prata). Essas barras são avaliadas pelo peso, como mostra a tabela Barras Comerciais.",
+      "tabelas": [
+        {
+          "titulo": "Barras Comerciais",
+          "cabecalhos": [
+            "Barra",
+            "Valor",
+            "Dimensões"
+          ],
+          "dados": [
+            [
+              "Barra de prata de 1 kg",
+              "10 PO",
+              "12,5 cm de comprimento × 5 cm de largura × 1,25 cm de espessura"
+            ],
+            [
+              "Barra de prata de 2,5 kg",
+              "25 PO",
+              "15 cm de comprimento × 5 cm de largura × 2,5 cm de espessura"
+            ],
+            [
+              "Barra de ouro de 2,5 kg",
+              "250 PO",
+              "12,5 cm de comprimento × 5 cm de largura × 1,9 cm de espessura"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Mercadorias",
+      "titulo_en": "Trade Goods",
+      "nivel": 1,
+      "pagina_pdf": 217,
+      "pagina_pdf_fim": 217,
+      "texto": "Os mercadores costumam trocar mercadorias sem usar moeda. A tabela Mercadorias mostra o valor das mercadorias trocadas com mais frequência.",
+      "tabelas": [
+        {
+          "titulo": "Mercadorias",
+          "cabecalhos": [
+            "Custo",
+            "Mercadoria"
+          ],
+          "dados": [
+            [
+              "1 PC",
+              "0,5 kg de trigo"
+            ],
+            [
+              "2 PC",
+              "1 kg de farinha ou uma galinha"
+            ],
+            [
+              "5 PC",
+              "0,5 kg de sal"
+            ],
+            [
+              "1 PP",
+              "0,5 kg de ferro ou 1 m² de lona"
+            ],
+            [
+              "5 PP",
+              "0,5 kg de cobre ou 1 m² de tecido de algodão"
+            ],
+            [
+              "1 PO",
+              "0,5 kg de gengibre ou uma cabra"
+            ],
+            [
+              "2 PO",
+              "0,5 kg de canela ou pimenta, ou uma ovelha"
+            ],
+            [
+              "3 PO",
+              "0,5 kg de cravo ou um porco"
+            ],
+            [
+              "5 PO",
+              "0,5 kg de prata ou 1 m² de linho"
+            ],
+            [
+              "10 PO",
+              "0,5 kg de seda ou uma vaca"
+            ],
+            [
+              "15 PO",
+              "0,5 kg de açafrão ou um boi"
+            ],
+            [
+              "50 PO",
+              "0,5 kg de ouro"
+            ],
+            [
+              "500 PO",
+              "0,5 kg de platina"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Gemas",
+      "titulo_en": "Gemstones",
+      "nivel": 1,
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218,
+      "texto": "As gemas são pequenas, leves e fáceis de guardar em comparação com o mesmo valor em moedas.\n\nSe um tesouro acumulado incluir gemas, você pode usar as tabelas a seguir para determinar aleatoriamente o tipo de gemas encontradas, com base no valor delas. Você pode jogar uma vez e considerar que todas as gemas são iguais ou jogar várias vezes para criar coleções variadas.",
+      "tabelas": [
+        {
+          "titulo": "Gemas de 10 PO",
+          "cabecalhos": [
+            "1d12",
+            "Pedra"
+          ],
+          "dados": [
+            [
+              "1",
+              "Azurita (azul-escuro mosqueado)"
+            ],
+            [
+              "2",
+              "Ágata listrada (listras marrons, azuis, brancas ou vermelhas)"
+            ],
+            [
+              "3",
+              "Quartzo azul (azul-claro)"
+            ],
+            [
+              "4",
+              "Ágata-olho (círculos cinza, brancos, marrons, azuis ou verdes)"
+            ],
+            [
+              "5",
+              "Hematita (preto-acinzentado)"
+            ],
+            [
+              "6",
+              "Lápis-lazúli (azul-claro e azul-escuro com pontos amarelos)"
+            ],
+            [
+              "7",
+              "Malaquita (estrias verde-claras e verde-escuras)"
+            ],
+            [
+              "8",
+              "Ágata musgo (rosa ou branco-amarelado com marcas cinza ou verdes semelhantes a musgo)"
+            ],
+            [
+              "9",
+              "Obsidiana (preto)"
+            ],
+            [
+              "10",
+              "Rodocrosita (rosa-claro)"
+            ],
+            [
+              "11",
+              "Olho de tigre (marrom com centro dourado)"
+            ],
+            [
+              "12",
+              "Turquesa (verde-azulado claro)"
+            ]
+          ]
+        },
+        {
+          "titulo": "Gemas de 50 PO",
+          "cabecalhos": [
+            "1d12",
+            "Pedra"
+          ],
+          "dados": [
+            [
+              "1",
+              "Heliotrópio (cinza-escuro com pontos vermelhos)"
+            ],
+            [
+              "2",
+              "Cornalina (laranja a marrom-avermelhado)"
+            ],
+            [
+              "3",
+              "Calcedônia (branco)"
+            ],
+            [
+              "4",
+              "Crisoprásio (verde)"
+            ],
+            [
+              "5",
+              "Citrino (marrom-amarelado claro)"
+            ],
+            [
+              "6",
+              "Jaspe (azul, preto ou marrom)"
+            ],
+            [
+              "7",
+              "Pedra da lua (branco com brilho azul-claro)"
+            ],
+            [
+              "8",
+              "Ônix (faixas pretas e brancas, ou totalmente preto ou branco)"
+            ],
+            [
+              "9",
+              "Quartzo (branco, cinza-fumê ou amarelo)"
+            ],
+            [
+              "10",
+              "Sardônica (faixas vermelhas e brancas)"
+            ],
+            [
+              "11",
+              "Quartzo rosa estrela (pedra rosada com centro branco em forma de estrela)"
+            ],
+            [
+              "12",
+              "Zircão (verde-azulado claro)"
+            ]
+          ]
+        },
+        {
+          "titulo": "Gemas de 100 PO",
+          "cabecalhos": [
+            "1d10",
+            "Pedra"
+          ],
+          "dados": [
+            [
+              "1",
+              "Âmbar (dourado aguado a dourado intenso)"
+            ],
+            [
+              "2",
+              "Ametista (roxo-escuro)"
+            ],
+            [
+              "3",
+              "Crisoberilo (verde-amarelado a verde-claro)"
+            ],
+            [
+              "4",
+              "Coral (carmesim)"
+            ],
+            [
+              "5",
+              "Granada (vermelho, verde-amarronzado ou violeta)"
+            ],
+            [
+              "6",
+              "Jade (verde-claro, verde-escuro ou branco)"
+            ],
+            [
+              "7",
+              "Azeviche (preto profundo)"
+            ],
+            [
+              "8",
+              "Pérola (branco lustroso, amarelo ou rosa)"
+            ],
+            [
+              "9",
+              "Espinélio (vermelho, marrom-avermelhado ou verde-escuro)"
+            ],
+            [
+              "10",
+              "Turmalina (verde-claro, azul, marrom ou vermelho)"
+            ]
+          ]
+        },
+        {
+          "titulo": "Gemas de 500 PO",
+          "cabecalhos": [
+            "1d6",
+            "Pedra"
+          ],
+          "dados": [
+            [
+              "1",
+              "Alexandrita (verde-escuro)"
+            ],
+            [
+              "2",
+              "Água-marinha (verde-azulado claro)"
+            ],
+            [
+              "3",
+              "Pérola negra (preto puro)"
+            ],
+            [
+              "4",
+              "Espinélio azul (azul-escuro)"
+            ],
+            [
+              "5",
+              "Peridoto (verde-oliva intenso)"
+            ],
+            [
+              "6",
+              "Topázio (amarelo-dourado)"
+            ]
+          ]
+        },
+        {
+          "titulo": "Gemas de 1.000 PO",
+          "cabecalhos": [
+            "1d8",
+            "Pedra"
+          ],
+          "dados": [
+            [
+              "1",
+              "Opala negra (verde-escuro com manchas pretas e pontos dourados)"
+            ],
+            [
+              "2",
+              "Safira azul (azul médio)"
+            ],
+            [
+              "3",
+              "Esmeralda (verde vivo intenso)"
+            ],
+            [
+              "4",
+              "Opala de fogo (vermelho-fogo)"
+            ],
+            [
+              "5",
+              "Opala (azul-claro com manchas verdes e douradas)"
+            ],
+            [
+              "6",
+              "Rubi estrela (rubi com centro branco em forma de estrela)"
+            ],
+            [
+              "7",
+              "Safira estrela (safira azul com centro branco em forma de estrela)"
+            ],
+            [
+              "8",
+              "Safira amarela (amarelo-fogo ou verde-amarelado)"
+            ]
+          ]
+        },
+        {
+          "titulo": "Gemas de 5.000 PO",
+          "cabecalhos": [
+            "1d4",
+            "Pedra"
+          ],
+          "dados": [
+            [
+              "1",
+              "Safira negra (preto lustroso com reflexos luminosos)"
+            ],
+            [
+              "2",
+              "Diamante (branco-azulado, amarelo-canário, rosa, marrom ou azul)"
+            ],
+            [
+              "3",
+              "Jacinto (laranja-fogo)"
+            ],
+            [
+              "4",
+              "Rubi (vermelho límpido a carmesim profundo)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Obras de Arte",
+      "titulo_en": "Art Objects",
+      "nivel": 1,
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215,
+      "texto": "Ídolos fundidos em ouro maciço, colares cravejados de pedras preciosas, pinturas de reis antigos, pratos adornados com joias — as obras de arte incluem tudo isso e mais.\n\nSe um tesouro acumulado incluir obras de arte, você pode usar as tabelas a seguir para determinar aleatoriamente quais obras de arte são encontradas, com base no valor delas. Jogue em uma tabela tantas vezes quantas forem as obras de arte do tesouro acumulado. Pode haver mais de um exemplar de uma mesma obra de arte.",
+      "tabelas": [
+        {
+          "titulo": "Obras de Arte de 25 PO",
+          "cabecalhos": [
+            "1d10",
+            "Objeto"
+          ],
+          "dados": [
+            [
+              "1",
+              "Jarro de prata"
+            ],
+            [
+              "2",
+              "Estatueta de osso entalhado"
+            ],
+            [
+              "3",
+              "Bracelete de ouro"
+            ],
+            [
+              "4",
+              "Vestes de tecido de ouro"
+            ],
+            [
+              "5",
+              "Máscara de veludo preto costurada com fio de prata"
+            ],
+            [
+              "6",
+              "Cálice de cobre com filigrana de prata"
+            ],
+            [
+              "7",
+              "Par de dados de osso gravados"
+            ],
+            [
+              "8",
+              "Espelho de mão em moldura de madeira pintada"
+            ],
+            [
+              "9",
+              "Lenço de seda bordado"
+            ],
+            [
+              "10",
+              "Medalhão de ouro com um retrato pintado dentro"
+            ]
+          ]
+        },
+        {
+          "titulo": "Obras de Arte de 250 PO",
+          "cabecalhos": [
+            "1d10",
+            "Objeto"
+          ],
+          "dados": [
+            [
+              "1",
+              "Anel de ouro cravejado de heliotrópios"
+            ],
+            [
+              "2",
+              "Estatueta de marfim entalhado"
+            ],
+            [
+              "3",
+              "Bracelete de ouro cravejado de joias"
+            ],
+            [
+              "4",
+              "Colar de prata com pingente de gema"
+            ],
+            [
+              "5",
+              "Coroa de bronze"
+            ],
+            [
+              "6",
+              "Vestes de seda com bordados de ouro"
+            ],
+            [
+              "7",
+              "Tapeçaria bem-feita de 3 por 3 metros"
+            ],
+            [
+              "8",
+              "Caneca de latão com incrustações de jade"
+            ],
+            [
+              "9",
+              "Caixa de estatuetas de animais em turquesa"
+            ],
+            [
+              "10",
+              "Gaiola de ouro com filigrana de electrum"
+            ]
+          ]
+        },
+        {
+          "titulo": "Obras de Arte de 750 PO",
+          "cabecalhos": [
+            "1d10",
+            "Objeto"
+          ],
+          "dados": [
+            [
+              "1",
+              "Cálice de prata cravejado de pedras da lua"
+            ],
+            [
+              "2",
+              "Maço de partituras com os cantos fúnebres perdidos de um compositor famoso"
+            ],
+            [
+              "3",
+              "Harpa de madeira entalhada com incrustações de marfim e gemas de zircão"
+            ],
+            [
+              "4",
+              "Ídolo de ouro"
+            ],
+            [
+              "5",
+              "Pente de ouro em forma de dragão com granadas vermelhas como olhos"
+            ],
+            [
+              "6",
+              "Rolha de garrafa com relevo em folha de ouro e cravejada de ametistas"
+            ],
+            [
+              "7",
+              "Crânio de draconato em tamanho real, detalhado, fundido em electrum"
+            ],
+            [
+              "8",
+              "Broche de prata e ouro"
+            ],
+            [
+              "9",
+              "Estatueta de obsidiana com guarnições e incrustações de ouro"
+            ],
+            [
+              "10",
+              "Máscara de guerra de ouro pintada"
+            ]
+          ]
+        },
+        {
+          "titulo": "Obras de Arte de 2.500 PO",
+          "cabecalhos": [
+            "1d10",
+            "Objeto"
+          ],
+          "dados": [
+            [
+              "1",
+              "Corrente fina de ouro cravejada com uma opala de fogo"
+            ],
+            [
+              "2",
+              "Pintura antiga de um grande mestre"
+            ],
+            [
+              "3",
+              "Manto de seda e veludo bordado, cravejado de numerosas pedras da lua"
+            ],
+            [
+              "4",
+              "Bracelete de platina cravejado com uma esmeralda"
+            ],
+            [
+              "5",
+              "Luva bordada cravejada de lascas de joias"
+            ],
+            [
+              "6",
+              "Tornozeleira cravejada de joias"
+            ],
+            [
+              "7",
+              "Caixa de música de ouro"
+            ],
+            [
+              "8",
+              "Diadema de ouro cravejado com quatro águas-marinhas"
+            ],
+            [
+              "9",
+              "Tapa-olho decorado com minúsculas safiras azuis e pedras da lua"
+            ],
+            [
+              "10",
+              "Um colar de pequenas pérolas rosadas"
+            ]
+          ]
+        },
+        {
+          "titulo": "Obras de Arte de 7.500 PO",
+          "cabecalhos": [
+            "1d10",
+            "Objeto"
+          ],
+          "dados": [
+            [
+              "1",
+              "Coroa de ouro cravejada de joias"
+            ],
+            [
+              "2",
+              "Anel de platina cravejado de joias"
+            ],
+            [
+              "3",
+              "Estatueta de ouro cravejada de rubis"
+            ],
+            [
+              "4",
+              "Taça de ouro cravejada de esmeraldas"
+            ],
+            [
+              "5",
+              "Porta-joias de ouro com filigrana de platina"
+            ],
+            [
+              "6",
+              "Conjunto de bonecas de ouro que se encaixam umas nas outras"
+            ],
+            [
+              "7",
+              "Tabuleiro de jogo de jade com peças de ouro"
+            ],
+            [
+              "8",
+              "Chifre de beber de marfim cravejado de joias com filigrana de ouro"
+            ],
+            [
+              "9",
+              "Carruagem real ou barcaça funerária dourada"
+            ],
+            [
+              "10",
+              "Armadura cerimonial de ouro com pérolas negras"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Itens Mágicos",
+      "titulo_en": "Magic Items",
+      "nivel": 1,
+      "pagina_pdf": 219,
+      "pagina_pdf_fim": 219,
+      "pagina": 216,
+      "pagina_fim": 216,
+      "texto": "Os itens mágicos são obtidos dos tesouros acumulados de monstros abatidos ou descobertos em câmaras há muito perdidas. Esses itens concedem capacidades que um personagem raramente teria de outra forma, ou complementam as capacidades de seu dono de maneiras maravilhosas.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Categorias de Itens Mágicos",
+      "titulo_en": "Magic Item Categories",
+      "nivel": 2,
+      "pagina_pdf": 219,
+      "pagina_pdf_fim": 219,
+      "pagina": 216,
+      "pagina_fim": 216,
+      "texto": "Todo item mágico pertence a uma categoria. A tabela Categorias de Itens Mágicos lista as nove categorias e dá exemplos. As regras de cada categoria aparecem depois da tabela.",
+      "tabelas": [
+        {
+          "titulo": "Categorias de Itens Mágicos",
+          "cabecalhos": [
+            "Categoria",
+            "Exemplos"
+          ],
+          "dados": [
+            [
+              "Armadura",
+              "*Armadura +1* (Couro), *Escudo +1*"
+            ],
+            [
+              "Poções",
+              "*Poção de Cura*"
+            ],
+            [
+              "Anéis",
+              "*Anel de Invisibilidade*"
+            ],
+            [
+              "Bastões",
+              "*Bastão Imóvel*"
+            ],
+            [
+              "Pergaminhos",
+              "*Pergaminho Mágico*"
+            ],
+            [
+              "Cajados",
+              "*Cajado do Impacto*"
+            ],
+            [
+              "Varinhas",
+              "*Varinha de Bolas de Fogo*"
+            ],
+            [
+              "Armas",
+              "*Munição +1*, *Arma +1* (Espada Longa)"
+            ],
+            [
+              "Itens Maravilhosos",
+              "*Bolsa Devoradora*, *Botas Élficas*"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Armadura",
+      "titulo_en": "Armor",
+      "nivel": 3,
+      "pagina_pdf": 219,
+      "pagina_pdf_fim": 219,
+      "pagina": 216,
+      "pagina_fim": 216,
+      "texto": "Um item da categoria Armadura costuma ser uma versão mágica de uma armadura do *Livro do Jogador*. A menos que a descrição da armadura diga o contrário, a armadura precisa ser vestida para que sua magia funcione.\n\nAlgumas armaduras mágicas especificam o tipo de armadura que são, como Cota de Malha ou Armadura de Placas. Se nenhum tipo for especificado, escolha o tipo ou determine-o aleatoriamente.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Poções",
+      "titulo_en": "Potions",
+      "nivel": 3,
+      "pagina_pdf": 219,
+      "pagina_pdf_fim": 219,
+      "pagina": 216,
+      "pagina_fim": 216,
+      "texto": "Um item da categoria Poção pode ser uma beberagem mágica que precisa ser ingerida ou um óleo que precisa ser aplicado a uma criatura ou a um objeto. Uma poção típica consiste em 30 ml de líquido em um frasco.\n\n***Usando uma Poção.*** As poções são itens consumíveis. Beber uma poção ou administrá-la a outra criatura requer uma Ação Bônus. Aplicar um óleo pode levar mais tempo, conforme especificado em sua descrição. Depois de usada, uma poção faz efeito imediatamente e se esgota.\n\n***Misturando Poções.*** Um personagem pode beber uma poção enquanto ainda está sob os efeitos de outra ou despejar várias poções em um único recipiente. Os estranhos ingredientes usados na criação de poções podem resultar em interações imprevisíveis.\n\nQuando um personagem mistura duas poções, jogue na tabela Miscibilidade de Poções. Se mais de duas forem combinadas, jogue novamente para cada poção adicional, combinando os resultados. A menos que os efeitos sejam imediatamente óbvios, revele-os apenas quando se tornarem evidentes.",
+      "tabelas": [
+        {
+          "titulo": "Miscibilidade de Poções",
+          "cabecalhos": [
+            "1d100",
+            "Resultado"
+          ],
+          "dados": [
+            [
+              "01",
+              "Ambas as poções perdem seus efeitos, e a mistura cria uma explosão mágica em uma Esfera de 1,5 metro de raio centrada em si mesma. Cada criatura nessa área sofre 4d10 de dano Energético."
+            ],
+            [
+              "02–08",
+              "Ambas as poções perdem seus efeitos, e a mistura se torna um veneno ingerido à sua escolha (veja \"Veneno\" no capítulo 3)."
+            ],
+            [
+              "09–15",
+              "Ambas as poções perdem seus efeitos."
+            ],
+            [
+              "16–25",
+              "Uma poção perde seu efeito."
+            ],
+            [
+              "26–35",
+              "Ambas as poções funcionam, mas seus efeitos numéricos e durações são reduzidos à metade. Se uma poção não tiver efeito numérico nem duração, ela perde seu efeito."
+            ],
+            [
+              "36–90",
+              "Ambas as poções funcionam normalmente."
+            ],
+            [
+              "91–99",
+              "Ambas as poções funcionam, mas os efeitos numéricos e a duração de uma das poções são dobrados. Se nenhuma das poções tiver algo a dobrar dessa forma, elas funcionam normalmente."
+            ],
+            [
+              "00",
+              "Apenas uma poção funciona, mas seus efeitos são permanentes. Escolha o efeito mais simples de tornar permanente ou aquele que pareça mais divertido. Por exemplo, uma *Poção de Cura* pode aumentar o máximo de Pontos de Vida de quem a bebe em 2d4 + 2, ou uma *Poção de Invisibilidade* pode dar a quem a bebe a condição Invisível indefinidamente. A seu critério, uma magia *Dissipar Magia* ou magia semelhante pode encerrar esse efeito duradouro."
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Anéis",
+      "titulo_en": "Rings",
+      "nivel": 3,
+      "pagina_pdf": 219,
+      "pagina_pdf_fim": 219,
+      "pagina": 216,
+      "pagina_fim": 216,
+      "texto": "Para que sua magia funcione, um item da categoria Anel precisa ser usado em um dedo ou em um dígito semelhante, a menos que sua descrição diga o contrário.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Bastões",
+      "titulo_en": "Rods",
+      "nivel": 3,
+      "pagina_pdf": 219,
+      "pagina_pdf_fim": 219,
+      "pagina": 216,
+      "pagina_fim": 216,
+      "texto": "Um item da categoria Bastão é um cetro geralmente feito de metal, madeira ou osso. Um bastão típico pesa de 1 a 2,5 kg.\n\nA menos que sua descrição diga o contrário, um bastão pode ser usado como Foco Arcano.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Pergaminhos",
+      "titulo_en": "Scrolls",
+      "nivel": 3,
+      "pagina_pdf": 219,
+      "pagina_pdf_fim": 224,
+      "pagina": 216,
+      "pagina_fim": 217,
+      "texto": "Um item da categoria Pergaminho é um rolo de papel ou pergaminho, às vezes preso a hastes de madeira e normalmente guardado em segurança em um tubo de marfim, jade, couro, metal ou madeira. O pergaminho mais comum é o *Pergaminho Mágico*, uma magia armazenada em forma escrita. No entanto, alguns pergaminhos, como o *Pergaminho de Proteção*, trazem um encantamento que não é uma magia.\n\n***Usando um Pergaminho.*** Os pergaminhos são itens consumíveis. Liberar a magia de um pergaminho requer que o usuário o leia. Depois que sua magia é invocada, o pergaminho não pode ser usado novamente. Suas palavras se apagam, ou ele se desfaz em pó.\n\nQualquer criatura capaz de entender uma língua escrita pode ler um pergaminho e tentar ativá-lo, a menos que sua descrição diga o contrário.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Cajados",
+      "titulo_en": "Staffs",
+      "nivel": 3,
+      "pagina_pdf": 224,
+      "pagina_pdf_fim": 224,
+      "pagina": 217,
+      "pagina_fim": 217,
+      "texto": "Os itens da categoria Cajado variam muito em aparência: alguns têm diâmetro quase uniforme em toda a extensão e são lisos, outros são nodosos e retorcidos, alguns são feitos de madeira e outros são compostos de metal polido ou cristal. Um cajado pesa entre 1 e 3,5 kg e serve bem como bordão ou bengala.\n\nA menos que sua descrição diga o contrário, um cajado pode ser usado como um Cajado não mágico e como Foco Arcano.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Varinhas",
+      "titulo_en": "Wands",
+      "nivel": 3,
+      "pagina_pdf": 224,
+      "pagina_pdf_fim": 224,
+      "pagina": 217,
+      "pagina_fim": 217,
+      "texto": "Um item da categoria Varinha costuma ter de 30 a 37,5 cm de comprimento e ser feito de metal, osso ou madeira. Sua ponta é de metal, cristal, pedra ou algum outro material.\n\nA menos que sua descrição diga o contrário, uma varinha pode ser usada como Foco Arcano.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Armas",
+      "titulo_en": "Weapons",
+      "nivel": 3,
+      "pagina_pdf": 224,
+      "pagina_pdf_fim": 224,
+      "pagina": 217,
+      "pagina_fim": 217,
+      "texto": "Uma arma mágica costuma ser uma versão mágica de uma arma do *Livro do Jogador*. Algumas armas mágicas especificam em suas descrições o tipo de arma que são, como Espada Longa ou Arco Longo. Se nenhum tipo de arma for especificado, você pode escolher o tipo ou determiná-lo aleatoriamente.\n\n***Munição.*** Se uma arma mágica tiver a propriedade Munição, a munição disparada por ela é considerada mágica para fins de qualquer regra que leve em conta se uma arma é mágica ou não.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Itens Maravilhosos",
+      "titulo_en": "Wondrous Items",
+      "nivel": 3,
+      "pagina_pdf": 224,
+      "pagina_pdf_fim": 224,
+      "pagina": 217,
+      "pagina_fim": 217,
+      "texto": "Os itens maravilhosos incluem itens vestíveis, como botas, cinturões, capas, amuletos, broches e diademas. Bolsas, tapetes, estatuetas, trompas, instrumentos musicais e outros também se enquadram nesta categoria.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Raridade de Itens Mágicos",
+      "titulo_en": "Magic Item Rarity",
+      "nivel": 2,
+      "pagina_pdf": 224,
+      "pagina_pdf_fim": 224,
+      "pagina": 217,
+      "pagina_fim": 217,
+      "texto": "Todo item mágico tem uma raridade, que fornece uma medida aproximada do poder do item em relação a outros itens mágicos. As raridades são mostradas na tabela Raridades e Valores de Itens Mágicos.\n\nOs itens mágicos comuns, como uma *Poção de Cura*, são os mais abundantes. Os Artefatos, como a *Varinha de Orcus*, são inestimáveis, únicos e difíceis de obter.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Regras de Itens Mágicos",
+      "titulo_en": "Magic Item Rules",
+      "nivel": 3,
+      "pagina_pdf": 224,
+      "pagina_pdf_fim": 224,
+      "pagina": 217,
+      "pagina_fim": 217,
+      "texto": "As regras para identificar, sintonizar e usar itens mágicos aparecem no *Livro do Jogador*. Regras adicionais são apresentadas abaixo.\n\n***Pré-requisitos de Sintonização.*** Se um item mágico tiver uma classe como pré-requisito, uma criatura precisa ser membro dessa classe para se sintonizar com o item. Se uma criatura precisar ser conjuradora para se sintonizar com um item, a criatura se qualifica se puder conjurar pelo menos uma magia usando seus traços ou características, e não usando um item mágico ou algo semelhante.\n\n***Itens Feitos para Criaturas Específicas.*** Itens mágicos feitos para serem vestidos tendem a se ajustar magicamente a quem os usa. No entanto, você pode decidir que um item mágico não ajusta seu tamanho para servir em qualquer usuário. Por exemplo, um armeiro específico pode fazer itens utilizáveis apenas por pessoas com o tamanho e o formato de anões.\n\n***Anatomia Incomum.*** Use seu critério para decidir se uma criatura pode usar um item que não foi feito para sua anatomia. Um anel colocado em um tentáculo pode funcionar, mas um yuan-ti com uma cauda serpentina no lugar das pernas não pode calçar botas mágicas.\n\n***Itens em Par.*** Você pode permitir exceções à regra de que itens em par precisam ser usados juntos. Por exemplo, um personagem com apenas um braço pode ser capaz de usar uma única luva das *Luvas Apanha-Projéteis*, desde que a luva correspondente esteja com ele.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Valores de Itens Mágicos por Raridade",
+      "titulo_en": "Magic Item Values by Rarity",
+      "nivel": 3,
+      "pagina_pdf": 224,
+      "pagina_pdf_fim": 224,
+      "pagina": 217,
+      "pagina_fim": 217,
+      "texto": "Itens mágicos comuns muitas vezes podem ser comprados em uma vila ou cidade. Itens mágicos Incomuns e Raros geralmente são encontrados apenas em cidades, e itens mágicos mais raros podem ser vendidos apenas em locais maravilhosos, como a Cidade de Bronze ou Sigil. Se você permitir que os personagens comprem e vendam itens mágicos em sua campanha, a raridade pode ajudar você a definir os preços desses itens. Os valores em Peças de Ouro são fornecidos na tabela Raridades e Valores de Itens Mágicos, embora um vendedor possa pedir um serviço em vez de moedas como pagamento.\n\nSe um item mágico incorporar um item que tem um custo de compra no *Livro do Jogador* (como uma arma ou uma armadura), some o custo desse item ao valor do item mágico. Por exemplo, *Armadura +1* (Armadura de Placas) tem valor de 5.500 PO, que é a soma do valor de um item mágico Raro (4.000 PO) com o custo da Armadura de Placas (1.500 PO).\n\n¹ Reduza o valor à metade para um item consumível que não seja um *Pergaminho Mágico*. O valor de um *Pergaminho Mágico* é o dobro do custo para escrever o pergaminho (como especificado no *Livro do Jogador*).",
+      "tabelas": [
+        {
+          "titulo": "Raridades e Valores de Itens Mágicos",
+          "cabecalhos": [
+            "Raridade",
+            "Valor¹"
+          ],
+          "dados": [
+            [
+              "Comum",
+              "100 PO"
+            ],
+            [
+              "Incomum",
+              "400 PO"
+            ],
+            [
+              "Rara",
+              "4.000 PO"
+            ],
+            [
+              "Muito Rara",
+              "40.000 PO"
+            ],
+            [
+              "Lendária",
+              "200.000 PO"
+            ],
+            [
+              "Artefato",
+              "Inestimável"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Concessão de Itens Mágicos",
+      "titulo_en": "Awarding Magic Items",
+      "nivel": 2,
+      "pagina_pdf": 220,
+      "pagina_pdf_fim": 220,
+      "pagina": 218,
+      "pagina_fim": 218,
+      "texto": "Conceder itens mágicos é atribuição do Mestre. Você pode conceder um item mágico porque a história pede ou porque os jogadores ficariam especialmente felizes em tê-lo. Esta seção ajuda você a determinar quais itens mágicos acabam em posse dos personagens.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Itens Mágicos Concedidos por Nível",
+      "titulo_en": "Magic Items Awarded by Level",
+      "nivel": 3,
+      "pagina_pdf": 220,
+      "pagina_pdf_fim": 220,
+      "pagina": 218,
+      "pagina_fim": 218,
+      "texto": "A tabela Itens Mágicos Concedidos por Nível mostra o número de itens mágicos que um grupo de D&D normalmente ganha durante uma campanha, totalizando cem itens mágicos até o nível 20. A tabela mostra quantos itens de cada raridade devem ser entregues durante cada um dos quatro patamares de jogo.\n\nOs Artefatos são omitidos da tabela porque costumam ser usados como elementos de enredo em aventuras de nível alto, e os personagens raramente ficam com eles por muito tempo (seja porque os Artefatos foram feitos para ser destruídos, seja porque a campanha está chegando ao fim).\n\n***Lista de Desejos dos Jogadores.*** Incentive seus jogadores a manter uma lista de desejos de itens mágicos que esperam que seus personagens encontrem ao longo da campanha. Se você quiser conceder um item mágico mas não tiver um item específico em mente, pode escolher um item da raridade apropriada na lista de desejos dos seus jogadores.\n\n***Excesso de Itens em uma Aventura.*** Ao criar ou modificar uma aventura, considere que os personagens não encontrarão todos os itens mágicos que você colocar nela. Uma aventura geralmente pode incluir um número de itens 25 por cento maior que o número da tabela Itens Mágicos Concedidos por Nível (arredondado para cima). Por exemplo, uma aventura projetada para levar os personagens do nível 1 ao 4 pode incluir catorze itens em vez de onze, na expectativa de que três itens não sejam encontrados.",
+      "tabelas": [
+        {
+          "titulo": "Itens Mágicos Concedidos por Nível",
+          "cabecalhos": [
+            "Nível do Personagem (Patamar de Jogo)",
+            "Itens Comuns",
+            "Itens Incomuns",
+            "Itens Raros",
+            "Itens Muito Raros",
+            "Itens Lendários",
+            "Todos os Itens"
+          ],
+          "dados": [
+            [
+              "1–4 (patamar 1)",
+              "6",
+              "4",
+              "1",
+              "0",
+              "0",
+              "11"
+            ],
+            [
+              "5–10 (patamar 2)",
+              "10",
+              "17",
+              "6",
+              "1",
+              "0",
+              "34"
+            ],
+            [
+              "11–16 (patamar 3)",
+              "3",
+              "7",
+              "11",
+              "7",
+              "2",
+              "30"
+            ],
+            [
+              "17–20 (patamar 4)",
+              "0",
+              "0",
+              "5",
+              "11",
+              "9",
+              "25"
+            ],
+            [
+              "Total",
+              "19",
+              "28",
+              "23",
+              "19",
+              "11",
+              "100"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Os Itens Mágicos São Necessários?",
+      "titulo_en": "Are Magic Items Necessary?",
+      "nivel": 3,
+      "pagina_pdf": 220,
+      "pagina_pdf_fim": 220,
+      "pagina": 218,
+      "pagina_fim": 218,
+      "texto": "O jogo D&D presume que os itens mágicos aparecem esporadicamente e que são uma dádiva, a menos que o item carregue uma maldição. Personagens e monstros são feitos para enfrentar uns aos outros sem a ajuda de itens mágicos, o que significa que ter um item mágico torna um personagem mais poderoso ou versátil do que um personagem genérico do mesmo nível. Como Mestre, você nunca precisa se preocupar em conceder itens mágicos só para que os personagens consigam acompanhar as ameaças da campanha. Os itens mágicos são verdadeiros prêmios — desejáveis, mas não necessários.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Rastreador de Itens Mágicos",
+      "titulo_en": "Magic Item Tracker",
+      "nivel": 3,
+      "pagina_pdf": 220,
+      "pagina_pdf_fim": 220,
+      "pagina": 218,
+      "pagina_fim": 218,
+      "texto": "Você pode usar a ficha Rastreador de Itens Mágicos para acompanhar quantos itens mágicos os personagens adquiriram. Cada vez que os personagens obtiverem um item mágico, marque um dos círculos vazios correspondentes à raridade do item e à faixa de nível atual dos personagens. Se os personagens obtiverem um item mágico de uma raridade que não tem círculos desmarcados na faixa de nível atual, marque um círculo vazio de um patamar inferior. Se todas as faixas de nível inferiores também não tiverem círculos restantes, marque um círculo vazio de uma faixa de nível superior.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Raridade Aleatória de Itens Mágicos",
+      "titulo_en": "Random Magic Item Rarity",
+      "nivel": 3,
+      "pagina_pdf": 220,
+      "pagina_pdf_fim": 220,
+      "pagina": 218,
+      "pagina_fim": 218,
+      "texto": "Quando você decidir que um tesouro contém itens mágicos, há duas maneiras de determinar a raridade desses itens. Você pode escolher uma raridade apropriada com base nos itens que já distribuiu (usando a ficha Rastreador de Itens Mágicos para acompanhar) ou pode jogar na tabela Raridades de Itens Mágicos.\n\nPara usar a tabela, encontre o nível dos personagens na linha superior. Jogue 1d100 e desça por essa coluna até encontrar seu resultado. Depois, siga pela linha até a coluna da direita para descobrir a raridade do item.",
+      "tabelas": [
+        {
+          "titulo": "Raridades de Itens Mágicos",
+          "cabecalhos": [
+            "1d100 (Níveis 1–4)",
+            "1d100 (Níveis 5–10)",
+            "1d100 (Níveis 11–16)",
+            "1d100 (Níveis 17–20)",
+            "Raridade do Item"
+          ],
+          "dados": [
+            [
+              "01–54",
+              "01–30",
+              "01–11",
+              "—",
+              "Comum"
+            ],
+            [
+              "55–91",
+              "31–81",
+              "12–34",
+              "—",
+              "Incomum"
+            ],
+            [
+              "92–00",
+              "82–98",
+              "35–70",
+              "01–20",
+              "Rara"
+            ],
+            [
+              "—",
+              "99–00",
+              "71–93",
+              "21–64",
+              "Muito Rara"
+            ],
+            [
+              "—",
+              "—",
+              "94–00",
+              "65–00",
+              "Lendária"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Ativação de um Item Mágico",
+      "titulo_en": "Activating a Magic Item",
+      "nivel": 2,
+      "pagina_pdf": 220,
+      "pagina_pdf_fim": 221,
+      "pagina": 218,
+      "pagina_fim": 220,
+      "texto": "Normalmente é preciso executar uma ação Usar Magia para ativar um item mágico. O usuário do item também pode precisar fazer algo especial. A descrição de cada categoria de item ou de cada item individual detalha como um item é ativado.\n\nAlguns itens usam as regras a seguir para sua ativação.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Itens Mágicos para Personagens Iniciais",
+      "titulo_en": "Magic Items for Starting Characters",
+      "nivel": 3,
+      "pagina_pdf": 221,
+      "pagina_pdf_fim": 221,
+      "pagina": 220,
+      "pagina_fim": 220,
+      "texto": "Se você estiver começando uma campanha para personagens acima do nível 1, o *Livro do Jogador* oferece sugestões de quantos itens mágicos esses personagens devem ter no início e da raridade desses itens. Considere estas abordagens para determinar os itens que cada personagem recebe:\n\n- **Escolha do Mestre.** Escolha os itens de cada personagem usando seu próprio julgamento.\n- **Escolha dos Jogadores.** Deixe os jogadores escolherem os itens que quiserem, dentro da raridade especificada.\n- **Determinação Aleatória.** Use as tabelas no fim deste capítulo para determinar aleatoriamente os itens iniciais. Use as tabelas Arcano para Feiticeiros, Bruxos e Magos. Use as tabelas Armamentos para Bárbaros, Guerreiros, Paladinos e Guardiões. Use as tabelas Implementos para Bardos, Monges e Ladinos. Use as tabelas Relíquias para Clérigos e Druidas. Sinta-se à vontade para variar as tabelas que usa, a fim de dar a cada personagem uma mistura de itens úteis e de combinar com os temas dos personagens. Por exemplo, para um Guerreiro com a subclasse Cavaleiro Místico, você pode escolher um item das tabelas Arcano e o restante dos itens do personagem das tabelas Armamentos.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Palavra de Comando",
+      "titulo_en": "Command Word",
+      "nivel": 3,
+      "pagina_pdf": 221,
+      "pagina_pdf_fim": 221,
+      "pagina": 220,
+      "pagina_fim": 220,
+      "texto": "Uma palavra de comando é uma palavra ou frase curta que precisa ser falada ou sinalizada para que um item funcione. Palavras de comando faladas precisam ser audíveis e não funcionam em áreas onde todo som é suprimido, como na área da magia *Silêncio*.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Itens Consumíveis",
+      "titulo_en": "Consumable Items",
+      "nivel": 3,
+      "pagina_pdf": 221,
+      "pagina_pdf_fim": 221,
+      "pagina": 220,
+      "pagina_fim": 220,
+      "texto": "Alguns itens são consumidos — esgotados, em outras palavras — quando são ativados. Uma *Poção de Cura* precisa ser engolida, por exemplo, enquanto a escrita desaparece de um pergaminho quando ele é lido. Depois de usado, um item consumível perde sua magia.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Magias Conjuradas a Partir de Itens",
+      "titulo_en": "Spells Cast from Items",
+      "nivel": 3,
+      "pagina_pdf": 221,
+      "pagina_pdf_fim": 221,
+      "pagina": 220,
+      "pagina_fim": 220,
+      "texto": "Alguns itens mágicos permitem que o usuário conjure uma magia a partir do item. A magia é conjurada no menor círculo de magia e no menor nível de conjurador possíveis, não gasta nenhum dos espaços de magia do usuário e não requer componentes, a menos que a descrição do item diga o contrário. A magia usa seu tempo de conjuração, alcance e duração normais, e o usuário do item precisa se concentrar se a magia exigir Concentração. Muitos itens, como as Poções, dispensam a conjuração de uma magia e conferem os efeitos da magia com sua duração habitual. Certos itens abrem exceções a essas regras, alterando o tempo de conjuração, a duração ou outras partes de uma magia.\n\nUm item mágico pode exigir que o usuário use seu próprio atributo de conjuração ao conjurar uma magia a partir do item. Se o usuário tiver mais de um atributo de conjuração, ele escolhe qual usar com o item. Se o usuário não tiver um atributo de conjuração, seu modificador de atributo de conjuração é +0 para o item, e o Bônus de Proficiência do usuário se aplica.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Cargas",
+      "titulo_en": "Charges",
+      "nivel": 3,
+      "pagina_pdf": 221,
+      "pagina_pdf_fim": 221,
+      "pagina": 220,
+      "pagina_fim": 220,
+      "texto": "Alguns itens mágicos têm cargas que precisam ser gastas para ativar suas propriedades. O número de cargas restantes de um item é revelado quando a magia *Identificar* é conjurada sobre ele. Uma criatura sintonizada com um item sabe quantas cargas o item tem e quantas recupera.",
+      "tabelas": []
+    },
+    {
+      "titulo": "\"O Próximo Amanhecer\"",
+      "titulo_en": "\"The Next Dawn\"",
+      "nivel": 2,
+      "pagina_pdf": 221,
+      "pagina_pdf_fim": 221,
+      "pagina": 220,
+      "pagina_fim": 220,
+      "texto": "Itens mágicos muitas vezes têm cargas ou propriedades que se recarregam no próximo amanhecer ou em algum outro momento especificado. Se um item estiver em um mundo ou plano de existência onde o evento especificado não ocorre, o Mestre determina quando o item se recarrega.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Itens Amaldiçoados",
+      "titulo_en": "Cursed Items",
+      "nivel": 2,
+      "pagina_pdf": 221,
+      "pagina_pdf_fim": 221,
+      "pagina": 220,
+      "pagina_fim": 220,
+      "texto": "A descrição de um item mágico especifica se ele carrega uma maldição. A maioria dos métodos de identificação de itens, incluindo a magia *Identificar*, não revela essa maldição.\n\nA Sintonização com um item amaldiçoado não pode ser encerrada voluntariamente a menos que a maldição seja quebrada primeiro, como com a magia *Remover Maldição*.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Resiliência de Itens Mágicos",
+      "titulo_en": "Magic Item Resilience",
+      "nivel": 2,
+      "pagina_pdf": 221,
+      "pagina_pdf_fim": 221,
+      "pagina": 220,
+      "pagina_fim": 220,
+      "texto": "Um item mágico é pelo menos tão durável quanto um item não mágico do mesmo tipo. A maioria dos itens mágicos, exceto Poções e Pergaminhos, tem Resistência a todo dano.\n\nUm Artefato só pode ser destruído de alguma maneira especial. Fora isso, ele é imune a dano. Descobrir como destruir um Artefato geralmente requer pesquisa ou a conclusão de uma missão.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Fabricação de Itens Mágicos",
+      "titulo_en": "Crafting Magic Items",
+      "nivel": 2,
+      "pagina_pdf": 221,
+      "pagina_pdf_fim": 221,
+      "pagina": 220,
+      "pagina_fim": 220,
+      "texto": "O *Livro do Jogador* contém regras para preparar exemplares de *Poção de Cura* e escrever exemplares de *Pergaminho Mágico*. Para criar outros itens mágicos, siga as regras abaixo. Nessas regras, \"você\" se refere ao personagem que fabrica o item mágico.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Proficiência em Arcanismo",
+      "titulo_en": "Arcana Proficiency",
+      "nivel": 3,
+      "pagina_pdf": 221,
+      "pagina_pdf_fim": 221,
+      "pagina": 220,
+      "pagina_fim": 220,
+      "texto": "Para fabricar um item mágico, você e quaisquer ajudantes precisam ter proficiência na perícia Arcanismo.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Ferramentas",
+      "titulo_en": "Tools",
+      "nivel": 3,
+      "pagina_pdf": 221,
+      "pagina_pdf_fim": 226,
+      "pagina": 220,
+      "pagina_fim": 221,
+      "texto": "A tabela Ferramentas de Itens Mágicos lista qual ferramenta é necessária para fabricar um item mágico de cada categoria. Você precisa usar a ferramenta exigida para fazer um item e ter proficiência com essa ferramenta. Quaisquer ajudantes também precisam ter proficiência com ela. Para mais informações sobre as ferramentas, veja o *Livro do Jogador*.",
+      "tabelas": [
+        {
+          "titulo": "Ferramentas de Itens Mágicos",
+          "cabecalhos": [
+            "Categoria do Item",
+            "Ferramenta Necessária"
+          ],
+          "dados": [
+            [
+              "Armadura",
+              "Ferramentas de Coureiro, Ferramentas de Ferreiro ou Ferramentas de Tecelão, dependendo do tipo de armadura, conforme indicado nas descrições das ferramentas"
+            ],
+            [
+              "Poção",
+              "Suprimentos de Alquimista ou Kit de Herbalismo"
+            ],
+            [
+              "Anel",
+              "Ferramentas de Joalheiro"
+            ],
+            [
+              "Bastão",
+              "Ferramentas de Entalhador"
+            ],
+            [
+              "Pergaminho",
+              "Suprimentos de Calígrafo"
+            ],
+            [
+              "Cajado",
+              "Ferramentas de Entalhador"
+            ],
+            [
+              "Varinha",
+              "Ferramentas de Entalhador"
+            ],
+            [
+              "Arma",
+              "Ferramentas de Coureiro, Ferramentas de Ferreiro ou Ferramentas de Entalhador, dependendo do tipo de arma, conforme indicado nas descrições das ferramentas"
+            ],
+            [
+              "Item Maravilhoso",
+              "Ferramentas de Funileiro ou a ferramenta necessária para fazer o item não mágico no qual o item mágico se baseia"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Magias",
+      "titulo_en": "Spells",
+      "nivel": 3,
+      "pagina_pdf": 226,
+      "pagina_pdf_fim": 226,
+      "pagina": 221,
+      "pagina_fim": 221,
+      "texto": "Se um item mágico permite que seu usuário conjure quaisquer magias a partir dele, você precisa ter todas essas magias preparadas em cada dia que passar fabricando o item.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Tempo e Custo",
+      "titulo_en": "Time and Cost",
+      "nivel": 3,
+      "pagina_pdf": 226,
+      "pagina_pdf_fim": 226,
+      "pagina": 221,
+      "pagina_fim": 221,
+      "texto": "Fabricar um item mágico exige uma quantidade de tempo e de dinheiro baseada na raridade do item, como mostra a tabela Tempo e Custo de Fabricação de Itens Mágicos.\n\n***Trabalho por Dia.*** Para cada dia de fabricação, você precisa trabalhar 8 horas. Se um item exigir vários dias, esses dias não precisam ser consecutivos.\n\n***Ajudantes.*** Os personagens podem combinar seus esforços para encurtar o tempo de fabricação. Divida o tempo necessário para criar um item pelo número de personagens que trabalham nele. Normalmente, apenas um outro personagem pode ajudar você, mas o Mestre pode permitir mais ajudantes.\n\n***Matérias-Primas.*** O custo na tabela representa as matérias-primas necessárias para fazer um item mágico. O Mestre determina se as matérias-primas adequadas estão disponíveis. Em uma cidade, há 75 por cento de chance de que os materiais estejam disponíveis, e em qualquer outro povoado essa chance é de 25 por cento. Se os materiais não estiverem disponíveis, você precisa esperar pelo menos 7 dias antes de verificar a disponibilidade novamente.\n\nSe um item mágico incorporar um item que tem custo de compra (como uma arma ou uma armadura), você também precisa pagar esse custo integral ou fabricar esse item usando as regras do *Livro do Jogador*. Por exemplo, para fazer *Armadura +1* (Armadura de Placas), você precisa pagar 3.500 PO ou pagar 2.000 PO e fabricar a armadura.\n\n¹ O tempo e o custo são reduzidos à metade para um item consumível que não seja um *Pergaminho Mágico*, cujo tempo e custo de fabricação são dados no *Livro do Jogador*.",
+      "tabelas": [
+        {
+          "titulo": "Tempo e Custo de Fabricação de Itens Mágicos",
+          "cabecalhos": [
+            "Raridade do Item",
+            "Tempo¹",
+            "Custo¹"
+          ],
+          "dados": [
+            [
+              "Comum",
+              "5 dias",
+              "50 PO"
+            ],
+            [
+              "Incomum",
+              "10 dias",
+              "200 PO"
+            ],
+            [
+              "Rara",
+              "50 dias",
+              "2.000 PO"
+            ],
+            [
+              "Muito Rara",
+              "125 dias",
+              "20.000 PO"
+            ],
+            [
+              "Lendária",
+              "250 dias",
+              "100.000 PO"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Características Especiais de Itens Mágicos",
+      "titulo_en": "Magic Item Special Features",
+      "nivel": 2,
+      "pagina_pdf": 222,
+      "pagina_pdf_fim": 227,
+      "pagina": 222,
+      "pagina_fim": 223,
+      "texto": "Você pode dar personalidade a um item mágico pensando em sua história. Quem fez o item? Há algo incomum em sua construção? Por que ele foi feito, e como foi usado originalmente? Que pequenas peculiaridades mágicas o diferenciam de outros itens do mesmo tipo? Responder a essas perguntas pode ajudar a transformar um item mágico genérico, como uma *Arma +1* (Espada Longa), em uma descoberta mais marcante.\n\nUse as tabelas a seguir para preencher detalhes sobre a história de um item mágico. Algumas entradas das tabelas fazem mais sentido para certos itens do que para outros. Se você obtiver algo que não faça sentido, jogue novamente, escolha uma entrada mais apropriada ou use o detalhe obtido como inspiração para criar sua própria característica especial.\n\nNas tabelas Propriedades Menores de Itens Mágicos e Peculiaridade do Item Mágico, \"você\" se refere ao portador do item.",
+      "tabelas": [
+        {
+          "titulo": "Criador ou Usuário Pretendido do Item Mágico",
+          "cabecalhos": [
+            "1d20",
+            "Criador ou Usuário Pretendido"
+          ],
+          "dados": [
+            [
+              "1",
+              "**Aberração.** O item é antigo. À primeira vista, parece estar coberto de muco."
+            ],
+            [
+              "2",
+              "**Celestial.** O item tem metade do peso normal e é gravado com asas emplumadas, sóis e estrelas. Os Ínferos o acham repulsivo."
+            ],
+            [
+              "3",
+              "**Devotos de Lolth.** O item tem metade do peso normal. Ele é gravado com aranhas e teias em homenagem a Lolth."
+            ],
+            [
+              "4",
+              "**Dragão.** Este item incorpora metais e gemas preciosos do tesouro acumulado de um dragão. Ele se aquece quando está a até 36 metros de um Dragão."
+            ],
+            [
+              "5–6",
+              "**Anão.** O item é durável e tem runas anãs trabalhadas em seu design. Ele pode estar associado a um clã que gostaria de vê-lo devolvido a seus salões ancestrais."
+            ],
+            [
+              "7",
+              "**Ar Elemental.** O item tem metade do peso normal e parece oco. Se for feito de tecido, é diáfano."
+            ],
+            [
+              "8",
+              "**Terra Elemental.** Este item pode ser feito de pedra. Quaisquer elementos de tecido ou couro são cravejados de rocha finamente polida."
+            ],
+            [
+              "9",
+              "**Fogo Elemental.** Este item é quente ao toque, e quaisquer partes de metal são feitas de ferro negro. Imagens de chamas cobrem sua superfície."
+            ],
+            [
+              "10",
+              "**Água Elemental.** Escamas lustrosas de peixe substituem o couro ou o tecido deste item, e conchas e coral trabalhado (tão duros quanto qualquer metal) substituem as partes de metal."
+            ],
+            [
+              "11–12",
+              "**Elfo.** O item tem metade do peso normal. Ele é adornado com símbolos da natureza: folhas, trepadeiras, estrelas e afins."
+            ],
+            [
+              "13",
+              "**Feérico.** O item é primorosamente fabricado com os melhores materiais e brilha com uma radiância pálida ao luar, emitindo Meia-luz em um raio de 1,5 metro. Qualquer metal do item é prata ou mithral em vez de ferro ou aço."
+            ],
+            [
+              "14",
+              "**Ínfero.** O item é feito de ferro ou chifre, e quaisquer componentes de tecido ou couro são feitos do couro de Ínferos. Rostos maliciosos ou runas vis estão gravados em sua superfície. Os Celestiais o acham repulsivo."
+            ],
+            [
+              "15",
+              "**Gigante.** O item é maior que o normal e foi fabricado por Gigantes para uso de seus aliados menores."
+            ],
+            [
+              "16",
+              "**Gnomo.** O item é feito para parecer comum e bem usado. Ele também pode incorporar engrenagens e componentes mecânicos, mesmo que estes não sejam essenciais para sua função."
+            ],
+            [
+              "17–19",
+              "**Humano.** O item foi criado durante o auge de um reino humano decaído, ou está ligado a um humano lendário. Ele pode conter escritos em um idioma esquecido ou símbolos cujo significado se perdeu com o tempo."
+            ],
+            [
+              "20",
+              "**Morto-Vivo.** O item incorpora símbolos da morte, como ossos e crânios, e pode ter sido feito de partes de cadáveres. Ele é frio ao toque."
+            ]
+          ]
+        },
+        {
+          "titulo": "História do Item Mágico",
+          "cabecalhos": [
+            "1d8",
+            "História"
+          ],
+          "dados": [
+            [
+              "1",
+              "**Arcano.** Este item foi criado para uma antiga ordem de conjuradores e traz o símbolo da ordem."
+            ],
+            [
+              "2",
+              "**Ruína.** Este item foi criado para se opor a criaturas de um tipo específico, como Aberrações ou Dragões."
+            ],
+            [
+              "3",
+              "**Heroico.** Um grande herói já empunhou este item. Qualquer um que conheça a história do item espera grandes feitos do novo dono."
+            ],
+            [
+              "4",
+              "**Ornamento.** O item homenageia um evento especial. Gemas incrustadas, embutidos de ouro ou platina e filigrana de ouro ou prata adornam sua superfície."
+            ],
+            [
+              "5",
+              "**Profecia.** O item aparece em uma profecia: seu portador está destinado a ter um papel crucial em eventos futuros."
+            ],
+            [
+              "6",
+              "**Religioso.** Este item foi usado em cerimônias religiosas dedicadas a uma divindade específica. Ele tem símbolos religiosos trabalhados nele."
+            ],
+            [
+              "7",
+              "**Sinistro.** Este item está ligado a um ato de grande maldade, como um massacre ou um assassinato. Ele pode ter um nome ou estar intimamente associado a um vilão que o usou."
+            ],
+            [
+              "8",
+              "**Símbolo de Poder.** Este item já foi usado como parte de insígnias reais ou como distintivo de um alto cargo."
+            ]
+          ]
+        },
+        {
+          "titulo": "Propriedades Menores de Itens Mágicos",
+          "cabecalhos": [
+            "1d20",
+            "Propriedade Menor"
+          ],
+          "dados": [
+            [
+              "1–2",
+              "**Farol.** Você pode executar uma Ação Bônus para fazer o item emitir Luz Plena em um raio de 3 metros e Meia-luz por mais 3 metros, ou para apagar a luz."
+            ],
+            [
+              "3",
+              "**Bússola.** Você pode executar uma ação Usar Magia para descobrir para que lado fica o norte magnético. Nada acontece se esta propriedade for usada em um local que não tenha norte magnético."
+            ],
+            [
+              "4",
+              "**Escavador.** Enquanto estiver no subterrâneo, você sempre sabe a profundidade do item abaixo da superfície e a direção da escadaria, rampa ou outro caminho mais próximo que leve para cima."
+            ],
+            [
+              "5–6",
+              "**Guardião.** O item avisa você, concedendo +2 de bônus em suas jogadas de Iniciativa se você não tiver a condição Incapacitado."
+            ],
+            [
+              "7–8",
+              "**Harmonioso.** A Sintonização com este item leva apenas 1 minuto."
+            ],
+            [
+              "9",
+              "**Chave.** O item é usado para destrancar um recipiente, câmara, cofre ou porta."
+            ],
+            [
+              "10",
+              "**Mensagem Secreta.** Uma mensagem está escondida em algum lugar do item. Ela pode ser visível apenas em um certo horário, sob a luz de uma fase da lua ou em um local específico."
+            ],
+            [
+              "11–12",
+              "**Sentinela.** O Mestre escolhe um tipo de criatura, como devoradores de mente ou trolls. Este item brilha fracamente quando essas criaturas estão a até 36 metros dele."
+            ],
+            [
+              "13",
+              "**Canção.** Sempre que este item é atingido ou usado para golpear um inimigo, você ouve um fragmento de uma canção antiga."
+            ],
+            [
+              "14–15",
+              "**Material Estranho.** O item foi criado com um material bizarro, dado seu propósito. Sua durabilidade não é afetada."
+            ],
+            [
+              "16",
+              "**Temperado.** Você não sofre mal com temperaturas de −18 °C ou menos e de 38 °C ou mais."
+            ],
+            [
+              "17",
+              "**Inquebrável.** O item não pode ser quebrado. Meios especiais precisam ser usados para destruí-lo."
+            ],
+            [
+              "18",
+              "**Líder de Guerra.** Você pode executar uma ação Usar Magia para fazer sua voz ou seu sinal ser transmitido com clareza por até 180 metros até o fim do seu próximo turno."
+            ],
+            [
+              "19",
+              "**Flutuante.** Este item flutua na água e em outros líquidos. Você tem Vantagem em testes de Força (Atletismo) para nadar."
+            ],
+            [
+              "20",
+              "Jogue duas vezes, jogando novamente qualquer 20 adicional."
+            ]
+          ]
+        },
+        {
+          "titulo": "Peculiaridade do Item Mágico",
+          "cabecalhos": [
+            "1d8",
+            "Peculiaridade"
+          ],
+          "dados": [
+            [
+              "1",
+              "**Ditoso.** Você se sente afortunado e otimista quanto ao que o futuro reserva. Borboletas e outras criaturas inofensivas podem brincar na presença do item."
+            ],
+            [
+              "2",
+              "**Confiante.** O item ajuda você a se sentir seguro de si."
+            ],
+            [
+              "3",
+              "**Cobiçoso.** Você fica obcecado por riqueza material."
+            ],
+            [
+              "4",
+              "**Frágil.** O item se esfarela, desfia, lasca ou racha levemente quando é empunhado, vestido ou ativado. Esta peculiaridade não tem efeito sobre suas propriedades."
+            ],
+            [
+              "5",
+              "**Barulhento.** O item faz um barulho alto — como um tinido, um grito ou o soar de um gongo — quando é usado."
+            ],
+            [
+              "6",
+              "**Metamórfico.** O item altera periodicamente sua aparência de pequenas maneiras. Você não tem controle sobre essas pequenas alterações, que não têm efeito sobre o uso do item."
+            ],
+            [
+              "7",
+              "**Doloroso.** Você sente uma pontada de dor inofensiva ao usar o item."
+            ],
+            [
+              "8",
+              "**Repulsivo.** Você sente uma sensação de repulsa ao entrar em contato com o item e continua a sentir desconforto enquanto o porta."
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Artefatos",
+      "titulo_en": "Artifacts",
+      "nivel": 2,
+      "pagina_pdf": 228,
+      "pagina_pdf_fim": 228,
+      "texto": "Um Artefato é um item mágico único e singularmente poderoso, com sua própria origem e história. Ele pode ter sido criado em meio a uma crise que ameaçou um reino, um mundo ou o multiverso inteiro, e carrega o peso desse momento decisivo da história.\n\nAlguns Artefatos aparecem quando são mais necessários. Para outros, o contrário é verdadeiro: quando esses Artefatos são descobertos, o mundo treme com as consequências da descoberta. Em qualquer caso, introduzir um Artefato em uma campanha exige reflexão prévia. Pode ser um item que lados opostos esperam reivindicar, ou pode ser algo de que os aventureiros precisam para superar seu maior desafio.\n\nOs personagens normalmente não encontram Artefatos no curso normal de suas aventuras. Na verdade, os Artefatos só aparecem quando você quer, pois são tanto elementos de enredo quanto itens mágicos. Rastrear e recuperar um Artefato muitas vezes é o objetivo principal de uma aventura. Os personagens precisam seguir rumores, passar por provações significativas e se aventurar em lugares perigosos e meio esquecidos para encontrar o Artefato que procuram. Como alternativa, um grande vilão pode já ter o Artefato. Obter e destruir o Artefato pode ser a única maneira de garantir que seu poder não seja usado para o mal.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Propriedades de Artefatos",
+      "titulo_en": "Artifact Properties",
+      "nivel": 3,
+      "pagina_pdf": 228,
+      "pagina_pdf_fim": 229,
+      "texto": "Além de suas propriedades definidas, um Artefato pode ter outras propriedades benéficas ou prejudiciais. Você pode escolher essas propriedades nas tabelas desta seção ou determiná-las aleatoriamente. Você também pode inventar novas propriedades benéficas e prejudiciais. Essas propriedades normalmente mudam a cada vez que um Artefato aparece no mundo.\n\nUm Artefato pode ter até quatro propriedades benéficas menores e duas propriedades benéficas maiores. Ele pode ter até quatro propriedades prejudiciais menores e duas propriedades prejudiciais maiores.",
+      "tabelas": [
+        {
+          "titulo": "Propriedades Benéficas Menores",
+          "cabecalhos": [
+            "1d100",
+            "Propriedade"
+          ],
+          "dados": [
+            [
+              "01–20",
+              "Enquanto estiver sintonizado com o Artefato, você ganha proficiência em uma perícia à escolha do Mestre."
+            ],
+            [
+              "21–30",
+              "Enquanto estiver sintonizado com o Artefato, você tem Imunidade à condição Envenenado."
+            ],
+            [
+              "31–40",
+              "Enquanto estiver sintonizado com o Artefato, você tem Imunidade às condições Enfeitiçado e Amedrontado."
+            ],
+            [
+              "41–50",
+              "Enquanto estiver sintonizado com o Artefato, você tem Resistência a um tipo de dano à escolha do Mestre."
+            ],
+            [
+              "51–60",
+              "Enquanto estiver sintonizado com o Artefato, você pode conjurar um truque (escolhido pelo Mestre) a partir dele."
+            ],
+            [
+              "61–70",
+              "Enquanto estiver sintonizado com o Artefato, você pode conjurar uma magia de 1º círculo (escolhida pelo Mestre) a partir dele. Depois de conjurar a magia, jogue 1d6. Com um resultado de 1–5, você não pode conjurá-la novamente dessa forma até o próximo amanhecer."
+            ],
+            [
+              "71–80",
+              "Como em 61–70 acima, exceto que a magia é de 2º círculo."
+            ],
+            [
+              "81–90",
+              "Como em 61–70 acima, exceto que a magia é de 3º círculo."
+            ],
+            [
+              "91–00",
+              "Enquanto estiver sintonizado com o Artefato, você recebe +1 de bônus na Classe de Armadura."
+            ]
+          ]
+        },
+        {
+          "titulo": "Propriedades Benéficas Maiores",
+          "cabecalhos": [
+            "1d100",
+            "Propriedade"
+          ],
+          "dados": [
+            [
+              "01–20",
+              "Enquanto estiver sintonizado com o Artefato, um de seus valores de atributo (à escolha do Mestre) aumenta em 2, até um máximo de 24."
+            ],
+            [
+              "21–30",
+              "Enquanto estiver sintonizado com o Artefato, você recupera 1d6 Pontos de Vida no início de cada um de seus turnos se tiver pelo menos 1 Ponto de Vida."
+            ],
+            [
+              "31–40",
+              "Quando você atinge com uma jogada de ataque enquanto está sintonizado com o Artefato, o alvo sofre 1d6 de dano Energético adicional."
+            ],
+            [
+              "41–50",
+              "Enquanto estiver sintonizado com o Artefato, seu Deslocamento aumenta em 3 metros."
+            ],
+            [
+              "51–60",
+              "Enquanto estiver sintonizado com o Artefato, você pode conjurar uma magia de 4º círculo (escolhida pelo Mestre) a partir dele. Depois de conjurar a magia, jogue 1d6. Com um resultado de 1–5, você não pode conjurá-la novamente dessa forma até o próximo amanhecer."
+            ],
+            [
+              "61–70",
+              "Como em 51–60 acima, exceto que a magia é de 5º círculo."
+            ],
+            [
+              "71–80",
+              "Como em 51–60 acima, exceto que a magia é de 6º círculo."
+            ],
+            [
+              "81–90",
+              "Como em 51–60 acima, exceto que a magia é de 7º círculo."
+            ],
+            [
+              "91–00",
+              "Enquanto estiver sintonizado com o Artefato, você tem Imunidade às condições Cego, Surdo, Petrificado e Atordoado."
+            ]
+          ]
+        },
+        {
+          "titulo": "Propriedades Prejudiciais Menores",
+          "cabecalhos": [
+            "1d100",
+            "Propriedade"
+          ],
+          "dados": [
+            [
+              "01–08",
+              "Enquanto estiver sintonizado com o Artefato, você tem Desvantagem em qualquer teste de atributo ou salvaguarda que use Força ou Constituição."
+            ],
+            [
+              "09–16",
+              "Enquanto estiver sintonizado com o Artefato, você tem Desvantagem em salvaguardas de Inteligência, Sabedoria e Carisma."
+            ],
+            [
+              "17–24",
+              "Enquanto estiver sintonizado com o Artefato, você tem Vulnerabilidade a dano Venenoso."
+            ],
+            [
+              "25–32",
+              "Enquanto estiver sintonizado com o Artefato, você tem a condição Cego quando está a mais de 3 metros de distância dele."
+            ],
+            [
+              "33–40",
+              "Enquanto estiver sintonizado com o Artefato, você tem a condição Surdo quando está a mais de 3 metros de distância dele."
+            ],
+            [
+              "41–48",
+              "Enquanto estiver sintonizado com o Artefato, você perde completamente o olfato."
+            ],
+            [
+              "49–66",
+              "Enquanto estiver sintonizado com o Artefato, sua aparência muda conforme o Mestre decidir."
+            ],
+            [
+              "67–72",
+              "Enquanto estiver sintonizado com o Artefato, você exala um fedor azedo perceptível a até 3 metros de distância."
+            ],
+            [
+              "73–76",
+              "Sempre que você toca uma gema não mágica ou uma obra de arte enquanto está sintonizado com este Artefato, o valor da gema ou da obra de arte é reduzido à metade. Isso afeta um objeto específico apenas uma vez."
+            ],
+            [
+              "77–80",
+              "Enquanto estiver sintonizado com o Artefato, toda Água Benta a até 3 metros de você é destruída."
+            ],
+            [
+              "81–84",
+              "Enquanto estiver sintonizado com o Artefato, chamas não mágicas se apagam a até 9 metros de você."
+            ],
+            [
+              "85–88",
+              "Enquanto estiver sintonizado com o Artefato, outras criaturas não podem fazer Descansos Curtos ou Longos enquanto estiverem a até 90 metros de você."
+            ],
+            [
+              "89–92",
+              "Enquanto estiver sintonizado com o Artefato, você mata qualquer vegetação não mágica que tocar e que não seja uma criatura."
+            ],
+            [
+              "93–00",
+              "Enquanto estiver sintonizado com o Artefato, Feras a até 9 metros de você que tenham Nível de Desafio 6 ou menor são Hostis a você."
+            ]
+          ]
+        },
+        {
+          "titulo": "Propriedades Prejudiciais Maiores",
+          "cabecalhos": [
+            "1d100",
+            "Propriedade"
+          ],
+          "dados": [
+            [
+              "01–09",
+              "Você não pode se sintonizar com outros itens mágicos enquanto estiver sintonizado com o Artefato. Quando você se sintoniza com o Artefato, sua Sintonização com outros itens mágicos termina imediatamente."
+            ],
+            [
+              "10–18",
+              "Quando você se sintoniza com o Artefato, um de seus valores de atributo, escolhido aleatoriamente, é reduzido em 2, até um mínimo de 3. Uma magia *Restauração Maior* restaura o atributo."
+            ],
+            [
+              "19–27",
+              "Quando você se sintoniza com o Artefato, você sofre 8d10 de dano Psíquico."
+            ],
+            [
+              "28–36",
+              "Na primeira vez que você se sintoniza com o Artefato, ele lhe dá uma missão determinada pelo Mestre. Você não pode usar nenhuma das propriedades do Artefato até concluir a missão."
+            ],
+            [
+              "37–45",
+              "Cada vez que você se sintoniza com o Artefato, há 10 por cento de chance de você atrair a atenção de um deus que envia um avatar para tomar o Artefato de você. O avatar tem o mesmo alinhamento de seu criador e usa o bloco de estatísticas de **Empíreo**. Depois de obter o Artefato, o avatar desaparece."
+            ],
+            [
+              "46–54",
+              "Cada vez que você se sintoniza com o Artefato, você precisa ser bem-sucedido em uma salvaguarda de Constituição CD 10 ou morre com o choque. Se você morrer, é transformado instantaneamente em um **Inumano** sob o controle do Mestre, que precisa proteger o Artefato."
+            ],
+            [
+              "55–63",
+              "O Artefato dilui poções a até 3 metros de si, tornando-as não mágicas."
+            ],
+            [
+              "64–72",
+              "O Artefato apaga pergaminhos a até 3 metros de si, tornando-os não mágicos."
+            ],
+            [
+              "73–81",
+              "Enquanto estiver sintonizado com o Artefato, criaturas de um tipo específico que não seja Humanoide (escolhido pelo Mestre) são sempre Hostis a você."
+            ],
+            [
+              "82–90",
+              "Enquanto estiver sintonizado com o Artefato, você tem Vulnerabilidade a todo dano."
+            ],
+            [
+              "91–96",
+              "O Artefato aprisiona um **Slaad da Morte**. Cada vez que você se sintoniza com o Artefato, o slaad tem 10 por cento de chance de escapar e, nesse caso, aparece em um espaço desocupado o mais próximo possível de você e ataca você."
+            ],
+            [
+              "97–00",
+              "Enquanto estiver sintonizado com o Artefato, você não pode gastar Dados de Pontos de Vida nem recuperar Pontos de Vida."
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Itens Mágicos Sencientes",
+      "titulo_en": "Sentient Magic Items",
+      "nivel": 2,
+      "pagina_pdf": 230,
+      "pagina_pdf_fim": 230,
+      "texto": "Alguns itens mágicos têm senciência e personalidade. Um item assim pode estar possuído, assombrado pelo espírito de um dono anterior ou ter consciência de si graças à magia usada para criá-lo. Um item senciente pode ser um aliado querido de seu portador ou um espinho constante em seu caminho.\n\nA maioria dos itens sencientes são armas, mas outros tipos de itens podem manifestar senciência. Itens de uso único, como poções e pergaminhos, nunca são sencientes.\n\nO Mestre controla os itens mágicos sencientes e suas propriedades ativadas. Um portador que mantém um bom relacionamento com o item pode acessar essas propriedades. Se o relacionamento estiver desgastado, pode surgir um conflito (veja \"Conflito\" abaixo).",
+      "tabelas": []
+    },
+    {
+      "titulo": "Características de Itens Mágicos Sencientes",
+      "titulo_en": "Sentient Magic Item Traits",
+      "nivel": 3,
+      "pagina_pdf": 230,
+      "pagina_pdf_fim": 230,
+      "texto": "Ao criar um item mágico senciente, você cria a persona do item de forma muito parecida com a de um personagem não jogador (como descrito na seção \"Personagens Não Jogadores\" do capítulo 3), com estas exceções.\n\n***Atributos.*** Um item mágico senciente tem valores de Inteligência, Sabedoria e Carisma. Escolha os atributos do item ou determine-os aleatoriamente da seguinte forma: jogue 4d6 para cada um, descartando o menor resultado e somando o restante.\n\n***Alinhamento.*** Um item mágico senciente tem um alinhamento. Seu criador ou sua natureza podem sugerir um alinhamento. Caso contrário, escolha um alinhamento ou jogue na tabela Alinhamento do Item Senciente.\n\n***Comunicação.*** Um item senciente se comunica compartilhando suas emoções, transmitindo seus pensamentos telepaticamente ou falando em voz alta. Você pode escolher como ele se comunica ou jogar na tabela Comunicação do Item Senciente.\n\n***Sentidos.*** Um item senciente consegue perceber seus arredores até um alcance limitado. Você pode escolher seus sentidos ou jogar na tabela Sentidos do Item Senciente.\n\n***Propósito Especial.*** Você pode dar a um item senciente um objetivo que ele persegue, talvez à exclusão de todo o resto. Enquanto o uso do item por seu portador estiver alinhado com esse propósito especial, o item permanece cooperativo. Desviar-se desse rumo pode causar conflito entre o portador e o item (veja \"Conflito\" abaixo). Você pode escolher um propósito especial ou jogar na tabela Propósito Especial do Item Senciente.",
+      "tabelas": [
+        {
+          "titulo": "Alinhamento do Item Senciente",
+          "cabecalhos": [
+            "1d100",
+            "Alinhamento"
+          ],
+          "dados": [
+            [
+              "01–15",
+              "Ordeiro e Bom"
+            ],
+            [
+              "16–35",
+              "Neutro e Bom"
+            ],
+            [
+              "36–50",
+              "Caótico e Bom"
+            ],
+            [
+              "51–63",
+              "Ordeiro e Neutro"
+            ],
+            [
+              "64–73",
+              "Neutro"
+            ],
+            [
+              "74–85",
+              "Caótico e Neutro"
+            ],
+            [
+              "86–89",
+              "Ordeiro e Mau"
+            ],
+            [
+              "90–96",
+              "Neutro e Mau"
+            ],
+            [
+              "97–00",
+              "Caótico e Mau"
+            ]
+          ]
+        },
+        {
+          "titulo": "Comunicação do Item Senciente",
+          "cabecalhos": [
+            "1d10",
+            "Comunicação"
+          ],
+          "dados": [
+            [
+              "1–6",
+              "O item se comunica transmitindo emoções à criatura que o carrega ou empunha."
+            ],
+            [
+              "7–9",
+              "O item fala um ou mais idiomas."
+            ],
+            [
+              "10",
+              "O item fala um ou mais idiomas. Além disso, o item pode se comunicar telepaticamente com qualquer criatura que o carregue ou empunhe."
+            ]
+          ]
+        },
+        {
+          "titulo": "Sentidos do Item Senciente",
+          "cabecalhos": [
+            "1d4",
+            "Sentidos"
+          ],
+          "dados": [
+            [
+              "1",
+              "Audição e visão normal até 9 metros"
+            ],
+            [
+              "2",
+              "Audição e visão normal até 18 metros"
+            ],
+            [
+              "3",
+              "Audição e visão normal até 36 metros"
+            ],
+            [
+              "4",
+              "Audição e Visão no Escuro até 36 metros"
+            ]
+          ]
+        },
+        {
+          "titulo": "Propósito Especial do Item Senciente",
+          "cabecalhos": [
+            "1d10",
+            "Propósito Especial"
+          ],
+          "dados": [
+            [
+              "1",
+              "**Alinhado.** O item busca derrotar ou destruir aqueles de alinhamento diametralmente oposto. Um item assim nunca é Neutro."
+            ],
+            [
+              "2",
+              "**Ruína.** O item busca frustrar ou destruir criaturas de um tipo específico, como Constructos, Ínferos ou Mortos-Vivos."
+            ],
+            [
+              "3",
+              "**Buscador do Criador.** O item busca seu criador e quer entender por que foi criado."
+            ],
+            [
+              "4",
+              "**Buscador do Destino.** O item acredita que ele e seu portador têm papéis cruciais a desempenhar em eventos futuros."
+            ],
+            [
+              "5",
+              "**Destruidor.** O item anseia por destruição e incita seu usuário a lutar arbitrariamente."
+            ],
+            [
+              "6",
+              "**Buscador da Glória.** O item busca renome como o maior item mágico do mundo, conquistando fama ou notoriedade para seu usuário."
+            ],
+            [
+              "7",
+              "**Buscador do Saber.** O item anseia por conhecimento ou está determinado a resolver um mistério, descobrir um segredo ou desvendar uma profecia enigmática."
+            ],
+            [
+              "8",
+              "**Protetor.** O item busca defender um tipo específico de criatura, como elfos ou lobisomens."
+            ],
+            [
+              "9",
+              "**Buscador da Alma Gêmea.** O item busca outro item mágico senciente, talvez um que seja semelhante a ele."
+            ],
+            [
+              "10",
+              "**Templário.** O item busca defender os servos e os interesses de uma divindade específica."
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "titulo": "Conflito",
+      "titulo_en": "Conflict",
+      "nivel": 3,
+      "pagina_pdf": 231,
+      "pagina_pdf_fim": 231,
+      "texto": "Quando o portador de um item senciente age de maneira contrária ao alinhamento ou ao propósito do item, pode surgir um conflito. Quando ocorre um conflito, o portador do item realiza uma salvaguarda de Carisma (CD 12 mais o modificador de Carisma do item). Se falhar na salvaguarda, o item faz uma ou mais das seguintes exigências:\n\n- **Persiga Meus Sonhos.** O item exige que seu portador persiga os objetivos do item à exclusão de todos os outros objetivos.\n- **Livre-se Disso.** O item exige que seu portador se desfaça de qualquer coisa que o item considere repugnante.\n- **É Hora de Mudar.** O item exige ser entregue a outra pessoa.\n- **Mantenha-me por Perto.** O item insiste em ser carregado ou usado o tempo todo.\n\nSe o portador se recusar a cumprir as exigências do item, o item pode fazer qualquer uma das seguintes coisas:\n\n- Tornar impossível que seu portador se sintonize com ele.\n- Suprimir uma ou mais de suas propriedades ativadas.\n- Tentar assumir o controle de seu portador; nesse caso, o portador realiza uma salvaguarda de Carisma (CD 12 mais o modificador de Carisma do item). Se falhar na salvaguarda, o portador tem a condição Enfeitiçado por 1d12 horas. Enquanto estiver Enfeitiçado dessa forma, o portador precisa tentar seguir os comandos do item. Se o portador sofrer dano, ele repete a salvaguarda, encerrando o efeito em caso de sucesso. Quer a tentativa de controlar o portador tenha sucesso ou não, o item não pode usar este poder novamente até o próximo amanhecer.",
+      "tabelas": []
+    },
+    {
+      "titulo": "Itens Mágicos de A a Z",
+      "titulo_en": "Magic Items A–Z",
+      "nivel": 2,
+      "pagina_pdf": 231,
+      "pagina_pdf_fim": 231,
+      "texto": "Os itens mágicos são apresentados em ordem alfabética.\n\nSe a descrição de um item mágico grafa o nome de uma criatura com inicial maiúscula e o apresenta em **negrito**, isso é uma indicação visual que remete ao bloco de estatísticas da criatura. A menos que o texto diga o contrário, o bloco de estatísticas está no *Livro dos Monstros*. Como ler e usar um bloco de estatísticas é explicado no *Livro dos Monstros* e, em menor grau, no *Livro do Jogador*.",
+      "tabelas": []
+    }
+  ],
+  "tesouros": [
+    {
+      "nome": "Azurita",
+      "nome_en": "Azurite",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "azul-escuro mosqueado",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Ágata listrada",
+      "nome_en": "Banded agate",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "listras marrons, azuis, brancas ou vermelhas",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Quartzo azul",
+      "nome_en": "Blue quartz",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "azul-claro",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Ágata-olho",
+      "nome_en": "Eye agate",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "círculos cinza, brancos, marrons, azuis ou verdes",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Hematita",
+      "nome_en": "Hematite",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "preto-acinzentado",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Lápis-lazúli",
+      "nome_en": "Lapis lazuli",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "azul-claro e azul-escuro com pontos amarelos",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Malaquita",
+      "nome_en": "Malachite",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "estrias verde-claras e verde-escuras",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Ágata musgo",
+      "nome_en": "Moss agate",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "rosa ou branco-amarelado com marcas cinza ou verdes semelhantes a musgo",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Obsidiana",
+      "nome_en": "Obsidian",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "preto",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Rodocrosita",
+      "nome_en": "Rhodochrosite",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "rosa-claro",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Olho de tigre",
+      "nome_en": "Tiger eye",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "marrom com centro dourado",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Turquesa",
+      "nome_en": "Turquoise",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "verde-azulado claro",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Heliotrópio",
+      "nome_en": "Bloodstone",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "cinza-escuro com pontos vermelhos",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Cornalina",
+      "nome_en": "Carnelian",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "laranja a marrom-avermelhado",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Calcedônia",
+      "nome_en": "Chalcedony",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "branco",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Crisoprásio",
+      "nome_en": "Chrysoprase",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "verde",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Citrino",
+      "nome_en": "Citrine",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "marrom-amarelado claro",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Jaspe",
+      "nome_en": "Jasper",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "azul, preto ou marrom",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Pedra da lua",
+      "nome_en": "Moonstone",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "branco com brilho azul-claro",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Ônix",
+      "nome_en": "Onyx",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "faixas pretas e brancas, ou totalmente preto ou branco",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Quartzo",
+      "nome_en": "Quartz",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "branco, cinza-fumê ou amarelo",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Sardônica",
+      "nome_en": "Sardonyx",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "faixas vermelhas e brancas",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Quartzo rosa estrela",
+      "nome_en": "Star rose quartz",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "pedra rosada com centro branco em forma de estrela",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Zircão",
+      "nome_en": "Zircon",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "verde-azulado claro",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Âmbar",
+      "nome_en": "Amber",
+      "categoria": "Gema",
+      "valor": "100 PO",
+      "descricao": "dourado aguado a dourado intenso",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Ametista",
+      "nome_en": "Amethyst",
+      "categoria": "Gema",
+      "valor": "100 PO",
+      "descricao": "roxo-escuro",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Crisoberilo",
+      "nome_en": "Chrysoberyl",
+      "categoria": "Gema",
+      "valor": "100 PO",
+      "descricao": "verde-amarelado a verde-claro",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Coral",
+      "nome_en": "Coral",
+      "categoria": "Gema",
+      "valor": "100 PO",
+      "descricao": "carmesim",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Granada",
+      "nome_en": "Garnet",
+      "categoria": "Gema",
+      "valor": "100 PO",
+      "descricao": "vermelho, verde-amarronzado ou violeta",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Jade",
+      "nome_en": "Jade",
+      "categoria": "Gema",
+      "valor": "100 PO",
+      "descricao": "verde-claro, verde-escuro ou branco",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Azeviche",
+      "nome_en": "Jet",
+      "categoria": "Gema",
+      "valor": "100 PO",
+      "descricao": "preto profundo",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Pérola",
+      "nome_en": "Pearl",
+      "categoria": "Gema",
+      "valor": "100 PO",
+      "descricao": "branco lustroso, amarelo ou rosa",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Espinélio",
+      "nome_en": "Spinel",
+      "categoria": "Gema",
+      "valor": "100 PO",
+      "descricao": "vermelho, marrom-avermelhado ou verde-escuro",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Turmalina",
+      "nome_en": "Tourmaline",
+      "categoria": "Gema",
+      "valor": "100 PO",
+      "descricao": "verde-claro, azul, marrom ou vermelho",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Alexandrita",
+      "nome_en": "Alexandrite",
+      "categoria": "Gema",
+      "valor": "500 PO",
+      "descricao": "verde-escuro",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Água-marinha",
+      "nome_en": "Aquamarine",
+      "categoria": "Gema",
+      "valor": "500 PO",
+      "descricao": "verde-azulado claro",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Pérola negra",
+      "nome_en": "Black pearl",
+      "categoria": "Gema",
+      "valor": "500 PO",
+      "descricao": "preto puro",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Espinélio azul",
+      "nome_en": "Blue spinel",
+      "categoria": "Gema",
+      "valor": "500 PO",
+      "descricao": "azul-escuro",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Peridoto",
+      "nome_en": "Peridot",
+      "categoria": "Gema",
+      "valor": "500 PO",
+      "descricao": "verde-oliva intenso",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Topázio",
+      "nome_en": "Topaz",
+      "categoria": "Gema",
+      "valor": "500 PO",
+      "descricao": "amarelo-dourado",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Opala negra",
+      "nome_en": "Black opal",
+      "categoria": "Gema",
+      "valor": "1.000 PO",
+      "descricao": "verde-escuro com manchas pretas e pontos dourados",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Safira azul",
+      "nome_en": "Blue sapphire",
+      "categoria": "Gema",
+      "valor": "1.000 PO",
+      "descricao": "azul médio",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Esmeralda",
+      "nome_en": "Emerald",
+      "categoria": "Gema",
+      "valor": "1.000 PO",
+      "descricao": "verde vivo intenso",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Opala de fogo",
+      "nome_en": "Fire opal",
+      "categoria": "Gema",
+      "valor": "1.000 PO",
+      "descricao": "vermelho-fogo",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Opala",
+      "nome_en": "Opal",
+      "categoria": "Gema",
+      "valor": "1.000 PO",
+      "descricao": "azul-claro com manchas verdes e douradas",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Rubi estrela",
+      "nome_en": "Star ruby",
+      "categoria": "Gema",
+      "valor": "1.000 PO",
+      "descricao": "rubi com centro branco em forma de estrela",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Safira estrela",
+      "nome_en": "Star sapphire",
+      "categoria": "Gema",
+      "valor": "1.000 PO",
+      "descricao": "safira azul com centro branco em forma de estrela",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Safira amarela",
+      "nome_en": "Yellow sapphire",
+      "categoria": "Gema",
+      "valor": "1.000 PO",
+      "descricao": "amarelo-fogo ou verde-amarelado",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Safira negra",
+      "nome_en": "Black sapphire",
+      "categoria": "Gema",
+      "valor": "5.000 PO",
+      "descricao": "preto lustroso com reflexos luminosos",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Diamante",
+      "nome_en": "Diamond",
+      "categoria": "Gema",
+      "valor": "5.000 PO",
+      "descricao": "branco-azulado, amarelo-canário, rosa, marrom ou azul",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Jacinto",
+      "nome_en": "Jacinth",
+      "categoria": "Gema",
+      "valor": "5.000 PO",
+      "descricao": "laranja-fogo",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Rubi",
+      "nome_en": "Ruby",
+      "categoria": "Gema",
+      "valor": "5.000 PO",
+      "descricao": "vermelho límpido a carmesim profundo",
+      "pagina_pdf": 218,
+      "pagina_pdf_fim": 218
+    },
+    {
+      "nome": "Jarro de prata",
+      "nome_en": "Silver ewer",
+      "categoria": "Obra de Arte",
+      "valor": "25 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Estatueta de osso entalhado",
+      "nome_en": "Carved bone statuette",
+      "categoria": "Obra de Arte",
+      "valor": "25 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Bracelete de ouro",
+      "nome_en": "Gold bracelet",
+      "categoria": "Obra de Arte",
+      "valor": "25 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Vestes de tecido de ouro",
+      "nome_en": "Cloth-of-gold vestments",
+      "categoria": "Obra de Arte",
+      "valor": "25 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Máscara de veludo preto costurada com fio de prata",
+      "nome_en": "Black velvet mask stitched with silver thread",
+      "categoria": "Obra de Arte",
+      "valor": "25 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Cálice de cobre com filigrana de prata",
+      "nome_en": "Copper chalice with silver filigree",
+      "categoria": "Obra de Arte",
+      "valor": "25 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Par de dados de osso gravados",
+      "nome_en": "Pair of engraved bone dice",
+      "categoria": "Obra de Arte",
+      "valor": "25 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Espelho de mão em moldura de madeira pintada",
+      "nome_en": "Handheld mirror set in a painted wooden frame",
+      "categoria": "Obra de Arte",
+      "valor": "25 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Lenço de seda bordado",
+      "nome_en": "Embroidered silk handkerchief",
+      "categoria": "Obra de Arte",
+      "valor": "25 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Medalhão de ouro com um retrato pintado dentro",
+      "nome_en": "Gold locket with a painted portrait inside",
+      "categoria": "Obra de Arte",
+      "valor": "25 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Anel de ouro cravejado de heliotrópios",
+      "nome_en": "Gold ring set with bloodstones",
+      "categoria": "Obra de Arte",
+      "valor": "250 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Estatueta de marfim entalhado",
+      "nome_en": "Carved ivory statuette",
+      "categoria": "Obra de Arte",
+      "valor": "250 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Bracelete de ouro cravejado de joias",
+      "nome_en": "Bejeweled gold bracelet",
+      "categoria": "Obra de Arte",
+      "valor": "250 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Colar de prata com pingente de gema",
+      "nome_en": "Silver necklace with a gemstone pendant",
+      "categoria": "Obra de Arte",
+      "valor": "250 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Coroa de bronze",
+      "nome_en": "Bronze crown",
+      "categoria": "Obra de Arte",
+      "valor": "250 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Vestes de seda com bordados de ouro",
+      "nome_en": "Silk vestments with gold embroidery",
+      "categoria": "Obra de Arte",
+      "valor": "250 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Tapeçaria bem-feita de 3 por 3 metros",
+      "nome_en": "Well-made tapestry that is 10 feet by 10 feet",
+      "categoria": "Obra de Arte",
+      "valor": "250 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Caneca de latão com incrustações de jade",
+      "nome_en": "Brass mug with jade inlay",
+      "categoria": "Obra de Arte",
+      "valor": "250 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Caixa de estatuetas de animais em turquesa",
+      "nome_en": "Box of turquoise animal figurines",
+      "categoria": "Obra de Arte",
+      "valor": "250 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Gaiola de ouro com filigrana de electrum",
+      "nome_en": "Gold birdcage with electrum filigree",
+      "categoria": "Obra de Arte",
+      "valor": "250 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Cálice de prata cravejado de pedras da lua",
+      "nome_en": "Silver chalice set with moonstones",
+      "categoria": "Obra de Arte",
+      "valor": "750 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Maço de partituras com os cantos fúnebres perdidos de um compositor famoso",
+      "nome_en": "Bundle of sheet music representing the lost dirges of a famous composer",
+      "categoria": "Obra de Arte",
+      "valor": "750 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Harpa de madeira entalhada com incrustações de marfim e gemas de zircão",
+      "nome_en": "Carved wooden harp with ivory inlay and zircon gems",
+      "categoria": "Obra de Arte",
+      "valor": "750 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Ídolo de ouro",
+      "nome_en": "Gold idol",
+      "categoria": "Obra de Arte",
+      "valor": "750 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Pente de ouro em forma de dragão com granadas vermelhas como olhos",
+      "nome_en": "Gold comb shaped like a dragon with red garnets as eyes",
+      "categoria": "Obra de Arte",
+      "valor": "750 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Rolha de garrafa com relevo em folha de ouro e cravejada de ametistas",
+      "nome_en": "Bottle stopper cork embossed with gold leaf and set with amethysts",
+      "categoria": "Obra de Arte",
+      "valor": "750 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Crânio de draconato em tamanho real, detalhado, fundido em electrum",
+      "nome_en": "Detailed, life-sized dragonborn skull cast in electrum",
+      "categoria": "Obra de Arte",
+      "valor": "750 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Broche de prata e ouro",
+      "nome_en": "Silver and gold brooch",
+      "categoria": "Obra de Arte",
+      "valor": "750 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Estatueta de obsidiana com guarnições e incrustações de ouro",
+      "nome_en": "Obsidian statuette with gold fittings and inlay",
+      "categoria": "Obra de Arte",
+      "valor": "750 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Máscara de guerra de ouro pintada",
+      "nome_en": "Painted gold war mask",
+      "categoria": "Obra de Arte",
+      "valor": "750 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Corrente fina de ouro cravejada com uma opala de fogo",
+      "nome_en": "Fine gold chain set with a fire opal",
+      "categoria": "Obra de Arte",
+      "valor": "2.500 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Pintura antiga de um grande mestre",
+      "nome_en": "Old masterpiece painting",
+      "categoria": "Obra de Arte",
+      "valor": "2.500 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Manto de seda e veludo bordado, cravejado de numerosas pedras da lua",
+      "nome_en": "Embroidered silk and velvet mantle set with numerous moonstones",
+      "categoria": "Obra de Arte",
+      "valor": "2.500 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Bracelete de platina cravejado com uma esmeralda",
+      "nome_en": "Platinum bracelet set with an emerald",
+      "categoria": "Obra de Arte",
+      "valor": "2.500 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Luva bordada cravejada de lascas de joias",
+      "nome_en": "Embroidered glove set with jewel chips",
+      "categoria": "Obra de Arte",
+      "valor": "2.500 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Tornozeleira cravejada de joias",
+      "nome_en": "Jeweled anklet",
+      "categoria": "Obra de Arte",
+      "valor": "2.500 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Caixa de música de ouro",
+      "nome_en": "Gold music box",
+      "categoria": "Obra de Arte",
+      "valor": "2.500 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Diadema de ouro cravejado com quatro águas-marinhas",
+      "nome_en": "Gold circlet set with four aquamarines",
+      "categoria": "Obra de Arte",
+      "valor": "2.500 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Tapa-olho decorado com minúsculas safiras azuis e pedras da lua",
+      "nome_en": "Eye patch decorated with tiny blue sapphires and moonstones",
+      "categoria": "Obra de Arte",
+      "valor": "2.500 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Um colar de pequenas pérolas rosadas",
+      "nome_en": "A necklace string of small pink pearls",
+      "categoria": "Obra de Arte",
+      "valor": "2.500 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Coroa de ouro cravejada de joias",
+      "nome_en": "Jeweled gold crown",
+      "categoria": "Obra de Arte",
+      "valor": "7.500 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Anel de platina cravejado de joias",
+      "nome_en": "Jeweled platinum ring",
+      "categoria": "Obra de Arte",
+      "valor": "7.500 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Estatueta de ouro cravejada de rubis",
+      "nome_en": "Gold statuette set with rubies",
+      "categoria": "Obra de Arte",
+      "valor": "7.500 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Taça de ouro cravejada de esmeraldas",
+      "nome_en": "Gold cup set with emeralds",
+      "categoria": "Obra de Arte",
+      "valor": "7.500 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Porta-joias de ouro com filigrana de platina",
+      "nome_en": "Gold jewelry box with platinum filigree",
+      "categoria": "Obra de Arte",
+      "valor": "7.500 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Conjunto de bonecas de ouro que se encaixam umas nas outras",
+      "nome_en": "Set of gold nesting dolls",
+      "categoria": "Obra de Arte",
+      "valor": "7.500 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Tabuleiro de jogo de jade com peças de ouro",
+      "nome_en": "Jade game board with gold playing pieces",
+      "categoria": "Obra de Arte",
+      "valor": "7.500 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Chifre de beber de marfim cravejado de joias com filigrana de ouro",
+      "nome_en": "Bejeweled ivory drinking horn with gold filigree",
+      "categoria": "Obra de Arte",
+      "valor": "7.500 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Carruagem real ou barcaça funerária dourada",
+      "nome_en": "Gilded royal coach or funeral barge",
+      "categoria": "Obra de Arte",
+      "valor": "7.500 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Armadura cerimonial de ouro com pérolas negras",
+      "nome_en": "Ceremonial gold armor with black pearls",
+      "categoria": "Obra de Arte",
+      "valor": "7.500 PO",
+      "descricao": "",
+      "pagina_pdf": 223,
+      "pagina_pdf_fim": 223,
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "nome": "Barra de prata de 1 kg",
+      "nome_en": "2-pound silver bar",
+      "categoria": "Barra Comercial",
+      "valor": "10 PO",
+      "descricao": "12,5 cm de comprimento × 5 cm de largura × 1,25 cm de espessura",
+      "pagina_pdf": 217,
+      "pagina_pdf_fim": 217
+    },
+    {
+      "nome": "Barra de prata de 2,5 kg",
+      "nome_en": "5-pound silver bar",
+      "categoria": "Barra Comercial",
+      "valor": "25 PO",
+      "descricao": "15 cm de comprimento × 5 cm de largura × 2,5 cm de espessura",
+      "pagina_pdf": 217,
+      "pagina_pdf_fim": 217
+    },
+    {
+      "nome": "Barra de ouro de 2,5 kg",
+      "nome_en": "5-pound gold bar",
+      "categoria": "Barra Comercial",
+      "valor": "250 PO",
+      "descricao": "12,5 cm de comprimento × 5 cm de largura × 1,9 cm de espessura",
+      "pagina_pdf": 217,
+      "pagina_pdf_fim": 217
+    }
+  ],
+  "pendencias": [
+    "PDF 225: ficha de acompanhamento, não extraída.",
+    "Ordem das páginas no PDF: a impressa 215 (Obras de Arte) está no PDF 223, a 217 no 224, a 219 (ficha) no 225, a 221 no 226 e a 223 no 227. As seções seguem a ordem impressa; Pergaminhos (219–224), Ferramentas (221–226) e Características Especiais (222–227) têm faixa de páginas que abrange páginas intermediárias de outra seção.",
+    "Itálico de item de outro lote: *Escudo +1* (Shield +1), pág. PDF 219, tabela Categorias de Itens Mágicos.",
+    "Itálico de item de outro lote: *Anel de Invisibilidade* (Ring of Invisibility), pág. PDF 219.",
+    "Itálico de item de outro lote: *Bastão Imóvel* (Immovable Rod), pág. PDF 219.",
+    "Itálico de item de outro lote: *Pergaminho Mágico* (Spell Scroll), págs. PDF 219, 221, 224, 226.",
+    "Itálico de item de outro lote: *Cajado do Impacto* (Staff of Striking), pág. PDF 219.",
+    "Itálico de item de outro lote: *Varinha de Bolas de Fogo* (Wand of Fireballs), pág. PDF 219.",
+    "Itálico de item de outro lote: *Arma +1* (Weapon +1; o livro escreve \"+1 Longsword\"), págs. PDF 219 e 222.",
+    "Itálico de item de outro lote: *Botas Élficas* (Boots of Elvenkind), pág. PDF 219.",
+    "Itálico de item de outro lote: *Poção de Invisibilidade* (Potion of Invisibility), pág. PDF 219.",
+    "Itálico de item de outro lote: *Pergaminho de Proteção* (Scroll of Protection), pág. PDF 224.",
+    "Itálico de item de outro lote: *Luvas Apanha-Projéteis* (Gloves of Missile Snaring), pág. PDF 224 (o livro diz \"a single Glove of Missile Snaring\": traduzido como \"uma única luva das *Luvas Apanha-Projéteis*\").",
+    "Itálico de item de outro lote: *Varinha de Orcus* (Wand of Orcus), pág. PDF 224.",
+    "Criatura em negrito sem bloco no repositório: Empíreo (Empyrean), Inumano (Wight), Slaad da Morte (Death Slaad), pág. PDF 229."
+  ]
+}

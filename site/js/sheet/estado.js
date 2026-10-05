@@ -118,6 +118,7 @@ export function seloPrerequisitoDispensado(classe, { comBotaoRemover = false } =
  * @returns {number} Delta manual acumulado (pode ser negativo).
  */
 export function deltaManualAtributo(key) {
+  // atributo-base: metadado de edição manual (edicoes.campos.atributos), não o valor do atributo
   const manual = char?.edicoes?.campos?.atributos?.manual;
   return Number(manual?.[key] || 0);
 }
@@ -142,9 +143,11 @@ export function marcaAjusteManual(key) {
   const bonus = char?.bonus_antecedente?.[key] || 0;
   const partes = [`base ${base}`];
   if (bonus) partes.push(`+${bonus} antecedente`);
+  // atributo-base: composição do valor-base (base + antecedente + nível + manual) exibida no title da marca
   const ganhoSistema = (char?.atributos?.[key] ?? 0) - base - bonus - delta;
   if (ganhoSistema) partes.push(`${ganhoSistema > 0 ? '+' : ''}${ganhoSistema} nível`);
   partes.push(`${sinal}${delta} manual`);
+  // atributo-base: metadado de edição manual (edicoes.campos.atributos), não o valor do atributo
   const editadoEm = char?.edicoes?.campos?.atributos?.editadoEm;
   if (editadoEm) partes.push(new Date(editadoEm).toLocaleDateString('pt-BR'));
   return `<div class="no-print" style="font-size:0.65rem;font-weight:700;color:var(--info);margin-top:2px" title="${escHtml(partes.join(' · '))}">✏️ ${sinal}${delta} manual</div>`;

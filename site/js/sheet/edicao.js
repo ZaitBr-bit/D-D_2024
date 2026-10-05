@@ -3,10 +3,10 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, IDIOMAS_COMUNS, IDIOMAS_RAROS, PERICIAS, POINT_BUY_CUSTOS, POINT_BUY_TOTAL, STANDARD_ARRAY } from '../dados-classes.js';
-import { TETO_ATRIBUTO_MANUAL, validarAtributosEditados, validarAtributosManuais, validarListaUnica } from '../ficha-edicao-validacoes.js';
+import { TETO_ATRIBUTO_MANUAL, atributosAcimaDoTeto, validarAtributosEditados, validarAtributosManuais, validarListaUnica } from '../ficha-edicao-validacoes.js';
 import { aplicarEdicao, consolidarEdicoesAtributos, deltaManualAtributos, registrarAjusteManualAtributos, reverterEdicao } from '../ficha-edicoes.js';
 import { abrirLevelUpCards } from '../levelup-ui.js';
-import { XP_POR_NIVEL, aplicarPvRetroativoPorCon, podeSubirDeNivel } from '../levelup.js';
+import { XP_POR_NIVEL, aplicarPvRetroativoPorCon, modConEmJogo, podeSubirDeNivel } from '../levelup.js';
 import { abrirModal, calcMod, escHtml, fmtMod, processarImagemArquivo, toast } from '../utils.js';
 import { rotuloPericia } from '../opcoes-dominio.js';
 import { campoEstaEditado, char, salvar, seloEdicao, talentosCache } from './estado.js';
@@ -262,6 +262,7 @@ export function abrirModalEdicaoFicha(secaoInicial = 'atributos') {
         if (!resultado.ok) { toast(resultado.erro, 'error'); return; }
         const antes = { ...char.atributos };
         const modConAntes = calcMod(antes.constituicao ?? 10);
+        const modJogoAntes = modConEmJogo(char);
         const deltas = Object.fromEntries(ATRIBUTOS_KEYS.map(k => [k, propostaManual[k] - (antes[k] ?? 0)]));
         if (ATRIBUTOS_KEYS.some(k => deltas[k] !== 0)) {
           consolidarEdicoesAtributos(char);
@@ -270,7 +271,7 @@ export function abrirModalEdicaoFicha(secaoInicial = 'atributos') {
           consolidarEdicoesAtributos(char);
           // A cascata da ficha é calculada no render; só o PV é persistido, e
           // por isso é o único que precisa ser movido à mão aqui.
-          aplicarPvRetroativoPorCon(char, modConAntes, calcMod(char.atributos?.constituicao ?? 10));
+          aplicarPvRetroativoPorCon(char, modConAntes, calcMod(char.atributos?.constituicao ?? 10), { antes: modJogoAntes, depois: modConEmJogo(char) });
         }
       } else if (secao === 'atributos') {
         const metodo = char.configuracao_criacao?.atributos?.metodo || document.getElementById('edicao-metodo-atributos')?.value;
@@ -289,7 +290,8 @@ export function abrirModalEdicaoFicha(secaoInicial = 'atributos') {
           const ganhoSistema = (char.atributos?.[k] || 0) - (char.atributos_base?.[k] || 0) - bonus;
           return [k, proposta[k] + bonus + ganhoSistema];
         }));
-        if (Object.values(atributosPropostos).some(valor => valor > 20)) { toast('Nenhum atributo pode ultrapassar 20.', 'error'); return; }
+        // Só recusa o atributo que ultrapassa 20 por causa desta edição; valor atual acima de 20 (Manual, capstone) pode ser mantido.
+        if (atributosAcimaDoTeto(char.atributos, atributosPropostos).length) { toast('Nenhum atributo pode ultrapassar 20.', 'error'); return; }
         consolidarEdicoesAtributos(char);
         const mudouBase = ATRIBUTOS_KEYS.some(k => char.atributos_base?.[k] !== proposta[k]);
         const mudouTotal = ATRIBUTOS_KEYS.some(k => char.atributos?.[k] !== atributosPropostos[k]);
@@ -410,6 +412,7 @@ export function abrirModalEdicaoFicha(secaoInicial = 'atributos') {
       // apagarem a entrada onde ela mora.
       const conAtual = char.atributos?.constituicao ?? 10;
       const deltaManualCon = deltaManualAtributos(char).constituicao || 0;
+      const modJogoAntesReversao = modConEmJogo(char);
       consolidarEdicoesAtributos(char);
       const mudouBase = reverterEdicao(char, 'atributos_base');
       const mudouTotal = reverterEdicao(char, 'atributos');
@@ -417,7 +420,7 @@ export function abrirModalEdicaoFicha(secaoInicial = 'atributos') {
         if (deltaManualCon !== 0) {
           // Sentido inverso do salvamento manual: desfazer a edição desfaz
           // também o PV que ela concedeu.
-          aplicarPvRetroativoPorCon(char, calcMod(conAtual), calcMod(conAtual - deltaManualCon));
+          aplicarPvRetroativoPorCon(char, calcMod(conAtual), calcMod(conAtual - deltaManualCon), { antes: modJogoAntesReversao, depois: modConEmJogo(char) });
         }
         salvar(); window.fecharModal(); renderFichaCompleta(); toast('Distribuição de atributos restaurada.', 'success');
       }

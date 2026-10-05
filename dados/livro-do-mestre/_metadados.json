@@ -1,0 +1,19 @@
+{
+  "titulo": "Livro do Mestre (2024)",
+  "idioma_original": "inglês; traduzido para PT-BR",
+  "observacao": "Separado de dados/ (Livro do Jogador). Itens que o Livro do Jogador já tem não são duplicados: o registro daqui traz livro_jogador apontando para o original. O site lê capitulo7/itens_magicos.json; os demais arquivos ainda não.",
+  "capitulos": [
+    {
+      "numero": 7,
+      "titulo": "Tesouros",
+      "paginas_livro": "213-331",
+      "arquivos": {
+        "capitulo7/regras.json": "Seções de regras do capítulo, com tabelas",
+        "capitulo7/itens_magicos.json": "Acervo de itens mágicos (A a Z), com variantes e dados_ficha no formato item.dados do site",
+        "capitulo7/tesouros.json": "Gemas, obras de arte e barras comerciais",
+        "capitulo7/tabelas_itens_aleatorios.json": "As 20 tabelas d100 de itens mágicos aleatórios, ligadas por item_id",
+        "capitulo7/_lotes/": "Fonte editável (um JSON por faixa de páginas); os quatro arquivos acima são gerados por scripts/livro-do-mestre/capitulo7.mjs montar"
+      }
+    }
+  ]
+}

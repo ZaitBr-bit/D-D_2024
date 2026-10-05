@@ -4,6 +4,7 @@
 // Consultado pela ficha, pelos descansos e pelas habilidades ativas.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
+import { atributoEfetivo } from '../../regras-atributos.js';
 import { char, salvar } from '../estado.js';
 import { temClasse, nivelNa, subclasseDe } from '../../regras-multiclasse.js';
 
@@ -67,7 +68,7 @@ export function getEstadoRecursosMago() {
   // Assinatura Mágica (nível 20): 2 magias de 3º círculo, 1x cada por descanso curto/longo
   const assinaturaMagicaAtiva = nivel >= 20;
 
-  const intMod = Math.floor(((char.atributos?.inteligencia || 10) - 10) / 2);
+  const intMod = Math.floor(((atributoEfetivo(char, 'inteligencia') || 10) - 10) / 2);
 
   // Subclasses de Mago
   if (!r.subclasses) r.subclasses = {};

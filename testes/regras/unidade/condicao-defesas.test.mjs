@@ -44,3 +44,18 @@ test('Contraste: Paralisado (não dá defesa nenhuma) não aciona a resistência
   assert.ok(html.includes('Nenhuma defesa configurada'),
     'Paralisado não é Petrificado -- não pode dar resistência a dano nenhuma');
 });
+
+test('efeito mágico com nome, condição e tipo de dano hostis não injeta HTML nas defesas', async () => {
+  const { sheetEstado } = await modulosApp();
+  const p = await personagemMulticlasse(GUERREIRO_1);
+  p.efeitos_magicos = [
+    { tipo: 'imunidade_condicao', condicao: 'Enfeitiçado', nome: '<img src=x onerror=alert(1)> (Magia)' },
+    { tipo: 'imunidade_condicao', condicao: '<b id="hostil1">', nome: 'Calma' },
+    { tipo: 'resistencia', tipos_dano: ['<i id="hostil2">'], nome: 'Proteção' },
+  ];
+  sheetEstado.definirChar(p);
+  const html = sheetCondicoes.renderSecaoDefesas();
+  assert.ok(!html.includes('<img src=x'), 'o nome do efeito não pode virar tag');
+  assert.ok(!html.includes('<b id="hostil1">') && !html.includes('<i id="hostil2">'), 'condição e tipo de dano são escapados');
+  assert.ok(html.includes('&lt;img src=x onerror=alert(1)&gt;'), 'o texto aparece escapado');
+});

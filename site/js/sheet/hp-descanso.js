@@ -5,6 +5,8 @@
 // de recursos por descanso curto e longo, que toca todas as classes.
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
+import { atributoEfetivo } from '../regras-atributos.js';
+import { aplicarDescansoRecursos, aplicarRecuperacaoInformada, itensComRecuperacaoPendente } from '../regras-recursos-itens.js';
 import { restaurarRecursosTalentos } from '../regras-cobertura.js';
 import { gastarDadosVida, nivelNa, reservasDadosVida, restaurarTodosDadosVida, subclasseDe, temClasse } from '../regras-multiclasse.js';
 import { trocasDoDescansoLongo } from '../regras-preparo-magias.js';
@@ -39,6 +41,7 @@ import { getEstadoRecursosPaladino } from './classes/paladino.js';
 import { contextosDeClasse, superficieAtivaDaFicha, superficiesDaFicha } from './contexto-classe.js';
 import { char, especiesCache, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
+import { atualizarBotaoRecuperarItens } from './inventario.js';
 import { mostrarTrocaMagiaConhecida, mostrarTrocaTruque, truquesTrocaveis } from './grimorio.js';
 import { abrirModalTrocaMaestriaDescanso, abrirModalTrocaMaestriaTalento, classesComMaestria, temMestreDasArmas, trocaTodasNoDescanso } from './maestrias.js';
 import { getConcentracaoAtiva } from './magias.js';
@@ -452,7 +455,7 @@ export function setupEventosHP() {
     // 5 d12. Com UMA reserva o modal e identico ao de antes.
     const reservas = reservasDadosVida(char).filter(r => r.disponiveis > 0);
     if (!reservas.length) { toast('Sem dados de vida restantes', 'error'); return; }
-    const modCon = calcMod(char.atributos.constituicao);
+    const modCon = calcMod(atributoEfetivo(char, 'constituicao'));
 
     const seletor = montarSeletorDeReserva(reservas, '', {
       modCon, comEmoji: true, labelPicker: 'Quantos dados de vida usar?',
@@ -636,12 +639,14 @@ export function setupEventosDescanso() {
     const reservasCurto = reservasDadosVida(char).filter(r => r.disponiveis > 0);
     const dvRestantes = reservasCurto.reduce((s, r) => s + r.disponiveis, 0);
     const pvMax = char.pv_max_override || char.pv_max;
-    const modCon = calcMod(char.atributos.constituicao);
+    const modCon = calcMod(atributoEfetivo(char, 'constituicao'));
     const jaCheio = char.pv_atual >= pvMax;
 
     // Restaurar habilidades de descanso curto
     restaurarHabilidades('curto');
     restaurarRecursosTalentos(char, 'curto');
+    // Usos de itens que voltam no Descanso Curto; cargas não voltam.
+    aplicarDescansoRecursos(char, 'curto');
 
     // Bárbaro: recupera 1 uso de Fúria no descanso curto
     // temClasse: char.classe e a classe INICIAL -- um Ladino 5/Barbaro 5
@@ -1034,6 +1039,8 @@ export function setupEventosDescanso() {
     // Restaurar todas as habilidades
     restaurarHabilidades('longo');
     restaurarRecursosTalentos(char, 'longo');
+    // Recupera usos e cargas fixas dos itens; as cargas em dado ficam pendentes.
+    const _pendentesItens = aplicarDescansoRecursos(char, 'longo');
 
     // Aasimar: Revelação Celestial (issue #91) -- a transformação dura no
     // máximo 1 minuto ("ou até você a encerrar"), então o Descanso Longo
@@ -1588,7 +1595,24 @@ export function setupEventosDescanso() {
         botoesModal += '<button class="btn btn-primary" id="btn-trocar-truque-dl">Trocar Truque</button>';
       }
 
-      abrirModal('Descanso Longo Concluído', conteudoModal, botoesModal);
+      if (_pendentesItens.length) {
+        conteudoModal += `<p style="font-size:0.85rem;margin-top:10px">${_pendentesItens.length} item(ns) com recuperação de cargas pendente — você poderá informar o resultado ao concluir.</p>`;
+      }
+
+      // Encerra o fluxo de trocas: renderiza a ficha e, havendo recuperação de
+      // itens pendente, abre o modal do amanhecer. Toda saída do fluxo (Manter
+      // Tudo, fim da cadeia, X ou clique fora) passa por aqui.
+      const finalizarTrocasDescanso = () => {
+        renderFichaCompleta();
+        if (_pendentesItens.length) abrirModalRecuperacao();
+      };
+      // true quando um botão de troca assumiu o fluxo; o onClose do modal não finaliza.
+      let seguiuParaTrocas = false;
+      abrirModal('Descanso Longo Concluído', conteudoModal, botoesModal, () => {
+        if (!seguiuParaTrocas) finalizarTrocasDescanso();
+      });
+      // Este ramo não renderiza a ficha de imediato: mostra o botão do amanhecer no inventário.
+      if (_pendentesItens.length) atualizarBotaoRecuperarItens();
 
       // Encadeamento das trocas do Descanso Longo.
       //
@@ -1650,37 +1674,43 @@ export function setupEventosDescanso() {
        */
       const iniciarTrocasAPartirDe = (chave) => {
         const restantes = PASSOS.slice(PASSOS.findIndex(p => p.chave === chave));
-        if (restantes.length === 0) { renderFichaCompleta(); return; }
+        if (restantes.length === 0) { finalizarTrocasDescanso(); return; }
+        // O último passo recebe o encerramento do fluxo no lugar de null.
         const cadeia = restantes.reduceRight(
           (prox, passo) => () => passo.abrir(prox),
-          null
+          finalizarTrocasDescanso
         );
         cadeia();
       };
 
+      // Manter Tudo: o onClose do modal finaliza o fluxo.
       document.getElementById('btn-pular-troca-dl')?.addEventListener('click', () => {
         window.fecharModal();
-        renderFichaCompleta();
       });
       document.getElementById('btn-trocar-maestrias-dl')?.addEventListener('click', () => {
+        seguiuParaTrocas = true;
         window.fecharModal();
         iniciarTrocasAPartirDe('maestria');
       });
       document.getElementById('btn-trocar-maestria-talento-dl')?.addEventListener('click', () => {
+        seguiuParaTrocas = true;
         window.fecharModal();
         iniciarTrocasAPartirDe('maestria-talento');
       });
       document.getElementById('btn-trocar-magias-dl')?.addEventListener('click', () => {
+        seguiuParaTrocas = true;
         window.fecharModal();
         iniciarTrocasAPartirDe(primeiraChaveMagia);
       });
       document.getElementById('btn-trocar-truque-dl')?.addEventListener('click', () => {
+        seguiuParaTrocas = true;
         window.fecharModal();
         iniciarTrocasAPartirDe('truque');
       });
     } else {
       toast('Descanso longo realizado! PV, espaços e habilidades restaurados', 'success');
       renderFichaCompleta();
+      if (_pendentesItens.length) abrirModalRecuperacao();
     }
   });
 
@@ -1694,5 +1724,30 @@ export function setupEventosDescanso() {
       window.fecharModal();
       window.navegar('home');
     });
+  });
+}
+
+/**
+ * Modal "Amanhecer: recuperar itens": uma linha por item com recuperação em
+ * dado pendente; o jogador informa o que rolou. Campo vazio mantém pendente.
+ */
+export function abrirModalRecuperacao() {
+  const pend = itensComRecuperacaoPendente(char);
+  if (!pend.length) return;
+  const linhas = pend.map(p => `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <span style="flex:1"><strong>${escHtml(p.nome)}</strong> — recupera ${escHtml(p.recupera)} (agora ${p.atual}/${p.max})</span>
+      <input type="number" min="0" class="form-input" style="width:80px" data-recuperacao-idx="${p.idx}" placeholder="rolou">
+    </div>`).join('');
+  abrirModal('Amanhecer: recuperar itens', `<p style="font-size:0.85rem">Role a recuperação de cada item e informe o resultado.</p>${linhas}`,
+    '<button class="btn btn-secondary" onclick="fecharModal()">Depois</button><button class="btn btn-primary" id="btn-aplicar-recuperacao">Aplicar</button>');
+  document.getElementById('btn-aplicar-recuperacao')?.addEventListener('click', () => {
+    let invalidos = 0;
+    document.querySelectorAll('[data-recuperacao-idx]').forEach(inp => {
+      if (inp.value === '') return;
+      if (!aplicarRecuperacaoInformada(char.inventario[parseInt(inp.dataset.recuperacaoIdx)], inp.value)) invalidos++;
+    });
+    salvar(); window.fecharModal(); renderFichaCompleta();
+    if (invalidos) toast(`Valor inválido em ${invalidos} item(ns): continua pendente`, 'error');
   });
 }

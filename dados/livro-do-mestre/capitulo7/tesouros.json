@@ -1,0 +1,1056 @@
+{
+  "fonte": "Livro do Mestre (2024), capítulo 7: Tesouros",
+  "total": 105,
+  "itens": [
+    {
+      "id": "azurita",
+      "nome": "Azurita",
+      "nome_en": "Azurite",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "azul-escuro mosqueado",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "agata-listrada",
+      "nome": "Ágata listrada",
+      "nome_en": "Banded agate",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "listras marrons, azuis, brancas ou vermelhas",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "quartzo-azul",
+      "nome": "Quartzo azul",
+      "nome_en": "Blue quartz",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "azul-claro",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "agata-olho",
+      "nome": "Ágata-olho",
+      "nome_en": "Eye agate",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "círculos cinza, brancos, marrons, azuis ou verdes",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "hematita",
+      "nome": "Hematita",
+      "nome_en": "Hematite",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "preto-acinzentado",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "lapis-lazuli",
+      "nome": "Lápis-lazúli",
+      "nome_en": "Lapis lazuli",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "azul-claro e azul-escuro com pontos amarelos",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "malaquita",
+      "nome": "Malaquita",
+      "nome_en": "Malachite",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "estrias verde-claras e verde-escuras",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "agata-musgo",
+      "nome": "Ágata musgo",
+      "nome_en": "Moss agate",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "rosa ou branco-amarelado com marcas cinza ou verdes semelhantes a musgo",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "obsidiana",
+      "nome": "Obsidiana",
+      "nome_en": "Obsidian",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "preto",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "rodocrosita",
+      "nome": "Rodocrosita",
+      "nome_en": "Rhodochrosite",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "rosa-claro",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "olho-de-tigre",
+      "nome": "Olho de tigre",
+      "nome_en": "Tiger eye",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "marrom com centro dourado",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "turquesa",
+      "nome": "Turquesa",
+      "nome_en": "Turquoise",
+      "categoria": "Gema",
+      "valor": "10 PO",
+      "descricao": "verde-azulado claro",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "heliotropio",
+      "nome": "Heliotrópio",
+      "nome_en": "Bloodstone",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "cinza-escuro com pontos vermelhos",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "cornalina",
+      "nome": "Cornalina",
+      "nome_en": "Carnelian",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "laranja a marrom-avermelhado",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "calcedonia",
+      "nome": "Calcedônia",
+      "nome_en": "Chalcedony",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "branco",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "crisoprasio",
+      "nome": "Crisoprásio",
+      "nome_en": "Chrysoprase",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "verde",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "citrino",
+      "nome": "Citrino",
+      "nome_en": "Citrine",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "marrom-amarelado claro",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "jaspe",
+      "nome": "Jaspe",
+      "nome_en": "Jasper",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "azul, preto ou marrom",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "pedra-da-lua",
+      "nome": "Pedra da lua",
+      "nome_en": "Moonstone",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "branco com brilho azul-claro",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "onix",
+      "nome": "Ônix",
+      "nome_en": "Onyx",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "faixas pretas e brancas, ou totalmente preto ou branco",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "quartzo",
+      "nome": "Quartzo",
+      "nome_en": "Quartz",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "branco, cinza-fumê ou amarelo",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "sardonica",
+      "nome": "Sardônica",
+      "nome_en": "Sardonyx",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "faixas vermelhas e brancas",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "quartzo-rosa-estrela",
+      "nome": "Quartzo rosa estrela",
+      "nome_en": "Star rose quartz",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "pedra rosada com centro branco em forma de estrela",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "zircao",
+      "nome": "Zircão",
+      "nome_en": "Zircon",
+      "categoria": "Gema",
+      "valor": "50 PO",
+      "descricao": "verde-azulado claro",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "ambar",
+      "nome": "Âmbar",
+      "nome_en": "Amber",
+      "categoria": "Gema",
+      "valor": "100 PO",
+      "descricao": "dourado aguado a dourado intenso",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "ametista",
+      "nome": "Ametista",
+      "nome_en": "Amethyst",
+      "categoria": "Gema",
+      "valor": "100 PO",
+      "descricao": "roxo-escuro",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "crisoberilo",
+      "nome": "Crisoberilo",
+      "nome_en": "Chrysoberyl",
+      "categoria": "Gema",
+      "valor": "100 PO",
+      "descricao": "verde-amarelado a verde-claro",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "coral",
+      "nome": "Coral",
+      "nome_en": "Coral",
+      "categoria": "Gema",
+      "valor": "100 PO",
+      "descricao": "carmesim",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "granada",
+      "nome": "Granada",
+      "nome_en": "Garnet",
+      "categoria": "Gema",
+      "valor": "100 PO",
+      "descricao": "vermelho, verde-amarronzado ou violeta",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "jade",
+      "nome": "Jade",
+      "nome_en": "Jade",
+      "categoria": "Gema",
+      "valor": "100 PO",
+      "descricao": "verde-claro, verde-escuro ou branco",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "azeviche",
+      "nome": "Azeviche",
+      "nome_en": "Jet",
+      "categoria": "Gema",
+      "valor": "100 PO",
+      "descricao": "preto profundo",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "perola",
+      "nome": "Pérola",
+      "nome_en": "Pearl",
+      "categoria": "Gema",
+      "valor": "100 PO",
+      "descricao": "branco lustroso, amarelo ou rosa",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "espinelio",
+      "nome": "Espinélio",
+      "nome_en": "Spinel",
+      "categoria": "Gema",
+      "valor": "100 PO",
+      "descricao": "vermelho, marrom-avermelhado ou verde-escuro",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "turmalina",
+      "nome": "Turmalina",
+      "nome_en": "Tourmaline",
+      "categoria": "Gema",
+      "valor": "100 PO",
+      "descricao": "verde-claro, azul, marrom ou vermelho",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "alexandrita",
+      "nome": "Alexandrita",
+      "nome_en": "Alexandrite",
+      "categoria": "Gema",
+      "valor": "500 PO",
+      "descricao": "verde-escuro",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "agua-marinha",
+      "nome": "Água-marinha",
+      "nome_en": "Aquamarine",
+      "categoria": "Gema",
+      "valor": "500 PO",
+      "descricao": "verde-azulado claro",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "perola-negra",
+      "nome": "Pérola negra",
+      "nome_en": "Black pearl",
+      "categoria": "Gema",
+      "valor": "500 PO",
+      "descricao": "preto puro",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "espinelio-azul",
+      "nome": "Espinélio azul",
+      "nome_en": "Blue spinel",
+      "categoria": "Gema",
+      "valor": "500 PO",
+      "descricao": "azul-escuro",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "peridoto",
+      "nome": "Peridoto",
+      "nome_en": "Peridot",
+      "categoria": "Gema",
+      "valor": "500 PO",
+      "descricao": "verde-oliva intenso",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "topazio",
+      "nome": "Topázio",
+      "nome_en": "Topaz",
+      "categoria": "Gema",
+      "valor": "500 PO",
+      "descricao": "amarelo-dourado",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "opala-negra",
+      "nome": "Opala negra",
+      "nome_en": "Black opal",
+      "categoria": "Gema",
+      "valor": "1.000 PO",
+      "descricao": "verde-escuro com manchas pretas e pontos dourados",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "safira-azul",
+      "nome": "Safira azul",
+      "nome_en": "Blue sapphire",
+      "categoria": "Gema",
+      "valor": "1.000 PO",
+      "descricao": "azul médio",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "esmeralda",
+      "nome": "Esmeralda",
+      "nome_en": "Emerald",
+      "categoria": "Gema",
+      "valor": "1.000 PO",
+      "descricao": "verde vivo intenso",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "opala-de-fogo",
+      "nome": "Opala de fogo",
+      "nome_en": "Fire opal",
+      "categoria": "Gema",
+      "valor": "1.000 PO",
+      "descricao": "vermelho-fogo",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "opala",
+      "nome": "Opala",
+      "nome_en": "Opal",
+      "categoria": "Gema",
+      "valor": "1.000 PO",
+      "descricao": "azul-claro com manchas verdes e douradas",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "rubi-estrela",
+      "nome": "Rubi estrela",
+      "nome_en": "Star ruby",
+      "categoria": "Gema",
+      "valor": "1.000 PO",
+      "descricao": "rubi com centro branco em forma de estrela",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "safira-estrela",
+      "nome": "Safira estrela",
+      "nome_en": "Star sapphire",
+      "categoria": "Gema",
+      "valor": "1.000 PO",
+      "descricao": "safira azul com centro branco em forma de estrela",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "safira-amarela",
+      "nome": "Safira amarela",
+      "nome_en": "Yellow sapphire",
+      "categoria": "Gema",
+      "valor": "1.000 PO",
+      "descricao": "amarelo-fogo ou verde-amarelado",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "safira-negra",
+      "nome": "Safira negra",
+      "nome_en": "Black sapphire",
+      "categoria": "Gema",
+      "valor": "5.000 PO",
+      "descricao": "preto lustroso com reflexos luminosos",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "diamante",
+      "nome": "Diamante",
+      "nome_en": "Diamond",
+      "categoria": "Gema",
+      "valor": "5.000 PO",
+      "descricao": "branco-azulado, amarelo-canário, rosa, marrom ou azul",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "jacinto",
+      "nome": "Jacinto",
+      "nome_en": "Jacinth",
+      "categoria": "Gema",
+      "valor": "5.000 PO",
+      "descricao": "laranja-fogo",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "rubi",
+      "nome": "Rubi",
+      "nome_en": "Ruby",
+      "categoria": "Gema",
+      "valor": "5.000 PO",
+      "descricao": "vermelho límpido a carmesim profundo",
+      "pagina": 214,
+      "pagina_fim": 214
+    },
+    {
+      "id": "jarro-de-prata",
+      "nome": "Jarro de prata",
+      "nome_en": "Silver ewer",
+      "categoria": "Obra de Arte",
+      "valor": "25 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "estatueta-de-osso-entalhado",
+      "nome": "Estatueta de osso entalhado",
+      "nome_en": "Carved bone statuette",
+      "categoria": "Obra de Arte",
+      "valor": "25 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "bracelete-de-ouro",
+      "nome": "Bracelete de ouro",
+      "nome_en": "Gold bracelet",
+      "categoria": "Obra de Arte",
+      "valor": "25 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "vestes-de-tecido-de-ouro",
+      "nome": "Vestes de tecido de ouro",
+      "nome_en": "Cloth-of-gold vestments",
+      "categoria": "Obra de Arte",
+      "valor": "25 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "mascara-de-veludo-preto-costurada-com-fio-de-prata",
+      "nome": "Máscara de veludo preto costurada com fio de prata",
+      "nome_en": "Black velvet mask stitched with silver thread",
+      "categoria": "Obra de Arte",
+      "valor": "25 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "calice-de-cobre-com-filigrana-de-prata",
+      "nome": "Cálice de cobre com filigrana de prata",
+      "nome_en": "Copper chalice with silver filigree",
+      "categoria": "Obra de Arte",
+      "valor": "25 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "par-de-dados-de-osso-gravados",
+      "nome": "Par de dados de osso gravados",
+      "nome_en": "Pair of engraved bone dice",
+      "categoria": "Obra de Arte",
+      "valor": "25 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "espelho-de-mao-em-moldura-de-madeira-pintada",
+      "nome": "Espelho de mão em moldura de madeira pintada",
+      "nome_en": "Handheld mirror set in a painted wooden frame",
+      "categoria": "Obra de Arte",
+      "valor": "25 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "lenco-de-seda-bordado",
+      "nome": "Lenço de seda bordado",
+      "nome_en": "Embroidered silk handkerchief",
+      "categoria": "Obra de Arte",
+      "valor": "25 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "medalhao-de-ouro-com-um-retrato-pintado-dentro",
+      "nome": "Medalhão de ouro com um retrato pintado dentro",
+      "nome_en": "Gold locket with a painted portrait inside",
+      "categoria": "Obra de Arte",
+      "valor": "25 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "anel-de-ouro-cravejado-de-heliotropios",
+      "nome": "Anel de ouro cravejado de heliotrópios",
+      "nome_en": "Gold ring set with bloodstones",
+      "categoria": "Obra de Arte",
+      "valor": "250 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "estatueta-de-marfim-entalhado",
+      "nome": "Estatueta de marfim entalhado",
+      "nome_en": "Carved ivory statuette",
+      "categoria": "Obra de Arte",
+      "valor": "250 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "bracelete-de-ouro-cravejado-de-joias",
+      "nome": "Bracelete de ouro cravejado de joias",
+      "nome_en": "Bejeweled gold bracelet",
+      "categoria": "Obra de Arte",
+      "valor": "250 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "colar-de-prata-com-pingente-de-gema",
+      "nome": "Colar de prata com pingente de gema",
+      "nome_en": "Silver necklace with a gemstone pendant",
+      "categoria": "Obra de Arte",
+      "valor": "250 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "coroa-de-bronze",
+      "nome": "Coroa de bronze",
+      "nome_en": "Bronze crown",
+      "categoria": "Obra de Arte",
+      "valor": "250 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "vestes-de-seda-com-bordados-de-ouro",
+      "nome": "Vestes de seda com bordados de ouro",
+      "nome_en": "Silk vestments with gold embroidery",
+      "categoria": "Obra de Arte",
+      "valor": "250 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "tapecaria-bem-feita-de-3-por-3-metros",
+      "nome": "Tapeçaria bem-feita de 3 por 3 metros",
+      "nome_en": "Well-made tapestry that is 10 feet by 10 feet",
+      "categoria": "Obra de Arte",
+      "valor": "250 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "caneca-de-latao-com-incrustacoes-de-jade",
+      "nome": "Caneca de latão com incrustações de jade",
+      "nome_en": "Brass mug with jade inlay",
+      "categoria": "Obra de Arte",
+      "valor": "250 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "caixa-de-estatuetas-de-animais-em-turquesa",
+      "nome": "Caixa de estatuetas de animais em turquesa",
+      "nome_en": "Box of turquoise animal figurines",
+      "categoria": "Obra de Arte",
+      "valor": "250 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "gaiola-de-ouro-com-filigrana-de-electrum",
+      "nome": "Gaiola de ouro com filigrana de electrum",
+      "nome_en": "Gold birdcage with electrum filigree",
+      "categoria": "Obra de Arte",
+      "valor": "250 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "calice-de-prata-cravejado-de-pedras-da-lua",
+      "nome": "Cálice de prata cravejado de pedras da lua",
+      "nome_en": "Silver chalice set with moonstones",
+      "categoria": "Obra de Arte",
+      "valor": "750 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "maco-de-partituras-com-os-cantos-funebres-perdidos-de-um-compositor-famoso",
+      "nome": "Maço de partituras com os cantos fúnebres perdidos de um compositor famoso",
+      "nome_en": "Bundle of sheet music representing the lost dirges of a famous composer",
+      "categoria": "Obra de Arte",
+      "valor": "750 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "harpa-de-madeira-entalhada-com-incrustacoes-de-marfim-e-gemas-de-zircao",
+      "nome": "Harpa de madeira entalhada com incrustações de marfim e gemas de zircão",
+      "nome_en": "Carved wooden harp with ivory inlay and zircon gems",
+      "categoria": "Obra de Arte",
+      "valor": "750 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "idolo-de-ouro",
+      "nome": "Ídolo de ouro",
+      "nome_en": "Gold idol",
+      "categoria": "Obra de Arte",
+      "valor": "750 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "pente-de-ouro-em-forma-de-dragao-com-granadas-vermelhas-como-olhos",
+      "nome": "Pente de ouro em forma de dragão com granadas vermelhas como olhos",
+      "nome_en": "Gold comb shaped like a dragon with red garnets as eyes",
+      "categoria": "Obra de Arte",
+      "valor": "750 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "rolha-de-garrafa-com-relevo-em-folha-de-ouro-e-cravejada-de-ametistas",
+      "nome": "Rolha de garrafa com relevo em folha de ouro e cravejada de ametistas",
+      "nome_en": "Bottle stopper cork embossed with gold leaf and set with amethysts",
+      "categoria": "Obra de Arte",
+      "valor": "750 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "cranio-de-draconato-em-tamanho-real-detalhado-fundido-em-electrum",
+      "nome": "Crânio de draconato em tamanho real, detalhado, fundido em electrum",
+      "nome_en": "Detailed, life-sized dragonborn skull cast in electrum",
+      "categoria": "Obra de Arte",
+      "valor": "750 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "broche-de-prata-e-ouro",
+      "nome": "Broche de prata e ouro",
+      "nome_en": "Silver and gold brooch",
+      "categoria": "Obra de Arte",
+      "valor": "750 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "estatueta-de-obsidiana-com-guarnicoes-e-incrustacoes-de-ouro",
+      "nome": "Estatueta de obsidiana com guarnições e incrustações de ouro",
+      "nome_en": "Obsidian statuette with gold fittings and inlay",
+      "categoria": "Obra de Arte",
+      "valor": "750 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "mascara-de-guerra-de-ouro-pintada",
+      "nome": "Máscara de guerra de ouro pintada",
+      "nome_en": "Painted gold war mask",
+      "categoria": "Obra de Arte",
+      "valor": "750 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "corrente-fina-de-ouro-cravejada-com-uma-opala-de-fogo",
+      "nome": "Corrente fina de ouro cravejada com uma opala de fogo",
+      "nome_en": "Fine gold chain set with a fire opal",
+      "categoria": "Obra de Arte",
+      "valor": "2.500 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "pintura-antiga-de-um-grande-mestre",
+      "nome": "Pintura antiga de um grande mestre",
+      "nome_en": "Old masterpiece painting",
+      "categoria": "Obra de Arte",
+      "valor": "2.500 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "manto-de-seda-e-veludo-bordado-cravejado-de-numerosas-pedras-da-lua",
+      "nome": "Manto de seda e veludo bordado, cravejado de numerosas pedras da lua",
+      "nome_en": "Embroidered silk and velvet mantle set with numerous moonstones",
+      "categoria": "Obra de Arte",
+      "valor": "2.500 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "bracelete-de-platina-cravejado-com-uma-esmeralda",
+      "nome": "Bracelete de platina cravejado com uma esmeralda",
+      "nome_en": "Platinum bracelet set with an emerald",
+      "categoria": "Obra de Arte",
+      "valor": "2.500 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "luva-bordada-cravejada-de-lascas-de-joias",
+      "nome": "Luva bordada cravejada de lascas de joias",
+      "nome_en": "Embroidered glove set with jewel chips",
+      "categoria": "Obra de Arte",
+      "valor": "2.500 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "tornozeleira-cravejada-de-joias",
+      "nome": "Tornozeleira cravejada de joias",
+      "nome_en": "Jeweled anklet",
+      "categoria": "Obra de Arte",
+      "valor": "2.500 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "caixa-de-musica-de-ouro",
+      "nome": "Caixa de música de ouro",
+      "nome_en": "Gold music box",
+      "categoria": "Obra de Arte",
+      "valor": "2.500 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "diadema-de-ouro-cravejado-com-quatro-aguas-marinhas",
+      "nome": "Diadema de ouro cravejado com quatro águas-marinhas",
+      "nome_en": "Gold circlet set with four aquamarines",
+      "categoria": "Obra de Arte",
+      "valor": "2.500 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "tapa-olho-decorado-com-minusculas-safiras-azuis-e-pedras-da-lua",
+      "nome": "Tapa-olho decorado com minúsculas safiras azuis e pedras da lua",
+      "nome_en": "Eye patch decorated with tiny blue sapphires and moonstones",
+      "categoria": "Obra de Arte",
+      "valor": "2.500 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "um-colar-de-pequenas-perolas-rosadas",
+      "nome": "Um colar de pequenas pérolas rosadas",
+      "nome_en": "A necklace string of small pink pearls",
+      "categoria": "Obra de Arte",
+      "valor": "2.500 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "coroa-de-ouro-cravejada-de-joias",
+      "nome": "Coroa de ouro cravejada de joias",
+      "nome_en": "Jeweled gold crown",
+      "categoria": "Obra de Arte",
+      "valor": "7.500 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "anel-de-platina-cravejado-de-joias",
+      "nome": "Anel de platina cravejado de joias",
+      "nome_en": "Jeweled platinum ring",
+      "categoria": "Obra de Arte",
+      "valor": "7.500 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "estatueta-de-ouro-cravejada-de-rubis",
+      "nome": "Estatueta de ouro cravejada de rubis",
+      "nome_en": "Gold statuette set with rubies",
+      "categoria": "Obra de Arte",
+      "valor": "7.500 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "taca-de-ouro-cravejada-de-esmeraldas",
+      "nome": "Taça de ouro cravejada de esmeraldas",
+      "nome_en": "Gold cup set with emeralds",
+      "categoria": "Obra de Arte",
+      "valor": "7.500 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "porta-joias-de-ouro-com-filigrana-de-platina",
+      "nome": "Porta-joias de ouro com filigrana de platina",
+      "nome_en": "Gold jewelry box with platinum filigree",
+      "categoria": "Obra de Arte",
+      "valor": "7.500 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "conjunto-de-bonecas-de-ouro-que-se-encaixam-umas-nas-outras",
+      "nome": "Conjunto de bonecas de ouro que se encaixam umas nas outras",
+      "nome_en": "Set of gold nesting dolls",
+      "categoria": "Obra de Arte",
+      "valor": "7.500 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "tabuleiro-de-jogo-de-jade-com-pecas-de-ouro",
+      "nome": "Tabuleiro de jogo de jade com peças de ouro",
+      "nome_en": "Jade game board with gold playing pieces",
+      "categoria": "Obra de Arte",
+      "valor": "7.500 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "chifre-de-beber-de-marfim-cravejado-de-joias-com-filigrana-de-ouro",
+      "nome": "Chifre de beber de marfim cravejado de joias com filigrana de ouro",
+      "nome_en": "Bejeweled ivory drinking horn with gold filigree",
+      "categoria": "Obra de Arte",
+      "valor": "7.500 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "carruagem-real-ou-barcaca-funeraria-dourada",
+      "nome": "Carruagem real ou barcaça funerária dourada",
+      "nome_en": "Gilded royal coach or funeral barge",
+      "categoria": "Obra de Arte",
+      "valor": "7.500 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "armadura-cerimonial-de-ouro-com-perolas-negras",
+      "nome": "Armadura cerimonial de ouro com pérolas negras",
+      "nome_en": "Ceremonial gold armor with black pearls",
+      "categoria": "Obra de Arte",
+      "valor": "7.500 PO",
+      "descricao": "",
+      "pagina": 215,
+      "pagina_fim": 215
+    },
+    {
+      "id": "barra-de-prata-de-1-kg",
+      "nome": "Barra de prata de 1 kg",
+      "nome_en": "2-pound silver bar",
+      "categoria": "Barra Comercial",
+      "valor": "10 PO",
+      "descricao": "12,5 cm de comprimento × 5 cm de largura × 1,25 cm de espessura",
+      "pagina": 213,
+      "pagina_fim": 213
+    },
+    {
+      "id": "barra-de-prata-de-2-5-kg",
+      "nome": "Barra de prata de 2,5 kg",
+      "nome_en": "5-pound silver bar",
+      "categoria": "Barra Comercial",
+      "valor": "25 PO",
+      "descricao": "15 cm de comprimento × 5 cm de largura × 2,5 cm de espessura",
+      "pagina": 213,
+      "pagina_fim": 213
+    },
+    {
+      "id": "barra-de-ouro-de-2-5-kg",
+      "nome": "Barra de ouro de 2,5 kg",
+      "nome_en": "5-pound gold bar",
+      "categoria": "Barra Comercial",
+      "valor": "250 PO",
+      "descricao": "12,5 cm de comprimento × 5 cm de largura × 1,9 cm de espessura",
+      "pagina": 213,
+      "pagina_fim": 213
+    }
+  ]
+}

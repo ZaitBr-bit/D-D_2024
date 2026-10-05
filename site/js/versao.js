@@ -13,13 +13,130 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.0.21';
+export const VERSAO_ATUAL = '3.1.0';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.1.0',
+    data: '2026-10-05',
+    rotulo: 'Itens mágicos',
+    resumo: 'Os itens mágicos do Livro do Mestre chegaram à ficha: 350 itens '
+      + 'com bônus, cargas, magias, defesas e atributos aplicados '
+      + 'automaticamente.',
+    melhorias: [
+      {
+        grupo: '🔮 Itens mágicos no inventário',
+        itens: [
+          'Nova categoria Itens Mágicos no Adicionar Item: os 350 itens do '
+            + 'Livro do Mestre, com busca e filtros por raridade e tipo. Itens '
+            + 'com variantes pedem a variante; armas e armaduras mágicas pedem '
+            + 'a arma ou armadura de base.',
+          'Tocar no item abre a descrição completa do livro, com as tabelas. '
+            + 'A linha mostra raridade, sintonização e os bônus que o item dá, '
+            + 'apagados enquanto ainda não valem (sem equipar ou sintonizar).',
+          'Bônus de CA, salvaguardas, ataque e CD de magia e ataque e dano da '
+            + 'arma entram sozinhos na ficha, na impressão e no PDF. Item '
+            + 'destruído e item sem sintonização exigida não contam.',
+          'Sintonização de item restrito (por exemplo, "por um Mago" ou '
+            + '"por um Conjurador"): a ficha avisa quando o personagem não '
+            + 'atende e pede confirmação antes de sintonizar.',
+        ],
+      },
+      {
+        grupo: '⚡ Cargas e usos',
+        itens: [
+          'Varinhas, cajados, anéis e outros itens com cargas mostram o '
+            + 'contador na mochila: toque em − para gastar e em + para '
+            + 'devolver. Usos diários ("uma vez por dia") viram botões que '
+            + 'alternam entre gasto e disponível.',
+          'No Descanso Longo, os usos diários voltam sozinhos e a ficha pede '
+            + 'o resultado da recuperação de cargas de cada item (por exemplo, '
+            + '1d6 + 1). Se você fechar o aviso, o botão no inventário '
+            + 'continua lá até resolver.',
+          'Ao gastar a última carga, a ficha pergunta o resultado do d20. '
+            + 'Item destruído fica riscado e pode ser restaurado se foi engano.',
+          'Qualquer item pode ganhar um contador próprio no detalhe, que '
+            + 'também pode ser editado ou removido.',
+          'Pérola do Poder e Bastão do Guardião do Pacto: ao usar, a ficha '
+            + 'lista os espaços de magia gastos (até o 3º círculo na Pérola, '
+            + 'qualquer círculo no Bastão, incluindo os de Pacto) e pergunta '
+            + 'qual restaurar. Sem espaço gasto, o uso não é consumido.',
+        ],
+      },
+      {
+        grupo: '✨ Magias de itens',
+        itens: [
+          'Itens que conjuram magias do Livro do Jogador ganham o bloco '
+            + 'Magias de Itens na seção Magias, com o custo, a CD e o botão '
+            + 'Conjurar. O botão gasta as cargas (com escolha do círculo '
+            + 'quando o item permite) ou o uso diário e aplica a magia como as '
+            + 'outras, com concentração.',
+          'Item fora da mão ou sem sintonização mostra o que falta. Itens '
+            + 'com magia escolhida na hora, sorteada ou com restrição própria '
+            + 'seguem só na descrição.',
+          'As magias de itens também saem na folha impressa e no PDF.',
+        ],
+      },
+      {
+        grupo: '🛡️ Defesas, deslocamento e sentidos',
+        itens: [
+          'Resistências e imunidades de itens aparecem em Defesas, e '
+            + 'imunidades a condição em Condições. Anel de Resistência e '
+            + 'similares pedem o tipo no detalhe do item.',
+          'Voo, Natação e Escalada de itens entram no Deslocamento, junto com '
+            + 'o mínimo das Botas de Caminhar e Saltar. Visão no Escuro, Visão '
+            + 'Verdadeira e Visão às Cegas de itens entram em Sentidos (os '
+            + 'Óculos da Noite somam à visão da espécie).',
+          'Vantagem de itens em perícias, salvaguardas e Iniciativa entra nos '
+            + 'selos de Vantagem. Quando só vale numa situação (por exemplo, '
+            + '"contra magias"), aparece como nota V* e não anula Desvantagem.',
+        ],
+      },
+      {
+        grupo: '💪 Atributos',
+        itens: [
+          'Itens que definem um atributo (Cinturão de Força do Gigante, '
+            + 'Manoplas de Poder do Ogro, Tiara do Intelecto, Amuleto da '
+            + 'Saúde) passam a valer na ficha enquanto equipados e '
+            + 'sintonizados. O card mostra o valor-base logo abaixo, e o PV '
+            + 'máximo acompanha a Constituição do item.',
+          'Itens que aumentam um atributo até um teto (Pedras Ioun, '
+            + 'Cinturão dos Anões, Machado dos Senhores Anões) somam enquanto '
+            + 'usados. O Martelo dos Trovões soma ao Cinturão de Força do '
+            + 'Gigante ou às Manoplas de Poder do Ogro.',
+          'Manuais, Tomos e os Livros que aumentam um atributo para sempre '
+            + 'ganham o botão Aplicar aumento no detalhe do item, que vale uma '
+            + 'vez, respeita o teto e ajusta o PV da Constituição.',
+        ],
+      },
+    ],
+    correcoes: [
+      {
+        grupo: '🐛 Pequenos bugs corrigidos',
+        itens: [
+          'PV: editar a Constituição, reverter uma edição, aplicar um '
+            + 'aumento ou subir de nível com o Amuleto da Saúde equipado não '
+            + 'cura nem tira PV atual sem motivo. A tela de resultado do '
+            + 'level-up mostra o ganho real de PV.',
+          'Adicionar Talento e dádivas que aumentam a Constituição agora '
+            + 'ajustam o PV como o aumento do level-up.',
+          'Level-up com PV rolado agora mostra "(Rolado: N)" no resultado.',
+          'Exaustão passou a reduzir também os Deslocamentos especiais fixos '
+            + '(Voo, Natação, Escalada) de itens e magias, como diz o livro.',
+          'Guardião multiclasse no nível 18 agora mostra a Visão às Cegas '
+            + 'dos Sentidos Selvagens, com o rótulo e o valor corretos.',
+          'Natação e Escalada duplicadas entre a classe e um item, e '
+            + 'imunidades repetidas em Condições, agora aparecem uma vez só.',
+          'Os modais de trocar magia ou truque do Descanso Longo agora '
+            + 'abrem a recuperação de cargas dos itens ao fechar.',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.0.21',
     data: '2026-10-03',

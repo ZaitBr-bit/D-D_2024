@@ -2307,6 +2307,24 @@ export async function abrirPreenchimentoSlotMagia(tipo = 'magia') {
 }
 
 /**
+ * Saída única dos modais de troca: chama `callbackPosTroca` (ou renderiza a
+ * ficha, sem callback) uma só vez, venha o fechamento de Confirmar, Não
+ * Trocar, Cancelar, X ou clique fora. Passada como `onClose` do modal,
+ * garante que o Cancelar também siga a cadeia do Descanso Longo.
+ * @param {Function|null} callbackPosTroca
+ * @returns {Function}
+ */
+function saidaUnicaDaTroca(callbackPosTroca) {
+  let saiu = false;
+  return () => {
+    if (saiu) return;
+    saiu = true;
+    if (callbackPosTroca) callbackPosTroca();
+    else renderFichaCompleta();
+  };
+}
+
+/**
  * Modal de troca de UMA magia conhecida/preparada -- usado pela troca do
  * Descanso Longo (uma por classe conjuradora, Tarefa 3 deste sub-projeto)
  * e pela Memorizar Magia do Mago (Descanso Curto, nível 5).
@@ -2419,6 +2437,7 @@ export async function mostrarTrocaMagiaConhecida(callbackPosTroca = null, opcoes
   const titulo = opcoes.titulo || (opcoes.classe ? `Trocar Magia Conhecida — ${nomeClasse}` : 'Trocar Magia Conhecida');
   const explicacao = opcoes.explicacao || explicacaoPadrao;
 
+  const sair = saidaUnicaDaTroca(callbackPosTroca);
   abrirModal(titulo, `
     <div class="info-box info" style="margin-bottom:12px;font-size:0.85rem">
       ${explicacao}
@@ -2439,7 +2458,8 @@ export async function mostrarTrocaMagiaConhecida(callbackPosTroca = null, opcoes
     </div>
   `, `<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
      <button class="btn btn-secondary" id="btn-pular-troca-conhecida">Não Trocar</button>
-     <button class="btn btn-primary" id="btn-confirmar-troca-conhecida" disabled>Confirmar Troca</button>`);
+     <button class="btn btn-primary" id="btn-confirmar-troca-conhecida" disabled>Confirmar Troca</button>`,
+  callbackPosTroca ? sair : null);
 
   const containerAdicionar = document.getElementById('troca-conhecida-adicionar-container');
   const resultadoEl = document.getElementById('resultado-troca-conhecida');
@@ -2557,8 +2577,7 @@ export async function mostrarTrocaMagiaConhecida(callbackPosTroca = null, opcoes
   // Nao trocar
   document.getElementById('btn-pular-troca-conhecida')?.addEventListener('click', () => {
     window.fecharModal();
-    if (callbackPosTroca) callbackPosTroca();
-    else renderFichaCompleta();
+    sair();
   });
 
   // Confirmar troca
@@ -2593,8 +2612,7 @@ export async function mostrarTrocaMagiaConhecida(callbackPosTroca = null, opcoes
       toast(`Trocou ${magiaRemover} por ${magiaAdicionar}`, 'success');
     }
     window.fecharModal();
-    if (callbackPosTroca) callbackPosTroca();
-    else renderFichaCompleta();
+    sair();
   });
 }
 
@@ -2740,6 +2758,7 @@ export async function mostrarTrocaTruque(callbackPosTroca = null, opcoes = {}) {
   // qualquer forma (mesmo sem opcoes.classe), entao so o titulo faltava.
   const titulo = opcoes.classe ? `Trocar Truque — ${nomeClasse}` : 'Trocar Truque';
 
+  const sair = saidaUnicaDaTroca(callbackPosTroca);
   abrirModal(titulo, `
     <div class="info-box info" style="margin-bottom:12px;font-size:0.85rem">
       Apos um Descanso Longo, voce pode trocar <strong>1 truque</strong> por outro da lista de ${escHtml(nomeClasse)}.
@@ -2756,7 +2775,8 @@ export async function mostrarTrocaTruque(callbackPosTroca = null, opcoes = {}) {
     </div>
   `, `<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
      <button class="btn btn-secondary" id="btn-pular-troca-truque">Não Trocar</button>
-     <button class="btn btn-primary" id="btn-confirmar-troca-truque" disabled>Confirmar Troca</button>`);
+     <button class="btn btn-primary" id="btn-confirmar-troca-truque" disabled>Confirmar Troca</button>`,
+  callbackPosTroca ? sair : null);
 
   const containerAdicionar = document.getElementById('troca-truque-adicionar-container');
   const confirmarBtn = document.getElementById('btn-confirmar-troca-truque');
@@ -2798,8 +2818,7 @@ export async function mostrarTrocaTruque(callbackPosTroca = null, opcoes = {}) {
 
   document.getElementById('btn-pular-troca-truque')?.addEventListener('click', () => {
     window.fecharModal();
-    if (callbackPosTroca) callbackPosTroca();
-    else renderFichaCompleta();
+    sair();
   });
 
   confirmarBtn?.addEventListener('click', () => {
@@ -2825,8 +2844,7 @@ export async function mostrarTrocaTruque(callbackPosTroca = null, opcoes = {}) {
       toast(`Trocou ${truqueRemover} por ${truqueAdicionar}`, 'success');
     }
     window.fecharModal();
-    if (callbackPosTroca) callbackPosTroca();
-    else renderFichaCompleta();
+    sair();
   });
 }
 /**

@@ -8,13 +8,15 @@
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ATRIBUTO_NOME_PARA_KEY, CLASSES_INFO, PERICIAS } from '../dados-classes.js';
 import { XP_POR_NIVEL } from '../levelup.js';
 import { _renderSyncIndicadorHtml } from '../pages/sheet.js';
+import { atributoDefinidoPorItem, atributoEfetivo, textosAtributoPorItem } from '../regras-atributos.js';
+import { magiasDeItens } from '../regras-magias-itens.js';
 import { conjuraPorAlgumaClasse } from '../regras-multiclasse-conjuracao.js';
 import { armadurasDoPersonagem, armasDoPersonagem } from '../regras-multiclasse-proficiencias.js';
 import { classesDe, nivelNa, reservasDadosVida, subclasseDe } from '../regras-multiclasse.js';
 import { possuiAlgumaMagia } from '../regras-origens-magia.js';
 import { ehProficienteEmSalvaguarda } from '../regras-salvaguardas.js';
 import { resolverPassivosTalentos } from '../talentos-effects.js';
-import { bonusProficiencia, calcBonusPericia, calcCA, calcMod, calcPVMulticlasse, coletarCAsAlternativas, conjuracoesPorClasse, equipamentoDeCA, escHtml, escolherCAAlternativa, fmtMod, getDeslocamento, getTamanho, semAcento } from '../utils.js';
+import { bonusProficiencia, calcBonusPericia, calcCA, calcMod, calcPVMulticlasse, calcSalvaguarda, coletarCAsAlternativas, conjuracoesPorClasse, equipamentoDeCA, escHtml, escolherCAAlternativa, fmtMod, getDeslocamento, getTamanho, semAcento } from '../utils.js';
 import { renderSecaoCaracteristicas, renderSecaoSubclasse, renderSecaoTracosEspecie } from './caracteristicas.js';
 import { getEstadoFuria, setupEventosSubclasseBarbaro } from './classes/barbaro.js';
 import { getEstadoInspiracaoBardo } from './classes/bardo.js';
@@ -35,6 +37,7 @@ import { setupEventosEdicao } from './edicao.js';
 import { ATRIBUTO_ESTILO, char, containerRef, definirPassivosTalentos, especiesCache, marcaAjusteManual, passivosTalentosCache, salvar, seloEdicao, seloPrerequisitoDispensado } from './estado.js';
 import { setupEventosHabilidades } from './habilidades.js';
 import { setupEventosDescanso, setupEventosHP, sincronizarBonusPvNiveis } from './hp-descanso.js';
+import { defesasDeItens } from '../regras-passivos-itens.js';
 import { getEstadoCarga, renderSecaoInventario, setupEventosInventarioSheet } from './inventario.js';
 import { renderSecaoMagias, setupEventosEspacosMagia } from './magias.js';
 import { migrarMulticlasse } from './migracoes.js';
@@ -211,6 +214,7 @@ export function renderFichaCompleta() {
   // nao muda agora -- o que muda e o que acontece ao equipar um Escudo.
   const caEmpatadas = caCandidatas.length >= 2
     && caCandidatas.every(c => c.valor === caCandidatas[0].valor);
+  // atributo-base: este modCon só alimenta o recálculo de PV de ficha corrompida (pv_max <= 0) com o valor-base; nesse ramo o marcador do bônus de item é zerado e sincronizarBonusPvNiveis reaplica o bônus no render seguinte
   const modCon = calcMod(char.atributos.constituicao);
   const iniciativa = getModIniciativa();
   const ataquesPorAcao = getAtaquesPorAcao();
@@ -238,6 +242,9 @@ export function renderFichaCompleta() {
   if (char.pv_max <= 0) {
     char.pv_max = calcPVMulticlasse(char, modCon);
     char.pv_atual = char.pv_max;
+    // O PV recalculado não inclui o bônus de item; zera o marcador para a
+    // próxima sincronização aplicá-lo de novo.
+    char.bonus_pv_itens_con_aplicado = 0;
     salvar();
   }
 
@@ -657,7 +664,7 @@ export function renderFichaCompleta() {
         <div class="stat-box">
           <div class="stat-label">Iniciativa</div>
           <div class="stat-value">${fmtMod(iniciativa.valor)}</div>
-          ${iniciativa.vantagem ? '<div style="font-size:0.65rem;color:var(--success);font-weight:700">Vantagem</div>' : ''}
+          ${iniciativa.vantagem ? `<div style="font-size:0.65rem;color:var(--success);font-weight:700"${iniciativa.fontesVantagem?.length ? ` title="${escHtml(iniciativa.fontesVantagem.join(', '))}"` : ''}>Vantagem</div>` : ''}
         </div>
         <div class="stat-box" ${_deslSobrecarga ? 'style="cursor:pointer;position:relative" onclick="window.avisarSobrecargaDeslocamento()"' : ''}>
           <div class="stat-label">Deslocamento</div>
@@ -827,8 +834,14 @@ export function renderFichaCompleta() {
       <div class="atributos-grid">
         ${ATRIBUTOS_KEYS.map(key => {
           const nome = ATRIBUTOS_NOMES[key];
-          const val = char.atributos[key];
+          const val = atributoEfetivo(char, key);
           const mod = calcMod(val);
+          // Marca o valor-base quando um item sintonizado define o atributo.
+          const porItem = atributoDefinidoPorItem(char, key);
+          const textosItem = porItem ? textosAtributoPorItem(porItem) : null;
+          const marcaItem = porItem
+            ? `<div class="atributo-por-item" data-atributo-item="${key}" title="${escHtml(textosItem.titulo)}" style="font-size:0.6rem;color:var(--text-muted)">${escHtml(textosItem.rotulo)}</div>`
+            : '';
           const isPrimario = info.atributo_primario?.includes(nome);
           // O selo 🔮 vale para o atributo de conjuração de QUALQUER classe
           // do personagem (livro:2075), não só o da inicial: num Clérigo/Mago
@@ -844,6 +857,7 @@ export function renderFichaCompleta() {
               <div class="atributo-nome" style="color:${attrStyle.cor || 'var(--text-muted)'}">${attrStyle.emoji || ''} ${nome}${seloEdicao(`atributos.${key}`)}</div>
               <div class="atributo-mod" style="color:${attrStyle.cor || 'var(--primary)'}">${fmtMod(mod)}</div>
               <div class="atributo-valor">${val}</div>
+              ${marcaItem}
               ${marcaAjusteManual(key)}
               ${isConjuracao ? '<div style="font-size:0.6rem;font-weight:700;color:var(--accent);margin-top:2px">🔮 Conjuração</div>' : ''}
             </div>`;
@@ -874,35 +888,42 @@ export function renderFichaCompleta() {
             _imunidades.push({ condicao: 'Enfeitiçado', fonte: 'Aura de Devoção' });
           }
         }
+        // Imunidades a condição de itens mágicos ativos (4C).
+        for (const i of defesasDeItens(char).imunidadesCondicao) {
+          if (!_imunidades.find(x => x.condicao === i.condicao)) _imunidades.push({ condicao: i.condicao, fonte: i.origem });
+        }
         return _imunidades.length > 0 ? `
           <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">
-            ${_imunidades.map(i => `<span class="badge" style="font-size:0.65rem;padding:2px 6px;background:var(--success);color:#fff" title="${i.fonte}">Imune: ${i.condicao} (${i.fonte})</span>`).join('')}
+            ${_imunidades.map(i => `<span class="badge" style="font-size:0.65rem;padding:2px 6px;background:var(--success);color:#fff" title="${escHtml(i.fonte)}">Imune: ${escHtml(i.condicao)} (${escHtml(i.fonte)})</span>`).join('')}
           </div>` : '';
       })()}
       <div class="salvaguardas-grid">
         ${ATRIBUTOS_KEYS.map(key => {
           const nome = ATRIBUTOS_NOMES[key];
-          const mod = calcMod(char.atributos[key]);
           // Quem é proficiente em salvaguarda mora em regras-salvaguardas.js.
           // Aqui se lia "char.salvaguardas_proficientes" direto, e por isso a
           // proficiência que Sobrevivente Disciplinado concede no nível 14 --
           // exibida como texto 250 linhas acima, em ficha.js:480 -- nunca
           // marcava salvaguarda nenhuma (issue #21).
           const proficiente = ehProficienteEmSalvaguarda(char, nome);
-          const bonus = mod + (proficiente ? prof : 0);
+          const bonus = calcSalvaguarda(char, key);
 
           const vd = calcVantagemDesvantagemSalvaguarda(nome);
           const temVant = vd.vantagens.length > 0;
           const temDesv = vd.desvantagens.length > 0;
           let indicadorSalv = '';
           if (vd.falhaAutomatica) {
-            indicadorSalv = `<span class="pericia-vd-badge falha-automatica" data-vd-info="Falha automática: ${vd.fontesFalha.join(', ')}">F</span>`;
+            indicadorSalv = `<span class="pericia-vd-badge falha-automatica" data-vd-info="Falha automática: ${vd.fontesFalha.map(escHtml).join(', ')}">F</span>`;
           } else if (temVant && temDesv) {
-            indicadorSalv = `<span class="pericia-vd-badge neutro" data-vd-info="Vantagem (${vd.vantagens.join(', ')}) e Desvantagem (${vd.desvantagens.join(', ')}) se anulam">—</span>`;
+            indicadorSalv = `<span class="pericia-vd-badge neutro" data-vd-info="Vantagem (${vd.vantagens.map(escHtml).join(', ')}) e Desvantagem (${vd.desvantagens.map(escHtml).join(', ')}) se anulam">—</span>`;
           } else if (temVant) {
-            indicadorSalv = `<span class="pericia-vd-badge vantagem" data-vd-info="Vantagem: ${vd.vantagens.join(', ')}">V</span>`;
+            indicadorSalv = `<span class="pericia-vd-badge vantagem" data-vd-info="Vantagem: ${vd.vantagens.map(escHtml).join(', ')}">V</span>`;
           } else if (temDesv) {
-            indicadorSalv = `<span class="pericia-vd-badge desvantagem" data-vd-info="Desvantagem: ${vd.desvantagens.join(', ')}">D</span>`;
+            indicadorSalv = `<span class="pericia-vd-badge desvantagem" data-vd-info="Desvantagem: ${vd.desvantagens.map(escHtml).join(', ')}">D</span>`;
+          }
+          // Vantagem condicional de item (4C): selo informativo, fora do cálculo de V/D.
+          if (vd.notas?.length) {
+            indicadorSalv += `<span class="pericia-vd-badge vantagem-nota" data-vd-info="${vd.notas.map(escHtml).join('; ')}">V*</span>`;
           }
           return `
             <div class="salva-item ${proficiente ? 'proficiente' : ''}">
@@ -952,11 +973,15 @@ export function renderFichaCompleta() {
             const temDesv = vd.desvantagens.length > 0;
             let indicador = '';
             if (temVant && temDesv) {
-              indicador = `<span class="pericia-vd-badge neutro" data-vd-info="Vantagem (${vd.vantagens.join(', ')}) e Desvantagem (${vd.desvantagens.join(', ')}) se anulam">—</span>`;
+              indicador = `<span class="pericia-vd-badge neutro" data-vd-info="Vantagem (${vd.vantagens.map(escHtml).join(', ')}) e Desvantagem (${vd.desvantagens.map(escHtml).join(', ')}) se anulam">—</span>`;
             } else if (temVant) {
-              indicador = `<span class="pericia-vd-badge vantagem" data-vd-info="Vantagem: ${vd.vantagens.join(', ')}">V</span>`;
+              indicador = `<span class="pericia-vd-badge vantagem" data-vd-info="Vantagem: ${vd.vantagens.map(escHtml).join(', ')}">V</span>`;
             } else if (temDesv) {
-              indicador = `<span class="pericia-vd-badge desvantagem" data-vd-info="Desvantagem: ${vd.desvantagens.join(', ')}">D</span>`;
+              indicador = `<span class="pericia-vd-badge desvantagem" data-vd-info="Desvantagem: ${vd.desvantagens.map(escHtml).join(', ')}">D</span>`;
+            }
+            // Vantagem condicional de item (4C): selo informativo, fora do cálculo de V/D.
+            if (vd.notas?.length) {
+              indicador += `<span class="pericia-vd-badge vantagem-nota" data-vd-info="${vd.notas.map(escHtml).join('; ')}">V*</span>`;
             }
             return `
             <div class="pericia-item" style="border-left:3px solid ${estilo.cor || 'var(--border)'}">
@@ -1021,7 +1046,7 @@ export function renderFichaCompleta() {
       classes de verdade (regras-multiclasse-conjuracao.js), Magia de Pacto
       inclusive.
     -->
-    ${(conjuraPorAlgumaClasse(char) || getTruquesExtraEstiloLuta() > 0 || char.iniciado_em_magia?.lista || (char.iniciado_em_magia_instancias?.length > 0) || possuiAlgumaMagia(char)) ? renderSecaoMagias() : ''}
+    ${(conjuraPorAlgumaClasse(char) || getTruquesExtraEstiloLuta() > 0 || char.iniciado_em_magia?.lista || (char.iniciado_em_magia_instancias?.length > 0) || possuiAlgumaMagia(char) || magiasDeItens(char).length > 0) ? renderSecaoMagias() : ''}
 
     <!-- Inventário -->
     ${renderSecaoInventario()}

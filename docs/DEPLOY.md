@@ -35,7 +35,8 @@ O passo 2 é o único com lógica própria:
    funcionar igual em desenvolvimento e em produção. **Não há reescrita de
    caminho** em lugar nenhum do pipeline.
 2. Um script Python varre `_dist/dados/**` e grava `site/dados-precache.json`
-   com URLs `../dados/….json`.
+   com URLs `../dados/….json`. `dados/livro-do-mestre/` fica de fora, exceto
+   `capitulo7/itens_magicos.json`; as pastas `_lotes` e `_mecanica` nunca entram.
 3. Outro varre `_dist/site/js/**` e grava `site/js-precache.json` com URLs
    `./js/….js`, imprimindo a contagem no log.
 4. Dois `sed` trocam `CACHE_VERSION = 0` no `sw.js` e `v0` no marcador
@@ -114,7 +115,9 @@ Os manifestos são **gerados por varredura**, então o caso comum não pede
 manutenção nenhuma:
 
 - Adicionar/remover JSON em `dados/` ou módulo em `site/js/**` → nada a fazer,
-  entram sozinhos no próximo deploy.
+  entram sozinhos no próximo deploy. Exceção: `dados/livro-do-mestre/` só pré-carrega
+  `capitulo7/itens_magicos.json` (`_lotes` e `_mecanica` nunca); outro arquivo dessa
+  pasta que o site passe a ler precisa ser incluído no filtro do passo `Prepare site`.
 - **Mover** `site/js/` ou `dados/` de lugar → aí sim, ajustar os `os.walk` e os
   `.replace(...)` no passo `Prepare site`, porque as URLs gravadas são relativas
   ao escopo do Service Worker (`/site/`).
