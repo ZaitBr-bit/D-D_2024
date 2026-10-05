@@ -18,7 +18,7 @@ async function fecharTudo(page) {
 /** Adiciona um item mágico pela categoria Itens Mágicos (com arma-base, se pedida) e fecha os modais. */
 async function adicionarItemMagico(page, busca, linha, base) {
   await clicarBotaoFicha(page, 'btn-add-inv', { esperar: '#lista-inv-cat' });
-  await page.locator('.filtro-inv-cat[data-cat="magicos"]').click();
+  await page.locator('#sel-inv-cat').selectOption('magicos');
   await page.locator('#busca-inv-cat').fill(busca);
   await page.locator('[data-item-magico]', { hasText: linha }).first().click();
   if (base) await page.selectOption('#base-item-magico', base);
@@ -218,7 +218,7 @@ test('re-renders do inventário não empilham modais do botão do amanhecer', as
 test('contador manual num item comum', async ({ context }) => {
   const { page, erros } = await abrirFicha(context, GUERREIRO, 'regras-cargas-4');
   await clicarBotaoFicha(page, 'btn-add-inv', { esperar: '#lista-inv-cat' });
-  await page.locator('.filtro-inv-cat[data-cat="equipamento"]').click();
+  await page.locator('#sel-inv-cat').selectOption('equipamento');
   await page.locator('#busca-inv-cat').fill('Corda');
   await page.locator('#lista-inv-cat .inv-item').first().click();
   await page.click('#btn-confirmar-add-item');
@@ -367,7 +367,7 @@ test('Escaravelho de Proteção: o aviso da última carga oferece Marcar como de
 /** Adiciona uma Corda e cria nela um contador manual de 3 cargas "todas no Descanso Longo". */
 async function cordaComContador(page) {
   await clicarBotaoFicha(page, 'btn-add-inv', { esperar: '#lista-inv-cat' });
-  await page.locator('.filtro-inv-cat[data-cat="equipamento"]').click();
+  await page.locator('#sel-inv-cat').selectOption('equipamento');
   await page.locator('#busca-inv-cat').fill('Corda');
   await page.locator('#lista-inv-cat .inv-item').first().click();
   await page.click('#btn-confirmar-add-item');

@@ -567,7 +567,7 @@ export async function renderStepEquipamento(el) {
     <div class="card mb-2">
       <div class="card-header"><h3>Inventário</h3>
         <div style="display:flex;gap:4px">
-          <button class="btn btn-sm btn-accent" id="btn-add-item">+ Item</button>
+          <button class="btn btn-sm btn-accent" id="btn-add-item">Loja</button>
           <button class="btn btn-sm btn-secondary" id="btn-add-custom">+ Custom</button>
         </div>
       </div>

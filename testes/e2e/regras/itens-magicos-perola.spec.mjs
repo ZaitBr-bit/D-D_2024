@@ -24,7 +24,7 @@ async function fecharTudo(page) {
 /** Adiciona a Pérola do Poder pela categoria Itens Mágicos e fecha os modais. */
 async function adicionarPerola(page) {
   await clicarBotaoFicha(page, 'btn-add-inv', { esperar: '#lista-inv-cat' });
-  await page.locator('.filtro-inv-cat[data-cat="magicos"]').click();
+  await page.locator('#sel-inv-cat').selectOption('magicos');
   await page.locator('#busca-inv-cat').fill('Pérola do Poder');
   await page.locator('[data-item-magico]', { hasText: 'Pérola do Poder' }).first().click();
   await page.click('#btn-confirmar-item-magico');

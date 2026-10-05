@@ -13,13 +13,43 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.1.1';
+export const VERSAO_ATUAL = '3.1.2';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.1.2',
+    data: '2026-10-05',
+    rotulo: 'Loja no celular',
+    resumo: 'O modal de adicionar item ficou utilizável no celular, com busca '
+      + 'em todas as categorias e ajuste ao teclado.',
+    melhorias: [
+      {
+        grupo: '✨ Melhorias',
+        itens: [
+          'Adicionar item: o modal tem altura fixa e só a lista rola; a '
+            + 'categoria virou um menu e o teclado do celular não cobre mais '
+            + 'os resultados.',
+          'Nova categoria "Todos": digite para buscar em armas, armaduras, '
+            + 'equipamento, ferramentas e itens mágicos de uma vez.',
+          'Os botões "+ Item" e "+ Local" agora se chamam "Loja" e '
+            + '"Novo Espaço".',
+        ],
+      },
+    ],
+    correcoes: [
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'A raridade de item mágico escolhida no filtro agora aparece '
+            + 'destacada.',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.1.1',
     data: '2026-10-05',

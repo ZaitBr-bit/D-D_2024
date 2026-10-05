@@ -27,11 +27,11 @@ test('ficha: modal "Adicionar Item" abre, lista as 7 categorias e a busca filtra
   await clicarBotaoFicha(page, 'btn-add-inv', { esperar: '#lista-inv-cat' });
 
   // As 5 categorias do brief, na ordem certa.
-  const filtros = page.locator('.filtro-inv-cat[data-cat]');
-  await expect(filtros).toHaveCount(7);
-  const categoriasEsperadas = ['armas', 'armaduras', 'consumiveis', 'municao', 'equipamento', 'ferramentas', 'magicos'];
-  const categoriasNoDOM = await filtros.evaluateAll(els => els.map(el => el.dataset.cat));
-  expect(categoriasNoDOM, 'categorias do filtro devem bater com as 7 do brief (a 6ª, Ferramentas, é da issue #120; a 7ª, Itens Mágicos, vem do acervo do Livro do Mestre), na mesma ordem').toEqual(categoriasEsperadas);
+  const filtros = page.locator('#sel-inv-cat option');
+  await expect(filtros).toHaveCount(8);
+  const categoriasEsperadas = ['todos', 'armas', 'armaduras', 'consumiveis', 'municao', 'equipamento', 'ferramentas', 'magicos'];
+  const categoriasNoDOM = await filtros.evaluateAll(els => els.map(el => el.value));
+  expect(categoriasNoDOM, 'categorias do filtro: "Todos" (busca em tudo) + as 7 do brief (a 6ª, Ferramentas, é da issue #120; a 7ª, Itens Mágicos, vem do acervo do Livro do Mestre), na mesma ordem').toEqual(categoriasEsperadas);
 
   // Toggle "Comprar" existe e começa desmarcado (preferência global só
   // fica marcada se salva antes -- contexto novo do teste, sem gravação prévia).
@@ -40,7 +40,7 @@ test('ficha: modal "Adicionar Item" abre, lista as 7 categorias e a busca filtra
   await expect(toggleComprar).not.toBeChecked();
 
   // Categoria inicial é "armas", com pelo menos um item renderizado.
-  await expect(page.locator('.filtro-inv-cat[data-cat="armas"]')).toHaveClass(/active/);
+  await expect(page.locator('#sel-inv-cat')).toHaveValue('armas');
   const listaCat = page.locator('#lista-inv-cat');
   await expect(listaCat.locator('.inv-item')).not.toHaveCount(0);
 
@@ -61,9 +61,9 @@ test('ficha: modal "Adicionar Item" abre, lista as 7 categorias e a busca filtra
 
   // Trocar de categoria re-renderiza: sai a Adaga (arma), entra um item
   // de equipamento de aventura, e o botão ativo muda.
-  await page.locator('.filtro-inv-cat[data-cat="equipamento"]').click();
-  await expect(page.locator('.filtro-inv-cat[data-cat="equipamento"]')).toHaveClass(/active/);
-  await expect(page.locator('.filtro-inv-cat[data-cat="armas"]')).not.toHaveClass(/active/);
+  await page.locator('#sel-inv-cat').selectOption('equipamento');
+  await expect(page.locator('#sel-inv-cat')).toHaveValue('equipamento');
+  await expect(page.locator('#sel-inv-cat')).not.toHaveValue('armas');
   await expect(listaCat, 'depois de trocar para "equipamento" a Adaga (categoria "armas") não deveria mais aparecer').not.toContainText('Adaga');
   await expect(listaCat.locator('.inv-item'), 'categoria "equipamento" deveria ter itens do equipamento de aventura').not.toHaveCount(0);
 
@@ -119,8 +119,8 @@ test('ficha: filtro de armas só aparece na categoria Armas, filtra por profici�
 
   // Trocar para a categoria Armaduras: a linha de filtro de armas é
   // exclusiva de Armas -- não deve nem ser renderizada (não basta escondê-la).
-  await page.locator('.filtro-inv-cat[data-cat="armaduras"]').click();
-  await expect(page.locator('.filtro-inv-cat[data-cat="armaduras"]')).toHaveClass(/active/);
+  await page.locator('#sel-inv-cat').selectOption('armaduras');
+  await expect(page.locator('#sel-inv-cat')).toHaveValue('armaduras');
   await expect(filtrosArma).toHaveCount(0);
 
   // Ainda em Armaduras, com Força 8 (abaixo do requisito "For 13" da Cota de
@@ -160,8 +160,8 @@ test('ficha: filtro de armaduras só aparece na categoria Armaduras, filtra por 
 
   await clicarBotaoFicha(page, 'btn-add-inv', { esperar: '#lista-inv-cat' });
 
-  await page.locator('.filtro-inv-cat[data-cat="armaduras"]').click();
-  await expect(page.locator('.filtro-inv-cat[data-cat="armaduras"]')).toHaveClass(/active/);
+  await page.locator('#sel-inv-cat').selectOption('armaduras');
+  await expect(page.locator('#sel-inv-cat')).toHaveValue('armaduras');
 
   // Cinco botões (Todas/Proficientes/Leve/Média/Pesada) -- espelha o filtro
   // de armas, mas com atributo PRÓPRIO (`data-filtro-armadura`, não
@@ -377,7 +377,7 @@ test('ficha: o botão de filtro ativo (armas e armaduras) tem estilo computado d
   // Trocar para Armaduras e repetir: a linha 238 do código (armaduras) tinha
   // o MESMO bug, de forma independente da linha 232 (armas) -- o teste
   // acima sozinho não pegaria uma regressão isolada nos botões de armadura.
-  await page.locator('.filtro-inv-cat[data-cat="armaduras"]').click();
+  await page.locator('#sel-inv-cat').selectOption('armaduras');
   await expect(page.locator('[data-filtro-armadura="todas"]')).toBeVisible();
   await expect(page.locator('[data-filtro-armadura="todas"]')).toHaveClass(/active/);
 

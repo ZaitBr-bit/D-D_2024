@@ -16,7 +16,7 @@ async function statBox(page, rotulo) {
 /** Abre o modal Adicionar Item na categoria Itens Mágicos e busca pelo texto. */
 async function abrirCategoriaMagicos(page, busca) {
   await clicarBotaoFicha(page, 'btn-add-inv', { esperar: '#lista-inv-cat' });
-  await page.locator('.filtro-inv-cat[data-cat="magicos"]').click();
+  await page.locator('#sel-inv-cat').selectOption('magicos');
   await expect(page.locator('#filtro-tipo-magico')).toBeVisible();
   await page.locator('#busca-inv-cat').fill(busca);
 }
@@ -153,7 +153,7 @@ test('seletor de itens mágicos: resposta atrasada da 1ª abertura não sobrescr
     await rota.continue();
   });
   await clicarBotaoFicha(page, 'btn-add-inv', { esperar: '#lista-inv-cat' });
-  await page.locator('.filtro-inv-cat[data-cat="magicos"]').click();
+  await page.locator('#sel-inv-cat').selectOption('magicos');
   await page.locator('#busca-inv-cat').fill('Anel de Proteção');
   const itens = page.locator('[data-item-magico]');
   await expect(itens.first()).toContainText('Anel de Proteção');

@@ -19,7 +19,7 @@ async function fecharTudo(page) {
 /** Adiciona um item mágico pela categoria Itens Mágicos (com arma-base, se pedida) e fecha os modais. */
 async function adicionarItemMagico(page, busca, linha, base) {
   await clicarBotaoFicha(page, 'btn-add-inv', { esperar: '#lista-inv-cat' });
-  await page.locator('.filtro-inv-cat[data-cat="magicos"]').click();
+  await page.locator('#sel-inv-cat').selectOption('magicos');
   await page.locator('#busca-inv-cat').fill(busca);
   await page.locator('[data-item-magico]', { hasText: linha }).first().click();
   if (base) await page.selectOption('#base-item-magico', base);

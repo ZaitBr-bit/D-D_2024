@@ -47,7 +47,7 @@ async function fecharTudo(page) {
 /** Adiciona um item mágico pela categoria Itens Mágicos (escolhendo a variante, se dada) e fecha os modais. */
 async function adicionarItem(page, busca, varianteId = null) {
   await clicarBotaoFicha(page, 'btn-add-inv', { esperar: '#lista-inv-cat' });
-  await page.locator('.filtro-inv-cat[data-cat="magicos"]').click();
+  await page.locator('#sel-inv-cat').selectOption('magicos');
   await page.locator('#busca-inv-cat').fill(busca);
   await page.locator('[data-item-magico]', { hasText: busca }).first().click();
   if (varianteId) await page.locator(`input[name="variante-magica"][value="${varianteId}"]`).check();

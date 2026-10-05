@@ -13,6 +13,10 @@ test('inventário: o botão de item customizado diz "+ Item Personalizado" e con
   }, 'regras-item-personalizado-rotulo');
   await assentar(page).catch(() => {});
 
+  // O botão do catálogo diz "Loja" (o modal tem o toggle Comprar); "+ Item"
+  // ao lado de "+ Item Personalizado" não distinguia os dois.
+  await expect(page.locator('#btn-add-inv')).toHaveText('Loja');
+
   const botao = page.locator('#btn-add-inv-custom');
   await expect(botao).toHaveText('+ Item Personalizado');
   await expect(page.locator('text=+ Custom')).toHaveCount(0);

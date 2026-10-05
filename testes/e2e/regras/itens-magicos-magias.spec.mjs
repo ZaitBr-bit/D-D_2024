@@ -19,7 +19,7 @@ async function fecharTudo(page) {
 /** Adiciona um item mágico pela categoria Itens Mágicos (com arma-base, se pedida) e fecha os modais. */
 async function adicionarItemMagico(page, busca, linha, base) {
   await clicarBotaoFicha(page, 'btn-add-inv', { esperar: '#lista-inv-cat' });
-  await page.locator('.filtro-inv-cat[data-cat="magicos"]').click();
+  await page.locator('#sel-inv-cat').selectOption('magicos');
   await page.locator('#busca-inv-cat').fill(busca);
   await page.locator('[data-item-magico]', { hasText: linha }).first().click();
   if (base) await page.selectOption('#base-item-magico', base);
@@ -220,7 +220,7 @@ test('Restauração Menor pelo Cajado da Cura: pede a condição, remove e cobra
 test('Proteção Contra Energia pelo Bandolim de Canaith: pede o tipo, registra a resistência e gasta o uso', async ({ context }) => {
   const { page, erros } = await abrirFicha(context, { classe: 'Bardo', nivel: 1, atributos: ATRIBUTOS_REGRAS }, 'regras-magias-itens-9');
   await clicarBotaoFicha(page, 'btn-add-inv', { esperar: '#lista-inv-cat' });
-  await page.locator('.filtro-inv-cat[data-cat="magicos"]').click();
+  await page.locator('#sel-inv-cat').selectOption('magicos');
   await page.locator('#busca-inv-cat').fill('Instrumento dos Bardos');
   await page.locator('[data-item-magico]', { hasText: 'Instrumento dos Bardos' }).first().click();
   await page.locator('label:has-text("Canaith") input[name="variante-magica"]').check();

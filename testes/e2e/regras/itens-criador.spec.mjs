@@ -23,15 +23,15 @@ test('criador: + Item abre o modal unificado, com a categoria Municao', async ({
   await expect(page.locator('#btn-add-armadura')).toHaveCount(0);
 
   await clicarBotaoFicha(page, 'btn-add-item', { esperar: '#lista-inv-cat' });
-  await expect(page.locator('[data-cat="municao"]'), 'categoria Municao nao existe no criador')
-    .toBeVisible({ timeout: 5000 });
+  await expect(page.locator('#sel-inv-cat option[value="municao"]'), 'categoria Municao nao existe no criador')
+    .toHaveCount(1);
 
   // O criador não oferece Itens Mágicos (a UI de inventário completa é só da ficha).
-  expect(await page.locator('.filtro-inv-cat[data-cat]').evaluateAll(els => els.map(el => el.dataset.cat)))
-    .toEqual(['armas', 'armaduras', 'consumiveis', 'municao', 'equipamento', 'ferramentas']);
-  await expect(page.locator('[data-cat="magicos"]')).toHaveCount(0);
+  expect(await page.locator('#sel-inv-cat option').evaluateAll(els => els.map(el => el.value)))
+    .toEqual(['todos', 'armas', 'armaduras', 'consumiveis', 'municao', 'equipamento', 'ferramentas']);
+  await expect(page.locator('#sel-inv-cat option[value="magicos"]')).toHaveCount(0);
 
-  await page.click('[data-cat="municao"]');
+  await page.selectOption('#sel-inv-cat', 'municao');
   await assentar(page);
   const primeiraMunicao = page.locator('#lista-inv-cat [data-add-cat]').first();
   await expect(primeiraMunicao, 'a lista de municao nasceu vazia').toBeVisible({ timeout: 5000 });
