@@ -8,6 +8,9 @@
 import { atributoEfetivo } from '../regras-atributos.js';
 import { aplicarDescansoRecursos, aplicarRecuperacaoInformada, itensComRecuperacaoPendente } from '../regras-recursos-itens.js';
 import { restaurarRecursosTalentos } from '../regras-cobertura.js';
+import { descansoCurtoArtifice, descansoLongoArtifice } from '../regras-artifice.js';
+import { removerItensExpirados } from '../regras-itens-temporarios.js';
+import { elixiresDoDescanso } from '../regras-subclasses-artifice.js';
 import { gastarDadosVida, nivelNa, reservasDadosVida, restaurarTodosDadosVida, subclasseDe, temClasse } from '../regras-multiclasse.js';
 import { trocasDoDescansoLongo, avisoTrocaTruqueForaDoLivro } from '../regras-preparo-magias.js';
 import { sincronizarBonusPvNivel } from '../levelup.js';
@@ -36,6 +39,7 @@ import { getEstadoRecursosGuardiao } from './classes/guardiao.js';
 import { getEstadoRecursosGuerreiro } from './classes/guerreiro.js';
 import { getEstadoRecursosLadino } from './classes/ladino.js';
 import { getEstadoRecursosMago } from './classes/mago.js';
+import { abrirCriarItensReplicados } from './classes/artifice.js';
 import { getEstadoRecursosMonge } from './classes/monge.js';
 import { getEstadoRecursosPaladino } from './classes/paladino.js';
 import { contextosDeClasse, superficieAtivaDaFicha, superficiesDaFicha } from './contexto-classe.js';
@@ -647,6 +651,7 @@ export function setupEventosDescanso() {
     restaurarRecursosTalentos(char, 'curto');
     // Usos de itens que voltam no Descanso Curto; cargas não voltam.
     aplicarDescansoRecursos(char, 'curto');
+    descansoCurtoArtifice(char);
 
     // Bárbaro: recupera 1 uso de Fúria no descanso curto
     // temClasse: char.classe e a classe INICIAL -- um Ladino 5/Barbaro 5
@@ -1039,6 +1044,13 @@ export function setupEventosDescanso() {
     // Restaurar todas as habilidades
     restaurarHabilidades('longo');
     restaurarRecursosTalentos(char, 'longo');
+    // Itens com expiração no Descanso Longo (Magia de Funileiro) somem; recursos do Artífice voltam.
+    const _expirados = removerItensExpirados(char, 'descanso_longo');
+    if (_expirados.length) toast(`Desapareceram: ${_expirados.join(', ')}`, 'info');
+    descansoLongoArtifice(char);
+    // Alquimista: os elixires do descanso anterior já sumiram (removerItensExpirados, acima); nascem os novos.
+    const _elixires = elixiresDoDescanso(char);
+    if (_elixires.length) toast(`Elixires criados: ${_elixires.join(', ')}`, 'info');
     // Recupera usos e cargas fixas dos itens; as cargas em dado ficam pendentes.
     const _pendentesItens = aplicarDescansoRecursos(char, 'longo');
 
@@ -1495,7 +1507,10 @@ export function setupEventosDescanso() {
     const temTrocaTruque = trocasLongo.some((entrada) => entrada.podeTrocarTruque)
       && truquesTrocaveis().length > 0;
 
-    if (temMaestria || temTrocaTalento || temTrocaMagia || temTrocaTruque) {
+    // Artífice 2+ com planos: oferecer a criação dos itens replicados.
+    const temReplicarArtifice = (nivelNa(char, 'Artífice') || 0) >= 2 && (char.recursos?.artifice?.planos || []).length > 0;
+
+    if (temMaestria || temTrocaTalento || temTrocaMagia || temTrocaTruque || temReplicarArtifice) {
       // Montar conteudo do modal conforme opcoes disponiveis
       let conteudoModal = `
         <div class="info-box success" style="margin-bottom:12px">
@@ -1583,6 +1598,15 @@ export function setupEventosDescanso() {
         `;
       }
 
+      if (temReplicarArtifice) {
+        conteudoModal += `
+          <p style="font-size:0.9rem">Deseja criar seus itens replicados?</p>
+          <p style="font-size:0.8rem;color:var(--text-muted)">
+            Como Artífice, você pode usar Replicar Item Mágico para criar itens a partir dos planos conhecidos após um Descanso Longo.
+          </p>
+        `;
+      }
+
       let botoesModal = '<button class="btn btn-secondary" id="btn-pular-troca-dl">Manter Tudo</button>';
       if (temMaestria) {
         botoesModal += '<button class="btn btn-accent" id="btn-trocar-maestrias-dl">Trocar Maestrias</button>';
@@ -1595,6 +1619,9 @@ export function setupEventosDescanso() {
       }
       if (temTrocaTruque) {
         botoesModal += '<button class="btn btn-primary" id="btn-trocar-truque-dl">Trocar Truque</button>';
+      }
+      if (temReplicarArtifice) {
+        botoesModal += '<button class="btn btn-accent" id="btn-replicar-dl">Criar Itens Replicados</button>';
       }
 
       if (_pendentesItens.length) {
@@ -1662,6 +1689,7 @@ export function setupEventosDescanso() {
             : mostrarTrocaMagiaConhecida(prox, { classe: entrada.classe }),
         })),
         { chave: 'truque', ativo: temTrocaTruque, abrir: (prox) => mostrarTrocaTruque(prox) },
+        { chave: 'replicar', ativo: temReplicarArtifice, abrir: (prox) => abrirCriarItensReplicados(prox) },
       ].filter(p => p.ativo);
       // Chave do PRIMEIRO passo de magia -- e onde o botao unico "Trocar
       // Magias" inicia a cadeia (item 5 do brief: um botao so, nunca um
@@ -1708,6 +1736,11 @@ export function setupEventosDescanso() {
         seguiuParaTrocas = true;
         window.fecharModal();
         iniciarTrocasAPartirDe('truque');
+      });
+      document.getElementById('btn-replicar-dl')?.addEventListener('click', () => {
+        seguiuParaTrocas = true;
+        window.fecharModal();
+        iniciarTrocasAPartirDe('replicar');
       });
     } else {
       toast('Descanso longo realizado! PV, espaços e habilidades restaurados', 'success');

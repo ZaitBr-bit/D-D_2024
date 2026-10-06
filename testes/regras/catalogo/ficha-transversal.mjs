@@ -112,12 +112,14 @@ export const EVOLUCAO_PERSONAGEM = [
 // (Criação de Personagens.md:416-421). `base` é a parte fixa da
 // fórmula do livro ("X + mod. de Constituição") — o modificador de
 // Constituição não entra aqui, é somado pelo motor que confrontar
-// esta tabela contra o app. 4 faixas, 12 classes ao todo (as 12 do
-// jogo, sem faltar nem repetir).
+// esta tabela contra o app. 4 faixas, 13 classes ao todo (as 12 do
+// jogo mais o Artífice de Tasha, d8 como Bardo; sem faltar nem repetir).
+// Fonte do d8 do Artífice: PDF Eberron: Forge of the Artificer, p. 10,
+// "Core Artificer Traits": Hit Point Die D8 per Artificer level.
 export const PV_NIVEL_1 = [
   { classes: ['Bárbaro'], base: 12 },
   { classes: ['Guardião', 'Guerreiro', 'Paladino'], base: 10 },
-  { classes: ['Bardo', 'Bruxo', 'Clérigo', 'Druida', 'Ladino', 'Monge'], base: 8 },
+  { classes: ['Artífice', 'Bardo', 'Bruxo', 'Clérigo', 'Druida', 'Ladino', 'Monge'], base: 8 },
   { classes: ['Feiticeiro', 'Mago'], base: 6 },
 ];
 
@@ -134,6 +136,6 @@ export const PV_NIVEL_1 = [
 export const PV_NIVEL_SEGUINTE = [
   { classes: ['Bárbaro'], incremento: 7 },
   { classes: ['Guardião', 'Guerreiro', 'Paladino'], incremento: 6 },
-  { classes: ['Bardo', 'Bruxo', 'Clérigo', 'Druida', 'Ladino', 'Monge'], incremento: 5 },
+  { classes: ['Artífice', 'Bardo', 'Bruxo', 'Clérigo', 'Druida', 'Ladino', 'Monge'], incremento: 5 },
   { classes: ['Feiticeiro', 'Mago'], incremento: 4 },
 ];

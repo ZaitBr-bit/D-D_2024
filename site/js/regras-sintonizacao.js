@@ -6,10 +6,23 @@
 // desenha o que este modulo responde.
 // ============================================================
 
+import { nivelNa } from './regras-multiclasse.js';
+import { tetoSintonizacaoArtifice } from './regras-artifice.js';
+
 // Equipamento.md:1198 -- "Voce pode estar sintonizado com no maximo tres
 // itens magicos ao mesmo tempo. Qualquer tentativa de sintonizar um quarto
 // item falha". O numero e do livro; nao e configuravel.
 export const TETO_SINTONIZACAO = 3;
+
+/**
+ * Teto de sintonização do personagem: 3, ou o do Artífice (4/5/6 nos níveis
+ * 10/14/18) pelo nível NA classe, não pelo nível total.
+ * @param {object} p Personagem.
+ * @returns {number}
+ */
+export function tetoSintonizacao(p) {
+  return Math.max(TETO_SINTONIZACAO, tetoSintonizacaoArtifice(nivelNa(p, 'Artífice') || 0));
+}
 
 /**
  * Os itens do inventario que estao sintonizados agora. So conta quem AINDA
@@ -35,5 +48,5 @@ export function podeSintonizar(p, idx) {
   const item = (p?.inventario || [])[idx];
   if (!item?.dados?.requer_sintonizacao) return false;
   if (item.sintonizado === true) return true;
-  return itensSintonizados(p).length < TETO_SINTONIZACAO;
+  return itensSintonizados(p).length < tetoSintonizacao(p);
 }

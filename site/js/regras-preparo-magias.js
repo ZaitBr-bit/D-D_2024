@@ -16,6 +16,7 @@
 // A TABELA DO LIVRO (PHB 2024, Magias.md:19-28), para comparação:
 //
 // | Classe     | Altere Quando Você…       | Número de Magias |
+// | Artífice   | Termina um Descanso Longo | Qualquer uma     |
 // | Bardo      | Avança um nível           | Uma              |
 // | Bruxo      | Avança um nível           | Uma              |
 // | Clérigo    | Termina um Descanso Longo | Qualquer uma     |
@@ -29,7 +30,7 @@
 //   1. Bardo, Bruxo e Feiticeiro ganham a troca no Descanso Longo, que o
 //      livro só dá ao avançar de nível. É uma conveniência A MAIS: a troca
 //      por nível continua existindo para eles.
-//   2. Clérigo, Druida e Mago passam a trocar UMA no Descanso Longo, e não
+//   2. Artífice (Tasha, "Alterando suas Magias Preparadas"), Clérigo, Druida e Mago passam a trocar UMA no Descanso Longo, e não
 //      "Qualquer uma". É mais RESTRITIVO que o livro, e uniformiza a regra:
 //      remontar a lista inteira é da subida de nível.
 //   3. Todos podem trocar QUANTAS quiserem ao subir de nível. O livro dá
@@ -52,9 +53,9 @@
 // ============================================================
 import { SUBCLASSES_CONJURADORAS } from './regras-conjuracao-subclasse.js';
 
-/** As oito classes conjuradoras que a tabela do livro cobre. */
+/** As classes conjuradoras que a tabela do livro cobre (as oito do Livro do Jogador mais o Artífice). */
 export const CLASSES_CONJURADORAS = [
-  'Bardo', 'Bruxo', 'Clérigo', 'Druida', 'Feiticeiro', 'Guardião', 'Mago', 'Paladino',
+  'Artífice', 'Bardo', 'Bruxo', 'Clérigo', 'Druida', 'Feiticeiro', 'Guardião', 'Mago', 'Paladino',
 ];
 
 /**
@@ -69,17 +70,18 @@ export function trocaNoDescansoLongo(classe) {
 }
 
 /**
- * Aviso exibido na troca de truque do Descanso Longo para quem não é Mago.
+ * Aviso exibido na troca de truque do Descanso Longo para quem não é Mago nem Artífice.
  * Pelo Livro do Jogador (Classes.md, Mago: "Truques"), só o Mago troca truque
  * ao completar um Descanso Longo; as demais classes trocam ao subir de nível.
+ * O Artífice também troca truque ao terminar um Descanso Longo (Conjuração, Artífice).
  * O app oferece a troca a todas por regra da casa (2026-08-13). Texto puro,
- * sem HTML; quem exibe escapa. Devolve '' para o Mago.
+ * sem HTML; quem exibe escapa. Devolve '' para o Mago e o Artífice.
  * @param {string} classe Classe da superfície da troca.
  * @returns {string}
  */
 export function avisoTrocaTruqueForaDoLivro(classe) {
-  if (classe === 'Mago') return '';
-  return 'Pelo livro, só o Mago troca truque no Descanso Longo; as outras classes trocam ao subir de nível. Esta troca é uma opção do app.';
+  if (classe === 'Mago' || classe === 'Artífice') return '';
+  return 'Pelo livro, só o Mago e o Artífice trocam truque no Descanso Longo; as outras classes trocam ao subir de nível. Esta troca é uma opção do app.';
 }
 
 /**

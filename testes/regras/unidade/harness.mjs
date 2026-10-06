@@ -8,6 +8,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { lacuna } from '../lacunas-conhecidas.mjs';
 import { TRACOS_BASICOS } from '../catalogo/classes.mjs';
+import { TRACOS_ARTIFICE } from '../catalogo/artifice.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 export const RAIZ = resolve(AQUI, '..', '..', '..');
@@ -342,7 +343,7 @@ export async function comLacuna(talento, teste, fn) {
 // .superpowers/sdd/2026-08-07-regras-classes-niveis/task-7-brief.md.
 // ============================================================
 
-// Os 15 valores de `tipo_pendencia` que subirDeNivel (site/js/levelup.js,
+// Os valores de `tipo_pendencia` que subirDeNivel (site/js/levelup.js,
 // linhas 948-1187) pode devolver. A lista é explícita, e o driver abaixo
 // LANÇA ao ver um tipo fora dela: se o app ganhar uma pendência nova, o
 // motor comportamental precisa parar e alguém precisa decidir a escolha
@@ -378,6 +379,8 @@ export const PENDENCIAS_CONHECIDAS = [
   // uma escada nova que semeie (um Gnomo do Bosque, por exemplo) precisa
   // encontrar o driver preparado, e nao um erro de "pendencia desconhecida".
   'subclasse_truque_substituto',
+  // Planos Conhecidos do Artífice (Replicar Item Mágico, nível 2+).
+  'planos_artifice',
 ];
 
 // Personagem-semente de cada classe. Diferente de charBase() (fixture
@@ -410,7 +413,8 @@ export async function personagemSemente(classe) {
   // procura --, semear a fixture com ele faria o motor comportamental
   // falhar no PV de toda a escada, escondendo a causa real atrás de 19
   // níveis de erro acumulado.
-  p.pv_max = TRACOS_BASICOS[classe].dadoVida + 2;
+  const tracos = TRACOS_BASICOS[classe] || (classe === 'Artífice' ? TRACOS_ARTIFICE : null);
+  p.pv_max = tracos.dadoVida + 2;
   p.pv_atual = p.pv_max;
   return p;
 }
@@ -559,6 +563,17 @@ function proximasPericias(p, quantidade, dadosClasses) {
   return candidatas.slice(0, quantidade);
 }
 
+/** Resposta canônica de 'planos_artifice': completa a lista de conhecidos até o máximo da tabela, sem trocar nenhum. */
+async function preencherPlanosArtifice(opcoes, p, classeData, nivelNaClasse) {
+  const { db, multiclasse } = await modulosApp();
+  const R = await import(pathToFileURL(resolve(RAIZ, 'site/js/regras-planos-artifice.js')).href);
+  const [pl, ac, ar] = await Promise.all([db.getPlanosArtifice(), db.getItensMagicos(), db.getArmaduras()]);
+  const futuro = { ...p, classes: multiclasse.classesDe(p).map((c) => (c.classe === 'Artífice' ? { ...c, nivel: nivelNaClasse, subclasse: opcoes.subclasse || c.subclasse } : c)) };
+  const ctxPlanos = { planos: pl.planos, acervo: ac.itens, armaduras: ar.armaduras, nivel: nivelNaClasse,
+    max: R.planosConhecidosMax(classeData.tabela_caracteristicas, futuro), armeiro: R.ehArmeiroAprimorado(futuro) };
+  opcoes.planos_artifice = R.completarCanonico(p.recursos?.artifice?.planos || [], ctxPlanos);
+}
+
 // Escolha canônica de cada pendência. Nenhum `default` mudo: um tipo sem
 // ramo cai no `throw` final, e escadaDeNivel já barrou os desconhecidos
 // antes de chegar aqui.
@@ -582,6 +597,10 @@ async function resolverPendencia(tipo, opcoes, p, classeData, ATRIBUTOS,
     ATRIBUTOS.find((a) => (p.atributos[a] ?? 10) <= 18) || 'constituicao';
 
   switch (tipo) {
+    case 'planos_artifice': {
+      await preencherPlanosArtifice(opcoes, p, classeData, nivel);
+      return;
+    }
     case 'subclasse':
       opcoes.subclasse = subclasseAlvo;
       return;
@@ -962,6 +981,10 @@ async function responderPendencia(opcoes, tipo, personagem, classeData, nomeClas
   const novoNivel = multiclasse.nivelNa(personagem, classeQueSobe) + 1;
 
   switch (tipo) {
+    case 'planos_artifice': {
+      await preencherPlanosArtifice(opcoes, personagem, classeData, novoNivel);
+      return;
+    }
     case 'subclasse':
       opcoes.subclasse = (classeData?.subclasses || [])
         .filter((sc) => !sc.nome.toLowerCase().startsWith('subclasses de'))[0]?.nome;

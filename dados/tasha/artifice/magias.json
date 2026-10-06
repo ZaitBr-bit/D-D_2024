@@ -1,0 +1,20 @@
+{
+  "fonte": "tasha",
+  "magias": [
+    {
+      "nome": "Servo Homúnculo",
+      "circulo": 2,
+      "escola": "Invocação",
+      "tempo_conjuracao": "1 hora ou Ritual",
+      "alcance": "3 metros",
+      "componentes": "V, S, M (uma gema que valha 100+ PO)",
+      "duracao": "Instantânea",
+      "descricao": "Você convoca um homúnculo especial em um espaço desocupado ao alcance. Essa criatura usa o bloco de estatísticas do Servo Homúnculo. Se você já tiver um homúnculo desta magia, ele é substituído pelo novo. Você determina a aparência do homúnculo, como um pássaro de aparência mecânica, um frasco alado ou um caldeirão em miniatura animado.\n\n**Combate.** O homúnculo é um aliado seu e dos seus aliados. Em combate, ele compartilha a sua contagem de Iniciativa, mas age logo depois de você. Ele obedece aos seus comandos (sem exigir ação sua). Se você não der nenhum, ele realiza a ação Esquivar e usa seu movimento para evitar perigo.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. Use o círculo do espaço de magia como o círculo da magia no bloco de estatísticas.",
+      "classes": [
+        "Artífice"
+      ],
+      "fonte": "tasha"
+    }
+  ]
+}

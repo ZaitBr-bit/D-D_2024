@@ -40,7 +40,7 @@ const { utils, levelup, dadosClasses, store } = await modulosApp();
 // talentos/antecedentes, que confere bijeção catálogo × dados/). Sem
 // isto, apagar entradas de MODIFICADORES_ATRIBUTO, EVOLUCAO_PERSONAGEM ou
 // PV_NIVEL_1/PV_NIVEL_SEGUINTE deixaria a suíte verde, e as contagens "30/30
-// valores", "20/20 níveis" e "12 classes" do README ficariam falsas em
+// valores", "20/20 níveis" e "13 classes" do README ficariam falsas em
 // silêncio. Fica AQUI, e não em completude.test.mjs, porque aquele arquivo
 // é cabeado especificamente para os catálogos de talentos/antecedentes
 // (importa CATALOGO_TALENTOS/CATALOGO_ANTECEDENTES/LACUNAS e confronta
@@ -202,7 +202,7 @@ test('calcularNivelPorXP em XP fora da faixa do livro (casos de borda)', () => {
 // modificadores de Constituição -5 a +10 (o intervalo alcançável pelo app:
 // atributo mínimo 1 dá mod -5; atributo máximo 30, via Dádivas Épicas, dá
 // mod +10 -- ver comentário de MODIFICADORES_ATRIBUTO no catálogo).
-test('PV de nível 1 bate com a tabela do livro nas 12 classes', () => {
+test('PV de nível 1 bate com a tabela do livro nas 13 classes', () => {
   for (const faixa of PV_NIVEL_1) {
     for (const classe of faixa.classes) {
       const info = dadosClasses.CLASSES_INFO[classe];
@@ -230,11 +230,11 @@ test('PV de nível 1 bate com a tabela do livro nas 12 classes', () => {
 // MESMAS quatro faixas de classes de PV_NIVEL_1, mas com o incremento fixo
 // por nível em vez do dado de vida completo.
 
-// calcPVTotal varrido por EXAUSTÃO nas 12 classes × níveis 1 a 20 × mod CON
-// -5 a +10 (12 × 20 × 16 = 3.840 combinações). O valor esperado reproduz a fórmula do
+// calcPVTotal varrido por EXAUSTÃO nas 13 classes × níveis 1 a 20 × mod CON
+// -5 a +10 (13 × 20 × 16 = 4.160 combinações). O valor esperado reproduz a fórmula do
 // livro ponto a ponto: PV nível 1 (dado de vida + mod CON) mais, para cada
 // nível adicional, o incremento fixo da tabela + mod CON.
-test('calcPVTotal bate com a tabela "Pontos de Vida Fixos por Classe" (12 classes × níveis 1-20 × mod CON -5 a +10)', () => {
+test('calcPVTotal bate com a tabela "Pontos de Vida Fixos por Classe" (13 classes × níveis 1-20 × mod CON -5 a +10)', () => {
   for (const faixa of PV_NIVEL_SEGUINTE) {
     for (const classe of faixa.classes) {
       const info = dadosClasses.CLASSES_INFO[classe];
@@ -337,12 +337,12 @@ test('CA base sem armadura é 10 + mod. Destreza, para toda Destreza de 1 a 30',
 // mesmo que uma classe conjuradora perdesse `atributo_conjuracao` (ela
 // simplesmente sairia da varredura, `calcCDMagia` passaria a devolver 0
 // para ela sem que nada aqui percebesse) ou ganhasse uma a mais por engano.
-// As 8 classes abaixo são a lista fechada conferida contra CLASSES_INFO
+// As 9 classes abaixo (as 8 do livro mais o Artífice de Tasha) são a lista fechada conferida contra CLASSES_INFO
 // (dados-classes.js): Bardo, Bruxo, Clérigo, Druida, Feiticeiro, Guardião,
-// Mago e Paladino -- as mesmas "8 classes conjuradoras" que o README e o
+// Mago e Paladino -- as "8 classes conjuradoras" do livro (mais o Artífice) que o README e o
 // plano deste domínio afirmam.
 const CLASSES_CONJURADORAS_ESPERADAS = [
-  'Bardo', 'Bruxo', 'Clérigo', 'Druida', 'Feiticeiro', 'Guardião', 'Mago', 'Paladino',
+  'Artífice', 'Bardo', 'Bruxo', 'Clérigo', 'Druida', 'Feiticeiro', 'Guardião', 'Mago', 'Paladino',
 ].sort();
 
 test('CD e ataque de magia batem com 8+BP+mod. / BP+mod., em toda classe conjuradora × nível 1-20 × atributo de conjuração 1-30', () => {

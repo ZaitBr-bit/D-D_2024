@@ -1,0 +1,182 @@
+{
+  "fonte": "tasha",
+  "criaturas": [
+    {
+      "id": "defensor-de-aco",
+      "nome": "Defensor de Aço",
+      "nome_en": "Steel Defender",
+      "tipo": "Construto Médio, Neutro",
+      "ca": {
+        "base": 12,
+        "soma": [
+          "mod_int"
+        ]
+      },
+      "pv": {
+        "base": 5,
+        "por_nivel_artifice": 5,
+        "dado_vida": "d8"
+      },
+      "deslocamento": "12 metros",
+      "atributos": {
+        "forca": 14,
+        "destreza": 12,
+        "constituicao": 14,
+        "inteligencia": 4,
+        "sabedoria": 10,
+        "carisma": 6
+      },
+      "imunidades": "Venenoso; Enfeitiçado, Exaustão, Envenenado",
+      "sentidos": "Visão no Escuro 18 metros; Percepção Passiva 10",
+      "idiomas": "Entende os idiomas que você conhece",
+      "tracos": [
+        {
+          "nome": "Vínculo de Aço",
+          "descricao": "Some seu Bônus de Proficiência a qualquer teste de atributo ou salvaguarda que o defensor fizer."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Golpe Reforçado por Energia",
+          "ataque": "magia",
+          "alcance": "1,5 metro",
+          "dano": {
+            "dado": "1d8",
+            "soma": [
+              "2",
+              "mod_int"
+            ],
+            "tipo": "Energético"
+          }
+        },
+        {
+          "nome": "Reparar (3/Dia)",
+          "usos": 3,
+          "recupera": "descanso_longo",
+          "descricao": "O defensor, ou um Construto ou objeto que ele possa ver a até 1,5 metro, recupera 2d8 + seu modificador de Inteligência Pontos de Vida."
+        }
+      ],
+      "reacoes": [
+        {
+          "nome": "Desviar Ataque",
+          "descricao": "Gatilho: uma criatura que o defensor possa ver a até 1,5 metro faz uma jogada de ataque contra uma criatura que não seja o defensor. Resposta: o atacante tem Desvantagem nessa jogada de ataque."
+        }
+      ],
+      "pagina_pdf": 26
+    },
+    {
+      "id": "canhao-mistico",
+      "nome": "Canhão Místico",
+      "nome_en": "Eldritch Cannon",
+      "tipo": "Objeto Pequeno ou Miúdo",
+      "ca": {
+        "base": 18,
+        "soma": []
+      },
+      "pv": {
+        "base": 0,
+        "por_nivel_artifice": 5
+      },
+      "atributos": {
+        "forca": 10,
+        "destreza": 10,
+        "constituicao": 10,
+        "inteligencia": 10,
+        "sabedoria": 10,
+        "carisma": 10
+      },
+      "imunidades": "Venenoso, Psíquico",
+      "acoes": [
+        {
+          "nome": "Lança-Chamas",
+          "salvaguarda": "Destreza",
+          "dano": {
+            "dado": "2d8",
+            "soma": [],
+            "tipo": "Ígneo"
+          },
+          "area": "Cone de 4,5 metros"
+        },
+        {
+          "nome": "Balista de Energia",
+          "ataque": "magia",
+          "alcance": "36 metros",
+          "dano": {
+            "dado": "2d8",
+            "soma": [],
+            "tipo": "Energético"
+          }
+        },
+        {
+          "nome": "Protetor",
+          "pv_temporarios": {
+            "dado": "1d8",
+            "soma": [
+              "mod_int_min1"
+            ]
+          },
+          "area": "3 metros"
+        }
+      ],
+      "pagina_pdf": 24
+    },
+    {
+      "id": "servo-homunculo",
+      "nome": "Servo Homúnculo",
+      "nome_en": "Homunculus Servant",
+      "tipo": "Construto Miúdo, Neutro",
+      "ca": {
+        "base": 13,
+        "soma": []
+      },
+      "pv": {
+        "base": 5,
+        "por_nivel_magia": 5,
+        "dado_vida": "d4"
+      },
+      "deslocamento": "6 metros, Voo 9 metros",
+      "atributos": {
+        "forca": 4,
+        "destreza": 15,
+        "constituicao": 12,
+        "inteligencia": 10,
+        "sabedoria": 10,
+        "carisma": 7
+      },
+      "imunidades": "Venenoso; Exaustão, Envenenado",
+      "sentidos": "Visão no Escuro 18 metros; Percepção Passiva 10",
+      "idiomas": "Telepatia 1,5 km (só com você)",
+      "tracos": [
+        {
+          "nome": "Evasão",
+          "descricao": "Se o homúnculo for submetido a um efeito que permita uma salvaguarda de Destreza para sofrer só metade do dano, ele não sofre dano se for bem-sucedido e sofre metade se falhar. Não funciona com a condição Incapacitado."
+        },
+        {
+          "nome": "Vínculo Mágico",
+          "descricao": "Some o círculo da magia a qualquer teste de atributo ou salvaguarda que o homúnculo fizer."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Golpe de Energia",
+          "ataque": "magia",
+          "alcance": "1,5 metro ou 9 metros",
+          "dano": {
+            "dado": "1d6",
+            "soma": [
+              "circulo_magia"
+            ],
+            "tipo": "Energético"
+          }
+        }
+      ],
+      "reacoes": [
+        {
+          "nome": "Canalizar Magia",
+          "descricao": "Gatilho: você conjura uma magia de alcance Toque com o homúnculo a até 36 metros de você. Resposta: o homúnculo entrega a magia pelo próprio toque."
+        }
+      ],
+      "pagina_pdf": 29
+    }
+  ]
+}

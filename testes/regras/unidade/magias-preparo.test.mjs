@@ -61,7 +61,7 @@ const { trocaNoDescansoLongo, trocaAoAvancarNivel } = await import(
 
 const LIVRO_POR_CLASSE = new Map(TROCA_POR_CLASSE.map((l) => [l.classe, l]));
 
-test('sanity: a decisão de produto cobre as mesmas 8 classes da tabela do livro', () => {
+test('sanity: a decisão de produto cobre as mesmas 9 classes da tabela do livro', () => {
   assert.deepEqual(
     DECISAO_PRODUTO.map((d) => d.classe).sort(),
     TROCA_POR_CLASSE.map((l) => l.classe).sort(),

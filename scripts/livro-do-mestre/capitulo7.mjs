@@ -137,7 +137,7 @@ function textoDaTabelaAleatoria(t) {
 }
 
 /** Erros de texto: inglês residual, unidade imperial e marcação que o site não renderiza. */
-function verificarTexto(t, onde) {
+export function verificarTexto(t, onde) {
   const e = [];
   const ing = t.match(RE_INGLES);
   if (ing) e.push(`${onde}: resíduo em inglês "${ing[0]}"`);
@@ -158,7 +158,7 @@ function verificarTabela(tab, onde) {
 }
 
 /** Erros de esquema e de texto de um item do acervo. */
-function verificarItem(i, onde) {
+export function verificarItem(i, onde) {
   const e = [];
   for (const c of ['nome', 'nome_en', 'tipo', 'raridade', 'linha_tipo', 'descricao']) {
     if (typeof i[c] !== 'string' || !i[c].trim()) e.push(`${onde}: campo "${c}" vazio`);

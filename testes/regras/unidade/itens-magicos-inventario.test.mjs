@@ -36,9 +36,9 @@ async function html(inventarioItens, extra = {}) {
   return inventario.renderSecaoInventario();
 }
 
-test('getItensMagicos carrega o acervo do Livro do Mestre', async () => {
+test('getItensMagicos carrega o acervo do Livro do Mestre (itens de expansão, com fonte, são mesclados à parte)', async () => {
   const acervo = await db.getItensMagicos();
-  assert.equal(acervo.itens.length, ACERVO.length);
+  assert.equal(acervo.itens.filter((i) => !i.fonte).length, ACERVO.length);
 });
 
 test('Anel de Proteção: selos de raridade, sintonização e efeitos inativos sem sintonizar', async () => {

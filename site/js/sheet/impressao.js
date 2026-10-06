@@ -13,7 +13,7 @@ import { rotuloRecursosImpressao } from '../regras-recursos-itens.js';
 import { bonusProficiencia, calcAtaqueMagia, calcCDMagia, calcBonusPericia, calcCA, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcMod, calcPercepcaoPassiva, calcSalvaguarda, conjuracoesPorClasse, escHtml, fmtMod, getDeslocamento, getTamanho, mdParaHtml, circuloSuperiorHtml, toast } from '../utils.js';
 import { SUBTRACOS_ESPECIE, gerarTracoSinteticoEspecie } from './caracteristicas.js';
 import { getEstadoRecursosBruxo } from './classes/bruxo.js';
-import { forcaPrimordialAtiva, getAtaquesPorAcao, getDeslocamentoFinal, getModIniciativa } from './combate.js';
+import { forcaPrimordialAtiva, getAtaquesPorAcao, getDeslocamentoFinal, getModIniciativa, textoDadosExtrasIniciativa } from './combate.js';
 import { visaoNoEscuroDaEspecie } from './condicoes.js';
 import { defesasDeItens, ROTULO_SENTIDO, sentidosDeItens } from '../regras-passivos-itens.js';
 import { char, classeData, especiesCache, indiceMagiasCache, passivosTalentosCache, seloPrerequisitoDispensado, talentosCache } from './estado.js';
@@ -377,7 +377,7 @@ export async function gerarHtmlImpressao() {
   // --- Stats de combate ---
   let statsHtml = `
     <div class="print-stat-box"><div class="print-stat-label">CA</div><div class="print-stat-value">${ca}</div></div>
-    <div class="print-stat-box"><div class="print-stat-label">Iniciativa</div><div class="print-stat-value">${fmtMod(iniciativa.valor)}</div></div>
+    <div class="print-stat-box"><div class="print-stat-label">Iniciativa</div><div class="print-stat-value">${fmtMod(iniciativa.valor)}${escHtml(textoDadosExtrasIniciativa(iniciativa))}</div></div>
     <div class="print-stat-box"><div class="print-stat-label">Deslocamento</div><div class="print-stat-value">${_deslocamento}</div></div>
     <div class="print-stat-box"><div class="print-stat-label">Ataques</div><div class="print-stat-value">${ataquesPorAcao}</div></div>
     <div class="print-stat-box"><div class="print-stat-label">Proficiência</div><div class="print-stat-value">+${prof}</div></div>

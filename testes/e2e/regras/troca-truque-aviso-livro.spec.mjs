@@ -1,6 +1,6 @@
 // ============================================================
 // Issue #128 -- o modal do Descanso Longo e o modal "Trocar Truque" avisam
-// que, pelo livro, só o Mago troca truque no Descanso Longo.
+// que, pelo livro, só o Mago e o Artífice trocam truque no Descanso Longo.
 // ============================================================
 import { test, expect } from '@playwright/test';
 import { abrirFicha, assentar, clicarBotaoFicha, ATRIBUTOS_REGRAS } from './helpers-regras.mjs';
@@ -23,11 +23,11 @@ test('Clérigo: o modal do Descanso Longo e o de Trocar Truque trazem o aviso', 
   const { page } = await abrirFicha(context, CLERIGO_3, 'regras-issue-128-a');
   await clicarBotaoFicha(page, 'btn-descanso-longo', { esperar: '#modal-overlay' });
   await assentar(page);
-  await expect(page.locator('#modal-corpo')).toContainText('só o Mago troca truque no Descanso Longo');
+  await expect(page.locator('#modal-corpo')).toContainText('só o Mago e o Artífice trocam truque no Descanso Longo');
 
   await page.locator('#btn-trocar-truque-dl').click();
   await assentar(page);
-  await expect(page.locator('#modal-corpo').last()).toContainText('só o Mago troca truque no Descanso Longo');
+  await expect(page.locator('#modal-corpo').last()).toContainText('só o Mago e o Artífice trocam truque no Descanso Longo');
 });
 
 test('Mago: nenhum dos dois modais traz o aviso (contraste)', async ({ context }) => {
@@ -35,11 +35,11 @@ test('Mago: nenhum dos dois modais traz o aviso (contraste)', async ({ context }
   await clicarBotaoFicha(page, 'btn-descanso-longo', { esperar: '#modal-overlay' });
   await assentar(page);
   await expect(page.locator('#btn-trocar-truque-dl')).toBeVisible();
-  await expect(page.locator('#modal-corpo')).not.toContainText('só o Mago troca truque');
+  await expect(page.locator('#modal-corpo')).not.toContainText('só o Mago e o Artífice trocam truque');
 
   await page.locator('#btn-trocar-truque-dl').click();
   await assentar(page);
-  await expect(page.locator('#modal-corpo').last()).not.toContainText('só o Mago troca truque');
+  await expect(page.locator('#modal-corpo').last()).not.toContainText('só o Mago e o Artífice trocam truque');
 });
 
 test('Clérigo 3/Mago 3: aviso só na troca feita pela superfície do Clérigo', async ({ context }) => {
@@ -54,5 +54,5 @@ test('Clérigo 3/Mago 3: aviso só na troca feita pela superfície do Clérigo',
   await assentar(page);
   // A superfície ativa por padrão é a primeira (Clérigo): o parágrafo do modal nomeia a Clérigo e traz o aviso.
   await expect(page.locator('#modal-corpo')).toContainText('lista de Clérigo');
-  await expect(page.locator('#modal-corpo')).toContainText('só o Mago troca truque no Descanso Longo');
+  await expect(page.locator('#modal-corpo')).toContainText('só o Mago e o Artífice trocam truque no Descanso Longo');
 });

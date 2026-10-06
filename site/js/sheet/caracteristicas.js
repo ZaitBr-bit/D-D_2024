@@ -5,6 +5,7 @@
 import { atributoEfetivo } from '../regras-atributos.js';
 import { bonusProficiencia, calcMod, detectarRecarga, ehHabilidadeAtiva, escHtml, mdParaHtml } from '../utils.js';
 import { char, especiesCache } from './estado.js';
+import { seloFonte } from '../fontes.js';
 import { contextosDeClasse } from './contexto-classe.js';
 import { detectarUsosMaximos, lerUsoHabilidade, renderFeatureItem } from './habilidades.js';
 
@@ -94,7 +95,7 @@ function renderSubclasseDeUmaClasse(ctx) {
 
   return `
     <div class="card print-break-before">
-      <div class="card-header"><h2>Subclasse — ${escHtml(ctx.subclasse)}</h2></div>
+      <div class="card-header"><h2>Subclasse — ${escHtml(ctx.subclasse)}${seloFonte(sc.fonte)}</h2></div>
       ${featsOrdenados.map(f => renderFeatureItem(f, 'subclasse', ctx)).join('')}
     </div>
   `;

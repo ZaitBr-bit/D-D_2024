@@ -13,11 +13,15 @@ import {
 import { resolvedorDaLinha, opcoesDaLinhaAsync } from './regras-subclasse-escolhas.js';
 import {
   renderCardEscolhaClasse, renderCardGanhosNivel, renderCardSubclasse, renderCardASI,
-  renderCardEscolhasClasse, renderCardMagias, renderCardManobrasGuerreiro,
+  renderCardEscolhasClasse, renderCardMagias, renderCardManobrasGuerreiro, renderCardPlanosArtifice,
   renderCardProficienciasClasseNova, renderCardOrdemClasseNova, renderCardRitualBonus, renderCardRevisao,
   OPCOES_ESTILO_LUTA_BASE, motivoBloqueio
 } from './levelup-cards.js';
 import { montarSeletor, montarTroca } from './ui-opcoes.js';
+import { resolverPlano, candidatosGenerico } from './regras-planos-artifice.js';
+import { opcoesDeBase } from './itens-magicos-catalogo.js';
+import { deItemMagicoAcervo, deItemMinimo, deBasesItem } from './opcoes-artifice.js';
+import { ligarSelosFonte } from './fontes.js';
 import { deArmas, deEstilosLuta, deMagias, deManobras, deTalentos, motivoPreRequisito, rotuloPericia } from './opcoes-dominio.js';
 import { collectOpcoes, validateAll } from './levelup-validations.js';
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, PERICIAS } from './dados-classes.js';
@@ -161,6 +165,9 @@ function renderModal(ctx, state, caches) {
     case 'manobras_guerreiro':
       conteudo = renderCardManobrasGuerreiro(ctx, state);
       break;
+    case 'planos_artifice':
+      conteudo = renderCardPlanosArtifice(ctx, state);
+      break;
     case 'proficiencias_classe_nova':
       conteudo = renderCardProficienciasClasseNova(ctx, state);
       break;
@@ -204,6 +211,7 @@ function renderModal(ctx, state, caches) {
   // Bind de navegação e eventos do step
   bindNavegacao(ctx, state, caches);
   bindEventosStep(ctx, state, step, caches);
+  ligarSelosFonte(document.getElementById('modal-corpo'));
 }
 
 function renderizarModalPrincipal(titulo, corpoHtml, acoesHtml) {
@@ -450,6 +458,9 @@ function salvarStateDoDOM(ctx, state, step) {
       // escolha.
       break;
     }
+    case 'planos_artifice':
+      // state.planosArtifice é gravado pelos eventos do passo; nada a ler do DOM.
+      break;
     case 'proficiencias_classe_nova': {
       // Os dois selects são NATIVOS e continuam no DOM enquanto o step
       // fica aberto -- mesmo padrão de 'escolha_subclasse' logo acima.
@@ -515,6 +526,7 @@ function bindEventosStep(ctx, state, step, caches) {
     case 'escolhas_classe': bindEventosEscolhasClasse(ctx, state); break;
     case 'selecao_magias': bindEventosMagias(ctx, state); break;
     case 'manobras_guerreiro': bindEventosManobrasGuerreiro(ctx, state); break;
+    case 'planos_artifice': bindEventosPlanosArtifice(ctx, state, caches); break;
     case 'proficiencias_classe_nova': bindEventosProficienciasClasseNova(ctx, state); break;
     case 'ordem_classe_nova': bindEventosOrdemClasseNova(ctx, state); break;
     case 'ritual_bonus_proficiencia': bindEventosRitualBonusProficiencia(ctx, state); break;
@@ -2059,6 +2071,124 @@ function bindEventosMagias(ctx, state) {
   }
 }
 
+// --- Planos de Item Mágico (Artífice) ---
+
+/**
+ * Eventos do passo de Planos de Item Mágico: remover um conhecido e
+ * adicionar um novo (escolha do plano; para genérico, do item concreto;
+ * para item com base, da arma/armadura). Cada mudança regrava
+ * state.planosArtifice e redesenha o passo.
+ */
+function bindEventosPlanosArtifice(ctx, state, caches) {
+  const pa = ctx.planosArtifice;
+  if (!pa) return;
+  if (!state.planosArtifice) state.planosArtifice = pa.atuais.map((c) => ({ ...c }));
+  const redesenhar = () => renderModal(ctx, state, caches);
+  document.querySelectorAll('[data-plano-remover]').forEach((btn) => btn.addEventListener('click', () => {
+    state.planosArtifice = state.planosArtifice.filter((c) => c.id !== btn.dataset.planoRemover);
+    redesenhar();
+  }));
+  document.getElementById('btn-plano-adicionar')?.addEventListener('click', () => abrirEscolhaPlano(pa, state, redesenhar));
+}
+
+/**
+ * Sub-modal de escolha de um plano: cards dos disponíveis e, conforme o plano,
+ * cards do item genérico e da arma/armadura-base.
+ */
+function abrirEscolhaPlano(pa, state, aoConcluir) {
+  const usados = new Set(state.planosArtifice.map((c) => `${c.item_id}|${c.variante_id || ''}`));
+  // Opções de card dos planos: item resolvido no acervo; plano genérico vira card "escolha o item".
+  const opcoesPlano = pa.disponiveis.map((p) => {
+    const alvo = p.generico ? null : resolverPlano(p, pa.acervo);
+    const ocupado = !p.generico && usados.has(`${p.item_id}|${p.variante_id || ''}`);
+    const bloqueado = ocupado ? { motivo: 'plano já conhecido' } : null;
+    const tags = [`nível ${p.nivel_minimo}+`];
+    if (alvo) return { ...deItemMagicoAcervo(alvo, { id: p.id, bloqueado }), tags };
+    if (p.generico) return { ...deItemMinimo(p.id, p.nome || p.nome_en, 'Escolha o item concreto depois de marcar este plano'), tags };
+    return { ...deItemMinimo(p.id, p.nome || p.nome_en), tags, bloqueado };
+  });
+  abrirModal('Adicionar Plano', `
+    <div id="plano-escolha"></div>
+    <div id="plano-detalhe" style="margin-top:8px"></div>
+    ${pa.armeiro && !state.planosArtifice.some((c) => c.armeiro) ? '<label id="plano-armeiro-rotulo" style="font-size:0.85rem;display:none;margin-top:8px"><input type="checkbox" id="plano-armeiro"> Plano extra do Armeiro (Armadura)</label>' : ''}`,
+    `<button class="btn btn-secondary" onclick="fecharModal()">Voltar</button>
+     <button class="btn btn-primary" id="btn-plano-confirmar">Adicionar</button>`);
+  const detalhe = document.getElementById('plano-detalhe');
+  // Escolhas atuais dos três seletores de cards (plano, item genérico, base).
+  let selPlano = '';
+  let selGenerico = '';
+  let selBase = '';
+  const planoAtual = () => pa.disponiveis.find((x) => x.id === selPlano);
+  // Item concreto do plano escolhido (para genérico, o candidato selecionado).
+  const itemEscolhido = (p) => {
+    if (!p.generico) return resolverPlano(p, pa.acervo)?.item || null;
+    const [itemId, varId] = (selGenerico || '|').split('|');
+    return itemId ? resolverPlano({ item_id: itemId, variante_id: varId || undefined }, pa.acervo)?.item || null : null;
+  };
+  // Mostra os cards de base (item com base) e a caixa do Armeiro (só item de Armadura) para o item escolhido.
+  const atualizarBaseEArmeiro = () => {
+    const p = planoAtual();
+    const item = p ? itemEscolhido(p) : null;
+    const area = document.getElementById('plano-base-area');
+    const opcoes = item?.base ? opcoesDeBase(item.base, { armas: pa.armas, armaduras: pa.armaduras }) : [];
+    selBase = '';
+    area.innerHTML = opcoes.length ? '<div style="margin-top:8px;font-weight:700;font-size:0.85rem">' + (item.base.tipo === 'arma' ? 'Arma-base' : 'Armadura-base') + '</div><div id="plano-base"></div>' : '';
+    if (opcoes.length) {
+      montarSeletor(document.getElementById('plano-base'), {
+        opcoes: deBasesItem(opcoes), densidade: 'densa', max: 1, busca: opcoes.length > 8,
+        selecionadas: opcoes.length === 1 ? [opcoes[0].nome] : [],
+        aoMudar: (sel) => { selBase = sel[0] || ''; },
+      });
+    }
+    const rotulo = document.getElementById('plano-armeiro-rotulo');
+    if (rotulo) {
+      const ehArmadura = item?.tipo === 'Armadura';
+      rotulo.style.display = ehArmadura ? 'block' : 'none';
+      if (!ehArmadura) document.getElementById('plano-armeiro').checked = false;
+    }
+  };
+  // Mostra os cards de item (plano genérico) e, abaixo, a base/Armeiro do item escolhido.
+  const atualizar = () => {
+    const p = planoAtual();
+    selGenerico = '';
+    if (!p) { detalhe.innerHTML = ''; return; }
+    detalhe.innerHTML = `${p.generico ? '<div id="plano-generico"></div>' : ''}<div id="plano-base-area"></div>`;
+    if (p.generico) {
+      const cand = candidatosGenerico(p, pa.acervo).filter((x) => !usados.has(`${x.item.id}|${x.variante?.id || ''}`));
+      montarSeletor(document.getElementById('plano-generico'), {
+        opcoes: cand.map((x) => deItemMagicoAcervo(x, { id: `${x.item.id}|${x.variante?.id || ''}` })),
+        densidade: 'densa', max: 1, busca: true,
+        aoMudar: (sel) => { selGenerico = sel[0] || ''; atualizarBaseEArmeiro(); },
+      });
+    } else {
+      atualizarBaseEArmeiro();
+    }
+  };
+  montarSeletor(document.getElementById('plano-escolha'), {
+    opcoes: opcoesPlano, densidade: 'densa', max: 1, busca: true,
+    aoMudar: (sel) => { if ((sel[0] || '') !== selPlano) { selPlano = sel[0] || ''; atualizar(); } },
+  });
+  document.getElementById('btn-plano-confirmar').addEventListener('click', () => {
+    const p = planoAtual();
+    if (!p) { toast('Escolha o plano.', 'error'); return; }
+    let novo = { id: `${p.id}-${Date.now()}`, plano_id: p.id, item_id: p.item_id, ...(p.variante_id ? { variante_id: p.variante_id } : {}) };
+    if (p.generico) {
+      const [itemId, varId] = (selGenerico || '|').split('|');
+      if (!itemId) { toast('Escolha o item.', 'error'); return; }
+      novo = { ...novo, item_id: itemId, ...(varId ? { variante_id: varId } : {}) };
+    }
+    // Base de arma/armadura: só existe quando o item concreto tem base.
+    if (document.getElementById('plano-base') && !selBase) { toast('Escolha a base do item.', 'error'); return; }
+    if (selBase) novo.base_nome = selBase;
+    // Armeiro: só item de Armadura e um único marcado por lista.
+    const marcouArmeiro = document.getElementById('plano-armeiro')?.checked;
+    if (marcouArmeiro && itemEscolhido(p)?.tipo === 'Armadura' && !state.planosArtifice.some((c) => c.armeiro)) novo.armeiro = true;
+    state.planosArtifice = [...state.planosArtifice, novo];
+    window.fecharModal();
+    aoConcluir();
+  });
+}
+
 // --- Manobras (Mestre da Batalha) ---
 function bindEventosManobrasGuerreiro(ctx, state) {
   const mg = ctx.manobrasGuerreiro;
@@ -2417,6 +2547,8 @@ function montarResumoFinal(resultado, char, classeQueSobe, truquesAdicionados, m
   // varias -- calar as demais faria o jogador confirmar o que nao viu.
   for (const t of trocasMagia) itens.push(`Troca: ${t.de} ${iconArrow} ${t.para}`);
   for (const t of trocasTruque) itens.push(`Troca de truque: ${t.de} ${iconArrow} ${t.para}`);
+  // Plano trocado: o item replicado dele desaparece do inventário.
+  for (const nome of (resultado.itens_replicados_removidos || [])) itens.push(`Item replicado desapareceu: <strong>${escHtml(nome)}</strong>`);
 
   const ganhoPv = ganhoPvDoResultado(resultado);
 

@@ -2,7 +2,7 @@
 // Sistema de Level-Up D&D 2024
 // ============================================================
 import { CLASSES_INFO, ESCOLAS_SUBCLASSE_MAGO } from './dados-classes.js';
-import { getClasse, getEspecies, getIndiceMagias, getTalentos, getMagiasRituais } from './db.js';
+import { getClasse, getEspecies, getIndiceMagias, getTalentos, getMagiasRituais, getPlanosArtifice, getItensMagicos, getArmas, getArmaduras } from './db.js';
 import { getTruquesFixosSubclasse, getTruquesFixosAcumulados } from './regras-conjuracao-subclasse.js';
 import { calcMod, bonusProficiencia, getEspacosMagia, getTruquesConhecidos, getMagiaPreparadas, semAcento } from './utils.js';
 import { aplicarDeltaSistema, garantirEstadoEdicoes } from './ficha-edicoes.js';
@@ -12,6 +12,8 @@ import { classesDe, migrarParaMulticlasse, nivelNa, sincronizarEspelhos, subclas
 import { conjuraPorAlgumaClasse } from './regras-multiclasse-conjuracao.js';
 import { armadurasDoPersonagem, concessoesAoEntrarEm } from './regras-multiclasse-proficiencias.js';
 import { ORDEM_CLASSE } from './regras-ordem-classe.js';
+import { concederTruquesDeEntrada, estadoArtifice } from './regras-artifice.js';
+import { validarConhecidos, trocasEntre, chaveConhecido, planosConhecidosMax, ehArmeiroAprimorado, removerItensDeConhecidos } from './regras-planos-artifice.js';
 import { atributoEfetivo } from './regras-atributos.js';
 import {
   linhasDaSubclasseNoNivel, opcoesDaLinha, truquesConhecidosDe,
@@ -75,7 +77,7 @@ function encontrarTalentoPorNome(dadosTalentos, nome) {
 
 export const CLASSES_COM_DADIVA_EPICA = [
   'Bárbaro', 'Bardo', 'Bruxo', 'Clérigo', 'Druida', 'Feiticeiro',
-  'Guardião', 'Guerreiro', 'Ladino', 'Mago', 'Monge', 'Paladino'
+  'Guardião', 'Guerreiro', 'Ladino', 'Mago', 'Monge', 'Paladino', 'Artífice'
 ];
 
 export function exigeDadivaEpica(classe, nivel) {
@@ -415,7 +417,8 @@ export function concedeAumentoAtributo(classe, nivel) {
     'Ladino': [4, 8, 10, 12, 16, 19],
     'Mago': [4, 8, 12, 16, 19],
     'Monge': [4, 8, 12, 16, 19],
-    'Paladino': [4, 8, 12, 16, 19]
+    'Paladino': [4, 8, 12, 16, 19],
+    'Artífice': [4, 8, 12, 16, 19]
   };
   
   return (aumentos[classe] || []).includes(nivel);
@@ -469,7 +472,8 @@ export function exigeSubclasse(classe, nivel) {
     'Ladino': 3,
     'Mago': 3,
     'Monge': 3,
-    'Paladino': 3
+    'Paladino': 3,
+    'Artífice': 3
   };
   
   return nivel === niveisSubclasse[classe];
@@ -1832,6 +1836,37 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     }
   }
 
+  // Planos Conhecidos do Artífice (Replicar Item Mágico, nível 2+): lista completa
+  // depois da subida, no máximo 1 troca por nível, nível mínimo de cada plano.
+  let planosArtificeNovos = null;
+  if (sub.classe === 'Artífice' && nivelNaClasseNovo >= 2) {
+    const [dadosPlanos, dadosAcervo, dadosArmas, dadosArmaduras] = await Promise.all([getPlanosArtifice(), getItensMagicos(), getArmas(), getArmaduras()]);
+    // classesDe (e não personagem.classes): classe única ainda sem `classes[]` cai no espelho `classe/nivel/subclasse`.
+    const futuro = { ...personagem, classes: classesDe(personagem).map((c) => (c.classe === 'Artífice' ? { ...c, nivel: nivelNaClasseNovo, subclasse: opcoes.subclasse || c.subclasse } : c)) };
+    if (!futuro.classes.some((c) => c.classe === 'Artífice')) futuro.classes.push({ classe: 'Artífice', nivel: nivelNaClasseNovo, subclasse: opcoes.subclasse || '' });
+    const ctxPlanos = {
+      planos: dadosPlanos?.planos || [], acervo: dadosAcervo?.itens || [], armas: dadosArmas?.armas, armaduras: dadosArmaduras?.armaduras, nivel: nivelNaClasseNovo,
+      max: planosConhecidosMax(classeData?.tabela_caracteristicas, futuro), armeiro: ehArmeiroAprimorado(futuro),
+    };
+    const lista = Array.isArray(opcoes.planos_artifice) ? opcoes.planos_artifice : [];
+    const erros = validarConhecidos(lista, ctxPlanos);
+    const atuais = personagem.recursos?.artifice?.planos || [];
+    // Cada entrada precisa de `id` único; um id de plano atual só pode ser reaproveitado pelo mesmo plano (mesma chave de conteúdo).
+    const ids = lista.map((c) => c?.id);
+    if (ids.some((id) => !id)) erros.push('Todo plano precisa de id.');
+    else if (new Set(ids).size !== ids.length) erros.push('Há id de plano repetido.');
+    else if (lista.some((c) => atuais.some((a) => a.id === c.id && chaveConhecido(a) !== chaveConhecido(c)))) erros.push('Id de plano já usado por outro plano.');
+    if (!erros.length && nivelNaClasseNovo > 2 && trocasEntre(atuais, lista) > 1) erros.push('Troque no máximo 1 plano por nível.');
+    if (erros.length) {
+      return { sucesso: false, pendente: true, tipo_pendencia: 'planos_artifice', mensagem: `Planos de Item Mágico: ${erros.join(' ')}` };
+    }
+    // Plano mantido (mesma chave de conteúdo) conserva o id antigo, e o item replicado continua ligado a ele.
+    planosArtificeNovos = lista.map((c) => {
+      const antigo = atuais.find((a) => chaveConhecido(a) === chaveConhecido(c));
+      return antigo ? { ...c, id: antigo.id } : c;
+    });
+  }
+
   // PROFICIENCIAS DE CLASSE NOVA (livro:2051). So no PRIMEIRO nivel
   // naquela classe -- `ehPrimeiroNivelNaClasse`, e nunca
   // `ehPrimeiroNivelDoPersonagem`: os dois campos existem separados
@@ -2256,6 +2291,9 @@ export async function subirDeNivel(personagem, opcoes = {}) {
         }
       }
     }
+
+    // Truque concedido por característica ao entrar na classe (Reparar do Artífice).
+    if (concessoesNovas) concederTruquesDeEntrada(personagem, sub.classe);
   }
 
   // Pre-requisito dispensado: fica registrado no personagem. Reusa o
@@ -2857,6 +2895,16 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     }
   }
 
+  // Planos Conhecidos do Artífice: grava a lista e apaga os itens replicados dos planos que saíram.
+  let itensReplicadosRemovidos = [];
+  if (planosArtificeNovos) {
+    const e = estadoArtifice(personagem);
+    const novos = new Set(planosArtificeNovos.map(chaveConhecido));
+    const saiu = e.planos.filter((c) => !novos.has(chaveConhecido(c))).map((c) => c.id);
+    if (saiu.length) itensReplicadosRemovidos = removerItensDeConhecidos(personagem, saiu);
+    e.planos = planosArtificeNovos.map((c) => ({ ...c }));
+  }
+
   // Aplicar Manobras do Mestre da Batalha
   let manobrasNovasAplicadas = [];
   let manobraTrocaAplicada = null;
@@ -2986,6 +3034,7 @@ export async function subirDeNivel(personagem, opcoes = {}) {
     grimorio_adicionado: magiasGrimorioSelecionadas,
     subclasse_magias_adicionadas: magiasSubclasseArcanaSelecionadas,
     manobras_novas_aplicadas: manobrasNovasAplicadas,
+    itens_replicados_removidos: itensReplicadosRemovidos,
     manobra_troca_aplicada: manobraTrocaAplicada
   };
 }

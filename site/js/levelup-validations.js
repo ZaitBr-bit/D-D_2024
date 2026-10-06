@@ -6,7 +6,7 @@ import { exigeManobrasGuerreiro } from './levelup.js';
 import { validarEscolhasTalento } from './regras-cobertura.js';
 import {
   calcularConjuracao, calcularSubclasseArcana,
-  proficienciaClasseNovaCompleta, ordemClasseNovaCompleta, ritualBonusProficienciaCompleto
+  proficienciaClasseNovaCompleta, ordemClasseNovaCompleta, ritualBonusProficienciaCompleto, planosArtificeCompleto
 } from './levelup-flow.js';
 
 /**
@@ -130,6 +130,9 @@ export function collectOpcoes(ctx, state) {
       opcoes.manobra_trocar_para = state.manobraTrocarPara;
     }
   }
+
+  // Planos de Item Mágico (Artífice): lista completa depois da subida.
+  if (ctx.planosArtifice) opcoes.planos_artifice = state.planosArtifice || ctx.planosArtifice.atuais;
 
   // Proficiências da Classe Nova (Bardo/Guardião/Ladino, livro:2051) --
   // os nomes das chaves têm de bater EXATAMENTE com o que subirDeNivel lê
@@ -261,6 +264,9 @@ export function validateAll(ctx, state) {
     if (state.manobraTrocarDe && !state.manobraTrocarPara)
       return 'Escolha a manobra substituta ou desmarque a troca.';
   }
+
+  // Planos de Item Mágico (Artífice): mesma regra do passo (levelup-flow.js).
+  if (ctx.planosArtifice && !planosArtificeCompleto(ctx, state)) return 'Ajuste os Planos de Item Mágico (quantidade da tabela e no máximo 1 troca por nível).';
 
   // Proficiências da Classe Nova (Bardo/Guardião/Ladino, livro:2051):
   // mesma checagem amigável que os outros requirements acima têm -- sem

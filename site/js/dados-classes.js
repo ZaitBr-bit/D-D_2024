@@ -288,7 +288,32 @@ export const CLASSES_INFO = {
       armaduras: ["Leve", "Média", "Escudo"], armas: ["Marcial"], pericias: 0,
       ferramentas: [], instrumentos: 0, salvaguardas: [],
     },
-  }
+  },
+  "Artífice": {
+    // Classe de expansão: os dados ficam em dados/tasha/artifice/ (db.js resolve pela fonte).
+    fonte: "tasha",
+    dado_vida: 8,
+    atributo_primario: "Inteligência",
+    // Pré-requisito de multiclasse (2024): 13+ no atributo primário.
+    atributos_primarios: { lista: ["Inteligência"], conector: "e" },
+    salvaguardas: ["Constituição", "Inteligência"],
+    armaduras: ["Leve", "Média", "Escudo"],
+    armas: ["Simples"],
+    pericias_opcoes: ["Arcanismo", "História", "Investigação", "Medicina", "Natureza", "Percepção", "Prestidigitação"],
+    num_pericias: 2,
+    // Ferramentas fixas da classe inicial; a de artesão é escolha (creator/comum.js CLASSES_ESCOLHAS).
+    ferramentas: ["Ferramentas de Ladrão", "Ferramentas de Funileiro"],
+    conjurador: true,
+    atributo_conjuracao: "Inteligência",
+    tipo_conjuracao: "preparadas",
+    // Meio-conjurador arredondado para cima: regras-multiclasse-conjuracao.js já soma Math.ceil(nivel / 2).
+    categoria_conjuracao: "meia",
+    // Multiclasse: Ferramentas de Funileiro, 1 perícia da lista, armadura Leve/Média e Escudo.
+    proficiencias_multiclasse: {
+      armaduras: ["Leve", "Média", "Escudo"], armas: [], pericias: 1,
+      ferramentas: ["Ferramentas de Funileiro"], instrumentos: 0, salvaguardas: [],
+    },
+  },
 };
 
 export const ESCOLAS_SUBCLASSE_MAGO = {
@@ -351,7 +376,7 @@ export const ATRIBUTOS_NOMES = {
 
 // Array base para atributos (nome da chave em JS)
 /** Classes que conjuram magias de lista própria (as que uma magia personalizada pode ter como "classe com acesso"). */
-export const CLASSES_CONJURADORAS = ['Bardo', 'Bruxo', 'Clérigo', 'Druida', 'Feiticeiro', 'Guardião', 'Mago', 'Paladino'];
+export const CLASSES_CONJURADORAS = ['Artífice', 'Bardo', 'Bruxo', 'Clérigo', 'Druida', 'Feiticeiro', 'Guardião', 'Mago', 'Paladino'];
 
 export const ATRIBUTOS_KEYS = ["forca", "destreza", "constituicao", "inteligencia", "sabedoria", "carisma"];
 

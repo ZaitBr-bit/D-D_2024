@@ -1,0 +1,1065 @@
+{
+  "tabela_classe": [
+    {
+      "nivel": 1,
+      "pb": 2,
+      "planos": null,
+      "itens": null,
+      "truques": 2,
+      "preparadas": 2,
+      "espacos": [
+        2,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "nivel": 2,
+      "pb": 2,
+      "planos": 4,
+      "itens": 2,
+      "truques": 2,
+      "preparadas": 3,
+      "espacos": [
+        2,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "nivel": 3,
+      "pb": 2,
+      "planos": 4,
+      "itens": 2,
+      "truques": 2,
+      "preparadas": 4,
+      "espacos": [
+        3,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "nivel": 4,
+      "pb": 2,
+      "planos": 4,
+      "itens": 2,
+      "truques": 2,
+      "preparadas": 5,
+      "espacos": [
+        3,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "nivel": 5,
+      "pb": 3,
+      "planos": 4,
+      "itens": 2,
+      "truques": 2,
+      "preparadas": 6,
+      "espacos": [
+        4,
+        2,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "nivel": 6,
+      "pb": 3,
+      "planos": 5,
+      "itens": 3,
+      "truques": 2,
+      "preparadas": 6,
+      "espacos": [
+        4,
+        2,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "nivel": 7,
+      "pb": 3,
+      "planos": 5,
+      "itens": 3,
+      "truques": 2,
+      "preparadas": 7,
+      "espacos": [
+        4,
+        3,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "nivel": 8,
+      "pb": 3,
+      "planos": 5,
+      "itens": 3,
+      "truques": 2,
+      "preparadas": 7,
+      "espacos": [
+        4,
+        3,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "nivel": 9,
+      "pb": 4,
+      "planos": 5,
+      "itens": 3,
+      "truques": 2,
+      "preparadas": 9,
+      "espacos": [
+        4,
+        3,
+        2,
+        null,
+        null
+      ]
+    },
+    {
+      "nivel": 10,
+      "pb": 4,
+      "planos": 6,
+      "itens": 4,
+      "truques": 3,
+      "preparadas": 9,
+      "espacos": [
+        4,
+        3,
+        2,
+        null,
+        null
+      ]
+    },
+    {
+      "nivel": 11,
+      "pb": 4,
+      "planos": 6,
+      "itens": 4,
+      "truques": 3,
+      "preparadas": 10,
+      "espacos": [
+        4,
+        3,
+        3,
+        null,
+        null
+      ]
+    },
+    {
+      "nivel": 12,
+      "pb": 4,
+      "planos": 6,
+      "itens": 4,
+      "truques": 3,
+      "preparadas": 10,
+      "espacos": [
+        4,
+        3,
+        3,
+        null,
+        null
+      ]
+    },
+    {
+      "nivel": 13,
+      "pb": 5,
+      "planos": 6,
+      "itens": 4,
+      "truques": 3,
+      "preparadas": 11,
+      "espacos": [
+        4,
+        3,
+        3,
+        1,
+        null
+      ]
+    },
+    {
+      "nivel": 14,
+      "pb": 5,
+      "planos": 7,
+      "itens": 5,
+      "truques": 4,
+      "preparadas": 11,
+      "espacos": [
+        4,
+        3,
+        3,
+        1,
+        null
+      ]
+    },
+    {
+      "nivel": 15,
+      "pb": 5,
+      "planos": 7,
+      "itens": 5,
+      "truques": 4,
+      "preparadas": 12,
+      "espacos": [
+        4,
+        3,
+        3,
+        2,
+        null
+      ]
+    },
+    {
+      "nivel": 16,
+      "pb": 5,
+      "planos": 7,
+      "itens": 5,
+      "truques": 4,
+      "preparadas": 12,
+      "espacos": [
+        4,
+        3,
+        3,
+        2,
+        null
+      ]
+    },
+    {
+      "nivel": 17,
+      "pb": 6,
+      "planos": 7,
+      "itens": 5,
+      "truques": 4,
+      "preparadas": 14,
+      "espacos": [
+        4,
+        3,
+        3,
+        3,
+        1
+      ]
+    },
+    {
+      "nivel": 18,
+      "pb": 6,
+      "planos": 8,
+      "itens": 6,
+      "truques": 4,
+      "preparadas": 14,
+      "espacos": [
+        4,
+        3,
+        3,
+        3,
+        1
+      ]
+    },
+    {
+      "nivel": 19,
+      "pb": 6,
+      "planos": 8,
+      "itens": 6,
+      "truques": 4,
+      "preparadas": 15,
+      "espacos": [
+        4,
+        3,
+        3,
+        3,
+        2
+      ]
+    },
+    {
+      "nivel": 20,
+      "pb": 6,
+      "planos": 8,
+      "itens": 6,
+      "truques": 4,
+      "preparadas": 15,
+      "espacos": [
+        4,
+        3,
+        3,
+        3,
+        2
+      ]
+    }
+  ],
+  "magias_en": {
+    "0": [
+      {
+        "nome": "Acid Splash",
+        "escola": "Evocation",
+        "especial": ""
+      },
+      {
+        "nome": "Dancing Lights",
+        "escola": "Illusion",
+        "especial": "C"
+      },
+      {
+        "nome": "Elementalism",
+        "escola": "Transmutation",
+        "especial": ""
+      },
+      {
+        "nome": "Fire Bolt",
+        "escola": "Evocation",
+        "especial": ""
+      },
+      {
+        "nome": "Guidance",
+        "escola": "Divination",
+        "especial": "C"
+      },
+      {
+        "nome": "Light",
+        "escola": "Evocation",
+        "especial": ""
+      },
+      {
+        "nome": "Mage Hand",
+        "escola": "Conjuration",
+        "especial": ""
+      },
+      {
+        "nome": "Message",
+        "escola": "Transmutation",
+        "especial": ""
+      },
+      {
+        "nome": "Poison Spray",
+        "escola": "Necromancy",
+        "especial": ""
+      },
+      {
+        "nome": "Prestidigitation",
+        "escola": "Transmutation",
+        "especial": ""
+      },
+      {
+        "nome": "Ray of Frost",
+        "escola": "Evocation",
+        "especial": ""
+      },
+      {
+        "nome": "Resistance",
+        "escola": "Abjuration",
+        "especial": "C"
+      },
+      {
+        "nome": "Shocking Grasp",
+        "escola": "Evocation",
+        "especial": ""
+      },
+      {
+        "nome": "Spare the Dying",
+        "escola": "Necromancy",
+        "especial": ""
+      },
+      {
+        "nome": "Thorn Whip",
+        "escola": "Transmutation",
+        "especial": ""
+      },
+      {
+        "nome": "Thunderclap",
+        "escola": "Evocation",
+        "especial": ""
+      },
+      {
+        "nome": "True Strike",
+        "escola": "Divination",
+        "especial": "M"
+      }
+    ],
+    "1": [
+      {
+        "nome": "Alarm",
+        "escola": "Abjuration",
+        "especial": "R"
+      },
+      {
+        "nome": "Cure Wounds",
+        "escola": "Abjuration",
+        "especial": ""
+      },
+      {
+        "nome": "Detect Magic",
+        "escola": "Divination",
+        "especial": "C,R"
+      },
+      {
+        "nome": "Disguise Self",
+        "escola": "Illusion",
+        "especial": ""
+      },
+      {
+        "nome": "Expeditious Retreat",
+        "escola": "Transmutation",
+        "especial": "C"
+      },
+      {
+        "nome": "Faerie Fire",
+        "escola": "Evocation",
+        "especial": "C"
+      },
+      {
+        "nome": "False Life",
+        "escola": "Necromancy",
+        "especial": ""
+      },
+      {
+        "nome": "Feather Fall",
+        "escola": "Transmutation",
+        "especial": ""
+      },
+      {
+        "nome": "Grease",
+        "escola": "Conjuration",
+        "especial": ""
+      },
+      {
+        "nome": "Identify",
+        "escola": "Divination",
+        "especial": "R,M"
+      },
+      {
+        "nome": "Jump",
+        "escola": "Transmutation",
+        "especial": ""
+      },
+      {
+        "nome": "Longstrider",
+        "escola": "Transmutation",
+        "especial": ""
+      },
+      {
+        "nome": "Purify Food and Drink",
+        "escola": "Transmutation",
+        "especial": "R"
+      },
+      {
+        "nome": "Sanctuary",
+        "escola": "Abjuration",
+        "especial": ""
+      }
+    ],
+    "2": [
+      {
+        "nome": "Aid",
+        "escola": "Abjuration",
+        "especial": ""
+      },
+      {
+        "nome": "Alter Self",
+        "escola": "Transmutation",
+        "especial": "C"
+      },
+      {
+        "nome": "Arcane Lock",
+        "escola": "Abjuration",
+        "especial": "M"
+      },
+      {
+        "nome": "Arcane Vigor",
+        "escola": "Abjuration",
+        "especial": ""
+      },
+      {
+        "nome": "Blur",
+        "escola": "Illusion",
+        "especial": "C"
+      },
+      {
+        "nome": "Continual Flame",
+        "escola": "Evocation",
+        "especial": "M"
+      },
+      {
+        "nome": "Darkvision",
+        "escola": "Transmutation",
+        "especial": ""
+      },
+      {
+        "nome": "Dragon's Breath",
+        "escola": "Transmutation",
+        "especial": "C"
+      },
+      {
+        "nome": "Enhance Ability",
+        "escola": "Transmutation",
+        "especial": "C"
+      },
+      {
+        "nome": "Enlarge/Reduce",
+        "escola": "Transmutation",
+        "especial": "C"
+      },
+      {
+        "nome": "Heat Metal",
+        "escola": "Transmutation",
+        "especial": "C"
+      },
+      {
+        "nome": "Homunculus Servant",
+        "escola": "Conjuration",
+        "especial": "R,M"
+      },
+      {
+        "nome": "Invisibility",
+        "escola": "Illusion",
+        "especial": "C"
+      },
+      {
+        "nome": "Lesser Restoration",
+        "escola": "Abjuration",
+        "especial": ""
+      },
+      {
+        "nome": "Levitate",
+        "escola": "Transmutation",
+        "especial": "C"
+      },
+      {
+        "nome": "Magic Mouth",
+        "escola": "Illusion",
+        "especial": "R.M"
+      },
+      {
+        "nome": "Magic Weapon",
+        "escola": "Transmutation",
+        "especial": ""
+      },
+      {
+        "nome": "Protection from Poison",
+        "escola": "Abjuration",
+        "especial": ""
+      },
+      {
+        "nome": "Rope Trick",
+        "escola": "Transmutation",
+        "especial": ""
+      },
+      {
+        "nome": "See Invisibility",
+        "escola": "Divination",
+        "especial": ""
+      },
+      {
+        "nome": "Spider Climb",
+        "escola": "Transmutation",
+        "especial": "C"
+      },
+      {
+        "nome": "Web",
+        "escola": "Conjuration",
+        "especial": "C"
+      }
+    ],
+    "3": [
+      {
+        "nome": "Blink",
+        "escola": "Transmutation",
+        "especial": ""
+      },
+      {
+        "nome": "Create Food and Water",
+        "escola": "Conjuration",
+        "especial": ""
+      },
+      {
+        "nome": "Dispel Magic",
+        "escola": "Abjuration",
+        "especial": ""
+      },
+      {
+        "nome": "Elemental Weapon",
+        "escola": "Transmutation",
+        "especial": "C"
+      },
+      {
+        "nome": "Fly",
+        "escola": "Transmutation",
+        "especial": "C"
+      },
+      {
+        "nome": "Glyph of Warding",
+        "escola": "Abjuration",
+        "especial": "M"
+      },
+      {
+        "nome": "Haste",
+        "escola": "Transmutation",
+        "especial": "C"
+      },
+      {
+        "nome": "Protection from Energy",
+        "escola": "Abjuration",
+        "especial": "C"
+      },
+      {
+        "nome": "Revivify",
+        "escola": "Necromancy",
+        "especial": "M"
+      },
+      {
+        "nome": "Water Breathing",
+        "escola": "Transmutation",
+        "especial": "R"
+      },
+      {
+        "nome": "Water Walk",
+        "escola": "Transmutation",
+        "especial": "R"
+      }
+    ],
+    "4": [
+      {
+        "nome": "Arcane Eye",
+        "escola": "Divination",
+        "especial": "C"
+      },
+      {
+        "nome": "Fabricate",
+        "escola": "Transmutation",
+        "especial": ""
+      },
+      {
+        "nome": "Freedom of Movement",
+        "escola": "Abjuration",
+        "especial": ""
+      },
+      {
+        "nome": "Leomund's Secret Chest",
+        "escola": "Conjuration",
+        "especial": "M"
+      },
+      {
+        "nome": "Mordenkainen's Faithful Hound",
+        "escola": "Conjuration",
+        "especial": ""
+      },
+      {
+        "nome": "Mordenkainen's Private Sanctum",
+        "escola": "Abjuration",
+        "especial": ""
+      },
+      {
+        "nome": "Otiluke's Resilient Sphere",
+        "escola": "Abjuration",
+        "especial": "C"
+      },
+      {
+        "nome": "Stone Shape",
+        "escola": "Transmutation",
+        "especial": ""
+      },
+      {
+        "nome": "Stoneskin",
+        "escola": "Transmutation",
+        "especial": "C,M"
+      },
+      {
+        "nome": "Summon Construct",
+        "escola": "Conjuration",
+        "especial": "C,M"
+      }
+    ],
+    "5": [
+      {
+        "nome": "Animate Objects",
+        "escola": "Transmutation",
+        "especial": "C"
+      },
+      {
+        "nome": "Bigby's Hand",
+        "escola": "Evocation",
+        "especial": "C"
+      },
+      {
+        "nome": "Circle of Power",
+        "escola": "Abjuration",
+        "especial": "C"
+      },
+      {
+        "nome": "Creation",
+        "escola": "Illusion",
+        "especial": ""
+      },
+      {
+        "nome": "Greater Restoration",
+        "escola": "Abjuration",
+        "especial": "M"
+      },
+      {
+        "nome": "Wall of Stone",
+        "escola": "Evocation",
+        "especial": "C"
+      }
+    ]
+  },
+  "planos": {
+    "2": [
+      {
+        "nome_en": "Alchemy Jug",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Bag of Holding",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Cap of Water Breathing",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Common magic item that isn't a Potion, a Scroll, or cursed*",
+        "sintonizacao": "Varies"
+      },
+      {
+        "nome_en": "Goggles of Night",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Manifold Tooft",
+        "sintonizacao": "Yes"
+      },
+      {
+        "nome_en": "Repeating Shott",
+        "sintonizacao": "Yes"
+      },
+      {
+        "nome_en": "Returning Weapont",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Rope of Climbing",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Sending Stones",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Shield, +1",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Wand of Magic Detection",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Wand of Secrets",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Wand of the War Mage, +7",
+        "sintonizacao": "Yes"
+      },
+      {
+        "nome_en": "Weapon, +1",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Wraps of Unarmed Power, +1",
+        "sintonizacao": "No"
+      }
+    ],
+    "6": [
+      {
+        "nome_en": "Armor, +1",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Boots of Elvenkind",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Boots of the Winding Patht",
+        "sintonizacao": "Yes"
+      },
+      {
+        "nome_en": "Cloak of Elvenkind",
+        "sintonizacao": "Yes"
+      },
+      {
+        "nome_en": "Cloak of the Manta Ray",
+        "sintonizacao": "Yes"
+      },
+      {
+        "nome_en": "Dazzling Weapont",
+        "sintonizacao": "Yes"
+      },
+      {
+        "nome_en": "Eyes of Charming",
+        "sintonizacao": "Yes"
+      },
+      {
+        "nome_en": "Eyes of Minute Seeing",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Gloves of Thievery",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Helm of Awareness",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Lantern of Revealing",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Mind Sharpened",
+        "sintonizacao": "Yes"
+      },
+      {
+        "nome_en": "Necklace of Adaptation",
+        "sintonizacao": "Yes"
+      },
+      {
+        "nome_en": "Pipes of Haunting",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Repulsion Shields",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Ring of Swimming",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Ring of Water Walking",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Sentinel Shield",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Spell-Refueling Ringt",
+        "sintonizacao": "Yes"
+      },
+      {
+        "nome_en": "Wand of Magic Missiles",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Wand of Web",
+        "sintonizacao": "Yes"
+      },
+      {
+        "nome_en": "Weapon of Warning",
+        "sintonizacao": "Yes"
+      }
+    ],
+    "10": [
+      {
+        "nome_en": "Armor of Resistance",
+        "sintonizacao": "Yes"
+      },
+      {
+        "nome_en": "Dagger of Venom",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Elven Chain",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Ring of Feather Falling",
+        "sintonizacao": "Yes"
+      },
+      {
+        "nome_en": "Ring of Jumping",
+        "sintonizacao": "Yes"
+      },
+      {
+        "nome_en": "Ring of Mind Shielding",
+        "sintonizacao": "Yes"
+      },
+      {
+        "nome_en": "Shield, +2",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Uncommon Wondrous Item that isn’t cursed*",
+        "sintonizacao": "Varies"
+      },
+      {
+        "nome_en": "Wand of the War Mage, +2",
+        "sintonizacao": "Yes"
+      },
+      {
+        "nome_en": "Weapon, +2",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Wraps of Unarmed Power, +2",
+        "sintonizacao": "No"
+      }
+    ],
+    "14": [
+      {
+        "nome_en": "Armor, +2",
+        "sintonizacao": "No"
+      },
+      {
+        "nome_en": "Arrow-Catching Shield",
+        "sintonizacao": "Yes"
+      },
+      {
+        "nome_en": "Flame Tongue",
+        "sintonizacao": "Yes"
+      },
+      {
+        "nome_en": "Rare Wondrous Item that isn’t cursed*",
+        "sintonizacao": "Varies"
+      },
+      {
+        "nome_en": "Ring of Free Action",
+        "sintonizacao": "Yes"
+      },
+      {
+        "nome_en": "Ring of Protection",
+        "sintonizacao": "Yes"
+      },
+      {
+        "nome_en": "Ring of the Ram",
+        "sintonizacao": "Yes"
+      }
+    ]
+  },
+  "magias_subclasse_en": {
+    "Alchemist": {
+      "3": [
+        "Healing Word",
+        "Ray of Sickness"
+      ],
+      "5": [
+        "Flaming Sphere",
+        "Melf's Acid Arrow"
+      ],
+      "9": [
+        "Gaseous Form",
+        "Mass Healing Word"
+      ],
+      "13": [
+        "Death Ward",
+        "Vitriolic Sphere"
+      ],
+      "17": [
+        "Cloudkill",
+        "Raise Dead"
+      ]
+    },
+    "Armorer": {
+      "3": [
+        "Magic Missile",
+        "Thunderwave"
+      ],
+      "5": [
+        "Mirror Image",
+        "Shatter"
+      ],
+      "9": [
+        "Hypnotic Pattern",
+        "Lightning Bolt"
+      ],
+      "13": [
+        "Fire Shield",
+        "Greater Invisibility"
+      ],
+      "17": [
+        "Passwall",
+        "Wall of Force"
+      ]
+    },
+    "Artillerist": {
+      "3": [
+        "Shield",
+        "Thunderwave"
+      ],
+      "5": [
+        "Scorching Ray",
+        "Shatter"
+      ],
+      "9": [
+        "Fireball",
+        "Wind Wall"
+      ],
+      "13": [
+        "Ice Storm",
+        "Wall of Fire"
+      ],
+      "17": [
+        "Cone of Cold",
+        "Wall of Force"
+      ]
+    },
+    "Battle Smith": {
+      "3": [
+        "Heroism",
+        "Shield"
+      ],
+      "5": [
+        "Shining Smite",
+        "Warding Bond"
+      ],
+      "9": [
+        "Aura of Vitality",
+        "Conjure Barrage"
+      ],
+      "13": [
+        "Aura of Purity",
+        "Fire Shield"
+      ],
+      "17": [
+        "Banishing Smite",
+        "Mass Cure Wounds"
+      ]
+    },
+    "Cartographer": {
+      "3": [
+        "Faerie Fire",
+        "Guiding Bolt",
+        "Healing Word"
+      ],
+      "5": [
+        "Locate Object",
+        "Mind Spike"
+      ],
+      "9": [
+        "Call Lightning",
+        "Clairvoyance"
+      ],
+      "13": [
+        "Banishment",
+        "Locate Creature"
+      ],
+      "17": [
+        "Scrying",
+        "Teleportation Circle"
+      ]
+    }
+  }
+}

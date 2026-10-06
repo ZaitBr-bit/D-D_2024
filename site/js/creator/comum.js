@@ -415,9 +415,54 @@ export function configurarSelectsExclusivos(seletor, opcoes = {}) {
 
 // Nível obrigatório de subclasse por classe
 export const NIVEL_SUBCLASSE = {
+  'Artífice': 3,
   'Bárbaro': 3, 'Bardo': 3, 'Bruxo': 3, 'Clérigo': 3, 'Druida': 3,
   'Feiticeiro': 3, 'Guardião': 3, 'Guerreiro': 3, 'Ladino': 3,
   'Mago': 3, 'Monge': 3, 'Paladino': 3
+};
+
+// Escolhas de antecedente (ferramentas/instrumentos)
+export const ANTECEDENTES_ESCOLHAS = {
+  'Artesão': {
+    titulo: 'Ferramenta de Artesão',
+    descricao: 'Escolha um tipo de Ferramenta de Artesão:',
+    campo: 'ferramenta_escolhida',
+    opcoes: [
+      'Suprimentos de Alquimista', 'Suprimentos de Cervejeiro', 'Suprimentos de Calígrafo',
+      'Ferramentas de Carpinteiro', 'Ferramentas de Cartógrafo', 'Ferramentas de Sapateiro',
+      'Ferramentas de Ferreiro', 'Ferramentas de Funileiro', 'Utensílios de Cozinheiro',
+      'Ferramentas de Vidreiro', 'Ferramentas de Joalheiro', 'Ferramentas de Pedreiro',
+      'Ferramentas de Pintor', 'Ferramentas de Oleiro', 'Ferramentas de Tecelão',
+      'Ferramentas de Marceneiro', 'Ferramentas de Entalhador'
+    ]
+  },
+  'Artista': {
+    titulo: 'Instrumento Musical',
+    descricao: 'Escolha um Instrumento Musical:',
+    campo: 'instrumento_escolhido',
+    opcoes: [
+      'Alaúde', 'Corne', 'Flauta', 'Flauta de Pã', 'Gaita de Foles', 'Harpa',
+      'Lira', 'Oboé', 'Tambor', 'Violino'
+    ]
+  },
+  'Guarda': {
+    titulo: 'Kit de Jogos',
+    descricao: 'Escolha um Kit de Jogos:',
+    campo: 'jogos_escolhido',
+    opcoes: ['Baralho', 'Conjunto de Dados', 'Xadrez de Dragão', 'Jogo de Três Dragões']
+  },
+  'Nobre': {
+    titulo: 'Kit de Jogos',
+    descricao: 'Escolha um Kit de Jogos:',
+    campo: 'jogos_escolhido',
+    opcoes: ['Baralho', 'Conjunto de Dados', 'Xadrez de Dragão', 'Jogo de Três Dragões']
+  },
+  'Soldado': {
+    titulo: 'Kit de Jogos',
+    descricao: 'Escolha um Kit de Jogos:',
+    campo: 'jogos_escolhido',
+    opcoes: ['Baralho', 'Conjunto de Dados', 'Xadrez de Dragão', 'Jogo de Três Dragões']
+  }
 };
 
 // Escolhas obrigatórias de classe no nível 1
@@ -434,6 +479,20 @@ export const NIVEL_SUBCLASSE = {
 // mapaEstilos como camada de compatibilidade (NÃO REMOVER: apagar aquele
 // mapa faz fichas antigas pararem de reconhecer o estilo escolhido).
 export const CLASSES_ESCOLHAS = {
+  // Ferramenta de Artesão do Artífice: mesma lista do antecedente Artesão
+  // (ANTECEDENTES_ESCOLHAS, declarado acima desta constante).
+  'Artífice': {
+    ferramenta_artesao: {
+      titulo: 'Ferramenta de Artesão',
+      descricao: 'Escolha um tipo de Ferramenta de Artesão (além de Ferramentas de Ladrão e de Funileiro).',
+      nivelMinimo: 1,
+      maxEscolhas: 1,
+      // Funileiro já é concedido pela classe: oferecê-lo desperdiçaria a escolha.
+      opcoes: ANTECEDENTES_ESCOLHAS['Artesão'].opcoes
+        .filter((nome) => nome !== 'Ferramentas de Funileiro')
+        .map((nome) => ({ nome, descricao: '' }))
+    }
+  },
   // Ordem Divina/Primal vêm de regras-ordem-classe.js (issue #59): o motor
   // de subida de nível (levelup-flow.js) precisa da MESMA definição pra
   // oferecer a escolha quando Clérigo/Druida entram como classe NOVA num
@@ -535,50 +594,6 @@ export const CLASSES_ESCOLHAS = {
   }
 };
 
-// Escolhas de antecedente (ferramentas/instrumentos)
-export const ANTECEDENTES_ESCOLHAS = {
-  'Artesão': {
-    titulo: 'Ferramenta de Artesão',
-    descricao: 'Escolha um tipo de Ferramenta de Artesão:',
-    campo: 'ferramenta_escolhida',
-    opcoes: [
-      'Suprimentos de Alquimista', 'Suprimentos de Cervejeiro', 'Suprimentos de Calígrafo',
-      'Ferramentas de Carpinteiro', 'Ferramentas de Cartógrafo', 'Ferramentas de Sapateiro',
-      'Ferramentas de Ferreiro', 'Ferramentas de Funileiro', 'Utensílios de Cozinheiro',
-      'Ferramentas de Vidreiro', 'Ferramentas de Joalheiro', 'Ferramentas de Pedreiro',
-      'Ferramentas de Pintor', 'Ferramentas de Oleiro', 'Ferramentas de Tecelão',
-      'Ferramentas de Marceneiro', 'Ferramentas de Entalhador'
-    ]
-  },
-  'Artista': {
-    titulo: 'Instrumento Musical',
-    descricao: 'Escolha um Instrumento Musical:',
-    campo: 'instrumento_escolhido',
-    opcoes: [
-      'Alaúde', 'Corne', 'Flauta', 'Flauta de Pã', 'Gaita de Foles', 'Harpa',
-      'Lira', 'Oboé', 'Tambor', 'Violino'
-    ]
-  },
-  'Guarda': {
-    titulo: 'Kit de Jogos',
-    descricao: 'Escolha um Kit de Jogos:',
-    campo: 'jogos_escolhido',
-    opcoes: ['Baralho', 'Conjunto de Dados', 'Xadrez de Dragão', 'Jogo de Três Dragões']
-  },
-  'Nobre': {
-    titulo: 'Kit de Jogos',
-    descricao: 'Escolha um Kit de Jogos:',
-    campo: 'jogos_escolhido',
-    opcoes: ['Baralho', 'Conjunto de Dados', 'Xadrez de Dragão', 'Jogo de Três Dragões']
-  },
-  'Soldado': {
-    titulo: 'Kit de Jogos',
-    descricao: 'Escolha um Kit de Jogos:',
-    campo: 'jogos_escolhido',
-    opcoes: ['Baralho', 'Conjunto de Dados', 'Xadrez de Dragão', 'Jogo de Três Dragões']
-  }
-};
-
 // Mapa de kits que sao colecoes de itens (devem ser expandidos nos componentes individuais)
 // Kits funcionais (Kit de Curandeiro, Kit de Escalada) NAO devem ser expandidos
 export const KITS_EXPANSAO = {
@@ -662,4 +677,4 @@ export const KITS_EXPANSAO = {
   ],
 };
 // Alias: "Kit de Explorador" (Druida) aponta para "Kit de Explorador de Masmorras"
-KITS_EXPANSAO['Kit de Explorador'] = KITS_EXPANSAO['Kit de Explorador de Masmorras'];
+KITS_EXPANSAO['Kit de Explorador'] = KITS_EXPANSAO['Kit de Explorador de Masmorras'];

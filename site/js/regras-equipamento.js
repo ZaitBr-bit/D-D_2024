@@ -28,6 +28,8 @@ export function temProficienciaArma(personagem, arma) {
   // Proficiencias extras (ex.: Clerigo Protetor recebe "Armas Marciais")
   if (extras.includes('armas marciais') && cat.includes('marciai')) return true;
   if (extras.includes('armas simples') && cat.includes('simples')) return true;
+  // Artilheiro (Artífice): só as Marciais à Distância.
+  if (extras.includes('armas marciais à distância') && cat.includes('marciais à distância')) return true;
 
   // Ladino: Marcial com Acuidade
   if (armasClasse.some(a => a.includes('Acuidade'))) {

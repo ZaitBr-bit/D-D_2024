@@ -24,9 +24,10 @@ import { EFEITO_RECUPERAR_ESPACO, espacosRecuperaveis, mensagemSemEspaco, restau
 import { recuperarUmEspaco, reservasDeEspacos } from './reservas-espacos.js';
 import { nomeBaseDoItem, selosDeEfeitos } from '../itens-magicos-catalogo.js';
 import { htmlCorpoItemMagico } from '../itens-magicos-ui.js';
-import { TETO_SINTONIZACAO, itensSintonizados, podeSintonizar } from '../regras-sintonizacao.js';
+import { tetoSintonizacao, itensSintonizados, podeSintonizar } from '../regras-sintonizacao.js';
 import { PASSIVOS_VERSAO, alternarUso, ajustarCarga, aplicarContadorManual, contadorEhManual, garantirEstadoRecursos, gastarCarga, itensComRecuperacaoPendente, limparPendenciasObsoletas, marcarDestruido, preencherRecursosDoAcervo, recursosDoFormulario, recursosDoItem, removerContadorManual, restaurarItem } from '../regras-recursos-itens.js';
 import { getItensMagicos } from '../db.js';
+import { modAtaqueArmaArtifice } from '../regras-artifice.js';
 import { aplicarMagiaNoPergaminho, circuloDoItemPergaminho } from '../regras-pergaminho.js';
 import { carregarMagiasIndicePergaminho, htmlSeletorMagiaPergaminho, ligarSeletorMagiaPergaminho, magiaSelecionadaPergaminho } from '../pergaminho-ui.js';
 import { opcoesDeEscolha } from '../regras-passivos-itens.js';
@@ -57,7 +58,7 @@ function htmlContadorSintonizados() {
   const temAlgumQuePede = itensSintonizados(char).length > 0
     || (char.inventario || []).some(i => i?.dados?.requer_sintonizacao);
   if (!temAlgumQuePede) return '';
-  return `<span style="font-size:0.75rem;color:var(--text-muted);margin-left:10px">Sintonizados: <strong>${itensSintonizados(char).length}</strong> / ${TETO_SINTONIZACAO}</span>`;
+  return `<span style="font-size:0.75rem;color:var(--text-muted);margin-left:10px">Sintonizados: <strong>${itensSintonizados(char).length}</strong> / ${tetoSintonizacao(char)}</span>`;
 }
 
 /**
@@ -243,6 +244,14 @@ function renderSheetInvItem(item, idx) {
     tipoBadge += ' <span class="badge badge-secondary" style="font-size:0.6rem">Em branco</span>';
   }
 
+  // Selos de origem: item replicado (Artífice) e item temporário (expira no descanso).
+  if (item.origem?.tipo === 'replicado') {
+    tipoBadge += ' <span class="badge badge-secondary" style="font-size:0.6rem">Replicado</span>';
+  }
+  if (item.origem?.expira) {
+    tipoBadge += ' <span class="badge badge-secondary" style="font-size:0.6rem">Temporário</span>';
+  }
+
   // Calcular bônus de ataque para armas
   let ataqueInfo = '';
   let danoAutoInfo = '';
@@ -270,6 +279,9 @@ function renderSheetInvItem(item, idx) {
       modAtq = calcMod(atributoEfetivo(char, 'forca'));
       usaForcaNoAtaque = true;
     }
+    // Ferreiro de Batalha: Int em arma mágica quando for maior.
+    const _artificeAtq = modAtaqueArmaArtifice(char, item, modAtq);
+    if (_artificeAtq.usouInt) { modAtq = _artificeAtq.mod; usaForcaNoAtaque = false; }
 
     const temProf = sheetTemProfArma({ categoria: item.dados.categoria, propriedades: item.dados.propriedades || '' });
     // Bônus mágico da própria arma (acervo ou customizado), sintonizada
@@ -491,7 +503,7 @@ function renderSheetInvItem(item, idx) {
       <div class="inv-item-acoes no-print" style="align-items:center">
         ${item.destruido ? `<button class="btn btn-sm" data-restaurar-item="${idx}">Restaurar</button>` : ''}
         ${item.dados?.requer_sintonizacao && !item.destruido ? `
-          <label class="inv-sintonia" title="${podeSintonizar(char, idx) ? 'Sintonizar com este item' : `Limite de ${TETO_SINTONIZACAO} itens sintonizados atingido`}"
+          <label class="inv-sintonia" title="${podeSintonizar(char, idx) ? 'Sintonizar com este item' : `Limite de ${tetoSintonizacao(char)} itens sintonizados atingido`}"
                  style="display:flex;align-items:center;gap:3px;font-size:0.65rem;${podeSintonizar(char, idx) ? '' : 'opacity:0.45;cursor:not-allowed'}">
             <input type="checkbox" data-sintonizar="${idx}" ${item.sintonizado ? 'checked' : ''} ${podeSintonizar(char, idx) ? '' : 'disabled'}>
             Sint.
@@ -499,11 +511,11 @@ function renderSheetInvItem(item, idx) {
         ${requisitoFaltando
           ? `<span class="inv-sintonia-requisito" title="${escHtml('Requer sintonização ' + requisitoFaltando)}" style="font-size:0.6rem;color:var(--danger)">requer: ${escHtml(requisitoFaltando)}</span>`
           : ''}
-        <div class="inv-qty-control" style="display:flex;align-items:center;gap:2px">
+        ${item.origem?.tipo === 'replicado' ? '' : `        <div class="inv-qty-control" style="display:flex;align-items:center;gap:2px">
           <button class="btn btn-sm btn-icon" data-qty-minus="${idx}" style="font-size:0.7rem;padding:1px 5px">−</button>
           <span style="min-width:20px;text-align:center;font-size:0.8rem;font-weight:700" data-qty-display="${idx}">${item.quantidade ?? 1}</span>
           <button class="btn btn-sm btn-icon" data-qty-plus="${idx}" style="font-size:0.7rem;padding:1px 5px">+</button>
-        </div>
+        </div>`}
         ${seletorMover}
         ${item.destruido ? '' : `<label class="form-check inv-equip-label" title="Equipar/Desequipar">
           <input type="checkbox" data-sheet-equip="${idx}" ${item.equipado ? 'checked' : ''}> Eq.
@@ -865,7 +877,8 @@ export function setupEventosInventarioSheet() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const idx = parseInt(btn.dataset.qtyPlus);
-      if (char.inventario[idx]) {
+      // Item replicado vale por um item no limite do Artífice: não duplica.
+      if (char.inventario[idx] && char.inventario[idx].origem?.tipo !== 'replicado') {
         char.inventario[idx].quantidade = (char.inventario[idx].quantidade ?? 1) + 1;
         salvar();
         reRenderSheetInv();
@@ -895,7 +908,7 @@ export function setupEventosInventarioSheet() {
       if (!item) return;
       if (!item.sintonizado && !podeSintonizar(char, idx)) {
         caixa.checked = false;
-        toast(`Você já está sintonizado com ${TETO_SINTONIZACAO} itens.`, 'error');
+        toast(`Você já está sintonizado com ${tetoSintonizacao(char)} itens.`, 'error');
         return;
       }
       // Ao marcar: requisito de classe/espécie não atendido pede confirmação.

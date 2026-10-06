@@ -22,6 +22,7 @@ import { getEstadoRecursosGuerreiro } from './classes/guerreiro.js';
 import { getEstadoRecursosLadino } from './classes/ladino.js';
 import { getEstadoRecursosMago } from './classes/mago.js';
 import { abrirEscolhaMagiasFixasMago, mostrarTrocaMagiaConhecida } from './grimorio.js';
+import { controleCaracteristicaArtifice } from './classes/artifice.js';
 import { getEstadoRecursosMonge } from './classes/monge.js';
 import { getEstadoRecursosPaladino } from './classes/paladino.js';
 import { ataqueImprudenteAtivo, formatarMetros, getDeslocamentoFinal, parseMetros, temArmaduraPesadaEquipada } from './combate.js';
@@ -3201,6 +3202,10 @@ export function renderFeatureItem(f, source, ctx) {
     ehVidaCuraSuprema || ehLuzLabaredaAprimorada || ehTrapacaTransposicao
   ) ? getEstadoSubclassesClerigo() : null;
 
+  // Artífice: características com controle próprio (sheet/classes/artifice.js).
+  const controleArtifice = controleCaracteristicaArtifice(f, source, ctx);
+  if (controleArtifice && controleArtifice.recarga !== undefined) recarga = controleArtifice.recarga;
+
   const recargaBadge = recarga
     ? `<span class="badge" style="font-size:0.65rem;margin-left:4px;background:${recarga === 'longo' ? 'var(--info)' : recarga === 'curto' ? 'var(--success)' : 'var(--warning)'};color:#fff">${recarga === 'longo' ? '🌙 Desc. Longo' : recarga === 'curto' ? '☀ Desc. Curto' : '☀🌙 Curto/Longo'}</span>`
     : '';
@@ -3212,7 +3217,10 @@ export function renderFeatureItem(f, source, ctx) {
   let usosHtmlSummary = '';
   let usosHtmlBody = '';
 
-  if (ehFuriaBarbaro && estadoFuria) {
+  if (controleArtifice) {
+    usosHtmlSummary = controleArtifice.summary;
+    usosHtmlBody = controleArtifice.body;
+  } else if (ehFuriaBarbaro && estadoFuria) {
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoFuria.usosDisponiveis}/${estadoFuria.usosMax}</span>`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
@@ -5165,6 +5173,8 @@ export function renderFeatureItem(f, source, ctx) {
 
   if (gratisJaControladoPelaListaDeMagias) {
     usosHtmlSummary = `<span style="font-size:0.7rem;color:var(--text-muted)" title="Controlado pelo botão &quot;Grátis&quot; na lista de Magias">Ver Magias</span>`;
+  } else if (controleArtifice) {
+    // Artífice: o controle (ou a ausência dele) já foi decidido acima; o card genérico não acrescenta contador nem toggle.
   } else if (!usosHtmlBody && temMultiplosUsos) {
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${usosMax - usosAtual}/${usosMax}</span>`;
     usosHtmlBody = `

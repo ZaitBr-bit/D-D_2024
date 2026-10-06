@@ -1,0 +1,143 @@
+{
+  "tipo": "subclasses",
+  "paginas_pdf": [26, 29],
+  "subclasses": [
+    {
+      "nome": "Cartógrafo",
+      "nome_en": "Cartographer",
+      "descricao": "Traçar Cursos Vantajosos em Meio à Turbulência\n\nOs Cartógrafos são os principais navegadores e agentes de reconhecimento. Usando suas criações, eles podem destacar ameaças, proteger aliados e abrir portais para locais distantes.",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Ferramentas da Profissão",
+          "nome_en": "Tools of the Trade",
+          "pagina_pdf": 27,
+          "descricao": "Você ganha os benefícios a seguir.\n\n**Proficiência com Ferramentas.** Você ganha proficiência com Suprimentos de Calígrafo e Ferramentas de Cartógrafo. Se já tiver uma dessas proficiências, você ganha proficiência com outro tipo de Ferramentas de Artesão à sua escolha (ou com dois outros tipos, se já tiver as duas).\n\n**Fabricação de Pergaminhos.** Ao escrever um Pergaminho de Magia usando as regras de fabricação do Livro do Jogador, o tempo necessário para fabricá-lo é reduzido à metade."
+        },
+        {
+          "nivel": 3,
+          "nome": "Magias de Cartógrafo",
+          "nome_en": "Cartographer Spells",
+          "pagina_pdf": 27,
+          "descricao": "Ao alcançar um nível de Artífice especificado na tabela Magias de Cartógrafo, você passa a sempre ter preparadas as magias listadas.\n\n| **Nível de Artífice** | **Magias** |\n|---|---|\n| 3 | *Fogo das Fadas, Raio Guia, Palavra Curativa* |\n| 5 | *Localizar Objeto, Espinho Mental* |\n| 9 | *Convocar Relâmpagos, Clarividência* |\n| 13 | *Banimento, Localizar Criatura* |\n| 17 | *Vidência, Círculo de Teleporte* |"
+        },
+        {
+          "nivel": 3,
+          "nome": "Atlas do Aventureiro",
+          "nome_en": "Adventurer's Atlas",
+          "pagina_pdf": 27,
+          "descricao": "Sempre que terminar um Descanso Longo segurando Ferramentas de Cartógrafo, você pode usar essa ferramenta para criar um conjunto de mapas mágicos tocando pelo menos duas criaturas (uma delas pode ser você), até um máximo de criaturas igual a 1 mais o seu modificador de Inteligência (mínimo de duas criaturas). Cada alvo recebe um mapa mágico, que se atualiza constantemente para mostrar a posição relativa de todos os portadores de mapas, mas é ilegível para todos os outros. Os mapas duram até você morrer ou até você usar esta característica novamente, e nesse momento quaisquer mapas existentes criados por ela desaparecem imediatamente.\n\nEnquanto carrega o mapa, um alvo ganha os benefícios a seguir.\n\n**Percepção.** O alvo soma 1d4 às suas jogadas de Iniciativa.\n\n**Posicionamento.** O alvo sabe a localização de todos os outros portadores de mapas que estejam no mesmo plano de existência que ele. Ao conjurar uma magia ou criar outro efeito que exija enxergar o alvo do efeito, um portador de mapa pode escolher como alvo outro portador de mapa independentemente de visão ou cobertura, desde que o outro portador de mapa ainda esteja dentro do alcance do efeito."
+        },
+        {
+          "nivel": 3,
+          "nome": "Magia de Mapeamento",
+          "nome_en": "Mapping Magic",
+          "pagina_pdf": 27,
+          "descricao": "Você ganha os benefícios a seguir.\n\n**Cartografia Iluminada.** Você sempre tem a magia *Fogo das Fadas* preparada e pode conjurá-la sem gastar um espaço de magia, delineando as criaturas afetadas como se fosse com tinta. Você pode fazer isso um número de vezes igual ao seu modificador de Inteligência (mínimo de uma vez). Você recupera todos os usos gastos ao terminar um Descanso Longo.\n\n**Salto de Portal.** No seu turno, você pode gastar uma quantidade de movimento igual à metade do seu Deslocamento (arredondada para baixo) para se teleportar para um espaço desocupado que você possa ver a até 3 metros de você ou a até 1,5 metro de uma criatura que esteja a até 9 metros de você e segure um dos mapas do seu Atlas do Aventureiro. Você não pode usar este benefício se o seu Deslocamento for 0."
+        },
+        {
+          "nivel": 5,
+          "nome": "Precisão Guiada",
+          "nome_en": "Guided Precision",
+          "pagina_pdf": 27,
+          "descricao": "Uma vez por turno, ao conjurar uma magia da sua lista de Magias de Cartógrafo ou ao atingir com uma jogada de ataque uma criatura afetada pelo seu *Fogo das Fadas*, você pode somar o seu modificador de Inteligência a uma jogada de dano da magia ou do ataque.\n\nAlém disso, sofrer dano não pode fazer você perder a Concentração em *Fogo das Fadas*."
+        },
+        {
+          "nivel": 9,
+          "nome": "Movimento Engenhoso",
+          "nome_en": "Ingenious Movement",
+          "pagina_pdf": 27,
+          "descricao": "Ao usar o seu Lampejo de Genialidade, você ou uma criatura voluntária à sua escolha que você possa ver a até 9 metros de você pode se teleportar até 9 metros para um espaço desocupado que você possa ver como parte dessa mesma Reação."
+        },
+        {
+          "nivel": 15,
+          "nome": "Atlas Superior",
+          "nome_en": "Superior Atlas",
+          "pagina_pdf": 27,
+          "descricao": "Seu Atlas do Aventureiro melhora, concedendo os benefícios a seguir.\n\n**Refúgio Seguro.** Quando um portador de mapa fosse reduzido a 0 Pontos de Vida mas não morto de imediato, essa criatura pode destruir o seu mapa. Em vez disso, os Pontos de Vida da criatura passam a ser um número igual ao dobro do seu nível de Artífice, e a criatura é teleportada para um espaço desocupado a até 1,5 metro de você ou de outro portador de mapa à escolha dela.\n\n**Caminho Infalível.** Se você for um dos portadores de mapa do seu Atlas do Aventureiro, você sempre tem a magia *Encontrar o Caminho* preparada e pode conjurá-la sem gastar um espaço de magia e sem precisar de componentes. Depois de usar este benefício, você não pode usá-lo novamente até terminar um Descanso Longo."
+        }
+      ]
+    }
+  ],
+  "magias": [
+    {
+      "nome": "Servo Homúnculo",
+      "nome_en": "Homunculus Servant",
+      "circulo": 2,
+      "escola": "Invocação",
+      "tempo_conjuracao": "1 hora ou Ritual",
+      "alcance": "3 metros",
+      "componentes": "V, S, M (uma gema que valha 100+ PO)",
+      "duracao": "Instantânea",
+      "descricao": "Você convoca um homúnculo especial em um espaço desocupado ao alcance. Essa criatura usa o bloco de estatísticas do Servo Homúnculo. Se você já tiver um homúnculo desta magia, ele é substituído pelo novo. Você determina a aparência do homúnculo, como um pássaro de aparência mecânica, um frasco alado ou um caldeirão em miniatura animado.\n\n**Combate.** O homúnculo é um aliado seu e dos seus aliados. Em combate, ele compartilha a sua contagem de Iniciativa, mas age logo depois de você. Ele obedece aos seus comandos (sem exigir ação sua). Se você não der nenhum, ele realiza a ação Esquivar e usa seu movimento para evitar perigo.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. Use o círculo do espaço de magia como o círculo da magia no bloco de estatísticas.",
+      "pagina_pdf": 29
+    }
+  ],
+  "criaturas": [
+    {
+      "id": "defensor-de-aco",
+      "nome": "Defensor de Aço",
+      "nome_en": "Steel Defender",
+      "tipo": "Construto Médio, Neutro",
+      "ca": { "base": 12, "soma": ["mod_int"] },
+      "pv": { "base": 5, "por_nivel_artifice": 5, "dado_vida": "d8" },
+      "deslocamento": "12 metros",
+      "atributos": { "forca": 14, "destreza": 12, "constituicao": 14, "inteligencia": 4, "sabedoria": 10, "carisma": 6 },
+      "imunidades": "Venenoso; Enfeitiçado, Exaustão, Envenenado",
+      "sentidos": "Visão no Escuro 18 metros; Percepção Passiva 10",
+      "idiomas": "Entende os idiomas que você conhece",
+      "tracos": [
+        { "nome": "Vínculo de Aço", "descricao": "Some seu Bônus de Proficiência a qualquer teste de atributo ou salvaguarda que o defensor fizer." }
+      ],
+      "acoes": [
+        { "nome": "Golpe Reforçado por Energia", "ataque": "magia", "alcance": "1,5 metro", "dano": { "dado": "1d8", "soma": ["2", "mod_int"], "tipo": "Energético" } },
+        { "nome": "Reparar (3/Dia)", "usos": 3, "recupera": "descanso_longo", "descricao": "O defensor, ou um Construto ou objeto que ele possa ver a até 1,5 metro, recupera 2d8 + seu modificador de Inteligência Pontos de Vida." }
+      ],
+      "reacoes": [
+        { "nome": "Desviar Ataque", "descricao": "Gatilho: uma criatura que o defensor possa ver a até 1,5 metro faz uma jogada de ataque contra uma criatura que não seja o defensor. Resposta: o atacante tem Desvantagem nessa jogada de ataque." }
+      ],
+      "pagina_pdf": 26
+    },
+    {
+      "id": "canhao-mistico",
+      "nome": "Canhão Místico",
+      "nome_en": "Eldritch Cannon",
+      "tipo": "Objeto Pequeno ou Miúdo",
+      "ca": { "base": 18, "soma": [] },
+      "pv": { "base": 0, "por_nivel_artifice": 5 },
+      "atributos": { "forca": 10, "destreza": 10, "constituicao": 10, "inteligencia": 10, "sabedoria": 10, "carisma": 10 },
+      "imunidades": "Venenoso, Psíquico",
+      "acoes": [
+        { "nome": "Lança-Chamas", "salvaguarda": "Destreza", "dano": { "dado": "2d8", "soma": [], "tipo": "Ígneo" }, "area": "Cone de 4,5 metros" },
+        { "nome": "Balista de Energia", "ataque": "magia", "alcance": "36 metros", "dano": { "dado": "2d8", "soma": [], "tipo": "Energético" } },
+        { "nome": "Protetor", "pv_temporarios": { "dado": "1d8", "soma": ["mod_int_min1"] }, "area": "3 metros" }
+      ],
+      "pagina_pdf": 24
+    },
+    {
+      "id": "servo-homunculo",
+      "nome": "Servo Homúnculo",
+      "nome_en": "Homunculus Servant",
+      "tipo": "Construto Miúdo, Neutro",
+      "ca": { "base": 13, "soma": [] },
+      "pv": { "base": 5, "por_nivel_magia": 5, "dado_vida": "d4" },
+      "deslocamento": "6 metros, Voo 9 metros",
+      "atributos": { "forca": 4, "destreza": 15, "constituicao": 12, "inteligencia": 10, "sabedoria": 10, "carisma": 7 },
+      "imunidades": "Venenoso; Exaustão, Envenenado",
+      "sentidos": "Visão no Escuro 18 metros; Percepção Passiva 10",
+      "idiomas": "Telepatia 1,5 km (só com você)",
+      "tracos": [
+        { "nome": "Evasão", "descricao": "Se o homúnculo for submetido a um efeito que permita uma salvaguarda de Destreza para sofrer só metade do dano, ele não sofre dano se for bem-sucedido e sofre metade se falhar. Não funciona com a condição Incapacitado." },
+        { "nome": "Vínculo Mágico", "descricao": "Some o círculo da magia a qualquer teste de atributo ou salvaguarda que o homúnculo fizer." }
+      ],
+      "acoes": [
+        { "nome": "Golpe de Energia", "ataque": "magia", "alcance": "1,5 metro ou 9 metros", "dano": { "dado": "1d6", "soma": ["circulo_magia"], "tipo": "Energético" } }
+      ],
+      "reacoes": [
+        { "nome": "Canalizar Magia", "descricao": "Gatilho: você conjura uma magia de alcance Toque com o homúnculo a até 36 metros de você. Resposta: o homúnculo entrega a magia pelo próprio toque." }
+      ],
+      "pagina_pdf": 29
+    }
+  ]
+}

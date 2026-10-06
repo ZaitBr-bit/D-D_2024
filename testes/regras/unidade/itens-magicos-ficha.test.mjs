@@ -178,3 +178,31 @@ test('Defensivo não liga com Escudo +1 sem armadura; liga com armadura corporal
   p.escolhas_classe.estilo_luta = 'Defensivo';
   assert.equal(utils.calcCA(p), caCota + 1, 'controle: com armadura o Defensivo soma 1');
 });
+
+// ---------- Ferreiro de Batalha: Int em arma mágica (fiação de inventario.js) ----------
+
+/** Personagem de classe única, For/Des 10 e Int dada, com a Rapieira (mágica +1 ou comum) equipada. */
+function comRapieira(classe, nivel, subclasse, int, magica) {
+  const dados = { ...RAPIEIRA, ...(magica ? { magico_id: 'rapieira-mais-1', efeitos: [{ alvo: 'ataque_arma', valor: 1 }, { alvo: 'dano_arma', valor: 1 }] } : {}) };
+  return { classes: [{ classe, nivel, ordem: 0, subclasse }], classe, subclasse, nivel,
+    atributos: { forca: 10, destreza: 10, constituicao: 10, inteligencia: int, sabedoria: 10, carisma: 10 },
+    recursos: {}, salvaguardas_proficientes: [], proficiencias_extra: classe === 'Artífice' ? ['Armas Marciais'] : [],
+    inventario: [{ nome: 'Rapieira', tipo: 'arma', equipado: true, quantidade: 1, dados }] };
+}
+
+test('Ferreiro de Batalha 3: Rapieira mágica usa Int no ataque e no dano (Atq +7, Dano 1d8+5)', () => {
+  const html = htmlInventario(comRapieira('Artífice', 3, 'Ferreiro de Batalha', 18, true));
+  assert.ok(html.includes('Atq +7'), html.match(/Atq [+-]\d+/)?.[0]);
+  assert.ok(html.includes('Dano 1d8+5 Perfurante'), html.match(/Dano [^<]+/)?.[0]);
+});
+
+test('Int em arma só vale com a guarda inteira: arma comum, Mago e Ferreiro nível 2 ficam em For/Des', () => {
+  const comum = htmlInventario(comRapieira('Artífice', 3, 'Ferreiro de Batalha', 18, false));
+  assert.ok(comum.includes('Atq +2'), comum.match(/Atq [+-]\d+/)?.[0]);
+  assert.ok(!comum.includes('Dano 1d8+4'), comum.match(/Dano [^<]+/)?.[0]);
+  const mago = htmlInventario(comRapieira('Mago', 5, 'Evocador', 20, true));
+  assert.ok(!mago.includes('Atq +6') && !mago.includes('Dano 1d8+6'), mago.match(/Atq [+-]\d+/)?.[0]);
+  const nivel2 = htmlInventario(comRapieira('Artífice', 2, 'Ferreiro de Batalha', 18, true));
+  assert.ok(nivel2.includes('Atq +3'), nivel2.match(/Atq [+-]\d+/)?.[0]);
+  assert.ok(nivel2.includes('Dano 1d8+1 Perfurante'), nivel2.match(/Dano [^<]+/)?.[0]);
+});

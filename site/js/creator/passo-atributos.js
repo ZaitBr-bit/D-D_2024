@@ -439,7 +439,8 @@ const DISTRIBUICOES_SUGERIDAS = {
   'Ladino':     { forca: 3, destreza: 0, constituicao: 2, inteligencia: 1, sabedoria: 4, carisma: 5 },  // For12 Des15 Con13 Int14 Sab10 Car8
   'Mago':       { forca: 5, destreza: 3, constituicao: 2, inteligencia: 0, sabedoria: 1, carisma: 4 },  // For8  Des12 Con13 Int15 Sab14 Car10
   'Monge':      { forca: 3, destreza: 0, constituicao: 2, inteligencia: 4, sabedoria: 1, carisma: 5 },  // For12 Des15 Con13 Int10 Sab14 Car8
-  'Paladino':   { forca: 0, destreza: 4, constituicao: 2, inteligencia: 5, sabedoria: 3, carisma: 1 }   // For15 Des10 Con13 Int8  Sab12 Car14
+  'Paladino':   { forca: 0, destreza: 4, constituicao: 2, inteligencia: 5, sabedoria: 3, carisma: 1 },  // For15 Des10 Con13 Int8  Sab12 Car14
+  'Artífice':   { forca: 5, destreza: 2, constituicao: 1, inteligencia: 0, sabedoria: 3, carisma: 4 }   // For8  Des13 Con14 Int15 Sab12 Car10
 };
 
 function renderStandardArray(el) {

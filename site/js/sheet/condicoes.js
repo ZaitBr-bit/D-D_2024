@@ -99,6 +99,7 @@ export function renderSecaoCondicoes() {
   // Uma por condição; ordem de precedência: Fúria/Auras, magia, item (a primeira fonte vale).
   const imunidadesMagia = efMag.filter(e => e.tipo === 'imunidade_condicao').map(e => ({ condicao: e.condicao, fonte: e.nome.replace(/ \(.*\)$/, '') }))
     .concat(defesasDeItens(char).imunidadesCondicao.map(i => ({ condicao: i.condicao, fonte: i.origem })))
+    .concat((char.imunidades_condicao || []).map(c => ({ condicao: c, fonte: 'Característica de classe' })))
     .filter(im => !condicoesDeFuriaEAuras.has(im.condicao))
     .filter((im, idx, lista) => lista.findIndex(x => x.condicao === im.condicao) === idx);
   const condicoesMagia = efMag.filter(e => e.tipo === 'condicao').map(e => ({ condicao: e.condicao, fonte: e.nome, rotulo: e.rotulo }));
@@ -414,6 +415,11 @@ export function setupEventosCondicoes() {
     if (_furiaImune) { _fontesImunidade['Amedrontado'] = 'Furia Irracional'; _fontesImunidade['Enfeitiçado'] = 'Furia Irracional'; }
     if (_epCond?.auraCoragemAtiva && !_fontesImunidade['Amedrontado']) _fontesImunidade['Amedrontado'] = 'Aura de Coragem';
     if (_epCond?.auraDevocaoAtiva && !_fontesImunidade['Enfeitiçado']) _fontesImunidade['Enfeitiçado'] = 'Aura de Devoção';
+    // Imunidades permanentes a condição concedidas por característica de classe (ex.: Alquimista 15).
+    for (const c of (char.imunidades_condicao || [])) {
+      if (!_condicoesImunes.includes(c)) _condicoesImunes.push(c);
+      if (!_fontesImunidade[c]) _fontesImunidade[c] = 'Característica de classe';
+    }
 
     const html = `
       <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">

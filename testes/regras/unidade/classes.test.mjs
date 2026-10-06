@@ -288,8 +288,8 @@ for (const classe of CLASSES) {
   });
 }
 
-test('CLASSES_INFO não tem classe além das 12 do livro', () => {
-  const extras = Object.keys(CLASSES_INFO).filter((c) => !PROGRESSAO[c]);
+test('CLASSES_INFO não tem classe além das 12 do livro, exceto as de expansão (com fonte)', () => {
+  const extras = Object.keys(CLASSES_INFO).filter((c) => !PROGRESSAO[c] && !CLASSES_INFO[c].fonte);
   assert.deepEqual(extras, [], `classes desconhecidas: ${extras.join(', ')}`);
 });
 

@@ -1,0 +1,111 @@
+{
+  "tipo": "subclasses",
+  "paginas_pdf": [24, 26],
+  "subclasses": [
+    {
+      "nome": "Artilheiro",
+      "nome_en": "Artillerist",
+      "descricao": "Empunhar Poder Destrutivo à Distância\n\nUm Artilheiro é especialista em usar a magia para lançar energia, projéteis e explosões em um campo de batalha.",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Ferramentas da Profissão",
+          "nome_en": "Tools of the Trade",
+          "pagina_pdf": 24,
+          "descricao": "Você ganha os benefícios a seguir.\n\n**Armamento à Distância.** Você ganha proficiência com armas Marciais à Distância.\n\n**Proficiência com Ferramentas.** Você ganha proficiência com Ferramentas de Entalhador. Se já tiver essa proficiência, você ganha proficiência com outro tipo de Ferramentas de Artesão à sua escolha.\n\n**Fabricação de Varinhas.** Quando você fabrica uma Varinha mágica, o tempo necessário para fabricá-la é reduzido à metade."
+        },
+        {
+          "nivel": 3,
+          "nome": "Magias de Artilheiro",
+          "nome_en": "Artillerist Spells",
+          "pagina_pdf": 24,
+          "descricao": "Ao alcançar um nível de Artífice especificado na tabela Magias de Artilheiro, você passa a sempre ter preparadas as magias listadas.\n\n| **Nível de Artífice** | **Magias** |\n|---|---|\n| 3 | *Escudo Arcano, Onda Trovejante* |\n| 5 | *Raio Ardente, Despedaçar* |\n| 9 | *Bola de Fogo, Muralha de Vento* |\n| 13 | *Tempestade Glacial, Muralha de Fogo* |\n| 17 | *Cone de Frio, Muralha de Energia* |"
+        },
+        {
+          "nivel": 3,
+          "nome": "Canhão Místico",
+          "nome_en": "Eldritch Cannon",
+          "pagina_pdf": 24,
+          "descricao": "Usando Ferramentas de Ferreiro ou Ferramentas de Entalhador, você pode usar uma Ação Mágica para criar um Canhão Místico Pequeno ou Miúdo em um espaço desocupado sobre uma superfície horizontal a até 1,5 metro de você. As estatísticas de jogo do canhão aparecem abaixo. Você determina a aparência dele, inclusive se você o carrega ou não (e, caso o carregue, se ele tem pernas ou rodas). Ele desaparece se for reduzido a 0 Pontos de Vida ou após 1 hora. Você pode dispensá-lo antes disso como uma Ação Mágica.\n\nDepois de criar um canhão, você não pode criar outro até terminar um Descanso Longo ou gastar um espaço de magia para criá-lo. Você pode ter apenas um canhão por vez e não pode criar um enquanto já tiver um.\n\n**Canhão Místico**\nObjeto Pequeno ou Miúdo\n\n**Classe de Armadura:** 18\n**Pontos de Vida:** 5 vezes o seu nível de Artífice (conjurar *Reparar* no canhão restaura 2d6 Pontos de Vida a ele)\n**Imunidades:** Psíquico, Venenoso\n\n**Ativar Canhão (Exige que Você Esteja a até 18 Metros do Canhão).** Como uma Ação Bônus, você ordena que o canhão use uma das opções Lança-Chamas, Balista de Energia ou Protetor descritas abaixo; você pode fazer o canhão se mover até 4,5 metros antes ou depois dessa opção.\n\n***Lança-Chamas.*** O canhão lança fogo em um Cone de 4,5 metros. Cada criatura nessa área faz uma salvaguarda de Destreza contra a CD das suas magias, sofrendo 2d8 de dano Ígneo em uma falha, ou metade desse dano em um sucesso. Objetos inflamáveis no Cone que não estejam sendo vestidos ou carregados começam a queimar.\n\n***Balista de Energia.*** Faça um ataque de magia à distância originado no canhão contra uma criatura ou objeto a até 36 metros dele. Em um acerto, o alvo sofre 2d8 de dano Energético e, se for uma criatura, é empurrado até 1,5 metro para longe do canhão.\n\n***Protetor.*** O canhão emite uma explosão de energia positiva que concede a ele mesmo e a cada criatura à sua escolha a até 3 metros do canhão uma quantidade de Pontos de Vida Temporários igual a 1d8 mais o seu modificador de Inteligência (mínimo de +1).\n\nO bloco de estatísticas completo do canhão está na seção de criaturas."
+        },
+        {
+          "nivel": 5,
+          "nome": "Arma de Fogo Arcana",
+          "nome_en": "Arcane Firearm",
+          "pagina_pdf": 24,
+          "descricao": "Ao terminar um Descanso Longo, você pode usar Ferramentas de Entalhador para entalhar sigilos especiais em um Bastão, Cajado, Varinha ou arma Marcial à Distância e, assim, transformá-lo na sua Arma de Fogo Arcana. Os sigilos desaparecem do objeto se você os entalhar depois em outro item. Fora isso, os sigilos duram indefinidamente.\n\nVocê pode usar sua Arma de Fogo Arcana como Foco de Conjuração para as suas magias de Artífice. Quando você conjura uma magia de Artífice por meio da arma, role 1d8 e ganhe um bônus em uma das rolagens de dano da magia igual ao número rolado."
+        },
+        {
+          "nivel": 9,
+          "nome": "Canhão Explosivo",
+          "nome_en": "Explosive Cannon",
+          "pagina_pdf": 24,
+          "descricao": "Todo Canhão Místico que você cria agora é mais destrutivo. Você ganha os benefícios a seguir.\n\n**Detonar.** Quando o seu canhão sofre dano, você pode usar uma Reação para ordenar que ele detone, se estiver a até 18 metros dele. Isso destrói o canhão e força cada criatura a até 6 metros dele a fazer uma salvaguarda de Destreza contra a CD das suas magias, sofrendo 3d10 de dano Energético em uma falha, ou metade desse dano em um sucesso.\n\n**Poder de Fogo.** As rolagens de dano do canhão e a quantidade de Pontos de Vida Temporários concedidos pelo Protetor aumentam em 1d8."
+        },
+        {
+          "nivel": 15,
+          "nome": "Posição Fortificada",
+          "nome_en": "Fortified Position",
+          "pagina_pdf": 25,
+          "descricao": "Você é mestre em formar posições bem defendidas usando seu Canhão Místico. Você ganha os benefícios a seguir.\n\n**Poder de Fogo Duplo.** Agora você pode ter dois canhões ao mesmo tempo e pode criar dois com a mesma Ação Mágica. (Se gastar um espaço de magia para criar o primeiro canhão, deve gastar outro espaço de magia para criar o segundo.) Você pode ativar os dois com a mesma Ação Bônus, ordenando que usem a mesma opção de ativação ou opções diferentes. Você não pode criar um terceiro canhão enquanto tiver dois.\n\n**Projeção de Campo Cintilante.** Você e seus aliados têm Meia-Cobertura enquanto estiverem a até 3 metros do seu Canhão Místico."
+        }
+      ]
+    },
+    {
+      "nome": "Ferreiro de Batalha",
+      "nome_en": "Battle Smith",
+      "descricao": "Comandar um Guardião Construto\n\nUm Ferreiro de Batalha é uma combinação de protetor e médico, especialista em defender os outros e em reparar tanto o material quanto o pessoal. Para auxiliá-lo no trabalho, os Ferreiros de Batalha são acompanhados por um Defensor de Aço, um companheiro protetor de sua própria criação.",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Ferramentas da Profissão",
+          "nome_en": "Tools of the Trade",
+          "pagina_pdf": 25,
+          "descricao": "Você ganha os benefícios a seguir.\n\n**Proficiência com Ferramentas.** Você ganha proficiência com Ferramentas de Ferreiro. Se já tiver essa proficiência, você ganha proficiência com outro tipo de Ferramentas de Artesão à sua escolha.\n\n**Fabricação de Armas.** Quando você fabrica uma arma mundana ou mágica, o tempo necessário para fabricá-la é reduzido à metade."
+        },
+        {
+          "nivel": 3,
+          "nome": "Magias de Ferreiro de Batalha",
+          "nome_en": "Battle Smith Spells",
+          "pagina_pdf": 25,
+          "descricao": "Ao alcançar um nível de Artífice especificado na tabela Magias de Ferreiro de Batalha, você passa a sempre ter preparadas as magias listadas.\n\n| **Nível de Artífice** | **Magias** |\n|---|---|\n| 3 | *Heroísmo, Escudo Arcano* |\n| 5 | *Destruição Radiante, Vínculo de Proteção* |\n| 9 | *Aura de Vitalidade, Invocar Barragem* |\n| 13 | *Aura de Pureza, Escudo Ardente* |\n| 17 | *Destruição Banidora, Curar Ferimentos em Massa* |"
+        },
+        {
+          "nivel": 3,
+          "nome": "Pronto para a Batalha",
+          "nome_en": "Battle Ready",
+          "pagina_pdf": 25,
+          "descricao": "Seu treinamento de combate e seus experimentos com magia renderam dois frutos.\n\n**Potencialização Arcana.** Quando você ataca com uma arma mágica, pode usar o seu modificador de Inteligência, em vez do modificador de Força ou de Destreza, nas jogadas de ataque e de dano.\n\n**Conhecimento de Armas.** Você ganha proficiência com armas Marciais. Você pode usar uma arma com a qual tenha proficiência como Foco de Conjuração para as suas magias de Artífice."
+        },
+        {
+          "nivel": 3,
+          "nome": "Defensor de Aço",
+          "nome_en": "Steel Defender",
+          "pagina_pdf": 25,
+          "descricao": "Seu trabalho de funileiro lhe rendeu um companheiro, um Defensor de Aço (veja o bloco de estatísticas na seção de criaturas). Você determina a aparência do defensor e se ele tem duas ou quatro pernas; suas escolhas não afetam as estatísticas de jogo do defensor.\n\nO defensor é Amigável para você e seus aliados e obedece a você. Ele desaparece se você morrer.\n\n**O Defensor em Combate.** Em combate, o defensor age durante o seu turno. Ele pode se mover e usar a própria Reação por conta própria, mas a única ação que realiza é Esquivar, a menos que você use uma Ação Bônus para ordenar que ele realize outra ação. Se você tiver a condição Incapacitado, o defensor age por conta própria e não fica limitado à ação Esquivar.\n\n**Restaurando ou Substituindo o Defensor.** Se o defensor morreu na última hora, você pode usar uma Ação Mágica para tocá-lo e gastar um espaço de magia. O defensor volta à vida após 1 minuto, com todos os seus Pontos de Vida restaurados.\n\nSempre que terminar um Descanso Longo, você pode criar um novo defensor se estiver segurando Ferramentas de Ferreiro. Se você já tiver um defensor desta característica, o primeiro desaparece."
+        },
+        {
+          "nivel": 5,
+          "nome": "Ataque Extra",
+          "nome_en": "Extra Attack",
+          "pagina_pdf": 26,
+          "descricao": "Você pode atacar duas vezes, em vez de uma, sempre que realizar a ação Atacar no seu turno. Você pode abrir mão de um dos seus ataques ao realizar a ação Atacar para ordenar que o seu Defensor de Aço realize a ação Golpe Reforçado por Energia."
+        },
+        {
+          "nivel": 9,
+          "nome": "Golpe Arcano",
+          "nome_en": "Arcane Jolt",
+          "pagina_pdf": 26,
+          "descricao": "Quando você acerta um alvo com uma jogada de ataque usando uma arma mágica, ou quando o seu Defensor de Aço acerta um alvo, você pode canalizar energia mágica através do golpe para criar um dos efeitos a seguir.\n\n**Energia Destrutiva.** O alvo sofre 2d6 de dano Energético adicional.\n\n**Energia Restauradora.** Escolha uma criatura ou objeto que você possa ver a até 9 metros do alvo. A energia curativa flui para o escolhido, restaurando 2d6 Pontos de Vida a ele.\n\nVocê pode usar esta energia um número de vezes igual ao seu modificador de Inteligência (mínimo de uma vez), mas não mais de uma vez por turno. Você recupera todos os usos gastos ao terminar um Descanso Longo."
+        },
+        {
+          "nivel": 15,
+          "nome": "Defensor Aprimorado",
+          "nome_en": "Improved Defender",
+          "pagina_pdf": 26,
+          "descricao": "Seu Golpe Arcano e seu Defensor de Aço ficaram mais poderosos, concedendo os benefícios a seguir.\n\n**Golpe Aprimorado.** O dano adicional e a cura do seu Golpe Arcano aumentam ambos para 4d6.\n\n**Deflexão Aprimorada.** Sempre que o seu Defensor de Aço usa Desviar Ataque, o atacante sofre dano Energético igual a 1d4 mais o seu modificador de Inteligência."
+        }
+      ]
+    }
+  ]
+}

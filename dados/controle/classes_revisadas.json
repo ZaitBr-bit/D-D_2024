@@ -1,6 +1,6 @@
 {
   "descricao": "Controle de classes revisadas para o sistema de level-up",
-  "ultima_atualizacao": "2026-02-14",
+  "ultima_atualizacao": "2026-10-06",
   "classes": [
     {
       "nome": "Clérigo",
@@ -95,6 +95,33 @@
       "revisado": false,
       "nivel_subclasse": 3,
       "niveis_aumento_atributo": [4, 8, 12, 16, 19]
+    },
+    {
+      "nome": "Artífice",
+      "revisado": true,
+      "data_revisao": "2026-10-06",
+      "nivel_subclasse": 3,
+      "niveis_aumento_atributo": [4, 8, 12, 16],
+      "caracteristicas_por_nivel": {
+        "1": ["Conjuração", "Magia de Funileiro"],
+        "2": ["Replicar Item Mágico"],
+        "3": ["Subclasse"],
+        "4": ["Aumento no Valor de Atributo"],
+        "5": ["Característica de Subclasse"],
+        "6": ["Funileiro de Item Mágico"],
+        "7": ["Lampejo de Genialidade"],
+        "8": ["Aumento no Valor de Atributo"],
+        "9": ["Característica de Subclasse"],
+        "10": ["Especialista em Itens Mágicos"],
+        "11": ["Item de Armazenar Magia"],
+        "12": ["Aumento no Valor de Atributo"],
+        "14": ["Artifício Avançado"],
+        "15": ["Característica de Subclasse"],
+        "16": ["Aumento no Valor de Atributo"],
+        "18": ["Mestre de Itens Mágicos"],
+        "19": ["Dádiva Épica"],
+        "20": ["Alma do Artífice"]
+      }
     }
   ]
 }

@@ -1,0 +1,450 @@
+{
+  "fonte": "tasha",
+  "niveis": [
+    2,
+    6,
+    10,
+    14
+  ],
+  "planos": [
+    {
+      "id": "alchemy-jug",
+      "nivel_minimo": 2,
+      "nome_en": "Alchemy Jug",
+      "requer_sintonizacao": false,
+      "item_id": "jarro-alquimico"
+    },
+    {
+      "id": "bag-of-holding",
+      "nivel_minimo": 2,
+      "nome_en": "Bag of Holding",
+      "requer_sintonizacao": false,
+      "item_id": "bolsa-devoradora"
+    },
+    {
+      "id": "cap-of-water-breathing",
+      "nivel_minimo": 2,
+      "nome_en": "Cap of Water Breathing",
+      "requer_sintonizacao": false,
+      "item_id": "gorro-de-respiracao-aquatica"
+    },
+    {
+      "id": "common-magic-item",
+      "nome": "Item mágico comum (que não seja poção, pergaminho nem amaldiçoado)",
+      "nivel_minimo": 2,
+      "nome_en": "Common magic item that isn't a Potion, a Scroll, or cursed",
+      "requer_sintonizacao": null,
+      "generico": {
+        "raridades": [
+          "Comum"
+        ],
+        "excluir_tipos": [
+          "Poção",
+          "Pergaminho"
+        ],
+        "excluir_amaldicoados": true
+      }
+    },
+    {
+      "id": "goggles-of-night",
+      "nivel_minimo": 2,
+      "nome_en": "Goggles of Night",
+      "requer_sintonizacao": false,
+      "item_id": "oculos-da-noite"
+    },
+    {
+      "id": "manifold-tool",
+      "nivel_minimo": 2,
+      "nome_en": "Manifold Tool",
+      "requer_sintonizacao": true,
+      "livro": "tasha",
+      "item_id": "ferramenta-multiforme"
+    },
+    {
+      "id": "repeating-shot",
+      "nivel_minimo": 2,
+      "nome_en": "Repeating Shot",
+      "requer_sintonizacao": true,
+      "livro": "tasha",
+      "item_id": "disparo-repetido"
+    },
+    {
+      "id": "returning-weapon",
+      "nivel_minimo": 2,
+      "nome_en": "Returning Weapon",
+      "requer_sintonizacao": false,
+      "livro": "tasha",
+      "item_id": "arma-retornavel"
+    },
+    {
+      "id": "rope-of-climbing",
+      "nivel_minimo": 2,
+      "nome_en": "Rope of Climbing",
+      "requer_sintonizacao": false,
+      "item_id": "corda-de-escalada"
+    },
+    {
+      "id": "sending-stones",
+      "nivel_minimo": 2,
+      "nome_en": "Sending Stones",
+      "requer_sintonizacao": false,
+      "item_id": "pedras-de-mensagem"
+    },
+    {
+      "id": "shield-1",
+      "nivel_minimo": 2,
+      "nome_en": "Shield, +1",
+      "requer_sintonizacao": false,
+      "item_id": "escudo-mais-1-mais-2-ou-mais-3",
+      "variante_id": "escudo-mais-1"
+    },
+    {
+      "id": "wand-of-magic-detection",
+      "nivel_minimo": 2,
+      "nome_en": "Wand of Magic Detection",
+      "requer_sintonizacao": false,
+      "item_id": "varinha-de-deteccao-de-magia"
+    },
+    {
+      "id": "wand-of-secrets",
+      "nivel_minimo": 2,
+      "nome_en": "Wand of Secrets",
+      "requer_sintonizacao": false,
+      "item_id": "varinha-dos-segredos"
+    },
+    {
+      "id": "wand-of-the-war-mage-1",
+      "nivel_minimo": 2,
+      "nome_en": "Wand of the War Mage, +1",
+      "requer_sintonizacao": true,
+      "item_id": "varinha-do-mago-de-guerra-mais-1-mais-2-ou-mais-3",
+      "variante_id": "varinha-do-mago-de-guerra-mais-1"
+    },
+    {
+      "id": "weapon-1",
+      "nivel_minimo": 2,
+      "nome_en": "Weapon, +1",
+      "requer_sintonizacao": false,
+      "item_id": "arma-mais-1-mais-2-ou-mais-3",
+      "variante_id": "arma-mais-1"
+    },
+    {
+      "id": "wraps-of-unarmed-power-1",
+      "nivel_minimo": 2,
+      "nome_en": "Wraps of Unarmed Power, +1",
+      "requer_sintonizacao": false,
+      "item_id": "faixas-do-poder-desarmado",
+      "variante_id": "faixas-do-poder-desarmado-mais-1"
+    },
+    {
+      "id": "armor-1",
+      "nivel_minimo": 6,
+      "nome_en": "Armor, +1",
+      "requer_sintonizacao": false,
+      "item_id": "armadura-mais-1-mais-2-ou-mais-3",
+      "variante_id": "armadura-mais-1"
+    },
+    {
+      "id": "boots-of-elvenkind",
+      "nivel_minimo": 6,
+      "nome_en": "Boots of Elvenkind",
+      "requer_sintonizacao": false,
+      "item_id": "botas-elficas"
+    },
+    {
+      "id": "boots-of-the-winding-path",
+      "nivel_minimo": 6,
+      "nome_en": "Boots of the Winding Path",
+      "requer_sintonizacao": true,
+      "livro": "tasha",
+      "item_id": "botas-do-caminho-sinuoso"
+    },
+    {
+      "id": "cloak-of-elvenkind",
+      "nivel_minimo": 6,
+      "nome_en": "Cloak of Elvenkind",
+      "requer_sintonizacao": true,
+      "item_id": "manto-elfico"
+    },
+    {
+      "id": "cloak-of-the-manta-ray",
+      "nivel_minimo": 6,
+      "nome_en": "Cloak of the Manta Ray",
+      "requer_sintonizacao": true,
+      "item_id": "manto-da-arraia-jamanta"
+    },
+    {
+      "id": "dazzling-weapon",
+      "nivel_minimo": 6,
+      "nome_en": "Dazzling Weapon",
+      "requer_sintonizacao": true,
+      "livro": "tasha",
+      "item_id": "arma-deslumbrante"
+    },
+    {
+      "id": "eyes-of-charming",
+      "nivel_minimo": 6,
+      "nome_en": "Eyes of Charming",
+      "requer_sintonizacao": true,
+      "item_id": "olhos-do-encantamento"
+    },
+    {
+      "id": "eyes-of-minute-seeing",
+      "nivel_minimo": 6,
+      "nome_en": "Eyes of Minute Seeing",
+      "requer_sintonizacao": false,
+      "item_id": "olhos-de-visao-minuciosa"
+    },
+    {
+      "id": "gloves-of-thievery",
+      "nivel_minimo": 6,
+      "nome_en": "Gloves of Thievery",
+      "requer_sintonizacao": false,
+      "item_id": "luvas-do-ladrao"
+    },
+    {
+      "id": "helm-of-awareness",
+      "nivel_minimo": 6,
+      "nome_en": "Helm of Awareness",
+      "requer_sintonizacao": false,
+      "livro": "tasha",
+      "item_id": "elmo-da-prontidao"
+    },
+    {
+      "id": "lantern-of-revealing",
+      "nivel_minimo": 6,
+      "nome_en": "Lantern of Revealing",
+      "requer_sintonizacao": false,
+      "item_id": "lanterna-reveladora"
+    },
+    {
+      "id": "mind-sharpener",
+      "nivel_minimo": 6,
+      "nome_en": "Mind Sharpener",
+      "requer_sintonizacao": true,
+      "livro": "tasha",
+      "item_id": "afiador-mental"
+    },
+    {
+      "id": "necklace-of-adaptation",
+      "nivel_minimo": 6,
+      "nome_en": "Necklace of Adaptation",
+      "requer_sintonizacao": true,
+      "item_id": "colar-de-adaptacao"
+    },
+    {
+      "id": "pipes-of-haunting",
+      "nivel_minimo": 6,
+      "nome_en": "Pipes of Haunting",
+      "requer_sintonizacao": false,
+      "item_id": "flauta-assombrosa"
+    },
+    {
+      "id": "repulsion-shield",
+      "nivel_minimo": 6,
+      "nome_en": "Repulsion Shield",
+      "requer_sintonizacao": false,
+      "livro": "tasha",
+      "item_id": "escudo-de-repulsao"
+    },
+    {
+      "id": "ring-of-swimming",
+      "nivel_minimo": 6,
+      "nome_en": "Ring of Swimming",
+      "requer_sintonizacao": false,
+      "item_id": "anel-de-natacao"
+    },
+    {
+      "id": "ring-of-water-walking",
+      "nivel_minimo": 6,
+      "nome_en": "Ring of Water Walking",
+      "requer_sintonizacao": false,
+      "item_id": "anel-de-caminhar-sobre-as-aguas"
+    },
+    {
+      "id": "sentinel-shield",
+      "nivel_minimo": 6,
+      "nome_en": "Sentinel Shield",
+      "requer_sintonizacao": false,
+      "item_id": "escudo-sentinela"
+    },
+    {
+      "id": "spell-refueling-ring",
+      "nivel_minimo": 6,
+      "nome_en": "Spell-Refueling Ring",
+      "requer_sintonizacao": true,
+      "livro": "tasha",
+      "item_id": "anel-de-reabastecimento-de-magia"
+    },
+    {
+      "id": "wand-of-magic-missiles",
+      "nivel_minimo": 6,
+      "nome_en": "Wand of Magic Missiles",
+      "requer_sintonizacao": false,
+      "item_id": "varinha-de-misseis-magicos"
+    },
+    {
+      "id": "wand-of-web",
+      "nivel_minimo": 6,
+      "nome_en": "Wand of Web",
+      "requer_sintonizacao": true,
+      "item_id": "varinha-da-teia"
+    },
+    {
+      "id": "weapon-of-warning",
+      "nivel_minimo": 6,
+      "nome_en": "Weapon of Warning",
+      "requer_sintonizacao": true,
+      "item_id": "arma-de-alerta"
+    },
+    {
+      "id": "armor-of-resistance",
+      "nivel_minimo": 10,
+      "nome_en": "Armor of Resistance",
+      "requer_sintonizacao": true,
+      "item_id": "armadura-de-resistencia"
+    },
+    {
+      "id": "dagger-of-venom",
+      "nivel_minimo": 10,
+      "nome_en": "Dagger of Venom",
+      "requer_sintonizacao": false,
+      "item_id": "adaga-do-veneno"
+    },
+    {
+      "id": "elven-chain",
+      "nivel_minimo": 10,
+      "nome_en": "Elven Chain",
+      "requer_sintonizacao": false,
+      "item_id": "cota-de-malha-elfica"
+    },
+    {
+      "id": "ring-of-feather-falling",
+      "nivel_minimo": 10,
+      "nome_en": "Ring of Feather Falling",
+      "requer_sintonizacao": true,
+      "item_id": "anel-de-queda-suave"
+    },
+    {
+      "id": "ring-of-jumping",
+      "nivel_minimo": 10,
+      "nome_en": "Ring of Jumping",
+      "requer_sintonizacao": true,
+      "item_id": "anel-de-salto"
+    },
+    {
+      "id": "ring-of-mind-shielding",
+      "nivel_minimo": 10,
+      "nome_en": "Ring of Mind Shielding",
+      "requer_sintonizacao": true,
+      "item_id": "anel-de-protecao-mental"
+    },
+    {
+      "id": "shield-2",
+      "nivel_minimo": 10,
+      "nome_en": "Shield, +2",
+      "requer_sintonizacao": false,
+      "item_id": "escudo-mais-1-mais-2-ou-mais-3",
+      "variante_id": "escudo-mais-2"
+    },
+    {
+      "id": "uncommon-wondrous-item",
+      "nome": "Item maravilhoso incomum (não amaldiçoado)",
+      "nivel_minimo": 10,
+      "nome_en": "Uncommon Wondrous Item that isn't cursed",
+      "requer_sintonizacao": null,
+      "generico": {
+        "raridades": [
+          "Incomum"
+        ],
+        "tipos": [
+          "Item Maravilhoso"
+        ],
+        "excluir_amaldicoados": true
+      }
+    },
+    {
+      "id": "wand-of-the-war-mage-2",
+      "nivel_minimo": 10,
+      "nome_en": "Wand of the War Mage, +2",
+      "requer_sintonizacao": true,
+      "item_id": "varinha-do-mago-de-guerra-mais-1-mais-2-ou-mais-3",
+      "variante_id": "varinha-do-mago-de-guerra-mais-2"
+    },
+    {
+      "id": "weapon-2",
+      "nivel_minimo": 10,
+      "nome_en": "Weapon, +2",
+      "requer_sintonizacao": false,
+      "item_id": "arma-mais-1-mais-2-ou-mais-3",
+      "variante_id": "arma-mais-2"
+    },
+    {
+      "id": "wraps-of-unarmed-power-2",
+      "nivel_minimo": 10,
+      "nome_en": "Wraps of Unarmed Power, +2",
+      "requer_sintonizacao": false,
+      "item_id": "faixas-do-poder-desarmado",
+      "variante_id": "faixas-do-poder-desarmado-mais-2"
+    },
+    {
+      "id": "armor-2",
+      "nivel_minimo": 14,
+      "nome_en": "Armor, +2",
+      "requer_sintonizacao": false,
+      "item_id": "armadura-mais-1-mais-2-ou-mais-3",
+      "variante_id": "armadura-mais-2"
+    },
+    {
+      "id": "arrow-catching-shield",
+      "nivel_minimo": 14,
+      "nome_en": "Arrow-Catching Shield",
+      "requer_sintonizacao": true,
+      "item_id": "escudo-apanha-flechas"
+    },
+    {
+      "id": "flame-tongue",
+      "nivel_minimo": 14,
+      "nome_en": "Flame Tongue",
+      "requer_sintonizacao": true,
+      "item_id": "lingua-flamejante"
+    },
+    {
+      "id": "rare-wondrous-item",
+      "nome": "Item maravilhoso raro (não amaldiçoado)",
+      "nivel_minimo": 14,
+      "nome_en": "Rare Wondrous Item that isn't cursed",
+      "requer_sintonizacao": null,
+      "generico": {
+        "raridades": [
+          "Rara"
+        ],
+        "tipos": [
+          "Item Maravilhoso"
+        ],
+        "excluir_amaldicoados": true
+      }
+    },
+    {
+      "id": "ring-of-free-action",
+      "nivel_minimo": 14,
+      "nome_en": "Ring of Free Action",
+      "requer_sintonizacao": true,
+      "item_id": "anel-de-acao-livre"
+    },
+    {
+      "id": "ring-of-protection",
+      "nivel_minimo": 14,
+      "nome_en": "Ring of Protection",
+      "requer_sintonizacao": true,
+      "item_id": "anel-de-protecao"
+    },
+    {
+      "id": "ring-of-the-ram",
+      "nivel_minimo": 14,
+      "nome_en": "Ring of the Ram",
+      "requer_sintonizacao": true,
+      "item_id": "anel-do-carneiro"
+    }
+  ]
+}

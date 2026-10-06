@@ -17,6 +17,7 @@ import { validarEscolhasTalento } from '../regras-cobertura.js';
 import { salvarPersonagem } from '../store.js';
 import { calcMod, calcPVNivel1, getBonusTruquesOrdem, getEspacosMagia, getMagiaPreparadas, getTruquesConhecidos, magiaMagoEstaNoGrimorio, toast } from '../utils.js';
 import { ANTECEDENTES_ESCOLHAS, CLASSES_ESCOLHAS, ESPECIES_TRACOS_ESCOLHA, FERRAMENTAS_TODAS, INSTRUMENTOS_MUSICAIS, consolidarPericiasProficientes, obterTruquesEspecie } from './comum.js';
+import { aplicarFerramentasDaCriacao, concederTruquesDeEntrada } from '../regras-artifice.js';
 import { renderStepAntecedente } from './passo-antecedente.js';
 import { renderStepAtributos } from './passo-atributos.js';
 import { renderStepClasse } from './passo-classe.js';
@@ -578,6 +579,10 @@ async function finalizar() {
       }
     }
   }
+
+  // Artífice: ferramentas fixas + a de artesão escolhida, e o truque Reparar da Magia de Funileiro.
+  aplicarFerramentasDaCriacao(personagem);
+  concederTruquesDeEntrada(personagem, personagem.classe);
 
   // Distribuir escolhas de talentos nas arrays de proficiência corretas
   if (personagem.escolhas_talento) {

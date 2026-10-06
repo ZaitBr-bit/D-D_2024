@@ -25,6 +25,8 @@
  * `quantas`: 'uma' ou 'qualquer' -- idem.
  */
 export const TROCA_POR_CLASSE = [
+  // Classe de expansão: fonte é dados/tasha/artifice/classe.json ("Alterando suas Magias Preparadas").
+  { classe: 'Artífice', ocasiao: 'descanso-longo', quantas: 'qualquer', livro: 'Tasha: Artífice, Alterando suas Magias Preparadas' },
   { classe: 'Bardo', ocasiao: 'nivel', quantas: 'uma', livro: 'Magias.md:21' },
   { classe: 'Bruxo', ocasiao: 'nivel', quantas: 'uma', livro: 'Magias.md:22' },
   { classe: 'Clérigo', ocasiao: 'descanso-longo', quantas: 'qualquer', livro: 'Magias.md:23' },
@@ -72,6 +74,7 @@ export const TROCA_POR_CLASSE = [
  * estrutura nova.
  */
 export const DECISAO_PRODUTO = [
+  { classe: 'Artífice', descansoLongo: 'uma', nivel: 'todas' },
   { classe: 'Bardo', descansoLongo: 'uma', nivel: 'todas' },
   { classe: 'Bruxo', descansoLongo: 'uma', nivel: 'todas' },
   { classe: 'Clérigo', descansoLongo: 'uma', nivel: 'todas' },
@@ -90,6 +93,9 @@ export const DECISAO_PRODUTO = [
  * A chave é `<classe>|<eixo>`, com eixo em { 'descanso-longo', 'nivel' }.
  */
 export const AFASTAMENTOS_DO_LIVRO = {
+  'Artífice|descanso-longo':
+    'Mesmo caso do Clérigo: o livro dá "Qualquer uma" e o app dá UMA, mais restritivo. Decisão do ' +
+    'dono do produto (2026-08-19).',
   'Bardo|descanso-longo':
     'O livro dá a ocasião "Avança um nível" e não prevê troca no Descanso Longo. O app oferece ' +
     'UMA troca aqui, como conveniência A MAIS -- a troca por nível continua existindo. Decisão ' +
@@ -128,6 +134,9 @@ export const AFASTAMENTOS_DO_LIVRO = {
     'Mesmo caso do Clérigo: o livro não prevê a ocasião, e o app oferece sem limite. Decisão do ' +
     'dono do produto (2026-08-19).',
   'Guardião|nivel':
+    'Mesmo caso do Clérigo: o livro não prevê a ocasião, e o app oferece sem limite. Decisão do ' +
+    'dono do produto (2026-08-19).',
+  'Artífice|nivel':
     'Mesmo caso do Clérigo: o livro não prevê a ocasião, e o app oferece sem limite. Decisão do ' +
     'dono do produto (2026-08-19).',
   'Mago|nivel':

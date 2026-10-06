@@ -7,6 +7,7 @@
 // ============================================================
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ATRIBUTO_NOME_PARA_KEY, CLASSES_INFO, PERICIAS } from '../dados-classes.js';
 import { XP_POR_NIVEL } from '../levelup.js';
+import { seloFonte, ligarSelosFonte } from '../fontes.js';
 import { _renderSyncIndicadorHtml } from '../pages/sheet.js';
 import { atributoDefinidoPorItem, atributoEfetivo, textosAtributoPorItem } from '../regras-atributos.js';
 import { magiasDeItens } from '../regras-magias-itens.js';
@@ -19,6 +20,8 @@ import { resolverPassivosTalentos } from '../talentos-effects.js';
 import { bonusProficiencia, calcBonusPericia, calcCA, calcMod, calcPVMulticlasse, calcSalvaguarda, coletarCAsAlternativas, conjuracoesPorClasse, equipamentoDeCA, escHtml, escolherCAAlternativa, fmtMod, getDeslocamento, getTamanho, semAcento } from '../utils.js';
 import { renderSecaoCaracteristicas, renderSecaoSubclasse, renderSecaoTracosEspecie } from './caracteristicas.js';
 import { getEstadoFuria, setupEventosSubclasseBarbaro } from './classes/barbaro.js';
+import { setupEventosArtifice } from './classes/artifice.js';
+import { renderSecaoCompanheirosArtifice, setupEventosCompanheirosArtifice } from './companheiros-artifice.js';
 import { getEstadoInspiracaoBardo } from './classes/bardo.js';
 import { getEstadoRecursosBruxo } from './classes/bruxo.js';
 import { getEstadoRecursosDruida } from './classes/druida.js';
@@ -276,7 +279,7 @@ export function renderFichaCompleta() {
               ${escHtml(char.especie || '')} ${(() => {
                 const cs = classesDe(char);
                 return cs.map((c) =>
-                  `${escHtml(c.classe)}${c.subclasse ? ` (${escHtml(c.subclasse)})` : ''}${cs.length > 1 ? ` ${c.nivel}` : ''}${seloPrerequisitoDispensado(c.classe, { comBotaoRemover: true })}`
+                  `${escHtml(c.classe)}${seloFonte(CLASSES_INFO[c.classe]?.fonte)}${c.subclasse ? ` (${escHtml(c.subclasse)})` : ''}${cs.length > 1 ? ` ${c.nivel}` : ''}${seloPrerequisitoDispensado(c.classe, { comBotaoRemover: true })}`
                 ).join(' / ');
               })()} &middot; Nível ${char.nivel}
             </div>
@@ -665,6 +668,7 @@ export function renderFichaCompleta() {
           <div class="stat-label">Iniciativa</div>
           <div class="stat-value">${fmtMod(iniciativa.valor)}</div>
           ${iniciativa.vantagem ? `<div style="font-size:0.65rem;color:var(--success);font-weight:700"${iniciativa.fontesVantagem?.length ? ` title="${escHtml(iniciativa.fontesVantagem.join(', '))}"` : ''}>Vantagem</div>` : ''}
+          ${iniciativa.dadosExtras?.length ? `<div style="font-size:0.65rem;color:var(--accent);font-weight:700" title="${escHtml(iniciativa.dadosExtras.join(', '))}">${escHtml(iniciativa.dadosExtras.map((d) => `+${d.split(' ')[0]}`).join(' '))}</div>` : ''}
         </div>
         <div class="stat-box" ${_deslSobrecarga ? 'style="cursor:pointer;position:relative" onclick="window.avisarSobrecargaDeslocamento()"' : ''}>
           <div class="stat-label">Deslocamento</div>
@@ -1022,6 +1026,9 @@ export function renderFichaCompleta() {
     <!-- Características de Subclasse -->
     ${renderSecaoSubclasse()}
 
+    <!-- Companheiros do Artífice -->
+    ${renderSecaoCompanheirosArtifice()}
+
     <!-- Traços da Espécie/Raça -->
     ${renderSecaoTracosEspecie()}
 
@@ -1069,6 +1076,9 @@ export function renderFichaCompleta() {
   setupEventosInventarioSheet();
   setupEventosEspacosMagia();
   setupEventosHabilidades();
+  setupEventosArtifice();
+  setupEventosCompanheirosArtifice();
+  ligarSelosFonte(containerRef);
   setupEventosSubclasseBarbaro();
   setupEventosCondicoes();
   setupEventosDefesas();

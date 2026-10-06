@@ -13,13 +13,46 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.1.3';
+export const VERSAO_ATUAL = '3.2.0';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.2.0',
+    data: '2026-10-06',
+    rotulo: 'Artífice',
+    resumo: 'Nova classe Artífice (Tasha\'s Cauldron of Everything, versão 2024) '
+      + 'com as cinco subclasses, Replicar Item Mágico e o selo de origem do livro.',
+    melhorias: [
+      {
+        grupo: '✨ Melhorias',
+        itens: [
+          'Nova classe Artífice, do nível 1 ao 20, na criação, na subida de '
+            + 'nível e na multiclasse: conjuração de meio-conjurador, Magia de '
+            + 'Funileiro, Lampejo de Genialidade, Armazenar Magia e o limite '
+            + 'de itens sintonizados que cresce com o nível. (#95)',
+          'Replicar Item Mágico: escolha os planos na subida de nível e crie '
+            + 'os itens de verdade no inventário (selos "Replicado" e '
+            + '"Temporário"), com Carregar, Drenar, Transmutar e Trapacear a '
+            + 'Morte.',
+          'Subclasses: Alquimista (Elixir Experimental, resistências do nível '
+            + '15), Armeiro (Armadura Arcana, modelos Couraçado, Guardião e '
+            + 'Infiltrador, arma especial e contadores), Artilheiro (Canhão '
+            + 'Místico), Ferreiro de Batalha (Defensor de Aço, Inteligência em '
+            + 'arma mágica) e Cartógrafo (Atlas do Aventureiro, com o +1d4 de '
+            + 'Iniciativa também no PDF e na impressão).',
+          'Novo selo de origem em classes e subclasses de livros de expansão: '
+            + 'toque em "Tasha\'s" para ver o nome do livro. Classes do Livro '
+            + 'do Jogador não mostram o selo.',
+          'Escolhas de magia e item do Artífice (Magia de Funileiro, efeito do '
+            + 'elixir, planos) usam cards com as informações de cada opção.',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.1.3',
     data: '2026-10-05',

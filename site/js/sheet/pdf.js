@@ -4,7 +4,7 @@
 // ============================================================
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES } from '../dados-classes.js';
 import { baixarArquivo, bonusProficiencia, calcBonusPericia, calcCA, calcIntuicaoPassiva, calcInvestigacaoPassiva, calcMod, calcPercepcaoPassiva, calcSalvaguarda, conjuracoesPorClasse, fmtMod, getDeslocamento, removerMarcadoresDado, toast } from '../utils.js';
-import { forcaPrimordialAtiva, getDeslocamentoFinal, getModIniciativa } from './combate.js';
+import { forcaPrimordialAtiva, getDeslocamentoFinal, getModIniciativa, textoDadosExtrasIniciativa } from './combate.js';
 import { char, especiesCache, passivosTalentosCache } from './estado.js';
 import { classesDe } from '../regras-multiclasse.js';
 import { atributoEfetivo } from '../regras-atributos.js';
@@ -126,7 +126,7 @@ function _montarDadosCartao() {
   const stats = [
     { label: 'CA', value: String(ca) },
     { label: 'PV', value: `${char.pv_atual ?? 0}/${char.pv_max ?? 0}` },
-    { label: 'Iniciativa', value: fmtMod(ini.valor) },
+    { label: 'Iniciativa', value: `${fmtMod(ini.valor)}${textoDadosExtrasIniciativa(ini)}` },
     { label: 'Deslocam.', value: desloc },
     { label: 'Prof.', value: `+${prof}` },
   ];

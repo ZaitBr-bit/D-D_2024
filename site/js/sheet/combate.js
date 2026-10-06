@@ -11,6 +11,7 @@ import { PERICIAS } from '../dados-classes.js';
 import { abrirModal, calcMod, escHtml, fmtPeso, getMultiplicadorCarga, PERICIAS_CONHECIMENTO_PRIMORDIAL, somaModificadoresManuais, toast } from '../utils.js';
 import { nivelNa, subclasseDe } from '../regras-multiclasse.js';
 import { estaIncapacitado } from '../regras-condicoes.js';
+import { modeloAtivo, bonusIniciativaAtlas } from '../regras-subclasses-artifice.js';
 import { getEstadoFuria } from './classes/barbaro.js';
 import { getProgressaoMonge } from './classes/monge.js';
 import { char, passivosTalentosCache } from './estado.js';
@@ -51,6 +52,9 @@ export function calcVantagemDesvantagemPericia(nomePericia) {
   if (nomePericia === 'Furtividade' && armaduraImpoeFurtividadeDesv()) {
     desvantagens.push('Armadura');
   }
+
+  // Armeiro Infiltrador: Campo Silenciador, Vantagem em Furtividade; a ficha (ficha.js) anula com a Desvantagem da armadura.
+  if (nomePericia === 'Furtividade' && modeloAtivo(char) === 'Infiltrador') vantagens.push('Campo Silenciador');
 
   // --- Barbaro em Furia: Vantagem em testes de Forca ---
   // Inclui as pericias do Conhecimento Primordial (Barbaro 3): o livro
@@ -299,6 +303,9 @@ export function getDeslocamentoFinal(baseDeslocamento) {
     final += 3;
   }
 
+  // Armeiro Infiltrador: Passos Potencializados, +1,5 m com a Armadura Arcana ativa.
+  if (modeloAtivo(char) === 'Infiltrador') final += 1.5;
+
   // Bônus de deslocamento de talentos (resolvido centralmente)
   const passivos = passivosTalentosCache || {};
   final += passivos.bonusDeslocamento || 0;
@@ -467,6 +474,9 @@ export function getAtaquesPorAcao() {
   // nao o espelho `char.subclasse` (que e o da classe inicial).
   if (subclasseDe(char, 'Bardo') === 'Colégio da Bravura'
       && nivelNa(char, 'Bardo') >= 6) ataques = Math.max(ataques, 2);
+  // Artífice: Ataque Extra do Ferreiro de Batalha e do Armeiro, no nível 5 DE ARTÍFICE.
+  if (['Ferreiro de Batalha', 'Armeiro'].includes(subclasseDe(char, 'Artífice'))
+      && nivelNa(char, 'Artífice') >= 5) ataques = Math.max(ataques, 2);
 
   // Bruxo: a invocacao Lamina Sedenta (Classes.md:1002-1006, Bruxo 5 +
   // Pacto da Lamina) concede Ataque Extra a arma de pacto, e Lamina
@@ -521,7 +531,17 @@ export function getModIniciativa() {
     if (!fontesVantagem.includes(origem)) fontesVantagem.push(origem);
   }
   const vantagem = fontesVantagem.length > 0;
-  return { valor: base + (passivos.bonusIniciativa || 0) + somaModificadoresManuais(char, 'iniciativa'), vantagem, fontesVantagem };
+  // Dados extras somados à rolagem (não entram em `valor`): Atlas do Aventureiro do Cartógrafo.
+  const dadosExtras = bonusIniciativaAtlas(char) ? ['1d4 (Atlas do Aventureiro)'] : [];
+  return { valor: base + (passivos.bonusIniciativa || 0) + somaModificadoresManuais(char, 'iniciativa'), vantagem, fontesVantagem, dadosExtras };
+}
+
+/**
+ * Texto dos dados extras de Iniciativa para a folha impressa e o PDF (ex.: " +1d4"); vazio sem dados extras.
+ * O valor numérico segue em `valor`; o dado é rolado e somado pelo jogador.
+ */
+export function textoDadosExtrasIniciativa(ini) {
+  return (ini?.dadosExtras || []).map((d) => ` +${String(d).split(' ')[0]}`).join('');
 }
 
 export function forcaPrimordialAtiva() {

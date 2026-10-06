@@ -9,6 +9,7 @@ import { carregarTaxasMoeda } from './store.js';
 import { toast, abrirModal } from './utils.js';
 import { VERSAO_ATUAL } from './versao.js';
 import { abrirNotasVersao } from './notas-versao.js';
+import { carregarFontes } from './fontes.js';
 
 // --- Router baseado em hash ---
 /**
@@ -343,6 +344,9 @@ function init() {
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') sincronizarHomeAoVoltar();
   });
+
+  // Registro de livros de origem: carregado cedo para o chip já nascer com a sigla.
+  carregarFontes().catch(() => {});
 
   // Rota inicial
   processarRota();

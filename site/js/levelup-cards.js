@@ -6,6 +6,7 @@ import { CLASSES_INFO, ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ATRIBUTO_NOME_PARA_KEY }
 import { getMagiasClasse, getMagiasPorCirculo } from './db.js';
 import { calcMod, bonusProficiencia, escHtml, mdParaHtml, semAcento, toast, abrirModal } from './utils.js';
 import { rotuloPericia } from './opcoes-dominio.js';
+import { seloFonte } from './fontes.js';
 import { obterTalentosElegiveis } from './levelup.js';
 import { calcularConjuracao, calcularSubclasseArcana, escolhasSubclasseDoNivel } from './levelup-flow.js';
 import { opcoesDaLinha, resolvedorDaLinha } from './regras-subclasse-escolhas.js';
@@ -13,6 +14,7 @@ import { opcoesDaLinha, resolvedorDaLinha } from './regras-subclasse-escolhas.js
 // classe"): ver uso perto de `magiasAtuais`, em renderCardMagias.
 import { preparadasPorClasse, truquesPorClasse } from './regras-magia-classe.js';
 import { classesDe } from './regras-multiclasse.js';
+import { resolverPlano, validarConhecidos, trocasEntre } from './regras-planos-artifice.js';
 import { podeEntrarEm } from './regras-multiclasse-progressao.js';
 // INSTRUMENTOS_MUSICAIS vem de regras-cobertura.js, NUNCA de
 // creator/comum.js -- a constante existe duplicada nos dois arquivos, e
@@ -77,7 +79,7 @@ export function renderCardEscolhaClasse(ctx, state) {
     return `
       <label class="levelup-check-label levelup-opcao${travada ? ' levelup-opcao-travada' : ''}">
         <input type="radio" name="classe-que-sobe" data-classe="${escHtml(nome)}"${marcado}${travada ? ' disabled' : ''}>
-        <span>${escHtml(rotulo)}</span>
+        <span>${escHtml(rotulo)}</span>${seloFonte(CLASSES_INFO[nome]?.fonte)}
         ${dispensada ? `<span class="levelup-motivo" data-prerequisito-dispensado="${escHtml(nome)}">⚠️ pré-requisito dispensado (${escHtml(motivoBloqueio(faltando))})</span>` : ''}
         ${travada && !dispensada ? `<span class="levelup-motivo">🔒 ${escHtml(motivoBloqueio(faltando))}</span>
                      <button class="btn btn-sm btn-secondary" data-dispensar="${escHtml(nome)}">usar mesmo assim</button>` : ''}
@@ -223,7 +225,7 @@ export function renderCardSubclasse(ctx, state) {
             // necessario para bater com a aparencia de antes da migracao.
             return `
               <div class="opcao-card ${selecionada ? 'selecionada' : ''}" data-subclasse="${sc.nome}" data-idx="${idx}" style="padding:10px 12px">
-                <div style="font-weight:700;font-size:1rem;margin-bottom:4px">${sc.nome}</div>
+                <div style="font-weight:700;font-size:1rem;margin-bottom:4px">${sc.nome}${seloFonte(sc.fonte)}</div>
                 <div style="font-size:0.82rem;color:var(--text-muted)">
                   ${featsNivel3.map(f => {
                     const descPlain = f.descricao.replace(/\|[^|]*\|/g, '').replace(/\*\*/g, '').trim();
@@ -901,7 +903,6 @@ export function renderCardMagias(ctx, state) {
 export function renderCardManobrasGuerreiro(ctx, state) {
   const { manobrasGuerreiro } = ctx;
   if (!manobrasGuerreiro) return '';
-
   const { qtdNova, manobrasConhecidasAtuais } = manobrasGuerreiro;
 
   let html = `
@@ -1282,5 +1283,47 @@ export function renderCardRevisao(ctx, state, steps) {
   html += renderCardTrocasOpcionais(ctx, state);
 
   return html;
+}
+
+// ============================================================
+// CARD: Planos de Item Mágico (Artífice)
+// ============================================================
+
+/**
+ * Card do passo de Planos de Item Mágico: lista os planos conhecidos em
+ * edição (com botão de remover), o botão de adicionar e os avisos de
+ * quantidade/troca. Lê state.planosArtifice (ou os atuais, se ainda intocado).
+ */
+export function renderCardPlanosArtifice(ctx, state) {
+  const pa = ctx.planosArtifice;
+  if (!pa) return '';
+  const lista = state.planosArtifice || pa.atuais;
+  const nomeDe = (c) => {
+    const alvo = resolverPlano(c, pa.acervo);
+    const nome = alvo ? (alvo.variante || alvo.item).nome : c.item_id;
+    return c.base_nome ? `${nome} (${c.base_nome})` : nome;
+  };
+  const erros = validarConhecidos(lista, pa);
+  const trocas = pa.nivel > 2 ? trocasEntre(pa.atuais, lista) : 0;
+  return `
+    <div class="levelup-card" id="levelup-planos-artifice">
+      <div class="levelup-card-header">Planos de Item Mágico (${lista.length}/${pa.max})</div>
+      <div class="levelup-card-body">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:6px">
+          ${pa.nivel > 2 ? 'Você pode trocar 1 plano neste nível e aprender os novos que a tabela concede.' : 'Escolha seus planos iniciais.'}
+          ${pa.armeiro ? ' Armeiro Aprimorado: marque um plano de Armadura como o extra.' : ''}
+        </div>
+        <div id="levelup-planos-lista" style="display:flex;flex-direction:column;gap:4px">
+          ${lista.map((c) => `
+            <div class="opcao-card selecionada" style="padding:6px 10px;display:flex;gap:8px;align-items:center">
+              <span style="flex:1">${escHtml(nomeDe(c))}${c.armeiro ? ' <span class="badge badge-accent">Armeiro</span>' : ''}</span>
+              <button class="btn btn-sm btn-secondary" data-plano-remover="${escHtml(c.id)}">Remover</button>
+            </div>`).join('')}
+        </div>
+        <button class="btn btn-sm btn-primary" id="btn-plano-adicionar" style="margin-top:8px" ${lista.length >= pa.max ? 'disabled' : ''}>Adicionar plano</button>
+        ${trocas > 1 ? '<div style="color:var(--danger);font-size:0.8rem;margin-top:6px">Só 1 troca por nível.</div>' : ''}
+        ${erros.length && lista.length === pa.max ? `<div style="color:var(--danger);font-size:0.8rem;margin-top:6px">${escHtml(erros.join(' '))}</div>` : ''}
+      </div>
+    </div>`;
 }
 

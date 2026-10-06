@@ -73,6 +73,31 @@ export const ESCOLHAS_SUBCLASSE_APP = [
     // concessão aqui é a simples, e o caso alternativo fica de fora de
     // propósito, não por esquecimento.
     automatica: { salvaguardas: ['Sabedoria'] } },
+  // ---------- Artífice (Tasha's) ----------
+  { subclasse: 'Ferreiro de Batalha', nivel: 3, caracteristica: 'Ferramentas da Profissão',
+    livro: 'dados/tasha/artifice/classe.json',
+    // "proficiência com Ferramentas de Ferreiro". A alternativa (outra ferramenta
+    // de artesão para quem já a tem) não é oferecida: registrada em PERGUNTAS-PENDENTES.
+    automatica: { ferramentas: ['Ferramentas de Ferreiro'] } },
+  { subclasse: 'Ferreiro de Batalha', nivel: 3, caracteristica: 'Pronto para a Batalha',
+    livro: 'dados/tasha/artifice/classe.json',
+    automatica: { extras: ['Armas Marciais'] } },
+  { subclasse: 'Artilheiro', nivel: 3, caracteristica: 'Ferramentas da Profissão',
+    livro: 'dados/tasha/artifice/classe.json',
+    automatica: { ferramentas: ['Ferramentas de Entalhador'], extras: ['Armas Marciais à Distância'] } },
+  { subclasse: 'Alquimista', nivel: 3, caracteristica: 'Ferramentas da Profissão',
+    livro: 'dados/tasha/artifice/classe.json',
+    automatica: { ferramentas: ['Suprimentos de Alquimista', 'Kit de Herbalismo'] } },
+  { subclasse: 'Alquimista', nivel: 15, caracteristica: 'Maestria Química',
+    livro: 'dados/tasha/artifice/classe.json',
+    // Resistência Química: Resistência a dano Ácido e Venenoso (tipos de dano) e Imunidade à condição Envenenado.
+    automatica: { resistencias: ['Ácido', 'Venenoso'], imunidades_condicao: ['Envenenado'] } },
+  { subclasse: 'Armeiro', nivel: 3, caracteristica: 'Ferramentas da Profissão',
+    livro: 'dados/tasha/artifice/classe.json',
+    automatica: { extras: ['Armadura Pesada'], ferramentas: ['Ferramentas de Ferreiro'] } },
+  { subclasse: 'Cartógrafo', nivel: 3, caracteristica: 'Ferramentas da Profissão',
+    livro: 'dados/tasha/artifice/classe.json',
+    automatica: { ferramentas: ['Suprimentos de Calígrafo', 'Ferramentas de Cartógrafo'] } },
   { subclasse: 'Ilusionista', nivel: 3, caracteristica: 'Ilusões Aprimoradas',
     livro: 'Classes.md:5074',
     // "Você também conhece o truque *Ilusão Menor*. Se já o conhece, você
@@ -528,6 +553,8 @@ export function aplicarConcessaoAutomatica(personagem, linha, contexto = {}) {
   if (a.ferramentas) acrescentarNaLista(personagem, 'proficiencias_ferramentas', a.ferramentas);
   if (a.salvaguardas) acrescentarNaLista(personagem, 'salvaguardas_proficientes', a.salvaguardas);
   if (a.extras) acrescentarNaLista(personagem, 'proficiencias_extra', a.extras);
+  if (a.resistencias) acrescentarNaLista(personagem, 'resistencias', a.resistencias);
+  if (a.imunidades_condicao) acrescentarNaLista(personagem, 'imunidades_condicao', a.imunidades_condicao);
   if (a.truques) {
     for (const nome of a.truques) concederTruqueDeSubclasse(personagem, nome, contexto.classe);
   }

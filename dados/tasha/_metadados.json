@@ -1,0 +1,23 @@
+{
+  "titulo": "Tasha's Cauldron of Everything",
+  "fonte": "tasha",
+  "pdf_extraido": "Eberron: Forge of the Artificer",
+  "idioma_original": "inglês; traduzido para PT-BR",
+  "observacao": "Separado de dados/ (Livro do Jogador). A origem exibida no site é Tasha's; o texto da classe veio do PDF Eberron: Forge of the Artificer (versão 2024 do Artífice).",
+  "conteudos": [
+    {
+      "id": "artifice",
+      "titulo": "Artífice",
+      "paginas_pdf": { "capitulo_1": "10-29", "apendice_itens": "136-144" },
+      "arquivos": {
+        "artifice/classe.json": "Classe no formato de dados/classes/*.json, com as 5 subclasses",
+        "artifice/magias_classe.json": "Lista de magias do Artífice no formato de dados/classes/magias_<classe>.json",
+        "artifice/magias.json": "Magia nova (Servo Homúnculo) no formato de dados/magias/circulo_N.json",
+        "artifice/planos.json": "Planos de Item Mágico por nível mínimo, ligados ao acervo por item_id/variante_id",
+        "artifice/itens_magicos.json": "9 itens do Apêndice no formato do acervo do Livro do Mestre",
+        "artifice/criaturas.json": "Defensor de Aço, Canhão Místico e Servo Homúnculo com fórmulas",
+        "artifice/_lotes/": "Fonte editável; os seis arquivos acima são gerados por scripts/tasha/artifice.mjs montar"
+      }
+    }
+  ]
+}

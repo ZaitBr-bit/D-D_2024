@@ -1,0 +1,111 @@
+{
+  "tipo": "subclasses",
+  "paginas_pdf": [20, 23],
+  "subclasses": [
+    {
+      "nome": "Alquimista",
+      "nome_en": "Alchemist",
+      "descricao": "Criar Elixires e Poções Mágicas\n\nUm Alquimista é um especialista em combinar reagentes para produzir efeitos mágicos. Os Alquimistas usam suas criações para dar vida e para drená-la.",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Ferramentas da Profissão",
+          "nome_en": "Tools of the Trade",
+          "pagina_pdf": 20,
+          "descricao": "Você ganha os benefícios a seguir.\n\n**Proficiência com Ferramentas.** Você ganha proficiência com Suprimentos de Alquimista e com o Kit de Herbalismo. Se já tiver uma dessas proficiências, você ganha proficiência com outro tipo de Ferramentas de Artesão à sua escolha (ou com dois outros tipos, se já tiver as duas).\n\n**Fabricação de Poções.** Quando você prepara uma poção usando as regras de fabricação do Livro do Mestre, o tempo necessário para fabricá-la é reduzido à metade."
+        },
+        {
+          "nivel": 3,
+          "nome": "Magias de Alquimista",
+          "nome_en": "Alchemist Spells",
+          "pagina_pdf": 20,
+          "descricao": "Ao alcançar um nível de Artífice especificado na tabela Magias de Alquimista, você passa a sempre ter preparadas as magias listadas.\n\n| **Nível de Artífice** | **Magias** |\n|---|---|\n| 3 | *Palavra Curativa, Raio Nauseante* |\n| 5 | *Esfera Flamejante, Flecha Ácida de Melf* |\n| 9 | *Forma Gasosa, Palavra Curativa em Massa* |\n| 13 | *Proteção Contra a Morte, Esfera Vitriólica* |\n| 17 | *Névoa Mortal, Reviver os Mortos* |"
+        },
+        {
+          "nivel": 3,
+          "nome": "Elixir Experimental",
+          "nome_en": "Experimental Elixir",
+          "pagina_pdf": 20,
+          "descricao": "Sempre que terminar um Descanso Longo segurando Suprimentos de Alquimista, você pode usar essa ferramenta para produzir magicamente dois elixires. Para cada elixir, role na tabela Elixir Experimental para determinar o efeito, que é ativado quando alguém bebe o elixir. O elixir aparece em um frasco, e o frasco desaparece quando o elixir é bebido ou derramado. Se algum elixir restar quando você terminar um Descanso Longo, o elixir e seu frasco desaparecem.\n\n**Bebendo um Elixir.** Como uma Ação Bônus, uma criatura pode beber o elixir ou administrá-lo a outra criatura a até 1,5 metro de si.\n\n**Criando Elixires Adicionais.** Como uma Ação Mágica enquanto segura Suprimentos de Alquimista, você pode gastar um espaço de magia para criar outro elixir. Ao fazer isso, você escolhe o efeito na tabela Elixir Experimental em vez de rolar.\n\nAo alcançar certos níveis de Artífice, você pode fazer um elixir adicional ao fim de cada Descanso Longo: um total de três no 5º nível, quatro no 9º nível e cinco no 15º nível.\n\n| **1d6** | **Efeito** |\n|---|---|\n| 1 | **Cura.** Quem bebe recupera um número de Pontos de Vida igual a 2d8 mais o seu modificador de Inteligência. O número de Pontos de Vida restaurados aumenta em 1d8 quando você alcança os níveis 9 (3d8) e 15 (4d8) de Artífice. |\n| 2 | **Rapidez.** O Deslocamento de quem bebe aumenta em 3 metros por 1 hora. Esse bônus aumenta quando você alcança os níveis 9 (4,5 metros) e 15 (6 metros) de Artífice. |\n| 3 | **Resiliência.** Quem bebe ganha +1 de bônus na CA por 10 minutos. A duração aumenta quando você alcança os níveis 9 (1 hora) e 15 (8 horas) de Artífice. |\n| 4 | **Ousadia.** Quem bebe pode rolar 1d4 e adicionar o resultado a cada jogada de ataque e salvaguarda que fizer no minuto seguinte. A duração aumenta quando você alcança os níveis 9 (10 minutos) e 15 (1 hora) de Artífice. |\n| 5 | **Voo.** Quem bebe ganha Deslocamento de Voo de 3 metros por 10 minutos. O Deslocamento de Voo aumenta quando você alcança os níveis 9 (6 metros) e 15 (9 metros) de Artífice. |\n| 6 | Você determina o efeito do elixir escolhendo uma das outras linhas desta tabela. |"
+        },
+        {
+          "nivel": 5,
+          "nome": "Perito em Alquimia",
+          "nome_en": "Alchemical Savant",
+          "pagina_pdf": 21,
+          "descricao": "Sempre que conjurar uma magia usando seus Suprimentos de Alquimista como Foco de Conjuração, você ganha um bônus em uma rolagem da magia. Essa rolagem deve restaurar Pontos de Vida ou ser uma rolagem de dano que cause dano Ácido, Ígneo ou Venenoso. O bônus é igual ao seu modificador de Inteligência (mínimo de +1)."
+        },
+        {
+          "nivel": 9,
+          "nome": "Reagentes Restauradores",
+          "nome_en": "Restorative Reagents",
+          "pagina_pdf": 21,
+          "descricao": "Você sempre tem a magia *Restauração Menor* preparada e pode conjurá-la sem gastar um espaço de magia, desde que use Suprimentos de Alquimista como Foco de Conjuração. Você pode fazer isso um número de vezes igual ao seu modificador de Inteligência (mínimo de uma vez). Você recupera todos os usos gastos ao terminar um Descanso Longo."
+        },
+        {
+          "nivel": 15,
+          "nome": "Maestria Química",
+          "nome_en": "Chemical Mastery",
+          "pagina_pdf": 21,
+          "descricao": "Você ganha os benefícios a seguir.\n\n**Erupção Alquímica.** Quando você conjura uma magia de Artífice que causa dano Ácido, Ígneo ou Venenoso a um alvo, você também pode causar 2d8 de dano Energético a esse alvo. Você pode usar este benefício apenas uma vez em cada um dos seus turnos.\n\n**Resistência Química.** Você ganha Resistência a dano Ácido e a dano Venenoso. Você também ganha Imunidade à condição Envenenado.\n\n**Caldeirão Conjurado.** Você sempre tem a magia *Caldeirão Borbulhante de Tasha* preparada e pode conjurá-la sem gastar um espaço de magia e sem componentes Materiais, desde que use Suprimentos de Alquimista como Foco de Conjuração. Depois de usar esta característica, você não pode usá-la novamente até terminar um Descanso Longo."
+        }
+      ]
+    },
+    {
+      "nome": "Armeiro",
+      "nome_en": "Armorer",
+      "descricao": "Criar Armadura Mágica para Aprimorar suas Habilidades\n\nUm Armeiro modifica armaduras para que funcionem quase como uma segunda pele. A armadura é aprimorada para concentrar a magia do Armeiro, liberar ataques potentes e gerar uma defesa formidável.",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Ferramentas da Profissão",
+          "nome_en": "Tools of the Trade",
+          "pagina_pdf": 22,
+          "descricao": "Você ganha os benefícios a seguir.\n\n**Treinamento com Armadura.** Você ganha treinamento com armaduras Pesadas.\n\n**Proficiência com Ferramentas.** Você ganha proficiência com Ferramentas de Ferreiro. Se já tiver essa proficiência, você ganha proficiência com outro tipo de Ferramentas de Artesão à sua escolha.\n\n**Fabricação de Armaduras.** Quando você fabrica uma armadura mundana ou mágica, o tempo necessário para fabricá-la é reduzido à metade."
+        },
+        {
+          "nivel": 3,
+          "nome": "Magias de Armeiro",
+          "nome_en": "Armorer Spells",
+          "pagina_pdf": 22,
+          "descricao": "Ao alcançar um nível de Artífice especificado na tabela Magias de Armeiro, você passa a sempre ter preparadas as magias listadas.\n\n| **Nível de Artífice** | **Magias** |\n|---|---|\n| 3 | *Mísseis Mágicos, Onda Trovejante* |\n| 5 | *Reflexos, Despedaçar* |\n| 9 | *Padrão Hipnótico, Relâmpago* |\n| 13 | *Escudo Ardente, Invisibilidade Maior* |\n| 17 | *Criar Passagem, Muralha de Energia* |"
+        },
+        {
+          "nivel": 3,
+          "nome": "Armadura Arcana",
+          "nome_en": "Arcane Armor",
+          "pagina_pdf": 22,
+          "descricao": "Como uma Ação Mágica enquanto segura Ferramentas de Ferreiro, você pode transformar uma armadura que está vestindo em Armadura Arcana. A armadura continua sendo Armadura Arcana até você vestir outra armadura ou morrer.\n\nVocê ganha os benefícios a seguir enquanto vestir sua Armadura Arcana.\n\n**Sem Requisito de Força.** Se a armadura normalmente tem um requisito de Força, a Armadura Arcana não o tem para você.\n\n**Vestir e Despir Rápido.** Você pode vestir ou despir a armadura como uma Ação Utilizar. A armadura não pode ser removida contra a sua vontade.\n\n**Foco de Conjuração.** Você pode usar a Armadura Arcana como Foco de Conjuração para as suas magias de Artífice."
+        },
+        {
+          "nivel": 3,
+          "nome": "Modelo de Armadura",
+          "nome_en": "Armor Model",
+          "pagina_pdf": 22,
+          "descricao": "Você pode personalizar sua Armadura Arcana. Ao fazer isso, escolha um dos modelos de armadura a seguir: Couraçado, Guardião ou Infiltrador. O modelo escolhido lhe dá benefícios especiais enquanto você o vestir.\n\nCada modelo inclui uma arma especial. Quando você ataca com essa arma, pode adicionar o seu modificador de Inteligência, em vez do modificador de Força ou de Destreza, às jogadas de ataque e de dano.\n\nVocê pode mudar o modelo da armadura sempre que terminar um Descanso Curto ou Longo, se estiver segurando Ferramentas de Ferreiro.\n\n**Couraçado.** Você projeta sua armadura para se tornar um colosso imponente em combate. Ela tem as características a seguir.\n\n***Demolidor de Energia.*** Uma bola de demolição ou marreta arcana se projeta da sua armadura. O demolidor conta como uma arma Simples Corpo a Corpo com a propriedade Alcance e causa 1d10 de dano Energético em um acerto. Se você acertar com o demolidor uma criatura pelo menos um tamanho menor que o seu, pode empurrar a criatura até 3 metros em linha reta para longe de você ou puxá-la até 3 metros em sua direção.\n\n***Estatura Gigante.*** Como uma Ação Bônus, você transforma e aumenta sua armadura por 1 minuto. Pela duração, seu alcance aumenta em 1,5 metro e, se você for menor que Grande, você se torna Grande, junto com tudo o que estiver vestindo. Se não houver espaço suficiente para aumentar seu tamanho, ele não muda. Você pode usar esta Ação Bônus um número de vezes igual ao seu modificador de Inteligência (mínimo de uma vez). Você recupera todos os usos gastos ao terminar um Descanso Longo.\n\n**Guardião.** Você projeta sua armadura para ficar na linha de frente do conflito. Ela tem as características a seguir.\n\n***Pulso Trovejante.*** Você pode descarregar explosões de impacto com golpes da sua armadura. O pulso conta como uma arma Simples Corpo a Corpo e causa 1d8 de dano Trovejante em um acerto. Uma criatura atingida pelo pulso tem Desvantagem em jogadas de ataque contra alvos que não sejam você até o início do seu próximo turno.\n\n***Campo Defensivo.*** Enquanto estiver Ferido, você pode usar uma Ação Bônus para ganhar Pontos de Vida Temporários iguais ao seu nível de Artífice. Você perde esses Pontos de Vida Temporários se despir a armadura.\n\n**Infiltrador.** Você personaliza sua armadura para empreitadas mais sutis. Ela tem as características a seguir.\n\n***Lançador de Relâmpagos.*** Um nódulo semelhante a uma gema surge na sua armadura, do qual você pode disparar raios elétricos. O lançador conta como uma arma Simples à Distância com alcance normal de 27 metros e alcance longo de 90 metros, e causa 1d6 de dano Elétrico em um acerto. Uma vez em cada um dos seus turnos, quando você acertar uma criatura com o lançador, pode causar 1d6 de dano Elétrico adicional a esse alvo.\n\n***Passos Potencializados.*** Seu Deslocamento aumenta em 1,5 metro.\n\n***Campo Silenciador.*** Você tem Vantagem em testes de Destreza (Furtividade). Se a armadura impõe Desvantagem nesses testes, a Vantagem e a Desvantagem se cancelam, como de costume."
+        },
+        {
+          "nivel": 5,
+          "nome": "Ataque Extra",
+          "nome_en": "Extra Attack",
+          "pagina_pdf": 23,
+          "descricao": "Você pode atacar duas vezes, em vez de uma, sempre que realizar a ação Atacar no seu turno."
+        },
+        {
+          "nivel": 9,
+          "nome": "Armeiro Aprimorado",
+          "nome_en": "Improved Armorer",
+          "pagina_pdf": 23,
+          "descricao": "Você ganha os benefícios a seguir.\n\n**Replicação de Armadura.** Você aprende um plano adicional para a sua característica Replicar Item Mágico, e ele deve ser da categoria Armadura. Se você substituir esse plano, deve substituí-lo por outro plano de Armadura.\n\nAlém disso, você pode criar um item adicional com essa característica, e o item também deve ser da categoria Armadura.\n\n**Arsenal Aprimorado.** Você ganha +1 de bônus nas jogadas de ataque e de dano feitas com a arma especial do modelo da sua Armadura Arcana."
+        },
+        {
+          "nivel": 15,
+          "nome": "Armadura Perfeita",
+          "nome_en": "Perfected Armor",
+          "pagina_pdf": 23,
+          "descricao": "Sua Armadura Arcana ganha benefícios adicionais conforme o modelo, detalhados a seguir.\n\n**Couraçado.** O dado de dano do seu Demolidor de Energia aumenta para 2d6 de dano Energético.\n\nAlém disso, quando você usa a Estatura Gigante, seu alcance aumenta em 3 metros, seu tamanho pode aumentar para Grande ou Enorme (à sua escolha) e você tem Vantagem em testes de Força e em salvaguardas de Força pela duração.\n\n**Guardião.** O dado de dano do seu Pulso Trovejante aumenta para 1d10 de dano Trovejante.\n\nAlém disso, quando uma criatura Enorme ou menor que você possa ver terminar o turno a até 9 metros de você, você pode usar uma Reação para forçar magicamente essa criatura a fazer uma salvaguarda de Força contra a CD das suas magias. Em uma falha, você puxa a criatura até 7,5 metros diretamente em sua direção, para um espaço desocupado. Se puxar o alvo para um espaço a até 1,5 metro de você, pode fazer um ataque corpo a corpo com arma contra ele como parte dessa Reação.\n\nVocê pode usar esta Reação um número de vezes igual ao seu modificador de Inteligência (mínimo de uma vez). Você recupera todos os usos gastos ao terminar um Descanso Longo.\n\n**Infiltrador.** O dado de dano do seu Lançador de Relâmpagos aumenta para 2d6 de dano Elétrico. Qualquer criatura que sofra dano Elétrico do seu Lançador de Relâmpagos cintila com luz mágica até o início do seu próximo turno. A criatura cintilante emite Meia-Luz em um raio de 1,5 metro e tem Desvantagem em jogadas de ataque contra você, pois a luz a eletriza se ela atacar você.\n\nAlém disso, como uma Ação Bônus, você pode ganhar um Deslocamento de Voo igual ao dobro do seu Deslocamento até o fim do turno atual. Você pode usar esta Ação Bônus um número de vezes igual ao seu modificador de Inteligência (mínimo de uma vez). Você recupera todos os usos gastos ao terminar um Descanso Longo."
+        }
+      ]
+    }
+  ]
+}

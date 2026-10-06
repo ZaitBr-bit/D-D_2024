@@ -1,0 +1,334 @@
+{
+  "fonte": "tasha",
+  "total_itens": 9,
+  "itens": [
+    {
+      "id": "botas-do-caminho-sinuoso",
+      "nome": "Botas do Caminho Sinuoso",
+      "nome_en": "Boots of the Winding Path",
+      "tipo": "Item Maravilhoso",
+      "subtipo": "",
+      "raridade": "Incomum",
+      "requer_sintonizacao": true,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Item Maravilhoso, Incomum (Requer Sintonização)",
+      "amaldicoado": false,
+      "descricao": "Enquanto estiver usando estas botas, você pode usar uma Ação Bônus para se teletransportar até 4,5 metros para um espaço desocupado que você possa ver. Você precisa ter ocupado esse espaço em algum momento durante o turno atual.",
+      "tabelas": [],
+      "variantes": [],
+      "efeitos": [],
+      "fonte": "tasha",
+      "dados_ficha": {
+        "tipo_item": "Item Mágico",
+        "raridade": "Incomum",
+        "requer_sintonizacao": true
+      },
+      "recursos": null,
+      "magias": null,
+      "aumento_permanente": null
+    },
+    {
+      "id": "arma-deslumbrante",
+      "nome": "Arma Deslumbrante",
+      "nome_en": "Dazzling Weapon",
+      "tipo": "Arma",
+      "subtipo": "Qualquer Arma Simples ou Marcial",
+      "raridade": "Rara",
+      "requer_sintonizacao": true,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Arma (Qualquer Arma Simples ou Marcial), Rara (Requer Sintonização)",
+      "amaldicoado": false,
+      "descricao": "Esta arma mágica concede um bônus de +1 nas jogadas de ataque e de dano feitas com ela. Enquanto a estiver segurando, você pode usar uma Ação Bônus para fazê-la emitir Luz Plena em um raio de 9 metros e Meia-luz por mais 9 metros. Você pode apagar a luz com uma Ação Bônus.\n\nA arma tem 4 cargas. Você pode usar uma Reação imediatamente após ser atingido por uma jogada de ataque para gastar 1 das cargas da arma e forçar o atacante a fazer uma salvaguarda de Constituição CD 15. Em uma falha, o atacante fica com a condição Cego até o fim do seu próximo turno. A arma recupera 1d4 cargas gastas diariamente ao amanhecer.",
+      "tabelas": [],
+      "variantes": [],
+      "base": {
+        "tipo": "arma",
+        "categorias": [
+          "Armas Simples Corpo a Corpo",
+          "Armas Simples à Distância",
+          "Armas Marciais Corpo a Corpo",
+          "Armas Marciais à Distância"
+        ]
+      },
+      "efeitos": [
+        {
+          "alvo": "ataque_arma",
+          "valor": 1
+        },
+        {
+          "alvo": "dano_arma",
+          "valor": 1
+        }
+      ],
+      "recursos": {
+        "cargas": {
+          "max": 4,
+          "recupera": "1d4",
+          "ultima_carga": null
+        }
+      },
+      "fonte": "tasha",
+      "dados_ficha": {
+        "tipo_item": "Item Mágico",
+        "raridade": "Rara",
+        "requer_sintonizacao": true
+      },
+      "magias": null,
+      "aumento_permanente": null
+    },
+    {
+      "id": "elmo-da-prontidao",
+      "nome": "Elmo da Prontidão",
+      "nome_en": "Helm of Awareness",
+      "tipo": "Item Maravilhoso",
+      "subtipo": "",
+      "raridade": "Incomum",
+      "requer_sintonizacao": false,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Item Maravilhoso, Incomum",
+      "amaldicoado": false,
+      "descricao": "Enquanto estiver usando este elmo, você tem Vantagem nas jogadas de Iniciativa.",
+      "tabelas": [],
+      "variantes": [],
+      "efeitos": [
+        {
+          "alvo": "vantagem",
+          "em": "iniciativa"
+        }
+      ],
+      "fonte": "tasha",
+      "dados_ficha": {
+        "tipo_item": "Item Mágico",
+        "raridade": "Incomum",
+        "requer_sintonizacao": false
+      },
+      "recursos": null,
+      "magias": null,
+      "aumento_permanente": null
+    },
+    {
+      "id": "ferramenta-multiforme",
+      "nome": "Ferramenta Multiforme",
+      "nome_en": "Manifold Tool",
+      "tipo": "Item Maravilhoso",
+      "subtipo": "",
+      "raridade": "Comum",
+      "requer_sintonizacao": true,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Item Maravilhoso, Comum (Requer Sintonização)",
+      "amaldicoado": false,
+      "descricao": "Esta ferramenta tem a forma de uma chave inglesa, uma chave de fenda ou outra ferramenta básica. Com uma ação Usar Magia, você pode tocar o item e transformá-lo em um tipo de Ferramentas de Artesão à sua escolha. Seja qual for a forma que a ferramenta assuma, você tem proficiência com ela quando a usa.",
+      "tabelas": [],
+      "variantes": [],
+      "efeitos": [],
+      "fonte": "tasha",
+      "dados_ficha": {
+        "tipo_item": "Item Mágico",
+        "raridade": "Comum",
+        "requer_sintonizacao": true
+      },
+      "recursos": null,
+      "magias": null,
+      "aumento_permanente": null
+    },
+    {
+      "id": "afiador-mental",
+      "nome": "Afiador Mental",
+      "nome_en": "Mind Sharpener",
+      "tipo": "Anel",
+      "subtipo": "",
+      "raridade": "Incomum",
+      "requer_sintonizacao": true,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Anel, Incomum (Requer Sintonização)",
+      "amaldicoado": false,
+      "descricao": "O item tem 4 cargas. Quando você falha em uma salvaguarda de Constituição para manter a Concentração, você pode usar uma Reação e gastar 1 das cargas do item para ser bem-sucedido em vez disso. O item recupera 1d4 cargas gastas diariamente ao amanhecer.",
+      "tabelas": [],
+      "variantes": [],
+      "efeitos": [],
+      "recursos": {
+        "cargas": {
+          "max": 4,
+          "recupera": "1d4",
+          "ultima_carga": null
+        }
+      },
+      "fonte": "tasha",
+      "dados_ficha": {
+        "tipo_item": "Item Mágico",
+        "raridade": "Incomum",
+        "requer_sintonizacao": true
+      },
+      "magias": null,
+      "aumento_permanente": null
+    },
+    {
+      "id": "disparo-repetido",
+      "nome": "Disparo Repetido",
+      "nome_en": "Repeating Shot",
+      "tipo": "Arma",
+      "subtipo": "Qualquer Arma Simples ou Marcial com a Propriedade Munição",
+      "raridade": "Incomum",
+      "requer_sintonizacao": true,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Arma (Qualquer Arma Simples ou Marcial com a Propriedade Munição), Incomum (Requer Sintonização)",
+      "amaldicoado": false,
+      "descricao": "Esta arma mágica concede um bônus de +1 nas jogadas de ataque e de dano feitas com ela quando usada para fazer um ataque à distância, e ignora a propriedade Recarga, se a tiver.\n\nSe a arma estiver sem munição, ela produz a própria, criando automaticamente uma peça de munição mágica quando o portador faz uma jogada de ataque à distância com ela. A munição criada pela arma desaparece no instante seguinte a acertar ou errar um alvo.",
+      "tabelas": [],
+      "variantes": [],
+      "base": {
+        "tipo": "arma",
+        "opcoes": [
+          "Arco Curto",
+          "Besta Leve",
+          "Funda",
+          "Arco Longo",
+          "Besta de Mão",
+          "Besta Pesada",
+          "Mosquete",
+          "Pistola",
+          "Zarabatana"
+        ]
+      },
+      "efeitos": [
+        {
+          "alvo": "ataque_arma",
+          "valor": 1
+        },
+        {
+          "alvo": "dano_arma",
+          "valor": 1
+        }
+      ],
+      "fonte": "tasha",
+      "dados_ficha": {
+        "tipo_item": "Item Mágico",
+        "raridade": "Incomum",
+        "requer_sintonizacao": true
+      },
+      "recursos": null,
+      "magias": null,
+      "aumento_permanente": null
+    },
+    {
+      "id": "escudo-de-repulsao",
+      "nome": "Escudo de Repulsão",
+      "nome_en": "Repulsion Shield",
+      "tipo": "Armadura",
+      "subtipo": "Escudo",
+      "raridade": "Incomum",
+      "requer_sintonizacao": false,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Armadura (Escudo), Incomum",
+      "amaldicoado": false,
+      "descricao": "Você recebe um bônus de +1 na Classe de Armadura enquanto empunhar este escudo.\n\nO escudo tem 4 cargas. Enquanto o segura, quando uma criatura Grande ou menor a até 1,5 metro de você o atinge com uma jogada de ataque corpo a corpo, você pode usar uma Reação para gastar 1 das cargas do escudo e empurrar o atacante até 4,5 metros em linha reta para longe. O escudo recupera 1d4 cargas gastas diariamente ao amanhecer.",
+      "tabelas": [],
+      "variantes": [],
+      "base": {
+        "tipo": "escudo"
+      },
+      "efeitos": [
+        {
+          "alvo": "ca",
+          "valor": 1
+        }
+      ],
+      "recursos": {
+        "cargas": {
+          "max": 4,
+          "recupera": "1d4",
+          "ultima_carga": null
+        }
+      },
+      "fonte": "tasha",
+      "dados_ficha": {
+        "tipo_item": "Armadura",
+        "raridade": "Incomum",
+        "requer_sintonizacao": false
+      },
+      "magias": null,
+      "aumento_permanente": null
+    },
+    {
+      "id": "arma-retornavel",
+      "nome": "Arma Retornável",
+      "nome_en": "Returning Weapon",
+      "tipo": "Arma",
+      "subtipo": "Qualquer Arma Simples ou Marcial com a Propriedade Arremesso",
+      "raridade": "Incomum",
+      "requer_sintonizacao": false,
+      "requisito_sintonizacao": "",
+      "linha_tipo": "Arma (Qualquer Arma Simples ou Marcial com a Propriedade Arremesso), Incomum",
+      "amaldicoado": false,
+      "descricao": "Esta arma mágica concede um bônus de +1 nas jogadas de ataque e de dano feitas com ela, e retorna à sua mão imediatamente depois de você usá-la para fazer uma jogada de ataque à distância.",
+      "tabelas": [],
+      "variantes": [],
+      "base": {
+        "tipo": "arma",
+        "opcoes": [
+          "Adaga",
+          "Azagaia",
+          "Lança",
+          "Machadinha",
+          "Martelo Leve",
+          "Dardo",
+          "Tridente"
+        ]
+      },
+      "efeitos": [
+        {
+          "alvo": "ataque_arma",
+          "valor": 1
+        },
+        {
+          "alvo": "dano_arma",
+          "valor": 1
+        }
+      ],
+      "fonte": "tasha",
+      "dados_ficha": {
+        "tipo_item": "Item Mágico",
+        "raridade": "Incomum",
+        "requer_sintonizacao": false
+      },
+      "recursos": null,
+      "magias": null,
+      "aumento_permanente": null
+    },
+    {
+      "id": "anel-de-reabastecimento-de-magia",
+      "nome": "Anel de Reabastecimento de Magia",
+      "nome_en": "Spell-Refueling Ring",
+      "tipo": "Anel",
+      "subtipo": "",
+      "raridade": "Incomum",
+      "requer_sintonizacao": true,
+      "requisito_sintonizacao": "por um Conjurador",
+      "linha_tipo": "Anel, Incomum (Requer Sintonização por um Conjurador)",
+      "amaldicoado": false,
+      "descricao": "Enquanto estiver usando este anel, você pode recuperar um espaço de magia gasto com uma Ação Bônus. O espaço recuperado pode ser de 3º círculo ou inferior. Depois de usado, o anel não pode ser usado novamente até o próximo amanhecer.",
+      "tabelas": [],
+      "variantes": [],
+      "efeitos": [],
+      "recursos": {
+        "usos": [
+          {
+            "nome": "Recuperar espaço de magia",
+            "max": 1,
+            "recupera": "amanhecer",
+            "efeito": "recuperar_espaco_magia",
+            "circulo_max": 3
+          }
+        ]
+      },
+      "fonte": "tasha",
+      "dados_ficha": {
+        "tipo_item": "Item Mágico",
+        "raridade": "Incomum",
+        "requer_sintonizacao": true
+      },
+      "magias": null,
+      "aumento_permanente": null
+    }
+  ]
+}

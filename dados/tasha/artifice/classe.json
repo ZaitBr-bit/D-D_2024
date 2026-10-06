@@ -1,0 +1,974 @@
+{
+  "nome": "Artífice",
+  "fonte": "tasha",
+  "tracos_basicos": {
+    "Atributo Primário": "Inteligência",
+    "Equipamento Inicial": "Escolha A ou B: (A) Couro Batido, Adaga, Ferramentas de Ladrão, Ferramentas de Funileiro, Kit de Explorador de Masmorras e 16 PO; ou (B) 150 PO"
+  },
+  "tabela_caracteristicas": [
+    {
+      "1": "2",
+      "2": "—",
+      "3": "—",
+      "4": "—",
+      "5": "—",
+      "Nível": "1",
+      "Bônus de Proficiência": "+2",
+      "Características": "Conjuração, Magia de Funileiro",
+      "Planos Conhecidos": "—",
+      "Itens Mágicos": "—",
+      "Truques": "2",
+      "Magias Preparadas": "2"
+    },
+    {
+      "1": "2",
+      "2": "—",
+      "3": "—",
+      "4": "—",
+      "5": "—",
+      "Nível": "2",
+      "Bônus de Proficiência": "+2",
+      "Características": "Replicar Item Mágico",
+      "Planos Conhecidos": "4",
+      "Itens Mágicos": "2",
+      "Truques": "2",
+      "Magias Preparadas": "3"
+    },
+    {
+      "1": "3",
+      "2": "—",
+      "3": "—",
+      "4": "—",
+      "5": "—",
+      "Nível": "3",
+      "Bônus de Proficiência": "+2",
+      "Características": "Subclasse de Artífice",
+      "Planos Conhecidos": "4",
+      "Itens Mágicos": "2",
+      "Truques": "2",
+      "Magias Preparadas": "4"
+    },
+    {
+      "1": "3",
+      "2": "—",
+      "3": "—",
+      "4": "—",
+      "5": "—",
+      "Nível": "4",
+      "Bônus de Proficiência": "+2",
+      "Características": "Aumento no Valor de Atributo",
+      "Planos Conhecidos": "4",
+      "Itens Mágicos": "2",
+      "Truques": "2",
+      "Magias Preparadas": "5"
+    },
+    {
+      "1": "4",
+      "2": "2",
+      "3": "—",
+      "4": "—",
+      "5": "—",
+      "Nível": "5",
+      "Bônus de Proficiência": "+3",
+      "Características": "Característica de Subclasse",
+      "Planos Conhecidos": "4",
+      "Itens Mágicos": "2",
+      "Truques": "2",
+      "Magias Preparadas": "6"
+    },
+    {
+      "1": "4",
+      "2": "2",
+      "3": "—",
+      "4": "—",
+      "5": "—",
+      "Nível": "6",
+      "Bônus de Proficiência": "+3",
+      "Características": "Funileiro de Item Mágico",
+      "Planos Conhecidos": "5",
+      "Itens Mágicos": "3",
+      "Truques": "2",
+      "Magias Preparadas": "6"
+    },
+    {
+      "1": "4",
+      "2": "3",
+      "3": "—",
+      "4": "—",
+      "5": "—",
+      "Nível": "7",
+      "Bônus de Proficiência": "+3",
+      "Características": "Lampejo de Genialidade",
+      "Planos Conhecidos": "5",
+      "Itens Mágicos": "3",
+      "Truques": "2",
+      "Magias Preparadas": "7"
+    },
+    {
+      "1": "4",
+      "2": "3",
+      "3": "—",
+      "4": "—",
+      "5": "—",
+      "Nível": "8",
+      "Bônus de Proficiência": "+3",
+      "Características": "Aumento no Valor de Atributo",
+      "Planos Conhecidos": "5",
+      "Itens Mágicos": "3",
+      "Truques": "2",
+      "Magias Preparadas": "7"
+    },
+    {
+      "1": "4",
+      "2": "3",
+      "3": "2",
+      "4": "—",
+      "5": "—",
+      "Nível": "9",
+      "Bônus de Proficiência": "+4",
+      "Características": "Característica de Subclasse",
+      "Planos Conhecidos": "5",
+      "Itens Mágicos": "3",
+      "Truques": "2",
+      "Magias Preparadas": "9"
+    },
+    {
+      "1": "4",
+      "2": "3",
+      "3": "2",
+      "4": "—",
+      "5": "—",
+      "Nível": "10",
+      "Bônus de Proficiência": "+4",
+      "Características": "Especialista em Itens Mágicos",
+      "Planos Conhecidos": "6",
+      "Itens Mágicos": "4",
+      "Truques": "3",
+      "Magias Preparadas": "9"
+    },
+    {
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "—",
+      "5": "—",
+      "Nível": "11",
+      "Bônus de Proficiência": "+4",
+      "Características": "Item de Armazenar Magia",
+      "Planos Conhecidos": "6",
+      "Itens Mágicos": "4",
+      "Truques": "3",
+      "Magias Preparadas": "10"
+    },
+    {
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "—",
+      "5": "—",
+      "Nível": "12",
+      "Bônus de Proficiência": "+4",
+      "Características": "Aumento no Valor de Atributo",
+      "Planos Conhecidos": "6",
+      "Itens Mágicos": "4",
+      "Truques": "3",
+      "Magias Preparadas": "10"
+    },
+    {
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "1",
+      "5": "—",
+      "Nível": "13",
+      "Bônus de Proficiência": "+5",
+      "Características": "—",
+      "Planos Conhecidos": "6",
+      "Itens Mágicos": "4",
+      "Truques": "3",
+      "Magias Preparadas": "11"
+    },
+    {
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "1",
+      "5": "—",
+      "Nível": "14",
+      "Bônus de Proficiência": "+5",
+      "Características": "Artifício Avançado",
+      "Planos Conhecidos": "7",
+      "Itens Mágicos": "5",
+      "Truques": "4",
+      "Magias Preparadas": "11"
+    },
+    {
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "2",
+      "5": "—",
+      "Nível": "15",
+      "Bônus de Proficiência": "+5",
+      "Características": "Característica de Subclasse",
+      "Planos Conhecidos": "7",
+      "Itens Mágicos": "5",
+      "Truques": "4",
+      "Magias Preparadas": "12"
+    },
+    {
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "2",
+      "5": "—",
+      "Nível": "16",
+      "Bônus de Proficiência": "+5",
+      "Características": "Aumento no Valor de Atributo",
+      "Planos Conhecidos": "7",
+      "Itens Mágicos": "5",
+      "Truques": "4",
+      "Magias Preparadas": "12"
+    },
+    {
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "3",
+      "5": "1",
+      "Nível": "17",
+      "Bônus de Proficiência": "+6",
+      "Características": "—",
+      "Planos Conhecidos": "7",
+      "Itens Mágicos": "5",
+      "Truques": "4",
+      "Magias Preparadas": "14"
+    },
+    {
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "3",
+      "5": "1",
+      "Nível": "18",
+      "Bônus de Proficiência": "+6",
+      "Características": "Mestre de Itens Mágicos",
+      "Planos Conhecidos": "8",
+      "Itens Mágicos": "6",
+      "Truques": "4",
+      "Magias Preparadas": "14"
+    },
+    {
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "3",
+      "5": "2",
+      "Nível": "19",
+      "Bônus de Proficiência": "+6",
+      "Características": "Dádiva Épica",
+      "Planos Conhecidos": "8",
+      "Itens Mágicos": "6",
+      "Truques": "4",
+      "Magias Preparadas": "15"
+    },
+    {
+      "1": "4",
+      "2": "3",
+      "3": "3",
+      "4": "3",
+      "5": "2",
+      "Nível": "20",
+      "Bônus de Proficiência": "+6",
+      "Características": "Alma do Artífice",
+      "Planos Conhecidos": "8",
+      "Itens Mágicos": "6",
+      "Truques": "4",
+      "Magias Preparadas": "15"
+    }
+  ],
+  "caracteristicas": [
+    {
+      "nivel": 1,
+      "nome": "Conjuração",
+      "descricao": "Você aprendeu a canalizar energia mágica por meio de objetos. Consulte o Livro do Jogador para as regras de conjuração. As informações abaixo detalham como você usa essas regras com as magias de Artífice, que aparecem na lista de magias de Artífice mais adiante na descrição da classe.\n\n**Ferramentas Necessárias.** Você produz suas magias de Artífice por meio de ferramentas. Você pode usar Ferramentas de Ladrão, Ferramentas de Funileiro ou outro tipo de Ferramentas de Artesão com o qual tenha proficiência como Foco de Conjuração, e precisa ter um desses focos em mãos ao conjurar uma magia de Artífice (ou seja, quando a magia tem um componente M).\n\n**Truques.** Você conhece dois truques de Artífice à sua escolha. *Bolha Ácida* e *Prestidigitação Arcana* são recomendados.\n\nSempre que terminar um Descanso Longo, você pode substituir um dos truques desta característica por outro truque de Artífice à sua escolha.\n\nAo alcançar os níveis 10 e 14 de Artífice, você aprende outro truque de Artífice à sua escolha, conforme mostrado na coluna Truques da tabela Características do Artífice.\n\n**Espaços de Magia.** A tabela Características do Artífice mostra quantos espaços de magia você tem para conjurar suas magias de 1º círculo ou superior. Você recupera todos os espaços gastos ao terminar um Descanso Longo.\n\n**Magias Preparadas de 1º Círculo ou Superior.** Você prepara a lista de magias de 1º círculo ou superior que estão disponíveis para você conjurar com esta característica. Para começar, escolha duas magias de Artífice de 1º círculo. *Curar Ferimentos* e *Graxa* são recomendadas.\n\nO número de magias da sua lista aumenta conforme você ganha níveis de Artífice, como mostrado na coluna Magias Preparadas da tabela Características do Artífice. Sempre que esse número aumentar, escolha magias de Artífice adicionais até que o número de magias da sua lista corresponda ao número da tabela. As magias escolhidas devem ser de um círculo para o qual você tenha espaços de magia. Por exemplo, se você é um Artífice de 5º nível, sua lista de magias preparadas pode incluir seis magias de Artífice de 1º e 2º círculos em qualquer combinação.\n\nSe outra característica de Artífice lhe der magias que você sempre tem preparadas, elas não contam no número de magias que você pode preparar com esta característica, mas, fora isso, contam como magias de Artífice para você.\n\n**Alterando Suas Magias Preparadas.** Sempre que terminar um Descanso Longo, você pode alterar sua lista de magias preparadas, substituindo qualquer magia da lista por outra magia de Artífice para a qual você tenha espaços de magia.\n\n**Atributo de Conjuração.** Inteligência é o seu atributo de conjuração para as suas magias de Artífice."
+    },
+    {
+      "nivel": 1,
+      "nome": "Magia de Funileiro",
+      "descricao": "Você conhece o truque *Reparar*.\n\nComo uma Ação Mágica enquanto segura Ferramentas de Funileiro, você pode criar um item em um espaço desocupado a até 1,5 metro de você, escolhendo o item na lista a seguir: Algibeira, Ampola, Armadilha de Caça, Arpéu, Balde, Caixa para Fogo, Cesta, Cobertor, Cordão, Corda, Esferas de Metal, Estacas de Ferro, Estrepes, Frasco, Garrafa de Vidro, Grilhões, Jarro, Lâmpada, Óleo, Pá, Papel, Pé de Cabra, Pergaminho, Rede, Roldana e Polias, Saca, Saco de Dormir, Sino, Tocha, Baliza e Vela.\n\nConsulte as regras do item no Livro do Jogador. O item dura até você terminar um Descanso Longo, quando então desaparece.\n\nVocê pode usar esta característica um número de vezes igual ao seu modificador de Inteligência (mínimo de uma vez). Você recupera todos os usos gastos ao terminar um Descanso Longo."
+    },
+    {
+      "nivel": 2,
+      "nome": "Replicar Item Mágico",
+      "descricao": "Você aprendeu planos arcanos que usa para fazer itens mágicos.\n\n**Planos Conhecidos.** Ao obter esta característica, escolha quatro planos para aprender na lista de Planos de Item Mágico (Artífice nível 2+); veja as descrições dos itens no Livro do Mestre. Bolsa Devoradora, Gorro de Respiração Aquática, Pedras de Mensagem e Varinha do Mago de Guerra são recomendados. Sempre que ganhar um nível de Artífice, você pode substituir um dos planos que conhece por um novo plano para o qual se qualifique.\n\nVocê aprende outro plano à sua escolha ao alcançar certos níveis de Artífice, conforme mostrado na coluna Planos Conhecidos da tabela Características do Artífice. Ao escolher um plano para aprender, você o escolhe em qualquer lista de Planos de Item Mágico para a qual se qualifique; sua qualificação se baseia no seu nível de Artífice.\n\n**Criando um Item.** Ao terminar um Descanso Longo, você pode criar um ou dois itens mágicos diferentes se estiver com Ferramentas de Funileiro em mãos. Cada item se baseia em um dos planos que você conhece para esta característica.\n\nSe um item criado exigir Sintonização, você pode se sintonizar com ele no instante em que o cria. Se decidir se sintonizar com o item mais tarde, deverá fazê-lo pelo processo normal de Sintonização.\n\nAo alcançar certos níveis de Artífice, indicados na coluna Itens Mágicos da tabela Características do Artífice, aumenta o número de itens mágicos que você pode criar ao fim de um Descanso Longo. Cada item que você criar deve se basear em um plano diferente que você conheça.\n\nVocê não pode ter mais itens mágicos desta característica do que o número mostrado na coluna Itens Mágicos da tabela Características do Artífice para o seu nível. Se tentar exceder o seu máximo de itens mágicos desta característica, o item mais antigo desaparece e, em seguida, o novo item surge.\n\n**Duração.** Um item mágico criado por esta característica funciona como o item mágico normal, exceto que sua magia não é permanente; quando você morre, o item mágico desaparece após 1d4 dias. Se você substituir um plano que conhece por um novo plano, qualquer item mágico criado com o plano substituído desaparece imediatamente.\n\nSe um item que você criou com esta característica for um recipiente, como uma Bolsa Devoradora, e desaparecer, seu conteúdo surge inofensivamente dentro e ao redor do espaço dele.\n\n**Foco de Conjuração.** Você pode usar qualquer Varinha ou Arma criada por esta característica como Foco de Conjuração no lugar de um conjunto de Ferramentas de Artesão.\n\n**Criando Mais Itens Mágicos.** A característica Replicar Item Mágico não é a única maneira de um Artífice fazer itens mágicos. O Livro do Mestre traz regras para personagens, não apenas Artífices, que queiram fazer itens mágicos de todos os tipos. Embora muitos personagens diferentes possam fazer itens mágicos, os Artífices conseguem fazê-lo mais depressa que os outros; cada subclasse de Artífice melhora a velocidade do personagem para fazer itens de uma certa categoria.\n\nQuando um Artífice cria um item mágico usando as regras normais do Livro do Mestre, o personagem não ganha nenhuma conexão especial com esse item. As características de classe que se referem a itens criados pela sua característica Replicar Item Mágico não se aplicam a itens que você cria por outros meios."
+    },
+    {
+      "nivel": 3,
+      "nome": "Subclasse de Artífice",
+      "descricao": "Você ganha uma subclasse de Artífice à sua escolha. As subclasses Alquimista, Armeiro, Artilheiro, Ferreiro de Batalha e Cartógrafo são detalhadas após a descrição desta classe. Uma subclasse é uma especialização que lhe concede características em certos níveis de Artífice. Pelo resto da sua carreira, você ganha cada uma das características da sua subclasse que sejam do seu nível de Artífice ou inferior."
+    },
+    {
+      "nivel": 4,
+      "nome": "Aumento no Valor de Atributo",
+      "descricao": "Você ganha o talento Aumento no Valor de Atributo ou outro talento à sua escolha para o qual se qualifique. Você ganha esta característica novamente nos níveis 8, 12 e 16 de Artífice."
+    },
+    {
+      "nivel": 6,
+      "nome": "Funileiro de Item Mágico",
+      "descricao": "Sua característica Replicar Item Mágico ganha as opções a seguir.\n\n**Carregar Item Mágico.** Como uma Ação Bônus, você pode tocar um item mágico a até 1,5 metro de você que tenha criado com Replicar Item Mágico e que use cargas. Você gasta um espaço de magia de 1º círculo ou superior e recarrega o item. O número de cargas que o item recupera é igual ao círculo do espaço de magia gasto.\n\n**Drenar Item Mágico.** Como uma Ação Bônus, você pode tocar um item mágico a até 1,5 metro de você que tenha criado com Replicar Item Mágico e fazer o item desaparecer, convertendo sua energia mágica em um espaço de magia. O espaço é de 1º círculo se o item for Comum, ou de 2º círculo se o item for Incomum ou Raro. Depois de usar esta opção, você não pode usá-la novamente até terminar um Descanso Longo. Qualquer espaço de magia criado por esta opção desaparece quando você termina um Descanso Longo.\n\n**Transmutar Item Mágico.** Como uma Ação Mágica, você pode tocar um item mágico a até 1,5 metro de você que tenha criado com Replicar Item Mágico e transformá-lo em um item mágico diferente. O item resultante deve se basear em um plano de item mágico que você conheça. Depois de usar esta opção, você não pode usá-la novamente até terminar um Descanso Longo."
+    },
+    {
+      "nivel": 7,
+      "nome": "Lampejo de Genialidade",
+      "descricao": "Quando você ou uma criatura que você possa ver a até 9 metros de você falhar em um teste de atributo ou em uma salvaguarda, você pode usar uma Reação para adicionar um bônus à rolagem, podendo fazê-la ter sucesso. O bônus é igual ao seu modificador de Inteligência (mínimo de +1).\n\nVocê pode usar esta Reação um número de vezes igual ao seu modificador de Inteligência (mínimo de uma vez). Você recupera todos os usos gastos ao terminar um Descanso Longo."
+    },
+    {
+      "nivel": 10,
+      "nome": "Especialista em Itens Mágicos",
+      "descricao": "Agora você pode se sintonizar com até quatro itens mágicos ao mesmo tempo."
+    },
+    {
+      "nivel": 11,
+      "nome": "Item de Armazenar Magia",
+      "descricao": "Sempre que terminar um Descanso Longo, você pode tocar uma arma Simples ou Marcial, ou um item que possa usar como Foco de Conjuração, e armazenar nele uma magia, escolhendo uma magia de Artífice de 1º, 2º ou 3º círculo que tenha tempo de conjuração de uma Ação e que não exija um componente Material consumido pela magia (você não precisa ter a magia preparada).\n\nEnquanto segura o objeto, uma criatura pode usar uma Ação Mágica para produzir o efeito da magia a partir dele, usando o modificador do seu atributo de conjuração. Se a magia exigir Concentração, a criatura deve se concentrar. Depois que uma criatura usa o objeto para produzir o efeito da magia, o objeto não pode ser usado dessa forma novamente até o início do próximo turno dessa criatura.\n\nA magia permanece no objeto até que ele seja usado um número de vezes igual ao dobro do seu modificador de Inteligência (mínimo de duas vezes) ou até que você use esta característica novamente para armazenar uma magia em um objeto."
+    },
+    {
+      "nivel": 14,
+      "nome": "Artifício Avançado",
+      "descricao": "Você ganha os benefícios a seguir.\n\n**Sábio em Itens Mágicos.** Agora você pode se sintonizar com até cinco itens mágicos ao mesmo tempo.\n\n**Gênio Renovado.** Ao terminar um Descanso Curto, você recupera um uso gasto da sua característica Lampejo de Genialidade."
+    },
+    {
+      "nivel": 18,
+      "nome": "Mestre de Itens Mágicos",
+      "descricao": "Agora você pode se sintonizar com até seis itens mágicos ao mesmo tempo."
+    },
+    {
+      "nivel": 19,
+      "nome": "Dádiva Épica",
+      "descricao": "Você ganha um talento de Dádiva Épica ou outro talento à sua escolha para o qual se qualifique. Dádiva da Resistência à Energia é recomendada."
+    },
+    {
+      "nivel": 20,
+      "nome": "Alma do Artífice",
+      "descricao": "Você desenvolveu uma conexão mística com seus itens mágicos, da qual pode extrair auxílio. Você ganha os benefícios a seguir.\n\n**Trapacear a Morte.** Se você for reduzido a 0 Pontos de Vida, mas não morrer na hora, você pode desintegrar qualquer quantidade de itens mágicos Incomuns ou Raros criados pela sua característica Replicar Item Mágico. Se fizer isso, seus Pontos de Vida passam a ser, em vez disso, um número igual a 20 vezes a quantidade de itens mágicos desintegrados.\n\n**Orientação Mágica.** Ao terminar um Descanso Curto, você recupera todos os usos gastos da sua característica Lampejo de Genialidade se estiver sintonizado com pelo menos um item mágico."
+    }
+  ],
+  "subclasses": [
+    {
+      "nome": "Alquimista",
+      "fonte": "tasha",
+      "descricao": "Criar Elixires e Poções Mágicas\n\nUm Alquimista é um especialista em combinar reagentes para produzir efeitos mágicos. Os Alquimistas usam suas criações para dar vida e para drená-la.",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Ferramentas da Profissão",
+          "descricao": "Você ganha os benefícios a seguir.\n\n**Proficiência com Ferramentas.** Você ganha proficiência com Suprimentos de Alquimista e com o Kit de Herbalismo. Se já tiver uma dessas proficiências, você ganha proficiência com outro tipo de Ferramentas de Artesão à sua escolha (ou com dois outros tipos, se já tiver as duas).\n\n**Fabricação de Poções.** Quando você prepara uma poção usando as regras de fabricação do Livro do Mestre, o tempo necessário para fabricá-la é reduzido à metade."
+        },
+        {
+          "nivel": 3,
+          "nome": "Magias de Alquimista",
+          "descricao": "Ao alcançar um nível de Artífice especificado na tabela Magias de Alquimista, você passa a sempre ter preparadas as magias listadas.\n\n| **Nível de Artífice** | **Magias** |\n|---|---|\n| 3 | *Palavra Curativa, Raio Nauseante* |\n| 5 | *Esfera Flamejante, Flecha Ácida de Melf* |\n| 9 | *Forma Gasosa, Palavra Curativa em Massa* |\n| 13 | *Proteção Contra a Morte, Esfera Vitriólica* |\n| 17 | *Névoa Mortal, Reviver os Mortos* |"
+        },
+        {
+          "nivel": 3,
+          "nome": "Elixir Experimental",
+          "descricao": "Sempre que terminar um Descanso Longo segurando Suprimentos de Alquimista, você pode usar essa ferramenta para produzir magicamente dois elixires. Para cada elixir, role na tabela Elixir Experimental para determinar o efeito, que é ativado quando alguém bebe o elixir. O elixir aparece em um frasco, e o frasco desaparece quando o elixir é bebido ou derramado. Se algum elixir restar quando você terminar um Descanso Longo, o elixir e seu frasco desaparecem.\n\n**Bebendo um Elixir.** Como uma Ação Bônus, uma criatura pode beber o elixir ou administrá-lo a outra criatura a até 1,5 metro de si.\n\n**Criando Elixires Adicionais.** Como uma Ação Mágica enquanto segura Suprimentos de Alquimista, você pode gastar um espaço de magia para criar outro elixir. Ao fazer isso, você escolhe o efeito na tabela Elixir Experimental em vez de rolar.\n\nAo alcançar certos níveis de Artífice, você pode fazer um elixir adicional ao fim de cada Descanso Longo: um total de três no 5º nível, quatro no 9º nível e cinco no 15º nível.\n\n| **1d6** | **Efeito** |\n|---|---|\n| 1 | **Cura.** Quem bebe recupera um número de Pontos de Vida igual a 2d8 mais o seu modificador de Inteligência. O número de Pontos de Vida restaurados aumenta em 1d8 quando você alcança os níveis 9 (3d8) e 15 (4d8) de Artífice. |\n| 2 | **Rapidez.** O Deslocamento de quem bebe aumenta em 3 metros por 1 hora. Esse bônus aumenta quando você alcança os níveis 9 (4,5 metros) e 15 (6 metros) de Artífice. |\n| 3 | **Resiliência.** Quem bebe ganha +1 de bônus na CA por 10 minutos. A duração aumenta quando você alcança os níveis 9 (1 hora) e 15 (8 horas) de Artífice. |\n| 4 | **Ousadia.** Quem bebe pode rolar 1d4 e adicionar o resultado a cada jogada de ataque e salvaguarda que fizer no minuto seguinte. A duração aumenta quando você alcança os níveis 9 (10 minutos) e 15 (1 hora) de Artífice. |\n| 5 | **Voo.** Quem bebe ganha Deslocamento de Voo de 3 metros por 10 minutos. O Deslocamento de Voo aumenta quando você alcança os níveis 9 (6 metros) e 15 (9 metros) de Artífice. |\n| 6 | Você determina o efeito do elixir escolhendo uma das outras linhas desta tabela. |"
+        },
+        {
+          "nivel": 5,
+          "nome": "Perito em Alquimia",
+          "descricao": "Sempre que conjurar uma magia usando seus Suprimentos de Alquimista como Foco de Conjuração, você ganha um bônus em uma rolagem da magia. Essa rolagem deve restaurar Pontos de Vida ou ser uma rolagem de dano que cause dano Ácido, Ígneo ou Venenoso. O bônus é igual ao seu modificador de Inteligência (mínimo de +1)."
+        },
+        {
+          "nivel": 9,
+          "nome": "Reagentes Restauradores",
+          "descricao": "Você sempre tem a magia *Restauração Menor* preparada e pode conjurá-la sem gastar um espaço de magia, desde que use Suprimentos de Alquimista como Foco de Conjuração. Você pode fazer isso um número de vezes igual ao seu modificador de Inteligência (mínimo de uma vez). Você recupera todos os usos gastos ao terminar um Descanso Longo."
+        },
+        {
+          "nivel": 15,
+          "nome": "Maestria Química",
+          "descricao": "Você ganha os benefícios a seguir.\n\n**Erupção Alquímica.** Quando você conjura uma magia de Artífice que causa dano Ácido, Ígneo ou Venenoso a um alvo, você também pode causar 2d8 de dano Energético a esse alvo. Você pode usar este benefício apenas uma vez em cada um dos seus turnos.\n\n**Resistência Química.** Você ganha Resistência a dano Ácido e a dano Venenoso. Você também ganha Imunidade à condição Envenenado.\n\n**Caldeirão Conjurado.** Você sempre tem a magia *Caldeirão Borbulhante de Tasha* preparada e pode conjurá-la sem gastar um espaço de magia e sem componentes Materiais, desde que use Suprimentos de Alquimista como Foco de Conjuração. Depois de usar esta característica, você não pode usá-la novamente até terminar um Descanso Longo."
+        }
+      ]
+    },
+    {
+      "nome": "Armeiro",
+      "fonte": "tasha",
+      "descricao": "Criar Armadura Mágica para Aprimorar suas Habilidades\n\nUm Armeiro modifica armaduras para que funcionem quase como uma segunda pele. A armadura é aprimorada para concentrar a magia do Armeiro, liberar ataques potentes e gerar uma defesa formidável.",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Ferramentas da Profissão",
+          "descricao": "Você ganha os benefícios a seguir.\n\n**Treinamento com Armadura.** Você ganha treinamento com armaduras Pesadas.\n\n**Proficiência com Ferramentas.** Você ganha proficiência com Ferramentas de Ferreiro. Se já tiver essa proficiência, você ganha proficiência com outro tipo de Ferramentas de Artesão à sua escolha.\n\n**Fabricação de Armaduras.** Quando você fabrica uma armadura mundana ou mágica, o tempo necessário para fabricá-la é reduzido à metade."
+        },
+        {
+          "nivel": 3,
+          "nome": "Magias de Armeiro",
+          "descricao": "Ao alcançar um nível de Artífice especificado na tabela Magias de Armeiro, você passa a sempre ter preparadas as magias listadas.\n\n| **Nível de Artífice** | **Magias** |\n|---|---|\n| 3 | *Mísseis Mágicos, Onda Trovejante* |\n| 5 | *Reflexos, Despedaçar* |\n| 9 | *Padrão Hipnótico, Relâmpago* |\n| 13 | *Escudo Ardente, Invisibilidade Maior* |\n| 17 | *Criar Passagem, Muralha de Energia* |"
+        },
+        {
+          "nivel": 3,
+          "nome": "Armadura Arcana",
+          "descricao": "Como uma Ação Mágica enquanto segura Ferramentas de Ferreiro, você pode transformar uma armadura que está vestindo em Armadura Arcana. A armadura continua sendo Armadura Arcana até você vestir outra armadura ou morrer.\n\nVocê ganha os benefícios a seguir enquanto vestir sua Armadura Arcana.\n\n**Sem Requisito de Força.** Se a armadura normalmente tem um requisito de Força, a Armadura Arcana não o tem para você.\n\n**Vestir e Despir Rápido.** Você pode vestir ou despir a armadura como uma Ação Utilizar. A armadura não pode ser removida contra a sua vontade.\n\n**Foco de Conjuração.** Você pode usar a Armadura Arcana como Foco de Conjuração para as suas magias de Artífice."
+        },
+        {
+          "nivel": 3,
+          "nome": "Modelo de Armadura",
+          "descricao": "Você pode personalizar sua Armadura Arcana. Ao fazer isso, escolha um dos modelos de armadura a seguir: Couraçado, Guardião ou Infiltrador. O modelo escolhido lhe dá benefícios especiais enquanto você o vestir.\n\nCada modelo inclui uma arma especial. Quando você ataca com essa arma, pode adicionar o seu modificador de Inteligência, em vez do modificador de Força ou de Destreza, às jogadas de ataque e de dano.\n\nVocê pode mudar o modelo da armadura sempre que terminar um Descanso Curto ou Longo, se estiver segurando Ferramentas de Ferreiro.\n\n**Couraçado.** Você projeta sua armadura para se tornar um colosso imponente em combate. Ela tem as características a seguir.\n\n***Demolidor de Energia.*** Uma bola de demolição ou marreta arcana se projeta da sua armadura. O demolidor conta como uma arma Simples Corpo a Corpo com a propriedade Alcance e causa 1d10 de dano Energético em um acerto. Se você acertar com o demolidor uma criatura pelo menos um tamanho menor que o seu, pode empurrar a criatura até 3 metros em linha reta para longe de você ou puxá-la até 3 metros em sua direção.\n\n***Estatura Gigante.*** Como uma Ação Bônus, você transforma e aumenta sua armadura por 1 minuto. Pela duração, seu alcance aumenta em 1,5 metro e, se você for menor que Grande, você se torna Grande, junto com tudo o que estiver vestindo. Se não houver espaço suficiente para aumentar seu tamanho, ele não muda. Você pode usar esta Ação Bônus um número de vezes igual ao seu modificador de Inteligência (mínimo de uma vez). Você recupera todos os usos gastos ao terminar um Descanso Longo.\n\n**Guardião.** Você projeta sua armadura para ficar na linha de frente do conflito. Ela tem as características a seguir.\n\n***Pulso Trovejante.*** Você pode descarregar explosões de impacto com golpes da sua armadura. O pulso conta como uma arma Simples Corpo a Corpo e causa 1d8 de dano Trovejante em um acerto. Uma criatura atingida pelo pulso tem Desvantagem em jogadas de ataque contra alvos que não sejam você até o início do seu próximo turno.\n\n***Campo Defensivo.*** Enquanto estiver Ferido, você pode usar uma Ação Bônus para ganhar Pontos de Vida Temporários iguais ao seu nível de Artífice. Você perde esses Pontos de Vida Temporários se despir a armadura.\n\n**Infiltrador.** Você personaliza sua armadura para empreitadas mais sutis. Ela tem as características a seguir.\n\n***Lançador de Relâmpagos.*** Um nódulo semelhante a uma gema surge na sua armadura, do qual você pode disparar raios elétricos. O lançador conta como uma arma Simples à Distância com alcance normal de 27 metros e alcance longo de 90 metros, e causa 1d6 de dano Elétrico em um acerto. Uma vez em cada um dos seus turnos, quando você acertar uma criatura com o lançador, pode causar 1d6 de dano Elétrico adicional a esse alvo.\n\n***Passos Potencializados.*** Seu Deslocamento aumenta em 1,5 metro.\n\n***Campo Silenciador.*** Você tem Vantagem em testes de Destreza (Furtividade). Se a armadura impõe Desvantagem nesses testes, a Vantagem e a Desvantagem se cancelam, como de costume."
+        },
+        {
+          "nivel": 5,
+          "nome": "Ataque Extra",
+          "descricao": "Você pode atacar duas vezes, em vez de uma, sempre que realizar a ação Atacar no seu turno."
+        },
+        {
+          "nivel": 9,
+          "nome": "Armeiro Aprimorado",
+          "descricao": "Você ganha os benefícios a seguir.\n\n**Replicação de Armadura.** Você aprende um plano adicional para a sua característica Replicar Item Mágico, e ele deve ser da categoria Armadura. Se você substituir esse plano, deve substituí-lo por outro plano de Armadura.\n\nAlém disso, você pode criar um item adicional com essa característica, e o item também deve ser da categoria Armadura.\n\n**Arsenal Aprimorado.** Você ganha +1 de bônus nas jogadas de ataque e de dano feitas com a arma especial do modelo da sua Armadura Arcana."
+        },
+        {
+          "nivel": 15,
+          "nome": "Armadura Perfeita",
+          "descricao": "Sua Armadura Arcana ganha benefícios adicionais conforme o modelo, detalhados a seguir.\n\n**Couraçado.** O dado de dano do seu Demolidor de Energia aumenta para 2d6 de dano Energético.\n\nAlém disso, quando você usa a Estatura Gigante, seu alcance aumenta em 3 metros, seu tamanho pode aumentar para Grande ou Enorme (à sua escolha) e você tem Vantagem em testes de Força e em salvaguardas de Força pela duração.\n\n**Guardião.** O dado de dano do seu Pulso Trovejante aumenta para 1d10 de dano Trovejante.\n\nAlém disso, quando uma criatura Enorme ou menor que você possa ver terminar o turno a até 9 metros de você, você pode usar uma Reação para forçar magicamente essa criatura a fazer uma salvaguarda de Força contra a CD das suas magias. Em uma falha, você puxa a criatura até 7,5 metros diretamente em sua direção, para um espaço desocupado. Se puxar o alvo para um espaço a até 1,5 metro de você, pode fazer um ataque corpo a corpo com arma contra ele como parte dessa Reação.\n\nVocê pode usar esta Reação um número de vezes igual ao seu modificador de Inteligência (mínimo de uma vez). Você recupera todos os usos gastos ao terminar um Descanso Longo.\n\n**Infiltrador.** O dado de dano do seu Lançador de Relâmpagos aumenta para 2d6 de dano Elétrico. Qualquer criatura que sofra dano Elétrico do seu Lançador de Relâmpagos cintila com luz mágica até o início do seu próximo turno. A criatura cintilante emite Meia-Luz em um raio de 1,5 metro e tem Desvantagem em jogadas de ataque contra você, pois a luz a eletriza se ela atacar você.\n\nAlém disso, como uma Ação Bônus, você pode ganhar um Deslocamento de Voo igual ao dobro do seu Deslocamento até o fim do turno atual. Você pode usar esta Ação Bônus um número de vezes igual ao seu modificador de Inteligência (mínimo de uma vez). Você recupera todos os usos gastos ao terminar um Descanso Longo."
+        }
+      ]
+    },
+    {
+      "nome": "Artilheiro",
+      "fonte": "tasha",
+      "descricao": "Empunhar Poder Destrutivo à Distância\n\nUm Artilheiro é especialista em usar a magia para lançar energia, projéteis e explosões em um campo de batalha.",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Ferramentas da Profissão",
+          "descricao": "Você ganha os benefícios a seguir.\n\n**Armamento à Distância.** Você ganha proficiência com armas Marciais à Distância.\n\n**Proficiência com Ferramentas.** Você ganha proficiência com Ferramentas de Entalhador. Se já tiver essa proficiência, você ganha proficiência com outro tipo de Ferramentas de Artesão à sua escolha.\n\n**Fabricação de Varinhas.** Quando você fabrica uma Varinha mágica, o tempo necessário para fabricá-la é reduzido à metade."
+        },
+        {
+          "nivel": 3,
+          "nome": "Magias de Artilheiro",
+          "descricao": "Ao alcançar um nível de Artífice especificado na tabela Magias de Artilheiro, você passa a sempre ter preparadas as magias listadas.\n\n| **Nível de Artífice** | **Magias** |\n|---|---|\n| 3 | *Escudo Arcano, Onda Trovejante* |\n| 5 | *Raio Ardente, Despedaçar* |\n| 9 | *Bola de Fogo, Muralha de Vento* |\n| 13 | *Tempestade Glacial, Muralha de Fogo* |\n| 17 | *Cone de Frio, Muralha de Energia* |"
+        },
+        {
+          "nivel": 3,
+          "nome": "Canhão Místico",
+          "descricao": "Usando Ferramentas de Ferreiro ou Ferramentas de Entalhador, você pode usar uma Ação Mágica para criar um Canhão Místico Pequeno ou Miúdo em um espaço desocupado sobre uma superfície horizontal a até 1,5 metro de você. As estatísticas de jogo do canhão aparecem abaixo. Você determina a aparência dele, inclusive se você o carrega ou não (e, caso o carregue, se ele tem pernas ou rodas). Ele desaparece se for reduzido a 0 Pontos de Vida ou após 1 hora. Você pode dispensá-lo antes disso como uma Ação Mágica.\n\nDepois de criar um canhão, você não pode criar outro até terminar um Descanso Longo ou gastar um espaço de magia para criá-lo. Você pode ter apenas um canhão por vez e não pode criar um enquanto já tiver um.\n\n**Canhão Místico**\nObjeto Pequeno ou Miúdo\n\n**Classe de Armadura:** 18\n**Pontos de Vida:** 5 vezes o seu nível de Artífice (conjurar *Reparar* no canhão restaura 2d6 Pontos de Vida a ele)\n**Imunidades:** Psíquico, Venenoso\n\n**Ativar Canhão (Exige que Você Esteja a até 18 Metros do Canhão).** Como uma Ação Bônus, você ordena que o canhão use uma das opções Lança-Chamas, Balista de Energia ou Protetor descritas abaixo; você pode fazer o canhão se mover até 4,5 metros antes ou depois dessa opção.\n\n***Lança-Chamas.*** O canhão lança fogo em um Cone de 4,5 metros. Cada criatura nessa área faz uma salvaguarda de Destreza contra a CD das suas magias, sofrendo 2d8 de dano Ígneo em uma falha, ou metade desse dano em um sucesso. Objetos inflamáveis no Cone que não estejam sendo vestidos ou carregados começam a queimar.\n\n***Balista de Energia.*** Faça um ataque de magia à distância originado no canhão contra uma criatura ou objeto a até 36 metros dele. Em um acerto, o alvo sofre 2d8 de dano Energético e, se for uma criatura, é empurrado até 1,5 metro para longe do canhão.\n\n***Protetor.*** O canhão emite uma explosão de energia positiva que concede a ele mesmo e a cada criatura à sua escolha a até 3 metros do canhão uma quantidade de Pontos de Vida Temporários igual a 1d8 mais o seu modificador de Inteligência (mínimo de +1).\n\nO bloco de estatísticas completo do canhão está na seção de criaturas."
+        },
+        {
+          "nivel": 5,
+          "nome": "Arma de Fogo Arcana",
+          "descricao": "Ao terminar um Descanso Longo, você pode usar Ferramentas de Entalhador para entalhar sigilos especiais em um Bastão, Cajado, Varinha ou arma Marcial à Distância e, assim, transformá-lo na sua Arma de Fogo Arcana. Os sigilos desaparecem do objeto se você os entalhar depois em outro item. Fora isso, os sigilos duram indefinidamente.\n\nVocê pode usar sua Arma de Fogo Arcana como Foco de Conjuração para as suas magias de Artífice. Quando você conjura uma magia de Artífice por meio da arma, role 1d8 e ganhe um bônus em uma das rolagens de dano da magia igual ao número rolado."
+        },
+        {
+          "nivel": 9,
+          "nome": "Canhão Explosivo",
+          "descricao": "Todo Canhão Místico que você cria agora é mais destrutivo. Você ganha os benefícios a seguir.\n\n**Detonar.** Quando o seu canhão sofre dano, você pode usar uma Reação para ordenar que ele detone, se estiver a até 18 metros dele. Isso destrói o canhão e força cada criatura a até 6 metros dele a fazer uma salvaguarda de Destreza contra a CD das suas magias, sofrendo 3d10 de dano Energético em uma falha, ou metade desse dano em um sucesso.\n\n**Poder de Fogo.** As rolagens de dano do canhão e a quantidade de Pontos de Vida Temporários concedidos pelo Protetor aumentam em 1d8."
+        },
+        {
+          "nivel": 15,
+          "nome": "Posição Fortificada",
+          "descricao": "Você é mestre em formar posições bem defendidas usando seu Canhão Místico. Você ganha os benefícios a seguir.\n\n**Poder de Fogo Duplo.** Agora você pode ter dois canhões ao mesmo tempo e pode criar dois com a mesma Ação Mágica. (Se gastar um espaço de magia para criar o primeiro canhão, deve gastar outro espaço de magia para criar o segundo.) Você pode ativar os dois com a mesma Ação Bônus, ordenando que usem a mesma opção de ativação ou opções diferentes. Você não pode criar um terceiro canhão enquanto tiver dois.\n\n**Projeção de Campo Cintilante.** Você e seus aliados têm Meia-Cobertura enquanto estiverem a até 3 metros do seu Canhão Místico."
+        }
+      ]
+    },
+    {
+      "nome": "Ferreiro de Batalha",
+      "fonte": "tasha",
+      "descricao": "Comandar um Guardião Construto\n\nUm Ferreiro de Batalha é uma combinação de protetor e médico, especialista em defender os outros e em reparar tanto o material quanto o pessoal. Para auxiliá-lo no trabalho, os Ferreiros de Batalha são acompanhados por um Defensor de Aço, um companheiro protetor de sua própria criação.",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Ferramentas da Profissão",
+          "descricao": "Você ganha os benefícios a seguir.\n\n**Proficiência com Ferramentas.** Você ganha proficiência com Ferramentas de Ferreiro. Se já tiver essa proficiência, você ganha proficiência com outro tipo de Ferramentas de Artesão à sua escolha.\n\n**Fabricação de Armas.** Quando você fabrica uma arma mundana ou mágica, o tempo necessário para fabricá-la é reduzido à metade."
+        },
+        {
+          "nivel": 3,
+          "nome": "Magias de Ferreiro de Batalha",
+          "descricao": "Ao alcançar um nível de Artífice especificado na tabela Magias de Ferreiro de Batalha, você passa a sempre ter preparadas as magias listadas.\n\n| **Nível de Artífice** | **Magias** |\n|---|---|\n| 3 | *Heroísmo, Escudo Arcano* |\n| 5 | *Destruição Radiante, Vínculo de Proteção* |\n| 9 | *Aura de Vitalidade, Invocar Barragem* |\n| 13 | *Aura de Pureza, Escudo Ardente* |\n| 17 | *Destruição Banidora, Curar Ferimentos em Massa* |"
+        },
+        {
+          "nivel": 3,
+          "nome": "Pronto para a Batalha",
+          "descricao": "Seu treinamento de combate e seus experimentos com magia renderam dois frutos.\n\n**Potencialização Arcana.** Quando você ataca com uma arma mágica, pode usar o seu modificador de Inteligência, em vez do modificador de Força ou de Destreza, nas jogadas de ataque e de dano.\n\n**Conhecimento de Armas.** Você ganha proficiência com armas Marciais. Você pode usar uma arma com a qual tenha proficiência como Foco de Conjuração para as suas magias de Artífice."
+        },
+        {
+          "nivel": 3,
+          "nome": "Defensor de Aço",
+          "descricao": "Seu trabalho de funileiro lhe rendeu um companheiro, um Defensor de Aço (veja o bloco de estatísticas na seção de criaturas). Você determina a aparência do defensor e se ele tem duas ou quatro pernas; suas escolhas não afetam as estatísticas de jogo do defensor.\n\nO defensor é Amigável para você e seus aliados e obedece a você. Ele desaparece se você morrer.\n\n**O Defensor em Combate.** Em combate, o defensor age durante o seu turno. Ele pode se mover e usar a própria Reação por conta própria, mas a única ação que realiza é Esquivar, a menos que você use uma Ação Bônus para ordenar que ele realize outra ação. Se você tiver a condição Incapacitado, o defensor age por conta própria e não fica limitado à ação Esquivar.\n\n**Restaurando ou Substituindo o Defensor.** Se o defensor morreu na última hora, você pode usar uma Ação Mágica para tocá-lo e gastar um espaço de magia. O defensor volta à vida após 1 minuto, com todos os seus Pontos de Vida restaurados.\n\nSempre que terminar um Descanso Longo, você pode criar um novo defensor se estiver segurando Ferramentas de Ferreiro. Se você já tiver um defensor desta característica, o primeiro desaparece."
+        },
+        {
+          "nivel": 5,
+          "nome": "Ataque Extra",
+          "descricao": "Você pode atacar duas vezes, em vez de uma, sempre que realizar a ação Atacar no seu turno. Você pode abrir mão de um dos seus ataques ao realizar a ação Atacar para ordenar que o seu Defensor de Aço realize a ação Golpe Reforçado por Energia."
+        },
+        {
+          "nivel": 9,
+          "nome": "Golpe Arcano",
+          "descricao": "Quando você acerta um alvo com uma jogada de ataque usando uma arma mágica, ou quando o seu Defensor de Aço acerta um alvo, você pode canalizar energia mágica através do golpe para criar um dos efeitos a seguir.\n\n**Energia Destrutiva.** O alvo sofre 2d6 de dano Energético adicional.\n\n**Energia Restauradora.** Escolha uma criatura ou objeto que você possa ver a até 9 metros do alvo. A energia curativa flui para o escolhido, restaurando 2d6 Pontos de Vida a ele.\n\nVocê pode usar esta energia um número de vezes igual ao seu modificador de Inteligência (mínimo de uma vez), mas não mais de uma vez por turno. Você recupera todos os usos gastos ao terminar um Descanso Longo."
+        },
+        {
+          "nivel": 15,
+          "nome": "Defensor Aprimorado",
+          "descricao": "Seu Golpe Arcano e seu Defensor de Aço ficaram mais poderosos, concedendo os benefícios a seguir.\n\n**Golpe Aprimorado.** O dano adicional e a cura do seu Golpe Arcano aumentam ambos para 4d6.\n\n**Deflexão Aprimorada.** Sempre que o seu Defensor de Aço usa Desviar Ataque, o atacante sofre dano Energético igual a 1d4 mais o seu modificador de Inteligência."
+        }
+      ]
+    },
+    {
+      "nome": "Cartógrafo",
+      "fonte": "tasha",
+      "descricao": "Traçar Cursos Vantajosos em Meio à Turbulência\n\nOs Cartógrafos são os principais navegadores e agentes de reconhecimento. Usando suas criações, eles podem destacar ameaças, proteger aliados e abrir portais para locais distantes.",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Ferramentas da Profissão",
+          "descricao": "Você ganha os benefícios a seguir.\n\n**Proficiência com Ferramentas.** Você ganha proficiência com Suprimentos de Calígrafo e Ferramentas de Cartógrafo. Se já tiver uma dessas proficiências, você ganha proficiência com outro tipo de Ferramentas de Artesão à sua escolha (ou com dois outros tipos, se já tiver as duas).\n\n**Fabricação de Pergaminhos.** Ao escrever um Pergaminho de Magia usando as regras de fabricação do Livro do Jogador, o tempo necessário para fabricá-lo é reduzido à metade."
+        },
+        {
+          "nivel": 3,
+          "nome": "Magias de Cartógrafo",
+          "descricao": "Ao alcançar um nível de Artífice especificado na tabela Magias de Cartógrafo, você passa a sempre ter preparadas as magias listadas.\n\n| **Nível de Artífice** | **Magias** |\n|---|---|\n| 3 | *Fogo das Fadas, Raio Guia, Palavra Curativa* |\n| 5 | *Localizar Objeto, Espinho Mental* |\n| 9 | *Convocar Relâmpagos, Clarividência* |\n| 13 | *Banimento, Localizar Criatura* |\n| 17 | *Vidência, Círculo de Teleporte* |"
+        },
+        {
+          "nivel": 3,
+          "nome": "Atlas do Aventureiro",
+          "descricao": "Sempre que terminar um Descanso Longo segurando Ferramentas de Cartógrafo, você pode usar essa ferramenta para criar um conjunto de mapas mágicos tocando pelo menos duas criaturas (uma delas pode ser você), até um máximo de criaturas igual a 1 mais o seu modificador de Inteligência (mínimo de duas criaturas). Cada alvo recebe um mapa mágico, que se atualiza constantemente para mostrar a posição relativa de todos os portadores de mapas, mas é ilegível para todos os outros. Os mapas duram até você morrer ou até você usar esta característica novamente, e nesse momento quaisquer mapas existentes criados por ela desaparecem imediatamente.\n\nEnquanto carrega o mapa, um alvo ganha os benefícios a seguir.\n\n**Percepção.** O alvo soma 1d4 às suas jogadas de Iniciativa.\n\n**Posicionamento.** O alvo sabe a localização de todos os outros portadores de mapas que estejam no mesmo plano de existência que ele. Ao conjurar uma magia ou criar outro efeito que exija enxergar o alvo do efeito, um portador de mapa pode escolher como alvo outro portador de mapa independentemente de visão ou cobertura, desde que o outro portador de mapa ainda esteja dentro do alcance do efeito."
+        },
+        {
+          "nivel": 3,
+          "nome": "Magia de Mapeamento",
+          "descricao": "Você ganha os benefícios a seguir.\n\n**Cartografia Iluminada.** Você sempre tem a magia *Fogo das Fadas* preparada e pode conjurá-la sem gastar um espaço de magia, delineando as criaturas afetadas como se fosse com tinta. Você pode fazer isso um número de vezes igual ao seu modificador de Inteligência (mínimo de uma vez). Você recupera todos os usos gastos ao terminar um Descanso Longo.\n\n**Salto de Portal.** No seu turno, você pode gastar uma quantidade de movimento igual à metade do seu Deslocamento (arredondada para baixo) para se teleportar para um espaço desocupado que você possa ver a até 3 metros de você ou a até 1,5 metro de uma criatura que esteja a até 9 metros de você e segure um dos mapas do seu Atlas do Aventureiro. Você não pode usar este benefício se o seu Deslocamento for 0."
+        },
+        {
+          "nivel": 5,
+          "nome": "Precisão Guiada",
+          "descricao": "Uma vez por turno, ao conjurar uma magia da sua lista de Magias de Cartógrafo ou ao atingir com uma jogada de ataque uma criatura afetada pelo seu *Fogo das Fadas*, você pode somar o seu modificador de Inteligência a uma jogada de dano da magia ou do ataque.\n\nAlém disso, sofrer dano não pode fazer você perder a Concentração em *Fogo das Fadas*."
+        },
+        {
+          "nivel": 9,
+          "nome": "Movimento Engenhoso",
+          "descricao": "Ao usar o seu Lampejo de Genialidade, você ou uma criatura voluntária à sua escolha que você possa ver a até 9 metros de você pode se teleportar até 9 metros para um espaço desocupado que você possa ver como parte dessa mesma Reação."
+        },
+        {
+          "nivel": 15,
+          "nome": "Atlas Superior",
+          "descricao": "Seu Atlas do Aventureiro melhora, concedendo os benefícios a seguir.\n\n**Refúgio Seguro.** Quando um portador de mapa fosse reduzido a 0 Pontos de Vida mas não morto de imediato, essa criatura pode destruir o seu mapa. Em vez disso, os Pontos de Vida da criatura passam a ser um número igual ao dobro do seu nível de Artífice, e a criatura é teleportada para um espaço desocupado a até 1,5 metro de você ou de outro portador de mapa à escolha dela.\n\n**Caminho Infalível.** Se você for um dos portadores de mapa do seu Atlas do Aventureiro, você sempre tem a magia *Encontrar o Caminho* preparada e pode conjurá-la sem gastar um espaço de magia e sem precisar de componentes. Depois de usar este benefício, você não pode usá-lo novamente até terminar um Descanso Longo."
+        }
+      ]
+    }
+  ],
+  "lista_magias": {
+    "Truques": [
+      {
+        "nome": "Acudir os Moribundos",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Bolha Ácida",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Chicote de Espinhos",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Elementalismo",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Golpe Certeiro",
+        "escola": "Adivinhação",
+        "especial": "M"
+      },
+      {
+        "nome": "Luz",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Luzes Dançantes",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Mãos Mágicas",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Mensagem",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Orientação",
+        "escola": "Adivinhação",
+        "especial": "C"
+      },
+      {
+        "nome": "Prestidigitação Arcana",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Raio de Fogo",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Raio de Gelo",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Rajada de Veneno",
+        "escola": "Necromancia",
+        "especial": "—"
+      },
+      {
+        "nome": "Resistência",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Toque Chocante",
+        "escola": "Evocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Trovão",
+        "escola": "Evocação",
+        "especial": "—"
+      }
+    ],
+    "1º Círculo": [
+      {
+        "nome": "Alarme",
+        "escola": "Abjuração",
+        "especial": "R"
+      },
+      {
+        "nome": "Curar Ferimentos",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Detectar Magia",
+        "escola": "Adivinhação",
+        "especial": "C, R"
+      },
+      {
+        "nome": "Disfarçar-se",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Fogo das Fadas",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Graxa",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Identificar",
+        "escola": "Adivinhação",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Passos Largos",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Purificar Alimentos e Bebidas",
+        "escola": "Transmutação",
+        "especial": "R"
+      },
+      {
+        "nome": "Queda Suave",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Retirada Acelerada",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Salto",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Santuário",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Vitalidade Vazia",
+        "escola": "Necromancia",
+        "especial": "—"
+      }
+    ],
+    "2º Círculo": [
+      {
+        "nome": "Alterar-se",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Aprimorar Atributo",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Arma Mágica",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Aumentar/Reduzir",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Auxílio",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Boca Encantada",
+        "escola": "Ilusão",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Chama Contínua",
+        "escola": "Evocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Corda Extradimensional",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Escalada de Aranha",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Esquentar Metal",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Invisibilidade",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Levitação",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Proteção Contra Veneno",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Restauração Menor",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Servo Homúnculo",
+        "escola": "Invocação",
+        "especial": "R, M"
+      },
+      {
+        "nome": "Sopro de Dragão",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Teia",
+        "escola": "Invocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Tranca Arcana",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Turvar",
+        "escola": "Ilusão",
+        "especial": "C"
+      },
+      {
+        "nome": "Ver o Invisível",
+        "escola": "Adivinhação",
+        "especial": "—"
+      },
+      {
+        "nome": "Vigor Arcano",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Visão no Escuro",
+        "escola": "Transmutação",
+        "especial": "—"
+      }
+    ],
+    "3º Círculo": [
+      {
+        "nome": "Arma Elemental",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Caminhar Sobre as Águas",
+        "escola": "Transmutação",
+        "especial": "R"
+      },
+      {
+        "nome": "Celeridade",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Criar Comida e Água",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Dissipar Magia",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Glifo de Proteção",
+        "escola": "Abjuração",
+        "especial": "M"
+      },
+      {
+        "nome": "Piscar",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Proteção Contra Energia",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Respirar na Água",
+        "escola": "Transmutação",
+        "especial": "R"
+      },
+      {
+        "nome": "Revivificar",
+        "escola": "Necromancia",
+        "especial": "M"
+      },
+      {
+        "nome": "Voo",
+        "escola": "Transmutação",
+        "especial": "C"
+      }
+    ],
+    "4º Círculo": [
+      {
+        "nome": "Arca Secreta de Leomund",
+        "escola": "Invocação",
+        "especial": "M"
+      },
+      {
+        "nome": "Cão Fiel de Mordenkainen",
+        "escola": "Invocação",
+        "especial": "—"
+      },
+      {
+        "nome": "Esfera Resiliente de Otiluke",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Fabricar",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Invocar Constructo",
+        "escola": "Invocação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Moldar Rochas",
+        "escola": "Transmutação",
+        "especial": "—"
+      },
+      {
+        "nome": "Movimentação Livre",
+        "escola": "Abjuração",
+        "especial": "—"
+      },
+      {
+        "nome": "Olho Arcano",
+        "escola": "Adivinhação",
+        "especial": "C"
+      },
+      {
+        "nome": "Pele-Rocha",
+        "escola": "Transmutação",
+        "especial": "C, M"
+      },
+      {
+        "nome": "Santuário Particular de Mordenkainen",
+        "escola": "Abjuração",
+        "especial": "—"
+      }
+    ],
+    "5º Círculo": [
+      {
+        "nome": "Animar Objetos",
+        "escola": "Transmutação",
+        "especial": "C"
+      },
+      {
+        "nome": "Círculo de Poder",
+        "escola": "Abjuração",
+        "especial": "C"
+      },
+      {
+        "nome": "Criação",
+        "escola": "Ilusão",
+        "especial": "—"
+      },
+      {
+        "nome": "Mão de Bigby",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Muralha de Pedra",
+        "escola": "Evocação",
+        "especial": "C"
+      },
+      {
+        "nome": "Restauração Maior",
+        "escola": "Abjuração",
+        "especial": "M"
+      }
+    ]
+  },
+  "texto_completo": "# Artífice\n\n### Nível 1: Conjuração\nVocê aprendeu a canalizar energia mágica por meio de objetos. Consulte o Livro do Jogador para as regras de conjuração. As informações abaixo detalham como você usa essas regras com as magias de Artífice, que aparecem na lista de magias de Artífice mais adiante na descrição da classe.\n\n**Ferramentas Necessárias.** Você produz suas magias de Artífice por meio de ferramentas. Você pode usar Ferramentas de Ladrão, Ferramentas de Funileiro ou outro tipo de Ferramentas de Artesão com o qual tenha proficiência como Foco de Conjuração, e precisa ter um desses focos em mãos ao conjurar uma magia de Artífice (ou seja, quando a magia tem um componente M).\n\n**Truques.** Você conhece dois truques de Artífice à sua escolha. *Bolha Ácida* e *Prestidigitação Arcana* são recomendados.\n\nSempre que terminar um Descanso Longo, você pode substituir um dos truques desta característica por outro truque de Artífice à sua escolha.\n\nAo alcançar os níveis 10 e 14 de Artífice, você aprende outro truque de Artífice à sua escolha, conforme mostrado na coluna Truques da tabela Características do Artífice.\n\n**Espaços de Magia.** A tabela Características do Artífice mostra quantos espaços de magia você tem para conjurar suas magias de 1º círculo ou superior. Você recupera todos os espaços gastos ao terminar um Descanso Longo.\n\n**Magias Preparadas de 1º Círculo ou Superior.** Você prepara a lista de magias de 1º círculo ou superior que estão disponíveis para você conjurar com esta característica. Para começar, escolha duas magias de Artífice de 1º círculo. *Curar Ferimentos* e *Graxa* são recomendadas.\n\nO número de magias da sua lista aumenta conforme você ganha níveis de Artífice, como mostrado na coluna Magias Preparadas da tabela Características do Artífice. Sempre que esse número aumentar, escolha magias de Artífice adicionais até que o número de magias da sua lista corresponda ao número da tabela. As magias escolhidas devem ser de um círculo para o qual você tenha espaços de magia. Por exemplo, se você é um Artífice de 5º nível, sua lista de magias preparadas pode incluir seis magias de Artífice de 1º e 2º círculos em qualquer combinação.\n\nSe outra característica de Artífice lhe der magias que você sempre tem preparadas, elas não contam no número de magias que você pode preparar com esta característica, mas, fora isso, contam como magias de Artífice para você.\n\n**Alterando Suas Magias Preparadas.** Sempre que terminar um Descanso Longo, você pode alterar sua lista de magias preparadas, substituindo qualquer magia da lista por outra magia de Artífice para a qual você tenha espaços de magia.\n\n**Atributo de Conjuração.** Inteligência é o seu atributo de conjuração para as suas magias de Artífice.\n\n### Nível 1: Magia de Funileiro\nVocê conhece o truque *Reparar*.\n\nComo uma Ação Mágica enquanto segura Ferramentas de Funileiro, você pode criar um item em um espaço desocupado a até 1,5 metro de você, escolhendo o item na lista a seguir: Algibeira, Ampola, Armadilha de Caça, Arpéu, Balde, Caixa para Fogo, Cesta, Cobertor, Cordão, Corda, Esferas de Metal, Estacas de Ferro, Estrepes, Frasco, Garrafa de Vidro, Grilhões, Jarro, Lâmpada, Óleo, Pá, Papel, Pé de Cabra, Pergaminho, Rede, Roldana e Polias, Saca, Saco de Dormir, Sino, Tocha, Baliza e Vela.\n\nConsulte as regras do item no Livro do Jogador. O item dura até você terminar um Descanso Longo, quando então desaparece.\n\nVocê pode usar esta característica um número de vezes igual ao seu modificador de Inteligência (mínimo de uma vez). Você recupera todos os usos gastos ao terminar um Descanso Longo.\n\n### Nível 2: Replicar Item Mágico\nVocê aprendeu planos arcanos que usa para fazer itens mágicos.\n\n**Planos Conhecidos.** Ao obter esta característica, escolha quatro planos para aprender na lista de Planos de Item Mágico (Artífice nível 2+); veja as descrições dos itens no Livro do Mestre. Bolsa Devoradora, Gorro de Respiração Aquática, Pedras de Mensagem e Varinha do Mago de Guerra são recomendados. Sempre que ganhar um nível de Artífice, você pode substituir um dos planos que conhece por um novo plano para o qual se qualifique.\n\nVocê aprende outro plano à sua escolha ao alcançar certos níveis de Artífice, conforme mostrado na coluna Planos Conhecidos da tabela Características do Artífice. Ao escolher um plano para aprender, você o escolhe em qualquer lista de Planos de Item Mágico para a qual se qualifique; sua qualificação se baseia no seu nível de Artífice.\n\n**Criando um Item.** Ao terminar um Descanso Longo, você pode criar um ou dois itens mágicos diferentes se estiver com Ferramentas de Funileiro em mãos. Cada item se baseia em um dos planos que você conhece para esta característica.\n\nSe um item criado exigir Sintonização, você pode se sintonizar com ele no instante em que o cria. Se decidir se sintonizar com o item mais tarde, deverá fazê-lo pelo processo normal de Sintonização.\n\nAo alcançar certos níveis de Artífice, indicados na coluna Itens Mágicos da tabela Características do Artífice, aumenta o número de itens mágicos que você pode criar ao fim de um Descanso Longo. Cada item que você criar deve se basear em um plano diferente que você conheça.\n\nVocê não pode ter mais itens mágicos desta característica do que o número mostrado na coluna Itens Mágicos da tabela Características do Artífice para o seu nível. Se tentar exceder o seu máximo de itens mágicos desta característica, o item mais antigo desaparece e, em seguida, o novo item surge.\n\n**Duração.** Um item mágico criado por esta característica funciona como o item mágico normal, exceto que sua magia não é permanente; quando você morre, o item mágico desaparece após 1d4 dias. Se você substituir um plano que conhece por um novo plano, qualquer item mágico criado com o plano substituído desaparece imediatamente.\n\nSe um item que você criou com esta característica for um recipiente, como uma Bolsa Devoradora, e desaparecer, seu conteúdo surge inofensivamente dentro e ao redor do espaço dele.\n\n**Foco de Conjuração.** Você pode usar qualquer Varinha ou Arma criada por esta característica como Foco de Conjuração no lugar de um conjunto de Ferramentas de Artesão.\n\n**Criando Mais Itens Mágicos.** A característica Replicar Item Mágico não é a única maneira de um Artífice fazer itens mágicos. O Livro do Mestre traz regras para personagens, não apenas Artífices, que queiram fazer itens mágicos de todos os tipos. Embora muitos personagens diferentes possam fazer itens mágicos, os Artífices conseguem fazê-lo mais depressa que os outros; cada subclasse de Artífice melhora a velocidade do personagem para fazer itens de uma certa categoria.\n\nQuando um Artífice cria um item mágico usando as regras normais do Livro do Mestre, o personagem não ganha nenhuma conexão especial com esse item. As características de classe que se referem a itens criados pela sua característica Replicar Item Mágico não se aplicam a itens que você cria por outros meios.\n\n### Nível 3: Subclasse de Artífice\nVocê ganha uma subclasse de Artífice à sua escolha. As subclasses Alquimista, Armeiro, Artilheiro, Ferreiro de Batalha e Cartógrafo são detalhadas após a descrição desta classe. Uma subclasse é uma especialização que lhe concede características em certos níveis de Artífice. Pelo resto da sua carreira, você ganha cada uma das características da sua subclasse que sejam do seu nível de Artífice ou inferior.\n\n### Nível 4: Aumento no Valor de Atributo\nVocê ganha o talento Aumento no Valor de Atributo ou outro talento à sua escolha para o qual se qualifique. Você ganha esta característica novamente nos níveis 8, 12 e 16 de Artífice.\n\n### Nível 6: Funileiro de Item Mágico\nSua característica Replicar Item Mágico ganha as opções a seguir.\n\n**Carregar Item Mágico.** Como uma Ação Bônus, você pode tocar um item mágico a até 1,5 metro de você que tenha criado com Replicar Item Mágico e que use cargas. Você gasta um espaço de magia de 1º círculo ou superior e recarrega o item. O número de cargas que o item recupera é igual ao círculo do espaço de magia gasto.\n\n**Drenar Item Mágico.** Como uma Ação Bônus, você pode tocar um item mágico a até 1,5 metro de você que tenha criado com Replicar Item Mágico e fazer o item desaparecer, convertendo sua energia mágica em um espaço de magia. O espaço é de 1º círculo se o item for Comum, ou de 2º círculo se o item for Incomum ou Raro. Depois de usar esta opção, você não pode usá-la novamente até terminar um Descanso Longo. Qualquer espaço de magia criado por esta opção desaparece quando você termina um Descanso Longo.\n\n**Transmutar Item Mágico.** Como uma Ação Mágica, você pode tocar um item mágico a até 1,5 metro de você que tenha criado com Replicar Item Mágico e transformá-lo em um item mágico diferente. O item resultante deve se basear em um plano de item mágico que você conheça. Depois de usar esta opção, você não pode usá-la novamente até terminar um Descanso Longo.\n\n### Nível 7: Lampejo de Genialidade\nQuando você ou uma criatura que você possa ver a até 9 metros de você falhar em um teste de atributo ou em uma salvaguarda, você pode usar uma Reação para adicionar um bônus à rolagem, podendo fazê-la ter sucesso. O bônus é igual ao seu modificador de Inteligência (mínimo de +1).\n\nVocê pode usar esta Reação um número de vezes igual ao seu modificador de Inteligência (mínimo de uma vez). Você recupera todos os usos gastos ao terminar um Descanso Longo.\n\n### Nível 10: Especialista em Itens Mágicos\nAgora você pode se sintonizar com até quatro itens mágicos ao mesmo tempo.\n\n### Nível 11: Item de Armazenar Magia\nSempre que terminar um Descanso Longo, você pode tocar uma arma Simples ou Marcial, ou um item que possa usar como Foco de Conjuração, e armazenar nele uma magia, escolhendo uma magia de Artífice de 1º, 2º ou 3º círculo que tenha tempo de conjuração de uma Ação e que não exija um componente Material consumido pela magia (você não precisa ter a magia preparada).\n\nEnquanto segura o objeto, uma criatura pode usar uma Ação Mágica para produzir o efeito da magia a partir dele, usando o modificador do seu atributo de conjuração. Se a magia exigir Concentração, a criatura deve se concentrar. Depois que uma criatura usa o objeto para produzir o efeito da magia, o objeto não pode ser usado dessa forma novamente até o início do próximo turno dessa criatura.\n\nA magia permanece no objeto até que ele seja usado um número de vezes igual ao dobro do seu modificador de Inteligência (mínimo de duas vezes) ou até que você use esta característica novamente para armazenar uma magia em um objeto.\n\n### Nível 14: Artifício Avançado\nVocê ganha os benefícios a seguir.\n\n**Sábio em Itens Mágicos.** Agora você pode se sintonizar com até cinco itens mágicos ao mesmo tempo.\n\n**Gênio Renovado.** Ao terminar um Descanso Curto, você recupera um uso gasto da sua característica Lampejo de Genialidade.\n\n### Nível 18: Mestre de Itens Mágicos\nAgora você pode se sintonizar com até seis itens mágicos ao mesmo tempo.\n\n### Nível 19: Dádiva Épica\nVocê ganha um talento de Dádiva Épica ou outro talento à sua escolha para o qual se qualifique. Dádiva da Resistência à Energia é recomendada.\n\n### Nível 20: Alma do Artífice\nVocê desenvolveu uma conexão mística com seus itens mágicos, da qual pode extrair auxílio. Você ganha os benefícios a seguir.\n\n**Trapacear a Morte.** Se você for reduzido a 0 Pontos de Vida, mas não morrer na hora, você pode desintegrar qualquer quantidade de itens mágicos Incomuns ou Raros criados pela sua característica Replicar Item Mágico. Se fizer isso, seus Pontos de Vida passam a ser, em vez disso, um número igual a 20 vezes a quantidade de itens mágicos desintegrados.\n\n**Orientação Mágica.** Ao terminar um Descanso Curto, você recupera todos os usos gastos da sua característica Lampejo de Genialidade se estiver sintonizado com pelo menos um item mágico."
+}

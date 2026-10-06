@@ -28,6 +28,7 @@ import { char } from './sheet/estado.js';
 import { getEstadoRecursosGuardiao } from './sheet/classes/guardiao.js';
 import { getEstadoRecursosDruida } from './sheet/classes/druida.js';
 import { nivelNa, subclasseDe, temClasse } from './regras-multiclasse.js';
+import { usosGratisArtifice, gastarGratisArtifice } from './regras-subclasses-artifice.js';
 
 /** Estado do Guardião só quando a característica que concede o uso grátis
  *  já foi ganha -- sem o nível mínimo, `getEstadoRecursosGuardiao` ainda
@@ -95,13 +96,25 @@ const ADAPTADORES = [
     disponivel: () => (estadoCirculoDasEstrelas(3)?.mapaEstelarDisponiveis ?? 0) > 0,
     consumir: () => { char.recursos.druida.subclasses.estrelas.mapa_estelar_usos_gastos += 1; },
   },
+  ...[
+    ['Restauração Menor', 'Reagentes Restauradores', 'restauracao_menor'],
+    ['Fogo das Fadas', 'Magia de Mapeamento', 'fogo_das_fadas'],
+  ].map(([nomeMagia, nomeFeature, chave]) => ({
+    nomeMagia,
+    nomeFeature,
+    // Caldeirão Borbulhante de Tasha e Encontrar o Caminho (1 uso) não entram: usam gratis_usado do motor.
+    // Só o Artífice com a subclasse e o nível certos: outra fonte da mesma magia (Drow, talento) mantém o próprio botão.
+    aplicavel: () => usosGratisArtifice(char, chave).max > 0,
+    disponivel: () => { const u = usosGratisArtifice(char, chave); return u.gastos < u.max; },
+    consumir: () => { gastarGratisArtifice(char, chave); },
+  })),
 ];
 
 /**
  * Diz se `nomeFeature` (nome da CARACTERÍSTICA, não da magia) tem um
  * adaptador cadastrado acima -- usado por sheet/habilidades.js para
  * suprimir o toggle/contador GENÉRICO do card de Características de
- * Classe (`char.usos_habilidades`) nessas quatro, que já têm controle
+ * Classe (`char.usos_habilidades`) nessas seis, que já têm controle
  * pelo botão "Grátis" da lista de Magias. Não checa `aplicavel()`: mesmo
  * quando o personagem ainda não tem a característica, o NOME continua
  * reservado -- não existe outro uso legítimo de "Inimigo Favorito" fora

@@ -40,6 +40,22 @@ const EXCECOES = {
     'Talento Dádiva da Recuperação: mesma via de restaurarRecursosTalentos.',
   dados_vitalidade_gastos:
     'Talento Dádiva da Recuperação: mesma via de restaurarRecursosTalentos.',
+  funileiro_gastos:
+    'Artífice: restaurado por descansoLongoArtifice (regras-artifice.js), chamada por hp-descanso.js no Descanso Longo.',
+  lampejo_gastos:
+    'Artífice: restaurado por descansoLongoArtifice e descansoCurtoArtifice (regras-artifice.js), chamadas por hp-descanso.js.',
+  drenar_usado:
+    'Artífice (Funileiro de Item Mágico): restaurado por descansoLongoArtifice (regras-artifice.js), chamada por hp-descanso.js no Descanso Longo.',
+  transmutar_usado:
+    'Artífice (Funileiro de Item Mágico): restaurado por descansoLongoArtifice (regras-artifice.js), chamada por hp-descanso.js no Descanso Longo.',
+  reparar_defensor_gastos:
+    'Artífice: restaurado por descansoLongoArtifice (regras-artifice.js), chamada por hp-descanso.js no Descanso Longo.',
+  golpe_arcano_gastos:
+    'Artífice: restaurado por descansoLongoArtifice (regras-artifice.js), chamada por hp-descanso.js no Descanso Longo.',
+  canhao_gratis_usado:
+    'Artífice: restaurado por descansoLongoArtifice (regras-artifice.js), chamada por hp-descanso.js no Descanso Longo.',
+  armeiro_gastos:
+    'Artífice (Armeiro): restaurado por descansoLongoArtifice (regras-artifice.js), chamada por hp-descanso.js no Descanso Longo.',
 };
 
 function listarJs(dir) {

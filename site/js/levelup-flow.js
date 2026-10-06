@@ -14,7 +14,8 @@ import { atributoEfetivo } from './regras-atributos.js';
 // (abaixo) confere o instrumento escolhido contra ela, para o predicado
 // nunca aceitar em tela o que o motor recusaria.
 import { INSTRUMENTOS_MUSICAIS, ritualBonusPendente } from './regras-cobertura.js';
-import { getClasse, getMagiasClasse, getMagiasPorCirculo } from './db.js';
+import { getClasse, getMagiasClasse, getMagiasPorCirculo, getPlanosArtifice, getItensMagicos, getArmaduras, getArmas } from './db.js';
+import { planosConhecidosMax, ehArmeiroAprimorado, planosDisponiveis, validarConhecidos, trocasEntre } from './regras-planos-artifice.js';
 import { getTruquesFixosSubclasse } from './regras-conjuracao-subclasse.js';
 // preparadasPorClasse (Item 1 da revisão final do sub-projeto "magia sabe a
 // classe"): ver uso perto de `temMagiaTrocavel`, no step 'selecao_magias'.
@@ -307,6 +308,20 @@ export async function buildLevelUpContext(char, classeData, helpers = {}, nomeCl
     };
   }
 
+  // Planos de Item Mágico (Artífice 2+): dados para o passo de escolha.
+  let planosArtifice = null;
+  if (sub.classe === 'Artífice' && nivelNaClasseNovo >= 2) {
+    const [pl, ac, ar, am] = await Promise.all([getPlanosArtifice(), getItensMagicos(), getArmaduras(), getArmas()]);
+    const futuro = { ...char, classes: classesDe(char).map((c) => (c.classe === 'Artífice' ? { ...c, nivel: nivelNaClasseNovo } : c)) };
+    const atuais = char.recursos?.artifice?.planos || [];
+    planosArtifice = {
+      planos: pl?.planos || [], acervo: ac?.itens || [], armaduras: ar?.armaduras || [], armas: am?.armas || [],
+      nivel: nivelNaClasseNovo, max: planosConhecidosMax(classeData?.tabela_caracteristicas, futuro),
+      armeiro: ehArmeiroAprimorado(futuro), atuais,
+      disponiveis: planosDisponiveis(pl?.planos || [], nivelNaClasseNovo),
+    };
+  }
+
   // Características ganhas neste nível
   const caracteristicas = await obterCaracteristicasNivel(sub.classe, nivelNaClasseNovo);
   // ESPÉCIE fica no nível TOTAL, de propósito -- NÃO "corrija" para o
@@ -401,6 +416,7 @@ export async function buildLevelUpContext(char, classeData, helpers = {}, nomeCl
     concessoesClasseNova,
     ordemClasseNovaPendente,
     manobrasGuerreiro,
+    planosArtifice,
     caracteristicas,
     caracteristicasEspecie,
     caracteristicasSubclasse,
@@ -509,6 +525,15 @@ export function calcularSubclasseArcana(ctx, state) {
   }
   if (quantidade === 0) return null;
   return { escola: escolaSubclasse, quantidade, circuloMax: conjuracao.maxCirculoNovo };
+}
+
+/** true quando a lista de planos do Artífice no estado cumpre a tabela e o limite de 1 troca por nível (nível 2 é livre). */
+export function planosArtificeCompleto(ctx, state) {
+  const pa = ctx.planosArtifice;
+  if (!pa) return true;
+  const lista = state.planosArtifice || pa.atuais;
+  if (validarConhecidos(lista, pa).length) return false;
+  return pa.nivel <= 2 || trocasEntre(pa.atuais, lista) <= 1;
 }
 
 /**
@@ -792,6 +817,14 @@ const STEP_DEFINITIONS = [
     }
   },
   {
+    id: 'planos_artifice',
+    titulo: 'Planos de Item Mágico',
+    tipo: 'escolha',
+    obrigatorio: true,
+    visivel: (ctx) => !!ctx.planosArtifice,
+    completo: (ctx, state) => !!ctx.planosArtifice && planosArtificeCompleto(ctx, state),
+  },
+  {
     id: 'proficiencias_classe_nova',
     titulo: 'Proficiências da Classe Nova',
     tipo: 'escolha',
@@ -1045,6 +1078,7 @@ export function createInitialState(char) {
     truqueTrocarPara: '',
     // Manobras (Mestre da Batalha)
     manobrasNovasSelecionadas: [],
+    planosArtifice: null,
     manobraTrocarDe: '',
     manobraTrocarPara: '',
     // Proficiências da Classe Nova (Bardo/Guardião/Ladino, livro:2051).

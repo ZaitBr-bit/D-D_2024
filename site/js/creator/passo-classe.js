@@ -8,6 +8,7 @@ import { abrirModal, mdParaHtml, toast } from '../utils.js';
 import { CLASSES_ESCOLHAS, NIVEL_SUBCLASSE } from './comum.js';
 import { rotuloPericia } from '../opcoes-dominio.js';
 import { dadosCache, personagem } from './wizard.js';
+import { seloFonte, ligarSelosFonte } from '../fontes.js';
 
 // ============================================================
 // PASSO 1: CLASSE
@@ -42,7 +43,7 @@ export function renderStepClasse(el) {
         return `
           <div class="opcao-card ${personagem.classe === c ? 'selecionada' : ''}" data-classe="${c}">
             <span class="opcao-check"></span>
-            <div class="opcao-nome">${c}</div>
+            <div class="opcao-nome">${c}${seloFonte(info.fonte)}</div>
             <div class="opcao-resumo">d${info.dado_vida} &middot; ${info.atributo_primario}</div>
             <div class="opcao-resumo">${info.conjurador ? 'Conjurador' : 'Marcial'}</div>
           </div>`;
@@ -55,6 +56,7 @@ export function renderStepClasse(el) {
   el.querySelectorAll('[data-classe]').forEach(card => {
     card.addEventListener('click', () => abrirPopupClasse(card.dataset.classe));
   });
+  ligarSelosFonte(el);
 
   document.getElementById('btn-alterar-classe')?.addEventListener('click', () => {
     if (personagem.classe) abrirPopupClasse(personagem.classe);
@@ -82,6 +84,7 @@ async function abrirPopupClasse(nome) {
           <option value="">Selecione uma subclasse</option>
           ${classeData.subclasses.map(s => `<option value="${s.nome}" ${personagem.subclasse === s.nome ? 'selected' : ''}>${s.nome}</option>`).join('')}
         </select>
+        <span id="sel-subclasse-fonte">${seloFonte(classeData.subclasses.find((s) => s.nome === personagem.subclasse)?.fonte)}</span>
       </div>`;
   } else if (classeData?.subclasses?.length) {
     subclassesHtml = `
@@ -170,6 +173,7 @@ async function abrirPopupClasse(nome) {
 
   const corpoHtml = `
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      ${seloFonte(info.fonte)}
       <span class="badge badge-primary" style="font-size:0.9rem">d${info.dado_vida}</span>
       <span style="font-size:0.85rem;color:var(--text-muted)">${info.conjurador ? 'Conjurador' : 'Marcial'}</span>
     </div>
@@ -195,7 +199,13 @@ async function abrirPopupClasse(nome) {
   // Evento subclasse
   document.getElementById('sel-subclasse')?.addEventListener('change', (e) => {
     personagem.subclasse = e.target.value;
+    const alvo = document.getElementById('sel-subclasse-fonte');
+    if (alvo) {
+      alvo.innerHTML = seloFonte(classeData.subclasses.find((s) => s.nome === e.target.value)?.fonte);
+      ligarSelosFonte(alvo);
+    }
   });
+  ligarSelosFonte(document.getElementById('modal-corpo'));
 
   // Eventos das escolhas de classe (generico)
   if (classeEscolhas) {
