@@ -5,7 +5,7 @@
 // Sem import de sheet/ nem creator/ (mesma regra de itens-seletor.js): o
 // personagem e os callbacks chegam por parâmetro.
 // ============================================================
-import { abrirModal, escHtml, mdParaHtml, toast } from './utils.js';
+import { abrirModal, escHtml, inserirNoInicio, mdParaHtml, toast } from './utils.js';
 import { cobrarPrecoInformado, htmlCampoPrecoInformado } from './preco-informado-ui.js';
 import { circuloDoPergaminho } from './regras-pergaminho.js';
 import { carregarMagiasIndicePergaminho, htmlSeletorMagiaPergaminho, ligarSeletorMagiaPergaminho, magiaSelecionadaPergaminho } from './pergaminho-ui.js';
@@ -24,7 +24,7 @@ export function adicionarAoInventario(personagem, novo) {
   const agrupa = novo.tipo === 'equipamento' || (novo.tipo === 'magico' && novo.dados?.tipo_item === 'Consumível');
   const existente = agrupa && personagem.inventario.find(i => i.nome === novo.nome && i.tipo === novo.tipo);
   if (existente) existente.quantidade = (existente.quantidade || 1) + 1;
-  else personagem.inventario.push(novo);
+  else inserirNoInicio(personagem.inventario, novo);
 }
 
 /**

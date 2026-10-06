@@ -21,7 +21,7 @@ import {
 import { filtrarAcervo, nomesReaproveitadosDoEquipamento } from './itens-magicos-catalogo.js';
 import { ajustarOverlayAoTeclado } from './modal-teclado.js';
 import { pagarCusto, parseCusto, podePagarCusto } from './moedas.js';
-import { abrirModal, escHtml, mdParaHtml, semAcento, toast } from './utils.js';
+import { abrirModal, escHtml, inserirNoInicio, mdParaHtml, semAcento, toast } from './utils.js';
 import {
   atendeRequisitoForca, badgeProficiencia,
   temProficienciaArma, temProficienciaArmadura
@@ -488,7 +488,10 @@ export async function abrirSeletorItens(ctx) {
         // Construir descrição completa do item
         let descCorpo = '';
         const d = item.dados || {};
-        if (item.tipo === 'arma') {
+        if (typeof ctx.htmlDetalhe === 'function') {
+          // Detalhe completo injetado pela ficha (itens-seletor não importa de sheet/).
+          descCorpo = ctx.htmlDetalhe({ ...item, quantidade: 1, equipado: false }, dados.propriedadesArmas || []);
+        } else if (item.tipo === 'arma') {
           descCorpo += `<div style="font-size:0.85rem;margin-bottom:6px">`;
           if (d.categoria) descCorpo += `<strong>Categoria:</strong> ${d.categoria}<br>`;
           if (d.dano) descCorpo += `<strong>Dano:</strong> ${d.dano}<br>`;
@@ -607,7 +610,7 @@ export async function abrirSeletorItens(ctx) {
           if (existente && ['equipamento', 'generico'].includes(item.tipo)) {
             existente.quantidade = (existente.quantidade || 1) + quantidadeSelecionada;
           } else {
-            ctx.personagem.inventario.push(novoItem);
+            inserirNoInicio(ctx.personagem.inventario, novoItem);
           }
 
           window.fecharModal();

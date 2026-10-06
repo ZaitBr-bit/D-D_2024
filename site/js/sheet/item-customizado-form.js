@@ -6,7 +6,9 @@
 // e a que faltasse sumia em silencio. Aqui ele e uma peca so; os modais
 // de inventario.js montam o HTML e leem o resultado por estas funcoes.
 // ============================================================
-import { escHtml, fmtPeso, parsePeso } from '../utils.js';
+import { abrirModal, escHtml, fecharModal, fmtPeso, parsePeso } from '../utils.js';
+import { montarSeletor } from '../ui-opcoes.js';
+import { MAESTRIAS_ARMA, PROPRIEDADES_ARMA, opcoesPropriedadesArma, opcoesMaestriaArma } from '../opcoes-armas.js';
 
 // Formato aceito no campo Dano: 1d8, 2d6 Cortante, 1d4+2 Perfurante.
 const REGEX_DANO = /^\d+d\d+(\s*[+\-]\s*\d+)?(\s+\w+)?$/i;
@@ -48,13 +50,8 @@ export function separarCategoria(valor) {
   return { categoria: '', tipo_item: '' };
 }
 
-// As maestrias de arma do catálogo (dados/equipamento/armas.json) --
-// mesma lista, para o campo do item customizado oferecer só nomes que
-// existem no livro.
-export const MAESTRIAS_ARMA = ['Afligir', 'Derrubar', 'Drenar', 'Empurrar', 'Garantido', 'Lentidão', 'Trespassar', 'Ágil'];
-
-/** As dez propriedades de arma do livro (Equipamento.md, "Propriedades"). */
-export const PROPRIEDADES_ARMA = ['Acuidade', 'Alcance', 'Arremesso', 'Duas Mãos', 'Extensão', 'Leve', 'Munição', 'Pesada', 'Recarga', 'Versátil'];
+// Listas de maestrias e propriedades de arma: moram em opcoes-armas.js (evita ciclo de import) e são reexportadas aqui.
+export { MAESTRIAS_ARMA, PROPRIEDADES_ARMA };
 
 /**
  * Descrição de uma propriedade: a personalizada do item vence; depois o
@@ -105,6 +102,7 @@ export function secoesComValor(d = {}) {
   return {
     categoria: texto(d.categoria) || texto(d.tipo_item) || texto(d.propriedades) || texto(d.maestria),
     atributos: numero(d.bonus_ca) || texto(d.ca_base) || texto(d.dano) || numero(d.bonus_ataque)
+      || (d.tipo_item === 'Armadura' && (texto(d.atributo) || texto(d.limite_atributo)))
       || numero(d.bonus_ataque_magia) || numero(d.bonus_cd_magia) || texto(d.peso),
     raridade: texto(d.raridade) || Boolean(d.requer_sintonizacao),
   };
@@ -114,6 +112,8 @@ export function secoesComValor(d = {}) {
  * HTML dos campos do formulario. Sem item, vem vazio (criacao); com item,
  * vem preenchido (edicao).
  * @param {object|null} [item] Item do inventario a editar.
+ * Os cards de propriedade/maestria só existem nos popups abertos pelos botões, montados em
+ * `ligarEventosFormularioItemCustomizado` (que recebe o glossário).
  * @returns {string} HTML pronto para o corpo do modal.
  */
 export function htmlFormularioItemCustomizado(item = null) {
@@ -131,6 +131,10 @@ export function htmlFormularioItemCustomizado(item = null) {
   // abre a que já tem dado (secoesComValor).
   const aberta = secoesComValor(d);
   const abre = (id) => (aberta[id] ? ' open' : '');
+  // `atributo` e `limite_atributo` só pertencem ao campo "Soma na CA" quando o item é Armadura (em arma é o atributo do ataque).
+  const ehArmaduraItem = d.tipo_item === 'Armadura';
+  const atributoCA = ehArmaduraItem ? d.atributo : '';
+  const limiteCA = ehArmaduraItem ? d.limite_atributo : '';
   return `
     <div class="form-group"><label class="form-label" for="ic-nome">Nome</label><input type="text" class="form-input" id="ic-nome" value="${attr(item?.nome || '')}"></div>
     <div class="form-group"><label class="form-label" for="ic-desc">Descrição</label><textarea class="form-textarea" id="ic-desc" rows="2">${escHtml(item?.descricao || '')}</textarea></div>
@@ -169,31 +173,24 @@ export function htmlFormularioItemCustomizado(item = null) {
           <input type="checkbox" id="ic-desv-furtividade"${d.furtividade === 'Desvantagem' ? ' checked' : ''}> Desvantagem em Furtividade
         </label>
       </div>
+      <div id="ic-props-maestria-campos">
       <div class="row gap-1">
         <div class="col">
           <label class="form-label">Propriedades (opcional)</label>
           <input type="hidden" id="ic-propriedades" value="${escHtml(d.propriedades || '')}">
           <div id="ic-props-lista" style="display:flex;gap:6px;flex-wrap:wrap;margin:4px 0">${chips}</div>
+          <input type="hidden" id="ic-prop-select" value="">
           <button type="button" class="btn btn-sm btn-secondary" id="ic-prop-add">+ Adicionar propriedade</button>
-          <div id="ic-prop-painel" style="display:none;margin-top:6px">
-            <select class="form-input" id="ic-prop-select">
-              ${PROPRIEDADES_ARMA.map(p => `<option value="${p}">${p}</option>`).join('')}
-              <option value="__personalizada__">Personalizada…</option>
-            </select>
-            <div id="ic-prop-custom" style="display:none;margin-top:6px">
-              <input type="text" class="form-input" id="ic-prop-nome" placeholder="Nome da propriedade">
-              <textarea class="form-textarea" id="ic-prop-desc" rows="2" placeholder="Descrição da propriedade" style="margin-top:6px"></textarea>
-            </div>
-            <button type="button" class="btn btn-sm btn-primary" id="ic-prop-confirmar" style="margin-top:6px">Adicionar</button>
+        </div>
+        <div class="col" id="ic-maestria-col">
+          <label class="form-label">Maestria (opcional)</label>
+          <input type="hidden" id="ic-maestria" value="${escHtml(d.maestria || '')}">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px">
+            <button type="button" class="btn btn-sm btn-secondary" id="ic-maestria-btn">Selecionar maestria</button>
+            <span style="font-size:0.8rem">Atual: <strong id="ic-maestria-atual">${escHtml(d.maestria || 'Nenhuma')}</strong></span>
           </div>
         </div>
-        <div class="col">
-          <label class="form-label" for="ic-maestria">Maestria (opcional)</label>
-          <select class="form-input" id="ic-maestria">
-            <option value=""${!d.maestria ? ' selected' : ''}>—</option>
-            ${MAESTRIAS_ARMA.map(m => `<option value="${m}"${d.maestria === m ? ' selected' : ''}>${m}</option>`).join('')}
-          </select>
-        </div>
+      </div>
       </div>
     </details>
 
@@ -208,7 +205,7 @@ export function htmlFormularioItemCustomizado(item = null) {
         <div class="col">
           <label class="form-label" for="ic-ca-base">CA Base</label>
           <input type="number" class="form-input" id="ic-ca-base" value="${num(d.ca_base)}" placeholder="—" min="0" step="1">
-          <div style="font-size:0.65rem;color:var(--text-muted)">define a CA (ex.: 20). Não soma Destreza</div>
+          <div style="font-size:0.65rem;color:var(--text-muted)">define a CA da armadura (ex.: 12 ou 20). Só soma atributo se você escolher um em "Soma de atributo na CA"</div>
         </div>
         <div class="col">
           <label class="form-label" for="ic-dano">Dano</label>
@@ -219,6 +216,20 @@ export function htmlFormularioItemCustomizado(item = null) {
           <label class="form-label" for="ic-atq">Bônus Atq</label>
           <input type="number" class="form-input" id="ic-atq" value="${num(d.bonus_ataque)}" placeholder="0" step="1">
           <div style="font-size:0.65rem;color:var(--text-muted)">soma na jogada de ataque</div>
+        </div>
+      </div>
+      <div class="row gap-1" id="ic-atributo-ca-campos" style="margin-top:8px;display:${d.tipo_armadura === 'Escudo' && ehArmaduraItem ? 'none' : 'flex'}">
+        <div class="col">
+          <label class="form-label" for="ic-atributo-ca">Soma de atributo na CA (opcional)</label>
+          <select class="form-input" id="ic-atributo-ca">
+            <option value=""${!atributoCA ? ' selected' : ''}>Nenhum (CA fixa)</option>
+            ${[['forca', 'Força'], ['destreza', 'Destreza'], ['constituicao', 'Constituição'], ['inteligencia', 'Inteligência'], ['sabedoria', 'Sabedoria'], ['carisma', 'Carisma']].map(([id, nome]) => `<option value="${id}"${atributoCA === id ? ' selected' : ''}>${nome}</option>`).join('')}
+          </select>
+          <div style="font-size:0.65rem;color:var(--text-muted)">soma o modificador à CA Base (ex.: Leve = Destreza; Média = Destreza, limite 2)</div>
+        </div>
+        <div class="col">
+          <label class="form-label" for="ic-limite-atributo">Limite do modificador (opcional)</label>
+          <input type="number" class="form-input" id="ic-limite-atributo" min="0" step="1" value="${attr(limiteCA)}" placeholder="sem limite">
         </div>
       </div>
       <div class="row gap-1" style="margin-top:8px">
@@ -264,6 +275,23 @@ export function htmlFormularioItemCustomizado(item = null) {
 }
 
 /**
+ * Mescla os valores lidos do formulário sobre `dados` do item (a edição não apaga chaves
+ * que o formulário não edita). Quando o item era Armadura e deixa de ser, remove
+ * `atributo` e `limite_atributo`, que valiam só como soma na CA.
+ * @param {object} dadosAntigos `item.dados` antes da edição
+ * @param {object} dadosNovos `valores.dados` do formulário
+ * @returns {object} novo objeto `dados`
+ */
+export function mesclarDadosItemCustomizado(dadosAntigos, dadosNovos) {
+  const mesclado = { ...(dadosAntigos || {}), ...(dadosNovos || {}) };
+  if (dadosAntigos?.tipo_item === 'Armadura' && mesclado.tipo_item !== 'Armadura') {
+    delete mesclado.atributo;
+    delete mesclado.limite_atributo;
+  }
+  return mesclado;
+}
+
+/**
  * Lê os chips de propriedade do formulário aberto: a string "A, B" (todos os
  * nomes) e a lista das personalizadas (as que carregam descrição).
  * @returns {{propriedades: string, propriedades_personalizadas: Array<{nome: string, descricao: string}>}}
@@ -298,58 +326,129 @@ function criarChipPropriedade(nome, descricao = '') {
 }
 
 /**
- * Liga os controles de propriedade do formulário aberto (botão
- * "+ Adicionar propriedade", seletor padrão/personalizada, remoção de chip).
+ * Liga os controles do formulário aberto: botões que abrem os popups de propriedade e de
+ * maestria (sub-modal sobre o formulário), remoção de chip e campos por categoria.
  * Chamar logo depois de abrir o modal.
+ * @param {Array<{nome: string, descricao: string}>} [glossario] `dados.propriedadesArmas`;
+ *   sem ele os cards saem só com o nome.
  */
-export function ligarEventosFormularioItemCustomizado() {
-  // Campos de armadura só aparecem quando a categoria é Armadura.
+export function ligarEventosFormularioItemCustomizado(glossario = []) {
   const selCategoria = document.getElementById('ic-categoria');
   const camposArmadura = document.getElementById('ic-armadura-campos');
-  selCategoria?.addEventListener('change', () => {
-    if (camposArmadura) camposArmadura.style.display = selCategoria.value === 'Armadura' ? 'block' : 'none';
-  });
-  const lista = document.getElementById('ic-props-lista');
-  const painel = document.getElementById('ic-prop-painel');
   const select = document.getElementById('ic-prop-select');
-  const custom = document.getElementById('ic-prop-custom');
+  const campoMaestria = document.getElementById('ic-maestria');
+  const lista = document.getElementById('ic-props-lista');
+  const categoriaEhArma = () => CATEGORIAS_ARMA.includes(selCategoria?.value || '');
   const erro = (msg) => {
     const el = document.getElementById('ic-erros');
-    if (!el) return;
-    el.style.display = msg ? 'block' : 'none';
-    el.textContent = msg || '';
+    if (el) {
+      el.style.display = msg ? 'block' : 'none';
+      el.textContent = msg || '';
+    }
+    // O popup cobre o formulário: a mensagem também aparece dentro dele.
+    const popup = document.getElementById('ic-prop-erro');
+    if (popup) {
+      popup.style.display = msg ? 'block' : 'none';
+      popup.textContent = msg || '';
+    }
   };
   const sincronizarOculto = () => {
     const oculto = document.getElementById('ic-propriedades');
     if (oculto) oculto.value = lerPropriedadesDoFormulario().propriedades;
   };
-  document.getElementById('ic-prop-add')?.addEventListener('click', () => {
-    if (painel) painel.style.display = painel.style.display === 'none' ? 'block' : 'none';
-  });
-  select?.addEventListener('change', () => {
-    if (custom) custom.style.display = select.value === '__personalizada__' ? 'block' : 'none';
-  });
-  document.getElementById('ic-prop-confirmar')?.addEventListener('click', () => {
-    const ehCustom = select?.value === '__personalizada__';
-    const nome = ehCustom ? (document.getElementById('ic-prop-nome')?.value || '').trim() : select?.value;
-    const descricao = ehCustom ? (document.getElementById('ic-prop-desc')?.value || '').trim() : '';
-    if (!nome) { erro('Informe o nome da propriedade.'); return; }
-    if ([...document.querySelectorAll('#ic-props-lista [data-ic-prop]')].some(c => c.dataset.nome === nome)) {
-      erro(`A propriedade "${nome}" já foi adicionada.`);
-      return;
-    }
-    erro('');
-    lista?.append(criarChipPropriedade(nome, descricao));
-    if (ehCustom) {
-      document.getElementById('ic-prop-nome').value = '';
-      document.getElementById('ic-prop-desc').value = '';
-    }
-    // Fecha o painel e volta o seletor ao padrão: o próximo "+ Adicionar" abre limpo.
-    if (painel) painel.style.display = 'none';
-    if (select) select.selectedIndex = 0;
-    if (custom) custom.style.display = 'none';
-    sincronizarOculto();
-  });
+
+  // Popup de propriedade: cards (livro só para arma, mais "Personalizada…"), campos da
+  // personalizada e botão Adicionar. A escolha marcada fica em #ic-prop-select (no formulário)
+  // e sobrevive ao fechar o popup sem adicionar.
+  const abrirPopupPropriedade = () => {
+    abrirModal('Adicionar propriedade', `
+      <div id="ic-prop-cards"></div>
+      <div id="ic-prop-custom" style="display:none;margin-top:6px">
+        <input type="text" class="form-input" id="ic-prop-nome" placeholder="Nome da propriedade">
+        <textarea class="form-textarea" id="ic-prop-desc" rows="2" placeholder="Descrição da propriedade" style="margin-top:6px"></textarea>
+      </div>
+      <div id="ic-prop-erro" style="display:none;color:var(--danger);font-size:0.8rem;margin-top:8px"></div>`,
+      `<button type="button" class="btn btn-secondary" data-fechar-sub="true">Cancelar</button>
+       <button type="button" class="btn btn-primary" id="ic-prop-confirmar">Adicionar</button>`);
+    const custom = document.getElementById('ic-prop-custom');
+    const opcoes = opcoesPropriedadesArma(glossario, { ehArma: categoriaEhArma() });
+    const marcada = select?.value && opcoes.some(o => o.id === select.value) ? select.value : '';
+    if (select) select.value = marcada;
+    montarSeletor(document.getElementById('ic-prop-cards'), {
+      opcoes, densidade: 'densa', max: 1, selecionadas: marcada ? [marcada] : [],
+      aoMudar: (ids) => {
+        if (select) select.value = ids[0] || '';
+        if (custom) custom.style.display = ids[0] === '__personalizada__' ? 'block' : 'none';
+      },
+    });
+    document.getElementById('ic-prop-confirmar')?.addEventListener('click', () => {
+      const ehCustom = select?.value === '__personalizada__';
+      const nome = ehCustom ? (document.getElementById('ic-prop-nome')?.value || '').trim() : select?.value;
+      const descricao = ehCustom ? (document.getElementById('ic-prop-desc')?.value || '').trim() : '';
+      if (!ehCustom && !select?.value) { erro('Escolha uma propriedade.'); return; }
+      if (!nome) { erro('Informe o nome da propriedade.'); return; }
+      if ([...document.querySelectorAll('#ic-props-lista [data-ic-prop]')].some(c => c.dataset.nome === nome)) {
+        erro(`A propriedade "${nome}" já foi adicionada.`);
+        return;
+      }
+      erro('');
+      lista?.append(criarChipPropriedade(nome, descricao));
+      // Desmarca para o próximo popup abrir limpo e fecha este.
+      if (select) select.value = '';
+      sincronizarOculto();
+      fecharModal();
+    });
+  };
+
+  // Popup de maestria: "Nenhuma" grava vazio; desmarcar o card também volta a vazio.
+  // Escolher fecha o popup e atualiza o botão; a chamada inicial de aoMudar (na montagem) não fecha.
+  const abrirPopupMaestria = () => {
+    abrirModal('Selecionar maestria', '<div id="ic-maestria-cards"></div>',
+      '<button type="button" class="btn btn-secondary" data-fechar-sub="true">Fechar</button>');
+    let montado = false;
+    montarSeletor(document.getElementById('ic-maestria-cards'), {
+      opcoes: opcoesMaestriaArma(glossario), densidade: 'densa', max: 1,
+      selecionadas: [campoMaestria?.value || '__nenhuma__'],
+      aoMudar: (ids) => {
+        const id = ids[0] || '__nenhuma__';
+        const valor = id === '__nenhuma__' ? '' : id;
+        if (campoMaestria) campoMaestria.value = valor;
+        const atual = document.getElementById('ic-maestria-atual');
+        if (atual) atual.textContent = valor || 'Nenhuma';
+        if (montado) fecharModal();
+      },
+    });
+    montado = true;
+  };
+
+  // Mostra os campos conforme a categoria: Armadura mostra os campos de armadura e esconde
+  // propriedades e maestria; só arma tem maestria e propriedades do livro. A propriedade
+  // marcada e ainda não adicionada só continua se existir nas opções da nova categoria.
+  const aplicarCategoria = () => {
+    const ehArmadura = (selCategoria?.value || '') === 'Armadura';
+    if (camposArmadura) camposArmadura.style.display = ehArmadura ? 'block' : 'none';
+    const campos = document.getElementById('ic-props-maestria-campos');
+    if (campos) campos.style.display = ehArmadura ? 'none' : '';
+    const colMaestria = document.getElementById('ic-maestria-col');
+    if (colMaestria) colMaestria.style.display = categoriaEhArma() ? '' : 'none';
+    const opcoes = opcoesPropriedadesArma(glossario, { ehArma: categoriaEhArma() });
+    if (select && !opcoes.some(o => o.id === select.value)) select.value = '';
+    aplicarAtributoCA();
+  };
+  // Escudo não soma atributo: esconde os campos de atributo da CA (seção Atributos).
+  // Em categoria que não é Armadura o tipo de armadura não vale e os campos seguem visíveis, como a CA Base.
+  const aplicarAtributoCA = () => {
+    const campos = document.getElementById('ic-atributo-ca-campos');
+    const escudo = (selCategoria?.value || '') === 'Armadura'
+      && document.getElementById('ic-tipo-armadura')?.value === 'Escudo';
+    if (campos) campos.style.display = escudo ? 'none' : 'flex';
+  };
+  selCategoria?.addEventListener('change', aplicarCategoria);
+  document.getElementById('ic-tipo-armadura')?.addEventListener('change', aplicarAtributoCA);
+  aplicarCategoria();
+
+  document.getElementById('ic-prop-add')?.addEventListener('click', abrirPopupPropriedade);
+  document.getElementById('ic-maestria-btn')?.addEventListener('click', abrirPopupMaestria);
   lista?.addEventListener('click', (e) => {
     const x = e.target.closest('[data-ic-prop-remover]');
     if (!x) return;
@@ -372,7 +471,8 @@ export function lerFormularioItemCustomizado() {
   const atq = parseInt(document.getElementById('ic-atq')?.value) || 0;
   const { categoria, tipo_item } = separarCategoria(val('ic-categoria'));
   const { propriedades, propriedades_personalizadas } = lerPropriedadesDoFormulario();
-  const maestria = val('ic-maestria');
+  // Maestria só vale com categoria de arma; outra categoria grava vazio (a edição precisa poder limpar).
+  const maestria = categoria ? val('ic-maestria') : '';
   const atqMagia = parseInt(document.getElementById('ic-atq-magia')?.value) || 0;
   const cdMagia = parseInt(document.getElementById('ic-cd-magia')?.value) || 0;
   // Campo VAZIO grava vazio, e nao 0: "sem CA base" e diferente de "CA base
@@ -411,10 +511,14 @@ export function lerFormularioItemCustomizado() {
         tipo_armadura: ehArmadura ? val('ic-tipo-armadura') : '',
         requisito_forca: ehArmadura && reqForca > 0 ? `For ${reqForca}` : '',
         furtividade: ehArmadura && document.getElementById('ic-desv-furtividade')?.checked ? 'Desvantagem' : '',
-        propriedades,
-        // Sempre grava (inclusive []): a edição faz merge e precisa poder apagar.
-        propriedades_personalizadas,
-        maestria,
+        // Só armadura grava atributo/limite: arma e outros itens não escrevem a chave (o `atributo` da arma vem do detalhe).
+        ...(ehArmadura ? {
+          atributo: val('ic-tipo-armadura') !== 'Escudo' ? val('ic-atributo-ca') : '',
+          limite_atributo: val('ic-tipo-armadura') !== 'Escudo' && val('ic-limite-atributo') !== '' ? String(Math.max(0, parseInt(val('ic-limite-atributo')) || 0)) : '',
+        } : {}),
+        // Em Armadura as chaves são omitidas: a edição faz merge e não apaga o que o item já tinha.
+        // Nos demais sempre grava (inclusive []): a edição precisa poder apagar.
+        ...(ehArmadura ? {} : { propriedades, propriedades_personalizadas, maestria }),
         bonus_ataque_magia: String(atqMagia),
         bonus_cd_magia: String(cdMagia),
         peso: pesoNum > 0 ? `${fmtPeso(pesoNum)} kg` : '',

@@ -5,21 +5,21 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { atributoEfetivo } from '../regras-atributos.js';
-import { CLASSES_INFO } from '../dados-classes.js';
 import { DENOMINACOES, ICONE_MOEDA, NOMES_MOEDA, adicionarMoeda, converterParaMaior, converterParaMenor, htmlCarteira, proximaDenominacaoMaior, proximaDenominacaoMenor, removerQuantidadeMoeda, taxasSaoPadrao } from '../moedas.js';
 import { carregarComprarAtivoPadrao, resetarTaxasMoeda, salvarComprarAtivoPadrao, salvarTaxasMoeda } from '../store.js';
-import { abrirModal, bonusProficiencia, calcMod, escHtml, fmtMod, fmtPeso, gerarId, getCapacidadeCarga, getPesoTotalInventario, localDoItem, mdParaHtml, semAcento, toast } from '../utils.js';
+import { abrirModal, escHtml, fmtMod, fmtPeso, gerarId, getCapacidadeCarga, getPesoTotalInventario, inserirNoInicio, localDoItem, mdParaHtml, moverParaInicio, semAcento, toast } from '../utils.js';
 import { abrirSeletorItens, carregarDadosEquipSheet } from '../itens-seletor.js';
 import { cobrarPrecoInformado, htmlCampoPrecoInformado } from '../preco-informado-ui.js';
-import { getEstadoFuria } from './classes/barbaro.js';
 import { getEstadoRecursosGuardiao } from './classes/guardiao.js';
 import { _salvarEstadoColapso, _secoesInvColapsadas } from './colapso.js';
 import { ataqueImprudenteAtivo, calcVantagemDesvantagemAtaque, temArmaduraPesadaEquipada } from './combate.js';
 import { sheetBadgeProf, sheetTemProfArma, sheetTemProfArmadura, visaoNoEscuroDaEspecie } from './condicoes.js';
-import { char, especiesCache, passivosTalentosCache, salvar } from './estado.js';
+import { char, especiesCache, salvar } from './estado.js';
+import { calcularAtaqueItem, atributoPadraoEfetivoArma, htmlSeloAtributoArma } from './ataque-calculo.js';
+import { ATRIBUTOS_MODIFICADOR, ehArmaDeAtaque, atributoExplicito, equiparComAjusteDeMaos, textoCADaArmadura } from '../regras-ataque.js';
 import { renderFichaCompleta } from './ficha.js';
-import { descricaoDePropriedade, htmlFormularioItemCustomizado, lerFormularioItemCustomizado, ligarEventosFormularioItemCustomizado } from './item-customizado-form.js';
-import { efeitosDaArma, itemAtivo } from '../regras-itens-magicos.js';
+import { descricaoDePropriedade, mesclarDadosItemCustomizado, htmlFormularioItemCustomizado, lerFormularioItemCustomizado, ligarEventosFormularioItemCustomizado } from './item-customizado-form.js';
+import { itemAtivo } from '../regras-itens-magicos.js';
 import { EFEITO_RECUPERAR_ESPACO, espacosRecuperaveis, mensagemSemEspaco, restaurarEspacoPorItem } from '../regras-espacos-itens.js';
 import { recuperarUmEspaco, reservasDeEspacos } from './reservas-espacos.js';
 import { nomeBaseDoItem, selosDeEfeitos } from '../itens-magicos-catalogo.js';
@@ -27,7 +27,6 @@ import { htmlCorpoItemMagico } from '../itens-magicos-ui.js';
 import { tetoSintonizacao, itensSintonizados, podeSintonizar } from '../regras-sintonizacao.js';
 import { PASSIVOS_VERSAO, alternarUso, ajustarCarga, aplicarContadorManual, contadorEhManual, garantirEstadoRecursos, gastarCarga, itensComRecuperacaoPendente, limparPendenciasObsoletas, marcarDestruido, preencherRecursosDoAcervo, recursosDoFormulario, recursosDoItem, removerContadorManual, restaurarItem } from '../regras-recursos-itens.js';
 import { getItensMagicos } from '../db.js';
-import { modAtaqueArmaArtifice } from '../regras-artifice.js';
 import { aplicarMagiaNoPergaminho, circuloDoItemPergaminho } from '../regras-pergaminho.js';
 import { carregarMagiasIndicePergaminho, htmlSeletorMagiaPergaminho, ligarSeletorMagiaPergaminho, magiaSelecionadaPergaminho } from '../pergaminho-ui.js';
 import { opcoesDeEscolha } from '../regras-passivos-itens.js';
@@ -98,7 +97,7 @@ export function renderSecaoInventario() {
   const { equipados, naoEquipados, zerados, porLocal } = dividirInventario(inv, char.inventario_locais || []);
 
   return `
-    <div class="card">
+    <div class="card" id="secao-inventario">
       <div class="card-header">
         <h2>Inventario</h2>
         <div class="no-print" style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
@@ -259,41 +258,9 @@ function renderSheetInvItem(item, idx) {
   let estiloLutaInfo = '';
   let danoExibicao = item.dados?.dano || '';
   if ((item.tipo === 'arma' || ehArmaCustom) && item.dados) {
-    const info = CLASSES_INFO[char.classe];
-    const prof = bonusProficiencia(char.nivel);
-    const props = (item.dados.propriedades || '').toLowerCase();
-    const cat = (item.dados.categoria || '').toLowerCase();
-    const isAcuidade = props.includes('acuidade');
-    const isDistancia = cat.includes('dist');
-
-    let modAtq;
-    let usaForcaNoAtaque = false;
-    if (isAcuidade) {
-      const modFor = calcMod(atributoEfetivo(char, 'forca'));
-      const modDes = calcMod(atributoEfetivo(char, 'destreza'));
-      usaForcaNoAtaque = modFor >= modDes;
-      modAtq = Math.max(modFor, modDes);
-    } else if (isDistancia) {
-      modAtq = calcMod(atributoEfetivo(char, 'destreza'));
-    } else {
-      modAtq = calcMod(atributoEfetivo(char, 'forca'));
-      usaForcaNoAtaque = true;
-    }
-    // Ferreiro de Batalha: Int em arma mágica quando for maior.
-    const _artificeAtq = modAtaqueArmaArtifice(char, item, modAtq);
-    if (_artificeAtq.usouInt) { modAtq = _artificeAtq.mod; usaForcaNoAtaque = false; }
-
-    const temProf = sheetTemProfArma({ categoria: item.dados.categoria, propriedades: item.dados.propriedades || '' });
-    // Bônus mágico da própria arma (acervo ou customizado), sintonizada
-    // quando exige (regras-itens-magicos.js): entra no ataque e no dano.
-    const magiaArma = efeitosDaArma(item);
-    const bonusAtq = modAtq + (temProf ? prof : 0) + magiaArma.ataque;
-    // Bônus de ataque de talentos
-    let bonusAtqTalento = 0;
-    const _passivos = passivosTalentosCache || {};
-    if (isDistancia) bonusAtqTalento += _passivos.bonusAtaqueDistancia || 0;
-    const bonusAtqFinal = bonusAtq + bonusAtqTalento;
-    ataqueInfo = `<span class="badge badge-secondary" style="font-size:0.65rem">Atq ${fmtMod(bonusAtqFinal)}</span>`;
+    const calc = calcularAtaqueItem(item);
+    const { usaForcaNoAtaque, isDistancia, props, passivos: _passivos } = calc;
+    ataqueInfo = `<span class="badge badge-secondary" style="font-size:0.65rem">Atq ${fmtMod(calc.bonusAtq)}</span>${htmlSeloAtributoArma(calc)}`;
     // Vantagem/Desvantagem no ataque: fontes de talento/classe (Imprudente,
     // Caçador Preciso) combinadas com as fontes de CONDIÇÃO (issue #94,
     // Fase 6) -- mesmo padrão de anular V com D que calcVantagemDesvantagemPericia
@@ -334,48 +301,19 @@ function renderSheetInvItem(item, idx) {
     // padrão de vantagemInfo acima), e não um número dentro de danoExibicao.
     //
     // O gatilho de Armas Grandes usa a PROPRIEDADE da arma (Duas Mãos ou
-    // Versátil, exatamente o que Talentos.md:764 exige) -- não a
-    // empunhadura escolhida pelo jogador, que o app não rastreia. Uma arma
-    // Versátil pode estar sendo empunhada com UMA mão só (aí o benefício
-    // não se aplica de verdade), e o app não tem como saber -- por isso o
-    // texto do selo é condicional ("se empunhada com as duas mãos"), não
-    // uma afirmação incondicional de que o benefício está valendo.
+    // Versátil, exatamente o que Talentos.md:764 exige), não a empunhadura
+    // escolhida na seção Ataques (`dados.empunhadura`). O texto do selo
+    // continua condicional ("se empunhada com as duas mãos").
     const ehArmaCorpoACorpoDuasMaosOuVersatil = !isDistancia && (props.includes('duas mãos') || props.includes('versátil'));
     if (_passivos.flags?.estilo_armas_grandes && ehArmaCorpoACorpoDuasMaosOuVersatil) {
-      estiloLutaInfo += '<span class="badge" style="font-size:0.6rem;background:#ede7f6;color:#4527a0;border:1px solid #b39ddb" title="Combate com Armas Grandes: se estiver empunhando esta arma com as DUAS mãos, trata qualquer 1 ou 2 no dado de dano como um 3 (Talentos.md) -- a ficha não sabe a empunhadura escolhida em armas Versáteis">1-2→3</span>';
+      estiloLutaInfo += '<span class="badge" style="font-size:0.6rem;background:#ede7f6;color:#4527a0;border:1px solid #b39ddb" title="Combate com Armas Grandes: se estiver empunhando esta arma com as DUAS mãos, trata qualquer 1 ou 2 no dado de dano como um 3 (Talentos.md) -- em armas Versáteis vale quando a empunhadura de duas mãos está escolhida na seção Ataques">1-2→3</span>';
     }
     if (_passivos.flags?.estilo_duas_armas && props.includes('leve')) {
       estiloLutaInfo += '<span class="badge" style="font-size:0.6rem;background:#e0f2f1;color:#00695c;border:1px solid #80cbc4" title="Combate com Duas Armas: soma seu mod. de atributo ao dano do ataque adicional com esta arma, se ainda não estiver somando (Talentos.md)">+mod extra</span>';
     }
 
-    const danoBase = item.dados?.dano || '';
-    const matchDano = danoBase.match(/^(\d+d\d+)(\s*[+\-]\s*\d+)?(.*)$/i);
-    if (matchDano) {
-      const dado = matchDano[1];
-      const modExistente = matchDano[2];
-      const sufixo = matchDano[3] || '';
-      const estadoFuria = getEstadoFuria();
-      const bonusFuria = estadoFuria?.ativa && usaForcaNoAtaque ? (estadoFuria.dano || 0) : 0;
-      const bonusTotalDano = modAtq + bonusFuria + magiaArma.dano;
-      // Bônus de dano de talentos
-      let bonusDanoTalento = 0;
-      const ehArremesso = props.includes('arremesso');
-      const usaUmaMao = !props.includes('duas mãos') && !props.includes('pesada');
-      if (usaUmaMao && !isDistancia) bonusDanoTalento += _passivos.bonusDanoUmaMao || 0;
-      if (ehArremesso) bonusDanoTalento += _passivos.bonusDanoArremesso || 0;
-      const bonusTotalDanoFinal = bonusTotalDano + bonusDanoTalento;
-
-      if (modExistente) {
-        const modBase = parseInt(String(modExistente).replace(/\s+/g, '')) || 0;
-        const modFinal = modBase + bonusFuria + bonusDanoTalento + magiaArma.dano;
-        const sinal = modFinal >= 0 ? `+${modFinal}` : `${modFinal}`;
-        danoExibicao = `${dado}${sinal}${sufixo}`.replace(/\s+/g, ' ').trim();
-      } else if (bonusTotalDanoFinal !== 0) {
-        const sinal = bonusTotalDanoFinal >= 0 ? `+${bonusTotalDanoFinal}` : `${bonusTotalDanoFinal}`;
-        danoExibicao = `${dado}${sinal}${sufixo}`.replace(/\s+/g, ' ').trim();
-      } else {
-        danoExibicao = danoBase;
-      }
+    if (calc.temDano) {
+      danoExibicao = calc.danoExibicao;
       danoAutoInfo = `<span class="badge" style="font-size:0.6rem;background:#fce4ec;color:#c62828;border:1px solid #ef9a9a">Dano ${danoExibicao}</span>`;
     }
   }
@@ -491,7 +429,7 @@ function renderSheetInvItem(item, idx) {
         }
         <div class="inv-item-detalhe">
           ${item.tipo === 'arma' ? `${danoExibicao} | ${item.dados?.propriedades || ''}` : ''}
-          ${item.tipo === 'armadura' ? `CA: ${item.dados?.ca || ''} | ${item.dados?.categoria || ''}` : ''}
+          ${item.tipo === 'armadura' ? `CA: ${textoCADaArmadura(item)} | ${item.dados?.categoria || ''}` : ''}
           ${item.tipo === 'escudo' ? `CA: ${item.dados?.ca || ''} | Escudo` : ''}
           ${item.tipo === 'equipamento' ? `${item.dados?.custo || ''} ${item.dados?.peso ? '| ' + item.dados.peso : ''}` : ''}
           ${item.tipo === 'magico' ? escHtml(item.dados?.linha_tipo || '') : ''}
@@ -831,9 +769,25 @@ export function setupEventosInventarioSheet() {
     cb.addEventListener('change', () => {
       const idx = parseInt(cb.dataset.sheetEquip);
       if (char.inventario[idx]) {
-        char.inventario[idx].equipado = cb.checked;
-        // Item equipado não fica guardado num local (issue #80).
-        if (cb.checked) delete char.inventario[idx].local;
+        const item = char.inventario[idx];
+        // Limite de mãos: arma versátil em duas mãos volta para uma mão quando isso faz o item caber;
+        // sem mãos livres mesmo assim, desfaz a marcação e avisa sem alterar nada.
+        let ajustadas = [];
+        if (cb.checked) {
+          const v = equiparComAjusteDeMaos(char, item);
+          if (!v.ok) {
+            cb.checked = false;
+            toast(v.motivo, 'error');
+            return;
+          }
+          ajustadas = v.ajustados;
+        }
+        item.equipado = cb.checked;
+        // Item equipado não fica guardado num local (issue #80) e vai para o início da lista.
+        if (cb.checked) {
+          delete item.local;
+          moverParaInicio(char.inventario, item);
+        }
 
         if (char.classe === 'Bárbaro' && temArmaduraPesadaEquipada()) {
           if (!char.recursos) char.recursos = {};
@@ -843,6 +797,7 @@ export function setupEventosInventarioSheet() {
         salvar();
         // Re-renderizar ficha inteira para recalcular CA e outros stats
         renderFichaCompleta();
+        if (ajustadas.length) toast(`${ajustadas.join(', ')} passou a ser empunhada com uma mão.`);
       }
     });
   });
@@ -953,6 +908,7 @@ export function setupEventosInventarioSheet() {
   if (btnAddInv) btnAddInv.onclick = () => abrirSeletorItens({
     personagem: char,
     permitirMagicos: true,
+    htmlDetalhe: (itemSintetico, propsDescs) => htmlDetalheItem(itemSintetico, propsDescs, { somenteLeitura: true }),
     lerComprarAtivo: carregarComprarAtivoPadrao,
     salvarComprarAtivo: salvarComprarAtivoPadrao,
     aoAdicionar: () => { salvar(); renderFichaCompleta(); },
@@ -960,11 +916,13 @@ export function setupEventosInventarioSheet() {
 
   // Item customizado
   const btnAddCustom = document.getElementById('btn-add-inv-custom');
-  if (btnAddCustom) btnAddCustom.onclick = () => {
+  if (btnAddCustom) btnAddCustom.onclick = async () => {
+    // O glossário do livro alimenta a descrição dos cards de propriedade e maestria.
+    const glossario = (await carregarDadosEquipSheet()).propriedadesArmas || [];
     // Bloco "Pagar" (rótulo distinto do campo informativo "Preço" do formulário): debita a carteira, não é gravado no item.
-    abrirModal('Item Customizado', htmlFormularioItemCustomizado(),
+    abrirModal('Item Customizado', htmlFormularioItemCustomizado(null),
       `${htmlCampoPrecoInformado('pagar-item-custom', 'Pagar')}<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-add-ic">Adicionar</button>`);
-    ligarEventosFormularioItemCustomizado();
+    ligarEventosFormularioItemCustomizado(glossario);
 
     // Impede que um segundo clique, já aceito o primeiro, adicione e cobre de novo.
     let adicionado = false;
@@ -975,7 +933,7 @@ export function setupEventosInventarioSheet() {
       const pagamento = cobrarPrecoInformado('pagar-item-custom', char, valores.nome);
       if (!pagamento.ok) return;
       adicionado = true;
-      char.inventario.push({
+      inserirNoInicio(char.inventario, {
         tipo: 'customizado',
         quantidade: 1,
         equipado: false,
@@ -1177,10 +1135,12 @@ export function setupEventosInventarioSheet() {
 }
 
 /** Abre modal para editar um item customizado existente no inventário */
-function abrirModalEditarItemCustomizado(item, idx) {
+async function abrirModalEditarItemCustomizado(item, idx) {
+  // O glossário do livro alimenta a descrição dos cards de propriedade e maestria.
+  const glossario = (await carregarDadosEquipSheet()).propriedadesArmas || [];
   abrirModal('Editar Item Customizado', htmlFormularioItemCustomizado(item),
     '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-salvar-ic">Salvar</button>');
-  ligarEventosFormularioItemCustomizado();
+  ligarEventosFormularioItemCustomizado(glossario);
 
   document.getElementById('btn-salvar-ic')?.addEventListener('click', () => {
     const { ok, valores } = lerFormularioItemCustomizado();
@@ -1190,7 +1150,7 @@ function abrirModalEditarItemCustomizado(item, idx) {
     alvo.descricao = valores.descricao;
     // Merge, nao substituicao: `dados` pode carregar chaves que o
     // formulario nao edita, e trocar o objeto inteiro as perderia.
-    alvo.dados = { ...(alvo.dados || {}), ...valores.dados };
+    alvo.dados = mesclarDadosItemCustomizado(alvo.dados, valores.dados);
     // Desmarcar "Requer Sintonizacao" nesta edicao libera a vaga: sem isto
     // `sintonizado: true` ficava gravado sem caixa na tela para desmarcar,
     // e o item prendia o teto para sempre (issue #57). Grava `false` em vez
@@ -1403,6 +1363,11 @@ export function htmlResumoItemCustomizado(d = {}) {
   const linha = (rotulo, valor) => { if (valor) linhas.push(`<strong>${rotulo}:</strong> ${escHtml(String(valor))}`); };
   if (d.tipo_item === 'Armadura') linha('Tipo de armadura', d.tipo_armadura);
   if (String(d.ca_base ?? '') !== '') linha('CA base', d.ca_base);
+  if (d.tipo_item === 'Armadura' && d.atributo) {
+    const nomes = { forca: 'Força', destreza: 'Destreza', constituicao: 'Constituição', inteligencia: 'Inteligência', sabedoria: 'Sabedoria', carisma: 'Carisma' };
+    const lim = String(d.limite_atributo ?? '') !== '' ? ` (máx. ${d.limite_atributo})` : '';
+    linha('Soma na CA', `${nomes[d.atributo] || d.atributo}${lim}`);
+  }
   linha('Requisito de Força', d.requisito_forca);
   linha('Furtividade', d.furtividade);
   linha('Custo', d.preco);
@@ -1423,8 +1388,7 @@ export function htmlResumoItemCustomizado(d = {}) {
  */
 function htmlPropriedadesEMaestria(d, propsDescs) {
   let html = '';
-  if (!d.propriedades) return html;
-  const propsNomes = d.propriedades.split(',').map(p => p.trim().replace(/\s*\(.*\)/, ''));
+  const propsNomes = (d.propriedades || '').split(',').filter(p => p.trim()).map(p => p.trim().replace(/\s*\(.*\)/, ''));
   const propsComDesc = propsNomes
     .map(nome => {
       // Issue #104: a descrição da propriedade personalizada vem do item.
@@ -1558,9 +1522,10 @@ function ligarAumentoPermanente(item) {
  * gravação); os botões são ligados depois por mostrarDetalheItemSheet.
  * @param {object} item Item do inventário.
  * @param {Array<{nome: string, descricao: string}>} propsDescs Glossário de propriedades de arma.
+ * @param {{somenteLeitura?: boolean}} [opcoes] somenteLeitura: devolve só o corpo descritivo, sem controles de edição.
  * @returns {string}
  */
-export function htmlDetalheItem(item, propsDescs = []) {
+export function htmlDetalheItem(item, propsDescs = [], { somenteLeitura = false } = {}) {
   let corpo = '';
 
   if (item.tipo === 'arma') {
@@ -1578,7 +1543,7 @@ export function htmlDetalheItem(item, propsDescs = []) {
     const d = item.dados || {};
     corpo += `<div style="font-size:0.85rem;margin-bottom:6px">`;
     if (d.categoria) corpo += `<strong>Categoria:</strong> ${d.categoria}<br>`;
-    if (d.ca) corpo += `<strong>Classe de Armadura:</strong> ${d.ca}<br>`;
+    if (d.ca) corpo += `<strong>Classe de Armadura:</strong> ${item.tipo === 'armadura' ? textoCADaArmadura(item) : d.ca}<br>`;
     if (d.requisito_forca && d.requisito_forca !== '—') corpo += `<strong>Requisito de Força:</strong> ${d.requisito_forca}<br>`;
     if (d.furtividade && d.furtividade !== '—') corpo += `<strong>Furtividade:</strong> ${d.furtividade}<br>`;
     if (d.custo || d.peso) corpo += `<strong>Custo:</strong> ${d.custo || '—'} | <strong>Peso:</strong> ${d.peso || '—'}`;
@@ -1591,10 +1556,16 @@ export function htmlDetalheItem(item, propsDescs = []) {
 
     corpo += `<div style="font-size:0.85rem;margin-bottom:6px"><span class="badge" style="font-size:0.7rem;background:#f3e5f5;color:#6a1b9a">Item Customizado</span></div>`;
 
-    if (bonusCa || dano || bonusAtq) {
+    // Arma personalizada (com categoria): Categoria e Dano na mesma linha e Maestria, como a arma de catálogo.
+    if (d.categoria) {
+      corpo += `<div class="row" style="font-size:0.85rem;gap:8px;margin-bottom:6px"><div class="col"><strong>Categoria:</strong> ${escHtml(d.categoria)}</div>${dano ? `<div class="col"><strong>Dano:</strong> ${escHtml(dano)}</div>` : ''}</div>`;
+      if (d.maestria) corpo += `<div style="font-size:0.85rem;margin-bottom:6px"><strong>Maestria:</strong> ${escHtml(d.maestria)}</div>`;
+    }
+
+    if (bonusCa || (dano && !d.categoria) || bonusAtq) {
       corpo += `<div style="font-size:0.85rem;margin-bottom:6px">`;
       if (bonusCa) corpo += `<strong>Bônus CA:</strong> ${bonusCa > 0 ? '+' : ''}${bonusCa}<br>`;
-      if (dano) corpo += `<strong>Dano:</strong> ${dano}<br>`;
+      if (dano && !d.categoria) corpo += `<strong>Dano:</strong> ${dano}<br>`;
       if (bonusAtq) corpo += `<strong>Bônus Ataque:</strong> ${bonusAtq > 0 ? '+' : ''}${bonusAtq}`;
       corpo += `</div>`;
     }
@@ -1602,9 +1573,7 @@ export function htmlDetalheItem(item, propsDescs = []) {
     // Arma customizada com categoria (issue #82): mesma formatação de
     // Propriedades/Maestria da arma de catálogo, em vez de só o nome cru
     // (issue #96, item a).
-    if (d.categoria) {
-      corpo += `<div style="font-size:0.85rem;margin-bottom:6px"><strong>Categoria:</strong> ${d.categoria}</div>`;
-    } else if (d.tipo_item) {
+    if (!d.categoria && d.tipo_item) {
       // Issue #100: categoria que não é arma (Armadura, Consumível...).
       corpo += `<div style="font-size:0.85rem;margin-bottom:6px"><strong>Categoria:</strong> ${escHtml(d.tipo_item)}</div>`;
     }
@@ -1639,6 +1608,24 @@ export function htmlDetalheItem(item, propsDescs = []) {
   if (item.tipo !== 'magico' && item.dados?.magico_id) corpo += htmlCorpoItemMagico(item.dados);
 
   if (!corpo.trim()) corpo = '<div style="color:var(--text-muted)">Sem informações adicionais disponíveis.</div>';
+
+  // Somente leitura (loja): sem atributo, resistência, pergaminho, aumento nem contador.
+  if (somenteLeitura) return corpo;
+
+  // Atributo do modificador (arma de ataque ou armadura): "Padrão (XXX)" + os 6 atributos.
+  // Armadura só tem seletor quando a CA soma modificador: Leve e Média, ou "N + modificador de Des" sem categoria.
+  const catArmadura = item.dados?.categoria;
+  const ehArmaduraComModificador = item.tipo === 'armadura'
+    && (catArmadura === 'Leve' || catArmadura === 'Média'
+      || (catArmadura !== 'Pesada' && /modificador de des/i.test(item.dados?.ca || '')));
+  if (ehArmaDeAtaque(item) || ehArmaduraComModificador) {
+    const padraoId = ehArmaDeAtaque(item) ? atributoPadraoEfetivoArma(item) : 'destreza';
+    const sigla = id => ATRIBUTOS_MODIFICADOR.find(a => a.id === id)?.sigla || '';
+    const atual = atributoExplicito(item) || '';
+    const limiteMedia = catArmadura === 'Média' ? ', máx. 2' : '';
+    corpo += `<div class="form-group no-print" style="margin-top:10px"><label class="form-label" for="sel-atributo-item">Atributo do modificador</label>
+      <select class="form-input" id="sel-atributo-item"><option value=""${atual ? '' : ' selected'}>Padrão (${sigla(padraoId)}${limiteMedia})</option>${ATRIBUTOS_MODIFICADOR.map(a => `<option value="${a.id}"${a.id === atual ? ' selected' : ''}>${a.nome}</option>`).join('')}</select></div>`;
+  }
 
   // Item com resistência a escolher (4C): seletor do tipo de dano.
   const opcoesResistencia = opcoesDeEscolha(item);
@@ -1677,7 +1664,7 @@ export function htmlDetalheItem(item, propsDescs = []) {
 }
 
 /** Mostra popup com detalhes completos de um item do inventário */
-async function mostrarDetalheItemSheet(item) {
+export async function mostrarDetalheItemSheet(item) {
   if (!item) return;
   const dados = await carregarDadosEquipSheet();
   const corpo = htmlDetalheItem(item, dados.propriedadesArmas || []);
@@ -1739,6 +1726,15 @@ async function mostrarDetalheItemSheet(item) {
       window.fecharModalTodos();
       renderFichaCompleta();
     });
+  });
+  // Escolha do atributo: grava em dados.atributo (vazio = padrão) e recalcula a ficha.
+  document.getElementById('sel-atributo-item')?.addEventListener('change', (e) => {
+    item.dados = item.dados || {};
+    if (e.target.value) item.dados.atributo = e.target.value;
+    else delete item.dados.atributo;
+    salvar();
+    window.fecharModal();
+    renderFichaCompleta();
   });
   // Grava a escolha de resistência, recalcula a ficha e fecha o modal.
   document.getElementById('sel-escolha-resistencia')?.addEventListener('change', (e) => {

@@ -16,15 +16,20 @@ async function abrirFormulario(page) {
 test('adicionar propriedade padrão mostra o chip; duplicada é recusada; × remove', async ({ context }) => {
   const { page } = await abrirFicha(context, GUERREIRO, 'regras-issue-104-a');
   await abrirFormulario(page);
+  // As propriedades do livro só aparecem com categoria de arma.
+  await page.selectOption('#ic-categoria', 'Armas Marciais Corpo a Corpo');
   await page.click('#ic-prop-add');
-  await page.selectOption('#ic-prop-select', 'Versátil');
+  await page.click('#ic-prop-cards [data-opcao="Versátil"]');
   await page.click('#ic-prop-confirmar');
   await expect(page.locator('#ic-props-lista [data-ic-prop][data-nome="Versátil"]')).toHaveCount(1);
 
   await page.click('#ic-prop-add');
-  await page.selectOption('#ic-prop-select', 'Versátil');
+  await page.click('#ic-prop-cards [data-opcao="Versátil"]');
   await page.click('#ic-prop-confirmar');
   await expect(page.locator('#ic-erros')).toContainText('já foi adicionada');
+  // A recusa mantém o popup aberto, com o aviso dentro dele.
+  await expect(page.locator('.sub-modal-overlay #ic-prop-erro')).toContainText('já foi adicionada');
+  await page.click('.sub-modal-overlay [data-fechar-sub]');
   await expect(page.locator('#ic-props-lista [data-ic-prop]')).toHaveCount(1);
 
   await page.click('#ic-props-lista [data-ic-prop-remover]');
@@ -36,7 +41,7 @@ test('propriedade personalizada grava nome e descrição e a descrição aparece
   await abrirFormulario(page);
   await page.fill('#ic-nome', 'Lâmina de Vidro');
   await page.click('#ic-prop-add');
-  await page.selectOption('#ic-prop-select', '__personalizada__');
+  await page.click('#ic-prop-cards [data-opcao="__personalizada__"]');
   await page.fill('#ic-prop-nome', 'Quebradiço');
   await page.fill('#ic-prop-desc', 'Quebra com um 1 natural no ataque.');
   await page.click('#ic-prop-confirmar');
@@ -58,7 +63,7 @@ test('personalizada sem nome é recusada', async ({ context }) => {
   const { page } = await abrirFicha(context, GUERREIRO, 'regras-issue-104-c');
   await abrirFormulario(page);
   await page.click('#ic-prop-add');
-  await page.selectOption('#ic-prop-select', '__personalizada__');
+  await page.click('#ic-prop-cards [data-opcao="__personalizada__"]');
   await page.click('#ic-prop-confirmar');
   await expect(page.locator('#ic-erros')).toContainText('Informe o nome');
   await expect(page.locator('#ic-props-lista [data-ic-prop]')).toHaveCount(0);

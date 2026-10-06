@@ -3,6 +3,7 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { atributoEfetivo } from '../regras-atributos.js';
+import { textoCADaArmadura } from '../regras-ataque.js';
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, PERICIAS } from '../dados-classes.js';
 import { getMagiasPorCirculo } from '../db.js';
 import { formatarCarteira, totalEmCobre } from '../moedas.js';
@@ -53,7 +54,7 @@ function _montarEfeitoDetalheItem(item) {
     efeito = [item.dados?.dano, item.dados?.propriedades].filter(Boolean).join(' | ');
     detalhe = [item.dados?.custo, item.dados?.peso].filter(Boolean).join(' | ');
   } else if (item.tipo === 'armadura') {
-    efeito = `CA: ${item.dados?.ca || '?'}${item.dados?.categoria ? ' | ' + item.dados.categoria : ''}`;
+    efeito = `CA: ${textoCADaArmadura(item) || '?'}${item.dados?.categoria ? ' | ' + item.dados.categoria : ''}`;
     detalhe = [item.dados?.custo, item.dados?.peso].filter(Boolean).join(' | ');
   } else if (item.tipo === 'escudo') {
     efeito = `CA: ${item.dados?.ca || '?'}`;

@@ -126,7 +126,7 @@ export async function modulosApp() {
          // Guardiao), consumido via
          // regrasUsosGratisMagia.magiaRecursoDedicadoGratisDisponivel/
          // consumirUsoRecursoDedicadoGratis.
-         regrasUsosGratisMagia] = await Promise.all([
+         regrasUsosGratisMagia, regrasAtaque, sheetAtaqueCalculo] = await Promise.all([
     importar('site/js/regras-cobertura.js'),
     importar('site/js/talentos-effects.js'),
     importar('site/js/store.js'),
@@ -205,6 +205,8 @@ export async function modulosApp() {
     importar('site/js/regras-sintonizacao.js'),
     importar('site/js/sheet/edicao.js'),
     importar('site/js/regras-usos-gratis-magia.js'),
+    importar('site/js/regras-ataque.js'),
+    importar('site/js/sheet/ataque-calculo.js'),
   ]);
   // Um modulo de classe por nome de ARQUIVO (minusculo, sem acento -- ex.:
   // sheetClasses.clerigo, sheetClasses.paladino), e nao pelo nome que o app
@@ -224,7 +226,7 @@ export async function modulosApp() {
              multiclasseProgressao, contextoClasse, sheetCaracteristicas, sheetFicha,
              proficiencias, magiaClasse, regrasPreparoMagias, sheetClasses, sheetHabilidades,
              sheetMaestrias, sheetHpDescanso, sheetCombate, itemCustomForm, sintonizacao, sheetEdicao,
-             regrasUsosGratisMagia };
+             regrasUsosGratisMagia, regrasAtaque, sheetAtaqueCalculo };
   return _cache;
 }
 

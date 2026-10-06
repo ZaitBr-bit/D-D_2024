@@ -13,13 +13,53 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.2.0';
+export const VERSAO_ATUAL = '3.2.1';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.2.1',
+    data: '2026-10-06',
+    rotulo: 'Ataques e mãos',
+    resumo: 'Nova seção Ataques, limite de mãos ao equipar, atributo do '
+      + 'modificador escolhido por arma e armadura, e a loja com o mesmo '
+      + 'detalhe do inventário.',
+    melhorias: [
+      {
+        grupo: '✨ Melhorias',
+        itens: [
+          'Nova seção Ataques entre Magias e Inventário: lista as armas '
+            + 'equipadas com bônus de ataque, dano, mãos ocupadas, selos de '
+            + 'proficiência e do atributo usado. Toque no nome para ver o '
+            + 'detalhe do item.',
+          'Mãos: o personagem tem 2 mãos (você pode cadastrar mais). Equipar '
+            + 'uma arma ou escudo além do limite é recusado com aviso. Ao '
+            + 'equipar um escudo com uma arma versátil empunhada com duas '
+            + 'mãos, a arma passa sozinha para uma mão e o dano volta ao dado '
+            + 'base. Fichas antigas com mais itens equipados não perdem nada: '
+            + 'aparece o aviso "Mãos excedidas".',
+          'Armas versáteis: o botão "Empunhar com duas mãos" troca o dano '
+            + '(por exemplo, 1d8 para 1d10) e passa a ocupar duas mãos.',
+          'Atributo do modificador: no detalhe de armas e de armaduras '
+            + 'leves e médias, escolha qual atributo entra no ataque, no dano '
+            + 'ou na CA. O texto da CA acompanha a escolha.',
+          'Armadura personalizada: o formulário ganhou "Soma de atributo na '
+            + 'CA" e "Limite do modificador" (opcionais) na seção Atributos. '
+            + 'Sem escolha, a CA dos itens já salvos não muda.',
+          'Item personalizado: Propriedade e Maestria agora são escolhidas '
+            + 'por cards em uma janela, com a descrição de cada opção, e o '
+            + 'detalhe de uma arma personalizada mostra categoria, dano, '
+            + 'maestria e propriedades como as armas do catálogo.',
+          'Loja: o detalhe do item tem as propriedades expansíveis e a '
+            + 'maestria, igual ao do inventário.',
+          'Itens novos e itens recém-equipados vão para o início da lista.',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.2.0',
     data: '2026-10-06',

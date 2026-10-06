@@ -38,7 +38,8 @@ test('o formulario preenchido reflete categoria, propriedades e maestria do item
   });
   assert.ok(/<option value="Armas Marciais Corpo a Corpo" selected/.test(html), 'a categoria tem de vir selecionada');
   assert.ok(html.includes('Acuidade, Leve'), 'as propriedades tem de vir preenchidas');
-  assert.ok(/<option value="Trespassar" selected/.test(html), 'a maestria tem de vir selecionada');
+  assert.ok(/id="ic-maestria" value="Trespassar"/.test(html), 'a maestria tem de vir no campo oculto (o popup a marca ao abrir)');
+  assert.ok(/id="ic-maestria-atual">Trespassar</.test(html), 'o botão mostra a maestria escolhida');
 });
 
 // bonusMagiaDeItens nao e exportado (funcao interna de utils.js) -- medido

@@ -4,7 +4,7 @@
 import { atributoEfetivo, atributosEfetivos } from './regras-atributos.js';
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, ATRIBUTO_NOME_PARA_KEY, PERICIAS, CLASSES_INFO } from './dados-classes.js';
 import { ehProficienteEmSalvaguarda } from './regras-salvaguardas.js';
-import { equipamentoDeCA, maiorEfeito, somaEfeitos } from './regras-itens-magicos.js';
+import { equipamentoDeCA, maiorEfeito, somaEfeitos, itemAtivo, armaduraPersonalizadaComAtributo, ATRIBUTOS_CA } from './regras-itens-magicos.js';
 import { magiaContaNoLimite } from './regras-origens-magia.js';
 import { getAtributoConjuracaoSubclasse, getConjuracaoSubclasse } from './regras-conjuracao-subclasse.js';
 // Acessores de multiclasse. Não há ciclo: regras-multiclasse.js importa
@@ -448,23 +448,26 @@ export function calcCA(personagem, passivos = null) {
   if (armadura) {
     const caStr = armadura.dados?.ca || '';
     const caBase = parseInt(caStr) || 0;
+    // Atributo escolhido pelo jogador (dados.atributo) substitui a Destreza; sem escolha vale a regra da categoria.
+    const atribEscolhido = ATRIBUTOS_CA.includes(armadura.dados?.atributo) ? armadura.dados.atributo : null;
+    const modArm = atribEscolhido ? calcMod(atributoEfetivo(personagem, atribEscolhido)) : modDes;
 
     if (armadura.dados?.categoria === 'Leve') {
-      ca = caBase + modDes;
+      ca = caBase + modArm;
     } else if (armadura.dados?.categoria === 'Média') {
       const maxDes = passivos?.bonusCAArmaduraMediaMaxDes ?? 2;
-      ca = caBase + Math.min(modDes, maxDes);
+      ca = caBase + Math.min(modArm, maxDes);
     } else if (armadura.dados?.categoria === 'Pesada') {
-      ca = caBase;
+      ca = caBase; // Pesada não soma modificador: o atributo escolhido não se aplica.
     } else {
       // Tentar parsear formato "XX + modificador de Des"
       const match = caStr.match(/^(\d+)/);
       if (match) {
         const base = parseInt(match[1]);
         if (caStr.includes('máx. 2') || caStr.includes('max. 2')) {
-          ca = base + Math.min(modDes, 2);
+          ca = base + Math.min(modArm, 2);
         } else if (caStr.includes('Des')) {
-          ca = base + modDes;
+          ca = base + modArm;
         } else {
           ca = base;
         }
@@ -490,7 +493,15 @@ export function calcCA(personagem, passivos = null) {
   // tipo de armadura -- "CA 20" tanto pode ser peitoral quanto amuleto -- e o
   // piso ja da o numero certo nos dois casos.
   // Fontes: item customizado (adaptador) e item do acervo; vale o maior.
-  const caBaseItens = maiorEfeito(personagem, 'ca_base');
+  // Armadura personalizada com atributo somado: CA = base + modificador (limitado por `limite_atributo`).
+  const caBasePersonalizadas = (personagem.inventario || [])
+    .filter(i => i.tipo === 'customizado' && itemAtivo(i) && armaduraPersonalizadaComAtributo(i.dados) && String(i.dados.ca_base ?? '') !== '')
+    .map(i => {
+      const mod = calcMod(atributoEfetivo(personagem, i.dados.atributo));
+      const limite = String(i.dados.limite_atributo ?? '') === '' ? Infinity : parseInt(i.dados.limite_atributo);
+      return (parseInt(i.dados.ca_base) || 0) + Math.min(mod, Number.isNaN(limite) ? Infinity : limite);
+    });
+  const caBaseItens = Math.max(maiorEfeito(personagem, 'ca_base'), ...caBasePersonalizadas);
   if (caBaseItens > ca) {
     ca = caBaseItens;
   }
@@ -1423,6 +1434,19 @@ export function rotuloDeTamanho(tamanho) {
 export function localDoItem(item, locais = []) {
   if (!item?.local || !Array.isArray(locais)) return null;
   return locais.find(l => l?.id === item.local) || null;
+}
+
+/** Insere o item no início do inventário (itens novos aparecem primeiro na bolsa ou no espaço). */
+export function inserirNoInicio(inventario, item) {
+  inventario.unshift(item);
+}
+
+/** Move um item já existente para o início do inventário; sem efeito se ele não está na lista. */
+export function moverParaInicio(inventario, item) {
+  const i = inventario.indexOf(item);
+  if (i <= 0) return;
+  inventario.splice(i, 1);
+  inventario.unshift(item);
 }
 
 /**

@@ -43,6 +43,7 @@ import { setupEventosDescanso, setupEventosHP, sincronizarBonusPvNiveis } from '
 import { defesasDeItens } from '../regras-passivos-itens.js';
 import { getEstadoCarga, renderSecaoInventario, setupEventosInventarioSheet } from './inventario.js';
 import { renderSecaoMagias, setupEventosEspacosMagia } from './magias.js';
+import { renderSecaoAtaques, setupEventosAtaques } from './ataques.js';
 import { migrarMulticlasse } from './migracoes.js';
 // reservasDeEspacos (Tarefa 4, sub-projeto 4, Ruling 11): o botao de
 // Companheiro Selvagem do Druida (linha ~405) testava
@@ -1055,6 +1056,9 @@ export function renderFichaCompleta() {
     -->
     ${(conjuraPorAlgumaClasse(char) || getTruquesExtraEstiloLuta() > 0 || char.iniciado_em_magia?.lista || (char.iniciado_em_magia_instancias?.length > 0) || possuiAlgumaMagia(char) || magiasDeItens(char).length > 0) ? renderSecaoMagias() : ''}
 
+    <!-- Ataques (só com arma equipada) -->
+    ${renderSecaoAtaques()}
+
     <!-- Inventário -->
     ${renderSecaoInventario()}
 
@@ -1074,6 +1078,7 @@ export function renderFichaCompleta() {
   setupEventosDescanso();
   setupEventosEdicao();
   setupEventosInventarioSheet();
+  setupEventosAtaques();
   setupEventosEspacosMagia();
   setupEventosHabilidades();
   setupEventosArtifice();

@@ -14,6 +14,8 @@ export const ALVOS_PASSIVOS = ['resistencia', 'imunidade', 'imunidade_condicao',
 export const ALVOS_AUMENTO = ['atributo_bonus', 'atributo_minimo_bonus'];
 export const ALVOS_EFEITO = ['ca', 'ca_base', 'ataque_arma', 'dano_arma', 'ataque_magia', 'cd_magia', 'salvaguarda', 'atributo', ...ALVOS_PASSIVOS, ...ALVOS_AUMENTO];
 export const CONDICOES_EFEITO = ['sem_armadura', 'sem_escudo', 'sem_armadura_nem_escudo'];
+// Atributos que o jogador pode escolher na armadura em lugar da Destreza (lidos por calcCA em utils.js).
+export const ATRIBUTOS_CA = ['forca', 'destreza', 'constituicao', 'inteligencia', 'sabedoria', 'carisma'];
 // Alvos que pertencem à arma do próprio item, não ao personagem.
 const ALVOS_DA_ARMA = ['ataque_arma', 'dano_arma'];
 
@@ -41,13 +43,19 @@ export function condicaoSatisfeita(condicao, personagem) {
   return false;
 }
 
+/** Armadura personalizada (não Escudo) com atributo somado à CA escolhido; o `calcCA` calcula a CA dela. */
+export function armaduraPersonalizadaComAtributo(d = {}) {
+  return d.tipo_item === 'Armadura' && d.tipo_armadura !== 'Escudo' && ATRIBUTOS_CA.includes(d.atributo);
+}
+
 /** Adaptador: os campos de bônus do item customizado como lista de efeitos. */
 export function efeitosDeCustomizado(item) {
   const d = item?.dados || {};
   const n = (v) => parseInt(v) || 0;
   const out = [];
   if (n(d.bonus_ca)) out.push({ alvo: 'ca', valor: n(d.bonus_ca) });
-  if (n(d.ca_base)) out.push({ alvo: 'ca_base', valor: n(d.ca_base) });
+  // Armadura com atributo somado: a CA vem do calcCA (base + modificador); sem atributo vale o piso de sempre.
+  if (n(d.ca_base) && !armaduraPersonalizadaComAtributo(d)) out.push({ alvo: 'ca_base', valor: n(d.ca_base) });
   if (n(d.bonus_ataque_magia)) out.push({ alvo: 'ataque_magia', valor: n(d.bonus_ataque_magia) });
   if (n(d.bonus_cd_magia)) out.push({ alvo: 'cd_magia', valor: n(d.bonus_cd_magia) });
   // Só ataque, sem dano: é o sentido do campo "Bônus de Ataque" do formulário.

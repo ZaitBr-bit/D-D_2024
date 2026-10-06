@@ -127,6 +127,21 @@ test('o formulário vem em seções <details> e mantém todos os ids', () => {
   }
 });
 
+test('soma de atributo na CA e limite ficam na seção Atributos, não em Categoria', () => {
+  const html = itemCustomForm.htmlFormularioItemCustomizado();
+  const secao = (id) => html.match(new RegExp(`<details class="ic-secao" data-ic-secao="${id}"[^>]*>(.*?)</details>`, 's'))[1];
+  for (const id of ['ic-ca-base', 'ic-atributo-ca', 'ic-limite-atributo']) {
+    assert.ok(secao('atributos').includes(`id="${id}"`), `${id} deve estar em Atributos`);
+    assert.ok(!secao('categoria').includes(`id="${id}"`), `${id} não pode ficar em Categoria`);
+  }
+});
+
+test('armadura com atributo na CA abre a seção Atributos na edição', () => {
+  const { secoesComValor } = itemCustomForm;
+  assert.equal(secoesComValor({ tipo_item: 'Armadura', atributo: 'destreza' }).atributos, true);
+  assert.equal(secoesComValor({ categoria: 'Armas Simples Corpo a Corpo', atributo: 'forca' }).atributos, false);
+});
+
 test('edição abre a seção que tem dado', () => {
   const html = itemCustomForm.htmlFormularioItemCustomizado({ nome: 'x', dados: { bonus_ca: '2' } });
   assert.match(html, /<details class="ic-secao" data-ic-secao="atributos" open>/);
