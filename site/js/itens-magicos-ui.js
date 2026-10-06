@@ -6,7 +6,7 @@
 // personagem e os callbacks chegam por parâmetro.
 // ============================================================
 import { abrirModal, escHtml, mdParaHtml, toast } from './utils.js';
-import { DENOMINACOES, ICONE_MOEDA, interpretarPrecoInformado, pagarCusto, podePagarCusto } from './moedas.js';
+import { cobrarPrecoInformado, htmlCampoPrecoInformado } from './preco-informado-ui.js';
 import { circuloDoPergaminho } from './regras-pergaminho.js';
 import { carregarMagiasIndicePergaminho, htmlSeletorMagiaPergaminho, ligarSeletorMagiaPergaminho, magiaSelecionadaPergaminho } from './pergaminho-ui.js';
 import {
@@ -146,14 +146,8 @@ export async function abrirItemMagico(item, ctx) {
         ${opcoes.map(a => `<option value="${escHtml(a.nome)}">${escHtml(a.nome)}</option>`).join('')}
       </select>` : ''}
     <div style="margin-top:8px;font-size:0.75rem;color:var(--text-muted)">Item mágico entra sem custo, a menos que você informe um preço.</div>`;
-  const opcoesMoeda = DENOMINACOES
-    .map(t => `<option value="${t}"${t === 'po' ? ' selected' : ''}>${ICONE_MOEDA[t]} ${t.toUpperCase()}</option>`).join('');
   abrirModal(item.nome, corpo,
-    `<div id="bloco-preco-item-magico" style="display:flex;align-items:center;gap:6px;margin-right:auto">
-       <label for="preco-item-magico-qtd" style="font-size:0.75rem;white-space:nowrap">Preço</label>
-       <input type="number" class="form-input" id="preco-item-magico-qtd" min="0" step="1" placeholder="0" style="width:80px">
-       <select class="form-input" id="preco-item-magico-moeda" style="width:auto">${opcoesMoeda}</select>
-     </div>
+    `${htmlCampoPrecoInformado('preco-item-magico')}
      <button class="btn btn-secondary" onclick="fecharModal()">Voltar</button>
      <button class="btn btn-primary" id="btn-confirmar-item-magico">Adicionar ao Inventário</button>`);
   if (ehPergaminho) {
@@ -184,28 +178,9 @@ export async function abrirItemMagico(item, ctx) {
     // vale com o flag "Comprar" marcado ou não (este modal não lê o flag).
     // Em input type=number, texto malformado ("1-", "e") devolve value '' e badInput=true;
     // sem esta checagem seria lido como campo vazio e o item entraria sem cobrança.
-    const campoPreco = document.getElementById('preco-item-magico-qtd');
-    if (campoPreco?.validity?.badInput) { toast('Informe um valor inteiro maior ou igual a zero.', 'error'); return; }
-    const preco = interpretarPrecoInformado(
-      campoPreco?.value,
-      document.getElementById('preco-item-magico-moeda')?.value,
-    );
-    if (!preco.ok) { toast(preco.erro, 'error'); return; }
-    let sufixoPreco = '';
-    if (preco.custo) {
-      if (!podePagarCusto(ctx.personagem.moedas, preco.custo)) {
-        toast(`Saldo insuficiente para pagar ${preco.custo} por ${novo.nome}!`, 'error');
-        return;
-      }
-      const pagamento = pagarCusto(ctx.personagem.moedas, preco.custo);
-      // Guarda defensiva: podePagarCusto já passou, mas sem sucesso não grava moedas nem adiciona o item.
-      if (!pagamento.sucesso) {
-        toast(`Não foi possível pagar ${preco.custo} por ${novo.nome}.`, 'error');
-        return;
-      }
-      ctx.personagem.moedas = pagamento.moedas;
-      sufixoPreco = ` por ${preco.custo}`;
-    }
+    const pagamento = cobrarPrecoInformado('preco-item-magico', ctx.personagem, novo.nome);
+    if (!pagamento.ok) return;
+    const sufixoPreco = pagamento.sufixo;
     confirmado = true;
     adicionarAoInventario(ctx.personagem, novo);
     window.fecharModal();

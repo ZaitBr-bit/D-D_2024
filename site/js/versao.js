@@ -13,13 +13,36 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.1.2';
+export const VERSAO_ATUAL = '3.1.3';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.1.3',
+    data: '2026-10-05',
+    rotulo: 'Compra e moedas',
+    resumo: 'Item personalizado pode ser pago ao adicionar, a Poção de Cura '
+      + 'fica só em Itens Mágicos e as moedas ganharam cores.',
+    melhorias: [
+      {
+        grupo: '✨ Melhorias',
+        itens: [
+          'Item personalizado: o campo "Pagar" (valor e moeda) no rodapé do '
+            + 'modal desconta o dinheiro ao adicionar; o campo de preço em '
+            + 'texto livre saiu do formulário (itens antigos continuam '
+            + 'mostrando o preço que já tinham). (#125)',
+          'A Poção de Cura comum não aparece mais em Equipamento na ficha; '
+            + 'use Itens Mágicos (as poções que você já tinha continuam '
+            + 'iguais e somam na mesma linha).',
+          'O saldo de moedas no inventário e na Carteira mostra cada moeda '
+            + 'com a sua cor (platina, ouro, electrum, prata e cobre).',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.1.2',
     data: '2026-10-05',

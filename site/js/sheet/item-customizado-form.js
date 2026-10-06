@@ -259,11 +259,6 @@ export function htmlFormularioItemCustomizado(item = null) {
       </div>
     </details>
 
-    <div class="form-group" style="margin-top:8px">
-      <label class="form-label" for="ic-preco">Preço</label>
-      <input type="text" class="form-input" id="ic-preco" value="${attr(d.preco || '')}" placeholder="150 PO">
-      <div style="font-size:0.65rem;color:var(--text-muted)">texto livre (ex.: 150 PO)</div>
-    </div>
     <div id="ic-erros" style="display:none;color:var(--danger);font-size:0.8rem;margin-top:8px"></div>
   `;
 }
@@ -424,7 +419,6 @@ export function lerFormularioItemCustomizado() {
         bonus_cd_magia: String(cdMagia),
         peso: pesoNum > 0 ? `${fmtPeso(pesoNum)} kg` : '',
         raridade: val('ic-raridade'),
-        preco: val('ic-preco'),
         requer_sintonizacao: !!document.getElementById('ic-sintonizacao')?.checked,
       },
     },

@@ -1,7 +1,7 @@
 // ============================================================
 // Issue #101 -- o formulario do item personalizado vem em secoes
 // recolhiveis (Categoria, Atributos, Raridade e sintonizacao); Nome,
-// Descricao e Preco ficam fora. Criacao nasce fechada; edicao abre a
+// Descricao ficam fora (o preco em texto livre foi removido). Criacao nasce fechada; edicao abre a
 // secao que tem dado. Clique real no summary.
 // ============================================================
 import { test, expect } from '@playwright/test';
@@ -15,10 +15,10 @@ test('criação: as três seções nascem recolhidas; clicar no summary abre e m
   const secoes = page.locator('details.ic-secao');
   await expect(secoes).toHaveCount(3);
   for (let i = 0; i < 3; i++) expect(await secoes.nth(i).evaluate(el => el.open)).toBe(false);
-  // Nome, Descrição e Preço ficam sempre à vista.
+  // Nome e Descrição ficam sempre à vista; o preço em texto livre não existe mais.
   await expect(page.locator('#ic-nome')).toBeVisible();
   await expect(page.locator('#ic-desc')).toBeVisible();
-  await expect(page.locator('#ic-preco')).toBeVisible();
+  await expect(page.locator('#ic-preco')).toHaveCount(0);
   await expect(page.locator('#ic-ca')).toBeHidden();
 
   await page.locator('details[data-ic-secao="atributos"] > summary').click();

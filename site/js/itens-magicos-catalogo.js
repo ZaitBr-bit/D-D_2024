@@ -96,6 +96,26 @@ function camposMagicos(item, variante) {
 }
 
 /**
+ * Nomes dos registros de equipamento_aventura.json que o acervo mágico reaproveita
+ * via `livro_jogador` (no item ou em variante). A ficha esconde esses nomes da
+ * listagem de Equipamento: a compra deles fica em Itens Mágicos.
+ * @param {Array<object>} acervoItens `itens` de itens_magicos.json
+ * @returns {Set<string>}
+ */
+export function nomesReaproveitadosDoEquipamento(acervoItens = []) {
+  const nomes = new Set();
+  /** Registra a referência quando ela aponta para equipamento_aventura. */
+  const registrar = (ref) => {
+    if (ref?.arquivo === 'equipamento_aventura' && ref.nome) nomes.add(ref.nome);
+  };
+  for (const item of acervoItens) {
+    registrar(item.livro_jogador);
+    for (const v of item.variantes || []) registrar(v.livro_jogador);
+  }
+  return nomes;
+}
+
+/**
  * Item de inventário de um item mágico do acervo. Devolve null quando falta
  * uma escolha obrigatória (variante, se o item tem variantes; base, se tem
  * `base`). `equipamentoPHB` é a lista `itens` de equipamento_aventura.json.

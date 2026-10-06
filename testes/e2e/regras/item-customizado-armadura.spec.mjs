@@ -14,7 +14,7 @@ async function abrirFormulario(page) {
   await abrirSecoesItemCustom(page);
 }
 
-/** Cria uma armadura personalizada completa (requisito, furtividade, CA, preço, peso) com o tipo dado. */
+/** Cria uma armadura personalizada completa (requisito, furtividade, CA, peso) com o tipo dado. */
 async function criarArmadura(page, nome, tipo) {
   await abrirFormulario(page);
   await page.fill('#ic-nome', nome);
@@ -24,7 +24,6 @@ async function criarArmadura(page, nome, tipo) {
   await page.fill('#ic-req-forca', '15');
   await page.check('#ic-desv-furtividade');
   await page.fill('#ic-ca-base', '18');
-  await page.fill('#ic-preco', '1.500 PO');
   await page.fill('#ic-peso', '32');
   await page.click('#btn-add-ic');
   await assentar(page).catch(() => {});
@@ -44,14 +43,15 @@ test('armadura Pesada grava os campos, mostra selo de proficiência e o resumo n
   const { page } = await abrirFicha(context, GUERREIRO, 'regras-issue-134-b');
   await criarArmadura(page, 'Placas do Mestre', 'Pesada');
   const item = (await personagemSalvo(page)).inventario.find(i => i.nome === 'Placas do Mestre');
-  expect(item.dados).toMatchObject({ tipo_item: 'Armadura', tipo_armadura: 'Pesada', requisito_forca: 'For 15', furtividade: 'Desvantagem', preco: '1.500 PO' });
+  expect(item.dados).toMatchObject({ tipo_item: 'Armadura', tipo_armadura: 'Pesada', requisito_forca: 'For 15', furtividade: 'Desvantagem' });
+  expect(item.dados).not.toHaveProperty('preco');
 
   const linha = page.locator('.inv-item[data-idx]', { hasText: 'Placas do Mestre' });
   await expect(linha.locator('.badge-prof-sm')).toBeVisible();
 
   await page.click('[data-info-inv-sheet="0"]');
   const modal = page.locator('#modal-corpo').last();
-  for (const trecho of ['Pesada', 'CA base', '18', 'For 15', 'Desvantagem', '1.500 PO', '32 kg']) {
+  for (const trecho of ['Pesada', 'CA base', '18', 'For 15', 'Desvantagem', '32 kg']) {
     await expect(modal).toContainText(trecho);
   }
 });
@@ -76,6 +76,24 @@ test('editar: trocar a categoria de Armadura para Consumível limpa tipo, requis
   expect(item.dados.tipo_armadura).toBe('');
   expect(item.dados.requisito_forca).toBe('');
   expect(item.dados.furtividade).toBe('');
+});
+
+test('editar item antigo com dados.preco: o preço gravado sobrevive e continua no detalhe', async ({ context }) => {
+  const { page, erros } = await abrirFicha(context, {
+    ...GUERREIRO,
+    inventario: [{ tipo: 'customizado', nome: 'Capa Velha', quantidade: 1, equipado: false, descricao: 'Uma capa.', dados: { preco: '2 PO' } }],
+  }, 'regras-preco-antigo-edicao');
+  await page.click('[data-info-inv-sheet="0"]');
+  await page.click('#btn-editar-item-custom');
+  await expect(page.locator('#ic-preco')).toHaveCount(0);
+  await page.fill('#ic-nome', 'Capa Nova');
+  await page.click('#btn-salvar-ic');
+  await assentar(page).catch(() => {});
+  const item = (await personagemSalvo(page)).inventario.find(i => i.nome === 'Capa Nova');
+  expect(item.dados.preco).toBe('2 PO');
+  await page.click('[data-info-inv-sheet="0"]');
+  await expect(page.locator('#modal-corpo').last()).toContainText('2 PO');
+  expect(erros).toEqual([]);
 });
 
 test('item personalizado antigo (sem campos de armadura) abre o detalhe sem erro', async ({ context }) => {

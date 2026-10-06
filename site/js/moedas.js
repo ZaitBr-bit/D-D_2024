@@ -207,6 +207,26 @@ export function formatarCarteira(moedas) {
   return partes.length > 0 ? partes.join(', ') : '0 PO';
 }
 
+// Cor do texto de cada denominação (combina com ICONE_MOEDA); todas com contraste >= 4,5:1 contra branco
+export const COR_MOEDA = {
+  pl: '#1565c0',
+  po: '#8a6d00',
+  pe: '#c2410c',
+  pp: '#5f6b7a',
+  pc: '#8b4513'
+};
+
+/**
+ * Mesmo texto de formatarCarteira, com cada denominação num <span> da sua cor
+ * (COR_MOEDA). Fallback "0 PO" na cor do ouro. Devolve HTML: só números e siglas fixas, sem texto livre.
+ */
+export function htmlCarteira(moedas) {
+  const m = normalizarCarteira(moedas);
+  const partes = DENOMINACOES.filter(tipo => m[tipo] > 0)
+    .map(tipo => `<span style="color:${COR_MOEDA[tipo]}">${m[tipo]} ${tipo.toUpperCase()}</span>`);
+  return partes.length > 0 ? partes.join(', ') : `<span style="color:${COR_MOEDA.po}">0 PO</span>`;
+}
+
 /** Extrai {tipo, qtd, cobre} de uma string de custo tipo "25 PO", "5 PP", "1.000 PO". Retorna null se nao for parseavel (ex: "Varia"). */
 export function parseCusto(texto) {
   if (!texto) return null;

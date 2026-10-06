@@ -6,10 +6,11 @@
 // ============================================================
 import { atributoEfetivo } from '../regras-atributos.js';
 import { CLASSES_INFO } from '../dados-classes.js';
-import { DENOMINACOES, ICONE_MOEDA, NOMES_MOEDA, adicionarMoeda, converterParaMaior, converterParaMenor, formatarCarteira, proximaDenominacaoMaior, proximaDenominacaoMenor, removerQuantidadeMoeda, taxasSaoPadrao } from '../moedas.js';
+import { DENOMINACOES, ICONE_MOEDA, NOMES_MOEDA, adicionarMoeda, converterParaMaior, converterParaMenor, htmlCarteira, proximaDenominacaoMaior, proximaDenominacaoMenor, removerQuantidadeMoeda, taxasSaoPadrao } from '../moedas.js';
 import { carregarComprarAtivoPadrao, resetarTaxasMoeda, salvarComprarAtivoPadrao, salvarTaxasMoeda } from '../store.js';
 import { abrirModal, bonusProficiencia, calcMod, escHtml, fmtMod, fmtPeso, gerarId, getCapacidadeCarga, getPesoTotalInventario, localDoItem, mdParaHtml, semAcento, toast } from '../utils.js';
 import { abrirSeletorItens, carregarDadosEquipSheet } from '../itens-seletor.js';
+import { cobrarPrecoInformado, htmlCampoPrecoInformado } from '../preco-informado-ui.js';
 import { getEstadoFuria } from './classes/barbaro.js';
 import { getEstadoRecursosGuardiao } from './classes/guardiao.js';
 import { _salvarEstadoColapso, _secoesInvColapsadas } from './colapso.js';
@@ -100,7 +101,7 @@ export function renderSecaoInventario() {
       <div class="card-header">
         <h2>Inventario</h2>
         <div class="no-print" style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
-          <span style="font-weight:700;color:var(--secondary);font-size:0.9rem;cursor:pointer" id="btn-edit-po" title="Editar Carteira">${formatarCarteira(char.moedas)}</span>
+          <span style="font-weight:700;color:var(--secondary);font-size:0.9rem;cursor:pointer" id="btn-edit-po" title="Editar Carteira">${htmlCarteira(char.moedas)}</span>
           <button class="btn btn-sm btn-accent" id="btn-add-inv">Loja</button>
           <button class="btn btn-sm btn-secondary" id="btn-add-inv-custom">+ Item Personalizado</button>
           <button class="btn btn-sm btn-secondary" id="btn-add-inv-local" title="Criar um local para guardar itens (ex.: Bolsa de Armazenamento)">Novo Espaço</button>
@@ -947,13 +948,20 @@ export function setupEventosInventarioSheet() {
   // Item customizado
   const btnAddCustom = document.getElementById('btn-add-inv-custom');
   if (btnAddCustom) btnAddCustom.onclick = () => {
+    // Bloco "Pagar" (rótulo distinto do campo informativo "Preço" do formulário): debita a carteira, não é gravado no item.
     abrirModal('Item Customizado', htmlFormularioItemCustomizado(),
-      '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-add-ic">Adicionar</button>');
+      `${htmlCampoPrecoInformado('pagar-item-custom', 'Pagar')}<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-add-ic">Adicionar</button>`);
     ligarEventosFormularioItemCustomizado();
 
+    // Impede que um segundo clique, já aceito o primeiro, adicione e cobre de novo.
+    let adicionado = false;
     document.getElementById('btn-add-ic')?.addEventListener('click', () => {
+      if (adicionado) return;
       const { ok, valores } = lerFormularioItemCustomizado();
       if (!ok) return;
+      const pagamento = cobrarPrecoInformado('pagar-item-custom', char, valores.nome);
+      if (!pagamento.ok) return;
+      adicionado = true;
       char.inventario.push({
         tipo: 'customizado',
         quantidade: 1,
@@ -963,7 +971,7 @@ export function setupEventosInventarioSheet() {
       salvar();
       window.fecharModal();
       renderFichaCompleta();
-      toast(`${valores.nome} adicionado!`, 'success');
+      toast(`${valores.nome} adicionado${pagamento.sufixo}!`, 'success');
     });
   };
 
@@ -1070,7 +1078,7 @@ export function setupEventosInventarioSheet() {
 
     const renderCorpoCarteira = () => `
       <div style="text-align:center;margin-bottom:12px">
-        <div style="font-size:1.1rem;font-weight:700;color:var(--primary)">${formatarCarteira(char.moedas)}</div>
+        <div style="font-size:1.1rem;font-weight:700">${htmlCarteira(char.moedas)}</div>
         <div style="font-size:0.75rem;color:var(--text-muted)">Saldo atual — remover converte moedas maiores automaticamente se necessário</div>
       </div>
       ${renderLinhasCarteira()}

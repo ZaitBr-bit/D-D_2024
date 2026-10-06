@@ -115,7 +115,7 @@ que segue é o resumo do que o autor descreve, a confirmar na triagem.
 
 **Melhorias**
 
-- [ ] **#125** — Comprar item personalizado (descontar moedas ao adicionar, como na loja).
+- [x] **#125** — Comprar item personalizado (descontar moedas ao adicionar, como na loja). Aguarda commit e versão. Causa: o modal "Item Customizado" não tinha como pagar. O rodapé da criação ganhou o bloco "Pagar" (valor + moeda, padrão PO; o campo de preço em texto livre foi removido do formulário; itens antigos continuam exibindo o preço gravado); cobra sempre que há valor, só depois de o formulário validar, e não grava nada no item; o modal de edição não tem o bloco. A lógica comum saiu para `preco-informado-ui.js` (`htmlCampoPrecoInformado`, `cobrarPrecoInformado`), usada também pelo modal do item mágico (ids e comportamento mantidos). Arquivos: `preco-informado-ui.js`, `sheet/inventario.js`, `itens-magicos-ui.js`. Testes: `item-customizado-compra.spec.mjs`, `item-magico-preco-informado.spec.mjs`.
 - [ ] **#126** — Passar magias e itens de uma ficha para outra (hoje é um a um).
 - [ ] **#127** — Campo "Conjuração como magia de Círculo" nas magias personalizadas e formulário de magia mais compacto (como o de item).
 - [x] **#128** — Deixar claro que só o Mago troca de truque no Descanso Longo (o texto sugere que qualquer conjurador troca). Aguarda commit e versão. Causa: a troca de truque é regra da casa (o livro só permite ao Mago), e os dois modais não diziam isso. `avisoTrocaTruqueForaDoLivro` (`regras-preparo-magias.js`) gera o aviso; `hp-descanso.js` (modal do Descanso Longo, `<p class="aviso-regra-livro">`) e `grimorio.js` (modal de troca no grimório, dentro da info-box) o exibem para quem não é Mago. A regra da casa foi mantida; a decisão está em `PERGUNTAS-PENDENTES.txt`. Testes: `troca-truque-aviso.test.mjs`, `troca-truque-aviso-livro.spec.mjs`.
@@ -170,6 +170,8 @@ _(nenhuma nesta faixa no momento — ver notas de manutenção)_
 ---
 
 ## Notas de manutenção
+
+- **Rodada 3 (2026-10-05), sem issue própria além da #125**: (1) a Poção de Cura sai da listagem de Equipamento na ficha, como o Pergaminho Mágico: o filtro agora vale para todo registro reaproveitado pelo acervo mágico (`nomesReaproveitadosDoEquipamento`), só com `ctx.permitirMagicos`; o criador lista tudo; fichas antigas não precisam de migração (`pocao-cura-so-magicos.spec.mjs`, `itens-nomes-so-magicos.test.mjs`). Isto resolve o item "pendente de aprovação do dono" da rodada 2. (2) Cada moeda tem cor própria no cabeçalho do inventário e no saldo do modal da Carteira (`COR_MOEDA` e `htmlCarteira` em `moedas.js`, contraste >= 4,5:1 contra branco); `formatarCarteira` segue texto puro para impressão/PDF/"Disponível" do grimório (`moedas-html-carteira.test.mjs`, `carteira-cores.spec.mjs`). Ao mudar o tema/fundo do app, revisar `COR_MOEDA`.
 
 - **Seletor de itens no celular (versão 3.1.2, 2026-10-05)** — pedido do dono, sem issue: modal "Adicionar Item" com altura fixa e categoria em dropdown, categoria "Todos" (busca em todas as categorias, limite de 80 resultados), ajuste ao teclado virtual (`site/js/modal-teclado.js`), destaque da raridade ativa e botões "Loja" e "Novo Espaço". Teclado virtual provado só por simulação de `visualViewport`; falta conferir em iPhone/Android reais.
 

@@ -18,7 +18,7 @@ import { getArmaduras, getArmas, getEquipamentoAventura, getFerramentas, getIten
 import {
   abrirItemMagico, aplicarSeVigente, criarGuardaRequisicao, htmlLinhaItemMagico, renderCategoriaMagicos
 } from './itens-magicos-ui.js';
-import { filtrarAcervo } from './itens-magicos-catalogo.js';
+import { filtrarAcervo, nomesReaproveitadosDoEquipamento } from './itens-magicos-catalogo.js';
 import { ajustarOverlayAoTeclado } from './modal-teclado.js';
 import { pagarCusto, parseCusto, podePagarCusto } from './moedas.js';
 import { abrirModal, escHtml, mdParaHtml, semAcento, toast } from './utils.js';
@@ -125,14 +125,19 @@ export async function abrirSeletorItens(ctx) {
 
   const consumiveis = dados.equipAvent.filter(i => ITENS_CONSUMIVEIS.some(c => i.nome.includes(c)));
   const municao = dados.municao || [];
-  // Na ficha (`ctx.permitirMagicos`) o Pergaminho Mágico só existe em Itens
-  // Mágicos (issue #103): a escolha da magia mora lá. O criador não tem essa
-  // categoria e continua listando o pergaminho em Equipamento. O registro
-  // segue em equipamento_aventura.json porque a variante do acervo o usa
-  // (`livro_jogador`); só a listagem da ficha o esconde.
-  const ehPergaminhoMagico = (i) => !!ctx.permitirMagicos && i.nome.startsWith('Pergaminho Mágico');
-  const outrosEquip = dados.equipAvent.filter(i =>
-    !ITENS_CONSUMIVEIS.some(c => i.nome.includes(c)) && !ehPergaminhoMagico(i)
+  // Na ficha (`ctx.permitirMagicos`) os registros que o acervo mágico reaproveita
+  // via `livro_jogador` (Pergaminho Mágico, issue #103; Poção de Cura) só existem
+  // em Itens Mágicos. O criador não tem essa categoria e continua listando tudo.
+  // Os registros seguem em equipamento_aventura.json porque a variante do acervo
+  // os usa; só a listagem da ficha os esconde. O conjunto de nomes vem do acervo,
+  // carregado só quando Equipamento ou Todos é aberto (null = ainda não
+  // carregado; vazio = criador ou acervo indisponível, nada é escondido).
+  let nomesSoMagicos = ctx.permitirMagicos ? null : new Set();
+  /** Guarda os nomes do acervo; acervo ausente deixa o conjunto vazio. */
+  const definirNomesSoMagicos = (acervo) => { nomesSoMagicos = nomesReaproveitadosDoEquipamento(acervo?.itens); };
+  /** Equipamento de aventura sem consumíveis e sem os registros exclusivos do acervo mágico. */
+  const listarOutrosEquip = () => dados.equipAvent.filter(i =>
+    !ITENS_CONSUMIVEIS.some(c => i.nome.includes(c)) && !nomesSoMagicos?.has(i.nome)
   );
 
   const categorias = [
@@ -237,6 +242,18 @@ export async function abrirSeletorItens(ctx) {
       }, avisoErro);
       return;
     }
+    // Equipamento na ficha: espera os nomes do acervo para esconder os registros exclusivos de Itens Mágicos.
+    if (cat === 'equipamento' && nomesSoMagicos === null) {
+      listaEl.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:16px">Carregando…</div>';
+      aplicarSeVigente(guardaBuscaMagicos, getItensMagicos(), acervo => {
+        definirNomesSoMagicos(acervo);
+        if (catAtual === 'equipamento') renderCategoria('equipamento', filtroTexto);
+      }, () => {
+        definirNomesSoMagicos(null);
+        if (catAtual === 'equipamento') renderCategoria('equipamento', filtroTexto);
+      });
+      return;
+    }
     // Todos sem texto: não lista nada, o catálogo inteiro não é renderizado.
     if (cat === 'todos' && !filtroTexto) {
       guardaBuscaMagicos.nova();
@@ -247,9 +264,11 @@ export async function abrirSeletorItens(ctx) {
     // chega de forma assíncrona; a lista só renderiza quando ele chega (ou falha).
     if (cat === 'todos' && ctx.permitirMagicos && magicosTodos === undefined) {
       aplicarSeVigente(guardaBuscaMagicos, getItensMagicos(), acervo => {
+        definirNomesSoMagicos(acervo);
         if (catAtual !== 'todos') return;
         renderCategoria('todos', filtroTexto, acervo?.itens ? filtrarAcervo(acervo.itens, { texto: filtroTexto }) : []);
       }, () => {
+        definirNomesSoMagicos(null);
         if (catAtual === 'todos') renderCategoria('todos', filtroTexto, []);
       });
       return;
@@ -342,7 +361,7 @@ export async function abrirSeletorItens(ctx) {
           }));
           break;
         case 'equipamento':
-          itens = outrosEquip.map(i => ({
+          itens = listarOutrosEquip().map(i => ({
             nome: i.nome,
             detalhe: `${i.custo} | ${i.peso || '\u2014'}`,
             badge: '', badgeCat: '',

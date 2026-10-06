@@ -61,22 +61,25 @@ test('as raridades sao as seis do livro, na ordem', () => {
     ['Comum', 'Incomum', 'Rara', 'Muito Rara', 'Lendária', 'Artefato']);
 });
 
-test('o formulario tem os campos de raridade, preco e sintonizacao', () => {
+test('o formulario tem os campos de raridade e sintonizacao, e nao tem o preco em texto livre', () => {
   const html = itemCustomForm.htmlFormularioItemCustomizado();
-  for (const id of ['ic-raridade', 'ic-preco', 'ic-sintonizacao']) {
+  for (const id of ['ic-raridade', 'ic-sintonizacao']) {
     assert.ok(html.includes(`id="${id}"`), `falta o campo ${id}`);
   }
+  assert.ok(!html.includes('id="ic-preco"'), 'o campo de preco em texto livre foi removido');
+  // Mesmo com item antigo que tem preco gravado, o campo nao reaparece.
+  const antigo = itemCustomForm.htmlFormularioItemCustomizado({ nome: 'x', dados: { preco: '3500 PO' } });
+  assert.ok(!antigo.includes('id="ic-preco"'), 'item antigo nao reabre o campo de preco');
   // O seletor de raridade abre com a opcao vazia: item nao magico e o padrao.
   assert.ok(html.includes('<option value=""'), 'a raridade tem de aceitar "nao informada"');
 });
 
-test('o formulario preenchido reflete raridade, preco e sintonizacao do item', () => {
+test('o formulario preenchido reflete raridade e sintonizacao do item', () => {
   const html = itemCustomForm.htmlFormularioItemCustomizado({
     nome: 'Anel de Proteção', descricao: '',
-    dados: { raridade: 'Rara', preco: '3500 PO', requer_sintonizacao: true },
+    dados: { raridade: 'Rara', requer_sintonizacao: true },
   });
   assert.ok(/<option value="Rara" selected/.test(html), 'a raridade tem de vir selecionada');
-  assert.ok(html.includes('3500 PO'), 'o preco tem de vir preenchido');
   assert.ok(/id="ic-sintonizacao"[^>]*checked/.test(html), 'a sintonizacao tem de vir marcada');
 });
 
@@ -119,7 +122,7 @@ test('o formulário vem em seções <details> e mantém todos os ids', () => {
   assert.equal((html.match(/<details class="ic-secao"/g) || []).length, 3);
   assert.doesNotMatch(html, /<details class="ic-secao"[^>]* open/, 'criação nasce recolhida');
   for (const id of ['ic-nome', 'ic-desc', 'ic-ca', 'ic-ca-base', 'ic-dano', 'ic-atq', 'ic-categoria', 'ic-propriedades',
-    'ic-maestria', 'ic-atq-magia', 'ic-cd-magia', 'ic-peso', 'ic-raridade', 'ic-preco', 'ic-sintonizacao']) {
+    'ic-maestria', 'ic-atq-magia', 'ic-cd-magia', 'ic-peso', 'ic-raridade', 'ic-sintonizacao']) {
     assert.match(html, new RegExp(`id="${id}"`), `${id} sumiu`);
   }
 });
