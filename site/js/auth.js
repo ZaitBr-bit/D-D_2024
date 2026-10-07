@@ -3,6 +3,8 @@
 // Modulo opcional: se nao logado, tudo funciona via localStorage
 // ============================================================
 
+import { podeSobrescreverNuvem } from './sync-merge.js';
+
 // Configuracao do projeto Firebase (produção)
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBlk6l-yuMQpC080fOsN4NC4mB5pbyY7VA",
@@ -120,13 +122,21 @@ export async function listarPersonagensCloud() {
 
 /** Salva ou atualiza um personagem no Firestore */
 export async function salvarPersonagemCloud(personagem) {
-  if (!_db || !_usuario) return;
-  const { doc, setDoc } = await _getFirestoreModules();
+  if (!_db || !_usuario) return { gravado: false, remoto: null };
+  const { doc, runTransaction } = await _getFirestoreModules();
   // Usar o id do personagem como docId para facil lookup
   const docRef = doc(_db, _colecaoPath(), personagem.id);
   // Remover campos undefined que o Firestore nao aceita
   const dados = JSON.parse(JSON.stringify(personagem));
-  await setDoc(docRef, dados);
+  // Transação: lê a versão da nuvem e só grava se ela não for mais nova. Antes era um
+  // setDoc cego, e uma cópia velha presa na fila apagava edições feitas em outro aparelho.
+  return runTransaction(_db, async (tx) => {
+    const snap = await tx.get(docRef);
+    const remoto = snap.exists() ? snap.data() : null;
+    if (!podeSobrescreverNuvem(dados, remoto)) return { gravado: false, remoto };
+    tx.set(docRef, dados);
+    return { gravado: true, remoto: null };
+  });
 }
 
 /**

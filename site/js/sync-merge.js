@@ -69,6 +69,20 @@ export function reconciliar({ locais, nuvem, idsPendentesRemocao }) {
 }
 
 /**
+ * Se a cópia local pode sobrescrever o documento da nuvem. Não pode quando a nuvem tem
+ * versão mais nova (ex.: snapshot preso na fila de sync desde antes de editarem em outro
+ * aparelho) nem quando é uma lápide posterior à cópia; mesma regra de `reconciliar`.
+ * @param {object} local Cópia que seria gravada.
+ * @param {object|null} remoto Documento atual da nuvem (personagem, lápide) ou null.
+ * @returns {boolean}
+ */
+export function podeSobrescreverNuvem(local, remoto) {
+  if (!remoto) return true;
+  if (ehLapide(remoto)) return _t(local.atualizado_em) > _t(remoto.removido_em);
+  return _t(remoto.atualizado_em) <= _t(local.atualizado_em);
+}
+
+/**
  * Decide o que fazer ao abrir uma ficha, dado o documento da nuvem dela.
  * @param {object} local Cópia local.
  * @param {object|null} docNuvem Documento da nuvem (personagem, lápide) ou null.

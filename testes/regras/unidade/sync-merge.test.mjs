@@ -82,3 +82,16 @@ test('substituirPersonagemLocal com null remove a copia local', () => {
   store.substituirPersonagemLocal(null, 'x');
   assert.equal(store.getPersonagem('x'), null);
 });
+
+// ---- Gravação na nuvem: cópia velha (ex.: snapshot preso na fila desde a criação) não sobrescreve a mais nova ----
+test('podeSobrescreverNuvem: só grava se a nuvem não tiver versão mais nova', () => {
+  const local = p('a', '2026-10-01T10:00:00Z');
+  assert.equal(m.podeSobrescreverNuvem(local, null), true, 'sem documento na nuvem, grava');
+  assert.equal(m.podeSobrescreverNuvem(local, p('a', '2026-09-30T10:00:00Z')), true, 'nuvem mais velha, grava');
+  assert.equal(m.podeSobrescreverNuvem(local, p('a', '2026-10-01T10:00:00Z')), true, 'mesma versão, grava (idempotente)');
+  assert.equal(m.podeSobrescreverNuvem(local, p('a', '2026-10-05T10:00:00Z')), false,
+    'snapshot da criação preso na fila não pode apagar dias de edição feitos em outro aparelho');
+  assert.equal(m.podeSobrescreverNuvem(local, lapide('a', '2026-10-02T10:00:00Z')), false, 'não ressuscita personagem excluído depois');
+  assert.equal(m.podeSobrescreverNuvem(p('a', '2026-10-03T10:00:00Z'), lapide('a', '2026-10-02T10:00:00Z')), true,
+    'editado depois da exclusão vence a lápide (mesma regra do reconciliar)');
+});

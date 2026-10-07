@@ -181,7 +181,8 @@ function renderSheetInvLista(equipados, naoEquipados, zerados, porLocal = {}) {
   for (const local of (char.inventario_locais || [])) {
     const idxs = porLocal?.[local.id] || [];
     const chave = `local_${local.id}`;
-    if (!(chave in _secoesInvColapsadas)) _secoesInvColapsadas[chave] = false;
+    // Espaço criado nasce recolhido; a escolha do jogador é guardada por personagem (colapso.js).
+    if (!(chave in _secoesInvColapsadas)) _secoesInvColapsadas[chave] = true;
     const colapsada = _secoesInvColapsadas[chave];
     html += `<div class="inv-secao-titulo${colapsada ? ' inv-secao-colapsada' : ''}" data-inv-secao="${escHtml(chave)}">
       <span>${escHtml(local.nome)} (${idxs.length})${local.conta_peso === false ? ' <small>— não conta no peso</small>' : ''}</span>

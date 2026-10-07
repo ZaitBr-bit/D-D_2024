@@ -13,13 +13,43 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.3.1';
+export const VERSAO_ATUAL = '3.3.2';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.3.2',
+    data: '2026-10-07',
+    rotulo: 'Sincronização',
+    resumo: 'Cópia antiga não sobrescreve mais a ficha na nuvem, o erro ao '
+      + 'salvar mostra o motivo e os espaços do inventário lembram se estão '
+      + 'recolhidos.',
+    melhorias: [
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'Sincronização: uma cópia antiga presa na fila (de um envio que '
+            + 'falhou) podia sobrescrever a ficha na nuvem e fazer outro '
+            + 'aparelho voltar ao estado de criação. Agora a nuvem só aceita '
+            + 'versão igual ou mais nova; se a dela for mais nova, o aparelho '
+            + 'adota essa versão e a ficha aberta é recarregada com aviso.',
+          'Espaços criados no inventário nascem recolhidos e lembram se '
+            + 'estão recolhidos ou expandidos, como os demais.',
+        ],
+      },
+      {
+        grupo: '✨ Melhorias',
+        itens: [
+          '"Erro ao salvar" agora é um toque que abre o motivo do erro '
+            + '(código, mensagem, tamanho da ficha e campos mais pesados), '
+            + 'com botão para copiar.',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.3.1',
     data: '2026-10-07',

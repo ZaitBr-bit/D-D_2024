@@ -8,6 +8,7 @@ import { getClasse, getIndiceMagias, getTalentos, getEspecies } from '../db.js';
 import { getMagiaPreparadas, normalizarGrimorioMago, toast } from '../utils.js';
 import { obterMagiasAutomaticasDoPersonagem } from '../levelup.js';
 import { getSyncStatus, onSyncStatusChange } from '../sync.js';
+import { ligarDetalheErroSync } from '../sync-erro-ui.js';
 import { resolverPassivosTalentos } from '../talentos-effects.js';
 import { abrirGridManobras } from '../manobras-ui.js';
 import { definirChar, definirContainer, definirClasseData, definirIndiceMagias, definirTalentos, definirEspecies, definirMagiasDominio, definirMagiasSempre, definirPassivosTalentos } from '../sheet/estado.js';
@@ -58,7 +59,21 @@ async function _atualizarDaNuvemAntesDeAbrir(charId) {
   }
 }
 
+/** Container da ficha aberta, para reabrir quando a nuvem trouxer versão mais nova. */
+let _containerFicha = null;
+
+// A fila de sync encontrou versão mais nova na nuvem e o aparelho adotou-a (sync.js): se for a
+// ficha aberta, reabre para o jogador não editar (e regravar) a cópia velha que está na tela.
+if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+  window.addEventListener('personagem-atualizado-da-nuvem', (ev) => {
+    if (!_containerFicha || !char || ev.detail?.id !== char.id) return;
+    toast('Esta ficha tinha uma versão mais nova na nuvem e foi atualizada.', 'info');
+    renderSheet(_containerFicha, char.id);
+  });
+}
+
 export async function renderSheet(container, charId) {
+  _containerFicha = container;
   definirContainer(container);
   await _atualizarDaNuvemAntesDeAbrir(charId);
   definirChar(getPersonagem(charId));
@@ -215,6 +230,7 @@ export async function renderSheet(container, charId) {
   if (!_syncSubscribed) {
     _syncSubscribed = true;
     onSyncStatusChange(_atualizarIndicadorSync);
+    ligarDetalheErroSync();
   }
 
   document.getElementById('btn-print')?.addEventListener('click', () => baixarPdfFicha());
@@ -253,16 +269,21 @@ function _textoStatusSync(status) {
   }
 }
 
+/** Span do texto do status; no erro vira um toque que abre o detalhe da falha (sync-erro-ui.js). */
+function _spanStatusSync(status) {
+  const { texto, cor } = _textoStatusSync(status);
+  if (status !== 'erro') return `<span style="color:${cor}">${texto}</span>`;
+  return `<span data-sync-erro="1" role="button" tabindex="0" title="Toque para ver o erro" style="color:${cor};text-decoration:underline;cursor:pointer">${texto} (ver erro)</span>`;
+}
+
 /** Retorna HTML do elemento do indicador com o status atual */
 export function _renderSyncIndicadorHtml() {
-  const { texto, cor } = _textoStatusSync(getSyncStatus());
-  return `<div id="sync-status-indicator" style="font-size:0.7rem;text-align:right;min-height:1em"><span style="color:${cor}">${texto}</span></div>`;
+  return `<div id="sync-status-indicator" style="font-size:0.7rem;text-align:right;min-height:1em">${_spanStatusSync(getSyncStatus())}</div>`;
 }
 
 /** Atualiza o indicador de sync no DOM sem re-render completo */
 function _atualizarIndicadorSync(status) {
   const el = document.getElementById('sync-status-indicator');
   if (!el) return;
-  const { texto, cor } = _textoStatusSync(status);
-  el.innerHTML = `<span style="color:${cor}">${texto}</span>`;
+  el.innerHTML = _spanStatusSync(status);
 }

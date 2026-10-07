@@ -8,6 +8,7 @@
 // ============================================================
 import { char } from './estado.js';
 // Estado de colapso das seções do inventário (sobrevive a re-renders parciais)
+// Os espaços criados pelo jogador entram aqui com a chave `local_<id>` (valor true = recolhido).
 export const _secoesInvColapsadas = { equipados: false, mochila: false, esgotados: false };
 // Estado de colapso da seção de Detalhes
 export let _detalhesColapsada = false;
@@ -24,6 +25,10 @@ export function _carregarEstadoColapso() {
   _secoesInvColapsadas.equipados = false;
   _secoesInvColapsadas.mochila = false;
   _secoesInvColapsadas.esgotados = false;
+  // Espaços criados: o estado de outro personagem não vaza para este.
+  for (const chave of Object.keys(_secoesInvColapsadas)) {
+    if (chave.startsWith('local_')) delete _secoesInvColapsadas[chave];
+  }
   _detalhesColapsada = false;
   _truquesColapsados = true;
   try {
@@ -33,6 +38,9 @@ export function _carregarEstadoColapso() {
     if (typeof estado.equipados === 'boolean') _secoesInvColapsadas.equipados = estado.equipados;
     if (typeof estado.mochila === 'boolean') _secoesInvColapsadas.mochila = estado.mochila;
     if (typeof estado.esgotados === 'boolean') _secoesInvColapsadas.esgotados = estado.esgotados;
+    for (const [chave, valor] of Object.entries(estado.locais || {})) {
+      if (typeof valor === 'boolean') _secoesInvColapsadas[`local_${chave}`] = valor;
+    }
     if (typeof estado.detalhes === 'boolean') _detalhesColapsada = estado.detalhes;
     if (typeof estado.truques === 'boolean') _truquesColapsados = estado.truques;
   } catch (_) { /* ignorar erros de parse */ }
@@ -45,6 +53,9 @@ export function _salvarEstadoColapso() {
       equipados: _secoesInvColapsadas.equipados,
       mochila: _secoesInvColapsadas.mochila,
       esgotados: _secoesInvColapsadas.esgotados,
+      locais: Object.fromEntries(Object.entries(_secoesInvColapsadas)
+        .filter(([chave]) => chave.startsWith('local_'))
+        .map(([chave, valor]) => [chave.slice('local_'.length), valor])),
       detalhes: _detalhesColapsada,
       truques: _truquesColapsados
     }));

@@ -56,6 +56,8 @@ test('local "sem peso": a seção aparece, mover o item tira o peso, voltar devo
   expect(await pesoExibido(page), 'a Corda (5 kg) saiu da conta; a Bolsa (2,3 kg) continua').toBe('2,3');
   expect((await personagemSalvo(page)).inventario[1].local).toBe(idLocal);
 
+  // O item está num espaço recolhido: expande para alcançar o seletor dele.
+  await page.locator(`[data-inv-secao="local_${idLocal}"]`).click();
   await page.selectOption('[data-mover-inv="1"]', '');
   await assentar(page).catch(() => {});
   expect(await pesoExibido(page)).toBe('7,3');
@@ -117,4 +119,30 @@ test('local sem nome é recusado', async ({ context }) => {
   await page.click('#btn-salvar-inv-local');
   await expect(page.locator('#il-erro')).toContainText('Informe um nome');
   expect((await personagemSalvo(page)).inventario_locais ?? []).toHaveLength(0);
+});
+
+test('espaço criado nasce recolhido e o expandir/recolher é lembrado ao recarregar', async ({ context }) => {
+  const { page, erros } = await abrirFicha(context, GUERREIRO, 'regras-inventario-local-recolhe');
+  await assentar(page).catch(() => {});
+  await criarLocal(page, 'Escrita', true);
+  const idLocal = (await personagemSalvo(page)).inventario_locais[0].id;
+  const titulo = page.locator(`[data-inv-secao="local_${idLocal}"]`);
+  const corpo = page.locator(`[data-inv-secao-body="local_${idLocal}"]`);
+
+  await expect(titulo, 'o espaço novo nasce recolhido').toHaveClass(/inv-secao-colapsada/);
+  await expect(corpo).toHaveClass(/inv-secao-body-oculto/);
+
+  await titulo.click();
+  await expect(titulo).not.toHaveClass(/inv-secao-colapsada/);
+  await page.reload();
+  await assentar(page).catch(() => {});
+  await expect(page.locator(`[data-inv-secao="local_${idLocal}"]`), 'expandido fica expandido depois do F5')
+    .not.toHaveClass(/inv-secao-colapsada/);
+
+  await page.locator(`[data-inv-secao="local_${idLocal}"]`).click();
+  await page.reload();
+  await assentar(page).catch(() => {});
+  await expect(page.locator(`[data-inv-secao="local_${idLocal}"]`), 'recolhido fica recolhido depois do F5')
+    .toHaveClass(/inv-secao-colapsada/);
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
