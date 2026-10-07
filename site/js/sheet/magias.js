@@ -14,6 +14,7 @@ import { getEstadoFuria } from './classes/barbaro.js';
 import { renderSecaoPactoBruxo, rotuloEfeitoInvocacaoTruque } from './classes/bruxo.js';
 import { interceptarConvocarFamiliar, registrarFamiliarPendente } from './familiar.js';
 import { motivoSemConjuracaoEmForma } from './forma-selvagem.js';
+import { limitesDosDados, valorPelaMedia, valorPelosDados } from '../regras-pv-dados.js';
 import { aposConjurarMagia } from './necromante.js';
 import { gastarPontosFeiticaria, getEstadoRecursosFeiticeiro } from './classes/feiticeiro.js';
 import { getCavaleiroMisticoConjuracao } from './classes/guerreiro.js';
@@ -1552,7 +1553,7 @@ const MAGIAS_EFEITO = {
   'Lentidão':         { tipo_efeito: null, concentracao: true, permite_self: false, permite_outro: true, rotulo: 'Apenas inimigos' },
 
   // --- PV Temporarios ---
-  'Vitalidade Vazia': { tipo: 'pv_temp', media: 9, concentracao: false, permite_self: true, permite_outro: false, rotulo: 'PV Temp: 2d4+4 (média 9)' },
+  'Vitalidade Vazia': { tipo: 'pv_temp', dados_pv: { quantidade: 2, faces: 4, fixo: 4, por_circulo: 5, base_circulo: 1, rotulo: 'PV Temporários', formula: '2d4 + 4 (+5 por círculo acima do 1º)' }, concentracao: false, permite_self: true, permite_outro: false, rotulo: 'PV Temp: 2d4+4 (média 9)' },
 
   // --- Reflexos (copias ilusorias) ---
   'Reflexos': { tipo: 'reflexos', copias: 3, concentracao: false, permite_self: true, permite_outro: false, rotulo: '3 Cópias Ilusórias' },
@@ -1657,8 +1658,8 @@ const MAGIAS_EFEITO = {
     { tipo: 'resistencia', tipos_dano: ['Venenoso'] },
     { tipo: 'imunidade_condicao', condicao: 'Amedrontado' },
     { tipo: 'imunidade_condicao', condicao: 'Envenenado' },
-    { tipo: 'bonus_pv_max', media: 11 }
-  ], concentracao: false, permite_self: true, permite_outro: true, rotulo: 'Resist. Venenoso + Imunidades + PV máx +2d10 (24h)' }
+    { tipo: 'bonus_pv_max' }
+  ], dados_pv: { quantidade: 2, faces: 10, fixo: 0, rotulo: 'PV máximos', formula: '2d10' }, concentracao: false, permite_self: true, permite_outro: true, rotulo: 'Resist. Venenoso + Imunidades + PV máx +2d10 (24h)' }
 };
 
 // Retorna o nome da magia de concentracao ativa (ou null)
@@ -2085,7 +2086,8 @@ function aplicarEfeitoMagico(nomeMagia, circ, opcoes) {
 
   // --- PV Temporarios ---
   if (tipo === 'pv_temp') {
-    const valor = config.media || 0;
+    // Valor escolhido no modal (média ou dados rolados); sem escolha, a média no círculo usado.
+    const valor = opcoes?.valor_pv ?? (config.dados_pv ? valorPelaMedia(config.dados_pv, circuloNum) : (config.media || 0));
     char.pv_temporario = Math.max(char.pv_temporario || 0, valor);
     return { detalhe: `+${valor} PV Temporários` };
   }
@@ -2240,7 +2242,7 @@ function aplicarEfeitoMagico(nomeMagia, circ, opcoes) {
       } else if (ef.tipo === 'protecao_pv_max') {
         char.efeitos_magicos.push({ nome: nomeMagia, tipo: 'protecao_pv_max', concentracao: concentracao, circulo: circuloNum, rotulo: 'PV máximos protegidos' });
       } else if (ef.tipo === 'bonus_pv_max') {
-        const bonusPV = ef.media || 11;
+        const bonusPV = opcoes?.valor_pv ?? (config.dados_pv ? valorPelaMedia(config.dados_pv, circuloNum) : (ef.media || 11));
         char.pv_max_override = (char.pv_max_override || char.pv_max) + bonusPV;
         char.pv_atual = (char.pv_atual || 0) + bonusPV;
         char.efeitos_magicos.push({ nome: nomeMagia + ' (PV Máx)', tipo: 'bonus_pv_max', valor: bonusPV, concentracao: concentracao, circulo: circuloNum, rotulo: `PV máx +${bonusPV}` });
@@ -2287,12 +2289,39 @@ function rastrearConcentracaoGenerica(nome, circulo) {
 }
 
 /**
+ * Pergunta como calcular os PV de uma magia de dados: pela média ou pela soma que o
+ * jogador rolou. Fechar o modal sem escolher não conjura a magia.
+ * @param {string} nome Nome da magia.
+ * @param {number|string} circ Círculo do espaço gasto.
+ * @param {import('../regras-pv-dados.js').DadosPV & {rotulo: string, formula: string}} d Dados da magia.
+ * @param {(valor: number) => void} aoEscolher Recebe o total de PV escolhido.
+ */
+function perguntarValorDosDados(nome, circ, d, aoEscolher) {
+  const media = valorPelaMedia(d, circ);
+  const { minimo, maximo } = limitesDosDados(d);
+  abrirModal(`${nome}: ${d.rotulo}`, `
+    <p style="font-size:0.9rem">${escHtml(d.rotulo)}: <strong>${escHtml(d.formula)}</strong>. Use a média ou informe o que você rolou.</p>
+    <button class="btn btn-primary" id="btn-pv-media" style="width:100%;margin-bottom:12px">Usar a média (${media})</button>
+    <div class="form-group"><label class="form-label" for="pv-soma-dados">Soma dos dados (${d.quantidade}d${d.faces}, de ${minimo} a ${maximo})</label>
+      <input type="number" class="form-input" id="pv-soma-dados" min="${minimo}" max="${maximo}" inputmode="numeric" style="width:100px"></div>
+    <button class="btn btn-secondary" id="btn-pv-dados">Usar o valor rolado</button>`,
+  '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>');
+  document.getElementById('btn-pv-media')?.addEventListener('click', () => { window.fecharModal(); aoEscolher(media); });
+  document.getElementById('btn-pv-dados')?.addEventListener('click', () => {
+    const valor = valorPelosDados(d, circ, document.getElementById('pv-soma-dados')?.value);
+    if (valor === null) { toast(`Informe a soma dos dados, de ${minimo} a ${maximo}.`, 'error'); return; }
+    window.fecharModal();
+    aoEscolher(valor);
+  });
+}
+
+/**
  * Aplica o efeito em si pedindo antes a seleção que a magia exige (tipo,
  * atributo, variante ou condição a remover), na mesma ordem do fluxo normal
  * de conjuração. `concluir` só roda depois da escolha; fechar o modal sem
  * escolher não aplica o efeito nem chama `concluir`.
  */
-function aplicarEfeitoSelfComSelecao(nome, circulo, config, concluir, podeAplicar = null) {
+function aplicarEfeitoSelfComSelecao(nome, circulo, config, concluir, podeAplicar = null, opcoesEfeito = null) {
   const aplicar = (opcoes) => {
     if (podeAplicar && !podeAplicar()) return;
     aplicarEfeitoMagico(nome, circulo, opcoes);
@@ -2306,8 +2335,11 @@ function aplicarEfeitoSelfComSelecao(nome, circulo, config, concluir, podeAplica
     mostrarModalSelecaoMagia(nome, circulo, Object.keys(config.selecionar_variante), 'Escolher Variante', (v) => aplicar({ variante_selecionada: v }));
   } else if (config.tipo === 'cura_condicao') {
     mostrarModalCuraCondicao(nome, circulo, config.condicoes || config.efeitos || [], (c) => aplicar({ condicao_removida: c }));
+  } else if (config.dados_pv && opcoesEfeito?.valor_pv == null) {
+    perguntarValorDosDados(nome, circulo, config.dados_pv, (valor) => aplicar({ valor_pv: valor }));
   } else {
-    aplicar(undefined);
+    // `opcoesEfeito`: valor já definido por quem conjura (Vigor Ínfero: máximo do dado, sem rolar).
+    aplicar(opcoesEfeito || undefined);
   }
 }
 
@@ -2323,7 +2355,7 @@ function aplicarEfeitoSelfComSelecao(nome, circulo, config, concluir, podeAplica
  * aplicado; devolver false aborta sem efeito, sem concentração e sem toast
  * (quem devolve false é quem avisa o jogador).
  */
-function aplicarConjuracaoSemEspaco(nome, circulo, mensagem, aoConcluir = null, podeAplicar = null) {
+function aplicarConjuracaoSemEspaco(nome, circulo, mensagem, aoConcluir = null, podeAplicar = null, opcoesEfeito = null) {
   const finalizar = () => {
     registrarFamiliarPendente(nome);
     aposConjurarMagia(nome, { circulo: Number(circulo) || 0, comEspaco: false });
@@ -2341,7 +2373,7 @@ function aplicarConjuracaoSemEspaco(nome, circulo, mensagem, aoConcluir = null, 
         // Em outra criatura, `aplicarEfeitoMagico` não entra -- a
         // concentração ainda precisa ser registrada aqui.
         if (alvo === 'self') {
-          aplicarEfeitoSelfComSelecao(nome, circulo, config, finalizar, podeAplicar);
+          aplicarEfeitoSelfComSelecao(nome, circulo, config, finalizar, podeAplicar, opcoesEfeito);
         } else {
           if (podeAplicar && !podeAplicar()) return;
           rastrearConcentracaoGenerica(nome, circulo);
@@ -2351,7 +2383,7 @@ function aplicarConjuracaoSemEspaco(nome, circulo, mensagem, aoConcluir = null, 
       return;
     }
     if (autoSelf) {
-      aplicarEfeitoSelfComSelecao(nome, circulo, config, finalizar, podeAplicar);
+      aplicarEfeitoSelfComSelecao(nome, circulo, config, finalizar, podeAplicar, opcoesEfeito);
       return;
     }
   }
@@ -2380,15 +2412,17 @@ function aplicarConjuracaoSemEspaco(nome, circulo, mensagem, aoConcluir = null, 
  *   chama. Sem ela, a ficha é renderizada e `mensagem` aparece em toast.
  * @param {Function|null} [podeAplicar] confirmação imediatamente antes do
  *   efeito; false aborta a conjuração (ver `aplicarConjuracaoSemEspaco`)
+ * @param {object|null} [opcoesEfeito] opções já decididas para o efeito (ex.:
+ *   `{ valor_pv }`), que dispensam a pergunta ao jogador
  */
-export function conjurarSemEspaco(nome, circulo, mensagem, aoConcluir = null, podeAplicar = null) {
+export function conjurarSemEspaco(nome, circulo, mensagem, aoConcluir = null, podeAplicar = null, opcoesEfeito = null) {
   const concentracaoAtiva = getConcentracaoAtiva();
   if (ehMagiaConcentracao(nome) && concentracaoAtiva && concentracaoAtiva !== nome) {
     confirmarSubstituirConcentracao(concentracaoAtiva, nome,
-      () => aplicarConjuracaoSemEspaco(nome, circulo, mensagem, aoConcluir, podeAplicar));
+      () => aplicarConjuracaoSemEspaco(nome, circulo, mensagem, aoConcluir, podeAplicar, opcoesEfeito));
     return;
   }
-  aplicarConjuracaoSemEspaco(nome, circulo, mensagem, aoConcluir, podeAplicar);
+  aplicarConjuracaoSemEspaco(nome, circulo, mensagem, aoConcluir, podeAplicar, opcoesEfeito);
 }
 
 /**
@@ -2737,6 +2771,9 @@ export function setupEventosEspacosMagia() {
             mostrarModalCuraCondicao(nome, circ, lista, (c) => {
               _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, { condicao_removida: c }, _metasAplicadas, _opcoesMetaConj, _fonteEscolhida);
             });
+          } else if (config.dados_pv) {
+            perguntarValorDosDados(nome, circ, config.dados_pv, (valor) =>
+              _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, { valor_pv: valor }, _metasAplicadas, _opcoesMetaConj, _fonteEscolhida));
           } else {
             _executarConjuracao(nome, circ, btn.dataset.conjCirc, true, undefined, _metasAplicadas, _opcoesMetaConj, _fonteEscolhida);
           }

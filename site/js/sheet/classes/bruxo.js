@@ -1242,7 +1242,7 @@ export function conjurarPorInvocacao(nomeInvocacao, magia, circulo) {
       toast(regra.pvTempMaximo
         ? `${magia} conjurada: ${regra.pvTempMaximo} PV Temporários (máximo do dado).`
         : `${magia} conjurada (via ${nomeInvocacao}, sem gastar espaço).`, 'success');
-    });
+    }, null, regra.pvTempMaximo ? { valor_pv: regra.pvTempMaximo } : null);
   };
   if (!regra.condicao) { executar(); return; }
   abrirModal(nomeInvocacao, `<p>${regra.condicao}</p>`,

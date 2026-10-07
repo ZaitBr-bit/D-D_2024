@@ -13,13 +13,37 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.3.4';
+export const VERSAO_ATUAL = '3.3.5';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.3.5',
+    data: '2026-10-07',
+    rotulo: 'PV por dados',
+    resumo: 'Vitalidade Vazia e Banquete de Heróis perguntam se você usa a '
+      + 'média ou os dados que rolou.',
+    melhorias: [
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'Vitalidade Vazia ignorava o círculo superior: agora soma +5 PV '
+            + 'temporários por círculo acima do 1º (média 9, 14, 19).',
+        ],
+      },
+      {
+        grupo: '✨ Melhorias',
+        itens: [
+          'Vitalidade Vazia e Banquete de Heróis perguntam ao conjurar se '
+            + 'você quer a média ou informar a soma dos dados que rolou (o '
+            + 'app soma a parte fixa). Antes aplicavam sempre a média.',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.3.4',
     data: '2026-10-07',
