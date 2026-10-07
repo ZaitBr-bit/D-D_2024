@@ -1,0 +1,1539 @@
+{
+  "total": 23,
+  "criaturas": [
+    {
+      "nome": "Urso das Cavernas",
+      "nome_en": "Cave Bear",
+      "fonte": "monstros",
+      "pagina": 295,
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "13",
+      "iniciativa": "+2 (12)",
+      "pv": "66 (7d10 + 28)",
+      "deslocamento": "12 m, Escalada 9 m",
+      "atributos": {
+        "For": {
+          "valor": "20",
+          "modificador": "+5",
+          "salvaguarda": "+5"
+        },
+        "Des": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Con": {
+          "valor": "18",
+          "modificador": "+4",
+          "salvaguarda": "+4"
+        },
+        "Int": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Sab": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Car": {
+          "valor": "7",
+          "modificador": "-2",
+          "salvaguarda": "-2"
+        }
+      },
+      "pericias": "Percepção +5",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 15",
+      "idiomas": "—",
+      "nd": "3 (XP 700; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Ataques Múltiplos",
+          "descricao": "O urso realiza três ataques de Rasgar."
+        },
+        {
+          "nome": "Rasgar",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +7 para acertar, alcance 1,5 m. *Dano:* 10 (1d10 + 5) Cortante."
+        }
+      ],
+      "acoes_bonus": [],
+      "reacoes": [],
+      "texto_completo": "## Urso das Cavernas\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 13\n\n**Iniciativa** +2 (12)\n\n**PV** 66 (7d10 + 28)\n\n**Deslocamento** 12 m, Escalada 9 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 20 | +5 | +5 | **Des** | 14 | +2 | +2 | **Con** | 18 | +4 | +4 |\n| **Int** | 2 | -4 | -4 | **Sab** | 13 | +1 | +1 | **Car** | 7 | -2 | -2 |\n\n**Perícias** Percepção +5\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 15\n\n**Idiomas** —\n\n**ND** 3 (XP 700; BP +2)\n\n### Ações\n\n**Ataques Múltiplos.** O urso realiza três ataques de Rasgar.\n\n**Rasgar.** *Jogada de Ataque Corpo a Corpo:* +7 para acertar, alcance 1,5 m. *Dano:* 10 (1d10 + 5) Cortante."
+    },
+    {
+      "nome": "Urso Atroz",
+      "nome_en": "Dire Bear",
+      "fonte": "monstros",
+      "pagina": 295,
+      "tipo_tamanho": "Fera Enorme, Sem Alinhamento",
+      "ca": "14",
+      "iniciativa": "+2 (12)",
+      "pv": "105 (10d12 + 50)",
+      "deslocamento": "12 m, Escalada 9 m",
+      "atributos": {
+        "For": {
+          "valor": "23",
+          "modificador": "+6",
+          "salvaguarda": "+6"
+        },
+        "Des": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Con": {
+          "valor": "21",
+          "modificador": "+5",
+          "salvaguarda": "+5"
+        },
+        "Int": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Sab": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Car": {
+          "valor": "7",
+          "modificador": "-2",
+          "salvaguarda": "-2"
+        }
+      },
+      "pericias": "Percepção +8",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 18",
+      "idiomas": "—",
+      "nd": "5 (XP 1.800; BP +3)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Ataques Múltiplos",
+          "descricao": "O urso realiza três ataques de Rasgar."
+        },
+        {
+          "nome": "Rasgar",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +9 para acertar, alcance 3 m. *Dano:* 13 (2d6 + 6) Cortante."
+        }
+      ],
+      "acoes_bonus": [
+        {
+          "nome": "Rugido Intimidador",
+          "descricao": "*Salvaguarda de Sabedoria:* CD 16, cada inimigo em uma Emanação de 18 metros com origem no urso. *Falha:* O alvo tem a condição Amedrontado até o fim do próximo turno do urso. *Sucesso:* O alvo fica imune ao Rugido Intimidador deste urso por 24 horas."
+        }
+      ],
+      "reacoes": [],
+      "texto_completo": "## Urso Atroz\n\n*Fera Enorme, Sem Alinhamento*\n\n**CA** 14\n\n**Iniciativa** +2 (12)\n\n**PV** 105 (10d12 + 50)\n\n**Deslocamento** 12 m, Escalada 9 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 23 | +6 | +6 | **Des** | 14 | +2 | +2 | **Con** | 21 | +5 | +5 |\n| **Int** | 2 | -4 | -4 | **Sab** | 14 | +2 | +2 | **Car** | 7 | -2 | -2 |\n\n**Perícias** Percepção +8\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 18\n\n**Idiomas** —\n\n**ND** 5 (XP 1.800; BP +3)\n\n### Ações\n\n**Ataques Múltiplos.** O urso realiza três ataques de Rasgar.\n\n**Rasgar.** *Jogada de Ataque Corpo a Corpo:* +9 para acertar, alcance 3 m. *Dano:* 13 (2d6 + 6) Cortante.\n\n### Ações Bônus\n\n**Rugido Intimidador.** *Salvaguarda de Sabedoria:* CD 16, cada inimigo em uma Emanação de 18 metros com origem no urso. *Falha:* O alvo tem a condição Amedrontado até o fim do próximo turno do urso. *Sucesso:* O alvo fica imune ao Rugido Intimidador deste urso por 24 horas."
+    },
+    {
+      "nome": "Rato Atroz",
+      "nome_en": "Dire Rat",
+      "fonte": "monstros",
+      "pagina": 296,
+      "tipo_tamanho": "Fera Média, Sem Alinhamento",
+      "ca": "14",
+      "iniciativa": "+3 (13)",
+      "pv": "16 (3d8 + 3)",
+      "deslocamento": "9 m, Escalada 6 m",
+      "atributos": {
+        "For": {
+          "valor": "11",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Des": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Con": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Int": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Sab": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Car": {
+          "valor": "4",
+          "modificador": "-3",
+          "salvaguarda": "-3"
+        }
+      },
+      "pericias": "Percepção +3",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 13",
+      "idiomas": "—",
+      "nd": "1/4 (XP 50; BP +2)",
+      "tracos": [
+        {
+          "nome": "Tática de Matilha",
+          "descricao": "O rato tem Vantagem em uma jogada de ataque contra uma criatura se pelo menos um aliado do rato estiver a até 1,5 metro da criatura e o aliado não tiver a condição Incapacitado."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 6 (1d6 + 3) Perfurante."
+        }
+      ],
+      "acoes_bonus": [],
+      "reacoes": [],
+      "texto_completo": "## Rato Atroz\n\n*Fera Média, Sem Alinhamento*\n\n**CA** 14\n\n**Iniciativa** +3 (13)\n\n**PV** 16 (3d8 + 3)\n\n**Deslocamento** 9 m, Escalada 6 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 11 | +0 | +0 | **Des** | 16 | +3 | +3 | **Con** | 13 | +1 | +1 |\n| **Int** | 2 | -4 | -4 | **Sab** | 12 | +1 | +1 | **Car** | 4 | -3 | -3 |\n\n**Perícias** Percepção +3\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 13\n\n**Idiomas** —\n\n**ND** 1/4 (XP 50; BP +2)\n\n### Traços\n\n**Tática de Matilha.** O rato tem Vantagem em uma jogada de ataque contra uma criatura se pelo menos um aliado do rato estiver a até 1,5 metro da criatura e o aliado não tiver a condição Incapacitado.\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 6 (1d6 + 3) Perfurante."
+    },
+    {
+      "nome": "Formiga-Soldado Gigante",
+      "nome_en": "Giant Army Ant",
+      "fonte": "monstros",
+      "pagina": 296,
+      "tipo_tamanho": "Fera Pequena, Sem Alinhamento",
+      "ca": "13",
+      "iniciativa": "+0 (10)",
+      "pv": "11 (2d6 + 4)",
+      "deslocamento": "9 m, Escalada 9 m",
+      "atributos": {
+        "For": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Des": {
+          "valor": "10",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Con": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Int": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Sab": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Car": {
+          "valor": "3",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        }
+      },
+      "pericias": "Percepção +5",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 15",
+      "idiomas": "—",
+      "nd": "1/4 (XP 50; BP +2)",
+      "tracos": [
+        {
+          "nome": "Tática de Matilha",
+          "descricao": "A formiga tem Vantagem em uma jogada de ataque contra uma criatura se pelo menos um aliado da formiga estiver a até 1,5 metro da criatura e o aliado não tiver a condição Incapacitado."
+        },
+        {
+          "nome": "Escalada de Aranha",
+          "descricao": "A criatura pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +3 para acertar, alcance 1,5 m. *Dano:* 4 (1d6 + 1) Perfurante."
+        },
+        {
+          "nome": "Ferrão",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +3 para acertar, alcance 1,5 m. *Dano:* 2 Perfurante, e o alvo tem a condição Envenenado até o fim do próximo turno da formiga."
+        }
+      ],
+      "acoes_bonus": [],
+      "reacoes": [],
+      "texto_completo": "## Formiga-Soldado Gigante\n\n*Fera Pequena, Sem Alinhamento*\n\n**CA** 13\n\n**Iniciativa** +0 (10)\n\n**PV** 11 (2d6 + 4)\n\n**Deslocamento** 9 m, Escalada 9 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 12 | +1 | +1 | **Des** | 10 | +0 | +0 | **Con** | 14 | +2 | +2 |\n| **Int** | 2 | -4 | -4 | **Sab** | 12 | +1 | +1 | **Car** | 3 | -4 | -4 |\n\n**Perícias** Percepção +5\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 15\n\n**Idiomas** —\n\n**ND** 1/4 (XP 50; BP +2)\n\n### Traços\n\n**Tática de Matilha.** A formiga tem Vantagem em uma jogada de ataque contra uma criatura se pelo menos um aliado da formiga estiver a até 1,5 metro da criatura e o aliado não tiver a condição Incapacitado.\n\n**Escalada de Aranha.** A criatura pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo.\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +3 para acertar, alcance 1,5 m. *Dano:* 4 (1d6 + 1) Perfurante.\n\n**Ferrão.** *Jogada de Ataque Corpo a Corpo:* +3 para acertar, alcance 1,5 m. *Dano:* 2 Perfurante, e o alvo tem a condição Envenenado até o fim do próximo turno da formiga."
+    },
+    {
+      "nome": "Percevejo-Assassino Gigante",
+      "nome_en": "Giant Assassin Bug",
+      "fonte": "monstros",
+      "pagina": 296,
+      "tipo_tamanho": "Fera Média, Sem Alinhamento",
+      "ca": "14",
+      "iniciativa": "+2 (12)",
+      "pv": "16 (3d8 + 3)",
+      "deslocamento": "9 m, Escalada 6 m",
+      "atributos": {
+        "For": {
+          "valor": "10",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Des": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Con": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Int": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Sab": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Car": {
+          "valor": "3",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        }
+      },
+      "pericias": "Furtividade +4",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 11",
+      "idiomas": "—",
+      "nd": "1/2 (XP 100; BP +2)",
+      "tracos": [
+        {
+          "nome": "Escalada de Aranha",
+          "descricao": "A criatura pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Probóscide",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 5 (1d6 + 2) Perfurante, o percevejo se prende ao alvo, e o alvo fica sujeito ao seguinte efeito. *Salvaguarda de Constituição:* CD 11. *Falha:* O alvo tem a condição Envenenado e repete a salvaguarda ao final de cada um de seus turnos, encerrando o efeito sobre si com um sucesso. Após 1 minuto, ele é bem-sucedido automaticamente. Enquanto Envenenado, o alvo tem a condição Paralisado. Enquanto estiver preso, o percevejo não pode realizar ataques de Probóscide, e o alvo sofre 5 (2d4) de dano Necrótico no início de cada turno do percevejo. O percevejo pode se soltar gastando 1,5 metro de seu deslocamento. O alvo ou uma criatura a até 1,5 metro dele pode soltar o percevejo com uma ação."
+        }
+      ],
+      "acoes_bonus": [],
+      "reacoes": [],
+      "texto_completo": "## Percevejo-Assassino Gigante\n\n*Fera Média, Sem Alinhamento*\n\n**CA** 14\n\n**Iniciativa** +2 (12)\n\n**PV** 16 (3d8 + 3)\n\n**Deslocamento** 9 m, Escalada 6 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 10 | +0 | +0 | **Des** | 14 | +2 | +2 | **Con** | 12 | +1 | +1 |\n| **Int** | 2 | -4 | -4 | **Sab** | 12 | +1 | +1 | **Car** | 3 | -4 | -4 |\n\n**Perícias** Furtividade +4\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 11\n\n**Idiomas** —\n\n**ND** 1/2 (XP 100; BP +2)\n\n### Traços\n\n**Escalada de Aranha.** A criatura pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo.\n\n### Ações\n\n**Probóscide.** *Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 5 (1d6 + 2) Perfurante, o percevejo se prende ao alvo, e o alvo fica sujeito ao seguinte efeito. *Salvaguarda de Constituição:* CD 11. *Falha:* O alvo tem a condição Envenenado e repete a salvaguarda ao final de cada um de seus turnos, encerrando o efeito sobre si com um sucesso. Após 1 minuto, ele é bem-sucedido automaticamente. Enquanto Envenenado, o alvo tem a condição Paralisado. Enquanto estiver preso, o percevejo não pode realizar ataques de Probóscide, e o alvo sofre 5 (2d4) de dano Necrótico no início de cada turno do percevejo. O percevejo pode se soltar gastando 1,5 metro de seu deslocamento. O alvo ou uma criatura a até 1,5 metro dele pode soltar o percevejo com uma ação."
+    },
+    {
+      "nome": "Sanguessuga Gigante",
+      "nome_en": "Giant Leech",
+      "fonte": "monstros",
+      "pagina": 297,
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "11",
+      "iniciativa": "-1 (9)",
+      "pv": "45 (6d10 + 12)",
+      "deslocamento": "6 m, Natação 9 m",
+      "atributos": {
+        "For": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Des": {
+          "valor": "8",
+          "modificador": "-1",
+          "salvaguarda": "-1"
+        },
+        "Con": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Int": {
+          "valor": "1",
+          "modificador": "-5",
+          "salvaguarda": "-5"
+        },
+        "Sab": {
+          "valor": "8",
+          "modificador": "-1",
+          "salvaguarda": "-1"
+        },
+        "Car": {
+          "valor": "3",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        }
+      },
+      "pericias": "",
+      "sentidos": "Visão às Cegas 9 m, Sismiconsciência 18 m, Percepção Passiva 9",
+      "idiomas": "—",
+      "nd": "1 (XP 200; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 7 (1d8 + 3) Perfurante, e a sanguessuga se prende ao alvo. Enquanto estiver presa, a sanguessuga não pode realizar ataques de Mordida, o alvo tem a condição Imobilizado (CD 13 para escapar) e sofre 7 (1d8 + 3) de dano Necrótico no início de cada turno da sanguessuga. A sanguessuga pode se soltar gastando 1,5 metro de seu deslocamento."
+        }
+      ],
+      "acoes_bonus": [],
+      "reacoes": [],
+      "texto_completo": "## Sanguessuga Gigante\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 11\n\n**Iniciativa** -1 (9)\n\n**PV** 45 (6d10 + 12)\n\n**Deslocamento** 6 m, Natação 9 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 16 | +3 | +3 | **Des** | 8 | -1 | -1 | **Con** | 14 | +2 | +2 |\n| **Int** | 1 | -5 | -5 | **Sab** | 8 | -1 | -1 | **Car** | 3 | -4 | -4 |\n\n**Sentidos** Visão às Cegas 9 m, Sismiconsciência 18 m, Percepção Passiva 9\n\n**Idiomas** —\n\n**ND** 1 (XP 200; BP +2)\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 7 (1d8 + 3) Perfurante, e a sanguessuga se prende ao alvo. Enquanto estiver presa, a sanguessuga não pode realizar ataques de Mordida, o alvo tem a condição Imobilizado (CD 13 para escapar) e sofre 7 (1d8 + 3) de dano Necrótico no início de cada turno da sanguessuga. A sanguessuga pode se soltar gastando 1,5 metro de seu deslocamento."
+    },
+    {
+      "nome": "Mosca-Ladra Gigante",
+      "nome_en": "Giant Robber Fly",
+      "fonte": "monstros",
+      "pagina": 298,
+      "tipo_tamanho": "Fera Média, Sem Alinhamento",
+      "ca": "13",
+      "iniciativa": "+4 (14)",
+      "pv": "22 (4d8 + 4)",
+      "deslocamento": "3 m, Voo 18 m",
+      "atributos": {
+        "For": {
+          "valor": "10",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Des": {
+          "valor": "18",
+          "modificador": "+4",
+          "salvaguarda": "+4"
+        },
+        "Con": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Int": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Sab": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Car": {
+          "valor": "3",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        }
+      },
+      "pericias": "Percepção +6, Furtividade +8",
+      "sentidos": "Percepção Passiva 16",
+      "idiomas": "—",
+      "nd": "1 (XP 200; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Probóscide",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +6 para acertar, alcance 1,5 m. *Dano:* 7 (1d6 + 4) Perfurante, a mosca se prende ao alvo, e o alvo fica sujeito ao seguinte efeito. *Salvaguarda de Constituição:* CD 11. *Falha:* O alvo tem a condição Envenenado e repete a salvaguarda ao final de cada um de seus turnos, encerrando o efeito sobre si com um sucesso. Após 1 minuto, ele é bem-sucedido automaticamente. Enquanto Envenenado, o alvo tem a condição Paralisado. Enquanto estiver presa, a mosca não pode realizar ataques de Probóscide, e o alvo sofre 7 (2d6) de dano Necrótico no início de cada turno da mosca. A mosca pode se soltar gastando 1,5 metro de seu deslocamento. O alvo ou uma criatura a até 1,5 metro dele pode soltar a mosca com uma ação."
+        }
+      ],
+      "acoes_bonus": [],
+      "reacoes": [],
+      "texto_completo": "## Mosca-Ladra Gigante\n\n*Fera Média, Sem Alinhamento*\n\n**CA** 13\n\n**Iniciativa** +4 (14)\n\n**PV** 22 (4d8 + 4)\n\n**Deslocamento** 3 m, Voo 18 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 10 | +0 | +0 | **Des** | 18 | +4 | +4 | **Con** | 12 | +1 | +1 |\n| **Int** | 2 | -4 | -4 | **Sab** | 14 | +2 | +2 | **Car** | 3 | -4 | -4 |\n\n**Perícias** Percepção +6, Furtividade +8\n\n**Sentidos** Percepção Passiva 16\n\n**Idiomas** —\n\n**ND** 1 (XP 200; BP +2)\n\n### Ações\n\n**Probóscide.** *Jogada de Ataque Corpo a Corpo:* +6 para acertar, alcance 1,5 m. *Dano:* 7 (1d6 + 4) Perfurante, a mosca se prende ao alvo, e o alvo fica sujeito ao seguinte efeito. *Salvaguarda de Constituição:* CD 11. *Falha:* O alvo tem a condição Envenenado e repete a salvaguarda ao final de cada um de seus turnos, encerrando o efeito sobre si com um sucesso. Após 1 minuto, ele é bem-sucedido automaticamente. Enquanto Envenenado, o alvo tem a condição Paralisado. Enquanto estiver presa, a mosca não pode realizar ataques de Probóscide, e o alvo sofre 7 (2d6) de dano Necrótico no início de cada turno da mosca. A mosca pode se soltar gastando 1,5 metro de seu deslocamento. O alvo ou uma criatura a até 1,5 metro dele pode soltar a mosca com uma ação."
+    },
+    {
+      "nome": "Besouro-Tigre Gigante",
+      "nome_en": "Giant Tiger Beetle",
+      "fonte": "monstros",
+      "pagina": 299,
+      "tipo_tamanho": "Fera Média, Sem Alinhamento",
+      "ca": "15",
+      "iniciativa": "+3 (13)",
+      "pv": "22 (4d8 + 4)",
+      "deslocamento": "12 m",
+      "atributos": {
+        "For": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Des": {
+          "valor": "17",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Con": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Int": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Sab": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Car": {
+          "valor": "3",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        }
+      },
+      "pericias": "Furtividade +5",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 11",
+      "idiomas": "—",
+      "nd": "1 (XP 200; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 8 (2d4 + 3) Perfurante. Se o alvo for Médio ou menor, ele tem a condição Imobilizado (CD 12 para escapar)."
+        }
+      ],
+      "acoes_bonus": [
+        {
+          "nome": "Pés Leves",
+          "descricao": "O besouro realiza a ação Correr ou Desengajar."
+        }
+      ],
+      "reacoes": [],
+      "texto_completo": "## Besouro-Tigre Gigante\n\n*Fera Média, Sem Alinhamento*\n\n**CA** 15\n\n**Iniciativa** +3 (13)\n\n**PV** 22 (4d8 + 4)\n\n**Deslocamento** 12 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 14 | +2 | +2 | **Des** | 17 | +3 | +3 | **Con** | 12 | +1 | +1 |\n| **Int** | 2 | -4 | -4 | **Sab** | 12 | +1 | +1 | **Car** | 3 | -4 | -4 |\n\n**Perícias** Furtividade +5\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 11\n\n**Idiomas** —\n\n**ND** 1 (XP 200; BP +2)\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 8 (2d4 + 3) Perfurante. Se o alvo for Médio ou menor, ele tem a condição Imobilizado (CD 12 para escapar).\n\n### Ações Bônus\n\n**Pés Leves.** O besouro realiza a ação Correr ou Desengajar."
+    },
+    {
+      "nome": "Sapo-Boi Gigante",
+      "nome_en": "Giant Bullfrog",
+      "fonte": "monstros",
+      "pagina": 297,
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "14",
+      "iniciativa": "+1 (11)",
+      "pv": "68 (8d10 + 24)",
+      "deslocamento": "9 m, Natação 9 m",
+      "atributos": {
+        "For": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Des": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Con": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Int": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Sab": {
+          "valor": "10",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Car": {
+          "valor": "3",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        }
+      },
+      "pericias": "Percepção +2, Furtividade +5",
+      "sentidos": "Visão no Escuro 9 m, Percepção Passiva 12",
+      "idiomas": "—",
+      "nd": "2 (XP 450; BP +2)",
+      "tracos": [
+        {
+          "nome": "Anfíbio",
+          "descricao": "O sapo pode respirar ar e água."
+        },
+        {
+          "nome": "Salto Parado",
+          "descricao": "O Salto em Distância do sapo é de até 9 metros e o Salto em Altura é de até 4,5 metros, com ou sem corrida."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 12 (2d8 + 3) Perfurante. Se o alvo for Médio ou menor, ele tem a condição Imobilizado (CD 13 para escapar)."
+        },
+        {
+          "nome": "Engolir",
+          "descricao": "O sapo engole um alvo Médio ou menor que ele esteja imobilizando. Enquanto engolido, o alvo não tem a condição Imobilizado, mas tem as condições Cego e Contido, e tem Cobertura Total contra ataques e outros efeitos fora do sapo. Enquanto estiver engolindo o alvo, o sapo não pode usar Mordida nem Língua, e se o sapo morrer, o alvo engolido deixa de ter a condição Contido e pode escapar do cadáver gastando 1,5 metro de deslocamento, saindo com a condição Caído. Ao final do próximo turno do sapo, o alvo engolido sofre 9 (2d8) de dano Ácido. Se esse dano não o matar, o sapo o regurgita, fazendo-o sair Caído."
+        }
+      ],
+      "acoes_bonus": [
+        {
+          "nome": "Língua",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 4,5 m. *Acerto:* Se o alvo for uma criatura Média ou menor, o sapo puxa o alvo 3 metros em linha reta em sua direção."
+        }
+      ],
+      "reacoes": [],
+      "texto_completo": "## Sapo-Boi Gigante\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 14\n\n**Iniciativa** +1 (11)\n\n**PV** 68 (8d10 + 24)\n\n**Deslocamento** 9 m, Natação 9 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 16 | +3 | +3 | **Des** | 13 | +1 | +1 | **Con** | 16 | +3 | +3 |\n| **Int** | 2 | -4 | -4 | **Sab** | 10 | +0 | +0 | **Car** | 3 | -4 | -4 |\n\n**Perícias** Percepção +2, Furtividade +5\n\n**Sentidos** Visão no Escuro 9 m, Percepção Passiva 12\n\n**Idiomas** —\n\n**ND** 2 (XP 450; BP +2)\n\n### Traços\n\n**Anfíbio.** O sapo pode respirar ar e água.\n\n**Salto Parado.** O Salto em Distância do sapo é de até 9 metros e o Salto em Altura é de até 4,5 metros, com ou sem corrida.\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 12 (2d8 + 3) Perfurante. Se o alvo for Médio ou menor, ele tem a condição Imobilizado (CD 13 para escapar).\n\n**Engolir.** O sapo engole um alvo Médio ou menor que ele esteja imobilizando. Enquanto engolido, o alvo não tem a condição Imobilizado, mas tem as condições Cego e Contido, e tem Cobertura Total contra ataques e outros efeitos fora do sapo. Enquanto estiver engolindo o alvo, o sapo não pode usar Mordida nem Língua, e se o sapo morrer, o alvo engolido deixa de ter a condição Contido e pode escapar do cadáver gastando 1,5 metro de deslocamento, saindo com a condição Caído. Ao final do próximo turno do sapo, o alvo engolido sofre 9 (2d8) de dano Ácido. Se esse dano não o matar, o sapo o regurgita, fazendo-o sair Caído.\n\n### Ações Bônus\n\n**Língua.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 4,5 m. *Acerto:* Se o alvo for uma criatura Média ou menor, o sapo puxa o alvo 3 metros em linha reta em sua direção."
+    },
+    {
+      "nome": "Cecília Gigante",
+      "nome_en": "Giant Caecilia",
+      "fonte": "monstros",
+      "pagina": 297,
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "12",
+      "iniciativa": "-1 (9)",
+      "pv": "51 (6d10 + 18)",
+      "deslocamento": "6 m, Escavação 3 m, Natação 6 m",
+      "atributos": {
+        "For": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Des": {
+          "valor": "9",
+          "modificador": "-1",
+          "salvaguarda": "-1"
+        },
+        "Con": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Int": {
+          "valor": "1",
+          "modificador": "-5",
+          "salvaguarda": "-5"
+        },
+        "Sab": {
+          "valor": "8",
+          "modificador": "-1",
+          "salvaguarda": "-1"
+        },
+        "Car": {
+          "valor": "3",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        }
+      },
+      "pericias": "",
+      "sentidos": "Visão às Cegas 9 m, Sismiconsciência 18 m, Percepção Passiva 9",
+      "idiomas": "—",
+      "nd": "2 (XP 450; BP +2)",
+      "tracos": [
+        {
+          "nome": "Anfíbia",
+          "descricao": "A cecília pode respirar ar e água."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 13 (3d6 + 3) Perfurante mais 7 (2d6) Venenoso. Se o alvo for Médio ou menor, ele tem a condição Imobilizado (CD 13 para escapar)."
+        }
+      ],
+      "acoes_bonus": [
+        {
+          "nome": "Engolir",
+          "descricao": "*Salvaguarda de Força:* CD 13, uma criatura Média ou menor Imobilizada pela cecília (ela pode ter até duas criaturas engolidas por vez). *Falha:* O alvo é engolido pela cecília, e a condição Imobilizado termina. Uma criatura engolida tem as condições Cego e Contido, tem Cobertura Total contra ataques e outros efeitos fora da cecília e sofre 10 (3d6) de dano Ácido no início de cada turno da cecília. Se a cecília sofrer 10 de dano ou mais em um único turno de uma criatura dentro dela, ela deve ser bem-sucedida em uma salvaguarda de Constituição CD 13 ao final desse turno ou regurgita todas as criaturas engolidas, cada uma caindo em um espaço a até 1,5 metro da cecília e tendo a condição Caído. Se a cecília morrer, qualquer criatura engolida deixa de ter a condição Contido e pode escapar do cadáver gastando 1,5 metro de deslocamento, saindo Caída."
+        }
+      ],
+      "reacoes": [],
+      "texto_completo": "## Cecília Gigante\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 12\n\n**Iniciativa** -1 (9)\n\n**PV** 51 (6d10 + 18)\n\n**Deslocamento** 6 m, Escavação 3 m, Natação 6 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 16 | +3 | +3 | **Des** | 9 | -1 | -1 | **Con** | 16 | +3 | +3 |\n| **Int** | 1 | -5 | -5 | **Sab** | 8 | -1 | -1 | **Car** | 3 | -4 | -4 |\n\n**Sentidos** Visão às Cegas 9 m, Sismiconsciência 18 m, Percepção Passiva 9\n\n**Idiomas** —\n\n**ND** 2 (XP 450; BP +2)\n\n### Traços\n\n**Anfíbia.** A cecília pode respirar ar e água.\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 13 (3d6 + 3) Perfurante mais 7 (2d6) Venenoso. Se o alvo for Médio ou menor, ele tem a condição Imobilizado (CD 13 para escapar).\n\n### Ações Bônus\n\n**Engolir.** *Salvaguarda de Força:* CD 13, uma criatura Média ou menor Imobilizada pela cecília (ela pode ter até duas criaturas engolidas por vez). *Falha:* O alvo é engolido pela cecília, e a condição Imobilizado termina. Uma criatura engolida tem as condições Cego e Contido, tem Cobertura Total contra ataques e outros efeitos fora da cecília e sofre 10 (3d6) de dano Ácido no início de cada turno da cecília. Se a cecília sofrer 10 de dano ou mais em um único turno de uma criatura dentro dela, ela deve ser bem-sucedida em uma salvaguarda de Constituição CD 13 ao final desse turno ou regurgita todas as criaturas engolidas, cada uma caindo em um espaço a até 1,5 metro da cecília e tendo a condição Caído. Se a cecília morrer, qualquer criatura engolida deixa de ter a condição Contido e pode escapar do cadáver gastando 1,5 metro de deslocamento, saindo Caída."
+    },
+    {
+      "nome": "Louva-a-Deus Gigante",
+      "nome_en": "Giant Praying Mantis",
+      "fonte": "monstros",
+      "pagina": 298,
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "13",
+      "iniciativa": "+2 (12)",
+      "pv": "52 (7d10 + 14)",
+      "deslocamento": "9 m, Escalada 9 m, Voo 9 m",
+      "atributos": {
+        "For": {
+          "valor": "18",
+          "modificador": "+4",
+          "salvaguarda": "+4"
+        },
+        "Des": {
+          "valor": "15",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Con": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Int": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Sab": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Car": {
+          "valor": "3",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        }
+      },
+      "pericias": "Percepção +3, Furtividade +6",
+      "sentidos": "Percepção Passiva 13",
+      "idiomas": "—",
+      "nd": "2 (XP 450; BP +2)",
+      "tracos": [
+        {
+          "nome": "Escalada de Aranha",
+          "descricao": "O louva-a-deus pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Garras",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +6 para acertar, alcance 4,5 m. *Dano:* 9 (2d4 + 4) Perfurante. Se o alvo for uma criatura Média ou menor, ele tem a condição Imobilizado (CD 14 para escapar). Enquanto Imobilizado, o alvo tem a condição Contido."
+        }
+      ],
+      "acoes_bonus": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Salvaguarda de Destreza:* CD 14, uma criatura Imobilizada pelo louva-a-deus. *Falha:* 15 (2d10 + 4) Perfurante. *Sucesso:* Metade do dano."
+        }
+      ],
+      "reacoes": [],
+      "texto_completo": "## Louva-a-Deus Gigante\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 13\n\n**Iniciativa** +2 (12)\n\n**PV** 52 (7d10 + 14)\n\n**Deslocamento** 9 m, Escalada 9 m, Voo 9 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 18 | +4 | +4 | **Des** | 15 | +2 | +2 | **Con** | 14 | +2 | +2 |\n| **Int** | 2 | -4 | -4 | **Sab** | 13 | +1 | +1 | **Car** | 3 | -4 | -4 |\n\n**Perícias** Percepção +3, Furtividade +6\n\n**Sentidos** Percepção Passiva 13\n\n**Idiomas** —\n\n**ND** 2 (XP 450; BP +2)\n\n### Traços\n\n**Escalada de Aranha.** O louva-a-deus pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo.\n\n### Ações\n\n**Garras.** *Jogada de Ataque Corpo a Corpo:* +6 para acertar, alcance 4,5 m. *Dano:* 9 (2d4 + 4) Perfurante. Se o alvo for uma criatura Média ou menor, ele tem a condição Imobilizado (CD 14 para escapar). Enquanto Imobilizado, o alvo tem a condição Contido.\n\n### Ações Bônus\n\n**Mordida.** *Salvaguarda de Destreza:* CD 14, uma criatura Imobilizada pelo louva-a-deus. *Falha:* 15 (2d10 + 4) Perfurante. *Sucesso:* Metade do dano."
+    },
+    {
+      "nome": "Lesma Gigante",
+      "nome_en": "Giant Slug",
+      "fonte": "monstros",
+      "pagina": 298,
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "12",
+      "iniciativa": "-2 (8)",
+      "pv": "85 (9d10 + 36)",
+      "deslocamento": "6 m, Escalada 6 m",
+      "atributos": {
+        "For": {
+          "valor": "18",
+          "modificador": "+4",
+          "salvaguarda": "+4"
+        },
+        "Des": {
+          "valor": "6",
+          "modificador": "-2",
+          "salvaguarda": "-2"
+        },
+        "Con": {
+          "valor": "18",
+          "modificador": "+4",
+          "salvaguarda": "+4"
+        },
+        "Int": {
+          "valor": "1",
+          "modificador": "-5",
+          "salvaguarda": "-5"
+        },
+        "Sab": {
+          "valor": "8",
+          "modificador": "-1",
+          "salvaguarda": "-1"
+        },
+        "Car": {
+          "valor": "3",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        }
+      },
+      "pericias": "Percepção +3, Sobrevivência +3",
+      "sentidos": "Visão às Cegas 9 m, Percepção Passiva 13",
+      "idiomas": "—",
+      "nd": "3 (XP 700; BP +2)",
+      "tracos": [
+        {
+          "nome": "Escalada de Aranha",
+          "descricao": "A lesma pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Raspar",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +6 para acertar, alcance 1,5 m. *Dano:* 14 (3d6 + 4) Cortante mais 10 (3d6) Ácido. Se o alvo for Médio ou menor, ele tem a condição Imobilizado (CD 14 para escapar)."
+        }
+      ],
+      "acoes_bonus": [
+        {
+          "nome": "Engolir",
+          "descricao": "*Salvaguarda de Força:* CD 14, uma criatura Média ou menor Imobilizada pela lesma (ela pode ter até duas criaturas engolidas por vez). *Falha:* O alvo é engolido pela lesma, e a condição Imobilizado termina. Uma criatura engolida tem as condições Cego e Contido, tem Cobertura Total contra ataques e outros efeitos fora da lesma e sofre 14 (4d6) de dano Ácido no início de cada turno da lesma. Se a lesma sofrer 15 de dano ou mais em um único turno de uma criatura dentro dela, ela deve ser bem-sucedida em uma salvaguarda de Constituição CD 14 ao final desse turno ou regurgita todas as criaturas engolidas, cada uma caindo em um espaço a até 1,5 metro da lesma e tendo a condição Caído. Se a lesma morrer, qualquer criatura engolida deixa de ter a condição Contido e pode escapar do cadáver gastando 1,5 metro de deslocamento, saindo Caída."
+        }
+      ],
+      "reacoes": [],
+      "texto_completo": "## Lesma Gigante\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 12\n\n**Iniciativa** -2 (8)\n\n**PV** 85 (9d10 + 36)\n\n**Deslocamento** 6 m, Escalada 6 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 18 | +4 | +4 | **Des** | 6 | -2 | -2 | **Con** | 18 | +4 | +4 |\n| **Int** | 1 | -5 | -5 | **Sab** | 8 | -1 | -1 | **Car** | 3 | -4 | -4 |\n\n**Perícias** Percepção +3, Sobrevivência +3\n\n**Sentidos** Visão às Cegas 9 m, Percepção Passiva 13\n\n**Idiomas** —\n\n**ND** 3 (XP 700; BP +2)\n\n### Traços\n\n**Escalada de Aranha.** A lesma pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo.\n\n### Ações\n\n**Raspar.** *Jogada de Ataque Corpo a Corpo:* +6 para acertar, alcance 1,5 m. *Dano:* 14 (3d6 + 4) Cortante mais 10 (3d6) Ácido. Se o alvo for Médio ou menor, ele tem a condição Imobilizado (CD 14 para escapar).\n\n### Ações Bônus\n\n**Engolir.** *Salvaguarda de Força:* CD 14, uma criatura Média ou menor Imobilizada pela lesma (ela pode ter até duas criaturas engolidas por vez). *Falha:* O alvo é engolido pela lesma, e a condição Imobilizado termina. Uma criatura engolida tem as condições Cego e Contido, tem Cobertura Total contra ataques e outros efeitos fora da lesma e sofre 14 (4d6) de dano Ácido no início de cada turno da lesma. Se a lesma sofrer 15 de dano ou mais em um único turno de uma criatura dentro dela, ela deve ser bem-sucedida em uma salvaguarda de Constituição CD 14 ao final desse turno ou regurgita todas as criaturas engolidas, cada uma caindo em um espaço a até 1,5 metro da lesma e tendo a condição Caído. Se a lesma morrer, qualquer criatura engolida deixa de ter a condição Contido e pode escapar do cadáver gastando 1,5 metro de deslocamento, saindo Caída."
+    },
+    {
+      "nome": "Naja-Cuspideira Gigante",
+      "nome_en": "Giant Spitting Cobra",
+      "fonte": "monstros",
+      "pagina": 299,
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "15",
+      "iniciativa": "+4 (14)",
+      "pv": "51 (6d10 + 18)",
+      "deslocamento": "12 m, Natação 12 m",
+      "atributos": {
+        "For": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Des": {
+          "valor": "18",
+          "modificador": "+4",
+          "salvaguarda": "+4"
+        },
+        "Con": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Int": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Sab": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Car": {
+          "valor": "3",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        }
+      },
+      "pericias": "Percepção +6, Furtividade +8",
+      "sentidos": "Visão às Cegas 3 m, Percepção Passiva 16",
+      "idiomas": "—",
+      "nd": "2 (XP 450; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +6 para acertar, alcance 3 m. *Dano:* 9 (2d4 + 4) Perfurante mais 9 (2d8) Venenoso."
+        },
+        {
+          "nome": "Cuspir Veneno",
+          "descricao": "*Jogada de Ataque à Distância:* +6 para acertar, alcance 6/18 m. *Dano:* 9 (2d8) Venenoso, e o alvo tem a condição Envenenado até o fim do próximo turno da naja. Enquanto Envenenada, a criatura tem a condição Cego."
+        }
+      ],
+      "acoes_bonus": [],
+      "reacoes": [],
+      "texto_completo": "## Naja-Cuspideira Gigante\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 15\n\n**Iniciativa** +4 (14)\n\n**PV** 51 (6d10 + 18)\n\n**Deslocamento** 12 m, Natação 12 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 14 | +2 | +2 | **Des** | 18 | +4 | +4 | **Con** | 16 | +3 | +3 |\n| **Int** | 2 | -4 | -4 | **Sab** | 14 | +2 | +2 | **Car** | 3 | -4 | -4 |\n\n**Perícias** Percepção +6, Furtividade +8\n\n**Sentidos** Visão às Cegas 3 m, Percepção Passiva 16\n\n**Idiomas** —\n\n**ND** 2 (XP 450; BP +2)\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +6 para acertar, alcance 3 m. *Dano:* 9 (2d4 + 4) Perfurante mais 9 (2d8) Venenoso.\n\n**Cuspir Veneno.** *Jogada de Ataque à Distância:* +6 para acertar, alcance 6/18 m. *Dano:* 9 (2d8) Venenoso, e o alvo tem a condição Envenenado até o fim do próximo turno da naja. Enquanto Envenenada, a criatura tem a condição Cego."
+    },
+    {
+      "nome": "Tarântula Gigante",
+      "nome_en": "Giant Tarantula",
+      "fonte": "monstros",
+      "pagina": 299,
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "14",
+      "iniciativa": "+2 (12)",
+      "pv": "59 (7d10 + 21)",
+      "deslocamento": "9 m, Escalada 9 m",
+      "atributos": {
+        "For": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Des": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Con": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Int": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Sab": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Car": {
+          "valor": "4",
+          "modificador": "-3",
+          "salvaguarda": "-3"
+        }
+      },
+      "pericias": "Percepção +6, Furtividade +6",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 16",
+      "idiomas": "—",
+      "nd": "2 (XP 450; BP +2)",
+      "tracos": [
+        {
+          "nome": "Escalada de Aranha",
+          "descricao": "A tarântula pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo."
+        },
+        {
+          "nome": "Andar na Teia",
+          "descricao": "A tarântula ignora restrições de movimento causadas por teias e sabe a localização de qualquer outra criatura em contato com a mesma teia."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 3 m. *Dano:* 10 (2d6 + 3) Perfurante mais 7 (2d6) Venenoso. Se o alvo for uma criatura, ele fica sujeito ao seguinte efeito. *Salvaguarda de Constituição:* CD 13. *Falha:* O alvo tem a condição Envenenado até o fim do próximo turno da tarântula. Enquanto Envenenado, o alvo tem a condição Paralisado."
+        },
+        {
+          "nome": "Pelos Urticantes (Recarrega após um Descanso Longo)",
+          "descricao": "A tarântula lança os pelos farpados de seu abdômen. *Salvaguarda de Constituição:* CD 13, cada criatura em uma Emanação de 6 metros com origem na tarântula. *Falha:* A criatura tem a condição Envenenado e repete a salvaguarda ao final de cada um de seus turnos, encerrando o efeito sobre si com um sucesso. Após 1 minuto, ela é bem-sucedida automaticamente."
+        }
+      ],
+      "acoes_bonus": [],
+      "reacoes": [],
+      "texto_completo": "## Tarântula Gigante\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 14\n\n**Iniciativa** +2 (12)\n\n**PV** 59 (7d10 + 21)\n\n**Deslocamento** 9 m, Escalada 9 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 16 | +3 | +3 | **Des** | 14 | +2 | +2 | **Con** | 16 | +3 | +3 |\n| **Int** | 2 | -4 | -4 | **Sab** | 14 | +2 | +2 | **Car** | 4 | -3 | -3 |\n\n**Perícias** Percepção +6, Furtividade +6\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 16\n\n**Idiomas** —\n\n**ND** 2 (XP 450; BP +2)\n\n### Traços\n\n**Escalada de Aranha.** A tarântula pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo.\n\n**Andar na Teia.** A tarântula ignora restrições de movimento causadas por teias e sabe a localização de qualquer outra criatura em contato com a mesma teia.\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 3 m. *Dano:* 10 (2d6 + 3) Perfurante mais 7 (2d6) Venenoso. Se o alvo for uma criatura, ele fica sujeito ao seguinte efeito. *Salvaguarda de Constituição:* CD 13. *Falha:* O alvo tem a condição Envenenado até o fim do próximo turno da tarântula. Enquanto Envenenado, o alvo tem a condição Paralisado.\n\n**Pelos Urticantes (Recarrega após um Descanso Longo).** A tarântula lança os pelos farpados de seu abdômen. *Salvaguarda de Constituição:* CD 13, cada criatura em uma Emanação de 6 metros com origem na tarântula. *Falha:* A criatura tem a condição Envenenado e repete a salvaguarda ao final de cada um de seus turnos, encerrando o efeito sobre si com um sucesso. Após 1 minuto, ela é bem-sucedida automaticamente."
+    },
+    {
+      "nome": "Verme-Veludo Gigante",
+      "nome_en": "Giant Velvet Worm",
+      "fonte": "monstros",
+      "pagina": 300,
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "13",
+      "iniciativa": "+1 (11)",
+      "pv": "85 (10d10 + 30)",
+      "deslocamento": "9 m, Escalada 6 m",
+      "atributos": {
+        "For": {
+          "valor": "17",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Des": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Con": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Int": {
+          "valor": "1",
+          "modificador": "-5",
+          "salvaguarda": "-5"
+        },
+        "Sab": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Car": {
+          "valor": "3",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        }
+      },
+      "pericias": "Percepção +6, Sobrevivência +6",
+      "sentidos": "Visão às Cegas 9 m, Visão no Escuro 18 m, Percepção Passiva 16",
+      "idiomas": "—",
+      "nd": "3 (XP 700; BP +2)",
+      "tracos": [
+        {
+          "nome": "Escalada de Aranha",
+          "descricao": "O verme pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Ataques Múltiplos",
+          "descricao": "O verme realiza dois ataques de Mordida. Ele pode substituir um ataque por um uso de Jato de Teia, se disponível."
+        },
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 10 (2d6 + 3) Perfurante mais 10 (3d6) Ácido."
+        },
+        {
+          "nome": "Jato de Teia (Recarga 5–6)",
+          "descricao": "*Salvaguarda de Destreza:* CD 13, cada criatura em um Cone de 9 metros. *Falha:* O alvo tem a condição Contido até que a teia seja destruída (CA 10; PV 5; Vulnerabilidade a dano Ígneo; Imunidade a dano Venenoso e Psíquico)."
+        }
+      ],
+      "acoes_bonus": [],
+      "reacoes": [],
+      "texto_completo": "## Verme-Veludo Gigante\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 13\n\n**Iniciativa** +1 (11)\n\n**PV** 85 (10d10 + 30)\n\n**Deslocamento** 9 m, Escalada 6 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 17 | +3 | +3 | **Des** | 12 | +1 | +1 | **Con** | 16 | +3 | +3 |\n| **Int** | 1 | -5 | -5 | **Sab** | 14 | +2 | +2 | **Car** | 3 | -4 | -4 |\n\n**Perícias** Percepção +6, Sobrevivência +6\n\n**Sentidos** Visão às Cegas 9 m, Visão no Escuro 18 m, Percepção Passiva 16\n\n**Idiomas** —\n\n**ND** 3 (XP 700; BP +2)\n\n### Traços\n\n**Escalada de Aranha.** O verme pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo.\n\n### Ações\n\n**Ataques Múltiplos.** O verme realiza dois ataques de Mordida. Ele pode substituir um ataque por um uso de Jato de Teia, se disponível.\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 10 (2d6 + 3) Perfurante mais 10 (3d6) Ácido.\n\n**Jato de Teia (Recarga 5–6).** *Salvaguarda de Destreza:* CD 13, cada criatura em um Cone de 9 metros. *Falha:* O alvo tem a condição Contido até que a teia seja destruída (CA 10; PV 5; Vulnerabilidade a dano Ígneo; Imunidade a dano Venenoso e Psíquico)."
+    },
+    {
+      "nome": "Carcaju Gigante",
+      "nome_en": "Giant Wolverine",
+      "fonte": "monstros",
+      "pagina": 300,
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "14",
+      "iniciativa": "+2 (12)",
+      "pv": "57 (6d10 + 24)",
+      "deslocamento": "9 m",
+      "atributos": {
+        "For": {
+          "valor": "18",
+          "modificador": "+4",
+          "salvaguarda": "+4"
+        },
+        "Des": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Con": {
+          "valor": "19",
+          "modificador": "+4",
+          "salvaguarda": "+4"
+        },
+        "Int": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Sab": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Car": {
+          "valor": "7",
+          "modificador": "-2",
+          "salvaguarda": "-2"
+        }
+      },
+      "pericias": "Percepção +6",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 16",
+      "idiomas": "—",
+      "nd": "2 (XP 450; BP +2)",
+      "tracos": [
+        {
+          "nome": "Fúria Sangrenta",
+          "descricao": "O carcaju tem Vantagem em jogadas de ataque corpo a corpo enquanto estiver Sangrando."
+        },
+        {
+          "nome": "Resistência Implacável (Recarrega após um Descanso Longo)",
+          "descricao": "Quando o carcaju é reduzido a 0 Pontos de Vida, mas não morto de imediato, ele pode cair para 1 Ponto de Vida."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Ataques Múltiplos",
+          "descricao": "O carcaju realiza dois ataques de Rasgar."
+        },
+        {
+          "nome": "Rasgar",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +6 para acertar, alcance 1,5 m. *Dano:* 11 (2d6 + 4) Cortante."
+        }
+      ],
+      "acoes_bonus": [],
+      "reacoes": [],
+      "texto_completo": "## Carcaju Gigante\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 14\n\n**Iniciativa** +2 (12)\n\n**PV** 57 (6d10 + 24)\n\n**Deslocamento** 9 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 18 | +4 | +4 | **Des** | 14 | +2 | +2 | **Con** | 19 | +4 | +4 |\n| **Int** | 2 | -4 | -4 | **Sab** | 14 | +2 | +2 | **Car** | 7 | -2 | -2 |\n\n**Perícias** Percepção +6\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 16\n\n**Idiomas** —\n\n**ND** 2 (XP 450; BP +2)\n\n### Traços\n\n**Fúria Sangrenta.** O carcaju tem Vantagem em jogadas de ataque corpo a corpo enquanto estiver Sangrando.\n\n**Resistência Implacável (Recarrega após um Descanso Longo).** Quando o carcaju é reduzido a 0 Pontos de Vida, mas não morto de imediato, ele pode cair para 1 Ponto de Vida.\n\n### Ações\n\n**Ataques Múltiplos.** O carcaju realiza dois ataques de Rasgar.\n\n**Rasgar.** *Jogada de Ataque Corpo a Corpo:* +6 para acertar, alcance 1,5 m. *Dano:* 11 (2d6 + 4) Cortante."
+    },
+    {
+      "nome": "Hatori",
+      "nome_en": "Hatori",
+      "fonte": "monstros",
+      "pagina": 301,
+      "tipo_tamanho": "Fera Enorme, Sem Alinhamento",
+      "ca": "15",
+      "iniciativa": "+2 (12)",
+      "pv": "126 (12d12 + 48)",
+      "deslocamento": "9 m, Escavação 4,5 m",
+      "atributos": {
+        "For": {
+          "valor": "22",
+          "modificador": "+6",
+          "salvaguarda": "+6"
+        },
+        "Des": {
+          "valor": "9",
+          "modificador": "-1",
+          "salvaguarda": "-1"
+        },
+        "Con": {
+          "valor": "18",
+          "modificador": "+4",
+          "salvaguarda": "+4"
+        },
+        "Int": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Sab": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Car": {
+          "valor": "4",
+          "modificador": "-3",
+          "salvaguarda": "-3"
+        }
+      },
+      "pericias": "Furtividade +5",
+      "sentidos": "Sismiconsciência 9 m, Percepção Passiva 12",
+      "idiomas": "—",
+      "nd": "6 (XP 2.300; BP +3)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Ataques Múltiplos",
+          "descricao": "O hatori realiza um ataque de Mordida e um ataque de Cauda."
+        },
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +9 para acertar, alcance 1,5 m. *Dano:* 22 (3d10 + 6) Perfurante. Se o alvo for uma criatura Grande ou menor, ele tem a condição Imobilizado (CD 16 para escapar). Enquanto Imobilizado, o alvo tem a condição Contido e não pode ser alvo da Cauda do hatori."
+        },
+        {
+          "nome": "Cauda",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +9 para acertar, alcance 3 m. *Dano:* 19 (3d8 + 6) Contundente. Se o alvo for uma criatura Grande ou menor, ele tem a condição Caído."
+        }
+      ],
+      "acoes_bonus": [
+        {
+          "nome": "Engolir",
+          "descricao": "*Salvaguarda de Força:* CD 17, uma criatura Média ou menor Imobilizada pelo hatori (ele pode ter até seis criaturas engolidas por vez). *Falha:* O alvo é engolido, e a condição Imobilizado termina. Uma criatura engolida tem as condições Cego e Contido, tem Cobertura Total contra ataques e outros efeitos fora do hatori e sofre 14 (4d6) de dano Ácido no início de cada turno do hatori. Se o hatori sofrer 20 de dano ou mais em um único turno de uma criatura dentro dele, ele deve ser bem-sucedido em uma salvaguarda de Constituição CD 16 ao final desse turno ou regurgita todas as criaturas engolidas, cada uma caindo em um espaço a até 1,5 metro do hatori e tendo a condição Caído. Se o hatori morrer, qualquer criatura engolida deixa de ter a condição Contido e pode escapar do cadáver gastando 4,5 metros de deslocamento, saindo Caída."
+        }
+      ],
+      "reacoes": [],
+      "texto_completo": "## Hatori\n\n*Fera Enorme, Sem Alinhamento*\n\n**CA** 15\n\n**Iniciativa** +2 (12)\n\n**PV** 126 (12d12 + 48)\n\n**Deslocamento** 9 m, Escavação 4,5 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 22 | +6 | +6 | **Des** | 9 | -1 | -1 | **Con** | 18 | +4 | +4 |\n| **Int** | 2 | -4 | -4 | **Sab** | 14 | +2 | +2 | **Car** | 4 | -3 | -3 |\n\n**Perícias** Furtividade +5\n\n**Sentidos** Sismiconsciência 9 m, Percepção Passiva 12\n\n**Idiomas** —\n\n**ND** 6 (XP 2.300; BP +3)\n\n### Ações\n\n**Ataques Múltiplos.** O hatori realiza um ataque de Mordida e um ataque de Cauda.\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +9 para acertar, alcance 1,5 m. *Dano:* 22 (3d10 + 6) Perfurante. Se o alvo for uma criatura Grande ou menor, ele tem a condição Imobilizado (CD 16 para escapar). Enquanto Imobilizado, o alvo tem a condição Contido e não pode ser alvo da Cauda do hatori.\n\n**Cauda.** *Jogada de Ataque Corpo a Corpo:* +9 para acertar, alcance 3 m. *Dano:* 19 (3d8 + 6) Contundente. Se o alvo for uma criatura Grande ou menor, ele tem a condição Caído.\n\n### Ações Bônus\n\n**Engolir.** *Salvaguarda de Força:* CD 17, uma criatura Média ou menor Imobilizada pelo hatori (ele pode ter até seis criaturas engolidas por vez). *Falha:* O alvo é engolido, e a condição Imobilizado termina. Uma criatura engolida tem as condições Cego e Contido, tem Cobertura Total contra ataques e outros efeitos fora do hatori e sofre 14 (4d6) de dano Ácido no início de cada turno do hatori. Se o hatori sofrer 20 de dano ou mais em um único turno de uma criatura dentro dele, ele deve ser bem-sucedido em uma salvaguarda de Constituição CD 16 ao final desse turno ou regurgita todas as criaturas engolidas, cada uma caindo em um espaço a até 1,5 metro do hatori e tendo a condição Caído. Se o hatori morrer, qualquer criatura engolida deixa de ter a condição Contido e pode escapar do cadáver gastando 4,5 metros de deslocamento, saindo Caída."
+    },
+    {
+      "nome": "Polvo Monstruoso",
+      "nome_en": "Monstrous Octopus",
+      "fonte": "monstros",
+      "pagina": 301,
+      "tipo_tamanho": "Fera Enorme, Sem Alinhamento",
+      "ca": "12",
+      "iniciativa": "+1 (11)",
+      "pv": "104 (11d12 + 33)",
+      "deslocamento": "1,5 m, Natação 24 m",
+      "atributos": {
+        "For": {
+          "valor": "21",
+          "modificador": "+5",
+          "salvaguarda": "+5"
+        },
+        "Des": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Con": {
+          "valor": "17",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Int": {
+          "valor": "6",
+          "modificador": "-2",
+          "salvaguarda": "-2"
+        },
+        "Sab": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Car": {
+          "valor": "4",
+          "modificador": "-3",
+          "salvaguarda": "-3"
+        }
+      },
+      "pericias": "Percepção +3, Furtividade +5",
+      "sentidos": "Visão no Escuro 36 m, Percepção Passiva 13",
+      "idiomas": "—",
+      "nd": "3 (XP 700; BP +2)",
+      "tracos": [
+        {
+          "nome": "Respirar na Água",
+          "descricao": "O polvo só pode respirar debaixo d'água."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Tentáculos",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +7 para acertar, alcance 4,5 m. *Dano:* 15 (3d6 + 5) Contundente. Se o alvo for uma criatura Grande ou menor, ele tem a condição Imobilizado (CD 15 para escapar) por todos os oito tentáculos. Enquanto Imobilizado, o alvo tem a condição Contido."
+        }
+      ],
+      "acoes_bonus": [],
+      "reacoes": [
+        {
+          "nome": "Nuvem de Tinta (1/Dia)",
+          "descricao": "*Gatilho:* O polvo sofre dano enquanto está debaixo d'água. *Resposta:* O polvo libera tinta que preenche um Cubo de 4,5 metros de lado centrado em si, e o polvo se desloca até o seu Deslocamento de Natação. O Cubo fica Totalmente Obscurecido por 1 minuto ou até que uma corrente forte ou efeito semelhante disperse a tinta."
+        }
+      ],
+      "texto_completo": "## Polvo Monstruoso\n\n*Fera Enorme, Sem Alinhamento*\n\n**CA** 12\n\n**Iniciativa** +1 (11)\n\n**PV** 104 (11d12 + 33)\n\n**Deslocamento** 1,5 m, Natação 24 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 21 | +5 | +5 | **Des** | 13 | +1 | +1 | **Con** | 17 | +3 | +3 |\n| **Int** | 6 | -2 | -2 | **Sab** | 12 | +1 | +1 | **Car** | 4 | -3 | -3 |\n\n**Perícias** Percepção +3, Furtividade +5\n\n**Sentidos** Visão no Escuro 36 m, Percepção Passiva 13\n\n**Idiomas** —\n\n**ND** 3 (XP 700; BP +2)\n\n### Traços\n\n**Respirar na Água.** O polvo só pode respirar debaixo d'água.\n\n### Ações\n\n**Tentáculos.** *Jogada de Ataque Corpo a Corpo:* +7 para acertar, alcance 4,5 m. *Dano:* 15 (3d6 + 5) Contundente. Se o alvo for uma criatura Grande ou menor, ele tem a condição Imobilizado (CD 15 para escapar) por todos os oito tentáculos. Enquanto Imobilizado, o alvo tem a condição Contido.\n\n### Reações\n\n**Nuvem de Tinta (1/Dia).** *Gatilho:* O polvo sofre dano enquanto está debaixo d'água. *Resposta:* O polvo libera tinta que preenche um Cubo de 4,5 metros de lado centrado em si, e o polvo se desloca até o seu Deslocamento de Natação. O Cubo fica Totalmente Obscurecido por 1 minuto ou até que uma corrente forte ou efeito semelhante disperse a tinta."
+    },
+    {
+      "nome": "Centopeia Monstruosa",
+      "nome_en": "Monstrous Centipede",
+      "fonte": "monstros",
+      "pagina": 301,
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "15",
+      "iniciativa": "+3 (13)",
+      "pv": "42 (5d10 + 15)",
+      "deslocamento": "12 m, Escalada 12 m",
+      "atributos": {
+        "For": {
+          "valor": "10",
+          "modificador": "+0",
+          "salvaguarda": "+0"
+        },
+        "Des": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Con": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Int": {
+          "valor": "1",
+          "modificador": "-5",
+          "salvaguarda": "-5"
+        },
+        "Sab": {
+          "valor": "8",
+          "modificador": "-1",
+          "salvaguarda": "-1"
+        },
+        "Car": {
+          "valor": "3",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        }
+      },
+      "pericias": "",
+      "sentidos": "Visão às Cegas 9 m, Percepção Passiva 9",
+      "idiomas": "—",
+      "nd": "2 (XP 450; BP +2)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 10 (2d6 + 3) Perfurante mais 10 (3d6) Venenoso, e o alvo tem a condição Envenenado até o início do próximo turno da centopeia."
+        }
+      ],
+      "acoes_bonus": [],
+      "reacoes": [],
+      "texto_completo": "## Centopeia Monstruosa\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 15\n\n**Iniciativa** +3 (13)\n\n**PV** 42 (5d10 + 15)\n\n**Deslocamento** 12 m, Escalada 12 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 10 | +0 | +0 | **Des** | 16 | +3 | +3 | **Con** | 16 | +3 | +3 |\n| **Int** | 1 | -5 | -5 | **Sab** | 8 | -1 | -1 | **Car** | 3 | -4 | -4 |\n\n**Sentidos** Visão às Cegas 9 m, Percepção Passiva 9\n\n**Idiomas** —\n\n**ND** 2 (XP 450; BP +2)\n\n### Ações\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +5 para acertar, alcance 1,5 m. *Dano:* 10 (2d6 + 3) Perfurante mais 10 (3d6) Venenoso, e o alvo tem a condição Envenenado até o início do próximo turno da centopeia."
+    },
+    {
+      "nome": "Escorpião Monstruoso",
+      "nome_en": "Monstrous Scorpion",
+      "fonte": "monstros",
+      "pagina": 302,
+      "tipo_tamanho": "Fera Enorme, Sem Alinhamento",
+      "ca": "16",
+      "iniciativa": "+1 (11)",
+      "pv": "105 (10d12 + 40)",
+      "deslocamento": "12 m, Natação 12 m",
+      "atributos": {
+        "For": {
+          "valor": "20",
+          "modificador": "+5",
+          "salvaguarda": "+5"
+        },
+        "Des": {
+          "valor": "13",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Con": {
+          "valor": "19",
+          "modificador": "+4",
+          "salvaguarda": "+4"
+        },
+        "Int": {
+          "valor": "1",
+          "modificador": "-5",
+          "salvaguarda": "-5"
+        },
+        "Sab": {
+          "valor": "9",
+          "modificador": "-1",
+          "salvaguarda": "-1"
+        },
+        "Car": {
+          "valor": "3",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        }
+      },
+      "pericias": "",
+      "sentidos": "Visão às Cegas 18 m, Percepção Passiva 9",
+      "idiomas": "—",
+      "nd": "6 (XP 2.300; BP +3)",
+      "tracos": [],
+      "acoes": [
+        {
+          "nome": "Ataques Múltiplos",
+          "descricao": "O escorpião realiza dois ataques de Garra e um ataque de Ferrão."
+        },
+        {
+          "nome": "Garra",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +8 para acertar, alcance 1,5 m. *Dano:* 12 (2d6 + 5) Contundente. Se o alvo for uma criatura Enorme ou menor, ele tem a condição Imobilizado (CD 15 para escapar) por uma de duas garras."
+        },
+        {
+          "nome": "Ferrão",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +8 para acertar, alcance 1,5 m. *Dano:* 14 (2d8 + 5) Perfurante mais 16 (3d10) Venenoso."
+        }
+      ],
+      "acoes_bonus": [],
+      "reacoes": [],
+      "texto_completo": "## Escorpião Monstruoso\n\n*Fera Enorme, Sem Alinhamento*\n\n**CA** 16\n\n**Iniciativa** +1 (11)\n\n**PV** 105 (10d12 + 40)\n\n**Deslocamento** 12 m, Natação 12 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 20 | +5 | +5 | **Des** | 13 | +1 | +1 | **Con** | 19 | +4 | +4 |\n| **Int** | 1 | -5 | -5 | **Sab** | 9 | -1 | -1 | **Car** | 3 | -4 | -4 |\n\n**Sentidos** Visão às Cegas 18 m, Percepção Passiva 9\n\n**Idiomas** —\n\n**ND** 6 (XP 2.300; BP +3)\n\n### Ações\n\n**Ataques Múltiplos.** O escorpião realiza dois ataques de Garra e um ataque de Ferrão.\n\n**Garra.** *Jogada de Ataque Corpo a Corpo:* +8 para acertar, alcance 1,5 m. *Dano:* 12 (2d6 + 5) Contundente. Se o alvo for uma criatura Enorme ou menor, ele tem a condição Imobilizado (CD 15 para escapar) por uma de duas garras.\n\n**Ferrão.** *Jogada de Ataque Corpo a Corpo:* +8 para acertar, alcance 1,5 m. *Dano:* 14 (2d8 + 5) Perfurante mais 16 (3d10) Venenoso."
+    },
+    {
+      "nome": "Aranha Monstruosa",
+      "nome_en": "Monstrous Spider",
+      "fonte": "monstros",
+      "pagina": 302,
+      "tipo_tamanho": "Fera Enorme, Sem Alinhamento",
+      "ca": "15",
+      "iniciativa": "+3 (13)",
+      "pv": "85 (9d12 + 27)",
+      "deslocamento": "9 m, Escalada 9 m",
+      "atributos": {
+        "For": {
+          "valor": "18",
+          "modificador": "+4",
+          "salvaguarda": "+4"
+        },
+        "Des": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Con": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Int": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Sab": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Car": {
+          "valor": "4",
+          "modificador": "-3",
+          "salvaguarda": "-3"
+        }
+      },
+      "pericias": "Percepção +5, Furtividade +7",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 15",
+      "idiomas": "—",
+      "nd": "4 (XP 1.100; BP +2)",
+      "tracos": [
+        {
+          "nome": "Escalada de Aranha",
+          "descricao": "A aranha pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo."
+        },
+        {
+          "nome": "Andar na Teia",
+          "descricao": "A aranha ignora restrições de movimento causadas por teias e sabe a localização de qualquer outra criatura em contato com a mesma teia."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Ataques Múltiplos",
+          "descricao": "A aranha realiza dois ataques de Mordida. Ela pode substituir um ataque por um uso de Teia."
+        },
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +6 para acertar, alcance 3 m. *Dano:* 13 (2d8 + 4) Perfurante mais 10 (3d6) Venenoso, e o alvo tem a condição Envenenado até o fim do próximo turno da aranha."
+        },
+        {
+          "nome": "Teia (Recarga 5–6)",
+          "descricao": "*Salvaguarda de Destreza:* CD 13, uma criatura que a aranha possa ver a até 18 metros. *Falha:* O alvo tem a condição Contido até que a teia seja destruída (CA 10; PV 5; Vulnerabilidade a dano Ígneo; Imunidade a dano Venenoso e Psíquico)."
+        }
+      ],
+      "acoes_bonus": [],
+      "reacoes": [],
+      "texto_completo": "## Aranha Monstruosa\n\n*Fera Enorme, Sem Alinhamento*\n\n**CA** 15\n\n**Iniciativa** +3 (13)\n\n**PV** 85 (9d12 + 27)\n\n**Deslocamento** 9 m, Escalada 9 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 18 | +4 | +4 | **Des** | 16 | +3 | +3 | **Con** | 16 | +3 | +3 |\n| **Int** | 2 | -4 | -4 | **Sab** | 12 | +1 | +1 | **Car** | 4 | -3 | -3 |\n\n**Perícias** Percepção +5, Furtividade +7\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 15\n\n**Idiomas** —\n\n**ND** 4 (XP 1.100; BP +2)\n\n### Traços\n\n**Escalada de Aranha.** A aranha pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo.\n\n**Andar na Teia.** A aranha ignora restrições de movimento causadas por teias e sabe a localização de qualquer outra criatura em contato com a mesma teia.\n\n### Ações\n\n**Ataques Múltiplos.** A aranha realiza dois ataques de Mordida. Ela pode substituir um ataque por um uso de Teia.\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +6 para acertar, alcance 3 m. *Dano:* 13 (2d8 + 4) Perfurante mais 10 (3d6) Venenoso, e o alvo tem a condição Envenenado até o fim do próximo turno da aranha.\n\n**Teia (Recarga 5–6).** *Salvaguarda de Destreza:* CD 13, uma criatura que a aranha possa ver a até 18 metros. *Falha:* O alvo tem a condição Contido até que a teia seja destruída (CA 10; PV 5; Vulnerabilidade a dano Ígneo; Imunidade a dano Venenoso e Psíquico)."
+    },
+    {
+      "nome": "Tarântula Monstruosa",
+      "nome_en": "Monstrous Tarantula",
+      "fonte": "monstros",
+      "pagina": 303,
+      "tipo_tamanho": "Fera Enorme, Sem Alinhamento",
+      "ca": "15",
+      "iniciativa": "+2 (12)",
+      "pv": "138 (12d12 + 60)",
+      "deslocamento": "9 m, Escalada 9 m",
+      "atributos": {
+        "For": {
+          "valor": "20",
+          "modificador": "+5",
+          "salvaguarda": "+5"
+        },
+        "Des": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Con": {
+          "valor": "20",
+          "modificador": "+5",
+          "salvaguarda": "+5"
+        },
+        "Int": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Sab": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Car": {
+          "valor": "4",
+          "modificador": "-3",
+          "salvaguarda": "-3"
+        }
+      },
+      "pericias": "Percepção +8, Furtividade +8",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 18",
+      "idiomas": "—",
+      "nd": "6 (XP 2.300; BP +3)",
+      "tracos": [
+        {
+          "nome": "Escalada de Aranha",
+          "descricao": "A tarântula pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo."
+        },
+        {
+          "nome": "Andar na Teia",
+          "descricao": "A tarântula ignora restrições de movimento causadas por teias e sabe a localização de qualquer outra criatura em contato com a mesma teia."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Ataques Múltiplos",
+          "descricao": "A aranha realiza dois ataques de Mordida. Ela pode substituir um ataque por um uso de Pelos Urticantes, se disponível."
+        },
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +8 para acertar, alcance 3 m. *Dano:* 15 (3d6 + 5) Perfurante mais 10 (3d6) Venenoso. Se o alvo for uma criatura, ele fica sujeito ao seguinte efeito. *Salvaguarda de Constituição:* CD 16. *Falha:* O alvo tem a condição Envenenado até o fim do próximo turno da tarântula. Enquanto Envenenado, o alvo tem a condição Paralisado."
+        },
+        {
+          "nome": "Pelos Urticantes (Recarrega após um Descanso Longo)",
+          "descricao": "A tarântula lança os pelos farpados de seu abdômen. *Salvaguarda de Constituição:* CD 16, cada criatura em uma Emanação de 9 metros com origem na tarântula. *Falha:* A criatura tem a condição Envenenado e repete a salvaguarda ao final de cada um de seus turnos, encerrando o efeito sobre si com um sucesso. Após 1 minuto, ela é bem-sucedida automaticamente."
+        }
+      ],
+      "acoes_bonus": [],
+      "reacoes": [],
+      "texto_completo": "## Tarântula Monstruosa\n\n*Fera Enorme, Sem Alinhamento*\n\n**CA** 15\n\n**Iniciativa** +2 (12)\n\n**PV** 138 (12d12 + 60)\n\n**Deslocamento** 9 m, Escalada 9 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 20 | +5 | +5 | **Des** | 14 | +2 | +2 | **Con** | 20 | +5 | +5 |\n| **Int** | 2 | -4 | -4 | **Sab** | 14 | +2 | +2 | **Car** | 4 | -3 | -3 |\n\n**Perícias** Percepção +8, Furtividade +8\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 18\n\n**Idiomas** —\n\n**ND** 6 (XP 2.300; BP +3)\n\n### Traços\n\n**Escalada de Aranha.** A tarântula pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo.\n\n**Andar na Teia.** A tarântula ignora restrições de movimento causadas por teias e sabe a localização de qualquer outra criatura em contato com a mesma teia.\n\n### Ações\n\n**Ataques Múltiplos.** A aranha realiza dois ataques de Mordida. Ela pode substituir um ataque por um uso de Pelos Urticantes, se disponível.\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +8 para acertar, alcance 3 m. *Dano:* 15 (3d6 + 5) Perfurante mais 10 (3d6) Venenoso. Se o alvo for uma criatura, ele fica sujeito ao seguinte efeito. *Salvaguarda de Constituição:* CD 16. *Falha:* O alvo tem a condição Envenenado até o fim do próximo turno da tarântula. Enquanto Envenenado, o alvo tem a condição Paralisado.\n\n**Pelos Urticantes (Recarrega após um Descanso Longo).** A tarântula lança os pelos farpados de seu abdômen. *Salvaguarda de Constituição:* CD 16, cada criatura em uma Emanação de 9 metros com origem na tarântula. *Falha:* A criatura tem a condição Envenenado e repete a salvaguarda ao final de cada um de seus turnos, encerrando o efeito sobre si com um sucesso. Após 1 minuto, ela é bem-sucedida automaticamente."
+    },
+    {
+      "nome": "Aranha-Espada",
+      "nome_en": "Sword Spider",
+      "fonte": "monstros",
+      "pagina": 303,
+      "tipo_tamanho": "Fera Grande, Sem Alinhamento",
+      "ca": "14",
+      "iniciativa": "+5 (15)",
+      "pv": "76 (9d10 + 27)",
+      "deslocamento": "12 m, Escalada 9 m",
+      "atributos": {
+        "For": {
+          "valor": "19",
+          "modificador": "+4",
+          "salvaguarda": "+4"
+        },
+        "Des": {
+          "valor": "14",
+          "modificador": "+2",
+          "salvaguarda": "+2"
+        },
+        "Con": {
+          "valor": "16",
+          "modificador": "+3",
+          "salvaguarda": "+3"
+        },
+        "Int": {
+          "valor": "2",
+          "modificador": "-4",
+          "salvaguarda": "-4"
+        },
+        "Sab": {
+          "valor": "12",
+          "modificador": "+1",
+          "salvaguarda": "+1"
+        },
+        "Car": {
+          "valor": "4",
+          "modificador": "-3",
+          "salvaguarda": "-3"
+        }
+      },
+      "pericias": "Percepção +7, Furtividade +8",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 17",
+      "idiomas": "—",
+      "nd": "5 (XP 1.800; BP +3)",
+      "tracos": [
+        {
+          "nome": "Escalada de Aranha",
+          "descricao": "A aranha pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo."
+        },
+        {
+          "nome": "Andar na Teia",
+          "descricao": "A aranha ignora restrições de movimento causadas por teias e sabe a localização de qualquer outra criatura em contato com a mesma teia."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Ataques Múltiplos",
+          "descricao": "A aranha realiza dois ataques de Pata Dianteira e um ataque de Mordida."
+        },
+        {
+          "nome": "Pata Dianteira",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +7 para acertar, alcance 3 m. *Dano:* 11 (2d6 + 4) Cortante."
+        },
+        {
+          "nome": "Mordida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +7 para acertar, alcance 1,5 m. *Dano:* 11 (2d6 + 4) Perfurante mais 10 (3d6) Venenoso, e o alvo tem a condição Envenenado até o fim do próximo turno da aranha."
+        },
+        {
+          "nome": "Salto Mortal",
+          "descricao": "A aranha gasta 1,5 metro de deslocamento para saltar até um espaço a até 4,5 metros que contenha uma ou mais criaturas Grandes ou menores. *Salvaguarda de Destreza:* CD 15, cada criatura no espaço de destino da aranha. *Falha:* 32 (8d6 + 4) Perfurante. *Sucesso:* Metade do dano."
+        }
+      ],
+      "acoes_bonus": [],
+      "reacoes": [
+        {
+          "nome": "Aparar",
+          "descricao": "*Gatilho:* A aranha é atingida por uma jogada de ataque corpo a corpo. *Resposta:* A aranha soma 3 à sua CA contra esse ataque, possivelmente fazendo-o errar."
+        }
+      ],
+      "texto_completo": "## Aranha-Espada\n\n*Fera Grande, Sem Alinhamento*\n\n**CA** 14\n\n**Iniciativa** +5 (15)\n\n**PV** 76 (9d10 + 27)\n\n**Deslocamento** 12 m, Escalada 9 m\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|---|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 19 | +4 | +4 | **Des** | 14 | +2 | +2 | **Con** | 16 | +3 | +3 |\n| **Int** | 2 | -4 | -4 | **Sab** | 12 | +1 | +1 | **Car** | 4 | -3 | -3 |\n\n**Perícias** Percepção +7, Furtividade +8\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 17\n\n**Idiomas** —\n\n**ND** 5 (XP 1.800; BP +3)\n\n### Traços\n\n**Escalada de Aranha.** A aranha pode escalar superfícies difíceis, inclusive ao longo de tetos, sem precisar realizar um teste de atributo.\n\n**Andar na Teia.** A aranha ignora restrições de movimento causadas por teias e sabe a localização de qualquer outra criatura em contato com a mesma teia.\n\n### Ações\n\n**Ataques Múltiplos.** A aranha realiza dois ataques de Pata Dianteira e um ataque de Mordida.\n\n**Pata Dianteira.** *Jogada de Ataque Corpo a Corpo:* +7 para acertar, alcance 3 m. *Dano:* 11 (2d6 + 4) Cortante.\n\n**Mordida.** *Jogada de Ataque Corpo a Corpo:* +7 para acertar, alcance 1,5 m. *Dano:* 11 (2d6 + 4) Perfurante mais 10 (3d6) Venenoso, e o alvo tem a condição Envenenado até o fim do próximo turno da aranha.\n\n**Salto Mortal.** A aranha gasta 1,5 metro de deslocamento para saltar até um espaço a até 4,5 metros que contenha uma ou mais criaturas Grandes ou menores. *Salvaguarda de Destreza:* CD 15, cada criatura no espaço de destino da aranha. *Falha:* 32 (8d6 + 4) Perfurante. *Sucesso:* Metade do dano.\n\n### Reações\n\n**Aparar.** *Gatilho:* A aranha é atingida por uma jogada de ataque corpo a corpo. *Resposta:* A aranha soma 3 à sua CA contra esse ataque, possivelmente fazendo-o errar."
+    }
+  ]
+}

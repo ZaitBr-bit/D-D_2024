@@ -11,7 +11,10 @@ import { consumirPergaminho, magiasDeItens, opcoesDeCusto, pagarConjuracao, rotu
 import { perguntarUltimaCarga } from './ultima-carga.js';
 import { abrirModal, bonusProficiencia, calcAtaqueMagia, calcCDMagia, calcMod, escHtml, getBonusTruquesOrdem, getLimitesMagias, getMagiaPreparadas, mdParaHtml, circuloSuperiorHtml, classesDaMagiaHtml, semAcento, toast } from '../utils.js';
 import { getEstadoFuria } from './classes/barbaro.js';
-import { renderSecaoPactoBruxo } from './classes/bruxo.js';
+import { renderSecaoPactoBruxo, rotuloEfeitoInvocacaoTruque } from './classes/bruxo.js';
+import { interceptarConvocarFamiliar, registrarFamiliarPendente } from './familiar.js';
+import { motivoSemConjuracaoEmForma } from './forma-selvagem.js';
+import { aposConjurarMagia } from './necromante.js';
 import { gastarPontosFeiticaria, getEstadoRecursosFeiticeiro } from './classes/feiticeiro.js';
 import { getCavaleiroMisticoConjuracao } from './classes/guerreiro.js';
 import { getTrapaceiroArcanoConjuracao } from './classes/ladino.js';
@@ -20,7 +23,7 @@ import { getTrapaceiroArcanoConjuracao } from './classes/ladino.js';
 // gravada por sincronizarMagiasFixasMago (classes/mago.js) quando a magia
 // escolhida e uma personalizada (issue #49).
 import { MAGIAS_FIXAS_MAGO, magiaFixaMagoGratisDisponivel, marcarAssinaturaMagicaUsada } from './classes/mago.js';
-import { consumirUsoRecursoDedicadoGratis, magiaRecursoDedicadoGratisDisponivel } from '../regras-usos-gratis-magia.js';
+import { consumirUsoRecursoDedicadoGratis, contagemUsosGratisDaMagia, magiaRecursoDedicadoGratisDisponivel } from '../regras-usos-gratis-magia.js';
 import { _truquesColapsados } from './colapso.js';
 import { ehBardoComSegredosMagicos, getTruquesExtraEstiloLuta } from './combate.js';
 import { char, classesData, indiceMagiasCache, salvar } from './estado.js';
@@ -696,7 +699,7 @@ export function badgesMagiaRapidos(nomeMagia) {
   return `<div class="magia-tags">${badges.join('')}</div>`;
 }
 
-export function renderSecaoMagias() {
+export function renderSecaoMagias(faixaRecursosHtml = '') {
   // sup: a superfície de conjuração ATIVA desta seção -- ver
   // superficieAtiva() (topo do arquivo). Tarefa 3 (sub-projeto "tela
   // magias por classe"): substitui a leitura dos espelhos
@@ -962,7 +965,7 @@ export function renderSecaoMagias() {
       const truque = inv?.truque;
       if (truque && INV_TRUQUE_LABELS[nomeInv]) {
         if (!truquesModificadosMapa[truque]) truquesModificadosMapa[truque] = [];
-        truquesModificadosMapa[truque].push({ invocacao: nomeInv, efeito: INV_TRUQUE_LABELS[nomeInv] });
+        truquesModificadosMapa[truque].push({ invocacao: nomeInv, efeito: rotuloEfeitoInvocacaoTruque(nomeInv, truque) || INV_TRUQUE_LABELS[nomeInv] });
       }
     }
   }
@@ -982,6 +985,7 @@ export function renderSecaoMagias() {
           <button class="btn btn-sm btn-secondary" id="btn-add-magia-custom">Magia Personalizada</button>
         </div>`}
       </div>
+      ${faixaRecursosHtml}
       ${(char._slots_truque_livre || 0) > 0 && tipoConj === 'conhecidas' && !soMagiasDeItens ? `
         <div class="info-box warning no-print" style="margin:0 0 8px;font-size:0.85rem;display:flex;align-items:center;justify-content:space-between;gap:8px">
           <span>Você tem <strong>${char._slots_truque_livre}</strong> vaga(s) de truque em aberto para o seu nível.</span>
@@ -1073,10 +1077,13 @@ export function renderSecaoMagias() {
         preparadas conta só a classe selecionada, e cita o indicador "sem
         classe" para quem tiver alguma preparada ainda não carimbada.
       -->
-      ${superficies.length > 1 ? `
-        <div class="info-box info" style="margin-bottom:8px;font-size:0.78rem">
+      ${superficies.length > 1 && !char.config?.aviso_truques_dispensado ? `
+        <div class="info-box info" id="aviso-truques-personagem-inteiro" style="margin-bottom:8px;font-size:0.78rem;display:flex;gap:8px;align-items:flex-start">
+          <div style="flex:1;min-width:0">
           Truques contam o personagem inteiro (todas as classes) contra o limite da classe selecionada acima.
           Já ${labelMagias.toLowerCase()} contam só as desta classe -- a lista abaixo mostra as de todas as classes, cada entrada com o rótulo da sua classe (ou "sem classe" nas fichas ainda não migradas, que também não entram nesta contagem).
+          </div>
+          <button class="btn btn-sm btn-secondary no-print" id="btn-dispensar-aviso-truques" title="Não mostrar mais nesta ficha" aria-label="Fechar aviso" style="flex:none;padding:0 8px;line-height:1.6">&times;</button>
         </div>
       ` : ''}
       <!-- Contador de magias preparadas/conhecidas e truques -->
@@ -1295,7 +1302,7 @@ export function renderSecaoMagias() {
                         ${circulos.map(c => `<option value="${c}"${c == m.circulo ? ' selected' : ''}>${c}º</option>`).join('')}
                       </select>
                     ` : ''}
-                    ${gratisDisponivel ? `<button class="btn btn-sm btn-accent" data-conjurar-gratis="${m.nome}">Grátis</button>` : ''}
+                    ${gratisDisponivel ? `<button class="btn btn-sm btn-accent" data-conjurar-gratis="${m.nome}">Grátis${(() => { const c = gratisFixa === null ? contagemUsosGratisDaMagia(m.nome) : null; return c ? ` (${c.disponiveis}/${c.max})` : ''; })()}</button>` : ''}
                     <button class="btn btn-sm ${todosEsgotados ? 'btn-secondary' : 'btn-primary'}" data-conjurar="${m.nome}" data-conj-circ="${circulos[0] || m.circulo}" ${todosEsgotados ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Conjurar</button>
                     ${ehMagiaRitual(m.nome) ? `<button class="btn btn-sm btn-secondary" data-conjurar-ritual="${m.nome}" data-conj-circ="${m.circulo}" title="Conjurar como Ritual (sem gastar espaço)">Ritual</button>` : ''}
                   </div>
@@ -2318,6 +2325,8 @@ function aplicarEfeitoSelfComSelecao(nome, circulo, config, concluir, podeAplica
  */
 function aplicarConjuracaoSemEspaco(nome, circulo, mensagem, aoConcluir = null, podeAplicar = null) {
   const finalizar = () => {
+    registrarFamiliarPendente(nome);
+    aposConjurarMagia(nome, { circulo: Number(circulo) || 0, comEspaco: false });
     salvar();
     if (aoConcluir) { aoConcluir(); return; }
     renderFichaCompleta();
@@ -2558,6 +2567,13 @@ function decidirFonteEContinuar(nome, circulo, continuar) {
 }
 
 export function setupEventosEspacosMagia() {
+  // Fecha o aviso de truques do personagem inteiro e não o mostra mais nesta ficha.
+  document.getElementById('btn-dispensar-aviso-truques')?.addEventListener('click', () => {
+    char.config = char.config || {};
+    char.config.aviso_truques_dispensado = true;
+    salvar();
+    renderFichaCompleta();
+  });
   // Conjurar magia de item: escolhe o gasto quando há faixa, conjura sem espaço e paga depois de confirmada.
   document.querySelectorAll('[data-conjurar-item]').forEach(btn => btn.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -2650,6 +2666,8 @@ export function setupEventosEspacosMagia() {
         toast('Não é possível conjurar magias enquanto a Fúria estiver ativa.', 'error');
         return;
       }
+      const semConjuracao = motivoSemConjuracaoEmForma();
+      if (semConjuracao) { toast(semConjuracao, 'error'); return; }
 
       const nome = btn.dataset.conjurar;
       const selectEl = btn.parentElement?.querySelector(`[data-conj-select="${nome}"]`);
@@ -2670,6 +2688,9 @@ export function setupEventosEspacosMagia() {
         toast(`Sem espaços de ${circ}º círculo!`, 'error');
         return;
       }
+
+      // Convocar Familiar: escolher a forma antes de gastar o espaço.
+      if (interceptarConvocarFamiliar(nome, 'espaco', () => btn.click())) return;
 
       // Verificar conflito de concentracao ANTES de prosseguir
       const magiaEhConc = ehMagiaConcentracao(nome);
@@ -2821,6 +2842,8 @@ export function setupEventosEspacosMagia() {
       metaTexto = _processarMetamagiasConjuracao(metamagiasAplicadas, opcoesMeta, nome, circ);
     }
 
+    registrarFamiliarPendente(nome);
+    aposConjurarMagia(nome, { circulo: Number(circ) || 0, comEspaco: true });
     salvar();
     const upcast = parseInt(circ) > parseInt(baseCirc);
     const sufixoAlvo = aplicarEfeitoSelf ? ' (em você)' : '';
@@ -2896,6 +2919,8 @@ export function setupEventosEspacosMagia() {
         toast('Não é possível conjurar magias enquanto a Fúria estiver ativa.', 'error');
         return;
       }
+      const semConjuracao = motivoSemConjuracaoEmForma();
+      if (semConjuracao) { toast(semConjuracao, 'error'); return; }
 
       const nome = btn.dataset.conjurarGratis;
       const gratisFixa = magiaFixaMagoGratisDisponivel(nome);
@@ -2906,6 +2931,9 @@ export function setupEventosEspacosMagia() {
       const entrada = char.magias_preparadas.find(m => m.nome === nome
         && (gratisFixa !== null ? gratisFixa : (magiaRecursoDedicadoGratisDisponivel(nome) === true || m.gratis_usado === false)));
       if (!entrada) return;
+
+      // Convocar Familiar: escolher a forma antes de gastar o uso grátis.
+      if (interceptarConvocarFamiliar(nome, 'gratis', () => btn.click())) return;
 
       // Verificar conflito de concentração
       const magiaEhConc = ehMagiaConcentracao(nome);
@@ -2934,6 +2962,8 @@ export function setupEventosEspacosMagia() {
         toast('Não é possível conjurar magias enquanto a Fúria estiver ativa.', 'error');
         return;
       }
+      const semConjuracao = motivoSemConjuracaoEmForma();
+      if (semConjuracao) { toast(semConjuracao, 'error'); return; }
       const nome = btn.dataset.lancarTruque;
 
       // Verificar conflito de concentracao antes de executar
@@ -2978,6 +3008,8 @@ export function setupEventosEspacosMagia() {
         toast('Não é possível conjurar magias enquanto a Fúria estiver ativa.', 'error');
         return;
       }
+      const semConjuracao = motivoSemConjuracaoEmForma();
+      if (semConjuracao) { toast(semConjuracao, 'error'); return; }
 
       const indice = Number(btn.dataset.conjurarMagiaCustom);
       const magia = normalizarMagiaPersonalizada((char.magias_customizadas || [])[indice], indice);
@@ -3021,6 +3053,8 @@ export function setupEventosEspacosMagia() {
         toast('Não é possível conjurar magias enquanto a Fúria estiver ativa.', 'error');
         return;
       }
+      const semConjuracao = motivoSemConjuracaoEmForma();
+      if (semConjuracao) { toast(semConjuracao, 'error'); return; }
 
       const indice = Number(btn.dataset.lancarMagiaCustom);
       const registro = (char.magias_customizadas || [])[indice];
@@ -3066,9 +3100,14 @@ export function setupEventosEspacosMagia() {
         toast('Não é possível conjurar magias enquanto a Fúria estiver ativa.', 'error');
         return;
       }
+      const semConjuracao = motivoSemConjuracaoEmForma();
+      if (semConjuracao) { toast(semConjuracao, 'error'); return; }
 
       const nome = btn.dataset.conjurarRitual;
       if (!nome || !ehMagiaRitual(nome)) return;
+
+      // Convocar Familiar: escolher a forma antes de conjurar.
+      if (interceptarConvocarFamiliar(nome, 'ritual', () => btn.click())) return;
 
       const executar = () => {
         // Concentração vale igual na versão Ritual: o que muda é o espaço.
@@ -3086,6 +3125,7 @@ export function setupEventosEspacosMagia() {
             rotulo: `Concentrando em ${nome}`,
           });
         }
+        registrarFamiliarPendente(nome);
         salvar();
         renderFichaCompleta();
         toast(`${nome} conjurada como Ritual (sem gastar espaço).`, 'success');
@@ -3108,6 +3148,8 @@ export function setupEventosEspacosMagia() {
         toast('Não é possível conjurar magias enquanto a Fúria estiver ativa.', 'error');
         return;
       }
+      const semConjuracao = motivoSemConjuracaoEmForma();
+      if (semConjuracao) { toast(semConjuracao, 'error'); return; }
 
       const indice = Number(btn.dataset.conjurarRitualCustom);
       const registro = (char.magias_customizadas || [])[indice];

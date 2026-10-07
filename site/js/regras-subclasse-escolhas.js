@@ -92,6 +92,11 @@ export const ESCOLHAS_SUBCLASSE_APP = [
     livro: 'dados/tasha/artifice/classe.json',
     // Resistência Química: Resistência a dano Ácido e Venenoso (tipos de dano) e Imunidade à condição Envenenado.
     automatica: { resistencias: ['Ácido', 'Venenoso'], imunidades_condicao: ['Envenenado'] } },
+  { subclasse: 'Necromante', nivel: 3, caracteristica: 'Livro de Magias Necromântico',
+    livro: 'Arcana Unleashed (PDF), p. 22',
+    // "Você tem Resistência a dano Necrótico" e "A magia Convocar Familiar aparece
+    // no seu livro de magias": as duas concessões automáticas desta característica.
+    automatica: { resistencias: ['Necrótico'], grimorio: [{ nome: 'Convocar Familiar', circulo: 1 }] } },
   { subclasse: 'Armeiro', nivel: 3, caracteristica: 'Ferramentas da Profissão',
     livro: 'dados/tasha/artifice/classe.json',
     automatica: { extras: ['Armadura Pesada'], ferramentas: ['Ferramentas de Ferreiro'] } },
@@ -555,6 +560,13 @@ export function aplicarConcessaoAutomatica(personagem, linha, contexto = {}) {
   if (a.extras) acrescentarNaLista(personagem, 'proficiencias_extra', a.extras);
   if (a.resistencias) acrescentarNaLista(personagem, 'resistencias', a.resistencias);
   if (a.imunidades_condicao) acrescentarNaLista(personagem, 'imunidades_condicao', a.imunidades_condicao);
+  if (a.grimorio) {
+    if (!Array.isArray(personagem.grimorio)) personagem.grimorio = [];
+    for (const magia of a.grimorio) {
+      if (personagem.grimorio.some((m) => m.nome === magia.nome)) continue;
+      personagem.grimorio.push({ nome: magia.nome, circulo: magia.circulo, classe: contexto.classe || 'Mago', origem: 'subclasse' });
+    }
+  }
   if (a.truques) {
     for (const nome of a.truques) concederTruqueDeSubclasse(personagem, nome, contexto.classe);
   }

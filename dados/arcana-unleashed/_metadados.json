@@ -1,0 +1,16 @@
+{
+  "titulo": "Arcana Unleashed",
+  "fonte": "arcana-unleashed",
+  "pdf_extraido": "Informacoes Separadas/PDF/Arcana Unleashed D&D 5.5e.pdf",
+  "idioma_original": "inglês; traduzido para PT-BR",
+  "observacao": "Separado de dados/ (Livro do Jogador). Termos de regra seguem dados/classes/mago.json. A característica 'Servos Mortos-Vivos' do livro foi dividida em duas ('Servos Mortos-Vivos', só com Animar Mortos grátis, e 'Servos Fortalecidos') porque o app detecta o uso grátis pela descrição e rejeita descrição com 'modificador ... mínimo'. db.getClasse('Mago') junta estas subclasses às do Livro do Jogador.",
+  "conteudos": [
+    {
+      "id": "necromante",
+      "titulo": "Necromante (Mago)",
+      "titulo_en": "Necromancer (Wizard)",
+      "paginas_pdf": "22-23",
+      "arquivos": { "subclasses_mago.json": "Subclasses do Mago no formato de dados/classes/mago.json, com fonte e nome_en" }
+    }
+  ]
+}

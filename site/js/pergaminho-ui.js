@@ -5,6 +5,7 @@
 // ============================================================
 import { abrirModal, circuloSuperiorHtml, classesDaMagiaHtml, escHtml, mdParaHtml, semAcento, toast } from './utils.js';
 import { getIndiceMagias, getMagiasPorCirculo } from './db.js';
+import { seloDaMagia } from './fontes.js';
 
 /**
  * Carrega as magias do índice. Falha de carregamento avisa com toast de erro
@@ -42,7 +43,7 @@ export function htmlSeletorMagiaPergaminho(magias, selecionada = '') {
       <div class="opcao-card${m.nome === selecionada ? ' selecionada' : ''}" data-magia-pergaminho="${escHtml(m.nome)}" data-circulo="${m.circulo}">
         <span class="opcao-check"></span>
         <div class="opcao-nome">${escHtml(m.nome)}</div>
-        <div class="opcao-resumo"><span>${escHtml(m.escola || '')}</span></div>
+        <div class="opcao-resumo"><span>${escHtml(m.escola || '')}</span>${seloDaMagia(m.nome)}</div>
       </div>`).join('')}
     </div>`;
 }

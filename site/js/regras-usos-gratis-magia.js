@@ -74,6 +74,7 @@ const ADAPTADORES = [
     aplicavel: () => temClasse(char, 'Guardião') && (getEstadoRecursosGuardiao()?.inimigoFavoritoMax ?? 0) > 0,
     disponivel: () => (getEstadoRecursosGuardiao()?.inimigoFavoritoDisponiveis ?? 0) > 0,
     consumir: () => { char.recursos.guardiao.inimigo_favorito_usos_gastos += 1; },
+    contagem: () => { const e = getEstadoRecursosGuardiao(); return { max: e?.inimigoFavoritoMax ?? 0, disponiveis: e?.inimigoFavoritoDisponiveis ?? 0 }; },
   },
   {
     nomeMagia: 'Convocar Feérico',
@@ -81,6 +82,7 @@ const ADAPTADORES = [
     aplicavel: () => estadoAndarilhoFeerico(11) !== null,
     disponivel: () => estadoAndarilhoFeerico(11)?.reforcosFeericosUsado === false,
     consumir: () => { char.recursos.guardiao.subclasses.andarilho.reforcos_feericos_usado = true; },
+    contagem: () => ({ max: 1, disponiveis: estadoAndarilhoFeerico(11)?.reforcosFeericosUsado === false ? 1 : 0 }),
   },
   {
     nomeMagia: 'Passo Nebuloso',
@@ -88,6 +90,7 @@ const ADAPTADORES = [
     aplicavel: () => estadoAndarilhoFeerico(15) !== null,
     disponivel: () => (estadoAndarilhoFeerico(15)?.andarilhoNebulosoDisponiveis ?? 0) > 0,
     consumir: () => { char.recursos.guardiao.subclasses.andarilho.andarilho_nebuloso_usos_gastos += 1; },
+    contagem: () => { const e = estadoAndarilhoFeerico(15); return { max: e?.andarilhoNebulosoMax ?? 0, disponiveis: e?.andarilhoNebulosoDisponiveis ?? 0 }; },
   },
   {
     nomeMagia: 'Raio Guia',
@@ -95,6 +98,7 @@ const ADAPTADORES = [
     aplicavel: () => estadoCirculoDasEstrelas(3) !== null,
     disponivel: () => (estadoCirculoDasEstrelas(3)?.mapaEstelarDisponiveis ?? 0) > 0,
     consumir: () => { char.recursos.druida.subclasses.estrelas.mapa_estelar_usos_gastos += 1; },
+    contagem: () => { const e = estadoCirculoDasEstrelas(3); return { max: e?.mapaEstelarMax ?? 0, disponiveis: e?.mapaEstelarDisponiveis ?? 0 }; },
   },
   ...[
     ['Restauração Menor', 'Reagentes Restauradores', 'restauracao_menor'],
@@ -107,6 +111,7 @@ const ADAPTADORES = [
     aplicavel: () => usosGratisArtifice(char, chave).max > 0,
     disponivel: () => { const u = usosGratisArtifice(char, chave); return u.gastos < u.max; },
     consumir: () => { gastarGratisArtifice(char, chave); },
+    contagem: () => { const u = usosGratisArtifice(char, chave); return { max: u.max, disponiveis: Math.max(0, u.max - u.gastos) }; },
   })),
 ];
 
@@ -155,4 +160,27 @@ export function consumirUsoRecursoDedicadoGratis(nomeMagia) {
   if (!def || !def.disponivel()) return false;
   def.consumir();
   return true;
+}
+
+/**
+ * Contador dos usos grátis de uma magia controlada por recurso dedicado:
+ * `{ max, disponiveis }`, ou `null` quando a magia não tem recurso dedicado
+ * neste personagem. Lê o mesmo campo que `disponivel` e `consumir`.
+ * @param {string} nomeMagia Nome da magia.
+ * @returns {{max: number, disponiveis: number}|null}
+ */
+export function contagemUsosGratisDaMagia(nomeMagia) {
+  const def = adaptadorAplicavel(nomeMagia);
+  return def ? def.contagem() : null;
+}
+
+/**
+ * Contador dos usos grátis de uma CARACTERÍSTICA (pelo nome dela) para o card
+ * de Características de Classe, que não pode ter um segundo contador próprio.
+ * @param {string} nomeFeature Nome da característica.
+ * @returns {{max: number, disponiveis: number}|null}
+ */
+export function contagemUsosGratisDaFeature(nomeFeature) {
+  const def = ADAPTADORES.find((a) => a.nomeFeature === nomeFeature);
+  return def && def.aplicavel() ? def.contagem() : null;
 }

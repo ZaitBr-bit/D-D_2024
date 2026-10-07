@@ -3,7 +3,8 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { defesasDeItens, ROTULO_SENTIDO, sentidosDeItens, TIPOS_DANO } from '../regras-passivos-itens.js';
-import { abrirModal, calcIntuicaoPassiva, escHtml, calcInvestigacaoPassiva, calcPercepcaoPassiva, toast } from '../utils.js';
+import { getMagia } from '../db.js';
+import { abrirModal, calcIntuicaoPassiva, escHtml, calcInvestigacaoPassiva, calcPercepcaoPassiva, mdParaHtml, toast } from '../utils.js';
 import { getEstadoFuria } from './classes/barbaro.js';
 import { getEstadoRecursosGuardiao } from './classes/guardiao.js';
 import { getEstadoRecursosPaladino } from './classes/paladino.js';
@@ -151,12 +152,12 @@ export function renderSecaoCondicoes() {
       ` : ''}
       ${condicoesMagia.length > 0 ? `
         <div style="display:flex;flex-wrap:wrap;gap:6px;padding:4px 0;margin-bottom:4px">
-          ${condicoesMagia.map(cm => `<span class="badge" style="font-size:0.7rem;padding:3px 7px;background:var(--accent);color:#fff" title="${cm.rotulo || cm.condicao}">${cm.condicao} (${cm.fonte})</span>`).join('')}
+          ${condicoesMagia.map(cm => `<span class="badge" style="font-size:0.7rem;padding:3px 7px;background:var(--accent);color:#fff;cursor:pointer" title="${escHtml(cm.rotulo || cm.condicao)} — clique para ver o que faz" data-efeito-info="${escHtml(cm.fonte.replace(/ \(.*\)$/, ''))}">${escHtml(cm.condicao)} (${escHtml(cm.fonte)})</span>`).join('')}
         </div>
       ` : ''}
       ${efeitosUnicos.length > 0 ? `
         <div style="display:flex;flex-wrap:wrap;gap:6px;padding:4px 0;margin-bottom:4px">
-          ${efeitosUnicos.map(ef => `<span class="badge" style="font-size:0.7rem;padding:3px 7px;background:var(--info);color:#fff" title="${ef.rotulo || ef.nome}">${ef.rotulo || ef.nome}${ef.concentracao ? ' (C)' : ''}</span>`).join('')}
+          ${efeitosUnicos.map(ef => { const base = ef.nome.replace(/ \(.*\)$/, ''); return `<span class="badge" style="font-size:0.7rem;padding:3px 7px;background:var(--info);color:#fff;cursor:pointer" title="${escHtml(ef.rotulo || ef.nome)} — clique para ver o que faz" data-efeito-info="${escHtml(base)}">${escHtml(base)}${ef.concentracao ? ' (C)' : ''}</span>`; }).join('')}
         </div>
       ` : ''}
       ${temCondicao ? `
@@ -381,6 +382,39 @@ export function renderSecaoSentidos() {
   `;
 }
 
+/**
+ * Popup de um efeito mágico ativo: o efeito aplicado na ficha, a descrição da
+ * condição quando o efeito dá uma e o texto da magia, quando o efeito vem
+ * dela. O texto da magia é buscado no acervo; sem ele o popup mostra só o
+ * efeito aplicado.
+ * @param {string} nomeBase Nome do efeito sem sufixo entre parênteses.
+ */
+async function abrirInfoEfeitoMagico(nomeBase) {
+  const efeitos = (char.efeitos_magicos || []).filter(e => e.nome.replace(/ \(.*\)$/, '') === nomeBase);
+  const ef = efeitos[0];
+  if (!ef) return;
+  const partes = [];
+  const rotulos = [...new Set(efeitos.map(e => e.rotulo).filter(Boolean))];
+  if (rotulos.length) {
+    partes.push(`<p><strong>Efeito na ficha:</strong> ${rotulos.map(escHtml).join('; ')}</p>`);
+  }
+  const condicao = efeitos.find(e => e.tipo === 'condicao')?.condicao;
+  if (condicao && CONDICOES_DESCRICAO[condicao]) {
+    partes.push(`<p><strong>${escHtml(condicao)}:</strong> ${escHtml(CONDICOES_DESCRICAO[condicao])}</p>`);
+  }
+  if (ef.concentracao) partes.push('<p><em>Exige Concentração.</em></p>');
+  try {
+    const magia = await getMagia(nomeBase, ef.circulo ?? 0);
+    if (magia?.descricao) {
+      partes.push(`<div class="md-content" style="margin-top:8px">${mdParaHtml(magia.descricao)}</div>`);
+    }
+  } catch (e) {
+    // Sem o acervo da magia, o popup mantém só o efeito aplicado.
+  }
+  abrirModal(nomeBase, partes.join('') || '<p>Sem descrição disponível.</p>',
+    '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
+}
+
 /** Setup de eventos para gerenciar condicoes */
 export function setupEventosCondicoes() {
   // Clicar na badge de condicao para ver descricao
@@ -392,6 +426,11 @@ export function setupEventosCondicoes() {
       abrirModal(`${info?.icone || ''} ${nome}`, `<div style="font-size:0.9rem;line-height:1.6">${desc}</div>`,
         '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
     });
+  });
+
+  // Clicar no selo de um efeito mágico ativo explica o que ele faz
+  document.querySelectorAll('[data-efeito-info]').forEach(el => {
+    el.addEventListener('click', () => abrirInfoEfeitoMagico(el.dataset.efeitoInfo));
   });
 
   document.getElementById('btn-modificadores')?.addEventListener('click', () => abrirModalModificadores());

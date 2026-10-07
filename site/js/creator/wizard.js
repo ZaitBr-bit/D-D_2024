@@ -18,6 +18,7 @@ import { salvarPersonagem } from '../store.js';
 import { calcMod, calcPVNivel1, getBonusTruquesOrdem, getEspacosMagia, getMagiaPreparadas, getTruquesConhecidos, magiaMagoEstaNoGrimorio, toast } from '../utils.js';
 import { ANTECEDENTES_ESCOLHAS, CLASSES_ESCOLHAS, ESPECIES_TRACOS_ESCOLHA, FERRAMENTAS_TODAS, INSTRUMENTOS_MUSICAIS, consolidarPericiasProficientes, obterTruquesEspecie } from './comum.js';
 import { aplicarFerramentasDaCriacao, concederTruquesDeEntrada } from '../regras-artifice.js';
+import { resistenciasDaEspecie } from '../regras-resistencias-especie.js';
 import { renderStepAntecedente } from './passo-antecedente.js';
 import { renderStepAtributos } from './passo-atributos.js';
 import { renderStepClasse } from './passo-classe.js';
@@ -493,39 +494,10 @@ async function finalizar() {
 
   if (!personagem.nome) personagem.nome = 'Sem Nome';
 
-  // Aplicar resistencias/vulnerabilidades/imunidades da especie
-  // Mapeamento baseado no Livro do Jogador 2024
-  const resistenciasEspecie = [];
+  // Aplicar resistencias da especie (regras-resistencias-especie.js)
   const especie = personagem.especie;
   const tracosEscolhidos = personagem.tracos_escolhidos || [];
-
-  if (especie === 'Aasimar') {
-    // Resistência Celestial: Necrótico e Radiante
-    resistenciasEspecie.push('Necrótico', 'Radiante');
-  } else if (especie === 'Anão') {
-    // Resistência a Toxinas: Venenoso
-    resistenciasEspecie.push('Venenoso');
-  } else if (especie === 'Draconato') {
-    // Resistência ao tipo de dano da Herança Dracônica
-    const herancaMap = {
-      'Azul': 'Elétrico', 'Branco': 'Gélido', 'Bronze': 'Elétrico',
-      'Cobre': 'Ácido', 'Latão': 'Ígneo', 'Negro': 'Ácido',
-      'Ouro': 'Ígneo', 'Prata': 'Gélido', 'Verde': 'Venenoso', 'Vermelho': 'Ígneo'
-    };
-    const dragao = tracosEscolhidos[0];
-    if (dragao && herancaMap[dragao]) {
-      resistenciasEspecie.push(herancaMap[dragao]);
-    }
-  } else if (especie === 'Tiferino') {
-    // Resistência pelo Legado Ínfero
-    const legadoMap = {
-      'Abissal': 'Venenoso', 'Ctônico': 'Necrótico', 'Infernal': 'Ígneo'
-    };
-    const legado = tracosEscolhidos[0];
-    if (legado && legadoMap[legado]) {
-      resistenciasEspecie.push(legadoMap[legado]);
-    }
-  }
+  const resistenciasEspecie = resistenciasDaEspecie(especie, tracosEscolhidos);
 
   // Aplicar resistencias da especie (sem duplicar existentes)
   if (resistenciasEspecie.length > 0) {

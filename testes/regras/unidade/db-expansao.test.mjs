@@ -19,7 +19,8 @@ test('getMagiasClasse e getMagiasPorClasseLista do Artífice', async () => {
   const m = await db.getMagiasClasse('Artífice');
   assert.ok(m.lista_magias.Truques.some((x) => x.nome === 'Bolha Ácida'));
   const l = await db.getMagiasPorClasseLista('Artífice');
-  assert.equal(l.total_magias, 80);
+  // 80 do Tasha's + Lanterna Espiritual (Arcana Unleashed, lista inclui o Artífice)
+  assert.equal(l.total_magias, 81);
   assert.ok(l.magias.some((x) => x.nome === 'Servo Homúnculo' && x.circulo === 2));
 });
 

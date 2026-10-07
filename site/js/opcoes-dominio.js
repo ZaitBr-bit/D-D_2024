@@ -8,6 +8,7 @@
 // ============================================================
 import { PERICIAS } from './dados-classes.js';
 import { talentoElegivelParaPersonagem } from './levelup.js';
+import { fonteDaMagia } from './db.js';
 import { escHtml, mdParaHtml, circuloSuperiorHtml, classesDaMagiaHtml } from './utils.js';
 
 /**
@@ -48,6 +49,19 @@ function _carregadorDetalheMagia(nome, circulo) {
 }
 
 /**
+ * Primeira frase de um texto, cortada em 110 caracteres, para a linha de
+ * resumo de um card.
+ * @param {string} texto Texto completo.
+ * @returns {string} Frase curta, ou '' sem texto.
+ */
+function resumoCurto(texto) {
+  const t = String(texto || '').replace(/\s+/g, ' ').trim();
+  if (!t) return '';
+  const frase = t.split(/(?<=[.!?])\s/)[0];
+  return frase.length > 110 ? `${frase.slice(0, 107)}…` : frase;
+}
+
+/**
  * Traduz talentos para opções. O resumo sai dos NOMES dos benefícios --
  * a descrição de topo costuma ser só "Você adquire os seguintes benefícios",
  * e o texto completo tem mediana de 402 caracteres (paredão num card).
@@ -74,9 +88,14 @@ export function deTalentos(talentos, ctx = {}) {
     return {
       id: t.nome,
       nome: t.nome,
-      resumo: beneficios.map(b => b.nome).join(' · ') || (t.descricao || ''),
-      detalhe: beneficios.map(b =>
-        `<div style="margin-bottom:4px"><strong>${b.nome}:</strong> ${b.descricao}</div>`).join(''),
+      // Talento sem lista de benefícios (Atacante Selvagem, Duelismo…): o
+      // resumo é só a primeira frase, e o texto completo vai para o
+      // "ver detalhes" (popup), nunca inteiro dentro do card.
+      resumo: beneficios.map(b => b.nome).join(' · ') || resumoCurto(t.descricao),
+      detalhe: beneficios.length
+        ? beneficios.map(b =>
+          `<div style="margin-bottom:4px"><strong>${b.nome}:</strong> ${b.descricao}</div>`).join('')
+        : (t.descricao ? mdParaHtml(t.descricao) : ''),
       tags: [],
       grupo: t.categoria || 'Geral',
       bloqueado,
@@ -136,6 +155,7 @@ export function deMagias(magias, ctx = {}) {
   return magias.map(m => ({
     id: m.nome,
     nome: m.nome,
+    fonte: m.fonte || fonteDaMagia(m.nome),
     resumo: [
       m.circulo === 0 ? 'Truque' : `${m.circulo}º Círculo`,
       m.escola || null,

@@ -5,6 +5,7 @@
 // Sem import de sheet/ nem creator/ (mesma regra de itens-seletor.js): o
 // personagem e os callbacks chegam por parâmetro.
 // ============================================================
+import { seloFonte } from './fontes.js';
 import { abrirModal, escHtml, inserirNoInicio, mdParaHtml, toast } from './utils.js';
 import { cobrarPrecoInformado, htmlCampoPrecoInformado } from './preco-informado-ui.js';
 import { circuloDoPergaminho } from './regras-pergaminho.js';
@@ -96,7 +97,7 @@ export function htmlLinhaItemMagico(it, indice) {
   return `
         <div class="inv-item" style="cursor:pointer" data-item-magico="${indice}">
           <div style="flex:1">
-            <div class="inv-item-nome">${escHtml(it.nome)}${it.requer_sintonizacao ? ' <span class="badge" style="font-size:0.6rem;background:#e0f2f1;color:#00695c">Sintonização</span>' : ''}</div>
+            <div class="inv-item-nome">${escHtml(it.nome)}${seloFonte(it.fonte)}${it.requer_sintonizacao ? ' <span class="badge" style="font-size:0.6rem;background:#e0f2f1;color:#00695c">Sintonização</span>' : ''}</div>
             <div class="inv-item-detalhe">${escHtml(it.tipo)} | ${escHtml(raridadesDoItem(it).join(', '))}</div>
           </div>
         </div>`;

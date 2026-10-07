@@ -88,12 +88,10 @@ export const GATILHOS_SEM_COBERTURA = [
   // aspas), o que esta fora do escopo desta entrega.
   'btn-confirmar-remover-grimorio',
   'btn-dist-sugerida',
-  'btn-edit-po',
   // 'btn-editar-item-custom' saiu daqui na Tarefa 9 (issue #43):
   // item-customizado-peso.spec.mjs clica nele para editar o peso.
   'btn-enable-levelup-v2',
   'btn-escolher-manobras-pendentes',
-  'btn-finalizar',
   'btn-furia-implacavel-falha',
   'btn-furia-implacavel-sucesso',
   'btn-gastar-metamagia',
@@ -123,7 +121,6 @@ export const GATILHOS_SEM_COBERTURA = [
   'btn-protecao-rest-ok',
   'btn-qtd-item-menos',
   'btn-recarregar-especies',
-  'btn-recuperar-confirmar',
   'btn-recuperar-dadiva-epica',
   'btn-resetar-pv-max',
   'btn-resetar-taxas',
@@ -159,9 +156,7 @@ export const GATILHOS_SEM_COBERTURA = [
   'clerigo-subclasse-acao=trapaca_invocar_duplicidade',
   'clerigo-subclasse-acao=vida_preservar_vida',
   'druida-forma-acao=desativar',
-  'druida-forma-acao=encerrar',
   'druida-ressurgimento-acao=recuperar-forma',
-  'druida-ressurgimento-acao=recuperar-slot',
   'druida-subclasse-acao=constelacao_escolha',
   'druida-subclasse-acao=passo_lunar',
   'druida-subclasse-acao=passo_lunar_restaurar',
@@ -208,7 +203,6 @@ export const GATILHOS_SEM_COBERTURA = [
   'guerreiro-acao=usar-folego',
   'guerreiro-acao=usar-indomavel',
   'guerreiro-acao=usar-superioridade',
-  'guerreiro-acao=usar-surto',
   'guerreiro-acao=vinculo-protetivo',
   'ladino-acao=gastar-dado-psionico',
   'ladino-acao=golpe-sorte',
@@ -216,7 +210,6 @@ export const GATILHOS_SEM_COBERTURA = [
   'ladino-acao=sussurros',
   'ladino-acao=teleporte-psiquico',
   'ladino-acao=veu-psiquico',
-  'mago-acao=recuperacao-arcana',
   'mago-subclasse-acao=autoimagem_restaurar',
   'mago-subclasse-acao=autoimagem_usar',
   'mago-subclasse-acao=prodigio_rolar',
@@ -248,6 +241,4 @@ export const GATILHOS_SEM_COBERTURA = [
   'paladino-subclasse-acao=gloria_lenda_viva',
   'paladino-subclasse-acao=vinganca_anjo_vingador',
   'paladino-subclasse-acao=vinganca_voto_inimizade',
-  'sortudo-acao=desvantagem',
-  'sortudo-acao=vantagem',
 ];

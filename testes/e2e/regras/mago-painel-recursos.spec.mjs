@@ -16,7 +16,7 @@
 // deixou o problema passar pelos testes anteriores.
 // ============================================================
 import { test, expect } from '@playwright/test';
-import { ATRIBUTOS_REGRAS, abrirFicha, assentar, clicarSeletorFicha, personagemSalvo } from './helpers-regras.mjs';
+import { abrirBlocosRecursos, ATRIBUTOS_REGRAS, abrirFicha, assentar, clicarSeletorFicha, personagemSalvo } from './helpers-regras.mjs';
 
 const GRIMORIO = [
   { nome: 'Mísseis Mágicos', circulo: 1 },
@@ -43,9 +43,10 @@ const MAGO_SEM_ESCOLHA = {
   grimorio: GRIMORIO,
 };
 
-test('painel: as magias escolhidas aparecem nos botões, sem precisar expandir nada', async ({ context }) => {
+test('painel: as magias escolhidas aparecem nos botões do bloco de recursos aberto', async ({ context }) => {
   const { page, erros } = await abrirFicha(context, MAGO_ESCOLHIDO, 'regras-mago-painel');
   await assentar(page).catch(() => {});
+  await abrirBlocosRecursos(page);
 
   const painel = page.locator('#painel-recursos-mago');
   await expect(painel).toBeVisible();
@@ -66,6 +67,7 @@ test('painel: as magias escolhidas aparecem nos botões, sem precisar expandir n
 test('painel: conjurar pela Maestria não gasta espaço de magia', async ({ context }) => {
   const { page, erros } = await abrirFicha(context, MAGO_ESCOLHIDO, 'regras-mago-painel-uso');
   await assentar(page).catch(() => {});
+  await abrirBlocosRecursos(page);
 
   const antes = await personagemSalvo(page);
   const usadosAntes = Object.values(antes.espacos_magia || {}).reduce((s, e) => s + (e.usados || 0), 0);
@@ -87,6 +89,7 @@ test('painel: conjurar pela Maestria não gasta espaço de magia', async ({ cont
 test('painel: sem escolha feita, o atalho para escolher fica à vista', async ({ context }) => {
   const { page, erros } = await abrirFicha(context, MAGO_SEM_ESCOLHA, 'regras-mago-painel-vazio');
   await assentar(page).catch(() => {});
+  await abrirBlocosRecursos(page);
 
   const painel = page.locator('#painel-recursos-mago');
   // Sem magia escolhida não há o que conjurar -- o painel oferece a escolha

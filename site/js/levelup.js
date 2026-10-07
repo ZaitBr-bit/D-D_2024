@@ -940,7 +940,10 @@ export async function obterCaracteristicasEspecieNivel(especie, nivel, tracosEsc
     caracteristicas.push({
       nome: `${tituloPai} — ${legadoEscolhido}`,
       descricao: `Você aprende automaticamente a magia *${nomeMagiaLegado}*, que fica sempre preparada. Pode conjurá-la uma vez sem gastar um espaço de magia; esse uso gratuito é restaurado ao completar um Descanso Longo.`,
-      magiaConcedida: { nome: nomeMagiaLegado, circulo: magiaIdx?.circulo ?? (nivel === 3 ? 1 : 2) }
+      // gratisSemEspaco: a descrição acima dá 1 conjuração sem espaço por
+      // Descanso Longo; sem a marca a magia não ganhava `gratis_usado` e o
+      // botão "Grátis" não aparecia.
+      magiaConcedida: { nome: nomeMagiaLegado, circulo: magiaIdx?.circulo ?? (nivel === 3 ? 1 : 2), gratisSemEspaco: true }
     });
   }
 

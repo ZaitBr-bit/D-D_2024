@@ -20,7 +20,7 @@
 // livro dispensa.
 // ============================================================
 import { test, expect } from '@playwright/test';
-import { ATRIBUTOS_REGRAS, abrirFicha, assentar, personagemSalvo } from './helpers-regras.mjs';
+import { abrirBlocosRecursos, ATRIBUTOS_REGRAS, abrirFicha, assentar, personagemSalvo } from './helpers-regras.mjs';
 
 // Armadura Arcana: MAGIAS_EFEITO diz `CA = 13 + Des`. Com Destreza 14 (+2)
 // e sem armadura, a CA sai de 12 (10 + Des) para 15.
@@ -65,6 +65,7 @@ function textoDaFichaAberta(page) {
 test('Maestria de Magias: Armadura Arcana conjurada de graça altera a CA', async ({ context }) => {
   const { page, erros } = await abrirFicha(context, MAGO_18, 'regras-mago-maestria-ca');
   await assentar(page).catch(() => {});
+  await abrirBlocosRecursos(page);
 
   // GUARDA CONTRA VACUIDADE: sem o botão da Maestria não há o que clicar, e
   // "a CA não mudou" acusaria a regra errada.
@@ -102,8 +103,9 @@ test('Maestria de Magias: Armadura Arcana conjurada de graça altera a CA', asyn
 test('Assinatura Mágica: a conjuração de graça aplica o efeito e queima o uso', async ({ context }) => {
   const { page, erros } = await abrirFicha(context, MAGO_20, 'regras-mago-assinatura-ca');
   await assentar(page).catch(() => {});
+  await abrirBlocosRecursos(page);
 
-  const botao = page.locator('[data-mago-acao="assinatura-1"]').first();
+  const botao = page.locator('#painel-recursos-mago [data-mago-acao="assinatura-1"]');
   await expect(botao, 'o Mago de nível 20 precisa ter o botão da Assinatura Mágica')
     .toBeVisible();
 

@@ -1,0 +1,49 @@
+{
+  "classe": "Mago",
+  "fonte": "arcana-unleashed",
+  "subclasses": [
+    {
+      "nome": "Necromante",
+      "nome_en": "Necromancer",
+      "fonte": "arcana-unleashed",
+      "descricao": "Você explora as forças da vida, da morte e da morte-viva. Como necromante, você aprende a manipular a energia que anima todas as criaturas e extrai poder crescente dos segredos proibidos em seu livro de magias. Embora muitos vejam os Necromantes como ameaçadores ou vilões, nem todos os Necromantes são maus.",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Versado em Necromancia",
+          "descricao": "Escolha duas magias de Mago da escola de Necromancia, cada uma deve ser de 2º círculo ou inferior e adicione-as gratuitamente ao seu livro de magias.\nAlém disso, ao adquirir acesso a um novo círculo de espaços de magia nesta classe, você pode adicionar gratuitamente uma magia de Mago da escola de Necromancia ao seu livro de magias. A magia escolhida deve ser de um círculo para o qual você tenha espaços de magia."
+        },
+        {
+          "nivel": 3,
+          "nome": "Livro de Magias Necromântico",
+          "descricao": "Os segredos necromânticos do seu livro de magias lhe concedem poderes adicionais. Você adquire os benefícios a seguir.\n**Resistência Necrótica.** Você tem Resistência a dano Necrótico.\n**Familiar Morto-Vivo.** A magia *Convocar Familiar* aparece no seu livro de magias. Ao conjurar a magia, você escolhe uma das formas normais para o familiar ou uma das seguintes formas especiais: Esqueleto ou Zumbi (veja o apêndice B do Livro do Jogador para o bloco de estatísticas do familiar). Ao escolher uma das formas normais, você pode escolher Morto-Vivo como o tipo de criatura dele. Além disso, ao executar a ação Atacar, você pode abrir mão de um dos seus ataques para permitir que seu familiar realize um ataque próprio com a Reação dele.\n**Vitalidade Morta-Viva.** Ao conjurar uma magia de Necromancia com um espaço de magia, você pode escolher uma criatura Morta-Viva que você veja a até 18 metros de você para recuperar um número de Pontos de Vida igual ao nível do espaço de magia gasto mais seu nível de Mago."
+        },
+        {
+          "nivel": 6,
+          "nome": "Poder Sepulcral",
+          "descricao": "Você descobriu mais percepções necromânticas e as inscreveu em seu livro de magias. Enquanto estiver segurando seu livro de magias, você adquire os benefícios a seguir.\n**Resiliência Sepulcral.** Ao usar Recuperação Arcana, seu nível de Exaustão, se houver, diminui em 1.\n**Necrose Esmagadora.** O dano das suas magias de Mago e das suas características de Mago ignora Resistência a dano Necrótico."
+        },
+        {
+          "nivel": 6,
+          "nome": "Servos Mortos-Vivos",
+          "descricao": "Você sempre tem a magia *Animar Mortos* preparada e pode conjurá-la sem gastar um espaço de magia, mas deve completar um Descanso Longo antes de poder conjurá-la dessa forma novamente. Sempre que começar a conjurar a magia, você pode aumentar o círculo efetivo dela em 1."
+        },
+        {
+          "nivel": 6,
+          "nome": "Servos Fortalecidos",
+          "descricao": "Enquanto estiver segurando seu livro de magias, você adquire os benefícios a seguir.\n**Fortitude Morta-Viva.** Sempre que conjurar uma magia de Necromancia que crie ou invoque um Morto-Vivo, o máximo de Pontos de Vida e os Pontos de Vida atuais do Morto-Vivo aumentam em um número igual ao seu modificador de Inteligência mais metade do seu nível de Mago (arredondado para baixo).\n**Golpe Debilitante.** Sempre que um Morto-Vivo sob seu controle a até 18 metros de você atingir uma criatura com uma jogada de ataque, o Morto-Vivo causa dano Necrótico extra igual ao seu modificador de Inteligência (mínimo de 1 de dano Necrótico)."
+        },
+        {
+          "nivel": 10,
+          "nome": "Colher Mortos-Vivos",
+          "descricao": "Você aprendeu mais segredos sobre as nuances da vida e da morte. Imediatamente depois de ficar Sangrando, mas sem ser reduzido a 0 Pontos de Vida pelo dano sofrido, você pode executar uma Reação para reduzir a 0 Pontos de Vida uma criatura Morta-Viva sob seu controle que você veja. Você então recupera imediatamente um número de Pontos de Vida igual ao seu nível de Mago."
+        },
+        {
+          "nivel": 14,
+          "nome": "Mestre da Morte",
+          "descricao": "Rituais abstrusos no seu livro de magias lhe dão domínio sobre a morte-viva. Enquanto estiver segurando seu livro de magias, você adquire os benefícios a seguir.\n**Fortalecer Mortos-Vivos.** Como uma Ação Bônus, escolha qualquer quantidade de Mortos-Vivos que você tenha criado ou invocado com uma magia de Necromancia e que estejam a até 18 metros de você. Cada um desses Mortos-Vivos recebe Pontos de Vida Temporários iguais ao seu nível de Mago. Depois de usar esta Ação Bônus, você não pode fazê-lo novamente até completar um Descanso Longo.\n**Extinguir Mortos-Vivos.** Quando uma criatura Morta-Viva que você veja é reduzida a 0 Pontos de Vida, você pode fazê-la explodir com energia necrótica. Role um número de d6 igual à metade dos Dados de Vida não gastos da criatura (arredondado para cima, mínimo de 1d6) e some os resultados. Cada criatura em uma Emanação de 3 metros com origem no Morto-Vivo faz uma salvaguarda de Destreza. Em uma falha, o alvo sofre dano Necrótico igual ao número rolado e não pode executar Reações até o início do próximo turno dele. Em um sucesso, o alvo sofre apenas metade do dano. Ao usar esta característica para explodir uma criatura Morta-Viva que você não controla, você deve executar uma Reação e gastar um espaço de magia de 5º círculo ou superior para fazê-lo."
+        }
+      ]
+    }
+  ]
+}

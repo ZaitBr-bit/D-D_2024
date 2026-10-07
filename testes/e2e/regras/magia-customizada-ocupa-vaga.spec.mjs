@@ -5,7 +5,7 @@
 // (Mago), do jeito que uma magia do livro apareceria.
 // ============================================================
 import { test, expect } from '@playwright/test';
-import { abrirFicha, assentar, ATRIBUTOS_REGRAS, clicarSeletorFicha } from './helpers-regras.mjs';
+import { abrirBlocosRecursos, abrirFicha, assentar, ATRIBUTOS_REGRAS, clicarSeletorFicha } from './helpers-regras.mjs';
 
 const MAGO_5 = {
   nome: 'Aluno de Magia', especie: 'Humano', classe: 'Mago', subclasse: '',
@@ -79,8 +79,9 @@ test('magia "ocupa vaga" aparece candidata de Maestria de Magias', async ({ cont
   const MAGO_18 = { ...MAGO_5, nivel: 18, xp: 300000, classes: [{ classe: 'Mago', subclasse: '', nivel: 18, ordem: 0 }] };
   const { page } = await abrirFicha(context, MAGO_18, 'regras-magia-custom-3');
   await assentar(page).catch(() => {});
+  await abrirBlocosRecursos(page);
   await criarMagiaPersonalizada(page, { nome: 'Chama Azul', semprePreparada: false });
-  await page.locator('[data-mago-acao="definir-maestria-magias"]').first().click();
+  await page.locator('#painel-recursos-mago [data-mago-acao="definir-maestria-magias"]').click();
   await assentar(page).catch(() => {});
   await expect(page.locator('#magia-fixa-c1')).toContainText('Chama Azul');
 });

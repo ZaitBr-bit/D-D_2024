@@ -10,7 +10,8 @@ import { CLASSES_INFO } from '../dados-classes.js';
 import { PROFICIENCIAS_FIXAS_TALENTO } from '../regras-cobertura.js';
 import { MAGIAS_LEGADO_ESPECIE, _concederMagiaAutomatica } from '../levelup.js';
 import { getTruquesFixosAcumulados } from '../regras-conjuracao-subclasse.js';
-import { classesDe } from '../regras-multiclasse.js';
+import { classesDe, nivelNa, subclasseDe, temClasse } from '../regras-multiclasse.js';
+import { ESCOLHAS_SUBCLASSE_APP, aplicarConcessaoAutomatica } from '../regras-subclasse-escolhas.js';
 import { getLimitesMagias } from '../utils.js';
 import { char, indiceMagiasCache, magiasDominioCache, magiasSempreCache, salvar } from './estado.js';
 import { getSubclasseConjuradoraConjuracao, magiaContaNoLimite } from './magias.js';
@@ -231,11 +232,37 @@ export function migrarMagiasLegadoEspecie() {
     const nivel = Number(nivelStr);
     if (nivel > char.nivel) continue;
     const jaTem = char.magias_preparadas.find(m => m.nome === nomeMagia && m.origem === 'especie_legado');
-    if (jaTem) continue;
+    if (jaTem) {
+      // Fichas concedidas antes de existir o uso grátis: a conjuração sem
+      // espaço (1x por Descanso Longo) passa a existir, disponível.
+      if (jaTem.gratis_usado === undefined) { jaTem.gratis_usado = false; alterado = true; }
+      continue;
+    }
     const magiaIdx = (indiceMagiasCache || []).find(m => m.nome === nomeMagia);
     const circulo = magiaIdx?.circulo ?? (nivel === 3 ? 1 : 2);
-    _concederMagiaAutomatica(char.magias_preparadas, { nome: nomeMagia, circulo }, 'especie_legado');
+    _concederMagiaAutomatica(char.magias_preparadas, { nome: nomeMagia, circulo, gratisSemEspaco: true }, 'especie_legado');
     alterado = true;
+  }
+  if (alterado) salvar();
+}
+
+/**
+ * Aplica à ficha as concessões automáticas da subclasse do Mago até o nível
+ * dela (Resistência Necrótica e Convocar Familiar do Necromante). Cobre quem
+ * escolheu a subclasse no criador em nível 3+ e quem subiu antes de a tabela
+ * existir. Idempotente: aplicar de novo não duplica nada.
+ */
+export function migrarConcessoesSubclasseMago() {
+  if (!temClasse(char, 'Mago')) return;
+  const sub = subclasseDe(char, 'Mago');
+  const nivel = nivelNa(char, 'Mago');
+  if (!sub || nivel < 3) return;
+  let alterado = false;
+  for (const linha of ESCOLHAS_SUBCLASSE_APP) {
+    if (linha.subclasse !== sub || linha.nivel > nivel || !linha.automatica) continue;
+    const antes = JSON.stringify([char.resistencias, char.grimorio]);
+    aplicarConcessaoAutomatica(char, linha, { classe: 'Mago' });
+    if (JSON.stringify([char.resistencias, char.grimorio]) !== antes) alterado = true;
   }
   if (alterado) salvar();
 }

@@ -21,6 +21,18 @@ async function espacosUsados(page) {
   return Object.values((await lerChar(page)).espacos_magia?.conjuracao || {}).reduce((s, n) => s + (Number(n) || 0), 0);
 }
 
+/**
+ * Aplica dano ou cura pelo modal do card (o mesmo do personagem): abre, digita
+ * no campo "ou digite" e confirma.
+ */
+async function aplicarPV(page, tipo, valor, extra = '') {
+  await clicarSeletorFicha(page, `${SEC} [data-artifice-acao="companheiro-${tipo}"]${extra}`, { esperar: tipo === 'dano' ? '#btn-aplicar-dano-criatura' : '#btn-aplicar-cura-criatura' });
+  const campo = page.locator(`#input-criatura-${tipo}-manual`);
+  await campo.fill(valor);
+  await campo.blur();
+  await page.locator(tipo === 'dano' ? '#btn-aplicar-dano-criatura' : '#btn-aplicar-cura-criatura').click();
+}
+
 test('Ferreiro de Batalha: Defensor de Aço criado, PV aplicado, Reparar e dispensa', async ({ context }) => {
   const { page, erros } = await abrirFicha(context, { classe: 'Artífice', subclasse: 'Ferreiro de Batalha', nivel: 5, xp: 6500, atributos: ATR }, 'regras-artifice-defensor');
   const secao = page.locator(SEC);
@@ -28,8 +40,7 @@ test('Ferreiro de Batalha: Defensor de Aço criado, PV aplicado, Reparar e dispe
   await assentar(page).catch(() => {});
   await expect(secao.locator('[data-companheiro-cartao="defensor-de-aco"]')).toContainText('CA 15');
   await expect(secao.locator('[data-companheiro-cartao="defensor-de-aco"]')).toContainText('PV 30/30');
-  await page.locator('#companheiro-pv-defensor-de-aco-0').fill('-7');
-  await clicarSeletorFicha(page, `${SEC} [data-artifice-acao="companheiro-pv"]`);
+  await aplicarPV(page, 'dano', '7');
   await assentar(page).catch(() => {});
   await expect(secao.locator('[data-companheiro-cartao="defensor-de-aco"]')).toContainText('PV 23/30');
   await clicarSeletorFicha(page, `${SEC} [data-artifice-acao="defensor-reparar"]`);
@@ -44,23 +55,25 @@ test('Ferreiro de Batalha: Defensor de Aço criado, PV aplicado, Reparar e dispe
   await expect(secao.locator('[data-artifice-acao="defensor-reparar"]')).toContainText('(0/3)');
   await expect(secao.locator('[data-artifice-acao="defensor-reparar"]')).toBeDisabled();
   expect((await lerChar(page)).recursos.artifice.reparar_defensor_gastos).toBe(3);
-  // PV decimal é truncado: -2.9 vira -2 (30 - 7 = 23 -> 21).
-  await page.locator('#companheiro-pv-defensor-de-aco-0').fill('-2.9');
-  await clicarSeletorFicha(page, `${SEC} [data-artifice-acao="companheiro-pv"]`);
+  // PV decimal é truncado: 2.9 vira 2 de dano (30 - 7 = 23 -> 21).
+  await aplicarPV(page, 'dano', '2.9');
   await assentar(page).catch(() => {});
   await expect(secao.locator('[data-companheiro-cartao="defensor-de-aco"]')).toContainText('PV 21/30');
-  // Fração que trunca para zero é recusada e não altera o PV.
-  await page.locator('#companheiro-pv-defensor-de-aco-0').fill('0.5');
-  await clicarSeletorFicha(page, `${SEC} [data-artifice-acao="companheiro-pv"]`);
+  // Cura limitada ao máximo: curar 99 num defensor com 21/30 deixa 30/30; volta a 21 com 9 de dano.
+  await aplicarPV(page, 'cura', '99');
+  await assentar(page).catch(() => {});
+  await expect(secao.locator('[data-companheiro-cartao="defensor-de-aco"]')).toContainText('PV 30/30');
+  await aplicarPV(page, 'dano', '9');
+  await assentar(page).catch(() => {});
   await expect(secao.locator('[data-companheiro-cartao="defensor-de-aco"]')).toContainText('PV 21/30');
   // Em 0 PV o defensor fica destruído: sem Aplicar PV nem Reparar; Reviver gasta um espaço e restaura os PV.
-  await page.locator('#companheiro-pv-defensor-de-aco-0').fill('-99');
-  await clicarSeletorFicha(page, `${SEC} [data-artifice-acao="companheiro-pv"]`);
+  await aplicarPV(page, 'dano', '99');
   await assentar(page).catch(() => {});
   const cartaoDef = secao.locator('[data-companheiro-cartao="defensor-de-aco"]');
   await expect(cartaoDef).toContainText('PV 0/30');
   await expect(cartaoDef).toContainText('Destruído');
-  await expect(cartaoDef.locator('[data-artifice-acao="companheiro-pv"]')).toBeDisabled();
+  await expect(cartaoDef.locator('[data-artifice-acao="companheiro-dano"]')).toBeDisabled();
+  await expect(cartaoDef.locator('[data-artifice-acao="companheiro-cura"]')).toBeDisabled();
   await expect(cartaoDef.locator('[data-artifice-acao="defensor-reparar"]')).toHaveCount(0);
   expect(await espacosUsados(page)).toBe(0);
   await clicarSeletorFicha(page, `${SEC} [data-artifice-acao="defensor-reviver"]`);
@@ -87,8 +100,7 @@ test('Artilheiro 15: criação grátis cria os dois canhões; gastar espaço cus
   // Sem vaga (nunca um terceiro), não há botão de criar.
   await expect(secao.locator('[data-artifice-acao^="companheiro-criar"]')).toHaveCount(0);
   // Canhão em 0 PV desaparece.
-  await page.locator('#companheiro-pv-canhao-mistico-1').fill('-999');
-  await clicarSeletorFicha(page, `${SEC} [data-artifice-acao="companheiro-pv"][data-i="1"]`);
+  await aplicarPV(page, 'dano', '999', '[data-i="1"]');
   await assentar(page).catch(() => {});
   await expect(secao.locator('[data-companheiro-cartao="canhao-mistico"]')).toHaveCount(1);
   // Criação grátis já usada: com uma vaga, gastar espaço cria um canhão por um espaço.

@@ -1,0 +1,107 @@
+{
+  "fonte": "arcana-unleashed",
+  "observacao": "Magias de Necromancia do Mago de Arcana Unleashed (PDF em Informacoes Separadas/PDF/). Classes conforme o bloco de cada magia no livro. Textos em PT-BR com as distancias convertidas para metros.",
+  "magias": [
+    {
+      "nome": "Murchar e Florescer",
+      "circulo": 2,
+      "escola": "Necromancia",
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S, M (uma videira murcha torcida em forma de laço)",
+      "duracao": "Instantânea",
+      "descricao": "Você invoca morte e vida ao mesmo tempo em uma Esfera de 3 metros de raio com centro em um ponto no alcance. Cada criatura à sua escolha na área faz uma salvaguarda de Constituição, sofrendo 3d6 de dano Necrótico em uma falha ou metade desse dano em um sucesso. Plantas não mágicas na área que não sejam criaturas, como árvores e arbustos, murcham.\n\nAlém disso, uma criatura à sua escolha na área pode rolar um dos seus Dados de Vida não gastos e recuperar um número de Pontos de Vida igual ao resultado mais o seu modificador de atributo de conjuração. Esse dado é então gasto.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano aumenta em 1d6 para cada círculo do espaço de magia acima de 2. A quantidade de Dados de Vida que podem ser rolados e gastos aumenta em um para cada círculo do espaço de magia acima de 2. Você soma o modificador de atributo de conjuração aos Pontos de Vida recuperados por esta magia apenas uma vez, independentemente da quantidade de Dados de Vida rolados e gastos.",
+      "classes": ["Druida", "Feiticeiro", "Mago"],
+      "fonte": "arcana-unleashed"
+    },
+    {
+      "nome": "Rajada Purulenta",
+      "circulo": 4,
+      "escola": "Necromancia",
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S",
+      "duracao": "1 minuto",
+      "descricao": "Uma Linha de miasma de 18 metros de comprimento e 3 metros de largura sai de você em uma direção à sua escolha. Cada criatura na Linha deve fazer uma salvaguarda de Constituição. Em uma falha, o alvo sofre 4d10 de dano Necrótico e tem a condição Envenenado pela duração.\n\nUma criatura Envenenada por esta magia sofre 2d10 de dano Venenoso no início de cada um dos seus turnos. No fim de cada um dos seus turnos, um alvo Envenenado repete a salvaguarda, encerrando a magia sobre si mesmo em um sucesso.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano inicial aumenta em 1d10 para cada círculo do espaço de magia acima de 4.",
+      "classes": ["Bruxo", "Druida", "Feiticeiro", "Mago"],
+      "fonte": "arcana-unleashed"
+    },
+    {
+      "nome": "Enervação",
+      "circulo": 5,
+      "escola": "Necromancia",
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, S",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Uma espiral de escuridão como tinta sai de você para drenar a vida de uma criatura que você veja no alcance.\n\nO alvo faz uma salvaguarda de Destreza. Em uma falha, o alvo sofre 6d8 de dano Necrótico. Em cada um dos seus turnos seguintes, você pode usar uma Ação Bônus para causar 2d8 de dano Necrótico ao alvo automaticamente. A magia termina se o alvo ficar fora do alcance da magia ou tiver Cobertura Total em relação a você.\n\nEm um sucesso, o alvo sofre apenas metade do dano inicial, e a magia termina.\n\nSempre que esta magia causar dano a um alvo, você recupera Pontos de Vida iguais à metade do dano Necrótico causado.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano inicial aumenta em 1d8 para cada círculo do espaço de magia acima de 5.",
+      "classes": ["Bruxo", "Feiticeiro", "Mago"],
+      "fonte": "arcana-unleashed"
+    },
+    {
+      "nome": "Terreno Sepulcral",
+      "circulo": 5,
+      "escola": "Necromancia",
+      "tempo_conjuracao": "Ação",
+      "alcance": "36 metros",
+      "componentes": "V, S, M (um punhado de terra de cova)",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Mãos esqueléticas brotam de uma área do chão no alcance. A área é formada por até quatro quadrados de 3 metros, que você arranja como quiser. Cada quadrado deve ser contíguo a pelo menos um outro quadrado. Essa área é Terreno Difícil para os seus inimigos.\n\nQualquer inimigo na área quando as mãos esqueléticas surgem faz uma salvaguarda de Força. Em uma falha, a criatura sofre 6d6 de dano Necrótico e, até o fim do próximo turno dela, subtrai 1d6 de todas as suas jogadas de dano. Um inimigo também faz essa salvaguarda se entrar na área ou terminar o turno nela. Uma criatura faz essa salvaguarda apenas uma vez por turno.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano aumenta em 1d6 para cada círculo do espaço de magia acima de 5.",
+      "classes": ["Bruxo", "Clérigo", "Mago"],
+      "fonte": "arcana-unleashed"
+    },
+    {
+      "nome": "Torrente de Energia Negativa",
+      "circulo": 5,
+      "escola": "Necromancia",
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V, M (um osso quebrado e um quadrado de seda preta)",
+      "duracao": "Instantânea",
+      "descricao": "Você envia fitas de energia negativa contra uma criatura que você veja no alcance. Se o alvo não for Morto-Vivo, ele faz uma salvaguarda de Constituição, sofrendo 3d10 + 25 de dano Necrótico em uma falha ou metade desse dano em um sucesso. Um Humanoide morto por esta magia se ergue no início do seu próximo turno como um Zumbi que segue suas ordens verbais por 24 horas; depois disso, age conforme a própria natureza.\n\nSe o alvo for Morto-Vivo, ele recebe 3d10 Pontos de Vida Temporários.",
+      "circulo_superior": "Usando um Espaço de Magia de Círculo Superior. O dano aumenta em 1d10 para cada círculo do espaço de magia acima de 5.",
+      "classes": ["Bruxo", "Mago"],
+      "fonte": "arcana-unleashed"
+    },
+    {
+      "nome": "Lanterna Espiritual",
+      "circulo": 5,
+      "escola": "Necromancia",
+      "tempo_conjuracao": "Ação",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (uma lanterna preta)",
+      "duracao": "10 minutos",
+      "descricao": "Você conjura uma lanterna negra e fantasmagórica que flutua acima de você e emite Luz Fraca em um raio de 18 metros. Quando um inimigo morre dentro dessa Luz Fraca, um fragmento da alma da criatura voa para dentro da lanterna. A lanterna pode guardar uma quantidade de fragmentos de alma igual ao seu modificador de atributo de conjuração, e os fragmentos se dissipam quando a magia termina.\n\nComo uma Ação Bônus, você pode gastar um fragmento de alma para criar um dos efeitos a seguir.\n\n**Drenar Vida.** O fragmento de alma avança contra uma criatura à sua escolha que você veja a até 18 metros de você. O alvo faz uma salvaguarda de Constituição, sofrendo dano Necrótico igual a 4d8 mais o seu modificador de atributo de conjuração em uma falha ou metade desse dano em um sucesso.\n\n**Reparar Morto-Vivo.** O fragmento de alma entra em uma criatura Morta-Viva à sua escolha que você veja a até 18 metros de você. Essa criatura recupera Pontos de Vida iguais a 4d8 mais o seu modificador de atributo de conjuração.\n\n**Proteger Aliado.** O fragmento de alma circula uma criatura à sua escolha que você veja a até 18 metros de você. Outras criaturas têm Desvantagem em jogadas de ataque contra a criatura escolhida até o início do seu próximo turno.",
+      "classes": ["Artífice", "Bruxo", "Clérigo", "Mago"],
+      "fonte": "arcana-unleashed"
+    },
+    {
+      "nome": "Ondas de Exaustão",
+      "circulo": 5,
+      "escola": "Necromancia",
+      "tempo_conjuracao": "Ação Bônus",
+      "alcance": "Pessoal",
+      "componentes": "V, S, M (um pedaço de carne seca)",
+      "duracao": "Concentração, até 1 minuto",
+      "descricao": "Você evoca um nimbo de luz cinzenta tremeluzente em volta do seu corpo. Pela duração, você pode usar uma ação de Magia para emitir uma onda de luz cinzenta em um Cone de 18 metros. As criaturas nessa área devem ser bem-sucedidas em uma salvaguarda de Constituição ou ganham 1 nível de Exaustão. Esta magia não pode aumentar o nível de Exaustão de uma criatura acima de 4.\n\nOs níveis de Exaustão ganhos por esta magia são removidos quando a magia termina.",
+      "classes": ["Bruxo", "Feiticeiro", "Mago"],
+      "fonte": "arcana-unleashed"
+    },
+    {
+      "nome": "Lamento da Banshee",
+      "circulo": 9,
+      "escola": "Necromancia",
+      "tempo_conjuracao": "Ação",
+      "alcance": "18 metros",
+      "componentes": "V",
+      "duracao": "Instantânea",
+      "descricao": "Você emite um grito terrível capaz de matar quem o ouve. Escolha até dez criaturas no alcance. Cada alvo com 50 Pontos de Vida ou menos morre. Alvos com mais de 50 Pontos de Vida fazem uma salvaguarda de Constituição. Em uma falha, o alvo sofre 12d10 de dano Psíquico e tem a condição Surdo por 1 hora. Em um sucesso, o alvo sofre apenas metade do dano. Um alvo não é afetado pela magia se não puder ouvir você.",
+      "classes": ["Bruxo", "Feiticeiro", "Mago"],
+      "fonte": "arcana-unleashed"
+    }
+  ]
+}

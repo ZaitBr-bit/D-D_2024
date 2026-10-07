@@ -278,3 +278,15 @@ test('deManobras: descrição vira resumo; manobra já conhecida bloqueia', () =
   assert.equal(b.resumo, 'Empurre o alvo até 3 metros ao acertar.');
   assert.equal(b.bloqueado, null);
 });
+
+test('deTalentos: talento sem lista de benefícios tem resumo curto e o texto vai para o popup', () => {
+  const todos = lerTalentosDados();
+  const sem = todos.filter((t) => !(t.beneficios || []).length && t.descricao);
+  assert.ok(sem.length >= 10, 'há talentos sem benefícios no livro (ex.: Atacante Selvagem)');
+  for (const o of deTalentos(sem)) {
+    assert.ok(o.resumo.length <= 111, `${o.nome}: o resumo do card não pode ser o texto inteiro (${o.resumo.length})`);
+    assert.ok(o.detalhe.length > 0, `${o.nome}: o texto completo precisa estar no detalhe (popup do "ver detalhes")`);
+  }
+  const [atacante] = deTalentos(sem.filter((t) => t.nome === 'Atacante Selvagem'));
+  assert.match(atacante.detalhe, /jogar os dados de dano da arma duas vezes/);
+});

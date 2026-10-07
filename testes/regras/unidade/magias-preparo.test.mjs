@@ -270,7 +270,12 @@ test('toda origem que o app escreve aparece em alguma lista de origem', () => {
   // em `char.talentos` (sheet/talentos.js:294,304). A varredura acima procura
   // `origem: '...'` em todo o site/js/ e não distingue a coleção de destino --
   // foi um falso positivo deste teste, não uma origem de magia esquecida.
-  const foraDoLimiteDeMagias = new Set(['manual', 'invocacao_grandes_antigos']);
+  //
+  // `companheiro_selvagem` é a origem do FAMILIAR em `char.recursos.familiar`
+  // (Druida, Companheiro Selvagem), não de magia. `subclasse` é a origem da
+  // magia que a subclasse põe no `char.grimorio` (Convocar Familiar do
+  // Necromante): o grimório não entra no limite de preparadas.
+  const foraDoLimiteDeMagias = new Set(['manual', 'invocacao_grandes_antigos', 'companheiro_selvagem', 'subclasse']);
   const semClassificacao = [...escritas]
     .filter((o) => !classificadas.has(o) && !foraDoLimiteDeMagias.has(o));
   assert.deepEqual(semClassificacao, [],

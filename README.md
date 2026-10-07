@@ -3,7 +3,7 @@
 **[▶ Abrir o app](https://zaitbr-bit.github.io/D-D_2024/)** &nbsp;·&nbsp;
 **[🐛 Relatar um problema](https://github.com/ZaitBr-bit/D-D_2024/issues/new?template=bug.yml)** &nbsp;·&nbsp;
 **[💡 Sugerir uma melhoria](https://github.com/ZaitBr-bit/D-D_2024/issues/new?template=sugestao.yml)** &nbsp;·&nbsp;
-versão atual **2.2.8**
+versão atual **3.2.1**
 
 Aplicativo web **gratuito e em português** para criar e usar fichas de personagem
 de **D&D 5.5 (edição de 2024)**. Roda no navegador do celular e do computador,
@@ -11,9 +11,11 @@ de **D&D 5.5 (edição de 2024)**. Roda no navegador do celular e do computador,
 próprio aparelho, e a conta Google é opcional, só para sincronizar entre
 dispositivos.
 
-O conteúdo de regras já está embutido: **12 classes**, **48 subclasses**,
-**11 espécies**, **16 antecedentes**, **75 talentos**, **391 magias**, além de
-armas, armaduras, equipamento de aventura, ferramentas, montarias e serviços.
+O conteúdo de regras já está embutido: **13 classes** (as 12 do Livro do Jogador
+mais o Artífice, de Tasha's), **54 subclasses**, **12 espécies** (com o Renascido,
+de Ravenloft), **16 antecedentes**, **75 talentos**, **391 magias**, os **itens
+mágicos do Livro do Mestre**, além de armas, armaduras, equipamento de aventura,
+ferramentas, montarias e serviços.
 
 > Este é um projeto de fã, feito por hobby. Não é um produto oficial e não tem
 > vínculo com a Wizards of the Coast.
@@ -67,21 +69,28 @@ personagem pode escolher.
 **Usar a ficha na mesa** — pontos de vida, dados de vida, condições, iniciativa,
 CA, perícias, salvaguardas, sentidos, proficiências, idiomas, resistências e
 imunidades. As habilidades de classe e de subclasse ficam com os usos contados
-(fúria, inspiração, canalizações, pontos de feitiçaria e afins).
+(fúria, inspiração, canalizações, pontos de feitiçaria e afins). Os recursos de
+classe aparecem em **chips**: os das classes conjuradoras no topo do card
+Magias, os das demais no card Recursos de Classe. Tocar no chip abre um popup
+com a explicação do recurso, e o botão dele usa o recurso na hora.
 
 **Descanso curto e descanso longo** com um botão, recuperando o que cada regra
 manda recuperar.
 
 **Subir de nível** pelo assistente, que apresenta as escolhas daquele nível
 (subclasse, talentos, aumentos de atributo, novas magias, trocas permitidas).
+Suporta **multiclasse**, com espaços de magia, dados de vida e recursos de cada
+classe tratados separadamente.
 
 **Magias** — lista completa por classe e por círculo, espaços de magia,
 concentração, magias sempre preparadas da subclasse, metamagia, grimório do Mago
 e a possibilidade de criar magias personalizadas.
 
 **Inventário** — armas, armaduras, escudos e equipamento com peso e custo, itens
-personalizados, controle de moedas, cálculo de capacidade de carga e
-arrastar-e-soltar para reordenar.
+personalizados, loja, controle de moedas, cálculo de capacidade de carga e
+arrastar-e-soltar para reordenar. Os **itens mágicos** do Livro do Mestre
+entram com efeitos, sintonização, cargas e magias. Armas equipadas alimentam a
+seção **Ataques**, com bônus, dano e mãos ocupadas.
 
 **Levar a ficha para fora do app** — botão **Gerar PDF** e uma versão formatada
 para **impressão**, ambos com a foto do personagem no cabeçalho. Também dá para
@@ -122,7 +131,7 @@ preenchida. Quanto mais específico o relato, mais rápido o conserto:
 
 | O quê | Exemplo |
 |---|---|
-| **Versão** | o número ao lado do título, no alto da tela (ex.: `2.2.8`) |
+| **Versão** | o número ao lado do título, no alto da tela (ex.: `3.2.1`) |
 | **Onde aconteceu** | criação de personagem, ficha, subida de nível, PDF… |
 | **O que você fez** | "criei um Bárbaro nível 5 e cliquei em Descanso Longo" |
 | **O que esperava** | "a fúria deveria voltar para 3 usos" |
@@ -202,11 +211,12 @@ D-D_2024/
 │   ├── sw.js                # Service Worker (cache offline)
 │   ├── css/app.css          # estilos globais (CSS vars: --primary, --danger, …)
 │   ├── img/, favicon.ico
-│   └── js/                  # 67 módulos ES + vendor/pdf-lib.min.js
+│   └── js/                  # ~115 módulos ES + vendor/pdf-lib.min.js
 │       ├── app.js           # router por hash, init, registro do SW
 │       ├── pages/           # home, creator, sheet (entradas de rota)
 │       ├── creator/         # assistente de criação, um arquivo por passo
-│       ├── sheet/           # ficha, um arquivo por assunto (+ classes/)
+│       ├── sheet/           # ficha, um arquivo por assunto (+ classes/ com as 13 classes)
+│       ├── regras-*.js      # regras puras, sem DOM (multiclasse, itens mágicos, Artífice…)
 │       ├── levelup*.js      # fluxo, UI, cards e validações de subida de nível
 │       ├── store.js db.js sync.js auth.js utils.js dados-classes.js
 │       └── versao.js        # VERSAO_ATUAL + notas de versão (edição manual)
@@ -214,16 +224,23 @@ D-D_2024/
 │   ├── classes/             # <classe>.json, magias_<classe>.json
 │   ├── origens/             # especies.json, antecedentes.json
 │   ├── talentos/  equipamento/  magias/  apendices/
+│   ├── tasha/               # Tasha's: Artífice, magias, itens e criaturas
+│   ├── ravenloft/           # Ravenloft: espécie Renascido
+│   ├── arcana-unleashed/    # Arcana Unleashed: subclasse Necromante do Mago
+│   ├── monstros/            # Manual dos Monstros (2026): Feras para a Forma Selvagem
+│   ├── fontes.json          # livros de origem do conteúdo (selo de fonte)
 │   ├── capitulo*.json, _metadados.json, controle/
 │   └── livro-do-mestre/     # Livro do Mestre (2024), traduzido; hoje só o cap. 7 (Tesouros). Separado do Livro do Jogador; o site lê o acervo de itens mágicos (capitulo7/itens_magicos.json)
 ├── Informacoes Separadas/   # regras em Markdown, referência humana — LOCAL, não versionada
 ├── testes/
-│   ├── e2e/                 # Playwright: paridade + specs de regra em regras/
-│   └── regras/              # regras de negócio confrontadas com o livro
-├── scripts/                 # verificar_extracao.py, excecoes/, livro-do-mestre/ (capitulo7.mjs: verificar/montar)
+│   ├── e2e/                 # Playwright: specs de regra em regras/ e Service Worker (Node isolado)
+│   └── regras/              # regras de negócio confrontadas com o livro (unidade/, catalogo/)
+├── scripts/                 # verificar_extracao.py, excecoes/, livro-do-mestre/, tasha/, itens-magicos/, limpar-processos-teste.ps1
+├── CLAUDE.md                # diretrizes de desenvolvimento (resumo)
 └── docs/
-    ├── ARQUITETURA.md       # aprofundamento técnico
-    └── DEPLOY.md            # pipeline de publicação e diagnóstico
+    ├── ARQUITETURA.md       # aprofundamento técnico e diretrizes de desenvolvimento
+    ├── DEPLOY.md            # pipeline de publicação e diagnóstico
+    └── TRIAGEM-ISSUES.md    # da issue à causa raiz
 ```
 
 ## Onde mexer para…
@@ -234,7 +251,8 @@ D-D_2024/
 | Magias, espaços, concentração | `sheet/magias.js` · grimório do Mago em `sheet/grimorio.js` |
 | PV, dados de vida, descansos | `sheet/hp-descanso.js` |
 | Inventário, itens, peso | `sheet/inventario.js` · seletor unificado em `js/itens-seletor.js` |
-| Recursos de uma classe | `sheet/classes/<classe>.js` |
+| Recursos de uma classe | `sheet/classes/<classe>.js` (lógica) e `sheet/recursos-classe.js` (chips na ficha) |
+| Uma regra pura (multiclasse, item mágico, magia) | `site/js/regras-*.js` |
 | Um passo do assistente de criação | `site/js/creator/passo-*.js` |
 | Subida de nível | `js/levelup-flow.js`, `levelup-cards.js`, `levelup-ui.js` |
 | Cálculos compartilhados | `js/utils.js` (`calcMod`, `calcCA`, `bonusProficiencia`, …) |
@@ -248,23 +266,27 @@ estão em **[docs/ARQUITETURA.md](docs/ARQUITETURA.md)**.
 
 ## Testes
 
-Três verificações independentes, que respondem perguntas diferentes:
+Verificações independentes, que respondem perguntas diferentes:
 
 | Verificação | Comando | Pergunta que responde |
 |---|---|---|
 | Estrutura dos módulos | `python scripts/verificar_extracao.py tudo` | "algum módulo tem símbolo sem import, import quebrado, declaração duplicada ou gravação em binding importado?" — estático, sem navegador |
-| Regras de negócio | `cd testes/e2e && npm run test:regras` | "o app obedece ao **livro**?" |
-| Paridade E2E | `cd testes/e2e && npm test` | "a tela é a mesma do repositório original?" — Playwright |
+| Regras, unidade | `cd testes/e2e && npm run test:regras:unidade` | "a regra pura obedece ao **livro**?" — `node:test`, segundos, ~5.300 casos |
+| Regras, tela | `cd testes/e2e && npm run test:regras:e2e` | "o clique na ficha faz o que o livro manda?" — Playwright, ~840 casos, ~11 min |
+| Service Worker | `cd testes/e2e && npm run test:offline` | "o app abre offline?" — precache do deploy |
 
 ```bash
 cd testes/e2e
 npm run instalar              # uma vez: dependências + Chromium
-npm run test:regras           # regras: unidade + navegador
+npm run test:regras           # unidade + tela
 npm run test:regras:unidade   # só node:test (segundos, sem navegador)
 npm run test:regras:e2e       # só os specs de regra em Playwright
-npm test                      # paridade (~6 min)
 npm run test:esm ../..        # força o parser de módulo ES em todos os JS
 ```
+
+Um spec isolado: `npx playwright test --config=regras/playwright.config.mjs regras/<arquivo>.spec.mjs`.
+No fim de uma rodada, `pwsh -File scripts/limpar-processos-teste.ps1 -Matar` fecha
+processos de teste esquecidos.
 
 - **Regras de negócio** (`testes/regras/`) é a suíte que importa hoje: confronta
   o app com o texto do livro a partir de catálogos curados à mão —
@@ -282,12 +304,11 @@ npm run test:esm ../..        # força o parser de módulo ES em todos os JS
 - **Quem for cobrir um domínio novo** deve ler antes o
   [GUIA-PROXIMOS-DOMINIOS.md](testes/regras/GUIA-PROXIMOS-DOMINIOS.md), que
   registra os erros das rodadas anteriores e traz um checklist de pré-voo.
-- **Paridade** (`testes/e2e/`) nasceu para guardar a refatoração que quebrou os
-  monólitos, comparando este repositório com uma cópia do original lado a lado
-  (`../D-D_2024` por padrão, ou `REPO_ORIGINAL=/caminho`). Ela **não é mais
-  restrição**: corrigir um bug faz os dois lados divergirem, e isso é o
-  esperado. Continua útil como rede contra regressão de renderização naquilo que
-  a correção não tocou — ver `testes/regras/README.md`.
+- **Os specs de tela** (`testes/e2e/regras/`) abrem uma ficha semeada, clicam e
+  conferem o resultado. A suíte de **paridade** com o repositório pré-refatoração
+  foi aposentada em 2026-08-23 — ver `testes/e2e/README.md`.
+- **Gatilho de tela novo exige spec que clique nele.** Todo botão
+  (`id="btn-..."` ou `data-*-acao`) sem teste faz a suíte de unidade falhar.
 - **`test.skip` sem motivo escrito é omissão silenciosa** — a regra do
   repositório é que todo skip carregue a justificativa no próprio arquivo.
 
@@ -313,6 +334,12 @@ um deploy foi mesmo ao ar e o que fazer quando ele falha:
   (`if (!char.config) char.config = {}`), porque personagens já salvos não têm o
   campo. Mudança de schema entra como migração em `sheet/migracoes.js`.
 - **Escapar entrada do usuário** com `escHtml()` ao interpolar em HTML.
+- **Lista com informação não usa dropdown.** Magias, itens, invocações e
+  qualquer lista em que cada entrada tenha descrição ou efeito aparecem como
+  **cards**, e clicar no card abre um **popup com as informações**. Dropdown só
+  para valores curtos sem descrição, ou quando for pedido expressamente.
+- **Regra de classe nunca lê o espelho** (`char.classe`, `char.nivel`): use
+  `nivelNa`, `subclasseDe` e `temClasse` — o personagem pode ter várias classes.
 - **Não commitar automaticamente** — política do repositório.
 - Ao lançar uma versão, `VERSAO_ATUAL` e a entrada no topo de `NOTAS_VERSAO`
   precisam bater; há teste que cobra isso.
@@ -321,7 +348,8 @@ um deploy foi mesmo ao ar e o que fazer quando ele falha:
 
 | Documento | Assunto |
 |---|---|
-| [docs/ARQUITETURA.md](docs/ARQUITETURA.md) | módulos, estado, dados, padrões de UI, cálculos |
+| [CLAUDE.md](CLAUDE.md) | diretrizes de desenvolvimento, em resumo |
+| [docs/ARQUITETURA.md](docs/ARQUITETURA.md) | módulos, multiclasse, recursos de classe, estado, dados, padrões de UI, diretrizes, cálculos |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | pipeline, versionamento, precache, diagnóstico de falhas |
 | [docs/TRIAGEM-ISSUES.md](docs/TRIAGEM-ISSUES.md) | puxar issue e anexos, confrontar com o livro, achar a causa raiz |
 | [testes/regras/README.md](testes/regras/README.md) | suíte de regras de negócio |

@@ -194,6 +194,16 @@ const ALVOS = [
     ],
   },
   {
+    nome: 'Recursos de classe da ficha (chips)',
+    rel: 'site/js/sheet/recursos-classe.js',
+    identificadores: ['char'],
+    ancoraInicio: null, // o arquivo inteiro
+    minimoLinhas: 300,
+    ancorasCodigo: ['subclasseDe(char,', 'nivelNa(char,'],
+    pisoPorClasse: 4,
+    excecoes: [],
+  },
+  {
     nome: 'PV, cabeçalho e painéis de recurso da ficha',
     rel: 'site/js/sheet/ficha.js',
     identificadores: ['char'],
@@ -202,11 +212,12 @@ const ALVOS = [
     // arquivo inteiro -- começa no recálculo de PV e vai até o fim dos
     // painéis de recurso (fim da função renderFichaCompleta).
     ancoraInicio: '  // Recalcular PV max se necessário.',
-    ancoraFimApos: 'Recursos do Guerreiro',
+    // Os painéis de recurso migraram para recursos-classe.js (alvo abaixo);
+    // a faixa vai até o fim de renderFichaCompleta.
+    ancoraFimApos: 'setupEventosTruquesColapso();',
     minimoLinhas: 200,
-    ancorasCodigo: ['calcPVMulticlasse', 'classesDe(char)',
-                    'subclasseDe(char,', 'nivelNa(char,'],
-    pisoPorClasse: 6,
+    ancorasCodigo: ['calcPVMulticlasse', 'classesDe(char)'],
+    pisoPorClasse: 2,
     excecoes: [
       {
         linha: '})()} &middot; Nível ${char.nivel}',

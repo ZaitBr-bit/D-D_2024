@@ -67,10 +67,10 @@ function renderCaracteristicasDeUmaClasse(ctx, mostrarNomeClasse) {
 }
 
 /** Um bloco de caracteristicas por classe do personagem. */
-export function renderSecaoCaracteristicas() {
+export function renderSecaoCaracteristicas(cardRecursosHtml = '') {
   const ctxs = contextosDeClasse();
   const mostrarNome = ctxs.length > 1;
-  return ctxs.map(ctx => renderCaracteristicasDeUmaClasse(ctx, mostrarNome)).join('');
+  return cardRecursosHtml + ctxs.map(ctx => renderCaracteristicasDeUmaClasse(ctx, mostrarNome)).join('');
 }
 
 // --- Subclasse ---
@@ -265,7 +265,7 @@ export function renderSecaoTracosEspecie() {
 
   return `
     <div class="card print-break-before">
-      <div class="card-header"><h2>Traços de Espécie — ${escHtml(char.especie)}</h2></div>
+      <div class="card-header"><h2>Traços de Espécie — ${escHtml(char.especie)}${seloFonte(esp.fonte)}</h2></div>
       ${tracosCards.map(t => renderTracoEspecie(t,
         TRACOS_HERDAM_ANCESTRALIDADE.includes(t.nome), false, subtracosRevelacao)).join('')}
     </div>
@@ -324,6 +324,8 @@ function renderTracoEspecie(traco, herdaAncestralidade = false, ehSubRevelacao =
   // três (ex.: deslocamento de voo de Asas Celestiais, combate.js) tinha
   // como ser aplicado.
   const ehRevelacaoCelestial = char.especie === 'Aasimar' && traco.nome === 'Revelação Celestial';
+  // Renascido: o 1d6 somado ao d20 depois de falhar num teste de atributo.
+  const ehVidaPassada = char.especie === 'Renascido' && traco.nome === 'Conhecimento de uma Vida Passada';
 
   let usosMax = detectarUsosMaximos(traco.descricao) || (recarga ? bonusProficiencia(char.nivel) : null);
 
@@ -425,6 +427,17 @@ function renderTracoEspecie(traco, herdaAncestralidade = false, ehSubRevelacao =
             ${usado ? '✗ Usada' : 'Transformar'}
           </button>
         </div>`;
+  } else if (ehVidaPassada) {
+    // Usos pelo Bônus de Proficiência; o botão gasta um uso e rola o 1d6
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${usosMax - usosAtual}/${usosMax}</span>`;
+    usosHtmlBody = `
+      <div class="no-print" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:4px 0 4px 16px">
+        <button class="btn btn-sm" style="padding:2px 8px;font-size:0.7rem" data-vida-passada="${key}" data-usos-max="${usosMax}">
+          ${usosAtual >= usosMax ? '✗ Esgotado' : 'Rolar +1d6'}
+        </button>
+        <span style="font-size:0.75rem;color:var(--text-muted)">Após falhar em um teste de atributo</span>
+      </div>
+    `;
   } else if (temMultiplosUsos) {
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${usosMax - usosAtual}/${usosMax}</span>`;
     usosHtmlBody = `
@@ -446,8 +459,14 @@ function renderTracoEspecie(traco, herdaAncestralidade = false, ehSubRevelacao =
 
   // Informacoes de escolhas vinculadas ao traco
   let infoEscolhaTraco = '';
-  if ((traco.nome === 'Hábil' || traco.nome === 'Sentidos Aguçados') && char.pericia_especie) {
+  if (['Hábil', 'Sentidos Aguçados', 'Conhecimento de uma Vida Passada'].includes(traco.nome) && char.pericia_especie) {
     infoEscolhaTraco = `<div class="info-box info" style="font-size:0.8rem;margin-top:6px"><strong>Perícia escolhida:</strong> ${escHtml(char.pericia_especie || '')}</div>`;
+  }
+  if (traco.nome === 'Resistência Estranha' && char.especie === 'Renascido' && char.tracos_escolhidos?.[0]) {
+    infoEscolhaTraco = `<div class="info-box info" style="font-size:0.8rem;margin-top:6px"><strong>Resistência escolhida:</strong> ${escHtml(char.tracos_escolhidos[0])}</div>`;
+  }
+  if (traco.nome === 'Perpétuo' && char.especie === 'Renascido') {
+    infoEscolhaTraco = `<div class="info-box info" style="font-size:0.8rem;margin-top:6px"><strong>Descanso Longo em 4 horas</strong> (inativo, imóvel e consciente)</div>`;
   }
   if (traco.nome === 'Memória Kenku' && char.pericias_especie?.length) {
     const todasProf = (char.pericias_proficientes || []).slice().sort((a, b) => a.localeCompare(b));

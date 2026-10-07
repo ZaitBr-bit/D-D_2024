@@ -1168,6 +1168,10 @@ export function setupEventosDescanso() {
       const estado = getEstadoRecursosBruxo();
       if (estado) {
         char.recursos.bruxo.astucia_usada = false;
+        // Usos de invocações que voltam no Descanso Longo (Presente das
+        // Profundezas, Presente dos Protetores).
+        char.recursos.bruxo.invocacoes_usos.presente_profundezas = false;
+        char.recursos.bruxo.invocacoes_usos.protetores = false;
         estado.circulosArcanum.forEach(c => {
           if (!char.recursos.bruxo.arcanum[c]) char.recursos.bruxo.arcanum[c] = { magia: '', usado: false };
           char.recursos.bruxo.arcanum[c].usado = false;
@@ -1203,7 +1207,10 @@ export function setupEventosDescanso() {
       if (estado) {
         char.recursos.druida.forma_selvagem_usos_gastos = 0;
         char.recursos.druida.forma_selvagem_ativa = false;
+        delete char.recursos.druida.forma_selvagem_atual;
         char.recursos.druida.companheiro_selvagem_ativo = false;
+        // O familiar do Companheiro Selvagem desaparece ao completar um Descanso Longo.
+        if (char.recursos.familiar?.origem === 'companheiro_selvagem') delete char.recursos.familiar;
         char.recursos.druida.ressurgimento_slot_recuperado_hoje = false;
 
         // Subclasses: restaurar todos os recursos de subclasse
@@ -1376,6 +1383,10 @@ export function setupEventosDescanso() {
           if (subclasseDe(char, 'Mago') === 'Abjurador' && char.recursos.mago.subclasses.abjurador) {
             char.recursos.mago.subclasses.abjurador.protecao_criada = false;
             char.recursos.mago.subclasses.abjurador.protecao_pv_atual = 0;
+          }
+          // Necromante: Fortalecer Mortos-Vivos volta no Descanso Longo
+          if (subclasseDe(char, 'Mago') === 'Necromante' && char.recursos.mago.subclasses.necromante) {
+            char.recursos.mago.subclasses.necromante.fortalecer_usado = false;
           }
           // Adivinhador: Prodígio re-rola dados + O Terceiro Olho restaura
           if (subclasseDe(char, 'Mago') === 'Adivinhador' && char.recursos.mago.subclasses.adivinhador) {

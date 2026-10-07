@@ -14,6 +14,7 @@ import {
 import { consumirEspacoMagiaDisponivel } from './magias.js';
 import { reservasDeEspacos } from './reservas-espacos.js';
 import { renderFichaCompleta } from './ficha.js';
+import { abrirModalPVCriatura } from './pv-criatura.js';
 
 let _criaturas = [];
 
@@ -47,8 +48,8 @@ function cartao(criatura, i, inst) {
       ${(criatura.tracos || []).map((t) => `<div style="font-size:0.78rem;color:var(--text-muted)"><strong>${escHtml(t.nome)}.</strong> ${escHtml(t.descricao)}</div>`).join('')}
       ${est.reacoes.map((t) => `<div style="font-size:0.78rem;color:var(--text-muted)"><strong>${escHtml(t.nome)} (Reação).</strong> ${escHtml(t.texto)}</div>`).join('')}
       <div class="no-print" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:6px">
-        <input type="number" class="form-input" style="width:80px" id="companheiro-pv-${escHtml(id)}-${i}" placeholder="±PV"${destruido ? ' disabled' : ''}>
-        <button class="btn btn-sm btn-secondary"${destruido ? ' disabled' : ''} data-artifice-acao="companheiro-pv" data-companheiro="${escHtml(id)}" data-i="${i}" data-pv-max="${est.pvMax}">Aplicar PV</button>
+        <button class="btn btn-sm btn-danger"${destruido ? ' disabled' : ''} data-artifice-acao="companheiro-dano" data-companheiro="${escHtml(id)}" data-i="${i}" data-pv-max="${est.pvMax}">Dano</button>
+        <button class="btn btn-sm btn-success"${destruido ? ' disabled' : ''} data-artifice-acao="companheiro-cura" data-companheiro="${escHtml(id)}" data-i="${i}" data-pv-max="${est.pvMax}">Cura</button>
         ${destruido ? '<button class="btn btn-sm btn-accent" data-artifice-acao="defensor-reviver">Reviver (gasta espaço)</button>' : ''}
         ${id === 'defensor-de-aco' && !destruido ? `<button class="btn btn-sm btn-accent" data-artifice-acao="defensor-reparar"${estadoCompanheiros(char).reparar_defensor_gastos >= 3 ? ' disabled' : ''}>Reparar (${Math.max(0, 3 - estadoCompanheiros(char).reparar_defensor_gastos)}/3)</button>` : ''}
         ${ehCanhao && nivel >= 9 ? `<button class="btn btn-sm btn-danger" data-artifice-acao="canhao-detonar" data-i="${i}">Detonar</button>` : ''}
@@ -144,11 +145,20 @@ export function setupEventosCompanheirosArtifice() {
         if (!criarPelaFicha(id, acao === 'companheiro-criar-espaco')) return;
       } else if (acao === 'companheiro-dispensar') {
         dispensarCompanheiro(char, id, i);
-      } else if (acao === 'companheiro-pv') {
-        const campo = document.getElementById(`companheiro-pv-${id}-${i}`);
-        const delta = Math.trunc(Number(campo?.value));
-        if (!Number.isFinite(delta) || !delta) { toast('Informe um número (negativo para dano).', 'error'); return; }
-        ajustarPVCompanheiro(char, id, i, delta, Number(btn.dataset.pvMax));
+      } else if (acao === 'companheiro-dano' || acao === 'companheiro-cura') {
+        // Mesmo modal de dano/cura do personagem; grava e redesenha só ao confirmar.
+        const dano = acao === 'companheiro-dano';
+        const pvMax = Number(btn.dataset.pvMax);
+        const criatura = _criaturas.find((c) => c.id === id);
+        abrirModalPVCriatura({
+          nome: criatura?.nome || 'Companheiro', tipo: dano ? 'dano' : 'cura', pvMax,
+          aoAplicar: (valor) => {
+            ajustarPVCompanheiro(char, id, i, dano ? -valor : valor, pvMax);
+            salvar();
+            renderFichaCompleta();
+          },
+        });
+        return;
       } else if (acao === 'defensor-reparar') {
         if (!usarRepararDefensor(char)) { toast('Reparar esgotado até o Descanso Longo.', 'error'); return; }
         toast('Reparar: 2d8 + mod. Int PV (role e aplique).', 'info');

@@ -63,6 +63,17 @@ export const ESPECIES_TRACOS_ESCOLHA = {
       { nome: 'Ctônico', descricao: 'Resistência Necrótico + Toque Necrótico + Vitalidade Vazia (nv.3) + Raio do Enfraquecimento (nv.5)' },
       { nome: 'Infernal', descricao: 'Resistência Ígneo + Raio de Fogo + Repreensão Diabólica (nv.3) + Escuridão (nv.5)' }
     ]
+  },
+  // Ravenloft: Horrors Within, p. 73. Mesmos tipos de RESISTENCIA_ESTRANHA (regras-resistencias-especie.js).
+  'Renascido': {
+    titulo: 'Resistência Estranha',
+    descricao: 'Escolha o tipo de dano ao qual você tem Resistência.',
+    maxEscolhas: 1,
+    opcoes: [
+      { nome: 'Gélido', descricao: 'Resistência a dano Gélido' },
+      { nome: 'Necrótico', descricao: 'Resistência a dano Necrótico' },
+      { nome: 'Venenoso', descricao: 'Resistência a dano Venenoso' }
+    ]
   }
 };
 

@@ -4,6 +4,7 @@
 // ============================================================
 import { ATRIBUTOS_NOMES, CLASSES_INFO } from '../dados-classes.js';
 import { getClasse, getIndiceMagias, getMagiasClasse } from '../db.js';
+import { seloDaMagia } from '../fontes.js';
 import { abrirModal, getBonusTruquesOrdem, getEspacosMagia, getMagiaPreparadas, getTruquesConhecidos, mdParaHtml, nomesMagiaCirculo1Conhecidas, circuloSuperiorHtml, classesDaMagiaHtml, semAcento, toast } from '../utils.js';
 import { obterTruquesEspecie } from './comum.js';
 import { dadosCache, personagem } from './wizard.js';
@@ -197,7 +198,7 @@ export async function renderStepMagias(el) {
                 <span class="opcao-check" data-creator-check="${nome}"></span>
                 <div class="opcao-nome" data-creator-info="${nome}" data-creator-info-circ="${circ}">${nome}${bloqueadoPorIM ? ' (já conhecido)' : ''}${bloqueadoPorEspecie ? ' (já concedido pela espécie)' : ''}</div>
                 <div class="opcao-resumo">
-                  <span>${m.escola || ''}</span>
+                  <span>${m.escola || ''}</span>${seloDaMagia(nome)}
                   ${ehConcentracao(m) ? '<span>Conc.</span>' : ''}
                   ${temMarcador(m, 'M') ? '<span>M$</span>' : ''}
                 </div>
@@ -488,7 +489,7 @@ async function _bindInstanciaIM(container, idx, aoMudar) {
                   <span class="opcao-check" data-im-check="${nome}"></span>
                   <div class="opcao-nome" data-im-info="${nome}" data-im-info-circ="${isTruque ? 0 : 1}">${nome}${bloqueado ? ' (já conhecido)' : ''}</div>
                   <div class="opcao-resumo">
-                    <span>${m.escola || ''}</span>
+                    <span>${m.escola || ''}</span>${seloDaMagia(nome)}
                     ${ehConcentracao(m) ? '<span>Conc.</span>' : ''}
                     ${temMarcador(m, 'M') ? '<span>M$</span>' : ''}
                   </div>

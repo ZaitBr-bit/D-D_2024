@@ -22,6 +22,7 @@
 //   bloqueado  opcional     { motivo } -- tira o card da seleção
 // ============================================================
 import { abrirModal, escHtml, semAcento } from './utils.js';
+import { ligarSelosFonte, seloFonte } from './fontes.js';
 
 /**
  * Guarda o handler de clique que cada elemento já tem, para poder removê-lo
@@ -129,7 +130,7 @@ function cardOpcaoHtml(o, { sel = false, cheio = false, selecionavel = true } = 
          style="${cheio ? 'opacity:0.5;cursor:not-allowed' : ''}">
       ${o.bloqueado ? '' : '<span class="opcao-check"></span>'}
       <div class="opcao-nome">
-        <span>${escHtml(o.nome)}</span>
+        <span>${escHtml(o.nome)}</span>${seloFonte(o.fonte)}
         ${o.tags?.length ? `<span class="opcao-tags">${escHtml(o.tags.join(' · '))}</span>` : ''}
       </div>
       ${o.bloqueado
@@ -242,6 +243,7 @@ export function montarSeletor(el, cfg) {
     contagemEl.textContent = max > 1
       ? `Selecionadas: ${estado.selecionadas.length}/${max} — ${totalLivres} disponíve${totalLivres === 1 ? 'l' : 'is'}`
       : `${totalLivres} disponíve${totalLivres === 1 ? 'l' : 'is'}`;
+    ligarSelosFonte(listaEl);
   };
 
   // Um clique no card marca/desmarca; no "ver detalhes", abre o popup.
@@ -439,6 +441,7 @@ export function montarTroca(el, cfg) {
       opcaoUnica = unica;
       saiEl.querySelector('#troca-sai-lista').innerHTML =
         `<div class="opcao-grid densa">${cardOpcaoHtml(unica, { sel: true, selecionavel: false })}</div>`;
+      ligarSelosFonte(saiEl);
       if (saiInicial === unica.id) {
         estado.sai = unica.id;
         abrirEntra(entraRestaurar);

@@ -1,0 +1,35 @@
+{
+  "total": 1,
+  "especies": [
+    {
+      "nome": "Renascido",
+      "nome_en": "Reborn",
+      "fonte": "ravenloft",
+      "pagina_pdf": 73,
+      "tracos": [
+        {
+          "nome": "Escapou da Morte",
+          "nome_en": "Escaped Death",
+          "descricao": "Você tem Vantagem em Salvaguardas Contra a Morte."
+        },
+        {
+          "nome": "Perpétuo",
+          "nome_en": "Everlasting",
+          "descricao": "Você não adquire níveis de Exaustão por desidratação, desnutrição ou asfixia. Você não precisa dormir, e magia não pode fazê-lo dormir. Você pode completar um Descanso Longo em 4 horas se passar essas horas em um estado inativo e imóvel, durante o qual mantém a consciência."
+        },
+        {
+          "nome": "Conhecimento de uma Vida Passada",
+          "nome_en": "Knowledge from a Past Life",
+          "descricao": "Você ganha proficiência em uma perícia à sua escolha.\n\nAlém disso, você pode espiar temporariamente o passado para ajudá-lo no presente. Ao falhar em um teste de atributo, você pode jogar 1d6 e somar o resultado ao d20, possivelmente transformando a falha em sucesso. Você pode fazer isso um número de vezes igual ao seu Bônus de Proficiência e recupera todos os usos gastos ao completar um Descanso Longo."
+        },
+        {
+          "nome": "Resistência Estranha",
+          "nome_en": "Strange Endurance",
+          "descricao": "Você tem Resistência a um dos seguintes tipos de dano, à sua escolha: Gélido, Necrótico ou Venenoso."
+        }
+      ],
+      "descricao": "Eventos extraordinários e horrores sobrenaturais transformaram indivíduos, criando espécies que se espalharam pelas Brumas e pelo multiverso. Um personagem pode ter nascido membro de uma dessas espécies ou ter se transformado em uma após eventos angustiantes.\n**Tipo de Criatura:** Humanoide",
+      "texto_completo": "## Renascido\n\nEventos extraordinários e horrores sobrenaturais transformaram indivíduos, criando espécies que se espalharam pelas Brumas e pelo multiverso. Um personagem pode ter nascido membro de uma dessas espécies ou ter se transformado em uma após eventos angustiantes.\n\n### Traços de Renascido\n\n**Tipo de Criatura:** Humanoide\n\n**Tamanho:** Médio (cerca de 1,20-2,10 metros de altura) ou Pequeno (cerca de 0,60-1,20 metro de altura), escolhido ao selecionar esta espécie\n\n**Deslocamento:** 9 metros\n\n**Escapou da Morte.** Você tem Vantagem em Salvaguardas Contra a Morte.\n\n**Perpétuo.** Você não adquire níveis de Exaustão por desidratação, desnutrição ou asfixia. Você não precisa dormir, e magia não pode fazê-lo dormir. Você pode completar um Descanso Longo em 4 horas se passar essas horas em um estado inativo e imóvel, durante o qual mantém a consciência.\n\n**Conhecimento de uma Vida Passada.** Você ganha proficiência em uma perícia à sua escolha.\n\nAlém disso, você pode espiar temporariamente o passado para ajudá-lo no presente. Ao falhar em um teste de atributo, você pode jogar 1d6 e somar o resultado ao d20, possivelmente transformando a falha em sucesso. Você pode fazer isso um número de vezes igual ao seu Bônus de Proficiência e recupera todos os usos gastos ao completar um Descanso Longo.\n\n**Resistência Estranha.** Você tem Resistência a um dos seguintes tipos de dano, à sua escolha: Gélido, Necrótico ou Venenoso."
+    }
+  ]
+}

@@ -212,6 +212,18 @@ export async function clicarBotaoFicha(page, id, { esperar = null } = {}) {
 }
 
 /**
+ * Abre os blocos de recursos de classe (`.recursos-grupo`), que nascem
+ * recolhidos. Specs que afirmam visibilidade ou clicam num botão desses
+ * blocos chamam isto depois de abrir a ficha.
+ */
+export async function abrirBlocosRecursos(page) {
+  await page.waitForSelector('.recursos-grupo', { state: 'attached', timeout: 20_000 });
+  await page.evaluate(() => {
+    document.querySelectorAll('.recursos-grupo').forEach((d) => { d.open = true; });
+  });
+}
+
+/**
  * Mesma disciplina de `clicarBotaoFicha`, para botões que a ficha
  * identifica por atributo (`[data-mago-acao="..."]`, `[data-config-maestrias]`)
  * em vez de `id` -- é o caso dos botões dentro dos cards de característica

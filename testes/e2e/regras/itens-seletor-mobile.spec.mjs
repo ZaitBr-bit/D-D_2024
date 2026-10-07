@@ -142,3 +142,26 @@ test('Todos: item comum e item mágico encontrados na busca são adicionáveis',
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
+
+// O dropdown de categoria é filho de um contêiner flex em coluna de altura
+// fixa. No Safari/iOS ele encolhia com a faixa de filtros embaixo (Armas,
+// Armaduras) e cortava o nome da categoria. O Chromium não reproduz o corte
+// (respeita a altura mínima do select), então o spec confere a regra que o
+// impede: sem encolhimento flex e com altura mínima. A prova no aparelho
+// continua manual.
+test('celular: o dropdown de categoria não encolhe no contêiner flex', async ({ context }) => {
+  const { page, erros } = await abrirSeletor(context, 'regras-seletor-mobile-categoria');
+
+  for (const categoria of ['armaduras', 'armas', 'equipamento']) {
+    await page.selectOption('#sel-inv-cat', categoria);
+    const { encolhe, minimo, altura } = await page.locator('#sel-inv-cat').evaluate((el) => {
+      const css = getComputedStyle(el);
+      return { encolhe: css.flexShrink, minimo: parseFloat(css.minHeight), altura: el.getBoundingClientRect().height };
+    });
+    expect(encolhe, `o dropdown em "${categoria}" não pode encolher`).toBe('0');
+    expect(minimo, `o dropdown em "${categoria}" precisa de altura mínima`).toBeGreaterThanOrEqual(36);
+    expect(altura, `o dropdown em "${categoria}" respeita a altura mínima`).toBeGreaterThanOrEqual(minimo);
+  }
+
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});

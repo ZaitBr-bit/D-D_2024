@@ -54,6 +54,30 @@ async function carregarJSON(caminho) {
 
 // --- Classes ---
 
+// Subclasses de livros de expansão que entram numa classe do Livro do Jogador,
+// juntadas depois das subclasses dela (cada subclasse traz o campo `fonte`).
+const SUBCLASSES_DE_EXPANSAO = { 'Mago': ['arcana-unleashed/subclasses_mago.json'] };
+const _classesComExpansao = {};
+
+/**
+ * Devolve os dados da classe com as subclasses de expansão somadas, sem
+ * mutar o JSON em cache. Expansão que falha deixa a classe do jeito que veio
+ * e não entra em cache, para nova tentativa na próxima chamada.
+ * @param {string} nome Nome da classe.
+ * @param {object} dados Dados da classe no Livro do Jogador.
+ * @returns {Promise<object>} Dados da classe com as subclasses de expansão.
+ */
+async function juntarSubclassesDeExpansao(nome, dados) {
+  const arquivos = SUBCLASSES_DE_EXPANSAO[nome];
+  if (!arquivos) return dados;
+  if (_classesComExpansao[nome]?.base === dados) return _classesComExpansao[nome].junto;
+  const expansoes = await Promise.all(arquivos.map(fetchJSON));
+  if (expansoes.some((e) => !e)) return dados;
+  const junto = { ...dados, subclasses: [...(dados.subclasses || []), ...expansoes.flatMap((e) => e.subclasses || [])] };
+  _classesComExpansao[nome] = { base: dados, junto };
+  return junto;
+}
+
 /** Carrega dados de uma classe específica (Livro do Jogador ou expansão, pela fonte). */
 export async function getClasse(nome) {
   const pasta = pastaDaExpansao(nome);
@@ -63,18 +87,17 @@ export async function getClasse(nome) {
     .replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u');
   const dados = await fetchJSON(`classes/${nomeArq}.json`);
   if (!dados) return null;
-
-  return dados;
+  return juntarSubclassesDeExpansao(nome, dados);
 }
 
 /** Carrega lista de magias de uma classe conjuradora (Livro do Jogador ou expansão). */
 export async function getMagiasClasse(nomeClasse) {
   const pasta = pastaDaExpansao(nomeClasse);
-  if (pasta) return fetchJSON(`${pasta}/magias_classe.json`);
+  if (pasta) return juntarMagiasDeLivroNaLista(nomeClasse, await fetchJSON(`${pasta}/magias_classe.json`));
   const nomeArq = nomeClasse.toLowerCase()
     .replace(/á/g, 'a').replace(/ã/g, 'a').replace(/é/g, 'e')
     .replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u');
-  return fetchJSON(`classes/magias_${nomeArq}.json`);
+  return juntarMagiasDeLivroNaLista(nomeClasse, await fetchJSON(`classes/magias_${nomeArq}.json`));
 }
 
 // --- Origens ---
@@ -84,9 +107,27 @@ export async function getAntecedentes() {
   return fetchJSON('origens/antecedentes.json');
 }
 
-/** Carrega todas as espécies */
+// Espécies de livros de expansão, juntadas depois das do Livro do Jogador.
+const ESPECIES_DE_EXPANSAO = ['ravenloft/especies.json'];
+let _especies = null;
+
+/**
+ * Carrega todas as espécies: as do Livro do Jogador seguidas das de
+ * expansão (com campo `fonte`). Expansão que falha fica de fora e a
+ * lista combinada não entra em cache, para nova tentativa na próxima chamada.
+ */
 export async function getEspecies() {
-  return fetchJSON('origens/especies.json');
+  if (!_especies) {
+    const carga = Promise.all([fetchJSON('origens/especies.json'), ...ESPECIES_DE_EXPANSAO.map(fetchJSON)])
+      .then(([livro, ...expansoes]) => {
+        if (!livro || expansoes.some((e) => !e)) { if (_especies === carga) _especies = null; }
+        if (!livro) return null;
+        const especies = [...(livro.especies || []), ...expansoes.flatMap((e) => e?.especies || [])];
+        return { ...livro, total: especies.length, especies };
+      });
+    _especies = carga;
+  }
+  return _especies;
 }
 
 // --- Talentos ---
@@ -161,6 +202,69 @@ export async function getFontes() {
 
 let _expansaoMagias = null;
 
+// Magias de livros de expansão que não pertencem a uma classe de expansão (a lista
+// de classes vem no campo `classes` de cada magia).
+const MAGIAS_DE_LIVRO = ['arcana-unleashed/magias.json'];
+
+/** Fonte (livro de origem) das magias de expansão já carregadas, por nome. */
+const _fonteDasMagias = new Map();
+
+/**
+ * Fonte da magia de expansão (ex.: 'arcana-unleashed'), ou undefined para as do
+ * Livro do Jogador. Só conhece as magias de expansão que o catálogo já carregou.
+ * @param {string} nome Nome da magia.
+ */
+export function fonteDaMagia(nome) {
+  return _fonteDasMagias.get(nome);
+}
+
+/** Guarda a fonte de cada magia de expansão carregada. */
+function registrarFontesDasMagias(magias) {
+  for (const m of magias) if (m.fonte) _fonteDasMagias.set(m.nome, m.fonte);
+}
+
+/** Magias de MAGIAS_DE_LIVRO, ou null se algum arquivo falhar. */
+async function carregarMagiasDeLivro() {
+  const arquivos = await Promise.all(MAGIAS_DE_LIVRO.map(fetchJSON));
+  if (arquivos.some((a) => !a)) return null;
+  const magias = arquivos.flatMap((a) => a.magias || []);
+  registrarFontesDasMagias(magias);
+  return magias;
+}
+
+/** Listas de classe (formato de getMagiasClasse) que já receberam as magias de livro. */
+const _listasComLivro = new WeakSet();
+
+/**
+ * Acrescenta à lista de magias da classe (`lista_magias`) as magias de livro de
+ * expansão que a classe usa, em ordem alfabética dentro do círculo. A lista é
+ * alterada uma vez só; se o livro falhar, devolve a lista como veio e tenta de novo na próxima chamada.
+ * @param {string} nomeClasse Nome da classe.
+ * @param {object|null} dados Resultado do JSON da lista da classe.
+ * @returns {object|null} A mesma lista, com as magias de livro.
+ */
+async function juntarMagiasDeLivroNaLista(nomeClasse, dados) {
+  if (!(dados?.lista_magias || Array.isArray(dados?.magias)) || _listasComLivro.has(dados)) return dados;
+  const magias = await carregarMagiasDeLivro();
+  if (!magias || _listasComLivro.has(dados)) return dados;
+  _listasComLivro.add(dados);
+  const dela = magias.filter((x) => (x.classes || []).includes(nomeClasse));
+  if (!dados.lista_magias) {
+    for (const m of dela) if (!dados.magias.some((x) => x.nome === m.nome)) dados.magias.push({ nome: m.nome, circulo: m.circulo, escola: m.escola, fonte: m.fonte });
+    dados.magias.sort((a, b) => a.circulo - b.circulo || a.nome.localeCompare(b.nome, 'pt-BR'));
+    dados.total_magias = dados.magias.length;
+    return dados;
+  }
+  for (const m of dela) {
+    const chave = m.circulo === 0 ? 'Truques' : `${m.circulo}º Círculo`;
+    const lista = dados.lista_magias[chave] || (dados.lista_magias[chave] = []);
+    if (lista.some((x) => x.nome === m.nome)) continue;
+    lista.push({ nome: m.nome, escola: m.escola, especial: /concentra/i.test(m.duracao) ? 'C' : '—', fonte: m.fonte });
+    lista.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+  }
+  return dados;
+}
+
 /**
  * Carrega, uma vez, o que as classes de expansão acrescentam ao catálogo
  * de magias: magias novas (magias.json) e o nome da classe para as magias
@@ -176,11 +280,15 @@ function expansaoMagias() {
         const [mag, lista] = await Promise.all([fetchJSON(`${pasta}/magias.json`), fetchJSON(`${pasta}/magias_classe.json`)]);
         if (!mag || !lista) return null;
         for (const m of mag?.magias || []) novas.push(m);
+        registrarFontesDasMagias(mag?.magias || []);
         for (const m of Object.values(lista?.lista_magias || {}).flat()) {
           if (!classesPorMagia.has(m.nome)) classesPorMagia.set(m.nome, new Set());
           classesPorMagia.get(m.nome).add(classe);
         }
       }
+      const deLivro = await carregarMagiasDeLivro();
+      if (!deLivro) return null;
+      novas.push(...deLivro);
       return { novas, classesPorMagia };
     })().then((r) => {
       if (!r) _expansaoMagias = null;
@@ -201,8 +309,8 @@ function acrescentarClasses(magias, classesPorMagia) {
 
 /** Resumo de magia no formato de _indice.json. */
 function resumoMagia(m) {
-  const { nome, circulo, escola, classes, tempo_conjuracao, alcance, componentes, duracao } = m;
-  return { nome, circulo, escola, classes, tempo_conjuracao, alcance, componentes, duracao };
+  const { nome, circulo, escola, classes, tempo_conjuracao, alcance, componentes, duracao, fonte } = m;
+  return { nome, circulo, escola, classes, tempo_conjuracao, alcance, componentes, duracao, ...(fonte ? { fonte } : {}) };
 }
 
 /** Objetos de dados (índice ou círculo) que já receberam a mescla de expansão. */
@@ -241,7 +349,7 @@ export async function getMagiasPorCirculo(circulo) {
 export async function getMagiasPorClasseLista(nomeClasse) {
   const pasta = pastaDaExpansao(nomeClasse);
   if (pasta) {
-    const dados = await fetchJSON(`${pasta}/magias_classe.json`);
+    const dados = await getMagiasClasse(nomeClasse);
     if (!dados) return null;
     const magias = Object.entries(dados.lista_magias || {}).flatMap(([chave, lista]) => {
       const circulo = chave === 'Truques' ? 0 : parseInt(chave, 10);
@@ -252,7 +360,7 @@ export async function getMagiasPorClasseLista(nomeClasse) {
   const nomeArq = nomeClasse.toLowerCase()
     .replace(/á/g, 'a').replace(/ã/g, 'a').replace(/é/g, 'e')
     .replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u');
-  return fetchJSON(`magias/por_classe/${nomeArq}.json`);
+  return juntarMagiasDeLivroNaLista(nomeClasse, await fetchJSON(`magias/por_classe/${nomeArq}.json`));
 }
 
 /**
@@ -299,9 +407,27 @@ export async function buscarMagias(termo) {
 
 // --- Apêndices ---
 
-/** Carrega criaturas */
+// Criaturas de livros de expansão, juntadas depois das do apêndice do Livro do Jogador.
+const CRIATURAS_DE_EXPANSAO = ['monstros/criaturas.json'];
+let _criaturas = null;
+
+/**
+ * Carrega as criaturas: as do apêndice do Livro do Jogador seguidas das de
+ * expansão (com campo `fonte`). Expansão que falha fica de fora e a lista
+ * combinada não entra em cache, para nova tentativa na próxima chamada.
+ */
 export async function getCriaturas() {
-  return fetchJSON('apendices/criaturas.json');
+  if (!_criaturas) {
+    const carga = Promise.all([fetchJSON('apendices/criaturas.json'), ...CRIATURAS_DE_EXPANSAO.map(fetchJSON)])
+      .then(([livro, ...expansoes]) => {
+        if (!livro || expansoes.some((e) => !e)) { if (_criaturas === carga) _criaturas = null; }
+        if (!livro) return null;
+        const criaturas = [...(livro.criaturas || []), ...expansoes.flatMap((e) => e?.criaturas || [])];
+        return { ...livro, total: criaturas.length, criaturas };
+      });
+    _criaturas = carga;
+  }
+  return _criaturas;
 }
 
 /** Carrega glossário */

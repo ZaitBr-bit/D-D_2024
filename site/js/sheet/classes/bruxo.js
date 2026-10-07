@@ -6,19 +6,19 @@
 // ============================================================
 import { atributoEfetivo } from '../../regras-atributos.js';
 import { getMagiasClasse, getTalentos } from '../../db.js';
-import { abrirModal, calcMod, mdParaHtml, semAcento, toast } from '../../utils.js';
+import { abrirModal, calcMod, escHtml, mdParaHtml, semAcento, toast } from '../../utils.js';
 import { char, indiceMagiasCache, salvar } from '../estado.js';
 import { renderFichaCompleta } from '../ficha.js';
-import { achatarMagiasClasse, badgesMagiaRapidos } from '../magias.js';
+import { achatarMagiasClasse, badgesMagiaRapidos, conjurarSemEspaco } from '../magias.js';
 import { abrirModalIniciadoEmMagiaFicha, sincronizarTalentosInvocacoes } from '../talentos.js';
-import { temClasse, nivelNa } from '../../regras-multiclasse.js';
+import { gastarDadosVida, nivelNa, reservasDadosVida, temClasse } from '../../regras-multiclasse.js';
 import { dadosDe } from '../contexto-classe.js';
 // recuperarUmEspaco/reservasDeEspacos/restaurarEspacosDePacto (Tarefa 4,
 // sub-projeto 4, Ruling 11): os dois pontos deste arquivo que liam
 // `char.espacos_magia[circulo]` direto, na forma antiga, passam a ler pelo
 // acessador derivado -- o gasto de um Bruxo (classe única ou não) vive na
 // fonte 'pacto', nunca em chaves de círculo direto no objeto.
-import { recuperarUmEspaco, reservasDeEspacos, restaurarEspacosDePacto } from '../reservas-espacos.js';
+import { gastarEspaco, recuperarUmEspaco, reservasDeEspacos, restaurarEspacosDePacto } from '../reservas-espacos.js';
 
 // Os tres Pactos sao invocacoes misticas COMUNS no PHB 2024: aparecem na
 // secao "Opcoes de Invocacoes Misticas" sem pre-requisito e sem nenhuma
@@ -105,6 +105,19 @@ export function getEstadoRecursosBruxo() {
     };
   }
 
+  // Usos limitados de invocações (voltam no Descanso Longo) e a página de
+  // nomes do Presente dos Protetores.
+  if (!char.recursos.bruxo.invocacoes_usos || typeof char.recursos.bruxo.invocacoes_usos !== 'object') {
+    char.recursos.bruxo.invocacoes_usos = {};
+  }
+  if (typeof char.recursos.bruxo.invocacoes_usos.presente_profundezas !== 'boolean') {
+    char.recursos.bruxo.invocacoes_usos.presente_profundezas = false;
+  }
+  if (typeof char.recursos.bruxo.invocacoes_usos.protetores !== 'boolean') {
+    char.recursos.bruxo.invocacoes_usos.protetores = false;
+  }
+  if (!Array.isArray(char.recursos.bruxo.protetores_nomes)) char.recursos.bruxo.protetores_nomes = [];
+
   [6, 7, 8, 9].forEach(c => {
     if (!char.recursos.bruxo.arcanum[c]) {
       char.recursos.bruxo.arcanum[c] = { magia: '', usado: false };
@@ -165,6 +178,9 @@ export function getEstadoRecursosBruxo() {
     // quando nenhuma passiva foi escolhida -- a tela nao inventa bloco.
     invocacoesPassivas: extrairInvocacoesPassivasBruxo(char.recursos.bruxo.invocacoes),
     mestreMisticoAtivo: nivel >= 20,
+    presenteProfundezasUsado: !!char.recursos.bruxo.invocacoes_usos.presente_profundezas,
+    protetoresUsado: !!char.recursos.bruxo.invocacoes_usos.protetores,
+    protetoresNomes: char.recursos.bruxo.protetores_nomes,
     pactoTomo: char.recursos.bruxo.pacto_tomo,
     nivel,
     modCar,
@@ -279,6 +295,32 @@ async function obterMagiasArcanumPorCirculo(circulo) {
   const magiasClasseData = await getMagiasClasse('Bruxo');
   const todas = achatarMagiasClasse(magiasClasseData);
   return todas.filter(m => m.circulo === circulo).sort((a, b) => a.nome.localeCompare(b.nome));
+}
+
+/**
+ * Popup com a descrição de uma invocação, aberto sobre o modal de recursos
+ * do Bruxo. Usa uma sobreposição própria porque `abrirModal` substitui o
+ * modal aberto e perderia a seleção em andamento.
+ * @param {{nome: string, prerequisito?: string, descricao?: string}} opcao
+ */
+function abrirPopupInvocacao(opcao) {
+  document.getElementById('inv-popup-sobreposicao')?.remove();
+  const sobreposicao = document.createElement('div');
+  sobreposicao.id = 'inv-popup-sobreposicao';
+  sobreposicao.className = 'inv-popup-sobreposicao';
+  sobreposicao.innerHTML = `
+    <div class="inv-popup" role="dialog" aria-modal="true" aria-label="${opcao.nome}">
+      <h3 style="margin:0 0 4px;font-size:1rem">${opcao.nome}</h3>
+      ${opcao.prerequisito ? `<div style="font-size:0.75rem;color:var(--secondary);font-weight:600;margin-bottom:8px">${opcao.prerequisito}</div>` : ''}
+      <div class="md-content" style="font-size:0.85rem">${mdParaHtml(opcao.descricao || 'Sem descrição disponível.')}</div>
+      <div style="display:flex;justify-content:flex-end;margin-top:12px">
+        <button class="btn btn-secondary" id="btn-fechar-inv-popup">Fechar</button>
+      </div>
+    </div>`;
+  const fechar = () => sobreposicao.remove();
+  sobreposicao.addEventListener('click', (e) => { if (e.target === sobreposicao) fechar(); });
+  sobreposicao.querySelector('#btn-fechar-inv-popup').addEventListener('click', fechar);
+  document.body.appendChild(sobreposicao);
 }
 
 export async function abrirModalRecursosBruxo() {
@@ -404,8 +446,6 @@ export async function abrirModalRecursosBruxo() {
           </div>`;
       }).join('');
     }
-    // Descricao formatada (exibida ao clicar no nome)
-    const descHtml = mdParaHtml(o.descricao || 'Sem descricao disponivel.');
     return `
       <div class="opcao-card ${sel ? 'selecionada' : ''} ${bloqueado ? 'bloqueada' : ''} ${ehPacto ? 'magia-dominio' : ''}"
            data-inv-card="${o.nome}" style="${bloqueado ? 'opacity:0.35;cursor:not-allowed;' : ''};position:relative">
@@ -420,10 +460,6 @@ export async function abrirModalRecursosBruxo() {
           </div>
         </div>
         ${paramHtml}
-        <div class="inv-desc-inline" data-inv-desc="${o.nome}" style="display:none;margin-top:6px;padding:6px 8px;border-top:1px solid var(--border-light);font-size:0.75rem;color:var(--text-muted)">
-          ${o.prerequisito ? `<div style="font-size:0.7rem;color:var(--secondary);font-weight:600;margin-bottom:4px">${o.prerequisito}</div>` : ''}
-          <div class="md-content">${descHtml}</div>
-        </div>
       </div>`;
   }
 
@@ -557,21 +593,12 @@ export async function abrirModalRecursosBruxo() {
       }
     });
 
-    // Clicar no nome da invocacao mostra/oculta descricao inline
+    // Clicar no nome da invocacao abre o popup com a descricao
     gridEl.querySelectorAll('[data-inv-info]').forEach(nomeEl => {
       nomeEl.addEventListener('click', (e) => {
         e.stopPropagation();
-        const nome = nomeEl.dataset.invInfo;
-        const card = nomeEl.closest('[data-inv-card]');
-        if (!card) return;
-        const descEl = card.querySelector(`[data-inv-desc="${nome}"]`);
-        if (!descEl) return;
-        // Ocultar outras descricoes abertas
-        gridEl.querySelectorAll('.inv-desc-inline').forEach(d => {
-          if (d !== descEl) d.style.display = 'none';
-        });
-        // Toggle da descricao clicada
-        descEl.style.display = descEl.style.display === 'none' ? 'block' : 'none';
+        const opcao = opcoes.find(o => o.nome === nomeEl.dataset.invInfo);
+        if (opcao) abrirPopupInvocacao(opcao);
       });
     });
 
@@ -837,12 +864,11 @@ export function renderSecaoPactoBruxo() {
   if (!estado) return '';
   // Um bloco por pacto: quem leva dois vê as dádivas dos dois.
   const pactos = estado.pactos;
-  if (!pactos.length) return '';
 
-  let html = '<details open style="margin-bottom:8px;border-left:3px solid var(--secondary);padding-left:8px">';
-  html += '<summary style="font-weight:700;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--border-light);color:var(--secondary)">';
-  html += `Dadivas do Pacto - ${pactos.join(' + ')}`;
-  html += '</summary><div style="padding-top:6px">';
+  // O corpo é montado sem moldura: as invocações que concedem magia, truque
+  // modificado ou talento valem sem Pacto, então a seção existe quando há
+  // qualquer conteúdo e não só quando há pacto.
+  let html = '';
 
   if (pactos.includes('Pacto da Corrente')) {
     html += `
@@ -959,9 +985,9 @@ export function renderSecaoPactoBruxo() {
 
   // Mostrar truques modificados por invocacoes (Explosao Agonizante, Repulsiva, Lanca Mistica)
   const INV_TRUQUE_DISPLAY = {
-    'Explosão Agonizante': { efeito: '+modificador de Carisma ao dano', cor: 'var(--danger)' },
-    'Explosão Repulsiva': { efeito: 'Empurra o alvo 3 metros para longe', cor: 'var(--accent)' },
-    'Lança Mística': { efeito: 'Alcance do truque aumentado', cor: 'var(--secondary)' }
+    'Explosão Agonizante': { cor: 'var(--danger)' },
+    'Explosão Repulsiva': { cor: 'var(--accent)' },
+    'Lança Mística': { cor: 'var(--secondary)' }
   };
   const truquesModificados = [];
   for (const inv of estado.invocacoes) {
@@ -969,7 +995,7 @@ export function renderSecaoPactoBruxo() {
     const truque = inv?.truque;
     const info = INV_TRUQUE_DISPLAY[nomeInv];
     if (info && truque) {
-      truquesModificados.push({ invocacao: nomeInv, truque, ...info });
+      truquesModificados.push({ invocacao: nomeInv, truque, efeito: rotuloEfeitoInvocacaoTruque(nomeInv, truque), ...info });
     }
   }
   if (truquesModificados.length > 0) {
@@ -1015,15 +1041,21 @@ export function renderSecaoPactoBruxo() {
     for (const inv of invocacoesComMagia) {
       const infoMagia = indiceMagiasCache?.find(m => m.nome === inv.magia);
       const circ = infoMagia?.circulo ?? 1;
+      // Invocação com uso limitado: desabilita o botão depois do uso.
+      const limite = REGRAS_CONJURACAO_INVOCACAO[semAcento(inv.invocacao)] || {};
+      const gasto = limite.usoChave === 'presente_profundezas' && estado.presenteProfundezasUsado;
+      const nota = gasto ? 'uso gasto até o Descanso Longo'
+        : limite.usoChave ? '1 uso grátis por Descanso Longo'
+        : limite.condicao ? 'exige Meia-luz ou Escuridão' : 'sem gastar espaco';
       html += `
         <div class="magia-item" data-magia-nome="${inv.magia}" data-magia-circ="${circ}" style="margin:2px 0;padding:4px 8px;border-left:2px solid var(--secondary);cursor:pointer">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <div>
               <div class="magia-nome" style="font-size:0.8rem">${inv.magia}</div>
               ${inv.magia ? badgesMagiaRapidos(inv.magia) : ''}
-              <div style="font-size:0.6rem;color:var(--text-muted)">${inv.invocacao} (sem gastar espaco)</div>
+              <div style="font-size:0.6rem;color:var(--text-muted)">${inv.invocacao} (${nota})</div>
             </div>
-            <button class="btn btn-sm btn-primary no-print" data-conjurar-pacto="${inv.magia}" data-conjurar-pacto-circ="${circ}" style="font-size:0.7rem;flex-shrink:0">Conjurar</button>
+            <button class="btn btn-sm btn-primary no-print" data-conjurar-pacto="${inv.magia}" data-conjurar-pacto-inv="${inv.invocacao}" data-conjurar-pacto-circ="${circ}" style="font-size:0.7rem;flex-shrink:0${gasto ? ';opacity:0.5;cursor:not-allowed' : ''}" ${gasto ? 'disabled' : ''}>Conjurar</button>
           </div>
           <div class="magia-desc" style="margin-top:4px;font-size:0.78rem;color:var(--text-muted)"></div>
         </div>`;
@@ -1031,8 +1063,11 @@ export function renderSecaoPactoBruxo() {
     html += '</div>';
   }
 
-  html += '</div></details>';
-  return html;
+  if (!html) return '';
+  const titulo = pactos.length ? `Dadivas do Pacto - ${pactos.join(' + ')}` : 'Invocações Místicas';
+  return `<details data-details-id="invocacoes-bruxo" style="margin-bottom:8px;border-left:3px solid var(--secondary);padding-left:8px">
+    <summary style="font-weight:700;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--border-light);color:var(--secondary)">${titulo}</summary>
+    <div style="padding-top:6px">${html}</div></details>`;
 }
 
 /**
@@ -1121,4 +1156,241 @@ function extrairInvocacoesMagicasBruxo(invocacoesSelecionadas) {
     }
   }
   return resultado;
-}
+}
+// ============================================================
+// Invocações Místicas com regra própria (uso limitado, condição, ação)
+// ============================================================
+
+/**
+ * Regras que a conjuração grátis de uma invocação carrega além de "sem
+ * espaço". A chave é o nome da invocação sem acento e em minúsculas.
+ * - usoChave: o livro limita a um uso por Descanso Longo (campo em
+ *   `recursos.bruxo.invocacoes_usos`).
+ * - pvTempMaximo: PV temporários sem rolar o dado (Vigor Ínfero: 2d4+4
+ *   no máximo).
+ * - condicao: exigência confirmada pelo jogador antes de conjurar.
+ */
+export const REGRAS_CONJURACAO_INVOCACAO = {
+  'presente das profundezas': { usoChave: 'presente_profundezas' },
+  'vigor infero': { pvTempMaximo: 12 },
+  'uno com as sombras': {
+    condicao: 'Você precisa estar em uma área de Meia-luz ou Escuridão para conjurar Invisibilidade com esta invocação.',
+  },
+};
+
+/**
+ * Texto do efeito de uma invocação que modifica um truque, com os números
+ * do personagem.
+ * @param {string} nomeInv Nome da invocação.
+ * @param {string} truque Truque escolhido.
+ * @returns {string} Efeito em texto curto.
+ */
+export function rotuloEfeitoInvocacaoTruque(nomeInv, truque) {
+  const chave = semAcento(nomeInv);
+  if (chave === 'explosao agonizante') {
+    const mod = calcMod(atributoEfetivo(char, 'carisma'));
+    return `${mod >= 0 ? '+' : '−'}${Math.abs(mod)} ao dano (modificador de Carisma)`;
+  }
+  if (chave === 'explosao repulsiva') return 'Ao atingir criatura Grande ou menor: empurra até 3 m para longe';
+  if (chave === 'lanca mistica') {
+    const extra = 9 * (nivelNa(char, 'Bruxo') || 1);
+    const info = (indiceMagiasCache || []).find((m) => m.nome === truque);
+    const base = parseFloat(String(info?.alcance || '').replace(',', '.').match(/(\d+(?:\.\d+)?)\s*metros/i)?.[1]);
+    return Number.isFinite(base)
+      ? `Alcance ${String(base).replace('.', ',')} m → ${String(base + extra).replace('.', ',')} m`
+      : `Alcance +${extra} m`;
+  }
+  return '';
+}
+
+/**
+ * Descrição de uma invocação no texto do livro.
+ * @param {string} nome Nome da invocação.
+ * @returns {string} Markdown, ou '' se não achar.
+ */
+export function descricaoInvocacaoBruxo(nome) {
+  const op = extrairOpcoesInvocacoesBruxo().find((o) => semAcento(o.nome) === semAcento(nome));
+  if (!op) return '';
+  return `${op.prerequisito ? `*Pré-requisito: ${op.prerequisito}*\n\n` : ''}${op.descricao}`;
+}
+
+/** Rola um dado de `faces` faces. */
+function rolarD(faces) {
+  return 1 + Math.floor(Math.random() * faces);
+}
+
+/**
+ * Conjura a magia concedida por uma invocação, aplicando a regra própria dela
+ * (confirmação de condição, uso limitado, PV temporários máximos).
+ * @param {string} nomeInvocacao Invocação que concede a magia.
+ * @param {string} magia Nome da magia.
+ * @param {number} circulo Círculo da magia.
+ */
+export function conjurarPorInvocacao(nomeInvocacao, magia, circulo) {
+  const regra = REGRAS_CONJURACAO_INVOCACAO[semAcento(nomeInvocacao)] || {};
+  const estado = getEstadoRecursosBruxo();
+  if (regra.usoChave && estado?.presenteProfundezasUsado) {
+    toast(`${nomeInvocacao}: o uso grátis já foi gasto até o Descanso Longo.`, 'error');
+    return;
+  }
+  const executar = () => {
+    conjurarSemEspaco(magia, circulo, `${magia} conjurada (via ${nomeInvocacao}, sem gastar espaço).`, () => {
+      if (regra.usoChave) char.recursos.bruxo.invocacoes_usos[regra.usoChave] = true;
+      if (regra.pvTempMaximo) char.pv_temporario = Math.max(char.pv_temporario || 0, regra.pvTempMaximo);
+      salvar();
+      renderFichaCompleta();
+      toast(regra.pvTempMaximo
+        ? `${magia} conjurada: ${regra.pvTempMaximo} PV Temporários (máximo do dado).`
+        : `${magia} conjurada (via ${nomeInvocacao}, sem gastar espaço).`, 'success');
+    });
+  };
+  if (!regra.condicao) { executar(); return; }
+  abrirModal(nomeInvocacao, `<p>${regra.condicao}</p>`,
+    '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>'
+    + '<button class="btn btn-primary" id="btn-confirmar-condicao-invocacao">Estou na penumbra ou no escuro</button>');
+  document.getElementById('btn-confirmar-condicao-invocacao')?.addEventListener('click', () => {
+    window.fecharModal();
+    executar();
+  });
+}
+
+/**
+ * Punição Mística (Pacto da Lâmina): gasta um espaço de Magia de Pacto e
+ * rola 1d8 + 1d8 por círculo do espaço, de dano Energético.
+ */
+export function usarPunicaoMistica() {
+  if (!temClasse(char, 'Bruxo')) return;
+  const reserva = reservasDeEspacos()
+    .filter((r) => r.fonte === 'pacto' && r.disponiveis > 0)
+    .sort((a, b) => a.circulo - b.circulo)[0];
+  if (!reserva) {
+    toast('Sem espaço de Magia de Pacto disponível para a Punição Mística.', 'error');
+    return;
+  }
+  const dados = 1 + reserva.circulo;
+  abrirModal('Punição Mística', `
+    <p>Uma vez por turno, ao atingir uma criatura com a arma de pacto, gaste um espaço de Magia de Pacto (${reserva.circulo}º círculo).</p>
+    <p><strong>Dano extra:</strong> ${dados}d8 Energético (1d8 + 1d8 por círculo). O alvo pode ficar Caído se for Enorme ou menor.</p>`,
+  '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>'
+  + '<button class="btn btn-primary" id="btn-confirmar-punicao-mistica">Gastar espaço e rolar</button>');
+  document.getElementById('btn-confirmar-punicao-mistica')?.addEventListener('click', () => {
+    if (!gastarEspaco(char, 'pacto', reserva.circulo)) {
+      window.fecharModal();
+      toast('Sem espaço de Magia de Pacto disponível para a Punição Mística.', 'error');
+      return;
+    }
+    const rolagens = Array.from({ length: dados }, () => rolarD(8));
+    const total = rolagens.reduce((s, n) => s + n, 0);
+    salvar();
+    window.fecharModal();
+    renderFichaCompleta();
+    abrirModal('Punição Mística', `
+      <p><strong>${total} de dano Energético</strong> (${dados}d8: ${rolagens.join(' + ')}).</p>
+      <p>O alvo fica Caído se for Enorme ou menor. Espaço de Pacto gasto: ${reserva.circulo}º círculo.</p>`,
+    '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
+  });
+}
+
+/**
+ * Sorvedouro de Vida (Pacto da Lâmina): 1d6 de dano extra (Necrótico,
+ * Psíquico ou Radiante) e, opcionalmente, gasta um Dado de Vida para
+ * recuperar PV igual ao resultado mais o modificador de Constituição
+ * (mínimo 1).
+ */
+export function usarSorvedouroVida() {
+  if (!temClasse(char, 'Bruxo')) return;
+  const dadosVida = reservasDadosVida(char).filter((r) => r.disponiveis > 0);
+  const opcoesDado = dadosVida.map((r) => `<option value="${r.faces}">d${r.faces} (${r.disponiveis} disponível(is))</option>`).join('');
+  abrirModal('Sorvedouro de Vida', `
+    <p>Uma vez por turno, ao atingir uma criatura com a arma de pacto: 1d6 de dano extra.</p>
+    <div class="form-group"><label class="form-label">Tipo de dano</label>
+      <select class="form-select" id="sorvedouro-tipo">
+        <option>Necrótico</option><option>Psíquico</option><option>Radiante</option>
+      </select></div>
+    ${dadosVida.length ? `
+      <div class="form-group"><label class="form-label">
+        <input type="checkbox" id="sorvedouro-curar"> Gastar um Dado de Vida para recuperar PV</label>
+        <select class="form-select" id="sorvedouro-dado" style="margin-top:4px">${opcoesDado}</select></div>
+    ` : '<p style="color:var(--text-muted);font-size:0.8rem">Sem Dados de Vida disponíveis para a cura.</p>'}`,
+  '<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>'
+  + '<button class="btn btn-primary" id="btn-confirmar-sorvedouro">Rolar</button>');
+  document.getElementById('btn-confirmar-sorvedouro')?.addEventListener('click', () => {
+    const tipo = document.getElementById('sorvedouro-tipo')?.value || 'Necrótico';
+    const curar = !!document.getElementById('sorvedouro-curar')?.checked;
+    const faces = parseInt(document.getElementById('sorvedouro-dado')?.value, 10);
+    const dano = rolarD(6);
+    let cura = '';
+    if (curar && Number.isFinite(faces) && gastarDadosVida(char, faces, 1) === 1) {
+      const rolagem = rolarD(faces);
+      const modCon = calcMod(atributoEfetivo(char, 'constituicao'));
+      const ganho = Math.max(1, rolagem + modCon);
+      const pvMax = char.pv_max_override || char.pv_max;
+      const antes = char.pv_atual;
+      char.pv_atual = Math.min(pvMax, (char.pv_atual || 0) + ganho);
+      cura = `<p><strong>Cura:</strong> d${faces} = ${rolagem} ${modCon >= 0 ? '+' : '−'} ${Math.abs(modCon)} (Constituição) = ${ganho} PV (${antes} → ${char.pv_atual}).</p>`;
+    }
+    salvar();
+    window.fecharModal();
+    renderFichaCompleta();
+    abrirModal('Sorvedouro de Vida', `<p><strong>${dano} de dano ${tipo}</strong> (1d6).</p>${cura}`,
+      '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
+  });
+}
+
+/**
+ * Presente dos Protetores (Pacto do Tomo): página de nomes com capacidade
+ * igual ao modificador de Carisma (mínimo 1).
+ */
+export function abrirModalProtetores() {
+  if (!temClasse(char, 'Bruxo')) return;
+  const estado = getEstadoRecursosBruxo();
+  if (!estado) return;
+  const max = estado.modCar;
+  const desenhar = () => {
+    const nomes = char.recursos.bruxo.protetores_nomes;
+    const corpo = document.getElementById('protetores-corpo');
+    if (!corpo) return;
+    corpo.innerHTML = `
+      <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:6px">Nomes na página: <strong>${nomes.length}</strong> / ${max}</div>
+      ${nomes.map((n, i) => `<div style="display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:4px">
+        <span>${escHtml(n)}</span>
+        <button class="btn btn-sm btn-secondary" data-protetores-remover="${i}">Apagar</button></div>`).join('')}
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <input class="form-input" id="protetores-novo" placeholder="Nome da criatura" style="flex:1">
+        <button class="btn btn-sm btn-accent" id="btn-protetores-adicionar">Escrever</button></div>`;
+    corpo.querySelectorAll('[data-protetores-remover]').forEach((b) => b.addEventListener('click', () => {
+      nomes.splice(parseInt(b.dataset.protetoresRemover, 10), 1);
+      salvar();
+      desenhar();
+    }));
+    document.getElementById('btn-protetores-adicionar')?.addEventListener('click', () => {
+      const campo = document.getElementById('protetores-novo');
+      const nome = (campo?.value || '').trim();
+      if (!nome) return;
+      if (nomes.length >= max) { toast(`A página comporta ${max} nome(s). Apague um antes.`, 'error'); return; }
+      nomes.push(nome);
+      salvar();
+      desenhar();
+    });
+  };
+  abrirModal('Presente dos Protetores', '<div id="protetores-corpo"></div>',
+    '<button class="btn btn-primary" id="btn-fechar-protetores">Fechar</button>', () => renderFichaCompleta());
+  document.getElementById('btn-fechar-protetores')?.addEventListener('click', () => window.fecharModal());
+  desenhar();
+}
+
+/**
+ * Marca (ou desmarca) o disparo do Presente dos Protetores: depois que uma
+ * criatura da página é salva com 1 PV, ninguém se beneficia até o Descanso
+ * Longo.
+ */
+export function alternarDisparoProtetores() {
+  if (!temClasse(char, 'Bruxo') || !getEstadoRecursosBruxo()) return;
+  const usos = char.recursos.bruxo.invocacoes_usos;
+  usos.protetores = !usos.protetores;
+  salvar();
+  renderFichaCompleta();
+  toast(usos.protetores
+    ? 'Presente dos Protetores disparado: sem efeito até o Descanso Longo.'
+    : 'Presente dos Protetores disponível de novo.', 'success');
+}

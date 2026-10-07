@@ -22,8 +22,9 @@ import { char, classeData, salvar, iniciarAberturaFicha, concluirAberturaFicha }
 import { nivelNa } from '../regras-multiclasse.js';
 import { renderFichaCompleta } from '../sheet/ficha.js';
 import { carregarCriaturasArtifice } from '../sheet/companheiros-artifice.js';
+import { carregarCriaturasFamiliar } from '../sheet/familiar.js';
 import { carregarDescricoesMagias } from '../sheet/impressao.js';
-import { migrarCopiasCustomizadasDoGrimorio, migrarEscolhasClasseLegadas, migrarEspacosMagia, migrarMagiaClasse, migrarMagiasCustomizadasSemprePreparadas, migrarMagiasDominio, migrarMagiasLegadoEspecie, migrarMagiasSemprePreparadas, migrarMulticlasse, migrarNomePericiaLidarAnimais, migrarPericiaEspecie, migrarPericiasEspecie, migrarPericiasTalentos, migrarProficienciasTalentos, migrarSlotsMagiaLivre, migrarTalentoVersatilHumano, migrarTruquesEspecie, migrarTruquesFixosSubclasse } from '../sheet/migracoes.js';
+import { migrarCopiasCustomizadasDoGrimorio, migrarEscolhasClasseLegadas, migrarEspacosMagia, migrarMagiaClasse, migrarMagiasCustomizadasSemprePreparadas, migrarMagiasDominio, migrarConcessoesSubclasseMago, migrarMagiasLegadoEspecie, migrarMagiasSemprePreparadas, migrarMulticlasse, migrarNomePericiaLidarAnimais, migrarPericiaEspecie, migrarPericiasEspecie, migrarPericiasTalentos, migrarProficienciasTalentos, migrarSlotsMagiaLivre, migrarTalentoVersatilHumano, migrarTruquesEspecie, migrarTruquesFixosSubclasse } from '../sheet/migracoes.js';
 import { baixarPdfFicha } from '../sheet/pdf.js';
 import { migrarAdeptoElementalTipos, migrarIniciadoEmMagiaInstancias } from '../sheet/talentos.js';
 let _syncSubscribed = false;
@@ -96,6 +97,7 @@ export async function renderSheet(container, charId) {
   definirTalentos(await getTalentos());
   definirEspecies(await getEspecies());
   await carregarCriaturasArtifice();
+  await carregarCriaturasFamiliar();
 
   // Pré-carregar magias de domínio/sempre preparadas de TODAS as classes,
   // cada uma no nível DELA. Montar esses dois caches pelos espelhos (que
@@ -153,6 +155,7 @@ export async function renderSheet(container, charId) {
     migrarSlotsMagiaLivre();
     migrarTruquesEspecie();
     migrarMagiasLegadoEspecie();
+    migrarConcessoesSubclasseMago();
     // Depois de TODA migração que atribui `origem` a entradas de
     // magias_preparadas (Tarefa 3, sub-projeto "magia sabe a classe"): esta é
     // a última delas na ordem acima -- migrarMagiasDominio ('dominio'),

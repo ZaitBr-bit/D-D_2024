@@ -4,6 +4,7 @@
 // ============================================================
 import { calcMod } from './utils.js';
 import { atributoEfetivo } from './regras-atributos.js';
+import { livroEmpunhado } from './regras-necromante.js';
 
 /** Atributos que o jogador pode escolher como modificador de uma arma ou armadura. */
 export const ATRIBUTOS_MODIFICADOR = [
@@ -118,9 +119,10 @@ function contaNasMaos(item) {
   return !!item?.equipado && !item.destruido && (item.quantidade ?? 1) > 0;
 }
 
-/** Soma das mãos ocupadas pelos itens equipados, sem contar o item `ignorar`. */
+/** Soma das mãos ocupadas pelos itens equipados (e pelo livro de magias do Necromante), sem contar o item `ignorar`. */
 export function maosEmUso(char, ignorar = null) {
-  return (char?.inventario || [])
+  const livro = livroEmpunhado(char) ? 1 : 0;
+  return livro + (char?.inventario || [])
     .filter(i => i !== ignorar && contaNasMaos(i))
     .reduce((s, i) => s + maosOcupadas(i), 0);
 }
@@ -139,6 +141,7 @@ export function verificarEquipar(char, item) {
   const bloqueadores = (char.inventario || [])
     .filter(i => i !== item && contaNasMaos(i) && maosOcupadas(i) > 0)
     .map(i => i.nome);
+  if (livroEmpunhado(char)) bloqueadores.push('Livro de magias');
   return {
     ok: false,
     motivo: `Sem mãos livres (${emUso} de ${total} em uso): desequipe ${bloqueadores.join(' ou ')}.`,

@@ -24,7 +24,8 @@ test('ficha: percepção, intuição, investigação e visão no escuro com acen
   }
 });
 
-test('formulário de item personalizado: Descrição, Bônus CA e Preço com acento', async ({ context }) => {
+// O campo de valor do rodapé se chama "Pagar" desde a 3.1.3 (antes "Preço"); o rótulo fica no #modal-acoes.
+test('formulário de item personalizado: Descrição e Bônus CA com acento e o campo Pagar no rodapé', async ({ context }) => {
   const { page } = await abrirFicha(context, GUERREIRO_5, 'regras-issue-99-b');
   await assentar(page).catch(() => {});
   await clicarSeletorFicha(page, '#btn-add-inv-custom', { esperar: '#ic-desc' });
@@ -33,7 +34,7 @@ test('formulário de item personalizado: Descrição, Bônus CA e Preço com ace
   const norm = corpo.toLowerCase();
   expect(norm).toContain('descrição');
   expect(norm).toContain('bônus ca');
-  expect(norm).toContain('preço');
+  await expect(page.locator('#modal-acoes label[for="pagar-item-custom-qtd"]')).toHaveText('Pagar');
   expect(norm).not.toContain('descricao');
   expect(norm).not.toContain('bonus ca');
 });

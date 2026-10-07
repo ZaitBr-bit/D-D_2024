@@ -7,6 +7,8 @@ import { char, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { calcularAtaqueItem, htmlSeloAtributoArma } from './ataque-calculo.js';
 import { ehArmaDeAtaque, maosOcupadas, maosEmUso, maosTotais, excedeMaos, avisoRecarga, danoVersatil, verificarEquipar } from '../regras-ataque.js';
+import { ehNecromante, estadoNecromante, livroEmpunhado, nivelDoMago } from '../regras-necromante.js';
+import { abrirDetalheLivro } from './necromante.js';
 import { abrirModalMaos } from './maos-ui.js';
 import { sheetBadgeProf, sheetTemProfArma } from './condicoes.js';
 import { mostrarDetalheItemSheet } from './inventario.js';
@@ -42,10 +44,27 @@ function htmlLinhaAtaque(item, idx) {
     ${botao}</div>`;
 }
 
-/** Seção Ataques; devolve string vazia quando não há arma equipada. */
+/** Se a linha do livro de magias aparece: Necromante de nível 3 ou mais. */
+function temLinhaDoLivro() {
+  return ehNecromante(char) && nivelDoMago(char) >= 3;
+}
+
+/** Linha do livro de magias do Necromante: ocupa 1 mão enquanto empunhado; botão Empunhar/Guardar. */
+function htmlLinhaLivro() {
+  const empunhado = livroEmpunhado(char);
+  return `<div class="ataque-item" id="ataque-livro" style="padding:6px 0;border-bottom:1px solid var(--border-light);display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap">
+    <div style="flex:1;min-width:0;cursor:pointer" data-ataque-livro-info="1" title="Ver detalhes"><strong>Livro de magias</strong>
+      <span class="badge badge-secondary" style="font-size:0.65rem">1 mão</span>
+      <span class="badge ${empunhado ? 'badge-success' : 'badge-secondary'}" style="font-size:0.65rem">${empunhado ? 'Empunhado' : 'Guardado'}</span>
+      <div style="font-size:0.75rem;color:var(--text-muted)">Poder Sepulcral, Servos Fortalecidos e Mestre da Morte exigem o livro na mão. Toque para ver o que cada um faz e onde é usado.</div></div>
+    <button class="btn btn-sm btn-secondary no-print" data-ataque-livro-acao="alternar">${empunhado ? 'Guardar o livro' : 'Empunhar o livro'}</button></div>`;
+}
+
+/** Seção Ataques; devolve string vazia quando não há arma equipada nem livro do Necromante. */
 export function renderSecaoAtaques() {
   const armas = armasEquipadas();
-  if (armas.length === 0) return '';
+  const livro = temLinhaDoLivro();
+  if (armas.length === 0 && !livro) return '';
   const avisos = [];
   if (excedeMaos(char)) avisos.push(`Mãos excedidas (${maosEmUso(char)} de ${maosTotais(char)}): desequipe um item.`);
   const recarga = avisoRecarga(char);
@@ -56,6 +75,7 @@ export function renderSecaoAtaques() {
       <button class="btn btn-sm btn-secondary no-print" id="btn-ataques-maos">Mãos (${maosEmUso(char)}/${maosTotais(char)})</button>
     </div>
     ${avisos.map(a => `<div class="aviso" style="font-size:0.8rem;color:#842029;margin:4px 0">${escHtml(a)}</div>`).join('')}
+    ${livro ? htmlLinhaLivro() : ''}
     ${armas.map(a => htmlLinhaAtaque(a, char.inventario.indexOf(a))).join('')}
   </div>`;
 }
@@ -63,6 +83,18 @@ export function renderSecaoAtaques() {
 /** Liga o botão de mãos e a troca de empunhadura das armas versáteis. */
 export function setupEventosAtaques() {
   document.getElementById('btn-ataques-maos')?.addEventListener('click', () => abrirModalMaos());
+  document.querySelectorAll('[data-ataque-livro-info]').forEach(el => el.addEventListener('click', () => abrirDetalheLivro()));
+  // Livro de magias do Necromante: empunhar exige uma mão livre; guardar sempre pode.
+  document.querySelectorAll('[data-ataque-livro-acao]').forEach(btn => btn.addEventListener('click', () => {
+    const e = estadoNecromante(char);
+    if (!e.livro_empunhado && maosEmUso(char) + 1 > maosTotais(char)) {
+      toast('Sem mãos livres para empunhar o livro de magias: desequipe uma arma ou escudo.', 'error');
+      return;
+    }
+    e.livro_empunhado = !e.livro_empunhado;
+    salvar();
+    renderFichaCompleta();
+  }));
   // Nome da arma abre o mesmo detalhe do inventário (inclui o seletor de atributo).
   document.querySelectorAll('[data-ataque-info]').forEach(el => el.addEventListener('click', () => {
     const item = char.inventario[parseInt(el.dataset.ataqueInfo)];

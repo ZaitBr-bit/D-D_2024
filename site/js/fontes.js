@@ -4,7 +4,7 @@
 // Registro com campo `fonte` ganha o chip; sem `fonte` o conteúdo é do
 // Livro do Jogador e nada é desenhado. Os nomes vêm de dados/fontes.json.
 // ============================================================
-import { getFontes } from './db.js';
+import { fonteDaMagia, getFontes } from './db.js';
 import { escHtml } from './utils.js';
 
 let _fontes = new Map();
@@ -45,6 +45,11 @@ export function seloFonte(fonteId) {
   if (!f && _fontes.size) console.warn(`fonte desconhecida: ${fonteId}`);
   const rotulo = f?.sigla || fonteId;
   return `<button type="button" class="selo-fonte" data-fonte="${escHtml(fonteId)}" title="Origem do conteúdo">${escHtml(rotulo)}</button>`;
+}
+
+/** Chip de origem de uma magia de expansão pelo nome; vazio para as do Livro do Jogador. */
+export function seloDaMagia(nome) {
+  return seloFonte(fonteDaMagia(nome));
 }
 
 /** Fecha o popover de origem aberto, se houver. */
@@ -110,4 +115,16 @@ export function ligarSelosFonte(container) {
       abrirPopoverFonte(botao);
     });
   });
+}
+
+// Chips desenhados depois da ligação inicial (listas redesenhadas, modais) abrem o
+// popover sem cada tela chamar ligarSelosFonte; o chip já ligado usa o próprio listener.
+if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+  document.addEventListener('click', (e) => {
+    const botao = e.target.closest?.('.selo-fonte');
+    if (!botao || botao.dataset.seloLigado) return;
+    e.preventDefault();
+    e.stopPropagation();
+    abrirPopoverFonte(botao);
+  }, true);
 }

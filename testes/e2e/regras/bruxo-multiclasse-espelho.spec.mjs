@@ -69,8 +69,8 @@ test('secao Magias: a invocacao que modifica truque aparece no Bruxo multiclasse
   // ele deixaria este oraculo verde mesmo com o defeito presente -- foi
   // exatamente o que aconteceu na primeira versao deste teste.
   await expect(page.locator('body'),
-    'a marca "+Carisma ao dano" no truque some quando o Bruxo nao e a classe inicial')
-    .toContainText('+Carisma ao dano');
+    'a marca "ao dano (modificador de Carisma)" no truque some quando o Bruxo nao e a classe inicial')
+    .toContainText('ao dano (modificador de Carisma)');
 });
 
 test('impressao: os espacos de Pacto saem na folha do Bruxo multiclasse', async ({ context }) => {

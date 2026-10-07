@@ -20,9 +20,11 @@ import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { abrirSite, assentar, confirmarModal, satisfazerPasso, personagemEmCriacao } from './helpers-regras.mjs';
 
-const DADOS = JSON.parse(readFileSync(
-  new URL('../../../dados/origens/especies.json', import.meta.url), 'utf-8'));
-const ESPECIES_NO_DADO = (DADOS.especies || DADOS).map((e) => e.nome);
+// Livro do Jogador mais as espécies de expansão que db.getEspecies() junta.
+const ESPECIES_NO_DADO = ['origens/especies.json', 'ravenloft/especies.json'].flatMap((arq) => {
+  const dados = JSON.parse(readFileSync(new URL(`../../../dados/${arq}`, import.meta.url), 'utf-8'));
+  return (dados.especies || dados).map((e) => e.nome);
+});
 
 /**
  * Leva o criador até o passo de Espécie. Classe vem ANTES dele

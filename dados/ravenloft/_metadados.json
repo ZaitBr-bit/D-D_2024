@@ -1,0 +1,18 @@
+{
+  "titulo": "Ravenloft: Horrors Within",
+  "fonte": "ravenloft",
+  "pdf_extraido": "Informacoes Separadas/Ravenloft Horrors within D&D 5.5e (D&D beyond).pdf",
+  "idioma_original": "inglês; traduzido para PT-BR",
+  "observacao": "Separado de dados/ (Livro do Jogador). O PDF é impressão de página do D&D Beyond só em imagem (sem camada de texto): a tradução foi feita pela leitura da página renderizada. Termos de regra seguem dados/origens/especies.json.",
+  "conteudos": [
+    {
+      "id": "renascido",
+      "titulo": "Renascido",
+      "titulo_en": "Reborn",
+      "paginas_pdf": { "introducao_especies": "17", "especie": "73" },
+      "arquivos": {
+        "especies.json": "Espécies do livro no formato de dados/origens/especies.json, com fonte e nome_en; db.getEspecies() as junta às do Livro do Jogador"
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "titulo": "Manual dos Monstros (2026)",
+  "fonte": "monstros",
+  "pdf_extraido": "Informacoes Separadas/PDF/Monsters Manual D&D 5.5e (2026) - DnD Beyond - Expanded [5.5e].pdf",
+  "idioma_original": "inglês; traduzido para PT-BR",
+  "observacao": "Separado de dados/ (Livro do Jogador). Entram as Feras do Apêndice A (Feras Diversas) com ND até 6, que o druida pode assumir na Forma Selvagem (o teto do Círculo da Lua é nível ÷ 3 = 6 no nível 20). Ficam de fora a Lula Monstruosa (ND 12), o Mosassauro (ND 11) e o Espinossauro (ND 9). Termos de regra seguem dados/apendices/criaturas.json. db.getCriaturas() junta estas criaturas às do apêndice do Livro do Jogador.",
+  "conteudos": [
+    {
+      "id": "feras-diversas",
+      "titulo": "Feras Diversas",
+      "titulo_en": "Miscellaneous Beasts",
+      "paginas_livro": "295-303",
+      "arquivos": {
+        "criaturas.json": "Criaturas no formato de dados/apendices/criaturas.json, com fonte, nome_en, pagina, acoes_bonus e reacoes; gerado por scripts/monstros/montar_criaturas.mjs"
+      }
+    }
+  ]
+}

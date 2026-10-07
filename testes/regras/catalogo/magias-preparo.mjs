@@ -178,11 +178,11 @@ export const EXCECOES_LISTA_ORIGEM = {
   // aspas, enxergava `['dominio']`. Era a MESMA pergunta, respondida com a lista
   // errada. Corrigida na Correção B (2026-08-19), junto com a cegueira do
   // extrator, que hoje registra os `...espalha` e tem asserção própria.
-  // Linha 93 (era 68 antes da Tarefa 3, sub-projeto "tela magias por
+  // Linha 94 (era 93 antes das importações do Necromante em migracoes.js; era 68 antes da Tarefa 3, sub-projeto "tela magias por
   // classe" -- migrarSlotsMagiaLivre passou a derivar a superfície de
   // conjuração ativa de classes[] em vez dos espelhos char.classe/
   // classeData/char.nivel, o que deslocou o resto da função).
-  'sheet/migracoes.js:93': 'Migração de dado legado: classifica origens de personagens ' +
+  'sheet/migracoes.js:94': 'Migração de dado legado: classifica origens de personagens ' +
     'salvos por versões antigas do app, incluindo `telecinetico`, que nenhuma das listas ' +
     'vivas usa. Não governa o limite de nenhum personagem novo.',
   // Linha 294 (era 295 antes da revisão final #105/#61 -- os docblocks de

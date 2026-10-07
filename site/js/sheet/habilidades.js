@@ -10,10 +10,14 @@
 import { atributoEfetivo } from '../regras-atributos.js';
 import { abrirModal, bonusProficiencia, calcMod, coletarCAsAlternativas, detectarRecarga, ehHabilidadeAtiva, equipamentoDeCA, escHtml, escolherCAAlternativa, fmtMod, getDeslocamento, mdParaHtml, semAcento, toast } from '../utils.js';
 import { featureConcedeUsoGratisSemEspaco } from '../levelup.js';
-import { featureTemUsoGratisPorRecursoDedicado } from '../regras-usos-gratis-magia.js';
+import { contagemUsosGratisDaFeature, featureTemUsoGratisPorRecursoDedicado } from '../regras-usos-gratis-magia.js';
 import { _abrirEscolhaAnimalFuria, getEstadoFuria } from './classes/barbaro.js';
 import { getEstadoInspiracaoBardo } from './classes/bardo.js';
-import { abrirModalPactoDoTomo, abrirModalRecursosBruxo, getEstadoRecursosBruxo, recuperarEspacosMagiaBruxo } from './classes/bruxo.js';
+import { abrirSelecaoFamiliar, interceptarConvocarFamiliar, registrarFamiliarPendente } from './familiar.js';
+import { aplicarResilienciaSepulcral } from './necromante.js';
+import { abrirGerenciarFormas, encerrarFormaSelvagem, iniciarFormaSelvagem, motivoSemConjuracaoEmForma } from './forma-selvagem.js';
+import { dispensarFamiliar } from '../regras-familiar.js';
+import { abrirModalPactoDoTomo, abrirModalProtetores, abrirModalRecursosBruxo, alternarDisparoProtetores, conjurarPorInvocacao, getEstadoRecursosBruxo, recuperarEspacosMagiaBruxo, usarPunicaoMistica, usarSorvedouroVida } from './classes/bruxo.js';
 import { getEstadoRecursosClerigo, getEstadoSubclassesClerigo, getProgressaoClerigo } from './classes/clerigo.js';
 import { consumirUsoFormaSelvagem, getEstadoRecursosDruida } from './classes/druida.js';
 import { gastarPontosFeiticaria, getEstadoRecursosFeiticeiro, recuperarPontosFeiticaria } from './classes/feiticeiro.js';
@@ -214,6 +218,27 @@ export function setupEventosHabilidades() {
         return;
       }
       char.usos_habilidades[key] = atual + 1;
+      salvar();
+      renderFichaCompleta();
+    });
+  });
+
+  // Renascido: Conhecimento de uma Vida Passada - gasta um uso e rola 1d6 para somar ao d20
+  document.querySelectorAll('[data-vida-passada]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const key = btn.dataset.vidaPassada;
+      const usosMax = parseInt(btn.dataset.usosMax) || 1;
+      if (!char.usos_habilidades) char.usos_habilidades = {};
+      const atual = typeof char.usos_habilidades[key] === 'number' ? char.usos_habilidades[key] : 0;
+      if (atual >= usosMax) {
+        toast('Usos esgotados! Descanse para recuperar.', 'error');
+        return;
+      }
+      char.usos_habilidades[key] = atual + 1;
+      const rolagem = Math.floor(Math.random() * 6) + 1;
+      toast(`Vida Passada: 1d6 = ${rolagem}. Some ao d20 do teste que falhou.`, 'success');
       salvar();
       renderFichaCompleta();
     });
@@ -1360,11 +1385,34 @@ export function setupEventosHabilidades() {
       e.preventDefault();
       const nomeMagia = btn.dataset.conjurarPacto;
       const circulo = parseInt(btn.dataset.conjurarPactoCirc, 10);
+      const semConjuracao = motivoSemConjuracaoEmForma();
+      if (semConjuracao) { toast(semConjuracao, 'error'); return; }
+      // Magia concedida por invocação: aplica a regra própria dela (uso
+      // limitado, condição, PV temporários máximos).
+      if (btn.dataset.conjurarPactoInv) {
+        conjurarPorInvocacao(btn.dataset.conjurarPactoInv, nomeMagia, Number.isFinite(circulo) ? circulo : 1);
+        return;
+      }
+      // Convocar Familiar pelo Pacto da Corrente: escolhe a forma (com as especiais) antes de conjurar.
+      if (interceptarConvocarFamiliar(nomeMagia, 'pacto', () => btn.click())) return;
       conjurarSemEspaco(
         nomeMagia,
         Number.isFinite(circulo) ? circulo : 1,
         `${nomeMagia} conjurada (via Pacto, sem gastar espaço).`,
       );
+    });
+  });
+
+  // Ações das Invocações Místicas do Bruxo com regra própria.
+  document.querySelectorAll('[data-bruxo-invocacao-acao]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const acao = btn.dataset.bruxoInvocacaoAcao;
+      if (acao === 'punicao-mistica') usarPunicaoMistica();
+      else if (acao === 'sorvedouro-vida') usarSorvedouroVida();
+      else if (acao === 'protetores-nomes') abrirModalProtetores();
+      else if (acao === 'protetores-disparo') alternarDisparoProtetores();
     });
   });
 
@@ -1379,20 +1427,11 @@ export function setupEventosHabilidades() {
       const estado = getEstadoRecursosDruida();
       if (!estado) return;
 
-      if (acao === 'ativar') {
-        if (!consumirUsoFormaSelvagem(1)) {
-          toast('Sem usos de Forma Selvagem disponíveis.', 'error');
-          return;
-        }
-        char.recursos.druida.forma_selvagem_ativa = true;
-        toast('Forma Selvagem ativada.', 'success');
-      } else {
-        char.recursos.druida.forma_selvagem_ativa = false;
-        toast('Forma Selvagem encerrada.', 'success');
-      }
-
-      salvar();
-      renderFichaCompleta();
+      // Ativar escolhe a forma (tela de cards) e gasta o uso ao confirmar;
+      // encerrar sai da forma. Cada um grava e redesenha por conta própria.
+      if (acao === 'ativar') iniciarFormaSelvagem();
+      else if (acao === 'formas') abrirGerenciarFormas();
+      else encerrarFormaSelvagem();
     });
   });
 
@@ -1407,6 +1446,7 @@ export function setupEventosHabilidades() {
       if (!estado) return;
 
       if (estado.companheiroSelvagemAtivo) {
+        dispensarFamiliar(char);
         char.recursos.druida.companheiro_selvagem_ativo = false;
         toast('Companheiro Selvagem dispensado.', 'success');
         salvar();
@@ -1414,21 +1454,33 @@ export function setupEventosHabilidades() {
         return;
       }
 
-      if (consumirUsoFormaSelvagem(1)) {
-        char.recursos.druida.companheiro_selvagem_ativo = true;
-        toast('Companheiro Selvagem invocado (consumiu 1 uso de Forma Selvagem).', 'success');
-      } else {
-        const circulo = consumirEspacoMagiaDisponivel(1);
-        if (!circulo) {
-          toast('Sem uso de Forma Selvagem ou espaço de magia disponível para invocar o companheiro.', 'error');
-          return;
+      // Ação Usar Magia: conjura Convocar Familiar (sem componentes Materiais)
+      // gastando um uso de Forma Selvagem OU um espaço de magia. O jogador
+      // escolhe a forma e o custo; o familiar é Feérico e some no Descanso Longo.
+      const temEspaco = reservasDeEspacos().some(r => r.fonte === 'conjuracao' && r.disponiveis > 0);
+      abrirSelecaoFamiliar('companheiro', (custo) => {
+        let gasto;
+        if (custo === 'uso') {
+          if (!consumirUsoFormaSelvagem(1)) { toast('Sem usos de Forma Selvagem disponíveis.', 'error'); return; }
+          gasto = '1 uso de Forma Selvagem';
+        } else {
+          const circulo = consumirEspacoMagiaDisponivel(1);
+          if (!circulo) { toast('Sem espaço de magia disponível para invocar o companheiro.', 'error'); return; }
+          gasto = `1 espaço de ${circulo}º círculo`;
         }
+        registrarFamiliarPendente('Convocar Familiar');
         char.recursos.druida.companheiro_selvagem_ativo = true;
-        toast(`Companheiro Selvagem invocado (consumiu 1 espaço de ${circulo}º círculo).`, 'success');
-      }
-
-      salvar();
-      renderFichaCompleta();
+        salvar();
+        renderFichaCompleta();
+        toast(`Companheiro Selvagem invocado (${gasto}). Convocar Familiar conjurada: familiar Feérico até o Descanso Longo.`, 'success');
+      }, {
+        origem: 'companheiro_selvagem',
+        tipoFixo: 'Feérico',
+        custos: [
+          { id: 'uso', rotulo: `Uso de Forma Selvagem (${estado.usosDisponiveis})`, disponivel: estado.usosDisponiveis > 0 },
+          { id: 'espaco', rotulo: 'Espaço de magia (1º círculo ou superior)', disponivel: temEspaco },
+        ],
+      });
     });
   });
 
@@ -2129,7 +2181,8 @@ export function setupEventosHabilidades() {
           });
           char.recursos.mago.recuperacao_arcana_usada = true;
           const detalhes = slots.map(s => `${s.qtd}x ${s.circulo}º`).join(', ');
-          toast(`Recuperação Arcana: ${detalhes} restaurados!`, 'success');
+          const msgSepulcral = aplicarResilienciaSepulcral();
+          toast(`Recuperação Arcana: ${detalhes} restaurados!${msgSepulcral}`, 'success');
           salvar();
           window.fecharModal();
           renderFichaCompleta();
@@ -3663,7 +3716,7 @@ export function renderFeatureItem(f, source, ctx) {
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoInspiracaoBardo.usosDisponiveis}/${estadoInspiracaoBardo.usosMax}</span>`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
-        <button class="btn btn-sm btn-accent" data-inspiração-ação="usar" ${estadoInspiracaoBardo.usosDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Inspiração (d${estadoInspiracaoBardo.dado})</button>
+        <button class="btn btn-sm btn-accent" data-inspiracao-acao="usar" ${estadoInspiracaoBardo.usosDisponiveis <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Inspiração (d${estadoInspiracaoBardo.dado})</button>
         <span style="font-size:0.75rem;color:var(--text-muted)">Recupera ${estadoInspiracaoBardo.recuperaCurto ? 'Descanso Curto' : 'Descanso Longo'}</span>
       </div>
     `;
@@ -3672,7 +3725,7 @@ export function renderFeatureItem(f, source, ctx) {
     usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">${estadoBruxoFeature.astuciaUsada ? 'Usada' : 'Disponivel'}</span>`;
     usosHtmlBody = `
       <div class="no-print" style="display:flex;align-items:center;gap:6px;padding:4px 0 4px 16px;flex-wrap:wrap">
-        <button class="btn btn-sm btn-accent" data-bruxo-astúcia-ação="usar" ${estadoBruxoFeature.astuciaUsada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Astúcia Mágica</button>
+        <button class="btn btn-sm btn-accent" data-bruxo-astucia-acao="usar" ${estadoBruxoFeature.astuciaUsada ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}>Usar Astúcia Mágica</button>
         <span style="font-size:0.75rem;color:var(--text-muted)">Recupera no Descanso Longo</span>
       </div>
     `;
@@ -5172,7 +5225,18 @@ export function renderFeatureItem(f, source, ctx) {
   }
 
   if (gratisJaControladoPelaListaDeMagias) {
-    usosHtmlSummary = `<span style="font-size:0.7rem;color:var(--text-muted)" title="Controlado pelo botão &quot;Grátis&quot; na lista de Magias">Ver Magias</span>`;
+    // Recurso dedicado (modificador de atributo, Descanso Longo): o contador
+    // é só leitura; o gasto continua no botão "Grátis" da lista de Magias.
+    const contagemGratis = contagemUsosGratisDaFeature(f.nome);
+    if (contagemGratis && contagemGratis.max > 0) {
+      usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto" title="Usos grátis restantes. O gasto é no botão &quot;Grátis&quot; da lista de Magias">${contagemGratis.disponiveis}/${contagemGratis.max}</span>`;
+      usosHtmlBody = `
+        <div style="padding:4px 0 4px 16px;font-size:0.8rem;color:var(--text-muted)">
+          Usos grátis: <strong>${contagemGratis.disponiveis}/${contagemGratis.max}</strong> · recupera no Descanso Longo · use o botão "Grátis" na lista de Magias.
+        </div>`;
+    } else {
+      usosHtmlSummary = `<span style="font-size:0.7rem;color:var(--text-muted)" title="Controlado pelo botão &quot;Grátis&quot; na lista de Magias">Ver Magias</span>`;
+    }
   } else if (controleArtifice) {
     // Artífice: o controle (ou a ausência dele) já foi decidido acima; o card genérico não acrescenta contador nem toggle.
   } else if (!usosHtmlBody && temMultiplosUsos) {

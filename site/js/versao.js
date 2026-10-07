@@ -13,13 +13,67 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.2.1';
+export const VERSAO_ATUAL = '3.3.0';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.3.0',
+    data: '2026-10-07',
+    rotulo: 'Necromante e criaturas',
+    resumo: 'Subclasse Necromante (Arcana Unleashed), Familiar e Forma Selvagem '
+      + 'funcionais, Invocações do Bruxo, espécie Renascido, recursos de '
+      + 'classe em chips e selo de origem nas telas de seleção.',
+    melhorias: [
+      {
+        grupo: '✨ Melhorias',
+        itens: [
+          'Nova subclasse Necromante do Mago (Arcana Unleashed), nível 3 ao '
+            + '14, com 8 magias de Necromancia novas: card Mortos-Vivos '
+            + '(registro, PV, ficha da criatura, Colher, Fortalecer, Extinguir), '
+            + 'Vitalidade Morta-Viva, Resiliência Sepulcral e familiar '
+            + 'Esqueleto, Zumbi ou Morto-Vivo.',
+          'Livro de magias do Necromante: linha em Ataques que ocupa 1 mão, '
+            + 'com popup do que ele ativa; sem ele aparece só um aviso.',
+          'Convocar Familiar: forma escolhida por cards com ficha técnica e '
+            + 'card Familiar na ficha. Vale para o Pacto da Corrente e para o '
+            + 'Companheiro Selvagem do Druida.',
+          'Forma Selvagem funcional: formas conhecidas por ND, ativar e '
+            + 'desativar com PV temporários, e 23 Feras do Manual dos Monstros.',
+          'Invocações Místicas do Bruxo: popup com a descrição, usos '
+            + 'limitados por Descanso Longo, Punição Mística, Sorvedouro de '
+            + 'Vida, Presente dos Protetores e as que valem sem Pacto.',
+          'Nova espécie Renascido (Ravenloft), com Conhecimento de uma Vida '
+            + 'Passada (1d6 no d20) e a perícia escolhida no criador.',
+          'Recursos de classe em chips no card Magias; dano e cura de '
+            + 'criaturas (familiar, Mortos-Vivos, companheiros do Artífice) '
+            + 'por modal.',
+          'Botão Grátis mostra os usos restantes (x/y) e o card de '
+            + 'Características usa o mesmo contador.',
+          'Efeitos mágicos ativos: toque para ver o efeito, a condição e o '
+            + 'texto da magia. O aviso de truques do personagem inteiro pode '
+            + 'ser fechado.',
+          'Selo de origem do livro em magias e itens de expansão, nas telas '
+            + 'de seleção (não na ficha).',
+        ],
+      },
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'Legado Ínfero e outras magias concedidas com uso grátis agora '
+            + 'mostram o botão Grátis, inclusive em fichas antigas.',
+          'Companheiro Selvagem do Druida passa a invocar o familiar de '
+            + 'verdade, e dispensá-lo pelo card Familiar o desliga.',
+          'Sintonização restrita por espécie reconhece o Renascido.',
+          'Lista de magias do Artífice inclui a Lanterna Espiritual, que o '
+            + 'livro dá à classe.',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.2.1',
     data: '2026-10-06',

@@ -883,7 +883,9 @@ tr:hover td { background: #faf8f4; }
   margin-bottom: 8px;
 }
 .faixa-chips .btn { white-space: nowrap; }
-.seletor-itens .filtro-tipo-compacto { padding: 6px 10px; font-size: 0.8rem; margin-bottom: 8px; }
+/* flex: none + altura mínima: o select é filho do corpo flex em coluna e,
+   com a faixa de filtros da categoria embaixo, encolhia e cortava o nome. */
+.seletor-itens .filtro-tipo-compacto { flex: none; min-height: 38px; line-height: 1.3; padding: 6px 10px; font-size: 0.8rem; margin-bottom: 8px; }
 /* Teclado virtual aberto: o overlay passa a ocupar só a área visível
    (medida por visualViewport em modal-teclado.js), o modal ocupa o overlay
    inteiro e as faixas de chips recolhem para sobrar espaço aos resultados. */
@@ -2279,3 +2281,52 @@ tr:hover td { background: #faf8f4; }
 }
 .popover-fonte-rotulo { font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
 .popover-fonte-nome { font-size: 0.9rem; font-weight: 700; }
+
+/* Faixa de recursos de classe (chips) no card Magias e no card Recursos de Classe */
+.recursos-faixa { margin-bottom: 10px; }
+.recursos-grupo { margin-bottom: 8px; display: flex; flex-direction: column; gap: 6px; }
+.recursos-grupo-titulo { font-size: 0.85rem; cursor: pointer; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
+.recursos-grupo:not([open]) > .recursos-grupo-titulo { margin-bottom: 0; }
+.recursos-grupo[open] > .recursos-grupo-titulo { margin-bottom: 6px; }
+.recursos-resumo { display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: 0.72rem; min-width: 0; }
+.recursos-grupo[open] > .recursos-grupo-titulo .recursos-resumo { display: none; }
+.recursos-resumo-item { white-space: nowrap; }
+.recursos-resumo-item.ok { color: var(--success); }
+.recursos-resumo-item.warn { color: var(--warning); }
+.recursos-resumo-item.off { color: var(--text-muted); }
+@media (max-width: 640px) {
+  .recursos-chips { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .recurso-chip { padding: 5px 6px; }
+}
+.recursos-chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+.recurso-chip {
+  background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 8px;
+  padding: 6px 8px; display: flex; flex-direction: column; gap: 3px; min-width: 0;
+  cursor: pointer; color: var(--text);
+}
+.recurso-chip:hover, .recurso-chip:focus-visible { border-color: var(--accent); outline: none; }
+.recurso-chip-larga { grid-column: 1 / -1; }
+.recurso-chip-nome { font-size: 0.8rem; font-weight: 700; overflow-wrap: anywhere; }
+.recurso-chip-i { font-size: 0.7rem; color: var(--text-muted); font-weight: 400; }
+.recurso-chip-estado { font-size: 0.75rem; font-weight: 600; overflow-wrap: anywhere; }
+.recurso-chip-estado::before { content: "\25CF\00a0"; }
+.recurso-chip-estado.ok { color: var(--success); }
+.recurso-chip-estado.warn { color: var(--warning); }
+.recurso-chip-estado.off { color: var(--text-muted); }
+.recurso-chip-detalhe { font-size: 0.72rem; color: var(--text-muted); overflow-wrap: anywhere; }
+.recurso-chip-acoes { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; min-width: 0; }
+/* Botão dentro do chip nunca passa da largura do card: o texto quebra em vez de vazar */
+.recurso-chip-acoes .btn { max-width: 100%; white-space: normal; text-align: center; line-height: 1.25; overflow-wrap: anywhere; }
+.recurso-chip-nome, .recurso-chip-estado { min-width: 0; }
+.recursos-notas { font-size: 0.75rem; color: var(--text-muted); }
+
+/* Descrição das invocações do Bruxo: popup sobre o modal, sem esticar o card */
+.inv-popup-sobreposicao {
+  position: fixed; inset: 0; z-index: 1100; background: rgba(0, 0, 0, 0.45);
+  display: flex; align-items: center; justify-content: center; padding: 16px;
+}
+.inv-popup {
+  background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 12px;
+  padding: 14px; width: min(480px, 100%); max-height: 80vh; overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}

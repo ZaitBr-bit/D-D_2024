@@ -13,9 +13,10 @@ import { CLASSES_INFO } from './dados-classes.js';
 
 // Classes da ficha (fonte única: CLASSES_INFO).
 const CLASSES = Object.keys(CLASSES_INFO);
-// Espécies de dados/origens/especies.json. O módulo é síncrono e a ficha só carrega o JSON
-// de forma assíncrona; o teste sintonizacao-restrita.test.mjs confere esta lista contra o JSON.
-export const ESPECIES = ['Aasimar', 'Anão', 'Draconato', 'Elfo', 'Gnomo', 'Golias', 'Humano', 'Orc', 'Pequenino', 'Tiferino', 'Kenku'];
+// Espécies de dados/origens/especies.json seguidas das de expansão (dados/ravenloft/especies.json).
+// O módulo é síncrono e a ficha só carrega o JSON de forma assíncrona; o teste
+// sintonizacao-restrita.test.mjs confere esta lista contra os JSONs.
+export const ESPECIES = ['Aasimar', 'Anão', 'Draconato', 'Elfo', 'Gnomo', 'Golias', 'Humano', 'Orc', 'Pequenino', 'Tiferino', 'Kenku', 'Renascido'];
 
 // Itens do acervo (`dados.magico_id`) que cada nome citado em "Criatura Sintonizada com um <item>" aceita.
 const IDS_DO_ITEM_EXIGIDO = {

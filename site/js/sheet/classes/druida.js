@@ -68,7 +68,11 @@ export function getEstadoRecursosDruida() {
 
   return {
     formaSelvagemAtiva: !!char.recursos.druida.forma_selvagem_ativa,
-    companheiroSelvagemAtivo: !!char.recursos.druida.companheiro_selvagem_ativo,
+    // Derivado do familiar: o Companheiro Selvagem é o familiar de origem
+    // 'companheiro_selvagem'; dispensá-lo pelo card Familiar também o desliga.
+    companheiroSelvagemAtivo: char.recursos?.familiar?.origem === 'companheiro_selvagem',
+    formaSelvagemAtual: char.recursos.druida.forma_selvagem_atual?.forma || '',
+    familiarCompanheiro: char.recursos?.familiar?.origem === 'companheiro_selvagem' ? char.recursos.familiar.forma : '',
     usosGastos: char.recursos.druida.forma_selvagem_usos_gastos,
     usosMax: prog.formaSelvagemMax,
     usosDisponiveis,

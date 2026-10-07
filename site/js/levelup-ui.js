@@ -21,7 +21,7 @@ import { montarSeletor, montarTroca } from './ui-opcoes.js';
 import { resolverPlano, candidatosGenerico } from './regras-planos-artifice.js';
 import { opcoesDeBase } from './itens-magicos-catalogo.js';
 import { deItemMagicoAcervo, deItemMinimo, deBasesItem } from './opcoes-artifice.js';
-import { ligarSelosFonte } from './fontes.js';
+import { ligarSelosFonte, seloDaMagia } from './fontes.js';
 import { deArmas, deEstilosLuta, deMagias, deManobras, deTalentos, motivoPreRequisito, rotuloPericia } from './opcoes-dominio.js';
 import { collectOpcoes, validateAll } from './levelup-validations.js';
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, PERICIAS } from './dados-classes.js';
@@ -1781,7 +1781,7 @@ function bindEventosMagias(ctx, state) {
             <div class="opcao-nome" data-grid-info="${m.nome}" data-grid-info-circ="${m.circulo}">${m.nome}</div>
             <div class="opcao-resumo">
               <span>${m.circulo === 0 ? 'Truque' : m.circulo + 'º Círculo'}</span>
-              <span>${m.escola || ''}</span>
+              <span>${m.escola || ''}</span>${seloDaMagia(m.nome)}
               ${m.especial === 'C' ? '<span>Conc.</span>' : ''}
             </div>
           </div>`;

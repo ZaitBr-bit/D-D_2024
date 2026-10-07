@@ -10,6 +10,10 @@ import { deTalentos, rotuloPericia } from '../opcoes-dominio.js';
 import { ESPECIES_TRACOS_ESCOLHA, configurarSelectsExclusivos, obterTruquesEspecie, periciasReservadasParaClasse, renderDescricaoTalento, renderEscolhasTalentoHtml, talentoExigeEscolhas, talentoNumEscolhas } from './comum.js';
 import { _reconstruirTalentosBase } from './passo-antecedente.js';
 import { dadosCache, personagem } from './wizard.js';
+import { seloFonte, ligarSelosFonte } from '../fontes.js';
+
+// Espécies cujo traço concede UMA perícia à escolha, gravada em `pericia_especie`.
+const ESPECIES_PERICIA_UNICA = ['Humano', 'Elfo', 'Renascido'];
 
 // ============================================================
 // PASSO 2: ESPÉCIE
@@ -50,7 +54,7 @@ export async function renderStepEspecie(el) {
     resumoHtml = `
       <div class="selecao-resumo">
         <div class="resumo-info">
-          <div class="resumo-titulo">${personagem.especie}</div>
+          <div class="resumo-titulo">${personagem.especie}${seloFonte(esp?.fonte)}</div>
           <div class="resumo-detalhe">${esp?.tracos?.length || 0} tracos${tracosEsc}</div>
         </div>
         <button class="btn btn-outline btn-sm" id="btn-alterar-especie">Alterar</button>
@@ -63,13 +67,15 @@ export async function renderStepEspecie(el) {
       ${especies.map(e => `
         <div class="opcao-card ${personagem.especie === e.nome ? 'selecionada' : ''}" data-especie="${e.nome}">
           <span class="opcao-check"></span>
-          <div class="opcao-nome">${e.nome}</div>
+          <div class="opcao-nome">${e.nome}${seloFonte(e.fonte)}</div>
           <div class="opcao-resumo">${e.tracos?.length || 0} tracos</div>
         </div>
       `).join('')}
     </div>
     ${resumoHtml}
   `;
+  // Chip de origem: o clique abre o popover e não chega ao card.
+  ligarSelosFonte(el);
 
   // Clicar num card abre popup com detalhes da especie
   el.querySelectorAll('[data-especie]').forEach(card => {
@@ -179,6 +185,20 @@ function abrirPopupEspecie(nome) {
         ${opcsElfo}
       </select>
     `;
+  } else if (nome === 'Renascido') {
+    // Conhecimento de uma Vida Passada: qualquer pericia, com a mesma reserva do Habil
+    const opcsPericia = PERICIAS.filter(p => !reservadasEspecie.has(p.nome)).map(p => {
+      const sel = personagem.pericia_especie === p.nome ? 'selected' : '';
+      return `<option value="${p.nome}" ${sel}>${p.nome} (${p.atributo})</option>`;
+    }).join('');
+    periciaEspecieHtml = `
+      <div class="section-divider"><span>Conhecimento de uma Vida Passada — Perícia</span></div>
+      <div class="info-box info" style="font-size:0.85rem">O traço Conhecimento de uma Vida Passada concede proficiência em uma perícia à sua escolha.</div>
+      <select id="select-pericia-especie" style="width:100%;padding:8px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:0.9rem;margin:8px 0">
+        <option value="">-- Escolha uma perícia --</option>
+        ${opcsPericia}
+      </select>
+    `;
   } else if (nome === 'Kenku') {
     // Memória Kenku: 2 perícias quaisquer à escolha
     const periciasSel = personagem.pericias_especie || [];
@@ -226,6 +246,7 @@ function abrirPopupEspecie(nome) {
   }
 
   const corpoHtml = `
+    ${esp.fonte ? `<div style="margin-bottom:8px">${seloFonte(esp.fonte)}</div>` : ''}
     <p style="font-size:0.85rem;margin-bottom:12px">${esp.descricao?.split('\n')[0] || ''}</p>
     <div style="font-size:0.85rem;margin-bottom:8px"><strong>Deslocamento:</strong> ${deslocamento}</div>
     ${escolhaHtml}
@@ -244,6 +265,7 @@ function abrirPopupEspecie(nome) {
     <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
     <button class="btn btn-primary" id="popup-confirmar-especie">Selecionar ${esp.nome}</button>
   `);
+  ligarSelosFonte(document.getElementById('modal-corpo'));
 
   if (nome === 'Kenku') {
     const primeiraPericia = document.getElementById('select-kenku-pericia-1');
@@ -398,11 +420,11 @@ function abrirPopupEspecie(nome) {
         return;
       }
     }
-    // Validar pericia de especie (Habil / Sentidos Aguçados)
-    if (nome === 'Humano' || nome === 'Elfo') {
+    // Validar pericia de especie (Habil / Sentidos Aguçados / Conhecimento de uma Vida Passada)
+    if (ESPECIES_PERICIA_UNICA.includes(nome)) {
       const selectPericia = document.getElementById('select-pericia-especie');
       if (!selectPericia?.value) {
-        const traco = nome === 'Humano' ? 'Habil' : 'Sentidos Aguçados';
+        const traco = { Humano: 'Habil', Elfo: 'Sentidos Aguçados', Renascido: 'Conhecimento de uma Vida Passada' }[nome];
         toast(`Selecione a perícia de ${traco}`, 'error');
         return;
       }
@@ -478,7 +500,7 @@ function abrirPopupEspecie(nome) {
       // Limpar talento versatil se mudou de especie
       if (nome !== 'Humano') delete personagem.talento_versatil;
       // Limpar pericia de especie se mudou para especie sem essa escolha
-      if (nome !== 'Humano' && nome !== 'Elfo') delete personagem.pericia_especie;
+      if (!ESPECIES_PERICIA_UNICA.includes(nome)) delete personagem.pericia_especie;
       // Limpar pericias de especie (Kenku) se mudou para especie sem essa escolha
       if (nome !== 'Kenku') delete personagem.pericias_especie;
     }

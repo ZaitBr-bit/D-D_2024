@@ -1,5 +1,8 @@
 {
   "fontes": [
-    { "id": "tasha", "nome": "Tasha's Cauldron of Everything", "sigla": "Tasha's" }
+    { "id": "tasha", "nome": "Tasha's Cauldron of Everything", "sigla": "Tasha's" },
+    { "id": "ravenloft", "nome": "Ravenloft: Horrors Within", "sigla": "Ravenloft" },
+    { "id": "monstros", "nome": "Manual dos Monstros (2026)", "sigla": "Monstros" },
+    { "id": "arcana-unleashed", "nome": "Arcana Unleashed", "sigla": "Arcana" }
   ]
 }

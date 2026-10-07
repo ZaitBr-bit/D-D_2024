@@ -4,7 +4,7 @@ Duas suítes vivem aqui, com configurações separadas.
 
 | Suíte | Config | O que garante |
 |---|---|---|
-| **Regras** | `regras/playwright.config.mjs` | As regras do livro, na tela. 263 casos. É a suíte que segura o comportamento do app. |
+| **Regras** | `regras/playwright.config.mjs` | As regras do livro, na tela. ~840 casos. É a suíte que segura o comportamento do app. |
 | **Offline** | `playwright.config.mjs` | Service Worker e precache. 3 casos, 2 deles dependentes de artefato de deploy. |
 
 ## Rodar

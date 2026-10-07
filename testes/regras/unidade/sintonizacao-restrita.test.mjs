@@ -89,8 +89,9 @@ test('atendeRequisito: Cinturão dos Anões renomeado é reconhecido pelo magico
 test('as listas de classes e espécies reconhecidas vêm das fontes da ficha', async () => {
   const { CLASSES_INFO } = await import('../../../site/js/dados-classes.js');
   const { ESPECIES } = await import('../../../site/js/regras-sintonizacao-restrita.js');
-  const json = JSON.parse(readFileSync(resolve(RAIZ, 'dados/origens/especies.json'), 'utf-8'));
-  assert.deepEqual([...ESPECIES].sort(), json.especies.map((e) => e.nome).sort());
+  const nomes = ['dados/origens/especies.json', 'dados/ravenloft/especies.json']
+    .flatMap((arq) => JSON.parse(readFileSync(resolve(RAIZ, arq), 'utf-8')).especies.map((e) => e.nome));
+  assert.deepEqual([...ESPECIES].sort(), nomes.sort());
   for (const classe of Object.keys(CLASSES_INFO)) assert.deepEqual(lerRequisito(`por um ${classe}`).classes, [classe]);
 });
 
