@@ -773,6 +773,13 @@ tr:hover td { background: #faf8f4; }
 .inv-secao-titulo:hover {
   background: rgba(0,0,0,0.05);
 }
+/* Card recolhível: o cabeçalho do card é o <summary> de um <details>. */
+.card-recolhivel-titulo { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+.card-recolhivel-titulo::-webkit-details-marker { display: none; }
+.card-recolhivel-chevron { font-size: 0.75rem; color: var(--text-muted); transition: transform 0.2s; }
+.card-recolhivel:not([open]) .card-recolhivel-chevron { transform: rotate(-90deg); }
+.card-recolhivel:not([open]) > .card-recolhivel-titulo { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+
 .inv-secao-chevron {
   font-size: 0.8rem;
   transition: transform 0.2s ease;

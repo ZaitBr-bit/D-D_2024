@@ -551,9 +551,10 @@ export function renderFichaCompleta() {
     <!-- Sentidos Passivos -->
     ${renderSecaoSentidos()}
 
-    <!-- Pericias em ordem customizada -->
+    <!-- Pericias em ordem customizada: quadro recolhível, nasce aberto (pedido do dono) -->
     <div class="card">
-      <div class="card-header"><h2>Perícias</h2></div>
+      <details class="card-recolhivel" data-details-id="pericias" open>
+      <summary class="card-header card-recolhivel-titulo"><h2>Perícias</h2><span class="card-recolhivel-chevron no-print">&#9660;</span></summary>
       <div class="pericias-lista-custom">
         ${(() => {
           // Ordem customizada de exibicao das pericias
@@ -600,6 +601,7 @@ export function renderFichaCompleta() {
           }).join('');
         })()}
       </div>
+      </details>
     </div>
 
     <!-- Talentos -->

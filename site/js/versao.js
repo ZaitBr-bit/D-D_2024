@@ -38,6 +38,7 @@ export const NOTAS_VERSAO = [
           'Loja, item mágico e item personalizado: campo "Guardar em" para '
             + 'escolher o espaço do item novo.',
           'Item personalizado: categoria Componente de Magia.',
+          'Ficha: o quadro de Perícias pode ser recolhido pelo título (nasce aberto).',
         ],
       },
     ],
