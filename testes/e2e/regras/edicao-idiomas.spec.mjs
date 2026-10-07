@@ -6,7 +6,7 @@
 // linha de idiomas do cabeçalho refletindo a mudança.
 // ============================================================
 import { test, expect } from '@playwright/test';
-import { ATRIBUTOS_REGRAS, abrirFicha, assentar } from './helpers-regras.mjs';
+import { ATRIBUTOS_REGRAS, abrirFicha, abrirIdentidade, assentar } from './helpers-regras.mjs';
 
 const MAGO_5 = {
   nome: 'Aluno de Magia', especie: 'Humano', classe: 'Mago', subclasse: '',
@@ -19,7 +19,9 @@ test('remover um idioma pela aba Idiomas some da linha do cabeçalho', async ({ 
   const { page } = await abrirFicha(context, MAGO_5, 'regras-idiomas-1');
   await assentar(page).catch(() => {});
 
-  await expect(page.locator('#char-nome-display').locator('xpath=..')).toContainText('Anão');
+  await expect(page.locator('#card-identidade')).toContainText('Anão');
+
+  await abrirIdentidade(page);
 
   await page.locator('#btn-editar-ficha').click();
   await assentar(page).catch(() => {});
@@ -29,12 +31,14 @@ test('remover um idioma pela aba Idiomas some da linha do cabeçalho', async ({ 
   await page.locator('#btn-salvar-edicao-ficha').click();
   await assentar(page).catch(() => {});
 
-  await expect(page.locator('#char-nome-display').locator('xpath=..')).not.toContainText('Anão');
+  await expect(page.locator('#card-identidade')).not.toContainText('Anão');
 });
 
 test('adicionar um idioma por texto livre aparece na linha do cabeçalho', async ({ context }) => {
   const { page } = await abrirFicha(context, MAGO_5, 'regras-idiomas-2');
   await assentar(page).catch(() => {});
+
+  await abrirIdentidade(page);
 
   await page.locator('#btn-editar-ficha').click();
   await assentar(page).catch(() => {});
@@ -45,5 +49,5 @@ test('adicionar um idioma por texto livre aparece na linha do cabeçalho', async
   await page.locator('#btn-salvar-edicao-ficha').click();
   await assentar(page).catch(() => {});
 
-  await expect(page.locator('#char-nome-display').locator('xpath=..')).toContainText('Dialeto da Guilda');
+  await expect(page.locator('#card-identidade')).toContainText('Dialeto da Guilda');
 });

@@ -363,3 +363,18 @@ export async function abrirSecoesItemCustom(page) {
     if (!(await s.evaluate(el => el.open))) await s.locator('> summary').click();
   }
 }
+
+/**
+ * Abre o bloco "Detalhes do personagem" do cabeçalho da ficha (espécie, classes,
+ * antecedente, idiomas, XP), que nasce fechado. Specs que leem ou clicam nesses
+ * dados chamam isto depois de abrir a ficha.
+ */
+export async function abrirIdentidade(page) {
+  await page.waitForSelector('#card-identidade details', { state: 'attached', timeout: 20_000 });
+  await page.evaluate(() => { document.querySelector('#card-identidade details').open = true; });
+}
+
+/** Linha "espécie, classes e nível" do cabeçalho (dentro do bloco de detalhes). */
+export function linhaClassesDaFicha(page) {
+  return page.locator('#card-identidade details > div > div').first();
+}

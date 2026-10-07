@@ -193,12 +193,31 @@ export function renderFichaCompleta() {
 
   const container = containerRef;
   container.innerHTML = `
-    <!-- Cabeçalho do personagem -->
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:8px">
-        <div style="display:flex;align-items:start;gap:10px;flex:1;min-width:0">
-          <div style="flex:1;min-width:0">
-            <h2 style="font-size:1.3rem;margin-bottom:2px" id="char-nome-display">${escHtml(char.nome) || 'Sem Nome'}</h2>
+    <!-- Cabeçalho do personagem: nome e botões sempre visíveis; o resto fica num bloco que nasce fechado -->
+    <div class="card" id="card-identidade">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px">
+        <div style="display:flex;align-items:center;gap:10px;flex:1 1 150px;min-width:0">
+          ${char.imagem ? `<div class="char-avatar" style="width:64px;height:64px;font-size:1.6rem;flex-shrink:0"><img src="${escHtml(char.imagem)}" alt=""></div>` : ''}
+          <h2 style="font-size:1.3rem;margin-bottom:0;overflow-wrap:anywhere" id="char-nome-display">${escHtml(char.nome) || 'Sem Nome'}</h2>
+        </div>
+        <div class="no-print" style="display:flex;gap:4px;flex-direction:column;flex:1 1 230px">
+          ${_renderSyncIndicadorHtml()}
+          ${char.nivel < 20 ? `
+            <button class="btn btn-sm btn-accent" id="btn-levelup" style="font-weight:700">
+              ⬆ Subir de Nível (Nível ${char.nivel + 1})
+            </button>
+          ` : ''}
+        </div>
+      </div>
+      <details data-details-id="ficha-identidade" style="margin-top:8px">
+        <summary style="cursor:pointer;font-size:0.85rem;color:var(--text-muted)">Detalhes do Personagem, Editar Ficha e Subir Nível</summary>
+        <div style="margin-top:6px;overflow-wrap:anywhere">
+            <div class="no-print" style="display:flex;gap:4px;margin-bottom:8px">
+              <button class="btn btn-sm btn-secondary" id="btn-editar-ficha">Editar ficha</button>
+              <button class="btn btn-sm btn-primary" id="btn-print" title="Gerar PDF da ficha" style="gap:4px">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6M9 18h6M9 12h2"/></svg> Gerar PDF
+              </button>
+            </div>
             <div style="font-size:0.9rem;color:var(--text-muted)">
               ${/* classesDe: o cabecalho mostrava so a classe INICIAL, entao
                     uma ficha que exibe recursos de Barbaro dizia "Mago 10" --
@@ -221,24 +240,8 @@ export function renderFichaCompleta() {
               XP: <span style="font-weight:600;color:var(--accent);cursor:pointer" id="xp-display" title="Clique para editar XP">${char.xp || 0}</span>
               ${char.nivel < 20 ? ` / ${XP_POR_NIVEL[char.nivel + 1]}` : ' (Nível Máximo)'}
             </div>
-          </div>
-          ${char.imagem ? `<div class="char-avatar" style="width:64px;height:64px;font-size:1.6rem;flex-shrink:0"><img src="${escHtml(char.imagem)}" alt=""></div>` : ''}
         </div>
-        <div class="no-print" style="display:flex;gap:4px;flex-direction:column">
-          <div style="display:flex;gap:4px">
-            <button class="btn btn-sm btn-secondary" id="btn-editar-ficha">Editar ficha</button>
-            <button class="btn btn-sm btn-primary" id="btn-print" title="Gerar PDF da ficha" style="gap:4px">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6M9 18h6M9 12h2"/></svg> Gerar PDF
-            </button>
-          </div>
-          ${_renderSyncIndicadorHtml()}
-          ${char.nivel < 20 ? `
-            <button class="btn btn-sm btn-accent" id="btn-levelup" style="font-weight:700">
-              ⬆ Subir de Nível (Nível ${char.nivel + 1})
-            </button>
-          ` : ''}
-        </div>
-      </div>
+      </details>
     </div>
 
     ${renderSecaoFormaSelvagem()}

@@ -108,7 +108,7 @@ import {
 import { lacuna } from '../../regras/lacunas-conhecidas.mjs';
 import {
   abrirSite, abrirFicha, satisfazerPasso, assentar, lerToastErro,
-  personagemEmCriacao, personagemSalvo, irAtePassoAntecedente,
+  personagemEmCriacao, personagemSalvo, irAtePassoAntecedente, abrirIdentidade,
 } from './helpers-regras.mjs';
 
 const ENTRADAS = Object.entries(CATALOGO_ANTECEDENTES);
@@ -413,6 +413,8 @@ test('teto de 20: base + bônus de antecedente acima de 20 é recusado na ediç�
   };
   const { page } = await abrirFicha(context, campos, 'regras-antecedentes-teto20-invalido');
 
+  await abrirIdentidade(page);
+
   await page.click('#btn-editar-ficha');
   await page.waitForSelector('#modal-overlay', { state: 'visible' });
   const chaves = await page.locator('[data-edicao-atributo]').evaluateAll(
@@ -446,6 +448,8 @@ test('teto de 20: redistribuição dentro do limite é aceita e persiste', async
     pericias_proficientes: ['Intuição', 'Religião'],
   };
   const { page } = await abrirFicha(context, campos, 'regras-antecedentes-teto20-valido');
+
+  await abrirIdentidade(page);
 
   await page.click('#btn-editar-ficha');
   await page.waitForSelector('#modal-overlay', { state: 'visible' });

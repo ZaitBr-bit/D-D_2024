@@ -3,7 +3,7 @@
 // popover com o nome do livro e não seleciona o card/radio por baixo.
 // ============================================================
 import { test, expect } from '@playwright/test';
-import { abrirSite, abrirFicha, assentar, abrirModalLevelUp } from './helpers-regras.mjs';
+import { abrirSite, abrirFicha, assentar, abrirModalLevelUp, abrirIdentidade } from './helpers-regras.mjs';
 
 const NOME_LIVRO = "Tasha's Cauldron of Everything";
 const ATRIBUTOS = { forca: 8, destreza: 13, constituicao: 14, inteligencia: 16, sabedoria: 12, carisma: 10 };
@@ -34,6 +34,7 @@ test('ficha: chip no cabeçalho e no título da subclasse', async ({ context }) 
     classe: 'Artífice', subclasse: 'Alquimista', nivel: 3, xp: 900, atributos: ATRIBUTOS,
   }, 'regras-fonte-tag-ficha');
   await assentar(page).catch(() => {});
+  await abrirIdentidade(page);
   const chips = page.locator('#app-content .selo-fonte[data-fonte="tasha"]');
   await expect(chips).toHaveCount(2);
   await conferirChip(page, chips.nth(0));

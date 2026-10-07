@@ -33,7 +33,7 @@
 // specs, e aqui ele É o objeto da medição.
 // ============================================================
 import { test, expect } from '@playwright/test';
-import { ATRIBUTOS_REGRAS, NOVO, abrirFicha, abrirModalLevelUp, assentar, personagemSalvo } from './helpers-regras.mjs';
+import { ATRIBUTOS_REGRAS, NOVO, abrirFicha, abrirIdentidade, abrirModalLevelUp, assentar, linhaClassesDaFicha, personagemSalvo } from './helpers-regras.mjs';
 
 const CARD_CLASSE = '#levelup-escolha-classe';
 const PROXIMO = '#btn-step-proximo';
@@ -175,7 +175,8 @@ test('Mago 5 escolhe Bárbaro: a ficha vira "Mago 5 / Bárbaro 1 · Nível 6" e 
 
   // O cabeçalho da ficha (já re-renderizado por trás do modal de resumo)
   // passa a listar as DUAS classes com seus níveis.
-  await expect(page.locator('#char-nome-display').locator('xpath=following-sibling::div[1]'),
+  await abrirIdentidade(page);
+  await expect(linhaClassesDaFicha(page),
     'o cabeçalho da ficha tem de listar as duas classes e o nível total')
     .toHaveText(/Mago 5 \/ Bárbaro 1\s*·\s*Nível 6/);
 
@@ -343,7 +344,8 @@ test('classe travada: "usar mesmo assim" dispensa o pré-requisito e marca a fic
     'a marca nomeia o que faltava, não só que algo faltou').toBe(true);
 
   // O cabeçalho da ficha (por trás do modal de resumo) mostra o selo.
-  await expect(page.locator('#char-nome-display').locator('xpath=following-sibling::div[1]'),
+  await abrirIdentidade(page);
+  await expect(linhaClassesDaFicha(page),
     'o cabeçalho tem de exibir o selo de pré-requisito dispensado')
     .toContainText('pré-requisito dispensado');
 

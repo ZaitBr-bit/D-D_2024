@@ -58,7 +58,7 @@
 // ============================================================
 import { test, expect } from '@playwright/test';
 import {
-  ATRIBUTOS_REGRAS, abrirFicha, abrirModalLevelUp, assentar,
+  ATRIBUTOS_REGRAS, abrirFicha, abrirModalLevelUp, assentar, linhaClassesDaFicha,
   lerToastErro, personagemSalvo,
 } from './helpers-regras.mjs';
 
@@ -197,7 +197,7 @@ test('Mago 5 escolhe Guardião: a perícia da classe nova é exigida na Revisão
 
   // O cabeçalho da ficha (por trás do modal de resumo) lista as duas
   // classes com seus níveis.
-  await expect(page.locator('#char-nome-display').locator('xpath=following-sibling::div[1]'),
+  await expect(linhaClassesDaFicha(page),
     'o cabeçalho da ficha tem de listar as duas classes e o nível total')
     .toHaveText(/Mago 5 \/ Guardião 1\s*·\s*Nível 6/);
 

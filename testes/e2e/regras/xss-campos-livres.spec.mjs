@@ -27,7 +27,7 @@
 // usuario" nao e correcao.
 // ============================================================
 import { test, expect } from '@playwright/test';
-import { abrirFicha, abrirSite, ATRIBUTOS_REGRAS } from './helpers-regras.mjs';
+import { abrirFicha, abrirIdentidade, abrirSite, ATRIBUTOS_REGRAS } from './helpers-regras.mjs';
 import { semearPersonagem, assentar } from '../helpers.mjs';
 
 // `src=x` falha a carregar em qualquer navegador, entao `onerror` dispara
@@ -138,6 +138,7 @@ test('ficha: carga que quebra atributo nao escapa do value', async ({ context })
 
   // Abrir a edicao da ficha, onde os campos voltam para dentro de
   // `value="..."` -- e onde a carga de quebra de atributo se paga.
+  await abrirIdentidade(page);
   await page.locator('#btn-edit-detalhes, [id^="btn-edit"]').first().click().catch(() => {});
   await page.waitForTimeout(300);
 

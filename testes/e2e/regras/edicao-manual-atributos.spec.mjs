@@ -12,7 +12,7 @@
 // retroativo grande o bastante para não se confundir com arredondamento.
 // ============================================================
 import { test, expect } from '@playwright/test';
-import { abrirFicha, assentar, lerToastErro, personagemSalvo } from './helpers-regras.mjs';
+import { abrirFicha, abrirIdentidade, assentar, lerToastErro, personagemSalvo } from './helpers-regras.mjs';
 
 const SEMENTE = {
   classe: 'Guerreiro', nivel: 5, antecedente: 'Soldado',
@@ -27,6 +27,7 @@ const SEMENTE = {
 /** Abre a ficha da semente e entra no modo de edição manual do modal. */
 async function abrirEdicaoManual(context, id) {
   const lado = await abrirFicha(context, SEMENTE, id);
+  await abrirIdentidade(lado.page);
   await lado.page.click('#btn-editar-ficha');
   await lado.page.waitForSelector('#modal-overlay', { state: 'visible' });
   await lado.page.click('#btn-edicao-modo-manual');
@@ -70,6 +71,7 @@ test('ficha: a composição do modo manual declara o ganho de nível e soma o to
   // qualquer personagem que já subiu de nível (achado da revisão da Task 4).
   const comGanhoDeNivel = { ...SEMENTE, atributos: { ...SEMENTE.atributos, destreza: 17 } };
   const lado = await abrirFicha(context, comGanhoDeNivel, 'regras-edicao-manual-ganho-nivel');
+  await abrirIdentidade(lado.page);
   await lado.page.click('#btn-editar-ficha');
   await lado.page.waitForSelector('#modal-overlay', { state: 'visible' });
   await lado.page.click('#btn-edicao-modo-manual');
@@ -120,6 +122,7 @@ test('ficha: Bárbaro com Força 22 (Campeão Primitivo) consegue editar outro a
     pv_max: 225, pv_atual: 225,
   };
   const { page, erros } = await abrirFicha(context, semente, 'regras-edicao-manual-forca-22');
+  await abrirIdentidade(page);
   await page.click('#btn-editar-ficha');
   await page.waitForSelector('#modal-overlay', { state: 'visible' });
   await page.click('#btn-edicao-modo-manual');
@@ -148,6 +151,7 @@ test('ficha: Bárbaro com Força 22 (Campeão Primitivo) consegue editar outro a
 
 test('ficha: o método da criação continua acessível ao lado do modo manual', async ({ context }) => {
   const lado = await abrirFicha(context, SEMENTE, 'regras-edicao-manual-3');
+  await abrirIdentidade(lado.page);
   await lado.page.click('#btn-editar-ficha');
   await lado.page.waitForSelector('#modal-overlay', { state: 'visible' });
 
@@ -173,6 +177,7 @@ test('ficha antiga sem método de criação pode ser ajustada à mão', async ({
   // exigência. O modo livre não a aplica, e é essa a saída.
   const semMetodo = { ...SEMENTE, configuracao_criacao: { atributos: { metodo: null, valoresBase: null, rolagens: null } } };
   const lado = await abrirFicha(context, semMetodo, 'regras-edicao-manual-sem-metodo');
+  await abrirIdentidade(lado.page);
   await lado.page.click('#btn-editar-ficha');
   await lado.page.waitForSelector('#modal-overlay', { state: 'visible' });
   await lado.page.click('#btn-edicao-modo-manual');
@@ -233,6 +238,7 @@ test('ficha: a marca de ajuste manual declara o ganho de nível quando o persona
   // (achado da revisão da Task 5).
   const comGanhoDeNivel = { ...SEMENTE, atributos: { ...SEMENTE.atributos, destreza: 17 } };
   const { page, erros } = await abrirFicha(context, comGanhoDeNivel, 'regras-edicao-manual-5-ganho-nivel');
+  await abrirIdentidade(page);
   await page.click('#btn-editar-ficha');
   await page.waitForSelector('#modal-overlay', { state: 'visible' });
   await page.click('#btn-edicao-modo-manual');
@@ -275,6 +281,7 @@ test('ficha: editar Constituição move o PV máximo, e reverter devolve', async
 
   // Reverter tem de desfazer TAMBÉM o PV -- sem isso o personagem fica com PV
   // inflado para sempre, e a origem some junto com a marca.
+  await abrirIdentidade(page);
   await page.click('#btn-editar-ficha');
   await page.waitForSelector('#modal-overlay', { state: 'visible' });
   await page.click('[data-reverter-atributos]');
@@ -333,6 +340,8 @@ test('ficha: reverter uma redistribuição do método com regras não inventa PV
   // concederia PV que a redistribuição nunca tirou.
   const { page, erros } = await abrirFicha(context, SEMENTE, 'regras-edicao-manual-6-redistribuicao');
 
+  await abrirIdentidade(page);
+
   await page.click('#btn-editar-ficha');
   await page.waitForSelector('#modal-overlay', { state: 'visible' });
 
@@ -350,6 +359,8 @@ test('ficha: reverter uma redistribuição do método com regras não inventa PV
   expect(depois?.atributos?.forca, 'a redistribuição deveria ter movido Força para 14').toBe(14);
   expect(depois?.atributos?.constituicao, 'e Constituição para 12 -- mod caiu de +2 para +1').toBe(12);
   expect(depois?.pv_max, 'o caminho com regras não mexe em PV ao salvar (fora do escopo desta tarefa)').toBe(44);
+
+  await abrirIdentidade(page);
 
   await page.click('#btn-editar-ficha');
   await page.waitForSelector('#modal-overlay', { state: 'visible' });

@@ -5,7 +5,7 @@
 // escolhas e o lembrete de Vantagem nas Salvaguardas Contra a Morte.
 // ============================================================
 import { test, expect } from '@playwright/test';
-import { ATRIBUTOS_REGRAS, abrirSite, abrirFicha, assentar, confirmarModal, satisfazerPasso, personagemEmCriacao, personagemSalvo } from './helpers-regras.mjs';
+import { ATRIBUTOS_REGRAS, abrirSite, abrirFicha, assentar, confirmarModal, satisfazerPasso, personagemEmCriacao, personagemSalvo, abrirIdentidade } from './helpers-regras.mjs';
 
 const NOME_LIVRO = 'Ravenloft: Horrors Within';
 const CHAVE_VIDA_PASSADA = 'especie_Conhecimento de uma Vida Passada';
@@ -77,6 +77,7 @@ test('ficha: chips, escolhas, contador do 1d6 e lembrete de Vantagem contra a mo
     atributos: ATRIBUTOS_REGRAS, pv_max: 40, pv_atual: 0, schema_versao: 2,
   }, 'regras-renascido-ficha');
   await assentar(page).catch(() => {});
+  await abrirIdentidade(page);
 
   const chips = page.locator('#app-content .selo-fonte[data-fonte="ravenloft"]');
   await expect(chips).toHaveCount(2);

@@ -23,10 +23,9 @@ export const NOTAS_VERSAO = [
   {
     versao: '3.3.0',
     data: '2026-10-07',
-    rotulo: 'Necromante e criaturas',
-    resumo: 'Subclasse Necromante (Arcana Unleashed), Familiar e Forma Selvagem '
-      + 'funcionais, Invocações do Bruxo, espécie Renascido, recursos de '
-      + 'classe em chips e selo de origem nas telas de seleção.',
+    rotulo: 'Necromante',
+    resumo: 'Subclasse Necromante (Arcana Unleashed), selo de origem nas telas '
+      + 'de seleção e cabeçalho da ficha retrátil no celular.',
     melhorias: [
       {
         grupo: '✨ Melhorias',
@@ -38,6 +37,32 @@ export const NOTAS_VERSAO = [
             + 'Esqueleto, Zumbi ou Morto-Vivo.',
           'Livro de magias do Necromante: linha em Ataques que ocupa 1 mão, '
             + 'com popup do que ele ativa; sem ele aparece só um aviso.',
+          'Selo de origem do livro em magias e itens de expansão, nas telas '
+            + 'de seleção (não na ficha).',
+          'Cabeçalho da ficha no celular: nome e Subir de Nível sempre à '
+            + 'vista; Editar ficha, Gerar PDF e as informações do personagem '
+            + 'ficam num bloco que nasce fechado, sem quebrar o texto.',
+        ],
+      },
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'Lista de magias do Artífice inclui a Lanterna Espiritual, que o '
+            + 'livro dá à classe.',
+        ],
+      },
+    ],
+  },
+  {
+    versao: '3.2.2',
+    data: '2026-10-07',
+    rotulo: 'Familiar e criaturas',
+    resumo: 'Familiar e Forma Selvagem funcionais, Invocações do Bruxo, espécie '
+      + 'Renascido e recursos de classe em chips.',
+    melhorias: [
+      {
+        grupo: '✨ Melhorias',
+        itens: [
           'Convocar Familiar: forma escolhida por cards com ficha técnica e '
             + 'card Familiar na ficha. Vale para o Pacto da Corrente e para o '
             + 'Companheiro Selvagem do Druida.',
@@ -56,8 +81,6 @@ export const NOTAS_VERSAO = [
           'Efeitos mágicos ativos: toque para ver o efeito, a condição e o '
             + 'texto da magia. O aviso de truques do personagem inteiro pode '
             + 'ser fechado.',
-          'Selo de origem do livro em magias e itens de expansão, nas telas '
-            + 'de seleção (não na ficha).',
         ],
       },
       {
@@ -68,8 +91,6 @@ export const NOTAS_VERSAO = [
           'Companheiro Selvagem do Druida passa a invocar o familiar de '
             + 'verdade, e dispensá-lo pelo card Familiar o desliga.',
           'Sintonização restrita por espécie reconhece o Renascido.',
-          'Lista de magias do Artífice inclui a Lanterna Espiritual, que o '
-            + 'livro dá à classe.',
         ],
       },
     ],
