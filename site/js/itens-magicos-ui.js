@@ -6,6 +6,7 @@
 // personagem e os callbacks chegam por parâmetro.
 // ============================================================
 import { seloFonte } from './fontes.js';
+import { aplicarEspaco, htmlEscolhaEspaco, lerEspacoEscolhido } from './espacos-inventario.js';
 import { abrirModal, escHtml, inserirNoInicio, mdParaHtml, toast } from './utils.js';
 import { cobrarPrecoInformado, htmlCampoPrecoInformado } from './preco-informado-ui.js';
 import { circuloDoPergaminho } from './regras-pergaminho.js';
@@ -17,13 +18,15 @@ import {
 
 /**
  * Grava o item no inventário. Equipamento (Poção de Cura do Livro do
- * Jogador) e item mágico Consumível somam na linha de mesmo nome; o resto
- * entra como linha nova.
+ * Jogador) e item mágico Consumível somam na linha de mesmo nome e no mesmo
+ * espaço; o resto entra como linha nova.
+ * @param {string} [destino] Id do local de destino ('' = Mochila).
  */
-export function adicionarAoInventario(personagem, novo) {
+export function adicionarAoInventario(personagem, novo, destino = '') {
   personagem.inventario = personagem.inventario || [];
+  aplicarEspaco(novo, destino);
   const agrupa = novo.tipo === 'equipamento' || (novo.tipo === 'magico' && novo.dados?.tipo_item === 'Consumível');
-  const existente = agrupa && personagem.inventario.find(i => i.nome === novo.nome && i.tipo === novo.tipo);
+  const existente = agrupa && personagem.inventario.find(i => i.nome === novo.nome && i.tipo === novo.tipo && (i.local || '') === destino);
   if (existente) existente.quantidade = (existente.quantidade || 1) + 1;
   else inserirNoInicio(personagem.inventario, novo);
 }
@@ -155,6 +158,7 @@ export async function abrirItemMagico(item, ctx) {
     abrindoItemMagico = false;
   }
   const corpo = `
+    ${htmlEscolhaEspaco(ctx.personagem, 'destino-item-magico')}
     ${htmlCorpoItemMagico({ linha_tipo: item.linha_tipo, descricao_magica: item.descricao, tabelas: item.tabelas })}
     ${variantes.length ? `
       <div style="margin-top:10px;font-weight:700;font-size:0.85rem">Variante</div>
@@ -211,7 +215,7 @@ export async function abrirItemMagico(item, ctx) {
     if (!pagamento.ok) return;
     const sufixoPreco = pagamento.sufixo;
     confirmado = true;
-    adicionarAoInventario(ctx.personagem, novo);
+    adicionarAoInventario(ctx.personagem, novo, lerEspacoEscolhido('destino-item-magico'));
     window.fecharModal();
     ctx.aoAdicionar();
     toast(`${novo.nome} adicionado${sufixoPreco}!`, 'success');

@@ -33,7 +33,8 @@ test('sem locais não há seletor de mover (layout antigo intacto) e o peso é o
   const { page } = await abrirFicha(context, GUERREIRO, 'regras-issue-80-a');
   await assentar(page).catch(() => {});
   await expect(page.locator('[data-mover-inv]')).toHaveCount(0);
-  expect(await pesoExibido(page)).toBe('7,3');
+  // A barra de peso pode chegar depois do primeiro desenho: espera o valor em vez de ler uma vez.
+  await expect.poll(() => pesoExibido(page)).toBe('7,3');
 });
 
 test('local "sem peso": a seção aparece, mover o item tira o peso, voltar devolve', async ({ context }) => {

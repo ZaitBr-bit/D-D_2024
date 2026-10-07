@@ -34,6 +34,7 @@ import { aplicarAumentoPermanente, aumentoPermanenteDoItem } from '../regras-aum
 import { atendeRequisito, lerRequisito } from '../regras-sintonizacao-restrita.js';
 import { abrirModalRecuperacao, sincronizarBonusPvNiveis } from './hp-descanso.js';
 import { perguntarUltimaCarga } from './ultima-carga.js';
+import { CHAVE_MOCHILA, aplicarEspaco, htmlEscolhaEspaco, lerEspacoEscolhido, moverEspacoPara, ordemDosEspacos } from '../espacos-inventario.js';
 
 // --- Inventário na ficha ---
 /** Estado de carga do personagem: peso atual, capacidade e flag de sobrecarga. */
@@ -166,26 +167,36 @@ function renderSheetInvLista(equipados, naoEquipados, zerados, porLocal = {}) {
     html += '</div>';
   }
 
-  if (naoEquipados.length > 0) {
-    const colapsada = _secoesInvColapsadas.mochila;
-    html += `<div class="inv-secao-titulo${colapsada ? ' inv-secao-colapsada' : ''}" data-inv-secao="mochila">
-      <span>Mochila (${naoEquipados.length})</span>
-      <span class="inv-secao-chevron">&#9660;</span>
+  // Mochila e locais customizados (issue #80) na ordem escolhida pelo jogador; Equipados
+  // fica sempre acima e Esgotados sempre abaixo. A Mochila vazia não aparece; local vazio aparece.
+  const locais = char.inventario_locais || [];
+  const visiveis = ordemDosEspacos(locais, char.inventario_ordem_espacos)
+    .filter((chave) => chave !== CHAVE_MOCHILA || naoEquipados.length > 0);
+  // Alça de arrastar (mesmo padrão dos itens) só com dois ou mais espaços na tela.
+  const alca = () => visiveis.length < 2 ? ''
+    : '<span class="inv-drag-handle no-print" data-espaco-handle="1" title="Arrastar para reordenar o espaço">&#9776;</span>';
+  visiveis.forEach((chaveEspaco) => {
+    if (chaveEspaco === CHAVE_MOCHILA) {
+      const colapsada = _secoesInvColapsadas.mochila;
+      html += `<div class="inv-secao-titulo${colapsada ? ' inv-secao-colapsada' : ''}" data-inv-secao="mochila" data-espaco-chave="mochila">
+      <span style="display:flex;align-items:center;gap:6px">${alca()}<span>Mochila (${naoEquipados.length})</span></span>
+      <span class="no-print">
+        <span class="inv-secao-chevron">&#9660;</span>
+      </span>
     </div>`;
-    html += `<div class="inv-secao-body${colapsada ? ' inv-secao-body-oculto' : ''}" data-inv-secao-body="mochila">`;
-    html += naoEquipados.map(idx => renderSheetInvItem(char.inventario[idx], idx)).join('');
-    html += '</div>';
-  }
-
-  // Locais customizados (issue #80): uma seção por local, inclusive vazia.
-  for (const local of (char.inventario_locais || [])) {
+      html += `<div class="inv-secao-body${colapsada ? ' inv-secao-body-oculto' : ''}" data-inv-secao-body="mochila">`;
+      html += naoEquipados.map(idx => renderSheetInvItem(char.inventario[idx], idx)).join('');
+      html += '</div>';
+      return;
+    }
+    const local = locais.find((l) => l.id === chaveEspaco);
     const idxs = porLocal?.[local.id] || [];
     const chave = `local_${local.id}`;
     // Espaço criado nasce recolhido; a escolha do jogador é guardada por personagem (colapso.js).
     if (!(chave in _secoesInvColapsadas)) _secoesInvColapsadas[chave] = true;
     const colapsada = _secoesInvColapsadas[chave];
-    html += `<div class="inv-secao-titulo${colapsada ? ' inv-secao-colapsada' : ''}" data-inv-secao="${escHtml(chave)}">
-      <span>${escHtml(local.nome)} (${idxs.length})${local.conta_peso === false ? ' <small>— não conta no peso</small>' : ''}</span>
+    html += `<div class="inv-secao-titulo${colapsada ? ' inv-secao-colapsada' : ''}" data-inv-secao="${escHtml(chave)}" data-espaco-chave="${escHtml(local.id)}">
+      <span style="display:flex;align-items:center;gap:6px">${alca()}<span>${escHtml(local.nome)} (${idxs.length})${local.conta_peso === false ? ' <small>— não conta no peso</small>' : ''}</span></span>
       <span class="no-print">
         <button type="button" class="btn btn-sm btn-icon" data-inv-local-editar="${escHtml(local.id)}" title="Editar local">&#9998;</button>
         <button type="button" class="btn btn-sm btn-icon" data-inv-local-remover="${escHtml(local.id)}" title="Remover local">&times;</button>
@@ -195,7 +206,7 @@ function renderSheetInvLista(equipados, naoEquipados, zerados, porLocal = {}) {
     html += `<div class="inv-secao-body${colapsada ? ' inv-secao-body-oculto' : ''}" data-inv-secao-body="${escHtml(chave)}">`;
     html += idxs.map(idx => renderSheetInvItem(char.inventario[idx], idx)).join('');
     html += '</div>';
-  }
+  });
 
   if (zerados && zerados.length > 0) {
     const colapsada = _secoesInvColapsadas.esgotados;
@@ -413,8 +424,11 @@ function renderSheetInvItem(item, idx) {
   const locaisInv = char.inventario_locais || [];
   const seletorMover = locaisInv.length === 0 ? '' : `
         <select class="form-input no-print" data-mover-inv="${idx}" title="Mover para (mover para um local desequipa o item)" style="width:auto;padding:1px 2px;font-size:0.7rem">
-          <option value="">Mochila</option>
-          ${locaisInv.map(l => `<option value="${escHtml(l.id)}"${item.local === l.id ? ' selected' : ''}>${escHtml(l.nome)}</option>`).join('')}
+          ${ordemDosEspacos(locaisInv, char.inventario_ordem_espacos).map(chave => {
+            if (chave === CHAVE_MOCHILA) return '<option value="">Mochila</option>';
+            const l = locaisInv.find(x => x.id === chave);
+            return `<option value="${escHtml(l.id)}"${item.local === l.id ? ' selected' : ''}>${escHtml(l.nome)}</option>`;
+          }).join('')}
         </select>`;
 
   return `
@@ -748,7 +762,9 @@ export function setupEventosInventarioSheet() {
 
   // Recolher / expandir seções do inventário
   invContainer.querySelectorAll('[data-inv-secao]').forEach(titulo => {
-    titulo.addEventListener('click', () => {
+    titulo.addEventListener('click', (ev) => {
+      // A alça é para arrastar o espaço: não recolhe nem expande.
+      if (ev.target.closest('[data-espaco-handle]')) return;
       const secao = titulo.dataset.invSecao;
       if (!(secao in _secoesInvColapsadas)) return;
       _secoesInvColapsadas[secao] = !_secoesInvColapsadas[secao];
@@ -921,7 +937,7 @@ export function setupEventosInventarioSheet() {
     // O glossário do livro alimenta a descrição dos cards de propriedade e maestria.
     const glossario = (await carregarDadosEquipSheet()).propriedadesArmas || [];
     // Bloco "Pagar" (rótulo distinto do campo informativo "Preço" do formulário): debita a carteira, não é gravado no item.
-    abrirModal('Item Customizado', htmlFormularioItemCustomizado(null),
+    abrirModal('Item Customizado', htmlEscolhaEspaco(char, 'destino-item-custom') + htmlFormularioItemCustomizado(null),
       `${htmlCampoPrecoInformado('pagar-item-custom', 'Pagar')}<button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button><button class="btn btn-primary" id="btn-add-ic">Adicionar</button>`);
     ligarEventosFormularioItemCustomizado(glossario);
 
@@ -934,12 +950,12 @@ export function setupEventosInventarioSheet() {
       const pagamento = cobrarPrecoInformado('pagar-item-custom', char, valores.nome);
       if (!pagamento.ok) return;
       adicionado = true;
-      inserirNoInicio(char.inventario, {
+      inserirNoInicio(char.inventario, aplicarEspaco({
         tipo: 'customizado',
         quantidade: 1,
         equipado: false,
         ...valores,
-      });
+      }, lerEspacoEscolhido('destino-item-custom')));
       salvar();
       window.fecharModal();
       renderFichaCompleta();
@@ -1207,6 +1223,7 @@ function reRenderSheetInv() {
 function setupSheetDragDrop() {
   const listaEl = document.getElementById('sheet-inventario');
   if (!listaEl) return;
+  setupArrastarEspacos(listaEl);
 
   let dragIdx = null;
 
@@ -1339,6 +1356,101 @@ function setupSheetDragDrop() {
       listaEl.querySelectorAll('.inv-item').forEach(item => item.classList.remove('inv-item-dragover'));
       touchDragEl = null;
       dragIdx = null;
+    });
+  });
+}
+
+/**
+ * Arrastar os espaços (Mochila e locais) pela alça ☰ do título, no mesmo padrão dos itens:
+ * mouse no computador e toque no celular. Soltar sobre outro espaço move o arrastado para
+ * o lugar dele; Equipados e Esgotados não são alvo. A ordem fica em
+ * `char.inventario_ordem_espacos`.
+ * @param {HTMLElement} listaEl Contêiner do inventário.
+ */
+function setupArrastarEspacos(listaEl) {
+  const titulos = [...listaEl.querySelectorAll('[data-espaco-chave]')];
+  if (titulos.length < 2) return;
+  let arrastado = null;
+  /** Grava a nova ordem e redesenha. */
+  const soltarEm = (alvo) => {
+    if (!arrastado || !alvo || alvo === arrastado) return;
+    const ordem = ordemDosEspacos(char.inventario_locais || [], char.inventario_ordem_espacos);
+    char.inventario_ordem_espacos = moverEspacoPara(ordem, arrastado, alvo);
+    salvar();
+    // Redesenho completo: religa recolher/expandir, mover e o próprio arrastar.
+    renderFichaCompleta();
+  };
+  const limparDestaque = () => titulos.forEach(t => t.classList.remove('inv-item-dragover'));
+
+  // Mouse: o arrastar só começa pela alça.
+  titulos.forEach(titulo => {
+    titulo.querySelector('[data-espaco-handle]')?.addEventListener('mousedown', () => titulo.setAttribute('draggable', 'true'));
+    titulo.addEventListener('dragstart', (e) => {
+      if (!titulo.getAttribute('draggable')) { e.preventDefault(); return; }
+      arrastado = titulo.dataset.espacoChave;
+      titulo.classList.add('inv-item-dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', arrastado);
+    });
+    titulo.addEventListener('dragend', () => {
+      titulo.classList.remove('inv-item-dragging');
+      titulo.removeAttribute('draggable');
+      limparDestaque();
+      arrastado = null;
+    });
+    titulo.addEventListener('dragover', (e) => {
+      if (!arrastado) return;
+      e.preventDefault();
+      titulo.classList.add('inv-item-dragover');
+    });
+    titulo.addEventListener('dragleave', () => titulo.classList.remove('inv-item-dragover'));
+    titulo.addEventListener('drop', (e) => {
+      if (!arrastado) return;
+      e.preventDefault();
+      soltarEm(titulo.dataset.espacoChave);
+    });
+  });
+
+  // Toque: clone do título segue o dedo; solta sobre o título que estiver embaixo.
+  let clone = null;
+  let origem = null;
+  const tituloEmbaixo = (x, y) => {
+    if (clone) clone.style.display = 'none';
+    const el = document.elementFromPoint(x, y)?.closest('[data-espaco-chave]');
+    if (clone) clone.style.display = '';
+    return el;
+  };
+  titulos.forEach(titulo => {
+    titulo.addEventListener('touchstart', (e) => {
+      if (!e.target.closest('[data-espaco-handle]')) return;
+      const r = titulo.getBoundingClientRect();
+      origem = titulo;
+      arrastado = titulo.dataset.espacoChave;
+      clone = titulo.cloneNode(true);
+      clone.style.cssText = `position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;opacity:0.85;pointer-events:none;z-index:9999;background:var(--bg-card);border:2px solid var(--primary);border-radius:var(--radius-sm)`;
+      document.body.appendChild(clone);
+      titulo.classList.add('inv-item-dragging');
+    }, { passive: true });
+    titulo.addEventListener('touchmove', (e) => {
+      if (!clone) return;
+      e.preventDefault();
+      const t = e.touches[0];
+      clone.style.top = `${t.clientY - clone.offsetHeight / 2}px`;
+      limparDestaque();
+      const alvo = tituloEmbaixo(t.clientX, t.clientY);
+      if (alvo && alvo !== origem) alvo.classList.add('inv-item-dragover');
+    }, { passive: false });
+    titulo.addEventListener('touchend', (e) => {
+      if (!clone) return;
+      const t = e.changedTouches[0];
+      const alvo = tituloEmbaixo(t.clientX, t.clientY);
+      clone.remove();
+      clone = null;
+      origem?.classList.remove('inv-item-dragging');
+      limparDestaque();
+      if (alvo && alvo !== origem) soltarEm(alvo.dataset.espacoChave);
+      origem = null;
+      arrastado = null;
     });
   });
 }

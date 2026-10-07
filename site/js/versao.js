@@ -13,13 +13,35 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.3.2';
+export const VERSAO_ATUAL = '3.3.3';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.3.3',
+    data: '2026-10-07',
+    rotulo: 'Inventário e loja',
+    resumo: 'Componentes de magia na loja, espaços do inventário reordenáveis '
+      + 'e escolha do espaço ao adicionar um item.',
+    melhorias: [
+      {
+        grupo: '✨ Melhorias',
+        itens: [
+          'Loja: nova categoria Componentes de Magia com os materiais de custo '
+            + 'em PO das magias, as magias que usam cada um e o selo '
+            + '"Consumido".',
+          'Inventário: arraste os espaços pela alça ☰ para mudar a ordem; '
+            + 'Equipados fica sempre em primeiro.',
+          'Loja, item mágico e item personalizado: campo "Guardar em" para '
+            + 'escolher o espaço do item novo.',
+          'Item personalizado: categoria Componente de Magia.',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.3.2',
     data: '2026-10-07',

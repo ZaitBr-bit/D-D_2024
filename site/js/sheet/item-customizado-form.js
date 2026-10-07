@@ -32,7 +32,7 @@ export const CATEGORIAS_ARMA = [
 // Categorias de item que NÃO são arma (issue #100). Ficam em `dados.tipo_item`,
 // separadas de `dados.categoria`: esta última decide proficiência e ataque
 // de arma, e não pode receber valor que não seja de arma.
-export const TIPOS_ITEM = ['Armadura', 'Consumível', 'Munição', 'Equipamento', 'Item Mágico', 'Ferramenta'];
+export const TIPOS_ITEM = ['Armadura', 'Consumível', 'Munição', 'Equipamento', 'Item Mágico', 'Ferramenta', 'Componente de Magia'];
 
 // Tipos de armadura do livro; `Escudo` entra aqui porque a proficiência dele é separada (regras-equipamento.js).
 export const TIPOS_ARMADURA = ['Leve', 'Média', 'Pesada', 'Escudo'];

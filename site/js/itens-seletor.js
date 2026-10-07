@@ -19,6 +19,7 @@ import {
   abrirItemMagico, aplicarSeVigente, criarGuardaRequisicao, htmlListaItensMagicos, renderCategoriaMagicos
 } from './itens-magicos-ui.js';
 import { filtrarAcervo, nomesReaproveitadosDoEquipamento, termosDaBusca } from './itens-magicos-catalogo.js';
+import { aplicarEspaco, htmlEscolhaEspaco, lerEspacoEscolhido } from './espacos-inventario.js';
 import { ajustarOverlayAoTeclado } from './modal-teclado.js';
 import { pagarCusto, parseCusto, podePagarCusto } from './moedas.js';
 import { abrirModal, escHtml, inserirNoInicio, mdParaHtml, semAcento, toast } from './utils.js';
@@ -528,6 +529,8 @@ export async function abrirSeletorItens(ctx) {
           if (d.descricao) descCorpo += `<div class="md-content" style="font-size:0.85rem">${mdParaHtml(d.descricao)}</div>`;
         }
         if (!descCorpo.trim()) descCorpo = '<div style="color:var(--text-muted)">Sem descrição disponível.</div>';
+        // Espaço de destino (só aparece quando o personagem tem locais criados).
+        descCorpo = htmlEscolhaEspaco(ctx.personagem, 'destino-item') + descCorpo;
 
         const custoItemStr = item.dados?.custo || '';
         const custoParseado = comprarAtivo ? parseCusto(custoItemStr) : null;
@@ -606,6 +609,7 @@ export async function abrirSeletorItens(ctx) {
             }
           }
 
+          const destino = lerEspacoEscolhido('destino-item');
           const novoItem = {
             nome: item.nome,
             tipo: item.tipo,
@@ -623,8 +627,10 @@ export async function abrirSeletorItens(ctx) {
             dados: { ...item.dados }
           };
 
-          // Verificar se já existe no inventário (agrupar)
-          const existente = ctx.personagem.inventario.find(inv => inv.nome === item.nome && inv.tipo === item.tipo);
+          aplicarEspaco(novoItem, destino);
+          // Verificar se já existe no inventário (agrupar), no mesmo espaço
+          const existente = ctx.personagem.inventario.find(inv => inv.nome === item.nome && inv.tipo === item.tipo
+            && (inv.local || '') === destino);
           if (existente && ['equipamento', 'generico'].includes(item.tipo)) {
             existente.quantidade = (existente.quantidade || 1) + quantidadeSelecionada;
           } else {
