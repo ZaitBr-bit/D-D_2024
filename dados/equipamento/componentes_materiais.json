@@ -1,0 +1,978 @@
+{
+  "observacao": "Gerado por scripts/magias/montar_componentes_materiais.mjs a partir dos componentes das magias. Custo = mínimo exigido pela magia (\"ou mais PO\").",
+  "total_itens": 68,
+  "itens": [
+    {
+      "nome": "Aljava",
+      "custo": "1 PO",
+      "peso": "0,5 kg",
+      "descricao": "Componente material de magia, custo mínimo 1 PO. Usado em: Aljava Veloz (5º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Aljava Veloz",
+          "circulo": 5,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Estatueta de si mesmo",
+      "custo": "5 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 5 PO. Usado em: Projetar Imagem (7º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Projetar Imagem",
+          "circulo": 7,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Símbolo Sagrado",
+      "custo": "5 PO",
+      "peso": "Varia",
+      "descricao": "Componente material de magia, custo mínimo 5 PO. Usado em: Bênção (1º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Bênção",
+          "circulo": 1,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Cetro de prata",
+      "custo": "10 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 10 PO. Usado em: Proteger Fortaleza (6º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Proteger Fortaleza",
+          "circulo": 6,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Incenso (10 PO)",
+      "custo": "10 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 10 PO. Usado em: Convocar Familiar (1º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Convocar Familiar",
+          "circulo": 1,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Poeira de jade (10 PO)",
+      "custo": "10 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 10 PO. Usado em: Boca Encantada (2º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Boca Encantada",
+          "circulo": 2,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Tinta",
+      "custo": "10 PO",
+      "peso": "—",
+      "descricao": "Componente material de magia, custo mínimo 10 PO. Usado em: Escrita Ilusória (1º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Escrita Ilusória",
+          "circulo": 1,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Porta em miniatura",
+      "custo": "15 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 15 PO. Usado em: Mansão Magnífica de Mordenkainen (7º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Mansão Magnífica de Mordenkainen",
+          "circulo": 7,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Água Benta",
+      "custo": "25 PO",
+      "peso": "0,5 kg",
+      "descricao": "Componente material de magia, custo mínimo 25 PO. Usado em: Proteção Contra o Bem e o Mal (1º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Proteção Contra o Bem e o Mal",
+          "circulo": 1,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Cogumelo em pó",
+      "custo": "25 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 25 PO. Usado em: Visão da Verdade (6º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Visão da Verdade",
+          "circulo": 6,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Incenso (25 PO)",
+      "custo": "25 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 25 PO. Usado em: Presságio (4º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Presságio",
+          "circulo": 4,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Pó de ouro",
+      "custo": "25 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 25 PO. Usado em: Tranca Arcana (2º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Tranca Arcana",
+          "circulo": 2,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Poeira de diamante (25 PO)",
+      "custo": "25 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 25 PO. Usado em: Indetectável (3º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Indetectável",
+          "circulo": 3,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Poeira de jade (25 PO)",
+      "custo": "25 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 25 PO. Usado em: Ilusão Programada (6º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Ilusão Programada",
+          "circulo": 6,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Varetas, ossos, cartas ou símbolos marcados",
+      "custo": "25 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 25 PO. Usado em: Augúrio (2º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Augúrio",
+          "circulo": 2,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Anel de platina",
+      "custo": "50 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 50 PO. Usado em: Vínculo de Proteção (2º círculo, um par: você e o alvo usam um cada).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Vínculo de Proteção",
+          "circulo": 2,
+          "consome": false,
+          "obs": "um par: você e o alvo usam um cada"
+        }
+      ]
+    },
+    {
+      "nome": "Diamante (50 PO)",
+      "custo": "50 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 50 PO. Usado em: Orbe Cromático (1º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Orbe Cromático",
+          "circulo": 1,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Réplica minúscula do baú, dos mesmos materiais",
+      "custo": "50 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 50 PO. Usado em: Arca Secreta de Leomund (4º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Arca Secreta de Leomund",
+          "circulo": 4,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Rubi em pó (50 PO)",
+      "custo": "50 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 50 PO. Usado em: Chama Contínua (2º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Chama Contínua",
+          "circulo": 2,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Tintas raras",
+      "custo": "50 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 50 PO. Usado em: Círculo de Teleporte (5º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Círculo de Teleporte",
+          "circulo": 5,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Tira de marfim",
+      "custo": "50 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 50 PO. Usado em: Lendas e Histórias (5º círculo, quatro tiras por conjuração).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Lendas e Histórias",
+          "circulo": 5,
+          "consome": false,
+          "obs": "quatro tiras por conjuração"
+        }
+      ]
+    },
+    {
+      "nome": "Barra de prata",
+      "custo": "100 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 100 PO. Usado em: Projeção Astral (9º círculo, consumido, uma por alvo).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Projeção Astral",
+          "circulo": 9,
+          "consome": true,
+          "obs": "uma por alvo"
+        }
+      ]
+    },
+    {
+      "nome": "Ferramentas de adivinhação (cartas ou runas)",
+      "custo": "100 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 100 PO. Usado em: Encontrar o Caminho (6º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Encontrar o Caminho",
+          "circulo": 6,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Foco de clarividência (chifre adornado com joias ou olho de vidro)",
+      "custo": "100 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 100 PO. Usado em: Clarividência (3º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Clarividência",
+          "circulo": 3,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Gema",
+      "custo": "100 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 100 PO. Usado em: Servo Homúnculo (2º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Servo Homúnculo",
+          "circulo": 2,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Pérola",
+      "custo": "100 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 100 PO. Usado em: Identificar (1º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Identificar",
+          "circulo": 1,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Poeira de diamante (100 PO)",
+      "custo": "100 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 100 PO. Usado em: Pele-Rocha (4º círculo, consumido); Restauração Maior (5º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Pele-Rocha",
+          "circulo": 4,
+          "consome": true
+        },
+        {
+          "nome": "Restauração Maior",
+          "circulo": 5,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Sal e prata em pó",
+      "custo": "100 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 100 PO. Usado em: Círculo Mágico (3º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Círculo Mágico",
+          "circulo": 3,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Pedra de ônix preto",
+      "custo": "150 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 150 PO. Usado em: Criar Mortos-Vivos (6º círculo, uma por cadáver).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Criar Mortos-Vivos",
+          "circulo": 6,
+          "consome": false,
+          "obs": "uma por cadáver"
+        }
+      ]
+    },
+    {
+      "nome": "Diamante em pó (200 PO)",
+      "custo": "200 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 200 PO. Usado em: Glifo de Proteção (3º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Glifo de Proteção",
+          "circulo": 3,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Pluma, tufo de pele e rabo de peixe dentro de uma bolota dourada",
+      "custo": "200 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 200 PO. Usado em: Invocar Fera (2º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Invocar Fera",
+          "circulo": 2,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Espada em miniatura",
+      "custo": "250 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 250 PO. Usado em: Espada de Mordenkainen (7º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Espada de Mordenkainen",
+          "circulo": 7,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Haste de metal bifurcada",
+      "custo": "250 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 250 PO. Usado em: Transição Planar (7º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Transição Planar",
+          "circulo": 7,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Incenso (250 PO)",
+      "custo": "250 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 250 PO. Usado em: Lendas e Histórias (5º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Lendas e Histórias",
+          "circulo": 5,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Crânio dourado",
+      "custo": "300 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 300 PO. Usado em: Invocar Morto-Vivo (3º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Invocar Morto-Vivo",
+          "circulo": 3,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Diamante (300 PO)",
+      "custo": "300 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 300 PO. Usado em: Revivificar (3º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Revivificar",
+          "circulo": 3,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Flor dourada",
+      "custo": "300 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 300 PO. Usado em: Convocar Feérico (3º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Convocar Feérico",
+          "circulo": 3,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Cofre",
+      "custo": "400 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 400 PO. Usado em: Invocar Constructo (4º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Invocar Constructo",
+          "circulo": 4,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Frasco incrustado de ouro com ar, uma pedra, cinzas e água",
+      "custo": "400 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 400 PO. Usado em: Convocar Elemental (4º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Convocar Elemental",
+          "circulo": 4,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Tentáculo em conserva e um globo ocular em um frasco incrustado de platina",
+      "custo": "400 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 400 PO. Usado em: Invocar Aberração (4º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Invocar Aberração",
+          "circulo": 4,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Colher de mexer caldeirão dourada",
+      "custo": "500 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 500 PO. Usado em: Caldeirão Borbulhante de Tasha (6º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Caldeirão Borbulhante de Tasha",
+          "circulo": 6,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Diamante (500 PO)",
+      "custo": "500 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 500 PO. Usado em: Reviver os Mortos (5º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Reviver os Mortos",
+          "circulo": 5,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Gema, cristal ou relicário",
+      "custo": "500 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 500 PO. Usado em: Receptáculo Arcano (6º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Receptáculo Arcano",
+          "circulo": 6,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Objeto com a imagem de um dragão gravado nele",
+      "custo": "500 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 500 PO. Usado em: Invocar Dragão (5º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Invocar Dragão",
+          "circulo": 5,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Pó de uma pérola negra esmagada",
+      "custo": "500 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 500 PO. Usado em: Círculo da Morte (6º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Círculo da Morte",
+          "circulo": 6,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Relicário (500 PO)",
+      "custo": "500 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 500 PO. Usado em: Convocar Celestial (5º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Convocar Celestial",
+          "circulo": 5,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Frasco com sangue",
+      "custo": "600 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 600 PO. Usado em: Invocar Ínfero (6º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Invocar Ínfero",
+          "circulo": 6,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Ágata",
+      "custo": "1.000 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 1.000 PO. Usado em: Despertar (5º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Despertar",
+          "circulo": 5,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Diamante (1.000 PO)",
+      "custo": "1.000 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 1.000 PO. Usado em: Clone (8º círculo, consumido); Ressurreição (7º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Clone",
+          "circulo": 8,
+          "consome": true
+        },
+        {
+          "nome": "Ressurreição",
+          "circulo": 7,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Diamante em pó (1.000 PO)",
+      "custo": "1.000 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 1.000 PO. Usado em: Símbolo (7º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Símbolo",
+          "circulo": 7,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Foco de vidência (bola de cristal, espelho ou fonte cheia de água)",
+      "custo": "1.000 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 1.000 PO. Usado em: Vidência (5º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Vidência",
+          "circulo": 5,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Incenso (1.000 PO)",
+      "custo": "1.000 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 1.000 PO. Usado em: Consagrar (5º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Consagrar",
+          "circulo": 5,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Joia",
+      "custo": "1.000 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 1.000 PO. Usado em: Âncora Planar (5º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Âncora Planar",
+          "circulo": 5,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Óleos raros",
+      "custo": "1.000 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 1.000 PO. Usado em: Reencarnar (5º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Reencarnar",
+          "circulo": 5,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Relicário (1.000 PO)",
+      "custo": "1.000 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 1.000 PO. Usado em: Aura Sagrada (8º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Aura Sagrada",
+          "circulo": 8,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Rubi em pó (1.000 PO)",
+      "custo": "1.000 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 1.000 PO. Usado em: Proibição (6º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Proibição",
+          "circulo": 6,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Safira",
+      "custo": "1.000 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 1.000 PO. Usado em: Invocação Instantânea de Drawmij (6º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Invocação Instantânea de Drawmij",
+          "circulo": 6,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Tigela incrustada de pedras preciosas",
+      "custo": "1.000 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 1.000 PO. Usado em: Banquete de Heróis (6º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Banquete de Heróis",
+          "circulo": 6,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Zircão",
+      "custo": "1.000 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 1.000 PO. Usado em: Projeção Astral (9º círculo, consumido, um por alvo).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Projeção Astral",
+          "circulo": 9,
+          "consome": true,
+          "obs": "um por alvo"
+        }
+      ]
+    },
+    {
+      "nome": "Argola de jade",
+      "custo": "1.500 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 1.500 PO. Usado em: Metamorfose (9º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Metamorfose",
+          "circulo": 9,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Estatueta de si mesmo incrustada de pedras preciosas",
+      "custo": "1.500 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 1.500 PO. Usado em: Contingência (6º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Contingência",
+          "circulo": 6,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Rubi em pó (1.500 PO)",
+      "custo": "1.500 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 1.500 PO. Usado em: Cárcere de Energia (7º círculo, consumido); Simulacro (7º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Cárcere de Energia",
+          "circulo": 7,
+          "consome": true
+        },
+        {
+          "nome": "Simulacro",
+          "circulo": 7,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Recipiente vedável do tamanho da criatura clonada",
+      "custo": "2.000 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 2.000 PO. Usado em: Clone (8º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Clone",
+          "circulo": 8,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Baú de materiais raros (1 m × 60 cm × 60 cm)",
+      "custo": "5.000 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 5.000 PO. Usado em: Arca Secreta de Leomund (4º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Arca Secreta de Leomund",
+          "circulo": 4,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Diamante (5.000 PO)",
+      "custo": "5.000 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 5.000 PO. Usado em: Portal (9º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Portal",
+          "circulo": 9,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Estatueta do alvo",
+      "custo": "5.000 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 5.000 PO. Usado em: Aprisionamento (9º círculo).",
+      "consumido": false,
+      "usado_em": [
+        {
+          "nome": "Aprisionamento",
+          "circulo": 9,
+          "consome": false
+        }
+      ]
+    },
+    {
+      "nome": "Poeira de uma pedra preciosa",
+      "custo": "5.000 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 5.000 PO. Usado em: Refugiar (7º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Refugiar",
+          "circulo": 7,
+          "consome": true
+        }
+      ]
+    },
+    {
+      "nome": "Diamante (25.000 PO)",
+      "custo": "25.000 PO",
+      "peso": "",
+      "descricao": "Componente material de magia, custo mínimo 25.000 PO. Usado em: Ressurreição Verdadeira (9º círculo, consumido).",
+      "consumido": true,
+      "usado_em": [
+        {
+          "nome": "Ressurreição Verdadeira",
+          "circulo": 9,
+          "consome": true
+        }
+      ]
+    }
+  ]
+}

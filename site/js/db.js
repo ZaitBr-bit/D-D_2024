@@ -159,6 +159,11 @@ export async function getFerramentas() {
   return fetchJSON('equipamento/ferramentas.json');
 }
 
+/** Componentes materiais de magia com custo em PO (gerado por scripts/magias/montar_componentes_materiais.mjs). */
+export async function getComponentesMateriais() {
+  return fetchJSON('equipamento/componentes_materiais.json');
+}
+
 let _acervoMesclado = null;
 
 /** Carrega o acervo de itens mágicos (Livro do Mestre, cap. 7) com os itens das expansões. */

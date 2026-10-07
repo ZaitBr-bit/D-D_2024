@@ -14,7 +14,7 @@
 // desfez, e importar store.js impediria o criador de usar uma preferencia
 // de sessao em vez do localStorage.
 // ============================================================
-import { getArmaduras, getArmas, getEquipamentoAventura, getFerramentas, getItensMagicos } from './db.js';
+import { getArmaduras, getArmas, getComponentesMateriais, getEquipamentoAventura, getFerramentas, getItensMagicos } from './db.js';
 import {
   abrirItemMagico, aplicarSeVigente, criarGuardaRequisicao, htmlListaItensMagicos, renderCategoriaMagicos
 } from './itens-magicos-ui.js';
@@ -31,11 +31,12 @@ import {
 let _cacheEquipSheet = null;
 
 /** Categorias da loja, na ordem em que a busca em "Todos" as percorre. */
-const CATEGORIAS_DA_LOJA = ['armas', 'armaduras', 'consumiveis', 'municao', 'equipamento', 'ferramentas'];
+const CATEGORIAS_DA_LOJA = ['armas', 'armaduras', 'consumiveis', 'municao', 'equipamento', 'ferramentas', 'componentes'];
 /** Rótulo da categoria de origem mostrado nos resultados da busca em "Todos". */
 const ROTULO_CATEGORIA = {
   armas: 'Armas', armaduras: 'Armaduras', consumiveis: 'Consumíveis',
   municao: 'Munição', equipamento: 'Equipamento', ferramentas: 'Ferramentas',
+  componentes: 'Componentes de Magia',
 };
 /** Máximo de linhas renderizadas por busca em "Todos". */
 const LIMITE_RESULTADOS_TODOS = 80;
@@ -75,8 +76,8 @@ export function montarFerramentasLoja(tabela = []) {
 /** Carrega (com cache) armas, armaduras, equipamento de aventura/munição e ferramentas usados pelo seletor e pelo popup de detalhe de item da ficha */
 export async function carregarDadosEquipSheet() {
   if (_cacheEquipSheet) return _cacheEquipSheet;
-  const [armasData, armadurasData, equipData, ferramentasData] = await Promise.all([
-    getArmas(), getArmaduras(), getEquipamentoAventura(), getFerramentas()
+  const [armasData, armadurasData, equipData, ferramentasData, componentesData] = await Promise.all([
+    getArmas(), getArmaduras(), getEquipamentoAventura(), getFerramentas(), getComponentesMateriais()
   ]);
   // `ferramentas` entrou aqui pela issue #43: o peso das ferramentas
   // ("Ferramentas de Ladrao", 0,5 kg) so existe nesse arquivo, e sem ele o
@@ -111,7 +112,9 @@ export async function carregarDadosEquipSheet() {
     // propria dentro da descricao. Sem elas, "Foco Arcano (Cajado)" --
     // citado por escrito na issue #43 -- casava com a entrada generica e
     // continuava pesando zero.
-    focos: equipData?.focos || []
+    focos: equipData?.focos || [],
+    // Componentes materiais de magia com custo em PO, um por material e custo mínimo.
+    componentes: componentesData?.itens || []
   };
   return _cacheEquipSheet;
 }
@@ -149,7 +152,8 @@ export async function abrirSeletorItens(ctx) {
     { id: 'consumiveis', label: 'Consumiveis', icon: '&#9878;' },
     { id: 'municao', label: 'Municao', icon: '&#10148;' },
     { id: 'equipamento', label: 'Equipamento', icon: '&#128188;' },
-    { id: 'ferramentas', label: 'Ferramentas', icon: '&#128295;' }
+    { id: 'ferramentas', label: 'Ferramentas', icon: '&#128295;' },
+    { id: 'componentes', label: 'Componentes de Magia', icon: '&#128142;' }
   ];
   // Itens Mágicos só onde a UI completa de inventário existe (a ficha, via
   // ctx.permitirMagicos); o criador mantém as seis categorias originais.
@@ -374,6 +378,20 @@ export async function abrirSeletorItens(ctx) {
             nome: i.nome,
             detalhe: `${i.custo || '—'} | ${i.peso || '—'}`,
             badge: '<span class="badge" style="font-size:0.6rem;background:#e3f2fd;color:#1565c0">Ferramenta</span>',
+            badgeCat: '',
+            dados: i,
+            tipo: 'equipamento'
+          }));
+          break;
+        case 'componentes':
+          itens = (dados.componentes || []).map(i => ({
+            nome: i.nome,
+            detalhe: `${i.custo || '—'} | ${i.peso || '—'}`,
+            // Magias que usam o material; a lista completa fica no detalhe do item.
+            detalhe2: `Usado em: ${(i.usado_em || []).map(m => m.nome).join(', ')}`,
+            badge: i.consumido
+              ? '<span class="badge" style="font-size:0.6rem;background:#fff3e0;color:#e65100" title="Ao menos uma magia consome o material">Consumido</span>'
+              : '',
             badgeCat: '',
             dados: i,
             tipo: 'equipamento'
