@@ -13,13 +13,36 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.3.3';
+export const VERSAO_ATUAL = '3.3.4';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.3.4',
+    data: '2026-10-07',
+    rotulo: 'Itens de mão',
+    resumo: 'Varinhas, bastões, cajados e alguns itens mágicos passam a '
+      + 'ocupar mão quando equipados.',
+    melhorias: [
+      {
+        grupo: '✨ Melhorias',
+        itens: [
+          'Itens mágicos de mão ocupam 1 mão quando equipados: varinhas, '
+            + 'bastões, cajados e 16 itens do livro que só funcionam '
+            + '"enquanto o segura" (Orbe do Tempo, Chapéu de Muitas Magias, '
+            + 'Livro da Escuridão Vil e outros). Entram no botão Mãos e '
+            + 'aparecem na seção Ataques.',
+          'Bastão e cajado são versáteis: botão "Empunhar com duas mãos" '
+            + 'na seção Ataques, e o escudo devolve o cajado para uma mão.',
+          'Sem mão livre, o item de mão equipa e mostra o aviso de mãos '
+            + 'excedidas, em vez de ser recusado como as armas.',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.3.3',
     data: '2026-10-07',

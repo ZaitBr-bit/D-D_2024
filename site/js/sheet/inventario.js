@@ -790,6 +790,7 @@ export function setupEventosInventarioSheet() {
         // Limite de mãos: arma versátil em duas mãos volta para uma mão quando isso faz o item caber;
         // sem mãos livres mesmo assim, desfaz a marcação e avisa sem alterar nada.
         let ajustadas = [];
+        let avisoMaos = '';
         if (cb.checked) {
           const v = equiparComAjusteDeMaos(char, item);
           if (!v.ok) {
@@ -798,6 +799,7 @@ export function setupEventosInventarioSheet() {
             return;
           }
           ajustadas = v.ajustados;
+          avisoMaos = v.aviso || '';
         }
         item.equipado = cb.checked;
         // Item equipado não fica guardado num local (issue #80) e vai para o início da lista.
@@ -815,6 +817,7 @@ export function setupEventosInventarioSheet() {
         // Re-renderizar ficha inteira para recalcular CA e outros stats
         renderFichaCompleta();
         if (ajustadas.length) toast(`${ajustadas.join(', ')} passou a ser empunhada com uma mão.`);
+        if (avisoMaos) toast(avisoMaos, 'info');
       }
     });
   });

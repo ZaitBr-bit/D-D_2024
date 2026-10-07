@@ -6,7 +6,7 @@ import { escHtml, fmtMod, toast } from '../utils.js';
 import { char, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
 import { calcularAtaqueItem, htmlSeloAtributoArma } from './ataque-calculo.js';
-import { ehArmaDeAtaque, maosOcupadas, maosEmUso, maosTotais, excedeMaos, avisoRecarga, danoVersatil, verificarEquipar } from '../regras-ataque.js';
+import { ehArmaDeAtaque, ehItemDeMao, ehItemVersatilDeMao, maosOcupadas, maosEmUso, maosTotais, excedeMaos, avisoRecarga, danoVersatil, verificarEquipar } from '../regras-ataque.js';
 import { ehNecromante, estadoNecromante, livroEmpunhado, nivelDoMago } from '../regras-necromante.js';
 import { abrirDetalheLivro } from './necromante.js';
 import { abrirModalMaos } from './maos-ui.js';
@@ -16,6 +16,24 @@ import { mostrarDetalheItemSheet } from './inventario.js';
 /** Armas equipadas (ativas) do personagem, na ordem do inventário. */
 function armasEquipadas() {
   return (char.inventario || []).filter(i => i.equipado && !i.destruido && (i.quantidade ?? 1) > 0 && ehArmaDeAtaque(i) && i.dados);
+}
+
+/** Itens mágicos de mão (varinha, bastão, cajado e afins) equipados: ocupam 1 mão cada. */
+function itensDeMaoEquipados() {
+  return (char.inventario || []).filter(i => i.equipado && !i.destruido && (i.quantidade ?? 1) > 0 && ehItemDeMao(i));
+}
+
+/** Linha de um item de mão equipado: nome, mãos ocupadas, botão de empunhadura (bastão e cajado) e a nota de que precisa estar na mão para usar. */
+function htmlLinhaItemDeMao(item, idx) {
+  const maos = maosOcupadas(item);
+  const botao = ehItemVersatilDeMao(item)
+    ? `<button class="btn btn-sm btn-secondary no-print" data-ataque-empunhar="${idx}">${item.dados.empunhadura === 'duas' ? 'Empunhar com uma mão' : 'Empunhar com duas mãos'}</button>`
+    : '';
+  return `<div class="ataque-item" style="padding:6px 0;border-bottom:1px solid var(--border-light);display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap">
+    <div style="flex:1;min-width:0;cursor:pointer" data-ataque-info="${idx}" title="Ver detalhes"><strong>${escHtml(item.nome)}</strong>
+      <span class="badge badge-secondary" style="font-size:0.65rem">${maos} ${maos === 1 ? 'mão' : 'mãos'}</span>
+      <div style="font-size:0.75rem;color:var(--text-muted)">Item de mão: precisa estar na mão para usar o efeito${botao ? '; versátil (uma ou duas mãos)' : ''}.</div></div>
+    ${botao}</div>`;
 }
 
 /** HTML de uma linha de ataque: nome, Atq, dano, mãos e botão de empunhadura se versátil. */
@@ -64,7 +82,8 @@ function htmlLinhaLivro() {
 export function renderSecaoAtaques() {
   const armas = armasEquipadas();
   const livro = temLinhaDoLivro();
-  if (armas.length === 0 && !livro) return '';
+  const itensMao = itensDeMaoEquipados();
+  if (armas.length === 0 && !livro && itensMao.length === 0) return '';
   const avisos = [];
   if (excedeMaos(char)) avisos.push(`Mãos excedidas (${maosEmUso(char)} de ${maosTotais(char)}): desequipe um item.`);
   const recarga = avisoRecarga(char);
@@ -77,6 +96,7 @@ export function renderSecaoAtaques() {
     ${avisos.map(a => `<div class="aviso" style="font-size:0.8rem;color:#842029;margin:4px 0">${escHtml(a)}</div>`).join('')}
     ${livro ? htmlLinhaLivro() : ''}
     ${armas.map(a => htmlLinhaAtaque(a, char.inventario.indexOf(a))).join('')}
+    ${itensMao.map(i => htmlLinhaItemDeMao(i, char.inventario.indexOf(i))).join('')}
   </div>`;
 }
 
@@ -109,6 +129,7 @@ export function setupEventosAtaques() {
       item.dados.empunhadura = 'duas';
       const v = verificarEquipar(char, item);
       if (!v.ok) { delete item.dados.empunhadura; toast(v.motivo, 'error'); return; }
+      if (v.aviso) toast(v.aviso, 'info');
     } else {
       delete item.dados.empunhadura;
     }

@@ -98,11 +98,46 @@ export function danoBaseEmpunhado(item) {
   return base.replace(/^\s*\d+d\d+/i, versatil);
 }
 
-/** Mãos que o item ocupa quando equipado: escudo 1; arma Duas Mãos 2; versátil 2 se empunhada com duas; demais armas 1; o resto 0. */
+// Itens mágicos que só funcionam na mão ("enquanto o segura/empunha" no texto do livro) e que
+// não são varinha, bastão nem cajado (esses entram pelo tipo). Revisados um a um; ficam de fora
+// os que citam "segurar" só de passagem (Buraco Portátil, Talismãs do Bem Puro e do Mal Supremo,
+// Vassoura Voadora), os que valem também vestidos (Olho de Bruxa, Talismã da Esfera) e os de uso
+// eventual que ficam presos ao corpo (Bolsa de Temperos Prática de Heward, Chapéu de Pragas).
+export const IDS_ITENS_MAGICOS_DE_MAO = new Set([
+  'baliza-de-pesca', 'baliza-retratil', 'bengala-do-veterano',
+  'chapeu-de-muitas-magias', 'corda-de-escalada', 'corda-do-enredamento',
+  'decantador-de-agua-infinita', 'demonomicon-de-iggwilv', 'frasco-de-ferro', 'gema-do-brilho',
+  'leque-do-vento', 'livro-da-escuridao-vil', 'orbe-da-direcao', 'orbe-do-tempo',
+  'tomo-da-lingua-silenciada', 'vassoura-dancante-de-baba-yaga',
+]);
+
+/**
+ * Se o item mágico é de mão (varinha, bastão, cajado ou um dos itens de
+ * IDS_ITENS_MAGICOS_DE_MAO): equipado, ocupa 1 mão. Armas e escudos têm a regra
+ * própria de mãos e ficam de fora.
+ */
+export function ehItemDeMao(item) {
+  if (!item || ehEscudoItem(item) || ehArmaDeAtaque(item)) return false;
+  const d = item.dados || {};
+  return IDS_ITENS_MAGICOS_DE_MAO.has(d.magico_id) || /^(varinha|bast[aã]o|cajado)\b/i.test(String(d.linha_tipo || ''));
+}
+
+/**
+ * Se o item de mão é versátil: bastão e cajado (sem arma-base) podem ser empunhados com uma
+ * ou com duas mãos, como uma arma Versátil. Varinha e os demais itens de mão são de uma mão.
+ */
+export function ehItemVersatilDeMao(item) {
+  return ehItemDeMao(item) && /^(bast[aã]o|cajado)\b/i.test(String(item.dados?.linha_tipo || ''));
+}
+
+/** Mãos que o item ocupa quando equipado: escudo 1; arma Duas Mãos 2; versátil 2 se empunhada com duas; demais armas 1; item mágico de mão 1 (bastão e cajado: 2 se empunhados com duas); o resto 0. */
 export function maosOcupadas(item) {
   if (!item) return 0;
   if (ehEscudoItem(item)) return 1;
-  if (!ehArmaDeAtaque(item)) return 0;
+  if (!ehArmaDeAtaque(item)) {
+    if (!ehItemDeMao(item)) return 0;
+    return ehItemVersatilDeMao(item) && item.dados?.empunhadura === 'duas' ? 2 : 1;
+  }
   const props = minusculo(item.dados?.propriedades);
   if (props.includes('duas mãos')) return 2;
   if (props.includes('versátil') && item.dados?.empunhadura === 'duas') return 2;
@@ -138,6 +173,10 @@ export function verificarEquipar(char, item) {
   const emUso = maosEmUso(char, item);
   const total = maosTotais(char);
   if (emUso + custo <= total) return { ok: true };
+  // Item mágico de mão não é recusado: equipa e avisa que as mãos passaram do limite.
+  if (ehItemDeMao(item)) {
+    return { ok: true, aviso: `Mãos excedidas (${emUso + custo} de ${total}): ${item.nome} ocupa uma mão, desequipe algo para usá-lo.` };
+  }
   const bloqueadores = (char.inventario || [])
     .filter(i => i !== item && contaNasMaos(i) && maosOcupadas(i) > 0)
     .map(i => i.nome);
@@ -151,6 +190,7 @@ export function verificarEquipar(char, item) {
 
 /** Indica se a arma é versátil, sem a propriedade Duas Mãos, e está empunhada com duas mãos (pode voltar para uma). */
 function versatilComDuasMaos(item) {
+  if (ehItemVersatilDeMao(item)) return item.dados?.empunhadura === 'duas';
   return ehArmaDeAtaque(item) && !!danoVersatil(item)
     && !minusculo(item.dados?.propriedades).includes('duas mãos')
     && item.dados?.empunhadura === 'duas';
@@ -166,7 +206,7 @@ function versatilComDuasMaos(item) {
  */
 export function equiparComAjusteDeMaos(char, item) {
   const direto = verificarEquipar(char, item);
-  if (direto.ok) return { ok: true, ajustados: [] };
+  if (direto.ok) return { ok: true, ajustados: [], ...(direto.aviso ? { aviso: direto.aviso } : {}) };
   const custo = maosOcupadas(item);
   const falta = maosEmUso(char, item) + custo - maosTotais(char);
   const candidatas = [item, ...(char.inventario || []).filter(i => i !== item && contaNasMaos(i))]
