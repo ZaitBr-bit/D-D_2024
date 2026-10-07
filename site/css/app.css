@@ -466,7 +466,9 @@ tr:hover td { background: #faf8f4; }
    no estado NAO selecionado, que e o estado mais comum e por isso o que
    mais importa bater com o original (medido em 02-vs-original.png). */
 .opcao-grid.ampla .opcao-card .opcao-check { display: none; }
-.opcao-grid.ampla .opcao-card.selecionada .opcao-check { display: flex; }
+.opcao-grid.ampla .opcao-card.selecionada .opcao-check,
+/* Card de seletor (data-opcao): o círculo fica sempre visível, porque é ele que seleciona. */
+.opcao-grid.ampla .opcao-card[data-opcao] .opcao-check { display: flex; }
 /* DEFEITO da Task 2, achado e corrigido na Task 13: sem `display` proprio,
    este <div> herdava o padrao de bloco e ocupava a LARGURA INTEIRA do
    card -- so o TEXTO ficava embaixo (bloco seguinte de `.opcao-resumo`
@@ -484,6 +486,7 @@ tr:hover td { background: #faf8f4; }
    IGUAL a antes) -- so a caixa invisivel de clique fica do tamanho do
    texto, nao do card. Nada muda visualmente (medido no navegador: mesma
    posicao/tamanho de texto nas duas densidades, antes e depois). */
+.opcao-card[data-com-detalhe] { cursor: pointer; }
 .opcao-card .opcao-ver {
   display: inline-block;
   font-size: 0.72rem; color: var(--primary); margin-top: 4px;

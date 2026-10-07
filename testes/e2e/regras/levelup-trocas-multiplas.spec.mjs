@@ -64,9 +64,9 @@ async function irAteCardDeTroca(page) {
 
 /** Faz uma troca no card: escolhe quem sai e quem entra. */
 async function escolherTroca(page, card, sai, entra) {
-  await card.locator(`.opcao-card[data-opcao="${sai}"]`).click();
+  await card.locator(`.opcao-card[data-opcao="${sai}"] .opcao-check`).click();
   await assentar(page).catch(() => {});
-  await card.locator(`.opcao-card[data-opcao="${entra}"]`).click();
+  await card.locator(`.opcao-card[data-opcao="${entra}"] .opcao-check`).click();
   await assentar(page).catch(() => {});
 }
 

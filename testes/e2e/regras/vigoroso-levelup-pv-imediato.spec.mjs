@@ -36,7 +36,7 @@ test('level-up: o "Total: X PV" da modal de conclusão já inclui o incremento d
   await page.check('input[name="levelup-asi-modo"][value="talento"]', { timeout: 1500 }).catch(() => {});
   const opcao = page.locator('#levelup-talento-lista .opcao-card[data-opcao="Vigoroso"]');
   await expect(opcao, 'Vigoroso (Talento de Origem, sem pré-requisito) precisa aparecer na lista').toBeVisible();
-  await opcao.click();
+  await opcao.locator('.opcao-check').click();
   await page.waitForTimeout(400);
   await page.locator('#btn-step-proximo').click();
   await page.waitForTimeout(400);

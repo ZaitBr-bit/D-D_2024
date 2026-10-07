@@ -56,7 +56,7 @@ test('seletor de cards (max:1): trocar a seleção com um clique direto, sem des
   await cardSortudo.waitFor({ state: 'visible', timeout: 5000 });
 
   // 1. Marca Alerta primeiro.
-  await cardAlerta.click();
+  await cardAlerta.locator('.opcao-check').click();
   await expect(cardAlerta, 'Alerta não marcou no primeiro clique').toHaveClass(/selecionada/);
 
   // 2. Com Alerta marcado, Sortudo (outra opção do MESMO grupo, max:1) não
@@ -72,7 +72,7 @@ test('seletor de cards (max:1): trocar a seleção com um clique direto, sem des
 
   // 3. Clique DIRETO em Sortudo (sem desmarcar Alerta antes) precisa trocar
   // a seleção num clique só.
-  await cardSortudo.click();
+  await cardSortudo.locator('.opcao-check').click();
   await expect(cardSortudo, 'clique direto em Sortudo não marcou -- a troca de seleção não aconteceu').toHaveClass(/selecionada/);
   await expect(cardAlerta, 'Alerta continuou marcado depois de clicar em Sortudo -- deveria ter desmarcado (max:1)').not.toHaveClass(/selecionada/);
 

@@ -684,7 +684,7 @@ test('Mago 5/Paladino 1 sobe para Paladino 2: a magia sempre preparada da segund
   for (let i = 0; i < 8 && !(await confirmar.count()); i++) {
     const estilo = page.locator('#lvlup-estilo-luta-escolha [data-opcao]').first();
     if (!estiloEscolhido && await estilo.count()) {
-      await estilo.click();
+      await estilo.locator('.opcao-check').click();
       await assentar(page).catch(() => {});
       estiloEscolhido = true;
       continue;

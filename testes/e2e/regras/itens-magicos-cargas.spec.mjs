@@ -477,7 +477,7 @@ async function terminarNoTruqueEAbrirRecuperacao(page) {
 test('cadeia do Descanso Longo: Confirmar a troca de magia abre o truque uma vez e a recuperação uma vez', async ({ context }) => {
   const { page, erros } = await abrirFicha(context, MAGO_CADEIA, 'regras-cargas-p8-8');
   await magoNaTrocaDeMagias(page);
-  await page.locator('#troca-conhecida-remover-lista .opcao-card[data-opcao="Mísseis Mágicos"]').click();
+  await page.locator('#troca-conhecida-remover-lista .opcao-card[data-opcao="Mísseis Mágicos"] .opcao-check').click();
   await page.locator('[data-selecionar-troca]').first().click({ position: { x: 3, y: 3 } });
   await page.click('#btn-confirmar-troca-conhecida');
   await assentar(page).catch(() => {});

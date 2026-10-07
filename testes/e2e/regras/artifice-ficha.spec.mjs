@@ -27,7 +27,7 @@ test('Magia de Funileiro cria item temporário e o Descanso Longo o remove', asy
   // Card com peso/custo e descrição do equipamento; a busca filtra a lista de 31 itens.
   await page.locator('#funileiro-item .opcao-busca').fill('corda');
   await expect(page.locator('#funileiro-item [data-opcao="Corda"]')).toContainText('kg');
-  await page.locator('#funileiro-item [data-opcao="Corda"]').click();
+  await page.locator('#funileiro-item [data-opcao="Corda"] .opcao-check').click();
   await page.locator('#btn-funileiro-criar').click();
   await assentar(page).catch(() => {});
   const temCorda = async () => (await lerPersonagem(page)).inventario
@@ -61,7 +61,7 @@ test('Item de Armazenar Magia: armazenar e usar', async ({ context }) => {
   // Card da magia com círculo, escola e conjuração; sem escolher, o botão recusa.
   await page.locator('#btn-armazenar-confirmar').click();
   expect((await lerPersonagem(page)).recursos?.artifice?.armazenar ?? null).toBeNull();
-  await page.locator('#armazenar-magia [data-opcao]').first().click();
+  await page.locator('#armazenar-magia [data-opcao] .opcao-check').first().click();
   await page.locator('#btn-armazenar-confirmar').click();
   await assentar(page).catch(() => {});
   await abrirTudo(page);

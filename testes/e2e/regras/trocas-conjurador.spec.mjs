@@ -62,7 +62,7 @@ test('descanso longo: conjurador com truque de classe recebe a opção de trocar
   await expect(cardSaindo, 'o truque de classe não apareceu como trocável')
     .toBeVisible({ timeout: 5000 });
 
-  await cardSaindo.click();
+  await cardSaindo.locator('.opcao-check').click();
   await assentar(page);
 
   // Escolhido o que sai, a lista de substitutos aparece. Um truque de
@@ -70,7 +70,7 @@ test('descanso longo: conjurador com truque de classe recebe a opção de trocar
   const cardEntrando = page.locator('#troca-truque-adicionar-lista .opcao-card[data-opcao="Orientação"]');
   await expect(cardEntrando, 'a lista de truques substitutos nasceu vazia')
     .toBeVisible({ timeout: 5000 });
-  await cardEntrando.click();
+  await cardEntrando.locator('.opcao-check').click();
   await clicarBotaoFicha(page, 'btn-confirmar-troca-truque');
   await assentar(page);
 

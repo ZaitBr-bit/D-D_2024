@@ -124,7 +124,7 @@ test('confirmar a troca de maestria (1-por-1) grava a arma nova e fecha o modal'
 
   // Passo 2 (entra): escolhe "Machado de Batalha", elegível para Bárbaro
   // (arma marcial corpo a corpo).
-  await page.locator('#troca-passo-entra .opcao-card[data-opcao="Machado de Batalha"]').click();
+  await page.locator('#troca-passo-entra .opcao-card[data-opcao="Machado de Batalha"] .opcao-check').click();
   await assentar(page).catch(() => {});
 
   await page.locator('#btn-confirmar-troca-maestria').click();

@@ -51,7 +51,7 @@ async function escolherTalento(page, nome) {
   await page.waitForSelector('#add-talento-lista', { state: 'visible', timeout: 5000 });
   const card = page.locator(`#add-talento-lista .opcao-card[data-opcao="${nome}"]`);
   await card.waitFor({ state: 'visible', timeout: 5000 });
-  await card.click();
+  await card.locator('.opcao-check').click();
   await page.click('#btn-confirmar-add-talento');
   await assentar(page);
 }
@@ -71,7 +71,7 @@ test('ficha: talento COM configuração fecha todos os modais ao ser adicionado'
 
     const lista = page.locator('#lvlup-magia-escola-lista');
     await expect(lista).toBeVisible({ timeout: 5000 });
-    await lista.locator('.opcao-card[data-opcao="Marca do Caçador"]').click();
+    await lista.locator('.opcao-card[data-opcao="Marca do Caçador"] .opcao-check').click();
     await page.selectOption('#levelup-talento-asi', 'sabedoria');
     await page.click('#btn-confirmar-add-talento-asi');
     await assentar(page);

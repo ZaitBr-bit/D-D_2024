@@ -11,8 +11,8 @@ import { cobrarPrecoInformado, htmlCampoPrecoInformado } from './preco-informado
 import { circuloDoPergaminho } from './regras-pergaminho.js';
 import { carregarMagiasIndicePergaminho, htmlSeletorMagiaPergaminho, ligarSeletorMagiaPergaminho, magiaSelecionadaPergaminho } from './pergaminho-ui.js';
 import {
-  filtrarAcervo, opcoesDeBase, montarItemInventario,
-  RARIDADES_ORDEM, TIPOS_ACERVO, raridadesDoItem,
+  casaEmPortugues, filtrarAcervo, opcoesDeBase, montarItemInventario,
+  RARIDADES_ORDEM, TIPOS_ACERVO, raridadesDoItem, variantesQueCasam,
 } from './itens-magicos-catalogo.js';
 
 /**
@@ -75,7 +75,7 @@ export function renderCategoriaMagicos(listaEl, ctx) {
     </select>
     ${itens.length === 0
       ? '<div style="color:var(--text-muted);text-align:center;padding:16px">Nenhum item encontrado</div>'
-      : itens.map((it, i) => htmlLinhaItemMagico(it, i)).join('')}`;
+      : htmlListaItensMagicos(itens, ctx.texto)}`;
   listaEl.querySelectorAll('[data-filtro-raridade]').forEach(btn => btn.addEventListener('click', () => {
     estado.raridade = btn.dataset.filtroRaridade;
     renderCategoriaMagicos(listaEl, ctx);
@@ -90,15 +90,43 @@ export function renderCategoriaMagicos(listaEl, ctx) {
 }
 
 /**
+ * Linhas dos itens do acervo para uma busca: primeiro os que casam pelo nome em
+ * português; depois, atrás de uma divisória, os que só casam pelo nome em inglês.
+ * O índice de cada linha é a posição em `itens`.
+ * @param {Array<object>} itens Resultado de filtrarAcervo (português, depois inglês).
+ * @param {string} texto Busca digitada.
+ * @returns {string} HTML das linhas.
+ */
+export function htmlListaItensMagicos(itens, texto = '') {
+  let html = '';
+  let divisoriaPosta = false;
+  itens.forEach((it, i) => {
+    if (texto && !divisoriaPosta && !casaEmPortugues(it, texto)) {
+      divisoriaPosta = true;
+      html += '<div class="opcao-grupo" id="divisoria-busca-ingles"><span>Encontrados pelo nome em inglês</span></div>';
+    }
+    html += htmlLinhaItemMagico(it, i, texto);
+  });
+  return html;
+}
+
+/**
  * Linha de um item do acervo numa lista (categoria Itens Mágicos ou busca em
  * Todos). `indice` vai em `data-item-magico` e aponta para a lista de quem chama.
  */
-export function htmlLinhaItemMagico(it, indice) {
+export function htmlLinhaItemMagico(it, indice, texto = '') {
+  const casadas = variantesQueCasam(it, texto);
+  const raridades = casadas.length ? [...new Set(casadas.map(v => v.raridade))] : raridadesDoItem(it);
+  const variantes = casadas.length
+    ? `<div class="inv-item-detalhe" style="font-size:0.72rem">Variante: ${escHtml(casadas.slice(0, 3).map(v => v.nome).join(', '))}${casadas.length > 3 ? ` e mais ${casadas.length - 3}` : ''}</div>`
+    : '';
+  const ingles = texto && !casaEmPortugues(it, texto) && it.nome_en
+    ? `<div class="inv-item-detalhe" style="font-size:0.72rem">Em inglês: ${escHtml(it.nome_en)}</div>` : '';
   return `
         <div class="inv-item" style="cursor:pointer" data-item-magico="${indice}">
           <div style="flex:1">
             <div class="inv-item-nome">${escHtml(it.nome)}${seloFonte(it.fonte)}${it.requer_sintonizacao ? ' <span class="badge" style="font-size:0.6rem;background:#e0f2f1;color:#00695c">Sintonização</span>' : ''}</div>
-            <div class="inv-item-detalhe">${escHtml(it.tipo)} | ${escHtml(raridadesDoItem(it).join(', '))}</div>
+            <div class="inv-item-detalhe">${escHtml(it.tipo)} | ${escHtml(raridades.join(', '))}</div>${variantes}${ingles}
           </div>
         </div>`;
 }

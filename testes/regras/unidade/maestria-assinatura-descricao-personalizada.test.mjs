@@ -84,7 +84,7 @@ function mago18ComOcupaVaga() {
   };
 }
 
-test('personalizada que ocupa vaga no grimório mostra a descrição de verdade ao clicar "ver detalhes"', async () => {
+test('personalizada que ocupa vaga no grimório mostra a descrição de verdade ao clicar no card (fora do círculo)', async () => {
   sheetEstado.definirChar(mago18ComOcupaVaga());
   const { registro, criados, restaurar } = instalarDocumentoFalso();
   try {
@@ -94,16 +94,16 @@ test('personalizada que ocupa vaga no grimório mostra a descrição de verdade 
     const handlerClique = elVaga.handlers.click[0];
     assert.ok(handlerClique, 'a vaga de 1o circulo precisa ter o handler de clique de montarSeletor');
 
-    // Simula o clique em "ver detalhes" do card "Chama Azul" -- o handler
-    // acha a opção por `ev.target.closest('[data-ver]').dataset.ver`.
-    handlerClique({ target: { closest: (sel) => sel === '[data-ver]' ? { dataset: { ver: 'Chama Azul' } } : null } });
+    // Simula o clique no corpo do card "Chama Azul" (fora do círculo de seleção): o
+    // handler acha a opção por `ev.target.closest('[data-opcao]').dataset.opcao`.
+    handlerClique({ target: { closest: (sel) => sel === '[data-opcao]' ? { dataset: { opcao: 'Chama Azul' } } : null } });
 
     // Com detalhe pronto (string), abrirDetalheOpcao chama abrirModal
     // SINCRONAMENTE -- sem "Carregando...", sem await. Como já havia um
     // modal aberto (o de Maestria de Magias), este vira sub-modal, e o
     // corpo entra direto no innerHTML criado por abrirModal (utils.js).
     const subModal = criados[criados.length - 1];
-    assert.ok(subModal, 'o "ver detalhes" deveria ter aberto um sub-modal (document.createElement("div"))');
+    assert.ok(subModal, 'o clique no card deveria ter aberto um sub-modal (document.createElement("div"))');
     assert.ok(subModal.innerHTML.includes('Dano de fogo azulado.'),
       'o sub-modal deveria mostrar a descrição real da personalizada, não "Carregando..." nem o aviso de falha');
     assert.ok(!subModal.innerHTML.includes('Não foi possível carregar'),

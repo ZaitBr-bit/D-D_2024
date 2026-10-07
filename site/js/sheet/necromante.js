@@ -8,10 +8,11 @@ import { abrirModal, escHtml, toast } from '../utils.js';
 import { renderFichaCompleta } from './ficha.js';
 import { abrirModalPVCriatura } from './pv-criatura.js';
 import { abrirPopupSobreposto, cardForma, criaturasApendice, fichaTecnica } from './familiar.js';
+import { estadoFamiliar } from '../regras-familiar.js';
 import { gastarEspaco, reservasDeEspacos } from './reservas-espacos.js';
 import {
   MAGIAS_QUE_CRIAM_MORTOS_VIVOS, ajustarPVMortoVivo, colherMortoVivo, dadosDeExtinguir, dispensarMortoVivo, ehMagiaDeNecromancia,
-  avisoLivroNaoEmpunhado, ehNecromante, estadoNecromante, fortalecerMortosVivos, fortitudeMortaViva, golpeDebilitante, livroEmpunhado, nivelDoMago, pvDaColheita, registrarMortoVivo,
+  FORMAS_ESPIRITO, avisoLivroNaoEmpunhado, candidatosVitalidade, curarCandidatoVitalidade, dadosDoEspirito, ehNecromante, pvDoEspirito, registrarEspirito, estadoNecromante, fortalecerMortosVivos, fortitudeMortaViva, golpeDebilitante, livroEmpunhado, nivelDoMago, pvDaColheita, registrarMortoVivo,
   vitalidadeMortaViva,
 } from '../regras-necromante.js';
 
@@ -34,17 +35,21 @@ export function renderSecaoMortosVivos() {
   const golpe = golpeDebilitante(char);
   const linhas = e.mortos_vivos.map((m) => {
     const c = criaturasApendice().find((x) => x.nome === m.nome);
-    const tipo = c ? String(c.tipo_tamanho || '').split(',')[0] : '';
-    const detalhes = c ? [c.deslocamento, c.nd ? `ND ${String(c.nd).split(' ')[0]}` : '', c.sentidos].filter(Boolean).map(escHtml).join(' · ') : '';
+    const esp = m.espirito ? dadosDoEspirito(char, m.espirito.forma, m.espirito.circulo) : null;
+    const tipo = esp ? 'Morto-vivo Médio' : (c ? String(c.tipo_tamanho || '').split(',')[0] : '');
+    const detalhes = esp
+      ? [FORMAS_ESPIRITO[esp.forma].deslocamento, `${esp.ataques} ataque(s): ${esp.acao} ${esp.bonusAtaque >= 0 ? '+' : ''}${esp.bonusAtaque}, ${esp.dano} ${esp.tipoDano}`].map(escHtml).join(' · ')
+      : (c ? [c.deslocamento, c.nd ? `ND ${String(c.nd).split(' ')[0]}` : '', c.sentidos].filter(Boolean).map(escHtml).join(' · ') : '');
+    const temFicha = !!(c || esp);
     return `
-    <div class="opcao-card" data-morto-vivo="${escHtml(m.id)}" data-morto-vivo-ficha="${escHtml(m.id)}" style="padding:8px 10px;margin-bottom:6px;cursor:${c ? 'pointer' : 'default'}" ${c ? 'title="Clique para ver a ficha técnica"' : ''}>
+    <div class="opcao-card" data-morto-vivo="${escHtml(m.id)}" data-morto-vivo-ficha="${escHtml(m.id)}" style="padding:8px 10px;margin-bottom:6px;cursor:${temFicha ? 'pointer' : 'default'}" ${temFicha ? 'title="Clique para ver a ficha técnica"' : ''}>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <strong>${escHtml(m.nome)}</strong>
         ${tipo ? `<span class="badge badge-secondary">${escHtml(tipo)}</span>` : ''}
-        ${c ? `<span class="badge badge-secondary">CA ${escHtml(c.ca)}</span>` : ''}
+        ${c || esp ? `<span class="badge badge-secondary">CA ${escHtml(esp ? esp.ca : c.ca)}</span>` : ''}
         <span class="badge badge-secondary">PV ${m.pv_atual}/${m.pv_max}</span>
         ${m.pv_temporarios ? `<span class="badge badge-secondary">PV temp. ${m.pv_temporarios}</span>` : ''}
-        <span style="font-size:0.72rem;color:var(--text-muted)">${m.dados_de_vida} Dado(s) de Vida</span>
+        ${m.dados_de_vida ? `<span style="font-size:0.72rem;color:var(--text-muted)">${m.dados_de_vida} Dado(s) de Vida</span>` : ''}
       </div>
       ${detalhes ? `<div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px">${detalhes}</div>` : ''}
       ${golpe ? `<div style="font-size:0.75rem;color:var(--text-muted)">Golpe Debilitante: +${golpe} de dano Necrótico por acerto.</div>` : ''}
@@ -124,8 +129,7 @@ export function setupEventosMortosVivos() {
   document.querySelectorAll('[data-morto-vivo-ficha]').forEach((el) => el.addEventListener('click', (ev) => {
     if (ev.target.closest('button, input')) return;
     const m = estadoNecromante(char).mortos_vivos.find((x) => x.id === el.dataset.mortoVivoFicha);
-    const c = m && criaturasApendice().find((x) => x.nome === m.nome);
-    if (c) abrirPopupSobreposto(`Morto-Vivo: ${m.nome}`, `<p style="font-size:0.8rem;color:var(--text-muted)">${escHtml(c.tipo_tamanho || '')}</p>${fichaTecnica(c)}`);
+    if (m) abrirFichaMortoVivo(m);
   }));
   document.querySelectorAll('[data-necromante-acao]').forEach((btn) => btn.addEventListener('click', (ev) => {
     ev.stopPropagation();
@@ -152,6 +156,85 @@ export function setupEventosMortosVivos() {
       renderFichaCompleta();
     }
   }));
+}
+
+/** Popup da ficha de um Morto-Vivo registrado (bloco do apêndice ou do Espírito). */
+function abrirFichaMortoVivo(m) {
+  if (m.espirito) { abrirDetalheEspirito(m); return; }
+  const c = criaturasApendice().find((x) => x.nome === m.nome);
+  if (c) abrirPopupSobreposto(`Morto-Vivo: ${m.nome}`, `<p style="font-size:0.8rem;color:var(--text-muted)">${escHtml(c.tipo_tamanho || '')}</p>${fichaTecnica(c)}`);
+}
+
+/** HTML das estatísticas de uma forma do Espírito no círculo dado (popup do registro e da ficha). */
+function htmlEstatisticasEspirito(forma, circulo, pvTexto) {
+  const d = dadosDoEspirito(char, forma, circulo);
+  const f = FORMAS_ESPIRITO[forma];
+  return `
+    <p style="font-size:0.8rem;color:var(--text-muted)">Morto-vivo Médio, Neutro · espaço de ${d.circulo}º círculo</p>
+    <p><strong>CA</strong> ${d.ca} · <strong>PV</strong> ${pvTexto} · <strong>Deslocamento</strong> ${escHtml(f.deslocamento)}</p>
+    <p><strong>Atributos</strong> For 12 · Des 16 · Con 15 · Int 4 · Sab 10 · Car 9</p>
+    <p><strong>Imunidades</strong> Necrótico, Venenoso; Amedrontado, Envenenado, Exaustão, Paralisado · Visão no Escuro 18 m</p>
+    <p><strong>Ataques Múltiplos.</strong> ${d.ataques} ataque(s) por Ação (metade do círculo, para baixo).</p>
+    <p><strong>${escHtml(d.acao)}.</strong> Ataque ${f.corpoACorpo ? 'corpo a corpo' : 'à distância'} ${d.bonusAtaque >= 0 ? '+' : ''}${d.bonusAtaque} (seu modificador de ataque mágico), alcance ${escHtml(f.alcance)}.
+      Dano: ${escHtml(d.dano)} ${escHtml(d.tipoDano)}${f.extra ? `; ${escHtml(f.extra)}` : ''}.</p>
+    <p>${escHtml(f.traco)}</p>
+    <p style="font-size:0.8rem;color:var(--text-muted)">Aliado seu: usa a sua Iniciativa e age logo depois de você; obedece a comandos verbais (sem ação) ou Esquiva. Desaparece a 0 PV ou quando a magia termina (Concentração, até 1 hora).</p>`;
+}
+
+/**
+ * Popup do Espírito Morto-Vivo registrado: estatísticas na forma e no círculo da conjuração.
+ * @param {object} m Entrada de `mortos_vivos` com `espirito`.
+ */
+function abrirDetalheEspirito(m) {
+  abrirPopupSobreposto(`Espírito Morto-Vivo (${m.espirito.forma})`,
+    htmlEstatisticasEspirito(m.espirito.forma, m.espirito.circulo, `${m.pv_atual}/${m.pv_max}`));
+}
+
+/**
+ * Escolha da forma do Espírito Morto-Vivo ao conjurar Invocar Morto-Vivo: cards com PV
+ * no círculo usado, ataque e deslocamento. Substitui o espírito anterior.
+ * @param {number} circulo Círculo do espaço gasto.
+ */
+export function abrirRegistroEspirito(circulo, aoFim) {
+  let forma = '';
+  const desenhar = () => {
+    const corpo = document.getElementById('registro-espirito');
+    if (!corpo) return;
+    corpo.innerHTML = `<p style="font-size:0.85rem">Espaço de ${circulo}º círculo: o espírito terá CA ${11 + circulo} e ${Math.max(1, Math.floor(circulo / 2))} ataque(s) por Ação.</p>
+      <div class="opcao-grid densa">${Object.keys(FORMAS_ESPIRITO).map((nome) => {
+        const d = dadosDoEspirito(char, nome, circulo);
+        const f = FORMAS_ESPIRITO[nome];
+        return `<div class="opcao-card ${nome === forma ? 'selecionada' : ''}" data-espirito-info="${escHtml(nome)}" style="cursor:pointer" title="Toque no card para ver os detalhes; o círculo seleciona">
+          <span class="opcao-check" data-espirito-forma="${escHtml(nome)}"></span>
+          <div class="opcao-nome">${escHtml(nome)}</div>
+          <div class="opcao-resumo">PV ${pvDoEspirito(nome, circulo) + fortitudeMortaViva(char)} · ${escHtml(f.deslocamento)}</div>
+          <div class="opcao-resumo">${escHtml(d.acao)}: ${escHtml(d.dano)} ${escHtml(d.tipoDano)}</div></div>`;
+      }).join('')}</div>`;
+    const botao = document.getElementById('btn-confirmar-espirito');
+    if (botao) { botao.disabled = !forma; botao.style.opacity = forma ? '' : '0.5'; }
+    corpo.querySelectorAll('[data-espirito-forma]').forEach((el) => el.addEventListener('click', (ev) => { ev.stopPropagation(); forma = el.dataset.espiritoForma; desenhar(); }));
+    corpo.querySelectorAll('[data-espirito-info]').forEach((el) => el.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      const nome = el.dataset.espiritoInfo;
+      abrirPopupSobreposto(`Espírito Morto-Vivo (${nome})`,
+        htmlEstatisticasEspirito(nome, circulo, `${pvDoEspirito(nome, circulo) + fortitudeMortaViva(char)}`),
+        { rotulo: 'Escolher esta forma', aoClicar: () => { forma = nome; desenhar(); } });
+    }));
+  };
+  abrirModal('Espírito Morto-Vivo', '<div id="registro-espirito"></div>',
+    '<button class="btn btn-secondary" id="btn-cancelar-espirito">Agora não</button>'
+    + '<button class="btn btn-primary" id="btn-confirmar-espirito" disabled>Invocar</button>',
+    () => aoFim?.());
+  desenhar();
+  document.getElementById('btn-cancelar-espirito')?.addEventListener('click', () => window.fecharModal());
+  document.getElementById('btn-confirmar-espirito')?.addEventListener('click', () => {
+    if (!forma) return;
+    registrarEspirito(char, forma, circulo);
+    salvar();
+    window.fecharModal();
+    renderFichaCompleta();
+    toast(`Espírito Morto-Vivo (${forma}) registrado.`, 'success');
+  });
 }
 
 /**
@@ -213,7 +296,7 @@ function abrirModalExtinguir() {
   const marcar = () => {
     document.querySelectorAll('[data-extinguir-card]').forEach((el) => el.classList.toggle('selecionada', el.dataset.extinguirCard === escolhido));
     const m = lista.find((x) => x.id === escolhido);
-    if (m) document.getElementById('extinguir-dv').value = m.dados_de_vida;
+    if (m) document.getElementById('extinguir-dv').value = Math.max(1, m.dados_de_vida || 1);
     document.getElementById('extinguir-controlado').checked = !!m;
     document.getElementById('extinguir-controlado').disabled = !!m;
     document.getElementById('extinguir-dv').disabled = !!m;
@@ -263,15 +346,57 @@ export function aposConjurarMagia(nome, { circulo, comEspaco }) {
   const cria = MAGIAS_QUE_CRIAM_MORTOS_VIVOS.includes(nome);
   if (!vitalidade && !cria) return;
   setTimeout(() => {
-    const registrar = () => { if (cria) abrirRegistroMortosVivos(); };
-    if (!vitalidade) { registrar(); return; }
-    abrirModal('Vitalidade Morta-Viva', `
-      <p>Uma criatura Morta-Viva que você veja a até 18 metros recupera <strong>${vitalidade} Pontos de Vida</strong>
-      (círculo ${circulo} + nível de Mago ${nivelDoMago(char)}).</p>
-      <p style="font-size:0.8rem;color:var(--text-muted)">Aplique pelo botão Cura do Morto-Vivo no card Mortos-Vivos.</p>`,
-    '<button class="btn btn-primary" id="btn-fechar-vitalidade">Fechar</button>', registrar);
-    document.getElementById('btn-fechar-vitalidade')?.addEventListener('click', () => window.fecharModal());
+    // Primeiro o registro da criatura criada; a Vitalidade vem depois, para o
+    // recém-criado já poder ser alvo de outra cura.
+    const aoFim = vitalidade ? () => oferecerVitalidade(vitalidade, circulo) : undefined;
+    if (nome === 'Invocar Morto-Vivo') abrirRegistroEspirito(circulo, aoFim);
+    else if (cria) abrirRegistroMortosVivos(aoFim);
+    else aoFim?.();
   }, 0);
+}
+
+/**
+ * Vitalidade Morta-Viva: lista os Mortos-Vivos feridos (registrados e familiar) com um
+ * botão para curar cada um; sem nenhum candidato, só um aviso rápido.
+ * @param {number} pv PV da cura (círculo do espaço + nível de Mago).
+ * @param {number} circulo Círculo do espaço gasto.
+ */
+function oferecerVitalidade(pv, circulo) {
+  const candidatos = candidatosVitalidade(char);
+  if (!candidatos.length) {
+    toast(`Vitalidade Morta-Viva: ${pv} PV para um Morto-Vivo (nenhum ferido registrado).`, 'info');
+    return;
+  }
+  const mortoDe = (c) => estadoNecromante(char).mortos_vivos.find((m) => m.id === c.id);
+  abrirModal('Vitalidade Morta-Viva', `
+    <p>Uma criatura Morta-Viva que você veja a até 18 metros recupera <strong>${pv} PV</strong>
+      (círculo ${circulo} + nível de Mago ${nivelDoMago(char)}). Escolha quem cura ou não use.</p>
+    <div class="opcao-grid densa">${candidatos.map((c, i) => `
+      <div class="opcao-card" data-vitalidade-ficha="${i}" style="cursor:pointer" title="Toque no card para ver a ficha">
+        <div class="opcao-nome">${escHtml(c.nome)}</div>
+        <div class="opcao-resumo">PV ${c.pv_atual}/${c.pv_max} → ${Math.min(c.pv_max, c.pv_atual + pv)}</div>
+        <button class="btn btn-sm btn-success" data-vitalidade-acao="curar" data-i="${i}" style="margin-top:6px">Curar +${Math.min(pv, c.pv_max - c.pv_atual)}</button>
+      </div>`).join('')}</div>`,
+  '<button class="btn btn-secondary" id="btn-fechar-vitalidade">Não usar</button>');
+  document.getElementById('btn-fechar-vitalidade')?.addEventListener('click', () => window.fecharModal());
+  document.querySelectorAll('[data-vitalidade-ficha]').forEach((el) => el.addEventListener('click', (ev) => {
+    if (ev.target.closest('button')) return;
+    const c = candidatos[Number(el.dataset.vitalidadeFicha)];
+    if (c.tipo === 'familiar') {
+      const f = estadoFamiliar(char);
+      const criatura = criaturasApendice().find((x) => x.nome === f?.forma);
+      if (criatura) abrirPopupSobreposto(`Familiar: ${f.forma}`, fichaTecnica(criatura));
+    } else if (mortoDe(c)) abrirFichaMortoVivo(mortoDe(c));
+  }));
+  document.querySelectorAll('[data-vitalidade-acao="curar"]').forEach((btn) => btn.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    const c = candidatos[Number(btn.dataset.i)];
+    const curado = curarCandidatoVitalidade(char, c, pv);
+    salvar();
+    window.fecharModal();
+    renderFichaCompleta();
+    toast(`Vitalidade Morta-Viva: ${c.nome} recuperou ${curado} PV.`, 'success');
+  }));
 }
 
 /**

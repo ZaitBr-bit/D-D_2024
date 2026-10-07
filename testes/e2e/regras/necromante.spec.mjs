@@ -55,11 +55,13 @@ test('magia de Necromancia do livro: conjura na ficha e dá a Vitalidade Morta-V
   const { page, erros } = await abrirFicha(context, MAGO_NECRO(9, {
     grimorio: [{ nome: 'Enervação', circulo: 5 }],
     magias_preparadas: [{ nome: 'Enervação', circulo: 5, classe: 'Mago' }],
+    recursos: { mago: { subclasses: { necromante: { mortos_vivos: [
+      { id: 'mv1', nome: 'Zumbi', pv_max: 30, pv_atual: 4, pv_temporarios: 0, dados_de_vida: 2 }] } } } },
   }), 'necro-magia-livro');
   await assentar(page).catch(() => {});
   await abrirTudo(page);
   await clicarSeletorFicha(page, '[data-conjurar="Enervação"]', { esperar: '#btn-fechar-vitalidade' });
-  await expect(page.locator('#modal-corpo')).toContainText('14 Pontos de Vida');
+  await expect(page.locator('#modal-corpo')).toContainText('14 PV');
   await page.locator('#btn-fechar-vitalidade').click();
   expect(Number((await personagemSalvo(page)).espacos_magia?.conjuracao?.[5] || 0), 'gastou o espaço de 5º círculo').toBe(1);
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
@@ -106,23 +108,32 @@ test('Vitalidade Morta-Viva e registro após Animar Mortos', async ({ context })
       { nome: 'Toque Vampírico', circulo: 3, classe: 'Mago' },
       { nome: 'Animar Mortos', circulo: 3, classe: 'Mago', origem: 'subclasse', gratis_usado: false },
     ],
+    recursos: { mago: { subclasses: { necromante: { mortos_vivos: [
+      { id: 'mv1', nome: 'Zumbi', pv_max: 30, pv_atual: 5, pv_temporarios: 0, dados_de_vida: 2 }] } } } },
   }), 'necro-vitalidade');
   await assentar(page).catch(() => {});
   await abrirTudo(page);
 
   // Magia de Necromancia com espaço (3º círculo): informa 3 + nível 6 = 9 PV.
   await clicarSeletorFicha(page, '[data-conjurar="Toque Vampírico"]', { esperar: '#btn-fechar-vitalidade' });
-  await expect(page.locator('#btn-fechar-vitalidade'), 'o modal de Vitalidade abre depois da conjuração').toBeVisible();
-  await expect(page.locator('#modal-corpo')).toContainText('9 Pontos de Vida');
-  await page.locator('#btn-fechar-vitalidade').click();
+  await expect(page.locator('#btn-fechar-vitalidade'), 'o modal de Vitalidade abre quando há Morto-Vivo ferido').toBeVisible();
+  await expect(page.locator('#modal-corpo')).toContainText('9 PV');
+  // O card do Morto-Vivo abre a ficha; o botão cura sem abrir a ficha.
+  await page.locator('[data-vitalidade-ficha="0"] .opcao-nome').click();
+  await expect(page.locator('#familiar-popup-sobreposto, #familiar-popup-sobreposicao')).toContainText('Zumbi');
+  await page.locator('#btn-fechar-familiar-popup').click();
+  await page.locator('[data-vitalidade-acao="curar"]').click();
+  await assentar(page).catch(() => {});
+  const curado = (await personagemSalvo(page)).recursos.mago.subclasses.necromante.mortos_vivos[0];
+  expect(curado.pv_atual, '5 + 9 de Vitalidade').toBe(14);
 
   // Animar Mortos de graça (Servos Mortos-Vivos): sem espaço, sem Vitalidade, mas oferece o registro.
   await abrirTudo(page);
   await clicarSeletorFicha(page, '[data-conjurar-gratis="Animar Mortos"]', { esperar: '#btn-confirmar-registro-mortos-vivos' });
-  await expect(page.locator('#btn-fechar-vitalidade')).toHaveCount(0);
+  await expect(page.locator('[data-vitalidade-acao="curar"]'), 'sem espaço gasto não há Vitalidade').toHaveCount(0);
   await page.locator('#btn-cancelar-registro-mortos-vivos').click();
   await expect(page.locator('#btn-confirmar-registro-mortos-vivos')).toBeHidden();
-  expect((await personagemSalvo(page)).recursos?.mago?.subclasses?.necromante?.mortos_vivos ?? []).toHaveLength(0);
+  expect((await personagemSalvo(page)).recursos?.mago?.subclasses?.necromante?.mortos_vivos ?? []).toHaveLength(1); // só o Zumbi do cenário; o cancelamento não registrou nada novo
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
 
@@ -290,5 +301,73 @@ test('Mortos-Vivos: registrar com Fortitude, mexer nos PV pelo modal e dispensar
   await card.locator('[data-morto-vivo]').first().locator('[data-necromante-acao="dispensar"]').click();
   await assentar(page).catch(() => {});
   await expect(card.locator('[data-morto-vivo]')).toHaveCount(1);
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});
+
+test('Invocar Morto-Vivo: escolhe a forma do Espírito, registra com PV do círculo e mantém o familiar e os outros', async ({ context }) => {
+  const { page, erros } = await abrirFicha(context, MAGO_NECRO(6, {
+    grimorio: [{ nome: 'Invocar Morto-Vivo', circulo: 3 }, { nome: 'Convocar Familiar', circulo: 1 }],
+    magias_preparadas: [{ nome: 'Invocar Morto-Vivo', circulo: 3, classe: 'Mago' }],
+    recursos: { familiar: { forma: 'Esqueleto', tipo: '', especial: true, pv_max: 13, pv_atual: 13, situacao: 'ativo', origem: '' },
+      mago: { subclasses: { necromante: { mortos_vivos: [{ id: 'mv1', nome: 'Zumbi', pv_max: 15, pv_atual: 5, pv_temporarios: 0, dados_de_vida: 2 }] } } } },
+  }), 'necro-espirito');
+  await assentar(page).catch(() => {});
+  await abrirTudo(page);
+  await clicarSeletorFicha(page, '[data-conjurar="Invocar Morto-Vivo"]', { esperar: '#btn-confirmar-espirito' });
+  await expect(page.locator('[data-espirito-forma]')).toHaveCount(3);
+  // Cada card abre os detalhes da forma e o popup oferece escolher.
+  await page.locator('[data-espirito-info="Fantasmagórico"]').click();
+  await expect(page.locator('#familiar-popup-sobreposicao')).toContainText('Passagem Incorpórea');
+  await page.locator('#btn-fechar-familiar-popup').click();
+  await page.locator('[data-espirito-info="Pútrido"]').click();
+  await page.locator('#btn-escolher-familiar-popup').click();
+  await expect(page.locator('[data-espirito-info="Pútrido"]')).toHaveClass(/selecionada/);
+  await page.locator('#btn-confirmar-espirito').click();
+  // Depois do espírito, a Vitalidade oferece curar o Zumbi ferido (5 + 8 = 13).
+  await expect(page.locator('[data-vitalidade-acao="curar"]')).toBeVisible();
+  await page.locator('[data-vitalidade-acao="curar"]').click();
+  await assentar(page).catch(() => {});
+  const card = page.locator('#card-mortos-vivos');
+  const espirito = card.locator('[data-morto-vivo]', { hasText: 'Espírito Morto-Vivo (Pútrido)' });
+  await expect(espirito).toContainText('PV 36/36');
+  await expect(espirito).toContainText('CA 14');
+  await expect(espirito).toContainText('Garra Podre');
+  await expect(card.locator('[data-morto-vivo]')).toHaveCount(2);
+  await espirito.locator('strong').click();
+  await expect(page.locator('#familiar-popup-sobreposicao')).toContainText('1d6 + 3 + 3');
+  await page.locator('#btn-fechar-familiar-popup').click();
+  const salvo = await personagemSalvo(page);
+  expect(salvo.recursos.familiar.forma, 'o familiar do Convocar Familiar continua').toBe('Esqueleto');
+  expect(salvo.recursos.mago.subclasses.necromante.mortos_vivos.map((m) => m.nome)).toContain('Zumbi');
+  expect(salvo.recursos.mago.subclasses.necromante.mortos_vivos.find((m) => m.nome === 'Zumbi').pv_atual, 'Vitalidade: 5 + (3 + nível 6 = 9) limitado a 15').toBe(14);
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});
+
+test('Invocar Morto-Vivo: "Agora não" fecha a escolha sem registrar nenhum espírito', async ({ context }) => {
+  const { page, erros } = await abrirFicha(context, MAGO_NECRO(6, {
+    grimorio: [{ nome: 'Invocar Morto-Vivo', circulo: 3 }],
+    magias_preparadas: [{ nome: 'Invocar Morto-Vivo', circulo: 3, classe: 'Mago' }],
+  }), 'necro-espirito-cancelar');
+  await assentar(page).catch(() => {});
+  await abrirTudo(page);
+  await clicarSeletorFicha(page, '[data-conjurar="Invocar Morto-Vivo"]', { esperar: '#btn-confirmar-espirito' });
+  await expect(page.locator('#btn-confirmar-espirito')).toBeDisabled();
+  await page.locator('#btn-cancelar-espirito').click();
+  await expect(page.locator('#btn-confirmar-espirito')).toBeHidden();
+  const salvo = await personagemSalvo(page);
+  expect(salvo.recursos?.mago?.subclasses?.necromante?.mortos_vivos ?? []).toHaveLength(0);
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});
+
+test('Vitalidade Morta-Viva sem Morto-Vivo ferido: só um aviso rápido, sem modal', async ({ context }) => {
+  const { page, erros } = await abrirFicha(context, MAGO_NECRO(9, {
+    grimorio: [{ nome: 'Enervação', circulo: 5 }],
+    magias_preparadas: [{ nome: 'Enervação', circulo: 5, classe: 'Mago' }],
+  }), 'necro-vitalidade-sem-candidato');
+  await assentar(page).catch(() => {});
+  await abrirTudo(page);
+  await clicarSeletorFicha(page, '[data-conjurar="Enervação"]');
+  await expect(page.locator('#toast-container')).toContainText('nenhum ferido registrado');
+  await expect(page.locator('#btn-fechar-vitalidade')).toHaveCount(0);
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });

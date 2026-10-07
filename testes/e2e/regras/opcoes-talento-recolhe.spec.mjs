@@ -42,7 +42,7 @@ test('lista de talentos da subida de nível recolhe ao escolher e deixa a escolh
 
   // Atleta exige escolher o atributo (Força ou Destreza) -- é justamente o
   // caso do relato.
-  await page.locator('#levelup-talento-lista .opcao-card[data-opcao="Atleta"]').click();
+  await page.locator('#levelup-talento-lista .opcao-card[data-opcao="Atleta"] .opcao-check').click();
   await page.waitForTimeout(500);
 
   const depois = await page.evaluate(() => {
@@ -101,7 +101,7 @@ test('lista de talentos da subida de nível recolhe ao escolher e deixa a escolh
 // vazamento -- clicar em "ver detalhes" numa lista recém-montada passava
 // mesmo com o bug presente.
 // ============================================================
-test('ver detalhes abre UM popup só, mesmo depois de recolher e reabrir a lista', async ({ context }) => {
+test('o clique no card abre UM popup só, mesmo depois de recolher e reabrir a lista', async ({ context }) => {
   const { page, erros } = await abrirFicha(context, {
     classe: 'Guerreiro', nivel: 3, xp: 2700,
     atributos: { forca: 15, destreza: 14, constituicao: 14, inteligencia: 13, sabedoria: 12, carisma: 13 },
@@ -113,24 +113,24 @@ test('ver detalhes abre UM popup só, mesmo depois de recolher e reabrir a lista
   await page.waitForSelector('#levelup-talento-lista .opcao-card', { state: 'visible', timeout: 10_000 });
 
   // Escolher recolhe (2ª montagem) e "trocar talento" reabre (3ª montagem).
-  await page.locator('#levelup-talento-lista .opcao-card[data-opcao="Alerta"]').click();
+  await page.locator('#levelup-talento-lista .opcao-card[data-opcao="Alerta"] .opcao-check').click();
   await page.waitForTimeout(400);
   await page.locator('#levelup-talento-lista [data-trocar-talento]').click();
   await page.waitForTimeout(400);
 
-  await page.locator('#levelup-talento-lista .opcao-card[data-opcao="Atleta"] [data-ver]').click();
+  await page.locator('#levelup-talento-lista .opcao-card[data-opcao="Atleta"] .opcao-nome').click();
   await page.waitForTimeout(800);
 
   const popups = await page.evaluate(() => [...document.querySelectorAll('.sub-modal-overlay')]
     .map(m => m.querySelector('.modal-titulo, h3, h2')?.textContent?.trim() || ''));
-  expect(popups, 'um clique em "ver detalhes" abriu mais de um popup -- ' +
+  expect(popups, 'um clique no card abriu mais de um popup -- ' +
     'handler de clique acumulado no container a cada remontagem de montarSeletor')
     .toEqual(['Atleta']);
 
   // O mesmo vazamento fazia um clique no card marcar e desmarcar de uma vez.
   await page.locator('.sub-modal-overlay .modal-fechar, .sub-modal-overlay [onclick*="fechar"]').first().click().catch(() => {});
   await page.waitForTimeout(400);
-  await page.locator('#levelup-talento-lista .opcao-card[data-opcao="Atleta"]').click();
+  await page.locator('#levelup-talento-lista .opcao-card[data-opcao="Atleta"] .opcao-check').click();
   await page.waitForTimeout(400);
   const marcados = await page.evaluate(() =>
     [...document.querySelectorAll('#levelup-talento-lista .opcao-card.selecionada')].map(c => c.dataset.opcao));

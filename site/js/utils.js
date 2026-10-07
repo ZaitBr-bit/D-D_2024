@@ -506,6 +506,16 @@ export function calcCA(personagem, passivos = null) {
     ca = caBaseItens;
   }
 
+  // Efeito mágico de CA BASE (Armadura Arcana = 13 + Des): troca a base, e por
+  // isso entra ANTES do escudo e dos bônus. Depois deles, o "maior entre" jogava
+  // fora o escudo e o bônus de item (Manto de Proteção).
+  for (const ef of personagem.efeitos_magicos || []) {
+    if (ef.tipo_efeito === 'base') {
+      const caBase = (ef.valor || 13) + modDes;
+      if (caBase > ca) ca = caBase;
+    }
+  }
+
   // Escudo: +2
   if (escudo) {
     ca += 2;
@@ -533,10 +543,6 @@ export function calcCA(personagem, passivos = null) {
   for (const ef of efeitos) {
     if (ef.tipo_efeito === 'bonus') {
       ca += ef.valor || 0;
-    } else if (ef.tipo_efeito === 'base') {
-      // CA base substitui (ex: Armadura Arcana = 13 + Des)
-      const caBase = (ef.valor || 13) + modDes;
-      if (caBase > ca) ca = caBase;
     } else if (ef.tipo_efeito === 'minimo') {
       // CA mínima (ex: Pele-Casca = mín 17)
       if ((ef.valor || 0) > ca) ca = ef.valor;

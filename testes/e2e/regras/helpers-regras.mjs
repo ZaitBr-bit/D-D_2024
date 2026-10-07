@@ -376,5 +376,5 @@ export async function abrirIdentidade(page) {
 
 /** Linha "espécie, classes e nível" do cabeçalho (dentro do bloco de detalhes). */
 export function linhaClassesDaFicha(page) {
-  return page.locator('#card-identidade details > div > div').first();
+  return page.locator('#card-identidade details > div > div:not(.no-print)').first();
 }

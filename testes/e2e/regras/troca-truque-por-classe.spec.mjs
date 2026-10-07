@@ -68,12 +68,12 @@ test('Mago 3/Clérigo 3: Trocar Truque na aba do Clérigo não oferece o truque 
     .toHaveCount(0);
   const cardSaindo = page.locator('#troca-truque-remover-lista .opcao-card[data-opcao="Chama Sagrada"]');
   await expect(cardSaindo, '"Chama Sagrada" (Clérigo) tem de aparecer como candidata a sair').toBeVisible({ timeout: 5000 });
-  await cardSaindo.click();
+  await cardSaindo.locator('.opcao-check').click();
   await assentar(page).catch(() => {});
 
   const cardEntrando = page.locator('#troca-truque-adicionar-lista .opcao-card[data-opcao="Orientação"]');
   await cardEntrando.waitFor({ state: 'visible', timeout: 5000 });
-  await cardEntrando.click();
+  await cardEntrando.locator('.opcao-check').click();
   await clicarBotaoFicha(page, 'btn-confirmar-troca-truque');
   await assentar(page).catch(() => {});
 
@@ -184,9 +184,9 @@ test('Mago 3/Clérigo 4 sobe de nível no Clérigo: o card "Trocar Truques" não
     .toHaveCount(0);
   const cardSaindo = cardTroca.locator('.opcao-card[data-opcao="Chama Sagrada"]');
   await expect(cardSaindo, '"Chama Sagrada" (Clérigo) tem de aparecer como candidata a sair').toBeVisible({ timeout: 5000 });
-  await cardSaindo.click();
+  await cardSaindo.locator('.opcao-check').click();
   await assentar(page).catch(() => {});
-  await cardTroca.locator('.opcao-card[data-opcao="Orientação"]').click();
+  await cardTroca.locator('.opcao-card[data-opcao="Orientação"] .opcao-check').click();
   await assentar(page).catch(() => {});
 
   // Conclui a subida de nível -- mesma disciplina de levelup-trocas-multiplas.spec.mjs.

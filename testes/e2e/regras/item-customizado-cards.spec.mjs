@@ -25,7 +25,7 @@ test('cards de propriedade e maestria mostram a descrição e gravam a escolha',
   await page.click('#ic-prop-add');
   await expect(page.locator('.sub-modal-overlay #ic-prop-cards [data-opcao]')).toHaveCount(11);
   await expect(page.locator('#ic-prop-cards [data-opcao="Versátil"]')).toContainText('duas mãos');
-  await page.click('#ic-prop-cards [data-opcao="Versátil"]');
+  await page.click('#ic-prop-cards [data-opcao="Versátil"] .opcao-check');
   await page.click('#ic-prop-confirmar');
   await expect(page.locator('#ic-props-lista [data-ic-prop]')).toHaveCount(1);
   // Confirmar fecha o popup; ao reabrir, os cards voltam sem marcação.
@@ -38,7 +38,7 @@ test('cards de propriedade e maestria mostram a descrição e gravam a escolha',
   await page.click('#ic-maestria-btn');
   await expect(page.locator('.sub-modal-overlay #ic-maestria-cards [data-opcao]')).toHaveCount(9);
   await expect(page.locator('#ic-maestria-cards [data-opcao="Derrubar"]')).toContainText(/\S+/);
-  await page.click('#ic-maestria-cards [data-opcao="Trespassar"]');
+  await page.click('#ic-maestria-cards [data-opcao="Trespassar"] .opcao-check');
   // Escolher fecha o popup, atualiza o botão e o campo oculto.
   await expect(page.locator('.sub-modal-overlay')).toHaveCount(0);
   await expect(page.locator('#ic-maestria-atual')).toHaveText('Trespassar');
@@ -56,12 +56,12 @@ test('card marcado de novo desmarca: maestria volta a vazio; propriedade sem car
   await abrirFormulario(page, 'Espada X');
   await page.selectOption('#ic-categoria', 'Armas Marciais Corpo a Corpo');
   await page.click('#ic-maestria-btn');
-  await page.click('#ic-maestria-cards [data-opcao="Ágil"]');
+  await page.click('#ic-maestria-cards [data-opcao="Ágil"] .opcao-check');
   await expect(page.locator('#ic-maestria-atual')).toHaveText('Ágil');
   // Reabre com Ágil marcada; clicar de novo desmarca e volta para Nenhuma.
   await page.click('#ic-maestria-btn');
   await expect(page.locator('#ic-maestria-cards [data-opcao="Ágil"]')).toHaveClass(/selecionada/);
-  await page.click('#ic-maestria-cards [data-opcao="Ágil"]');
+  await page.click('#ic-maestria-cards [data-opcao="Ágil"] .opcao-check');
   await expect(page.locator('#ic-maestria-atual')).toHaveText('Nenhuma');
   await expect(page.locator('#ic-maestria')).toHaveValue('');
   await page.click('#ic-prop-add');
@@ -114,7 +114,7 @@ test('maestria escolhida e depois a categoria trocada para Equipamento grava mae
   await abrirFormulario(page, 'Adaga X');
   await page.selectOption('#ic-categoria', 'Armas Simples Corpo a Corpo');
   await page.click('#ic-maestria-btn');
-  await page.click('#ic-maestria-cards [data-opcao="Afligir"]');
+  await page.click('#ic-maestria-cards [data-opcao="Afligir"] .opcao-check');
   await page.selectOption('#ic-categoria', 'Equipamento');
   await page.click('#btn-add-ic');
   await assentar(page).catch(() => {});
@@ -131,7 +131,7 @@ test('trocar a categoria mantém o card marcado quando a opção continua válid
     await expect(page.locator('.sub-modal-overlay')).toHaveCount(0);
   };
   await page.click('#ic-prop-add');
-  await page.click('#ic-prop-cards [data-opcao="Personalizada…"], #ic-prop-cards [data-opcao="__personalizada__"]');
+  await page.click('#ic-prop-cards [data-opcao="Personalizada…"], #ic-prop-cards [data-opcao="__personalizada__"] .opcao-check');
   await expect(page.locator('#ic-prop-cards [data-opcao="__personalizada__"]')).toHaveClass(/selecionada/);
   await fecharPopup();
   // "Personalizada" existe em toda categoria: continua marcada e mantém o painel de nome e descrição.
@@ -143,7 +143,7 @@ test('trocar a categoria mantém o card marcado quando a opção continua válid
   // Propriedade do livro (só arma) some ao trocar para categoria que não é arma.
   await page.selectOption('#ic-categoria', 'Armas Simples Corpo a Corpo');
   await page.click('#ic-prop-add');
-  await page.click('#ic-prop-cards [data-opcao="Versátil"]');
+  await page.click('#ic-prop-cards [data-opcao="Versátil"] .opcao-check');
   await expect(page.locator('#ic-prop-cards [data-opcao="Versátil"]')).toHaveClass(/selecionada/);
   await fecharPopup();
   await page.selectOption('#ic-categoria', 'Armas Marciais Corpo a Corpo');

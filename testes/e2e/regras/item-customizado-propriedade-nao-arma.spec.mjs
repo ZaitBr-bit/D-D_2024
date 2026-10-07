@@ -16,7 +16,7 @@ async function criarItemComPropriedade(page, nome, categoria) {
   await page.fill('#ic-nome', nome);
   if (categoria) await page.selectOption('#ic-categoria', categoria);
   await page.click('#ic-prop-add');
-  await page.click('#ic-prop-cards [data-opcao="__personalizada__"]');
+  await page.click('#ic-prop-cards [data-opcao="__personalizada__"] .opcao-check');
   await page.fill('#ic-prop-nome', 'Ressonante');
   await page.fill('#ic-prop-desc', 'Vibra quando há magia por perto.');
   await page.click('#ic-prop-confirmar');

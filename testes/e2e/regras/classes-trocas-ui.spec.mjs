@@ -98,7 +98,7 @@ test('level-up: troca de Estilo de Luta do Guerreiro funciona de ponta a ponta n
     'se continuar oculto, o listener de montarTroca não ligou').toBeVisible();
 
   // Escolhe "Duelismo" na grade do passo 2.
-  await passoEntra.locator('.opcao-card[data-opcao="Duelismo"]').click();
+  await passoEntra.locator('.opcao-card[data-opcao="Duelismo"] .opcao-check').click();
 
   await page.locator('#btn-confirmar-levelup').click();
   await page.waitForTimeout(600);

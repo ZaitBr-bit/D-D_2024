@@ -13,13 +13,46 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.3.0';
+export const VERSAO_ATUAL = '3.3.1';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.3.1',
+    data: '2026-10-07',
+    rotulo: 'Correções',
+    resumo: 'CA com Armadura Arcana, busca de itens, Invocar Morto-Vivo '
+      + 'completo e cards que abrem os detalhes fora do círculo.',
+    melhorias: [
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'CA: a Armadura Arcana trocava a CA inteira e fazia sumir o bônus '
+            + 'do Manto de Proteção e o +2 do escudo. Agora ela só troca a '
+            + 'base e os bônus somam por cima.',
+          'Invocar Morto-Vivo agora cria o Espírito Morto-Vivo de verdade: '
+            + 'escolha da forma (Esquelético, Fantasmagórico ou Pútrido), PV '
+            + 'e CA pelo círculo usado, ataques e ficha em popup.',
+        ],
+      },
+      {
+        grupo: '✨ Melhorias',
+        itens: [
+          'Busca de itens: aceita palavras em qualquer ordem, ignora '
+            + '"de/da/do" e acha também pelo nome em inglês, em um bloco '
+            + 'separado depois dos resultados em português. Item achado por '
+            + 'variante mostra a variante e só a raridade dela.',
+          'Vitalidade Morta-Viva: lista os Mortos-Vivos feridos (e o '
+            + 'familiar Morto-Vivo) com botão para curar, em vez de só avisar.',
+          'Cards de escolha: o círculo seleciona e tocar no resto do card '
+            + 'abre os detalhes; o link "ver detalhes" saiu.',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.3.0',
     data: '2026-10-07',

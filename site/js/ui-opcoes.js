@@ -127,6 +127,7 @@ function cardOpcaoHtml(o, { sel = false, cheio = false, selecionavel = true } = 
   return `
     <div class="opcao-card ${sel ? 'selecionada' : ''} ${o.bloqueado ? 'bloqueada' : ''}"
          ${selecionavel ? `data-opcao="${escHtml(o.id)}"` : ''} ${cheio ? 'data-cheio="1"' : ''}
+         ${o.detalhe && !o.bloqueado ? 'data-com-detalhe="1" title="Toque no card para ver os detalhes; o círculo seleciona"' : ''}
          style="${cheio ? 'opacity:0.5;cursor:not-allowed' : ''}">
       ${o.bloqueado ? '' : '<span class="opcao-check"></span>'}
       <div class="opcao-nome">
@@ -136,9 +137,6 @@ function cardOpcaoHtml(o, { sel = false, cheio = false, selecionavel = true } = 
       ${o.bloqueado
         ? `<div class="opcao-motivo">${escHtml(o.bloqueado.motivo)}</div>`
         : (o.resumo ? `<div class="opcao-resumo">${escHtml(o.resumo)}</div>` : '')}
-      ${o.detalhe && !o.bloqueado
-        ? `<div class="opcao-ver" data-ver="${escHtml(o.id)}">&#8964; ver detalhes</div>`
-        : ''}
     </div>`;
 }
 
@@ -246,15 +244,19 @@ export function montarSeletor(el, cfg) {
     ligarSelosFonte(listaEl);
   };
 
-  // Um clique no card marca/desmarca; no "ver detalhes", abre o popup.
+  // O círculo do card marca/desmarca; um clique no resto do card abre o popup com os
+  // detalhes (sem detalhe, o card inteiro marca).
   ligarClique(el, (ev) => {
-    const ver = ev.target.closest('[data-ver]');
-    if (ver) {
-      // Popup em vez de expansao embutida: expandir empurrava a lista
-      // inteira para baixo, atrapalhando quem esta comparando opcoes.
-      // Nao mexe em `estado` nem chama `aoMudar` -- ler nao e escolher.
-      abrirDetalheOpcao(opcoes.find(o => o.id === ver.dataset.ver));
-      return;
+    const cardClicado = ev.target.closest('[data-opcao]');
+    if (cardClicado && !ev.target.closest('.opcao-check')) {
+      const opcaoClicada = opcoes.find(o => o.id === cardClicado.dataset.opcao);
+      if (opcaoClicada?.detalhe && !opcaoClicada.bloqueado) {
+        // Popup em vez de expansao embutida: expandir empurrava a lista
+        // inteira para baixo, atrapalhando quem esta comparando opcoes.
+        // Nao mexe em `estado` nem chama `aoMudar` -- ler nao e escolher.
+        abrirDetalheOpcao(opcaoClicada);
+        return;
+      }
     }
     const revelar = ev.target.closest('[data-revelar]');
     if (revelar) { estado.gruposRevelados.add(revelar.dataset.revelar); desenhar(); return; }
@@ -483,7 +485,7 @@ export function montarTroca(el, cfg) {
     // apresentação, não seleção: abre o popup e não mexe em `estado` nem
     // chama `cfg.aoMudar`. O passo 2 tem o seu próprio montarSeletor, que
     // trata o "ver detalhes" dos cards dele.
-    if (opcaoUnica && ev.target.closest('[data-ver]')) {
+    if (opcaoUnica && opcaoUnica.detalhe && ev.target.closest('#troca-sai-lista .opcao-card')) {
       abrirDetalheOpcao(opcaoUnica);
     }
   });

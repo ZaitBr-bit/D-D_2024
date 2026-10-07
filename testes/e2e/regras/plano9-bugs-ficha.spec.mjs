@@ -16,7 +16,7 @@ async function adicionarAumentoCon(page) {
   await page.waitForSelector('#add-talento-lista', { state: 'visible', timeout: 5000 });
   const card = page.locator('#add-talento-lista .opcao-card[data-opcao="Aumento no Valor de Atributo"]');
   await card.waitFor({ state: 'visible', timeout: 5000 });
-  await card.click();
+  await card.locator('.opcao-check').click();
   await page.click('#btn-confirmar-add-talento');
   await page.waitForSelector('#levelup-talento-attr-constituicao', { state: 'visible', timeout: 5000 });
   await page.selectOption('#levelup-talento-attr-constituicao', '2');

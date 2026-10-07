@@ -113,3 +113,51 @@ test('fortalecer sem Mortos-Vivos não gasta o uso', () => {
   assert.equal(N.fortalecerMortosVivos(p), 0);
   assert.equal(N.estadoNecromante(p).fortalecer_usado, false);
 });
+
+test('Espírito Morto-Vivo: PV por forma e círculo, CA, ataques e bônus', () => {
+  assert.equal(N.pvDoEspirito('Esquelético', 3), 20);
+  assert.equal(N.pvDoEspirito('Pútrido', 3), 30);
+  assert.equal(N.pvDoEspirito('Fantasmagórico', 5), 30 + 20, '+10 por círculo acima do 3º');
+  const p = necro(6);
+  const d = N.dadosDoEspirito(p, 'Pútrido', 5);
+  assert.equal(d.ca, 16, 'CA 11 + círculo');
+  assert.equal(d.ataques, 2, 'metade do círculo, para baixo');
+  assert.equal(N.dadosDoEspirito(p, 'Pútrido', 3).ataques, 1);
+  assert.equal(d.bonusAtaque, 3 + 3, 'Int +3 e bônus de proficiência +3 no nível 6');
+  assert.equal(d.dano, '1d6 + 3 + 5');
+  assert.equal(N.dadosDoEspirito(p, 'Esquelético', 4).dano, '2d4 + 3 + 4');
+});
+
+test('registrar o Espírito: Fortitude a partir do nível 6, um só espírito por vez, sem Dados de Vida', () => {
+  const p = necro(6);
+  const a = N.registrarEspirito(p, 'Pútrido', 3);
+  assert.equal(a.pv_max, 30 + 6, 'PV do bloco + Fortitude Morta-Viva');
+  assert.equal(a.dados_de_vida, 0);
+  assert.equal(a.espirito.forma, 'Pútrido');
+  N.registrarMortoVivo(p, esqueleto, { quantidade: 1 });
+  const b = N.registrarEspirito(p, 'Esquelético', 4);
+  const lista = N.estadoNecromante(p).mortos_vivos;
+  assert.equal(lista.filter((m) => m.espirito).length, 1, 'o espírito anterior some');
+  assert.equal(lista.length, 2, 'o Esqueleto de Animar Mortos fica');
+  assert.equal(b.pv_max, 20 + 10 + 6);
+  assert.equal(N.registrarEspirito(necro(3), 'Esquelético', 3).pv_max, 20, 'sem Fortitude abaixo do nível 6');
+  assert.equal(N.registrarEspirito(p, 'Inexistente', 3), null);
+});
+
+test('Vitalidade: candidatos são os Mortos-Vivos feridos e o familiar Morto-Vivo, e a cura respeita o máximo', () => {
+  const p = necro(6);
+  assert.deepEqual(N.candidatosVitalidade(p), [], 'sem nenhum Morto-Vivo, ninguém para curar');
+  const [cheio, ferido] = N.registrarMortoVivo(p, esqueleto, { quantidade: 2 });
+  N.ajustarPVMortoVivo(p, ferido.id, -10);
+  let c = N.candidatosVitalidade(p);
+  assert.deepEqual(c.map((x) => x.id), [ferido.id], 'o de PV cheio não entra');
+  p.recursos.familiar = { forma: 'Zumbi', tipo: '', especial: true, pv_max: 15, pv_atual: 6, situacao: 'ativo', origem: '' };
+  c = N.candidatosVitalidade(p);
+  assert.deepEqual(c.map((x) => x.tipo), ['morto', 'familiar']);
+  assert.equal(N.curarCandidatoVitalidade(p, c[0], 99), 10, 'só recupera o que falta');
+  assert.equal(N.curarCandidatoVitalidade(p, c[1], 4), 4);
+  assert.equal(p.recursos.familiar.pv_atual, 10);
+  p.recursos.familiar.tipo = 'Feérico'; p.recursos.familiar.especial = false; p.recursos.familiar.forma = 'Gato';
+  assert.deepEqual(N.candidatosVitalidade(p), [], 'familiar que não é Morto-Vivo não entra');
+  assert.equal(cheio.pv_atual, cheio.pv_max);
+});

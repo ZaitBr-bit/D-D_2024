@@ -69,7 +69,7 @@ test('Alquimista: criar elixir gastando espaço; Descanso Longo troca os elixire
   const { page, erros } = await abrirFicha(context, { classe: 'Artífice', subclasse: 'Alquimista', nivel: 3, xp: 900, atributos: ATR }, 'regras-artifice-elixir');
   await abrirTudo(page);
   await clicarSeletorFicha(page, '[data-artifice-acao="elixir-criar"]', { esperar: '#elixir-efeito' });
-  await page.locator('#elixir-efeito [data-opcao="Voo"]').click();
+  await page.locator('#elixir-efeito [data-opcao="Voo"] .opcao-check').click();
   await clicarSeletorFicha(page, '#btn-elixir-confirmar');
   await assentar(page).catch(() => {});
   expect((await lerChar(page)).inventario.filter((i) => i.origem?.tipo === 'elixir').map((i) => i.nome)).toEqual(['Elixir Experimental (Voo)']);
@@ -92,7 +92,7 @@ test('Alquimista: elixir da rolagem 6 recebe o efeito escolhido pelo card', asyn
   }, 'regras-artifice-elixir-escolha');
   await abrirTudo(page);
   await clicarSeletorFicha(page, '[data-artifice-acao="elixir-definir"]', { esperar: '#elixir-efeito' });
-  await page.locator('#elixir-efeito [data-opcao="Rapidez"]').click();
+  await page.locator('#elixir-efeito [data-opcao="Rapidez"] .opcao-check').click();
   await clicarSeletorFicha(page, '#btn-elixir-definir-confirmar');
   await assentar(page).catch(() => {});
   expect((await lerChar(page)).inventario[0].nome).toBe('Elixir Experimental (Rapidez)');
@@ -109,7 +109,7 @@ test('Alquimista: Criar elixir consome exatamente um espaço de magia', async ({
   await abrirTudo(page);
   const antes = espacosGastos(await lerChar(page));
   await clicarSeletorFicha(page, '[data-artifice-acao="elixir-criar"]', { esperar: '#elixir-efeito' });
-  await page.locator('#elixir-efeito [data-opcao="Cura"]').click();
+  await page.locator('#elixir-efeito [data-opcao="Cura"] .opcao-check').click();
   await clicarSeletorFicha(page, '#btn-elixir-confirmar');
   await assentar(page).catch(() => {});
   const c = await lerChar(page);
@@ -126,7 +126,7 @@ test('Alquimista: Criar elixir sem espaço disponível recusa e não cria o elix
   await abrirTudo(page);
   const antes = await lerChar(page);
   await clicarSeletorFicha(page, '[data-artifice-acao="elixir-criar"]', { esperar: '#elixir-efeito' });
-  await page.locator('#elixir-efeito [data-opcao="Cura"]').click();
+  await page.locator('#elixir-efeito [data-opcao="Cura"] .opcao-check').click();
   await page.locator('#btn-elixir-confirmar').click();
   await assentar(page).catch(() => {});
   // O fluxo não conclui: o modal continua aberto e nada muda no personagem.

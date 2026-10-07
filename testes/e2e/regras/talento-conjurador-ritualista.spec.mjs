@@ -37,7 +37,7 @@ test('subida de nível: Conjurador Ritualista lista as magias rituais e grava a 
   await page.check('input[name="levelup-asi-modo"][value="talento"]', { timeout: 1500 }).catch(() => {});
   await page.waitForSelector('#levelup-talento-lista .opcao-card', { state: 'visible', timeout: 10_000 });
 
-  await page.locator('#levelup-talento-lista .opcao-card[data-opcao="Conjurador Ritualista"]').click();
+  await page.locator('#levelup-talento-lista .opcao-card[data-opcao="Conjurador Ritualista"] .opcao-check').click();
   await page.waitForSelector('#levelup-rituais-lista .opcao-card', { state: 'visible', timeout: 10_000 });
 
   const cards = await page.evaluate(() =>
@@ -48,8 +48,8 @@ test('subida de nível: Conjurador Ritualista lista as magias rituais e grava a 
   expect(cards, 'Mísseis Mágicos NÃO é ritual e não pode entrar na lista').not.toContain('Mísseis Mágicos');
 
   // Bônus de proficiência 2 no nível 3->4: exatamente 2 escolhas.
-  await page.locator('#levelup-rituais-lista .opcao-card[data-opcao="Identificar"]').click();
-  await page.locator('#levelup-rituais-lista .opcao-card[data-opcao="Alarme"]').click();
+  await page.locator('#levelup-rituais-lista .opcao-card[data-opcao="Identificar"] .opcao-check').click();
+  await page.locator('#levelup-rituais-lista .opcao-card[data-opcao="Alarme"] .opcao-check').click();
   // O talento tambem exige o atributo (+1); sem ele a subida e barrada por
   // outro motivo e o teste nao mediria as magias rituais.
   await page.selectOption('#levelup-talento-asi', 'inteligencia');
@@ -79,7 +79,7 @@ test('ficha: "+ Talento" com Conjurador Ritualista lista as magias e grava a esc
 
   await page.locator('#btn-add-talento').click();
   await page.waitForSelector('#add-talento-lista .opcao-card', { state: 'visible', timeout: 10_000 });
-  await page.locator('#add-talento-lista .opcao-card[data-opcao="Conjurador Ritualista"]').click();
+  await page.locator('#add-talento-lista .opcao-card[data-opcao="Conjurador Ritualista"] .opcao-check').click();
   await page.locator('#btn-confirmar-add-talento').click();
 
   // Segundo modal ("Configurar Talento"), onde a lista de rituais mora.
@@ -89,8 +89,8 @@ test('ficha: "+ Talento" com Conjurador Ritualista lista as magias e grava a esc
   expect(cards.length, 'a lista de magias rituais nasceu vazia no "+ Talento" da ficha')
     .toBe(RITUAIS_1O_CIRCULO);
 
-  await page.locator('#levelup-rituais-lista .opcao-card[data-opcao="Identificar"]').click();
-  await page.locator('#levelup-rituais-lista .opcao-card[data-opcao="Alarme"]').click();
+  await page.locator('#levelup-rituais-lista .opcao-card[data-opcao="Identificar"] .opcao-check').click();
+  await page.locator('#levelup-rituais-lista .opcao-card[data-opcao="Alarme"] .opcao-check').click();
   await page.waitForTimeout(300);
   await page.selectOption('#levelup-talento-asi', 'inteligencia');
   await page.locator('#btn-confirmar-add-talento-asi').click();

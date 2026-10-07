@@ -49,7 +49,7 @@ async function escolherTalento(page, nome) {
   await page.waitForSelector('#add-talento-lista', { state: 'visible', timeout: 5000 });
   const card = page.locator(`#add-talento-lista .opcao-card[data-opcao="${nome}"]`);
   await card.waitFor({ state: 'visible', timeout: 5000 });
-  await card.click();
+  await card.locator('.opcao-check').click();
   await page.click('#btn-confirmar-add-talento');
   await assentar(page);
 }
@@ -83,7 +83,7 @@ test('ficha: Monge com Tocado Por Fadas mostra a magia escolhida e a parceira',
     const cardMagia = lista.locator(`.opcao-card[data-opcao="${MAGIA_ESCOLHIDA}"]`);
     await expect(cardMagia, `${MAGIA_ESCOLHIDA} não apareceu entre as opções`)
       .toBeVisible({ timeout: 5000 });
-    await cardMagia.click();
+    await cardMagia.locator('.opcao-check').click();
 
     // +1 em Inteligência, Sabedoria ou Carisma -- obrigatório no talento.
     await page.selectOption('#levelup-talento-asi', 'sabedoria');

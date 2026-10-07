@@ -350,3 +350,48 @@ test('nome do item: mantém quando já contém o nome da base; acrescenta o sufi
   const outra = C.montarItemInventario({ item, base: porNome('Armadura de Placas Parcial'), equipamentoPHB: PHB });
   assert.equal(outra.nome, `${item.nome} (Armadura de Placas Parcial)`);
 });
+
+// ---- Busca: palavras em qualquer ordem, sem "de/da/do", português antes do inglês ----
+const nomesDe = (texto, extra = {}) => C.filtrarAcervo(ACERVO, { texto, ...extra }).map((i) => i.nome);
+
+test('busca: palavras soltas, em qualquer ordem e sem preposição', () => {
+  assert.ok(nomesDe('manto protecao').includes('Manto de Proteção'));
+  assert.ok(nomesDe('protecao manto').includes('Manto de Proteção'));
+  assert.ok(nomesDe('manto da protecao').includes('Manto de Proteção'), '"da" no lugar de "de" não pode esconder o item');
+  assert.ok(nomesDe('anel protecao').includes('Anel de Proteção'));
+  assert.deepEqual(C.termosDaBusca('Manto da'), ['manto']);
+  assert.deepEqual(C.termosDaBusca('de da'), ['de', 'da'], 'só preposição: usa todas, não esvazia a busca');
+});
+
+test('busca: o nome em português vem antes do inglês, e o inglês só entra se o português não casa', () => {
+  const resultado = C.filtrarAcervo(ACERVO, { texto: 'cloak' });
+  assert.ok(resultado.length > 0, 'o nome em inglês acha o item');
+  assert.ok(resultado.every((i) => !C.casaEmPortugues(i, 'cloak')), '"cloak" não existe em português');
+  const misto = C.filtrarAcervo(ACERVO, { texto: 'ring' });
+  const primeiroIngles = misto.findIndex((i) => !C.casaEmPortugues(i, 'ring'));
+  if (primeiroIngles >= 0) {
+    assert.ok(misto.slice(primeiroIngles).every((i) => !C.casaEmPortugues(i, 'ring')), 'os de português vêm todos antes');
+  }
+  assert.ok(nomesDe('cloak of protection').includes('Manto de Proteção'));
+});
+
+test('busca: a frase inteira no nome vem antes do casamento por palavras soltas', () => {
+  const lista = nomesDe('anel protecao');
+  assert.ok(lista.indexOf('Anel de Proteção') < lista.indexOf('Escaravelho de Proteção') || !lista.includes('Escaravelho de Proteção'));
+  const pedra = nomesDe('protecao');
+  assert.ok(pedra.indexOf('Anel de Proteção') < pedra.indexOf('Pedra Ioun'), 'item cujo nome casa vem antes da variante');
+});
+
+test('busca: Pedra Ioun por variante mostra só a(s) variante(s) que casaram', () => {
+  const pedra = porId('pedra-ioun') || ACERVO.find((i) => i.nome === 'Pedra Ioun');
+  const casadas = C.variantesQueCasam(pedra, 'protecao');
+  assert.deepEqual(casadas.map((v) => v.nome), ['Pedra Ioun (proteção)']);
+  assert.deepEqual(C.variantesQueCasam(pedra, 'pedra ioun'), [], 'o nome do próprio item casa: sem destaque de variante');
+  assert.deepEqual(C.variantesQueCasam(ACERVO.find((i) => i.nome === 'Anel de Proteção'), 'protecao'), []);
+});
+
+test('busca: raridade e tipo continuam filtrando; texto vazio devolve tudo', () => {
+  assert.equal(C.filtrarAcervo(ACERVO, { texto: '' }).length, ACERVO.length);
+  assert.ok(nomesDe('protecao', { raridade: 'Rara' }).includes('Anel de Proteção'));
+  assert.ok(!nomesDe('protecao', { raridade: 'Lendária' }).includes('Anel de Proteção'));
+});

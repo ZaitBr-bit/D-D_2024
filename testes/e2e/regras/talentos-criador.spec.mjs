@@ -276,7 +276,7 @@ test('criador: Versátil (Humano) concede Habilidoso com escolhas', async ({ con
   // montarSeletor dentro de `#versatil-talento-lista`).
   const cardHabilidoso = page.locator('#versatil-talento-lista .opcao-card[data-opcao="Habilidoso"]');
   await cardHabilidoso.waitFor({ state: 'visible', timeout: 10_000 });
-  await cardHabilidoso.click();
+  await cardHabilidoso.locator('.opcao-check').click();
   await page.waitForTimeout(300);
 
   // 1. Escolher Habilidoso no combo injeta os 3 selects de escolha do
@@ -354,7 +354,7 @@ test('criador: Versátil (Humano) com talento NÃO repetível sobrevive a reabri
 
   const cardAlerta = page.locator('#versatil-talento-lista .opcao-card[data-opcao="Alerta"]');
   await cardAlerta.waitFor({ state: 'visible', timeout: 10_000 });
-  await cardAlerta.click();
+  await cardAlerta.locator('.opcao-check').click();
   await page.waitForTimeout(200);
   await page.click('#popup-confirmar-especie');
   await page.waitForTimeout(300);
@@ -385,7 +385,7 @@ test('criador: Versátil (Humano) com talento NÃO repetível sobrevive a reabri
   // `pointer-events:none` e um clique nele não fazia nada -- aqui um
   // clique tem que desmarcar (max:1, clicar de novo no já selecionado
   // desmarca) e confirmar sem nada marcado tem que voltar a recusar.
-  await cardAlerta.click();
+  await cardAlerta.locator('.opcao-check').click();
   await page.waitForTimeout(150);
   expect(await cardAlerta.evaluate((el) => el.classList.contains('selecionada')),
     'clicar em Alerta (já selecionado) não desmarcou -- sinal de bloqueio residual').toBe(false);
@@ -397,7 +397,7 @@ test('criador: Versátil (Humano) com talento NÃO repetível sobrevive a reabri
 
   // Reseleciona e confirma de novo, pra fechar o roteiro com o personagem
   // num estado consistente (sem duplicar "Alerta" em `talentos`).
-  await cardAlerta.click();
+  await cardAlerta.locator('.opcao-check').click();
   await page.waitForTimeout(150);
   const opcoesPericia2 = await page.locator('#select-pericia-especie option')
     .evaluateAll((ops) => ops.map((o) => o.value).filter(Boolean));

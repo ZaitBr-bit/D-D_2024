@@ -50,7 +50,7 @@ test('ficha: + Talento com Alerta aplica o bonus de iniciativa sem recarregar', 
   await page.waitForSelector('#add-talento-lista', { state: 'visible', timeout: 5000 });
   const cardAlerta = page.locator('#add-talento-lista .opcao-card[data-opcao="Alerta"]');
   await cardAlerta.waitFor({ state: 'visible', timeout: 5000 });
-  await cardAlerta.click();
+  await cardAlerta.locator('.opcao-check').click();
   await page.click('#btn-confirmar-add-talento');
   await assentar(page);
 

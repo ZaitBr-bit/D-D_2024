@@ -40,7 +40,7 @@ async function escolherTalento(page, nome) {
   await page.waitForSelector('#add-talento-lista', { state: 'visible', timeout: 5000 });
   const card = page.locator(`#add-talento-lista .opcao-card[data-opcao="${nome}"]`);
   await card.waitFor({ state: 'visible', timeout: 5000 });
-  await card.click();
+  await card.locator('.opcao-check').click();
   await page.click('#btn-confirmar-add-talento');
   await assentar(page);
 }
@@ -71,7 +71,7 @@ test('ficha: Telecinético com Mãos Mágicas oferece truque substituto e o grav
   const substituto = lista.locator('.opcao-card[data-opcao="Raio de Gelo"]');
   await expect(substituto, 'a lista de truques de Mago nasceu vazia')
     .toBeVisible({ timeout: 5000 });
-  await substituto.click();
+  await substituto.locator('.opcao-check').click();
 
   // Atributo do talento (+1 em Int/Sab/Car) -- obrigatório nos dois ramos.
   await page.selectOption('#levelup-talento-asi', 'inteligencia');

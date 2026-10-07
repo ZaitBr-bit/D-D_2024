@@ -10,7 +10,7 @@
 // ============================================================
 import { test, expect } from '@playwright/test';
 import {
-  abrirSite, assentar, confirmarModal, passoAtual, personagemSalvo, satisfazerPasso,
+  abrirIdentidade, abrirSite, assentar, confirmarModal, passoAtual, personagemSalvo, satisfazerPasso,
 } from './helpers-regras.mjs';
 
 const FERRAMENTA = 'Ferramentas de Ferreiro';
@@ -74,6 +74,7 @@ test('criador: Artífice nível 1 do começo ao fim grava ferramentas, Reparar e
   expect(truquesDaTabela).toHaveLength(2);
   expect((p.magias_preparadas || []).filter((m) => (m.circulo ?? 1) >= 1 && m.classe === 'Artífice' && !m.origem)).toHaveLength(2);
 
+  await abrirIdentidade(page);
   await expect(page.locator('#app-content .selo-fonte[data-fonte="tasha"]').first()).toBeVisible();
   expect(erros, erros.join('; ')).toEqual([]);
 });

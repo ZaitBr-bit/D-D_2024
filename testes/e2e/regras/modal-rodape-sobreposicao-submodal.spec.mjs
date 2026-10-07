@@ -25,7 +25,7 @@ const SEMENTE = {
  *  "Configurar Talento" (com a lista de armas) terminar de animar. */
 async function abrirConfigurarMestreDasArmas(page) {
   await clicarBotaoFicha(page, 'btn-add-talento', { esperar: '#add-talento-lista' });
-  await page.click('[data-opcao="Mestre das Armas"]');
+  await page.click('[data-opcao="Mestre das Armas"] .opcao-check');
   await page.click('#btn-confirmar-add-talento');
   await page.waitForSelector('#lvlup-mestre-armas-lista .opcao-card', { timeout: 10_000 });
   await page.waitForFunction(() => {
@@ -52,8 +52,11 @@ async function circulosPorCimaDasBarrasDoSubModal(page, fracao) {
     for (const chk of ct.querySelectorAll('.opcao-check')) {
       const r = chk.getBoundingClientRect();
       if (r.width === 0) continue;
-      const zona = (r.bottom > rod.top && r.top < rod.bottom) ? 'rodapé'
-        : (r.top < cab.bottom && r.bottom > cab.top) ? 'cabeçalho' : null;
+      // Só vale o círculo cujo CENTRO está sob a barra: um que apenas encosta na borda
+      // tem o centro livre e o toque nele chega ao botão (medido em elementFromPoint abaixo).
+      const cy = r.top + r.height / 2;
+      const zona = (cy > rod.top && cy < rod.bottom) ? 'rodapé'
+        : (cy < cab.bottom && cy > cab.top) ? 'cabeçalho' : null;
       if (!zona) continue;
       const alvo = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
       if (alvo && alvo.classList?.contains('opcao-check')) {

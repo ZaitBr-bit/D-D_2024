@@ -38,7 +38,7 @@ test('ficha: Assinatura Mágica pede as duas magias de 3º círculo do livro', a
   const nomes = await opcoes.evaluateAll(els => els.map(e => e.dataset.opcao));
   expect(new Set(nomes)).toEqual(new Set(['Bola de Fogo', 'Contramagia']));
 
-  await page.locator('#modal-overlay [data-opcao="Bola de Fogo"]').first().click();
+  await page.locator('#modal-overlay [data-opcao="Bola de Fogo"] .opcao-check').first().click();
   await page.click('#btn-salvar-magias-fixas');
   await assentar(page).catch(() => {});
 
@@ -63,14 +63,14 @@ test('ficha: as duas assinaturas têm de ser magias DIFERENTES', async ({ contex
     { esperar: '#btn-salvar-magias-fixas' });
   await assentar(page).catch(() => {});
 
-  await page.locator('#magia-fixa-m1 [data-opcao="Bola de Fogo"]').click();
+  await page.locator('#magia-fixa-m1 [data-opcao="Bola de Fogo"] .opcao-check').click();
   await assentar(page).catch(() => {});
 
   // A mesma magia não pode continuar disponível na outra vaga.
   await expect(page.locator('#magia-fixa-m2 [data-opcao="Bola de Fogo"]'))
     .toHaveClass(/bloqueada/);
 
-  await page.locator('#magia-fixa-m2 [data-opcao="Contramagia"]').click();
+  await page.locator('#magia-fixa-m2 [data-opcao="Contramagia"] .opcao-check').click();
   await page.click('#btn-salvar-magias-fixas');
   await assentar(page).catch(() => {});
 

@@ -28,7 +28,7 @@ async function trocarPara(page, arma) {
   await assentar(page).catch(() => {});
   await page.locator('[data-troca-um]').click();
   await assentar(page).catch(() => {});
-  await page.locator(`#troca-passo-entra .opcao-card[data-opcao="${arma}"]`).click();
+  await page.locator(`#troca-passo-entra .opcao-card[data-opcao="${arma}"] .opcao-check`).click();
   await assentar(page).catch(() => {});
   await page.locator('#btn-confirmar-troca-maestria-talento').click();
   await assentar(page).catch(() => {});

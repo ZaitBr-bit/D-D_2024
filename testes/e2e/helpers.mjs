@@ -88,7 +88,7 @@ export async function confirmarModal(page, idBotao, maxTentativas = 8) {
       for (const [seletor, marcado] of CARDS) {
         for (const card of modal.querySelectorAll(seletor)) {
           if (card.classList.contains('bloqueada') || card.dataset.cheio) continue;
-          if (!card.classList.contains(marcado)) { card.click(); return true; }
+          if (!card.classList.contains(marcado)) { (card.querySelector(".opcao-check") || card).click(); return true; }
         }
       }
       for (const sel of modal.querySelectorAll('select')) {
@@ -377,7 +377,7 @@ async function preencherTela(page, maxEscolhas = 30) {
           // aceita clique.
           const livre = cards.find((c) => !c.classList.contains(marcado)
             && !c.classList.contains('bloqueada') && !c.dataset.cheio);
-          if (livre) { livre.click(); return true; }
+          if (livre) { (livre.querySelector(".opcao-check") || livre).click(); return true; }
         }
       }
 
@@ -481,7 +481,7 @@ async function preencherTela(page, maxEscolhas = 30) {
         const marcadas = caixas.filter((c) => c.checked).length;
         if (marcadas === 0 || faltaAlgo) {
           const livre = caixas.find((c) => !c.checked && !c.disabled);
-          if (livre) { livre.click(); return true; }
+          if (livre) { (livre.querySelector(".opcao-check") || livre).click(); return true; }
         }
       }
       return false;
@@ -633,7 +633,7 @@ export async function satisfazerPasso(page, { maxVoltas = 80 } = {}) {
       }
       for (const cards of porPai.values()) {
         if (cards.some((c) => c.classList.contains('selecionada'))) continue;
-        cards[0].click();
+        (cards[0].querySelector(".opcao-check") || cards[0]).click();
         return true;
       }
 

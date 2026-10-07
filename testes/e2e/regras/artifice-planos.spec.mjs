@@ -27,7 +27,7 @@ async function irAtePlanos(page) {
 /** Abre o sub-modal de adicionar e escolhe o plano pelo card (data-opcao = id do plano). */
 async function adicionarPlano(page, planoId) {
   await page.locator('#btn-plano-adicionar').click();
-  await page.locator(`#plano-escolha [data-opcao="${planoId}"]`).click();
+  await page.locator(`#plano-escolha [data-opcao="${planoId}"] .opcao-check`).click();
 }
 
 /** Confirma o sub-modal e espera o redesenho do passo. */
@@ -72,11 +72,11 @@ test('plano genérico com item que exige base: seletor de base aparece e a subid
   expect(await abrirModalLevelUp(page)).toBe(true);
   await irAtePlanos(page);
   await adicionarPlano(page, 'common-magic-item');
-  await page.locator('#plano-generico [data-opcao="arma-prateada|"]').click();
+  await page.locator('#plano-generico [data-opcao="arma-prateada|"] .opcao-check').click();
   await expect(page.locator('#plano-base')).toBeVisible();
   // Cards de base com informação (dano/propriedades) e escolha explícita.
   await expect(page.locator('#plano-base [data-opcao]').first()).toContainText(/[0-9]d[0-9]|CA/);
-  await page.locator('#plano-base [data-opcao]').first().click();
+  await page.locator('#plano-base [data-opcao] .opcao-check').first().click();
   await expect(page.locator('#plano-armeiro')).toHaveCount(0);
   await confirmarPlano(page);
   for (const id of QUATRO.slice(0, 3)) {
@@ -99,9 +99,9 @@ test('Armeiro 9: a caixa do plano extra só aparece para item de Armadura', asyn
   expect(await abrirModalLevelUp(page)).toBe(true);
   await irAtePlanos(page);
   await page.locator('#btn-plano-adicionar').click();
-  await page.locator('#plano-escolha [data-opcao="alchemy-jug"]').click();
+  await page.locator('#plano-escolha [data-opcao="alchemy-jug"] .opcao-check').click();
   await expect(page.locator('#plano-armeiro')).toBeHidden();
-  await page.locator('#plano-escolha [data-opcao="armor-1"]').click();
+  await page.locator('#plano-escolha [data-opcao="armor-1"] .opcao-check').click();
   await expect(page.locator('#plano-armeiro')).toBeVisible();
   expect(erros, erros.join('; ')).toEqual([]);
 });
@@ -148,7 +148,7 @@ async function abrirComItens(context, id, ids, extra = {}) {
   }, id);
   await abrirTudo(page);
   await clicarSeletorFicha(page, '[data-artifice-acao="replicar-criar"]');
-  for (const k of ids) await page.locator(`#replicar-conhecidos [data-opcao="${k}"]`).click();
+  for (const k of ids) await page.locator(`#replicar-conhecidos [data-opcao="${k}"] .opcao-check`).click();
   await page.locator('#btn-replicar-confirmar').click();
   await assentar(page).catch(() => {});
   return { page, erros };
@@ -180,7 +180,7 @@ test('criar, transmutar, drenar e gastar o espaço temporário de itens replicad
 
   // Transmutar o k2 (primeiro do inventário) em outro conhecido sem item.
   await clicarSeletorFicha(page, '[data-artifice-acao="replicar-transmutar"][data-conhecido="k2"]');
-  await page.locator('#transmutar-destino [data-opcao="k3"]').click();
+  await page.locator('#transmutar-destino [data-opcao="k3"] .opcao-check').click();
   await page.locator('#btn-transmutar-confirmar').click();
   await assentar(page).catch(() => {});
   c = await lerChar(page);
@@ -242,7 +242,7 @@ test('Descanso Longo oferece Criar Itens Replicados', async ({ context }) => {
   // #btn-descanso-longo fica num FAB oculto: só o clique por DOM (clicarBotaoFicha) o aciona; não há passo de confirmação.
   await clicarBotaoFicha(page, 'btn-descanso-longo', { esperar: '#btn-replicar-dl' });
   await page.locator('#btn-replicar-dl').click();
-  await page.locator('#replicar-conhecidos [data-opcao="k1"]').click();
+  await page.locator('#replicar-conhecidos [data-opcao="k1"] .opcao-check').click();
   await page.locator('#btn-replicar-confirmar').click();
   await assentar(page).catch(() => {});
   const c = await lerChar(page);
@@ -257,7 +257,7 @@ test('Trapacear a Morte com 0 PV desintegra o item, zera salvaguardas e limita a
   }, 'regras-artifice-trapacear');
   await abrirTudo(page);
   await clicarSeletorFicha(page, '[data-artifice-acao="replicar-criar"]');
-  await page.locator('#replicar-conhecidos [data-opcao="k1"]').click();
+  await page.locator('#replicar-conhecidos [data-opcao="k1"] .opcao-check').click();
   await page.locator('#btn-replicar-confirmar').click();
   await assentar(page).catch(() => {});
   await abrirTudo(page);
@@ -280,7 +280,7 @@ test('Trapacear a Morte não passa do PV máximo', async ({ context }) => {
   }, 'regras-artifice-trapacear-teto');
   await abrirTudo(page);
   await clicarSeletorFicha(page, '[data-artifice-acao="replicar-criar"]');
-  await page.locator('#replicar-conhecidos [data-opcao="k1"]').click();
+  await page.locator('#replicar-conhecidos [data-opcao="k1"] .opcao-check').click();
   await page.locator('#btn-replicar-confirmar').click();
   await assentar(page).catch(() => {});
   await abrirTudo(page);

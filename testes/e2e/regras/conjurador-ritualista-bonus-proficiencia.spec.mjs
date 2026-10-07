@@ -80,7 +80,7 @@ async function irAteTalento(page) {
 async function escolherRitualistaEMedir(page) {
   await page.check('input[name="levelup-asi-modo"][value="talento"]', { timeout: 1500 }).catch(() => {});
   await page.waitForSelector('#levelup-talento-lista .opcao-card', { state: 'visible', timeout: 10_000 });
-  await page.locator('#levelup-talento-lista .opcao-card[data-opcao="Conjurador Ritualista"]').click();
+  await page.locator('#levelup-talento-lista .opcao-card[data-opcao="Conjurador Ritualista"] .opcao-check').click();
   await page.waitForSelector('#levelup-rituais-lista .opcao-card', { state: 'visible', timeout: 10_000 });
   return page.locator('#levelup-rituais-container').innerText();
 }
@@ -158,7 +158,7 @@ test('"+ Talento" da ficha: Guerreiro nível 4 oferece exatamente 2 magias ritua
 
   await page.locator('#btn-add-talento').click();
   await page.waitForSelector('#add-talento-lista .opcao-card', { state: 'visible', timeout: 10_000 });
-  await page.locator('#add-talento-lista .opcao-card[data-opcao="Conjurador Ritualista"]').click();
+  await page.locator('#add-talento-lista .opcao-card[data-opcao="Conjurador Ritualista"] .opcao-check').click();
   await page.locator('#btn-confirmar-add-talento').click();
 
   // Segundo modal ("Configurar Talento"), onde a lista de rituais mora.

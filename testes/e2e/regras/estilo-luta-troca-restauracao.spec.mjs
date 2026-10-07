@@ -74,7 +74,7 @@ test('level-up: troca de Estilo de Luta sobrevive a Anterior/Próximo sem escond
   await trocaContainer.locator('[data-troca-um]').click();
   const passoEntra = trocaContainer.locator('#troca-passo-entra');
   await expect(passoEntra, 'passo 2 (novo estilo) deveria aparecer depois de "Trocar este"').toBeVisible();
-  await passoEntra.locator('.opcao-card[data-opcao="Duelismo"]').click();
+  await passoEntra.locator('.opcao-card[data-opcao="Duelismo"] .opcao-check').click();
   await expect(passoEntra.locator('.opcao-card[data-opcao="Duelismo"]'),
     'Duelismo deveria estar marcado antes de navegar').toHaveClass(/selecionada/);
 

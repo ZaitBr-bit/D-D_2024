@@ -35,8 +35,8 @@ test('lista principal: botão Grátis da Maestria de Magias conjura sem gastar e
   await clicarSeletorFicha(page, '[data-mago-acao="definir-maestria-magias"]',
     { esperar: '#btn-salvar-magias-fixas' });
   await assentar(page).catch(() => {});
-  await page.locator('#magia-fixa-c1 [data-opcao="Mísseis Mágicos"]').click();
-  await page.locator('#magia-fixa-c2 [data-opcao="Despedaçar"]').click();
+  await page.locator('#magia-fixa-c1 [data-opcao="Mísseis Mágicos"] .opcao-check').click();
+  await page.locator('#magia-fixa-c2 [data-opcao="Despedaçar"] .opcao-check').click();
   await page.click('#btn-salvar-magias-fixas');
   await assentar(page).catch(() => {});
   await abrirTudo(page);
@@ -63,7 +63,7 @@ test('lista principal: botão Grátis da Assinatura Mágica esgota a vaga e some
   await clicarSeletorFicha(page, '[data-mago-acao="definir-assinaturas"]',
     { esperar: '#btn-salvar-magias-fixas' });
   await assentar(page).catch(() => {});
-  await page.locator('#modal-overlay [data-opcao="Bola de Fogo"]').first().click();
+  await page.locator('#modal-overlay [data-opcao="Bola de Fogo"] .opcao-check').first().click();
   await page.click('#btn-salvar-magias-fixas');
   await assentar(page).catch(() => {});
   await abrirTudo(page);

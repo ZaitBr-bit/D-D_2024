@@ -84,11 +84,11 @@ export function fichaTecnica(c) {
 export function cardForma(c, selecionada) {
   const nome = escHtml(c.nome);
   return `
-    <div class="opcao-card ${selecionada ? 'selecionada' : ''}" data-familiar-card="${nome}" style="position:relative">
+    <div class="opcao-card ${selecionada ? 'selecionada' : ''}" data-familiar-card="${nome}" data-familiar-info="${nome}" style="position:relative;cursor:pointer" title="Toque no card para ver a ficha; o círculo seleciona">
       <div style="display:flex;align-items:center;gap:6px">
         <span class="opcao-check" data-familiar-toggle="${nome}" style="cursor:pointer;flex-shrink:0"></span>
         <div style="flex:1;min-width:0">
-          <div class="opcao-nome" data-familiar-info="${nome}" style="cursor:pointer">${nome}</div>
+          <div class="opcao-nome">${nome}</div>
           <div class="opcao-resumo"><span style="font-size:0.65rem">${resumoForma(c)}</span> ${seloFonte(c.fonte)}</div>
         </div>
       </div>

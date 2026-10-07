@@ -129,7 +129,7 @@ async function abrirTrocaDoDescansoLongo(page, nomeQueSai = MAGIA_CLASSE) {
   await expect(page.locator('#btn-confirmar-troca-conhecida'),
     'o Bardo tem direito à troca de 1 magia no Descanso Longo -- o modal precisa abrir')
     .toBeVisible({ timeout: 10_000 });
-  await page.locator(`#troca-conhecida-remover-lista .opcao-card[data-opcao="${nomeQueSai}"]`)
+  await page.locator(`#troca-conhecida-remover-lista .opcao-card[data-opcao="${nomeQueSai}"] .opcao-check`)
     .click();
   await assentar(page).catch(() => {});
 }
@@ -439,7 +439,7 @@ test('Bardo 5/Mago 1: a customizada não entra na troca de NENHUMA das duas clas
   // PASSO 1 -- Bardo (classe inicial, ordem 0).
   await expect(page.locator('#modal-titulo'), 'o passo 1 tem de ser do Bardo')
     .toHaveText('Trocar Magia Conhecida — Bardo', { timeout: 10_000 });
-  await page.locator('#troca-conhecida-remover-lista .opcao-card[data-opcao="Heroísmo"]').click();
+  await page.locator('#troca-conhecida-remover-lista .opcao-card[data-opcao="Heroísmo"] .opcao-check').click();
   await assentar(page).catch(() => {});
   await expect(page.locator('#resultado-troca-conhecida [data-selecionar-troca]'),
     'GUARDA CONTRA VACUIDADE: a lista do Bardo continua sendo oferecida no passo dele')
@@ -455,7 +455,7 @@ test('Bardo 5/Mago 1: a customizada não entra na troca de NENHUMA das duas clas
   // PASSO 2 -- Mago.
   await expect(page.locator('#modal-titulo'), 'o passo 2 tem de ser do Mago')
     .toHaveText('Trocar Magia Conhecida — Mago', { timeout: 10_000 });
-  await page.locator('#troca-conhecida-remover-lista .opcao-card[data-opcao="Mísseis Mágicos"]')
+  await page.locator('#troca-conhecida-remover-lista .opcao-card[data-opcao="Mísseis Mágicos"] .opcao-check')
     .click();
   await assentar(page).catch(() => {});
 

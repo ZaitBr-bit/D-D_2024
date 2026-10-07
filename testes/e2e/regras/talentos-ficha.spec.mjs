@@ -52,7 +52,7 @@ for (const { nome, campoProficiencia } of CASOS) {
     await page.waitForSelector('#add-talento-lista', { state: 'visible', timeout: 5000 });
     const cardTalento = page.locator(`#add-talento-lista .opcao-card[data-opcao="${nome}"]`);
     await cardTalento.waitFor({ state: 'visible', timeout: 5000 });
-    await cardTalento.click();
+    await cardTalento.locator('.opcao-check').click();
     await page.click('#btn-confirmar-add-talento');
     // Sem popup de configuração para esperar (é exatamente isso que está
     // sob teste) -- um tempo curto basta para o clique síncrono assentar.
@@ -126,7 +126,7 @@ test('ficha: + Talento mostra pré-requisito não atendido como aviso, não bloq
   // tem "Aumento no Valor de Atributo" embutido -- abre o popup de
   // configuração do atributo, mesmo caminho de qualquer talento "só
   // atributo", sem relação com este teste).
-  await card.click();
+  await card.locator('.opcao-check').click();
   await page.click('#btn-confirmar-add-talento');
   await page.waitForTimeout(400);
   const asiSelect = page.locator('select#levelup-talento-asi');

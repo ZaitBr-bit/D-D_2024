@@ -221,7 +221,7 @@ for (const [nome, entrada] of CANDIDATOS) {
         .not.toBeNull();
       return;
     }
-    await opcao.click();
+    await opcao.locator('.opcao-check').click();
     await page.waitForTimeout(400);
 
     // 1. A tela oferece os controles de escolha que o livro exige.

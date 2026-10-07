@@ -4,8 +4,9 @@
 // Golpe Debilitante (nv 6), Colher Mortos-Vivos (nv 10), Fortalecer e
 // Extinguir Mortos-Vivos (nv 14).
 // ============================================================
-import { nivelNa, subclasseDe } from './regras-multiclasse.js';
-import { calcMod } from './utils.js';
+import { nivelNa, nivelTotal, subclasseDe } from './regras-multiclasse.js';
+import { ajustarPVFamiliar, estadoFamiliar } from './regras-familiar.js';
+import { bonusProficiencia, calcMod } from './utils.js';
 
 /** Magias de Necromancia que criam ou invocam Mortos-Vivos. */
 export const MAGIAS_QUE_CRIAM_MORTOS_VIVOS = ['Animar Mortos', 'Criar Mortos-Vivos', 'Invocar Morto-Vivo'];
@@ -99,6 +100,44 @@ export function avisoLivroNaoEmpunhado(p) {
   return 'Livro de magias não empunhado: esta característica exige o livro na mão (marque em Ataques).';
 }
 
+/**
+ * Formas do Espírito Morto-Vivo (magia Invocar Morto-Vivo, 3º círculo). PV base
+ * no 3º círculo; cada círculo acima soma 10. A ação e o dano seguem o bloco do livro.
+ */
+export const FORMAS_ESPIRITO = {
+  'Esquelético': {
+    pvBase: 20, deslocamento: '9 m', alcance: '45 m', acao: 'Raio da Cova', corpoACorpo: false,
+    dano: (c) => `2d4 + 3 + ${c}`, tipoDano: 'Necrótico', extra: '',
+    traco: 'Sem traço próprio; ataca à distância.',
+  },
+  'Fantasmagórico': {
+    pvBase: 30, deslocamento: '9 m; Voo 12 m (pairar)', alcance: '1,5 m', acao: 'Toque Mortal', corpoACorpo: true,
+    dano: (c) => `1d8 + 3 + ${c}`, tipoDano: 'Necrótico', extra: 'o alvo fica Amedrontado até o fim do próximo turno dele',
+    traco: 'Passagem Incorpórea: atravessa criaturas e objetos como Terreno Difícil; terminar o turno dentro de um objeto causa 1d10 de dano Energético por 1,5 m.',
+  },
+  'Pútrido': {
+    pvBase: 30, deslocamento: '9 m', alcance: '1,5 m', acao: 'Garra Podre', corpoACorpo: true,
+    dano: (c) => `1d6 + 3 + ${c}`, tipoDano: 'Cortante', extra: 'alvo Envenenado fica Paralisado até o fim do próximo turno dele',
+    traco: 'Aura Purulenta: criatura (exceto você) que começa o turno a até 1,5 m dele faz salvaguarda de Constituição (sua CD) ou fica Envenenada até o início do próximo turno.',
+  },
+};
+
+/** PV do espírito: base da forma + 10 por círculo acima do 3º. */
+export function pvDoEspirito(forma, circulo) {
+  return (FORMAS_ESPIRITO[forma]?.pvBase || 0) + 10 * Math.max(0, (Number(circulo) || 3) - 3);
+}
+
+/** Dados do espírito que dependem do círculo e do conjurador (CA, ataques, bônus de ataque). */
+export function dadosDoEspirito(p, forma, circulo) {
+  const f = FORMAS_ESPIRITO[forma];
+  const c = Number(circulo) || 3;
+  return {
+    forma, circulo: c, ca: 11 + c, ataques: Math.max(1, Math.floor(c / 2)),
+    bonusAtaque: modInteligencia(p) + bonusProficiencia(nivelTotal(p) || 1),
+    acao: f?.acao || '', dano: f ? f.dano(c) : '', tipoDano: f?.tipoDano || '',
+  };
+}
+
 /** Número de dados da fórmula de PV do bloco ("13 (2d8 + 4)" -> 2). */
 function dadosDaFormula(criatura) {
   const m = String(criatura?.pv || '').match(/\((\d+)d\d+/);
@@ -130,6 +169,62 @@ export function registrarMortoVivo(p, criatura, { quantidade = 1 } = {}) {
     criadas.push(entrada);
   }
   return criadas;
+}
+
+/**
+ * Registra o Espírito Morto-Vivo de Invocar Morto-Vivo. A criatura é uma só por
+ * conjuração: um espírito anterior some. PV do bloco do livro mais a Fortitude
+ * Morta-Viva (nível 6+). Não tem Dados de Vida.
+ * @param {object} p Personagem, mutado no lugar.
+ * @param {string} forma Esquelético, Fantasmagórico ou Pútrido.
+ * @param {number} circulo Círculo do espaço gasto.
+ * @returns {object|null} A entrada criada; null se a forma não existe.
+ */
+export function registrarEspirito(p, forma, circulo) {
+  if (!FORMAS_ESPIRITO[forma]) return null;
+  const e = estadoNecromante(p);
+  e.mortos_vivos = e.mortos_vivos.filter((m) => !m.espirito);
+  _sequencia += 1;
+  const pv = pvDoEspirito(forma, circulo) + fortitudeMortaViva(p);
+  const entrada = {
+    id: `mv${Date.now().toString(36)}${_sequencia}`, nome: `Espírito Morto-Vivo (${forma})`,
+    pv_max: pv, pv_atual: pv, pv_temporarios: 0, dados_de_vida: 0,
+    espirito: { forma, circulo: Number(circulo) || 3 },
+  };
+  e.mortos_vivos.push(entrada);
+  return entrada;
+}
+
+/**
+ * Criaturas Mortas-Vivas que podem receber a cura da Vitalidade Morta-Viva: as
+ * registradas e o familiar Morto-Vivo (tipo Morto-Vivo, Esqueleto ou Zumbi), em
+ * campo e com PV abaixo do máximo.
+ * @param {object} p Personagem.
+ * @returns {Array<{tipo: 'morto'|'familiar', id: string, nome: string, pv_atual: number, pv_max: number}>}
+ */
+export function candidatosVitalidade(p) {
+  const lista = estadoNecromante(p).mortos_vivos
+    .filter((m) => m.pv_atual < m.pv_max)
+    .map((m) => ({ tipo: 'morto', id: m.id, nome: m.nome, pv_atual: m.pv_atual, pv_max: m.pv_max }));
+  const f = estadoFamiliar(p);
+  const familiarMortoVivo = f && (f.tipo === 'Morto-Vivo' || (f.especial && ['Esqueleto', 'Zumbi'].includes(f.forma)));
+  if (familiarMortoVivo && f.situacao === 'ativo' && f.pv_atual < f.pv_max) {
+    lista.push({ tipo: 'familiar', id: 'familiar', nome: `Familiar: ${f.forma}`, pv_atual: f.pv_atual, pv_max: f.pv_max });
+  }
+  return lista;
+}
+
+/**
+ * Aplica a cura da Vitalidade Morta-Viva ao candidato escolhido.
+ * @returns {number} PV realmente recuperados (limitados ao máximo); 0 se o candidato não existe mais.
+ */
+export function curarCandidatoVitalidade(p, candidato, pv) {
+  const antes = candidato.tipo === 'familiar' ? estadoFamiliar(p)?.pv_atual : estadoNecromante(p).mortos_vivos.find((m) => m.id === candidato.id)?.pv_atual;
+  if (antes == null) return 0;
+  const depois = candidato.tipo === 'familiar'
+    ? ajustarPVFamiliar(p, pv)?.pv_atual
+    : ajustarPVMortoVivo(p, candidato.id, pv)?.pv_atual;
+  return depois == null ? 0 : depois - antes;
 }
 
 /** Soma `delta` aos PV do Morto-Vivo, entre 0 e o máximo. */

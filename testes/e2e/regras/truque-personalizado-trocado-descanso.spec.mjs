@@ -40,12 +40,12 @@ test('descanso longo: trocar um truque personalizado "ocupa vaga" o deixa "Não 
 
   const cardSaindo = page.locator('#troca-truque-remover-lista .opcao-card[data-opcao="Faísca Menor"]');
   await expect(cardSaindo, 'o truque personalizado que ocupa vaga não apareceu como trocável').toBeVisible({ timeout: 5000 });
-  await cardSaindo.click();
+  await cardSaindo.locator('.opcao-check').click();
   await assentar(page).catch(() => {});
 
   const cardEntrando = page.locator('#troca-truque-adicionar-lista .opcao-card[data-opcao="Orientação"]');
   await cardEntrando.waitFor({ state: 'visible', timeout: 5000 });
-  await cardEntrando.click();
+  await cardEntrando.locator('.opcao-check').click();
   await clicarBotaoFicha(page, 'btn-confirmar-troca-truque');
   await assentar(page).catch(() => {});
 

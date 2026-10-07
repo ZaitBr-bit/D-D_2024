@@ -53,7 +53,7 @@ test('ficha: + Talento com Especialista em Armaduras Leves concede Leve e Escudo
   await page.waitForSelector('#add-talento-lista', { state: 'visible', timeout: 5000 });
   const card = page.locator('#add-talento-lista .opcao-card[data-opcao="Especialista em Armaduras Leves"]');
   await card.waitFor({ state: 'visible', timeout: 5000 });
-  await card.click();
+  await card.locator('.opcao-check').click();
   await page.click('#btn-confirmar-add-talento');
 
   // O talento tem "Aumento no Valor de Atributo" (Forca ou Destreza), entao

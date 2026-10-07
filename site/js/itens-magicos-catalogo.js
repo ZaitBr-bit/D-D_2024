@@ -32,13 +32,82 @@ export function raridadesDoItem(item) {
   return [...new Set((item.variantes || []).map(v => v.raridade))];
 }
 
-/** Itens do acervo que casam o texto (nome do item ou da variante), a raridade e o tipo do livro. */
+/** Palavras de ligação que a busca ignora ("Manto da" acha "Manto de Proteção"). */
+const PALAVRAS_DE_LIGACAO = new Set(['de', 'da', 'do', 'das', 'dos', 'a', 'o', 'as', 'os', 'e', 'of', 'the']);
+
+/**
+ * Termos de uma busca: palavras sem acento e sem as de ligação, em qualquer
+ * ordem. Se só sobrarem palavras de ligação, usa todas.
+ * @param {string} texto Texto digitado.
+ * @returns {string[]}
+ */
+export function termosDaBusca(texto) {
+  const todos = normalizar(texto).split(/\s+/).filter(Boolean);
+  const uteis = todos.filter(p => !PALAVRAS_DE_LIGACAO.has(p));
+  return uteis.length ? uteis : todos;
+}
+
+/** Se todos os termos aparecem no texto alvo (já normalizado). */
+function contemTodos(termos, alvo) {
+  return termos.every(t => alvo.includes(t));
+}
+
+/** Nomes em português do item e das variantes, normalizados e juntos. */
+function nomesPt(item) {
+  return normalizar([item.nome, ...(item.variantes || []).map(v => v.nome)].join(' | '));
+}
+
+/** Nomes em inglês do item e das variantes, normalizados e juntos. */
+function nomesEn(item) {
+  return normalizar([item.nome_en, ...(item.variantes || []).map(v => v.nome_en)].filter(Boolean).join(' | '));
+}
+
+/**
+ * Se o item casa a busca pelo nome em português (item ou variante).
+ * Sem texto, casa tudo.
+ */
+export function casaEmPortugues(item, texto) {
+  const termos = termosDaBusca(texto);
+  return !termos.length || contemTodos(termos, nomesPt(item));
+}
+
+/**
+ * Variantes de um item "Varia" que casam a busca (por nome em português ou em
+ * inglês), quando o nome do próprio item não casa sozinho. Vazio nos demais casos.
+ * @param {object} item Item do acervo.
+ * @param {string} texto Busca digitada.
+ * @returns {Array<object>}
+ */
+export function variantesQueCasam(item, texto) {
+  const termos = termosDaBusca(texto);
+  if (!termos.length || !(item.variantes || []).length) return [];
+  if (contemTodos(termos, normalizar(item.nome)) || contemTodos(termos, normalizar(item.nome_en))) return [];
+  return item.variantes.filter(v => contemTodos(termos, normalizar(v.nome)) || contemTodos(termos, normalizar(v.nome_en)));
+}
+
+/**
+ * Itens do acervo que casam a busca, a raridade e o tipo do livro. A busca divide o
+ * texto em palavras (qualquer ordem, sem acento, ignorando "de/da/do"). Primeiro
+ * vêm os que casam pelo nome em português (nome do item antes de variante);
+ * depois, separados, os que só casam pelo nome em inglês.
+ * @returns {Array<object>} Itens em português seguidos dos de inglês.
+ */
 export function filtrarAcervo(itens, { texto = '', raridade = '', tipo = '' } = {}) {
-  const t = normalizar(texto).trim();
-  return (itens || []).filter(i =>
-    (!t || normalizar(i.nome).includes(t) || (i.variantes || []).some(v => normalizar(v.nome).includes(t)))
-    && (!raridade || raridadesDoItem(i).includes(raridade))
-    && (!tipo || i.tipo === tipo));
+  const termos = termosDaBusca(texto);
+  const base = (itens || []).filter(i =>
+    (!raridade || raridadesDoItem(i).includes(raridade)) && (!tipo || i.tipo === tipo));
+  if (!termos.length) return base;
+  const frase = normalizar(texto).trim();
+  const pt = [];
+  const en = [];
+  for (const i of base) {
+    if (contemTodos(termos, nomesPt(i))) pt.push(i);
+    else if (contemTodos(termos, nomesEn(i))) en.push(i);
+  }
+  // Ordem estável: frase inteira no nome, depois todos os termos no nome, depois só nas variantes.
+  const peso = i => (normalizar(i.nome).includes(frase) ? 0 : contemTodos(termos, normalizar(i.nome)) ? 1 : 2);
+  pt.sort((a, b) => peso(a) - peso(b));
+  return [...pt, ...en];
 }
 
 /** Armas, armaduras ou escudo do catálogo que a `base` do item aceita (respeita `excluir`). */

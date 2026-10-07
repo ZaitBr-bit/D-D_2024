@@ -16,9 +16,9 @@
 // ============================================================
 import { getArmaduras, getArmas, getEquipamentoAventura, getFerramentas, getItensMagicos } from './db.js';
 import {
-  abrirItemMagico, aplicarSeVigente, criarGuardaRequisicao, htmlLinhaItemMagico, renderCategoriaMagicos
+  abrirItemMagico, aplicarSeVigente, criarGuardaRequisicao, htmlListaItensMagicos, renderCategoriaMagicos
 } from './itens-magicos-ui.js';
-import { filtrarAcervo, nomesReaproveitadosDoEquipamento } from './itens-magicos-catalogo.js';
+import { filtrarAcervo, nomesReaproveitadosDoEquipamento, termosDaBusca } from './itens-magicos-catalogo.js';
 import { ajustarOverlayAoTeclado } from './modal-teclado.js';
 import { pagarCusto, parseCusto, podePagarCusto } from './moedas.js';
 import { abrirModal, escHtml, inserirNoInicio, mdParaHtml, semAcento, toast } from './utils.js';
@@ -399,12 +399,12 @@ export async function abrirSeletorItens(ctx) {
     // match funciona sem precisar extrair o texto das tags. semAcento nos
     // dois lados, como no resto do arquivo.
     if (filtroTexto) {
-      itens = itens.filter(i =>
-        semAcento(i.nome).includes(filtroTexto)
-        || semAcento(i.detalhe || '').includes(filtroTexto)
-        || semAcento(i.detalhe2 || '').includes(filtroTexto)
-        || semAcento(i.badgeCat || '').includes(filtroTexto)
-      );
+      // Palavras em qualquer ordem, sem "de/da/do" (mesmo critério dos itens mágicos).
+      const termos = termosDaBusca(filtroTexto);
+      itens = itens.filter(i => {
+        const alvo = semAcento([i.nome, i.detalhe, i.detalhe2, i.badgeCat].filter(Boolean).join(' '));
+        return termos.every(t => alvo.includes(t));
+      });
     }
 
     // Linha de filtro: por peso/proficiencia em Armas, por
@@ -450,7 +450,7 @@ export async function abrirSeletorItens(ctx) {
           </div>
           ${it.badgeCat || ''}
         </div>
-      `).join('') + magicosVisiveis.map((it, i) => htmlLinhaItemMagico(it, i)).join('') + avisoLimite);
+      `).join('') + htmlListaItensMagicos(magicosVisiveis, filtroTexto) + avisoLimite);
 
     // Itens mágicos da busca em Todos: mesmo modal de detalhe da categoria Itens Mágicos.
     listaEl.querySelectorAll('[data-item-magico]').forEach(el => el.addEventListener('click', () => {

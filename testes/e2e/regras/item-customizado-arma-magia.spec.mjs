@@ -29,12 +29,12 @@ test('item customizado com categoria de arma: Atq/Dano/Maestria calculados como 
   // Issue #104: propriedades pelo botão "+ Adicionar propriedade" (antes era texto livre).
   for (const propriedade of ['Acuidade', 'Leve']) {
     await page.click('#ic-prop-add');
-    await page.click(`#ic-prop-cards [data-opcao="${propriedade}"]`);
+    await page.click(`#ic-prop-cards [data-opcao="${propriedade}"] .opcao-check`);
     await page.click('#ic-prop-confirmar');
   }
   // Maestria: botão abre o popup de cards; escolher fecha o popup e mostra a escolha no botão.
   await page.click('#ic-maestria-btn');
-  await page.click('#ic-maestria-cards [data-opcao="Trespassar"]');
+  await page.click('#ic-maestria-cards [data-opcao="Trespassar"] .opcao-check');
   await expect(page.locator('#ic-maestria-atual')).toHaveText('Trespassar');
   await page.click('#btn-add-ic');
 
