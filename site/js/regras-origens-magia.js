@@ -56,6 +56,7 @@ export const ORIGENS_MAGIA_ISENTA = [
 export const ORIGENS_TRUQUE_NAO_TROCAVEL = [
   'especie',                // truque de espécie (Alto Elfo, Tiferino)
   'sempre',
+  'dominio',                // truque de domínio/subclasse concedido (Raio de Gelo do Círculo do Mar)
   'especie_legado',
   'iniciado_em_magia',
   'tocado_por_fadas',

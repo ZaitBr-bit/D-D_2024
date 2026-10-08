@@ -26,6 +26,20 @@ export function migrarMagiasDominio() {
   if (!magiasDominioCache?.length || !char.magias_preparadas?.length) return;
   let alterado = false;
   const nomesDominio = new Set(magiasDominioCache.map(m => m.nome));
+  // Truque de domínio gravado antes como magia preparada de 1º círculo: passa para
+  // `magias_conhecidas` com círculo 0, onde a ficha e a descrição o esperam.
+  const truquesDominio = new Set(magiasDominioCache.filter(m => m.circulo === 0).map(m => m.nome));
+  const movidos = char.magias_preparadas.filter(m => m?.origem === 'dominio' && truquesDominio.has(m.nome));
+  if (movidos.length) {
+    if (!Array.isArray(char.magias_conhecidas)) char.magias_conhecidas = [];
+    for (const m of movidos) {
+      const existente = char.magias_conhecidas.find(c => c.nome === m.nome);
+      if (existente) { existente.origem = 'dominio'; existente.circulo = 0; }
+      else char.magias_conhecidas.push({ ...m, circulo: 0 });
+    }
+    char.magias_preparadas = char.magias_preparadas.filter(m => !movidos.includes(m));
+    alterado = true;
+  }
   char.magias_preparadas.forEach(m => {
     if (nomesDominio.has(m.nome) && m.origem !== 'dominio' && m.origem !== 'sempre' && m.origem !== 'especie_legado') {
       m.origem = 'dominio';

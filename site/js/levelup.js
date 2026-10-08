@@ -1040,7 +1040,8 @@ export async function obterMagiasDominioNivel(classe, subclasse, nivel) {
   
   return nomesMagias.map(nome => {
     const magiaIdx = indiceMagias.find(m => m.nome === nome);
-    return { nome, circulo: magiaIdx?.circulo || 1 };
+    // `??`: truque tem círculo 0 e `||` o transformava em 1, o que fazia a busca da descrição falhar.
+    return { nome, circulo: magiaIdx?.circulo ?? 1 };
   });
 }
 
@@ -2445,7 +2446,10 @@ export async function subirDeNivel(personagem, opcoes = {}) {
   if (magiasDominio.length > 0) {
     if (!personagem.magias_preparadas) personagem.magias_preparadas = [];
     for (const magia of magiasDominio) {
-      _concederMagiaAutomatica(personagem.magias_preparadas, magia, 'dominio', sub.classe);
+      // Truque de domínio (Raio de Gelo no Círculo do Mar) mora em `magias_conhecidas`, como os demais truques.
+      if (magia.circulo === 0 && !personagem.magias_conhecidas) personagem.magias_conhecidas = [];
+      const lista = magia.circulo === 0 ? personagem.magias_conhecidas : personagem.magias_preparadas;
+      _concederMagiaAutomatica(lista, magia, 'dominio', sub.classe);
     }
   }
 

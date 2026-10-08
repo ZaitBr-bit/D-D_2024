@@ -5388,16 +5388,17 @@
       "pericias_expertise": [],
       "escolhas_classe": {},
       "talentos": [],
-      "magias_conhecidas": [],
+      "magias_conhecidas": [
+        {
+          "nome": "Fagulha Estelar",
+          "circulo": 0,
+          "origem": "dominio",
+          "classe": "Druida"
+        }
+      ],
       "magias_preparadas": [
         {
           "nome": "Curar Ferimentos",
-          "circulo": 1,
-          "origem": "dominio",
-          "classe": "Druida"
-        },
-        {
-          "nome": "Fagulha Estelar",
           "circulo": 1,
           "origem": "dominio",
           "classe": "Druida"
@@ -5446,16 +5447,17 @@
       "talentos": [
         "Aumento no Valor de Atributo"
       ],
-      "magias_conhecidas": [],
+      "magias_conhecidas": [
+        {
+          "nome": "Fagulha Estelar",
+          "circulo": 0,
+          "origem": "dominio",
+          "classe": "Druida"
+        }
+      ],
       "magias_preparadas": [
         {
           "nome": "Curar Ferimentos",
-          "circulo": 1,
-          "origem": "dominio",
-          "classe": "Druida"
-        },
-        {
-          "nome": "Fagulha Estelar",
           "circulo": 1,
           "origem": "dominio",
           "classe": "Druida"
@@ -5504,16 +5506,17 @@
       "talentos": [
         "Aumento no Valor de Atributo"
       ],
-      "magias_conhecidas": [],
+      "magias_conhecidas": [
+        {
+          "nome": "Fagulha Estelar",
+          "circulo": 0,
+          "origem": "dominio",
+          "classe": "Druida"
+        }
+      ],
       "magias_preparadas": [
         {
           "nome": "Curar Ferimentos",
-          "circulo": 1,
-          "origem": "dominio",
-          "classe": "Druida"
-        },
-        {
-          "nome": "Fagulha Estelar",
           "circulo": 1,
           "origem": "dominio",
           "classe": "Druida"
@@ -5568,16 +5571,17 @@
       "talentos": [
         "Aumento no Valor de Atributo"
       ],
-      "magias_conhecidas": [],
+      "magias_conhecidas": [
+        {
+          "nome": "Fagulha Estelar",
+          "circulo": 0,
+          "origem": "dominio",
+          "classe": "Druida"
+        }
+      ],
       "magias_preparadas": [
         {
           "nome": "Curar Ferimentos",
-          "circulo": 1,
-          "origem": "dominio",
-          "classe": "Druida"
-        },
-        {
-          "nome": "Fagulha Estelar",
           "circulo": 1,
           "origem": "dominio",
           "classe": "Druida"
@@ -5632,16 +5636,17 @@
       "talentos": [
         "Aumento no Valor de Atributo"
       ],
-      "magias_conhecidas": [],
+      "magias_conhecidas": [
+        {
+          "nome": "Fagulha Estelar",
+          "circulo": 0,
+          "origem": "dominio",
+          "classe": "Druida"
+        }
+      ],
       "magias_preparadas": [
         {
           "nome": "Curar Ferimentos",
-          "circulo": 1,
-          "origem": "dominio",
-          "classe": "Druida"
-        },
-        {
-          "nome": "Fagulha Estelar",
           "circulo": 1,
           "origem": "dominio",
           "classe": "Druida"
@@ -5703,16 +5708,17 @@
         "Aumento no Valor de Atributo",
         "Aumento no Valor de Atributo"
       ],
-      "magias_conhecidas": [],
+      "magias_conhecidas": [
+        {
+          "nome": "Fagulha Estelar",
+          "circulo": 0,
+          "origem": "dominio",
+          "classe": "Druida"
+        }
+      ],
       "magias_preparadas": [
         {
           "nome": "Curar Ferimentos",
-          "circulo": 1,
-          "origem": "dominio",
-          "classe": "Druida"
-        },
-        {
-          "nome": "Fagulha Estelar",
           "circulo": 1,
           "origem": "dominio",
           "classe": "Druida"
@@ -5774,16 +5780,17 @@
         "Aumento no Valor de Atributo",
         "Aumento no Valor de Atributo"
       ],
-      "magias_conhecidas": [],
+      "magias_conhecidas": [
+        {
+          "nome": "Fagulha Estelar",
+          "circulo": 0,
+          "origem": "dominio",
+          "classe": "Druida"
+        }
+      ],
       "magias_preparadas": [
         {
           "nome": "Curar Ferimentos",
-          "circulo": 1,
-          "origem": "dominio",
-          "classe": "Druida"
-        },
-        {
-          "nome": "Fagulha Estelar",
           "circulo": 1,
           "origem": "dominio",
           "classe": "Druida"
@@ -5851,16 +5858,17 @@
         "Aumento no Valor de Atributo",
         "Aumento no Valor de Atributo"
       ],
-      "magias_conhecidas": [],
+      "magias_conhecidas": [
+        {
+          "nome": "Fagulha Estelar",
+          "circulo": 0,
+          "origem": "dominio",
+          "classe": "Druida"
+        }
+      ],
       "magias_preparadas": [
         {
           "nome": "Curar Ferimentos",
-          "circulo": 1,
-          "origem": "dominio",
-          "classe": "Druida"
-        },
-        {
-          "nome": "Fagulha Estelar",
           "circulo": 1,
           "origem": "dominio",
           "classe": "Druida"
@@ -5928,16 +5936,17 @@
         "Aumento no Valor de Atributo",
         "Aumento no Valor de Atributo"
       ],
-      "magias_conhecidas": [],
+      "magias_conhecidas": [
+        {
+          "nome": "Fagulha Estelar",
+          "circulo": 0,
+          "origem": "dominio",
+          "classe": "Druida"
+        }
+      ],
       "magias_preparadas": [
         {
           "nome": "Curar Ferimentos",
-          "circulo": 1,
-          "origem": "dominio",
-          "classe": "Druida"
-        },
-        {
-          "nome": "Fagulha Estelar",
           "circulo": 1,
           "origem": "dominio",
           "classe": "Druida"
@@ -6006,16 +6015,17 @@
         "Aumento no Valor de Atributo",
         "Aumento no Valor de Atributo"
       ],
-      "magias_conhecidas": [],
+      "magias_conhecidas": [
+        {
+          "nome": "Fagulha Estelar",
+          "circulo": 0,
+          "origem": "dominio",
+          "classe": "Druida"
+        }
+      ],
       "magias_preparadas": [
         {
           "nome": "Curar Ferimentos",
-          "circulo": 1,
-          "origem": "dominio",
-          "classe": "Druida"
-        },
-        {
-          "nome": "Fagulha Estelar",
           "circulo": 1,
           "origem": "dominio",
           "classe": "Druida"
@@ -6084,16 +6094,17 @@
         "Aumento no Valor de Atributo",
         "Aumento no Valor de Atributo"
       ],
-      "magias_conhecidas": [],
+      "magias_conhecidas": [
+        {
+          "nome": "Fagulha Estelar",
+          "circulo": 0,
+          "origem": "dominio",
+          "classe": "Druida"
+        }
+      ],
       "magias_preparadas": [
         {
           "nome": "Curar Ferimentos",
-          "circulo": 1,
-          "origem": "dominio",
-          "classe": "Druida"
-        },
-        {
-          "nome": "Fagulha Estelar",
           "circulo": 1,
           "origem": "dominio",
           "classe": "Druida"
@@ -6162,16 +6173,17 @@
         "Aumento no Valor de Atributo",
         "Aumento no Valor de Atributo"
       ],
-      "magias_conhecidas": [],
+      "magias_conhecidas": [
+        {
+          "nome": "Fagulha Estelar",
+          "circulo": 0,
+          "origem": "dominio",
+          "classe": "Druida"
+        }
+      ],
       "magias_preparadas": [
         {
           "nome": "Curar Ferimentos",
-          "circulo": 1,
-          "origem": "dominio",
-          "classe": "Druida"
-        },
-        {
-          "nome": "Fagulha Estelar",
           "circulo": 1,
           "origem": "dominio",
           "classe": "Druida"
@@ -6240,16 +6252,17 @@
         "Aumento no Valor de Atributo",
         "Aumento no Valor de Atributo"
       ],
-      "magias_conhecidas": [],
+      "magias_conhecidas": [
+        {
+          "nome": "Fagulha Estelar",
+          "circulo": 0,
+          "origem": "dominio",
+          "classe": "Druida"
+        }
+      ],
       "magias_preparadas": [
         {
           "nome": "Curar Ferimentos",
-          "circulo": 1,
-          "origem": "dominio",
-          "classe": "Druida"
-        },
-        {
-          "nome": "Fagulha Estelar",
           "circulo": 1,
           "origem": "dominio",
           "classe": "Druida"
@@ -6319,16 +6332,17 @@
         "Aumento no Valor de Atributo",
         "Aumento no Valor de Atributo"
       ],
-      "magias_conhecidas": [],
+      "magias_conhecidas": [
+        {
+          "nome": "Fagulha Estelar",
+          "circulo": 0,
+          "origem": "dominio",
+          "classe": "Druida"
+        }
+      ],
       "magias_preparadas": [
         {
           "nome": "Curar Ferimentos",
-          "circulo": 1,
-          "origem": "dominio",
-          "classe": "Druida"
-        },
-        {
-          "nome": "Fagulha Estelar",
           "circulo": 1,
           "origem": "dominio",
           "classe": "Druida"
@@ -6398,16 +6412,17 @@
         "Aumento no Valor de Atributo",
         "Aumento no Valor de Atributo"
       ],
-      "magias_conhecidas": [],
+      "magias_conhecidas": [
+        {
+          "nome": "Fagulha Estelar",
+          "circulo": 0,
+          "origem": "dominio",
+          "classe": "Druida"
+        }
+      ],
       "magias_preparadas": [
         {
           "nome": "Curar Ferimentos",
-          "circulo": 1,
-          "origem": "dominio",
-          "classe": "Druida"
-        },
-        {
-          "nome": "Fagulha Estelar",
           "circulo": 1,
           "origem": "dominio",
           "classe": "Druida"
@@ -6477,16 +6492,17 @@
         "Aumento no Valor de Atributo",
         "Aumento no Valor de Atributo"
       ],
-      "magias_conhecidas": [],
+      "magias_conhecidas": [
+        {
+          "nome": "Fagulha Estelar",
+          "circulo": 0,
+          "origem": "dominio",
+          "classe": "Druida"
+        }
+      ],
       "magias_preparadas": [
         {
           "nome": "Curar Ferimentos",
-          "circulo": 1,
-          "origem": "dominio",
-          "classe": "Druida"
-        },
-        {
-          "nome": "Fagulha Estelar",
           "circulo": 1,
           "origem": "dominio",
           "classe": "Druida"
@@ -6559,16 +6575,17 @@
         "Aumento no Valor de Atributo",
         "Aumento no Valor de Atributo"
       ],
-      "magias_conhecidas": [],
+      "magias_conhecidas": [
+        {
+          "nome": "Fagulha Estelar",
+          "circulo": 0,
+          "origem": "dominio",
+          "classe": "Druida"
+        }
+      ],
       "magias_preparadas": [
         {
           "nome": "Curar Ferimentos",
-          "circulo": 1,
-          "origem": "dominio",
-          "classe": "Druida"
-        },
-        {
-          "nome": "Fagulha Estelar",
           "circulo": 1,
           "origem": "dominio",
           "classe": "Druida"
@@ -6641,16 +6658,17 @@
         "Aumento no Valor de Atributo",
         "Aumento no Valor de Atributo"
       ],
-      "magias_conhecidas": [],
+      "magias_conhecidas": [
+        {
+          "nome": "Fagulha Estelar",
+          "circulo": 0,
+          "origem": "dominio",
+          "classe": "Druida"
+        }
+      ],
       "magias_preparadas": [
         {
           "nome": "Curar Ferimentos",
-          "circulo": 1,
-          "origem": "dominio",
-          "classe": "Druida"
-        },
-        {
-          "nome": "Fagulha Estelar",
           "circulo": 1,
           "origem": "dominio",
           "classe": "Druida"
