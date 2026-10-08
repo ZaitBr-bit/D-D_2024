@@ -2123,11 +2123,14 @@ export function setupEventosHabilidades() {
           const reserva = reservasDeEspacos().find(r => r.fonte === 'conjuracao' && r.circulo === c);
           const usados = reserva?.usados || 0;
           if (usados <= 0) continue;
+          // Linha com botões − e + (sem digitar); o campo só mostra a quantidade e guarda o valor.
           opcoesHtml += `
-            <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:0.85rem">
-              <input type="number" class="recuperar-slot" data-circulo="${c}" min="0" max="${usados}" value="0" style="width:60px;padding:4px;border-radius:var(--radius);border:1px solid var(--border)">
-              ${c}º Círculo (${usados} gastos)
-            </label>`;
+            <div class="recuperar-linha" style="display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:0.9rem">
+              <button type="button" class="btn btn-secondary" data-recuperar-passo="menos" data-circulo="${c}" aria-label="Menos um espaço de ${c}º círculo" style="width:42px;height:42px;padding:0;font-size:1.3rem;font-weight:700" disabled>−</button>
+              <input type="number" class="recuperar-slot" data-circulo="${c}" min="0" max="${usados}" value="0" readonly aria-label="Espaços de ${c}º círculo a recuperar" style="width:44px;text-align:center;font-weight:700;font-size:1.1rem;padding:4px 0;border:none;background:transparent">
+              <button type="button" class="btn btn-secondary" data-recuperar-passo="mais" data-circulo="${c}" aria-label="Mais um espaço de ${c}º círculo" style="width:42px;height:42px;padding:0;font-size:1.3rem;font-weight:700">+</button>
+              <span style="flex:1">${c}º Círculo <span style="color:var(--text-muted)">(${usados} ${usados === 1 ? 'gasto' : 'gastos'})</span></span>
+            </div>`;
         }
         if (!opcoesHtml) {
           toast('Nenhum espaço de magia gasto para recuperar.', 'info');
@@ -2143,7 +2146,8 @@ export function setupEventosHabilidades() {
           <button class="btn btn-secondary" onclick="window.fecharModal()">Cancelar</button>
           <button class="btn btn-accent" id="btn-recuperar-confirmar">Recuperar</button>
         `);
-        // Atualizar total em tempo real
+        // Atualiza o total e liga/desliga os botões: + só enquanto houver espaço gasto e sobrar
+        // orçamento (círculos combinados ≤ máximo); − só acima de zero.
         const atualizarTotal = () => {
           let total = 0;
           document.querySelectorAll('.recuperar-slot').forEach(inp => {
@@ -2151,8 +2155,24 @@ export function setupEventosHabilidades() {
           });
           const el = document.getElementById('recuperar-total');
           if (el) el.textContent = `Total: ${total} / ${estado.recuperacaoArcanaMax}`;
+          document.querySelectorAll('.recuperar-slot').forEach(inp => {
+            const c = parseInt(inp.dataset.circulo);
+            const atual = parseInt(inp.value) || 0;
+            const mais = document.querySelector(`[data-recuperar-passo="mais"][data-circulo="${c}"]`);
+            const menos = document.querySelector(`[data-recuperar-passo="menos"][data-circulo="${c}"]`);
+            if (mais) mais.disabled = atual >= parseInt(inp.max) || total + c > estado.recuperacaoArcanaMax;
+            if (menos) menos.disabled = atual <= 0;
+          });
+          const confirmar = document.getElementById('btn-recuperar-confirmar');
+          if (confirmar) { confirmar.disabled = total <= 0; confirmar.style.opacity = total <= 0 ? '0.5' : ''; }
         };
-        document.querySelectorAll('.recuperar-slot').forEach(inp => inp.addEventListener('input', atualizarTotal));
+        document.querySelectorAll('[data-recuperar-passo]').forEach(btn => btn.addEventListener('click', () => {
+          const inp = document.querySelector(`.recuperar-slot[data-circulo="${btn.dataset.circulo}"]`);
+          if (!inp || btn.disabled) return;
+          inp.value = (parseInt(inp.value) || 0) + (btn.dataset.recuperarPasso === 'mais' ? 1 : -1);
+          atualizarTotal();
+        }));
+        atualizarTotal();
         document.getElementById('btn-recuperar-confirmar')?.addEventListener('click', () => {
           let total = 0;
           const slots = [];

@@ -144,8 +144,7 @@ test('Resiliência Sepulcral: a Recuperação Arcana tira 1 nível de Exaustão'
   await assentar(page).catch(() => {});
   await abrirBlocosRecursos(page);
   await clicarSeletorFicha(page, '#painel-recursos-mago [data-mago-acao="recuperacao-arcana"]', { esperar: '#btn-recuperar-confirmar' });
-  await page.locator('.recuperar-slot[data-circulo="1"]').fill('1');
-  await page.locator('.recuperar-slot[data-circulo="1"]').blur();
+  await page.locator('[data-recuperar-passo="mais"][data-circulo="1"]').click();
   await page.locator('#btn-recuperar-confirmar').click();
   await assentar(page).catch(() => {});
   await expect(page.locator('#toast-container')).toContainText('Resiliência Sepulcral');
