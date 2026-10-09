@@ -161,7 +161,9 @@ export const AFASTAMENTOS_DO_LIVRO = {
  * que este catálogo existe para medir.
  */
 export const PAPEIS_LISTA_ORIGEM = {
-  magia: { marcador: 'dominio', descricao: 'isentas do limite de magias PREPARADAS' },
+  // `assinatura_magica` (Mago nível 20) só existe na lista de MAGIA. `dominio` serviu de marcador
+  // até a lista de TRUQUE passar a trazê-lo também (truque concedido por subclasse).
+  magia: { marcador: 'assinatura_magica', descricao: 'isentas do limite de magias PREPARADAS' },
   truque: { marcador: 'especie', descricao: 'truques que não podem ser trocados' },
 };
 
@@ -178,11 +180,12 @@ export const EXCECOES_LISTA_ORIGEM = {
   // aspas, enxergava `['dominio']`. Era a MESMA pergunta, respondida com a lista
   // errada. Corrigida na Correção B (2026-08-19), junto com a cegueira do
   // extrator, que hoje registra os `...espalha` e tem asserção própria.
-  // Linha 94 (era 93 antes das importações do Necromante em migracoes.js; era 68 antes da Tarefa 3, sub-projeto "tela magias por
+  // Linha 108 (era 94 antes da migração do truque concedido por subclasse em migracoes.js; era 93 antes das importações do
+  // Necromante; era 68 antes da Tarefa 3, sub-projeto "tela magias por
   // classe" -- migrarSlotsMagiaLivre passou a derivar a superfície de
   // conjuração ativa de classes[] em vez dos espelhos char.classe/
   // classeData/char.nivel, o que deslocou o resto da função).
-  'sheet/migracoes.js:94': 'Migração de dado legado: classifica origens de personagens ' +
+  'sheet/migracoes.js:108': 'Migração de dado legado: classifica origens de personagens ' +
     'salvos por versões antigas do app, incluindo `telecinetico`, que nenhuma das listas ' +
     'vivas usa. Não governa o limite de nenhum personagem novo.',
   // Linha 294 (era 295 antes da revisão final #105/#61 -- os docblocks de

@@ -1,8 +1,8 @@
 {
   "fontes": [
-    { "id": "tasha", "nome": "Tasha's Cauldron of Everything", "sigla": "Tasha's" },
-    { "id": "ravenloft", "nome": "Ravenloft: Horrors Within", "sigla": "Ravenloft" },
-    { "id": "monstros", "nome": "Manual dos Monstros (2026)", "sigla": "Monstros" },
-    { "id": "arcana-unleashed", "nome": "Arcana Unleashed", "sigla": "Arcana" }
+    { "id": "tasha", "nome": "Suplemento 1", "sigla": "Sup. 1" },
+    { "id": "ravenloft", "nome": "Suplemento 2", "sigla": "Sup. 2" },
+    { "id": "monstros", "nome": "Suplemento 4", "sigla": "Sup. 4" },
+    { "id": "arcana-unleashed", "nome": "Suplemento 3", "sigla": "Sup. 3" }
   ]
 }

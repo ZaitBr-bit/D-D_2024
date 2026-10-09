@@ -7,6 +7,7 @@
 import { nivelNa, nivelTotal, subclasseDe } from './regras-multiclasse.js';
 import { ajustarPVFamiliar, estadoFamiliar } from './regras-familiar.js';
 import { bonusProficiencia, calcMod } from './utils.js';
+import { atributoEfetivo } from './regras-atributos.js';
 
 /** Magias de Necromancia que criam ou invocam Mortos-Vivos. */
 export const MAGIAS_QUE_CRIAM_MORTOS_VIVOS = ['Animar Mortos', 'Criar Mortos-Vivos', 'Invocar Morto-Vivo'];
@@ -26,9 +27,9 @@ export function nivelDoMago(p) {
   return nivelNa(p, 'Mago') || 0;
 }
 
-/** Modificador de Inteligência (valor gravado em `atributos`). */
+/** Modificador de Inteligência em jogo (valor-base, mínimo de item ativo e aumentos passivos). */
 export function modInteligencia(p) {
-  return calcMod(p?.atributos?.inteligencia ?? 10);
+  return calcMod(atributoEfetivo(p, 'inteligencia') ?? 10);
 }
 
 /** PV recuperados por Vitalidade Morta-Viva: nível do espaço gasto + nível de Mago. */

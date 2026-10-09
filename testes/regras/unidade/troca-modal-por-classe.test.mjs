@@ -355,9 +355,10 @@ test('ORACULO DOM 2 -- mostrarTrocaTruque: titulo nomeia a classe, saida nao per
     // mesmo handler que ligarClique (site/js/ui-opcoes.js) registra via
     // el.addEventListener('click', ...) sobre o elemento passado a
     // montarSeletor (aqui, 'troca-truque-remover-lista'; NAO o filho
-    // '.opcao-lista', que so recebe o innerHTML).
+    // '.opcao-lista', que so recebe o innerHTML). O clique cai no circulo
+    // (.opcao-check): so ele seleciona; o resto do card abre o popup de detalhes.
     const elRemover = registro.get('troca-truque-remover-lista');
-    const cardFalso = { dataset: { opcao: 'Chama Sagrada' }, closest: (sel) => (sel === '[data-opcao]' ? cardFalso : null) };
+    const cardFalso = { dataset: { opcao: 'Chama Sagrada' }, closest: (sel) => (sel === '[data-opcao]' || sel === '.opcao-check' ? cardFalso : null) };
     const cliques = elRemover?.handlers?.click || [];
     assert.equal(cliques.length, 1, 'sanity: montarSeletor tem que ter registrado UM clique no container de remover');
     cliques[0]({ target: cardFalso });

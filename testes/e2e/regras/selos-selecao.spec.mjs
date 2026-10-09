@@ -19,7 +19,7 @@ test('Preparar Magias: a magia de Arcana tem o selo e a do Livro do Jogador não
   await clicarSeletorFicha(page, '#btn-add-magia', { esperar: '[data-tab-mg="5"]' });
   await page.locator('[data-tab-mg="5"]').click();
   const enervacao = page.locator('#modal-corpo .opcao-card', { hasText: 'Enervação' });
-  await expect(enervacao.locator('.selo-fonte')).toHaveText('Arcana');
+  await expect(enervacao.locator('.selo-fonte')).toHaveText('Sup. 3');
   await page.locator('[data-tab-mg="1"]').click();
   const raio = page.locator('#modal-corpo .opcao-card', { hasText: 'Raio Nauseante' });
   await expect(raio).toBeVisible();
@@ -42,12 +42,12 @@ test('Adicionar Item: o item de Tasha tem o selo, o do Livro do Mestre não, e o
   await clicarBotaoFicha(page, 'btn-add-inv', { esperar: '#lista-inv-cat' });
   await page.locator('#sel-inv-cat').selectOption('magicos');
   const tasha = page.locator('[data-item-magico]', { hasText: 'Botas do Caminho Sinuoso' });
-  await expect(tasha.locator('.selo-fonte')).toHaveText("Tasha's");
+  await expect(tasha.locator('.selo-fonte')).toHaveText('Sup. 1');
   const semSelo = await page.locator('[data-item-magico]').evaluateAll((els) => els.filter((e) => !e.querySelector('.selo-fonte')).length);
   expect(semSelo, 'itens do Livro do Mestre ficam sem selo').toBeGreaterThan(10);
 
   await tasha.locator('.selo-fonte').click();
-  await expect(page.locator('.popover-fonte')).toContainText("Tasha's Cauldron of Everything");
+  await expect(page.locator('.popover-fonte')).toContainText('Suplemento 1');
   await expect(page.locator('#modal-titulo'), 'o clique no selo não abre o item').not.toContainText('Botas do Caminho Sinuoso');
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
@@ -75,7 +75,7 @@ test('subida de nível: o grid de "Necromancia: +2 Magia(s)" mostra o selo na ma
   const grupos = page.locator('#grid-magias details[data-grid-circulo] summary');
   for (let i = 0; i < await grupos.count(); i++) await grupos.nth(i).click();
   const murchar = page.locator('#grid-magias [data-grid-nome="Murchar e Florescer"]');
-  await expect(murchar.locator('.selo-fonte')).toHaveText('Arcana');
+  await expect(murchar.locator('.selo-fonte')).toHaveText('Sup. 3');
   const enfraquecimento = page.locator('#grid-magias [data-grid-nome="Raio do Enfraquecimento"]');
   await expect(enfraquecimento).toBeVisible();
   await expect(enfraquecimento.locator('.selo-fonte')).toHaveCount(0);

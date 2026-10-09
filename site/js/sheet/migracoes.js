@@ -441,8 +441,8 @@ export function migrarProficienciasTalentos() {
 // linha no bloco de imports desloca a numeração de todo o arquivo abaixo,
 // e testes/regras/catalogo/magias-preparo.mjs guarda uma exceção chaveada
 // pela linha exata de `origensForaDoLimite` em migrarSlotsMagiaLivre
-// (EXCECOES_LISTA_ORIGEM['sheet/migracoes.js:93'] -- linha 93 desde a
-// Tarefa 3, que já deslocou este trecho ao converter migrarSlotsMagiaLivre
+// (EXCECOES_LISTA_ORIGEM['sheet/migracoes.js:108'] -- linha 108 desde a
+// migração do truque de subclasse; antes, a Tarefa 3 já deslocou este trecho ao converter migrarSlotsMagiaLivre
 // para ler classes[] via superficiesDaFicha; o import de
 // superficiesDaFicha foi ao bloco do topo mesmo assim, porque o
 // deslocamento de `origensForaDoLimite` já vinha do corpo da função

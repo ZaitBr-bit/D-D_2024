@@ -1,4 +1,4 @@
-# Criador de Ficha de Personagem — D&D 5.5 (2024)
+# Criador de Ficha de Personagem — compatível com a 5ª edição (2024)
 
 **[▶ Abrir o app](https://zaitbr-bit.github.io/D-D_2024/)** &nbsp;·&nbsp;
 **[🐛 Relatar um problema](https://github.com/ZaitBr-bit/D-D_2024/issues/new?template=bug.yml)** &nbsp;·&nbsp;
@@ -6,15 +6,15 @@
 versão atual **3.2.1**
 
 Aplicativo web **gratuito e em português** para criar e usar fichas de personagem
-de **D&D 5.5 (edição de 2024)**. Roda no navegador do celular e do computador,
+compatíveis com a **5ª edição (revisão de 2024)**. Roda no navegador do celular e do computador,
 **funciona offline** e não precisa de cadastro: seus personagens ficam salvos no
 próprio aparelho, e a conta Google é opcional, só para sincronizar entre
 dispositivos.
 
-O conteúdo de regras já está embutido: **13 classes** (as 12 do Livro do Jogador
-mais o Artífice, de Tasha's), **54 subclasses**, **12 espécies** (com o Renascido,
-de Ravenloft), **16 antecedentes**, **75 talentos**, **391 magias**, os **itens
-mágicos do Livro do Mestre**, além de armas, armaduras, equipamento de aventura,
+O conteúdo de regras já está embutido: **13 classes** (as 12 do livro base
+mais o Artífice, do Suplemento 1), **54 subclasses**, **12 espécies** (com o Renascido,
+do Suplemento 2), **16 antecedentes**, **75 talentos**, **391 magias**, os **itens
+mágicos**, além de armas, armaduras, equipamento de aventura,
 ferramentas, montarias e serviços.
 
 > Este é um projeto de fã, feito por hobby. Não é um produto oficial e não tem
@@ -154,7 +154,7 @@ opcional, só para sincronizar entre aparelhos.
 **Funciona sem internet?** Sim, depois da primeira abertura. Ele se instala no
 navegador e continua funcionando offline.
 
-**Serve para D&D 5e (2014)?** Não. O conteúdo segue a edição de 2024 (5.5).
+**Serve para a 5ª edição de 2014?** Não. O conteúdo segue a revisão de 2024.
 
 **Meus dados são meus?** Ficam no seu aparelho. Se você entrar com o Google, uma
 cópia vai para a nuvem para sincronizar; sem login, nada sai do aparelho.
@@ -224,10 +224,10 @@ D-D_2024/
 │   ├── classes/             # <classe>.json, magias_<classe>.json
 │   ├── origens/             # especies.json, antecedentes.json
 │   ├── talentos/  equipamento/  magias/  apendices/
-│   ├── tasha/               # Tasha's: Artífice, magias, itens e criaturas
-│   ├── ravenloft/           # Ravenloft: espécie Renascido
-│   ├── arcana-unleashed/    # Arcana Unleashed: subclasse Necromante do Mago
-│   ├── monstros/            # Manual dos Monstros (2026): Feras para a Forma Selvagem
+│   ├── tasha/               # Suplemento 1: Artífice, magias, itens e criaturas
+│   ├── ravenloft/           # Suplemento 2: espécie Renascido
+│   ├── arcana-unleashed/    # Suplemento 3: subclasse Necromante do Mago
+│   ├── monstros/            # Suplemento 4: Feras para a Forma Selvagem
 │   ├── fontes.json          # livros de origem do conteúdo (selo de fonte)
 │   ├── capitulo*.json, _metadados.json, controle/
 │   └── livro-do-mestre/     # Livro do Mestre (2024), traduzido; hoje só o cap. 7 (Tesouros). Separado do Livro do Jogador; o site lê o acervo de itens mágicos (capitulo7/itens_magicos.json)
@@ -364,6 +364,12 @@ O **código** deste repositório está sob a licença [MIT](LICENSE): pode usar,
 modificar e redistribuir, mantendo o aviso de copyright.
 
 A licença **não alcança o conteúdo de jogo** — as regras, tabelas e descrições
-de D&D em `dados/` pertencem aos seus detentores
+em `dados/` pertencem aos seus detentores
 de direitos e estão aqui apenas para a aplicação funcionar. Projeto pessoal, sem
 fins lucrativos, sem vínculo, patrocínio ou endosso da Wizards of the Coast.
+
+Este aplicativo é compatível com a 5ª edição (5E compatible).
+
+### Atribuição do SRD 5.2.1
+
+This work includes material from the System Reference Document 5.2.1 ("SRD 5.2.1") by Wizards of the Coast LLC, available at https://www.dndbeyond.com/srd. The SRD 5.2.1 is licensed under the Creative Commons Attribution 4.0 International License, available at https://creativecommons.org/licenses/by/4.0/legalcode.

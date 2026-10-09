@@ -134,11 +134,11 @@ function processarRota() {
 
   // Definir título padrão
   const titulos = new Map([
-    ['home', 'D&D 5.5 Ficha'],
+    ['home', 'Ficha 5e'],
     ['criar', 'Novo Personagem'],
     ['ficha', 'Ficha'],
   ]);
-  definirTituloHeader(titulos.get(pagina) || 'D&D 5.5 Ficha');
+  definirTituloHeader(titulos.get(pagina) || 'Ficha 5e');
   atualizarSeloVersaoClicavel(pagina);
 
   if (render) {

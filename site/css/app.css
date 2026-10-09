@@ -129,6 +129,19 @@ body {
   min-height: calc(100dvh - var(--header-h));
 }
 
+/* --- Rodapé de atribuição (SRD 5.2.1) --- */
+#rodape-atribuicao {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 8px 16px 24px;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+#rodape-atribuicao p { margin: 0 0 4px; }
+#rodape-atribuicao a { color: inherit; }
+
 /* --- Cards --- */
 .card {
   background: var(--bg-card);

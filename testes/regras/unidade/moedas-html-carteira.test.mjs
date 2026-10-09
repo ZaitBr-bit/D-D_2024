@@ -17,8 +17,16 @@ function contrasteContraBranco(hex) {
   return 1.05 / (luminancia(hex) + 0.05);
 }
 
-/** Remove as tags e devolve só o texto. */
-const semTags = (html) => html.replace(/<[^>]+>/g, '');
+/** Remove as tags e devolve só o texto; repete até estabilizar para não deixar `<script` reaparecer. */
+function semTags(html) {
+  let atual = html;
+  let anterior;
+  do {
+    anterior = atual;
+    atual = atual.replace(/<[^>]*>/g, '');
+  } while (atual !== anterior);
+  return atual;
+}
 
 test('COR_MOEDA: uma cor hex distinta por denominação', () => {
   assert.deepEqual(Object.keys(COR_MOEDA).sort(), [...DENOMINACOES].sort());

@@ -35,7 +35,7 @@ for (const rota of ROTAS) {
     // O titulo cai no padrao, e nao no codigo-fonte de uma funcao herdada.
     const titulo = await page.locator('#header-titulo').textContent();
     expect(titulo, 'o header recebeu algo que nao e um titulo').not.toContain('native code');
-    expect(titulo).toContain('D&D 5.5 Ficha');
+    expect(titulo).toContain('Ficha 5e');
 
     expect(erros, `erros de console/pagina: ${erros.join('; ')}`).toEqual([]);
   });

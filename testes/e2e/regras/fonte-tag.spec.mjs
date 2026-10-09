@@ -5,7 +5,7 @@
 import { test, expect } from '@playwright/test';
 import { abrirSite, abrirFicha, assentar, abrirModalLevelUp, abrirIdentidade } from './helpers-regras.mjs';
 
-const NOME_LIVRO = "Tasha's Cauldron of Everything";
+const NOME_LIVRO = 'Suplemento 1';
 const ATRIBUTOS = { forca: 8, destreza: 13, constituicao: 14, inteligencia: 16, sabedoria: 12, carisma: 10 };
 
 /** Clica no chip e confere o popover; fecha com Esc. */

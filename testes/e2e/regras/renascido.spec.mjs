@@ -7,7 +7,7 @@
 import { test, expect } from '@playwright/test';
 import { ATRIBUTOS_REGRAS, abrirSite, abrirFicha, assentar, confirmarModal, satisfazerPasso, personagemEmCriacao, personagemSalvo, abrirIdentidade } from './helpers-regras.mjs';
 
-const NOME_LIVRO = 'Ravenloft: Horrors Within';
+const NOME_LIVRO = 'Suplemento 2';
 const CHAVE_VIDA_PASSADA = 'especie_Conhecimento de uma Vida Passada';
 
 /** Clica no chip, confere o popover com o nome do livro e fecha com Esc. */

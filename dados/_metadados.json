@@ -1,5 +1,5 @@
 {
-  "titulo": "D&D 5.5 - Livro do Jogador (2024)",
+  "titulo": "Compatível com a 5ª edição - Livro do Jogador (2024)",
   "versao": "4ª Edição, 18 de Abril de 2025",
   "total_linhas": 21811,
   "capitulos": [
@@ -75,7 +75,7 @@
     "magias/_indice.json": "Índice completo de todas as magias",
     "magias/por_classe/": "Magias filtradas por classe conjuradora",
     "apendices/criaturas.json": "Blocos de estatísticas de criaturas",
-    "apendices/multiverso.json": "Informações sobre o multiverso de D&D",
+    "apendices/multiverso.json": "Informações sobre o multiverso do jogo",
     "apendices/glossario.json": "Glossário completo de termos de regras"
   }
 }

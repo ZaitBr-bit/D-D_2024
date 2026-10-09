@@ -212,7 +212,7 @@ test('Formas conhecidas: agrupadas por ND do maior para o menor, com selo de ori
   // Fera nova do Manual dos Monstros: aparece com o selo de origem.
   const card = page.locator('[data-familiar-card="Sanguessuga Gigante"]');
   await expect(card).toBeVisible();
-  await expect(card.locator('.selo-fonte')).toHaveText('Monstros');
+  await expect(card.locator('.selo-fonte')).toHaveText('Sup. 4');
   await expect(page.locator('[data-familiar-card="Hatori"]'), 'ND 6 passa do limite do nível 8').toHaveCount(0);
 
   // Escolhe a fera nova como forma conhecida e assume a forma.

@@ -19,7 +19,7 @@ import { abrirFicha, personagemSalvo, clicarBotaoFicha } from './helpers-regras.
 
 const SEMENTE_BASE = { classe: 'Guerreiro', nivel: 1 };
 
-test('ficha: modal "Adicionar Item" abre, lista as 7 categorias e a busca filtra', async ({ context }) => {
+test('ficha: modal "Adicionar Item" abre, lista as categorias e a busca filtra', async ({ context }) => {
   const { page, erros } = await abrirFicha(context, SEMENTE_BASE, 'regras-itens-seletor-1');
 
   // Abrir pelo botão da ficha -- getElementById(...)?.click() puro é
@@ -28,8 +28,8 @@ test('ficha: modal "Adicionar Item" abre, lista as 7 categorias e a busca filtra
 
   // As 5 categorias do brief, na ordem certa.
   const filtros = page.locator('#sel-inv-cat option');
-  await expect(filtros).toHaveCount(8);
-  const categoriasEsperadas = ['todos', 'armas', 'armaduras', 'consumiveis', 'municao', 'equipamento', 'ferramentas', 'magicos'];
+  await expect(filtros).toHaveCount(9);
+  const categoriasEsperadas = ['todos', 'armas', 'armaduras', 'consumiveis', 'municao', 'equipamento', 'ferramentas', 'componentes', 'magicos'];
   const categoriasNoDOM = await filtros.evaluateAll(els => els.map(el => el.value));
   expect(categoriasNoDOM, 'categorias do filtro: "Todos" (busca em tudo) + as 7 do brief (a 6ª, Ferramentas, é da issue #120; a 7ª, Itens Mágicos, vem do acervo do Livro do Mestre), na mesma ordem').toEqual(categoriasEsperadas);
 

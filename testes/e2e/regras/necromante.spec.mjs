@@ -28,7 +28,7 @@ test('subclasse Necromante: aparece com selo de origem e suas características n
   await abrirTudo(page);
   const secao = page.locator('.card', { has: page.locator('h2', { hasText: 'Subclasse — Necromante' }) });
   await expect(secao).toBeVisible();
-  await expect(secao.locator('.selo-fonte')).toHaveText('Arcana');
+  await expect(secao.locator('.selo-fonte')).toHaveText('Sup. 3');
   for (const nome of ['Versado em Necromancia', 'Livro de Magias Necromântico', 'Poder Sepulcral', 'Servos Mortos-Vivos', 'Servos Fortalecidos']) {
     await expect(secao.locator('summary', { hasText: nome })).toBeVisible();
   }
@@ -47,7 +47,7 @@ test('criador: Necromante aparece entre as subclasses do Mago com o selo de orig
   await expect(page.locator('#sel-subclasse option[value="Necromante"]')).toHaveCount(1);
   await expect(page.locator('#sel-subclasse-fonte .selo-fonte')).toHaveCount(0);
   await page.selectOption('#sel-subclasse', 'Necromante');
-  await expect(page.locator('#sel-subclasse-fonte .selo-fonte')).toHaveText('Arcana');
+  await expect(page.locator('#sel-subclasse-fonte .selo-fonte')).toHaveText('Sup. 3');
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
 

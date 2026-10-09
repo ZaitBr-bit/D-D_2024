@@ -236,6 +236,10 @@
       "id": "zircao",
       "nome": "Zircão",
       "nome_en": "Zircon",
+      "livro_jogador": {
+        "arquivo": "componentes_materiais",
+        "nome": "Zircão"
+      },
       "categoria": "Gema",
       "valor": "50 PO",
       "descricao": "verde-azulado claro",
@@ -316,6 +320,10 @@
       "id": "perola",
       "nome": "Pérola",
       "nome_en": "Pearl",
+      "livro_jogador": {
+        "arquivo": "componentes_materiais",
+        "nome": "Pérola"
+      },
       "categoria": "Gema",
       "valor": "100 PO",
       "descricao": "branco lustroso, amarelo ou rosa",

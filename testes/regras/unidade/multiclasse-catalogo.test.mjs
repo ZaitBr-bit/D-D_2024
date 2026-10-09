@@ -18,7 +18,7 @@ const CLASSES = [
   'Guardião', 'Guerreiro', 'Ladino', 'Mago', 'Monge', 'Paladino',
 ];
 
-const ARQUIVO_LIVRO = 'D&D 5.5 - Livro do Jogador (2024) 5.3.7.md';
+const ARQUIVO_LIVRO = 'PDF/D&D 5.5 - Livro do Jogador (2024) 5.3.7.md';
 const LEGENDA_TABELA = 'Conjurador Multiclasse: Espaços de Magia por Círculo de Magia';
 
 // Lê a tabela "Conjurador Multiclasse" direto do arquivo do livro (não do

@@ -28,7 +28,7 @@ test('criador: + Item abre o modal unificado, com a categoria Municao', async ({
 
   // O criador não oferece Itens Mágicos (a UI de inventário completa é só da ficha).
   expect(await page.locator('#sel-inv-cat option').evaluateAll(els => els.map(el => el.value)))
-    .toEqual(['todos', 'armas', 'armaduras', 'consumiveis', 'municao', 'equipamento', 'ferramentas']);
+    .toEqual(['todos', 'armas', 'armaduras', 'consumiveis', 'municao', 'equipamento', 'ferramentas', 'componentes']);
   await expect(page.locator('#sel-inv-cat option[value="magicos"]')).toHaveCount(0);
 
   await page.selectOption('#sel-inv-cat', 'municao');

@@ -45,7 +45,7 @@ test('carregarFontes tenta de novo depois de uma falha', async () => {
   try {
     await assert.rejects(fontes.carregarFontes());
     const mapa = await fontes.carregarFontes();
-    assert.equal(mapa.get('tasha')?.sigla, "Tasha's");
+    assert.equal(mapa.get('tasha')?.sigla, 'Sup. 1');
   } finally {
     globalThis.fetch = fetchOriginal;
     console.error = log;
@@ -54,5 +54,5 @@ test('carregarFontes tenta de novo depois de uma falha', async () => {
 
 test('carregarFontes lê dados/fontes.json', async () => {
   const mapa = await fontes.carregarFontes();
-  assert.equal(mapa.get('tasha')?.sigla, "Tasha's");
+  assert.equal(mapa.get('tasha')?.sigla, 'Sup. 1');
 });

@@ -38,8 +38,8 @@ async function renascido() {
 test('fontes.json registra o Ravenloft com a sigla do chip', () => {
   const fonte = lerJson('dados', 'fontes.json').fontes.find((f) => f.id === 'ravenloft');
   assert.ok(fonte, 'dados/fontes.json sem a entrada "ravenloft"');
-  assert.equal(fonte.sigla, 'Ravenloft');
-  assert.equal(fonte.nome, 'Ravenloft: Horrors Within');
+  assert.equal(fonte.sigla, 'Sup. 2');
+  assert.equal(fonte.nome, 'Suplemento 2');
 });
 
 test('getEspecies junta as do Livro do Jogador e as do Ravenloft, nessa ordem', async () => {
