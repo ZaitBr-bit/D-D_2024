@@ -17,6 +17,7 @@ import { getEstadoFuria } from './classes/barbaro.js';
 import { getProgressaoMonge } from './classes/monge.js';
 import { char, passivosTalentosCache } from './estado.js';
 import { getEstadoCarga } from './inventario.js';
+import { notaEscaparImobilizado, tamanhoParaCarga } from '../regras-carga.js';
 import { deslocamentoMinimoDeItens, ROTULO_MODO, vantagensDeItens, velocidadesDeItens } from '../regras-passivos-itens.js';
 
 export function ehBardoComSegredosMagicos() {
@@ -114,6 +115,8 @@ export function calcVantagemDesvantagemPericia(nomePericia) {
     if (v.contexto) notas.push(`${v.origem}: Vantagem ${v.contexto}`);
     else vantagens.push(v.origem);
   }
+  const notaPorte = notaEscaparImobilizado(nomePericia, char?.especie, condicoes);
+  if (notaPorte) notas.push(notaPorte);
 
   return { vantagens, desvantagens, notas };
 }
@@ -240,14 +243,19 @@ function textoExtraVelocidade(tipo, { metros, pairar }) {
 // Popup com o cálculo real da capacidade de carga (clique no peso do inventário).
 window.mostrarCalculoCarga = function () {
   const forca = atributoEfetivo(char, 'forca') || 0;
-  const tamanho = char?.tamanho || 'Médio';
+  const tamanhoReal = char?.tamanho || 'Médio';
+  const { tamanho, traco } = tamanhoParaCarga(tamanhoReal, char?.especie);
   const mult = getMultiplicadorCarga(tamanho);
   const _c = getEstadoCarga();
   const disp = _c.capacidade - _c.pesoAtual;
+  const rotuloTamanho = tamanho !== tamanhoReal
+    ? `${escHtml(tamanhoReal)}, conta como ${escHtml(tamanho)}`
+    : escHtml(tamanho);
   abrirModal('Capacidade de Carga', `
     <div style="font-size:0.9rem;line-height:1.7">
       <div style="font-weight:700;margin-bottom:4px">Cálculo do peso máximo</div>
-      <div>Força ${forca} × ${fmtPeso(mult)} (${escHtml(tamanho)}) = <strong>${fmtPeso(_c.capacidade)} kg</strong></div>
+      <div>Força ${forca} × ${fmtPeso(mult)} (${rotuloTamanho}) = <strong>${fmtPeso(_c.capacidade)} kg</strong></div>
+      ${traco ? `<div data-carga-traco style="font-size:0.8rem;color:var(--text-muted)">${escHtml(traco)}: conta como um tamanho maior na capacidade de carga.</div>` : ''}
       <hr style="border:none;border-top:1px solid var(--border-light);margin:8px 0">
       <div>Peso atual: <strong>${fmtPeso(_c.pesoAtual)} kg</strong></div>
       <div>${disp >= 0

@@ -34,6 +34,7 @@ import { aplicarAumentoPermanente, aumentoPermanenteDoItem } from '../regras-aum
 import { atendeRequisito, lerRequisito } from '../regras-sintonizacao-restrita.js';
 import { abrirModalRecuperacao, sincronizarBonusPvNiveis } from './hp-descanso.js';
 import { perguntarUltimaCarga } from './ultima-carga.js';
+import { tamanhoParaCarga } from '../regras-carga.js';
 import { encerrarCancaoSeImpedida } from '../regras-lamina-cantante.js';
 import { CHAVE_MOCHILA, aplicarEspaco, htmlEscolhaEspaco, lerEspacoEscolhido, moverEspacoPara, ordemDosEspacos } from '../espacos-inventario.js';
 
@@ -41,7 +42,7 @@ import { CHAVE_MOCHILA, aplicarEspaco, htmlEscolhaEspaco, lerEspacoEscolhido, mo
 /** Estado de carga do personagem: peso atual, capacidade e flag de sobrecarga. */
 export function getEstadoCarga() {
   const forca = atributoEfetivo(char, 'forca') || 0;
-  const tamanho = char?.tamanho || 'Médio';
+  const { tamanho } = tamanhoParaCarga(char?.tamanho, char?.especie);
   const pesoAtual = getPesoTotalInventario(char?.inventario || [], char?.inventario_locais || []);
   const capacidade = getCapacidadeCarga(forca, tamanho);
   const sobrecarregado = capacidade > 0 && pesoAtual > capacidade;

@@ -4,6 +4,7 @@
 // ============================================================
 import { ATRIBUTOS_NOMES, CLASSES_INFO, IDIOMAS_COMUNS } from '../dados-classes.js';
 import { calcMod, calcPVNivel1, descreverCapacidadeCarga, escHtml, getTamanho, processarImagemArquivo, toast } from '../utils.js';
+import { tamanhoParaCarga } from '../regras-carga.js';
 import { dadosCache, personagem } from './wizard.js';
 
 // ============================================================
@@ -144,7 +145,9 @@ export function renderStepDetalhes(el) {
     const tamanhoFixo = personagem.tamanho || 'Médio';
     const espacoCombate = tamanhoFixo === 'Pequeno' ? '1,5 x 1,5 m' : (tamanhoFixo === 'Grande' ? '3 x 3 m' : '1,5 x 1,5 m');
     const _forcaCargaFixo = personagem.atributos?.forca || 0;
-    const _capFixo = descreverCapacidadeCarga(_forcaCargaFixo, tamanhoFixo);
+    const _carga = tamanhoParaCarga(tamanhoFixo, personagem.especie);
+    const _capFixo = descreverCapacidadeCarga(_forcaCargaFixo, _carga.tamanho)
+      + (_carga.traco ? ` — ${escHtml(_carga.traco)}: conta como ${escHtml(_carga.tamanho)}` : '');
     tamanhoCardHtml = `
     <div class="card mb-2">
       <div class="card-header"><h3>Tamanho da Criatura</h3></div>

@@ -113,6 +113,17 @@
 >
 > Ordem sugerida: publicar as correções e fechar #144 e #145; na #142, pedir
 > ao autor que teste a versão nova.
+>
+> **Revalidação de 2026-11-07**: 29 issues abertas (contagem conferida na API,
+> lista batendo uma a uma). Saíram **#144** e **#145**, fechadas pelo dono em
+> 2026-10-19 com a 3.3.8 (sem `Closes`; detalhe nas notas de manutenção).
+> Entraram três: **#146** (bug, PDF não baixa, aberta já na 3.3.8), **#148**
+> (capacidade de carga do Golias) e **#149** (níveis 21 a 40). Última versão
+> publicada: 3.3.8. Das três novas, só a #148 foi corrigida (working tree).
+>
+> Ordem sugerida: publicar a correção da **#148** (feita no working tree em
+> 2026-11-07) e fechá-la; depois #146 e #142 juntas (mesmo sintoma, pedir dados
+> ao autor).
 
 ---
 
@@ -120,9 +131,8 @@
 
 ### Média
 
-- [ ] **#144** (NOVA, 2026-10-17, 3.3.7, **P1**) — PDF da ficha multiclasse sai com o nível e as características só da primeira classe. Relato: Guerreiro 3/Bruxo 1 sai como Guerreiro 4 sem as características do Bruxo (só as magias aparecem); Guerreiro 1/Bárbaro 1 sai como Guerreiro de nível 2, sem a característica do Bárbaro. A ficha na tela está certa. **Corrigida no working tree em 2026-10-19 (sem versão).** (1) Conteúdo: `sheet/impressao.js` montava "Características de Classe" e "Subclasse" só com `classeData` (classe inicial), `char.subclasse` e `char.nivel` (nível TOTAL). Agora percorre `contextosDeClasse()` com o nível de cada classe (`_htmlCaracteristicasClasseImpressao`, `_htmlSubclasseImpressao`), igual à tela; com duas ou mais classes o título leva classe e nível. Cabeçalho e bônus de proficiência já usavam `classesDe`/nível total, o que está certo. Teste: `impressao-multiclasse-caracteristicas.spec.mjs` (Guerreiro 3/Bruxo 1 e classe única). (2) **"Clico em Gerar PDF e nada acontece; depois de recarregar baixa"** (relato da issue, reproduzido pelo dono): `#btn-print` fica dentro do HTML que `renderFichaCompleta` recria, e o listener era ligado uma vez só, em `renderSheet` (`pages/sheet.js`). Qualquer ação que re-renderiza a ficha (dano, inspiração, edição) deixava o botão morto até recarregar. `#btn-escolher-manobras-pendentes` tinha o mesmo defeito. Os dois passaram a delegação no `document`, ligada uma vez por sessão (`_ligarBotoesRecriadosNoRender`). Teste: `pdf-botao-apos-render.spec.mjs` (re-render por clique e depois clique nos botões; vermelho sem a correção). PDFs anexados na issue têm dados de personagens de terceiros: não copiar para o repo.
-- [ ] **#145** (NOVA, 2026-10-19, 3.3.7, **P2**) — Importar ficha por arquivo `.json` (Windows 11, navegador não informado): o personagem aparece por uma fração de segundo e some; às vezes fica e, ao clicar, aparece "personagem não encontrado". **Corrigida no working tree em 2026-10-19 (sem versão).** Causa confirmada na lógica, sem Firebase real: a ficha importada mantinha o `atualizado_em` da exportação; se o mesmo id tinha lápide de exclusão mais nova na nuvem (ficha excluída e depois reimportada de um backup), `reconciliar` (`sync-merge.js`) a tirava da lista logo após aparecer, e `decidirAoAbrir` respondia "remover" ao clicar ("personagem não encontrado"). Agora `importarPersonagensDetalhado` (`store.js`) carimba `atualizado_em` no momento da importação; id que já está na lista continua ignorado (`PERGUNTAS-PENDENTES.txt`). Junto, a pedido do dono: importação com problema (arquivo que não é JSON, que não é lista ou ficha inválida) abre o popup "Problema ao importar" com relatório copiável (versão, navegador, arquivo, motivo por ficha, de `motivoPersonagemInvalido`) e o link "Relatar problema", que abre a issue preenchida e pede o `.json` (`regras-importacao.js`, `importacao-ui.js`). Testes: `importar-personagens.test.mjs` (lápide antiga não remove a importada; relatório; nasceu vermelho) e `home-importar-erro.spec.mjs` (clica em Importar, Copiar e confere o link; vermelho com a home antiga). Se o autor confirmar outro cenário (sem login, por exemplo), reabrir a investigação.
-- [ ] **#142** (NOVA, 2026-10-15, 3.3.5, **P2**) — PDF da ficha não baixa (Android, "Google"). **Não investigado**: o relato não diz o que aparece (nada, erro, aba em branco) nem o navegador exato. O dono pediu esses dados (e versão do Android e aparelho) em 2026-10-16; sem resposta até 2026-10-19. **Provável causa** (achada na #144): o botão "Gerar PDF" ficava sem listener depois de qualquer re-render da ficha, até recarregar; corrigido no working tree. Depois de publicar, pedir ao autor que teste a versão nova. Mesmo sintoma da #70 e da #114 (fechadas; o download já usa `baixarArquivo` em `utils.js`). Pedir ao autor o navegador, se aparece algum aviso e se o export JSON da home baixa; se não reproduzir em emulação, o caminho é teste em aparelho (`adb reverse` + `chrome://inspect`).
+- [ ] **#146** (NOVA, 2026-10-19, 3.3.8, **P2**) — PDF da ficha não baixa (Android, Chrome). Aberta já na 3.3.8, que trazia a correção do botão "Gerar PDF" morto após re-render (#144), então a causa provável da #142 não explica este caso. **Não investigado.** O autor anexou prints e diz que "vai para baixar a ficha"; o dono respondeu em 2026-10-19 que a opção de PDF fica dentro da ficha do personagem (não na home) — pode ser só o caminho até o botão. Sem resposta do autor. Se ele confirmar que o botão está na ficha e nada baixa, é o mesmo caso da #142 e da #70/#114 (fechadas): o download usa `baixarArquivo` em `utils.js`; o caminho é teste em aparelho (`adb reverse` + `chrome://inspect`). Tratar junto com a #142.
+- [ ] **#142** (NOVA, 2026-10-15, 3.3.5, **P2**) — PDF da ficha não baixa (Android, "Google"). **Não investigado**: o relato não diz o que aparece (nada, erro, aba em branco) nem o navegador exato. O dono pediu esses dados (e versão do Android e aparelho) em 2026-10-16; sem resposta até 2026-10-19. **Provável causa** (achada na #144): o botão "Gerar PDF" ficava sem listener depois de qualquer re-render da ficha, até recarregar; corrigido e publicado na 3.3.8. Pedir ao autor que teste a versão nova; a #146 (3.3.8) relata o mesmo sintoma depois da correção. Mesmo sintoma da #70 e da #114 (fechadas; o download já usa `baixarArquivo` em `utils.js`). Pedir ao autor o navegador, se aparece algum aviso e se o export JSON da home baixa; se não reproduzir em emulação, o caminho é teste em aparelho (`adb reverse` + `chrome://inspect`).
 
 ---
 
@@ -134,6 +144,7 @@ _(nenhuma nesta faixa no momento — ver notas de manutenção)_
 
 ### Baixa–Média
 
+- [ ] **#148** (NOVA, 2026-11-02, **P2**) — Espécie Golias: o traço "Porte Poderoso" (`dados/origens/especies.json:187`) faz contar como um tamanho maior na capacidade de carga, mas a ficha usava só `char.tamanho`: Força 17 × 7 (Médio) = 119 kg, quando deveria ser × 13,5 (Grande, tabela do glossário) = 229,5 kg. **Corrigida no working tree em 2026-11-07 (sem versão).** Regra pura nova `tamanhoParaCarga(tamanho, especie)` (`site/js/regras-carga.js`), usada em `getEstadoCarga` (`sheet/inventario.js`), no popup `mostrarCalculoCarga` (`sheet/combate.js`, mostra "Médio, conta como Grande" e o nome do traço) e no criador (`passo-detalhes.js`, `passo-equipamento.js`); `char.tamanho` não muda. Testes: `carga-tamanho-especie.test.mjs` (2 vermelhos antes, com 119 kg; inclui guarda que varre `dados/` atrás de outra espécie com o mesmo traço) e `carga-golias.spec.mjs` (clica no peso do inventário; vermelho revertendo a ficha). O criador não tem teste. A outra metade do traço, Vantagem no teste para encerrar Imobilizado (escapar é Atletismo ou Acrobacia, glossário "Imobilizando"), entrou como nota V* nessas duas perícias, só com a condição Imobilizado marcada (decisão do dono) (`notaEscaparImobilizado`, lida por `calcVantagemDesvantagemPericia`), fora do cálculo de V/D porque vale só nesse teste (`PERGUNTAS-PENDENTES.txt`); mesmos dois testes, vermelhos antes. Fora: a carga com Forma Grande ativa (o app não muda o tamanho nela).
 - [ ] **#127** — Campo "Conjuração como magia de Círculo" nas magias personalizadas e formulário de magia mais compacto (como o de item). Conferido em 2026-10-16: nada entregue nas versões 3.1–3.3.
 
 ### Média
@@ -171,11 +182,15 @@ decidir trazer o livro; enquanto isso, a resposta é apontar o homebrew (#40,
 
 ### Fora do escopo atual
 
+- [ ] **#149** (NOVA, 2026-11-05, **P4**) — Níveis 21 a 40 e aumento de atributo além do máximo (20). O livro termina no nível 20 e as tabelas de classe, espaços de magia e proficiência do app também; seria regra da casa em todas as classes (progressão, dado de vida, conjuração, bônus de proficiência), no peso da #40. Decisão do dono: recusar, ou aceitar como homebrew (#47). Não conferido no código se a edição manual aceita atributo acima de 20.
+
 - [ ] **#56** — Compatibilidade com iOS 15. Falta diagnóstico: precisa saber qual API/recurso quebra no dispositivo antes de estimar.
 
 ---
 
 ## Notas de manutenção
+
+- **Fechadas em 2026-10-19** (revalidação de 2026-11-07): **#144** e **#145**, fechadas pelo dono no GitHub com a versão 3.3.8 (commits `43ac1b0` e `4b64e31`, sem `Closes #N`). Causas e testes: #144 — `sheet/impressao.js` montava Características de Classe e Subclasse só com a classe inicial e o nível total (agora percorre `contextosDeClasse()`), e `#btn-print` perdia o listener a cada re-render (delegação no `document`, `_ligarBotoesRecriadosNoRender`); testes `impressao-multiclasse-caracteristicas.spec.mjs` e `pdf-botao-apos-render.spec.mjs`. #145 — `importarPersonagensDetalhado` (`store.js`) carimba `atualizado_em` na importação, para a lápide antiga da nuvem não remover a ficha; relatório copiável em `importacao-ui.js`; testes `importar-personagens.test.mjs` e `home-importar-erro.spec.mjs`. Após a 3.3.8, a #146 relata de novo o PDF sem baixar (ver entrada).
 
 - **Suíte completa em 2026-10-19** (com as correções de #144/#145 no working tree): unidade 5452 testes, 5193 passaram, 257 pulados, 2 falhas; e2e 917, 910 passaram (14,8 min), 7 falhas. Todas as falhas já existiam antes desta rodada:
   - Desatualizadas pela 3.3.6/3.3.7 e corrigidas: a exceção `sheet/migracoes.js:108` em `testes/regras/catalogo/magias-preparo.mjs` virou `:109`, porque o import de `migrarTabelasItensMagicos` (3.3.6) empurrou a linha; isso derrubava os 2 testes de unidade. `grimorio-mago.spec.mjs` passou a esperar "3º Círculo (35)", que são 32 do livro base mais 3 do Tasha. `magias-lista-classe.spec.mjs` passou a aceitar os truques e o 1º círculo de `dados/tasha/mago/magias.json`.

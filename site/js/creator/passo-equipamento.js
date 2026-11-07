@@ -6,6 +6,7 @@ import { CLASSES_INFO } from '../dados-classes.js';
 import { getClasse } from '../db.js';
 import { DENOMINACOES, ICONE_MOEDA, adicionarMoeda, removerQuantidadeMoeda } from '../moedas.js';
 import { abrirModal, escHtml, fmtPeso, getCapacidadeCarga, getPesoTotalInventario, mdParaHtml, semAcento, toast } from '../utils.js';
+import { tamanhoParaCarga } from '../regras-carga.js';
 import { ANTECEDENTES_ESCOLHAS, KITS_EXPANSAO } from './comum.js';
 import { containerRef, dadosCache, personagem } from './wizard.js';
 import { temProficienciaArma, temProficienciaArmadura } from '../regras-equipamento.js';
@@ -686,7 +687,8 @@ export async function renderStepEquipamento(el) {
 function renderListaInventario() {
   // Barra de peso (atual / máximo) — recalculada a cada re-render da lista.
   const _pesoAtual = getPesoTotalInventario(personagem.inventario || []);
-  const _cap = getCapacidadeCarga(personagem.atributos?.forca || 0, personagem.tamanho || 'Médio');
+  const _cap = getCapacidadeCarga(personagem.atributos?.forca || 0,
+    tamanhoParaCarga(personagem.tamanho, personagem.especie).tamanho);
   const _barraPeso = `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border-light);margin-bottom:6px;font-size:0.8rem;color:var(--text-muted)"><span>Peso: <strong>${fmtPeso(_pesoAtual)}</strong> / ${fmtPeso(_cap)} kg</span></div>`;
 
   if (personagem.inventario.length === 0) {
