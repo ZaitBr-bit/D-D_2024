@@ -119,11 +119,13 @@
 > 2026-10-19 com a 3.3.8 (sem `Closes`; detalhe nas notas de manutenção).
 > Entraram três: **#146** (bug, PDF não baixa, aberta já na 3.3.8), **#148**
 > (capacidade de carga do Golias) e **#149** (níveis 21 a 40). Última versão
-> publicada: 3.3.8. Das três novas, só a #148 foi corrigida (working tree).
+> publicada: 3.3.8. Das três novas, só a #148 foi corrigida.
 >
-> Ordem sugerida: publicar a correção da **#148** (feita no working tree em
-> 2026-11-07) e fechá-la; depois #146 e #142 juntas (mesmo sintoma, pedir dados
-> ao autor).
+> **Mais tarde em 2026-11-07**: #148 corrigida na 3.3.9 (commit `a6c36a6`,
+> `Closes #148`) e fechada no GitHub — 28 abertas. Ver notas de manutenção.
+> Última versão publicada: 3.3.9.
+>
+> Ordem sugerida: #146 e #142 juntas (mesmo sintoma, pedir dados ao autor).
 
 ---
 
@@ -144,7 +146,6 @@ _(nenhuma nesta faixa no momento — ver notas de manutenção)_
 
 ### Baixa–Média
 
-- [ ] **#148** (NOVA, 2026-11-02, **P2**) — Espécie Golias: o traço "Porte Poderoso" (`dados/origens/especies.json:187`) faz contar como um tamanho maior na capacidade de carga, mas a ficha usava só `char.tamanho`: Força 17 × 7 (Médio) = 119 kg, quando deveria ser × 13,5 (Grande, tabela do glossário) = 229,5 kg. **Corrigida no working tree em 2026-11-07 (sem versão).** Regra pura nova `tamanhoParaCarga(tamanho, especie)` (`site/js/regras-carga.js`), usada em `getEstadoCarga` (`sheet/inventario.js`), no popup `mostrarCalculoCarga` (`sheet/combate.js`, mostra "Médio, conta como Grande" e o nome do traço) e no criador (`passo-detalhes.js`, `passo-equipamento.js`); `char.tamanho` não muda. Testes: `carga-tamanho-especie.test.mjs` (2 vermelhos antes, com 119 kg; inclui guarda que varre `dados/` atrás de outra espécie com o mesmo traço) e `carga-golias.spec.mjs` (clica no peso do inventário; vermelho revertendo a ficha). O criador não tem teste. A outra metade do traço, Vantagem no teste para encerrar Imobilizado (escapar é Atletismo ou Acrobacia, glossário "Imobilizando"), entrou como nota V* nessas duas perícias, só com a condição Imobilizado marcada (decisão do dono) (`notaEscaparImobilizado`, lida por `calcVantagemDesvantagemPericia`), fora do cálculo de V/D porque vale só nesse teste (`PERGUNTAS-PENDENTES.txt`); mesmos dois testes, vermelhos antes. Fora: a carga com Forma Grande ativa (o app não muda o tamanho nela).
 - [ ] **#127** — Campo "Conjuração como magia de Círculo" nas magias personalizadas e formulário de magia mais compacto (como o de item). Conferido em 2026-10-16: nada entregue nas versões 3.1–3.3.
 
 ### Média
@@ -189,6 +190,8 @@ decidir trazer o livro; enquanto isso, a resposta é apontar o homebrew (#40,
 ---
 
 ## Notas de manutenção
+
+- **Fechada em 2026-11-07**: **#148**, versão 3.3.9 (commit `a6c36a6`, `Closes #148`). O traço Porte Poderoso do Golias (`dados/origens/especies.json:187`) não era lido: a carga usava só `char.tamanho` (Força 17 × 7 = 119 kg). `tamanhoParaCarga(tamanho, especie)` (`site/js/regras-carga.js`) sobe um tamanho na carga (× 13,5, Grande = 229,5 kg) e é usada em `getEstadoCarga` (`sheet/inventario.js`), no popup `mostrarCalculoCarga` (`sheet/combate.js`, "Médio, conta como Grande" e o nome do traço) e no criador (`passo-detalhes.js`, `passo-equipamento.js`); `char.tamanho` não muda. A Vantagem para escapar de Imobilizado (Atletismo ou Acrobacia, glossário "Imobilizando") entrou como nota V* nessas perícias só com a condição marcada (`notaEscaparImobilizado`, decisão do dono), fora do cálculo de V/D. Testes, vermelhos antes: `carga-tamanho-especie.test.mjs` (com guarda que varre `dados/` atrás de outra espécie com o traço) e `carga-golias.spec.mjs` (clica no peso do inventário, marca Imobilizado e clica no V*). Sem teste: as duas telas do criador. Fora: carga com Forma Grande ativa (o app não muda o tamanho nela).
 
 - **Fechadas em 2026-10-19** (revalidação de 2026-11-07): **#144** e **#145**, fechadas pelo dono no GitHub com a versão 3.3.8 (commits `43ac1b0` e `4b64e31`, sem `Closes #N`). Causas e testes: #144 — `sheet/impressao.js` montava Características de Classe e Subclasse só com a classe inicial e o nível total (agora percorre `contextosDeClasse()`), e `#btn-print` perdia o listener a cada re-render (delegação no `document`, `_ligarBotoesRecriadosNoRender`); testes `impressao-multiclasse-caracteristicas.spec.mjs` e `pdf-botao-apos-render.spec.mjs`. #145 — `importarPersonagensDetalhado` (`store.js`) carimba `atualizado_em` na importação, para a lápide antiga da nuvem não remover a ficha; relatório copiável em `importacao-ui.js`; testes `importar-personagens.test.mjs` e `home-importar-erro.spec.mjs`. Após a 3.3.8, a #146 relata de novo o PDF sem baixar (ver entrada).
 

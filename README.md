@@ -3,7 +3,7 @@
 **[▶ Abrir o app](https://zaitbr-bit.github.io/D-D_2024/)** &nbsp;·&nbsp;
 **[🐛 Relatar um problema](https://github.com/ZaitBr-bit/D-D_2024/issues/new?template=bug.yml)** &nbsp;·&nbsp;
 **[💡 Sugerir uma melhoria](https://github.com/ZaitBr-bit/D-D_2024/issues/new?template=sugestao.yml)** &nbsp;·&nbsp;
-versão atual **3.3.8**
+versão atual **3.3.9**
 
 Aplicativo web **gratuito e em português** para criar e usar fichas de personagem
 da **5.5 (revisão de 2024 da 5ª edição)**. Roda no navegador do celular e do computador,

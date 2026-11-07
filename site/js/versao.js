@@ -13,13 +13,34 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.3.8';
+export const VERSAO_ATUAL = '3.3.9';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.3.9',
+    data: '2026-11-07',
+    rotulo: 'Golias',
+    resumo: 'A capacidade de carga do Golias passa a contar como Grande, e '
+      + 'a ficha avisa da Vantagem para escapar de Imobilizado.',
+    melhorias: [
+      {
+        grupo: '🐛 Correções',
+        itens: [
+          'Golias: o traço Porte Poderoso não entrava na capacidade de '
+            + 'carga, que contava como Médio (Força 17 dava 119 kg e a ficha '
+            + 'acusava sobrecarga). Agora conta como Grande: Força 17 dá '
+            + '229,5 kg, e o cálculo ao clicar no peso do Inventário mostra '
+            + 'o traço.',
+          'Golias com a condição Imobilizado: Atletismo e Acrobacia mostram o '
+            + 'selo V* com a Vantagem do Porte Poderoso no teste para escapar.',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.3.8',
     data: '2026-10-19',
