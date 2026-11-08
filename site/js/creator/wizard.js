@@ -19,6 +19,7 @@ import { calcMod, calcPVNivel1, getBonusTruquesOrdem, getEspacosMagia, getMagiaP
 import { ANTECEDENTES_ESCOLHAS, CLASSES_ESCOLHAS, ESPECIES_TRACOS_ESCOLHA, FERRAMENTAS_TODAS, INSTRUMENTOS_MUSICAIS, consolidarPericiasProficientes, obterTruquesEspecie } from './comum.js';
 import { aplicarFerramentasDaCriacao, concederTruquesDeEntrada } from '../regras-artifice.js';
 import { resistenciasDaEspecie } from '../regras-resistencias-especie.js';
+import { aplicarFerramentaDaEspecie } from '../regras-bonus-especie.js';
 import { renderStepAntecedente } from './passo-antecedente.js';
 import { renderStepAtributos } from './passo-atributos.js';
 import { renderStepClasse } from './passo-classe.js';
@@ -518,6 +519,9 @@ async function finalizar() {
       }
     });
   }
+
+  // Ferramenta de Projeto Especializado (Warforged)
+  aplicarFerramentaDaEspecie(personagem);
 
   // Adicionar truques concedidos pela espécie/traço (sem duplicar)
   const truquesEspecie = obterTruquesEspecie(especie, tracosEscolhidos);

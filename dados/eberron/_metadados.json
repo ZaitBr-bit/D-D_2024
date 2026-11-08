@@ -1,0 +1,18 @@
+{
+  "titulo": "Eberron: Forge of the Artificer",
+  "fonte": "eberron",
+  "pdf_extraido": "Informacoes Separadas/PDF/Eberron Forge of the Artificer D&D 5.5e - Copia.pdf",
+  "idioma_original": "inglês; traduzido para PT-BR",
+  "observacao": "Separado de dados/ (Livro do Jogador). Termos de regra seguem dados/origens/especies.json.",
+  "conteudos": [
+    {
+      "id": "warforged",
+      "titulo": "Warforged",
+      "titulo_en": "Warforged",
+      "paginas_pdf": { "especie": "46" },
+      "arquivos": {
+        "especies.json": "Espécies do livro no formato de dados/origens/especies.json, com fonte e nome_en; db.getEspecies() as junta às do Livro do Jogador"
+      }
+    }
+  ]
+}

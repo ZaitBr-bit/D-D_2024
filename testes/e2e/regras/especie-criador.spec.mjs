@@ -21,7 +21,7 @@ import { readFileSync } from 'node:fs';
 import { abrirSite, assentar, confirmarModal, satisfazerPasso, personagemEmCriacao } from './helpers-regras.mjs';
 
 // Livro do Jogador mais as espécies de expansão que db.getEspecies() junta.
-const ESPECIES_NO_DADO = ['origens/especies.json', 'ravenloft/especies.json'].flatMap((arq) => {
+const ESPECIES_NO_DADO = ['origens/especies.json', 'ravenloft/especies.json', 'eberron/especies.json'].flatMap((arq) => {
   const dados = JSON.parse(readFileSync(new URL(`../../../dados/${arq}`, import.meta.url), 'utf-8'));
   return (dados.especies || dados).map((e) => e.nome);
 });

@@ -13,13 +13,42 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.3.9';
+export const VERSAO_ATUAL = '3.4.0';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.4.0',
+    data: '2026-11-07',
+    rotulo: 'Warforged',
+    resumo: 'Nova espécie Warforged (Eberron), Magias de Itens no padrão das '
+      + 'outras magias, ordem das Perícias à sua escolha e botão de novo '
+      + 'personagem no topo da lista.',
+    melhorias: [
+      {
+        grupo: '✨ Melhorias',
+        itens: [
+          'Nova espécie Warforged (Eberron: Forge of the Artificer, '
+            + 'Suplemento 5): +1 na CA, Resistência a Venenoso, Vantagem '
+            + 'contra Envenenado, tamanho Médio ou Pequeno e escolha de uma '
+            + 'perícia e de uma ferramenta no criador. A ficha mostra as '
+            + 'escolhas no traço Projeto Especializado.',
+          'Magias de Itens: o bloco agora nasce recolhido, com a contagem no '
+            + 'título, e cada magia segue o padrão das magias preparadas: '
+            + 'selos de escola, tempo, duração e alcance, e o botão '
+            + 'Conjurar sempre à direita.',
+          'Perícias: novo seletor "Ordem" no quadro, com Padrão, Atributo, '
+            + 'Maior bônus e A–Z. A escolha fica salva em cada personagem.',
+          'Início: o botão "+ Novo Personagem" ficou menor e passou para o '
+            + 'lado do título "Meus Personagens", em vez de ficar embaixo da '
+            + 'lista.',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.3.9',
     data: '2026-11-07',

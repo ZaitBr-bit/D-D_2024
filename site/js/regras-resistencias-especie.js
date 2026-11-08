@@ -29,6 +29,7 @@ export function resistenciasDaEspecie(especie, tracosEscolhidos = []) {
     case 'Anão': return ['Venenoso'];
     case 'Draconato': return HERANCA_DRACONICA[escolha] ? [HERANCA_DRACONICA[escolha]] : [];
     case 'Tiferino': return LEGADO_INFERO[escolha] ? [LEGADO_INFERO[escolha]] : [];
+    case 'Warforged': return ['Venenoso'];
     case 'Renascido': return RESISTENCIA_ESTRANHA.includes(escolha) ? [escolha] : [];
     default: return [];
   }

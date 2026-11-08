@@ -46,7 +46,7 @@ test('getEspecies junta as do Livro do Jogador e as do Ravenloft, nessa ordem', 
   const phb = lerJson('dados', 'origens', 'especies.json').especies.map((e) => e.nome);
   const nomes = (await db.getEspecies()).especies.map((e) => e.nome);
   assert.deepEqual(nomes.slice(0, phb.length), phb, 'as espécies do Livro do Jogador vêm primeiro e inalteradas');
-  assert.deepEqual(nomes.slice(phb.length), ['Renascido']);
+  assert.deepEqual(nomes.slice(phb.length), ['Renascido', 'Warforged']);
 });
 
 test('Renascido traz fonte, nome em inglês e os quatro traços da p. 73', async () => {

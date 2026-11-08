@@ -7,13 +7,13 @@ import { getEspecies, getTalentos } from '../db.js';
 import { abrirModal, getDeslocamento, mdParaHtml, toast } from '../utils.js';
 import { montarSeletor } from '../ui-opcoes.js';
 import { deTalentos, rotuloPericia } from '../opcoes-dominio.js';
-import { ESPECIES_TRACOS_ESCOLHA, configurarSelectsExclusivos, obterTruquesEspecie, periciasReservadasParaClasse, renderDescricaoTalento, renderEscolhasTalentoHtml, talentoExigeEscolhas, talentoNumEscolhas } from './comum.js';
+import { ESPECIES_TRACOS_ESCOLHA, FERRAMENTAS_TODAS, INSTRUMENTOS_MUSICAIS, configurarSelectsExclusivos, obterTruquesEspecie, periciasReservadasParaClasse, renderDescricaoTalento, renderEscolhasTalentoHtml, talentoExigeEscolhas, talentoNumEscolhas } from './comum.js';
 import { _reconstruirTalentosBase } from './passo-antecedente.js';
 import { dadosCache, personagem } from './wizard.js';
 import { seloFonte, ligarSelosFonte } from '../fontes.js';
 
 // Espécies cujo traço concede UMA perícia à escolha, gravada em `pericia_especie`.
-const ESPECIES_PERICIA_UNICA = ['Humano', 'Elfo', 'Renascido'];
+const ESPECIES_PERICIA_UNICA = ['Humano', 'Elfo', 'Renascido', 'Warforged'];
 
 // ============================================================
 // PASSO 2: ESPÉCIE
@@ -197,6 +197,29 @@ function abrirPopupEspecie(nome) {
       <select id="select-pericia-especie" style="width:100%;padding:8px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:0.9rem;margin:8px 0">
         <option value="">-- Escolha uma perícia --</option>
         ${opcsPericia}
+      </select>
+    `;
+  } else if (nome === 'Warforged') {
+    // Projeto Especializado: qualquer pericia (mesma reserva do Habil) e uma ferramenta ou instrumento
+    const opcsPericia = PERICIAS.filter(p => !reservadasEspecie.has(p.nome)).map(p => {
+      const sel = personagem.pericia_especie === p.nome ? 'selected' : '';
+      return `<option value="${p.nome}" ${sel}>${p.nome} (${p.atributo})</option>`;
+    }).join('');
+    const opcsFerramenta = [...FERRAMENTAS_TODAS, ...INSTRUMENTOS_MUSICAIS].map(f => {
+      const sel = personagem.ferramenta_especie === f ? 'selected' : '';
+      return `<option value="${f}" ${sel}>${f}</option>`;
+    }).join('');
+    periciaEspecieHtml = `
+      <div class="section-divider"><span>Projeto Especializado — Perícia</span></div>
+      <div class="info-box info" style="font-size:0.85rem">O traço Projeto Especializado concede proficiência em uma perícia e em uma ferramenta ou instrumento à sua escolha.</div>
+      <select id="select-pericia-especie" style="width:100%;padding:8px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:0.9rem;margin:8px 0">
+        <option value="">-- Escolha uma perícia --</option>
+        ${opcsPericia}
+      </select>
+      <div class="section-divider"><span>Projeto Especializado — Ferramenta</span></div>
+      <select id="select-ferramenta-especie" style="width:100%;padding:8px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:0.9rem;margin:8px 0">
+        <option value="">-- Escolha uma ferramenta --</option>
+        ${opcsFerramenta}
       </select>
     `;
   } else if (nome === 'Kenku') {
@@ -424,9 +447,17 @@ function abrirPopupEspecie(nome) {
     if (ESPECIES_PERICIA_UNICA.includes(nome)) {
       const selectPericia = document.getElementById('select-pericia-especie');
       if (!selectPericia?.value) {
-        const traco = { Humano: 'Habil', Elfo: 'Sentidos Aguçados', Renascido: 'Conhecimento de uma Vida Passada' }[nome];
+        const traco = { Humano: 'Habil', Elfo: 'Sentidos Aguçados', Renascido: 'Conhecimento de uma Vida Passada', Warforged: 'Projeto Especializado' }[nome];
         toast(`Selecione a perícia de ${traco}`, 'error');
         return;
+      }
+      if (nome === 'Warforged') {
+        const selectFerramenta = document.getElementById('select-ferramenta-especie');
+        if (!selectFerramenta?.value) {
+          toast('Selecione a ferramenta de Projeto Especializado', 'error');
+          return;
+        }
+        personagem.ferramenta_especie = selectFerramenta.value;
       }
       personagem.pericia_especie = selectPericia.value;
     }
@@ -501,6 +532,8 @@ function abrirPopupEspecie(nome) {
       if (nome !== 'Humano') delete personagem.talento_versatil;
       // Limpar pericia de especie se mudou para especie sem essa escolha
       if (!ESPECIES_PERICIA_UNICA.includes(nome)) delete personagem.pericia_especie;
+      // Limpar ferramenta de especie se mudou para especie sem essa escolha
+      if (nome !== 'Warforged') delete personagem.ferramenta_especie;
       // Limpar pericias de especie (Kenku) se mudou para especie sem essa escolha
       if (nome !== 'Kenku') delete personagem.pericias_especie;
     }

@@ -1,0 +1,40 @@
+{
+  "total": 1,
+  "especies": [
+    {
+      "nome": "Warforged",
+      "nome_en": "Warforged",
+      "fonte": "eberron",
+      "pagina_pdf": 46,
+      "tracos": [
+        {
+          "nome": "Resiliência de Construto",
+          "nome_en": "Construct Resilience",
+          "descricao": "Você tem Resistência a dano Venenoso. Você também tem Vantagem em Salvaguardas para evitar ou encerrar a condição Envenenado."
+        },
+        {
+          "nome": "Proteção Integrada",
+          "nome_en": "Integrated Protection",
+          "descricao": "Você ganha +1 de bônus na Classe de Armadura. Além disso, a armadura que você vestiu não pode ser removida contra a sua vontade enquanto você estiver vivo."
+        },
+        {
+          "nome": "Descanso do Sentinela",
+          "nome_en": "Sentry's Rest",
+          "descricao": "Você não precisa dormir, e magia não pode fazê-lo dormir. Você pode completar um Descanso Longo em 6 horas se passar essas horas em um estado inativo e imóvel. Durante esse tempo, você parece inerte, mas permanece consciente."
+        },
+        {
+          "nome": "Projeto Especializado",
+          "nome_en": "Specialized Design",
+          "descricao": "Você ganha proficiência em uma perícia e em uma ferramenta à sua escolha."
+        },
+        {
+          "nome": "Incansável",
+          "nome_en": "Tireless",
+          "descricao": "Você não adquire níveis de Exaustão por desidratação, desnutrição ou asfixia."
+        }
+      ],
+      "descricao": "Os Warforged são seres mecânicos construídos como armas para lutar na Última Guerra. Um avanço inesperado produziu seres sencientes feitos de madeira e metal que, ainda assim, sentem dor e emoção.\n**Tipo de Criatura:** Construto",
+      "texto_completo": "## Warforged\n\nOs Warforged são seres mecânicos construídos como armas para lutar na Última Guerra. Um avanço inesperado produziu seres sencientes feitos de madeira e metal que, ainda assim, sentem dor e emoção.\n\nOs Warforged combinam materiais orgânicos e inorgânicos. Cordas semelhantes a raízes, infundidas com fluidos alquímicos, servem como músculos e envolvem uma estrutura de aço, madeira escura ou pedra. Placas blindadas formam uma carapaça protetora externa e reforçam as articulações. Quanto mais um Warforged cultiva sua individualidade, mais provável é que modifique o próprio corpo, procurando um artífice para personalizar a aparência de seu rosto, membros e placas.\n\n### Traços de Warforged\n\n**Tipo de Criatura:** Construto\n\n**Tamanho:** Médio (cerca de 1,80-2,40 metros de altura) ou Pequeno (cerca de 0,90-1,20 metro de altura), escolhido ao selecionar esta espécie\n\n**Deslocamento:** 9 metros\n\n**Resiliência de Construto.** Você tem Resistência a dano Venenoso. Você também tem Vantagem em Salvaguardas para evitar ou encerrar a condição Envenenado.\n\n**Proteção Integrada.** Você ganha +1 de bônus na Classe de Armadura. Além disso, a armadura que você vestiu não pode ser removida contra a sua vontade enquanto você estiver vivo.\n\n**Descanso do Sentinela.** Você não precisa dormir, e magia não pode fazê-lo dormir. Você pode completar um Descanso Longo em 6 horas se passar essas horas em um estado inativo e imóvel. Durante esse tempo, você parece inerte, mas permanece consciente.\n\n**Projeto Especializado.** Você ganha proficiência em uma perícia e em uma ferramenta à sua escolha.\n\n**Incansável.** Você não adquire níveis de Exaustão por desidratação, desnutrição ou asfixia."
+    }
+  ]
+}

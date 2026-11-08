@@ -174,6 +174,7 @@ export function calcVantagemDesvantagemSalvaguarda(nomeAtributo) {
   if (char.especie === 'Gnomo' && ['Inteligência', 'Sabedoria', 'Carisma'].includes(nomeAtributo)) vantagens.push('Astucia de Gnomo');
   if (char.especie === 'Elfo' && condicoes.includes('Enfeitiçado')) vantagens.push('Ancestralidade Feerica');
   if (char.especie === 'Anão' && condicoes.includes('Envenenado')) vantagens.push('Resistencia a Toxinas');
+  if (char.especie === 'Warforged' && condicoes.includes('Envenenado')) vantagens.push('Resiliência de Construto');
   if (char.especie === 'Pequenino' && condicoes.includes('Amedrontado')) vantagens.push('Corajoso');
 
   if (nomeAtributo === 'Destreza' && condicoes.includes('Contido')) desvantagens.push('Contido');

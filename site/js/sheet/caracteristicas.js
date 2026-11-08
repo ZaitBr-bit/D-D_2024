@@ -459,8 +459,12 @@ function renderTracoEspecie(traco, herdaAncestralidade = false, ehSubRevelacao =
 
   // Informacoes de escolhas vinculadas ao traco
   let infoEscolhaTraco = '';
-  if (['Hábil', 'Sentidos Aguçados', 'Conhecimento de uma Vida Passada'].includes(traco.nome) && char.pericia_especie) {
+  if (['Hábil', 'Sentidos Aguçados', 'Conhecimento de uma Vida Passada', 'Projeto Especializado'].includes(traco.nome) && char.pericia_especie) {
     infoEscolhaTraco = `<div class="info-box info" style="font-size:0.8rem;margin-top:6px"><strong>Perícia escolhida:</strong> ${escHtml(char.pericia_especie || '')}</div>`;
+  }
+  // Projeto Especializado também guarda uma ferramenta escolhida
+  if (traco.nome === 'Projeto Especializado' && char.ferramenta_especie) {
+    infoEscolhaTraco += `<div class="info-box info" style="font-size:0.8rem;margin-top:6px"><strong>Ferramenta escolhida:</strong> ${escHtml(char.ferramenta_especie)}</div>`;
   }
   if (traco.nome === 'Resistência Estranha' && char.especie === 'Renascido' && char.tracos_escolhidos?.[0]) {
     infoEscolhaTraco = `<div class="info-box info" style="font-size:0.8rem;margin-top:6px"><strong>Resistência escolhida:</strong> ${escHtml(char.tracos_escolhidos[0])}</div>`;

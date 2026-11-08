@@ -1,6 +1,6 @@
 # Backlog de Issues — ZaitBr-bit/D-D_2024
 
-> Revalidado em 2026-10-16, a partir da API do GitHub (issues abertas, sem PRs).
+> Revalidado em 2026-11-07, a partir da API do GitHub (issues abertas, sem PRs).
 > Ordenado por **tipo** (Bug / Melhoria) e depois por **complexidade**. Ticket
 > aqui é a issue do GitHub — ver [`TRIAGEM-ISSUES.md`](TRIAGEM-ISSUES.md) para
 > o procedimento de investigar e corrigir.
@@ -125,7 +125,18 @@
 > `Closes #148`) e fechada no GitHub — 28 abertas. Ver notas de manutenção.
 > Última versão publicada: 3.3.9.
 >
-> Ordem sugerida: #146 e #142 juntas (mesmo sintoma, pedir dados ao autor).
+> **Revalidação de 2026-11-07 (noite)**: 26 issues abertas (contagem conferida
+> na API, lista batendo uma a uma). Saíram **#142** e **#146**, fechadas pelo
+> dono às 22:46 (UTC) como concluídas, sem commit nem PR; nenhuma entrou. Não
+> há bug aberto. Todas as abertas são melhorias. Ver notas de manutenção.
+>
+> Ordem sugerida: nenhuma urgente; o que sobra é decisão de produto (homebrew
+> #40/#38/#41/#23, ver a seção de conteúdo de outros livros).
+>
+> **Mais tarde em 2026-11-07**: Warforged entregue na 3.4.0 (junto com Magias de
+> Itens recolhível, ordem das Perícias e botão de novo personagem no topo da
+> lista). A **#26** fecha com o commit (`Closes #26`): 25 abertas. Última versão
+> publicada: 3.4.0.
 
 ---
 
@@ -133,8 +144,7 @@
 
 ### Média
 
-- [ ] **#146** (NOVA, 2026-10-19, 3.3.8, **P2**) — PDF da ficha não baixa (Android, Chrome). Aberta já na 3.3.8, que trazia a correção do botão "Gerar PDF" morto após re-render (#144), então a causa provável da #142 não explica este caso. **Não investigado.** O autor anexou prints e diz que "vai para baixar a ficha"; o dono respondeu em 2026-10-19 que a opção de PDF fica dentro da ficha do personagem (não na home) — pode ser só o caminho até o botão. Sem resposta do autor. Se ele confirmar que o botão está na ficha e nada baixa, é o mesmo caso da #142 e da #70/#114 (fechadas): o download usa `baixarArquivo` em `utils.js`; o caminho é teste em aparelho (`adb reverse` + `chrome://inspect`). Tratar junto com a #142.
-- [ ] **#142** (NOVA, 2026-10-15, 3.3.5, **P2**) — PDF da ficha não baixa (Android, "Google"). **Não investigado**: o relato não diz o que aparece (nada, erro, aba em branco) nem o navegador exato. O dono pediu esses dados (e versão do Android e aparelho) em 2026-10-16; sem resposta até 2026-10-19. **Provável causa** (achada na #144): o botão "Gerar PDF" ficava sem listener depois de qualquer re-render da ficha, até recarregar; corrigido e publicado na 3.3.8. Pedir ao autor que teste a versão nova; a #146 (3.3.8) relata o mesmo sintoma depois da correção. Mesmo sintoma da #70 e da #114 (fechadas; o download já usa `baixarArquivo` em `utils.js`). Pedir ao autor o navegador, se aparece algum aviso e se o export JSON da home baixa; se não reproduzir em emulação, o caminho é teste em aparelho (`adb reverse` + `chrome://inspect`).
+_(nenhum bug aberto no momento — ver notas de manutenção)_
 
 ---
 
@@ -161,7 +171,7 @@ _(nenhuma nesta faixa no momento — ver notas de manutenção)_
 - [ ] **#38** + **#52** — Talentos customizados/criação de talentos. **Consolidar as duas.**
 - [ ] **#41** + **#140** — Antecedentes customizados (concede atributo + perícia + talento de origem + equipamento — 4 integrações no criador). **Consolidar as duas**: #140 (2026-10-13) pede o mesmo, citando a regra do livro (3 atributos, 1 ferramenta, 2 perícias, 1 talento de origem).
 - [ ] **#53** — Montaria na ficha (entidade nova, bloco de estatísticas de criatura). `dados/monstros/criaturas.json` (3.3.0) já traz blocos de criatura que podem servir de base.
-- [ ] **#23** + **#26** — Espécie customizada / Warforged. **Consolidar as duas** (espécie alimenta deslocamento, sentidos, truques, resistências). #139 pede espécies de suplementos; a customizada atenderia.
+- [ ] **#23** — Espécie customizada (a #26, Warforged, foi entregue na 3.4.0 e fechada; espécie alimenta deslocamento, sentidos, truques, resistências). #139 pede espécies de suplementos; a customizada atenderia. **Warforged entregue na 3.4.0** (`dados/eberron/`, Eberron pág. 46). Outras espécies do Eberron já têm texto no PDF e não estão no app: Changeling, Kalashtar, Khoravar e Shifter (págs. 42 a 45).
 
 ### Muito alta
 
@@ -175,11 +185,41 @@ Tasha's, Arcana Unleashed e Ravenloft já no app, cada pedido depende de o dono
 decidir trazer o livro; enquanto isso, a resposta é apontar o homebrew (#40,
 #38/#52, #23/#26).
 
-- [ ] **#18** — Subclasse Paladino Juramento dos Gênios Nobres (Heroes of Faerûn).
-- [ ] **#28** — Subclasse Guerreiro do Eco (Wildemount, 5e 2014 — sem versão 2024).
-- [ ] **#109** (2026-09-22) — Conteúdo de "Tasha's Cauldron of Everything" (subclasses como Guerreiro Rúnico, talentos). O Artífice de Tasha's entrou na 3.2.0 (`dados/tasha/artifice/`) e, na 3.3.7, o Mago (Lâmina Cantante e 13 magias novas, `dados/tasha/mago/`); o resto do livro não. Três comentários apontam homebrew (#40, #38/#52).
-- [ ] **#139** (NOVA, 2026-10-10) — Mais espécies de suplementos (Tabaxi, Warforged, Tritão, Genasi, Minotauro, Goblin, Hobgoblin, Firbolg, Aarakocra...). Sobrepõe #23/#26; hoje só o Renascido (Ravenloft) veio de fora do PHB.
-- [ ] **#141** (NOVA, 2026-10-14) — Subclasse de Bruxo Lâmina Maldita (Hexblade, Guia de Xanathar, 5e 2014 — sem versão 2024). O autor anexou prints e link para PDF do livro; não usar como fonte. Mesmo caso de #28.
+**Conferência nos PDFs de `Informacoes Separadas/PDF` (2026-11-07)** — só os
+pedidos que citam raça, classe ou subclasse específica. Texto extraído com
+`pdftotext`; o PDF de Ravenloft é só imagem, e foi lido pela renderização das
+páginas. "No app" = já em `dados/`.
+
+| Issue | Pedido | Livro e página do PDF | Existe? | No app |
+|---|---|---|---|---|
+| #18 | Paladino, Juramento dos Gênios Nobres | Heroes of Faerûn | **Não** (livro fora dos PDFs) | Não |
+| #28 | Guerreiro, Cavaleiro do Eco | Explorer's Guide to Wildemount | **Não** (livro fora dos PDFs) | Não |
+| #141 | Bruxo, Lâmina Maldita | Guia de Xanathar, págs. 19–22 | **Sim** (PT-BR, 5e 2014) | Não |
+| #109 | Guerreiro, Cavaleiro Rúnico e demais de Tasha's | Tasha's, págs. 60–62 (Rúnico) | **Sim** (PT-BR, 5e 2014) | Só Artífice e Mago (Lâmina Cantante) |
+| #139, #23, #26 | Warforged | Eberron: Forge of the Artificer, pág. 46 | **Sim** (5.5e, formato 2024) | **Sim, 3.4.0** |
+| #139 | Tabaxi, Tritão, Genasi, Minotauro, Goblin, Hobgoblin, Firbolg, Aarakocra | — | **Não** como espécie jogável | Não |
+
+Subclasses de Tasha's presentes no PDF e ausentes do app (16): Bárbaro —
+Magia Selvagem; Bardo — Criação, Eloquência; Bruxo — O Insondável, O Gênio;
+Clérigo — Ordem, Paz, Crepúsculo; Druida — Esporos, Fogo Selvagem; Guerreiro —
+Cavaleiro Rúnico; Monge — Forma Astral; Paladino — Vigilância; Guardião —
+Portador do Enxame; Ladino — Fantasma; Mago — Ordem dos Escribas. As demais
+de Tasha's já entraram pelo Livro do Jogador 2024 (Psíquico, Misericórdia,
+Glória, Estrelas, Aberrante, Mecânica, Andarilho Feérico, Adaga Espiritual) ou
+pela 3.3.7 (Lâmina Cantante). A Trilha da Besta virou Coração Selvagem em 2024.
+
+Disponíveis nos PDFs sem pedido aberto: Eberron — Changeling, Kalashtar,
+Khoravar, Shifter (págs. 42–45); Ravenloft (pág. 17) — Dhampir, Hexblood,
+Lupin (Renascido já está no app), 7 subclasses (nomes do livro em inglês:
+Reanimator, College of Spirits, Grave Domain, Hollow Warden, Phantom, Shadow
+Sorcery, Undead Patron) e 4 antecedentes (Haunted One, Investigator, Mist
+Wanderer, Spirit Medium).
+
+- [ ] **#18** — Subclasse Paladino Juramento dos Gênios Nobres (Heroes of Faerûn). **PDFs (2026-11-07): não existe.** O Juramento dos Gênios Nobres é de Heroes of Faerûn, que não está entre os PDFs. Tasha's só cita "gênios nobres" no texto do patrono O Gênio (Bruxo, pág. 33).
+- [ ] **#28** — Subclasse Guerreiro do Eco (Wildemount, 5e 2014 — sem versão 2024). **PDFs (2026-11-07): não existe.** O Cavaleiro do Eco é do Explorer's Guide to Wildemount; nenhum dos 7 PDFs o traz.
+- [ ] **#109** (2026-09-22) — Conteúdo de "Tasha's Cauldron of Everything" (subclasses como Guerreiro Rúnico, talentos). O Artífice de Tasha's entrou na 3.2.0 (`dados/tasha/artifice/`) e, na 3.3.7, o Mago (Lâmina Cantante e 13 magias novas, `dados/tasha/mago/`); o resto do livro não. Três comentários apontam homebrew (#40, #38/#52). **PDFs (2026-11-07): existe.** O PDF de Tasha's (PT-BR) traz o Cavaleiro Rúnico (págs. 60 a 62 do PDF) e mais 15 subclasses que o app ainda não tem; lista na tabela abaixo.
+- [ ] **#139** (NOVA, 2026-10-10) — Mais espécies de suplementos (Tabaxi, Warforged, Tritão, Genasi, Minotauro, Goblin, Hobgoblin, Firbolg, Aarakocra...). Sobrepõe #23; hoje só o Renascido (Ravenloft) e o Warforged (Eberron, 3.4.0) vieram de fora do PHB. **PDFs (2026-11-07):** só o Warforged existe (Eberron, pág. 46 do PDF). Tabaxi, Tritão, Genasi, Minotauro, Goblin, Hobgoblin, Firbolg e Aarakocra não são espécies jogáveis em nenhum PDF (aparecem só como monstro ou citação).
+- [ ] **#141** (NOVA, 2026-10-14) — Subclasse de Bruxo Lâmina Maldita (Hexblade, Guia de Xanathar, 5e 2014 — sem versão 2024). O autor anexou prints e link para PDF do livro; não usar como fonte. Mesmo caso de #28. **PDFs (2026-11-07): existe.** O Guia de Xanathar (PDF em PT-BR) traz "O Lâmina Maldita" como patrono de Bruxo (págs. 19 a 22 do PDF). É texto de 5e 2014, a converter para os termos de 2024, como foi feito com a Lâmina Cantante.
 
 ### Fora do escopo atual
 
@@ -190,6 +230,10 @@ decidir trazer o livro; enquanto isso, a resposta é apontar o homebrew (#40,
 ---
 
 ## Notas de manutenção
+
+- **Fechada em 2026-11-07** (noite): **#26**, versão 3.4.0 (`Closes #26`). Espécie Warforged do Eberron: Forge of the Artificer (pág. 46 do PDF) em `dados/eberron/especies.json`, fonte "Suplemento 5", com +1 na CA (`bonusCADaEspecie`, `site/js/regras-bonus-especie.js`, somado em `calcCA`), Resistência a Venenoso (`resistenciasDaEspecie`), Vantagem contra Envenenado (`sheet/combate.js`) e escolha de perícia e ferramenta no criador (`ferramenta_especie`). Construto ficou só como texto. Não foi preciso trazer magias nem itens: o Servo Homúnculo e os 9 itens do Eberron já estavam em `dados/tasha/artifice/`. Pontos menores da revisão sem correção: o +1 de CA entra depois do piso da Pele-Casca (CA 12 vira 18, não 17); a ferramenta é escolhida antes do antecedente e, se ele der a mesma, a escolha se perde sem aviso; nenhum teste conclui o assistente inteiro com Warforged. Testes: `warforged.test.mjs` e `warforged.spec.mjs`.
+
+- **Fechadas em 2026-11-07** (revalidação da noite): **#142** e **#146**, ambas "PDF da ficha não baixa" (Android, Chrome), do mesmo autor, fechadas pelo dono como concluídas, sem commit nem PR. O autor nunca respondeu aos dados pedidos; a causa provável era o botão "Gerar PDF" sem listener após re-render, corrigido na 3.3.8 (#144). A #146 foi respondida em 2026-10-19 (a opção de PDF fica dentro da ficha).
 
 - **Fechada em 2026-11-07**: **#148**, versão 3.3.9 (commit `a6c36a6`, `Closes #148`). O traço Porte Poderoso do Golias (`dados/origens/especies.json:187`) não era lido: a carga usava só `char.tamanho` (Força 17 × 7 = 119 kg). `tamanhoParaCarga(tamanho, especie)` (`site/js/regras-carga.js`) sobe um tamanho na carga (× 13,5, Grande = 229,5 kg) e é usada em `getEstadoCarga` (`sheet/inventario.js`), no popup `mostrarCalculoCarga` (`sheet/combate.js`, "Médio, conta como Grande" e o nome do traço) e no criador (`passo-detalhes.js`, `passo-equipamento.js`); `char.tamanho` não muda. A Vantagem para escapar de Imobilizado (Atletismo ou Acrobacia, glossário "Imobilizando") entrou como nota V* nessas perícias só com a condição marcada (`notaEscaparImobilizado`, decisão do dono), fora do cálculo de V/D. Testes, vermelhos antes: `carga-tamanho-especie.test.mjs` (com guarda que varre `dados/` atrás de outra espécie com o traço) e `carga-golias.spec.mjs` (clica no peso do inventário, marca Imobilizado e clica no V*). Sem teste: as duas telas do criador. Fora: carga com Forma Grande ativa (o app não muda o tamanho nela).
 

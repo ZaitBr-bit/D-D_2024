@@ -103,8 +103,11 @@ function _renderConteudo(container, personagens, usuario) {
 
   container.innerHTML = `
     ${contaHtml}
-    <div class="flex justify-between items-center mb-1">
-      <h2 style="font-size:1.1rem;color:var(--text)">Meus Personagens</h2>
+    <div class="flex justify-between items-center mb-1" style="flex-wrap:wrap;gap:8px">
+      <div class="flex items-center" style="gap:10px">
+        <h2 style="font-size:1.1rem;color:var(--text)">Meus Personagens</h2>
+        <button class="btn btn-sm btn-primary" id="btn-novo-personagem" onclick="navegar('criar')">+ Novo Personagem</button>
+      </div>
       <div class="flex gap-1">
         <button class="btn btn-sm btn-secondary" id="btn-exportar" title="Exportar todos os personagens num único arquivo">Exportar Todos</button>
         <button class="btn btn-sm btn-secondary" id="btn-importar" title="Importar arquivo com 1 ou vários personagens">Importar</button>
@@ -115,11 +118,6 @@ function _renderConteudo(container, personagens, usuario) {
     </p>
     <div class="char-list">
       ${personagens.map(p => renderCharCard(p)).join('')}
-    </div>
-    <div class="mt-3 text-center">
-      <button class="btn btn-primary btn-lg btn-block" onclick="navegar('criar')">
-        + Novo Personagem
-      </button>
     </div>
   `;
 

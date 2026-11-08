@@ -108,7 +108,7 @@ export async function getAntecedentes() {
 }
 
 // Espécies de livros de expansão, juntadas depois das do Livro do Jogador.
-const ESPECIES_DE_EXPANSAO = ['ravenloft/especies.json'];
+const ESPECIES_DE_EXPANSAO = ['ravenloft/especies.json', 'eberron/especies.json'];
 let _especies = null;
 
 /**

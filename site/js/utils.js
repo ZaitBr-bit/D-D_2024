@@ -11,6 +11,7 @@ import { getAtributoConjuracaoSubclasse, getConjuracaoSubclasse } from './regras
 // apenas dados-classes.js, que utils.js já importa acima.
 import { classesDe, temClasse } from './regras-multiclasse.js';
 import { bonusCancao, cancaoAtiva } from './regras-lamina-cantante.js';
+import { bonusCADaEspecie } from './regras-bonus-especie.js';
 // preparadasPorClasse: sem ciclo -- regras-magia-classe.js importa
 // regras-origens-magia.js e regras-multiclasse-conjuracao.js, nenhum dos
 // dois importa utils.js. Ver o comentario de normalizarGrimorioMago abaixo
@@ -552,6 +553,9 @@ export function calcCA(personagem, passivos = null) {
 
   // Canção da Lâmina ativa: + mod. Int (mínimo +1); recalculada a cada chamada a partir do estado.
   if (cancaoAtiva(personagem)) ca += bonusCancao(personagem);
+
+  // Bônus fixo de CA da espécie (Warforged: Proteção Integrada)
+  ca += bonusCADaEspecie(personagem.especie);
 
   // Bônus genérico de CA de talentos
   ca += passivos?.bonusCA || 0;
