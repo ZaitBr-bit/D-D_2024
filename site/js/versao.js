@@ -13,13 +13,43 @@
 // ============================================================
 
 /** Versão exibida no header e marcada como atual na lista de notas. */
-export const VERSAO_ATUAL = '3.4.0';
+export const VERSAO_ATUAL = '3.4.1';
 
 // Cada entrada é uma versão. `melhorias` e `correcoes` são listas de
 // grupos, e cada grupo tem um título curto e seus itens. O emoji do
 // grupo entra no próprio título -- é o que separa visualmente melhoria
 // de correção sem depender de cor.
 export const NOTAS_VERSAO = [
+  {
+    versao: '3.4.1',
+    data: '2026-11-08',
+    rotulo: 'Lâmina Maldita',
+    resumo: 'Nova subclasse de Bruxo, o Patrono Lâmina Maldita (Hexblade), do '
+      + 'Guia de Xanathar, com a Maldição ativa na ficha.',
+    melhorias: [
+      {
+        grupo: '✨ Melhorias',
+        itens: [
+          'Nova subclasse de Bruxo: Patrono Lâmina Maldita (Guia de Xanathar, '
+            + 'Suplemento 6), nos níveis 3, 6, 10 e 14, com as magias do '
+            + 'patrono sempre preparadas e as proficiências do Guerreiro '
+            + 'Maldito (armadura média, escudos e armas marciais).',
+          'Maldição da Lâmina Maldita: a seção do patrono tem os botões '
+            + 'Amaldiçoar, O alvo morreu (curar ou passar a maldição) e '
+            + 'Encerrar. Com a maldição ativa, cada ataque mostra "+N '
+            + 'amaldiçoado · crítico 19–20", e ela termina ao ficar '
+            + 'Incapacitado, ao cair a 0 PV e nos descansos.',
+          'Espectro Amaldiçoado (nível 6) com ficha técnica, PV temporários e '
+            + 'ataque com Carisma; Armadura de Maldições (nível 10) com o d6 '
+            + 'da Reação; Mestre das Maldições (nível 14) para passar a '
+            + 'maldição ao próximo alvo.',
+          'Funciona como segunda classe: o nível de Bruxo (e não o total) '
+            + 'rege a cura e o Espectro, e a subida de nível concede as '
+            + 'magias e as proficiências do patrono.',
+        ],
+      },
+    ],
+  },
   {
     versao: '3.4.0',
     data: '2026-11-07',

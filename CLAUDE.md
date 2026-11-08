@@ -56,4 +56,7 @@ Resumo para quem mexe neste repositório (pessoa ou agente). O detalhe está em
   `git add -A`, `git add .` nem `git commit -a`.
 - `docs/superpowers/` (specs, planos, revisões) não entra em commit, salvo pedido.
 - Versão visível: `VERSAO_ATUAL` e a entrada no topo de `NOTAS_VERSAO`
-  (`site/js/versao.js`) só mudam quando o dono do projeto pede, e precisam bater.
+  (`site/js/versao.js`) precisam bater. Mudam quando o dono pede, e **sempre** na
+  mesma entrega que cria **classe, subclasse, espécie ou origem (antecedente)**:
+  entrada nova de release notes. Versão sugerida: classe nova = minor, o resto =
+  patch. Diga no fim qual versão usou, para o dono ajustar.
