@@ -4,7 +4,10 @@
 // adicionado; conjuração consome o pergaminho.
 // ============================================================
 import { test, expect } from '@playwright/test';
-import { abrirFicha, abrirSite, irAtePassoEquipamento, personagemSalvo, clicarBotaoFicha, assentar, ATRIBUTOS_REGRAS } from './helpers-regras.mjs';
+import { abrirFicha as abrirFichaBase, abrirMagiasDeItensSozinho, abrirSite, irAtePassoEquipamento, personagemSalvo, clicarBotaoFicha, assentar, ATRIBUTOS_REGRAS } from './helpers-regras.mjs';
+
+/** Abre a ficha e deixa o bloco "Magias de Itens" (nasce fechado) abrir ao primeiro clique. */
+const abrirFicha = async (...args) => abrirMagiasDeItensSozinho(await abrirFichaBase(...args));
 
 const MAGO_5 = {
   nome: 'Aluno', especie: 'Humano', classe: 'Mago', subclasse: '', nivel: 5, xp: 6500, atributos: ATRIBUTOS_REGRAS,

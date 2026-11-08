@@ -5,7 +5,10 @@
 // conjuração, CD "sua" e detalhe da magia.
 // ============================================================
 import { test, expect } from '@playwright/test';
-import { abrirFicha, personagemSalvo, clicarBotaoFicha, marcarCondicao, assentar, ATRIBUTOS_REGRAS } from './helpers-regras.mjs';
+import { abrirFicha as abrirFichaBase, abrirMagiasDeItensSozinho, personagemSalvo, clicarBotaoFicha, marcarCondicao, assentar, ATRIBUTOS_REGRAS } from './helpers-regras.mjs';
+
+/** Abre a ficha e deixa o bloco "Magias de Itens" (nasce fechado) abrir ao primeiro clique. */
+const abrirFicha = async (...args) => abrirMagiasDeItensSozinho(await abrirFichaBase(...args));
 
 const GUERREIRO = { classe: 'Guerreiro', nivel: 1, atributos: ATRIBUTOS_REGRAS };
 const MONGE = { classe: 'Monge', nivel: 1, atributos: ATRIBUTOS_REGRAS };
@@ -184,7 +187,7 @@ test('Cajado do Fogo: a CD "sua" é a CD de magia da ficha', async ({ context })
 test('clicar no nome da magia abre o detalhe', async ({ context }) => {
   const { page, erros } = await abrirFicha(context, GUERREIRO, 'regras-magias-itens-7');
   await adicionarItemMagico(page, 'Bolas de Fogo', 'Varinha de Bolas de Fogo');
-  await linhaMagia(page, 'Bola de Fogo').locator('strong').click();
+  await linhaMagia(page, 'Bola de Fogo').locator('.magia-nome').click();
   await expect(linhaMagia(page, 'Bola de Fogo').locator('.magia-desc')).toContainText('Esfera de 6 metros');
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });

@@ -16,6 +16,7 @@ import { armadurasDoPersonagem, armasDoPersonagem } from '../regras-multiclasse-
 import { classesDe, reservasDadosVida } from '../regras-multiclasse.js';
 import { possuiAlgumaMagia } from '../regras-origens-magia.js';
 import { ehProficienteEmSalvaguarda } from '../regras-salvaguardas.js';
+import { MODOS_ORDEM_PERICIAS, ORDEM_PERICIAS_PADRAO, ordenarPericias } from '../regras-ordem-pericias.js';
 import { bonusCancao, cancaoAtiva } from '../regras-lamina-cantante.js';
 import { resolverPassivosTalentos } from '../talentos-effects.js';
 import { bonusProficiencia, calcBonusPericia, calcCA, calcMod, calcPVMulticlasse, calcSalvaguarda, coletarCAsAlternativas, conjuracoesPorClasse, equipamentoDeCA, escHtml, escolherCAAlternativa, fmtMod, getDeslocamento, getTamanho } from '../utils.js';
@@ -561,26 +562,34 @@ export function renderFichaCompleta() {
     <div class="card">
       <details class="card-recolhivel" data-details-id="pericias" open>
       <summary class="card-header card-recolhivel-titulo"><h2>Perícias</h2><span class="card-recolhivel-chevron no-print">&#9660;</span></summary>
+      <div class="no-print" style="display:flex;justify-content:flex-end;margin-bottom:6px">
+        <label>Ordem
+          <select id="sel-ordem-pericias" class="form-input" data-ordem-pericias style="width:auto;padding:2px 4px;font-size:0.75rem">
+            ${(() => {
+              const efetivo = MODOS_ORDEM_PERICIAS.some(m => m.valor === char.ordem_pericias) ? char.ordem_pericias : 'padrao';
+              return MODOS_ORDEM_PERICIAS.map(m => `<option value="${m.valor}"${m.valor === efetivo ? ' selected' : ''}>${m.rotulo}</option>`).join('');
+            })()}
+          </select>
+        </label>
+      </div>
       <div class="pericias-lista-custom">
         ${(() => {
-          // Ordem customizada de exibicao das pericias
-          const ordemPericias = [
-            'Percepção', 'Intuição', 'Investigação', 'Religião', 'História',
-            'Prestidigitação', 'Furtividade', 'Persuasão', 'Atletismo', 'Medicina',
-            'Acrobacia', 'Enganação', 'Arcanismo', 'Sobrevivência', 'Natureza',
-            'Atuação', 'Intimidação', 'Lidar com Animais'
-          ];
-          return ordemPericias.map(nome => {
+          // Bônus calculado uma vez por perícia; o mesmo valor ordena e é exibido
+          const lista = ORDEM_PERICIAS_PADRAO.map(nome => {
             const p = PERICIAS.find(x => x.nome === nome);
-            if (!p) return '';
-            const key = ATRIBUTO_NOME_PARA_KEY[p.atributo];
-            const estilo = ATRIBUTO_ESTILO[key] || {};
-            const proficiente = (char.pericias_proficientes || []).includes(p.nome);
-            const expertise = (char.pericias_expertise || []).includes(p.nome);
+            if (!p) return null;
             const bonus = calcBonusPericia(char, p.nome, {
               emFuria: !!getEstadoFuria()?.ativa,
               forcaPrimordialAtiva: forcaPrimordialAtiva()
             });
+            return { nome: p.nome, atributo: p.atributo, bonus };
+          }).filter(Boolean);
+          return ordenarPericias(lista, char.ordem_pericias).map(({ nome, bonus }) => {
+            const p = PERICIAS.find(x => x.nome === nome);
+            const key = ATRIBUTO_NOME_PARA_KEY[p.atributo];
+            const estilo = ATRIBUTO_ESTILO[key] || {};
+            const proficiente = (char.pericias_proficientes || []).includes(p.nome);
+            const expertise = (char.pericias_expertise || []).includes(p.nome);
             const vd = calcVantagemDesvantagemPericia(p.nome);
             const temVant = vd.vantagens.length > 0;
             const temDesv = vd.desvantagens.length > 0;
@@ -707,9 +716,21 @@ export function renderFichaCompleta() {
   setupEventosDetalhesColapso();
   setupEventosTruquesColapso();
   setupEventosRecursosClasse();
+  setupEventosOrdemPericias();
   document.getElementById('btn-recuperar-dadiva-epica')
     ?.addEventListener('click', abrirModalRecuperarDadivaEpica);
 
   // Restaurar estado dos details
   restaurarEstadoDetails(estadoDetails);
+}
+
+// Grava a ordem escolhida no select de Perícias e redesenha a ficha.
+function setupEventosOrdemPericias() {
+  document.querySelectorAll('[data-ordem-pericias]').forEach(sel => {
+    sel.addEventListener('change', () => {
+      char.ordem_pericias = sel.value;
+      salvar();
+      renderFichaCompleta();
+    });
+  });
 }

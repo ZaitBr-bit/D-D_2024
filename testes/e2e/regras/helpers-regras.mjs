@@ -279,6 +279,18 @@ export async function abrirFicha(context, campos, id = 'regras-teste-1') {
   return lado;
 }
 
+/**
+ * Registra na página um tratador que abre o bloco "Magias de Itens" (nasce
+ * fechado) sempre que uma ação o encontra recolhido (abre por propriedade, sem clique). Retorna o `lado` recebido.
+ */
+export async function abrirMagiasDeItensSozinho(lado) {
+  await lado.page.addLocatorHandler(
+    lado.page.locator('details[data-details-id="magias-de-itens"]:not([open]) > summary'),
+    async (resumo) => { await resumo.evaluate((el) => { el.parentElement.open = true; }); },
+  );
+  return lado;
+}
+
 // ---------- Navegação compartilhada do domínio Antecedentes ----------
 
 /**

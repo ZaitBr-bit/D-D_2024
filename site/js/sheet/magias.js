@@ -1495,33 +1495,42 @@ export function renderSecaoMagias(faixaRecursosHtml = '') {
 }
 
 /**
- * Bloco "Magias de Itens" da seção Magias: uma linha por magia de item não
- * destruído, com custo, CD/ataque e o botão Conjurar (desabilitado com a dica
- * quando o item não está pronto). A linha usa `data-magia-nome`/`data-magia-circ`
- * para reaproveitar o detalhe expansível das magias do livro.
+ * Bloco recolhível (nasce fechado) "Magias de Itens" da seção Magias: uma linha
+ * por magia de item não destruído, no layout das magias preparadas (nome e
+ * origem à esquerda, botão Conjurar à direita; desabilitado com a dica quando o
+ * item não está pronto). A linha usa `data-magia-nome`/`data-magia-circ` para
+ * reaproveitar o detalhe expansível das magias do livro.
  */
 function htmlMagiasDeItens() {
   const linhas = magiasDeItens(char);
   if (!linhas.length) return '';
   const conj = { cd: calcCDMagia(char), ataque: calcAtaqueMagia(char) };
   return `
-    <div class="magias-de-itens" style="margin-top:12px">
-      <h3 style="font-size:0.95rem;margin:0 0 6px">Magias de Itens</h3>
+    <details class="magias-de-itens" data-details-id="magias-de-itens" style="margin-top:12px;margin-bottom:8px">
+      <summary style="font-weight:700;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--border-light)">
+        Magias de Itens (${linhas.length})
+      </summary>
+      <div style="padding-top:4px">
       ${linhas.map(({ idx, item, k, magia, situacao }) => {
         const rc = rotuloConjuracao(magia, conj);
         return `
         <div class="magia-item" data-magia-nome="${escHtml(magia.nome)}" data-magia-circ="${magia.circulo_base ?? 0}">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-            <strong>${escHtml(magia.nome)}</strong>
-            <span style="font-size:0.8rem;color:var(--text-muted)">${escHtml(item.nome)} · ${escHtml(rotuloCusto(magia, item))}</span>
-            ${rc.texto ? `<span style="font-size:0.8rem" title="${escHtml(rc.title)}">${escHtml(rc.texto)}</span>` : ''}
-            <button class="btn btn-sm btn-primary no-print" data-conjurar-item="${idx}" data-conjurar-magia="${k}"
-              ${situacao.ok ? '' : `disabled title="${escHtml(situacao.motivo)}"`}>Conjurar</button>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+            <div style="min-width:0">
+              <div class="magia-nome">${escHtml(magia.nome)}</div>
+              ${badgesMagiaRapidos(magia.nome)}
+              <div style="font-size:0.65rem;color:var(--text-muted);margin-top:1px">${escHtml(item.nome)} · ${escHtml(rotuloCusto(magia, item))}${rc.texto ? ` · <span title="${escHtml(rc.title)}">${escHtml(rc.texto)}</span>` : ''}</div>
+            </div>
+            <div class="no-print" style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+              <button class="btn btn-sm btn-primary" data-conjurar-item="${idx}" data-conjurar-magia="${k}"
+                ${situacao.ok ? '' : `disabled title="${escHtml(situacao.motivo)}"`}>Conjurar</button>
+            </div>
           </div>
           <div class="magia-desc"></div>
         </div>`;
       }).join('')}
-    </div>`;
+      </div>
+    </details>`;
 }
 
 // Mapa unificado de magias com efeitos mecanicos quando conjuradas
