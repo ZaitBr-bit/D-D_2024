@@ -15,6 +15,7 @@ import { quebrarConcentracaoAtiva } from './hp-descanso.js';
 import { abrirModalModificadores } from './modificadores.js';
 import { estaIncapacitado, condicaoIncapacitante } from '../regras-condicoes.js';
 import { encerrarCancaoSeImpedida } from '../regras-lamina-cantante.js';
+import { encerrarMaldicaoSeIncapacitado } from '../regras-lamina-maldita.js';
 import { temProficienciaArma, temProficienciaArmadura, badgeProficiencia } from '../regras-equipamento.js';
 import { armasCatalogoEmCache } from '../itens-seletor.js';
 
@@ -537,6 +538,8 @@ export function setupEventosCondicoes() {
       char.condicoes = novas;
       // Ficar Incapacitado encerra a Canção da Lâmina.
       encerrarCancaoSeImpedida(char);
+      // Ficar Incapacitado encerra a Maldição da Lâmina Maldita.
+      encerrarMaldicaoSeIncapacitado(char);
       // Se Exaustao foi removida, zerar nivel
       if (!novas.includes('Exaustão') && char.exaustao > 0) {
         char.exaustao = 0;

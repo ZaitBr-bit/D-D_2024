@@ -4,6 +4,7 @@
     { "id": "ravenloft", "nome": "Suplemento 2", "sigla": "Sup. 2" },
     { "id": "monstros", "nome": "Suplemento 4", "sigla": "Sup. 4" },
     { "id": "arcana-unleashed", "nome": "Suplemento 3", "sigla": "Sup. 3" },
-    { "id": "eberron", "nome": "Suplemento 5", "sigla": "Sup. 5" }
+    { "id": "eberron", "nome": "Suplemento 5", "sigla": "Sup. 5" },
+    { "id": "xanathar", "nome": "Suplemento 6", "sigla": "Sup. 6" }
   ]
 }

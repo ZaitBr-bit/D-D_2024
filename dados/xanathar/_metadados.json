@@ -1,0 +1,19 @@
+{
+  "titulo": "Xanathar's Guide to Everything",
+  "fonte": "xanathar",
+  "pdf_extraido": "Informacoes Separadas/PDF/Xanathar's guide to everything D&D 5e.pdf",
+  "idioma_original": "português (texto do livro de 2014); níveis e termos adaptados ao 2024",
+  "observacao": "Separado de dados/ (Livro do Jogador). O livro dá o patrono no nível 1; o app segue 2024 e o concede no nível 3. Trecho inicial do Mestre das Maldições corrompido no PDF (pág. 21): regra conferida pela parte legível.",
+  "conteudos": [
+    {
+      "id": "bruxo",
+      "titulo": "Bruxo (Patrono Lâmina Maldita)",
+      "titulo_en": "Warlock (The Hexblade)",
+      "paginas_pdf": { "lamina_maldita": "20-21" },
+      "arquivos": {
+        "bruxo/subclasses_bruxo.json": "Patrono Lâmina Maldita no formato de dados/classes/bruxo.json, níveis adaptados ao Bruxo 2024; db.getClasse('Bruxo') junta às subclasses do Livro do Jogador",
+        "criaturas.json": "Espectro (estatísticas escritas de memória, NÃO conferidas no PDF: o Espectro comum não consta no Manual dos Monstros do projeto, só o Espectro Pavoroso) para o Espectro Amaldiçoado; db.getCriaturasXanathar"
+      }
+    }
+  ]
+}

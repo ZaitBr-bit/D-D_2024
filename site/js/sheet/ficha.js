@@ -27,6 +27,7 @@ import { renderSecaoCompanheirosArtifice, setupEventosCompanheirosArtifice } fro
 import { renderSecaoFamiliar, setupEventosFamiliar } from './familiar.js';
 import { renderSecaoMortosVivos, setupEventosMortosVivos } from './necromante.js';
 import { renderSecaoLaminaCantante, setupEventosLaminaCantante } from './lamina-cantante.js';
+import { renderSecaoLaminaMaldita, setupEventosLaminaMaldita } from './lamina-maldita.js';
 import { renderSecaoFormaSelvagem, setupEventosFormaSelvagem } from './forma-selvagem.js';
 import { getEstadoRecursosGuardiao } from './classes/guardiao.js';
 import { getEstadoRecursosPaladino } from './classes/paladino.js';
@@ -673,6 +674,7 @@ export function renderFichaCompleta() {
       inclusive.
     -->
     ${renderSecaoLaminaCantante()}
+    ${renderSecaoLaminaMaldita()}
     ${renderSecaoMortosVivos()}
     ${renderSecaoFamiliar()}
     ${temSecaoMagias ? renderSecaoMagias(renderFaixaRecursosMagias(recursosClasse.magias)) : ''}
@@ -706,6 +708,7 @@ export function renderFichaCompleta() {
   setupEventosCompanheirosArtifice();
   setupEventosFamiliar();
   setupEventosLaminaCantante();
+  setupEventosLaminaMaldita();
   setupEventosMortosVivos();
   setupEventosFormaSelvagem();
   ligarSelosFonte(containerRef);

@@ -56,7 +56,10 @@ async function carregarJSON(caminho) {
 
 // Subclasses de livros de expansão que entram numa classe do Livro do Jogador,
 // juntadas depois das subclasses dela (cada subclasse traz o campo `fonte`).
-const SUBCLASSES_DE_EXPANSAO = { 'Mago': ['arcana-unleashed/subclasses_mago.json', 'tasha/mago/subclasses_mago.json'] };
+const SUBCLASSES_DE_EXPANSAO = {
+  'Mago': ['arcana-unleashed/subclasses_mago.json', 'tasha/mago/subclasses_mago.json'],
+  'Bruxo': ['xanathar/bruxo/subclasses_bruxo.json'],
+};
 const _classesComExpansao = {};
 
 /**
@@ -433,6 +436,18 @@ export async function getCriaturas() {
     _criaturas = carga;
   }
   return _criaturas;
+}
+
+let _criaturasXanathar = null;
+
+/** Criaturas do Xanathar (Espectro da Lâmina Maldita), em cache; fora de getCriaturas. */
+export async function getCriaturasXanathar() {
+  if (!_criaturasXanathar) {
+    const carga = fetchJSON('xanathar/criaturas.json');
+    _criaturasXanathar = carga;
+    carga.then((r) => { if (!r && _criaturasXanathar === carga) _criaturasXanathar = null; });
+  }
+  return _criaturasXanathar;
 }
 
 /** Carrega glossário */

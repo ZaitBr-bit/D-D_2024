@@ -38,6 +38,11 @@ Resumo para quem mexe neste repositório (pessoa ou agente). O detalhe está em
   `testes/e2e/regras/` que **clique** nele.
 - Oráculo vermelho antes da correção: o teste nasce falhando, pelo motivo certo.
 - `test.skip` leva o motivo escrito no arquivo.
+- **Classe ou subclasse nova valida multiclasse e ganha teste para isso.** A regra
+  usa `nivelNa`, `subclasseDe` e `temClasse`, e os testes cobrem (a) a classe como
+  segunda classe, (b) a subida de nível que escolhe a subclasse (magias sempre
+  preparadas e proficiências concedidas) e (c) a ficha com a subclasse num
+  personagem multiclasse. Rode também `node --test ../regras/unidade/multiclasse-*.test.mjs`.
 - **Rode só os testes focados na alteração**: o spec e o teste de unidade do
   assunto (`npx playwright test --config=regras/playwright.config.mjs regras/<arquivo>.spec.mjs`,
   `node --test ../regras/unidade/<arquivo>.test.mjs`). A suíte completa

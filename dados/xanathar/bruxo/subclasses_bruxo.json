@@ -1,0 +1,44 @@
+{
+  "classe": "Bruxo",
+  "fonte": "xanathar",
+  "subclasses": [
+    {
+      "nome": "Patrono Lâmina Maldita",
+      "nome_en": "The Hexblade",
+      "fonte": "xanathar",
+      "descricao": "Você fez o seu pacto com uma entidade misteriosa do Pendor das Sombras, uma força que se manifesta em armas mágicas inteligentes esculpidas da matéria da sombra. A poderosa espada Lâmina Negra é a mais notável dessas armas, que se espalharam pelo multiverso ao longo dos tempos. A força sombria por trás dessas armas pode oferecer poder a guerreiros que formam pactos com ela. Muitos Bruxos da Lâmina Maldita criam armas que imitam aquelas criadas no Pendor das Sombras. Outros renunciam a tais armas, contentando-se em tecer a magia negra daquele plano ao conjurar suas magias.\n\nComo a Rainha Corvo é conhecida por ter forjado a primeira dessas armas, muitos sábios especulam que ela e a força são uma só e que as armas, juntamente com os Bruxos da Lâmina Maldita, são ferramentas que ela usa para manipular eventos no plano material até seus fins inescrutáveis.",
+      "caracteristicas": [
+        {
+          "nivel": 3,
+          "nome": "Magia de Pacto da Lâmina Maldita",
+          "descricao": "A magia do seu patrono assegura que você sempre tenha algumas magias disponíveis; ao atingir um nível de Bruxo indicado na tabela Magias da Lâmina Maldita, você sempre tem essas magias preparadas.\n**Magias da Lâmina Maldita**\n| **Nível de Bruxo** | **Magias**                                                      |\n|--------------------|-----------------------------------------------------------------|\n| 3                  | *Escudo Arcano, Destruição Colérica, Turvar, Destruição Radiante* |\n| 5                  | *Piscar, Arma Elemental*                                        |\n| 7                  | *Assassino Fantasmagórico, Destruição Atordoante*               |\n| 9                  | *Destruição Banidora, Cone de Frio*                             |"
+        },
+        {
+          "nivel": 3,
+          "nome": "Maldição da Lâmina Maldita",
+          "descricao": "Você ganha a habilidade de colocar uma maldição perniciosa em alguém. Como uma Ação Bônus, escolha uma criatura que você possa ver a até 9 metros de você. O alvo fica amaldiçoado por 1 minuto. A maldição termina antes se o alvo morrer, se você morrer ou se você ficar Incapacitado. Até a maldição terminar, você recebe os benefícios a seguir.\n- Você recebe um bônus nas jogadas de dano contra o alvo amaldiçoado. O bônus é igual ao seu Bônus de Proficiência.\n- Qualquer jogada de ataque que você fizer contra o alvo amaldiçoado é um Acerto Crítico com um resultado 19 ou 20 no d20.\n- Se o alvo amaldiçoado morrer, você recupera Pontos de Vida iguais ao seu nível de Bruxo mais seu modificador de Carisma (mínimo de 1 Ponto de Vida).\nVocê não pode usar esta característica novamente até completar um Descanso Curto ou Longo."
+        },
+        {
+          "nivel": 3,
+          "nome": "Guerreiro Maldito",
+          "descricao": "Você adquire o treinamento necessário para se armar efetivamente para a batalha. Você ganha proficiência com armaduras Médias, Escudos e armas Marciais.\nA influência do seu patrono também permite que você canalize sua vontade por meio de uma arma específica. Sempre que terminar um Descanso Longo, você pode tocar uma arma com a qual tenha proficiência e que não possua a propriedade Duas Mãos. Quando atacar com essa arma, você pode usar seu modificador de Carisma, em vez de Força ou Destreza, nas jogadas de ataque e de dano. Esse benefício dura até você terminar um Descanso Longo. Na ficha, escolha Carisma no seletor de atributo da arma tocada. Se você obtiver depois a característica Pacto da Lâmina, esse benefício se estende a todas as armas de pacto que você conjurar com essa característica, independentemente do tipo da arma."
+        },
+        {
+          "nivel": 6,
+          "nome": "Espectro Amaldiçoado",
+          "descricao": "Você pode amaldiçoar a alma de uma pessoa que mata, vinculando-a temporariamente ao seu serviço. Quando você mata um humanoide, pode fazer o espírito dele se levantar do cadáver como um Espectro, cujas estatísticas estão no Manual dos Monstros. Quando o Espectro aparece, ele recebe Pontos de Vida Temporários iguais à metade do seu nível de Bruxo. Role iniciativa para o Espectro, que tem seus próprios turnos. Ele obedece aos seus comandos verbais e recebe um bônus nas jogadas de ataque igual ao seu modificador de Carisma (mínimo de +0).\nO Espectro permanece a seu serviço até o final do seu próximo Descanso Longo, momento em que se dissipa para a vida após a morte.\nDepois de vincular um Espectro com esta característica, você não pode usá-la novamente até completar um Descanso Longo."
+        },
+        {
+          "nivel": 10,
+          "nome": "Armadura de Maldições",
+          "descricao": "Suas maldições ficam mais poderosas. Se o alvo amaldiçoado pela Maldição da Lâmina Maldita o atingir com uma jogada de ataque, você pode usar sua Reação para rolar 1d6. Com 4 ou mais, o ataque erra você instantaneamente, independentemente do resultado."
+        },
+        {
+          "nivel": 14,
+          "nome": "Mestre das Maldições",
+          "descricao": "Você pode espalhar a Maldição da Lâmina Maldita de uma criatura morta para outra criatura. Quando a criatura amaldiçoada pela Maldição da Lâmina Maldita morre, você pode aplicar a maldição a uma criatura diferente que possa ver a até 9 metros de você, desde que você não esteja Incapacitado. Quando aplica a maldição dessa maneira, você não recupera Pontos de Vida pela morte da criatura anteriormente amaldiçoada."
+        }
+      ]
+    }
+  ]
+}

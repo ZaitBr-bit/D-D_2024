@@ -1028,7 +1028,7 @@ const ESCRITAS_PERMITIDAS = new Set([
   // saíram no 3e (gasto e reset passaram por gastarDadosVida()/
   // restaurarTodosDadosVida(), em regras-multiclasse.js, que está em
   // ARQUIVOS_AUTORIZADOS); o da subida de nível saiu no sub-projeto 5.
-  'site/js/creator/wizard.js:443',     // grava dados_vida_total na criação de personagem -- de 442 pelo Renascido (import de regras-resistencias-especie acima)
+  'site/js/creator/wizard.js:444',     // grava dados_vida_total na criação de personagem -- de 443 pelo Warforged (import de regras-bonus-especie); de 442 pelo Renascido (import de regras-resistencias-especie acima)
   'site/js/store.js:390',  // dados_vida_total: 1  (template de criação) -- de 366 pelo relatório de importação (issue #145)
   'site/js/store.js:391',  // dados_vida_usados: 0 (template de criação) -- idem
 
@@ -1037,8 +1037,8 @@ const ESCRITAS_PERMITIDAS = new Set([
   // restaurarEspacosDePacto/restaurarEspacosDeConjuracao, em
   // sheet/reservas-espacos.js, agora ARQUIVOS_AUTORIZADOS). Sobra só a
   // CRIAÇÃO, que ainda inicializa o campo direto.
-  'site/js/creator/wizard.js:94',   // personagem.espacos_magia = {} na criação -- sub-projeto 5; de 93 pelo Renascido (import acima)
-  'site/js/creator/wizard.js:449',  // idem, grava a tabela da classe inicial -- sub-projeto 5; de 448 pelo Renascido
+  'site/js/creator/wizard.js:95',   // personagem.espacos_magia = {} na criação -- sub-projeto 5; de 94 pelo Warforged (import acima); de 93 pelo Renascido (import acima)
+  'site/js/creator/wizard.js:450',  // idem, grava a tabela da classe inicial -- sub-projeto 5; de 449 pelo Warforged; de 448 pelo Renascido
   // pages/sheet.js:100-158 era o reconciliador de render -- a Tarefa 4
   // removeu-o (deixando migrarEspacosMagia() no lugar, em
   // sheet/migracoes.js, ARQUIVOS_AUTORIZADOS) e as 9 entradas que
@@ -1052,7 +1052,7 @@ const ESCRITAS_PERMITIDAS = new Set([
   // de Fonte de Magia são efêmeros por natureza (concedidos e limpos a
   // cada Descanso Longo), e nenhuma tarefa do sub-projeto 4 lhes dá um
   // escritor único.
-  'site/js/sheet/hp-descanso.js:1035',      // char.espacos_magia_extras = {} (limpa no Longo) -- reapontado de 1033 pela Lâmina Cantante (import e gancho do Descanso Curto acima); de 1032 pelo Plano 5 (import de elixiresDoDescanso); de 1031 pelo Plano 3 (import de abrirCriarItensReplicados); número reapontado pela extração de quebrarConcentracaoAtiva (issue #94, Fase 4), que empurrou o arquivo 16 linhas; era 1007; reapontado de 1024 pelo Plano 4 (imports e chamadas de recursos de itens acima); de 1028 pelo Artífice (imports e gancho do Descanso Curto acima)
+  'site/js/sheet/hp-descanso.js:1039',      // char.espacos_magia_extras = {} (limpa no Longo) -- reapontado de 1035 pela Lâmina Maldita (import e ganchos dos descansos acima); de 1033 pela Lâmina Cantante (import e gancho do Descanso Curto acima); de 1032 pelo Plano 5 (import de elixiresDoDescanso); de 1031 pelo Plano 3 (import de abrirCriarItensReplicados); número reapontado pela extração de quebrarConcentracaoAtiva (issue #94, Fase 4), que empurrou o arquivo 16 linhas; era 1007; reapontado de 1024 pelo Plano 4 (imports e chamadas de recursos de itens acima); de 1028 pelo Artífice (imports e gancho do Descanso Curto acima)
   'site/js/sheet/habilidades.js:990',       // if (!extras) extras = {}  (Fonte de Magia) -- número reapontado pela correção do issue #91 (handlers de Revelação Celestial acrescentados acima); era 923; de 964 pelo Artífice (import acima); de 965 pelo Renascido (handler de Vida Passada acima); de 986 pelo familiar, de 987 pela Forma Selvagem e de 989 pelo Necromante (imports acima)
   'site/js/sheet/habilidades.js:991',       // extras[c] = (extras[c] || 0) + 1  (Fonte de Magia) -- idem
   // habilidades.js: Resplendor Sagrado (Paladino/Devoção), Fonte de Magia

@@ -24,6 +24,7 @@ import { nivelNa } from '../regras-multiclasse.js';
 import { renderFichaCompleta } from '../sheet/ficha.js';
 import { carregarCriaturasArtifice } from '../sheet/companheiros-artifice.js';
 import { carregarCriaturasFamiliar } from '../sheet/familiar.js';
+import { carregarCriaturasLaminaMaldita } from '../sheet/lamina-maldita.js';
 import { carregarDescricoesMagias } from '../sheet/impressao.js';
 import { migrarCopiasCustomizadasDoGrimorio, migrarEscolhasClasseLegadas, migrarEspacosMagia, migrarMagiaClasse, migrarMagiasCustomizadasSemprePreparadas, migrarMagiasDominio, migrarConcessoesSubclasseMago, migrarMagiasLegadoEspecie, migrarMagiasSemprePreparadas, migrarMulticlasse, migrarNomePericiaLidarAnimais, migrarPericiaEspecie, migrarPericiasEspecie, migrarPericiasTalentos, migrarProficienciasTalentos, migrarSlotsMagiaLivre, migrarTabelasItensMagicos, migrarTalentoVersatilHumano, migrarTruquesEspecie, migrarTruquesFixosSubclasse } from '../sheet/migracoes.js';
 import { baixarPdfFicha } from '../sheet/pdf.js';
@@ -115,6 +116,7 @@ export async function renderSheet(container, charId) {
   definirEspecies(await getEspecies());
   await carregarCriaturasArtifice();
   await carregarCriaturasFamiliar();
+  await carregarCriaturasLaminaMaldita();
 
   // Pré-carregar magias de domínio/sempre preparadas de TODAS as classes,
   // cada uma no nível DELA. Montar esses dois caches pelos espelhos (que

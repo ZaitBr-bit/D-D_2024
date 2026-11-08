@@ -1,0 +1,42 @@
+{
+  "total": 1,
+  "criaturas": [
+    {
+      "nome": "Espectro",
+      "nome_en": "Specter",
+      "fonte": "monstros",
+      "observacao": "Estatísticas escritas de memória, não conferidas no PDF (o Espectro comum não consta no Manual dos Monstros do projeto).",
+      "tipo_tamanho": "Morto-vivo Médio, Caótico e Mau",
+      "ca": "12",
+      "iniciativa": "+2 (12)",
+      "pv": "22 (5d8)",
+      "deslocamento": "1,5 m, Voo 15 m (pairar)",
+      "atributos": {
+        "For": { "valor": "1", "modificador": "-5", "salvaguarda": "-5" },
+        "Des": { "valor": "14", "modificador": "+2", "salvaguarda": "+2" },
+        "Con": { "valor": "11", "modificador": "+0", "salvaguarda": "+0" }
+      },
+      "pericias": "",
+      "sentidos": "Visão no Escuro 18 m, Percepção Passiva 10",
+      "idiomas": "Compreende o Comum mais um outro idioma, mas não consegue falar",
+      "nd": "1 (XP 200; BP +2)",
+      "tracos": [
+        {
+          "nome": "Movimento Incorpóreo",
+          "descricao": "O espectro pode se mover através de outras criaturas e objetos como se fossem Terreno Difícil. Ele sofre 5 (1d10) de dano de Força se terminar o turno dentro de um objeto."
+        },
+        {
+          "nome": "Sensibilidade à Luz Solar",
+          "descricao": "Sob a luz do sol, o espectro tem Desvantagem em testes de atributo e jogadas de ataque."
+        }
+      ],
+      "acoes": [
+        {
+          "nome": "Drenar Vida",
+          "descricao": "*Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 7 (2d6) Necrótico. O alvo deve ser bem-sucedido em uma salvaguarda de Constituição CD 10 ou seu máximo de Pontos de Vida diminui em uma quantidade igual ao dano sofrido. Essa redução dura até o alvo terminar um Descanso Longo. O alvo morre se essa redução levar seu máximo de Pontos de Vida a 0."
+        }
+      ],
+      "texto_completo": "## Espectro\n\n*Morto-vivo Médio, Caótico e Mau*\n\n**CA** 12\n\n**Iniciativa** +2 (12)\n\n**PV** 22 (5d8)\n\n**Deslocamento** 1,5 m, Voo 15 m (pairar)\n\n|         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |         |    | **Mod** | **SG** |\n|---------|----|---------|--------|---------|----|---------|--------|---------|----|---------|--------|\n| **For** | 1  | -5      | -5     | **Des** | 14 | +2      | +2     | **Con** | 11 | +0      | +0     |\n| **Int** | 10 | +0      | +0     | **Sab** | 10 | +0      | +0     | **Car** | 11 | +0      | +0     |\n\n**Resistências** Ácido, Contundente, Gélido, Ígneo, Elétrico, Perfurante, Cortante, Trovejante\n\n**Imunidades** Necrótico, Venenoso; Enfeitiçado, Exaustão, Imobilizado, Paralisado, Petrificado, Envenenado, Caído, Contido, Inconsciente\n\n**Sentidos** Visão no Escuro 18 m, Percepção Passiva 10\n\n**Idiomas** Compreende o Comum mais um outro idioma, mas não consegue falar\n\n**ND** 1 (XP 200; BP +2)\n\n### Traços\n\n**Movimento Incorpóreo.** O espectro pode se mover através de outras criaturas e objetos como se fossem Terreno Difícil. Ele sofre 5 (1d10) de dano de Força se terminar o turno dentro de um objeto.\n\n**Sensibilidade à Luz Solar.** Sob a luz do sol, o espectro tem Desvantagem em testes de atributo e jogadas de ataque.\n\n### Ações\n\n**Drenar Vida.** *Jogada de Ataque Corpo a Corpo:* +4 para acertar, alcance 1,5 m. *Dano:* 7 (2d6) Necrótico. O alvo deve ser bem-sucedido em uma salvaguarda de Constituição CD 10 ou seu máximo de Pontos de Vida diminui em uma quantidade igual ao dano sofrido. Essa redução dura até o alvo terminar um Descanso Longo. O alvo morre se essa redução levar seu máximo de Pontos de Vida a 0."
+    }
+  ]
+}

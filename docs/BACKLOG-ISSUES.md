@@ -135,7 +135,7 @@
 >
 > **Mais tarde em 2026-11-07**: Warforged entregue na 3.4.0 (junto com Magias de
 > Itens recolhível, ordem das Perícias e botão de novo personagem no topo da
-> lista). A **#26** fecha com o commit (`Closes #26`): 25 abertas. Última versão
+> lista). A **#26** fecha com o commit (`Closes #26`): 25 abertas. Depois disso a **#141** (Lâmina Maldita) também fecha com o commit (`Closes #141`): 24 abertas. Última versão
 > publicada: 3.4.0.
 
 ---
@@ -194,7 +194,7 @@ páginas. "No app" = já em `dados/`.
 |---|---|---|---|---|
 | #18 | Paladino, Juramento dos Gênios Nobres | Heroes of Faerûn | **Não** (livro fora dos PDFs) | Não |
 | #28 | Guerreiro, Cavaleiro do Eco | Explorer's Guide to Wildemount | **Não** (livro fora dos PDFs) | Não |
-| #141 | Bruxo, Lâmina Maldita | Guia de Xanathar, págs. 19–22 | **Sim** (PT-BR, 5e 2014) | Não |
+| #141 | Bruxo, Lâmina Maldita | Guia de Xanathar, págs. 19–22 | **Sim** (PT-BR, 5e 2014) | **Sim**, entregue (fecha com o commit) |
 | #109 | Guerreiro, Cavaleiro Rúnico e demais de Tasha's | Tasha's, págs. 60–62 (Rúnico) | **Sim** (PT-BR, 5e 2014) | Só Artífice e Mago (Lâmina Cantante) |
 | #139, #23, #26 | Warforged | Eberron: Forge of the Artificer, pág. 46 | **Sim** (5.5e, formato 2024) | **Sim, 3.4.0** |
 | #139 | Tabaxi, Tritão, Genasi, Minotauro, Goblin, Hobgoblin, Firbolg, Aarakocra | — | **Não** como espécie jogável | Não |
@@ -219,7 +219,6 @@ Wanderer, Spirit Medium).
 - [ ] **#28** — Subclasse Guerreiro do Eco (Wildemount, 5e 2014 — sem versão 2024). **PDFs (2026-11-07): não existe.** O Cavaleiro do Eco é do Explorer's Guide to Wildemount; nenhum dos 7 PDFs o traz.
 - [ ] **#109** (2026-09-22) — Conteúdo de "Tasha's Cauldron of Everything" (subclasses como Guerreiro Rúnico, talentos). O Artífice de Tasha's entrou na 3.2.0 (`dados/tasha/artifice/`) e, na 3.3.7, o Mago (Lâmina Cantante e 13 magias novas, `dados/tasha/mago/`); o resto do livro não. Três comentários apontam homebrew (#40, #38/#52). **PDFs (2026-11-07): existe.** O PDF de Tasha's (PT-BR) traz o Cavaleiro Rúnico (págs. 60 a 62 do PDF) e mais 15 subclasses que o app ainda não tem; lista na tabela abaixo.
 - [ ] **#139** (NOVA, 2026-10-10) — Mais espécies de suplementos (Tabaxi, Warforged, Tritão, Genasi, Minotauro, Goblin, Hobgoblin, Firbolg, Aarakocra...). Sobrepõe #23; hoje só o Renascido (Ravenloft) e o Warforged (Eberron, 3.4.0) vieram de fora do PHB. **PDFs (2026-11-07):** só o Warforged existe (Eberron, pág. 46 do PDF). Tabaxi, Tritão, Genasi, Minotauro, Goblin, Hobgoblin, Firbolg e Aarakocra não são espécies jogáveis em nenhum PDF (aparecem só como monstro ou citação).
-- [ ] **#141** (NOVA, 2026-10-14) — Subclasse de Bruxo Lâmina Maldita (Hexblade, Guia de Xanathar, 5e 2014 — sem versão 2024). O autor anexou prints e link para PDF do livro; não usar como fonte. Mesmo caso de #28. **PDFs (2026-11-07): existe.** O Guia de Xanathar (PDF em PT-BR) traz "O Lâmina Maldita" como patrono de Bruxo (págs. 19 a 22 do PDF). É texto de 5e 2014, a converter para os termos de 2024, como foi feito com a Lâmina Cantante.
 
 ### Fora do escopo atual
 
@@ -230,6 +229,8 @@ Wanderer, Spirit Medium).
 ---
 
 ## Notas de manutenção
+
+- **Fechada em 2026-11-08**: **#141**, `Closes #141` (versão e nota de versão ainda não definidas pelo dono). Patrono de Bruxo Lâmina Maldita (Hexblade) do Guia de Xanathar em `dados/xanathar/bruxo/subclasses_bruxo.json`, fonte "Suplemento 6", níveis 3/6/10/14 do app (o livro de 2014 dá no 1). Magias sempre preparadas (10 magias já existentes no app), Guerreiro Maldito (proficiências por `proficiencias_extra`, inclusive para quem cria o personagem em nível 3+ via `migracoes.js`), Maldição ativa com selo "+N amaldiçoado · crítico 19–20" nos ataques (o +N não entra no total de dano), Espectro Amaldiçoado com ficha técnica, Armadura de Maldições (d6) e Mestre das Maldições. Estado em `char.recursos.lamina_maldita`; regras em `site/js/regras-lamina-maldita.js` e tela em `site/js/sheet/lamina-maldita.js`. A Maldição encerra ao ficar Incapacitado, ao cair a 0 PV e nos descansos. **Atenção:** o Espectro simples (ND 1) não existe nos PDFs do projeto (o Monsters Manual traz só o Dread Specter); as estatísticas em `dados/xanathar/criaturas.json` vieram de memória e precisam de conferência no livro. Fora do escopo: as invocações do Xanathar's (Maldição Enlouquecedora e Maldição Incansável, entre outras). Testes: `regras-lamina-maldita.test.mjs`, `lamina-maldita-dados.test.mjs`, `lamina-maldita.spec.mjs` e `lamina-maldita-multiclasse.spec.mjs`. A suíte completa tem 3 specs que já falhavam antes (`druida-mapa-estelar-gratis`, `ilusionista-espectrais-gratis`, `guardiao-inimigo-favorito-gratis`).
 
 - **Fechada em 2026-11-07** (noite): **#26**, versão 3.4.0 (`Closes #26`). Espécie Warforged do Eberron: Forge of the Artificer (pág. 46 do PDF) em `dados/eberron/especies.json`, fonte "Suplemento 5", com +1 na CA (`bonusCADaEspecie`, `site/js/regras-bonus-especie.js`, somado em `calcCA`), Resistência a Venenoso (`resistenciasDaEspecie`), Vantagem contra Envenenado (`sheet/combate.js`) e escolha de perícia e ferramenta no criador (`ferramenta_especie`). Construto ficou só como texto. Não foi preciso trazer magias nem itens: o Servo Homúnculo e os 9 itens do Eberron já estavam em `dados/tasha/artifice/`. Pontos menores da revisão sem correção: o +1 de CA entra depois do piso da Pele-Casca (CA 12 vira 18, não 17); a ferramenta é escolhida antes do antecedente e, se ele der a mesma, a escolha se perde sem aviso; nenhum teste conclui o assistente inteiro com Warforged. Testes: `warforged.test.mjs` e `warforged.spec.mjs`.
 

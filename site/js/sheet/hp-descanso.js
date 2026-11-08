@@ -10,6 +10,7 @@ import { aplicarDescansoRecursos, aplicarRecuperacaoInformada, itensComRecuperac
 import { restaurarRecursosTalentos } from '../regras-cobertura.js';
 import { descansoCurtoArtifice, descansoLongoArtifice } from '../regras-artifice.js';
 import { descansoCancao } from '../regras-lamina-cantante.js';
+import { descansoCurtoLaminaMaldita, descansoLongoLaminaMaldita, encerrarMaldicaoSeIncapacitado } from '../regras-lamina-maldita.js';
 import { removerItensExpirados } from '../regras-itens-temporarios.js';
 import { elixiresDoDescanso } from '../regras-subclasses-artifice.js';
 import { gastarDadosVida, nivelNa, reservasDadosVida, restaurarTodosDadosVida, subclasseDe, temClasse } from '../regras-multiclasse.js';
@@ -373,6 +374,8 @@ export function setupEventosHP() {
         dano -= absorvido;
       }
       char.pv_atual = Math.max(0, char.pv_atual - dano);
+      // Cair a 0 PV encerra a Maldição da Lâmina Maldita.
+      encerrarMaldicaoSeIncapacitado(char);
       const estadoGuardiao = getEstadoRecursosGuardiao();
       if (estadoGuardiao?.predadorImplacavelAtivo && estadoGuardiao?.marcaPredadorAtiva && dano > 0) {
         toast('Predador Implacável: sua concentração de Marca do Caçador não é quebrada por dano.', 'info');
@@ -654,6 +657,7 @@ export function setupEventosDescanso() {
     aplicarDescansoRecursos(char, 'curto');
     descansoCurtoArtifice(char);
     descansoCancao(char);
+    descansoCurtoLaminaMaldita(char);
 
     // Bárbaro: recupera 1 uso de Fúria no descanso curto
     // temClasse: char.classe e a classe INICIAL -- um Ladino 5/Barbaro 5
@@ -1051,6 +1055,7 @@ export function setupEventosDescanso() {
     if (_expirados.length) toast(`Desapareceram: ${_expirados.join(', ')}`, 'info');
     descansoLongoArtifice(char);
     descansoCancao(char);
+    descansoLongoLaminaMaldita(char);
     // Alquimista: os elixires do descanso anterior já sumiram (removerItensExpirados, acima); nascem os novos.
     const _elixires = elixiresDoDescanso(char);
     if (_elixires.length) toast(`Elixires criados: ${_elixires.join(', ')}`, 'info');

@@ -5,7 +5,7 @@
 import { escHtml, fmtMod, toast } from '../utils.js';
 import { char, salvar } from './estado.js';
 import { renderFichaCompleta } from './ficha.js';
-import { calcularAtaqueItem, htmlSeloAtributoArma } from './ataque-calculo.js';
+import { calcularAtaqueItem, htmlSeloAtributoArma, htmlSeloMaldicao } from './ataque-calculo.js';
 import { ehArmaDeAtaque, ehItemDeMao, ehItemVersatilDeMao, maosOcupadas, maosEmUso, maosTotais, excedeMaos, avisoRecarga, danoVersatil, verificarEquipar } from '../regras-ataque.js';
 import { ehNecromante, estadoNecromante, livroEmpunhado, nivelDoMago } from '../regras-necromante.js';
 import { abrirDetalheLivro } from './necromante.js';
@@ -55,7 +55,7 @@ function htmlLinhaAtaque(item, idx) {
     <div style="flex:1;min-width:0;cursor:pointer" data-ataque-info="${idx}" title="Ver detalhes"><strong>${escHtml(item.nome)}</strong>
       ${profBadge}${magicoBadge}
       <span class="badge badge-secondary" style="font-size:0.65rem">Atq ${fmtMod(calc.bonusAtq)}</span>
-      ${htmlSeloAtributoArma(calc)}
+      ${htmlSeloAtributoArma(calc)}${htmlSeloMaldicao(calc)}
       <span class="badge" style="font-size:0.65rem">Dano ${escHtml(calc.danoExibicao)}</span>
       <span class="badge badge-secondary" style="font-size:0.65rem">${maos} ${maos === 1 ? 'mão' : 'mãos'}</span>
       <div style="font-size:0.75rem;color:var(--text-muted)">${escHtml(item.dados.propriedades || '')}</div></div>

@@ -8,6 +8,7 @@ import { modAtaqueArmaArtifice } from '../regras-artifice.js';
 import { efeitosDaArma } from '../regras-itens-magicos.js';
 import { ATRIBUTOS_MODIFICADOR, atributoPadraoArma, atributoExplicito, danoBaseEmpunhado, danoVersatil } from '../regras-ataque.js';
 import { bonusDanoCancaoVitoria } from '../regras-lamina-cantante.js';
+import { maldicaoAtiva, bonusDanoMaldicao } from '../regras-lamina-maldita.js';
 import { getEstadoFuria } from './classes/barbaro.js';
 import { sheetTemProfArma } from './condicoes.js';
 import { char, passivosTalentosCache } from './estado.js';
@@ -92,4 +93,13 @@ export function htmlSeloAtributoArma(calc) {
   const a = ATRIBUTOS_MODIFICADOR.find(x => x.id === calc?.atributo);
   if (!a) return '';
   return `<span class="badge badge-secondary" data-selo-atributo="${a.id}" title="Atributo do modificador: ${a.nome}" style="font-size:0.65rem">${a.sigla}</span>`;
+}
+
+/**
+ * Selo da Maldição da Lâmina Maldita: bônus de dano e crítico ampliado; vazio sem Maldição ativa.
+ * Só informa; o dano de calcularAtaqueItem não inclui o bônus.
+ */
+export function htmlSeloMaldicao(calc) {
+  if (!calc || !maldicaoAtiva(char)) return '';
+  return `<span class="badge badge-secondary" data-selo-maldicao title="Maldição da Lâmina Maldita" style="font-size:0.65rem">+${bonusDanoMaldicao(char)} amaldiçoado · crítico 19–20</span>`;
 }

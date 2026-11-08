@@ -56,6 +56,10 @@ const EXCECOES = {
     'Artífice: restaurado por descansoLongoArtifice (regras-artifice.js), chamada por hp-descanso.js no Descanso Longo.',
   armeiro_gastos:
     'Artífice (Armeiro): restaurado por descansoLongoArtifice (regras-artifice.js), chamada por hp-descanso.js no Descanso Longo.',
+  maldicao_usada:
+    'Lâmina Maldita: restaurado por descansoCurtoLaminaMaldita e descansoLongoLaminaMaldita (regras-lamina-maldita.js), chamadas por hp-descanso.js nos dois descansos.',
+  espectro_usado:
+    'Lâmina Maldita: restaurado por descansoLongoLaminaMaldita (regras-lamina-maldita.js), chamada por hp-descanso.js no Descanso Longo.',
 };
 
 function listarJs(dir) {

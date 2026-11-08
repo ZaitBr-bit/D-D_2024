@@ -262,22 +262,23 @@ export function migrarMagiasLegadoEspecie() {
 }
 
 /**
- * Aplica à ficha as concessões automáticas da subclasse do Mago até o nível
- * dela (Resistência Necrótica e Convocar Familiar do Necromante). Cobre quem
- * escolheu a subclasse no criador em nível 3+ e quem subiu antes de a tabela
- * existir. Idempotente: aplicar de novo não duplica nada.
+ * Aplica à ficha as concessões automáticas da subclasse (Mago e Bruxo) até o
+ * nível dela. Cobre quem escolheu a subclasse no criador em nível 3+ e quem
+ * subiu antes de a tabela existir. Idempotente: aplicar de novo não duplica nada.
  */
 export function migrarConcessoesSubclasseMago() {
-  if (!temClasse(char, 'Mago')) return;
-  const sub = subclasseDe(char, 'Mago');
-  const nivel = nivelNa(char, 'Mago');
-  if (!sub || nivel < 3) return;
   let alterado = false;
-  for (const linha of ESCOLHAS_SUBCLASSE_APP) {
-    if (linha.subclasse !== sub || linha.nivel > nivel || !linha.automatica) continue;
-    const antes = JSON.stringify([char.resistencias, char.grimorio]);
-    aplicarConcessaoAutomatica(char, linha, { classe: 'Mago' });
-    if (JSON.stringify([char.resistencias, char.grimorio]) !== antes) alterado = true;
+  for (const classe of ['Mago', 'Bruxo']) {
+    if (!temClasse(char, classe)) continue;
+    const sub = subclasseDe(char, classe);
+    const nivel = nivelNa(char, classe);
+    if (!sub || nivel < 3) continue;
+    for (const linha of ESCOLHAS_SUBCLASSE_APP) {
+      if (linha.subclasse !== sub || linha.nivel > nivel || !linha.automatica) continue;
+      const antes = JSON.stringify([char.resistencias, char.grimorio, char.proficiencias_extra, char.pericias_proficientes, char.proficiencias_ferramentas]);
+      aplicarConcessaoAutomatica(char, linha, { classe });
+      if (JSON.stringify([char.resistencias, char.grimorio, char.proficiencias_extra, char.pericias_proficientes, char.proficiencias_ferramentas]) !== antes) alterado = true;
+    }
   }
   if (alterado) salvar();
 }
