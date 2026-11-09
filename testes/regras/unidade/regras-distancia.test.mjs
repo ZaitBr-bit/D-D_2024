@@ -3,7 +3,7 @@
 // ============================================================
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { metrosParaQuadrados, comQuadrados, deslocamentoComQuadrados } from '../../../site/js/regras-distancia.js';
+import { metrosParaQuadrados, comQuadrados, deslocamentoComQuadrados, textoComQuadrados } from '../../../site/js/regras-distancia.js';
 
 test('metrosParaQuadrados converte e trata entrada inválida', () => {
   assert.equal(metrosParaQuadrados(9), 6);
@@ -60,4 +60,27 @@ test('deslocamentoComQuadrados é idempotente', () => {
     assert.equal(deslocamentoComQuadrados(uma), uma, entrada);
   }
   assert.equal(deslocamentoComQuadrados('9 m (6 q) · Voo 12 m (8 q)'), '9 m (6 q) · Voo 12 m (8 q)');
+});
+
+test('textoComQuadrados anota só múltiplos de 1,5 m e mantém a unidade escrita', () => {
+  const t = textoComQuadrados;
+  assert.equal(t('4,5 metros'), '4,5 metros (3 q)');
+  assert.equal(t('1,5 metro'), '1,5 metro (1 q)');
+  assert.equal(t('3 metros de distância'), '3 metros (2 q) de distância');
+  assert.equal(t('Cubo de 4,5 m'), 'Cubo de 4,5 m (3 q)');
+  assert.equal(t('de 1,5 a 6 metros'), 'de 1,5 a 6 metros (4 q)');
+  assert.equal(t(undefined), '');
+});
+
+test('textoComQuadrados ignora valores fora da grade, unidades compostas e outras palavras', () => {
+  for (const s of ['1 metro', '2 metros', '2,5 metros', '800 metros', '3.700 metros quadrados',
+    '9 metros cúbicos', '2,5 centímetros', '2 mãos', '2 mês', '0 metros']) {
+    assert.equal(textoComQuadrados(s), s, s);
+  }
+});
+
+test('textoComQuadrados é idempotente e preserva o markdown', () => {
+  const uma = textoComQuadrados('Cubo de 4,5 metros e **18 metros** | 3 m |');
+  assert.equal(uma, 'Cubo de 4,5 metros (3 q) e **18 metros (12 q)** | 3 m (2 q) |');
+  assert.equal(textoComQuadrados(uma), uma);
 });

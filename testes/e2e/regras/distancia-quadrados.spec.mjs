@@ -65,7 +65,7 @@ test('Detalhe da magia mostra o alcance em quadrados e a descrição não muda',
   await linha.locator('.magia-nome').first().click();
   await expect(linha.locator('.magia-desc .magia-meta')).toContainText('45 m (30 q)');
   const desc = linha.locator('.magia-desc');
-  await expect(desc).toContainText('Esfera de 6 metros de raio');
+  await expect(desc).toContainText('Esfera de 6 metros (4 q) de raio');
   await expect(desc).not.toContainText('6 m (4 q)');
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
@@ -96,7 +96,56 @@ test('Detalhe da magia no seletor do Pergaminho Mágico mostra o alcance em quad
   await page.locator('#pergaminho-cards .opcao-card[data-magia-pergaminho="Bola de Fogo"] .opcao-nome').click();
   const popup = page.locator('.sub-modal-overlay:has(.magia-meta)');
   await expect(popup).toContainText('45 m (30 q)');
-  await expect(popup).toContainText('Esfera de 6 metros de raio');
+  await expect(popup).toContainText('Esfera de 6 metros (4 q) de raio');
+  await expect(popup).not.toContainText('(4 q) (4 q)');
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});
+
+// ------------------------------------------------------------
+// Distâncias dentro do texto das magias: "4,5 metros" vira "4,5 metros (3 q)".
+// ------------------------------------------------------------
+const MAGO_TEXTO = {
+  ...MAGO_MAGIAS,
+  magias_preparadas: [
+    { nome: 'Onda Trovejante', circulo: 1, classe: 'Mago' },
+    { nome: 'Névoa Obscurecente', circulo: 1, classe: 'Mago' },
+    { nome: 'Disco Flutuante de Tenser', circulo: 1, classe: 'Mago' },
+  ],
+};
+
+test('Descrição da Onda Trovejante anota os quadrados uma única vez', async ({ context }) => {
+  const { page, erros } = await abrirFicha(context, MAGO_TEXTO, 'quadrados-texto-onda');
+  await assentar(page).catch(() => {});
+  await abrirBlocosMagias(page);
+  const linha = linhaMagia(page, 'Onda Trovejante');
+  await linha.locator('.magia-nome').first().click();
+  const desc = linha.locator('.magia-desc');
+  await expect(desc).toContainText('Cubo de 4,5 metros (3 q)');
+  await expect(desc).toContainText('empurrada a 3 metros (2 q) de distância');
+  await expect(desc).toContainText('audível a até 90 metros (60 q)');
+  await expect(desc).not.toContainText('(3 q) (3 q)');
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});
+
+test('Em Níveis Superiores da Névoa Obscurecente anota os quadrados', async ({ context }) => {
+  const { page, erros } = await abrirFicha(context, MAGO_TEXTO, 'quadrados-texto-upcast');
+  await assentar(page).catch(() => {});
+  await abrirBlocosMagias(page);
+  const linha = linhaMagia(page, 'Névoa Obscurecente');
+  await linha.locator('.magia-nome').first().click();
+  await expect(linha.locator('.magia-desc .info-box')).toContainText('aumenta em 6 metros (4 q) para cada círculo');
+  expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
+});
+
+test('Valores fora da grade na descrição ficam como no livro, sem "(0 q)"', async ({ context }) => {
+  const { page, erros } = await abrirFicha(context, MAGO_TEXTO, 'quadrados-texto-fora-grade');
+  await assentar(page).catch(() => {});
+  await abrirBlocosMagias(page);
+  const linha = linhaMagia(page, 'Disco Flutuante de Tenser');
+  await linha.locator('.magia-nome').first().click();
+  const desc = linha.locator('.magia-desc');
+  await expect(desc).toContainText('1 metro de diâmetro e 2,5 centímetros de altura');
+  await expect(desc).not.toContainText('1 metro (');
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
 

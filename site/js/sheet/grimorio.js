@@ -7,7 +7,7 @@
 // ============================================================
 import { getIndiceMagias, getMagiasClasse, getMagiasPorCirculo } from '../db.js';
 import { seloDaMagia } from '../fontes.js';
-import { comQuadrados } from '../regras-distancia.js';
+import { comQuadrados, textoComQuadrados } from '../regras-distancia.js';
 import { VALOR_EM_COBRE, formatarCarteira, podePagar, retirarValor } from '../moedas.js';
 import { abrirModal, escHtml, getBonusTruquesOrdem, getEspacosMagia, getLimitesMagias, magiaMagoEstaNoGrimorio, mdParaHtml, circuloSuperiorHtml, classesDaMagiaHtml, semAcento, toast } from '../utils.js';
 import { montarSeletor } from '../ui-opcoes.js';
@@ -1227,7 +1227,7 @@ export async function mostrarBuscaMagia() {
             <span>${escHtml(magia.componentes)}</span>
             <span>${escHtml(magia.duracao)}</span>
           </div>
-          <div class="md-content">${mdParaHtml(magia.descricao)}</div>
+          <div class="md-content">${mdParaHtml(textoComQuadrados(magia.descricao))}</div>
           ${magia.circulo_superior ? `<div class="info-box info mt-1"><div class="md-content">${circuloSuperiorHtml(magia.circulo_superior, circ)}</div></div>` : ''}
           ${classesDaMagiaHtml(magia.classes)}
         `;
@@ -2290,7 +2290,7 @@ export async function abrirPreenchimentoSlotMagia(tipo = 'magia') {
             <span>${magia.tempo_conjuracao}</span> <span>${escHtml(comQuadrados(magia.alcance))}</span>
             <span>${magia.componentes}</span> <span>${magia.duracao}</span>
           </div>
-          <div class="md-content">${mdParaHtml(magia.descricao)}</div>
+          <div class="md-content">${mdParaHtml(textoComQuadrados(magia.descricao))}</div>
           ${magia.circulo_superior ? `<div class="info-box info mt-1"><div class="md-content">${circuloSuperiorHtml(magia.circulo_superior, circ)}</div></div>` : ''}
           ${classesDaMagiaHtml(magia.classes)}
         `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');
@@ -2562,7 +2562,7 @@ export async function mostrarTrocaMagiaConhecida(callbackPosTroca = null, opcoes
             <span>${escHtml(magia.tempo_conjuracao)}</span> <span>${escHtml(comQuadrados(magia.alcance))}</span>
             <span>${escHtml(magia.componentes)}</span> <span>${escHtml(magia.duracao)}</span>
           </div>
-          <div class="md-content">${mdParaHtml(magia.descricao)}</div>
+          <div class="md-content">${mdParaHtml(textoComQuadrados(magia.descricao))}</div>
           ${magia.circulo_superior ? `<div class="info-box info mt-1"><div class="md-content">${circuloSuperiorHtml(magia.circulo_superior, circ)}</div></div>` : ''}
           ${classesDaMagiaHtml(magia.classes)}
         `, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');

@@ -373,7 +373,7 @@ test('clicar na magia personalizada abre a descrição dela, no endereço novo (
   await expect(descricao,
     'a descrição exibida tem de ser a da magia personalizada (lida de '
     + 'char.magias_customizadas), não ficar vazia')
-    .toContainText(DESCRICAO);
+    .toContainText(DESCRICAO.replace('3 metros', '3 metros (2 q)'));
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });

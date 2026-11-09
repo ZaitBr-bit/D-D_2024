@@ -4,7 +4,7 @@
 // ============================================================
 import { defesasDeItens, ROTULO_SENTIDO, sentidosDeItens, TIPOS_DANO } from '../regras-passivos-itens.js';
 import { getMagia } from '../db.js';
-import { comQuadrados } from '../regras-distancia.js';
+import { comQuadrados, textoComQuadrados } from '../regras-distancia.js';
 import { abrirModal, calcIntuicaoPassiva, escHtml, calcInvestigacaoPassiva, calcPercepcaoPassiva, mdParaHtml, toast } from '../utils.js';
 import { getEstadoFuria } from './classes/barbaro.js';
 import { getEstadoRecursosGuardiao } from './classes/guardiao.js';
@@ -410,7 +410,7 @@ async function abrirInfoEfeitoMagico(nomeBase) {
   try {
     const magia = await getMagia(nomeBase, ef.circulo ?? 0);
     if (magia?.descricao) {
-      partes.push(`<div class="md-content" style="margin-top:8px">${mdParaHtml(magia.descricao)}</div>`);
+      partes.push(`<div class="md-content" style="margin-top:8px">${mdParaHtml(textoComQuadrados(magia.descricao))}</div>`);
     }
   } catch (e) {
     // Sem o acervo da magia, o popup mantém só o efeito aplicado.

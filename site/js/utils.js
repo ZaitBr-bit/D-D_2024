@@ -17,6 +17,7 @@ import { bonusCADaEspecie } from './regras-bonus-especie.js';
 // dois importa utils.js. Ver o comentario de normalizarGrimorioMago abaixo
 // para o porque desta importacao (issue #62).
 import { preparadasPorClasse } from './regras-magia-classe.js';
+import { textoComQuadrados } from './regras-distancia.js';
 
 // --- Cálculos D&D ---
 
@@ -963,7 +964,7 @@ const ROTULO_CIRCULO_SUPERIOR = 'Usando um Espaço de Magia de Círculo Superior
  * @returns {string} HTML interno do bloco (vazio sem texto).
  */
 export function circuloSuperiorHtml(texto, circulo) {
-  const t = typeof texto === 'string' ? texto.trim() : '';
+  const t = typeof texto === 'string' ? textoComQuadrados(texto.trim()) : '';
   if (!t) return '';
   if (circulo === 0) return mdParaHtml(t);
   const resto = t.startsWith(ROTULO_CIRCULO_SUPERIOR) ? t.slice(ROTULO_CIRCULO_SUPERIOR.length).trim() : t;

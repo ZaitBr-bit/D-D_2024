@@ -5,7 +5,7 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { atributoEfetivo } from '../regras-atributos.js';
-import { comQuadrados } from '../regras-distancia.js';
+import { comQuadrados, textoComQuadrados } from '../regras-distancia.js';
 import { ATRIBUTO_NOME_PARA_KEY, CLASSES_CONJURADORAS, CLASSES_INFO } from '../dados-classes.js';
 import { getMagiasClasse, getMagiasPorCirculo } from '../db.js';
 import { consumirPergaminho, magiasDeItens, opcoesDeCusto, pagarConjuracao, rotuloConjuracao, rotuloCusto, situacaoConjuracao } from '../regras-magias-itens.js';
@@ -297,13 +297,13 @@ export function renderDetalhesMagiaPersonalizada(magia) {
     .filter(Boolean)
     .map(escHtml)
     .join(' | ');
-  const dano = magia.dano ? `<div style="margin-top:6px"><strong>Dano / efeito:</strong> ${mdParaHtml(magia.dano)}</div>` : '';
+  const dano = magia.dano ? `<div style="margin-top:6px"><strong>Dano / efeito:</strong> ${mdParaHtml(textoComQuadrados(magia.dano))}</div>` : '';
   const upcast = magia.circulo_superior
     ? `<div class="info-box info" style="margin-top:6px"><div class="md-content">${circuloSuperiorHtml(magia.circulo_superior, magia.circulo)}</div></div>`
     : '';
   return `
     ${meta ? `<div class="magia-meta" style="margin-bottom:4px">${meta}</div>` : ''}
-    ${magia.descricao ? `<div class="md-content">${mdParaHtml(magia.descricao)}</div>` : ''}
+    ${magia.descricao ? `<div class="md-content">${mdParaHtml(textoComQuadrados(magia.descricao))}</div>` : ''}
     ${dano}
     ${upcast}
     ${classesDaMagiaHtml(magia.classes)}
@@ -3243,7 +3243,7 @@ export function setupEventosEspacosMagia() {
               <span>${escHtml(comQuadrados(magia.alcance))}</span> | <span>${magia.componentes}</span> |
               <span>${magia.duracao}</span>
             </div>
-            <div class="md-content">${mdParaHtml(magia.descricao)}</div>
+            <div class="md-content">${mdParaHtml(textoComQuadrados(magia.descricao))}</div>
             ${magia.circulo_superior ? `<div class="info-box info" style="margin-top:4px"><div class="md-content">${circuloSuperiorHtml(magia.circulo_superior, circ)}</div></div>` : ''}
             ${classesDaMagiaHtml(magia.classes)}
           `;

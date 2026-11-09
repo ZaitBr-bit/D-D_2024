@@ -28,3 +28,17 @@ export function deslocamentoComQuadrados(texto) {
   if (!m) return comQuadrados(s);
   return `${comQuadrados(m[1])} · ${comQuadrados(m[2])}`;
 }
+
+// Distância em prosa: número (vírgula decimal, sem ponto de milhar) + unidade, fora de "metros quadrados/cúbicos" e já anotados.
+const RE_DISTANCIA_PROSA = /(?<![\d.,])(\d+(?:,\d+)?)(\s*(?:metros?|m))(?![\p{L}\p{N}_])(?!\s*\(\d+\s*q\))(?!\s+(?:quadrad|c[úu]bic))/gu;
+
+/** Acrescenta " (X q)" após cada distância em prosa múltipla de 1,5 m ("4,5 metros" vira "4,5 metros (3 q)"); outros valores ficam iguais. */
+export function textoComQuadrados(texto) {
+  const s = String(texto ?? '');
+  return s.replace(RE_DISTANCIA_PROSA, (todo, num, unidade) => {
+    const metros = parseFloat(num.replace(',', '.'));
+    const dobro = Math.round(metros * 2);
+    if (metros <= 0 || Math.abs(metros * 2 - dobro) > 1e-9 || dobro % 3 !== 0) return todo;
+    return `${num}${unidade} (${metrosParaQuadrados(metros)} q)`;
+  });
+}

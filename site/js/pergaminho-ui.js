@@ -4,7 +4,7 @@
 // Usada ao adicionar (itens-magicos-ui.js) e ao trocar (sheet/inventario.js).
 // ============================================================
 import { abrirModal, circuloSuperiorHtml, classesDaMagiaHtml, escHtml, mdParaHtml, semAcento, toast } from './utils.js';
-import { comQuadrados } from './regras-distancia.js';
+import { comQuadrados, textoComQuadrados } from './regras-distancia.js';
 import { getIndiceMagias, getMagiasPorCirculo } from './db.js';
 import { seloDaMagia } from './fontes.js';
 
@@ -67,7 +67,7 @@ async function abrirDetalhesMagiaPergaminho(nome, circulo) {
       <span>${escHtml(magia.componentes)}</span>
       <span>${escHtml(magia.duracao)}</span>
     </div>
-    <div class="md-content">${mdParaHtml(magia.descricao)}</div>
+    <div class="md-content">${mdParaHtml(textoComQuadrados(magia.descricao))}</div>
     ${magia.circulo_superior ? `<div class="info-box info mt-1"><div class="md-content">${circuloSuperiorHtml(magia.circulo_superior, circulo)}</div></div>` : ''}
     ${classesDaMagiaHtml(magia.classes)}`;
   abrirModal(magia.nome, detalhesHtml, '<button class="btn btn-primary" onclick="fecharModal()">Fechar</button>');

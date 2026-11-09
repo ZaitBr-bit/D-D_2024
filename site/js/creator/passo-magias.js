@@ -6,7 +6,7 @@ import { ATRIBUTOS_NOMES, CLASSES_INFO } from '../dados-classes.js';
 import { getClasse, getIndiceMagias, getMagiasClasse } from '../db.js';
 import { seloDaMagia } from '../fontes.js';
 import { abrirModal, escHtml, getBonusTruquesOrdem, getEspacosMagia, getMagiaPreparadas, getTruquesConhecidos, mdParaHtml, nomesMagiaCirculo1Conhecidas, circuloSuperiorHtml, classesDaMagiaHtml, semAcento, toast } from '../utils.js';
-import { comQuadrados } from '../regras-distancia.js';
+import { comQuadrados, textoComQuadrados } from '../regras-distancia.js';
 import { obterTruquesEspecie } from './comum.js';
 import { dadosCache, personagem } from './wizard.js';
 
@@ -632,7 +632,7 @@ async function mostrarDetalheMagia(nome, circulo) {
       <span>${magia.componentes}</span>
       <span>${magia.duracao}</span>
     </div>
-    <div class="md-content">${mdParaHtml(magia.descricao)}</div>
+    <div class="md-content">${mdParaHtml(textoComQuadrados(magia.descricao))}</div>
     ${magia.circulo_superior ? `<div class="info-box info mt-1">${circuloSuperiorHtml(magia.circulo_superior, circulo)}</div>` : ''}
     ${classesDaMagiaHtml(magia.classes)}
   `);

@@ -3,7 +3,7 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { atributoEfetivo } from '../regras-atributos.js';
-import { comQuadrados, deslocamentoComQuadrados } from '../regras-distancia.js';
+import { comQuadrados, textoComQuadrados, deslocamentoComQuadrados } from '../regras-distancia.js';
 import { textoCADaArmadura } from '../regras-ataque.js';
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, PERICIAS } from '../dados-classes.js';
 import { getMagiasPorCirculo } from '../db.js';
@@ -306,7 +306,7 @@ function htmlMagiaImpressao(nome, circulo, cacheMagias, origemExtra) {
   if (magia) {
     meta = [magia.escola, magia.tempo_conjuracao, comQuadrados(magia.alcance), magia.componentes, magia.duracao]
       .filter(Boolean).join(' | ');
-    desc = mdParaHtml(magia.descricao || '');
+    desc = mdParaHtml(textoComQuadrados(magia.descricao || ''));
     if (magia.circulo_superior) {
       upcast = `<div class="print-spell-upcast">${circuloSuperiorHtml(magia.circulo_superior, circulo)}</div>`;
     }
@@ -339,14 +339,14 @@ function htmlMagiaPersonalizadaImpressao(registro) {
     magia.ritual ? '<span style="font-weight:400;font-size:7pt;color:#666">(Ritual)</span>' : ''
   ].filter(Boolean).join(' ');
   const dano = magia.dano
-    ? `<div class="print-spell-desc"><strong>Dano / efeito:</strong> ${mdParaHtml(magia.dano)}</div>`
+    ? `<div class="print-spell-desc"><strong>Dano / efeito:</strong> ${mdParaHtml(textoComQuadrados(magia.dano))}</div>`
     : '';
 
   return `
     <div class="print-spell">
       <div class="print-spell-name">${escHtml(magia.nome)} ${badges}</div>
       ${meta ? `<div class="print-spell-meta">${meta}</div>` : ''}
-      ${magia.descricao ? `<div class="print-spell-desc"><div class="md-content">${mdParaHtml(magia.descricao)}</div></div>` : ''}
+      ${magia.descricao ? `<div class="print-spell-desc"><div class="md-content">${mdParaHtml(textoComQuadrados(magia.descricao))}</div></div>` : ''}
       ${dano}
     </div>`;
 }
@@ -905,7 +905,7 @@ export async function gerarHtmlImpressao() {
           <div class="print-spell">
             <div class="print-spell-name">${m.nome} <span style="font-weight:400;font-size:7pt;color:#666">(${circLabel})</span></div>
             ${m.escola ? `<div class="print-spell-meta">${m.escola}${m.tempo_conjuracao ? ' | ' + m.tempo_conjuracao : ''}${m.alcance ? ' | ' + escHtml(comQuadrados(m.alcance)) : ''}${m.duracao ? ' | ' + m.duracao : ''}</div>` : ''}
-            <div class="print-spell-desc"><div class="md-content">${mdParaHtml(m.descricao || '')}</div></div>
+            <div class="print-spell-desc"><div class="md-content">${mdParaHtml(textoComQuadrados(m.descricao || ''))}</div></div>
           </div>`;
       });
       pagMagias += `</div></div>`;

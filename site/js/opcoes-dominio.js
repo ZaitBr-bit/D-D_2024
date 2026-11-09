@@ -10,7 +10,7 @@ import { PERICIAS } from './dados-classes.js';
 import { talentoElegivelParaPersonagem } from './levelup.js';
 import { fonteDaMagia } from './db.js';
 import { escHtml, mdParaHtml, circuloSuperiorHtml, classesDaMagiaHtml } from './utils.js';
-import { comQuadrados } from './regras-distancia.js';
+import { comQuadrados, textoComQuadrados } from './regras-distancia.js';
 
 /**
  * Monta o carregador do detalhe de uma magia, para o card abrir sob demanda.
@@ -39,7 +39,7 @@ function _carregadorDetalheMagia(nome, circulo) {
     ].filter(Boolean).map(t => `<span>${escHtml(t)}</span>`).join('');
     return `
       <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:0.85rem;margin-bottom:8px">${meta}</div>
-      <div class="md-content">${mdParaHtml(magia.descricao || '')}</div>
+      <div class="md-content">${mdParaHtml(textoComQuadrados(magia.descricao || ''))}</div>
       ${magia.circulo_superior
         ? `<div class="info-box info mt-1">${circuloSuperiorHtml(magia.circulo_superior, circulo)}</div>`
         : ''}
@@ -165,7 +165,7 @@ export function deMagias(magias, ctx = {}) {
     // Descrição pronta quando a fonte a traz (circulo_N.json); senão, um
     // carregador que a busca no clique -- ver _carregadorDetalheMagia.
     detalhe: m.descricao
-      ? `<div class="md-content">${mdParaHtml(m.descricao)}</div>`
+      ? `<div class="md-content">${mdParaHtml(textoComQuadrados(m.descricao))}</div>`
       : _carregadorDetalheMagia(m.nome, m.circulo),
     tags: [],
     grupo: m.circulo === 0 ? 'Truques' : `${m.circulo}º Círculo`,
