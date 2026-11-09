@@ -27,6 +27,7 @@ import { collectOpcoes, validateAll } from './levelup-validations.js';
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, PERICIAS } from './dados-classes.js';
 import { getArmas, getClasse, getMagiasPorCirculo, getMagiasClasse, getMagiasRituais } from './db.js';
 import { abrirModal, fecharModal, toast, mdParaHtml, circuloSuperiorHtml, classesDaMagiaHtml, semAcento, calcMod, escHtml, getEspacosMagia, bonusProficiencia } from './utils.js';
+import { comQuadrados } from './regras-distancia.js';
 import { subirDeNivel, ganhoPvDoResultado, obterAtributosASITalento, getLimiteASITalento, obterTalentosElegiveis } from './levelup.js';
 import { abrirGridManobras } from './manobras-ui.js';
 // preparadasPorClasse (Tarefa 4 do sub-projeto "magia sabe a classe"): ver
@@ -1901,7 +1902,7 @@ function bindEventosMagias(ctx, state) {
             <div style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:8px;font-size:0.85rem">
               <span class="badge badge-primary">${circ === 0 ? 'Truque' : circ + 'º Círculo'}</span>
               <span class="badge badge-secondary">${magia.escola}</span>
-              <span>${magia.tempo_conjuracao}</span> <span>${magia.alcance}</span>
+              <span>${magia.tempo_conjuracao}</span> <span>${escHtml(comQuadrados(magia.alcance))}</span>
               <span>${magia.componentes}</span> <span>${magia.duracao}</span>
             </div>
             <div class="md-content">${mdParaHtml(magia.descricao)}</div>

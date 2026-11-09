@@ -5,6 +5,7 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { atributoEfetivo } from '../regras-atributos.js';
+import { comQuadrados } from '../regras-distancia.js';
 import { ATRIBUTO_NOME_PARA_KEY, CLASSES_CONJURADORAS, CLASSES_INFO } from '../dados-classes.js';
 import { getMagiasClasse, getMagiasPorCirculo } from '../db.js';
 import { consumirPergaminho, magiasDeItens, opcoesDeCusto, pagarConjuracao, rotuloConjuracao, rotuloCusto, situacaoConjuracao } from '../regras-magias-itens.js';
@@ -292,7 +293,7 @@ export function fundirTruquesComPersonalizados(conhecidos, personalizadas) {
 }
 
 export function renderDetalhesMagiaPersonalizada(magia) {
-  const meta = [magia.escola, magia.tempo_conjuracao, magia.alcance, magia.componentes, magia.duracao]
+  const meta = [magia.escola, magia.tempo_conjuracao, comQuadrados(magia.alcance), magia.componentes, magia.duracao]
     .filter(Boolean)
     .map(escHtml)
     .join(' | ');
@@ -368,7 +369,7 @@ function renderLinhaMagiaPersonalizada(magia, indice) {
   if (magia.alcance) {
     const alcance = String(magia.alcance);
     const alcanceNormalizado = alcance.toLowerCase();
-    const rotuloAlcance = alcanceNormalizado === 'pessoal' ? 'Pessoal' : alcanceNormalizado === 'toque' ? 'Toque' : alcance;
+    const rotuloAlcance = alcanceNormalizado === 'pessoal' ? 'Pessoal' : alcanceNormalizado === 'toque' ? 'Toque' : comQuadrados(alcance);
     tags.push(`<span class="magia-tag tag-alcance">${escHtml(rotuloAlcance)}</span>`);
   }
   const ritual = magia.ritual
@@ -691,7 +692,7 @@ export function badgesMagiaRapidos(nomeMagia) {
   // Alcance
   if (info.alcance) {
     const alc = info.alcance.toLowerCase();
-    let label = info.alcance;
+    let label = comQuadrados(info.alcance);
     if (alc === 'pessoal') label = 'Pessoal';
     else if (alc === 'toque') label = 'Toque';
     badges.push(`<span class="magia-tag tag-alcance">${label}</span>`);
@@ -3239,7 +3240,7 @@ export function setupEventosEspacosMagia() {
           descEl.innerHTML = `
             <div class="magia-meta" style="margin-bottom:4px">
               <span>${magia.escola}</span> | <span>${magia.tempo_conjuracao}</span> |
-              <span>${magia.alcance}</span> | <span>${magia.componentes}</span> |
+              <span>${escHtml(comQuadrados(magia.alcance))}</span> | <span>${magia.componentes}</span> |
               <span>${magia.duracao}</span>
             </div>
             <div class="md-content">${mdParaHtml(magia.descricao)}</div>

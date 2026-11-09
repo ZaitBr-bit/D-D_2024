@@ -8,6 +8,7 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { atributoEfetivo } from '../regras-atributos.js';
+import { comQuadrados } from '../regras-distancia.js';
 import { abrirModal, bonusProficiencia, calcMod, coletarCAsAlternativas, detectarRecarga, ehHabilidadeAtiva, equipamentoDeCA, escHtml, escolherCAAlternativa, fmtMod, getDeslocamento, mdParaHtml, semAcento, toast } from '../utils.js';
 import { featureConcedeUsoGratisSemEspaco } from '../levelup.js';
 import { contagemUsosGratisDaFeature, featureTemUsoGratisPorRecursoDedicado } from '../regras-usos-gratis-magia.js';
@@ -4626,7 +4627,7 @@ export function renderFeatureItem(f, source, ctx) {
       <div style="padding:4px 0 4px 16px;font-size:0.8rem">
         <div style="color:var(--accent);font-weight:600">Passiva</div>
         <div style="color:var(--text-muted);font-size:0.75rem;margin-top:2px">
-          Deslocamento de Escalada = Deslocamento normal (${formatarMetros(deslocAndarilhoNum)}m).<br>
+          Deslocamento de Escalada = Deslocamento normal (${comQuadrados(`${formatarMetros(deslocAndarilhoNum)} m`)}).<br>
           Saltos usam Destreza em vez de Força.
         </div>
       </div>
@@ -4750,10 +4751,10 @@ export function renderFeatureItem(f, source, ctx) {
     `;
     recarga = 'curto_ou_longo';
   } else if (ehAuraProtecaoPaladino && estadoPaladino && estadoPaladino.auraProtecaoAtiva) {
-    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">+${estadoPaladino.bonusAura} (${estadoPaladino.auraRaio}m)</span>`;
+    usosHtmlSummary = `<span style="font-size:0.7rem;font-weight:600;margin-left:auto">+${estadoPaladino.bonusAura} (${comQuadrados(`${estadoPaladino.auraRaio} m`)})</span>`;
     usosHtmlBody = `
       <div style="padding:4px 0 4px 16px;font-size:0.8rem;color:var(--text-muted)">
-        Bônus nas salvaguardas = mod Carisma (+${estadoPaladino.bonusAura}) para você e aliados em ${estadoPaladino.auraRaio}m.
+        Bônus nas salvaguardas = mod Carisma (+${estadoPaladino.bonusAura}) para você e aliados em ${comQuadrados(`${estadoPaladino.auraRaio} m`)}.
         ${estadoPaladino.auraCoragemAtiva ? ' Inclui imunidade a Amedrontado.' : ''}
       </div>
     `;

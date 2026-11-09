@@ -21,13 +21,13 @@ test('Paralisado marcado no gerenciador de condições zera o Deslocamento mostr
   const id = 'regras-issue94-deslocamento-paralisado';
   const { page, erros } = await abrirFicha(context, GUERREIRO_5, id);
 
-  await expect(statBoxDeslocamento(page).locator('.stat-value')).toHaveText('9metros');
+  await expect(statBoxDeslocamento(page).locator('.stat-value')).toHaveText('9metros · 6 q');
 
   await marcarCondicao(page, 'Paralisado');
 
   await expect(statBoxDeslocamento(page).locator('.stat-value'),
     'depois de marcar Paralisado no gerenciador, o Deslocamento mostrado tem de zerar')
-    .toHaveText('0metros');
+    .toHaveText('0metros · 0 q');
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
@@ -36,13 +36,13 @@ test('Contraste: Amedrontado marcado não muda o Deslocamento mostrado', async (
   const id = 'regras-issue94-deslocamento-amedrontado';
   const { page, erros } = await abrirFicha(context, GUERREIRO_5, id);
 
-  await expect(statBoxDeslocamento(page).locator('.stat-value')).toHaveText('9metros');
+  await expect(statBoxDeslocamento(page).locator('.stat-value')).toHaveText('9metros · 6 q');
 
   await marcarCondicao(page, 'Amedrontado');
 
   await expect(statBoxDeslocamento(page).locator('.stat-value'),
     'Amedrontado não está entre as condições que zeram Deslocamento -- o número não pode mudar')
-    .toHaveText('9metros');
+    .toHaveText('9metros · 6 q');
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });

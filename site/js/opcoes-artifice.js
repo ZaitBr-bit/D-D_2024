@@ -4,6 +4,7 @@
 // e armas/armaduras-base em opções de card (nome, resumo e detalhe).
 // ============================================================
 import { escHtml } from './utils.js';
+import { comQuadrados } from './regras-distancia.js';
 import { deMagias } from './opcoes-dominio.js';
 import { htmlCorpoItemMagico } from './itens-magicos-ui.js';
 
@@ -43,7 +44,7 @@ export function deMagiasArmazenar(magias) {
     return {
       ...o,
       resumo: [
-        m.circulo === 0 ? 'Truque' : `${m.circulo}º Círculo`, m.escola, m.tempo_conjuracao, m.alcance, m.componentes,
+        m.circulo === 0 ? 'Truque' : `${m.circulo}º Círculo`, m.escola, m.tempo_conjuracao, comQuadrados(m.alcance), m.componentes,
       ].filter(Boolean).join(' · '),
     };
   });

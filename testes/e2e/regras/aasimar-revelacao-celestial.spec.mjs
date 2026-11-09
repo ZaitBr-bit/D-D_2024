@@ -40,7 +40,7 @@ test('Revelação Celestial: clicar em Transformar escolhe Asas Celestiais, grav
 
   const conteudoComVoo = await page.evaluate(() => document.body.innerText);
   expect(conteudoComVoo, 'com Asas Celestiais ativa, o deslocamento de voo precisa aparecer na ficha')
-    .toMatch(/Voo 9m/);
+    .toMatch(/Voo 9 m \(6 q\)/);
 
   await page.click('[data-revelacao-encerrar="1"]');
   await assentar(page).catch(() => {});
@@ -51,7 +51,7 @@ test('Revelação Celestial: clicar em Transformar escolhe Asas Celestiais, grav
 
   const conteudoSemVoo = await page.evaluate(() => document.body.innerText);
   expect(conteudoSemVoo, 'depois de encerrar, o voo não pode continuar aparecendo')
-    .not.toMatch(/Voo 9m/);
+    .not.toMatch(/Voo 9 m \(6 q\)/);
 
   expect(erros, 'nenhum erro de console').toEqual([]);
 });

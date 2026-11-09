@@ -11,6 +11,7 @@
 import { char, salvar } from './estado.js';
 import { seloFonte, ligarSelosFonte } from '../fontes.js';
 import { abrirModal, calcMod, escHtml, semAcento, toast } from '../utils.js';
+import { comQuadrados } from '../regras-distancia.js';
 import { atributoEfetivo } from '../regras-atributos.js';
 import { nivelNa, subclasseDe } from '../regras-multiclasse.js';
 import { renderFichaCompleta } from './ficha.js';
@@ -252,7 +253,7 @@ export function renderSecaoFormaSelvagem() {
           <strong>${escHtml(forma.forma)}</strong>
           ${c ? `<span class="badge badge-secondary">${escHtml(c.tipo_tamanho)}</span>
           <span class="badge badge-secondary">CA ${caNaForma(c, subclasse, modSab)}</span>
-          <span class="badge badge-secondary">${escHtml(c.deslocamento || '')}</span>
+          <span class="badge badge-secondary">${escHtml(comQuadrados(c.deslocamento || ''))}</span>
           <span class="badge badge-secondary">ND ${escHtml(String(c.nd).split(' ')[0])}</span>` : ''}
           <span class="badge badge-secondary">PV temp. ${char.pv_temporario || 0}</span>
         </div>

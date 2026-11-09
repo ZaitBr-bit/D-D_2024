@@ -161,7 +161,7 @@ test('1.3 contraste: sem Exaustão a Natação fixa continua 12 m', async () => 
 test('1.4 Ladino 1 / Guardião 18 com Sentidos Selvagens mostra Visão às Cegas 9 m', async () => {
   await usar([{ classe: 'Ladino', nivel: 1 }, { classe: 'Guardião', nivel: 18 }]);
   const html = condicoes.renderSecaoSentidos();
-  assert.match(html, /<span class="pericia-bonus">9 m<\/span>\s*<span class="pericia-nome">Visão às Cegas<\/span>/);
+  assert.match(html, /<span class="pericia-bonus">9 m \(6 q\)<\/span>\s*<span class="pericia-nome">Visão às Cegas<\/span>/);
 });
 
 test('1.4 Guardião puro 18 mostra Visão às Cegas 9 m', async () => {

@@ -7,6 +7,7 @@ import { escHtml, toast, bonusProficiencia } from '../utils.js';
 import { getCriaturasArtifice } from '../db.js';
 import { nivelNa, nivelTotal } from '../regras-multiclasse.js';
 import { modInt } from '../regras-artifice.js';
+import { comQuadrados } from '../regras-distancia.js';
 import {
   companheirosDisponiveis, estadoCompanheiros, estatisticasCriatura, maxInstancias, criarCompanheiro,
   dispensarCompanheiro, ajustarPVCompanheiro, usarRepararDefensor, reviverDefensor, vagasCanhao,
@@ -42,7 +43,7 @@ function cartao(criatura, i, inst) {
         <span class="badge badge-secondary">CA ${est.ca}</span>
         <span class="badge badge-secondary">PV ${inst.pv_atual}/${est.pvMax}</span>
         ${destruido ? '<span class="badge badge-secondary" style="color:var(--danger,#c0392b)">Destruído</span>' : ''}
-        ${criatura.deslocamento ? `<span style="font-size:0.75rem;color:var(--text-muted)">${escHtml(criatura.deslocamento)}</span>` : ''}
+        ${criatura.deslocamento ? `<span style="font-size:0.75rem;color:var(--text-muted)">${escHtml(comQuadrados(criatura.deslocamento))}</span>` : ''}
       </div>
       <div style="font-size:0.8rem;margin-top:6px">${est.acoes.filter((a) => !a.nome.startsWith('Reparar')).map((a) => `<div><strong>${escHtml(a.nome)}.</strong> ${escHtml(a.texto)}</div>`).join('')}</div>
       ${(criatura.tracos || []).map((t) => `<div style="font-size:0.78rem;color:var(--text-muted)"><strong>${escHtml(t.nome)}.</strong> ${escHtml(t.descricao)}</div>`).join('')}

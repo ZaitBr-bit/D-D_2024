@@ -5,6 +5,7 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { atributoEfetivo } from '../../regras-atributos.js';
+import { comQuadrados } from '../../regras-distancia.js';
 import { getMagiasClasse, getTalentos } from '../../db.js';
 import { abrirModal, calcMod, escHtml, mdParaHtml, semAcento, toast } from '../../utils.js';
 import { char, indiceMagiasCache, salvar } from '../estado.js';
@@ -1196,9 +1197,9 @@ export function rotuloEfeitoInvocacaoTruque(nomeInv, truque) {
     const extra = 9 * (nivelNa(char, 'Bruxo') || 1);
     const info = (indiceMagiasCache || []).find((m) => m.nome === truque);
     const base = parseFloat(String(info?.alcance || '').replace(',', '.').match(/(\d+(?:\.\d+)?)\s*metros/i)?.[1]);
-    return Number.isFinite(base)
+    return comQuadrados(Number.isFinite(base)
       ? `Alcance ${String(base).replace('.', ',')} m → ${String(base + extra).replace('.', ',')} m`
-      : `Alcance +${extra} m`;
+      : `Alcance +${extra} m`);
   }
   return '';
 }

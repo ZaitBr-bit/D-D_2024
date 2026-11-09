@@ -68,8 +68,8 @@ test('1.3 ficha: Exaustão 2 com Anel de Natação (12 m) mostra Deslocamento 6 
   }, 'regras-plano9-exaustao-natacao');
   await assentar(page).catch(() => {});
   const box = page.locator('.stat-box', { hasText: 'Deslocamento' });
-  await expect(box.locator('.stat-value')).toHaveText('6metros');
-  await expect(box).toContainText('Natação 9m');
+  await expect(box.locator('.stat-value')).toHaveText('6metros · 4 q');
+  await expect(box).toContainText('Natação 9 m (6 q)');
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
 

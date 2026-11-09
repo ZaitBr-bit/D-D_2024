@@ -7,6 +7,7 @@ import { baixarArquivo, bonusProficiencia, calcBonusPericia, calcCA, calcIntuica
 import { forcaPrimordialAtiva, getDeslocamentoFinal, getModIniciativa, textoDadosExtrasIniciativa } from './combate.js';
 import { char, especiesCache, passivosTalentosCache } from './estado.js';
 import { classesDe } from '../regras-multiclasse.js';
+import { comQuadrados, deslocamentoComQuadrados } from '../regras-distancia.js';
 import { atributoEfetivo } from '../regras-atributos.js';
 import { ehProficienteEmSalvaguarda } from '../regras-salvaguardas.js';
 import { defesasDeItens, ROTULO_SENTIDO, sentidosDeItens } from '../regras-passivos-itens.js';
@@ -127,7 +128,7 @@ function _montarDadosCartao() {
     { label: 'CA', value: String(ca) },
     { label: 'PV', value: `${char.pv_atual ?? 0}/${char.pv_max ?? 0}` },
     { label: 'Iniciativa', value: `${fmtMod(ini.valor)}${textoDadosExtrasIniciativa(ini)}` },
-    { label: 'Deslocam.', value: desloc },
+    { label: 'Deslocam.', value: deslocamentoComQuadrados(desloc) },
     { label: 'Prof.', value: `+${prof}` },
   ];
   // pv_temporario, nao pv_temp: mesmo campo morto de impressao.js --
@@ -171,7 +172,7 @@ function _montarDadosCartao() {
     ['Percepção', calcPercepcaoPassiva(char)],
     ['Intuição', calcIntuicaoPassiva(char)],
     ['Investigação', calcInvestigacaoPassiva(char)],
-  ].map(([n, v]) => `${n} ${v}`).concat(sentidosDeAlcanceParaPdf(char, especiesCache));
+  ].map(([n, v]) => `${n} ${v}`).concat(sentidosDeAlcanceParaPdf(char, especiesCache).map(comQuadrados));
 
   // Defesas de itens mágicos ativos (4C): só o tipo, sem repetir os fixos.
   const dItens = defesasDeItens(char);

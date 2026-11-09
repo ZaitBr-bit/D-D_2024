@@ -271,16 +271,16 @@ function itemSintetico(nome, efeitos) {
 
 test('3.1 Guardião 6 + Manto da Arraia-Jamanta: uma só Natação (a maior) e nenhuma velocidade sob Contido', async ({ context }) => {
   const { page, erros } = await abrirFicha(context, classeUnica('Guardião', 6), 'regras-passivos-p8-31');
-  await expect(statDe(page, 'Deslocamento')).toContainText('Natação 12m');
+  await expect(statDe(page, 'Deslocamento')).toContainText('Natação 12 m (8 q)');
   await adicionarItemMagico(page, 'Manto da Arraia', 'Manto da Arraia-Jamanta');
   await equiparESintonizar(page, 'Manto da Arraia-Jamanta');
   const texto = await statDe(page, 'Deslocamento').innerText();
-  expect(texto).toContain('Natação 18m');
+  expect(texto).toContain('Natação 18 m (12 q)');
   expect(texto.match(/Natação/g) || [], `Natação repetida: ${texto}`).toHaveLength(1);
-  expect(texto).toContain('Escalada 12m');
+  expect(texto).toContain('Escalada 12 m (8 q)');
 
   await marcarCondicao(page, 'Contido');
-  await expect(statDe(page, 'Deslocamento').locator('.stat-value')).toHaveText('0metros');
+  await expect(statDe(page, 'Deslocamento').locator('.stat-value')).toHaveText('0metros · 0 q');
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
 
@@ -291,14 +291,14 @@ test('3.3 selos de Visão no Escuro: Óculos da Noite somam à base e o Cinturã
   await adicionarItemMagico(page, 'Óculos da Noite', 'Óculos da Noite');
   await equipar(page, 'Óculos da Noite');
   const seloOculos = linhaDe(page, 'Óculos da Noite').locator('[data-selo-efeito]', { hasText: 'Visão no Escuro' });
-  await expect(seloOculos).toContainText('+18 m (soma à base)');
+  await expect(seloOculos).toContainText('+18 m (12 q) (soma à base)');
   await expect(seloOculos).toHaveAttribute('data-selo-efeito', 'ativo');
 
   await adicionarItemMagico(page, 'Cinturão dos Anões', 'Cinturão dos Anões');
   await equiparESintonizar(page, 'Cinturão dos Anões');
   const seloCinturao = linhaDe(page, 'Cinturão dos Anões').locator('[data-selo-efeito]', { hasText: 'Visão no Escuro' });
   await expect(seloCinturao).toHaveAttribute('data-selo-efeito', 'inativo');
-  await expect(seloCinturao).toHaveAttribute('title', `sem efeito: sua base já é ${base} m`);
+  await expect(seloCinturao).toHaveAttribute('title', `sem efeito: sua base já é ${base} m (${Math.floor(base / 1.5)} q)`);
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });
 
@@ -343,19 +343,19 @@ test('3.6 Guardião 18 (Sentidos Selvagens) + Navalha Negra: empate em 9 m fica 
   const { page, erros } = await abrirFicha(context, guardiao, 'regras-passivos-p8-36a');
   const cegas = () => page.locator('.salva-item', { hasText: /Vis(ã|a)o (à|a)s Cegas/ });
   await expect(cegas()).toHaveCount(1);
-  await expect(cegas().locator('.pericia-bonus')).toHaveText('9 m');
+  await expect(cegas().locator('.pericia-bonus')).toHaveText('9 m (6 q)');
   await adicionarItemMagico(page, 'Navalha Negra', 'Navalha Negra', 'Espada Grande');
   await equiparESintonizar(page, 'Navalha Negra');
   // Item e Guardião em 9 m: uma só caixa, a do Guardião (sem origem de item no title).
   await expect(cegas()).toHaveCount(1);
-  await expect(cegas().locator('.pericia-bonus')).toHaveText('9 m');
+  await expect(cegas().locator('.pericia-bonus')).toHaveText('9 m (6 q)');
   await expect(cegas()).not.toHaveAttribute('title', /Navalha/);
 
   // Item com alcance maior que o do Guardião: aparece só a maior, com a origem do item.
   const maior = await abrirFicha(context, { ...guardiao, inventario: [itemSintetico('Lente Longa', [{ alvo: 'sentido', sentido: 'visao_as_cegas', metros: 18 }])] }, 'regras-passivos-p8-36b');
   const cegasMaior = maior.page.locator('.salva-item', { hasText: /Vis(ã|a)o (à|a)s Cegas/ });
   await expect(cegasMaior).toHaveCount(1);
-  await expect(cegasMaior.locator('.pericia-bonus')).toHaveText('18 m');
+  await expect(cegasMaior.locator('.pericia-bonus')).toHaveText('18 m (12 q)');
   await expect(cegasMaior).toHaveAttribute('title', 'Lente Longa');
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
   expect(maior.erros, `erros de console/página: ${maior.erros.join('; ')}`).toEqual([]);
@@ -368,8 +368,8 @@ test('3.2 PDF: o cartão traz os sentidos de espécie e de item (Visão no Escur
     const mod = await import(new URL('./js/sheet/pdf.js', location.href).href);
     return mod.montarDadosCartaoPdf().sentidos;
   });
-  expect(sentidos).toContain('Visão no Escuro 18 m');
-  expect(sentidos).toContain('Visão Verdadeira 36 m');
+  expect(sentidos).toContain('Visão no Escuro 18 m (12 q)');
+  expect(sentidos).toContain('Visão Verdadeira 36 m (24 q)');
   // O botão "Gerar PDF" produz o arquivo com esses textos sem erro.
   await assentar(page).catch(() => {});
   const espera = page.waitForEvent('download', { timeout: 60_000 });

@@ -4,6 +4,7 @@
 // ============================================================
 import { char, salvar } from './estado.js';
 import { escHtml, toast } from '../utils.js';
+import { comQuadrados } from '../regras-distancia.js';
 import { getCriaturasXanathar } from '../db.js';
 import { renderFichaCompleta } from './ficha.js';
 import { abrirPopupSobreposto, fichaTecnica } from './familiar.js';
@@ -75,7 +76,7 @@ function cardEspectro(c) {
       </div>
       <div style="font-size:0.8rem;margin-top:4px">PV temporários: ${pvTemporariosEspectro(char)}</div>
       <div style="font-size:0.8rem">${escHtml(c.acoes?.[0]?.nome || 'Ataque')}: +${base + car} para acertar (+${base} do bloco, +${car} de Carisma)</div>
-      <div style="font-size:0.75rem;color:var(--text-muted)">${escHtml(c.deslocamento || '')}. Tem turnos próprios, obedece a comandos verbais e dissipa no fim do próximo Descanso Longo.</div>
+      <div style="font-size:0.75rem;color:var(--text-muted)">${escHtml(comQuadrados(c.deslocamento || ''))}. Tem turnos próprios, obedece a comandos verbais e dissipa no fim do próximo Descanso Longo.</div>
       <div class="no-print" style="margin-top:6px">${botao('dispensar-espectro', 'Dispensar Espectro')}</div>
     </div>`;
 }

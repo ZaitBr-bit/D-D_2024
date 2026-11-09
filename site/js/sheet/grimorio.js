@@ -7,6 +7,7 @@
 // ============================================================
 import { getIndiceMagias, getMagiasClasse, getMagiasPorCirculo } from '../db.js';
 import { seloDaMagia } from '../fontes.js';
+import { comQuadrados } from '../regras-distancia.js';
 import { VALOR_EM_COBRE, formatarCarteira, podePagar, retirarValor } from '../moedas.js';
 import { abrirModal, escHtml, getBonusTruquesOrdem, getEspacosMagia, getLimitesMagias, magiaMagoEstaNoGrimorio, mdParaHtml, circuloSuperiorHtml, classesDaMagiaHtml, semAcento, toast } from '../utils.js';
 import { montarSeletor } from '../ui-opcoes.js';
@@ -1222,7 +1223,7 @@ export async function mostrarBuscaMagia() {
             <span class="badge badge-primary">${circ === 0 ? 'Truque' : circ + 'º Círculo'}</span>
             <span class="badge badge-secondary">${escHtml(magia.escola)}</span>
             <span>${escHtml(magia.tempo_conjuracao)}</span>
-            <span>${escHtml(magia.alcance)}</span>
+            <span>${escHtml(comQuadrados(magia.alcance))}</span>
             <span>${escHtml(magia.componentes)}</span>
             <span>${escHtml(magia.duracao)}</span>
           </div>
@@ -2286,7 +2287,7 @@ export async function abrirPreenchimentoSlotMagia(tipo = 'magia') {
           <div class="magia-meta" style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:8px;font-size:0.85rem">
             <span class="badge badge-primary">${circ}\u00ba Circulo</span>
             <span class="badge badge-secondary">${magia.escola}</span>
-            <span>${magia.tempo_conjuracao}</span> <span>${magia.alcance}</span>
+            <span>${magia.tempo_conjuracao}</span> <span>${escHtml(comQuadrados(magia.alcance))}</span>
             <span>${magia.componentes}</span> <span>${magia.duracao}</span>
           </div>
           <div class="md-content">${mdParaHtml(magia.descricao)}</div>
@@ -2558,7 +2559,7 @@ export async function mostrarTrocaMagiaConhecida(callbackPosTroca = null, opcoes
           <div class="magia-meta" style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:8px;font-size:0.85rem">
             <span class="badge badge-primary">${circ}\u00ba Circulo</span>
             <span class="badge badge-secondary">${escHtml(magia.escola)}</span>
-            <span>${escHtml(magia.tempo_conjuracao)}</span> <span>${escHtml(magia.alcance)}</span>
+            <span>${escHtml(magia.tempo_conjuracao)}</span> <span>${escHtml(comQuadrados(magia.alcance))}</span>
             <span>${escHtml(magia.componentes)}</span> <span>${escHtml(magia.duracao)}</span>
           </div>
           <div class="md-content">${mdParaHtml(magia.descricao)}</div>

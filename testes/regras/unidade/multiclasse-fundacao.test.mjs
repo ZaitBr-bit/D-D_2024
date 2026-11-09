@@ -1053,8 +1053,8 @@ const ESCRITAS_PERMITIDAS = new Set([
   // cada Descanso Longo), e nenhuma tarefa do sub-projeto 4 lhes dá um
   // escritor único.
   'site/js/sheet/hp-descanso.js:1039',      // char.espacos_magia_extras = {} (limpa no Longo) -- reapontado de 1035 pela Lâmina Maldita (import e ganchos dos descansos acima); de 1033 pela Lâmina Cantante (import e gancho do Descanso Curto acima); de 1032 pelo Plano 5 (import de elixiresDoDescanso); de 1031 pelo Plano 3 (import de abrirCriarItensReplicados); número reapontado pela extração de quebrarConcentracaoAtiva (issue #94, Fase 4), que empurrou o arquivo 16 linhas; era 1007; reapontado de 1024 pelo Plano 4 (imports e chamadas de recursos de itens acima); de 1028 pelo Artífice (imports e gancho do Descanso Curto acima)
-  'site/js/sheet/habilidades.js:990',       // if (!extras) extras = {}  (Fonte de Magia) -- número reapontado pela correção do issue #91 (handlers de Revelação Celestial acrescentados acima); era 923; de 964 pelo Artífice (import acima); de 965 pelo Renascido (handler de Vida Passada acima); de 986 pelo familiar, de 987 pela Forma Selvagem e de 989 pelo Necromante (imports acima)
-  'site/js/sheet/habilidades.js:991',       // extras[c] = (extras[c] || 0) + 1  (Fonte de Magia) -- idem
+  'site/js/sheet/habilidades.js:991',       // if (!extras) extras = {}  (Fonte de Magia) -- número reapontado pela correção do issue #91 (handlers de Revelação Celestial acrescentados acima); era 923; de 964 pelo Artífice (import acima); de 965 pelo Renascido (handler de Vida Passada acima); de 986 pelo familiar, de 987 pela Forma Selvagem e de 989 pelo Necromante e de 990 pelo comQuadrados (imports acima)
+  'site/js/sheet/habilidades.js:992',       // extras[c] = (extras[c] || 0) + 1  (Fonte de Magia) -- idem
   // habilidades.js: Resplendor Sagrado (Paladino/Devoção), Fonte de Magia
   // (Feiticeiro) e Recuperação Arcana (Mago) foram convertidos na Tarefa 4
   // (Ruling 11 do controlador) para gastarEspaco/recuperarUmEspaco/

@@ -14,6 +14,7 @@
 // ============================================================
 import { abrirModal, escHtml, mdParaHtml, semAcento } from '../utils.js';
 import { nivelNa, subclasseDe } from '../regras-multiclasse.js';
+import { comQuadrados } from '../regras-distancia.js';
 import { char, containerRef } from './estado.js';
 import { contextosDeClasse } from './contexto-classe.js';
 import { getEstadoFuria } from './classes/barbaro.js';
@@ -405,7 +406,7 @@ function gruposGuardiao(e) {
   const notas = [
     notaPassiva(e.predadorImplacavelAtivo, 'Predador Implacável: sofrer dano não quebra sua Concentração de Marca do Caçador.'),
     notaPassiva(e.cacadorPrecisoAtivo, 'Caçador Preciso: ataques contra alvo marcado têm vantagem.'),
-    notaPassiva(e.sentidosSelvagensAtivo, 'Sentidos Selvagens: Visão às Cegas 9 m.'),
+    notaPassiva(e.sentidosSelvagensAtivo, `Sentidos Selvagens: ${comQuadrados('Visão às Cegas 9 m')}.`),
   ].join('');
   return grupo('Recursos do Guardião:', chips, { notas });
 }
@@ -445,7 +446,7 @@ function gruposPaladino(e) {
     }) : '',
     e.auraProtecaoAtiva ? chip({
       id: 'paladino-aura', nome: 'Aura de Proteção', classe: 'Paladino',
-      estado: `+${e.bonusAura} Salvaguardas (${e.auraRaio}m)`, tom: 'ok',
+      estado: `+${e.bonusAura} Salvaguardas (${comQuadrados(`${e.auraRaio} m`)})`, tom: 'ok',
       caracteristica: ['Aura de Proteção'],
     }) : '',
   ];

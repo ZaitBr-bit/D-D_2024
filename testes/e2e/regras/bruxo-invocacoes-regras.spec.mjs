@@ -89,7 +89,7 @@ test('Explosão Agonizante e Lança Mística: a marca do truque traz os números
   const corpo = page.locator('body');
   await expect(corpo).toContainText(/[+−]\d+ ao dano \(modificador de Carisma\)/);
   await expect(corpo, 'alcance base + 9 m por nível de Bruxo (nível 5 = +45 m)')
-    .toContainText('Alcance 36 m → 81 m');
+    .toContainText('Alcance 36 m (24 q) → 81 m (54 q)');
 
   expect(erros, `erros de console/página: ${erros.join('; ')}`).toEqual([]);
 });

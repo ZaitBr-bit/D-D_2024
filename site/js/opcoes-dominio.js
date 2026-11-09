@@ -10,6 +10,7 @@ import { PERICIAS } from './dados-classes.js';
 import { talentoElegivelParaPersonagem } from './levelup.js';
 import { fonteDaMagia } from './db.js';
 import { escHtml, mdParaHtml, circuloSuperiorHtml, classesDaMagiaHtml } from './utils.js';
+import { comQuadrados } from './regras-distancia.js';
 
 /**
  * Monta o carregador do detalhe de uma magia, para o card abrir sob demanda.
@@ -33,7 +34,7 @@ function _carregadorDetalheMagia(nome, circulo) {
     if (!magia) return '';
     const meta = [
       circulo === 0 ? 'Truque' : `${circulo}º Círculo`,
-      magia.escola, magia.tempo_conjuracao, magia.alcance,
+      magia.escola, magia.tempo_conjuracao, comQuadrados(magia.alcance),
       magia.componentes, magia.duracao,
     ].filter(Boolean).map(t => `<span>${escHtml(t)}</span>`).join('');
     return `

@@ -4,6 +4,7 @@
 // ============================================================
 import { defesasDeItens, ROTULO_SENTIDO, sentidosDeItens, TIPOS_DANO } from '../regras-passivos-itens.js';
 import { getMagia } from '../db.js';
+import { comQuadrados } from '../regras-distancia.js';
 import { abrirModal, calcIntuicaoPassiva, escHtml, calcInvestigacaoPassiva, calcPercepcaoPassiva, mdParaHtml, toast } from '../utils.js';
 import { getEstadoFuria } from './classes/barbaro.js';
 import { getEstadoRecursosGuardiao } from './classes/guardiao.js';
@@ -364,19 +365,19 @@ export function renderSecaoSentidos() {
         </div>
         ${visaoEscuro ? `
         <div class="salva-item" style="justify-content:center;gap:8px"${origemVE ? ` title="${escHtml(origemVE)}"` : ''}>
-          <span class="pericia-bonus">${visaoEscuro}</span>
+          <span class="pericia-bonus">${comQuadrados(visaoEscuro)}</span>
           <span class="pericia-nome">Visão no Escuro</span>
         </div>
         ` : ''}
         ${sentidoExtra ? `
         <div class="salva-item" style="justify-content:center;gap:8px">
-          <span class="pericia-bonus">${sentidoExtra}</span>
+          <span class="pericia-bonus">${comQuadrados(sentidoExtra)}</span>
           <span class="pericia-nome">Visão às Cegas</span>
         </div>
         ` : ''}
         ${sentidosItemExtras.map(s => `
         <div class="salva-item" style="justify-content:center;gap:8px" title="${escHtml(s.origem)}">
-          <span class="pericia-bonus">${escHtml(String(s.metros))} m</span>
+          <span class="pericia-bonus">${comQuadrados(`${escHtml(String(s.metros))} m`)}</span>
           <span class="pericia-nome">${ROTULO_SENTIDO[s.sentido]}</span>
         </div>
         `).join('')}

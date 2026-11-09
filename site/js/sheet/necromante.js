@@ -9,6 +9,7 @@ import { renderFichaCompleta } from './ficha.js';
 import { abrirModalPVCriatura } from './pv-criatura.js';
 import { abrirPopupSobreposto, cardForma, criaturasApendice, fichaTecnica } from './familiar.js';
 import { estadoFamiliar } from '../regras-familiar.js';
+import { comQuadrados } from '../regras-distancia.js';
 import { gastarEspaco, reservasDeEspacos } from './reservas-espacos.js';
 import {
   MAGIAS_QUE_CRIAM_MORTOS_VIVOS, ajustarPVMortoVivo, colherMortoVivo, dadosDeExtinguir, dispensarMortoVivo, ehMagiaDeNecromancia,
@@ -38,8 +39,8 @@ export function renderSecaoMortosVivos() {
     const esp = m.espirito ? dadosDoEspirito(char, m.espirito.forma, m.espirito.circulo) : null;
     const tipo = esp ? 'Morto-vivo Médio' : (c ? String(c.tipo_tamanho || '').split(',')[0] : '');
     const detalhes = esp
-      ? [FORMAS_ESPIRITO[esp.forma].deslocamento, `${esp.ataques} ataque(s): ${esp.acao} ${esp.bonusAtaque >= 0 ? '+' : ''}${esp.bonusAtaque}, ${esp.dano} ${esp.tipoDano}`].map(escHtml).join(' · ')
-      : (c ? [c.deslocamento, c.nd ? `ND ${String(c.nd).split(' ')[0]}` : '', c.sentidos].filter(Boolean).map(escHtml).join(' · ') : '');
+      ? [comQuadrados(FORMAS_ESPIRITO[esp.forma].deslocamento), `${esp.ataques} ataque(s): ${esp.acao} ${esp.bonusAtaque >= 0 ? '+' : ''}${esp.bonusAtaque}, ${esp.dano} ${esp.tipoDano}`].map(escHtml).join(' · ')
+      : (c ? [comQuadrados(c.deslocamento), c.nd ? `ND ${String(c.nd).split(' ')[0]}` : '', comQuadrados(c.sentidos)].filter(Boolean).map(escHtml).join(' · ') : '');
     const temFicha = !!(c || esp);
     return `
     <div class="opcao-card" data-morto-vivo="${escHtml(m.id)}" data-morto-vivo-ficha="${escHtml(m.id)}" style="padding:8px 10px;margin-bottom:6px;cursor:${temFicha ? 'pointer' : 'default'}" ${temFicha ? 'title="Clique para ver a ficha técnica"' : ''}>
@@ -171,11 +172,11 @@ function htmlEstatisticasEspirito(forma, circulo, pvTexto) {
   const f = FORMAS_ESPIRITO[forma];
   return `
     <p style="font-size:0.8rem;color:var(--text-muted)">Morto-vivo Médio, Neutro · espaço de ${d.circulo}º círculo</p>
-    <p><strong>CA</strong> ${d.ca} · <strong>PV</strong> ${pvTexto} · <strong>Deslocamento</strong> ${escHtml(f.deslocamento)}</p>
+    <p><strong>CA</strong> ${d.ca} · <strong>PV</strong> ${pvTexto} · <strong>Deslocamento</strong> ${escHtml(comQuadrados(f.deslocamento))}</p>
     <p><strong>Atributos</strong> For 12 · Des 16 · Con 15 · Int 4 · Sab 10 · Car 9</p>
-    <p><strong>Imunidades</strong> Necrótico, Venenoso; Amedrontado, Envenenado, Exaustão, Paralisado · Visão no Escuro 18 m</p>
+    <p><strong>Imunidades</strong> Necrótico, Venenoso; Amedrontado, Envenenado, Exaustão, Paralisado · Visão no Escuro ${escHtml(comQuadrados('18 m'))}</p>
     <p><strong>Ataques Múltiplos.</strong> ${d.ataques} ataque(s) por Ação (metade do círculo, para baixo).</p>
-    <p><strong>${escHtml(d.acao)}.</strong> Ataque ${f.corpoACorpo ? 'corpo a corpo' : 'à distância'} ${d.bonusAtaque >= 0 ? '+' : ''}${d.bonusAtaque} (seu modificador de ataque mágico), alcance ${escHtml(f.alcance)}.
+    <p><strong>${escHtml(d.acao)}.</strong> Ataque ${f.corpoACorpo ? 'corpo a corpo' : 'à distância'} ${d.bonusAtaque >= 0 ? '+' : ''}${d.bonusAtaque} (seu modificador de ataque mágico), alcance ${escHtml(comQuadrados(f.alcance))}.
       Dano: ${escHtml(d.dano)} ${escHtml(d.tipoDano)}${f.extra ? `; ${escHtml(f.extra)}` : ''}.</p>
     <p>${escHtml(f.traco)}</p>
     <p style="font-size:0.8rem;color:var(--text-muted)">Aliado seu: usa a sua Iniciativa e age logo depois de você; obedece a comandos verbais (sem ação) ou Esquiva. Desaparece a 0 PV ou quando a magia termina (Concentração, até 1 hora).</p>`;
@@ -207,7 +208,7 @@ export function abrirRegistroEspirito(circulo, aoFim) {
         return `<div class="opcao-card ${nome === forma ? 'selecionada' : ''}" data-espirito-info="${escHtml(nome)}" style="cursor:pointer" title="Toque no card para ver os detalhes; o círculo seleciona">
           <span class="opcao-check" data-espirito-forma="${escHtml(nome)}"></span>
           <div class="opcao-nome">${escHtml(nome)}</div>
-          <div class="opcao-resumo">PV ${pvDoEspirito(nome, circulo) + fortitudeMortaViva(char)} · ${escHtml(f.deslocamento)}</div>
+          <div class="opcao-resumo">PV ${pvDoEspirito(nome, circulo) + fortitudeMortaViva(char)} · ${escHtml(comQuadrados(f.deslocamento))}</div>
           <div class="opcao-resumo">${escHtml(d.acao)}: ${escHtml(d.dano)} ${escHtml(d.tipoDano)}</div></div>`;
       }).join('')}</div>`;
     const botao = document.getElementById('btn-confirmar-espirito');

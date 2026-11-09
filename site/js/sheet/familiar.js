@@ -12,6 +12,7 @@ import { abrirModal, escHtml, mdParaHtml, semAcento, toast } from '../utils.js';
 import { getCriaturas } from '../db.js';
 import { ligarSelosFonte, seloFonte } from '../fontes.js';
 import { ehNecromante } from '../regras-necromante.js';
+import { comQuadrados } from '../regras-distancia.js';
 import { renderFichaCompleta } from './ficha.js';
 import { abrirModalPVCriatura } from './pv-criatura.js';
 import {
@@ -72,7 +73,7 @@ export function interceptarConvocarFamiliar(nome, rota, reabrir) {
 
 /** Linha de resumo de uma forma: tamanho, CA, PV e deslocamento. */
 export function resumoForma(c) {
-  return [tamanhoDaForma(c), `CA ${c.ca}`, `PV ${String(c.pv).split(' ')[0]}`, c.deslocamento].filter(Boolean).map(escHtml).join(' · ');
+  return [tamanhoDaForma(c), `CA ${c.ca}`, `PV ${String(c.pv).split(' ')[0]}`, comQuadrados(c.deslocamento)].filter(Boolean).map(escHtml).join(' · ');
 }
 
 /** Bloco de ficha técnica de uma criatura (o texto do apêndice, sem o título). */
@@ -251,7 +252,7 @@ export function renderSecaoFamiliar() {
           <span class="badge badge-secondary">${escHtml(tipoExibido(c, f.tipo, f.especial))}</span>
           <span class="badge badge-secondary">CA ${escHtml(c.ca)}</span>
           <span class="badge badge-secondary">PV ${f.pv_atual}/${f.pv_max}</span>
-          <span style="font-size:0.75rem;color:var(--text-muted)">${escHtml(c.deslocamento || '')}</span>
+          <span style="font-size:0.75rem;color:var(--text-muted)">${escHtml(comQuadrados(c.deslocamento || ''))}</span>
         </div>
         <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px">
           Conexão telepática a até 30 m; Ação Bônus para ver e ouvir pelo familiar. Não ataca.

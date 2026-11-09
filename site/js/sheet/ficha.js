@@ -11,6 +11,7 @@ import { seloFonte, ligarSelosFonte } from '../fontes.js';
 import { _renderSyncIndicadorHtml } from '../pages/sheet.js';
 import { atributoDefinidoPorItem, atributoEfetivo, textosAtributoPorItem } from '../regras-atributos.js';
 import { magiasDeItens } from '../regras-magias-itens.js';
+import { comQuadrados, metrosParaQuadrados } from '../regras-distancia.js';
 import { conjuraPorAlgumaClasse } from '../regras-multiclasse-conjuracao.js';
 import { armadurasDoPersonagem, armasDoPersonagem } from '../regras-multiclasse-proficiencias.js';
 import { classesDe, reservasDadosVida } from '../regras-multiclasse.js';
@@ -238,7 +239,7 @@ export function renderFichaCompleta() {
             </div>
             <div style="font-size:0.8rem;color:var(--text-muted)">Antecedente: ${escHtml(char.antecedente || '–')}${char.alinhamento ? ' | Alinhamento: ' + escHtml(char.alinhamento) : ''}</div>
             <div style="font-size:0.8rem;color:var(--text-muted)">Tamanho: ${escHtml(_tamanho)}${(char.idiomas && char.idiomas.length) ? ' | Idiomas: ' + char.idiomas.map(escHtml).join(', ') : ''}</div>
-            ${(estadoGuardiao && estadoGuardiao.sentidosSelvagensAtivo) ? '<div style="font-size:0.8rem;color:var(--text-muted)">Sentidos: Visão às Cegas 9 m</div>' : ''}
+            ${(estadoGuardiao && estadoGuardiao.sentidosSelvagensAtivo) ? `<div style="font-size:0.8rem;color:var(--text-muted)">Sentidos: ${comQuadrados('Visão às Cegas 9 m')}</div>` : ''}
             ${(estadoGuardiao && estadoGuardiao.exaustao > 0) ? `<div style="font-size:0.8rem;color:var(--danger)">Exaustão: ${estadoGuardiao.exaustao}</div>` : ''}
             <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px">
               XP: <span style="font-weight:600;color:var(--accent);cursor:pointer" id="xp-display" title="Clique para editar XP">${char.xp || 0}</span>
@@ -276,8 +277,8 @@ export function renderFichaCompleta() {
         </div>
         <div class="stat-box" ${_deslSobrecarga ? 'style="cursor:pointer;position:relative" onclick="window.avisarSobrecargaDeslocamento()"' : ''}>
           <div class="stat-label">Deslocamento</div>
-          <div class="stat-value">${_deslNumero}<br><span class="stat-unit">metros</span></div>
-          ${_deslExtra ? `<div style="font-size:0.6rem;color:var(--text-muted)">${_deslExtra}</div>` : ''}
+          <div class="stat-value">${_deslNumero}<br><span class="stat-unit">metros · ${metrosParaQuadrados(parseFloat(String(_deslNumero).replace(',', '.')))} q</span></div>
+          ${_deslExtra ? `<div style="font-size:0.6rem;color:var(--text-muted)">${comQuadrados(_deslExtra)}</div>` : ''}
           ${chipsEfeitosMagicos((ef) => ef.tipo === 'deslocamento')}
           ${_deslSobrecarga ? '<div class="no-print" style="position:absolute;bottom:2px;left:0;right:0;font-size:0.55rem;color:var(--danger);font-weight:700">&#9888; Sobrecarga</div>' : ''}
         </div>

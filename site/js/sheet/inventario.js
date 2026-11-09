@@ -5,6 +5,7 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { atributoEfetivo } from '../regras-atributos.js';
+import { comQuadrados } from '../regras-distancia.js';
 import { DENOMINACOES, ICONE_MOEDA, NOMES_MOEDA, adicionarMoeda, converterParaMaior, converterParaMenor, htmlCarteira, proximaDenominacaoMaior, proximaDenominacaoMenor, removerQuantidadeMoeda, taxasSaoPadrao } from '../moedas.js';
 import { carregarComprarAtivoPadrao, resetarTaxasMoeda, salvarComprarAtivoPadrao, salvarTaxasMoeda } from '../store.js';
 import { abrirModal, escHtml, fmtMod, fmtPeso, gerarId, getCapacidadeCarga, getPesoTotalInventario, inserirNoInicio, localDoItem, mdParaHtml, moverParaInicio, semAcento, toast } from '../utils.js';
@@ -376,7 +377,7 @@ function renderSheetInvItem(item, idx) {
     if (item.dados.raridade) magicoBadges += `<span class="badge" style="font-size:0.6rem;background:#f3e5f5;color:#6a1b9a;border:1px solid #ce93d8">${escHtml(item.dados.raridade)}</span> `;
     if (item.dados.requer_sintonizacao) magicoBadges += `<span class="badge" style="font-size:0.6rem;background:#e0f2f1;color:#00695c;border:1px solid #80cbc4">Sintonização</span> `;
     for (const s of selosDeEfeitos(item, char, { visaoNoEscuroBase: visaoNoEscuroDaEspecie(char, especiesCache) })) {
-      magicoBadges += `<span class="badge badge-secondary" data-selo-efeito="${s.ativo ? 'ativo' : 'inativo'}" title="${escHtml(s.motivo)}" style="font-size:0.6rem${s.ativo ? '' : ';opacity:0.5'}">${escHtml(s.texto)}</span> `;
+      magicoBadges += `<span class="badge badge-secondary" data-selo-efeito="${s.ativo ? 'ativo' : 'inativo'}" title="${escHtml(comQuadrados(s.motivo))}" style="font-size:0.6rem${s.ativo ? '' : ';opacity:0.5'}">${escHtml(comQuadrados(s.texto))}</span> `;
     }
   }
 

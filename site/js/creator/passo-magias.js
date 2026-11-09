@@ -5,7 +5,8 @@
 import { ATRIBUTOS_NOMES, CLASSES_INFO } from '../dados-classes.js';
 import { getClasse, getIndiceMagias, getMagiasClasse } from '../db.js';
 import { seloDaMagia } from '../fontes.js';
-import { abrirModal, getBonusTruquesOrdem, getEspacosMagia, getMagiaPreparadas, getTruquesConhecidos, mdParaHtml, nomesMagiaCirculo1Conhecidas, circuloSuperiorHtml, classesDaMagiaHtml, semAcento, toast } from '../utils.js';
+import { abrirModal, escHtml, getBonusTruquesOrdem, getEspacosMagia, getMagiaPreparadas, getTruquesConhecidos, mdParaHtml, nomesMagiaCirculo1Conhecidas, circuloSuperiorHtml, classesDaMagiaHtml, semAcento, toast } from '../utils.js';
+import { comQuadrados } from '../regras-distancia.js';
 import { obterTruquesEspecie } from './comum.js';
 import { dadosCache, personagem } from './wizard.js';
 
@@ -627,7 +628,7 @@ async function mostrarDetalheMagia(nome, circulo) {
       <span class="badge badge-primary">${circulo === 0 ? 'Truque' : circulo + 'º Círculo'}</span>
       <span class="badge badge-secondary">${magia.escola}</span>
       <span>${magia.tempo_conjuracao}</span>
-      <span>${magia.alcance}</span>
+      <span>${escHtml(comQuadrados(magia.alcance))}</span>
       <span>${magia.componentes}</span>
       <span>${magia.duracao}</span>
     </div>

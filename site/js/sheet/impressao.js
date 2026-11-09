@@ -3,6 +3,7 @@
 // Extraido de site/js/pages/sheet.js sem alteracao de comportamento.
 // ============================================================
 import { atributoEfetivo } from '../regras-atributos.js';
+import { comQuadrados, deslocamentoComQuadrados } from '../regras-distancia.js';
 import { textoCADaArmadura } from '../regras-ataque.js';
 import { ATRIBUTOS_KEYS, ATRIBUTOS_NOMES, PERICIAS } from '../dados-classes.js';
 import { getMagiasPorCirculo } from '../db.js';
@@ -191,7 +192,7 @@ function _montarEfeitoDetalheItem(item) {
  */
 function _textosDeEfeitosAtivos(item) {
   return selosDeEfeitos(item, char, { visaoNoEscuroBase: visaoNoEscuroDaEspecie(char, especiesCache) })
-    .filter(s => s.ativo).map(s => s.texto);
+    .filter(s => s.ativo).map(s => comQuadrados(s.texto));
 }
 
 /** Nome do item na impressão, com "(destruído)" quando o item foi destruído. */
@@ -303,14 +304,14 @@ function htmlMagiaImpressao(nome, circulo, cacheMagias, origemExtra) {
   let upcast = '';
 
   if (magia) {
-    meta = [magia.escola, magia.tempo_conjuracao, magia.alcance, magia.componentes, magia.duracao]
+    meta = [magia.escola, magia.tempo_conjuracao, comQuadrados(magia.alcance), magia.componentes, magia.duracao]
       .filter(Boolean).join(' | ');
     desc = mdParaHtml(magia.descricao || '');
     if (magia.circulo_superior) {
       upcast = `<div class="print-spell-upcast">${circuloSuperiorHtml(magia.circulo_superior, circulo)}</div>`;
     }
   } else if (infoIdx) {
-    meta = [infoIdx.escola, infoIdx.tempo_conjuracao, infoIdx.alcance, infoIdx.duracao]
+    meta = [infoIdx.escola, infoIdx.tempo_conjuracao, comQuadrados(infoIdx.alcance), infoIdx.duracao]
       .filter(Boolean).join(' | ');
   }
 
@@ -329,7 +330,7 @@ function htmlMagiaImpressao(nome, circulo, cacheMagias, origemExtra) {
 
 function htmlMagiaPersonalizadaImpressao(registro) {
   const magia = normalizarMagiaPersonalizada(registro);
-  const meta = [magia.escola, magia.tempo_conjuracao, magia.alcance, magia.componentes, magia.duracao]
+  const meta = [magia.escola, magia.tempo_conjuracao, comQuadrados(magia.alcance), magia.componentes, magia.duracao]
     .filter(Boolean)
     .map(escHtml)
     .join(' | ');
@@ -452,7 +453,7 @@ export async function gerarHtmlImpressao() {
   let statsHtml = `
     <div class="print-stat-box"><div class="print-stat-label">CA</div><div class="print-stat-value">${ca}</div></div>
     <div class="print-stat-box"><div class="print-stat-label">Iniciativa</div><div class="print-stat-value">${fmtMod(iniciativa.valor)}${escHtml(textoDadosExtrasIniciativa(iniciativa))}</div></div>
-    <div class="print-stat-box"><div class="print-stat-label">Deslocamento</div><div class="print-stat-value">${_deslocamento}</div></div>
+    <div class="print-stat-box"><div class="print-stat-label">Deslocamento</div><div class="print-stat-value">${deslocamentoComQuadrados(_deslocamento)}</div></div>
     <div class="print-stat-box"><div class="print-stat-label">Ataques</div><div class="print-stat-value">${ataquesPorAcao}</div></div>
     <div class="print-stat-box"><div class="print-stat-label">Proficiência</div><div class="print-stat-value">+${prof}</div></div>
   `;
@@ -568,8 +569,8 @@ export async function gerarHtmlImpressao() {
         <div class="print-sense-item"><div class="print-sense-value">${percepcao}</div><div class="print-sense-label">Percepção</div></div>
         <div class="print-sense-item"><div class="print-sense-value">${intuicao}</div><div class="print-sense-label">Intuição</div></div>
         <div class="print-sense-item"><div class="print-sense-value">${investigacao}</div><div class="print-sense-label">Investigação</div></div>
-        ${visaoEscuro ? `<div class="print-sense-item"><div class="print-sense-value">${visaoEscuro}</div><div class="print-sense-label">Visão no Escuro</div></div>` : ''}
-        ${sentidosItemExtras.map(x => `<div class="print-sense-item"><div class="print-sense-value">${escHtml(String(x.metros))} m</div><div class="print-sense-label">${ROTULO_SENTIDO[x.sentido]}</div></div>`).join('')}
+        ${visaoEscuro ? `<div class="print-sense-item"><div class="print-sense-value">${comQuadrados(visaoEscuro)}</div><div class="print-sense-label">Visão no Escuro</div></div>` : ''}
+        ${sentidosItemExtras.map(x => `<div class="print-sense-item"><div class="print-sense-value">${comQuadrados(`${escHtml(String(x.metros))} m`)}</div><div class="print-sense-label">${ROTULO_SENTIDO[x.sentido]}</div></div>`).join('')}
       </div>
     </div>
   `;
@@ -903,7 +904,7 @@ export async function gerarHtmlImpressao() {
         pagMagias += `
           <div class="print-spell">
             <div class="print-spell-name">${m.nome} <span style="font-weight:400;font-size:7pt;color:#666">(${circLabel})</span></div>
-            ${m.escola ? `<div class="print-spell-meta">${m.escola}${m.tempo_conjuracao ? ' | ' + m.tempo_conjuracao : ''}${m.alcance ? ' | ' + m.alcance : ''}${m.duracao ? ' | ' + m.duracao : ''}</div>` : ''}
+            ${m.escola ? `<div class="print-spell-meta">${m.escola}${m.tempo_conjuracao ? ' | ' + m.tempo_conjuracao : ''}${m.alcance ? ' | ' + escHtml(comQuadrados(m.alcance)) : ''}${m.duracao ? ' | ' + m.duracao : ''}</div>` : ''}
             <div class="print-spell-desc"><div class="md-content">${mdParaHtml(m.descricao || '')}</div></div>
           </div>`;
       });
